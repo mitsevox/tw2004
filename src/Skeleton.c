@@ -382,14 +382,11 @@ void fn_8002787C(CharModel* pModel) {
     Skeleton* pSkel = pModel->pSkel;
     f32 qRot[4];
 
-    if (pSkel != NULL && lbl_802810A6 != 0) {
-        if (pSkel->fIKWeight <= 0.0f) {
-            return;
-        }
-        if (pSkel->n10E4 != 0) {
-            fn_80008FCC(pSkel->q10D4, pSkel->p20[fn_8001EEE4(pModel, 0x11)], qRot);
-            fn_8001E85C(qRot, pModel->pSkel->p20[fn_8001EEE4(pModel, 0x11)]);
-        }
+    if (pSkel == NULL) return;
+    if (lbl_802810A6 == 0 || pSkel->fIKWeight <= 0.0f) return;
+    if (pSkel->n10E4 != 0) {
+        fn_80008FCC(pSkel->q10D4, pSkel->p20[fn_8001EEE4(pModel, 0x11)], qRot);
+        fn_8001E85C(qRot, pModel->pSkel->p20[fn_8001EEE4(pModel, 0x11)]);
     }
 }
 
@@ -505,23 +502,21 @@ void fn_80027D14(Character* pChar) {
     f32 (*pMtx28)[4];
     f32 (*pGripMtx)[4];
 
-    if (pModel->pSkel != NULL) {
-        if (lbl_802810A6 == 0) return;
-        pMtx28 = pModel->pMatrices[fn_8001EEE4(pModel, 0x28)];
-        pGripMtx = pModel->pMatrices[fn_8001EED8(pModel, 0x52)];
-        if (pModel->bEE) {
-            fn_8000ADC0(mFlip);
-            mFlip[0][0] = -1.0f;
-            fn_800BADF8(pGripMtx, mFlip, mGrip, 4);
-        } else {
-            fn_8000A0E8(pGripMtx, mGrip);
-        }
-        fn_8000A798(mGrip, mInv);
-        fn_800BADF8(mInv, pMtx28, mRel, 4);
-        fn_800089D4(mRel, pModel->pSkel->q107C);
-        fn_800BAD60(mInv, (Vec4*)pMtx28[3], (Vec4*)pModel->pSkel->v108C);
-        pModel->pSkel->v108C[3] = 0.0f;
+    if (pModel->pSkel == NULL || lbl_802810A6 == 0) return;
+    pMtx28 = pModel->pMatrices[fn_8001EEE4(pModel, 0x28)];
+    pGripMtx = pModel->pMatrices[fn_8001EED8(pModel, 0x52)];
+    if (pModel->bEE) {
+        fn_8000ADC0(mFlip);
+        mFlip[0][0] = -1.0f;
+        fn_800BADF8(pGripMtx, mFlip, mGrip, 4);
+    } else {
+        fn_8000A0E8(pGripMtx, mGrip);
     }
+    fn_8000A798(mGrip, mInv);
+    fn_800BADF8(mInv, pMtx28, mRel, 4);
+    fn_800089D4(mRel, pModel->pSkel->q107C);
+    fn_800BAD60(mInv, (Vec4*)pMtx28[3], (Vec4*)pModel->pSkel->v108C);
+    pModel->pSkel->v108C[3] = 0.0f;
 }
 
 // TW06: SKEL_TranslateIKChainY. Moves the chain's bones up by f, in their poses and matrices.
