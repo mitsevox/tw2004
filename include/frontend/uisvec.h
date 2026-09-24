@@ -1,9 +1,8 @@
 #ifndef FRONTEND_UISVEC_H
 #define FRONTEND_UISVEC_H
 
-// The UI Studio's four-float values (uistudio.h includes this). A file of its own so the menu UI's
-// elements (uiText.c) can use them next to game/frontend.h, whose fn_8016B0F8 prototype differs
-// from uistudio.h's.
+// The UI Studio's four-float values (uistudio.h includes this), in a file of their own so the menu
+// UI's elements (uiText.c) can use them without the rest of uistudio.h.
 
 #include "game_types.h"
 
