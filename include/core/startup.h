@@ -178,13 +178,13 @@ void fn_800B04EC(void* p, u32 uLen, int nDir);
 void fn_800B051C(void* p, u32 uLen, int nDir);
 
 // startUp.c, called by the sound engine (hlaudmovie.c).
-int  fn_800AFB48(void);
+u8   fn_800AFB48(void);
 void fn_800AFB50(void);
 u32  fn_800AFD8C(u16 nVoice);                   // where the voice is playing in ARAM
 void fn_800B0338(u16 nVoice, MovieSoundBlock* pBlock, int nChannel, int nMode);
-int  fn_800B0440(void);
+u8   fn_800B0440(void);
 void fn_800B0448(void);
-int  fn_800B0624(void);
+u8   fn_800B0624(void);
 void fn_800B0660(void);
 u32  fn_800B0698(u32 uSize);                    // take an ARAM block
 void fn_800B06CC(u32 uAddr);                    // give it back

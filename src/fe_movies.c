@@ -500,8 +500,8 @@ void fn_80091BDC(int nPoint) {
     fn_8005CC64(lbl_80281F20, lbl_80281F24);
     fn_80014118(0x50);
     fn_80012EF8();
-    afColour[3] = 0.25f;        // EA code: overwritten at once
     afColour[0] = 0.5f;
+    afColour[3] = 0.25f;        // EA code: overwritten at once
     afColour[1] = 0.5f;
     afColour[2] = 0.5f;
     afColour[3] = 0.5f;

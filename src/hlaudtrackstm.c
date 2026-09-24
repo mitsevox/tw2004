@@ -8,7 +8,7 @@
 #include "core/startup.h"
 
 int  fn_80006478(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
-                 void (*pfnDone)(int nBytes, int nError, AudTrack* pTrack, u8 nId), int n,
+                 void (*pfnDone)(void* pDst, int nBytes, AudTrack* pTrack, u8 nId), int n,
                  AudTrack* pTrack, u8 nId, int n19);                 // read from disc, not waiting
 
 void fn_800AB860(AudTrack* pTrack);
@@ -16,7 +16,7 @@ void fn_800ABC54(AudTrack* pTrack);
 void fn_800AC310(AudTrack* pTrack);
 s32  fn_800AC328(void);
 void RemoveFromAudStreamQueue(AudTrack* pTrack);
-void fn_800AB99C(int nBytes, int nError, AudTrack* pTrack, u8 nId);
+void fn_800AB99C(void* pDst, int nBytes, AudTrack* pTrack, u8 nId);
 
 // Applies a play list or stream change that came in while the track was busy.
 u8 fn_800AB3A4(AudTrack* pTrack) {
@@ -55,7 +55,7 @@ void fn_800AB428(AudTrack* pTrack) {
 
 // Queues a disc read; returns 0 when the queue is full.
 u8 fn_800AB4C0(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
-               void (*pfnDone)(int nBytes, int nError, AudTrack* pTrack, u8 nId), AudTrack* pTrack,
+               void (*pfnDone)(void* pDst, int nBytes, AudTrack* pTrack, u8 nId), AudTrack* pTrack,
                u8 nId, u8 n19) {
     u8 bQueued;
     AudStreamRead* pRead;
@@ -210,8 +210,9 @@ void fn_800AB958(AudTrack* pTrack, u32 uLen) {
     pTrack->u.stm.uReadPos = uLoop;
 }
 
-// A disc read is done: DMA it to the voices, unless the track moved on meanwhile.
-void fn_800AB99C(int nBytes, int nError, AudTrack* pTrack, u8 nId) {
+// A disc read of nBytes into pDst is done: DMA it to the voices, unless the track moved on
+// meanwhile. The file reader calls it with the request's buffer, length, track and id.
+void fn_800AB99C(void* pDst, int nBytes, AudTrack* pTrack, u8 nId) {
     if (pTrack->u.stm.nReadId != nId || pTrack->pTmpl == NULL || pTrack->pTmpl->data.pPlayList == NULL ||
         pTrack->u.stm.pStream == NULL) {
         RemoveFromAudStreamQueue(pTrack);
@@ -231,18 +232,17 @@ void fn_800ABA28(AudTrack* pTrack) {
 
     pList = pTrack->pTmpl->data.pPlayList;
     hFile = fn_800AC328();
-    if (pList == NULL) return;
-    if (pTrack->nState == 5) return;
+    if (pList == NULL || pTrack->nState == 5) return;
     if (pTrack->u.stm.pStream == NULL) return;
     request.flags.n = 0;
-    request.flags.b.b14 = 1;
     request.nPriority = 0x3FFF;
-    i = 0;
     request.n4 = 2;
     request.pfnCallback = fn_800AA400;
+    request.flags.b.b14 = 1;
+    i = 0;
     request.pUser = pTrack;
     request.flags.b.b12 = 1;
-    request.flags.b.b11 = pList->nId >> 2;
+    request.flags.b.b11 = (pList->nId >> 2) & 1;
     for (; i < pList->nChannels; i++) {
         request.nIndex = i;
         pVoice = fn_800AC4A0(&request);
@@ -338,11 +338,10 @@ u8 Stm_Tick(AudTrack* pTrack) {
     fn_800B596C("Stm_Tick");
     pList = pTrack->pTmpl->data.pPlayList;
     if (DVDGetDriveStatus() == 0) {
-        ppVoice = pTrack->apVoices;
-        for (i = 0; i < pList->nChannels; i++, ppVoice++) {
-            if (*ppVoice != NULL && (*ppVoice)->flags.b.bB_6) {
-                (*ppVoice)->flags.b.bB_6 = 0;
-                fn_800ACA5C(*ppVoice, 0);
+        for (i = 0; i < pList->nChannels; i++) {
+            if (pTrack->apVoices[i] != NULL && pTrack->apVoices[i]->flags.b.bB_6) {
+                pTrack->apVoices[i]->flags.b.bB_6 = 0;
+                fn_800ACA5C(pTrack->apVoices[i], 0);
             }
         }
     }
@@ -433,6 +432,7 @@ void Stm_SetPlayList(AudTrack* pTrack, u8 nPlayList) {
     AudPlayList* pList;
     AudPlayList* pOld;
     u32 uSize;
+    u8* pBuffer;
 
     nOld = 0;
     pTmpl = pTrack->pTmpl;
@@ -452,8 +452,9 @@ void Stm_SetPlayList(AudTrack* pTrack, u8 nPlayList) {
             if (pTrack->u.stm.pBuffer != NULL) {
                 fn_800A9434(pTrack->u.stm.pBuffer, pTrack->u.stm.uBufferSize, nOld);
             }
+            pBuffer = fn_800A942C(uSize, pList->nId);
             pTmpl->data.pPlayList = pList;
-            pTrack->u.stm.pBuffer = fn_800A942C(uSize, pList->nId);
+            pTrack->u.stm.pBuffer = pBuffer;
             pTrack->u.stm.uBufferSize = uSize;
             pTmpl->n2 = pList->nChannels;
         }

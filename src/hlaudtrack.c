@@ -55,7 +55,7 @@ u8 fn_800A98B4(void) {
 }
 
 // Frees every track.
-s32 fn_800A9A50(u8 a, u8 b) {
+u8 fn_800A9A50(u8 a, u8 b) {
     s32 i;
     UList* pList;
     AudTrack* pTrack;

@@ -593,14 +593,17 @@ void fn_800BCB74(s32* pClass, int nSurface) {
 // otherwise 0.
 int fn_800BCB88(void) {
     int nResult;
+    u8 bFlag;
     if (fn_800BCC48()) {
         nResult = 1;
     } else if (fn_800BCBE0()) {
         nResult = 3;
-    } else if (fn_80035574()) {
-        nResult = 2;
     } else {
+        bFlag = fn_80035574();
         nResult = 0;
+        if (bFlag) {
+            nResult = 2;
+        }
     }
     return nResult;
 }

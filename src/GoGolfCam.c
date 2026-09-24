@@ -233,11 +233,11 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
     f32* pSub;
     CourseInfo* pCourse;
     u8 bMirror;
-    f32 fDist;
     f32 fTotal;
-    f32 fBase;
-    f32 fSlow;
     f32 fSpeed;
+    f32 fSlow;
+    f32 fDist;
+    f32 fBase;
     f32 f;
     f32 fAimY;
     f32 fCamY;
@@ -722,10 +722,10 @@ void fn_800BF184(View* pView, int nPlayer) {
             pView->script.f90 += gSession.fFrameTime;
         }
         if (gSession.fFrameTime != 0.0f) {
-            fUp = fn_800095F0(20.0f * PI / 180.0f);    // not DEG(20.0f): see fn_800BF658
-            fBack = fn_80009638(20.0f * PI / 180.0f);
-            fUp *= 10.0f;
-            fBack *= 10.0f;
+            fSin = fn_800095F0(20.0f * PI / 180.0f);    // not DEG(20.0f): see fn_800BF658
+            fCos = fn_80009638(20.0f * PI / 180.0f);
+            fUp = 10.0f * fSin;
+            fBack = 10.0f * fCos;
             fSin = fn_800095F0(gPlayers[nPlayer].fA88);
             fCos = fn_80009638(gPlayers[nPlayer].fA88);
             fX = fBack * -fSin;

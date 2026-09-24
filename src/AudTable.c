@@ -34,7 +34,7 @@ u8 fn_800A7AF0(void) {
     return bOk;
 }
 
-s32 fn_800A7C24(void) {
+u8 fn_800A7C24(void) {
     return 1;
 }
 

@@ -13,7 +13,7 @@ void* fn_800AF114(u32 uSize);
 void fn_800AF140(void* p);
 void fn_800AF144(s8 nMode);
 int fn_800AF224(void);
-int fn_800AF264(u8 nKind, u8 bOn);
+u8 fn_800AF264(u8 nKind, u8 bOn);
 void fn_800AF2D8(void);
 void fn_800AF2DC(u8 bMute);
 void fn_800AF31C(void);
@@ -77,7 +77,7 @@ int fn_800AF224(void) {
 
 // Pick the effect: the mode 0 reverb when bOn is 0, the mode 2 reverb for nKind 8 on hole index 2
 // (fn_80015464), otherwise the delay.
-int fn_800AF264(u8 nKind, u8 bOn) {
+u8 fn_800AF264(u8 nKind, u8 bOn) {
     s8 nHole;                           // fake match: EA keeps the hole index as a signed byte
     s8 nMode;
 

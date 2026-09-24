@@ -15,10 +15,11 @@ const s32 lbl_80183AA8[4] = {17, 17, 17, 17};
 const s32 lbl_80183AB8[4] = {0, 12, 9, 1};
 const s32 lbl_80183AC8[4] = {4, 15, 27, 7};
 
+// Uninitialised data, defined last-first (CodeWarrior lays it out in reverse).
 Session lbl_801DB8A0;           // the session as it was before fn_80099ED8 changed it
-s32 lbl_80281F90;               // which of the four set-ups the next start uses
-u8  lbl_80281F94;               // the timer ran out
 f32 lbl_80281F98;               // seconds counted
+u8  lbl_80281F94;               // the timer ran out
+s32 lbl_80281F90;               // which of the four set-ups the next start uses
 
 // Saves the session and sets up a two-player game on the next of four course/hole/golfer set-ups,
 // moving on through the courses until one is on the disc. With uFlags bit 14 it is a one-player
@@ -33,10 +34,10 @@ void fn_80099ED8(void) {
     gSession.nPaused = 0;
     gSession.nNumPlayers = 2;
     fn_800E0B38(0);
-    gSession.aProfile[0].n0 = 0;
     gSession.nController[0] = 9;
     gSession.nGolfer[0] = lbl_80183AB8[lbl_80281F90];
     gSession.nTeeSet[0] = 2;
+    gSession.aProfile[0].n0 = 0;
     gSession.nController[1] = 9;
     gSession.nGolfer[1] = lbl_80183AC8[lbl_80281F90];
     gSession.nTeeSet[1] = 2;

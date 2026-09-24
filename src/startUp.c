@@ -389,7 +389,7 @@ u8 fn_800AFAB0(void) {
     return 1;
 }
 
-int fn_800AFB48(void) {
+u8 fn_800AFB48(void) {
     return 1;
 }
 
@@ -515,7 +515,9 @@ s16 fn_800AFF9C(s16 nVolume) {
     nVolume >>= 1;
     if (nVolume <= 0) return VOLUME_MIN;
     if (nVolume >= 0x3FFF) return 0;
-    fDb = logf(16383.0f / nVolume);
+    fDb = 16383.0f;
+    fDb /= nVolume;
+    fDb = logf(fDb);
     fDb *= -86.5617f;
     nDb = fDb;
     if (nDb < VOLUME_MIN) {
@@ -651,7 +653,7 @@ u8 fn_800B0438(void) {
     return 1;
 }
 
-int fn_800B0440(void) {
+u8 fn_800B0440(void) {
     return 1;
 }
 
@@ -714,7 +716,7 @@ u8 fn_800B0568(void) {
 }
 
 // Free the DMA buffer once the DMA is done.
-int fn_800B0624(void) {
+u8 fn_800B0624(void) {
     if (lbl_80282110) {
         lbl_80282110 = 0;
         fn_8009527C(lbl_80282104);
@@ -1311,8 +1313,9 @@ f32 fn_800B1960(f32* v) {
     if (b > 0.5f * a) {
         s = a + b;
         d = a - b;
-        a = (32.0f * b + (a + (2.0f * s + (64.0f * s + 8.0f * s)))) / 128.0f;
+        s = 32.0f * b + (a + (2.0f * s + (64.0f * s + 8.0f * s)));
         b = d;
+        a = (1.0f / 128.0f) * s;
     }
     return a + 0.25f * b - 0.0078125f * b;
 }

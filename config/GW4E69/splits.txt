@@ -495,6 +495,10 @@ UFstPart.c:
 
 BootCourse.c:
 	.text       start:0x80099ED8 end:0x8009A250
+	.rodata     start:0x80183A98 end:0x80183AD8
+	.bss        start:0x801DB8A0 end:0x801E1470
+	.sbss       start:0x80281F90 end:0x80281FA0
+	.sdata2     start:0x80283E70 end:0x80283E78
 
 SunFlr_Gc.c:
 	.text       start:0x8009A250 end:0x8009A844

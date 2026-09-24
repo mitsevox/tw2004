@@ -930,7 +930,7 @@ config.libs = [
             Object(Matching, "GoCamTuningVars.c"),
             Object(NonMatching, "GoShaderObject_Glows_Gc.c"),
             Object(Matching, "UFstPart.c"),
-            Object(NonMatching, "BootCourse.c"),
+            Object(Matching, "BootCourse.c"),
             Object(NonMatching, "SunFlr_Gc.c"),
             Object(NonMatching, "Code8009AA28.c"),
             Object(NonMatching, "GoGreenGrid.c"),

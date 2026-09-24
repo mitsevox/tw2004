@@ -55,7 +55,7 @@ u8 fn_800AC470(void) {
     return 1;
 }
 
-s32 fn_800AC494(void) {
+u8 fn_800AC494(void) {
     return 1;
 }
 
