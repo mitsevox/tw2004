@@ -824,7 +824,15 @@ u8* fn_8016C674(UISNode* pNode, u16 uEvent) {
     return NULL;
 }
 
-// The index of a loaded screen, or the number of screens when it is not loaded.
+// The index of a loaded screen, or the number of screens when it is not loaded. Written out, not
+// through UIS_FindScreen: returning an inlined call adds a copy of the index (88.6 -> 90.5%).
 u16 fn_8016C6C4(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
-    return UIS_FindScreen(pStudio, uGroup, uScreen);
+    u16 i;
+    UISScreen* pScreen;
+
+    for (i = 0; i < pStudio->nScreens; i++) {
+        pScreen = &pStudio->pScreens[i];
+        if (pScreen->uGroup == uGroup && pScreen->uScreen == uScreen) break;
+    }
+    return i;
 }
