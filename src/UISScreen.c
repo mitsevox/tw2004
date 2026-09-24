@@ -290,6 +290,19 @@ void fn_8016B0F8(UIStudio* pStudio, u32 uEvent, s32 nArgs, const s32* pArgs) {
     }
 }
 
+// A node's script for an event (its 0x4000 handler), or NULL.
+// fake match: fn_8016C5C4's body, kept here so fn_8016B188 can inline it (as UIS_FindScreen below).
+static inline u8* UIS_FindScript(UISNode* pNode, u32 uEvent) {
+    u32 i;
+    for (i = 0; i < pNode->nHandlers; i++) {
+        UISHandler* pHandler = &pNode->pHandlers[i];
+        if ((pHandler->uFlags & 0x4000) && pHandler->uEvent == (u16)uEvent) {
+            return pHandler->u4.pScript;
+        }
+    }
+    return NULL;
+}
+
 // Runs the 0x4000 handlers for an event of node nNode and of every node it links to, the linked
 // nodes first.
 void fn_8016B188(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u32 nNode, u32 uEvent,
@@ -305,7 +318,7 @@ void fn_8016B188(UIStudio* pStudio, UISScreen* pScreen, UISWordStack* pStack, u3
             fn_8016B188(pStudio, pScreen, pStack, pHandler->u4.nNode, uEvent, nArgs, pArgs);
         }
     }
-    pScript = fn_8016C5C4(pNode, uEvent);
+    pScript = UIS_FindScript(pNode, uEvent);
     if (pScript != NULL) {
         fn_8016C270(pStudio, pScreen, pNode->pInfo, pStack, pScript, nArgs, pArgs, 0, NULL, 0, 0, NULL);
     }
@@ -768,11 +781,11 @@ s8 fn_8016C270(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pInfo, UISWor
 }
 
 // The node's handler of the kind marked 0x4000 for an event.
-u8* fn_8016C5C4(UISNode* pNode, u16 uEvent) {
+u8* fn_8016C5C4(UISNode* pNode, u32 uEvent) {
     u32 i;
     for (i = 0; i < pNode->nHandlers; i++) {
         UISHandler* pHandler = &pNode->pHandlers[i];
-        if ((pHandler->uFlags & 0x4000) && pHandler->uEvent == uEvent) {
+        if ((pHandler->uFlags & 0x4000) && pHandler->uEvent == (u16)uEvent) {
             return pHandler->u4.pScript;
         }
     }

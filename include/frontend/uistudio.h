@@ -335,7 +335,7 @@ f32* fn_8016C1A4(s32 n20, UISNodeInfo* pInfo);
 s8 fn_8016C270(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pInfo, UISWordStack* pStack, u8* pScript,
                u32 nArgs, const s32* pArgs, u32 nArgs2, const s32* pArgs2, u8 bExtra, s32 nExtra, s32* pnSaved);
 // A node's handler scripts for an event, by kind (0x4000, plain with an ID, 0x8000); NULL for none.
-u8* fn_8016C5C4(UISNode* pNode, u16 uEvent);
+u8* fn_8016C5C4(UISNode* pNode, u32 uEvent);   // callers pass the event unmasked
 u8* fn_8016C614(UISNode* pNode, u16 uId, u16 uEvent);
 u8* fn_8016C674(UISNode* pNode, u16 uEvent);
 u16 fn_8016C6C4(UIStudio* pStudio, u16 uGroup, u16 uScreen);
