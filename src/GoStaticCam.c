@@ -398,7 +398,7 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
                     // the path ends: stop at its last shot
                     fDist = fTarget;
                     fT = 1.0f;
-                    continue;
+                    break;
                 }
                 pShot = pShot->p40;
                 StaticCam_SetupFlybyCameraPointers(pShot, &pPrev, &pNext, &pAfter);

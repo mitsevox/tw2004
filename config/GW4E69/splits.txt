@@ -649,6 +649,11 @@ startUp.c:
 
 shadow.c:
 	.text       start:0x800B2314 end:0x800B34F0
+	.data       start:0x8018FF68 end:0x8018FF78
+	.bss        start:0x801F5E20 end:0x801F6320
+	.sdata      start:0x802814A8 end:0x802814B8
+	.sbss       start:0x80282158 end:0x80282178
+	.sdata2     start:0x802840B8 end:0x802840F8
 
 GoComicCam.c:
 	.text       start:0x800B34F0 end:0x800B4B5C

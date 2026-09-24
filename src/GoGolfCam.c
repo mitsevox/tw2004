@@ -346,7 +346,8 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
             fAimY = fLow;
         }
         fAimY += pView->shot19C.f68;
-        fCamY = pView->script.fD8 + lbl_80281F78->f14;
+        fCamY = pView->script.fD8;
+        fCamY += lbl_80281F78->f14;
     } else {
         fAimY = 0.0f;
         fCamY = 0.0f;
@@ -354,7 +355,8 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
     if (pView->script.f108 < 0.0f || fDist / fTotal > 0.5f) {
         f = fAimY;
     } else {
-        f = fDist / fTotal * 2.0f;
+        f = fDist / fTotal;
+        f *= 2.0f;
         f = fAimY + (1.0f - f) * (fCamY - fAimY);
     }
     if (pView->script.f108 >= 1.0f) {
@@ -708,6 +710,7 @@ void GolfCamera_ProcessPlaceBallCamera(View* pView, int nPlayer) {
     CourseInfo* pCourse;
     int nPinSet;
     f32 fGround;
+    f32 fDiff;
     f32 fUp;
     f32 fBack;
     f32 fSin;
@@ -789,7 +792,9 @@ void GolfCamera_ProcessPlaceBallCamera(View* pView, int nPlayer) {
                         pCam[1] = fUp;
                         pView->script.fD8 = fGround;
                     } else {
-                        pCam[1] += (1.0f - lbl_80281F78->f98) * (fUp - pCam[1]);
+                        fDiff = fUp;
+                        fDiff -= pCam[1];
+                        pCam[1] += (1.0f - lbl_80281F78->f98) * fDiff;
                     }
                 } else {
                     pCam[1] += (1.0f - lbl_80281F78->f98) * (fUp - pCam[1]);
@@ -808,7 +813,9 @@ void GolfCamera_ProcessPlaceBallCamera(View* pView, int nPlayer) {
                 fGround = 0.0f;
             }
             if (pView->script.n110 != 0) {
-                pSub[1] += (1.0f - lbl_80281F78->f98) * (fGround - pSub[1]);
+                fDiff = fGround;
+                fDiff -= pSub[1];
+                pSub[1] += (1.0f - lbl_80281F78->f98) * fDiff;
                 if (pCam[1] - pSub[1] > 5.0f) {
                     pSub[1] = pCam[1] - 5.0f;
                 }

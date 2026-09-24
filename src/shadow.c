@@ -40,6 +40,21 @@ void fn_800B3460(f32* pA, f32* pB, f32* pOut);
 void fn_800B3484(CamLens* pLens, f32 (*pMtx)[4]);
 void fn_800360D4(u8* pMesh);
 
+Shadow lbl_801F5E20;
+
+Shadow* lbl_802814A8 = &lbl_801F5E20;
+f32 lbl_802814AC = 0.01f;
+f32 lbl_802814B0 = 0.08f;
+
+// .sbss, defined in reverse address order
+f32* lbl_80282170;
+u8* lbl_8028216C;
+f32* lbl_80282168;
+s16* lbl_80282164;
+TrailDraw* lbl_80282160;
+s32 lbl_8028215C;
+s32 lbl_80282158;
+
 // Where the frame buffer is copied to: the screen copy's buffer.
 void fn_800B2314(void) {
     Shadow* p = lbl_802814A8;
@@ -99,6 +114,12 @@ void fn_800B24D0(int nWidth, int nHeight) {
 
     p->nWidth = nWidth;
     p->nHeight = nHeight;
+}
+
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x802840B8), before the 27.0f fn_800B24E0 uses first; its body is unknown.
+static f32 shadow_StrippedFn(f32 x) {
+    return x + 1.0f;
 }
 
 void fn_800B24E0(f32 f) {
@@ -203,6 +224,12 @@ void fn_800B281C(void) {
     aXY[6] = 0.0f;
     fn_80014194(aColour);
     fn_8001644C(0xA1, aXY, 0, NULL, 2);
+}
+
+// fake match: stands in for code the original linker stripped. The pool has 0.5f (0x802840CC)
+// here, before the 1000000.0f fn_800B28D4 uses first; its body is unknown.
+static f32 shadow_StrippedFn2(f32 x) {
+    return x + 0.5f;
 }
 
 // Draw the golfer into the shadow texture. The golfer's box is projected onto the ground along
@@ -441,8 +468,8 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     f32           fV;
     int           nList;
     int           n;
-    int           i;
     int           nCount;
+    int           i;
     TerPolyRef*   pRef;
     int           j;
     int           nVerts;
@@ -509,8 +536,8 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     fFar = vCentre[2] + fHalfZ;
     nVerts = 0;
     nStrips = 0;
-    pRef = aList;
-    for (i = 0; i < nList; i++, pRef++) {
+    for (i = 0; i < nList; i++) {
+        pRef = &aList[i];
         nCount = pRef->nTris + 2;
         if (nVerts + nCount > 0x800 || nStrips >= 0x200) {
             continue;

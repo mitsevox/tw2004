@@ -945,7 +945,7 @@ config.libs = [
             Object(Matching, "UAudContainers.c"),
             Object(Matching, "uiobject.c"),
             Object(NonMatching, "startUp.c"),
-            Object(NonMatching, "shadow.c"),
+            Object(Matching, "shadow.c"),
             Object(Matching, "GoComicCam.c"),
             Object(NonMatching, "GoShaderObject_Rain_Gc.c"),
             Object(Matching, "UAudMemStack.c"),
