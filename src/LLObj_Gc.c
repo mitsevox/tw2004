@@ -3,6 +3,30 @@
 // camera space, then cull it), written earlier as unsorted/code_80007BC4.c and not yet cleaned up.
 
 #include "unsorted/cull.h"
+#include "dynobj.h"
+
+int fn_80007BC4(RenderObj* obj, Camera* cam, float* outDepth, int mode, float scale);
+
+// Culls a mesh by its bounding sphere scaled by fScale: 3 when it is out of view, 2 when it is
+// wholly in view (mode 0, then mode 1), else 0. fDist and fHalfFovTan are not used.
+int fn_80007B2C(UObjMesh* pMesh, void* pCamera, f32 fDist, f32 fHalfFovTan, f32 fScale) {
+    int nClip;
+    int nRet;
+
+    nClip = fn_80007BC4((RenderObj*)pMesh, pCamera, NULL, 0, fScale);
+    if (nClip == 2) {
+        return 3;
+    }
+    if (nClip == 1) {
+        return 2;
+    }
+    nClip = fn_80007BC4((RenderObj*)pMesh, pCamera, NULL, 1, fScale);
+    nRet = 0;
+    if (nClip == 1) {
+        nRet = 2;
+    }
+    return nRet;
+}
 
 // ---- sweep code (not yet cleaned up) ----
 
