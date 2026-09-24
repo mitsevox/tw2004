@@ -11,6 +11,10 @@
 void fn_80076BF0(void);
 u16 fn_80076D68(f32 fU, f32 fV, f32 fScale, f32 fInv);
 
+// .sbss, in reverse address order (CodeWarrior lays it out last-defined-first).
+f32 lbl_80281EC4;                   // the frame count the clock was last set from
+TexAnimManager* lbl_80281EC0;       // the manager
+
 // Make the manager, empty.
 void fn_80076B7C(void) {
     TexAnimManager* pMgr;

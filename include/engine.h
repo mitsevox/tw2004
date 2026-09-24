@@ -745,9 +745,6 @@ typedef struct TexAnimManager {
 } TexAnimManager;
 LAYOUT_ASSERT(TexAnimManager, 0x610);
 
-extern TexAnimManager* lbl_80281EC0;
-extern f32 lbl_80281EC4;            // the frame count the clock was last set from
-
 void fn_80076B7C(void);             // make the manager
 void fn_80076BC4(void);             // free it
 void fn_80076C20(f32 fFrame);       // set the clock and move every matrix
