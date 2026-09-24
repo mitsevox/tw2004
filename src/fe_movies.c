@@ -12,6 +12,9 @@ void fn_80008380(void);
 void fn_80092250(f32* pA, f32* pB, f32* pOut);
 void fn_80092080(LLPict* pPict, f32 fAlpha);    // draws the picture at that alpha
 void fn_80091FC0(LLPict* pPict, int nFrames, f32 fStep);
+s32  fn_800171B0(void);                 // ViewController.c
+void fn_800760D8(LLPict* pPict);        // LLVideo.c
+void fn_800760F4(f32* pUV, LLPict* pPict);  // LLVideo.c
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -201,6 +204,37 @@ void fn_80091FC0(LLPict* pPict, int nFrames, f32 fStep) {
         fn_800A4BDC();
         fn_800B7490();
     }
+}
+
+// Draw pPict over the whole 512x448 screen at fAlpha, through a frame buffer of its own, then put
+// the previous render slot back.
+void fn_80092080(LLPict* pPict, f32 fAlpha) {
+    f32 afColour[4];
+    f32 afXY[8];
+    f32 afUV[8];
+    GoFrameBuf frameBuf;
+    s32 nOld;
+
+    fn_800760D8(pPict);
+    fn_80035118(4, 5);
+    fn_80014118(0x50);
+    fn_80012F50(0, 6, 0x80);
+    fn_80012F18(7);
+    nOld = fn_800171B0();
+    fn_8006E26C(&frameBuf, 0.0f, 0.0f, 512.0f, 448.0f, 1.0f, 1.0f);
+    // port: the render slot is typed s32 but holds a pointer
+    fn_80092274((s32)&frameBuf);
+    fn_80013EEC(fn_8001614C());
+    fn_80012EF8();
+    afColour[0] = 0.5f;
+    afColour[1] = 0.5f;
+    afColour[2] = 0.5f;
+    afColour[3] = 0.5f * fAlpha;
+    fn_800141F8(NULL, afXY, 0.0f, 0.0f, 1.0f, 1.0f);
+    fn_800760F4(afUV, pPict);
+    fn_80014194(afColour);
+    fn_8001644C(0xA1, afXY, 0, afUV, 2);
+    fn_80092274(nOld);
 }
 
 // Free the pixel data of every bank whose entry in lbl_801D8890 has a positive n4.
