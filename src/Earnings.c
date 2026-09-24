@@ -813,8 +813,8 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
             GM_GetGameProgress(&gpSaveData[nPlayer]) < 100.0f) continue;
 
         if (lbl_80200538.aPuttGoal[i].nAward != 39) {
-            u8 bLost;
             int nSlot;
+            u8 bLost;
 
             if (!fn_800D76AC(nPlayer, lbl_80200538.aPuttGoal[i].nAward)) continue;
             bReplace = 0;
@@ -844,8 +844,8 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
                                          lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].nValue);
             }
         } else {
-            u8 bLost;
             int nSlot;
+            u8 bLost;
 
             nValue = lbl_80200538.aPuttGoal[i].nValue;
             if (nValue == 0) continue;
@@ -865,8 +865,8 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
                 }
             }
             if (bLost) continue;
-            aPrizeIds[nSlot] = lbl_80200538.aPuttGoal[i].nId;
             lbl_80200308[nSlot] = nValue;
+            aPrizeIds[nSlot] = lbl_80200538.aPuttGoal[i].nId;
             lbl_80200380[nSlot] = fn_800D6A70(lbl_80200308[nSlot], nPlayer,
                                               fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 0),
                                               fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 1),
@@ -903,6 +903,9 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
     s32 aPrizeIds[10];
     s32 aAwardIds[10];
     int i;
+    u8 bReplace;
+    u8 bLost;
+    int j;
     s32 nValue;
     int nHoles;
     int nNeed;
@@ -988,9 +991,6 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
             GM_GetGameProgress(&gpSaveData[nPlayer]) < 100.0f) continue;
 
         if (lbl_80200538.aHoleGoal[i].nAward != 39) {
-            u8 bReplace;
-            u8 bLost;
-            int j;
             int nSlot;
 
             if (!fn_800D76AC(nPlayer, lbl_80200538.aHoleGoal[i].nAward)) continue;
@@ -1021,9 +1021,6 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
                                          lbl_80200538.aBio[lbl_80200538.aHoleGoal[i].nBio].nValue);
             }
         } else {
-            u8 bReplace;
-            u8 bLost;
-            int j;
             int nSlot;
 
             nValue = lbl_80200538.aHoleGoal[i].nValue;
@@ -1044,8 +1041,8 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
                 }
             }
             if (bLost) continue;
-            aPrizeIds[nSlot] = lbl_80200538.aHoleGoal[i].nId;
             lbl_802002E0[nSlot] = nValue;
+            aPrizeIds[nSlot] = lbl_80200538.aHoleGoal[i].nId;
             lbl_80200358[nSlot] = fn_800D6A70(lbl_802002E0[nSlot], nPlayer,
                                               fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 0),
                                               fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 1),
