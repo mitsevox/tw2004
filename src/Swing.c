@@ -605,9 +605,9 @@ f32 fn_8005B64C(int nPlayer) {
 // shot), the power, forgiveness, the launch blocks, and the aim - the player's aim plus the
 // face vector's angle plus the miss - go to Ball_Launch.
 void Swing_Launch(int nPlayer) {
-    Player* p;
     f32*    pLaunchB;
     f32*    pLaunchA;
+    Player* p;
     Ball*   pBall;
     int     nClub, nTrajectory, nKind;
     f32     fAim;

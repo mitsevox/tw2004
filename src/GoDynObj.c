@@ -539,8 +539,8 @@ void fn_8004731C(u8* pState) {
     f32 aRot[4];
     int i;
     UObject* pBall;
-    UObject* pLogoA;
     UObject* pLogoB;
+    UObject* pLogoA;
     f32 fDist;
     f32 fSink;
     f32 fSize;
