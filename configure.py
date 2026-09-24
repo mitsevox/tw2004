@@ -1049,7 +1049,9 @@ config.libs = [
             # deferred: -inline auto,deferred emits the functions in reverse order and pastes
             # fn_8016C614/fn_8016C674 and the fn_8016C15C accessors into fn_8016A2D4/fn_8016A510,
             # which the original calls (87 -> 62%, 93 -> 69%).
-            Object(NonMatching, "UISScreen.c", extra_cflags=["-inline auto"]),
+            # -inline auto,deferred with the functions in reverse order and auto_inline pragmas around
+            # the six callees EA calls: fn_8016B188 77.50 -> 93.27, nothing worse.
+            Object(NonMatching, "UISScreen.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "GoDynObjTypes.c"),
             Object(Matching, "unsorted/sweep_800977CC.c"),
             Object(Matching, "GoDynObjBase.c"),
