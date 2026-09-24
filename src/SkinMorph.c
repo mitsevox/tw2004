@@ -53,6 +53,46 @@ SkinMorphWork* fn_8011C564(void) {
     return pWork;
 }
 
+// Picks the meshes to blend for vertex set nSet of p44 entry pEntry: each morph target with a
+// weight other than 0 that has that set. Gives how many (in apTargets and afTargets).
+s32 fn_8011C5B4(SkinMorphWork* pWork, SkinDesc44* pEntry, int nSet) {
+    s32 nPicked = 0;
+    SkinDesc44* pTarget;
+    SkinDesc* pDesc;
+    SkinMesh* aMeshes;
+    s32* aIndexes;
+    s32 nFirst;
+    s32 nCount;
+    s32 i;
+    s32 nMesh;
+    f32 fWeight;
+
+    nFirst = pEntry->n18;
+    pDesc = pWork->pDesc;
+    nCount = pEntry->n14;
+    aMeshes = pDesc->p34;
+    aIndexes = pDesc->p3C;
+    pTarget = &pDesc->p44[pEntry->n10];
+    if (nCount > pWork->nMorphs - nFirst) {
+        nCount = pWork->nMorphs - nFirst;
+    }
+    for (i = 0; i < nCount; i++) {
+        if (nSet < pTarget->n8) {
+            fWeight = pWork->afWeights[nFirst + i];
+            if (fWeight != 0.0f) {
+                nMesh = aIndexes[pTarget->n0 + nSet];
+                if (nMesh >= 0) {
+                    pWork->apTargets[nPicked] = &aMeshes[nMesh];
+                    pWork->afTargets[nPicked] = fWeight;
+                    nPicked++;
+                }
+            }
+        }
+        pTarget++;
+    }
+    return nPicked;
+}
+
 void fn_8011C580(SkinMorphWork* pWork, SkinDesc* pDesc) {
     pWork->pDesc = pDesc;
 }
