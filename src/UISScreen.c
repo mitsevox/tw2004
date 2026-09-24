@@ -4,6 +4,8 @@
 // rate function drives. Called by UIStudio.c and by the game's menus. The original was built with
 // automatic inlining (-inline auto in configure.py): fn_8016A830 and fn_8016B188 have their own
 // recursion inlined three deep.
+// section order: built with -inline auto,deferred, which emits the functions last-first, so they
+// are written here from the highest address down.
 
 #include "frontend/uistudio.h"
 
