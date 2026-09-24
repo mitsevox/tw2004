@@ -30,9 +30,11 @@ typedef struct UStreamChunk {
                                 //       (2: fn_800A9374)
     u32  uSize;                 // 0x20  SHDR: the object's (unpacked) size
     u8   unk24[0x34 - 0x24];
-    int  nNameLen;              // 0x34  SHDR: the name's length
-    int  n38;                   // 0x38  SHDR of a 'Csac': a second length after the name
-    char szName[4];             // 0x3C  SHDR: the name, nNameLen bytes (it runs on past the header)
+    int  nScriptLen;            // 0x34  SHDR: the first script's length; a 'Csac' has no scripts
+                                //       and keeps nScriptLen + n38 bytes of the header's tail instead
+    int  n38;                   // 0x38  SHDR of a 'Csac': a second length
+    u8   aScripts[4];           // 0x3C  SHDR: two LLTex scripts (fn_8000EA1C), the first nScriptLen
+                                //       bytes long (they run on past the header)
 } UStreamChunk;
 
 // The SONO sound being loaded (0x14 bytes): where its data goes and how far it has got.
