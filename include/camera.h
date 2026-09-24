@@ -553,7 +553,7 @@ typedef struct CrAPState {
     u8   b1C8;                  // 0x1C8
     u8   unk1C9[3];
     f32  f1CC;                  // 0x1CC
-    s8   n1D0;                  // 0x1D0
+    u8   n1D0;                  // 0x1D0  0: sFE_AdjustAndSetGolferPosition keeps f14C at 0.5
     u8   b1D1;                  // 0x1D1
     u8   b1D2;                  // 0x1D2
     u8   unk1D3;
@@ -577,6 +577,7 @@ extern void** lbl_80280DF0;
 // GoTerrain.c: gives the current render camera the view matrix pMtx (NULL: the identity), through
 // fn_80013D9C.
 void   fn_80035240(f32 (*pMtx)[4]);
+f32*   fn_8003526C(void);               // GoTerrain.c: the current render camera's screen rectangle
 
 ViewController* fn_80016CF4(void);     // the current view (lbl_80281CA4)
 ViewController* fn_80016CFC(int nView);

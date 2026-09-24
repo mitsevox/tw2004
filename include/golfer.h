@@ -83,7 +83,8 @@ typedef struct GolferRecord {
     char szFirst[32];           // 0x002
     char szLast[32];            // 0x022
     char szNick[32];            // 0x042
-    u8   nOutfit;               // 0x062  the outfit (copied to PlayerProfile.nOutfit). TW06 has ballID here
+    s8   nOutfit;               // 0x062  the outfit (copied to PlayerProfile.nOutfit). TW06 has ballID here;
+                                //        FEgolferanim.c passes it to fn_800484E0 as a ball index
     s8   nEarningsRating;       // 0x063  0..25, what beating this golfer pays (Earnings.c). TW06: earningsRating
     u8   unk64[4];              // 0x064  TW06 has trajectory[3], characteristic, severity, chance here
     s8   attr[NUM_ATTRS];       // 0x068  block A. TW06: baseStats

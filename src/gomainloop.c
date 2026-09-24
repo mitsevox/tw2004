@@ -8,6 +8,7 @@
 #include "lighting.h"
 #include "core/memcard.h"
 #include "game/frontend.h"
+#include "llpict.h"
 
 // The other systems' start-up, shut-down and per-frame calls, from their files (most are not
 // decompiled yet; the types are from the calls here).
@@ -85,7 +86,6 @@ void fn_8002F180(void);
 void fn_8002F32C(s32 nSurface);
 void fn_8002F4FC(void);
 void fn_8002F540(void);
-void fn_8002FEAC(void);
 void fn_80030254(void);
 void fn_800329CC(void);
 void fn_80032AEC(void);

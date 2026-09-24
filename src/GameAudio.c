@@ -1727,6 +1727,9 @@ void fn_800A754C(u8 a, u16 b) {
     }
 }
 
+// port: the callers pass nKind and nMsg as full ints (their prototype takes int), but this body
+// was compiled for a u8 nKind and a u16 nMsg: it stores and passes them on without masking. Kept
+// as int to match the callers, so this function stays at 91% (masks where the original has none).
 void fn_800A7664(int nKind, int nMsg, int a) {
     if ((s8)gSession.options.a0[4] != 0) {
         if (lbl_80282054 != 0) {

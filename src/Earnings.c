@@ -1156,9 +1156,9 @@ u8 fn_800D8DB4(int nKind) {
 // hole, b2F6 a ball on the green or in the hole in par - 2 strokes or fewer. A putt (club 25) that
 // fn_800E2DB4 accepts can be the longest, in feet.
 void fn_800D8FE4(int nPlayer) {
+    u32 nClass;
     Ball* pBall;
     int nPar;
-    u32 nClass;
     f32 fDist;
     f32 fDx;
     f32 fDz;

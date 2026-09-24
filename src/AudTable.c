@@ -89,7 +89,7 @@ void fn_800A7CA4(u8 nEntry, u8 uMaskA, u8 uMaskB, u32* auStreams, f32 (*aPos)[3]
         fVolume = 1.0f;
         nTracks = pSource->pSound->nTracks;
         pTmpl = pSource->pSound->aTracks;
-        for (i = 0, uBit = 1; i < nTracks; i++, uBit <<= 1, pTmpl++, ppTrack++) {
+        for (i = 0, uBit = 1; i < nTracks; uBit <<= 1, i++, pTmpl++, ppTrack++) {
             pTrack = *ppTrack;
             bOn = (uMaskA & uBit) != 0;
             bOff = (uMaskB & uBit) != 0;

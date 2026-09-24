@@ -9,6 +9,7 @@
 #include "game.h"
 #include "engine.h"
 #include "endian.h"
+#include "dynobj.h"
 
 #define AXIS3(n) ((n) == 0 ? 0 : 2)    // grid axis 0 (x) or 1 (z) as an index into a 3D vector
 #define PIN_RADIUS_SQ 0.00077160494f   // the flagstick's radius squared: (1 inch)^2 in square yards
@@ -56,8 +57,7 @@ u8    fn_8004FCB4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32
 u8    fn_800504F4(CourseInfo* pCourse, int nX, int nZ, f32* pFrom, f32* pTo, f32* pDir, f32 fMax, f32* pHit,
                   f32* pNormal, SurfaceType** ppSurface, TerObject** ppObj);
 u8    fn_8004E0D4(f32* pFrom, f32* pDir, f32 fRange, f32* pCentre, f32 fRadius);
-s8**  fn_80034A20(u16 nPatch, u16 nObjList);               // a course object's model (GoTerrain.c)
-int   fn_80050BD8(s8** ppData, int n);
+int   fn_80050BD8(UObjMesh* pModel, int n);
 
 // TW06: bool Ter_LineTriangleIntersection(f32*, f32*, f32, f32**, f32*, f32[4]*, f32[4]*). Where the
 // line from pFrom along pDir meets a triangle, as a fraction t of pDir (0 < t < fMax): t, the point
@@ -336,7 +336,7 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
     f32 (*pVert)[3];
     u8* pFlags;
     u8 uFlags;
-    s8** ppModel;
+    UObjMesh* pModel;
 
     bObstructed = 0;
     bFirst = 1;
@@ -369,9 +369,9 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
                     fDist = (f32)fn_80009680(fDx * fDx + fDz * fDz) - fObjRadius;
                     if (fDist < fRadius || (fObjRadius > 4.0f && fDist < fWide)) {
                         if (bModels) {
-                            ppModel = fn_80034A20(pCourse->pObjects[*pObjRef].nPatch,
-                                                  pCourse->pObjects[*pObjRef].nObjList);
-                            if (ppModel != NULL && (fn_80050BD8(ppModel, 0) & 0x40)) {
+                            pModel = fn_80034A20(pCourse->pObjects[*pObjRef].nPatch,
+                                                 pCourse->pObjects[*pObjRef].nObjList);
+                            if (pModel != NULL && (fn_80050BD8(pModel, 0) & 0x40)) {
                                 bObstructed = 1;
                             }
                         } else {
@@ -2301,12 +2301,11 @@ u8 fn_80050A9C(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ) {
     return 1;
 }
 
-// A signed byte of a course object's model data: byte 0x24 + n of the block the model's first
-// word points at. Ter_CheckObjectAndHazardObstruction finds the model with fn_80034A20 (from the
-// object's nPatch and nObjList) and tests bit 0x40 of byte n = 0. The block's layout is not known
-// yet (its other accessors, from 0x800354E4, are still sweep code), so the offset stays raw.
-int fn_80050BD8(s8** ppData, int n) {
-    return (*ppData)[n + 0x24];
+// A flag byte of a course object's model (GoTerrain.c's fn_800354D0 reads the same bytes).
+// Ter_CheckObjectAndHazardObstruction finds the model with fn_80034A20 (from the object's nPatch
+// and nObjList) and tests bit 0x40 of byte n = 0.
+int fn_80050BD8(UObjMesh* pModel, int n) {
+    return pModel->pInfo->a24[n];
 }
 
 // TW06: s32 MaterialTypes::getMaterialID(const TGD_MaterialInfo*). A surface's row in

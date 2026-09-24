@@ -139,8 +139,8 @@ void Mov_Init(void) {
     AudVoiceRequest request;
 
     request.nPriority = 0x3FFF;
-    request.n4 = 2;
     request.flags.n = 0;
+    request.n4 = 2;
     request.flags.b.b14 = 1;
     request.flags.b.b10 = 1;
     request.flags.b.b9 = 1;
@@ -205,11 +205,11 @@ void Mov_Start(void) {
 
 // A chunk of the movie's sound came in: each channel goes into the next block of its voice's ring.
 void fn_800A8AD4(MovieSoundBlock* pBlock) {
+    u32 uRight;
     int nMode;
     u8* pDataL;
     u8* pDataR;
     u32 uLeft;
-    u32 uRight;
 
     if (lbl_801F1850.nState == 0) return;
     if (lbl_801F1850.nSendBlock == 0) {
@@ -442,7 +442,7 @@ void fn_800A929C(u32 uMemory) {
         }
         return;
     }
-    for (i = 0; i < pBank->nSamples; i++, pSample++) {
+    for (i = 0; i < pBank->nSamples; pSample++, i++) {
         pSample->u0 += pBank->uAram * 2;
         pSample->u4 += pBank->uAram * 2;
         if (pSample->uC != 0) {

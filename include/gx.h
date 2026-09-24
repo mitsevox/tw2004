@@ -25,10 +25,22 @@ typedef struct GXColor {
 void GXSetAlphaUpdate(u8 bUpdate);
 void GXSetColorUpdate(u8 bUpdate);
 void GXSetZMode(u8 bCompare, int eCompare, u8 bUpdate);
+void GXSetBlendMode(int eType, int eSrcFactor, int eDstFactor, int eLogicOp);
 
 // ---- vertex arrays ----------------------------------------------------------------------------
 
 void GXInvalidateVtxCache(void);
+
+// ---- display lists ----------------------------------------------------------------------------
+
+void GXBeginDisplayList(void* pList, u32 uSize);
+u32  GXEndDisplayList(void);            // the list's size
+void GXResetWriteGatherPipe(void);
+
+// ---- matrices --------------------------------------------------------------------------------
+
+void GXLoadPosMtxImm(f32 (*pMtx)[4], int nId);
+void GXSetClipMode(int eMode);
 void GXSetArray(int eAttr, void* pBase, u8 nStride);
 void GXClearVtxDesc(void);
 void GXSetVtxDesc(int eAttr, int eType);
@@ -45,6 +57,7 @@ void GXInitTlutObj(GXTlutObj* pObj, void* pLut, int eFormat, u16 nEntries);
 u32  GXGetTexBufferSize(u16 nWidth, u16 nHeight, u32 eFormat, u8 bMipmap, u8 nMaxLod);
 void GXLoadTexObj(GXTexObj* pObj, int eMap);
 void GXSetNumTexGens(u8 nGens);
+void GXLoadTexMtxIndx(u16 nIndex, u32 nId, int eType);
 
 // ---- the texture environment (TEV) ------------------------------------------------------------
 
