@@ -18,6 +18,226 @@ f32  fn_80043420(int nPlayer, CamScript* pScript, f32* pPos, f32* pCam, CamShot*
 void fn_8004349C(int nPlayer, f32* pCam, f32* pOut, f32* pTarget, CamScript* pScript, f32 fLag);
 void fn_8004255C(f32* pPos, f32* pTarget, f32 fUp, f32 fSide);
 void fn_8001EB8C(Character* pChar, int nBone, f32* pPos);   // char.c: a bone's position
+CamLens* fn_80008370(void* pCamera);                        // the render camera's lens
+void fn_80038054(u8 a, int n, f32 f1, f32 f2);
+void fn_800457B8(int nPlayer, f32 f);
+f32  fn_800DC45C(f32 f);
+u8   fn_80044E74(CamShot* pShot);
+void fn_80064F54(CamShot* pShot, int nPlayer, f32* pOut);
+void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pSub, f32* pPrev,
+                 f32 fTime);
+void fn_8003EE68(CamScript* pScript, f32* pCam, int a, int nPlayer, f32 f);
+f32  fn_8003F064(CamScript* pScript, f32 fTime);
+void fn_8003F518(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime);
+void fn_8003F7EC(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime);
+void fn_8003FAA0(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime);
+void fn_8003FD54(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime);
+void fn_8004017C(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime);
+void CamScript_SplineCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime);
+void fn_800407D4(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime);
+void fn_80040A58(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime);
+void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam, CamScript* pScript,
+                              f32* pVec, f32 fTime);
+void CameraScript_GoToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pCam, f32* pSub,
+                                CamShot* pSaved);
+void CamScript_CheckOutOfBounds(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pSaved,
+                                f32* pPrev, u8 b);
+void CamScript_UpdateFairwayCam(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer);
+void fn_800441E4(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pSaved, f32* pPrev);
+u8   fn_800439E4(f32* pCam, int nPlayer);
+u8   fn_80043920(CamScript* pScript, int nPlayer);
+
+// The camera script's frame (a view's &View.script; pShot is the view's hand-built shot19C). Unless
+// paused (or b), it eases the ball-update rate fEC, places the camera for the current and next
+// shots (fn_8003A148 for script shots, bA8 1), then either takes the current shot outright (its look-at
+// point, field of view, slow motion) or blends by the next shot's kind nBC (0, 1, 2/11/12, 3, 7,
+// 13, 14, 15); keeps the camera above the ground and on the fairway, steps the script's clocks, and
+// moves on to the next shot when the current one has run its f8C (kinds 13 and 15: when fF8
+// reaches 1).
+void fn_8003DCE8(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b, f32 fTime) {
+    f32 vBall[4];
+    f32 vMove[4];
+    f32 vPrev[4];
+    f32 fFov;
+    f32 fStep;
+    f32 f88;
+    f32 f8C;
+    f32 f90;
+    int nUpdates;
+
+    if (pScript->pShot == NULL) return;
+    if (fn_800C714C()) {
+        fTime = FRAME_TIME;
+    }
+    fn_8000C594();  // the result is not used
+    if (!b && !fn_80043388(pScript, pScript->pShot)
+        && (gSession.nPaused != 0 || (0.0f == gSession.fFrameTime && 0.0f == fTime))) {
+        if (pScript->nCamera != 0) {
+            fn_8003F2E0(pScript, fTime);
+        }
+        return;
+    }
+    if (fn_80043920(pScript, nPlayer)) {
+        if (pScript->nCamera != 0) {
+            fn_8003F2E0(pScript, fTime);
+        }
+        return;
+    }
+    Vec_Copy(pCam, vPrev);
+    nUpdates = GameEffects_BallUpdatesThisFrame(nPlayer);
+    if (nUpdates > 0 && (f32)nUpdates != pScript->fEC) {
+        if (pScript->fEC < (f32)nUpdates) {
+            pScript->fEC += lbl_80281F78->f1A8;
+            if (pScript->fEC > (f32)nUpdates) {
+                pScript->fEC = nUpdates;
+            }
+        } else {
+            pScript->fEC -= lbl_80281F78->f1A8;
+            if (pScript->fEC < (f32)nUpdates) {
+                pScript->fEC = nUpdates;
+            }
+        }
+    }
+    pScript->fEC = pScript->fEC < 1.0f ? 1.0f : (pScript->fEC > 2.0f ? 2.0f : pScript->fEC);
+    if (pScript->pShot->bA8 == 1) {
+        fn_8003A148(pScript->pShot, nPlayer, pScript, pScript->v0, pSub, vPrev, fTime);
+    } else {
+        fn_80064F54(pScript->pShot, nPlayer, pScript->v0);
+    }
+    if (pScript->pNextShot != NULL) {
+        if (pScript->pNextShot->bA8 == 1) {
+            fn_8003A148(pScript->pNextShot, nPlayer, pScript, pScript->v10, pSub, vPrev, fTime);
+        } else {
+            fn_80064F54(pScript->pNextShot, nPlayer, pScript->v10);
+        }
+    }
+    if (pScript->pNextShot == NULL || pScript->nBC == 5 || pScript->nBC == 6
+        || (pScript->nBC >= 8 && pScript->nBC <= 10) || pScript->nBC == 4) {
+        Vec3Copy(pScript->v0, pCam);
+        CamScript_GetLookAtPoint(pScript->pShot, nPlayer, pScript->a20, pCam, pScript, vPrev, fTime);
+        Vec3Copy(pScript->a20, pSub);
+        if (pScript->pShot->f78 == pScript->pShot->f7C) {
+            fFov = pScript->pShot->f78;
+        } else if (pScript->fCamTime < pScript->pShot->f48) {
+            fFov = pScript->fCamTime / pScript->pShot->f48 * (pScript->pShot->f7C - pScript->pShot->f78)
+                   + pScript->pShot->f78;
+        } else {
+            fFov = pScript->pShot->f7C;
+        }
+        fFov += fn_800DC3A4();
+        if (fn_80044E74(pScript->pShot)) {
+            fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[1])), fFov);
+        } else {
+            fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), fFov);
+        }
+        f88 = pScript->pShot->f88;
+        fn_800457B8(nPlayer, f88 + fn_800DC45C(f88));
+        f8C = pScript->pShot->f8C;
+        f90 = pScript->pShot->f90;
+        if (f8C > 0.0f || f90 > 0.0f) {
+            if (fn_80044E74(pScript->pShot)) {
+                fn_80038054(1, gPlayers[nPlayer].nView[1], f90, f8C);
+            } else {
+                fn_80038054(1, gPlayers[nPlayer].nView[0], f90, f8C);
+            }
+        }
+        pScript->fA8 = pScript->pShot->f9C;
+    } else {
+        switch (pScript->nBC) {
+        case 0:
+            fn_8003F518(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+            break;
+        case 13:
+            fn_8003F7EC(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+            break;
+        case 15:
+            fn_8003FAA0(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+            break;
+        case 1:
+            fn_8003FD54(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+            break;
+        case 14:
+            fn_8004017C(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+            break;
+        case 2:
+        case 11:
+        case 12:
+            fn_800407D4(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+            break;
+        case 7:
+            fn_80040A58(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+            break;
+        case 3:
+            CamScript_SplineCameras(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+            break;
+        }
+    }
+    if (pScript->pShot->bA8 == 1 || (pScript->pNextShot != NULL && pScript->pNextShot->bA8 == 1)) {
+        if (pScript->pShot->bAD != 0
+            && CamScript_KeepAboveGround(nPlayer, pCam, vPrev, fn_80043388(pScript, pScript->pShot) == 0,
+                                         NULL, NULL, NULL, lbl_80281F78->f168)
+            && (s8)GOLFERSTATE_GetCurrentState(nPlayer) == 12 && pScript->pShot->bAD != 3) {
+            CamScript_PutBackOnFairway(pScript, pCam, pSub, nPlayer, pShot, vPrev);
+        }
+        if (pScript->bCF) {
+            if (pScript->pShot != NULL && pScript->pShot->bAD == 4) {
+                CamScript_UpdateFairwayCam(pScript, pCam, pSub, nPlayer);
+            }
+        }
+        if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 12 && fn_80043388(pScript, pScript->pShot)
+            && pScript->pShot->bAD != 3 && !pScript->bCF && fn_800439E4(pCam, nPlayer) && !fn_800E39F0()) {
+            CamScript_PutBackOnFairway(pScript, pCam, pSub, nPlayer, pShot, vPrev);
+        }
+        if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 12 && !fn_8003A76C(pScript->pShot)) {
+            fn_800441E4(pScript, pCam, pSub, nPlayer, pShot, vPrev);
+        }
+    }
+    fn_8003EE68(pScript, pCam, 1, nPlayer, -1.0f);
+    if (pScript->nCamera != 0) {
+        fn_8003F2E0(pScript, fTime);
+    }
+    if (fn_80043388(pScript, pScript->pShot)) {
+        pScript->v60[0] = 0.0f;
+        pScript->v60[1] = 0.0f;
+        pScript->v60[2] = 0.0f;
+    } else {
+        fn_80045428(pCam, vPrev, pScript->v60);
+    }
+    b = fn_80043388(pScript, pScript->pShot);
+    fStep = fn_8003F064(pScript, fTime);
+    pScript->f84 = pScript->fCamTime;
+    pScript->fCamTime += fStep;
+    pScript->f90 += fStep;
+    pScript->f88 += fStep;
+    pScript->f9C = pScript->f98;
+    pScript->f98 += fStep;
+    fn_8003D9AC(pScript, pScript->pShot, nPlayer, vBall, 1);
+    if (pScript->nE0 != 25 && pScript->f98 > pScript->fE4) {
+        pScript->nC4 = pScript->nE0;
+    }
+    if (0.0f != fStep) {
+        pScript->bCC = 0;
+    }
+    if (pScript->pNextShot != NULL) {
+        if ((pScript->nBC == 13 || pScript->nBC == 15) ? pScript->fF8 >= 1.0f
+                                                         : pScript->fCamTime > pScript->f8C) {
+            if (pScript->nBC == 7) {
+                pScript->pNextShot = NULL;
+                pScript->nBC = 5;
+            } else {
+                CameraScript_GoToNewScript(pScript, pScript->pNextShot, nPlayer, pCam, pSub, pShot);
+                b = fn_80043388(pScript, pScript->pShot);
+            }
+            if (fStep > 0.0f) {
+                fn_80045428(vPrev, pCam, vMove);
+                pScript->fD4 = fn_80009680(fn_80009744(vMove)) / fStep;
+            }
+        }
+    }
+    if (pScript->pShot->bA8 == 1) {
+        CamScript_CheckOutOfBounds(pScript, pCam, pSub, nPlayer, pShot, vPrev, b);
+    }
+}
 
 // Where the camera looks for the shot's bAC, into pOut: the pin (kind 0 in golfer state 18), the
 // ball, Player.vBall, bones of the golfer, the tee, the aim; the look-at point is moved by the
