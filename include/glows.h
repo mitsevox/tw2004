@@ -49,15 +49,25 @@ typedef struct GlowQueue {
 
 extern GlowQueue* lbl_80281F80;
 
+// A part of a SunFlrView (0x20 bytes; our name): one of four images, one per video field mod 4.
+typedef struct SunFlrPart {
+    s32  n0;                    // 0x00  } where fn_8009A754 starts reading p1C's pixels (x, y)
+    s32  n4;                    // 0x04  }
+    s32  n8;                    // 0x08  } and lbl_80189DA8's weights (column, row)
+    s32  nC;                    // 0x0C  }
+    s32  n10;                   // 0x10  how many columns it reads
+    s32  n14;                   // 0x14  how many rows
+    u32  u18;                   // 0x18  a pixel's colour must be above this for its weight to count
+    u8*  p1C;                   // 0x1C  its part of pBuffer: a 12 x 12 RGBA8 image
+} SunFlrPart;
+LAYOUT_ASSERT(SunFlrPart, 0x20);
+
 // A view's part of lbl_802813B8 (0xA8 bytes), which SunFlr_Gc.c's functions work on.
 typedef struct SunFlrView {
     u8*  pBuffer;               // 0x00  2304 bytes, four parts of 576 (fn_8009A344); freed by fn_8009A3D0
     u8   unk4[0xC - 0x4];
     s32  nC;                    // 0x0C  576
-    struct {
-        u8   unk0[0x1C];
-        u8*  p1C;               // +0x1C  its part of pBuffer
-    } aPart[4];                 // 0x10  the first two are cleared at set-up
+    SunFlrPart aPart[4];        // 0x10  the first two are cleared at set-up
     f32  af90[2];               // 0x90  fn_8009A754's result, one per video field
     f32  f98;                   // 0x98  } where fn_8006434C puts lbl_802813B8->v4 on the view's
     f32  f9C;                   // 0x9C  } screen
@@ -67,6 +77,9 @@ typedef struct SunFlrView {
     u8   unkA6[0xA8 - 0xA6];
 } SunFlrView;
 LAYOUT_ASSERT(SunFlrView, 0xA8);
+
+// SunFlr_Gc.c's weights for fn_8009A754 (6 rows of 8).
+extern f32 lbl_80189DA8[6][8];
 
 // An entry of Code8009AA28.c's table lbl_80189E78 (0x90 bytes; our name): up to two elements.
 typedef struct SunFlrSet {
@@ -87,7 +100,7 @@ extern u8 lbl_8018A4D8[];
 
 // Code8009AA28.c's state (our name), reached through lbl_802813B8. Only the fields read are named.
 typedef struct SunFlrState {
-    u8   unk0[4];
+    f32  f0;                    // 0x0000  scales fn_8009A754's sum
     f32  v4[3];                 // 0x0004  set by GoTerrain.c's fn_80035590
     u8   unk10[4];
     f32  v14[3];                // 0x0014  set by GoTerrain.c's fn_800355B8
