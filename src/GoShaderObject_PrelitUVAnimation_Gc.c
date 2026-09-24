@@ -1,6 +1,6 @@
 // GoShaderObject_PrelitUVAnimation_Gc.c (EA's name, from its asserts): the shader object of row 5
 // of lbl_80188E88, prelit course geometry whose texture scrolls (engine.h's PrelitUVObject), and
-// the code that runs every row's frame hooks.
+// the code that inits and closes every shader type (ModuleHooks.pfn0 / pfn4).
 
 #include "game_types.h"
 #include "engine.h"
@@ -242,14 +242,14 @@ void fn_8007178C(void) {
 
 // ---- end of sweep code ----
 
-// Run hook set nRow of lbl_80188E78's first hook, if it has one.
+// Run the first hook of lbl_80188E78's set nRow, if it has one.
 void fn_800717AC(int nRow) {
     if (lbl_80188E78[nRow].pfn0 != NULL) {
         lbl_80188E78[nRow].pfn0();
     }
 }
 
-// Run hook set nRow of lbl_80188E78's second hook, if it has one.
+// Run the second hook of lbl_80188E78's set nRow, if it has one.
 void fn_800717E8(int nRow) {
     if (lbl_80188E78[nRow].pfn4 != NULL) {
         lbl_80188E78[nRow].pfn4();
@@ -307,7 +307,8 @@ void fn_80071910(void) {
 
 // ---- end of sweep code ----
 
-// Run every row's first hook: all rows in game types 4 to 8, else only those lbl_801893D8 marks.
+// Init every shader type (ModuleHooks.pfn0): all rows in game types 4 to 8, else only those
+// lbl_801893D8 marks.
 void fn_80071914(void) {
     int i;
 
@@ -318,17 +319,15 @@ void fn_80071914(void) {
     }
 }
 
-// Run every row's second hook, for the same rows as fn_80071914.
+// Close every shader type (ModuleHooks.pfn4), the same rows as fn_80071914.
 void fn_80071994(void) {
     int i;
 
-    i = 0;
-    do {
+    for (i = 0; i < 20; i++) {
         if ((gSession.nGameType >= 4 && gSession.nGameType <= 8) || lbl_801893D8[i] != 0) {
             fn_80071A90(i);
         }
-        i++;
-    } while (i < 20);
+    }
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -343,14 +342,14 @@ void fn_80071A34(void) {
 
 // ---- end of sweep code ----
 
-// Run row nRow's first hook, if it has one.
+// Init shader type nRow, if it has an init.
 void fn_80071A54(int nRow) {
     if (lbl_80188E88[nRow].pfn0 != NULL) {
         lbl_80188E88[nRow].pfn0();
     }
 }
 
-// Run row nRow's second hook, if it has one.
+// Close shader type nRow, if it has a close.
 void fn_80071A90(int nRow) {
     if (lbl_80188E88[nRow].pfn4 != NULL) {
         lbl_80188E88[nRow].pfn4();
