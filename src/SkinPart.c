@@ -577,9 +577,9 @@ s32 fn_800CD5D0(SkinDesc* pDesc, int n) {
 s32 fn_800CD664(SkinDesc* pDesc, int nPart) {
     SkinPartDef* pPart;
     SkinVariant* pVariant;
+    s32 nMax;
     int i;
     int j;
-    s32 nMax;
     s32 nBytes;
 
     nMax = 0;
