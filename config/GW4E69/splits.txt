@@ -200,6 +200,7 @@ DepthField.c:
 UObject3D.c:
 	.text       start:0x80045D18 end:0x80045F74
 	.data       start:0x80187B88 end:0x80187B98
+	.sbss       start:0x80281D98 end:0x80281DA0
 
 GoDynObj.c:
 	.text       start:0x80045F74 end:0x800486F4
