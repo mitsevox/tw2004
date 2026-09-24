@@ -158,13 +158,15 @@ void fn_80110A24(HwsBurn* pBurn, int n) {
 // Everything the meshes of SkinDesc.p5C entry n use (fn_80110A38 on each).
 void fn_80110C88(HwsBurn* pBurn, int n) {
     SkinIterArgs args;
-    u8 aBuf[0x20];                      // size unknown
+    u8 aBuf[0x48];                      // size unknown
     SkinIter* pIter;
+    int nMesh;
 
     args.pDesc = pBurn->pDesc;
     args.n = n;
     for (pIter = fn_80113A9C(aBuf, &args); fn_800CEEC0(pIter); fn_800CEEC8(pIter)) {
-        fn_80110A38(pBurn, fn_800CEEFC(pIter));
+        nMesh = fn_800CEEFC(pIter);
+        fn_80110A38(pBurn, nMesh);
     }
     fn_80113B14(pIter);
 }
@@ -270,9 +272,9 @@ s32 fn_80111310(HwsBurn* pBurn, s32 nAlign) {
 // Copy SkinDesc.p28 and each entry's block to pBase + *pOffset (see fn_80110E98).
 SkinDesc28* fn_80111384(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
     SkinDesc* pDesc = pBurn->pDesc;
+    int i;
     int n = pDesc->n24;
     SkinDesc28* aCopy = fn_80110E98(pBase, pOffset, pDesc->p28, n * sizeof(SkinDesc28), nAlign);
-    int i;
 
     for (i = 0; i < n; i++) {
         aCopy[i].p10 = fn_80110E98(pBase, pOffset, pDesc->p28[i].p10, pDesc->p28[i].n14, nAlign);
