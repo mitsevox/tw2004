@@ -6,6 +6,7 @@
 #include "gx.h"
 #include "core/startup.h"
 #include "lldyntex.h"
+#include "character.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -20,7 +21,8 @@ void fn_8000FBAC();
 // ---- end of sweep code ----
 
 void fn_8010B7C0(void);
-void fn_8010A930(DynTexObj* pObj, u8* pBuf, void* p, s32 n);
+void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode);
+s32  fn_8010B754(DynTexObj* pObj);
 s32  fn_8010B338(DynTex* pTex, DynTexObj* pObj, DynTexPalette* pPal, u8* pPixels, u8* pPalette,
                  void* p, s32 n);   // adds a texture; gives its index
 DynTexJob* fn_8010B960(void);
@@ -31,6 +33,9 @@ int  fn_800106F0(TexBank* pBank);       // LLTexGrp.c
 int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
 TexEntry* fn_800107E4(TexBank* pBank, int nTex);  // LLTexGrp.c
 s32  fn_8010BC94(const void* pA, const void* pB);
+s32  fn_8010B5F8(DynTexObj* pObj);
+void fn_80007368(void);
+void fn_80007328(void);
 
 // Set up: the state and its nSize-byte block (gomainloop.c: 0x18000, later 0x6000).
 void fn_8010A448(int nSize) {
@@ -152,6 +157,114 @@ void fn_8010A788(f32* pIn, f32* pOut, f32 (*pMtx)[3], s32 nMode) {
     pOut[0] = (pOut[0] < 0.0f) ? 0.0f : ((pOut[0] > 1.0f) ? 1.0f : pOut[0]);
     pOut[1] = (pOut[1] < 0.0f) ? 0.0f : ((pOut[1] > 1.0f) ? 1.0f : pOut[1]);
     pOut[2] = (pOut[2] < 0.0f) ? 0.0f : ((pOut[2] > 1.0f) ? 1.0f : pOut[2]);
+}
+
+// Recolour a compressed (GX_TF_CMPR) texture through a colour matrix (fn_8010A788): in each 4x4
+// block, both key colours (RGB565) go through it; when that flips which one is larger, which
+// switches the block between its four- and three-colour modes, they are stored the other way
+// round and the block's 2-bit indices are remapped to match.
+void fn_8010A930(DynTexObj* pObj, u8* pBuf, f32 (*pMtx)[3], s32 nMode) {
+    u8* pPixels = pBuf + pObj->aBlocks[0].nOffset;
+    u16* pBlock = (u16*)pPixels;
+    int y;
+    int x;
+    f32 aIn[3];
+    f32 aOut[3];
+    u16 uOld0;
+    u16 uOld1;
+    u16 uNew0;
+    u16 uNew1;
+    u8 bSwap;
+    u8 bThree;
+    int i;
+    int nShift;
+    u8 uIndices;
+    u8 uIndex;
+    u8* pIndices;
+
+    if (pObj->n40 != 14) {      // GX_TF_CMPR
+        return;
+    }
+    for (y = 0; y < pObj->n3A / 4; y++) {
+        for (x = 0; x < pObj->n38 / 4; x++, pBlock += 4) {
+            uOld0 = pBlock[0];
+            aIn[0] = (f32)(u32)((uOld0 >> 8) & 0xF8) / 255.0f;
+            aIn[1] = (f32)(u32)((uOld0 >> 3) & 0xFC) / 255.0f;
+            aIn[2] = (f32)(u32)((uOld0 << 3) & 0xF8) / 255.0f;
+            fn_8010A788(aIn, aOut, pMtx, nMode);
+            uNew0 = (u16)((((u8)(int)(aOut[0] * 255.0f + 0.5f) >> 3) << 11) |
+                          (((u8)(int)(aOut[1] * 255.0f + 0.5f) >> 2) << 5) |
+                          ((u8)(int)(aOut[2] * 255.0f + 0.5f) >> 3));
+            uOld1 = pBlock[1];
+            aIn[0] = (f32)(u32)((uOld1 >> 8) & 0xF8) / 255.0f;
+            aIn[1] = (f32)(u32)((uOld1 >> 3) & 0xFC) / 255.0f;
+            aIn[2] = (f32)(u32)((uOld1 << 3) & 0xF8) / 255.0f;
+            fn_8010A788(aIn, aOut, pMtx, nMode);
+            uNew1 = (u16)((((u8)(int)(aOut[0] * 255.0f + 0.5f) >> 3) << 11) |
+                          (((u8)(int)(aOut[1] * 255.0f + 0.5f) >> 2) << 5) |
+                          ((u8)(int)(aOut[2] * 255.0f + 0.5f) >> 3));
+            if (uOld0 > uOld1) {
+                // Four colours: the first key colour must stay the larger.
+                if (uNew0 > uNew1) {
+                    pBlock[0] = uNew0;
+                    bSwap = 0;
+                    pBlock[1] = uNew1;
+                } else {
+                    pBlock[0] = uNew1;
+                    bSwap = 1;
+                    bThree = 0;
+                    pBlock[1] = uNew0;
+                }
+            } else if (uNew0 > uNew1) {
+                // Three colours: the first key colour must stay the smaller.
+                pBlock[0] = uNew1;
+                bSwap = 1;
+                bThree = 1;
+                pBlock[1] = uNew0;
+            } else {
+                pBlock[0] = uNew0;
+                bSwap = 0;
+                pBlock[1] = uNew1;
+            }
+            if (!bSwap) {
+                continue;
+            }
+            pIndices = (u8*)&pBlock[2];
+            for (i = 0; i < 4; i++, pIndices++) {
+                uIndices = 0;
+                for (nShift = 0; nShift < 8; nShift += 2) {
+                    // EA bug: the mask keeps every bit from nShift up, not just the index's two,
+                    // and the indices are compared as if 0x10 and 0x11 were binary 10 and 11;
+                    // only the top index of a row is read right.
+                    uIndex = (*pIndices & (0xFF << nShift)) >> nShift;
+                    if (bThree) {
+                        if (uIndex == 0) {
+                            uIndices |= 1 << nShift;
+                        } else if (uIndex == 1) {
+                            uIndices |= 0 << nShift;
+                        } else if (uIndex == 0x10) {
+                            uIndices |= 0x10 << nShift;
+                        } else if (uIndex == 0x11) {
+                            uIndices |= 0x11 << nShift;
+                        }
+                    } else {
+                        if (uIndex == 0) {
+                            uIndices |= 1 << nShift;
+                        } else if (uIndex == 1) {
+                            uIndices |= 0 << nShift;
+                        } else if (uIndex == 0x10) {
+                            uIndices |= 0x11 << nShift;
+                        } else if (uIndex == 0x11) {
+                            uIndices |= 0x10 << nShift;
+                        }
+                    }
+                }
+                *pIndices = uIndices;
+            }
+        }
+    }
+    DCFlushRange(pPixels, fn_8010B754(pObj));
+    GXInvalidateTexAll();
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -558,13 +671,132 @@ u8 fn_8010BF3C(void) {
     return bDone;
 }
 
-void fn_8010BFA0(s32 n) {
-    lbl_80282488->n97C = n;
-    lbl_80282488->n978 = lbl_80282488->n978 + n;
+// fn_80006444's callback: nBytes more arrived (nError is not read).
+void fn_8010BFA0(int nBytes, int nError) {
+    lbl_80282488->n97C = nBytes;
+    lbl_80282488->n978 = lbl_80282488->n978 + nBytes;
     lbl_80282488->b974 = 1;
     if (lbl_80282488->n978 >= lbl_80282488->n984) {
         lbl_80282488->b975 = 1;
     }
+}
+
+// The Character whose p50 ppBank points at (char.c hands LLDynTex.c &Character.p50; the fields
+// after it, up to p60, are read through it).
+// port: EA likely had these five fields in a struct of their own inside Character
+#define DYNTEX_CHAR(ppBank) ((Character*)((u8*)(ppBank) - 0x50))
+
+// The loader, run each frame by fn_8010BF68: takes the next queued job, then streams the pixels
+// and palette of each texture in use (aUses) from the job's character file in reads of at most
+// nA98 bytes, fn_80006444 reading in the background and fn_8010BFA0 counting what arrived, and
+// copies them into the character's DynTex. Returns whether it is still busy.
+u8 fn_8010BFE0(void) {
+    TexEntry* pEntry;
+    TexPalette* pPal;
+    DynTex* pTex;
+    u32 bReady;
+    s32 nLen;
+
+    if (lbl_80282488->n980 == 3) {
+        if (lbl_80282488->b974 != 0) {
+            lbl_80282488->n980 = 0;
+            return 0;
+        }
+        return 1;
+    }
+    if (lbl_80282488->n980 == 0) {
+        if (lbl_80282488->nA84 != 0) {
+            lbl_80282488->pA88 = fn_8010B960();
+            lbl_80282488->pA88->pfnA(lbl_80282488->pA88->pChar);
+            if (DYNTEX_CHAR(lbl_80282488->p8)->hFile < 0) {
+                lbl_80282488->pA88->pfnB(lbl_80282488->pA88->pChar);
+                lbl_80282488->n980 = 0;
+                lbl_80282488->pA88->bUsed = 0;
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+    }
+    fn_80007368();
+    bReady = lbl_80282488->b974 != 0;
+    fn_80007328();
+    if (bReady) {
+        pTex = DYNTEX_CHAR(lbl_80282488->pA88->p0)->p60;
+        // Copy what the last read brought.
+        if (lbl_80282488->n978 != 0) {
+            Mem_cpy(lbl_80282488->p4, lbl_80282488->p0 + lbl_80282488->nA94, lbl_80282488->nA90);
+            lbl_80282488->p4 += lbl_80282488->nA90;
+            lbl_80282488->nA8C += lbl_80282488->nA90;
+            lbl_80282488->nA94 = 0;
+        }
+        if (lbl_80282488->b975) {
+            if (lbl_80282488->n980 == 1) {
+                // The last texture is all in: flush it (and its palette) to the GPU.
+                if (lbl_80282488->n978 != 0 && lbl_80282488->n970 > 0) {
+                    fn_8010B1D4(pTex, lbl_80282488->aUses[lbl_80282488->n970 - 1].nC, NULL,
+                                lbl_80282488->aUses[lbl_80282488->n970 - 1].p4,
+                                lbl_80282488->aUses[lbl_80282488->n970 - 1].n8);
+                    if (pTex->p0[lbl_80282488->aUses[lbl_80282488->n970 - 1].nC].n1C != 0) {
+                        // port: EA passes two arguments fn_8010B2A8 ignores
+                        ((void (*)(DynTex*, int, s16*, void*, s32))fn_8010B2A8)(
+                            pTex, lbl_80282488->aUses[lbl_80282488->n970 - 1].nC, NULL,
+                            lbl_80282488->aUses[lbl_80282488->n970 - 1].p4,
+                            lbl_80282488->aUses[lbl_80282488->n970 - 1].n8);
+                    }
+                }
+                if (lbl_80282488->n970 == lbl_80282488->n96C) {
+                    // All done.
+                    lbl_80282488->pA88->pfnB(lbl_80282488->pA88->pChar);
+                    lbl_80282488->pA88->bUsed = 0;
+                    lbl_80282488->n980 = 0;
+                    return 0;
+                }
+                // The next texture: add it to the DynTex and work out the 2 KB-aligned read.
+                pEntry = lbl_80282488->aUses[lbl_80282488->n970].pTex;
+                lbl_80282488->n984 = 0;
+                pPal = NULL;
+                if (pEntry->nPalette != -1) {
+                    pPal = &(*lbl_80282488->p8)->pC[pEntry->nPalette];
+                }
+                lbl_80282488->aUses[lbl_80282488->n970].nC =
+                    fn_8010B338(DYNTEX_CHAR(lbl_80282488->pA88->p0)->p60, (DynTexObj*)pEntry,
+                                (DynTexPalette*)pPal, NULL, NULL,
+                                lbl_80282488->aUses[lbl_80282488->n970].p4,
+                                lbl_80282488->aUses[lbl_80282488->n970].n8);
+                lbl_80282488->p4 = pTex->p18 +
+                    pTex->p4->p8[lbl_80282488->aUses[lbl_80282488->n970].nC].aBlocks[0].nOffset;
+                lbl_80282488->u98C = DYNTEX_CHAR(lbl_80282488->p8)->n58 + pEntry->uPixels;
+                lbl_80282488->u98C &= ~0x7FF;
+                lbl_80282488->nA94 =
+                    DYNTEX_CHAR(lbl_80282488->p8)->n58 + pEntry->uPixels - lbl_80282488->u98C;
+                lbl_80282488->n988 = fn_8010B5F8((DynTexObj*)pEntry) << 4;
+                if (pPal != NULL) {
+                    lbl_80282488->n988 += fn_8010B664((DynTexPalette*)pPal) << 4;
+                }
+                lbl_80282488->n984 = lbl_80282488->n988 + lbl_80282488->nA94;
+                lbl_80282488->n984 = (lbl_80282488->n984 + 0x7FF) & ~0x7FF;
+                lbl_80282488->n970++;
+            }
+            lbl_80282488->n978 = 0;
+            lbl_80282488->nA8C = 0;
+            lbl_80282488->b975 = 0;
+        }
+        // Start the next read.
+        nLen = lbl_80282488->n984 - lbl_80282488->n978;
+        if (nLen > lbl_80282488->nA98) {
+            nLen = lbl_80282488->nA98;
+        }
+        lbl_80282488->nA90 = nLen - lbl_80282488->nA94;
+        if (lbl_80282488->nA8C + lbl_80282488->nA90 > lbl_80282488->n988) {
+            lbl_80282488->nA90 = lbl_80282488->n988 - lbl_80282488->nA8C;
+        }
+        lbl_80282488->b974 = 0;
+        fn_80006444(DYNTEX_CHAR(lbl_80282488->p8)->hFile, lbl_80282488->p0, nLen,
+                    lbl_80282488->u98C + lbl_80282488->n978, fn_8010BFA0);
+        return 1;
+    }
+    return 1;
 }
 
 // ---- end of sweep code ----
