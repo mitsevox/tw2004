@@ -3101,10 +3101,6 @@ void STATEFUNC_GreenWatchRollUpdate(int nPlayer) {
     Vec4        vOffset = {0.45f, 0.45f, 0.45f, 0.5f};
     CourseInfo* pCourse = fn_8000C594();
     int         nSteps;
-    s32*        pGhostState;
-    Ball*       pGhost;
-    s32*        pnView;
-    f32*        pGhostMinDist;
     int         i;
 
     Caddie_Update(nPlayer);
@@ -3130,23 +3126,20 @@ void STATEFUNC_GreenWatchRollUpdate(int nPlayer) {
         GOLFERSTATE_Pop(nPlayer);
         return;
     }
-    pGhost        = &gPlayers[nPlayer].ballBefore;
-    pGhostState   = &gPlayers[nPlayer].ballBefore.nState;
-    pnView        = gPlayers[nPlayer].nView;
-    pGhostMinDist = &gPlayers[nPlayer].ballBefore.fClosest;
     for (i = 0; i < nSteps; i++) {
         Ball_SetSimulating(1);
-        Physics_Simulate(pGhost, 20);
+        Physics_Simulate(&gPlayers[nPlayer].ballBefore, 20);
         Ball_SetSimulating(0);
-        if (*pGhostState == 1 || *pGhostState == 5) {
-            if (!fn_80063C90(fn_80017028(*pnView))) {
-                CameraController_FadeOut(fn_80017028(*pnView), 0.25f, (f32*)&vOffset);
+        if (gPlayers[nPlayer].ballBefore.nState == 1 || gPlayers[nPlayer].ballBefore.nState == 5) {
+            if (!fn_80063C90(fn_80017028(gPlayers[nPlayer].nView[0]))) {
+                CameraController_FadeOut(fn_80017028(gPlayers[nPlayer].nView[0]), 0.25f, (f32*)&vOffset);
             }
-        } else if (!fn_80063C90(fn_80017028(*pnView)) && pCourse != NULL) {
+        } else if (!fn_80063C90(fn_80017028(gPlayers[nPlayer].nView[0])) && pCourse != NULL) {
             int nPinSet = Game_CurrentPinSet();
-            if (*pGhostMinDist < 0.5f ||
-                *pGhostMinDist < Vec_Distance(pGhost->vPos, &pCourse->pin[nPinSet].x) - 0.1f) {
-                CameraController_FadeOut(fn_80017028(*pnView), 0.25f, (f32*)&vOffset);
+            if (gPlayers[nPlayer].ballBefore.fClosest < 0.5f ||
+                gPlayers[nPlayer].ballBefore.fClosest <
+                    Vec_Distance(gPlayers[nPlayer].ballBefore.vPos, &pCourse->pin[nPinSet].x) - 0.1f) {
+                CameraController_FadeOut(fn_80017028(gPlayers[nPlayer].nView[0]), 0.25f, (f32*)&vOffset);
             }
         }
     }
