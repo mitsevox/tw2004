@@ -478,9 +478,9 @@ void* fn_800951A0(u32 uSize, u16 nAlign, int n) {
     }
     uPad = nAlign - 1;
     uTotal = sizeof(HeapBlockHead) + 1 + uPad + uSize;
-    pData = OSAllocFromHeap(__OSCurrHeap, uTotal);
-    if (pData == NULL) return NULL;
-    pBlock = pData;
+    pBlock = OSAllocFromHeap(__OSCurrHeap, uTotal);
+    if (pBlock == NULL) return NULL;
+    pData = pBlock;
     // port: aligned by the address
     uOff = (uptr)(pBlock + sizeof(HeapBlockHead)) % nAlign;
     if (uOff != 0) {
