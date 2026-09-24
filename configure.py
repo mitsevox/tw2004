@@ -1014,7 +1014,7 @@ config.libs = [
             Object(NonMatching, "GameMode22.c"),
             Object(NonMatching, "SkinBurn.c"),
             Object(NonMatching, "EASBStorage.c"),
-            Object(NonMatching, "EASB.c"),
+            Object(Matching, "EASB.c"),
             # Built with pool_data on: fn_80165E9C 82.1 -> 94.2%, no function worse.
             Object(NonMatching, "UISEvent.c", extra_cflags=['-pragma "pool_data on"']),
             Object(NonMatching, "UIStudio.c"),

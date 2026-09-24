@@ -919,6 +919,7 @@ EASBStorage.c:
 
 EASB.c:
 	.text       start:0x8012CCD8 end:0x8012E950
+	.sdata2     start:0x80284B58 end:0x80284B60
 
 src/vi/vi.c:
 	.text       start:0x8012E950 end:0x8013042C
