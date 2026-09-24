@@ -199,6 +199,20 @@ void fn_8011E584(UStreamObject* pObject) {
     }
 }
 
+// A sort order: by the float at +8 of the objects the two entries point to, the larger first
+// (equal gives -1).
+int fn_8011E6B0(f32** ppA, f32** ppB) {
+    f32 fA = (*ppA)[2];
+    f32 fB = (*ppB)[2];
+    if (fA < fB) {
+        return 1;
+    }
+    if (fA >= fB) {
+        return -1;
+    }
+    return 0;
+}
+
 // The grass's frame update (after one skipped frame): new random tuning values when f3D4 changed,
 // the buffers and the grass camera, the texture pass, then the 16 sway points around the circle
 // and the phase moved on by f418 per 60th of a second.
@@ -251,20 +265,6 @@ void fn_8011E6E8(void) {
     if (lbl_80281900->f414 > 2.0f * PI) {
         lbl_80281900->f414 = lbl_80281900->f414 - 2.0f * PI;
     }
-}
-
-// A sort order: by the float at +8 of the objects the two entries point to, the larger first
-// (equal gives -1).
-int fn_8011E6B0(f32** ppA, f32** ppB) {
-    f32 fA = (*ppA)[2];
-    f32 fB = (*ppB)[2];
-    if (fA < fB) {
-        return 1;
-    }
-    if (fA >= fB) {
-        return -1;
-    }
-    return 0;
 }
 
 void fn_8011E974(void) {
