@@ -11,6 +11,9 @@
 #include "gx.h"
 #include "lighting.h"
 #include "terrain.h"
+#include "charstate.h"
+#include "dynobj.h"
+#include "lldyntex.h"
 #include "ustream.h"
 
 // The golfers the menus show in turn when none is picked: four rows of five golfer ids, the row
@@ -21,6 +24,9 @@ s32 lbl_801899E0[4][5] = {
     { 0, 8, 21, 24, 26 },
     { 1, 27, 4, 15, 25 },
 };
+
+// Where the golfer is placed (sFE_AdjustAndSetGolferPosition).
+f32 lbl_80189A30[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
 // Per screen kind: two vectors copied into CrAPState.v120 and v130 (all three are the same).
 f32 lbl_80189A40[2][4] = { { 0.5f, 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, 0.0f, 1.0f } };
@@ -59,6 +65,8 @@ GxTexture lbl_801D8714;         // the screen copy (fn_8002A624's pixels)
 GxTexture lbl_801D8744[2];      // lbl_80281BA4's two buffers
 
 s32 lbl_80281330 = 1;           // draw the golfer into the menu's texture (fn_8008E358)
+f32 lbl_80281334 = 0.17f;       // with b83: the most f14C may be
+f32 lbl_80281338 = 0.1f;        // with b83: f140, f144 and f148
 u8  lbl_8028133C = 1;
 s32 lbl_80281340 = -1;          // } the golfer and profile slot last drawn (fn_8008CE88)
 s32 lbl_80281344 = -1;          // }
@@ -82,6 +90,9 @@ void fn_8008CA88(void);
 void fn_8008CC30(void);
 void fn_8008CE2C(void);
 void fn_8008CE88(u8 bFull);
+void fn_8008D058(void);
+void fn_8008D6CC(void);
+void fn_8008E0B0(f32 fTurn);
 void fn_8008D8F4(void);
 void fn_8008D9DC(UStreamObject* pObject);
 void fn_8008DBE8(void);
@@ -118,6 +129,15 @@ void fn_80035810(Character* pChar);
 void fn_80035FBC(void);
 void fn_80035FDC(void);
 void fn_800760B0(int nX, int nY, int nWidth, int nHeight);
+void fn_8008F24C(void);
+void fn_800364A0(void);
+void fn_800B9EB8(char* szBall);
+void fn_8001A024(Character* pChar);
+char* fn_800484E0(int i);
+void fn_80035600(void);
+void Character_UpdateAnimation(Character* pChar, int a, f32 f);
+void fn_80035B40(Character* pChar, int n);
+void fn_80035FFC(void);
 void Session_SetupProfiles(void);
 void fn_80079974(void);
 void fn_800B9CF0(int n);
@@ -513,6 +533,317 @@ void fn_8008B9A0(void) {
         Vec_Copy(lbl_80189A80[1], lbl_80281EE0->v130);
         break;
     }
+}
+
+// Each frame: fade the golfer display (f14C, 0..0.5) with his animation, run screen kind 3's
+// shot sequence (n1C0), place him, turn to the next golfer when his animation ends, and animate
+// and light him.
+void sFE_AdjustAndSetGolferPosition(void) {
+    f32 vSaved[4];
+    LightParams params;
+    LightParams* pLight;
+    View* pView;
+    Character* pChar;
+    f32 fEnd;
+    f32 fTime;
+    f32 f180;
+    f32 fStart;
+    f32 fBlend;
+    f32 fHalf;
+    f32 fLeft;
+    f32 fFade;
+    int i;
+
+    fBlend = 1.0f;
+    pView = fn_80017028(fn_80016D10());
+    fn_8008F24C();
+    fn_800364A0();
+    if (lbl_80281EE0->aGolfer[0].b19 || lbl_80281EE0->b8A) {
+        lbl_80281EE0->aGolfer[0].b18 = 0;
+    }
+    if (lbl_80281EE0->b8A || (lbl_80281EE0->pB4 != NULL && lbl_80281EE0->pB4->b19)) {
+        lbl_80281EE0->pB4->b18 = 0;
+    }
+    // EA bug: without a character fEnd, fTime and f180 (and fStart) are read unset below.
+    if (lbl_80281EE0->pB4->pChar != NULL) {
+        fEnd = lbl_80281EE0->pB4->pChar->fAnimEnd;
+        fTime = lbl_80281EE0->pB4->pChar->fAnimTime;
+        f180 = lbl_80281EE0->pB4->pChar->f180;
+    }
+    if (lbl_80281EE0->n0 == 0) {
+        fFade = 1.0f;
+        if (lbl_80281EE0->pB4->pChar != NULL) {
+            fStart = fEnd - 1.0f;
+        }
+        if (fTime >= fStart) {
+            lbl_80281EE0->f14C = 0.5f * ((fEnd - fTime) / fFade);
+            if (lbl_80281EE0->f14C < 0.0f) {
+                lbl_80281EE0->f14C = 0.0f;
+            }
+        } else {
+            lbl_80281EE0->f14C = 0.5f * fTime / fFade;
+            if (lbl_80281EE0->f14C > 0.5f) {
+                lbl_80281EE0->f14C = 0.5f;
+            }
+        }
+    } else if (lbl_80281EE0->n0 == 3 && lbl_80281EE0->pB4->pChar != NULL) {
+        if (lbl_80281EE0->b1C8 == 1 && lbl_80281EE0->n1B4 != -1
+            && (lbl_80281EE0->n1C0 == lbl_80281EE0->n1C4 || lbl_80281EE0->n1C0 == 4)) {
+            lbl_80281EE0->b1C8 = 0;
+        }
+        if (lbl_80281EE0->n1C0 == 0) {
+            if (fEnd - fTime < 0.6f) {
+                lbl_80281EE0->n1C0 = 1;
+            }
+        } else if (lbl_80281EE0->n1C0 == 1 && lbl_80281EE0->sz20[0] != '\0') {
+            lbl_80281EE0->f14C = 0.5f * lbl_80281EE0->f1CC / 0.5f;
+            lbl_80281EE0->f1CC -= FRAME_TIME;
+            if (lbl_80281EE0->f1CC < 0.0f) {
+                if ((lbl_80281EE0->n8 == 2 && lbl_80281EE0->nC != 1) || lbl_80281EE0->nC == 2) {
+                    if (fn_800484F4(lbl_80281EE0->sz54) >= 0) {
+                        fn_800B9EB8(lbl_80281EE0->sz54);
+                    } else {
+                        fn_800B9EB8(NULL);
+                    }
+                    fn_8008E2F8(0, 0.0f);
+                    fn_8008E244();
+                    lbl_80281EE0->n1C0 = 2;
+                    fn_8008E468(lbl_80281EE0->sz20, lbl_80281EE0->sz30, 0);
+                    if (lbl_80281EE0->b80) {
+                        lbl_80281EE0->n8 = lbl_80281EE0->nC;
+                        GolfCamera_SwitchCrAPCamera(pView, NULL, 4, 0, 0, 0);
+                    }
+                } else if (lbl_80281EE0->n74 == 2 || lbl_80281EE0->b78 == 0) {
+                    if (lbl_80281EE0->f7C <= 0.0f) {
+                        fn_8001A024(lbl_80281EE0->pB4->pChar);
+                        lbl_80281EE0->b81 = 0;
+                    }
+                    fn_8008E2F8(0, 0.0f);
+                    fn_8008E244();
+                    lbl_80281EE0->n1C0 = 2;
+                    fn_8008E468(lbl_80281EE0->sz20, lbl_80281EE0->sz30, 0);
+                    if (lbl_80281EE0->b80) {
+                        lbl_80281EE0->n8 = lbl_80281EE0->nC;
+                        if (lbl_80281EE0->n8 == 1) {
+                            GolfCamera_SwitchCrAPCamera(pView, NULL, 3, 0, 0, 0);
+                        } else if (lbl_80281EE0->n8 == 2) {
+                            GolfCamera_SwitchCrAPCamera(pView, NULL, 4, 0, 0, 0);
+                        }
+                    }
+                    if (lbl_80281EE0->n1BC >= 0) {
+                        fn_8001C5B4(lbl_80281EE0->pB4->pChar, lbl_80281EE0->n1BC);
+                    }
+                }
+            }
+        } else if (lbl_80281EE0->n1C0 == 2) {
+            if (lbl_80281EE0->n74 == 2 && (lbl_80281EE0->b78 == 0 || fTime > lbl_80281EE0->f7C)) {
+                lbl_80281EE0->f7C = 0.0f;
+                fn_8001A024(lbl_80281EE0->pB4->pChar);
+                lbl_80281EE0->b81 = 0;
+            }
+            if (fTime >= fEnd - 0.5f) {
+                fLeft = fEnd - fTime;
+                lbl_80281EE0->f14C = 0.5f * (fLeft / 0.5f);
+                if (lbl_80281EE0->f14C <= 0.01f || fLeft < FRAME_TIME) {
+                    lbl_80281EE0->f14C = 0.0f;
+                    lbl_80281EE0->n1C0 = 3;
+                    if (lbl_80281EE0->b80) {
+                        lbl_80281EE0->n8 = 0;
+                        lbl_80281EE0->b80 = 0;
+                    }
+                    if (lbl_80281EE0->n1BC >= 0) {
+                        fn_8001C5B4(lbl_80281EE0->pB4->pChar, lbl_80281EE0->n1B8);
+                        lbl_80281EE0->n1BC = -1;
+                    }
+                    fn_8008DD50(0);
+                }
+                if (lbl_80281EE0->n1D0 == 0) {
+                    lbl_80281EE0->f14C = 0.5f;
+                }
+            } else {
+                lbl_80281EE0->f14C = 0.5f * fTime / 0.5f;
+                if (lbl_80281EE0->f14C >= 0.5f) {
+                    lbl_80281EE0->f14C = 0.5f;
+                }
+            }
+        } else if (lbl_80281EE0->n1C0 == 3) {
+            if (lbl_80281EE0->n74 == 2) {
+                fn_8001A024(lbl_80281EE0->pB4->pChar);
+                lbl_80281EE0->b81 = 0;
+            }
+            lbl_80281EE0->f14C = 0.5f * fTime / 0.5f;
+            if (lbl_80281EE0->f14C >= 0.5f) {
+                lbl_80281EE0->n1C0 = 4;
+                lbl_80281EE0->f14C = 0.5f;
+            }
+            if (lbl_80281EE0->n1D0 == 0) {
+                lbl_80281EE0->f14C = 0.5f;
+            }
+        } else {
+            if (lbl_80281EE0->n74 == 2) {
+                fn_8001A024(lbl_80281EE0->pB4->pChar);
+                lbl_80281EE0->b81 = 0;
+            }
+            lbl_80281EE0->f14C = 0.5f;
+        }
+    } else {
+        lbl_80281EE0->f14C = 0.5f;
+    }
+    lbl_80281EE0->f14C = (lbl_80281EE0->f14C < 0.0f) ? 0.0f
+                       : (lbl_80281EE0->f14C > 0.5f) ? 0.5f : lbl_80281EE0->f14C;
+    if (lbl_80281EE0->b83) {
+        if (lbl_80281EE0->f14C > lbl_80281334) {
+            lbl_80281EE0->f14C = lbl_80281334;
+        }
+        lbl_80281EE0->f140 = lbl_80281338;
+        lbl_80281EE0->f144 = lbl_80281338;
+        lbl_80281EE0->f148 = lbl_80281338;
+    } else {
+        lbl_80281EE0->f140 = 0.5f;
+        lbl_80281EE0->f144 = 0.5f;
+        lbl_80281EE0->f148 = 0.5f;
+    }
+    if (fEnd - f180 < 0.5f) {
+        fBlend = (fEnd - f180) / 2.0f;
+    }
+    fLeft = fEnd - fTime;
+    fHalf = fBlend / 2.0f;
+    if (fLeft > fHalf) {
+        lbl_80281EE0->b82 = 0;
+    }
+    if (lbl_80281EE0->pB4->pChar != NULL
+        && (lbl_80281EE0->n0 == 2 || lbl_80281EE0->n0 == 1 || lbl_80281EE0->n0 == 4)
+        && fLeft < fHalf && lbl_80281EE0->b82 == 0 && lbl_80281EE0->pB4->pChar->nClubClass == 3) {
+        lbl_80281EE0->b82 = 1;
+        fn_8001BE88(lbl_80281EE0->pB4->pChar, lbl_80281EE0->pB4->pChar->pCurClip, 0, 0.5f);
+    } else if (lbl_80281EE0->pB4->pChar != NULL && lbl_80281EE0->n0 == 3 && fLeft < fHalf
+               && lbl_80281EE0->b82 == 0 && lbl_80281EE0->n1C0 == 4 && lbl_80281EE0->n8 == 0) {
+        lbl_80281EE0->b82 = 1;
+        fn_8008DD50(1);
+    }
+    // Screen kind 3: the pad turns the golfer (buttons 0x33 and 0x34) and button 0x35 does
+    // fn_8008E254.
+    if (lbl_80281EE0->pB4->pChar != NULL && lbl_80281EE0->n0 == 3) {
+        if (lbl_80281EE0->b1C8 == 0) {
+            if (fn_80014300(fn_800142AC(0x33, 0)) || fn_80014300(fn_800142AC(0x33, 1))) {
+                fn_8008E0B0(0.05f);
+            } else if (fn_80014300(fn_800142AC(0x34, 0)) || fn_80014300(fn_800142AC(0x34, 1))) {
+                fn_8008E0B0(-0.05f);
+            } else {
+                fn_8008E0B0(0.0f);
+            }
+        } else {
+            fn_8008E0B0(0.0f);
+        }
+        if (lbl_80281EE0->b1C8 == 0 && lbl_80281EE0->n8 == 0
+            && (fn_80014300(fn_800142AC(0x35, 0)) || fn_80014300(fn_800142AC(0x35, 1)))) {
+            fn_8008E254(1);
+        } else {
+            fn_8008E254(0);
+        }
+    }
+    if (lbl_80281EE0->pB4->b18 && lbl_80281EE0->b86 == 0) {
+        if (lbl_80281EE0->pB4->n1C != lbl_80281EE0->n0) {
+            fn_8008D058();
+        }
+        if (lbl_80281EE0->n8 == 1) {
+            // Raise him by his club class's amount while he is placed, then put the spot back.
+            Vec_Copy(lbl_80189A30, vSaved);
+            if (lbl_80281EE0->pB4->pChar->nClubClass == 3) {
+                lbl_80189A30[1] += 0.13166f;
+            } else if (lbl_80281EE0->pB4->pChar->nClubClass == 4) {
+                lbl_80189A30[1] += 0.19583f;
+            } else if (lbl_80281EE0->pB4->pChar->nClubClass == 5) {
+                lbl_80189A30[1] += 0.21944f;
+            } else if (lbl_80281EE0->pB4->pChar->nClubClass == 2) {
+                lbl_80189A30[1] += 0.23167f;
+            }
+            Character_SetPosition(lbl_80281EE0->pB4->pChar, lbl_80189A30, 1);
+            Vec_Copy(vSaved, lbl_80189A30);
+        } else {
+            Character_SetPosition(lbl_80281EE0->pB4->pChar, lbl_80189A30, 1);
+        }
+    }
+    // His animation has ended: show the next golfer of the ring and pick the one after it from
+    // lbl_801899E0.
+    if (lbl_80281EE0->b91 && fLeft < FRAME_TIME) {
+        if (lbl_80281EE0->pB4->pNext->b18) {
+            if (lbl_80281EE0->pB4->nC != lbl_80281EE0->pB4->pNext->nC) {
+                lbl_80281EE0->pB4 = lbl_80281EE0->pB4->pNext;
+                gPlayers[0].pChar = lbl_80281EE0->pB4->pChar;
+            } else {
+                lbl_80281EE0->pB4 = lbl_80281EE0->pB4->pPrev;
+                gPlayers[0].pChar = lbl_80281EE0->pB4->pChar;
+            }
+            if (lbl_80281EE0->n0 == 0 || lbl_80281EE0->n0 == 2) {
+                gSession.nGolfer[0] = lbl_80281EE0->pB4->nC;
+            }
+        } else if (fn_8008B990() != 1) {
+            lbl_80281EE0->pB4 = lbl_80281EE0->pB8;
+            lbl_80281EE0->pB4->b18 = 0;
+        }
+        lbl_80281EE0->pB4->pNext->nC = lbl_801899E0[lbl_80281EE0->n198][lbl_80281EE0->n194];
+        lbl_80281EE0->n194 = lbl_80281EE0->n194 + 1;
+        if (lbl_80281EE0->n194 >= 5) {
+            lbl_80281EE0->n194 = 0;
+            lbl_80281EE0->n198 = lbl_80281EE0->n198 + 1;
+            if (lbl_80281EE0->n198 >= 4) {
+                lbl_80281EE0->n198 = 0;
+            }
+        }
+        lbl_80281EE0->pB4->pNext->b18 = 0;
+    }
+    if (lbl_8028133C == 0) {
+        return;
+    }
+    if (lbl_80281EE0->pB4->pChar != NULL) {
+        lbl_80281EE0->pB4->pChar->pfn17B0 = fn_8008D6CC;
+    }
+    // Another golfer or profile slot than last drawn: give him his ball and textures.
+    if ((lbl_80281340 != lbl_80281EE0->pB4->nC || lbl_80281344 != lbl_80281ED4->nSlot || lbl_80281EE0->b87)
+        && lbl_80281EE0->pB4->b18 && lbl_80281EE0->b86 == 0) {
+        pChar = lbl_80281EE0->pB4->pChar;
+        if (lbl_80281EE0->n0 == 0) {
+            gSession.nGolfer[0] = lbl_80281EE0->pB4->nC;
+        }
+        fn_80008380();
+        if (lbl_80281EE0->pB4->nC == 7 || lbl_80281EE0->pB4->nC == 29) {
+            if (fn_80077ACC()->nGolferOutfit >= 0) {
+                fn_800B9EB8(fn_800484E0(fn_80077ACC()->nGolferOutfit));
+            } else {
+                fn_800B9EB8(NULL);
+            }
+        } else {
+            fn_800B9EB8(fn_800484E0(gGolferTable[lbl_80281EE0->pB4->nC].nOutfit));
+        }
+        lbl_80281EE0->b87 = 0;
+        fn_8001A024(pChar);
+        for (i = 0; i < pChar->nSkins; i++) {
+            fn_800CE170(pChar->apSkins[i], pChar->a64[pChar->n74]);
+        }
+        fn_8010BC64(pChar->a64[pChar->n74]);
+    }
+    if (lbl_80281EE0->pB4->b18 && lbl_80281EE0->b86 == 0) {
+        fn_80035600();
+        Character_UpdateAnimation(lbl_80281EE0->pB4->pChar, 1, 1.0f / 60.0f);
+        if (lbl_80281EE0->pB4->pChar->n1698 == 0) {
+            fn_80035B40(lbl_80281EE0->pB4->pChar, 0);
+        }
+        fn_80035338(0);
+        if (lbl_80281EE0->pB4->pChar->p44 != NULL) {
+            // Screen kind 1 with b83 set lights him with all-zero settings; otherwise with his
+            // own, which sit in p44's entry 21 (port: read as LightParams, both 0x30 bytes).
+            pLight = (LightParams*)&lbl_80281EE0->pB4->pChar->p44[21];
+            if (lbl_80281EE0->n0 == 1 && lbl_80281EE0->b83) {
+                fn_80005AE8(&params, 0, sizeof(params));
+                fn_80093854(&params);
+            } else {
+                fn_80093854(pLight);
+            }
+        }
+        fn_80035FFC();
+    }
+    fn_80035308();
 }
 
 // Draw the golfer into the menu's texture, when he is shown and lbl_80281330 allows it.
