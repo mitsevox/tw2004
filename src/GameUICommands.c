@@ -1173,7 +1173,9 @@ void fn_80087460(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_800874C8(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = gpSaveData[pArgs[0].i].tour.field.aEntrant[0].n18;
+    SaveProfile* pProfile = &gpSaveData[pArgs[0].i];
+
+    pResult->i = pProfile->tour.field.aEntrant[0].n18;
 }
 
 void fn_800874F0(MsgArg* pArgs, MsgArg* pResult) {

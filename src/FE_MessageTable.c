@@ -1369,8 +1369,8 @@ void fn_8007BCA4(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8007BCC4(MsgArg* pArgs, MsgArg* pResult) {
     lbl_801D7148.b11 = 1;
     fn_800E0B38((u8)pArgs[0].i);
-    lbl_801D87C0.b0 = 1;
     gSession.a8[0] = 1;
+    lbl_801D87C0.b0 = 1;
     fn_800A4FD8();
 }
 
@@ -1392,7 +1392,9 @@ void fn_8007BD84(MsgArg* pArgs, MsgArg* pResult) {
 
 // A golfer's attribute.
 void fn_8007BDAC(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_80077A80(pArgs[0].i)->attr[pArgs[1].i];
+    GolferRecord* pRecord = fn_80077A80(pArgs[0].i);
+
+    pResult->i = pRecord->attr[pArgs[1].i];
 }
 
 void fn_8007BDFC(MsgArg* pArgs, MsgArg* pResult) {
@@ -2440,10 +2442,9 @@ void fn_8007E0F8(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007E128(MsgArg* pArgs, MsgArg* pResult) {
-    Award* pAward;
+    SaveProfile* pProfile = fn_80077ACC();
 
-    pAward = &fn_80077ACC()->aAward[pArgs[0].i];
-    pResult->i = pAward[23].bWon;
+    pResult->i = pProfile->aAward[pArgs[0].i + 23].bWon;
 }
 
 void fn_8007E174(MsgArg* pArgs, MsgArg* pResult) {

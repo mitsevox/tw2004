@@ -309,11 +309,11 @@ void fn_8010DF8C(CharSliderDefs* pDefs) {
                                 fPlace = pOther->fValue;
                             }
                             if (pLink->uFlags & 1) {
-                                pOther->fLow = fT * fSpan + pOther->fLow;
+                                pOther->fLow += fT * fSpan;
                                 pOther->fLow = pOther->fLow < 0.0f ? 0.0f
                                              : pOther->fLow > 1.0f ? 1.0f : pOther->fLow;
                             } else if (pLink->uFlags & 2) {
-                                pOther->fHigh = fT * fSpan + pOther->fHigh;
+                                pOther->fHigh += fT * fSpan;
                                 pOther->fHigh = pOther->fHigh < 0.0f ? 0.0f
                                               : pOther->fHigh > 1.0f ? 1.0f : pOther->fHigh;
                             }

@@ -258,12 +258,15 @@ void fn_8008B044(int nGolfer, int a, int b) {
 // With b90 set, wait until no golfer slot holds a character.
 u8 fn_8008B1AC(void) {
     u8 bReady;
+    int i;
 
     if (lbl_80281EE0->b90) {
         bReady = 1;
-        if (lbl_80281EE0->aGolfer[0].pChar != NULL) {
-            lbl_80281EE0->aGolfer[0].b19 = 1;
-            bReady = 0;
+        for (i = 0; i < CRAP_NUM_GOLFERS; i++) {
+            if (lbl_80281EE0->aGolfer[i].pChar != NULL) {
+                lbl_80281EE0->aGolfer[i].b19 = 1;
+                bReady = 0;
+            }
         }
         if (bReady) {
             lbl_80281EE0->b90 = 0;
@@ -422,7 +425,9 @@ void fn_8008B6E4(void) {
 // Abort the running state.
 void fn_8008B704(void) {
     lbl_801D8708.bAbort = 1;
-    lbl_80189AA0[lbl_801D8708.nState].pfnAbort();
+    // port: EA passes an argument the abort handlers (fn_8008B3C8, fn_8008B4A0, fn_8008B5FC,
+    // fn_8008B6E4) ignore
+    ((void (*)(int))lbl_80189AA0[lbl_801D8708.nState].pfnAbort)(0);
 }
 
 void fn_8008B754(int nNext) {
@@ -438,7 +443,7 @@ void fn_8008B760(void) {
 // Start in state 1.
 void fn_8008B790(void) {
     lbl_801D8708.nState = 1;
-    lbl_801D8708.nNext = lbl_80189AA0[1].nNext;
+    lbl_801D8708.nNext = lbl_80189AA0[lbl_801D8708.nState].nNext;
     lbl_801D8708.bDone = 0;
     lbl_801D8708.bEnter = 1;
     lbl_801D8708.bAbort = 0;
@@ -467,14 +472,15 @@ void fn_8008B850(void) {
 // Run the state machine once: enter the state, update it, and when it is finished leave it for
 // the next one.
 void fn_8008B864(void) {
+    // port: EA passes an argument the state handlers (lbl_80189AA0) ignore
     if (lbl_801D8708.bPaused == 0 && lbl_801D8708.nState != 0) {
         if (lbl_801D8708.bEnter) {
-            lbl_80189AA0[lbl_801D8708.nState].pfnEnter();
+            ((void (*)(int))lbl_80189AA0[lbl_801D8708.nState].pfnEnter)(0);
             lbl_801D8708.bEnter = 0;
         }
-        lbl_80189AA0[lbl_801D8708.nState].pfnUpdate();
+        ((void (*)(int))lbl_80189AA0[lbl_801D8708.nState].pfnUpdate)(0);
         if (lbl_801D8708.bDone) {
-            lbl_80189AA0[lbl_801D8708.nState].pfnExit();
+            ((void (*)(int))lbl_80189AA0[lbl_801D8708.nState].pfnExit)(0);
             lbl_801D8708.bDone = 0;
             lbl_801D8708.nState = lbl_801D8708.nNext;
             lbl_801D8708.bEnter = 1;
@@ -1213,8 +1219,7 @@ void fn_8008DAEC(void) {
     fn_8008B754(1);
     lbl_80281EE0->n190 = 0;
     lbl_80281EE0->pB4->b18 = 0;
-    switch (lbl_80281EE0->n0) {
-    case 0:
+    if (lbl_80281EE0->n0 == 0) {
         lbl_80281EE0->aGolfer[0].nC = lbl_801899E0[lbl_80281EE0->n198][lbl_80281EE0->n194 % 5];
         lbl_80281EE0->n194++;
         if (lbl_80281EE0->n194 >= 5) {
@@ -1224,10 +1229,8 @@ void fn_8008DAEC(void) {
                 lbl_80281EE0->n198 = 0;
             }
         }
-        break;
-    case 4:
+    } else if (lbl_80281EE0->n0 == 4) {
         lbl_80281EE0->aGolfer[0].nC = -1;
-        break;
     }
 }
 
