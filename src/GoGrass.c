@@ -4,11 +4,13 @@
 #include "game_types.h"
 #include "platform.h"
 #include "grassshader.h"
+#include "ball.h"
 #include "endian.h"
 #include "gx.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
+void fn_8011E170(void);
 void fn_8011E3B0(void);
 u8 fn_80112B80();
 void fn_8011E4A4(void);
@@ -54,6 +56,59 @@ GrassBuffer* fn_8011FDEC(s32 nSize);
 void fn_8011FF58(void);
 void fn_80120194(void);
 void fn_80008248(void* p);
+
+// The grass's start: its chunk loader (chunk 6) is registered and its settings get their defaults.
+void fn_8011E170(void) {
+    lbl_80281900->p370 = NULL;
+    lbl_80281900->n1C = 0;
+    // port: fn_8011E4D8 takes the chunk as a GrassChunk*
+    Course_RegisterLoader(6, (void (*)(u8*))fn_8011E4D8);
+    lbl_80281900->n3DC = 1;
+    lbl_80281900->n3E0 = 1;
+    lbl_80281900->n3F0 = 1;
+    lbl_80281900->f3E8 = 4.9f;
+    lbl_80281900->f3D0 = 128.0f;
+    lbl_80281900->f3BC = 128.0f;
+    lbl_80281900->f3C0 = 128.0f;
+    lbl_80281900->f3C4 = 1.5f;
+    lbl_80281900->f3C8 = 2.6f;
+    lbl_80281900->nC0 = 10;
+    lbl_80281900->f3D4 = 2.5914f;
+    lbl_80281900->f3D8 = 2.5914f;
+    lbl_80281900->f3A8 = 2.5f;
+    lbl_80281900->f3AC = 2.5f;
+    lbl_80281900->f3B0 = 500.0f;
+    lbl_80281900->f3B4 = 0.6f;
+    lbl_80281900->f3B8 = 0.13f;
+    lbl_80281900->n3CC = 0;
+    lbl_80281900->n10 = 0;
+    lbl_80281900->n104 = 0;
+    lbl_80281900->n100 = 0;
+    lbl_80281900->f3EC = 0.0f;
+    lbl_80281900->f3FC = 0.0f;
+    lbl_80281900->f400 = -0.36f;
+    lbl_80281900->n3E4 = 1;
+    lbl_80281900->f40C = 0.78f;
+    lbl_80281900->f410 = 0.16f;
+    lbl_80281900->f414 = 0.0f;
+    lbl_80281900->f418 = 0.025f;
+    lbl_80281900->f41C = 0.025f;
+    lbl_80281900->n3A4 = 0;
+    lbl_80281900->n14 = -500;
+    lbl_80281900->n16 = -500;
+    lbl_80281900->n18 = 1000;
+    lbl_80281900->n1A = 1000;
+    lbl_80281900->af168[0] = 1.19f;
+    lbl_80281900->af168[1] = 0.168f;
+    lbl_80281900->af168[2] = 0.49f;
+    lbl_80281900->af168[3] = 0.308f;
+    lbl_80281900->af168[4] = 0.981f;
+    lbl_80281900->af168[5] = 0.06f;
+    lbl_80281900->af168[6] = 0.685f;
+    lbl_80281900->af168[7] = 0.272f;
+    fn_8002A528(&lbl_80281900->tex80, 256, 256, fn_8002A624(), NULL, 6, 0, 0, 0);
+    lbl_80282514 = 0;
+}
 
 void fn_8011E3B0(void) {
 }

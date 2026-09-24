@@ -120,10 +120,12 @@ typedef struct GrassManager {
     CamLens*     pLens;         // 0x74  a flat lens, 20 x 20
     GoFrameBuf*  pFrameBuf;     // 0x78  256 x 256
     f32*         pRect;         // 0x7C  its screen rectangle
-    u8           unk80[0xB0 - 0x80];
+    GxTexture    tex80;         // 0x80  the 256 x 256 screen copy (fn_8011E170)
     f32          vB0[3];        // 0xB0  a position: the lens looks down on it from vB0[0], f3B0, vB0[2]
                                 //       (fn_8011EB04)
-    u8           unkBC[0xD8 - 0xBC];
+    u8           unkBC[0xC0 - 0xBC];
+    s32          nC0;           // 0xC0  10 at start
+    u8           unkC4[0xD8 - 0xC4];
     GrassBuffer** apD8;         // 0xD8  a stack of buffers (fn_8011FDC4 pushes, fn_8011FF58 empties)
     GrassBuffer** apDC;         // 0xDC  16 free buffers (fn_8011FD74 puts one back, fn_8011FDEC
                                 //       takes the best fit)
@@ -134,7 +136,10 @@ typedef struct GrassManager {
     GrassBuffer** apF0[2];      // 0xF0  two buffer lists; n100 picks the one in use
     s32          anF8[2];       // 0xF8  their lengths
     s32          n100;          // 0x100
-    u8           unk104[0x348 - 0x104];
+    s32          n104;          // 0x104
+    u8           unk108[0x168 - 0x108];
+    f32          af168[8];      // 0x168  eight tuning values set at start (fn_8011E170)
+    u8           unk188[0x348 - 0x188];
     // 0x348..0x370: the block fn_8011F3AC hands to fn_8003519C (row 17) once per buffer and pass.
     f32          f348;          // 0x348  f3D0
     f32          f34C;          // 0x34C  the buffer's f0
@@ -149,15 +154,35 @@ typedef struct GrassManager {
     void*        p370;          // 0x370  an allocation; set while the grass is on (fn_8012022C)
     u8           unk374[0x3A4 - 0x374];
     s32          n3A4;          // 0x3A4  the last chunk's GrassChunkData.n0
-    u8           unk3A8[0x3B0 - 0x3A8];
-    f32          f3B0;          // 0x3B0  the height the grass lens looks down from (fn_8011EB04)
-    f32          f3B4;          // 0x3B4
-    f32          f3B8;          // 0x3B8  the last chunk's GrassChunkData.f4
-    u8           unk3BC[0x3CC - 0x3BC];
-    s32          n3CC;          // 0x3CC
-    f32          f3D0;          // 0x3D0
-    u8           unk3D4[0x3E0 - 0x3D4];
-    s32          n3E0;          // 0x3E0
+    // 0x3A8..0x420: values fn_8011E170 sets at start (given there).
+    f32          f3A8;          // 0x3A8  2.5
+    f32          f3AC;          // 0x3AC  2.5
+    f32          f3B0;          // 0x3B0  the height the grass lens looks down from (fn_8011EB04); 500
+    f32          f3B4;          // 0x3B4  0.6
+    f32          f3B8;          // 0x3B8  the last chunk's GrassChunkData.f4; 0.13
+    f32          f3BC;          // 0x3BC  128
+    f32          f3C0;          // 0x3C0  128
+    f32          f3C4;          // 0x3C4  1.5
+    f32          f3C8;          // 0x3C8  2.6
+    s32          n3CC;          // 0x3CC  0
+    f32          f3D0;          // 0x3D0  128
+    f32          f3D4;          // 0x3D4  2.5914
+    f32          f3D8;          // 0x3D8  2.5914
+    s32          n3DC;          // 0x3DC  1
+    s32          n3E0;          // 0x3E0  1
+    s32          n3E4;          // 0x3E4  1
+    f32          f3E8;          // 0x3E8  4.9
+    f32          f3EC;          // 0x3EC  0
+    s32          n3F0;          // 0x3F0  1
+    u8           unk3F4[0x3FC - 0x3F4];
+    f32          f3FC;          // 0x3FC  0
+    f32          f400;          // 0x400  -0.36
+    u8           unk404[0x40C - 0x404];
+    f32          f40C;          // 0x40C  0.78
+    f32          f410;          // 0x410  0.16
+    f32          f414;          // 0x414  0
+    f32          f418;          // 0x418  0.025
+    f32          f41C;          // 0x41C  0.025
 } GrassManager;
 
 extern GrassManager* lbl_80281900;
