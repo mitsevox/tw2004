@@ -59,6 +59,11 @@ void  fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFi
 void  fn_800341A4(UStreamObject* pObject);
 void  fn_800342B4(UStreamObject* pObject);
 void  fn_800342F0(UStreamObject* pObject);
+void  fn_80035584(s32 v);
+void  fn_80035590(f32* p0);
+void  fn_800355B8(f32* p0);
+void  fn_80034648(int n);
+void  fn_80035370(void);
 void  fn_80035098(u8 b);
 void  fn_80034CAC(int nRenderPass);
 void  fn_80034DE4(void);
@@ -1082,6 +1087,100 @@ void fn_800342B4(UStreamObject* pObject) {
     lbl_801D3CB0.pCurrentHoleData = fn_800073B4(pObject->pData, 0);
 }
 
+// The course chunk: clears the pin and tee positions (fn_80034720 and fn_800347B4 fill them), readies
+// the collision data, fills light sets 2, 0 and 1 from the hole's lights and makes set 3 current, and
+// hands the glows the course's values (p3C, or defaults). The light vector gSession.f5B3C..f5B48 is
+// the hole's own (v60) when it has one, else the glows' vector; it is raised to at least its
+// distance across the ground and made at least 2000 long.
+void fn_800342F0(UStreamObject* pObject) {
+    f32 v18[4];
+    f32 v8[4];
+    int i;
+    u32 nGlow;
+    CourseGlowBlock* pGlow;
+    f32 fLength;
+
+    lbl_801D3CB0.pCourseStreamData = pObject;
+    lbl_801D3CB0.pCourse = (CourseInfo*)pObject->pData;
+    for (i = 0; i < 4; i++) {
+        lbl_801D3CB0.pCourse->tee[i].x = 0.0f;
+        lbl_801D3CB0.pCourse->pin[i].x = 0.0f;
+        lbl_801D3CB0.pCourse->tee[i].y = 0.0f;
+        lbl_801D3CB0.pCourse->pin[i].y = 0.0f;
+        lbl_801D3CB0.pCourse->tee[i].z = 0.0f;
+        lbl_801D3CB0.pCourse->pin[i].z = 0.0f;
+        lbl_801D3CB0.pCourse->tee[i].w = 0.0f;
+        lbl_801D3CB0.pCourse->pin[i].w = 0.0f;
+    }
+    fn_8004B1EC(lbl_801D3CB0.pCourse);
+    fn_80035338(2);
+    fn_800935CC(&lbl_801D3CB0.pCourse->lights);
+    fn_80093900(lbl_801D3CB0.pCourse->p38);
+    fn_80035338(0);
+    fn_800935CC(&lbl_801D3CB0.pCourse->lights);
+    fn_80093900(lbl_801D3CB0.pCourse->p38);
+    fn_80035338(1);
+    fn_800935CC(&lbl_801D3CB0.pCourse->lights);
+    fn_80093900(lbl_801D3CB0.pCourse->p38);
+    fn_80035338(3);
+    fn_80035370();
+    fn_8003534C();
+    pGlow = lbl_801D3CB0.pCourse->p3C;
+    if (pGlow != NULL) {
+        v18[0] = pGlow->v10[0];
+        v18[1] = pGlow->v10[1];
+        v18[2] = pGlow->v10[2];
+        v18[3] = pGlow->v10[3];
+        v8[0] = pGlow->v0[0];
+        v8[1] = pGlow->v0[1];
+        v8[2] = pGlow->v0[2];
+        v8[3] = 1.0f;
+        if (pGlow->nC <= 3) {
+            nGlow = pGlow->nC;
+        } else {
+            nGlow = 1;
+        }
+    } else {
+        nGlow = 1;
+        v18[0] = 0.8f;
+        v18[1] = 0.8f;
+        v18[2] = 0.4f;
+        v18[3] = 1.0f;
+        v8[0] = 0.0f;
+        v8[1] = 150.0f;
+        v8[2] = -400.0f;
+        v8[3] = 1.0f;
+    }
+    fn_800355B8(v18);
+    fn_80035590(v8);
+    fn_80035584(nGlow);
+    if (lbl_801D3CB0.pCourse->v60[0] || lbl_801D3CB0.pCourse->v60[1] || lbl_801D3CB0.pCourse->v60[2]) {
+        gSession.f5B3C = lbl_801D3CB0.pCourse->v60[0];
+        gSession.f5B40 = lbl_801D3CB0.pCourse->v60[1];
+        gSession.f5B44 = lbl_801D3CB0.pCourse->v60[2];
+        gSession.f5B48 = 1.0f;
+    } else {
+        gSession.f5B3C = v8[0];
+        gSession.f5B40 = v8[1];
+        gSession.f5B44 = v8[2];
+        gSession.f5B48 = v8[3];
+    }
+    fLength = fn_80009680(gSession.f5B3C * gSession.f5B3C + gSession.f5B44 * gSession.f5B44);
+    if (gSession.f5B40 < fLength) {
+        gSession.f5B40 = fLength;
+    }
+    // port: f5B3C..f5B48 are read as one vector
+    fLength = fn_80009680(fn_80009744(&gSession.f5B3C));
+    if (fLength < 2000.0f && fLength > 0.0f) {
+        fn_8001EF34(&gSession.f5B3C, 2000.0f / fLength, &gSession.f5B3C);
+    }
+    i = Game_GetCourse();
+    if (i >= 21) {
+        i = 0;
+    }
+    fn_80034648(i);
+}
+
 void fn_80034648(int n) {
     lbl_801D3CB0.fDefaultObjectMipmapBias[0] = lbl_801876D8[n][0];
     lbl_801D3CB0.fDefaultObjectMipmapBias[1] = lbl_801876D8[n][1];
@@ -1503,9 +1602,6 @@ void fn_80035398(void) {
 void fn_8006F154();
 void fn_800082CC(void* p);
 s32 fn_80035508(u8* p0);
-void fn_80035584(s32 v);
-void fn_80035590(f32* p0);
-void fn_800355B8(f32* p0);
 extern s32 lbl_80281B88;
 extern s32 lbl_80281D68;
 void fn_800355E0(s32 arg0);

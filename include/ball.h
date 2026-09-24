@@ -104,6 +104,14 @@ typedef struct CourseLights {
     CourseLight aLight[5];      // 0x10
 } CourseLights;
 
+// The optional block at CourseInfo.p3C: what fn_800342F0 hands the glows (glows.h) when a hole is
+// loaded; without it the glows get 0.8, 0.8, 0.4 / 0, 150, -400 / 1.
+typedef struct CourseGlowBlock {
+    f32  v0[3];                 // 0x00  to fn_80035590 (GlowState.v4), and gSession.f5B3C..f5B44
+    u32  nC;                    // 0x0C  to fn_80035584 (GlowState.n1930) when 0..3, else 1
+    f32  v10[4];                // 0x10  to fn_800355B8 (GlowState.v14)
+} CourseGlowBlock;
+
 // A block of four light vectors and values (CourseInfo.p38 and p44): fn_80093900 hands them to
 // the current light set (fn_8006F400), and f80 to fn_8006F430.
 typedef struct CourseLightBlock {
@@ -133,13 +141,14 @@ typedef struct CourseInfo {
     u8*    pLight;              // 0x30  per vertex: the light on the ground there, 0..255 (fn_8004B78C)
     TerCell* pGrid;             // 0x34  nGridWidth x nGridLength cells, row by row. TW06: pTerrainGrid (0x3C)
     CourseLightBlock* p38;      // 0x38  four optional blocks (NULL when absent); TW06 has its fog, sun,
-    u8*    p3C;                 // 0x3C    sky and lighting data in the same place. fn_800A27FC uses
+    struct CourseGlowBlock* p3C;    // 0x3C    sky and lighting data in the same place. fn_800A27FC uses
     u8*    p40;                 // 0x40    p38 without a test, p44 only when it is set
     CourseLightBlock* p44;      // 0x44
     TerObject* pObjects;        // 0x48  the course objects. TW06: pObjectInstanceTable (0x54)
     TerPolyRef* pPolyRefs;      // 0x4C  TW06: pPolygonReferenceList (at 0x58 there)
     u16*   pObjRefs;            // 0x50  per cell, the objects in it (indices). TW06: pObjectReferenceList (0x5C)
-    u8     unk54[0x6C - 0x54];
+    u8     unk54[0x60 - 0x54];
+    f32    v60[3];              // 0x60  the hole's own gSession.f5B3C..f5B44 when not all 0 (fn_800342F0)
     f32    fFloor;              // 0x6C  a ball in the air above this with no ground under it is still in play
     PinPos pin[4];              // 0x70  the hole's four pin positions: gpGame->nPinSet[] picks one
     PinPos tee[4];              // 0xB0  the tee of each tee set (gSession.nTeeSet[])
@@ -285,6 +294,7 @@ f32  fn_800CBEE0(CourseInfo* pCourse, f32* pPos, TerCell** ppCell, TerPolyRef** 
 SurfaceType* fn_800CC190(CourseInfo* pCourse, f32* pPos);   // surface type under a point
 
 // GoTerrainCollision (TW06's goterraincollision.c; types from its definitions)
+void fn_8004B1EC(CourseInfo* pCourse);          // TW06: Ter_InitTGD, readies a loaded course's data
 u8   Ter_Use3DCupGeometry(void);               // the cup is real geometry the ball drops into
 u8   Ter_PointInFreeDropNetwork(f32* pPos);    // inside a free-drop area
 u8   Ter_PointInOOBNetwork(f32* pPos);         // inside the in-bounds outlines (always, with none loaded)
