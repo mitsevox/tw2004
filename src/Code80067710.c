@@ -15,7 +15,10 @@ u8   fn_800BB7AC(SitDevEntry* pEntry, SitDevData* pData, int nPlayer);
 void fn_800BCD68(SitDevEntry* pEntry, int nSit, int nPlayer, u8 nEvent);
 void fn_80067B5C(f32* pA, f32* pB, f32* pOut);
 
+// .sbss, defined in reverse address order
 u8 lbl_80281E2A;    // event 26 has been queued since the last event 2 or 3
+u8 lbl_80281E29;
+u8 lbl_80281E28;
 
 // Queue event nEvent for nPlayer (0xFF: player 0; below 0: nobody).
 void fn_80067710(int nPlayer, int a, u8 nEvent) {
@@ -139,7 +142,7 @@ void fn_8006795C(void) {
 }
 
 void fn_80067B1C(u16* pValues, int nIndex, u16 uValue, u32* pSetBits) {
-    pValues[nIndex] = uValue;
+    pValues[nIndex] = (int)uValue;  // fake match: the no-op widening only moves the store in the schedule
     pSetBits[nIndex / 32] |= 1 << (nIndex % 32);
 }
 
