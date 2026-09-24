@@ -180,17 +180,10 @@ void fn_80114398(DynChain* pChain) {
 }
 
 // pIn (x, y, z, w) through pMtx's rotation into pOut; w is copied.
-void fn_801143D0(f32 (*pMtx)[4], f32* pIn, f32* pOut) {
-    f32 fY = pIn[1];
-    f32 fX = pIn[0];
-    f32 fZ = pIn[2];
-    f32 fOutX = fZ * pMtx[2][0] + (fX * pMtx[0][0] + fY * pMtx[1][0]);
-    f32 fOutY = fZ * pMtx[2][1] + (fX * pMtx[0][1] + fY * pMtx[1][1]);
-    f32 fOutZ = fZ * pMtx[2][2] + (fX * pMtx[0][2] + fY * pMtx[1][2]);
-
-    pOut[0] = fOutX;
-    pOut[1] = fOutY;
-    pOut[2] = fOutZ;
+void fn_801143D0(const f32 (*pMtx)[4], const f32* pIn, f32* pOut) {
+    pOut[0] = pIn[2] * pMtx[2][0] + (pIn[0] * pMtx[0][0] + pIn[1] * pMtx[1][0]);
+    pOut[1] = pIn[2] * pMtx[2][1] + (pIn[0] * pMtx[0][1] + pIn[1] * pMtx[1][1]);
+    pOut[2] = pIn[2] * pMtx[2][2] + (pIn[0] * pMtx[0][2] + pIn[1] * pMtx[1][2]);
     pOut[3] = pIn[3];
 }
 
@@ -505,17 +498,17 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     f32 qTurn[4];
     f32 qOut[4];
     u32 auBits[4];
-    f32 fFaceAmt;
-    f32 fStrength;
+    f32 fPeriod;
     f32 fPhase;
     f32 fSway;
     f32 fFacing;
-    f32 fSizeA;
-    f32 fSizeB;
     f32 fSpeedA;
+    f32 fSizeA;
     f32 fSpeedB;
+    f32 fSizeB;
+    f32 fStrength;
+    f32 fFaceAmt;
     f32 fT;
-    f32 fPeriod;
     f32 fSize;
     f32 fAngle;
     s32 nFrames;
@@ -536,7 +529,8 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     }
     fSway = fn_80116304(pChain->n14, fPhase, fStrength);
     pChain->n14++;
-    pChain->n18 += (s32)(nFrames * fSway);
+    nFrames = nFrames * fSway;
+    pChain->n18 += nFrames;
 
     // Where the wind blows from.
     if (lbl_802824F8->nB4 == 0) {
@@ -569,7 +563,8 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     fn_800BAD60(pModel->pMatrices[0], (Vec4*)lbl_80193DE8[pChain->n10], (Vec4*)vFace);
     vFace[1] = 0.0f;
     vWind[1] = 0.0f;
-    fFacing = (1.0f + fn_8000C5FC(vFace, vWind)) * 0.5f * fFaceAmt;
+    fFacing = 1.0f + fn_8000C5FC(vFace, vWind);
+    fFacing = fFacing / 2.0f * fFaceAmt;
     fSpeedA = (1.0f - lbl_802824F8->f7C) * fFacing + lbl_802824F8->f7C;
     fSizeA = (1.0f - lbl_802824F8->f78) * fFacing + lbl_802824F8->f78;
     if (fStrength < lbl_802824F8->nBC) {
@@ -599,8 +594,9 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             vAxis1[2] = 0.0f;
             vAxis1[3] = 0.0f;
         }
+        fPeriod = 60.0f * FRAME_RATE * lbl_802824F8->aParams[0].aC[i];
         if (0.0f != fSpeedA) {
-            fPeriod = 60.0f * FRAME_RATE * lbl_802824F8->aParams[0].aC[i] * (1.0f / fSpeedA);
+            fPeriod = fPeriod * (1.0f / fSpeedA);
         } else {
             fPeriod = 100000000.0f;
         }
@@ -609,12 +605,14 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         } else {
             fPeriod = 100000000.0f;
         }
-        fSize = DEG(lbl_802824F8->aParams[0].a0[i]) * fSizeA * fSizeB;
+        fSize = DEG(lbl_802824F8->aParams[0].a0[i]);
+        fSize *= fSizeA;
+        fSize *= fSizeB;
         if (0.0f != fPeriod) {
             nPeriod = fPeriod;
             fT = (f32)(pChain->n18 % nPeriod) / fPeriod;
-            fAngle = fSize * fn_800095F0(2.0f * PI * fT + PI * (2.0f * lbl_802824F8->aParams[0].a18[i])) +
-                     PI * lbl_802824F8->aParams[0].a24[i] / 180.0f;
+            fAngle = fSize * fn_800095F0(2.0f * PI * fT + PI * (2.0f * lbl_802824F8->aParams[0].a18[i]));
+            fAngle += PI * lbl_802824F8->aParams[0].a24[i] / 180.0f;
         } else {
             fAngle = 0.0f;
         }
@@ -641,8 +639,9 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             vAxis2[2] = 1.0f;
             vAxis2[3] = 0.0f;
         }
+        fPeriod = 60.0f * FRAME_RATE * lbl_802824F8->aParams[1].aC[i];
         if (0.0f != fSpeedA) {
-            fPeriod = 60.0f * FRAME_RATE * lbl_802824F8->aParams[1].aC[i] * (1.0f / fSpeedA);
+            fPeriod = fPeriod * (1.0f / fSpeedA);
         } else {
             fPeriod = 100000000.0f;
         }
@@ -651,12 +650,14 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         } else {
             fPeriod = 100000000.0f;
         }
-        fSize = DEG(lbl_802824F8->aParams[1].a0[i]) * fSizeA * fSizeB;
+        fSize = DEG(lbl_802824F8->aParams[1].a0[i]);
+        fSize *= fSizeA;
+        fSize *= fSizeB;
         if (0.0f != fPeriod) {
             nPeriod = fPeriod;
             fT = (f32)(pChain->n18 % nPeriod) / fPeriod;
-            fAngle = fSize * fn_800095F0(2.0f * PI * fT + PI * (2.0f * lbl_802824F8->aParams[1].a18[i])) +
-                     PI * lbl_802824F8->aParams[1].a24[i] / 180.0f;
+            fAngle = fSize * fn_800095F0(2.0f * PI * fT + PI * (2.0f * lbl_802824F8->aParams[1].a18[i]));
+            fAngle += PI * lbl_802824F8->aParams[1].a24[i] / 180.0f;
         } else {
             fAngle = 0.0f;
         }
@@ -697,15 +698,16 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     f32 fY;
     f32 fZ;
     f32 fStrength;
-    f32 fBend;
     f32 fSway;
     f32 fLevel;
+    f32 fBend;
     f32 fOff;
     f32 fT;
     f32 fSpeed;
     f32 fSize;
     f32 fPeriod;
     f32 fAngle;
+    f32 fScale;
     s32 nFrames;
     u32 nPeriod;
     int nRef;
@@ -717,9 +719,10 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     fStrength = fn_80116468();
     nFrames = 60.0f * (FRAME_RATE * fDelta);
     fBend = pModel->f13C;
-    fSway = fn_80116304(pChain->n14, PI * pChain->n10 * 0.125f, fStrength);
+    fSway = fn_80116304(pChain->n14, PI * pChain->n10 / 8.0f, fStrength);
     pChain->n14++;
-    pChain->n18 += (s32)(nFrames * fSway);
+    nFrames = nFrames * fSway;
+    pChain->n18 += nFrames;
     fn_8011651C(pModel->pMatrices[pChain->pLinks->nBone][3], pModel->pMatrices[pChain->pLinks->nParent][3],
                 vBone);
     if (0.0f != vBone[0] || 0.0f != vBone[1] || 0.0f != vBone[2]) {
@@ -754,23 +757,28 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
                 fSpeed = (1.0f - lbl_802824F8->f88) * fT + lbl_802824F8->f88;
                 fSize = (1.0f - lbl_802824F8->f80) * fT + lbl_802824F8->f80;
             } else {
-                fT = 1.0f;
-                if (35.0f != lbl_802824F8->nBC) {
+                if (35.0f == lbl_802824F8->nBC) {
+                    fT = 1.0f;
+                } else {
                     fT = (fStrength - lbl_802824F8->nBC) / (35.0f - lbl_802824F8->nBC);
                 }
                 // Unlike fn_80115348, both come from f8C, as 1 - f8C.
-                fSpeed = fSize = (1.0f - lbl_802824F8->f8C) * fT + 1.0f;
+                fScale = (1.0f - lbl_802824F8->f8C) * fT + 1.0f;
+                fSpeed = fScale;
+                fSize = fScale;
             }
+            fPeriod = 60.0f * FRAME_RATE * lbl_802824F8->f64;
             if (0.0f != fSpeed) {
-                fPeriod = 60.0f * FRAME_RATE * lbl_802824F8->f64 * (1.0f / fSpeed);
+                fPeriod = fPeriod * (1.0f / fSpeed);
             } else {
                 fPeriod = 100000000.0f;
             }
             fSize = DEG(lbl_802824F8->f60) * fSize;
             if (0.0f != fPeriod) {
                 nPeriod = fPeriod;
-                fAngle = fSize * fn_800095F0(2.0f * PI * ((f32)(pChain->n18 % nPeriod) / fPeriod) +
-                                             pChain->n10 / 0.5f);
+                fAngle = fn_800095F0(2.0f * PI * ((f32)(pChain->n18 % nPeriod) / fPeriod) +
+                                     pChain->n10 / 0.5f);
+                fAngle *= fSize;
             } else {
                 fAngle = 0.0f;
             }
@@ -850,20 +858,20 @@ void fn_8011443C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
 // scaled by the settings' f90. 1 is no sway.
 f32 fn_80116304(u32 nFrame, f32 fPhase, f32 fStrength) {
     f32 fPeriod = 600.0f;
+    f32 fOne = 1.0f;            // the wave's scale and the most sway (EA kept the multiply)
     f32 fAngle;
     f32 fWave;
-    f32 fBase;
     f32 fSway;
 
     fAngle = PI * (2.0f * ((f32)(nFrame % (u32)fPeriod) / fPeriod));
-    fWave = fn_800095F0(3.0f * fAngle + 2.0f + fPhase);
-    fWave = fn_800095F0(fAngle + fPhase) + fWave;
-    fWave = fn_800095F0(5.0f * fAngle + 4.0f + fPhase) + fWave;
-    fWave = fn_800095F0(7.0f * fAngle + 6.0f + fPhase) + fWave;
-    fBase = lbl_802824F8->f94 + fStrength * (lbl_802824F8->f98 - lbl_802824F8->f94) / 35.0f;
-    fSway = 1.0f * fWave + fBase;
-    fSway = (fSway < 0.0f) ? 0.0f : ((fSway > 1.0f) ? 1.0f : fSway);
-    return 1.0f - lbl_802824F8->f90 * (1.0f - fSway);
+    // Four waves; CodeWarrior calls the right operand first, so the 3x wave is made first.
+    fWave = fn_800095F0(7.0f * fAngle + 6.0f + fPhase) +
+            (fn_800095F0(5.0f * fAngle + 4.0f + fPhase) +
+             (fn_800095F0(fAngle + fPhase) + fn_800095F0(3.0f * fAngle + 2.0f + fPhase)));
+    fSway = fOne * fWave;
+    fSway += lbl_802824F8->f94 + fStrength * (lbl_802824F8->f98 - lbl_802824F8->f94) / 35.0f;
+    fSway = (fSway < 0.0f) ? 0.0f : ((fSway > fOne) ? fOne : fSway);
+    return 1.0f - lbl_802824F8->f90 * (fOne - fSway);
 }
 
 // The strength the chains sway with: the settings' nB8, or fn_80055F80's when it is -1; at least 5.
