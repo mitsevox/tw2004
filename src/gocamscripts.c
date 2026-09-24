@@ -23,7 +23,6 @@ void fn_80038054(u8 a, int n, f32 f1, f32 f2);
 void fn_800457B8(int nPlayer, f32 f);
 f32  fn_800DC45C(f32 f);
 u8   fn_80044E74(CamShot* pShot);
-void fn_80064F54(CamShot* pShot, int nPlayer, f32* pOut);
 void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pSub, f32* pPrev,
                  f32 fTime);
 void fn_8003EE68(CamScript* pScript, f32* pCam, u8 b, int nPlayer, f32 fMaxStep);
@@ -51,7 +50,6 @@ f32  fn_8003F790(CamScript* pScript);   // the blend's share (0..1) so far
 f32  fn_80044F58(int nPlayer, CamScript* pScript);
 CamLens* fn_8001F004(void);             // the current camera's lens
 f32  fn_8001EFFC(u8* pLens);            // the lens's fB0 (char.c: its parameter is u8*)
-f32  fn_80014278(u8* pLens);            // the lens's field of view (GoRenderCtx_Gc.c: u8*)
 u8   fn_8004561C(void);
 u8   fn_80044E2C(int n);
 u8   fn_80044AA8(SurfaceType* pSurface);
@@ -357,6 +355,104 @@ void fn_8003E624(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
         if (fTime > 0.0f) {
             fn_80045428(vPrev, pCam, vMove);
             pScript->fD4 = (f32)fn_80009680(fn_80009744(vMove)) / fTime;
+        }
+    }
+}
+
+// The script frame of a fly-by path (GoStaticCam.c). When the path has a spline, the camera flies
+// along it (fn_80065488) by the share of the spline's length the time has reached, and at the end
+// goes on to the next path's shots; without one, the camera moves between the shots like
+// fn_8003E624 does.
+void fn_8003EA50(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b, f32 fTime) {
+    f32 vPrev[4];
+    f32 vMove[4];
+    f32 vMoveTo[4];
+    f32 fFov;
+    FlyByPath* pPath;
+    f32 fShare;
+    f32 fStep;
+    f32 fMoveTime = lbl_80281F78->f178;
+
+    if (pScript->pShot == NULL) return;
+    Vec_Copy(lbl_80281F78->v17C, vMoveTo);
+    if (!b && !fn_80043388(pScript, pScript->pShot)
+        && (gSession.nPaused != 0 || (0.0f == gSession.fFrameTime && 0.0f == fTime))) {
+        if (pScript->nCamera != 0) {
+            fn_8003F2E0(pScript, fTime);
+        }
+        return;
+    }
+    pPath = fn_80065424(pScript->pShot->nA4);
+    if (pPath != NULL) {
+        fShare = pScript->fCamTime / pPath->fLength;
+        if (fShare > 1.0f) {
+            fShare = 1.0f;
+        }
+        fn_80065488(pScript, pScript->pShot->nA4, pCam, pSub, &fFov, nPlayer, fn_800C7A9C(pPath, fShare));
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), fFov);
+        if (pScript->nCamera != 0) {
+            fn_8003F2E0(pScript, fTime);
+        }
+        if (fShare >= 1.0f) {
+            if (pScript->pNextShot != NULL && pScript->pNextShot->p40 != NULL) {
+                pScript->pShot = pScript->pNextShot;
+                pScript->pNextShot = pScript->pNextShot->p40;
+                pScript->fCamTime = 0.0f;
+                pScript->nCamera = 2;
+                Vec_Copy(vMoveTo, pScript->v40);
+                pScript->f90 = 0.0f;
+                pScript->f94 = fMoveTime;
+                pScript->fA0 = 0.0f;
+                pScript->fA4 = 0.0f;
+                return;
+            }
+            pScript->pShot = NULL;
+            pScript->pNextShot = NULL;
+            return;
+        }
+        pScript->f84 = pScript->fCamTime;
+        pScript->fCamTime += fTime;
+        pScript->f90 += fTime;
+        pScript->f8C = pPath->fLength;
+        return;
+    }
+    Vec_Copy(pCam, vPrev);
+    fn_80064F54(pScript->pShot, nPlayer, pScript->v0);
+    if (pScript->pNextShot != NULL) {
+        fn_80064F54(pScript->pNextShot, nPlayer, pScript->v10);
+    }
+    if (pScript->pNextShot == NULL || pScript->nBC == 5 || pScript->nBC == 4) {
+        Vec3Copy(pScript->v0, pCam);
+        CamScript_GetLookAtPoint(pScript->pShot, nPlayer, pSub, pCam, pScript, vPrev, fTime);
+        fFov = pScript->pShot->f78;
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), fFov);
+    } else {
+        CamScript_SplineCameras(nPlayer, pCam, pSub, pScript, vPrev, fTime);
+    }
+    if (pScript->nCamera != 0) {
+        fn_8003F2E0(pScript, fTime);
+    }
+    if (fn_80043388(pScript, pScript->pShot)) {
+        pScript->v60[0] = 0.0f;
+        pScript->v60[1] = 0.0f;
+        pScript->v60[2] = 0.0f;
+    } else {
+        fn_80045428(pCam, vPrev, pScript->v60);
+    }
+    fn_80043388(pScript, pScript->pShot);   // its answer is not used
+    fStep = fn_8003F064(pScript, fTime);
+    pScript->f84 = pScript->fCamTime;
+    pScript->fCamTime += fStep;
+    pScript->f90 += fStep;
+    if (0.0f != fStep) {
+        pScript->bCC = 0;
+    }
+    if (pScript->pNextShot != NULL && pScript->fCamTime > pScript->f8C) {
+        CameraScript_GoToNewScript(pScript, pScript->pNextShot, nPlayer, pCam, pSub, pShot);
+        fn_80043388(pScript, pScript->pShot);   // its answer is not used
+        if (fStep > 0.0f) {
+            fn_80045428(vPrev, pCam, vMove);
+            pScript->fD4 = (f32)fn_80009680(fn_80009744(vMove)) / fStep;
         }
     }
 }
@@ -1530,9 +1626,9 @@ void CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int nPl
     pShot->f74 = 0.0f;
     pShot->bAA = 1;
     if (bView1) {
-        pShot->f78 = fn_80014278((u8*)fn_80008370(fn_80016CFC(gPlayers[nPlayer].nView[1])->pCamera));
+        pShot->f78 = fn_80014278(fn_80008370(fn_80016CFC(gPlayers[nPlayer].nView[1])->pCamera));
     } else {
-        pShot->f78 = fn_80014278((u8*)fn_80008370(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera));
+        pShot->f78 = fn_80014278(fn_80008370(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera));
         pShot->f78 -= fn_800DC3A4();
     }
     pShot->f7C = pShot->f78;
@@ -2418,9 +2514,9 @@ f32 Terrain_HeightAt(f32* pPos, SurfaceType** ppSurface) {
                     fBest = aHeights[j];
                 }
             }
-            // fake match: the row number through u32 addresses (not 64-bit safe); the u8* spelling
-            // swaps two registers
-            if ((int)(((u32)aSurfaces[nIdx] - (u32)gSurfaceTypes) / sizeof(SurfaceType)) != 149
+            // fake match: the row number from the addresses as unsigned integers; pointer
+            // subtraction (or the u8* spelling) swaps two registers
+            if ((int)(((uptr)aSurfaces[nIdx] - (uptr)gSurfaceTypes) / sizeof(SurfaceType)) != 149
                 && !(Game_GetCourse() == 7 && fn_80015464() == 2 && fBest > 10.0f)) {
                 if (fn_80044AA8(aSurfaces[nIdx])) {
                     if (!bRegion && fLast - aHeights[nIdx] > lbl_80281F78->f130) {

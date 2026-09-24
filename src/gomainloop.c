@@ -77,7 +77,6 @@ void fn_8001D384(void);
 void fn_8001D63C(void);
 void fn_8001D6F0(void);
 void fn_8001E7DC(void);
-int  fn_8001EE88(Character* pChar);
 void fn_80029FC8(void);
 void fn_8002A020(void);
 void fn_8002E258(void);

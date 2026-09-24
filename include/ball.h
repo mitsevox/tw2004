@@ -302,6 +302,7 @@ f32  fn_8004D5F0(CourseInfo* pCourse, f32* pPos);   // ground height (GoTerrainC
 // Every ground height under and over pPos (up to nMax), with its surface; returns how many.
 u32  fn_8004DCC4(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurfaces, f32* pHeights, u32 nMax);
 f32  fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
+f32  fn_8004D650(CourseInfo* pCourse, f32* pPos, f32* pNormal);   // covering ground height and normal
 SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, f32* pPos);   // the surface under a point
 f32  Ter_GetSupportingGroundData(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pNormal);
 void Ter_GetEnclosingGroundHeight(CourseInfo* pCourse, f32* pPos, f32* pLow, f32* pHigh);

@@ -1,7 +1,7 @@
 // FE_PGATourMessages.c (EA's name, from its asserts): the PGA TOUR mode's menu message handlers:
 // the tournament leaderboard, the season schedule, the season wrap-up, the sponsor offers and
-// the player's wins. The first functions (to fn_8010E4DC) blend a character model's sliders; they
-// sit in this unit until the file boundary there is proven.
+// the player's wins. The file starts at fn_8010E58C; the slider blending before it is
+// CharSliders.c's.
 
 #include "golfer.h"
 #include "game.h"
@@ -13,8 +13,6 @@
 #include "game/modes/pgatour.h"
 #include "game/modes/pgatoursim.h"
 
-void fn_8011CADC(Skin* pSkin, int nMorph, f32 fWeight);    // SkinMorph.c
-void fn_800736D8(u8* pNode, int n);     // animblender.c
 u8   fn_80118F60(int nPlayer, int nGolfer, GM_Pga_StatTypes_t nStat);   // PGATourSimulation.c
 
 s32* lbl_802824B0;                      // the tournaments on the schedule (fn_8010EA24)
@@ -22,272 +20,6 @@ s32 lbl_802824B4;                       // and how many there are
 
 // The sponsor offers' asset kinds (11), picked at random.
 s16 lbl_80193CFC[11] = { 0, 1, 2, 5, 6, 9, 10, 11, 13, 14, 15 };
-
-// The index of the slider whose id is nId, or -1.
-int fn_8010DC94(CharSliderDefs* pDefs, s32 nId) {
-    int i;
-
-    if (pDefs == NULL) {
-        return -1;
-    }
-    for (i = 0; i < pDefs->nSliders; i++) {
-        if (nId == pDefs->pDefs[i].nId) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-// Every slider back to the range 0..1 at 0.
-void fn_8010DCE8(CharSliderDefs* pDefs) {
-    int i;
-
-    if (pDefs != NULL) {
-        for (i = 0; i < pDefs->nSliders; i++) {
-            pDefs->pValues[i].fLow = 0.0f;
-            pDefs->pValues[i].fHigh = 1.0f;
-            pDefs->pValues[i].fValue = 0.0f;
-            pDefs->pValues[i].bFixed = 0;
-        }
-    }
-}
-
-// Set the sliders with ids 0..nSliders-1 from percentages.
-void fn_8010DD4C(CharSliderDefs* pDefs, int nSliders, u8* aValues) {
-    int i;
-    int n;
-
-    for (i = 0; i < nSliders; i++) {
-        n = fn_8010DC94(pDefs, i);
-        if (n >= 0) {
-            pDefs->pValues[n].fValue = (s8)aValues[i] / 100.0f;
-        }
-    }
-}
-
-// Keep every value in 0..0.99999.
-void fn_8010DE04(CharSliderDefs* pDefs) {
-    int i;
-    CharSliderValue* pValue;
-
-    for (i = 0; i < pDefs->nSliders; i++) {
-        pValue = &pDefs->pValues[i];
-        if (pValue->fValue <= 0.0f) {
-            pValue->fValue = 0.0f;
-        }
-        if (pValue->fValue >= 0.99999f) {
-            pValue->fValue = 0.99999f;
-        }
-    }
-}
-
-// Cut each pair of sliders that share a length back to it.
-void fn_8010DE60(CharSliderDefs* pDefs) {
-    CharSliderValue* pValue;
-    CharSliderDef* pDef;
-    CharSliderLimit* pLimit;
-    CharSliderValue* pOther;
-    f32 fLength;
-    int i;
-    int j;
-    int n;
-
-    if (pDefs != NULL) {
-        for (i = 0; i < pDefs->nSliders; i++) {
-            pValue = &pDefs->pValues[i];
-            pDef = &pDefs->pDefs[i];
-            if (pValue->bFixed != 1 && pDef->nLimits > 0) {
-                for (j = 0; j < pDef->nLimits; j++) {
-                    pLimit = &pDef->pLimits[j];
-                    n = fn_8010DC94(pDefs, pLimit->nSlider);
-                    if (n >= 0) {
-                        pOther = &pDefs->pValues[n];
-                        if (pOther->bFixed == 0) {
-                            fLength = fn_80009680(pValue->fValue * pValue->fValue
-                                                  + pOther->fValue * pOther->fValue);
-                            if (fLength > pLimit->fLength && fLength != 0.0f) {
-                                pValue->fValue = pLimit->fLength * (pValue->fValue / fLength);
-                                pOther->fValue = pLimit->fLength * (pOther->fValue / fLength);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-// Let each slider move the ranges of the sliders it links to, keeping their values at the same
-// place in their ranges.
-void fn_8010DF8C(CharSliderDefs* pDefs) {
-    CharSliderDef* pDef;
-    CharSliderValue* pValue;
-    CharSliderLink* pLink;
-    CharSliderValue* pOther;
-    f32 fT;
-    f32 fSpan;
-    f32 fPlace;
-    u8 bMove;
-    int i;
-    int j;
-    int n;
-
-    if (pDefs != NULL) {
-        for (i = 0; i < pDefs->nSliders; i++) {
-            pDef = &pDefs->pDefs[i];
-            pValue = &pDefs->pValues[i];
-            if (pDef->nLinks > 0) {
-                for (j = 0; j < pDef->nLinks; j++) {
-                    pLink = &pDef->pLinks[j];
-                    n = fn_8010DC94(pDefs, pLink->nSlider);
-                    if (n >= 0) {
-                        fT = 0.0f;
-                        bMove = 0;
-                        fSpan = fT;
-                        if (pLink->fFrom < pLink->fTo) {
-                            if (pValue->fValue <= pLink->fTo && pValue->fValue >= pLink->fFrom) {
-                                fSpan = pLink->fTo - pLink->fFrom;
-                                bMove = 1;
-                                fT = (pValue->fValue - pLink->fFrom) / fSpan;
-                            }
-                        } else if (pLink->fFrom > pLink->fTo) {
-                            if (pValue->fValue <= pLink->fFrom && pValue->fValue >= pLink->fTo) {
-                                fSpan = pLink->fFrom - pLink->fTo;
-                                bMove = 1;
-                                fT = 1.0f - (pValue->fValue - pLink->fTo) / fSpan;
-                            }
-                        }
-                        if (bMove) {
-                            pOther = &pDefs->pValues[n];
-                            if (pOther->fHigh != pOther->fLow) {
-                                fPlace = (pOther->fValue - pOther->fLow) / (pOther->fHigh - pOther->fLow);
-                            } else {
-                                fPlace = pOther->fValue;
-                            }
-                            if (pLink->uFlags & 1) {
-                                pOther->fLow = fT * fSpan + pOther->fLow;
-                                pOther->fLow = pOther->fLow < 0.0f ? 0.0f
-                                             : pOther->fLow > 1.0f ? 1.0f : pOther->fLow;
-                            } else if (pLink->uFlags & 2) {
-                                pOther->fHigh = fT * fSpan + pOther->fHigh;
-                                pOther->fHigh = pOther->fHigh < 0.0f ? 0.0f
-                                              : pOther->fHigh > 1.0f ? 1.0f : pOther->fHigh;
-                            }
-                            pOther->fValue = fPlace * (pOther->fHigh - pOther->fLow) + pOther->fLow;
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-// fX's place between fFrom and fTo (0..1, either way round), as a blend of fA to fB.
-f32 fn_8010E194(f32 fFrom, f32 fTo, f32 fX, f32 fA, f32 fB) {
-    f32 fT;
-
-    if (fFrom == fTo) {
-        return 0.0f;
-    }
-    if (fTo > fFrom) {
-        fT = (fX - fFrom) / (fTo - fFrom);
-        fT = fT < 0.0f ? 0.0f : fT > 1.0f ? 1.0f : fT;
-    } else {
-        fT = 1.0f - (fX - fFrom) / (fFrom - fTo);
-        fT = fT < 0.0f ? 0.0f : fT > 1.0f ? 1.0f : fT;
-    }
-    return fT * (fB - fA) + fA;
-}
-
-// Scale the model's bones by the sliders.
-void fn_8010E224(CharSliderDefs* pDefs, CharModel* pModel) {
-    CharSliderDef* pDef;
-    CharSliderValue* pValue;
-    CharSliderRange* pRange;
-    CharSliderBone* pBone;
-    f32 fScale;
-    int nBone;
-    int i;
-    int j;
-    int k;
-
-    if (pDefs == NULL || pModel == NULL) {
-        return;
-    }
-    for (i = 0; i < pDefs->nSliders; i++) {
-        pDef = &pDefs->pDefs[i];
-        pValue = &pDefs->pValues[i];
-        for (j = 0; j < pDef->nBoneRanges; j++) {
-            pRange = &pDef->pBoneRanges[j];
-            if (pValue->fValue >= pRange->fStart && pValue->fValue < pRange->fEnd) {
-                for (k = 0; k < pRange->nItems; k++) {
-                    pBone = &pRange->items.pBones[k];
-                    fScale = fn_8010E194(pRange->fStart, pRange->fEnd, pValue->fValue,
-                                         pBone->fFrom, pBone->fTo);
-                    nBone = fn_800298F4(pModel, pBone->uId);
-                    if (nBone >= 0) {
-                        fn_80028A70(pModel, nBone, pBone->uAxes, fScale);
-                    }
-                }
-            }
-        }
-    }
-}
-
-// Weight the skin's morph targets by the sliders (and mark the first 20 in the blend node).
-void fn_8010E35C(CharSliderDefs* pDefs, Skin* pSkin, u8* pNode) {
-    CharSliderDef* pDef;
-    CharSliderValue* pValue;
-    CharSliderRange* pRange;
-    CharSliderMorph* pMorph;
-    f32 fWeight;
-    int i;
-    int j;
-    int k;
-    int m;
-
-    if (pDefs == NULL || pSkin == NULL) {
-        return;
-    }
-    for (i = 0; i < pDefs->nSliders; i++) {
-        pDef = &pDefs->pDefs[i];
-        pValue = &pDefs->pValues[i];
-        for (j = 0; j < pDef->nMorphRanges; j++) {
-            pRange = &pDef->pMorphRanges[j];
-            if (pValue->fValue >= pRange->fStart && pValue->fValue < pRange->fEnd) {
-                for (k = 0; k < pRange->nItems; k++) {
-                    pMorph = &pRange->items.pMorphs[k];
-                    fWeight = fn_8010E194(pRange->fStart, pRange->fEnd, pValue->fValue,
-                                          pMorph->fFrom, pMorph->fTo);
-                    for (m = 0; m < pDefs->nMorphs; m++) {
-                        if (pMorph->uId == pDefs->aMorphIds[m]) {
-                            fn_8011CADC(pSkin, m, fWeight);
-                            if (m < 20) {
-                                fn_800736D8(pNode, m);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-// Apply nSliders slider values (percentages) to a character's model and skin.
-void fn_8010E4DC(CharSliderDefs* pDefs, CharModel* pModel, Skin* pSkin, int nSliders, u8* aValues,
-                 u8* pNode) {
-    if (pModel == NULL || pSkin == NULL || aValues == NULL || pDefs == NULL) {
-        return;
-    }
-    fn_80028A3C(pModel);
-    fn_8010DCE8(pDefs);
-    fn_8010DD4C(pDefs, nSliders, aValues);
-    fn_8010DE60(pDefs);
-    fn_8010DF8C(pDefs);
-    fn_8010DE04(pDefs);
-    fn_8010E224(pDefs, pModel);
-    fn_8010E35C(pDefs, pSkin, pNode);
-}
 
 // One leaderboard row: the place ("CUT", "T3" for a tie, "3"), the name, the score, the round
 // scores and the money won (empty when none).
@@ -789,12 +521,12 @@ void fn_8010F5AC(MsgArg* pArgs, MsgArg* pResult) {
 
 // The n4 of every record of lbl_80282470 together.
 void fn_8010F63C(MsgArg* pArgs, MsgArg* pResult) {
-    char sz[0x24];                      // a CrAPRecord's name
+    char sz[0x34];                      // a CrAPRecord's name (0x24); size unknown, the frame fits 0x34
     s32 n4;
     s16 n0;
     s32 nRecords = fn_801070F4();
-    s32 nTotal;
     int i;
+    s32 nTotal;
 
     n0 = 0;
     nTotal = 0;
