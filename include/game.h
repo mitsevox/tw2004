@@ -694,12 +694,16 @@ void fn_8010FF9C(void);                 // read the lists (at startup, gomainloo
 u8   fn_801100AC(char* szName);         // the file is on the disc in the drive
 void fn_80110178(u8 b);
 int  fn_80110180(void);                 // the current hole's course is on the disc in the drive
+void fn_8006DBD4(void);                 // gomainloop.c: the frame of the current game type
 s32  fn_8011027C(void);                 // the disc in the drive is not disc 1 (its disk number is not 0)
 void fn_801102AC(void);                 // ask for the other disc and wait for it
 int  fn_80110450(void);                 // the disc change has finished (lbl_802824D0)
 void fn_80110458(u8 b);
 u8   fn_80110460(void);
 int  fn_80110468(void);                 // the disc in the drive (its disk number; 0: disc 1)
-u8*  fn_801104A0(void);                 // the disc change's command block
+DVDCommandBlock* fn_801104A0(void);     // the disc change's command block
+extern DVDDiskID lbl_80213B60;          // the disc asked for by fn_80110390
+extern DVDCommandBlock lbl_80213B80;    // fn_80110390's disc change
+extern u8 lbl_802824D8;                 // fn_801102AC left a disc change for fn_80110390 to ask for
 
 #endif

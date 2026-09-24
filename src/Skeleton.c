@@ -5,7 +5,6 @@
 #include "character.h"
 #include "charstate.h"
 
-void fn_8001E938(u32* aBits, u32 nBits);                // clears a bit array
 void fn_80029BC8(f32* pVec);                            // sets a vector to lbl_80186838
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // pDst = pSrc's rows
                                                                                 // through pMtx
