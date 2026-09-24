@@ -458,7 +458,12 @@ typedef struct RenderState {
     s32  nC0;                   // 0x0C0  } width, y, height; the movies give 0, 512, 0, 448)
     s32  nC4;                   // 0x0C4  }
     s32  nC8;                   // 0x0C8  }
-    u8   unkCC[0xE4 - 0xCC];
+    f32  fCC;                   // 0x0CC  } a render camera's screen rectangle in frame buffer units:
+    f32  fD0;                   // 0x0D0  } left, top, width, height, then 0 and 1; bit 0x800
+    f32  fD4;                   // 0x0D4  } (GoRenderCtx_Gc.c fn_80013EEC)
+    f32  fD8;                   // 0x0D8  }
+    f32  fDC;                   // 0x0DC  }
+    f32  fE0;                   // 0x0E0  }
     s32  nE4;                   // 0x0E4  } fn_800140E8's six arguments, bit 0x1000
     s32  nE8;                   // 0x0E8  }
     s32  nEC;                   // 0x0EC  }

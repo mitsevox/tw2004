@@ -10,6 +10,7 @@ void fn_80013D68(Camera* pCamera);
 void fn_80013E28(Camera* pCamera, f32* pRect);
 void fn_80013E30(Camera* pCamera, GoFrameBuf* pBuf);
 void fn_80013E38(Camera* pCamera, CamLens* pLens);
+GoFrameBuf* fn_80013E40(Camera* pCamera);
 void fn_80013E48(Camera* pCamera);
 void fn_80013EA0(Camera* pCamera);
 void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
@@ -36,16 +37,11 @@ void fn_80013D5C(s32 v);
 void RC_vUpdateRenderCtxScreenMatricesAndInfo();
 void fn_80013DD0(u8* arg0, f32 (*arg1)[4]);
 s32 fn_8000ADC0();
-s32 fn_80013E40(u8* p);
 f32 fn_80014134(u8* p);
 f32 fn_8001413C(u8* p);
 f32 fn_80014144(u8* p);
 f32 fn_8001414C(u8* p);
 f32 fn_80014154(u8* p);
-f32 fn_8001415C(u8* p);
-f32 fn_80014164(u8* p);
-f32 fn_8001416C(u8* p);
-f32 fn_80014174(u8* p);
 f32 fn_8001417C(u8* p);
 f32 fn_80014184(u8* p);
 f32 fn_8001418C(u8* p);
@@ -143,8 +139,8 @@ void fn_80013E38(Camera* pCamera, CamLens* pLens) {
     pCamera->unk10 = pLens;
 }
 
-s32 fn_80013E40(u8* p) {
-    return *(s32*)(p + 0x18);
+GoFrameBuf* fn_80013E40(Camera* pCamera) {
+    return pCamera->pBuf;
 }
 
 // Starts a new camera: the identity view matrix and its first values.
@@ -162,6 +158,28 @@ void fn_80013E48(Camera* pCamera) {
 void fn_80013EA0(Camera* pCamera) {
     lbl_801B8980.fB4 = fn_80008360(pCamera);
     lbl_801B8980.fB8 = fn_80008368(pCamera);
+}
+
+// Hands the renderer the camera's screen rectangle: in frame buffer units (bit 0x800), and in
+// 512 x 448 screen pixels, left, right, top, bottom (bit 0x200).
+void fn_80013EEC(void* pCamera) {
+    f32* pRect;
+    GoFrameBuf* pBuf;
+
+    pRect = fn_80012EF0(pCamera);
+    pBuf = fn_80013E40(pCamera);
+    lbl_801B8980.fCC = fn_80014174(pBuf) + fn_80012EE8(pRect) * fn_8001416C(pBuf);
+    lbl_801B8980.fD0 = fn_80014164(pBuf) + fn_80012EE0(pRect) * fn_8001415C(pBuf);
+    lbl_801B8980.fD4 = fn_80012ED8(pRect) * fn_8001416C(pBuf);
+    lbl_801B8980.fD8 = fn_80012ED0(pRect) * fn_8001415C(pBuf);
+    lbl_801B8980.fDC = 0.0f;
+    lbl_801B8980.fE0 = 1.0f;
+    lbl_801B8980.u110 |= 0x800;
+    lbl_801B8980.nBC = fn_80012EE8(pRect) * 512.0f;
+    lbl_801B8980.nC0 = (int)((fn_80012EE8(pRect) + fn_80012ED8(pRect)) * 512.0f) - 1;
+    lbl_801B8980.nC4 = fn_80012EE0(pRect) * 448.0f;
+    lbl_801B8980.nC8 = (int)((fn_80012EE0(pRect) + fn_80012ED0(pRect)) * 448.0f) - 1;
+    lbl_801B8980.u110 |= 0x200;
 }
 
 f32 fn_80014134(u8* p) {
@@ -184,20 +202,20 @@ f32 fn_80014154(u8* p) {
     return *(f32*)(p + 0x28);
 }
 
-f32 fn_8001415C(u8* p) {
-    return *(f32*)(p + 0xC);
+f32 fn_8001415C(GoFrameBuf* pBuf) {
+    return pBuf->fHeight;
 }
 
-f32 fn_80014164(u8* p) {
-    return *(f32*)(p + 0x4);
+f32 fn_80014164(GoFrameBuf* pBuf) {
+    return pBuf->f4;
 }
 
-f32 fn_8001416C(u8* p) {
-    return *(f32*)(p + 0x8);
+f32 fn_8001416C(GoFrameBuf* pBuf) {
+    return pBuf->fWidth;
 }
 
-f32 fn_80014174(u8* p) {
-    return *(f32*)(p + 0x0);
+f32 fn_80014174(GoFrameBuf* pBuf) {
+    return pBuf->f0;
 }
 
 f32 fn_8001417C(u8* p) {
