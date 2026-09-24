@@ -776,7 +776,8 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             fSize = DEG(lbl_802824F8->f60) * fSize;
             if (0.0f != fPeriod) {
                 nPeriod = fPeriod;
-                fAngle = fn_800095F0(2.0f * PI * ((f32)(pChain->n18 % nPeriod) / fPeriod) + pChain->n10 / 0.5f);
+                fAngle = fn_800095F0(2.0f * PI * ((f32)(pChain->n18 % nPeriod) / fPeriod) +
+                                     pChain->n10 / 0.5f);
                 fAngle *= fSize;
             } else {
                 fAngle = 0.0f;
