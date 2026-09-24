@@ -11,6 +11,7 @@ void fn_80012520(u32 ePrim, u32 eFormat, u16 nVerts);  // LLFont.c: GXBegin
 void fn_800124A8(void);                                // LLFont.c: end the primitive
 void fn_800B58B4(s32 p0);
 void fn_800B58C0(f32 farg0, f32 farg1, f32 farg2);
+void fn_800B58FC(f32* pA, f32* pOut);
 
 void fn_800B4B5C(void);
 void fn_800B4BB0(void);
@@ -148,3 +149,25 @@ void fn_800B58E4(s32 p0, s32 p1, s32 p2, s32 p3) {
 }
 
 // ---- end of sweep code ----
+
+// -a into out (four floats)
+#ifdef __MWERKS__
+asm void fn_800B58FC(register f32* pA, register f32* pOut) {
+    nofralloc
+    psq_l  f0, 0(pA), 0, 0
+    psq_l  f1, 8(pA), 0, 0
+    ps_neg f0, f0
+    ps_neg f1, f1
+    psq_st f0, 0(pOut), 0, 0
+    psq_st f1, 8(pOut), 0, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_800B58FC(f32* pA, f32* pOut) {
+    pOut[0] = -pA[0];
+    pOut[1] = -pA[1];
+    pOut[2] = -pA[2];
+    pOut[3] = -pA[3];
+}
+#endif
