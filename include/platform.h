@@ -139,12 +139,30 @@ s32  OSWaitSemaphore(OSSemaphore* pSem);
 s32  OSSignalSemaphore(OSSemaphore* pSem);
 
 // ---- the GameCube audio library (AX) and its effects (AXFX) ------------------------------------
-// The effects' state is only handed to the library, so its layout is left to it.
+// An effect is its settings after the library's working state; the game fills in the settings
+// (AudReverb.c) and hands the whole block to the library.
 
 typedef void (*AXAuxCallback)(void* pData, void* pContext);
 
-typedef struct AXFX_DELAY AXFX_DELAY;
-typedef struct AXFX_REVERBHI AXFX_REVERBHI;
+typedef struct AXFX_DELAY {
+    u8   work[0x3C];            // 0x00  the library's working state
+    u32  auDelay[3];            // 0x3C  per channel (left, right, surround): the delay, ms
+    u32  auFeedback[3];         // 0x48  per channel: the feedback, percent
+    u32  auOutput[3];           // 0x54  per channel: the output level, percent
+} AXFX_DELAY;
+LAYOUT_ASSERT(AXFX_DELAY, 0x60);
+
+typedef struct AXFX_REVERBHI {
+    u8   work[0x1C4];           // 0x000 the library's working state
+    u8   bTempDisable;          // 0x1C4
+    f32  fColoration;           // 0x1C8
+    f32  fMix;                  // 0x1CC
+    f32  fTime;                 // 0x1D0 the reverb's length, seconds
+    f32  fDamping;              // 0x1D4
+    f32  fPreDelay;             // 0x1D8 seconds
+    f32  fCrosstalk;            // 0x1DC
+} AXFX_REVERBHI;
+LAYOUT_ASSERT(AXFX_REVERBHI, 0x1E0);
 
 void AXRegisterAuxACallback(AXAuxCallback cb, void* pContext);
 void AXFXSetHooks(void* (*pAlloc)(u32 uSize), void (*pFree)(void* p));
