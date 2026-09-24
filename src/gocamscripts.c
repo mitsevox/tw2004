@@ -1140,6 +1140,8 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
     f32 fLen;
     f32 fStep;
     CourseInfo* pCourse;
+    int nPin;
+    int nTee;
 
     if (!fn_80043388(pScript, pShot)) {
         fn_800418B0(pShot, vOffset, pScript->f9C, pShot->f98);
@@ -1149,7 +1151,8 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
     case 0:
         if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 18) {  // fake match: see game.h
             pCourse = fn_8000C594();
-            Vec3Copy(&pCourse->pin[Game_CurrentPinSet()].x, pOut);
+            nPin = Game_CurrentPinSet();
+            Vec3Copy(&pCourse->pin[nPin].x, pOut);
         } else if (fn_80043388(pScript, pShot)) {
             fn_8003D9AC(pScript, pShot, nPlayer, vPos, 0);
             if (pScript->bCF) {
@@ -1284,11 +1287,15 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
         }
         break;
     case 10:
-        Vec3Copy(&fn_8000C594()->pin[Game_CurrentPinSet()].x, pOut);
+        nPin = Game_CurrentPinSet();
+        pCourse = fn_8000C594();
+        Vec3Copy(&pCourse->pin[nPin].x, pOut);
         fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
         break;
     case 11:
-        Vec3Copy(&fn_8000C594()->tee[gSession.nTeeSet[nPlayer]].x, pOut);
+        nTee = gSession.nTeeSet[nPlayer];
+        pCourse = fn_8000C594();
+        Vec3Copy(&pCourse->tee[nTee].x, pOut);
         fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
         break;
     case 9:
