@@ -157,17 +157,17 @@ typedef struct CharModel {
 // down through its children (fn_80114270).
 typedef struct DynChainLink {
     f32  fLength;               // 0x00  to its parent bone in the rest pose (0.5 unless type 0)
-    f32  v04[4];                // 0x04  its matrix's position when set up
-    u8   unk14[0x24 - 0x14];
-    f32  v24[4];                // 0x24  set by fn_80029BC8
-    u8   unk34[0x44 - 0x34];
+    f32  v04[4];                // 0x04  its matrix's position when set up; the updates move it
+    f32  v14[4];                // 0x14  v04 as the last update left it (fn_80114540)
+    f32  v24[4];                // 0x24  set by fn_80029BC8; the updates keep a velocity in it
+    f32  v34[4];                // 0x34  from its bone to the next one's position (fn_80114A84)
     f32  q44[4];                // 0x44  } its rest pose's rotation, twice
     f32  q54[4];                // 0x54  }
     f32  v64[4];                // 0x64  } and position, twice
     f32  v74[4];                // 0x74  }
     s32  nBone;                 // 0x84
     s32  nParent;               // 0x88  its bone's parent
-    f32  f8C;                   // 0x8C
+    f32  f8C;                   // 0x8C  fn_80114540 keeps the link's stretch in it
 } DynChainLink;
 LAYOUT_ASSERT(DynChainLink, 0x90);
 

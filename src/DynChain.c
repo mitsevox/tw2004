@@ -7,9 +7,15 @@
 #include "charstate.h"
 
 f32  fn_800BAFC0(f32* pSrc, f32* pDst);     // VecMath.c: normalises pSrc into pDst, gives its length
+f32  fn_800BAF58(f32* pSrc, f32* pDst);     // VecMath.c: normalises, gives the length (0 if near zero)
 void fn_80029BC8(f32* pVec);                // GoLighting.c
 void fn_801164D4(f32* pA, f32* pB, f32* pOut);
+void fn_801164F8(f32* pA, f32* pB, f32* pOut);
 f32  fn_80055F80(void);                     // Ball.c
+void fn_80008FCC(f32* pA, f32* pB, f32* pOut);                                // Quaternion.c
+void fn_8000914C(f32* pQ, f32 (*pMtx)[4]);                                    // Quaternion.c
+void fn_8000ADC0(f32 (*pMtx)[4]);                                             // identity
+void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);  // VecMath.c
 void fn_80114540(CharModel* pModel, DynChain* pChain, f32 f);
 void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 f);
 void fn_80115348(CharModel* pModel, DynChain* pChain, f32 f);
@@ -180,6 +186,316 @@ void fn_801143D0(f32 (*pMtx)[4], f32* pIn, f32* pOut) {
     pOut[1] = fOutY;
     pOut[2] = fOutZ;
     pOut[3] = pIn[3];
+}
+
+// The type 1 update: the chain's first link hangs from its bone's matrix fLength along the matrix's
+// z axis. It falls and swings with a velocity (v24) that gravity pulls down, limited to a top speed
+// and slowed by drag; it may lag at most 0.4 (times the model's f12C) behind where it hangs, and only
+// moves along the matrix's y axis. The bone then turns to point at it. Not on game type 3.
+void fn_80114540(CharModel* pModel, DynChain* pChain, f32 fDelta) {
+    f32 mScale[4][4];
+    f32 mRot[4][4];
+    f32 qTurn[4];
+    f32 vAxis[4];
+    f32 vHang[4];
+    f32 vZ[4];
+    f32 vUnitY[4];
+    f32 vUp[4];
+    f32 vX[4];
+    f32 vUnitX[4];
+    f32 vUnitZ[4];
+    f32 vDiff[4];
+    f32 vTo[4];
+    f32 vWas[4];
+    f32 vPos[4];
+    f32 vBack[4];
+    f32 vDrag[4];
+    f32 vMove[4];
+    f32 fScale;
+    f32 fMaxLag;
+    f32 fMaxSpeed;
+    f32 fLag;
+    f32 fSpeed;
+    f32 fDrag;
+    f32 fAngle;
+    f32 fX;
+    f32 fY;
+    f32 fZ;
+
+    if (gSession.nGameType == 3) {
+        return;
+    }
+    fScale = pModel->f12C;
+    if (0.0f == fScale) {
+        return;
+    }
+    fMaxLag = 0.4f * fScale;
+    // 0x40A66667, one bit above 5.2f; EA's expression for it is not known.
+    fMaxSpeed = 5.2000003f * fDelta * fScale;
+    // EA bug: only x, y and z of the unit axes are set; fn_801143D0 copies w as it is.
+    vUnitY[0] = 0.0f;
+    vUnitY[1] = 1.0f;
+    vUnitY[2] = 0.0f;
+    vUnitX[0] = 1.0f;
+    vUnitX[1] = 0.0f;
+    vUnitX[2] = 0.0f;
+    vUnitZ[0] = 0.0f;
+    vUnitZ[1] = 0.0f;
+    vUnitZ[2] = 1.0f;
+    fn_801143D0(pModel->pMatrices[pChain->nBone], vUnitY, vUp);
+    fn_801143D0(pModel->pMatrices[pChain->nBone], vUnitX, vX);
+    fn_801143D0(pModel->pMatrices[pChain->nBone], vUnitZ, vZ);
+    fn_800BAF04(vZ, vZ);
+    fn_800BAF04(vX, vX);
+    fn_800BAF04(vUp, vUp);
+    Vec3Copy(vZ, vWas);
+    vHang[0] = vZ[0] * pChain->pLinks->fLength + pModel->pMatrices[pChain->nBone][3][0];
+    vHang[1] = vZ[1] * pChain->pLinks->fLength + pModel->pMatrices[pChain->nBone][3][1];
+    vHang[2] = vZ[2] * pChain->pLinks->fLength + pModel->pMatrices[pChain->nBone][3][2];
+
+    // Pulled toward where it hangs, and by gravity.
+    fn_801164D4(vHang, pChain->pLinks->v04, vDiff);
+    fLag = fn_80009680(fn_80009744(vDiff));
+    fn_8001EF34(vDiff, fDelta, vDiff);
+    fn_801164F8(pChain->pLinks->v24, vDiff, pChain->pLinks->v24);
+    pChain->pLinks->v24[1] -= 0.018f * fDelta;
+    fSpeed = fn_80009680(fn_80009744(pChain->pLinks->v24));
+    if (fSpeed > fMaxSpeed) {
+        fSpeed = fMaxSpeed;
+        fn_800BAF04(pChain->pLinks->v24, pChain->pLinks->v24);
+        fn_8001EF34(pChain->pLinks->v24, fMaxSpeed, pChain->pLinks->v24);
+    }
+    if (fLag > fMaxLag) {
+        // Too far behind: put it back at the limit, moving toward where it hangs.
+        fn_800BAF04(vDiff, vDiff);
+        fn_8001EF34(vDiff, -fMaxLag, vBack);
+        fn_801164F8(vHang, vBack, pChain->pLinks->v04);
+        fn_801164D4(vHang, pChain->pLinks->v04, vDiff);
+        fn_800BAF04(vDiff, vDiff);
+        fn_8001EF34(vDiff, fSpeed, pChain->pLinks->v24);
+    }
+    fDrag = -0.069f * fDelta;
+    if (fabs(fDrag) < fabs(fSpeed)) {
+        fn_800BAF04(pChain->pLinks->v24, vDrag);
+        fn_8001EF34(vDrag, fDrag, vDrag);
+        fn_801164F8(pChain->pLinks->v24, vDrag, pChain->pLinks->v24);
+        fn_801164F8(pChain->pLinks->v24, pChain->pLinks->v04, pChain->pLinks->v04);
+    }
+
+    // Keep only the part of its offset along the matrix's y axis.
+    fn_801164D4(vHang, pChain->pLinks->v04, vDiff);
+    fn_8001EF34(vUp, fn_8000C5FC(vDiff, vUp), vMove);
+    fn_801164F8(vMove, pChain->pLinks->v04, pChain->pLinks->v04);
+    fn_801164D4(pChain->pLinks->v04, pModel->pMatrices[pChain->nBone][3], vTo);
+    fn_800BAF04(vTo, vTo);
+    pChain->pLinks->f8C = fLag;
+
+    // Turn the bone from its z axis to the link.
+    fX = vWas[0] - vTo[0];
+    fY = vWas[1] - vTo[1];
+    fZ = vWas[2] - vTo[2];
+    fX *= fX;
+    fY *= fY;
+    fZ *= fZ;
+    if (fX + fY + fZ > 0.00001f) {
+        fn_800BAF04(vTo, vTo);
+        fn_800BAF04(vWas, vWas);
+        vec4flt_CrossProduct(vTo, vWas, vAxis);
+        fAngle = fn_80009614(fn_8000C5FC(vTo, vWas));
+        if (fAngle > 0.00001f) {
+            fn_800BAF04(vAxis, vAxis);
+            vAxis[0] *= fAngle;
+            vAxis[1] *= fAngle;
+            vAxis[2] *= fAngle;
+            fn_8000923C(vAxis, qTurn);
+            fn_80008FCC(pModel->pPoses[pChain->nBone].q0, qTurn, pModel->pPoses[pChain->nBone].q0);
+        }
+        fn_8000914C(pModel->pPoses[pChain->nBone].q0, mRot);
+        fn_8000ADC0(mScale);
+        mScale[0][0] = pModel->a140[pChain->nBone][0];
+        mScale[1][1] = pModel->a140[pChain->nBone][1];
+        mScale[2][2] = pModel->a140[pChain->nBone][2];
+        Vec_Copy(pModel->pMatrices[pChain->nBone][3], vPos);
+        fn_800BAE5C(mRot, mScale, pModel->pMatrices[pChain->nBone], 3);
+        Vec_Copy(vPos, pModel->pMatrices[pChain->nBone][3]);
+        fn_80029A90(pModel, pModel->pMatrices[pChain->nBone], pChain->nBone);
+    }
+    Vec3Copy(pChain->pLinks->v04, pChain->pLinks->v14);
+}
+
+// The type 0 update: each link below the top one trails behind, pulled back toward where it was
+// (v64) the less the model's f130 and the further down the chain it is, kept from going above the
+// top bone (along its matrix's z axis) and held at fLength from its parent. Each bone then turns to
+// point at the next one, as it did in the rest pose (v34).
+void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
+    f32 mScale[4][4];
+    f32 mRot[4][4];
+    f32 vBone[4];
+    f32 vWas[4];
+    f32 vAxis[4];
+    f32 vPos[4];
+    f32 qTurn[4];
+    f32 vParent[4];
+    f32 vDiff[4];
+    f32 vUnitZ[4];
+    f32 vZ[4];
+    f32 vTop[4];
+    f32 vOff[4];
+    f32 vPoint[4];
+    f32 vSave[4];
+    f32 fDrag;
+    f32 fLoose;
+    f32 fPull;
+    f32 fStiff;
+    f32 fDown;
+    f32 fDist;
+    f32 fFall;
+    f32 fStep;
+    f32 fDot;
+    f32 fAngle;
+    f32 fX;
+    f32 fY;
+    f32 fZ;
+    int i;
+
+    fStiff = pModel->f130;
+    // EA bug: vUnitZ's w is never set; fn_801143D0 copies it as it is.
+    vUnitZ[0] = 0.0f;
+    vUnitZ[1] = 0.0f;
+    vUnitZ[2] = 1.0f;
+    fn_801143D0(pModel->pMatrices[pChain->nBone], vUnitZ, vZ);
+    fn_800BAF04(vZ, vZ);
+    Vec3Copy(pModel->pMatrices[pChain->nBone][3], vTop);
+    fn_8001EF34(vZ, 0.025f, vOff);
+    fn_801164F8(vTop, vOff, vTop);
+
+    // Each link's offset to the next bone as the model stands now.
+    for (i = 0; i < pChain->nLinks - 1; i++) {
+        pChain->pLinks[i].v34[0] =
+            pModel->pPoses[pChain->nBone + i + 1].v10[0] - pModel->pPoses[pChain->nBone + i].v10[0];
+        pChain->pLinks[i].v34[1] =
+            pModel->pPoses[pChain->nBone + i + 1].v10[1] - pModel->pPoses[pChain->nBone + i].v10[1];
+        pChain->pLinks[i].v34[2] =
+            pModel->pPoses[pChain->nBone + i + 1].v10[2] - pModel->pPoses[pChain->nBone + i].v10[2];
+        pChain->pLinks[i].v34[3] = 0.0f;
+    }
+
+    // Move each link below the top one.
+    fDrag = 0.5f * fDelta;
+    fLoose = 1.0f - fStiff;
+    fPull = 30.0f * fStiff * fDelta;
+    for (i = 1; i < pChain->nLinks; i++) {
+        fDown = (f32)i / (f32)(pChain->nLinks + 1);
+        fn_8001E85C(pModel->pPoses[pChain->nBone + i].v10, vPos);
+        pChain->pLinks[i].v64[3] = 1.0f;
+        vPos[3] = 1.0f;
+        vDiff[0] = vPos[0] - pChain->pLinks[i].v64[0];
+        vDiff[1] = vPos[1] - pChain->pLinks[i].v64[1];
+        vDiff[3] = 0.0f;
+        vDiff[2] = vPos[2] - pChain->pLinks[i].v64[2];
+        fDist = fn_800BAF58(vDiff, vDiff);
+        if (fDist < 0.4f) {
+            // Close to where it was: stay back, the more so the further down the chain.
+            fFall = 1.0f - fDown;
+            fStep = fDist / 0.4f * (fFall * fPull) + fFall * fDrag * fLoose;
+            if (fStep > fDist) {
+                fStep = fDist;
+            }
+            vPos[0] = vDiff[0] * fStep + pChain->pLinks[i].v64[0];
+            vPos[1] = vDiff[1] * fStep + pChain->pLinks[i].v64[1];
+            vPos[2] = vDiff[2] * fStep + pChain->pLinks[i].v64[2];
+        }
+        vPoint[0] = vPos[0];
+        vPoint[1] = vPos[1];
+        vPoint[2] = vPos[2];
+        fn_801164D4(vTop, vPoint, vOff);
+        fDot = fn_8000C5FC(vOff, vZ);
+        if (fDot < 0.0f) {
+            vPos[0] += vZ[0] * fDot;
+            vPos[1] += vZ[1] * fDot;
+            vPos[2] += vZ[2] * fDot;
+        }
+        fn_8001E85C(pModel->pPoses[pChain->pLinks[i].nParent].v10, vParent);
+        vDiff[0] = vPos[0] - vParent[0];
+        vDiff[1] = vPos[1] - vParent[1];
+        vDiff[2] = vPos[2] - vParent[2];
+        if (0.0f != vDiff[0] && 0.0f != vDiff[1] && 0.0f != vDiff[2]) {
+            fn_800BAF04(vDiff, vDiff);
+        }
+        vPos[0] = vDiff[0] * pChain->pLinks[i].fLength + vParent[0];
+        vPos[1] = vDiff[1] * pChain->pLinks[i].fLength + vParent[1];
+        vPos[2] = vDiff[2] * pChain->pLinks[i].fLength + vParent[2];
+        fn_8001E85C(vPos, pChain->pLinks[i].v64);
+        fn_8001E85C(vPos, pModel->pPoses[pChain->nBone + i].v10);
+        fn_8001E880(vPos, pModel->pMatrices[pChain->nBone + i][3]);
+        fn_80029A90(pModel, pModel->pMatrices[pChain->nBone + i], pChain->nBone + i);
+    }
+
+    // Turn each bone toward the next one, and rebuild its matrix.
+    for (i = 0; i < pChain->nLinks; i++) {
+        if (i + 1 < pChain->nLinks) {
+            vBone[0] =
+                pModel->pPoses[pChain->nBone + i + 1].v10[0] - pModel->pPoses[pChain->nBone + i].v10[0];
+            vBone[1] =
+                pModel->pPoses[pChain->nBone + i + 1].v10[1] - pModel->pPoses[pChain->nBone + i].v10[1];
+            vBone[2] =
+                pModel->pPoses[pChain->nBone + i + 1].v10[2] - pModel->pPoses[pChain->nBone + i].v10[2];
+            vBone[3] = 0.0f;
+            Vec3Copy(pChain->pLinks[i].v34, vWas);
+            if (0.0f != vBone[0] || 0.0f != vBone[1] || 0.0f != vBone[2]) {
+                fn_800BAF04(vBone, vBone);
+            }
+            if (0.0f != vWas[0] || 0.0f != vWas[1] || 0.0f != vWas[2]) {
+                fn_800BAF04(vWas, vWas);
+            }
+            fX = vWas[0] - vBone[0];
+            fY = vWas[1] - vBone[1];
+            fZ = vWas[2] - vBone[2];
+            fX *= fX;
+            fY *= fY;
+            fZ *= fZ;
+            if ((f32)fn_80009680(fX + fY + fZ) > 0.001f) {
+                vec4flt_CrossProduct(vWas, vBone, vAxis);
+                fAngle = fn_80009614(fn_8000C5FC(vBone, vWas));
+                if (fabs(fAngle) > 0.01f) {
+                    if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
+                        fn_800BAF04(vAxis, vAxis);
+                    }
+                    vAxis[0] *= fAngle;
+                    vAxis[1] *= fAngle;
+                    vAxis[2] *= fAngle;
+                    fn_8000923C(vAxis, qTurn);
+                    fn_80008FCC(pModel->pPoses[pChain->nBone + i].q0, qTurn,
+                                pModel->pPoses[pChain->nBone + i].q0);
+                }
+            }
+            fn_8000914C(pModel->pPoses[pChain->nBone + i].q0, mRot);
+            fn_8000ADC0(mScale);
+            mScale[0][0] = pModel->a140[pChain->nBone + i][0];
+            mScale[1][1] = pModel->a140[pChain->nBone + i][1];
+            mScale[2][2] = pModel->a140[pChain->nBone + i][2];
+            Vec_Copy(pModel->pMatrices[pChain->nBone + i][3], vSave);
+            fn_800BAE5C(mRot, mScale, pModel->pMatrices[pChain->nBone + i], 3);
+            Vec_Copy(vSave, pModel->pMatrices[pChain->nBone + i][3]);
+            fn_80029A90(pModel, pModel->pMatrices[pChain->nBone + i], pChain->nBone + i);
+        } else {
+            // The last bone takes the rotation of the one above it (not in 4-link chains).
+            if (pChain->nLinks != 4) {
+                fn_8001E85C(pModel->pPoses[pChain->nBone + i - 1].q0, pModel->pPoses[pChain->nBone + i].q0);
+            }
+            fn_8000914C(pModel->pPoses[pChain->nBone + i].q0, mRot);
+            fn_8000ADC0(mScale);
+            mScale[0][0] = pModel->a140[pChain->nBone + i][0];
+            mScale[1][1] = pModel->a140[pChain->nBone + i][1];
+            mScale[2][2] = pModel->a140[pChain->nBone + i][2];
+            Vec_Copy(pModel->pMatrices[pChain->nBone + i][3], vSave);
+            fn_800BAE5C(mRot, mScale, pModel->pMatrices[pChain->nBone + i], 3);
+            Vec_Copy(vSave, pModel->pMatrices[pChain->nBone + i][3]);
+            fn_80029A90(pModel, pModel->pMatrices[pChain->nBone + i], pChain->nBone + i);
+        }
+        fn_8001E85C(pChain->pLinks[i].q44, pChain->pLinks[i].q54);
+        fn_8001E85C(pChain->pLinks[i].v64, pChain->pLinks[i].v74);
+    }
 }
 
 // Update a chain by fDelta: set it up again first if asked, then the update of its type.
