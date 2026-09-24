@@ -58,6 +58,9 @@ PgaStatRanking lbl_80226870[GM_PGA_STAT_COUNT];
 PgaEntrant lbl_80224070[PGA_MAX_ENTRANTS];
 PgaScoreRanking lbl_80223C70;
 
+s32 lbl_80282504;
+u8  lbl_80282500;
+
 PgaEntrantMC* GetEntrantMCPtr(int nPlayer, int nEntrant) {
     return &gpSaveData[nPlayer].tour.field.aEntrant[nEntrant];
 }
@@ -1780,3 +1783,25 @@ void fn_8011C058(u8 bDirty) {
 void fn_8011C060(u8 bDirty) {
     gbScoresDirty = bDirty;
 }
+
+u8 (*lbl_80193F88[GM_PGA_STAT_SIMPLE_COUNT])(PgaStatCounts* pCounts, f32* pfValue) = {
+    CalcDrivingDistance, CalcAccuracy, CalcGIR, CalcPuttsPerRound, CalcPuttingAvg, CalcSandSave,
+    CalcScrambling, CalcBounceBack, CalcHolesPerEagle, CalcBirdieAvg, CalcPar3BirdieAvg,
+    CalcPar4BirdieAvg, CalcPar5BirdieAvg, CalcBirdieConversion, CalcScoringAvg, CalcParBreakers,
+    CalcPar3ScoringAvg, CalcPar4ScoringAvg, CalcPar5ScoringAvg, CalcLongestDrive, CalcLongestPutt,
+    CalcTotalEagles, CalcTotalBirdies, CalcConsecutiveCuts, CalcSeasonWinnings, CalcCareerWinnings,
+    CalcRounds, CalcPlayerOfYearPoints,
+};
+s32 (*lbl_80193FF8[GM_PGA_STAT_COUNT])(const void* pA, const void* pB) = {
+    fn_8011BCFC, fn_8011BCFC, fn_8011BCFC, fn_8011BBD8, fn_8011BBD8, fn_8011BCFC, fn_8011BCFC,
+    fn_8011BCFC, fn_8011BBD8, fn_8011BCFC, fn_8011BCFC, fn_8011BCFC, fn_8011BCFC, fn_8011BCFC,
+    fn_8011BBD8, fn_8011BCFC, fn_8011BBD8, fn_8011BBD8, fn_8011BBD8, fn_8011BCFC, fn_8011BCFC,
+    fn_8011BCFC, fn_8011BCFC, fn_8011BCFC, fn_8011BCFC, fn_8011BCFC, fn_8011BCFC, fn_8011BCFC,
+    fn_8011BBD8, fn_8011BBD8, fn_8011BBD8,
+};
+s32 lbl_80194074[GM_PGA_STAT_COUNT] = {
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1,
+};
+s32 lbl_801940F0[32] = {
+    1, 1, 1, 2, 3, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+};
