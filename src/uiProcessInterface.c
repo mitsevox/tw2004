@@ -170,6 +170,7 @@ void fn_8008F820(void) {
     u32 uMask;
     int i;
     int j;
+    UIButtonEvent* pEvent;
 
     fOne = 1.0f;
     if (gSession.nGameType == 3 || gSession.nGameType == 1 ||
@@ -251,10 +252,12 @@ void fn_8008F820(void) {
         for (i = 0; i < 4; i++) {
             if (lbl_801D87C0.a1[i] && lbl_801D87C0.a30[i]) {
                 if (gSession.nGameType != 6 || (gSession.nPaused != 2 && gSession.nPaused != 3)) {
+                    pEvent = lbl_80189B58;
                     for (j = 0; j < UI_NUM_BUTTON_EVENTS; j++) {
-                        if (lbl_80189B58[j].uMask & aPressed[i]) {
-                            fn_80168DB0(lbl_80281F1C->pHandler, i, lbl_80189B58[j].nEvent, 1, &fOne, 0);
+                        if (pEvent->uMask & aPressed[i]) {
+                            fn_80168DB0(lbl_80281F1C->pHandler, i, pEvent->nEvent, 1, &fOne, 0);
                         }
+                        pEvent++;
                     }
                     if (aButtons[i] != 0 && gSession.nGameType == 3) {
                         fn_8016B09C(lbl_80281F1C->pHandler, 0x22, 1, aArgs);
