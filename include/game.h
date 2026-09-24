@@ -208,6 +208,23 @@ int  fn_800D06FC(int nPlayer, u8 bCurrent, u8 bOnlyFlagged);   // two under par 
 int  fn_800D07D8(int nPlayer, u8 bCurrent);   // the current run of holes under par
 int  fn_800D089C(int nPlayer, u8 bCurrent);   // the current run of holes two under par or better
 u8   fn_800D0AF4(void);                 // nobody took anything on the last hole played
+u8   fn_800CF77C(int nPlayer);          // HoleScore.c
+u8   fn_800CF848(int nPlayer);          // HoleScore.c
+u32  fn_800CF904(int nPlayer);          // HoleScore.c
+u32  fn_800CFD58(int nPlayer);          // HoleScore.c
+int  fn_800CFFE4(int nPlayer);          // HoleScore.c
+f32  fn_800D04E0(int nPlayer);          // HoleScore.c
+int  fn_800D0514(int nPlayer);          // HoleScore.c
+f32  fn_800D0960(int nPlayer);          // HoleScore.c
+int  fn_800D0FBC(int nPlayer);          // HoleScore.c
+int  fn_800D10B0(int nPlayer);          // HoleScore.c
+int  fn_800D1170(int nPlayer, u8 bOnlyFlagged);    // HoleScore.c
+int  fn_800D1250(int nPlayer);          // HoleScore.c
+int  fn_800D13F4(int nPlayer);          // HoleScore.c
+int  fn_800D1530(int nPlayer);          // HoleScore.c
+s32  fn_8008AB4C(void);                 // GameUICommands.c
+int  fn_800E184C(int nPlayer, u8 bCurrent);        // GameRound.c
+s32  fn_800E81A0(int nPlayer);          // GameModeBattle.c
 s32  fn_800BCCCC(int nPlayer);          // SitDevFile.c: gpGame->pfn208
 s32  fn_800BCCF8(int nPlayer);          // SitDevFile.c: strokes behind the leader (gpGame->pfn200)
 u8   fn_800BCD50(void);                 // SitDevFile.c: gpGame->bD4

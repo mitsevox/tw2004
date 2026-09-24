@@ -7,8 +7,6 @@
 #include "game.h"
 
 f32  fn_800D04AC(int nPlayer);
-f32  fn_800D04E0(int nPlayer);
-int  fn_800D0514(int nPlayer);
 f32  fn_800D05A4(f32* pPos);
 u32  fn_800D0BAC(int nPlayer);
 u8   fn_800D0D54(int nPlayer);
