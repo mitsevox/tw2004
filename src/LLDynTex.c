@@ -81,6 +81,73 @@ void fn_8010AD50(DynTex* pTex, u64 uId) {
     }
 }
 
+// Drops the textures whose id was cleared (fn_8010AD50): the others' pixels and palettes move
+// down in p18 over the gaps, and from the first dropped one on their entries and descriptions
+// are packed to the front.
+void fn_8010ADA4(DynTex* pTex) {
+    DynTexHeader* pHdr = pTex->p4;
+    DynTexEntry* pOutEntry = pTex->p0;
+    DynTexObj* pOutObj = pHdr->p8;
+    DynTexPalette* pOutPal = pHdr->pC;
+    u8* pOut10 = pHdr->p10;
+    u8* pOut14 = pHdr->p14;
+    DynTexEntry* pEntry;
+    u32 nSrc = 0;
+    u32 nDst = 0;
+    s32 nKept = 0;
+    s32 nObjs = 0;
+    u8 bMoved = 0;
+    int i;
+    int j;
+
+    for (i = 0; i < pTex->n8; i++) {
+        pEntry = &pTex->p0[i];
+        if (pEntry->uId == 0) {
+            bMoved = 1;
+            for (j = 0; j < pEntry->n8; j++) {
+                nSrc += pEntry->aC[j];
+            }
+            nSrc += pEntry->n1C;
+            continue;
+        }
+        for (j = 0; j < pEntry->n8; j++) {
+            if (pEntry->aC[j] != 0 && nDst != nSrc) {
+                memmove(pTex->p18 + nDst, pTex->p18 + nSrc, pEntry->aC[j]);
+                pHdr->p8[i].aBlocks[j].nOffset = nDst;
+            }
+            nDst += pEntry->aC[j];
+            nSrc += pEntry->aC[j];
+        }
+        if (pEntry->n1C != 0 && nDst != nSrc) {
+            memmove(pTex->p18 + nDst, pTex->p18 + nSrc, pEntry->n1C);
+            pHdr->pC[i].nOffset = nDst;
+        }
+        nDst += pEntry->n1C;
+        nSrc += pEntry->n1C;
+        if (bMoved) {
+            memcpy(pOutObj, &pHdr->p8[i], sizeof(DynTexObj));
+            memcpy(pOutPal, &pHdr->pC[i], sizeof(DynTexPalette));
+            memcpy(pOut10, pHdr->p10 + i * 0x40, 0x40);
+            memcpy(pOut14, pHdr->p14 + i * 0x18, 0x18);
+            memcpy(pOutEntry, pEntry, sizeof(DynTexEntry));
+            if (pEntry->n1C != 0) {
+                pOutObj->n3C = (s8)nKept;
+            }
+        }
+        pOutEntry++;
+        pOutObj++;
+        pOutPal++;
+        pOut10 += 0x40;
+        pOut14 += 0x18;
+        nObjs++;
+        nKept++;
+    }
+    pTex->n8 = nKept;
+    pHdr->n2 = nKept;
+    pHdr->n4 = nObjs;
+    pTex->n14 = nDst;
+}
+
 // Fills pEntry for pObj and its palette pPal (if any): the id, each level's bytes and the
 // palette's, each rounded up to 16. Returns them all added up.
 s32 fn_8010B0C0(DynTexObj* pObj, DynTexPalObj* pPal, DynTexEntry* pEntry) {
