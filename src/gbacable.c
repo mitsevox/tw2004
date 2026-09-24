@@ -637,7 +637,7 @@ void fn_80123CBC(s32 a, s32 b) {
 }
 
 // fake match: EA takes the probe's slot through an inline; &pCh->u5C in place allocates pType r25, not r30
-static inline u32* Gba_ProbeSlot(GbaChannel* pCh) {
+static inline u32* fn_80123E34_Read(GbaChannel* pCh) {
     return &pCh->u5C;
 }
 
@@ -676,7 +676,7 @@ void fn_80123E34(void) {
             if (pCh->n0 == 0 && GBAGetProcessStatus(nChan, &uProc) != 2) {
                 if (lbl_80281984 == -1) {
                     uStart = OSGetTick();
-                    pType = Gba_ProbeSlot(pCh);
+                    pType = fn_80123E34_Read(pCh);
                     do {
                         fn_800A4BDC();
                         fn_800B7490();

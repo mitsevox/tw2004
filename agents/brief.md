@@ -42,8 +42,12 @@ if things are going well.
 
 - **Commit in your branch only**, plain messages like the history
   (`GameMode8.c: fn_800FA9E0, fn_800FAAB8 exact (43/66)`), never a Co-Authored-By line or AI footer.
-- **Never delete any file** (no `rm`, not even scratch temp files). `git checkout -- <file>` to undo
-  your own edit is fine.
+- **Never delete any file** (no `rm`, not even scratch temp files, and never anything outside your
+  worktree and scratch: `rm -f /dev/null` broke a cloud container on 2026-09-24). `git checkout --
+  <file>` to undo your own edit is fine.
+- **A helper you add for a match has no name evidence:** name it after its caller,
+  `fn_<caller address>_Read` (or `_Calc`, `_Get`: mechanical, never a guess at its job), with a
+  `// fake match:` comment. A name that says what it does needs the audit (docs/style.md).
 - **Edit C and headers only with the editor tools.** For one edit repeated in many places, save a
   Python script with the Write tool, run it, read the whole `git diff`, and name it in your report.
   No sed / heredocs / `python -c` / `python -` on anything, scratch scripts included.
