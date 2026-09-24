@@ -79,8 +79,8 @@ void fn_8010E748(MsgArg* pArgs, MsgArg* pResult) {
             bShow = 1;
         }
     } else if (nRow < fn_80118664(nPlayer)) {
-        bShow = 1;
         nEntrant = fn_801197CC(nPlayer, nRow);
+        bShow = 1;
     }
     if (bShow) {
         fn_8010E58C(szPlace, szName, szScore, szRounds, szMoney, nEntrant);
@@ -201,9 +201,9 @@ void fn_8010EBDC(MsgArg* pArgs, MsgArg* pResult) {
     int nPlayer = fn_80077B08();
     PgaStatCounts* pStats = &gpSaveData[nPlayer].tour.aStats[PGA_USER_GOLFER];
     s32 nGolfer;
-    SeasonEvent* pEvent;
-    s32 nCount;
     int i;
+    s32 nCount;
+    SeasonEvent* pEvent;
 
     sprintf(szOut, "", nLine);
     switch (nLine) {
