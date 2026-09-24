@@ -32,10 +32,10 @@ u8 fn_800CF158(int nPlayer) {
     int anTotal[4];   // one per player set up, as in fn_800CFE74
     int i;
     int nKind;
+    int nMineStrokes;
     int nMine;
     int nBest;
     int nOther;
-    int nMineStrokes;
     int nBestStrokes;
 
     nKind = fn_8008AB40();
