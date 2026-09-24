@@ -294,7 +294,13 @@ typedef struct CamTuning {
     f32  f124;                  // 0x124  ... and less than this above it counts as in the way
     f32  f128;                  // 0x128  CamScript_GetLookAtPoint: the least level distance for the
                                 //        steep-aim limit
-    u8   unk12C[0x15C - 0x12C];
+    u8   unk12C[0x134 - 0x12C];
+    f32  f134;                  // 0x134  fn_800422C4: the look-at point eases in slower within this share
+                                //        of the (field-of-view scaled) camera distance
+    u8   unk138[0x144 - 0x138];
+    f32  f144;                  // 0x144  fn_800422C4: the look-at point's level share of the way a frame
+    f32  f148;                  // 0x148  ... and its height's
+    u8   unk14C[0x15C - 0x14C];
     f32  f15C;                  // 0x15C  CameraScript_InterpToNewScript puts it in CamScript.f88 (0 for
                                 //        the default swing camera)
     u8   unk160[0x164 - 0x160];

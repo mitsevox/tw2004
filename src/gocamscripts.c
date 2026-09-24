@@ -1177,6 +1177,66 @@ void fn_800418B0(CamShot* pShot, f32* pOut, f32 fTime, f32 fSpeed) {
     }
 }
 
+// Eases the look-at point pOut towards pTarget (moved by the shot's f74 up and f70 sideways, the
+// other way round for fn_800453C8), level and in height separately, by CamTuning.f144 and f148 a
+// frame; slower when it is close. Right after a cut to the next shot it jumps there. Without a
+// next shot (or with blend 5) the aim lags by fLag (fn_8004349C). Only on frames with ball updates
+// or with fn_800C714C.
+void fn_800422C4(int nPlayer, f32* pOut, f32* pCam, f32* pTarget, CamShot* pShot, CamScript* pScript,
+                 f32 fTime, f32 fLag) {
+    f32 vMove[4];
+    f32 vAim[4];
+    f32 vSpan[4];
+    f32 fFrames;
+    f32 fDist;
+    f32 fRange;
+    f32 fDy;
+    f32 fRate;
+    f32 fNear;
+
+    if (GameEffects_BallUpdatesThisFrame(nPlayer) != 0 || fn_800C714C()) {
+        Vec3Copy(pTarget, vAim);
+        if (fn_800453C8(nPlayer, pShot)) {
+            fn_8004255C(vAim, pCam, pShot->f74, -pShot->f70);
+        } else {
+            fn_8004255C(vAim, pCam, pShot->f74, pShot->f70);
+        }
+        fn_80045428(vAim, pOut, vMove);
+        vMove[1] = 0.0f;
+        fDist = fn_80009680(fn_80009744(vMove));
+        fFrames = fTime / (1.0f / FRAME_RATE);
+        fRate = lbl_80281F78->f144 * fFrames;
+        fn_80045428(vAim, pCam, vSpan);
+        fRange = fn_80009680(fn_80009744(vSpan));
+        fRange *= pShot->f78 / DEG(60.0f);
+        fNear = lbl_80281F78->f134 * fRange;
+        if (fDist < fNear) {
+            fRate *= fRange / fNear;    // EA bug: fDist was likely meant (this is always 1 / f134)
+        }
+        if (pScript->pNextShot != NULL && pScript->nBC != 5 && pShot == pScript->pNextShot
+            && 0.0f == pScript->fCamTime) {
+            fRate = 1.0f;
+        }
+        fn_8001EF34(vMove, fRate, vMove);
+        fn_8004544C(vMove, pOut, pOut);
+        fn_80045428(vAim, pOut, vMove);
+        fDy = vAim[1] - pOut[1];
+        fRate = lbl_80281F78->f148 * fFrames;
+        if (fabsf(fDy) < fNear) {
+            fRate *= fabsf(fDy) / fNear;
+        }
+        if (pScript->pNextShot != NULL && pScript->nBC != 5 && pShot == pScript->pNextShot
+            && 0.0f == pScript->fCamTime) {
+            fRate = 1.0f;
+        }
+        fDy *= fRate;
+        pOut[1] += fDy;
+        if (pScript->pNextShot == NULL || pScript->nBC == 5) {
+            fn_8004349C(nPlayer, pCam, pOut, vAim, pScript, fLag);
+        }
+    }
+}
+
 // Raises pPos by fUp and moves it fSide sideways, square to the line from pTarget to it.
 void fn_8004255C(f32* pPos, f32* pTarget, f32 fUp, f32 fSide) {
     f32 vDir[4];
