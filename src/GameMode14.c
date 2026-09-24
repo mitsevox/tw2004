@@ -16,14 +16,14 @@ typedef struct Claim {
     s32 nRank;                  // 0x0
     s32 nOwner;                 // 0x4
 } Claim;
-extern Claim lbl_80211FB8[40];
+Claim lbl_80211FB8[40];
 
-extern s32 lbl_80281688;                    // the options saved while the game runs
-extern s32 lbl_80282368;
-extern s32 lbl_8028236C;                    // who starts: 0 or 1, at random
-extern u8  lbl_80282370;                    // set by fn_800F3828: the shot then claims nothing
-extern s32 lbl_80282374;                    // the points of the last claim
-extern s32 lbl_801928F0[];                  // points per rank
+s32 lbl_80281688 = 4;                    // the options saved while the game runs
+s32 lbl_80282374;                    // the points of the last claim
+u8  lbl_80282370;                    // set by fn_800F3828: the shot then claims nothing
+s32 lbl_8028236C;                    // who starts: 0 or 1, at random
+s32 lbl_80282368;
+s32 lbl_801928F0[6] = {500, 400, 300, 200, 100, 0};                  // points per rank
 
 void  fn_800F2BBC(void);
 void  fn_800F2BD8(void);

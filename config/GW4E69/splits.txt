@@ -805,6 +805,10 @@ GameTargets.c:
 
 GameMode14.c:
 	.text       start:0x800F2984 end:0x800F39F4
+	.data       start:0x801928F0 end:0x80192908
+	.bss        start:0x80211FB8 end:0x802120F8
+	.sdata      start:0x80281688 end:0x80281690
+	.sbss       start:0x80282368 end:0x80282378
 	.sdata2     start:0x802846B8 end:0x802846C0
 
 GameMode15.c:
