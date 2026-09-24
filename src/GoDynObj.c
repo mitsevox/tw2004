@@ -34,6 +34,7 @@ void fn_80047290(void);
 void fn_8004731C(u8* pState);
 void fn_80047C24(int nPlayer);
 void fn_80048184(int nPlayer);
+int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
 
 // ---- sweep code (not yet cleaned up) ----
 
