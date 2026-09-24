@@ -124,22 +124,22 @@ void fn_80112DA0(void) {
 // with the next one (TexEntry.b47 bit 0) or kind 9, blended over the first and with its material's
 // texture scale and offset. A mesh the override table replaces is drawn from the table's data.
 void fn_80112DD8(s32 nEntry) {
-    int nDraw;
+    int j;
     SkinDesc* pDesc;
     SkinDesc44* pEntry;
     s32* pMaterials;
-    SkinDesc28* pPasses;
-    s16* pFirst;
     SkinMeshRefs* pRefs;
     s16* pCount;
     TexEntry* pTex;
     f32* pUV;
     s32* pMesh;
+    SkinDesc28* pPasses;
+    s16* pFirst;
     s32 nOverrides;
     void** apOverride;
     int nPasses;
     int nMeshes;
-    s32* pMaterial;
+    int nDraw;
     int nDraws;
     int nPass;
     int nMesh;
@@ -162,7 +162,7 @@ void fn_80112DD8(s32 nEntry) {
     nOverrides = (pState->pOverride != NULL) ? pState->pOverride->nMeshes : 0;
     apOverride = (pState->pOverride != NULL) ? pState->pOverride->apMesh : NULL;
 
-    for (nPass = 0, pMaterial = pMaterials; nPass < nPasses; pMaterial++, nPass++) {
+    for (nPass = 0; nPass < nPasses; nPass++) {
         nMeshes = pPasses->a8[0].n1;
         for (i = 0; i < nMeshes; i++) {
             anFirst[i] = pFirst[i];
@@ -170,7 +170,7 @@ void fn_80112DD8(s32 nEntry) {
         if (pDesc->p18 == NULL) {
             return;
         }
-        pTex = pDesc->p18[*pMaterial].pTex;
+        pTex = pDesc->p18[pMaterials[nPass]].pTex;
         if (pTex == NULL) {
             // No texture: the vertex colour alone.
             GXSetNumTexGens(0);
@@ -181,7 +181,7 @@ void fn_80112DD8(s32 nEntry) {
             GXSetTevAlphaIn(0, 7, 7, 7, 5);
             GXSetTevAlphaOp(0, 0, 0, 1, 1, 0);
         } else if (nPass <= 0 || (pTex->b47 & 1) || pTex->b40 == 9) {
-            fn_800738DC(pDesc->p18[*pMaterial].pBank, pTex, 1);
+            fn_800738DC(pDesc->p18[pMaterials[nPass]].pBank, pTex, 1);
             GXSetBlendMode(0, 0, 0, 0);
             if ((pTex->b47 & 1) || nPass > 0) {
                 GXSetTevColorIn(1, 15, 15, 15, 0);
@@ -192,7 +192,7 @@ void fn_80112DD8(s32 nEntry) {
                 GXSetAlphaCompare(7, 0, 0, 7, 0x7F);
                 GXSetZCompLoc(1);
             }
-            pUV = pDesc->p18[*pMaterial].uvC.a;
+            pUV = pDesc->p18[pMaterials[nPass]].uvC.a;
             PSMTXIdentity(lbl_80223C14);
             if (nPass > 0) {
                 PSMTXScale(mScale, pUV[0], pUV[1], 1.0f);
@@ -214,16 +214,16 @@ void fn_80112DD8(s32 nEntry) {
             pRefs = fn_80113764();
             pRefs->f20 = pDesc->fB0;
             pMesh = &pDesc->p3C[pEntry->n0];
-            for (i = 0; i < nMeshes; i++) {
+            for (j = 0; j < nMeshes; j++) {
                 nMesh = *pMesh++;
                 if (nMesh >= 0) {
                     if (nMesh < nOverrides && apOverride[nMesh] != NULL) {
-                        fn_801136C4(&pDesc->p34[nMesh], apOverride[nMesh], pRefs, anFirst[i], *pCount);
+                        fn_801136C4(&pDesc->p34[nMesh], apOverride[nMesh], pRefs, anFirst[j], *pCount);
                     } else {
-                        fn_8011368C(&pDesc->p34[nMesh], pRefs, anFirst[i], *pCount);
+                        fn_8011368C(&pDesc->p34[nMesh], pRefs, anFirst[j], *pCount);
                     }
                 }
-                anFirst[i] += *pCount;
+                anFirst[j] += *pCount;
                 pCount++;
             }
             fn_801132C4(pRefs);
