@@ -78,6 +78,9 @@ typedef struct MsgString {
 // values, and where its answers go (an int or float, or a string to fill in).
 typedef void (*MsgHandler)(MsgArg* pArgs, MsgArg* pResult);
 
+void fn_8007BCA4(MsgArg* pArgs, MsgArg* pResult);  // FE_MessageTable.c: fn_80079AD4 (DiscCheck.c
+                                        // calls it directly, with no values)
+
 // Send message nMsg with nArgs values to a front-end handler (fn_8016B09C also sends through it).
 void fn_8016B0F8(void* pHandler, int nMsg, int nArgs, MsgArg* pArgs);
 

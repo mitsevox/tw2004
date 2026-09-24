@@ -251,7 +251,12 @@ typedef struct SaveProfile {
     u8   unk5ECE[0x5ED0 - 0x5ECE];
     LogoRecord aLogos[5];       // 0x05ED0  the user logos ("_usrtextr0".."_usrtextr4"; fe.h's
                                 //          ProfileLogos reaches them from 0x5500)
-    u8   unkAF7A[0xAF80 - 0xAF7A];
+    u8   nAF7A;                 // 0x0AF7A  set by a menu message, which passes it to fn_80103B8C
+                                //          (s8); read back signed
+    u8   unkAF7B;
+    s8   nDateMonth;            // 0x0AF7C  } a date, set and read by menu messages packed as
+    s8   nDateDay;              // 0x0AF7D  } fn_80078604 packs it (FE_CrAPMessages.c
+    s16  nDateYear;             // 0x0AF7E  } fn_80108178, fn_80108244)
     s32  aAF80[53];             // 0x0AF80  per slot: a Create-A-Player asset (FE_CrAPDB.c
                                 //          fn_80103D14), -1 for none; an asset's n2E is its slot
     // Four bit arrays with a bit per Create-A-Player asset (0x80057F18's loop over them all, which
@@ -284,6 +289,7 @@ extern s32 lbl_801894D0[6];             // the courses GM_GetGameProgress counts
 // The password manager (0x80056480-0x80057F18; TW06's passwordmanager.cpp)
 void fn_80056B8C(void);
 void fn_80057364(int nSlot);    // sets up save profile nSlot
+void fn_80057ED0(SaveProfile* pProfile, const char* pName);     // PasswordManager.c: name it
 
 // GameManager.c: the profile's completion score (fn_800D439C raises the TOUR card level with it)
 f32  GM_GetGameProgress(SaveProfile* pProfile);

@@ -990,7 +990,7 @@ config.libs = [
             Object(NonMatching, "CharSliders.c"),
             Object(NonMatching, "FE_PGATourMessages.c"),
             Object(Matching, "FE_LogoDesign.c"),
-            Object(NonMatching, "DiscCheck.c"),
+            Object(Matching, "DiscCheck.c"),
             Object(NonMatching, "hwsBurn.c"),
             Object(NonMatching, "CalendarScreen.c"),
             Object(NonMatching, "hwsMaterial_Gc.c"),
