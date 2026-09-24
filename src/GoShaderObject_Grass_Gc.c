@@ -2,9 +2,11 @@
 // siblings): the grass shader object, one row of the shader object table. Builds the shells of
 // grass over the hole's terrain into a vertex buffer (the GrassPacket calls) and draws them through
 // GX. GoGrass.c hands it the grass parameters once per hole (SD_vSetGrassParamsOnce).
-// Partly decompiled: the builder, the drawing and their two interpolation helpers are still asm.
+// Partly decompiled: the builder (SD_vShaderObject_Grass_Static_Init) is still asm.
 
 #include "grassshader.h"
+#include "camera.h"
+#include "gx.h"
 
 void SD_vShaderObject_Grass_Type_Init(void);
 void SD_vShaderObject_Grass_Type_Close(void);
@@ -19,6 +21,8 @@ void fn_80120C2C(f32 (*aPoints)[3], u8* aFlags, f32* pOut, u16 nIndex, u8 nStep,
 void GrassPacket_vBeginPacket(GrassWord** ppStart);
 void SD_vSetGrassParamsOnce(f32* pUnused0, f32* pUnused1, f32 (*a2)[4], f32* p8, f32 (*b2)[4],
                             f32 (*a16)[4], f32 fA, f32 fB);
+void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject);
+CamLens* fn_8001F004(void);
 void fn_800B5918(f32* pSrc, f32* pDst);
 GrassWord* GrassPacket_pGetNextAvailableVertSlot(void);
 void GrassPacket_vSetNewRow(void);
@@ -197,6 +201,118 @@ void SD_vSetGrassParamsOnce(f32* pUnused0, f32* pUnused1, f32 (*a2)[4], f32* p8,
     lbl_802608D0[3] = 16.0f;
     for (i = 0; i < 16; i++) {
         Vec_Copy(a16[i], lbl_802607D0[i]);
+    }
+}
+
+// Draws a grass object: every row of its current vertex run as a strip of blades, each vertex twice
+// (at the ground, then raised and blown by one of the 16 wind offsets). The grass fades with the
+// distance from the camera.
+void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject) {
+    GrassRenderData* pData = pObject->pData;
+    GrassParams* pParams = SD_gpGrassTypeData->pParams;
+    s32 nSet = pParams->n24;
+    s32 nVerts = pData->anVerts[nSet][pParams->a18[nSet]];
+    GrassWord* pVert = pData->apVerts[nSet][pParams->a18[nSet]];
+    f32 vEye[3];
+    f32 vAt[3];
+    f32 fDist;
+    f32 fPerX;
+    f32 fPerZ;
+    f32 fBase;
+    f32 fInvScale;
+    f32 fTexS;
+    f32 fTexT;
+    f32 fShade;
+    f32 fBladeT;
+    f32 fFade;
+    GrassWord* pAxis;
+    int nAxis;
+    int nWind;
+    int nDone;
+    int nInRow;
+    int nPass;
+    s8 nRow;
+    u8 nAlpha;
+
+    if (nVerts <= 0) {
+        return;
+    }
+    GXInvalidateVtxCache();
+    GXSetVtxAttrFmt(3, 9, 1, 4, 0);
+    GXSetVtxAttrFmt(3, 13, 1, 4, 9);
+    GXSetVtxAttrFmt(3, 14, 1, 4, 9);
+    GXSetVtxAttrFmt(3, 11, 1, 5, 0);
+    GXClearVtxDesc();
+    GXSetVtxDesc(9, 1);
+    GXSetVtxDesc(11, 1);
+    GXSetVtxDesc(13, 1);
+    GXSetVtxDesc(14, 1);
+
+    // How fast the camera distance changes along x and along z, from 2.5-unit steps.
+    Vec_Copy(fn_8001F004()->v34, vEye);
+    vAt[0] = pParams->a04[0];
+    vAt[1] = pVert[1].f;
+    vAt[2] = pParams->a04[1];
+    fDist = Vec_Distance(vEye, vAt);
+    vAt[0] = 2.5f + pParams->a04[0];
+    fPerX = Vec_Distance(vEye, vAt) - fDist;
+    vAt[0] = pParams->a04[0];
+    vAt[2] = 2.5f + pParams->a04[1];
+    fPerZ = Vec_Distance(vEye, vAt) - fDist;
+    fPerX /= 2.5f;
+    fPerZ /= 2.5f;
+
+    nAxis = (nSet == 0) ? 0 : 2;
+    fBase = pParams->a04[nAxis];
+    fInvScale = 1.0f / pParams->a04[2];
+    nWind = 0;
+    nDone = 0;
+    while (nDone < nVerts) {
+        nRow = pVert[3].b[2];
+        if (nRow < 2) {
+            // Too short to draw: skipped.
+            for (nInRow = nRow; nInRow > 0; nInRow--) {
+                pVert += 4;
+                nDone++;
+            }
+            continue;
+        }
+        GXBegin(0x98, 3, nRow * 2);
+        pAxis = pVert + nAxis;
+        for (nInRow = 0; nInRow < nRow; nInRow++) {
+            fFade = (fDist + (fPerX * (pVert[0].f - pParams->a04[0]) +
+                              fPerZ * (pVert[2].f - pParams->a04[1]))) *
+                        lbl_80260900[1][3] +
+                    lbl_80260900[0][3];
+            if (fFade < 0.0f) {
+                fFade = 0.0f;
+            }
+            if (fFade > 1.0f) {
+                fFade = 1.0f;
+            }
+            fTexS = pVert[0].f * lbl_80260920[1][0] + lbl_80260920[0][0];
+            fTexT = pVert[2].f * lbl_80260920[1][1] + lbl_80260920[0][1];
+            fShade = fInvScale * ((pAxis->f - fBase) + lbl_802608E0[(s8)pVert[3].b[0]]);
+            nAlpha = 255.0f * pParams->a10[nSet] * fFade;
+            for (nPass = 0; nPass < 2; nPass++) {
+                if (nPass == 1) {
+                    fn_8012141C(pVert[0].f + lbl_802607D0[nWind][0], pVert[1].f + pParams->f20,
+                                pVert[2].f + lbl_802607D0[nWind][2]);
+                    fBladeT = 0.025f;
+                    nWind = (nWind + 1) & 15;
+                } else {
+                    fn_8012141C(pVert[0].f, pVert[1].f, pVert[2].f);
+                    fBladeT = 1.0f;
+                }
+                fn_80121404(0x80, 0x80, 0x80, nAlpha);
+                fn_801213F4(fShade, fBladeT);
+                fn_801213F4(fTexS, fTexT);
+            }
+            pVert += 4;
+            pAxis += 4;
+            nDone++;
+        }
+        fn_801213F0();
     }
 }
 

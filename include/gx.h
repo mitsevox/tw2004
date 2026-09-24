@@ -32,6 +32,8 @@ void GXInvalidateVtxCache(void);
 void GXSetArray(int eAttr, void* pBase, u8 nStride);
 void GXClearVtxDesc(void);
 void GXSetVtxDesc(int eAttr, int eType);
+void GXSetVtxAttrFmt(int eFmt, int eAttr, int eCompCnt, int eCompType, u8 nFrac);
+void GXBegin(int ePrim, int eFmt, u16 nVerts);
 
 // ---- textures ---------------------------------------------------------------------------------
 

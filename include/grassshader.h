@@ -21,6 +21,23 @@ typedef struct GrassShell {
     u32        nVerts;          // 0x4
 } GrassShell;
 
+// The grass parameters SD_vShaderObject_Grass_Type_SetParameters is given (what the drawing reads).
+typedef struct GrassParams {
+    u32 unk0;
+    f32 a04[3];                 // 0x04  [0] and [1]: the x and z the fade is measured from; [nAxis]
+                                //       also the base of the grass texture's s
+    f32 a10[2];                 // 0x10  per shell set: the opacity
+    s32 a18[2];                 // 0x18  per shell set: which of its two vertex runs to draw
+    f32 f20;                    // 0x20  the height of the upper vertices
+    s32 n24;                    // 0x24  which shell set to draw
+} GrassParams;
+
+// A grass object's render record (one 32-byte node of the type's pool): two sets of two vertex runs.
+typedef struct GrassRenderData {
+    GrassWord* apVerts[2][2];   // 0x00
+    s32        anVerts[2][2];   // 0x10
+} GrassRenderData;
+
 // The grass type's data (TW06: SD_SShaderTypeData_Grass_Static, SD_gGrassTypeData).
 typedef struct SD_SShaderTypeData_Grass_Static {
     u16        a000[2][128];    // 0x000
@@ -33,7 +50,7 @@ typedef struct SD_SShaderTypeData_Grass_Static {
     GrassWord* pRow;            // 0x360  the first vertex of the current row
     u32        unk364;
     UMemPool*  pPool;           // 0x368  32 render records
-    void*      pParams;         // 0x36C  set by SD_vShaderObject_Grass_Type_SetParameters
+    GrassParams* pParams;       // 0x36C  set by SD_vShaderObject_Grass_Type_SetParameters
     f32        f370;            // 0x370
     s8         n374;            // 0x374
     u8         unk375[3];
