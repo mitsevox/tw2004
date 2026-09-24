@@ -499,8 +499,8 @@ u64 fn_800CD388(Skin* pSkin, int nSet, int nVariant) {
 // Allocates the four copies of the skin's choices: parts with nothing picked, sets on their
 // "Defaults" variant (or the first) and their first option (-1 when a variant has none).
 void fn_800CD404(Skin* pSkin) {
-    int i;
     int j;
+    int i;
     s32 nParts;
     s32 nSets;
     u32 nBytes;
@@ -518,7 +518,9 @@ void fn_800CD404(Skin* pSkin) {
         }
         nSets = fn_800CCEA0(pSkin);
         if (nSets != 0) {
-            pSkin->aSets[i] = fn_80009B34(nSets * sizeof(SkinChoice), 2, 16, "SkinPart.c", 670);
+            // nSets * 8 is nSets SkinChoices; an int product here, so it is not shared with the
+            // memset's size (sizeof makes that one unsigned)
+            pSkin->aSets[i] = fn_80009B34(nSets * 8, 2, 16, "SkinPart.c", 670);
             memset(pSkin->aSets[i], 0, nSets * sizeof(SkinChoice));
             for (j = 0; j < nSets; j++) {
                 if (fn_800CCF10(pSkin, j, 0) >= 1) {
