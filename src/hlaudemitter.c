@@ -16,6 +16,12 @@ void fn_800ACB98(void);                 // hlaudvoice.c
 void fn_800AF320(void);
 void fn_800B0434(void);                 // startUp.c
 
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x80284008), before the 0.0f fn_800AD800 uses first; its body is unknown.
+static f32 hlaudemitter_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
+
 // Sets up the instances, all on the free list, and empties every emitter. Always 1.
 int fn_800ACECC(void) {
     AudInstance* pInst;
@@ -28,10 +34,10 @@ int fn_800ACECC(void) {
         pInst->pPrevActive = pInst - 1;
         pInst->pNextActive = pInst + 1;
     }
-    lbl_801F2668.pFree = &lbl_801F2740[0];
-    lbl_801F2740[0].pPrevActive = NULL;
+    lbl_801F2668.pFree = lbl_801F2740;
+    lbl_801F2668.pFree->pPrevActive = NULL;
     lbl_801F2668.pFreeTail = &lbl_801F2740[255];
-    lbl_801F2740[255].pNextActive = NULL;
+    lbl_801F2668.pFreeTail->pNextActive = NULL;
     lbl_801F2668.pActive = NULL;
     lbl_801F2668.pActiveTail = NULL;
     lbl_801F2668.nActive = 0;
@@ -88,7 +94,7 @@ void fn_800AD1C8(void) {
 // Takes a free instance for sound nSound: onto the tail of the active list and, when nEmitter is
 // not negative, the tail of that emitter's list (its first instance sets the emitter's sound). Its
 // source's commands are cleared and handed on once. Returns its id, or 0xFF when all 256 are in use.
-u8 fn_800AD280(s16 nSound, s16 nEmitter, u8 n24, int n28, void (*pfnCallback)(u8 nId, u8 nBit, s32 n)) {
+u8 fn_800AD280(s16 nSound, s16 nEmitter, int n24, int n28, void (*pfnCallback)(u8 nId, u8 nBit, s32 n)) {
     AudInstance* pInst;
     AudInstance* p;
 

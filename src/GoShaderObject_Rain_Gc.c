@@ -134,18 +134,18 @@ void fn_800B4F24(RainObject* pRain) {
 // Draw a rain object: the drops' display list once at each lit point of the current buffer, then
 // the splash triangles, textured with "splash".
 void fn_800B4FA4(RainObject* pRain) {
+    int i;
     Vec4 v;
     f32 mPos[4][4];
     f32 mView[4][4];
     Camera* pCamera;
-    RainData* pData;
-    RainPoint* pPoint;
-    RainSplash* pSplash;
     int nBuf;
-    int nHalf;
-    int i;
+    RainData* pData;
     int j;
     int k;
+    int nHalf;
+    RainPoint* pPoint;
+    RainSplash* pSplash;
     int nAlpha;
 
     pCamera = fn_8001614C();
@@ -382,3 +382,11 @@ void fn_800B58FC(f32* pA, f32* pOut) {
     pOut[3] = -pA[3];
 }
 #endif
+
+// Copy three floats. Like the GX writes above, it sits at the end of this file's code and every
+// other caller (GoGolfCam.c, GoShaderObject_Grass_Gc.c) comes later in the link order.
+void fn_800B5918(const f32* pSrc, f32* pDst) {
+    pDst[0] = pSrc[0];
+    pDst[1] = pSrc[1];
+    pDst[2] = pSrc[2];
+}

@@ -150,7 +150,7 @@ void fn_800AB72C(AudTrack* pTrack, void (*pfnDone)(u32 bLast), u32 uStep, u8 bSk
             fn_800B0268(pVoice->nHwVoice, (StreamChunk*)pSrc, 0x8000, pVoice->flags.b.bHalf);
             fn_800B044C(uAram, pSrc + 0x100, 0x7F00, pfnDone, i == nChannels - 1);
             pSrc += uStep;
-            pVoice->flags.b.bHalf = !pVoice->flags.b.bHalf;
+            pVoice->flags.b.bHalf ^= 1;
         }
         i++;
     }
@@ -190,9 +190,9 @@ void fn_800AB8FC(u32 bLast) {
     AudTrack* pTrack;
 
     pTrack = lbl_802820AC;
-    lbl_802820AC->u.stm.uFilled += 0x8000;
+    pTrack->u.stm.uFilled += 0x8000;
     if (bLast) {
-        fn_800AB8B4(lbl_802820AC);
+        fn_800AB8B4(pTrack);
         lbl_802820AC = NULL;
         RemoveFromAudStreamQueue(pTrack);
     }

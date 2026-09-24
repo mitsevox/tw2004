@@ -524,6 +524,8 @@ GameAudio.c:
 
 AudTable.c:
 	.text       start:0x800A7AF0 end:0x800A85CC
+	.sbss       start:0x80282058 end:0x80282060
+	.sdata2     start:0x80283F88 end:0x80283FB0
 
 hlaudmovie.c:
 	.text       start:0x800A85CC end:0x800A9808
@@ -542,6 +544,7 @@ hlaudvoice.c:
 
 hlaudemitter.c:
 	.text       start:0x800ACECC end:0x800ADE70
+	.sdata2     start:0x80284008 end:0x80284018
 
 UAudContainers.c:
 	.text       start:0x800ADE70 end:0x800AE1F8
@@ -570,7 +573,7 @@ GoComicCam.c:
 	.text       start:0x800B34F0 end:0x800B4B5C
 
 GoShaderObject_Rain_Gc.c:
-	.text       start:0x800B4B5C end:0x800B5918
+	.text       start:0x800B4B5C end:0x800B5934
 
 AudLock.c:
 	.text       start:0x800B5934 end:0x800B5A14
@@ -819,6 +822,10 @@ FE_CrAPDB.c:
 
 FE_CrAPMessages.c:
 	.text       start:0x801077EC end:0x8010A448
+	.rodata     start:0x80184E10 end:0x80184E30
+	.data       start:0x801939D0 end:0x80193AE0
+	.sdata      start:0x80281758 end:0x80281760
+	.sdata2     start:0x80284848 end:0x80284868
 
 LLDynTex.c:
 	.text       start:0x8010A448 end:0x8010C4A0
@@ -852,6 +859,8 @@ hwsBurn.c:
 
 CalendarScreen.c:
 	.text       start:0x80111F58 end:0x80112614
+	.data       start:0x80193D90 end:0x80193DA8
+	.sdata      start:0x802817D8 end:0x802817E8
 
 hwsMaterial_Gc.c:
 	.text       start:0x80112614 end:0x80112804
@@ -869,6 +878,9 @@ DynChain.c:
 
 GameModeDriver.c:
 	.text       start:0x80116540 end:0x80117600
+	.data       start:0x80193E70 end:0x80193F88
+	.bss        start:0x80223C48 end:0x80223C70
+	.sdata      start:0x802817F8 end:0x80281840
 
 PGATourSimulation.c:
 	.text       start:0x80117600 end:0x8011C068

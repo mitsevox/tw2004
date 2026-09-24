@@ -438,8 +438,11 @@ s32 fn_80111124(HwsBurn* pBurn, s32 nAlign) {
     SkinDesc* pDesc = pBurn->pDesc;
     int i;
     int nBits = pDesc->n2C;
-    int n = 0;
-    s32 nBytes = 0;
+    int n;
+    s32 nBytes;
+
+    nBytes = 0;
+    n = 0;
 
     for (i = 0; i < nBits; i++) {
         if (fn_8001E9CC(pBurn->p28, i)) {

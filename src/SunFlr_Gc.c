@@ -205,9 +205,7 @@ void fn_8009A704(s32 nView) {
 u32 fn_8009A708(u8* pImage, int x, int y) {
     u8* p;
 
-    p = pImage + (x / 4 + y / 4 * 3) * 64;
-    p += (y & 3) * 8;
-    p += (x & 3) * 2;
+    p = &pImage[(x / 4 + y / 4 * 3) * 64 + (y & 3) * 8 + (x & 3) * 2];
     return (p[1] << 16) | (p[0x20] << 8) | p[0x21];
 }
 

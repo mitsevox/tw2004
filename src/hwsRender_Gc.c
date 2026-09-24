@@ -45,7 +45,10 @@ u8 fn_80112B80(void) {
     if (gSession.nNumPlayers > 3) {
         return 0;
     }
-    return gSession.nSplitScreen == 0;
+    if (gSession.nSplitScreen) {
+        return 0;
+    }
+    return 1;
 }
 
 // The same limit for course 14's hole 11 alone: at most three players.
@@ -468,7 +471,7 @@ SkinIter* fn_80113910(u8* pBuf, SkinIterArgs* pArgs) {
     SkinMeshIter* pIter = (SkinMeshIter*)pBuf;
     SkinDesc28* p28;
     s32 nCount;
-    int i;
+    s32 i;
 
     fn_80113E54(&pIter->iter, lbl_802817E8);
     pIter->pDesc = pArgs->pDesc;
@@ -498,9 +501,10 @@ void fn_80113A7C(SkinIter* pIter) {
 
 // An iterator in pBuf over the meshes of pArgs's SkinDesc.p5C entry (first step taken).
 SkinIter* fn_80113A9C(u8* pBuf, SkinIterArgs* pArgs) {
-    SkinDescIter* pIter = (SkinDescIter*)pBuf;
+    SkinDescIter* pIter;
 
-    fn_80113E54(&pIter->iter, lbl_802817EC);
+    fn_80113E54((SkinIter*)pBuf, lbl_802817EC);
+    pIter = (SkinDescIter*)pBuf;
     pIter->pDesc = pArgs->pDesc;
     pIter->pEntry = &pArgs->pDesc->p5C[pArgs->n];
     pIter->pSub = NULL;
@@ -519,9 +523,10 @@ void fn_80113B14(SkinIter* pIter) {
 
 // The same with the other step function.
 SkinIter* fn_80113B34(u8* pBuf, SkinIterArgs* pArgs) {
-    SkinDescIter* pIter = (SkinDescIter*)pBuf;
+    SkinDescIter* pIter;
 
-    fn_80113E54(&pIter->iter, lbl_802817F0);
+    fn_80113E54((SkinIter*)pBuf, lbl_802817F0);
+    pIter = (SkinDescIter*)pBuf;
     pIter->pDesc = pArgs->pDesc;
     pIter->pEntry = &pArgs->pDesc->p5C[pArgs->n];
     pIter->pSub = NULL;
