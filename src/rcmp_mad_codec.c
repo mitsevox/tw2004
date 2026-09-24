@@ -42,15 +42,31 @@ s32 lbl_80190FE0[64] = {
     0x3B21, 0x2AA1, 0x2D41, 0x3249, 0x3B21, 0x4B42, 0x6D41, 0xD650,
     0x73FC, 0x539F, 0x58C5, 0x62A3, 0x73FC, 0x939F, 0xD650, 0x1A463,
 };
+// the scan order of a block's coefficients
+const s32 lbl_80184B68[64] = {
+    0,  8,  1,  2,  9,  16, 24, 17, 10, 3,  4,  11, 18, 25, 32, 40,
+    33, 26, 19, 12, 5,  6,  13, 20, 27, 34, 41, 48, 56, 49, 42, 35,
+    28, 21, 14, 7,  15, 22, 29, 36, 43, 50, 57, 58, 51, 44, 37, 30,
+    23, 31, 38, 45, 52, 59, 60, 53, 46, 39, 47, 54, 61, 62, 55, 63,
+};
+
 u8 lbl_801F6858[512];           // a pixel value's clamp to 0..255, by its low 9 bits
+s32 lbl_801F6A58[2][64];        // a macroblock's U and V blocks
+s32 lbl_801F6C58[256];          // a macroblock's 16x16 Y block
 s32 lbl_801F7058[64];           // the quantizer for this picture
 u32 lbl_801F7158[64];           // looked up by the buffer's top 6 bits
-s32 lbl_801F8358[64];
+u32 lbl_801F7258[256];          // } the coefficient codes: the first 9 bits index
+u32 lbl_801F7658[256];          // } lbl_801F7A58; longer codes continue in these two
+u32 lbl_801F7A58[512];          // }
+s32 lbl_801F8258[64];           // the inverse DCT's first pass
+s32 lbl_801F8358[64];           // a block's coefficients
 
 void fn_800B769C(void);
 u32 fn_800B8984(u8* pData, int nBytes);
 s32 fn_800B8A04(s32 a, s32 b);
-void fn_800B8618(u8* pRefY, u8* pRefU, u8* pRefV, u8* pY, u8* pU, u8* pV);
+void fn_800B8618(u8* pRefY, u8* pRefU, u8* pRefV, u8* pY, u8* pU, u8* pV, int nStride);
+int fn_800B8AA0(void);
+void fn_800B8F28(s32* pOut, int nStride);
 u32 fn_800B94B0(PictFile* pFile);
 void fn_800B95FC(PictFile* pFile);
 void fn_800B9624(PictFrame** apList, PictFrame* pFrame);
@@ -194,6 +210,97 @@ void fn_800B8528(u8* pData, int nMode, int nQuant) {
     }
 }
 
+// Decode one macroblock (16x16 Y, 8x8 U and V) into pY, pU and pV, nStride the Y rows' spacing
+// (the U and V rows are half that). In a frame coded against a reference, a block with its bit
+// set in the block pattern is the reference block (moved by the macroblock's motion) plus a
+// level; the others are coded in full.
+void fn_800B8618(u8* pRefY, u8* pRefU, u8* pRefV, u8* pY, u8* pU, u8* pV, int nStride) {
+    int nHalf;
+    u32 uPattern;
+    int dx;
+    int dy;
+    int nOffset;
+
+    nHalf = nStride >> 1;
+    if (lbl_802821AC == 0) {
+        uPattern = 0;
+    } else if (!(lbl_802821B4 & 0xC0000000)) {
+        uPattern = 0;
+        fn_800B7D80(2);
+    } else {
+        if (lbl_802821B4 & 0x80000000) {
+            uPattern = 0x3FF;
+            fn_800B7D80(1);
+        } else {
+            uPattern = lbl_802821B4 >> 24;
+            fn_800B7D80(8);
+        }
+        dx = fn_800B7DF4();
+        dy = fn_800B7DF4();
+        pRefY += dx + dy * nStride;
+        nOffset = (dx >> 1) + (dy >> 1) * nHalf;
+        pRefU += nOffset;
+        pRefV += nOffset;
+    }
+    if (!(uPattern & 1)) {
+        if (fn_800B8AA0() == 1) {
+            fn_800B7E38(&lbl_801F6C58[0], 16);
+        } else {
+            fn_800B8F28(&lbl_801F6C58[0], 16);
+        }
+    } else {
+        fn_800B8064(pRefY, nStride, &lbl_801F6C58[0], fn_800B7DF4() * 2 - 128);
+    }
+    if (!(uPattern & 2)) {
+        if (fn_800B8AA0() == 1) {
+            fn_800B7E38(&lbl_801F6C58[8], 16);
+        } else {
+            fn_800B8F28(&lbl_801F6C58[8], 16);
+        }
+    } else {
+        fn_800B8064(pRefY + 8, nStride, &lbl_801F6C58[8], fn_800B7DF4() * 2 - 128);
+    }
+    if (!(uPattern & 4)) {
+        if (fn_800B8AA0() == 1) {
+            fn_800B7E38(&lbl_801F6C58[128], 16);
+        } else {
+            fn_800B8F28(&lbl_801F6C58[128], 16);
+        }
+    } else {
+        fn_800B8064(pRefY + nStride * 8, nStride, &lbl_801F6C58[128], fn_800B7DF4() * 2 - 128);
+    }
+    if (!(uPattern & 8)) {
+        if (fn_800B8AA0() == 1) {
+            fn_800B7E38(&lbl_801F6C58[136], 16);
+        } else {
+            fn_800B8F28(&lbl_801F6C58[136], 16);
+        }
+    } else {
+        fn_800B8064(pRefY + nStride * 8 + 8, nStride, &lbl_801F6C58[136], fn_800B7DF4() * 2 - 128);
+    }
+    if (!(uPattern & 0x10)) {
+        if (fn_800B8AA0() == 1) {
+            fn_800B7E38(lbl_801F6A58[0], 8);
+        } else {
+            fn_800B8F28(lbl_801F6A58[0], 8);
+        }
+    } else {
+        fn_800B8180(pRefU, nHalf, lbl_801F6A58[0], fn_800B7DF4() * 2 - 128);
+    }
+    if (!(uPattern & 0x20)) {
+        if (fn_800B8AA0() == 1) {
+            fn_800B7E38(lbl_801F6A58[1], 8);
+        } else {
+            fn_800B8F28(lbl_801F6A58[1], 8);
+        }
+    } else {
+        fn_800B8180(pRefV, nHalf, lbl_801F6A58[1], fn_800B7DF4() * 2 - 128);
+    }
+    fn_800B829C(lbl_801F6C58, pY, nStride);
+    fn_800B83DC(lbl_801F6A58[0], pU, nHalf);
+    fn_800B83DC(lbl_801F6A58[1], pV, nHalf);
+}
+
 // nBytes bytes at pData, little-endian.
 u32 fn_800B8984(u8* pData, int nBytes) {
     if (nBytes == 1) {
@@ -225,6 +332,186 @@ void fn_800B8A2C(int nBits) {
         lbl_802821B0 += 16;
         lbl_802821B8 += 2;
     }
+}
+
+// Decode one block's coefficients into lbl_801F8358, dequantized, in natural order. The result
+// is one past the last coefficient's scan position: 1 when there is only the DC one.
+int fn_800B8AA0(void) {
+    u32 uCode;
+    int nLen;
+    int n;
+    int i;
+    int nDC;
+
+    nDC = (s32)lbl_802821B4 >> 24;
+    lbl_801F8358[0] = nDC * lbl_801F7058[0];
+    fn_800B8A2C(8);
+    for (i = 1; i < 64; i++) {
+        lbl_801F8358[i] = 0;
+    }
+    n = 1;
+    while (1) {
+        uCode = lbl_801F7A58[lbl_802821B4 >> 23];
+        nLen = uCode & 0xFF;
+        if (nLen > 9) {
+            if (!(nLen & 0x20)) {
+                if (!(nLen & 0x10)) {
+                    fn_800B8A2C(9);
+                    uCode = lbl_801F7658[lbl_802821B4 >> 24];
+                    nLen = uCode & 0xFF;
+                } else {
+                    fn_800B8A2C(6);
+                    uCode = lbl_801F7258[lbl_802821B4 >> 24];
+                    nLen = uCode & 0xFF;
+                }
+            } else if (!(nLen & 0x10)) {
+                // escape: the run and level follow as they are
+                fn_800B8A2C(6);
+                uCode = lbl_802821B4;
+                nLen = 16;
+            } else {
+                // end of block
+                fn_800B8A2C(2);
+                return n;
+            }
+        }
+        fn_800B8A2C(nLen);
+        n += (uCode >> 16) & 0x3F;
+        i = lbl_80184B68[n++];
+        lbl_801F8358[i] = ((s32)uCode >> 22) * lbl_801F7058[i];
+    }
+}
+
+// The inverse DCT's first pass: eight coefficients in, a column of pOut (8 apart) out.
+void fn_800B8C54(const s32* pIn, s32* pOut) {
+    s32 z10;
+    s32 z11;
+    s32 z12;
+    s32 z13;
+    s32 z5;
+    s32 t10;
+    s32 t11;
+    s32 t12;
+    s32 o0;
+    s32 o1;
+    s32 o2;
+    s32 e0;
+    s32 e1;
+    s32 e2;
+    s32 e3;
+    s32 t;
+    s32 s;
+
+    if ((pIn[1] | pIn[2] | pIn[3] | pIn[4] | pIn[5] | pIn[6] | pIn[7]) == 0) {
+        // only the DC coefficient: the column is flat
+        pOut[0] = pIn[0];
+        pOut[8] = pIn[0];
+        pOut[16] = pIn[0];
+        pOut[24] = pIn[0];
+        pOut[32] = pIn[0];
+        pOut[40] = pIn[0];
+        pOut[48] = pIn[0];
+        pOut[56] = pIn[0];
+        return;
+    }
+    z10 = pIn[5] - pIn[3];
+    z12 = pIn[1] - pIn[7];
+    z11 = pIn[1] + pIn[7];
+    z13 = pIn[5] + pIn[3];
+    z5 = fn_800B8A04(z10 + z12, 0x61F8);
+    t10 = z5 + fn_800B8A04(z10, 0x8A8C);
+    t11 = fn_800B8A04(z11 - z13, 0xB505);
+    t12 = fn_800B8A04(z12, 0x14E7B) - z5;
+    o0 = z13 + z11 + t12;
+    o1 = t12 + t11;
+    o2 = t11 + t10;
+    e0 = pIn[0] + pIn[4];
+    e1 = pIn[0] - pIn[4];
+    t = fn_800B8A04(pIn[2] - pIn[6], 0xB505);
+    e2 = e1 - t;
+    e1 = e1 + t;
+    s = pIn[2] + pIn[6] + t;
+    e3 = e0 - s;
+    e0 = e0 + s;
+    pOut[0] = e0 + o0;
+    pOut[8] = e1 + o1;
+    pOut[16] = e2 + o2;
+    pOut[24] = e3 + t10;
+    pOut[32] = e3 - t10;
+    pOut[40] = e2 - o2;
+    pOut[48] = e1 - o1;
+    pOut[56] = e0 - o0;
+}
+
+// The second pass: a row of the first pass's output into eight 16.16 values.
+void fn_800B8DF4(const s32* pIn, s32* pOut) {
+    s32 z10;
+    s32 z11;
+    s32 z12;
+    s32 z13;
+    s32 z5;
+    s32 t10;
+    s32 t11;
+    s32 t12;
+    s32 o0;
+    s32 o1;
+    s32 o2;
+    s32 e0;
+    s32 e1;
+    s32 e2;
+    s32 e3;
+    s32 t;
+    s32 s;
+
+    z10 = pIn[5] - pIn[3];
+    z13 = pIn[5] + pIn[3];
+    z11 = pIn[1] + pIn[7];
+    z12 = pIn[1] - pIn[7];
+    t11 = z11 - z13;
+    s = z13 + z11;
+    z5 = fn_800B8A04(z10 + z12, 0x61F8);
+    t10 = z5 + fn_800B8A04(z10, 0x8A8C);
+    t11 = fn_800B8A04(t11, 0xB505);
+    t12 = fn_800B8A04(z12, 0x14E7B) - z5;
+    o0 = s + t12;
+    o1 = t12 + t11;
+    o2 = t11 + t10;
+    e0 = pIn[0] + pIn[4];
+    e1 = pIn[0] - pIn[4];
+    t = fn_800B8A04(pIn[2] - pIn[6], 0xB505);
+    e2 = e1 - t;
+    e1 = e1 + t;
+    s = pIn[2] + (pIn[6] + t);
+    e3 = e0 - s;
+    e0 = e0 + s;
+    pOut[0] = e0 + o0;
+    pOut[1] = e1 + o1;
+    pOut[2] = e2 + o2;
+    pOut[3] = e3 + t10;
+    pOut[4] = e3 - t10;
+    pOut[5] = e2 - o2;
+    pOut[6] = e1 - o1;
+    pOut[7] = e0 - o0;
+}
+
+// The inverse DCT of lbl_801F8358 into an 8x8 block (rows nStride words apart).
+void fn_800B8F28(s32* pOut, int nStride) {
+    fn_800B8C54(&lbl_801F8358[0], &lbl_801F8258[0]);
+    fn_800B8C54(&lbl_801F8358[8], &lbl_801F8258[1]);
+    fn_800B8C54(&lbl_801F8358[16], &lbl_801F8258[2]);
+    fn_800B8C54(&lbl_801F8358[24], &lbl_801F8258[3]);
+    fn_800B8C54(&lbl_801F8358[32], &lbl_801F8258[4]);
+    fn_800B8C54(&lbl_801F8358[40], &lbl_801F8258[5]);
+    fn_800B8C54(&lbl_801F8358[48], &lbl_801F8258[6]);
+    fn_800B8C54(&lbl_801F8358[56], &lbl_801F8258[7]);
+    fn_800B8DF4(&lbl_801F8258[0], pOut);
+    fn_800B8DF4(&lbl_801F8258[8], pOut + nStride);
+    fn_800B8DF4(&lbl_801F8258[16], pOut + nStride * 2);
+    fn_800B8DF4(&lbl_801F8258[24], pOut + nStride * 3);
+    fn_800B8DF4(&lbl_801F8258[32], pOut + nStride * 4);
+    fn_800B8DF4(&lbl_801F8258[40], pOut + nStride * 5);
+    fn_800B8DF4(&lbl_801F8258[48], pOut + nStride * 6);
+    fn_800B8DF4(&lbl_801F8258[56], pOut + nStride * 7);
 }
 
 // The read function the decoder takes its MAD files from.
@@ -288,9 +575,9 @@ PictFrame* fn_800B928C(MadDecoder* p, PictFile* pFile) {
     u8* pY;
     u8* pU;
     u8* pV;
+    int xc;
     int y;
     int x;
-    int xc;
 
     if (fn_800B94B0(pFile) == 'MADk') {
         if (p->pLast != NULL) {
@@ -332,7 +619,7 @@ PictFrame* fn_800B928C(MadDecoder* p, PictFile* pFile) {
         for (x = 0, xc = 0; x < p->nWidth; xc += 8, x += 16) {
             fn_800B8618(&pRefY[x + y * p->nWidth], &pRefU[xc + y * p->nWidth / 4],
                         &pRefV[xc + y * p->nWidth / 4], &pY[x + y * p->nWidth],
-                        &pU[xc + y * p->nWidth / 4], &pV[xc + y * p->nWidth / 4]);
+                        &pU[xc + y * p->nWidth / 4], &pV[xc + y * p->nWidth / 4], p->nWidth);
         }
     }
     if (fn_800B94B0(pFile) == 'MADm') {
