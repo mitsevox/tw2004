@@ -234,14 +234,16 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
     f32* pSub;
     CourseInfo* pCourse;
     u8 bMirror;
-    f32 fTotal;
     f32 fSpeed;
-    f32 fSlow;
     f32 fDist;
+    f32 fTotal;
     f32 fBase;
     f32 f;
+    f32 fSlow;
     f32 fAimY;
     f32 fCamY;
+    f32 fFlatDist;
+    f32 fAmount;
     pCam = fn_8001731C(pView);
     pSub = fn_80017314(pView);
     Vec3Copy(pCam, vOld);
@@ -301,12 +303,12 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
         }
         fn_8001EF34(fSlow, vMove, vMove);
         fn_800C73B8(vMove, pCam, pCam);
-        fSpeed = lbl_80281F78->f1C * (1.0f - fBase / fSpeed);
-        if (fSpeed < 0.0f) {
-            fSpeed = 0.0f;
+        fAmount = lbl_80281F78->f1C * (1.0f - fBase / fSpeed);
+        if (fAmount < 0.0f) {
+            fAmount = 0.0f;
         }
         if (gSession.nPaused == 0) {
-            fn_80038054(1, fn_80016D10(), 0.0f, fSpeed);
+            fn_80038054(1, fn_80016D10(), 0.0f, fAmount);
         }
         pView->script.f108 = 1.0f - fDist / fTotal;
     } else if (pView->script.f108 >= 0.0f) {
@@ -362,17 +364,17 @@ void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
     }
     CamScript_KeepAboveGround(nPlayer, pCam, vOld, 1, &bHit, NULL, NULL, 0.5f);
     if (pView->script.f108 >= 1.0f) {
-        fSlow = 1.0f + lbl_80281F78->f4;
-        fSlow *= 1.0f / fn_8001EFFC((u8*)fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])));
+        fFlatDist = 1.0f + lbl_80281F78->f4;
+        fFlatDist *= 1.0f / fn_8001EFFC((u8*)fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])));
     } else {
-        fSlow = 10000.0f;
+        fFlatDist = 10000.0f;
     }
     if (!bHit && pCam[1] < lbl_80281F78->f168 + fn_8000C594()->fFloor) {
         pCam[1] = lbl_80281F78->f168 + fn_8000C594()->fFloor;
     }
     f = lbl_80281F78->f18 + fDist / fTotal * (lbl_80281F78->f28 - lbl_80281F78->f18);
     if (pView->script.f108 >= 0.0f) {
-        CameraScript_LagAimMarker(nPlayer, pSub, pCam, &pView->shot19C, 1, bMirror != 0, f, fSlow,
+        CameraScript_LagAimMarker(nPlayer, pSub, pCam, &pView->shot19C, 1, bMirror != 0, f, fFlatDist,
                                   lbl_80281F78->fDC);
     }
 }
