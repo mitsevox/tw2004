@@ -55,7 +55,7 @@ typedef struct ProfWatch {
 LAYOUT_ASSERT(ProfWatch, 0x18);
 
 typedef struct ProfClock {
-    ProfTime tStart;            // 0x00  when fn_800952D8 set it up
+    ProfTime tStart;            // 0x00  when TI_vInitModule set it up
     ProfTime tNow;              // 0x08  the last reading
     ProfWatch aWatches[5];      // 0x10
 } ProfClock;
@@ -72,14 +72,14 @@ typedef struct ParticleBuffers {
 extern ParticleBuffers* lbl_802813A8;
 
 u32  fn_8000B3E8(void);                 // the tick (urandom.c)
-void fn_800952D8(void);                 // set up, every watch reset and stopped
-u64  fn_80095368(void);                 // the clock, since the set-up
-void fn_800953C8(int nWatch);           // start
-u8   fn_80095430(int nWatch);           // running?
-u64  fn_80095444(int nWatch);           // stop; returns the reading
-u64  fn_800954A4(int nWatch);           // the reading
+void TI_vInitModule(void);                 // set up, every watch reset and stopped
+u64  TI_sRead(void);                 // the clock, since the set-up
+void TI_vStartCounter(int nWatch);           // start
+u8   TI_bCounterIsRunning(int nWatch);           // running?
+u64  TI_sStopCounter(int nWatch);           // stop; returns the reading
+u64  TI_sReadCounter(int nWatch);           // the reading
 f32  fn_8006E118(u64 uNow, u64 uLast);  // seconds between two readings (gomainloop.c)
-void fn_80095504(int nWatch);           // reset to 0
+void TI_vResetCounter(int nWatch);           // reset to 0
 // Pack up to 12 characters of pName into a 64-bit code (base 40, table lbl_80191520).
 int   fn_800CB700(u64* pId, const char* pName);
 // And back: the 12 characters a code was made from (table lbl_80191720); szName takes 13 bytes.

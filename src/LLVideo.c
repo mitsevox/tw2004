@@ -332,7 +332,7 @@ void fn_80075A14_Start(Video* pVideo) {
 
 // The next frame is timed from now.
 void fn_80075A98_SetLastFrameTime(Video* pVideo) {
-    pVideo->tLast = fn_800954A4(0);
+    pVideo->tLast = TI_sReadCounter(0);
 }
 
 // Runs every movie once: each one whose next frame is due decodes it into its picture; one whose
@@ -364,7 +364,7 @@ void fn_80075AD0_UpdateAll(void) {
 
 // The movie's next frame is due.
 u8 fn_80075BF4_IsFrameDue(Video* pVideo) {
-    if (fn_8006E118(fn_800954A4(0), pVideo->tLast) < pVideo->fFrameTime) {
+    if (fn_8006E118(TI_sReadCounter(0), pVideo->tLast) < pVideo->fFrameTime) {
         return 0;
     }
     return 1;
@@ -426,7 +426,7 @@ void fn_80075DEC_RunPlayback(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nAr
     fn_80075C48();
     fn_80075C88();
     fn_80075A14_Start(pVideo);
-    tFrame = fn_800954A4(0);
+    tFrame = TI_sReadCounter(0);
     nLastFrame = -1;
     bFirst = 1;
     bDone = 0;
@@ -460,11 +460,11 @@ void fn_80075DEC_RunPlayback(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nAr
         fn_800760D8(&pVideo->pict);
         fn_80012EF8();
         fn_8001644C(0xA1, xy, 0, uv, 2);
-        while (fn_8006E118(fn_800954A4(0), tFrame) < 1.0f / 33.0f) {
+        while (fn_8006E118(TI_sReadCounter(0), tFrame) < 1.0f / 33.0f) {
         }
         fn_80006FE8();
         VIWaitForRetrace();
-        tFrame = fn_800954A4(0);
+        tFrame = TI_sReadCounter(0);
         fn_800083A0();
         fn_80008380();
     } while (!bDone);

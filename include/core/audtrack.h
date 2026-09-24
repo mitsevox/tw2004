@@ -495,7 +495,7 @@ extern AudTrack* lbl_802820AC;          // the track whose block is being DMA'd 
 // hlaudtrack.c
 void InsertSortWorldPerf(AudTrack* pTrack);
 u8   Trk_InitModule(void);
-u8   fn_800A9A50(u8 a, u8 b);          // fn_800A8DC8's a and b, unused
+u8   fn_800A9A50(u8 a, u8 b);          // Ses_Init's a and b, unused
 void Trk_ExitSession(void);
 void Trk_Cycle(void);
 AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 fPriority);
@@ -542,7 +542,7 @@ u8   fn_800ABBC8(void);
 void fn_800ABC34(AudTrack* pTrack);
 void Stm_Exit(AudTrack* pTrack);
 void Stm_Start(AudTrack* pTrack);
-void fn_800ABD7C(AudTrack* pTrack);
+void Stm_Stop(AudTrack* pTrack);
 u8   Stm_Tick(AudTrack* pTrack);
 void Stm_SetPlayList(AudTrack* pTrack, u8 nPlayList);
 void Stm_SetStream(AudTrack* pTrack, u16 nStream, int nMode);

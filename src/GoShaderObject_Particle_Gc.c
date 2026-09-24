@@ -1,8 +1,9 @@
 // GoShaderObject_Particle_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree): the
 // particle shader's buffers and drawing, and at its end the game's main-memory heap (made from the
-// OS arena by fn_80095108) and the stopwatches the main loop times its frames with. The heap and
-// the stopwatches are this file's by their data: its .sdata (0x802813A8-0x802813B8) and .sbss
-// (0x80281F58-0x80281F70). Where it ends between 0x8009554C and char_state.c is not proven.
+// OS arena by fn_80095108) and a clock with five stopwatches that the main loop, golfer, UI and
+// audio code time things with. The heap and the stopwatches are this file's by their data: its
+// .sdata (0x802813A8-0x802813B8) and .sbss (0x80281F58-0x80281F70). Where it ends between
+// 0x8009554C and char_state.c is not proven.
 
 #include "engine.h"
 #include "gx.h"
@@ -97,7 +98,8 @@ void fn_8009428C(SD_SShaderObject_Static* pObject, ParticleCreate* pCreate) {
                           * (2.0f * PI) / 720.0f;
 }
 
-// The close callback: the system's run is handed back when it is the last one given out.
+// The close callback: the buffers' cursor goes back to the start of the system's run (also over
+// any runs given out after it, even while those are in use).
 void fn_800944F8(SD_SShaderObject_Static* pObject) {
     ParticleSystem* pSys = pObject->pData;
 
@@ -512,7 +514,7 @@ void fn_8009527C(void* p) {
     }
 }
 
-void fn_800952D8(void) {
+void TI_vInitModule(void) {
     int i;
 
     lbl_802813B0->tStart.u = 0;
@@ -520,15 +522,15 @@ void fn_800952D8(void) {
     lbl_802813B0->tNow = lbl_802813B0->tStart;
     for (i = 0; i < 5; i++) {
         lbl_802813B0->aWatches[i].bRunning = 0;
-        fn_80095504(i);
+        TI_vResetCounter(i);
     }
 }
 
-void fn_80095364(void) {
+void TI_vCloseModule(void) {
 }
 
 // Reads the clock: the tick's wraps are counted in the high half.
-u64 fn_80095368(void) {
+u64 TI_sRead(void) {
     u32 nTick;
 
     nTick = fn_8000B3E8();
@@ -539,49 +541,49 @@ u64 fn_80095368(void) {
     return lbl_802813B0->tNow.u - lbl_802813B0->tStart.u;
 }
 
-void fn_800953C8(int nWatch) {
+void TI_vStartCounter(int nWatch) {
     ProfWatch* pWatch;
 
     pWatch = &lbl_802813B0->aWatches[nWatch];
-    pWatch->tBase.u = pWatch->tBase.u + fn_80095368() - pWatch->tStop.u;
+    pWatch->tBase.u = pWatch->tBase.u + TI_sRead() - pWatch->tStop.u;
     pWatch->bRunning = 1;
 }
 
-u8 fn_80095430(int nWatch) {
+u8 TI_bCounterIsRunning(int nWatch) {
     ProfWatch* pWatch;
 
     pWatch = &lbl_802813B0->aWatches[nWatch];
     return pWatch->bRunning;
 }
 
-u64 fn_80095444(int nWatch) {
+u64 TI_sStopCounter(int nWatch) {
     ProfWatch* pWatch;
 
     pWatch = &lbl_802813B0->aWatches[nWatch];
-    pWatch->tStop.u = fn_80095368();
+    pWatch->tStop.u = TI_sRead();
     pWatch->bRunning = 0;
     return pWatch->tStop.u - pWatch->tBase.u;
 }
 
-u64 fn_800954A4(int nWatch) {
+u64 TI_sReadCounter(int nWatch) {
     ProfWatch* pWatch;
     u64 uNow;
 
     pWatch = &lbl_802813B0->aWatches[nWatch];
     if (pWatch->bRunning) {
-        uNow = fn_80095368();
+        uNow = TI_sRead();
     } else {
         uNow = pWatch->tStop.u;
     }
     return uNow - pWatch->tBase.u;
 }
 
-void fn_80095504(int nWatch) {
+void TI_vResetCounter(int nWatch) {
     ProfWatch* pWatch;
     u64 uNow;
 
     pWatch = &lbl_802813B0->aWatches[nWatch];
-    uNow = fn_80095368();
+    uNow = TI_sRead();
     pWatch->tStop.u = uNow;
     pWatch->tBase.u = uNow;
 }

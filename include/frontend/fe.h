@@ -87,8 +87,8 @@ typedef struct FE801D8858 {
     u8  b18;                    // 0x18  set once fn_800918A4 has set it up
     u8  unk19[0x1C - 0x19];
     s32 n1C;                    // 0x1C
-    u64 u20;                    // 0x20  fn_80095368's clock when it was set up, then at the last update
-    u64 u28;                    // 0x28  fn_80095368's clock at this update (fn_8009198C)
+    u64 u20;                    // 0x20  TI_sRead's clock when it was set up, then at the last update
+    u64 u28;                    // 0x28  TI_sRead's clock at this update (fn_8009198C)
     struct LLPict* p30;         // 0x30  a picture decoded from the 'load' object (fn_800917C8)
     u8  unk34[0x38 - 0x34];
 } FE801D8858;

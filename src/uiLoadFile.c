@@ -1,6 +1,7 @@
 // uiLoadFile.c (EA's name, from its asserts; also in EA's 2002 source tree): loads the menu UI's
 // files. Registers the stream handlers for the UI's data, keeps the loaded file's data (and can
-// park it in ARAM while a round is played), and frees what was loaded.
+// park it in ARAM while char.c borrows its buffer to load a menu golfer), and frees what was
+// loaded.
 
 #include "game.h"
 #include "frontend/fe.h"
@@ -10,9 +11,9 @@
 u8    lbl_80281360 = 1;         // the menus' 'GRPS'/'MPCS' data has not been copied to ARAM yet
 
 u32   lbl_80281EF0;             // the menus' 'GRPS'/'MPCS' data's ARAM address
-u32   lbl_80281EF4;             // its size, rounded up to 32 bytes
+u32   lbl_80281EF4;             // the next multiple of 32 above its size
 u32   lbl_80281EF8;             // the UI file's ARAM address while it is parked there
-u32   lbl_80281EFC;             // its size, rounded up to 32 bytes
+u32   lbl_80281EFC;             // the next multiple of 32 above its size
 u8    lbl_80281F00;             // it is in ARAM (fn_8008F310), not in main memory
 UINamedList* lbl_80281F04;      // the 'GRPS'/'MPCS' data: a count, then that many offsets that
                                 // fn_8008EFC0 turns into pointers

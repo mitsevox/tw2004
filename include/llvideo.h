@@ -49,7 +49,7 @@ typedef struct Video {
     u8         bEnded;                  // 0x1022 the decoder ran out (fn_800760A8_HasEnded)
     u8         bStarved;                // 0x1023 the queue ran dry while reading
     LLPict     pict;                    // 0x1024 the picture the frames are copied into
-    u64        tLast;                   // 0x1098 when the last frame was due (fn_800954A4(0))
+    u64        tLast;                   // 0x1098 when the last frame was due (TI_sReadCounter(0))
     f32        fFrameTime;              // 0x10A0 seconds per frame: 1.0f / the frame rate
     int        nFrame;                  // 0x10A4 frames decoded; -1 before the first
     u8         bFirstFrame;             // 0x10A8 set once the first frame has been decoded

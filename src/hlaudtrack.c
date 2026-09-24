@@ -288,7 +288,7 @@ void Trk_Stop(AudTrack* pTrack) {
         fn_800AAEEC(pTrack);
         return;
     }
-    fn_800ABD7C(pTrack);
+    Stm_Stop(pTrack);
 }
 
 // Stops a track's voices: at once (bNow == 1), or by letting them end, in which case the track

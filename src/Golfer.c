@@ -1804,8 +1804,8 @@ void Session_SetGolfer(int nGolfer, int nPlayer) {
 }
 
 void fn_8002F180(void) {
-    fn_80095504(0);
-    fn_800953C8(0);
+    TI_vResetCounter(0);
+    TI_vStartCounter(0);
 }
 
 void fn_8002E258(void) {

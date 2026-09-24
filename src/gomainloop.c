@@ -190,7 +190,7 @@ void fn_80093AD4(void);
 void fn_80093D14(void);
 void BS_vInit(void);
 void BS_vClose(void);
-void fn_80095364(void);
+void TI_vCloseModule(void);
 void fn_80095550(void);
 void CameraTuning_Init(void);
 void fn_80097E98(void);
@@ -441,7 +441,7 @@ void fn_8006C7A8(void) {
     VM_vInitModule();
     fn_800136F4();
     fn_800103C0();
-    fn_800952D8();
+    TI_vInitModule();
     fn_8001C37C();
     fn_8002F180();
     uSeed = Misc_CreateRandomSeed();
@@ -474,7 +474,7 @@ void fn_8006C854(void) {
     fn_80055F18();
     Misc_CloseModule();
     fn_8001C468();
-    fn_80095364();
+    TI_vCloseModule();
     fn_8001049C();
     fn_80013718();
     VM_vCloseModule();
@@ -541,8 +541,8 @@ void GO_vInitFE(void) {
     lbl_80281E58 = VM_spCreateViewport();
     lbl_80281E54 = fn_8001371C(lbl_80281E60, lbl_80281E5C, lbl_80281E58);
     fn_80013D5C(lbl_80281E54);
-    fn_80095504(2);
-    fn_800953C8(2);
+    TI_vResetCounter(2);
+    TI_vStartCounter(2);
     fn_800A7A34(0, 0, 1, 0);
     fn_8000B884();
     fn_80124B54();
@@ -580,7 +580,7 @@ void fn_8006CB2C(void) {
     fn_8001C350();
     fn_8001C518();
     Players_Reset();
-    fn_80095444(2);
+    TI_sStopCounter(2);
     fn_80103A64();
     fn_8010A4E8();
     fn_80090664();
@@ -662,8 +662,8 @@ void GO_vInitIG(void) {
     fn_800DAE44();
     PsBallFx_InitModule();
     fn_8011E170();
-    fn_80095504(1);
-    fn_800953C8(1);
+    TI_vResetCounter(1);
+    TI_vStartCounter(1);
     if (gSession.nC == 3) {
         fn_800E0B38(5);
         fn_800EAF7C();
@@ -687,8 +687,8 @@ void fn_8006CDC4(void) {
     fn_800A2E14();
     fn_80093D14();
     fn_800C8108();
-    if (fn_80095430(1)) {
-        fn_80095444(1);
+    if (TI_bCounterIsRunning(1)) {
+        TI_sStopCounter(1);
     }
     fn_8006765C();
     fn_8006DCA4(0);
@@ -1030,15 +1030,15 @@ void fn_8006D838(void) {
 }
 
 // The main loop, until fn_8006D01C says stop. Each frame's time is taken from watch 1
-// (fn_800954A4), at most four frames (a bad reading counts as four); outside start-up it counts
+// (TI_sReadCounter), at most four frames (a bad reading counts as four); outside start-up it counts
 // the frames and sends event 0x1A once a second; then it runs the game type's frame.
 void fn_8006D8E8(void) {
-    u64 uLast = fn_800954A4(1);
+    u64 uLast = TI_sReadCounter(1);
     u64 uNow;
     f32 fTime;
     f64 dTime;
 
-    fn_800954A4(0);
+    TI_sReadCounter(0);
     while (!fn_8006D01C()) {
         fn_80110390();
         fn_800B7490();
@@ -1047,14 +1047,14 @@ void fn_8006D8E8(void) {
         }
         fn_8006C69C();
         fn_80006EDC();
-        uNow = fn_800954A4(1);
+        uNow = TI_sReadCounter(1);
         // fake match: the double step gives the original's frsp (EA's gomainloop.c saw a double
         // return; every other file saw the float fn_8006E118 returns).
         fTime = dTime = gSession.fFrameTime = fn_8006E118(uNow, uLast);
         if (fTime > 4.0f * FRAME_TIME || fTime < 0.0f) {
             gSession.fFrameTime = 4.0f * FRAME_TIME;
         }
-        fn_800954A4(0);
+        TI_sReadCounter(0);
         fn_80013400();
         if (gSession.nGameType == 6) {
             fn_800DFC18();
