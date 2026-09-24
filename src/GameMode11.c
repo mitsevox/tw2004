@@ -427,7 +427,7 @@ void fn_801008F8(void) {
     if (lbl_802823FC == 7) {
         AI_DefaultTarget(0);
         Shot_Prepare(0, 1);
-        BreakLine_Start(gPlayers[0].nView[0]);
+        BreakLine_Reset(gPlayers[0].nView[0]);
         fn_8009B970(gPlayers[0].nView[0]);
         fn_8001C804(0, 1, 1);
         fn_800957D8(gPlayers[0].pChar);
@@ -455,7 +455,7 @@ void fn_80100A3C(int nPlayer) {
     Shot_Prepare(0, 1);
     gPlayers[0].nShotKind = nShotKind;
     gPlayers[0].nClub = nClub;
-    BreakLine_Start(gPlayers[0].nView[0]);
+    BreakLine_Reset(gPlayers[0].nView[0]);
     fn_8009B970(gPlayers[0].nView[0]);
     fn_8001C804(0, 1, 1);
     fn_800957D8(gPlayers[0].pChar);

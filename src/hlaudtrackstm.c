@@ -169,7 +169,8 @@ void fn_800AB818(u32 bLast) {
     }
 }
 
-// Refills the whole buffer from its start (after the stream looped).
+// Queued by fn_800AB570 once a stream that does not loop has ended: clears the chunk and DMAs it
+// (silence) into each voice's free half, with no step (fn_800AB72C).
 void fn_800AB860(AudTrack* pTrack) {
     fn_80005AE8(pTrack->u.stm.pBuffer, 0, sizeof(StreamChunk));
     fn_800AB72C(pTrack, fn_800AB818, 0, 0);

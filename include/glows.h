@@ -87,7 +87,7 @@ typedef struct SunFlrView {
     f32  f9C;                   // 0x9C  } screen
     f32  fA0;                   // 0xA0  }
     u8   bA4;                   // 0xA4  fn_8006434C's result
-    u8   bA5;                   // 0xA5  set to 1 at set-up (fn_8009AF30)
+    u8   bA5;                   // 0xA5  set to 1 at set-up (SF_vInitModule)
     u8   unkA6[0xA8 - 0xA6];
 } SunFlrView;
 LAYOUT_ASSERT(SunFlrView, 0xA8);
@@ -111,7 +111,7 @@ typedef struct SunFlrSet {
 } SunFlrSet;
 LAYOUT_ASSERT(SunFlrSet, 0x90);
 
-// Code8009AA28.c's tables (.data), handed to its state by fn_8009AF30.
+// Code8009AA28.c's tables (.data), handed to its state by SF_vInitModule.
 extern SunFlrSet lbl_80189E78[3];
 extern u8 lbl_8018A028[0x4B0];
 extern u8 lbl_8018A4D8[];

@@ -200,8 +200,8 @@ void fn_8009A704(s32 nView) {
 
 // ---- end of sweep code ----
 
-// The colour (0xRRGGBB) of pixel (x, y) of a 12 x 12 RGBA8 image: GX's 4 x 4 tiles of 64 bytes,
-// the alpha and red pairs first, then the green and blue pairs.
+// The 24-bit depth at pixel (x, y) of the 12 x 12 Z24X8 copy fn_8009A3F4 makes: GX's 4 x 4 tiles
+// of 64 bytes (laid out as RGBA8), the high byte in the first 32, the middle and low in the next.
 u32 fn_8009A708(u8* pImage, int x, int y) {
     u8* p;
     u32 uColour;

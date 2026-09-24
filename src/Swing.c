@@ -155,7 +155,7 @@ void  SW_vSetSwingStrength(int nPlayer);
 void  SW_vCheckForSwingBoost(int nPlayer);
 void  SW_vUIAdjustClub(Character* pObj, SwingData* pSw, int nStickX);
 int   fn_8005CC5C(void);
-void  fn_800AE3F8(int nView);
+void  UI_Obj_RenderBoostUI(int nView);
 void  fn_800360D4(u8* pMesh);
 void  fn_80098C70(void);
 void  GOLFERSTATE_Pop(int nPlayer);
@@ -1815,7 +1815,7 @@ void fn_8005A7A0(int nPlayer) {
         gPlayers[nPlayer].nShotKind != 0 && gPlayers[nPlayer].swing.bDrawBoostUI != 0 &&
         gSession.bReplay == 0 &&
         gSession.nPaused == 0 && !fn_800C6CB0()) {
-        fn_800AE3F8(gPlayers[nPlayer].nView[0]);
+        UI_Obj_RenderBoostUI(gPlayers[nPlayer].nView[0]);
     }
 }
 
@@ -3013,7 +3013,7 @@ void STATEFUNC_GreenMorphUpdate(int nPlayer) {
                 AI_ChooseTarget(nPlayer);
             }
             Shot_Prepare(nPlayer, 1);
-            BreakLine_Start(gPlayers[nPlayer].nView[0]);
+            BreakLine_Reset(gPlayers[nPlayer].nView[0]);
             fn_8001C804(nPlayer, 1, 1);
             fn_800957D8(gPlayers[nPlayer].pChar);
             fn_80095744(gPlayers[nPlayer].pChar, 5);
@@ -3361,7 +3361,7 @@ void STATEFUNC_PreShotInit(int nPlayer) {
     }
     fn_80045824(nPlayer);
     SW_vClearBoosts(nPlayer);
-    BreakLine_Start(gPlayers[nPlayer].nView[0]);
+    BreakLine_Reset(gPlayers[nPlayer].nView[0]);
     fn_8009B970(gPlayers[nPlayer].nView[0]);
     if (gPlayers[nPlayer].ball.nLie == 0) {
         DynObj_TeeAdd(&gPlayers[nPlayer].ball, nPlayer, 1);
@@ -3841,7 +3841,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
                 AI_ChooseTarget(nPlayer);
             }
             Shot_Prepare(nPlayer, 1);
-            BreakLine_Start(gPlayers[nPlayer].nView[0]);
+            BreakLine_Reset(gPlayers[nPlayer].nView[0]);
             fn_8009B970(gPlayers[nPlayer].nView[0]);
             fn_8001C804(nPlayer, 1, 1);
             fn_800957D8(gPlayers[nPlayer].pChar);

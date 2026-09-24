@@ -916,7 +916,7 @@ void GM_CheckForShotChanges(int nPlayer) {
             if (gpGame->pfn258(nPlayer)) {
                 AI_DefaultTarget(nPlayer);
                 Shot_Prepare(nPlayer, 1);
-                BreakLine_Start(gPlayers[nPlayer].nView[0]);
+                BreakLine_Reset(gPlayers[nPlayer].nView[0]);
                 fn_8009B970(gPlayers[nPlayer].nView[0]);
                 fn_8001C804(nPlayer, 1, 1);
                 fn_800957D8(gPlayers[nPlayer].pChar);

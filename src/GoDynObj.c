@@ -18,7 +18,7 @@ void fn_80047208(u8* aState);
 int  fn_800F1960(void);                 // GameModeReplay.c: how many targets the target games have
 void fn_800F196C(int i, f32* pOut);     // GameModeReplay.c: target i's position
 void fn_80093DB8(Ball* pBall, int nPlayer);    // GoObjShadow.c
-void fn_80093AE0(Ball* pBall, int nPlayer);    // GoObjShadow.c
+void BFX_vRender(Ball* pBall, int nPlayer);    // GoObjShadow.c
 void fn_80048584(UObject* pObj, s8 nLod);
 void fn_8000ADC0(f32 (*pMtx)[4]);                   // identity
 int  fn_800636EC(void);
@@ -523,7 +523,7 @@ void fn_80047290(void) {
 
     for (i = 0; i < gSession.nNumPlayers; i++) {
         if (fn_80046B1C(i)) {
-            fn_80093AE0(&PLAYER(i)->ball, i);
+            BFX_vRender(&PLAYER(i)->ball, i);
         }
     }
 }

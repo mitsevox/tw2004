@@ -24,12 +24,12 @@ void fn_80057438(SaveProfile* pProfile);
 void fn_8008E354(void);                 // FEgolferanim.c
 void fn_8008F80C(s32 p0, s32 p1);       // uiProcessInterface.c
 void fn_8008E358(s32 p0);               // FEgolferanim.c
-s32  fn_800A0C6C(MCCardPosStr* pPos);   // MC.c
+s32  MC_LoadUser(MCCardPosStr* pPos);   // MC.c
 s32  fn_800A0230(MCCardPos* pPos);      // MC.c: load a replay from the card
 void fn_8009CD80(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_8009EB44(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_800A1164(s32 nPort, s32 nSlot, char* pName, s32 n);     // MC.c
-s32  fn_800A1590(s32 nPort, s32 nSlot, s32 n, char* szOut);     // MC.c: clears szOut first
+s32  MC_GetUser(s32 nPort, s32 nSlot, s32 n, char* szOut);     // MC.c: clears szOut first
 void fn_8007739C(Replay* pReplay);      // FE_Manager.c
 f32  GM_GetBonusProgress(SaveProfile* pProfile);    // GameManager.c
 void fn_801176C0(TourSeason* pTour);    // PGATourSimulation.c
@@ -65,11 +65,11 @@ int  GameMode4_GetNumEventsWon(void);                 // GameMode4.c
 void fn_80102308(s32 n);                // GameMode4.c
 void fn_8010D334(s32 v);                // CharSliders.c
 void fn_8008DD34(int nSlot, int n);
-s32  fn_8009FCFC(MCCardPos* pPos);      // MC.c: load the save from the card
-s32  fn_8009FE90(MCCardPos* pPos);      // } MC.c, in lbl_8018C7D8 (sets 0, 2, 1, 1)
+s32  MC_LoadOptions(MCCardPos* pPos);      // MC.c: load the save from the card
+s32  MC_SaveOptions(MCCardPos* pPos);      // } MC.c, in lbl_8018C7D8 (sets 0, 2, 1, 1)
 s32  fn_800A09EC(MCCardPos* pPos);      // }
-s32  fn_800A0E6C(MCCardPos* pPos);      // }
-s32  fn_800A1964(MCCardPos* pPos);      // }
+s32  MC_SaveUser(MCCardPos* pPos);      // }
+s32  MC_GetNumUser(MCCardPos* pPos);      // }
 void fn_800A4FD8(void);
 void fn_800A73F0(int n);
 void fn_8010F2FC(MsgArg* pArgs, MsgArg* pResult);
@@ -1566,7 +1566,7 @@ void fn_8007C4D8(MsgArg* pArgs, MsgArg* pResult) {
     fn_8009CD7C();
 }
 
-// fn_800A0C6C with a card, a profile slot and a string, then the slot's profile is marked loaded
+// MC_LoadUser with a card, a profile slot and a string, then the slot's profile is marked loaded
 // (the test never fails: the result is 1 or an error, never 0).
 void fn_8007C4F8(MsgArg* pArgs, MsgArg* pResult) {
     MCCardPosStr pos;
@@ -1577,7 +1577,7 @@ void fn_8007C4F8(MsgArg* pArgs, MsgArg* pResult) {
     pos.pos.nSlot = pArgs[1].i;
     pos.pos.n8 = pArgs[2].i;
     pos.szC = ((MsgString*)pArgs[3].p)->pStr;
-    nError = fn_800A0C6C(&pos);
+    nError = MC_LoadUser(&pos);
     n = 1;
     if (nError != 0) {
         n = nError;
@@ -1597,7 +1597,7 @@ void fn_8007C594(MsgArg* pArgs, MsgArg* pResult) {
     pos.nPort = pArgs[0].i;
     pos.nSlot = pArgs[1].i;
     pos.n8 = pArgs[2].i;
-    nError = fn_800A0E6C(&pos);
+    nError = MC_SaveUser(&pos);
     n = 1;
     if (nError != 0) {
         n = nError;
@@ -1751,7 +1751,7 @@ void fn_8007C9A4(MsgArg* pArgs, MsgArg* pResult) {
 
     pos.nPort = pArgs[0].i;
     pos.nSlot = pArgs[1].i;
-    nError = fn_8009FE90(&pos);
+    nError = MC_SaveOptions(&pos);
     n = 1;
     if (nError != 0) {
         n = nError;
@@ -1766,7 +1766,7 @@ void fn_8007C9F8(MsgArg* pArgs, MsgArg* pResult) {
 
     pos.nPort = pArgs[0].i;
     pos.nSlot = pArgs[1].i;
-    nError = fn_8009FCFC(&pos);
+    nError = MC_LoadOptions(&pos);
     n = 1;
     if (nError != 0) {
         n = nError;
@@ -2636,7 +2636,7 @@ void fn_8007E818(MsgArg* pArgs, MsgArg* pResult) {
 
     pos.nPort = pArgs[0].i;
     pos.nSlot = pArgs[1].i;
-    pResult->i = fn_800A1964(&pos);
+    pResult->i = MC_GetNumUser(&pos);
 }
 
 void fn_8007E85C(MsgArg* pArgs, MsgArg* pResult) {
@@ -4306,15 +4306,15 @@ void fn_800826C4(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_80082708(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = fn_8009EB44(pArgs[0].i, pArgs[1].i);
-    *(s32*)pArgs[2].p = fn_800A2628();
+    *(s32*)pArgs[2].p = MC_GetNumEATitles();
 }
 
 void fn_80082758(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_800A2604(pArgs[0].i);
+    pResult->i = MC_EASaveExists(pArgs[0].i);
 }
 
 void fn_80082790(MsgArg* pArgs, MsgArg* pResult) {
-    strcpy(((MsgString*)pArgs[1].p)->pStr, fn_800A2614(pArgs[0].i));
+    strcpy(((MsgString*)pArgs[1].p)->pStr, MC_GetEASaveName(pArgs[0].i));
 }
 
 // Add a payout to player slot 0's money (when pArgs[1] is set); the front end keeps the amount.
@@ -5493,11 +5493,11 @@ void fn_80084C88(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Checks the card pArgs[0], pArgs[1] with fn_800A1590: 1 when it succeeds, -1 when the file read
+// Checks the card pArgs[0], pArgs[1] with MC_GetUser: 1 when it succeeds, -1 when the file read
 // back is not a good save, else 0.
 void fn_80084CFC(MsgArg* pArgs, MsgArg* pResult) {
     char sz[0x20];              // the size is unknown (0x20 gives the original's frame)
-    s32  nResult = fn_800A1590(pArgs[0].i, pArgs[1].i, pArgs[2].i, sz);
+    s32  nResult = MC_GetUser(pArgs[0].i, pArgs[1].i, pArgs[2].i, sz);
 
     if (nResult == 0) {
         pResult->i = 1;

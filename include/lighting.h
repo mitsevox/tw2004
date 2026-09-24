@@ -125,7 +125,7 @@ void fn_80093900(struct CourseLightBlock* pBlock);
 
 // ---- goballfx.c's ball marker: a quad drawn on the ground under the ball ("marker" texture) ----
 
-extern u8    lbl_80281F40;      // set by fn_80093AD4; fn_80093AE0 passes it on and clears it
+extern u8    lbl_80281F40;      // set by fn_80093AD4; BFX_vRender passes it on and clears it
 extern TexBank*  lbl_80281F44;  // the "marker" texture's bank (BFX_vInit)
 extern TexEntry* lbl_80281F48;  // and the texture
 extern u8    lbl_801D94B0[0x28];    // the marker's mesh object (Skin.c's fn_80036054 sets it up)

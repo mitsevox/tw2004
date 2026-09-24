@@ -818,7 +818,7 @@ void fn_800B0960(void) {
     }
     fn_8009CD10();
     fn_8009FAD0();
-    lbl_80282120 = fn_8009F850();
+    lbl_80282120 = MC_LoadInitialUser();
     fn_8009CD7C();
 }
 

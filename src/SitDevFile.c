@@ -352,7 +352,7 @@ static inline int SurfaceType_IsValid(int n) {
 // Fill in the values the scripts test for the player, for a situation of kind nKind: each kind
 // sets its own values and falls through to the ones every later group needs (the round and the
 // golfer, then the shot so far, then the ball and the hole).
-void FE_GolferAttributes(int nPlayer, u8 nKind) {
+void SitDev_SetupStateVector(int nPlayer, u8 nKind) {
     Player* pPlayer = &gPlayers[nPlayer];
     Ball* pBall = &pPlayer->ball;
     Ball* pBefore = &pPlayer->ballBefore;

@@ -12,7 +12,7 @@
 void ColGlow_InitModule(void);                 // GoShaderObject_Glows_Gc.c
 void ColGlow_CloseModule(void);                 // GoShaderObject_Glows_Gc.c
 void ColGlow_RenderAllGlowInCurrentList(void);                 // GoShaderObject_Glows_Gc.c: draw the queued glows
-void fn_8009AF30(s32 nViews);           // Code8009AA28.c
+void SF_vInitModule(s32 nViews);           // Code8009AA28.c
 void SF_vCloseModule(void);                 // Code8009AA28.c
 void SF_vUpdateSunFlare(s32 nView);            // Code8009AA28.c
 void fn_8009B528(f32 fTime);            // Code8009B340.c
@@ -27,7 +27,7 @@ void GLW_vInitModule(s32 nViews) {
     ColGlow_InitModule();
     ColGlow_SetCurrentList(0);
     fn_8009B604();
-    fn_8009AF30(nViews);
+    SF_vInitModule(nViews);
 }
 
 void GLW_vCloseModule(void) {

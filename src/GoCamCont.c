@@ -125,7 +125,7 @@ void CameraController_Idle(View* pView, int nPlayer) {
         fn_800C0804(pView, nPlayer);
         break;
     case 8:
-        fn_800BF184(pView, nPlayer);
+        GolfCamera_ProcessPlaceBallCamera(pView, nPlayer);
         break;
     case 9:
         fn_800BF658(pView, nPlayer);

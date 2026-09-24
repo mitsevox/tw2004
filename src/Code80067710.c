@@ -8,7 +8,7 @@
 #include "game.h"
 #include "sitdev.h"
 
-void FE_GolferAttributes(int nPlayer, u8 nEvent);
+void SitDev_SetupStateVector(int nPlayer, u8 nEvent);
 void fn_800BB0DC(void);
 void fn_800BB1C0(void);
 u8   fn_800BB7AC(SitDevEntry* pEntry, SitDevData* pData, int nPlayer);
@@ -77,7 +77,7 @@ void fn_80067710(int nPlayer, int a, u8 nEvent) {
     pEvent->nEvent = nEvent;
     lbl_802811B8->n13C++;
     if (lbl_802811B8->n13C == 1) {
-        FE_GolferAttributes(nWho, nEvent);
+        SitDev_SetupStateVector(nWho, nEvent);
         if (nEvent == 20 || nEvent == 29) {
             fn_80067B5C(gPlayers[nPlayer].ballBefore.vPos, gPlayers[nPlayer].ball.vStart, vDiff);
             vDiff[1] = 0.0f;

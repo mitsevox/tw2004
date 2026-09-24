@@ -8,10 +8,10 @@
 #include "dynobj.h"
 #include "lighting.h"
 
-// One object's settings (lbl_801F5B98: two of them, 0x38 bytes each; fn_800AE3F8 picks one by
+// One object's settings (lbl_801F5B98: two of them, 0x38 bytes each; UI_Obj_RenderBoostUI picks one by
 // its argument), filled with constants by UI_Obj_InitModule.
 typedef struct UIObjSettings {
-    f32  a0[10];                // 0x00  [0..2] the position, [5] its tilt (fn_800AE3F8 sets it
+    f32  a0[10];                // 0x00  [0..2] the position, [5] its tilt (UI_Obj_RenderBoostUI sets it
                                 //       from the spin asked for), [6] its scale, [9] its roll,
                                 //       0..2 pi
     f32  a28[4];                // 0x28  object 0: the rings' largest size, the size they start

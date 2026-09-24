@@ -12,19 +12,19 @@
 #include "game/frontend.h"
 #include "frontend/uistudio.h"
 
-s32 fn_800A13E8(s32 nPort, s32 nSlot, s32 nProfile);
+s32 MC_LoadLastUser(s32 nPort, s32 nSlot, s32 nProfile);
 s32 fn_800A2248(s32 nPort, s32 nSlot);
 s32 fn_800A0B18(s32 nPort, s32 nSlot, const char* szName, SaveImage* pImage);
 s32 fn_800A0BC8(s32 nPort, s32 nSlot, const char* szName, SaveImage* pImage);
-void fn_800A253C(void);
+void MC_FillCRCTable(void);
 
-// At boot: no created golfer yet; try fn_800A13E8 on each card, and at the first that succeeds mark
+// At boot: no created golfer yet; try MC_LoadLastUser on each card, and at the first that succeeds mark
 // player slot 0's profile loaded and return 1.
-u8 fn_8009F850(void) {
+u8 MC_LoadInitialUser(void) {
     int i;
     gCurGolferRecord.bAvailable = 0;
     for (i = 0; i < MC_NUM_PORTS; i++) {
-        if (fn_800A13E8(i, 0, 0) == 0) {
+        if (MC_LoadLastUser(i, 0, 0) == 0) {
             lbl_801D7148.aLoaded[0] = 1;
             return 1;
         }
@@ -153,9 +153,11 @@ s32 fn_8009FAD0(void) {
     return nResult;
 }
 
-// Load the save file from the card at pPos into the first image and, if it is good, make it the
-// game's copy (the second image) and take its options and records into the game.
-s32 fn_8009FCFC(MCCardPos* pPos) {
+// Meant to load the save file from the card at pPos into the first image and, if it is good, make
+// it the game's copy (the second image) and take its options and records into the game. EA bug: it
+// reads only when fn_8009DD44 fails (its other callers read on 0), so with the save on the card
+// nothing is loaded and 0 comes back.
+s32 MC_LoadOptions(MCCardPos* pPos) {
     u8 bLoaded;
     s32 nPort;
     s32 nMount;
@@ -205,7 +207,7 @@ s32 fn_8009FCFC(MCCardPos* pPos) {
 
 // Save the options and the records to the card at pPos: a new save file when there is none (if the
 // card has room), else into the save already there.
-s32 fn_8009FE90(MCCardPos* pPos) {
+s32 MC_SaveOptions(MCCardPos* pPos) {
     s32 nMount;
     s32 nResult;
     s32 nPort;
@@ -316,7 +318,7 @@ s32 fn_800A0230(MCCardPos* pPos) {
 }
 
 // Save gReplayData as replay pPos->n8 of the save on the card (-1: the first free one; -17 when none
-// is). With no save file on the card, one is made first (fn_8009FE90).
+// is). With no save file on the card, one is made first (MC_SaveOptions).
 s32 fn_800A036C(MCCardPos* pPos) {
     s32 nMount;
     s32 nResult;
@@ -341,7 +343,7 @@ s32 fn_800A036C(MCCardPos* pPos) {
         if (lbl_801F1510[nPort][nSlot].nFreeBlocks < fn_8009D1D8(nPort, nSlot, 0, 0)) {
             return MC_ERR_INSSPACE;
         }
-        nResult = fn_8009FE90(pPos);
+        nResult = MC_SaveOptions(pPos);
         if (nResult != 0) return nResult;
     }
     if (fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FEC, MC_BUFFER_SIZE) != 0) {
@@ -507,8 +509,8 @@ s32 fn_800A09EC(MCCardPos* pPos) {
 
 // Load the profile named pPos->szC from the save on the card into profile pPos->pos.n8, and the
 // save's records into the game. A save marked "@BD" gets the profile's CrAP info reset and its
-// created golfer's model set to 7 (as fn_800A13E8).
-s32 fn_800A0C6C(MCCardPosStr* pPos) {
+// created golfer's model set to 7 (as MC_LoadLastUser).
+s32 MC_LoadUser(MCCardPosStr* pPos) {
     s32 nMount;
     s32 nResult;
     s32 nRead;
@@ -572,8 +574,8 @@ s32 fn_800A0C6C(MCCardPosStr* pPos) {
 
 // Save profile pPos->n8 (gpSaveData) to the card, over the saved profile of the same name or into a
 // free slot, with the options and the records; the save then remembers it as the last one saved
-// (n4D0C0). With no save file on the card, one is made first (fn_8009FE90).
-s32 fn_800A0E6C(MCCardPos* pPos) {
+// (n4D0C0). With no save file on the card, one is made first (MC_SaveOptions).
+s32 MC_SaveUser(MCCardPos* pPos) {
     s32 nProfile;
     s32 nMount;
     u8 bNewFile;
@@ -595,7 +597,7 @@ s32 fn_800A0E6C(MCCardPos* pPos) {
         if (lbl_801F1510[nPort][nSlot].nFreeBlocks < fn_8009D1D8(nPort, nSlot, 0, 0)) {
             return MC_ERR_INSSPACE;
         }
-        nResult = fn_8009FE90(pPos);
+        nResult = MC_SaveOptions(pPos);
         if (nResult != 0) return nResult;
     }
     if (fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FE8, MC_BUFFER_SIZE) != 0) {
@@ -687,7 +689,7 @@ int fn_800A1758(MCCardPos* pPos) {
 // Load the save on the card and take the profile it was last saved from (n4D0C0) into profile
 // nProfile, and the save's records into the game. A save marked "@BD" (older than "@BE") gets its
 // CrAP info reset and its created golfer's model set to 7.
-s32 fn_800A13E8(s32 nPort, s32 nSlot, s32 nProfile) {
+s32 MC_LoadLastUser(s32 nPort, s32 nSlot, s32 nProfile) {
     s32 nMount;
     s32 nResult;
 
@@ -723,7 +725,7 @@ s32 fn_800A13E8(s32 nPort, s32 nSlot, s32 nProfile) {
 }
 
 // The name of profile nProfile in the save on the card, into szName ("" and -15 when there is none).
-s32 fn_800A1590(s32 nPort, s32 nSlot, s32 nProfile, char* szName) {
+s32 MC_GetUser(s32 nPort, s32 nSlot, s32 nProfile, char* szName) {
     s32 nMount;
     s32 nResult;
 
@@ -822,7 +824,7 @@ s32 fn_800A1164(s32 nPort, s32 nSlot, const char* szName, s32 nProfile) {
 }
 
 // Read the names of the profiles saved on the card into its MCCardState, for the menus.
-void fn_800A178C(s32 nPort, s32 nSlot) {
+void MC_RefreshMCUserInfo(s32 nPort, s32 nSlot) {
     MCCardState* pState;
     s32 nMount;
     int i;
@@ -872,8 +874,8 @@ void fn_800A178C(s32 nPort, s32 nSlot) {
     }
 }
 
-// How many profiles the card at pPos holds (fn_800A178C reads their names).
-s32 fn_800A1964(MCCardPos* pPos) {
+// How many profiles the card at pPos holds (MC_RefreshMCUserInfo reads their names).
+s32 MC_GetNumUser(MCCardPos* pPos) {
     MCCardState* pState;
     s32 nPort;
     s32 nSlot;
@@ -882,7 +884,7 @@ s32 fn_800A1964(MCCardPos* pPos) {
     nSlot = pPos->nSlot;
     nPort = pPos->nPort;
     pState = fn_8009F834(nPort, nSlot);
-    fn_800A178C(nPort, nSlot);
+    MC_RefreshMCUserInfo(nPort, nSlot);
     for (i = 0; i < 4; i++) {
         if (fn_8001E9CC(pState->aNameUsed, i)) {
             nCount++;
@@ -897,7 +899,7 @@ void fn_800A19F4(void) {
 // ---- reading the 'eagm' text: lines end in '\r\n', the buffer ends in 0xFF (-1 as a char) ----
 
 // The length of the line at p.
-s32 fn_800A19F8(const char* p) {
+s32 MC_StringLength(const char* p) {
     s32 nLen = 0;
     while (*p != '\r' && *p != -1) {
         nLen++;
@@ -907,7 +909,7 @@ s32 fn_800A19F8(const char* p) {
 }
 
 // Skip white space; NULL at the end of the buffer.
-char* fn_800A1A28(char* p) {
+char* MC_SkipLeadingSpaces(char* p) {
     while (*p != -1 && isspace(*p)) {
         p++;
     }
@@ -919,7 +921,7 @@ char* fn_800A1A28(char* p) {
 
 // The next line's text, past its white space; NULL at the end of the buffer or at the line
 // "END_OF_FILE".
-char* fn_800A1A90(char* p) {
+char* MC_SkipToNextLine(char* p) {
     char* pLine;
     while (*p != '\n' && *p != -1) {
         p++;
@@ -927,7 +929,7 @@ char* fn_800A1A90(char* p) {
     if (*p == -1) {
         return NULL;
     }
-    pLine = fn_800A1A28(p);
+    pLine = MC_SkipLeadingSpaces(p);
     if (strncmp("END_OF_FILE", pLine, strlen("END_OF_FILE")) != 0) {
         return pLine;
     }
@@ -935,15 +937,15 @@ char* fn_800A1A90(char* p) {
 }
 
 // How many lines follow p before the next one that starts with a quote.
-s32 fn_800A1B28(char* p) {
+s32 MC_CountSlusNumbers(char* p) {
     s32 nLines = 0;
     u8 bFound;
-    p = fn_800A1A90(p);
+    p = MC_SkipToNextLine(p);
     bFound = 0;
     while (!bFound && p != NULL) {
         if (*p != '"') {
             nLines++;
-            p = fn_800A1A90(p);
+            p = MC_SkipToNextLine(p);
         } else {
             bFound = 1;
         }
@@ -952,19 +954,19 @@ s32 fn_800A1B28(char* p) {
 }
 
 // How many lines from p on start with a quote.
-s32 fn_800A1B94(char* p) {
+s32 MC_CountTitles(char* p) {
     s32 nQuoted = 0;
     while (p != NULL) {
         if (*p == '"') {
             nQuoted++;
         }
-        p = fn_800A1A90(p);
+        p = MC_SkipToNextLine(p);
     }
     return nQuoted;
 }
 
 // Free the 'eagm' list.
-void fn_800A1BE0(void) {
+void MC_FreeEAGameList(void) {
     int i;
     if (lbl_80281FF0 != NULL) {
         for (i = 0; i < lbl_80281FF4; i++) {
@@ -1007,7 +1009,7 @@ void fn_800A1C58(char* szText) {
 
 // The 'eagm' handler: build the 'eagm' list from the object's text, then free the object. The text
 // is a list of entries, each a quoted line with the entry's name followed by its names, one a line.
-void fn_800A1D4C(UStreamObject* pObject) {
+void MC_LoadEAGameListfromStream(UStreamObject* pObject) {
     char* p;
     int i;
     int j;
@@ -1018,33 +1020,33 @@ void fn_800A1D4C(UStreamObject* pObject) {
         return;
     }
     p = (char*)pObject->pData;
-    lbl_80281FF4 = fn_800A1B94(p);
+    lbl_80281FF4 = MC_CountTitles(p);
     if (lbl_80281FF4 == 0) {
         fn_80009E70(pObject);
         return;
     }
     lbl_80281FF0 = fn_80009B34(lbl_80281FF4 * sizeof(MCEagmEntry), 2, 0x10, "MC.c", 3336);
     for (i = 0; i < lbl_80281FF4; i++) {
-        lbl_80281FF0[i].n8 = fn_800A1B28(p);
+        lbl_80281FF0[i].n8 = MC_CountSlusNumbers(p);
         lbl_80281FF0[i].p4 = fn_80009B34(lbl_80281FF0[i].n8 * 16, 2, 0x10, "MC.c", 3349);
         for (j = 0; j < lbl_80281FF0[i].n8 + 1; j++) {
-            p = fn_800A1A90(p);
+            p = MC_SkipToNextLine(p);
         }
     }
     p = (char*)pObject->pData;
     for (i = 0; i < lbl_80281FF4; i++) {
         lbl_80281FF0[i].b0 = 0;
-        nLen = fn_800A19F8(p);
+        nLen = MC_StringLength(p);
         strncpy(lbl_80281FF0[i].szName, p, nLen);
         lbl_80281FF0[i].szName[nLen] = 0;
         fn_800A1C58(lbl_80281FF0[i].szName);
-        p = fn_800A1A90(p);
+        p = MC_SkipToNextLine(p);
         for (j = 0; j < lbl_80281FF0[i].n8; j++) {
-            nLen = fn_800A19F8(p);
+            nLen = MC_StringLength(p);
             strncpy(lbl_80281FF0[i].p4 + j * 16, p, nLen);
             (lbl_80281FF0[i].p4 + j * 16)[nLen] = 0;
             fn_800A1C58(lbl_80281FF0[i].p4 + j * 16);
-            p = fn_800A1A90(p);
+            p = MC_SkipToNextLine(p);
         }
     }
     fn_80009E70(pObject);
@@ -1052,7 +1054,7 @@ void fn_800A1D4C(UStreamObject* pObject) {
 
 // Find the first 'eagm' entry holding a name that szGameCode starts with: mark it and set its bit
 // in lbl_801F1100.
-void fn_800A1F6C(const char* szGameCode) {
+void MC_RecordEATitleByName(const char* szGameCode) {
     int i;
     int j;
     for (i = 0; i < lbl_80281FF4; i++) {
@@ -1068,7 +1070,7 @@ void fn_800A1F6C(const char* szGameCode) {
 }
 
 // How many 'eagm' entries are marked.
-s32 fn_800A2030(void) {
+s32 MC_TalleyEATitlesFound(void) {
     s32 nMarked = 0;
     MCEagmEntry* pEntry = lbl_80281FF0;
     int i;
@@ -1098,7 +1100,7 @@ void fn_800A2064(void) {
     if (lbl_80281FE0 == NULL) {
         lbl_80281FE0 = lbl_80281FDC;
     }
-    fn_800A253C();
+    MC_FillCRCTable();
     CARDInit();
     for (nPort = 0; nPort < MC_NUM_PORTS; nPort++) {
         // EA bug: the slot loop runs to 2 where a port has one slot, so [0][1] is [1][0] and
@@ -1192,7 +1194,7 @@ u8 fn_800A233C(void* pData, SaveTrailer* pTrailer) {
     return 1;
 }
 
-// The save's CRC-32, over the table fn_800A253C builds.
+// The save's CRC-32, over the table MC_FillCRCTable builds.
 u32 fn_800A23BC(void* pData, SaveTrailer* pTrailer) {
     u32 i;
     u8* p = pData;
@@ -1210,7 +1212,7 @@ u32 fn_800A23BC(void* pData, SaveTrailer* pTrailer) {
 // Build the CRC table, at start-up (fn_800A2064). EA shifts right but uses the polynomial's
 // unreflected form 0x04C11DB7 (the usual table takes 0xEDB88320), so this is not the standard
 // CRC-32; the game only ever checks its own sums with it.
-void fn_800A253C(void) {
+void MC_FillCRCTable(void) {
     u32 i;
     u32 uCrc;
     int k;
@@ -1227,20 +1229,20 @@ void fn_800A253C(void) {
     }
 }
 
-u8 fn_800A2604(s32 nEntry) {
+u8 MC_EASaveExists(s32 nEntry) {
     return lbl_80281FF0[nEntry].b0;
 }
 
-char* fn_800A2614(s32 nEntry) {
+char* MC_GetEASaveName(s32 nEntry) {
     return lbl_80281FF0[nEntry].szName;
 }
 
-s32 fn_800A2628(void) {
+s32 MC_GetNumEATitles(void) {
     return lbl_80281FF4;
 }
 
 // Three callbacks of a table in .data (0x80189CB0 area), one per save kind, each paired with one
-// of fn_800A26D8/fn_800A270C/fn_800A2740: whether the file on the card was rejected as bad data.
+// of MC_MemoryRequiredForOptions/fn_800A270C/fn_800A2740: whether the file on the card was rejected as bad data.
 s32 fn_800A2630(MCCardPos* pPos) {
     return fn_8009EE28(pPos->nPort, pPos->nSlot) == MC_ERR_BADDATA;
 }
@@ -1253,8 +1255,9 @@ s32 fn_800A26A0(MCCardPos* pPos) {
     return fn_8009EE28(pPos->nPort, pPos->nSlot) == MC_ERR_BADDATA;
 }
 
-// The space the three save kinds need (fn_8009D1D8's last argument).
-void fn_800A26D8(MCCardPos* pPos) {
+// Ask fn_8009D1D8 for the space save kinds 0, 1 and 2 need (its last argument); the result is not
+// kept.
+void MC_MemoryRequiredForOptions(MCCardPos* pPos) {
     fn_8009D1D8(pPos->nPort, pPos->nSlot, 0, 0);
 }
 
@@ -1266,7 +1269,7 @@ void fn_800A2740(MCCardPos* pPos) {
     fn_8009D1D8(pPos->nPort, pPos->nSlot, 0, 2);
 }
 
-void fn_800A2774(const u16* szSrc, char* szDst, s32 nMax) {
+void MC_ConvertWideCharToChar(const u16* szSrc, char* szDst, s32 nMax) {
     while (*szSrc != 0 && nMax > 1) {
         if (*szSrc > 0xFF) {
             *szDst = '\xAC';

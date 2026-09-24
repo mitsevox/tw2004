@@ -17,12 +17,12 @@ typedef struct BreakLine {
     f32  vPin[3];               // 0x54B0  the pin, from the course's pin set (fn_800C8134)
     u8   aColor[2][BREAKLINE_VERTS][4];     // 0x54BC  per view: the vertices' colours (anColor)
     f32  aUV[2][BREAKLINE_VERTS][2];        // 0x70DC  per view: the vertices' texture coordinates
-    u8   abA91C[2];             // 0xA91C  per view: set by BreakLine_Start
+    u8   abA91C[2];             // 0xA91C  per view: set by BreakLine_Reset
     u8   unkA91E[0xA921 - 0xA91E];
     u8   abSkip[2];             // 0xA921  per view: set by fn_800C8134; BreakLine_Update clears it
                                 //         instead of stepping the line once
     u8   unkA923[0xA928 - 0xA923];
-    s32  anVerts[2];            // 0xA928  per view: the vertices laid so far (BreakLine_Step)
+    s32  anVerts[2];            // 0xA928  per view: the vertices laid so far (BreakLine_Render)
     u8   unkA930[0xA93C - 0xA930];
     Ball aBall[2];              // 0xA93C  per view: a copy of the player's ball, rolled by the line
     f32  aViewPoint[2][4];      // 0xAAB4  per view: where the ball started (fn_800C8C3C hands it out)
@@ -53,7 +53,7 @@ LAYOUT_ASSERT(BreakLine, 0xAB40);
 extern BreakLine* lbl_80282228;
 extern u8 lbl_8028222C;         // the line is on
 
-void BreakLine_Step(int nView);
+void BreakLine_Render(int nView);
 void fn_800C8C3C(int nView, f32* pOut);
 void fn_800C9038(int nView, f32* pLong, f32* pSide);
 

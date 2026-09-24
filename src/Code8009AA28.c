@@ -24,9 +24,9 @@ void fn_80035584(s32 v);                // GoTerrain.c
 void fn_80035590(f32* p0);
 void fn_800355B8(f32* p0);
 
-// Fills a24 from [1] with four sweeps of ten steps of 0.1: red up, then green down, then red down,
-// then green up (blue and alpha 1), aCA4 with zeros alongside, and closes the ramp with a copy of
-// entry 1.
+// Fills a24 from [1] with four sweeps of ten steps of 0.1 round the unit square's edge: [0] up
+// (with [1] at 1), then [1] down, then [0] down, then [1] up ([2] and [3] always 1), aCA4 with
+// zeros alongside, and closes the loop with a copy of entry 1.
 void fn_8009AA28(void) {
     int n;
     int i;
@@ -85,7 +85,7 @@ void fn_8009AA28(void) {
 
 // Sets up for nViews views: the tables, each table entry's largest f24, each view's part, and
 // GoTerrain.c's values (v4 = (0, 150, -400), v14 = (0.8, 0.8, 0.4)).
-void fn_8009AF30(s32 nViews) {
+void SF_vInitModule(s32 nViews) {
     s32 i;
     s32 j;
     s32 k;

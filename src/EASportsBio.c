@@ -164,7 +164,7 @@ void fn_80124C10(void) {
         for (i = lbl_80282574, n = 0; i < nCount; i++) {
             if (fn_8012E434(lbl_80282570, i, bByTime, szWide, EASB_ACCOMPLISHMENT_NAME_SIZE, &uTime,
                             &uWantLanguage, 1, &uLanguage) == EASB_ERROR_NONE) {
-                fn_800A2774(szWide, szAccomplishment, 0x3F);
+                MC_ConvertWideCharToChar(szWide, szAccomplishment, 0x3F);
                 fn_80107594(0xAE, n, szAccomplishment);
                 n++;
             }
@@ -220,7 +220,7 @@ void fn_80124C10(void) {
         fn_8012E1E0(lbl_80282570, &uGameLevel);
         fn_8012E084(lbl_80282570, szGamesPlayedType, EASB_GAMES_PLAYED_TYPE_SIZE, &uWantLanguage, 1,
                     &uLanguage);
-        fn_800A2774(szGamesPlayedType, szGamesPlayed, 0x3F);
+        MC_ConvertWideCharToChar(szGamesPlayedType, szGamesPlayed, 0x3F);
         fn_801076B0(szGamesPlayed, 0xBF);
         fn_801076B0(szName, 0xB3);
         fn_80107774(0xB2, nDays, nHours, nMinutes, nSeconds, nMonth, nDay, nYear, nPlayed, nPercent,

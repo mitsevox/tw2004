@@ -58,7 +58,7 @@ void fn_8009CC00(void) {
     fn_8009EF98();
 }
 
-// Free the icon and banner objects, MC.c's 'eagm' list (fn_800A1BE0), the first image and the
+// Free the icon and banner objects, MC.c's 'eagm' list (MC_FreeEAGameList), the first image and the
 // ARAM. The second image is not freed.
 void fn_8009CC88(void) {
     if (lbl_80281FB8 != NULL) {
@@ -69,7 +69,7 @@ void fn_8009CC88(void) {
         fn_80009E70(lbl_80281FBC);
         lbl_80281FBC = NULL;
     }
-    fn_800A1BE0();
+    MC_FreeEAGameList();
     if (lbl_80281FE8 != NULL) {
         fn_80009E70(lbl_80281FE8);
         lbl_80281FEC = NULL;
@@ -875,7 +875,7 @@ s32 fn_8009E918(s32 nPort, s32 nSlot) {
 void fn_8009EA98(void) {
     Stream_RegisterLoadChunkCallback('MCI ', fn_8009EB30);
     Stream_RegisterLoadChunkCallback('MCB ', fn_8009EB38);
-    Stream_RegisterLoadChunkCallback('eagm', fn_800A1D4C);
+    Stream_RegisterLoadChunkCallback('eagm', MC_LoadEAGameListfromStream);
 }
 
 void fn_8009EAF0(void) {
@@ -915,7 +915,7 @@ s32 fn_8009EB44(s32 nPort, s32 nSlot) {
                 if (nResult == 0) {
                     strncpy(szGameCode, stat.gameName, 4);
                     szGameCode[4] = '\0';
-                    fn_800A1F6C(szGameCode);
+                    MC_RecordEATitleByName(szGameCode);
                 }
             }
         }
@@ -923,7 +923,7 @@ s32 fn_8009EB44(s32 nPort, s32 nSlot) {
     if (nMount == 0) {
         fn_8009DBAC(nPort, nSlot);
     }
-    if (nResult == 0 || nResult == MC_ERR_NOFILE) return fn_800A2030();
+    if (nResult == 0 || nResult == MC_ERR_NOFILE) return MC_TalleyEATitlesFound();
     return nResult;
 }
 

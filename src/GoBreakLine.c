@@ -75,7 +75,7 @@ void fn_800C830C(void) {
     lbl_8028222C = 0;
 }
 
-// Steps view nView's line (BreakLine_Step) while the line is on (lbl_8028222C) and its player, a
+// Steps view nView's line (BreakLine_Render) while the line is on (lbl_8028222C) and its player, a
 // human, stands over a putt within 75 of the hole with the target (vTarget) within an inch of the
 // pin (EA's test; distances in yards). A view's first call after the line is set up only clears
 // its abSkip.
@@ -89,7 +89,7 @@ void BreakLine_Update(int nView) {
         gPlayers[nPlayer].nShotKind == 0 && gPlayers[nPlayer].swing.nState == 0 &&
         gPlayers[nPlayer].fDistance < 75.0f && !Player_IsCPU(nPlayer) && lbl_8028222C) {
         if (!lbl_80282228->abSkip[nView]) {
-            BreakLine_Step(nView);
+            BreakLine_Render(nView);
             return;
         }
         lbl_80282228->abSkip[nView] = 0;
@@ -99,7 +99,7 @@ void BreakLine_Update(int nView) {
 // Draws view nView's line, first growing it by one step: while the ball copy rolls, step it, lay
 // the next pair of vertices across its path, fade the line's alpha from fAB30 at the ball to fAB34
 // at the end, and trigger events 0x28 / 0x29 when it stops or starts to move away from the pin.
-void BreakLine_Step(int nView) {
+void BreakLine_Render(int nView) {
     f32 vAxis[4] = {0.0f, 0.0f, 1.0f, 0.0f};
     int nPlayer = fn_8001707C(nView);
     TrailMeshDescEx desc;
@@ -235,7 +235,7 @@ void BreakLine_Step(int nView) {
 // Starts view nView's line when its player stands over a putt within 75 of the hole: lays out the
 // line's vertices, colours and texture coordinates, and launches a copy of the ball with the
 // putt's power for the distance, with sounds and effects off.
-void BreakLine_Start(int nView) {
+void BreakLine_Reset(int nView) {
     Player* pPlayer;
     f32 fPower;
     int i;

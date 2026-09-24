@@ -27,7 +27,7 @@ typedef struct MCCardState {
     s32  nFreeBlocks;           // 0x04  free space, in whole sectors (CARDFreeBlocks' bytes, rounded up)
     u32  aReplayUsed[1];        // 0x08  a bit per replay saved on the card (fn_800A0868; FE_MessageTable
                                 //       fn_8007EA14 tests one)
-    u32  aNameUsed[1];          // 0x0C  a bit per aszName entry that holds a profile's name (fn_800A178C)
+    u32  aNameUsed[1];          // 0x0C  a bit per aszName entry that holds a profile's name (MC_RefreshMCUserInfo)
     char aszName[4][0x1D];      // 0x10  four names the menus show (FE_MessageTable fn_8007C3C8)
     s32  nFreeFiles;           // 0x84  free directory entries (CARDFreeBlocks)
     s32  nSectorSize;           // 0x88  CARDProbeEx
@@ -83,7 +83,7 @@ typedef struct MCCardPos {
 } MCCardPos;
 LAYOUT_ASSERT(MCCardPos, 0xC);
 
-// A card position and a string, as fn_800A0C6C takes them (the menus pass a name typed in).
+// A card position and a string, as MC_LoadUser takes them (the menus pass a name typed in).
 typedef struct MCCardPosStr {
     MCCardPos pos;              // 0x0
     char* szC;                  // 0xC
@@ -91,7 +91,7 @@ typedef struct MCCardPosStr {
 LAYOUT_ASSERT(MCCardPosStr, 0x10);
 
 // The memory-card screens' operations (lbl_8018C7D8): four sets of five, one set per kind of save
-// (fn_80084FF0 picks one; set 0 is the game's save, starting with fn_8009FE90 and fn_8009FCFC; set 3
+// (fn_80084FF0 picks one; set 0 is the game's save, starting with MC_SaveOptions and MC_LoadOptions; set 3
 // is the EA Sports Bio's). apfn[4] gives the save's size on the card (startUp.c). The menus'
 // messages call them through fn_80084FB4 and its neighbours with the card they picked.
 typedef s32 (*MCOp)(MCCardPos* pPos);
@@ -181,7 +181,7 @@ extern SaveImage* lbl_80281FE8; // }
 extern SaveImage* lbl_80281FEC; // }
 extern s32   lbl_80281FF8;      // SaveImage.n4D0C0 of the save loaded (0 when it has none)
 
-// One entry of the list the 'eagm' stream object carries (fn_800A1D4C builds it, 0x4C bytes).
+// One entry of the list the 'eagm' stream object carries (MC_LoadEAGameListfromStream builds it, 0x4C bytes).
 typedef struct MCEagmEntry {
     u8    b0;                   // 0x00  cleared when the list is loaded
     u8    unk1[3];
@@ -191,9 +191,9 @@ typedef struct MCEagmEntry {
 } MCEagmEntry;
 LAYOUT_ASSERT(MCEagmEntry, 0x4C);
 
-extern u32   lbl_801F1100[4];   // a bit per 'eagm' entry, set when fn_800A1F6C marks it
-extern u32   lbl_801F1110[256]; // the save checksum's CRC table (fn_800A253C)
-extern MCEagmEntry* lbl_80281FF0;   // the 'eagm' list (fn_800A1BE0 frees it)
+extern u32   lbl_801F1100[4];   // a bit per 'eagm' entry, set when MC_RecordEATitleByName marks it
+extern u32   lbl_801F1110[256]; // the save checksum's CRC table (MC_FillCRCTable)
+extern MCEagmEntry* lbl_80281FF0;   // the 'eagm' list (MC_FreeEAGameList frees it)
 extern s32   lbl_80281FF4;      // its number of entries
 extern u32   lbl_80281FC0;     // the size parked in ARAM (MC_BUFFER_SIZE + 0x20)
 extern u32   lbl_80281FC4;      // the ARAM address they are parked at (0: none yet)
@@ -263,14 +263,14 @@ MCCardState* fn_8009F834(s32 nPort, s32 nSlot);                 // &lbl_801F1510
 
 // ---- MC.c ---------------------------------------------------------------------------------------
 
-u8   fn_8009F850(void);             // at boot: fn_800A13E8 on each card until one succeeds
+u8   MC_LoadInitialUser(void);             // at boot: MC_LoadLastUser on each card until one succeeds
 
 s32  fn_8009FAD0(void);
 s32  fn_800A0A7C(s32 nPort, s32 nSlot);
-void fn_800A1BE0(void);
-void fn_800A1D4C(UStreamObject* pObject);  // the 'eagm' handler
-void fn_800A1F6C(const char* szGameCode);   // mark the 'eagm' entries whose names match
-s32  fn_800A2030(void);                     // how many 'eagm' entries are marked
+void MC_FreeEAGameList(void);
+void MC_LoadEAGameListfromStream(UStreamObject* pObject);  // the 'eagm' handler
+void MC_RecordEATitleByName(const char* szGameCode);   // mark the first matching 'eagm' entry
+s32  MC_TalleyEATitlesFound(void);                     // how many 'eagm' entries are marked
 s32  fn_800A2100(s32 nPort, s32 nSlot);
 s32  fn_800A218C(s32 nPort, s32 nSlot);    // always MC_ERR_NOFILE
 s32  fn_800A2194(s32 nPort, s32 nSlot);
@@ -285,13 +285,13 @@ u32  fn_800A23BC(void* pData, SaveTrailer* pTrailer);
 
 // ---- the 'eagm' list and string helpers (MC.c) ----------------------------------------------------
 
-u8    fn_800A2604(s32 nEntry);      // lbl_80281FF0[nEntry].b0
-char* fn_800A2614(s32 nEntry);      // lbl_80281FF0[nEntry].szName
-s32   fn_800A2628(void);            // lbl_80281FF4
+u8    MC_EASaveExists(s32 nEntry);      // lbl_80281FF0[nEntry].b0
+char* MC_GetEASaveName(s32 nEntry);      // lbl_80281FF0[nEntry].szName
+s32   MC_GetNumEATitles(void);            // lbl_80281FF4
 s32   fn_800A27F4(void);            // lbl_80281FF8
 // Copy a string of 16-bit characters into 8-bit ones (and back), nMax characters at most, the
 // terminator included. A character above 0xFF becomes 0xAC.
-void  fn_800A2774(const u16* szSrc, char* szDst, s32 nMax);
+void  MC_ConvertWideCharToChar(const u16* szSrc, char* szDst, s32 nMax);
 void  fn_800A27BC(const char* szSrc, u16* szDst, s32 nMax);
 
 // ---- MC_Gc.c's CARD state (the CARD library itself is in core/card.h) ----------------------------

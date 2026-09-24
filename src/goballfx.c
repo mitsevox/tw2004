@@ -201,7 +201,7 @@ void fn_80093AD4(void) {
 
 // Draws the player's ball marker: a quad 0.04 across in the player's colour, just above the ground
 // under the ball; nothing where there is no ground.
-void fn_80093AE0(Ball* pBall, int nPlayer) {
+void BFX_vRender(Ball* pBall, int nPlayer) {
     s16 aIndex[4] = {0, 1, 2, 3};
     TrailMeshDesc desc;
     f32* pPos;

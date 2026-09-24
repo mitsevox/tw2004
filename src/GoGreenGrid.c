@@ -22,7 +22,7 @@ void fn_800354B4(u8* p, f32 v);         // sets the lens's f32 at 0xAC (fn_80014
 f32  fn_80014268(u8* p);
 
 void fn_8009CB78(f32* pA, f32* pB, f32* pOut);
-void fn_8009C0BC(int nView);
+void GR_BuildGridRenderData(int nView);
 u8   fn_8009BD24(int nPlayer);
 u8   fn_8009BD94(int nPlayer);
 
@@ -187,7 +187,7 @@ void fn_8009BE08(int nView) {
 // along. Each point gives two vertices (a line strip drawn doubled back); a point with no ground
 // (the -65536.125 marker) breaks the line, and the end of each line fades out. The texture scrolls
 // with the frame count.
-void fn_8009C0BC(int nView) {
+void GR_BuildGridRenderData(int nView) {
     f32 fPrev;
     f32 fHole;
     f32 fDirX;
@@ -384,7 +384,7 @@ void fn_8009C914(int nView) {
     if (lbl_802813C0->anDone[nView] != lbl_802813C0->nCols * lbl_802813C0->anRows[nView]) {
         return;
     }
-    fn_8009C0BC(nView);
+    GR_BuildGridRenderData(nView);
     fn_80016B9C();
     fn_80035118(4, 5);
     fn_80012F50(0, 6, 0x80);

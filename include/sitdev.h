@@ -109,7 +109,7 @@ extern SitDevZone* lbl_801FA1C0[10];    // the hole's zones
 extern s32 lbl_80282210;                // how many
 
 extern u8 lbl_80281E28;             // cleared by fn_800BCD68 when lbl_80281E29 is set and nothing played
-extern u32 lbl_80282218;            // the class of what the ball last hit, kept by FE_GolferAttributes (kind 29)
+extern u32 lbl_80282218;            // the class of what the ball last hit, kept by SitDev_SetupStateVector (kind 29)
 extern u8 lbl_80281E29;             // cleared by fn_800BCD68 after every run
 
 // Per value: nonzero when the scripts compare it as signed (fn_800BB8A8).

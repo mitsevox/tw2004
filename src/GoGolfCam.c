@@ -213,10 +213,11 @@ void GolfCamera_InitZoomToAimCamera(View* pView, int nPlayer) {
 }
 
 // The zoom-to-aim camera's tick: fly the camera to the goal fn_800C3FC0 works out, fast at first
-// and slowing over the tuning's f8, with slow motion while it moves. script.f108 runs from below 0 (not
-// set off yet) to 1 (arrived); on the way the height blends from the aim's ground plus the shot's
-// f68 to the tuning's f14 over View.script.fD8 (the ground at the target) in the second half. Arrived, it
-// creeps on towards the goal and eases its height.
+// and slowing over the tuning's f8, with GoPostFx's screen effect (fn_80038054) set by its speed
+// while it moves. script.f108 runs from below 0 (not set off yet) to 1 (arrived); on the way the
+// height blends from the aim's ground plus the shot's f68 to the tuning's f14 over View.script.fD8
+// (the ground at the target) in the second half. Arrived, it creeps on towards the goal and eases
+// its height.
 void GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer) {
     f32 vMove[4];
     f32 vGoal[4];
@@ -691,7 +692,7 @@ void fn_800BF110(View* pView, int nPlayer) {
 
 // Camera 8: 10 back and up at 20 degrees from the ball's placement spot along its heading (fA88),
 // over the ground there, which it follows smoothly; it looks at the placement spot.
-void fn_800BF184(View* pView, int nPlayer) {
+void GolfCamera_ProcessPlaceBallCamera(View* pView, int nPlayer) {
     f32 vOld[4];
     f32 v[4];
     f32 vHit[4];

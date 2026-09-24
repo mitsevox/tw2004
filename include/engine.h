@@ -1436,7 +1436,7 @@ void fn_800B5918(const f32* pSrc, f32* pDst);   // GoShaderObject_Rain_Gc.c: cop
 f32  fn_800BAFC0(f32* pSrc, f32* pDst);   // VecMath.c: normalises pSrc into pDst, gives its length
 f32  Vec_Distance(f32* pA, f32* pB);
 void fn_800BD83C(int nSound, int a);      // SitDevFile.c: fn_800A7664(0, nSound, a)
-void BreakLine_Start(int nView);
+void BreakLine_Reset(int nView);
 // The EA Sports Bio, game side (EASportsBio.c; TW06's names)
 void EASBio_SetGamePlayState(u8 bFlag);
 void EASBio_IncrementGamesWon(u32 uCount);

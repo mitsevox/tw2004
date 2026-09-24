@@ -697,7 +697,7 @@ u8       fn_8004562C(CamShot* pShot);             // the shot's bAC is 0, 13..15
 // GoCamera.c: works out the lens's fB0 from its field of view.
 void     CA_vUpdateInternalFieldOfViewData(CamLens* pLens);
 
-// ---- camera script helpers (gocamscripts, 0x800C7480..) -------------------------------------
+// ---- camera script helpers (CamSpline.c, 0x800C7480..)-------------------------------------
 
 // Both write a point into pOut: fn_800C7D14 goes fDist along the direction from pA to pB (its y
 // cleared unless bKeepY, normalised unless bRaw), then fSide across the flattened direction;
@@ -706,13 +706,13 @@ void     CA_vUpdateInternalFieldOfViewData(CamLens* pLens);
 void   fn_800C7D14(f32* pA, f32* pB, u8 bKeepY, u8 bRaw, f32* pOut, f32 fDist, f32 fSide);
 void   fn_800C7E50(f32* pA, f32* pB, f32* pC, int n, f32* pOut, f32 fT);
 // The splined camera (CamScript_SplineCameras): the camera position on the spline through pPos0..3,
-// the look-at point on the one through pLook0..3, and the field of view between fFov1 and fFov2,
-// at share fT between the middle two.
+// the look angles on the one through pLook0..3 (each unwrapped to within half a turn of the one
+// before), and the field of view between fFov1 and fFov2, at share fT between the middle two.
 void   fn_800C7480(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3, f32* pLook0, f32* pLook1, f32* pLook2,
                    f32* pLook3, f32* pCam, f32* pSub, f32* pFov, f32 fFov1, f32 fFov2, f32 fT);
 void   fn_800C7898(f32* p0, f32* p1, f32* p2, f32* p3, f32* pOut, f32 fT);   // a point on the spline
 f32    fn_800C7970(f32 fA, f32 fB, f32 fC, f32 fD, f32 fE, f32 fF);
-// Not decompiled yet: a share of a fly-by path's spline (CamScript_RunFlybyCamera).
+// The value of a fly-by path's curve at time fT (CamScript_RunFlybyCamera).
 f32    fn_800C7A9C(FlyByPath* pPath, f32 fT);
 // CamSpline.c: the Catmull-Rom basis matrix.
 extern f32 lbl_80191440[4][4];
@@ -763,7 +763,7 @@ void   fn_800BFE00(View* pView, int nPlayer);                       // 4
 void   fn_800C0414(View* pView, int nPlayer);                       // 5
 void   fn_800C06C8(View* pView, int nPlayer);                       // 6
 void   fn_800C0804(View* pView, int nPlayer);                       // 7
-void   fn_800BF184(View* pView, int nPlayer);                       // 8
+void   GolfCamera_ProcessPlaceBallCamera(View* pView, int nPlayer);                       // 8
 void   fn_800BF658(View* pView, int nPlayer);                       // 9
 void   GolfCamera_ProcessFlyByCamera(View* pView, int nPlayer);                       // 10
 void   GolfCamera_ProcessPreShotCamera(View* pView, int nPlayer);                       // 11

@@ -1,6 +1,6 @@
 // uiobject.c (our name, after TW06's golf/ui core/istudio runtime/uiobject.c; UI_Obj_InitModule is
 // a TW06 pair): the 3D objects the in-game UI draws (TW06: the confidence-boost rings and the
-// "tappa spinna" UI): here the power boost and spin display (fn_800AE3F8).
+// "tappa spinna" UI): here the power boost and spin display (UI_Obj_RenderBoostUI).
 
 #include "game_types.h"
 #include "engine.h"
@@ -16,7 +16,7 @@ void UI_Obj_InitModule(void);
 void fn_800AE338(void);
 void fn_800AE380(void);
 void fn_800AE3C4(void);
-void fn_800AE3F8(int nObj);
+void UI_Obj_RenderBoostUI(int nObj);
 void fn_800AF0A8(CamLens* pLens);
 void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_80035F1C(void);
@@ -112,7 +112,7 @@ void fn_800AE3C4(void) {
 // Draw object nObj's screen: the power boost quads (the base, one grown by the boost level, and a
 // ring per level that grows and fades), then the ball-like model tilted toward the spin asked
 // for and rolling with it. The object's own lens is used, and the view put back afterwards.
-void fn_800AE3F8(int nObj) {
+void UI_Obj_RenderBoostUI(int nObj) {
     f32 mRoll[4][4];
     f32 mTilt[4][4];
     f32 mRot[4][4];

@@ -1,6 +1,7 @@
-// AnimStream.c (EA's name, from its asserts): streams animation clips for the reaction groups
-// (1 and 5) per player, style and club class, reading them from disc into double buffers. Only
-// partly decompiled. The types are in character.h.
+// AnimStream.c (EA's name, from its asserts): streams animation clips for groups 1 and 5 per
+// player, style and club class, reading them from disc into double buffers. Its set-up
+// (fn_800C937C) turns streaming off in every case, so the reads never happen. The file also holds
+// the base-40 name codes (fn_800CB700..fn_800CB8F0). The types are in character.h.
 
 #include "game.h"
 #include "endian.h"
