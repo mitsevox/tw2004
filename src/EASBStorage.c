@@ -907,7 +907,7 @@ void fn_80129E88(EASBImageSlot* pSlot, u8* pBuffer, u32 uSize) {
 
 // Adds pAdd into pTotals, keeping u8 at least uC; the record count comes from pAdd, one more
 // (up to 250) unless nMode is 3.
-void fn_80129F98(EASBTotals* pTotals, EASBTotals* pAdd, s32 nMode) {
+void fn_80129F98(EASBTotals* pTotals, const EASBTotals* pAdd, s32 nMode) {
     pTotals->u0 = fn_80128468(pTotals->u0, pAdd->u0);
     pTotals->u4 = fn_80128468(pTotals->u4, pAdd->u4);
     pTotals->u8 = fn_80128468(pTotals->u8, pAdd->u8);
