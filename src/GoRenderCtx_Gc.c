@@ -163,7 +163,6 @@ f32 fn_80014270(u8* p);
 f32 fn_80014278(u8* p);
 double tan();
 f32 fn_80014280(f32 x0);
-extern u8 lbl_80281C98;
 void fn_800142A4(s8 v);
 void fn_800131C4(int nController);
 void fn_8001437C(void);
@@ -192,6 +191,14 @@ f32 fn_80014280(f32 x0) {
 
 void fn_800142A4(s8 v) {
     lbl_80281C98 = v;
+}
+
+// A button's mask in the row in use; bShift moves it up 16 bits.
+u32 fn_800142AC(int nButton, u8 bShift) {
+    if (bShift) {
+        return lbl_80186AF0[lbl_80281C98][nButton] << 16;
+    }
+    return lbl_80186AF0[lbl_80281C98][nButton];
 }
 
 void fn_8001437C(void) {

@@ -1286,7 +1286,9 @@ void fn_800141F8(f32* pXY, f32* pUV, f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_8001425C(int a);
 void fn_8001644C(int a, f32* pXY, f32* pColour, f32* pUV, int c);
 void fn_800BA74C(u8 bFade);             // ScreenClear.c: a black screen for 1, 2 or 30 frames
-u32  fn_800142AC(int nButton, int a);   // a button's mask
+u32  fn_800142AC(int nButton, u8 bShift);   // a button's mask (bShift: moved up 16 bits)
+extern s8   lbl_80281C98;               // GoRenderCtx_Gc.c: the row of lbl_80186AF0 in use (fn_800142A4)
+extern u32  lbl_80186AF0[][0xE8 / 4];   // GoRenderCtx_Gc.c: rows of button masks, by button
 u8   fn_80014300(u32 uMask);            // any pad pressed these buttons
 
 // ---- events, sound, effects ------------------------------------------------------------------
