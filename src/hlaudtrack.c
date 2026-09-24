@@ -207,16 +207,16 @@ s32 fn_800A9D7C(AudTrack* pTrack) {
 // caller's requests, which only count for the templates flagged 0x04 (and not 0x01).
 void fn_800A9E7C(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u8 nChannel, u8 bOn,
                  u8 bOff, f32 fPriority) {
-    u8 bResort;
-    u8 bStart;
-    u8 bKeep;
-    u8 n64;
-    u8 n68;
     u8 bPlaying;
     u8 bSwitch;
     u8 bRetrigger;
+    u8 bResort;
     u8 bAudible;
+    u8 bStart;
     u8 bStop;
+    u8 bKeep;
+    u8 n64;
+    u8 n68;
 
     bKeep = 0;
     if (pTrack != NULL && pTrack->nState == 2) return;
@@ -226,8 +226,8 @@ void fn_800A9E7C(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u8 n
     bResort = bPlaying;
     bAudible = fPriority > 0.0f;
     bStart = bAudible &&
-             ((!bPlaying && ((!bRetrigger && (!bSwitch || (bOn && !bOff))) ||
-                             (bRetrigger && (!bSwitch || bOn)))) ||
+             ((!bPlaying && ((!bRetrigger && (!bSwitch || (bSwitch && bOn && !bOff))) ||
+                             (bRetrigger && (!bSwitch || (bSwitch && bOn))))) ||
               (bPlaying && bRetrigger && bSwitch && bOn));
     bStop = (!bAudible && bPlaying) ||
             (bAudible && bPlaying && bSwitch &&
