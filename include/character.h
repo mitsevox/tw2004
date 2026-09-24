@@ -517,6 +517,8 @@ extern AnimStream* lbl_80282230;
 u8    fn_800C9828(int nGroup, int nStyle, int nClub, int nKey);   // the clips are streamed
 void  fn_800CA9DC(int nSlot);
 
+void  fn_800177A0(Character* pChar, SkelPose* pPose);   // a blend node's pose from the body skin
+void  fn_80017864(Character* pChar, SkelPose* pPose);   // only its bit arrays
 void  Character_SetPosition(Character* pChar, f32* pPos, u8 bPlace);
 int   fn_8001C558(int nPlayer);          // the model id of the player's golfer
 void  fn_8001C724(Character* pChar, int nKind);
@@ -557,6 +559,7 @@ void  fn_80029A88(CharModel* pModel, f32 (*pMatrices)[4][4]);
 void  fn_80029A90(CharModel* pModel, f32 (*pMtx)[4], int nBone);
 void  fn_80029AF8(CharModel* pModel);
 int   fn_80048574(Character* pChar, u64 uEvent);    // the character's animation has event uEvent
+u8    fn_8009637C(Character* pChar);    // CharAnim.c: n26 is not 1 (both callers mask the result)
 void  fn_80072ACC(SKABlendNode* pNode, int* pn, f32 fTime);
 f32   fn_80072CB8(SKABlendNode* pNode, u64 uEvent); // an event's time in a blend tree
 void  fn_8007326C(u8* pAnim);

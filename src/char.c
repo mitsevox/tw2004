@@ -77,7 +77,6 @@ void  fn_80072ED8(void* pAnim, SKABlendNode* pNode, f32 fTime);                 
 void  fn_80073108(Character* pChar, int nPlayer, void* pAnim, SKABlendNode* pNode, f32 fTime);
 void  fn_8009622C(Character* pChar, void* pClip, u8 bKeep, f32 fOffset);                  // CharAnim.c
 void  fn_80096F0C(Character* pChar);                            // CharAnim.c
-s32   fn_8009637C(Character* pChar);                            // CharAnim.c
 void  fn_8000914C(f32* pQ, f32 (*m)[4]);                        // Quaternion.c: a rotation matrix
 void  fn_8001BD18(Character* pChar, Clip* pClip);
 void  fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, int n, f32 fTime);
@@ -151,19 +150,9 @@ void  fn_80112CEC(void);
 // ---- sweep code (not yet cleaned up) ----
 void fn_8001E8A4(u32* aBits, u32 nBits);
 void fn_8001E938(u32* aBits, u32 nBits);
-void fn_80017864(void* arg0, u32 (*arg1)[4]);
 void fn_8001B1DC(s32 p0, u8* p1, s32 p2);
 void fn_8001B1E8(void* p);
 void fn_8001C650(void* arg0, s32 arg1);
-
-void fn_80017864(void* arg0, u32 (*arg1)[4]) {
-    if ((u32) (*(u32*)((u8*)(arg0) + 0x3C)) != 0U) {
-        fn_8001E8A4(arg1[2], 0x80);
-        fn_8001E8A4(arg1[3], 0x80);
-        fn_8001E938(arg1[0], 0x80);
-        fn_8001E938(arg1[1], 0x80);
-    }
-}
 
 void fn_8001B1DC(s32 p0, u8* p1, s32 p2) {
     *(s32*)p1 = p2;
@@ -251,6 +240,34 @@ void* Char_SetClip(Character* pChar, int nGroup, int nStyle, const char* pName) 
     }
     pChar->pCurClip = pClip;
     return pClip;
+}
+
+// Fill a blend node's pose from the character's body skin (none: the pose is left alone): the
+// first two bit arrays cleared, the next two set, and every bone's rotation and position copied.
+void fn_800177A0(Character* pChar, SkelPose* pPose) {
+    int i;
+    Skin* pSkin = pChar->pSkin;
+
+    if (pSkin != NULL) {
+        fn_8001E938(pPose->a0, 0x80);
+        fn_8001E938(pPose->a10, 0x80);
+        fn_8001E8A4(pPose->a20, 0x80);
+        fn_8001E8A4(pPose->a30, 0x80);
+        for (i = 0; i < pChar->pModel->nBones; i++) {
+            fn_8001E85C(pSkin->pose.aBones[i].q0, pPose->aBones[i].q0);
+            fn_8001E85C(pSkin->pose.aBones[i].v10, pPose->aBones[i].v10);
+        }
+    }
+}
+
+// Only the bit arrays of fn_800177A0 (with a body skin): the last two set, the first two cleared.
+void fn_80017864(Character* pChar, SkelPose* pPose) {
+    if (pChar->pSkin != NULL) {
+        fn_8001E8A4(pPose->a20, 0x80);
+        fn_8001E8A4(pPose->a30, 0x80);
+        fn_8001E938(pPose->a0, 0x80);
+        fn_8001E938(pPose->a10, 0x80);
+    }
 }
 
 // Advances the character's animation by fTime: both animation players and their blend trees, the
