@@ -9,6 +9,7 @@
 void fn_80008380(void);
 void fn_80092250(f32* pA, f32* pB, f32* pOut);
 void fn_80092080(LLPict* pPict, f32 fAlpha);    // draws the picture at that alpha
+void fn_80091FC0(LLPict* pPict, int nFrames, f32 fStep);
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -24,7 +25,7 @@ void fn_800A4BDC();
 void fn_80091B98(s32 p0);
 void fn_80012EF8();
 void fn_8005CC64();
-void fn_80091DB8();
+void fn_80091DB8(int nFrames);
 void fn_80091D84(void);
 void fn_80091EE4(void);
 void fn_8009220C(void);
@@ -112,10 +113,31 @@ void fn_800917C8(void) {
     }
 }
 
+// Free the picture fn_800917C8 decoded, unless the session has flag 4.
+void fn_80091818(void) {
+    if (!(gSession.uFlags & 4) && lbl_801D8858.p30 != NULL) {
+        fn_8002FE70(lbl_801D8858.p30);
+        fn_8002FEAC();
+        lbl_801D8858.p30 = NULL;
+    }
+}
+
 // Free the bank fn_80091778 loaded.
 void fn_80091870(void) {
     if (gSession.uFlags & 4) return;
     fn_80010544(lbl_80281378);
+}
+
+// Decode the picture in the 'load' object, show it for nFrames frames (fading in over 30), then
+// free it.
+void fn_80091DB8(int nFrames) {
+    LLPict* pPict;
+
+    pPict = fn_8002FD00(lbl_80281C04, lbl_801A25F0.uSize);
+    fn_80091FC0(pPict, nFrames, 1.0f / 30.0f);
+    fn_80008380();
+    fn_8002FE70(pPict);
+    fn_8002FEAC();
 }
 
 // Show pPict for nFrames frames, fading it in by fStep a frame (up to 1).
