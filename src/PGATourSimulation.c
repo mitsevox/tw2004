@@ -1318,17 +1318,14 @@ void fn_8011AC40(int nPlayer, GM_Pga_StatTypes_t nStat) {
 }
 
 // Works out a golfer's simple statistics from the counts in the player's profile, with their text.
-static inline PgaStatValue* StatValue(GM_Pga_StatTypes_t nStat, int nGolfer) {
-    return &lbl_80226870[nStat].aValue[nGolfer];
-}
-
 void fn_8011AE1C(int nPlayer, int nGolfer) {
-    s32 nStat;
+    GM_Pga_StatTypes_t nStat;
 
     for (nStat = 0; nStat < GM_PGA_STAT_SIMPLE_COUNT; nStat++) {
-        lbl_80193F88[nStat](&gpSaveData[nPlayer].tour.aStats[nGolfer], &StatValue(nStat, nGolfer)->fValue);
-        GM_PgaTourSim_GetStatValString(nStat, StatValue(nStat, nGolfer)->fValue,
-                                       StatValue(nStat, nGolfer)->szValue);
+        lbl_80193F88[nStat](&gpSaveData[nPlayer].tour.aStats[nGolfer],
+                            &lbl_80226870[nStat].aValue[nGolfer].fValue);
+        GM_PgaTourSim_GetStatValString(nStat, lbl_80226870[nStat].aValue[nGolfer].fValue,
+                                       lbl_80226870[nStat].aValue[nGolfer].szValue);
     }
 }
 
