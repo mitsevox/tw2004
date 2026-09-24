@@ -272,6 +272,7 @@ int File_ReadAsyncEx(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDon
                 u8 nPrio, s32 n1C, u8 b20, u8 b21) {
     FileReqPool* pPool;
     FileReq* pReq;
+    FileQueue* pQueue;
 
     fn_800B7490();
     fn_800B596C("File_ReadAsyncEx");
@@ -291,7 +292,9 @@ int File_ReadAsyncEx(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDon
             }
             lbl_8019E868[nPrio].pPrev = pReq;
         }
-        lbl_8019E868[nPrio].nCount++;
+        pQueue = lbl_8019E868;
+        pQueue += nPrio;
+        pQueue->nCount++;
         pReq->nFile = hFile;
         pReq->pBuf = pDst;
         pReq->nOffset = uOffset;
