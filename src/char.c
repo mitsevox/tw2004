@@ -91,6 +91,9 @@ void  fn_800725BC(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 f);             
 void  fn_800958EC(AnimPlayer* pAnim, s32 n, f32 f);            // CharAnim.c
 void  fn_800094D8(f32* pQ, f32* pA, f32* pB, f32* pC);          // Quaternion.c: a rotation as angles
 void  fn_80029968(CharModel* pModel, SkelPose* pPose);          // Skeleton.c
+void  fn_8000AB40(f32 (*pSrc)[4], f32 (*pDst)[4]);              // UMemPool.c
+void  fn_8001EDA8(Character* pChar, int nBone, f32* pPos);
+void  fn_8001EF54(f32* pA, f32* pB, f32* pOut);
 void  fn_80095558(void);
 void  AnimLib_ApplyOverlays(int nSlot);                         // skalib.c
 void  fn_80025478(void);                                        // skalib.c
@@ -386,6 +389,73 @@ void fn_80018484(Character* pChar, CharModel* pModel) {
         pChar->nClubHeadBone = fn_8001EED8(pChar->pModel, 0x53);
         pChar->nGripBone     = fn_8001EED8(pChar->pModel, 0x52);
         pChar->n16A8         = fn_8001EEE4(pChar->pModel, 0x15);
+    }
+}
+
+// Gives the character its body's skin and poses the model from it; for a golfer, the skin also
+// keeps four points of the legs (bones 0x3A, 0x48, 0x39, 0x47, each moved by a small offset that
+// depends on the animation slot) in the frame of their bone (through fn_8000AB40's matrix).
+void fn_800184E4(Character* pChar, Skin* pSkin) {
+    f32 m48[4][4];
+    f32 m3A[4][4];
+    f32 m47[4][4];
+    f32 m39[4][4];
+    Vec4 v48;
+    Vec4 v3A;
+    Vec4 v47;
+    Vec4 v39;
+    Vec4 vOffsetB;
+    Vec4 vOffsetA;
+    f32 (*pMtx48)[4];
+    f32 (*pMtx3A)[4];
+    f32 (*pMtx47)[4];
+    f32 (*pMtx39)[4];
+
+    if (pChar != NULL) {
+        pChar->pSkin = pSkin;
+        fn_80018710(pChar);
+        if (fn_8001EC48(pChar)) {
+            pMtx48 = fn_8001EC6C(pChar, 0x48);
+            pMtx3A = fn_8001EC6C(pChar, 0x3A);
+            pMtx47 = fn_8001EC6C(pChar, 0x47);
+            pMtx39 = fn_8001EC6C(pChar, 0x39);
+            fn_8000AB40(pMtx48, m48);
+            fn_8000AB40(pMtx3A, m3A);
+            fn_8000AB40(pMtx47, m47);
+            fn_8000AB40(pMtx39, m39);
+            if (pChar->nSlot == 0) {
+                vOffsetA.x = 0.0f;
+                vOffsetA.y = -0.031f;
+                vOffsetA.z = 0.0f;
+                vOffsetA.w = 1.0f;
+                vOffsetB.x = 0.0f;
+                vOffsetB.y = -0.11f;
+                vOffsetB.z = -0.06f;
+                vOffsetB.w = 1.0f;
+            } else {
+                vOffsetA.x = 0.0f;
+                vOffsetA.y = -0.025f;
+                vOffsetA.z = 0.0f;
+                vOffsetA.w = 1.0f;
+                vOffsetB.x = 0.0f;
+                vOffsetB.y = -0.08f;
+                vOffsetB.z = -0.025f;
+                vOffsetB.w = 1.0f;
+            }
+            fn_8001EDA8(pChar, 0x48, &v48.x);
+            fn_8001EDA8(pChar, 0x3A, &v3A.x);
+            fn_8001EDA8(pChar, 0x47, &v47.x);
+            fn_8001EDA8(pChar, 0x39, &v39.x);
+            fn_8001EF54(&v48.x, &vOffsetA.x, &v48.x);
+            fn_8001EF54(&v3A.x, &vOffsetA.x, &v3A.x);
+            fn_8001EF54(&v47.x, &vOffsetB.x, &v47.x);
+            fn_8001EF54(&v39.x, &vOffsetB.x, &v39.x);
+            fn_800BAD60(m3A, &v3A, (Vec4*)pChar->pSkin->a1048[0]);
+            fn_800BAD60(m48, &v48, (Vec4*)pChar->pSkin->a1048[1]);
+            fn_800BAD60(m39, &v39, (Vec4*)pChar->pSkin->a1048[2]);
+            fn_800BAD60(m47, &v47, (Vec4*)pChar->pSkin->a1048[3]);
+            pChar->pSkin->b1044 = 1;
+        }
     }
 }
 
