@@ -1,6 +1,5 @@
 // DynChain.c (EA's name, from its asserts; TW06): bone chains that swing on their own (hair,
-// cloth), made from a bone down through its children and updated with the model. Partly
-// decompiled.
+// cloth), made from a bone down through its children and updated with the model.
 
 #include "engine.h"
 #include "character.h"
@@ -229,8 +228,8 @@ void fn_8011443C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
 
 // The type 1 update: the chain's first link hangs from its bone's matrix fLength along the matrix's
 // z axis. It falls and swings with a velocity (v24) that gravity pulls down, limited to a top speed
-// and slowed by drag; it may lag at most 0.4 (times the model's f12C) behind where it hangs, and only
-// moves along the matrix's y axis. The bone then turns to point at it. Not on game type 3.
+// and slowed by drag; it may lag at most 0.4 (times the model's f12C) behind where it hangs, but
+// never along the matrix's y axis. The bone then turns to point at it. Not on game type 3.
 void fn_80114540(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     f32 mScale[4][4];
     f32 mRot[4][4];
@@ -318,7 +317,7 @@ void fn_80114540(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         fn_801164F8(pChain->pLinks->v24, pChain->pLinks->v04, pChain->pLinks->v04);
     }
 
-    // Keep only the part of its offset along the matrix's y axis.
+    // Drop the part of its offset along the matrix's y axis.
     fn_801164D4(vHang, pChain->pLinks->v04, vDiff);
     fn_8001EF34(vUp, fn_8000C5FC(vDiff, vUp), vMove);
     fn_801164F8(vMove, pChain->pLinks->v04, pChain->pLinks->v04);
@@ -356,9 +355,9 @@ void fn_80114540(CharModel* pModel, DynChain* pChain, f32 fDelta) {
 }
 
 // The type 0 update: each link below the top one trails behind, pulled back toward where it was
-// (v64) the less the model's f130 and the further down the chain it is, kept from going above the
-// top bone (along its matrix's z axis) and held at fLength from its parent. Each bone then turns to
-// point at the next one, as it did in the rest pose (v34).
+// (v64) the less the model's f130 and the further down the chain it is, kept from passing 0.025
+// along the top bone's z axis and held at fLength from its parent. Each bone then turns by how its
+// direction to the next one moved in this update (from v34, taken before the links move).
 void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     f32 mScale[4][4];
     f32 mRot[4][4];
@@ -872,9 +871,10 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     }
 }
 
-// The sway at frame nFrame: four sine waves with a 600-frame period (1, 3, 5 and 7 times the base
-// frequency), offset by fPhase, on a base that grows with fStrength (0..35), limited to 0..1 and
-// scaled by the settings' f90. 1 is no sway.
+// The sway's speed at frame nFrame (its callers scale their frame step by it; 1: full speed):
+// four sine waves with a 600-frame period (1, 3, 5 and 7 times the base frequency), offset by
+// fPhase, on a base that grows with fStrength (0..35), limited to 0..1 and scaled by the settings'
+// f90.
 f32 fn_80116304(u32 nFrame, f32 fPhase, f32 fStrength) {
     f32 fPeriod = 600.0f;
     f32 fOne = 1.0f;            // the wave's scale and the most sway (EA kept the multiply)

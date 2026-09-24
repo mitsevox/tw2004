@@ -15,21 +15,21 @@ extern s32 lbl_802823C0;                    // skins carried over
 extern s32 lbl_802823C4;                    // the money carried over
 
 void fn_800F81EC(void);
-void fn_800F81FC(void);
+void GameModeSkins_SetupNextGolfer(void);
 s32  GameModeSkins_GetHonors(int nPlayer);
-u8   fn_800F8624(int nPlayer, u8 bCheck);
+u8   GameModeSkins_HoleFinished(int nPlayer, u8 bCheck);
 u8   GameModeSkins_GameFinished(u8 bCheck);
 u8   GameModeSkins_GoToPlayoff(u8 bCheck);
 void GameModeSkins_EndHole(void);
 void GameModeSkins_EndGame(void);
-s32  fn_800F9308(void);
+s32  GameModeSkins_CurrentHoleNumberSkins(void);
 
-// Mode 2 starts: up to four players, CPUs may concede.
+// Mode 2 starts: CPUs may concede, no mulligans, nothing carried over.
 void fn_800F80FC(void) {
     gpGame->pfnInit = fn_800F80FC;
-    gpGame->pfnSetupNextGolfer = fn_800F81FC;
+    gpGame->pfnSetupNextGolfer = GameModeSkins_SetupNextGolfer;
     gpGame->pfnGetHonors = GameModeSkins_GetHonors;
-    gpGame->pfnHoleFinished = fn_800F8624;
+    gpGame->pfnHoleFinished = GameModeSkins_HoleFinished;
     gpGame->pfnGameFinished = GameModeSkins_GameFinished;
     gpGame->pfnGoToPlayoff = GameModeSkins_GoToPlayoff;
     gpGame->pfnEndHole = GameModeSkins_EndHole;
@@ -52,8 +52,8 @@ void fn_800F81EC(void) {
     lbl_802823C0 = 0;
 }
 
-// Hole start: the honor plays first, everyone else waits.
-void fn_800F81FC(void) {
+// When everyone waits: the player GetHonors picks goes to pre-shot, the others wait.
+void GameModeSkins_SetupNextGolfer(void) {
     int i;
     lbl_80282278 = gpGame->pfnGetHonors(5);
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -147,9 +147,9 @@ s32 GameModeSkins_GetHonors(int nPlayer) {
     return nBest;
 }
 
-// The hole is over when nobody still playing can beat (or, with a tie for the lead, tie) the best
-// holed score.
-u8 fn_800F8624(int nPlayer, u8 bCheck) {
+// The hole is over when nobody still playing can tie the best holed score (with a tie for the
+// lead: beat it); not before someone has holed out.
+u8 GameModeSkins_HoleFinished(int nPlayer, u8 bCheck) {
     int i;
     int nBest = 5;
     int nSecond = 5;
@@ -319,11 +319,11 @@ void GameModeSkins_EndHole(void) {
             lbl_802823C0++;
         }
     } else {
-        n = fn_800F9254();
+        n = GameModeSkins_CurrentHoleValue();
         gPlayers[nBest].n22C[Game_CurHoleIndex()] = n;
         gPlayers[nBest].n274 += gPlayers[nBest].n22C[Game_CurHoleIndex()];
         gPlayers[nBest].nModePoints[Game_CurHoleIndex()] = 1;
-        gPlayers[nBest].nHolesWon += fn_800F9308();
+        gPlayers[nBest].nHolesWon += GameModeSkins_CurrentHoleNumberSkins();
         lbl_802823C4 = 0;
         lbl_802823C0 = 0;
     }
@@ -372,7 +372,7 @@ void GameModeSkins_EndGame(void) {
 
 // The skin on this hole: what is carried over plus this hole's value (the next selected hole's in
 // some cases).
-s32 fn_800F9254(void) {
+s32 GameModeSkins_CurrentHoleValue(void) {
     int h;
     if (gpGame->bD4) {
         return lbl_802823C4;
@@ -388,8 +388,8 @@ s32 fn_800F9254(void) {
     return lbl_802823C4 + fn_800D3D64(fn_800D3C1C(), h);
 }
 
-// Skins won on this hole: one plus those carried over (only one in the playoff... as the count).
-s32 fn_800F9308(void) {
+// Skins at stake on this hole: those carried over, plus one outside the playoff.
+s32 GameModeSkins_CurrentHoleNumberSkins(void) {
     if (gpGame->bD4) {
         return lbl_802823C0;
     }
