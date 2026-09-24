@@ -31,6 +31,8 @@ HwsOverrideTable* fn_80112A10(SkinDesc* pDesc, s32 nMeshes);  // hwsOverride_Gc.
 void  fn_80112B18(HwsOverrideTable* pTable, int i, void* p);   // hwsOverride_Gc.c
 
 u8    fn_8001EC48(Character* pChar);           // char.c
+s32   fn_800CCA40(Skin* pSkin);                // SkinPart.c: how many parts
+void  fn_80035810(Character* pChar);
 void  fn_80035D10(Character* pChar, int nView);
 void  fn_80035F40(void* pCamera);
 void  fn_80036054(void* pMesh, int n, s32* pDesc);
@@ -58,6 +60,78 @@ void fn_80035F40(void* pCamera) {
 
     pRect = fn_80012EF0(pCamera);
     fn_80016978(fn_80012EE8(pRect), fn_80012EE0(pRect), fn_80012ED8(pRect), fn_80012ED0(pRect));
+}
+
+// Picks the "shadow" part of the character's skin and of its club's skin, for n17B4.
+void fn_80035640(Character* pChar) {
+    u64 uShadow;
+    s32 nParts;
+    int i;
+    Skin* pSkin;
+
+    fn_800CB700(&uShadow, "shadow");
+    fn_800CE02C(pChar->pSkin, pChar->n17B4);
+    nParts = fn_800CCA40(pChar->pSkin);
+    for (i = 0; i < nParts; i++) {
+        if (fn_800CCDDC(pChar->pSkin, i) == uShadow) {
+            // port: EA passes an argument fn_800CE0B0 ignores
+            ((void (*)(Skin*, int, int))fn_800CE0B0)(pChar->pSkin, i, pChar->n17B4);
+        }
+    }
+    fn_800CE128(pChar->pSkin);
+    if (pChar->p16D8 != NULL) {
+        pSkin = pChar->p16D8->apSkins[pChar->nClubClass];
+        if (pSkin != NULL) {
+            fn_800CE02C(pSkin, pChar->n17B4);
+            // port: EA passes an argument fn_800CE0B0 ignores
+            ((void (*)(Skin*, int, int))fn_800CE0B0)(pSkin, fn_800CDAFC(pSkin, uShadow),
+                                                     pChar->n17B4);
+            fn_800CE128(pSkin);
+        }
+    }
+}
+
+// Picks every part but "shadow" of the character's skin, then of its club's skin (fn_80035810).
+void fn_80035754(Character* pChar) {
+    u64 uShadow;
+    s32 nParts;
+    int i;
+
+    fn_800CB700(&uShadow, "shadow");
+    fn_800CE02C(pChar->pSkin, pChar->n17B4);
+    nParts = fn_800CCA40(pChar->pSkin);
+    for (i = 0; i < nParts; i++) {
+        if (fn_800CCDDC(pChar->pSkin, i) != uShadow) {
+            // port: EA passes an argument fn_800CE0B0 ignores
+            ((void (*)(Skin*, int, int))fn_800CE0B0)(pChar->pSkin, i, pChar->n17B4);
+        }
+    }
+    fn_800CE128(pChar->pSkin);
+    fn_80035810(pChar);
+}
+
+// Picks every part but "shadow" of the character's club skin.
+void fn_80035810(Character* pChar) {
+    u64 uShadow;
+    Skin* pSkin;
+    s32 nShadow;
+    int i;
+
+    fn_800CB700(&uShadow, "shadow");
+    if (pChar->p16D8 != NULL) {
+        pSkin = pChar->p16D8->apSkins[pChar->nClubClass];
+        if (pSkin != NULL) {
+            fn_800CE02C(pSkin, pChar->n17B4);
+            nShadow = fn_800CDB70(pSkin, "shadow");
+            for (i = 0; i < fn_800CCA40(pSkin); i++) {
+                if (i != nShadow) {
+                    // port: EA passes an argument fn_800CE0B0 ignores
+                    ((void (*)(Skin*, int, int))fn_800CE0B0)(pSkin, i, pChar->n17B4);
+                }
+            }
+            fn_800CE128(pSkin);
+        }
+    }
 }
 
 // Sets up the triangles' mesh objects, one per view.

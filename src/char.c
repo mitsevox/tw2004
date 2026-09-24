@@ -1048,7 +1048,7 @@ Character* fn_8001942C(void) {
     pChar->n5CC = -1;
     pChar->p1790 = NULL;
     pChar->n1784 = -1;
-    pChar->b17B4 = 0;
+    pChar->n17B4 = 0;
     pChar->pRecords = NULL;
     fn_800962F8(pChar);
     pChar->n16DC = 0;
