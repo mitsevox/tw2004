@@ -1098,6 +1098,7 @@ void fn_800A573C(u8 nPlayer) {
     GameAudioView* pView;
     u8 nId;
     int nState;
+    s32 nLastState;
     f32 fSpeed;
     f32 fPitch;
     f32 fVolume;
@@ -1113,7 +1114,8 @@ void fn_800A573C(u8 nPlayer) {
         nState = pPlayer->swing.nState;
         if (nState == 1 || nState == 3) {
             if (pView->fC > 0.0f) {
-                if (pView->n18 == 1 && pView->n18 != nState) {
+                nLastState = pView->n18;
+                if (nLastState == 1 && nLastState != nState) {
                     fn_800ADA28(nId, 0, 1, 1);
                 } else {
                     fSpeed = Vec_Distance(vPos, vLast) / (FRAME_RATE * pView->fC);

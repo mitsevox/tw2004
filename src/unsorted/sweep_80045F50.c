@@ -1,14 +1,12 @@
-// Small functions found by the sweep (sweep.py). Original file and meanings unknown.
+// Small functions found by the sweep (sweep.py). Original file unknown; UObject3D.c's fn_80045D80
+// calls them.
 
-#include "game_types.h"
+#include "dynobj.h"
 
-
-s32 fn_80045F50(u8* p0);
-s32 fn_80045F5C(u8* p0, s32 p1);
-s32 fn_80045F50(u8* p0) {
-    return *(s16*)((u8*)*(s32*)p0);
+int fn_80045F50(UObjMesh* pMesh) {
+    return pMesh->pInfo->n0;
 }
 
-s32 fn_80045F5C(u8* p0, s32 p1) {
-    return *(s32*)(((u8*)*(s32*)(p0 + 0x8)) + (p1 << 2));
+UObjMesh* fn_80045F5C(UObjMesh* pMesh, int i) {
+    return pMesh->p8[i];
 }

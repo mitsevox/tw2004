@@ -999,7 +999,7 @@ Skin* fn_800377FC(u8* pData, u8 b) {
     pSkin = fn_80009B34(sizeof(Skin), 2, 0x80, "Skin.c", 0x5C4);
     memset(pSkin, 0, sizeof(Skin));
     pModel = (SkinModel*)pData;     // the file's model, then the copy
-    if ((((SkinModel*)pData)->u30 & 0x40000002) != 0x40000002) {
+    if ((pModel->u30 & 0x40000002) != 0x40000002) {
         fn_8003682C((SkinModel*)pData);
         bSwap = 1;
         ((SkinModel*)pData)->u30 = ((SkinModel*)pData)->u30 | 0x40000000 | 2;
