@@ -503,12 +503,14 @@ s32   fn_800CE224(Skin* pSkin, SkinDesc14* pEntry, u8** ppOut, s32* pnOut, int n
 u8    fn_800CEEC0(SkinIter* pIter);
 void  fn_800CEEC8(SkinIter* pIter);
 SkinMesh* fn_800CEEF4(SkinIter* pIter);
+s32   fn_800CEEFC(SkinIter* pIter);
 SkinIter* fn_80113B34(u8* pBuf, SkinIterArgs* pArgs);
 void  fn_80113BAC(SkinIter* pIter);
 
 // hwsOverride_Gc.c: a mesh table and a memory block for a skin description's morphed meshes.
 HwsMemBlock* fn_801128EC(SkinDesc* pDesc, s32 nSize);
 HwsOverrideTable* fn_80112A34(SkinDesc* pDesc, s32 nMeshes);
+void* fn_80112A80(HwsMemBlock* pBlock, HwsOverrideTable* pTable, int i, u8 bKeep);
 
 // SkinBurn.c: burns a skin (aParts and aList each end with -1).
 void  fn_80127B98(Skin* pSkin, s32* aParts, s32* aList);

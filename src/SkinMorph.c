@@ -27,7 +27,7 @@ void fn_8011C068(SkinMorphWork* pWork, s16* pPos, s8* pNrm, u32 nVerts) {
     }
 }
 
-void fn_8011C68C(SkinMorphWork* pWork, int n);
+SkinIter* fn_80113910(u8* pBuf, SkinIterArgs* pArgs);     // hwsRender_Gc.c: another mesh iterator
 s32  fn_8011CDE8(Skin* pSkin);
 
 // Packs the work area's nVerts vertices back: positions as four s16 each, normals as four s8.
@@ -176,6 +176,62 @@ void fn_8011C59C(SkinMorphWork* pWork, HwsOverrideTable* pTable) {
 
 void fn_8011C5A8(SkinMorphWork* pWork, HwsMemBlock* pBlock) {
     pWork->pBlock = pBlock;
+}
+
+// Blends the morph targets of p44 entry n into its meshes' overrides: each mesh with flags
+// 0x100000 and 0x10 gets its own vertices plus every picked target times its weight, or a plain
+// copy when no target is picked.
+void fn_8011C68C(SkinMorphWork* pWork, int n) {
+    SkinDesc* pDesc = pWork->pDesc;
+    SkinIterArgs args;
+    u8 aBuf[0x20];      // the iterator's buffer; its size is not known
+    SkinIter* pIter;
+    SkinDesc44* pEntry;
+    SkinMesh* pMesh;
+    s32 nSet;
+    s32 nPicked;
+    u8* pDst;
+    s32 i;
+    s32 nVerts;
+    s32 nNext;
+
+    if (pDesc == NULL || n < 0 || n >= pDesc->n40) {
+        return;
+    }
+    pEntry = &pDesc->p44[n];
+    if (!(pEntry->u24 & 2)) {
+        return;
+    }
+    args.pDesc = pDesc;
+    args.n = n;
+    pIter = fn_80113910(aBuf, &args);
+    nSet = 0;
+    while (fn_800CEEC0(pIter)) {
+        pMesh = fn_800CEEF4(pIter);
+        if ((pMesh->uFlags & 0x100010) == 0x100010) {
+            nPicked = fn_8011C5B4(pWork, pEntry, nSet);
+            nSet++;
+            pDst = fn_80112A80(pWork->pBlock, pWork->pTable, fn_800CEEFC(pIter), 1);
+            if (pDst != NULL) {
+                if (nPicked == 0) {
+                    memcpy(pDst, pMesh->pBits, pMesh->nSize);
+                } else {
+                    fn_8011C49C(pWork, pMesh);
+                    nVerts = fn_8011C484(pWork, pWork->apTargets[0]);
+                    for (i = 1; i < nPicked; i++) {
+                        fn_8011C46C(pWork);
+                        nNext = fn_8011C484(pWork, pWork->apTargets[i]);
+                        fn_8011C504(pWork, nVerts, pWork->afTargets[i - 1]);
+                        nVerts = nNext;
+                    }
+                    fn_8011C46C(pWork);
+                    fn_8011C504(pWork, nVerts, pWork->afTargets[i - 1]);
+                    fn_8011C4D4(pWork, pDst);
+                }
+            }
+        }
+        fn_800CEEC8(pIter);
+    }
 }
 
 // Every caller passes the work area; it is unused.

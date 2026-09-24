@@ -61,7 +61,6 @@ void  fn_800CEDE0(Skin* pSkin, u8* p, u64 uId);
 void  fn_800CEE04(Skin* pSkin, int nFrom, int nTo);
 void  fn_800CEE88(u8 b);
 void  fn_800CEE98(void);
-s32   fn_800CEEFC(SkinIter* pIter);
 
 s32   lbl_80191748[11] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1};
 char* lbl_80281540[2] = {"Glove", NULL};     // the parts fn_800CC4EC lists
