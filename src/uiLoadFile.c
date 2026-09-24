@@ -14,7 +14,7 @@ u32   lbl_80281EF4;             // its size, rounded up to 32 bytes
 u32   lbl_80281EF8;             // the UI file's ARAM address while it is parked there
 u32   lbl_80281EFC;             // its size, rounded up to 32 bytes
 u8    lbl_80281F00;             // it is in ARAM (fn_8008F310), not in main memory
-u32*  lbl_80281F04;             // the 'GRPS'/'MPCS' data: a count, then that many offsets that
+UINamedList* lbl_80281F04;      // the 'GRPS'/'MPCS' data: a count, then that many offsets that
                                 // fn_8008EFC0 turns into pointers
 u32*  lbl_80281F08;             // the 'FONS' data: a count, then that many UIFont offsets, turned
                                 // into pointers the same way
@@ -25,11 +25,11 @@ void fn_8008ED28(void);
 void fn_8008ED80(UStreamObject* pObject);
 void fn_8008EE1C(UStreamObject* pObject);
 void fn_8008EEB8(UStreamObject* pObject);
-void fn_8008EFC0(u32* pTable);
+void fn_8008EFC0(UINamedList* pList);
 void fn_8008EFFC(UStreamObject* pObject);
 void* fn_8008F0C0(void);
 UILoaded* fn_8008F0F0(void);
-u32* fn_8008F15C(void);
+UINamedList* fn_8008F15C(void);
 u32* fn_8008F18C(void);
 u8 fn_8008F204(int nKind);
 void fn_80090898(void);                                 // uiProcessInterface.c
@@ -105,7 +105,7 @@ void fn_8008EE1C(UStreamObject* pObject) {
 // 'GRPS' and 'MPCS'. The menus' copy goes to ARAM the first time it comes in, and later ones
 // are dropped: fn_8008F294 brings it back from there.
 void fn_8008EEB8(UStreamObject* pObject) {
-    u32* pData;
+    UINamedList* pData;
 
     if (strcmp(lbl_80281F10, "frontend") == 0) {
         if (lbl_80281EF4 == 0) {
@@ -130,12 +130,12 @@ void fn_8008EEB8(UStreamObject* pObject) {
 
 // Turn the table's offsets into pointers.
 // port: the data stores 32-bit offsets where the code expects pointers, as the GameCube's are.
-void fn_8008EFC0(u32* pTable) {
+void fn_8008EFC0(UINamedList* pList) {
     u32 i;
 
-    lbl_80281F04 = pTable;
-    for (i = 0; i < lbl_80281F04[0]; i++) {
-        lbl_80281F04[1 + i] = lbl_80281F04[1 + i] + (uptr)pTable;
+    lbl_80281F04 = pList;
+    for (i = 0; i < lbl_80281F04->nCount; i++) {
+        lbl_80281F04->apNames[i] = (char*)((uptr)lbl_80281F04->apNames[i] + (uptr)pList);
     }
 }
 
@@ -184,7 +184,7 @@ void fn_8008F0FC(UILoaded* pLoaded) {
     }
 }
 
-u32* fn_8008F15C(void) {
+UINamedList* fn_8008F15C(void) {
     return lbl_80281F04;
 }
 
@@ -228,7 +228,7 @@ void fn_8008F24C(void) {
 
 // Bring the menus' 'GRPS'/'MPCS' data back from ARAM if the front end has none.
 void fn_8008F294(void) {
-    u32* pData;
+    UINamedList* pData;
 
     if (lbl_80281F1C->pC == NULL) {
         pData = fn_80009B34(lbl_80281EF4, 1, 32, "uiLoadFile.c", 585);

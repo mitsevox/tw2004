@@ -19,6 +19,7 @@ s32 fn_800BA038();
 void fn_80090400(FrontEnd* pFE);
 void fn_80090664(void);
 void fn_8008FE88(FrontEnd* pFE);
+TexEntry* fn_80090904(TexBank* pBank, u64 uHash);
 void fn_8008F820(void);
 void fn_800E573C(void);         // GameMessages.c
 void fn_800E5798(void);         // GameMessages.c
@@ -138,6 +139,46 @@ void fn_8008FDDC(FrontEnd* pFE) {
         }
     } else {
         pFE->p14 = NULL;
+    }
+}
+
+// Resolve the UI file's entries by their names: kind 1 (except in game type 3) to the texture of
+// that name in the texture bank fn_8008FFF0 picks, kind 2 to the record of that name in pC (its
+// table noted in lbl_801D87C0.n3C).
+void fn_8008FE88(FrontEnd* pFE) {
+    UIColorTable* pTable;
+    UIColorEntry* pEntry;
+    u64 uHash;
+    char* szName;
+    int nBank;
+    u32 i;
+    u32 j;
+    u32 k;
+
+    for (i = 0; i < pFE->pFile->p8->nCount; i++) {
+        pTable = pFE->pFile->p8->apTables[i];
+        for (j = 0; j < pTable->nCount; j++) {
+            pEntry = pTable->apEntries[j];
+            szName = pEntry->szC;
+            if (pEntry->u0 == 1) {
+                if (gSession.nGameType != 3) {
+                    uHash = fn_8000BEE4(szName);
+                    nBank = fn_8008FFF0(szName);
+                    if (nBank != -1) {
+                        pEntry->p4 = fn_80090904(lbl_80281F1C->p8->ap4[nBank], uHash);
+                    }
+                }
+            } else if (pEntry->u0 == 2 && pFE->pC != NULL) {
+                lbl_801D87C0.n3C = i;
+                for (k = 0; k < pFE->pC->nCount; k++) {
+                    if (strcmp(pEntry->szC, pFE->pC->apNames[k]) == 0) {
+                        pEntry->p4 = pFE->pC->apNames[k];
+                        pEntry->p8 = NULL;
+                        break;
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -315,18 +356,20 @@ void fn_800908D0(void) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-s32 fn_8001005C();
-void fn_800107E4();
+int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
+TexEntry* fn_800107E4(TexBank* pBank, int nTex);  // LLTexGrp.c
+
 void fn_800908D4(f32 x0) {
     UFontContext* pCtx;
     pCtx = fn_80012EC4();
     pCtx->fB4 = x0;
 }
 
-void fn_80090904(s32 p0) {
-    s32 t0;
-    t0 = fn_8001005C();
-    fn_800107E4(p0, t0);
+// The texture in pBank whose name hashes to uHash.
+TexEntry* fn_80090904(TexBank* pBank, u64 uHash) {
+    int nTex = fn_8001005C(pBank, uHash);
+
+    return fn_800107E4(pBank, nTex);
 }
 
 // ---- end of sweep code ----

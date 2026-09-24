@@ -61,7 +61,7 @@ typedef struct FEScreen {
     u8  a30[4];                 // 0x30  set to 1 by fn_800905A8; fn_8008F80C sets one
     s32 n34;                    // 0x34  cleared by fn_800905A8
     s32 n38;                    // 0x38  a menu message reads it (fn_8007DAD4)
-    u8  unk3C[0x40 - 0x3C];
+    s32 n3C;                    // 0x3C  the UI file table holding the movie entries (fn_8008FE88)
     u8  b40;                    // 0x40  cleared by fn_800905A8
     u8  unk41[0x44 - 0x41];
     f32 fFade;                  // 0x44  the fade to black before a movie, 0 to 1

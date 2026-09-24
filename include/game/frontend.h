@@ -52,11 +52,18 @@ typedef struct UIFile {
     UIFileTables* p8;           // 0x8  its tables
 } UIFile;
 
+// The block at FrontEnd.pC: a count, then pointers to records that each start with a name;
+// fn_8008FE88 gives a UI file entry of kind 2 the record of its name.
+typedef struct UINamedList {
+    u32   nCount;               // 0x0
+    char* apNames[1];           // 0x4  nCount of them
+} UINamedList;
+
 typedef struct FrontEnd {
     UIFile* pFile;              // 0x0
     void* pHandler;             // 0x4  where GameMessages.c sends its messages (fn_8016B09C)
     struct UILoaded* p8;        // 0x8  the texture banks fn_8008F0FC frees (fn_80090400)
-    void* pC;                   // 0xC  a block uiLoadFile.c frees (fn_8008F24C)
+    UINamedList* pC;            // 0xC  a block uiLoadFile.c frees (fn_8008F24C)
     u32*  p10;                  // 0x10  the fonts table fn_8008F194 frees (fn_80090400)
     UIColorTable* p14;          // 0x14  the colours UIText.n8 picks from (uiText.c), NULL: none
     f32   f18;                  // 0x18  set to 1 when a round starts (gomainloop fn_8006DC20)
