@@ -252,7 +252,7 @@ void fn_800D28B0(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month 
 void fn_800D28DC(u16 nDate, char* szOut);       // a date as text
 void fn_800D293C(u16 nDate, char* szOut);       // a date as month/day
 s32  fn_800D2608(u16 nDate);            // Calendar.c
-s32  fn_800D2640(u16 nDate);            // Calendar.c
+u32  fn_800D2640(u16 nDate);            // Calendar.c (unsigned: callers compare it with cmplw)
 u16  fn_800D2994(void);                 // today's date
 int  fn_800D2ABC(int nCourse, int nHole);   // a hole's par on a course
 int  fn_800D2AD8(int nHole);            // a hole's par
