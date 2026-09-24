@@ -733,6 +733,7 @@ int  AI_ClubForShot(int nPlayer, int nKind, u8 bUnderOnly, f32 fDist);
 f32  AI_PowerForTarget(int nPlayer);
 s8   AI_NearestTarget(f32* pPos, f32* pOut);
 void AI_DefaultTarget(int nPlayer);
+s8   Caddie_GetTip(int nPlayer, f32* pOut);     // 0 no tip, 1 the aim point in pOut, 2 gave up
 u8   Player_IsCPU(int nPlayer);
 u8   Controller_IsCPU(int nController);
 u8   Player_HasPad(int nPlayer);

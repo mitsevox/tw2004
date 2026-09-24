@@ -38,5 +38,6 @@ void fn_8009727C(MorphAnim* pAnim);
 // Records a vertex's morph offset (three s8s) while its display list is built.
 void fn_80097330(MorphAnim* pAnim, u16 nVert, s8* pDelta);
 void fn_80097474(MorphAnim* pAnim);
+void fn_800976A8(MorphAnim* pAnim, f32 fWeight);
 
 #endif

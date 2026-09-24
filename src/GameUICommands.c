@@ -269,7 +269,7 @@ s32   fn_800A7528(void);
 void  fn_800A7944(void);
 u8    fn_800C6E44(View* pView);
 u8    fn_800C708C(View* pView);
-void  fn_800C9038(int nView, int a, int b);
+void  fn_800C9038(int nView, f32* pLong, f32* pSide);    // GoBreakLine.c
 s32   fn_800D2B4C(int nPlayer);
 s32   fn_800D2D40(int nTeeSet);
 s32   fn_800D2DA0(int nTeeSet);
@@ -1165,7 +1165,8 @@ void fn_800873D4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80087420(MsgArg* pArgs, MsgArg* pResult) {
-    fn_800C9038(gPlayers[pArgs[0].i].nView[0], pArgs[1].i, pArgs[2].i);
+    // port: the studio passes the addresses of the two answers as 32-bit words
+    fn_800C9038(gPlayers[pArgs[0].i].nView[0], (f32*)pArgs[1].i, (f32*)pArgs[2].i);
 }
 
 void fn_80087460(MsgArg* pArgs, MsgArg* pResult) {

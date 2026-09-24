@@ -348,6 +348,18 @@ u8 fn_80073610(SKABlendNode* pNode, void* pSrc);
 // The blend callback CharacterState_AddSKABlendData attaches (fn_80072ACC is one).
 typedef void (*SKABlendFn)(SKABlendNode* pNode, int* pn, f32 fTime);
 
+// animblender.c: set up *ppNode (taken from nType's pool when NULL) as a node of nType with pose
+// format nFormat, bC set from nC.
+void fn_80071C28(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn pfnBlend, int nC);
+// animblender.c: make pNode a blend node that mixes its children with pfnBlend at fWeight.
+void fn_800725BC(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 fWeight);
+f32  fn_80072938(SKABlendNode* pNode);  // animblender.c: the latest end time under pNode
+// animblender.c: pNew plays pClip (a Clip, or an MtaLib from a MAL bank for a format 1 node).
+void fn_800724C0(SKABlendNode* pNode, SKABlendNode* pNew, void* pClip, f32 fWeight);
+// animblender.c: blend pNew into *ppNode over the window pBlend (six floats, fn_800958F8).
+void fn_800720C8(struct Character* pChar, SKABlendNode* pNew, SKABlendNode** ppNode, f32* pBlend,
+                 SKABlendFn pfnBlend, int b);
+
 // A node of a character's SKA blend tree (animblender.c; the root is at Character + 0x40C). A node
 // of type 1 blends its two children into its pose with pfnBlend; a node of type 0 plays one source
 // from fFrom to fTo. fn_80071C28 takes nodes from three pools by type (0x34, 0x2C and 0x20 bytes),
@@ -528,11 +540,16 @@ typedef struct Character {
                                 //        clip lookup fell back (Char_SetClip). Signed: the original tests
                                 //        it with cmpwi
     s32   n16C;                 // 0x16C  set to -1 by fn_8001D020
-    u8    unk170[0x17C - 0x170];
+    s32   n170;                 // 0x170  } the state queued for when fAnimTime reaches f174
+    f32   f174;                 // 0x174  }   (CharacterState_UpdateSKAState; fn_800958EC sets both)
+    u8    unk178[0x17C - 0x178];
     f32   fAnimTime;            // 0x17C
     f32   f180;                 // 0x180  fn_8001966C: fAnimTime = f180 + the blend's time - v1638[1]
     f32   fAnimEnd;             // 0x184  the animation's end time
-    u8    unk188[0x29C - 0x188];
+    u8    unk188[0x198 - 0x188];
+    f32   f198;                 // 0x198  } set to 0 and the animation time when state 8 starts
+    f32   f19C;                 // 0x19C  }   (CharacterState_UpdateSKAState)
+    u8    unk1A0[0x29C - 0x1A0];
     AnimPlayer anim29C;         // 0x29C  a second animation player
     s32   n3D4;                 // 0x3D4  the bytes of its CHR object before the animation library
     AnimLib* pLib;              // 0x3D8  its animation library
@@ -585,7 +602,8 @@ typedef struct Character {
     f32   afGroundHeight[4];    // 0x1774  }
     s32   n1784;                // 0x1784  set to -1 by Character_SetPosition
     Clip* pCurClip;             // 0x1788  the clip Char_SetClip picked
-    s32   n178C;                // 0x178C  cleared by fn_8001BE88
+    struct MtaLib* p178C;       // 0x178C  the MAL library the second player plays (fn_80095FD0);
+                                //         cleared by fn_8001BE88
     Clip* p1790;                // 0x1790  cleared by fn_80062BFC; CharacterState_AddSKABlendData plays it for
                                 //         groups 5, 6 and 10
     void* p1794;                // 0x1794  cleared by fn_80062BE8; the same for group 9
@@ -760,9 +778,9 @@ int   fn_80095780(Character* pChar);    // the animation playing
 int   fn_80095798(Character* pChar);
 void  fn_800957B0(Character* pChar, int a);
 void  fn_800957D8(Character* pChar);
-void  fn_800957FC(Character* pChar, int a);
-void  CharacterState_AddSKABlendData(Character* pChar, int a, int nGroup, SKABlendFn pfnBlend, int c, int d,
-                                     f32 f1, f32 f2, f32 f3, f32 f4, f32 f5);
+void  fn_800957FC(Character* pChar, u8 bReset);   // CharAnim.c: stop the second player
+void  CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKABlendFn pfnBlend, int nC,
+                                     int nAnim, f32 fStart, f32 fFrom, f32 fTo, f32 fOffset, f32 fTime);
 void  CharAnim_StartTapIn(Character* pChar);
 void  CharacterState_UpdateSKAState(Character* pChar);
 void  fn_800CC5C0(Character* pChar, char* pA, char* pB);   // an attachment (the glove) on / off
@@ -1014,7 +1032,8 @@ LAYOUT_ASSERT(MtaRecord, 0x2C);
 typedef struct MtaLib {
     u8     unk00[0x14];
     s32    nBytes;              // 0x14  the library's size (fn_8001F804 allocates it)
-    u8     unk18[0x20 - 0x18];
+    u8     unk18[4];
+    f32    f1C;                 // 0x1C  its end time (fn_80095FD0 plays it up to this)
     s32    nRecords;            // 0x20
     u8     unk24[0x30 - 0x24];
     MtaRecord* pRecords;        // 0x30

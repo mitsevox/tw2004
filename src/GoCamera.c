@@ -83,15 +83,15 @@ void fn_8007656C(CamLens* pLens, f32* pPos, f32* pTarget, f32* pSide) {
 }
 
 // Aims the lens like fn_8007646C, then scales the world by pScale around pCenter: m44 gets the
-// scale, m4 its inverse (1 / pScale, kept in v84).
+// scale, m4 its inverse (1 / pScale, kept in m84[0]).
 void fn_80076664(CamLens* pLens, f32* pPos, f32* pTarget, f32* pCenter, f32* pScale) {
     f32 vDir[4];
     f32 mB[4][4];
     f32 mA[4][4];
     f32 mTmp[4][4];
 
-    Vec_Copy(pScale, pLens->v94);
-    fn_80076A38(pLens->v94, pLens->v84);
+    Vec_Copy(pScale, pLens->m84[1]);
+    fn_80076A38(pLens->m84[1], pLens->m84[0]);
     pLens->m4[3][0] = pPos[0];
     pLens->m4[3][1] = pPos[1];
     pLens->m4[3][2] = pPos[2];
@@ -134,9 +134,9 @@ void fn_80076664(CamLens* pLens, f32* pPos, f32* pTarget, f32* pCenter, f32* pSc
     mTmp[3][1] = pCenter[1];
     mTmp[3][2] = pCenter[2];
     fn_8000ADC0(mB);
-    mB[0][0] = pLens->v84[0];
-    mB[1][1] = pLens->v84[1];
-    mB[2][2] = pLens->v84[2];
+    mB[0][0] = pLens->m84[0][0];
+    mB[1][1] = pLens->m84[0][1];
+    mB[2][2] = pLens->m84[0][2];
     fn_800BADF8(mB, mTmp, mA, 4);
     fn_8000ADC0(mTmp);
     mTmp[3][0] = -pCenter[0];
