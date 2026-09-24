@@ -137,6 +137,8 @@ void fn_8008EFC0(UINamedList* pList) {
 
     lbl_80281F04 = pList;
     for (i = 0; i < lbl_80281F04->nCount; i++) {
+        // fake match: the add goes through a local (in one expression the value and the offset
+        // come out in each other's registers)
         pName = lbl_80281F04->apNames[i];
         pName += (uptr)pList;
         lbl_80281F04->apNames[i] = pName;
@@ -155,7 +157,7 @@ void fn_8008EFFC(UStreamObject* pObject) {
     Mem_cpy(pData, pObject->pData, pObject->uSize);
     lbl_80281F08 = pData;
     for (i = 0; i < lbl_80281F08[0]; i++) {
-        uFont = lbl_80281F08[1 + i];
+        uFont = lbl_80281F08[1 + i];        // fake match: through a local, as in fn_8008EFC0
         uFont += (uptr)pData;
         lbl_80281F08[1 + i] = uFont;
         nSlot = UFont_FindFreeSlot();
