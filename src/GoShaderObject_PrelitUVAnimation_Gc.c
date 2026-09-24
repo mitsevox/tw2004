@@ -323,10 +323,12 @@ void fn_80071910(void) {
 // Init every shader type (ModuleHooks.pfn0): all rows in game types 4 to 8, else only those
 // lbl_801893D8 marks.
 void fn_80071914(void) {
+    Session* pSession = &gSession;
+    u8* pbRows = lbl_801893D8;
     int i;
 
     for (i = 0; i < 20; i++) {
-        if ((gSession.nGameType >= 4 && gSession.nGameType <= 8) || lbl_801893D8[i] != 0) {
+        if ((pSession->nGameType >= 4 && pSession->nGameType <= 8) || pbRows[i] != 0) {
             fn_80071A54(i);
         }
     }
@@ -334,10 +336,12 @@ void fn_80071914(void) {
 
 // Close every shader type (ModuleHooks.pfn4), the same rows as fn_80071914.
 void fn_80071994(void) {
+    Session* pSession = &gSession;
+    u8* pbRows = lbl_801893D8;
     int i;
 
     for (i = 0; i < 20; i++) {
-        if ((gSession.nGameType >= 4 && gSession.nGameType <= 8) || lbl_801893D8[i] != 0) {
+        if ((pSession->nGameType >= 4 && pSession->nGameType <= 8) || pbRows[i] != 0) {
             fn_80071A90(i);
         }
     }
