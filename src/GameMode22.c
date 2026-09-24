@@ -7,9 +7,13 @@
 #include "ball.h"
 #include "game.h"
 #include "engine.h"
+#include "game/frontend.h"
+#include "frontend/fe.h"
+#include "game/save.h"
+#include "game/modes/ladder.h"
+#include "game/modes/rte.h"
 #include "game/modes/mode22.h"
 
-void fn_80125BB8(const s32* pA, s32* pOut);
 void fn_801260B8(void);
 void fn_801260BC(void);
 void fn_80126130(void);
@@ -38,9 +42,58 @@ u8   fn_80127004(void);
 void fn_80127034(int nPlayer);
 s32 fn_80127098(s32 arg0);
 
-// A value mod 4 (a callback FE_MessageTable.c installs).
-void fn_80125BB8(const s32* pA, s32* pOut) {
-    *pOut = *pA % 4;
+// Message handler (FE_MessageTable.c): placeholder texts for a trophy's name and date.
+void fn_80125B38(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nA = pArgs[0].i;
+    s32 nB = pArgs[1].i;
+    char* szDate = ((MsgString*)pArgs[3].p)->pStr;
+
+    sprintf(((MsgString*)pArgs[2].p)->pStr, "trophy name %d %d", nA, nB);
+    sprintf(szDate, "date %d %d", nA, nB);
+}
+
+// Message handler (FE_MessageTable.c): the value mod 4.
+void fn_80125BB8(MsgArg* pArgs, MsgArg* pResult) {
+    pResult->i = pArgs[0].i % 4;
+}
+
+// Message handler (FE_MessageTable.c): the day the medal of challenge group n (1-based) was
+// earned, as text; empty for group 0 or no medal.
+void fn_80125BD8(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nGroup = pArgs[0].i;
+    char* szOut = ((MsgString*)pArgs[1].p)->pStr;
+    SaveProfile* pProfile = fn_80077ACC();
+
+    if (nGroup == 0) {
+        szOut[0] = '\0';
+        return;
+    }
+    if (pProfile->aMedal[nGroup - 1] != 3) {
+        fn_800D28DC(pProfile->aMedalDate[nGroup - 1], szOut);
+        return;
+    }
+    szOut[0] = '\0';
+}
+
+// Message handler (FE_MessageTable.c): a ladder event's course, and whether it is won.
+void fn_80125D08(MsgArg* pArgs, MsgArg* pResult) {
+    s32 nEvent = pArgs[0].i;
+    SaveProfile* pProfile = fn_80077ACC();
+
+    *(s32*)pArgs[1].p = fn_80102104(nEvent);
+    pResult->i = pProfile->aLadderAward[nEvent].bWon;
+}
+
+// Message handler (FE_MessageTable.c): fn_800F1154 of a won real-time event, else -1.
+void fn_80125D78(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = fn_80077ACC();
+    s32 nEvent = pArgs[0].i;
+
+    if (pProfile->aRTEAward[nEvent].bWon) {
+        pResult->i = fn_800F1154(nEvent);
+        return;
+    }
+    pResult->i = -1;
 }
 
 void fn_801260B8(void) {
