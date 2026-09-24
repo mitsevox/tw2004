@@ -5,12 +5,6 @@
 #include "golfer.h"
 #include "shadow.h"
 
-CamLens* fn_80076400(void);             // a new lens
-f32*  fn_80076ACC(void);                // a new screen rectangle
-void* fn_8001371C(CamLens* pLens, GoFrameBuf* pBuf, f32* pRect);   // a render camera from three parts
-void  fn_800137B0(void* pCamera);       // free a render camera
-void  fn_80076B18(f32* pRect);          // free a screen rectangle
-void  fn_8007644C(CamLens* pLens);      // free a lens
 void  fn_80076A54(f32* pRect);
 void  fn_80036054(void* pMesh, int n, s32* pDesc);   // Skin.c: set up a mesh object
 void  fn_800360A0(void* pMesh);                      // Skin.c: free it
@@ -22,7 +16,6 @@ void fn_800B2360(u8 nIntensity);
 void fn_800B24D0(int nWidth, int nHeight);
 void fn_800B26DC(void);
 void fn_800B2724(void);
-void fn_800B3438(f32* pRect, f32 x, f32 y);
 
 // Where the frame buffer is copied to: the screen copy's buffer.
 void fn_800B2314(void) {

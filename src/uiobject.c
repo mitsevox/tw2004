@@ -10,9 +10,6 @@
 #include "uiobject.h"
 
 void fn_80013E38(u8* p, s32 v);  // GoRenderCtx_Gc.c
-void fn_8007644C(CamLens* pLens);    // GoCamera.c: free a lens
-CamLens* fn_80076400(void);          // GoCamera.c: a new lens
-void fn_800768E0(void);
 void UI_Obj_InitModule(void);
 void fn_800AE338(void);
 void fn_800AE380(void);
@@ -39,7 +36,7 @@ void UI_Obj_InitModule(void) {
     lbl_801F5B98.a28[3] = 0.0f;
     fn_800AE380();
     lbl_802820CC = fn_80076400();
-    fn_800768E0();
+    fn_800768E0(lbl_802820CC);
     lbl_801F5B98.a0[0] = -0.345f;
     lbl_801F5B98.a0[1] = -0.23f;
     lbl_801F5B98.a0[2] = -3.13f;

@@ -575,7 +575,7 @@ s32   fn_800CDCE0(Skin* pSkin, int nSet, u64 uId);
 s32   fn_800CDD5C(Skin* pSkin, int nSet, const char* pName);
 s32   fn_800CDDB0(Skin* pSkin, int nSet, int nVariant, u64 uId);
 void  fn_8010E4DC(CharSliderDefs* pDefs, CharModel* pModel, Skin* pSkin, int nSliders, u8* aValues,
-                  u8* pNode);
+                  struct SKABlendNode* pNode);
                                         // applies slider values (Character.p17AC's definitions)
 void  fn_8010D454(CharSliderDefs* pDefs);   // CharSliders.c: frees slider definitions
 void  fn_800CE170(Skin* pSkin, SkinTarget* pTarget);

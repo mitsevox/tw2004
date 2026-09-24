@@ -135,7 +135,6 @@ void   fn_80075AD0(void);
 u8     fn_80075BF4(Video* pVideo);
 
 // GameAudio.c
-void fn_800A4BDC(void);
 u8   fn_800A7770(void);
 void fn_800A7994(void);
 void fn_800A79B4(void);

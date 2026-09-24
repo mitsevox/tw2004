@@ -7,7 +7,6 @@
 #include "charstate.h"
 #include "unsorted/cull.h"
 
-f32  fn_800BAFC0(f32* pSrc, f32* pDst);     // VecMath.c: normalises pSrc into pDst, gives its length
 f32  fn_800BAF58(f32* pSrc, f32* pDst);     // VecMath.c: normalises, gives the length (0 if near zero)
 void fn_80029BC8(f32* pVec);                // GoLighting.c
 void fn_801164D4(f32* pA, f32* pB, f32* pOut);
@@ -20,7 +19,6 @@ void fn_800561CC(f32* pOut);                // Ball.c: the wind's direction
 void SKEL_TransformBones(CharModel* pModel, u32* auBits);
 f32  fn_80116304(u32 nFrame, f32 fPhase, f32 fStrength);
 f32  fn_80116468(void);
-void fn_80008FCC(f32* pA, f32* pB, f32* pOut);                                // Quaternion.c
 void fn_8000914C(f32* pQ, f32 (*pMtx)[4]);                                    // Quaternion.c
 void fn_8000ADC0(f32 (*pMtx)[4]);                                             // identity
 void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);  // VecMath.c

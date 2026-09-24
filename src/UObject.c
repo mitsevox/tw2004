@@ -14,7 +14,6 @@ void fn_80048A84(UObjMesh* pMesh);
 UObjMesh* fn_80048AC4(UObjMesh* pMesh, int i);
 int  fn_80048AD4(UObjMesh* pMesh, int i);
 int  fn_80048AE8(UObject* pObj);
-CamLens* fn_8001F004(void);                 // the current camera's lens (its fFov is read)
 f32  fn_8001414C(u8* p);
 f32  fn_80014280(f32 f);
 void fn_8004B78C(CourseInfo* pCourse, f32* pPos);  // the ground's light at pPos

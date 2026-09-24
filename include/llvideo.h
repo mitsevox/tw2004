@@ -69,4 +69,7 @@ LAYOUT_ASSERT(VideoSlots, 0x28);
 extern VideoSlots* lbl_80281200;
 extern u8 lbl_80281EB8;                 // fn_80007258()'s value when the last movie started
 
+// Play the movie file pName; pfnStop(pVideo, nArg) nonzero stops it early.
+void fn_80075FB8(const char* pName, u8 (*pfnStop)(Video* pVideo, int nArg), int nArg, int nFlags);
+
 #endif
