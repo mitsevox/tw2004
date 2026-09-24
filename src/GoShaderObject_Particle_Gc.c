@@ -224,7 +224,71 @@ void fn_80094B84(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg) {
     *pMsg->u.age.pnLive = nLive;
 }
 
-void fn_80094E34(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg);
+void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // VecMath.c: a vector through a matrix
+
+// Emits pMsg's particles after the live ones of the buffer not being drawn (at most as many as
+// fit, less one). Their ages run from fAgeSpread down; unless the settings' flag 0x1000 keeps a
+// slot whose f18 is not 1024, each gets a new position and velocity through the matrix.
+void fn_80094E34(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg) {
+    u32 i;
+    u32 nTotal;
+    ParticleSystem* pSys;
+    ParticleVertex* pVert;
+    int nBuf;
+    int nFree;
+    f32 fAge;
+    Vec4 v;
+
+    pSys = pObject->pData;
+    nBuf = 1 - lbl_802813A8->b10;
+    nFree = pSys->nCount - pSys->anLive[nBuf];
+    if (nFree > 1) {
+        if (pMsg->u.emit.nCount == 0) {
+            return;
+        }
+        if (pMsg->u.emit.nCount > nFree - 1) {
+            pMsg->u.emit.nCount = nFree - 1;
+        }
+        i = pSys->anStart[nBuf] + pSys->anLive[nBuf];
+        if (i >= pSys->nCount) {
+            i -= pSys->nCount;
+        }
+        pSys->anLive[nBuf] += (u16)pMsg->u.emit.nCount;
+        nTotal = pMsg->u.emit.nCount;
+        do {
+            if (pMsg->u.emit.fAgeSpread != 0.0f) {
+                fAge = pMsg->u.emit.fAgeSpread * ((f32)pMsg->u.emit.nCount / (f32)nTotal);
+            } else {
+                fAge = 0.0f;
+            }
+            *((f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst + i) = fAge;
+            pVert = (ParticleVertex*)lbl_802813A8->apBuffers[nBuf] + pSys->nFirst + i;
+            if (!(pMsg->pParams->u58 & 0x1000) || pVert->f18 == 1024.0f) {
+                fn_80098CDC(pMsg->pParams, pVert->v0, pVert->vC, &pVert->f18, &pVert->f1C, &pVert->f20);
+                pVert->f20 *= 1.4142f;
+                v.x = pVert->v0[0];
+                v.y = pVert->v0[1];
+                v.z = pVert->v0[2];
+                v.w = 1.0f;
+                fn_800BAD60(pMsg->u.emit.pMtx, &v, &v);
+                Vec3Copy(&v.x, pVert->v0);
+                v.x = pVert->vC[0];
+                v.y = pVert->vC[1];
+                v.z = pVert->vC[2];
+                v.w = 1.0f;
+                fn_800BADB4(pMsg->u.emit.pMtx, &v.x, &v.x);
+                Vec3Copy(&v.x, pVert->vC);
+                // the next three slots get copies of it
+                Mem_cpy(pVert + 1, pVert, sizeof(ParticleVertex));
+                Mem_cpy(pVert + 2, pVert, 2 * sizeof(ParticleVertex));
+            }
+            if (++i == pSys->nCount) {
+                i = 0;
+            }
+            pMsg->u.emit.nCount--;
+        } while (pMsg->u.emit.nCount != 0);
+    }
+}
 
 // The message callback: pMsg->nWhat 0 ages the particles, 1 emits new ones.
 void fn_80095088(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg) {

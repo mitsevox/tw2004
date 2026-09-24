@@ -384,8 +384,9 @@ typedef struct ParticleShape {
 typedef struct ParticleVertex {
     f32  v0[3];                 // 0x00
     f32  vC[3];                 // 0x0C
-    u8   unk18[0x20 - 0x18];
-    f32  f20;                   // 0x20
+    f32  f18;                   // 0x18  } set by fn_80098CDC
+    f32  f1C;                   // 0x1C  }
+    f32  f20;                   // 0x20  }
 } ParticleVertex;
 LAYOUT_ASSERT(ParticleVertex, 0x24);
 
@@ -399,8 +400,17 @@ typedef struct ParticleMsg {
             f32  fStep;         // 0x0C  added to the age of each live one
             s32* pnLive;        // 0x10  gets how many are live after
         } age;
+        struct {
+            f32 (*pMtx)[4];     // 0x08  the new particles' positions and velocities go through it
+            u32  nCount;        // 0x0C  how many to emit; counted down to 0
+            u8   unk10[4];
+            f32  fAgeSpread;    // 0x14  the new particles' ages run from this down to 0
+        } emit;
     } u;
 } ParticleMsg;
+
+// UFstPart.c: a new particle's position, velocity and the three values after them.
+void fn_80098CDC(ParticleParams* pParams, f32* pPos, f32* pVel, f32* p18, f32* p1C, f32* p20);
 
 // A particle system (0xAC bytes, the shader object's pData): its run of particles in the particle
 // buffers (lbl_802813A8), and what it draws with.
