@@ -9,6 +9,9 @@
 #include "charstate.h"
 #include "endian.h"
 #include "platform.h"
+#include "ball.h"
+#include "terrain.h"
+#include "game.h"
 
 void  fn_80008380(void);
 void  fn_80016978(f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight);
@@ -34,9 +37,23 @@ u8    fn_8001EC48(Character* pChar);           // char.c
 void  fn_80035810(Character* pChar);
 void  fn_80035D10(Character* pChar, int nView);
 void  fn_80035F40(void* pCamera);
-void  fn_80036054(void* pMesh, int n, s32* pDesc);
-void  fn_800360A0(void* pMesh);
+void  fn_80036054(ShaderObject* pObj, int nRow, const void* pDesc);
+void  fn_800360A0(ShaderObject* pObj);
+void  fn_800360D4(ShaderObject* pObj);
+void  fn_80036100(ShaderObject* pObj, const void* pData, int n);
 void  fn_8003612C(LightGroup* pGroup);
+void  fn_8003614C(Character* pChar, f32* pOut);
+void  fn_80036180(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut, f32 fWeight);
+int   fn_80035A9C(void);
+void  fn_80035FBC(void);
+void  fn_80035FDC(UObject* pObj);
+void  fn_80035FFC(void);
+void  fn_80036024(f32 f);
+void  fn_80093824(void);                                     // goballfx.c
+f32   fn_8004B78C(CourseInfo* pCourse, f32* pPos);           // GoTerrainCollision.c: the ground's light
+void  fn_8003519C(int nRow, void* pData);                    // GoTerrain.c: calls row nRow's pfn8
+void  fn_80021980(u32* aA, u32* aB, u32* aOut, u32 nBits);   // Skeleton.c: aOut = aA | aB
+void  fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits);          // Skeleton.c
 void  fn_80036278(SkinModel44* pEntries, s32 nEntries);
 void  fn_80036344(SkinModel44* pEntries, s32 nEntries);
 void  fn_800363B4(SkinModel54* pEntries, s32 nEntries);
@@ -133,15 +150,129 @@ void fn_80035810(Character* pChar) {
     }
 }
 
+// Draws the character's skin: without flag 2, lit by the current course's light set (flag 4: set 3
+// instead, without the character's own light settings) and the ground's light under it; with flag
+// 2, only its "shadow" parts, through row 10 of lbl_80188E88.
+void fn_800358E0(Character* pChar, u32 uFlags) {
+    static f32 aRow10[4] = { 128.0f, 128.0f, 128.0f, 128.0f };
+    f32 aRoot[3];
+    f32 aData[4];
+    CharEntry44* pEntry;
+    u32 uSet3;
+    int nMode;
+    u32 uShadow;
+
+    if (pChar->p44 != NULL) {
+        pEntry = &pChar->p44[fn_80035A9C()];
+    } else {
+        pEntry = NULL;
+    }
+    uShadow = uFlags & 2;
+    if (!uShadow) {
+        uSet3 = uFlags & 4;
+        if (uSet3) {
+            fn_80035338(3);
+        } else {
+            fn_80035338(0);
+            if (pEntry != NULL) {
+                // port: Character.p44's entries are what lighting.h calls LightParams
+                fn_80093854((LightParams*)pEntry);
+            }
+        }
+        if (!uSet3) {
+            fn_80093824();
+        }
+        fn_8003614C(pChar, aRoot);
+        fn_80036024(0.5f * fn_8004B78C(fn_8000C594(), aRoot) + 0.5f);
+        fn_80035FFC();
+        fn_80035308();
+    }
+    fn_800352E4();
+    fn_80035FDC(NULL);
+    if (uShadow) {
+        nMode = 2;
+    } else if (pChar->n1654 != 1) {
+        nMode = 1;
+    } else {
+        nMode = 2;
+    }
+    if (uShadow) {
+        Vec_Copy(aRow10, aData);
+        switch (nMode) {
+        case 2:
+            fn_80035138(1);
+            break;
+        case 1:
+            fn_80035138(1);
+            break;
+        default:
+            fn_80035138(0);
+            break;
+        }
+        fn_80012EF8();
+        fn_8003519C(10, aData);
+        fn_80035640(pChar);
+    } else {
+        switch (nMode) {
+        case 2:
+            fn_80035138(1);
+            break;
+        case 1:
+            fn_80035138(1);
+            break;
+        default:
+            fn_80035138(0);
+            break;
+        }
+        fn_80012EF8();
+        fn_80035754(pChar);
+    }
+    fn_80035FBC();
+}
+
+// The current course, except on course 7, where fn_80015464's value picks another.
+int fn_80035A9C(void) {
+    int nCourse;
+
+    nCourse = Game_GetCourse();
+    if (nCourse == 7) {
+        switch (fn_80015464()) {
+        case 0:
+            return nCourse;
+        case 1:
+            return 0x16;
+        case 2:
+            return 0x17;
+        case 3:
+            return 0xD;
+        case 4:
+            return 9;
+        case 5:
+            return 0x10;
+        case 6:
+            return 0x14;
+        case 7:
+            return 8;
+        case 15:
+        case 16:
+        case 17:
+            return 0x18;
+        default:
+            return 0xD;
+        }
+    }
+    return nCourse;
+}
+
 // Sets up the triangles' mesh objects, one per view.
 void fn_80035C58(void) {
-    s32 aDesc[2];
+    DynRenderSize size;
     int i;
 
-    aDesc[0] = 3;
-    aDesc[1] = 1;
+    size.nMaxVerts = 3;
+    size.nMaxDraws = 1;
     for (i = 0; i < 2; i++) {
-        fn_80036054(lbl_801D4E78.aMesh[i], 0x13, aDesc);
+        fn_80036054(&lbl_801D4E78.aMesh[i], 0x13, &size);
     }
 }
 
@@ -150,7 +281,7 @@ void fn_80035CC0(void) {
     int i;
 
     for (i = 0; i < 2; i++) {
-        fn_800360A0(lbl_801D4E78.aMesh[i]);
+        fn_800360A0(&lbl_801D4E78.aMesh[i]);
     }
 }
 
@@ -183,23 +314,64 @@ void fn_80036024(f32 f) {
     fn_8003532C()->group.v18[0] = f;
 }
 
-void fn_800360A0(void* arg0) {
-    s32 (*temp_r12)();
+// Sets up a shader object for row nRow of lbl_80188E88, handing its hooks pDesc.
+void fn_80036054(ShaderObject* pObj, int nRow, const void* pDesc) {
+    pObj->nRow = nRow;
+    pObj->pHooks = &lbl_80188E88[nRow].shader;
+    pObj->pHooks->pfnInit(pObj, pDesc);
+}
 
-    temp_r12 = (*(s32 (**)())((u8*)((*(void**)((u8*)(arg0) + 0x24))) + 4));
-    if (temp_r12 != NULL) {
-        temp_r12(arg0);
+// Frees it, if its row has a free hook.
+void fn_800360A0(ShaderObject* pObj) {
+    if (pObj->pHooks->pfnFree != NULL) {
+        pObj->pHooks->pfnFree(pObj);
     }
+}
+
+// Draws it.
+void fn_800360D4(ShaderObject* pObj) {
+    pObj->pHooks->pfnDraw(pObj);
+}
+
+// Hands it a frame's data.
+void fn_80036100(ShaderObject* pObj, const void* pData, int n) {
+    pObj->pHooks->pfnFill(pObj, pData, n);
 }
 
 void fn_8003612C(LightGroup* pGroup) {
     fn_8006E7A4(pGroup);
 }
 
-// pObj's type is not known yet: the one fn_800358E0 is handed.
-void fn_8003614C(void* pObj, f32* pOut) {
-    if (pObj != NULL) {
-        Vec_Copy((f32*)(*(u8**)(*(u8**)((u8*)pObj + 0x38) + 4) + 0x1C), pOut);
+// Copies the character's root bone position to pOut.
+void fn_8003614C(Character* pChar, f32* pOut) {
+    if (pChar != NULL) {
+        Vec_Copy(pChar->pModel->pBones[0].v1C, pOut);
+    }
+}
+
+// Blends the morph weights of two format 1 poses into pOut, fWeight of the way from pA to pB, for
+// each morph either sets; the morphs pOut gets are those of both, and pA's and pB's are cleared.
+void fn_80036180(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut, f32 fWeight) {
+    u32 aBits[4];   // only 20 bits are used; the size is not known
+    SkelPoseBlock* pBlockA;
+    SkelPoseBlock* pBlockB;
+    SkelPoseBlock* pBlockOut;
+    int i;
+    int j;
+
+    for (i = 0; i < 3; i++) {
+        pBlockA = &pA->aBlocks[i];
+        pBlockB = &pB->aBlocks[i];
+        pBlockOut = &pOut->aBlocks[i];
+        fn_80021980(pBlockA->aBits, pBlockB->aBits, aBits, 20);
+        fn_80029EF4(aBits, pBlockOut->aBits, 20);
+        for (j = 0; j < 20; j++) {
+            if (fn_8001E9CC(aBits, j)) {
+                pBlockOut->af8[j] = fWeight * (pBlockB->af8[j] - pBlockA->af8[j]) + pBlockA->af8[j];
+            }
+        }
+        fn_8001E938(pBlockA->aBits, 20);
+        fn_8001E938(pBlockB->aBits, 20);
     }
 }
 

@@ -608,7 +608,7 @@ Skin* fn_800377FC(u8* pData, u8 b);     // Skin.c: makes a skin from its file
 // Skin.c's triangles (lbl_801D4E78, 0xF0 bytes; our name, layout from fn_80035D10): per view a
 // mesh object and three vertices' positions, texture coordinates, colours and indexes.
 typedef struct SkinTris {
-    u8   aMesh[2][0x28];        // 0x00  (fn_80035C58 sets them up with fn_80036054, fn_80035CC0 frees them)
+    ShaderObject aMesh[2];      // 0x00  (fn_80035C58 sets them up with fn_80036054, fn_80035CC0 frees them)
     f32  aPos[2][3][3];         // 0x50
     f32  aUV[2][3][2];          // 0x98
     u8   aColor[2][3][4];       // 0xC8

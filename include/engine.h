@@ -471,6 +471,25 @@ typedef struct ParticleSystem {
 } ParticleSystem;
 LAYOUT_ASSERT(ParticleSystem, 0xAC);
 
+// A shader object (our name; 0x28 bytes): a mesh a module fills and draws each frame through the
+// shader-object hooks of its row of lbl_80188E88 (Skin.c's fn_80036054 sets it up, fn_800360A0
+// frees it, fn_80036100 fills it, fn_800360D4 draws it).
+typedef struct ShaderObject ShaderObject;
+
+typedef struct ShaderObjectHooks {
+    void  (*pfnInit)(ShaderObject* pObj, const void* pDesc);        // 0x00
+    void  (*pfnFree)(ShaderObject* pObj);                           // 0x04  may be NULL
+    void  (*pfnDraw)(ShaderObject* pObj);                           // 0x08
+    void  (*pfnFill)(ShaderObject* pObj, const void* pData, int n); // 0x0C
+} ShaderObjectHooks;
+
+struct ShaderObject {
+    s32   nRow;                 // 0x00  its row of lbl_80188E88
+    u8    unk4[0x20];           // 0x04  the row's own data (rows 0 and 19: a DynRenderObject)
+    ShaderObjectHooks* pHooks;  // 0x24  that row's hooks
+};
+LAYOUT_ASSERT(ShaderObject, 0x28);
+
 // One row of lbl_80188E88 (our name; 20 rows of 0x44 bytes): a module's hooks. The main loop
 // (gomainloop.c) calls each row's pfnC..pfn20 at six points of a frame (fn_8006DDA8 and its
 // neighbours), skipping NULL ones; fn_8003519C calls a row's pfn8 with data. Rows 0 and 1 hold
@@ -484,7 +503,8 @@ typedef struct ModuleHooks {
     void  (*pfn18)(void);         // 0x18  fn_8006DE68
     void  (*pfn1C)(void);         // 0x1C  fn_8006DF68
     void  (*pfn20)(void);         // 0x20  fn_8006DEE8
-    u8    unk24[0x44 - 0x24];
+    u8    unk24[0x34 - 0x24];
+    ShaderObjectHooks shader;     // 0x34  its shader objects' hooks
 } ModuleHooks;
 LAYOUT_ASSERT(ModuleHooks, 0x44);
 
