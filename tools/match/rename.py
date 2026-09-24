@@ -11,7 +11,8 @@ Nothing is written unless every line passes:
     capture or shadow it);
   - no two lines share a current name or a new name.
 Then the name is replaced on its symbols.txt line and as a whole word in every .c/.h/.inc file under
-src/ and include/ (comments too). Line endings and encoding are kept. The build proves the rest:
+src/ and include/ (comments too), except right after "TW06:", "TW06's" or "TW06 " (optionally with
+a return type): that records TW06's own name and stays. Line endings and encoding are kept. The build proves the rest:
 run configure + ninja (main.dol: OK) and compare the exact functions by address.
 
 --refs-only is for a branch that was started before a rename: symbols.txt already has the new name,
@@ -116,10 +117,17 @@ def main():
             sym_lines[i] = new + sym_lines[i][len(old):]
         if not dry:
             write(SYMS, '\n'.join(sym_lines))
+    tw06_ref = re.compile(r"TW06(?:'s|:)?\s+(?:[A-Za-z_]\w*\s*\**\s*)?$")
+
+    def sub_keeping_tw06(regex, new, text):
+        # "TW06: GM_Foo" records TW06's own name for the function: history, not a reference to
+        # our symbol, so it stays when our name changes
+        return regex.sub(lambda m: m.group(0) if tw06_ref.search(text[max(0, m.start() - 40):m.start()])
+                         else new, text)
     for p, t in files.items():
         u = t
         for _, _, old, new in rows:
-            u = pat[old].sub(new, u)
+            u = sub_keeping_tw06(pat[old], new, u)
         if u != t:
             changed += 1
             if not dry:
