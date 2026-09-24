@@ -1,16 +1,24 @@
-// GoShaderObject_Rain_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): not
-// yet decompiled; the sweep code below is the matched small functions.
+// GoShaderObject_Rain_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): the
+// rain shader object. Partly decompiled.
 
 #include "game_types.h"
+#include "engine.h"
+#include "rain.h"
 
-// ---- sweep code (not yet cleaned up) ----
-
+void fn_800B4B5C(void);
 void fn_800B4BB0(void);
 void fn_800B4BB4(void);
-extern s32 lbl_802814B8;
 void fn_800B4BB8(void);
 void fn_800B4BD8(void);
 void fn_800B4BFC(void);
+
+void fn_800B4B5C(void) {
+    lbl_802814B8->n0 = 0;
+    lbl_802814B8->n4 = 0;
+    lbl_802814B8->f8 = fn_80029B64(3075.0f);
+    lbl_802814B8->pBank = NULL;
+    lbl_802814B8->pTex = NULL;
+}
 
 void fn_800B4BB0(void) {
 }
@@ -19,18 +27,16 @@ void fn_800B4BB4(void) {
 }
 
 void fn_800B4BB8(void) {
-    *(s32*)((u8*)lbl_802814B8) = 0;
-    *(s32*)(((u8*)lbl_802814B8) + 0x4) = (1 - *(s32*)(((u8*)lbl_802814B8) + 0x4));
+    lbl_802814B8->n0 = 0;
+    lbl_802814B8->n4 = 1 - lbl_802814B8->n4;
 }
 
 void fn_800B4BD8(void) {
-    *(s32*)((u8*)lbl_802814B8) = ((((*(s32*)((u8*)lbl_802814B8) + 1) & 0x1) ^ ((u32)(*(s32*)((u8*)lbl_802814B8) + 1) >> 31)) - ((u32)(*(s32*)((u8*)lbl_802814B8) + 1) >> 31));
+    lbl_802814B8->n0 = (lbl_802814B8->n0 + 1) % 2;
 }
 
 void fn_800B4BFC(void) {
 }
-
-// ---- end of sweep code ----
 
 // ---- sweep code (not yet cleaned up) ----
 
