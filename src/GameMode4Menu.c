@@ -43,11 +43,8 @@ void fn_80121458(MsgArg* pArgs, MsgArg* pResult) {
 // goes by the last name).
 void fn_80121488(int nGolfer, char* szOut) {
     GolferRecord* pRecord = fn_80077A80(nGolfer);
-    int bNick = 0;
+    int bNick = strcmp(pRecord->szNick, "NA") != 0 && strlen(pRecord->szNick) > 1 && nGolfer != 18;
 
-    if (strcmp(pRecord->szNick, "NA") != 0 && strlen(pRecord->szNick) > 1 && nGolfer != 18) {
-        bNick = 1;
-    }
     if (bNick) {
         sprintf(szOut, "\"%s\"", pRecord->szNick);
     } else {
@@ -168,19 +165,14 @@ u8 fn_801218EC(int nRegion) {
 
 // Has the player won every event of the region?
 u8 fn_801218FC(int nRegion) {
-    int bWon;
     int nProfile = fn_80077B08();
 
     if (fn_801218EC(nRegion)) {
         return fn_80102204(nProfile, 24);
     }
-    bWon = 0;
-    if (fn_80102204(nProfile, lbl_801946B0[nRegion * 3]) &&
-        fn_80102204(nProfile, lbl_801946B0[nRegion * 3 + 1]) &&
-        fn_80102204(nProfile, lbl_801946B0[nRegion * 3 + 2])) {
-        bWon = 1;
-    }
-    return bWon;
+    return fn_80102204(nProfile, lbl_801946B0[nRegion * 3]) &&
+           fn_80102204(nProfile, lbl_801946B0[nRegion * 3 + 1]) &&
+           fn_80102204(nProfile, lbl_801946B0[nRegion * 3 + 2]);
 }
 
 // Has the player won every event but the final?
