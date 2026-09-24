@@ -432,3 +432,19 @@ void fn_80029C3C(f32* pA, f32* pB, f32* pOut) {
     pOut[3] = pA[3] - pB[3];
 }
 #endif
+
+// Copies a bit array of nBits bits (whole words) from pSrc to pDst, when both are given.
+void fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits) {
+    u32 nWords;
+    u32 i;
+
+    if (pDst != NULL) {
+        if (pSrc == NULL) {
+            return;
+        }
+        nWords = (nBits + 31) >> 5;
+        for (i = 0; i < nWords; i++) {
+            pDst[i] = pSrc[i];
+        }
+    }
+}
