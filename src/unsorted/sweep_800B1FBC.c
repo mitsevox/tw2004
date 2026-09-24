@@ -2,19 +2,15 @@
 
 #include "game_types.h"
 
-s32 fn_800B13FC();
-s32 fn_800B14E4();
+int fn_800B13FC(s32* pnPort, s32* pnSlot);
+int fn_800B14E4(s32* pnPort, s32* pnSlot);
 
-void fn_800B1FBC(u8* p0, u8* p1);
-void fn_800B1FFC(u8* p0, u8* p1);
-void fn_800B1FBC(u8* p0, u8* p1) {
-    s32 t0;
-    t0 = fn_800B14E4(*(s32*)p0, *(s32*)(p0 + 0x4), p0);
-    *(s32*)p1 = (t0 & 0xFF);
+void fn_800B1FBC(s32** p0, s32* p1);
+void fn_800B1FFC(s32** p0, s32* p1);
+void fn_800B1FBC(s32** p0, s32* p1) {
+    *p1 = (u8)fn_800B14E4(p0[0], p0[1]);
 }
 
-void fn_800B1FFC(u8* p0, u8* p1) {
-    s32 t0;
-    t0 = fn_800B13FC(*(s32*)p0, *(s32*)(p0 + 0x4), p0);
-    *(s32*)p1 = (t0 & 0xFF);
+void fn_800B1FFC(s32** p0, s32* p1) {
+    *p1 = (u8)fn_800B13FC(p0[0], p0[1]);
 }
