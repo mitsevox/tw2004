@@ -44,7 +44,8 @@ typedef struct PsEmitter {
     u8   unk54[0x58 - 0x54];
     s32  n58;                   // 0x58  cleared by fn_80099B74
     s8   b5C;                   // 0x5C  cleared by fn_80098BDC
-    u8   unk5D[0x84 - 0x5D];
+    u8   unk5D[0x60 - 0x5D];
+    u8   a60[0x84 - 0x60];      // 0x60  handed to the mesh draw (fn_800990BC); its layout is not known
     f32  f84;                   // 0x84  the radius fn_80099AE4 tests it with (over 1000: always)
     u8   unk88[0xB4 - 0x88];
     s32  nB4;                   // 0xB4  below 0: fn_80098BDC frees the emitter
@@ -56,6 +57,16 @@ typedef struct PsEmitter {
     u8   unkF0[0x180 - 0xF0];
     u8   mesh[0x28];            // 0x180 a mesh object (Skin.c)
 } PsEmitter;
+
+// What fn_800990BC hands an emitter's mesh (our name): Skin.c's fn_80036100 passes it on.
+typedef struct PsEmitterDraw {
+    s32  n0;                    // 0x00  1
+    u8*  p4;                    // 0x04  the emitter's a60
+    PsEmitter* pEmitter;        // 0x08
+    s32  nC;                    // 0x0C  fn_800990BC's n, also added to the emitter's n50
+    f32  f10;                   // 0x10  } fn_800990BC's two floats
+    f32  f14;                   // 0x14  }
+} PsEmitterDraw;
 
 // UFstPart.c's six fixed emitters.
 extern PsEmitter* lbl_801DB888[6];

@@ -9,6 +9,7 @@
 // Skin.c
 void fn_800360A0(void* pMesh);
 void fn_800360D4(u8* pMesh);
+void fn_80036100(u8* pMesh, void* pDesc, int n);
 
 void fn_80098BDC(PsEmitter* pEmitter);
 // Sort the list (next pointer in word n of each emitter?) by pfnCompare; not yet decompiled.
@@ -63,6 +64,20 @@ void fn_80098C70(void) {
     lbl_801DB888[3]->uB8 |= 0x80000000;
     lbl_801DB888[4]->uB8 |= 0x80000000;
     lbl_801DB888[5]->uB8 |= 0x80000000;
+}
+
+// Draw the emitter's mesh (with n and the two floats), and add n to its n50.
+void fn_800990BC(PsEmitter* pEmitter, int n, f32 fA, f32 fB) {
+    PsEmitterDraw draw;
+
+    draw.n0 = 1;
+    draw.p4 = pEmitter->a60;
+    draw.pEmitter = pEmitter;
+    draw.nC = n;
+    draw.f10 = fA;
+    draw.f14 = fB;
+    fn_80036100(pEmitter->mesh, &draw, 1);
+    pEmitter->n50 += n;
 }
 
 // Whether fn_80099BA0 passes the emitter: always with a radius over 1000, else unless
