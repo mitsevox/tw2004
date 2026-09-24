@@ -101,7 +101,8 @@ typedef struct Skeleton {
     u8   unk10C8[0x10D4 - 0x10C8];
     f32  q10D4[4];              // 0x10D4  a rotation (quaternion) given by fn_80027808
     s32  n10E4;                 // 0x10E4  set to 4 as a swing starts
-    u8   unk10E8[0x112C - 0x10E8];
+    f32  a10E8[4][4];           // 0x10E8  per leg, the last good bend axis (Character_IKLegToGround)
+    u8   unk1128[0x112C - 0x1128];
     s32  n112C;                 // 0x112C  } the character's club class and n16D4 (fn_8001C860)
     s32  n1130;                 // 0x1130  }
 } Skeleton;
@@ -124,7 +125,9 @@ typedef struct CharModel {
     Bone*     pBones;           // 0x004
     f32     (*pMatrices)[4][4]; // 0x008  one per bone (fn_8001EED8 gives a bone's index); row 3 is its
                                 //        position
-    u8        unkC[0x34 - 0xC];
+    f32       fC;               // 0x00C  } lengths Character_UpdateTestPoints sets points 0-3 out by
+    f32       f10;              // 0x010  } along the leg bones' axes when the skin has no a1048
+    u8        unk14[0x34 - 0x14];
     BonePose* pPoses;           // 0x034  one per bone; freed with the model
     Skeleton* pSkel;            // 0x038
     u8        aBone[0x59];      // 0x03C  each bone id's index (fn_8001EED8), 0xFF none; fn_80029664
@@ -157,17 +160,17 @@ typedef struct CharModel {
 // down through its children (fn_80114270).
 typedef struct DynChainLink {
     f32  fLength;               // 0x00  to its parent bone in the rest pose (0.5 unless type 0)
-    f32  v04[4];                // 0x04  its matrix's position when set up
-    u8   unk14[0x24 - 0x14];
-    f32  v24[4];                // 0x24  set by fn_80029BC8
-    u8   unk34[0x44 - 0x34];
+    f32  v04[4];                // 0x04  its matrix's position when set up; the updates move it
+    f32  v14[4];                // 0x14  v04 as the last update left it (fn_80114540)
+    f32  v24[4];                // 0x24  set by fn_80029BC8; the updates keep a velocity in it
+    f32  v34[4];                // 0x34  from its bone to the next one's position (fn_80114A84)
     f32  q44[4];                // 0x44  } its rest pose's rotation, twice
     f32  q54[4];                // 0x54  }
     f32  v64[4];                // 0x64  } and position, twice
     f32  v74[4];                // 0x74  }
     s32  nBone;                 // 0x84
     s32  nParent;               // 0x88  its bone's parent
-    f32  f8C;                   // 0x8C
+    f32  f8C;                   // 0x8C  fn_80114540 keeps the link's stretch in it
 } DynChainLink;
 LAYOUT_ASSERT(DynChainLink, 0x90);
 
@@ -176,7 +179,7 @@ typedef struct DynChain {
     s32  nLinks;                // 0x04
     DynChainLink* pLinks;       // 0x08
     s32  nType;                 // 0x0C  0..3: which update runs (fn_8011443C)
-    s32  n10;                   // 0x10
+    s32  n10;                   // 0x10  its kind, 0..5 (fn_80115348 indexes the settings by it)
     s32  n14;                   // 0x14  } counters the updates advance
     s32  n18;                   // 0x18  }
     u8   bReset;                // 0x1C  set up the links again on the next update
@@ -185,19 +188,13 @@ typedef struct DynChain {
 LAYOUT_ASSERT(DynChain, 0x20);
 
 // Twelve values of DynChainSettings, twice (fn_80113E60 sets both the same way).
+// Each is per link (fn_80115348 indexes them by the link; a chain of more than three links reads
+// on into the next array).
 typedef struct DynChainParams {
-    f32  f0;                    // 0x00
-    f32  f4;                    // 0x04
-    f32  f8;                    // 0x08
-    f32  fC;                    // 0x0C
-    f32  f10;                   // 0x10
-    f32  f14;                   // 0x14
-    f32  f18;                   // 0x18
-    f32  f1C;                   // 0x1C
-    f32  f20;                   // 0x20
-    f32  f24;                   // 0x24
-    f32  f28;                   // 0x28
-    f32  f2C;                   // 0x2C
+    f32  a0[3];                 // 0x00  the sway's size, in degrees
+    f32  aC[3];                 // 0x0C  the sway's period, in minutes (60 * FRAME_RATE frames)
+    f32  a18[3];                // 0x18  the sway's phase, in turns
+    f32  a24[3];                // 0x24  an angle added to the sway, in degrees
 } DynChainParams;
 
 // The chains' settings (lbl_802824F8, made by fn_80113E60; DynChain.c's updates read them).
@@ -218,19 +215,16 @@ typedef struct DynChainSettings {
     f32  f90;                   // 0x90  how much fn_80116304's sway takes off 1
     f32  f94;                   // 0x94  } the base fn_80116304 adds, from f94 to f98 as its
     f32  f98;                   // 0x98  } fStrength goes from 0 to 35
-    s32  n9C;                   // 0x9C
-    s32  nA0;                   // 0xA0
-    s32  nA4;                   // 0xA4
-    s32  nA8;                   // 0xA8
-    s32  nAC;                   // 0xAC
-    s32  nB0;                   // 0xB0
-    s32  nB4;                   // 0xB4
+    s32  an9C[6];               // 0x9C  per chain kind (DynChain.n10): fn_80115348 sways it
+    s32  nB4;                   // 0xB4  fn_80115348's wind direction: 0 the wind's, else a fixed one
     s32  nB8;                   // 0xB8  the strength fn_80116468 gives; -1: fn_80055F80's
     s32  nBC;                   // 0xBC
 } DynChainSettings;
 LAYOUT_ASSERT(DynChainSettings, 0xC0);
 
 extern DynChainSettings* lbl_802824F8;
+extern f32 lbl_80193DE8[6][4];  // DynChain.c: a direction per chain kind, in the model's root space
+extern f32 lbl_80193E48[6];     // DynChain.c: an angle per chain kind, in degrees (fn_80115B2C)
 
 // A clip's header (the fields used here). In a file, pD0 marks the end of the header and
 // uAram points at the end of the key data; once a clip's frames are streamed out, uAram is
@@ -240,7 +234,8 @@ typedef struct Clip {
     s32    n04;                 // 0x04  bytes of the second frame stream
     u8     unk08[4];
     s16    nFrames;             // 0x0C
-    u8     unk0E[0xE];
+    u8     unk0E[0xA];
+    f32    f18;                 // 0x18  fn_8001BE88 blends up to it
     s32    n1C;                 // 0x1C
     u8     unk20[0xC];
     s32    n2C;                 // 0x2C
@@ -248,7 +243,9 @@ typedef struct Clip {
     s32    n38;                 // 0x38  bytes of the first frame stream
     s32    n3C;                 // 0x3C
     s32    n40;                 // 0x40
-    u8     unk44[8];
+    u8     unk44[4];
+    s16    nEvents;             // 0x48  how many pEvents holds
+    u8     unk4A[2];
     s32    n4C;                 // 0x4C
     s32    n50;                 // 0x50
     u8     unk54[0x10];
@@ -259,10 +256,12 @@ typedef struct Clip {
     s16    n8E;                 // 0x8E  bytes per frame, second stream
     u64    u90;                 // 0x90  looked up in lbl_801B9638 (FEgolferanim.c fn_8008D058)
     u8     unk98[8];
-    char   name[0x30];          // 0xA0
+    char   name[0x2C];          // 0xA0
+    f32    fCC;                 // 0xCC  how far along the swing is, 0..1 (Character.fBackswing copies it)
     u8*    pD0;                 // 0xD0
-    struct ClipD4* pD4;         // 0xD4
-    u32    uD8;                 // 0xD8  nonzero: FEgolferanim.c turns the golfer round for it
+    struct ClipEvent* pEvents;  // 0xD4  its timed events (fn_8001F02C finds one by its id)
+    struct BlendClip* pD8;      // 0xD8  fn_800204A0 samples it; set: FEgolferanim.c turns the
+                                //       golfer round for the clip
     u32    uAram;               // 0xDC
     u8     unkE0[4];
     u8*    pE4;                 // 0xE4
@@ -295,6 +294,8 @@ extern UMemPool* lbl_80281E94;
 extern UMemPool* lbl_80281E90;
 extern UMemPool* lbl_80281E8C;
 extern UMemPool* lbl_80281E88;
+// animblender.c: clear bit nBit in the three blocks of pNode's format 1 pose buffer, and its sources'.
+void fn_800736D8(SKABlendNode* pNode, s32 nBit);
 void fn_80071F58(struct SKABlendNode** ppNode, u8 bFreeSources);   // animblender.c: gives a blend
                                         // tree back (bFreeSources: the sources' clips too)
 
@@ -325,7 +326,7 @@ struct SKABlendNode {
             SKABlendNode* apChild[2];       // 0x24
         } blend;                            // nType 1
         struct {
-            void* pSrc;                     // 0x20  a ClipBlend for nFormat 0 (fn_8001F02C)
+            void* pSrc;                     // 0x20  a Clip for nFormat 0 (fn_8001F02C)
             f32   fFrom;                    // 0x24
             f32   fTo;                      // 0x28
         } src;                              // nType 0
@@ -335,33 +336,21 @@ struct SKABlendNode {
 };
 LAYOUT_ASSERT(SKABlendNode, 0x30);
 
-// A clip as the swing reads it through a ClipBlend; only what the swing reads.
+// What Clip.pD8 points at; only what the swing reads.
 typedef struct BlendClip {
     u8   unk0[8];
     f32  f08;                   // 0x08  added to the time fn_800204A0 samples the clip at
     f32  f0C;                   // 0x0C
 } BlendClip;
 
-// One of a ClipBlend's timed events (fn_8001F02C finds one by its id). Event 2's time is the
-// ball-hit time the swing measures.
+// One of a clip's timed events (Clip.pEvents; fn_8001F02C finds one by its id). Event 2's time is
+// the ball-hit time the swing measures (fn_8001C860 starts the skeleton's clip at it).
 typedef struct ClipEvent {
     u32  uId;                   // 0x0
     f32  fTime;                 // 0x4
     u8   unk8[8];
 } ClipEvent;
 LAYOUT_ASSERT(ClipEvent, 0x10);
-
-// What Character.pBlend points at: two clips and how far along the blend is; only what the swing
-// reads.
-typedef struct ClipBlend {
-    u8   unk0[0x48];
-    s16  nEvents;               // 0x48  how many pEvents holds
-    u8   unk4A[0xCC - 0x4A];
-    f32  fCC;                   // 0xCC  how far along it is, 0..1 (Character.fBackswing copies it)
-    u8   unkD0[4];
-    ClipEvent* pEvents;         // 0xD4
-    BlendClip* pD8;             // 0xD8  fn_800204A0 samples it
-} ClipBlend;
 
 // One of a character's four data buffers (Character.buffers): pBuf holds three runs of 16-byte
 // entries, p0C..p18 mark where they start and end, their counts read from p04's +0x60, +0x58 and
@@ -380,9 +369,9 @@ LAYOUT_ASSERT(CharBuffer, 0x1C);
 // An animation player; only what is read. Character has two: the one at 0x164, whose fields are
 // named in Character directly, and anim29C.
 typedef struct AnimPlayer {
-    u8    unk0[4];
+    s32   n00;                  // 0x00  } reset to 0 and -1 by fn_8001BE88
     s32   uFlags;               // 0x04  fn_8007325C sets bit 2, fn_8007326C clears bits 1 and 2
-    u8    unk8[4];
+    s32   n08;                  // 0x08  }
     s32   nC;                   // 0x0C  } set together by fn_800958EC
     f32   f10;                  // 0x10  }
     u8    unk14[4];
@@ -413,12 +402,6 @@ extern CharModelDefs lbl_80280E18;
 // Per club class, an offset (x, y, z) fn_8001C860 places the golfer by (0x4C bytes: one more
 // float follows the six).
 extern f32 lbl_80187184[6][3];
-
-// What Clip.pD4 points at; only what the code reads.
-typedef struct ClipD4 {
-    u8    unk0[0x24];
-    f32   f24;                  // 0x24  fn_8001C860 starts the skeleton's clip at it
-} ClipD4;
 
 // The golfer's character object (0x1798 bytes or more); only the fields read so far. Anim_SetRate,
 // Anim_SetTime and fn_8007326C take the address of its animation player at 0x164, whose fields
@@ -498,7 +481,7 @@ typedef struct Character {
     s32   n5CC;                 // 0x5CC
     u8    unk5D0[0x1614 - 0x5D0];
     char  sz1614[16];           // 0x1614  a name the situation scripts test (fn_800BB7AC)
-    ClipBlend* pBlend;          // 0x1624
+    Clip* pBlend;               // 0x1624
     f32   fBackswing;           // 0x1628  how far along the backswing is, 0..1 (pBlend's fCC, copied every
                                 //         frame of the backswing; the swing's power is its square root)
     f32   f162C;                // 0x162C
@@ -506,18 +489,25 @@ typedef struct Character {
     f32   f1634;                // 0x1634
     f32   v1638[3];             // 0x1638
     f32   f1644;                // 0x1644
-    u8    unk1648[0x1654 - 0x1648];
+    u8    unk1648[0x1650 - 0x1648];
+    s32   n1650;                // 0x1650  cleared by fn_8001942C
     s32   n1654;                // 0x1654  (fn_8001EE90)
     s32   n1658;                // 0x1658
     f32   f165C;                // 0x165C  } scaled by the view's lens (fn_8001EE00, fn_8001ED44)
     f32   f1660;                // 0x1660  }
-    u8    unk1664[0x1698 - 0x1664];
+    f32   f1664;                // 0x1664  } fn_8001B878: 1 near the camera, fading to 0 from 6 to 15
+    f32   v1668[3];             // 0x1668  } its bounding sphere, tested against the camera
+    f32   f1674;                // 0x1674  } (fn_8001B878)
+    f32   vMin[4];              // 0x1678  } the box around its bones (fn_8001B644), grown by 0.33;
+    f32   vMax[3];              // 0x1688  } v1668 and f1674 are its centre and half its diagonal
+    u8    unk1694[0x1698 - 0x1694];
     s32   n1698;                // 0x1698
     s32   nClubClass;           // 0x169C  the club class for clip lookups (Char_SetClip; 1 looks up as 0)
     s32   nClubHeadBone;        // 0x16A0  bone 0x53's index: the club head (the swing trail's end)
     s32   nGripBone;            // 0x16A4  bone 0x52's index: the grip (the trail's other end)
     s32   n16A8;                // 0x16A8  fn_8001EEE4's answer for bone 0x15
-    u8    unk16AC[0x16CC - 0x16AC];
+    f32   q16AC[4];             // 0x16AC  } the grip bone's rotation and offset from the root while
+    f32   v16BC[4];             // 0x16BC  } flag 0x4000 holds it (fn_8001BD18)
     s32   nClub;                // 0x16CC  the club (fn_8001C774)
     s32   nShotKind;            // 0x16D0  the player's shot kind (fn_8001C724)
     s32   n16D4;              // 0x16D4  the key for clip lookups (Char_SetClip)
@@ -532,7 +522,7 @@ typedef struct Character {
     f32   afGroundHeight[4];    // 0x1774  }
     s32   n1784;                // 0x1784  set to -1 by Character_SetPosition
     Clip* pCurClip;             // 0x1788  the clip Char_SetClip picked
-    u8    unk178C[0x1790 - 0x178C];
+    s32   n178C;                // 0x178C  cleared by fn_8001BE88
     Clip* p1790;                // 0x1790  cleared by fn_80062BFC; CharacterState_AddSKABlendData plays it for
                                 //         groups 5, 6 and 10
     void* p1794;                // 0x1794  cleared by fn_80062BE8; the same for group 9
@@ -544,7 +534,8 @@ typedef struct Character {
                                 //         fn_8001A9F4); fn_8001DC64 applies them
     void (*pfn17B0)(void);      // 0x17B0  called by Character_UpdateAnimation before the bones are
                                 //         transformed; cleared by fn_8001942C
-    u8    unk17B4[0x17B8 - 0x17B4];
+    u8    b17B4;                // 0x17B4  cleared by fn_8001942C
+    u8    unk17B5[0x17B8 - 0x17B5];
     struct SkinChoices* pChoices;   // 0x17B8  its look (fn_8001D4A4 dresses it from this); fn_8001A20C
                                     //         puts its logos on the model (fn_8001744C)
 } Character;
@@ -579,6 +570,7 @@ void  Character_SetClubStatesForCharacter(Character* pChar, int nSlot, struct Sk
 extern f32 lbl_801C6498[4];             // the identity rotation (quaternion), set by fn_80029530
 extern u8  lbl_802810A6;                // IK on (fn_80027738); off, the IK functions do nothing
 extern u8  lbl_8018742C[42][2];         // pairs of standard bones (fn_80029804 reads the first 41)
+extern f32 lbl_80186838[4];             // a zero vector (fn_80029BC8 copies it)
 
 // AnimStream.c: the animation groups it streams clips for (groups 1 and 5, the reactions), and the
 // index each has in its tables.
@@ -666,8 +658,10 @@ int   fn_8001EE88(Character* pChar);    // n1658
 int   fn_8001EE90(Character* pChar);
 int   fn_8001EED8(CharModel* pModel, int nBone);    // a bone's index
 int   fn_8001EEE4(CharModel* pModel, int nBone);
-f32   fn_8001F02C(struct ClipBlend* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
+f32   fn_8001F02C(struct Clip* pClip, u64 uEvent);   // an event's time (by its 64-bit id)
 void  Anim_SetRate(u8* pAnim, f32 fRate);           // 0x8001F084
+// Plays a clip on the character: blended in from the current one, or (bNoBlend) from scratch.
+void  fn_8001BE88(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime);
 void  fn_8001E85C(f32* pSrc, f32* pDst);            // copy a quaternion
 void  SKEL_SetIKSolutionWeight(Skeleton* pSkel, f32 f);
 void  fn_80027108(Skeleton* pSkel);                                         // Skeleton.c
@@ -923,6 +917,44 @@ typedef struct MalBank {
     MalGroup aGroup[3];         // 0x04
 } MalBank;
 LAYOUT_ASSERT(MalBank, 0x1C);
+
+// An animation library as fn_8001F110 byte-swaps and links it in place (MtaLib, MtaRecord and
+// MtaEntry are our names): a 0x34-byte header, its records, each record's entries, then each
+// entry's data (4-byte aligned). An entry is a track of one value per frame, a byte each: frame
+// byte b gives fLo + (fHi - fLo) * b / 256 (fn_8001F32C).
+typedef struct MtaEntry {
+    u8     unk00[0x20];
+    s32    nMorph;              // 0x20  the morph whose weight it drives (SkelPoseBlock.af8); < 0: none
+    s32    nBytes;              // 0x24  the bytes of its data
+    s32    nLastFrame;          // 0x28
+    f32    fFrameTime;          // 0x2C  the time per frame
+    u8     unk30[4];
+    f32    fLo;                 // 0x34
+    f32    fHi;                 // 0x38
+    u8*    pData;               // 0x3C  a byte per frame
+    u8     unk40[0x48 - 0x40];
+} MtaEntry;
+LAYOUT_ASSERT(MtaEntry, 0x48);
+
+typedef struct MtaRecord {
+    u8     unk00[0x20];
+    s32    nBlock;              // 0x20  its block of the pose buffer (SkelPose1.aBlocks)
+    s32    nEntries;            // 0x24
+    MtaEntry* pEntries;         // 0x28
+} MtaRecord;
+LAYOUT_ASSERT(MtaRecord, 0x2C);
+
+typedef struct MtaLib {
+    u8     unk00[0x14];
+    s32    nBytes;              // 0x14  the library's size (fn_8001F804 allocates it)
+    u8     unk18[0x20 - 0x18];
+    s32    nRecords;            // 0x20
+    u8     unk24[0x30 - 0x24];
+    MtaRecord* pRecords;        // 0x30
+} MtaLib;
+LAYOUT_ASSERT(MtaLib, 0x34);
+
+MtaLib* fn_8001F110(MtaLib* pLib, s32* pnSize);    // char.c: swap and link a library; *pnSize: its bytes
 
 MalBank* fn_8001F760(int nBank);
 void*    fn_8001F79C(MalBank* pBank, int nGroup, int n);

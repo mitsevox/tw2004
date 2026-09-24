@@ -34,10 +34,22 @@ typedef struct Ter_PatchReference {
 LAYOUT_ASSERT(Ter_PatchReference, 0x34);
 
 // An object to sort by distance (0x30 bytes; TW06: Ter_ObjectReference, 0x24, the same up to 0x14).
+// From 0x1C on the fields carry TW06's names by their use (fn_80031AB4); TW06 keeps them elsewhere.
 typedef struct Ter_ObjectReference {
-    u8   unk0[0x10];
+    struct UObjMesh* apObject[3];   // 0x00  its model at each level of detail (fn_80031E58). TW06:
+                                //       pObject
+    struct Ter_PatchReference* pContainerPatch; // 0x0C  the patch it is in (fn_80031154). TW06: the same
     f32  fDistanceSquared;      // 0x10  the sort key (fn_8003185C, smallest first). TW06: the same
-    u8   unk14[0x30 - 0x14];
+    f32  f14;                   // 0x14  } fn_80031E58 draws it opaque when f14 is beyond
+    f32  f18;                   // 0x18  }   fXZDistanceToClosestBallSquared and f18 is above 0
+    s8   nLODs;                 // 0x1C  how many levels of detail its model has. TW06: nLODs
+    s8   iOpaqueLOD;            // 0x1D  the level drawn opaque. TW06: iOpaqueLOD
+    s8   iTranslucentLOD;       // 0x1E  the level faded in over it. TW06: iTranslucentLOD
+    u8   unk1F;
+    f32  fAlpha;                // 0x20  how far the fade has gone, 0..1. TW06: fAlpha
+    s32  iGlobalObjectIndex;    // 0x24  its row of pObjectStateList. TW06: iGlobalObjectIndex
+    s32  eClipMethod;           // 0x28  TW06: eClipMethod
+    u8   unk2C[0x30 - 0x2C];
 } Ter_ObjectReference;
 LAYOUT_ASSERT(Ter_ObjectReference, 0x30);
 
@@ -62,13 +74,20 @@ LAYOUT_ASSERT(Ter_ObjectDrawData, 0x20);
 // The state of one course object (0x40 bytes; TW06: Ter_ObjectState, 0x2C, laid out differently).
 // Found by patch: iPatchFirstObjectInstanceIndex[patch] + the object's number in it.
 typedef struct Ter_ObjectState {
-    u8   unk0[0x10];
+    f32  f0;                    // 0x00  fn_80030254: fTreeMinPeriod plus a random share of fTreeDiffPeriod
+    f32  f4;                    // 0x04  handed to row 2 or 3 of fn_8003519C (fn_80032F88), 0.5 the rest;
+                                //       fTreeOverdrive at first
+    f32  f8;                    // 0x08
+    s32  nC;                    // 0x0C
     f32  f10;                   // 0x10  } fn_800335F8 resets f14 to f10, or to 0 with n18
     f32  f14;                   // 0x14  }
     s32  n18;                   // 0x18
     s32  n1C;                   // 0x1C
     s32  a20[4];                // 0x20  four flag words read from the object's model (fn_800354D0, 0..3)
-    u8   unk30[0x40 - 0x30];
+    struct {
+        f32  f0;                // 0x0   fn_80031E58 sets 1 and n4 3 when it draws the object opaque
+        s32  n4;                // 0x4
+    } aView[2];                 // 0x30  one per view (Ter_TerrainRendererMgr.iCurrentViewContext)
 } Ter_ObjectState;
 LAYOUT_ASSERT(Ter_ObjectState, 0x40);
 
@@ -194,6 +213,21 @@ LAYOUT_ASSERT(TerSettings, 0x54);
 extern Ter_TerrainRendererMgr lbl_801D3CB0;
 extern TerSettings* lbl_802811E0;    // Code8006F154.c: points at lbl_801D70A8
 extern TerSettings lbl_801D70A8;
+// A step of a crowd member's move from one pose state to another (0x14 bytes; fn_80033744): when its
+// states are n0 and n4, f4 is eased toward fC, and once there it goes to state n8 with f4 = f10.
+typedef struct TerPoseStep {
+    s32  n0;                    // 0x00
+    s32  n4;                    // 0x04
+    s32  n8;                    // 0x08
+    f32  fC;                    // 0x0C
+    f32  f10;                   // 0x10
+} TerPoseStep;
+
+extern TerPoseStep lbl_801877E0[6]; // fn_80033744: for objects without bit 0x40 of word 3
+extern TerPoseStep lbl_80187858[2]; // fn_80033744: for objects with it
+extern f32 lbl_80281D60;           // fn_80030254's random number, 0..1, stepped once per object
+extern s32 lbl_801D3A30[5][32];     // [n][k]: how many of k's lowest n bits are set (fn_80030254);
+                                    // fn_80032B7C picks a ground's mesh by it
 
 void fn_8006F334(TerSettings* pSettings);   // Code8006F154.c: the default colours
 extern f32 lbl_801876D8[21][3];     // rows fn_80034648 copies into fDefaultObjectMipmapBias
@@ -221,6 +255,5 @@ u8   fn_800347B4(struct UStreamObject* pObject);   // a pin's position (TerPosDa
 void fn_80035118(int a, int b);     // renderer state: n10 and n14
 void fn_80035138(int a);            // renderer state: uFC
 struct UObjMesh* fn_80034A20(u16 nPatch, u16 nObjList);    // a course object's model
-f32* fn_8003526C(void);             // the renderer camera's screen rectangle (fn_80012EF0)
 
 #endif

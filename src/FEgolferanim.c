@@ -116,14 +116,12 @@ void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
 void fn_80035098(u8 b);
 void fn_80016E90(int nView);
-void fn_8001BE88(Character* pChar, Clip* pClip, int bNoBlend, f32 f);
 void fn_800352BC(void);
 void fn_80035754(Character* pChar);
 void fn_80035810(Character* pChar);
 void fn_80035FBC(void);
 void fn_80035FDC(void);
 void fn_800760B0(int nX, int nY, int nWidth, int nHeight);
-void fn_8008F24C(void);
 void fn_800364A0(void);
 void fn_800B9EB8(char* szBall);
 void fn_8001A024(Character* pChar);
@@ -132,7 +130,6 @@ void fn_80035600(void);
 void Character_UpdateAnimation(Character* pChar, int a, f32 f);
 void fn_80035B40(Character* pChar, int n);
 void fn_80035FFC(void);
-void Session_SetupProfiles(void);
 void fn_80079974(void);
 void fn_800B9CF0(int n);
 void fn_800CEE88(u8 b);
@@ -1323,7 +1320,7 @@ void fn_8008DD50(u8 bNoBlend) {
     } else {
         pClip = fn_8008E02C();
     }
-    if (pClip->uD8 != 0) {
+    if (pClip->pD8 != NULL) {
         if (!fn_8001EDF4(lbl_80281EE0->pB4->pChar) && fn_80077ACC()->choices.n113 != 0) {
             fn_8008E2F8(0, PI);
         }
@@ -1489,7 +1486,7 @@ u8 fn_8008E468(char* szAnim, char* szShot, u8 bNoBlend) {
         if (pClip == NULL) {
             return 0;
         }
-        if (pClip->uD8 != 0) {
+        if (pClip->pD8 != NULL) {
             if (!fn_8001EDF4(lbl_80281EE0->pB4->pChar) && fn_80077ACC()->choices.n113 != 0) {
                 fn_8008E2F8(0, PI);
             }

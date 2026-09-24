@@ -137,12 +137,12 @@ LAYOUT_ASSERT(SkinDescB8, 0x10);
 typedef struct SkinDesc {
     s32  nVersion;              // 0x000  8
     s32  n04;                   // 0x004
-    u8   unk08[4];
+    s32  n08;                   // 0x008  a burnt one's size, in bytes (fn_80111850)
     u32  uFlags;                // 0x00C  bit 1: its offsets are pointers now
     s32  n10;                   // 0x010  entries in p14 and p18
     SkinDesc14* p14;            // 0x014
     u8*  p18;                   // 0x018  0x1C bytes each
-    u8   unk1C[4];
+    s32  n1C;                   // 0x01C  entries in p20
     s32* p20;                   // 0x020
     s32  n24;                   // 0x024  entries in p28
     SkinDesc28* p28;            // 0x028
@@ -156,11 +156,11 @@ typedef struct SkinDesc {
     SkinDesc44* p44;            // 0x044
     s32  nParts;                // 0x048
     SkinPartDef* pParts;        // 0x04C
-    u8   unk50[4];
+    s32  nVariants;             // 0x050
     SkinVariant* pVariants;     // 0x054
     s32  n58;                   // 0x058  entries in p5C
     SkinDesc5C* p5C;            // 0x05C
-    u8   unk60[4];
+    s32  nLinks;                // 0x060
     SkinLink* pLinks;           // 0x064
     s32  n68;                   // 0x068  entries in p6C
     s32* p6C;                  // 0x06C  entries of p44, -1 none
@@ -168,17 +168,20 @@ typedef struct SkinDesc {
     SkinDesc74* p74;            // 0x074
     s32  n78;                   // 0x078  entries in p7C
     SkinDesc7C* p7C;            // 0x07C
-    u8   unk80[4];
+    s32  n80;                   // 0x080  entries in p84 (fn_80111850 clears both)
     u64* p84;                   // 0x084  name codes
     s32  n88;                   // 0x088  entries in p8C
     SkinDesc8C* p8C;            // 0x08C
-    u8   unk90[0x9C - 0x90];
+    s32  n90;                   // 0x090  entries in p94
+    u8*  p94;                   // 0x094  0x50 bytes each
+    u8   unk98[4];
     u8*  p9C;                   // 0x09C
-    u8   unkA0[4];
-    u8*  pA4;                   // 0x0A4
-    u8   unkA8[4];
-    u8*  pAC;                   // 0x0AC
-    u8   unkB0[0xB8 - 0xB0];
+    s32  nA0;                   // 0x0A0  entries in pA4
+    u8*  pA4;                   // 0x0A4  2 bytes each
+    s32  nA8;                   // 0x0A8  entries in pAC
+    u8*  pAC;                   // 0x0AC  2 bytes each
+    u8   unkB0[4];
+    s32  nB4;                   // 0x0B4  entries in pB8
     SkinDescB8* pB8;            // 0x0B8
     u8   unkBC[0x120 - 0xBC];
 } SkinDesc;
@@ -426,6 +429,22 @@ typedef struct SkinMeshIter {
 } SkinMeshIter;
 LAYOUT_ASSERT(SkinMeshIter, 0x20);
 
+// Where a mesh's data goes by its flags (fn_801136C4 fills it in; our name, its users are not
+// decompiled yet).
+typedef struct SkinMeshRefs {
+    u16  n0;                    // 0x00  } flag 2: the two numbers fn_801136C4 is given, and the data
+    u16  n2;                    // 0x02  }   (fn_801132C4 draws n2 of p4's u16 indices from n0 on)
+    void* p4;                   // 0x04  }
+    s32  n8;                    // 0x08  } flag 0x200000: the mesh's count and data
+    void* pC;                   // 0x0C  }
+    s32  n10;                   // 0x10  } flags 1 and 0x10: the mesh's count and data
+    void* p14;                  // 0x14  }
+    s32  n18;                   // 0x18  } flags 1 and 0x40: the mesh's count and its data's third
+    void* p1C;                  // 0x1C  }   part (after n10 bits and n10 words when 0x10 is set)
+    f32  f20;                   // 0x20  fn_801132C4 scales the positions by it
+    // The size is not known past 0x24.
+} SkinMeshRefs;
+
 // The whole iterator fn_80113A9C and fn_80113B34 build (our name): the SkinDesc.p6C entries of one
 // SkinDesc.p5C entry. fn_80113B34's kind walks each entry's meshes with a SkinMeshIter in sub.
 typedef struct SkinDescIter {
@@ -498,12 +517,22 @@ typedef struct SkinTarget {
 } SkinTarget;
 
 // What Character.p16D8 points at; only what SkinPart.c reads.
+// An 8-byte record fn_8001B208 makes for each skin of a CharSkinSet (fn_8001B1DC fills it;
+// CharSkinRef is our name).
+typedef struct CharSkinRef {
+    s32  n0;                    // 0x0  8
+    Skin* pSkin;                // 0x4
+} CharSkinRef;
+
 typedef struct CharSkinSet {
-    u8   unk0[0xC];
+    s32  n0;                    // 0x00  cleared by fn_8001B208
+    u8   unk4[4];
+    s32  nCount;                // 0x08  how many club classes the 'CLB ' object holds
     f32  afC[6];                // 0x0C  per club class: the club head bone's height (fn_8001C5B4)
     Skin* apSkins[6];           // 0x24
-    u8   unk3C[0x9C - 0x3C];
-    void* a9C[6];               // 0x9C  freed with fn_8001B1E8 (fn_8001B58C)
+    f32  a3C[6][4];             // 0x3C  per club class: a point on the club, through bone 0x52's matrix
+                                //       (Character_UpdateTestPoints: aPoints[4])
+    CharSkinRef* a9C[6];        // 0x9C  freed with fn_8001B1E8 (fn_8001B58C)
 } CharSkinSet;
 
 // A pool of seven entries characters take (fn_8001A418) and give back (fn_8001A3B0).
@@ -546,7 +575,7 @@ s32   fn_800CDCE0(Skin* pSkin, int nSet, u64 uId);
 s32   fn_800CDD5C(Skin* pSkin, int nSet, const char* pName);
 s32   fn_800CDDB0(Skin* pSkin, int nSet, int nVariant, u64 uId);
 void  fn_8010E4DC(CharSliderDefs* pDefs, CharModel* pModel, Skin* pSkin, int nSliders, u8* aValues,
-                  u8* pNode);
+                  struct SKABlendNode* pNode);
                                         // applies slider values (Character.p17AC's definitions)
 void  fn_8010D454(CharSliderDefs* pDefs);   // CharSliders.c: frees slider definitions
 void  fn_800CE170(Skin* pSkin, SkinTarget* pTarget);

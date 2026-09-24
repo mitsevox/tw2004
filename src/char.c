@@ -24,8 +24,10 @@ void  fn_8001A75C(UStreamObject* pObject);
 void  fn_8001A798(void);
 void  fn_8001A7C8(void);
 Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, SkinChoices* pChoices);
-void* fn_8001B208(u8* pData);
+CharSkinSet* fn_8001B208(u8* pData);
 Character* fn_8001942C(void);
+void  fn_80072D90(void* pAnim);                                 // animblender.c: reset a player
+s32   fn_800962F8(Character* pChar);                            // CharAnim.c
 void  fn_800184E4(Character* pChar, Skin* pSkin);
 void  fn_80018710(Character* pChar);
 void  fn_8001DC64(Character* pChar, SkinChoices* pChoices);
@@ -40,7 +42,8 @@ void  fn_80037AB8(Skin* pSkin, CharModel* pModel, int nBone, int nId);   // Skin
 void  fn_800CC4EC(Character* pChar);                // SkinPart.c
 void* CharSlider_CreateDefinitionsFromMem(u8** ppData);
 void  fn_8001B58C(CharSkinSet* pSet);
-void  fn_8001B878(Character* pChar, int n);
+void  fn_8001B878(Character* pChar, int nPlayer);
+f32 (*fn_8001EE64(Character* pChar))[4];                        // bone 1's matrix
 Character* fn_8001C21C(Character* pChar);
 void  Character_UpdateAnimation(Character* pChar, int a, f32 f);
 void  Character_UpdateTestPoints(Character* pChar);
@@ -62,8 +65,11 @@ void  fn_800BBADC(int nValue);         // SitDevFile.c
 void  fn_8001EBD8(Character* pChar, int nBone, f32* pPos);
 u8    fn_8001EC48(Character* pChar);
 f32   fn_8001ED44(Character* pChar, int b);
+f32   fn_8001EE00(Character* pChar, int b);
 void  fn_80017DDC(Character* pChar);
-void  fn_8001899C(Character* pChar, int a, int b);
+void  fn_8001899C(Character* pChar, u8 bLegA, u8 bLegB);
+void  Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, int nBoneA, int nBoneB,
+                              int nBoneC, int nBoneD, int nPoint, int b);
 void  fn_8001B644(Character* pChar);
 void  fn_8001C860(Character* pChar);
 void  fn_80021978(u8 v);                                        // ska_shared.c
@@ -77,7 +83,10 @@ void  fn_80073108(Character* pChar, int nPlayer, void* pAnim, SKABlendNode* pNod
 void  fn_8009622C(Character* pChar, void* pClip, u8 bKeep, f32 fOffset);                  // CharAnim.c
 void  fn_80096F0C(Character* pChar);                            // CharAnim.c
 void  fn_8000914C(f32* pQ, f32 (*m)[4]);                        // Quaternion.c: a rotation matrix
-void  fn_8001BD18(Character* pChar, Clip* pClip);
+int   fn_8001BD18(Character* pChar, Clip* pClip);
+void  fn_80008F20(f32* pQ, f32* pOut);                          // Quaternion.c
+void  fn_800090E4(f32* pQ, f32* pIn, f32* pOut);                // Quaternion.c: a vector turned by pQ
+void  fn_80009410(f32 fAngle, f32* pOut);                       // Quaternion.c
 void  fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, int n, f32 fTime);
 void  fn_800280E8(Character* pChar, f32* pPos, int bPlace);     // Skeleton.c
 void  fn_8001EFB4(f32* pA, f32* pB, f32* pOut);
@@ -92,6 +101,7 @@ void  fn_80029968(CharModel* pModel, SkelPose* pPose);          // Skeleton.c
 void  fn_8000AB40(f32 (*pSrc)[4], f32 (*pDst)[4]);              // UMemPool.c
 void  fn_8001EDA8(Character* pChar, int nBone, f32* pPos);
 void  fn_8001EF54(f32* pA, f32* pB, f32* pOut);
+void  fn_8001EF10(f32* pA, f32* pB, f32* pOut);
 void  fn_80095558(void);
 void  AnimLib_ApplyOverlays(int nSlot);                         // skalib.c
 void  fn_80025478(void);                                        // skalib.c
@@ -108,7 +118,6 @@ void  fn_8001EFD8(f32* pA, f32* pB, f32* pOut);
 f32 (*fn_8001EC6C(Character* pChar, int nBone))[4];
 f32 (*fn_8001ECA8(Character* pChar, int nBone))[4];
 f32   fn_8001EFFC(CamLens* pLens);
-CamLens* fn_8001F004(void);
 void  fn_80027738(u8 bOn);
 void  fn_80035C58(void);
 void  fn_80035CC0(void);
@@ -143,7 +152,11 @@ void  fn_800106B8(u8 b);                // LLTexGrp.c
 void  fn_8008F310(void);                // uiLoadFile.c: park the UI file's data in ARAM
 void* fn_8008F354(void);                // uiLoadFile.c: the UI file's buffer
 void  fn_8008F35C(void);                // uiLoadFile.c: bring the UI file's data back
-void  fn_8001BE88(Character* pChar, Clip* pClip, int bNoBlend, f32 f);
+void  fn_800720C8(Character* pChar, SKABlendNode* pNew, SKABlendNode** ppNode, f32* pBlend,
+                  SKABlendFn pfnBlend, int b);                                         // animblender.c
+void  fn_800724C0(SKABlendNode* pNode, SKABlendNode* pNew, Clip* pClip, f32 fWeight);  // animblender.c
+void  fn_800732F4(void* pNode, void* pAnim, f32 fTime);                                // CharAnim.c
+void  fn_801141F8(struct DynChain* pChain, CharModel* pModel);                         // DynChain.c
 void  fn_80035600(void);                // GoTerrain.c
 void  fn_80035604(void);                // GoTerrain.c
 void  fn_800358E0(Character* pChar, u32 uFlags);
@@ -158,13 +171,13 @@ void  fn_80112CEC(void);
 // ---- sweep code (not yet cleaned up) ----
 void fn_8001E8A4(u32* aBits, u32 nBits);
 void fn_8001E938(u32* aBits, u32 nBits);
-void fn_8001B1DC(s32 p0, u8* p1, s32 p2);
+void fn_8001B1DC(Skin* pSkin, CharSkinRef* pRef, s32 n);
 void fn_8001B1E8(void* p);
 void fn_8001C650(void* arg0, s32 arg1);
 
-void fn_8001B1DC(s32 p0, u8* p1, s32 p2) {
-    *(s32*)p1 = p2;
-    *(s32*)(p1 + 0x4) = p0;
+void fn_8001B1DC(Skin* pSkin, CharSkinRef* pRef, s32 n) {
+    pRef->n0 = n;
+    pRef->pSkin = pSkin;
 }
 
 void fn_8001B1E8(void* p) {
@@ -195,7 +208,7 @@ void fn_80017508(Character* pChar) {
 
 // Sets the character's animation events from the blend's, fStart later. Events 5..14 are only
 // taken when their time is past 0.
-void fn_800175B0(Character* pChar, ClipBlend* pBlend, f32 fStart) {
+void fn_800175B0(Character* pChar, Clip* pBlend, f32 fStart) {
     u32 uId;
     int i;
 
@@ -362,6 +375,50 @@ f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNor
     return -65536.125f;
 }
 
+// Moves a golfer's test points with its bones: points 0-3 from the skin's leg points through the
+// leg bones' matrices (or, without them, set out along the bones' axes by the model's fC and f10),
+// point 4 from the club class's club point through bone 0x52's matrix.
+void Character_UpdateTestPoints(Character* pChar) {
+    f32 (*pClubMtx)[4];
+    f32 (*pMtx48)[4];
+    f32 (*pMtx3A)[4];
+    f32 (*pMtx47)[4];
+    f32 (*pMtx39)[4];
+    f32 fA;
+    f32 fB;
+
+    if (!fn_8001EC48(pChar)) {
+        return;
+    }
+    pClubMtx = fn_8001ED08(pChar, 0x52);
+    if (pChar->pSkin->b1044) {
+        pMtx48 = fn_8001EC6C(pChar, 0x48);
+        pMtx3A = fn_8001EC6C(pChar, 0x3A);
+        pMtx47 = fn_8001EC6C(pChar, 0x47);
+        pMtx39 = fn_8001EC6C(pChar, 0x39);
+        fn_800BAD60(pMtx3A, (Vec4*)pChar->pSkin->a1048[0], (Vec4*)pChar->aPoints[0]);
+        fn_800BAD60(pMtx48, (Vec4*)pChar->pSkin->a1048[1], (Vec4*)pChar->aPoints[1]);
+        fn_800BAD60(pMtx39, (Vec4*)pChar->pSkin->a1048[2], (Vec4*)pChar->aPoints[2]);
+        fn_800BAD60(pMtx47, (Vec4*)pChar->pSkin->a1048[3], (Vec4*)pChar->aPoints[3]);
+    } else {
+        fA = 0.8f * pChar->pModel->f10;
+        fB = 0.8f * pChar->pModel->fC;
+        pMtx48 = fn_8001EC6C(pChar, 0x48);
+        pMtx3A = fn_8001EC6C(pChar, 0x3A);
+        pMtx47 = fn_8001EC6C(pChar, 0x47);
+        pMtx39 = fn_8001EC6C(pChar, 0x39);
+        fn_8000AE6C(pMtx3A[3], pMtx3A[1], pChar->pModel->f10, pChar->aPoints[0]);
+        fn_8000AE6C(pMtx48[3], pMtx48[1], pChar->pModel->fC, pChar->aPoints[1]);
+        fn_8000AE6C(pMtx39[3], pMtx3A[2], fA, pChar->aPoints[2]);
+        fn_8000AE6C(pMtx47[3], pMtx48[2], fB, pChar->aPoints[3]);
+        fn_8000AE6C(pChar->aPoints[0], pMtx3A[2], 0.25f * fA, pChar->aPoints[0]);
+        fn_8000AE6C(pChar->aPoints[1], pMtx48[2], 0.25f * fB, pChar->aPoints[1]);
+    }
+    if (pChar->p16D8 != NULL && pClubMtx != NULL) {
+        fn_800BAD60(pClubMtx, (Vec4*)pChar->p16D8->a3C[pChar->nClubClass], (Vec4*)pChar->aPoints[4]);
+    }
+}
+
 // Keeps the club out of the ground: when point 4 is below the terrain and bone 0x52's y axis
 // points into the slope, that axis is shortened by how far the point is under, measured against
 // the club class's head height (not below 3/4 of it).
@@ -406,8 +463,8 @@ void fn_80017DDC(Character* pChar) {
 void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     u32 auBits[4];
     int bC860 = 0;
-    int bLegA = 0;
-    int bLegB = 0;
+    u8 bLegA = 0;
+    u8 bLegB = 0;
     int i;
 
     if (pChar == NULL) {
@@ -620,6 +677,277 @@ void fn_80018710(Character* pChar) {
     }
 }
 
+// A golfer is dropped to 0.01 below the lowest of its four ground heights (the test points move
+// with it) and a179C set to the average ground normal; any other character stands on the ground
+// under its root bone (the ground below it, if the one found is more than 1 above).
+void Character_PlaceFeetOnGround(Character* pChar) {
+    CourseInfo* pCourse;
+    f32 fLowest;
+    f32 fY;
+    f32 fDelta;
+    f32* pPos;
+    int i;
+    f32 fLow;
+    f32 fHigh;
+    SurfaceType* pSurfLow;
+    SurfaceType* pSurfHigh;
+    f32 vNormalLow[4];
+    f32 vNormalHigh[4];
+
+    if (pChar == NULL) {
+        return;
+    }
+    pCourse = fn_8000C594();
+    if (pCourse == NULL) {
+        return;
+    }
+    fLowest = 1073741824.0f;
+    if (fn_8001EC48(pChar)) {
+        pChar->a179C[0] = 0.0f;
+        pChar->a179C[1] = 0.0f;
+        pChar->a179C[2] = 0.0f;
+        pChar->a179C[3] = 0.0f;
+        for (i = 0; i < 4; i++) {
+            fn_8001EF54(pChar->aGroundNormal[i], pChar->a179C, pChar->a179C);
+            if (pChar->afGroundHeight[i] < fLowest) {
+                fLowest = pChar->afGroundHeight[i];
+            }
+        }
+        fn_800BAF04(pChar->a179C, pChar->a179C);
+        if (fLowest < -60000.0f) {
+            return;
+        }
+        fY = fLowest - 0.01f;
+        fDelta = fY - pChar->pModel->pBones[0].v1C[1];
+        pChar->pModel->pBones[0].v1C[1] = fY;
+        pChar->aPoints[0][1] += fDelta;
+        pChar->aPoints[1][1] += fDelta;
+        pChar->aPoints[2][1] += fDelta;
+        pChar->aPoints[3][1] += fDelta;
+        pChar->aPoints[4][1] += fDelta;
+        return;
+    }
+    pPos = pChar->pModel->pBones[0].v1C;
+    Ter_GetEnclosingGroundData(pCourse, pPos, &fLow, &pSurfLow, vNormalLow, &fHigh, &pSurfHigh,
+                               vNormalHigh);
+    fY = fHigh;
+    if (fHigh < -60000.0f || fHigh > 1.0f + pPos[1]) {
+        fY = (fLow < -60000.0f) ? pPos[1] : fLow;
+    }
+    if (fY > 131072.25f || fY < -131072.25f) {
+        return;
+    }
+    pChar->pModel->pBones[0].v1C[1] = fY;
+}
+
+// Puts a golfer's legs on the ground by IK: with bLegA the leg of bones 0x36-0x3A (point 2),
+// with bLegB the leg of bones 0x44-0x48 (point 3); the bones they move are then transformed again.
+void fn_8001899C(Character* pChar, u8 bLegA, u8 bLegB) {
+    CourseInfo* pCourse;
+    u32 auBits[4];
+
+    if (pChar == NULL) {
+        return;
+    }
+    fn_8001E938(auBits, 0x80);
+    if (!fn_8001EC48(pChar)) {
+        return;
+    }
+    pCourse = fn_8000C594();
+    if (pCourse == NULL) {
+        return;
+    }
+    if (bLegA) {
+        Character_IKLegToGround(pChar, pCourse, 0, fn_8001EEE4(pChar->pModel, 0x36),
+                                fn_8001EEE4(pChar->pModel, 0x38), fn_8001EEE4(pChar->pModel, 0x39),
+                                fn_8001EEE4(pChar->pModel, 0x3A), 2, 0);
+        fn_8001EA34(auBits, fn_8001EEE4(pChar->pModel, 0x38));
+        fn_8001EA34(auBits, fn_8001EEE4(pChar->pModel, 0x36));
+        fn_8001EA34(auBits, fn_8001EEE4(pChar->pModel, 0x39));
+    }
+    if (bLegB) {
+        Character_IKLegToGround(pChar, pCourse, 1, fn_8001EEE4(pChar->pModel, 0x44),
+                                fn_8001EEE4(pChar->pModel, 0x46), fn_8001EEE4(pChar->pModel, 0x47),
+                                fn_8001EEE4(pChar->pModel, 0x48), 3, 1);
+        fn_8001EA34(auBits, fn_8001EEE4(pChar->pModel, 0x46));
+        fn_8001EA34(auBits, fn_8001EEE4(pChar->pModel, 0x44));
+        fn_8001EA34(auBits, fn_8001EEE4(pChar->pModel, 0x47));
+    }
+    if (fn_8001E9F4(auBits, auBits, 0x80)) {
+        SKEL_TransformBones(pChar->pModel, auBits);
+    }
+}
+
+// Bends leg nLeg (bones A, B, C and D down the leg, test points nPoint and nOther under it) so its
+// foot stands on the ground: the knee (B) and hip (A) are turned so bone C reaches the ground height
+// under nPoint, then C is tilted towards the ground's slope, more the deeper the foot sat.
+void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, int nBoneA, int nBoneB,
+                             int nBoneC, int nBoneD, int nPoint, int nOther) {
+    f32 vOld[4];
+    f32 vC[4];
+    f32 vPoint[4];
+    f32 vD[4];
+    f32 vA[4];
+    f32 vB[4];
+    f32 vReach[4];
+    f32 vLeg[4];
+    f32 vThigh[4];
+    f32 vShin[4];
+    f32 vFoot[4];
+    f32 vAxis[4];
+    f32 vSlope[4];
+    f32 qTurn[4];
+    f32 qB8[4];
+    f32 qA8[4];
+    f32 q98[4];
+    f32 q88[4];
+    f32 q78[4];
+    f32 q68[4];
+    f32 q58[4];
+    f32 q48[4];
+    f32 q38[4];
+    f32 q28[4];
+    f32 q18[4];
+    f32 vNormal[4];
+    f32 fDropA;
+    f32 fDropB;
+    f32 fDrop;
+    f32 fReach;
+    f32 fLeg;
+    f32 fThigh;
+    f32 fShin;
+    f32 fDen;
+    f32 fSq;
+    f32 fCos;
+    f32 fAngleA;
+    f32 fAngleB;
+    f32 fTurn;
+    f32 fLen;
+    f32 fScale;
+    Skeleton* pSkel;
+    Bone* pBone;
+
+    fn_8001EBD8(pChar, nBoneC, vC);
+    fn_8001EBD8(pChar, nBoneA, vA);
+    fn_8001EBD8(pChar, nBoneB, vB);
+    fn_8001EBD8(pChar, nBoneD, vD);
+    Vec_Copy(pChar->aPoints[nPoint], vPoint);
+    // how far each test point sits below the ground (0.165 in, in feet)
+    fDropA = 0.165f / 12.0f + (pChar->afGroundHeight[nPoint] - vPoint[1]);
+    fDropB = 0.165f / 12.0f + (pChar->afGroundHeight[nOther] - pChar->aPoints[nOther][1]);
+    if (fDropA < 0.0f && fDropB < 0.0f) {
+        return;
+    }
+    if (fDropA > 1.0f) {
+        return;
+    }
+    fDrop = (fDropA <= fDropB) ? fDropB : fDropA;
+    if (fDrop < 0.0f) {
+        return;
+    }
+    fn_8001EF54(pChar->aGroundNormal[nPoint], pChar->aGroundNormal[nOther], vSlope);
+    fn_800BAF04(vSlope, vSlope);
+    if (fDrop > 0.33f / 12.0f) {
+        fDrop = 1.0f;
+    } else {
+        fDrop = fDrop / (0.33f / 12.0f);
+    }
+    fDropA -= 0.165f / 12.0f;
+    if (fDropA < 0.0f) {
+        fDropA = 0.0f;
+    }
+
+    // the knee: the angle the thigh and shin must make for the hip to reach bone C raised by fDropA
+    Vec3Copy(vC, vOld);
+    vC[1] += fDropA;
+    fn_8001EF10(vA, vOld, vReach);
+    fn_8001EF10(vA, vC, vLeg);
+    fn_8001EF10(vB, vA, vThigh);
+    fn_8001EF10(vB, vOld, vShin);
+    fn_8001EF10(vOld, vD, vFoot);
+    fReach = (f32)fn_80009680(fn_80009744(vReach));
+    fLeg = (f32)fn_80009680(fn_80009744(vLeg));
+    fThigh = (f32)fn_80009680(fn_80009744(vThigh));
+    fShin = (f32)fn_80009680(fn_80009744(vShin));
+    if (fLeg > fThigh + fShin) {
+        fLeg = fThigh + fShin;
+    }
+    fDen = 2.0f * fThigh * fShin;
+    if (0.0f == fDen) {
+        fDen = 1.0f;
+    }
+    fSq = fThigh * fThigh + fShin * fShin;
+    fCos = (fSq - fReach * fReach) / fDen;
+    fAngleA = fn_80009614((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
+    fCos = (fSq - fLeg * fLeg) / fDen;
+    fAngleB = fn_80009614((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
+    fTurn = fAngleA - fAngleB;
+    vec4flt_CrossProduct(vShin, vThigh, vNormal);
+    fLen = fn_800BAFC0(vNormal, vNormal);
+    vNormal[3] = 0.0f;
+    pSkel = pChar->pModel->pSkel;
+    if (pSkel != NULL) {
+        // a degenerate bend axis falls back on the last good one
+        if (fLen > 0.0001f) {
+            Vec_Copy(vNormal, pSkel->a10E8[nLeg]);
+        } else {
+            Vec_Copy(pSkel->a10E8[nLeg], vNormal);
+        }
+    }
+    if (fabsf(fTurn) > 0.0001f) {
+        fn_8001EF34(vNormal, fTurn, vAxis);
+        fn_8000923C(vAxis, qTurn);
+        fn_80008F20(pChar->pModel->pPoses[nBoneB].q0, qA8);
+        fn_800090E4(qA8, qTurn, q98);
+        fn_80008FCC(q98, pChar->pModel->pBones[nBoneB].q0C, qB8);
+        fn_8001E85C(qB8, pChar->pModel->pBones[nBoneB].q0C);
+    }
+
+    // the hip: turned by the change in the angle between the thigh and the hip-to-foot line
+    fTurn = fn_8000965C(fShin * fn_800095F0(fAngleA) / fReach) -
+            fn_8000965C(fShin * fn_800095F0(fAngleB) / fLeg);
+    if (fabsf(fTurn) > 0.0001f) {
+        fn_8001EF34(vNormal, fTurn, vAxis);
+        vAxis[3] = 0.0f;
+        fn_8000923C(vAxis, qTurn);
+        fn_80008F20(pChar->pModel->pPoses[nBoneA].q0, qA8);
+        fn_800090E4(qA8, qTurn, q98);
+        fn_80008FCC(q98, pChar->pModel->pBones[nBoneA].q0C, qB8);
+        fn_8001E85C(qB8, pChar->pModel->pBones[nBoneA].q0C);
+    }
+
+    // the ankle: tilted about the horizontal axis across the slope, by the slope's angle
+    pBone = &pChar->pModel->pBones[nBoneA];
+    fn_80008FCC(pBone->q0C, pChar->pModel->pPoses[pBone->nParent].q0, q88);
+    fn_80008FCC(pChar->pModel->pBones[nBoneB - 1].q0C, q88, q58);
+    fn_80008FCC(pChar->pModel->pBones[nBoneB].q0C, q58, q68);
+    fn_80008F20(q68, q78);
+    fn_80008FCC(pChar->pModel->pPoses[nBoneC].q0, q78, q48);
+    vAxis[0] = vSlope[2];
+    vAxis[1] = 0.0f;
+    vAxis[2] = -vSlope[0];
+    vAxis[3] = 0.0f;
+    fLen = (f32)fn_80009680(vAxis[0] * vAxis[0] + vAxis[2] * vAxis[2]);
+    if (fLen < 0.01f) {
+        return;
+    }
+    fScale = 1.0f / fLen;
+    vAxis[0] *= fScale;
+    vAxis[2] *= fScale;
+    fCos = vSlope[1];
+    fTurn = fn_80009614((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos)) * fDrop;
+    if (fabsf(fTurn) > 0.0001f) {
+        fn_8001EF34(vAxis, fTurn, vAxis);
+        fn_80008FCC(q48, q68, q38);
+        fn_80008F20(q38, q28);
+        vAxis[3] = 0.0f;
+        fn_8000923C(vAxis, qTurn);
+        fn_800090E4(q28, qTurn, qB8);
+        fn_80008FCC(qB8, q48, q18);
+        fn_8001E85C(q18, pChar->pModel->pBones[nBoneC].q0C);
+    }
+}
+
 // Moves the character to pPos (its root bone's position); with bPlace, the bones are transformed
 // again and the feet put back on the ground.
 void Character_SetPosition(Character* pChar, f32* pPos, u8 bPlace) {
@@ -672,6 +1000,83 @@ void fn_80019358(Character* pChar, f32* pDir, f32 fAngle) {
         fn_8000A4E0(mtx, &fYaw, &fB, &fC);
         fn_800192D4(pChar, fYaw + fAngle);
     }
+}
+
+// Makes a character: its four data buffers, both blend trees and animation players, and every
+// field that starts at a value.
+Character* fn_8001942C(void) {
+    Character* pChar;
+    SKABlendNode* pNode;
+    int i;
+
+    pNode = NULL;
+    pChar = fn_80009B34(sizeof(Character), 2, 0x40, "char.c", 0x8A4);
+    pChar->pfn17B0 = NULL;
+    for (i = 0; i < 4; i++) {
+        pChar->buffers[i].n00 = -1;
+        pChar->buffers[i].p04 = NULL;
+        pChar->buffers[i].p0C = NULL;
+        pChar->buffers[i].p10 = NULL;
+        pChar->buffers[i].p14 = NULL;
+        pChar->buffers[i].pBuf = fn_80009B34(0x890, 2, 0x40, "char.c", 0x8AF);
+    }
+    pNode = &pChar->blend;
+    fn_80072D90(pChar->anim);
+    fn_80071C28(&pNode, 1, 0, fn_80072ACC, 1);
+    pNode = (SKABlendNode*)pChar->node3E0;
+    fn_80072D90(&pChar->anim29C);
+    fn_80071C28(&pNode, 1, 1, fn_80072ACC, 1);
+    pChar->pLib = NULL;
+    pChar->n3D4 = 0;
+    pChar->p44 = NULL;
+    pChar->f14 = 0.0f;
+    pChar->nAnim = 0;
+    pChar->n20 = 0;
+    pChar->n18 = 0;
+    pChar->u10 = 0x4000;
+    pChar->f162C = 1.0f;
+    pChar->f1630 = 0.5f;
+    pChar->f1634 = 0.2f;
+    pChar->n1650 = 0;
+    pChar->n1654 = 2;
+    pChar->n1658 = 2;
+    pChar->n1698 = 0;
+    pChar->p16D8 = NULL;
+    pChar->nClubClass = 0;
+    pChar->n16D4 = 0;
+    pChar->nSlot = 0;
+    pChar->n48 = -1;
+    pChar->f1664 = 1.0f;
+    pChar->nStyle = 0;
+    pChar->nPlayer = -1;
+    pChar->uId = 0;
+    pChar->pBlend = NULL;
+    pChar->fBackswing = 0.0f;
+    pChar->blend.nGroup = -1;
+    pChar->n5CC = -1;
+    pChar->p1790 = NULL;
+    pChar->n1784 = -1;
+    pChar->b17B4 = 0;
+    pChar->pRecords = NULL;
+    fn_800962F8(pChar);
+    pChar->n16DC = 0;
+    pChar->f165C = pChar->f1660 = 1073741824.0f;
+    pChar->pCurClip = NULL;
+    pChar->n178C = 0;
+    pChar->a6C[0] = -1;
+    pChar->a64[0] = NULL;
+    pChar->a6C[1] = -1;
+    pChar->a64[1] = NULL;
+    if (gSession.nGameType == 10 || gSession.nGameType == 3) {
+        pChar->n70 = 2;
+    } else {
+        pChar->n70 = 1;
+    }
+    pChar->n74 = 0;
+    pChar->bE0 = 0;
+    fn_80017508(pChar);
+    pChar->p1798 = NULL;
+    return pChar;
 }
 
 void fn_80019648(void) {
@@ -1400,6 +1805,71 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
     return pChar;
 }
 
+// Makes a club skin set from a 'CLB ' object: per entry its club class, that class's afC, the
+// entry's size and, 4 bytes on, its skin (fn_800377FC); a3C gets the class's club point.
+CharSkinSet* fn_8001B208(u8* pData) {
+    CharSkinSet* pSet;
+    s32 nSize;
+    s32 nClass;
+    int i;
+
+    pSet = fn_80009B34(sizeof(CharSkinSet), 2, 0x40, "char.c", 0xF15);
+    if (pSet == NULL) {
+        return NULL;
+    }
+    pSet->apSkins[0] = NULL;
+    pSet->apSkins[1] = NULL;
+    pSet->apSkins[2] = NULL;
+    pSet->apSkins[3] = NULL;
+    pSet->apSkins[4] = NULL;
+    pSet->apSkins[5] = NULL;
+    fn_80076158(&pData, (u8*)&pSet->nCount, 4, 4);
+    pData += 0xC;
+    for (i = 0; i < pSet->nCount; i++) {
+        fn_80076158(&pData, (u8*)&nClass, 4, 4);
+        fn_80076158(&pData, (u8*)&pSet->afC[nClass], 4, 4);
+        fn_80076158(&pData, (u8*)&nSize, 4, 4);
+        pData += 4;
+        pSet->apSkins[nClass] = fn_800377FC(pData, 0);
+        pSet->a9C[nClass] = fn_80009B34(sizeof(CharSkinRef), 2, 0x40, "char.c", 0xF25);
+        fn_8001B1DC(pSet->apSkins[nClass], pSet->a9C[nClass], sizeof(CharSkinRef));
+        if (nClass == 0 || nClass == 1) {
+            pSet->a3C[nClass][0] = 0.065f;
+            pSet->a3C[nClass][1] = 1.117f;
+            pSet->a3C[nClass][2] = -0.013f;
+            pSet->a3C[nClass][3] = 1.0f;
+        } else if (nClass == 3) {
+            pSet->a3C[nClass][0] = 0.087f;
+            pSet->a3C[nClass][1] = 0.986f;
+            pSet->a3C[nClass][2] = 0.02f;
+            pSet->a3C[nClass][3] = 1.0f;
+        } else if (nClass == 4) {
+            pSet->a3C[nClass][0] = 0.089f;
+            pSet->a3C[nClass][1] = 0.926f;
+            pSet->a3C[nClass][2] = 0.017f;
+            pSet->a3C[nClass][3] = 1.0f;
+        } else if (nClass == 2) {
+            pSet->a3C[nClass][0] = 0.115f;
+            pSet->a3C[nClass][1] = 0.852f;
+            pSet->a3C[nClass][2] = -0.015f;
+            pSet->a3C[nClass][3] = 1.0f;
+        } else if (nClass == 5) {
+            pSet->a3C[nClass][0] = 0.099f;
+            pSet->a3C[nClass][1] = 0.94f;
+            pSet->a3C[nClass][2] = 0.031f;
+            pSet->a3C[nClass][3] = 1.0f;
+        } else {
+            pSet->a3C[nClass][0] = 0.0f;
+            pSet->a3C[nClass][1] = 0.0f;
+            pSet->a3C[nClass][2] = 0.0f;
+            pSet->a3C[nClass][3] = 1.0f;
+        }
+        pData += nSize;
+    }
+    pSet->n0 = 0;
+    return pSet;
+}
+
 // Frees the club skin sets (lbl_80280E24): each one's skins and a9C blocks, then the set. pSet is
 // not used: fn_8001C468 passes the set it found, but both are freed here.
 void fn_8001B58C(CharSkinSet* pSet) {
@@ -1419,6 +1889,93 @@ void fn_8001B58C(CharSkinSet* pSet) {
             fn_80009E70(lbl_80280E24[i]);
             lbl_80280E24[i] = NULL;
         }
+    }
+}
+
+#define MIN(a, b) ((a) <= (b) ? (a) : (b))
+#define MAX(a, b) ((a) <= (b) ? (b) : (a))
+
+// The character's bounding box and sphere, from its bones' positions (bone 1 on).
+void fn_8001B644(Character* pChar) {
+    f32 vCentre[4];
+    f32 vDiff[4];
+    int i;
+
+    if (pChar->pModel->nBones < 2) {
+        return;
+    }
+    Vec3Copy(pChar->pModel->pMatrices[1][3], pChar->vMin);
+    Vec3Copy(pChar->pModel->pMatrices[1][3], pChar->vMax);
+    for (i = 2; i < pChar->pModel->nBones; i++) {
+        pChar->vMin[0] = MIN(pChar->pModel->pMatrices[i][3][0], pChar->vMin[0]);
+        pChar->vMin[1] = MIN(pChar->pModel->pMatrices[i][3][1], pChar->vMin[1]);
+        pChar->vMin[2] = MIN(pChar->pModel->pMatrices[i][3][2], pChar->vMin[2]);
+        pChar->vMax[0] = MAX(pChar->pModel->pMatrices[i][3][0], pChar->vMax[0]);
+        pChar->vMax[1] = MAX(pChar->pModel->pMatrices[i][3][1], pChar->vMax[1]);
+        pChar->vMax[2] = MAX(pChar->pModel->pMatrices[i][3][2], pChar->vMax[2]);
+    }
+    pChar->vMin[0] -= 0.33f;
+    pChar->vMin[1] -= 0.33f;
+    pChar->vMin[2] -= 0.33f;
+    pChar->vMax[0] += 0.33f;
+    pChar->vMax[1] += 0.33f;
+    pChar->vMax[2] += 0.33f;
+    fn_8001EF54(pChar->vMin, pChar->vMax, vCentre);
+    fn_8001EF34(vCentre, 0.5f, vCentre);
+    pChar->v1668[0] = vCentre[0];
+    pChar->v1668[1] = vCentre[1];
+    pChar->v1668[2] = vCentre[2];
+    fn_8001EF10(pChar->vMax, pChar->vMin, vDiff);
+    pChar->f1674 = (f32)fn_80009680(fn_80009744(vDiff)) / 2.0f;
+}
+
+// How the camera sees the character: n1654 and n1658 are fn_80007D74's answers for its bounding
+// sphere and for a 3-unit one (2 when it is not the view's player or is too far away), f14 the
+// nearest it has been, f1664 1 up close fading to 0 between 6 and 15 units deep.
+void fn_8001B878(Character* pChar, int nPlayer) {
+    f32 (*pMtx)[4];
+    f32 fDepth;
+    f32 fDist;
+    f32 fLen;
+    Sphere sphere;
+    Vec4 vPos;
+    f32 vDir[4];
+
+    pMtx = fn_8001EE64(pChar);
+    if (nPlayer != 1000 && nPlayer != fn_8001707C(fn_80016D10())) {
+        pChar->n1654 = pChar->n1658 = 2;
+        return;
+    }
+    Vec3Copy(pChar->v1668, &vPos.x);
+    vPos.w = 1.0f;
+    fn_800BAD60(((Camera*)fn_8001614C())->viewMtx, &vPos, &vPos);
+    Vec3Copy(&vPos.x, &sphere.x);
+    sphere.radius = pChar->f1674;
+    fDepth = sphere.z;
+    pChar->n1654 = fn_80007D74(&sphere, fn_8001614C(), 0);
+    sphere.radius = 3.0f;
+    pChar->n1658 = fn_80007D74(&sphere, fn_8001614C(), 0);
+    fn_8001EFB4(pMtx[3], fn_8001F004()->v34, vDir);
+    fDist = fn_8000C5FC(fn_8001F004()->v24, vDir);
+    fLen = (f32)fn_80009680(fn_80009744(vDir));
+    if (fLen < pChar->f14) {
+        pChar->f14 = fLen;
+    }
+    if (fDist > fn_8001ED44(pChar, gSession.nSplitScreen)) {
+        pChar->n1654 = 2;
+    }
+    if (fDist > fn_8001EE00(pChar, gSession.nSplitScreen)) {
+        pChar->n1658 = 2;
+    }
+    fDepth *= fn_8001EFFC(fn_8001F004());
+    if (pChar->n1654 == 2) {
+        pChar->f1664 = 0.0f;
+    } else if (fDepth > 15.0f) {
+        pChar->f1664 = 0.0f;
+    } else if (fDepth < 6.0f) {
+        pChar->f1664 = 1.0f;
+    } else {
+        pChar->f1664 = 1.0f - (fDepth - 6.0f) / 9.0f;
     }
 }
 
@@ -1483,6 +2040,105 @@ void fn_8001BC8C(f32 fTime) {
             Character_UpdateAnimation(lbl_801B9624[i], 0, fTime);
         }
     }
+}
+
+// With a clip of flag 0x10 the grip bone goes back to its parent; otherwise it is cut loose
+// (parent 0) and its rotation and offset from the root are kept in q16AC and v16BC (mirrored
+// while bEE is set). 1 when the state changed, 0 when it already was that way.
+int fn_8001BD18(Character* pChar, Clip* pClip) {
+    CharModel* pModel;
+    f32 qRoot[4];
+    f32 vOffset[4];
+    f32 qGrip[4];
+    f32 qTurn[4];
+
+    if (pClip->uFlags & 0x10) {
+        if (pChar->u10 & 0x4000) {
+            pChar->u10 &= ~0x4000;
+            pChar->pModel->pBones[pChar->nGripBone].nParent = pChar->n16A8;
+            return 1;
+        }
+    } else if (!(pChar->u10 & 0x4000)) {
+        pModel = pChar->pModel;
+        pChar->u10 |= 0x4000;
+        pChar->pModel->pBones[pChar->nGripBone].nParent = 0;
+        fn_80008F20(pModel->pPoses[0].q0, qRoot);
+        fn_80008FCC(pModel->pPoses[pChar->nGripBone].q0, qRoot, pChar->q16AC);
+        if (fn_8001EDF4(pChar)) {
+            fn_80009410(PI, qTurn);
+            fn_80008FCC(pChar->q16AC, qTurn, qGrip);
+            fn_8001E85C(qGrip, pChar->q16AC);
+        }
+        fn_8001EFB4(pModel->pPoses[pChar->nGripBone].v10, pModel->pPoses[0].v10, vOffset);
+        vOffset[3] = 0.0f;
+        fn_800090E4(qRoot, vOffset, pChar->v16BC);
+        pChar->v16BC[3] = 0.0f;
+        if (fn_8001EDF4(pChar)) {
+            pChar->v16BC[2] = -pChar->v16BC[2];
+        }
+        return 1;
+    }
+    return 0;
+}
+
+// Plays pClip on the character. With bNoBlend the blend tree and the animation player start
+// over; otherwise the clip is blended in over its first f18 seconds from the current time.
+void fn_8001BE88(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) {
+    f32 aBlend[6];
+    SKABlendNode* pNode;
+    SKABlendNode* pNew;
+    AnimPlayer* pAnim;
+    f32 fLen;
+
+    pNode = &pChar->blend;
+    pNew = NULL;
+    pAnim = (AnimPlayer*)pChar->anim;
+    if (pClip == NULL) {
+        return;
+    }
+    if (fn_8001EC48(pChar)) {
+        fn_8001BD18(pChar, pClip);
+    }
+    pChar->n178C = 0;
+    if (bNoBlend) {
+        fn_80071F58(&pNode, 0);
+        fn_80071C28(&pNode, 1, 0, fn_80072ACC, 0);
+        fn_800725BC(pNode, fn_80072ACC, 0.5f);
+        Anim_SetRate((u8*)pAnim, 1.0f);
+        pAnim->n00 = 0;
+        pAnim->uFlags = 0;
+        pAnim->n08 = -1;
+        pAnim->fTime = 0.0f;
+    }
+    fn_80071C28(&pNew, 0, 0, fn_80072ACC, 1);
+    fn_800724C0(&pChar->blend, pNew, pClip, 1.0f);
+    if (!bNoBlend) {
+        fn_800732F4(&pChar->blend, pChar->anim, pChar->fAnimTime + fTime);
+        aBlend[5] = 0.0f;
+        aBlend[0] = 0.0f;
+        fLen = pClip->f18;
+        aBlend[1] = fLen;
+        aBlend[2] = -1.0f;
+        if (fLen > aBlend[1]) {
+            aBlend[1] = fLen;
+        }
+        aBlend[3] = pAnim->fTime + aBlend[5];
+        aBlend[4] = aBlend[3] + (aBlend[1] - aBlend[0]);
+        fn_800720C8(pChar, pNew, &pNode, aBlend, fn_80072ACC, 1);
+    } else {
+        fn_800720C8(pChar, pNew, &pNode, NULL, fn_80072ACC, 0);
+        aBlend[3] = 0.0f;
+    }
+    pAnim->fStart = pNode->fStart;
+    pAnim->fEnd = pNode->fEnd;
+    fn_800175B0(pChar, pClip, aBlend[3]);
+    if (pClip != NULL && pClip->pF4 != NULL) {
+        fn_8009622C(pChar, pClip->pF4, bNoBlend, fTime);
+    }
+    pChar->pCurClip = pClip;
+    fn_801141F8(pChar->pModel->pF0, pChar->pModel);
+    fn_801141F8(pChar->pModel->pF4, pChar->pModel);
+    fn_801141F8(pChar->pModel->pF8, pChar->pModel);
 }
 
 // Frees a character: its texture bank slot, both blend trees, its skin, library, model, buffers
@@ -1777,7 +2433,7 @@ void fn_8001C860(Character* pChar) {
         fn_8001EED8(pChar->pModel, 1);      // the results are not used
         fn_8001EED8(pChar->pModel, 0x52);
         pClip = Char_SetClip(pChar, 0, pChar->nStyle, NULL);
-        if (pClip->uD8 == 0) {
+        if (pClip->pD8 == NULL) {
             fn_80027108(pSkel);
             SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 0.0f);
             pChar->pModel->pSkel->f1074 = 0.0f;
@@ -1787,7 +2443,7 @@ void fn_8001C860(Character* pChar) {
             pSkel->pClip = pClip;
             fn_80021978(pChar->pModel->bEE);
             if (bClipTime) {
-                fn_8001FCF4(pChar, pClip, &pSkel->pose, 0, pClip->pD4->f24);
+                fn_8001FCF4(pChar, pClip, &pSkel->pose, 0, pClip->pEvents[2].fTime);
             } else {
                 fn_8001FCF4(pChar, pClip, &pSkel->pose, 0, 0.0f);
             }
@@ -2228,7 +2884,8 @@ u8 fn_8001DBF4(Character* pChar) {
 // model's bEE.
 void fn_8001DC64(Character* pChar, SkinChoices* pChoices) {
     fn_800CC1EC(pChar, pChoices);
-    fn_8010E4DC(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, pChoices->a9B4, pChar->node3E0);
+    fn_8010E4DC(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, pChoices->a9B4,
+                (SKABlendNode*)pChar->node3E0);
     if (gSession.nGameType != 3 || lbl_80281EE0->n0 == 1 || lbl_80281EE0->n0 == 4) {
         if (pChoices->n113 == 0) {
             fn_8001EE98(pChar, 0);
@@ -2536,8 +3193,8 @@ f32 fn_8001EE00(Character* pChar, int b) {
     return pChar->f165C * (1.0f / fn_8001EFFC(fn_8001F004()));
 }
 
-void fn_8001EE64(Character* pChar) {
-    fn_8001ED08(pChar, 1);
+f32 (*fn_8001EE64(Character* pChar))[4] {
+    return fn_8001ED08(pChar, 1);
 }
 
 int fn_8001EE88(Character* pChar) {
@@ -2729,7 +3386,7 @@ CamLens* fn_8001F004(void) {
 }
 
 // The time of the blend's event uEvent, 0 when it has none.
-f32 fn_8001F02C(ClipBlend* pBlend, u64 uEvent) {
+f32 fn_8001F02C(Clip* pBlend, u64 uEvent) {
     int i;
 
     for (i = 0; i < pBlend->nEvents; i++) {
@@ -2767,4 +3424,57 @@ void fn_8001F08C(void** ppSrc, void** ppDst, SwapField* pFormat, int nFields, in
             }
         } while (--nCount > 0);
     }
+}
+
+// Byte-swaps an animation library in place and links it: the header, the records after it, each
+// record's entries after those, then each entry's data (each start rounded up to 4 bytes).
+// *pnSize gets the library's size.
+MtaLib* fn_8001F110(MtaLib* pLib, s32* pnSize) {
+    SwapField aHeader[10] = {
+        { 16, 1 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 2, 2 }, { 6, 1 },
+        { 4, 4 },
+    };
+    SwapField aRecord[5] = {
+        { 16, 1 }, { 16, 1 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+    };
+    SwapField aEntry[11] = {
+        { 16, 1 }, { 16, 1 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+        { 4, 4 }, { 8, 4 },
+    };
+    void* pSrc;
+    void* pDst;
+    s32 nOffset;
+    MtaRecord* pRecords;
+    int i;
+    MtaRecord* pRecord;
+    int j;
+
+    pSrc = pDst = pLib;
+    fn_8001F08C(&pSrc, &pDst, aHeader, 10, 1);
+    pRecords = (MtaRecord*)(pLib + 1);
+    pSrc = pDst = pRecords;
+    fn_8001F08C(&pSrc, &pDst, aRecord, 5, pLib->nRecords);
+    pLib->pRecords = pRecords;
+    nOffset = sizeof(MtaLib) + pLib->nRecords * sizeof(MtaRecord);
+    for (i = 0; i < pLib->nRecords; i++) {
+        pRecord = &pLib->pRecords[i];
+        pSrc = pDst = (u8*)pLib + nOffset;
+        fn_8001F08C(&pSrc, &pDst, aEntry, 11, pRecord->nEntries);
+        pRecord->pEntries = (MtaEntry*)((u8*)pLib + nOffset);
+        nOffset += pRecord->nEntries * sizeof(MtaEntry);
+    }
+    for (i = 0; i < pLib->nRecords; i++) {
+        pRecord = &pLib->pRecords[i];
+        for (j = 0; j < pRecord->nEntries; j++) {
+            pRecord->pEntries[j].pData = (u8*)pLib + nOffset;
+            nOffset += pRecord->pEntries[j].nBytes;
+            if (nOffset % 4 != 0) {
+                nOffset += 4 - nOffset % 4;
+            }
+        }
+    }
+    if (pnSize != NULL) {
+        *pnSize = nOffset;
+    }
+    return pLib;
 }

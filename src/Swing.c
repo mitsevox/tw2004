@@ -163,7 +163,7 @@ int   Swing_StickX(int nPlayer, u8* pPad);       // 0x80058F04  main or C-stick 
 int   Swing_StickY(int nPlayer, u8* pPad);       // 0x80058F30
 f32   Swing_TopTime(SwingData* pSw);             // 0x80058E98  fTimeSwingTop - 0.0076
 f32   Swing_StartTime(SwingData* pSw);           // 0x80058EA8  fTimeSwingStart + 0.0076
-int   fn_800204A0(ClipBlend* pBlend, f32* pOut, f32 fTime);   // samples pBlend->pD8 at fTime
+int   fn_800204A0(Clip* pBlend, f32* pOut, f32 fTime);   // samples pBlend->pD8 at fTime
 void  Character_UpdateAnimation(Character* pObj, int a, f32 f);
 void  Swing_UpdatePower(int nPlayer);
 void  Swing_BoostInput(int nPlayer);

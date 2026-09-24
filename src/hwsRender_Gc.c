@@ -5,12 +5,16 @@
 #include "charstate.h"
 #include "golfer.h"
 #include "game.h"
+#include "gx.h"
+#include "core/startup.h"
+#include "unsorted/cull.h"
 
 void fn_80036460(int n);                // Skin.c
 void PostFx_CopyScreenToBuffer(void);   // gomainloop.c
 void fn_8011EB80(void);
 void fn_80112B34(void);                 // hwsOverride_Gc.c
 void fn_80112DD8(s32 nEntry);
+void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut);  // VecMath.c
 void fn_80113BCC(SkinIter* pIter);
 void fn_80113C70(SkinIter* pIter);
 void fn_80113D28(SkinIter* pIter);
@@ -21,7 +25,10 @@ void (*lbl_802817EC[1])(SkinIter* pIter) = { fn_80113C70 };
 void (*lbl_802817F0[2])(SkinIter* pIter) = { fn_80113D28, NULL };
 
 void* lbl_802824E0;                     // the screen buffer (fn_80112C64)
-u32 lbl_802824EC;                       // and its size
+u32 lbl_802824E4;                       // the next free offset in it (fn_801132C4)
+int lbl_802824E8;                       // set: fn_801132C4 skins the next mesh's vertices again
+u32 lbl_802824EC;                       // the buffer's size
+void* lbl_802824F0;                     // the vertices fn_801132C4 last wrote
 
 // Whether the extra pass runs: one view, at most three players (two on course 14's hole 11).
 u8 fn_80112B80(void) {
@@ -106,8 +113,6 @@ void fn_80112DA0(void) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_801136C4();
-void fn_8011368C(u8* p0, s32 p1, s32 p2, s32 p3);
 u32* fn_80113764(void);
 void fn_80113840(void);
 void fn_80113844(void);
@@ -122,9 +127,139 @@ void fn_80113B14(SkinIter* pIter);
 void fn_80113E54(SkinIter* pIter, void (**ppfnNext)(SkinIter* pIter));
 void fn_80113E5C(SkinIter* pIter);
 
-void fn_8011368C(u8* p0, s32 p1, s32 p2, s32 p3) {
-    fn_801136C4(p0, *(s32*)(p0 + 0x0), p1, p2, p3, p1);
+// ---- end of sweep code ----
+
+// Draw a mesh's triangle strip. When lbl_802824E8 is set, its vertices are first skinned into the
+// screen buffer (positions as floats, normals as bytes) and set up as GX's vertex arrays.
+void fn_801132C4(SkinMeshRefs* pRefs) {
+    Vec4 vNormalIn;
+    Vec4 vPosIn;
+    Vec4 vPosOut;
+    Vec4 vNormalOut;
+    s16* pPos;
+    s8* pNormal;
+    f32* pPosOut;
+    s8* pNormalOut;
+    f32 (*pMatrix)[4];
+    u32 i;
+    f32 (*pMatrices)[4][4];
+    u32 uSize;
+    f32* pPosBuf;
+    s8* pNormalBuf;
+    int n;
+    void* pBuf;
+    s32 n10;
+    s16* pVerts;
+    void* pTexCoords;
+    u16* pIndices;
+    u16 nIndex;
+
+    if (lbl_802824E8 != 0) {
+        lbl_802824E8 = 0;
+        // Room for n10 positions (12 bytes) and normals (3 bytes), in whole 32-byte blocks.
+        uSize = pRefs->n10 * 15;
+        uSize += 32 - (uSize & 31);
+        if (lbl_802824E4 + uSize >= lbl_802824EC) {
+            lbl_802824E4 = 0;
+        }
+        pBuf = (u8*)lbl_802824E0 + lbl_802824E4;
+        lbl_802824E4 += uSize;
+        pPosBuf = pBuf;
+        lbl_802824F0 = pBuf;
+        pPosOut = pBuf;
+        n10 = pRefs->n10;
+        pVerts = pRefs->p14;
+        pMatrices = pRefs->pC;
+        pPos = pVerts;
+        pNormal = (s8*)(pVerts + n10 * 4);
+        pNormalBuf = (s8*)pBuf + n10 * 12;
+        pNormalOut = pNormalBuf;
+        for (i = 0; i < pRefs->n10; pPos += 4, pNormal += 4, i++) {
+            // Each position is x, y, z and the index of its matrix.
+            pMatrix = pMatrices[(u16)pPos[3]];
+            vPosIn.x = pPos[0] / 16384.0f;
+            vPosIn.y = pPos[1] / 16384.0f;
+            vPosIn.z = pPos[2] / 16384.0f;
+            vPosIn.w = 1.0f;
+            vPosIn.x *= pRefs->f20;
+            vPosIn.y *= pRefs->f20;
+            vPosIn.z *= pRefs->f20;
+            vNormalIn.x = pNormal[0] / 64.0f;
+            vNormalIn.y = pNormal[1] / 64.0f;
+            vNormalIn.z = pNormal[2] / 64.0f;
+            vNormalIn.w = 1.0f;
+            fn_800BAD60(pMatrix, &vPosIn, &vPosOut);
+            fn_800BADB4(pMatrix, &vNormalIn.x, &vNormalOut.x);
+            pPosOut[0] = vPosOut.x;
+            pPosOut[1] = vPosOut.y;
+            pPosOut[2] = vPosOut.z;
+            pPosOut += 3;
+            pNormalOut[0] = 64.0f * vNormalOut.x;
+            pNormalOut[1] = 64.0f * vNormalOut.y;
+            pNormalOut[2] = 64.0f * vNormalOut.z;
+            pNormalOut += 3;
+        }
+        DCFlushRange(lbl_802824F0, uSize);
+        pTexCoords = pRefs->p1C;
+        GXInvalidateVtxCache();
+        GXSetVtxAttrFmt(1, 9, 1, 4, 0);         // positions: xyz floats
+        GXSetVtxAttrFmt(1, 10, 0, 1, 6);        // normals: s8, 6 fraction bits
+        GXSetVtxAttrFmt(1, 13, 1, 3, 12);       // texture coordinates: s16 pairs, 12 fraction bits
+        GXSetArray(9, pPosBuf, 12);
+        GXSetArray(10, pNormalBuf, 3);
+        GXSetArray(13, pTexCoords, 4);
+        GXClearVtxDesc();
+        GXSetVtxDesc(9, 3);                     // all three by 16-bit index
+        GXSetVtxDesc(10, 3);
+        GXSetVtxDesc(13, 3);
+    }
+    pIndices = pRefs->p4;
+    GXBegin(0x98, 1, pRefs->n2);                // a triangle strip
+    for (n = 0; n < pRefs->n2; n++) {
+        nIndex = pIndices[n + pRefs->n0];
+        fn_80113904(nIndex);
+        fn_801138F8(nIndex);
+        fn_801138EC(nIndex);
+    }
+    fn_801138E8();
 }
+
+void fn_801136C4(SkinMesh* pMesh, void* pData, SkinMeshRefs* pOut, u16 n0, s16 n2);
+
+// fn_801136C4 with the mesh's own data.
+void fn_8011368C(SkinMesh* pMesh, SkinMeshRefs* pOut, u16 n0, s16 n2) {
+    fn_801136C4(pMesh, pMesh->pBits, pOut, n0, n2);
+}
+
+// Point pOut at pData by the mesh's flags (nothing for an empty mesh).
+void fn_801136C4(SkinMesh* pMesh, void* pData, SkinMeshRefs* pOut, u16 n0, s16 n2) {
+    if (pMesh->n8 == 0) {
+        return;
+    }
+    if (pMesh->uFlags & 1) {
+        if (pMesh->uFlags & 0x10) {
+            pOut->n10 = pMesh->n8;
+            pOut->p14 = pData;
+            if (pMesh->uFlags & 0x40) {
+                // The third part follows n10 bits (8 bytes each) and n10 words.
+                pOut->p1C = (u8*)pMesh->pBits + (pOut->n10 * 4 + pOut->n10 * 8);
+                pOut->n18 = pMesh->n8;
+            }
+        } else if (pMesh->uFlags & 0x40) {
+            pOut->n18 = pMesh->n8;
+            pOut->p1C = pMesh->pBits;
+        }
+    } else if (pMesh->uFlags & 2) {
+        pOut->n0 = n0;
+        pOut->n2 = n2;
+        pOut->p4 = pData;
+    } else if (pMesh->uFlags & 0x200000) {
+        pOut->n8 = pMesh->n8;
+        pOut->pC = pData;
+    }
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 u32* fn_80113764(void) {
     return lbl_80223BB0.s10.p48;

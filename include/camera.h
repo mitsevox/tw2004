@@ -665,18 +665,23 @@ void     fn_800763BC(CamLens* pLens);
 
 // ---- camera script helpers (gocamscripts, 0x800C7480..) -------------------------------------
 
-// Not decompiled yet. Both write a point into pOut: fn_800C7D14 from the direction between pA and
-// pB (its y cleared unless b1, normalised unless b2), a distance f and an angle; fn_800C7E50 from
-// three points and fT.
-void   fn_800C7D14(f32* pA, f32* pB, u8 b1, u8 b2, f32* pOut, f32 f, f32 fAngle);
+// Both write a point into pOut: fn_800C7D14 goes fDist along the direction from pA to pB (its y
+// cleared unless bKeepY, normalised unless bRaw), then fSide across the flattened direction;
+// fn_800C7E50 swings around pC from pA towards pB at share fT (n: 0 the short way round, 1 angle
+// decreasing, else increasing).
+void   fn_800C7D14(f32* pA, f32* pB, u8 bKeepY, u8 bRaw, f32* pOut, f32 fDist, f32 fSide);
 void   fn_800C7E50(f32* pA, f32* pB, f32* pC, int n, f32* pOut, f32 fT);
 // The splined camera (CamScript_SplineCameras): the camera position on the spline through pPos0..3,
 // the look-at point on the one through pLook0..3, and the field of view between fFov1 and fFov2,
 // at share fT between the middle two.
 void   fn_800C7480(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3, f32* pLook0, f32* pLook1, f32* pLook2,
                    f32* pLook3, f32* pCam, f32* pSub, f32* pFov, f32 fFov1, f32 fFov2, f32 fT);
+void   fn_800C7898(f32* p0, f32* p1, f32* p2, f32* p3, f32* pOut, f32 fT);   // a point on the spline
+f32    fn_800C7970(f32 fA, f32 fB, f32 fC, f32 fD, f32 fE, f32 fF);
 // Not decompiled yet: a share of a fly-by path's spline (fn_8003EA50).
 f32    fn_800C7A9C(FlyByPath* pPath, f32 fT);
+// CamSpline.c: the Catmull-Rom basis matrix.
+extern f32 lbl_80191440[4][4];
 
 // ---- the static and fly-by cameras (GoStaticCam.c, 0x8006449C..) ----------------------------
 
@@ -778,5 +783,22 @@ GoFrameBuf* fn_8006E1C8(void);               // a new frame buffer with the defa
 void        fn_8006E214(GoFrameBuf* pBuf);   // free it
 void        fn_8006E234(GoFrameBuf* pBuf);   // the default size: 512 x 448, scale 1
 void        fn_8006E26C(GoFrameBuf* pBuf, f32 f0, f32 f4, f32 fWidth, f32 fHeight, f32 f10, f32 f14);
+
+// ---- the parts of a render camera: lens (GoCamera.c), screen rectangle (GoViewport.c) ---------
+
+CamLens* fn_80076400(void);                     // a new lens
+void     fn_8007644C(CamLens* pLens);           // free it
+void     fn_8007646C(CamLens* pLens, f32* pA, f32* pB);   // not decompiled yet: two 4-float points
+void     fn_800768E0(CamLens* pLens);
+void     fn_80076948(CamLens* pLens, f32 fB4, f32 fB8);   // sets fB4 and fB8
+void     fn_80076A0C(CamLens* pLens, s32 nType);          // sets nType
+f32*     fn_80076ACC(void);                     // a new screen rectangle
+void     fn_80076B18(f32* pRect);               // free it
+void     fn_800B3438(f32* pRect, f32 x, f32 y); // shadow.c
+CamLens* fn_8001F004(void);                     // char.c
+
+// GoRenderCtx_Gc.c: a render camera made from a lens, a frame buffer and a screen rectangle.
+void*    fn_8001371C(CamLens* pLens, GoFrameBuf* pBuf, f32* pRect);
+void     fn_800137B0(void* pCamera);            // free it
 
 #endif

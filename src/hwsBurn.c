@@ -284,8 +284,9 @@ void* fn_80110E98(u8* pBase, s32* pOffset, void* pSrc, s32 nSize, s32 nAlign) {
     return pDst;
 }
 
-// List the bits of p40 that are set (a44) and give each its place in the list (a48).
-s32 fn_80110F2C(HwsBurn* pBurn) {
+// List the bits of p40 that are set (a44) and give each its place in the list (a48). nAlign is
+// unused (fn_80111850 passes it, as to the other sizing steps).
+s32 fn_80110F2C(HwsBurn* pBurn, s32 nAlign) {
     int i;
     int nBits = pBurn->pDesc->n40;
     int n = 0;
@@ -373,8 +374,9 @@ SkinDesc28* fn_80111384(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
     return aCopy;
 }
 
-// List the bits of p54 that are set (a58) and give each its place in the list (a5C).
-s32 fn_80111424(HwsBurn* pBurn) {
+// List the bits of p54 that are set (a58) and give each its place in the list (a5C). nAlign is
+// unused (see fn_80110F2C).
+s32 fn_80111424(HwsBurn* pBurn, s32 nAlign) {
     int i;
     int nBits = pBurn->pDesc->n38;
     int n = 0;
@@ -485,8 +487,9 @@ SkinMesh* fn_801111E8(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
     return aOut;
 }
 
-// Mark the SkinDesc.p8C entries the a64 entries use (p78) and list them (a7C, a80).
-s32 fn_80111658(HwsBurn* pBurn) {
+// Mark the SkinDesc.p8C entries the a64 entries use (p78) and list them (a7C, a80). nAlign is
+// unused (see fn_80110F2C).
+s32 fn_80111658(HwsBurn* pBurn, s32 nAlign) {
     int i;
     int nEntries = pBurn->n60;
     int nBits = pBurn->n70;
@@ -550,6 +553,119 @@ void fn_801115C4(HwsBurn* pBurn) {
             pBurn->pfn68(pBurn->pSkin, &pBurn->a64[i]);
         }
     }
+}
+
+// Burn the description: list what is used, then copy the description and each table it keeps into
+// one block, renumbered for the burn. p74, p7C and p84 are dropped. An entry left with no morph
+// targets loses its flag, and so do its meshes' 0x100000 flags where they also have 0x10; n30 ends
+// after the last mesh still flagged 0x100000.
+SkinDesc* fn_80111850(HwsBurn* pBurn) {
+    SkinMeshIter iterBuf;
+    SkinIterArgs args;
+    SkinDesc* pDesc;
+    s32 nOffset;
+    int i;
+    SkinIter* pIter;
+    SkinMesh* pMesh;
+    SkinDesc44* pEntry;
+    SkinDesc* pOut;
+    u8* pBlock;
+    s32 nBytes;
+    int nLast;
+
+    pDesc = pBurn->pDesc;
+    fn_801115C4(pBurn);
+    memset(pBurn->a2C, -1, pBurn->n20 * 4);
+    memset(pBurn->a30, -1, pBurn->n20 * 4);
+    memset(pBurn->a44, -1, pBurn->n34 * 4);
+    memset(pBurn->a48, -1, pBurn->n34 * 4);
+    memset(pBurn->a58, -1, pBurn->n4C * 4);
+    memset(pBurn->a5C, -1, pBurn->n4C * 4);
+    memset(pBurn->a7C, -1, pBurn->n70 * 4);
+    memset(pBurn->a80, -1, pBurn->n70 * 4);
+
+    // The size of the block.
+    nBytes = fn_80111310(pBurn, 16);
+    nBytes += fn_80110F2C(pBurn, 16);
+    nBytes += fn_80111124(pBurn, 16);
+    nBytes += fn_80111424(pBurn, 16);
+    nBytes += fn_80111658(pBurn, 16);
+    // port: fn_80110E74 only tests its pointer for NULL; EA passes the local's address.
+    nBytes += fn_80110E74(&pDesc, 1, sizeof(SkinDesc), 16);
+    nBytes += fn_80110E74(pDesc->p14, pBurn->n60, sizeof(SkinDesc14), 16);
+    nBytes += fn_80110E74(pDesc->p20, pDesc->n1C, 4, 16);
+    nBytes += fn_80110E74(pDesc->p28, pDesc->n24, sizeof(SkinDesc28), 16);
+    nBytes += fn_80110E74(pDesc->p44, pBurn->n38, sizeof(SkinDesc44), 16);
+    nBytes += fn_80110E74(pDesc->p34, pBurn->n24, sizeof(SkinMesh), 16);
+    nBytes += fn_80110E74(pDesc->p3C, pBurn->n50, 4, 16);
+    nBytes += fn_80110E74(pDesc->pParts, pDesc->nParts, sizeof(SkinPartDef), 16);
+    nBytes += fn_80110E74(pDesc->pVariants, pDesc->nVariants, sizeof(SkinVariant), 16);
+    nBytes += fn_80110E74(pDesc->p5C, pDesc->n58, sizeof(SkinDesc5C), 16);
+    nBytes += fn_80110E74(pDesc->pLinks, pDesc->nLinks, sizeof(SkinLink), 16);
+    nBytes += fn_80110E74(pDesc->p6C, pDesc->n68, 4, 16);
+    nBytes += fn_80110E74(pDesc->p8C, pBurn->n74, sizeof(SkinDesc8C), 16);
+    nBytes += fn_80110E74(pDesc->p94, pDesc->n90, 0x50, 16);
+    nBytes += fn_80110E74(pDesc->pA4, pDesc->nA0, 2, 16);
+    nBytes += fn_80110E74(pDesc->pAC, pDesc->nA8, 2, 16);
+    nBytes += fn_80110E74(pDesc->pB8, pDesc->nB4, sizeof(SkinDescB8), 16);
+
+    // The copy.
+    pBlock = fn_80009B34(nBytes, 2, 16, "hwsBurn.c", 979);
+    nOffset = 0;
+    pOut = fn_80110E98(pBlock, &nOffset, pDesc, sizeof(SkinDesc), 16);
+    pOut->n08 = nBytes;
+    pOut->n2C = pBurn->n24;
+    pOut->n40 = pBurn->n38;
+    pOut->n38 = pBurn->n50;
+    pOut->n70 = 0;
+    pOut->n78 = 0;
+    pOut->n80 = 0;
+    pOut->p74 = NULL;
+    pOut->p7C = NULL;
+    pOut->p84 = NULL;
+    pOut->p28 = fn_80111384(pBurn, pBlock, &nOffset, 16);
+    pOut->p44 = fn_80110FB4(pBurn, pBlock, &nOffset, 16);
+    pOut->p34 = fn_801111E8(pBurn, pBlock, &nOffset, 16);
+    pOut->p3C = fn_801114AC(pBurn, pBlock, &nOffset, 16);
+    pOut->p6C = fn_80111540(pBurn, pBlock, &nOffset, 16);
+    pOut->p14 = fn_801117D0(pBurn, pBlock, &nOffset, 16);
+    pOut->p8C = fn_8011172C(pBurn, pBlock, &nOffset, 16);
+    pOut->p20 = fn_80110E98(pBlock, &nOffset, pDesc->p20, pDesc->n1C * 4, 16);
+    pOut->pParts = fn_80110E98(pBlock, &nOffset, pDesc->pParts, pDesc->nParts * sizeof(SkinPartDef), 16);
+    pOut->pVariants =
+        fn_80110E98(pBlock, &nOffset, pDesc->pVariants, pDesc->nVariants * sizeof(SkinVariant), 16);
+    pOut->p5C = fn_80110E98(pBlock, &nOffset, pDesc->p5C, pDesc->n58 * sizeof(SkinDesc5C), 16);
+    pOut->pLinks = fn_80110E98(pBlock, &nOffset, pDesc->pLinks, pDesc->nLinks * sizeof(SkinLink), 16);
+    pOut->p94 = fn_80110E98(pBlock, &nOffset, pDesc->p94, pDesc->n90 * 0x50, 16);
+    pOut->pA4 = fn_80110E98(pBlock, &nOffset, pDesc->pA4, pDesc->nA0 * 2, 16);
+    pOut->pAC = fn_80110E98(pBlock, &nOffset, pDesc->pAC, pDesc->nA8 * 2, 16);
+    pOut->pB8 = fn_80110E98(pBlock, &nOffset, pDesc->pB8, pDesc->nB4 * sizeof(SkinDescB8), 16);
+
+    // Entries that kept no morph targets.
+    for (i = 0; i < pOut->n40; i++) {
+        pEntry = &pOut->p44[i];
+        if ((pEntry->u24 & 2) && pEntry->n14 == 0) {
+            pEntry->u24 &= ~2;
+            args.pDesc = pOut;
+            args.n = i;
+            pIter = fn_80113910((u8*)&iterBuf, &args);
+            while (fn_800CEEC0(pIter)) {
+                pMesh = fn_800CEEF4(pIter);
+                if ((pMesh->uFlags & 0x100000) && (pMesh->uFlags & 0x10)) {
+                    pMesh->uFlags &= ~0x100000;
+                }
+                fn_800CEEC8(pIter);
+            }
+        }
+    }
+    nLast = 0;
+    for (i = 0; i < pOut->n2C; i++) {
+        if (pOut->p34[i].uFlags & 0x100000) {
+            nLast = i + 1;
+        }
+    }
+    pOut->n30 = nLast;
+    return pOut;
 }
 
 // Everything the chosen variants of every part use (all variants of a part without a choice),

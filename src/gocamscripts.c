@@ -48,7 +48,6 @@ u8   fn_80043920(CamScript* pScript, int nPlayer);
 void fn_80044768(f32* pPos, f32* pOut);
 f32  fn_8003F790(CamScript* pScript);   // the blend's share (0..1) so far
 f32  fn_80044F58(int nPlayer, CamScript* pScript);
-CamLens* fn_8001F004(void);             // the current camera's lens
 f32  fn_8001EFFC(u8* pLens);            // the lens's fB0 (char.c: its parameter is u8*)
 u8   fn_8004561C(void);
 u8   fn_80044E2C(int n);
@@ -61,8 +60,6 @@ void fn_800386F0(int n, f32* pVec);
 f32  fn_8003F194(CamShot* pShot, f32 fA, f32 fB, f32 fTime);
 u8   Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bHazards, f32 fStep,
                                          u8 bSlope, f32 fMaxSlope);   // GoTerrainCollision.c
-void fn_800C7898(f32* p0, f32* p1, f32* p2, f32* p3, f32* pOut, f32 fT);    // a point on the spline
-f32  fn_800C7970(CamShot* pShot, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
 void fn_80040CF0(CamScript* pScript, f32* pSub, int nPlayer, f32* pPrev, f32 fTime);
 void fn_800090E4(f32* pTurn, f32* pVec, f32* pOut);     // the vector turned by it
 u8   fn_800DC464(int nPlayer);          // GameEffects.c: the ball is simulated from its position
@@ -526,8 +523,9 @@ f32 fn_8003F064(CamScript* pScript, f32 fTime) {
     fStart = fn_8003F194(pScript->pShot, 0.0f, fTime / pScript->f8C, fTime);
     if (fSpeed < fStart && fSpeed > fNow) return fTime;
     if (fSpeed > fStart && fSpeed < fNow) return fTime;
-    return fn_800C7970(pScript->pShot, fSpeed, fNow, pScript->pShot->f48, pScript->pShot->f4C,
-                       pScript->fCamTime, fTime);
+    // port: EA passes an argument fn_800C7970 ignores (the shot, in r3)
+    return ((f32 (*)(CamShot*, f32, f32, f32, f32, f32, f32))fn_800C7970)(
+        pScript->pShot, fSpeed, fNow, pScript->pShot->f48, pScript->pShot->f4C, pScript->fCamTime, fTime);
 }
 
 // The camera's speed on the spline through the shot's chain (p44, the shot, its p40 and that one's

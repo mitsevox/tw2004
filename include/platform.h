@@ -37,6 +37,7 @@
 // ---- the C library (MSL) --------------------------------------------------------------------
 
 #ifndef TW_PORT
+#include <stdarg.h>
 void*  memcpy(void* pDst, const void* pSrc, u32 uLen);
 void*  memmove(void* pDst, const void* pSrc, u32 uLen);
 void*  memset(void* pDst, int nValue, u32 uLen);
@@ -54,6 +55,7 @@ char*  strtok(char* pStr, const char* pDelim);
 int    atoi(const char* p);
 int    sprintf(char* pBuf, const char* pFmt, ...);
 int    snprintf(char* pBuf, u32 uLen, const char* pFmt, ...);
+int    vsprintf(char* pBuf, const char* pFmt, va_list args);
 int    sscanf(const char* pStr, const char* pFmt, ...);   // 0x80159408, before MSL's __StringRead
 double atan(double x);
 double sin(double x);
@@ -97,6 +99,7 @@ s64  OSGetTime(void);           // the time base, in ticks
 void OSTicksToCalendarTime(s64 nTicks, OSCalendarTime* pTime);
 u32  OSGetTick(void);           // the low 32 bits of the time base
 void OSReport(const char* pFmt, ...);   // debug print (nothing in the retail build)
+void OSPanic(const char* pFile, int nLine, const char* pFmt, ...);   // print and halt
 
 // ---- the GameCube DVD library -----------------------------------------------------------------
 

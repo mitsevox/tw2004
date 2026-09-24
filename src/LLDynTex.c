@@ -27,6 +27,10 @@ DynTexJob* fn_8010B960(void);
 u8   fn_8010BF3C(void);
 u8   fn_8010BFE0(void);
 void fn_80007254(void);                 // LLDisp_Gc.c
+int  fn_800106F0(TexBank* pBank);       // LLTexGrp.c
+int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
+TexEntry* fn_800107E4(TexBank* pBank, int nTex);  // LLTexGrp.c
+s32  fn_8010BC94(const void* pA, const void* pB);
 
 // Set up: the state and its nSize-byte block (gomainloop.c: 0x18000, later 0x6000).
 void fn_8010A448(int nSize) {
@@ -48,6 +52,44 @@ void fn_8010A4E8(void) {
     }
     fn_80009E70(lbl_80282488);
 }
+
+// ---- end of sweep code ----
+
+// Make a dynamic texture for nC textures with an nSize-byte pixel buffer: one block holds the
+// DynTex, its header and the per-texture tables; the header is registered as a texture bank.
+DynTex* fn_8010A520(int nC, int nSize, int n2, int n3, int n4) {
+    s32 nBytes;
+    DynTex* pTex;
+    DynTexHeader* pHeader;
+
+    // fake match: the terms' order and the casts only steer CW's regrouping (still 90%)
+    nBytes = nC * (s32)sizeof(DynTexObj) + nC * (s32)sizeof(DynTexEntry) +
+             nC * (s32)sizeof(DynTexPalette) + nC * (s32)sizeof(DynTex40) +
+             nC * (s32)sizeof(DynTex18) + (s32)sizeof(DynTex);
+    pTex = fn_80009B34(nBytes, 2, 16, "LLDynTex.c", 151);
+    memset(pTex, 0, nBytes);
+    pTex->nC = nC;
+    pTex->p18 = fn_80009B34(nSize, 2, 32, "LLDynTex.c", 161);
+    pTex->n10 = nSize;
+    pHeader = &pTex->header;
+    pTex->p4 = pHeader;
+    pTex->p0 = (DynTexEntry*)(pHeader + 1);
+    pTex->header.p8 = (DynTexObj*)(pTex->p0 + nC);
+    pTex->header.pC = (DynTexPalette*)(pTex->header.p8 + nC);
+    pTex->header.p10 = (DynTex40*)(pTex->header.pC + nC);
+    pTex->header.p14 = (DynTex18*)(pTex->header.p10 + nC);
+    pTex->header.p18 = pTex->p18;
+    pTex->header.p20 = pTex->p18;
+    pTex->header.b2C = 0;
+    // port: the header has TexBank's layout (see lldyntex.h)
+    pTex->n1C = fn_800106F0((TexBank*)pTex->p4);
+    pTex->p4->n7 = n4;
+    pTex->p4->n28 = n2;
+    pTex->p4->n0 = n3;
+    return pTex;
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 // Free a dynamic texture.
 void fn_8010A668(DynTex* pTex) {
@@ -89,6 +131,30 @@ void fn_8010A6A8(DynTex* pSrc, DynTex* pDst) {
 void* fn_8010A780(DynTex* pTex) {
     return pTex->p4;
 }
+
+// ---- end of sweep code ----
+
+// Put an RGB colour through a 3x3 colour matrix, clamped to 0..1. Mode 0 combines each input
+// channel's part like light (one minus the product of what each lets through), mode 1 adds them.
+void fn_8010A788(f32* pIn, f32* pOut, f32 (*pMtx)[3], s32 nMode) {
+    if (nMode == 0) {
+        pOut[0] = 1.0f - (1.0f - pIn[0] * pMtx[0][0]) * (1.0f - pIn[1] * pMtx[1][0]) *
+                             (1.0f - pIn[2] * pMtx[2][0]);
+        pOut[1] = 1.0f - (1.0f - pIn[0] * pMtx[0][1]) * (1.0f - pIn[1] * pMtx[1][1]) *
+                             (1.0f - pIn[2] * pMtx[2][1]);
+        pOut[2] = 1.0f - (1.0f - pIn[0] * pMtx[0][2]) * (1.0f - pIn[1] * pMtx[1][2]) *
+                             (1.0f - pIn[2] * pMtx[2][2]);
+    } else if (nMode == 1) {
+        pOut[0] = pIn[0] * pMtx[0][0] + pIn[1] * pMtx[1][0] + pIn[2] * pMtx[2][0];
+        pOut[1] = pIn[0] * pMtx[0][1] + pIn[1] * pMtx[1][1] + pIn[2] * pMtx[2][1];
+        pOut[2] = pIn[0] * pMtx[0][2] + pIn[1] * pMtx[1][2] + pIn[2] * pMtx[2][2];
+    }
+    pOut[0] = (pOut[0] < 0.0f) ? 0.0f : ((pOut[0] > 1.0f) ? 1.0f : pOut[0]);
+    pOut[1] = (pOut[1] < 0.0f) ? 0.0f : ((pOut[1] > 1.0f) ? 1.0f : pOut[1]);
+    pOut[2] = (pOut[2] < 0.0f) ? 0.0f : ((pOut[2] > 1.0f) ? 1.0f : pOut[2]);
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 s32 fn_8010AD10(DynTex* pTex) {
     return pTex->n8;
@@ -243,6 +309,64 @@ void fn_8010B2A8(DynTex* pTex, int nTex, s16* pPalette) {
     GXInvalidateTexAll();
 }
 
+// Add a copy of texture pObj (and its palette pPal, if any) to pTex: its pixel blocks and palette
+// get room at the end of pTex's buffer, filled from pPixels and pPalette when given, the pixels
+// then recoloured by fn_8010A930 when p is set. Returns the new texture's index, or 0 when the
+// buffer is full.
+s32 fn_8010B338(DynTex* pTex, DynTexObj* pObj, DynTexPalette* pPal, u8* pPixels, u8* pPalette,
+                void* p, s32 n) {
+    char szName[16];            // the size is not known (fn_800CB8F0 writes the name)
+    s32 nTex;
+    DynTexObj* pNew;
+    DynTexPalette* pNewPal;
+    s32 nBytes;
+    int i;
+    DynTexEntry* pEntry;
+    s32 nFirst;
+
+    pNewPal = NULL;
+    nTex = pTex->n8;
+    memcpy(&pTex->p4->p8[nTex], pObj, sizeof(DynTexObj));
+    pNew = &pTex->p4->p8[nTex];
+    pEntry = &pTex->p0[nTex];
+    if (pPal != NULL) {
+        pNew->n3C = (s8)nTex;
+        memcpy(&pTex->p4->pC[nTex], pPal, sizeof(DynTexPalette));
+        pNewPal = &pTex->p4->pC[nTex];
+    } else {
+        memset(&pTex->p4->pC[nTex], 0, sizeof(DynTexPalette));
+    }
+    if ((u32)(pTex->n14 + fn_8010B0C0(pNew, pNewPal, pEntry)) > (u32)pTex->n10) {
+        fn_800CB8F0(&pObj->uId, szName);
+        return 0;
+    }
+    nFirst = pNew->aBlocks[0].nOffset;
+    for (i = 0; i < pEntry->n8; i++) {
+        nBytes = pEntry->aC[i];
+        if (pPixels != NULL) {
+            memcpy(pTex->p18 + pTex->n14, pPixels + (pNew->aBlocks[i].nOffset - nFirst), nBytes);
+        }
+        pNew->aBlocks[i].nOffset = pTex->n14;
+        if (pPixels != NULL && p != NULL) {
+            fn_8010A930(pNew, pTex->p18, p, n);
+        }
+        pTex->n14 += nBytes;
+    }
+    if (pEntry->n1C != 0) {
+        if (pPalette != NULL) {
+            memcpy(pTex->p18 + pTex->n14, pPalette, pEntry->n1C);
+        }
+        pNewPal->nOffset = pTex->n14;
+        pTex->n14 += pEntry->n1C;
+    }
+    pTex->n8++;
+    pTex->p4->n2++;
+    if (pNewPal != NULL) {
+        pTex->p4->n4++;
+    }
+    return pTex->n8 - 1;
+}
+
 // A free job, or NULL.
 DynTexJob* fn_8010B8EC(void) {
     int i;
@@ -315,6 +439,54 @@ s32 fn_8010B664(DynTexPalette* pPal) {
     return 4;
 }
 
+// Set up GX's texture (and palette) objects of each of pTex's textures in use, first moving
+// their blocks' n8 by the header's n28. Always 1.
+s32 fn_8010BA2C(DynTex* pTex) {
+    int i;
+    DynTexObj* pObj;
+    DynTexPalette* pPal;
+    DynTex40* pTexObj;
+    DynTex18* pTlut;
+    int j;
+
+    if (pTex == NULL) {
+        return 1;
+    }
+    for (i = 0; i < pTex->n8; i++) {
+        DynTexEntry* pEntry = &pTex->p0[i];
+
+        pObj = &pTex->p4->p8[i];
+        pPal = &pTex->p4->pC[i];
+        pTexObj = &pTex->p4->p10[i];
+        pTlut = &pTex->p4->p14[i];
+        if (pEntry->uId == 0) {
+            continue;
+        }
+        for (j = 0; j < pObj->n41; j++) {
+            pObj->aBlocks[j].n8 += (s16)pTex->p4->n28;
+        }
+        if (pObj->n3C == -1) {
+            // fake match: the same wrap tests as below, written another way (82.7% -> 86.6%)
+            GXInitTexObj(&pTexObj->tex, pTex->p4->p18 + pObj->aBlocks[0].nOffset, pObj->n38,
+                         pObj->n3A, pObj->n40, !(pObj->b46 & 1), !((pObj->b46 >> 1) & 1),
+                         pObj->n41 > 1);
+        } else {
+            GXInitTexObjCI(&pTexObj->tex, pTex->p4->p18 + pObj->aBlocks[0].nOffset, pObj->n38,
+                           pObj->n3A, pObj->n40, (pObj->b46 & 1) == 0, (pObj->b46 & 2) == 0, 0,
+                           0);
+            if (pPal != NULL) {
+                GXInitTlutObj(&pTlut->tlut, pTex->p4->p20 + pPal->nOffset, pPal->nFormat,
+                              pPal->nEntries);
+            }
+        }
+        if (pObj->n41 > 1) {
+            GXInitTexObjLOD(&pTexObj->tex, 5, 1, 0.0f, pObj->n41 - 1.0f, -2.0f, 0, 0, 0);
+        }
+        pObj->n3E = i;
+    }
+    return 1;
+}
+
 void fn_8010BC64(u8* p) {
     fn_8000FBAC(*(s32*)(p + 0x4));
 }
@@ -323,8 +495,57 @@ void fn_8010BC88(void* p) {
     lbl_80282488->p8 = p;
 }
 
+// qsort's order for DynTexUse entries: by where their textures' pixels start in the bank.
+s32 fn_8010BC94(const void* pA, const void* pB) {
+    // port: EA converts the offsets as signed
+    f32 fA = (s32)((DynTexUse*)pA)->pTex->uPixels;
+    f32 fB = (s32)((DynTexUse*)pB)->pTex->uPixels;
+
+    return (fA < fB) ? -1 : (fA >= fB);
+}
+
+// Note that a skin uses the bank's texture uId (and the one paired with it), with p and n; an
+// unknown name is only turned into text.
+void fn_8010BCFC(u64 uId, void* p, s32 n) {
+    char szName[16];            // the size is not known (fn_800CB868 writes the name)
+    int nTex = fn_8001005C(*lbl_80282488->p8, uId);
+
+    if (nTex != (int)0x80000000) {
+        lbl_80282488->aUses[lbl_80282488->n96C].pTex = fn_800107E4(*lbl_80282488->p8, nTex);
+    } else {
+        fn_800CB868(&uId, szName);
+        return;
+    }
+    lbl_80282488->aUses[lbl_80282488->n96C].p4 = p;
+    lbl_80282488->aUses[lbl_80282488->n96C].n8 = n;
+    lbl_80282488->aUses[lbl_80282488->n96C].nC = -1;
+    lbl_80282488->n96C++;
+    if (lbl_80282488->aUses[lbl_80282488->n96C - 1].pTex->b47 & 1) {
+        lbl_80282488->aUses[lbl_80282488->n96C].pTex = fn_800107E4(*lbl_80282488->p8, nTex + 1);
+        lbl_80282488->aUses[lbl_80282488->n96C].p4 = p;
+        lbl_80282488->aUses[lbl_80282488->n96C].n8 = n;
+        lbl_80282488->aUses[lbl_80282488->n96C].nC = -1;
+        // The pair is kept only when it has the same name.
+        if ((lbl_80282488->aUses[lbl_80282488->n96C - 1].pTex->b47 & 1) &&
+            lbl_80282488->aUses[lbl_80282488->n96C - 1].pTex->u0 ==
+                lbl_80282488->aUses[lbl_80282488->n96C].pTex->u0) {
+            lbl_80282488->n96C++;
+        }
+    }
+}
+
 void fn_8010BEC4(void) {
     lbl_80282488->n96C = 0;
+}
+
+// Start over: sort the textures in use by where their pixels start (fn_8010BC94).
+void fn_8010BED4(void) {
+    lbl_80282488->b975 = 1;
+    lbl_80282488->b974 = 1;
+    lbl_80282488->n978 = 0;
+    lbl_80282488->n970 = 0;
+    lbl_80282488->n980 = 1;
+    qsort(lbl_80282488->aUses, lbl_80282488->n96C, sizeof(DynTexUse), fn_8010BC94);
 }
 
 // Whether the queue is empty and nothing is left to do.

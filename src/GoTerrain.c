@@ -18,9 +18,7 @@
 void* fn_800073B4(u8* pData, int n);
 void  fn_800075CC(void* p);         // frees what fn_800073B4 made
 void  fn_80019358(Character* pChar, f32* pDir, f32 f);
-void  fn_8001BE88(Character* pChar, void* pClip, int n, f32 f);
 void  fn_800F199C(f32 x, f32 y, f32 z);
-CamLens* fn_8001F004(void);         // the current camera's lens
 f32   fn_8001414C(u8* p);
 f32   fn_80014280(f32 x);           // tan
 void  fn_80030894(void);
@@ -30,7 +28,12 @@ void  fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject);
 void  fn_8003185C(void);
 void  fn_800318D8(void);
 void  fn_80031AB4(void);
+u8    fn_80031E40(void);
 void  fn_80031E58(void);
+u8    fn_80032330(UObjMesh* pModel);
+void  fn_8003241C(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, UObjMesh* pModel, s32 iObject,
+                  s32 eClipMethod, u8 bUseFog, u8 bSetsPrimField, f32 fAlpha, f32 fMipmapBias,
+                  f32 fDistanceSquared);
 void  fn_80032518(int nRenderPass);
 void  fn_80032770(void);
 void  fn_80032954(void);
@@ -54,6 +57,18 @@ void  fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFi
 void  fn_800341A4(UStreamObject* pObject);
 void  fn_800342B4(UStreamObject* pObject);
 void  fn_800342F0(UStreamObject* pObject);
+void  fn_80035584(s32 v);
+void  fn_80035590(f32* p0);
+void  fn_800355B8(f32* p0);
+void  fn_80034648(int n);
+void  fn_80035514(u8* pObject);
+void  fn_800332F4(void);
+u8    fn_8003505C(u8 b);
+f32*  fn_80035508(UObjMesh* pMesh);
+void  fn_80063920(int nView, f32* pBounds);     // GoCamCont: given an object the camera is inside
+u8    fn_80033308(Ter_ObjectDrawData* pDraw, u8 bForce);
+void  fn_8000ADC0(f32 (*pMtx)[4]);  // identity matrix
+void  fn_80035370(void);
 void  fn_80035098(u8 b);
 void  fn_80034CAC(int nRenderPass);
 void  fn_80034DE4(void);
@@ -89,6 +104,94 @@ void fn_80031084(UObjMesh* pNode, s32 eClipMethod, s32 iRenderPass, Ter_PatchRef
         return;
     }
     pPatch->pObjects = NULL;
+}
+
+// Sets up the terrain renderer: allocates its lists, gives every object state its starting values
+// (each tree its own period from a stepped random number), sets the renderer's defaults and fills
+// the bit-count table lbl_801D3A30.
+void fn_80030254(void) {
+    s32 i;
+    s32 n;
+    s32 k;
+    s32 j;
+    s32 nBits;
+
+    lbl_801D3CB0.pPatchList = fn_80009B34(1024 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c", 567);
+    lbl_801D3CB0.pPostDrawTerrainList =
+        fn_80009B34(20 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c", 572);
+    lbl_801D3CB0.pObjectSortList = fn_80009B34(650 * sizeof(Ter_ObjectReference), 2, 16, "GoTerrain.c", 577);
+    lbl_801D3CB0.pOpaqueObjectList = fn_80009B34(650 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 582);
+    lbl_801D3CB0.pTranslucentObjectList =
+        fn_80009B34(200 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 587);
+    lbl_801D3CB0.pNearbyObjectList = fn_80009B34(70 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 592);
+    lbl_801D3CB0.pDeferredItemsList = fn_80009B34(50 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 597);
+    lbl_801D3CB0.pPanoramaItemsList =
+        fn_80009B34(300 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 602);
+    lbl_801D3CB0.pPostDrawItemsList =
+        fn_80009B34(400 * sizeof(Ter_ObjectDrawData), 2, 16, "GoTerrain.c", 607);
+    lbl_801D3CB0.pObjectStateList =
+        fn_80009B34(TER_NUM_OBJECTS * sizeof(Ter_ObjectState), 2, 16, "GoTerrain.c", 612);
+    lbl_801D3CB0.xpGrassPatchList = fn_80009B34(128 * sizeof(Ter_PatchReference), 2, 16, "GoTerrain.c", 633);
+    lbl_801D3CB0.fTreeMinPeriod = 3.7f;
+    lbl_801D3CB0.fTreeDiffPeriod = 1.6f;
+    lbl_801D3CB0.fTreeOverdrive = 1.0f;
+    lbl_801D3CB0.fTreeNoisePeriodScale = 1.0f;
+    lbl_801D3CB0.fTreeNoiseAmplitudeScale = 0.0f;
+    for (i = 0; i < TER_NUM_OBJECTS; i++) {
+        lbl_801D3CB0.pObjectStateList[i].a20[0] = 0;
+        lbl_801D3CB0.pObjectStateList[i].a20[1] = 0;
+        lbl_801D3CB0.pObjectStateList[i].a20[2] = 0;
+        lbl_801D3CB0.pObjectStateList[i].a20[3] = 0;
+        lbl_801D3CB0.pObjectStateList[i].f0 =
+            lbl_80281D60 * lbl_801D3CB0.fTreeDiffPeriod + lbl_801D3CB0.fTreeMinPeriod;
+        lbl_80281D60 *= 131.2934f;
+        lbl_80281D60 += 82.459f;
+        lbl_80281D60 -= fn_80035074(lbl_80281D60);
+        lbl_801D3CB0.pObjectStateList[i].f4 = lbl_801D3CB0.fTreeOverdrive;
+        lbl_801D3CB0.pObjectStateList[i].f8 = 0.0f;
+        lbl_801D3CB0.pObjectStateList[i].nC = 0;
+        lbl_801D3CB0.pObjectStateList[i].n18 = 0;
+        lbl_801D3CB0.pObjectStateList[i].n1C = 0;
+        lbl_801D3CB0.pObjectStateList[i].f10 = lbl_80281D60;
+        lbl_801D3CB0.pObjectStateList[i].aView[0].n4 = 3;
+        lbl_801D3CB0.pObjectStateList[i].aView[0].f0 = 1.0f;
+        lbl_801D3CB0.pObjectStateList[i].aView[1].n4 = 3;
+        lbl_801D3CB0.pObjectStateList[i].aView[1].f0 = 1.0f;
+    }
+    lbl_801D3CB0.pCurrentHoleData = NULL;
+    lbl_801D3CB0.pCourse = NULL;
+    lbl_801D3CB0.fDetailMipmapBias = 0.0f;
+    lbl_801D3CB0.fLakeSurfaceMipmapBias = 0.0f;
+    lbl_801D3CB0.iLowLODListOffset = -1;
+    lbl_801D3CB0.fCrowdAnimationDelayedStartTimer = -1.0f;
+    lbl_801D3CB0.fCrowdAnimationDelayedStartPercentage = 0.0f;
+    lbl_801D3CB0.fCrowdAnimationDelayedStartDuration = 0.0f;
+    lbl_801D3CB0.fCrowdAnimationCountdown = -1.0f;
+    lbl_801D3CB0.fCrowdFadeDistanceMin = 4.0f;
+    lbl_801D3CB0.fCrowdFadeDistanceMax = 5.0f;
+    lbl_801D3CB0.iCrowdPose = 0;
+    lbl_801D3CB0.fCrowdInterpValue = 0.5f;
+    lbl_801D3CB0.fTreeDampingDistance = 5625.0f;
+    lbl_801D3CB0.fTreeDampingMaxForce = 0.5f;
+    lbl_801D3CB0.fDistanceCullYardsBase = 150.0f;
+    lbl_801D3CB0.eObjectFilterMin = 4;
+    lbl_801D3CB0.eObjectFilterMag = 1;
+    lbl_801D3CB0.eTerrainFilterMin = 5;
+    lbl_801D3CB0.eTerrainFilterMag = 1;
+    lbl_801D3CB0.fCrowdFullMaxDistanceFromGolfer = 60.0f;
+    lbl_801D3CB0.fCrowdHalfMaxDistanceFromGolfer = 350.0f;
+    fn_8003505C(1);
+    for (n = 0; n < 5; n++) {
+        for (k = 0; k < 32; k++) {
+            nBits = 0;
+            for (j = 0; j < n; j++) {
+                if (k & (1 << j)) {
+                    nBits++;
+                }
+            }
+            lbl_801D3A30[n][k] = nBits;
+        }
+    }
 }
 
 void fn_800306B8(void) {
@@ -340,6 +443,174 @@ void fn_8003185C(void) {
     }
 }
 
+// Adds a patch's objects to pObjectSortList, numbering them from nFirstObject: each gets its three
+// levels of detail (in object test mode the first list's; else lists 0, and 1 and 2 past
+// iLowLODListOffset), its distance from the camera and a clip method, or is left out (clip method 3).
+// Split screen leaves out objects with bit 0x8 of word 2. Hidden are: far objects with bit 0x80;
+// tee markers (word 1 bits 0x1, 0x2, 0x4: tee sets 0-2) not of the player's tee set, and all of them
+// once the ball is off the tee (Ball.nLie); crowd objects (word 3 bits 0x4, 0x10, 0x20) while the
+// camera moves, beyond fCrowdHalfMaxDistanceFromGolfer from the ball, or beyond
+// fCrowdFullMaxDistanceFromGolfer and farther from the pin than the ball is (every other one when
+// nearer).
+void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
+    f32 v48[4];
+    f32 v38[4];
+    f32 v28[4];
+    f32 v18[4];
+    f32 v8[4];
+    s32 nObjects;
+    s32 nLists;
+    s32 i;
+    s32 nLast;
+    UObjMesh* pLOD0;
+    UObjMesh* pLOD1;
+    UObjMesh* pLOD2;
+    s32 uFlags2;
+    f32* pBounds;
+    f32* pBall;
+    f32* pPin;
+    f32 fHeight;
+    f32 fXZ;
+    f32 fDistanceSquared;
+    f32 fBallToObject;
+    f32 fPinToBall;
+    f32 fObjectToPin;
+    u8 bHide;
+    s32 eClipMethod;
+    View* pView;
+    Ter_ObjectReference* pRef;
+    s32 iObject;
+
+    nObjects = fn_800354F4(fn_800354E4(pPatch->pObjects, 0));
+    if (nObjects == 0) {
+        return;
+    }
+    if (lbl_801D3CB0.bObjectTestMode) {
+        nObjects = 1;
+        nLists = fn_800354F4(fn_800354E4(pPatch->pObjects, 0));
+        pLOD0 = fn_800354E4(fn_800354E4(pPatch->pObjects, 0), 0);
+        pLOD1 = nLists > 1 ? fn_800354E4(fn_800354E4(pPatch->pObjects, 0), 1) : pLOD0;
+        pLOD2 = nLists > 2 ? fn_800354E4(fn_800354E4(pPatch->pObjects, 0), 2) : pLOD1;
+    } else {
+        if (lbl_801D3CB0.iLowLODListOffset == -1) {
+            if (fn_800354F4(pPatch->pObjects) == 5) {
+                lbl_801D3CB0.iLowLODListOffset = 2;
+            } else {
+                lbl_801D3CB0.iLowLODListOffset = 0;
+            }
+        }
+        pLOD0 = fn_800354E4(fn_800354E4(pPatch->pObjects, 0), 0);
+        pLOD1 = fn_800354E4(fn_800354E4(pPatch->pObjects, lbl_801D3CB0.iLowLODListOffset + 1), 0);
+        pLOD2 = fn_800354E4(fn_800354E4(pPatch->pObjects, lbl_801D3CB0.iLowLODListOffset + 2), 0);
+    }
+    nLast = nObjects + nFirstObject - 1;
+    for (i = nObjects - 1; i >= 0; i--) {
+        uFlags2 = fn_800354D0(pLOD0, 2);
+        if (gSession.nSplitScreen == 0 || !(uFlags2 & 8)) {
+            pBounds = fn_80035508(pLOD0);
+            fHeight = fabsf(lbl_801D3CB0.xCameraReferencePos[1] - pBounds[1]) - pBounds[7];
+            if (fHeight < 0.0f) {
+                fHeight = 0.0f;
+            }
+            fn_8003546C(pBounds, lbl_801D3CB0.xCameraReferencePos, v48);
+            v48[1] = 0.0f;
+            fXZ = (f32)fn_80009680(fn_80009744(v48)) - pBounds[3];
+            if (fXZ < 0.0f) {
+                fXZ = 0.0f;
+            }
+            fDistanceSquared = fHeight * fHeight + fXZ * fXZ;
+            if (fDistanceSquared <= 0.0f) {
+                fn_80063920(lbl_801D3CB0.iCurrentViewContext, pBounds);
+            }
+            bHide = 0;
+            if ((uFlags2 & 0x80) && fDistanceSquared > lbl_801D3CB0.fDistanceCullFrameYardsSquared) {
+                bHide = 1;
+            } else if ((fn_800354D0(pLOD0, 3) & 4) || (fn_800354D0(pLOD0, 3) & 0x10)
+                       || (fn_800354D0(pLOD0, 3) & 0x20)) {
+                pBall = gPlayers[fn_8001707C(lbl_801D3CB0.iCurrentViewContext)].vBall;
+                pPin = &fn_8000C594()->pin[Game_CurrentPinSet()].x;
+                fn_8003546C(pBounds, pBall, v28);
+                v28[1] = 0.0f;
+                fBallToObject = (f32)fn_80009680(fn_80009744(v28)) - pBounds[3];
+                if (fBallToObject < 0.0f) {
+                    fBallToObject = 0.0f;
+                }
+                fn_8003546C(pPin, pBall, v18);
+                v18[1] = 0.0f;
+                fPinToBall = fn_80009680(fn_80009744(v18));
+                if (fPinToBall < 0.0f) {
+                    fPinToBall = 0.0f;
+                }
+                fn_8003546C(pBounds, pPin, v8);
+                v8[1] = 0.0f;
+                fObjectToPin = (f32)fn_80009680(fn_80009744(v8)) - pBounds[3];
+                if (fObjectToPin < 0.0f) {
+                    fObjectToPin = 0.0f;
+                }
+                if (!fn_800172C4(fn_80017028(lbl_801D3CB0.iCurrentViewContext))) {
+                    bHide = 1;
+                } else if (fBallToObject > lbl_801D3CB0.fCrowdHalfMaxDistanceFromGolfer) {
+                    bHide = 1;
+                } else if (fBallToObject > lbl_801D3CB0.fCrowdFullMaxDistanceFromGolfer
+                           && fObjectToPin > fPinToBall) {
+                    bHide = 1;
+                } else if (fBallToObject > lbl_801D3CB0.fCrowdFullMaxDistanceFromGolfer
+                           && fObjectToPin <= fPinToBall && (nLast - i) % 2 != 0) {
+                    bHide = 1;
+                } else if (((fn_800354D0(pLOD0, 1) & 1)
+                            && gSession.nTeeSet[fn_8001707C(lbl_801D3CB0.iCurrentViewContext)] != 0)
+                           || ((fn_800354D0(pLOD0, 1) & 2)
+                               && gSession.nTeeSet[fn_8001707C(lbl_801D3CB0.iCurrentViewContext)] != 1)
+                           || ((fn_800354D0(pLOD0, 1) & 4)
+                               && gSession.nTeeSet[fn_8001707C(lbl_801D3CB0.iCurrentViewContext)] != 2)) {
+                    bHide = 1;
+                } else if (((fn_800354D0(pLOD0, 1) & 1) || (fn_800354D0(pLOD0, 1) & 2)
+                            || (fn_800354D0(pLOD0, 1) & 4))
+                           && gPlayers[fn_8001707C(lbl_801D3CB0.iCurrentViewContext)].ball.nLie != 0) {
+                    bHide = 1;
+                }
+            }
+            if (bHide) {
+                eClipMethod = 3;
+            } else if (pPatch->eClipMethod == 2) {
+                eClipMethod = 2;
+            } else {
+                pView = fn_80017028(lbl_801D3CB0.iCurrentViewContext);
+                eClipMethod = fn_80007B2C(pLOD0, fn_8001614C(), fn_80009680(fDistanceSquared),
+                                          lbl_801D3CB0.fCameraMinHalfFieldOfViewTan, pView->f54);
+            }
+            if (eClipMethod != 3) {
+                pRef = &lbl_801D3CB0.pObjectSortList[lbl_801D3CB0.iTotalSortObjects];
+                pRef->fDistanceSquared = fDistanceSquared;
+                pRef->f14 = fn_80009744(v48);
+                fn_8003546C(pBounds, lbl_801D3CB0.xCameraReferencePos, v38);
+                pRef->f18 = fn_8000C5FC(lbl_801D3CB0.xCameraLookVector, v38);
+                iObject = nLast - i;
+                pRef->eClipMethod = eClipMethod;
+                pRef->pContainerPatch = pPatch;
+                pRef->iGlobalObjectIndex = iObject;
+                lbl_801D3CB0.pObjectStateList[iObject].a20[0] = fn_800354D0(pLOD0, 0);
+                lbl_801D3CB0.pObjectStateList[iObject].a20[1] = fn_800354D0(pLOD0, 1);
+                lbl_801D3CB0.pObjectStateList[iObject].a20[2] = fn_800354D0(pLOD0, 2);
+                lbl_801D3CB0.pObjectStateList[iObject].a20[3] = fn_800354D0(pLOD0, 3);
+                if ((uFlags2 & 0x40) || (fn_800354D0(pLOD0, 3) & 0x10) || (fn_800354D0(pLOD0, 3) & 0x20)) {
+                    pRef->nLODs = 1;
+                    pRef->apObject[0] = pLOD0;
+                } else {
+                    pRef->nLODs = 3;
+                    pRef->apObject[0] = pLOD0;
+                    pRef->apObject[1] = pLOD1;
+                    pRef->apObject[2] = pLOD2;
+                }
+                lbl_801D3CB0.iTotalSortObjects++;
+            }
+        }
+        pLOD0 = fn_800354BC(pLOD0);
+        pLOD1 = fn_800354BC(pLOD1);
+        pLOD2 = fn_800354BC(pLOD2);
+    }
+}
+
 // fn_8003185C's comparison: nearest first.
 s32 fn_800318AC(const void* pA, const void* pB) {
     f32 fA = ((const Ter_ObjectReference*)pA)->fDistanceSquared;
@@ -381,9 +652,216 @@ void fn_80031A08(s32* pA, s32* pB, s32 a, s32 b) {
     *pB = lbl_802810DC + (b + lbl_802810E0 * (s32)lbl_802810D8 - n) / (int)lbl_802810D8;
 }
 
+// Picks each sorted object's level of detail by its distance: the first LOD plane whose end it is
+// inside. Once the 'tLOD' chunk is loaded, objects whose flags (bits 0x4, 0x10, 0x20 of the model's
+// word 3) ask for it always get level 0, and the others never get level 0 while the camera moves.
+// Unless gSession.b11 is set, an object between two planes fades from one level into the next.
+void fn_80031AB4(void) {
+    Ter_LODPlane* pPlanes = lbl_801D3CB0.LODPlanes;
+    s32 i;
+    s32 nLOD;
+    s32 nTranslucent;
+    s32 nLast;
+    s32 iObject;
+    s32 uFlags;
+    f32 fDistanceSquared;
+    f32 fAlpha;
+    f32 fT;
+
+    if (gSession.b11 != 0) {
+        fAlpha = 0.0f;
+        for (i = lbl_801D3CB0.iTotalSortObjects - 1; i >= 0; i--) {
+            iObject = lbl_801D3CB0.pObjectSortList[i].iGlobalObjectIndex;
+            fDistanceSquared = lbl_801D3CB0.pObjectSortList[i].fDistanceSquared;
+            nLast = lbl_801D3CB0.pObjectSortList[i].nLODs - 1;
+            uFlags = lbl_801D3CB0.pObjectStateList[iObject].a20[3];
+            if (((uFlags & 4) || (uFlags & 0x10) || (uFlags & 0x20)) && fn_80031E40()) {
+                nLOD = 0;
+            } else {
+                for (nLOD = 0; nLOD < nLast; nLOD++) {
+                    if (fDistanceSquared <= pPlanes[nLOD].fEnd * pPlanes[nLOD].fEnd) break;
+                }
+                if (!fn_800172C4(fn_80017028(lbl_801D3CB0.iCurrentViewContext))) {
+                    uFlags = lbl_801D3CB0.pObjectStateList[iObject].a20[3];
+                    if (!(uFlags & 4) && !(uFlags & 0x10) && !(uFlags & 0x20) && fn_80031E40() && nLOD == 0) {
+                        nLOD = 1;
+                    }
+                }
+            }
+            lbl_801D3CB0.pObjectSortList[i].fAlpha = fAlpha;
+            lbl_801D3CB0.pObjectSortList[i].iOpaqueLOD = nLOD;
+            lbl_801D3CB0.pObjectSortList[i].iTranslucentLOD = nLOD;
+        }
+        return;
+    }
+    for (i = lbl_801D3CB0.iTotalSortObjects - 1; i >= 0; i--) {
+        fDistanceSquared = lbl_801D3CB0.pObjectSortList[i].fDistanceSquared;
+        iObject = lbl_801D3CB0.pObjectSortList[i].iGlobalObjectIndex;
+        nLast = lbl_801D3CB0.pObjectSortList[i].nLODs - 1;
+        for (nLOD = 0; nLOD < nLast; nLOD++) {
+            if (fDistanceSquared <= pPlanes[nLOD].fEnd * pPlanes[nLOD].fEnd) break;
+        }
+        if (!fn_800172C4(fn_80017028(lbl_801D3CB0.iCurrentViewContext))) {
+            uFlags = lbl_801D3CB0.pObjectStateList[iObject].a20[3];
+            if (!(uFlags & 4) && !(uFlags & 0x10) && !(uFlags & 0x20) && fn_80031E40() && nLOD == 0) {
+                nLOD = 1;
+            }
+        }
+        if (nLOD < nLast
+            && fDistanceSquared > pPlanes[nLOD + 1].fBegin * pPlanes[nLOD + 1].fBegin) {
+            // between this plane's end and the next one's start: fade over to the next level
+            fT = ((f32)fn_80009680(fDistanceSquared) - pPlanes[nLOD + 1].fBegin)
+               / (pPlanes[nLOD].fEnd - pPlanes[nLOD + 1].fBegin);
+            if (fT < 0.5f) {
+                nTranslucent = nLOD + 1;
+                fAlpha = 2.0f * fT;
+            } else {
+                nTranslucent = nLOD;
+                nLOD++;
+                fAlpha = 2.0f * (1.0f - fT);
+            }
+            if (fAlpha < 0.0f) {
+                fAlpha = 0.0f;
+            }
+            if (fAlpha > 1.0f) {
+                fAlpha = 1.0f;
+            }
+            uFlags = lbl_801D3CB0.pObjectStateList[iObject].a20[3];
+            if (((uFlags & 4) || (uFlags & 0x10) || (uFlags & 0x20)) && fn_80031E40()) {
+                fAlpha = 0.0f;
+                nTranslucent = 0;
+                nLOD = 0;
+            }
+        } else {
+            fAlpha = 0.0f;
+            uFlags = lbl_801D3CB0.pObjectStateList[iObject].a20[3];
+            if (((uFlags & 4) || (uFlags & 0x10) || (uFlags & 0x20)) && fn_80031E40()) {
+                nLOD = 0;
+            }
+            nTranslucent = nLOD;
+        }
+        lbl_801D3CB0.pObjectSortList[i].iOpaqueLOD = nLOD;
+        lbl_801D3CB0.pObjectSortList[i].iTranslucentLOD = nTranslucent;
+        lbl_801D3CB0.pObjectSortList[i].fAlpha = fAlpha;
+    }
+}
+
 // Whether the 'tLOD' chunk has been loaded.
 u8 fn_80031E40(void) {
     return lbl_802810E4 != -1;
+}
+
+// Sorts the objects (farthest first) into the draw lists: post-draw objects (bit 0x80 of the
+// model's word 2) straight to pPostDrawItemsList; the others opaque when far or when they must
+// stay solid, faded in over the near range (pNearbyObjectList), and their fading level into
+// pTranslucentObjectList. Crowd objects (bit 0x20 of word 0, only while the camera is still) use
+// the crowd's fade distances.
+void fn_80031E58(void) {
+    s32 i;
+    UObjMesh* pModel;
+    s32 uFlags0;
+    s32 uFlags2;
+    s32 uCrowd;
+    f32 fNear;
+    f32 fFar;
+    f32 fFarSquared;
+    f32 fRange;
+    f32 fDistance;
+    f32 fT;
+    Ter_ObjectReference* pRef;
+
+    for (i = lbl_801D3CB0.iTotalSortObjects - 1; i >= 0; i--) {
+        pRef = &lbl_801D3CB0.pObjectSortList[i];
+        pModel = pRef->apObject[pRef->iOpaqueLOD];
+        uFlags0 = fn_800354D0(pModel, 0);
+        uFlags2 = fn_800354D0(pModel, 2);
+        if ((fn_800354D0(pModel, 3) & 0x10) || (fn_800354D0(pModel, 3) & 0x20)) {
+            uFlags0 |= 0x20;
+            uFlags2 &= ~0x80;
+            uFlags0 &= ~0x40;
+        }
+        if (!fn_800172C4(fn_80017028(lbl_801D3CB0.iCurrentViewContext))) {
+            uFlags0 &= ~0x20;
+        }
+        uCrowd = uFlags0 & 0x20;
+        if (uCrowd == 0 && !(uFlags0 & 0x40)) {
+            fNear = 0.1f * lbl_801D3CB0.fFOVScale;
+            fFar = 0.2f * lbl_801D3CB0.fFOVScale;
+            fFarSquared = fFar * fFar;
+            fRange = fFar - fNear;
+        } else if (uCrowd != 0 && !(uFlags0 & 0x40)) {
+            fNear = lbl_801D3CB0.fCrowdFadeDistanceMin * lbl_801D3CB0.fFOVScale;
+            fFar = lbl_801D3CB0.fCrowdFadeDistanceMax * lbl_801D3CB0.fFOVScale;
+            if (fNear < 0.1f) {
+                fNear = 0.1f;
+            }
+            fFarSquared = fFar * fFar;
+            fRange = fFar - fNear;
+        } else {
+            fNear = -100.0f;
+            fFar = -101.0f;
+            fFarSquared = 0.0f;
+            fRange = 1.0f;
+        }
+        // every draw re-reads the list pointer, as the original does
+        if (uFlags2 & 0x80) {
+            pRef = &lbl_801D3CB0.pObjectSortList[i];
+            fn_8003241C(&lbl_801D3CB0.pPostDrawItemsList[lbl_801D3CB0.iPostDrawItems],
+                        &lbl_801D3CB0.iPostDrawItems, 400, pRef->apObject[pRef->iOpaqueLOD],
+                        pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0, 1.0f,
+                        lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iOpaqueLOD], pRef->fDistanceSquared);
+        } else if (lbl_801D3CB0.pObjectSortList[i].fDistanceSquared < fFarSquared) {
+            fDistance = fn_80009680(lbl_801D3CB0.pObjectSortList[i].fDistanceSquared);
+            pRef = &lbl_801D3CB0.pObjectSortList[i];
+            if (fDistance > fFar || (uFlags0 & 0x40)
+                || (uCrowd == 0
+                    && ((pRef->f14 > lbl_801D3CB0.fXZDistanceToClosestBallSquared && pRef->f18 > 0.0f)
+                        || fn_80032330(pRef->apObject[0])))) {
+                lbl_801D3CB0.pObjectStateList[pRef->iGlobalObjectIndex]
+                    .aView[lbl_801D3CB0.iCurrentViewContext].n4 = 3;
+                lbl_801D3CB0.pObjectStateList[pRef->iGlobalObjectIndex]
+                    .aView[lbl_801D3CB0.iCurrentViewContext].f0 = 1.0f;
+                pRef = &lbl_801D3CB0.pObjectSortList[i];
+                fn_8003241C(&lbl_801D3CB0.pOpaqueObjectList[lbl_801D3CB0.iOpaqueObjects],
+                            &lbl_801D3CB0.iOpaqueObjects, 650, pRef->apObject[pRef->iOpaqueLOD],
+                            pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0,
+                            1.0f, lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iOpaqueLOD],
+                            pRef->fDistanceSquared);
+            } else {
+                fT = (fDistance - fNear) / fRange;
+                if (fT < 0.0f) {
+                    fT = 0.0f;
+                }
+                if (fT != 0.0f) {
+                    pRef = &lbl_801D3CB0.pObjectSortList[i];
+                    fn_8003241C(&lbl_801D3CB0.pNearbyObjectList[lbl_801D3CB0.iNearbyObjects],
+                                &lbl_801D3CB0.iNearbyObjects, 70, pRef->apObject[pRef->iOpaqueLOD],
+                                pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f,
+                                0, fT, lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iOpaqueLOD],
+                                pRef->fDistanceSquared);
+                }
+            }
+        } else {
+            pRef = &lbl_801D3CB0.pObjectSortList[i];
+            lbl_801D3CB0.pObjectStateList[pRef->iGlobalObjectIndex]
+                .aView[lbl_801D3CB0.iCurrentViewContext].n4 = 3;
+            pRef = &lbl_801D3CB0.pObjectSortList[i];
+            fn_8003241C(&lbl_801D3CB0.pOpaqueObjectList[lbl_801D3CB0.iOpaqueObjects],
+                        &lbl_801D3CB0.iOpaqueObjects, 650, pRef->apObject[pRef->iOpaqueLOD],
+                        pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0, 1.0f,
+                        lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iOpaqueLOD], pRef->fDistanceSquared);
+        }
+        if (gSession.b11 == 0) {
+            pRef = &lbl_801D3CB0.pObjectSortList[i];
+            if (pRef->fAlpha != 0.0f && !(uFlags0 & 0x40)) {
+                fn_8003241C(&lbl_801D3CB0.pTranslucentObjectList[lbl_801D3CB0.iTranslucentObjects],
+                            &lbl_801D3CB0.iTranslucentObjects, 200, pRef->apObject[pRef->iTranslucentLOD],
+                            pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0,
+                            pRef->fAlpha, lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iTranslucentLOD],
+                            pRef->fDistanceSquared);
+            }
+        }
+    }
 }
 
 // Whether a ball has settled inside pModel's bounding sphere: a ball that has left where its shot
@@ -637,6 +1115,224 @@ void fn_80032AEC(void) {
     fn_80012EF8();
 }
 
+// Draws one patch's ground in render pass nPass: its mesh for the pass and the patch's bits (n1C
+// bits 0-2 and 0x80, n18 bit 1), then the extra meshes its word 2 asks for: bit 0x8 drawn at once,
+// bits 0x10 and 0x20 as deferred items, bit 0x40 (near enough, not in split screen) raised by
+// 0.005 without z writes. Passes 1 and 2 leave out patches beyond 100 x fFOVScale unless the
+// ground's bit 0x80 is set. A lake surface (n20 bit 0x80) uses fLakeSurfaceMipmapBias; while the
+// camera moves, one with ground bit 0x80 is left out. *pbFirst tracks a renderer state switched
+// by fFar; b2 keeps it and the deferred and raised meshes out. b1 is not read.
+void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s32 n20, u8* pbFirst, u8 b1,
+                 u8 b2, f32 fNear, f32 fFar) {
+    f32 mRaise[4][4];
+    u8 bFirst;
+    s32 uFlags2;
+    UObjMesh* pMesh;
+    u8 nMesh;
+    u8 bPinSet;
+    u8 bLake;
+    u32 uPinBit;
+    u32 uOtherPins;
+    f32 fBias;
+
+    bPinSet = 0;
+    bLake = 0;
+    uPinBit = 1 << Game_CurrentPinSet();
+    uOtherPins = ~(uPinBit | uPinBit) & 0xF;
+    if (nPass >= 1 && nPass <= 2 && fNear > 100.0f * lbl_801D3CB0.fFOVScale
+        && !(fn_800354D0(pGround, 0) & 0x80)) {
+        return;
+    }
+    nMesh = n1C & 7;
+    if (n1C & 0x80) {
+        nMesh |= 8;
+    }
+    if (n18 & 2) {
+        nMesh |= 0x10;
+    }
+    if (n20 & 0x80) {
+        if (!fn_800172C4(fn_80017028(lbl_801D3CB0.iCurrentViewContext)) && (fn_800354D0(pGround, 0) & 0x80)) {
+            return;
+        }
+        bLake = 1;
+        fBias = lbl_801D3CB0.fLakeSurfaceMipmapBias;
+    }
+    pGround = fn_800354E4(pGround, lbl_801D3A30[nPass][nMesh]);
+    bFirst = *pbFirst;
+    if (bFirst == 0 && fFar > 0.0f && b2 == 0) {
+        *pbFirst = 1;
+        fn_80014118(0x70);
+        fn_80012EF8();
+    } else if ((fFar <= 0.0f || b2 != 0) && bFirst != 0) {
+        *pbFirst = 0;
+        fn_80014118(0x50);
+        fn_80012EF8();
+    }
+    uFlags2 = fn_800354D0(pGround, 2);
+    pMesh = fn_800354E4(pGround, 0);
+    if ((n20 & uPinBit) && !(n20 & uOtherPins)) {
+        fn_80012F50(1, 6, 1);
+        fn_80012EF8();
+        bPinSet = 1;
+    }
+    if (bLake) {
+        fn_80012EF8();
+    }
+    if (uFlags2 & 8) {
+        fn_80035514((u8*)pMesh);
+        pMesh = fn_800354BC(pMesh);
+    }
+    if (bLake) {
+        fn_80012EF8();
+    }
+    if ((uFlags2 & 0x10) && b2 == 0) {
+        if (pMesh->n20 != 0) {
+            fn_8003241C(&lbl_801D3CB0.pDeferredItemsList[lbl_801D3CB0.iDeferredItems],
+                        &lbl_801D3CB0.iDeferredItems, 50, pMesh, 0x289, eClipMethod, fFar > 0.0f, 0, 1.0f,
+                        bLake ? fBias : 0.0f, 0.0f);
+        }
+        pMesh = fn_800354BC(pMesh);
+    }
+    if (uFlags2 & 0x20) {
+        if (pMesh->n20 != 0) {
+            fn_8003241C(&lbl_801D3CB0.pDeferredItemsList[lbl_801D3CB0.iDeferredItems],
+                        &lbl_801D3CB0.iDeferredItems, 50, pMesh, 0x289, eClipMethod, fFar > 0.0f, 0, 1.0f,
+                        bLake ? fBias : 0.0f, 0.0f);
+        }
+        pMesh = fn_800354BC(pMesh);
+    }
+    if (gSession.nSplitScreen == 0 && (uFlags2 & 0x40) && b2 == 0) {
+        if (fNear < 60.0f * lbl_801D3CB0.fFOVScale && pMesh->n20 != 0) {
+            fn_8000ADC0(mRaise);
+            mRaise[3][1] = 0.005f;
+            fn_80035240(mRaise);
+            fn_80016B9C();
+            fn_80012F34(0);
+            fn_80012EF8();
+            fn_80035514((u8*)pMesh);
+            fn_80012F34(1);
+            fn_80035240(NULL);
+            fn_80016B9C();
+            fn_80012EF8();
+        }
+        fn_800354BC(pMesh);
+    }
+    if (bPinSet) {
+        fn_80012F50(0, 6, 1);
+        fn_80012EF8();
+    }
+}
+
+// Draws nCount objects of a draw list, switching the renderer state only when it changes from one
+// object to the next: the clip method, the mipmap bias, and the flags (0x40, fog 0x20, and 0x10 for
+// shader types other than 1 and 3) unless the object sets its own. Objects whose state word 0 has
+// bit 0x1 hand their f4 to row 2 or 3 of fn_8003519C (by shader type); without bit 0x2 it is
+// damped toward 0.5 with distance (fTreeDampingMaxForce, fTreeDampingDistance). The filters are
+// not read.
+void fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFilterMag) {
+    f32 fWave2;
+    f32 fWave3;
+    Ter_ObjectDrawData* pDraw;
+    s32 iObject;
+    f32 fBias = 100.0f;
+    s32 eClipMethod = 3;
+    u8 bUseFog = 1;
+    u8 bBit5 = 0;
+    u8 bShaded = 1;
+    u8 bDirty = 0;
+    u8 bForce = 1;
+    s32 i;
+    u8 bNewBit5;
+    u8 bNewShaded;
+    u32 uState;
+    f32 fDamp;
+
+    fn_800332F4();
+    pDraw = pList;
+    for (i = 0; i < nCount; i++) {
+        iObject = pDraw->iGlobalObjectIndex;
+        if (eClipMethod != pDraw->eClipMethod) {
+            eClipMethod = pDraw->eClipMethod;
+            switch (eClipMethod) {
+            case 2:
+                fn_80035138(1);
+                break;
+            case 1:
+                fn_80035138(1);
+                break;
+            default:
+                fn_80035138(0);
+                break;
+            }
+            bDirty = 1;
+        }
+        if (fBias != pDraw->fMipmapBias) {
+            fBias = pDraw->fMipmapBias;
+            bDirty = 1;
+        }
+        bNewBit5 = (lbl_801D3CB0.pObjectStateList[iObject].a20[1] >> 5) & 1;
+        bNewShaded = 0;
+        if (pDraw->eShaderObjectType != 1 && pDraw->eShaderObjectType != 3) {
+            bNewShaded = 1;
+        }
+        if (pDraw->bSetsPrimField == 0
+            && (bUseFog != pDraw->bUseFog || bBit5 != bNewBit5 || bShaded != bNewShaded || bForce)) {
+            bUseFog = pDraw->bUseFog;
+            bBit5 = bNewBit5;
+            bShaded = bNewShaded;
+            fn_80014118((bShaded ? 0x10 : 0) | (bUseFog ? 0x20 : 0) | 0x40);
+            bForce = 0;
+            bDirty = 1;
+        }
+        if (fn_80033308(pDraw, 0)) {
+            bDirty = 1;
+        }
+        uState = lbl_801D3CB0.pObjectStateList[iObject].a20[0];
+        if ((uState & 1) && !(uState & 2)) {
+            fDamp = 1.0f;
+            if (lbl_801D3CB0.fTreeDampingMaxForce) {
+                fDamp = lbl_801D3CB0.fTreeDampingMaxForce
+                        * (pDraw->fDistanceSquared / lbl_801D3CB0.fTreeDampingDistance)
+                      + (1.0f - lbl_801D3CB0.fTreeDampingMaxForce);
+                if (fDamp > 1.0f) {
+                    fDamp = 1.0f;
+                }
+            }
+            if (bDirty) {
+                fn_80012EF8();
+                bDirty = 0;
+            }
+            if (pDraw->eShaderObjectType == 2) {
+                fWave2 = fDamp * (lbl_801D3CB0.pObjectStateList[iObject].f4 - 0.5f) + 0.5f;
+                fn_8003519C(2, &fWave2);
+            } else if (pDraw->eShaderObjectType == 3) {
+                fWave3 = fDamp * (lbl_801D3CB0.pObjectStateList[iObject].f4 - 0.5f) + 0.5f;
+                fn_8003519C(3, &fWave3);
+            }
+        } else if ((uState & 1) && (uState & 2)) {
+            if (bDirty) {
+                fn_80012EF8();
+                bDirty = 0;
+            }
+            if (pDraw->eShaderObjectType == 2) {
+                fWave2 = lbl_801D3CB0.pObjectStateList[iObject].f4;
+                fn_8003519C(2, &fWave2);
+            } else if (pDraw->eShaderObjectType == 3) {
+                fWave3 = lbl_801D3CB0.pObjectStateList[iObject].f4;
+                fn_8003519C(3, &fWave3);
+            }
+        } else if (bDirty) {
+            fn_80012EF8();
+            bDirty = 0;
+        }
+        fn_80035514((u8*)pDraw->pObject);
+        if (pDraw->bSetsPrimField) {
+            bForce = 1;
+        }
+        pDraw++;
+    }
+}
+
 void fn_800332F4(void) {
     lbl_802810CC = -1;
     lbl_802810C8 = -1.0f;
@@ -774,6 +1470,216 @@ void fn_80033704(u16 nPatch, u16 nObject) {
     }
 }
 
+// Animates the course objects once a frame (the frame time capped at 1/30 s): runs the crowd
+// countdowns, fades each object's views in (state 2) or out (state 0), and moves each object with
+// bit 0x1 of word 0: crowd members (bit 0x2) held in iCrowdPose, swaying in their pose or easing to
+// the next one through lbl_801877E0 (lbl_80187858 with bit 0x40 of word 3); bit 0x1 of word 3 rises
+// to 1 once n1C is 1; the trees sway by their period with noise.
+void fn_80033744(void) {
+    f32 fDrop;
+    f32 fTime;
+    f32 fUpFast;
+    f32 fDownFast;
+    f32 fUp;
+    f32 fDown;
+    u32 nFrames;
+    s32 i;
+    s32 v;
+    s32 k;
+    u32 uFlags0;
+    u32 uFlags3;
+    f32 fPeriod;
+    f32 fStep;
+    f32 fNoise;
+    f32 fSum;
+    f32 fScale;
+    f32 fWave;
+    Ter_ObjectState* pState;
+
+    fTime = gSession.fFrameTime;
+    if (fTime > 1.0f / 30.0f) {
+        fTime = 1.0f / 30.0f;
+    }
+    if (fTime < 0.0f) {
+        fTime = 0.0f;
+    }
+    if (lbl_801D3CB0.fCrowdAnimationDelayedStartTimer > 0.0f) {
+        lbl_801D3CB0.fCrowdAnimationDelayedStartTimer -= fTime;
+        if (lbl_801D3CB0.fCrowdAnimationDelayedStartTimer <= 0.0f) {
+            fn_8003349C(lbl_801D3CB0.fCrowdAnimationDelayedStartPercentage,
+                        lbl_801D3CB0.fCrowdAnimationDelayedStartDuration, 0.0f);
+        }
+    }
+    if (lbl_801D3CB0.fCrowdAnimationCountdown > 0.0f) {
+        lbl_801D3CB0.fCrowdAnimationCountdown -= fTime;
+        if (lbl_801D3CB0.fCrowdAnimationCountdown <= 0.0f) {
+            fn_800335F8(0);
+        }
+    }
+    nFrames = FRAME_RATE * fTime;
+    fUpFast = 6.0f * fTime;
+    fDownFast = -6.0f * fTime;
+    fUp = 4.0f * fTime;
+    fDown = -4.0f * fTime;
+    fDrop = 5.0f * fTime;
+    for (i = 0; i < TER_NUM_OBJECTS; i++) {
+        for (v = 0; v < 2; v++) {
+            if (lbl_801D3CB0.pObjectStateList[i].aView[v].n4 == 2) {
+                lbl_801D3CB0.pObjectStateList[i].aView[v].f0 += 4.0f * gSession.fFrameTime;
+                if (lbl_801D3CB0.pObjectStateList[i].aView[v].f0 >= 1.0f) {
+                    lbl_801D3CB0.pObjectStateList[i].aView[v].f0 = 1.0f;
+                    lbl_801D3CB0.pObjectStateList[i].aView[v].n4 = 3;
+                }
+            }
+            if (lbl_801D3CB0.pObjectStateList[i].aView[v].n4 == 0) {
+                lbl_801D3CB0.pObjectStateList[i].aView[v].f0 -= 4.0f * gSession.fFrameTime;
+                if (lbl_801D3CB0.pObjectStateList[i].aView[v].f0 <= 0.0f) {
+                    lbl_801D3CB0.pObjectStateList[i].aView[v].f0 = 0.0f;
+                    lbl_801D3CB0.pObjectStateList[i].aView[v].n4 = 1;
+                }
+            }
+        }
+        pState = &lbl_801D3CB0.pObjectStateList[i];
+        uFlags0 = pState->a20[0];
+        uFlags3 = pState->a20[3];
+        if (!(uFlags0 & 1)) {
+            continue;
+        }
+        if ((uFlags0 & 2) && lbl_801D3CB0.iCrowdPose != 0) {
+            if (lbl_801D3CB0.iCrowdPose == 1) {
+                pState->n18 = 0;
+                pState->n1C = 0;
+            } else {
+                pState->n18 = 3;
+                pState->n1C = 3;
+            }
+            pState->f4 = lbl_801D3CB0.fCrowdInterpValue;
+        } else if ((uFlags0 & 2) && !(uFlags3 & 0x40)) {
+            pState->nC += nFrames;
+            if (pState->n18 == pState->n1C || pState->f14 > 0.0f) {
+                fPeriod = 4.0f * (pState->f0 - lbl_801D3CB0.fTreeMinPeriod) + 1.5f;
+                if (pState->n18 == 3) {
+                    pState->f4 =
+                        0.5f * fn_800095F0(10.0f * (6.2831855f * fn_800351D8(pState->nC, fPeriod / 10.0f))
+                                           / fPeriod)
+                        + 0.5f;
+                } else {
+                    pState->f4 =
+                        0.5f * fn_800095F0(0.5f * (6.2831855f * fn_800351D8(pState->nC, fPeriod / 0.5f))
+                                           / fPeriod)
+                        + 0.5f;
+                }
+                pState->f14 -= fTime;
+            } else {
+                for (k = 0; k < 6; k++) {
+                    if (pState->n18 == lbl_801877E0[k].n0 && pState->n1C == lbl_801877E0[k].n4) {
+                        fStep = lbl_801877E0[k].fC - pState->f4;
+                        if (pState->n18 == 2 || pState->n18 == 3) {
+                            if (fStep > fUpFast) {
+                                fStep = fUpFast;
+                            }
+                            if (fStep < fDownFast) {
+                                fStep = fDownFast;
+                            }
+                        } else {
+                            if (fStep > fUp) {
+                                fStep = fUp;
+                            }
+                            if (fStep < fDown) {
+                                fStep = fDown;
+                            }
+                        }
+                        pState->f4 += fStep;
+                        if (fabsf(pState->f4 - lbl_801877E0[k].fC) < 0.01f) {
+                            pState->n18 = lbl_801877E0[k].n8;
+                            pState->f4 = lbl_801877E0[k].f10;
+                            pState->nC = 0;
+                            break;
+                        }
+                    }
+                }
+            }
+        } else if ((uFlags0 & 2) && (uFlags3 & 0x40)) {
+            pState->nC += nFrames;
+            if (pState->n18 == pState->n1C || pState->f14 > 0.0f) {
+                if (pState->n18 == 0) {
+                    pState->f4 -= fDrop;
+                    if (pState->f4 < 0.0f) {
+                        pState->f4 = 0.0f;
+                    }
+                    pState->f14 -= fTime;
+                } else {
+                    fPeriod = 4.0f * (pState->f0 - lbl_801D3CB0.fTreeMinPeriod) + 1.5f;
+                    if (pState->n18 == 1) {
+                        pState->f4 =
+                            0.5f * fn_800095F0(10.0f * (6.2831855f * fn_800351D8(pState->nC, fPeriod / 10.0f))
+                                               / fPeriod)
+                            + 0.5f;
+                    } else {
+                        pState->f4 =
+                            0.5f * fn_800095F0(0.5f * (6.2831855f * fn_800351D8(pState->nC, fPeriod / 0.5f))
+                                               / fPeriod)
+                            + 0.5f;
+                    }
+                    pState->f14 -= fTime;
+                }
+            } else {
+                for (k = 0; k < 2; k++) {
+                    if (pState->n18 == lbl_80187858[k].n0 && pState->n1C == lbl_80187858[k].n4) {
+                        fStep = lbl_80187858[k].fC - pState->f4;
+                        if (pState->n18 == 2 || pState->n18 == 3) {
+                            if (fStep > fUpFast) {
+                                fStep = fUpFast;
+                            }
+                            if (fStep < fDownFast) {
+                                fStep = fDownFast;
+                            }
+                        } else {
+                            if (fStep > fUp) {
+                                fStep = fUp;
+                            }
+                            if (fStep < fDown) {
+                                fStep = fDown;
+                            }
+                        }
+                        pState->f4 += fStep;
+                        if (fabsf(pState->f4 - lbl_80187858[k].fC) < 0.01f) {
+                            pState->n18 = lbl_80187858[k].n8;
+                            pState->f4 = lbl_80187858[k].f10;
+                            pState->nC = 0;
+                            break;
+                        }
+                    }
+                }
+            }
+        } else if (uFlags3 & 1) {
+            if (pState->n1C == 1) {
+                pState->f4 += fTime;
+                if (pState->f4 > 1.0f) {
+                    pState->f4 = 1.0f;
+                }
+            } else {
+                pState->f4 = 0.0f;
+            }
+        } else {
+            fNoise = lbl_801D3CB0.fTreeNoiseAmplitudeScale;
+            fSum = 1.0f + fNoise;
+            fScale = 1.0f / fSum;
+            fWave = 0.5f * (fScale * fNoise)
+                    * fn_800095F0(6.2831855f
+                                  * fn_800351D8(gSession.nFrameCount,
+                                                lbl_801D3CB0.fTreeNoisePeriodScale * pState->f0)
+                                  / (lbl_801D3CB0.fTreeNoisePeriodScale * pState->f0));
+            pState->f4 = 0.5f * fScale
+                             * fn_800095F0(6.2831855f * fn_800351D8(gSession.nFrameCount, pState->f0)
+                                           / pState->f0)
+                       + fWave;
+            pState->f4 = pState->f4 * lbl_801D3CB0.fTreeOverdrive;
+            pState->f4 = pState->f4 + 0.5f;
+        }
+    }
+}
+
 // Draws object list nList of the hole data (0 before the patches, 2 after them) when its switch is
 // on, as panorama items: each object that is not off screen, except (list 0) objects 0-1 or 2-3 by
 // lbl_802811F0's flag 0x2, (list 2) the last lbl_80281D64, and in split screen those with flag 8.
@@ -868,6 +1774,100 @@ void fn_800341A4(UStreamObject* pObject) {
 void fn_800342B4(UStreamObject* pObject) {
     lbl_801D3CB0.pCurrentHoleDataStreamData = pObject;
     lbl_801D3CB0.pCurrentHoleData = fn_800073B4(pObject->pData, 0);
+}
+
+// The course chunk: clears the pin and tee positions (fn_80034720 and fn_800347B4 fill them), readies
+// the collision data, fills light sets 2, 0 and 1 from the hole's lights and makes set 3 current, and
+// hands the glows the course's values (p3C, or defaults). The light vector gSession.f5B3C..f5B48 is
+// the hole's own (v60) when it has one, else the glows' vector; it is raised to at least its
+// distance across the ground and made at least 2000 long.
+void fn_800342F0(UStreamObject* pObject) {
+    f32 v18[4];
+    f32 v8[4];
+    int i;
+    u32 nGlow;
+    CourseGlowBlock* pGlow;
+    f32 fLength;
+
+    lbl_801D3CB0.pCourseStreamData = pObject;
+    lbl_801D3CB0.pCourse = (CourseInfo*)pObject->pData;
+    for (i = 0; i < 4; i++) {
+        lbl_801D3CB0.pCourse->tee[i].x = 0.0f;
+        lbl_801D3CB0.pCourse->pin[i].x = 0.0f;
+        lbl_801D3CB0.pCourse->tee[i].y = 0.0f;
+        lbl_801D3CB0.pCourse->pin[i].y = 0.0f;
+        lbl_801D3CB0.pCourse->tee[i].z = 0.0f;
+        lbl_801D3CB0.pCourse->pin[i].z = 0.0f;
+        lbl_801D3CB0.pCourse->tee[i].w = 0.0f;
+        lbl_801D3CB0.pCourse->pin[i].w = 0.0f;
+    }
+    fn_8004B1EC(lbl_801D3CB0.pCourse);
+    fn_80035338(2);
+    fn_800935CC(&lbl_801D3CB0.pCourse->lights);
+    fn_80093900(lbl_801D3CB0.pCourse->p38);
+    fn_80035338(0);
+    fn_800935CC(&lbl_801D3CB0.pCourse->lights);
+    fn_80093900(lbl_801D3CB0.pCourse->p38);
+    fn_80035338(1);
+    fn_800935CC(&lbl_801D3CB0.pCourse->lights);
+    fn_80093900(lbl_801D3CB0.pCourse->p38);
+    fn_80035338(3);
+    fn_80035370();
+    fn_8003534C();
+    pGlow = lbl_801D3CB0.pCourse->p3C;
+    if (pGlow != NULL) {
+        v18[0] = pGlow->v10[0];
+        v18[1] = pGlow->v10[1];
+        v18[2] = pGlow->v10[2];
+        v18[3] = pGlow->v10[3];
+        v8[0] = pGlow->v0[0];
+        v8[1] = pGlow->v0[1];
+        v8[2] = pGlow->v0[2];
+        v8[3] = 1.0f;
+        if (pGlow->nC <= 3) {
+            nGlow = pGlow->nC;
+        } else {
+            nGlow = 1;
+        }
+    } else {
+        nGlow = 1;
+        v18[0] = 0.8f;
+        v18[1] = 0.8f;
+        v18[2] = 0.4f;
+        v18[3] = 1.0f;
+        v8[0] = 0.0f;
+        v8[1] = 150.0f;
+        v8[2] = -400.0f;
+        v8[3] = 1.0f;
+    }
+    fn_800355B8(v18);
+    fn_80035590(v8);
+    fn_80035584(nGlow);
+    if (lbl_801D3CB0.pCourse->v60[0] || lbl_801D3CB0.pCourse->v60[1] || lbl_801D3CB0.pCourse->v60[2]) {
+        gSession.f5B3C = lbl_801D3CB0.pCourse->v60[0];
+        gSession.f5B40 = lbl_801D3CB0.pCourse->v60[1];
+        gSession.f5B44 = lbl_801D3CB0.pCourse->v60[2];
+        gSession.f5B48 = 1.0f;
+    } else {
+        gSession.f5B3C = v8[0];
+        gSession.f5B40 = v8[1];
+        gSession.f5B44 = v8[2];
+        gSession.f5B48 = v8[3];
+    }
+    fLength = fn_80009680(gSession.f5B3C * gSession.f5B3C + gSession.f5B44 * gSession.f5B44);
+    if (gSession.f5B40 < fLength) {
+        gSession.f5B40 = fLength;
+    }
+    // port: f5B3C..f5B48 are read as one vector
+    fLength = fn_80009680(fn_80009744(&gSession.f5B3C));
+    if (fLength < 2000.0f && fLength > 0.0f) {
+        fn_8001EF34(&gSession.f5B3C, 2000.0f / fLength, &gSession.f5B3C);
+    }
+    i = Game_GetCourse();
+    if (i >= 21) {
+        i = 0;
+    }
+    fn_80034648(i);
 }
 
 void fn_80034648(int n) {
@@ -1290,10 +2290,6 @@ void fn_80035398(void) {
 
 void fn_8006F154();
 void fn_800082CC(void* p);
-s32 fn_80035508(u8* p0);
-void fn_80035584(s32 v);
-void fn_80035590(f32* p0);
-void fn_800355B8(f32* p0);
 extern s32 lbl_80281B88;
 extern s32 lbl_80281D68;
 void fn_800355E0(s32 arg0);
@@ -1397,8 +2393,9 @@ UObjMesh* fn_80035500(u8* pHoleData) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-s32 fn_80035508(u8* p0) {
-    return (*(s32*)p0 + 104);
+// A terrain object's bounds.
+f32* fn_80035508(UObjMesh* pMesh) {
+    return pMesh->pInfo->a68;
 }
 
 // If the object's current entry (n28) is switched on, hands its 0x2C-byte record to LLObj_Gc.c's

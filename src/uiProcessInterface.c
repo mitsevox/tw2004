@@ -16,7 +16,7 @@ void fn_8008F80C(s32 p0, s32 p1);
 s32 fn_80092BC4();
 s32 fn_800934F8();
 s32 fn_800BA038();
-s32 fn_80090400();
+void fn_80090400(FrontEnd* pFE);
 void fn_80090664(void);
 void fn_8008FE88(FrontEnd* pFE);
 void fn_8008F820(void);
@@ -34,6 +34,7 @@ void fn_80077348(void);                 // FE_Manager.c
 // UIStudio.c, with the front end's view of the handler (uistudio.h cannot be included with
 // game/frontend.h; it takes a UIStudio*).
 void fn_80168B80(void* pHandler, u32 uEvent);
+void fn_80169B4C(void* pHandler);      // UISApi.c: unload every screen
 
 u8 fn_8008F39C(void) {
     return lbl_80281F1B;
@@ -120,6 +121,38 @@ int fn_8008FFF0(const char* szName) {
         return -1;
     }
     return 0;
+}
+
+// Shut the front end down: in game type 1 with no nC, fe_movies.c's fn_80091EE8; in game type 3,
+// every lbl_801D8890 entry whose lbl_801D8ED0 word is set gets b0 set and b1 cleared, and the
+// menus' data is brought back and freed (fn_8008F294, fn_8008F24C). Then everything the front
+// end loaded is freed, and the front end itself.
+void fn_80090400(FrontEnd* pFE) {
+    int i;
+
+    fn_80090B10();
+    if (gSession.nGameType == 1 && gSession.nC == 0) {
+        fn_80091EE8();
+    } else if (gSession.nGameType == 3) {
+        for (i = 0; i < FE_NUM_801D8890; i++) {
+            if (lbl_801D8ED0[i] != 0) {
+                lbl_801D8890[i].b0 = 1;
+                lbl_801D8890[i].b1 = 0;
+            }
+        }
+        lbl_80281370 = 1;
+        fn_80091454();
+        fn_8008F294();
+        fn_8008F24C();
+    }
+    fn_80169B4C(lbl_80281F1C->pHandler);
+    fn_8008F194(pFE->p10);
+    fn_8008F164(pFE->pC);
+    fn_8008F0FC(pFE->p8);
+    fn_8008F0C8(pFE->pFile);
+    fn_80009E70(lbl_80281F1C->pHandler);
+    fn_80009E70(lbl_80281F1C);
+    lbl_80281F1C = NULL;
 }
 
 // Resets the front end's screen state.
@@ -255,12 +288,10 @@ void fn_800908D0(void) {
 
 s32 fn_8001005C();
 void fn_800107E4();
-s32 fn_80012EC4();
-
 void fn_800908D4(f32 x0) {
-    s32 t0;
-    t0 = fn_80012EC4();
-    *(f32*)(((u8*)t0) + 0xB4) = x0;
+    UFontContext* pCtx;
+    pCtx = fn_80012EC4();
+    pCtx->fB4 = x0;
 }
 
 void fn_80090904(s32 p0) {

@@ -236,6 +236,57 @@ They will be sorted into the sections below.
 - **[verified] A struct's size can be proved by a `Mem_cpy` of it** (CamScript 0x118).
 - **[verified] `li r3/r4` missing before a call is not a missing argument**: CW reuses a still-live
   argument register (char fn_8001D4A4).
+- **[verified] Two null tests that each go straight to the exit are two `return`s, not `||`** (`beq end;
+  lwz; cmplwi; beq end`; animblender fn_80071F58 98.8 -> 100).
+- **[verified] Keep a call result in a named local when it is an index, a compare operand or an argument
+  inside an iterator loop.** It sets the `mulli`/`add` order (GoDynObj fn_80045FC8, also for `Rand % n`
+  in GoStaticCam fn_80064F7C) and the `cmplw` operand order (char fn_8001CE5C; swapping the operands does
+  not help), and it matches inside iterator loops (hwsBurn fn_80110C88). A `u8` flag argument computed
+  before intervening float tests also goes in a local first (animblender fn_80072ACC 65.6 -> 98.2).
+- **[verified] A `switch` inside a loop lays out its case bodies in source order**, not case-value order
+  (GoStaticCam fn_800659F4).
+- **[verified] `(uptr)` casts give the same code as `(u32)` for address arithmetic**: use them, they are
+  64-bit safe (Terrain_HeightAt).
+- **[verified] An inlined helper keeps its own shape**: `&&` conditions in the inlined copy can match while
+  the real function needs nested ifs (GoStaticCam fn_8006509C / fn_8006596C).
+- **[verified] Stores after a divide-by-w are scheduled z first**: write `z = 0` before x and y (GoDynObj
+  fn_8004787C).
+- **[verified] A `u8` function returning an `int` local** gives the `li; li; clrlwi` join; a `u8` local lets
+  CW use `bnelr` (LLDynTex fn_8010BF3C 80 -> 100).
+- **[verified] A parameter reused as the running pointer** is the parameter itself, not a new local (char
+  fn_8001DD18 95.3 -> 100).
+- **[verified] Copy a `u16` field to a `u32` local before shifting** it into a pointer offset: plain `slwi`
+  instead of `clrlslwi` (SkinMorph fn_8011C4D4 95 -> 100).
+- **[verified] `!(a ^ b)`** gives the original's `xor.` where `a == b` gives `cmpw` (u8 field vs int
+  parameter; Glows fn_800985FC).
+- **[verified] The order of a for-loop's increments sets the order of the `addi`s** (hlaudmovie
+  fn_800A929C, AudTable fn_800A7CA4).
+- **[verified] A `(u8)` cast on each argument to an `int` parameter is computed once (CSE)**; a `u8`
+  parameter masks at every call (Particle fn_80094534 91.3 -> 96.4).
+- **[verified] Read fields into locals before a run of matrix stores**, or CW reloads them after each store
+  (Glows fn_80098408 80.6 -> 94.5).
+- **[verified] Calls inside a later argument can run before a call in an earlier one**: write the
+  expression inline as the argument (GoTerrain fn_80030A40 96.7 -> 100).
+- **[verified] `(int)` before a float-to-u8 conversion** gives `fctiwz` + `clrlwi` (GoComicCam fn_800B4108).
+- **[verified] Set every loop cursor and end pointer as plain statements at the head of the loop**, in the
+  original's order; an end pointer can double as the backward cursor (hlaudvoice fn_800AC330 78 -> 100).
+- **[verified] EA's message-list macro is `aMsgs[n] = x; n++;`**, not `aMsgs[n++] = x` (GameMode26
+  fn_8010CA2C, GameMode22 fn_80126698 91.4 -> 94.1). `PLAYER(i)->` instead of `gPlayers[i].` fixed both
+  twins' loops (fn_8010D278, fn_80126EC0, about 73 -> 100).
+- **[verified] `(u32)` of a float held in a local calls `__cvt_fp2unsigned`**; the same cast of a literal is
+  folded (DynChain fn_80116304 75.5 -> 95.4).
+- **[verified] A 64-bit id packed from u16s**: `u <<= 16; u |= p[i];` gives `slwi; or`
+  (ShaderObjectsData fn_80074A24 67.7 -> 100).
+- **[verified] A call whose result EA ignores is a bare call statement**; assigning it to a later-overwritten
+  pointer keeps a dead `mulli`/`add` (FEgolferanim fn_8008D6CC).
+- **[verified] A command reader returning the advanced pointer** wants the advance in its own local or as a
+  post-increment in the `switch` (ShaderObjectsData fn_80074BE0, fn_80074CF4).
+- **[verified] A divide EA kept (`fdivs` by 1.0)** was a local set to 1.0f (FEgolferanim).
+- **[verified] Divide by a power of two, not multiply by the reciprocal**: `/ 2.0f` gives `fmuls` with the
+  dividend first (char fn_8001B644). A stack vector can need `[4]` though only 3 are used, for the
+  offsets after it (char fn_8001B878).
+- **[verified] A counted skip loop written counting down** gives CW's ctr loop with no index register
+  (Grass_Gc Static_Render 92.5 -> 96.5).
 - **Linking (tools):**
   - A unit's `.data` range ends at its own 8-byte alignment, not the next object's 32-byte alignment
     (GoARAM). The last object in `.sdata`/`.sbss` ends at the true section end, not rounded to 8 (CARD).
@@ -246,6 +297,10 @@ They will be sorted into the sections below.
   - A dead instruction after an asm function's tail branch (`b TRK_main; blr`) must be counted in the
     function's `symbols.txt` size. Otherwise dtk makes a `gap_` symbol from it and objdiff scores the
     function below 100 although the DOL links (InitMetroTRK: size 0x94 -> 0x98, 97.3 -> 100).
+  - graduate.py takes `.rodata`, `.bss` and `.sdata` ranges too. `.bss` definitions go in reverse address
+    order, and `.bss`/`.sdata` ranges end at the last symbol's padded size (Trax).
+  - lint reports `ub-no-prototype` when a trailing `// comment` sits on a function-definition line: put the
+    comment on the line above (SkinBurn fn_801271E0).
 - **Shell:** the Bash tool strips backslashes even inside quoted heredocs (`<<'EOF'`). Write scripts with
   the Write tool.
 

@@ -6,7 +6,6 @@
 
 // Builds a bank from a 'txf ' object's data, into pBank or, when it is NULL, a new allocation.
 TexBank* TX_spParseTextureGroupFromStream(u8* pData, TexBank* pBank, int n);
-void GXSetTexCoordGen2(int nDst, int nFunc, int nSrc, int nMtx, u8 bNormalize, int nPostMtx);
 
 void fn_8000F0E8(void) {
 }
