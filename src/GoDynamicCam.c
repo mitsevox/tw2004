@@ -423,6 +423,7 @@ void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
     f32 fDist;
     f32 fLimit;
     f32 fStep;
+    f32 fOver;
 
     nPinSet = Game_CurrentPinSet();
     Vec3Copy(pOut, aOld);
@@ -529,8 +530,8 @@ void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
         fAbove = pOut[1] - fFollow;
         fTop = fHi - fEase;
         if (fAbove > fTop) {
-            fEase = fEase * (1.0f - fEase / (fAbove - fTop + fEase));
-            pOut[1] = fEase + (fFollow + fTop);
+            fOver = fEase * (1.0f - fEase / (fAbove - fTop + fEase));
+            pOut[1] = fOver + (fFollow + fTop);
             if (pOut[1] - fGround < fLo) {
                 pOut[1] = fGround + fLo;
             }
@@ -741,9 +742,8 @@ void fn_8003ADF8(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
                 if (fFar > lbl_80281F78->f244) {
                     fScale = lbl_80281F78->f248;
                 } else {
-                    fScale = lbl_80281F78->f240 -
-                             (fFar - lbl_80281F78->f23C) / (lbl_80281F78->f244 - lbl_80281F78->f23C) *
-                                 (lbl_80281F78->f240 - lbl_80281F78->f248);
+                    fScale = (fFar - lbl_80281F78->f23C) / (lbl_80281F78->f244 - lbl_80281F78->f23C);
+                    fScale = lbl_80281F78->f240 - fScale * (lbl_80281F78->f240 - lbl_80281F78->f248);
                 }
                 fn_8001EF34(vOff, fScale, vOff);
                 fn_8003DC30(vOff, pSub, pOut);
