@@ -23,7 +23,6 @@ void fn_8011DC30(int nKind, char* szTitle, char* szText);
 
 void fn_80116798(int nPlace, char* sz);
 void fn_80117264(u16 nDate, char* sz);
-void fn_80117348(void);
 u8   fn_801174B8(u32 nMonth, u32 nOther);
 u8   fn_801174E4(u32 nMonth, u32 nOther);
 
