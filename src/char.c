@@ -34,9 +34,6 @@ void  ClipBank_Restore(int nSlot);                  // skalib.c
 ClipBank* ClipBank_Get(u32 nSlot);                  // skalib.c
 AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank);  // skalib.c
 CharModel* fn_80028564(u8* pData, s8 n, CharModelDefs* pDefs, u8 b);    // Skeleton.c
-Skin* fn_800377FC(u8* pData, u8 b);                 // Skin.c
-s32   fn_80037708(void* pSkin);                     // Skin.c
-void  fn_800375AC(Skin* pSkin, int n);              // Skin.c
 void  fn_80037AB8(Skin* pSkin, CharModel* pModel, int nBone, int nId);   // Skin.c
 void  fn_800CC4EC(Character* pChar);                // SkinPart.c
 void* CharSlider_CreateDefinitionsFromMem(u8** ppData);
@@ -1050,7 +1047,7 @@ Character* fn_8001942C(void) {
     pChar->n5CC = -1;
     pChar->p1790 = NULL;
     pChar->n1784 = -1;
-    pChar->b17B4 = 0;
+    pChar->n17B4 = 0;
     pChar->pRecords = NULL;
     fn_800962F8(pChar);
     pChar->n16DC = 0;

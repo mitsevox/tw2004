@@ -576,7 +576,8 @@ typedef struct Character {
                                 //         fn_8001A9F4); fn_8001DC64 applies them
     void (*pfn17B0)(void);      // 0x17B0  called by Character_UpdateAnimation before the bones are
                                 //         transformed; cleared by fn_8001942C
-    u8    b17B4;                // 0x17B4  cleared by fn_8001942C
+    s8    n17B4;                // 0x17B4  cleared by fn_8001942C; Skin.c hands it to fn_800CE02C as
+                                //         the a10A0 index
     u8    unk17B5[0x17B8 - 0x17B5];
     struct SkinChoices* pChoices;   // 0x17B8  its look (fn_8001D4A4 dresses it from this); fn_8001A20C
                                     //         puts its logos on the model (fn_8001744C)

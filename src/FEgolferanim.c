@@ -119,7 +119,7 @@ void fn_800352BC(void);
 void fn_80035754(Character* pChar);
 void fn_80035810(Character* pChar);
 void fn_80035FBC(void);
-void fn_80035FDC(void);
+void fn_80035FDC(UObject* pObj);
 void fn_800760B0(int nX, int nY, int nWidth, int nHeight);
 void fn_800364A0(void);
 void fn_800B9EB8(char* szBall);
@@ -959,7 +959,7 @@ void fn_8008CE88(u8 bFull) {
         return;
     }
     if (lbl_80281EE0->pB4->b18 && lbl_80281EE0->b86 == 0) {
-        ((void (*)(int))fn_80035FDC)(0);   // port: EA passes an argument fn_80035FDC ignores
+        fn_80035FDC(NULL);
         fn_80035240(lbl_80281EE0->mC0);
         fn_800352BC();
         fn_80013CCC(fn_8001614C());
