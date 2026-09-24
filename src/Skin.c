@@ -429,11 +429,11 @@ void fn_8003614C(Character* pChar, f32* pOut) {
 // each morph either sets; the morphs pOut gets are those of both, and pA's and pB's are cleared.
 void fn_80036180(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut, f32 fWeight) {
     u32 aBits[4];   // only 20 bits are used; the size is not known
+    int i;
+    int j;
     SkelPoseBlock* pBlockA;
     SkelPoseBlock* pBlockB;
     SkelPoseBlock* pBlockOut;
-    int i;
-    int j;
 
     for (i = 0; i < 3; i++) {
         pBlockA = &pA->aBlocks[i];
@@ -457,11 +457,12 @@ void fn_80036278(SkinModel44* pEntries, s32 nEntries) {
     void* pSrc;
     void* pDst;
     int i;
+    SkinModel44* pEntry = pEntries;
 
     for (i = 0; i < nEntries; i++) {
-        pSrc = pDst = pEntries;
+        pSrc = pDst = pEntry;
         fn_8001F08C(&pSrc, &pDst, aFormat, 5, 1);
-        pEntries++;
+        pEntry++;
     }
 }
 
@@ -485,11 +486,12 @@ void fn_800363B4(SkinModel54* pEntries, s32 nEntries) {
     void* pSrc;
     void* pDst;
     int i;
+    SkinModel54* pEntry = pEntries;
 
     for (i = 0; i < nEntries; i++) {
-        pSrc = pDst = pEntries;
+        pSrc = pDst = pEntry;
         fn_8001F08C(&pSrc, &pDst, aFormat, 3, 1);
-        pEntries++;
+        pEntry++;
     }
 }
 
@@ -567,12 +569,12 @@ void fn_8003662C(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int 
     f32 (*aMtx)[4][4];
     f32 (*pDst)[4];
     f32 (*pSrc)[4];
-    s32 nMatrices;
     f32 fWeight;
     int nBones;
     int i;
     int j;
     int k;
+    s32 nMatrices;
 
     if (pSkin->pModel == NULL) {
         return;
