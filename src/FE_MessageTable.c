@@ -13,6 +13,7 @@
 #include "charstate.h"
 #include "trax.h"
 #include "core/gameaudio.h"
+#include "unsorted/cull.h"
 #include "core/easb.h"
 #include "game/earnings.h"
 #include "game/modes/ladder.h"
@@ -3307,6 +3308,30 @@ void fn_80080AA0(MsgArg* pArgs, MsgArg* pResult) {
 // A string's first character.
 void fn_80080AD0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = ((MsgString*)pArgs[0].p)->pStr[0];
+}
+
+// Turn the point (*pArgs[1], *pArgs[2]) by pArgs[0] degrees.
+void fn_80080AE8(MsgArg* pArgs, MsgArg* pResult) {
+    Vec4 v;
+    f32 mtx[4][4];              // EA bug: only the 2x2 rotation is set; the rest is left unset
+                                // (z and w are 0, so it only matters if it holds a NaN)
+    f32 fAngle = pArgs[0].f * PI / 180.0f;
+    f32 fSin;
+    f32 fCos;
+
+    v.x = *(f32*)pArgs[1].p;
+    v.y = *(f32*)pArgs[2].p;
+    v.z = 0.0f;
+    v.w = 0.0f;
+    fSin = fn_800095F0(fAngle);
+    fCos = fn_80009638(fAngle);
+    mtx[0][0] = fCos;
+    mtx[0][1] = fSin;
+    mtx[1][0] = -fSin;
+    mtx[1][1] = fCos;
+    fn_800BAD60(mtx, &v, &v);
+    *(f32*)pArgs[1].p = v.x;
+    *(f32*)pArgs[2].p = v.y;
 }
 
 // Hole pArgs[2] of slot pArgs[0]'s custom round pArgs[1]: its course and hole number.
