@@ -4463,6 +4463,38 @@ void fn_800842D0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = nError == 0;
 }
 
+// The EA Sports Bio requests for the card in slot pArgs[0], pArgs[1]: unless fn_80125194 answers 0
+// or -18, fn_80125280 first (only for -43 and -44), then fn_801252D0; the first error ends it,
+// else fn_801251EC runs. The answer is 1, or the error; the profile's n11704 keeps it too.
+void fn_80084354(MsgArg* pArgs, MsgArg* pResult) {
+    s32 aPos[2];
+    s32 nError;
+
+    aPos[0] = pArgs[0].i;
+    aPos[1] = pArgs[1].i;
+    nError = fn_80125194(aPos[0], aPos[1]);
+    if (nError != 0 && nError != -18) {
+        if (nError == -43 || nError == -44) {
+            nError = fn_80125280(pArgs[0].i, pArgs[1].i);
+            lbl_80281ED4->n11704 = nError;
+            if (nError != 0) {
+                pResult->i = (nError != 0) ? nError : 1;
+                return;
+            }
+        }
+        nError = fn_801252D0(pArgs[0].i, pArgs[1].i);
+        lbl_80281ED4->n11704 = nError;
+        if (nError != 0) {
+            pResult->i = (nError != 0) ? nError : 1;
+            lbl_80281ED4->n11704 = nError;
+            return;
+        }
+    }
+    nError = fn_801251EC(aPos);
+    pResult->i = (nError != 0) ? nError : 1;
+    lbl_80281ED4->n11704 = nError;
+}
+
 // For the card in slot pArgs[0], pArgs[1]: fn_801255C4's answer.
 void fn_8008449C(MsgArg* pArgs, MsgArg* pResult) {
     s32 aPos[2];
