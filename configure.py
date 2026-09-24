@@ -1066,7 +1066,7 @@ config.libs = [
             Object(NonMatching, "LLMem_Gc.c"),
             Object(Matching, "unsorted/sweep_800072E8.c"),
             Object(Matching, "fe_craputils.c"),
-            Object(NonMatching, "DynamicRenderingBuffer.c"),
+            Object(Matching, "DynamicRenderingBuffer.c"),
             Object(Matching, "Code80070EC4.c"),
             Object(Matching, "unsorted/sweep_80097E98.c"),
             Object(Matching, "Code8009A928.c"),

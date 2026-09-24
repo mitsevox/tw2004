@@ -135,51 +135,51 @@ void fn_800705F0(DynRenderBuffer* pBuf, u16* pIndices, u32 nCount, u8 bRestart) 
 
 // Append nCount draws (or, with no list, one draw of nCount indices of kind nPrim); bRestart starts
 // the list over. Appended draws start after the indices already there.
+// EA writes the list (DynRenderDrawList) as a stream of words through one cursor: the count, then
+// three words per draw (nStart, nCount, nPrim).
 void fn_80070764(DynRenderBuffer* pBuf, const DynRenderDrawIn* pIn, u16 nCount, int nPrim, u8 bRestart) {
-    DynRenderDrawList* pList = pBuf->pDraws;
-    DynRenderDraw* pDraw;
+    u32* pWord = (u32*)pBuf->pDraws;
     u32 nOld;
     u32 i;
+    u32 j;
 
     if (bRestart) {
         if (pIn == NULL) {
-            pList->nDraws = 1;
-            pList->aDraws[0].nStart = 0;
-            pList->aDraws[0].nCount = nCount;
-            pList->aDraws[0].nPrim = nPrim;
+            pWord[0] = 1;
+            pWord[1] = 0;
+            pWord[2] = nCount;
+            pWord[3] = nPrim;
             return;
         }
-        pList->nDraws = nCount;
-        for (i = 0, pDraw = pList->aDraws; i < nCount; i++) {
-            pDraw->nStart = pIn[i].nStart;
-            pDraw->nCount = pIn[i].nCount;
-            pDraw->nPrim = pIn[i].nPrim;
-            pDraw++;
+        *pWord++ = nCount;
+        for (i = 0; i < nCount; i++) {
+            pWord[0] = pIn[i].nStart;
+            pWord[1] = pIn[i].nCount;
+            pWord[2] = pIn[i].nPrim;
+            pWord += 3;
         }
     } else {
         if (pIn == NULL) {
-            nOld = pList->nDraws;
-            pList->nDraws = nOld + 1;
-            pDraw = pList->aDraws;
-            for (i = 0; i < nOld; i++) {
-                pDraw++;
+            nOld = *pWord;
+            *pWord++ = nOld + 1;
+            for (j = 0; j < nOld; j++) {
+                pWord += 3;
             }
-            pDraw->nStart = pBuf->nIndices;
-            pDraw->nCount = nCount;
-            pDraw->nPrim = nPrim;
+            pWord[0] = pBuf->nIndices;
+            pWord[1] = nCount;
+            pWord[2] = nPrim;
             return;
         }
-        nOld = pList->nDraws;
-        pList->nDraws = nOld + nCount;
-        pDraw = pList->aDraws;
-        for (i = 0; i < nOld; i++) {
-            pDraw++;
+        nOld = *pWord;
+        *pWord++ = nOld + nCount;
+        for (j = 0; j < nOld; j++) {
+            pWord += 3;
         }
         for (i = 0; i < nCount; i++) {
-            pDraw->nStart = pBuf->nIndices + pIn[i].nStart;
-            pDraw->nCount = pIn[i].nCount;
-            pDraw->nPrim = pIn[i].nPrim;
-            pDraw++;
+            pWord[0] = pBuf->nIndices + pIn[i].nStart;
+            pWord[1] = pIn[i].nCount;
+            pWord[2] = pIn[i].nPrim;
+            pWord += 3;
         }
     }
 }

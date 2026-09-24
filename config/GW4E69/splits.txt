@@ -337,6 +337,8 @@ unsorted/sweep_80070168.c:
 
 DynamicRenderingBuffer.c:
 	.text       start:0x8007018C end:0x80070EC4
+	.data       start:0x80188E18 end:0x80188E50
+	.sdata2     start:0x802839B8 end:0x802839C8
 
 Code80070EC4.c:
 	.text       start:0x80070EC4 end:0x8007110C
