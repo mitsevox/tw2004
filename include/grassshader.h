@@ -79,6 +79,23 @@ typedef struct GrassChunkData {
     f32 f4;                     // 0x4
 } GrassChunkData;
 
+// The grass file ('gras' stream object, fn_8011E584): a word giving the size of the part after its
+// 16-byte header, then this header, n0 halfwords, a word count and 16 bytes on, the records.
+typedef struct GrassFileHeader {
+    s32 n0;                     // 0x0
+    u16 uVersion;               // 0x4  100: n6/n8/nA are given
+    s16 n6;                     // 0x6
+    s16 n8;                     // 0x8
+    s16 nA;                     // 0xA
+    u8  unkC[4];
+} GrassFileHeader;
+
+typedef struct GrassTile {
+    u8  unk0[0x10];
+    u32 u10;                    // 0x10  } offsets from the file's start (after its first 16 bytes),
+    u32 u14;                    // 0x14  } made into addresses on load
+} GrassTile;
+
 // One of GoGrass.c's buffers, kept in GrassManager.apD8 / apDC.
 typedef struct GrassBuffer {
     u8  unk0[0x14];
@@ -88,7 +105,14 @@ typedef struct GrassBuffer {
 
 // GoGrass.c's state (*lbl_80281900). Only the fields the decompiled code uses; its size is not known.
 typedef struct GrassManager {
-    u8           unk0[0x1C];
+    u8           unk0[0x8];
+    s16*         p8;            // 0x08  the grass file's n0 halfwords (fn_8011E584)
+    struct GrassTile* pC;       // 0x0C  the grass file's n10 records
+    s32          n10;           // 0x10
+    s16          n14;           // 0x14  from a version-100 file's header, else -500
+    s16          n16;           // 0x16  from a version-100 file's header, else -500
+    s16          n18;           // 0x18  from a version-100 file's header, else 400
+    s16          n1A;           // 0x1A  the header's n0 / n18
     s32          n1C;           // 0x1C  the chunks added (fn_8011E4D8); cleared when the grass is freed
     struct GrassChunkData* a20[10];   // 0x20  each chunk's data, byte-swapped in place
     struct GrassChunk*     a48[10];   // 0x48  the chunks

@@ -48,6 +48,8 @@ void fn_80008380(void);
 void fn_8011E468(void);
 void fn_8011E4D8(GrassChunk* pChunk);
 void fn_8011EB80(void);
+void fn_8011E9D8(void);
+void fn_8011FFCC(void);
 void fn_8011E584(UStreamObject* pObject);
 int  fn_8011E6B0(f32** ppA, f32** ppB);
 void fn_8011FD74(GrassBuffer* pBuffer);
@@ -101,6 +103,46 @@ void fn_8011E4D8(GrassChunk* pChunk) {
     lbl_80281900->f3B8 = lbl_80281900->a20[0]->f4;
     lbl_80281900->n3A4 = lbl_80281900->a20[0]->n0;
     lbl_80281900->n1C = lbl_80281900->n1C + 1;
+}
+
+// The 'gras' stream handler: the hole's grass file is loaded. Its header gives the grid (defaults
+// for a file before version 100); the records' two offsets become addresses.
+void fn_8011E584(UStreamObject* pObject) {
+    u8* pCur;
+    u8* pBase;
+    s32 nSkip;
+    s32 n;
+    int i;
+
+    lbl_80281900->p370 = pObject;
+    pCur = pObject->pData;
+    fn_8011FFCC();
+    fn_8011E9D8();
+    nSkip = *(s32*)pCur;
+    pCur += 0x10;
+    pBase = pCur;
+    pCur += nSkip;
+    if (((GrassFileHeader*)pCur)->uVersion == 100) {
+        lbl_80281900->n14 = ((GrassFileHeader*)pCur)->n6;
+        lbl_80281900->n16 = ((GrassFileHeader*)pCur)->n8;
+        lbl_80281900->n18 = ((GrassFileHeader*)pCur)->nA;
+    } else {
+        lbl_80281900->n14 = -500;
+        lbl_80281900->n16 = -500;
+        lbl_80281900->n18 = 400;
+    }
+    n = ((GrassFileHeader*)pCur)->n0;
+    pCur += sizeof(GrassFileHeader);
+    lbl_80281900->n1A = n / lbl_80281900->n18;
+    lbl_80281900->p8 = (s16*)pCur;
+    pCur += n * 2;
+    lbl_80281900->n10 = *(s32*)pCur;
+    lbl_80281900->pC = (GrassTile*)(pCur + 0x10);
+    // port: the file's offsets are made into 32-bit addresses in place
+    for (i = 0; i < lbl_80281900->n10; i++) {
+        lbl_80281900->pC[i].u10 += (u32)pBase;
+        lbl_80281900->pC[i].u14 += (u32)pBase;
+    }
 }
 
 // A sort order: by the float at +8 of the objects the two entries point to, the larger first
