@@ -1,7 +1,7 @@
-// GameMode16.c (our name): game mode 16, target practice. Each player has 20 balls (nDC0) to hit
-// the targets; a target pays up to 3 times, hitting every target pays the prize row's bonus, and
-// the bullseyes, streaks and the longest carry are counted. Bonuses picked up on the way
-// (pfn268) raise a points multiplier.
+// GameMode16.c (our name): game mode 16. Each player has 20 balls (nDC0) to hit the targets in any
+// order; a target pays up to 4 times, hitting every target pays the prize row's bonus, and the
+// bullseyes, streaks and the longest shot are counted. Hitting world objects on the way (pfn268)
+// raises a points multiplier.
 
 #include "golfer.h"
 #include "ball.h"
@@ -35,7 +35,7 @@ s32   fn_800F59DC(int nPlayer, int i);
 void  fn_800F5A14(int nPlayer, int nId);
 void  fn_800F5A88(void);
 
-// Mode 16 starts: one player at a time, no wind, no gimmes, no mulligans.
+// Mode 16 starts: no wind, no gimmes, no mulligans.
 void fn_800F4B40(void) {
     gpGame->pfnInit = fn_800F4B40;
     gpGame->pfnShutdown = fn_800F4D6C;
@@ -140,7 +140,7 @@ void fn_800F4F40(int nPlayer) {
     }
 }
 
-// The ball stopped: score the target, the all-targets bonus, and the longest carry.
+// The ball stopped: score the target, the all-targets bonus, and the longest shot.
 void fn_800F5014(int nPlayer) {
     s32 nSurface;
     s8 nTarget;
@@ -309,7 +309,8 @@ void fn_800F5014(int nPlayer) {
     fn_800F2668(nPlayer);
 }
 
-// Hole start: maybe a multiplier, and a player who has not shot aims at their target.
+// Next turn: each player in pre-shot may get a shot multiplier, and is re-aimed at their target
+// only when out of balls; the bonus multiplier goes back to 1.
 void fn_800F56D4(void) {
     int i;
     fn_800F2030();
@@ -389,7 +390,7 @@ s32 fn_800F59D4(s32 a) {
     return lbl_80282394;
 }
 
-// A target's state for the HUD: 1 when it has paid out 3 times.
+// A target's state for the HUD: 1 when it has paid out 4 times (closed).
 s32 fn_800F59DC(int nPlayer, int i) {
     if (gPlayers[nPlayer].nDE4[i] > 3) {
         return 1;
@@ -397,7 +398,7 @@ s32 fn_800F59DC(int nPlayer, int i) {
     return 0;
 }
 
-// A bonus was collected: the multiplier goes up.
+// The ball hit a world object (nId): the points multiplier goes up by 2 to 6.
 void fn_800F5A14(int nPlayer, int nId) {
     s32 n = fn_800F2810(nId);
     fn_800A30E4(8, &gPlayers[nPlayer].ball, nPlayer, 0, 0.0f);
