@@ -56,12 +56,13 @@ void fn_8008F488(FrontEnd* pFE) {
     UIFile* pFile = pFE->pFile;
     u32 i;
 
-    pFE->pFile->p4 = (u32*)((uptr)pFE->pFile->p4 + (uptr)pFile);
-    pFE->pFile->p8 = (u32*)((uptr)pFE->pFile->p8 + (uptr)pFile);
-    fn_8008F3A4(pFE->pFile->p4 + 1, (uptr)pFile, 1, pFE->pFile->p4[0] * 2);
-    fn_8008F3A4(pFE->pFile->p8 + 1, (uptr)pFile, 1, pFE->pFile->p8[0]);
-    for (i = 0; i < pFE->pFile->p8[0]; i++) {
-        fn_8008F3A4((u32*)pFE->pFile->p8[1 + i] + 1, (uptr)pFile, 1, *(u32*)pFE->pFile->p8[1 + i]);
+    pFE->pFile->p4 = (UIFilePairs*)((uptr)pFE->pFile->p4 + (uptr)pFile);
+    pFE->pFile->p8 = (UIFileTables*)((uptr)pFE->pFile->p8 + (uptr)pFile);
+    fn_8008F3A4((u32*)pFE->pFile->p4->aPairs, (uptr)pFile, 1, pFE->pFile->p4->nCount * 2);
+    fn_8008F3A4((u32*)pFE->pFile->p8->apTables, (uptr)pFile, 1, pFE->pFile->p8->nCount);
+    for (i = 0; i < pFE->pFile->p8->nCount; i++) {
+        fn_8008F3A4((u32*)pFE->pFile->p8->apTables[i]->apEntries, (uptr)pFile, 1,
+                    pFE->pFile->p8->apTables[i]->nCount);
     }
 }
 
@@ -79,12 +80,13 @@ void fn_8008F568(s32 nCmd, s32 unused1, s32 unused2, s32 unused3, s32 a, s32 b) 
     }
 }
 
-// Entry n of the UI file's first table: the second word of its pair (0 past the end).
-u32 fn_8008F610(void* unused, u16 n) {
-    u32* pTable = lbl_80281F1C->pFile->p4;
+// The studio's UISLoadFn: screen uScreen's data from the UI file's pairs (0 past the end). The
+// group is ignored.
+u32 fn_8008F610(u16 uGroup, u16 uScreen) {
+    UIFilePairs* pPairs = lbl_80281F1C->pFile->p4;
 
-    if (n >= pTable[0]) return 0;
-    return pTable[2 + n * 2];
+    if (uScreen >= pPairs->nCount) return 0;
+    return (u32)pPairs->aPairs[uScreen].p4;
 }
 
 void fn_8008F644(void) {
@@ -109,6 +111,33 @@ void fn_8008FD60(u32 uEvent) {
         } else if (lbl_80281F1C != NULL) {
             fn_8008F820();
         }
+    }
+}
+
+// Find the colour table among the UI file's tables (the one whose first entry is of kind 0x10)
+// and turn its entries' colour offsets into pointers; with none, p14 is NULL.
+void fn_8008FDDC(FrontEnd* pFE) {
+    UIFile* pFile = pFE->pFile;
+    u8 bFound = 0;
+    int nTables;
+    int i;
+
+    nTables = pFile->p8->nCount;
+    for (i = 0; i < nTables; i++) {
+        UIColorTable* pTable = pFE->pFile->p8->apTables[i];
+
+        // fake match: the original tests the count unsigned here (cmplwi), signed below
+        if ((u32)pTable->nCount != 0 && pTable->apEntries[0]->u0 == 0x10) {
+            pFE->p14 = pTable;
+            bFound = 1;
+        }
+    }
+    if (bFound) {
+        for (i = 0; i < pFE->p14->nCount; i++) {
+            pFE->p14->apEntries[i]->p8 = (u8*)((uptr)pFE->p14->apEntries[i]->p8 + (uptr)pFile);
+        }
+    } else {
+        pFE->p14 = NULL;
     }
 }
 

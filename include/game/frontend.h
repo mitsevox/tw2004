@@ -8,17 +8,12 @@
 #include "game_types.h"
 #include "platform.h"
 
-// The menu UI's file (the 'DATS' object uiLoadFile.c keeps). Its tables hold offsets from the
-// file's start until fn_8008F488 adds the file's address to them.
-typedef struct UIFile {
-    u32  u0;                    // 0x0
-    u32* p4;                    // 0x4  a count, then that many pairs of words
-    u32* p8;                    // 0x8  a count, then that many tables (each a count and its words)
-} UIFile;
-
 // An entry of the front end's colour table: p8 points at four bytes, alpha first (uiText.c).
+// Every table in the UI file's second list holds entries of this shape; u0 is the entry's kind,
+// 0x10 in the colour table (fn_8008FDDC).
 typedef struct UIColorEntry {
-    u8   unk0[0x8];
+    u32  u0;                    // 0x0
+    u8   unk4[0x4];
     u8*  p8;                    // 0x8
 } UIColorEntry;
 
@@ -26,6 +21,33 @@ typedef struct UIColorTable {
     s32  nCount;                // 0x0  read as an s16
     UIColorEntry* apEntries[1]; // 0x4  nCount of them
 } UIColorTable;
+
+// A pair in the UI file's first list. fn_8008F610 hands p4 to the studio as a screen's data.
+typedef struct UIFilePair {
+    void* p0;                   // 0x0
+    void* p4;                   // 0x4
+} UIFilePair;
+
+typedef struct UIFilePairs {
+    u32  nCount;                // 0x0
+    UIFilePair aPairs[1];      // 0x4  nCount of them
+} UIFilePairs;
+
+// The UI file's second list: its tables, one of them the colour table (fn_8008FDDC).
+typedef struct UIFileTables {
+    s32  nCount;                // 0x0
+    UIColorTable* apTables[1];  // 0x4  nCount of them
+} UIFileTables;
+
+// The menu UI's file (the 'DATS' object uiLoadFile.c keeps). Its lists hold offsets from the
+// file's start until fn_8008F488 adds the file's address to them.
+// port: the file stores 32-bit offsets in these pointer fields and in the lists' pointers, and
+// fn_8008F488 turns them into pointers in place; a 64-bit port must load the file into structs.
+typedef struct UIFile {
+    u32  u0;                    // 0x0
+    UIFilePairs*  p4;           // 0x4  its pairs
+    UIFileTables* p8;           // 0x8  its tables
+} UIFile;
 
 typedef struct FrontEnd {
     UIFile* pFile;              // 0x0
