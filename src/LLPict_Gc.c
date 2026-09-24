@@ -17,8 +17,6 @@ void fn_80056204();
 void fn_80056208();
 void fn_8002F4FC(void);
 void fn_8002F540(void);
-void fn_8002FE70(void* arg0);
-void fn_8002FEAC(void);
 void fn_800B90F4();
 void fn_800B91B8();
 s32 fn_800B920C();
@@ -35,10 +33,10 @@ void fn_8002F540(void) {
     fn_80009E70((void*)*(s32*)((u8*)lbl_802810C0));
 }
 
-void fn_8002FE70(void* arg0) {
-    if (arg0 != NULL) {
-        fn_80009E70((*(void**)((u8*)(arg0) + 0x60)));
-        fn_80009E70(arg0);
+void fn_8002FE70(LLPict* pPict) {
+    if (pPict != NULL) {
+        fn_80009E70(pPict->pPixels);
+        fn_80009E70(pPict);
     }
 }
 
