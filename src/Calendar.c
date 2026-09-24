@@ -7,7 +7,6 @@
 u8  fn_800D256C(u32 nYear);
 u32 fn_800D25D4(u32 nYear);
 s32 fn_800D2608(u16 nDate);
-s32 fn_800D2640(u16 nDate);
 void fn_800D293C(u16 nDate, char* pBuf);
 
 u8 lbl_80191798[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};    // days in each month

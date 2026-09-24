@@ -211,6 +211,7 @@ u8   fn_800D0AF4(void);                 // nobody took anything on the last hole
 s32  fn_800BCCCC(int nPlayer);          // SitDevFile.c: gpGame->pfn208
 s32  fn_800BCCF8(int nPlayer);          // SitDevFile.c: strokes behind the leader (gpGame->pfn200)
 u8   fn_800BCD50(void);                 // SitDevFile.c: gpGame->bD4
+s32  fn_800D2640(u16 nDate);                   // a date's month (1..12)
 void fn_800D2714(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
 void fn_800D2678(u16* pDate, s32 nMonth, s32 nDay, u32 nYear);    // make a date
 void fn_800D27CC(u16* pDate, s32 nDays);        // move a date on by nDays
