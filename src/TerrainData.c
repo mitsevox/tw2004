@@ -111,11 +111,11 @@ s32 fn_8000C140(f32* pPos, TNetwork* pNet, s32 nNodes) {
 
     for (i = 0; i < nNodes; i++) {
         pA = pNet->aNodes[nCur].vPos;
-        if (nPrev != pNet->aNodes[nCur].nLink10) {
-            nNext = pNet->aNodes[nCur].nLink10;
+        if (nPrev != pNet->aNodes[nCur].aLinks[0]) {
+            nNext = pNet->aNodes[nCur].aLinks[0];
             pB = pNet->aNodes[nNext].vPos;
         } else {
-            nNext = pNet->aNodes[nCur].nLink12;
+            nNext = pNet->aNodes[nCur].aLinks[1];
             pB = pNet->aNodes[nNext].vPos;
         }
         if (pA[2] <= pPos[2]) {
@@ -233,11 +233,11 @@ u8 fn_8000C3C8(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes, f32* pHit) {
 
     for (i = 0; i < nNodes; i++) {
         pA = pNet->aNodes[nCur].vPos;
-        if (nPrev != pNet->aNodes[nCur].nLink10) {
-            nNext = pNet->aNodes[nCur].nLink10;
+        if (nPrev != pNet->aNodes[nCur].aLinks[0]) {
+            nNext = pNet->aNodes[nCur].aLinks[0];
             pB = pNet->aNodes[nNext].vPos;
         } else {
-            nNext = pNet->aNodes[nCur].nLink12;
+            nNext = pNet->aNodes[nCur].aLinks[1];
             pB = pNet->aNodes[nNext].vPos;
         }
         if (fn_8000C278(pFrom, pTo, pA, pB, v)) {
@@ -269,11 +269,11 @@ u8 fn_8000C4E0(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes) {
 
     for (i = 0; i < nNodes; i++) {
         pA = pNet->aNodes[nCur].vPos;
-        if (nPrev != pNet->aNodes[nCur].nLink10) {
-            nNext = pNet->aNodes[nCur].nLink10;
+        if (nPrev != pNet->aNodes[nCur].aLinks[0]) {
+            nNext = pNet->aNodes[nCur].aLinks[0];
             pB = pNet->aNodes[nNext].vPos;
         } else {
-            nNext = pNet->aNodes[nCur].nLink12;
+            nNext = pNet->aNodes[nCur].aLinks[1];
             pB = pNet->aNodes[nNext].vPos;
         }
         if (fn_8000C328(pFrom, pTo, pA, pB)) {

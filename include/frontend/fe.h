@@ -172,7 +172,8 @@ typedef struct FEProfile {
     s8  n5;                     // 0x00005  }
     u8  unk6[0x10 - 0x6];
     SaveProfile profile;        // 0x00010  a working copy
-    u8  unk10610[0x10620 - 0x10610];
+    u8  unk10610[0x1061C - 0x10610];
+    s32 n1061C;                 // 0x1061C  the award whose replay is shown (fn_8007F8A0)
     s8  n10620;                 // 0x10620  read and cleared by menu messages
     s8  a10621[15][2];          // 0x10621  pairs a menu message reads (fn_80082620)
     u8  bCopy;                  // 0x1063F  the working copy is the profile, not the slot's own

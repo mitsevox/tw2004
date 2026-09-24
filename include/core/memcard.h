@@ -102,6 +102,22 @@ LAYOUT_ASSERT(MCOpSet, 0x14);
 
 extern MCOpSet lbl_8018C7D8[4];
 
+// The operations do not all take the same payload: the menus' message fn_800847E0 builds op 0
+// and 3 an MCCardPos, op 1 an MCCardPosStr, op 2 the card alone and op 4 the card and a name.
+// So fn_80084FB4 and its neighbours take the payload as a void*.
+typedef struct MCOpCard {       // op 2's payload (8 bytes)
+    s32  nPort;                 // 0x0
+    s32  nSlot;                 // 0x4
+} MCOpCard;
+LAYOUT_ASSERT(MCOpCard, 0x8);
+
+typedef struct MCOpCardName {   // op 4's payload
+    s32   nPort;                // 0x0
+    s32   nSlot;                // 0x4
+    char* szName;               // 0x8  the message's string
+} MCOpCardName;
+LAYOUT_ASSERT(MCOpCardName, 0xC);
+
 // The save file's names on the card: EA kept the PlayStation 2 names (SLUS-20757 is the PS2
 // release), the second a backup copy.
 #define MC_FILE_NAME    "BASLUS-20757"
