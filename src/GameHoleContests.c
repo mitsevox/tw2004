@@ -59,8 +59,6 @@ u8 fn_800D9E5C(void) {
 void fn_800D9F34(void) {
     u8 bFound;
     int i;
-    int h;
-    u8 bPar3;
 
     bFound = 0;
     for (i = 0; i < 18; i++) {
@@ -77,13 +75,13 @@ void fn_800D9F34(void) {
         lbl_80281568 = -1;
     }
 
-    bPar3 = 0;
-    for (h = 0; h < 18; h++) {
-        if (fn_800D2AD8(h) == 3) {
-            bPar3 = 1;
+    bFound = 0;
+    for (i = 0; i < 18; i++) {
+        if (fn_800D2AD8(i) == 3) {
+            bFound = 1;
         }
     }
-    if (bPar3) {
+    if (bFound) {
         lbl_8028156C = Rand_Next(0) % 18;
         while (fn_800D2AD8(lbl_8028156C) > 3) {
             lbl_8028156C = Rand_Next(0) % 18;
@@ -93,13 +91,13 @@ void fn_800D9F34(void) {
     }
 
     if ((int)(Rand_Next(0) % 100) < 20) {
-        bPar3 = 0;
-        for (h = 0; h < 18; h++) {
-            if (fn_800D2AD8(h) == 3 && h != lbl_8028156C) {
-                bPar3 = 1;
+        bFound = 0;
+        for (i = 0; i < 18; i++) {
+            if (fn_800D2AD8(i) == 3 && i != lbl_8028156C) {
+                bFound = 1;
             }
         }
-        if (bPar3) {
+        if (bFound) {
             lbl_80281570 = Rand_Next(0) % 18;
             while (fn_800D2AD8(lbl_80281570) > 3 || lbl_80281570 == lbl_8028156C) {
                 lbl_80281570 = Rand_Next(0) % 18;

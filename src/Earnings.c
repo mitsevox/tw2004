@@ -1674,8 +1674,10 @@ int fn_800D7DA0(int nPlayer, int bSave, u8 bCountStroke, u8 bAll) {
     char szName[32];
     int nProfile;
     int nResult;
-    int i;
     int nValue;
+    int i;
+    int nEagles;
+    int nPutts;
 
     lbl_80282258 = 0;
     if (gSession.uFlags & 0x4000) return 0;
@@ -1754,26 +1756,26 @@ int fn_800D7DA0(int nPlayer, int bSave, u8 bCountStroke, u8 bAll) {
             lbl_80282258++;
         }
     }
-    nValue = 0;
+    nEagles = 0;
     for (i = 0; i < 18; i++) {
         if (gPlayers[nPlayer].nStrokes[i] < fn_800D2AD8(i) - 1) {
-            nValue++;
+            nEagles++;
         }
     }
     if (fn_800D8DB4(6)) {
-        nResult = fn_800D8750(6, nValue, bSave, szName, nPlayer);
+        nResult = fn_800D8750(6, nEagles, bSave, szName, nPlayer);
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
             lbl_80200448[lbl_80282258] = nResult;
             lbl_802004C0[lbl_80282258] = 6;
             lbl_80282258++;
         }
     }
-    nValue = 0;
+    nPutts = 0;
     for (i = 0; i < 18; i++) {
-        nValue += gPlayers[nPlayer].nPutts[i];
+        nPutts += gPlayers[nPlayer].nPutts[i];
     }
     if (fn_800D8DB4(4)) {
-        nResult = fn_800D8750(4, nValue, bSave, szName, nPlayer);
+        nResult = fn_800D8750(4, nPutts, bSave, szName, nPlayer);
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
             lbl_80200448[lbl_80282258] = nResult;
             lbl_802004C0[lbl_80282258] = 4;

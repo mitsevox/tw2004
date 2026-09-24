@@ -485,6 +485,7 @@ void fn_80108690(MsgArg* pArgs, MsgArg* pResult) {
 // A part's choice i is one of today's random assets: parts 0, 1, 2 and 7 are category -1, parts
 // 8, 19 and 20 category -2, part 12 category -3 (other parts have none).
 void fn_80108768(MsgArg* pArgs, MsgArg* pResult) {
+    int j;
     s16 nPart = pArgs[0].i;
     int b = pArgs[1].i;
     int i = pArgs[2].i;
@@ -492,7 +493,6 @@ void fn_80108768(MsgArg* pArgs, MsgArg* pResult) {
     int nAsset = fn_80104FA8(nPart, b, i);
     int nKind;
     int nCategory;
-    int j;
 
     switch (nPart) {
     case 0:

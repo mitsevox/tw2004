@@ -145,11 +145,12 @@ void fn_8001333C(PadStatus* pStatus, PadAnalog* pAnalog) {
 }
 
 void fn_80013400(void) {
+    u32 uBit;
     int i;
     u32 uReset;
-    u32 uBit;
     u32 uHeld;
     u32 uPressed;
+    PadAnalog* pAnalog;
 
     PADRead(lbl_801A36A0.aStatus);
     lbl_801A36A0.nRead = 0;
@@ -165,6 +166,9 @@ void fn_80013400(void) {
             uReset |= uBit;
             lbl_801A36A0.nRead |= 1 << i;
             break;
+        case -2:        // not ready yet, or a transfer error: try again next frame
+        case -3:
+            break;
         }
     }
     if (uReset != 0) {
@@ -179,17 +183,18 @@ void fn_80013400(void) {
             lbl_801A36A0.auButtons[i] = lbl_801A36A0.aStatus[i].uButtons;
             if (lbl_801A36A0.bStickAsDpad) {
                 // D-pad bits: 1 left, 2 right, 4 down, 8 up
-                if (lbl_801A36A0.aAnalog[i].nStickX > 0xAA) {
+                pAnalog = &lbl_801A36A0.aAnalog[i];
+                if (pAnalog->nStickX > 0xAA) {
                     lbl_801A36A0.auButtons[i] |= 2;
                     lbl_801A36A0.auButtons[i] &= ~1;
-                } else if (lbl_801A36A0.aAnalog[i].nStickX < 0x56) {
+                } else if (pAnalog->nStickX < 0x56) {
                     lbl_801A36A0.auButtons[i] |= 1;
                     lbl_801A36A0.auButtons[i] &= ~2;
                 }
-                if (lbl_801A36A0.aAnalog[i].nStickY > 0xAA) {
+                if (pAnalog->nStickY > 0xAA) {
                     lbl_801A36A0.auButtons[i] |= 4;
                     lbl_801A36A0.auButtons[i] &= ~8;
-                } else if (lbl_801A36A0.aAnalog[i].nStickY < 0x56) {
+                } else if (pAnalog->nStickY < 0x56) {
                     lbl_801A36A0.auButtons[i] |= 8;
                     lbl_801A36A0.auButtons[i] &= ~4;
                 }
@@ -203,7 +208,7 @@ void fn_80013400(void) {
             uHeld = lbl_801A36A0.auButtons[i];
             uPressed = uHeld & ~lbl_801A36A0.auHeld[i];
             lbl_801A36A0.auHeld[i] = uHeld;
-            lbl_801A36A0.auButtons[i] = (uHeld << 16) | uPressed;
+            lbl_801A36A0.auButtons[i] = uPressed | (uHeld << 16);
         } else {
             lbl_801A36A0.aAnalog[i].nStickX = 0x80;
             lbl_801A36A0.aAnalog[i].nStickY = 0x80;
