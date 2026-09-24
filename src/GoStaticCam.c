@@ -238,7 +238,7 @@ CamShot* fn_8006509C(int nPath) {
     CamShot* pNext;
     CamShot* pPrev;
     CamShot* pAfter;
-    int i;
+    s32 i;
     int j;
     u8 bFound;
 
