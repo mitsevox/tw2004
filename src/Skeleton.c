@@ -434,7 +434,7 @@ void fn_800279C0(Character* pChar) {
 
     if (pSkel == NULL || lbl_802810A6 == 0) return;
     if (pSkel->f1074 > 0.0f) {
-        pSkel->f1074 -= gSession.fFrameTime;
+        pModel->pSkel->f1074 -= gSession.fFrameTime;
         if (pModel->pSkel->f1074 < 0.0f) {
             pModel->pSkel->f1074 = 0.0f;
         }
