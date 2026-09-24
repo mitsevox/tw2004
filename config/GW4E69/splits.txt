@@ -864,6 +864,10 @@ CharSliders.c:
 
 FE_PGATourMessages.c:
 	.text       start:0x8010E58C end:0x8010F6C8
+	.data       start:0x80193C90 end:0x80193D28
+	.sdata      start:0x80281790 end:0x802817C8
+	.sbss       start:0x802824B0 end:0x802824B8
+	.sdata2     start:0x802848C0 end:0x802848C8
 
 FE_LogoDesign.c:
 	.text       start:0x8010F6C8 end:0x8010FC3C
@@ -904,6 +908,9 @@ hwsRender_Gc.c:
 
 DynChain.c:
 	.text       start:0x80113E60 end:0x80116540
+	.data       start:0x80193DE8 end:0x80193E70
+	.sbss       start:0x802824F8 end:0x80282500
+	.sdata2     start:0x802848E8 end:0x802849C0
 
 GameModeDriver.c:
 	.text       start:0x80116540 end:0x80117600
