@@ -755,9 +755,9 @@ u8 fn_80031E40(void) {
 // pTranslucentObjectList. Crowd objects (bit 0x20 of word 0, or 0x10 or 0x20 of word 3; not when
 // fn_800172C4 is 0 for the view) use the crowd's fade distances.
 void fn_80031E58(void) {
-    s32 i;
     UObjMesh* pModel;
     s32 uFlags0;
+    s32 i;
     s32 uFlags2;
     s32 uCrowd;
     f32 fNear;
