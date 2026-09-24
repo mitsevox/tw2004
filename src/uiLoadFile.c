@@ -27,10 +27,6 @@ void fn_8008EE1C(UStreamObject* pObject);
 void fn_8008EEB8(UStreamObject* pObject);
 void fn_8008EFC0(UINamedList* pList);
 void fn_8008EFFC(UStreamObject* pObject);
-void* fn_8008F0C0(void);
-UILoaded* fn_8008F0F0(void);
-UINamedList* fn_8008F15C(void);
-u32* fn_8008F18C(void);
 u8 fn_8008F204(int nKind);
 void fn_80090898(void);                                 // uiProcessInterface.c
 void fn_80010028(void* pBank);                          // LLTex.c: free a texture bank
@@ -158,7 +154,8 @@ void fn_8008EFFC(UStreamObject* pObject) {
     fn_80009E70(pObject);
 }
 
-void* fn_8008F0C0(void) {
+// szUnused: EA passes the UI set's name (fn_8009005C) to this getter and the three below.
+void* fn_8008F0C0(char* szUnused) {
     return lbl_80281F0C;
 }
 
@@ -168,7 +165,7 @@ void fn_8008F0C8(void* p) {
     }
 }
 
-UILoaded* fn_8008F0F0(void) {
+UILoaded* fn_8008F0F0(char* szUnused) {
     return &lbl_801D87A8;
 }
 
@@ -184,7 +181,7 @@ void fn_8008F0FC(UILoaded* pLoaded) {
     }
 }
 
-UINamedList* fn_8008F15C(void) {
+UINamedList* fn_8008F15C(char* szUnused) {
     return lbl_80281F04;
 }
 
@@ -194,7 +191,7 @@ void fn_8008F164(void* p) {
     }
 }
 
-u32* fn_8008F18C(void) {
+u32* fn_8008F18C(char* szUnused) {
     return lbl_80281F08;
 }
 
