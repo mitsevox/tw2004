@@ -42,6 +42,7 @@ void fn_8009F8C8(SaveRecords* pRecords) {
     int i;
     int k;
     int j;
+    int nHole;
 
     nMode = Game_GetMode();
     nHoleNum = gpGame->nCurHoleNum;
@@ -59,27 +60,27 @@ void fn_8009F8C8(SaveRecords* pRecords) {
         }
     }
     gpGame->nMode = 16;
-    for (i = 0; i < 3; i++) {
-        gpGame->nCurHoleNum = i;
+    for (nHole = 0; nHole < 3; nHole++) {
+        gpGame->nCurHoleNum = nHole;
         for (j = 0; j < 3; j++) {
             for (k = 0; k < 5; k++) {
-                if (!fn_800D853C(j, pRecords->recB[(u32)i][(u32)j][k].nValue,
-                                 pRecords->recB[(u32)i][(u32)j][k].szName, i)) {
-                    fn_800D8750(j, pRecords->recB[(u32)i][(u32)j][k].nValue, 1,
-                                pRecords->recB[(u32)i][(u32)j][k].szName, 5);
+                if (!fn_800D853C(j, pRecords->recB[(u32)nHole][(u32)j][k].nValue,
+                                 pRecords->recB[(u32)nHole][(u32)j][k].szName, nHole)) {
+                    fn_800D8750(j, pRecords->recB[(u32)nHole][(u32)j][k].nValue, 1,
+                                pRecords->recB[(u32)nHole][(u32)j][k].szName, 5);
                 }
             }
         }
     }
     gpGame->nMode = 22;
-    for (i = 0; i < 5; i++) {
-        gpGame->nCurHoleNum = i;
+    for (nHole = 0; nHole < 5; nHole++) {
+        gpGame->nCurHoleNum = nHole;
         for (j = 0; j < 2; j++) {
             for (k = 0; k < 5; k++) {
-                if (!fn_800D85DC(j, pRecords->recC[(u32)i][(u32)j][k].nValue,
-                                 pRecords->recC[(u32)i][(u32)j][k].szName, i)) {
-                    fn_800D8750(j, pRecords->recC[(u32)i][(u32)j][k].nValue, 1,
-                                pRecords->recC[(u32)i][(u32)j][k].szName, 5);
+                if (!fn_800D85DC(j, pRecords->recC[(u32)nHole][(u32)j][k].nValue,
+                                 pRecords->recC[(u32)nHole][(u32)j][k].szName, nHole)) {
+                    fn_800D8750(j, pRecords->recC[(u32)nHole][(u32)j][k].nValue, 1,
+                                pRecords->recC[(u32)nHole][(u32)j][k].szName, 5);
                 }
             }
         }
