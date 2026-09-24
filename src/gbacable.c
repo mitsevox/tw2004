@@ -561,13 +561,14 @@ void fn_80123C2C(s32 nChan) {
 // GBA to answer, then the port is opened (fn_8012332C), run (fn_80123398), given our context
 // (fn_80123ABC) or told the contexts differ (fn_80123C2C).
 void fn_80123CBC(s32 a, s32 b) {
-    GbaChannel* pCh = lbl_80260E18;
+    GbaChannel* pCh;
     s32 nChan = 0;
     u32 uStart;
     s32 nErr;
     u8* pStatus;
 
     do {
+        pCh = &lbl_80260E18[nChan];
         if (pCh->u5C != 0x40000 || (lbl_80281984 != -1 && lbl_80281984 != nChan)) {
             pCh->n4C = 0;
             pCh->n0 = 0;
@@ -605,7 +606,6 @@ void fn_80123CBC(s32 a, s32 b) {
             }
         }
         nChan++;
-        pCh++;
     } while (nChan < GBA_NUM_CHANNELS);
 }
 
@@ -626,10 +626,10 @@ void fn_80123E34(void) {
     PADRead(lbl_80260FF8);
     PADClamp(lbl_80260FF8);
     nChan = 0;
-    pCh = lbl_80260E18;
-    pPad = lbl_80260FF8;
-    pMask = lbl_80184E30;
     do {
+        pCh = &lbl_80260E18[nChan];
+        pPad = &lbl_80260FF8[nChan];
+        pMask = &lbl_80184E30[nChan];
         if (pCh->n0 == 2) {
             if (pCh->n64 != 0) {
                 if ((u8)pCh->u58 == fn_801228E0(((pCh->u58 >> 16) & 0xFF) | (pCh->u58 & 0xFF00))) {
@@ -659,9 +659,6 @@ void fn_80123E34(void) {
             }
         }
         nChan++;
-        pPad++;
-        pMask++;
-        pCh++;
     } while (nChan < GBA_NUM_CHANNELS);
     if (uReset != 0) {
         PADReset(uReset);
