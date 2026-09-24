@@ -562,7 +562,8 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     fn_800BAD60(pModel->pMatrices[0], (Vec4*)lbl_80193DE8[pChain->n10], (Vec4*)vFace);
     vFace[1] = 0.0f;
     vWind[1] = 0.0f;
-    fFacing = (1.0f + fn_8000C5FC(vFace, vWind)) * 0.5f * fFaceAmt;
+    fFacing = 1.0f + fn_8000C5FC(vFace, vWind);
+    fFacing = fFacing / 2.0f * fFaceAmt;
     fSpeedA = (1.0f - lbl_802824F8->f7C) * fFacing + lbl_802824F8->f7C;
     fSizeA = (1.0f - lbl_802824F8->f78) * fFacing + lbl_802824F8->f78;
     if (fStrength < lbl_802824F8->nBC) {
