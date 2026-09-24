@@ -101,6 +101,7 @@ typedef struct SkelPose1 {
 LAYOUT_ASSERT(SkelPose1, 0x114C);
 
 void fn_80036180(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut, f32 fWeight);  // Skin.c: blends morphs
+void fn_80021980(u32* aA, u32* aB, u32* aOut, u32 nBits);   // ska_shared.c: aOut = aA | aB, bit arrays
 
 // A character's skeleton data (CharModel.pSkel; the SKEL_ functions take it): its IK chains and
 // how strongly their solution is applied (the IK weight, 0..1); only what the code reads.

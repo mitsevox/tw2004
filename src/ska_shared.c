@@ -4,6 +4,7 @@
 
 #include "game_types.h"
 #include "core/goaram.h"
+#include "character.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -26,6 +27,16 @@ void fn_8001FCD4(ARAMTransfer* pTransfer) {
 
 void fn_80021978(u8 v) {
     lbl_80281CC0 = v;
+}
+
+// aOut = aA | aB over bit arrays of nBits bits (whole words).
+void fn_80021980(u32* aA, u32* aB, u32* aOut, u32 nBits) {
+    u32 nWords = (nBits + 31) >> 5;
+    u32 i;
+
+    for (i = 0; i < nWords; i++) {
+        aOut[i] = aA[i] | aB[i];
+    }
 }
 
 f32 fn_80021A98(void* arg0) {

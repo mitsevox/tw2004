@@ -59,7 +59,6 @@ void  fn_800090A0(f32* pA, f32* pB, f32* pOut);                // Quaternion.c
 void  fn_800090E4(f32* pQuat, f32* pIn, f32* pOut);            // Quaternion.c: pIn turned by pQuat
 void  fn_8000914C(f32* pQ, f32 (*pMtx)[4]);                   // Quaternion.c: to a matrix
 void  fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);            // UMemPool.c: inverts a matrix
-void  fn_80021980(u32* aA, u32* aB, u32* aOut, u32 nBits);   // Skeleton.c: aOut = aA | aB
 void  fn_80029EF4(u32* pSrc, u32* pDst, u32 nBits);          // Skeleton.c
 void  fn_80036278(SkinModel44* pEntries, s32 nEntries);
 void  fn_80036344(SkinModel44* pEntries, s32 nEntries);

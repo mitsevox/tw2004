@@ -35,7 +35,6 @@ void fn_800092F8(f32* pAxis, f32* pOut, f32 fAngle);     // Quaternion.c: an axi
 void fn_8000914C(f32* pQ, f32 (*pMtx)[4]);               // Quaternion.c: a rotation's matrix
 void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies a matrix
 void fn_8000ADC0(f32 (*pMtx)[4]);                        // identity
-void fn_80021980(u32* aA, u32* aB, u32* aOut, u32 nBits);   // aOut = aA | aB, bit arrays
 void fn_80029A00(CharModel* pModel, int nA, int nB, f32* pRot);
 void fn_80029BF4(f32* pA, f32* pB, f32* pOut);
 void fn_80029C3C(f32* pA, f32* pB, f32* pOut);
