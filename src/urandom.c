@@ -40,8 +40,8 @@ u32 fn_8000B194(void) {
     u32 uHi;
 
     uHi = (lbl_80281BE8 >> 16) * 16807;
-    uLo = (lbl_80281BE8 & 0xFFFF) * 16807 + (uHi >> 15);
-    lbl_80281BE8 = ((uHi & 0x7FFF) << 16) + uLo;
+    uLo = (lbl_80281BE8 & 0xFFFF) * 16807;
+    lbl_80281BE8 = ((uHi & 0x7FFF) << 16) + uLo + (uHi >> 15);
     if ((s32)lbl_80281BE8 < 0) {
         lbl_80281BE8 -= 0x7FFFFFFF;
     }
