@@ -223,10 +223,9 @@ LAYOUT_ASSERT(Ball, 0xBC);
 typedef struct TNetNode {
     f32  vPos[3];               // 0x00
     u8   unkC[4];
-    s16  nLink10;               // 0x10  } the two neighbouring nodes
-    s16  nLink12;               // 0x12  }
-    s16  a14[8];                // 0x14  more node indexes (-1: none); fn_8006A7A8 clears those
-                                //       naming the node itself
+    s16  aLinks[10];            // 0x10  linked node indexes (-1: none); an outline's first two
+                                //       are its two neighbours. fn_8006A7A8 clears those naming
+                                //       the node itself
     u8   unk24[0x30 - 0x24];
 } TNetNode;
 LAYOUT_ASSERT(TNetNode, 0x30);

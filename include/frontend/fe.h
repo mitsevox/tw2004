@@ -172,7 +172,8 @@ typedef struct FEProfile {
     s8  n5;                     // 0x00005  }
     u8  unk6[0x10 - 0x6];
     SaveProfile profile;        // 0x00010  a working copy
-    u8  unk10610[0x10620 - 0x10610];
+    u8  unk10610[0x1061C - 0x10610];
+    s32 n1061C;                 // 0x1061C  the award whose replay is shown (fn_8007F8A0)
     s8  n10620;                 // 0x10620  read and cleared by menu messages
     s8  a10621[15][2];          // 0x10621  pairs a menu message reads (fn_80082620)
     u8  bCopy;                  // 0x1063F  the working copy is the profile, not the slot's own
@@ -420,6 +421,14 @@ int  fn_80106E48(s16 n);                // FE_CrAPDB.c: the profile's assets who
 s32  fn_801070F4(void);                 // FE_CrAPDB.c: fill lbl_80282470; how many records
 void fn_80107244(int n, s16* pN0, s32* pN4, char* pDst);   // FE_CrAPDB.c: copy record n out
 void fn_80107294(s16 n, char* pDst);    // FE_CrAPDB.c: name n of lbl_801935C8
+// FE_CrAPDB.c: send message nMsg with its values to the front end (the EA Sports Bio screens).
+void fn_80107554(int nMsg, s32 nA);
+void fn_80107594(int nMsg, s32 nA, char* szB);
+void fn_801075F8(int nMsg, s32 nA, char* szB, s32 nC);
+int  fn_801076B0(char* sz, int nMsg);
+void fn_8010771C(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, f32 fG);
+void fn_80107774(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, s32 nG, s32 nH, s32 nI,
+                 s32 nJ);
 SaveProfile* fn_80077ACC(void);         // the profile being worked on
 u8   fn_80078008(s32 nAsset, SaveProfile* pProfile);  // the asset is locked (FE_Manager.c)
 int  fn_80078604(int a, int b, int c);  // a date (month, day, year from fn_8011E020) packed
@@ -518,8 +527,8 @@ LogoRecord* fn_8010FB70(void);          // the logo being edited
 s16* fn_8010FBC4(void);                 // the palette
 int  fn_8010FBCC(int nX, int nY, u32* pR, u32* pG, u32* pB, u32* pA);  // a pixel's colour index,
                                         // and its colour as fn_8010F7FC gives it
-void fn_8010FC3C(u8* pDst, u8* pSrc, int a, int nWidth, int nHeight);   // copy pixels: a = 0
-                                        // from a texture into the logo, 1 from the logo into one
+void fn_8010FC3C(u8* pDst, u8* pSrc, int bToTexture, int nWidth, int nHeight);  // copy pixels:
+                                        // 0 from a texture into the logo, 1 from the logo into one
 u8*  fn_8010FF5C(u8* pLogo, int nWidth, int nHeight);   // the logo's pixels as a texture (in
                                         // lbl_80212B60)
 

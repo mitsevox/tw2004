@@ -80,6 +80,102 @@ PictFrame* fn_800B97A8(MadDecoder* p);
 void fn_800B9808(MadDecoder* p, PictFrame* pFrame);
 void fn_800B9864(MadDecoder* p, PictFrame* pFrame);
 
+// A code's table entry: its length in the low byte, the run in bits 16-21, the level on top.
+#define MAD_ENTRY(nLen, nValue) ((nLen) | (((u32)(nValue) << 22) | (((nValue) << 6) & 0x3F0000)))
+
+// Build the decoder's tables: the pixel clamp, the coefficient code lookups and the DC codes.
+void fn_800B769C(void) {
+    s32 nCode;
+    s32 nValue;
+    u32 uEntry;
+    int nIndex;
+    int nCount;
+    int nLen;
+    int nBits;                          // the length left after the table's prefix
+    int i;
+    int j;
+    int n;
+
+    for (i = -256; i < 255; i++) {
+        n = i;
+        if (n < -128) {
+            n = -128;
+        } else if (n > 127) {
+            n = 127;
+        }
+        lbl_801F6858[i & 0x1FF] = n + 128;
+    }
+
+    // the first 9 bits: the escape and end-of-block prefixes, and where longer codes continue
+    lbl_801F7A58[0] = 0xF;
+    for (i = 1; i < 8; i++) {
+        lbl_801F7A58[i] = 0x1F;
+    }
+    for (i = 8; i < 16; i++) {
+        lbl_801F7A58[i] = 0x2F;
+    }
+    for (i = 0; i < 128; i++) {
+        lbl_801F7A58[256 + i] = 0x3F;
+    }
+
+    for (i = 1; i < 95; i++) {
+        nCode = lbl_80183C78[i].nCode;
+        nLen = lbl_80183C78[i].nLen;
+        nValue = lbl_80183C78[i].nValue;
+        if (nCode & 0xFC00) {
+            // up to 9 bits: every 9-bit index that starts with the code
+            nIndex = nCode >> 7;
+            nCount = 1 << (9 - nLen);
+            uEntry = MAD_ENTRY(nLen, nValue);
+            for (j = 0; j < nCount; j++) {
+                lbl_801F7A58[nIndex + j] = uEntry;
+            }
+        } else {
+            // six zero bits first: the next 8 bits index lbl_801F7258
+            nIndex = nCode >> 2;
+            nBits = nLen - 6;
+            nCount = 1 << (8 - nBits);
+            uEntry = MAD_ENTRY(nBits, nValue);
+            for (j = 0; j < nCount; j++) {
+                lbl_801F7258[nIndex + j] = uEntry;
+            }
+        }
+    }
+
+    for (i = 0; i < 128; i++) {
+        nCode = lbl_80184268[i].nCode;
+        nLen = lbl_80184268[i].nLen;
+        nValue = lbl_80184268[i].nValue;
+        if (!(nCode & 0x8000)) {
+            nBits = nLen - 1;
+            nIndex = nCode >> 7;
+            nCount = 1 << (8 - nBits);
+            uEntry = MAD_ENTRY(nBits, nValue);
+            for (j = 0; j < nCount; j++) {
+                lbl_801F7658[nIndex + j] = uEntry;
+            }
+        } else {
+            nBits = nLen + 2;
+            nIndex = nCode >> 10;
+            nCount = 1 << (8 - nBits);
+            uEntry = MAD_ENTRY(nBits, nValue);
+            for (j = 0; j < nCount; j++) {
+                lbl_801F7258[nIndex + j] = uEntry;
+            }
+        }
+    }
+
+    // the DC codes, by the top 6 bits: a 0 bit is 0; 1 and five bits are 1..16 or -16..-1
+    for (i = 0; i < 32; i++) {
+        lbl_801F7158[i] = 1;
+    }
+    for (i = 0; i < 16; i++) {
+        lbl_801F7158[32 + i] = ((u32)(i + 1) << 22) | 6;
+        lbl_801F7158[48 + i] = ((u32)(i - 16) << 22) | 6;
+    }
+    lbl_802821A8 = 1;
+}
+
 // Drop nBits bits from the buffer, refilling 16 at a time.
 void fn_800B7D80(int nBits) {
     lbl_802821B4 <<= nBits;

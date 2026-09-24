@@ -16,6 +16,29 @@ EASBErrorE fn_8012CCD8(s32 nNeed) {
     return EASB_ERROR_NONE;
 }
 
+// Allocates the buffer the Bio's product records are loaded into, every record marked empty.
+EASBErrorE fn_8012CD8C(void) {
+    EASBErrorE eError;
+    u8 i;
+    u8 j;
+
+    eError = EASB_ERROR_NONE;
+    if (lbl_802825B8->pProductBuffer != NULL) return EASB_ERROR_PRODUCT_ALREADY_LOADED;
+    lbl_802825B8->pProductBuffer = TibExtMemAlloc(lbl_802825B8->uHeapID, EASB_PRODUCT_BUFFER_SIZE, 4);
+    if (lbl_802825B8->pProductBuffer == NULL) {
+        eError = EASB_ERROR_OUT_OF_MEMORY;
+    }
+    if (eError == EASB_ERROR_NONE) {
+        for (i = 0; i < EASB_MAX_PRODUCTS; i++) {
+            lbl_802825B8->pProductBuffer[i].bValid = 0;
+            for (j = 0; j < EASB_MAX_ACCOMPLISHMENTS; j++) {
+                lbl_802825B8->pProductBuffer[i].aAccomplishments[j].bValid = 0;
+            }
+        }
+    }
+    return eError;
+}
+
 // Frees the product buffer.
 EASBErrorE fn_8012CF00(void) {
     if (lbl_802825B8->pProductBuffer == NULL) return EASB_ERROR_PRODUCT_NOT_LOADED;
@@ -144,6 +167,51 @@ EASBErrorE fn_8012D290(u8 nProduct, EASBProduct** ppProduct) {
     return eError;
 }
 
+// Starts the library: checks the game's parameters, starts the storage code and sets up this
+// game's own record with no accomplishments.
+EASBErrorE fn_8012D394(EASBInitParams* pParams) {
+    EASBErrorE eError;
+    u32 uNow;
+    u8 i;
+
+    if (lbl_802825B8 != NULL) return EASB_ERROR_INITIALIZED;
+    eError = fn_801283B0(pParams);
+    if (eError != EASB_ERROR_NONE) return eError;
+    uNow = TibExtCurrentTimeGet();
+    eError = fn_8012BD0C(pParams->uHeapID, pParams->pCallbacks);
+    if (eError != EASB_ERROR_NONE) return eError;
+    lbl_802825B8 = TibExtMemAlloc(pParams->uHeapID, sizeof(EASBState), 4);
+    if (lbl_802825B8 == NULL) {
+        eError = EASB_ERROR_OUT_OF_MEMORY;
+    }
+    if (eError == EASB_ERROR_NONE) {
+        memset(lbl_802825B8, 0, sizeof(EASBState));
+        lbl_802825B8->uHeapID = pParams->uHeapID;
+        fn_80128BF8(lbl_802825B8->szProductName, pParams->szProductName, sizeof(lbl_802825B8->szProductName));
+        fn_80128C4C(lbl_802825B8->szGamesPlayedType, pParams->szGamesPlayedType, EASB_GAMES_PLAYED_TYPE_SIZE);
+        lbl_802825B8->uGamesPlayedTypeLanguage = pParams->uGamesPlayedTypeLanguage;
+        fn_80128EC0(lbl_802825B8->szProductName);
+        fn_80128F04(lbl_802825B8->szGamesPlayedType, lbl_802825B8->uGamesPlayedTypeLanguage);
+        lbl_802825B8->product.bValid = 0;
+        lbl_802825B8->b11D0 = EASB_PRODUCT_NONE;
+        for (i = 0; i < EASB_MAX_ACCOMPLISHMENTS; i++) {
+            lbl_802825B8->product.aAccomplishments[i].u86 = 0;
+            lbl_802825B8->product.aAccomplishments[i].bValid = 0;
+            memset(lbl_802825B8->product.aAccomplishments[i].szName, 0,
+                   sizeof(lbl_802825B8->product.aAccomplishments[i].szName));
+        }
+        lbl_802825B8->uLastTime = uNow;
+        lbl_802825B8->b11E0 = 0;
+        fn_80128488(&lbl_802825B8->product, 1, lbl_802825B8->szProductName, lbl_802825B8->szGamesPlayedType,
+                    lbl_802825B8->uGamesPlayedTypeLanguage);
+        fn_80128528(&lbl_802825B8->totals, &lbl_802825B8->product);
+    }
+    if (eError != EASB_ERROR_NONE) {
+        fn_8012BE74();
+    }
+    return eError;
+}
+
 EASBErrorE fn_8012D560(void) {
     EASBErrorE eError;
 
@@ -153,7 +221,7 @@ EASBErrorE fn_8012D560(void) {
     } else {
         eError = fn_8012D1A0();
         if (eError == EASB_ERROR_NONE) {
-            eError = fn_8012C5F8(&lbl_802825B8->totals,&lbl_802825B8->product, (char*)lbl_802825B8->unk4);
+            eError = fn_8012C5F8(&lbl_802825B8->totals,&lbl_802825B8->product, lbl_802825B8->szProductName);
         }
         return eError;
     }
@@ -168,6 +236,24 @@ EASBErrorE fn_8012D5B0(void) {
     } else {
         return fn_8012C69C();
     }
+}
+
+// Creates the Bio file (operation 0) with the save's icon. A picture is not supported here.
+EASBErrorE fn_8012D5E4(void* pIcon, EASBImage* pImage) {
+    EASBErrorE eError;
+
+    if (pIcon == NULL) return EASB_ERROR_NULL_PARAMETERS;
+    if (pImage != NULL) return EASB_ERROR_IMAGE_NOT_SUPPORTED;
+    eError = fn_8012CCD8(EASB_NEED_NO_FILE);
+    if (eError != EASB_ERROR_NONE) return eError;
+    eError = fn_80128200(pIcon, lbl_802825B8->uHeapID);
+    if (eError != EASB_ERROR_NONE) return eError;
+    lbl_802825B8->pImage = pImage;
+    eError = fn_8012D1A0();
+    if (eError == EASB_ERROR_NONE) {
+        eError = fn_8012C6D4(&lbl_802825B8->totals, &lbl_802825B8->product, -1, pIcon, pImage);
+    }
+    return eError;
 }
 
 EASBErrorE fn_8012D694(void) {
@@ -236,6 +322,33 @@ EASBErrorE fn_8012D794(void* pImage) {
 // Images are not supported on this platform.
 EASBErrorE fn_8012D7F0(void) {
     return EASB_ERROR_IMAGE_NOT_SUPPORTED;
+}
+
+// Runs the next step of the storage operation. When one finishes, the loaded records are brought
+// in line with it (operations 8, 9 and 0), and the product buffer is freed after a failed 8.
+EASBErrorE fn_8012D7F8(EASBProcessE* peProcess) {
+    s32 nOperation;
+    EASBErrorE eError;
+
+    if (peProcess == NULL) return EASB_ERROR_NULL_PARAMETERS;
+    eError = fn_8012CCD8(EASB_NEED_ANY);
+    if (eError != EASB_ERROR_NONE) return eError;
+    eError = fn_8012C388(peProcess, &nOperation);
+    if (*peProcess == EASB_PROCESS_COMPLETE) {
+        if (eError == EASB_ERROR_NONE && nOperation == 8) {
+            fn_8012CF64();
+        }
+        if (eError == EASB_ERROR_NONE && nOperation == 9) {
+            fn_8012D030();
+        }
+        if (eError == EASB_ERROR_NONE && nOperation == 0) {
+            fn_8012D0D4();
+        }
+        if (nOperation == EASB_OPERATION_ERROR && fn_8012CCC0() == 8) {
+            fn_8012CF00();
+        }
+    }
+    return eError;
 }
 
 // Adds uCount to this game's counter at 0x58 and the Bio's at 0x5C.
@@ -323,8 +436,59 @@ EASBErrorE fn_8012DAB8(u16 uLevel) {
     }
 }
 
-EASBErrorE fn_8012DD24(u16* szName, s32 arg1, s32 nLanguage) {
-    return fn_8012DB30(szName, arg1, nLanguage, TibExtCurrentTimeGet());
+// Adds an accomplishment to this game's record, in the first free entry. With none free, the
+// entries and the new one are sorted (by u86, then all but the first five by time) and the one
+// that comes last is replaced, unless that is the new one.
+EASBErrorE fn_8012DB30(u16* szName, u32 uValue, u16 uLanguage, u32 uTime) {
+    EASBAccomplishment newAccomplishment;
+    EASBAccomplishment* apList[EASB_MAX_ACCOMPLISHMENTS + 1];
+    EASBAccomplishment* pSlot;
+    u32 uLength;
+    EASBErrorE eError;
+    u8 i;
+
+    pSlot = NULL;
+    eError = fn_8012CCD8(EASB_NEED_ANY);
+    if (eError != EASB_ERROR_NONE) return eError;
+    if (uValue > 250 || uValue == 0) return EASB_ERROR_INVALID_ACCOMPLISHMENT;
+    if (!fn_801280F8(uLanguage)) return EASB_ERROR_INVALID_LANGUAGE;
+    eError = fn_8012835C(szName, EASB_ACCOMPLISHMENT_NAME_SIZE, &uLength);
+    if (eError != EASB_ERROR_NONE) return eError;
+    uTime = fn_80128BC4(uTime);
+    memset(&newAccomplishment, 0, sizeof(newAccomplishment));
+    newAccomplishment.uTime = uTime;
+    newAccomplishment.u86 = uValue;
+    newAccomplishment.bValid = 1;
+    newAccomplishment.uLanguage = uLanguage;
+    fn_80128C4C(newAccomplishment.szName, szName, EASB_ACCOMPLISHMENT_NAME_SIZE);
+    fn_80128F04(newAccomplishment.szName, uLanguage);
+    for (i = 0; i < EASB_MAX_ACCOMPLISHMENTS; i++) {
+        if (lbl_802825B8->product.aAccomplishments[i].bValid == 0) {
+            pSlot = &lbl_802825B8->product.aAccomplishments[i];
+            break;
+        }
+    }
+    if (pSlot == NULL) {
+        for (i = 0; i < EASB_MAX_ACCOMPLISHMENTS; i++) {
+            apList[i] = &lbl_802825B8->product.aAccomplishments[i];
+        }
+        apList[EASB_MAX_ACCOMPLISHMENTS] = &newAccomplishment;
+        fn_8012872C(apList, EASB_MAX_ACCOMPLISHMENTS + 1, 0);
+        fn_8012872C(&apList[5], EASB_MAX_ACCOMPLISHMENTS + 1 - 5, 1);
+        pSlot = apList[EASB_MAX_ACCOMPLISHMENTS];
+        if (pSlot == &newAccomplishment) {
+            pSlot = NULL;
+        }
+    }
+    if (pSlot != NULL) {
+        memcpy(pSlot, &newAccomplishment, sizeof(newAccomplishment));
+    }
+    return eError;
+}
+
+// Adds an accomplishment stamped with the current time.
+EASBErrorE fn_8012DD24(u16* szName, u32 uValue, u16 uLanguage) {
+    return fn_8012DB30(szName, uValue, uLanguage, TibExtCurrentTimeGet());
 }
 
 // Switches which play-time counter runs, adding up the time so far first.
@@ -533,6 +697,84 @@ EASBErrorE fn_8012E3C0(u8 nProduct, u32* pOut) {
     eError = fn_8012D290(nProduct, &pProduct);
     if (eError == EASB_ERROR_NONE) {
         *pOut = pProduct->u5C;
+    }
+    return eError;
+}
+
+// Copies one of a game's accomplishments, by its place in the order nSort gives (0: the first
+// five, 1: the first 27).
+EASBErrorE fn_8012E434(u8 nProduct, u8 nIndex, s32 nSort, u16* szName, u32 uLength, u32* puTime,
+                       u16* aLanguages, u8 nLanguages, u16* puLanguage) {
+    EASBAccomplishment* apList[EASB_MAX_ACCOMPLISHMENTS];
+    EASBProduct* pProduct;
+    EASBErrorE eError;
+    u32 i;
+
+    if (puTime == NULL || szName == NULL || aLanguages == NULL || puLanguage == NULL) {
+        return EASB_ERROR_NULL_PARAMETERS;
+    }
+    if (nIndex >= EASB_MAX_ACCOMPLISHMENTS) return EASB_ERROR_INVALID_ACCOMPLISHMENT;
+    if (uLength < EASB_ACCOMPLISHMENT_NAME_SIZE) return EASB_ERROR_STRING_TOO_SMALL;
+    if (nSort == 0 && nIndex >= 5) return EASB_ERROR_INVALID_PARAMETERS;
+    if (nSort == 1 && nIndex >= 27) return EASB_ERROR_INVALID_PARAMETERS;
+    eError = fn_8012CCD8(EASB_NEED_ANY);
+    if (eError != EASB_ERROR_NONE) return eError;
+    eError = fn_8012D290(nProduct, &pProduct);
+    if (eError != EASB_ERROR_NONE) return eError;
+    for (i = 0; i < EASB_MAX_ACCOMPLISHMENTS; i++) {
+        apList[i] = &pProduct->aAccomplishments[i];
+    }
+    fn_8012872C(apList, EASB_MAX_ACCOMPLISHMENTS, nSort);
+    if (!apList[nIndex]->bValid) {
+        eError = EASB_ERROR_INVALID_ACCOMPLISHMENT;
+    } else if (apList[nIndex]->uTime > EASB_TIME_LAST || apList[nIndex]->u86 > 250) {
+        eError = EASB_ERROR_INVALID_ACCOMPLISHMENT;
+    } else if (!fn_801281B4(apList[nIndex]->uLanguage, aLanguages, nLanguages)) {
+        eError = EASB_ERROR_INVALID_LANGUAGE;
+        *puTime = apList[nIndex]->uTime;
+    } else {
+        fn_80128C4C(szName, apList[nIndex]->szName, uLength);
+        *puLanguage = apList[nIndex]->uLanguage;
+        *puTime = apList[nIndex]->uTime;
+    }
+    return eError;
+}
+
+// Counts a game's valid accomplishments, up to what fn_8012E434 shows for nSort. A valid one
+// after an invalid one in the sorted list gives EASB_ERROR_UNKNOWN.
+EASBErrorE fn_8012E670(u8 nProduct, s32 nSort, u8* pnCount) {
+    EASBAccomplishment* apList[EASB_MAX_ACCOMPLISHMENTS];
+    EASBProduct* pProduct;
+    EASBErrorE eError;
+    u32 i;
+    u8 bGap;
+
+    bGap = 0;
+    if (pnCount == NULL) return EASB_ERROR_NULL_PARAMETERS;
+    eError = fn_8012CCD8(EASB_NEED_ANY);
+    if (eError != EASB_ERROR_NONE) return eError;
+    *pnCount = 0;
+    eError = fn_8012D290(nProduct, &pProduct);
+    if (eError != EASB_ERROR_NONE) return eError;
+    for (i = 0; i < EASB_MAX_ACCOMPLISHMENTS; i++) {
+        apList[i] = &pProduct->aAccomplishments[i];
+    }
+    fn_8012872C(apList, EASB_MAX_ACCOMPLISHMENTS, nSort);
+    for (i = 0; i < EASB_MAX_ACCOMPLISHMENTS; i++) {
+        if (fn_80128054(apList[i]) == EASB_ERROR_NONE) {
+            *pnCount = *pnCount + 1;
+            if (bGap == 1) {
+                eError = EASB_ERROR_UNKNOWN;
+            }
+        } else {
+            bGap = 1;
+        }
+    }
+    if (nSort == 0 && *pnCount > 5) {
+        *pnCount = 5;
+    }
+    if (nSort == 1 && *pnCount > 27) {
+        *pnCount = 27;
     }
     return eError;
 }

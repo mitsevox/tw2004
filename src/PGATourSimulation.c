@@ -22,7 +22,6 @@ s32  fn_80119AE0(int nPlayer);
 s32  fn_8011BDF8(const void* pA, const void* pB);
 s32  fn_8011BF74(const void* pA, const void* pB);
 s32  fn_8011BCFC(const void* pA, const void* pB);
-u8   fn_80118F60(int nPlayer, int nGolfer, GM_Pga_StatTypes_t nStat);
 s32  TotalEntrantHoleScores(int nEntrant);
 void fn_8011A074(int nPlayer, int nRound, int nEntrant, int nHole);
 void fn_8011A890(int nPlayer);

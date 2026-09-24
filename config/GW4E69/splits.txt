@@ -520,17 +520,8 @@ UAudContainers.c:
 uiobject.c:
 	.text       start:0x800AE1F8 end:0x800AF114
 
-unsorted/sweep_800AF140.c:
-	.text       start:0x800AF140 end:0x800AF144
-
-unsorted/sweep_800AF2D8.c:
-	.text       start:0x800AF2D8 end:0x800AF2DC
-
-unsorted/sweep_800AF2DC.c:
-	.text       start:0x800AF2DC end:0x800AF31C
-
-unsorted/sweep_800AF31C.c:
-	.text       start:0x800AF31C end:0x800AF324
+AudReverb.c:
+	.text       start:0x800AF114 end:0x800AF324
 
 startUp.c:
 	.text       start:0x800AF324 end:0x800B1AA8
@@ -587,11 +578,9 @@ GoComicCam.c:
 GoShaderObject_Rain_Gc.c:
 	.text       start:0x800B4B5C end:0x800B5918
 
-unsorted/sweep_800B5934.c:
-	.text       start:0x800B5934 end:0x800B59BC
-
-unsorted/sweep_800B59EC.c:
-	.text       start:0x800B59EC end:0x800B5A14
+AudLock.c:
+	.text       start:0x800B5934 end:0x800B5A14
+	.bss        start:0x801F6338 end:0x801F6360
 
 UAudMemStack.c:
 	.text       start:0x800B5A14 end:0x800B5C40
@@ -847,12 +836,9 @@ FE_PGATourMessages.c:
 	.text       start:0x8010E58C end:0x8010F6C8
 
 FE_LogoDesign.c:
-	.text       start:0x8010F6C8 end:0x8010FB70
+	.text       start:0x8010F6C8 end:0x8010FC3C
 	.data       start:0x80193D28 end:0x80193D58
 	.sbss       start:0x802824B8 end:0x802824C8
-
-unsorted/sweep_8010FBC4.c:
-	.text       start:0x8010FBC4 end:0x8010FBCC
 
 unsorted/sweep_8010FF5C.c:
 	.text       start:0x8010FF5C end:0x8010FF9C

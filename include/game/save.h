@@ -326,6 +326,7 @@ f32  GM_GetGameProgress(SaveProfile* pProfile);
 u8   fn_800D7770(int nPlayer, Award* pAward);   // mark an award won today; 1 if it was not won before
 
 // fe_craputils.c (TW06's FE_CrAP_ utilities)
+void FE_CrAP_InitCrAPInfo(SaveProfile* pProfile);
 u8   fn_80058304(SaveProfile* pProfile, int nBit);  // bit nBit of pProfile->u10548
 void fn_80058560(SaveProfile* pProfile, int nKind, char* pName);  // add pName to list nKind
 void fn_80058624(SaveProfile* pProfile, int nKind, char* pName);  // take pName out of list nKind

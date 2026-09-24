@@ -56,6 +56,18 @@ typedef struct MadDecoder {
 } MadDecoder;
 LAYOUT_ASSERT(MadDecoder, 0x50);
 
+// One coefficient code of the MAD codec (rcmp_mad_codec.c builds its lookup tables from these).
+typedef struct MadCode {
+    s32  nLen;                  // 0x00  the code's length in bits
+    s32  nValue;                // 0x04  the level in bits 0-9 (signed), the run in bits 10-15
+    s32  unk8;                  // 0x08
+    s32  nCode;                 // 0x0C  the code's bits, from the top of 16
+} MadCode;
+LAYOUT_ASSERT(MadCode, 0x10);
+
+extern const MadCode lbl_80183C78[95];   // the codes of the first table (entry 0 is not used)
+extern const MadCode lbl_80184268[128];  // the codes of the second table
+
 // What LLVideo.c hands LLPict_Gc.c for a movie: the decoder (fn_8002FEB0 makes it, 0x50 bytes)
 // and its current frame.
 typedef struct PictStream {

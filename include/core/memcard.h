@@ -25,7 +25,9 @@
 typedef struct MCCardState {
     u32  uFlags;                // 0x00  MC_CARD_* below
     s32  nFreeBlocks;           // 0x04  free space, in whole sectors (CARDFreeBlocks' bytes, rounded up)
-    u32  a8[2];                 // 0x08  a bit array (FE_MessageTable fn_8007EA14 tests a bit)
+    u32  aReplayUsed[1];        // 0x08  a bit per replay saved on the card (fn_800A0868; FE_MessageTable
+                                //       fn_8007EA14 tests one)
+    u32  aNameUsed[1];          // 0x0C  a bit per aszName entry that holds a profile's name (fn_800A178C)
     char aszName[4][0x1D];      // 0x10  four names the menus show (FE_MessageTable fn_8007C3C8)
     s32  nFreeFiles;           // 0x84  free directory entries (CARDFreeBlocks)
     s32  nSectorSize;           // 0x88  CARDProbeEx
@@ -99,6 +101,22 @@ typedef struct MCOpSet {
 LAYOUT_ASSERT(MCOpSet, 0x14);
 
 extern MCOpSet lbl_8018C7D8[4];
+
+// The operations do not all take the same payload: the menus' message fn_800847E0 builds op 0
+// and 3 an MCCardPos, op 1 an MCCardPosStr, op 2 the card alone and op 4 the card and a name.
+// So fn_80084FB4 and its neighbours take the payload as a void*.
+typedef struct MCOpCard {       // op 2's payload (8 bytes)
+    s32  nPort;                 // 0x0
+    s32  nSlot;                 // 0x4
+} MCOpCard;
+LAYOUT_ASSERT(MCOpCard, 0x8);
+
+typedef struct MCOpCardName {   // op 4's payload
+    s32   nPort;                // 0x0
+    s32   nSlot;                // 0x4
+    char* szName;               // 0x8  the message's string
+} MCOpCardName;
+LAYOUT_ASSERT(MCOpCardName, 0xC);
 
 // The save file's names on the card: EA kept the PlayStation 2 names (SLUS-20757 is the PS2
 // release), the second a backup copy.
@@ -183,6 +201,7 @@ typedef struct MCEagmEntry {
 } MCEagmEntry;
 LAYOUT_ASSERT(MCEagmEntry, 0x4C);
 
+extern u32   lbl_801F1100[4];   // a bit per 'eagm' entry, set when fn_800A1F6C marks it
 extern u32   lbl_801F1110[256]; // the save checksum's CRC table (fn_800A253C)
 extern MCEagmEntry* lbl_80281FF0;   // the 'eagm' list (fn_800A1BE0 frees it)
 extern s32   lbl_80281FF4;      // its number of entries

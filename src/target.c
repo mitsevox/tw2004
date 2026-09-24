@@ -3,6 +3,8 @@
 // decompiled; the machine-style code at the end is the sweep's.
 
 #include "game.h"
+#include "camera.h"
+#include "unsorted/cull.h"
 
 void fn_80067B80(void);
 void fn_80067CD4(int nPlayer);
@@ -47,6 +49,9 @@ void fn_80067B80(void) {
         lbl_801D5BF0[i].f24 = 0.2f;
     }
 }
+
+f32  fn_8001EFFC(CamLens* pLens);      // char.c: the lens's fB0
+void fn_8006752C(void);
 
 // Each frame: while the ball is being placed, the placement cursor; otherwise, for a human
 // lining up a shot (states 2..4, 8..10) before the swing starts, the aim marker.
@@ -99,6 +104,153 @@ void fn_800689D4(int nPlayer) {
 void fn_80068AA8(int nPlayer) {
     gPlayers[nPlayer].fA5C = 0.0f;
     gPlayers[nPlayer].fA60 = 0.0f;
+}
+
+// A human moving the aim point with the stick: fA5C turns it about the ball (a degree a tick at
+// full stick, half that on a putt; slower the further the camera is from the ball), fA60 moves
+// it nearer or further along the aim. A move past the shot's range (closer than 0.3 or 5, further
+// than 180 feet on a putt, 30 on shot kind 2, else the longest usable club) is undone and fA60
+// parked at -1000 or 1000 until the stick is let go. Returns whether the aim point moved.
+u8 fn_80068AC8(int nPlayer) {
+    f32  vToCamera[4];
+    f32  vSaved[4];
+    f32  vDir[4];
+    f32  fZoom;
+    f32  fStep;
+    f32  fTurn;
+    f32  fMin;
+    f32  fSin;
+    f32  fCos;
+    f32  fCameraDist;
+    int  nClub;
+    u8   bInRange;
+    u8   bMoved;
+    f32* pTarget;
+
+    fStep = 0.5f;
+    bInRange = 0;
+    pTarget = gPlayers[nPlayer].vTarget;
+    bMoved = 0;
+    Vec3Copy(pTarget, vSaved);
+    fZoom = fn_8001EFFC(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])));
+
+    // the turn eases off towards 0
+    if (gPlayers[nPlayer].fA5C < 0.0f) {
+        gPlayers[nPlayer].fA5C += 0.05f;
+        if (gPlayers[nPlayer].fA5C > 0.0f) {
+            gPlayers[nPlayer].fA5C = 0.0f;
+        }
+    } else if (gPlayers[nPlayer].fA5C > 0.0f) {
+        gPlayers[nPlayer].fA5C -= 0.05f;
+        if (gPlayers[nPlayer].fA5C < 0.0f) {
+            gPlayers[nPlayer].fA5C = 0.0f;
+        }
+    }
+    if (0.0f != gPlayers[nPlayer].fA5C) {
+        bMoved = 1;
+        fTurn = PI / 180.0f * gPlayers[nPlayer].fA5C;
+        if (gPlayers[nPlayer].nShotKind == 0) {
+            fTurn = PI / 360.0f * gPlayers[nPlayer].fA5C;
+        }
+        fn_8006A964(fn_80017028(gPlayers[nPlayer].nView[0])->v0, gPlayers[nPlayer].vBall, vToCamera);
+        vToCamera[1] = 0.0f;
+        fCameraDist = 0.05f * (f32)fn_80009680(fn_80009744(vToCamera));
+        if (fCameraDist > 1.0f) {
+            fTurn /= fCameraDist;
+        }
+        fTurn *= fZoom;
+        gPlayers[nPlayer].fAim += 60.0f * fTurn * gSession.fFrameTime;
+        if (gPlayers[nPlayer].fAim < -PI) {
+            gPlayers[nPlayer].fAim += 2.0f * PI;
+        } else if (gPlayers[nPlayer].fAim > PI) {
+            gPlayers[nPlayer].fAim -= 2.0f * PI;
+        }
+        fSin = fn_800095F0(gPlayers[nPlayer].fAim);
+        fCos = fn_80009638(gPlayers[nPlayer].fAim);
+        gPlayers[nPlayer].vTarget[0] = -fSin * gPlayers[nPlayer].fDistance + gPlayers[nPlayer].vBall[0];
+        gPlayers[nPlayer].vTarget[2] = fCos * gPlayers[nPlayer].fDistance + gPlayers[nPlayer].vBall[2];
+        AI_PlanShot(nPlayer, pTarget);
+        Vec_Copy(pTarget, gPlayers[nPlayer].vTarget2);
+        fn_8001C804(nPlayer, 0, 1);
+        fn_80062C38();
+        fn_8006A8B0();
+    }
+
+    Vec3Copy(pTarget, vSaved);
+    if (1000.0f == fabsf(gPlayers[nPlayer].fA60)) {
+        return bMoved;
+    }
+    // the push eases off towards 0
+    if (gPlayers[nPlayer].fA60 < 0.0f) {
+        gPlayers[nPlayer].fA60 += 3.0f * gSession.fFrameTime;
+        if (gPlayers[nPlayer].fA60 > 0.0f) {
+            gPlayers[nPlayer].fA60 = 0.0f;
+        }
+    } else if (gPlayers[nPlayer].fA60 > 0.0f) {
+        gPlayers[nPlayer].fA60 -= 3.0f * gSession.fFrameTime;
+        if (gPlayers[nPlayer].fA60 < 0.0f) {
+            gPlayers[nPlayer].fA60 = 0.0f;
+        }
+    }
+    if (0.0f != gPlayers[nPlayer].fA60) {
+        if (gPlayers[nPlayer].nShotKind == 0 || gPlayers[nPlayer].nShotKind == 2) {
+            fStep = 0.2f;
+            fMin = 0.3f;
+        } else {
+            fMin = 5.0f;
+        }
+        bMoved = 1;
+        fStep *= gSession.fFrameTime * (60.0f * gPlayers[nPlayer].fA60);
+        fSin = fn_800095F0(gPlayers[nPlayer].fAim);
+        fCos = fn_80009638(gPlayers[nPlayer].fAim);
+        gPlayers[nPlayer].vTarget[0] += fStep * -fSin;
+        gPlayers[nPlayer].vTarget[2] += fStep * fCos;
+        fn_8006A964(pTarget, gPlayers[nPlayer].vBall, vDir);
+        vDir[1] = 0.0f;
+        if (gPlayers[nPlayer].fA60 < 0.0f && (f32)fn_80009680(fn_80009744(vDir)) >= fMin) {
+            bInRange = 1;
+        } else if (gPlayers[nPlayer].fA60 > 0.0f
+                   && ((gPlayers[nPlayer].nShotKind == 0 && 3.0f * gPlayers[nPlayer].fDistance < 180.0f)
+                       || (gPlayers[nPlayer].nShotKind == 2 && gPlayers[nPlayer].fDistance < 30.0f)
+                       || (gPlayers[nPlayer].nShotKind != 0 && gPlayers[nPlayer].nShotKind != 2
+                           && gPlayers[nPlayer].fDistance
+                                  < AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind,
+                                                   AI_FirstUsableClub(nPlayer,
+                                                                      gPlayers[nPlayer].nShotKind))))) {
+            bInRange = 1;
+        }
+        if (bInRange) {
+            AI_PlanShot(nPlayer, pTarget);
+            fSin = fn_800095F0(gPlayers[nPlayer].fAim);
+            fCos = fn_80009638(gPlayers[nPlayer].fAim);
+            gPlayers[nPlayer].vTarget[0] = -fSin * gPlayers[nPlayer].fDistance + gPlayers[nPlayer].vBall[0];
+            gPlayers[nPlayer].vTarget[2] = fCos * gPlayers[nPlayer].fDistance + gPlayers[nPlayer].vBall[2];
+            AI_PlanShot(nPlayer, pTarget);
+            Vec_Copy(pTarget, gPlayers[nPlayer].vTarget2);
+            if (gPlayers[nPlayer].nShotKind != 2) {
+                nClub = gPlayers[nPlayer].nClub;
+                gPlayers[nPlayer].nClub = AI_ClubForShot(nPlayer, gPlayers[nPlayer].nShotKind, 1,
+                                                         gPlayers[nPlayer].fDistance);
+                if (nClub != gPlayers[nPlayer].nClub) {
+                    fn_8006752C();
+                }
+            }
+            gPlayers[nPlayer].fPower = AI_PowerForTarget(nPlayer);
+            fn_8001C774(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nClub);
+            fn_8001C724(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nShotKind);
+            fn_8001C804(nPlayer, 0, 1);
+            fn_80062C38();
+            fn_8006A8B0();
+        } else {
+            if (gPlayers[nPlayer].fA60 < 0.0f) {
+                gPlayers[nPlayer].fA60 = -1000.0f;
+            } else {
+                gPlayers[nPlayer].fA60 = 1000.0f;
+            }
+            Vec3Copy(vSaved, pTarget);
+        }
+    }
+    return bMoved;
 }
 
 // The placement cursor speeds up towards -x, at most -1.
@@ -285,28 +437,23 @@ void fn_8006A6C4(int nPlayer) {
 // The hole's chunk 3 loader: the placement outline. Each node is listed in lbl_801D5CCC, and any
 // of its links that names the node itself is cleared.
 void fn_8006A7A8(u8* pChunk) {
-    TNetNode* pNode;
+    TNetwork* pNet = (TNetwork*)pChunk;
     int i;
     int j;
+    TNetNode* pNode;
 
-    lbl_80281E30 = (TNetwork*)pChunk;
-    pNode = lbl_80281E30->aNodes;
+    lbl_80281E30 = pNet;
+    pNode = pNet->aNodes;
     lbl_80281E44 = 0;
-    for (i = 0; i < lbl_80281E30->nNumNodes; i++) {
+    for (i = 0; i < pNet->nNumNodes; i++) {
         lbl_801D5CCC[i].pNode = pNode;
-        if (pNode->nLink10 == i) {
-            pNode->nLink10 = -1;
-        }
-        if (pNode->nLink12 == i) {
-            pNode->nLink12 = -1;
-        }
-        for (j = 0; j < 8; j++) {
-            if (pNode->a14[j] == i) {
-                pNode->a14[j] = -1;
+        for (j = 0; j < 10; j++) {
+            if (pNode->aLinks[j] == i) {
+                pNode->aLinks[j] = -1;
             }
         }
-        pNode++;
         lbl_80281E44++;
+        pNode++;
     }
 }
 
