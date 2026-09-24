@@ -54,14 +54,15 @@ void fn_800B235C(void) {
 // The palette: entry 0 clear, every other entry nIntensity.
 void fn_800B2360(u8 nIntensity) {
     Shadow* p = lbl_802814A8;
+    u32 uValue = nIntensity;   // fake match: a wider copy gives the original's clrlwi on entry
     int i;
 
     for (i = 0; i < 256; i++) {
         if (i != 0) {
-            p->aLut[i][0] = nIntensity;
-            p->aLut[i][1] = nIntensity;
-            p->aLut[i][2] = nIntensity;
-            p->aLut[i][3] = nIntensity;
+            p->aLut[i][0] = uValue;
+            p->aLut[i][1] = uValue;
+            p->aLut[i][2] = uValue;
+            p->aLut[i][3] = uValue;
         } else {
             p->aLut[i][0] = 0;
             p->aLut[i][1] = 0;

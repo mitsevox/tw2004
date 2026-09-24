@@ -841,13 +841,13 @@ u8 fn_80073610(SKABlendNode* pNode, void* pSrc) {
 // Clear bit nBit in the three blocks of pNode's format 1 pose buffer, and of every source's under
 // it (a source's only when its parent is format 1).
 void fn_800736D8(SKABlendNode* pNode, s32 nBit) {
-    int j;
     SKABlendNode* pChild;
     int i;
+    int j;
     int n = nBit;   // fake match: a copy of the parameter for the pose calls
 
-    for (i = 0; i < 3; i++) {
-        fn_8001EB6C(((SkelPose1*)pNode->pPose)->aBlocks[i].aBits, n);
+    for (j = 0; j < 3; j++) {
+        fn_8001EB6C(((SkelPose1*)pNode->pPose)->aBlocks[j].aBits, n);
     }
     for (i = 0; i < 2; i++) {
         pChild = pNode->u.blend.apChild[i];

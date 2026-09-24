@@ -295,6 +295,7 @@ void  fn_800A27BC(const char* szSrc, u16* szDst, s32 nMax);
 // ---- MC_Gc.c's CARD state (the CARD library itself is in core/card.h) ----------------------------
 
 extern CARDFileInfo lbl_801E3180[127];  // the open files, by file number
+extern u8    lbl_801E7100[0xA000];      // the CARD library's work area (lbl_802813D0 points here)
 extern void* lbl_802813D0;      // the CARD library's work area, given to CARDMountAsync
 extern CARDStat lbl_801E3B6C[127];      // the directory entries fn_8009F0F0 found
 extern s32   lbl_80281FB0;      // how many fn_8009F0F0 found
