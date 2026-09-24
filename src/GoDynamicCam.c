@@ -547,7 +547,7 @@ void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
             aDir[1] = 0.0f;
             aDir[2] = 0.0f;
         }
-        fLimit = 0.5f * fabsf(pShot->f60);
+        fLimit = fabsf(pShot->f60) / 2.0f;
         if (fDist > fLimit) {
             fStep = fDist - fLimit;
         } else {
