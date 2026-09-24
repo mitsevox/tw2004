@@ -340,12 +340,12 @@ extern DynObjSlot lbl_801D5228[32];
 
 // GoDynObj.c's two records per player (our names; 0x104 and 0x100 bytes, GoDynObjMgr.aA and aB).
 typedef struct GoDynObjPlayerA {
-    u8   b0;                    // 0x00  set by fn_80047EF0; fn_80048184 moves pF4 while it is set
+    u8   b0;                    // 0x00  set by DynObj_TeeAdd; fn_80048184 moves pF4 while it is set
     u8   unk1[0xC - 0x1];
     f32  fC;                    // 0x0C  its heading once launched
     f32  f10;                   // 0x10  time in flight
     u8   unk14[0x20 - 0x14];
-    f32  v20[4];                // 0x20  where fn_80047EF0 put pF4 (x, y, z, 1)
+    f32  v20[4];                // 0x20  where DynObj_TeeAdd put pF4 (x, y, z, 1)
     f32  v30[4];                // 0x30  where it is now (Swing.c's STATEFUNC_PreShotUpdate fills it)
     f32  v40[4];                // 0x40  its launch velocity
     f32  v50[4];                // 0x50  its turn angles so far (STATEFUNC_PreShotUpdate fills them) ...
@@ -353,9 +353,9 @@ typedef struct GoDynObjPlayerA {
     u8   b70;                   // 0x70  set by fn_8004816C: launch it
     u8   unk71[0xB4 - 0x71];
     f32  mB4[4][4];             // 0xB4  its rotation
-    DynObj* pF4;                // 0xF4  a 'TEO ' 10004 object (fn_80047EF0)
+    DynObj* pF4;                // 0xF4  a 'TEO ' 10004 object (DynObj_TeeAdd)
     u8   bF8;                   // 0xF8  pF4 is in use
-    u8   bF9;                   // 0xF9  set by fn_80047EF0
+    u8   bF9;                   // 0xF9  set by DynObj_TeeAdd
     u8   unkFA[0x104 - 0xFA];
 } GoDynObjPlayerA;
 LAYOUT_ASSERT(GoDynObjPlayerA, 0x104);
@@ -381,7 +381,7 @@ typedef struct GoDynObjPlayerB {
 LAYOUT_ASSERT(GoDynObjPlayerB, 0x100);
 
 // GoDynObj.c's state (0xAB0 bytes, lbl_80281DA0, allocated by fn_800461A8): per-player records
-// and objects, and the models of the 'TEO ' stream objects (fn_80046288 makes them).
+// and objects, and the models of the 'TEO ' stream objects (DynObj_InitForHole makes them).
 typedef struct GoDynObjMgr {
     GoDynObjPlayerA aA[5];      // 0x000
     GoDynObjPlayerB aB[5];      // 0x514

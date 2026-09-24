@@ -1,6 +1,5 @@
 // LLFont.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): the font renderer
-// under UFont.c: loads 'sfn ' fonts, sets GX up for text and draws glyphs. The loader
-// (FO_spLoadFontFromStream) and the glyph drawing are not decompiled yet.
+// under UFont.c: loads 'sfn ' fonts, sets GX up for text and draws glyphs.
 
 #include "engine.h"
 #include "gx.h"

@@ -117,8 +117,9 @@ u8 fn_800B36F4(View* pView, int nPlayer, f32 fFrameTime) {
     return 0;
 }
 
-// Layout 1's ending: once the last panel is reached, grow it a little each frame, keeping it centred,
-// until it fills the screen. nPlayer is not used.
+// Layout 1's ending: once the last panel is reached, grow it a little each frame until it fills the
+// screen: its shorter side (both when square), from the centre when centred, else away from the
+// nearer screen edge. nPlayer is not used.
 void fn_800B39B8(ComicPanel* pPanel, f32* pRect, int nPlayer, f32 fFrameTime) {
     f32 fX;
     f32 fY;
@@ -398,7 +399,7 @@ void fn_800B4108(void) {
 }
 
 // Is the comic camera finished? Layout 1: once the golfer is half a second past animation event 2
-// and the current panel fills the screen; layout 0: once the last panel has been reached.
+// and the current panel fills the screen; layout 0: once the last panel has run its course (bDone).
 u8 fn_800B4818(f32* pRect, int nPlayer) {
     switch (lbl_80282178->nKind) {
     case 0:
@@ -420,7 +421,9 @@ u8 fn_800B4908(void) {
     return lbl_80282178->bNext;
 }
 
-// Move the camera on to the current panel's shot, with the panel's sound.
+// Move the camera on for the current panel: layout 0 to shot 0x28 + the panel, layout 1 to the next
+// of shots 0x2B..0x2D every 9 panels shown. Then hand fn_800A6AC8 (GameAudio.c) the panel's column
+// (3 for layout 1's last panel).
 void fn_800B4914(View* pView, int nPlayer) {
     f32* pCam = fn_8001731C(pView);
     f32* pSub = fn_80017314(pView);

@@ -1077,7 +1077,7 @@ s32 fn_8009F0F0(s32 nPort, s32 nSlot, const char* pPattern, char** apName, s32 n
 }
 
 // Read nLen bytes of open file nFile into pBuf at the file position (lbl_80281FC8) and move the
-// position on; CARDRead's result is ignored. arg3 is not used (TibExt's fn_80122744 passes 0).
+// position on; CARDRead's result is ignored. arg3 is not used (TibExt's SFIO_vReadCallback passes 0).
 s32 fn_8009F208(s32 nFile, void* pBuf, s32 nLen, s32 arg3) {
     CARDRead(&lbl_801E3180[nFile], pBuf, nLen, lbl_80281FC8);
     lbl_80281FC8 += nLen;

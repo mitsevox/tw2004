@@ -1,8 +1,8 @@
 // GoStaticCam.c (EA's name, from its asserts; also in EA's 2002 source tree): the course's static
 // cameras and fly-by camera paths. The course data brings them as 'Cact' objects (UKernel.c hands
-// type 201 to fn_80064A0C, type 200 to fn_800646D0) and the paths' splines
+// type 201 to fn_80064A0C, type 200 to fn_800646D0) and the paths' timing curves
 // as a 'CAMC' stream object (fn_800644F4). The golf cameras (GoGolfCam.c) pick a static camera
-// that sees the golfer or the ball (fn_80064F7C) and fly along a path (fn_8006509C, fn_80065488).
+// whose area holds the ball (StaticCam_ChooseScript) and fly along a path (StaticCam_GetFlyByCam, fn_80065488).
 
 #include "game_types.h"
 #include "engine.h"
@@ -17,8 +17,8 @@ void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a
 f32  fn_800C79BC(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3);
 
 void fn_800644F4(UStreamObject* pObject);
-void fn_80064EA4(void);
-void fn_8006596C(CamShot* pShot, CamShot** ppPrev, CamShot** ppNext, CamShot** ppAfter);
+void StaticCam_Reset(void);
+void StaticCam_SetupFlybyCameraPointers(CamShot* pShot, CamShot** ppPrev, CamShot** ppNext, CamShot** ppAfter);
 u8   fn_800659F4(CamShot* pShot, int nPlayer);
 void fn_80065AFC(f32* pA, f32* pB, f32* pOut);
 void fn_80065B20(f32* pA, f32* pB, f32* pOut);
@@ -32,7 +32,7 @@ void fn_800644CC(void) {
     UStream_UnregisterHandler('CAMC');
 }
 
-// The 'CAMC' handler: the fly-by paths' splines, byte-swapped into a new table.
+// The 'CAMC' handler: the fly-by paths' timing curves, byte-swapped into a new table.
 void fn_800644F4(UStreamObject* pObject) {
     SwapField aHeader[2] = { { 4, 4 }, { 4, 4 } };
     SwapField aPath[4] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };
@@ -91,7 +91,7 @@ void fn_800646D0(UStreamObject* pObject) {
     lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].v30[0] = PI * (pDef->aLook[0] / 180.0f);
     lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].v30[1] = PI * (pDef->aLook[1] / 180.0f);
     lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].v30[2] = PI * (pDef->aLook[2] / 180.0f);
-    // port: p40 and p44 hold the next camera's number and this one's until fn_8006509C links them
+    // port: p40 and p44 hold the next camera's number and this one's until StaticCam_GetFlyByCam links them
     lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].p40 = (CamShot*)(uptr)(s32)pDef->nNext;
     lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].p44 = (CamShot*)(uptr)(s32)pDef->nId;
     lbl_80281E18->aFlyBy[lbl_80281E18->nFlyBy].bB2 = 0;
@@ -163,20 +163,20 @@ void fn_80064A0C(UStreamObject* pObject) {
     fn_80009E70(pObject);
 }
 
-void fn_80064E2C(void) {
+void StaticCam_Init(void) {
     lbl_80281E18 = fn_80009B34(sizeof(StaticCams), 2, 0, "GoStaticCam.c", 380);
     lbl_80281E18->pPaths = NULL;
-    fn_80064EA4();
+    StaticCam_Reset();
 }
 
-void fn_80064E74(void) {
-    fn_80064EA4();
+void StaticCam_DeInit(void) {
+    StaticCam_Reset();
     fn_80009E70(lbl_80281E18);
     lbl_80281E18 = NULL;
 }
 
 // Forget every camera and path.
-void fn_80064EA4(void) {
+void StaticCam_Reset(void) {
     lbl_80281E18->nStatic = 0;
     lbl_80281E18->nFlyBy = 0;
     lbl_80281E18->bLinked = 0;
@@ -201,9 +201,10 @@ void fn_80064F54(CamShot* pShot, int nPlayer, f32* pOut) {
     Vec3Copy(pShot->v20, pOut);
 }
 
-// A random static camera for shot kind nKind that sees nPlayer's golfer or ball, other than pNot
-// (bNotKind5: none with bAC 5). Only course 12 in mode 10 has them, and only for kind 0x20.
-CamShot* fn_80064F7C(int nPlayer, int nKind, u8 bNotKind5, CamShot* pNot) {
+// A random static camera for shot kind nKind whose area holds one of nPlayer's ball positions,
+// other than pNot (bNotKind5: none with bAC 5). NULL except on course 12's hole index 10
+// (fn_80015464) for kind 0x20, so every other kind gets none.
+CamShot* StaticCam_ChooseScript(int nPlayer, int nKind, u8 bNotKind5, CamShot* pNot) {
     int aFound[NUM_STATIC_CAMS];
     int* pFound;
     int i;
@@ -232,7 +233,7 @@ CamShot* fn_80064F7C(int nPlayer, int nKind, u8 bNotKind5, CamShot* pNot) {
 // Fly-by path nPath's first shot. The first call after loading chains the fly-by cameras into their
 // paths (p40 the next shot, p44 the one before), finds each path's first shot and measures the
 // paths.
-CamShot* fn_8006509C(int nPath) {
+CamShot* StaticCam_GetFlyByCam(int nPath) {
     u8 abEnds[NUM_FLYBY_PATHS];   // the path ends on a camera marked -99
     CamShot* pShot;
     CamShot* pNext;
@@ -299,7 +300,7 @@ CamShot* fn_8006509C(int nPath) {
                 if (lbl_80281E18->apPath != NULL) {   // always true: apPath is an array
                     for (pShot = lbl_80281E18->apPath[i]; pShot->p40 != NULL && pShot->p40->nA4 == i;
                          pShot = pShot->p40) {
-                        // fn_8006596C's body
+                        // StaticCam_SetupFlybyCameraPointers's body
                         if (pShot->p44 != NULL) {
                             pPrev = pShot->p44;
                         } else {
@@ -332,7 +333,7 @@ CamShot* fn_8006509C(int nPath) {
     return lbl_80281E18->apPath[nPath];
 }
 
-// Fly-by path uPath's spline, or NULL.
+// Fly-by path uPath's timing curve, or NULL.
 FlyByPath* fn_80065424(u32 uPath) {
     FlyByPath* pPaths;
     u32 i;
@@ -380,7 +381,7 @@ void fn_80065488(CamScript* pScript, int nPath, f32* pCam, f32* pSub, f32* pFov,
     fLastT = fT;
     fLastDist = fDist;
     fTarget = fShare * lbl_80281E18->afPathLength[nPath];
-    fn_8006596C(pShot, &pPrev, &pNext, &pAfter);
+    StaticCam_SetupFlybyCameraPointers(pShot, &pPrev, &pNext, &pAfter);
     Vec_Copy(pCam, vLast);
     *pFov = fn_80014278(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])));
     if (0.0f == fTarget) {
@@ -399,7 +400,7 @@ void fn_80065488(CamScript* pScript, int nPath, f32* pCam, f32* pSub, f32* pFov,
                     continue;
                 }
                 pShot = pShot->p40;
-                fn_8006596C(pShot, &pPrev, &pNext, &pAfter);
+                StaticCam_SetupFlybyCameraPointers(pShot, &pPrev, &pNext, &pAfter);
                 fT = 0.0f;
             }
             fn_800C7480(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20, pPrev->v30, pShot->v30, pNext->v30,
@@ -461,7 +462,7 @@ void fn_80065488(CamScript* pScript, int nPath, f32* pCam, f32* pSub, f32* pFov,
 
 // The four shots a fly-by spline runs through around pShot: the one before (pShot itself at the
 // path's start), pShot, the next one and the one after that (each repeating the last at the end).
-void fn_8006596C(CamShot* pShot, CamShot** ppPrev, CamShot** ppNext, CamShot** ppAfter) {
+void StaticCam_SetupFlybyCameraPointers(CamShot* pShot, CamShot** ppPrev, CamShot** ppNext, CamShot** ppAfter) {
     if (pShot->p44 != NULL) {
         *ppPrev = pShot->p44;
     } else {
@@ -487,7 +488,7 @@ void fn_8006596C(CamShot* pShot, CamShot** ppPrev, CamShot** ppNext, CamShot** p
     }
 }
 
-// nPlayer's golfer or ball is inside the shot's area.
+// nPlayer's vBall (tested first) or ball.vPos lies inside the shot's x/z area.
 u8 fn_800659F4(CamShot* pShot, int nPlayer) {
     f32* pBallPos;
     f32* pVBall;

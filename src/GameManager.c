@@ -440,7 +440,7 @@ void GM_BumpBallForObstructions(int nPlayer) {
                 Physics_DropBall(pBall, gPlayers[nPlayer].vPreShot);
                 if (gPlayers[n].vA44[0] == gPlayers[n].vBall[0] &&
                     gPlayers[n].vA44[2] == gPlayers[n].vBall[2]) {
-                    fn_80055AA8(pBall, gPlayers[nPlayer].vPreShot, n);
+                    Physics_InitBall(pBall, gPlayers[nPlayer].vPreShot, n);
                 }
             }
         }
@@ -551,7 +551,7 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
     gPlayers[nPlayer].bC2F = 1;
     gpGame->pfn254(nPlayer);
     if (gSession.bReplay) {
-        fn_8006C4A0();
+        REPLAY_Stop();
     }
     fn_800C70F8(fn_80017028(gPlayers[nPlayer].nView[0]), 1);
     fn_800957D8(gPlayers[nPlayer].pChar);
@@ -798,7 +798,7 @@ void GM_ReplaceOOBBall(int nPlayer) {
     Physics_DropBall(pBall, pPre);
     if (gPlayers[nPlayer].vA44[0] == gPlayers[nPlayer].vBall[0] &&
         gPlayers[nPlayer].vA44[2] == gPlayers[nPlayer].vBall[2]) {
-        fn_80055AA8(pBall, pPre, nPlayer);
+        Physics_InitBall(pBall, pPre, nPlayer);
     }
 }
 
@@ -816,7 +816,7 @@ void fn_800DEB5C(int nPlayer) {
     Physics_DropBall(pBall, pPre);
     if (gPlayers[nPlayer].vA44[0] == gPlayers[nPlayer].vBall[0] &&
         gPlayers[nPlayer].vA44[2] == gPlayers[nPlayer].vBall[2]) {
-        fn_80055AA8(pBall, pPre, nPlayer);
+        Physics_InitBall(pBall, pPre, nPlayer);
     }
 }
 
@@ -921,7 +921,7 @@ void GM_CheckForShotChanges(int nPlayer) {
                 fn_8001C804(nPlayer, 1, 1);
                 fn_800957D8(gPlayers[nPlayer].pChar);
                 fn_80095744(gPlayers[nPlayer].pChar, 5);
-                fn_800689D4(nPlayer);
+                TARGET_SetupTarget(nPlayer);
                 fn_80062C38();
                 fn_800E3D38(nPlayer, 1);
             }
@@ -985,7 +985,7 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
         CameraController_FadeOut(pView, lbl_80281F78->f170, vOffset);
         return;
     }
-    if (Player_IsNotCPU(nPlayer) && gSession.nSplitScreen == 0) {
+    if (fn_8002E8B4(nPlayer) && gSession.nSplitScreen == 0) {
         if (gSession.bReplay == 0 && (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x19, 0)) &&
             !(gPlayers[nPlayer].uFlags & 8)) {
             if (GM_PlayerTakeMulligan(nPlayer)) {
@@ -1004,7 +1004,7 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
         if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0, 0)) && !fn_8008AC40()) {
             fn_800E41D4(nPlayer);
         }
-    } else if (Player_IsNotCPU(nPlayer)) {
+    } else if (fn_8002E8B4(nPlayer)) {
         if (!fn_8008AC40() && (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0, 0))) {
             fn_800E41D4(nPlayer);
         }
@@ -1085,7 +1085,7 @@ void GM_SimulateBallMovement(int nPlayer) {
     f32 fDist;
     int nResult;
 
-    t0 = fn_800954A4(0);
+    t0 = TI_sReadCounter(0);
     nUpdates = GameEffects_BallUpdatesThisFrame(nPlayer);
     if (gpGame->n294 != 0 && fn_800C71A4(fn_80017028(gPlayers[nPlayer].nView[0]), nPlayer)) {
         nUpdates = 0;
@@ -1093,19 +1093,19 @@ void GM_SimulateBallMovement(int nPlayer) {
     for (i = 0; i < nUpdates; i++) {
         Physics_Simulate(&gPlayers[nPlayer].ball, 20);
     }
-    fMs = 1000.0f * fn_8006E118(fn_800954A4(0), t0);
+    fMs = 1000.0f * fn_8006E118(TI_sReadCounter(0), t0);
     fBudget = 0.83f - fMs;
     if (fn_8008AC40()) {
         fBudget = 0.83f;
     }
     if (gSession.nSplitScreen == 0 && gSession.fFrameTime > 0.0f) {
-        Ball_SetSimulating(1);
+        fn_80050D24_SetSimulating(1);
         fn_80050D2C(1);
         while (gPlayers[nPlayer].ballBefore.nState != 1 && gPlayers[nPlayer].ballBefore.nState != 5 &&
                gPlayers[nPlayer].ballBefore.nState != 0 && fBudget > 0.1f) {
-            t0 = fn_800954A4(0);
+            t0 = TI_sReadCounter(0);
             Physics_Simulate(&gPlayers[nPlayer].ballBefore, 20);
-            fMs = 1000.0f * fn_8006E118(fn_800954A4(0), t0);
+            fMs = 1000.0f * fn_8006E118(TI_sReadCounter(0), t0);
             nSteps++;
             fBudget -= fMs;
             if (fn_8008AC40()) {
@@ -1125,7 +1125,7 @@ void GM_SimulateBallMovement(int nPlayer) {
             }
         }
         fn_80050D2C(0);
-        Ball_SetSimulating(0);
+        fn_80050D24_SetSimulating(0);
         if (fn_800BB1F8(nPlayer)) {
             nResult = fn_8006AA9C(nPlayer);
             bReact  = nResult == 8 || nResult == 9;

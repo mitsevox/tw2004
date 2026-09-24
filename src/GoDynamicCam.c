@@ -107,9 +107,9 @@ void fn_80039554(UStreamObject* pObject) {
         return;
     }
     pSrc = pObject->pData;
-    fn_80076158(&pSrc, (u8*)&nSequences, sizeof(nSequences), 4);
+    BYTESWAP_SWAPDATA(&pSrc, (u8*)&nSequences, sizeof(nSequences), 4);
     pSrc = pObject->pData + 4;
-    fn_80076158(&pSrc, (u8*)&nChoices, sizeof(nChoices), 4);
+    BYTESWAP_SWAPDATA(&pSrc, (u8*)&nChoices, sizeof(nChoices), 4);
     lbl_80281D88->pSequences = fn_80009B34(nSequences * sizeof(CamSequence), 2, 0, "GoDynamicCam.c", 403);
     lbl_80281D88->pChoices = fn_80009B34(nChoices * sizeof(CamChoice), 2, 0, "GoDynamicCam.c", 404);
     lbl_80281D88->nSequences = 0;
@@ -457,14 +457,14 @@ void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
     }
     pCourse = fn_8000C594();
     if (pCourse != NULL) {
-        if (fn_80043388(pScript, pShot) && pShot != pScript->pNextShot) {
+        if (CameraScript_SnapToScript(pScript, pShot) && pShot != pScript->pNextShot) {
             if (Game_GetCourse() == 12 && fn_80015464() == 10) {
                 fn_8003DC54(&pCourse->tee[gSession.nTeeSet[nPlayer]].x, pOut, aOff);
                 aOff[1] = 0.0f;
                 if ((f32)fn_80009680(fn_80009744(aOff)) < 40.0f) {
                     fGround = fn_8004D5F0(pCourse, pOut);
                 } else {
-                    fGround = Terrain_HeightAt(pOut, NULL);
+                    fGround = CamScript_GuessBestPlayableHeight(pOut, NULL);
                     if (pShot->bAD == 4 && !fn_8003A76C(pShot) && !fn_8003DC78(pShot)) {
                         fLow = (pCourse->pin[nPinSet].y <= pCourse->tee[gSession.nTeeSet[nPlayer]].y)
                                    ? pCourse->pin[nPinSet].y
@@ -477,7 +477,7 @@ void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
                     pScript->fD8 = fn_8000C594()->fFloor;
                 }
             } else {
-                fGround = Terrain_HeightAt(pOut, NULL);
+                fGround = CamScript_GuessBestPlayableHeight(pOut, NULL);
                 if (pShot->bAD == 4 && !fn_8003A76C(pShot) && !fn_8003DC78(pShot)) {
                     fLow = (pCourse->pin[nPinSet].y <= pCourse->tee[gSession.nTeeSet[nPlayer]].y)
                                ? pCourse->pin[nPinSet].y
@@ -544,7 +544,7 @@ void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
             }
         }
     }
-    if (pShot->bB1 == 3 && !fn_80043388(pScript, pShot) &&
+    if (pShot->bB1 == 3 && !CameraScript_SnapToScript(pScript, pShot) &&
         (pScript->pNextShot != pShot || pScript->fCamTime > 0.0f)) {
         fn_8003DC54(pOut, aOld, aStep);
         fDist = (f32)fn_80009680(fn_80009744(aStep));
@@ -712,7 +712,7 @@ void fn_8003AC50(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
 
 // As fn_8003AC50, with the distance and side from fn_8003DAC8 (level for bB1 2 and 3). For bB1 8,
 // the camera's offset from pSub is shortened as fn_80044F58's distance (never less than the most
-// seen, pScript->f100) goes from CamTuning.f23C to f244, unless fn_80043388 holds.
+// seen, pScript->f100) goes from CamTuning.f23C to f244, unless CameraScript_SnapToScript holds.
 void fn_8003ADF8(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub) {
     f32 vFrom[4];
     f32 vTo[4];
@@ -738,7 +738,7 @@ void fn_8003ADF8(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
     }
     if (pShot->bB1 == 8) {
         fFar = fn_80044F58(nPlayer, pScript);
-        if (!fn_80043388(pScript, pShot)) {
+        if (!CameraScript_SnapToScript(pScript, pShot)) {
             if (fFar > pScript->f100) {
                 pScript->f100 = fFar;
             }
@@ -764,7 +764,7 @@ void fn_8003ADF8(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
 
 // A camera that follows the ball (placement kinds 5 and 6; 6 stays level): its target is along the
 // ball's direction from DynamicCam_GetLocation's kind 0 point, by the shot's f60 (changed as in
-// fn_8003B534), moved sideways by f64. Unless fn_80043388 holds, pOut moves towards it by a share
+// fn_8003B534), moved sideways by f64. Unless CameraScript_SnapToScript holds, pOut moves towards it by a share
 // of the distance and the angle between them per frame, scaled while f98 is under CamTuning.f154,
 // by f8C when nBC is 4, for a ball slower than f198 and early on the second clock (f88).
 void fn_8003B028(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub,
@@ -825,7 +825,7 @@ void fn_8003B028(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
     }
     fn_8000C5D4(aFrom, aBallDir, fDist, aTarget);
     fn_8003D324(aTarget, aBallDir, pScript, pShot, nPlayer, pShot->f64, fY);
-    if (fn_80043388(pScript, pShot)) {
+    if (CameraScript_SnapToScript(pScript, pShot)) {
         Vec3Copy(aTarget, pOut);
         return;
     }
@@ -953,7 +953,7 @@ void fn_8003B6D0(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
 // A point of kind nKind for the shot into pOut: 0 the ball (or the script's v70 near the pin,
 // fn_8003D9AC), 1 Player.vBall, 2 halfway between bones 0x39 and 0x47 of the golfer, 4, 6 and 8
 // bones 1, 10 and 7, 9 Player.vTarget2, 10 the pin, 11 the player's tee, 12 the script's v50,
-// 16 the script's own points (kept on the fairway when fn_80043388 says so), 17..19 bones 10, 7
+// 16 the script's own points (kept on the fairway when CameraScript_SnapToScript says so), 17..19 bones 10, 7
 // and 1 moved along their matrix's third row, 20 and 21 the shot's other point (bone 0 when that
 // is 20 or 21 too) moved along bone 0's first or third row, 24 the shot's v20, 25 (0, 0, 100).
 void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScript, CamShot* pShot, f32* pCam,
@@ -1026,9 +1026,9 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
         Vec3Copy(pShot->v20, pOut);
         break;
     case 16:
-        if (fn_80043388(pScript, pShot)) {
+        if (CameraScript_SnapToScript(pScript, pShot)) {
             if (pShot == pScript->pShot) {
-                fn_80043C74(pScript, pOut, pCam, nPlayer, pScript->pB4, pSub, NULL);
+                CamScript_GetCameraOnFairwayPos(pScript, pOut, pCam, nPlayer, pScript->pB4, pSub, NULL);
                 Vec3Copy(pOut, pScript->v0);
                 pScript->bCF = 1;
             } else if (pShot == pScript->pNextShot) {
@@ -1695,7 +1695,7 @@ void fn_8003D414(f32* pPos, CamScript* pScript, CamShot* pShot, int nPlayer, f32
     if (pShot->bB2 != 7) {
         return;
     }
-    if (fn_80043388(pScript, pShot)) {
+    if (CameraScript_SnapToScript(pScript, pShot)) {
         pScript->f104 = pShot->f68;
         return;
     }

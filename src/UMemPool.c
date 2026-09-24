@@ -613,12 +613,12 @@ UMemPool* UMemPool_Create(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign) {
     return pPool;
 }
 
-void UMemPool_Destroy(UMemPool* pPool) {
+void DeleteMemPool(UMemPool* pPool) {
     fn_80009E70(pPool);
 }
 
 // Takes a node off the free list and fills it with 0xBB; NULL when the pool is empty.
-void* UMemPool_Alloc(UMemPool* pPool) {
+void* AllocPoolMem(UMemPool* pPool) {
     UMemPoolNode* pNode;
 
     pNode = pPool->pFree;
@@ -631,7 +631,7 @@ void* UMemPool_Alloc(UMemPool* pPool) {
 }
 
 // Fills a node with 0x99 and puts it back on the free list.
-void UMemPool_Free(UMemPool* pPool, void* p) {
+void ReturnPoolMem(UMemPool* pPool, void* p) {
     UMemPoolNode* pNode;
 
     pNode = p;

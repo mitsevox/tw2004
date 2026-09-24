@@ -216,8 +216,8 @@ void fn_800E3E3C(void) {
         fn_800E5714(4);
         fn_8001437C();
         fn_80062CE0(0);
-        if (fn_80095430(1)) {
-            fn_80095444(1);
+        if (TI_bCounterIsRunning(1)) {
+            TI_sStopCounter(1);
         }
         lbl_802822DF = 1;
         gSession.nPaused = 1;
@@ -247,8 +247,8 @@ void fn_800E3EE0(void) {
             fn_80101EDC();
         }
         if (!fn_800E5C84()) {
-            if (!fn_80095430(1)) {
-                fn_800953C8(1);
+            if (!TI_bCounterIsRunning(1)) {
+                TI_vStartCounter(1);
             }
             lbl_802822DF = 0;
             gSession.nPaused = 0;

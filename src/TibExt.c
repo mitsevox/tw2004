@@ -2,7 +2,7 @@
 // Bio's EASB.c, the shared file library, TagFile, CRC32) and the game: memory, the real-time clock,
 // and the memory-card callbacks (lbl_80281970) the shared file library calls. The callbacks that
 // take a device use its port (eDevice / 4) and slot (eDevice % 4); the last card call's error and
-// result are kept for fn_8012288C, the library's update call.
+// result are kept for SFIO_eProcessCallback, the library's update call.
 
 #include "engine.h"
 #include "game.h"
@@ -12,25 +12,25 @@
 
 #define TIBEXT_MAX_FOUND 10     // save files one probe looks at
 
-void fn_80122468(s32 nCardError);
-void fn_80122488(s32 n);
-void fn_80122330(char* pSearchName, int eDevice);
-void fn_80122494(int eDevice);
-void fn_801224E0(int eDevice);
-void fn_80122530(int eDevice);
-void fn_8012258C(int eDevice);
-void fn_801225CC(const char* pDirName, char* pFileName, int eDevice, u32 uFlags);
-void fn_80122630(int uHandle);
-void fn_80122654(char* pFileName, u32 uSize, int eDevice);
-void fn_801226AC(char* pDirName, char* pFileName, int eDevice);
-void fn_80122700(char* pDirName, int eDevice);
-void fn_80122744(int uHandle, void* pBuffer, u32 uSize);
-void fn_801227A0(int uHandle, void* pBuffer, u32 uSize);
-void fn_801227F8(int uHandle, u32 uOffset, u32 uWhence);
+void SFIO_vSetCurrentError(s32 nCardError);
+void SFIO_vSetCurrentResult(s32 n);
+void SFIO_vFindCallback(char* pSearchName, int eDevice);
+void SFIO_vFreeSpaceCallback(int eDevice);
+void SFIO_vFreeEntryCallback(int eDevice);
+void SFIO_vMountCallback(int eDevice);
+void SFIO_vUnMountCallback(int eDevice);
+void SFIO_vOpenCallback(const char* pDirName, char* pFileName, int eDevice, u32 uFlags);
+void SFIO_vCloseCallback(int uHandle);
+void SFIO_vCreateCallback(char* pFileName, u32 uSize, int eDevice);
+void SFIO_vDeleteCallback(char* pDirName, char* pFileName, int eDevice);
+void SFIO_vDestroyCallback(char* pDirName, int eDevice);
+void SFIO_vReadCallback(int uHandle, void* pBuffer, u32 uSize);
+void SFIO_vWriteCallback(int uHandle, void* pBuffer, u32 uSize);
+void SFIO_vSeekCallback(int uHandle, u32 uOffset, u32 uWhence);
 void fn_80122834(int uHandle);
 void fn_80122868(int uHandle, u32 uValue);
-int  fn_8012288C(int* pProcess, int* pResult);
-void fn_801228AC(char* pFileName);
+int  SFIO_eProcessCallback(int* pProcess, int* pResult);
+void SFIO_vGetFileCallback(char* pFileName);
 
 TibExtCard lbl_80260D88;
 TibExtCard* lbl_80281970 = &lbl_80260D88;
@@ -70,54 +70,54 @@ u32 TibExtCurrentTimeGet(void) {
     return nSeconds;
 }
 
-SFIOFuncTable* fn_801221F0(void) {
-    lbl_80281970->fn.pfnProbe = fn_80122330;
-    lbl_80281970->fn.pfn08 = fn_80122494;
-    lbl_80281970->fn.pfn0C = fn_801224E0;
-    lbl_80281970->fn.pfnStartProbe = fn_80122530;
-    lbl_80281970->fn.pfnSelectDevice = fn_8012258C;
-    lbl_80281970->fn.pfnMount = fn_801225CC;
-    lbl_80281970->fn.pfnOp19 = fn_80122630;
-    lbl_80281970->fn.pfn20 = fn_80122654;
-    lbl_80281970->fn.pfn24 = fn_801226AC;
-    lbl_80281970->fn.pfn28 = fn_80122700;
-    lbl_80281970->fn.pfnRead = fn_80122744;
-    lbl_80281970->fn.pfnWrite = fn_801227A0;
-    lbl_80281970->fn.pfnSeek = fn_801227F8;
+SFIOFuncTable* SFIO_spGetCallbacks(void) {
+    lbl_80281970->fn.pfnProbe = SFIO_vFindCallback;
+    lbl_80281970->fn.pfn08 = SFIO_vFreeSpaceCallback;
+    lbl_80281970->fn.pfn0C = SFIO_vFreeEntryCallback;
+    lbl_80281970->fn.pfnStartProbe = SFIO_vMountCallback;
+    lbl_80281970->fn.pfnSelectDevice = SFIO_vUnMountCallback;
+    lbl_80281970->fn.pfnMount = SFIO_vOpenCallback;
+    lbl_80281970->fn.pfnOp19 = SFIO_vCloseCallback;
+    lbl_80281970->fn.pfn20 = SFIO_vCreateCallback;
+    lbl_80281970->fn.pfn24 = SFIO_vDeleteCallback;
+    lbl_80281970->fn.pfn28 = SFIO_vDestroyCallback;
+    lbl_80281970->fn.pfnRead = SFIO_vReadCallback;
+    lbl_80281970->fn.pfnWrite = SFIO_vWriteCallback;
+    lbl_80281970->fn.pfnSeek = SFIO_vSeekCallback;
     lbl_80281970->fn.pfnOp18 = fn_80122834;
     lbl_80281970->fn.pfn3C = fn_80122868;
-    lbl_80281970->fn.pfnUpdate = fn_8012288C;
-    lbl_80281970->fn.pfn44 = fn_801228AC;
+    lbl_80281970->fn.pfnUpdate = SFIO_eProcessCallback;
+    lbl_80281970->fn.pfn44 = SFIO_vGetFileCallback;
     return &lbl_80281970->fn;
 }
 
 // Looks for the save file: the first of the card's files named like pSearchName that the library
 // takes as a save file name is kept in szFileName, with a result of 1.
-void fn_80122330(char* pSearchName, int eDevice) {
+void SFIO_vFindCallback(char* pSearchName, int eDevice) {
     char aszName[TIBEXT_MAX_FOUND][64];
     char* apName[TIBEXT_MAX_FOUND];
     s32 nFound;
     s32 nErr;
     int i;
 
-    fn_80122488(0);
+    SFIO_vSetCurrentResult(0);
     for (i = 0; i < TIBEXT_MAX_FOUND; i++) {
         apName[i] = aszName[i];
     }
     nErr = fn_8009F0F0(eDevice / 4, eDevice % 4, pSearchName, apName, TIBEXT_MAX_FOUND, &nFound);
     if (nErr != 0) {
-        fn_80122468(nErr);
+        SFIO_vSetCurrentError(nErr);
         return;
     }
     for (i = 0; i < nFound; i++) {
         if (SFIOValidateFilename(apName[i])) {
             strcpy(lbl_80281970->szFileName, apName[i]);
-            fn_80122468(0);
-            fn_80122488(1);
+            SFIO_vSetCurrentError(0);
+            SFIO_vSetCurrentResult(1);
             return;
         }
     }
-    fn_80122468(0);
+    SFIO_vSetCurrentError(0);
 }
 
 // The file library's error code for each card error, by -error: 0 for none, 17 for most.
@@ -128,132 +128,132 @@ s32 lbl_80194758[46] __attribute__((aligned(8))) = {
     17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 14, 3,  14, 17, 17, 17, 17, 17, 17, 17, 17, 17,
 };
 
-void fn_80122468(s32 nCardError) {
+void SFIO_vSetCurrentError(s32 nCardError) {
     lbl_80281970->nError = lbl_80194758[-nCardError];
 }
 
-void fn_80122488(s32 n) {
+void SFIO_vSetCurrentResult(s32 n) {
     lbl_80281970->n48 = n;
 }
 
 // The card's free space.
-void fn_80122494(int eDevice) {
+void SFIO_vFreeSpaceCallback(int eDevice) {
     s32 nFree;
 
-    fn_80122468(fn_8009F36C(eDevice / 4, eDevice % 4, &nFree));
-    fn_80122488(nFree);
+    SFIO_vSetCurrentError(fn_8009F36C(eDevice / 4, eDevice % 4, &nFree));
+    SFIO_vSetCurrentResult(nFree);
 }
 
 // The card's free directory entries.
-void fn_801224E0(int eDevice) {
+void SFIO_vFreeEntryCallback(int eDevice) {
     s32 nFree;
 
-    fn_80122468(fn_8009F3A0(eDevice / 4, eDevice % 4, ".", &nFree));
-    fn_80122488(nFree);
+    SFIO_vSetCurrentError(fn_8009F3A0(eDevice / 4, eDevice % 4, ".", &nFree));
+    SFIO_vSetCurrentResult(nFree);
 }
 
 // Mounts the card.
-void fn_80122530(int eDevice) {
+void SFIO_vMountCallback(int eDevice) {
     s32 nErr = fn_8009D74C(eDevice / 4, eDevice % 4);
 
-    fn_80122468(nErr);
+    SFIO_vSetCurrentError(nErr);
     if (nErr == 0) {
-        fn_80122468(nErr);
+        SFIO_vSetCurrentError(nErr);
     }
 }
 
 // Unmounts the card.
-void fn_8012258C(int eDevice) {
-    fn_80122468(fn_8009DBAC(eDevice / 4, eDevice % 4));
+void SFIO_vUnMountCallback(int eDevice) {
+    SFIO_vSetCurrentError(fn_8009DBAC(eDevice / 4, eDevice % 4));
 }
 
 // Opens the save file; the result is its file number.
-void fn_801225CC(const char* pDirName, char* pFileName, int eDevice, u32 uFlags) {
+void SFIO_vOpenCallback(const char* pDirName, char* pFileName, int eDevice, u32 uFlags) {
     s32 nFile;
     s32 nErr = fn_8009F3D4(eDevice / 4, eDevice % 4, pFileName, uFlags, &nFile);
 
-    fn_80122468(nErr);
+    SFIO_vSetCurrentError(nErr);
     if (nErr == 0) {
-        fn_80122488(nFile);
+        SFIO_vSetCurrentResult(nFile);
     }
 }
 
 // Closes it.
-void fn_80122630(int uHandle) {
-    fn_80122468(fn_8009F488(uHandle));
+void SFIO_vCloseCallback(int uHandle) {
+    SFIO_vSetCurrentError(fn_8009F488(uHandle));
 }
 
 // Creates it with uSize bytes.
-void fn_80122654(char* pFileName, u32 uSize, int eDevice) {
+void SFIO_vCreateCallback(char* pFileName, u32 uSize, int eDevice) {
     s32 nErr = fn_8009F514(eDevice / 4, eDevice % 4, pFileName, uSize);
 
-    fn_80122468(nErr);
+    SFIO_vSetCurrentError(nErr);
     if (nErr != 0) return;
 }
 
-void fn_801226AC(char* pDirName, char* pFileName, int eDevice) {
+void SFIO_vDeleteCallback(char* pDirName, char* pFileName, int eDevice) {
     s32 nErr = fn_8009E758(eDevice / 4, eDevice % 4, pFileName);
 
-    fn_80122468(nErr);
+    SFIO_vSetCurrentError(nErr);
     if (nErr != 0) return;
 }
 
 // Deletes the save file.
-void fn_80122700(char* pDirName, int eDevice) {
-    fn_80122468(fn_8009F5E4(eDevice / 4, eDevice % 4, pDirName));
+void SFIO_vDestroyCallback(char* pDirName, int eDevice) {
+    SFIO_vSetCurrentError(fn_8009F5E4(eDevice / 4, eDevice % 4, pDirName));
 }
 
 // Reads from the open file; the result is the bytes read.
-void fn_80122744(int uHandle, void* pBuffer, u32 uSize) {
+void SFIO_vReadCallback(int uHandle, void* pBuffer, u32 uSize) {
     s32 nErr = fn_8009F208(uHandle, pBuffer, uSize, 0);
 
-    fn_80122468(nErr);
+    SFIO_vSetCurrentError(nErr);
     if (nErr != 0) {
-        fn_80122488(0);
+        SFIO_vSetCurrentResult(0);
     } else {
-        fn_80122488(uSize);
+        SFIO_vSetCurrentResult(uSize);
     }
 }
 
 // Writes to the open file; the result is the bytes written.
-void fn_801227A0(int uHandle, void* pBuffer, u32 uSize) {
+void SFIO_vWriteCallback(int uHandle, void* pBuffer, u32 uSize) {
     s32 nErr = fn_8009F258(uHandle, pBuffer, uSize);
 
-    fn_80122468(nErr);
+    SFIO_vSetCurrentError(nErr);
     if (nErr != 0) {
-        fn_80122488(0);
+        SFIO_vSetCurrentResult(0);
     } else {
-        fn_80122488(uSize);
+        SFIO_vSetCurrentResult(uSize);
     }
 }
 
-void fn_801227F8(int uHandle, u32 uOffset, u32 uWhence) {
+void SFIO_vSeekCallback(int uHandle, u32 uOffset, u32 uWhence) {
     s32 nErr = fn_8009F2D8(uHandle, uOffset, uWhence == 0);
 
-    fn_80122468(nErr);
+    SFIO_vSetCurrentError(nErr);
     if (nErr != 0) return;
 }
 
 void fn_80122834(int uHandle) {
     s32 nErr = fn_8009F35C();
 
-    fn_80122468(nErr);
+    SFIO_vSetCurrentError(nErr);
     if (nErr != 0) return;
 }
 
 void fn_80122868(int uHandle, u32 uValue) {
-    fn_80122468(fn_8009F364());
+    SFIO_vSetCurrentError(fn_8009F364());
 }
 
 // The library's update call: every card call here finishes at once, so the process is always
 // done (2); the error and result are the last call's.
-int fn_8012288C(int* pProcess, int* pResult) {
+int SFIO_eProcessCallback(int* pProcess, int* pResult) {
     *pResult = lbl_80281970->n48;
     *pProcess = 2;
     return lbl_80281970->nError;
 }
 
 // The save file's name, as the probe found it.
-void fn_801228AC(char* pFileName) {
+void SFIO_vGetFileCallback(char* pFileName) {
     snprintf(pFileName, 64, "%s", lbl_80281970->szFileName);
 }

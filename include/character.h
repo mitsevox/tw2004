@@ -100,7 +100,7 @@ typedef struct SkelPose1 {
 } SkelPose1;
 LAYOUT_ASSERT(SkelPose1, 0x114C);
 
-void fn_80036180(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut, f32 fWeight);  // Skin.c: blends morphs
+void fn_80036180(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut, f32 fWeight);  // Skin.c: blends two poses' channels
 void fn_80021980(u32* aA, u32* aB, u32* aOut, u32 nBits);   // ska_shared.c: aOut = aA | aB, bit arrays
 
 // A character's skeleton data (CharModel.pSkel; the SKEL_ functions take it): its IK chains and
@@ -118,7 +118,7 @@ typedef struct Skeleton {
                                 //         fn_8001966C's animation update
     SkelPose pose;              // 0x0030  (fn_8001C860 passes it to SKEL_UpdateState)
     f32  fIKWeight;             // 0x1070  SKEL_SetIKSolutionWeight
-    f32  f1074;                 // 0x1074  } set by fn_8002792C and SKEL_TransitionIK
+    f32  f1074;                 // 0x1074  } set by SKEL_RelaxIK and SKEL_TransitionIK
     f32  f1078;                 // 0x1078  }
     f32  q107C[4];              // 0x107C  a rotation (quaternion) fn_800279C0 turns the grip's by
     f32  v108C[4];              // 0x108C  an offset from the grip, turned by its rotation: the IK
@@ -143,7 +143,7 @@ typedef struct Skeleton {
 
 // A bone of a character's model (CharModel.pBones).
 typedef struct Bone {
-    u64  uId;                   // 0x00  fn_800298F4 finds a bone by it
+    u64  uId;                   // 0x00  SKEL_GetBoneIDFromNameID finds a bone by it
     s8   nParent;               // 0x08  its parent bone (fn_80114270 walks a chain down by it)
     u8   unk9[3];
     f32  q0C[4];                // 0x0C  a rotation (quaternion)
@@ -165,10 +165,10 @@ typedef struct CharModel {
     u32       a24[4];           // 0x024  }   and moves one set in a24, then sets them all again
     BonePose* pPoses;           // 0x034  one per bone; freed with the model
     Skeleton* pSkel;            // 0x038
-    u8        aBone[0x59];      // 0x03C  each bone id's index (fn_8001EED8), 0xFF none; fn_80029664
+    u8        aBone[0x59];      // 0x03C  each bone id's index (fn_8001EED8), 0xFF none; SKEL_GenerateBoneLookupTable
                                 //        fills it in by name
     u8        aBone2[0x59];     // 0x095  the index fn_8001EEE4 gives while bEE is set, by bone index
-                                //        (fn_80029804: itself, or the other bone of a pair)
+                                //        (SKEL_GenerateLeftHandedTable: itself, or the other bone of a pair)
     u8        bEE;              // 0x0EE  fn_8001EDF4
     u8        unkEF;
     struct DynChain* pF0;       // 0x0F0  } freed with the model (fn_80114398)
@@ -185,7 +185,7 @@ typedef struct CharModel {
                                 //        multiplied by fn_80028A70 (the next field is at 0x740)
     f32       q740[4];          // 0x740  } rotations (quaternions) fn_80029968 fills in
     f32       q750[4];          // 0x750  }
-    void*     p760;             // 0x760  } fn_80029A90 does nothing unless all three are set
+    void*     p760;             // 0x760  } SKEL_UpdateSkinningMatrix does nothing unless all three are set
     f32     (*p764)[4][4];      // 0x764  }   a matrix per bone, transformed into p768
     f32     (*p768)[4][4];      // 0x768  }
     s32       n76C;             // 0x76C  matrices in p768
@@ -261,7 +261,7 @@ LAYOUT_ASSERT(DynChainSettings, 0xC0);
 // copies bone 0x54's first 8 bytes into each bone it adds as the bone's uId.
 extern char* lbl_80187278[90];
 // Skeleton.c: the names of the club models' bones ("IGDriver", "IGputter", "IGiron3", "IGiron7",
-// "IGwedge"); fn_80029664 gives a model bone with one of them bone id 0x52's index.
+// "IGwedge"); SKEL_GenerateBoneLookupTable gives a model bone with one of them bone id 0x52's index.
 extern char* lbl_80187418[5];
 extern struct Character* lbl_80281D20;   // Skeleton.c: the character fn_80027E8C moves with its root
 extern u8 lbl_80281098[6];      // Skeleton.c: the bone ids of the model's kind 2 dynamic chains
@@ -547,7 +547,7 @@ typedef struct Character {
     s32   n18;                  // 0x018  cleared with the animation state (fn_8001D7EC)
     s32   nAnim;            // 0x01C  the playing animation (6 backswing, 7 downswing)
     s32   n20;                  // 0x020
-    s8    n24;                  // 0x024  } counters CharacterState's idle update (fn_80096398) runs down
+    s8    n24;                  // 0x024  } counters CharacterState's idle update (CharacterState_UpdateFidgetState) runs down
     s8    n25;                  // 0x025  }
     s8    n26;                  // 0x026  set while that update's clip plays
     u8    unk27;
@@ -700,9 +700,9 @@ extern char lbl_801870A0[6][13];        // "Defaults"
 void  Character_SetClubStatesForCharacter(Character* pChar, int nSlot, struct SkinChoices* pChoices);
 
 // Skeleton.c
-extern f32 lbl_801C6498[4];             // the identity rotation (quaternion), set by fn_80029530
-extern u8  lbl_802810A6;                // IK on (fn_80027738); off, the IK functions do nothing
-extern u8  lbl_8018742C[42][2];         // pairs of standard bones (fn_80029804 reads the first 41)
+extern f32 lbl_801C6498[4];             // the identity rotation (quaternion), set by SKEL_InitModule
+extern u8  lbl_802810A6;                // IK on (SKEL_EnableIK); off, the IK functions do nothing
+extern u8  lbl_8018742C[42][2];         // pairs of standard bones (SKEL_GenerateLeftHandedTable reads the first 41)
 extern f32 lbl_80186838[4];             // a zero vector (fn_80029BC8 copies it)
 
 // AnimStream.c: the animation groups it streams clips for (groups 1 and 5, the reactions), and the
@@ -801,19 +801,19 @@ void  SKEL_SetIKSolutionWeight(Skeleton* pSkel, f32 f);
 void  fn_80027108(Skeleton* pSkel);                                         // Skeleton.c
 void  SKEL_TranslateIKChainY(CharModel* pModel, IKChain* pChain, f32 f);   // Skeleton.c
 void  fn_80027808(CharModel* pModel, f32* pRot);
-void  fn_8002792C(Skeleton* pSkel);
+void  SKEL_RelaxIK(Skeleton* pSkel);
 void  SKEL_TransitionIK(Skeleton* pSkel, u8 b, f32 f);
 void  fn_80028A3C(CharModel* pModel);
 void  fn_80028A70(CharModel* pModel, int nBone, u32 uAxes, f32 f);
-void  fn_80029530(void);
-void  fn_8002955C(void);
+void  SKEL_InitModule(void);
+void  SKEL_CloseModule(void);
 void  SKEL_Free(CharModel* pModel);
-int   fn_800298F4(CharModel* pModel, u64 uId);
+int   SKEL_GetBoneIDFromNameID(CharModel* pModel, u64 uId);
 void  fn_80029948(CharModel* pModel, struct DynChain* pChain, f32 f);
 void  fn_80029A74(CharModel* pModel, void* p);
 void  fn_80029A7C(CharModel* pModel, f32 (*pMatrices)[4][4], s32 nMatrices);
-void  fn_80029A88(CharModel* pModel, f32 (*pMatrices)[4][4]);
-void  fn_80029A90(CharModel* pModel, f32 (*pMtx)[4], int nBone);
+void  SKEL_SetDefaultWorld2BoneMatrices(CharModel* pModel, f32 (*pMatrices)[4][4]);
+void  SKEL_UpdateSkinningMatrix(CharModel* pModel, f32 (*pMtx)[4], int nBone);
 void  fn_80029AF8(CharModel* pModel);
 int   fn_80048574(Character* pChar, u64 uEvent);    // the character's animation has event uEvent
 u8    fn_8009637C(Character* pChar);    // CharAnim.c: n26 is not 1 (both callers mask the result)

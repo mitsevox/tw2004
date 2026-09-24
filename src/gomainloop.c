@@ -27,8 +27,8 @@ void fn_8000F0E8(void);
 void fn_800103C0(void);
 void fn_8001049C(void);
 void fn_8001058C(void);
-void UFont_Init(void);
-void UFont_Shutdown(void);
+void FO_vInitModule(void);
+void FO_vCloseModule(void);
 void UFont_DrawQueue(void);
 void fn_800136F4(void);
 void fn_80013718(void);
@@ -141,14 +141,14 @@ void fn_8005D3A8(s8 nState);
 void fn_80062E00(void);
 void fn_80062E20(void);
 int  fn_80063758(void);
-void fn_80064E2C(void);
-void fn_80064E74(void);
+void StaticCam_Init(void);
+void StaticCam_DeInit(void);
 void fn_80065B44(void);
 void fn_80067608(void);
 void fn_8006765C(void);
 void fn_80067B80(void);
 void fn_80067CD4(int nPlayer);
-void fn_8006795C(void);
+void SitDev_ProcessEventQueue(void);
 void FB_vInitModule(void);
 void FB_vCloseModule(void);
 void fn_8006E2A4(void);
@@ -188,9 +188,9 @@ void fn_80091778(void);
 void fn_80091870(void);
 void fn_80093AD4(void);
 void fn_80093D14(void);
-void fn_80093D3C(void);
-void fn_800940FC(void);
-void fn_80095364(void);
+void BS_vInit(void);
+void BS_vClose(void);
+void TI_vCloseModule(void);
 void fn_80095550(void);
 void CameraTuning_Init(void);
 void fn_80097E98(void);
@@ -200,7 +200,7 @@ void fn_80099344(f32 fFrameTime);
 void fn_80099BA0(void);
 void fn_8009A16C(void);
 u8   fn_8009A180(void);
-void fn_8009A1F4(void);
+void DEMO_Restore(void);
 void GLW_vInitModule(int n);
 void GLW_vCloseModule(void);
 void GLW_vUpdateGlows(int nView);
@@ -255,7 +255,7 @@ void fn_800E2F14(void);
 void fn_800E5314(void);
 s32  fn_800FD6A4(int nPlayer);
 void fn_801020BC(void);
-void fn_801037F8(void);
+void FE_CrAP_InitModule(void);
 void fn_80103A64(void);
 void fn_8010A448(int nSize);
 void fn_8010A4E8(void);
@@ -280,7 +280,7 @@ void fn_801250C0(void);
 void fn_80124C10(void);
 void AI_TargetsInit(void);
 void BreakLine_Update(int nView);
-void FE_UpdateMovieQueue(void);
+void FE_movieFade(void);
 void fn_800DFC18(void);
 void GM_Update(void);
 void GR_vInit(void);
@@ -290,7 +290,7 @@ void Players_Reset(void);
 void Players_SetupAll(void);
 void fn_80037DD8(void);
 void PsBallFx_InitModule(void);
-void SH_vSetShadowIntensity(int n);
+void fn_800B251C_ShadowInit(int n);
 void UI_Obj_InitModule(void);
 void UStream_CloseAll(void);
 void UStream_Init(void);
@@ -424,7 +424,7 @@ void fn_8006C770(void) {
 void fn_8006C7A8(void) {
     u32 uSeed;
 
-    fn_8006BF4C();
+    REPLAY_Init();
     fn_8000989C();
     fn_800B5C38();
     fn_800080D4();
@@ -434,14 +434,14 @@ void fn_8006C7A8(void) {
     fn_8000F060();
     fn_8006DC44();
     fn_80016198();
-    UFont_Init();
+    FO_vInitModule();
     fn_80015540();
     FB_vInitModule();
     fn_8007185C();
     VM_vInitModule();
     fn_800136F4();
     fn_800103C0();
-    fn_800952D8();
+    TI_vInitModule();
     fn_8001C37C();
     fn_8002F180();
     uSeed = Misc_CreateRandomSeed();
@@ -474,13 +474,13 @@ void fn_8006C854(void) {
     fn_80055F18();
     Misc_CloseModule();
     fn_8001C468();
-    fn_80095364();
+    TI_vCloseModule();
     fn_8001049C();
     fn_80013718();
     VM_vCloseModule();
     FB_vCloseModule();
     fn_80015620();
-    UFont_Shutdown();
+    FO_vCloseModule();
     fn_800162A0();
     fn_8006DC48();
     fn_8000F0E8();
@@ -531,7 +531,7 @@ void GO_vInitFE(void) {
     fn_80029FC8();
     fn_8009CC00();
     fn_800905A8();
-    fn_801037F8();
+    FE_CrAP_InitModule();
     fn_8010A448(0x18000);
     lbl_80281E60 = CA_spCreateCamera();
     CameraTuning_Init();
@@ -541,8 +541,8 @@ void GO_vInitFE(void) {
     lbl_80281E58 = VM_spCreateViewport();
     lbl_80281E54 = fn_8001371C(lbl_80281E60, lbl_80281E5C, lbl_80281E58);
     fn_80013D5C(lbl_80281E54);
-    fn_80095504(2);
-    fn_800953C8(2);
+    TI_vResetCounter(2);
+    TI_vStartCounter(2);
     fn_800A7A34(0, 0, 1, 0);
     fn_8000B884();
     fn_80124B54();
@@ -573,14 +573,14 @@ void fn_8006CB2C(void) {
     fn_80077428();
     VM_vReleaseViewport(lbl_80281E58);
     FB_vReleaseFrameBuffer(lbl_80281E5C);
-    CA_vDestroyCamera(lbl_80281E60);
+    CA_vReleaseCamera(lbl_80281E60);
     fn_80062E20();
     fn_8003A074();
     fn_80097E98();
     fn_8001C350();
     fn_8001C518();
     Players_Reset();
-    fn_80095444(2);
+    TI_sStopCounter(2);
     fn_80103A64();
     fn_8010A4E8();
     fn_80090664();
@@ -603,7 +603,7 @@ void GO_vInitIG(void) {
     fn_8006DCA8(256, 224, 2, 4);
     fn_80029FC8();
     fn_8010A448(0x6000);
-    SH_vSetShadowIntensity(0);
+    fn_800B251C_ShadowInit(0);
     fn_800905A8();
     Session_SetupProfiles();
     fn_8001C254();
@@ -625,7 +625,7 @@ void GO_vInitIG(void) {
     CameraTuning_Init();
     fn_80062E00();
     fn_80039FF8();
-    fn_80064E2C();
+    StaticCam_Init();
     fn_800B34F0();
     fn_80048DD0();
     fn_8006DCA0(0);
@@ -652,18 +652,18 @@ void GO_vInitIG(void) {
     fn_800A2934();
     fn_80098A98();
     fn_8009CC00();
-    fn_80093D3C();
+    BS_vInit();
     GR_vInit();
     fn_8006F4B4();
     fn_8009005C("ingame");
     fn_8006DC20(1.0f);
     Swing_Init();
-    fn_8006BED4();
+    REPLAY_InitModule();
     fn_800DAE44();
     PsBallFx_InitModule();
     fn_8011E170();
-    fn_80095504(1);
-    fn_800953C8(1);
+    TI_vResetCounter(1);
+    TI_vStartCounter(1);
     if (gSession.nC == 3) {
         fn_800E0B38(5);
         fn_800EAF7C();
@@ -681,20 +681,20 @@ void fn_8006CDC4(void) {
     fn_800137B0(lbl_80281E54);
     VM_vReleaseViewport(lbl_80281E58);
     FB_vReleaseFrameBuffer(lbl_80281E5C);
-    CA_vDestroyCamera(lbl_80281E60);
+    CA_vReleaseCamera(lbl_80281E60);
     fn_80091870();
     fn_8011E3B0();
     fn_800A2E14();
     fn_80093D14();
     fn_800C8108();
-    if (fn_80095430(1)) {
-        fn_80095444(1);
+    if (TI_bCounterIsRunning(1)) {
+        TI_sStopCounter(1);
     }
     fn_8006765C();
     fn_8006DCA4(0);
     Players_Reset();
     fn_8009B898();
-    fn_800940FC();
+    BS_vClose();
     fn_8009CC88();
     if (gSession.nSplitScreen) {
         fn_80016E3C(0);
@@ -711,7 +711,7 @@ void fn_8006CDC4(void) {
     GLW_vCloseModule();
     fn_8006DD84();
     fn_800B2734();
-    fn_8006BF20();
+    REPLAY_CloseModule();
     fn_80058DB4();
     fn_80090664();
     fn_8001C2B4();
@@ -720,7 +720,7 @@ void fn_8006CDC4(void) {
     fn_800B352C();
     fn_80062E20();
     fn_8003A074();
-    fn_80064E74();
+    StaticCam_DeInit();
     fn_80097E98();
     fn_800DCC30();
     fn_8006F64C();
@@ -730,7 +730,7 @@ void fn_8006CDC4(void) {
     fn_8002A020();
     fn_8006DD44();
     fn_8006C854();
-    fn_8009A1F4();
+    DEMO_Restore();
 }
 
 // Starts the start-up screens (game type 1).
@@ -1023,22 +1023,22 @@ void fn_8006D838(void) {
     fn_8009069C();
     fn_8008FD60(1);
     fn_800382E0();
-    FE_UpdateMovieQueue();
+    FE_movieFade();
     fn_8006DE28();
     fn_8006DDA8();
     fn_801242D0();
 }
 
 // The main loop, until fn_8006D01C says stop. Each frame's time is taken from watch 1
-// (fn_800954A4), at most four frames (a bad reading counts as four); outside start-up it counts
+// (TI_sReadCounter), at most four frames (a bad reading counts as four); outside start-up it counts
 // the frames and sends event 0x1A once a second; then it runs the game type's frame.
 void fn_8006D8E8(void) {
-    u64 uLast = fn_800954A4(1);
+    u64 uLast = TI_sReadCounter(1);
     u64 uNow;
     f32 fTime;
     f64 dTime;
 
-    fn_800954A4(0);
+    TI_sReadCounter(0);
     while (!fn_8006D01C()) {
         fn_80110390();
         fn_800B7490();
@@ -1047,14 +1047,14 @@ void fn_8006D8E8(void) {
         }
         fn_8006C69C();
         fn_80006EDC();
-        uNow = fn_800954A4(1);
+        uNow = TI_sReadCounter(1);
         // fake match: the double step gives the original's frsp (EA's gomainloop.c saw a double
         // return; every other file saw the float fn_8006E118 returns).
         fTime = dTime = gSession.fFrameTime = fn_8006E118(uNow, uLast);
         if (fTime > 4.0f * FRAME_TIME || fTime < 0.0f) {
             gSession.fFrameTime = 4.0f * FRAME_TIME;
         }
-        fn_800954A4(0);
+        TI_sReadCounter(0);
         fn_80013400();
         if (gSession.nGameType == 6) {
             fn_800DFC18();
@@ -1108,7 +1108,7 @@ void fn_8006D8E8(void) {
         case 6:
             fn_8006D27C();
             fn_800BB0E8();
-            fn_8006795C();
+            SitDev_ProcessEventQueue();
             break;
         case 1:
             fn_8006D7E8();

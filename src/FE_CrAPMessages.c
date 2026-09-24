@@ -86,7 +86,7 @@ void fn_8010799C(MsgArg* pArgs, MsgArg* pResult) {
     if (pChar == NULL) {
         return;
     }
-    fn_8010E4DC(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, pChoices->a9B4,
+    CharSlider_UpdateCharacterBasedOnSliderValues(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, pChoices->a9B4,
                 &pChar->node3E0);
     FE_CrAP_TurnOnPart(18, 0, n);
 }
@@ -248,10 +248,10 @@ void fn_80107DBC(MsgArg* pArgs, MsgArg* pResult) {
         *(s32*)pArgs[5].p = 0;
         *(s32*)pArgs[6].p = 0;
     } else {
-        *(s32*)pArgs[3].p = fn_80105404(nPart, b, i);
-        *(s32*)pArgs[4].p = fn_80105428(nPart, b, i);
-        *(s32*)pArgs[5].p = fn_8010544C(nPart, b, i);
-        *(s32*)pArgs[6].p = fn_80105470(nPart, b, i);
+        *(s32*)pArgs[3].p = FE_CrAP_GetPartAttributeUpgrade1(nPart, b, i);
+        *(s32*)pArgs[4].p = FE_CrAP_GetPartAttributeModifier1(nPart, b, i);
+        *(s32*)pArgs[5].p = FE_CrAP_GetPartAttributeUpgrade2(nPart, b, i);
+        *(s32*)pArgs[6].p = FE_CrAP_GetPartAttributeModifier2(nPart, b, i);
     }
 }
 
@@ -270,8 +270,8 @@ void fn_80107EB0(MsgArg* pArgs, MsgArg* pResult) {
     } else {
         *(s32*)pArgs[3].p = fn_80105368(nPart, b, i);
         *(s32*)pArgs[4].p = fn_8010539C(nPart, b, i);
-        *(s32*)pArgs[5].p = fn_80105574(nPart, b, i);
-        *(s32*)pArgs[6].p = fn_801055A8(nPart, b, i);
+        *(s32*)pArgs[5].p = FE_CrAP_GetPartGMLockID(nPart, b, i);
+        *(s32*)pArgs[6].p = FE_CrAP_GetPartGMLockVal(nPart, b, i);
     }
 }
 
@@ -326,7 +326,7 @@ void fn_80108070(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80108140(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_801049C8(pArgs[0].i);
+    pResult->i = FE_CrAP_GetNumberOfSubcategoryIndicesForCategory(pArgs[0].i);
 }
 
 // ---- end of sweep code ----
@@ -449,7 +449,7 @@ void fn_801084F4(MsgArg* pArgs, MsgArg* pResult) {
     int b = pArgs[1].i;
     int i = pArgs[2].i;
 
-    fn_80104AF4(nPart, b);
+    FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(nPart, b);
     if (nPart == 13) {
         fn_80105B4C(nPart, b, i, szName);
         pResult->i = fn_800587A8(pProfile, b, szName);
@@ -821,11 +821,11 @@ void fn_80109304(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80109354(MsgArg* pArgs, MsgArg* pResult) {
-    fn_80104DB8(pArgs[0].i, pArgs[1].i, ((MsgString*)pArgs[2].p)->pStr);
+    FE_CrAP_GetSubCategoryNameForCategoryAndSubcategoryIndex(pArgs[0].i, pArgs[1].i, ((MsgString*)pArgs[2].p)->pStr);
 }
 
 void fn_80109388(MsgArg* pArgs, MsgArg* pResult) {
-    fn_8010645C(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
+    FE_CrAP_GetColorNameFromID(pArgs[0].i, ((MsgString*)pArgs[1].p)->pStr);
 }
 
 // ---- end of sweep code ----
@@ -1118,7 +1118,7 @@ void fn_80109DE0(MsgArg* pArgs, MsgArg* pResult) {
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_80109EAC(MsgArg* pArgs, MsgArg* pResult) {
-    fn_801072CC(pArgs[0].i, pArgs[3].p, pArgs[2].p, pArgs[4].p, pArgs[1].p);
+    FE_CrAP_GetCategoryInfo(pArgs[0].i, pArgs[3].p, pArgs[2].p, pArgs[4].p, pArgs[1].p);
 }
 
 // ---- end of sweep code ----

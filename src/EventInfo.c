@@ -14,7 +14,7 @@
 #include "game/modes/rte.h"
 
 // Up to three reward names for a real-time event (nKind 0x11); how many there are.
-int  fn_80106F68(int nKind, s32 nId, char* szFirst, char* szSecond, char* szThird);
+int  FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(int nKind, s32 nId, char* szFirst, char* szSecond, char* szThird);
 void fn_800A73F0(s32 n);
 void fn_8011D658(int nLine, char* szLabel, char* szValue);
 
@@ -197,7 +197,7 @@ void fn_8011D878(int nLine, char* szLabel, char* szValue) {
     int nRewards;
 
     GameModeDriverRTE_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
-    nRewards = fn_80106F68(0x11, fn_800F120C(nId), szReward1, szReward2, szReward3);
+    nRewards = FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(0x11, fn_800F120C(nId), szReward1, szReward2, szReward3);
     fn_800907AC(fn_800F0F30(nId), szMoney);
     sprintf(szPurse, "$%s", szMoney);
     switch (nLine) {
@@ -255,7 +255,7 @@ void fn_8011DA44(int nLine, char* szLabel, char* szValue) {
 
     GameModeDriverRTE_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
     bComplete = GameModeDriverRTE_IsEventComplete(lbl_80281ED4->nSlot, nId);
-    nRewards = fn_80106F68(0x11, fn_800F120C(nId), szReward1, szReward2, szReward3);
+    nRewards = FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(0x11, fn_800F120C(nId), szReward1, szReward2, szReward3);
     fn_800907AC(fn_800F0F30(nId), szMoney);
     sprintf(szPurse, "$%s", szMoney);
     switch (nLine) {
@@ -315,7 +315,7 @@ void fn_8011DC30(int nLine, char* szLabel, char* szValue) {
     int nRewards;
 
     GameModeDriverRTE_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
-    nRewards = fn_80106F68(0x11, fn_800F120C(nId), szReward1, szReward2, szReward3);
+    nRewards = FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(0x11, fn_800F120C(nId), szReward1, szReward2, szReward3);
     fn_800907AC(fn_800F0F30(nId), szMoney);
     sprintf(szPurse, "$%s", szMoney);
     switch (nLine) {

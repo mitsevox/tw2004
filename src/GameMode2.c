@@ -25,8 +25,8 @@ void GameModeSkins_EndGame(void);
 s32  GameModeSkins_CurrentHoleNumberSkins(void);
 
 // Mode 2 starts: CPUs may concede, no mulligans, nothing carried over.
-void fn_800F80FC(void) {
-    gpGame->pfnInit = fn_800F80FC;
+void GameModeSkins_Init(void) {
+    gpGame->pfnInit = GameModeSkins_Init;
     gpGame->pfnSetupNextGolfer = GameModeSkins_SetupNextGolfer;
     gpGame->pfnGetHonors = GameModeSkins_GetHonors;
     gpGame->pfnHoleFinished = GameModeSkins_HoleFinished;

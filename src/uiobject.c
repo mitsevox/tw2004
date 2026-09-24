@@ -36,6 +36,7 @@ void fn_80035294(void);                 // GoTerrain.c
 // Set up the objects: their settings, lens, textures and one directional light.
 void UI_Obj_InitModule(void) {
     u64 uName;
+    int i;
 
     lbl_802820D0 = NULL;
     lbl_801F5B98[0].a28[0] = 1.35f;
@@ -45,26 +46,18 @@ void UI_Obj_InitModule(void) {
     fn_800AE380();
     lbl_802820CC = CA_spCreateCamera();
     CA_vInitCamera(lbl_802820CC);
-    lbl_801F5B98[0].a0[0] = -0.345f;
-    lbl_801F5B98[0].a0[1] = -0.23f;
-    lbl_801F5B98[0].a0[2] = -3.13f;
-    lbl_801F5B98[0].a0[3] = 0.0f;
-    lbl_801F5B98[0].a0[4] = 0.0f;
-    lbl_801F5B98[0].a0[5] = 0.0f;
-    lbl_801F5B98[0].a0[6] = 0.00168f;
-    lbl_801F5B98[0].a0[7] = 0.02f;
-    lbl_801F5B98[0].a0[8] = 0.02f;
-    lbl_801F5B98[0].a0[9] = 0.0f;
-    lbl_801F5B98[1].a0[0] = -0.345f;
-    lbl_801F5B98[1].a0[1] = -0.23f;
-    lbl_801F5B98[1].a0[2] = -3.13f;
-    lbl_801F5B98[1].a0[3] = 0.0f;
-    lbl_801F5B98[1].a0[4] = 0.0f;
-    lbl_801F5B98[1].a0[5] = 0.0f;
-    lbl_801F5B98[1].a0[6] = 0.00168f;
-    lbl_801F5B98[1].a0[7] = 0.02f;
-    lbl_801F5B98[1].a0[8] = 0.02f;
-    lbl_801F5B98[1].a0[9] = 0.0f;
+    for (i = 0; i < 2; i++) {
+        lbl_801F5B98[i].a0[0] = -0.345f;
+        lbl_801F5B98[i].a0[1] = -0.23f;
+        lbl_801F5B98[i].a0[2] = -3.13f;
+        lbl_801F5B98[i].a0[3] = 0.0f;
+        lbl_801F5B98[i].a0[4] = 0.0f;
+        lbl_801F5B98[i].a0[5] = 0.0f;
+        lbl_801F5B98[i].a0[6] = 0.00168f;
+        lbl_801F5B98[i].a0[7] = 0.02f;
+        lbl_801F5B98[i].a0[8] = 0.02f;
+        lbl_801F5B98[i].a0[9] = 0.0f;
+    }
     uName = fn_8000BEE4("toball");
     fn_800102DC(uName, &lbl_802820BC, &lbl_802820C8);
     uName = fn_8000BEE4("toball");
@@ -77,17 +70,17 @@ void UI_Obj_InitModule(void) {
     lbl_801F5B40.apLight[0]->u.dir.fC = 1.0f;
 }
 
-// Free the object, the lens and the lights.
+// Free the object, the camera and the lights.
 void fn_800AE338(void) {
     if (lbl_802820D0 != NULL) {
         fn_80048860(lbl_802820D0);
     }
     lbl_802820D0 = NULL;
-    CA_vDestroyCamera(lbl_802820CC);
+    CA_vReleaseCamera(lbl_802820CC);
     fn_8006E62C(&lbl_801F5B40);
 }
 
-// Make the object from its 'TEO ' model once that has streamed in.
+// Make the object from its 'TEO ' model (id 10003), unless it is made already.
 // port: a 'TEO ' object's UStreamObject.uUnk4 holds its model (see rcmp_mad_codec.c fn_800B9B48).
 void fn_800AE380(void) {
     if (lbl_802820D0 == NULL) {

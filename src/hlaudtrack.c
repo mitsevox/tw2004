@@ -8,7 +8,7 @@
 #include "core/audtrack.h"
 
 // Puts a track in the sorted list, before the first one of lower priority.
-void fn_800A9808(AudTrack* pTrack) {
+void InsertSortWorldPerf(AudTrack* pTrack) {
     AudTrack* pAt;
     UList* pList;
 
@@ -102,7 +102,7 @@ void Trk_Cycle(void) {
             } else if (!(lbl_8028207C & 0x40) ||
                        (pTmpl->data.pPlayList->n3 == 0 && pTrack->pSource->nSound != 8)) {
                 if (Trk_Tick(pTrack)) {
-                    fn_800AA34C(pTrack);
+                    Trk_Render(pTrack);
                 } else {
                     Trk_FreePerf(pTrack);
                 }
@@ -117,7 +117,7 @@ void Trk_Cycle(void) {
 // Allocates a track for channel nChannel of a source. When the pool is empty, a sorted source
 // steals the lowest-priority sorted track below fPriority that is not streamed or unstarted; an
 // unsorted source takes the last sorted track.
-AudTrack* fn_800A9BC8(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 fPriority) {
+AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 fPriority) {
     UPool* const pPool = &lbl_80282098;
     s32 bSorted;
     UList* pList;
@@ -160,7 +160,7 @@ AudTrack* fn_800A9BC8(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 
     if (bSorted == 0) {
         fn_800ADEC8(pList, &pTrack->link);
     } else {
-        fn_800A9808(pTrack);
+        InsertSortWorldPerf(pTrack);
     }
     if (!(pTmpl->n0 & 8)) {
         fn_800AADE8(pTrack);
@@ -246,7 +246,7 @@ void Trk_UpdatePerf(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u
     if (bStart) {
         bResort = 0;
         if (pTrack == NULL) {
-            pTrack = fn_800A9BC8(pSource, pTmpl, nChannel, fPriority);
+            pTrack = Trk_AllocPerf(pSource, pTmpl, nChannel, fPriority);
         }
         if (pTrack != NULL) {
             Trk_Start(pTrack);
@@ -259,7 +259,7 @@ void Trk_UpdatePerf(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u
     if (bResort && pTrack->bits.b.bSorted == 1) {
         pTrack->f48 = fPriority;
         fn_800ADF6C(&lbl_801F1868[1], &pTrack->link);
-        fn_800A9808(pTrack);
+        InsertSortWorldPerf(pTrack);
     }
 }
 
@@ -288,11 +288,11 @@ void Trk_Stop(AudTrack* pTrack) {
         fn_800AAEEC(pTrack);
         return;
     }
-    fn_800ABD7C(pTrack);
+    Stm_Stop(pTrack);
 }
 
 // Stops a track's voices: at once (bNow == 1), or by letting them end, in which case the track
-// stays in state 3 until the last one calls back (fn_800AA400).
+// stays in state 3 until the last one calls back (Trk_VoiceEndCB).
 void Trk_StopAllVoices(AudTrack* pTrack, int bNow) {
     AudVoice** ppVoice;
     AudVoice** ppEnd;
@@ -333,20 +333,20 @@ u8 Trk_Tick(AudTrack* pTrack) {
     return !(pTrack->pTmpl->n0 & 8) ? fn_800AAEFC(pTrack) : Stm_Tick(pTrack);
 }
 
-void fn_800AA2EC(AudTrack* pTrack, u8 n, u8 bCheck) {
+void Trk_Step(AudTrack* pTrack, u8 n, u8 bCheck) {
     fn_800AB118(pTrack, n, bCheck);
 }
 
-void fn_800AA30C(AudTrack* pTrack, u8 n) {
+void Trk_SelectVariation(AudTrack* pTrack, u8 n) {
     fn_800AA444(pTrack, n);
 }
 
-void fn_800AA32C(AudTrack* pTrack, u8 n) {
+void Trk_SetVariationRange(AudTrack* pTrack, u8 n) {
     fn_800AB14C(pTrack, n);
 }
 
 // Renders a track: its volume through its curve, then its pan and volume per voice.
-void fn_800AA34C(AudTrack* pTrack) {
+void Trk_Render(AudTrack* pTrack) {
     AudSource* pSource;
     AudPlayList* pList;
     f32 fCurve;
@@ -355,7 +355,7 @@ void fn_800AA34C(AudTrack* pTrack) {
     pSource = pTrack->pSource;
     pList = pTrack->pTmpl->data.pPlayList;
     if (pList == NULL) return;
-    fCurve = fn_800AA44C(pList->n3);
+    fCurve = Mas_GetSubmix(pList->n3);
     fVolume = fn_800A85FC(pTrack->f44, fCurve);
     if (pTrack->bits.b.bSorted == 1) {
         fn_800A9590(pSource, pTrack, fVolume);
@@ -371,7 +371,7 @@ void fn_800AA3D4(AudTrackTmpl* pTmpl) {
 }
 
 // A voice's end callback: it leaves its track, and a stopping track with no voices left is stopped.
-void fn_800AA400(AudVoice* pVoice, int nReason) {
+void Trk_VoiceEndCB(AudVoice* pVoice, int nReason) {
     AudTrack* pTrack;
 
     pTrack = pVoice->pUser;
@@ -386,13 +386,13 @@ void fn_800AA444(AudTrack* pTrack, u8 n) {
 }
 
 // Curve nCurve's volume (lbl_801F17D0), 0 while its bit in lbl_80282060 is set (muted).
-f32 fn_800AA44C(u8 nCurve) {
-    if (fn_800AA498(nCurve)) {
+f32 Mas_GetSubmix(u8 nCurve) {
+    if (Mas_IsChanMuted(nCurve)) {
         return 0.0f;
     }
     return lbl_801F17D0[nCurve];
 }
 
-u8 fn_800AA498(u8 nCurve) {
+u8 Mas_IsChanMuted(u8 nCurve) {
     return (lbl_80282060 & (1 << nCurve)) != 0;
 }

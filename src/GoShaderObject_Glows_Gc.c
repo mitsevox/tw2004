@@ -1,5 +1,6 @@
-// GoShaderObject_Glows_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree): not yet
-// decompiled; the sweep code below is the matched small functions.
+// GoShaderObject_Glows_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree): the
+// glows' shapes (a display list per ring or star, built when the module starts) and the drawing
+// of the queued glows through the glow mesh object.
 
 #include "glows.h"
 #include "gx.h"
@@ -13,7 +14,7 @@ void fn_80012520(u32 ePrim, u32 eFormat, u16 nVerts);  // LLFont.c: GXBegin
 void fn_80070168(void);                                 // calls a display list (see fn_80098408)
 
 // Starts glow nGlow's display list, with room for nVerts vertices of 32 bytes and 1 KB more.
-GlowList* fn_80097F44(int nGlow, int nVerts) {
+GlowList* _StartGlowStrip(int nGlow, int nVerts) {
     u32 uSize;
     void* pList;
 
@@ -32,7 +33,7 @@ GlowList* fn_80097F44(int nGlow, int nVerts) {
 }
 
 // Ends pList's display list and keeps a copy of just its size.
-void fn_80098004(GlowList* pList) {
+void _EndGlowStrip(GlowList* pList) {
     void* pCopy;
     u32 uSize;
 
@@ -48,7 +49,7 @@ void fn_80098004(GlowList* pList) {
 
 // Glow nGlow as a ring of nSides sides around the unit circle: a strip with two vertices at each
 // point (fn_80097EC4), starting and ending at (1, 0, 0).
-void fn_8009809C(int nGlow, int nSides) {
+void _CreateRing(int nGlow, int nSides) {
     int nVerts;
     GlowList* pList;
     int i;
@@ -57,7 +58,7 @@ void fn_8009809C(int nGlow, int nSides) {
     f32 vStart[4];
 
     nVerts = (nSides + 1) * 2;
-    pList = fn_80097F44(nGlow, nVerts);
+    pList = _StartGlowStrip(nGlow, nVerts);
     fn_80012520(0x98, 4, nVerts);
     vStart[0] = 1.0f;
     vStart[1] = 0.0f;
@@ -72,7 +73,7 @@ void fn_8009809C(int nGlow, int nSides) {
     }
     fn_80097EC4(vStart);
     fn_800124A8();
-    fn_80098004(pList);
+    _EndGlowStrip(pList);
 }
 
 // Glow nGlow as nPoints four-pointed stars, each turned a further pi / nPoints: a strip per star
@@ -86,7 +87,7 @@ void fn_800981D0(int nGlow, int nPoints) {
     f32 fBase;
     f32 v[4];                                   // the fourth is not used
 
-    pList = fn_80097F44(nGlow, nPoints * 14);
+    pList = _StartGlowStrip(nGlow, nPoints * 14);
     for (i = 0; i < nPoints; i++) {
         fBase = PI / (f32)nPoints * (f32)i + PI / 2.0f;
         fn_80012520(0x98, 4, 10);
@@ -106,7 +107,7 @@ void fn_800981D0(int nGlow, int nPoints) {
         } while (j <= 4);
         fn_800124A8();
     }
-    fn_80098004(pList);
+    _EndGlowStrip(pList);
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -114,15 +115,15 @@ void fn_800981D0(int nGlow, int nPoints) {
 void fn_80098350(void);
 
 void fn_80098350(void) {
-    fn_8009809C(8, 3);
-    fn_8009809C(9, 4);
-    fn_8009809C(10, 5);
-    fn_8009809C(11, 6);
-    fn_8009809C(12, 8);
-    fn_8009809C(0, 10);
-    fn_8009809C(1, 16);
-    fn_8009809C(2, 24);
-    fn_8009809C(3, 32);
+    _CreateRing(8, 3);
+    _CreateRing(9, 4);
+    _CreateRing(10, 5);
+    _CreateRing(11, 6);
+    _CreateRing(12, 8);
+    _CreateRing(0, 10);
+    _CreateRing(1, 16);
+    _CreateRing(2, 24);
+    _CreateRing(3, 32);
     fn_800981D0(4, 1);
     fn_800981D0(5, 2);
     fn_800981D0(6, 3);
@@ -236,7 +237,7 @@ void fn_800985FC(GlowQueue* pQueue, f32 (*pMtx)[4], int bOnTop) {
     }
 }
 
-void fn_80098740(void) {
+void GlowsRenderData_InitModule(void) {
     s32 i;
     lbl_801D99D0.nCount = 0;
     for (i = 0; i < NUM_GLOWS; i++) {
@@ -246,7 +247,7 @@ void fn_80098740(void) {
 }
 
 // Free the glows' data. The pointers are left as they were.
-void fn_800987D4(void) {
+void GlowsRenderData_CloseModule(void) {
     int i;
     for (i = 0; i < NUM_GLOWS; i++) {
         if (lbl_801D99D0.a[i].p4 != NULL) {
@@ -268,8 +269,8 @@ void fn_800988CC(s32 p0);
 extern u8 lbl_801D9A40[];
 void fn_80036054();
 void fn_800360A0();
-void fn_800988D8(void);
-void fn_80098910(void);
+void ColGlow_InitModule(void);
+void ColGlow_CloseModule(void);
 
 void fn_80098844(void) {
 }
@@ -304,12 +305,12 @@ void fn_800988CC(s32 p0) {
     *(volatile u8*)0xCC008000 = p0;
 }
 
-void fn_800988D8(void) {
+void ColGlow_InitModule(void) {
     fn_80036054(lbl_801D9A40, 11, 0);
     lbl_80281F80 = NULL;
 }
 
-void fn_80098910(void) {
+void ColGlow_CloseModule(void) {
     fn_800360A0(lbl_801D9A40);
 }
 
@@ -320,7 +321,7 @@ void fn_800360D4(u8* pMesh);
 
 // Draws the queued glows through the glow mesh in two passes, with the lens's matrices, then puts
 // the camera's identity view matrix back.
-void fn_80098938(void) {
+void ColGlow_RenderAllGlowInCurrentList(void) {
     GlowDrawDesc desc;
     void* pCamera = fn_8001614C();
     CamLens* pLens = fn_80008370(pCamera);

@@ -68,7 +68,7 @@ void GameEffects_ResetGameEffectSettings(void) {
     lbl_80202898.b19 = 0;
     lbl_80202898.b4A = 0;
     for (i = 0; i < gSession.nNumPlayers; i++) {
-        if (Controller_IsPad(gSession.nController[i])) {
+        if (fn_8002E898_IsPad(gSession.nController[i])) {
             fn_800131C4(gSession.nController[i]);
         }
     }
@@ -259,7 +259,7 @@ void fn_800DB714(int nPlayer) {
         }
         nLie = gPlayers[nPlayer].ball.nLie;
         fDist = AI_MaxDistance(nPlayer, gPlayers[nPlayer].nShotKind, gPlayers[nPlayer].nClub);
-        fDist *= fn_800510EC(&gPlayers[nPlayer].ball);
+        fDist *= Physics_GetLiePowerPercentage(&gPlayers[nPlayer].ball);
         fDist *= fn_8005B64C(nPlayer);
         fn_80045494(0, nPlayer);
         fn_80045558(0, nPlayer);
@@ -293,7 +293,7 @@ int fn_800DB86C(int nPlayer) {
     }
     nPar = fn_800D2B08();
     nStrokes = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1;
-    pSurface = fn_800CC190(pCourse, gPlayers[nPlayer].vTarget2);
+    pSurface = Ter_GetSupportingGroundMaterial(pCourse, gPlayers[nPlayer].vTarget2);
     fDist = fn_800D0478(nPlayer);
     if (!pSurface) {
         return 0;
@@ -635,7 +635,7 @@ void fn_800DC664(int nPlayer) {
     if (lbl_80202898.bRumble) {
         if (++lbl_80202898.nRumbleFrames == 5) {
             lbl_80202898.bRumble = 0;
-            if (Controller_IsPad(nController)) {
+            if (fn_8002E898_IsPad(nController)) {
                 fn_80013130(nController, 0);
             }
         }
@@ -649,7 +649,7 @@ void fn_800DC6E8(int nPlayer) {
         lbl_80202898.nHeartbeats++;
         nController = gPlayers[nPlayer].nController;
         if (!lbl_80202898.bRumble) {
-            if (Controller_IsPad(nController)) {
+            if (fn_8002E898_IsPad(nController)) {
                 fn_80013130(nController, 0xFF);
             }
             lbl_80202898.bRumble = 1;

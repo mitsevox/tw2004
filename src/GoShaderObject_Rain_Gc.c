@@ -1,5 +1,5 @@
 // GoShaderObject_Rain_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): the
-// rain shader object. Partly decompiled.
+// rain shader object: falling streaks drawn around the camera and splashes on the ground.
 
 #include "game_types.h"
 #include "engine.h"
@@ -314,7 +314,7 @@ void fn_800B52D4(RainObject* pRain, f32* pTime) {
         vCenter.x = (20.0f * Misc_RandFuncf(1) + pLens->m4[3][0]) - 10.0f;
         vCenter.y = pLens->m4[3][1];
         vCenter.z = (20.0f * Misc_RandFuncf(1) + pLens->m4[3][2]) - 10.0f;
-        vCenter.y = 0.1f + fn_8004D5C0(fn_8000C594(), &vCenter.x);
+        vCenter.y = 0.1f + Ter_GetHighestGroundHeight(fn_8000C594(), &vCenter.x);
         Ter_GetSupportingGroundNormal(fn_8000C594(), &vCenter.x, &vPos.x);
         fn_800B5918(&vCenter.x, pSplash->av[0]);
         pSplash->av[1][0] = pSplash->av[0][0] + fSize;

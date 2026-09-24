@@ -51,7 +51,7 @@ void Luck_TightenOdds(void);
 void fn_8009554C(void);
 void fn_8001A73C(void);
 u8   fn_8009A1EC(void);
-void fn_80099ED8(void);
+void DEMO_Start(void);
 void fn_800070DC(void);                     // LLDisp_Gc.c
 void fn_800072E8(void);
 u8   fn_80007320(void);
@@ -189,7 +189,7 @@ void fn_800083A4(void) {
                 gSession.nGameType = 12;
             }
             if ((gSession.uFlags & 0x4000) && fn_8009A1EC()) {
-                fn_80099ED8();
+                DEMO_Start();
                 gSession.nGameType = 4;
             }
             break;

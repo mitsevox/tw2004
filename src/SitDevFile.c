@@ -221,7 +221,7 @@ void fn_800BB52C(void) {
         pDst = lbl_80282208->p20;
         // EA bug: the byte count and the value width are swapped, and the address of pDst is
         // passed for pDst (the call is shaped like fn_8001F08C's)
-        fn_80076158((u8**)&pSrc, (u8*)&pDst, 4, lbl_80282208->n0C * 4);
+        BYTESWAP_SWAPDATA((u8**)&pSrc, (u8*)&pDst, 4, lbl_80282208->n0C * 4);
     }
     for (i = 0; i < lbl_80282208->nEntries; i++) {
         pEntry = &lbl_80282208->p14[i];
@@ -427,7 +427,7 @@ void FE_GolferAttributes(int nPlayer, u8 nKind) {
         fn_80067B1C(pValues, 41, fn_800D0FBC(nPlayer), pSetBits);
         fn_80067B1C(pValues, 42, fn_800D1170(nPlayer, 0), pSetBits);
         fn_80067B1C(pValues, 6, pPlayer->pChar->nSlot, pSetBits);
-        fn_80067B1C(pValues, 13, Controller_IsNotCPU(pPlayer->nController), pSetBits);
+        fn_80067B1C(pValues, 13, fn_8002E8E4(pPlayer->nController), pSetBits);
         fn_80067B1C(pValues, 84, gSession.nGolfer[nPlayer] >= 30, pSetBits);
         fn_80067B1C(pValues, 61, gSession.nGolfer[nPlayer], pSetBits);
         if (gSession.nNumPlayers == 2) {
@@ -536,7 +536,7 @@ void FE_GolferAttributes(int nPlayer, u8 nKind) {
         nValue = fn_800D0514(nPlayer);
         fn_800BCA60(&nValue, nBeforeSurface, pBefore, pPlayer);
         fn_80067B1C(pValues, 27, nValue, pSetBits);
-        // the lie, in percent (fn_800510EC inlined)
+        // the lie, in percent (Physics_GetLiePowerPercentage inlined)
         nValue = SurfaceType_IsValid(pBall->nStartSurface) ?
                  (u32)(100.0f * (pBall->f70 + gSurfaceTypes[pBall->nStartSurface].f00)) : 100;
         fn_80067B1C(pValues, 58, nValue, pSetBits);
@@ -844,7 +844,7 @@ void fn_800BD580(SitDevEntry8* pDo, int nPlayer, u8 nEvent) {
         }
         break;
     case 4:
-        if (Player_IsNotCPU(nPlayer)) {
+        if (fn_8002E8B4(nPlayer)) {
             if (pDo->n4 == 0) {
                 fn_800DBA50(nPlayer);
             } else {

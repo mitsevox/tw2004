@@ -15,7 +15,7 @@
 // Copy nBytes from *ppSrc to pDst as values nWidth bytes wide (2, 4 or 8), reversing each value's
 // bytes, and move *ppSrc past them; a negative nWidth copies without swapping (ByteSwap.c). For
 // the files that are little-endian on disc.
-void fn_80076158(u8** ppSrc, u8* pDst, int nBytes, int nWidth);
+void BYTESWAP_SWAPDATA(u8** ppSrc, u8* pDst, int nBytes, int nWidth);
 
 // One field of a byte-swap description: nBytes bytes made of nSize-byte values (negative: not
 // swapped).

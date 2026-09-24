@@ -37,7 +37,8 @@ void* AnimLib_FindByName(AnimLib* pLib, const char* pName) {
 }
 
 // Sets everything up: no libraries or banks, the last-played table allocated and cleared, and the
-// four 32-aligned staging buffers used when overlay clips are merged in.
+// four 32-aligned staging buffers for clip data going to and from ARAM (overlay clips merged in,
+// frames and keys fetched back).
 void Skalib_Init(void) {
     int i;
     s32 j;
@@ -279,8 +280,8 @@ int AnimLib_MergeSizeCb(AnimLib* pLibA, AnimLib* pLib, AnimLeaf* pLeaf, AnimLeaf
     return 0;
 }
 
-// Merge walk, release pass: every clip of a replaced leaf loses a user; the ones nobody uses any
-// more come off the totals.
+// Merge walk, release pass: every clip of a leaf marked 2 (replaced by the overlay's, or picked by
+// fn_800C9828) loses a user; the ones nobody uses any more come off the totals.
 int AnimLib_MergeReleaseCb(AnimLib* pLibA, AnimLib* pLibB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx,
                            int nLevel, int nIndex) {
     ClipRecord* pRec;
@@ -381,8 +382,9 @@ void Skalib_SetBudgets(void) {
 
 f32 Skalib_Random(void);
 
-// Merge walk, trim pass: cuts each leaf down to the clip limit (none for a leaf being replaced,
-// all of them for the ones fn_800C9828 protects), keeping a run of clips at a random start.
+// Merge walk, trim pass: cuts both leaves down to the clip limit (none when the library's leaf
+// is marked 2, all of them for the ones fn_800C9828 protects), keeping a run of clips at a random
+// start.
 int AnimLib_TrimCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx, int nLevel,
                    int nIndex) {
     s32         nKeep;
@@ -450,15 +452,17 @@ f32 Skalib_Random(void) {
     return Misc_RandFuncf(1);
 }
 
-// A clip that can still be kept: not moved (2, 0x10), not kept already (1), and used by
-// between 1 and nMaxUsers leaves.
+// A clip that can still be marked for dropping: not moved (2, 0x10), not marked already (1), and
+// used by between 1 and nMaxUsers leaves.
 #define SKA_KEEPABLE(pRec, pCtx) \
     (!((pRec)->n12 & 2) && !((pRec)->n12 & 0x10) && !((pRec)->n12 & 1) && (pRec)->n10 > 0 && \
      (pRec)->n10 <= (pCtx)->nMaxUsers)
 
-// Merge walk, keep pass: marks nCount - nKeep more clips of each leaf to keep, picked at random
-// (the next keepable one from a random start, looking forward, then back).
-int AnimLib_KeepRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx,
+// Merge walk, mark pass: marks nCount - nKeep clips of the leaf (1) for AnimLib_DropCb to drop,
+// picked at random (the next markable one from a random start, looking forward, then back; while
+// fn_80100294, names fn_80101E34 accepts are skipped but counted), then again through moved
+// records.
+int fn_80022EC8_MarkDropRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx,
                          int nLevel, int nIndex) {
     AnimLeaf*   pLeaf;
     AnimLib*    pLib;
@@ -548,8 +552,9 @@ int AnimLib_KeepRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* p
     return 0;
 }
 
-// Merge walk, keep pass: marks nCount - nKeep more clips of each leaf to keep, highest n18 first.
-int AnimLib_KeepBestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx,
+// Merge walk, mark pass: marks nCount - nKeep clips of the leaf (1) for AnimLib_DropCb to drop,
+// highest n18 first, as fn_80022EC8_MarkDropRandomCb does at random.
+int fn_800231E8_MarkDropHighestCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, MergeCtx* pCtx,
                        int nLevel, int nIndex) {
     int         i;
     int         nMarked;
@@ -711,7 +716,8 @@ void* AnimLib_ResolveRecord(AnimLib* pLib, int nRec, ClipRecord* pOut, u8 bLink)
 
 // Merge walk, build pass: writes the merged tree into pCtx->pLib (a node for each group, style
 // and club, a leaf wherever either side has one) and copies the clips of each leaf: from the one
-// side that has it, or from both when the overlay's clips are added to the library's.
+// side that has it, from the overlay when its leaf replaces the library's, or from both (the
+// library's, then the overlay's). Group 20 takes only the library's.
 int AnimLib_BuildCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB, BuildCtx* pCtx, int nLevel,
                     int nIndex) {
     AnimLib*    pLib    = pCtx->pLib;
@@ -886,9 +892,9 @@ int Skalib_HasOverlays(int nSlot) {
 }
 
 // Cuts a library and its overlays down until their clips fit pCtx->nTarget: rounds of lowering
-// the per-leaf limit, marking clips to keep (by n18, or at random), and dropping the rest from
-// leaves longer than lbl_80281070 (3 down to 1). First the overlays are trimmed, then the
-// library itself. TRUE when the target was reached.
+// the per-leaf limit, marking the surplus clips to drop (highest n18 first, or at random), and
+// dropping the marked ones from leaves longer than lbl_80281070 (3 down to 1). First the overlays'
+// clips are marked, then the library's. TRUE when the target was reached.
 u8 AnimLib_TrimToFit(MergeCtx* pCtx, AnimLib* pLib, LibOverlay* pOvs, int nOvs, u8 bBest) {
     int      nRet = 0;
     int      i;
@@ -907,9 +913,9 @@ u8 AnimLib_TrimToFit(MergeCtx* pCtx, AnimLib* pLib, LibOverlay* pOvs, int nOvs, 
             for (i = 0; i < nOvs; i++) {
                 pOvLib = pOvs[i].pWork;
                 if (bBest) {
-                    AnimLib_WalkPair(NULL, pOvLib, (AnimLibWalkFn)AnimLib_KeepBestCb, pCtx);
+                    AnimLib_WalkPair(NULL, pOvLib, (AnimLibWalkFn)fn_800231E8_MarkDropHighestCb, pCtx);
                 } else {
-                    AnimLib_WalkPair(NULL, pOvLib, (AnimLibWalkFn)AnimLib_KeepRandomCb, pCtx);
+                    AnimLib_WalkPair(NULL, pOvLib, (AnimLibWalkFn)fn_80022EC8_MarkDropRandomCb, pCtx);
                 }
             }
             nRet = AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)AnimLib_DropCb, pCtx);
@@ -930,9 +936,9 @@ u8 AnimLib_TrimToFit(MergeCtx* pCtx, AnimLib* pLib, LibOverlay* pOvs, int nOvs, 
         while (pCtx->nKeep > lbl_80281070) {
             pCtx->nKeep--;
             if (bBest) {
-                AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)AnimLib_KeepBestCb, pCtx);
+                AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)fn_800231E8_MarkDropHighestCb, pCtx);
             } else {
-                AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)AnimLib_KeepRandomCb, pCtx);
+                AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)fn_80022EC8_MarkDropRandomCb, pCtx);
             }
             nRet = AnimLib_WalkPair(pLib, NULL, (AnimLibWalkFn)AnimLib_DropCb, pCtx);
             if (nRet != 0) {
@@ -1526,8 +1532,8 @@ void AnimLib_FreeCopies(void) {
     }
 }
 
-// Re-applies a slot's active overlay libraries.
-void AnimLib_ApplyOverlays(int nSlot) {
+// Applies each active overlay's player's saved name lists to it (fn_800269E4).
+void fn_800253E0_ApplySavedChoices(int nSlot) {
     LibSlot*    pSlot = &lbl_801C6068[nSlot];
     LibOverlay* pOv;
     int         n     = pSlot->nOverlays;
@@ -1552,8 +1558,9 @@ void fn_80025478(void) {
     }
 }
 
-// Rebuilds the current slot's libraries from their pristine copies (they are swapped in place
-// when loaded, so a reload starts from the copy), first freeing the bank clips kept in ARAM.
+// Rebuilds the next slot's (Skalib_NextSlot) libraries from their pristine copies when it has
+// overlays (they are swapped in place when loaded, so a reload starts from the copy), first
+// freeing the bank clips kept in ARAM; then applies the saved name lists and plans the bank.
 void AnimLib_ReloadSlot(void) {
     u32         nSlot = Skalib_NextSlot();
     u32         i;
@@ -1583,14 +1590,15 @@ void AnimLib_ReloadSlot(void) {
             pOv->n10 = pOv->n14 + 3;
         }
     }
-    AnimLib_ApplyOverlays(nSlot);
+    fn_800253E0_ApplySavedChoices(nSlot);
     fn_800CA9DC(nSlot);
     AnimLib_PlanBank(nSlot);
 }
 
-// The clips for an animation group, style, club class and key: each level falls back to its
-// default (flag 1 when the group, style or club level did, flag 2 when only the key did), and
-// the library default is the last resort. Returns the leaf's clip pointers.
+// The clips for an animation group, style, club class and key: a missing style tries style 0
+// first; then each level falls back to its default (flag 1 when the group, style or club level
+// did, flag 2 when only the key did), and the library default is the last resort. Returns the
+// leaf's clip pointers.
 void** AnimLib_Find(AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, s32* pCount,
                     u32* pFlags, u32** ppUsed, s32* pFirst) {
     s16* pNode;
@@ -1683,9 +1691,10 @@ u8 AnimLib_WasLastPlayed(int nPlayer, const char* pName, char** ppSlot, int nGro
 int   AnimLib_RandomIndex(u32 uUsed, int nCount);
 void* fn_800CAA7C(int nPlayer, int nGroup, int nStyle, int nClub);
 
-// The clip a player plays for a group and style. A named clip (lessons) is looked up by name.
-// Otherwise one of the leaf's clips at random, never the reaction played last time, and - through
-// the leaf's played mask - none again until all of them have been played.
+// The clip a player plays for a group, style, club class and key: fn_800CAA7C's clip when
+// fn_800C9828 picks this position and there is one; a named clip by its name; otherwise one of the
+// leaf's clips at random, never the reaction played last time, and - through the leaf's played
+// mask - none again until all of them have been played.
 void* AnimLib_Pick(int nPlayer, AnimLib* pLib, int nGroup, int nStyle, int nClub, int nKey, u32* pFlags,
                    const char* pName) {
     s32    nCount;
@@ -1875,7 +1884,7 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
         pDst = pSrc = pLib->ppClips;
         // port: the library's clip numbers into its bank, little-endian on disc; a little-endian port does
         //       not swap here
-        fn_80076158((u8**)&pSrc, pDst, pLib->nClips * 4, 4);   // port: pSrc is a void* (fn_8001F08C's)
+        BYTESWAP_SWAPDATA((u8**)&pSrc, pDst, pLib->nClips * 4, 4);   // port: pSrc is a void* (fn_8001F08C's)
         if (pLib->uId != pBank->uId) {
             for (i = 0; i < pLib->nClips; i++) {
                 pLib->ppClips[i] = pBank->ppClips[0];
@@ -1899,7 +1908,7 @@ AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank) {
         pData += pLib->nTreeSize;
         pDst = pSrc = pLib->pIndex;
         // port: the library's clip index, little-endian on disc; a little-endian port does not swap here
-        fn_80076158((u8**)&pSrc, pDst, pLib->nClips * 2, 2);   // port: as above
+        BYTESWAP_SWAPDATA((u8**)&pSrc, pDst, pLib->nClips * 2, 2);   // port: as above
         pDst = pSrc = pLib->pRecords;
         // port: the library's clip records (ClipRecord, laid over the bytes), little-endian on disc; a
         //       little-endian port does not swap here
@@ -1954,7 +1963,7 @@ ClipBank* ClipBank_Load(u8* pFile, u32 uAlign) {
     pBank->ppClips = (void**)pData;
     pSrc = (u8*)pBank->ppClips;
     // port: the bank's clip offsets, little-endian on disc; a little-endian port does not swap here
-    fn_80076158(&pSrc, (u8*)pBank->ppClips, pBank->nClips * 4, 4);
+    BYTESWAP_SWAPDATA(&pSrc, (u8*)pBank->ppClips, pBank->nClips * 4, 4);
     pData += pBank->nClips * 4;
     uPad = 16 - ((uptr)pData & 15);
     if (uPad == 16) {
@@ -2031,8 +2040,8 @@ void ClipBank_Release(int nSlot) {
     }
 }
 
-// Copies a slot's bank file to ARAM and frees it; the first time, allocates the buffer it is
-// brought back into.
+// Copies a slot's bank file to ARAM and frees it; for slot 0, when there is none yet, allocates
+// the buffer banks are brought back into.
 void ClipBank_Stash(int nSlot) {
     if (lbl_801C6488[nSlot] != NULL) {
         lbl_801C647C[nSlot] = ((lbl_801C6488[nSlot]->uSize + 0x80) / 32 + 1) * 32;
@@ -2148,8 +2157,8 @@ void fn_80026844(LibOverlay* pOv, int nSlot, int nGroup, int nClub, int nStyle, 
     }
 }
 
-// Applies the created golfer's three name lists (SkinChoices.a1, a82 and sz103) of player n to
-// the overlay.
+// Applies player n's three saved name lists (gpSaveData[n].choices: a1, a82 and sz103) to the
+// overlay (fn_80026844).
 void fn_800269E4(LibOverlay* pOv, int nSlot, s32 n) {
     fn_80026844(pOv, nSlot, 5, 2, 7, -1, gpSaveData[n].choices.a1[0], gpSaveData[n].choices.n0);
     fn_80026844(pOv, nSlot, 5, 2, 1, -1, gpSaveData[n].choices.a82[0], gpSaveData[n].choices.n81);

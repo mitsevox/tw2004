@@ -118,7 +118,7 @@ typedef struct AudStream {
 typedef struct AudPlayList {
     u16  nStreams;              // 0x0
     u8   nId;                   // 0x2    the play list's number (bit 2 goes into the voice request)
-    u8   n3;                    // 0x3    its volume curve (fn_800AA44C)
+    u8   n3;                    // 0x3    its volume curve (Mas_GetSubmix)
     u16  n4;                    // 0x4    its sample rate
     u8   nChannels;             // 0x6    one voice each
     u8   nIndex;                // 0x7    its place in the stream file's list
@@ -298,7 +298,7 @@ typedef struct AudTrackSeq {
 typedef struct AudTrack {
     UListNode link;             // 0x0    in one of the two track lists (lbl_801F1868)
     AudTrackTmpl* pTmpl;        // 0x8
-    AudVoice* apVoices[8];      // 0xC    one per channel (fn_800A9BC8 clears 0x20 bytes)
+    AudVoice* apVoices[8];      // 0xC    one per channel (Trk_AllocPerf clears 0x20 bytes)
     struct AudSource* pSource;  // 0x2C   the sound source the track plays for
     AudVoiceParams params;      // 0x30   its flags are cleared when the track starts
     f32  f40;                  // 0x40   from its template
@@ -436,8 +436,8 @@ typedef struct AudBlock48 {
 
 extern AudSource* lbl_80282058;         // AudTable.c's table
 extern u8 lbl_80282068;                 // the number of listeners (hlaudmovie.c)
-extern f32 lbl_801F17D0[32];            // the volume of each curve (fn_800AA44C; hlaudmovie.c)
-extern s32 lbl_80282060;                // one bit per curve: 1 = flat (fn_800AA498; hlaudmovie.c)
+extern f32 lbl_801F17D0[32];            // the volume of each curve (Mas_GetSubmix; hlaudmovie.c)
+extern s32 lbl_80282060;                // one bit per curve: 1 = muted (Mas_IsChanMuted; hlaudmovie.c)
 extern f32 lbl_80281460;                // fn_800A86BC's rate, fn_800AB39C's result (hlaudmovie.c)
 extern s32 lbl_80282080;                // fn_800AB374 says whether it is 0 (hlaudmovie.c)
 extern AudStreamFile* lbl_80282070;     // the stream file's header (hlaudmovie.c)
@@ -493,12 +493,12 @@ extern u8 lbl_802820A8;                 // the last read id handed out (hlaudtra
 extern AudTrack* lbl_802820AC;          // the track whose block is being DMA'd (hlaudtrackstm.c)
 
 // hlaudtrack.c
-void fn_800A9808(AudTrack* pTrack);
+void InsertSortWorldPerf(AudTrack* pTrack);
 u8   Trk_InitModule(void);
-u8   fn_800A9A50(u8 a, u8 b);          // fn_800A8DC8's a and b, unused
+u8   fn_800A9A50(u8 a, u8 b);          // Ses_Init's a and b, unused
 void Trk_ExitSession(void);
 void Trk_Cycle(void);
-AudTrack* fn_800A9BC8(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 fPriority);
+AudTrack* Trk_AllocPerf(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 fPriority);
 s32  Trk_FreePerf(AudTrack* pTrack);
 void Trk_UpdatePerf(AudSource* pSource, AudTrack* pTrack, AudTrackTmpl* pTmpl, u8 nChannel, u8 bOn,
                  u8 bOff, f32 fPriority);
@@ -506,15 +506,15 @@ void Trk_Start(AudTrack* pTrack);
 void Trk_Stop(AudTrack* pTrack);
 void Trk_StopAllVoices(AudTrack* pTrack, int bNow);
 u8   Trk_Tick(AudTrack* pTrack);
-void fn_800AA2EC(AudTrack* pTrack, u8 n, u8 bCheck);
-void fn_800AA30C(AudTrack* pTrack, u8 n);
-void fn_800AA32C(AudTrack* pTrack, u8 n);
-void fn_800AA34C(AudTrack* pTrack);
+void Trk_Step(AudTrack* pTrack, u8 n, u8 bCheck);
+void Trk_SelectVariation(AudTrack* pTrack, u8 n);
+void Trk_SetVariationRange(AudTrack* pTrack, u8 n);
+void Trk_Render(AudTrack* pTrack);
 void fn_800AA3D4(AudTrackTmpl* pTmpl);
-void fn_800AA400(AudVoice* pVoice, int nReason);
+void Trk_VoiceEndCB(AudVoice* pVoice, int nReason);
 void fn_800AA444(AudTrack* pTrack, u8 n);
-f32  fn_800AA44C(u8 nCurve);
-u8   fn_800AA498(u8 nCurve);
+f32  Mas_GetSubmix(u8 nCurve);
+u8   Mas_IsChanMuted(u8 nCurve);
 
 // hlaudtrackseq.c
 void fn_800AA4BC(AudTrack* pTrack);
@@ -542,7 +542,7 @@ u8   fn_800ABBC8(void);
 void fn_800ABC34(AudTrack* pTrack);
 void Stm_Exit(AudTrack* pTrack);
 void Stm_Start(AudTrack* pTrack);
-void fn_800ABD7C(AudTrack* pTrack);
+void Stm_Stop(AudTrack* pTrack);
 u8   Stm_Tick(AudTrack* pTrack);
 void Stm_SetPlayList(AudTrack* pTrack, u8 nPlayList);
 void Stm_SetStream(AudTrack* pTrack, u16 nStream, int nMode);

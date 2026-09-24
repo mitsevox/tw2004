@@ -1,6 +1,6 @@
 // CharSliders.c (EA's name, from its asserts; TW06): the character's body sliders: reading their
 // definitions (CharSlider_CreateDefinitionsFromMem), freeing them, and blending a model's bones
-// and a skin's morph targets by the slider values (fn_8010E4DC). The file starts at fn_8010D454
+// and a skin's morph targets by the slider values (CharSlider_UpdateCharacterBasedOnSliderValues). The file starts at CharSlider_Free
 // (before it is GameMode26.c) and ends at fn_8010E58C, where FE_PGATourMessages.c's leaderboard
 // messages begin.
 
@@ -21,7 +21,7 @@ SwapField lbl_80193C30[10] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
 SwapField lbl_80281788[1] = { { 8, 8 } };                                   // a morph target id (u64)
 
 // Free slider definitions made by CharSlider_CreateDefinitionsFromMem.
-void fn_8010D454(CharSliderDefs* pDefs) {
+void CharSlider_Free(CharSliderDefs* pDefs) {
     int i;
     int j;
 
@@ -75,8 +75,8 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
     int nBoneRange;
     int nLimit;
 
-    fn_80076158(ppData, (u8*)&nSliders, 4, 4);
-    fn_80076158(ppData, (u8*)&nMorphs, 4, 4);
+    BYTESWAP_SWAPDATA(ppData, (u8*)&nSliders, 4, 4);
+    BYTESWAP_SWAPDATA(ppData, (u8*)&nMorphs, 4, 4);
     *ppData += 8;
     if (nSliders <= 0) {
         return NULL;
@@ -184,7 +184,7 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
 }
 
 // The index of the slider whose id is nId, or -1.
-int fn_8010DC94(CharSliderDefs* pDefs, s32 nId) {
+int CharSlider_GetSliderIndex(CharSliderDefs* pDefs, s32 nId) {
     int i;
 
     if (pDefs == NULL) {
@@ -199,7 +199,7 @@ int fn_8010DC94(CharSliderDefs* pDefs, s32 nId) {
 }
 
 // Every slider back to the range 0..1 at 0.
-void fn_8010DCE8(CharSliderDefs* pDefs) {
+void CharSlider_ResetGameSettings(CharSliderDefs* pDefs) {
     int i;
 
     if (pDefs != NULL) {
@@ -213,12 +213,12 @@ void fn_8010DCE8(CharSliderDefs* pDefs) {
 }
 
 // Set the sliders with ids 0..nSliders-1 from percentages.
-void fn_8010DD4C(CharSliderDefs* pDefs, int nSliders, u8* aValues) {
+void CharSlider_SetInitialVirtualValues(CharSliderDefs* pDefs, int nSliders, u8* aValues) {
     int i;
     int n;
 
     for (i = 0; i < nSliders; i++) {
-        n = fn_8010DC94(pDefs, i);
+        n = CharSlider_GetSliderIndex(pDefs, i);
         if (n >= 0) {
             pDefs->pValues[n].fValue = (s8)aValues[i] / 100.0f;
         }
@@ -226,7 +226,7 @@ void fn_8010DD4C(CharSliderDefs* pDefs, int nSliders, u8* aValues) {
 }
 
 // Keep every value in 0..0.99999.
-void fn_8010DE04(CharSliderDefs* pDefs) {
+void CharSlider_ClampVirtualValues(CharSliderDefs* pDefs) {
     int i;
     CharSliderValue* pValue;
 
@@ -242,7 +242,7 @@ void fn_8010DE04(CharSliderDefs* pDefs) {
 }
 
 // Cut each pair of sliders that share a length back to it.
-void fn_8010DE60(CharSliderDefs* pDefs) {
+void CharSlider_NormalizePairs(CharSliderDefs* pDefs) {
     int i;
     int j;
     CharSliderDef* pDef;
@@ -259,7 +259,7 @@ void fn_8010DE60(CharSliderDefs* pDefs) {
             if (pValue->bFixed != 1 && pDef->nLimits > 0) {
                 for (j = 0; j < pDef->nLimits; j++) {
                     pLimit = &pDef->pLimits[j];
-                    n = fn_8010DC94(pDefs, pLimit->nSlider);
+                    n = CharSlider_GetSliderIndex(pDefs, pLimit->nSlider);
                     if (n >= 0) {
                         pOther = &pDefs->pValues[n];
                         if (pOther->bFixed == 0) {
@@ -279,7 +279,7 @@ void fn_8010DE60(CharSliderDefs* pDefs) {
 
 // Let each slider move the ranges of the sliders it links to, keeping their values at the same
 // place in their ranges.
-void fn_8010DF8C(CharSliderDefs* pDefs) {
+void CharSlider_PropogateEffects(CharSliderDefs* pDefs) {
     int i;
     int j;
     CharSliderDef* pDef;
@@ -299,7 +299,7 @@ void fn_8010DF8C(CharSliderDefs* pDefs) {
             if (pDef->nLinks > 0) {
                 for (j = 0; j < pDef->nLinks; j++) {
                     pLink = &pDef->pLinks[j];
-                    n = fn_8010DC94(pDefs, pLink->nSlider);
+                    n = CharSlider_GetSliderIndex(pDefs, pLink->nSlider);
                     if (n >= 0) {
                         fT = 0.0f;
                         bMove = 0;
@@ -384,7 +384,7 @@ void fn_8010E224(CharSliderDefs* pDefs, CharModel* pModel) {
                     pBone = &pRange->items.pBones[k];
                     fScale = fn_8010E194(pRange->fStart, pRange->fEnd, pValue->fValue,
                                          pBone->fFrom, pBone->fTo);
-                    nBone = fn_800298F4(pModel, pBone->uId);
+                    nBone = SKEL_GetBoneIDFromNameID(pModel, pBone->uId);
                     if (nBone >= 0) {
                         fn_80028A70(pModel, nBone, pBone->uAxes, fScale);
                     }
@@ -434,17 +434,17 @@ void fn_8010E35C(CharSliderDefs* pDefs, Skin* pSkin, SKABlendNode* pNode) {
 }
 
 // Apply nSliders slider values (percentages) to a character's model and skin.
-void fn_8010E4DC(CharSliderDefs* pDefs, CharModel* pModel, Skin* pSkin, int nSliders, u8* aValues,
+void CharSlider_UpdateCharacterBasedOnSliderValues(CharSliderDefs* pDefs, CharModel* pModel, Skin* pSkin, int nSliders, u8* aValues,
                  SKABlendNode* pNode) {
     if (pModel == NULL || pSkin == NULL || aValues == NULL || pDefs == NULL) {
         return;
     }
     fn_80028A3C(pModel);
-    fn_8010DCE8(pDefs);
-    fn_8010DD4C(pDefs, nSliders, aValues);
-    fn_8010DE60(pDefs);
-    fn_8010DF8C(pDefs);
-    fn_8010DE04(pDefs);
+    CharSlider_ResetGameSettings(pDefs);
+    CharSlider_SetInitialVirtualValues(pDefs, nSliders, aValues);
+    CharSlider_NormalizePairs(pDefs);
+    CharSlider_PropogateEffects(pDefs);
+    CharSlider_ClampVirtualValues(pDefs);
     fn_8010E224(pDefs, pModel);
     fn_8010E35C(pDefs, pSkin, pNode);
 }

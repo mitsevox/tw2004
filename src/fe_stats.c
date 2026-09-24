@@ -29,7 +29,7 @@ void PrintStatsWithUnits(const char* szValue, StatsUnits eUnits, char* szOut) {
 
 // The player's line in a category: its title, the player's value and the player's place. A
 // category with no statistic behind it shows "TODO".
-void fn_8011CF64(MsgArg* pArgs, MsgArg* pResult) {
+void UIStatsRankings_GetRow(MsgArg* pArgs, MsgArg* pResult) {
     int nCategory = pArgs[0].i;
     char* szTitle = ((MsgString*)pArgs[1].p)->pStr;
     char* szValue = ((MsgString*)pArgs[2].p)->pStr;
@@ -58,14 +58,14 @@ void fn_8011D05C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 // Picks the category the leader board shows.
-void fn_8011D09C(MsgArg* pArgs, MsgArg* pResult) {
+void UIStatsRankings_SetActiveStat(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80282508 = pArgs[0].i;
 }
 
 // A leader board line of the chosen category: place, golfer, tournaments played (rounds for the
 // statistics counted per round, nothing for career money) and value, percentages without the
 // sign. Row -1 is the player's own line.
-void fn_8011D0A8(MsgArg* pArgs, MsgArg* pResult) {
+void UIStatsRankings_GetIndStatsRow(MsgArg* pArgs, MsgArg* pResult) {
     StatsUnits eUnits;
     GM_Pga_StatTypes_t nStat;
     int nPlayer;

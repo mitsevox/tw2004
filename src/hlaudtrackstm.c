@@ -1,5 +1,6 @@
-// hlaudtrackstm.c (our name, after TW06's golf/audio/engine/hl/hlaudtrackstm.c; the Stm_ names and
-// the read-queue names are EA's own, from the name strings its functions hand to the audio locks):
+// hlaudtrackstm.c (our name, after TW06's golf/audio/engine/hl/hlaudtrackstm.c; the names of the
+// functions that hand a name string to the audio locks are EA's own, from those strings, and
+// Stm_Stop, Stm_FlushQueue, CheckQueue and StartStreamVoices are TW07's):
 // the streamed tracks of the sound engine (music and long sounds read from disc). Each track reads
 // its stream into a main-memory buffer through a queue of disc reads (lbl_801F18B8), DMAs each
 // block into its voices' ARAM buffers, and keeps the reads ahead of what the voices play.
@@ -13,13 +14,13 @@ int  fn_80006478(s32 hFile, u8* pDst, u32 uLen, u32 uOffset,
 
 void fn_800AB860(AudTrack* pTrack);
 void fn_800ABC54(AudTrack* pTrack);
-void fn_800AC310(AudTrack* pTrack);
+void Stm_FlushQueue(AudTrack* pTrack);
 s32  fn_800AC328(void);
 void RemoveFromAudStreamQueue(AudTrack* pTrack);
 void fn_800AB99C(void* pDst, int nBytes, AudTrack* pTrack, u8 nId);
 
 // Applies a play list or stream change that came in while the track was busy.
-u8 fn_800AB3A4(AudTrack* pTrack) {
+u8 CheckQueue(AudTrack* pTrack) {
     u8 bChanged;
 
     bChanged = 0;
@@ -39,13 +40,13 @@ u8 fn_800AB3A4(AudTrack* pTrack) {
 }
 
 // Starts the voices on what is in their ARAM buffers.
-void fn_800AB428(AudTrack* pTrack) {
+void StartStreamVoices(AudTrack* pTrack) {
     AudPlayList* pList;
     u8 bLoud;
     u8 i;
 
     pList = pTrack->pTmpl->data.pPlayList;
-    fn_800A85FC(pTrack->f44, fn_800AA44C(pList->n3));
+    fn_800A85FC(pTrack->f44, Mas_GetSubmix(pList->n3));
     bLoud = pList->n3 == 15;
     for (i = 0; i < pList->nChannels; i++) {
         fn_800AC7DC(pTrack->apVoices[i], 0xFE00, pList->n4, bLoud);
@@ -237,7 +238,7 @@ void fn_800ABA28(AudTrack* pTrack) {
     request.flags.n = 0;
     request.nPriority = 0x3FFF;
     request.n4 = 2;
-    request.pfnCallback = fn_800AA400;
+    request.pfnCallback = Trk_VoiceEndCB;
     request.flags.b.b14 = 1;
     i = 0;
     request.pUser = pTrack;
@@ -310,13 +311,13 @@ void Stm_Start(AudTrack* pTrack) {
     if (pTrack->nState != 5) {
         fn_800ABA28(pTrack);
     } else {
-        fn_800AB428(pTrack);
+        StartStreamVoices(pTrack);
     }
     fn_800B5994("Stm_Start");
 }
 
-void fn_800ABD7C(AudTrack* pTrack) {
-    fn_800AC310(pTrack);
+void Stm_Stop(AudTrack* pTrack) {
+    Stm_FlushQueue(pTrack);
     pTrack->u.stm.nReadId = 0;
 }
 
@@ -358,7 +359,7 @@ u8 Stm_Tick(AudTrack* pTrack) {
                 pTrack->nState = 5;
             } else {
                 bFed = 1;
-                fn_800AB428(pTrack);
+                StartStreamVoices(pTrack);
             }
         }
         break;
@@ -419,7 +420,7 @@ u8 Stm_Tick(AudTrack* pTrack) {
     }
     ProcessAudStreamReadQueue();
     fn_800B5994("Stm_Tick");
-    if (pTrack->nState == 2 && fn_800AB3A4(pTrack)) {
+    if (pTrack->nState == 2 && CheckQueue(pTrack)) {
         Stm_Start(pTrack);
     }
     return pTrack->nState != 2;
@@ -499,7 +500,7 @@ void Stm_SetStream(AudTrack* pTrack, u16 nStream, int nMode) {
     fn_800B5994("Stm_SetStream");
 }
 
-void fn_800AC310(AudTrack* pTrack) {
+void Stm_FlushQueue(AudTrack* pTrack) {
     pTrack->u.stm.nNextPlayList = 0xFF;
     pTrack->u.stm.nNextStream = 0xFFFF;
 }

@@ -1,6 +1,6 @@
 // hwsBurn.c (EA's name, from its asserts): "burns" a skin description into one block: an HwsBurn
 // (fn_801104AC) records which parts, variants and options are chosen and which bits of the
-// description they use, then copies what they need after it. Partly decompiled.
+// description they use, and fn_80111850 copies what they use into one new block.
 
 #include "engine.h"
 #include "charstate.h"
@@ -11,8 +11,8 @@ s32   fn_800CF104(SkinDesc* pDesc, u64 uId);
 void  fn_80110A38(HwsBurn* pBurn, int n);
 SkinDesc* fn_80111850(HwsBurn* pBurn);
 
-// A burn of pDesc: every table sized from the description and cleared (no variant or option
-// chosen yet).
+// A burn of pDesc: its tables sized from the description, the bit sets cleared, and no variant or
+// option chosen yet (-1).
 HwsBurn* fn_801104AC(SkinDesc* pDesc) {
     HwsBurn* pBurn = fn_80009B34(sizeof(HwsBurn), 1, 16, "hwsBurn.c", 46);
     int i;
@@ -200,7 +200,7 @@ void fn_80110A38(HwsBurn* pBurn, int n) {
     }
 }
 
-// Everything the meshes of SkinDesc.p5C entry n use (fn_80110A38 on each).
+// Everything the SkinDesc.p44 entries of SkinDesc.p5C entry n use (fn_80110A38 on each).
 void fn_80110C88(HwsBurn* pBurn, int n) {
     SkinIterArgs args;
     u8 aBuf[0x48];                      // size unknown
@@ -468,8 +468,8 @@ s32 fn_80111124(HwsBurn* pBurn, s32 nAlign) {
     return nBytes;
 }
 
-// Copies of the meshes fn_80111124 listed at pBase + *pOffset, each followed by its data (from
-// the override table when it has the mesh). NULL when none are listed.
+// Copies of the meshes fn_80111124 listed at pBase + *pOffset, then each one's data after them
+// (from the override table when it has the mesh). NULL when none are listed.
 SkinMesh* fn_801111E8(HwsBurn* pBurn, u8* pBase, s32* pOffset, s32 nAlign) {
     SkinDesc* pDesc = pBurn->pDesc;
     SkinMesh* aOut;

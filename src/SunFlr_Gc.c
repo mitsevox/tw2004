@@ -1,5 +1,5 @@
-// SunFlr_Gc.c (EA's name, from its asserts): not yet decompiled; the sweep code below is the
-// matched small functions.
+// SunFlr_Gc.c (EA's name, from its asserts): the sun flare's GameCube part: per view, a copy of
+// the depth around the sun and, from it, how much of the sun is visible (fn_8009A754).
 
 #include "glows.h"
 #include "camera.h"

@@ -17,9 +17,9 @@
 #define BALL_RADIUS  INCHES(0.924f)   // 1.1 x a real ball's 0.84 in
 #define CUP_DIAMETER 0.10717f         // 3.86 in (a real cup is 4.25)
 
-void   Ball_Stop(Ball* pBall);                   // 0x80054340
+void   Physics_StopBall(Ball* pBall);                   // 0x80054340
 void   Ball_SetLie(Ball* pBall, SurfaceType* pSurface);
-void   Ball_Tick(Ball* pBall, f32 fTicks);
+void   Physics_QuickSimulate(Ball* pBall, f32 fTicks);
 void   Physics_FixBallHeight(Ball* pBall, u8 bSettle, f32 fTicks);
 u8     fn_80050DE4(int nKind, int nClub, int a, const ClubRow** ppRow, s32* pSurface);
 u8     Physics_GetShotData(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA,
@@ -375,7 +375,7 @@ f32    fn_80055E1C(f32 a, f32 b, f32 fSin, f32 fCos);
 void   fn_80055E28(f32 fAngle, f32* pSin, f32* pCos);
 void   Physics_OutOfBounds(Ball* pBall, u8 bSound);
 f32    Ball_DistanceToPin(f32* pPos);
-void   Ball_Holed(Ball* pBall);
+void   Physics_ForceBallInHole(Ball* pBall);
 void   Ball_SimSeconds(Ball* pBall, f32 fSeconds, f32 fTick);
 
 u8     fn_800B1B18(int nPlayer, f32* pTo, f32* pFrom, f32* pHit, f32* pNormal, HitObject** ppWhat);
@@ -386,11 +386,11 @@ u8     fn_80053240(Ball* pBall, f32 fTicks);
 // the bounce; returns the impact
 f32    Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface);
 void   fn_800B1AB0(HitObject* pObj, f32* pPos, f32* pRadius);   // the flagstick's position and radius
-u8     Ball_Collide(Ball* pBall, f32 fTicks);
+u8     Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks);
 void   Ball_GroundContact(Ball* pBall, f32 fTicks);
-void   fn_80052268(Ball* pBall, f32 fTicks);
+void   Physics_BallRollingandSlipping(Ball* pBall, f32 fTicks);
 void   Ball_FlightStep(Ball* pBall, f32 fTicks);
-f32    fn_80055324(Ball* pBall);
+f32    Physics_GetBallAltitude(Ball* pBall);
 u8     fn_80054040(Ball* pBall, f32 fTicks);
 
 extern u8  gSimulating;                          // 0x80281DD0  a rehearsal: no sounds or effects
@@ -448,20 +448,20 @@ static inline f32 Ball_Clamp(f32 x, f32 fLo, f32 fHi) {
 
 
 // The ball dropped in: park it in the cup and stop it.
-void Ball_Holed(Ball* pBall) {
+void Physics_ForceBallInHole(Ball* pBall) {
     Vec3Copy(PIN(pBall), pBall->vPos);
     pBall->vPos[0] += INCHES(0.5f);
     pBall->vPos[1] -= INCHES(3.0f);
     pBall->vPos[2] += INCHES(0.5f);
     pBall->bHoled = 1;
-    Ball_Stop(pBall);
+    Physics_StopBall(pBall);
 }
 
 // The ball ends in a hazard: state 5, lie 16, and (for a real ball) the splash event 0x22.
-// Surfaces 98 and 105 send it to Ball_Holed instead.
+// Surfaces 98 and 105 send it to Physics_ForceBallInHole instead.
 void Physics_OutOfBounds(Ball* pBall, u8 bSound) {
     if (pBall->nSurface == 105 || pBall->nSurface == 98) {
-        Ball_Holed(pBall);
+        Physics_ForceBallInHole(pBall);
         return;
     }
     pBall->nState = PHYSICS_BALLSTATE_BallOutOfBounds_e;
@@ -472,7 +472,7 @@ void Physics_OutOfBounds(Ball* pBall, u8 bSound) {
 }
 
 // On for rehearsals and look-aheads: no sounds, no effects, no tree roll.
-void Ball_SetSimulating(u8 bOn) {
+void fn_80050D24_SetSimulating(u8 bOn) {
     gSimulating = bOn;
 }
 
@@ -502,7 +502,7 @@ f32 fn_80050D34(f32 fDist) {
 
 // fake match: stands in for a function the original linker stripped. The file's pool has 20.0,
 // 0.5, 2.0, 1.0, 0.0, 0.1 in that order right after fn_80050D34's constants, before the
-// functions below use them (fn_80050F88 would put -60000 and 0.375 before 0.1); its body is
+// functions below use them (Physics_EstimateShotPower would put -60000 and 0.375 before 0.1); its body is
 // unknown, this one only reproduces the order.
 static f32 Ball_StrippedFn(f32 x) {
     x = (x + 2.0f) * 0.5f + 20.0f;
@@ -581,7 +581,7 @@ static inline f32 ClubRow_Dist(const ClubRow* pRow, int i) {
     return pRow->fDist[i];
 }
 
-f32 fn_80050F88(f32 fDist, Ball* pBall, int nKind, int nClub) {
+f32 Physics_EstimateShotPower(f32 fDist, Ball* pBall, int nKind, int nClub) {
     s32          nSurface;
     SurfaceType* pSurface;
     const ClubRow* pRow;
@@ -612,15 +612,15 @@ f32 fn_80050F88(f32 fDist, Ball* pBall, int nKind, int nClub) {
 }
 
 // The ball's f70 plus its surface's first value; 1 without a ball or a surface.
-f32 fn_800510EC(Ball* pBall) {
+f32 Physics_GetLiePowerPercentage(Ball* pBall) {
     if (pBall != NULL && pBall->nSurface >= 0) {
         return pBall->f70 + gSurfaceTypes[pBall->nSurface].f00;
     }
     return 1.0f;
 }
 
-// The slope along the aim: the ground normal turned into the aim's frame, then the angle of
-// its x against its y, clamped to +-44 degrees.
+// The slope across the aim (sidehill): the ground normal turned into the aim's frame, then the
+// angle of its x against its y, clamped to +-44 degrees.
 f32 fn_80051124(Ball* pBall, f32 fAim, f32* pNormal) {
     f32 vN[4];
     f32 fSin, fCos;
@@ -644,7 +644,7 @@ f32 fn_80051124(Ball* pBall, f32 fAim, f32* pNormal) {
     return fAngle;
 }
 
-// The slope across the aim: as fn_80051124 with the normal's z.
+// The slope along the aim (uphill or downhill): as fn_80051124 with the normal's z.
 f32 fn_800511F0(Ball* pBall, f32 fAim, f32* pNormal) {
     f32 vN[4];
     f32 fSin, fCos;
@@ -681,7 +681,7 @@ f32 fn_800511F0(Ball* pBall, f32 fAim, f32* pNormal) {
 // - the launch angle is the club's loft (chips: their own), + the kind's, - 0.8 degrees per
 //   club step for kind 4, + the trajectory's (-5, 0, +5 degrees), clamped to 0..80 degrees,
 //   and turns pA into the spin axis;
-// - a sidehill lie (fn_80051124, +-45 degrees) turns that axis by 0.2 of the slope - not for
+// - a sidehill lie (fn_80051124, +-44 degrees) turns that axis by 0.2 of the slope - not for
 //   slot 4 or a perfect shot;
 // - the lie (sand 6/7/8, rough 3/4) or the surface sets how much of the speed survives and
 //   how much spin; the club step adds 1.25% of the loss back per step; a chip from lie 3..5
@@ -875,7 +875,7 @@ done:
 }
 
 // Launch the ball from a point along a direction at a speed (x 0.489): in the air, no spin.
-void fn_80051A18(Ball* pBall, f32* pDir, f32 fSpeed, f32* pFrom) {
+void Physics_ThrowBall(Ball* pBall, f32* pDir, f32 fSpeed, f32* pFrom) {
     pBall->nState = 2;
     Vec_Copy(pFrom, pBall->vStart);
     Vec_Copy(pFrom, pBall->vPos);
@@ -901,7 +901,7 @@ void fn_80051A18(Ball* pBall, f32* pDir, f32 fSpeed, f32* pFrom) {
 // Strike the ball: Physics_GetShotData turns club, kind, power, aim, trajectory and the two launch
 // blocks into its velocity and spin (failing that it is a hazard). A putt (kind 0, or the
 // putter) starts rolling (state 3), anything else is in the air (state 2). Event 10.
-void Ball_Launch(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB) {
+void Physics_ShotImpact(Ball* pBall, int nClub, int nKind, f32 fPower, f32 fAim, int nTrajectory, f32* pA, f32* pB) {
     Vec_Copy(pBall->vPos, pBall->vStart);
     pBall->fAC    = 0.0f;
     pBall->fLastDistFromInitShotPos    = 0.0f;
@@ -1081,7 +1081,7 @@ check:
 // kept on the plane at its speed; friction (1.5 x surface +0x18 x the normal force, same
 // settings) builds roll spin about dir x normal. Once 0.84 x the spin reaches the speed it
 // is rolling (state 4).
-void fn_80052268(Ball* pBall, f32 fTicks) {
+void Physics_BallRollingandSlipping(Ball* pBall, f32 fTicks) {
     f32          vNormal[4];
     f32          vAccel[4];
     f32          vTmp[4];
@@ -1139,7 +1139,7 @@ void fn_80052268(Ball* pBall, f32 fTicks) {
     }
 }
 
-// The bounce. Returns the square of the speed into the surface (Ball_Collide keeps its root as
+// The bounce. Returns the square of the speed into the surface (Physics_CheckTerrainCollisions keeps its root as
 // the sand-landing impact).
 // - Water (class 7, 16) quarters the spin; elsewhere sideways spin is capped (2.93, or the
 //   ball's ground speed once that is 5.28 or more).
@@ -1832,7 +1832,7 @@ void Physics_FixBallHeight(Ball* pBall, u8 bSettle, f32 fTicks) {
 // The ball has stopped. Holed: state 1, lie 12, events 0x21 and 0x20. Otherwise it is settled
 // (Physics_FixBallHeight) and given the lie of the surface under it - a surface whose +0x1C is not 0.375
 // counts as surface 14 - or, with no surface at all, it is a hazard.
-void Ball_Stop(Ball* pBall) {
+void Physics_StopBall(Ball* pBall) {
     SurfaceType* pSurface;
     if (pBall->bHoled) {
         pBall->nState = 1;
@@ -1867,7 +1867,7 @@ void Ball_Stop(Ball* pBall) {
 // tick (fn_8004EE20 for a second hit). Water (class 7 or 16): surfaces 47, 41 and 104 let a ball
 // that bounces up faster than 2.93 and moves on more than 1.71 x that (and over 5.87) skip, its
 // rise quartered; anything else is a hazard.
-u8 Ball_Collide(Ball* pBall, f32 fTicks) {
+u8 Physics_CheckTerrainCollisions(Ball* pBall, f32 fTicks) {
     f32          vHit[4];
     f32          vNormal[4];
     f32          vFrom[4];
@@ -1912,14 +1912,14 @@ u8 Ball_Collide(Ball* pBall, f32 fTicks) {
     if (pSurface->nClass == 12 || pSurface->nClass == 18 ||
         (nIndex == 90 && Vec_Distance(pBall->vPos, PIN(pBall)) < 2.0f)) {
         if (pBall->pCourse->pin[Game_CurrentPinSet()].y - pBall->vPos[1] > 0.0694444478f) {
-            Ball_Holed(pBall);
+            Physics_ForceBallInHole(pBall);
             return 1;
         }
     }
     if (pBall->nState == 4) {
         if (pSurface->nClass == 12) {
             pBall->bHoled = 1;
-            Ball_Stop(pBall);
+            Physics_StopBall(pBall);
             return 1;
         }
         pBall->vVel[1] = 0.0293333326f;
@@ -1969,7 +1969,7 @@ f32 Ball_DistanceToPin(f32* pPos) {
 
 // The shot starts here: remember the surface and the position, and the distance to the pin
 // as the closest so far.
-void fn_80054A6C(Ball* pBall) {
+void Physics_InitShotData(Ball* pBall) {
     pBall->nStartSurface = pBall->nSurface;
     Vec_Copy(pBall->vPos, pBall->vStart);
     pBall->fClosest = Ball_DistanceToPin(pBall->vPos);
@@ -2056,7 +2056,7 @@ void Ball_GroundContact(Ball* pBall, f32 fTicks) {
     if (pSurface->nClass == 12 || pSurface->nClass == 18 ||
         (pBall->nSurface == 90 && Vec_Distance(pBall->vPos, PIN(pBall)) < 2.0f)) {
         if (pBall->pCourse->pin[Game_CurrentPinSet()].y - pBall->vPos[1] > 0.055555556f) {
-            Ball_Holed(pBall);
+            Physics_ForceBallInHole(pBall);
             return;
         }
     }
@@ -2150,7 +2150,7 @@ void Ball_GroundContact(Ball* pBall, f32 fTicks) {
     }
     fTurn *= fTicks;
     if ((f32)fn_80009680(fn_80009744(pBall->vVel)) < fTurn) {
-        Ball_Stop(pBall);
+        Physics_StopBall(pBall);
         return;
     }
     fB = pBall->vVel[1];
@@ -2171,7 +2171,7 @@ void Ball_GroundContact(Ball* pBall, f32 fTicks) {
 // under it: within 8 ft of the pin it is set on the other ground height; if that is less than
 // 1.68 in above it, that is the ground; else above the course floor it is still in play
 // (surface -1), and below it a hazard.
-f32 fn_80055324(Ball* pBall) {
+f32 Physics_GetBallAltitude(Ball* pBall) {
     f32          vNormal[4];
     f32          vNormal2[4];
     f32          vPin[4];
@@ -2211,7 +2211,7 @@ f32 fn_80055324(Ball* pBall) {
 // still in play is kept on the ground or collided, checked against objects, and every 4 s
 // (0.0167 a tick) it must have moved 4 in, or it stops. Then its speed (x 60 / 36), its height
 // and its closest approach to the pin.
-void Ball_Tick(Ball* pBall, f32 fTicks) {
+void Physics_QuickSimulate(Ball* pBall, f32 fTicks) {
     f32 fDist;
     lbl_80281DE4 = 0;
     switch (pBall->nState) {
@@ -2219,7 +2219,7 @@ void Ball_Tick(Ball* pBall, f32 fTicks) {
         Ball_FlightStep(pBall, fTicks);
         break;
     case 3:
-        fn_80052268(pBall, fTicks);
+        Physics_BallRollingandSlipping(pBall, fTicks);
         break;
     case 4:
         Ball_GroundContact(pBall, fTicks);
@@ -2234,7 +2234,7 @@ void Ball_Tick(Ball* pBall, f32 fTicks) {
             if (pBall->nState != 2) {
                 Physics_FixBallHeight(pBall, 0, fTicks);
             } else {
-                Ball_Collide(pBall, fTicks);
+                Physics_CheckTerrainCollisions(pBall, fTicks);
             }
             fn_80054040(pBall, fTicks);
         }
@@ -2242,7 +2242,7 @@ void Ball_Tick(Ball* pBall, f32 fTicks) {
         if (pBall->fTimeSinceLastCheck > 4.0f) {
             fDist = Vec_Distance(pBall->vStart, pBall->vPos);
             if (fabsf(fDist - pBall->fLastDistFromInitShotPos) < 0.111111112f) {
-                Ball_Stop(pBall);
+                Physics_StopBall(pBall);
             } else {
                 pBall->fLastDistFromInitShotPos = fDist;
                 pBall->fTimeSinceLastCheck = 0.0f;
@@ -2256,7 +2256,7 @@ done:
     } else {
         fDist = fn_80009680(fn_80009744(pBall->vVel));
         pBall->fSpeed  = 60.0f * (fDist / 36.0f);
-        pBall->fHeight = fn_80055324(pBall);
+        pBall->fHeight = Physics_GetBallAltitude(pBall);
         fDist = Ball_DistanceToPin(pBall->vPos);
         if (fDist < pBall->fClosest) {
             pBall->fClosest = fDist;
@@ -2270,7 +2270,7 @@ int Physics_Simulate(Ball* pBall, int nMs) {
     u8 bA, bB;
     if (nMs < 20) return 0;
     if (pBall->nState == 0 || pBall->nState == 1 || pBall->nState == 5) return 0;
-    Ball_Tick(pBall, (f32)nMs / 20.0f);
+    Physics_QuickSimulate(pBall, (f32)nMs / 20.0f);
     if (pBall->nPlayer >= 0 && pBall->nPlayer <= 3) {
         if (Ter_IsValidDropSurface(pBall->nSurface)) {
             Ter_CheckForDropLocation(pBall->pCourse, pBall->vPos, 1, &bA, &bB, NULL);
@@ -2293,13 +2293,13 @@ void Ball_SimSeconds(Ball* pBall, f32 fSeconds, f32 fTick) {
     gSimulating = 1;
     fSeconds *= 60.0f;
     do {
-        Ball_Tick(pBall, fTick);
+        Physics_QuickSimulate(pBall, fTick);
         fSeconds -= fTick;
     } while (fSeconds > 0.0f && (pBall->nState == 2 || pBall->nState == 3 || pBall->nState == 4));
     gSimulating = 0;
 }
 
-void Ball_SimStep(Ball* pBall, f32 fSeconds, f32 fTick) {
+void fn_8005585C_SimForTime(Ball* pBall, f32 fSeconds, f32 fTick) {
     Ball_SimSeconds(pBall, fSeconds, fTick);
 }
 
@@ -2311,9 +2311,9 @@ u8 Physics_DropBall(Ball* pBall, f32* pPos) {
     f32          fGround;
     Vec3Copy(pPos, v);
     v[1] += INCHES(2.0f);
-    fGround = fn_8004D620(pBall->pCourse, v);
+    fGround = Ter_GetSupportingGroundHeight(pBall->pCourse, v);
     if (fGround < -60000.0f) {
-        fGround = fn_8004D5C0(pBall->pCourse, v);
+        fGround = Ter_GetHighestGroundHeight(pBall->pCourse, v);
         if (fGround < -60000.0f) return 0;
     }
     v[1] = 0.0013888889f + (BALL_RADIUS + fGround);
@@ -2334,11 +2334,11 @@ u8 Physics_DropBall(Ball* pBall, f32* pPos) {
 
 // Drop the ball from a point: at least 0.25 in above the ground, its height remembered, and it
 // is in the air (state 2) with no velocity or spin.
-u8 fn_800559BC(Ball* pBall, f32* pPos) {
+u8 Physics_SetBallPosition(Ball* pBall, f32* pPos) {
     f32 v[4];
     f32 fGround;
     Vec3Copy(pPos, v);
-    fGround = fn_8004D620(pBall->pCourse, v);
+    fGround = Ter_GetSupportingGroundHeight(pBall->pCourse, v);
     if (fGround < -60000.0f) return 0;
     if (v[1] <= fGround) {
         v[1] = 0.0069444445f + fGround;
@@ -2367,7 +2367,7 @@ u8 fn_800559BC(Ball* pBall, f32* pPos) {
 // A fresh ball for a player at a point: everything cleared (surface 45), the course looked up,
 // and the ball set on the ground there (radius + 1 in; the point itself if there is no
 // ground). Returns 1 when there is no course.
-u8 fn_80055AA8(Ball* pBall, f32* pPos, int nPlayer) {
+u8 Physics_InitBall(Ball* pBall, f32* pPos, int nPlayer) {
     f32 fGround;
     Vec_Copy(pPos, pBall->vPos);
     pBall->nState        = 0;
@@ -2396,9 +2396,9 @@ u8 fn_80055AA8(Ball* pBall, f32* pPos, int nPlayer) {
     pBall->pCourse = fn_8000C594();
     if (pBall->pCourse == NULL) return 1;
     pBall->vPos[1] += 0.053444445f;
-    fGround = fn_8004D620(pBall->pCourse, pBall->vPos);
+    fGround = Ter_GetSupportingGroundHeight(pBall->pCourse, pBall->vPos);
     if (fGround < -60000.0f) {
-        fGround = fn_8004D5C0(pBall->pCourse, pBall->vPos);
+        fGround = Ter_GetHighestGroundHeight(pBall->pCourse, pBall->vPos);
         if (fGround < -60000.0f) {
             fGround = pBall->vPos[1];
         }

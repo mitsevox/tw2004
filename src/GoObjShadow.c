@@ -27,7 +27,7 @@ s32 lbl_80281390 = 4;           // vertices to colour
 TexEntry* lbl_80281F54;         // the "shadow" texture
 TexBank*  lbl_80281F50;         // and its bank
 
-void fn_80093D3C(void) {
+void BS_vInit(void) {
     s32 desc[2];
     int i;
     fn_800102DC(fn_8000BEE4("shadow"), &lbl_80281F50, &lbl_80281F54);
@@ -38,7 +38,7 @@ void fn_80093D3C(void) {
     }
 }
 
-// Defined after fn_80093D3C: its "shadow" string sits before them in .sdata.
+// Defined after BS_vInit: its "shadow" string sits before them in .sdata.
 f32 lbl_8028139C = 0.07f;       // half the quad's size
 f32 lbl_802813A0 = 0.01f;       // how far the shadow is pushed from the light point
 
@@ -109,7 +109,7 @@ void fn_80093DB8(Ball* pBall, int nPlayer) {
     }
 }
 
-void fn_800940FC(void) {
+void BS_vClose(void) {
     int i;
     for (i = 0; i < NUM_SHADOW_MESHES; i++) {
         fn_800360A0(lbl_801D96B8[i]);

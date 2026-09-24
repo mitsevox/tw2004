@@ -57,7 +57,8 @@ void fn_800A2E14(void) {
     fn_80009E70(lbl_80281408->ap50[0]);
 }
 
-// Clear the effects' state and give emitters 0, 6 and 14 the current course's vectors.
+// Clear the sand trail's state and give emitters 0, 6 and 14 the current course's vectors (on
+// course 18, lbl_8018E958's when fn_80015464 is 0, 1, 2 or 17).
 void fn_800A2E68(void) {
     int i;
 
@@ -131,8 +132,9 @@ void fn_800A30E4(int nKind, Ball* pBall, int nPlayer, u8 bFlight, f32 fValue) {
     }
 }
 
-// The swing effect of the surface under the ball (unless the club is 25), and on some lies and
-// surfaces (a club above 8, shot kind 1 or 4) the player's 'TEO ' objects at the ball.
+// Nothing for club 25 or on ground a ball can't stop on (f1C not 0.375). Otherwise the swing
+// effect of the surface under the ball, on some lies and surfaces (a club above 8, shot kind 1
+// or 4) the player's 'TEO ' objects at the ball, and fn_8004816C on lie 0.
 void fn_800A31E0(Ball* pBall, int nPlayer) {
     f32 vPos[4];
     f32 vNormal[4];
