@@ -7,11 +7,19 @@
 // with the next file's first function.
 
 #include "glows.h"
+#include "camera.h"
 
 // SunFlr_Gc.c
 void fn_8009A340(void);
 void fn_8009A3D0(s32 nView, SunFlrView* pView);
 void fn_8009A704(s32 nView);
+void fn_8009A3F4(s32 nView);
+f32  fn_8009A754(s32 nView, SunFlrView* pView);
+
+s32  fn_800171B0(void);                 // ViewController.c
+CamLens* fn_8001F004(void);
+f32  fn_8001415C(u8* p);                // GoRenderCtx_Gc.c
+f32  fn_8001416C(u8* p);
 
 // Frees each view's part.
 void fn_8009B0D0(void) {
@@ -30,6 +38,31 @@ void fn_8009B134(void) {
         for (i = 0; i < lbl_802813B8->nViews; i++) {
             fn_8009A704(i);
         }
+    }
+}
+
+// Per view, each frame: where v4 falls on the view's screen, and fn_8009A754's result for the
+// field being drawn. The getters called first have their results thrown away.
+void fn_8009B18C(s32 nView) {
+    f32* pRect;
+    s32 nCtx;
+    SunFlrState* pState;
+    SunFlrView* pView;
+
+    pRect = fn_8003526C();
+    nCtx = fn_800171B0();
+    fn_8001F004();
+    // port: fn_800171B0 is typed s32 in ViewController.c, but its value is a render context pointer
+    fn_8001416C((u8*)nCtx);
+    fn_80012ED8(pRect);
+    fn_8001415C((u8*)nCtx);
+    fn_80012ED0(pRect);
+    pState = lbl_802813B8;
+    if (pState->b1BF0) {
+        pView = &pState->aView[nView];
+        pView->bA4 = fn_8006434C(fn_80017004(nView), pState->v4, &pView->f98, &pView->f9C, &pView->fA0);
+        pView->af90[1 - (lbl_80281B88 & 1)] = fn_8009A754(nView, pView);
+        fn_8009A3F4(nView);
     }
 }
 
