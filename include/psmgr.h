@@ -33,18 +33,29 @@ void fn_800A2C08(int nView);    // draw it (the view is not used)
 
 // ---- PsBallFx.c (EA's name, from its asserts): the ball's particle effects ----------------------
 
-// One of PsBallFx.c's particle emitters; only the fields read here. Its size is not known.
+// One of UFstPart.c's particle emitters (PsBallFx.c starts them); only the fields read so far.
+// Its size is not known.
 typedef struct PsEmitter {
     u8   unk0[0x30];
     f32  v30[4];                // 0x30  a position (fn_800A3D6C)
     struct PsEmitter* p40;      // 0x40  the next in the list fn_80099EA4 pushes onto
     u8   unk44[0x50 - 0x44];
     s32  n50;                   // 0x50  fn_800A3DF4 sets 1000000
-    u8   unk54[0xB8 - 0x54];
-    u32  uB8;                   // 0xB8  flags; the functions below only act with 0x20000 set
+    u8   unk54[0x58 - 0x54];
+    s32  n58;                   // 0x58  cleared by fn_80099B74
+    s8   b5C;                   // 0x5C  cleared by fn_80098BDC
+    u8   unk5D[0xB4 - 0x5D];
+    s32  nB4;                   // 0xB4  below 0: fn_80098BDC frees the emitter
+    u32  uB8;                   // 0xB8  flags; the functions below only act with 0x20000 set;
+                                //       fn_80098C70 sets 0x80000000 on the six fixed emitters
     u8   unkBC[0xE0 - 0xBC];
     f32  vE0[4];                // 0xE0  a position (fn_800A3D6C)
+    u8   unkF0[0x180 - 0xF0];
+    u8   mesh[0x28];            // 0x180 a mesh object (Skin.c)
 } PsEmitter;
+
+// UFstPart.c's six fixed emitters.
+extern PsEmitter* lbl_801DB888[6];
 
 // PsBallFx.c's state (lbl_801F1708, 0x88 bytes), reached through lbl_80281408.
 typedef struct PsBallFxState {

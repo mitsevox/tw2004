@@ -1,41 +1,69 @@
-// UFstPart.c (EA's name, from its asserts; also in EA's 2002 source tree): not yet decompiled; the
-// sweep code below is the matched small functions.
+// UFstPart.c (EA's name, from its asserts; also in EA's 2002 source tree): the particle emitters
+// (PsEmitter in include/psmgr.h). Mostly not yet decompiled.
 
 #include "game_types.h"
 #include "psmgr.h"
 
-// ---- sweep code (not yet cleaned up) ----
+// Skin.c
+void fn_800360A0(void* pMesh);
+void fn_800360D4(u8* pMesh);
 
-s32 fn_800360A0(u8*);
-void fn_80098BDC(u8* arg0);
-extern u8 lbl_801DB888[];
-void fn_80098C70(void);
-void fn_800360D4();
-void fn_80099B74(u8* p0);
+void fn_80098BDC(PsEmitter* pEmitter);
 
-void fn_80098BDC(u8* arg0) {
-    (*(s8*)((u8*)(arg0) + 0x5C)) = 0;
-    if ((s32) (*(s32*)((u8*)(arg0) + 0xB4)) < 0) {
-        fn_800360A0(arg0 + 0x180);
-        fn_80009E70(arg0);
+// Free every emitter on the list, then the six fixed ones.
+void fn_80098B5C(void) {
+    PsEmitter* pEmitter;
+    PsEmitter* pDone;
+    int i;
+
+    pEmitter = lbl_80281F88;
+    while (pEmitter != NULL) {
+        pDone = pEmitter;
+        pEmitter = pEmitter->p40;
+        fn_80098BDC(pDone);
+    }
+    lbl_80281F88 = NULL;
+    for (i = 0; i < 6; i++) {
+        fn_800360A0(lbl_801DB888[i]->mesh);
+        fn_80009E70(lbl_801DB888[i]);
     }
 }
 
+void fn_80098BDC(PsEmitter* pEmitter) {
+    pEmitter->b5C = 0;
+    if (pEmitter->nB4 < 0) {
+        fn_800360A0(pEmitter->mesh);
+        fn_80009E70(pEmitter);
+    }
+}
+
+// Free every emitter on the list.
+void fn_80098C28(void) {
+    PsEmitter* pEmitter;
+    PsEmitter* pNext;
+
+    pEmitter = lbl_80281F88;
+    while (pEmitter != NULL) {
+        pNext = pEmitter->p40;
+        fn_80098BDC(pEmitter);
+        pEmitter = pNext;
+    }
+    lbl_80281F88 = NULL;
+}
+
 void fn_80098C70(void) {
-    *(s32*)(((u8*)*(s32*)lbl_801DB888) + 0xB8) = (*(s32*)(((u8*)*(s32*)lbl_801DB888) + 0xB8) | 0x80000000);
-    *(s32*)(((u8*)*(s32*)(lbl_801DB888 + 0x4)) + 0xB8) = (*(s32*)(((u8*)*(s32*)(lbl_801DB888 + 0x4)) + 0xB8) | 0x80000000);
-    *(s32*)(((u8*)*(s32*)(lbl_801DB888 + 0x8)) + 0xB8) = (*(s32*)(((u8*)*(s32*)(lbl_801DB888 + 0x8)) + 0xB8) | 0x80000000);
-    *(s32*)(((u8*)*(s32*)(lbl_801DB888 + 0xC)) + 0xB8) = (*(s32*)(((u8*)*(s32*)(lbl_801DB888 + 0xC)) + 0xB8) | 0x80000000);
-    *(s32*)(((u8*)*(s32*)(lbl_801DB888 + 0x10)) + 0xB8) = (*(s32*)(((u8*)*(s32*)(lbl_801DB888 + 0x10)) + 0xB8) | 0x80000000);
-    *(s32*)(((u8*)*(s32*)(lbl_801DB888 + 0x14)) + 0xB8) = (*(s32*)(((u8*)*(s32*)(lbl_801DB888 + 0x14)) + 0xB8) | 0x80000000);
+    lbl_801DB888[0]->uB8 |= 0x80000000;
+    lbl_801DB888[1]->uB8 |= 0x80000000;
+    lbl_801DB888[2]->uB8 |= 0x80000000;
+    lbl_801DB888[3]->uB8 |= 0x80000000;
+    lbl_801DB888[4]->uB8 |= 0x80000000;
+    lbl_801DB888[5]->uB8 |= 0x80000000;
 }
 
-void fn_80099B74(u8* p0) {
-    *(s32*)(p0 + 0x58) = 0;
-    fn_800360D4((p0 + 0x180));
+void fn_80099B74(PsEmitter* pEmitter) {
+    pEmitter->n58 = 0;
+    fn_800360D4(pEmitter->mesh);
 }
-
-// ---- end of sweep code ----
 
 void fn_80099EA4(PsEmitter* pEmitter) {
     pEmitter->p40 = lbl_80281F88;
