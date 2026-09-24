@@ -817,6 +817,7 @@ u8   fn_80014300(u32 uMask);            // any pad pressed these buttons
 // ---- events, sound, effects ------------------------------------------------------------------
 
 void fn_800A7A98(s32 n);                // GameAudio.c
+void fn_800A4BDC(void);                 // GameAudio.c: once a frame, the emitters and the queued sound
 u8   fn_800B7490(void);                 // DiscError.c: show the disc-error screen while the drive
                                         // reports a problem; 1: it was shown (UStream.c, DiscCheck.c)
 
@@ -890,6 +891,7 @@ void fn_800A78F0(f32 f);                // } and a0[1] (FE_MessageTable.c, GameU
 void fn_800A7924(f32 f);                // }
 void Vec_Normalize(f32* pSrc, f32* pDst);
 void fn_800BAF04(f32* pSrc, f32* pDst);   // normalise
+void fn_800B5918(f32* pSrc, f32* pDst);   // copy three floats (not decompiled yet)
 f32  fn_800BAFC0(f32* pSrc, f32* pDst);   // VecMath.c: normalises pSrc into pDst, gives its length
 f32  Vec_Distance(f32* pA, f32* pB);
 void fn_800BD83C(int nSound, int a);      // SitDevFile.c: fn_800A7664(0, nSound, a)

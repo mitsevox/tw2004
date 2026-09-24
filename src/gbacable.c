@@ -20,7 +20,6 @@ void fn_80123398(s32 nChan, s32 a, s32 b);
 void fn_80123ABC(s32 nChan);
 void fn_80123C2C(s32 nChan);
 void fn_80123CBC(s32 a, s32 b);
-void fn_800A4BDC(void);
 void fn_80123E34(void);
 s32  fn_80176280(s32 nChan, u8* pOut);  // the GBA library: 2 while the port is busy
 s32  fn_80122FD8(s32 nChan);

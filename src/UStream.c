@@ -60,7 +60,6 @@ int gnNumHandlers = -1;           // 0x80280DB8 (.sdata): -1 until UStream_Init
 
 int   fn_8000EA1C(const char* pName, int a, int b, int c);
 void  fn_8007593C(void* pChunk);                             // MPG2
-void  fn_800A4BDC(void);
 void  fn_800A8AD4(void* pChunk);                             // DSPM / VAGM / XADP
 void* fn_800A8FB4(u32 uSize, int nMemory);
 void  fn_800A8FFC(u32 uMemory);

@@ -8,7 +8,6 @@
 #include "camera.h"
 #include "terrain.h"
 
-CamLens* fn_8001F004(void);
 void fn_8006F3D0(f32* pA, f32* pB, f32* pOut, f32 t);
 f32* fn_8006F400(TerSettings* pSettings, int nColour, f32* pColour, f32 fW);
 void fn_8006F430(TerSettings* pSettings, f32 fAngle);
