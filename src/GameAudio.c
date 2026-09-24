@@ -1054,14 +1054,16 @@ void fn_800A500C(void) {
 }
 
 void fn_800A562C(u8 nPlayer) {
-    Player* pPlayer;
+    s32* pnView;
     GameAudioView* pView;
+    Player* pPlayer;
     u8 nId;
     f32 vPos[3];
 
     pPlayer = &gPlayers[nPlayer];
+    pnView = pPlayer->nView;
     lbl_80282030 = 0;
-    pView = &lbl_801F1790[pPlayer->nView[0]];
+    pView = &lbl_801F1790[*pnView];
     lbl_80282032 = 0;
     nId = pView->n0;
     lbl_80282034 = 0;
@@ -1071,7 +1073,7 @@ void fn_800A562C(u8 nPlayer) {
     fn_800A6BA8(nPlayer);
     fn_800AD734(pView->n2, 0);
     fn_800AD734(pView->n3, 0);
-    if (fn_80016CFC(pPlayer->nView[0])->bFlagOut) {
+    if (fn_80016CFC(*pnView)->bFlagOut) {
         fn_800AD450(lbl_80281420);
         lbl_80281420 = 0xFF;
     }
