@@ -150,8 +150,7 @@ void fn_80070764(DynRenderBuffer* pBuf, const DynRenderDrawIn* pIn, u16 nCount, 
             return;
         }
         pList->nDraws = nCount;
-        pDraw = pList->aDraws;
-        for (i = 0; i < nCount; i++) {
+        for (i = 0, pDraw = pList->aDraws; i < nCount; i++) {
             pDraw->nStart = pIn[i].nStart;
             pDraw->nCount = pIn[i].nCount;
             pDraw->nPrim = pIn[i].nPrim;
