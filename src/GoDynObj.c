@@ -27,7 +27,6 @@ void fn_8000A194(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix fro
 void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void fn_8000A144(f32 (*pSrc)[4], f32 (*pDst)[4]);        // copies three rows
-f32  fn_8004D5F0(CourseInfo* pCourse, f32* pPos);          // GoTerrainCollision.c: the ground height
 void fn_80048680(f32* pA, f32* pB, f32* pOut);
 void fn_800486A4(f32* pA, f32* pB, f32* pOut);
 void fn_800486C8(f32* pA, f32* pB, f32* pOut);

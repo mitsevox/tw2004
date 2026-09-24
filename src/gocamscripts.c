@@ -26,7 +26,7 @@ u8   fn_80044E74(CamShot* pShot);
 void fn_80064F54(CamShot* pShot, int nPlayer, f32* pOut);
 void fn_8003A148(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pSub, f32* pPrev,
                  f32 fTime);
-void fn_8003EE68(CamScript* pScript, f32* pCam, int a, int nPlayer, f32 f);
+void fn_8003EE68(CamScript* pScript, f32* pCam, u8 b, int nPlayer, f32 fMaxStep);
 f32  fn_8003F064(CamScript* pScript, f32 fTime);
 void fn_8003F518(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime);
 void fn_8003F7EC(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime);
@@ -351,6 +351,59 @@ void fn_8003E624(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
         if (fTime > 0.0f) {
             fn_80045428(vPrev, pCam, vMove);
             pScript->fD4 = (f32)fn_80009680(fn_80009744(vMove)) / fTime;
+        }
+    }
+}
+
+// Eases the script's ground height fD8 towards the ground under pCam (by CamTuning.fE0 a frame; with
+// no ground found, fD8 stays and bE8 asks for the fairway fix). With fMaxStep 0 or more, fD8 is
+// kept within it of the ground; never below the course's floor. Not while a held shot of bA8 1
+// plays.
+void fn_8003EE68(CamScript* pScript, f32* pCam, u8 b, int nPlayer, f32 fMaxStep) {
+    CourseInfo* pCourse = fn_8000C594();
+    f32 fGround;
+    f32 fRate;
+    f32 fStep;
+
+    pScript->bE8 = 0;
+    if (!fn_80043388(pScript, pScript->pShot) || pScript->pShot->bA8 != 1) {
+        if (pCourse != NULL) {
+            fGround = fn_8004D620(pCourse, pCam);
+        } else {
+            fGround = pScript->fD8;
+        }
+        if (fGround < -60000.0f) {
+            fGround = fn_8004D5F0(pCourse, pCam);
+            if (fGround < -60000.0f) {
+                fGround = pScript->fD8;
+                pScript->bE8 = 1;
+            }
+        }
+        fRate = lbl_80281F78->fE0;
+        // All three cases ease the same way (only a level fD8 is left alone in golfer state 12).
+        if (!b || gPlayers[nPlayer].ball.nCollideCount > 0
+            || (s8)GOLFERSTATE_GetCurrentState(nPlayer) != 12) {
+            fStep = fGround - pScript->fD8;
+            fStep *= fRate;
+            pScript->fD8 += fStep;
+        } else if (fGround > pScript->fD8) {
+            fStep = fGround - pScript->fD8;
+            fStep *= fRate;
+            pScript->fD8 += fStep;
+        } else if (fGround < pScript->fD8) {
+            fStep = fGround - pScript->fD8;
+            fStep *= fRate;
+            pScript->fD8 += fStep;
+        }
+        if (fMaxStep >= 0.0f) {
+            if (fGround > pScript->fD8 && fGround - pScript->fD8 > fMaxStep) {
+                pScript->fD8 = fGround - fMaxStep;
+            } else if (fGround < pScript->fD8 && pScript->fD8 - fGround > fMaxStep) {
+                pScript->fD8 = fGround + fMaxStep;
+            }
+        }
+        if (pScript->fD8 < -60000.0f || pScript->fD8 < fn_8000C594()->fFloor) {
+            pScript->fD8 = fn_8000C594()->fFloor;
         }
     }
 }

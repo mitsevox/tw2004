@@ -270,7 +270,8 @@ typedef struct CamTuning {
     u8   unkD4[0xD8 - 0xD4];
     f32  fD8;                   // 0x0D8  CamScript_GetLookAtPoint: CameraScript_LagAimMarker's first lag
     f32  fDC;                   // 0x0DC  the green zoom-to-aim camera's aim marker (CameraScript_LagAimMarker)
-    u8   unkE0[0xE4 - 0xE0];
+    f32  fE0;                   // 0x0E0  fn_8003EE68: CamScript.fD8's share of the way to the ground
+                                //        height a frame
     f32  fE4;                   // 0x0E4  CamScript_GetLookAtPoint: the aim's lag on the ball (fn_800422C4,
                                 //        fn_8004349C); also put in CamScript.fDC
     f32  fE8;                   // 0x0E8  ... its lag on a bone of the golfer (fn_800422C4)
