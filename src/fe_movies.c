@@ -2,6 +2,7 @@
 // decompiled; the sweep code below is the matched small functions.
 
 #include "game_types.h"
+#include "llpict.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -73,3 +74,11 @@ s32 fn_800922A0(u8* p) {
 }
 
 // ---- end of sweep code ----
+
+// The picture's f6C and f70, then 0 and 1.
+void fn_8009222C(f32* pOut, LLPict* pPict) {
+    pOut[0] = pPict->f6C;
+    pOut[1] = pPict->f70;
+    pOut[2] = 0.0f;
+    pOut[3] = 1.0f;
+}
