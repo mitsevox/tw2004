@@ -133,15 +133,17 @@ s32 fn_8011C5B4(SkinMorphWork* pWork, SkinDesc44* pEntry, int nSet) {
     SkinDesc* pDesc;
     s32 nMesh;
     f32 fWeight;
+    s32 nLeft;
 
     nFirst = pEntry->n18;
     pDesc = pWork->pDesc;
-    nCount = pEntry->n14;
     aMeshes = pDesc->p34;
     aIndexes = pDesc->p3C;
     pTarget = &pDesc->p44[pEntry->n10];
-    if (nCount > pWork->nMorphs - nFirst) {
-        nCount = pWork->nMorphs - nFirst;
+    nLeft = pWork->nMorphs - nFirst;
+    nCount = pEntry->n14;
+    if (nCount > nLeft) {
+        nCount = nLeft;
     }
     for (i = 0; i < nCount; i++, pTarget++) {
         if (nSet < pTarget->n8) {
