@@ -2208,9 +2208,11 @@ void fn_800D9458(int nPlayer) {
             return;
         }
         if (fn_800E177C() == 0) {
+            f32* pPos = gPlayers[nPlayer].ball.vPos;
+
             // How far the ball ended from vBall; the result is not used.
-            dx = gPlayers[nPlayer].ball.vPos[0] - gPlayers[nPlayer].vBall[0];
-            dz = gPlayers[nPlayer].ball.vPos[2] - gPlayers[nPlayer].vBall[2];
+            dx = pPos[0] - gPlayers[nPlayer].vBall[0];
+            dz = pPos[2] - gPlayers[nPlayer].vBall[2];
             fn_80009680(dx * dx + dz * dz);
             nProfile = gPlayers[nPlayer].nIndex;
             nPar = fn_800D2B08();
