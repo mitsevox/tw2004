@@ -55,6 +55,9 @@ f32  fn_80014278(u8* pLens);            // the lens's field of view (GoRenderCtx
 u8   fn_8004561C(void);
 u8   fn_80044E2C(int n);
 u8   fn_80044AA8(SurfaceType* pSurface);
+void fn_8000ADC0(f32 (*pMtx)[4]);                   // identity
+void fn_8000A6C8(f32 (*pSrc)[4], f32 (*pDst)[4]);   // UMemPool.c: transposes the 3x3 part
+void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
 void fn_80038010(u8 a, int n, f32* pVec);
 void fn_800386F0(int n, f32* pVec);
 f32  fn_8003F194(CamShot* pShot, f32 fA, f32 fB, f32 fTime);
@@ -1797,6 +1800,95 @@ f32 fn_80043420(int nPlayer, CamScript* pScript, f32* pPos, f32* pCam, CamShot* 
         fY -= fDrop;
     }
     return fY;
+}
+
+// Lags the look-at point pOut behind pTarget as seen from pCam: when the angle between the two
+// directions is more than the script's lag angle fDC, pOut is turned towards pTarget (about their
+// common perpendicular) until it is fDC away; otherwise fDC takes the angle once it passes fLag
+// (scaled by the lens's fB0). nPlayer is not read.
+void fn_8004349C(int nPlayer, f32* pCam, f32* pOut, f32* pTarget, CamScript* pScript, f32 fLag) {
+    f32 vToTarget[4];
+    f32 vTargetDir[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    f32 vToOut[4];
+    f32 vOutDir[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    f32 vTurned[4];
+    f32 vAxis[4];
+    f32 mAlign[4][4];
+    f32 mBack[4][4];
+    f32 mTurn[4][4];
+    f32 fDot;
+    f32 fAngle;
+    f32 fLen;
+    f32 fInv;
+    f32 fCos;
+    f32 fSin;
+
+    fLag *= fn_8001EFFC((u8*)fn_8001F004());
+    fn_80045428(pTarget, pCam, vToTarget);
+    fn_80045428(pOut, pCam, vToOut);
+    if (0.0f == vToTarget[0] && 0.0f == vToTarget[1] && 0.0f == vToTarget[2]) return;
+    if (0.0f == vToOut[0] && 0.0f == vToOut[1] && 0.0f == vToOut[2]) return;
+    fn_800BAF04(vToTarget, vTargetDir);
+    fn_800BAF04(vToOut, vOutDir);
+    fDot = fn_8000C5FC(vTargetDir, vOutDir);
+    if (fDot < -1.0f) {
+        fDot = -1.0f;
+    } else if (fDot > 1.0f) {
+        fDot = 1.0f;
+    }
+    fAngle = fn_80009614(fDot);
+    if (fabsf(fAngle) > pScript->fDC) {
+        fAngle -= pScript->fDC;
+        vec4flt_CrossProduct(vOutDir, vTargetDir, vAxis);
+        if (0.0f == vAxis[0] && 0.0f == vAxis[1] && 0.0f == vAxis[2]) return;
+        fn_800BAF04(vAxis, vAxis);
+        fLen = fn_80009680(vAxis[1] * vAxis[1] + vAxis[2] * vAxis[2]);
+        if (0.0f == fLen) return;
+        // mAlign turns the axis onto x; mTurn turns by fAngle about it there; mBack turns back
+        fInv = 1.0f / fLen;
+        mAlign[0][0] = fLen;
+        mAlign[0][1] = 0.0f;
+        mAlign[0][2] = vAxis[0];
+        mAlign[0][3] = 0.0f;
+        mAlign[1][0] = fInv * -(vAxis[0] * vAxis[1]);
+        mAlign[1][1] = vAxis[2] * fInv;
+        mAlign[1][2] = vAxis[1];
+        mAlign[1][3] = 0.0f;
+        mAlign[2][0] = fInv * -(vAxis[0] * vAxis[2]);
+        mAlign[2][1] = -vAxis[1] * fInv;
+        mAlign[2][2] = vAxis[2];
+        mAlign[2][3] = 0.0f;
+        mAlign[3][0] = 0.0f;
+        mAlign[3][1] = 0.0f;
+        mAlign[3][2] = 0.0f;
+        mAlign[3][3] = 1.0f;
+        fCos = fn_80009638(fAngle);
+        fSin = fn_80009680(1.0f - fCos * fCos);
+        mTurn[0][0] = fCos;
+        mTurn[0][1] = fSin;
+        mTurn[0][2] = 0.0f;
+        mTurn[0][3] = 0.0f;
+        mTurn[1][0] = -fSin;
+        mTurn[1][1] = fCos;
+        mTurn[1][2] = 0.0f;
+        mTurn[1][3] = 0.0f;
+        mTurn[2][0] = 0.0f;
+        mTurn[2][1] = 0.0f;
+        mTurn[2][2] = 1.0f;
+        mTurn[2][3] = 0.0f;
+        mTurn[3][0] = 0.0f;
+        mTurn[3][1] = 0.0f;
+        mTurn[3][2] = 0.0f;
+        mTurn[3][3] = 1.0f;
+        fn_8000ADC0(mBack);
+        fn_8000A6C8(mAlign, mBack);
+        fn_800BADB4(mAlign, vToOut, vTurned);
+        fn_800BADB4(mTurn, vTurned, vTurned);
+        fn_800BADB4(mBack, vTurned, vTurned);
+        fn_8004544C(pCam, vTurned, pOut);
+    } else if (fabsf(fAngle) > fLag) {
+        pScript->fDC = fAngle;
+    }
 }
 
 // The shot is the default swing camera: kind (bAD) 3 or 29..33, and the camera looks along the aim
