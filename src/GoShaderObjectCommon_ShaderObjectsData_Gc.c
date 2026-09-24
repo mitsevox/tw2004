@@ -4,11 +4,33 @@
 
 #include "engine.h"
 #include "gx.h"
+#include "core/startup.h"
+#include "shaderdata.h"
+
+// The morph the list being built records its vertices for (a command 6 sets it), and which
+// vertex arrays the list has: texture coordinates, normals, colours.
+MorphAnim* lbl_80281EA0;
+u8 lbl_80281EB3;
+u8 lbl_80281EB4;
+u8 lbl_80281EB5;
 
 int fn_80073878(TexBank* pBank, TexEntry* pTex);
 void fn_800738DC(TexBank* pBank, TexEntry* pTex, u8 bFirst);
 void fn_800740F4(TexBank* pBank, TexEntry* pTex, TexBank* pBank2, TexEntry* pTex2);
+u16* fn_80074628(u16* p, u16* pEnd);
+u16* fn_80074A24(u16* p, u16* pEnd, u8 bSecond, u8* pbFirst);
+u16* fn_80074BE0(u16* p, u16* pEnd);
+u16* fn_80074CEC(u16* p, u16* pEnd);
+u16* fn_80074CF4(u16* p, u16* pEnd);
+void fn_80075250(u16 nIndex);
+void fn_8007525C(u16 nIndex);
+void fn_80075268(u16 nIndex);
+void fn_80075274(u16 nIndex);
 u16 fn_80076D68(f32 fU, f32 fV, f32 fScale, f32 fInv);    // GoShaderObjectCommon_TexAnimManager_Gc.c
+void fn_80076BF0(void);                                 // GoShaderObjectCommon_TexAnimManager_Gc.c
+void fn_80012520(u32 ePrim, u32 eFormat, u16 nVerts);   // LLFont.c: GXBegin
+void fn_800124A8(void);                                 // LLFont.c: end the primitive
+void fn_8001618C(u8 v);                                 // streammanagerhole.c
 
 // Another texture in pTex's bank with the same u0 as pTex: its index, or -1.
 int fn_80073878(TexBank* pBank, TexEntry* pTex) {
@@ -17,6 +39,184 @@ int fn_80073878(TexBank* pBank, TexEntry* pTex) {
         if (pBank->p8[i].u0 == pTex->u0 && pTex != &pBank->p8[i]) return i;
     }
     return -1;
+}
+
+// A command of the display list: a primitive (0 points, 1 a line strip, 2 triangles, 3 a triangle
+// strip), its vertex layout and its vertex count, then the vertices as u16 array indexes. An array
+// the list has but a layout leaves out gets index 0. Layouts 1 and 2 carry a morph offset (three
+// s8s packed in two u16s), recorded for the vertex (layout 2 only when one of them is above 2).
+// Every command handler takes the commands' end (pEnd), which this one does not use.
+u16* fn_80074628(u16* p, u16* pEnd) {
+    u16 auDelta[2];
+    u16 ePrim;
+    u16 eLayout;
+    u16 nVerts;
+    u16 nPos;
+    u16 nTex;
+    u16 nColour;
+    u16 nNormal;
+    u16 nTex2;
+
+    ePrim = p[0];
+    eLayout = p[1];
+    nVerts = p[2];
+    p += 3;
+    switch (ePrim) {
+    case 0:
+        fn_80012520(0xB8, 0, nVerts);
+        break;
+    case 1:
+        fn_80012520(0xB0, 0, nVerts);
+        break;
+    case 2:
+        fn_80012520(0x90, 0, nVerts);
+        break;
+    case 3:
+        fn_80012520(0x98, 0, nVerts);
+        break;
+    }
+    switch (eLayout) {
+    case 4:
+        while (nVerts != 0) {
+            nPos = p[0];
+            nColour = p[1];
+            p += 2;
+            fn_80075274(nPos);
+            if (lbl_80281EB4) {
+                fn_80075268(0);
+            }
+            fn_8007525C(nColour);
+            if (lbl_80281EB3) {
+                fn_80075250(0);
+            }
+            nVerts--;
+        }
+        break;
+    case 0:
+    case 3:
+        while (nVerts != 0) {
+            nPos = p[0];
+            nTex = p[1];
+            nColour = p[2];
+            p += 3;
+            fn_80075274(nPos);
+            if (lbl_80281EB4) {
+                fn_80075268(0);
+            }
+            fn_8007525C(nColour);
+            fn_80075250(nTex);
+            nVerts--;
+        }
+        break;
+    case 1:
+        while (nVerts != 0) {
+            nPos = p[0];
+            auDelta[0] = p[1];
+            auDelta[1] = p[2];
+            nTex = p[3];
+            nColour = p[4];
+            p += 5;
+            fn_80075274(nPos);
+            if (lbl_80281EB4) {
+                fn_80075268(0);
+            }
+            fn_8007525C(nColour);
+            fn_80075250(nTex);
+            // port: the offset's bytes are read in the data's (big-endian) order
+            fn_80097330(lbl_80281EA0, nPos, (s8*)auDelta);
+            nVerts--;
+        }
+        break;
+    case 2:
+        while (nVerts != 0) {
+            nPos = p[0];
+            auDelta[0] = p[1];
+            auDelta[1] = p[2];
+            nColour = p[3];
+            p += 4;
+            fn_80075274(nPos);
+            if (lbl_80281EB4) {
+                fn_80075268(0);
+            }
+            fn_8007525C(nColour);
+            if (lbl_80281EB3) {
+                fn_80075250(0);
+            }
+            if (__abs(((s8*)auDelta)[0]) > 2 || __abs(((s8*)auDelta)[1]) > 2 ||
+                __abs(((s8*)auDelta)[2]) > 2) {
+                fn_80097330(lbl_80281EA0, nPos, (s8*)auDelta);
+            }
+            nVerts--;
+        }
+        break;
+    case 5:
+        while (nVerts != 0) {
+            nNormal = p[0];
+            nPos = p[1];
+            nTex = p[2];
+            p += 3;
+            fn_80075274(nPos);
+            fn_80075268(nNormal);
+            if (lbl_80281EB5) {
+                fn_8007525C(0);
+            }
+            fn_80075250(nTex);
+            nVerts--;
+        }
+        break;
+    case 6:
+        while (nVerts != 0) {
+            nPos = p[0];
+            nNormal = p[1];
+            p += 2;
+            fn_80075274(nPos);
+            fn_80075268(nNormal);
+            if (lbl_80281EB5) {
+                fn_8007525C(0);
+            }
+            if (lbl_80281EB3) {
+                fn_80075250(0);
+            }
+            nVerts--;
+        }
+        break;
+    case 7:
+        while (nVerts != 0) {
+            nPos = *p;
+            p += 1;
+            fn_80075274(nPos);
+            if (lbl_80281EB4) {
+                fn_80075268(0);
+            }
+            if (lbl_80281EB5) {
+                fn_8007525C(0);
+            }
+            if (lbl_80281EB3) {
+                fn_80075250(0);
+            }
+            nVerts--;
+        }
+        break;
+    case 11:
+        while (nVerts != 0) {
+            nPos = p[0];
+            nTex = p[1];
+            nColour = p[2];
+            nTex2 = p[3];
+            p += 4;
+            fn_80075274(nPos);
+            if (lbl_80281EB4) {
+                fn_80075268(0);
+            }
+            fn_8007525C(nColour);
+            fn_80075250(nTex);
+            fn_80075250(nTex2);
+            nVerts--;
+        }
+        break;
+    }
+    fn_800124A8();
+    return p;
 }
 
 // A command of the display list: a texture by its 64-bit id (four u16s, high first), with
@@ -69,7 +269,7 @@ u16* fn_80074A24(u16* p, u16* pEnd, u8 bSecond, u8* pbFirst) {
 // A command of the display list: three s16s make a texture matrix (fn_80076D68), loaded as
 // texture matrix 0x39 (the first two: 0 for none, else 0.5 + 10000 / n; the third: a scale,
 // made positive, and its inverse).
-u16* fn_80074BE0(u16* p) {
+u16* fn_80074BE0(u16* p, u16* pEnd) {
     f32 fU;
     f32 fV;
     f32 fScale;
@@ -95,19 +295,14 @@ u16* fn_80074BE0(u16* p) {
     return pNext;
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
-u8* fn_80074CEC(u8* p0);
-
-u8* fn_80074CEC(u8* p0) {
-    return (p0 + 0x2);
+// A command of the display list with one u16 argument, which the list skips.
+u16* fn_80074CEC(u16* p, u16* pEnd) {
+    return p + 1;
 }
-
-// ---- end of sweep code ----
 
 // A command of the display list: the blend mode (0 none, 1 alpha blend, 2 add source times
 // alpha, 3 subtract).
-u16* fn_80074CF4(u16* p) {
+u16* fn_80074CF4(u16* p, u16* pEnd) {
     switch (*p++) {
     case 0:
         GXSetBlendMode(0, 4, 5, 0);
@@ -125,31 +320,165 @@ u16* fn_80074CF4(u16* p) {
     return p;
 }
 
-// ---- sweep code (not yet cleaned up) ----
+// Build pAnim's display list from pCmds's commands (1 a primitive, 2 and 7 one or two textures,
+// 3 skipped, 4 the blend mode, 5 a texture matrix, 6 the morph and its f32), in a buffer then
+// copied over the commands. Types 1, 3 and 10 draw untextured, 2 and 3 morph, 4 and 5 use a
+// texture matrix; 10 has no colours or normals either.
+void fn_80074DA8(ShaderVtxArrays* pArrays, int eType, MorphAnim* pAnim, ShaderCmds* pCmds) {
+    void* pList;
+    u8 bFirst;
+    u16* p;
+    u16* pEnd;
+    u32 nWords;
+    u8 bArrays;
+    u32 nSize;
+    u8 bTexMtx;
 
-void fn_8007524C(void);
-void fn_80075250(s32 p0);
-void fn_8007525C(s32 p0);
-void fn_80075268(s32 p0);
-void fn_80075274(s32 p0);
+    bTexMtx = 0;
+    lbl_80281EA0 = NULL;
+    lbl_80281EB5 = lbl_80281EB4 = lbl_80281EB3 = 0;
+    bFirst = 1;
+    if (pCmds->nFrames > 1) {
+        pAnim->b8 = 1;
+    } else {
+        pAnim->b8 = 0;
+    }
+    nWords = pCmds->nWords;
+    p = pCmds->pCmds;
+    nSize = (((nWords << 1) + 0x1F) & ~0x1F) + 0x800;   // the commands' bytes, rounded up, + 2 KB
+    pList = fn_80009B34(nSize, 1, 32, "GoShaderObjectCommon_ShaderObjectsData_Gc.c", 1039);
+    DCInvalidateRange(pList, nSize);
+    GXBeginDisplayList(pList, nSize);
+    GXResetWriteGatherPipe();
+    bArrays = 0;
+    GXClearVtxDesc();
+    if (eType != 1 && eType != 3 && eType != 10 && pArrays->p14 != NULL) {
+        GXSetVtxDesc(13, 3);
+        GXSetArray(13, pArrays->p14, 4);
+        bArrays = 1;
+        lbl_80281EB3 = 1;
+    }
+    if (pArrays->apPos[pCmds->nFrame] != NULL) {
+        GXSetVtxDesc(9, 3);
+        if (pAnim->b8 == 0) {
+            GXSetArray(9, pArrays->apPos[pCmds->nFrame], 12);
+        }
+        bArrays = 1;
+    }
+    if (eType != 10 && pArrays->p18 != NULL) {
+        GXSetVtxDesc(11, 3);
+        GXSetArray(11, pArrays->p18, 4);
+        bArrays = 1;
+        lbl_80281EB5 = 1;
+    }
+    if (eType != 10 && pArrays->p1C != NULL) {
+        GXSetVtxDesc(10, 3);
+        GXSetArray(10, pArrays->p1C, 12);
+        bArrays = 1;
+        lbl_80281EB4 = 1;
+    }
+    if (eType == 5 || eType == 4) {
+        GXSetTexCoordGen2(0, 1, 4, 0x39, 0, 0x7D);
+        fn_80076BF0();
+        bArrays = 1;
+        bTexMtx = 1;
+    } else if (eType != 10) {
+        GXSetTexCoordGen2(0, 1, 4, 0x3C, 0, 0x7D);
+    }
+    if (bArrays) {
+        GXInvalidateVtxCache();
+    }
+    if (pCmds->uFlags & 1) {
+        fn_8001618C(1);
+    }
+    if (eType == 1 || eType == 3) {
+        fn_80074A24(NULL, NULL, 0, &bFirst);
+    }
+    if (eType == 2 || eType == 3) {
+        fn_8009727C(pAnim);
+    }
+    pEnd = p + nWords;
+    while (p < pEnd) {
+        switch (*p++) {
+        case 1:
+            p = fn_80074628(p, pEnd);
+            break;
+        case 2:
+            if (eType != 1 && eType != 3 && eType != 10) {
+                p = fn_80074A24(p, pEnd, 0, &bFirst);
+            } else {
+                p += 4;
+            }
+            break;
+        case 7:
+            if (eType != 1 && eType != 3 && eType != 10) {
+                if (bFirst) {
+                    GXSetVtxDesc(14, 3);
+                    GXSetTexCoordGen2(1, 1, 5, 0x3C, 0, 0x7D);
+                    GXSetArray(14, pArrays->p14, 4);
+                    GXInvalidateVtxCache();
+                }
+                p = fn_80074A24(p, pEnd, 1, &bFirst);
+            } else {
+                p += 8;
+            }
+            break;
+        case 3:
+            p = fn_80074CEC(p, pEnd);
+            break;
+        case 4:
+            p = fn_80074CF4(p, pEnd);
+            break;
+        case 5:
+            if (eType == 5 || eType == 4) {
+                p = fn_80074BE0(p, pEnd);
+            } else {
+                p += 3;
+            }
+            break;
+        case 6:
+            if (lbl_80281EA0 == NULL) {
+                lbl_80281EA0 = pAnim;
+            }
+            // port: an f32 stored in two of the u16 commands, in the data's (big-endian) order
+            lbl_80281EA0->fC = *(f32*)p;
+            p += 2;
+            lbl_80281EA0->p1C = pArrays->apPos[pCmds->nFrame];
+            break;
+        }
+    }
+    if (bTexMtx) {
+        GXSetTexCoordGen2(0, 1, 4, 0x3C, 0, 0x7D);
+    }
+    pAnim->n0 = GXEndDisplayList();
+    // port: rounds the address up to 32 bytes; a u32 cannot hold a 64-bit pointer
+    pAnim->p4 = (void*)(((u32)pCmds->pCmds + 0x1F) & ~0x1F);
+    Mem_cpy(pAnim->p4, pList, pAnim->n0);
+    DCFlushRange(pAnim->p4, pAnim->n0);
+    fn_80009E70(pList);
+    if (eType == 2 || eType == 3) {
+        fn_80097474(pAnim);
+    }
+    fn_8001618C(0);
+}
 
 void fn_8007524C(void) {
 }
 
-void fn_80075250(s32 p0) {
-    *(volatile u16*)0xCC008000 = p0;
+// Write a vertex's texture coordinate, colour, normal and position index to GX's FIFO (the GX
+// index writes, not inlined).
+void fn_80075250(u16 nIndex) {
+    *(volatile u16*)0xCC008000 = nIndex;
 }
 
-void fn_8007525C(s32 p0) {
-    *(volatile u16*)0xCC008000 = p0;
+void fn_8007525C(u16 nIndex) {
+    *(volatile u16*)0xCC008000 = nIndex;
 }
 
-void fn_80075268(s32 p0) {
-    *(volatile u16*)0xCC008000 = p0;
+void fn_80075268(u16 nIndex) {
+    *(volatile u16*)0xCC008000 = nIndex;
 }
 
-void fn_80075274(s32 p0) {
-    *(volatile u16*)0xCC008000 = p0;
+void fn_80075274(u16 nIndex) {
+    *(volatile u16*)0xCC008000 = nIndex;
 }
-
-// ---- end of sweep code ----
