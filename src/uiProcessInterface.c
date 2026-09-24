@@ -302,13 +302,14 @@ void fn_8008FD60(u32 uEvent) {
 // and turn its entries' colour offsets into pointers; with none, p14 is NULL.
 void fn_8008FDDC(FrontEnd* pFE) {
     UIFile* pFile = pFE->pFile;
+    UIColorTable* pTable;
     u8 bFound = 0;
     int nTables;
     int i;
 
     nTables = pFile->p8->nCount;
     for (i = 0; i < nTables; i++) {
-        UIColorTable* pTable = pFE->pFile->p8->apTables[i];
+        pTable = pFE->pFile->p8->apTables[i];
 
         // fake match: the original tests the count unsigned here (cmplwi), signed below
         if ((u32)pTable->nCount != 0 && pTable->apEntries[0]->u0 == 0x10) {
