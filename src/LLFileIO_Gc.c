@@ -138,9 +138,9 @@ int fn_80005EC0(void) {
         lbl_801A0350[j][0] = 0;
     }
     lbl_80281B80 = i = 0;
-    pQueue = lbl_8019E868;
-    pPool = lbl_8019E880;
-    for (; i < 2; i++, pQueue++, pPool++) {
+    for (; i < 2; i++) {
+        pQueue = &lbl_8019E868[i];
+        pPool = &lbl_8019E880[i];
         fn_80005AE8(pQueue, 0, sizeof(FileQueue));
         fn_80005AE8(pPool, 0, sizeof(FileReqPool));
         pQueue->pNext = (FileReq*)pQueue;
