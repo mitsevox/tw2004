@@ -811,7 +811,6 @@ void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
 void fn_8001EB8C(Character* pChar, int nBone, f32* pPos);
 void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
-void fn_80035240(int n);
 
 void fn_800B9944(void) {
     UStream_RegisterHandler('TEO ', fn_800B99FC);
@@ -973,7 +972,7 @@ void fn_800B9CF0(u8 bTarget) {
                 fn_800B9BF4(lbl_802821D8, mBone, mScale, vPos);
             }
         }
-        fn_80035240(0);
+        fn_80035240(NULL);
         fn_800140E8(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
         fn_80013EEC(fn_8001614C());
         fn_80012EF8();
