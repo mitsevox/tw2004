@@ -1255,13 +1255,13 @@ void fn_800C0804(View* pView, int nPlayer) {
     fn_8003DCE8(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
 }
 
-// Camera 10: start on the first shot fn_8006509C gives.
+// Camera 10: start on the first shot StaticCam_GetFlyByCam gives.
 void fn_800C0880(View* pView, int nPlayer) {
     CamShot* pShot;
     s32 n;
     n = lbl_80282220->n60;  // fake match: read before the store below, in the original's order
     lbl_80282220->f68 = 0.0f;
-    pShot = fn_8006509C(n);
+    pShot = StaticCam_GetFlyByCam(n);
     if (pShot != NULL) {
         pView->script.pShot = pShot;
         pView->script.pNextShot = pShot->p40;
@@ -1317,7 +1317,7 @@ void GolfCamera_InitPreShotCamera(View* pView, int nPlayer) {
     pView->script.bCF = 0;
     nLie = gPlayers[nPlayer].ball.nLie;
     pView->p74 = NULL;
-    pShot = fn_80064F7C(nPlayer, 0x20, 0, pView->script.pShot);
+    pShot = StaticCam_ChooseScript(nPlayer, 0x20, 0, pView->script.pShot);
     if (pShot == NULL || Misc_RandFunc(1) % 100 > 50) {
         if (fn_8003C9D0(nPlayer, 0, &pView->p74, &pShot) && pView->p74 != NULL) {
             pShot = fn_8003A950(pView->p74, 13, &nA, &f1, &f2, &nB, &f3, nPlayer);
@@ -1979,15 +1979,15 @@ void GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer) {
                 && (pView->script.pNextShot == NULL || pView->p80 != pView->script.pShot)))) {
         if (gSession.bReplay || Player_IsCPU(nPlayer)) {
             if (gPlayers[nPlayer].nClub == 25) {
-                pShot = fn_80064F7C(nPlayer, 0x10, 0, pView->script.pShot);
+                pShot = StaticCam_ChooseScript(nPlayer, 0x10, 0, pView->script.pShot);
             } else if (gPlayers[nPlayer].ball.nState == 2) {
                 if (gPlayers[nPlayer].ball.nCollideCount > 0) {
-                    pShot = fn_80064F7C(nPlayer, 4, 0, pView->script.pShot);
+                    pShot = StaticCam_ChooseScript(nPlayer, 4, 0, pView->script.pShot);
                 } else {
-                    pShot = fn_80064F7C(nPlayer, 2, 0, pView->script.pShot);
+                    pShot = StaticCam_ChooseScript(nPlayer, 2, 0, pView->script.pShot);
                 }
             } else {
-                pShot = fn_80064F7C(nPlayer, 8, 0, pView->script.pShot);
+                pShot = StaticCam_ChooseScript(nPlayer, 8, 0, pView->script.pShot);
             }
         }
         if (pShot == NULL) {
@@ -2127,7 +2127,7 @@ void GolfCamera_InitPostShotCamera(View* pView, int nPlayer) {
             fn_800C6110(pView, nPlayer, 0x40);
         } else {
             if (GM_ShowPostShotCrowdFlyby()) {
-                pShot = fn_8006509C(9);
+                pShot = StaticCam_GetFlyByCam(9);
             }
             if (pShot != NULL) {
                 pView->script.pShot = pShot;
@@ -2138,7 +2138,7 @@ void GolfCamera_InitPostShotCamera(View* pView, int nPlayer) {
                 pView->script.fA0 = 0.0f;
                 pView->script.fA4 = 0.0f;
             } else {
-                pShot = fn_80064F7C(nPlayer, 0x40, 1, pView->script.pShot);
+                pShot = StaticCam_ChooseScript(nPlayer, 0x40, 1, pView->script.pShot);
                 if (pShot != NULL && fn_80062C28(gPlayers[nPlayer].pChar) < 1.0f) {
                     pView->script.n114 = 1;
                 }
@@ -2192,7 +2192,7 @@ void GolfCamera_ProcessPostShotCamera(View* pView, int nPlayer) {
         && (pView->script.pShot == NULL
             || (pView->script.pShot->bAA && pView->script.pShot->bAD && nPlayer != fn_800636EC()))) {
         if (GM_ShowPostShotCrowdFlyby()) {
-            pShot = fn_8006509C(9);
+            pShot = StaticCam_GetFlyByCam(9);
         }
         if (pShot != NULL) {
             pView->script.pShot = pShot;
@@ -2596,8 +2596,8 @@ u8 fn_800C3FC0(View* pView, int nPlayer, f32* pSub, f32* pAim, f32* pCam) {
     pCam[0] = vTarget[0] - vBack[0] * fBack;
     pCam[2] = vTarget[2] - vBack[2] * fBack;
     pCam[1] = 0.0f;
-    if (!fn_80069428(pCam)) {
-        pNet = fn_80069498();
+    if (!PlaceBall_CheckInBounds(pCam)) {
+        pNet = PlaceBall_GetPlaceBallNetwork();
         if (pNet != NULL) {
             if (fn_8000C3C8(pCam, pAim, pNet, pNet->nNumNodes, vHit)) {
                 bMoved = 1;
@@ -3455,7 +3455,7 @@ void GolfCamera_CutToGolferDoneAnimatingCam(View* pView, int nPlayer) {
         pView->script.n110 = 1;
         return;
     }
-    pShot = fn_80064F7C(nPlayer, 0x40, 1, pView->script.pShot);
+    pShot = StaticCam_ChooseScript(nPlayer, 0x40, 1, pView->script.pShot);
     if (pShot == NULL || pShot == pView->script.pShot || pShot == pView->script.pB8) {
         pShot = fn_8003A950(pView->p78, 5, &nA, &f1, &f2, &nB, &f3, nPlayer);
     }

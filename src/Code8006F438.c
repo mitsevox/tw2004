@@ -65,7 +65,7 @@ s32 fn_8003467C();
 s32 fn_80046664();
 s32 fn_80048EF4();
 s32 fn_80058E40();
-s32 fn_80064EA4();
+s32 StaticCam_Reset();
 s32 fn_8006FBF8();
 s32 fn_80098C28();
 s32 fn_800A2B34(s32);
@@ -116,7 +116,7 @@ void fn_8006F568(void) {
         fn_8011E3B4();
         fn_8003467C();
         fn_80046664();
-        fn_80064EA4();
+        StaticCam_Reset();
         fn_80098C28();
         var_r31 = 0;
         do {

@@ -1161,8 +1161,8 @@ void fn_800FBD2C(int nPlayer) {
         break;
     case 0:
         Vec_Copy(p->vBall, vStart);
-        fn_80069330(nPlayer, vStart);
-        fn_8006A6C4(nPlayer);
+        PlaceBall_Set(nPlayer, vStart);
+        PlaceBall_SetupTarget(nPlayer);
         n = gPlayers[nPlayer].nView[0];
         CameraController_SetCameraMode(fn_80017028(n), 9, nPlayer, n);
         gPlayers[nPlayer].nC3C |= 1;

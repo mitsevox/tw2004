@@ -740,7 +740,7 @@ void fn_80067220(int nPlayer) {
         pPlayer->nShotKind2 = pPlayer->nShotKind;
         break;
     }
-    fn_800689D4(nPlayer);
+    TARGET_SetupTarget(nPlayer);
     pPlayer->fA60 = 0.0f;
     Shot_FitTargetToClub(nPlayer);
     Vec_Copy(pPlayer->vTarget, pPlayer->vTarget2);

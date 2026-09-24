@@ -168,12 +168,12 @@ u8    fn_80062B88(int nPlayer);
 void  fn_80062B84(int a);
 u8    fn_80062B7C(void);
 void  fn_800A5980(u8 nPlayer);
-void  fn_80068AA8(int nPlayer);
+void  TARGET_ResetMomentums(int nPlayer);
 f32   fn_800D04AC(int nPlayer);
 void  fn_800170F4(int nView);
 void  fn_8003349C(f32 a, f32 b, f32 c);
 void  fn_800D8D10(int nPlayer);
-void  fn_800693A4(int nPlayer);
+void  PlaceBall_ResetMomentums(int nPlayer);
 void  fn_80062D98(void);
 void  fn_80047EF0(Ball* pBall, int nPlayer, int a);  // tee the ball up
 void  fn_800A573C(u8 nPlayer);
@@ -2868,9 +2868,9 @@ void STATEFUNC_ShotSetupInit(int nPlayer) {
     GameEffects_ResetGameEffectSettings();
     fn_80058FA4(nPlayer);
     gPlayers[nPlayer].swing.unk630 = 1;
-    fn_80068AA8(nPlayer);
+    TARGET_ResetMomentums(nPlayer);
     if (gpGame->b276 != 0) {
-        fn_800689D4(nPlayer);
+        TARGET_SetupTarget(nPlayer);
     }
     if (gPlayers[nPlayer].pChar->n2C == 4 ||
         gPlayers[nPlayer].pChar->n2C == 5) {
@@ -2950,7 +2950,7 @@ void STATEFUNC_PlaceBallInit(int nPlayer) {
     fn_800957D8(gPlayers[nPlayer].pChar);
     GameEffects_ResetGameEffectSettings();
     fn_800D8D10(nPlayer);
-    fn_800693A4(nPlayer);
+    PlaceBall_ResetMomentums(nPlayer);
     Emotion_UpdatePlayerEmotion(nPlayer);
     fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut = 1;
     for (i = 0; i < gSession.nNumPlayers; i++) {
@@ -2963,8 +2963,8 @@ void STATEFUNC_PlaceBallInit(int nPlayer) {
     fn_80045824(nPlayer);
     CameraController_SetCameraMode(fn_80017028(gPlayers[nPlayer].nView[0]), 8, nPlayer, gPlayers[nPlayer].nView[0]);
     Vec_Copy(gPlayers[nPlayer].vBall, fTmp);
-    fn_80069330(nPlayer, fTmp);
-    fn_8006A6C4(nPlayer);
+    PlaceBall_Set(nPlayer, fTmp);
+    PlaceBall_SetupTarget(nPlayer);
     Swing_ResetBoostAndSpin(nPlayer);
 }
 
@@ -3047,7 +3047,7 @@ void STATEFUNC_PlaceBallUpdate(int nPlayer) {
         if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x19, 0)) &&
             gPlayers[nPlayer].ball.nLie != 0 && GM_PlayerTakeMulligan(nPlayer)) {
             fn_8001D8DC(nPlayer);
-            fn_800689D4(nPlayer);
+            TARGET_SetupTarget(nPlayer);
         }
     }
     PlaceBall_UpdateMomentums(nPlayer, 1.0f);
@@ -3333,7 +3333,7 @@ void STATEFUNC_PreShotInit(int nPlayer) {
     }
     GameEffects_ResetGameEffectSettings();
     fn_800D8D10(nPlayer);
-    fn_80068AA8(nPlayer);
+    TARGET_ResetMomentums(nPlayer);
     fn_800957FC(gPlayers[nPlayer].pChar, 1);
     Emotion_UpdatePlayerEmotion(nPlayer);
     if (gPlayers[nPlayer].pChar->n2C == 0) {
@@ -3694,7 +3694,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
     CameraController_SetCameraMode(fn_80017028(nView), 0xC, nPlayer, nView);
     GameEffects_ResetGameEffectSettings();
     fn_8001C804(nPlayer, 1, 1);
-    fn_80068AA8(nPlayer);
+    TARGET_ResetMomentums(nPlayer);
     fn_800A562C((u8)nPlayer);
     fn_8006BAA8(nPlayer);
     EVENT_Trigger(nPlayer, 0x2A, 0, -1);
@@ -3823,16 +3823,16 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
             fn_8001C804(nPlayer, 1, 1);
             fn_800957D8(gPlayers[nPlayer].pChar);
             fn_80095744(gPlayers[nPlayer].pChar, 5);
-            fn_800689D4(nPlayer);
+            TARGET_SetupTarget(nPlayer);
             fn_80062C38();
             if (gSession.nSplitScreen != 0) {
                 fn_80062CB0(gPlayers[nPlayer].nC58, 1);
             }
-            fn_80068AA8(nPlayer);
+            TARGET_ResetMomentums(nPlayer);
             fn_800642D0_ReapplyCurrentShot(fn_80017028(gPlayers[nPlayer].nView[0]), nPlayer);
             fn_800E3D38(nPlayer, 1);
         } else {
-            fn_80068AA8(nPlayer);
+            TARGET_ResetMomentums(nPlayer);
         }
         gpGame->pfn22C(nPlayer);
     } else {

@@ -395,7 +395,7 @@ typedef struct Player {
     s32  nEE4;                  // 0xEE4  2 or 3 picks a message after a shot (GM_PlayerTookShot)
     u32  uFlags;                // 0xEE8  bit 0: scripted reaction, bit 2: the early reaction has played, bit 3: score display
     f32  fEEC;                  // 0xEEC  distance to the pin when the early reaction started (GM_SimulateBallMovement)
-    u32  uFlagsEF0;             // 0xEF0  0x1: the ball can be placed at vPlacement (fn_800693A4);
+    u32  uFlagsEF0;             // 0xEF0  0x1: the ball can be placed at vPlacement (PlaceBall_ResetMomentums);
                                 //        0x2: target is over water
     u8   unkEF4[0xEF8 - 0xEF4];
 } Player;
@@ -650,7 +650,7 @@ typedef struct AITarget {
 } AITarget;
 
 // How a player's aim marker is drawn (our name; 0x2C bytes, one per player at lbl_801D5BF0,
-// target.c): the "tball" texture drawn at the target. Putts get a different set (fn_800689D4).
+// target.c): the "tball" texture drawn at the target. Putts get a different set (TARGET_SetupTarget).
 typedef struct TargetMarker {
     f32  f0;                    // 0x00
     f32  f4;                    // 0x04

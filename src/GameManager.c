@@ -921,7 +921,7 @@ void GM_CheckForShotChanges(int nPlayer) {
                 fn_8001C804(nPlayer, 1, 1);
                 fn_800957D8(gPlayers[nPlayer].pChar);
                 fn_80095744(gPlayers[nPlayer].pChar, 5);
-                fn_800689D4(nPlayer);
+                TARGET_SetupTarget(nPlayer);
                 fn_80062C38();
                 fn_800E3D38(nPlayer, 1);
             }

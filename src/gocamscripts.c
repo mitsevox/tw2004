@@ -2168,7 +2168,7 @@ u8 fn_800439E4(f32* pCam, int nPlayer) {
 
 // Puts the camera back on the fairway (CamScript_PutBackOnFairway) when the script asks for it
 // (bE8), or, once the camera has run CamTuning.fEC (or b) and the move is past half way (f98), when
-// the camera has left the hole's outline (fn_80069498) while the ball's next step stays inside it.
+// the camera has left the hole's outline (PlaceBall_GetPlaceBallNetwork) while the ball's next step stays inside it.
 // Only for a next shot (or, without one, a current shot) of bAD 4, and not while fn_800C6D9C holds.
 void CamScript_CheckOutOfBounds(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pSaved,
                                 f32* pPrev, u8 b) {
@@ -2189,7 +2189,7 @@ void CamScript_CheckOutOfBounds(CamScript* pScript, f32* pCam, f32* pSub, int nP
         }
     }
     if (!bEarly && (b || pScript->f98 > 0.5f)) {
-        pNet = fn_80069498();
+        pNet = PlaceBall_GetPlaceBallNetwork();
         if (pNet != NULL && fn_8000C140(pCam, pNet, pNet->nNumNodes) == 0) {
             fn_8004544C(gPlayers[nPlayer].ball.vVel, gPlayers[nPlayer].ball.vPos, vNext);
             if (!fn_8000C4E0(gPlayers[nPlayer].ball.vPos, vNext, pNet, pNet->nNumNodes)) {

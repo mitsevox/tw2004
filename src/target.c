@@ -1,6 +1,6 @@
-// target.c (TW06's target.c, golf/ai/target.c): where the CPU aims, the aim marker drawn at the
-// target, and where a ball may be placed or dropped (TW06's PlaceBall_* functions). Partly
-// decompiled; the machine-style code at the end is the sweep's.
+// target.c (TW06's target.c, golf/ai/target.c): the aim marker drawn at the target, a human's
+// aim-point and ball-placement controls, and where a ball may be placed or dropped (TW06's
+// PlaceBall_* functions). The machine-style code near the end is the sweep's.
 
 #include "game.h"
 #include "camera.h"
@@ -9,12 +9,12 @@
 void fn_80067B80(void);
 void fn_80067CD4(int nPlayer);
 void fn_80067DAC(int nPlayer);
-void fn_80068AA8(int nPlayer);
+void TARGET_ResetMomentums(int nPlayer);
 void fn_800690C0(int nPlayer);
 void fn_80069104(int nPlayer);
 void fn_80069148(int nPlayer);
 void fn_800691B0(int nPlayer);
-void fn_800693A4(int nPlayer);
+void PlaceBall_ResetMomentums(int nPlayer);
 void fn_80069A84(int nPlayer);
 void fn_80069AFC(int nPlayer);
 void fn_80069B74(int nPlayer);
@@ -323,7 +323,7 @@ void fn_80067DAC(int nPlayer) {
 
 // The marker's settings for the coming shot: one set for putts and shot kind 2, another for
 // everything else.
-void fn_800689D4(int nPlayer) {
+void TARGET_SetupTarget(int nPlayer) {
     if (gPlayers[nPlayer].nShotKind == 0 || gPlayers[nPlayer].nShotKind == 2) {
         lbl_801D5BF0[nPlayer].f0 = 0.0f;
         lbl_801D5BF0[nPlayer].f4 = 0.0f;
@@ -349,8 +349,8 @@ void fn_800689D4(int nPlayer) {
     lbl_801D5BF0[nPlayer].f24 = 0.2f;
 }
 
-// The ball-placement cursor stops.
-void fn_80068AA8(int nPlayer) {
+// Stops the aim point: its turn and move inputs (fA5C, fA60) back to 0.
+void TARGET_ResetMomentums(int nPlayer) {
     gPlayers[nPlayer].fA5C = 0.0f;
     gPlayers[nPlayer].fA60 = 0.0f;
 }
@@ -510,7 +510,7 @@ u8 fn_80068AC8(int nPlayer) {
     return bMoved;
 }
 
-// The placement cursor speeds up towards -x, at most -1.
+// The aim point's turn input (fA5C) ramps towards -1 (4.5 x the frame time a call).
 void fn_800690C0(int nPlayer) {
     gPlayers[nPlayer].fA5C -= 4.5f * gSession.fFrameTime;
     if (gPlayers[nPlayer].fA5C < -1.0f) {
@@ -518,7 +518,7 @@ void fn_800690C0(int nPlayer) {
     }
 }
 
-// The placement cursor speeds up towards +x, at most 1.
+// The aim point's turn input (fA5C) ramps towards 1 (4.5 x the frame time a call).
 void fn_80069104(int nPlayer) {
     gPlayers[nPlayer].fA5C += 4.5f * gSession.fFrameTime;
     if (gPlayers[nPlayer].fA5C > 1.0f) {
@@ -526,7 +526,8 @@ void fn_80069104(int nPlayer) {
     }
 }
 
-// The placement cursor speeds up towards +z, at most 1. 1000 holds it; -1000 is reset to 0 first.
+// The aim point's move input (fA60) ramps towards 1 (4.5 x the frame time a call). 1000 holds
+// it; -1000 is reset to 0 first.
 void fn_80069148(int nPlayer) {
     if (1000.0f == gPlayers[nPlayer].fA60) return;
     if (-1000.0f == gPlayers[nPlayer].fA60) {
@@ -538,7 +539,8 @@ void fn_80069148(int nPlayer) {
     }
 }
 
-// The placement cursor speeds up towards -z, at most -1. -1000 holds it; 1000 is reset to 0 first.
+// The aim point's move input (fA60) ramps towards -1 (4.5 x the frame time a call). -1000 holds
+// it; 1000 is reset to 0 first.
 void fn_800691B0(int nPlayer) {
     if (-1000.0f == gPlayers[nPlayer].fA60) return;
     if (1000.0f == gPlayers[nPlayer].fA60) {
@@ -553,7 +555,7 @@ void fn_800691B0(int nPlayer) {
 // Whether a ball may be placed at pPos: in bounds, not in a free-drop area, on ground that takes
 // a ball (not water, 7 and 16, or the cup, 12) and flat enough (the normal's y above cos 30);
 // then class 1 always, else a valid drop surface or a spot with no object or hazard near it.
-u8 fn_80069218(f32* pPos) {
+u8 PlaceBall_IsValidDropLocation(f32* pPos) {
     SurfaceType* pSurface;
     f32          vNormal[4];
 
@@ -570,7 +572,7 @@ u8 fn_80069218(f32* pPos) {
 }
 
 // Puts the placement point over pPos, on the ground if there is any there.
-void fn_80069330(int nPlayer, f32* pPos) {
+void PlaceBall_Set(int nPlayer, f32* pPos) {
     f32 fHeight;
 
     gPlayers[nPlayer].vPlacement[0] = pPos[0];
@@ -581,11 +583,11 @@ void fn_80069330(int nPlayer, f32* pPos) {
     }
 }
 
-// Stops the placement cursor and flags whether the ball can be placed where it is.
-void fn_800693A4(int nPlayer) {
+// Zeroes the aim inputs (fA5C, fA60) and flags whether the ball can be placed at vPlacement.
+void PlaceBall_ResetMomentums(int nPlayer) {
     gPlayers[nPlayer].fA5C = 0.0f;
     gPlayers[nPlayer].fA60 = 0.0f;
-    if (fn_80069218(gPlayers[nPlayer].vPlacement)) {
+    if (PlaceBall_IsValidDropLocation(gPlayers[nPlayer].vPlacement)) {
         gPlayers[nPlayer].uFlagsEF0 |= 1;
     } else {
         gPlayers[nPlayer].uFlagsEF0 &= ~1;
@@ -594,7 +596,7 @@ void fn_800693A4(int nPlayer) {
 
 // Inside the hole's placement outline, or, with none loaded, the in-bounds outlines; with an
 // outline, a point outside it still counts when some in-bounds outline holds it.
-u8 fn_80069428(f32* pPos) {
+u8 PlaceBall_CheckInBounds(f32* pPos) {
     if (lbl_80281E30 != NULL) {
         if (fn_8000C140(pPos, lbl_80281E30, lbl_80281E30->nNumNodes)) {
             return 1;
@@ -607,7 +609,7 @@ u8 fn_80069428(f32* pPos) {
     return Ter_PointInOOBNetwork(pPos);
 }
 
-TNetwork* fn_80069498(void) {
+TNetwork* PlaceBall_GetPlaceBallNetwork(void) {
     return lbl_80281E30;
 }
 
@@ -742,11 +744,11 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
         fBaseZ = gPlayers[nPlayer].vPlacement[2];
         vPos[0] = fZ * -fSin + fBaseX + fX * fCos;
         vPos[2] = fZ * fCos + fBaseZ + fX * fSin;
-        if (fn_80069428(vPos)) {
+        if (PlaceBall_CheckInBounds(vPos)) {
         place:
             gPlayers[nPlayer].vPlacement[0] = vPos[0];
             gPlayers[nPlayer].vPlacement[2] = vPos[2];
-            fn_80069330(nPlayer, gPlayers[nPlayer].vPlacement);
+            PlaceBall_Set(nPlayer, gPlayers[nPlayer].vPlacement);
         } else {
             // outside: try the step turned further and further either way
             for (fAngle = 15.0f; fAngle <= 90.0f; fAngle += 15.0f) {
@@ -759,7 +761,7 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
                 fCos = fn_80009638(fHeading);
                 vPos[0] = fZ * -fSin + fBaseX + fX * fCos;
                 vPos[2] = fZ * fCos + fBaseZ + fX * fSin;
-                if (fn_80069428(vPos)) {
+                if (PlaceBall_CheckInBounds(vPos)) {
                     gPlayers[nPlayer].fA84 = 0.0f;
                     goto place;  // fake match: the original has one copy of the placing code
                 }
@@ -771,7 +773,7 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
                 fCos = fn_80009638(fHeading);
                 vPos[0] = fZ * -fSin + fBaseX + fX * fCos;
                 vPos[2] = fZ * fCos + fBaseZ + fX * fSin;
-                if (fn_80069428(vPos)) {
+                if (PlaceBall_CheckInBounds(vPos)) {
                     gPlayers[nPlayer].fA84 = 0.0f;
                     goto place;  // fake match: as above
                 }
@@ -782,7 +784,7 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
             gPlayers[nPlayer].fA7C = 0.0f;
         }
     }
-    if (fn_80069218(gPlayers[nPlayer].vPlacement)) {
+    if (PlaceBall_IsValidDropLocation(gPlayers[nPlayer].vPlacement)) {
         gPlayers[nPlayer].uFlagsEF0 |= 1;
     } else {
         gPlayers[nPlayer].uFlagsEF0 &= ~1;
@@ -1087,7 +1089,7 @@ void fn_80069CDC(int nPlayer) {
 
 // fA88: the heading from the game's point (gpGame->p130) to the placement point, less a quarter
 // turn; and the aim marker's usual settings.
-void fn_8006A6C4(int nPlayer) {
+void PlaceBall_SetupTarget(int nPlayer) {
     f32 vDir[4];
 
     fn_8006A988(gPlayers[nPlayer].vPlacement, gpGame->p130, vDir);

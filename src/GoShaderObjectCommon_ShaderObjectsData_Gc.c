@@ -1,6 +1,5 @@
 // GoShaderObjectCommon_ShaderObjectsData_Gc.c (EA's name, from its asserts): builds the display
-// lists that draw the shader objects (the grass and other course objects drawn through GX
-// texture and colour stages). Partly decompiled.
+// lists that draw the shader objects through GX texture and colour stages.
 
 #include "engine.h"
 #include "gx.h"
@@ -544,8 +543,8 @@ u16* fn_80074CEC(u16* p, u16* pEnd) {
     return p + 1;
 }
 
-// A command of the display list: the blend mode (0 none, 1 alpha blend, 2 add source times
-// alpha, 3 subtract).
+// A command of the display list: the blend mode (0 none, 1 alpha blend, 2 source times alpha
+// replacing what is drawn there, 3 subtract).
 u16* fn_80074CF4(u16* p, u16* pEnd) {
     switch (*p++) {
     case 0:

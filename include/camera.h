@@ -95,7 +95,7 @@ typedef struct StaticCamDef {
     u8   unk0[0x10];
     f32  aPos[3];               // 0x10  -> CamShot.v20
     s32  n1C;                   // 0x1C  -> CamShot.nAE
-    s32  n20;                   // 0x20  -> CamShot.bAC (5: skipped when fn_80064F7C is asked to)
+    s32  n20;                   // 0x20  -> CamShot.bAC (5: skipped when StaticCam_ChooseScript is asked to)
     s32  nKinds;                // 0x24  -> CamShot.nA4: the shot kinds it serves, a bit each
     f32  fFov;                  // 0x28  in degrees -> CamShot.f78
     f32  f2C;                   // 0x2C  in degrees -> CamShot.f7C
@@ -145,13 +145,13 @@ LAYOUT_ASSERT(FlyByPath, 0x2E0);
 #define NUM_FLYBY_CAMS  30
 #define NUM_FLYBY_PATHS 10
 
-// GoStaticCam.c's state (0x1E68 bytes, allocated by fn_80064E2C).
+// GoStaticCam.c's state (0x1E68 bytes, allocated by StaticCam_Init).
 typedef struct StaticCams {
     CamShot aStatic[NUM_STATIC_CAMS];      // 0x0000  "Static Cam: n"
     CamShot aFlyBy[NUM_FLYBY_CAMS];        // 0x0780  "FlyBy Cam: n"
     s32  nFlyBy;                // 0x1E00  how many of aFlyBy are loaded
     s32  nStatic;               // 0x1E04  how many of aStatic are loaded
-    u8   bLinked;               // 0x1E08  the fly-by paths are chained (fn_8006509C)
+    u8   bLinked;               // 0x1E08  the fly-by paths are chained (StaticCam_GetFlyByCam)
     f32  afPathLength[NUM_FLYBY_PATHS];    // 0x1E0C  each path's length, its shots' f4C added up
     CamShot* apPath[NUM_FLYBY_PATHS];      // 0x1E34  each path's first shot
     u32  u1E5C;                 // 0x1E5C  } the 'CAMC' object's header
@@ -490,7 +490,7 @@ typedef struct GolfCamState {
     u8      b5C;                // 0x05C
     u8      b5D;                // 0x05D  cleared by the swing camera
     u8      unk5E[2];
-    s32     n60;                // 0x060  passed to fn_8006509C
+    s32     n60;                // 0x060  passed to StaticCam_GetFlyByCam
     f32     f64;                // 0x064  camera 7's slow-motion rate while b5A is set
     f32     f68;                // 0x068
     CamShot shot6C;             // 0x06C  the tutorial wait's two hand-made shots (camera 18)
@@ -720,9 +720,9 @@ extern f32 lbl_80191440[4][4];
 // ---- the static and fly-by cameras (GoStaticCam.c, 0x8006449C..) ----------------------------
 
 void     fn_80064F54(CamShot* pShot, int nPlayer, f32* pOut);   // the shot's position
-CamShot* fn_80064F7C(int nPlayer, int nKind, u8 bNotKind5, CamShot* pNot);
-CamShot* fn_8006509C(int nPath);        // a fly-by path's first shot (NULL past the 10th)
-FlyByPath* fn_80065424(u32 uPath);      // a fly-by path's spline (NULL: none)
+CamShot* StaticCam_ChooseScript(int nPlayer, int nKind, u8 bNotKind5, CamShot* pNot);
+CamShot* StaticCam_GetFlyByCam(int nPath);        // a fly-by path's first shot (NULL past the 10th)
+FlyByPath* fn_80065424(u32 uPath);      // a fly-by path's timing curve (NULL: none)
 void     fn_80065488(CamScript* pScript, int nPath, f32* pCam, f32* pSub, f32* pFov, int nPlayer,
                      f32 fShare);
 

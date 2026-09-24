@@ -141,8 +141,8 @@ void fn_8005D3A8(s8 nState);
 void fn_80062E00(void);
 void fn_80062E20(void);
 int  fn_80063758(void);
-void fn_80064E2C(void);
-void fn_80064E74(void);
+void StaticCam_Init(void);
+void StaticCam_DeInit(void);
 void fn_80065B44(void);
 void fn_80067608(void);
 void fn_8006765C(void);
@@ -625,7 +625,7 @@ void GO_vInitIG(void) {
     CameraTuning_Init();
     fn_80062E00();
     fn_80039FF8();
-    fn_80064E2C();
+    StaticCam_Init();
     fn_800B34F0();
     fn_80048DD0();
     fn_8006DCA0(0);
@@ -720,7 +720,7 @@ void fn_8006CDC4(void) {
     fn_800B352C();
     fn_80062E20();
     fn_8003A074();
-    fn_80064E74();
+    StaticCam_DeInit();
     fn_80097E98();
     fn_800DCC30();
     fn_8006F64C();

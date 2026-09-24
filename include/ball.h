@@ -291,9 +291,9 @@ u8   fn_8000C4E0(f32* pFrom, f32* pTo, TNetwork* pNet, s32 nNodes);   // the ray
 s32  Ter_iNumOOBNetworksLoaded(void);
 
 // target.c: placing the ball (TW06's PlaceBall_* functions, names not proven here)
-u8   fn_80069218(f32* pPos);            // a ball may be placed here. TW06: PlaceBall_IsValidDropLocation?
-u8   fn_80069428(f32* pPos);            // the point is in bounds. TW06: PlaceBall_CheckInBounds?
-TNetwork* fn_80069498(void);            // the hole's placement outline (lbl_80281E30), if any
+u8   PlaceBall_IsValidDropLocation(f32* pPos);            // a ball may be placed here. TW06: PlaceBall_IsValidDropLocation?
+u8   PlaceBall_CheckInBounds(f32* pPos);            // the point is in bounds. TW06: PlaceBall_CheckInBounds?
+TNetwork* PlaceBall_GetPlaceBallNetwork(void);            // the hole's placement outline (lbl_80281E30), if any
 f32  Terrain_HeightAt(f32* pPos, SurfaceType** ppSurface);   // 0x800447DC
 
 // TerrainGround.c (our name): the ground under a point or a quad
