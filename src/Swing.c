@@ -1509,7 +1509,7 @@ int Swing_UpdateDownswing(int nPlayer) {
     int        nController;
     Character* pObj;
     SwingData* pSw;
-    int        nX, nY;
+    s32        nX, nY;
     u8*        pPad;
 
     p           = &gPlayers[nPlayer];
@@ -1526,9 +1526,8 @@ int Swing_UpdateDownswing(int nPlayer) {
         nX     = Swing_StickX(nPlayer, pPad);
         nY     = Swing_StickY(nPlayer, pPad);
         nDX    = nX - pSw->nCalibrateX;
-        nDX    = nDX * nDX;     // fake match: squaring in its own statement sets the schedule (99.9%)
         nDY    = nY - pSw->nCalibrateY;
-        fDist2 = nDX + nDY * nDY;
+        fDist2 = nDX * nDX + nDY * nDY;
         if (nY <= 96 && fDist2 > 300.0f) {
             pSw->nFollowThroughX  = nX;
             pSw->nFollowThroughY  = nY;
@@ -3389,7 +3388,6 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
     View*   pV;
     GoDynObjPlayerA* pSlot;
     int     nSteps, i;
-    s32*    pState;
     f32     vHand[4];
 
     pV    = fn_80017028(gPlayers[nPlayer].nView[0]);
@@ -3439,15 +3437,14 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
     } else if (gPlayers[nPlayer].ball.nLie == 0) {
         fn_80047EF0(&gPlayers[nPlayer].ball, nPlayer, 0);
     }
-    pState = &gPlayers[nPlayer].ball.nState;
-    if (*pState != 0 && gPlayers[nPlayer].ball.nCollideCount == 0) {
+    if (gPlayers[nPlayer].ball.nState != 0 && gPlayers[nPlayer].ball.nCollideCount == 0) {
         nSteps = GameEffects_BallUpdatesThisFrame(nPlayer);
         Ball_SetSimulating(1);
         for (i = 0; i < nSteps; i++) {
             Physics_Simulate(&gPlayers[nPlayer].ball, 20);
         }
         Ball_SetSimulating(0);
-    } else if (*pState != 0) {
+    } else if (gPlayers[nPlayer].ball.nState != 0) {
         Physics_DropBall(&gPlayers[nPlayer].ball, gPlayers[nPlayer].ball.vPos);
     }
     if (!Player_IsCPU(nPlayer)) {
@@ -3459,7 +3456,7 @@ void STATEFUNC_PreShotUpdate(int nPlayer) {
             }
         }
     } else {
-        if (*pState == 0 && !bInHand) {
+        if (gPlayers[nPlayer].ball.nState == 0 && !bInHand) {
             AI_RehearseShot(nPlayer, NULL, 0, CPU_TOLERANCE);
         }
         if (!fn_80100294() && fn_80014300(fn_800142AC(0, 0))) {
