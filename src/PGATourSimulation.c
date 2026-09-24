@@ -46,6 +46,13 @@ char* GameModeDriverPGATour_GetInitialChampName(s32 i);               // a tourn
 s32  GameModeDriverPGATour_GetInitialChampScore(s32 i);                // and the champion's score
 s32  fn_800EF0E0(int nPlayer);          // GameModeDriverPGATour.c: the player's bracket
 
+PgaStatSort lbl_80281840 = { -1, 0 };
+#pragma explicit_zero_data on
+int lbl_80281848 = 0;
+#pragma explicit_zero_data reset
+u8 gbStatsDirty = 1;
+u8 gbScoresDirty = 1;
+
 PgaEntrantMC* GetEntrantMCPtr(int nPlayer, int nEntrant) {
     return &gpSaveData[nPlayer].tour.field.aEntrant[nEntrant];
 }
@@ -243,6 +250,7 @@ void fn_80117E98(int nPlayer) {
     u8 bFirst;
     s32 nPlayoff;
     s32 nPick;
+    s32 nRand;
     s32 i;
     PgaEntrantMC* pWinner;
     s32 nFirstPrize;
@@ -255,7 +263,9 @@ void fn_80117E98(int nPlayer) {
     if (fn_8011A6F4(nPlayer, 0)) {
         nWinner = 0;
     } else {
-        nPick = Misc_RandFunc(0) % nPlayoff;
+        // fake match: the pick goes through its own local (orig computes it in r0, then copies it)
+        nRand = Misc_RandFunc(0) % nPlayoff;
+        nPick = nRand;
         for (i = 0; i < nEntrants; i++) {
             if (fn_8011A6F4(nPlayer, i)) {
                 nWinner = i;
@@ -289,24 +299,24 @@ void fn_80117E98(int nPlayer) {
 // winnings or, with 15 tournaments, the scoring average). When a month ends, leading every pro's
 // winnings for the month wins that month's award, and the month's winnings start again.
 void fn_801180C4(int nPlayer, u8 bUser, u8 bFirst) {
-    SaveProfile* pProfile = &gpSaveData[nPlayer];
+    int i;
     s32 nAhead;
-    s32 i;
     s32 nNext;
+    TourSeason* pTour = &gpSaveData[nPlayer].tour;
+    PgaStatCounts* pStats = &gpSaveData[nPlayer].tour.aStats[PGA_USER_GOLFER];
 
     if (bFirst && fn_800EFA70(gpSaveData[nPlayer].tour.nEvent)->nC != 0) {
-        pProfile->tour.n4E9A++;
+        pTour->n4E9A++;
     }
     if (bUser && bFirst) {
-        pProfile->tour.n4E96++;
+        pTour->n4E96++;
     } else if (bUser && !bFirst) {
-        pProfile->tour.n4E96 = 0;
+        pTour->n4E96 = 0;
     }
 
     nAhead = 0;
     for (i = 0; i < PGA_NUM_PROS; i++) {
-        if (gpSaveData[nPlayer].tour.aStats[i].nCareerWinnings >
-            gpSaveData[nPlayer].tour.aStats[PGA_USER_GOLFER].nCareerWinnings) {
+        if (gpSaveData[nPlayer].tour.aStats[i].nCareerWinnings > pStats->nCareerWinnings) {
             nAhead++;
         }
     }
@@ -330,7 +340,7 @@ void fn_801180C4(int nPlayer, u8 bUser, u8 bFirst) {
     nNext = GameModeDriverPGATour_GetNextEvent();
     if (nNext == -1) {
         if (gpSaveData[nPlayer].tour.nSeason == 0
-            && gpSaveData[nPlayer].tour.aStats[PGA_USER_GOLFER].nSeasonWins > 1
+            && pStats->nSeasonWins > 1
             && fn_800D7770(nPlayer, &gpSaveData[nPlayer].a1C0[12])) {
             fn_8011C054(12, 2);
         }
@@ -346,7 +356,7 @@ void fn_801180C4(int nPlayer, u8 bUser, u8 bFirst) {
                 fn_8011C054(2, 1);
             }
         }
-        if (pProfile->tour.aStats[PGA_USER_GOLFER].nEvents >= 15
+        if (pStats->nEvents >= 15
             && fn_80118F60(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_SCORING)
             && fn_800D7770(nPlayer, &gpSaveData[nPlayer].a1C0[15])) {
             fn_8011C054(6, 2);
@@ -357,7 +367,7 @@ void fn_801180C4(int nPlayer, u8 bUser, u8 bFirst) {
         || CalDate_GetMonth(GameModeDriverPGATour_GetEndDate(nNext))
                != CalDate_GetMonth(GameModeDriverPGATour_GetEndDate(gpSaveData[nPlayer].tour.nEvent))) {
         for (i = 0; i < PGA_NUM_PROS; i++) {
-            if (pProfile->tour.aStats[PGA_USER_GOLFER].n44 < gpSaveData[nPlayer].tour.aStats[i].n44) {
+            if (pStats->n44 < gpSaveData[nPlayer].tour.aStats[i].n44) {
                 break;
             }
         }
@@ -845,6 +855,14 @@ s32 fn_80119AE0(int nPlayer) {
         }
     }
     return nRow;
+}
+
+// fake match: stands in for a function the original linker stripped. The file's pool has 0.0
+// right after the int-to-float constant, before fn_80119B54's 0.25; its body is unknown, this
+// one only reproduces the order.
+static f32 PGATourSimulation_StrippedFn(f32 x) {
+    if (x > 0.0f) return x;
+    return 0.0f;
 }
 
 // Simulates an entrant's strokes on a hole: the pro's scoring average for the hole's par (the
@@ -1691,17 +1709,21 @@ s32 fn_8011BCFC(const void* pA, const void* pB) {
 
 // The score sort comparisons (lbl_80281848 is the player). Lower scores first, then by name.
 
-// All entrants: a cut entrant sorts last, the winner first. 97.4%: only nPlayer and nEntrantA/nScoreB
-// swap saved registers (declaration orders, int/s32, an inline score helper and the permuter tried).
+// All entrants: a cut entrant sorts last, the winner first.
 s32 fn_8011BDF8(const void* pA, const void* pB) {
+    PgaEntrantMC* pEntrantA;
+    PgaEntrantMC* pEntrantB;
+    int nEntrantA;
+    int nEntrantB;
     s32 nScoreA;
-    s32 nEntrantB = *(const s32*)pB;
-    s32 nPlayer = lbl_80281848;
-    s32 nEntrantA = *(const s32*)pA;
-    PgaEntrantMC* pEntrantA = GetEntrantMCPtr(nPlayer, nEntrantA);
-    PgaEntrantMC* pEntrantB = GetEntrantMCPtr(nPlayer, nEntrantB);
     s32 nScoreB;
+    int nPlayer;
 
+    nEntrantA = *(const s32*)pA;
+    nEntrantB = *(const s32*)pB;
+    nPlayer = lbl_80281848;
+    pEntrantA = GetEntrantMCPtr(nPlayer, nEntrantA);
+    pEntrantB = GetEntrantMCPtr(nPlayer, nEntrantB);
     nScoreA = fn_8011937C(nPlayer, nEntrantA, !fn_8011908C(nPlayer, nEntrantA));
     if (fn_801197A4(nPlayer, nEntrantA)) {
         nScoreA = PGA_SCORE_CUT;
@@ -1725,9 +1747,9 @@ s32 fn_8011BDF8(const void* pA, const void* pB) {
 
 // The cut entrants among themselves.
 s32 fn_8011BF74(const void* pA, const void* pB) {
-    s32 nEntrantA = *(const s32*)pA;
-    s32 nEntrantB = *(const s32*)pB;
-    s32 nPlayer = lbl_80281848;
+    int nEntrantA = *(const s32*)pA;
+    int nEntrantB = *(const s32*)pB;
+    int nPlayer = lbl_80281848;
     PgaEntrantMC* pEntrantA = GetEntrantMCPtr(nPlayer, nEntrantA);
     PgaEntrantMC* pEntrantB = GetEntrantMCPtr(nPlayer, nEntrantB);
     s32 nScoreA = fn_8011937C(nPlayer, nEntrantA, !fn_8011908C(nPlayer, nEntrantA));

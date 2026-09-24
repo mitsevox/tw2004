@@ -588,15 +588,12 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
     s32 aAwardIds[10];
     Ball saved;
     int i;
-    int nSlot;
     u8 bReplace;
     u8 bLost;
     int j;
     s32 nValue;
-    u8 bHole;
-    u8 bTee;
     u8 bNoBall;
-    int nAdj;
+    s32 nAdj;
     int nHoles;
 
     lbl_80282254 = 0;
@@ -634,7 +631,7 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
         if (!bNoBall && !fn_800D4EF8(lbl_80200538.aShotGoal[i].uBallLies,
                                      fn_800D46E8(gPlayers[nPlayer].ball.nLie))) continue;
         if (!bNoBall && lbl_80200538.aShotGoal[i].f14 > fn_800D0550(nPlayer)) continue;
-        if (!bNoBall && lbl_80200538.aShotGoal[i].f18 != 0.0f &&
+        if (!bNoBall && lbl_80200538.aShotGoal[i].f18 &&
             lbl_80200538.aShotGoal[i].f18 < fn_800D0478(nPlayer)) continue;
         if (!fn_800D4EF8(lbl_80200538.aShotGoal[i].uShotKinds, gPlayers[nPlayer].nShotKind)) continue;
         if (!fn_800D4EF8(lbl_80200538.aShotGoal[i].uClubs, gPlayers[nPlayer].nClub)) continue;
@@ -659,6 +656,8 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
             GM_GetGameProgress(&gpSaveData[nPlayer]) < 100.0f) continue;
 
         if (lbl_80200538.aShotGoal[i].nAward != 39) {
+            int nSlot;
+
             if (!fn_800D76AC(nPlayer, lbl_80200538.aShotGoal[i].nAward)) continue;
             bReplace = 0;
             bLost = 0;
@@ -687,6 +686,8 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
                                          lbl_80200538.aBio[lbl_80200538.aShotGoal[i].nBio].nValue);
             }
         } else {
+            int nSlot;
+
             nValue = lbl_80200538.aShotGoal[i].nValue;
             if (nValue == 0) continue;
             bReplace = 0;
@@ -705,12 +706,12 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
                 }
             }
             if (bLost) continue;
-            aPrizeIds[nSlot] = lbl_80200538.aShotGoal[i].nId;
             lbl_80200330[nSlot] = nValue;
-            bHole = fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 2);
-            bTee = fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 1);
+            aPrizeIds[nSlot] = lbl_80200538.aShotGoal[i].nId;
             lbl_802003A8[nSlot] = fn_800D6A70(lbl_80200330[nSlot], nPlayer,
-                                              fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 0), bTee, bHole,
+                                              fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 0),
+                                              fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 1),
+                                              fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 2),
                                               &lbl_801FFAE8[nSlot]);
             if (fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 3)) {
                 lbl_802003A8[nSlot] = fn_800D7220(lbl_802003A8[nSlot], nPlayer, &lbl_801FFAE8[nSlot]);
@@ -745,13 +746,9 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
     s32 aPrizeIds[10];
     s32 aAwardIds[10];
     int i;
-    int nSlot;
     u8 bReplace;
-    u8 bLost;
     int j;
     s32 nValue;
-    u8 bHole;
-    u8 bTee;
 
     lbl_80282254 = 0;
     lbl_80282250 = 0;
@@ -819,6 +816,9 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
             GM_GetGameProgress(&gpSaveData[nPlayer]) < 100.0f) continue;
 
         if (lbl_80200538.aPuttGoal[i].nAward != 39) {
+            int nSlot;
+            u8 bLost;
+
             if (!fn_800D76AC(nPlayer, lbl_80200538.aPuttGoal[i].nAward)) continue;
             bReplace = 0;
             bLost = 0;
@@ -847,6 +847,9 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
                                          lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].nValue);
             }
         } else {
+            int nSlot;
+            u8 bLost;
+
             nValue = lbl_80200538.aPuttGoal[i].nValue;
             if (nValue == 0) continue;
             bReplace = 0;
@@ -865,12 +868,12 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
                 }
             }
             if (bLost) continue;
-            aPrizeIds[nSlot] = lbl_80200538.aPuttGoal[i].nId;
             lbl_80200308[nSlot] = nValue;
-            bHole = fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 2);
-            bTee = fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 1);
+            aPrizeIds[nSlot] = lbl_80200538.aPuttGoal[i].nId;
             lbl_80200380[nSlot] = fn_800D6A70(lbl_80200308[nSlot], nPlayer,
-                                              fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 0), bTee, bHole,
+                                              fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 0),
+                                              fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 1),
+                                              fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 2),
                                               &lbl_801FFAE8[nSlot]);
             if (fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 3)) {
                 lbl_80200380[nSlot] = fn_800D7220(lbl_80200380[nSlot], nPlayer, &lbl_801FFAE8[nSlot]);
@@ -903,13 +906,10 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
     s32 aPrizeIds[10];
     s32 aAwardIds[10];
     int i;
-    int nSlot;
     u8 bReplace;
     u8 bLost;
     int j;
     s32 nValue;
-    u8 bHole;
-    u8 bTee;
     int nHoles;
     int nNeed;
     u8 bMore;
@@ -994,6 +994,8 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
             GM_GetGameProgress(&gpSaveData[nPlayer]) < 100.0f) continue;
 
         if (lbl_80200538.aHoleGoal[i].nAward != 39) {
+            int nSlot;
+
             if (!fn_800D76AC(nPlayer, lbl_80200538.aHoleGoal[i].nAward)) continue;
             bReplace = 0;
             bLost = 0;
@@ -1022,6 +1024,8 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
                                          lbl_80200538.aBio[lbl_80200538.aHoleGoal[i].nBio].nValue);
             }
         } else {
+            int nSlot;
+
             nValue = lbl_80200538.aHoleGoal[i].nValue;
             if (nValue == 0) continue;
             bReplace = 0;
@@ -1040,12 +1044,12 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
                 }
             }
             if (bLost) continue;
-            aPrizeIds[nSlot] = lbl_80200538.aHoleGoal[i].nId;
             lbl_802002E0[nSlot] = nValue;
-            bHole = fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 2);
-            bTee = fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 1);
+            aPrizeIds[nSlot] = lbl_80200538.aHoleGoal[i].nId;
             lbl_80200358[nSlot] = fn_800D6A70(lbl_802002E0[nSlot], nPlayer,
-                                              fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 0), bTee, bHole,
+                                              fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 0),
+                                              fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 1),
+                                              fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 2),
                                               &lbl_801FFAE8[nSlot]);
             if (fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 3)) {
                 lbl_80200358[nSlot] = fn_800D7220(lbl_80200358[nSlot], nPlayer, &lbl_801FFAE8[nSlot]);
@@ -1895,20 +1899,24 @@ s32 fn_800D8720(s32 n) {
 int fn_800D8750(int nKind, int nValue, int bSave, const char* szName, int nPlayer) {
     int nResult;
     int nPos;
-    int j;
     int n;
     RecordEntry* pFrom;
     RecordEntry* pTo;
+    RecordEntry* pLast;
+    RecordEntry* pRec;
+    int j;
+    PlayerNumber_t nProfile;
 
     nResult = 0;
     if (gpGame->b136) return 0;
     if (nKind < 8) {
-        if (fn_800D867C(nKind, nValue, gSession.aCourseRecord[Game_GetCourse()].aRecord[nKind][4].nValue)) {
+        pLast = &gSession.aCourseRecord[Game_GetCourse()].aRecord[nKind][4];
+        if (fn_800D867C(nKind, nValue, pLast->nValue)) {
             nResult = 1;
             nPos = 4;
             for (j = 3; j >= 0; j--) {
-                if (fn_800D867C(nKind, nValue,
-                                gSession.aCourseRecord[Game_GetCourse()].aRecord[nKind][j].nValue)) {
+                pRec = &gSession.aCourseRecord[Game_GetCourse()].aRecord[nKind][j];
+                if (fn_800D867C(nKind, nValue, pRec->nValue)) {
                     nPos = j;
                 }
             }
@@ -1927,11 +1935,13 @@ int fn_800D8750(int nKind, int nValue, int bSave, const char* szName, int nPlaye
                 sprintf(pTo->szName, szName);
             }
         }
-        if (fn_800D867C(nKind, nValue, gSession.recA[nKind][4].nValue)) {
+        pLast = &gSession.recA[nKind][4];
+        if (fn_800D867C(nKind, nValue, pLast->nValue)) {
             nResult = 3;
             nPos = 4;
             for (j = 3; j >= 0; j--) {
-                if (fn_800D867C(nKind, nValue, gSession.recA[nKind][j].nValue)) {
+                pRec = &gSession.recA[nKind][j];
+                if (fn_800D867C(nKind, nValue, pRec->nValue)) {
                     nPos = j;
                 }
             }
@@ -1953,11 +1963,13 @@ int fn_800D8750(int nKind, int nValue, int bSave, const char* szName, int nPlaye
     } else if (nKind == 8) {
         n = fn_800D86DC(Game_GetMode());
         if (n != 3) {
-            if (fn_800D867C(nKind, nValue, gSession.recB[fn_80015464()][n][4].nValue)) {
+            pLast = &gSession.recB[fn_80015464()][n][4];
+            if (fn_800D867C(nKind, nValue, pLast->nValue)) {
                 nResult = 1;
                 nPos = 4;
                 for (j = 3; j >= 0; j--) {
-                    if (fn_800D867C(nKind, nValue, gSession.recB[fn_80015464()][n][j].nValue)) {
+                    pRec = &gSession.recB[fn_80015464()][n][j];
+                    if (fn_800D867C(nKind, nValue, pRec->nValue)) {
                         nPos = j;
                     }
                 }
@@ -1980,11 +1992,13 @@ int fn_800D8750(int nKind, int nValue, int bSave, const char* szName, int nPlaye
     } else {
         n = fn_800D8720(fn_80126FA0());
         if (n != 2) {
-            if (fn_800D867C(nKind, nValue, gSession.recC[fn_80127098(fn_80015464())][n][4].nValue)) {
+            pLast = &gSession.recC[fn_80127098(fn_80015464())][n][4];
+            if (fn_800D867C(nKind, nValue, pLast->nValue)) {
                 nResult = 1;
                 nPos = 4;
                 for (j = 3; j >= 0; j--) {
-                    if (fn_800D867C(nKind, nValue, gSession.recC[fn_80127098(fn_80015464())][n][j].nValue)) {
+                    pRec = &gSession.recC[fn_80127098(fn_80015464())][n][j];
+                    if (fn_800D867C(nKind, nValue, pRec->nValue)) {
                         nPos = j;
                     }
                 }
@@ -2005,9 +2019,12 @@ int fn_800D8750(int nKind, int nValue, int bSave, const char* szName, int nPlaye
             }
         }
     }
-    if (nPlayer != 5 && nResult != 0 && (u8)bSave) {
-        if (gpSaveData[gPlayers[nPlayer].nIndex].bActive) {
-            gpSaveData[gPlayers[nPlayer].nIndex].b70 = 1;
+    if (nPlayer != 5) {
+        nProfile = gPlayers[nPlayer].nIndex;
+        if (nResult != 0 && (u8)bSave) {
+            if (gpSaveData[nProfile].bActive) {
+                gpSaveData[nProfile].b70 = 1;
+            }
         }
     }
     return nResult;
@@ -2332,17 +2349,22 @@ u8 fn_800D9998(int nPlayer, int nAward) {
     u8 bFullSeason;
     int i;
     int nLeads;
+    PgaStatCounts* pStats;
+    TourSeason* pTour;
 
     if (fn_800E177C() != 0) return 0;
     pProfile = &gpSaveData[nPlayer];
     if (!pProfile->bActive) return 0;
-    bSeasonEnd = 0;
+    pStats = &pProfile->tour.aStats[PGA_USER_GOLFER];
+    pTour = &pProfile->tour;
     if ((pProfile->tour.nEvent == -1 || GameModeDriverPGATour_GetNextEvent() == -1) &&
         pProfile->tour.nRound + 1 == GameModeDriverPGATour_GetRounds(pProfile->tour.nEvent)) {
         bSeasonEnd = 1;
+    } else {
+        bSeasonEnd = 0;
     }
     // fake match: the (int) changes nothing in C, but gives EA's signed compare (srawi; subfc; adde)
-    bFullSeason = (int)pProfile->tour.aStats[PGA_USER_GOLFER].nEvents >= 15;
+    bFullSeason = (int)pStats->nEvents >= 15;
 
     switch (nAward) {
     case 23:
@@ -2403,7 +2425,7 @@ u8 fn_800D9998(int nPlayer, int nAward) {
         }
         return 0;
     case 31:
-        return pProfile->tour.n4E96 > 11;
+        return pTour->n4E96 > 11;
     case 32:
         return fn_800E17AC(nPlayer) < 59;
     case 33:
@@ -2413,20 +2435,19 @@ u8 fn_800D9998(int nPlayer, int nAward) {
         }
         return 0;
     case 34:
-        if (pProfile->tour.n4E94 > 100 &&
-            (f32)pProfile->tour.aStats[PGA_USER_GOLFER].nCareerWins / (f32)pProfile->tour.n4E94 > 0.28f) {
+        if (pTour->n4E94 > 100 && (f32)pStats->nCareerWins / (f32)pTour->n4E94 > 0.28f) {
             return 1;
         }
         return 0;
     case 35:
-        return pProfile->tour.n4E98 > 66;
+        return pTour->n4E98 > 66;
     case 36:
-        return pProfile->tour.n4E9A > 18;
+        return pTour->n4E9A > 18;
     case 37:
-        return pProfile->tour.aStats[PGA_USER_GOLFER].nSeasonWins > 9;
+        return pStats->nSeasonWins > 9;
     case 38:
         // Tiger Woods's season record, $9,188,321 in 2000.
-        return pProfile->tour.aStats[PGA_USER_GOLFER].nSeasonWinnings > 9188321;
+        return pStats->nSeasonWinnings > 9188321;
     }
     return 0;
 }
