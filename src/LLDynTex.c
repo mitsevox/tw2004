@@ -21,6 +21,8 @@ void fn_8000FBAC();
 
 void fn_8010B7C0(void);
 void fn_8010A930(DynTexObj* pObj, u8* pBuf, void* p, s32 n);
+s32  fn_8010B338(DynTex* pTex, DynTexObj* pObj, DynTexPalette* pPal, u8* pPixels, u8* pPalette,
+                 void* p, s32 n);   // adds a texture; gives its index
 DynTexJob* fn_8010B960(void);
 u8   fn_8010BF3C(void);
 u8   fn_8010BFE0(void);
@@ -53,6 +55,36 @@ void fn_8010A668(DynTex* pTex) {
     fn_80009E70(pTex->p18);
     fn_80009E70(pTex);
 }
+
+// ---- end of sweep code ----
+
+// pDst emptied, then every texture of pSrc added to it (with its palette when it has one).
+void fn_8010A6A8(DynTex* pSrc, DynTex* pDst) {
+    int i;
+    u8* pPixels;
+    u8* pPalettes;
+    DynTexObj* pObj;
+    DynTexPalette* pPal;
+
+    fn_8010B098(pDst);
+    pPixels = pSrc->p4->p18;
+    pPalettes = pSrc->p4->p20;
+    for (i = 0; i < pSrc->n8; i++) {
+        pObj = &pSrc->p4->p8[i];
+        pPal = NULL;
+        if (pObj->n3C != -1) {
+            pPal = &pSrc->p4->pC[i];
+        }
+        if (pPal != NULL) {
+            fn_8010B338(pDst, pObj, pPal, pPixels + pObj->aBlocks[0].nOffset, pPalettes + pPal->nOffset,
+                        NULL, 0);
+        } else {
+            fn_8010B338(pDst, pObj, NULL, pPixels + pObj->aBlocks[0].nOffset, NULL, NULL, 0);
+        }
+    }
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void* fn_8010A780(DynTex* pTex) {
     return pTex->p4;
@@ -150,7 +182,7 @@ void fn_8010ADA4(DynTex* pTex) {
 
 // Fills pEntry for pObj and its palette pPal (if any): the id, each level's bytes and the
 // palette's, each rounded up to 16. Returns them all added up.
-s32 fn_8010B0C0(DynTexObj* pObj, DynTexPalObj* pPal, DynTexEntry* pEntry) {
+s32 fn_8010B0C0(DynTexObj* pObj, DynTexPalette* pPal, DynTexEntry* pEntry) {
     u32 nA = pObj->n38;
     u32 nB = pObj->n3A;
     s32 nTotal = 0;

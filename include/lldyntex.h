@@ -53,7 +53,7 @@ void  fn_8010BC64(u8* p);
 void  fn_8010BC88(void* p);
 void  fn_8010BEC4(void);
 void  fn_8010BED4(void);
-void  fn_8010A6A8(void* pSrc, void* pDst);   // char.c: from the model in use to the other one
+void  fn_8010A6A8(struct DynTex* pSrc, struct DynTex* pDst);   // char.c: from the model in use to the other one
 DynTexJob* fn_8010B8EC(void);           // a free job, or NULL
 void  fn_8010B930(DynTexJob* pJob);     // queue it
 
@@ -88,18 +88,12 @@ typedef struct DynTexObj {
 } DynTexObj;
 LAYOUT_ASSERT(DynTexObj, 0x50);
 
-// A texture's palette as fn_8010B0C0 and fn_8010B664 read it (our name; only what they read,
-// size unknown).
-typedef struct DynTexPalObj {
-    u8    unk0[8];
-    s16   nEntries;             // 0x8
-    s16   nFormat;              // 0xA  a pixel format, as DynTexObj.n40
-} DynTexPalObj;
-
-// Per texture (0xC bytes, DynTexHeader.pC): where its palette sits in DynTex.p18.
+// Per texture (0xC bytes, DynTexHeader.pC): where its palette sits in DynTex.p18, and its size.
 typedef struct DynTexPalette {
     s32   nOffset;              // 0x0
-    u8    unk4[8];
+    u8    unk4[4];
+    s16   nEntries;             // 0x8
+    s16   nFormat;              // 0xA  a pixel format, as DynTexObj.n40
 } DynTexPalette;
 LAYOUT_ASSERT(DynTexPalette, 0xC);
 
@@ -122,6 +116,9 @@ typedef struct DynTexHeader {
     DynTexPalette* pC;          // 0x0C
     struct DynTex40* p10;       // 0x10  } per texture, not read yet
     struct DynTex18* p14;       // 0x14  }
+    u8*   p18;                  // 0x18  the textures' pixels (at their blocks' nOffset)
+    u8    unk1C[4];
+    u8*   p20;                  // 0x20  and palettes (at their DynTexPalette.nOffset)
 } DynTexHeader;
 
 // A dynamic texture (made by fn_8010A520, freed by fn_8010A668); only what the code reads so far.
