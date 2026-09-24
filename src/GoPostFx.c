@@ -46,7 +46,9 @@ void fn_80037E50(void) {
         fn_8002A528(&lbl_801D4FB0[0], 256, 224, lbl_80281D80, NULL, 6, 0, 0, 0);
         fn_8002A528(&lbl_801D4FB0[1], 256, 224, lbl_80281D80, NULL, 6, 0, 0, 0);
     }
-    if (fn_8002A624() != NULL) {
+    // fake match: EA tests the pixel pointer as a signed number (cmpwi; port: a 64-bit pointer
+    // must be tested whole, against NULL)
+    if ((s32)fn_8002A624() != 0) {
         fn_8002A528(&lbl_801D4F80, 256, 128, fn_8002A624(), NULL, 4, 0, 0, 0);
     }
 }
@@ -518,6 +520,11 @@ void fn_80038A90(f32* pColour, u8 bCopy, int nView, int nField, f32 fCX, f32 fCY
 // pSrc's own alpha), and texture coordinates in the 256 x 128 screen copy.
 void fn_80038E7C(f32* pXY, f32* pColour, f32* pUV, int n, f32* pSrc, f32 fCX, f32 fCY, f32 fX0,
                  f32 fY0, f32 fX1, f32 fY1, f32 fMaxDist) {
+    f32* pOutXY;
+    f32* pOutUV;
+    f32* pOutColour;
+    f32* pIn;
+    int nVerts;
     int i;
     f32 fX;
     f32 fY;
@@ -525,28 +532,33 @@ void fn_80038E7C(f32* pXY, f32* pColour, f32* pUV, int n, f32* pSrc, f32 fCX, f3
     f32 fDYSq;
     f32 fAlpha;
 
-    for (i = 0; i < n; i++) {
-        fX = (f32)i * ((fX1 - fX0) / (f32)n) + fX0;
-        fY = (f32)i * ((fY1 - fY0) / (f32)n) + fY0;
+    pOutXY = pXY;
+    pOutUV = pUV;
+    pOutColour = pColour;
+    pIn = pSrc;
+    nVerts = n;
+    for (i = 0; i < nVerts; i++) {
+        fX = (f32)i * ((fX1 - fX0) / (f32)nVerts) + fX0;
+        fY = (f32)i * ((fY1 - fY0) / (f32)nVerts) + fY0;
         fDXSq = (fX - fCX) * (fX - fCX);
         fDYSq = (fY - fCY) * (fY - fCY);
-        fAlpha = pSrc[3] * ((f32)fn_80009680(fDXSq + fDYSq) / fMaxDist);
-        fAlpha = (fAlpha < 0.0f) ? 0.0f : ((fAlpha > pSrc[3]) ? pSrc[3] : fAlpha);
-        pXY[0] = fX;
-        pXY[1] = fY;
-        pXY[2] = 1.0f;
-        pXY[3] = 1.0f;
-        pXY += 4;
-        pUV[0] = fX;
-        pUV[1] = 224.0f * fY / 128.0f;
-        pUV[2] = 1.0f;
-        pUV[3] = 1.0f;
-        pUV += 4;
-        pColour[0] = pSrc[0];
-        pColour[1] = pSrc[1];
-        pColour[2] = pSrc[2];
-        pColour[3] = fAlpha;
-        pColour += 4;
+        fAlpha = pIn[3] * ((f32)fn_80009680(fDXSq + fDYSq) / fMaxDist);
+        fAlpha = (fAlpha < 0.0f) ? 0.0f : ((fAlpha > pIn[3]) ? pIn[3] : fAlpha);
+        pOutXY[0] = fX;
+        pOutXY[1] = fY;
+        pOutXY[2] = 1.0f;
+        pOutXY[3] = 1.0f;
+        pOutXY += 4;
+        pOutUV[0] = fX;
+        pOutUV[1] = 224.0f * fY / 128.0f;
+        pOutUV[2] = 1.0f;
+        pOutUV[3] = 1.0f;
+        pOutUV += 4;
+        pOutColour[0] = pIn[0];
+        pOutColour[1] = pIn[1];
+        pOutColour[2] = pIn[2];
+        pOutColour[3] = fAlpha;
+        pOutColour += 4;
     }
 }
 
