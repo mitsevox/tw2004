@@ -76,6 +76,100 @@ void fn_80107994(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80107998(MsgArg* pArgs, MsgArg* pResult) {
 }
 
+// ---- end of sweep code ----
+
+// The place, in its part's list, of the asset in the profile's slot for part pArgs[0] (part 12:
+// for its entry pArgs[1]); 0 when the part has no slot or the slot is empty.
+void fn_80107A2C(MsgArg* pArgs, MsgArg* pResult) {
+    s16 nPart = pArgs[0].i;
+    s32 nEntry = pArgs[1].i;
+    s32 n;
+    s16 nSlot;
+
+    switch (nPart) {
+    case 3:
+        nSlot = 16;
+        break;
+    case 4:
+        nSlot = 19;
+        break;
+    case 5:
+        nSlot = 18;
+        break;
+    case 6:
+        nSlot = 17;
+        break;
+    case 9:
+        nSlot = 24;
+        break;
+    case 10:
+        nSlot = 25;
+        break;
+    case 14:
+        nSlot = 22;
+        break;
+    case 15:
+        nSlot = 23;
+        break;
+    case 16:
+        nSlot = 20;
+        break;
+    case 21:
+        nSlot = 21;
+        break;
+    case 11:
+        nSlot = 26;
+        break;
+    case 22:
+        nSlot = 15;
+        break;
+    default:
+        nSlot = -1;
+        break;
+    }
+    if (nPart == 12) {
+        switch (nEntry) {
+        case 0:
+            nSlot = 44;
+            break;
+        case 1:
+            nSlot = 45;
+            break;
+        case 2:
+            nSlot = 46;
+            break;
+        case 3:
+            nSlot = 47;
+            break;
+        case 4:
+            nSlot = 48;
+            break;
+        case 5:
+            nSlot = 49;
+            break;
+        case 6:
+            nSlot = 51;
+            break;
+        case 7:
+            nSlot = 50;
+            break;
+        }
+    }
+    if (nSlot == -1) {
+        pResult->i = 0;
+    } else {
+        n = fn_80103D14(nSlot);
+        if (n < 0) {
+            n = 0;
+        } else {
+            fn_80105FF8(n, &nPart, &nEntry, &n);
+        }
+        pResult->i = n;
+    }
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_80107BA4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
@@ -373,6 +467,52 @@ void fn_80108690(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[3].p = lbl_80281ED4->aPart[b][nCategory][2];
     *(s32*)pArgs[4].p = lbl_80281ED4->aPart[b][nCategory][3];
     *(s32*)pArgs[5].p = lbl_80281ED4->aPart[b][nCategory][4];
+}
+
+// A part's choice i is one of today's random assets: parts 0, 1, 2 and 7 are category -1, parts
+// 8, 19 and 20 category -2, part 12 category -3 (other parts have none).
+void fn_80108768(MsgArg* pArgs, MsgArg* pResult) {
+    s16 nPart = pArgs[0].i;
+    int b = pArgs[1].i;
+    int i = pArgs[2].i;
+    s8 nDb = fn_80103BB4();
+    int nAsset = fn_80104FA8(nPart, b, i);
+    int nKind;
+    int nCategory;
+    int j;
+
+    switch (nPart) {
+    case 0:
+    case 1:
+    case 2:
+    case 7:
+        nKind = -1;
+        break;
+    case 8:
+    case 19:
+    case 20:
+        nKind = -2;
+        break;
+    case 12:
+        nKind = -3;
+        break;
+    default:
+        pResult->i = 0;
+        return;
+    }
+    nCategory = fn_80077BDC(nKind);
+    if (lbl_80281ED4->aKind[nDb][nCategory] != nPart) {
+        pResult->i = 0;
+        return;
+    }
+    for (j = 0; j < 5; j++) {
+        if (nAsset == fn_80104FA8(lbl_80281ED4->aKind[nDb][nCategory], lbl_80281ED4->aPart[nDb][nCategory][j],
+                                  lbl_80281ED4->aChoice[nDb][nCategory][j])) {
+            pResult->i = 1;
+            return;
+        }
+    }
+    pResult->i = 0;
 }
 
 // ---- sweep code (not yet cleaned up) ----
