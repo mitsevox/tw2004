@@ -118,13 +118,14 @@ void fn_800A9AC8(void) {
 // steals the lowest-priority sorted track below fPriority that is not streamed or unstarted; an
 // unsorted source takes the last sorted track.
 AudTrack* fn_800A9BC8(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 fPriority) {
+    UPool* const pPool = &lbl_80282098;
     s32 bSorted;
     UList* pList;
     AudTrack* pTrack;
 
     bSorted = pSource->pSound->n3 & 1;
     pList = &lbl_801F1868[bSorted];
-    if (lbl_80282098.nFree == 0) {
+    if (pPool->nFree == 0) {
         pTrack = (AudTrack*)lbl_801F1868[1].pTail;
         if (lbl_801F1868[1].nCount == 0) return NULL;
         if (bSorted == 1) {
@@ -139,7 +140,7 @@ AudTrack* fn_800A9BC8(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 
             return NULL;
         }
     }
-    pTrack = fn_800AE1AC(&lbl_80282098);
+    pTrack = fn_800AE1AC(pPool);
     pTrack->pTmpl = pTmpl;
     pTrack->pSource = pSource;
     pSource->apTracks[nChannel] = pTrack;
