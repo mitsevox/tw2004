@@ -216,6 +216,8 @@ UObject3D.c:
 
 GoDynObj.c:
 	.text       start:0x80045F74 end:0x800486F4
+	.data       start:0x80187B98 end:0x80187D48
+	.sdata2     start:0x80283168 end:0x802831E0
 
 UObject.c:
 	.text       start:0x800486F4 end:0x80048AF4

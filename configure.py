@@ -889,7 +889,7 @@ config.libs = [
             Object(NonMatching, "gocamscripts.c"),
             Object(NonMatching, "DepthField.c"),
             Object(Matching, "UObject3D.c"),
-            Object(NonMatching, "GoDynObj.c"),
+            Object(Matching, "GoDynObj.c"),
             Object(NonMatching, "UObject.c"),
             Object(Matching, "UKernel.c"),
             Object(Matching, "GoAnimalActors.c"),
