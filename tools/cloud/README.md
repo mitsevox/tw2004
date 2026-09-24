@@ -20,7 +20,9 @@ bash tools/cloud/setup.sh      # main.dol, compilers (wibo), permuter + m2c besi
 It must end with `build/GW4E69/main.dol: OK`. Then time, and record in `agents/state.md`: a full
 build from clean (`ninja -t clean && time ninja`), one `trial.py` loop on a near-miss, and a
 5-minute `permute.py` run (iterations reported). Locally (Windows, 20 cores) a full build took
-about a minute.
+about a minute; the first cloud box (4 cores) took 27 s. `ninja -t clean` ends with "Directory not
+empty" for `build/compilers` and `build/binutils`: harmless, the game objects are gone and the
+downloaded tools stay.
 
 ## Notes
 

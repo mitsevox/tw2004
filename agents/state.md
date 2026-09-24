@@ -19,8 +19,11 @@ headers 69 (phase 3, not started).
 
 ## First tasks in the cloud (in order)
 
-1. **Setup and speed test** (`tools/cloud/README.md`): `main.dol: OK`, then time a full build, a
-   trial.py loop and a 5-minute permuter run.
+1. DONE 2026-09-24, cloud box = 4 cores, 15 GB: setup OK; full build from clean 27 s (441 steps,
+   `main.dol: OK`); trial.py 0.4 s per variant (Earnings); permuter `-j 2` 3,446 iterations in 5
+   min (fn_800D477C). permute.py fixed on Linux (it left its pool workers running and hid the
+   iteration count). Lane budget here: CPU, not builds, is the limit: 2 lanes with at most one
+   permuter each, 3 if only one permutes at a time.
 2. **Make tools/match Linux-clean**: several tools call Windows `.exe` paths directly (datamap,
    declcheck, lint `--compile`, quicktrial, sbs2, symaudit, typeaudit; perm_setup, perm_objdump and
    permute are already portable). Use the build's own wrapper logic (wibo/wine for the compiler, no

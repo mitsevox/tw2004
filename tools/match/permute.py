@@ -3,7 +3,7 @@
 Sets up build/perm/<fn> (perm_setup.py), runs the permuter, and stops it after the time limit,
 killing its whole process tree (Git Bash's `timeout` does not stop it on Windows). Then lists the
 best outputs found. Read the diff in the best output and apply the idea by hand."""
-import glob, os, pathlib, subprocess, sys, time
+import glob, os, pathlib, signal, subprocess, sys, time
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]   # the checkout this script lives in
 # decomp-permuter checkout: TW_PERMUTER, else tools/decomp-permuter beside the main checkout
@@ -37,21 +37,33 @@ def kill_orphan_workers():
 kill_orphan_workers()                # leftovers of earlier runs
 subprocess.run([sys.executable, str(ROOT / 'tools/match/perm_setup.py'), unit, fn], check=True)
 out = ROOT / 'build/perm' / fn
+log = open(out / 'permuter.log', 'w')   # its progress line gives the iteration count
+# on Linux the permuter gets its own process group: p.kill() alone left its pool workers running
 p = subprocess.Popen([sys.executable, PERMUTER, str(out), '-j%d' % jobs, '--best-only'],
-                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                     stdout=log, stderr=subprocess.STDOUT, start_new_session=os.name != 'nt')
+timed_out = False
 try:
     p.wait(timeout=minutes * 60)
 except subprocess.TimeoutExpired:
-    pass
+    timed_out = True
 finally:                             # whatever ended the wait, the whole tree goes
     if p.poll() is None:
         if os.name == 'nt':
             subprocess.run(['taskkill', '/PID', str(p.pid), '/T', '/F'], capture_output=True)
         else:
-            p.kill()
+            os.killpg(p.pid, signal.SIGINT)      # the permuter's own clean exit
+            try:
+                p.wait(timeout=15)
+            except subprocess.TimeoutExpired:
+                os.killpg(p.pid, signal.SIGKILL)
         p.wait()
     kill_orphan_workers()
-print('permuter stopped after', 'the time limit' if p.returncode else 'finishing', f'({minutes} min)')
+    log.close()
+print('permuter stopped after', 'the time limit' if timed_out else 'finishing', f'({minutes} min)')
+progress = [l for l in (out / 'permuter.log').read_text(errors='replace').replace('\r', '\n').split('\n')
+            if l.startswith('iteration ')]
+if progress:
+    print(' ', progress[-1].strip())
 best = sorted(glob.glob(str(out / 'output-*')), key=lambda d: int(d.split('output-')[1].split('-')[0]))
 if not best:
     print('no improvement found')
