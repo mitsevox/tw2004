@@ -6,8 +6,6 @@
 #include "dynobj.h"
 
 int fn_80007BC4(RenderObj* obj, Camera* cam, float* outDepth, int mode, float scale);
-void fn_80008214(void);
-void fn_80008248(void* p);
 void fn_80007930(UObjModelRoot* pRoot, int nSet);
 void fn_80007658(UObjModelRoot* pRoot, UObjMesh* pMesh, u8* pData, int nCount, int n);   // not decompiled yet
 
@@ -35,7 +33,7 @@ void fn_80007524(UObjMesh* pMesh) {
 void fn_800075CC(UObjModelRoot* pRoot) {
     int i;
 
-    fn_80008214();
+    fn_80008214(&pRoot->aSets[0]);
     for (i = 1; i < 4; i++) {
         if (pRoot->aSets[i].n30 != -1) {
             fn_80007930(pRoot, i);

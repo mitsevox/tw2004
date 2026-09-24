@@ -11,7 +11,6 @@ void fn_80013D68(Camera* pCamera);
 void fn_80013E28(Camera* pCamera, f32* pRect);
 void fn_80013E30(Camera* pCamera, GoFrameBuf* pBuf);
 void fn_80013E38(Camera* pCamera, CamLens* pLens);
-GoFrameBuf* fn_80013E40(Camera* pCamera);
 void fn_80013E48(Camera* pCamera);
 void fn_80013EA0(Camera* pCamera);
 void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
