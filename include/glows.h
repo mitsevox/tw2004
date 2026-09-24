@@ -65,15 +65,38 @@ typedef struct SunFlrView {
 } SunFlrView;
 LAYOUT_ASSERT(SunFlrView, 0xA8);
 
+// An entry of Code8009AA28.c's table lbl_80189E78 (0x90 bytes; our name): up to two elements.
+typedef struct SunFlrSet {
+    struct {
+        u8   unk0[0x24];
+        f32  f24;               // +0x24
+        u8   unk28[0x40 - 0x28];
+    } a[2];                     // 0x00
+    s32  nCount;                // 0x80  how many of a[] are used
+    u8   unk84[0x90 - 0x84];
+} SunFlrSet;
+LAYOUT_ASSERT(SunFlrSet, 0x90);
+
+// Code8009AA28.c's tables (.data), handed to its state by fn_8009AF30.
+extern SunFlrSet lbl_80189E78[3];
+extern u8 lbl_8018A028[0x4B0];
+extern u8 lbl_8018A4D8[];
+
 // Code8009AA28.c's state (our name), reached through lbl_802813B8. Only the fields read are named.
 typedef struct SunFlrState {
     u8   unk0[4];
     f32  v4[3];                 // 0x0004  set by GoTerrain.c's fn_80035590
     u8   unk10[4];
     f32  v14[3];                // 0x0014  set by GoTerrain.c's fn_800355B8
-    u8   unk20[0x1930 - 0x20];
+    u8   unk20[0x1924 - 0x20];
+    SunFlrSet* p1924;           // 0x1924  lbl_80189E78
+    u8*  p1928;                 // 0x1928  lbl_8018A028
+    u8*  p192C;                 // 0x192C  lbl_8018A4D8
     s32  n1930;                 // 0x1930  set by GoTerrain.c's fn_80035584
-    u8   unk1934[0x194C - 0x1934];
+    f32  f1934;                 // 0x1934  0 at set-up
+    f32  f1938;                 // 0x1938  1 at set-up
+    f32  af193C[3];             // 0x193C  per entry of p1924, its elements' largest f24
+    u8   unk1948[4];
     s32  nViews;                // 0x194C  how many of aView are in use
     SunFlrView aView[4];        // 0x1950
     u8   b1BF0;                 // 0x1BF0  set by fn_8009B314; fn_8009B134 does nothing without it

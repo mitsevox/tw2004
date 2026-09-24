@@ -13,6 +13,7 @@
 void fn_8009A340(void);
 void fn_8009A3D0(s32 nView, SunFlrView* pView);
 void fn_8009A704(s32 nView);
+void fn_8009A344(s32 nView, SunFlrView* pView);
 void fn_8009A3F4(s32 nView);
 f32  fn_8009A754(s32 nView, SunFlrView* pView);
 
@@ -20,6 +21,60 @@ s32  fn_800171B0(void);                 // ViewController.c
 CamLens* fn_8001F004(void);
 f32  fn_8001415C(u8* p);                // GoRenderCtx_Gc.c
 f32  fn_8001416C(u8* p);
+void fn_8009A250(void);                 // SunFlr_Gc.c
+void fn_8009AA28(void);
+void fn_8009B314(u8 v);
+void fn_80035584(s32 v);                // GoTerrain.c
+void fn_80035590(f32* p0);
+void fn_800355B8(f32* p0);
+
+// Sets up for nViews views: the tables, each table entry's largest f24, each view's part, and
+// GoTerrain.c's values (v4 = (0, 150, -400), v14 = (0.8, 0.8, 0.4)).
+void fn_8009AF30(s32 nViews) {
+    s32 i;
+    SunFlrSet* pSet;
+    s32 j;
+    SunFlrView* pView;
+    f32 v14[4];
+    f32 v4[4];
+
+    fn_8009A250();
+    lbl_802813B8->f1934 = 0.0f;
+    lbl_802813B8->f1938 = 1.0f;
+    lbl_802813B8->p1924 = lbl_80189E78;
+    lbl_802813B8->p1928 = lbl_8018A028;
+    lbl_802813B8->p192C = lbl_8018A4D8;
+    for (i = 0; i < 3; i++) {
+        lbl_802813B8->af193C[i] = 0.0f;
+        pSet = &lbl_802813B8->p1924[i];
+        for (j = 0; j < pSet->nCount; j++) {
+            if (lbl_802813B8->af193C[i] < pSet->a[j].f24) {
+                lbl_802813B8->af193C[i] = pSet->a[j].f24;
+            }
+        }
+    }
+    fn_8009AA28();
+    lbl_802813B8->nViews = nViews;
+    for (i = 0; i < nViews; i++) {
+        pView = &lbl_802813B8->aView[i];
+        fn_8009A344(i, pView);
+        pView->af90[0] = 0.0f;
+        pView->af90[1] = 0.0f;
+        pView->bA5 = 1;
+    }
+    fn_8009B314(1);
+    fn_80035584(1);
+    v14[0] = 0.8f;
+    v14[1] = 0.8f;
+    v14[2] = 0.4f;
+    v14[3] = 1.0f;
+    v4[0] = 0.0f;
+    v4[1] = 150.0f;
+    v4[2] = -400.0f;
+    v4[3] = 1.0f;
+    fn_800355B8(v14);
+    fn_80035590(v4);
+}
 
 // Frees each view's part.
 void fn_8009B0D0(void) {
