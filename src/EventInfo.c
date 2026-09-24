@@ -349,9 +349,9 @@ void fn_8011DDFC(MsgArg* pArgs, MsgArg* pResult) {
     char* szName = ((MsgString*)pArgs[0].p)->pStr;
     char* szStatus = ((MsgString*)pArgs[1].p)->pStr;
     char* szDate = ((MsgString*)pArgs[2].p)->pStr;
+    u8 bSoon;
     s32 nEvent = GameModeDriverRTE_GetNextEvent();
     u16 nDate;
-    u8 bSoon;
     int bNear;
 
     if (nEvent == -1) {
