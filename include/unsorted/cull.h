@@ -33,7 +33,9 @@ typedef struct Camera {
     /* 0x000 */ void* unk0;
     /* 0x004 */ char pad4[0xC];
     /* 0x010 */ CamLens* unk10;
-    /* 0x014 */ char pad14[0x108];
+    /* 0x014 */ char pad14[0x48];
+    /* 0x05C */ float m5C[4][4];     // camera space to the screen (GoDynObj.c fn_8004787C divides by w)
+    /* 0x09C */ char pad9C[0x80];
     /* 0x11C */ float viewMtx[4][4];
     /* 0x15C */ char pad15C[0x98];
     /* 0x1F4 */ float unk1F4;

@@ -9,6 +9,7 @@
 #include "terrain.h"
 #include "camera.h"
 #include "game.h"
+#include "unsorted/cull.h"
 
 void fn_80045FC8(UStreamObject* pObject);   // the 'BALL' stream handler
 void fn_80046FDC(int nView);
@@ -526,7 +527,47 @@ void fn_80047290(void) {
     }
 }
 
-// ---- 0x8004731C..0x80047A24: not yet decompiled ----
+// ---- 0x8004731C..0x8004787C: not yet decompiled ----
+
+// How big nPlayer's ball looks on screen: the distance between the points its radius above and
+// below its centre land on, on a 512 x 448 screen.
+f32 fn_8004787C(int nPlayer) {
+    Vec4 vPos;
+    f32 vDiff[4];
+    Vec4 vAbove;
+    Vec4 vBelow;
+    Vec4 vTop;
+    Vec4 vBottom;
+    Camera* pCamera;
+    CamLens* pLens;
+    f32 fRadius;
+
+    pCamera = fn_8001614C();
+    pLens = fn_80008370(pCamera);
+    fRadius = lbl_80281DA0->pTeo10000->pModel->apLod[0]->pInfo->f64 * lbl_80281128;
+    Vec_Copy(gPlayers[nPlayer].ball.vPos, &vPos.x);
+    vPos.w = 1.0f;
+    fn_800BAD60(pLens->m44, &vPos, &vAbove);
+    Vec_Copy(&vAbove.x, &vBelow.x);
+    vAbove.y += fRadius;
+    vBelow.y -= fRadius;
+    fn_800BAD60(pCamera->m5C, &vAbove, &vTop);
+    fn_800BAD60(pCamera->m5C, &vBelow, &vBottom);
+    if (0.0f != vTop.w) {
+        fn_8000AE28(&vTop.x, 1.0f / vTop.w, &vTop.x);
+    }
+    if (0.0f != vBottom.w) {
+        fn_8000AE28(&vBottom.x, 1.0f / vBottom.w, &vBottom.x);
+    }
+    vTop.z = 0.0f;
+    vTop.x = 256.0f * (1.0f + vTop.x);
+    vTop.y = 224.0f * (1.0f + vTop.y);
+    vBottom.z = 0.0f;
+    vBottom.x = 256.0f * (1.0f + vBottom.x);
+    vBottom.y = 224.0f * (1.0f + vBottom.y);
+    fn_80048680(&vTop.x, &vBottom.x, vDiff);
+    return (f32)fn_80009680(fn_80009744(vDiff));
+}
 
 // Puts the player's 'TEO ' 10002 object at pPos, facing against the aim; the first time it is made
 // (as a type 0 object, flag 0x200).

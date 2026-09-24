@@ -283,6 +283,7 @@ extern GoDynObjMgr* lbl_80281DA0;
 extern s32  lbl_80187D38[4];            // GoDynObj.c: each player's partner in game mode 21
 extern char lbl_80187B98[27][13];       // GoDynObj.c: 27 names (fn_800484F4 finds one)
 extern char lbl_80187CF8[4][13];        // GoDynObj.c: each player's ball logo texture ("logoea", ...)
+extern f32  lbl_80281128;               // 1.0: scales the ball's radius (fn_8004787C); owner unknown
 
 // UKernel.c's list of the objects, first and last, the last id given out (DynObj.n134), a bit
 // mask of the used entries of lbl_801D5228 (fn_80049230; 16 at most), and two node pools (400-
