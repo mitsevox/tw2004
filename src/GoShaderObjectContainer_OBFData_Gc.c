@@ -3,6 +3,12 @@
 
 #include "game.h"
 #include "ball.h"
+#include "psmgr.h"
+#include "obfdata.h"
+#include "core/startup.h"
+
+void fn_80055C24(int n);        // Ball.c
+void fn_800B24E0(f32 f);        // shadow.c
 
 void fn_8006FB10(void);
 void fn_8006FCC4(u32 uSeed);
@@ -111,6 +117,54 @@ void fn_8006F650(void) {
     fn_8006FB10();
 }
 
+// Applies lbl_802811F0's flags: bit 0 calls fn_800B24E0 with 1; bit 1 starts effects 0 (with f18
+// kept to 0.1..1), 2 and 1 and calls fn_80055C24 with whether f18 is under 0.5; bit 4 starts
+// effect 3.
+void fn_8006FB10(void) {
+    f32 fAmount;
+
+    if (lbl_802811F0->uFlags & 1) {
+        fn_800B24E0(1.0f);
+    }
+    if (lbl_802811F0->uFlags & 2) {
+        fAmount = lbl_802811F0->f18 < 0.1f ? 0.1f : (lbl_802811F0->f18 > 1.0f ? 1.0f : lbl_802811F0->f18);
+        fn_800A2A80(0, &fAmount, 2);
+        fn_800A2A80(2, NULL, 2);
+        fn_800A2A80(1, NULL, 2);
+        if (lbl_802811F0->f18 < 0.5f) {
+            fn_80055C24(1);
+        } else {
+            fn_80055C24(0);
+        }
+    }
+    if (lbl_802811F0->uFlags & 0x10) {
+        fn_800A2A80(3, NULL, 2);
+    }
+}
+
+// Undoes fn_8006FB10: keeps the flags in u04, stops the effects and clears bits 0, 1, 2 and 4.
+void fn_8006FBF8(void) {
+    lbl_802811F0->b1C = 0;
+    lbl_802811F0->u04 = lbl_802811F0->uFlags;
+    if (lbl_802811F0->uFlags & 1) {
+        lbl_802811F0->uFlags &= ~1;
+    }
+    if (lbl_802811F0->uFlags & 2) {
+        fn_800A2B34(0);
+        fn_800A2B34(2);
+        fn_800A2B34(1);
+        fn_80055C24(2);
+        lbl_802811F0->uFlags &= ~2;
+    }
+    if (lbl_802811F0->uFlags & 4) {
+        lbl_802811F0->uFlags &= ~4;
+    }
+    if (lbl_802811F0->uFlags & 0x10) {
+        fn_800A2B34(3);
+        lbl_802811F0->uFlags &= ~0x10;
+    }
+}
+
 // ---- sweep code (not yet cleaned up) ----
 
 // uSeed: unused (the stub takes the seed fn_8006F650 hands it)
@@ -132,6 +186,38 @@ void fn_8006FCD8(void) {
 
 // ---- end of sweep code ----
 
+// Copies pChunk's data into a new 32-byte aligned buffer (flushed for the graphics chip) and keeps
+// it in pData by the chunk's kind, with the chunk's n02.
+void fn_8006FCDC(OBFData* pData, OBFChunk* pChunk) {
+    u8 nKind;
+    u32 uSize;
+    u8* pBuf;
+
+    uSize = pChunk->n02 * pChunk->n04;
+    pBuf = fn_80009B34((uSize + 31) & ~31, 2, 32, "GoShaderObjectContainer_OBFData_Gc.c", 0x41);
+    nKind = pChunk->nKind;
+    Mem_cpy(pBuf, pChunk->aData, uSize);
+    DCFlushRange(pBuf, uSize);
+    switch (nKind) {
+    case 2:
+        pData->aBufs[pChunk->nIndex] = pBuf;
+        pData->an20[pChunk->nIndex] = pChunk->n02;
+        break;
+    case 0:
+        pData->pBuf0 = pBuf;
+        pData->n2C = pChunk->n02;
+        break;
+    case 1:
+        pData->pBuf1 = pBuf;
+        pData->n2A = pChunk->n02;
+        break;
+    case 3:
+        pData->pBuf3 = pBuf;
+        pData->n2E = pChunk->n02;
+        break;
+    }
+}
+
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_8006FDCC(void);
@@ -146,6 +232,39 @@ void fn_8006FDCC(void) {
 
 void fn_8006FDD0(void) {
 }
+
+// ---- end of sweep code ----
+
+// Loads each chunk of pList into pData.
+void fn_8006FDD4(OBFData* pData, OBFChunkList* pList) {
+    s32 i;
+
+    for (i = 0; i < pList->nChunks; i++) {
+        fn_8006FCDC(pData, pList->apChunks[i]);
+    }
+}
+
+// Frees pData's buffers.
+void fn_8006FE44(OBFData* pData) {
+    s32 i;
+
+    for (i = 0; i < 5; i++) {
+        if (pData->aBufs[i] != NULL) {
+            fn_80009E70(pData->aBufs[i]);
+        }
+    }
+    if (pData->pBuf1 != NULL) {
+        fn_80009E70(pData->pBuf1);
+    }
+    if (pData->pBuf0 != NULL) {
+        fn_80009E70(pData->pBuf0);
+    }
+    if (pData->pBuf3 != NULL) {
+        fn_80009E70(pData->pBuf3);
+    }
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_8006FED4(u8* p0, s32 p1) {
     fn_80074DA8(*(s32*)(p0 + 0x24), *(s32*)(p0 + 0x0), (p0 + 0x4), p1);

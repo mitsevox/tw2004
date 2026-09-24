@@ -372,12 +372,20 @@ void fn_80071F58(struct SKABlendNode** ppNode, u8 bFreeSources);   // animblende
 u8 fn_80073554(SKABlendNode* pNode, void* pSrc);
 u8 fn_80073610(SKABlendNode* pNode, void* pSrc);
 
-// The blend callback CharacterState_AddSKABlendData attaches (fn_80072ACC is one).
-typedef void (*SKABlendFn)(SKABlendNode* pNode, int* pn, f32 fTime);
+// The blend callback CharacterState_AddSKABlendData attaches (fn_80072ACC is one); fn_8007260C
+// passes it the character's model.
+typedef void (*SKABlendFn)(SKABlendNode* pNode, CharModel* pModel, f32 fTime);
 
 // animblender.c: set up *ppNode (taken from nType's pool when NULL) as a node of nType with pose
 // format nFormat, bC set from nC.
 void fn_80071C28(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn pfnBlend, int nC);
+// animblender.c: cut the tree at pNode off at fTime, or start it over (pPlayer plays it).
+void fn_800732F4(SKABlendNode* pNode, struct AnimPlayer* pPlayer, f32 fTime);
+// animblender.c: pose the tree at pNode at fTime into its buffers (each blend node's pfnBlend).
+void fn_8007260C(struct Character* pChar, SKABlendNode* pNode, CharModel* pModel, f32 fTime);
+void fn_8001FCF4(struct Character* pChar, Clip* pClip, SkelPose* pPose, int n, f32 fTime);
+// mtalib.c (pUnused is not read)
+int  fn_8001F494(void* pUnused, struct MtaLib* pLib, SkelPose1* pPose, f32 fTime);
 // animblender.c: make pNode a blend node that mixes its children with pfnBlend at fWeight.
 void fn_800725BC(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 fWeight);
 f32  fn_80072938(SKABlendNode* pNode);  // animblender.c: the latest end time under pNode
@@ -389,8 +397,8 @@ void fn_800720C8(struct Character* pChar, SKABlendNode* pNew, SKABlendNode** ppN
 
 // A node of a character's SKA blend tree (animblender.c; the root is at Character + 0x40C). A node
 // of type 1 blends its two children into its pose with pfnBlend; a node of type 0 plays one source
-// from fFrom to fTo. fn_80071C28 takes nodes from three pools by type (0x34, 0x2C and 0x20 bytes),
-// so the blend fields end at 0x2C; nGroup follows the root in Character.
+// from fFrom to fTo. fn_80071C28 takes nodes from three pools by type: sources 0x34 bytes
+// (SKASourceNode), blend nodes 0x2C (this struct, as Character embeds two), others 0x20.
 struct SKABlendNode {
     s32  bPooled;               // 0x00  taken from a pool, so fn_80071F58 gives it back
     s32  nType;                 // 0x04  0: plays a source, 1: blends apChild
@@ -412,10 +420,16 @@ struct SKABlendNode {
             f32   fTo;                      // 0x28
         } src;                              // nType 0
     } u;
-    s32  nGroup;                // 0x2C  the clip group CharacterState_AddSKABlendData last added (the
-                                //       root only: past the end of a pooled blend node)
 };
-LAYOUT_ASSERT(SKABlendNode, 0x30);
+LAYOUT_ASSERT(SKABlendNode, 0x2C);
+
+// A source node (nType 0) as its pool makes it: the node and two more fields.
+typedef struct SKASourceNode {
+    SKABlendNode node;          // 0x00
+    f32  f2C;                   // 0x2C  0 when it starts playing (fn_800724C0)
+    s32  n30;                   // 0x30  0 when set up (fn_80071C28)
+} SKASourceNode;
+LAYOUT_ASSERT(SKASourceNode, 0x34);
 
 // One of a BlendClip's keys: six values fn_800204A0 blends between neighbouring keys.
 typedef struct BlendKey {
@@ -591,8 +605,9 @@ typedef struct Character {
     s32   n3D4;                 // 0x3D4  the bytes of its CHR object before the animation library
     AnimLib* pLib;              // 0x3D8  its animation library
     struct ClipRecord* pRecords;    // 0x3DC  records for its merged library (skalib)
-    u8    node3E0[0x40C - 0x3E0];   // 0x3E0  a blend node for anim29C (fn_800732F4 takes it as it takes blend)
+    SKABlendNode node3E0;       // 0x3E0  the root of anim29C's blend tree
     SKABlendNode blend;         // 0x40C  the root of its blend tree
+    s32   nGroup;               // 0x438  the clip group CharacterState_AddSKABlendData last added
     CharBuffer buffers[4];      // 0x43C
     struct { u32 bSet; f32 fTime; u8 unk8[8]; } events[18];   // 0x4AC  animation events, by 64-bit id
     s32   n5CC;                 // 0x5CC
@@ -803,7 +818,7 @@ void  fn_80029A90(CharModel* pModel, f32 (*pMtx)[4], int nBone);
 void  fn_80029AF8(CharModel* pModel);
 int   fn_80048574(Character* pChar, u64 uEvent);    // the character's animation has event uEvent
 u8    fn_8009637C(Character* pChar);    // CharAnim.c: n26 is not 1 (both callers mask the result)
-void  fn_80072ACC(SKABlendNode* pNode, int* pn, f32 fTime);
+void  fn_80072ACC(SKABlendNode* pNode, CharModel* pModel, f32 fTime);
 f32   fn_80072CB8(SKABlendNode* pNode, u64 uEvent); // an event's time in a blend tree
 void  fn_80072ED8(AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT);    // advance a player
 void  fn_80073108(Character* pChar, int nPlayer, AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT);
