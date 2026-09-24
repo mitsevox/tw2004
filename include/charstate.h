@@ -429,6 +429,21 @@ typedef struct SkinMeshIter {
 } SkinMeshIter;
 LAYOUT_ASSERT(SkinMeshIter, 0x20);
 
+// Where a mesh's data goes by its flags (fn_801136C4 fills it in; our name, its users are not
+// decompiled yet).
+typedef struct SkinMeshRefs {
+    u16  n0;                    // 0x00  } flag 2: the two numbers fn_801136C4 is given, and the data
+    s16  n2;                    // 0x02  }
+    void* p4;                   // 0x04  }
+    s32  n8;                    // 0x08  } flag 0x200000: the mesh's count and data
+    void* pC;                   // 0x0C  }
+    s32  n10;                   // 0x10  } flags 1 and 0x10: the mesh's count and data
+    void* p14;                  // 0x14  }
+    s32  n18;                   // 0x18  } flags 1 and 0x40: the mesh's count and its data's third
+    void* p1C;                  // 0x1C  }   part (after n10 bits and n10 words when 0x10 is set)
+} SkinMeshRefs;
+LAYOUT_ASSERT(SkinMeshRefs, 0x20);
+
 // The whole iterator fn_80113A9C and fn_80113B34 build (our name): the SkinDesc.p6C entries of one
 // SkinDesc.p5C entry. fn_80113B34's kind walks each entry's meshes with a SkinMeshIter in sub.
 typedef struct SkinDescIter {
