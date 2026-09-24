@@ -33,6 +33,8 @@ void  fn_80112B18(HwsOverrideTable* pTable, int i, void* p);   // hwsOverride_Gc
 u8    fn_8001EC48(Character* pChar);           // char.c
 void  fn_80035D10(Character* pChar, int nView);
 void  fn_80035F40(void* pCamera);
+void  fn_80036054(void* pMesh, int n, s32* pDesc);
+void  fn_800360A0(void* pMesh);
 void  fn_8003612C(LightGroup* pGroup);
 void  fn_80036278(SkinModel44* pEntries, s32 nEntries);
 void  fn_80036344(SkinModel44* pEntries, s32 nEntries);
@@ -56,6 +58,27 @@ void fn_80035F40(void* pCamera) {
 
     pRect = fn_80012EF0(pCamera);
     fn_80016978(fn_80012EE8(pRect), fn_80012EE0(pRect), fn_80012ED8(pRect), fn_80012ED0(pRect));
+}
+
+// Sets up the triangles' mesh objects, one per view.
+void fn_80035C58(void) {
+    s32 aDesc[2];
+    int i;
+
+    aDesc[0] = 3;
+    aDesc[1] = 1;
+    for (i = 0; i < 2; i++) {
+        fn_80036054(lbl_801D4E78.aMesh[i], 0x13, aDesc);
+    }
+}
+
+// And frees them.
+void fn_80035CC0(void) {
+    int i;
+
+    for (i = 0; i < 2; i++) {
+        fn_800360A0(lbl_801D4E78.aMesh[i]);
+    }
 }
 
 // Runs fn_80035D10 for view nView on every character made so far, except those fn_8001EC48 picks
