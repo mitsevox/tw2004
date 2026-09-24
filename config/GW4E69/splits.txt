@@ -751,13 +751,14 @@ VecMath.c:
 
 SitDevMisc.c:
 	.text       start:0x800BB0A8 end:0x800BB42C
+	.data       start:0x801910F8 end:0x80191168
 	.bss        start:0x801FA198 end:0x801FA1C0
 	.sbss       start:0x802821F8 end:0x80282208
 	.sdata2     start:0x80284290 end:0x802842A0
 
 SitDevFile.c:
 	.text       start:0x800BB42C end:0x800BB6DC
-	.data       start:0x80191230 end:0x80191240
+	.data       start:0x80191168 end:0x80191240
 	.sbss       start:0x80282208 end:0x80282210
 
 SitDevCommentaryZones.c:
