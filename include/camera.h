@@ -11,12 +11,11 @@
 // the pointer at the render camera's +0x10. Only the fields read so far; its size is unknown.
 typedef struct CamLens {
     s32  nType;                 // 0x00  0: a perspective camera, else flat (LLObj_Gc.c)
-    f32  v4[3];                 // 0x04  a position: the green zoom-to-aim camera copies it to View.v20
-    u8   unk10[0x24 - 0x10];
-    f32  v24[3];                // 0x24  a direction: goballfx.c's fn_80093A50 takes its angle to a light
-    u8   unk30[0x34 - 0x30];
-    f32  v34[3];                // 0x34  a position: GameMode8 measures the ball's distance to it
-    u8   unk40[0x44 - 0x40];
+    f32  m4[4][4];              // 0x04  camera to world space (shadow.c fn_800B3484 hands it on as a
+                                //       matrix): m4[2] is the view direction (goballfx.c fn_80093A50
+                                //       takes its angle to a light), m4[3] the camera's position
+                                //       (GameMode8 measures the ball's distance to it); the green
+                                //       zoom-to-aim camera copies m4[0] to View.v20
     f32  m44[4][4];             // 0x44  world to camera space (hlaudemitter.c fn_800AD800 moves a
                                 //       sound's position with it)
     u8   unk84[0xA4 - 0x84];

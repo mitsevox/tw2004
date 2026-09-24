@@ -457,8 +457,8 @@ void GrassRender_vBuildAndUploadOneTimeData(void) {
     GXSetTevColorOp(2, 0, 0, 0, 1, 0);
     GXSetTevAlphaIn(2, 7, 4, 5, 7);
     GXSetTevAlphaOp(2, 0, 0, 1, 1, 0);
-    fX = lbl_80281900->pLens->v34[0] - 0.5f * lbl_80281900->pLens->fB4;
-    fZ = lbl_80281900->pLens->v34[2] - 0.5f * lbl_80281900->pLens->fB8;
+    fX = lbl_80281900->pLens->m4[3][0] - 0.5f * lbl_80281900->pLens->fB4;
+    fZ = lbl_80281900->pLens->m4[3][2] - 0.5f * lbl_80281900->pLens->fB8;
     lbl_80281900->af108[0][0] = 1.0f + fX / lbl_80281900->pLens->fB4;
     lbl_80281900->af108[0][1] = 1.0f + fZ / lbl_80281900->pLens->fB8;
     lbl_80281900->af108[0][2] = 1.0f;
@@ -506,7 +506,7 @@ void fn_8011F3AC(void) {
     CamLens* pLens = fn_8001F004();
 
     nBuffers = lbl_80281900->anF8[lbl_80281900->n100];
-    Vec_Copy(pLens->v24, vDir);
+    Vec_Copy(pLens->m4[2], vDir);
     vDir[1] = 0.0f;
     if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
         fn_800BAF04(vDir, vDir);
@@ -643,7 +643,7 @@ void fn_8011F7F8(void) {
     lbl_80281900->n404 = 0;
     lbl_80281900->n408 = 0;
     nRadius = 1.0f + lbl_80281900->f3E8 / 2.5f;
-    Vec3Copy(pLens->v24, vLook);
+    Vec3Copy(pLens->m4[2], vLook);
     Vec3Copy(vLook, vFlat);
     if (vLook[0] != 0.0f || vLook[1] != 0.0f || vLook[2] != 0.0f) {
         fn_800BAF04(vLook, vLook);
@@ -660,7 +660,7 @@ void fn_8011F7F8(void) {
     if (vFlat[0] != 0.0f || vFlat[1] != 0.0f || vFlat[2] != 0.0f) {
         fn_800BAF04(vFlat, vFlat);
     }
-    Vec_Copy(pLens->v34, vPos);
+    Vec_Copy(pLens->m4[3], vPos);
     fn_8000AE28(vFlat, lbl_80281900->f3EC, vAhead);
     fn_80120268(vAhead, vPos, vCentre);
     if (vCentre[0] < 0.0f) {

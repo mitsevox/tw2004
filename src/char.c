@@ -1943,8 +1943,8 @@ void fn_8001B878(Character* pChar, int nPlayer) {
     pChar->n1654 = fn_80007D74(&sphere, fn_8001614C(), 0);
     sphere.radius = 3.0f;
     pChar->n1658 = fn_80007D74(&sphere, fn_8001614C(), 0);
-    fn_8001EFB4(pMtx[3], fn_8001F004()->v34, vDir);
-    fDist = fn_8000C5FC(fn_8001F004()->v24, vDir);
+    fn_8001EFB4(pMtx[3], fn_8001F004()->m4[3], vDir);
+    fDist = fn_8000C5FC(fn_8001F004()->m4[2], vDir);
     fLen = (f32)fn_80009680(fn_80009744(vDir));
     if (fLen < pChar->f14) {
         pChar->f14 = fLen;

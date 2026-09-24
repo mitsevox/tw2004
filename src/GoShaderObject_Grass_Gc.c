@@ -456,7 +456,7 @@ void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject) {
     GXSetVtxDesc(14, 1);
 
     // How fast the camera distance changes along x and along z, from 2.5-unit steps.
-    Vec_Copy(fn_8001F004()->v34, vEye);
+    Vec_Copy(fn_8001F004()->m4[3], vEye);
     vAt[0] = pParams->a04[0];
     vAt[1] = pVert[1].f;
     vAt[2] = pParams->a04[1];
