@@ -124,7 +124,15 @@ GoRenderCtx_Gc.c:
 	.sdata2     start:0x80282B58 end:0x80282B80
 
 streammanagerhole.c:
-	.text       start:0x800143B8 end:0x80016CB8
+	.text       start:0x800143B8 end:0x80015470
+
+Code80015470.c:
+	.text       start:0x80015470 end:0x80016198
+	.sdata2     start:0x80282B80 end:0x80282BA0
+
+Code80016198.c:
+	.text       start:0x80016198 end:0x80016CB8
+	.sdata2     start:0x80282BA0 end:0x80282BB8
 
 ViewController.c:
 	.text       start:0x80016CB8 end:0x80017320
