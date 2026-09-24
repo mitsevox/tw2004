@@ -342,20 +342,22 @@ void fn_8007260C(Character* pChar, SKABlendNode* pNode, CharModel* pModel, f32 f
         pA = pNode->u.blend.apChild[0];
         if (pA != NULL) {
             pB = pNode->u.blend.apChild[1];
-            if (pB != NULL && pA->nType == 0 && pB->nType == 0) {
+            if (pB != NULL) {
                 pFirst = pA;
-                pClipFirst = pA->u.src.pSrc;
-                pClipOther = pB->u.src.pSrc;
-                if (pA->fStart > pB->fStart) {
-                    pSwap = pClipFirst;
-                    pClipFirst = pClipOther;
-                    pClipOther = pSwap;
-                    pFirst = pB;
-                }
-                if ((pClipFirst->uFlags & 0x10) && !(pClipOther->uFlags & 0x10)) {
-                    pPose = pFirst->pPose;
-                    Vec_Copy(pChar->q16AC, pPose->aBones[pChar->nGripBone].q0);
-                    Vec_Copy(pChar->v16BC, pPose->aBones[pChar->nGripBone].v10);
+                if (pA->nType == 0 && pB->nType == 0) {
+                    pClipFirst = pA->u.src.pSrc;
+                    pClipOther = pB->u.src.pSrc;
+                    if (pA->fStart > pB->fStart) {
+                        pSwap = pClipFirst;
+                        pClipFirst = pClipOther;
+                        pClipOther = pSwap;
+                        pFirst = pB;
+                    }
+                    if ((pClipFirst->uFlags & 0x10) && !(pClipOther->uFlags & 0x10)) {
+                        pPose = pFirst->pPose;
+                        Vec_Copy(pChar->q16AC, pPose->aBones[pChar->nGripBone].q0);
+                        Vec_Copy(pChar->v16BC, pPose->aBones[pChar->nGripBone].v10);
+                    }
                 }
             }
         }
