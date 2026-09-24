@@ -67,9 +67,16 @@ typedef struct SkinMesh {
 } SkinMesh;
 LAYOUT_ASSERT(SkinMesh, 0x10);
 
+// A pair of bytes of a SkinDesc28 (fn_80110A38 and fn_80113910 add up the n1s).
+typedef struct SkinDesc28Pair {
+    s8   n0;                    // 0x0
+    s8   n1;                    // 0x1
+} SkinDesc28Pair;
+
 typedef struct SkinDesc28 {
-    s32  n0;                    // 0x00
-    u8   unk4[0x10 - 4];
+    s32  n0;                    // 0x00  pairs in a8 (fn_80113910 reads n0 of them, not only four)
+    u8   unk4[4];
+    SkinDesc28Pair a8[4];       // 0x08
     void* p10;                  // 0x10  } a block hwsBurn.c copies (fn_80111384)
     s32  n14;                   // 0x14  } and its size
 } SkinDesc28;
@@ -418,6 +425,15 @@ typedef struct SkinDescIter {
     s32  n18;                   // 0x18  -1 before the first step
     s32  n1C;                   // 0x1C
 } SkinDescIter;
+
+// The iterator fn_80113910 builds (our name): the SkinDesc.p3C entries of one SkinDesc.p44 entry.
+typedef struct SkinMeshIter {
+    SkinIter iter;              // 0x00
+    SkinDesc* pDesc;            // 0x10
+    SkinDesc44* pEntry;         // 0x14
+    s32  nCount;                // 0x18  the n1s of its SkinDesc28's pairs added up (1 without one)
+    s32  n1C;                   // 0x1C  -1 before the first step
+} SkinMeshIter;
 
 // hwsBurn.c's state for one SkinDesc (our name; fn_801104AC makes it, fn_801108B0 frees it). The
 // bit arrays hold one bit per entry of the count before them.
