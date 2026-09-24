@@ -12,6 +12,9 @@ f32  fn_800BAF58(f32* pSrc, f32* pDst);     // VecMath.c: normalises, gives the 
 void fn_80029BC8(f32* pVec);                // GoLighting.c
 void fn_801164D4(f32* pA, f32* pB, f32* pOut);
 void fn_801164F8(f32* pA, f32* pB, f32* pOut);
+void fn_8011651C(f32* pA, f32* pB, f32* pOut);
+void fn_800090E4(f32* pQuat, f32* pIn, f32* pOut);           // Quaternion.c: a vector turned by it
+void fn_800094D8(f32* pQ, f32* pA, f32* pB, f32* pC);        // Quaternion.c: a rotation as angles
 f32  fn_80055F80(void);                     // Ball.c
 void fn_800561CC(f32* pOut);                // Ball.c: the wind's direction
 void SKEL_TransformBones(CharModel* pModel, u32* auBits);
@@ -682,6 +685,152 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     SKEL_TransformBones(pModel, auBits);
     for (i = 0; i < pChain->nLinks; i++) {
         fn_8001E85C(pChain->pLinks[i].q44, pModel->pBones[pChain->pLinks[i].nBone].q0C);
+    }
+}
+
+// The type 3 update, for a one-link chain: the link bends down toward the ground the more it points
+// the way lbl_80193E48 gives for its kind and the more level it is (the settings' f68 degrees at
+// most, times the model's f13C), then sways about the axis across it and a reference bone (bone id
+// 0x12 for kinds 0-2, 0x25 for 3-5) by a sine wave. Not on game type 3.
+void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
+    f32 qTurn[4];
+    f32 vBoneN[4];
+    f32 vBone[4];
+    f32 vDown[4];
+    f32 vNew[4];
+    f32 vSide[4];
+    f32 vAxis[4];
+    f32 vAxisN[4];
+    f32 vTurn[4];
+    f32 vRef[4];
+    f32 vRefN[4];
+    f32 vDir[4];
+    f32 vDirN[4];
+    f32 vSwung[4];
+    f32 fX;
+    f32 fY;
+    f32 fZ;
+    f32 fStrength;
+    f32 fBend;
+    f32 fSway;
+    f32 fLevel;
+    f32 fOff;
+    f32 fT;
+    f32 fSpeed;
+    f32 fSize;
+    f32 fPeriod;
+    f32 fAngle;
+    s32 nFrames;
+    u32 nPeriod;
+    int nRef;
+    int i;
+
+    if (gSession.nGameType == 3) {
+        return;
+    }
+    fStrength = fn_80116468();
+    nFrames = 60.0f * (FRAME_RATE * fDelta);
+    fBend = pModel->f13C;
+    fSway = fn_80116304(pChain->n14, PI * pChain->n10 * 0.125f, fStrength);
+    pChain->n14++;
+    pChain->n18 += (s32)(nFrames * fSway);
+    fn_8011651C(pModel->pMatrices[pChain->pLinks->nBone][3], pModel->pMatrices[pChain->pLinks->nParent][3],
+                vBone);
+    if (0.0f != vBone[0] || 0.0f != vBone[1] || 0.0f != vBone[2]) {
+        // Bend down, by how level the link is and how near it points to the kind's direction.
+        fn_800BAF04(vBone, vBoneN);
+        fLevel = 1.0f - fabsf(vBoneN[1]);
+        fn_800094D8(pModel->pPoses[pChain->pLinks->nParent].q0, &fX, &fY, &fZ);
+        fOff = fabsf(180.0f / PI * fY - lbl_80193E48[pChain->n10]);
+        if (fOff > 360.0f) {
+            fOff = (s32)fOff % 360;
+        }
+        if (fOff > lbl_802824F8->f70 || 0.0f == lbl_802824F8->f70) {
+            fLevel = 0.0f;
+        } else {
+            fLevel *= 1.0f - fOff / lbl_802824F8->f70;
+        }
+        fLevel *= fBend;
+        Vec_Copy(vBone, vDown);
+        vDown[1] = vDown[1] - 1.0f;
+        vec4flt_CrossProduct(vBone, vDown, vAxis);
+        if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
+            fn_800BAF04(vAxis, vAxisN);
+            fn_8000AE28(vAxisN, DEG(lbl_802824F8->f68) * fLevel, vTurn);
+            fn_8000923C(vTurn, qTurn);
+            fn_800090E4(qTurn, vBone, vNew);
+            fn_801164F8(vNew, pModel->pMatrices[pChain->pLinks->nParent][3],
+                        pModel->pMatrices[pChain->pLinks->nBone][3]);
+
+            // The sway, faster and bigger in a stronger wind.
+            if (fStrength < lbl_802824F8->nBC) {
+                fT = fStrength / lbl_802824F8->nBC;
+                fSpeed = (1.0f - lbl_802824F8->f88) * fT + lbl_802824F8->f88;
+                fSize = (1.0f - lbl_802824F8->f80) * fT + lbl_802824F8->f80;
+            } else {
+                fT = 1.0f;
+                if (35.0f != lbl_802824F8->nBC) {
+                    fT = (fStrength - lbl_802824F8->nBC) / (35.0f - lbl_802824F8->nBC);
+                }
+                // Unlike fn_80115348, both come from f8C, as 1 - f8C.
+                fSpeed = fSize = (1.0f - lbl_802824F8->f8C) * fT + 1.0f;
+            }
+            if (0.0f != fSpeed) {
+                fPeriod = 60.0f * FRAME_RATE * lbl_802824F8->f64 * (1.0f / fSpeed);
+            } else {
+                fPeriod = 100000000.0f;
+            }
+            fSize = DEG(lbl_802824F8->f60) * fSize;
+            if (0.0f != fPeriod) {
+                nPeriod = fPeriod;
+                fAngle = fSize * fn_800095F0(2.0f * PI * ((f32)(pChain->n18 % nPeriod) / fPeriod) +
+                                             pChain->n10 / 0.5f);
+            } else {
+                fAngle = 0.0f;
+            }
+            fn_8001E85C(pModel->pBones[pChain->pLinks->nBone].q0C, pChain->pLinks->q44);
+            fn_8011651C(pModel->pMatrices[pChain->pLinks->nBone][3],
+                        pModel->pMatrices[pChain->pLinks->nParent][3], vDir);
+            if (!(fabsf(vDir[0]) < 0.001f) || !(fabsf(vDir[1]) < 0.001f) || !(fabsf(vDir[2]) < 0.001f)) {
+                fn_800BAF04(vDir, vDirN);
+                if (pChain->n10 < 3) {
+                    nRef = fn_8001EED8(pModel, 0x12);
+                } else {
+                    nRef = fn_8001EED8(pModel, 0x25);
+                }
+                fn_8011651C(pModel->pMatrices[nRef][3], pModel->pMatrices[pChain->pLinks->nParent][3], vRef);
+                if (!(fabsf(vRef[0]) < 0.001f) || !(fabsf(vRef[1]) < 0.001f) || !(fabsf(vRef[2]) < 0.001f)) {
+                    fn_800BAF04(vRef, vRefN);
+                    vec4flt_CrossProduct(vRefN, vDirN, vSide);
+                    if (!(fabsf(vSide[0]) < 0.001f) || !(fabsf(vSide[1]) < 0.001f) ||
+                        !(fabsf(vSide[2]) < 0.001f)) {
+                        fn_800BAF04(vSide, vSide);
+                        vec4flt_CrossProduct(vSide, vDirN, vAxis);
+                        if (!(fabsf(vAxis[0]) < 0.001f) || !(fabsf(vAxis[1]) < 0.001f) ||
+                            !(fabsf(vAxis[2]) < 0.001f)) {
+                            fn_800BAF04(vAxis, vAxis);
+                            fn_8001EF34(vSide, lbl_802824F8->f6C, vSide);
+                            fn_801164F8(vSide, vAxis, vAxis);
+                            if (!(fabsf(vAxis[0]) < 0.001f) || !(fabsf(vAxis[1]) < 0.001f) ||
+                                !(fabsf(vAxis[2]) < 0.001f)) {
+                                fn_800BAF04(vAxis, vAxis);
+                                fn_8000AE28(vAxis, fAngle, vAxis);
+                                fn_8000923C(vAxis, qTurn);
+                                fn_800090E4(qTurn, vDir, vSwung);
+                                fn_801164F8(vSwung, pModel->pMatrices[pChain->pLinks->nParent][3],
+                                            pModel->pMatrices[pChain->pLinks->nBone][3]);
+                                fn_80029A90(pModel, pModel->pMatrices[pChain->pLinks->nBone],
+                                            pChain->pLinks->nBone);
+                                for (i = 0; i < pChain->nLinks; i++) {
+                                    fn_8001E85C(pChain->pLinks[i].q44,
+                                                pModel->pBones[pChain->pLinks[i].nBone].q0C);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

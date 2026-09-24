@@ -221,6 +221,7 @@ LAYOUT_ASSERT(DynChainSettings, 0xC0);
 
 extern DynChainSettings* lbl_802824F8;
 extern f32 lbl_80193DE8[6][4];  // DynChain.c: a direction per chain kind, in the model's root space
+extern f32 lbl_80193E48[6];     // DynChain.c: an angle per chain kind, in degrees (fn_80115B2C)
 
 // A clip's header (the fields used here). In a file, pD0 marks the end of the header and
 // uAram points at the end of the key data; once a clip's frames are streamed out, uAram is
