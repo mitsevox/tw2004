@@ -439,7 +439,7 @@ typedef struct SkinMeshIter {
 // bit arrays hold one bit per entry of the count before them.
 typedef struct HwsBurn {
     SkinDesc* pDesc;            // 0x00
-    s32  n4;                    // 0x04  fn_80110A1C
+    HwsOverrideTable* pOverride;    // 0x04  meshes used instead of the description's (fn_80110A1C)
     s32  nParts;                // 0x08  pDesc->nParts
     s32* aVariant;              // 0x0C  per part: its variant, -1 all (fn_801109FC)
     s32* aOption;               // 0x10  per part: its option, -1 all (fn_80110A0C)
@@ -569,6 +569,7 @@ s32   fn_800CEEFC(SkinIter* pIter);
 SkinIter* fn_80113B34(u8* pBuf, SkinIterArgs* pArgs);
 void  fn_80113BAC(SkinIter* pIter);
 SkinIter* fn_80113910(u8* pBuf, SkinIterArgs* pArgs);   // hwsRender_Gc.c: another mesh iterator
+void  fn_80113A7C(SkinIter* pIter);     // and its end
 
 // SkinMorph.c: the morph targets a skin description needs.
 s32   fn_8011C850(SkinDesc* pDesc);

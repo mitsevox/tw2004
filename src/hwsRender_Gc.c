@@ -117,7 +117,6 @@ void fn_801138E8(void);
 void fn_801138EC(s32 p0);
 void fn_801138F8(s32 p0);
 void fn_80113904(s32 p0);
-void fn_80113A7C(SkinIter* pIter);
 void fn_80113B14(SkinIter* pIter);
 void fn_80113E54(SkinIter* pIter, void (**ppfnNext)(SkinIter* pIter));
 void fn_80113E5C(SkinIter* pIter);
