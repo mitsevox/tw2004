@@ -96,6 +96,17 @@ void fn_800B6C0C(void* pFrameBuffer) {
     lbl_80282194 = pFrameBuffer;
 }
 
+// printf onto the screen at (nX, nY).
+void fn_800B6C14(s16 nX, s16 nY, const char* pFmt, ...) {
+    char szText[256];           // size not proven by the frame (0x100..0x110 bytes)
+    va_list args;
+
+    va_start(args, pFmt);
+    vsprintf(szText, pFmt, args);
+    va_end(args);
+    fn_800B6CD8(nX, nY, szText);
+}
+
 void fn_800B6CD0(u16 nColor) {
     lbl_80282190 = nColor;
 }
