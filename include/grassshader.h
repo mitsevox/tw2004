@@ -16,7 +16,7 @@
 // The buffer is walked in words (GrassPacket_iEndPacket divides the word count by 4).
 typedef union GrassWord {
     f32 f;
-    u8  b[4];
+    s8  b[4];
 } GrassWord;
 
 // One shell's run of vertices in the buffer.

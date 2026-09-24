@@ -308,8 +308,7 @@ void GrassPacket_vFlushRow(void) {
 void GrassPacket_vAddVert(f32* pPos, int nInRow) {
     GrassWord* pVert = SD_gpGrassTypeData->pCur;
     if (nInRow == 0) {
-        GrassWord* pRow = SD_gpGrassTypeData->pRow;
-        pRow[3].b[2] = (pVert - pRow) / 4;
+        SD_gpGrassTypeData->pRow[3].b[2] = (SD_gpGrassTypeData->pCur - SD_gpGrassTypeData->pRow) / 4;
         SD_gpGrassTypeData->pRow = SD_gpGrassTypeData->pCur;
         pVert[3].b[2] = 0;
     }
@@ -447,7 +446,7 @@ void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject) {
     int nDone;
     int nInRow;
     int nPass;
-    s8 nRow;
+    int nRow;
     u8 nAlpha;
 
     if (nVerts <= 0) {
@@ -508,7 +507,7 @@ void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject) {
             }
             fTexS = pVert[0].f * lbl_80260920[1][0] + lbl_80260920[0][0];
             fTexT = pVert[2].f * lbl_80260920[1][1] + lbl_80260920[0][1];
-            fShade = fInvScale * ((pAxis->f - fBase) + lbl_802608E0[(s8)pVert[3].b[0]]);
+            fShade = fInvScale * ((pAxis->f - fBase) + lbl_802608E0[pVert[3].b[0]]);
             nAlpha = 255.0f * pParams->a10[nSet] * fFade;
             for (nPass = 0; nPass < 2; nPass++) {
                 if (nPass == 1) {
