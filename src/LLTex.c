@@ -1,6 +1,6 @@
 // LLTex.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): texture banks, made
-// from the 'txf ' objects of the stream files. Not yet decompiled; the code below is the matched
-// small functions.
+// from the 'txf ' objects of the stream files, and the byte-code scripts that drive the texture
+// items (fn_8000EA1C).
 
 #include "engine.h"
 #include "gx.h"
@@ -10,7 +10,7 @@ u8   fn_8002A3A4(void);                 // GxUtil.c
 void fn_8002A3AC(u8 b);                 // GxUtil.c
 void fn_80010114(int nDst, int nFunc, int nSrc, int nMtx);
 
-// Builds a bank from a 'txf ' object's data, into pBank or, when it is NULL, a new allocation.
+// Builds a bank from a 'txf ' object's data, into pInto or, when it is NULL, a new allocation.
 TexBank* TX_spParseTextureGroupFromStream(u8* pData, TexBank* pInto, int n);
 
 // A DynObj is going: every item whose def has its id counts one fewer (n1A).
@@ -160,7 +160,7 @@ int fn_8000EA1C(u8* pCode, int nArg, int nPush, DynObj* pObj) {
                 a = lbl_80281C6C[a];
                 break;
             case 17:
-                // port: the entry holds an address
+                // port: entries from 7 on hold 32-bit addresses (also in case 30)
                 a = *(int*)lbl_80281C6C[a + 7];
                 break;
             case 18:
