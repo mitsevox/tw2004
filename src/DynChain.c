@@ -9,6 +9,7 @@
 f32  fn_800BAFC0(f32* pSrc, f32* pDst);     // VecMath.c: normalises pSrc into pDst, gives its length
 void fn_80029BC8(f32* pVec);                // GoLighting.c
 void fn_801164D4(f32* pA, f32* pB, f32* pOut);
+f32  fn_80055F80(void);                     // Ball.c
 void fn_80114540(CharModel* pModel, DynChain* pChain, f32 f);
 void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 f);
 void fn_80115348(CharModel* pModel, DynChain* pChain, f32 f);
@@ -17,7 +18,6 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 f);
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_8011407C(void);
-extern void* lbl_802824F8;             // the chains' settings (the updates read them)
 void fn_80114080(void);
 
 void fn_8011407C(void) {
@@ -154,6 +154,44 @@ void fn_8011443C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             }
         }
     }
+}
+
+// The sway at frame nFrame: four sine waves with a 600-frame period (1, 3, 5 and 7 times the base
+// frequency), offset by fPhase, on a base that grows with fStrength (0..35), limited to 0..1 and
+// scaled by the settings' f90. 1 is no sway.
+f32 fn_80116304(u32 nFrame, f32 fPhase, f32 fStrength) {
+    f32 fPeriod = 600.0f;
+    f32 fAngle;
+    f32 fWave;
+    f32 fBase;
+    f32 fSway;
+
+    fAngle = PI * (2.0f * ((f32)(nFrame % (u32)fPeriod) / fPeriod));
+    fWave = fn_800095F0(3.0f * fAngle + 2.0f + fPhase);
+    fWave = fn_800095F0(fAngle + fPhase) + fWave;
+    fWave = fn_800095F0(5.0f * fAngle + 4.0f + fPhase) + fWave;
+    fWave = fn_800095F0(7.0f * fAngle + 6.0f + fPhase) + fWave;
+    fBase = lbl_802824F8->f94 + fStrength * (lbl_802824F8->f98 - lbl_802824F8->f94) / 35.0f;
+    fSway = 1.0f * fWave + fBase;
+    fSway = (fSway < 0.0f) ? 0.0f : ((fSway > 1.0f) ? 1.0f : fSway);
+    return 1.0f - lbl_802824F8->f90 * (1.0f - fSway);
+}
+
+// The strength the chains sway with: the settings' nB8, or fn_80055F80's when it is -1; at least 5.
+f32 fn_80116468(void) {
+    f32 fStrength;
+
+    if (lbl_802824F8->nB8 == -1) {
+        fStrength = fn_80055F80();
+    } else if (lbl_802824F8->nB8 == -1) {
+        fStrength = 0.0f;
+    } else {
+        fStrength = lbl_802824F8->nB8;
+    }
+    if (fStrength < 5.0f) {
+        fStrength = 5.0f;
+    }
+    return fStrength;
 }
 
 // Three floats: pOut gets pA minus pB.

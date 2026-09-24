@@ -184,6 +184,19 @@ typedef struct DynChain {
 } DynChain;
 LAYOUT_ASSERT(DynChain, 0x20);
 
+// The chains' settings (lbl_802824F8; DynChain.c's updates read them). Only what is used is
+// named; the size is unknown.
+typedef struct DynChainSettings {
+    u8   unk0[0x90];
+    f32  f90;                   // 0x90  how much fn_80116304's sway takes off 1
+    f32  f94;                   // 0x94  } the base fn_80116304 adds, from f94 to f98 as its
+    f32  f98;                   // 0x98  } fStrength goes from 0 to 35
+    u8   unk9C[0xB8 - 0x9C];
+    s32  nB8;                   // 0xB8  the strength fn_80116468 gives; -1: fn_80055F80's
+} DynChainSettings;
+
+extern DynChainSettings* lbl_802824F8;
+
 // A clip's header (the fields used here). In a file, pD0 marks the end of the header and
 // uAram points at the end of the key data; once a clip's frames are streamed out, uAram is
 // their ARAM address and flag 4 is set.
