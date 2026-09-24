@@ -51,6 +51,20 @@ void GXSetTevAlphaIn(int eStage, int eA, int eB, int eC, int eD);
 void GXSetTevColorOp(int eStage, int eOp, int eBias, int eScale, u8 bClamp, int eOutReg);
 void GXSetTevAlphaOp(int eStage, int eOp, int eBias, int eScale, u8 bClamp, int eOutReg);
 
+// ---- lighting -----------------------------------------------------------------------------------
+
+typedef struct GXLightObj {
+    u32 unk0[16];
+} GXLightObj;                   // a light (0x40 bytes)
+
+void GXSetChanAmbColor(int eChan, GXColor colour);
+void GXSetChanMatColor(int eChan, GXColor colour);
+void GXSetChanCtrl(int eChan, u8 bEnable, int eAmbSrc, int eMatSrc, u32 uLightMask, int eDiffFn,
+                   int eAttnFn);
+void GXInitLightPos(GXLightObj* pLight, f32 x, f32 y, f32 z);
+void GXInitLightColor(GXLightObj* pLight, GXColor colour);
+void GXLoadLightObjImm(GXLightObj* pLight, int eLight);
+
 // ---- copying the screen into a texture --------------------------------------------------------
 
 void GXSetTexCopySrc(u16 nLeft, u16 nTop, u16 nWidth, u16 nHeight);
