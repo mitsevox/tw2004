@@ -253,8 +253,6 @@ s32   GameModeBattle_GetWinner(void);
 u8    GameModeBattle_IsClubStealingFinished(void);
 int   GameModeBattle_NumRemovableClubsLeft(int nPlayer);
 u8    GameModeBattle_RemoveClub(int nPlayer, int nClub);
-s32   GameModeDriverPGATour_GetCurrentEventID(void);          // GameModeDriverPGATour.c
-char* GameModeDriverRTE_GetDescription(s32 i);                // GameModeDriverRTE.c
 void  fn_8001A870(void);
 void  fn_80062B84(int a);
 void  fn_8006F4E0(void);
@@ -349,7 +347,6 @@ void  fn_801002C0(void);
 void  fn_80100B38(void);
 void  fn_80101CFC(void);
 void  fn_80101D24(void);
-s32   fn_80118664(int nPlayer);
 s32   fn_80126FA0(void);
 s32   fn_80127098(s32 n);
 

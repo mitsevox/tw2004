@@ -211,7 +211,6 @@ u8   fn_800D0AF4(void);                 // nobody took anything on the last hole
 s32  fn_800BCCCC(int nPlayer);          // SitDevFile.c: gpGame->pfn208
 s32  fn_800BCCF8(int nPlayer);          // SitDevFile.c: strokes behind the leader (gpGame->pfn200)
 u8   fn_800BCD50(void);                 // SitDevFile.c: gpGame->bD4
-s32  fn_800D2640(u16 nDate);                   // a date's month (1..12)
 void fn_800D2714(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
 void fn_800D2678(u16* pDate, s32 nMonth, s32 nDay, u32 nYear);    // make a date
 void fn_800D27CC(u16* pDate, s32 nDays);        // move a date on by nDays
@@ -220,6 +219,9 @@ s32  fn_800D2814(u32 nMonth, u32 nYear);        // the days in a month (compared
 void fn_800D2884(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month before
 void fn_800D28B0(s32 nMonth, s32 nYear, s32* pMonth, s32* pYear);  // the month after
 void fn_800D28DC(u16 nDate, char* szOut);       // a date as text
+void fn_800D293C(u16 nDate, char* szOut);       // a date as month/day
+s32  fn_800D2608(u16 nDate);            // Calendar.c
+s32  fn_800D2640(u16 nDate);            // Calendar.c
 u16  fn_800D2994(void);                 // today's date
 int  fn_800D2ABC(int nCourse, int nHole);   // a hole's par on a course
 int  fn_800D2AD8(int nHole);            // a hole's par
@@ -567,6 +569,7 @@ int  fn_800EC558(void);
 void fn_800ECBE4(void);
 u8   fn_800ED540(void);
 void fn_800ED548(void);
+void fn_800ED6E8(u8 v);
 u8   fn_800ED6F0(void);
 void fn_800ED6F8(f32 x);
 void fn_800ED710(s32 a);
@@ -599,6 +602,24 @@ LAYOUT_ASSERT(CareerCalendar, 0x28);
 extern CareerCalendar lbl_80223C48;
 extern char* (*lbl_80193EDC[3])(u16 nDate);    // the name of the event on a day ("" none)
 extern u16 (*lbl_80193EC4[3])(void);           // the career's current day
+// The calendar screen's (CalendarScreen.c) per-driver tables.
+extern u8 (*lbl_80193E70[3])(void);             // the month before; 0: the calendar may move there
+extern u8 (*lbl_80193E7C[3])(void);             // the month after
+extern s32 (*lbl_80193E88[3])(char* sz, u16 nDate, s32* pLook, s32* pButton);  // a day cell
+extern void (*lbl_80193E94[3])(int nLine, char* sz);
+extern void (*lbl_80193EA0[3])(u16 nDate, int n, char* sz);
+extern s32 (*lbl_80193EAC[3])(u16 nDate);       // the day-details panel for a day
+extern void (*lbl_80193EB8[3])(int nKind, char* szTitle, char* szText);
+extern void (*lbl_80193ED0[3])(void);           // set the driver up
+extern void* (*lbl_80193EE8[3])(u16 nDate);     // the event on a day (NULL: none)
+extern void (*lbl_80193EF4[3])(void);
+extern u8 (*lbl_80193F00[3])(void);
+
+// GameModeDriver.c
+void fn_80117188(void);
+void fn_80117348(void);
+u16  fn_801173F0(u32 nCell);            // the date in a grid cell
+s32  fn_80117510(u16 nDate);
 
 // GameTargets.c: what the target games (modes 13..17) share
 extern f32 lbl_80211D38[40][4];         // the target list: lbl_80282360 points (w = 1)

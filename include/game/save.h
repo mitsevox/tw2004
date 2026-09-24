@@ -237,8 +237,9 @@ typedef struct SaveProfile {
     s32  nC0;                   // 0x000C0  }
     s32  nC4;                   // 0x000C4  }
     TourWin aC8[31];           // 0x000C8  one per PGA TOUR tournament
-    Award a1C0[16];             // 0x001C0  the won ones count for GM_GetBonusProgress. 0..11: per
-                                //          month, the tour's month money leader (n44); 12..15: the
+    Award a1C0[16];            // 0x001C0  the won ones count for GM_GetBonusProgress. 0..11: Player
+                                //          of the Month, per month (the tour's month money leader,
+                                //          n44; FE_PGATourMessages.c fn_8010F3A4); 12..15: the
                                 //          four trophies (both awarded by PGATourSimulation
                                 //          fn_801180C4; GameMode22 fn_8012597C reads their days)
     Award a200[3];              // 0x00200  the player's career winnings first, in the top 5 and in the

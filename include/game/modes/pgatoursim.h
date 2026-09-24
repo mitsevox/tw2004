@@ -134,6 +134,7 @@ u8    fn_80117DE0(void);
 void  fn_80117DE8(int nPlayer, u8 b);
 void  fn_80117DF0(int nPlayer);
 void  fn_80117E98(int nPlayer);
+s32   fn_80118664(int nPlayer);
 s32   fn_80118684(int nPlayer);
 char* fn_80118E30(int nPlayer, int nGolfer);    // TW06: GM_PgaTourSim_GetNameFromGolferID
 u8    fn_8011908C(int nPlayer, int nEntrant);   // TW06: GM_PgaTourSim_IsEntrantUser

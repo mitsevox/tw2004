@@ -45,7 +45,6 @@ void fn_80076F80(UStreamObject* pObject);
 int  fn_80076FDC(void);
 void fn_8007706C(char* pName, char* pDir, char* pPath);
 void fn_800770D4(char* pName, char* pPath);
-u8   fn_80077148(void);
 void FE_GetBIOMovieName(void);
 void fn_800772E0(void);
 void fn_8007731C(void);
