@@ -19,6 +19,9 @@ typedef struct GXTlutObj {
 typedef struct GXColor {
     u8 r, g, b, a;
 } GXColor;
+typedef struct GXColorS10 {
+    s16 r, g, b, a;
+} GXColorS10;                   // a signed colour for a TEV register (10 bits a component)
 typedef struct GXFifoObj {
     u8 unk0[0x80];
 } GXFifoObj;                    // the command FIFO (0x80 bytes)
@@ -69,6 +72,7 @@ void PSMTXIdentity(f32 (*pMtx)[4]);
 void PSMTXConcat(f32 (*pA)[4], f32 (*pB)[4], f32 (*pOut)[4]);
 void PSMTXScale(f32 (*pMtx)[4], f32 fX, f32 fY, f32 fZ);
 void PSMTXTrans(f32 (*pMtx)[4], f32 fX, f32 fY, f32 fZ);
+u32  PSMTXInvXpose(f32 (*pSrc)[4], f32 (*pInvX)[4]);   // 0: pSrc has no inverse
 void C_MTXOrtho(f32 (*pMtx)[4], f32 fTop, f32 fBottom, f32 fLeft, f32 fRight, f32 fNear, f32 fFar);
 
 // ---- the command FIFO -------------------------------------------------------------------------
@@ -101,6 +105,7 @@ void GXSetAlphaUpdate(u8 bUpdate);
 void GXSetColorUpdate(u8 bUpdate);
 void GXSetZMode(u8 bCompare, int eCompare, u8 bUpdate);
 void GXSetBlendMode(int eType, int eSrcFactor, int eDstFactor, int eLogicOp);
+void GXSetFog(int eType, f32 fStartZ, f32 fEndZ, f32 fNearZ, f32 fFarZ, GXColor colour);
 
 // ---- vertex arrays ----------------------------------------------------------------------------
 
@@ -115,6 +120,7 @@ void GXResetWriteGatherPipe(void);
 // ---- matrices --------------------------------------------------------------------------------
 
 void GXLoadPosMtxImm(f32 (*pMtx)[4], int nId);
+void GXLoadNrmMtxImm(f32 (*pMtx)[4], int nId);
 void GXSetClipMode(int eMode);
 void GXSetArray(int eAttr, void* pBase, u8 nStride);
 void GXClearVtxDesc(void);
@@ -146,7 +152,11 @@ void GXSetNumTevStages(u8 nStages);
 void GXSetTevOrder(int eStage, int eCoord, int eMap, int eColour);
 void GXSetTevColor(int eReg, GXColor colour);
 void GXSetTevKColor(int eReg, GXColor colour);
+void GXSetTevColorS10(int eReg, GXColorS10 colour);
+void GXSetTevKColorSel(int eStage, int eSel);
 void GXSetTevKAlphaSel(int eStage, int eSel);
+void GXSetTevSwapMode(int eStage, int eRasSel, int eTexSel);
+void GXSetTevSwapModeTable(int eTable, int eRed, int eGreen, int eBlue, int eAlpha);
 void GXSetTevColorIn(int eStage, int eA, int eB, int eC, int eD);
 void GXSetTevAlphaIn(int eStage, int eA, int eB, int eC, int eD);
 void GXSetTevColorOp(int eStage, int eOp, int eBias, int eScale, u8 bClamp, int eOutReg);
@@ -195,6 +205,8 @@ void fn_8002A608(GxTexture* pTex);  // make pTex the texture of the next draw
 void fn_8002A024(u8 bOn, f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_8002A164(int nMode);
 void fn_8002A2FC(void);             // the end of fn_8002A164's drawing
+u8   fn_8002A3A4(void);             // fn_8002A164's screen copy is being drawn with
+void fn_8002A3AC(u8 b);
 
 // DepthField.c's textures: the half-size screen copy, and the two full-size image buffers.
 extern GxTexture lbl_801D5198;

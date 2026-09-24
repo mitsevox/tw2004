@@ -2013,8 +2013,10 @@ void fn_8004349C(int nPlayer, f32* pCam, f32* pOut, f32* pTarget, CamScript* pSc
     fLag *= fn_8001EFFC((u8*)fn_8001F004());
     fn_80045428(pTarget, pCam, vToTarget);
     fn_80045428(pOut, pCam, vToOut);
-    if (0.0f == vToTarget[0] && 0.0f == vToTarget[1] && 0.0f == vToTarget[2]) return;
-    if (0.0f == vToOut[0] && 0.0f == vToOut[1] && 0.0f == vToOut[2]) return;
+    if ((0.0f == vToTarget[0] && 0.0f == vToTarget[1] && 0.0f == vToTarget[2]) ||
+        (0.0f == vToOut[0] && 0.0f == vToOut[1] && 0.0f == vToOut[2])) {
+        return;
+    }
     fn_800BAF04(vToTarget, vTargetDir);
     fn_800BAF04(vToOut, vOutDir);
     fDot = fn_8000C5FC(vTargetDir, vOutDir);

@@ -203,12 +203,13 @@ void fn_80010754(u8 b) {
 
 // The first unused record after nAfter for the object id uId, or -1.
 int fn_80010760(u32 uId, int nAfter) {
-    TexGrpRec* aRecs;
+    TexGrpRec* pRec;
     int i;
 
-    aRecs = lbl_80280DD8->pRecs;
+    pRec = lbl_80280DD8->pRecs + nAfter + 1;
     for (i = nAfter + 1; i < lbl_80280DD8->nNumRecs; i++) {
-        if (!aRecs[i].bUsed && aRecs[i].uId == uId) return i;
+        if (!pRec->bUsed && pRec->uId == uId) return i;
+        pRec++;
     }
     return -1;
 }

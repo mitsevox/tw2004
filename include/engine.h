@@ -296,6 +296,7 @@ int  fn_800102DC(u64 uHash, TexBank** ppBank, TexEntry** ppTex);
 // a new allocation.
 TexBank* fn_8000FB88(struct UStreamObject* pObject, TexBank* pBank, int n);
 void fn_8000FFAC(TexBank* pBank);       // LLTex.c: free a bank's pixel and palette data
+void fn_8000F0EC(TexBank* pBank, TexEntry* pTex);   // LLTex.c: set up the texture's TEV stages
 
 // The texture banks from 'txf2' stream objects (LoadData.c): a bank per object id (modulo
 // 100000), searched by name with fn_8000BDF8.
@@ -471,10 +472,10 @@ typedef struct RenderState {
     u8   unk1E[0x20 - 0x1E];
     u32  u20;                   // 0x020  bits cleared and set by fn_80035170, bit 0x20
     s32  n24;                   // 0x024  2 at reset
-    f32  f28;                   // 0x028  } bit 0x8, with a30. fn_80035398 sets all three from
+    f32  f28;                   // 0x028  } bit 0x8, with c30. fn_80035398 sets all three from
     f32  f2C;                   // 0x02C  } lbl_802811E0
-    u8   a30[4];                // 0x030  a colour: three bytes given, the fourth always 0x80;
-                                //        all 0xFF at reset
+    GXColor c30;                // 0x030  the fog colour (fn_80015624): three bytes given, the
+                                //        fourth always 0x80; all 0xFF at reset
     f32  m34[4][4];             // 0x034  } set to identity at reset
     f32  m74[4][4];             // 0x074  }
     f32  fB4;                   // 0x0B4  } a render camera's fn_80008360 and fn_80008368
@@ -507,6 +508,7 @@ typedef struct RenderState {
 LAYOUT_ASSERT(RenderState, 0x118);
 
 extern RenderState lbl_801B8980;
+void fn_80015624(void);                 // hand GX the groups of lbl_801B8980 that changed
 
 // A pool of 20 blocks of 0x1000 bytes (our names; lbl_801A4900, 0x14080 bytes, reached through
 // the pointer lbl_80280E00). fn_80015470 frees them all; fn_800154F4 moves nNext past the used ones.

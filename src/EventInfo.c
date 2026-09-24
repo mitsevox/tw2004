@@ -17,13 +17,22 @@ int  fn_80106F68(int nKind, s32 nId, char* szFirst, char* szSecond, char* szThir
 void fn_800A73F0(s32 n);
 void fn_8011D658(int nLine, char* szLabel, char* szValue);
 
+// fake match: stands in for a function the original linker stripped. The file's strings start
+// with "", "Purse:" and "Status:" (.sdata 0x802818A8) and "Rewards:" (.data 0x801944F8), before
+// fn_8011D280's; the body is unknown.
+static void EventInfo_StrippedFn(char* szLabel, char* szValue) {
+    strcpy(szValue, "");
+    strcpy(szLabel, "Purse:");
+    strcpy(szLabel, "Status:");
+    strcpy(szLabel, "Rewards:");
+}
+
 // A PGA TOUR event under way: purse, round, course, leader, the leader's score, the player's score.
 void fn_8011D280(int nLine, char* szLabel, char* szValue) {
     char sz[128];
     s32 aCourses[4];
     s32 nId;
     s32 nRound;
-    int nScore;
     s32 nRounds;
 
     GameModeDriverPGATour_GetEventByDate(lbl_80223C48.nSelected, &nId, &nRound);
@@ -52,8 +61,9 @@ void fn_8011D280(int nLine, char* szLabel, char* szValue) {
         GameModeDriverPGATour_GetCurrentEventLeader(sz);
         strcpy(szValue, sz);
         break;
-    case 7:
-        nScore = fn_800F009C();
+    case 7: {
+        // Each score case has its own block-scoped local (a shared one allocates differently).
+        int nScore = fn_800F009C();
         strcpy(szLabel, "Score:");
         if (nScore == 0) {
             sprintf(szValue, "E");
@@ -63,8 +73,9 @@ void fn_8011D280(int nLine, char* szLabel, char* szValue) {
             sprintf(szValue, "%d", nScore);
         }
         break;
-    case 8:
-        nScore = fn_800F018C(nId);
+    }
+    case 8: {
+        int nScore = fn_800F018C(nId);
         strcpy(szLabel, "Your Score:");
         if (nScore == 0) {
             sprintf(szValue, "E");
@@ -74,6 +85,7 @@ void fn_8011D280(int nLine, char* szLabel, char* szValue) {
             sprintf(szValue, "%d", nScore);
         }
         break;
+    }
     }
 }
 

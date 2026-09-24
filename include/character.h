@@ -280,7 +280,9 @@ typedef struct Clip {
     u8     unk08[2];
     s16    n0A;                 // 0x0A  non-zero: it has a first frame stream (fn_80020328)
     s16    nFrames;             // 0x0C
-    u8     unk0E[0xA];
+    s16    n0E;                 // 0x0E  the last key fn_8001FCF4 reads
+    f32    f10;                 // 0x10  the time from one key to the next (fn_8001FCF4)
+    u8     unk14[4];
     f32    f18;                 // 0x18  fn_8001BE88 blends up to it
     s32    n1C;                 // 0x1C  how many tracks (pD0)
     u8     unk20[8];
@@ -301,7 +303,7 @@ typedef struct Clip {
     s32    n54;                 // 0x54  bytes from pC4 to the pF4 library (fn_80020DD4)
     s32    n58;                 // 0x58  passed to fn_8002148C with a second-stream frame
     s32    n5C;                 // 0x5C  passed to fn_80021134 with a first-stream frame
-    u8     unk60[4];
+    s32    n60;                 // 0x60  passed to fn_80021134 with pE8
     s32    n64;                 // 0x64
     u8     unk68[0x80 - 0x68];
     f32    v80[3];              // 0x80  a point fn_8001DB04 puts through bone 0's matrix
@@ -383,7 +385,8 @@ void fn_80071C28(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn pfnBl
 void fn_800732F4(SKABlendNode* pNode, struct AnimPlayer* pPlayer, f32 fTime);
 // animblender.c: pose the tree at pNode at fTime into its buffers (each blend node's pfnBlend).
 void fn_8007260C(struct Character* pChar, SKABlendNode* pNode, CharModel* pModel, f32 fTime);
-void fn_8001FCF4(struct Character* pChar, Clip* pClip, SkelPose* pPose, int n, f32 fTime);
+// ska_shared.c: pose pPose from pClip at fTime (aBits, if not NULL, gets the bones it sets).
+void fn_8001FCF4(struct Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32 fTime);
 // mtalib.c (pUnused is not read)
 int  fn_8001F494(void* pUnused, struct MtaLib* pLib, SkelPose1* pPose, f32 fTime);
 // animblender.c: make pNode a blend node that mixes its children with pfnBlend at fWeight.
