@@ -707,6 +707,7 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     f32 fSize;
     f32 fPeriod;
     f32 fAngle;
+    f32 fScale;
     s32 nFrames;
     u32 nPeriod;
     int nRef;
@@ -718,7 +719,7 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     fStrength = fn_80116468();
     nFrames = 60.0f * (FRAME_RATE * fDelta);
     fBend = pModel->f13C;
-    fSway = fn_80116304(pChain->n14, PI * pChain->n10 * 0.125f, fStrength);
+    fSway = fn_80116304(pChain->n14, PI * pChain->n10 / 8.0f, fStrength);
     pChain->n14++;
     nFrames = nFrames * fSway;
     pChain->n18 += nFrames;
@@ -762,7 +763,9 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
                     fT = (fStrength - lbl_802824F8->nBC) / (35.0f - lbl_802824F8->nBC);
                 }
                 // Unlike fn_80115348, both come from f8C, as 1 - f8C.
-                fSpeed = fSize = (1.0f - lbl_802824F8->f8C) * fT + 1.0f;
+                fScale = (1.0f - lbl_802824F8->f8C) * fT + 1.0f;
+                fSpeed = fScale;
+                fSize = fScale;
             }
             fPeriod = 60.0f * FRAME_RATE * lbl_802824F8->f64;
             if (0.0f != fSpeed) {
