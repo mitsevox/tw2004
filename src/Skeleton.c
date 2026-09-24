@@ -271,12 +271,12 @@ void fn_800273BC(CharModel* pModel, IKChain* pChain, f32* pTarget, s32 nIteratio
 // and v48, the others (once the link before was redone) from their bones' rotation and position.
 void fn_80027478(CharModel* pModel, IKChain* pChain) {
     f32 vOffset[4];
-    u64 uDone;
-    u64 uPrevBit;
-    int i;
     IKLink* pLink;
+    int i;
     int nBone;
     int nPrevBone;
+    u64 uDone;
+    u64 uPrevBit;
     int bKept;
     Bone* pBone;
     BonePose* pPose;
@@ -968,6 +968,7 @@ void fn_800293CC(int nBone, int nCount, SkelPose* pA, SkelPose* pB, SkelPose* pO
     u32 aCur[4];
     u32 aPos[4];
     u32 aRot[4];
+    int i;
     int nLast;
 
     fn_8001EA54(pA->a20, pB->a20, aPos, 0x80);
@@ -977,13 +978,13 @@ void fn_800293CC(int nBone, int nCount, SkelPose* pA, SkelPose* pB, SkelPose* pO
     nLast = nBone + nCount - 1;
     fn_8001E938(pOut->a0, 0x80);
     fn_8001E938(pOut->a10, 0x80);
-    for (; nBone <= nLast; nBone++) {
+    for (i = nBone; i <= nLast; i++) {
         if (fn_8001E9F4(aRot, aCur, 0x80)) {
-            fn_8001FB00(pA->aBones[nBone].q0, pB->aBones[nBone].q0, pOut->aBones[nBone].q0, fT);
+            fn_8001FB00(pA->aBones[i].q0, pB->aBones[i].q0, pOut->aBones[i].q0, fT);
             fn_80021980(pOut->a0, aCur, pOut->a0, 0x80);
         }
         if (fn_8001E9F4(aPos, aCur, 0x80)) {
-            fn_8001FBA4(pA->aBones[nBone].v10, pB->aBones[nBone].v10, pOut->aBones[nBone].v10, fT);
+            fn_8001FBA4(pA->aBones[i].v10, pB->aBones[i].v10, pOut->aBones[i].v10, fT);
             fn_80021980(pOut->a10, aCur, pOut->a10, 0x80);
         }
         fn_80029C60(aCur, aCur, 0x80, 1);
@@ -1254,12 +1255,12 @@ void fn_80029C3C(f32* pA, f32* pB, f32* pOut) {
 // Shifts a bit array of nBits bits (whole words) from aSrc into aDst by nShift bits: each word's top
 // nShift bits carry into the bottom of the next word.
 void fn_80029C60(u32* aSrc, u32* aDst, u32 nBits, u32 nShift) {
-    u32 uCarry = 0;
-    u32 uMask = 0;
+    u32 uWord;
+    u32 nWords;
     u32 i;
     u32 j;
-    u32 nWords;
-    u32 uWord;
+    u32 uCarry = 0;
+    u32 uMask = 0;
 
     for (i = 0; i < nShift; i++) {
         uMask |= 1 << (31 - i);

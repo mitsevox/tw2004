@@ -330,9 +330,9 @@ u8 Ter_CheckObjectAndHazardObstruction(f32* pPos, f32 fRadius, u8 bModels, u8 bH
     int k;
     int n;
     int nCorner;
-    TerCell* pCell;
     TerPolyRef* pRef;
     u16* pObjRef;
+    TerCell* pCell;
     f32 (*pVert)[3];
     u8* pFlags;
     u8 uFlags;
