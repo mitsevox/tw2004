@@ -63,15 +63,15 @@ void fn_8008F3A4(u32* p, uptr uBase, int nStride, u32 n) {
 // Turn the UI file's offsets into pointers.
 // port: the file stores 32-bit offsets in its pointer fields, as the GameCube's pointers are.
 void fn_8008F488(FrontEnd* pFE) {
-    UIFile* pFile = pFE->pFile;
     u32 i;
+    uptr uBase = (uptr)pFE->pFile;
 
-    pFE->pFile->p4 = (UIFilePairs*)((uptr)pFE->pFile->p4 + (uptr)pFile);
-    pFE->pFile->p8 = (UIFileTables*)((uptr)pFE->pFile->p8 + (uptr)pFile);
-    fn_8008F3A4((u32*)pFE->pFile->p4->aPairs, (uptr)pFile, 1, pFE->pFile->p4->nCount * 2);
-    fn_8008F3A4((u32*)pFE->pFile->p8->apTables, (uptr)pFile, 1, pFE->pFile->p8->nCount);
+    pFE->pFile->p4 = (UIFilePairs*)((uptr)pFE->pFile->p4 + uBase);
+    pFE->pFile->p8 = (UIFileTables*)((uptr)pFE->pFile->p8 + uBase);
+    fn_8008F3A4((u32*)pFE->pFile->p4->aPairs, uBase, 1, pFE->pFile->p4->nCount * 2);
+    fn_8008F3A4((u32*)pFE->pFile->p8->apTables, uBase, 1, pFE->pFile->p8->nCount);
     for (i = 0; i < pFE->pFile->p8->nCount; i++) {
-        fn_8008F3A4((u32*)pFE->pFile->p8->apTables[i]->apEntries, (uptr)pFile, 1,
+        fn_8008F3A4((u32*)pFE->pFile->p8->apTables[i]->apEntries, uBase, 1,
                     pFE->pFile->p8->apTables[i]->nCount);
     }
 }
@@ -170,6 +170,7 @@ void fn_8008F820(void) {
     u32 uMask;
     int i;
     int j;
+    UIButtonEvent* pEvent;
 
     fOne = 1.0f;
     if (gSession.nGameType == 3 || gSession.nGameType == 1 ||
@@ -251,10 +252,12 @@ void fn_8008F820(void) {
         for (i = 0; i < 4; i++) {
             if (lbl_801D87C0.a1[i] && lbl_801D87C0.a30[i]) {
                 if (gSession.nGameType != 6 || (gSession.nPaused != 2 && gSession.nPaused != 3)) {
+                    pEvent = lbl_80189B58;
                     for (j = 0; j < UI_NUM_BUTTON_EVENTS; j++) {
-                        if (lbl_80189B58[j].uMask & aPressed[i]) {
-                            fn_80168DB0(lbl_80281F1C->pHandler, i, lbl_80189B58[j].nEvent, 1, &fOne, 0);
+                        if (pEvent->uMask & aPressed[i]) {
+                            fn_80168DB0(lbl_80281F1C->pHandler, i, pEvent->nEvent, 1, &fOne, 0);
                         }
+                        pEvent++;
                     }
                     if (aButtons[i] != 0 && gSession.nGameType == 3) {
                         fn_8016B09C(lbl_80281F1C->pHandler, 0x22, 1, aArgs);
@@ -301,13 +304,13 @@ void fn_8008FD60(u32 uEvent) {
 // Find the colour table among the UI file's tables (the one whose first entry is of kind 0x10)
 // and turn its entries' colour offsets into pointers; with none, p14 is NULL.
 void fn_8008FDDC(FrontEnd* pFE) {
-    UIFile* pFile = pFE->pFile;
+    uptr uBase = (uptr)pFE->pFile;
     UIColorTable* pTable;
     u8 bFound = 0;
     int nTables;
     int i;
 
-    nTables = pFile->p8->nCount;
+    nTables = pFE->pFile->p8->nCount;
     for (i = 0; i < nTables; i++) {
         pTable = pFE->pFile->p8->apTables[i];
 
@@ -319,7 +322,7 @@ void fn_8008FDDC(FrontEnd* pFE) {
     }
     if (bFound) {
         for (i = 0; i < pFE->p14->nCount; i++) {
-            pFE->p14->apEntries[i]->p8 = (u8*)((uptr)pFE->p14->apEntries[i]->p8 + (uptr)pFile);
+            pFE->p14->apEntries[i]->p8 = (u8*)((uptr)pFE->p14->apEntries[i]->p8 + uBase);
         }
     } else {
         pFE->p14 = NULL;
