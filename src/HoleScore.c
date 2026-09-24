@@ -23,6 +23,110 @@ int  fn_800D1330(int nPlayer);
 void fn_800D1674(f32* pA, f32* pB, f32* pOut);
 void fn_800C8C3C(int nView, f32* pOut);   // GoBreakLine: a point kept per view
 
+// gpGame->pfn1F8: whether holing this ball would put the player in the lead (the others' balls
+// not yet holed counting one more stroke). Strokes (scoring kind 0): only when not leading
+// already. Holes won (1): level on holes and beating the best other score on this hole by more
+// than a stroke. Skins (2): the same, from level or behind, when this hole's skin would lift the
+// player past the best.
+u8 fn_800CF158(int nPlayer) {
+    int anTotal[4];   // one per player set up, as in fn_800CFE74
+    int i;
+    int nKind;
+    int nMine;
+    int nBest;
+    int nOther;
+    int nMineStrokes;
+    int nBestStrokes;
+
+    nKind = fn_8008AB40();
+    if (gNumPlayersSetUp == 1) {
+        return 0;
+    }
+    if (nKind == 0) {
+        nBest = 1000;
+        // EA bug: nMine is never set when nPlayer is cut or not one of the players set up
+        for (i = 0; i < gNumPlayersSetUp; i++) {
+            if (!gPlayers[i].bPlayerCut) {
+                anTotal[i] = fn_800E1904(i, 0);
+                if (i == nPlayer) {
+                    nMine = anTotal[i];
+                } else if (anTotal[i] < nBest) {
+                    nBest = anTotal[i];
+                }
+            }
+        }
+        if (nMine >= nBest) {
+            for (i = 0; i < gNumPlayersSetUp; i++) {
+                if (!gPlayers[i].bPlayerCut) {
+                    if (i == nPlayer) {
+                        nMineStrokes = anTotal[i] + (gPlayers[i].nStrokes[Game_CurHoleIndex()] + 1) -
+                                       fn_800D2B08();
+                    } else {
+                        nOther = anTotal[i] + gPlayers[i].nStrokes[Game_CurHoleIndex()] - fn_800D2B08();
+                        if (gPlayers[i].ball.nLie != LIE_INCUP_e) {
+                            nOther++;
+                        }
+                        if (nOther < nBest) {
+                            nBest = nOther;
+                        }
+                    }
+                }
+            }
+            return nMineStrokes < nBest;
+        }
+        return 0;
+    } else if (nKind == 1) {
+        nBest = -1;
+        nBestStrokes = 1000;
+        for (i = 0; i < gNumPlayersSetUp; i++) {
+            if (i == nPlayer) {
+                nMine = gPlayers[i].nHolesWon;
+                nMineStrokes = gPlayers[i].nStrokes[Game_CurHoleIndex()];
+            } else {
+                if (gPlayers[i].nHolesWon > nBest) {
+                    nBest = gPlayers[i].nHolesWon;
+                }
+                nOther = gPlayers[i].nStrokes[Game_CurHoleIndex()];
+                if (gPlayers[i].ball.nLie != LIE_INCUP_e) {
+                    nOther++;
+                }
+                if (nOther < nBestStrokes) {
+                    nBestStrokes = nOther;
+                }
+            }
+        }
+        if (nMine == nBest && nMineStrokes < nBestStrokes - 1) {
+            return 1;
+        }
+        return 0;
+    } else if (nKind == 2) {
+        nBest = -1;
+        nBestStrokes = 1000;
+        for (i = 0; i < gNumPlayersSetUp; i++) {
+            if (i == nPlayer) {
+                nMine = gPlayers[i].n274;
+                nMineStrokes = gPlayers[i].nStrokes[Game_CurHoleIndex()];
+            } else {
+                if (gPlayers[i].n274 > nBest) {
+                    nBest = gPlayers[i].n274;
+                }
+                nOther = gPlayers[i].nStrokes[Game_CurHoleIndex()];
+                if (gPlayers[i].ball.nLie != LIE_INCUP_e) {
+                    nOther++;
+                }
+                if (nOther < nBestStrokes) {
+                    nBestStrokes = nOther;
+                }
+            }
+        }
+        if (nMine <= nBest && nMineStrokes < nBestStrokes - 1 && nMine + fn_800F9254() > nBest) {
+            return 1;
+        }
+        return 0;
+    }
+    return 0;
+}
+
 // For a human player: whether Player.ballBefore passes the fn_800D782C check or, when that ball
 // is in the cup, the fn_800D7B1C putt check.
 u8 fn_800CF77C(int nPlayer) {
