@@ -121,12 +121,10 @@ AudTrack* fn_800A9BC8(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 
     s32 bSorted;
     UList* pList;
     AudTrack* pTrack;
-    UPool* pPool;
 
-    pPool = &lbl_80282098;
     bSorted = pSource->pSound->n3 & 1;
     pList = &lbl_801F1868[bSorted];
-    if (pPool->nFree == 0) {
+    if (lbl_80282098.nFree == 0) {
         pTrack = (AudTrack*)lbl_801F1868[1].pTail;
         if (lbl_801F1868[1].nCount == 0) return NULL;
         if (bSorted == 1) {
@@ -141,7 +139,7 @@ AudTrack* fn_800A9BC8(AudSource* pSource, AudTrackTmpl* pTmpl, u8 nChannel, f32 
             return NULL;
         }
     }
-    pTrack = fn_800AE1AC(pPool);
+    pTrack = fn_800AE1AC(&lbl_80282098);
     pTrack->pTmpl = pTmpl;
     pTrack->pSource = pSource;
     pSource->apTracks[nChannel] = pTrack;

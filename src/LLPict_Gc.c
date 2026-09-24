@@ -41,14 +41,14 @@ void fn_8002F56C(u8* pPlane, void* pWork, int nWidth, int nHeight) {
     int nRow = nWidth * 4;      // a band of four rows
     int i;
     int y;
-    u32* pIn;
+    int nOff;
 
     for (y = 0; y < nHeight; y += 4) {
         memcpy(pWork, pPlane, nRow);
         for (i = 1; i < nWidth / 2; i++) {
-            pIn = (u32*)pWork + ((i / 4) * 2 + (nWidth / 4) * (i % 4));
-            ((u32*)pPlane)[i * 2] = pIn[0];
-            ((u32*)pPlane)[i * 2 + 1] = pIn[1];
+            nOff = (i / 4) * 2 + (nWidth / 4) * (i % 4);
+            ((u32*)pPlane)[i * 2] = ((u32*)pWork)[nOff];
+            ((u32*)pPlane)[i * 2 + 1] = ((u32*)pWork)[nOff + 1];
         }
         pPlane += nRow;
     }
@@ -59,13 +59,13 @@ void fn_8002F56C(u8* pPlane, void* pWork, int nWidth, int nHeight) {
 void fn_8002F898(u8* pSrc, u8* pDst, int nWidth, int nHeight) {
     int i;
     int y;
-    u32* pIn;
+    int nOff;
 
     for (y = 0; y < nHeight; y += 4) {
         for (i = 0; i < nWidth / 2; i++) {
-            pIn = (u32*)pSrc + ((i / 4) * 2 + (nWidth / 4) * (i % 4));
-            ((u32*)pDst)[i * 2] = pIn[0];
-            ((u32*)pDst)[i * 2 + 1] = pIn[1];
+            nOff = (i / 4) * 2 + (nWidth / 4) * (i % 4);
+            ((u32*)pDst)[i * 2] = ((u32*)pSrc)[nOff];
+            ((u32*)pDst)[i * 2 + 1] = ((u32*)pSrc)[nOff + 1];
         }
         pSrc += nWidth * 4;
         pDst += nWidth * 4;

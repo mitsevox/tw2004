@@ -47,7 +47,7 @@ void fn_800B694C(s32 nWidth, s32 nHeight, u32 uSize) {
     lbl_8028218C = nWidth;
     lbl_80282188 = nHeight;
     lbl_80282198 = uSize;
-    for (n = 0, nRow = 0; n < 107; n++, nRow += 8) {
+    for (nRow = n = 0; n < 107; nRow += 8, n++) {
         uBits = 0;
         for (i = 0; i < 8; i++) {
             uBits |= lbl_8018FFE0[nRow + i];
