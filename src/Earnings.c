@@ -57,11 +57,17 @@ void  fn_8005844C(int nProfile);                        // the same for aCourseU
 u8    fn_8005846C(int nProfile);
 void  fn_80058494(int nProfile);                        // and for aCourseUnlocked[22]
 u8    fn_800584B4(int nProfile);
+f32   fn_800D04AC(int nPlayer);                         // HoleScore.c
+u32   fn_800D0BAC(int nPlayer);                         // the class of the ground the shot left
+u8    fn_800D0BF8(int nPlayer, u8 bUnder, u8 bAnyLie);
+u8    fn_800D0D54(int nPlayer);
+int   fn_800D0DC8(int nPlayer, int nToPar);
 
 int   fn_800D3A20(int nProfile, u8 bMessage);
 int   fn_800D3CF8(int nRating);
 u8    fn_800D4010(int nId);
 f32   fn_800D6EEC(void);
+u8    fn_800D748C(int nPlayer);
 u8    fn_800D76AC(int nPlayer, int nAward);
 int   fn_800D7DA0(int nPlayer, u8 a, u8 b, u8 c);
 s32   fn_800D9E00(s32 i);
@@ -570,6 +576,166 @@ s32 fn_800D46E8(int n) {
 // Whether bit nBit of uMask is set.
 u8 fn_800D4EF8(u32 uMask, int nBit) {
     return (uMask & (1 << nBit)) != 0;
+}
+
+// After a putt: check the putt goals and fill the working tables with what they give, awards
+// (lbl_80282250 of them) and money prizes (lbl_80282254). Of goals with the same id only the one
+// with the biggest nValue is kept. The holes still to come count 999 strokes and putts meanwhile.
+// With bPreview the hole counts one more stroke and putt (the ball dropping now), a few tests are
+// skipped and no EA Sports Bio accomplishment is posted.
+void fn_800D4F14(int nPlayer, u8 bPreview) {
+    s32 aPrizeIds[10];
+    s32 aAwardIds[10];
+    int i;
+    int nSlot;
+    u8 bReplace;
+    u8 bLost;
+    int j;
+    s32 nValue;
+    u8 bHole;
+    u8 bTee;
+
+    lbl_80282254 = 0;
+    lbl_80282250 = 0;
+    if (gSession.uFlags & 0x4000) return;
+    if (Player_IsCPU(nPlayer)) return;
+    if (!fn_800D748C(nPlayer)) return;
+    if (fn_800EC550() && !fn_801025F4()) return;
+    if (fn_800E177C() != 0) return;
+
+    for (i = Game_CurHoleIndex() + 1; i < 18; i++) {
+        gPlayers[nPlayer].nStrokes[i] = 999;
+        gPlayers[nPlayer].nPutts[i] = 999;
+    }
+    if (bPreview) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]++;
+        gPlayers[nPlayer].nPutts[Game_CurHoleIndex()]++;
+    }
+
+    for (i = 0; i < NUM_PUTT_GOALS; i++) {
+        if (!lbl_80200538.aPuttGoal[i].bEnabled) continue;
+        if (!fn_800D4EF8(lbl_80200538.aPuttGoal[i].uModes, Game_GetMode())) continue;
+        if (fn_800EC550() && !fn_801025F4() && !fn_800D4EF8(lbl_80200538.aPuttGoal[i].uModes, 5)) continue;
+        if (!fn_800D4EF8(lbl_80200538.aPuttGoal[i].uPars, 0) && fn_800D2B08() == 3) continue;
+        if (!fn_800D4EF8(lbl_80200538.aPuttGoal[i].uPars, 1) && fn_800D2B08() == 4) continue;
+        if (!fn_800D4EF8(lbl_80200538.aPuttGoal[i].uPars, 2) && fn_800D2B08() == 5) continue;
+        if (!fn_800D4EF8(lbl_80200538.aPuttGoal[i].uLies, fn_800D4694(fn_800D0BAC(nPlayer)))) continue;
+        if (lbl_80200538.aPuttGoal[i].f0C > fn_800D04AC(nPlayer)) continue;
+        if (!fn_800D4EF8(lbl_80200538.aPuttGoal[i].uShotKinds, gPlayers[nPlayer].nShotKind)) continue;
+        if (!fn_800D4EF8(lbl_80200538.aPuttGoal[i].uClubs, gPlayers[nPlayer].nClub)) continue;
+        if (fn_800D4EF8(lbl_80200538.aPuttGoal[i].uFlags, 0) && !fn_800D0BF8(nPlayer, 1, 0)) continue;
+        if (fn_800D4EF8(lbl_80200538.aPuttGoal[i].uFlags, 1) && !fn_800D0BF8(nPlayer, 0, 0)) continue;
+        if (!bPreview && fn_800D4EF8(lbl_80200538.aPuttGoal[i].uFlags, 2) && !fn_800D0D54(nPlayer)) continue;
+        if (fn_800D4EF8(lbl_80200538.aPuttGoal[i].uFlags, 4) &&
+            !gPlayers[nPlayer].b310 && !gPlayers[nPlayer].b311) continue;
+        if (!bPreview && fn_800D4EF8(lbl_80200538.aPuttGoal[i].uFlags, 5) &&
+            !gPlayers[nPlayer].b30D) continue;
+        if (lbl_80200538.aPuttGoal[i].nMaxPutts != 0 &&
+            lbl_80200538.aPuttGoal[i].nMaxPutts < gPlayers[nPlayer].nPutts[Game_CurHoleIndex()]) continue;
+        // The score on the hole: 2 triple bogey or better, 3 double bogey, 4 bogey, 5 par or better,
+        // 6 birdie, 7 eagle and 8 albatross (not with a hole in one), 9 a hole in one.
+        if (lbl_80200538.aPuttGoal[i].nScore == 2 &&
+            gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] > fn_800D2B08() + 3) continue;
+        if (lbl_80200538.aPuttGoal[i].nScore == 3 &&
+            gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] != fn_800D2B08() + 2) continue;
+        if (lbl_80200538.aPuttGoal[i].nScore == 4 &&
+            gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] != fn_800D2B08() + 1) continue;
+        if (lbl_80200538.aPuttGoal[i].nScore == 5 &&
+            gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] > fn_800D2B08()) continue;
+        if (lbl_80200538.aPuttGoal[i].nScore == 6 &&
+            gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] != fn_800D2B08() - 1) continue;
+        if (lbl_80200538.aPuttGoal[i].nScore == 7 &&
+            (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 ||
+             gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] != fn_800D2B08() - 2)) continue;
+        if (lbl_80200538.aPuttGoal[i].nScore == 8 &&
+            (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 ||
+             gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] != fn_800D2B08() - 3)) continue;
+        if (lbl_80200538.aPuttGoal[i].nScore == 9 &&
+            gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] > 1) continue;
+        // Flag 6: a hole in one, and the round's second (fn_800D0DC8 below -3 counts holes in one).
+        if (fn_800D4EF8(lbl_80200538.aPuttGoal[i].uFlags, 6) &&
+            (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] > 1 || fn_800D0DC8(nPlayer, -5) < 2)) continue;
+        if (lbl_80200538.aPuttGoal[i].nAward >= 23 && lbl_80200538.aPuttGoal[i].nAward <= 38 &&
+            (bPreview || !fn_800D9998(nPlayer, lbl_80200538.aPuttGoal[i].nAward))) continue;
+        if (lbl_80200538.aPuttGoal[i].nAward == 22 &&
+            GM_GetGameProgress(&gpSaveData[nPlayer]) < 100.0f) continue;
+
+        if (lbl_80200538.aPuttGoal[i].nAward != 39) {
+            if (!fn_800D76AC(nPlayer, lbl_80200538.aPuttGoal[i].nAward)) continue;
+            bReplace = 0;
+            bLost = 0;
+            nSlot = lbl_80282250;
+            if (lbl_80200538.aPuttGoal[i].nId != 0) {
+                for (j = 0; j < lbl_80282250; j++) {
+                    if (lbl_80200538.aPuttGoal[i].nId == aAwardIds[j]) {
+                        if (lbl_80200538.aPuttGoal[i].nValue > lbl_80200218[j]) {
+                            nSlot = j;
+                            bReplace = 1;
+                        } else {
+                            bLost = 1;
+                        }
+                    }
+                }
+            }
+            if (bLost) continue;
+            lbl_80200290[nSlot] = lbl_80200538.aPuttGoal[i].nAward;
+            lbl_80200218[nSlot] = lbl_80200538.aPuttGoal[i].nValue;
+            aAwardIds[nSlot] = lbl_80200538.aPuttGoal[i].nId;
+            if (!bReplace) {
+                lbl_80282250++;
+            }
+            if (!bPreview && lbl_80200538.aPuttGoal[i].nBio != -1) {
+                fn_80125874(lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].szName,
+                            lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].nValue);
+            }
+        } else {
+            nValue = lbl_80200538.aPuttGoal[i].nValue;
+            if (nValue == 0) continue;
+            bReplace = 0;
+            bLost = 0;
+            nSlot = lbl_80282254;
+            if (lbl_80200538.aPuttGoal[i].nId != 0) {
+                for (j = 0; j < lbl_80282254; j++) {
+                    if (lbl_80200538.aPuttGoal[i].nId == aPrizeIds[j]) {
+                        if (lbl_80200538.aPuttGoal[i].nValue > lbl_80200308[j]) {
+                            nSlot = j;
+                            bReplace = 1;
+                        } else {
+                            bLost = 1;
+                        }
+                    }
+                }
+            }
+            if (bLost) continue;
+            aPrizeIds[nSlot] = lbl_80200538.aPuttGoal[i].nId;
+            lbl_80200308[nSlot] = nValue;
+            bHole = fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 2);
+            bTee = fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 1);
+            lbl_80200380[nSlot] = fn_800D6A70(lbl_80200308[nSlot], nPlayer,
+                                              fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 0), bTee, bHole,
+                                              &lbl_801FFAE8[nSlot]);
+            if (fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 3)) {
+                lbl_80200380[nSlot] = fn_800D7220(lbl_80200380[nSlot], nPlayer, &lbl_801FFAE8[nSlot]);
+            }
+            lbl_802003F8[nSlot] = lbl_80200538.aPuttGoal[i].n1D;
+            if (!bReplace) {
+                lbl_80282254++;
+            }
+            if (!bPreview && lbl_80200538.aPuttGoal[i].nBio != -1) {
+                fn_80125874(lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].szName,
+                            lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].nValue);
+            }
+        }
+    }
+
+    for (i = Game_CurHoleIndex() + 1; i < 18; i++) {
+        gPlayers[nPlayer].nStrokes[i] = 0;
+        gPlayers[nPlayer].nPutts[i] = 0;
+    }
+    if (bPreview) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]--;
+        gPlayers[nPlayer].nPutts[Game_CurHoleIndex()]--;
+    }
 }
 
 // Without bCheck: whether the profile has won all 31 PGA TOUR tournaments. With it: whether this is

@@ -40,6 +40,31 @@ typedef struct BioAccomplishment {
 
 #define NUM_BIO_ACCOMPLISHMENTS 50  // the 'ERN ' data fills 50 (0xA54..0x1864); the rest is other data
 
+// A putt goal (0x24 bytes, fn_800D4F14): what a hole must show when the putt drops to earn an
+// award, or a money prize (award 0x27).
+typedef struct PuttGoal {
+    s32  nId;                   // 0x00  goals with the same nonzero id compete: the biggest nValue is kept
+    u32  uModes;                // 0x04  the game modes it counts in, a bit per mode
+    u8   unk08;                 // 0x08
+    u8   uPars;                 // 0x09  the hole's pars it counts on: bit 0 par 3, 1 par 4, 2 par 5
+    u8   uShotKinds;            // 0x0A  a bit per Player.nShotKind
+    u8   uLies;                 // 0x0B  a bit per fn_800D4694 class of the ground the shot left
+    f32  f0C;                   // 0x0C  the most fn_800D04AC may return
+    u32  uClubs;                // 0x10  a bit per Player.nClub
+    u8   uFlags;                // 0x14  more tests, a bit each (fn_800D4F14)
+    s8   nMaxPutts;             // 0x15  the most putts on the hole, 0 any
+    s8   nScore;                // 0x16  the score on the hole it takes (fn_800D4F14), 0 any
+    u8   uMults;                // 0x17  the multipliers a prize takes: bit 0 course, 1 tee, 2 pin set, 3 TOUR card
+    s32  nValue;                // 0x18  the prize (award 0x27), else what ranks goals with the same id
+    s8   nAward;                // 0x1C  the award it gives (fn_800D76AC), 0x27 a money prize
+    s8   n1D;                   // 0x1D  kept with a money prize (lbl_802003F8)
+    u8   unk1E;                 // 0x1E
+    u8   bEnabled;              // 0x1F
+    s32  nBio;                  // 0x20  the EA Sports Bio accomplishment it posts (aBio), -1 none
+} PuttGoal;
+
+#define NUM_PUTT_GOALS 18
+
 // A row of the mini-game table (0x1C bytes): what landing on a surface is worth in the target
 // games (modes 12, 13, 15, 16, 17). The row with nId 999 holds the target games' prizes instead.
 typedef struct MiniPrize {
@@ -96,7 +121,9 @@ typedef struct EarningsTable {
     s32  nA24;                  // 0xA24  paid with award 0x1C after a challenge (GameMode5)
     u8   unkA28[0xA54 - 0xA28];
     BioAccomplishment aBio[NUM_BIO_ACCOMPLISHMENTS];    // 0xA54
-    u8   unk1864[0x22F0 - 0x1864];
+    u8   unk1864[0x1B6C - 0x1864];
+    PuttGoal aPuttGoal[NUM_PUTT_GOALS];                 // 0x1B6C
+    u8   unk1DF4[0x22F0 - 0x1DF4];
 } EarningsTable;
 LAYOUT_ASSERT(EarningsTable, 0x22F0);
 
@@ -109,6 +136,7 @@ extern s32 lbl_80200470[10];    // the putt record results (fn_800D7B1C)
 extern s32 lbl_80200498[10];    // a working table: fn_800D3DDC messages the entries of kind 2 or 4
 extern s32 lbl_80200510[10];    // with these ids
 extern s32 lbl_80282258;        // their count
+extern s32 lbl_80200308[10];    // the money prizes fn_800D4F14 finds, before the multipliers
 
 // Earnings.c
 int  fn_800D38F0(int nWinner, int nLoser, int nMargin, s32* pPrize);   // a ladder event's winnings
