@@ -145,14 +145,14 @@ double acos(double x);                  // 0x8015F784 (MSL)
 double asin(double x);                  // 0x8015F7A4 (MSL)
 double atan2(double y, double x);       // 0x8015F7C4 (MSL)
 double log(double x);                   // 0x8015F804 (MSL)
-u32  Rand_Next(int nStream);            // 0x8000B130  EA's lagged-Fibonacci generator
-f32  fn_8000B318(int nStream);          // a normally distributed random number (mean 0, deviation 1):
-                                        // Box-Muller on two Rand_Floats, the second value kept
-void fn_8000B1D4(int nStream, u32 uSeed);   // seed a random stream
-u32  fn_8000B244(void);                 // a random seed from the clock
-void fn_8000B2B8(u32 uSeed);            // seed all three random streams
-void fn_8000B30C(void);                 // drop the kept normal value (fn_8000B318)
-f32  Rand_Float(int nStream);           // 0x8000B428  [0, 1)
+u32  Misc_RandFunc(int nStream);            // 0x8000B130  EA's lagged-Fibonacci generator
+f32  Misc_RandFuncg(int nStream);          // a normally distributed random number (mean 0, deviation 1):
+                                        // Box-Muller on two Misc_RandFuncf, the second result kept
+void Misc_SetSeedFunc(int nStream, u32 uSeed);   // seed a random stream
+u32  Misc_CreateRandomSeed(void);                 // a random seed from the clock
+void Misc_InitModule(u32 uSeed);            // seed all three random streams
+void Misc_CloseModule(void);                 // drop the kept normal value (Misc_RandFuncg)
+f32  Misc_RandFuncf(int nStream);           // 0x8000B428  [0, 1)
 void fn_8000883C(f32* pA, f32* pB, f32 fT);   // quaternion slerp from a to b by fT, into b
 void fn_80008FCC(f32* pA, f32* pB, f32* pOut); // quaternion product a x b (Quaternion.c)
 void fn_80008BB8(f32* pOut, f32 fA, f32 fB, f32 fC);   // the quaternion of three (negated) angles

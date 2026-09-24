@@ -821,17 +821,17 @@ void fn_80047C24(int nPlayer) {
         fn_8000C5A4(pB->pF0->obj.m0);
         Vec_Copy(pB->v20, pB->v30);
         fn_8004858C(pB->v40, pB->fC, lbl_80281DA0->fAA0);
-        fn_8000AE28(pB->v40, lbl_80281DA0->fA98 * (0.5f * Rand_Float(1) + 0.5f), pB->v40);
+        fn_8000AE28(pB->v40, lbl_80281DA0->fA98 * (0.5f * Misc_RandFuncf(1) + 0.5f), pB->v40);
         pB->v40[3] = pB->v40[1];
         pB->bF5 = 0;
         pB->b0 = 1;
         pB->f10 = 0.0f;
         fRange = lbl_80281DA0->fAA8;
-        pB->v60[0] = fRange * Rand_Float(1) - 0.5f * fRange;
+        pB->v60[0] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
         fRange = lbl_80281DA0->fAA8;
-        pB->v60[1] = fRange * Rand_Float(1) - 0.5f * fRange;
+        pB->v60[1] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
         fRange = lbl_80281DA0->fAA8;
-        pB->v60[2] = fRange * Rand_Float(1) - 0.5f * fRange;
+        pB->v60[2] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
         pB->v50[0] = 0.0f;
         pB->v50[1] = 0.0f;
         pB->v50[2] = 0.0f;
@@ -954,7 +954,7 @@ void fn_80048184(int nPlayer) {
     if (pA->b70 && pA->b0) {
         pA->b0 = 0;
         if (pA->bF9) {
-            pA->fC = -gPlayers[nPlayer].fAim + Rand_Float(1) - 0.5f;
+            pA->fC = -gPlayers[nPlayer].fAim + Misc_RandFuncf(1) - 0.5f;
             fn_8000ADC0(pA->mB4);
             fn_8000A194(pA->mB4, pA->fC, 0.0f, 0.0f);
             fn_800BADF8(pA->pF4->obj.m0, pA->mB4, mTmp, 4);
@@ -962,17 +962,17 @@ void fn_80048184(int nPlayer) {
             fn_8000C5A4(pA->pF4->obj.m0);
             Vec_Copy(pA->v20, pA->v30);
             fn_8004858C(pA->v40, pA->fC, lbl_80281DA0->fA9C);
-            fn_8000AE28(pA->v40, lbl_80281DA0->fA94 * Rand_Float(1), pA->v40);
+            fn_8000AE28(pA->v40, lbl_80281DA0->fA94 * Misc_RandFuncf(1), pA->v40);
             pA->v40[3] = pA->v40[1];
             pA->bF9 = 0;
             pA->b0 = 1;
             pA->f10 = 0.0f;
             fRange = lbl_80281DA0->fAA4;
-            pA->v60[0] = fRange * Rand_Float(1) - 0.5f * fRange;
+            pA->v60[0] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
             fRange = lbl_80281DA0->fAA4;
-            pA->v60[1] = fRange * Rand_Float(1) - 0.5f * fRange;
+            pA->v60[1] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
             fRange = lbl_80281DA0->fAA4;
-            pA->v60[2] = fRange * Rand_Float(1) - 0.5f * fRange;
+            pA->v60[2] = fRange * Misc_RandFuncf(1) - 0.5f * fRange;
             pA->v50[0] = 0.0f;
             pA->v50[1] = 0.0f;
             pA->v50[2] = 0.0f;

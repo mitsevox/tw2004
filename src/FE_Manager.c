@@ -493,8 +493,8 @@ void fn_80077C1C(int a, int b) {
     if (lbl_80281ED4->nDateSeed == 0) {
         lbl_80281ED4->nDateSeed = 3081979;          // 8/3/1979, packed as fn_80078604 does
     }
-    fn_8000B1D4(0, lbl_80281ED4->nDateSeed);
-    lbl_80281ED4->aKind[b][nCategory] = aKinds[Rand_Next(0) % nKinds];
+    Misc_SetSeedFunc(0, lbl_80281ED4->nDateSeed);
+    lbl_80281ED4->aKind[b][nCategory] = aKinds[Misc_RandFunc(0) % nKinds];
     nB = b;
     for (i = 0; i < nCount; i++) {
         fn_80103B8C(fn_80103BC0(i));
@@ -510,7 +510,7 @@ void fn_80077C1C(int a, int b) {
     for (j = 0; j < 5; j++) {
         if (j >= nFound) break;
     retry:
-        fn_80105FF8(aFound[Rand_Next(0) % nFound], &nKind, &nPart, &nChoice);
+        fn_80105FF8(aFound[Misc_RandFunc(0) % nFound], &nKind, &nPart, &nChoice);
         lbl_80281ED4->aPart[b][nCategory][j] = nPart;
         lbl_80281ED4->aChoice[b][nCategory][j] = nChoice;
         for (i = 0; i < j; i++) {
@@ -520,8 +520,8 @@ void fn_80077C1C(int a, int b) {
             }
         }
     }
-    gSession.nSeed = fn_8000B244();
-    fn_8000B1D4(0, gSession.nSeed);
+    gSession.nSeed = Misc_CreateRandomSeed();
+    Misc_SetSeedFunc(0, gSession.nSeed);
 }
 
 // Whether a Create-A-Player asset is still locked for the profile (never in the session's 0x4000
@@ -840,7 +840,7 @@ u8 FE_CrAP_IsAssetUndesirable(s16 nPart, CrAPAsset* pAsset) {
 // chance of 100 - nChance percent, else a desirable one; only choices fn_80104020 allows.
 void fn_80078A2C(s16 nPart, int nChance) {
     int aChoices[250];
-    u32 bDesirable = (int)(Rand_Next(0) % 100) < nChance;
+    u32 bDesirable = (int)(Misc_RandFunc(0) % 100) < nChance;
     int nFound = 0;
     int nCount = fn_801048EC(nPart, 0);
     int i;
@@ -856,7 +856,7 @@ void fn_80078A2C(s16 nPart, int nChance) {
         }
     }
     if (nFound) {
-        FE_CrAP_TurnOnPart(nPart, 0, aChoices[Rand_Next(0) % nFound]);
+        FE_CrAP_TurnOnPart(nPart, 0, aChoices[Misc_RandFunc(0) % nFound]);
     }
 }
 
@@ -957,11 +957,11 @@ void fn_80078E34(SaveProfile* pProfile) {
     fn_8007975C(pProfile, 9, 0);
     fn_8007975C(pProfile, 16, 0);
 
-    bChance = Rand_Next(0) % 100 < 10;
+    bChance = Misc_RandFunc(0) % 100 < 10;
     bPicking = 1;
     nCount = fn_801048EC(3, 0);
     while (bPicking) {
-        nPick = Rand_Next(0) % nCount;
+        nPick = Misc_RandFunc(0) % nCount;
         pAsset = fn_80104E84(3, 0, nPick);
         if (bChance && pAsset &&
             (stricmp(pAsset->szName, "Corn Rows") == 0 || stricmp(pAsset->szName, "Afro") == 0 ||
@@ -978,32 +978,32 @@ void fn_80078E34(SaveProfile* pProfile) {
         }
     }
 
-    bChance = Rand_Next(0) % 100 < 20;
+    bChance = Misc_RandFunc(0) % 100 < 20;
     if (bChance) {
         nCount = fn_801048EC(4, 0);
-        nPick = Rand_Next(0) % (nCount - 1);
+        nPick = Misc_RandFunc(0) % (nCount - 1);
         nPick++;
         FE_CrAP_TurnOnPart(4, 0, nPick);
     } else {
         FE_CrAP_TurnOnPart(4, 0, 0);
     }
-    bChance = Rand_Next(0) % 100 < 10;
+    bChance = Misc_RandFunc(0) % 100 < 10;
     if (bChance) {
         nCount = fn_801048EC(5, 0);
-        nPick = Rand_Next(0) % (nCount - 1);
+        nPick = Misc_RandFunc(0) % (nCount - 1);
         nPick++;
         FE_CrAP_TurnOnPart(5, 0, nPick);
     } else {
         FE_CrAP_TurnOnPart(5, 0, 0);
     }
-    bChance = Rand_Next(0) % 100 < 10;
+    bChance = Misc_RandFunc(0) % 100 < 10;
     if (bChance) {
         nCount = fn_801048EC(6, 0);
         if (nCount != -1) {
             if (nCount > 1) {
-                nPick = Rand_Next(0) % (nCount - 1);
+                nPick = Misc_RandFunc(0) % (nCount - 1);
             } else {
-                nPick = Rand_Next(0) % (nCount - 1);   // EA bug: divides by zero for one choice
+                nPick = Misc_RandFunc(0) % (nCount - 1);   // EA bug: divides by zero for one choice
                 nPick++;
             }
             FE_CrAP_TurnOnPart(6, 0, nPick);
@@ -1012,11 +1012,11 @@ void fn_80078E34(SaveProfile* pProfile) {
         FE_CrAP_TurnOnPart(6, 0, 0);
     }
 
-    bChance = Rand_Next(0) % 100 < 80;
+    bChance = Misc_RandFunc(0) % 100 < 80;
     bPicking = 1;
     nCount = fn_801048EC(14, 0);
     while (bPicking) {
-        nPick = Rand_Next(0) % nCount;
+        nPick = Misc_RandFunc(0) % nCount;
         pAsset = fn_80104E84(14, 0, nPick);
         if (bChance && !fn_80078B84(pAsset)) {
             FE_CrAP_TurnOnPart(14, 0, nPick);
@@ -1028,15 +1028,15 @@ void fn_80078E34(SaveProfile* pProfile) {
         }
         nPrev = nPick;
     }
-    bChance = Rand_Next(0) % 100 < 90;
+    bChance = Misc_RandFunc(0) % 100 < 90;
     if (bChance) {
         FE_CrAP_TurnOnPart(15, 0, nPrev);
     } else {
-        bChance = Rand_Next(0) % 100 < 80;
+        bChance = Misc_RandFunc(0) % 100 < 80;
         bPicking = 1;
         nCount = fn_801048EC(15, 0);
         while (bPicking) {
-            nPick = Rand_Next(0) % nCount;
+            nPick = Misc_RandFunc(0) % nCount;
             pAsset = fn_80104E84(15, 0, nPick);
             if (bChance && !fn_80078D24(pAsset)) {
                 FE_CrAP_TurnOnPart(15, 0, nPick);
@@ -1049,13 +1049,13 @@ void fn_80078E34(SaveProfile* pProfile) {
         }
     }
 
-    bChance = Rand_Next(0) % 100 < 40;
+    bChance = Misc_RandFunc(0) % 100 < 40;
     if (bChance) {
-        bChance = Rand_Next(0) % 100 < 80;
+        bChance = Misc_RandFunc(0) % 100 < 80;
         bPicking = 1;
         nCount = fn_801048EC(0, 0);
         while (bPicking) {
-            nPick = Rand_Next(0) % nCount;
+            nPick = Misc_RandFunc(0) % nCount;
             pAsset = fn_80104E84(0, 0, nPick);
             if (bChance && !FE_CrAP_IsCrazyHat(pAsset)) {
                 FE_CrAP_TurnOnPart(0, 0, nPick);
@@ -1080,23 +1080,23 @@ void fn_80078E34(SaveProfile* pProfile) {
     fn_801073DC(12);
     fn_801073DC(13);
     fn_801073DC(14);
-    if (Rand_Next(0) % 100 < 30) {
+    if (Misc_RandFunc(0) % 100 < 30) {
         fn_8007975C(pProfile, 19, 0);
     }
-    if (Rand_Next(0) % 100 < 30) {
+    if (Misc_RandFunc(0) % 100 < 30) {
         fn_8007975C(pProfile, 20, 0);
     }
-    bChance = Rand_Next(0) % 100 < 20;
+    bChance = Misc_RandFunc(0) % 100 < 20;
     if (bChance) {
         nCount = fn_801048EC(19, 3);
-        nPick = Rand_Next(0) % nCount;
+        nPick = Misc_RandFunc(0) % nCount;
         fn_80104E84(19, 3, nPick);
         FE_CrAP_TurnOnPart(19, 0, nPick);
     }
-    bChance = Rand_Next(0) % 100 < 5;
+    bChance = Misc_RandFunc(0) % 100 < 5;
     if (bChance) {
         nCount = fn_801048EC(8, 0);
-        FE_CrAP_TurnOnPart(8, 0, Rand_Next(0) % nCount);
+        FE_CrAP_TurnOnPart(8, 0, Misc_RandFunc(0) % nCount);
     } else {
         fn_801073DC(13);
     }
@@ -1114,7 +1114,7 @@ void fn_80079664(SaveProfile* pProfile) {
     fn_8007975C(pProfile, 1, 0);
     fn_8007975C(pProfile, 2, 0);
     fn_8007975C(pProfile, 7, 0);
-    fn_800797E0(pProfile, 7, (Rand_Next(0) & 1) + 1, 0);
+    fn_800797E0(pProfile, 7, (Misc_RandFunc(0) & 1) + 1, 0);
     fn_80078E34(pProfile);
 }
 
@@ -1124,7 +1124,7 @@ int fn_8007975C(SaveProfile* pProfile, s16 nPart, int nChance) {
     int nCount = fn_801049C8(nPart);
     int nPick;
     if (nCount > 0) {
-        nPick = Rand_Next(0) % nCount;
+        nPick = Misc_RandFunc(0) % nCount;
     } else {
         nPick = 0;
     }
@@ -1142,7 +1142,7 @@ int fn_800797E0(SaveProfile* pProfile, s16 nPart, int b, int nChance) {
     int i;
     int nPick;
     fn_80105C00();
-    if ((int)(Rand_Next(0) % 100) + 1 <= nChance) {
+    if ((int)(Misc_RandFunc(0) % 100) + 1 <= nChance) {
         if (gSession.uFlags & 0x4000) {
             FE_CrAP_TurnOnPart(nPart, b, 0);
             return 0;
@@ -1152,7 +1152,7 @@ int fn_800797E0(SaveProfile* pProfile, s16 nPart, int b, int nChance) {
     if (gSession.uFlags & 0x4000) {
         nCount = fn_801048EC(nPart, b);
         if (nCount != 0) {
-            nPick = Rand_Next(0) % nCount;
+            nPick = Misc_RandFunc(0) % nCount;
             FE_CrAP_TurnOnPart(nPart, b, nPick);
             return nPick;
         }
@@ -1169,7 +1169,7 @@ int fn_800797E0(SaveProfile* pProfile, s16 nPart, int b, int nChance) {
             FE_CrAP_TurnOnPart(nPart, b, 0);
             return 0;
         }
-        nPick = Rand_Next(0) % nFound;
+        nPick = Misc_RandFunc(0) % nFound;
         FE_CrAP_TurnOnPart(nPart, b, aChoices[nPick]);
         return aChoices[nPick];
     }

@@ -207,7 +207,7 @@ u8 GameModeSkins_GameFinished(u8 bCheck) {
         }
         nHole = Game_CurHoleIndex();
         while (nHole == Game_CurHoleIndex()) {
-            fn_800E1480(Rand_Next(0) % 18);
+            fn_800E1480(Misc_RandFunc(0) % 18);
         }
         gpGame->bHoleSelected[Game_CurHoleIndex()] = 1;
         // Every player's scores are cleared for the new playoff hole.
@@ -268,7 +268,7 @@ u8 GameModeSkins_GoToPlayoff(u8 bCheck) {
     }
     nHole = Game_CurHoleIndex();
     while (nHole == Game_CurHoleIndex()) {
-        fn_800E1480(Rand_Next(0) % 18);
+        fn_800E1480(Misc_RandFunc(0) % 18);
     }
     gpGame->bHoleSelected[Game_CurHoleIndex()] = 1;
     // Every player's scores are cleared for the playoff.

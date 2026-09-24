@@ -94,7 +94,7 @@ void fn_80099ED8(void) {
             fn_800E1404(17);
             break;
         }
-        gpGame->nPinSet[Game_CurHoleIndex()] = Rand_Next(0) & 3;
+        gpGame->nPinSet[Game_CurHoleIndex()] = Misc_RandFunc(0) & 3;
     }
     lbl_80281F90 = lbl_80281F90 + 1;
     lbl_80281F90 = lbl_80281F90 & 3;

@@ -1,7 +1,6 @@
 // GoLighting.c (EA's name, from its asserts; also in EA's 2002 source tree): the scene's lights.
 // A pool of 25 lights (lighting.h, GoLighting) that light groups take their lights from, and the
 // loading of a group into the graphics chip: up to four point lights and an ambient colour.
-// Partly decompiled.
 
 #include "lighting.h"
 #include "camera.h"
@@ -88,7 +87,8 @@ void fn_8006E424(void) {
 }
 
 // Scales the loaded colours by the group's v18[0] (white without a group) into aPointColour2 and
-// vAmbient2; the unused point lights get fn_80029BC8's vector.
+// vAmbient2, point light 0 by v28 times v18[0] instead; the unused point lights get
+// fn_80029BC8's vector.
 void fn_8006E460(LightGroup* pGroup) {
     f32 vScale[4];
     s32 n;
@@ -161,7 +161,7 @@ void fn_8006E62C(LightGroup* pGroup) {
 }
 
 // Builds pMtx from three rotations: by fA (in the x-z plane) times fB (y-z), then fC (x-y).
-void fn_8006E67C(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC) {
+void LI_vEulerAnglesRYP(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC) {
     f32 mA[4][4];
     f32 mB[4][4];
     f32 mC[4][4];
@@ -246,7 +246,7 @@ void fn_8006E7A4(LightGroup* pGroup) {
 
 // Loads the lights for drawing pObj (or, without one, in world space): the ambient colour on
 // channel 4, then each point light, turned into pObj's space and through the camera's view,
-// pushed far out along its direction and lit on channel 0.
+// placed 999999 times as far out with x and z negated, and lit on channel 0.
 void fn_8006EADC(UObject* pObj) {
     Camera* pCamera = fn_8001614C();
     GXColor colour;
@@ -309,7 +309,7 @@ void fn_8006ED70(void) {
 }
 
 // The default lights of a group: a dim directional light and four point lights placed by turning
-// (0, 0, 1) through fn_8006E67C's rotations.
+// (0, 0, 1) through LI_vEulerAnglesRYP's rotations.
 void fn_8006EDC0(LightGroup* pGroup) {
     f32 m0[4][4];
     f32 m1[4][4];
@@ -342,7 +342,7 @@ void fn_8006EDC0(LightGroup* pGroup) {
     v0[1] = 0.0f;
     v0[2] = 1.0f;
     // the angles are degrees / 180 * PI: DEG(x) rounds 175, -17 and -5 one bit differently
-    fn_8006E67C(m0, 175.0f / 180.0f * PI, -17.0f / 180.0f * PI, 0.0f);
+    LI_vEulerAnglesRYP(m0, 175.0f / 180.0f * PI, -17.0f / 180.0f * PI, 0.0f);
     fn_800BADB4(m0, v0, pLight->u.point.vPos);
     pLight->u.point.fC = 1.0f;
     pLight->u.point.f10 = 1.0f;
@@ -357,7 +357,7 @@ void fn_8006EDC0(LightGroup* pGroup) {
     v1[0] = 0.0f;
     v1[1] = 0.0f;
     v1[2] = 1.0f;
-    fn_8006E67C(m1, 63.0f / 180.0f * PI, -5.0f / 180.0f * PI, 0.0f);
+    LI_vEulerAnglesRYP(m1, 63.0f / 180.0f * PI, -5.0f / 180.0f * PI, 0.0f);
     fn_800BADB4(m1, v1, pLight->u.point.vPos);
     pLight->u.point.fC = 0.5f;
     pLight->u.point.f10 = 1.0f;
@@ -372,7 +372,7 @@ void fn_8006EDC0(LightGroup* pGroup) {
     v2[0] = 0.0f;
     v2[1] = 0.0f;
     v2[2] = 1.0f;
-    fn_8006E67C(m2, -71.0f / 180.0f * PI, -30.0f / 180.0f * PI, 0.0f);
+    LI_vEulerAnglesRYP(m2, -71.0f / 180.0f * PI, -30.0f / 180.0f * PI, 0.0f);
     fn_800BADB4(m2, v2, pLight->u.point.vPos);
     pLight->u.point.fC = 0.58f;
     pLight->u.point.f10 = 1.0f;
@@ -387,7 +387,7 @@ void fn_8006EDC0(LightGroup* pGroup) {
     v3[0] = 0.0f;
     v3[1] = 0.0f;
     v3[2] = 1.0f;
-    fn_8006E67C(m3, -5.0f / 180.0f * PI, 90.0f / 180.0f * PI, 0.0f);
+    LI_vEulerAnglesRYP(m3, -5.0f / 180.0f * PI, 90.0f / 180.0f * PI, 0.0f);
     fn_800BADB4(m3, v3, pLight->u.point.vPos);
     pLight->u.point.fC = 0.4f;
     pLight->u.point.f10 = 1.0f;

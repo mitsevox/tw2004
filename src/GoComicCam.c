@@ -303,7 +303,7 @@ void fn_800B4108(void) {
         { 1, 0, 4, 6, 8, 5, 3, 2, 7 },
         { 0, 1, 2, 7, 8, 3, 6, 5, 4 },
     };
-    int nOrder = Rand_Next(1) & 3;
+    int nOrder = Misc_RandFunc(1) & 3;
 
     lbl_80282178->aPanel[aOrder[nOrder][0]].fTop = 0.03f;
     lbl_80282178->aPanel[aOrder[nOrder][0]].fLeft = 0.03f;
@@ -389,7 +389,7 @@ void fn_800B4108(void) {
     lbl_80282178->nPanel = 0;
     lbl_80282178->fTime = 0.0f;
     lbl_80282178->nShown = 0;
-    if (!(Rand_Next(1) & 1)) {
+    if (!(Misc_RandFunc(1) & 1)) {
         lbl_80282178->nPanels = 18;
     } else {
         lbl_80282178->nPanels = 9;

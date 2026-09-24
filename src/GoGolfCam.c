@@ -1318,7 +1318,7 @@ void GolfCamera_InitPreShotCamera(View* pView, int nPlayer) {
     nLie = gPlayers[nPlayer].ball.nLie;
     pView->p74 = NULL;
     pShot = fn_80064F7C(nPlayer, 0x20, 0, pView->script.pShot);
-    if (pShot == NULL || Rand_Next(1) % 100 > 50) {
+    if (pShot == NULL || Misc_RandFunc(1) % 100 > 50) {
         if (fn_8003C9D0(nPlayer, 0, &pView->p74, &pShot) && pView->p74 != NULL) {
             pShot = fn_8003A950(pView->p74, 13, &nA, &f1, &f2, &nB, &f3, nPlayer);
         }
@@ -3556,7 +3556,7 @@ void fn_800C6618(View* pView, int nPlayer) {
         if (fPower > lbl_80281F78->fB4 && (u8)bShortClub) {
             pView->n260 = 11;
         } else if (fPower > lbl_80281F78->fA4) {
-            if ((f32)(s32)(Rand_Next(1) % 100) < lbl_80281F78->fB0) {
+            if ((f32)(s32)(Misc_RandFunc(1) % 100) < lbl_80281F78->fB0) {
                 pView->n260 = lbl_80282220->n1EC[nPlayer];
                 lbl_80282220->n1EC[nPlayer]++;
                 if (lbl_80282220->n1EC[nPlayer] >= 12) {
@@ -3564,7 +3564,7 @@ void fn_800C6618(View* pView, int nPlayer) {
                 }
             }
         } else if (fPower > lbl_80281F78->fA0) {
-            if ((f32)(s32)(Rand_Next(1) % 100) < lbl_80281F78->fAC) {
+            if ((f32)(s32)(Misc_RandFunc(1) % 100) < lbl_80281F78->fAC) {
                 pView->n260 = lbl_80282220->n1EC[nPlayer];
                 lbl_80282220->n1EC[nPlayer]++;
                 if (lbl_80282220->n1EC[nPlayer] >= 12) {
@@ -3572,7 +3572,7 @@ void fn_800C6618(View* pView, int nPlayer) {
                 }
             }
         } else if (fPower > lbl_80281F78->f9C) {
-            if ((f32)(s32)(Rand_Next(1) % 100) < lbl_80281F78->fA8) {
+            if ((f32)(s32)(Misc_RandFunc(1) % 100) < lbl_80281F78->fA8) {
                 pView->n260 = lbl_80282220->n1EC[nPlayer];
                 lbl_80282220->n1EC[nPlayer]++;
                 if (lbl_80282220->n1EC[nPlayer] >= 12) {
@@ -3584,7 +3584,7 @@ void fn_800C6618(View* pView, int nPlayer) {
             pView->n260 = 1;
             lbl_80282220->n1EC[nPlayer] = 2;
         }
-        if (fn_8006BEA4() && Rand_Next(1) % 100 > 50) {
+        if (fn_8006BEA4() && Misc_RandFunc(1) % 100 > 50) {
             pView->n260 = 7;
             lbl_80282220->n1EC[nPlayer] = 8;
             if (lbl_80282220->n1EC[nPlayer] >= 12) {

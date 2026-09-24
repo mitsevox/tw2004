@@ -1,6 +1,6 @@
 // GoAnimalActors.c (TW06's golf/hi-rendering/goanimalactors.c; our spelling): the animals on the
-// course (ActAnimal_*). Not yet decompiled; the unit covers the file's certain core, whose
-// functions share its constant block (0x80283218-0x80283280).
+// course (ActAnimal_*). The unit covers the file's certain core, whose functions share its
+// constant block (0x80283218-0x80283280).
 
 #include "dynobj.h"
 #include "ball.h"
@@ -20,8 +20,8 @@ void fn_8004A578(DynObjAnimal* pAnimal, void* pArg);            // message 6: pA
 
 // Places the animal on its route at f194 (0..1 round it): a spline through the four points around
 // that place (camera spline code, fn_800C7480) gives its position and heading, dropped onto the
-// ground when b1BD is set and raised by f198. Then the matrix faces the heading, and f19C turns
-// the animal about it (f1A0 the angle so far, fDt the frame time) until it comes back upright.
+// ground when b1BD is set and raised by f198. Then the matrix faces the heading, and a spin f19C
+// turns the animal (f1A0 the angle so far, fDt the frame time) until it is near 0 or 180 degrees.
 void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 fDt) {
     f32 aPos[4][4];
     f32 aTan[4][4];
@@ -120,8 +120,8 @@ void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 fDt) {
     }
     vec4flt_CrossProduct(pAnimal->base.obj.m0[2], pAnimal->base.obj.m0[0], pAnimal->base.obj.m0[1]);
 
-    // the roll: f19C speeds up to at most 72 degrees a second each way, and stops once the angle
-    // is back near upright
+    // the spin: f19C slows by a full turn a second each second, down to 72 degrees a second either
+    // way, and stops once it is there and the angle f1A0 is near 0 or 180 degrees
     if (pAnimal->f19C) {
         pAnimal->f1A0 = pAnimal->f19C * fDt + pAnimal->f1A0;
         if (pAnimal->f19C < 0.0f) {
@@ -158,7 +158,7 @@ void ActAnimal_SetWorldMatrix(DynObjAnimal* pAnimal, f32 fDt) {
     fn_8000C5A4(pAnimal->base.obj.m0);
 }
 
-// Scales f16C and f174 by the length of the animal's route (once round its points).
+// Divides f16C and f174 by the length of the animal's route (once round its points).
 void fn_8004A14C(DynObjAnimal* pAnimal) {
     f32 vStep[4];
     f32 fLength = 0.0f;
@@ -365,7 +365,7 @@ void fn_8004A578(DynObjAnimal* pAnimal, void* pArg) {
         case 3:
             break;
         }
-        pAnimal->f18C = pAnimal->a178[3] * Rand_Float(1) + pAnimal->a178[2];
+        pAnimal->f18C = pAnimal->a178[3] * Misc_RandFuncf(1) + pAnimal->a178[2];
     }
     pAnimal->n1B8 += (u32)(59.94f * fDt);  // port: frames at the NTSC rate
 

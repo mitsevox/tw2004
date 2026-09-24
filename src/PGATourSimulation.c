@@ -142,7 +142,7 @@ void fn_801178C8(s32 nPlayer, SeasonEvent* pEvent, int nRound, int n, int uFlags
         pEntrant->nCurrentHole = 0;
         for (i = 1; i < nEntrants; i++) {
             pEntrant = GetEntrantNonMCPtr(i);
-            pEntrant->nCurrentHole = Rand_Next(0) % 18;
+            pEntrant->nCurrentHole = Misc_RandFunc(0) % 18;
         }
     }
 }
@@ -256,7 +256,7 @@ void fn_80117E98(int nPlayer) {
     if (fn_8011A6F4(nPlayer, 0)) {
         nWinner = 0;
     } else {
-        nPick = Rand_Next(0) % nPlayoff;
+        nPick = Misc_RandFunc(0) % nPlayoff;
         for (i = 0; i < nEntrants; i++) {
             if (fn_8011A6F4(nPlayer, i)) {
                 nWinner = i;
@@ -341,7 +341,7 @@ void fn_801180C4(int nPlayer, u8 bUser, u8 bFirst) {
         }
         if (fn_80118F60(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_SEASON_WINNINGS)
             && fn_800D7770(nPlayer, &gpSaveData[nPlayer].a1C0[14])) {
-            if ((Rand_Next(0) & 1) == 0) {
+            if ((Misc_RandFunc(0) & 1) == 0) {
                 fn_8011C054(5, 1);
             } else {
                 fn_8011C054(2, 1);
@@ -434,14 +434,14 @@ void fn_801187F0(PgaEntrantMC* aEntrant, s16* pnEntrants, u8 bUser) {
         aGolfer[i] = i;
     }
     for (i = 0; i < PGA_NUM_PROS - 1; i++) {
-        j = i + Rand_Next(0) % (PGA_NUM_PROS - i);
+        j = i + Misc_RandFunc(0) % (PGA_NUM_PROS - i);
         if (j != i) {
             nSwap = aGolfer[j];
             aGolfer[j] = aGolfer[i];
             aGolfer[i] = nSwap;
         }
     }
-    *pnEntrants = Rand_Next(0) % 28 + 100;
+    *pnEntrants = Misc_RandFunc(0) % 28 + 100;
     if (bUser) {
         aGolfer[0] = PGA_USER_GOLFER;
     }
@@ -508,7 +508,7 @@ void fn_80118B0C(int nPlayer, int n) {
     }
     qsort(aOrder, nEntrants, sizeof(aOrder[0]), fn_80118A5C);
     for (i = 0; i < nEntrants - 1; i++) {
-        j = i + (s32)fabsf(3.0f * fn_8000B318(0));
+        j = i + (s32)fabsf(3.0f * Misc_RandFuncg(0));
         j = (j <= nEntrants - 1) ? j : nEntrants - 1;
         if (j != i && !fn_8011908C(nPlayer, aOrder[j])) {
             nEntrant = aOrder[j];
@@ -518,7 +518,7 @@ void fn_80118B0C(int nPlayer, int n) {
     }
     nPar = n + fn_800D2FB4(gSession.nTeeSet[0]) * 4;
     for (i = 0; i < nEntrants; i++) {
-        nTarget = 8.0f * fn_8000B318(0) + (18.0f + nPar);
+        nTarget = 8.0f * Misc_RandFuncg(0) + (18.0f + nPar);
         nTarget = (nTarget <= nPar) ? nPar : nTarget;
         aTarget[i] = (nTarget <= nPar + 25) ? nTarget : nPar + 25;
     }
@@ -800,7 +800,7 @@ void fn_80119934(int nPlayer) {
     nMinHole++;                 // fake match: one statement, "+ 1", swaps the saved registers
     for (i = 1; i < nEntrants; i++) {
         pEntrant = GetEntrantNonMCPtr(i);
-        pEntrant->nCurrentHole += Rand_Next(0) % 3;
+        pEntrant->nCurrentHole += Misc_RandFunc(0) % 3;
         pEntrant->nCurrentHole = pEntrant->nCurrentHole <= nMinHole ? nMinHole : pEntrant->nCurrentHole;
         pEntrant->nCurrentHole = 18 < pEntrant->nCurrentHole ? 18 : pEntrant->nCurrentHole;
     }
@@ -876,13 +876,13 @@ void fn_80119B54(int nPlayer, int nRound, int nEntrant, int nHole) {
     fPar5 = fScale * pPro->fPar5Avg;
     switch (nPar) {
     case 3:
-        fStrokes = 0.5f * fn_8000B318(0) + fPar3;
+        fStrokes = 0.5f * Misc_RandFuncg(0) + fPar3;
         break;
     case 4:
-        fStrokes = 0.6f * fn_8000B318(0) + fPar4;
+        fStrokes = 0.6f * Misc_RandFuncg(0) + fPar4;
         break;
     case 5:
-        fStrokes = 0.7f * fn_8000B318(0) + fPar5;
+        fStrokes = 0.7f * Misc_RandFuncg(0) + fPar5;
         break;
     }
     // EA bug: fStrokes is never set on a hole whose par is not 3, 4 or 5.
@@ -917,7 +917,7 @@ void fn_80119E28(int nPlayer, int nEntrant, int nRound) {
     gbScoresDirty = 1;
     if (nRound < 3) {
         fTarget = 0.25f * pEntrantMC->nTargetScore;
-        fScore = fTarget + fn_8000B318(0);
+        fScore = fTarget + Misc_RandFuncg(0);
         fScore = fScore <= fTarget - 3.0f ? fTarget - 3.0f : fScore;
         fScore = fScore <= 3.0f + fTarget ? fScore : 3.0f + fTarget;
         nTarget = (s32)(0.5f + fScore);
@@ -925,13 +925,13 @@ void fn_80119E28(int nPlayer, int nEntrant, int nRound) {
         nTarget = pEntrantMC->nTargetScore - fn_801191D0(nPlayer, nEntrant, 0);
     }
     while (TotalEntrantHoleScores(nEntrant) > nTarget) {
-        s32 nHole = Rand_Next(0) % 18;
+        s32 nHole = Misc_RandFunc(0) % 18;
         u8 bDone = 0;
 
         while (!bDone) {
             if (pEntrant->aHoleStrokes[nHole] > 1) {
                 if (pEntrant->aHoleStrokes[nHole] == 2) {
-                    if (Rand_Float(0) < 0.0005f) {
+                    if (Misc_RandFuncf(0) < 0.0005f) {
                         bDone = 1;
                         pEntrant->aHoleStrokes[nHole]--;
                     }
@@ -947,13 +947,13 @@ void fn_80119E28(int nPlayer, int nEntrant, int nRound) {
         }
     }
     while (TotalEntrantHoleScores(nEntrant) < nTarget) {
-        s32 nHole = Rand_Next(0) % 18;
+        s32 nHole = Misc_RandFunc(0) % 18;
         u8 bDone = 0;
 
         while (!bDone) {
             if (pEntrant->aHoleStrokes[nHole] < 10) {
                 if (pEntrant->aHoleStrokes[nHole] >= 6) {
-                    if (Rand_Float(0) < 0.01f) {
+                    if (Misc_RandFuncf(0) < 0.01f) {
                         bDone = 1;
                         pEntrant->aHoleStrokes[nHole]++;
                     }
@@ -1042,7 +1042,7 @@ void fn_8011A074(int nPlayer, int nRound, int nEntrant, int nHole) {
 
     // A green in regulation: fGIRPct percent of holes.
     bGIR = 0;
-    if (Rand_Float(0) * 100.0f < pPro->fGIRPct) {
+    if (Misc_RandFuncf(0) * 100.0f < pPro->fGIRPct) {
         bGIR = 1;
     }
     pStats->nGreensHit += bGIR;
@@ -1055,13 +1055,13 @@ void fn_8011A074(int nPlayer, int nRound, int nEntrant, int nHole) {
 
     // The drive: the pro's average plus 30 x a normal random number, no longer than the hole;
     // one over 520 loses up to 50.
-    fRandom = 30.0f * fn_8000B318(0) + pPro->fDriveAvg;
+    fRandom = 30.0f * Misc_RandFuncg(0) + pPro->fDriveAvg;
     fDrive = (fRandom > 0.0f) ? fRandom : 0.0f;
     if (fDrive > fn_800D2C30(nHole, 0)) {
         fDrive = fn_800D2C30(nHole, 0);
     }
     if (fDrive > 520.0f) {
-        fDrive -= 50.0f * Rand_Float(0);
+        fDrive -= 50.0f * Misc_RandFuncf(0);
     }
     nDrive = fDrive;
     pStats->nLongestDrive = ((u16)nDrive <= pStats->nLongestDrive) ? pStats->nLongestDrive : nDrive;
@@ -1071,9 +1071,9 @@ void fn_8011A074(int nPlayer, int nRound, int nEntrant, int nHole) {
     }
 
     // The putts: the pro's average per hole, never more than the strokes less one.
-    nPutts = 0.5f + (0.3f * fn_8000B318(0) + pPro->fPuttAvg / 18.0f);
+    nPutts = 0.5f + (0.3f * Misc_RandFuncg(0) + pPro->fPuttAvg / 18.0f);
     if (nPutts <= 0) {
-        if (Rand_Float(0) < 0.05f) {
+        if (Misc_RandFuncf(0) < 0.05f) {
             nPutts = 0;
         } else {
             nPutts = 1;
@@ -1088,7 +1088,7 @@ void fn_8011A074(int nPlayer, int nRound, int nEntrant, int nHole) {
     // A fairway on a par 4 or 5: fFairwayPct percent of them.
     if (nPar >= 4) {
         bHit = 0;
-        if (Rand_Float(0) * 100.0f < pPro->fFairwayPct) {
+        if (Misc_RandFuncf(0) * 100.0f < pPro->fFairwayPct) {
             bHit = 1;
         }
         pStats->nFairwaysHit += bHit;
@@ -1096,9 +1096,9 @@ void fn_8011A074(int nPlayer, int nRound, int nEntrant, int nHole) {
     }
 
     // A bunker on one hole in ten not under par, saved fSandSavePct percent of the time.
-    if (nStrokes >= nPar && Rand_Float(0) < 0.1f) {
+    if (nStrokes >= nPar && Misc_RandFuncf(0) < 0.1f) {
         bHit = 0;
-        if (Rand_Float(0) * 100.0f < pPro->fSandSavePct) {
+        if (Misc_RandFuncf(0) * 100.0f < pPro->fSandSavePct) {
             bHit = 1;
         }
         pStats->nBunkerSaves += bHit;

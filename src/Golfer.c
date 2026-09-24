@@ -318,13 +318,13 @@ void AI_ApplyError(int nPlayer) {
         }
         // Even a good golfer occasionally blows an approach.
         if (fSkill > 80.0f) {
-            if (Rand_Next(0) % 20 == 0) {
+            if (Misc_RandFunc(0) % 20 == 0) {
                 fMaxAngle *= 4.0f; fDist1 *= 4.0f; fDist2 *= 4.0f; fSkill *= 0.25f;
-            } else if (Rand_Next(0) % 10 == 0) {
+            } else if (Misc_RandFunc(0) % 10 == 0) {
                 fMaxAngle *= 2.0f; fDist1 *= 2.0f; fDist2 *= 2.0f; fSkill *= 0.5f;
             }
         } else if (fSkill > 60.0f) {
-            if (Rand_Next(0) % 20 == 0) {
+            if (Misc_RandFunc(0) % 20 == 0) {
                 fMaxAngle *= 2.0f; fDist1 *= 2.0f; fDist2 *= 2.0f; fSkill *= 0.5f;
             }
         }
@@ -340,13 +340,13 @@ void AI_ApplyError(int nPlayer) {
         }
 
         // Aim: up to the angle limit, at least a quarter of a degree, either side.
-        fRand   = Rand_Float(0);
+        fRand   = Misc_RandFuncf(0);
         fMiss   = 100.0f - fSkill;
         fAimErr = fMaxAngle * (fMiss * fRand) / 100.0f;
         if (fAimErr < DEG(0.25f)) {
             fAimErr += DEG(0.25f);
         }
-        if (Rand_Next(0) & 1) {
+        if (Misc_RandFunc(0) & 1) {
             fAimErr *= -1.0f;
         }
         p->fAim += fAimErr;
@@ -360,12 +360,12 @@ void AI_ApplyError(int nPlayer) {
 
         // Distance error (in fSkill from here): two percentage terms, either side; one shot
         // kind always comes up short.
-        fRand   = Rand_Float(0);
+        fRand   = Misc_RandFuncf(0);
         fDistErr  = fDist1 * (fMiss * fRand) / 100.0f;
-        fRand     = Rand_Float(0);
+        fRand     = Misc_RandFuncf(0);
         fDistErr += fDist2 * (fMiss * fRand) / 100.0f;
         // (A full swing outside lesson 3 always comes up short; otherwise a coin flip.)
-        if ((p->nShotKind == SHOT_TYPE_DRIVE_e && fn_800D2B08() != 3) || (Rand_Next(0) & 1)) {
+        if ((p->nShotKind == SHOT_TYPE_DRIVE_e && fn_800D2B08() != 3) || (Misc_RandFunc(0) & 1)) {
             fDistErr *= -1.0f;
         }
         p->fDistance = p->fDistance * ((100.0f + fDistErr) / 100.0f);
@@ -696,7 +696,7 @@ u8 Golfer_IsLucky(int nPlayer) {
             uOdds = 1;
         }
     }
-    uRoll = Rand_Next(0) % uOdds;
+    uRoll = Misc_RandFunc(0) % uOdds;
     if (gPlayers[nPlayer].ball.nLie != LIE_GREEN_e && gPlayers[nPlayer].nShotKind != SHOT_TYPE_PUTT_e &&
         !gSession.nSplitScreen) {
         Game_CurrentPinSet();
@@ -771,7 +771,7 @@ void AI_SetShotModifiers(int nPlayer) {
         p->attrMod[ATTR_LUCK]          = 10;
     } else if (Game_GetMode() == 4) {
         int nLead = gPlayers[1].nHolesWon - gPlayers[0].nHolesWon;
-        p->attrMod[ATTR_POWER] = Rand_Next(0) % 10 - 5;
+        p->attrMod[ATTR_POWER] = Misc_RandFunc(0) % 10 - 5;
         if (nLead > 0) {
             p->attrMod[ATTR_IQ]            = nLead * -5;
             p->attrMod[ATTR_AGGRESSION]    = nLead * -5;
@@ -781,23 +781,23 @@ void AI_SetShotModifiers(int nPlayer) {
             p->attrMod[ATTR_RECOVERY]      = nLead * -5;
             p->attrMod[ATTR_LUCK]          = nLead * -5;
         } else {
-            p->attrMod[ATTR_IQ]            = Rand_Next(0) % 10 - 5;
-            p->attrMod[ATTR_AGGRESSION]    = Rand_Next(0) % 10 - 5;
-            p->attrMod[ATTR_BALL_STRIKING] = Rand_Next(0) % 10 - 5;
-            p->attrMod[ATTR_APPROACH]      = Rand_Next(0) % 10 - 5;
-            p->attrMod[ATTR_PUTTING]       = Rand_Next(0) % 10 - 5;
-            p->attrMod[ATTR_RECOVERY]      = Rand_Next(0) % 10 - 5;
-            p->attrMod[ATTR_LUCK]          = Rand_Next(0) % 10 - 5;
+            p->attrMod[ATTR_IQ]            = Misc_RandFunc(0) % 10 - 5;
+            p->attrMod[ATTR_AGGRESSION]    = Misc_RandFunc(0) % 10 - 5;
+            p->attrMod[ATTR_BALL_STRIKING] = Misc_RandFunc(0) % 10 - 5;
+            p->attrMod[ATTR_APPROACH]      = Misc_RandFunc(0) % 10 - 5;
+            p->attrMod[ATTR_PUTTING]       = Misc_RandFunc(0) % 10 - 5;
+            p->attrMod[ATTR_RECOVERY]      = Misc_RandFunc(0) % 10 - 5;
+            p->attrMod[ATTR_LUCK]          = Misc_RandFunc(0) % 10 - 5;
         }
     } else {
-        p->attrMod[ATTR_POWER]         = Rand_Next(0) % 10 - 5;
-        p->attrMod[ATTR_IQ]            = Rand_Next(0) % 10 - 5;
-        p->attrMod[ATTR_AGGRESSION]    = Rand_Next(0) % 10 - 5;
-        p->attrMod[ATTR_BALL_STRIKING] = Rand_Next(0) % 10 - 5;
-        p->attrMod[ATTR_APPROACH]      = Rand_Next(0) % 10 - 5;
-        p->attrMod[ATTR_PUTTING]       = Rand_Next(0) % 10 - 5;
-        p->attrMod[ATTR_RECOVERY]      = Rand_Next(0) % 10 - 5;
-        p->attrMod[ATTR_LUCK]          = Rand_Next(0) % 10 - 5;
+        p->attrMod[ATTR_POWER]         = Misc_RandFunc(0) % 10 - 5;
+        p->attrMod[ATTR_IQ]            = Misc_RandFunc(0) % 10 - 5;
+        p->attrMod[ATTR_AGGRESSION]    = Misc_RandFunc(0) % 10 - 5;
+        p->attrMod[ATTR_BALL_STRIKING] = Misc_RandFunc(0) % 10 - 5;
+        p->attrMod[ATTR_APPROACH]      = Misc_RandFunc(0) % 10 - 5;
+        p->attrMod[ATTR_PUTTING]       = Misc_RandFunc(0) % 10 - 5;
+        p->attrMod[ATTR_RECOVERY]      = Misc_RandFunc(0) % 10 - 5;
+        p->attrMod[ATTR_LUCK]          = Misc_RandFunc(0) % 10 - 5;
     }
     Golfer_ClampModifiers(p);
 }
@@ -1891,8 +1891,8 @@ void Session_Init(void) {
     pSession->nFrameCount = 0;
     pSession->n28         = 0;
     Options_SetDefaults(&gSession.options);
-    gSession.nSeed = Rand_Next(0);
-    fn_8000B1D4(0, gSession.nSeed);
+    gSession.nSeed = Misc_RandFunc(0);
+    Misc_SetSeedFunc(0, gSession.nSeed);
     gSession.nNumPlayers = 1;
     gSession.nPinSet     = -1;
     gSession.bStrokeLimit = 1;

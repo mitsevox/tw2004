@@ -646,7 +646,7 @@ void fn_80126698(int nPlayer) {
         }
     }
     if (nMsgs > 0 && lbl_80195498.n8 == 5) {
-        fn_8010D428(aMsgs[Rand_Next(1) % nMsgs], 0);
+        fn_8010D428(aMsgs[Misc_RandFunc(1) % nMsgs], 0);
     }
 }
 

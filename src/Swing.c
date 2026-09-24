@@ -614,7 +614,7 @@ void Swing_Launch(int nPlayer) {
 
     p = &gPlayers[nPlayer];
     if (Game_GetMode() == 10) {
-        fn_8000B1D4(0, gReplayData.nSeed);
+        Misc_SetSeedFunc(0, gReplayData.nSeed);
         // port: 0x630 of the swing data's 0x634 bytes (it holds no pointers)
         Mem_cpy(&gPlayers[0].swing, &gReplayData.player.swing, 0x630);
     } else if (gSession.bReplay == 0) {
@@ -691,8 +691,8 @@ f32 Swing_MeterError(int nPlayer) {
     fCentreX = gPlayers[nPlayer].swing.nCalibrateX;
     fCentreY = gPlayers[nPlayer].swing.nCalibrateY;
 
-    fTopX    += Rand_Float(0) * 30.0f - 15.0f;
-    fImpactX += Rand_Float(0) * 30.0f - 15.0f;
+    fTopX    += Misc_RandFuncf(0) * 30.0f - 15.0f;
+    fImpactX += Misc_RandFuncf(0) * 30.0f - 15.0f;
     vDir[0] = 0.0f;
     vDir[1] = 0.0f;
     vDir[2] = 1.0f;
@@ -3795,7 +3795,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
         View* pV;
         GM_BallHit(nPlayer);
         fn_80062B6C(nPlayer);
-        fn_8000B1D4(1, gSession.nSeed);
+        Misc_SetSeedFunc(1, gSession.nSeed);
         pV = fn_80017028(gPlayers[nPlayer].nView[0]);
         fn_800C6618(pV, nPlayer);
         fn_800A5980((u8)nPlayer);

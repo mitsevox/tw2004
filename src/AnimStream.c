@@ -631,7 +631,7 @@ void fn_800CABA0(void) {
                                          NULL, NULL);
                             if (nCount > 0) {
                                 lbl_80282230->players[i].clips[nIndex][nStyle][nClub].nNext =
-                                    Rand_Next(1) % nCount;
+                                    Misc_RandFunc(1) % nCount;
                             }
                         }
                     }

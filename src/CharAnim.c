@@ -310,7 +310,7 @@ s32 fn_800962F8(Character* pChar) {
 
 // A random wait of 8 to 10.
 s8 fn_80096338(void) {
-    return Rand_Next(1) % 3 + 8;
+    return Misc_RandFunc(1) % 3 + 8;
 }
 
 u8 fn_8009637C(Character* pChar) {
@@ -375,7 +375,7 @@ s32 fn_80096398(Character* pChar) {
 }
 
 s32 fn_80096508(void) {
-    Rand_Next(1);
+    Misc_RandFunc(1);
     return 1;
 }
 
@@ -435,7 +435,7 @@ void CharacterState_UpdateSKAState(Character* pChar) {
             gSession.options.nWind >= 1 && pChar->nSlot == 0) {
             nGroup = 16;
         } else if (gPlayers[pChar->nPlayer].ball.nLie == 0 && gPlayers[pChar->nPlayer].nClub >= 0 &&
-                   gPlayers[pChar->nPlayer].nClub <= 5 && Rand_Next(1) % 100 < 10 && pChar->nSlot == 0) {
+                   gPlayers[pChar->nPlayer].nClub <= 5 && Misc_RandFunc(1) % 100 < 10 && pChar->nSlot == 0) {
             nGroup = 16;
         }
         CharacterState_AddSKABlendData(pChar, 1, nGroup, fn_80072ACC, 1, 2, -10000.0f, -30000.0f, -10000.0f,

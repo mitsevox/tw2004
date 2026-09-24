@@ -51,7 +51,7 @@ void fn_8006F650(void) {
 
                 if (lbl_802811F0->n10 >= lbl_802811F0->n0C || lbl_802811F0->b14) {
                     fSum = 0.0f;
-                    fRoll = Rand_Float(1);
+                    fRoll = Misc_RandFuncf(1);
                     lbl_802811F0->n08 = 0;
                     for (i = 0; fRoll > fSum; i++) {
                         fSum += lbl_80188900[Game_GetCourse()][i].fShare;
@@ -64,7 +64,7 @@ void fn_8006F650(void) {
                     fMin = lbl_80188900[Game_GetCourse()][i].nMin;
                     nMax = lbl_80188900[Game_GetCourse()][i].nMax;
                     fRange = nMax - lbl_80188900[Game_GetCourse()][i].nMin;
-                    lbl_802811F0->n0C = Rand_Float(1) * fRange + fMin;
+                    lbl_802811F0->n0C = Misc_RandFuncf(1) * fRange + fMin;
                     lbl_802811F0->b14 = 0;
                     lbl_802811F0->n10 = 1;
                     lbl_802811F0->f18 = 0.3f;
@@ -91,7 +91,7 @@ void fn_8006F650(void) {
                 int i;
 
                 fSum = 0.0f;
-                fRoll = Rand_Float(1);
+                fRoll = Misc_RandFuncf(1);
                 for (i = 0; fRoll > fSum; i++) {
                     fSum += lbl_80188900[Game_GetCourse()][i].fShare;
                     if (fRoll <= fSum) {
@@ -100,12 +100,12 @@ void fn_8006F650(void) {
                         break;
                     }
                 }
-                lbl_802811F0->f18 = 0.75f * Rand_Float(1) + 0.25f;
+                lbl_802811F0->f18 = 0.75f * Misc_RandFuncf(1) + 0.25f;
                 break;
             }
             case 3:
                 lbl_802811F0->uFlags |= 2;
-                lbl_802811F0->f18 = 0.75f * Rand_Float(1) + 0.25f;
+                lbl_802811F0->f18 = 0.75f * Misc_RandFuncf(1) + 0.25f;
                 break;
             case 5:
             case 6:
@@ -117,8 +117,8 @@ void fn_8006F650(void) {
     if (fn_8006FCCC()) {
         fn_8006FCC8();
     } else {
-        uSeed = Rand_Next(1);
-        fn_8000B1D4(1, uSeed);
+        uSeed = Misc_RandFunc(1);
+        Misc_SetSeedFunc(1, uSeed);
         fn_8006FCC4(uSeed);
     }
     fn_8006FB10();

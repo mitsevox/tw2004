@@ -555,7 +555,7 @@ void fn_8000AE9C(void) {
     i = 0;
     uMantissa = 0;
     do {
-        // port: builds the float from its bits through a u32 pointer (see Rand_Float).
+        // port: builds the float from its bits through a u32 pointer (see Misc_RandFuncf).
         *(u32*)&f = uMantissa | 0x3F800000;
         *pEntry = 1.442695f * logf(f);
         i++;

@@ -302,7 +302,7 @@ void fn_800AA1B8(AudTrack* pTrack, int bNow) {
     if (bNow == 1) {
         for (; ppVoice < ppEnd; ppVoice++) {
             if (*ppVoice != NULL) {
-                fn_800ACB28(*ppVoice);
+                Voc_Delete(*ppVoice);
                 *ppVoice = NULL;
             }
         }
@@ -314,7 +314,7 @@ void fn_800AA1B8(AudTrack* pTrack, int bNow) {
         bNone = 1;
         for (; ppVoice < ppEnd; ppVoice++) {
             if (*ppVoice != NULL) {
-                fn_800ACA94(*ppVoice);
+                Voc_Stop(*ppVoice);
                 bNone = 0;
             }
         }

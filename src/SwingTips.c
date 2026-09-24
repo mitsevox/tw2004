@@ -187,7 +187,7 @@ u8 fn_800D1D38(int nPlayer) {
 // Which of a tip's nCount short versions to show. EA wrote the count as a parameter: with one
 // version (% 1) the compiler still divides, where a literal % 1 folds away.
 static inline u32 SwingTips_Pick(u32 nCount) {
-    return Rand_Next(0) % nCount;
+    return Misc_RandFunc(0) % nCount;
 }
 
 // The tips as a swing starts, when the tips option is on and the player has a save profile (and

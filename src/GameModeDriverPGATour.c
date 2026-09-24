@@ -312,7 +312,7 @@ void fn_800EE8C4(void) {
             if (nWins >= 3) {
                 fn_800E4364(5, 8, 0, 0);
             } else {
-                fn_800E4364(5, (Rand_Next(1) & 3) + 27, 0, 0);
+                fn_800E4364(5, (Misc_RandFunc(1) & 3) + 27, 0, 0);
             }
         } else if (gpSaveData[nPlayer].tour.nEvent == 9) {
             fn_800E4364(5, 9, 0, 0);

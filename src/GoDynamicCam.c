@@ -589,7 +589,7 @@ CamShot* fn_8003A7C8(int nPlayer, int nKind, CamShot* pShot) {
         }
     }
     if (nCount == 0) return NULL;
-    i = Rand_Next(1) % nCount;
+    i = Misc_RandFunc(1) % nCount;
     return &lbl_80281D88->pShots[aPick[i]];
 }
 
@@ -635,7 +635,7 @@ CamShot* fn_8003A950(CamSequence* pSequence, int nKind, int* pA, f32* pF1, f32* 
         }
     }
     if (nCount == 0) return NULL;
-    nPick = Rand_Next(1) % nCount;
+    nPick = Misc_RandFunc(1) % nCount;
     if (pA != NULL) {
         *pA = pSequence->p4C[aPick[nPick]].b15;
     }
@@ -1185,7 +1185,7 @@ CamSequence* fn_8003BDBC(int nPlayer, int nLie, int nClass, int nKind, u8 a, f32
         }
         return NULL;
     }
-    uRand = Rand_Next(1);
+    uRand = Misc_RandFunc(1);
     fTotal = 0.0f;
     for (i = 0; i < nPicked; i++) {
         fTotal += lbl_80281D88->pSequences[anPicked[i]].f34;
@@ -1275,7 +1275,7 @@ CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind
         }
         return NULL;
     }
-    uRand = Rand_Next(1);
+    uRand = Misc_RandFunc(1);
     fTotal = 0.0f;
     for (i = 0; i < nPicked; i++) {
         fTotal += lbl_80281D88->pSequences[anPicked[i]].f34;
@@ -1302,12 +1302,12 @@ u8 fn_8003C800(char* szName, CamSequence** ppSeq, CamShot** ppShot) {
             continue;
         }
         if (lbl_80281D88->pSets[i].p20 != NULL && lbl_80281D88->pSets[i].p20->nChoices > 0 &&
-            Rand_Next(1) % 100 > 60) {
+            Misc_RandFunc(1) % 100 > 60) {
             *ppSeq = lbl_80281D88->pSets[i].p20;
             return 1;
         }
         if (lbl_80281D88->pSets[i].nKind == 14) {
-            nPick = Rand_Next(1) % 3;
+            nPick = Misc_RandFunc(1) % 3;
             if (nPick == 0 && lbl_80281D88->pSets[i].p14 != NULL) {
                 *ppSeq = lbl_80281D88->pSets[i].p14;
                 return 1;

@@ -347,8 +347,8 @@ void fn_80038724(int nField, int nView, f32 fAlpha, f32 fShake) {
     aUV[1] = aXY[1];
     aUV[4] = aXY[4];
     aUV[5] = aXY[5];
-    fDX = fShake * (Rand_Float(1) - 0.5f);
-    fDY = fShake * (Rand_Float(1) - 0.5f);
+    fDX = fShake * (Misc_RandFuncf(1) - 0.5f);
+    fDY = fShake * (Misc_RandFuncf(1) - 0.5f);
     aXY[0] += fDX;
     aXY[1] += fDY;
     aXY[4] += fDX;

@@ -177,7 +177,7 @@ void fn_800F5F58(int nPlayer) {
                 lbl_802823A8 = 0;
                 if ((s8)gPlayers[nPlayer].bE9E == 0) {
                     gPlayers[nPlayer].bE9E = 1;
-                    if (!(Rand_Next(0) & 1)) {
+                    if (!(Misc_RandFunc(0) & 1)) {
                         nMsg = 0x2B;
                     } else {
                         nMsg = 0x2C;
@@ -187,21 +187,21 @@ void fn_800F5F58(int nPlayer) {
             if (nMsg == -1) {
                 switch (lbl_80282360 - fn_800F20C0(nPlayer)) {
                 case 1:
-                    if (Rand_Next(0) & 1) {
+                    if (Misc_RandFunc(0) & 1) {
                         nMsg = 0x26;
                     } else {
                         nMsg = 0x43;
                     }
                     break;
                 case 2:
-                    if (Rand_Next(0) & 1) {
+                    if (Misc_RandFunc(0) & 1) {
                         nMsg = 0x27;
                     } else {
                         nMsg = 0x44;
                     }
                     break;
                 case 3:
-                    if (Rand_Next(0) & 1) {
+                    if (Misc_RandFunc(0) & 1) {
                         nMsg = 0x28;
                     } else {
                         nMsg = 0x45;
@@ -216,13 +216,13 @@ void fn_800F5F58(int nPlayer) {
                 default:
                     if (fn_800F20C0(nPlayer) <= lbl_80282360 / 4) {
                         if (lbl_802823A4 == 1) {
-                            if (Rand_Next(0) & 1) {
+                            if (Misc_RandFunc(0) & 1) {
                                 nMsg = 0x36;
                             } else {
                                 nMsg = 0x37;
                             }
                         } else {
-                            switch (Rand_Next(0) & 3) {
+                            switch (Misc_RandFunc(0) & 3) {
                             case 0:
                                 nMsg = 0x4F;
                                 break;
@@ -238,7 +238,7 @@ void fn_800F5F58(int nPlayer) {
                             }
                         }
                     } else {
-                        switch (Rand_Next(0) & 7) {
+                        switch (Misc_RandFunc(0) & 7) {
                         case 0:
                         case 1:
                             nMsg = 0x46;
@@ -289,7 +289,7 @@ void fn_800F5F58(int nPlayer) {
             lbl_802823A8 = 0;
             gPlayers[nPlayer].nE90 = 0;
             lbl_802823A4 = 0;
-            if (Rand_Next(0) & 1) {
+            if (Misc_RandFunc(0) & 1) {
                 nMsg = 0xB;
             } else {
                 nMsg = 0xD;
@@ -307,7 +307,7 @@ void fn_800F5F58(int nPlayer) {
             lbl_802823A8 = fn_800D6A70(lbl_802823A8, nPlayer, 1, 1, 1, 0);
             lbl_802823A8 = fn_800D7220(lbl_802823A8, nPlayer, 0);
         } else if (nMsg == -1) {
-            if (!(Rand_Next(0) & 1)) {
+            if (!(Misc_RandFunc(0) & 1)) {
                 nMsg = 0;
             } else {
                 nMsg = 0x4E;

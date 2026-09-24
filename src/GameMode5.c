@@ -248,7 +248,7 @@ void fn_800EAF7C(void) {
             }
             nDiff = lbl_80281664[lbl_802822F4].nTargetBase - nSum0;
             while (nDiff != 0) {
-                h = Rand_Next(0) % (Game_CurHoleIndex() + 1);
+                h = Misc_RandFunc(0) % (Game_CurHoleIndex() + 1);
                 if (nDiff < 0) {
                     if (gPlayers[0].nStrokes[h] > fn_800D2AD8(h) - 1) {
                         gPlayers[0].nStrokes[h]--;
@@ -280,7 +280,7 @@ void fn_800EAF7C(void) {
             }
             nDiff = lbl_80281664[lbl_802822F4].nTargetBase;
             while (nDiff != 0) {
-                h = Rand_Next(0) % (Game_CurHoleIndex() + 1);
+                h = Misc_RandFunc(0) % (Game_CurHoleIndex() + 1);
                 if (nDiff < 0) {
                     if (gPlayers[0].nStrokes[h] > fn_800D2AD8(h) - 1) {
                         gPlayers[0].nStrokes[h]--;
@@ -315,7 +315,7 @@ void fn_800EAF7C(void) {
         if (gpGame->n4 == 1) {
             nDiff = lbl_80281664[lbl_802822F4].nTargetBase;
             while (nDiff != 0) {
-                h = Rand_Next(0) % (Game_CurHoleIndex() + 1);
+                h = Misc_RandFunc(0) % (Game_CurHoleIndex() + 1);
                 if (nDiff < 0) {
                     if (gPlayers[0].nModePoints[h] == 0 && gPlayers[1].nModePoints[h] == 0) {
                         nDiff++;
@@ -340,7 +340,7 @@ void fn_800EAF7C(void) {
             }
             nDiff = lbl_80281664[lbl_802822F4].nTargetBase;
             while (nDiff != 0) {
-                i = Rand_Next(0) % (Game_CurHoleIndex() + 1);
+                i = Misc_RandFunc(0) % (Game_CurHoleIndex() + 1);
                 if (nDiff < 0) {
                     if (gPlayers[0].nStrokes[i] > fn_800D2AD8(i) - 1) {
                         gPlayers[0].nStrokes[i]--;
@@ -546,7 +546,7 @@ s32 lbl_801925F0[3][3] = {
 
 // A message of kind n: one of three at random.
 void fn_800EC170(int n) {
-    s32 nMsg = lbl_801925F0[n][Rand_Next(0) % 3];
+    s32 nMsg = lbl_801925F0[n][Misc_RandFunc(0) % 3];
     fn_800E4364(7, nMsg, 0, 0);
 }
 

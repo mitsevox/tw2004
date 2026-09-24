@@ -111,12 +111,12 @@ void fn_80098CDC(ParticleParams* pParams, f32* pPos, f32* pVel, f32* p18, f32* p
     f32 z;
 
     if (pParams->u58 & 8) {
-        fSpeed = pParams->f2C * Rand_Float(1) + pParams->f28;
+        fSpeed = pParams->f2C * Misc_RandFuncf(1) + pParams->f28;
     } else {
         fSpeed = pParams->f28;
     }
     if (pParams->u58 & 0x20) {
-        fRand = Rand_Float(1);
+        fRand = Misc_RandFuncf(1);
         if (pParams->u58 & 0x10) {
             fRand = fn_80009680(fRand);
         }
@@ -124,11 +124,11 @@ void fn_80098CDC(ParticleParams* pParams, f32* pPos, f32* pVel, f32* p18, f32* p
     } else {
         fDist = pParams->f30;
     }
-    fTurn = 2.0f * PI * Rand_Float(1);
+    fTurn = 2.0f * PI * Misc_RandFuncf(1);
     fSinTurn = fn_800095F0(fTurn);
     fCosTurn = fn_80009638(fTurn);
     if (pParams->u58 & 0x40) {
-        fPitch = pParams->f3C * Rand_Float(1) + pParams->f38;
+        fPitch = pParams->f3C * Misc_RandFuncf(1) + pParams->f38;
     } else {
         fPitch = pParams->f38;
     }
@@ -146,14 +146,14 @@ void fn_80098CDC(ParticleParams* pParams, f32* pPos, f32* pVel, f32* p18, f32* p
     pVel[3] = 0.0f;
     if (pParams->u58 & 0x200) {
         if (pParams->u58 & 0x400) {
-            fTurn = 2.0f * PI * Rand_Float(1);
+            fTurn = 2.0f * PI * Misc_RandFuncf(1);
             fSinTurn = fn_800095F0(fTurn);
             fCosTurn = fn_80009638(fTurn);
-            fPitch = 2.0f * PI * Rand_Float(1);
+            fPitch = 2.0f * PI * Misc_RandFuncf(1);
             fSinPitch = fn_800095F0(fPitch);
             fCosPitch = fn_80009638(fPitch);
             if (pParams->u58 & 0x800) {
-                fRand = Rand_Float(1);
+                fRand = Misc_RandFuncf(1);
                 fRandXZ = fRand * fSinPitch;
                 y = fRand * fCosPitch;
                 z = fRandXZ * fSinTurn;
@@ -179,30 +179,30 @@ void fn_80098CDC(ParticleParams* pParams, f32* pPos, f32* pVel, f32* p18, f32* p
         } else {
             fSpread = pParams->v60[0];
             if (fSpread) {
-                pPos[0] += fSpread * (2.0f * Rand_Float(1) - 1.0f);
+                pPos[0] += fSpread * (2.0f * Misc_RandFuncf(1) - 1.0f);
             }
             fSpread = pParams->v60[1];
             if (fSpread) {
-                pPos[1] += fSpread * (2.0f * Rand_Float(1) - 1.0f);
+                pPos[1] += fSpread * (2.0f * Misc_RandFuncf(1) - 1.0f);
             }
             fSpread = pParams->v60[2];
             if (fSpread) {
-                pPos[2] += fSpread * (2.0f * Rand_Float(1) - 1.0f);
+                pPos[2] += fSpread * (2.0f * Misc_RandFuncf(1) - 1.0f);
             }
         }
     }
     if (pParams->u58 & 1) {
-        *p18 = 2.0f * PI * Rand_Float(1);
+        *p18 = 2.0f * PI * Misc_RandFuncf(1);
     } else {
         *p18 = 0.0f;
     }
     if (pParams->u58 & 2) {
-        *p1C = pParams->fC * -(2.0f * Rand_Float(1) - 1.0f);
+        *p1C = pParams->fC * -(2.0f * Misc_RandFuncf(1) - 1.0f);
     } else {
         *p1C = pParams->fC;
     }
     if (pParams->u58 & 4) {
-        *p20 = pParams->f14 * Rand_Float(1) + pParams->f10;
+        *p20 = pParams->f14 * Misc_RandFuncf(1) + pParams->f10;
     } else {
         *p20 = pParams->f10;
     }
@@ -262,7 +262,7 @@ u32 fn_8009912C(PsEmitter* pEmitter, int n, f32 fStep, f32 fLiveStep) {
     }
     pEmitter->f48 -= fStep;
     if (pEmitter->f48 < 0.0f) {
-        pEmitter->f48 += pEmitter->params.f1C * Rand_Float(1) + pEmitter->params.f18;
+        pEmitter->f48 += pEmitter->params.f1C * Misc_RandFuncf(1) + pEmitter->params.f18;
         pEmitter->f44 = pEmitter->params.f20;
     }
     if (pEmitter->f44 >= 0.0f) {

@@ -654,9 +654,9 @@ void fn_80064108(View* pView) {
 
 // Shakes the camera: moves its position by up to half of the script's fF4 each way.
 void CameraController_Shake(View* pView) {
-    pView->v0[0] += pView->script.fF4 * (Rand_Float(0) - 0.5f);
-    pView->v0[1] += pView->script.fF4 * (Rand_Float(0) - 0.5f);
-    pView->v0[2] += pView->script.fF4 * (Rand_Float(0) - 0.5f);
+    pView->v0[0] += pView->script.fF4 * (Misc_RandFuncf(0) - 0.5f);
+    pView->v0[1] += pView->script.fF4 * (Misc_RandFuncf(0) - 0.5f);
+    pView->v0[2] += pView->script.fF4 * (Misc_RandFuncf(0) - 0.5f);
 }
 
 void fn_800642A4(View* pView, f32 fF0, f32 fF4) {

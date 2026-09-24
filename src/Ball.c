@@ -1278,7 +1278,7 @@ f32 Physics_HandleCollision(Ball* pBall, f32* pNormal, SurfaceType* pSurface) {
     if (fRest < 0.0f) {
         if (!(gSimulating || lbl_80281DD2 || pBall->nPlayer == 4 ||
               (pBall->nPlayer >= 0 && pBall->nPlayer <= 3 && gPlayers[pBall->nPlayer].bPerfect))) {
-            fD = 1.0f - 2.0f * Rand_Float(0);
+            fD = 1.0f - 2.0f * Misc_RandFuncf(0);
             fD -= 0.005f * (s8)Golfer_GetAttribute(&gPlayers[pBall->nPlayer], ATTR_LUCK, ATTR_TOTAL);
             if (fD < -1.0f) {
                 fD = -1.0f;
@@ -1454,7 +1454,7 @@ u8 fn_80053240(Ball* pBall, f32 fTicks) {
 //   6, 20 (sand): lie 6 (clean, surface 35), 7 (surface 36) or 8 (plugged, surface 34),
 //     from where and how hard it landed and three LUCK rolls; class 20 is surface 146.
 //   12: holed (event 0x21 the first time).  Anything else: lie 17.
-// Then a random lie quality (+0x70), +-(Rand_Float - LUCK/200, not below 0) x surface +0x04.
+// Then a random lie quality (+0x70), +-(Misc_RandFuncf - LUCK/200, not below 0) x surface +0x04.
 // The cases share code through gotos, as the original's branches do: a roll can move a lie up a
 // level (class 11 to the rough; plugged to 7 to clean). Copies of the shared code do not match
 // (the rough code copied into case 11: 91.8%).
@@ -1495,7 +1495,7 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
         if (gSimulating || lbl_80281DD2) {
             r = 0;
         } else {
-            r = Rand_Next(0);
+            r = Misc_RandFunc(0);
         }
     rough:
         if ((r & 127) < uLuck / 2) {
@@ -1513,7 +1513,7 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
         if (gSimulating || lbl_80281DD2) {
             r = 0;
         } else {
-            r = Rand_Next(0);
+            r = Misc_RandFunc(0);
         }
         if ((r & 127) < uLuck / 4 + 16) {
             r >>= 8;
@@ -1527,7 +1527,7 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
         if (gSimulating || lbl_80281DD2) {
             r = 0;
         } else {
-            r = Rand_Next(0);
+            r = Misc_RandFunc(0);
         }
         if (!pBall->bGotFirstSandPos
             || fabsf(pBall->vPos[0] - pBall->vFirstSandPos[0]) >= 0.16666667f ||
@@ -1594,8 +1594,8 @@ void Ball_SetLie(Ball* pBall, SurfaceType* pSurface) {
                 f = 0.0f;
                 rSign = 0;
             } else {
-                rSign = Rand_Next(0);
-                f = Rand_Float(0) - 0.5f * (0.01f * uLuck);
+                rSign = Misc_RandFunc(0);
+                f = Misc_RandFuncf(0) - 0.5f * (0.01f * uLuck);
                 if (f < 0.0f) {
                     f = 0.0f;
                 }
@@ -1635,7 +1635,7 @@ u8 Physics_ProcessCollision(Ball* pBall, f32* pHit, f32* pNormal, SurfaceType* p
             (pBall->nPlayer >= 0 && pBall->nPlayer <= 3 && gPlayers[pBall->nPlayer].bPerfect)) {
             r = 0;
         } else {
-            r = Rand_Next(0);
+            r = Misc_RandFunc(0);
         }
         nA = (r & 7) + 12;
         if (r & 31) {
@@ -2662,19 +2662,19 @@ void Wind_Generate(void) {
         }
         switch (n) {
         case 0:
-            fSpeed = Rand_Next(0) % 7;
+            fSpeed = Misc_RandFunc(0) % 7;
             break;
         case 1:
-            fSpeed = 2.0f + Rand_Next(0) % 11;
+            fSpeed = 2.0f + Misc_RandFunc(0) % 11;
             break;
         case 2:
-            fSpeed = 5.0f + Rand_Next(0) % 16;
+            fSpeed = 5.0f + Misc_RandFunc(0) % 16;
             break;
         case 3:
-            fSpeed = 12.0f + Rand_Next(0) % 20;
+            fSpeed = 12.0f + Misc_RandFunc(0) % 20;
             break;
         }
-        n = Rand_Next(0) % 8;
+        n = Misc_RandFunc(0) % 8;
     }
     Wind_Set(n, fSpeed);
 }

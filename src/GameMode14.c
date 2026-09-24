@@ -107,7 +107,7 @@ void fn_800F2BD8(void) {
     lbl_80282368 = gSession.options.nWind;
     gSession.options.nC = 4;
     gSession.options.nWind = 0;
-    lbl_8028236C = Rand_Next(0) & 1;
+    lbl_8028236C = Misc_RandFunc(0) & 1;
 }
 
 u8 fn_800F2C2C(u8 bCheck) {
@@ -180,7 +180,7 @@ void fn_800F2E08(int nPlayer) {
             } else {
                 nText = 0;
                 if (lbl_80211FB8[nTarget].nRank == 5) {
-                    if (!(Rand_Next(0) & 1)) {
+                    if (!(Misc_RandFunc(0) & 1)) {
                         nMsg = 0x1A;
                     } else {
                         nMsg = 0x52;
@@ -191,7 +191,7 @@ void fn_800F2E08(int nPlayer) {
                     nText = 0xD4;
                     nKind = 1;
                     gPlayers[nPlayer].nE94++;
-                    if (!(Rand_Next(0) & 1)) {
+                    if (!(Misc_RandFunc(0) & 1)) {
                         nMsg = 0xF;
                     } else {
                         nMsg = 0x1B;
@@ -201,14 +201,14 @@ void fn_800F2E08(int nPlayer) {
                     gPlayers[nPlayer].nDE0++;
                     if (nKind == 0) {
                         nText = 0xD2;
-                        if (!(Rand_Next(0) & 1)) {
+                        if (!(Misc_RandFunc(0) & 1)) {
                             nMsg = 0x16;
                         } else {
                             nMsg = 0x53;
                         }
                     } else {
                         nText = 0xD5;
-                        if (!(Rand_Next(0) & 1)) {
+                        if (!(Misc_RandFunc(0) & 1)) {
                             nMsg = 0x17;
                         } else {
                             nMsg = 0x1C;
@@ -278,13 +278,13 @@ void fn_800F31E0(void) {
                 fn_800F1B60(i, (s8)PLAYER(i)->nTarget);
             }
             if (i == 0 && n1 >= n0 + 3) {
-                if (!(Rand_Next(0) & 1)) {
+                if (!(Misc_RandFunc(0) & 1)) {
                     nMsg = 0x4A;
                 } else {
                     nMsg = 0x4C;
                 }
             } else if (i == 1 && n0 >= n1 + 3) {
-                if (!(Rand_Next(0) & 1)) {
+                if (!(Misc_RandFunc(0) & 1)) {
                     nMsg = 0x4B;
                 } else {
                     nMsg = 0x4D;

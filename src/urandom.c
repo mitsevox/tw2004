@@ -1,7 +1,7 @@
-// urandom.c (TW06's legacy/lib/urandom.c): the game's random numbers. Three independent streams
-// (0 for the ball and the front end, 1 for the golfer's animation), each an additive
-// lagged-Fibonacci generator over a table of 20 words, seeded from the Park-Miller "minimal
-// standard" generator; on top of them uniform floats and normally distributed floats.
+// urandom.c (TW06's legacy/lib/urandom.c): the game's random numbers. Three independent streams,
+// each an additive lagged-Fibonacci generator over a table of 20 words, seeded from the
+// Park-Miller "minimal standard" generator; on top of them uniform floats and normally distributed
+// floats.
 
 #include "engine.h"
 #include "golfer.h"                     // PI
@@ -13,12 +13,12 @@ u32 lbl_80281BE8;               // the Park-Miller seed the tables are filled fr
 f32 lbl_80281BE4;               // the second normal value of the last Box-Muller pair
 u8  lbl_80281BE0;               // lbl_80281BE4 holds a value not yet handed out
 
-u32 fn_8000B194(void);
-u32 fn_8000B264(void);
+u32 Misc_PMRand(void);
+u32 Misc_CreateRandomSeed_Internal(void);
 u32 fn_8000B408(void);
 
 // The next number of a stream: the table entry 3 places on is added into the current one.
-u32 Rand_Next(int nStream) {
+u32 Misc_RandFunc(int nStream) {
     int nLag;
     int nIndex;
 
@@ -35,7 +35,7 @@ u32 Rand_Next(int nStream) {
 }
 
 // Park-Miller: seed = seed * 16807 mod (2^31 - 1), in 32-bit arithmetic (Carta's method).
-u32 fn_8000B194(void) {
+u32 Misc_PMRand(void) {
     u32 uLo;
     u32 uHi;
 
@@ -49,23 +49,23 @@ u32 fn_8000B194(void) {
 }
 
 // Seeds a stream: its table is filled from the Park-Miller generator started at uSeed.
-void fn_8000B1D4(int nStream, u32 uSeed) {
+void Misc_SetSeedFunc(int nStream, u32 uSeed) {
     int i;
 
     lbl_80281BE8 = uSeed;
     lbl_801A24B8[nStream] = 19;
     for (i = 0; i < 20; i++) {
-        lbl_801A24C4[nStream][i] = fn_8000B194();
+        lbl_801A24C4[nStream][i] = Misc_PMRand();
     }
 }
 
 // A seed from the clock (the front end seeds a new session with it).
-u32 fn_8000B244(void) {
-    return fn_8000B264();
+u32 Misc_CreateRandomSeed(void) {
+    return Misc_CreateRandomSeed_Internal();
 }
 
 // The seconds, minutes and hours of the date, plus 10, mixed with the CPU's tick counter.
-u32 fn_8000B264(void) {
+u32 Misc_CreateRandomSeed_Internal(void) {
     OSCalendarTime time;
     u32 uSeed;
 
@@ -76,24 +76,24 @@ u32 fn_8000B264(void) {
 }
 
 // Seeds all three streams with one seed.
-void fn_8000B2B8(u32 uSeed) {
+void Misc_InitModule(u32 uSeed) {
     int i;
 
     i = 0;
     do {
-        fn_8000B1D4(i, uSeed);
+        Misc_SetSeedFunc(i, uSeed);
         i++;
     } while (i < 3);
     lbl_80281BE0 = 0;
 }
 
-void fn_8000B30C(void) {
+void Misc_CloseModule(void) {
     lbl_80281BE0 = 0;
 }
 
 // Box-Muller: two uniform numbers make two independent normal ones; the second is kept for the
 // next call.
-f32 fn_8000B318(int nStream) {
+f32 Misc_RandFuncg(int nStream) {
     f32 fU;
     f32 fAngle;
     f32 fSin;
@@ -104,8 +104,8 @@ f32 fn_8000B318(int nStream) {
         lbl_80281BE0 = 0;
         return lbl_80281BE4;
     }
-    fU = Rand_Float(nStream);
-    fAngle = 2.0f * PI * Rand_Float(nStream);
+    fU = Misc_RandFuncf(nStream);
+    fAngle = 2.0f * PI * Misc_RandFuncf(nStream);
     fSin = fn_800095F0(fAngle);
     fCos = fn_80009638(fAngle);
     fRadius = fn_80009680(-2.0f * logf(fU));
@@ -123,13 +123,13 @@ u32 fn_8000B408(void) {
 }
 
 // A float in [0, 1): 23 random bits as the mantissa of a number in [1, 2), less 1.
-f32 Rand_Float(int nStream) {
+f32 Misc_RandFuncf(int nStream) {
     f32 f;
 
     f = 0.0f;
     // port: writes the float's bits through a u32 pointer (a union does not keep the store of
     // 0.0f above, which the original has); build with -fno-strict-aliasing or use memcpy.
-    *(u32*)&f = (Rand_Next(nStream) & 0x7FFFFF) | 0x3F800000;
+    *(u32*)&f = (Misc_RandFunc(nStream) & 0x7FFFFF) | 0x3F800000;
     f -= 1.0f;
     return f;
 }

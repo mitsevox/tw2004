@@ -34,7 +34,7 @@ void GameModeMatch_Init(void) {
     gSession.nSplitScreen = 0;
 }
 
-// The hole starts: the first golfer to play gets ready, the other waits.
+// Next shot (every player waiting): the honors callback's pick gets ready, the other waits.
 void fn_800E9F14(void) {
     int i;
     lbl_80282278 = gpGame->pfnGetHonors(5);
@@ -133,9 +133,9 @@ s32 GameModeMatch_GetHonors(int nPlayer) {
     return nBest;
 }
 
-// Both holed; or one holed and the other can no longer win the
-// hole (nor halve it when the holed player is dormie). Unless only checking, the loser's score gets
-// a stroke for the putt they did not take.
+// Both holed; or one holed and the other can no longer halve the
+// hole (with the holed player dormie: no longer win it). Unless only checking, the other's score
+// gets a stroke for the putt they did not take.
 u8 GameModeMatch_HoleFinished(int nPlayer, u8 bCheck) {
     int nLeft;
     int h;

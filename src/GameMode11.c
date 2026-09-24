@@ -158,7 +158,7 @@ void fn_800FFF34(void) {
     gSession.options.b84 = 0;
     gSession.options.bBoostEnabled = 1;
     gSession.options.bSpinEnabled = 1;
-    fn_8000B1D4(0, 69);
+    Misc_SetSeedFunc(0, 69);
 }
 
 // Hole start.

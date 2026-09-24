@@ -178,7 +178,7 @@ void Mov_Exit(void);
 void Mov_Start(void);
 void Mov_Tick(void);
 
-u8   fn_800AC470(void);                   // hlaudvoice.c
+u8   Voc_InitModule(void);                   // hlaudvoice.c
 u8   fn_800ACECC(void);                   // no C yet; returns 1
 u8   fn_800AF224(void);                   // no C yet; returns 1
 void fn_800AD1C8(void);                   // hlaudemitter.c, no C yet
@@ -209,7 +209,7 @@ u8 fn_800A3E3C(u8 nRate) {
         && (bOk = fn_800AF224()) && (bOk = fn_800B0798()) && (bOk = fn_800A8604())
         && (bOk = fn_800A8D2C()) && (bOk = fn_800A7AF0()) && (bOk = fn_800A98B4())
         && (bOk = fn_800AAD18()) && (bOk = fn_800ABBC8()) && (bOk = fn_800A8754())
-        && (bOk = fn_800AC470()) && (bOk = fn_800A8824()) && (bOk = fn_800ACECC())
+        && (bOk = Voc_InitModule()) && (bOk = fn_800A8824()) && (bOk = fn_800ACECC())
         && (bOk = fn_800A3FF4())) {
         fn_800B07A0();
         fn_800A86BC(nRate);
@@ -1121,7 +1121,7 @@ void fn_800A5EC0(u8 nPlayer) {
     nId = lbl_801F1790[pPlayer->nView[0]].n1;
     fn_800AD800(nId, pPlayer->ball.vPos, NULL, 0);
     fn_800ADA94(nId, 0, 2.0f);
-    nRand = Rand_Next(2) & 1;   // one of two sounds at random
+    nRand = Misc_RandFunc(2) & 1;   // one of two sounds at random
     fn_800ADA28(nId, 0, nRand == 0 ? 0x1A : 0x1C, 0);
 }
 

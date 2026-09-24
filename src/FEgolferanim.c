@@ -170,7 +170,7 @@ void fn_8008AD80(void) {
     lbl_80281EE0->b8A = 0;
     lbl_80281EE0->n8C = -1;
     lbl_80281EE0->n194 = 0;
-    lbl_80281EE0->n198 = Rand_Next(0) & 3;
+    lbl_80281EE0->n198 = Misc_RandFunc(0) & 3;
     lbl_80281EE0->f19C = 0.0f;
     lbl_80281EE0->f1A0 = 0.0f;
     lbl_80281EE0->b1B0 = 0;
