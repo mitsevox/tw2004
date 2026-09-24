@@ -142,6 +142,63 @@ void fn_8006E62C(LightGroup* pGroup) {
     }
 }
 
+// Loads a group (or none): the directional light becomes the ambient colour (63.75 grey without
+// one), the point lights fill the point slots in order; the slots left over are cleared.
+void fn_8006E7A4(LightGroup* pGroup) {
+    GoLight** ppLight;
+    GoLight* pLight;
+    s32 n;
+    s32 i;
+    u8 bAmbient = 0;
+
+    lbl_802811D8->nPoints = 0;
+    if (pGroup != NULL) {
+        n = pGroup->nLights;
+        ppLight = pGroup->apLight;
+        for (; n > 0; n--) {
+            pLight = *ppLight++;
+            switch (pLight->nType) {
+            case 1:
+                bAmbient = 1;
+                lbl_802811D8->vAmbient[0] =
+                    255.0f * (pLight->u.dir.fC * (pLight->u.dir.vColor[0] * pLight->u.dir.f10));
+                lbl_802811D8->vAmbient[1] =
+                    255.0f * (pLight->u.dir.fC * (pLight->u.dir.vColor[1] * pLight->u.dir.f10));
+                lbl_802811D8->vAmbient[2] =
+                    255.0f * (pLight->u.dir.fC * (pLight->u.dir.vColor[2] * pLight->u.dir.f10));
+                break;
+            case 2:
+                lbl_802811D8->aPointColour[lbl_802811D8->nPoints][0] =
+                    255.0f * (pLight->u.point.vColor[0] * pLight->u.point.fC);
+                lbl_802811D8->aPointColour[lbl_802811D8->nPoints][1] =
+                    255.0f * (pLight->u.point.vColor[1] * pLight->u.point.fC);
+                lbl_802811D8->aPointColour[lbl_802811D8->nPoints][2] =
+                    255.0f * (pLight->u.point.vColor[2] * pLight->u.point.fC);
+                lbl_802811D8->afPointX[lbl_802811D8->nPoints] = pLight->u.point.vPos[0];
+                lbl_802811D8->afPointY[lbl_802811D8->nPoints] = pLight->u.point.vPos[1];
+                lbl_802811D8->afPointZ[lbl_802811D8->nPoints] = pLight->u.point.vPos[2];
+                Vec3Copy(pLight->u.point.vPos, lbl_802811D8->aPointPos[lbl_802811D8->nPoints]);
+                lbl_802811D8->nPoints++;
+                break;
+            }
+        }
+    }
+    if (!bAmbient) {
+        lbl_802811D8->vAmbient[0] = 63.75f;
+        lbl_802811D8->vAmbient[1] = 63.75f;
+        lbl_802811D8->vAmbient[2] = 63.75f;
+    }
+    for (i = lbl_802811D8->nPoints; i < NUM_POINT_LIGHTS; i++) {
+        lbl_802811D8->afPointX[i] = 0.0f;
+        lbl_802811D8->afPointY[i] = 0.0f;
+        lbl_802811D8->afPointZ[i] = 0.0f;
+        lbl_802811D8->aPointColour[i][0] = 0.0f;
+        lbl_802811D8->aPointColour[i][1] = 0.0f;
+        lbl_802811D8->aPointColour[i][2] = 0.0f;
+    }
+    fn_8006E460(pGroup);
+}
+
 // Channel 4 unlit, with a grey ambient colour.
 void fn_8006ED70(void) {
     GXColor grey = {0x80, 0x80, 0x80, 0x80};
