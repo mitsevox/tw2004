@@ -343,6 +343,50 @@ void fn_8003E624(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
     }
 }
 
+// Blend kind 0: the camera and the point it looks at both move on straight lines from the current
+// shot's to the next one's (by fn_8003F790's share); field of view, fn_800457B8's value, slow
+// motion and fA8 blend the same.
+void fn_8003F518(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
+    f32 vMove[4];
+    f32 vPos[4];
+    CamShot* pShot = pScript->pShot;
+    CamShot* pNext = pScript->pNextShot;
+    f32 fT = fn_8003F790(pScript);
+    f32 f;
+    f32 f90;
+
+    fn_80045428(pScript->v10, pScript->v0, vMove);
+    fn_8001EF34(vMove, fT, vPos);
+    fn_8004544C(vPos, pScript->v0, vPos);
+    Vec3Copy(vPos, pCam);
+    CamScript_GetLookAtPoint(pShot, nPlayer, pScript->a20, pScript->v0, pScript, pPrev, fTime);
+    CamScript_GetLookAtPoint(pNext, nPlayer, &pScript->a20[4], pScript->v10, pScript, pPrev, fTime);
+    fn_80045428(&pScript->a20[4], pScript->a20, vMove);
+    fn_8001EF34(vMove, fT, vPos);
+    fn_8004544C(vPos, pScript->a20, vPos);
+    Vec3Copy(vPos, pSub);
+    f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
+    f += fn_800DC3A4();
+    if (fn_80044E74(pScript->pShot)) {
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[1])), f);
+    } else {
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), f);
+    }
+    f = fT * (pNext->f88 - pShot->f88) + pShot->f88;
+    f += fn_800DC45C(f);
+    fn_800457B8(nPlayer, f);
+    f = fT * (pNext->f8C - pShot->f8C) + pShot->f8C;
+    f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
+    if (f > 0.0f || f90 > 0.0f) {
+        if (fn_80044E74(pShot)) {
+            fn_80038054(1, gPlayers[nPlayer].nView[1], f90, f);
+        } else {
+            fn_80038054(1, gPlayers[nPlayer].nView[0], f90, f);
+        }
+    }
+    pScript->fA8 = fT * (pNext->f9C - pShot->f9C) + pShot->f9C;
+}
+
 // Blend kind 1: the camera moves on the straight line from the current shot's position to the next
 // one's (by fn_8003F790's share), and its view direction turns from the one shot's to the other's
 // about their common axis; field of view, fn_800457B8's value, slow motion and fA8 blend the same.
@@ -399,6 +443,63 @@ void fn_8003FD54(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     fDist = fn_80009680(fn_80009744(vFromAim));
     fn_8001EF34(pSub, fT * ((f32)fn_80009680(fn_80009744(vToAim)) - fDist) + fDist, pSub);
     fn_8004544C(pCam, pSub, pSub);
+    f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
+    f += fn_800DC3A4();
+    if (fn_80044E74(pScript->pShot)) {
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[1])), f);
+    } else {
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), f);
+    }
+    f = fT * (pNext->f88 - pShot->f88) + pShot->f88;
+    f += fn_800DC45C(f);
+    fn_800457B8(nPlayer, f);
+    f = fT * (pNext->f8C - pShot->f8C) + pShot->f8C;
+    f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
+    if (f > 0.0f || f90 > 0.0f) {
+        if (fn_80044E74(pShot)) {
+            fn_80038054(1, gPlayers[nPlayer].nView[1], f90, f);
+        } else {
+            fn_80038054(1, gPlayers[nPlayer].nView[0], f90, f);
+        }
+    }
+    pScript->fA8 = fT * (pNext->f9C - pShot->f9C) + pShot->f9C;
+}
+
+// Blend kind 14: the camera moves on the straight line between the two shots' positions. The point
+// it looks at is the current shot's look-at point plus the share of the way from a point along the
+// current view direction (at the ball's level distance from the camera) to the next shot's look-at
+// point.
+void fn_8004017C(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
+    f32 vDir[4];
+    f32 vFromAim[4];
+    f32 vMove[4];
+    f32 vPos[4];
+    f32 vBall[4];
+    CamShot* pShot = pScript->pShot;
+    CamShot* pNext = pScript->pNextShot;
+    f32 fT = fn_8003F790(pScript);
+    f32 f;
+    f32 f90;
+
+    fn_80045428(pScript->v10, pScript->v0, vMove);
+    fn_8001EF34(vMove, fT, vPos);
+    fn_8004544C(vPos, pScript->v0, vPos);
+    Vec3Copy(vPos, pCam);
+    fn_80045428(pScript->v0, pScript->a20, vFromAim);
+    CamScript_GetLookAtPoint(pShot, nPlayer, pScript->a20, pScript->v0, pScript, pPrev, fTime);
+    fn_80045428(pScript->a20, pScript->v0, vDir);
+    if (0.0f != vDir[0] || 0.0f != vDir[1] || 0.0f != vDir[2]) {
+        fn_800BAF04(vDir, vDir);
+    }
+    fn_80045428(gPlayers[nPlayer].ball.vPos, pScript->v0, vBall);
+    vBall[1] = 0.0f;
+    fn_8001EF34(vDir, fn_80009680(fn_80009744(vBall)), vDir);
+    fn_8004544C(vDir, pScript->v0, vDir);
+    CamScript_GetLookAtPoint(pNext, nPlayer, &pScript->a20[4], pScript->v10, pScript, pPrev, fTime);
+    fn_80045428(&pScript->a20[4], vDir, vMove);
+    fn_8001EF34(vMove, fT, vPos);
+    fn_8004544C(vPos, pScript->a20, vPos);
+    Vec3Copy(vPos, pSub);
     f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
     f += fn_800DC3A4();
     if (fn_80044E74(pScript->pShot)) {
