@@ -576,7 +576,7 @@ typedef struct GameState {
     void (*pfn228)(int nPlayer); // 0x228  called every frame of the shot setup (state 10)
     void (*pfn22C)(int nPlayer); // 0x22C  called after a re-plan in swing state 9
     u8   (*pfn230)(int nPlayer); // 0x230
-    u8   (*pfn234)(void);       // 0x234  GM_CheckControllerPulled asks it (TW06 CheckControllerPulled)
+    u8   (*pfn234)(void);       // 0x234  fn_800DFC18 asks it (TW06 CheckControllerPulled)
     u8   (*pfn238)(int nPlayer); // 0x238  nonzero: skip addressing the ball (swing state 1)
     void (*pfn23C)(int nPlayer); // 0x23C
     s32  (*pfn240)(int nPlayer); // 0x240  called from 0x800A3460 with the player
