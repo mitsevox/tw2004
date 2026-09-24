@@ -361,11 +361,16 @@ typedef struct DVDFileInfo {
 typedef void (*DVDCallback)(s32 nResult, DVDFileInfo* pInfo);
 s32 DVDReadAsyncPrio(DVDFileInfo* pInfo, void* pBuf, s32 nLen, s32 nOffset, DVDCallback pCallback,
                      s32 nPrio);
+s32 DVDConvertPathToEntrynum(const char* pPath);
+int DVDFastOpen(s32 nEntry, DVDFileInfo* pInfo);
+int DVDClose(DVDFileInfo* pInfo);
 
 // An open file (lbl_8019EAD0, 32 of them, 0xC4 bytes each).
 typedef struct DiscFile {
     DVDFileInfo info;           // 0x00
-    u8   unk3C[0xC4 - 0x3C];
+    s32  nEntry;                // 0x3C  its disc entry number; -1: a free slot
+    s32  nOpens;                // 0x40  how many opens it has (File_Close closes it at 0)
+    char szPath[0x80];          // 0x44  its path in the disc's form (fn_80005BE8)
 } DiscFile;
 
 // A queued read (0x24 bytes: lbl_8019E880 holds eight free ones per priority).

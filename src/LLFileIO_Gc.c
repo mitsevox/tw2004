@@ -10,6 +10,9 @@ FileQueue lbl_8019E868[2];              // the queued reads, per priority
 FileReqPool lbl_8019E880[2];            // the free requests, per priority
 OSSemaphore lbl_8019D540;               // signalled when a read ends, or the queue gets its first read
 s32 lbl_80281B84;                       // the last read's result: bytes read, or below 0 an error
+// The open files' paths, by slot. The symbol is 0x2000 bytes; the code only reaches the first 0x1000.
+char lbl_801A0350[32][0x80];
+s32 lbl_80281B80;                       // how many files are open
 
 void fn_80005BE8(const char* szSrc, char* szDst);
 void fn_80005C48(s32 nResult, DVDFileInfo* pInfo);
@@ -52,6 +55,89 @@ void fn_80005C90(FileReq* pReq) {
 }
 
 void fn_800060DC(void) {
+}
+
+// Opens a file (EA's name, from its lock: File_Open): a file already open gets one more open, a
+// new one takes a free slot. Returns the slot, or -1 when none is free.
+int fn_800060E0(const char* szName) {
+    char szPath[0x80];          // the size is unknown: the frame leaves 0x88 bytes for it
+    int hFile;
+    int i;
+    s32 nEntry;
+    DiscFile* pFile;
+
+    hFile = -1;
+    fn_80005BE8(szName, szPath);
+    fn_800B596C("File_Open");
+    pFile = lbl_8019EAD0;
+    for (i = 0; i < 32; i++) {
+        if (lbl_8019EAD0[i].nEntry == -1) {
+            hFile = i;
+            break;
+        }
+    }
+    if (hFile != -1) {
+        do {
+            nEntry = DVDConvertPathToEntrynum(szPath);
+            if (nEntry < 0) {
+                fn_800B7490();
+            }
+        } while (nEntry < 0);
+        for (i = 0; i < 32; i++, pFile++) {
+            if (nEntry == pFile->nEntry && strcmp(szPath, pFile->szPath) == 0) {
+                hFile = i;
+                lbl_8019EAD0[i].nOpens++;
+                break;
+            }
+        }
+        if (i >= 32) {
+            for (;;) {
+                if (DVDFastOpen(nEntry, &lbl_8019EAD0[hFile].info)) {
+                    lbl_8019EAD0[hFile].nEntry = nEntry;
+                    lbl_8019EAD0[hFile].nOpens = 1;
+                    strcpy(lbl_8019EAD0[hFile].szPath, szPath);
+                    strcpy(lbl_801A0350[hFile], szPath);
+                    break;
+                }
+                fn_800B7490();
+            }
+            lbl_80281B80++;
+        }
+    }
+    fn_800B5994("File_Open");
+    return hFile;
+}
+
+// Closes a file (EA's name, from its lock: File_Close): one open fewer, and at none the disc file is
+// closed and its slot freed.
+int fn_8000633C(int hFile) {
+    FileQueue* pQueue;
+    FileReq* pReq;
+    int bClosed;
+
+    fn_800B596C("File_Close");
+    // what walked the queues here was compiled out (asserts, likely)
+    pQueue = lbl_8019E868;
+    for (pReq = pQueue->pNext; pReq != (FileReq*)pQueue; pReq = pReq->pNext) {
+    }
+    pQueue++;
+    for (pReq = pQueue->pNext; pReq != (FileReq*)pQueue; pReq = pReq->pNext) {
+    }
+    lbl_8019EAD0[hFile].nOpens--;
+    if (lbl_8019EAD0[hFile].nOpens <= 0) {
+        do {
+            bClosed = DVDClose(&lbl_8019EAD0[hFile].info);
+            if (!bClosed) {
+                fn_800B7490();
+            }
+        } while (!bClosed);
+        lbl_8019EAD0[hFile].nEntry = -1;
+        lbl_8019EAD0[hFile].szPath[0] = 0;
+        lbl_801A0350[hFile][0] = 0;
+        lbl_80281B80--;
+    }
+    fn_800B5994("File_Close");
+    return 0;
 }
 
 int fn_80006444(int hFile, void* pDst, u32 uLen, u32 uOffset,
@@ -101,6 +187,61 @@ int fn_80006478(int hFile, void* pDst, u32 uLen, u32 uOffset, void (*pfnDone)(in
     }
     fn_800B5994("File_ReadAsyncEx");
     return 0;
+}
+
+// Reads a whole file, waiting for the drive, into a new allocation aligned to nAlign; its size goes
+// to *puSize when that is not NULL. NULL when no memory is free.
+void* fn_800065C8(const char* szPath, u32* puSize, int nAlign) {
+    DVDFileInfo info;
+    s32 nEntry;
+    u32 uSize;
+    s32 nLen;
+    void* pData;
+    s32 nStatus;
+    u8 bRetry;
+
+    do {
+        nEntry = DVDConvertPathToEntrynum(szPath);
+        if (nEntry < 0) {
+            fn_800B7490();
+        }
+    } while (nEntry < 0);
+    if (nEntry < 0) {           // never: the loop above waits for the file
+        return NULL;
+    }
+    for (;;) {
+        if (DVDFastOpen(nEntry, &info)) {
+            break;
+        }
+        fn_800B7490();
+    }
+    uSize = info.uLength;
+    nLen = uSize;
+    pData = fn_80009B34(uSize, 1, nAlign, "LLFileIO_Gc.c", 750);
+    if (pData == NULL) {
+        return NULL;
+    }
+    do {
+        DVDReadAsyncPrio(&info, pData, uSize, 0, NULL, 2);
+        bRetry = 0;
+        do {
+            // a DVDFileInfo begins with its command block
+            nStatus = DVDGetCommandBlockStatus((DVDCommandBlock*)&info);
+            if (nStatus != 0) {
+                bRetry = fn_800B7490();
+            }
+        } while (nStatus != 0);
+    } while (bRetry);
+    do {
+        nStatus = DVDClose(&info);
+        if (!nStatus) {
+            fn_800B7490();
+        }
+    } while (!nStatus);
+    if (puSize != NULL) {
+        *puSize = uSize;
+    }
+    return pData;
 }
 
 // A file's size in bytes.
