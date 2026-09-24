@@ -1070,7 +1070,7 @@ config.libs = [
             Object(Matching, "hlaudvoice.c"),
             Object(Matching, "AudLock.c"),
             Object(Matching, "unsorted/sweep_8010FF5C.c"),
-            Object(Matching, "unsorted/sweep_801654F4.c"),
+            Object(Matching, "unsorted/sweep_801654F4.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
             Object(Matching, "unsorted/sweep_80005580.c"),
             Object(Matching, "unsorted/sweep_8006F608.c"),
 
@@ -1086,8 +1086,8 @@ config.libs = [
             Object(Matching, "AudReverb.c"),
             Object(Matching, "unsorted/sweep_8013B3C4.c"),
             Object(Matching, "unsorted/sweep_8014CA80.c"),
-            Object(Matching, "unsorted/sweep_801654D0.c"),
-            Object(Matching, "unsorted/sweep_80165524.c"),
+            Object(Matching, "unsorted/sweep_801654D0.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
+            Object(Matching, "unsorted/sweep_80165524.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
             Object(Matching, "Code80012ED0.c"),
             Object(Matching, "Controller_Gc.c"),
             Object(Matching, "unsorted/sweep_800136F4.c"),
@@ -1097,7 +1097,7 @@ config.libs = [
             Object(Matching, "Code80095564.c"),
             Object(Matching, "unsorted/sweep_8009B314.c"),
             Object(Matching, "Code8009B340.c"),
-            Object(Matching, "unsorted/sweep_801338E0.c"),
+            Object(Matching, "unsorted/sweep_801338E0.c", progress_category="sdk"),  # Metrowerks runtime / MetroTRK, not EA code
             Object(Matching, "unsorted/sweep_80155F40.c"),
         ],
     },

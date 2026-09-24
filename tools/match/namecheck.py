@@ -12,8 +12,9 @@ Hard errors (always):
 Flags (a reviewer may keep the row by writing `namecheck-ok: <why>` in its evidence):
   prefix    the name's system prefix (text before the first `_`) must be the unit's name, the prefix
             of a named function in the same unit, of a named caller or callee, or of another row of
-            the batch for the same unit whose codes include E1 or E2 (EA's text or a confirmed TW06
-            name establishes a prefix). A `Render_` name for code only career-mode code calls fails.
+            the batch for the same unit whose codes include E1, E2 or E2b (EA's text or a confirmed
+            TW06/TW07 name establishes a prefix; an E2b row is EA's own name and skips this check).
+            A `Render_` name for code only career-mode code calls fails.
   domain    a name that claims a subsystem (Render/Draw/Texture..., Audio/Sound/Voice...,
             Card/MemCard, Pad/Controller/Rumble, DVD/Disc) must reach it: the function, its callees
             two calls deep, or the globals and strings they use must touch that subsystem."""
@@ -102,7 +103,7 @@ def main():
     established = collections.defaultdict(set)     # unit -> prefixes set up by E1/E2 rows
     for r in rows:
         u = unit_of.get(r['cur'])
-        if u and re.search(r'\bE[12]\b', r['codes']):
+        if u and re.search(r'\bE(1|2b?)\b', r['codes']):
             established[u].add(prefix(r['new']))
     errors, flags = [], []
     for r in rows:
@@ -136,7 +137,8 @@ def main():
         p = prefix(r['new'])
         near = {prefix(f) for f in by_unit[u] | callers.get(r['cur'], set()) | set(calls.get(r['cur'], []))
                 if named(f) and f != r['cur']}
-        if p != u.split('/')[-1] and p not in near and p not in established[u] and not ok:
+        eas = re.search(r'\bE2b\b', r['codes'])         # EA's own TW07 name: its prefix is EA's
+        if p != u.split('/')[-1] and p not in near and p not in established[u] and not ok and not eas:
             flags.append('%s: prefix %s is not the unit (%s) nor used by its unit, callers or callees (%s)'
                          % (tag, p, u, ', '.join(sorted(near)) or 'none named'))
             w = words(r['new'])
