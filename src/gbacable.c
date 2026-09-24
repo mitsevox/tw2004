@@ -23,6 +23,36 @@ s32  GbaReadContext(s32 nChan);
 void GbaOpen(s32 nChan);
 void fn_8012408C(s32 v);
 
+const u32 lbl_80184E30[GBA_NUM_CHANNELS] = { 0x80000000, 0x40000000, 0x20000000, 0x10000000 };
+
+s32 lbl_80281980 = -1;
+s32 lbl_80281984 = -1;
+
+// data order: .bss and .sbss are defined in reverse address order (CodeWarrior lays them out
+// last-defined-first)
+PadStatus lbl_80260FF8[GBA_NUM_CHANNELS];
+GbaChannel lbl_80260E18[GBA_NUM_CHANNELS];
+
+u32 lbl_80282560;
+DVDDiskID* lbl_8028255C;
+s32 lbl_80282558;
+s32 lbl_80282554;
+s32 lbl_80282550;
+s32 lbl_8028254C;
+u32 lbl_80282548;
+u32 lbl_80282544;
+s32 lbl_80282540;
+s32 lbl_8028253C;
+s32 lbl_80282538;
+s32 lbl_80282534;
+s32 lbl_80282530;
+s32 lbl_8028252C;
+s32 lbl_80282528;
+s32 lbl_80282524;
+s32 lbl_80282520;
+s32 lbl_8028251C;
+s32 lbl_80282518;
+
 // The check byte of a port's key: a CRC-style sum over its two bytes, with the polynomial 0xCD.
 u32 fn_801228E0(u32 uValue) {
     u32 uSum = 0;
@@ -606,12 +636,17 @@ void fn_80123CBC(s32 a, s32 b) {
     } while (nChan < GBA_NUM_CHANNELS);
 }
 
+// fake match: EA takes the probe's slot through an inline; &pCh->u5C in place allocates pType r25, not r30
+static inline u32* Gba_ProbeSlot(GbaChannel* pCh) {
+    return &pCh->u5C;
+}
+
 // Reads the pads. A linked GBA's d-pad (u58, when new and its check byte holds) replaces its port's
 // buttons. An unlinked port is probed for what is plugged in (waiting up to 800 ms for a GBA while
 // no port is being worked on); ports whose probe gave 8 or 0x40 are reset.
 void fn_80123E34(void) {
-    u32 uReset = 0;
     int nChan;
+    u32 uReset = 0;
     GbaChannel* pCh;
     PadStatus* pPad;
     const u32* pMask;
@@ -641,7 +676,7 @@ void fn_80123E34(void) {
             if (pCh->n0 == 0 && GBAGetProcessStatus(nChan, &uProc) != 2) {
                 if (lbl_80281984 == -1) {
                     uStart = OSGetTick();
-                    pType = &pCh->u5C;
+                    pType = Gba_ProbeSlot(pCh);
                     do {
                         fn_800A4BDC();
                         fn_800B7490();
@@ -668,23 +703,11 @@ void fn_801229F8();
 void fn_80123FF8(void);
 s32 OSGetResetButtonState();
 s32 OSResetSystem(s32, s32, s32);
-extern s32 lbl_80282540;
 void fn_8012402C(void);
-extern s32 lbl_80281980;
-extern s32 lbl_80282518;
 void fn_8012408C(s32 v);
 s32 fn_80124094(void);
 void fn_8012409C(void);
-extern s32 lbl_8028251C;
 void fn_801240A8(void);
-extern s32 lbl_80282520;
-extern s32 lbl_80282524;
-extern s32 lbl_80282528;
-extern s32 lbl_8028252C;
-extern s32 lbl_80282530;
-extern s32 lbl_80282534;
-extern s32 lbl_80282538;
-extern s32 lbl_8028253C;
 void fn_801241AC(s32 v);
 s32 fn_801241B4(void);
 void fn_801241BC(s32 v);
@@ -702,10 +725,6 @@ s32 fn_80124214(void);
 void fn_8012421C(s32 v);
 s32 fn_80124224(void);
 void fn_8012422C(void);
-extern s32 lbl_8028254C;
-extern s32 lbl_80282550;
-extern s32 lbl_80282554;
-extern s32 lbl_80282558;
 void fn_80124238(s32 arg0, s32 arg1);
 s32 fn_80124280(s32 arg0);
 

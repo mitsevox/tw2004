@@ -6,6 +6,16 @@
 #include "camera.h"
 #include "unsorted/cull.h"
 
+// .bss / .sbss: defined in reverse address order
+TPlaceNode lbl_801D5CCC[85];
+TargetMarker lbl_801D5BF0[5];
+s32 lbl_80281E44;
+TexEntry* lbl_80281E40;
+TexBank* lbl_80281E3C;
+TexEntry* lbl_80281E38;
+TexBank* lbl_80281E34;
+TNetwork* lbl_80281E30;
+
 void TARGET_Init(void);
 void fn_80067CD4(int nPlayer);
 void TARGET_RenderBallTarget(int nPlayer);
@@ -28,15 +38,24 @@ void fn_8006A988(f32* pA, f32* pB, f32* pOut);
 f32  fn_8006A9FC(void);
 LLFont* fn_8006AA3C(void);
 
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x80283778), before the 0.01f TARGET_Init uses first; its body is unknown.
+static f32 target_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
+
 // Set up when play starts (GO_vInitIG): the hole's chunk 3 loader, the marker textures ("tball"
 // and "shadow") and the five players' marker settings.
 void TARGET_Init(void) {
+    u64 textureID;
     int i;
 
     Course_RegisterLoader(3, fn_8006A7A8);
     lbl_80281E30 = NULL;
-    fn_800102DC(fn_8000BEE4("tball"), &lbl_80281E3C, &lbl_80281E40);
-    fn_800102DC(fn_8000BEE4("shadow"), &lbl_80281E34, &lbl_80281E38);
+    textureID = fn_8000BEE4("tball");
+    fn_800102DC(textureID, &lbl_80281E3C, &lbl_80281E40);
+    textureID = fn_8000BEE4("shadow");
+    fn_800102DC(textureID, &lbl_80281E34, &lbl_80281E38);
     for (i = 0; i < 5; i++) {
         lbl_801D5BF0[i].f0 = 0.01f;
         lbl_801D5BF0[i].f4 = 0.0f;
@@ -624,9 +643,9 @@ TNetwork* PlaceBall_GetPlaceBallNetwork(void) {
 u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
     SurfaceType* pSurface;
     f32          vPos[3];
-    f32          fGround;
     f32          fTicks;
     f32          fStep;
+    f32          fGround;
     f32          fZ;
     f32          fX;
     f32          fBaseX;
@@ -684,8 +703,13 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
     }
 
     // port: NTSC rate; the frame's length in ticks
-    fTicks = (59.94f / 60.0f) * (59.94f * gSession.fFrameTime);
-    fStep = -0.5f * fTicks * fSpeed;
+    fTicks = 59.94f / 60.0f;
+    fTicks *= 59.94f * gSession.fFrameTime;    // port: NTSC rate
+    // fake match: the tick and step products written as *= steps, one multiply per statement,
+    // give EA's multiply order and registers (in one expression they do not)
+    fStep = -0.5f;
+    fStep *= fTicks;
+    fStep *= fSpeed;
     fStep *= fGround;
 
     if (gPlayers[nPlayer].fA80 < 0.0f) {
@@ -855,6 +879,10 @@ void fn_80069C64(char* sz, f32 fX, f32 fY) {
 }
 
 f32  fn_8001414C(u8* p);    // GoRenderCtx_Gc.c: of the screen rectangle
+
+f32 lbl_801887CC[4] = { 0.5f, 0.5f, 0.5f, 0.5f };
+f32 lbl_801887DC[4] = { 0.5f, 0.15f, 0.15f, 0.5f };
+f32 lbl_801887EC[4] = { 0.4f, 0.4f, 0.4f, 0.5f };
 
 // Each frame while the ball is being placed (not while paused): the bobbing marker ball and its
 // shadow at the placement point, the marker kept inside the camera's view, and below it the
@@ -1139,8 +1167,26 @@ void fn_8006A89C(void) {
     lbl_80281E30 = NULL;
 }
 
+// ---- sweep code (not yet cleaned up) ----
+
+f32 fn_8006A8A8(u8* p);
+
+f32 fn_8006A8A8(u8* p) {
+    return *(f32*)(p + 0x0);
+}
+
+// ---- end of sweep code ----
+
 void fn_8006A8B0(void) {
     fn_800E58B4(32);
+}
+
+// A point given as fractions of the camera's view (0..1) into the view's screen rectangle.
+void fn_8006A8D4(void* pCamera, f32* pX, f32* pY) {
+    f32* pRect = fn_80012EF0(pCamera);
+
+    *pX = fn_80012EE8(pRect) + *pX * fn_80012ED8(pRect);
+    *pY = fn_80012EE0(pRect) + *pY * fn_80012ED0(pRect);
 }
 
 // a - b into out (three floats)
@@ -1189,24 +1235,6 @@ void fn_8006A988(f32* pA, f32* pB, f32* pOut) {
     pOut[3] = pA[3] - pB[3];
 }
 #endif
-
-// ---- sweep code (not yet cleaned up) ----
-
-f32 fn_8006A8A8(u8* p);
-
-f32 fn_8006A8A8(u8* p) {
-    return *(f32*)(p + 0x0);
-}
-
-// ---- end of sweep code ----
-
-// A point given as fractions of the camera's view (0..1) into the view's screen rectangle.
-void fn_8006A8D4(void* pCamera, f32* pX, f32* pY) {
-    f32* pRect = fn_80012EF0(pCamera);
-
-    *pX = fn_80012EE8(pRect) + *pX * fn_80012ED8(pRect);
-    *pY = fn_80012EE0(pRect) + *pY * fn_80012ED0(pRect);
-}
 
 // Draw text in one colour (pColor: RGBA).
 void fn_8006A9AC(f32* pColor) {
