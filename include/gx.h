@@ -29,6 +29,17 @@ void GXSetZMode(u8 bCompare, int eCompare, u8 bUpdate);
 // ---- vertex arrays ----------------------------------------------------------------------------
 
 void GXInvalidateVtxCache(void);
+
+// ---- display lists ----------------------------------------------------------------------------
+
+void GXBeginDisplayList(void* pList, u32 uSize);
+u32  GXEndDisplayList(void);            // the list's size
+void GXResetWriteGatherPipe(void);
+
+// ---- matrices --------------------------------------------------------------------------------
+
+void GXLoadPosMtxImm(f32 (*pMtx)[4], int nId);
+void GXSetClipMode(int eMode);
 void GXSetArray(int eAttr, void* pBase, u8 nStride);
 void GXClearVtxDesc(void);
 void GXSetVtxDesc(int eAttr, int eType);
