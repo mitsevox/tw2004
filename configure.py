@@ -1026,7 +1026,7 @@ config.libs = [
             Object(NonMatching, "GoShaderObject_Grass_Gc.c"),
             Object(Matching, "GameMode4Menu.c"),
             Object(Matching, "LadderMap.c"),
-            Object(NonMatching, "TibExt.c"),
+            Object(Matching, "TibExt.c"),
             Object(NonMatching, "gbacable.c"),
             Object(Matching, "ShaderRow19.c"),
             Object(Matching, "EASportsBio.c"),
