@@ -7,8 +7,10 @@ its address (fn_XXXXXXXX). SDK and C library names stay: that code is out of the
 Globals, types and struct fields keep their names: treat them as claims, not facts.
 --uses also prints every line (with one line either side) that calls or mentions the function,
 in any game file, blinded the same way.
-Blind is the point: a reader who sees the current name or comment is primed by it."""
-import collections, json, pathlib, re, sys
+Blind is the point: a reader who sees the current name or comment is primed by it.
+A re-check batch (functions audited before) sets BLIND_HIDE=<file listing their addresses> so their
+names stay hidden too (callgraph.py --blind uses the same Blinder)."""
+import collections, json, os, pathlib, re, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 AUDIT = ROOT / 'config/GW4E69/audit.tsv'
@@ -71,14 +73,24 @@ def audited():
     return ok
 
 
+def rechecked():
+    """addresses a re-check batch audits again (env BLIND_HIDE = a file whose lines start with an
+    address): their names stay hidden although they passed the audit before."""
+    p = os.environ.get('BLIND_HIDE')
+    if not p:
+        return set()
+    return {int(m.group(1), 16) for m in re.finditer(r'^(?:0x|fn_)?([0-9A-Fa-f]{8})\b', pathlib.Path(p).read_text(encoding='utf-8'), re.M)}
+
+
 class Blinder:
     def __init__(self):
         self.game = game_functions()
         self.ok = audited()
+        self.again = rechecked()
 
     def hide(self, name):
         a = self.game.get(name)
-        return a is not None and name not in self.ok and not re.fullmatch(r'fn_[0-9A-F]{8}', name)
+        return a is not None and (name not in self.ok or a in self.again) and not re.fullmatch(r'fn_[0-9A-F]{8}', name)
 
     def __call__(self, text, own=None):
         code = strip_comments(text)

@@ -1,5 +1,5 @@
-// ScreenClear.c (our name): draws the screen as one flat colour (black, or the other colour when
-// asked) for one to thirty frames, e.g. to blank it between game states.
+// ScreenClear.c (our name): draws a black full-screen quad for one, two or thirty frames, e.g. to
+// blank the screen between game states.
 
 #include "game_types.h"
 #include "engine.h"

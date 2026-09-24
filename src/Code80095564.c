@@ -18,7 +18,7 @@ void fn_80095564(void) {
     }
 }
 
-// With a single view, makes nPlayer's golfer the only one whose body skin is loaded (bit 2 of its
+// With a single view, makes nPlayer's golfer the only one whose body skin is loaded (flag 2 of its
 // u10D4): if any golfer is the wrong way, the others' skins are freed and nPlayer's is loaded and
 // its matrices given to the model.
 void fn_800955F0(int nPlayer) {

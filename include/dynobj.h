@@ -450,7 +450,7 @@ void fn_80048894(UObject* pObj);
 void fn_80048F68(int nMsg, void* pArg, void* pArg2);     // sends nMsg to every object with id > 0
 
 // GoDynObjBase.c
-int  fn_80049820(int nMsg, DynObj* pObj, void* pArg, void* pArg2);  // type 0's handler, the others' default
+int  fn_80049820(int nMsg, DynObj* pObj, void* pArg, void* pArg2);  // type 0's handler, types 2/11's default
 DynObjHandler fn_800499B0(int nType);
 
 // GoDynObjTypes.c: the handlers of types 6 and 9.

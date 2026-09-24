@@ -58,8 +58,8 @@ u32 TibExtCurrentTimeGet(void) {
     s32 nDays;
 
     fn_8011E020(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
-    fn_800D2678(&uEpoch, 0, 0, 1970);
-    fn_800D2678(&uToday, nMonth, nDay, nYear);
+    CalDate_SetMDY(&uEpoch, 0, 0, 1970);
+    CalDate_SetMDY(&uToday, nMonth, nDay, nYear);
     nDays = uToday - uEpoch - 1;
     return nMinute * 60 + nHour * 3600 + nSecond + 86400 * nDays;
 }

@@ -1,5 +1,5 @@
 // GoDynObjBase.c (our name): the course's dynamic objects, type 0 and the types' table. Type 0's
-// message handler (fn_80049820) is also every other type's default; fn_800499B0 finds a type's
+// message handler (fn_80049820) is also types 2 and 11's default; fn_800499B0 finds a type's
 // handler. Type 2 is an object that turns at a steady speed.
 
 #include "dynobj.h"

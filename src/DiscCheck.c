@@ -113,7 +113,8 @@ s32 fn_8011027C(void) {
 }
 
 // Ask for the other disc and wait for it, keeping the screen and the game going. In game type 3
-// the menus' state machine is paused instead and fn_80110390 asks later.
+// the menu golfer's state machine (FEgolferanim.c) is sent back to state 1 and paused instead, and
+// fn_80110390 asks later.
 void fn_801102AC(void) {
     DVDDiskID id;
     DVDCommandBlock block;
@@ -151,8 +152,8 @@ void fn_801102AC(void) {
     } while (nStatus != 0);
 }
 
-// The disc change fn_801102AC left for later: ask for the other disc once the drive is idle
-// (not busy, waiting or with its cover open).
+// The disc change fn_801102AC left for later: ask for the other disc unless the drive status is
+// 1, 4 or 6 (busy, no disc, wrong disc in the SDK's numbering).
 void fn_80110390(void) {
     u8 nDisc;
     s32 nStatus;
@@ -192,7 +193,8 @@ int fn_80110460(void) {
     return lbl_802824D1;
 }
 
-// The disc in the drive: its disk number, or the one noted when the lists were read.
+// The disc in the drive: its disk number until the lists are read, then the one noted (at the
+// read and at each disc change asked for).
 int fn_80110468(void) {
     if (lbl_802824D2 == 0) {
         return DVDGetCurrentDiskID()->nDiskNumber;

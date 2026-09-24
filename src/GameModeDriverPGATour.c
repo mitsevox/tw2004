@@ -654,7 +654,7 @@ u8 GameModeDriverPGATour_GetEventByDate(u16 nDate, s32* pId, s32* pRound) {
     s32 nYear;
     s32 nSeason;
     u8 bFound;
-    fn_800D2714(&nDate, &nMonth, &nDay, &nYear);
+    CalDate_GetMDY(&nDate, &nMonth, &nDay, &nYear);
     bFound = 0;
     nSeason = nYear - 2004;
     if (nSeason >= 0 && nSeason < 10) {
@@ -812,7 +812,7 @@ u16 GameModeDriverPGATour_GetEndDate(s32 i) {
         return 0xFFFF;
     }
     nDate = p->aStartDate[GameModeDriverPGATour_GetCurrentSeason()];
-    fn_800D27CC(&nDate, GameModeDriverPGATour_GetRounds(i) - 1);
+    CalDate_AddDays(&nDate, GameModeDriverPGATour_GetRounds(i) - 1);
     return nDate;
 }
 

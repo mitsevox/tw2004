@@ -15,8 +15,8 @@ void fn_8006F4F0(void);
 void fn_8006F518(void);
 void fn_8006F5F8(void);
 
-// The hole loader's flags: [0] a hole has just been loaded (fn_8006F568 finishes it and clears
-// it), [1] a hole load is asked for (fn_8006F4B4 / fn_8006F4E0). The size is not known (2 to 8).
+// The hole loader's flags: [0] a hole is loaded (fn_8006F568 unloads it and clears the flag),
+// [1] a hole load is asked for (fn_8006F4B4 / fn_8006F4E0). The size is not known (2 to 8).
 u8 lbl_80281E68[2];
 u8* lbl_802811E8 = lbl_80281E68;
 
