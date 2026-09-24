@@ -229,6 +229,8 @@ void fn_800DA48C(int nPlayer) {
 // (or the shots closest to the pin), then the players with no result (distance -1). Each is named by
 // a CPU golfer's nickname ("NA": none, then the last name) or the player's profile name ("User n"
 // while no profile is loaded). The first is the winner. Not on the hole-in-one prize hole.
+// fake match: the (u32) casts on the player index; with a signed index the compiler walks one
+// pointer instead of keeping the array start and the offset apart (see GoTerrain fn_80032518).
 void fn_800DA6D0(void) {
     s32 aRank[5];               // per player: the place in the table, -1 not placed yet
     char szName[32];            // the stack frame gives 32 bytes; the real size is not known
