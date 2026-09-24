@@ -325,10 +325,10 @@ void fn_80012E54(f32* pColor, u8* pOut) {
     fG = 255.0f * pColor[1];
     fB = 255.0f * pColor[2];
     fA = 255.0f * pColor[3];
-    pOut[0] = fR;
-    pOut[1] = fG;
-    pOut[2] = fB;
-    pOut[3] = fA;
+    pOut[0] = (int)fR;
+    pOut[1] = (int)fG;
+    pOut[2] = (int)fB;
+    pOut[3] = (int)fA;
 }
 
 UFontContext* fn_80012EC4(void) {
