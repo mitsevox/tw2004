@@ -12,7 +12,6 @@
 void fn_80036054(ShaderObject* pObj, int nRow, const void* pDesc);  // Skin.c
 void fn_800360A0(ShaderObject* pObj);                               // Skin.c
 void fn_800360D4(ShaderObject* pObj);                               // Skin.c
-void fn_80036100(ShaderObject* pObj, const void* pData, int n);     // Skin.c
 void fn_800352BC(void);
 void PsBallFx_TriggerTrail(Ball* pBall, int nPlayer);   // below; Ball.c declares it too
 void fn_800A34C0(int n, Ball* pBall, f32* pDir);          // not yet decompiled

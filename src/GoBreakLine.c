@@ -12,7 +12,6 @@ u8 lbl_8028222C;
 void fn_80036054(void* pMesh, int n, s32* pDesc);    // Skin.c: sets up a mesh object
 void fn_800360A0(void* pMesh);         // Skin.c: frees a mesh object
 void fn_800360D4(u8* pMesh);           // Skin.c
-void fn_80036100(u8* pMesh, void* pDesc, int n);    // Skin.c
 void fn_800C9310(f32* pA, f32* pB, f32* pOut);
 void fn_800C9334(f32* pA, f32* pB, f32* pOut);
 void fn_800C9358(f32* pA, f32* pB, f32* pOut);
@@ -219,7 +218,7 @@ void BreakLine_Step(int nView) {
             desc.af18[3] = 1.0f / lbl_80282228->fAB18;
             nFrame = gSession.nFrameCount;
             fn_8003519C(5, &nFrame);
-            fn_80036100(lbl_80282228->aMesh[nView], &desc, 1);
+            fn_80036100((ShaderObject*)lbl_80282228->aMesh[nView], &desc, 1);
             fn_800360D4(lbl_80282228->aMesh[nView]);
         }
         fn_80012F50(1, 6, 0x80);

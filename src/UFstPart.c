@@ -11,7 +11,6 @@
 void fn_80036054(ShaderObject* pObj, int nRow, const void* pDesc);
 void fn_800360A0(ShaderObject* pObj);
 void fn_800360D4(ShaderObject* pObj);
-void fn_80036100(ShaderObject* pObj, const void* pData, int n);
 
 void fn_8000A194(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 f32  fn_800351D8(u32 n, f32 fPeriod);                   // GoTerrain.c

@@ -1,14 +1,24 @@
 // GoCamCont.c (TW06's golf/cameras/gocamcont.c; our spelling): the camera controller of each view
 // (View, TW06's CameraController): picking the camera mode (View_SetCamera), its idle state and the
-// small setters and tests the camera code uses. Not decompiled yet beyond the functions below.
+// small setters and tests the camera code uses.
 
 #include "golfer.h"
+#include "game.h"
 #include "camera.h"
+#include "unsorted/cull.h"
 
 u8   fn_800C72DC(View* pView);
 u8   fn_80063608(int nPlayer, f32* pPos, f32 fMargin);
 u8   fn_800637C4(int nPlayer, int nView);
 void fn_800642A4(View* pView, f32 fF0, f32 fF4);
+void fn_80064478(f32* pA, f32* pB, f32* pOut);
+void fn_800090E4(f32* pQuat, f32* pIn, f32* pOut);      // Quaternion.c: a vector turned by it
+void fn_80016CD8(int nView);                            // ViewController.c: sets the current view
+void fn_80045824(int n);                                // DepthField.c: turns depth-of-field layer n off
+void fn_800A6070(u8 nPlayer, u8 bLimit);                // GameAudio.c
+f32  fn_8005CC18(f32* pV);                              // Swing.c
+void fn_8006421C(View* pView);
+void fn_80064108(View* pView);
 
 // Sets a view up: no camera (25), no shots, the script cleared.
 void fn_80062E40(View* pView) {
@@ -63,6 +73,226 @@ void fn_80062F1C(View* pView) {
     pView->p80 = NULL;
     pView->p74 = NULL;
     pView->b268 = 0;
+}
+
+// The view's camera, every frame: runs the current mode's update (mode 25, no camera, only moves
+// the script), shakes the camera on the swing's events 5..14, and keeps its v20 nonzero.
+void CameraController_Idle(View* pView, int nPlayer) {
+    int i;
+    int nMove;
+
+    if (pView->nCurCamera != 2) {
+        pView->v20[0] = 0.0f;
+        pView->v20[1] = 0.0f;
+        pView->v20[2] = 0.0f;
+        pView->v20[3] = 0.0f;
+    }
+    switch (pView->nCurCamera) {
+    case 10:
+        fn_800C0914(pView, nPlayer);
+        break;
+    case 0:
+        fn_800BDBA4(pView, nPlayer);
+        break;
+    case 11:
+        fn_800C0C0C(pView, nPlayer);
+        break;
+    case 1:
+        GolfCamera_ProcessZoomToAimCamera(pView, nPlayer);
+        break;
+    case 2:
+        GolfCamera_ProcessGreenZoomToAimCamera(pView, nPlayer);
+        break;
+    case 3:
+        fn_800BF094(pView, nPlayer);
+        break;
+    case 4:
+        fn_800BFE00(pView, nPlayer);
+        break;
+    case 5:
+        fn_800C0414(pView, nPlayer);
+        break;
+    case 6:
+        fn_800C06C8(pView, nPlayer);
+        break;
+    case 7:
+        fn_800C0804(pView, nPlayer);
+        break;
+    case 8:
+        fn_800BF184(pView, nPlayer);
+        break;
+    case 9:
+        fn_800BF658(pView, nPlayer);
+        break;
+    case 12:
+        fn_800C1338(pView, nPlayer);
+        break;
+    case 13:
+        fn_800C1530(pView, nPlayer);
+        break;
+    case 14:
+        GolfCamera_ProcessBallFlightCamera(pView, nPlayer);
+        break;
+    case 15:
+        GolfCamera_ProcessPostShotCamera(pView, nPlayer);
+        break;
+    case 16:
+        GolfCamera_ProcessInHoleCamera(pView, nPlayer);
+        break;
+    case 17:
+        fn_800C34F8(pView, nPlayer);
+        break;
+    case 18:
+        fn_800C37FC(pView, nPlayer);
+        break;
+    case 23:
+        fn_800C39A8(pView, nPlayer);
+        break;
+    case 24:
+        fn_800C3EDC(pView, nPlayer);
+        break;
+    case 19:
+        GolfCamera_ProcessSteepSlopeCamera(pView, nPlayer);
+        break;
+    case 20:
+        fn_800C16C4(pView, nPlayer);
+        break;
+    case 21:
+        GolfCamera_ProcessHeartBeatCamera(pView, nPlayer);
+        break;
+    case 22:
+        fn_800C1D3C(pView, nPlayer);
+        break;
+    case 25:
+        nMove = pView->script.nCamera;
+        if (gSession.nPaused == 0) {
+            fn_8003F2E0(&pView->script, FRAME_TIME);   // port: one NTSC frame a call, not gSession.fFrameTime
+            // A move of kind 4 that has just ended stays on.
+            if (nMove == 4 && pView->script.nCamera == 0) {
+                pView->script.nCamera = 4;
+            }
+            pView->script.f90 += FRAME_TIME;
+        }
+        break;
+    }
+    if (gPlayers[nPlayer].pChar != NULL && gSession.nGameType != 3) {
+        for (i = 0; i <= 9; i++) {
+            if (fn_80048574(gPlayers[nPlayer].pChar, i + 5) && fn_80062BB0(gPlayers[nPlayer].pChar, i + 5)) {
+                fn_80062B98(gPlayers[nPlayer].pChar, i + 5);
+                fn_800642A4(pView, lbl_80281F78->f204, lbl_80281F78->f200);
+                fn_800A6070(nPlayer, 0);
+            }
+        }
+    }
+    if (pView->script.fF0 > 0.0f && gSession.fFrameTime > 0.0f) {
+        fn_8006421C(pView);
+        pView->script.fF0 -= gSession.fFrameTime;
+    }
+    if ((f32)fn_80009680(fn_8005CC18(pView->v20)) == 0.0f) {
+        fn_80064108(pView);
+        if ((f32)fn_80009680(fn_8005CC18(pView->v20)) == 0.0f) {
+            pView->v20[0] = 1.0f;
+            pView->v20[1] = 0.0f;
+            pView->v20[2] = 0.0f;
+        }
+    }
+    if (pView->bFade) {
+        pView->fFade += gSession.fFrameTime;
+    }
+}
+
+// Switches the view to camera mode nCamera for the player (TW06's CameraController_SetCameraMode):
+// the mode's setup runs with nView as the current view.
+void View_SetCamera(View* pView, int nCamera, int nPlayer, int nView) {
+    int nPrevView;
+
+    fn_8001731C(pView);
+    fn_80017314(pView);
+    if (pView->nCurCamera == nCamera) {
+        return;
+    }
+    nPrevView = fn_80016D10();
+    fn_80016CD8(nView);
+    switch (nCamera) {
+    case 10:
+        fn_800C0880(pView, nPlayer);
+        break;
+    case 0:
+        fn_800BDA30(pView, nPlayer);
+        break;
+    case 11:
+        GolfCamera_InitPreShotCamera(pView, nPlayer);
+        break;
+    case 1:
+        GolfCamera_InitZoomToAimCamera(pView, nPlayer);
+        break;
+    case 2:
+        GolfCamera_InitGreenZoomToAimCamera(pView, nPlayer);
+        break;
+    case 3:
+        GolfCamera_InitElevatorCamera(pView, nPlayer);
+        break;
+    case 8:
+        fn_800BF110(pView, nPlayer);
+        break;
+    case 9:
+        fn_800BF5E4(pView, nPlayer);
+        break;
+    case 4:
+        fn_800BFC80(pView, nPlayer);
+        break;
+    case 5:
+        fn_800C0364(pView, nPlayer);
+        break;
+    case 6:
+        fn_800C0624(pView, nPlayer);
+        break;
+    case 7:
+        fn_800C0744(pView, nPlayer);
+        break;
+    case 12:
+        GolfCamera_InitSwingCamera(pView, nPlayer);
+        break;
+    case 13:
+        fn_800C14B0(pView, nPlayer);
+        break;
+    case 14:
+        GolfCamera_InitBallFlightCamera(pView, nPlayer);
+        break;
+    case 15:
+        GolfCamera_InitPostShotCamera(pView, nPlayer);
+        break;
+    case 16:
+        GolfCamera_InitInHoleCamera(pView, nPlayer);
+        break;
+    case 17:
+        fn_800C3478(pView, nPlayer);
+        break;
+    case 18:
+        GolfCamera_InitTutorialWaitCamera(pView, nPlayer);
+        break;
+    case 23:
+        fn_800C38BC(pView, nPlayer);
+        break;
+    case 24:
+        fn_800C3EB8(pView, nPlayer);
+        break;
+    case 19:
+        GolfCamera_InitSteepSlopeCamera(pView, nPlayer);
+        break;
+    case 20:
+        fn_800C1670(pView, nPlayer);
+        break;
+    case 21:
+        GolfCamera_InitHeartBeatCamera(pView, nPlayer);
+        break;
+    case 22:
+        GolfCamera_InitShutterCamera(pView, nPlayer);
+        break;
+    }
+    pView->nCurCamera = nCamera;
+    fn_80045824(nPlayer);
+    fn_80016CD8(nPrevView);
 }
 
 // Starts the player's shot of kind nKind on the view and runs its script from the start.
@@ -168,6 +398,77 @@ void fn_800638B8(View* pView, int nPlayer) {
     }
 }
 
+// The view's camera is inside the object at pBounds: while the ball is in flight, with a current
+// shot whose bAD is not 3 (or none) and no next shot, 0.5 or more into its shot, a camera that moves
+// toward the object, not too fast, while looking toward it goes back on the fairway. Directions
+// are taken flat.
+void fn_80063920(int nView, f32* pBounds) {
+    View* pView = fn_80017028(nView);
+    int nPlayer = fn_8001707C(nView);
+    f32 vObj[4];
+    f32 vToObj[4];
+    f32 vLook[4];
+    f32 vMove[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    f32* pPos;
+    f32* pAt;
+    f32 fSpeed;
+    f32 fMoveCos;
+    f32 fLookCos;
+
+    if (pView == NULL) {
+        return;
+    }
+    if (!gpGame->b289) {
+        return;
+    }
+    pPos = fn_8001731C(pView);
+    pAt = fn_80017314(pView);
+    if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_SIMULATE) {   // fake match: (s8), see game.h
+        return;
+    }
+    if (pView->script.pShot != NULL && pView->script.pShot->bAD == 3) {
+        return;
+    }
+    if (pView->script.pNextShot != NULL) {
+        return;
+    }
+    if (pView->script.fCamTime < 0.5f) {
+        return;
+    }
+    vObj[0] = pBounds[0];
+    vObj[1] = 0.0f;
+    vObj[2] = pBounds[2];
+    vMove[0] = pView->script.v60[0];
+    vMove[1] = 0.0f;
+    vMove[2] = pView->script.v60[2];
+    fSpeed = fn_80009680(fn_80009744(vMove));
+    fn_80064478(vObj, pPos, vToObj);
+    vToObj[1] = 0.0f;
+    if (vToObj[0] != 0.0f || vToObj[1] != 0.0f || vToObj[2] != 0.0f) {
+        fn_800BAF04(vToObj, vToObj);
+    }
+    if (vMove[0] != 0.0f || vMove[1] != 0.0f || vMove[2] != 0.0f) {
+        fn_800BAF04(vMove, vMove);
+    }
+    fMoveCos = fn_8000C5FC(vMove, vToObj);
+    fn_80064478(pAt, pPos, vLook);
+    vLook[1] = 0.0f;
+    if (vLook[0] != 0.0f || vLook[1] != 0.0f || vLook[2] != 0.0f) {
+        fn_800BAF04(vLook, vLook);
+    }
+    fLookCos = fn_8000C5FC(vLook, vToObj);
+    if (fSpeed <= 0.0f) {
+        return;
+    }
+    if (fSpeed > lbl_80281F78->f1BC) {
+        return;
+    }
+    if (fMoveCos < lbl_80281F78->f1B4 || fLookCos < lbl_80281F78->f1B8) {
+        return;
+    }
+    CamScript_PutBackOnFairway(&pView->script, pPos, pAt, nPlayer, &pView->shot19C, pPos);
+}
+
 // Camera 2 on the point pVec, over fTime.
 void fn_80063B98(View* pView, f32 fTime, f32* pVec) {
     pView->script.nCamera = 2;
@@ -207,6 +508,129 @@ void fn_80063CBC(View* pView, f32* pVec) {
     Vec_Copy(pVec, pView->script.v40);
 }
 
+// Asks for shot kind nKind on the player's view. With club 25 only kinds 0, 5, 8, 11 and 23 are
+// taken. Kind 12 first records the current camera and blends from it into the player's kind 12
+// shot; kind 7 becomes 10 when the ball lies on surface class 7 or 16. While kind 12 is asked for
+// only 5, 8 and 10 replace it, 6 is never taken, 2 and 3 do not replace 7, and 7 does not replace
+// 2 or 3.
+void fn_80063CF0(View* pView, int nKind, int nPlayer) {
+    f32* pPos = fn_8001731C(pView);
+    f32* pAt = fn_80017314(pView);
+    f32 vNormal[4];
+    f32 vSpeed[4] = {0.1f, 0.1f, 0.1f, 0.5f};
+    SurfaceType* pSurface;
+    CamShot* pShot;
+    int nAsked;
+
+    if (gPlayers[nPlayer].nClub == 25 && nKind != 0 && nKind != 8 && nKind != 5 && nKind != 11
+        && nKind != 23) {
+        return;
+    }
+    if (nKind == 12 && pView->script.nC4 != 12) {
+        pShot = fn_8003A7C8(nPlayer, 12, NULL);
+        if (pShot != NULL) {
+            CameraScript_RecordCurrentCam(&pView->shot19C, pPos, pAt, nPlayer, &pView->script, 0);
+            pView->shot19C.p40 = pShot;
+            CameraScript_InterpToNewScript(&pView->script, &pView->shot19C, nPlayer, pPos, pAt, 5, 0.0f,
+                                           100.0f, 25, 0.0f);
+            pView->script.nBC = 5;
+            pView->script.f8C = 0.3f;
+            fn_80063BF4(pView, 0.3f, vSpeed);
+        }
+    }
+    if (nKind == 7) {
+        if (!(fn_8004DBB0(fn_8000C594(), gPlayers[nPlayer].ball.vPos, &pSurface, vNormal) < -60000.0f)
+            && pSurface != NULL && (pSurface->nClass == 7 || pSurface->nClass == 16)) {
+            nKind = 10;
+        }
+    }
+    nAsked = pView->script.nC4;
+    if (nAsked == 12 && nKind != 8 && nKind != 5 && nKind != 6 && nKind != 10) {
+        return;
+    }
+    if (nKind == 6) {
+        return;
+    }
+    if (nKind == 3 || nKind == 2) {
+        if (nAsked != 7) {
+            pView->script.nC4 = nKind;
+        }
+    } else if (nKind == 7) {
+        if (nAsked != 3 && nAsked != 2) {
+            pView->script.nC4 = nKind;
+        }
+    } else {
+        pView->script.nC4 = nKind;
+    }
+}
+
+// Turns pA a fifth of the way towards pB (both taken as directions) into pOut; while the game is
+// paused pA is copied unchanged.
+void fn_80063F08(f32* pA, f32* pB, f32* pOut) {
+    f32 qTurn[4];
+    f32 vAxis[4];
+    f32 vA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    f32 vB[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    f32 fAngle;
+
+    if (gSession.nPaused != 0) {
+        Vec3Copy(pA, pOut);
+        return;
+    }
+    if (pA[0] != 0.0f || pA[1] != 0.0f || pA[2] != 0.0f) {
+        fn_800BAF04(pA, vA);
+    } else {
+        vA[0] = 0.0f;
+        vA[1] = 0.0f;
+        vA[2] = 0.0f;
+    }
+    if (pB[0] != 0.0f || pB[1] != 0.0f || pB[2] != 0.0f) {
+        fn_800BAF04(pB, vB);
+    } else {
+        vB[0] = 0.0f;
+        vB[1] = 0.0f;
+        vB[2] = 0.0f;
+    }
+    fAngle = fn_80009614(fn_8000C5FC(vA, vB) < -1.0f  ? -1.0f
+                         : fn_8000C5FC(vA, vB) > 1.0f ? 1.0f
+                                                      : fn_8000C5FC(vA, vB));
+    fAngle *= 0.2f;
+    vec4flt_CrossProduct(vA, vB, vAxis);
+    if (vAxis[0] != 0.0f || vAxis[1] != 0.0f || vAxis[2] != 0.0f) {
+        fn_800BAF04(vAxis, vAxis);
+    }
+    fn_8001EF34(vAxis, fAngle, vAxis);
+    fn_8000923C(vAxis, qTurn);
+    vA[3] = 0.0f;
+    fn_800090E4(qTurn, vA, pOut);
+}
+
+// The view's v20: the side vector of its flat look direction, turned about that direction by the
+// current shot's fA8 (0 without a shot).
+void fn_80064108(View* pView) {
+    f32 vDir[4];
+    f32 vUp[4] = {0.0f, 1.0f, 0.0f, 0.0f};
+    f32 vSide[4];
+    f32 qTurn[4];
+
+    fn_80064478(pView->v10, pView->v0, vDir);
+    vDir[1] = 0.0f;
+    if (vDir[0] == 0.0f && vDir[2] == 0.0f) {
+        vDir[0] = 0.01f;
+    }
+    if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
+        fn_800BAF04(vDir, vDir);
+    }
+    vec4flt_CrossProduct(vUp, vDir, vSide);
+    if (pView->script.pShot == NULL) {
+        pView->script.fA8 = 0.0f;
+    }
+    fn_8001EF34(vDir, pView->script.fA8, vDir);
+    fn_8000923C(vDir, qTurn);
+    vSide[3] = 0.0f;
+    fn_800090E4(qTurn, vSide, pView->v20);
+}
+
 // Shakes the camera: moves its position by up to half of the script's fF4 each way.
 void fn_8006421C(View* pView) {
     pView->v0[0] += pView->script.fF4 * (Rand_Float(0) - 0.5f);
@@ -229,6 +653,36 @@ void fn_800642D0(View* pView, int nPlayer) {
 
     CameraScript_InterpToNewScript(&pView->script, pView->script.pShot, nPlayer, pPos, fn_80017314(pView), 5,
                                    0.0f, 100.0f, 25, 0.0f);
+}
+
+// Puts the point pPos through the camera onto the screen: pX and pY from 0 to 1 across it, pZ its
+// depth. 0 when the point is behind the camera.
+u8 fn_8006434C(void* pCamera, f32* pPos, f32* pX, f32* pY, f32* pZ) {
+    f32 v[4];
+    u8 bInFront = 1;
+
+    pPos[3] = 1.0f;
+    fn_800BAD60(((Camera*)pCamera)->mDC, (Vec4*)pPos, (Vec4*)v);
+    if (v[3] >= 0.0f) {
+        bInFront = 0;
+    }
+    if (v[3] < -0.0001f || v[3] > 0.0001f) {
+        fn_8000AE28(v, 1.0f / v[3], v);
+    } else if (v[3] < 0.0f) {
+        fn_8000AE28(v, -10000.0f, v);
+    } else {
+        fn_8000AE28(v, 10000.0f, v);
+    }
+    if (pX != NULL) {
+        *pX = 0.5f * (1.0f + v[0]);
+    }
+    if (pY != NULL) {
+        *pY = 0.5f * (1.0f + v[1]);
+    }
+    if (pZ != NULL) {
+        *pZ = v[2];
+    }
+    return bInFront;
 }
 
 // a - b into out, three floats; the same helper as Ball.c's fn_80055EA0.
