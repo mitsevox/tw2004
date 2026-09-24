@@ -82,7 +82,7 @@ u8    fn_800D4010(int nId);
 f32   fn_800D6EEC(void);
 u8    fn_800D748C(int nPlayer);
 u8    fn_800D76AC(int nPlayer, int nAward);
-int   fn_800D7DA0(int nPlayer, u8 a, u8 b, u8 c);
+int   fn_800D7DA0(int nPlayer, int bSave, u8 bCountStroke, u8 bAll);
 s32   fn_800D9E00(s32 i);
 
 // Put the working tables back to their saved copies.
@@ -1512,6 +1512,126 @@ int fn_800D7B1C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll) {
         if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
             lbl_80200470[lbl_80282258] = nResult;
             lbl_802004E8[lbl_80282258] = 2;
+            lbl_80282258++;
+        }
+    }
+    if (bCountStroke) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]--;
+    }
+    return lbl_80282258;
+}
+
+// After a hole, the round records as fn_800D782C checks the drive: mode 22's (kind 9), the
+// fn_800E39F0 rounds' (kind 8), or the score (0), fn_800D1170's (3) and fn_800D0FBC's (5) counts,
+// the holes under par (7) and at two under or better (6) and the putts (4). bCountStroke counts
+// the hole one stroke more meanwhile; the results go to lbl_80200448/lbl_802004C0 as there.
+int fn_800D7DA0(int nPlayer, int bSave, u8 bCountStroke, u8 bAll) {
+    char szName[32];
+    int nProfile;
+    int nResult;
+    int i;
+    int nValue;
+
+    lbl_80282258 = 0;
+    if (gSession.uFlags & 0x4000) return 0;
+    if (Player_IsCPU(nPlayer)) return 0;
+    if (Game_GetMode() == 12) return 0;
+    if (fn_800E177C() != 0) return 0;
+    nProfile = gPlayers[nPlayer].nIndex;
+    if (gpSaveData[nProfile].bActive == 0) return 0;
+    if (lbl_801D7148.aLoaded[nProfile] == 0) {
+        sprintf(szName, "User %d", nProfile + 1);
+    } else {
+        strcpy(szName, gpSaveData[nProfile].szName);
+    }
+    if (Game_GetMode() == 22) {
+        if (fn_800D8DB4(9)) {
+            nResult = fn_800D8750(9, gPlayers[nPlayer].nEBC, bSave, szName, nPlayer);
+            if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
+                lbl_80200448[lbl_80282258] = nResult;
+                lbl_802004C0[lbl_80282258] = 9;
+                lbl_80282258++;
+            }
+        }
+        return lbl_80282258;
+    }
+    if (fn_800E39F0()) {
+        if (fn_800D8DB4(8)) {
+            nResult = fn_800D8750(8, gPlayers[nPlayer].nDD8, bSave, szName, nPlayer);
+            if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
+                lbl_80200448[lbl_80282258] = nResult;
+                lbl_802004C0[lbl_80282258] = 8;
+                lbl_80282258++;
+            }
+        }
+        return lbl_80282258;
+    }
+    if (gpGame->b137) return 0;
+    if (bCountStroke) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]++;
+    }
+    nValue = fn_800E17AC(nPlayer);
+    if (fn_800D8DB4(0)) {
+        nResult = fn_800D8750(0, nValue, bSave, szName, nPlayer);
+        if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
+            lbl_80200448[lbl_80282258] = nResult;
+            lbl_802004C0[lbl_80282258] = 0;
+            lbl_80282258++;
+        }
+    }
+    if (fn_800D8DB4(3)) {
+        nResult = fn_800D8750(3, fn_800D1170(nPlayer, 0), bSave, szName, nPlayer);
+        if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
+            lbl_80200448[lbl_80282258] = nResult;
+            lbl_802004C0[lbl_80282258] = 3;
+            lbl_80282258++;
+        }
+    }
+    if (fn_800D8DB4(5)) {
+        nResult = fn_800D8750(5, fn_800D0FBC(nPlayer), bSave, szName, nPlayer);
+        if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
+            lbl_80200448[lbl_80282258] = nResult;
+            lbl_802004C0[lbl_80282258] = 5;
+            lbl_80282258++;
+        }
+    }
+    nValue = 0;
+    for (i = 0; i < 18; i++) {
+        if (gPlayers[nPlayer].nStrokes[i] <= fn_800D2AD8(i) - 1) {
+            nValue++;
+        }
+    }
+    if (fn_800D8DB4(7)) {
+        nResult = fn_800D8750(7, nValue, bSave, szName, nPlayer);
+        if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
+            lbl_80200448[lbl_80282258] = nResult;
+            lbl_802004C0[lbl_80282258] = 7;
+            lbl_80282258++;
+        }
+    }
+    nValue = 0;
+    for (i = 0; i < 18; i++) {
+        if (gPlayers[nPlayer].nStrokes[i] < fn_800D2AD8(i) - 1) {
+            nValue++;
+        }
+    }
+    if (fn_800D8DB4(6)) {
+        nResult = fn_800D8750(6, nValue, bSave, szName, nPlayer);
+        if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
+            lbl_80200448[lbl_80282258] = nResult;
+            lbl_802004C0[lbl_80282258] = 6;
+            lbl_80282258++;
+        }
+    }
+    nValue = 0;
+    for (i = 0; i < 18; i++) {
+        nValue += gPlayers[nPlayer].nPutts[i];
+    }
+    if (fn_800D8DB4(4)) {
+        nResult = fn_800D8750(4, nValue, bSave, szName, nPlayer);
+        if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
+            lbl_80200448[lbl_80282258] = nResult;
+            lbl_802004C0[lbl_80282258] = 4;
             lbl_80282258++;
         }
     }
