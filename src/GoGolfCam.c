@@ -465,7 +465,7 @@ void GolfCamera_InitGreenZoomToAimCamera(View* pView, int nPlayer) {
             fn_800C73B8(pCam, vDir, pSub);
         }
         EVENT_Trigger(nPlayer, 0x30, NULL, -1);
-        Vec3Copy(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0]))->v4, pView->v20);
+        Vec3Copy(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0]))->m4[0], pView->v20);
     }
 }
 

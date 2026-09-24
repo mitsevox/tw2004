@@ -586,7 +586,7 @@ void fn_8004731C(u8* pState) {
                 fn_8000914C(gPlayers[i].vOrient, pLogoB->m0);
             }
         }
-        fDist = fn_800BB028(fn_8001F004()->v34, gPlayers[i].ball.vPos);
+        fDist = fn_800BB028(fn_8001F004()->m4[3], gPlayers[i].ball.vPos);
         if (fDist > 2500.0f) {
             fn_80048584(pBall, 2);
             if (pLogoA != NULL) {

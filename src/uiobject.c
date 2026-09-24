@@ -32,8 +32,6 @@ void fn_800082CC(UObjMeshPart* pPart);
 void fn_8003612C(LightGroup* pGroup);   // Skin.c: load the group's lights (fn_8006E7A4)
 void fn_8006EADC(UObject* pObj);        // GoLighting.c: light the object
 void fn_8006ED70(void);                 // GoLighting.c
-void fn_80035098(u8 b);                 // GoTerrain.c: renderer state
-void fn_80035154(u8 b);                 // GoTerrain.c: renderer state
 void fn_80035294(void);                 // GoTerrain.c
 
 // Set up the objects: their settings, lens, textures and one directional light.

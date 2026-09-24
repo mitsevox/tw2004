@@ -7,18 +7,12 @@
 #include "game.h"
 
 f32  fn_800D04AC(int nPlayer);
-f32  fn_800D04E0(int nPlayer);
-int  fn_800D0514(int nPlayer);
 f32  fn_800D05A4(f32* pPos);
 u32  fn_800D0BAC(int nPlayer);
 u8   fn_800D0D54(int nPlayer);
 int  fn_800D0DC8(int nPlayer, int nToPar);
 int  fn_800D0E74(int nPlayer);
 int  fn_800D0F04(int nPlayer, int nToPar);
-int  fn_800D0FBC(int nPlayer);
-int  fn_800D10B0(int nPlayer);
-int  fn_800D1170(int nPlayer, u8 bOnlyFlagged);
-int  fn_800D1250(int nPlayer);
 int  fn_800D1330(int nPlayer);
 void fn_800D1674(f32* pA, f32* pB, f32* pOut);
 void fn_800C8C3C(int nView, f32* pOut);   // GoBreakLine: a point kept per view

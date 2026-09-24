@@ -439,7 +439,7 @@ EASBErrorE fn_8012DAB8(u16 uLevel) {
 // Adds an accomplishment to this game's record, in the first free entry. With none free, the
 // entries and the new one are sorted (by u86, then all but the first five by time) and the one
 // that comes last is replaced, unless that is the new one.
-EASBErrorE fn_8012DB30(u16* szName, u32 uValue, u16 uLanguage, u32 uTime) {
+EASBErrorE fn_8012DB30(const u16* szName, u32 uValue, u16 uLanguage, u32 uTime) {
     EASBAccomplishment newAccomplishment;
     EASBAccomplishment* apList[EASB_MAX_ACCOMPLISHMENTS + 1];
     EASBAccomplishment* pSlot;

@@ -13,7 +13,6 @@ u8 lbl_80281F19;
 u8 lbl_80281F1A;                // set: fn_8008FD60 passes events to the UI
 u8 lbl_80281F1B;
 
-void fn_800B1D3C(s32 nCmd, s32 a, s32 b);
 void fn_8008F80C(s32 p0, s32 p1);
 s32 fn_80092BC4();
 s32 fn_800934F8();
@@ -80,10 +79,10 @@ void fn_8008F488(FrontEnd* pFE) {
 // Pass a UI command to the part of the game that is running: by the session's game type,
 // start-up (1), the menus (3) or a round (4 to 8).
 void fn_8008F568(s32 nCmd, s32 unused1, s32 unused2, s32 unused3, s32 a, s32 b) {
-    if (gSession.nGameType == 1) {
-        fn_800B1D3C(nCmd, a, b);
-    }
     // port: the studio passes the addresses of the command's values and answer as 32-bit words
+    if (gSession.nGameType == 1) {
+        fn_800B1D3C(nCmd, (MsgArg*)a, (MsgArg*)b);
+    }
     if (gSession.nGameType == 3) {
         fn_80079E6C(nCmd, (MsgArg*)a, (MsgArg*)b);
     } else if (gSession.nGameType >= 4 && gSession.nGameType <= 8) {
