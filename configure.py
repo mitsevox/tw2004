@@ -943,7 +943,7 @@ config.libs = [
             Object(NonMatching, "hlaudmovie.c"),
             Object(NonMatching, "hlaudtrackstm.c"),
             Object(Matching, "UAudContainers.c"),
-            Object(NonMatching, "uiobject.c"),
+            Object(Matching, "uiobject.c"),
             Object(NonMatching, "startUp.c"),
             Object(NonMatching, "shadow.c"),
             Object(NonMatching, "GoComicCam.c"),
