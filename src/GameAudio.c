@@ -977,8 +977,8 @@ void fn_800A4CB8(GameAudioSource** ppSource, int n) {
 void fn_800A4E34(void) {
     f32 vPos[3];
 
-    lbl_80281419 = 0xFF;
     lbl_8028203C = 0;
+    lbl_80281419 = 0xFF;
     lbl_8028141A = 0xFF;
     lbl_80281418 = 0xFF;
     if (lbl_80282028 == 0) {
@@ -1189,7 +1189,7 @@ void fn_800A573C(u8 nPlayer) {
     Player* pPlayer;
     GameAudioView* pView;
     u8 nId;
-    s32 nState;
+    int nState;
     f32 fSpeed;
     f32 fPitch;
     f32 fVolume;
