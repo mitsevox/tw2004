@@ -124,7 +124,7 @@ void fn_801217C4(MsgArg* pArgs, MsgArg* pResult) {
 
 // The angle, in degrees, from one point to another (x0, y0, x1, y1; y grows downwards).
 void fn_80121808(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->f = (180.0f / PI) * fn_8000AD78(pArgs[2].f - pArgs[0].f, -(pArgs[3].f - pArgs[1].f));
+    pResult->f = (180.0f / PI) * atan2f(pArgs[2].f - pArgs[0].f, -(pArgs[3].f - pArgs[1].f));
 }
 
 void fn_8012185C(MsgArg* pArgs, MsgArg* pResult) {

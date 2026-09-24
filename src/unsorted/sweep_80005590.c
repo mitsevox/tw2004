@@ -11,7 +11,7 @@ void fn_8000AF58();
 void fn_80013030();
 void fn_80014590();
 void fn_800B5C34();
-void fn_800B64D8();
+void GoARAM_Shutdown();
 
 void fn_80005590(void);
 void fn_80005590(void) {
@@ -22,7 +22,7 @@ void fn_80005590(void) {
     fn_80013030();
     fn_8000977C();
     fn_8000AF58();
-    fn_800B64D8();
+    GoARAM_Shutdown();
     fn_800B5C34();
     fn_800055D4();
 }

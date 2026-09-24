@@ -41,11 +41,11 @@ void fn_8001FC0C(u16* pPacked, f32* aRange, f32* pOut) {
 
 // Starts copying uSize bytes from ARAM address uAram to pDst; fn_8001FCD4 waits for it.
 ARAMTransfer* fn_8001FCA8(u32 uAram, void* pDst, u32 uSize) {
-    return fn_800B68B4(pDst, uAram, uSize);
+    return GoARAM_CopyFromAram(pDst, uAram, uSize);
 }
 
 void fn_8001FCD4(ARAMTransfer* pTransfer) {
-    fn_800B67EC(pTransfer);
+    GoARAM_WaitTransfer(pTransfer);
 }
 
 void fn_80021134(u16* pFrame, f32* pOut, s32 nBones, u32* pBits);

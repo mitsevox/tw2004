@@ -106,10 +106,10 @@ void fn_8008EEB8(UStreamObject* pObject) {
     if (strcmp(lbl_80281F10, "frontend") == 0) {
         if (lbl_80281EF4 == 0) {
             lbl_80281EF4 = ((pObject->uSize >> 5) + 1) << 5;
-            lbl_80281EF0 = fn_800B6564(lbl_80281EF4);
+            lbl_80281EF0 = GoARAM_Alloc(lbl_80281EF4);
         }
         if (lbl_80281360) {
-            fn_800B67EC(fn_800B6844(pObject->pData, lbl_80281EF0, lbl_80281EF4));
+            GoARAM_WaitTransfer(GoARAM_CopyToAram(pObject->pData, lbl_80281EF0, lbl_80281EF4));
             pData = fn_80009B34(pObject->uSize, 1, 32, "uiLoadFile.c", 247);
             lbl_80281360 = 0;
         } else {
@@ -231,7 +231,7 @@ void fn_8008F294(void) {
 
     if (lbl_80281F1C->pC == NULL) {
         pData = fn_80009B34(lbl_80281EF4, 1, 32, "uiLoadFile.c", 585);
-        fn_800B67EC(fn_800B68B4(pData, lbl_80281EF0, lbl_80281EF4));
+        GoARAM_WaitTransfer(GoARAM_CopyFromAram(pData, lbl_80281EF0, lbl_80281EF4));
         fn_8008EFC0(pData);
         lbl_80281F1C->pC = lbl_80281F04;
         fn_80090898();
@@ -240,8 +240,8 @@ void fn_8008F294(void) {
 
 // Park the UI file's data in ARAM (the main memory copy stays allocated).
 void fn_8008F310(void) {
-    lbl_80281EF8 = fn_800B6564(lbl_80281EFC);
-    fn_800B67EC(fn_800B6844(lbl_80281F0C, lbl_80281EF8, lbl_80281EFC));
+    lbl_80281EF8 = GoARAM_Alloc(lbl_80281EFC);
+    GoARAM_WaitTransfer(GoARAM_CopyToAram(lbl_80281F0C, lbl_80281EF8, lbl_80281EFC));
     lbl_80281F00 = 1;
 }
 
@@ -252,6 +252,6 @@ void* fn_8008F354(void) {
 // Bring the UI file's data back from ARAM and free the ARAM.
 void fn_8008F35C(void) {
     lbl_80281F00 = 0;
-    fn_800B67EC(fn_800B68B4(lbl_80281F0C, lbl_80281EF8, lbl_80281EFC));
-    fn_800B6594(lbl_80281EF8);
+    GoARAM_WaitTransfer(GoARAM_CopyFromAram(lbl_80281F0C, lbl_80281EF8, lbl_80281EFC));
+    GoARAM_Free(lbl_80281EF8);
 }

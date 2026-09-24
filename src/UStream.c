@@ -57,7 +57,7 @@ int gnNumHandlers = -1;           // 0x80280DB8 (.sdata): -1 until UStream_Init
 
 // ---- other files' functions -----------------------------------------------------------
 
-void  fn_8007593C(void* pChunk);                             // MPG2
+void  LLVideo_HandleChunk(void* pChunk);                             // MPG2
 void  fn_800A8AD4(void* pChunk);                             // DSPM / VAGM / XADP
 void* fn_800A8FB4(u32 uSize, int nMemory);
 void  fn_800A8FFC(u32 uMemory);
@@ -261,7 +261,7 @@ static void UStream_FinishObject(UStreamObject* pObject) {
     UStreamNode* pNode;
     UStreamNode* p;
     if (gnCurStream == -1) return;
-    pNode = fn_8000B078(gpNodePool);
+    pNode = UMemPool_Alloc(gpNodePool);
     if (pNode == NULL) return;
     pNode->pNext = NULL;
     pNode->pObject = pObject;
@@ -608,7 +608,7 @@ static void UStream_ParseChunks(void) {
                 pBuffer->nRefs++;
                 // port: the movie player gets its buffer through the chunk's first word (a 32-bit pointer)
                 *(UStreamBuffer**)pChunk = pBuffer;
-                fn_8007593C(pChunk);
+                LLVideo_HandleChunk(pChunk);
                 break;
             case TAG('C', 'T', 'R', 'L'):
             case TAG('P', 'A', 'D', 'D'):
@@ -677,7 +677,7 @@ static UStreamObject* UStream_NextObject(u8 bParse) {
     if (pNode == NULL) return NULL;
     pObject = pNode->pObject;
     gpDoneList = pNode->pNext;
-    fn_8000B0D4(gpNodePool, pNode);
+    UMemPool_Free(gpNodePool, pNode);
     return pObject;
 }
 
@@ -826,7 +826,7 @@ void UStream_CloseAll(void) {
         pStream->hFile = -1;
     }
     if (gpNodePool != NULL) {
-        fn_8000B058(gpNodePool);
+        UMemPool_Destroy(gpNodePool);
         gpNodePool = NULL;
     }
 }
@@ -977,7 +977,7 @@ void UStream_Init(void) {
     gpUsedList = NULL;
     gFill.pObject = NULL;
     gpDoneList = NULL;
-    gpNodePool = fn_8000AFA0(0x200, 8, 1, 0x10);
+    gpNodePool = UMemPool_Create(0x200, 8, 1, 0x10);
     gnNumStreams = 0;
     gnNumHandlers = 0;
     for (i = 0; i < USTREAM_MAX_HANDLERS; i++) {

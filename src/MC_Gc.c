@@ -47,7 +47,7 @@ void fn_8009CB9C(s32 nPort, s32 nSlot, s32 nSize) {
 void fn_8009CC00(void) {
     lbl_80281FC0 = MC_BUFFER_SIZE + 0x20;
     if (lbl_80281FC4 == 0) {
-        lbl_80281FC4 = fn_800B6564(MC_BUFFER_SIZE + 0x20);
+        lbl_80281FC4 = GoARAM_Alloc(MC_BUFFER_SIZE + 0x20);
     }
     lbl_80281FE8 = fn_80009B34(MC_BUFFER_SIZE, 1, 0x20, "MC_Gc.c", 129);
     lbl_80281FE4 = lbl_80281FE8;
@@ -76,7 +76,7 @@ void fn_8009CC88(void) {
         lbl_80281FE8 = NULL;
     }
     if (lbl_80281FC4 != 0) {
-        fn_800B6594(lbl_80281FC4);
+        GoARAM_Free(lbl_80281FC4);
         lbl_80281FC4 = 0;
     }
 }
@@ -1014,7 +1014,7 @@ u32 fn_8009EF90(void) {
 void fn_8009EF98(void) {
     if (lbl_80281FE8 != NULL) {
         lbl_80281FC0 = MC_BUFFER_SIZE + 0x20;
-        fn_800B67EC(fn_800B6844(lbl_80281FE8, lbl_80281FC4, lbl_80281FC0));
+        GoARAM_WaitTransfer(GoARAM_CopyToAram(lbl_80281FE8, lbl_80281FC4, lbl_80281FC0));
         if (gSession.nGameType == 6) {
             Skalib_ScratchFromAram(0);
             Skalib_ScratchFromAram(1);
@@ -1044,7 +1044,7 @@ void fn_8009F02C(void) {
             lbl_80281FDC = lbl_80281FE0 = lbl_80281FD8 =
                 fn_80009B34(lbl_80281FC0, 1, 0x20, "MC_Gc.c", 2810);
         }
-        fn_800B67EC(fn_800B68B4(lbl_80281FE8, lbl_80281FC4, lbl_80281FC0));
+        GoARAM_WaitTransfer(GoARAM_CopyFromAram(lbl_80281FE8, lbl_80281FC4, lbl_80281FC0));
     }
 }
 

@@ -958,7 +958,7 @@ int fn_800D13F4(int nPlayer) {
     f32 fAngle;
 
     if (Wind_Get(vWind) > 6.0f) {
-        fAngle = fn_8000AD78(-vWind[0], vWind[2]) - fAim;
+        fAngle = atan2f(-vWind[0], vWind[2]) - fAim;
         while (fAngle < 0.0f) {
             fAngle += 2.0f * PI;
         }
@@ -1014,7 +1014,7 @@ int fn_800D1530(int nPlayer) {
             fDegrees = 90.0f;
         }
     } else {
-        fDegrees = fn_8000AD78(vTurned[0], vTurned[1]) * (180.0f / PI);
+        fDegrees = atan2f(vTurned[0], vTurned[1]) * (180.0f / PI);
     }
     return (int)fDegrees;
 }

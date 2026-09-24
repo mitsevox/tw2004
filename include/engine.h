@@ -103,10 +103,10 @@ typedef struct UMemPool {
 } UMemPool;
 LAYOUT_ASSERT(UMemPool, 0x10);
 
-UMemPool* fn_8000AFA0(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign);   // create
-void  fn_8000B058(UMemPool* pPool);                     // destroy
-void* fn_8000B078(UMemPool* pPool);                     // take a node (NULL when none is free)
-void  fn_8000B0D4(UMemPool* pPool, void* pNode);        // give a node back
+UMemPool* UMemPool_Create(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign);   // create
+void  UMemPool_Destroy(UMemPool* pPool);                     // destroy
+void* UMemPool_Alloc(UMemPool* pPool);                     // take a node (NULL when none is free)
+void  UMemPool_Free(UMemPool* pPool, void* pNode);        // give a node back
 // Sorts nCount items of nSize bytes with pfnCompare (MSL, 0x8015929C).
 void  qsort(void* pBase, u32 nCount, u32 nSize, s32 (*pfnCompare)(const void* pA, const void* pB));
 
@@ -135,9 +135,9 @@ double fn_80009680(double x);           // sqrt
 f32  fn_80009744(f32* pVec);            // dot with itself (at most FLT_MAX)
 extern f32 lbl_80281B40[];              // FLT_MAX (MSL's)
 void Vec_Copy(const f32* pSrc, f32* pDst);   // 0x8000AD10 (const: see Vec3Copy)
-f32  fn_8000AD78(f32 y, f32 x);         // atan2f
+f32  atan2f(f32 y, f32 x);         // atan2f
 f32  fabsf(f32 x);                      // 0x8000AD9C: fabs (0x8000AE94, platform.h) rounded to a float
-f32  fn_8000AF7C(f32 x);                // natural logarithm
+f32  logf(f32 x);                // natural logarithm
 void fn_8000A4E0(f32 (*pMtx)[4], f32* pA, f32* pB, f32* pC);   // a rotation matrix's three angles
 void fn_8000AF20(void);                 // make the log2 table (lbl_80281BD8)
 void fn_8000AF58(void);                 // free the log2 table

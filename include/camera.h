@@ -793,7 +793,7 @@ u8     fn_80063C7C(View* pView);
 u8     fn_80063C90(View* pView);        // the camera is still moving
 void   fn_80063CBC(View* pView, f32* pVec);   // script.nCamera 3, the vector into script.v40
 void   fn_80063CF0(View* pView, int nCamera, int nPlayer);
-void   fn_800642D0(View* pView, int nPlayer);
+void   CameraController_ResetAimMarkerInSwingCamera_800642D0(View* pView, int nPlayer);
 u8     fn_800642B0(void);               // fn_800C6CB0's answer (gomainloop tests it)
 void   fn_80063F08(f32* pA, f32* pB, f32* pOut);   // the green zoom-to-aim camera: View.v20 as pA and pOut
 

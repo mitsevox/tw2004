@@ -515,7 +515,7 @@ s16 fn_800AFF9C(s16 nVolume) {
     nVolume >>= 1;
     if (nVolume <= 0) return VOLUME_MIN;
     if (nVolume >= 0x3FFF) return 0;
-    fDb = fn_8000AF7C(16383.0f / nVolume);
+    fDb = logf(16383.0f / nVolume);
     fDb *= -86.5617f;
     nDb = fDb;
     if (nDb < VOLUME_MIN) {
@@ -661,13 +661,13 @@ void fn_800B0448(void) {
 // DMA nLen bytes from main memory to ARAM; pfnDone is called when it is done.
 int fn_800B044C(u32 uAram, void* pSrc, int nLen, void (*pfnDone)(u32 n), int n) {
     fn_800B051C(pSrc, nLen, 0);
-    fn_800B65C0((u32)pSrc, uAram, nLen, 0, 1, pfnDone, n, 3);  // port: the ARQ library takes addresses as u32
+    GoARAM_QueueTransfer((u32)pSrc, uAram, nLen, 0, 1, pfnDone, n, 3);  // port: the ARQ library takes addresses as u32
     fn_800B04EC(pSrc, nLen, 0);
     return 1;
 }
 
 void fn_800B04CC(void* pOwner) {
-    fn_800B6728((u32)pOwner);  // port: the ARQ library keeps owners as u32
+    GoARAM_CancelTransfers((u32)pOwner);  // port: the ARQ library keeps owners as u32
 }
 
 // After a DMA between main memory and ARAM: when the data came into main memory (nDir 1), drop
@@ -702,14 +702,14 @@ void fn_800B055C(u32 n) {
 
 // Set up the ARAM heap: a silent block at its start, then the eight blocks of fn_800B06F4.
 u8 fn_800B0568(void) {
-    lbl_802820FC = fn_800B6564(ARAM_HEAP_SIZE);
+    lbl_802820FC = GoARAM_Alloc(ARAM_HEAP_SIZE);
     lbl_8028210C = fn_800B5BD8(sizeof(ARAMHeap) + 32 * sizeof(ARAMBlock));
-    lbl_802820F8 = fn_800B5C40(ARAM_HEAP_SIZE, lbl_802820FC, 32, lbl_8028210C);
-    lbl_80282100 = fn_800B5D34(lbl_802820F8, ARAM_ZERO_SIZE, 32);
+    lbl_802820F8 = GoARAM_HeapInit(ARAM_HEAP_SIZE, lbl_802820FC, 32, lbl_8028210C);
+    lbl_80282100 = GoARAM_HeapAlloc(lbl_802820F8, ARAM_ZERO_SIZE, 32);
     lbl_80282104 = fn_800951A0(ARAM_ZERO_SIZE, 32, 1);
     fn_80005AE8(lbl_80282104, 0, ARAM_ZERO_SIZE);
     fn_800B044C(lbl_80282100, lbl_80282104, ARAM_ZERO_SIZE, fn_800B055C, 0);
-    lbl_80282108 = fn_800B5D34(lbl_802820F8, 0x7F000, 32);
+    lbl_80282108 = GoARAM_HeapAlloc(lbl_802820F8, 0x7F000, 32);
     return 1;
 }
 
@@ -731,11 +731,11 @@ void fn_800B0660(void) {
 
 // Allocate ARAM, 32-byte aligned; returns the address.
 u32 fn_800B0698(u32 uSize) {
-    return fn_800B5D34(lbl_802820F8, (uSize + 31) & ~31, 32);
+    return GoARAM_HeapAlloc(lbl_802820F8, (uSize + 31) & ~31, 32);
 }
 
 void fn_800B06CC(u32 uAddr) {
-    fn_800B5E88(lbl_802820F8, uAddr);
+    GoARAM_HeapFree(lbl_802820F8, uAddr);
 }
 
 // Take the first free 0xFE00-byte ARAM block; returns its address.

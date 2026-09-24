@@ -1099,7 +1099,7 @@ void fn_8006A6C4(int nPlayer) {
     fn_8006A988(gPlayers[nPlayer].vPlacement, gpGame->p130, vDir);
     vDir[1] = 0.0f;
     Vec_Normalize(vDir, vDir);
-    gPlayers[nPlayer].fA88 = fn_8000AD78(vDir[2], vDir[0]) - PI / 2.0f;
+    gPlayers[nPlayer].fA88 = atan2f(vDir[2], vDir[0]) - PI / 2.0f;
     lbl_801D5BF0[nPlayer].f0 = 0.01f;
     lbl_801D5BF0[nPlayer].f4 = 0.0f;
     lbl_801D5BF0[nPlayer].f8 = 0.04f;

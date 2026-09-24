@@ -23,10 +23,10 @@ void fn_80048BDC(UStreamObject* pObject);
 // else from the heap.
 void* Kernel_InitModule(int nSize) {
     if (nSize < 400 && lbl_80281DAC->nFree != 0) {
-        return fn_8000B078(lbl_80281DAC);
+        return UMemPool_Alloc(lbl_80281DAC);
     }
     if (nSize < 528 && lbl_80281DA8->nFree != 0) {
-        return fn_8000B078(lbl_80281DA8);
+        return UMemPool_Alloc(lbl_80281DA8);
     }
     return fn_80009B34(nSize, 1, 16, "UKernel.c", 201);
 }
@@ -34,9 +34,9 @@ void* Kernel_InitModule(int nSize) {
 // Gives an object's memory back to the pool it came from, or to the heap.
 void fn_80048B70(void* p) {
     if ((u8*)p > (u8*)lbl_80281DAC && (u8*)p < lbl_80281DAC->pEnd) {
-        fn_8000B0D4(lbl_80281DAC, p);
+        UMemPool_Free(lbl_80281DAC, p);
     } else if ((u8*)p > (u8*)lbl_80281DA8 && (u8*)p < lbl_80281DA8->pEnd) {
-        fn_8000B0D4(lbl_80281DA8, p);
+        UMemPool_Free(lbl_80281DA8, p);
     } else {
         fn_80009E70(p);
     }
@@ -104,8 +104,8 @@ void fn_80048BDC(UStreamObject* pObject) {
 // Sets the kernel up: the 'Cact' stream handler, the two node pools and an empty list.
 void fn_80048DD0(void) {
     UStream_RegisterHandler('Cact', fn_80048BDC);
-    lbl_80281DAC = fn_8000AFA0(256, 400, 2, 16);
-    lbl_80281DA8 = fn_8000AFA0(256, 528, 2, 16);
+    lbl_80281DAC = UMemPool_Create(256, 400, 2, 16);
+    lbl_80281DA8 = UMemPool_Create(256, 528, 2, 16);
     lbl_80281DBC = NULL;
     lbl_80281DB8 = NULL;
     lbl_80281DB4 = 0;
@@ -141,8 +141,8 @@ void fn_80048E7C(void) {
     fn_800490EC();
     fn_800490EC();
     lbl_80281DB4 = 0;
-    fn_8000B058(lbl_80281DAC);
-    fn_8000B058(lbl_80281DA8);
+    UMemPool_Destroy(lbl_80281DAC);
+    UMemPool_Destroy(lbl_80281DA8);
 }
 
 // The same, keeping the pools, and the list starts over empty.
