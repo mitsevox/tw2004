@@ -9,6 +9,10 @@
 void fn_800AFBD8(u16 nVoice, u8 bOn);   // startUp.c
 void fn_800AFDC8(u16 nVoice, SoundHeader* pHdr);        // startUp.c
 void fn_800B0114(u16 nVoice, VoiceEnvelope* pEnv);      // startUp.c
+void fn_800AFEF4(u16 nVoice, s16 nVolume, int a, int b); // startUp.c
+void fn_800B0034(u16 nVoice, u8 nPan, int nMode);       // startUp.c
+void fn_800B00A4(u16 nVoice, u32 u, int a);             // startUp.c
+void fn_800B01B4(u16 nVoice, u8 bA, u8 bB);             // startUp.c
 
 void fn_800AC330(void);
 u8   fn_800AC6B0(AudVoiceRequest* pRequest, s16* pPriority);
@@ -78,7 +82,7 @@ void fn_800AC6D0(AudVoice* pVoice, AudVoiceParams* pParams, u8 nVolume, f32 fPit
     }
     pVoice->uC = fn_800ACEC4(uRate, fPitch);
     pVoice->n14 = nVolume;
-    pVoice->unkA_0 = 1;
+    pVoice->bA_0 = 1;
     fn_800AFDC8(nHwVoice, pTone->pHeader);
     // EA bug: hands over the address of the pointer, so the voice's envelope is the pointer's bits;
     // the tone's own envelope (changed above, for every voice that plays it) is never used.
@@ -100,7 +104,7 @@ void fn_800AC7DC(AudVoice* pVoice, u32 uLen, u32 nRate, u8 bLoud) {
     env.nRelease = bLoud ? 0x10 : 0x80;
     pVoice->uC = nRate;
     pVoice->n14 = 0x7F;
-    pVoice->unkA_0 = 1;
+    pVoice->bA_0 = 1;
     fn_80005AE8(&hdr, 0, sizeof(hdr));
     hdr.uC = 1;
     // the buffer's start and end in 4-bit units, past the first frame's header
@@ -114,6 +118,45 @@ void fn_800AC7DC(AudVoice* pVoice, u32 uLen, u32 nRate, u8 bLoud) {
     pVoice->uC = (f32)pVoice->uC * 2.048f;
     fn_800AFDC8(nHwVoice, &hdr);
     fn_800B0114(nHwVoice, &env);
+}
+
+// Passes a voice's settings on to its hardware voice; a voice just set up is started first.
+void fn_800AC91C(AudVoice* pVoice, AudVoiceParams* pParams) {
+    u16 nHwVoice = pVoice->nHwVoice;
+    u32 uRate;
+    u8 bSetRate;
+    int bPlaying;
+    u8 bReverb;
+
+    if (!pVoice->bA_5) {
+        uRate = pVoice->uC;
+        if (pVoice->bA_0) {
+            bReverb = !pVoice->bA_6;
+            fn_800AFBD8(nHwVoice, 1);
+            fn_800B01B4(nHwVoice, bReverb, bReverb);
+            bPlaying = 0;
+            pVoice->bA_0 = 0;
+            bSetRate = 1;
+        } else {
+            bPlaying = 1;
+            bSetRate = 0;
+        }
+        if (pParams->flags.b.bVolume) {
+            fn_800AFEF4(nHwVoice, pParams->nVolume, 0, bPlaying);
+            // port: EA passes an argument fn_800B0034 ignores
+            ((void (*)(u16, u8, int, int))fn_800B0034)(nHwVoice, pParams->nPan, 2, bPlaying);
+            ((void (*)(u16, u8, int, int))fn_800B0034)(nHwVoice, pParams->n7, 3, bPlaying);
+        }
+        if (pParams->flags.b.bPitch) {
+            uRate = fn_800ACEC4(pVoice->uC, pParams->fPitch);
+            bSetRate = 1;
+        }
+        if (bSetRate) {
+            fn_800B00A4(nHwVoice, uRate, bPlaying);
+        }
+    } else {
+        pVoice->bA_5 = 0;
+    }
 }
 
 // Pauses or resumes a voice's hardware voice.
