@@ -895,7 +895,7 @@ config.libs = [
             Object(NonMatching, "LLVideo.c"),
             Object(NonMatching, "ByteSwap.c"),
             Object(NonMatching, "GoCamera.c"),
-            Object(NonMatching, "GoViewport.c"),
+            Object(Matching, "GoViewport.c"),
             Object(NonMatching, "GoShaderObjectCommon_TexAnimManager_Gc.c"),
             Object(Matching, "FE_Manager.c"),
             Object(NonMatching, "FE_MessageTable.c"),
