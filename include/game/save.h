@@ -331,7 +331,7 @@ void fn_80058560(SaveProfile* pProfile, int nKind, char* pName);  // add pName t
 void fn_80058624(SaveProfile* pProfile, int nKind, char* pName);  // take pName out of list nKind
 u8   fn_800587A8(SaveProfile* pProfile, int nKind, char* pName);  // pName is in list nKind (0..2)
 void fn_800588D4(s16 n);            // set lbl_80281DF0 (switched on, value n)
-s16  fn_800588E8(void);             // lbl_80281DF0's value
+int  fn_800588E8(void);             // lbl_80281DF0's value (callers take it without extsh)
 
 // 0x800588F4: marked hole i's kind-0 byte (a5004/a10578) or kind-1 value (a504C/a1057C); -1 for
 // another kind.
