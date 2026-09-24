@@ -83,6 +83,12 @@ void  fn_8001BD18(Character* pChar, Clip* pClip);
 void  fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, int n, f32 fTime);
 void  fn_800280E8(Character* pChar, f32* pPos, int bPlace);     // Skeleton.c
 void  fn_8001EFB4(f32* pA, f32* pB, f32* pOut);
+void  fn_8001DD18(u8* pData, int nBytes);
+void  fn_8001DEC8(u8* pData, int nBytes);
+s32   fn_800CE8C0(Skin** apSkins, int nSkins, SkinListEntry** ppList);   // SkinPart.c
+void  fn_800CEEBC(void);                                        // SkinPart.c: empty
+void  fn_800100B0(TexBank* pBank, TexEntry* p8, TexPalette* pC, void* p10, void* p14, s16 nNumTex,
+                  s16 nNumPalettes);                            // LLTex.c
 void  fn_8001EFD8(f32* pA, f32* pB, f32* pOut);
 f32 (*fn_8001EC6C(Character* pChar, int nBone))[4];
 f32 (*fn_8001ECA8(Character* pChar, int nBone))[4];
@@ -462,6 +468,127 @@ void fn_8001971C(Character* pChar) {
     }
 }
 
+// Reads the character's textures from its CHR object (after the slider definitions, p4C) into
+// bank78: in the front end (game types 10 and 3) all of them; otherwise, for each name the skins
+// use (fn_800CE8C0), the texture of that name (and the one after it when it goes with it) with its
+// palette, or an empty one. Then it opens the golfer's texture file.
+void fn_80019798(Character* pChar, Skin** apSkins, int nSkins) {
+    int nTexBytes;
+    int nPalBytes;
+    u8* pData;
+    SkinListEntry* pList;
+    TexEntry* pTexData;
+    TexPalette* pPalData;
+    u8 bAll;
+    u8 bFound;
+    int nTex;
+    int nPal;
+    int nExtra;
+    int nNames;
+    int nOut;
+    int i;
+    int j;
+
+    nExtra = 0;
+    pList = NULL;
+    pData = pChar->p4C;
+    fn_80076158(&pData, (u8*)&nTexBytes, 4, 4);
+    fn_80076158(&pData, (u8*)&nPalBytes, 4, 4);
+    fn_80076158(&pData, (u8*)&pChar->n58, 4, 4);
+    fn_80076158(&pData, (u8*)&pChar->n5C, 4, 4);
+    if (nTexBytes != 0) {
+        pTexData = (TexEntry*)pData;
+        fn_8001DD18(pData, nTexBytes);
+        pData += nTexBytes;
+    }
+    if (nPalBytes != 0) {
+        pPalData = (TexPalette*)pData;
+        fn_8001DEC8(pData, nPalBytes);
+    } else {
+        pChar->n5C = 0;
+    }
+    bAll = 0;
+    if (gSession.nGameType == 10 || gSession.nGameType == 3) {
+        bAll = 1;
+    }
+    nTex = nTexBytes / (int)sizeof(TexEntry);
+    nPal = nPalBytes / (int)sizeof(TexPalette);
+    if (bAll) {
+        pChar->nAC = nTex;
+        pChar->nB4 = nPal;
+    } else {
+        pChar->nAC = fn_800CE8C0(apSkins, nSkins, &pList);
+        nExtra = 0;
+        pChar->nB4 = pChar->nAC;
+        nPalBytes = pChar->nB4 * sizeof(TexPalette);
+        for (i = 0; i < pChar->nAC; i++) {
+            for (j = 0; j < nTex; j++) {
+                if (pList[i].uId == pTexData[j].u0 && (pTexData[j].b47 & 1)) {
+                    nExtra++;
+                    break;
+                }
+            }
+        }
+        pChar->nAC += nExtra;
+    }
+    pChar->pA8 = NULL;
+    pChar->pB8 = NULL;
+    pChar->pB0 = NULL;
+    pChar->pBC = NULL;
+    if (pChar->nAC != 0) {
+        pChar->pA8 = fn_80009B34(pChar->nAC * sizeof(TexEntry), 2, 0x10, "char.c", 0x9A9);
+        pChar->pB8 = fn_80009B34(pChar->nAC * 64, 2, 0x10, "char.c", 0x9AE);
+    }
+    if (pChar->nB4 != 0) {
+        pChar->pB0 = fn_80009B34(nPalBytes, 2, 0x10, "char.c", 0x9B8);
+        pChar->pBC = fn_80009B34(nPal, 2, 0x10, "char.c", 0x9BD);
+    }
+    if (bAll) {
+        if (pChar->nAC != 0) {
+            Mem_cpy(pChar->pA8, pTexData, nTexBytes);
+        }
+        if (pChar->nB4 != 0) {
+            Mem_cpy(pChar->pB0, pPalData, nPalBytes);
+        }
+    } else {
+        nOut = 0;
+        nNames = pChar->nAC - nExtra;
+        for (i = 0; i < nNames; i++) {
+            bFound = 0;
+            for (j = 0; j < nTex; j++) {
+                if (pList[i].uId == pTexData[j].u0) {
+                    Mem_cpy(&pChar->pA8[nOut], &pTexData[j], sizeof(TexEntry));
+                    if (pTexData[j].nPalette != -1) {
+                        Mem_cpy(&pChar->pB0[i], &pPalData[pTexData[j].nPalette], sizeof(TexPalette));
+                        pChar->pA8[nOut].nPalette = i;
+                    }
+                    nOut++;
+                    if (pTexData[j].b47 & 1) {
+                        Mem_cpy(&pChar->pA8[nOut], &pTexData[j + 1], sizeof(TexEntry));
+                        nOut++;
+                    }
+                    bFound = 1;
+                    break;
+                }
+            }
+            if (!bFound) {
+                pChar->pA8[nOut].u0 = 0;
+                pChar->pA8[nOut].nPalette = -1;
+                nOut++;
+            }
+        }
+    }
+    if (pList != NULL) {
+        fn_80009E70(pList);
+    }
+    fn_800100B0(&pChar->bank78, pChar->pA8, pChar->pB0, pChar->pB8, pChar->pBC, pChar->nAC, pChar->nB4);
+    pChar->p50 = &pChar->bank78;
+    // port: EA passes arguments fn_800CEEBC (empty) ignores
+    ((void (*)(Skin*, TexBank*, int, int))fn_800CEEBC)(pChar->pSkin, &pChar->bank78, 0xBF600, 0xCDA);
+    sprintf(pChar->szE1, "%sdata\\CharStrm\\CharTex\\%02dalltex.fxg", "", pChar->nC + 1);
+    pChar->hFile = fn_800060E0(pChar->szE1);
+}
+
 void fn_80019C1C(Character* pChar) {
     int i;
     for (i = 0; i < pChar->nSkins; i++) {
@@ -494,7 +621,7 @@ void fn_80019D64(Character* pChar, void (*pfnA)(Character* pChar), void (*pfnB)(
         pJob->pfnA = pfnA;
         pJob->pChar = pChar;
         pJob->pfnB = pfnB;
-        pJob->p0 = pChar->a50;
+        pJob->p0 = &pChar->p50;
         fn_8010B930(pJob);
     } else {
         lbl_801B95E8.a[6].p = NULL;
@@ -507,7 +634,7 @@ void fn_80019DE8(Character* pChar) {
 
     fn_8008EAC8(0);
     pChar->p60 = pModel;
-    fn_8010BC88(pChar->a50);
+    fn_8010BC88(&pChar->p50);
     // port: EA passes an argument fn_8010BEC4 ignores
     ((void (*)(void*))fn_8010BEC4)(pModel);
     fn_80019C1C(pChar);
@@ -538,7 +665,7 @@ void fn_80019EF4(Character* pChar) {
     pModel = pChar->a64[1 - pChar->n74];
     fn_8010A6A8(pChar->a64[pChar->n74], pModel);
     pChar->p60 = pModel;
-    fn_8010BC88(pChar->a50);
+    fn_8010BC88(&pChar->p50);
     // port: EA passes an argument fn_8010BEC4 ignores
     ((void (*)(void*))fn_8010BEC4)(pModel);
     for (i = 0; i < pChar->nSkins; i++) {

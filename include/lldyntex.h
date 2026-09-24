@@ -13,7 +13,7 @@ struct Character;
 // A job for the dynamic textures (0x14 bytes, ten in DynTexState): char.c's fn_80019D64 fills one
 // with a character and two of its functions.
 typedef struct DynTexJob {
-    void* p0;                   // 0x00  the character's a50
+    void* p0;                   // 0x00  the address of the character's p50
     void (*pfnA)(struct Character* pChar);   // 0x04
     struct Character* pChar;    // 0x08
     void (*pfnB)(struct Character* pChar);   // 0x0C
@@ -26,7 +26,7 @@ LAYOUT_ASSERT(DynTexJob, 0x14);
 typedef struct DynTexState {
     void* p0;                   // 0x000  a 0x40-byte block allocated with it
     u8    unk4[4];
-    void* p8;                   // 0x008  set by fn_8010BC88 (char.c gives it Character.a50)
+    void* p8;                   // 0x008  set by fn_8010BC88 (char.c gives it &Character.p50)
     u8    unkC[0x96C - 0xC];
     s32   n96C;                 // 0x96C
     u8    unk970[4];

@@ -342,22 +342,24 @@ typedef struct Character {
     struct CharEntry44* p44;    // 0x044  } freed with the character (fn_8001C0E0)
     s32   n48;                  // 0x048  a texture bank slot (LLTexGrp.c), freed with it when >= 0
     u8*   p4C;                  // 0x04C  where its CHR object's data ends (fn_8001A9F4)
-    u8    a50[4];               // 0x050  LLDynTex.c is given its address (fn_80019DE8)
+    TexBank* p50;               // 0x050  its texture bank, bank78 (fn_80019798); LLDynTex.c is given
+                                //        this field's address (fn_80019DE8)
     s32   hFile;                // 0x054  a file closed with it (fn_8001971C), -1 none
-    u8    unk58[0x60 - 0x58];
+    s32   n58;                  // 0x058  } from its CHR object's texture header (fn_80019798)
+    s32   n5C;                  // 0x05C  } 0 without palettes
     void* p60;                  // 0x060  the entry of a64 fn_80019DE8 set up
     void* a64[2];               // 0x064  } entries taken from lbl_801B95E8 (fn_8001A418), and their
     s8    a6C[2];               // 0x06C  } indices there (-1 once given back)
     u8    unk6E[2];
     s32   n70;                  // 0x070  how many of a64 it takes
     s32   n74;                  // 0x074  the one of a64 fn_80019E80 uses
-    u8    unk78[0xA8 - 0x78];
-    void* pA8;                  // 0x0A8  } freed by fn_8001971C
-    u8    unkAC[4];
-    void* pB0;                  // 0x0B0  }
-    u8    unkB4[4];
-    void* pB8;                  // 0x0B8  }
-    void* pBC;                  // 0x0BC  }
+    TexBank bank78;             // 0x078  its textures (fn_80019798)
+    TexEntry* pA8;              // 0x0A8  } bank78's tables, freed by fn_8001971C
+    s32   nAC;                  // 0x0AC  how many textures pA8 holds
+    TexPalette* pB0;            // 0x0B0  }
+    s32   nB4;                  // 0x0B4  how many palettes pB0 holds
+    void* pB8;                  // 0x0B8  } 64 bytes per texture
+    void* pBC;                  // 0x0BC  } a byte per palette
     struct Skin* apSkins[7];    // 0x0C0  its skins: the body's, then its attachments' (fn_8001CE5C)
     s32   nSkins;               // 0x0DC
     u8    bE0;                  // 0x0E0  cleared by fn_8001A3B0, set by fn_8001A20C
