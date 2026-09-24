@@ -298,22 +298,36 @@ typedef struct Clip {
     s16    n8E;                 // 0x8E  bytes per frame, second stream
     u64    u90;                 // 0x90  looked up in lbl_801B9638 (FEgolferanim.c fn_8008D058)
     u8     unk98[8];
-    char   name[0x2C];          // 0xA0
+    char   name[0x20];          // 0xA0  (fn_8002091C swaps 0xA0 and 0xB0 as 16 bytes each, then words)
+    struct Clip* pC0;           // 0xC0  the clip itself, once laid out (fn_80020F60)
+    u8*    pC4;                 // 0xC4  the end of pD0's tracks
+    u8*    pC8;                 // 0xC8  the same; fn_800206C8 lays out the streams from here
     f32    fCC;                 // 0xCC  how far along the swing is, 0..1 (Character.fBackswing copies it)
-    u8*    pD0;                 // 0xD0
+    u8*    pD0;                 // 0xD0  n1C ClipTracks
     struct ClipEvent* pEvents;  // 0xD4  its timed events (fn_8001F02C finds one by its id)
     struct BlendClip* pD8;      // 0xD8  fn_800204A0 samples it; set: FEgolferanim.c turns the
                                 //       golfer round for the clip
-    u32    uAram;               // 0xDC
-    u8     unkE0[4];
-    u8*    pE4;                 // 0xE4
-    u8     unkE8[4];
-    u8*    pEC;                 // 0xEC
-    u8*    pF0;                 // 0xF0
+    u32    uAram;               // 0xDC  the first frame stream: its ARAM address with flag 4, else its
+                                //       address in memory (fn_800206C8)
+    u8*    pE0;                 // 0xE0  n3C bytes (fn_80020BC8 swaps them as halfwords)
+    u8*    pE4;                 // 0xE4  the second frame stream (n04 bytes)
+    u8*    pE8;                 // 0xE8  n40 bytes (halfwords)
+    u8*    pEC;                 // 0xEC  the tracks' ranges, 0x18 bytes each (ClipTrack.aRange)
+    u8*    pF0;                 // 0xF0  the tracks' packed keys, nFrames * 6 bytes each (ClipTrack.pKeys)
     u8*    pF4;                 // 0xF4
     u8*    pF8;                 // 0xF8
     u8*    pFC;                 // 0xFC
 } Clip;
+LAYOUT_ASSERT(Clip, 0x100);
+
+// One of a clip's tracks (Clip.pD0, n1C of them; fn_80020B2C swaps them as four words). A track with
+// flag 0x10 has its own keys: nFrames points packed as three u16s (fn_8001FC0C expands one with aRange).
+typedef struct ClipTrack {
+    u32  uFlags;                // 0x0  0x10: it has keys
+    u32  u04;                   // 0x4
+    f32* aRange;                // 0x8  min, max per axis (in Clip.pEC)
+    u16* pKeys;                 // 0xC  (in Clip.pF0)
+} ClipTrack;
 
 // char.c: run on a clip just read from disc (skalib.c, AnimStream.c).
 void* fn_80020DD4(void* pClip, void* pOut, int nAlign);
@@ -1009,6 +1023,7 @@ typedef struct MtaLib {
 LAYOUT_ASSERT(MtaLib, 0x34);
 
 MtaLib* fn_8001F110(MtaLib* pLib, s32* pnSize);    // char.c: swap and link a library; *pnSize: its bytes
+void    fn_8001F578(MtaLib* pLib);                  // mtalib.c: link a library already in our byte order
 
 MalBank* fn_8001F760(int nBank);
 void*    fn_8001F79C(MalBank* pBank, int nGroup, int n);

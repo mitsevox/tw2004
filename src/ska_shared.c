@@ -125,6 +125,100 @@ f32 fn_800205F8(Clip* pClip, f32 fTime) {
     return 0.0f;
 }
 
+// Lays out a clip's data after its tracks: the pE8 and pE0 blocks from pC8 (rounded up to 16
+// bytes), then the first frame stream (in ARAM at uAram when uAram is not 0), the second, and the
+// tracks' ranges and keys. Tracks only get their key pointers when the frames stay in memory.
+void fn_800206C8(Clip* pClip, u32 uAram) {
+    u8* p = pClip->pC8;
+    ClipTrack* pTrack;
+    int i;
+    u16* pKeys;
+    f32* aRange;
+
+    if ((uptr)p & 15) {
+        p = (u8*)(((uptr)p & ~15) + 16);
+    }
+    if (pClip->n40 != 0) {
+        pClip->pE8 = p;
+        p += pClip->n40;
+    } else {
+        pClip->pE8 = NULL;
+    }
+    if (pClip->n3C != 0) {
+        pClip->pE0 = p;
+        p += pClip->n3C;
+    } else {
+        pClip->pE0 = NULL;
+    }
+    if (uAram != 0) {
+        // port: an ARAM address, not a pointer; the field holds either
+        p = (u8*)uAram;
+        pClip->uFlags |= 4;
+    } else {
+        pClip->uFlags &= ~4;
+    }
+    pClip->uAram = (uptr)p;
+    p += pClip->n38;
+    if (pClip->n04 != 0) {
+        pClip->pE4 = p;
+        p += pClip->n04;
+    } else {
+        pClip->pE4 = NULL;
+    }
+    if (pClip->n4C != 0) {
+        pClip->pEC = p;
+        p += pClip->n50;
+        pClip->pF0 = p;
+    } else {
+        pClip->pF0 = NULL;
+        pClip->pEC = NULL;
+    }
+    if (uAram == 0) {
+        pKeys = (u16*)pClip->pF0;
+        aRange = (f32*)pClip->pEC;
+        for (i = 0; i < pClip->n1C; i++) {
+            pTrack = (ClipTrack*)pClip->pD0 + i;
+            if (pTrack->uFlags & 0x10) {
+                pTrack->pKeys = pKeys;
+                pKeys += pClip->nFrames * 3;
+                pTrack->aRange = aRange;
+                aRange += 6;
+            } else {
+                pTrack->pKeys = NULL;
+                pTrack->aRange = NULL;
+            }
+        }
+    } else {
+        for (i = 0; i < pClip->n1C; i++) {
+            pTrack = (ClipTrack*)pClip->pD0 + i;
+            pTrack->pKeys = NULL;
+            pTrack->aRange = NULL;
+        }
+    }
+}
+
+// Byte-swaps a clip's frame streams, ranges and keys in place (the clip is laid out in memory).
+void fn_80020858(Clip* pClip) {
+    u8* pSrc;
+
+    pSrc = (u8*)pClip->uAram;
+    fn_80076158(&pSrc, pSrc, pClip->n38, 2);
+    if (pClip->n04 != 0) {  // tests n04 but swaps the n3C bytes at pE0
+        pSrc = pClip->pE0;
+        fn_80076158(&pSrc, pSrc, pClip->n3C, 2);
+    }
+    if (pClip->n40 != 0) {
+        pSrc = pClip->pE8;
+        fn_80076158(&pSrc, pSrc, pClip->n40, 2);
+    }
+    if (pClip->n4C != 0) {
+        pSrc = pClip->pEC;
+        fn_80076158(&pSrc, pSrc, pClip->n50, 4);
+        pSrc = pClip->pF0;
+        fn_80076158(&pSrc, pSrc, pClip->n4C, 2);
+    }
+}
+
 // Byte-swaps a clip's 0x100-byte header in place.
 void fn_8002091C(Clip* pClip) {
     void* pSrc = pClip;
@@ -175,6 +269,32 @@ void fn_80020B2C(void* pRecords, int nCount) {
     pSrc = pRecords;
     pDst = pRecords;
     fn_8001F08C(&pSrc, &pDst, aRecord, 4, nCount);
+}
+
+// Links a clip already in our byte order in place: its events and BlendClip follow the header,
+// then its tracks; fn_800206C8 lays out the rest (the first frame stream in ARAM at uAram when it
+// is not 0). Its pF4 library (n64 bytes) is linked too.
+Clip* fn_80020F60(Clip* pClip, u32 uAram) {
+    u8* p = (u8*)pClip + sizeof(Clip);
+
+    pClip->pC0 = pClip;
+    if (pClip->nEvents != 0) {
+        pClip->pEvents = (ClipEvent*)p;
+        p += pClip->nEvents * sizeof(ClipEvent);
+    }
+    if (pClip->uFlags & 2) {
+        pClip->pD8 = (BlendClip*)p;
+        p += sizeof(BlendClip);
+    }
+    pClip->pD0 = p;
+    p += pClip->n2C;
+    pClip->pC4 = p;
+    pClip->pC8 = pClip->pC4;
+    fn_800206C8(pClip, uAram);
+    if (pClip->n64 != 0) {
+        fn_8001F578((MtaLib*)pClip->pF4);
+    }
+    return pClip;
 }
 
 // ---- sweep code (not yet cleaned up) ----
