@@ -705,6 +705,8 @@ u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
     // port: NTSC rate; the frame's length in ticks
     fTicks = 59.94f / 60.0f;
     fTicks *= 59.94f * gSession.fFrameTime;    // port: NTSC rate
+    // fake match: the tick and step products written as *= steps, one multiply per statement,
+    // give EA's multiply order and registers (in one expression they do not)
     fStep = -0.5f;
     fStep *= fTicks;
     fStep *= fSpeed;
