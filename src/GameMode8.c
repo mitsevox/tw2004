@@ -1,7 +1,7 @@
 // GameMode8.c (our name): speed golf. Each hole scores the time taken (n290, in seconds) plus 3
 // per stroke (fn_800FDA30, the scorecard and the prize). The golfer runs to the ball between shots
-// (custom golfer states 12 and 24..26 replace the normal ones). Mode 8 is solo; modes 7 and 6
-// (GameMode7.c, GameMode6.c) are the two-player stroke and match versions.
+// (custom golfer states 12 and 24..26 replace the normal ones). Mode 8 is solo; mode 7
+// (GameMode7.c) is two players trading event points, mode 6 (GameMode6.c) two at match play.
 
 #include "golfer.h"
 #include "game.h"
@@ -315,7 +315,7 @@ u8 fn_800F9F04(u8 bCheck) {
     return 0;
 }
 
-// Stroke version: the hole is over when both have finished (bit 3).
+// Mode 7: the hole is over when both have finished (bit 3).
 u8 fn_800FA118(int nPlayer, u8 bCheck) {
     if ((gPlayers[0].nC3C & 8) && (gPlayers[1].nC3C & 8)) {
         return 1;
@@ -323,7 +323,7 @@ u8 fn_800FA118(int nPlayer, u8 bCheck) {
     return 0;
 }
 
-// Stroke version: the game is over once a player has nC3C bit 13 (fn_800FD534 sets it from bit
+// Mode 7: the game is over once a player has nC3C bit 13 (fn_800FD534 sets it from bit
 // 14 after a player's points ran out) or no hole is left.
 u8 fn_800FA148(u8 bCheck) {
     int h;
@@ -339,7 +339,7 @@ u8 fn_800FA148(u8 bCheck) {
 }
 
 // Solo: once holed, the hole's time is taken; the hole is over when holed or when nC3C bit 26 is
-// set (fn_800FDADC ends the hole that way when both golfers are idle).
+// set (fn_800FDADC, a UI command, sets it when both golfers are in states 1 to 4 or 10).
 u8 fn_800FA1CC(int nPlayer, u8 bCheck) {
     if (gPlayers[0].n290[Game_CurHoleIndex()] == 0 && Player_IsHoled(0)) {
         gPlayers[0].n290[Game_CurHoleIndex()] = fn_800E27C0();
@@ -364,8 +364,8 @@ u8 fn_800FA2C8(u8 bCheck) {
     return 0;
 }
 
-// End of hole: in stroke play fn_800FA48C for each player (its result is thrown away), in match
-// play the hole winner.
+// End of hole: with n4 0, fn_800FA48C for each player (its result is thrown away); with n4 1
+// (mode 8 sets 1), a hole won for each of players 0 and 1 who holed out.
 void fn_800FA2D0(void) {
     if (gpGame->n4 == 0) {
         fn_800FA48C(0, Game_CurHoleIndex());
@@ -389,7 +389,7 @@ void fn_800FA3AC(void) {
     gPlayers[1].nC6C[Game_CurHoleIndex()] = gPlayers[1].nC44;
 }
 
-// Game finished: in stroke play fn_800FA4B8's totals (thrown away too), then EASBio_SetCurrentGameWon(1).
+// Game finished, n4 0 (mode 7) only: totals thrown away, EASBio_SetCurrentGameWon(1) (solo: nC44>0)
 void fn_800FA410(void) {
     if (gpGame->n4 == 0) {
         fn_800FA4B8(0);
@@ -406,8 +406,8 @@ void fn_800FA410(void) {
     }
 }
 
-// A hole's seconds plus 30 per stroke. Nothing uses the result (fn_800FA2D0 and fn_800FA410
-// discard it); the scores shown and paid use 3 per stroke (fn_800FDA30, SG_Score).
+// A hole's seconds plus 30 per stroke. fn_800FA2D0 and fn_800FA410 discard it, but fn_800FA4B8's
+// sum goes to the UI (fn_80086970); fn_800FDA30, SG_Score and the prize use 3 per stroke.
 s32 fn_800FA48C(int nPlayer, int nHole) {
     return gPlayers[nPlayer].n290[nHole] + gPlayers[nPlayer].nStrokes[nHole] * 30;
 }
@@ -449,7 +449,7 @@ void fn_800FA570(void) {
     }
 }
 
-// State 25, enter: the countdown before the clock starts.
+// State 25, enter: the countdown at the hole's start, before the first shot.
 void fn_800FA608(int nPlayer) {
     int i;
     if (nPlayer == 0) {
@@ -533,7 +533,7 @@ void fn_800FA998(int nPlayer) {
     }
 }
 
-// States 12 and 24, enter: the shot starts; the ball is saved and the shot clock set.
+// States 12 and 24, enter: the ball is saved and the 60-frame wait before the run is set.
 void fn_800FA9E0(int nPlayer) {
     Player* p = &gPlayers[nPlayer];
     Mem_cpy(&p->ballBefore, &p->ball, sizeof(Ball));
@@ -556,7 +556,7 @@ void fn_800FAA70(int nEvent) {
 }
 
 // An event for a player: its flags, and its points taken from the other player. A player whose
-// points run out loses the hole; the other gets 6000.
+// points run out loses the game: 0 for them, 6000 for the other, both to state 26.
 void fn_800FAAB8(int nPlayer, int nEvent) {
     int nOther;
     s32 nPoints;
@@ -617,10 +617,10 @@ void fn_800FAAB8(int nPlayer, int nEvent) {
 }
 
 // A shot has come to rest (from state 12's update): count the stroke, and after out of bounds
-// drop the ball (water) or replace it. Returns 0 when the golfer goes back to state 1. In the
-// two-player stroke game (mode 7) it also scores events: the penalties (4/5, or 0x1E/0x1F with
-// nC3C bit 4), and the distance from vBall[0]/vBall[2] against the other player's (events 1, 0x18
-// and 0x19).
+// drop the ball (water) or replace it. Returns 0 when the golfer goes back to state 1 (in mode 7
+// possibly a frame later, through nC3C bit 20). In mode 7 it also scores events: the penalties
+// (4/5, or 0x1E/0x1F with nC3C bit 4), and a drive's length from the tee spot against the other
+// player's (events 1, 0x18 and 0x19).
 u8 fn_800FAD54(int nPlayer) {
     int nOther;
     f32 fDist;
@@ -789,7 +789,7 @@ void fn_800FB35C(int nPlayer, int nOther) {
     }
 }
 
-// The distance from pA to pB on the ground (x and z).
+// Meant as the distance from pA to pB on the ground (x and z); it is always 0 (see below).
 f32 fn_800FB41C(f32* pA, f32* pB) {
     f32 v[4];
     fn_800FE190(pB, pB, v);     // EA bug: pB less itself, so the distance is always 0
@@ -895,9 +895,9 @@ void fn_800FB774(int nPlayer) {
     }
 }
 
-// A CPU player's sticks for the run: turn from the heading fA88 towards vPlacement (fA80),
-// forward speed from how far off the heading is (fA84), both eased off near the target; fCB4
-// rises until it reaches a level set by the golfer's speed attribute.
+// A CPU player's sticks for the run: steer from the heading fA88 towards the ball (fA80, and fA7C
+// past 2 degrees off), forward speed from how far off the heading is (fA84), both eased off near
+// the ball; fCB4 rises until it reaches a level set by the golfer's speed attribute.
 void fn_800FBB30(Player* p) {
     f32 v[4];
     f32 fAngle;
@@ -944,11 +944,11 @@ void fn_800FBB30(Player* p) {
     }
 }
 
-// States 12 and 24, update: the ball flies, then the golfer runs to it. Once the ball stops,
-// fn_800FAD54 scores the shot; a holed ball (mode 7: its events, and state 26 once both are
-// down) or a ball on the green gets its events, and out of bounds replaces the ball. Then the
-// run: the countdown from fn_800FA518, the sticks (fn_800FB774, or fn_800FBB30 for the CPU), and
-// arriving at the ball (within 5 of it).
+// States 12 and 24, update: the ball flies and the golfer runs to it. Once the ball stops,
+// fn_800FAD54 counts the shot; a holed ball (mode 7: its events, and state 26 once both are
+// down; other modes: state 13) and, in mode 7, a ball on the green get their events; out of
+// bounds replaces the ball. Then the run: the countdown from fn_800FA518, the sticks
+// (fn_800FB774, or fn_800FBB30 for the CPU), and arriving at the ball (within 5 of it).
 void fn_800FBD2C(int nPlayer) {
     Player* p = &gPlayers[nPlayer];
     int nOther = nPlayer ? 0 : 1;
@@ -1285,9 +1285,9 @@ u8 fn_800FCC38(int nPlayer) {
     return bDown;
 }
 
-// Every frame (pfn220 through fn_800FDF38): in the two-player game, a holed player takes 5 points a
-// second from one still playing, which can end the hole; in both games, button 0x25 restarts the
-// hole from the tee (for the cost of event 39 in mode 7). Then speed golf's lbl_802823C8 is set.
+// Every frame (pfn220 through fn_800FDF38): in mode 7, a holed player takes 5 points a second
+// from one still playing, which can knock that one out; in modes 7 and 8, button 0x25 puts the
+// ball back on the tee (for the cost of event 39 in mode 7). Then lbl_802823C8 is set.
 void fn_800FCCF0(void) {
     PlayerNumber_t i;
     PlayerNumber_t nOther;
@@ -1469,7 +1469,7 @@ void fn_800FD1C0(int nPlayer) {
     }
 }
 
-// State 26, update: a player who lost the hole (bit 15) or won it on the other's points (bit 16)
+// State 26, update: a player whose points ran out (bit 15) or who ran the other's out (bit 16)
 // gets event 40 or 41. When the countdown ends (and fn_800A7720 is clear), bit 14 becomes bit 13
 // and the player's turn is over; if the other player is not in state 26 and their ball is at
 // rest, both get bit 3 and the turn is ended again.
@@ -1513,7 +1513,7 @@ s32 fn_800FD6A4(int nPlayer) {
 }
 
 // A hole's points (nC6C) for the scorecard; *pWon is 1 when the player gained points on it
-// (two-player game only). The hole being played counts from nC44 until it is finished.
+// (two-player games only). The current hole counts once both have finished it, from nC44.
 s32 fn_800FD704(int nPlayer, int nHole, s32* pWon) {
     int nCur = Game_CurHoleIndex();
     int nGain;
@@ -1546,7 +1546,7 @@ s32 fn_800FD704(int nPlayer, int nHole, s32* pWon) {
     return gPlayers[nPlayer].nC6C[nHole];
 }
 
-// The two players' names ("User n" without a profile) and points for the results screen. Returns
+// The two players' names ("User n" without a loaded profile) and points, for the UI. Returns
 // which player gained points on the current hole: 0, 1, or -1 for neither.
 s32 fn_800FD8D0(char* szName1, s32* pPoints1, char* szName2, s32* pPoints2) {
     s32 bWon;
@@ -1614,7 +1614,7 @@ static inline s32 SG_Score(s32 nSeconds, s32 nStrokes) {
     return nStrokes * 3 + nSeconds;
 }
 
-// EndGame: the prize money. Solo (mode 8): the total of time plus 3 per stroke over the holes
+// The prize money (for the UI). Solo (mode 8): the total of time plus 3 per stroke over the holes
 // played, under the course's three limits (fn_800FDC0C), wins 5000, 2500 or 1000. Two players:
 // the winner takes the points margin over 3000 (4500 from a margin of 3000). Returns the winner
 // (-1 for none) and the money in *pMoney.
@@ -1707,8 +1707,8 @@ u8 fn_800FDF58(int nPlayer) {
 }
 
 // The mode's pfn234, which fn_800DFC18 asks (TW06's CheckControllerPulled, by
-// position): during the countdown (nC3C bit 1) once it is below 71; otherwise once player 0's
-// camera has stopped moving.
+// position): during the countdown (nC3C bit 1) once it is below 71; otherwise when player 0's
+// view is not on camera 1, 2 or 4 (fn_80063C90).
 u8 fn_800FDF60(void) {
     if (gPlayers[0].nC3C & 2) {
         if (gPlayers[0].nC54 < 71) {
