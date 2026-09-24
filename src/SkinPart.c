@@ -138,24 +138,28 @@ void fn_800CC588(Character* pChar, int nPart, int nVariant) {
 void fn_800CC5C0(Character* pChar, char* pPart, char* pVariant) {
     u64 uId;
     int nPart;
+    int nVariant;
 
     if (pChar == NULL || pChar->pSkin == NULL) return;
     fn_800CB700(&uId, pPart);
     nPart = fn_800CDAFC(pChar->pSkin, uId);
     fn_800CB700(&uId, pVariant);
-    fn_800CC588(pChar, nPart, fn_800CDBB0(pChar->pSkin, nPart, uId));
+    nVariant = fn_800CDBB0(pChar->pSkin, nPart, uId);
+    fn_800CC588(pChar, nPart, nVariant);
 }
 
 // Picks a set's variant and option of the body's skin by their names.
 void fn_800CC658(Character* pChar, char* pSet, char* pVariant, char* pOption) {
     int nSet;
     int nVariant;
+    int nOption;
 
     if (pChar == NULL || pChar->pSkin == NULL) return;
     if (pChar->pSkin->pModel != NULL) {
         nSet = fn_800CDCA0(pChar->pSkin, pSet);
         nVariant = fn_800CDD5C(pChar->pSkin, nSet, pVariant);
-        fn_800CC9D8(pChar, nSet, nVariant, fn_800CDE80(pChar->pSkin, nSet, nVariant, pOption));
+        nOption = fn_800CDE80(pChar->pSkin, nSet, nVariant, pOption);
+        fn_800CC9D8(pChar, nSet, nVariant, nOption);
     }
 }
 
