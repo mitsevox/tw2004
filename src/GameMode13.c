@@ -11,11 +11,11 @@
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState (see game.h).
 
-extern s32 lbl_802816A8;                    // the options saved while the game runs
-extern s32 lbl_802823B0;
-extern s32 lbl_802823B4;                    // the points multiplier from bonuses
-extern s32 lbl_802823B8;                    // the seconds added by the last shot
-extern s32 lbl_802823BC;                    // the points of the last shot
+s32 lbl_802816A8 = 4;                    // the options saved while the game runs
+s32 lbl_802823BC;                    // the points of the last shot
+s32 lbl_802823B8;                    // the seconds added by the last shot
+s32 lbl_802823B4;                    // the points multiplier from bonuses
+s32 lbl_802823B0;
 
 void  fn_800A624C(void);
 

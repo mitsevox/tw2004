@@ -9,6 +9,8 @@
 #include "frontend/fe.h"
 #include "endian.h"
 
+DynCamTables* lbl_80281D88;
+
 u8   fn_8001E9CC(u32* pBits, int nBit);         // the bit is set
 void fn_80039884(u8* pSrc, u8* pDst, int nCount);
 void fn_800399E0(u8* pSrc, CamShot* pDst, u32 nCount);

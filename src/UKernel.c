@@ -6,6 +6,15 @@
 #include "terrain.h"
 #include "psmgr.h"
 
+DynObjSlot lbl_801D5228[32];
+
+DynObj* lbl_80281DBC;
+DynObj* lbl_80281DB8;
+s32 lbl_80281DB4;
+u32 lbl_80281DB0;
+UMemPool* lbl_80281DAC;
+UMemPool* lbl_80281DA8;
+
 DynObj* fn_80049018(DynObjSetup* pSetup);
 void fn_8000E830(DynObj* pObj);
 void fn_8000ADC0(f32 (*pMtx)[4]);                   // identity

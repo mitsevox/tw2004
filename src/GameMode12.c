@@ -10,12 +10,12 @@
 #include "game/save.h"
 #include "game/earnings.h"
 
-extern s32 lbl_802823DC;                    // the surface the ball last landed on (-1: none)
+s32 lbl_802823DC;                    // the surface the ball last landed on (-1: none)
 
 // The surfaces a player has scored on, for the HUD (fn_800FF634): lbl_802823D8 entries.
-extern s32 lbl_802823D8;
-extern s32 lbl_80212468[20];                // the surface
-extern s32 lbl_80212418[20];                // how many times
+s32 lbl_802823D8;
+s32 lbl_80212468[20];                // the surface
+s32 lbl_80212418[20];                // how many times
 
 u8   fn_800FEC78(u8 bCheck);
 void fn_800FEF00(s32 nSurface, s32* pPoints, s32* pMeter, s32* pMult);

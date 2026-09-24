@@ -6,6 +6,15 @@
 #include "ball.h"
 #include "camera.h"
 
+AnimalStep lbl_80187DF0[6] = {
+    { 0, 3, 1, 0.5f, 0.0f },
+    { 1, 3, 2, 1.0f, 0.0f },
+    { 2, 3, 3, 1.0f, 0.5f },
+    { 3, 0, 2, 0.5f, 1.0f },
+    { 2, 0, 1, 0.0f, 1.0f },
+    { 1, 0, 0, 0.0f, 0.5f },
+};
+
 void fn_8000ADC0(f32 (*pMtx)[4]);                       // identity
 void fn_8000A194(f32 (*pMtx)[4], f32 a, f32 b, f32 c);  // a rotation matrix from three angles
 void fn_8000C5A4(f32 (*pMtx)[4]);

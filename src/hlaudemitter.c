@@ -16,6 +16,9 @@ void Voc_Cycle(void);                 // hlaudvoice.c
 void fn_800AF320(void);
 void fn_800B0434(void);                 // startUp.c
 
+AudInstance lbl_801F2740[256];
+AudEmitters lbl_801F2668;
+
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x80284008), before the 0.0f fn_800AD800 uses first; its body is unknown.
 static f32 hlaudemitter_StrippedFn(f32 x) {

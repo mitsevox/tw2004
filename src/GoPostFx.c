@@ -9,6 +9,15 @@
 #include "camera.h"
 #include "terrain.h"
 
+PostFxTint lbl_801D50C0[4];
+PostFx5090 lbl_801D5090[4];
+PostFx5020 lbl_801D5020[4];
+f32 lbl_801D5010[4];
+GxTexture lbl_801D4FB0[2];
+GxTexture lbl_801D4F80;
+
+void* lbl_80281D80;
+
 void fn_80037E50(void);
 void fn_80038A90(f32* pColour, f32 fCX, f32 fCY, u8 bCopy, int nView, int nField);
 void fn_80038724(int nField, int nView, f32 fAlpha, f32 fShake);

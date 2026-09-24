@@ -8,6 +8,8 @@
 #include "charstate.h"
 #include "frontend/fe.h"
 
+char lbl_80188138[] = "NoLogoName";
+
 void fn_80057FBC(SaveProfile* pProfile);
 void fn_80058208(SaveProfile* pProfile);
 

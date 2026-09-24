@@ -9,6 +9,9 @@
 #include "game/modes/pgatour.h"
 #include "game/modes/pgatoursim.h"
 
+u32 lbl_801D5948[8];
+u32 lbl_801D5908[16];
+
 void fn_80057438(SaveProfile* pProfile);
 void fn_80057DA4(SaveProfile* pProfile);
 

@@ -5,6 +5,10 @@
 #include "game.h"
 #include "terrain.h"
 
+Replay gReplayData;
+
+ReplayBuffer* lbl_80281E48;
+
 int  fn_80055CA4(void);                 // Ball.c
 int  fn_80055CC8(void);                 // Ball.c
 int  fn_80055D34(void);                 // Ball.c

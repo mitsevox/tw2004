@@ -6,7 +6,7 @@
 #include "game.h"
 #include "engine.h"
 
-extern u8 lbl_80282330;                     // the hole was ended early (fn_800ED974)
+u8 lbl_80282330;                     // the hole was ended early (fn_800ED974)
 
 void fn_800ED890(void);
 void fn_800ED8B8(void);

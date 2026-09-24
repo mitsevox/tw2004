@@ -5,6 +5,8 @@
 #include "engine.h"
 #include "charstate.h"
 
+s32* lbl_802825A8;
+
 s32   fn_801275F0(const void* p, s32 nCount, s32 nSize, s32 nAlign);
 void* fn_80127614(u8* pBase, s32* pOffset, const void* pSrc, s32 nSize, s32 nAlign);
 void* fn_801276A8(u8* pBase, s32* pOffset, s32 nSize, s32 nAlign);

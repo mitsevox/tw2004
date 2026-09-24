@@ -74,7 +74,7 @@ void fn_800E0AF0(f32* pA, f32* pB, f32* pOut) {
 typedef struct CourseList {
     u32 a[20];
 } CourseList;
-extern CourseList lbl_80184D40;
+const CourseList lbl_80184D40 = {{0, 1, 2, 3, 0, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20}};
 
 // A course counts as unlocked when any of the five profiles (or the second block) has its flag.
 #define COURSE_UNLOCKED(c, k) (gpSaveData[k].aCourseUnlocked[c] || lbl_80281DF4->aCourseUnlocked[c])

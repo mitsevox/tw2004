@@ -7,6 +7,11 @@
 
 #include "core/audtrack.h"
 
+UList lbl_801F1868[2];
+
+AudTrack* lbl_802820A0;
+UPool lbl_80282098;
+
 // Puts a track in the sorted list, before the first one of lower priority.
 void InsertSortWorldPerf(AudTrack* pTrack) {
     AudTrack* pAt;

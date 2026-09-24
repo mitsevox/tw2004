@@ -11,8 +11,8 @@
 
 void  fn_80102704_WinSkinsEvent(void);
 void  GameMode4_WinEvent(void);
-extern s32 lbl_802823C0;                    // skins carried over
-extern s32 lbl_802823C4;                    // the money carried over
+s32 lbl_802823C4;                    // the money carried over
+s32 lbl_802823C0;                    // skins carried over
 
 void fn_800F81EC(void);
 void GameModeSkins_SetupNextGolfer(void);

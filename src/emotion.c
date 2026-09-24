@@ -5,6 +5,8 @@
 #include "game.h"
 #include "physics.h"
 
+PlayerEmotion lbl_801D5F78[5];
+
 int  fn_8006AA70(int nPlayer);
 int  fn_8006AA84(int nPlayer);
 void fn_8006AE50(int nPlayer);

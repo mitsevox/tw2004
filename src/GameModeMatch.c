@@ -9,7 +9,7 @@
 #include "game/modes/challenge.h"
 #include "game/save.h"
 
-extern s32 lbl_80281658;                    // who has the honor in the playoff (5 = nobody yet)
+s32 lbl_80281658 = 5;                    // who has the honor in the playoff (5 = nobody yet)
 
 int  GameModeMatch_GetTeeHonors(int nPlayer);
 void GameModeMatch_EndGame(void);

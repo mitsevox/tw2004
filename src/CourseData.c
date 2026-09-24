@@ -21,6 +21,9 @@ u8   fn_800D304C(int nHole);
 int  fn_800D30B4(int nRound);
 int  fn_800D3208(void);
 
+CourseData lbl_801FA2F4[NUM_COURSE_DATA];
+BuiltRound lbl_801FA1F8[NUM_BUILT_ROUNDS];
+
 // Nothing to free: the tables are static.
 void fn_800D29E8(void) {
 }

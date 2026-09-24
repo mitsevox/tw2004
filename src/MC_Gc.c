@@ -35,6 +35,10 @@ void* lbl_802813D0 = lbl_801E7100;
 u8    lbl_802813D4 = 1;
 s32   lbl_802813D8 = -1;
 
+u8    lbl_801E7100[0xA000];
+CARDStat lbl_801E3B6C[127];
+CARDFileInfo lbl_801E3180[127];
+
 // Before a mount, read, write, delete or format: note the operation's size (lbl_80281FB4) and the
 // CARD library's transfer count so far (nXferStart).
 void fn_8009CB9C(s32 nPort, s32 nSlot, s32 nSize) {
