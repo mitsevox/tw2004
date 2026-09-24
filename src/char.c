@@ -1111,6 +1111,15 @@ void fn_8001EA34(u32* aBits, u32 n) {
     aBits[n >> 5] |= 1 << (n & 31);
 }
 
+// aOut = aA & aB, bit arrays of nBits bits.
+void fn_8001EA54(u32* aA, u32* aB, u32* aOut, u32 nBits) {
+    u32 i;
+
+    for (i = 0; i < (nBits + 31) >> 5; i++) {
+        aOut[i] = aA[i] & aB[i];
+    }
+}
+
 void fn_8001EB6C(u32* aBits, u32 n) {
     aBits[n >> 5] &= ~(1 << (n & 31));
 }
