@@ -41,8 +41,8 @@ u8 fn_800AB3A4(AudTrack* pTrack) {
 // Starts the voices on what is in their ARAM buffers.
 void fn_800AB428(AudTrack* pTrack) {
     AudPlayList* pList;
+    u8 bLoud;
     u8 i;
-    int bLoud;
 
     pList = pTrack->pTmpl->data.pPlayList;
     fn_800A85FC(pTrack->f44, fn_800AA44C(pList->n3));

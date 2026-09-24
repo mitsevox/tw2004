@@ -7,6 +7,8 @@
 #include "core/startup.h"
 
 void fn_800AFBD8(u16 nVoice, u8 bOn);   // startUp.c
+void fn_800AFDC8(u16 nVoice, SoundHeader* pHdr);        // startUp.c
+void fn_800B0114(u16 nVoice, VoiceEnvelope* pEnv);      // startUp.c
 
 void fn_800AC330(void);
 u8   fn_800AC6B0(AudVoiceRequest* pRequest, s16* pPriority);
@@ -54,6 +56,37 @@ void fn_800AC49C(void) {
 // Can this request take a voice playing at *pPriority?
 u8 fn_800AC6B0(AudVoiceRequest* pRequest, s16* pPriority) {
     return pRequest->nPriority > *pPriority;
+}
+
+// Sets a streamed voice up to play uLen bytes of its ARAM buffer at nRate, looping: a slow attack,
+// full sustain and a quick release when bLoud.
+void fn_800AC7DC(AudVoice* pVoice, u32 uLen, u32 nRate, u8 bLoud) {
+    VoiceEnvelope env;
+    SoundHeader hdr;
+    u16 nHwVoice;
+
+    *(u32*)&env = 0;            // the envelope's whole word cleared first (it is 4 bytes)
+    nHwVoice = pVoice->nHwVoice;
+    env.nAttack = 0x200;
+    env.nDecay = 0;
+    env.nSustain = 0xF;
+    env.nRelease = bLoud ? 0x10 : 0x80;
+    pVoice->uC = nRate;
+    pVoice->n14 = 0x7F;
+    pVoice->unkA_0 = 1;
+    fn_80005AE8(&hdr, 0, sizeof(hdr));
+    hdr.uC = 1;
+    // the buffer's start and end in 4-bit units, past the first frame's header
+    hdr.u0 = hdr.u4 = pVoice->uAram;
+    hdr.u4 += uLen;
+    hdr.u0 *= 2;
+    hdr.u4 *= 2;
+    hdr.u0 += 2;
+    hdr.u4 -= 1;
+    hdr.u8 = hdr.u0;
+    pVoice->uC = (f32)pVoice->uC * 2.048f;
+    fn_800AFDC8(nHwVoice, &hdr);
+    fn_800B0114(nHwVoice, &env);
 }
 
 // Pauses or resumes a voice's hardware voice.

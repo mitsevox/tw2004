@@ -540,7 +540,7 @@ s32  fn_800AC494(void);
 void fn_800AC49C(void);
 AudVoice* fn_800AC4A0(AudVoiceRequest* pRequest);
 void fn_800AC6D0(AudVoice* pVoice, AudVoiceParams* pParams, u8 n, f32 f);
-void fn_800AC7DC(AudVoice* pVoice, u32 uLen, u16 n4, int bLoud);
+void fn_800AC7DC(AudVoice* pVoice, u32 uLen, u32 nRate, u8 bLoud);
 void fn_800AC91C(AudVoice* pVoice, AudVoiceParams* pParams);
 void fn_800ACA5C(AudVoice* pVoice, u8 bPause);
 void fn_800ACA94(AudVoice* pVoice);     // let it end
