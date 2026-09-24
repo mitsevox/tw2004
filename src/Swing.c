@@ -552,10 +552,12 @@ f32 SW_vCalculateShotPower(int nPlayer) {
     }
     case SHOT_TYPE_CHIP_e:
     case SHOT_TYPE_PITCH_e: {
-        f32 f = *pPower;
+        f32 f;
         if (PLAYER(nPlayer)->nShotKind == SHOT_TYPE_CHIP_e) {
             f = *pPower * Physics_EstimateShotPower(PLAYER(nPlayer)->fDistance, &PLAYER(nPlayer)->ball,
                                                     SHOT_TYPE_CHIP_e, PLAYER(nPlayer)->nClub);
+        } else {
+            f = *pPower;
         }
         fPower = Swing_ApplyPowerBoost(nPlayer, f);
         Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_APPROACH, ATTR_TOTAL);
