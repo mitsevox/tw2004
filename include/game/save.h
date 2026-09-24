@@ -208,6 +208,30 @@ typedef struct SkinChoices {
 } SkinChoices;
 LAYOUT_ASSERT(SkinChoices, 0x5A7C);
 
+// A saved shot (gReplayData, 0x801D6030): the seed, player 0 as it was, and the conditions.
+typedef struct Replay {
+    u32    nSeed;               // 0x000
+    u8     unk4[4];
+    Player player;              // 0x008  player 0 before the shot
+    s32    nCourse;             // 0xF00
+    s16    nHole;               // 0xF04
+    s8     nTeeSet;             // 0xF06
+    s8     nPinSet;             // 0xF07  the session's pin set when the shot was saved
+    f32    fF08;                // 0xF08
+    f32    fF0C;                // 0xF0C
+    u8     bF10;                // 0xF10  in-flight replays are on (GameManager.c)
+    u8     unkF11;
+    s16    nF12;                // 0xF12  1..3: fn_800ED6F8 is set from nF14
+    s16    nF14;                // 0xF14  hundredths
+    s16    nWindDir;            // 0xF16
+    s16    nWindSpeed;          // 0xF18
+    s16    nF1A;                // 0xF1A  -> fn_80055C40
+    s16    nF1C;                // 0xF1C  -> fn_80055CAC
+    s16    nF1E;                // 0xF1E  -> fn_80055CD0
+    s16    nStrokes;            // 0xF20  strokes on the hole before the shot
+} Replay;
+LAYOUT_ASSERT(Replay, 0xF28);
+
 // One save profile (0x10600 bytes).
 typedef struct SaveProfile {
     u8   bActive;               // 0x00000  1: the slot holds a profile; payouts are scaled and awards given only then
@@ -257,7 +281,7 @@ typedef struct SaveProfile {
     Award aLadderAward[25];     // 0x00338  per ladder event (GameMode4.c); fn_800584DC's earnings
                                 //          rating counts the won ones
     Award aAward[39];           // 0x0039C
-    u8   aReplay[5][0xF28];     // 0x00438  a Replay each, saved with awards 0, 6, 9, 3 and 13
+    Replay aReplay[5];          // 0x00438  a Replay each, saved with awards 0, 6, 9, 3 and 13
     s32  nTourCardLevel;        // 0x05000  0..6: level 1 comes from the lessons (GameMode11), the rest
                                 //          from fn_800D439C; it scales payouts (GM_Earnings_ComputeTOURCardModifiers)
     u8   a5004[71];             // 0x05004  per marked hole 0..70 (fn_800E1CE8): fn_800588F4's kind 0

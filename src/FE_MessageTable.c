@@ -3138,23 +3138,23 @@ void fn_8007F8A0(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->n1061C = pArgs[1].i;
     switch (pArgs[1].i) {
     case 0:
-        replay0 = *(Replay*)gpSaveData[pArgs[0].i].aReplay[0];
+        replay0 = gpSaveData[pArgs[0].i].aReplay[0];
         fn_8007739C(&replay0);
         break;
     case 6:
-        replay6 = *(Replay*)gpSaveData[pArgs[0].i].aReplay[1];
+        replay6 = gpSaveData[pArgs[0].i].aReplay[1];
         fn_8007739C(&replay6);
         break;
     case 9:
-        replay9 = *(Replay*)gpSaveData[pArgs[0].i].aReplay[2];
+        replay9 = gpSaveData[pArgs[0].i].aReplay[2];
         fn_8007739C(&replay9);
         break;
     case 3:
-        replay3 = *(Replay*)gpSaveData[pArgs[0].i].aReplay[3];
+        replay3 = gpSaveData[pArgs[0].i].aReplay[3];
         fn_8007739C(&replay3);
         break;
     case 13:
-        replay13 = *(Replay*)gpSaveData[pArgs[0].i].aReplay[4];
+        replay13 = gpSaveData[pArgs[0].i].aReplay[4];
         fn_8007739C(&replay13);
         break;
     }
@@ -3194,7 +3194,7 @@ void fn_8007FA60(MsgArg* pArgs, MsgArg* pResult) {
     fn_80077808(nSlot);
 
     for (k = 0; k < 5; k++) {
-        strcpy(((Replay*)gpSaveData[pArgs[0].i].aReplay[k])->player.golfer.szLast, gpSaveData[nSlot].szName);
+        strcpy(gpSaveData[pArgs[0].i].aReplay[k].player.golfer.szLast, gpSaveData[nSlot].szName);
     }
     for (j = 0; j < 8; j++) {
         for (k = 0; k < 5; k++) {
