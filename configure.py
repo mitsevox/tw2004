@@ -914,7 +914,7 @@ config.libs = [
             Object(Matching, "GoViewport.c"),
             Object(Matching, "GoShaderObjectCommon_TexAnimManager_Gc.c"),
             Object(Matching, "FE_Manager.c"),
-            Object(NonMatching, "FE_MessageTable.c"),
+            Object(Matching, "FE_MessageTable.c"),
             Object(Matching, "GameUICommands.c"),
             Object(Matching, "FEgolferanim.c"),
             Object(NonMatching, "uiLoadFile.c"),

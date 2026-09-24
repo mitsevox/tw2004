@@ -709,10 +709,6 @@ void fn_80084F84(MsgArg* pArgs, MsgArg* pResult);
 #define FE_NUM_MESSAGES 770
 MsgHandler lbl_801D77A8[FE_NUM_MESSAGES];
 
-// fn_8007D428 and fn_80080388 set it to 0.2 for a locked golfer, else 0 (also for one that is not
-// available).
-f32 lbl_80281374 = 0.25f;
-
 // Run message nMsg's handler.
 void fn_80079E6C(int nMsg, MsgArg* pArgs, MsgArg* pResult) {
     lbl_801D77A8[nMsg](pArgs, pResult);
@@ -2935,48 +2931,6 @@ void fn_8007F088(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GM_vGetAllTimeRecordsHeld(&gpSaveData[pArgs[0].i]);
 }
 
-// Profile pArgs[0]'s stats, into the values pArgs[1..9] point at: the best round, the longest
-// drive and putt, nAC, two zeros, the game progress, the golfers unlocked and the courses
-// unlocked. The course list names course 0 twice (and not 4 or 7), so the count is one less; all
-// 18 rewards unlocked add one back.
-void fn_8007F2C0(MsgArg* pArgs, MsgArg* pResult) {
-    int nGolfers = 0;
-    int nCourses = 0;
-    int nRewards = 0;
-    int nProfile = pArgs[0].i;
-    int aCourses[20] = {0, 1, 2, 3, 0, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
-    int i;
-
-    *(s32*)pArgs[1].p = gpSaveData[nProfile].nA8;
-    *(s32*)pArgs[2].p = gpSaveData[nProfile].nA0;
-    *(s32*)pArgs[3].p = gpSaveData[nProfile].nA4;
-    *(s32*)pArgs[4].p = gpSaveData[nProfile].nAC;
-    *(s32*)pArgs[5].p = 0;
-    *(s32*)pArgs[6].p = 0;
-    *(f32*)pArgs[7].p = GM_GetGameProgress(&gpSaveData[nProfile]);
-    for (i = 0; i < 30; i++) {
-        if (gpSaveData[nProfile].aGolferUnlocked[i]) {
-            nGolfers++;
-        }
-    }
-    *(s32*)pArgs[8].p = nGolfers;
-    for (i = 0; i < 20; i++) {
-        if (gpSaveData[nProfile].aCourseUnlocked[aCourses[i]]) {
-            nCourses++;
-        }
-    }
-    nCourses--;
-    for (i = 0; i < 18; i++) {
-        if (gpSaveData[nProfile].aRewardUnlocked[i]) {
-            nRewards++;
-        }
-    }
-    if (nRewards == 18) {
-        nCourses++;
-    }
-    *(s32*)pArgs[9].p = nCourses;
-}
-
 // Profile pArgs[0]'s progress, into the values pArgs[1..7] point at: ladder awards won, PGA TOUR
 // tournaments won, the bonus progress, aB1CC bits set, real-time event awards won and a1054C
 // entries set (pArgs[5] is not used).
@@ -3031,6 +2985,48 @@ void fn_8007F0D0(MsgArg* pArgs, MsgArg* pResult) {
         }
     }
     *pnLocks = n;
+}
+
+// Profile pArgs[0]'s stats, into the values pArgs[1..9] point at: the best round, the longest
+// drive and putt, nAC, two zeros, the game progress, the golfers unlocked and the courses
+// unlocked. The course list names course 0 twice (and not 4 or 7), so the count is one less; all
+// 18 rewards unlocked add one back.
+void fn_8007F2C0(MsgArg* pArgs, MsgArg* pResult) {
+    int nGolfers = 0;
+    int nCourses = 0;
+    int nRewards = 0;
+    int nProfile = pArgs[0].i;
+    int aCourses[20] = {0, 1, 2, 3, 0, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
+    int i;
+
+    *(s32*)pArgs[1].p = gpSaveData[nProfile].nA8;
+    *(s32*)pArgs[2].p = gpSaveData[nProfile].nA0;
+    *(s32*)pArgs[3].p = gpSaveData[nProfile].nA4;
+    *(s32*)pArgs[4].p = gpSaveData[nProfile].nAC;
+    *(s32*)pArgs[5].p = 0;
+    *(s32*)pArgs[6].p = 0;
+    *(f32*)pArgs[7].p = GM_GetGameProgress(&gpSaveData[nProfile]);
+    for (i = 0; i < 30; i++) {
+        if (gpSaveData[nProfile].aGolferUnlocked[i]) {
+            nGolfers++;
+        }
+    }
+    *(s32*)pArgs[8].p = nGolfers;
+    for (i = 0; i < 20; i++) {
+        if (gpSaveData[nProfile].aCourseUnlocked[aCourses[i]]) {
+            nCourses++;
+        }
+    }
+    nCourses--;
+    for (i = 0; i < 18; i++) {
+        if (gpSaveData[nProfile].aRewardUnlocked[i]) {
+            nRewards++;
+        }
+    }
+    if (nRewards == 18) {
+        nCourses++;
+    }
+    *(s32*)pArgs[9].p = nCourses;
 }
 
 // How many of the 71 marked holes the slot's profile has (fn_800588F4's kind 0).
