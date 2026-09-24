@@ -852,6 +852,8 @@ hwsBurn.c:
 
 CalendarScreen.c:
 	.text       start:0x80111F58 end:0x80112614
+	.data       start:0x80193D90 end:0x80193DA8
+	.sdata      start:0x802817D8 end:0x802817E8
 
 hwsMaterial_Gc.c:
 	.text       start:0x80112614 end:0x80112804

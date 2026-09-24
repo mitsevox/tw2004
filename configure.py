@@ -1010,7 +1010,7 @@ config.libs = [
             Object(Matching, "FE_LogoDesign.c"),
             Object(Matching, "DiscCheck.c"),
             Object(NonMatching, "hwsBurn.c"),
-            Object(NonMatching, "CalendarScreen.c"),
+            Object(Matching, "CalendarScreen.c"),
             Object(Matching, "hwsMaterial_Gc.c"),
             Object(Matching, "hwsOverride_Gc.c"),
             Object(NonMatching, "hwsRender_Gc.c"),
