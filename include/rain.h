@@ -24,6 +24,9 @@ typedef struct RainList {
     void* pList;                // 0x4
 } RainList;
 
+#define RAIN_BUF_A_SIZE 0x1B0   // RainData.apA's buffers
+#define RAIN_BUF_B_SIZE 1000    // RainData.apB's buffers
+
 // A rain effect object's render data. Its size is not known yet.
 typedef struct RainData {
     RainList list;              // 0x00  900 drops

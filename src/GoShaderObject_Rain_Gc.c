@@ -50,12 +50,12 @@ void SD_vShaderObject_Rain_Dynamic_Init(RainObject* pRain, f32* pStrength) {
 
     fn_800B4C00(&pData->list, 900);
     for (i = 0; i < 4; i++) {
-        pData->apA[i] = fn_80009B34(0x1B0, 2, 0x20, "GoShaderObject_Rain_Gc.c", 280);
-        memset(pData->apA[i], 0, 0x1B0);
+        pData->apA[i] = fn_80009B34(RAIN_BUF_A_SIZE, 2, 0x20, "GoShaderObject_Rain_Gc.c", 280);
+        memset(pData->apA[i], 0, RAIN_BUF_A_SIZE);
     }
     for (i = 0; i < 2; i++) {
-        pData->apB[i] = fn_80009B34(1000, 2, 0x20, "GoShaderObject_Rain_Gc.c", 292);
-        memset(pData->apB[i], 0, 1000);
+        pData->apB[i] = fn_80009B34(RAIN_BUF_B_SIZE, 2, 0x20, "GoShaderObject_Rain_Gc.c", 292);
+        memset(pData->apB[i], 0, RAIN_BUF_B_SIZE);
     }
     uSplash = fn_8000BEE4("splash");
     fn_800102DC(uSplash, &lbl_802814B8->pBank, &lbl_802814B8->pTex);
