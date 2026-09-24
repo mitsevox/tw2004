@@ -420,6 +420,14 @@ int  fn_80106E48(s16 n);                // FE_CrAPDB.c: the profile's assets who
 s32  fn_801070F4(void);                 // FE_CrAPDB.c: fill lbl_80282470; how many records
 void fn_80107244(int n, s16* pN0, s32* pN4, char* pDst);   // FE_CrAPDB.c: copy record n out
 void fn_80107294(s16 n, char* pDst);    // FE_CrAPDB.c: name n of lbl_801935C8
+// FE_CrAPDB.c: send message nMsg with its values to the front end (the EA Sports Bio screens).
+void fn_80107554(int nMsg, s32 nA);
+void fn_80107594(int nMsg, s32 nA, char* szB);
+void fn_801075F8(int nMsg, s32 nA, char* szB, s32 nC);
+int  fn_801076B0(char* sz, int nMsg);
+void fn_8010771C(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, f32 fG);
+void fn_80107774(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, s32 nG, s32 nH, s32 nI,
+                 s32 nJ);
 SaveProfile* fn_80077ACC(void);         // the profile being worked on
 u8   fn_80078008(s32 nAsset, SaveProfile* pProfile);  // the asset is locked (FE_Manager.c)
 int  fn_80078604(int a, int b, int c);  // a date (month, day, year from fn_8011E020) packed

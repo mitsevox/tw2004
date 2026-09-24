@@ -6,6 +6,7 @@
 #include "engine.h"
 #include "core/memcard.h"
 #include "core/easb.h"
+#include "frontend/fe.h"
 
 s32 fn_80106ED8(s32 arg0, s32 nLevel);
 s32 fn_80107084(s32 arg0, s32 nLevel);
@@ -90,6 +91,132 @@ f32 fn_80124BDC(void) {
 
     fn_8012DF4C(&uLevel, &fProgress);
     return 100.0f * fProgress;
+}
+
+// Sends the Bio screens what they asked for (fn_80125600, fn_80125648, fn_8012566C, fn_80125680):
+// the list of games (each marked when the Bio's level has reached it), a game's accomplishments,
+// and every 15 frames the Bio's summary and one game's details.
+void fn_80124C10(void) {
+    u16 szWide[EASB_ACCOMPLISHMENT_NAME_SIZE];
+    char szName[EASB_PRODUCT_NAME_SIZE];
+    char szAccomplishment[0x40];
+    u16 szGamesPlayedType[EASB_GAMES_PLAYED_TYPE_SIZE];
+    char szGamesPlayed[0x40];
+    s32 nPlayed;
+    u32 nDays;              // EA bug: fn_8012E820 stores a u16 into it (the high half here)
+    u32 uUnused;
+    s32 nWon;
+    u32 uTimeB;
+    u32 uTimeA;
+    u32 uTime;
+    f32 fProgress;
+    u16 uGameLevel;
+    u16 nYear;
+    u16 uBioLevel;
+    u16 uWantLanguage;      // the one language asked for (a list of one)
+    u16 uLanguage;
+    u16 uLevel;
+    u8 nHours;
+    u8 nMinutes;
+    u8 nSeconds;
+    u8 nMonth;
+    u8 nDay;
+    u8 nProducts;
+    u8 nCount;
+    s32 i;
+    s32 n;
+    s32 nPercent;
+    s32 bUnlocked;
+    s32 bByTime;
+
+    uWantLanguage = 'en';
+    uLanguage = 'en';
+    if (lbl_8028257D) {
+        fn_8012DE90(&nProducts);
+        fn_80107554(0xAD, nProducts);
+        fn_8012DF4C(&uBioLevel, &fProgress);
+        for (i = lbl_80282578, n = 0; i < nProducts; n++, i++) {
+            fn_8012E1E0(i, &uLevel);
+            bUnlocked = uBioLevel >= uLevel;
+            fn_8012DFDC(i, szName, sizeof(szName));
+            fn_801075F8(0xAC, n, szName, bUnlocked);
+        }
+        for (i = nProducts; i < 11; i++) {
+            fn_801075F8(0xAC, i, lbl_80281994, 0);
+        }
+        lbl_8028257D = 0;
+    }
+    if (lbl_8028257C) {
+        nCount = 0;
+        bByTime = !lbl_80282568;
+        fn_8012E670(lbl_80282570, bByTime, &nCount);
+        fn_80107554(0xAF, nCount);
+        for (i = lbl_80282574, n = 0; i < nCount; i++) {
+            if (fn_8012E434(lbl_80282570, i, bByTime, szWide, EASB_ACCOMPLISHMENT_NAME_SIZE, &uTime,
+                            &uWantLanguage, 1, &uLanguage) == EASB_ERROR_NONE) {
+                fn_800A2774(szWide, szAccomplishment, 0x3F);
+                fn_80107594(0xAE, n, szAccomplishment);
+                n++;
+            }
+        }
+        for (; n < 10; n++) {
+            fn_80107594(0xAE, n, lbl_80281994);
+        }
+        lbl_8028257C = 0;
+    }
+    if (lbl_8028256A && lbl_8028198C-- <= 0) {
+        nPlayed = 0;
+        nDays = 0;
+        nHours = 0;
+        nMinutes = 0;
+        nSeconds = 0;
+        uBioLevel = 0;
+        fProgress = 0.0f;
+        fn_8012DF4C(&uBioLevel, &fProgress);
+        fn_8012DDE0(&uTimeA);
+        fn_8012DE38(&uTimeB);
+        fn_8012E820(uTimeA + uTimeB, (u16*)&nDays, &nHours, &nMinutes, &nSeconds);
+        fn_8012DE90(&nProducts);
+        fn_8010771C(0xB1, uBioLevel, nProducts, nDays, nHours, nMinutes, nSeconds, uBioLevel);
+        lbl_8028198C = 15;
+    }
+    if (lbl_80282569 && lbl_80281990-- <= 0) {
+        nDays = 0;
+        nHours = 0;
+        nMinutes = 0;
+        nSeconds = 0;
+        nWon = 0;
+        nPlayed = 0;
+        nMonth = 0;
+        nDay = 0;
+        nYear = 0;
+        uUnused = 0;
+        fProgress = 0.0f;
+        fn_8012DFDC(lbl_80282570, szName, sizeof(szName));
+        fn_801076B0(szName, 0xB3);
+        fn_8012E25C(lbl_80282570, &uTimeA);
+        fn_8012E2D4(lbl_80282570, &uTimeB);
+        fn_8012E820(uTimeA + uTimeB, (u16*)&nDays, &nHours, &nMinutes, &nSeconds);
+        fn_8012E16C(lbl_80282570, &uTime);
+        // the time of day is not shown: all three go to one unused word
+        fn_8012E8A8(uTime, &nYear, &nMonth, &nDay, (u8*)&uUnused, (u8*)&uUnused, (u8*)&uUnused);
+        fn_8012E34C(lbl_80282570, (u32*)&nPlayed);
+        fn_8012E3C0(lbl_80282570, (u32*)&nWon);
+        if (nPlayed == 0) {
+            nPercent = 0;
+        } else {
+            nPercent = 100.0f * nWon / nPlayed;
+        }
+        fn_8012E1E0(lbl_80282570, &uGameLevel);
+        fn_8012E084(lbl_80282570, szGamesPlayedType, EASB_GAMES_PLAYED_TYPE_SIZE, &uWantLanguage, 1,
+                    &uLanguage);
+        fn_800A2774(szGamesPlayedType, szGamesPlayed, 0x3F);
+        fn_801076B0(szGamesPlayed, 0xBF);
+        fn_801076B0(szName, 0xB3);
+        fn_80107774(0xB2, nDays, nHours, nMinutes, nSeconds, nMonth, nDay, nYear, nPlayed, nPercent,
+                    uGameLevel);
+        lbl_80281990 = 15;
+    }
 }
 
 void fn_801250C0(void) {
