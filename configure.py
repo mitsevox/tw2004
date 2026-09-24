@@ -878,7 +878,7 @@ config.libs = [
             Object(NonMatching, "LLPict_Gc.c"),
             Object(NonMatching, "GoTerrain.c"),
             Object(NonMatching, "Skin.c"),
-            Object(NonMatching, "GoPostFx.c"),
+            Object(Matching, "GoPostFx.c"),
             Object(NonMatching, "GoDynamicCam.c"),
             Object(NonMatching, "gocamscripts.c"),
             Object(NonMatching, "DepthField.c"),
