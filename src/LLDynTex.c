@@ -22,6 +22,9 @@ void fn_8000FBAC();
 void fn_8010B7C0(void);
 void fn_8010A930(DynTexObj* pObj, u8* pBuf, void* p, s32 n);
 DynTexJob* fn_8010B960(void);
+u8   fn_8010BF3C(void);
+u8   fn_8010BFE0(void);
+void fn_80007254(void);                 // LLDisp_Gc.c
 
 // Set up: the state and its nSize-byte block (gomainloop.c: 0x18000, later 0x6000).
 void fn_8010A448(int nSize) {
@@ -197,12 +200,14 @@ void fn_8010BEC4(void) {
     lbl_80282488->n96C = 0;
 }
 
-s32 fn_8010BF3C(void) {
-    u8 b = 0;
+// Whether the queue is empty and nothing is left to do.
+u8 fn_8010BF3C(void) {
+    int bDone = 0;
+
     if (lbl_80282488->nA84 == 0 && lbl_80282488->n980 == 0) {
-        b = 1;
+        bDone = 1;
     }
-    return b;
+    return bDone;
 }
 
 void fn_8010BFA0(s32 n) {
@@ -215,3 +220,25 @@ void fn_8010BFA0(s32 n) {
 }
 
 // ---- end of sweep code ----
+
+// Empty the job pool and the queue.
+void fn_8010B7C0(void) {
+    int i;
+
+    lbl_80282488->nA84 = 0;
+    for (i = 0; i < 10; i++) {
+        lbl_80282488->aJobs[i].bUsed = 0;
+        lbl_80282488->aJobs[i].pfnA = NULL;
+        lbl_80282488->aJobs[i].pfnB = NULL;
+        lbl_80282488->apQueue[i] = NULL;
+    }
+}
+
+// Run the jobs until the queue is empty and nothing is left to do, a frame at a time.
+void fn_8010BF68(void) {
+    while (!fn_8010BF3C()) {
+        fn_800B7490();
+        fn_8010BFE0();
+        fn_80007254();
+    }
+}
