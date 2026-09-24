@@ -6,6 +6,7 @@
 #include "gx.h"
 #include "core/startup.h"
 #include "lldyntex.h"
+#include "character.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -31,6 +32,9 @@ int  fn_800106F0(TexBank* pBank);       // LLTexGrp.c
 int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
 TexEntry* fn_800107E4(TexBank* pBank, int nTex);  // LLTexGrp.c
 s32  fn_8010BC94(const void* pA, const void* pB);
+s32  fn_8010B5F8(DynTexObj* pObj);
+void fn_80007368(void);
+void fn_80007328(void);
 
 // Set up: the state and its nSize-byte block (gomainloop.c: 0x18000, later 0x6000).
 void fn_8010A448(int nSize) {
@@ -558,13 +562,128 @@ u8 fn_8010BF3C(void) {
     return bDone;
 }
 
-void fn_8010BFA0(s32 n) {
-    lbl_80282488->n97C = n;
-    lbl_80282488->n978 = lbl_80282488->n978 + n;
+// fn_80006444's callback: nBytes more arrived (nError is not read).
+void fn_8010BFA0(int nBytes, int nError) {
+    lbl_80282488->n97C = nBytes;
+    lbl_80282488->n978 = lbl_80282488->n978 + nBytes;
     lbl_80282488->b974 = 1;
     if (lbl_80282488->n978 >= lbl_80282488->n984) {
         lbl_80282488->b975 = 1;
     }
+}
+
+// The Character whose p50 ppBank points at (char.c hands LLDynTex.c &Character.p50; the fields
+// after it, up to p60, are read through it).
+// port: EA likely had these five fields in a struct of their own inside Character
+#define DYNTEX_CHAR(ppBank) ((Character*)((u8*)(ppBank) - 0x50))
+
+// The loader, run each frame by fn_8010BF68: takes the next queued job, then streams the pixels
+// and palette of each texture in use (aUses) from the job's character file in reads of at most
+// nA98 bytes, fn_80006444 reading in the background and fn_8010BFA0 counting what arrived, and
+// copies them into the character's DynTex. Returns whether it is still busy.
+u8 fn_8010BFE0(void) {
+    DynTex* pTex;
+    TexEntry* pEntry;
+    TexPalette* pPal;
+    DynTexUse* pUse;
+    int bReady;
+    s32 nLen;
+
+    if (lbl_80282488->n980 == 3) {
+        if (lbl_80282488->b974 != 0) {
+            lbl_80282488->n980 = 0;
+            return 0;
+        }
+        return 1;
+    }
+    if (lbl_80282488->n980 == 0) {
+        if (lbl_80282488->nA84 == 0) {
+            return 0;
+        }
+        lbl_80282488->pA88 = fn_8010B960();
+        lbl_80282488->pA88->pfnA(lbl_80282488->pA88->pChar);
+        if (DYNTEX_CHAR(lbl_80282488->p8)->hFile < 0) {
+            lbl_80282488->pA88->pfnB(lbl_80282488->pA88->pChar);
+            lbl_80282488->n980 = 0;
+            lbl_80282488->pA88->bUsed = 0;
+            return 0;
+        }
+    }
+    fn_80007368();
+    bReady = lbl_80282488->b974 != 0;
+    fn_80007328();
+    if (!bReady) {
+        return 1;
+    }
+    pTex = DYNTEX_CHAR(lbl_80282488->pA88->p0)->p60;
+    // Copy what the last read brought.
+    if (lbl_80282488->n978 != 0) {
+        Mem_cpy(lbl_80282488->p4, lbl_80282488->p0 + lbl_80282488->nA94, lbl_80282488->nA90);
+        lbl_80282488->p4 += lbl_80282488->nA90;
+        lbl_80282488->nA8C += lbl_80282488->nA90;
+        lbl_80282488->nA94 = 0;
+    }
+    if (lbl_80282488->b975) {
+        if (lbl_80282488->n980 == 1) {
+            // The last texture is all in: flush it (and its palette) to the GPU.
+            if (lbl_80282488->n978 != 0 && lbl_80282488->n970 > 0) {
+                pUse = &lbl_80282488->aUses[lbl_80282488->n970 - 1];
+                fn_8010B1D4(pTex, pUse->nC, NULL, pUse->p4, pUse->n8);
+                pUse = &lbl_80282488->aUses[lbl_80282488->n970 - 1];
+                if (pTex->p0[pUse->nC].n1C != 0) {
+                    // port: EA passes two arguments fn_8010B2A8 ignores
+                    ((void (*)(DynTex*, int, s16*, void*, s32))fn_8010B2A8)(pTex, pUse->nC, NULL,
+                                                                            pUse->p4, pUse->n8);
+                }
+            }
+            if (lbl_80282488->n970 == lbl_80282488->n96C) {
+                // All done.
+                lbl_80282488->pA88->pfnB(lbl_80282488->pA88->pChar);
+                lbl_80282488->pA88->bUsed = 0;
+                lbl_80282488->n980 = 0;
+                return 0;
+            }
+            // The next texture: add it to the DynTex and work out the 2 KB-aligned read.
+            pEntry = lbl_80282488->aUses[lbl_80282488->n970].pTex;
+            lbl_80282488->n984 = 0;
+            pPal = NULL;
+            if (pEntry->nPalette != -1) {
+                pPal = &(*lbl_80282488->p8)->pC[pEntry->nPalette];
+            }
+            pUse = &lbl_80282488->aUses[lbl_80282488->n970];
+            pUse->nC = fn_8010B338(DYNTEX_CHAR(lbl_80282488->pA88->p0)->p60, (DynTexObj*)pEntry,
+                                   (DynTexPalette*)pPal, NULL, NULL, pUse->p4, pUse->n8);
+            lbl_80282488->p4 = pTex->p18 +
+                pTex->p4->p8[lbl_80282488->aUses[lbl_80282488->n970].nC].aBlocks[0].nOffset;
+            lbl_80282488->u98C = DYNTEX_CHAR(lbl_80282488->p8)->n58 + pEntry->uPixels;
+            lbl_80282488->u98C &= ~0x7FF;
+            lbl_80282488->nA94 =
+                DYNTEX_CHAR(lbl_80282488->p8)->n58 + pEntry->uPixels - lbl_80282488->u98C;
+            lbl_80282488->n988 = fn_8010B5F8((DynTexObj*)pEntry) << 4;
+            if (pPal != NULL) {
+                lbl_80282488->n988 += fn_8010B664((DynTexPalette*)pPal) << 4;
+            }
+            lbl_80282488->n984 = lbl_80282488->n988 + lbl_80282488->nA94;
+            lbl_80282488->n984 = (lbl_80282488->n984 + 0x7FF) & ~0x7FF;
+            lbl_80282488->n970++;
+        }
+        lbl_80282488->n978 = 0;
+        lbl_80282488->nA8C = 0;
+        lbl_80282488->b975 = 0;
+    }
+    // Start the next read.
+    nLen = lbl_80282488->n984 - lbl_80282488->n978;
+    if (nLen > lbl_80282488->nA98) {
+        nLen = lbl_80282488->nA98;
+    }
+    lbl_80282488->nA90 = nLen - lbl_80282488->nA94;
+    if (lbl_80282488->nA8C + lbl_80282488->nA90 > lbl_80282488->n988) {
+        lbl_80282488->nA90 = lbl_80282488->n988 - lbl_80282488->nA8C;
+    }
+    lbl_80282488->b974 = 0;
+    fn_80006444(DYNTEX_CHAR(lbl_80282488->p8)->hFile, lbl_80282488->p0, nLen,
+                lbl_80282488->u98C + lbl_80282488->n978, fn_8010BFA0);
+    return 1;
 }
 
 // ---- end of sweep code ----
