@@ -78,6 +78,7 @@ void fn_800953C8(int nWatch);           // start
 u8   fn_80095430(int nWatch);           // running?
 u64  fn_80095444(int nWatch);           // stop; returns the reading
 u64  fn_800954A4(int nWatch);           // the reading
+f32  fn_8006E118(u64 uNow, u64 uLast);  // seconds between two readings (gomainloop.c)
 void fn_80095504(int nWatch);           // reset to 0
 // Pack up to 12 characters of pName into a 64-bit code (base 40, table lbl_80191520).
 int   fn_800CB700(u64* pId, const char* pName);

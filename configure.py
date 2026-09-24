@@ -899,7 +899,7 @@ config.libs = [
             Object(NonMatching, "target.c"),
             Object(Matching, "emotion.c"),
             Object(Matching, "Replay.c"),
-            Object(NonMatching, "gomainloop.c"),
+            Object(Matching, "gomainloop.c"),
             Object(Matching, "GoFrameBuf.c"),
             Object(Matching, "GoLighting.c"),
             Object(Matching, "Code8006F154.c"),
