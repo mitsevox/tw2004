@@ -99,8 +99,8 @@ void fn_800F0678(void) {
     lbl_8028234C = 0;
 }
 
-// Starts today's event: the options are saved (wind off), and
-// its challenge runs in mode 5 with this file's start and end wrapped around it.
+// Starts today's event: the options are saved (wind off) and, if the event is on and has a
+// challenge, it runs in mode 5 with this file's shutdown and end-game wrapped around mode 5's.
 void GameModeDriverRTE_StartEvent(void) {
     lbl_80281680 = gSession.options.nC;
     lbl_80282348 = gSession.options.nWind;
@@ -149,8 +149,8 @@ s32 fn_800F0820(void) {
     return n;
 }
 
-// The message after an event (before its award is marked won): the first win (0), or one for the
-// event, else one of four at random.
+// The messages after an event win (before its award is marked won): 0 for the first win, one for
+// some events, and one of four at random when neither applies.
 void fn_800F08A8(void) {
     u8 bFirst = 0;
     u8 bSaid;
