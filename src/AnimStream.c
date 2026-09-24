@@ -651,11 +651,11 @@ void fn_800CACD4(int nPlayer) {
     AnimLib* pLib;
     ClipRecord* pRecords;
     int nSlot;
-    int nAnimSlot;
-    u32 uFileSize;
     int i;
     int nStyle;
     int nClub;
+    int nAnimSlot;
+    u32 uFileSize;
     s32 nCount;
     u32 uFlags;
     s32 nFirst;
