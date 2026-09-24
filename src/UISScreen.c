@@ -601,7 +601,7 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
 char* fn_8016BEDC(char* pOut, char* pEnd, s32 nWidth, s32 nPrec, f32 f) {
     char aDigits[64];
     s32 nDigits;
-    u8 bNeg;
+    s32 bNeg;
     f32 fRound;
     s32 i;
     f32 fFrac;
@@ -618,7 +618,7 @@ char* fn_8016BEDC(char* pOut, char* pEnd, s32 nWidth, s32 nPrec, f32 f) {
     }
     fRound = 0.5f;
     for (i = 0; i < nPrec; i++) {
-        fRound *= 0.1f;
+        fRound = 0.1f * fRound;
     }
     f += fRound;
     fFrac = f - (s32)f;
