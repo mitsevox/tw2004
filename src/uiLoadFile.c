@@ -8,19 +8,20 @@
 #include "core/goaram.h"
 #include "game/frontend.h"
 
-u8    lbl_80281360 = 1;         // the menus' 'GRPS'/'MPCS' data has not been copied to ARAM yet
-
-u32   lbl_80281EF0;             // the menus' 'GRPS'/'MPCS' data's ARAM address
-u32   lbl_80281EF4;             // the next multiple of 32 above its size
-u32   lbl_80281EF8;             // the UI file's ARAM address while it is parked there
-u32   lbl_80281EFC;             // the next multiple of 32 above its size
-u8    lbl_80281F00;             // it is in ARAM (fn_8008F310), not in main memory
-UINamedList* lbl_80281F04;      // the 'GRPS'/'MPCS' data: a count, then that many offsets that
-                                // fn_8008EFC0 turns into pointers
+// .sbss: defined in reverse address order (CodeWarrior lays them out last-defined-first).
+char* lbl_80281F10;             // the name of the UI set: "frontend", "ingame" or "startup"
+void* lbl_80281F0C;             // the UI file's data, copied out of its stream object (fn_8008ED80)
 u32*  lbl_80281F08;             // the 'FONS' data: a count, then that many UIFont offsets, turned
                                 // into pointers the same way
-void* lbl_80281F0C;             // the UI file's data, copied out of its stream object (fn_8008ED80)
-char* lbl_80281F10;             // the name of the UI set: "frontend", "ingame" or "startup"
+UINamedList* lbl_80281F04;      // the 'GRPS'/'MPCS' data: a count, then that many offsets that
+                                // fn_8008EFC0 turns into pointers
+u8    lbl_80281F00;             // it is in ARAM (fn_8008F310), not in main memory
+u32   lbl_80281EFC;             // the next multiple of 32 above its size
+u32   lbl_80281EF8;             // the UI file's ARAM address while it is parked there
+u32   lbl_80281EF4;             // the next multiple of 32 above its size
+u32   lbl_80281EF0;             // the menus' 'GRPS'/'MPCS' data's ARAM address
+
+UILoaded lbl_801D87A8;
 
 void fn_8008ED28(void);
 void fn_8008ED80(UStreamObject* pObject);
@@ -99,6 +100,9 @@ void fn_8008EE1C(UStreamObject* pObject) {
     fn_80009E70(pObject);
 }
 
+// .sdata order: defined here, after fn_8008EC68's "ingame" and "startup", as in the original.
+u8    lbl_80281360 = 1;         // the menus' 'GRPS'/'MPCS' data has not been copied to ARAM yet
+
 // 'GRPS' and 'MPCS'. The menus' copy goes to ARAM the first time it comes in, and later ones
 // are dropped: fn_8008F294 brings it back from there.
 void fn_8008EEB8(UStreamObject* pObject) {
@@ -129,12 +133,15 @@ void fn_8008EEB8(UStreamObject* pObject) {
 // port: the data stores 32-bit offsets where the code expects pointers, as the GameCube's are.
 void fn_8008EFC0(UINamedList* pList) {
     u32 i;
-    char** ppName;
+    char* pName;
 
     lbl_80281F04 = pList;
     for (i = 0; i < lbl_80281F04->nCount; i++) {
-        ppName = &lbl_80281F04->apNames[i];
-        *ppName = (char*)((uptr)*ppName + (uptr)pList);
+        // fake match: the add goes through a local (in one expression the value and the offset
+        // come out in each other's registers)
+        pName = lbl_80281F04->apNames[i];
+        pName += (uptr)pList;
+        lbl_80281F04->apNames[i] = pName;
     }
 }
 
@@ -144,12 +151,15 @@ void fn_8008EFFC(UStreamObject* pObject) {
     u32* pData;
     u32 i;
     int nSlot;
+    u32 uFont;
 
     pData = fn_80009B34(pObject->uSize, 2, 32, "uiLoadFile.c", 348);
     Mem_cpy(pData, pObject->pData, pObject->uSize);
     lbl_80281F08 = pData;
     for (i = 0; i < lbl_80281F08[0]; i++) {
-        lbl_80281F08[1 + i] = (uptr)((u8*)lbl_80281F08[1 + i] + (uptr)pData);
+        uFont = lbl_80281F08[1 + i];        // fake match: through a local, as in fn_8008EFC0
+        uFont += (uptr)pData;
+        lbl_80281F08[1 + i] = uFont;
         nSlot = UFont_FindFreeSlot();
         UFont_LoadFont(nSlot, &((UIFont*)lbl_80281F08[1 + i])->nSlot, 0);
         ((UIFont*)lbl_80281F08[1 + i])->nSlot = nSlot;
