@@ -51,7 +51,7 @@ void fn_80037FB4(u8 b, f32* pColour);
 u8 fn_8003944C();
 void fn_80038314(void);
 void fn_800383A8(void);
-s32 fn_80038438();
+void fn_80038438(void);
 void fn_800382E0(void);
 void fn_80038A2C(int nField, RenderCamera* pCamera);
 void fn_80038A6C(int nField, void* pCamera);
@@ -136,6 +136,56 @@ void fn_800383A8(void) {
         }
     }
     fn_8002A2FC();
+}
+
+// Draws the set colour of each view in use over that view's rectangle, then clears it. The
+// current camera is given each view's rectangle for this and gets its own back after.
+void fn_80038438(void) {
+    int i;
+    f32 aXY[8];
+    f32* pRect;
+    f32* pViewRect;
+    f32 fX;
+    f32 fY;
+    f32 fH;
+    f32 fW;
+
+    fn_8001425C(0);
+    fn_80012F34(0);
+    fn_80014118(0x40);
+    fn_80012F18(7);
+    fn_80035118(4, 5);
+    fn_80012F50(0, 6, 0x80);
+    fn_80012EF8();
+    pRect = fn_80012EF0(fn_8001614C());
+    fX = pRect[0];
+    fY = pRect[1];
+    fW = pRect[2];
+    fH = pRect[3];
+    for (i = 0; i < 4; i++) {
+        if (lbl_801D50C0[i].b0 && fn_800170A0(i)) {
+            pViewRect = fn_80012EF0(fn_80017004(i));
+            fn_800171D8(pRect, pViewRect[0], pViewRect[1], pViewRect[2], pViewRect[3]);
+            fn_80035240(NULL);
+            fn_80013CCC(fn_8001614C());
+            fn_80013EEC(fn_8001614C());
+            fn_80016B9C();
+            fn_80012EF8();
+            fn_800141F8(aXY, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
+            fn_80014194(lbl_801D50C0[i].aColour);
+            fn_8001644C(0xA1, aXY, NULL, NULL, 2);
+            lbl_801D50C0[i].b0 = 0;
+        }
+    }
+    fn_800171D8(pRect, fX, fY, fW, fH);
+    fn_80035240(NULL);
+    fn_80013CCC(fn_8001614C());
+    fn_80013EEC(fn_8001614C());
+    fn_80016B9C();
+    fn_80012F34(1);
+    fn_80012F18(3);
+    fn_80012F50(1, 6, 0x80);
+    fn_80012EF8();
 }
 
 // Draws pColour over the whole screen.
