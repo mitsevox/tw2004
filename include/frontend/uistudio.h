@@ -290,7 +290,7 @@ void fn_80168C24(UIStudio* pStudio, s32 nTicks);
 void fn_80168CD8(UIStudio* pStudio, UISWordStack* pStack, u32 uEvent, s32 n, u8 b, void* p, u8 bAll);
 void fn_80168DB0(UIStudio* pStudio, u32 uEvent, s32 n, u8 b, void* p, u8 bAll);
 void fn_80168EE8(UIStudio* pStudio, u16* puGroup, u16* puScreen);
-void fn_80168F5C(UIStudio* pStudio, s16 nGroup, s16 nScreen);
+void fn_80168F5C(UIStudio* pStudio, u16 uGroup, u16 uScreen);
 s32 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n);
 u8 fn_80169308(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n);
 s32 fn_801694A0(UIStudio* pStudio, u16 uGroup, u16 uScreen, u8 nArgs, s32* pArgs);

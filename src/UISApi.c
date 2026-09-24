@@ -81,12 +81,12 @@ void fn_80168EE8(UIStudio* pStudio, u16* puGroup, u16* puScreen) {
 }
 
 // Queues event 3 for a screen and runs the queue, unless an event is being sent right now.
-void fn_80168F5C(UIStudio* pStudio, s16 nGroup, s16 nScreen) {
+void fn_80168F5C(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
     UISEventData data;
 
-    data.aw[0] = nGroup;
-    data.aw[1] = nScreen;
-    fn_80165B90(nGroup, nScreen, pStudio, 3, &data, 0, NULL);
+    data.aw[0] = uGroup;
+    data.aw[1] = uScreen;
+    fn_80165B90(uGroup, uScreen, pStudio, 3, &data, 0, NULL);
     if (!(pStudio->uFlags & 2)) {
         fn_80165528(pStudio, 0);
     }
