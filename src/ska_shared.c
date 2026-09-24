@@ -13,7 +13,7 @@
 // a non-zero result is renormalised.
 void fn_8001FB00(f32* pA, f32* pB, f32* pOut, f32 fT) {
     fn_8001E85C(pB, pOut);
-    fn_8000883C(pA, pOut, fT);
+    Quat_Slerp(pA, pOut, fT);
     if (0.0f != pOut[0] || 0.0f != pOut[1] || 0.0f != pOut[2] || 0.0f != pOut[3]) {
         Vec_Normalize(pOut, pOut);
     }
@@ -710,22 +710,22 @@ void fn_80021134(u16* p, f32* pOut, s32 nBones, u32* pBits) {
         switch (uKind) {
         case 1:
             if (lbl_80281CC0) {
-                fn_800093AC(TWOPI * p[0] / 65536.0f, pOut);
+                Legacy_Quat_BuildFromYaw(TWOPI * p[0] / 65536.0f, pOut);
             } else {
-                fn_800093AC(-(TWOPI * p[0]) / 65536.0f, pOut);
+                Legacy_Quat_BuildFromYaw(-(TWOPI * p[0]) / 65536.0f, pOut);
             }
             p += 1;
             break;
         case 3:
             if (lbl_80281CC0) {
-                fn_80009410(TWOPI * p[0] / 65536.0f, pOut);
+                Legacy_Quat_BuildFromPitch(TWOPI * p[0] / 65536.0f, pOut);
             } else {
-                fn_80009410(-(TWOPI * p[0]) / 65536.0f, pOut);
+                Legacy_Quat_BuildFromPitch(-(TWOPI * p[0]) / 65536.0f, pOut);
             }
             p += 1;
             break;
         case 2:
-            fn_80009474(-(TWOPI * p[0]) / 65536.0f, pOut);
+            Legacy_Quat_BuildFromRoll(-(TWOPI * p[0]) / 65536.0f, pOut);
             p += 1;
             break;
         case 0:
@@ -760,22 +760,22 @@ void fn_8002148C(u8* p, f32* pOut, s32 nBones, u32* pBits, u16* aBase) {
         switch (uKind) {
         case 1:
             if (lbl_80281CC0) {
-                fn_800093AC(TWOPI * aBase[0] / 65536.0f - TWOPI * ((u32)(u16)p[0] << 4) / 65536.0f, pOut);
+                Legacy_Quat_BuildFromYaw(TWOPI * aBase[0] / 65536.0f - TWOPI * ((u32)(u16)p[0] << 4) / 65536.0f, pOut);
             } else {
-                fn_800093AC(-(TWOPI * aBase[0] / 65536.0f - TWOPI * ((u32)(u16)p[0] << 4) / 65536.0f), pOut);
+                Legacy_Quat_BuildFromYaw(-(TWOPI * aBase[0] / 65536.0f - TWOPI * ((u32)(u16)p[0] << 4) / 65536.0f), pOut);
             }
             p += 1;
             break;
         case 3:
             if (lbl_80281CC0) {
-                fn_80009410(TWOPI * aBase[1] / 65536.0f - TWOPI * ((u32)(u16)p[0] << 4) / 65536.0f, pOut);
+                Legacy_Quat_BuildFromPitch(TWOPI * aBase[1] / 65536.0f - TWOPI * ((u32)(u16)p[0] << 4) / 65536.0f, pOut);
             } else {
-                fn_80009410(-(TWOPI * aBase[1] / 65536.0f - TWOPI * ((u32)(u16)p[0] << 4) / 65536.0f), pOut);
+                Legacy_Quat_BuildFromPitch(-(TWOPI * aBase[1] / 65536.0f - TWOPI * ((u32)(u16)p[0] << 4) / 65536.0f), pOut);
             }
             p += 1;
             break;
         case 2:
-            fn_80009474(-(TWOPI * aBase[2] / 65536.0f - TWOPI * ((u32)(u16)p[0] << 4) / 65536.0f), pOut);
+            Legacy_Quat_BuildFromRoll(-(TWOPI * aBase[2] / 65536.0f - TWOPI * ((u32)(u16)p[0] << 4) / 65536.0f), pOut);
             p += 1;
             break;
         case 0:

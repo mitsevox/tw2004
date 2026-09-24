@@ -1934,7 +1934,7 @@ void fn_8005AD20(Character* pObj, SwingData* pSw, int nStickX) {
     if (fn_8001EDF4(pObj)) {
         fAmount = -fAmount;
     }
-    fn_80008BB8(vRot, 0.0f, 0.0f, fAmount);
+    Quat_EulerAngles(0.0f, 0.0f, fAmount, vRot);
     fn_80027808(pObj->pModel, vRot);
 }
 

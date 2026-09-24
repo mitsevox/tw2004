@@ -20,7 +20,7 @@ void fn_80039E58(void);
 u8   fn_8003C800(char* szName, CamSequence** ppSeq, CamShot** ppShot);
 void fn_8003DC30(f32* pA, f32* pB, f32* pOut);         // a + b
 void fn_8003DC54(f32* pA, f32* pB, f32* pOut);
-void fn_800090E4(f32* pTurn, f32* pVec, f32* pOut);     // the vector turned by it
+void Quat_RotateVector(f32* pTurn, f32* pVec, f32* pOut);     // the vector turned by it
 void fn_80039EB8(int nSize);
 u8   fn_8003D0EC(CamSequence* pSequence, int nKind);
 u8   fn_8003D240(CamShot* pShot, int nKind);
@@ -880,9 +880,9 @@ void fn_8003B028(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
         fn_800BAF04(aAxis, aAxis);
     }
     fn_8001EF34(aAxis, fTurn, aAxis);
-    fn_8000923C(aAxis, aTurn);
+    Quat_BuildFromVector(aAxis, aTurn);
     aCurDir[3] = 0.0f;
-    fn_800090E4(aTurn, aCurDir, aNew);
+    Quat_RotateVector(aTurn, aCurDir, aNew);
     if (aNew[0] != 0.0f || aNew[1] != 0.0f || aNew[2] != 0.0f) {
         fn_800BAF04(aNew, aNewDir);
     } else {
@@ -1761,9 +1761,9 @@ void fn_8003D810(f32* pDir, f32* pA, f32* pB) {
             fn_800BAF04(vAxis, vAxis);
         }
         fn_8001EF34(vAxis, lbl_80281F78->f19C, vAxis);
-        fn_8000923C(vAxis, qTurn);
+        Quat_BuildFromVector(vAxis, qTurn);
         vLevel[3] = 0.0f;
-        fn_800090E4(qTurn, vLevel, pDir);
+        Quat_RotateVector(qTurn, vLevel, pDir);
         if (0.0f != pDir[0] || 0.0f != pDir[1] || 0.0f != pDir[2]) {
             fn_800BAF04(pDir, pDir);
         }

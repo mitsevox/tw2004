@@ -86,6 +86,27 @@ Rules for reading CodeWarrior output while matching, grouped by topic. Start wit
 
 The fixes that come up most often. Each points to its full entry below.
 
+- **Read EA's later source first, when there is one.** A debug build of a later game from the same
+  studio and engine keeps EA's own declarations. For this game, TW07's PS3 debug info is split per
+  source file in `C:\dev\ext\symbols\tw07-cu\` (made by `tools/match/tw07dwarf.py`; a machine
+  pairing of our functions with TW07's is in the agent scratch `tw07\tw07_pairs.tsv`). The compiler
+  differs, but the programmers' style carried over three years, and it decides register
+  allocation. **[verified]** on 16 functions in one session (2026-09-24), in five patterns:
+  - **EA's types:** a player index typed as EA's enum `PlayerNumber_t`, not `int`/`s32`, made four
+    Earnings functions exact; one `s32` -> `int` parameter fixed a PGA Tour loop.
+  - **EA's local order:** `i` before `bMoved` (DynTex compaction), the quaternion maths, a music
+    track update, a terrain line test.
+  - **EA's temporaries, and only EA's:** a named helper local (`numSeconds`, `roundParScore`)
+    matched; dropping a decompiler-invented local (`fWeight`: EA had one float and one int)
+    matched two camera sequence pickers; a buffer plus counter instead of a walking pointer
+    matched a string cleaner.
+  - **EA's scope:** a counter declared inside the loop body.
+  - **EA's parameter order:** `Quat_EulerAngles(yaw, pitch, roll, pOut)` with the output pointer
+    last made its CALLER exact (a prototype change: rebuild every linked user).
+  About half of the TW07 attempts do not help (the code moved on in three years): treat it as the
+  first hypothesis, never as a fact, and never copy a name or comment from it into the source
+  without the audit (docs/style.md "Where names and comments come from").
+
 - **Every float constant: read its hex from the original's data and write the exact expression
   EA wrote.** EA writes fractions and unit conversions, not decimals: `1.0f / 72.0f` (0x3C638E39),
   `59.94f / 60.0f` (0x3F7FBE76), `0.92f / 36.0f`, `1.0f / 65536.0f`, `DEG(x)`, `PI / 180.0f`. A

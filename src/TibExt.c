@@ -1,8 +1,8 @@
-// TibExt.c (EA's name, from its asserts; TW06): the glue between EA's Tiburon SDK libraries (the
-// EA Sports Bio's EASB.c, the shared file library) and the game: memory, the real-time clock, and
-// the memory-card callbacks (lbl_80281970) the shared file library calls. Each callback runs one
-// card call on the device's port (eDevice / 4) and slot (eDevice % 4) and keeps its error and
-// result for fn_8012288C, the library's update call.
+// TibExt.c (EA's name, from its asserts; TW06): the glue between EA's libraries (the EA Sports
+// Bio's EASB.c, the shared file library, TagFile, CRC32) and the game: memory, the real-time clock,
+// and the memory-card callbacks (lbl_80281970) the shared file library calls. The callbacks that
+// take a device use its port (eDevice / 4) and slot (eDevice % 4); the last card call's error and
+// result are kept for fn_8012288C, the library's update call.
 
 #include "engine.h"
 #include "game.h"

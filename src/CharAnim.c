@@ -27,7 +27,7 @@ void  fn_800175B0(Character* pChar, Clip* pBlend, f32 fStart);   // char.c
 void  fn_801141F8(struct DynChain* pChain, CharModel* pModel);   // DynChain.c
 char* fn_801008A8(void);                                    // GameMode11.c
 void  fn_8000A144(f32 (*pSrc)[4], f32 (*pDst)[4]);          // UMemPool.c: copies three rows
-void  fn_800089D4(f32 (*m)[4], f32* pQ);                    // Quaternion.c: a rotation matrix's quaternion
+void  Quat_BuildFromMatrix(f32 (*m)[4], f32* pQ);                    // Quaternion.c: a rotation matrix's quaternion
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x80283CD8), before the 0.0f fn_800957FC uses first; its body is unknown.
@@ -172,7 +172,7 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
             m[2][3] = 0.0f;
             m[3][3] = 1.0f;
             fn_8000A144(m, pChar->pModel->pMatrices[0]);
-            fn_800089D4(m, pChar->pModel->pBones->q0C);
+            Quat_BuildFromMatrix(m, pChar->pModel->pBones->q0C);
             pChar->u10 |= 0x8000;
         }
         strcpy(pChar->sz1614, pClip->name);

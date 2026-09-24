@@ -678,11 +678,7 @@ void fn_80015540(void) {
     lbl_801B8980.n24 = 2;
     lbl_801B8980.f28 = 100.0f;
     lbl_801B8980.f2C = 2048.0f;
-    // the original stores the colour as one word (-1)
-    lbl_801B8980.c30.r = 0xFF;
-    lbl_801B8980.c30.g = 0xFF;
-    lbl_801B8980.c30.b = 0xFF;
-    lbl_801B8980.c30.a = 0xFF;
+    *(u32*)&lbl_801B8980.c30 = 0xFFFFFFFF; // port: all four GXColor bytes 0xFF, stored as one word
     fn_8000ADC0(lbl_801B8980.m34);
     fn_8000ADC0(lbl_801B8980.m74);
     lbl_801B8980.p100 = NULL;
