@@ -149,7 +149,7 @@ void fn_80013400(void) {
     int i;
     u32 uReset;
     u32 uHeld;
-    u32 uPressed;
+    u32 uLastHeld;
     PadAnalog* pAnalog;
 
     PADRead(lbl_801A36A0.aStatus);
@@ -206,9 +206,10 @@ void fn_80013400(void) {
                 }
             }
             uHeld = lbl_801A36A0.auButtons[i];
-            uPressed = uHeld & ~lbl_801A36A0.auHeld[i];
+            uLastHeld = lbl_801A36A0.auHeld[i];
             lbl_801A36A0.auHeld[i] = uHeld;
-            lbl_801A36A0.auButtons[i] = uPressed | (uHeld << 16);
+            // pressed this frame in the low half, held in the high half
+            lbl_801A36A0.auButtons[i] = (uHeld & ~uLastHeld) | (uHeld << 16);
         } else {
             lbl_801A36A0.aAnalog[i].nStickX = 0x80;
             lbl_801A36A0.aAnalog[i].nStickY = 0x80;

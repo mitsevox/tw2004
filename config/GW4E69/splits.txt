@@ -113,14 +113,12 @@ LLFont.c:
 UFont.c:
 	.text       start:0x8001256C end:0x80012ED0
 
-unsorted/sweep_80012ED0.c:
-	.text       start:0x80012ED0 end:0x80012F18
-
-unsorted/sweep_80012FA0.c:
-	.text       start:0x80012FA0 end:0x80012FA4
+Code80012ED0.c:
+	.text       start:0x80012ED0 end:0x80012FA4
 
 Controller_Gc.c:
 	.text       start:0x80012FA4 end:0x800136F4
+	.bss        start:0x801A36A0 end:0x801A3728
 
 unsorted/sweep_800136F4.c:
 	.text       start:0x800136F4 end:0x8001371C
@@ -820,6 +818,7 @@ GameMode11.c:
 
 GameMode4.c:
 	.text       start:0x80101FEC end:0x80102AC8
+	.data       start:0x80193130 end:0x80193188
 
 uiArc.c:
 	.text       start:0x80102AC8 end:0x801037F8

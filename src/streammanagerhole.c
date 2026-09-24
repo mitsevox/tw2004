@@ -1020,11 +1020,11 @@ void fn_800162AC(f32* pPos, f32* pColour, f32* pUV, int nVerts) {
     f32 aPos[4][4];
     f32 aColour[4][4];
     f32 aUV[4][4];
-    f32* pQuadColour;
     f32* pQuadUV;
+    int i;
+    f32* pQuadColour;
     f32 fX0;
     f32 fX1;
-    int i;
 
     for (i = 0; i < nVerts - 1; i += 2) {
         fX0 = pPos[i * 4];
@@ -1201,8 +1201,8 @@ void fn_80014BB4(void) {
 void fn_80014C9C(void) {
     char szName[0x80];  // size unknown: the frame allows up to 0x8C bytes
     u32 nSlot;
-    LibSlot* pSlot;
     int nPlayer;
+    LibSlot* pSlot;
     int nModel;
     int i;
 
