@@ -72,7 +72,6 @@ void  fn_8002787C(CharModel* pModel);                           // Skeleton.c
 void  fn_800279C0(Character* pChar);                            // Skeleton.c
 void  SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform);   // Skeleton.c
 void  fn_80037C48(Skin* pSkin, SkelPose* pPose);                // Skin.c
-void  fn_8007260C(Character* pChar, SKABlendNode* pNode, CharModel* pModel, f32 fTime);  // animblender.c
 void  fn_8009622C(Character* pChar, void* pClip, u8 bKeep, f32 fOffset);                  // CharAnim.c
 void  fn_80096F0C(Character* pChar);                            // CharAnim.c
 void  fn_8000914C(f32* pQ, f32 (*m)[4]);                        // Quaternion.c: a rotation matrix
@@ -80,7 +79,6 @@ int   fn_8001BD18(Character* pChar, Clip* pClip);
 void  fn_80008F20(f32* pQ, f32* pOut);                          // Quaternion.c
 void  fn_800090E4(f32* pQ, f32* pIn, f32* pOut);                // Quaternion.c: a vector turned by pQ
 void  fn_80009410(f32 fAngle, f32* pOut);                       // Quaternion.c
-void  fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, int n, f32 fTime);
 void  fn_800280E8(Character* pChar, f32* pPos, int bPlace);     // Skeleton.c
 void  fn_8001EFB4(f32* pA, f32* pB, f32* pOut);
 void  fn_8001A14C(Character* pChar);
@@ -143,7 +141,6 @@ void  fn_800106B8(u8 b);                // LLTexGrp.c
 void  fn_8008F310(void);                // uiLoadFile.c: park the UI file's data in ARAM
 void* fn_8008F354(void);                // uiLoadFile.c: the UI file's buffer
 void  fn_8008F35C(void);                // uiLoadFile.c: bring the UI file's data back
-void  fn_800732F4(void* pNode, void* pAnim, f32 fTime);                                // CharAnim.c
 void  fn_801141F8(struct DynChain* pChain, CharModel* pModel);                         // DynChain.c
 void  fn_80035600(void);                // GoTerrain.c
 void  fn_80035604(void);                // GoTerrain.c
@@ -495,7 +492,7 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     }
     fn_80021978(pChar->pModel->bEE);
     if (!gSession.b11) {
-        fn_80072ED8(&pChar->anim29C, (SKABlendNode*)pChar->node3E0, fTime);
+        fn_80072ED8(&pChar->anim29C, &pChar->node3E0, fTime);
     }
     if (fn_8001EC48(pChar)) {
         CharacterState_UpdateSKAState(pChar);
@@ -527,9 +524,9 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
             }
         }
     }
-    if (!gSession.b11 && fn_8001EC48(pChar) && ((SKABlendNode*)pChar->node3E0)->pPose != NULL) {
-        fn_8007260C(pChar, (SKABlendNode*)pChar->node3E0, pChar->pModel, pChar->anim29C.fTime);
-        fn_80037C48(pChar->pSkin, ((SKABlendNode*)pChar->node3E0)->pPose);
+    if (!gSession.b11 && fn_8001EC48(pChar) && pChar->node3E0.pPose != NULL) {
+        fn_8007260C(pChar, &pChar->node3E0, pChar->pModel, pChar->anim29C.fTime);
+        fn_80037C48(pChar->pSkin, pChar->node3E0.pPose);
     }
     if (pChar->uFlags & 2) {
         pChar->uFlags |= 1;
@@ -1006,7 +1003,7 @@ Character* fn_8001942C(void) {
     pNode = &pChar->blend;
     fn_80072D90((AnimPlayer*)pChar->anim);
     fn_80071C28(&pNode, 1, 0, fn_80072ACC, 1);
-    pNode = (SKABlendNode*)pChar->node3E0;
+    pNode = &pChar->node3E0;
     fn_80072D90(&pChar->anim29C);
     fn_80071C28(&pNode, 1, 1, fn_80072ACC, 1);
     pChar->pLib = NULL;
@@ -2094,7 +2091,7 @@ void fn_8001BE88(Character* pChar, Clip* pClip, int bNoBlend, f32 fTime) {
     fn_80071C28(&pNew, 0, 0, fn_80072ACC, 1);
     fn_800724C0(&pChar->blend, pNew, pClip, 1.0f);
     if (!bNoBlend) {
-        fn_800732F4(&pChar->blend, pChar->anim, pChar->fAnimTime + fTime);
+        fn_800732F4(&pChar->blend, (AnimPlayer*)pChar->anim, pChar->fAnimTime + fTime);
         aBlend[5] = 0.0f;
         aBlend[0] = 0.0f;
         fLen = pClip->f18;
@@ -2136,7 +2133,7 @@ void fn_8001C0E0(Character* pChar) {
         }
         pNode = &pChar->blend;
         fn_80071F58(&pNode, 0);
-        pNode = (SKABlendNode*)pChar->node3E0;  // a node without the root's nGroup
+        pNode = &pChar->node3E0;  // a node without the root's nGroup
         fn_80071F58(&pNode, 0);
         if (pChar->pSkin != NULL) {
             fn_80037CD8(pChar->pSkin);
@@ -2758,7 +2755,7 @@ void fn_8001D7EC(Character* pChar) {
     fn_80071F58(&pNode, 0);
     fn_80071C28(&pNode, 1, 0, fn_80072ACC, 0);
     fn_800725BC(pNode, fn_80072ACC, 0.5f);
-    pNode = (SKABlendNode*)pChar->node3E0;
+    pNode = &pChar->node3E0;
     fn_80071F58(&pNode, 0);
     fn_80071C28(&pNode, 1, 1, fn_80072ACC, 1);
     fn_800725BC(pNode, fn_80072ACC, 0.5f);
@@ -2866,7 +2863,7 @@ u8 fn_8001DBF4(Character* pChar) {
 void fn_8001DC64(Character* pChar, SkinChoices* pChoices) {
     fn_800CC1EC(pChar, pChoices);
     fn_8010E4DC(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, pChoices->a9B4,
-                (SKABlendNode*)pChar->node3E0);
+                &pChar->node3E0);
     if (gSession.nGameType != 3 || lbl_80281EE0->n0 == 1 || lbl_80281EE0->n0 == 4) {
         if (pChoices->n113 == 0) {
             fn_8001EE98(pChar, 0);

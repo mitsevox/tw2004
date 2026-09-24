@@ -62,7 +62,7 @@ void fn_80071B94(void) {
     }
 }
 
-// Set up *ppNode (taken from nType's pool when NULL) as an empty node of nType: no time, full
+// Set up *ppNode (taken from nType's pool when NULL) as an empty node of nType: no time, half
 // weight, a fresh pose buffer of nFormat (format 1's three blocks all set, their floats 0).
 void fn_80071C28(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn pfnBlend, int nC) {
     SKABlendNode* pNode;
@@ -91,7 +91,7 @@ void fn_80071C28(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn pfnBl
     (*ppNode)->nFormat = nFormat;
     (*ppNode)->bC = nC;
     (*ppNode)->fStart = (*ppNode)->fEnd = 0.0f;
-    (*ppNode)->fWeight = 1.0f;
+    (*ppNode)->fWeight = 0.5f;
     if ((*ppNode)->nFormat == 0) {
         (*ppNode)->pPose = fn_8000B078(lbl_80281E8C);
         if ((*ppNode)->pPose == NULL) return;
@@ -210,7 +210,7 @@ void fn_800724C0(SKABlendNode* pNode, SKABlendNode* pNew, void* pClip, f32 fWeig
     if (fn_800723E8(pNode, &ppOldest) >= lbl_80280E20) {
         fn_80071F58(&pNode, 0);
         fn_80071C28(&pNode, 1, pNode->nFormat, fn_80072ACC, 1);
-        fn_800725BC(pNode, fn_80072ACC, 1.0f);
+        fn_800725BC(pNode, fn_80072ACC, 0.5f);
     }
     pNew->nType = 0;
     pNew->u.src.pSrc = pClip;
@@ -234,6 +234,90 @@ void fn_800725BC(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 fWeight) {
         pNode->fStart = fn_800728D8(pNode);
         pNode->fEnd = fn_80072938(pNode);
     }
+}
+
+// fTime's point between fStart and fEnd, carried over to fFrom..fTo (our name). fake match: EA's
+// fn_8007260C fuses this multiply-add, which CW does here only for an inline function's result.
+static inline f32 RemapTime(f32 fFrom, f32 fTo, f32 fTime, f32 fStart, f32 fEnd) {
+    return (fTime - fStart) * ((fTo - fFrom) / (fEnd - fStart)) + fFrom;
+}
+
+// Pose the tree at pNode at fTime: take its times from its children, free a flagged child that has
+// ended, pose each source at its clip time (fFrom to fTo in proportion, kept in f2C) and each blend
+// node the same way, then blend with pfnBlend. Between two format 0 sources, when only the earlier
+// one's clip has flag 0x10, its grip bone takes the character's held grip (q16AC, v16BC).
+void fn_8007260C(Character* pChar, SKABlendNode* pNode, CharModel* pModel, f32 fTime) {
+    int nPlaying;
+    s32 i;
+    SKABlendNode* pA;
+    SKABlendNode* pB;
+    SKABlendNode* pFirst;
+    Clip* pClipFirst;
+    Clip* pClipOther;
+    Clip* pSwap;
+    SkelPose* pPose;
+    SKABlendNode* pChild;
+    int bInside;
+    f32 fClip;
+
+    if (pNode == NULL) return;
+    pNode->fStart = fn_800728D8(pNode);
+    pNode->fEnd = fn_80072938(pNode);
+    nPlaying = fn_8007286C(pNode, fTime);
+    if (nPlaying < 0 && pNode->nFormat == 0) {
+        pA = pNode->u.blend.apChild[0];
+        if (pA != NULL) {
+            pB = pNode->u.blend.apChild[1];
+            if (pB != NULL && pA->nType == 0 && pB->nType == 0) {
+                pFirst = pA;
+                pClipFirst = pA->u.src.pSrc;
+                pClipOther = pB->u.src.pSrc;
+                if (pA->fStart > pB->fStart) {
+                    pSwap = pClipFirst;
+                    pClipFirst = pClipOther;
+                    pClipOther = pSwap;
+                    pFirst = pB;
+                }
+                if ((pClipFirst->uFlags & 0x10) && !(pClipOther->uFlags & 0x10)) {
+                    pPose = pFirst->pPose;
+                    Vec_Copy(pChar->q16AC, pPose->aBones[pChar->nGripBone].q0);
+                    Vec_Copy(pChar->v16BC, pPose->aBones[pChar->nGripBone].v10);
+                }
+            }
+        }
+    }
+    for (i = 0; i < 2; i++) {
+        pChild = pNode->u.blend.apChild[i];
+        if (pChild != NULL && pChild->bC && pChild->fStart < fTime && pChild->fEnd < fTime &&
+            nPlaying > -1) {
+            fn_80071F58(&pNode->u.blend.apChild[i], 0);
+        }
+        pChild = pNode->u.blend.apChild[i];
+        if (pChild != NULL) {
+            if (pChild->nType == 1) {
+                fn_8007260C(pChar, pChild, pModel, fTime);
+            } else {
+                bInside = 1;
+                fClip = RemapTime(pChild->u.src.fFrom, pChild->u.src.fTo, fTime, pChild->fStart,
+                                  pChild->fEnd);
+                if (fClip >= pChild->u.src.fTo) {
+                    fClip = pChild->u.src.fTo;
+                    bInside = 0;
+                } else if (fClip < pChild->u.src.fFrom) {
+                    fClip = pChild->u.src.fFrom;
+                }
+                ((SKASourceNode*)pChild)->f2C = fClip;
+                if (pChild->nFormat == 0) {
+                    if (bInside) {
+                        fn_8001FCF4(pChar, pChild->u.src.pSrc, pChild->pPose, 0, fClip);
+                    }
+                } else if (pChild->nFormat == 1) {
+                    fn_8001F494(pChar, pChild->u.src.pSrc, (SkelPose1*)pChild->pPose, fClip);
+                }
+            }
+        }
+    }
+    pNode->u.blend.pfnBlend(pNode, pModel, fTime);
 }
 
 // Which of pNode's children play at fTime: -1 neither, 0 or 1 that one, 2 both.
@@ -347,7 +431,7 @@ f32 fn_80072980(SKABlendNode* pA, SKABlendNode* pB, u8 bOut, f32 fTime) {
 // between them) and fTime is inside their overlap, their weights come from fn_80072980 and the
 // poses are blended by format; while only one plays, its pose is copied (a format 1 copy then
 // has the child's morph bits cleared).
-void fn_80072ACC(SKABlendNode* pNode, int* pn, f32 fTime) {
+void fn_80072ACC(SKABlendNode* pNode, CharModel* pModel, f32 fTime) {
     int nPlaying;
     u8 bBetween;
     f32 fWeight;
@@ -369,8 +453,8 @@ void fn_80072ACC(SKABlendNode* pNode, int* pn, f32 fTime) {
         pNode->u.blend.apChild[0]->fWeight = fWeight;
         pNode->u.blend.apChild[1]->fWeight = 1.0f - fWeight;
         if (pNode->nFormat == 0) {
-            fn_800293CC(1, *pn - 1, pNode->u.blend.apChild[0]->pPose, pNode->u.blend.apChild[1]->pPose,
-                        pNode->pPose, fWeight);
+            fn_800293CC(1, pModel->nBones - 1, pNode->u.blend.apChild[0]->pPose,
+                        pNode->u.blend.apChild[1]->pPose, pNode->pPose, fWeight);
         } else if (pNode->nFormat == 1) {
             fn_80036180((SkelPose1*)pNode->u.blend.apChild[0]->pPose,
                         (SkelPose1*)pNode->u.blend.apChild[1]->pPose, (SkelPose1*)pNode->pPose);
@@ -567,7 +651,9 @@ void fn_800732F4(SKABlendNode* pNode, AnimPlayer* pPlayer, f32 fTime) {
     SKABlendFn pfnBlend;
     SKABlendNode* pChild;
 
-    if (pPlayer->fTime < pNode->fStart || fn_8007286C(pNode, pPlayer->fTime) == -1) {
+    // fake match: the goto gives EA's layout, the start-over block between the two tests
+    if (pPlayer->fTime < pNode->fStart) {
+    reset:
         nFormat = pNode->nFormat;
         pfnBlend = pNode->u.blend.pfnBlend;
         pPlayer->fTime = 0.0f;
@@ -576,6 +662,9 @@ void fn_800732F4(SKABlendNode* pNode, AnimPlayer* pPlayer, f32 fTime) {
         fn_80071F58(&pNode, 0);
         fn_80071C28(&pNode, 1, nFormat, pfnBlend, 1);
         return;
+    }
+    if (fn_8007286C(pNode, pPlayer->fTime) == -1) {
+        goto reset;     // fake match: see above
     }
     if (pNode->fEnd > fTime) {
         pNode->fEnd = fTime;

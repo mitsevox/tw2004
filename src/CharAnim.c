@@ -11,8 +11,6 @@
 
 f32   fn_8001F02C(Clip* pBlend, u64 uEvent);   // an event's time (by its 64-bit id)
 
-void  fn_800732F4(void* pNode, void* pAnim, f32 fTime);   // set a blend node's time (blend or node3E0)
-
 void  fn_800958EC(AnimPlayer* pAnim, s32 n, f32 f);
 void  fn_80095FD0(Character* pChar, MtaLib* pLib, u8 bReset, int nGroup, SKABlendFn pfnBlend, int nC,
                   int nAnim, f32 fStart, f32 fFrom, f32 fTo, f32 fOffset, f32 fTime);
@@ -42,14 +40,14 @@ void fn_800957FC(Character* pChar, u8 bReset) {
     pChar->u28 &= ~1;
     fn_800958EC(&pChar->anim29C, 0, 0.0f);
     if (bReset) {
-        pNode = (SKABlendNode*)pChar->node3E0;
+        pNode = &pChar->node3E0;
         fn_80071F58(&pNode, 0);
         fn_80071C28(&pNode, 1, 1, fn_80072ACC, 1);
         fn_800725BC(pNode, fn_80072ACC, 0.5f);
     }
     if (gSession.nGameType == 3 && pChar->p17AC != NULL) {
         fn_8010E4DC(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, fn_80077ACC()->choices.a9B4,
-                    (SKABlendNode*)pChar->node3E0);
+                    &pChar->node3E0);
     }
 }
 
@@ -77,7 +75,7 @@ f32 fn_800958F8(Character* pChar, f32* aPrev, Clip* pClip, f32* aBlend, f32 fFro
         } else if (-70000.0f == fFrom) {
             aBlend[0] = pChar->v1638[1];
             aBlend[2] = fn_8001F02C(pClip, 2);
-            fn_800732F4(&pChar->blend, pChar->anim, pChar->fAnimTime);
+            fn_800732F4(&pChar->blend, (AnimPlayer*)pChar->anim, pChar->fAnimTime);
         } else if (fFrom < 0.0f) {
             aBlend[0] = 0.0f;
         }
@@ -229,7 +227,7 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
 // nGroup is not used; every caller passes it (fn_80096F0C: the MAL group pLib came from).
 void fn_80095FD0(Character* pChar, MtaLib* pLib, u8 bReset, int nGroup, SKABlendFn pfnBlend, int nC,
                  int nAnim, f32 fStart, f32 fFrom, f32 fTo, f32 fOffset, f32 fTime) {
-    SKABlendNode* pNode = (SKABlendNode*)pChar->node3E0;
+    SKABlendNode* pNode = &pChar->node3E0;
     SKABlendNode* pNew = NULL;
     f32 aBlend[6];
 
@@ -251,7 +249,7 @@ void fn_80095FD0(Character* pChar, MtaLib* pLib, u8 bReset, int nGroup, SKABlend
     }
     pNew = NULL;
     fn_80071C28(&pNew, 0, pNode->nFormat, pfnBlend, nC);
-    fn_800724C0((SKABlendNode*)pChar->node3E0, pNew, pLib, 1.0f);
+    fn_800724C0(&pChar->node3E0, pNew, pLib, 1.0f);
     aBlend[3] = fStart;
     aBlend[5] = fOffset;
     aBlend[0] = fFrom;
@@ -276,7 +274,7 @@ void fn_80095FD0(Character* pChar, MtaLib* pLib, u8 bReset, int nGroup, SKABlend
     pChar->p178C = pLib;
     if (gSession.nGameType == 3 && pChar->p17AC != NULL) {
         fn_8010E4DC(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, fn_80077ACC()->choices.a9B4,
-                    (SKABlendNode*)pChar->node3E0);
+                    &pChar->node3E0);
     }
 }
 
@@ -285,7 +283,7 @@ void fn_80095FD0(Character* pChar, MtaLib* pLib, u8 bReset, int nGroup, SKABlend
 void fn_8009622C(Character* pChar, void* pClip, u8 bKeep, f32 fOffset) {
     if (pClip == NULL) return;
     if (!bKeep) {
-        fn_800732F4(pChar->node3E0, &pChar->anim29C, pChar->anim29C.fTime + fOffset);
+        fn_800732F4(&pChar->node3E0, &pChar->anim29C, pChar->anim29C.fTime + fOffset);
     }
     fn_80095FD0(pChar, pClip, bKeep, 0, fn_80072ACC, 1, 5, -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
     pChar->n2C = 4;
@@ -483,11 +481,11 @@ void CharacterState_UpdateSKAState(Character* pChar) {
             pChar->u10 &= ~0x80;
             switch (pChar->n20) {
             case 6:
-                fn_800732F4(&pChar->blend, pChar->anim, pChar->fAnimTime);
+                fn_800732F4(&pChar->blend, (AnimPlayer*)pChar->anim, pChar->fAnimTime);
                 fOffset = 0.35f;
                 break;
             case 5:
-                fn_800732F4(&pChar->blend, pChar->anim, 0.25f + pChar->fAnimTime);
+                fn_800732F4(&pChar->blend, (AnimPlayer*)pChar->anim, 0.25f + pChar->fAnimTime);
                 fOffset = 0.0f;
                 break;
             default:
@@ -498,7 +496,7 @@ void CharacterState_UpdateSKAState(Character* pChar) {
         } else {
             switch (pChar->n20) {
             case 6:
-                fn_800732F4(&pChar->blend, pChar->anim, pChar->fAnimTime);
+                fn_800732F4(&pChar->blend, (AnimPlayer*)pChar->anim, pChar->fAnimTime);
                 fOffset = 0.35f;
                 break;
             case 1:
@@ -523,7 +521,7 @@ void CharacterState_UpdateSKAState(Character* pChar) {
         bReset = 0;
         switch (pChar->n20) {
         case 5:
-            fn_800732F4(&pChar->blend, pChar->anim, 0.25f + pChar->fAnimTime);
+            fn_800732F4(&pChar->blend, (AnimPlayer*)pChar->anim, 0.25f + pChar->fAnimTime);
             break;
         default:
             bReset = 1;
@@ -552,7 +550,7 @@ void CharacterState_UpdateSKAState(Character* pChar) {
             break;
         }
         pChar->uFlags &= ~0x40;
-        fn_800732F4(&pChar->blend, pChar->anim, pChar->fAnimTime);
+        fn_800732F4(&pChar->blend, (AnimPlayer*)pChar->anim, pChar->fAnimTime);
         CharacterState_AddSKABlendData(pChar, bReset, 0, fn_80072ACC, 1, 8, -20000.0f, -70000.0f, -10000.0f,
                                        fLag, -10000.0f);
         bNoIK = 1;
@@ -621,7 +619,7 @@ void CharacterState_UpdateSKAState(Character* pChar) {
             CharacterState_AddSKABlendData(pChar, 1, 5, fn_80072ACC, 1, 0, -20000.0f, -30000.0f, -10000.0f,
                                            0.0f, -10000.0f);
         } else {
-            fn_800732F4(&pChar->blend, pChar->anim, pChar->fAnimTime);
+            fn_800732F4(&pChar->blend, (AnimPlayer*)pChar->anim, pChar->fAnimTime);
             CharacterState_AddSKABlendData(pChar, bOther, nGroup, fn_80072ACC, 1, 0, -20000.0f, -30000.0f,
                                            -10000.0f, 0.5f, -10000.0f);
             bTransition = 1;
@@ -679,7 +677,7 @@ void fn_80096F0C(Character* pChar) {
             goto skip;  // fake match: past the n30 update to the shared clear (a copy here: 90.3%)
         }
         pLib = fn_80017678(pChar, 1, -1);
-        fn_800732F4(pChar->node3E0, &pChar->anim29C, 0.5f + pChar->anim29C.fTime);
+        fn_800732F4(&pChar->node3E0, &pChar->anim29C, 0.5f + pChar->anim29C.fTime);
         fn_80095FD0(pChar, pLib, 0, 1, fn_80072ACC, 1, 2, -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
         pChar->anim29C.f10 -= 0.5f;
         break;
@@ -687,7 +685,7 @@ void fn_80096F0C(Character* pChar) {
         if (pChar->n30 == 4 || (pChar->n20 != 6 && pChar->n20 != 7)) {
             goto skip;  // fake match: as in case 2
         }
-        fn_800732F4(pChar->node3E0, &pChar->anim29C, 0.5f + pChar->anim29C.fTime);
+        fn_800732F4(&pChar->node3E0, &pChar->anim29C, 0.5f + pChar->anim29C.fTime);
         pLib = fn_80017678(pChar, 2, -1);
         fn_80095FD0(pChar, pLib, 0, 2, fn_80072ACC, 1, 3, -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
         pChar->anim29C.f10 -= 0.5f;
@@ -696,7 +694,7 @@ void fn_80096F0C(Character* pChar) {
         if (pChar->n30 == 4 || (pChar->n20 != 6 && pChar->n20 != 7)) {
             goto skip;  // fake match: as in case 2
         }
-        fn_800732F4(pChar->node3E0, &pChar->anim29C, 0.5f + pChar->anim29C.fTime);
+        fn_800732F4(&pChar->node3E0, &pChar->anim29C, 0.5f + pChar->anim29C.fTime);
         pLib = fn_80017678(pChar, 0, -1);
         fn_80095FD0(pChar, pLib, 0, 0, fn_80072ACC, 1, 1, -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
         pChar->anim29C.f10 -= 0.5f;
