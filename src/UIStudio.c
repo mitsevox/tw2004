@@ -10,15 +10,6 @@ UISWord lbl_802805D8[20];
 
 void fn_80168644(UIStudio* pStudio, UISScreen* pScreen, s32 nKind, void* p, s32 bOn);
 
-// A script address: an offset into the studio's current UI file when the top bit is set,
-// otherwise into the screen's own file (our name).
-static inline u8* UIStudio_ScriptAddr(UIStudio* pStudio, UISScreen* pScreen, u32 uOffset) {
-    if ((uOffset & 0x80000000) == 0x80000000) {
-        return (u8*)pStudio->pCurrent->p10 + (uOffset & 0x7FFFFFFF);
-    }
-    return (u8*)pScreen->pData + uOffset;
-}
-
 // Runs a screen's script from pFrame->p10: a byte-code machine with a stack of 32-bit words
 // (ints, floats and pointers) that grows up from pFrame->pC. It stops at the script's end
 // (returns 0) or when the script waits for another screen (returns 3; fn_80169308 resumes it
@@ -104,8 +95,10 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             fn_80165B90(pScreen->uGroup, pScreen->uScreen, pStudio, 3, &data, 0, NULL);
             break;
         case 0x58: {  // start a rate function (the byte: how many script addresses follow)
-            s32* pNodeInfo;
-            s32* pN30;
+            // Script addresses: an offset into the studio's current UI file when the top bit is
+            // set, otherwise into the screen's own file.
+            UISNodeInfo* pNodeInfo;
+            s32 n30;
             s32* pTime;
             s32* pTarget;
             s32* pU20;
@@ -113,29 +106,46 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             u8* pDoneScript = NULL;
             u8* pStepScript = NULL;
 
-            n = *pFrame->p10++;
-            pNodeInfo = --pFrame->pC;
-            pN30 = --pFrame->pC;
-            if (n >= 5) {
-                if (n >= 6) {
-                    pStepScript = UIStudio_ScriptAddr(pStudio, pScreen, *--pFrame->pC);
+            nArgs = *pFrame->p10++;
+            pNodeInfo = (UISNodeInfo*)*--pFrame->pC;
+            n30 = *--pFrame->pC;
+            if (nArgs >= 5) {
+                if (nArgs >= 6) {
+                    u = *--pFrame->pC;
+                    if ((u & 0x80000000) == 0x80000000) {
+                        pStepScript = (u8*)pStudio->pCurrent->p10 + (u & 0x7FFFFFFF);
+                    } else {
+                        pStepScript = (u8*)pScreen->pData + u;
+                    }
                 }
-                pDoneScript = UIStudio_ScriptAddr(pStudio, pScreen, *--pFrame->pC);
+                u = *--pFrame->pC;
+                if ((u & 0x80000000) == 0x80000000) {
+                    pDoneScript = (u8*)pStudio->pCurrent->p10 + (u & 0x7FFFFFFF);
+                } else {
+                    pDoneScript = (u8*)pScreen->pData + u;
+                }
             }
             pTime = --pFrame->pC;
             pTarget = --pFrame->pC;
             pU20 = --pFrame->pC;
             pId = --pFrame->pC;
-            fn_80165E9C(pStudio, pScreen, (UISNodeInfo*)*pNodeInfo, *pN30, *pId, pDoneScript, pStepScript,
-                        *pTime, *(f32*)pTarget, *pU20);
+            fn_80165E9C(pStudio, pScreen, pNodeInfo, n30, *pId, pDoneScript, pStepScript, *pTime,
+                        *(f32*)pTarget, *pU20);
             break;
         }
         case 0x06: {  // start a stepped rate function
             s32* pNodeInfo = --pFrame->pC;
             s32* pU10 = --pFrame->pC;
-            u8* pStepScript = UIStudio_ScriptAddr(pStudio, pScreen, *--pFrame->pC);
-            s32* pId = --pFrame->pC;
+            u8* pStepScript;
+            s32* pId;
 
+            u = *--pFrame->pC;
+            if ((u & 0x80000000) == 0x80000000) {
+                pStepScript = (u8*)pStudio->pCurrent->p10 + (u & 0x7FFFFFFF);
+            } else {
+                pStepScript = (u8*)pScreen->pData + u;
+            }
+            pId = --pFrame->pC;
             fn_80165D90(pStudio, pScreen, (UISNodeInfo*)*pNodeInfo, *pId, pStepScript, *pU10);
             break;
         }
@@ -428,7 +438,11 @@ s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, 
             u |= *pCode;
             *pFrame->pC = (s32)pFrame->p10;
             pFrame->pC++;
-            pFrame->p10 = UIStudio_ScriptAddr(pStudio, pScreen, u);
+            if ((u & 0x80000000) == 0x80000000) {
+                pFrame->p10 = (u8*)pStudio->pCurrent->p10 + (u & 0x7FFFFFFF);
+            } else {
+                pFrame->p10 = (u8*)pScreen->pData + u;
+            }
             break;
         case 0x44:  // return to the popped address
             pFrame->p10 = (u8*)*--pFrame->pC;
