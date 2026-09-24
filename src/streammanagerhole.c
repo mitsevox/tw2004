@@ -51,6 +51,9 @@ void fn_800141CC(void);
 s32  fn_800072E0(void);
 void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);  // UMemPool.c: copy a 4x4 matrix
 void fn_80016C28(f32* pSrc, f32* pDst);             // negate four floats
+void fn_80012520(u32 ePrim, u32 eFormat, u16 nVerts);  // LLFont.c: GXBegin
+void fn_800124A8(void);                                // LLFont.c: end the primitive
+void fn_800162AC(f32* pPos, f32* pColour, f32* pUV, int nVerts);
 void fn_800169AC(void);     // apply lbl_80280E08's viewport
 void fn_80016208(void);
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
@@ -783,6 +786,76 @@ void fn_80016B9C(void) {
 // Set the GX viewport from six values (GXGetViewportv's layout).
 void fn_80016C44(f32* pViewport) {
     GXSetViewport(pViewport[0], pViewport[1], pViewport[2], pViewport[3], pViewport[4], pViewport[5]);
+}
+
+// Draw nVerts vertices as primitive ePrim in the view (0xA1 goes through fn_800162AC). Each
+// vertex takes four floats of pPos, and of pColour and pUV when given; without pColour the view's
+// colour is used. Unless the view's nD0 is set, its viewport and matrices are used for the draw
+// and the GX state is put back afterwards.
+void fn_8001644C(int ePrim, f32* pPos, f32* pColour, f32* pUV, int nVerts) {
+    f32 aProjection[7];
+    f32 aViewport[6];
+    ViewState* pView = lbl_80280E08;
+    int i;
+
+    if (ePrim == 0xA1) {
+        fn_800162AC(pPos, pColour, pUV, nVerts);
+        return;
+    }
+    if (pView->nD0 == 0) {
+        GXGetProjectionv(aProjection);
+        GXGetViewportv(aViewport);
+        GXSetViewport(pView->n70, pView->n74, pView->n78, pView->n7C, 0.0f, 1.0f);
+        GXSetProjection(pView->m0, 1);
+        GXLoadPosMtxImm(pView->m40, 0);
+        GXSetCurrentMtx(0);
+    }
+    GXClearVtxDesc();
+    GXSetVtxDesc(9, 1);
+    GXSetVtxDesc(11, 1);
+    if (pUV != NULL) {
+        GXSetVtxDesc(13, 1);
+    }
+    GXSetVtxAttrFmt(7, 9, 1, 4, 0);
+    GXSetVtxAttrFmt(7, 11, 1, 5, 0);
+    if (pUV != NULL) {
+        GXSetVtxAttrFmt(7, 13, 1, 4, 0);
+    }
+    fn_80012520(ePrim, 7, nVerts);
+    if (pUV != NULL) {
+        if (pColour != NULL) {
+            for (i = 0; i < nVerts; i++) {
+                fn_800168A0(pPos, pColour, pUV);
+                pUV += 4;
+                pColour += 4;
+                pPos += 4;
+            }
+        } else {
+            for (i = 0; i < nVerts; i++) {
+                fn_80016800(pPos, pUV);
+                pUV += 4;
+                pPos += 4;
+            }
+        }
+    } else if (pColour != NULL) {
+        for (i = 0; i < nVerts; i++) {
+            fn_80016770(pPos, pColour);
+            pColour += 4;
+            pPos += 4;
+        }
+    } else {
+        for (i = 0; i < nVerts; i++) {
+            fn_800166E8(pPos);
+            pPos += 4;
+        }
+    }
+    fn_800124A8();
+    if (pView->nD0 == 0) {
+        GXSetProjectionv(aProjection);
+        fn_80016C44(aViewport);
+        fn_80016B9C();
+        fn_80012EF8();
+    }
 }
 
 // Set the viewport's corners, as fractions of the screen.
