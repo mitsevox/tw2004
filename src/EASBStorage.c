@@ -6,6 +6,21 @@
 #include "core/easb.h"
 #include "platform.h"
 
+EASBStorageOp lbl_80195520[EASB_OPERATION_NONE + 1] = {
+    { 0, 1, 1, {0, 0}, {0xB, 0, 0xC, 8, 0xD, 2, EASB_STEP_END, 0} },
+    { 1, 1, 1, {0, 0}, {0xF, EASB_STEP_END, 0, 0, 0, 0, 0, 0} },
+    { 2, 1, 1, {0, 0}, {0, 0x10, 0x11, 0x12, 2, EASB_STEP_END, 0, 0} },
+    { 3, 1, 1, {0, 0}, {1, 0x10, 0x11, 0x13, 2, EASB_STEP_END, 0, 0} },
+    { 4, 1, 0, {0, 0}, {0, 0x10, 3, 4, 5, EASB_STEP_END, 0, 0} },
+    { 5, 1, 0, {0, 0}, {1, 0x10, EASB_STEP_END, 0, 0, 0, 0, 0} },
+    { 6, 0, 1, {0, 0}, {2, EASB_STEP_END, 0, 0, 0, 0, 0, 0} },
+    { 7, 0, 0, {0, 0}, {8, 9, EASB_STEP_END, 0, 0, 0, 0, 0} },
+    { 8, 0, 0, {0, 0}, {6, EASB_STEP_END, 0, 0, 0, 0, 0, 0} },
+    { 9, 0, 0, {0, 0}, {7, EASB_STEP_END, 0, 0, 0, 0, 0, 0} },
+    { EASB_OPERATION_ERROR, 0, 1, {0, 0}, {2, EASB_STEP_END, 0, 0, 0, 0, 0, 0} },
+    { EASB_OPERATION_NONE, 0, 0, {0, 0}, {EASB_STEP_END, 0, 0, 0, 0, 0, 0, 0} },
+};
+
 // The two-letter language codes the library knows (EASBInitParams.uGamesPlayedTypeLanguage).
 #define EASB_LANGUAGE(a, b) (((a) << 8) | (b))
 
