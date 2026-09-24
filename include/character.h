@@ -590,6 +590,7 @@ void  Character_SetClubStatesForCharacter(Character* pChar, int nSlot, struct Sk
 extern f32 lbl_801C6498[4];             // the identity rotation (quaternion), set by fn_80029530
 extern u8  lbl_802810A6;                // IK on (fn_80027738); off, the IK functions do nothing
 extern u8  lbl_8018742C[42][2];         // pairs of standard bones (fn_80029804 reads the first 41)
+extern f32 lbl_80186838[4];             // a zero vector (fn_80029BC8 copies it)
 
 // AnimStream.c: the animation groups it streams clips for (groups 1 and 5, the reactions), and the
 // index each has in its tables.
