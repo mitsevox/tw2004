@@ -931,7 +931,16 @@ GoShaderObject_Grass_Gc.c:
 	.text       start:0x80120298 end:0x80121430
 
 GameMode4Menu.c:
-	.text       start:0x80121430 end:0x801220D4
+	.text       start:0x80121430 end:0x801218BC
+	.data       start:0x80194648 end:0x80194660
+	.sdata      start:0x80281910 end:0x80281928
+	.sdata2     start:0x80284B00 end:0x80284B08
+
+LadderMap.c:
+	.text       start:0x801218BC end:0x801220D4
+	.data       start:0x80194660 end:0x80194748
+	.sdata      start:0x80281928 end:0x80281970
+	.sdata2     start:0x80284B08 end:0x80284B10
 
 TibExt.c:
 	.text       start:0x801220D4 end:0x801228E0
