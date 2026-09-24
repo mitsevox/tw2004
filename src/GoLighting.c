@@ -194,6 +194,8 @@ void fn_8006E7A4(LightGroup* pGroup) {
         for (; n > 0; n--) {
             pLight = *ppLight++;
             switch (pLight->nType) {
+            case 0:
+                break;
             case 1:
                 bAmbient = 1;
                 lbl_802811D8->vAmbient[0] =
