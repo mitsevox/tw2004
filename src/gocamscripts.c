@@ -1762,8 +1762,8 @@ void fn_800441E4(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot*
     fDist = fn_80009680(fn_80009744(vDiff));
     fDist *= fn_8001EFFC((u8*)fn_8001F004());
     if (fDist < lbl_80281F78->f120) {
-        fAbove = pCam[1] - pCourse->pin[nPin].y;
-        if (fAbove < lbl_80281F78->f124) {
+        if (pCam[1] - pCourse->pin[nPin].y < lbl_80281F78->f124) {
+            fAbove = pCam[1] - pCourse->pin[nPin].y;
             pCam[1] += (lbl_80281F78->f124 - fAbove) * (1.0f - fDist / lbl_80281F78->f120);
         }
     }
