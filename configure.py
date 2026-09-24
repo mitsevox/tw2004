@@ -852,7 +852,7 @@ config.libs = [
             Object(NonMatching, "LLObj_Gc.c"),
             Object(Matching, "unsorted/code_800080D0.c"),
             Object(Matching, "unsorted/code_800082F8.c"),
-            Object(NonMatching, "GoEntry.c"),
+            Object(Matching, "GoEntry.c"),
             Object(NonMatching, "Quaternion.c"),
             Object(NonMatching, "StaticMemory.c"),
             Object(Matching, "UMemPool.c"),

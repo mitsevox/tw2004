@@ -40,8 +40,7 @@ static s8   gFreeRingHead;        // 0x80281C54
 static UStreamBuffer* gpFreeList; // 0x80281C50  released buffers not yet back in the ring
 static UStreamBuffer* gpCurList;  // 0x80281C4C  buffers being parsed
 static UStreamBuffer* gpUsedList; // 0x80281C48  parsed buffers that objects still reference
-static u32  gCurObjectPos;        // 0x80281C44
-static UStreamObject* gpCurObject;   // 0x80281C40  object being filled
+static UStreamFill gFill;         // 0x80281C40  object being filled and how far
 static UMemPool* gpNodePool;      // 0x80281C3C
 static UStreamNode* gpDoneList;   // 0x80281C38  objects finished by the parser
 static void* gpBufferMemory;      // 0x80281C34
@@ -187,20 +186,24 @@ void UStream_SetAutoRead(u8 bAuto) {
 }
 
 // Object allocation from an SHDR chunk: header + name + 0x80-aligned data.
-static int UStream_BeginObject(UStreamObject** ppObject, UStreamChunk* pChunk) {
+static int UStream_BeginObject(UStreamFill* pFill, UStreamChunk* pChunk) {
     u32 uExtra;
     int nWanted;
     u32 uPad;
     UStreamObject* pObject;
     if (pChunk->uType == TAG('C', 's', 'a', 'c')) {
         nWanted = 1;
-        uExtra = ((pChunk->n38 + 3 + pChunk->nNameLen) & ~3) + 8;
+        uExtra = ((pChunk->nNameLen + pChunk->n38 + 3) & ~3) + 8;
     } else {
-        const char* pName = (const char*)pChunk->szName + pChunk->nNameLen;
+        // Two LLTex scripts sit at szName: the first (nNameLen bytes) says whether the object is
+        // wanted, the one after it runs only when it is.
+        const char* pCode = pChunk->szName;
+        const char* pNext = pCode + pChunk->nNameLen;
+
         uExtra = 0;
-        nWanted = fn_8000EA1C(pName, 0, -1, 0);
+        nWanted = fn_8000EA1C(pCode, 0, -1, 0);
         if (nWanted) {
-            fn_8000EA1C(pName, 0, -1, 0);
+            fn_8000EA1C(pNext, 0, -1, 0);
         }
     }
     if (nWanted) {
@@ -218,16 +221,13 @@ static int UStream_BeginObject(UStreamObject** ppObject, UStreamChunk* pChunk) {
         }
         uPad = (uExtra + sizeof(UStreamObject)) & 0x7F;
         uPad = uPad ? 0x80 - uPad : 0;
-        {
-            u32 uDataSize = pChunk->uSize;
-            pObject = fn_80009B34((uExtra + uPad) + uDataSize + sizeof(UStreamObject), pChunk->uFlags,
-                                  0x80, "UStream.c", 732);
-        }
-        *ppObject = pObject;
+        pObject = fn_80009B34(sizeof(UStreamObject) + uExtra + uPad + pChunk->uSize, pChunk->uFlags,
+                              0x80, "UStream.c", 732);
+        pFill->pObject = pObject;
         pObject->nUnk14 = 0;
-        ppObject[1] = NULL;
+        pFill->uPos = 0;
         Mem_cpy(&pObject->uFlags, &pChunk->uFlags, uExtra + 0x1C);
-        pObject->pData = (u8*)pObject + uExtra + uPad + sizeof(UStreamObject);
+        pObject->pData = (u8*)(pObject + 1) + uExtra + uPad;
         pObject->uUnk4 = 0;
         pObject->pfn8 = NULL;
         pObject->pPrev = NULL;
@@ -503,34 +503,38 @@ static void UStream_ParseChunks(void) {
                 break;
             case TAG('S', 'H', 'O', 'C'):
                 if (pChunk->uSubTag == TAG('S', 'H', 'D', 'R')) {
-                    if (UStream_BeginObject(&gpCurObject, pChunk) != 0) return;
+                    if (UStream_BeginObject(&gFill, pChunk) != 0) return;
                 } else if (pChunk->uSubTag == TAG('S', 'D', 'A', 'T')) {
+                    UStreamFill* pFill = &gFill;
+
                     pBuffer->uPos += 0x40;
                     uLen -= 0x40;
-                    if (gpCurObject != NULL) {
+                    if (pFill->pObject != NULL) {
                         u32 uCopy = uLen;
-                        if (gCurObjectPos + uLen > gpCurObject->uSize) {
-                            uCopy = gpCurObject->uSize - gCurObjectPos;
+                        if (pFill->uPos + uLen > pFill->pObject->uSize) {
+                            uCopy = pFill->pObject->uSize - pFill->uPos;
                         }
-                        Mem_cpy(gpCurObject->pData + gCurObjectPos, (u8*)(pChunk + 1), uCopy);
-                        gCurObjectPos += uCopy;
-                        if (gCurObjectPos == gpCurObject->uSize) {
-                            UStream_FinishObject(gpCurObject);
-                            gpCurObject = NULL;
+                        Mem_cpy(pFill->pObject->pData + pFill->uPos, (u8*)(pChunk + 1), uCopy);
+                        pFill->uPos += uCopy;
+                        if (pFill->uPos == pFill->pObject->uSize) {
+                            UStream_FinishObject(pFill->pObject);
+                            pFill->pObject = NULL;
                         }
                     }
                 } else if (pChunk->uSubTag == TAG('R', 'd', 'a', 't')) {
+                    UStreamFill* pFill = &gFill;
+
                     pBuffer->uPos += 0x40;
                     uLen -= 0x40;
-                    if (gpCurObject != NULL) {
+                    if (pFill->pObject != NULL) {
                         // the piece's unpacked size, then the packed bytes
                         u32 uUnpacked = BE32(pChunk + 1);
-                        UStream_Decompress((u32*)(pChunk + 1) + 1, gpCurObject->pData + gCurObjectPos,
+                        UStream_Decompress((u32*)(pChunk + 1) + 1, pFill->pObject->pData + pFill->uPos,
                                            uUnpacked);
-                        gCurObjectPos += uUnpacked;
-                        if (gCurObjectPos == gpCurObject->uSize) {
-                            UStream_FinishObject(gpCurObject);
-                            gpCurObject = NULL;
+                        pFill->uPos += uUnpacked;
+                        if (pFill->uPos == pFill->pObject->uSize) {
+                            UStream_FinishObject(pFill->pObject);
+                            pFill->pObject = NULL;
                         }
                     }
                 }
@@ -833,9 +837,9 @@ int UStream_Close(int nStream) {
     if (gpCurList != NULL && nStream > 0) return -1;
     if (gpUsedList != NULL && nStream > 0) return -1;
     if (fn_8000633C(gStreams[(u32)nStream].hFile) != 0) return -1;
-    if (gpCurObject != NULL) {
-        fn_80009E70(gpCurObject);
-        gpCurObject = NULL;
+    if (gFill.pObject != NULL) {
+        fn_80009E70(gFill.pObject);
+        gFill.pObject = NULL;
     }
     gnCurStream--;
     gnNumStreams--;
@@ -937,6 +941,7 @@ void UStream_Init(void) {
     s32 i;
     UStreamBuffer* p;
     UStreamBuffer* pPrev;
+    s32 n;
     gbReadPending = 0;
     gpReadBuffer = NULL;
     gReadyRingTail = 0;
@@ -954,17 +959,18 @@ void UStream_Init(void) {
     gpNodePool = NULL;
     pPrev = NULL;
     p = (UStreamBuffer*)gpBufferMemory;
-    for (i = USTREAM_NUM_BUFFERS; i > 0; i--) {
+    n = USTREAM_NUM_BUFFERS;
+    do {
         p->pNext = pPrev;
         p->uPos = 0;
         p->nRefs = 0;
         pPrev = p;
         p++;
-    }
+    } while (--n);
     gpFreeList = pPrev;
     gpCurList = NULL;
     gpUsedList = NULL;
-    gpCurObject = NULL;
+    gFill.pObject = NULL;
     gpDoneList = NULL;
     gpNodePool = fn_8000AFA0(0x200, 8, 1, 0x10);
     gnNumStreams = 0;
