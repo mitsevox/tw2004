@@ -448,6 +448,7 @@ void fn_8003185C(void) {
 // fCrowdFullMaxDistanceFromGolfer and farther from the pin than the ball is (every other one when
 // nearer).
 void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
+    s32 iObject;
     f32 v48[4];
     f32 v38[4];
     f32 v28[4];
@@ -474,7 +475,6 @@ void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
     s32 eClipMethod;
     View* pView;
     Ter_ObjectReference* pRef;
-    s32 iObject;
 
     nObjects = fn_800354F4(fn_800354E4(pPatch->pObjects, 0));
     if (nObjects == 0) {
@@ -652,16 +652,16 @@ void fn_80031A08(s32* pA, s32* pB, s32 a, s32 b) {
 // word 3) ask for it always get level 0, and the others never get level 0 while the camera moves.
 // Unless gSession.b11 is set, an object between two planes fades from one level into the next.
 void fn_80031AB4(void) {
-    Ter_LODPlane* pPlanes = lbl_801D3CB0.LODPlanes;
-    s32 i;
-    s32 nLOD;
-    s32 nTranslucent;
-    s32 nLast;
-    s32 iObject;
-    s32 uFlags;
-    f32 fDistanceSquared;
-    f32 fAlpha;
     f32 fT;
+    f32 fAlpha;
+    f32 fDistanceSquared;
+    s32 uFlags;
+    s32 iObject;
+    s32 nLast;
+    s32 nTranslucent;
+    s32 nLOD;
+    s32 i;
+    Ter_LODPlane* pPlanes = lbl_801D3CB0.LODPlanes;
 
     if (gSession.b11 != 0) {
         fAlpha = 0.0f;

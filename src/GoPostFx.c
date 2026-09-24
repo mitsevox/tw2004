@@ -10,10 +10,12 @@
 #include "terrain.h"
 
 void fn_80037E50(void);
-void fn_80038A90(f32* pColour, u8 bCopy, int nView, int nField, f32 fCX, f32 fCY);
+void fn_80038A90(f32* pColour, f32 fCX, f32 fCY, u8 bCopy, int nView, int nField);
 void fn_80038724(int nField, int nView, f32 fAlpha, f32 fShake);
 void fn_80038E7C(f32* pXY, f32* pColour, f32* pUV, int n, f32* pSrc, f32 fCX, f32 fCY, f32 fX0,
                  f32 fY0, f32 fX1, f32 fY1, f32 fMaxDist);
+void fn_80038A2C(int nField, RenderCamera* pCamera);
+void fn_80038A6C(int nField, void* pCamera);
 void fn_800390CC(int nField, RenderCamera* pCamera);
 void fn_800A6070(u8 nPlayer, u8 bLimit);      // GameAudio.c
 void fn_80016948(void);
@@ -215,8 +217,8 @@ void fn_80038314(void) {
 
     for (i = 0; i < 4; i++) {
         if (lbl_801D5020[i].b0 && fn_800170A0(i)) {
-            fn_80038A90(lbl_801D5020[i].aColour, lbl_801D5020[i].b1, i, lbl_80281B88 & 1,
-                        lbl_801D5020[i].fX, lbl_801D5020[i].fY);
+            fn_80038A90(lbl_801D5020[i].aColour, lbl_801D5020[i].fX, lbl_801D5020[i].fY,
+                        lbl_801D5020[i].b1, i, lbl_80281B88 & 1);
             lbl_801D5020[i].b0 = 0;
         }
     }
@@ -307,6 +309,11 @@ void fn_80038624(f32* pColour) {
     fn_80012EF8();
 }
 
+// Copies view nView's colour to pOut.
+void fn_800386F0(int nView, f32* pOut) {
+    Vec_Copy(lbl_801D50C0[nView].aColour, pOut);
+}
+
 // Draws the effect's screen copy (nField picks which of the two) over view nView's rectangle at
 // fAlpha, shaken by up to half of fShake each way.
 void fn_80038724(int nField, int nView, f32 fAlpha, f32 fShake) {
@@ -361,26 +368,6 @@ void fn_80038724(int nField, int nView, f32 fAlpha, f32 fShake) {
     fn_80012EF8();
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
-// Copies view nView's colour to pOut.
-void fn_800386F0(int nView, f32* pOut) {
-    Vec_Copy(lbl_801D50C0[nView].aColour, pOut);
-}
-
-// Turns fn_8002A024 on for the camera's screen rectangle (nField unused).
-void fn_80038A2C(int nField, RenderCamera* pCamera) {
-    fn_8002A024(1, pCamera->pRect[0], pCamera->pRect[1], pCamera->pRect[0] + pCamera->pRect[2],
-                pCamera->pRect[1] + pCamera->pRect[3]);
-}
-
-// nField and pCamera are unused; fn_800389C0 passes them.
-void fn_80038A6C(int nField, void* pCamera) {
-    fn_8002A164(1);
-}
-
-// ---- end of sweep code ----
-
 // With any view's lbl_801D5090 effect set, calls fn_80038A2C for the current render camera.
 void fn_80038968(void) {
     int i;
@@ -404,25 +391,21 @@ void fn_800389C0(void) {
     }
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
-void fn_800392D0(void) {
-    if (lbl_80281D80 != NULL) {
-        GXSetZMode(0, 3, 0);
-        GXSetTexCopySrc(0, 0, 0x200, 0x1C0);
-        GXSetTexCopyDst(0x100, 0xE0, 6, 1);
-        GXCopyTex(lbl_80281D80, 0);
-        GXPixModeSync();
-        GXInvalidateTexAll();
-    }
+// Turns fn_8002A024 on for the camera's screen rectangle (nField unused).
+void fn_80038A2C(int nField, RenderCamera* pCamera) {
+    fn_8002A024(1, pCamera->pRect[0], pCamera->pRect[1], pCamera->pRect[0] + pCamera->pRect[2],
+                pCamera->pRect[1] + pCamera->pRect[3]);
 }
 
-// ---- end of sweep code ----
+// nField and pCamera are unused; fn_800389C0 passes them.
+void fn_80038A6C(int nField, void* pCamera) {
+    fn_8002A164(1);
+}
 
 // Draws pColour over view nView as a fan from (fCX, fCY) (fractions of the view) to its edges, the
 // alpha growing with the distance from the centre to pColour's alpha at the farthest corner.
 // With bCopy, the effect's screen copy is drawn first.
-void fn_80038A90(f32* pColour, u8 bCopy, int nView, int nField, f32 fCX, f32 fCY) {
+void fn_80038A90(f32* pColour, f32 fCX, f32 fCY, u8 bCopy, int nView, int nField) {
     f32 aXY[18][4];
     f32 aUV[18][4];
     f32 aColour[18][4];
@@ -609,6 +592,21 @@ void fn_800390CC(int nField, RenderCamera* pCamera) {
     fn_80035F40(pCamera);
     fn_80012EF8();
 }
+
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_800392D0(void) {
+    if (lbl_80281D80 != NULL) {
+        GXSetZMode(0, 3, 0);
+        GXSetTexCopySrc(0, 0, 0x200, 0x1C0);
+        GXSetTexCopyDst(0x100, 0xE0, 6, 1);
+        GXCopyTex(lbl_80281D80, 0);
+        GXPixModeSync();
+        GXInvalidateTexAll();
+    }
+}
+
+// ---- end of sweep code ----
 
 void fn_80039344(int nView, f32 f) {
     lbl_801D5010[nView] = f;

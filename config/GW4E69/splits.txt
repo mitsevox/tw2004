@@ -182,6 +182,8 @@ Skin.c:
 
 GoPostFx.c:
 	.text       start:0x80037DD8 end:0x8003944C
+	.data       start:0x80187900 end:0x80187910
+	.sdata2     start:0x80283028 end:0x80283068
 
 unsorted/sweep_8003944C.c:
 	.text       start:0x8003944C end:0x80039454
@@ -932,7 +934,16 @@ GoShaderObject_Grass_Gc.c:
 	.text       start:0x80120298 end:0x80121430
 
 GameMode4Menu.c:
-	.text       start:0x80121430 end:0x801220D4
+	.text       start:0x80121430 end:0x801218BC
+	.data       start:0x80194648 end:0x80194660
+	.sdata      start:0x80281910 end:0x80281928
+	.sdata2     start:0x80284B00 end:0x80284B08
+
+LadderMap.c:
+	.text       start:0x801218BC end:0x801220D4
+	.data       start:0x80194660 end:0x80194748
+	.sdata      start:0x80281928 end:0x80281970
+	.sdata2     start:0x80284B08 end:0x80284B10
 
 TibExt.c:
 	.text       start:0x801220D4 end:0x801228E0

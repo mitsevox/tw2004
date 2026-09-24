@@ -763,6 +763,7 @@ void fn_8003ADF8(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
 // by f8C when nBC is 4, for a ball slower than f198 and early on the second clock (f88).
 void fn_8003B028(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub,
                  f32 f) {
+    f32 fStep;
     f32 aFrom[4];
     f32 aBallDir[4];
     f32 aTarget[4];
@@ -786,7 +787,6 @@ void fn_8003B028(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
     f32 fEase;
     f32 fT;
     f32 fCurDist;
-    f32 fStep;
     f32 fGrow;
 
     fY = pOut[1];
