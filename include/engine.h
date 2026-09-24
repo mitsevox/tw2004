@@ -152,6 +152,7 @@ void fn_8000B2B8(u32 uSeed);            // seed all three random streams
 void fn_8000B30C(void);                 // drop the kept normal value (fn_8000B318)
 f32  Rand_Float(int nStream);           // 0x8000B428  [0, 1)
 void fn_8000883C(f32* pA, f32* pB, f32 fT);   // quaternion slerp from a to b by fT, into b
+void fn_80008FCC(f32* pA, f32* pB, f32* pOut); // quaternion product a x b (Quaternion.c)
 void fn_80008BB8(f32* pOut, f32 fA, f32 fB, f32 fC);   // the quaternion of three (negated) angles
 void fn_8000923C(f32* pRot, f32* pOut); // a rotation vector (axis * angle) as a quaternion
 void fn_80009710(f32* pQ);              // the identity quaternion (0, 0, 0, 1)
@@ -796,7 +797,8 @@ u8   fn_80014300(u32 uMask);            // any pad pressed these buttons
 
 void fn_800A7A98(s32 n);                // GameAudio.c
 void fn_800A4BDC(void);                 // GameAudio.c: once a frame, the emitters and the queued sound
-void fn_800B7490(void);                 // DiscError.c: yield / pump (UStream.c, DiscCheck.c)
+u8   fn_800B7490(void);                 // DiscError.c: show the disc-error screen while the drive
+                                        // reports a problem; 1: it was shown (UStream.c, DiscCheck.c)
 
 // A node of Code8009B340.c's list (lbl_80281FA0): glows queued by fn_8009B260 that fade out
 // (fAlpha falls by fAlphaSpeed a second) and is freed once it has faded.

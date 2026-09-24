@@ -85,7 +85,6 @@ void  fn_80096F0C(Character* pChar);                            // CharAnim.c
 void  fn_8000914C(f32* pQ, f32 (*m)[4]);                        // Quaternion.c: a rotation matrix
 int   fn_8001BD18(Character* pChar, Clip* pClip);
 void  fn_80008F20(f32* pQ, f32* pOut);                          // Quaternion.c
-void  fn_80008FCC(f32* pA, f32* pB, f32* pOut);                 // Quaternion.c: a product
 void  fn_800090E4(f32* pQ, f32* pIn, f32* pOut);                // Quaternion.c: a vector turned by pQ
 void  fn_80009410(f32 fAngle, f32* pOut);                       // Quaternion.c
 void  fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, int n, f32 fTime);
