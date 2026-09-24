@@ -11,31 +11,31 @@ void fn_8001728C(CamLens* pLens);
 f32  fn_80014280(f32 x);                              // tan, as a float
 void fn_800354B4(u8* p, f32 v);                       // GoTerrain.c: sets the lens's fAC
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
-void fn_80076954(CamLens* pLens, f32 (*pMtx)[4]);
+void CA_vSetMatrix(CamLens* pLens, f32 (*pMtx)[4]);
 void fn_800769C0(CamLens* pLens, f32 fA8, f32 fAC);
 void fn_80076A04(CamLens* pLens, f32 fA8);
 void fn_80076A14(f32* pA, f32* pB, f32* pOut);
 void fn_80076A38(f32* pA, f32* pOut);
 
 // fB0 is 1 at the default 60-degree field of view: tan(fov / 2) over tan(30 degrees).
-void fn_800763BC(CamLens* pLens) {
+void CA_vCalcFovScale_800763BC(CamLens* pLens) {
     pLens->fB0 = fn_80014280(0.5f * pLens->fFov) / 0.57735026f;
 }
 
-CamLens* fn_80076400(void) {
+CamLens* CA_spCreateCamera(void) {
     CamLens* pLens = fn_80009B34(sizeof(CamLens), 2, 16, "GoCamera.c", 152);
 
-    fn_800768E0(pLens);
+    CA_vInitCamera(pLens);
     return pLens;
 }
 
-void fn_8007644C(CamLens* pLens) {
+void CA_vDestroyCamera(CamLens* pLens) {
     fn_80009E70(pLens);
 }
 
 // fake match: stands in for a function the original linker stripped. The file's pool has 0.1,
-// 4096, 60 degrees and 20 (fn_800768E0's settings) right after fn_800763BC's constants, before
-// the 1.0 and 0.0 fn_8007646C uses first; its body is unknown, this one only reproduces the order.
+// 4096, 60 degrees and 20 (CA_vInitCamera's settings) right after CA_vCalcFovScale_800763BC's constants, before
+// the 1.0 and 0.0 CA_vSetLookAt uses first; its body is unknown, this one only reproduces the order.
 static void GoCamera_StrippedFn(CamLens* pLens) {
     fn_800769C0(pLens, 0.1f, 4096.0f);
     fn_80045470(pLens, DEG(60.0f));
@@ -44,7 +44,7 @@ static void GoCamera_StrippedFn(CamLens* pLens) {
 
 // Stands the lens at pPos looking at pTarget, level (its x axis flat) unless it looks almost
 // straight up or down, where it keeps the old x axis. A target closer than 0.1 keeps the old aim.
-void fn_8007646C(CamLens* pLens, f32* pPos, f32* pTarget) {
+void CA_vSetLookAt(CamLens* pLens, f32* pPos, f32* pTarget) {
     f32 vDir[4];
 
     fn_8001728C(pLens);
@@ -69,7 +69,7 @@ void fn_8007646C(CamLens* pLens, f32* pPos, f32* pTarget) {
 }
 
 // The same with the lens's x axis given (pSide, normalised here).
-void fn_8007656C(CamLens* pLens, f32* pPos, f32* pTarget, f32* pSide) {
+void CA_vSetLookAtSide(CamLens* pLens, f32* pPos, f32* pTarget, f32* pSide) {
     f32 vDir[4];
 
     fn_8001728C(pLens);
@@ -91,9 +91,9 @@ void fn_8007656C(CamLens* pLens, f32* pPos, f32* pTarget, f32* pSide) {
     fn_8000A798(pLens->m4, pLens->m44);
 }
 
-// Aims the lens like fn_8007646C, then scales the world by pScale around pCenter: m44 gets the
+// Aims the lens like CA_vSetLookAt, then scales the world by pScale around pCenter: m44 gets the
 // scale, m4 its inverse (1 / pScale, kept in m84[0]).
-void fn_80076664(CamLens* pLens, f32* pPos, f32* pTarget, f32* pCenter, f32* pScale) {
+void CA_vSetScaledLookAt_80076664(CamLens* pLens, f32* pPos, f32* pTarget, f32* pCenter, f32* pScale) {
     f32 vDir[4];
     f32 mB[4][4];
     f32 mA[4][4];
@@ -159,11 +159,11 @@ void fn_80076664(CamLens* pLens, f32* pPos, f32* pTarget, f32* pCenter, f32* pSc
 
 // A new lens's settings: a perspective camera, fA8 0.1, fAC 4096, a 60-degree field of view,
 // no matrix, a 20 x 20 flat view.
-void fn_800768E0(CamLens* pLens) {
-    fn_80076A0C(pLens, 0);
+void CA_vInitCamera(CamLens* pLens) {
+    CA_vSetType_80076A0C(pLens, 0);
     fn_800769C0(pLens, 0.1f, 4096.0f);
     fn_80045470(pLens, DEG(60.0f));
-    fn_80076954(pLens, NULL);
+    CA_vSetMatrix(pLens, NULL);
     fn_80076948(pLens, 20.0f, 20.0f);
 }
 
@@ -173,7 +173,7 @@ void fn_80076948(CamLens* pLens, f32 fB4, f32 fB8) {
 }
 
 // Sets the lens's camera-to-world matrix (pMtx, or the identity when NULL) and its inverse.
-void fn_80076954(CamLens* pLens, f32 (*pMtx)[4]) {
+void CA_vSetMatrix(CamLens* pLens, f32 (*pMtx)[4]) {
     if (pMtx == NULL) {
         fn_8000ADC0(pLens->m4);
         fn_8000ADC0(pLens->m44);
@@ -193,7 +193,7 @@ void fn_80076A04(CamLens* pLens, f32 fA8) {
     pLens->fA8 = fA8;
 }
 
-void fn_80076A0C(CamLens* pLens, s32 nType) {
+void CA_vSetType_80076A0C(CamLens* pLens, s32 nType) {
     pLens->nType = nType;
 }
 

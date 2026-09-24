@@ -174,7 +174,7 @@ typedef struct UIArc {
 typedef struct UIText {
     s32  nText;                 // 0x00  messages 3 and 4: its string (a MsgString), as an offset
                                 //       from the element
-    s16  n4;                    // 0x04  its font (fn_80012868)
+    s16  n4;                    // 0x04  its font (UFont_SetFont)
     u8   unk6[2];
     s16  n8;                    // 0x08  message 8, low half: an entry of the colour table, -1: aColor
     s16  nA;                    // 0x0A  message 8, high half

@@ -202,7 +202,7 @@ void fn_800E0B38(int nMode) {
         fn_800F80FC();
         break;
     case 4:
-        fn_80101FEC();
+        GameMode4_Init();
         break;
     case 6:
         fn_800F944C();

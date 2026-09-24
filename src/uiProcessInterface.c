@@ -33,9 +33,9 @@ void fn_80077340(void);                 // FE_Manager.c
 void fn_80077344(void);                 // FE_Manager.c
 void fn_80077348(void);                 // FE_Manager.c
 void fn_80016B6C(f32 x, f32 y);
-void fn_80012898(s32 nMode);
-void fn_80012C54(s32 v);
-void fn_8001273C(void);
+void UFont_SetMode_80012898(s32 nMode);
+void UFont_SetWordWrap_80012C54(s32 v);
+void UFont_ResetContext(void);
 void fn_800908D4(f32 x0);
 void fn_80090890(s32 nLevel, const char* szFile, s32 nLine, const char* szMsg);
 void fn_80090894(u16 uGroup, u16 uScreen, s32 n);
@@ -122,14 +122,14 @@ void fn_8008F648(s32 nTicks) {
         }
         fn_80014194(NULL);
         fn_80016B6C(1.0f / 512.0f, 1.0f / 448.0f);
-        fn_80012898(1);
-        fn_80012C54(1);
+        UFont_SetMode_80012898(1);
+        UFont_SetWordWrap_80012C54(1);
         fn_800908D4(0.85f);
         if (lbl_80281F1C != NULL) {
             fn_80168C24(lbl_80281F1C->pHandler, nTicks);
         }
         fn_800908D4(1.0f);
-        fn_80012C54(0);
+        UFont_SetWordWrap_80012C54(0);
         fn_80016B6C(1.0f, 1.0f);
         fn_80012F34(1);
         fn_80012F50(1, 6, 0x80);
@@ -148,7 +148,7 @@ void fn_8008F648(s32 nTicks) {
                 fn_8016B09C(lbl_80281F1C->pHandler, 0x24, 1, aArgs);
             }
         }
-        fn_8001273C();
+        UFont_ResetContext();
     }
 }
 
@@ -621,7 +621,7 @@ TexEntry* fn_800107E4(TexBank* pBank, int nTex);  // LLTexGrp.c
 
 void fn_800908D4(f32 x0) {
     UFontContext* pCtx;
-    pCtx = fn_80012EC4();
+    pCtx = UFont_GetContext();
     pCtx->fB4 = x0;
 }
 

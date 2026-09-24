@@ -108,7 +108,7 @@ f32 fn_8000B318(int nStream) {
     fAngle = 2.0f * PI * Rand_Float(nStream);
     fSin = fn_800095F0(fAngle);
     fCos = fn_80009638(fAngle);
-    fRadius = fn_80009680(-2.0f * fn_8000AF7C(fU));
+    fRadius = fn_80009680(-2.0f * logf(fU));
     lbl_80281BE0 = 1;
     lbl_80281BE4 = fRadius * fSin;
     return fRadius * fCos;

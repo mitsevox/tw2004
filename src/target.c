@@ -72,7 +72,7 @@ void fn_80067CD4(int nPlayer) {
     }
 }
 
-void fn_80012C84(int a);
+void UFont_SetFlags_80012C84(int a);
 void fn_800E5118(int a, int b, int nPlayer);                       // GameMessages.c
 void fn_800E5178(int nPlayer, f32 a, f32 b, f32 c, f32 d);          // GameMessages.c
 
@@ -179,7 +179,7 @@ void fn_80067DAC(int nPlayer) {
 
     // the HUD: where the target is on screen, how far above or below the ball, and the share of
     // the club's range (1..100)
-    fn_80012C84(0);
+    UFont_SetFlags_80012C84(0);
     fn_8006A9AC(aText);
     fn_8006434C(pCamera, vPos, &fX, &fY, NULL);
     fn_8006A8D4(pCamera, &fX, &fY);
@@ -849,7 +849,7 @@ void fn_80069BEC(int nPlayer) {
 void fn_80069C64(char* sz, f32 fX, f32 fY) {
     fX -= fn_80012C30(sz) / 2.0f;
     fY -= fn_8006A9FC() / 2.0f;
-    fn_800128F8(sz, fX, fY);
+    UFont_DrawString(sz, fX, fY);
 }
 
 f32  fn_8001414C(u8* p);    // GoRenderCtx_Gc.c: of the screen rectangle
@@ -1065,7 +1065,7 @@ void fn_80069CDC(int nPlayer) {
 
     if (!bBall) {
         // the distances, under the marker and kept on screen
-        fn_80012C84(0);
+        UFont_SetFlags_80012C84(0);
         if (bInBounds && (gPlayers[nPlayer].uFlagsEF0 & 1)) {
             fn_8006A9AC(lbl_801887CC);
         } else {
@@ -1099,7 +1099,7 @@ void fn_8006A6C4(int nPlayer) {
     fn_8006A988(gPlayers[nPlayer].vPlacement, gpGame->p130, vDir);
     vDir[1] = 0.0f;
     Vec_Normalize(vDir, vDir);
-    gPlayers[nPlayer].fA88 = fn_8000AD78(vDir[2], vDir[0]) - PI / 2.0f;
+    gPlayers[nPlayer].fA88 = atan2f(vDir[2], vDir[0]) - PI / 2.0f;
     lbl_801D5BF0[nPlayer].f0 = 0.01f;
     lbl_801D5BF0[nPlayer].f4 = 0.0f;
     lbl_801D5BF0[nPlayer].f8 = 0.04f;
@@ -1210,16 +1210,16 @@ void fn_8006A8D4(void* pCamera, f32* pX, f32* pY) {
 
 // Draw text in one colour (pColor: RGBA).
 void fn_8006A9AC(f32* pColor) {
-    fn_80012EC4()->nA4 = 0x12;
-    fn_80012E54(pColor, (u8*)&fn_80012EC4()->u5C);
+    UFont_GetContext()->nA4 = 0x12;
+    UFont_PackColor(pColor, (u8*)&UFont_GetContext()->u5C);
 }
 
 // The current font's line height, scaled as the text is drawn.
 f32 fn_8006A9FC(void) {
-    return fn_8006A8A8((u8*)fn_8006AA3C()) * fn_80012EC4()->f80;
+    return fn_8006A8A8((u8*)fn_8006AA3C()) * UFont_GetContext()->f80;
 }
 
 // The font the current text settings draw with.
 LLFont* fn_8006AA3C(void) {
-    return lbl_80280DE0->apFonts[fn_80012EC4()->nFont];
+    return lbl_80280DE0->apFonts[UFont_GetContext()->nFont];
 }

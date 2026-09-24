@@ -804,7 +804,7 @@ void fn_800864F8(MsgArg* pArgs, MsgArg* pResult) {
     f32 fAngle;
 
     Wind_Get(vWind);
-    fAngle = fn_8000AD78(-vWind[0], vWind[2]) - fAim;
+    fAngle = atan2f(-vWind[0], vWind[2]) - fAim;
     while (fAngle < 0.0f) {
         fAngle += TWOPI;
     }

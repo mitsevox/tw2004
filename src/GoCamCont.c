@@ -17,7 +17,7 @@ void fn_80016CD8(int nView);                            // ViewController.c: set
 void fn_80045824(int n);                                // DepthField.c: turns depth-of-field layer n off
 void fn_800A6070(u8 nPlayer, u8 bLimit);                // GameAudio.c
 f32  fn_8005CC18(f32* pV);                              // Swing.c
-void fn_8006421C(View* pView);
+void CameraController_Shake(View* pView);
 void fn_80064108(View* pView);
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
@@ -191,7 +191,7 @@ void CameraController_Idle(View* pView, int nPlayer) {
         }
     }
     if (pView->script.fF0 > 0.0f && gSession.fFrameTime > 0.0f) {
-        fn_8006421C(pView);
+        CameraController_Shake(pView);
         pView->script.fF0 -= gSession.fFrameTime;
     }
     if ((f32)fn_80009680(fn_8005CC18(pView->v20)) == 0.0f) {
@@ -326,7 +326,7 @@ u8 fn_800635D0(int nPlayer) {
 
 // fake match: stands in for code the original compiled here and the linker stripped: the pool has
 // fn_8006434C's constants (-0.0001f, 0.0001f, -10000.0f, 10000.0f, 0x802836F8) at this point, not
-// after fn_800642D0's; the body is unknown.
+// after CameraController_ResetAimMarkerInSwingCamera_800642D0's; the body is unknown.
 static f32 GoCamCont_StrippedFn2(f32 x) {
     if (x < -0.0001f || x > 0.0001f) {
         return 1.0f / x;
@@ -651,7 +651,7 @@ void fn_80064108(View* pView) {
 }
 
 // Shakes the camera: moves its position by up to half of the script's fF4 each way.
-void fn_8006421C(View* pView) {
+void CameraController_Shake(View* pView) {
     pView->v0[0] += pView->script.fF4 * (Rand_Float(0) - 0.5f);
     pView->v0[1] += pView->script.fF4 * (Rand_Float(0) - 0.5f);
     pView->v0[2] += pView->script.fF4 * (Rand_Float(0) - 0.5f);
@@ -667,7 +667,7 @@ u8 fn_800642B0(void) {
 }
 
 // Blends the view's script into its current shot.
-void fn_800642D0(View* pView, int nPlayer) {
+void CameraController_ResetAimMarkerInSwingCamera_800642D0(View* pView, int nPlayer) {
     f32* pPos = fn_8001731C(pView);
 
     CameraScript_InterpToNewScript(&pView->script, pView->script.pShot, nPlayer, pPos, fn_80017314(pView), 5,

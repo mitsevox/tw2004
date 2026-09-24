@@ -127,7 +127,7 @@ void fn_80076F80(UStreamObject* pObject) {
     fn_80009E70(pObject);
 }
 
-// A movie's skip test (fn_80075FB8's pfnStop, whose arguments it ignores): any button on any
+// A movie's skip test (LLVideo_PlayFile's pfnStop, whose arguments it ignores): any button on any
 // controller.
 u8 fn_80076FDC(Video* pVideo, int nArg) {
     int i;
@@ -195,12 +195,12 @@ void FE_GetBIOMovieName(void) {
             switch (pMovie->nKind) {
             case FE_MOVIE_CREDITS:
                 FE_MakeMoviePath("credits", szPath);
-                fn_80075FB8(szPath, fn_80076FDC, 0, 0);
+                LLVideo_PlayFile(szPath, fn_80076FDC, 0, 0);
                 break;
             case FE_MOVIE_BIO:
                 sprintf(szName, "bio%02d", pMovie->nBio + 1);
                 fn_800770D4(szName, szPath);
-                fn_80075FB8(szPath, fn_80076FDC, 0, 0);
+                LLVideo_PlayFile(szPath, fn_80076FDC, 0, 0);
                 break;
             case 4:                     // fake match: the original never compares with 4; this empty
                 break;                  // case only makes the dispatch test 3 before 1
@@ -246,7 +246,7 @@ void fn_8007734C(void) {
     char szPath[64];
     if (!(gSession.uFlags & 0x4000)) {
         FE_MakeMoviePath("intro", szPath);
-        fn_80075FB8(szPath, fn_80076FDC, 0, 0);
+        LLVideo_PlayFile(szPath, fn_80076FDC, 0, 0);
     }
 }
 
@@ -1264,9 +1264,9 @@ void fn_80079D30(void) {
     if (lbl_801D7148.p658 != NULL) {
         lbl_80281ECC = FE_BACKUP_SIZE;
         if (lbl_80281ED0 == 0) {
-            lbl_80281ED0 = fn_800B6564(FE_BACKUP_SIZE);
+            lbl_80281ED0 = GoARAM_Alloc(FE_BACKUP_SIZE);
         }
-        fn_800B67EC(fn_800B6844(lbl_801D7148.p658, lbl_80281ED0, lbl_80281ECC));
+        GoARAM_WaitTransfer(GoARAM_CopyToAram(lbl_801D7148.p658, lbl_80281ED0, lbl_80281ECC));
         fn_80009E70(lbl_801D7148.p658);
         lbl_801D7148.p658 = NULL;
     }
@@ -1279,8 +1279,8 @@ void fn_80079DAC(void) {
         lbl_801D7148.p658 = fn_80009B34(lbl_80281ECC, 2, 32, "FE_Manager.c", 2778);
         memset(lbl_801D7148.p658, 0, lbl_80281ECC);
         if (lbl_80281ED0 != 0) {
-            fn_800B67EC(fn_800B68B4(lbl_801D7148.p658, lbl_80281ED0, lbl_80281ECC));
-            fn_800B6594(lbl_80281ED0);
+            GoARAM_WaitTransfer(GoARAM_CopyFromAram(lbl_801D7148.p658, lbl_80281ED0, lbl_80281ECC));
+            GoARAM_Free(lbl_80281ED0);
             lbl_80281ED0 = 0;
         }
     }

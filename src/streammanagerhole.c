@@ -101,8 +101,8 @@ void GameModeDriverPGATour_RegisterStreamClients();
 void GameModeDriverPGATour_UnregisterStreamClients();
 void GameModeDriverRTE_RegisterStreamClients();
 void GameModeDriverRTE_UnregisterStreamClients();
-void fn_80102310();
-void fn_80102354();
+void GameMode4_RegisterStreamClients();
+void GameMode4_UnregisterStreamClients();
 void fn_8011763C();
 void fn_8011766C();
 void fn_80014864(void);
@@ -283,7 +283,7 @@ void fn_80014864(void) {
     fn_800D29EC();
     fn_800EAE74();
     fn_800D33F4();
-    fn_80102310();
+    GameMode4_RegisterStreamClients();
     fn_8011763C();
     GameModeDriverPGATour_RegisterStreamClients();
     GameModeDriverRTE_RegisterStreamClients();
@@ -296,7 +296,7 @@ void fn_800148A8(void) {
     fn_800D2A30();
     fn_800EAEB8();
     fn_800D3424();
-    fn_80102354();
+    GameMode4_UnregisterStreamClients();
     fn_8011766C();
     GameModeDriverPGATour_UnregisterStreamClients();
     GameModeDriverRTE_UnregisterStreamClients();
@@ -1070,6 +1070,9 @@ void fn_8001644C(int ePrim, f32* pPos, f32* pColour, f32* pUV, int nVerts) {
     f32 aProjection[7];
     f32 aViewport[6];
     ViewState* pView = lbl_80280E08;
+    f32* pP;
+    f32* pC;
+    f32* pT;
     int i;
 
     if (ePrim == 0xA1) {
@@ -1098,29 +1101,37 @@ void fn_8001644C(int ePrim, f32* pPos, f32* pColour, f32* pUV, int nVerts) {
     fn_80012520(ePrim, 7, nVerts);
     if (pUV != NULL) {
         if (pColour != NULL) {
+            pP = pPos;
+            pC = pColour;
+            pT = pUV;
             for (i = 0; i < nVerts; i++) {
-                fn_800168A0(pPos, pColour, pUV);
-                pUV += 4;
-                pColour += 4;
-                pPos += 4;
+                fn_800168A0(pP, pC, pT);
+                pT += 4;
+                pC += 4;
+                pP += 4;
             }
         } else {
+            pP = pPos;
+            pT = pUV;
             for (i = 0; i < nVerts; i++) {
-                fn_80016800(pPos, pUV);
-                pUV += 4;
-                pPos += 4;
+                fn_80016800(pP, pT);
+                pT += 4;
+                pP += 4;
             }
         }
     } else if (pColour != NULL) {
+        pP = pPos;
+        pC = pColour;
         for (i = 0; i < nVerts; i++) {
-            fn_80016770(pPos, pColour);
-            pColour += 4;
-            pPos += 4;
+            fn_80016770(pP, pC);
+            pC += 4;
+            pP += 4;
         }
     } else {
+        pP = pPos;
         for (i = 0; i < nVerts; i++) {
-            fn_800166E8(pPos);
-            pPos += 4;
+            fn_800166E8(pP);
+            pP += 4;
         }
     }
     fn_800124A8();

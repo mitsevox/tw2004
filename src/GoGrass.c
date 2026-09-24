@@ -296,14 +296,14 @@ void fn_8011E974(void) {
 
 // The grass's render camera: a flat 20 x 20 lens drawing into a 256 x 256 frame buffer.
 void fn_8011E9D8(void) {
-    lbl_80281900->pLens = fn_80076400();
+    lbl_80281900->pLens = CA_spCreateCamera();
     lbl_80281900->pFrameBuf = fn_8006E1C8();
     lbl_80281900->pRect = fn_80076ACC();
     fn_8006E26C(lbl_80281900->pFrameBuf, 0.0f, 0.0f, 256.0f, 256.0f, 1.0f, 1.0f);
     fn_800171D8(lbl_80281900->pRect, 0.0f, 0.0f, 1.0f, 1.0f);
     fn_800B3438(lbl_80281900->pRect, 1.0f, 1.0f);
-    fn_800768E0(lbl_80281900->pLens);
-    fn_80076A0C(lbl_80281900->pLens, 1);
+    CA_vInitCamera(lbl_80281900->pLens);
+    CA_vSetType_80076A0C(lbl_80281900->pLens, 1);
     fn_80076948(lbl_80281900->pLens, 20.0f, 20.0f);
     lbl_80281900->pCamera =
         fn_8001371C(lbl_80281900->pLens, lbl_80281900->pFrameBuf, lbl_80281900->pRect);
@@ -311,7 +311,7 @@ void fn_8011E9D8(void) {
 
 void fn_8011EAB8(void) {
     fn_8006E214(lbl_80281900->pFrameBuf);
-    fn_8007644C(lbl_80281900->pLens);
+    CA_vDestroyCamera(lbl_80281900->pLens);
     fn_80076B18(lbl_80281900->pRect);
     fn_800137B0(lbl_80281900->pCamera);
 }
@@ -335,7 +335,7 @@ void fn_8011EB04(void) {
     aAt[1] = lbl_80281900->f3B0 - 1.0f;
     aAt[2] = fZ;
     aAt[3] = 1.0f;
-    fn_8007646C(lbl_80281900->pLens, aEye, aAt);
+    CA_vSetLookAt(lbl_80281900->pLens, aEye, aAt);
 }
 
 // The grass's 256x256 texture: its buffer and texture object.

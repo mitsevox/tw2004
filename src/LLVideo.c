@@ -8,15 +8,15 @@
 #include "camera.h"
 #include "terrain.h"
 
-u8   fn_80075280(Video* pVideo, int* pnQueued);
-void fn_800752DC(Video* pVideo);
-void fn_8007531C(VideoChunk* pChunk);
-void fn_8007533C(VideoChunk* pChunk);
-void fn_8007535C(VideoQueue* pQueue);
-int  fn_8007540C(VideoQueue* pQueue, VideoChunk* pChunk);
-VideoChunk* fn_80075470(VideoQueue* pQueue);
-int  fn_80076088(VideoQueue* pQueue);
-u8   fn_80076090(VideoQueue* pQueue);
+u8   LLVideo_UpdateStream(Video* pVideo, int* pnQueued);
+void LLVideo_PreloadQueue_800752DC(Video* pVideo);
+void LLVideo_ChunkAddBufferRef(VideoChunk* pChunk);
+void LLVideo_ChunkReleaseBuffer(VideoChunk* pChunk);
+void LLVideo_QueueReset(VideoQueue* pQueue);
+int  LLVideo_QueueAdd(VideoQueue* pQueue, VideoChunk* pChunk);
+VideoChunk* LLVideo_QueueRemove(VideoQueue* pQueue);
+int  LLVideo_QueueGetCount(VideoQueue* pQueue);
+u8   LLVideo_QueueIsEmpty(VideoQueue* pQueue);
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
 // 1.0f (0x80283A50), before the 0.0f, 0.1f and 0.5f fn_800755F0 uses first; its body is unknown.
@@ -25,34 +25,34 @@ static f32 LLVideo_StrippedFn(f32 x) {
 }
 
 // Runs the stream loader once; pnQueued, if given, gets how many chunks are now queued.
-u8 fn_80075280(Video* pVideo, int* pnQueued) {
+u8 LLVideo_UpdateStream(Video* pVideo, int* pnQueued) {
     u8 bRet = UStream_Update();
     if (pnQueued != NULL) {
-        *pnQueued = fn_80076088(&pVideo->queue);
+        *pnQueued = LLVideo_QueueGetCount(&pVideo->queue);
     }
     return bRet;
 }
 
 // Runs the stream loader until 16 chunks are queued (before the movie starts).
-void fn_800752DC(Video* pVideo) {
+void LLVideo_PreloadQueue_800752DC(Video* pVideo) {
     int nQueued;
     do {
-        fn_80075280(pVideo, &nQueued);
+        LLVideo_UpdateStream(pVideo, &nQueued);
     } while (nQueued < 16);
 }
 
 // A queued chunk holds on to its stream buffer.
-void fn_8007531C(VideoChunk* pChunk) {
+void LLVideo_ChunkAddBufferRef(VideoChunk* pChunk) {
     UStream_AddBufferRef(&pChunk->pBuffer);
 }
 
 // A chunk is done with: let go of its stream buffer.
-void fn_8007533C(VideoChunk* pChunk) {
+void LLVideo_ChunkReleaseBuffer(VideoChunk* pChunk) {
     UStream_ReleaseObjectBuffer(&pChunk->pBuffer);
 }
 
 // Empties the queue.
-void fn_8007535C(VideoQueue* pQueue) {
+void LLVideo_QueueReset(VideoQueue* pQueue) {
     s32 i;
     pQueue->nHead = 0;
     pQueue->nTail = 0;
@@ -63,7 +63,7 @@ void fn_8007535C(VideoQueue* pQueue) {
 }
 
 // Queues a chunk (its stream buffer stays in use meanwhile); returns the slot it went in.
-int fn_8007540C(VideoQueue* pQueue, VideoChunk* pChunk) {
+int LLVideo_QueueAdd(VideoQueue* pQueue, VideoChunk* pChunk) {
     int nSlot = pQueue->nHead;
     pQueue->nHead++;
     if (pQueue->nHead == VIDEO_QUEUE_SIZE) {
@@ -71,12 +71,12 @@ int fn_8007540C(VideoQueue* pQueue, VideoChunk* pChunk) {
     }
     pQueue->nCount++;
     pQueue->apChunk[nSlot] = pChunk;
-    fn_8007531C(pChunk);
+    LLVideo_ChunkAddBufferRef(pChunk);
     return nSlot;
 }
 
 // Takes the oldest chunk off the queue (NULL when it is empty).
-VideoChunk* fn_80075470(VideoQueue* pQueue) {
+VideoChunk* LLVideo_QueueRemove(VideoQueue* pQueue) {
     VideoChunk* pChunk;
     if (pQueue->nCount == 0) return NULL;
     pChunk = pQueue->apChunk[pQueue->nTail];
@@ -101,7 +101,7 @@ void* fn_800754C0(void* pArg) {
     int nChunks;
     int j;
 
-    apChunk[0] = fn_80075470(&pVideo->queue);
+    apChunk[0] = LLVideo_QueueRemove(&pVideo->queue);
     if (apChunk[0] == NULL) {
         pVideo->bStarved = 1;
         return NULL;
@@ -109,11 +109,11 @@ void* fn_800754C0(void* pArg) {
     nSize = apChunk[0]->uSize;
     nChunks = apChunk[0]->nMore + 1;
     for (i = 1; i < nChunks; i++) {
-        apChunk[i] = fn_80075470(&pVideo->queue);
+        apChunk[i] = LLVideo_QueueRemove(&pVideo->queue);
         if (apChunk[i] == NULL) {
             pVideo->bStarved = 1;
             for (j = 0; j < i; j++) {
-                fn_8007533C(apChunk[j]);
+                LLVideo_ChunkReleaseBuffer(apChunk[j]);
             }
             return NULL;
         }
@@ -124,21 +124,21 @@ void* fn_800754C0(void* pArg) {
     for (i = 0; i < nChunks; i++) {
         memcpy(pDst, apChunk[i]->aData, apChunk[i]->uSize);
         pDst += apChunk[i]->uSize;
-        fn_8007533C(apChunk[i]);
+        LLVideo_ChunkReleaseBuffer(apChunk[i]);
     }
     return pData;
 }
 
 void   fn_800757B8(void);
 Video* fn_80075800(void);
-void   fn_80075880(Video* pVideo, int nRate);
+void   LLVideo_SetFrameRate(Video* pVideo, int nRate);
 void   fn_800758B4(Video* pVideo);
 Video* fn_80075904(int nSlot, Video* pVideo);
-void   fn_8007599C(Video* pVideo);
-void   fn_80075A14(Video* pVideo);
-void   fn_80075A98(Video* pVideo);
-void   fn_80075AD0(void);
-u8     fn_80075BF4(Video* pVideo);
+void   LLVideo_Stop_8007599C(Video* pVideo);
+void   LLVideo_Start_80075A14(Video* pVideo);
+void   LLVideo_SetLastFrameTime_80075A98(Video* pVideo);
+void   LLVideo_UpdateAll_80075AD0(void);
+u8     LLVideo_IsFrameDue_80075BF4(Video* pVideo);
 
 // GameAudio.c
 u8   fn_800A7770(void);
@@ -149,8 +149,8 @@ void fn_800A79F4(void);
 // the renderer
 void fn_80008380(void);
 void fn_800083A0(void);
-void fn_80012898(s32 v);
-s32  fn_800128A4(void);
+void UFont_SetMode_80012898(s32 v);
+s32  UFont_GetMode_800128A4(void);
 void fn_80012B2C(f32 x0, f32 x1);
 void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
@@ -172,8 +172,8 @@ void fn_80075C48(void);
 void fn_80075C68(void);
 void fn_80075C88(void);
 void fn_80075D58(void);
-int  fn_800760A0(Video* pVideo);
-u8   fn_800760A8(Video* pVideo);
+int  LLVideo_GetFrame_800760A0(Video* pVideo);
+u8   LLVideo_HasEnded_800760A8(Video* pVideo);
 void fn_800760B0(int nX, int nY, int nWidth, int nHeight);
 void fn_800760D8(LLPict* pPict);
 void fn_800760F4(f32* pUV, LLPict* pPict);
@@ -256,12 +256,12 @@ Video* fn_80075800(void) {
     pVideo->nSlot = -1;
     pVideo->b1020 = 0;
     pVideo->bFirstFrame = 0;
-    fn_80075880(pVideo, 33);
+    LLVideo_SetFrameRate(pVideo, 33);
     return pVideo;
 }
 
 // Sets the frame rate.
-void fn_80075880(Video* pVideo, int nRate) {
+void LLVideo_SetFrameRate(Video* pVideo, int nRate) {
     pVideo->fFrameTime = 1.0f / nRate;
 }
 
@@ -288,36 +288,36 @@ Video* fn_80075904(int nSlot, Video* pVideo) {
 }
 
 // UStream.c hands over an MPG2 chunk: it is queued if its movie is running, else given back.
-void fn_8007593C(VideoChunk* pChunk) {
+void LLVideo_HandleChunk(VideoChunk* pChunk) {
     Video* pVideo = lbl_80281200->apVideo[pChunk->nSlot];
     if (pVideo != NULL && pVideo->b1020) {
-        fn_8007540C(&pVideo->queue, pChunk);
+        LLVideo_QueueAdd(&pVideo->queue, pChunk);
     }
-    fn_8007533C(pChunk);
+    LLVideo_ChunkReleaseBuffer(pChunk);
 }
 
 // Stops a running movie and gives back every chunk it still holds.
-void fn_8007599C(Video* pVideo) {
+void LLVideo_Stop_8007599C(Video* pVideo) {
     if (pVideo->b1020) {
         fn_800A79B4();
         pVideo->b1020 = 0;
         if (pVideo->p1018 != NULL) {
-            fn_8007533C(pVideo->p1018);
+            LLVideo_ChunkReleaseBuffer(pVideo->p1018);
             pVideo->p1018 = NULL;
         }
-        while (!fn_80076090(&pVideo->queue)) {
-            fn_8007533C(fn_80075470(&pVideo->queue));
+        while (!LLVideo_QueueIsEmpty(&pVideo->queue)) {
+            LLVideo_ChunkReleaseBuffer(LLVideo_QueueRemove(&pVideo->queue));
         }
     }
 }
 
 // Starts a movie: waits for the sound side, then reads ahead until 16 chunks are queued.
-void fn_80075A14(Video* pVideo) {
+void LLVideo_Start_80075A14(Video* pVideo) {
     do {
         fn_800A4BDC();
     } while (fn_800A7770());
     fn_800A7994();
-    fn_8007535C(&pVideo->queue);
+    LLVideo_QueueReset(&pVideo->queue);
     pVideo->p1018 = NULL;
     pVideo->b1020 = 1;
     pVideo->b1021 = 0;
@@ -325,28 +325,28 @@ void fn_80075A14(Video* pVideo) {
     pVideo->bEnded = 0;
     pVideo->bStarved = 0;
     fn_8002FF94(&pVideo->pict, &pVideo->stream);
-    fn_80075A98(pVideo);
-    fn_800752DC(pVideo);
+    LLVideo_SetLastFrameTime_80075A98(pVideo);
+    LLVideo_PreloadQueue_800752DC(pVideo);
 }
 
 // The next frame is timed from now.
-void fn_80075A98(Video* pVideo) {
+void LLVideo_SetLastFrameTime_80075A98(Video* pVideo) {
     pVideo->tLast = fn_800954A4(0);
 }
 
 // Runs every movie once: each one whose next frame is due decodes it into its picture; one whose
 // data ran out is stopped.
-void fn_80075AD0(void) {
+void LLVideo_UpdateAll_80075AD0(void) {
     Video* pVideo;
     s32 i;
     fn_800A79F4();
     for (i = 0; i < NUM_VIDEO_SLOTS; i++) {
         pVideo = lbl_80281200->apVideo[i];
-        if (pVideo != NULL && pVideo->b1020 && !pVideo->b1021 && fn_80075BF4(pVideo)) {
-            fn_80075A98(pVideo);
+        if (pVideo != NULL && pVideo->b1020 && !pVideo->b1021 && LLVideo_IsFrameDue_80075BF4(pVideo)) {
+            LLVideo_SetLastFrameTime_80075A98(pVideo);
             if (pVideo->bStarved || fn_8003001C(&pVideo->pict, &pVideo->stream)) {
                 pVideo->bEnded = 1;
-                fn_8007599C(pVideo);
+                LLVideo_Stop_8007599C(pVideo);
             } else if (fn_80030040(&pVideo->pict, &pVideo->stream)) {
                 pVideo->nFrame++;
                 if (!pVideo->bFirstFrame) {
@@ -362,7 +362,7 @@ void fn_80075AD0(void) {
 }
 
 // The movie's next frame is due.
-u8 fn_80075BF4(Video* pVideo) {
+u8 LLVideo_IsFrameDue_80075BF4(Video* pVideo) {
     if (fn_8006E118(fn_800954A4(0), pVideo->tLast) < pVideo->fFrameTime) {
         return 0;
     }
@@ -389,8 +389,8 @@ void fn_80075C88(void) {
     fn_80016B54(512, 448, 1.0f, 1.0f);
     fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
     fn_80014194(NULL);
-    lbl_80281200->n20 = fn_800128A4();
-    fn_80012898(1);
+    lbl_80281200->n20 = UFont_GetMode_800128A4();
+    UFont_SetMode_80012898(1);
     fn_80012B2C(1.0f, 1.0f);
     fn_80076128(10);
 }
@@ -400,7 +400,7 @@ void fn_80075D58(void) {
     fn_80008380();
     fn_80006EDC();
     fn_80012B2C(1.0f, 1.0f);
-    fn_80012898(lbl_80281200->n20);
+    UFont_SetMode_80012898(lbl_80281200->n20);
     fn_80012F34(1);
     fn_80012F50(0, 6, 0x80);
     fn_80012F18(3);
@@ -414,7 +414,7 @@ void fn_80075D58(void) {
 
 // Plays a movie until its data runs out, showing each new frame full screen, at most 33 times a
 // second. pfnStop(pVideo, nArg), if given, is asked every frame whether to stop early.
-void fn_80075DEC(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nArg), int nArg) {
+void LLVideo_RunPlayback_80075DEC(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nArg), int nArg) {
     f32 xy[8];
     f32 uv[8];
     u64 tFrame;
@@ -424,28 +424,28 @@ void fn_80075DEC(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nArg), int nArg
 
     fn_80075C48();
     fn_80075C88();
-    fn_80075A14(pVideo);
+    LLVideo_Start_80075A14(pVideo);
     tFrame = fn_800954A4(0);
     nLastFrame = -1;
     bFirst = 1;
     bDone = 0;
     do {
-        if (!fn_80075280(pVideo, NULL)) {
+        if (!LLVideo_UpdateStream(pVideo, NULL)) {
             bDone = 1;
         } else {
-            fn_80075AD0();
+            LLVideo_UpdateAll_80075AD0();
             if (pfnStop != NULL && pfnStop(pVideo, nArg)) {
                 UStream_Stop();
-                fn_8007599C(pVideo);
+                LLVideo_Stop_8007599C(pVideo);
             }
-            if (fn_800760A8(pVideo)) {
+            if (LLVideo_HasEnded_800760A8(pVideo)) {
                 UStream_Stop();
-                fn_8007599C(pVideo);
+                LLVideo_Stop_8007599C(pVideo);
             }
-            if (nLastFrame == fn_800760A0(pVideo)) {
+            if (nLastFrame == LLVideo_GetFrame_800760A0(pVideo)) {
                 continue;
             }
-            nLastFrame = fn_800760A0(pVideo);
+            nLastFrame = LLVideo_GetFrame_800760A0(pVideo);
             fn_80006EDC();
             fn_800162A8();
             fn_800760B0(0, 0, 512, 448);
@@ -467,14 +467,14 @@ void fn_80075DEC(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nArg), int nArg
         fn_800083A0();
         fn_80008380();
     } while (!bDone);
-    fn_8007599C(pVideo);
+    LLVideo_Stop_8007599C(pVideo);
     fn_800755F0(6);
     fn_80075D58();
     fn_80075C68();
 }
 
-// Plays the movie file pName in slot 0 (fn_80075DEC), after clearing the screen (fn_800755F0).
-void fn_80075FB8(const char* pName, u8 (*pfnStop)(Video* pVideo, int nArg), int nArg, int nFlags) {
+// Plays the movie file pName in slot 0 (LLVideo_RunPlayback_80075DEC), after clearing the screen (fn_800755F0).
+void LLVideo_PlayFile(const char* pName, u8 (*pfnStop)(Video* pVideo, int nArg), int nArg, int nFlags) {
     int nStream;
     Video* pVideo;
 
@@ -489,7 +489,7 @@ void fn_80075FB8(const char* pName, u8 (*pfnStop)(Video* pVideo, int nArg), int 
         UStream_SetAutoRead(1);
         pVideo = fn_80075800();
         fn_80075904(0, pVideo);
-        fn_80075DEC(pVideo, pfnStop, nArg);
+        LLVideo_RunPlayback_80075DEC(pVideo, pfnStop, nArg);
         UStream_SetAutoRead(0);
         fn_800758B4(pVideo);
         UStream_Close(nStream);
@@ -497,22 +497,22 @@ void fn_80075FB8(const char* pName, u8 (*pfnStop)(Video* pVideo, int nArg), int 
 }
 
 // How many chunks are queued.
-int fn_80076088(VideoQueue* pQueue) {
+int LLVideo_QueueGetCount(VideoQueue* pQueue) {
     return pQueue->nCount;
 }
 
 // The queue is empty.
-u8 fn_80076090(VideoQueue* pQueue) {
+u8 LLVideo_QueueIsEmpty(VideoQueue* pQueue) {
     return pQueue->nCount == 0;
 }
 
 // The frames decoded so far (-1 before the first).
-int fn_800760A0(Video* pVideo) {
+int LLVideo_GetFrame_800760A0(Video* pVideo) {
     return pVideo->nFrame;
 }
 
 // The decoder has run out.
-u8 fn_800760A8(Video* pVideo) {
+u8 LLVideo_HasEnded_800760A8(Video* pVideo) {
     return pVideo->bEnded;
 }
 
@@ -547,7 +547,7 @@ void fn_800760F4(f32* pUV, LLPict* pPict) {
 
 void fn_80076128(s32 p0) {
     UFontContext* pCtx;
-    pCtx = fn_80012EC4();
+    pCtx = UFont_GetContext();
     pCtx->nA4 = p0;
 }
 

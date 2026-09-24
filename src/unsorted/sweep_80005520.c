@@ -18,7 +18,7 @@ void fn_8002F1D4();
 void fn_80095108();
 void fn_800A4BAC();
 void fn_800B5C30();
-void fn_800B62DC();
+void GoARAM_Init();
 
 void fn_80005520(void);
 void fn_80005520(void) {
@@ -27,7 +27,7 @@ void fn_80005520(void) {
     fn_800071BC();
     fn_80095108();
     fn_800B5C30();
-    fn_800B62DC();
+    GoARAM_Init();
     fn_8000AF20();
     fn_8000B984();
     fn_800097CC();

@@ -522,7 +522,7 @@ u8 Ter_SearchForDropLocation(int nPlayer, u8 bPreferred, u8 bCheck, f32* pOut) {
         || (!bPreferred && pGround->nClass != gSurfaceTypes[p->ball.nSurface].nClass)) {
         fn_8005097C(&pCourse->pin[Game_CurrentPinSet()].x, p->ball.vPos, vDir);
         fn_800BAF04(vDir, vDir);
-        fHeading = fn_8000AD78(vDir[0], vDir[2]);
+        fHeading = atan2f(vDir[0], vDir[2]);
         fRadius = 1.0f;
         for (nRing = 0; nRing < 4; nRing++) {
             fLift = 2.0f * fRadius;
