@@ -574,6 +574,47 @@ void fn_80028208(CharModel* pModel, IKChain* pChain, IKChainDef* pDef) {
     }
 }
 
+// Makes a model's skeleton: an IK chain per setup in pDefs, a rotation per bone in each set, and
+// the IK state at rest (weight 0, no swing started).
+Skeleton* fn_80028314(CharModel* pModel, CharModelDefs* pDefs) {
+    int i;
+    Skeleton* pSkel;
+    IKChainDef* pChainDefs = pDefs->pDefs;
+    s8 nChains = pDefs->nDefs;
+
+    pSkel = fn_80009B34(sizeof(Skeleton), 2, 64, "Skeleton.c", 1148);
+    pSkel->nChains = nChains;
+    pSkel->pChains = fn_80009B34(nChains * sizeof(IKChain), 2, 64, "Skeleton.c", 1151);
+    for (i = 0; i < pSkel->nChains; i++) {
+        fn_80028208(pModel, &pSkel->pChains[i], &pChainDefs[i]);
+    }
+    pSkel->pDefs = pChainDefs;
+    pSkel->p20 = fn_80009B34(pModel->nBones * sizeof(f32[4]), 2, 64, "Skeleton.c", 1159);
+    pSkel->p24 = fn_80009B34(pModel->nBones * sizeof(f32[4]), 2, 64, "Skeleton.c", 1160);
+    pSkel->p28 = pSkel->p20;
+    pSkel->n112C = -1;
+    pSkel->n1130 = -1;
+    fn_8001E938(pSkel->a10, 0x80);
+    pSkel->n0 = 0;
+    pSkel->f109C = 0.1f;
+    pSkel->f10A0 = 0.2f;
+    fn_80029BC8(pSkel->v10A4);
+    fn_80029BC8(pSkel->v10B4);
+    pSkel->f10C4 = 1.0f;
+    pSkel->f10C8 = 0.0f;
+    pSkel->f10CC = 1.0f;
+    pSkel->pClip = NULL;
+    pSkel->f1074 = 0.0f;
+    pSkel->a1108[0] = fn_8001EEE4(pModel, 0x24);
+    pSkel->a1108[1] = fn_8001EEE4(pModel, 0x25);
+    pSkel->a1108[2] = fn_8001EEE4(pModel, 0x11);
+    pSkel->a1108[3] = fn_8001EEE4(pModel, 0x12);
+    SKEL_SetIKSolutionWeight(pSkel, 0.0f);
+    fn_80009710(pSkel->q10D4);
+    pSkel->n10E4 = 0;
+    return pSkel;
+}
+
 // Frees a skeleton: its chains' links, the chains, and both rotation sets.
 void fn_800284DC(Skeleton* pSkel) {
     int i;

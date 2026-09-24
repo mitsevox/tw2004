@@ -103,9 +103,9 @@ LAYOUT_ASSERT(SkelPose1, 0x114C);
 // A character's skeleton data (CharModel.pSkel; the SKEL_ functions take it): its IK chains and
 // how strongly their solution is applied (the IK weight, 0..1); only what the code reads.
 typedef struct Skeleton {
-    u8   unk0[4];
+    s32  n0;                    // 0x0000  cleared by fn_80028314
     s32  nChains;               // 0x0004
-    u8   unk8[4];
+    IKChainDef* pDefs;          // 0x0008  the chains' setups (CharModelDefs.pDefs)
     IKChain* pChains;           // 0x000C
     u32  a10[4];                // 0x0010  a bit per bone (128; fn_8001EB6C clears one)
     f32  (*p20)[4];             // 0x0020  a quaternion per bone
@@ -130,8 +130,10 @@ typedef struct Skeleton {
     f32  f10D0;                 // 0x10D0  }
     f32  q10D4[4];              // 0x10D4  a rotation (quaternion) given by fn_80027808
     s32  n10E4;                 // 0x10E4  set to 4 as a swing starts
-    f32  a10E8[4][4];           // 0x10E8  per leg, the last good bend axis (Character_IKLegToGround)
-    u8   unk1128[0x112C - 0x1128];
+    f32  a10E8[2][4];           // 0x10E8  per leg, the last good bend axis (Character_IKLegToGround,
+                                //         legs 0 and 1)
+    u8   a1108[4];              // 0x1108  the indexes of bones 0x24, 0x25, 0x11 and 0x12 (fn_80028314)
+    u8   unk110C[0x112C - 0x110C];
     s32  n112C;                 // 0x112C  } the character's club class and n16D4 (fn_8001C860)
     s32  n1130;                 // 0x1130  }
 } Skeleton;
@@ -429,7 +431,7 @@ LAYOUT_ASSERT(CharEntry44, 0x30);
 // What fn_8001A9F4 hands the skeleton loader (fn_80028564) for a golfer's model (our name):
 // lbl_80280E10, or lbl_80280E18 in split screen; a table of 0x10-byte entries and their count.
 typedef struct CharModelDefs {
-    void* pDefs;                // 0x0
+    IKChainDef* pDefs;          // 0x0  (fn_80028314 builds a chain from each)
     s32   nDefs;                // 0x4
 } CharModelDefs;
 
