@@ -212,7 +212,7 @@ void fn_80116798(int nPlace, char* sz) {
 
 // A day's cell: the button text (on today: START on the tour's first round, CONTINUE on a later
 // one, none once the season is over; on the day before today in the tour's event, the place
-// fn_801190D8 gives, as an ordinal), how the cell looks (*pLook) and the button (*pButton).
+// GM_PgaTourSim_GetScoreRankFromEntrantID gives, as an ordinal), how the cell looks (*pLook) and the button (*pButton).
 // Returns the tournament's n10 (fn_800EFE3C) on its last round's day, else -1.
 s32 fn_80116858(char* sz, u16 nDate, s32* pLook, s32* pButton) {
     s32 nId;
@@ -244,7 +244,7 @@ s32 fn_80116858(char* sz, u16 nDate, s32* pLook, s32* pButton) {
             strcpy(sz, "");
         }
         if (nDate == lbl_80223C48.nToday - 1 && bSelected) {
-            fn_80116798(fn_801190D8(fn_80077B08(), 0), sz);
+            fn_80116798(GM_PgaTourSim_GetScoreRankFromEntrantID(fn_80077B08(), 0), sz);
         }
         if (bSelected) {
             *pLook = 4;

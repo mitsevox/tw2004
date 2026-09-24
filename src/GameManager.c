@@ -16,14 +16,14 @@ void  fn_800D8D38(int nPlayer);
 u8    fn_800E0A90(int nPlayer);
 void  fn_800D439C(int nPlayer, int a);
 void  fn_800D9834(int nPlayer);
-void  fn_8011989C(int nPlayer, int nStrokes);
+void  GM_PgaTourSim_SetUserEntrantHoleStrokes(int nPlayer, int nStrokes);
 void  GM_GolferConcede_Hole(int nPlayer);
 void  GM_EndOfGolferTurn_HoleFinished(int nPlayer);
 void  GM_EndOfGolferTurn_GameFinished(int nPlayer);
 void  GM_HoleFinished_GameNotFinished(int nPlayer);
 u8    GM_CheckForAIConcede(int nPlayer);
 
-void  fn_800D8FE4(int nPlayer);
+void  GM_RecordIndividualShotStats(int nPlayer);
 void  fn_800D3DDC(int nPlayer);
 void  fn_800D9458(int nPlayer);
 void  fn_800D4030(int nPlayer);
@@ -325,7 +325,7 @@ void GM_PlayerAddStroke(int nPlayer) {
         gPlayers[nPlayer].nPutts[gpGame->nCurHole]++;
     }
     if (fn_800EE470()) {
-        fn_8011989C(nPlayer, gPlayers[nPlayer].nStrokes[gpGame->nCurHole]);
+        GM_PgaTourSim_SetUserEntrantHoleStrokes(nPlayer, gPlayers[nPlayer].nStrokes[gpGame->nCurHole]);
     }
 }
 
@@ -361,14 +361,14 @@ u8 GM_CheckForBallOOB(int nPlayer) {
                 gPlayers[nPlayer].nPutts[gpGame->nCurHole]++;
             }
             if (fn_800EE470()) {
-                fn_8011989C(nPlayer, gPlayers[nPlayer].nStrokes[gpGame->nCurHole]);
+                GM_PgaTourSim_SetUserEntrantHoleStrokes(nPlayer, gPlayers[nPlayer].nStrokes[gpGame->nCurHole]);
             }
             if (Game_GetMode() == 8 || Game_GetMode() == 7) {
                 return 1;
             }
             if (gpGame->bStrokeLimit && gPlayers[nPlayer].nStrokes[gpGame->nCurHole] >= 10) {
                 if (fn_800EE470()) {
-                    fn_8011989C(nPlayer, 10);
+                    GM_PgaTourSim_SetUserEntrantHoleStrokes(nPlayer, 10);
                 }
                 return 0;
             }
@@ -462,7 +462,7 @@ void GM_PlayerTookShot(int nPlayer) {
     GM_PlayerAddStroke(nPlayer);
     bOut = GM_CheckForBallOOB(nPlayer);
     if (!bOut) {
-        fn_800D8FE4(nPlayer);
+        GM_RecordIndividualShotStats(nPlayer);
         fn_800D3DDC(nPlayer);
     }
     fn_800DA48C(nPlayer);

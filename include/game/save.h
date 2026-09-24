@@ -72,7 +72,7 @@ typedef struct PgaStatCounts {
     u8   unk3E[2];
     u32  nSeasonWinnings;       // 0x40  TW06: seasonWinnings
     u32  n44;                   // 0x44  winnings this month: the leader at a month's end gets that
-                                //       month's award, then every golfer's is cleared (fn_801180C4)
+                                //       month's award, then every golfer's is cleared (GM_PgaTourSim_CheckEndOfTournamentAward)
     u16  nSeasonWins;           // 0x48  (0x80117E98; a new season clears 0x00-0x4A, 0x80117860)
     u8   nPlayerOfYearPoints;   // 0x4A  1 a win, 3 more where fn_800EFA70's nC is set. TW06: playerOfYearPoints
     u8   unk4B;
@@ -114,12 +114,12 @@ typedef struct TourSeason {
     PgaStatCounts aStats[PGA_NUM_GOLFERS];      // 0x0468  per golfer id
     PgaField field;             // 0x4090
     u16  n4E94;                 // 0x4E94  counts the tournaments started
-    u16  n4E96;                 // 0x4E96  a run of the player's tournament wins (fn_801180C4);
+    u16  n4E96;                 // 0x4E96  a run of the player's tournament wins (GM_PgaTourSim_CheckEndOfTournamentAward);
                                 //         reset to 0 when the player finishes elsewhere
     u16  n4E98;                 // 0x4E98  a run of tour rounds, counted on each 18th hole
                                 //         (GameModeDriverPGATour_EndHole); reset to 0 when the run breaks
     u16  n4E9A;                 // 0x4E9A  wins of the tournaments whose Tournament.nC is set
-                                //         (fn_801180C4)
+                                //         (GM_PgaTourSim_CheckEndOfTournamentAward)
 } TourSeason;
 LAYOUT_ASSERT(TourSeason, 0x4E9C);
 
@@ -141,7 +141,7 @@ typedef struct SavedRound {
 // (GameModeDriverPGATour fn_800EEA3C).
 typedef struct TourWin {
     Award award;                // 0x0  won, and the day (fn_800D7770)
-    u16  nScore;                // 0x4  the player's score (fn_801191D0, as SeasonEvent.nUserScore)
+    u16  nScore;                // 0x4  the player's score (GM_PgaTourSim_GetTotalScoreFromEntrantID, as SeasonEvent.nUserScore)
     u16  n6;                    // 0x6  the tournament's aPrize[bracket][1] (thousands of dollars:
                                 //      fn_8010F440 reads it unsigned)
 } TourWin;
@@ -229,14 +229,14 @@ typedef struct SaveProfile {
     s32  n80;                  // 0x00080  holes whose putts are counted (fewer than 10; fn_800D9458)
     s32  n84;                   // 0x00084  their putts
     s32  n88;                  // 0x00088  drives counted (the tee shot of a par 4 or 5 off class-1
-                                //          ground; fn_800D8FE4)
+                                //          ground; GM_RecordIndividualShotStats)
     s32  n8C;                   // 0x0008C  their distance together
     s32  n90;                   // 0x00090  } par 4 and 5 holes counted (fn_800D9458), and those where
     s32  n94;                   // 0x00094  } the player's b2E4 was set
     s32  n98;                   // 0x00098  } every hole counted, and those where the player's b2F6
     s32  n9C;                   // 0x0009C  } was set
     s32  nA0;                   // 0x000A0  the longest of those drives
-    s32  nA4;                   // 0x000A4  the longest putt, in feet (fn_800D8FE4)
+    s32  nA4;                   // 0x000A4  the longest putt, in feet (GM_RecordIndividualShotStats)
     s32  nA8;                   // 0x000A8  the best stroke-play round (0: none yet)
     s32  nAC;                   // 0x000AC  } read by menu messages (FE_MessageTable.c)
     s32  nB0;                   // 0x000B0  }
@@ -250,16 +250,16 @@ typedef struct SaveProfile {
                                 //          of the Month, per month (the tour's month money leader,
                                 //          n44; FE_PGATourMessages.c fn_8010F3A4); 12..15: the
                                 //          four trophies (both awarded by PGATourSimulation
-                                //          fn_801180C4; GameMode22 fn_8012597C reads their days)
+                                //          GM_PgaTourSim_CheckEndOfTournamentAward; GameMode22 fn_8012597C reads their days)
     Award a200[3];              // 0x00200  the player's career winnings first, in the top 5 and in the
-                                //          top 25 of the tour (PGATourSimulation fn_801180C4)
+                                //          top 25 of the tour (PGATourSimulation GM_PgaTourSim_CheckEndOfTournamentAward)
     Award aRTEAward[75];        // 0x0020C  per real-time event id. TW06: rteEventAwardInfo
     Award aLadderAward[25];     // 0x00338  per ladder event (GameMode4.c); fn_800584DC's earnings
                                 //          rating counts the won ones
     Award aAward[39];           // 0x0039C
     u8   aReplay[5][0xF28];     // 0x00438  a Replay each, saved with awards 0, 6, 9, 3 and 13
     s32  nTourCardLevel;        // 0x05000  0..6: level 1 comes from the lessons (GameMode11), the rest
-                                //          from fn_800D439C; it scales payouts (fn_800D7220)
+                                //          from fn_800D439C; it scales payouts (GM_Earnings_ComputeTOURCardModifiers)
     u8   a5004[71];             // 0x05004  per marked hole 0..70 (fn_800E1CE8): fn_800588F4's kind 0
     u8   unk504B;
     s32  a504C[71];             // 0x0504C  the same, fn_800588F4's kind 1

@@ -1068,7 +1068,7 @@ void fn_80086F0C(MsgArg* pArgs, MsgArg* pResult) {
         pResult->i = fn_800E1788(pArgs[0].i);
         return;
     case 23:
-        pResult->i = fn_8011937C(pArgs[0].i, 0, 0);
+        pResult->i = GM_PgaTourSim_GetRelativeScoreFromEntrantID(pArgs[0].i, 0, 0);
         return;
     case 19:
         pResult->i = fn_800E8CA8(pArgs[0].i, 1);
@@ -1083,7 +1083,7 @@ void fn_80086F0C(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80086FB4(MsgArg* pArgs, MsgArg* pResult) {
     switch (Game_GetMode()) {
     case 23:
-        pResult->i = fn_80119638(pArgs[0].i, 0, pArgs[1].i);
+        pResult->i = GM_PgaTourSim_GetRoundScoreFromEntrantID(pArgs[0].i, 0, pArgs[1].i);
         return;
     }
     pResult->i = gPlayers[pArgs[0].i].nRoundScore[pArgs[1].i];
@@ -1091,46 +1091,46 @@ void fn_80086FB4(MsgArg* pArgs, MsgArg* pResult) {
 
 // The PGA TOUR leaderboard: the name of the golfer on row pArgs[0].
 void fn_80087038(MsgArg* pArgs, MsgArg* pResult) {
-    s32 nEntrant = fn_801197CC(0, pArgs[0].i);
-    s32 nGolfer = fn_80119118(0, nEntrant);
+    s32 nEntrant = GM_PgaTourSim_GetEntrantIDFromScoreRow(0, pArgs[0].i);
+    s32 nGolfer = GM_PgaTourSim_GetGolferIDFromEntrantID(0, nEntrant);
 
     strcpy(((MsgString*)pArgs[1].p)->pStr, fn_80118E30(0, nGolfer));
 }
 
 // The rank of the golfer on a row.
 void fn_8008709C(MsgArg* pArgs, MsgArg* pResult) {
-    s32 nEntrant = fn_801197CC(0, pArgs[0].i);
+    s32 nEntrant = GM_PgaTourSim_GetEntrantIDFromScoreRow(0, pArgs[0].i);
 
-    pResult->i = fn_801190D8(0, nEntrant);
+    pResult->i = GM_PgaTourSim_GetScoreRankFromEntrantID(0, nEntrant);
 }
 
 void fn_800870E4(MsgArg* pArgs, MsgArg* pResult) {
-    s32 nEntrant = fn_801197CC(0, pArgs[0].i);
+    s32 nEntrant = GM_PgaTourSim_GetEntrantIDFromScoreRow(0, pArgs[0].i);
 
     pResult->i = fn_80119808(0, nEntrant);
 }
 
 // The score to par of the golfer on a row, over the holes before its current one.
 void fn_80087130(MsgArg* pArgs, MsgArg* pResult) {
-    int nEntrant = fn_801197CC(0, pArgs[0].i);
+    int nEntrant = GM_PgaTourSim_GetEntrantIDFromScoreRow(0, pArgs[0].i);
 
-    pResult->i = fn_8011937C(0, nEntrant, !fn_8011908C(0, nEntrant));
+    pResult->i = GM_PgaTourSim_GetRelativeScoreFromEntrantID(0, nEntrant, !GM_PgaTourSim_IsEntrantUser(0, nEntrant));
 }
 
 // The hole the golfer on a row is on.
 void fn_8008719C(MsgArg* pArgs, MsgArg* pResult) {
-    s32 nEntrant = fn_801197CC(0, pArgs[0].i);
+    s32 nEntrant = GM_PgaTourSim_GetEntrantIDFromScoreRow(0, pArgs[0].i);
 
-    pResult->i = fn_80119A04(0, nEntrant);
+    pResult->i = GM_PgaTourSim_GetCurrentHoleFromEntrantID(0, nEntrant);
 }
 
 // The golfer on a row's score in round pArgs[1].
 void fn_800871E4(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_80119638(0, fn_801197CC(0, pArgs[0].i), pArgs[1].i);
+    pResult->i = GM_PgaTourSim_GetRoundScoreFromEntrantID(0, GM_PgaTourSim_GetEntrantIDFromScoreRow(0, pArgs[0].i), pArgs[1].i);
 }
 
 void fn_80087238(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_801190D8(0, 0);
+    pResult->i = GM_PgaTourSim_GetScoreRankFromEntrantID(0, 0);
 }
 
 void fn_80087270(MsgArg* pArgs, MsgArg* pResult) {
@@ -1139,7 +1139,7 @@ void fn_80087270(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_800872AC(MsgArg* pArgs, MsgArg* pResult) {
     if (fn_800EE470()) {
-        pResult->i = fn_80118664(0);
+        pResult->i = GM_PgaTourSim_GetNumEntrants(0);
         return;
     }
     pResult->i = 0;
@@ -1186,7 +1186,7 @@ static inline PgaEntrantMC* Tour_EntrantMC(PlayerNumber_t nPlayer, int nEntrant)
 void fn_80087460(MsgArg* pArgs, MsgArg* pResult) {
     PlayerNumber_t nPlayer = PLR_1_e;
 
-    pResult->i = Tour_EntrantMC(nPlayer, fn_801197CC(0, pArgs[0].i))->n18;
+    pResult->i = Tour_EntrantMC(nPlayer, GM_PgaTourSim_GetEntrantIDFromScoreRow(0, pArgs[0].i))->n18;
 }
 
 void fn_800874C8(MsgArg* pArgs, MsgArg* pResult) {
@@ -2769,13 +2769,13 @@ void fn_8008AAAC(MsgArg* pArgs, MsgArg* pResult) {
 
 // Whether the golfer on a leaderboard row missed the cut.
 void fn_8008AAB8(MsgArg* pArgs, MsgArg* pResult) {
-    s32 nEntrant = fn_801197CC(0, pArgs[0].i);
+    s32 nEntrant = GM_PgaTourSim_GetEntrantIDFromScoreRow(0, pArgs[0].i);
 
-    pResult->i = fn_801197A4(0, nEntrant);
+    pResult->i = GM_PgaTourSim_GetWasCutFromEntrantID(0, nEntrant);
 }
 
 void fn_8008AB04(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_801197A4(pArgs[0].i, 0);
+    pResult->i = GM_PgaTourSim_GetWasCutFromEntrantID(pArgs[0].i, 0);
 }
 
 s32 fn_8008AB40(void) {

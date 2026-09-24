@@ -256,16 +256,16 @@ u16  CalDate_GetToday(void);                 // today's date
 int  fn_800D2ABC(int nCourse, int nHole);   // a hole's par on a course
 int  fn_800D2AD8(int nHole);            // a hole's par
 s32  fn_800D2C30(int nHole, int nTee);  // CourseData.c: a round hole's length from tee set nTee
-s32  fn_800D3478(int nTotal, int n, int nRow);  // Earnings.c: the prize for a finishing row
+s32  GM_Earnings_TournamentPayout(int nTotal, int n, int nRow);  // Earnings.c: the prize for a finishing row
 void fn_800D3548(int nPlayer, int nMoney, CourseMoneyTracking* pMoney);   // pMoney may be NULL
-int  fn_800D36E0(int nWinner, int nLoser, int nMargin, int* pPrize);
-int  fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize);
-int  fn_800D3C7C(int nPlayer);          // the player's earnings rating, 0..25
-s32  fn_800D6A70(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole, CourseMoneyTracking* pMoney);
-int  fn_800D7220(int nReward, int nPlayer, CourseMoneyTracking* pMoney);
+int  GM_Earnings_GetStrokeWinnings(int nWinner, int nLoser, int nMargin, int* pPrize);
+int  GM_Earnings_GetStrokeWinningsTeam(int nWinner, int nLoser, int nMargin, int* pPrize);
+int  GM_Earnings_RateGolfer(int nPlayer);          // the player's earnings rating, 0..25
+s32  GM_Earnings_ComputeBonusModifiers(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole, CourseMoneyTracking* pMoney);
+int  GM_Earnings_ComputeTOURCardModifiers(int nReward, int nPlayer, CourseMoneyTracking* pMoney);
 s32  fn_800D7660(int nPlayer, Ball* pBall, u8 b);   // one of GameEffects' GameBreaker checks
 s32  fn_800D7684(int nPlayer, Ball* pBall, u8 b);   // the same through fn_800D4F14 (pBall unused)
-u8   fn_800D8DB4(int nKind);            // Earnings.c: whether goals of a kind count now
+u8   fn_800D8DB4(int nKind);            // Earnings.c: whether records of a kind count now
 void fn_800D477C(int nPlayer, Ball* pBall, u8 b);   // Earnings.c: the shot's check
 void fn_800D4F14(int nPlayer, u8 b);                // the putt's
 void fn_800D588C(int nPlayer, u8 a, u8 bRoundOver); // the hole's

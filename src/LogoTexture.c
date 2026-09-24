@@ -1,6 +1,6 @@
 // LogoTexture.c (our name): the tail of FE_LogoDesign.c (the logo editor), kept as its own unit
 // until its one function is exact. FE_LogoDesign.c is linked and calls it, and the function after
-// it (sweep_8010FF5C) copies into FE_LogoDesign.c's lbl_80212B60; it folds back into
+// it (fn_8010FF5C) copies into FE_LogoDesign.c's lbl_80212B60; it folds back into
 // FE_LogoDesign.c once exact.
 
 #include "engine.h"

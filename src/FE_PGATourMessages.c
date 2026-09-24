@@ -27,21 +27,21 @@ void fn_8010E58C(char* szPlace, char* szName, char* szScore, char* szRounds, cha
     char szAmount[128];                 // sizes unknown
     char szRound[4];
     int nPlayer = fn_80077B08();
-    s32 nGolfer = fn_80119118(nPlayer, nEntrant);
+    s32 nGolfer = GM_PgaTourSim_GetGolferIDFromEntrantID(nPlayer, nEntrant);
     s32 nMoney;
 
-    if (fn_801197A4(nPlayer, nEntrant)) {
+    if (GM_PgaTourSim_GetWasCutFromEntrantID(nPlayer, nEntrant)) {
         sprintf(szPlace, "CUT");
     } else if (fn_80119808(nPlayer, nEntrant)) {
-        sprintf(szPlace, "T%d", fn_801190D8(nPlayer, nEntrant));
+        sprintf(szPlace, "T%d", GM_PgaTourSim_GetScoreRankFromEntrantID(nPlayer, nEntrant));
     } else {
-        sprintf(szPlace, "%d", fn_801190D8(nPlayer, nEntrant));
+        sprintf(szPlace, "%d", GM_PgaTourSim_GetScoreRankFromEntrantID(nPlayer, nEntrant));
     }
     sprintf(szName, "%s", fn_80118E30(nPlayer, nGolfer));
-    sprintf(szScore, "%d", fn_801191D0(nPlayer, nEntrant, 1));
+    sprintf(szScore, "%d", GM_PgaTourSim_GetTotalScoreFromEntrantID(nPlayer, nEntrant, 1));
     szRounds[0] = '\0';
     for (i = 0; i < 4; i++) {
-        nRoundScore = fn_80119638(nPlayer, nEntrant, i);
+        nRoundScore = GM_PgaTourSim_GetRoundScoreFromEntrantID(nPlayer, nEntrant, i);
         if (nRoundScore != 0) {
             if (i > 0) {
                 strcat(szRounds, " ");
@@ -50,7 +50,7 @@ void fn_8010E58C(char* szPlace, char* szName, char* szScore, char* szRounds, cha
             strcat(szRounds, szRound);
         }
     }
-    nMoney = fn_80119A2C(nPlayer, nEntrant);
+    nMoney = GM_PgaTourSim_GetLeaderboardWinningsFromEntrantID(nPlayer, nEntrant);
     if (nMoney) {
         fn_800907AC(nMoney, szAmount);
         sprintf(szMoney, "$%s", szAmount);
@@ -72,12 +72,12 @@ void fn_8010E748(MsgArg* pArgs, MsgArg* pResult) {
     s32 nEntrant;
 
     if (nRow == -1) {
-        if (fn_80118664(nPlayer) > 0) {
+        if (GM_PgaTourSim_GetNumEntrants(nPlayer) > 0) {
             nEntrant = 0;
             bShow = 1;
         }
-    } else if (nRow < fn_80118664(nPlayer)) {
-        nEntrant = fn_801197CC(nPlayer, nRow);
+    } else if (nRow < GM_PgaTourSim_GetNumEntrants(nPlayer)) {
+        nEntrant = GM_PgaTourSim_GetEntrantIDFromScoreRow(nPlayer, nRow);
         bShow = 1;
     }
     if (bShow) {
@@ -93,7 +93,7 @@ void fn_8010E748(MsgArg* pArgs, MsgArg* pResult) {
 
 // The number of leaderboard rows.
 void fn_8010E85C(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = fn_80118664(fn_80077B08());
+    pResult->i = GM_PgaTourSim_GetNumEntrants(fn_80077B08());
 }
 
 // Schedule line pArgs[0]: the tournament's dates, name, courses (one when all its rounds are on
@@ -165,7 +165,7 @@ void fn_8010EAC4(MsgArg* pArgs, MsgArg* pResult) {
 
     switch (nLine) {
     case 1:
-        if (fn_80118664(nPlayer) > 0) {
+        if (GM_PgaTourSim_GetNumEntrants(nPlayer) > 0) {
             nEvent = GameModeDriverPGATour_GetCurrentEventID();
             if (nEvent == -1) {
                 nEvent = GameModeDriverPGATour_GetFinalEventOfSeason();
@@ -209,7 +209,7 @@ void fn_8010EBDC(MsgArg* pArgs, MsgArg* pResult) {
         sprintf(szOut, "%d Season Wrap-up", fn_800EFBAC());
         return;
     case 0:
-        if (fn_80118F60(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_PLAYER_OF_YEAR_POINTS)) {
+        if (GM_PgaTourSim_IsLeaderForStat(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_PLAYER_OF_YEAR_POINTS)) {
             nGolfer = PGA_USER_GOLFER;
         } else {
             nGolfer = GM_PgaTourSim_GetGolferIDFromStatRow(nPlayer, GM_PGA_STAT_PLAYER_OF_YEAR_POINTS, 0);
@@ -217,7 +217,7 @@ void fn_8010EBDC(MsgArg* pArgs, MsgArg* pResult) {
         strcpy(szOut, fn_80118E30(nPlayer, nGolfer));
         return;
     case 1:
-        if (fn_80118F60(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_SEASON_WINNINGS)) {
+        if (GM_PgaTourSim_IsLeaderForStat(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_SEASON_WINNINGS)) {
             nGolfer = PGA_USER_GOLFER;
         } else {
             nGolfer = GM_PgaTourSim_GetGolferIDFromStatRow(nPlayer, GM_PGA_STAT_SEASON_WINNINGS, 0);

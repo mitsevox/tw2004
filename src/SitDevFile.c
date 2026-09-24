@@ -140,7 +140,7 @@ u32 fn_800BB334(u16* pList, int nCount, int nLeft, u32 nPick) {
 int fn_800BB37C(int nPlayer) {
     int nRank;
     if (Game_GetMode() == 23) {
-        nRank = fn_801190D8(nPlayer, 0);
+        nRank = GM_PgaTourSim_GetScoreRankFromEntrantID(nPlayer, 0);
     } else {
         nRank = 1;
     }

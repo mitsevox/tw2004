@@ -1,7 +1,7 @@
 // earnings.h (our name): the prize table (lbl_80200538, 0x22F0 bytes, loaded from the 'ERN '
 // stream by Earnings.c) and the Earnings.c functions the game modes call. Multipliers are
 // percentages (100 = x1). Prizes that depend on a golfer are indexed by earnings rating
-// (fn_800D3C7C, 0..25).
+// (GM_Earnings_RateGolfer, 0..25).
 
 #ifndef GAME_EARNINGS_H
 #define GAME_EARNINGS_H
@@ -11,14 +11,14 @@
 
 #define NUM_EARNINGS_RATINGS 26  // fn_800D3CF8 caps a rating at 25
 
-// Beating a CPU golfer of one rating in stroke play (fn_800D36E0; TW06: GM_Earnings_GetStrokeWinnings
+// Beating a CPU golfer of one rating in stroke play (GM_Earnings_GetStrokeWinnings; TW06: GM_Earnings_GetStrokeWinnings
 // (by position)).
 typedef struct StrokePrize {
     s32  nBase;                 // 0x0  the prize for a win
     s32  nPerStroke;            // 0x4  and for each stroke of the margin, up to 5
 } StrokePrize;
 
-// A skin's value at one rating (fn_800D3D64; TW06: GM_Earnings_GetSkinsHoleValue (by position)).
+// A skin's value at one rating (GM_Earnings_GetSkinsHoleValue; TW06: GM_Earnings_GetSkinsHoleValue (by position)).
 typedef struct SkinsValue {
     s32  aValue[4];             // 0x00  holes 1..6, 7..12, 13..17, 18
     s32  n10;                   // 0x10
@@ -203,9 +203,9 @@ extern s32 lbl_802002E0[10];    // and those fn_800D588C finds
 
 // Earnings.c
 int  fn_800D38F0(int nWinner, int nLoser, int nMargin, s32* pPrize);   // a ladder event's winnings
-int  fn_800D3C1C(void);                 // the best rating among the players
-s32  fn_800D3D64(int nRating, int nHole);   // a skin's value
-u8   fn_800D750C(int nPlayer, int nAward);  // give an award if the player does not have it yet
+int  GM_GetHighestRatedGolfer(void);                 // the best rating among the players
+s32  GM_Earnings_GetSkinsHoleValue(int nRating, int nHole);   // a skin's value
+u8   GM_Earnings_AwardTrophyBall(int nPlayer, int nAward);  // give an award if the player does not have it yet
 // Whether nValue and szName are already among the top five of a record (i the kind, k the table:
 // course k's records, recB[k], recC[k]). MC.c tests the u8 result.
 u8   fn_800D8458(int i, int nValue, const char* szName, int k);

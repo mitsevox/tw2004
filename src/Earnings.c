@@ -77,7 +77,7 @@ u8    fn_800D76AC(int nPlayer, int nAward);
 int   fn_800D7DA0(int nPlayer, int bSave, u8 bCountStroke, u8 bAll);
 s32   fn_800D9E00(s32 i);
 
-// Put the working tables back to their saved copies.
+// Copy the working tables and their two counts into the second set, which the payouts then read.
 void fn_800D3244(void) {
     lbl_80282248 = lbl_80282250;
     lbl_8028224C = lbl_80282254;
@@ -96,7 +96,7 @@ void fn_800D3244(void) {
     memcpy(lbl_801FFD90, lbl_801FFAE8, sizeof(lbl_801FFD90));
 }
 
-// Every payout is a multiple of $25. TW06: roundToNearest25 (by position).
+// nMoney rounded to the nearest $25. TW06: roundToNearest25 (by position).
 s32 fn_800D33A8(s32 nMoney) {
     return (s32)((12.5f + (f32)nMoney) / 25.0f) * 25;
 }
@@ -122,10 +122,10 @@ void fn_800D344C(UStreamObject* pObject) {
     Stream_StreamLoadFixedSize(pObject, sizeof(lbl_80200538), &lbl_80200538);
 }
 
-// With a row of lbl_80191AA4, n scaled down by how far it is
-// into nTotal (against the row 0 share), rounded to $10; row 0 leaves n as it is.
+// Row 0 gets n as it is; any other row gets nTotal * lbl_80191AA4[nRow] scaled by
+// (1 - n / nTotal) / (1 - lbl_80191AA4[0]), rounded to $10.
 // TW06: GM_Earnings_TournamentPayout (by position).
-s32 fn_800D3478(int nTotal, int n, int nRow) {
+s32 GM_Earnings_TournamentPayout(int nTotal, int n, int nRow) {
     f32 f;
     s32 nRounded;
     s32 nRet;
@@ -178,12 +178,12 @@ void fn_800D3548(int nPlayer, int nMoney, CourseMoneyTracking* pMoney) {
 // Beating a CPU golfer pays by their earnings rating: a base
 // prize and so much a stroke of the margin (at most 5). *pPrize gets the base.
 // TW06: GM_Earnings_GetStrokeWinnings (by position).
-int fn_800D36E0(int nWinner, int nLoser, int nMargin, int* pPrize) {
+int GM_Earnings_GetStrokeWinnings(int nWinner, int nLoser, int nMargin, int* pPrize) {
     int nRating;
 
     if (fn_800E177C() != 0) return 0;
     if (Player_IsCPU(nWinner) || !Player_IsCPU(nLoser)) return 0;
-    nRating = fn_800D3C7C(nLoser);
+    nRating = GM_Earnings_RateGolfer(nLoser);
     if (nMargin > 5) {
         nMargin = 5;
     }
@@ -196,7 +196,7 @@ int fn_800D36E0(int nWinner, int nLoser, int nMargin, int* pPrize) {
 // The same for a team (0: players 0 and 1, 1: players 2 and
 // 3) beating a CPU team: the average of what the two losers would pay.
 // TW06: GM_Earnings_GetStrokeWinningsTeam (by position).
-int fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize) {
+int GM_Earnings_GetStrokeWinningsTeam(int nWinner, int nLoser, int nMargin, int* pPrize) {
     int nFirst;
     int nSecond;
     int nRating1;
@@ -214,8 +214,8 @@ int fn_800D37BC(int nWinner, int nLoser, int nMargin, int* pPrize) {
         nFirst = 2;
         nSecond = 3;
     }
-    nRating1 = fn_800D3C7C(nFirst);
-    nRating2 = fn_800D3C7C(nSecond);
+    nRating1 = GM_Earnings_RateGolfer(nFirst);
+    nRating2 = GM_Earnings_RateGolfer(nSecond);
     if (nMargin > 5) {
         nMargin = 5;
     }
@@ -267,9 +267,10 @@ void fn_800D39B4(int nPlayer, int nMoney) {
     }
 }
 
-// The courses a profile's money has bought: each course whose price the money has reached is
-// unlocked, with its EA Sports Bio accomplishment; courses 21 and 22 get a message of their own.
-// With bMessage, a message for each other course unlocked. Returns how many those were.
+// The courses a profile's money has bought: each of courses 0..20 whose price the money has reached
+// is unlocked and, except course 4, listed, with its EA Sports Bio accomplishment when it has one;
+// entries 21 and 23 get a message of their own. With bMessage, a message for each listed course.
+// Returns how many were listed.
 int fn_800D3A20(int nProfile, u8 bMessage) {
     int i;
     int n;
@@ -315,14 +316,14 @@ int fn_800D3A20(int nProfile, u8 bMessage) {
 }
 
 // The best earnings rating among the players. TW06: GM_GetHighestRatedGolfer (by position).
-int fn_800D3C1C(void) {
+int GM_GetHighestRatedGolfer(void) {
     int i;
     int nBest;
     int nRating;
 
     nBest = 0;
     for (i = 0; i < gNumPlayersSetUp; i++) {
-        nRating = fn_800D3C7C(i);
+        nRating = GM_Earnings_RateGolfer(i);
         if (nRating > nBest) {
             nBest = nRating;
         }
@@ -332,7 +333,7 @@ int fn_800D3C1C(void) {
 
 // A CPU plays at its golfer's rating; a human's comes from the profile.
 // TW06: GM_Earnings_RateGolfer (by position).
-int fn_800D3C7C(int nPlayer) {
+int GM_Earnings_RateGolfer(int nPlayer) {
     int nRating;
 
     nRating = fn_800584DC(gPlayers[nPlayer].nIndex);
@@ -365,17 +366,18 @@ int fn_800D3D10(int nGolfer) {
 }
 
 // What a skin on hole nHole (0..17) is worth. TW06: GM_Earnings_GetSkinsHoleValue (by position).
-s32 fn_800D3D64(int nRating, int nHole) {
+s32 GM_Earnings_GetSkinsHoleValue(int nRating, int nHole) {
     if (nHole < 6) return lbl_80200538.aSkins[nRating].aValue[0];
     if (nHole < 12) return lbl_80200538.aSkins[nRating].aValue[1];
     if (nHole < 17) return lbl_80200538.aSkins[nRating].aValue[2];
     return lbl_80200538.aSkins[nRating].aValue[3];
 }
 
-// After a shot that stayed in bounds (GM_PlayerTookShot), for a human player with a profile: the
-// shot is checked (fn_800D782C, fn_800D477C) and what it earned is paid out from the working
-// tables, each with its message: the lbl_80200498 entries of kind 2 or 4, the shot's bonuses with
-// their breakdowns, and the awards won with their money (booked as bonuses, money.n8).
+// After a shot that stayed in bounds (GM_PlayerTookShot), for a human player with a profile (not in
+// game mode 10): the shot is checked (fn_800D782C, fn_800D477C) and what it earned is paid out from
+// the copies fn_800D3244 makes of the working tables, each with its message: the lbl_80200498
+// entries of kind 2 or 4, the shot's bonuses with their breakdowns, and the awards won with their
+// money (booked as bonuses, money.n8).
 void fn_800D3DDC(int nPlayer) {
     int nProfile;
     int i;
@@ -403,7 +405,7 @@ void fn_800D3DDC(int nPlayer) {
         }
     }
     for (i = 0; i < lbl_80282248; i++) {
-        if (fn_800D750C(nPlayer, lbl_802000D8[i])) {
+        if (GM_Earnings_AwardTrophyBall(nPlayer, lbl_802000D8[i])) {
             if (fn_800D4010(lbl_802000D8[i])) {
                 fn_800E4364(6, fn_800D9E00(lbl_802000D8[i]), 0, nProfile);
             } else {
@@ -426,9 +428,10 @@ u8 fn_800D4010(int nId) {
     return b;
 }
 
-// After a putt, for a human player with a profile: the putt record check (fn_800D7B1C) with its
-// messages, then two rounds of payouts from the working tables as fn_800D3DDC pays them: the
-// putt's (fn_800D4F14), then the hole's (fn_800D588C; none in a playoff).
+// After the ball is holed (GM_PlayerTookShot, when fn_800E2DB4 says so), for a human player with a
+// profile: the putt record check (fn_800D7B1C) with its messages, then two rounds of payouts from
+// the copies of the working tables as fn_800D3DDC pays them: the putt's (fn_800D4F14), then the
+// hole's (fn_800D588C; none in a playoff).
 void fn_800D4030(int nPlayer) {
     int nProfile;
     int nKind;
@@ -455,7 +458,7 @@ void fn_800D4030(int nPlayer) {
         }
     }
     for (i = 0; i < lbl_80282248; i++) {
-        if (fn_800D750C(nPlayer, lbl_802000B0[i])) {
+        if (GM_Earnings_AwardTrophyBall(nPlayer, lbl_802000B0[i])) {
             if (fn_800D4010(lbl_802000B0[i])) {
                 fn_800E4364(6, fn_800D9E00(lbl_802000B0[i]), 0, nProfile);
             } else {
@@ -479,7 +482,7 @@ void fn_800D4030(int nPlayer) {
         }
     }
     for (i = 0; i < lbl_80282248; i++) {
-        if (fn_800D750C(nPlayer, lbl_80200268[i])) {
+        if (GM_Earnings_AwardTrophyBall(nPlayer, lbl_80200268[i])) {
             if (fn_800D4010(lbl_80200088[i])) {
                 fn_800E4364(6, fn_800D9E00(lbl_80200088[i]), 0, nProfile);
             } else {
@@ -491,10 +494,11 @@ void fn_800D4030(int nPlayer) {
     }
 }
 
-// At the end of a hole, for a human player with a profile: what the hole earned is paid out from
-// the working tables, with its messages (as fn_800D3DDC does after a shot), and the TOUR card
+// At the end of the round (GameManager: after its last hole, and with bRoundOver when the game
+// ends), for a human player with a profile: what the hole goals earned is paid out from the copies
+// of the working tables, with its messages (as fn_800D3DDC does after a shot), and the TOUR card
 // level rises with the profile's completion score: level 2 from 7.5, 3 from 15, 4 from 30, 5 from
-// 60, 6 at 100. bRoundOver skips the hole check (fn_800D7DA0) and its messages.
+// 60, 6 at 100. bRoundOver skips the round record check (fn_800D7DA0) and its messages.
 void fn_800D439C(int nPlayer, u8 bRoundOver) {
     int nProfile;
     int nLevel;
@@ -526,7 +530,7 @@ void fn_800D439C(int nPlayer, u8 bRoundOver) {
         }
     }
     for (i = 0; i < lbl_80282248; i++) {
-        if (fn_800D750C(nPlayer, lbl_80200268[i])) {
+        if (GM_Earnings_AwardTrophyBall(nPlayer, lbl_80200268[i])) {
             if (fn_800D4010(lbl_80200088[i])) {
                 fn_800E4364(6, fn_800D9E00(lbl_80200088[i]), 0, nProfile);
             } else {
@@ -708,13 +712,13 @@ void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
             if (bLost) continue;
             lbl_80200330[nSlot] = nValue;
             aPrizeIds[nSlot] = lbl_80200538.aShotGoal[i].nId;
-            lbl_802003A8[nSlot] = fn_800D6A70(lbl_80200330[nSlot], nPlayer,
+            lbl_802003A8[nSlot] = GM_Earnings_ComputeBonusModifiers(lbl_80200330[nSlot], nPlayer,
                                               fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 0),
                                               fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 1),
                                               fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 2),
                                               &lbl_801FFAE8[nSlot]);
             if (fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 3)) {
-                lbl_802003A8[nSlot] = fn_800D7220(lbl_802003A8[nSlot], nPlayer, &lbl_801FFAE8[nSlot]);
+                lbl_802003A8[nSlot] = GM_Earnings_ComputeTOURCardModifiers(lbl_802003A8[nSlot], nPlayer, &lbl_801FFAE8[nSlot]);
             }
             lbl_80200420[nSlot] = lbl_80200538.aShotGoal[i].n2A;
             if (!bReplace) {
@@ -739,9 +743,9 @@ u8 fn_800D4EF8(u32 uMask, int nBit) {
 
 // After a putt: check the putt goals and fill the working tables with what they give, awards
 // (lbl_80282250 of them) and money prizes (lbl_80282254). Of goals with the same id only the one
-// with the biggest nValue is kept. The holes still to come count 999 strokes and putts meanwhile.
-// With bPreview the hole counts one more stroke and putt (the ball dropping now), a few tests are
-// skipped and no EA Sports Bio accomplishment is posted.
+// with the biggest nValue is kept. The holes still to come count 999 strokes and putts meanwhile
+// (and 0 afterwards). With bPreview the hole counts one more stroke and putt (the ball dropping
+// now), a few tests are skipped and no EA Sports Bio accomplishment is posted.
 void fn_800D4F14(int nPlayer, u8 bPreview) {
     s32 aPrizeIds[10];
     s32 aAwardIds[10];
@@ -870,13 +874,13 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
             if (bLost) continue;
             lbl_80200308[nSlot] = nValue;
             aPrizeIds[nSlot] = lbl_80200538.aPuttGoal[i].nId;
-            lbl_80200380[nSlot] = fn_800D6A70(lbl_80200308[nSlot], nPlayer,
+            lbl_80200380[nSlot] = GM_Earnings_ComputeBonusModifiers(lbl_80200308[nSlot], nPlayer,
                                               fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 0),
                                               fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 1),
                                               fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 2),
                                               &lbl_801FFAE8[nSlot]);
             if (fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 3)) {
-                lbl_80200380[nSlot] = fn_800D7220(lbl_80200380[nSlot], nPlayer, &lbl_801FFAE8[nSlot]);
+                lbl_80200380[nSlot] = GM_Earnings_ComputeTOURCardModifiers(lbl_80200380[nSlot], nPlayer, &lbl_801FFAE8[nSlot]);
             }
             lbl_802003F8[nSlot] = lbl_80200538.aPuttGoal[i].n1D;
             if (!bReplace) {
@@ -1046,13 +1050,13 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
             if (bLost) continue;
             lbl_802002E0[nSlot] = nValue;
             aPrizeIds[nSlot] = lbl_80200538.aHoleGoal[i].nId;
-            lbl_80200358[nSlot] = fn_800D6A70(lbl_802002E0[nSlot], nPlayer,
+            lbl_80200358[nSlot] = GM_Earnings_ComputeBonusModifiers(lbl_802002E0[nSlot], nPlayer,
                                               fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 0),
                                               fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 1),
                                               fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 2),
                                               &lbl_801FFAE8[nSlot]);
             if (fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 3)) {
-                lbl_80200358[nSlot] = fn_800D7220(lbl_80200358[nSlot], nPlayer, &lbl_801FFAE8[nSlot]);
+                lbl_80200358[nSlot] = GM_Earnings_ComputeTOURCardModifiers(lbl_80200358[nSlot], nPlayer, &lbl_801FFAE8[nSlot]);
             }
             lbl_802003D0[nSlot] = lbl_80200538.aHoleGoal[i].n25;
             if (!bReplace) {
@@ -1322,7 +1326,7 @@ u8 fn_800D69B8(int nPlayer, u8 bCheck) {
 // course, the tees played and the hole's gpGame->nPinSet value (each flag switches one on).
 // Each part is rounded to $25 by itself; the total is at least 0.
 // TW06: GM_Earnings_ComputeBonusModifiers (by position).
-s32 fn_800D6A70(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole,
+s32 GM_Earnings_ComputeBonusModifiers(s32 nPoints, int nPlayer, u8 bCourse, u8 bTee, u8 bHole,
                                        CourseMoneyTracking* pMoney) {
     f32 fCourseBonus;           // fake match: whole dollars kept as floats and added as floats, as
     f32 fTeeBonus;              // the original does (s32 locals with float casts: 87%)
@@ -1464,7 +1468,7 @@ f32 fn_800D6EEC(void) {
 // The TOUR card level raises the payout; the extra
 // goes in the breakdown. Nothing is paid when fn_800E177C says so.
 // TW06: GM_Earnings_ComputeTOURCardModifiers (by position).
-int fn_800D7220(int nReward, int nPlayer, CourseMoneyTracking* pMoney) {
+int GM_Earnings_ComputeTOURCardModifiers(int nReward, int nPlayer, CourseMoneyTracking* pMoney) {
     f32 fMult;
     s32 nTotal;
 
@@ -1512,7 +1516,7 @@ u8 fn_800D748C(int nPlayer) {
 }
 
 // Give a player award nAward if they do not have it yet. Five awards also keep the shot's replay.
-u8 fn_800D750C(int nPlayer, int nAward) {
+u8 GM_Earnings_AwardTrophyBall(int nPlayer, int nAward) {
     PlayerNumber_t nProfile;
     int nSlot;
 
@@ -1576,10 +1580,10 @@ u8 fn_800D7770(int nPlayer, Award* pAward) {
 // CPU player or one without a profile; the record holder's name is the profile's, or "User <n>"
 // when the front end has no profile loaded in that slot.
 
-// Whether a drive (from the tee of a par 4 or 5, off the fairway class 1 surface, in bounds) sets a
-// record (kind 1) of its distance. With bAll only a new best (fn_800D8750 gives 2 or 4) counts,
-// else any place; a hit goes into lbl_80200498/lbl_80200510. bCountStroke counts the shot on the
-// hole while it is checked. Returns how many hit.
+// Whether a shot on a par 4 or 5 from class-1 ground, in bounds, sets a record (kind 1) of its
+// distance. With bAll only a new best (fn_800D8750 gives 2 or 4) counts, else any place; a hit
+// goes into lbl_80200498/lbl_80200510. bCountStroke counts the shot on the hole while it is
+// checked. Returns how many hit.
 int fn_800D782C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll) {
     char szName[32];
     int nProfile;
@@ -1819,7 +1823,7 @@ u8 fn_800D8458(int i, int nValue, const char* szName, int k) {
     return 0;
 }
 
-// Whether nValue and szName are among the top five of all-time record recB[k][i].
+// Whether nValue and szName are among the top five of recB[k][i].
 u8 fn_800D853C(int i, int nValue, const char* szName, int k) {
     RecordEntry* pRec;
     int j;
@@ -1847,7 +1851,8 @@ u8 fn_800D85DC(int i, int nValue, const char* szName, int k) {
     return 0;
 }
 
-// Whether nValue breaks record kind nKind's nRecord: kinds 0 and 4 go low, 1..9 high.
+// Whether nValue equals or beats record kind nKind's nRecord: kinds 0 and 4 go low, the others
+// (1..3, 5..9) high.
 u8 fn_800D867C(int nKind, int nValue, int nRecord) {
     switch (nKind) {
     case 0:
@@ -2065,7 +2070,7 @@ void fn_800D8D5C(int nPlayer) {
     gPlayers[nPlayer].money.n24 = 0;
 }
 
-// Whether goals of kind nKind count now: never in modes 9 and 11 or when fn_800E177C says so;
+// Whether records of kind nKind count now: never in modes 9 and 11 or when fn_800E177C says so;
 // kinds 0 and 3..7 need fn_800EC550 off, a round of every hole and fn_8008AB40 off, kinds 1 and 2
 // only fn_800EC550 off, kind 8 fn_800E39F0, kind 9 game mode 22.
 u8 fn_800D8DB4(int nKind) {
@@ -2112,7 +2117,7 @@ u8 fn_800D8DB4(int nKind) {
 // nC24; b2E4 marks a first stroke on a par 4 or 5 that finished on the fairway, the green or in the
 // hole, b2F6 a ball on the green or in the hole in par - 2 strokes or fewer. A putt (club 25) that
 // fn_800E2DB4 accepts can be the longest, in feet.
-void fn_800D8FE4(int nPlayer) {
+void GM_RecordIndividualShotStats(int nPlayer) {
     u32 nClass;
     Ball* pBall;
     int nPar;
@@ -2290,8 +2295,8 @@ void fn_800D9458(int nPlayer) {
     }
 }
 
-// At the end of a round: count it in the profile (a full round; in stroke play also its strokes and
-// the best score).
+// At the end of a round: count it in the profile (a round of every hole; when gpGame->n4 is 0 also
+// its strokes and the best score).
 void fn_800D9834(int nPlayer) {
     PlayerNumber_t nProfile;
     int nStrokes;
@@ -2386,7 +2391,7 @@ u8 fn_800D9998(int nPlayer, int nAward) {
         if (bSeasonEnd && bFullSeason) {
             nLeads = 0;
             for (i = 0; i < 28; i++) {
-                if (fn_80118F60(nPlayer, PGA_USER_GOLFER, i)) {
+                if (GM_PgaTourSim_IsLeaderForStat(nPlayer, PGA_USER_GOLFER, i)) {
                     nLeads++;
                 }
             }
@@ -2394,9 +2399,9 @@ u8 fn_800D9998(int nPlayer, int nAward) {
         }
         return 0;
     case 26:
-        if (bSeasonEnd && bFullSeason && fn_80118F60(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_PAR3BIRDS) &&
-            fn_80118F60(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_PAR4BIRDS) &&
-            fn_80118F60(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_PAR5BIRDS)) {
+        if (bSeasonEnd && bFullSeason && GM_PgaTourSim_IsLeaderForStat(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_PAR3BIRDS) &&
+            GM_PgaTourSim_IsLeaderForStat(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_PAR4BIRDS) &&
+            GM_PgaTourSim_IsLeaderForStat(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_PAR5BIRDS)) {
             return 1;
         }
         return 0;
@@ -2411,7 +2416,7 @@ u8 fn_800D9998(int nPlayer, int nAward) {
         if (fn_800ED6F0() && fn_800EC558() == 0) return 1;
         return 0;
     case 29:
-        return fn_80118F60(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_CAREER_WINNINGS) != 0;
+        return GM_PgaTourSim_IsLeaderForStat(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_CAREER_WINNINGS) != 0;
     case 30:
         // Under par in every tournament played.
         if (bSeasonEnd && bFullSeason) {

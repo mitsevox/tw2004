@@ -335,7 +335,7 @@ void GameMode4_WinEvent(void) {
             }
             if (bLast == 1) {
                 fn_800E4364(5, 0x1A, 0, nProfile);
-                if (fn_800D750C(0, 15)) {
+                if (GM_Earnings_AwardTrophyBall(0, 15)) {
                     fn_800E4364(2, 15, lbl_80200538.nLadderDone, nProfile);
                     fn_800D3548(0, lbl_80200538.nLadderDone, NULL);
                     gPlayers[0].money.n8 += lbl_80200538.nLadderDone;

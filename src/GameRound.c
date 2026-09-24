@@ -518,7 +518,7 @@ int fn_800E184C(int nPlayer, u8 bCurrent) {
 // (gpGame->bD4), else strokes against par while gpGame->nDC < nE0, and 0 after that.
 int fn_800E1904(int nPlayer, u8 bCurrent) {
     if (fn_800EE470()) {
-        return fn_8011937C(nPlayer, 0, bCurrent);
+        return GM_PgaTourSim_GetRelativeScoreFromEntrantID(nPlayer, 0, bCurrent);
     }
     if (gpGame->bD4) {
         return gPlayers[nPlayer].n2D8;

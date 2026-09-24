@@ -315,7 +315,7 @@ void GameModeSkins_EndHole(void) {
     if (nSecond != 5 && gPlayers[nBest].nStrokes[Game_CurHoleIndex()] ==
                         gPlayers[nSecond].nStrokes[Game_CurHoleIndex()]) {
         if (!gpGame->bD4) {
-            lbl_802823C4 += fn_800D3D64(fn_800D3C1C(), Game_CurHoleIndex());
+            lbl_802823C4 += GM_Earnings_GetSkinsHoleValue(GM_GetHighestRatedGolfer(), Game_CurHoleIndex());
             lbl_802823C0++;
         }
     } else {
@@ -380,12 +380,12 @@ s32 GameModeSkins_CurrentHoleValue(void) {
     if (fn_800E4BF8()) {
         for (h = Game_CurHoleIndex() + 1; h < 18; h++) {
             if (gpGame->bHoleSelected[h]) {
-                return lbl_802823C4 + fn_800D3D64(fn_800D3C1C(), h);
+                return lbl_802823C4 + GM_Earnings_GetSkinsHoleValue(GM_GetHighestRatedGolfer(), h);
             }
         }
     }
     h = Game_CurHoleIndex();
-    return lbl_802823C4 + fn_800D3D64(fn_800D3C1C(), h);
+    return lbl_802823C4 + GM_Earnings_GetSkinsHoleValue(GM_GetHighestRatedGolfer(), h);
 }
 
 // Skins at stake on this hole: those carried over, plus one outside the playoff.

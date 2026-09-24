@@ -190,7 +190,7 @@ void fn_800EE2C8(void) {
         gpGame->nE0 = gPgaData.aTourEvent[nFormat].nRounds;
         fn_800EE0A0(gPgaData.aTournament[nEvent].nTourEvent - 1);
         fn_80117DE8(0, 0);
-        fn_801178C8(0, &gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent],
+        GM_PgaTourSim_SimRound(0, &gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent],
                     gpSaveData[nPlayer].tour.nRound, gPgaData.aTourEvent[nFormat].a40[fn_800EF0E0(0)], 5);
         fn_80005AE8(pRec, 0, sizeof(*pRec));
         pRec->nRounds++;
@@ -227,11 +227,11 @@ void fn_800EE478(void) {
     if (GameModeDriverPGATour_GetRounds(gpSaveData[nPlayer].tour.nEvent) >= 4 &&
         gpSaveData[nPlayer].tour.nRound == 1) {
         fn_80117B58(0);
-        if (fn_801197A4(0, 0)) {
+        if (GM_PgaTourSim_GetWasCutFromEntrantID(0, 0)) {
             Tour_CurrentEvent(nPlayer)->nUserRankType = 1;
         }
     }
-    gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent].nUserScore = fn_801191D0(0, 0, 1);
+    gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent].nUserScore = GM_PgaTourSim_GetTotalScoreFromEntrantID(0, 0, 1);
     if (gpSaveData[nPlayer].tour.nRound + 1 >=
         GameModeDriverPGATour_GetRounds(gpSaveData[nPlayer].tour.nEvent)) {
         fn_800EEA3C(0);
@@ -244,7 +244,7 @@ u8 GameModeDriverPGATour_IsPuttForLead(int nPlayer) {
     int bLead;
     if (gpGame->bD4) {
         return gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 <
-               fn_8011A7C8(nPlayer, Game_CurHoleIndex());
+               GM_PgaTourSim_GetBestOpponentPlayoffHoleScore(nPlayer, Game_CurHoleIndex());
     }
     bLead = 0;
     if (fn_800E1904(nPlayer, 0) >= fn_80119588(nPlayer, 1) &&
@@ -269,14 +269,14 @@ u8 GameModeDriverPGATour_IsPuttForWin(s32 nPlayer) {
 // Strokes ahead of the best other player, negative when behind (in a playoff, on this hole).
 s32 GameModeDriverPGATour_GetCurrentLead(int nPlayer) {
     if (gpGame->bD4) {
-        return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) - gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
+        return GM_PgaTourSim_GetBestOpponentPlayoffHoleScore(nPlayer, Game_CurHoleIndex()) - gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()];
     }
     return fn_80119588(nPlayer, 1) - fn_800E1904(nPlayer, 0);
 }
 
 s32 GameModeDriverPGATour_GetPotentialLead(int nPlayer) {
     if (gpGame->bD4) {
-        return fn_8011A7C8(nPlayer, Game_CurHoleIndex()) -
+        return GM_PgaTourSim_GetBestOpponentPlayoffHoleScore(nPlayer, Game_CurHoleIndex()) -
                (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1);
     }
     return fn_80119588(nPlayer, 1) - (fn_800E1904(nPlayer, 1) + 1);
@@ -328,15 +328,15 @@ void fn_800EEA3C(int nPlayer) {
     s32 nBracket = fn_800EF0E0(nPlayer);
     Tournament* p = fn_800EFA70(gpSaveData[nPlayer].tour.nEvent);
     s32 nMoney;
-    fn_80117E98(nPlayer);
-    if (fn_801190D8(nPlayer, 0) == 1) {
+    GM_PgaTourSim_SimTournamentWinner(nPlayer);
+    if (GM_PgaTourSim_GetScoreRankFromEntrantID(nPlayer, 0) == 1) {
         fn_800EE8C4();
         if (fn_800D7770(nPlayer, &gpSaveData[nPlayer].aC8[gpSaveData[nPlayer].tour.nEvent].award)) {
-            gpSaveData[nPlayer].aC8[gpSaveData[nPlayer].tour.nEvent].nScore = fn_801191D0(nPlayer, 0, 1);
+            gpSaveData[nPlayer].aC8[gpSaveData[nPlayer].tour.nEvent].nScore = GM_PgaTourSim_GetTotalScoreFromEntrantID(nPlayer, 0, 1);
             gpSaveData[nPlayer].aC8[gpSaveData[nPlayer].tour.nEvent].n6 = p->aPrize[nBracket][1];
         }
     }
-    nMoney = fn_80119A2C(nPlayer, 0);
+    nMoney = GM_PgaTourSim_GetLeaderboardWinningsFromEntrantID(nPlayer, 0);
     if (nMoney) {
         fn_800D3548(0, nMoney, NULL);
         gPlayers[nPlayer].money.n4 += nMoney;
@@ -347,18 +347,18 @@ void fn_800EEA3C(int nPlayer) {
 // player's result (cut, a place, or did not play), and the season moves on to the next tournament.
 void fn_800EEB94(int nPlayer) {
     SeasonEvent* p = &gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent];
-    s32 nLeader = fn_801197CC(nPlayer, 0);
-    s32 nGolfer = fn_80119118(nPlayer, nLeader);
+    s32 nLeader = GM_PgaTourSim_GetEntrantIDFromScoreRow(nPlayer, 0);
+    s32 nGolfer = GM_PgaTourSim_GetGolferIDFromEntrantID(nPlayer, nLeader);
     strcpy(p->szChampName, fn_80118E30(nPlayer, nGolfer));
-    p->nChampScore = fn_8011937C(nPlayer, nLeader, 1);
-    if (fn_8011908C(nPlayer, 0)) {
-        if (fn_801197A4(nPlayer, 0)) {
+    p->nChampScore = GM_PgaTourSim_GetRelativeScoreFromEntrantID(nPlayer, nLeader, 1);
+    if (GM_PgaTourSim_IsEntrantUser(nPlayer, 0)) {
+        if (GM_PgaTourSim_GetWasCutFromEntrantID(nPlayer, 0)) {
             p->nUserRank = 0;
             p->nUserScore = 0;
             p->nUserRankType = 1;
         } else {
-            p->nUserRank = fn_801190D8(nPlayer, 0);
-            p->nUserScore = fn_8011937C(nPlayer, 0, 1);
+            p->nUserRank = GM_PgaTourSim_GetScoreRankFromEntrantID(nPlayer, 0);
+            p->nUserScore = GM_PgaTourSim_GetRelativeScoreFromEntrantID(nPlayer, 0, 1);
             p->nUserRankType = 2;
         }
     } else {
@@ -430,7 +430,7 @@ void fn_800EEF88(s32 nPlayer) {
         fn_80117D80(nPlayer);
         fn_80117DF0(nPlayer);
         gpSaveData[nPlayer].tour.nRound++;
-        if (fn_801197A4(nPlayer, 0)) {
+        if (GM_PgaTourSim_GetWasCutFromEntrantID(nPlayer, 0)) {
             fn_800EF130(nPlayer, 0);
         }
         if (gpSaveData[nPlayer].tour.nRound >=
@@ -442,7 +442,7 @@ void fn_800EEF88(s32 nPlayer) {
 
 void fn_800EF094(int a, s32 n) {
     lbl_80205F30.b0 = 1;
-    lbl_80205F30.n4 = fn_801190D8(a, 0);
+    lbl_80205F30.n4 = GM_PgaTourSim_GetScoreRankFromEntrantID(a, 0);
     lbl_80205F30.n8 = n;
 }
 
@@ -468,18 +468,18 @@ void fn_800EF130(int nPlayer, u8 bQuick) {
             if (bQuick) {
                 k = 3;
             }
-            fn_801178C8(nPlayer, &gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent],
+            GM_PgaTourSim_SimRound(nPlayer, &gpSaveData[nPlayer].tour.aEvent[gpSaveData[nPlayer].tour.nEvent],
                         gpSaveData[nPlayer].tour.nRound,
                         gPgaData.aTourEvent[nTourEvent].a40[fn_800EF0E0(nPlayer)], k);
         }
         gpSaveData[nPlayer].tour.nRound++;
     }
-    fn_8011A5F8(nPlayer);
-    fn_80117E98(nPlayer);
+    GM_PgaTourSim_InitPlayoff(nPlayer);
+    GM_PgaTourSim_SimTournamentWinner(nPlayer);
 }
 
 void fn_800EF294(void) {
-    fn_80119934(0);
+    GM_PgaTourSim_AdvanceField(0);
 }
 
 // Called by its slot. Outside a playoff, the hole just finished goes
@@ -580,7 +580,7 @@ void GameModeDriverPGATour_EndHole(void) {
     pRound->nLongestDrive = pRound->nLongestDrive <= (u16)p->n2DC ? (u16)p->n2DC : pRound->nLongestDrive;
     pRound->nLongestPutt = pRound->nLongestPutt <= (u16)p->n2E0 ? (u16)p->n2E0 : pRound->nLongestPutt;
     if (nHole == 17) {
-        n = fn_80119638(0, 0, gpSaveData[nPlayer].tour.nRound);
+        n = GM_PgaTourSim_GetRoundScoreFromEntrantID(0, 0, gpSaveData[nPlayer].tour.nRound);
         if (n <= fn_800D2FB4(gSession.nTeeSet[0])) {
             gpSaveData[nPlayer].tour.n4E98++;
         } else {
@@ -595,7 +595,7 @@ void GameModeDriverPGATour_EndHole(void) {
 u8 GameModeDriverPGATour_GameFinished(u8 bCheck) {
     s32 i;
     if (gpGame->bD4) {
-        fn_8011A720(0, Game_CurHoleIndex());
+        GM_PgaTourSim_UpdatePlayoffs(0, Game_CurHoleIndex());
         return GameModeDriverPGATour_GoToPlayoff(bCheck) == 0;
     }
     for (i = Game_CurHoleIndex() + 1; i < 18; i++) {
@@ -604,7 +604,7 @@ u8 GameModeDriverPGATour_GameFinished(u8 bCheck) {
         }
     }
     if (gpGame->nDC + 1 >= gpGame->nE0) {
-        fn_8011A5F8(0);
+        GM_PgaTourSim_InitPlayoff(0);
         return GameModeDriverPGATour_GoToPlayoff(bCheck) == 0;
     }
     return 1;
@@ -617,7 +617,7 @@ u8 GameModeDriverPGATour_GoToPlayoff(u8 bCheck) {
     u8 bPlayoff = 0;
     s32 i;
     int h;
-    if (fn_8011A684(0) > 1 && fn_8011A6F4(0, 0)) {
+    if (GM_PgaTourSim_GetNumPlayoffEntrants(0) > 1 && GM_PgaTourSim_EntrantIsInPlayoff(0, 0)) {
         bPlayoff = 1;
     }
     if (bPlayoff) {
@@ -704,7 +704,7 @@ s32 GameModeDriverPGATour_GetFinalEventOfSeason(void) {
 void fn_800EF9D0(s32 nEvent) {
     PlayerNumber_t nPlayer = PLR_1_e;
     if (nEvent != gpSaveData[nPlayer].tour.nEvent && gpSaveData[nPlayer].tour.nRound > 0) {
-        fn_80117C50(0, 0);
+        GM_PgaTourSim_CutEntrant(0, 0);
     }
     while (gpSaveData[nPlayer].tour.nEvent < nEvent) {
         fn_800EF130(0, 0);
@@ -876,16 +876,16 @@ void GameModeDriverPGATour_GetCurrentEventLeader(char* pDst) {
     if (n > 1) {
         sprintf(pDst, "Tied (%d players)", n);
     } else {
-        s32 nLeader = fn_801197CC(0, 0);
-        s32 nGolfer = fn_80119118(0, nLeader);
+        s32 nLeader = GM_PgaTourSim_GetEntrantIDFromScoreRow(0, 0);
+        s32 nGolfer = GM_PgaTourSim_GetGolferIDFromEntrantID(0, nLeader);
         strcpy(pDst, fn_80118E30(0, nGolfer));
     }
 }
 
 // The leader's score in the current tournament.
 int fn_800F009C(void) {
-    s32 nLeader = fn_801197CC(0, 0);
-    return fn_8011937C(0, nLeader, fn_8011908C(0, nLeader) == 0);
+    s32 nLeader = GM_PgaTourSim_GetEntrantIDFromScoreRow(0, 0);
+    return GM_PgaTourSim_GetRelativeScoreFromEntrantID(0, nLeader, GM_PgaTourSim_IsEntrantUser(0, nLeader) == 0);
 }
 
 // The same for the first prize (the winner's share).
@@ -903,7 +903,7 @@ void GameModeDriverPGATour_GetWinnerEarningsString(s32 i, char* pDst) {
 
 // The player's own score in the current tournament. The event (EventInfo.c passes it) is not used.
 int fn_800F018C(s32 nEvent) {
-    return fn_8011937C(0, 0, fn_8011908C(0, 0) == 0);
+    return GM_PgaTourSim_GetRelativeScoreFromEntrantID(0, 0, GM_PgaTourSim_IsEntrantUser(0, 0) == 0);
 }
 
 // Profile 0's result in tournament i:
@@ -958,8 +958,8 @@ s32 fn_800F0304(s32 i) {
 // cut, and in a playoff the score to beat.
 s32 fn_800F031C(char* pDst) {
     PlayerNumber_t nPlayer = PLR_1_e;
-    if (gpSaveData[nPlayer].tour.nRound == 1 && fn_80119A04(0, 0) == 18) {
-        if (fn_801197A4(0, 0)) {
+    if (gpSaveData[nPlayer].tour.nRound == 1 && GM_PgaTourSim_GetCurrentHoleFromEntrantID(0, 0) == 18) {
+        if (GM_PgaTourSim_GetWasCutFromEntrantID(0, 0)) {
             strcpy(pDst, "TOURNAMENT CUT\n\nYou did not place in the top 70 after two\n"
                          "rounds. You have been cut from the tournament.");
             return 1;
@@ -968,10 +968,10 @@ s32 fn_800F031C(char* pDst) {
                      "after two rounds. You made the cut!");
         return 1;
     }
-    if (gpGame->bD4 && fn_8011A6F4(0, 0) && fn_8011A684(0) > 1) {
+    if (gpGame->bD4 && GM_PgaTourSim_EntrantIsInPlayoff(0, 0) && GM_PgaTourSim_GetNumPlayoffEntrants(0) > 1) {
         sprintf(pDst, "TOURNAMENT PLAYOFF\n\nYou're tied for first place. You must beat\n"
                       "your opponent's score of %d on the playoff\nhole to win.",
-                fn_8011A7C8(0, lbl_80282340));
+                GM_PgaTourSim_GetBestOpponentPlayoffHoleScore(0, lbl_80282340));
         return 1;
     }
     return 0;

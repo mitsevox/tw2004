@@ -35,7 +35,7 @@ typedef struct TourEvent {
     TourRound aRound[4];        // 0x04
     s32  nTeeSet;               // 0x34  every player's tee set (Session.nTeeSet)
     u8   unk38[8];
-    s16  a40[10];               // 0x40  per bracket (fn_800EF0E0), passed to fn_801178C8
+    s16  a40[10];               // 0x40  per bracket (fn_800EF0E0), passed to GM_PgaTourSim_SimRound
 } TourEvent;
 
 // A 'PGAp' record.

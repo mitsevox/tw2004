@@ -19,7 +19,8 @@ u8   fn_800E8904(u8 bCheck);
 void fn_800E890C(void);
 void fn_800E8A68(void);
 
-// TW06: GameModeBestBall::Init. Four players, stroke play, one mulligan each.
+// TW06: GameModeBestBall::Init. Installs the mode's handlers in gpGame, mulligan rule 2, nC and
+// n10 4, split screen off.
 void fn_800E81C4(void) {
     gpGame->pfnInit = fn_800E81C4;
     gpGame->pfnSetupNextGolfer = fn_800E83F8;
@@ -77,8 +78,8 @@ int fn_800E83A8(int nPlayer) {
     }
 }
 
-// The hole starts: in split screen everyone plays at once; otherwise the first golfer gets ready and
-// the others wait.
+// The next shot: in split screen everyone plays at once; otherwise the golfer pfnGetHonors picks
+// gets ready and the others wait.
 void fn_800E83F8(void) {
     int i;
     if (gSession.nSplitScreen == 1) {
@@ -271,7 +272,7 @@ void fn_800E890C(void) {
 // Not exact yet: nBase and nFirst + i swap r26/r25, and the prize block schedules the two row
 // addresses and the loop's hoisted gPlayers/0x10600/i = 0 in another order. The two-statement
 // nSum (= base 1; += base 2) fixed its scratch registers (94.46 -> 94.82). Tried without effect: every order
-// and operand order of the sum/money/base statements, Earnings.c fn_800D37BC's shape
+// and operand order of the sum/money/base statements, Earnings.c GM_Earnings_GetStrokeWinningsTeam's shape
 // (nBase1/nBase2), row pointers, inline accessors and a whole-prize inline helper with an out pointer, nBase
 // reusing any earlier local, an nPlayer local for nFirst + i in every declaration slot, i + nFirst, PLAYER(),
 // (u32) index, int/s32 on eight locals (256 combinations), declaration climb, GC/2.0 to 2.7, the permuter (20
@@ -320,8 +321,8 @@ void fn_800E8A68(void) {
                         if (nMargin > 5) {
                             nMargin = 5;
                         }
-                        nRating1 = fn_800D3C7C(nOther);
-                        nRating2 = fn_800D3C7C(nOther2);
+                        nRating1 = GM_Earnings_RateGolfer(nOther);
+                        nRating2 = GM_Earnings_RateGolfer(nOther2);
                         nSum = lbl_80200538.aStrokePrize[nRating1].nBase;
                         nSum += lbl_80200538.aStrokePrize[nRating2].nBase;
                         nMoney = nSum + lbl_80200538.aStrokePrize[nRating1].nPerStroke * nMargin;

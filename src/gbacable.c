@@ -608,7 +608,7 @@ void fn_80123CBC(s32 a, s32 b) {
 
 // Reads the pads. A linked GBA's d-pad (u58, when new and its check byte holds) replaces its port's
 // buttons. An unlinked port is probed for what is plugged in (waiting up to 800 ms for a GBA while
-// no port is being worked on); ports with a pad (types 8 and 0x40) are reset.
+// no port is being worked on); ports whose probe gave 8 or 0x40 are reset.
 void fn_80123E34(void) {
     u32 uReset = 0;
     s32 nChan;

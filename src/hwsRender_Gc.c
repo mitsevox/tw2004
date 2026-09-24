@@ -252,8 +252,9 @@ void fn_80113E5C(SkinIter* pIter);
 
 // ---- end of sweep code ----
 
-// Draw a mesh's triangle strip. When lbl_802824E8 is set, its vertices are first skinned into the
-// screen buffer (positions as floats, normals as bytes) and set up as GX's vertex arrays.
+// Draw a mesh's triangle strip. When lbl_802824E8 is set (it is then cleared), its vertices are
+// first skinned into the next slice of the lbl_802824E0 ring buffer (positions as floats, normals as
+// bytes) and set up as GX's vertex arrays.
 void fn_801132C4(SkinMeshRefs* pRefs) {
     Vec4 vNormalIn;
     Vec4 vPosIn;

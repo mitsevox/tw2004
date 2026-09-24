@@ -241,7 +241,7 @@ void GameModeStableford_EndGame(void) {
                     if (i != j && Player_IsCPU(j)) {
                         nTheirs = fn_800E1788(j);
                         if (nOurs < nTheirs) {
-                            nRating = fn_800D3C7C(j);
+                            nRating = GM_Earnings_RateGolfer(j);
                             if (nRating > nBest) {
                                 nBest = nRating;
                                 nMargin = nTheirs - nOurs;

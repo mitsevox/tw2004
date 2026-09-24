@@ -93,10 +93,10 @@ void fn_80168F5C(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
 }
 
 // Unloads a screen. Screens that named it as their previous screen take its previous screen
-// instead; it gets event -1, its queued events, nodes and rate functions are dropped, the unload
-// callback frees its data and the table closes up. With no current screen left, its previous
-// screen (or the last one) becomes current through event 3. Returns 0 when fn_80169308 says the
-// screen cannot go yet.
+// instead; it gets event -1 and the type 9 events queued for it (fn_80165ACC), its nodes and rate
+// functions are dropped, the unload callback frees its data and the table closes up. With no
+// current screen left, its previous screen (or the last one) becomes current through event 3.
+// Returns 0 when fn_80169308 says the screen cannot go yet.
 u8 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
     u32 nIndex;
     UISScreen* pScreen;
