@@ -926,7 +926,7 @@ void GM_CheckForShotChanges(int nPlayer) {
                 fn_800E3D38(nPlayer, 1);
             }
         } else if (!gpGame->b28D && fn_800E012C(nPlayer)) {
-            fn_800C4E80(fn_80017028(gPlayers[nPlayer].nView[0]), nPlayer);
+            GolfCamera_vSwitchToNextAlternateSwingCamera(fn_80017028(gPlayers[nPlayer].nView[0]), nPlayer);
         } else if (fn_800DFF0C(nPlayer)) {
             if (gSession.options.bSkipCameras) return;
             if (fn_8008AC40()) return;

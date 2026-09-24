@@ -238,7 +238,7 @@ void fn_800BAA4C(void);
 void fn_800BAA50(int nPlayer);
 void fn_800BAB80(int nPlayer);
 void fn_800BB0E8(void);
-void fn_800C808C(void);
+void BreakLine_InitModule(void);
 void fn_800C8108(void);
 void fn_800C9970(void);
 u8   fn_800D3004(void);
@@ -646,7 +646,7 @@ void GO_vInitIG(void) {
     } else {
         GLW_vInitModule(2);
     }
-    fn_800C808C();
+    BreakLine_InitModule();
     BFX_vInit();
     fn_800BA940();
     fn_800A2934();
@@ -1061,7 +1061,7 @@ void fn_8006D8E8(void) {
         }
         fn_80090628();
         gSession.fFrameTime = fn_800DAF98(gSession.fFrameTime);
-        if (gSession.nGameType != 1 && fn_800C6D9C()) {
+        if (gSession.nGameType != 1 && GolfCamera_IsFreezeTimeActive()) {
             gSession.fFrameTime = 0.0f;
         }
         if (gSession.nGameType != 1) {

@@ -239,7 +239,7 @@ s32  fn_8008AB4C(void);                 // GameUICommands.c
 int  fn_800E184C(int nPlayer, u8 bCurrent);        // GameRound.c
 s32  fn_800E81A0(int nPlayer);          // GameModeBattle.c
 s32  fn_800BCCCC(int nPlayer);          // SitDevFile.c: gpGame->pfn208
-s32  fn_800BCCF8(int nPlayer);          // SitDevFile.c: strokes behind the leader (gpGame->pfn200)
+s32  fn_800BCCF8(int nPlayer);          // SitDevFile.c: gpGame->pfn200's answer (TW06: GetCurrentLead)
 u8   fn_800BCD50(void);                 // SitDevFile.c: gpGame->bD4
 void CalDate_GetMDY(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
 void CalDate_SetMDY(u16* pDate, s32 nMonth, s32 nDay, u32 nYear);    // make a date

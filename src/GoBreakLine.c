@@ -1,5 +1,5 @@
 // GoBreakLine.c (EA's name, from its asserts): the putt's break line, a line on the green from the
-// ball that shows how the putt will break (BreakLine, breakline.h). Partly decompiled.
+// ball that shows how the putt will break (BreakLine, breakline.h).
 
 #include "golfer.h"
 #include "game.h"
@@ -17,7 +17,7 @@ void fn_800C9334(f32* pA, f32* pB, f32* pOut);
 void fn_800C9358(f32* pA, f32* pB, f32* pOut);
 void fn_8003519C(int nRow, void* pData);   // GoTerrain.c: calls row nRow's function with pData
 
-void fn_800C808C(void) {
+void BreakLine_InitModule(void) {
     lbl_80282228 = fn_80009B34(sizeof(BreakLine), 2, 16, "GoBreakLine.c", 93);
     lbl_80282228->fAB30 = 27.0f;
     lbl_80282228->fAB34 = 0.0f;
@@ -75,8 +75,10 @@ void fn_800C830C(void) {
     lbl_8028222C = 0;
 }
 
-// Steps view nView's line while its player, a human, stands over a putt within 75 of the hole
-// and the ball is within an inch of the pin (EA's test; distances in yards).
+// Steps view nView's line (BreakLine_Step) while the line is on (lbl_8028222C) and its player, a
+// human, stands over a putt within 75 of the hole with the target (vTarget) within an inch of the
+// pin (EA's test; distances in yards). A view's first call after the line is set up only clears
+// its abSkip.
 void BreakLine_Update(int nView) {
     int nPlayer = fn_8001707C(nView);
     f32 fDist;

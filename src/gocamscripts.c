@@ -87,7 +87,7 @@ void CamScript_RunScript(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, 
     u8 bFirstFrame;
 
     if (pScript->pShot == NULL) return;
-    if (fn_800C714C()) {
+    if (GolfCamera_IsScriptMatrixModeOn()) {
         fTime = FRAME_TIME;
     }
     fn_8000C594();  // the result is not used
@@ -1552,7 +1552,7 @@ void CameraScript_LagBallFlight(int nPlayer, f32* pOut, f32* pCam, CamShot* pSho
 // other way round for fn_800453C8), level and in height separately, by CamTuning.f144 and f148 a
 // frame; slower when it is close. Right after a cut to the next shot it jumps there. Without a
 // next shot (or with blend 5) the aim lags by fLag (CameraScript_KeepPointInView). Only on frames with ball updates
-// or with fn_800C714C.
+// or with GolfCamera_IsScriptMatrixModeOn.
 void CameraScript_LagTargetPoint(int nPlayer, f32* pOut, f32* pCam, f32* pTarget, CamShot* pShot, CamScript* pScript,
                  f32 fTime, f32 fLag) {
     f32 vMove[4];
@@ -1565,7 +1565,7 @@ void CameraScript_LagTargetPoint(int nPlayer, f32* pOut, f32* pCam, f32* pTarget
     f32 fRate;
     f32 fNear;
 
-    if (GameEffects_BallUpdatesThisFrame(nPlayer) != 0 || fn_800C714C()) {
+    if (GameEffects_BallUpdatesThisFrame(nPlayer) != 0 || GolfCamera_IsScriptMatrixModeOn()) {
         Vec3Copy(pTarget, vAim);
         if (fn_800453C8(nPlayer, pShot)) {
             CameraScript_OffsetLookVector(vAim, pCam, pShot->f74, -pShot->f70);
@@ -1836,9 +1836,9 @@ void CameraScript_GoToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer,
             fn_80045494(0, nPlayer);
         }
         if (pScript->pShot->nA0 == 3) {
-            fn_800C7140(1);
+            GolfCamera_SetCameraMatrixMode(1);
         } else {
-            fn_800C7140(0);
+            GolfCamera_SetCameraMatrixMode(0);
         }
     }
     if (pScript->bCC == 0) {
@@ -1851,7 +1851,7 @@ void CameraScript_GoToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer,
 // makes pShot the next shot (first recording the current camera into pB4 when both shots are
 // script shots), its length f1 at least the move's distance over speed f2; otherwise pShot and
 // its follow-on start at once. nB and f3 go to nE0/fE4; single-view play sets fn_80045494,
-// fn_80045558 and fn_800C7140 from the shot's nA0.
+// fn_80045558 and GolfCamera_SetCameraMatrixMode from the shot's nA0.
 void CameraScript_InterpToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pCam, f32* pSub,
                                     int nA, f32 f1, f32 f2, int nB, f32 f3) {
     f32 vDiff[4];
@@ -1970,9 +1970,9 @@ void CameraScript_InterpToNewScript(CamScript* pScript, CamShot* pShot, int nPla
             fn_80045494(0, nPlayer);
         }
         if (pScript->pShot->nA0 == 3) {
-            fn_800C7140(1);
+            GolfCamera_SetCameraMatrixMode(1);
         } else {
-            fn_800C7140(0);
+            GolfCamera_SetCameraMatrixMode(0);
         }
     }
     pScript->fF8 = 0.0f;
@@ -2172,7 +2172,7 @@ u8 CamScript_CheckObstructedCamera(f32* pCam, int nPlayer) {
 // Puts the camera back on the fairway (CamScript_PutBackOnFairway) when the script asks for it
 // (bE8), or, once the camera has run CamTuning.fEC (or b) and the move is past half way (f98), when
 // the camera has left the hole's outline (PlaceBall_GetPlaceBallNetwork) while the ball's next step stays inside it.
-// Only for a next shot (or, without one, a current shot) of bAD 4, and not while fn_800C6D9C holds.
+// Only for a next shot (or, without one, a current shot) of bAD 4, and not while GolfCamera_IsFreezeTimeActive holds.
 void CamScript_CheckOutOfBounds(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot* pSaved,
                                 f32* pPrev, u8 b) {
     f32 vNext[4];
@@ -2183,7 +2183,7 @@ void CamScript_CheckOutOfBounds(CamScript* pScript, f32* pCam, f32* pSub, int nP
     if (!b && pScript->fCamTime < lbl_80281F78->fEC) {
         bEarly = 1;
     }
-    if (fn_800C6D9C()) return;
+    if (GolfCamera_IsFreezeTimeActive()) return;
     if (pScript->pShot != NULL) {
         if (pScript->pNextShot != NULL) {
             if (pScript->pNextShot->bAD != 4) return;

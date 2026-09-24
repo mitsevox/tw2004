@@ -145,7 +145,7 @@ f32 fn_800DAF98(f32 fFrameTime) {
 // twice that in mode 26), none when the frame time is 0, one outside the ball's flight. With the
 // slow-down on and a frame shorter than FRAME_TIME, it moves only on every n2C-th frame.
 int GameEffects_BallUpdatesThisFrame(int nPlayer) {
-    if (gSession.nGameType == 3 || fn_800C714C()) {
+    if (gSession.nGameType == 3 || GolfCamera_IsScriptMatrixModeOn()) {
         return 1;
     }
     if (0.0f == gSession.fFrameTime) {

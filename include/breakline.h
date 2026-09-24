@@ -1,5 +1,5 @@
 // breakline.h (our name): GoBreakLine.c's state, the putt's break line (lbl_80282228, 0xAB40
-// bytes, allocated by fn_800C808C). Only the fields read so far.
+// bytes, allocated by BreakLine_InitModule). Only the fields read so far.
 
 #ifndef BREAKLINE_H
 #define BREAKLINE_H

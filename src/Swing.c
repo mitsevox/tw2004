@@ -2424,7 +2424,7 @@ void STATEFUNC_RemoveBallExit(int nPlayer) {
 void STATEFUNC_ElevatorInit(int nPlayer) {
     int nView;
     if (lbl_80281F78->n1C0 != 0) {
-        if (fn_800C4650(fn_80017028(gPlayers[nPlayer].nView[0]), nPlayer)) {
+        if (GolfCamera_NeedSteepSlopeCam(fn_80017028(gPlayers[nPlayer].nView[0]), nPlayer)) {
             nView = gPlayers[nPlayer].nView[0];
             CameraController_SetCameraMode(fn_80017028(nView), 0x13, nPlayer, nView);
             return;
@@ -2588,7 +2588,7 @@ void STATEFUNC_MidHoleFlyByInit(int nPlayer) {
             CameraController_SetCameraMode(fn_80017028(nView), 10, nPlayer, nView);
         }
     }
-    fn_800C7140(0);
+    GolfCamera_SetCameraMatrixMode(0);
     fn_800E3D38(nPlayer, 0);
     fn_80045824(nPlayer);
     fn_800DC9D4(1);
@@ -2898,7 +2898,7 @@ void STATEFUNC_InitialFlyByInit(int nPlayer) {
     fn_800170C4(gPlayers[nPlayer].nView[0], 1);
     CameraController_SetCameraMode(fn_80017028(gPlayers[nPlayer].nView[0]), 10, nPlayer, gPlayers[nPlayer].nView[0]);
     CameraController_FadeIn(fn_80017028(gPlayers[nPlayer].nView[0]), 0.5f, (f32*)&vOffset);
-    fn_800C7140(0);
+    GolfCamera_SetCameraMatrixMode(0);
     fn_800170F4(gPlayers[nPlayer].nView[0]);
     fn_800171D8(fn_80012EF0(fn_80017004(gPlayers[nPlayer].nView[0])), 0.0f, 0.0f, 1.0f, 1.0f);
     for (i = 0; i < gNumPlayersSetUp; i++) {
@@ -3166,14 +3166,14 @@ void STATEFUNC_InTheHoleUpdate(int nPlayer) {
         lbl_80281E12 = 0;
         fn_800C7168(pV, GM_ChooseRemoveBallState(nPlayer));
         if (fn_800C7170(pV)) {
-            fn_800C7158(pV, 1);
+            GolfCamera_SetPostShowPostShotAnimations(pV, 1);
             return;
         }
-        fn_800C7158(pV, GM_ShowPostShotAnimation(nPlayer));
+        GolfCamera_SetPostShowPostShotAnimations(pV, GM_ShowPostShotAnimation(nPlayer));
         if (gpGame->n294 != 0 && pV->script.nCamera != 1 && pV->script.nCamera != 4) {
             if (!(gPlayers[nPlayer].uFlags & 8) || fn_8006AA9C(nPlayer) == 2) {
                 if (fn_80095780(gPlayers[nPlayer].pChar) != 9 && fn_80095798(gPlayers[nPlayer].pChar) != 9 &&
-                    fn_800C7160(pV)) {
+                    GolfCamera_ShowPostShotAnimations(pV)) {
                     fn_80095744(gPlayers[nPlayer].pChar, 9);
                 } else {
                     CameraController_SetCameraMode(pV, 0x10, nPlayer, gPlayers[nPlayer].nView[0]);
@@ -3211,11 +3211,11 @@ void STATEFUNC_ReplaySwingInit(int nPlayer) {
         CameraController_SetCameraMode(pV, 0xC, nPlayer, gPlayers[nPlayer].nView[0]);
     } else {
         fn_80062D98();
-        if (fn_800C44A8(pV, nPlayer)) {
+        if (GolfCamera_Choose3ScreenCam(pV, nPlayer)) {
             CameraController_SetCameraMode(pV, 0x14, nPlayer, gPlayers[nPlayer].nView[0]);
-        } else if (fn_800C44CC(pV, nPlayer)) {
+        } else if (GolfCamera_ChooseHeartBeatCam(pV, nPlayer)) {
             CameraController_SetCameraMode(pV, 0x15, nPlayer, gPlayers[nPlayer].nView[0]);
-        } else if (fn_800C44E0(pV, nPlayer)) {
+        } else if (GolfCamera_ChooseShutterCam(pV, nPlayer)) {
             CameraController_SetCameraMode(pV, 0x16, nPlayer, gPlayers[nPlayer].nView[0]);
         } else {
             CameraController_SetCameraMode(pV, 0xD, nPlayer, gPlayers[nPlayer].nView[0]);
@@ -3228,8 +3228,8 @@ void STATEFUNC_ReplaySwingInit(int nPlayer) {
     if (gPlayers[nPlayer].uFlags & 8) {
         CharacterState_SetTapInState(gPlayers[nPlayer].pChar);
     } else {
-        if (fn_800C6D80() || fn_800C44A8(pV, nPlayer) || fn_800C44CC(pV, nPlayer) ||
-            fn_800C44E0(pV, nPlayer)) {
+        if (GolfCamera_IsSlowMoSwingCamActive() || GolfCamera_Choose3ScreenCam(pV, nPlayer) || GolfCamera_ChooseHeartBeatCam(pV, nPlayer) ||
+            GolfCamera_ChooseShutterCam(pV, nPlayer)) {
             CharacterState_AddSKABlendData(gPlayers[nPlayer].pChar, 1, 0, fn_80072ACC, 1, 8,
                                            -20000.0f, -30000.0f, -10000.0f, 0.0f, -10000.0f);
         } else {
@@ -3250,7 +3250,7 @@ void STATEFUNC_ReplaySwingInit(int nPlayer) {
     } else {
         fn_800DAF74();
     }
-    GameEffects_SetSuperSlowMo(1, nPlayer, fn_800C6B7C(pV));
+    GameEffects_SetSuperSlowMo(1, nPlayer, GolfCamera_ReplaySwingSpeed(pV));
     gPlayers[nPlayer].ball.nState = 0;
     if (gSession.bReplay != 0) {
         fn_80062CE0(1);
@@ -3264,7 +3264,7 @@ void STATEFUNC_ReplaySwingInit(int nPlayer) {
 void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
     View* pV    = fn_80017028(gPlayers[nPlayer].nView[0]);
     u8    bSpecial = 0;
-    GameEffects_SetSuperSlowMo(1, nPlayer, fn_800C6B7C(fn_80017028(gPlayers[nPlayer].nView[0])));
+    GameEffects_SetSuperSlowMo(1, nPlayer, GolfCamera_ReplaySwingSpeed(fn_80017028(gPlayers[nPlayer].nView[0])));
     if (!fn_80048574(gPlayers[nPlayer].pChar, 2) ||
         fn_8005CB78(gPlayers[nPlayer].pChar, 2) < gPlayers[nPlayer].pChar->fAnimTime) {
         if (gSession.bReplay) {
@@ -3273,13 +3273,13 @@ void STATEFUNC_ReplaySwingUpdate(int nPlayer) {
             GOLFERSTATE_Switch(GS_SIMULATE, nPlayer);
         } else if (fn_800C4518(pV) >= fn_800C6B38(pV)) {
             EVENT_Trigger(nPlayer, 0xA, &gPlayers[nPlayer].ball, 1);
-            fn_800C44A8(pV, nPlayer);
+            GolfCamera_Choose3ScreenCam(pV, nPlayer);
             SKEL_RelaxIK(gPlayers[nPlayer].pChar->pModel->pSkel);
             Swing_Launch(nPlayer);
             GOLFERSTATE_Switch(GS_SIMULATE, nPlayer);
         } else {
             fn_800C5CEC(pV, nPlayer);
-            GameEffects_SetSuperSlowMo(1, nPlayer, fn_800C6B7C(pV));
+            GameEffects_SetSuperSlowMo(1, nPlayer, GolfCamera_ReplaySwingSpeed(pV));
             if (fn_800C4518(pV) >= fn_800C6B38(pV)) {
                 bSpecial = fn_800C5FE4(pV, nPlayer);
             }
@@ -3586,7 +3586,7 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
     View* pV;
 
     pV = fn_80017028(gPlayers[nPlayer].nView[0]);
-    if (fn_800C6D9C()) return;
+    if (GolfCamera_IsFreezeTimeActive()) return;
     GM_SimulateBallMovement(nPlayer);
     Swing_RumbleTick(nPlayer);
     if (fn_80062DD4(pV) && fn_80062DCC(pV) > 0.5f) {
@@ -3652,7 +3652,7 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
             if (fn_800C6D28()) {
                 fn_800C6DE4();
             }
-            if (fn_800C6D64()) {
+            if (GolfCamera_IsSuperZoomCamActive()) {
                 fn_800C6DFC();
             }
             REPLAY_Play(nPlayer);
@@ -3666,7 +3666,7 @@ void STATEFUNC_SimulateUpdate(int nPlayer) {
         if (fn_800C6D28()) {
             fn_800C6DE4();
         }
-        if (fn_800C6D64()) {
+        if (GolfCamera_IsSuperZoomCamActive()) {
             fn_800C6DFC();
         }
     }
@@ -3796,14 +3796,14 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
         fn_80062B6C(nPlayer);
         Misc_SetSeedFunc(1, gSession.nSeed);
         pV = fn_80017028(gPlayers[nPlayer].nView[0]);
-        fn_800C6618(pV, nPlayer);
+        GolfCamera_ChooseSpecialSwing(pV, nPlayer);
         fn_800A5980((u8)nPlayer);
         if (fn_800C7138(pV) == 0) {
             EVENT_Trigger(nPlayer, 0x3B, 0, 0);
         }
         if (gpGame->b283 != 0 &&
-            (fn_800C441C(pV, nPlayer) || fn_800C44A8(pV, nPlayer) || fn_800C44CC(pV, nPlayer) ||
-             fn_800C44E0(pV, nPlayer))) {
+            (fn_800C441C(pV, nPlayer) || GolfCamera_Choose3ScreenCam(pV, nPlayer) || GolfCamera_ChooseHeartBeatCam(pV, nPlayer) ||
+             GolfCamera_ChooseShutterCam(pV, nPlayer))) {
             GOLFERSTATE_Switch(GS_REPLAY_SWING, nPlayer);
         } else {
             GOLFERSTATE_Switch(GS_SIMULATE, nPlayer);
@@ -3863,9 +3863,9 @@ void STATEFUNC_ShowYardageUpdate(int nPlayer) {
     Vec4  vOffset;
 
     if (lbl_80281E13 != 0) {
-        fn_800C7158(pV, GM_ShowPostShotAnimation(nPlayer));
+        GolfCamera_SetPostShowPostShotAnimations(pV, GM_ShowPostShotAnimation(nPlayer));
         if (fn_80095780(gPlayers[nPlayer].pChar) != 9 && fn_80095798(gPlayers[nPlayer].pChar) != 9 &&
-            fn_800C7160(pV)) {
+            GolfCamera_ShowPostShotAnimations(pV)) {
             fn_80095744(gPlayers[nPlayer].pChar, 9);
         } else {
             CameraController_SetCameraMode(pV, 0xF, nPlayer, gPlayers[nPlayer].nView[0]);
