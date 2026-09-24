@@ -160,17 +160,80 @@ void fn_800949D0(SD_SShaderObject_Static* pObject) {
     }
 }
 
-void fn_80094B84(void);
-void fn_80094E34(void);
+// The buffer not being drawn is rebuilt from the one drawn last: its own live particles age by
+// fStep and those past the lifetime are dropped; then the particles the other buffer has beyond
+// them are carried over, aged by fCarried.
+void fn_80094B84(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg) {
+    ParticleSystem* pSys;
+    int nBuf;
+    u32 nDead;
+    u32 nStart;
+    u32 nLive;
+    u32 i;
+    u32 n;
+    u32 nEnd;
+    f32 fAge;
+    ParticleVertex* pSrc;
+    ParticleVertex* pDst;
 
-// A callback: what *pnWhat asks for, 0 or 1, is done by fn_80094B84 or fn_80094E34.
-void fn_80095088(void* p, s32* pnWhat) {
-    switch (*pnWhat) {
+    nDead = 0;
+    pSys = pObject->pData;
+    nBuf = 1 - lbl_802813A8->b10;
+    nStart = pSys->anStart[nBuf];
+    nLive = pSys->anLive[nBuf];
+    i = nStart;
+    for (n = nLive; n != 0; n--) {
+        fAge = *((f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst + i) + pMsg->u.age.fStep;
+        if (fAge > pMsg->pParams->f4) {
+            nDead++;
+        } else {
+            *((f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst + i) = fAge;
+        }
+        if (++i == pSys->nCount) {
+            i = 0;
+        }
+    }
+    if (nDead != 0) {
+        nStart += nDead;
+        if (nStart >= pSys->nCount) {
+            nStart -= pSys->nCount;
+        }
+        nLive -= nDead;
+    }
+    nEnd = pSys->anStart[1 - nBuf] + pSys->anLive[1 - nBuf];
+    if (nEnd >= pSys->nCount) {
+        nEnd -= pSys->nCount;
+    }
+    while (i != nEnd) {
+        *((f32*)lbl_802813A8->apBuffers[nBuf + 2] + pSys->nFirst + i) =
+            *((f32*)lbl_802813A8->apBuffers[1 - nBuf + 2] + pSys->nFirst + i) + pMsg->u.age.fCarried;
+        // EA copies four slots from each particle's on; the next three are other particles'
+        pSrc = (ParticleVertex*)lbl_802813A8->apBuffers[1 - nBuf] + pSys->nFirst + i;
+        pDst = (ParticleVertex*)lbl_802813A8->apBuffers[nBuf] + pSys->nFirst + i;
+        pDst[0] = pSrc[0];
+        pDst[1] = pSrc[1];
+        pDst[2] = pSrc[2];
+        pDst[3] = pSrc[3];
+        if (++i == pSys->nCount) {
+            i = 0;
+        }
+        nLive++;
+    }
+    pSys->anStart[nBuf] = nStart;
+    pSys->anLive[nBuf] = nLive;
+    *pMsg->u.age.pnLive = nLive;
+}
+
+void fn_80094E34(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg);
+
+// The message callback: pMsg->nWhat 0 ages the particles, 1 emits new ones.
+void fn_80095088(SD_SShaderObject_Static* pObject, ParticleMsg* pMsg) {
+    switch (pMsg->nWhat) {
     case 0:
-        fn_80094B84();
+        fn_80094B84(pObject, pMsg);
         break;
     case 1:
-        fn_80094E34();
+        fn_80094E34(pObject, pMsg);
         break;
     }
 }

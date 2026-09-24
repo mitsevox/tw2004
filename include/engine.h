@@ -328,7 +328,9 @@ typedef struct SD_SShaderObject_Static {
 // A particle system's settings, as the particle shader's create callback (fn_8009428C) reads
 // them. Only the fields read there are named.
 typedef struct ParticleParams {
-    u8   unk0[0x58];
+    u8   unk0[4];
+    f32  f4;                    // 0x04  the particles' lifetime: older ones are dropped (fn_80094B84)
+    u8   unk8[0x58 - 0x8];
     u32  u58;                   // 0x58  flags; 0x80 and 0x100 pick the blend (fn_800949D0)
     u8   unk5C[2];
     s16  nCount;                // 0x5E  how many particles
@@ -386,6 +388,19 @@ typedef struct ParticleVertex {
     f32  f20;                   // 0x20
 } ParticleVertex;
 LAYOUT_ASSERT(ParticleVertex, 0x24);
+
+// What the particle shader's message callback (fn_80095088) is handed; nWhat picks the message.
+typedef struct ParticleMsg {
+    s32  nWhat;                 // 0x00  0: age the particles (fn_80094B84), 1: emit (fn_80094E34)
+    ParticleParams* pParams;    // 0x04
+    union {
+        struct {
+            f32  fCarried;      // 0x08  added to the age of each particle carried over
+            f32  fStep;         // 0x0C  added to the age of each live one
+            s32* pnLive;        // 0x10  gets how many are live after
+        } age;
+    } u;
+} ParticleMsg;
 
 // A particle system (0xAC bytes, the shader object's pData): its run of particles in the particle
 // buffers (lbl_802813A8), and what it draws with.
