@@ -2171,12 +2171,7 @@ AnimLib* fn_80026AC0(Character* pChar) {
     return NULL;
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
-AnimLib* fn_80026B34(Character* pChar);
-
+// The library of the character's animation slot.
 AnimLib* fn_80026B34(Character* pChar) {
     return lbl_801C6068[pChar->nSlot].pLib;
 }
-
-// ---- end of sweep code ----
