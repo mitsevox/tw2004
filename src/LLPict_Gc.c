@@ -35,6 +35,24 @@ void fn_8002F540(void) {
 
 // ---- end of sweep code ----
 
+// fn_8002F898 in place: each band of four rows is copied to pWork first and tiled back from there.
+// The first 8 bytes are already where they belong.
+void fn_8002F56C(u8* pPlane, void* pWork, int nWidth, int nHeight) {
+    int i;
+    int y;
+    u32* pIn;
+
+    for (y = 0; y < nHeight; y += 4) {
+        memcpy(pWork, pPlane, nWidth * 4);
+        for (i = 1; i < nWidth / 2; i++) {
+            pIn = (u32*)pWork + ((i / 4) * 2 + (nWidth / 4) * (i % 4));
+            ((u32*)pPlane)[i * 2] = pIn[0];
+            ((u32*)pPlane)[i * 2 + 1] = pIn[1];
+        }
+        pPlane += nWidth * 4;
+    }
+}
+
 // Copies a plane of nWidth x nHeight bytes into GameCube I8 tile order: tiles of 8 x 4 bytes, each
 // row of a tile being 8 bytes of one source row.
 void fn_8002F898(u8* pSrc, u8* pDst, int nWidth, int nHeight) {
