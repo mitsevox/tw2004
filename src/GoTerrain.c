@@ -65,6 +65,8 @@ void  fn_80034648(int n);
 void  fn_80035514(u8* pObject);
 void  fn_800332F4(void);
 u8    fn_8003505C(u8 b);
+f32*  fn_80035508(UObjMesh* pMesh);
+void  fn_80063920(int nView, f32* pBounds);     // GoCamCont: given an object the camera is inside
 u8    fn_80033308(Ter_ObjectDrawData* pDraw, u8 bForce);
 void  fn_8000ADC0(f32 (*pMtx)[4]);  // identity matrix
 void  fn_80035370(void);
@@ -439,6 +441,174 @@ void fn_8003185C(void) {
     if (gSession.b11 == 0) {
         qsort(lbl_801D3CB0.pObjectSortList, lbl_801D3CB0.iTotalSortObjects, sizeof(Ter_ObjectReference),
               fn_800318AC);
+    }
+}
+
+// Adds a patch's objects to pObjectSortList, numbering them from nFirstObject: each gets its three
+// levels of detail (in object test mode the first list's; else lists 0, and 1 and 2 past
+// iLowLODListOffset), its distance from the camera and a clip method, or is left out (clip method 3).
+// Split screen leaves out objects with bit 0x8 of word 2. Hidden are: far objects with bit 0x80;
+// tee markers (word 1 bits 0x1, 0x2, 0x4: tee sets 0-2) not of the player's tee set, and all of them
+// once the ball is off the tee (Ball.nLie); crowd objects (word 3 bits 0x4, 0x10, 0x20) while the
+// camera moves, beyond fCrowdHalfMaxDistanceFromGolfer from the ball, or beyond
+// fCrowdFullMaxDistanceFromGolfer and farther from the pin than the ball is (every other one when
+// nearer).
+void fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject) {
+    f32 v48[4];
+    f32 v38[4];
+    f32 v28[4];
+    f32 v18[4];
+    f32 v8[4];
+    s32 nObjects;
+    s32 nLists;
+    s32 i;
+    s32 nLast;
+    UObjMesh* pLOD0;
+    UObjMesh* pLOD1;
+    UObjMesh* pLOD2;
+    s32 uFlags2;
+    f32* pBounds;
+    f32* pBall;
+    f32* pPin;
+    f32 fHeight;
+    f32 fXZ;
+    f32 fDistanceSquared;
+    f32 fBallToObject;
+    f32 fPinToBall;
+    f32 fObjectToPin;
+    u8 bHide;
+    s32 eClipMethod;
+    View* pView;
+    Ter_ObjectReference* pRef;
+    s32 iObject;
+
+    nObjects = fn_800354F4(fn_800354E4(pPatch->pObjects, 0));
+    if (nObjects == 0) {
+        return;
+    }
+    if (lbl_801D3CB0.bObjectTestMode) {
+        nObjects = 1;
+        nLists = fn_800354F4(fn_800354E4(pPatch->pObjects, 0));
+        pLOD0 = fn_800354E4(fn_800354E4(pPatch->pObjects, 0), 0);
+        pLOD1 = nLists > 1 ? fn_800354E4(fn_800354E4(pPatch->pObjects, 0), 1) : pLOD0;
+        pLOD2 = nLists > 2 ? fn_800354E4(fn_800354E4(pPatch->pObjects, 0), 2) : pLOD1;
+    } else {
+        if (lbl_801D3CB0.iLowLODListOffset == -1) {
+            if (fn_800354F4(pPatch->pObjects) == 5) {
+                lbl_801D3CB0.iLowLODListOffset = 2;
+            } else {
+                lbl_801D3CB0.iLowLODListOffset = 0;
+            }
+        }
+        pLOD0 = fn_800354E4(fn_800354E4(pPatch->pObjects, 0), 0);
+        pLOD1 = fn_800354E4(fn_800354E4(pPatch->pObjects, lbl_801D3CB0.iLowLODListOffset + 1), 0);
+        pLOD2 = fn_800354E4(fn_800354E4(pPatch->pObjects, lbl_801D3CB0.iLowLODListOffset + 2), 0);
+    }
+    nLast = nObjects + nFirstObject - 1;
+    for (i = nObjects - 1; i >= 0; i--) {
+        uFlags2 = fn_800354D0(pLOD0, 2);
+        if (gSession.nSplitScreen == 0 || !(uFlags2 & 8)) {
+            pBounds = fn_80035508(pLOD0);
+            fHeight = fabsf(lbl_801D3CB0.xCameraReferencePos[1] - pBounds[1]) - pBounds[7];
+            if (fHeight < 0.0f) {
+                fHeight = 0.0f;
+            }
+            fn_8003546C(pBounds, lbl_801D3CB0.xCameraReferencePos, v48);
+            v48[1] = 0.0f;
+            fXZ = (f32)fn_80009680(fn_80009744(v48)) - pBounds[3];
+            if (fXZ < 0.0f) {
+                fXZ = 0.0f;
+            }
+            fDistanceSquared = fHeight * fHeight + fXZ * fXZ;
+            if (fDistanceSquared <= 0.0f) {
+                fn_80063920(lbl_801D3CB0.iCurrentViewContext, pBounds);
+            }
+            bHide = 0;
+            if ((uFlags2 & 0x80) && fDistanceSquared > lbl_801D3CB0.fDistanceCullFrameYardsSquared) {
+                bHide = 1;
+            } else if ((fn_800354D0(pLOD0, 3) & 4) || (fn_800354D0(pLOD0, 3) & 0x10)
+                       || (fn_800354D0(pLOD0, 3) & 0x20)) {
+                pBall = gPlayers[fn_8001707C(lbl_801D3CB0.iCurrentViewContext)].vBall;
+                pPin = &fn_8000C594()->pin[Game_CurrentPinSet()].x;
+                fn_8003546C(pBounds, pBall, v28);
+                v28[1] = 0.0f;
+                fBallToObject = (f32)fn_80009680(fn_80009744(v28)) - pBounds[3];
+                if (fBallToObject < 0.0f) {
+                    fBallToObject = 0.0f;
+                }
+                fn_8003546C(pPin, pBall, v18);
+                v18[1] = 0.0f;
+                fPinToBall = fn_80009680(fn_80009744(v18));
+                if (fPinToBall < 0.0f) {
+                    fPinToBall = 0.0f;
+                }
+                fn_8003546C(pBounds, pPin, v8);
+                v8[1] = 0.0f;
+                fObjectToPin = (f32)fn_80009680(fn_80009744(v8)) - pBounds[3];
+                if (fObjectToPin < 0.0f) {
+                    fObjectToPin = 0.0f;
+                }
+                if (!fn_800172C4(fn_80017028(lbl_801D3CB0.iCurrentViewContext))) {
+                    bHide = 1;
+                } else if (fBallToObject > lbl_801D3CB0.fCrowdHalfMaxDistanceFromGolfer) {
+                    bHide = 1;
+                } else if (fBallToObject > lbl_801D3CB0.fCrowdFullMaxDistanceFromGolfer
+                           && fObjectToPin > fPinToBall) {
+                    bHide = 1;
+                } else if (fBallToObject > lbl_801D3CB0.fCrowdFullMaxDistanceFromGolfer
+                           && fObjectToPin <= fPinToBall && (nLast - i) % 2 != 0) {
+                    bHide = 1;
+                } else if (((fn_800354D0(pLOD0, 1) & 1)
+                            && gSession.nTeeSet[fn_8001707C(lbl_801D3CB0.iCurrentViewContext)] != 0)
+                           || ((fn_800354D0(pLOD0, 1) & 2)
+                               && gSession.nTeeSet[fn_8001707C(lbl_801D3CB0.iCurrentViewContext)] != 1)
+                           || ((fn_800354D0(pLOD0, 1) & 4)
+                               && gSession.nTeeSet[fn_8001707C(lbl_801D3CB0.iCurrentViewContext)] != 2)) {
+                    bHide = 1;
+                } else if (((fn_800354D0(pLOD0, 1) & 1) || (fn_800354D0(pLOD0, 1) & 2)
+                            || (fn_800354D0(pLOD0, 1) & 4))
+                           && gPlayers[fn_8001707C(lbl_801D3CB0.iCurrentViewContext)].ball.nLie != 0) {
+                    bHide = 1;
+                }
+            }
+            if (bHide) {
+                eClipMethod = 3;
+            } else if (pPatch->eClipMethod == 2) {
+                eClipMethod = 2;
+            } else {
+                pView = fn_80017028(lbl_801D3CB0.iCurrentViewContext);
+                eClipMethod = fn_80007B2C(pLOD0, fn_8001614C(), fn_80009680(fDistanceSquared),
+                                          lbl_801D3CB0.fCameraMinHalfFieldOfViewTan, pView->f54);
+            }
+            if (eClipMethod != 3) {
+                pRef = &lbl_801D3CB0.pObjectSortList[lbl_801D3CB0.iTotalSortObjects];
+                pRef->fDistanceSquared = fDistanceSquared;
+                pRef->f14 = fn_80009744(v48);
+                fn_8003546C(pBounds, lbl_801D3CB0.xCameraReferencePos, v38);
+                pRef->f18 = fn_8000C5FC(lbl_801D3CB0.xCameraLookVector, v38);
+                iObject = nLast - i;
+                pRef->eClipMethod = eClipMethod;
+                pRef->pContainerPatch = pPatch;
+                pRef->iGlobalObjectIndex = iObject;
+                lbl_801D3CB0.pObjectStateList[iObject].a20[0] = fn_800354D0(pLOD0, 0);
+                lbl_801D3CB0.pObjectStateList[iObject].a20[1] = fn_800354D0(pLOD0, 1);
+                lbl_801D3CB0.pObjectStateList[iObject].a20[2] = fn_800354D0(pLOD0, 2);
+                lbl_801D3CB0.pObjectStateList[iObject].a20[3] = fn_800354D0(pLOD0, 3);
+                if ((uFlags2 & 0x40) || (fn_800354D0(pLOD0, 3) & 0x10) || (fn_800354D0(pLOD0, 3) & 0x20)) {
+                    pRef->nLODs = 1;
+                    pRef->apObject[0] = pLOD0;
+                } else {
+                    pRef->nLODs = 3;
+                    pRef->apObject[0] = pLOD0;
+                    pRef->apObject[1] = pLOD1;
+                    pRef->apObject[2] = pLOD2;
+                }
+                lbl_801D3CB0.iTotalSortObjects++;
+            }
+        }
+        pLOD0 = fn_800354BC(pLOD0);
+        pLOD1 = fn_800354BC(pLOD1);
+        pLOD2 = fn_800354BC(pLOD2);
     }
 }
 
@@ -1911,7 +2081,6 @@ void fn_80035398(void) {
 
 void fn_8006F154();
 void fn_800082CC(void* p);
-s32 fn_80035508(u8* p0);
 extern s32 lbl_80281B88;
 extern s32 lbl_80281D68;
 void fn_800355E0(s32 arg0);
@@ -2015,8 +2184,9 @@ UObjMesh* fn_80035500(u8* pHoleData) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-s32 fn_80035508(u8* p0) {
-    return (*(s32*)p0 + 104);
+// A terrain object's bounds.
+f32* fn_80035508(UObjMesh* pMesh) {
+    return pMesh->pInfo->a68;
 }
 
 // If the object's current entry (n28) is switched on, hands its 0x2C-byte record to LLObj_Gc.c's

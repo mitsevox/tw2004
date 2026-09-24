@@ -86,7 +86,9 @@ typedef struct UObjMeshInfo {
     f32  v58[3];                // 0x58  copied to UObjModel.v2C by type 0's setup; with f64 the
                                 //       bounding sphere GoTerrain.c's fn_800354C4 returns
     f32  f64;                   // 0x64  copied to UObjModel.f5C by type 0's setup
-    u8   unk68[0x8B - 0x68];
+    f32  a68[8];                // 0x68  a terrain object's bounds (GoTerrain.c fn_80035508, fn_80031154):
+                                //       its centre [0..2], a radius [3] and a height [7]
+    u8   unk88[0x8B - 0x88];
     u8   b8B;                   // 0x8B  bit 1: a terrain object drawn without z writes (GoTerrain.c
                                 //       fn_80035554, fn_80033308)
 } UObjMeshInfo;
