@@ -157,10 +157,10 @@ int fn_800C9928(int nIndex) {
 void fn_800C9970(void) {
     int nStart;
     int nSlot;
-    int nPlayer;
     int i;
     int nStyle;
     int nClub;
+    int nPlayer;
     int nFirst;
 
     if (gSession.nGameType != 6) return;
@@ -172,11 +172,11 @@ void fn_800C9970(void) {
     if (lbl_80282230->p0 != NULL) return;
     nFirst = fn_800E292C();
     if (nFirst == 5) return;
-    nStart = lbl_80282230->players[nFirst].nId;
-    if (nStart < 0) {
+    if ((nStart = lbl_80282230->players[nFirst].nId) < 0) {
         nStart = 0;
     }
-    nStart = (nStart + 1) % 2;
+    nStart++;
+    nStart %= 2;
     for (nSlot = nStart; nSlot < 2; nSlot++) {
         nPlayer = fn_800CB568(nSlot);
         if (nPlayer < 0 || lbl_80282230->p0 != NULL) break;
@@ -200,7 +200,8 @@ void fn_800C9970(void) {
     if (lbl_80282230->p0 != NULL) return;
     for (nSlot = 0; nSlot < nStart; nSlot++) {
         nPlayer = fn_800CB568(nSlot);
-        if (nPlayer < 0 || lbl_80282230->p0 != NULL) return;
+        if (nPlayer < 0) return;
+        if (lbl_80282230->p0 != NULL) return;
         for (i = 0; i < 2; i++) {
             for (nStyle = 0; nStyle < 8; nStyle++) {
                 for (nClub = 0; nClub < 6; nClub++) {
