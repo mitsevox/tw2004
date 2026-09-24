@@ -91,7 +91,8 @@ typedef struct Skeleton {
 // A bone of a character's model (CharModel.pBones).
 typedef struct Bone {
     u64  uId;                   // 0x00  fn_800298F4 finds a bone by it
-    u8   unk8[4];
+    s8   nParent;               // 0x08  its parent bone (fn_80114270 walks a chain down by it)
+    u8   unk9[3];
     f32  q0C[4];                // 0x0C  a rotation (quaternion)
     f32  v1C[4];                // 0x1C  a position (the root bone's is the character's,
                                 //       Character_SetPosition)
@@ -133,6 +134,37 @@ typedef struct CharModel {
     f32     (*p768)[4][4];      // 0x768  }
     s32       n76C;             // 0x76C  matrices in p768
 } CharModel;
+
+// DynChain.c (EA's name; our type names): a chain of bones that swings on its own, from a bone
+// down through its children (fn_80114270).
+typedef struct DynChainLink {
+    f32  fLength;               // 0x00  to its parent bone in the rest pose (0.5 unless type 0)
+    f32  v04[4];                // 0x04  its matrix's position when set up
+    u8   unk14[0x24 - 0x14];
+    f32  v24[4];                // 0x24  set by fn_80029BC8
+    u8   unk34[0x44 - 0x34];
+    f32  q44[4];                // 0x44  } its rest pose's rotation, twice
+    f32  q54[4];                // 0x54  }
+    f32  v64[4];                // 0x64  } and position, twice
+    f32  v74[4];                // 0x74  }
+    s32  nBone;                 // 0x84
+    s32  nParent;               // 0x88  its bone's parent
+    f32  f8C;                   // 0x8C
+} DynChainLink;
+LAYOUT_ASSERT(DynChainLink, 0x90);
+
+typedef struct DynChain {
+    s32  nBone;                 // 0x00  the top bone; -1 or 0xFF: none
+    s32  nLinks;                // 0x04
+    DynChainLink* pLinks;       // 0x08
+    s32  nType;                 // 0x0C  0..3: which update runs (fn_8011443C)
+    s32  n10;                   // 0x10
+    s32  n14;                   // 0x14  } counters the updates advance
+    s32  n18;                   // 0x18  }
+    u8   bReset;                // 0x1C  set up the links again on the next update
+    u8   pad1D[3];
+} DynChain;
+LAYOUT_ASSERT(DynChain, 0x20);
 
 // A clip's header (the fields used here). In a file, pD0 marks the end of the header and
 // uAram points at the end of the key data; once a clip's frames are streamed out, uAram is
