@@ -387,22 +387,17 @@ SkinMeshRefs* fn_80113764(void) {
 // the description being drawn (nothing when the part or variant does not exist).
 void fn_80113774(int nPart, int nVariant, int nOption) {
     SkinDesc* pDesc = lbl_80223BB0.pDesc;
-    SkinPartDef* pPart;
-    SkinDesc5C* pOption;
+    int i;
+    int nIndex;
     s32 nCount;
     s32 nFirst;
-    int i;
 
-    if (nPart >= pDesc->nParts) {
+    if (nPart >= pDesc->nParts || nVariant >= pDesc->pParts[nPart].nVariants) {
         return;
     }
-    pPart = &pDesc->pParts[nPart];
-    if (nVariant >= pPart->nVariants) {
-        return;
-    }
-    pOption = &pDesc->p5C[nOption + pDesc->pVariants[nVariant + pPart->nFirst].nFirstOption];
-    nCount = pOption->n0;
-    nFirst = pOption->n4;
+    nIndex = nOption + pDesc->pVariants[nVariant + pDesc->pParts[nPart].nFirst].nFirstOption;
+    nCount = pDesc->p5C[nIndex].n0;
+    nFirst = pDesc->p5C[nIndex].n4;
     for (i = 0; i < nCount; i++) {
         fn_80112DD8(lbl_80223BB0.pDesc->p6C[nFirst + i]);
     }
