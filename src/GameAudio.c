@@ -190,6 +190,13 @@ void fn_800ADA28(u8 nId, u8 nTrack, u8 n, int bCheck);
 u8   fn_800A3FF4(void);
 void fn_800A75B4(void);
 
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x80283F48), before the 0.2f and the int-to-float double fn_800A41A4 uses first; its
+// body is unknown.
+static f32 GameAudio_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
+
 // Starts the sound engine one step after another; stops at the first step that fails and
 // returns 0, else 1.
 u8 fn_800A3E3C(u8 nRate) {
@@ -1059,17 +1066,17 @@ void fn_800A500C(void) {
     lbl_80282040 = ((1 << nMode) & 0x03BC0437) != 0;
 }
 
+// Resets the swing sound state and parks the view's swish emitter (emitter 0) at the club head
+// (bone 0x53), silent, before the swing meter starts.
 void fn_800A562C(u8 nPlayer) {
-    s32* pnView;
     GameAudioView* pView;
     Player* pPlayer;
     u8 nId;
     f32 vPos[3];
 
+    pView = &lbl_801F1790[gPlayers[nPlayer].nView[0]];
     pPlayer = &gPlayers[nPlayer];
-    pnView = pPlayer->nView;
     lbl_80282030 = 0;
-    pView = &lbl_801F1790[*pnView];
     lbl_80282032 = 0;
     nId = pView->n0;
     lbl_80282034 = 0;
@@ -1079,7 +1086,7 @@ void fn_800A562C(u8 nPlayer) {
     fn_800A6BA8(nPlayer);
     fn_800AD734(pView->n2, 0);
     fn_800AD734(pView->n3, 0);
-    if (fn_80016CFC(*pnView)->bFlagOut) {
+    if (fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut) {
         fn_800AD450(lbl_80281420);
         lbl_80281420 = 0xFF;
     }
