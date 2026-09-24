@@ -657,6 +657,7 @@ SkinPart.c:
 
 HoleScore.c:
 	.text       start:0x800CF158 end:0x800D1698
+	.sdata2     start:0x80284478 end:0x802844C8
 
 SwingTips.c:
 	.text       start:0x800D1698 end:0x800D256C
