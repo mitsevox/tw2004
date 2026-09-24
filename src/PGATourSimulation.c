@@ -1580,16 +1580,15 @@ void CalcBallStriking(int nGolfer, f32* pfValue) {
 // Entrants tied on a place share the prizes of the rows they fill: nCount entrants from score row
 // nFirstRow each get nTotal / nCount, added to their golfer's winnings.
 void fn_8011B978(int nPlayer, s32 nTotal, s32 nFirstRow, s32 nCount) {
+    int i;
     s32 nShare;
-    s32 nEntrant;
-    s32 i;
 
     if (nCount == 0) {
         return;
     }
     nShare = (f32)nTotal / (f32)nCount;
     for (i = 0; i < nCount; i++) {
-        nEntrant = lbl_80223C70.aEntrant[nFirstRow + i];
+        int nEntrant = lbl_80223C70.aEntrant[nFirstRow + i];
         GetEntrantMCPtr(nPlayer, nEntrant)->n18 = nShare;
         gpSaveData[nPlayer].tour.aStats[fn_80119118(nPlayer, nEntrant)].n44 += nShare;
         gpSaveData[nPlayer].tour.aStats[fn_80119118(nPlayer, nEntrant)].nSeasonWinnings += nShare;
