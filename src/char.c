@@ -954,7 +954,7 @@ void fn_800192D4(Character* pChar, f32 fAngle) {
         if (gSession.nGameType == 3 && fn_8001EDF4(pChar)) {
             fAngle += PI;
         }
-        fn_80008BB8(pChar->pModel->pBones->q0C, 0.0f, fAngle, 0.0f);
+        fn_80008BB8(0.0f, fAngle, 0.0f, pChar->pModel->pBones->q0C);
     }
 }
 
