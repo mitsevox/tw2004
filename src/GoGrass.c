@@ -42,7 +42,7 @@ void fn_80016B9C();
 void fn_80035138();
 void fn_800352BC();
 void GrassRender_vBuildAndUploadOneTimeData();
-void fn_8011FDC4(void* pObject);
+void fn_8011FDC4(GrassBuffer* pBuffer);
 void fn_8011E3B4(void);
 void fn_80008380(void);
 void fn_8011E468(void);
@@ -50,7 +50,8 @@ void fn_8011E4D8(GrassChunk* pChunk);
 void fn_8011EB80(void);
 void fn_8011E584(UStreamObject* pObject);
 int  fn_8011E6B0(f32** ppA, f32** ppB);
-void fn_8011FD74(void* pObject);
+void fn_8011FD74(GrassBuffer* pBuffer);
+GrassBuffer* fn_8011FDEC(s32 nSize);
 void fn_8011FF58(void);
 void fn_80120194(void);
 void fn_80008248(void* p);
@@ -197,28 +198,53 @@ void fn_8011F374(void) {
     fn_80012EF8();
 }
 
-// Puts pObject in the first free one of the 16 apDC slots.
-void fn_8011FD74(void* pObject) {
+// Puts pBuffer in the first free one of the 16 apDC slots.
+void fn_8011FD74(GrassBuffer* pBuffer) {
     int i;
     for (i = 0; i < 16; i++) {
         if (lbl_80281900->apDC[i] == NULL) {
-            lbl_80281900->apDC[i] = pObject;
+            lbl_80281900->apDC[i] = pBuffer;
             lbl_80281900->nE8 = lbl_80281900->nE8 + 1;
             return;
         }
     }
 }
 
-// Pushes pObject on the apD8 stack.
-void fn_8011FDC4(void* pObject) {
-    lbl_80281900->apD8[lbl_80281900->nE4] = pObject;
+// Pushes pBuffer on the apD8 stack.
+void fn_8011FDC4(GrassBuffer* pBuffer) {
+    lbl_80281900->apD8[lbl_80281900->nE4] = pBuffer;
     lbl_80281900->nE4 = lbl_80281900->nE4 + 1;
 }
 
-// Empties the apD8 stack: each object gets fn_80008248 on its +0x14 and goes to a free apDC slot.
+// Takes the smallest free buffer of at least nSize out of apDC (NULL if there is none).
+GrassBuffer* fn_8011FDEC(s32 nSize) {
+    int nBest = -1;
+    GrassBuffer* pBest = NULL;
+    GrassBuffer* pBuffer;
+    int i;
+
+    if (lbl_80281900->nE8 == 0) {
+        return NULL;
+    }
+    for (i = 0; i < 16; i++) {
+        pBuffer = lbl_80281900->apDC[i];
+        if (pBuffer != NULL && pBuffer->n44 >= nSize && (pBest == NULL || pBuffer->n44 < pBest->n44)) {
+            nBest = i;
+            pBest = pBuffer;
+        }
+    }
+    if (pBest != NULL) {
+        lbl_80281900->nE8 = lbl_80281900->nE8 - 1;
+        lbl_80281900->apDC[nBest] = NULL;
+        return pBest;
+    }
+    return NULL;
+}
+
+// Empties the apD8 stack: each buffer gets fn_80008248 on its a14 and goes to a free apDC slot.
 void fn_8011FF58(void) {
     while (lbl_80281900->nE4 != 0) {
-        fn_80008248((u8*)lbl_80281900->apD8[lbl_80281900->nE4 - 1] + 0x14);
+        fn_80008248(lbl_80281900->apD8[lbl_80281900->nE4 - 1]->a14);
         fn_8011FD74(lbl_80281900->apD8[lbl_80281900->nE4 - 1]);
         lbl_80281900->nE4 = lbl_80281900->nE4 - 1;
     }

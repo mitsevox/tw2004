@@ -79,6 +79,13 @@ typedef struct GrassChunkData {
     f32 f4;                     // 0x4
 } GrassChunkData;
 
+// One of GoGrass.c's buffers, kept in GrassManager.apD8 / apDC.
+typedef struct GrassBuffer {
+    u8  unk0[0x14];
+    u8  a14[0x44 - 0x14];       // 0x14  handed to fn_80008248 when the buffer is put back
+    s32 n44;                    // 0x44  its size: fn_8011FDEC picks the smallest big enough
+} GrassBuffer;
+
 // GoGrass.c's state (*lbl_80281900). Only the fields the decompiled code uses; its size is not known.
 typedef struct GrassManager {
     u8           unk0[0x1C];
@@ -90,13 +97,14 @@ typedef struct GrassManager {
     void*        p78;           // 0x78
     void*        p7C;           // 0x7C
     u8           unk80[0xD8 - 0x80];
-    void**       apD8;          // 0xD8  a stack of objects (fn_8011FDC4 pushes, fn_8011FF58 empties)
-    void**       apDC;          // 0xDC  16 slots (fn_8011FD74 fills the first free one)
+    GrassBuffer** apD8;         // 0xD8  a stack of buffers (fn_8011FDC4 pushes, fn_8011FF58 empties)
+    GrassBuffer** apDC;         // 0xDC  16 free buffers (fn_8011FD74 puts one back, fn_8011FDEC
+                                //       takes the best fit)
     s32          nE0;           // 0xE0  the records at pEC
     u32          nE4;           // 0xE4  apD8's depth
-    s32          nE8;           // 0xE8  apDC's used slots
+    u32          nE8;           // 0xE8  apDC's used slots
     GrassRecord* pEC;           // 0xEC
-    void**       apF0[2];       // 0xF0  two object lists; n100 picks the one in use
+    GrassBuffer** apF0[2];      // 0xF0  two buffer lists; n100 picks the one in use
     s32          anF8[2];       // 0xF8  their lengths
     s32          n100;          // 0x100
     u8           unk104[0x370 - 0x104];
