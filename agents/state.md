@@ -1,8 +1,12 @@
 # State (keep this short: current facts only; history goes to docs/journal.md)
 
-Updated 2026-09-24 ~16:00 CDT. RUNNING (cloud, checkpoint 17:00 CDT), quickest wins first:
-- cam-01: GoGolfCam, GoBreakLine, UStream, Skin, gbacable
-- money-01: Earnings, SunFlr_Gc, uiLoadFile, Ball, DepthField, PsMgr
+Updated 2026-09-24 ~16:30 CDT. RUNNING (cloud), quickest wins first:
+- cam-01 (to 17:00 CDT): GoGolfCam, GoBreakLine, UStream, Skin, gbacable
+- swing-01 (to 17:30, no permuter): gocamscripts, Swing, ska_shared, MC
+- golfer-01 (to 17:30, no permuter): Golfer, hwsRender_Gc, GameModeBestBall, CamSpline, LLPictInt
+- money-01 round 2 (to 17:30, no permuter): GoTerrainCollision, GoShaderObject_Glows_Gc, uiArc,
+  LLDynTex, goballfx. Round 1 (merged): uiLoadFile linked; Earnings, SunFlr_Gc, Ball, DepthField,
+  PsMgr not exact (agents/notes/money-01-notes_cloud1.txt).
 
 Held by the owner's PC until ~16:45 CDT (permuters + a closer lane on agent/map-09; hands wins to the
 cloud to apply, never pushes): GoStaticCam, GoShaderObjectCommon_ShaderObjectsData_Gc, UObject,
