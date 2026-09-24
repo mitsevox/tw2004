@@ -825,7 +825,7 @@ void  fn_8007326C(u8* pAnim);
 void  Anim_SetTime(u8* pAnim, f32 fTime);           // 0x8007327C
 u8    fn_800734A0(SKABlendNode* pNode);
 void  fn_80095744(Character* pChar, int nAnim);     // play an animation
-int   fn_80095780(Character* pChar);    // the animation playing
+int   fn_80095780(Character* pChar);    // n20 (-1 for NULL); fn_80095798 reads nAnim
 int   fn_80095798(Character* pChar);
 void  fn_800957B0(Character* pChar, int a);
 void  fn_800957D8(Character* pChar);

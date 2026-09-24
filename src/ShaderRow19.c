@@ -1,7 +1,7 @@
 // ShaderRow19.c (our name): the four hooks of row 19 of the shader-object table lbl_80188E88
 // (engine.h's ModuleHooks, +0x34..+0x40): make and free the object's dynamic rendering buffer
 // (0x8007018C..0x80070764), fill it and draw it. The same code as row 0's hooks (ShaderRow0.c)
-// except that the fill adds its draws as primitive kind 3 (row 0: 0).
+// except that a fill without a draw list makes its one draw primitive kind 3 (row 0: 0).
 // Which shader object row 19 is, is not known yet.
 
 #include "game_types.h"
