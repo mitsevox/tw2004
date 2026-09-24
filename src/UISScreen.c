@@ -346,6 +346,7 @@ void fn_8016B4D4(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 nMove) {
     s32 nFrom;
     s32 nTo;
     u32 i;
+    u32 j;
     UISScreen tmp;
 
     nScreens = pStudio->nScreens;
@@ -362,7 +363,7 @@ void fn_8016B4D4(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 nMove) {
         while (nCount-- != 0) {
             nFrom = nTo;
             nTo += nStep;
-            if (nTo >= nScreens || nTo < 0) return;
+            if (nTo >= nScreens || nTo < 0) break;
             if (pStudio->nCurScreen == nTo) {
                 pStudio->nCurScreen = nFrom;
             } else if (pStudio->nCurScreen == nFrom) {
@@ -375,11 +376,11 @@ void fn_8016B4D4(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 nMove) {
                     pStudio->pRateFns[i].pScreen = &pStudio->pScreens[nTo];
                 }
             }
-            for (i = 0; i < pStudio->n5C; i++) {
-                if (pStudio->p60[i].pScreen == &pStudio->pScreens[nTo]) {
-                    pStudio->p60[i].pScreen = &pStudio->pScreens[nFrom];
-                } else if (pStudio->p60[i].pScreen == &pStudio->pScreens[nFrom]) {
-                    pStudio->p60[i].pScreen = &pStudio->pScreens[nTo];
+            for (j = 0; j < pStudio->n5C; j++) {
+                if (pStudio->p60[j].pScreen == &pStudio->pScreens[nTo]) {
+                    pStudio->p60[j].pScreen = &pStudio->pScreens[nFrom];
+                } else if (pStudio->p60[j].pScreen == &pStudio->pScreens[nFrom]) {
+                    pStudio->p60[j].pScreen = &pStudio->pScreens[nTo];
                 }
             }
             memcpy(&tmp, &pStudio->pScreens[nTo], sizeof(UISScreen));
