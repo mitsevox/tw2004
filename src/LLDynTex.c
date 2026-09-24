@@ -27,6 +27,7 @@ DynTexJob* fn_8010B960(void);
 u8   fn_8010BF3C(void);
 u8   fn_8010BFE0(void);
 void fn_80007254(void);                 // LLDisp_Gc.c
+int  fn_800106F0(TexBank* pBank);       // LLTexGrp.c
 
 // Set up: the state and its nSize-byte block (gomainloop.c: 0x18000, later 0x6000).
 void fn_8010A448(int nSize) {
@@ -48,6 +49,44 @@ void fn_8010A4E8(void) {
     }
     fn_80009E70(lbl_80282488);
 }
+
+// ---- end of sweep code ----
+
+// Make a dynamic texture for nC textures with an nSize-byte pixel buffer: one block holds the
+// DynTex, its header and the per-texture tables; the header is registered as a texture bank.
+DynTex* fn_8010A520(int nC, int nSize, int n2, int n3, int n4) {
+    s32 nBytes;
+    DynTex* pTex;
+    DynTexHeader* pHeader;
+
+    // fake match: the terms' order and the casts only steer CW's regrouping (still 90%)
+    nBytes = nC * (s32)sizeof(DynTexObj) + nC * (s32)sizeof(DynTexEntry) +
+             nC * (s32)sizeof(DynTexPalette) + nC * (s32)sizeof(DynTex40) +
+             nC * (s32)sizeof(DynTex18) + (s32)sizeof(DynTex);
+    pTex = fn_80009B34(nBytes, 2, 16, "LLDynTex.c", 151);
+    memset(pTex, 0, nBytes);
+    pTex->nC = nC;
+    pTex->p18 = fn_80009B34(nSize, 2, 32, "LLDynTex.c", 161);
+    pTex->n10 = nSize;
+    pHeader = &pTex->header;
+    pTex->p4 = pHeader;
+    pTex->p0 = (DynTexEntry*)(pHeader + 1);
+    pTex->header.p8 = (DynTexObj*)(pTex->p0 + nC);
+    pTex->header.pC = (DynTexPalette*)(pTex->header.p8 + nC);
+    pTex->header.p10 = (DynTex40*)(pTex->header.pC + nC);
+    pTex->header.p14 = (DynTex18*)(pTex->header.p10 + nC);
+    pTex->header.p18 = pTex->p18;
+    pTex->header.p20 = pTex->p18;
+    pTex->header.b2C = 0;
+    // port: the header has TexBank's layout (see lldyntex.h)
+    pTex->n1C = fn_800106F0((TexBank*)pTex->p4);
+    pTex->p4->n7 = n4;
+    pTex->p4->n28 = n2;
+    pTex->p4->n0 = n3;
+    return pTex;
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 // Free a dynamic texture.
 void fn_8010A668(DynTex* pTex) {
@@ -89,6 +128,30 @@ void fn_8010A6A8(DynTex* pSrc, DynTex* pDst) {
 void* fn_8010A780(DynTex* pTex) {
     return pTex->p4;
 }
+
+// ---- end of sweep code ----
+
+// Put an RGB colour through a 3x3 colour matrix, clamped to 0..1. Mode 0 combines each input
+// channel's part like light (one minus the product of what each lets through), mode 1 adds them.
+void fn_8010A788(f32* pIn, f32* pOut, f32 (*pMtx)[3], s32 nMode) {
+    if (nMode == 0) {
+        pOut[0] = 1.0f - (1.0f - pIn[0] * pMtx[0][0]) * (1.0f - pIn[1] * pMtx[1][0]) *
+                             (1.0f - pIn[2] * pMtx[2][0]);
+        pOut[1] = 1.0f - (1.0f - pIn[0] * pMtx[0][1]) * (1.0f - pIn[1] * pMtx[1][1]) *
+                             (1.0f - pIn[2] * pMtx[2][1]);
+        pOut[2] = 1.0f - (1.0f - pIn[0] * pMtx[0][2]) * (1.0f - pIn[1] * pMtx[1][2]) *
+                             (1.0f - pIn[2] * pMtx[2][2]);
+    } else if (nMode == 1) {
+        pOut[0] = pIn[0] * pMtx[0][0] + pIn[1] * pMtx[1][0] + pIn[2] * pMtx[2][0];
+        pOut[1] = pIn[0] * pMtx[0][1] + pIn[1] * pMtx[1][1] + pIn[2] * pMtx[2][1];
+        pOut[2] = pIn[0] * pMtx[0][2] + pIn[1] * pMtx[1][2] + pIn[2] * pMtx[2][2];
+    }
+    pOut[0] = (pOut[0] < 0.0f) ? 0.0f : ((pOut[0] > 1.0f) ? 1.0f : pOut[0]);
+    pOut[1] = (pOut[1] < 0.0f) ? 0.0f : ((pOut[1] > 1.0f) ? 1.0f : pOut[1]);
+    pOut[2] = (pOut[2] < 0.0f) ? 0.0f : ((pOut[2] > 1.0f) ? 1.0f : pOut[2]);
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 s32 fn_8010AD10(DynTex* pTex) {
     return pTex->n8;

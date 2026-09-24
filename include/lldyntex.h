@@ -107,11 +107,14 @@ typedef struct DynTex18 {
 } DynTex18;
 
 // What DynTex.p4 points at; only what the code reads so far.
+// It has TexBank's layout (engine.h) and fn_8010A520 hands it to LLTexGrp.c's fn_800106F0 as one;
+// the two are not merged yet.
 typedef struct DynTexHeader {
-    u8    unk0[2];
+    s16   n0;                   // 0x00  fn_8010A520's n3
     s16   n2;                   // 0x02  } counts fn_8010ADA4 sets and fn_8010B098 clears
     s16   n4;                   // 0x04  }
-    u8    unk6[2];
+    u8    unk6;
+    s8    n7;                   // 0x07  fn_8010A520's n4
     DynTexObj* p8;              // 0x08
     DynTexPalette* pC;          // 0x0C
     struct DynTex40* p10;       // 0x10  } per texture, not read yet
@@ -119,7 +122,12 @@ typedef struct DynTexHeader {
     u8*   p18;                  // 0x18  the textures' pixels (at their blocks' nOffset)
     u8    unk1C[4];
     u8*   p20;                  // 0x20  and palettes (at their DynTexPalette.nOffset)
+    u8    unk24[4];
+    s32   n28;                  // 0x28  fn_8010A520's n2
+    u8    b2C;                  // 0x2C  cleared by fn_8010A520
+    u8    unk2D[3];
 } DynTexHeader;
+LAYOUT_ASSERT(DynTexHeader, 0x30);
 
 // A dynamic texture (made by fn_8010A520, freed by fn_8010A668); only what the code reads so far.
 typedef struct DynTex {
@@ -131,7 +139,11 @@ typedef struct DynTex {
     s32   n14;                  // 0x14
     u8*   p18;                  // 0x18  a buffer of n10 bytes: the textures' pixels and palettes
     s16   n1C;                  // 0x1C  from fn_800106F0; fn_8001052C takes it back
+    DynTexHeader header;        // 0x20  p4 points here
+    // Then nC of each: DynTexEntry (p0), DynTexObj, DynTexPalette, DynTex40 and DynTex18 (the
+    // header's p8, pC, p10 and p14).
 } DynTex;
+LAYOUT_ASSERT(DynTex, 0x50);
 
 DynTex* fn_8010A520(int nC, int nSize, int n2, int n3, int n4);
 s32   fn_8010AD10(DynTex* pTex);        // how many textures it has
