@@ -34,10 +34,21 @@ typedef struct Ter_PatchReference {
 LAYOUT_ASSERT(Ter_PatchReference, 0x34);
 
 // An object to sort by distance (0x30 bytes; TW06: Ter_ObjectReference, 0x24, the same up to 0x14).
+// From 0x1C on the fields carry TW06's names by their use (fn_80031AB4); TW06 keeps them elsewhere.
 typedef struct Ter_ObjectReference {
-    u8   unk0[0x10];
+    struct UObjMesh* apObject[4];   // 0x00  its model at each level of detail (fn_80031E58). TW06:
+                                //       pObject
     f32  fDistanceSquared;      // 0x10  the sort key (fn_8003185C, smallest first). TW06: the same
-    u8   unk14[0x30 - 0x14];
+    f32  f14;                   // 0x14  } fn_80031E58 draws it opaque when f14 is beyond
+    f32  f18;                   // 0x18  }   fXZDistanceToClosestBallSquared and f18 is above 0
+    s8   nLODs;                 // 0x1C  how many levels of detail its model has. TW06: nLODs
+    s8   iOpaqueLOD;            // 0x1D  the level drawn opaque. TW06: iOpaqueLOD
+    s8   iTranslucentLOD;       // 0x1E  the level faded in over it. TW06: iTranslucentLOD
+    u8   unk1F;
+    f32  fAlpha;                // 0x20  how far the fade has gone, 0..1. TW06: fAlpha
+    s32  iGlobalObjectIndex;    // 0x24  its row of pObjectStateList. TW06: iGlobalObjectIndex
+    s32  eClipMethod;           // 0x28  TW06: eClipMethod
+    u8   unk2C[0x30 - 0x2C];
 } Ter_ObjectReference;
 LAYOUT_ASSERT(Ter_ObjectReference, 0x30);
 
@@ -68,7 +79,10 @@ typedef struct Ter_ObjectState {
     s32  n18;                   // 0x18
     s32  n1C;                   // 0x1C
     s32  a20[4];                // 0x20  four flag words read from the object's model (fn_800354D0, 0..3)
-    u8   unk30[0x40 - 0x30];
+    struct {
+        f32  f0;                // 0x0   fn_80031E58 sets 1 and n4 3 when it draws the object opaque
+        s32  n4;                // 0x4
+    } aView[2];                 // 0x30  one per view (Ter_TerrainRendererMgr.iCurrentViewContext)
 } Ter_ObjectState;
 LAYOUT_ASSERT(Ter_ObjectState, 0x40);
 

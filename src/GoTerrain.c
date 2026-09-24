@@ -30,7 +30,12 @@ void  fn_80031154(Ter_PatchReference* pPatch, s32 nFirstObject);
 void  fn_8003185C(void);
 void  fn_800318D8(void);
 void  fn_80031AB4(void);
+u8    fn_80031E40(void);
 void  fn_80031E58(void);
+u8    fn_80032330(UObjMesh* pModel);
+void  fn_8003241C(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, UObjMesh* pModel, s32 iObject,
+                  s32 eClipMethod, u8 bUseFog, u8 bSetsPrimField, f32 fAlpha, f32 fMipmapBias,
+                  f32 fDistanceSquared);
 void  fn_80032518(int nRenderPass);
 void  fn_80032770(void);
 void  fn_80032954(void);
@@ -381,9 +386,216 @@ void fn_80031A08(s32* pA, s32* pB, s32 a, s32 b) {
     *pB = lbl_802810DC + (b + lbl_802810E0 * (s32)lbl_802810D8 - n) / (int)lbl_802810D8;
 }
 
+// Picks each sorted object's level of detail by its distance: the first LOD plane whose end it is
+// inside. Once the 'tLOD' chunk is loaded, objects whose flags (bits 0x4, 0x10, 0x20 of the model's
+// word 3) ask for it always get level 0, and the others never get level 0 while the camera moves.
+// Unless gSession.b11 is set, an object between two planes fades from one level into the next.
+void fn_80031AB4(void) {
+    Ter_LODPlane* pPlanes = lbl_801D3CB0.LODPlanes;
+    s32 i;
+    s32 nLOD;
+    s32 nTranslucent;
+    s32 nLast;
+    s32 iObject;
+    s32 uFlags;
+    f32 fDistanceSquared;
+    f32 fAlpha;
+    f32 fT;
+
+    if (gSession.b11 != 0) {
+        fAlpha = 0.0f;
+        for (i = lbl_801D3CB0.iTotalSortObjects - 1; i >= 0; i--) {
+            iObject = lbl_801D3CB0.pObjectSortList[i].iGlobalObjectIndex;
+            fDistanceSquared = lbl_801D3CB0.pObjectSortList[i].fDistanceSquared;
+            nLast = lbl_801D3CB0.pObjectSortList[i].nLODs - 1;
+            uFlags = lbl_801D3CB0.pObjectStateList[iObject].a20[3];
+            if (((uFlags & 4) || (uFlags & 0x10) || (uFlags & 0x20)) && fn_80031E40()) {
+                nLOD = 0;
+            } else {
+                for (nLOD = 0; nLOD < nLast; nLOD++) {
+                    if (fDistanceSquared <= pPlanes[nLOD].fEnd * pPlanes[nLOD].fEnd) break;
+                }
+                if (!fn_800172C4(fn_80017028(lbl_801D3CB0.iCurrentViewContext))) {
+                    uFlags = lbl_801D3CB0.pObjectStateList[iObject].a20[3];
+                    if (!(uFlags & 4) && !(uFlags & 0x10) && !(uFlags & 0x20) && fn_80031E40() && nLOD == 0) {
+                        nLOD = 1;
+                    }
+                }
+            }
+            lbl_801D3CB0.pObjectSortList[i].fAlpha = fAlpha;
+            lbl_801D3CB0.pObjectSortList[i].iOpaqueLOD = nLOD;
+            lbl_801D3CB0.pObjectSortList[i].iTranslucentLOD = nLOD;
+        }
+        return;
+    }
+    for (i = lbl_801D3CB0.iTotalSortObjects - 1; i >= 0; i--) {
+        fDistanceSquared = lbl_801D3CB0.pObjectSortList[i].fDistanceSquared;
+        iObject = lbl_801D3CB0.pObjectSortList[i].iGlobalObjectIndex;
+        nLast = lbl_801D3CB0.pObjectSortList[i].nLODs - 1;
+        for (nLOD = 0; nLOD < nLast; nLOD++) {
+            if (fDistanceSquared <= pPlanes[nLOD].fEnd * pPlanes[nLOD].fEnd) break;
+        }
+        if (!fn_800172C4(fn_80017028(lbl_801D3CB0.iCurrentViewContext))) {
+            uFlags = lbl_801D3CB0.pObjectStateList[iObject].a20[3];
+            if (!(uFlags & 4) && !(uFlags & 0x10) && !(uFlags & 0x20) && fn_80031E40() && nLOD == 0) {
+                nLOD = 1;
+            }
+        }
+        if (nLOD < nLast
+            && fDistanceSquared > pPlanes[nLOD + 1].fBegin * pPlanes[nLOD + 1].fBegin) {
+            // between this plane's end and the next one's start: fade over to the next level
+            fT = ((f32)fn_80009680(fDistanceSquared) - pPlanes[nLOD + 1].fBegin)
+               / (pPlanes[nLOD].fEnd - pPlanes[nLOD + 1].fBegin);
+            if (fT < 0.5f) {
+                nTranslucent = nLOD + 1;
+                fAlpha = 2.0f * fT;
+            } else {
+                nTranslucent = nLOD;
+                nLOD++;
+                fAlpha = 2.0f * (1.0f - fT);
+            }
+            if (fAlpha < 0.0f) {
+                fAlpha = 0.0f;
+            }
+            if (fAlpha > 1.0f) {
+                fAlpha = 1.0f;
+            }
+            uFlags = lbl_801D3CB0.pObjectStateList[iObject].a20[3];
+            if (((uFlags & 4) || (uFlags & 0x10) || (uFlags & 0x20)) && fn_80031E40()) {
+                fAlpha = 0.0f;
+                nTranslucent = 0;
+                nLOD = 0;
+            }
+        } else {
+            fAlpha = 0.0f;
+            uFlags = lbl_801D3CB0.pObjectStateList[iObject].a20[3];
+            if (((uFlags & 4) || (uFlags & 0x10) || (uFlags & 0x20)) && fn_80031E40()) {
+                nLOD = 0;
+            }
+            nTranslucent = nLOD;
+        }
+        lbl_801D3CB0.pObjectSortList[i].iOpaqueLOD = nLOD;
+        lbl_801D3CB0.pObjectSortList[i].iTranslucentLOD = nTranslucent;
+        lbl_801D3CB0.pObjectSortList[i].fAlpha = fAlpha;
+    }
+}
+
 // Whether the 'tLOD' chunk has been loaded.
 u8 fn_80031E40(void) {
     return lbl_802810E4 != -1;
+}
+
+// Sorts the objects (farthest first) into the draw lists: post-draw objects (bit 0x80 of the
+// model's word 2) straight to pPostDrawItemsList; the others opaque when far or when they must
+// stay solid, faded in over the near range (pNearbyObjectList), and their fading level into
+// pTranslucentObjectList. Crowd objects (bit 0x20 of word 0, only while the camera is still) use
+// the crowd's fade distances.
+void fn_80031E58(void) {
+    s32 i;
+    UObjMesh* pModel;
+    s32 uFlags0;
+    s32 uFlags2;
+    s32 uCrowd;
+    f32 fNear;
+    f32 fFar;
+    f32 fFarSquared;
+    f32 fRange;
+    f32 fDistance;
+    f32 fT;
+    Ter_ObjectReference* pRef;
+
+    for (i = lbl_801D3CB0.iTotalSortObjects - 1; i >= 0; i--) {
+        pRef = &lbl_801D3CB0.pObjectSortList[i];
+        pModel = pRef->apObject[pRef->iOpaqueLOD];
+        uFlags0 = fn_800354D0(pModel, 0);
+        uFlags2 = fn_800354D0(pModel, 2);
+        if ((fn_800354D0(pModel, 3) & 0x10) || (fn_800354D0(pModel, 3) & 0x20)) {
+            uFlags0 |= 0x20;
+            uFlags2 &= ~0x80;
+            uFlags0 &= ~0x40;
+        }
+        if (!fn_800172C4(fn_80017028(lbl_801D3CB0.iCurrentViewContext))) {
+            uFlags0 &= ~0x20;
+        }
+        uCrowd = uFlags0 & 0x20;
+        if (uCrowd == 0 && !(uFlags0 & 0x40)) {
+            fNear = 0.1f * lbl_801D3CB0.fFOVScale;
+            fFar = 0.2f * lbl_801D3CB0.fFOVScale;
+            fFarSquared = fFar * fFar;
+            fRange = fFar - fNear;
+        } else if (uCrowd != 0 && !(uFlags0 & 0x40)) {
+            fNear = lbl_801D3CB0.fCrowdFadeDistanceMin * lbl_801D3CB0.fFOVScale;
+            fFar = lbl_801D3CB0.fCrowdFadeDistanceMax * lbl_801D3CB0.fFOVScale;
+            if (fNear < 0.1f) {
+                fNear = 0.1f;
+            }
+            fFarSquared = fFar * fFar;
+            fRange = fFar - fNear;
+        } else {
+            fNear = -100.0f;
+            fFar = -101.0f;
+            fFarSquared = 0.0f;
+            fRange = 1.0f;
+        }
+        // every draw re-reads the list pointer, as the original does
+        if (uFlags2 & 0x80) {
+            pRef = &lbl_801D3CB0.pObjectSortList[i];
+            fn_8003241C(&lbl_801D3CB0.pPostDrawItemsList[lbl_801D3CB0.iPostDrawItems],
+                        &lbl_801D3CB0.iPostDrawItems, 400, pRef->apObject[pRef->iOpaqueLOD],
+                        pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0, 1.0f,
+                        lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iOpaqueLOD], pRef->fDistanceSquared);
+        } else if (lbl_801D3CB0.pObjectSortList[i].fDistanceSquared < fFarSquared) {
+            fDistance = fn_80009680(lbl_801D3CB0.pObjectSortList[i].fDistanceSquared);
+            pRef = &lbl_801D3CB0.pObjectSortList[i];
+            if (fDistance > fFar || (uFlags0 & 0x40)
+                || (uCrowd == 0
+                    && ((pRef->f14 > lbl_801D3CB0.fXZDistanceToClosestBallSquared && pRef->f18 > 0.0f)
+                        || fn_80032330(pRef->apObject[0])))) {
+                lbl_801D3CB0.pObjectStateList[pRef->iGlobalObjectIndex]
+                    .aView[lbl_801D3CB0.iCurrentViewContext].n4 = 3;
+                lbl_801D3CB0.pObjectStateList[pRef->iGlobalObjectIndex]
+                    .aView[lbl_801D3CB0.iCurrentViewContext].f0 = 1.0f;
+                pRef = &lbl_801D3CB0.pObjectSortList[i];
+                fn_8003241C(&lbl_801D3CB0.pOpaqueObjectList[lbl_801D3CB0.iOpaqueObjects],
+                            &lbl_801D3CB0.iOpaqueObjects, 650, pRef->apObject[pRef->iOpaqueLOD],
+                            pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0,
+                            1.0f, lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iOpaqueLOD],
+                            pRef->fDistanceSquared);
+            } else {
+                fT = (fDistance - fNear) / fRange;
+                if (fT < 0.0f) {
+                    fT = 0.0f;
+                }
+                if (fT != 0.0f) {
+                    pRef = &lbl_801D3CB0.pObjectSortList[i];
+                    fn_8003241C(&lbl_801D3CB0.pNearbyObjectList[lbl_801D3CB0.iNearbyObjects],
+                                &lbl_801D3CB0.iNearbyObjects, 70, pRef->apObject[pRef->iOpaqueLOD],
+                                pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f,
+                                0, fT, lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iOpaqueLOD],
+                                pRef->fDistanceSquared);
+                }
+            }
+        } else {
+            pRef = &lbl_801D3CB0.pObjectSortList[i];
+            lbl_801D3CB0.pObjectStateList[pRef->iGlobalObjectIndex]
+                .aView[lbl_801D3CB0.iCurrentViewContext].n4 = 3;
+            pRef = &lbl_801D3CB0.pObjectSortList[i];
+            fn_8003241C(&lbl_801D3CB0.pOpaqueObjectList[lbl_801D3CB0.iOpaqueObjects],
+                        &lbl_801D3CB0.iOpaqueObjects, 650, pRef->apObject[pRef->iOpaqueLOD],
+                        pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0, 1.0f,
+                        lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iOpaqueLOD], pRef->fDistanceSquared);
+        }
+        if (gSession.b11 == 0) {
+            pRef = &lbl_801D3CB0.pObjectSortList[i];
+            if (pRef->fAlpha != 0.0f && !(uFlags0 & 0x40)) {
+                fn_8003241C(&lbl_801D3CB0.pTranslucentObjectList[lbl_801D3CB0.iTranslucentObjects],
+                            &lbl_801D3CB0.iTranslucentObjects, 200, pRef->apObject[pRef->iTranslucentLOD],
+                            pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0,
+                            pRef->fAlpha, lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iTranslucentLOD],
+                            pRef->fDistanceSquared);
+            }
+        }
+    }
 }
 
 // Whether a ball has settled inside pModel's bounding sphere: a ball that has left where its shot
