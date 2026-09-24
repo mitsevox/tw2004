@@ -68,7 +68,7 @@ void fn_80090B80(FEVertex* pSrc, FEVertex* pDst, u8 bTint) {
     }
 }
 
-// Draw pQuad: with a UI file entry, textured by it (flag 1: a texture, flag 2: a movie's current
+// Draw pQuad: with a UI file entry, textured by it (flag 1: a texture, flag 2: its decoded
 // picture); its colours tinted, recoloured from the colour table (n4) and scaled by the transform
 // level's colour; its corners transformed and projected; nothing when every corner is transparent.
 void fn_80090D28(FEQuad* pQuad) {
@@ -79,7 +79,7 @@ void fn_80090D28(FEQuad* pQuad) {
     f32 aColour[4][4];
     f32 vScale[4];
     f32 vAdd[4];
-    f32 vPictUV[4];     // fn_8009222C fills two; the original's buffer is 16 bytes
+    f32 vPictUV[4];     // fn_8009222C fills all four, two are used; the original's buffer is 16 bytes
     f32 fDist;
     f32 fZ;
     f32 fProj;
@@ -166,7 +166,7 @@ void fn_80090D28(FEQuad* pQuad) {
     fn_800912F4(&aVtx[2], &aPos[2].x, aUV[2], aColour[2], vScale, vAdd);
     fn_800912F4(&aVtx[3], &aPos[3].x, aUV[3], aColour[3], vScale, vAdd);
     if (pQuad->n2 != -1 && (pEntry->u0 & 2)) {
-        // a movie's picture fills only part of its texture
+        // a picture fills only part of its texture
         fn_8009222C(vPictUV, pPict);
         aUV[0][0] *= vPictUV[0];
         aUV[0][1] *= vPictUV[1];
@@ -216,7 +216,8 @@ void fn_800912F4(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale,
     fn_80092250(pColour, pAdd, pColour);
 }
 
-// Make the picture of UI file entry (nTable, nEntry) when its flags have 2 set and 1 clear.
+// When UI file entry (nTable, nEntry) has flag 2 set and 1 clear, make the picture of entry
+// nEntry of table lbl_801D87C0.n3C (fn_80090940).
 void fn_800913EC(s16 nTable, s16 nEntry) {
     u32 uFlags;
 
@@ -231,7 +232,8 @@ void fn_80091454(void) {
     lbl_80281370 = 0;
 }
 
-// For UI file entry (nTable, nEntry) with flags 2 set and 1 clear: fn_80008380, then flag 0x10.
+// For UI file entry (nTable, nEntry) with flags 2 set and 1 clear: fn_80008380, then flag 0x10
+// on entry nEntry of table lbl_801D87C0.n3C (fn_800909B4).
 void fn_80091460(s16 nTable, s16 nEntry) {
     u32 uFlags;
 
@@ -360,7 +362,7 @@ void fn_80091778(void) {
     lbl_80281F24 = fn_800922A0(lbl_80281F20);
 }
 
-// Decodes the picture in the 'load' object, once.
+// Decodes the picture in the 'load' object into lbl_801D8858.p30, unless one is there.
 void fn_800917C8(void) {
     if (lbl_801D8858.p30 == NULL) {
         lbl_801D8858.p30 = fn_8002FD00(lbl_80281C04, lbl_801A25F0.uSize);
@@ -382,8 +384,9 @@ void fn_80091870(void) {
     fn_80010544(lbl_80281378);
 }
 
-// Set lbl_801D8858 up once, unless the session has flag 4: the clock, the number of players in
-// game type 4 (else 0) and values from it, then the 'load' object's picture (fn_800917C8).
+// Set lbl_801D8858 up, unless the session has flag 4 or it is set up already (b18): the clock,
+// the number of players in game type 4 (else 0) and values from it, then the 'load' object's
+// picture (fn_800917C8).
 void fn_800918A4(void) {
     if (!(gSession.uFlags & 4) && !lbl_801D8858.b18) {
         lbl_801D8858.b18 = 1;
@@ -533,8 +536,8 @@ void fn_80091DB8(int nFrames) {
     fn_8002FEAC();
 }
 
-// Show the picture of the first movie entry (fading in over 30 frames), free it, then wait 600
-// frames.
+// Show the picture of entry 0 of table lbl_801D87C0.n3C (fading in over 30 frames) and free it.
+// The 600 calls to fn_80007254 after it do nothing (it is empty).
 void fn_80091E1C(void) {
     int i = 0;
     LLPict* pPict;
@@ -561,10 +564,10 @@ void fn_80091E1C(void) {
 void fn_80091EE4(void) {
 }
 
-// The movies after a round in game type 1 (uiProcessInterface.c fn_80090400): "eas", then, unless
-// the session has flag 0x4000, one of the two cameo movies "tigcam01"/"tigcam02" at random
-// (skippable with any button); then the first 'LEGL' picture startUp.c kept, shown for 180
-// frames and freed.
+// The start-up movies, when the start-up front end (game type 1, nC 0) shuts down
+// (uiProcessInterface.c fn_80090400): "eas", then, unless the session has flag 0x4000, one of the
+// two cameo movies "tigcam01"/"tigcam02" at random (skippable with any button); then the first
+// 'LEGL' picture startUp.c kept, shown for 180 frames (fading in over 30) and freed.
 void fn_80091EE8(void) {
     char szPath[0x40];          // the size is unknown: the frame leaves 0x40 bytes for it
     char szName[0x40];          // the size is unknown: the frame leaves 0x40 bytes for it

@@ -74,17 +74,17 @@ void  SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform);   // 
 void  fn_80037C48(Skin* pSkin, SkelPose* pPose);                // Skin.c
 void  fn_8009622C(Character* pChar, void* pClip, u8 bKeep, f32 fOffset);                  // CharAnim.c
 void  fn_80096F0C(Character* pChar);                            // CharAnim.c
-void  fn_8000914C(f32* pQ, f32 (*m)[4]);                        // Quaternion.c: a rotation matrix
+void  Quat_QuatToMatrix(f32* pQ, f32 (*m)[4]);                        // Quaternion.c: a rotation matrix
 int   fn_8001BD18(Character* pChar, Clip* pClip);
-void  fn_80008F20(f32* pQ, f32* pOut);                          // Quaternion.c
-void  fn_800090E4(f32* pQ, f32* pIn, f32* pOut);                // Quaternion.c: a vector turned by pQ
+void  Quat_Invert(f32* pQ, f32* pOut);                          // Quaternion.c
+void  Quat_RotateVector(f32* pQ, f32* pIn, f32* pOut);                // Quaternion.c: a vector turned by pQ
 void  fn_800280E8(Character* pChar, f32* pPos, int bPlace);     // Skeleton.c
 void  fn_8001EFB4(f32* pA, f32* pB, f32* pOut);
 void  fn_8001A14C(Character* pChar);
 void  fn_8001D6D8(int n);
 void  fn_8010B098(void* pModel);                                // LLDynTex.c
 void  fn_800958EC(AnimPlayer* pAnim, s32 n, f32 f);            // CharAnim.c
-void  fn_800094D8(f32* pQ, f32* pA, f32* pB, f32* pC);          // Quaternion.c: a rotation as angles
+void  Quat_ExtractEulerAngles(f32* pQ, f32* pA, f32* pB, f32* pC);          // Quaternion.c: a rotation as angles
 void  fn_80029968(CharModel* pModel, SkelPose* pPose);          // Skeleton.c
 void  fn_8000AB40(f32 (*pSrc)[4], f32 (*pDst)[4]);              // UMemPool.c
 void  fn_8001EDA8(Character* pChar, int nBone, f32* pPos);
@@ -877,10 +877,10 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     }
     if (fabsf(fTurn) > 0.0001f) {
         fn_8001EF34(vNormal, fTurn, vAxis);
-        fn_8000923C(vAxis, qTurn);
-        fn_80008F20(pChar->pModel->pPoses[nBoneB].q0, qA8);
-        fn_800090E4(qA8, qTurn, q98);
-        fn_80008FCC(q98, pChar->pModel->pBones[nBoneB].q0C, qB8);
+        Quat_BuildFromVector(vAxis, qTurn);
+        Quat_Invert(pChar->pModel->pPoses[nBoneB].q0, qA8);
+        Quat_RotateVector(qA8, qTurn, q98);
+        Quat_Multiply(q98, pChar->pModel->pBones[nBoneB].q0C, qB8);
         fn_8001E85C(qB8, pChar->pModel->pBones[nBoneB].q0C);
     }
 
@@ -890,20 +890,20 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     if (fabsf(fTurn) > 0.0001f) {
         fn_8001EF34(vNormal, fTurn, vAxis);
         vAxis[3] = 0.0f;
-        fn_8000923C(vAxis, qTurn);
-        fn_80008F20(pChar->pModel->pPoses[nBoneA].q0, qA8);
-        fn_800090E4(qA8, qTurn, q98);
-        fn_80008FCC(q98, pChar->pModel->pBones[nBoneA].q0C, qB8);
+        Quat_BuildFromVector(vAxis, qTurn);
+        Quat_Invert(pChar->pModel->pPoses[nBoneA].q0, qA8);
+        Quat_RotateVector(qA8, qTurn, q98);
+        Quat_Multiply(q98, pChar->pModel->pBones[nBoneA].q0C, qB8);
         fn_8001E85C(qB8, pChar->pModel->pBones[nBoneA].q0C);
     }
 
     // the ankle: tilted about the horizontal axis across the slope, by the slope's angle
     pBone = &pChar->pModel->pBones[nBoneA];
-    fn_80008FCC(pBone->q0C, pChar->pModel->pPoses[pBone->nParent].q0, q88);
-    fn_80008FCC(pChar->pModel->pBones[nBoneB - 1].q0C, q88, q58);
-    fn_80008FCC(pChar->pModel->pBones[nBoneB].q0C, q58, q68);
-    fn_80008F20(q68, q78);
-    fn_80008FCC(pChar->pModel->pPoses[nBoneC].q0, q78, q48);
+    Quat_Multiply(pBone->q0C, pChar->pModel->pPoses[pBone->nParent].q0, q88);
+    Quat_Multiply(pChar->pModel->pBones[nBoneB - 1].q0C, q88, q58);
+    Quat_Multiply(pChar->pModel->pBones[nBoneB].q0C, q58, q68);
+    Quat_Invert(q68, q78);
+    Quat_Multiply(pChar->pModel->pPoses[nBoneC].q0, q78, q48);
     vAxis[0] = vSlope[2];
     vAxis[1] = 0.0f;
     vAxis[2] = -vSlope[0];
@@ -919,12 +919,12 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     fTurn = fn_80009614((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos)) * fDrop;
     if (fabsf(fTurn) > 0.0001f) {
         fn_8001EF34(vAxis, fTurn, vAxis);
-        fn_80008FCC(q48, q68, q38);
-        fn_80008F20(q38, q28);
+        Quat_Multiply(q48, q68, q38);
+        Quat_Invert(q38, q28);
         vAxis[3] = 0.0f;
-        fn_8000923C(vAxis, qTurn);
-        fn_800090E4(q28, qTurn, qB8);
-        fn_80008FCC(qB8, q48, q18);
+        Quat_BuildFromVector(vAxis, qTurn);
+        Quat_RotateVector(q28, qTurn, qB8);
+        Quat_Multiply(qB8, q48, q18);
         fn_8001E85C(q18, pChar->pModel->pBones[nBoneC].q0C);
     }
 }
@@ -954,7 +954,7 @@ void fn_800192D4(Character* pChar, f32 fAngle) {
         if (gSession.nGameType == 3 && fn_8001EDF4(pChar)) {
             fAngle += PI;
         }
-        fn_80008BB8(0.0f, fAngle, 0.0f, pChar->pModel->pBones->q0C);
+        Quat_EulerAngles(0.0f, fAngle, 0.0f, pChar->pModel->pBones->q0C);
     }
 }
 
@@ -2041,16 +2041,16 @@ int fn_8001BD18(Character* pChar, Clip* pClip) {
         pModel = pChar->pModel;
         pChar->u10 |= 0x4000;
         pChar->pModel->pBones[pChar->nGripBone].nParent = 0;
-        fn_80008F20(pModel->pPoses[0].q0, qRoot);
-        fn_80008FCC(pModel->pPoses[pChar->nGripBone].q0, qRoot, pChar->q16AC);
+        Quat_Invert(pModel->pPoses[0].q0, qRoot);
+        Quat_Multiply(pModel->pPoses[pChar->nGripBone].q0, qRoot, pChar->q16AC);
         if (fn_8001EDF4(pChar)) {
-            fn_80009410(PI, qTurn);
-            fn_80008FCC(pChar->q16AC, qTurn, qGrip);
+            Legacy_Quat_BuildFromPitch(PI, qTurn);
+            Quat_Multiply(pChar->q16AC, qTurn, qGrip);
             fn_8001E85C(qGrip, pChar->q16AC);
         }
         fn_8001EFB4(pModel->pPoses[pChar->nGripBone].v10, pModel->pPoses[0].v10, vOffset);
         vOffset[3] = 0.0f;
-        fn_800090E4(qRoot, vOffset, pChar->v16BC);
+        Quat_RotateVector(qRoot, vOffset, pChar->v16BC);
         pChar->v16BC[3] = 0.0f;
         if (fn_8001EDF4(pChar)) {
             pChar->v16BC[2] = -pChar->v16BC[2];
@@ -2405,7 +2405,7 @@ void fn_8001C860(Character* pChar) {
     fn_80019358(pChar, vDir, 0.0f);
     fn_8001E85C(pModel->pBones[0].q0C, pModel->pPoses[0].q0);
     fn_8001E85C(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
-    fn_8000914C(pModel->pPoses[0].q0, pModel->pMatrices[0]);
+    Quat_QuatToMatrix(pModel->pPoses[0].q0, pModel->pMatrices[0]);
     fn_8001E880(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
     if (bStance && (pSkel = pChar->pModel->pSkel) != NULL) {
         pOldClip = pChar->pCurClip;
@@ -2798,7 +2798,7 @@ void Character_GetBallOnFingerPosition(Character* pChar, f32* pPos) {
 
 // Where the hand holds the ball, for the swing: bone 0x1A's position moved 0.000625 along the
 // bone's x axis (the other way while the model's bEE is set), and bone 0x15's pose as three angles
-// (fn_800094D8), the second 30 degrees more.
+// (Quat_ExtractEulerAngles), the second 30 degrees more.
 void fn_8001DA04(Character* pChar, f32* pPos, f32* pAngles) {
     f32 (*pMtx)[4];
     f32 vAxis[3];
@@ -2813,7 +2813,7 @@ void fn_8001DA04(Character* pChar, f32* pPos, f32* pAngles) {
         } else {
             fn_8000C5D4(pPos, vAxis, 0.000625f, pPos);
         }
-        fn_800094D8(pChar->pModel->pPoses[fn_8001EEE4(pChar->pModel, 0x15)].q0, &pAngles[0], &pAngles[1],
+        Quat_ExtractEulerAngles(pChar->pModel->pPoses[fn_8001EEE4(pChar->pModel, 0x15)].q0, &pAngles[0], &pAngles[1],
                     &pAngles[2]);
         pAngles[1] += 30.0f / 180.0f * PI;
     }
