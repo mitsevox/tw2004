@@ -238,6 +238,20 @@ void fn_800141CC(void) {
     lbl_80280E08->aColour[3] = 1.0f;
 }
 
+// Whether any of the four pads has any of the buttons in uMask (0: any button at all).
+u8 fn_80014300(u32 uMask) {
+    u8 bPressed = 0;
+    int nController = 0;
+
+    do {
+        if ((uMask == 0 && fn_800136DC(nController) != 0) || (uMask & fn_800136DC(nController))) {
+            bPressed = 1;
+        }
+        nController++;
+    } while (nController < 4);
+    return bPressed;
+}
+
 // Fill a screen quad's two corners (x0, y0)-(x1, y1) and its texture coordinates (0,0)-(1,1),
 // four floats per vertex.
 void fn_800141F8(f32* pXY, f32* pUV, f32 x0, f32 y0, f32 x1, f32 y1) {
