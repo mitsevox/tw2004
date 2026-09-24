@@ -420,8 +420,7 @@ s32 fn_800CCF10(Skin* pSkin, int nSet, int nVariant) {
 
 // Picks a set's variant (0 when out of range) and option (-1 when out of range).
 void fn_800CCF90(Skin* pSkin, int nSet, int nVariant, int nOption) {
-    if (pSkin == NULL || nSet < 0) return;
-    if (nSet >= fn_800CCEA0(pSkin)) return;
+    if (pSkin == NULL || nSet < 0 || nSet >= fn_800CCEA0(pSkin)) return;
     if (nVariant < 0 || nVariant >= fn_800CCED0(pSkin, nSet)) {
         nVariant = 0;
     }
