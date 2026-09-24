@@ -676,6 +676,8 @@ void   fn_800C7E50(f32* pA, f32* pB, f32* pC, int n, f32* pOut, f32 fT);
 // at share fT between the middle two.
 void   fn_800C7480(f32* pPos0, f32* pPos1, f32* pPos2, f32* pPos3, f32* pLook0, f32* pLook1, f32* pLook2,
                    f32* pLook3, f32* pCam, f32* pSub, f32* pFov, f32 fFov1, f32 fFov2, f32 fT);
+void   fn_800C7898(f32* p0, f32* p1, f32* p2, f32* p3, f32* pOut, f32 fT);   // a point on the spline
+f32    fn_800C7970(f32 fA, f32 fB, f32 fC, f32 fD, f32 fE, f32 fF);
 // Not decompiled yet: a share of a fly-by path's spline (fn_8003EA50).
 f32    fn_800C7A9C(FlyByPath* pPath, f32 fT);
 // CamSpline.c: the Catmull-Rom basis matrix.

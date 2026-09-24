@@ -6,8 +6,6 @@
 #include "camera.h"
 #include "unsorted/cull.h"
 
-void fn_800C7898(f32* p0, f32* p1, f32* p2, f32* p3, f32* pOut, f32 fT);
-f32  fn_800C7970(f32 fA, f32 fB, f32 fC, f32 fD, f32 fE, f32 fF);
 f32  fn_800C79BC(f32* p0, f32* p1, f32* p2, f32* p3);
 void fn_800C8068(f32* pA, f32* pB, f32* pOut);
 
