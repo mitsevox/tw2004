@@ -873,25 +873,25 @@ void fn_80069CDC(int nPlayer) {
     f32   vBallDir[4];
     f32   fX;
     f32   fY;
-    f32   fCos;
-    f32   fDot;
-    f32   fSin;
-    f32   fTeeDist;
-    f32   fHoleDist;
-    f32   fBallDist;
+    f32   fHeight;
     f32   fHalfFov;
-    f32   fCos2;
+    f32   fLow;
+    f32   fHigh;
     f32   fDotX;
     f32   fDotZ;
+    f32   fCos2;
     f32   fA;
     f32   fB;
     f32   fC;
-    f32   fDisc;
     f32   fDenom;
-    f32   fLow;
-    f32   fHigh;
-    f32   fHeight;
     f32   fOld;
+    f32   fDisc;
+    f32   fSin;
+    f32   fCos;
+    f32   fTeeDist;
+    f32   fHoleDist;
+    f32   fBallDist;
+    f32   fDot;
     View* pView;
     f32*  pCamPos;
     f32*  pLook;
@@ -1038,12 +1038,10 @@ void fn_80069CDC(int nPlayer) {
 
     // the bob: f4 runs between 0 and f18 at f0 a frame, and the shadow shrinks as it rises
     if (0.0f != lbl_801D5BF0[nPlayer].f0) {
-        fOld = lbl_801D5BF0[nPlayer].f4;
-        lbl_801D5BF0[nPlayer].f4 = fOld + lbl_801D5BF0[nPlayer].f0;
-        aMarker[0][1] -= fOld;
-        aMarker[1][1] -= fOld;
-        aMarker[2][1] -= fOld;
-        aMarker[3][1] -= fOld;
+        for (i = 0; i < 4; i++) {
+            aMarker[i][1] -= lbl_801D5BF0[nPlayer].f4;
+        }
+        lbl_801D5BF0[nPlayer].f4 += lbl_801D5BF0[nPlayer].f0;
         if (lbl_801D5BF0[nPlayer].f4 > lbl_801D5BF0[nPlayer].f18 || lbl_801D5BF0[nPlayer].f4 < 0.0f) {
             lbl_801D5BF0[nPlayer].f0 = -lbl_801D5BF0[nPlayer].f0;
         }
