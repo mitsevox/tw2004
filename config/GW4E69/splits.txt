@@ -869,6 +869,8 @@ DynChain.c:
 
 GameModeDriver.c:
 	.text       start:0x80116540 end:0x80117600
+	.data       start:0x80193E70 end:0x80193F88
+	.sdata      start:0x802817F8 end:0x80281840
 
 PGATourSimulation.c:
 	.text       start:0x80117600 end:0x8011C068
