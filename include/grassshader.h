@@ -68,7 +68,9 @@ typedef struct GrassRecord {
 
 // GoGrass.c's state (*lbl_80281900). Only the fields the decompiled code uses; its size is not known.
 typedef struct GrassManager {
-    u8           unk0[0x70];
+    u8           unk0[0x1C];
+    s32          n1C;           // 0x1C  cleared when the grass is freed (fn_8011E3B4)
+    u8           unk20[0x70 - 0x20];
     void*        p70;           // 0x70
     void*        p74;           // 0x74
     void*        p78;           // 0x78
@@ -80,10 +82,11 @@ typedef struct GrassManager {
     u32          nE4;           // 0xE4  apD8's depth
     s32          nE8;           // 0xE8  apDC's used slots
     GrassRecord* pEC;           // 0xEC
-    void*        pF0;           // 0xF0
-    void*        pF4;           // 0xF4
-    u8           unkF8[0x370 - 0xF8];
-    u32          u370;          // 0x370  the grass is on (fn_8012022C)
+    void**       apF0[2];       // 0xF0  two object lists; n100 picks the one in use
+    s32          anF8[2];       // 0xF8  their lengths
+    s32          n100;          // 0x100
+    u8           unk104[0x370 - 0x104];
+    void*        p370;          // 0x370  an allocation; set while the grass is on (fn_8012022C)
     u8           unk374[0x3CC - 0x374];
     s32          n3CC;          // 0x3CC
     u8           unk3D0[0x3E0 - 0x3D0];
@@ -91,6 +94,7 @@ typedef struct GrassManager {
 } GrassManager;
 
 extern GrassManager* lbl_80281900;
+extern s32 lbl_80282514;        // cleared when the grass is freed (fn_8011E3B4)
 
 // The grass parameters GoGrass.c hands over once per hole (SD_vSetGrassParamsOnce).
 extern f32 lbl_802607D0[16][4];

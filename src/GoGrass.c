@@ -56,6 +56,8 @@ void fn_80035138();
 void fn_800352BC();
 void GrassRender_vBuildAndUploadOneTimeData();
 void fn_8011FDC4(void* pObject);
+void fn_8011E3B4(void);
+void fn_80008380(void);
 void fn_8011E468(void);
 void fn_8011E584(UStreamObject* pObject);
 int  fn_8011E6B0(f32** ppA, f32** ppB);
@@ -65,6 +67,25 @@ void fn_80120194(void);
 void fn_80008248(void* p);
 
 void fn_8011E3B0(void) {
+}
+
+// The grass goes: the objects of the list in use are pushed and the stack emptied into the slots,
+// then everything is freed.
+void fn_8011E3B4(void) {
+    int i;
+    if (lbl_80281900->p370 != NULL) {
+        fn_80008380();
+        for (i = 0; i < lbl_80281900->anF8[lbl_80281900->n100]; i++) {
+            fn_8011FDC4(lbl_80281900->apF0[lbl_80281900->n100][i]);
+        }
+        fn_8011FF58();
+        fn_80009E70(lbl_80281900->p370);
+        lbl_80281900->p370 = NULL;
+        fn_80120194();
+        fn_8011EAB8();
+        lbl_80282514 = 0;
+    }
+    lbl_80281900->n1C = 0;
 }
 
 // The grass's stream handler ('gras') is registered when fn_80112B80 allows it.
@@ -95,7 +116,7 @@ int fn_8011E6B0(f32** ppA, f32** ppB) {
 }
 
 void fn_8011E974(void) {
-    if (lbl_80281900->u370 != 0 && lbl_80281900->n3E0 != 0 && fn_800C6CB0() == 0) {
+    if (lbl_80281900->p370 != NULL && lbl_80281900->n3E0 != 0 && fn_800C6CB0() == 0) {
         fn_8011EF88();
         fn_8011F3AC();
         fn_8011F374();
@@ -206,8 +227,8 @@ void fn_80120194(void) {
     for (i = 0; i < lbl_80281900->nE0; i++) {
         fn_80009E70(lbl_80281900->pEC[i].p40);
     }
-    fn_80009E70(lbl_80281900->pF0);
-    fn_80009E70(lbl_80281900->pF4);
+    fn_80009E70(lbl_80281900->apF0[0]);
+    fn_80009E70(lbl_80281900->apF0[1]);
     fn_80009E70(lbl_80281900->pEC);
     fn_80009E70(lbl_80281900->apDC);
     fn_80009E70(lbl_80281900->apD8);
@@ -218,7 +239,7 @@ f32 fn_80120244(f32 fX, f32 fM);
 s32 fn_8012028C(u8* p0);
 
 s32 fn_8012022C(void) {
-    return lbl_80281900->u370 != 0;
+    return lbl_80281900->p370 != NULL;
 }
 
 // fmod for floats: the remainder of fX / fM (both callers pass the modulus in the second argument).
