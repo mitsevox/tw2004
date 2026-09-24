@@ -12,7 +12,7 @@
 #include "game/frontend.h"
 #include "frontend/uistudio.h"
 
-s32 fn_800A13E8(s32 nPort, s32 nSlot, s32 n);
+s32 fn_800A13E8(s32 nPort, s32 nSlot, s32 nProfile);
 s32 fn_800A2248(s32 nPort, s32 nSlot);
 void fn_800A253C(void);
 
@@ -200,6 +200,46 @@ s32 fn_8009FCFC(MCCardPos* pPos) {
     return nResult;
 }
 
+// Load replay pPos->n8 of the save on the card into gReplayData: -16 when the save has none there.
+s32 fn_800A0230(MCCardPos* pPos) {
+    s32 nMount;
+    s32 nResult;
+    s32 nPort;
+    s32 nSlot;
+    s32 nReplay;
+
+    nSlot = pPos->nSlot;
+    nPort = pPos->nPort;
+    nReplay = pPos->n8;
+    nMount = fn_8009D74C(nPort, nSlot);
+    if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
+    // EA bug: this return leaves a card it mounted mounted
+    nResult = fn_8009F734(nPort, nSlot);
+    if (nResult != 0) return nResult;
+    nResult = fn_8009DD44(nPort, nSlot, MC_DIR_NAME);
+    if (nResult != 0) {
+        if (nMount == 0) {
+            fn_8009DBAC(nPort, nSlot);
+        }
+        return nResult;
+    }
+    nResult = fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FEC, MC_BUFFER_SIZE);
+    if (nResult == 0) {
+        if (!fn_800A233C(lbl_80281FEC, &lbl_80281FEC->trailer)) {
+            nResult = MC_ERR_BADDATA;
+        } else if (lbl_80281FEC->uFlags & MC_SAVE_REPLAY(nReplay)) {
+            Mem_cpy(&gReplayData, &lbl_80281FEC->aReplay[nReplay], sizeof(Replay));
+            nResult = 0;
+        } else {
+            nResult = -16;
+        }
+    }
+    if (nMount == 0) {
+        fn_8009DBAC(nPort, nSlot);
+    }
+    return nResult;
+}
+
 // Note in the card's MCCardState which replays the save on it holds.
 void fn_800A0868(s32 nPort, s32 nSlot) {
     MCCardState* pState;
@@ -314,6 +354,94 @@ s32 fn_800A0BC8(s32 nPort, s32 nSlot, const char* szName, SaveImage* pImage) {
 // Whether the card at pPos holds the save file (one of the file functions in lbl_8018C7D8).
 int fn_800A1758(MCCardPos* pPos) {
     return fn_800A2248(pPos->nPort, pPos->nSlot) == 0;
+}
+
+// Load the save on the card and take the profile it was last saved from (n4D0C0) into profile
+// nProfile, and the save's records into the game. A save marked "@BD" (older than "@BE") gets its
+// CrAP info reset and its created golfer's model set to 7.
+s32 fn_800A13E8(s32 nPort, s32 nSlot, s32 nProfile) {
+    s32 nMount;
+    s32 nResult;
+
+    nMount = fn_8009D74C(nPort, nSlot);
+    if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
+    // EA bug: this return and the ones below leave a card it mounted mounted
+    nResult = fn_8009F734(nPort, nSlot);
+    if (nResult != 0) return nResult;
+    nResult = fn_8009DD44(nPort, nSlot, MC_DIR_NAME);
+    if (nResult == 0) {
+        nResult = fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FE8, MC_BUFFER_SIZE);
+        if (nResult != 0) {
+            return (nResult == MC_ERR_BADDATA) ? MC_ERR_BADDATA : -15;
+        }
+        if (!fn_800A233C(lbl_80281FE8, &lbl_80281FE8->trailer)) return MC_ERR_BADDATA;
+        Mem_cpy(lbl_80281FDC, lbl_80281FE8, MC_BUFFER_SIZE);
+        if (!(lbl_80281FDC->uFlags & MC_SAVE_4D0C0)) return -15;
+        if (!(lbl_80281FDC->uFlags & MC_SAVE_PROFILE(lbl_80281FDC->n4D0C0))) return -15;
+        if (lbl_80281FDC->uFlags & MC_SAVE_RECORDS) {
+            fn_8009F8C8(&lbl_80281FDC->records);
+        }
+        Mem_cpy(&gpSaveData[nProfile], &lbl_80281FDC->aProfile[lbl_80281FDC->n4D0C0],
+                sizeof(SaveProfile));
+        if (lbl_80281FE4->trailer.aMagic[2] != 'E') {
+            FE_CrAP_InitCrAPInfo(&gpSaveData[nProfile]);
+            gpSaveData[nProfile].createdGolfer.nModelID = 7;
+        }
+    }
+    if (nMount == 0) {
+        fn_8009DBAC(nPort, nSlot);
+    }
+    return nResult;
+}
+
+// The name of profile nProfile in the save on the card, into szName ("" and -15 when there is none).
+s32 fn_800A1590(s32 nPort, s32 nSlot, s32 nProfile, char* szName) {
+    s32 nMount;
+    s32 nResult;
+
+    if (nPort >= MC_NUM_PORTS || nSlot >= MC_NUM_SLOTS) return -15;
+    szName[0] = 0;
+    nMount = fn_8009D74C(nPort, nSlot);
+    if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
+    nResult = fn_8009F734(nPort, nSlot);
+    if (nResult != 0) {
+        if (nMount == 0) {
+            fn_8009DBAC(nPort, nSlot);
+        }
+        return nResult;
+    }
+    nResult = fn_8009DD44(nPort, nSlot, MC_DIR_NAME);
+    if (nResult != 0) {
+        if (nMount == 0) {
+            fn_8009DBAC(nPort, nSlot);
+        }
+        return nResult;
+    }
+    nResult = fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FE4, MC_BUFFER_SIZE);
+    if (nResult != 0) {
+        if (nMount == 0) {
+            fn_8009DBAC(nPort, nSlot);
+        }
+        return nResult;
+    }
+    if (!fn_800A233C(lbl_80281FE4, &lbl_80281FE4->trailer)) {
+        if (nMount == 0) {
+            fn_8009DBAC(nPort, nSlot);
+        }
+        return MC_ERR_BADDATA;
+    }
+    Mem_cpy(lbl_80281FD8, lbl_80281FE4, MC_BUFFER_SIZE);
+    if (lbl_80281FD8->uFlags & MC_SAVE_PROFILE(nProfile)) {
+        strncpy(szName, lbl_80281FD8->aProfile[nProfile].szName, 0x1D);
+        if (nMount == 0) {
+            fn_8009DBAC(nPort, nSlot);
+        }
+        return 0;
+    }
+    if (nMount == 0) {
+        fn_8009DBAC(nPort, nSlot);
+    }
+    return -15;
 }
 
 // Read the names of the profiles saved on the card into its MCCardState, for the menus.
