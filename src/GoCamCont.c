@@ -210,6 +210,62 @@ void fn_80063CBC(View* pView, f32* pVec) {
     Vec_Copy(pVec, pView->script.v40);
 }
 
+// Asks for shot kind nKind on the player's view. With club 25 only kinds 0, 5, 8, 11 and 23 are
+// taken. Kind 12 first records the current camera and blends from it into the player's kind 12
+// shot; kind 7 becomes 10 when the ball lies on surface class 7 or 16. While kind 12 is asked for
+// only 5, 8 and 10 replace it, 6 is never taken, 2 and 3 do not replace 7, and 7 does not replace
+// 2 or 3.
+void fn_80063CF0(View* pView, int nKind, int nPlayer) {
+    f32* pPos = fn_8001731C(pView);
+    f32* pAt = fn_80017314(pView);
+    f32 vNormal[4];
+    f32 vSpeed[4] = {0.1f, 0.1f, 0.1f, 0.5f};
+    SurfaceType* pSurface;
+    CamShot* pShot;
+    int nAsked;
+
+    if (gPlayers[nPlayer].nClub == 25 && nKind != 0 && nKind != 8 && nKind != 5 && nKind != 11
+        && nKind != 23) {
+        return;
+    }
+    if (nKind == 12 && pView->script.nC4 != 12) {
+        pShot = fn_8003A7C8(nPlayer, 12, NULL);
+        if (pShot != NULL) {
+            CameraScript_RecordCurrentCam(&pView->shot19C, pPos, pAt, nPlayer, &pView->script, 0);
+            pView->shot19C.p40 = pShot;
+            CameraScript_InterpToNewScript(&pView->script, &pView->shot19C, nPlayer, pPos, pAt, 5, 0.0f, 100.0f,
+                                           25, 0.0f);
+            pView->script.nBC = 5;
+            pView->script.f8C = 0.3f;
+            fn_80063BF4(pView, 0.3f, vSpeed);
+        }
+    }
+    if (nKind == 7) {
+        if (!(fn_8004DBB0(fn_8000C594(), gPlayers[nPlayer].ball.vPos, &pSurface, vNormal) < -60000.0f)
+            && pSurface != NULL && (pSurface->nClass == 7 || pSurface->nClass == 16)) {
+            nKind = 10;
+        }
+    }
+    nAsked = pView->script.nC4;
+    if (nAsked == 12 && nKind != 8 && nKind != 5 && nKind != 6 && nKind != 10) {
+        return;
+    }
+    if (nKind == 6) {
+        return;
+    }
+    if (nKind == 3 || nKind == 2) {
+        if (nAsked != 7) {
+            pView->script.nC4 = nKind;
+        }
+    } else if (nKind == 7) {
+        if (nAsked != 3 && nAsked != 2) {
+            pView->script.nC4 = nKind;
+        }
+    } else {
+        pView->script.nC4 = nKind;
+    }
+}
+
 // Shakes the camera: moves its position by up to half of the script's fF4 each way.
 void fn_8006421C(View* pView) {
     pView->v0[0] += pView->script.fF4 * (Rand_Float(0) - 0.5f);
@@ -232,6 +288,47 @@ void fn_800642D0(View* pView, int nPlayer) {
 
     CameraScript_InterpToNewScript(&pView->script, pView->script.pShot, nPlayer, pPos, fn_80017314(pView), 5,
                                    0.0f, 100.0f, 25, 0.0f);
+}
+
+// Turns pA a fifth of the way towards pB (both taken as directions) into pOut; while the game is
+// paused pA is copied unchanged.
+void fn_80063F08(f32* pA, f32* pB, f32* pOut) {
+    f32 qTurn[4];
+    f32 vAxis[4];
+    f32 vA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    f32 vB[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    f32 fAngle;
+
+    if (gSession.nPaused != 0) {
+        Vec3Copy(pA, pOut);
+        return;
+    }
+    if (pA[0] != 0.0f || pA[1] != 0.0f || pA[2] != 0.0f) {
+        fn_800BAF04(pA, vA);
+    } else {
+        vA[0] = 0.0f;
+        vA[1] = 0.0f;
+        vA[2] = 0.0f;
+    }
+    if (pB[0] != 0.0f || pB[1] != 0.0f || pB[2] != 0.0f) {
+        fn_800BAF04(pB, vB);
+    } else {
+        vB[0] = 0.0f;
+        vB[1] = 0.0f;
+        vB[2] = 0.0f;
+    }
+    fAngle = fn_80009614(fn_8000C5FC(vA, vB) < -1.0f  ? -1.0f
+                         : fn_8000C5FC(vA, vB) > 1.0f ? 1.0f
+                                                      : fn_8000C5FC(vA, vB));
+    fAngle *= 0.2f;
+    vec4flt_CrossProduct(vA, vB, vAxis);
+    if (vAxis[0] != 0.0f || vAxis[1] != 0.0f || vAxis[2] != 0.0f) {
+        fn_800BAF04(vAxis, vAxis);
+    }
+    fn_8001EF34(vAxis, fAngle, vAxis);
+    fn_8000923C(vAxis, qTurn);
+    vA[3] = 0.0f;
+    fn_800090E4(qTurn, vA, pOut);
 }
 
 // The view's v20: the side vector of its flat look direction, turned about that direction by the
