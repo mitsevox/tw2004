@@ -406,6 +406,8 @@ void fn_8008E960(char* sz);
 int  fn_8008E9A8(void);
 void fn_8008E9B4(void);
 void fn_8008EA38(u8 b);
+u8   fn_8008EAB0(void);
+u8   fn_8008EAD4(void);
 void fn_8008EABC(u8 b);
 void fn_8008EAE0(int n);
 int  fn_8008EAEC(void);
@@ -424,13 +426,6 @@ typedef struct LogoEdit {
     u8  bDirty;                 // 0x8  changed since it was last copied into its texture
 } LogoEdit;
 LAYOUT_ASSERT(LogoEdit, 0xC);
-
-// The part of the save profile from 0x5500 that char_tex_manager.c is given (fn_80077ACC() +
-// 0x5500); only the logos are known.
-typedef struct ProfileLogos {
-    u8  unk0[0x9D0];
-    LogoRecord aLogo[5];        // 0x09D0  the user logos ("_usrtextr0".."_usrtextr4")
-} ProfileLogos;
 
 extern LogoEdit* lbl_802824B8;
 extern s16* lbl_802824BC;               // the palette: 256 colours, 1-bit alpha (the sign bit)
