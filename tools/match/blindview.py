@@ -1,5 +1,6 @@
 """A function's C as a blind auditor must see it (name and comment audit, docs/style.md "Names").
     python tools/match/blindview.py <function name or address> [--uses]
+    python tools/match/blindview.py --type <struct/union/enum name>   a type's definition, comments removed
 Prints the definition with: every comment removed; the function's own name and every game-code
 function name that has not passed the audit (config/GW4E69/audit.tsv, tier T1 or T2) replaced by
 its address (fn_XXXXXXXX). SDK and C library names stay: that code is out of the audit's scope.
@@ -116,11 +117,38 @@ def find_definition(name):
     return None, 0, None
 
 
+def find_type(name):
+    """A struct/union/enum definition (typedef'd or tagged) by name, from include/ and src/."""
+    pats = [re.compile(r'typedef\s+(struct|union|enum)\s*\w*\s*\{'), re.compile(r'\b(struct|union|enum)\s+%s\s*\{' % re.escape(name))]
+    for p in sorted((ROOT / 'include').rglob('*.h')) + game_sources():
+        t = strip_comments(p.read_text(encoding='utf-8', errors='replace'))
+        for pat in pats:
+            for m in pat.finditer(t):
+                k = t.index('{', m.start())
+                depth = 0
+                for j in range(k, len(t)):
+                    depth += (t[j] == '{') - (t[j] == '}')
+                    if depth == 0:
+                        break
+                tail = re.match(r'\s*(\w+)\s*;', t[j + 1:])
+                if pat is pats[1] or (tail and tail.group(1) == name):
+                    end = j + 1 + (tail.end() if tail else 0)
+                    return p, t[m.start():end]
+    return None, None
+
+
 def main():
     if len(sys.argv) < 2:
         sys.exit(__doc__)
     b = Blinder()
     arg = sys.argv[1]
+    if arg == '--type':
+        p, body = find_type(sys.argv[2])
+        if body is None:
+            sys.exit('no definition of type %s' % sys.argv[2])
+        print('// %s (blind view)' % p.relative_to(ROOT).as_posix())
+        print(re.sub(r'\n\s*\n+', '\n', b(body)))
+        return
     if re.fullmatch(r'(0x)?[0-9A-Fa-f]{8}', arg):
         a = int(arg.removeprefix('0x'), 16)
         arg = next((n for n, x in b.game.items() if x == a), 'fn_%08X' % a)

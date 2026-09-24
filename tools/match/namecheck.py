@@ -5,9 +5,10 @@ batch.tsv (tab-separated, a header row is allowed):
 Exit 1 if any row fails; each failure says why. Run on the current build (`ninja`).
 
 Hard errors (always):
-  tier      must be T1, T2 or T3.
-  suffix    a T3 (provisional) name ends with its address, `Name_80012CB4`, so it can always be traced
-            to the disassembly and is visibly unconfirmed; T1/T2 names carry no address.
+  tier      must be T1, T2, T3 or D (demoted).
+  format    a T3 (provisional) name is `fn_<address>_<Guess>` (fn_80082E40_BallSpinDecay): it sorts and
+            greps with the other unknowns and can always be traced to the disassembly; a demotion
+            goes back to plain `fn_<address>`; T1/T2 names carry no address.
 Flags (a reviewer may keep the row by writing `namecheck-ok: <why>` in its evidence):
   prefix    the name's system prefix (text before the first `_`) must be the unit's name, the prefix
             of a named function in the same unit, of a named caller or callee, or of another row of
@@ -106,18 +107,32 @@ def main():
     errors, flags = [], []
     for r in rows:
         tag = '%08X %s -> %s' % (r['addr'], r['cur'], r['new'])
-        if r['tier'] not in ('T1', 'T2', 'T3'):
-            errors.append('%s: tier "%s" is not T1/T2/T3' % (tag, r['tier']))
-        m = HEX_SUFFIX.search(r['new'])
-        if r['tier'] == 'T3' and (not m or int(m.group(1), 16) != r['addr']):
-            errors.append('%s: a T3 name must end with _%08X' % (tag, r['addr']))
-        if r['tier'] in ('T1', 'T2') and m:
+        if r['tier'] not in ('T1', 'T2', 'T3', 'D'):
+            errors.append('%s: tier "%s" is not T1/T2/T3/D' % (tag, r['tier']))
+        own = '%08X' % r['addr']
+        if r['tier'] == 'T3' and not re.fullmatch(r'fn_%s_[A-Za-z]\w*' % own, r['new']):
+            errors.append('%s: a T3 name is fn_%s_<Guess>' % (tag, own))
+        if r['tier'] == 'D' and r['new'] != 'fn_' + own:
+            errors.append('%s: a demotion goes back to fn_%s' % (tag, own))
+        if r['tier'] in ('T1', 'T2') and (r['new'].startswith('fn_') or re.search(r'[0-9A-F]{8}', r['new'])):
             errors.append('%s: only T3 names carry the address' % tag)
         u = unit_of.get(r['cur'])
         if u is None:
             errors.append('%s: %s is not a function in the current build' % (tag, r['cur']))
             continue
+        if r['tier'] == 'D':
+            continue
         ok = 'namecheck-ok:' in r['evidence']
+        if r['tier'] == 'T3':
+            # a guess has no system prefix to check; what it claims is still checked below
+            w = words(r['new'][len('fn_') + 9:])
+            for dom, (vocab, marker) in DOMAINS.items():
+                if w & vocab and not ok:
+                    hits = [x for x in reach(r['cur']) | {u.split('/')[-1]} if re.search(marker, x)]
+                    if not hits:
+                        flags.append('%s: the guess says %s but nothing it reaches (2 calls deep) touches %s'
+                                     % (tag, '/'.join(sorted(w & vocab)), dom))
+            continue
         p = prefix(r['new'])
         near = {prefix(f) for f in by_unit[u] | callers.get(r['cur'], set()) | set(calls.get(r['cur'], []))
                 if named(f) and f != r['cur']}
