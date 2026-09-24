@@ -184,16 +184,51 @@ typedef struct DynChain {
 } DynChain;
 LAYOUT_ASSERT(DynChain, 0x20);
 
-// The chains' settings (lbl_802824F8; DynChain.c's updates read them). Only what is used is
-// named; the size is unknown.
+// Twelve values of DynChainSettings, twice (fn_80113E60 sets both the same way).
+typedef struct DynChainParams {
+    f32  f0;                    // 0x00
+    f32  f4;                    // 0x04
+    f32  f8;                    // 0x08
+    f32  fC;                    // 0x0C
+    f32  f10;                   // 0x10
+    f32  f14;                   // 0x14
+    f32  f18;                   // 0x18
+    f32  f1C;                   // 0x1C
+    f32  f20;                   // 0x20
+    f32  f24;                   // 0x24
+    f32  f28;                   // 0x28
+    f32  f2C;                   // 0x2C
+} DynChainParams;
+
+// The chains' settings (lbl_802824F8, made by fn_80113E60; DynChain.c's updates read them).
 typedef struct DynChainSettings {
-    u8   unk0[0x90];
+    DynChainParams aParams[2];  // 0x00
+    f32  f60;                   // 0x60
+    f32  f64;                   // 0x64
+    f32  f68;                   // 0x68
+    f32  f6C;                   // 0x6C
+    f32  f70;                   // 0x70
+    f32  f74;                   // 0x74
+    f32  f78;                   // 0x78
+    f32  f7C;                   // 0x7C
+    f32  f80;                   // 0x80
+    f32  f84;                   // 0x84
+    f32  f88;                   // 0x88
+    f32  f8C;                   // 0x8C
     f32  f90;                   // 0x90  how much fn_80116304's sway takes off 1
     f32  f94;                   // 0x94  } the base fn_80116304 adds, from f94 to f98 as its
     f32  f98;                   // 0x98  } fStrength goes from 0 to 35
-    u8   unk9C[0xB8 - 0x9C];
+    s32  n9C;                   // 0x9C
+    s32  nA0;                   // 0xA0
+    s32  nA4;                   // 0xA4
+    s32  nA8;                   // 0xA8
+    s32  nAC;                   // 0xAC
+    s32  nB0;                   // 0xB0
+    s32  nB4;                   // 0xB4
     s32  nB8;                   // 0xB8  the strength fn_80116468 gives; -1: fn_80055F80's
+    s32  nBC;                   // 0xBC
 } DynChainSettings;
+LAYOUT_ASSERT(DynChainSettings, 0xC0);
 
 extern DynChainSettings* lbl_802824F8;
 

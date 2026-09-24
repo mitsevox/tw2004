@@ -15,6 +15,59 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 f);
 void fn_80115348(CharModel* pModel, DynChain* pChain, f32 f);
 void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 f);
 
+// Make the chains' settings, with their starting values.
+void fn_80113E60(void) {
+    lbl_802824F8 = fn_80009B34(sizeof(DynChainSettings), 2, 0, "DynChain.c", 173);
+    lbl_802824F8->aParams[1].f0 = 3.6f;
+    lbl_802824F8->aParams[1].f4 = 6.0f;
+    lbl_802824F8->aParams[1].f8 = 9.9f;
+    lbl_802824F8->aParams[1].fC = 0.5f;
+    lbl_802824F8->aParams[1].f10 = 0.5f;
+    lbl_802824F8->aParams[1].f14 = 0.5f;
+    lbl_802824F8->aParams[1].f18 = 0.0f;
+    lbl_802824F8->aParams[1].f1C = 0.9f;
+    lbl_802824F8->aParams[1].f20 = 0.7f;
+    lbl_802824F8->aParams[1].f24 = 0.0f;
+    lbl_802824F8->aParams[1].f28 = 0.0f;
+    lbl_802824F8->aParams[1].f2C = 0.0f;
+    lbl_802824F8->aParams[0].f0 = 2.0f;
+    lbl_802824F8->aParams[0].f4 = 4.0f;
+    lbl_802824F8->aParams[0].f8 = 8.0f;
+    lbl_802824F8->aParams[0].fC = 0.25f;
+    lbl_802824F8->aParams[0].f10 = 0.25f;
+    lbl_802824F8->aParams[0].f14 = 0.25f;
+    lbl_802824F8->aParams[0].f18 = 0.0f;
+    lbl_802824F8->aParams[0].f1C = 0.9f;
+    lbl_802824F8->aParams[0].f20 = 0.7f;
+    lbl_802824F8->aParams[0].f24 = -2.0f;
+    lbl_802824F8->aParams[0].f28 = 0.0f;
+    lbl_802824F8->aParams[0].f2C = 3.0f;
+    lbl_802824F8->n9C = 1;
+    lbl_802824F8->nA0 = 1;
+    lbl_802824F8->nA4 = 1;
+    lbl_802824F8->nA8 = 1;
+    lbl_802824F8->nAC = 1;
+    lbl_802824F8->nB0 = 1;
+    lbl_802824F8->nB4 = 0;
+    lbl_802824F8->nB8 = -1;
+    lbl_802824F8->nBC = 10;
+    lbl_802824F8->f90 = 0.9f;
+    lbl_802824F8->f94 = 0.2f;
+    lbl_802824F8->f98 = 1.5f;
+    lbl_802824F8->f78 = 0.02f;
+    lbl_802824F8->f7C = 1.0f;
+    lbl_802824F8->f80 = 0.6f;
+    lbl_802824F8->f84 = 1.0f;
+    lbl_802824F8->f88 = 0.6f;
+    lbl_802824F8->f8C = 1.0f;
+    lbl_802824F8->f68 = 14.0f;
+    lbl_802824F8->f70 = 180.0f;
+    lbl_802824F8->f74 = 1.0f;
+    lbl_802824F8->f60 = 5.0f;
+    lbl_802824F8->f6C = 0.5f;
+    lbl_802824F8->f64 = 0.2f;
+}
+
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_8011407C(void);
