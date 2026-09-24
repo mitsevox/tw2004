@@ -687,8 +687,8 @@ void fn_80074DA8(ShaderVtxArrays* pArrays, int eType, MorphAnim* pAnim, ShaderCm
         GXSetTexCoordGen2(0, 1, 4, 0x3C, 0, 0x7D);
     }
     pAnim->n0 = GXEndDisplayList();
-    // port: rounds the address up to 32 bytes; a u32 cannot hold a 64-bit pointer
-    pAnim->p4 = (void*)(((u32)pCmds->pCmds + 0x1F) & ~0x1F);
+    // the commands' address rounded up to 32 bytes
+    pAnim->p4 = (void*)(((uptr)pCmds->pCmds + 0x1F) & ~(uptr)0x1F);
     Mem_cpy(pAnim->p4, pList, pAnim->n0);
     DCFlushRange(pAnim->p4, pAnim->n0);
     fn_80009E70(pList);
