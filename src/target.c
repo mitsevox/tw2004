@@ -374,6 +374,8 @@ u8 fn_80068AC8(int nPlayer) {
     f32  fSin;
     f32  fCos;
     f32  fCameraDist;
+    f32  fDX;
+    f32  fDZ;
     int  nClub;
     u8   bInRange;
     u8   bMoved;
@@ -419,8 +421,10 @@ u8 fn_80068AC8(int nPlayer) {
         }
         fSin = fn_800095F0(gPlayers[nPlayer].fAim);
         fCos = fn_80009638(gPlayers[nPlayer].fAim);
-        gPlayers[nPlayer].vTarget[0] = -fSin * gPlayers[nPlayer].fDistance + gPlayers[nPlayer].vBall[0];
-        gPlayers[nPlayer].vTarget[2] = fCos * gPlayers[nPlayer].fDistance + gPlayers[nPlayer].vBall[2];
+        fDX = -fSin * gPlayers[nPlayer].fDistance;
+        fDZ = fCos * gPlayers[nPlayer].fDistance;
+        gPlayers[nPlayer].vTarget[0] = fDX + gPlayers[nPlayer].vBall[0];
+        gPlayers[nPlayer].vTarget[2] = fDZ + gPlayers[nPlayer].vBall[2];
         AI_PlanShot(nPlayer, pTarget);
         Vec_Copy(pTarget, gPlayers[nPlayer].vTarget2);
         fn_8001C804(nPlayer, 0, 1);
@@ -455,8 +459,10 @@ u8 fn_80068AC8(int nPlayer) {
         fStep *= gSession.fFrameTime * (60.0f * gPlayers[nPlayer].fA60);
         fSin = fn_800095F0(gPlayers[nPlayer].fAim);
         fCos = fn_80009638(gPlayers[nPlayer].fAim);
-        gPlayers[nPlayer].vTarget[0] += fStep * -fSin;
-        gPlayers[nPlayer].vTarget[2] += fStep * fCos;
+        fDX = fStep * -fSin;
+        fDZ = fStep * fCos;
+        gPlayers[nPlayer].vTarget[0] += fDX;
+        gPlayers[nPlayer].vTarget[2] += fDZ;
         fn_8006A964(pTarget, gPlayers[nPlayer].vBall, vDir);
         vDir[1] = 0.0f;
         if (gPlayers[nPlayer].fA60 < 0.0f && (f32)fn_80009680(fn_80009744(vDir)) >= fMin) {
@@ -475,8 +481,10 @@ u8 fn_80068AC8(int nPlayer) {
             AI_PlanShot(nPlayer, pTarget);
             fSin = fn_800095F0(gPlayers[nPlayer].fAim);
             fCos = fn_80009638(gPlayers[nPlayer].fAim);
-            gPlayers[nPlayer].vTarget[0] = -fSin * gPlayers[nPlayer].fDistance + gPlayers[nPlayer].vBall[0];
-            gPlayers[nPlayer].vTarget[2] = fCos * gPlayers[nPlayer].fDistance + gPlayers[nPlayer].vBall[2];
+            fDX = -fSin * gPlayers[nPlayer].fDistance;
+            fDZ = fCos * gPlayers[nPlayer].fDistance;
+            gPlayers[nPlayer].vTarget[0] = fDX + gPlayers[nPlayer].vBall[0];
+            gPlayers[nPlayer].vTarget[2] = fDZ + gPlayers[nPlayer].vBall[2];
             AI_PlanShot(nPlayer, pTarget);
             Vec_Copy(pTarget, gPlayers[nPlayer].vTarget2);
             if (gPlayers[nPlayer].nShotKind != 2) {
