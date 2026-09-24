@@ -206,8 +206,8 @@ void fn_80107C30(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- end of sweep code ----
 
-// A part's choice i: its name and four values ("Coming Soon" in a demo session, "No Entry Found"
-// otherwise, when there is no such choice).
+// A part's choice i: its name and five values ("Coming Soon" in the session's 0x4000 mode,
+// "No Entry Found" otherwise, when there is no such choice).
 void fn_80107C3C(MsgArg* pArgs, MsgArg* pResult) {
     s16 nPart = pArgs[0].i;
     int b = pArgs[1].i;
@@ -275,8 +275,9 @@ void fn_80107EB0(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// Put a part's choice i on the created golfer, and save the profile. Part 17 is always turned on
-// directly; for the others fn_80103F94 does it when fn_80103C98 and fn_801074D4 allow.
+// Put a part's choice i on the created golfer and recompute its equipment tiers (fn_8007873C).
+// Part 17 is only turned on directly; for the others fn_80103F94 does it when fn_80103C98 and
+// fn_801074D4 allow.
 void fn_80107FAC(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = fn_80077ACC();
     s16 nPart = pArgs[0].i;
@@ -299,7 +300,7 @@ void fn_80107FAC(MsgArg* pArgs, MsgArg* pResult) {
     }
 }
 
-// fn_80107FAC without saving the profile.
+// fn_80107FAC without recomputing the equipment tiers.
 void fn_80108070(MsgArg* pArgs, MsgArg* pResult) {
     s16 nPart;
     int b;
@@ -386,7 +387,7 @@ void fn_80108300(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- end of sweep code ----
 
-// A part's choice i is locked (never in a demo session).
+// A part's choice i is locked (never in the session's 0x4000 mode).
 void fn_80108314(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = fn_80077ACC();
     s16 nPart = pArgs[0].i;
@@ -410,8 +411,8 @@ void fn_80108398(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- end of sweep code ----
 
-// Buy a part's choice i: take its price from the money, mark it bought (aB1CC), put it on the
-// created golfer and save the profile.
+// Buy a part's choice i: take the price pArgs[3] from the money, mark it bought (aB1CC), put it on
+// the created golfer and recompute its equipment tiers (fn_8007873C).
 void fn_8010840C(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = fn_80077ACC();
     s16 nPart = pArgs[0].i;
@@ -439,7 +440,8 @@ void fn_80108494(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- end of sweep code ----
 
-// A part's choice i is in the profile's list b: for part 13 by its name, else by fn_80106374.
+// Part 13: choice i's name is in the profile's list b (fn_800587A8); other parts: choice i is the
+// asset in its slot of the profile (fn_80106374).
 void fn_801084F4(MsgArg* pArgs, MsgArg* pResult) {
     char szName[16];                    // the size is unknown (the frame allows up to 20)
     SaveProfile* pProfile = fn_80077ACC();
@@ -470,7 +472,7 @@ void fn_80108594(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[6].p = lbl_80281ED4->aChoice[b][nCategory][4];
 }
 
-// The parts of the five random assets of category pArgs[0].
+// The entries (aPart, which fn_80104FA8 takes as b) of the five random assets of category pArgs[0].
 void fn_80108690(MsgArg* pArgs, MsgArg* pResult) {
     int nCategory = fn_80077BDC(pArgs[0].i);
     s8 b = fn_80103BB4();
@@ -698,7 +700,7 @@ void fn_80108E4C(MsgArg* pArgs, MsgArg* pResult) {
 // ---- end of sweep code ----
 
 // The newly unlocked assets (aB344) for the five strings pArgs[0..4]: their names when there are
-// at most five, else their categories (the fifth line "And more..." when there are more than four).
+// at most five, else their categories (the fifth line "And more..." when there are more than five).
 void fn_80108E9C(MsgArg* pArgs, MsgArg* pResult) {
     char aNames[5][64];
     char aCategories[5][64];
@@ -990,8 +992,10 @@ void fn_8010988C(MsgArg* pArgs, MsgArg* pResult) {
 void fn_801098AC(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Make a random created golfer: clear the slots, then dress it as fn_80109FB4 does with more parts
-// drawn (0 and 4 at 80%, 5 and 6 at 90%, 19, 20 and 8 at 70%), part 7 at b 1 or 2, and save.
+// Make a random created golfer: take the assets in slots 2, 5..8 and 11..14 off, parts 4, 5 and 6
+// at their first choice, random choices for parts 0 to 8, 14, 16, 19 and 20 (no pick with a chance
+// of 80% for 0 and 4, 90% for 5 and 6, 70% for 8, 19 and 20), parts 15, 9 and 10 as fn_80109FB4
+// does, part 7 at b 1 or 2, then its equipment tiers again (fn_8007873C).
 void fn_801098B0(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = fn_80077ACC();
     int nRoll = Rand_Next(0) % 100;
@@ -1070,7 +1074,8 @@ void fn_80109BA4(MsgArg* pArgs, MsgArg* pResult) {
     fn_8007873C(pProfile);
 }
 
-// The CrAP camera to the "Crap Idle" shot.
+// The CrAP camera to the "Crap Idle" shot; then a random created golfer (fn_80079664) and its
+// equipment tiers again (fn_8007873C).
 void fn_80109CBC(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = fn_80077ACC();
     View* pView = fn_80017028(fn_80016D10());
@@ -1083,7 +1088,7 @@ void fn_80109CBC(MsgArg* pArgs, MsgArg* pResult) {
     fn_8007873C(pProfile);
 }
 
-// The CrAP camera to the "Crap Face" shot.
+// The CrAP camera to the "Crap Face" shot; then fn_80078E34 dresses the created golfer at random.
 void fn_80109D5C(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = fn_80077ACC();
     View* pView = fn_80017028(fn_80016D10());
