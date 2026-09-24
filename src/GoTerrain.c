@@ -1484,13 +1484,7 @@ void fn_80033704(u16 nPatch, u16 nObject) {
 // the next one through lbl_801877E0 (lbl_80187858 with bit 0x40 of word 3); bit 0x1 of word 3 rises
 // to 1 once n1C is 1; the trees sway by their period with noise.
 void fn_80033744(void) {
-    f32 fDrop;
     f32 fTime;
-    f32 fUpFast;
-    f32 fDownFast;
-    f32 fUp;
-    f32 fDown;
-    u32 nFrames;
     s32 i;
     s32 v;
     s32 k;
@@ -1523,12 +1517,6 @@ void fn_80033744(void) {
             fn_800335F8(0);
         }
     }
-    nFrames = FRAME_RATE * fTime;
-    fUpFast = 6.0f * fTime;
-    fDownFast = -6.0f * fTime;
-    fUp = 4.0f * fTime;
-    fDown = -4.0f * fTime;
-    fDrop = 5.0f * fTime;
     for (i = 0; i < TER_NUM_OBJECTS; i++) {
         for (v = 0; v < 2; v++) {
             if (lbl_801D3CB0.pObjectStateList[i].aView[v].n4 == 2) {
@@ -1561,7 +1549,7 @@ void fn_80033744(void) {
             }
             lbl_801D3CB0.pObjectStateList[i].f4 = lbl_801D3CB0.fCrowdInterpValue;
         } else if ((uFlags0 & 2) && !(uFlags3 & 0x40)) {
-            lbl_801D3CB0.pObjectStateList[i].nC += nFrames;
+            lbl_801D3CB0.pObjectStateList[i].nC += (u32)(FRAME_RATE * fTime);
             if (lbl_801D3CB0.pObjectStateList[i].n18 == lbl_801D3CB0.pObjectStateList[i].n1C
                 || lbl_801D3CB0.pObjectStateList[i].f14 > 0.0f) {
                 fPeriod = 4.0f * (lbl_801D3CB0.pObjectStateList[i].f0 - lbl_801D3CB0.fTreeMinPeriod) + 1.5f;
@@ -1584,24 +1572,24 @@ void fn_80033744(void) {
                 }
                 lbl_801D3CB0.pObjectStateList[i].f14 -= fTime;
             } else {
-                for (k = 0; k < 6; k++) {
+                for (k = 0; k < sizeof(lbl_801877E0) / sizeof(lbl_801877E0[0]); k++) {
                     if (lbl_801D3CB0.pObjectStateList[i].n18 == lbl_801877E0[k].n0
                         && lbl_801D3CB0.pObjectStateList[i].n1C == lbl_801877E0[k].n4) {
                         fStep = lbl_801877E0[k].fC - lbl_801D3CB0.pObjectStateList[i].f4;
                         if (lbl_801D3CB0.pObjectStateList[i].n18 == 2
                             || lbl_801D3CB0.pObjectStateList[i].n18 == 3) {
-                            if (fStep > fUpFast) {
-                                fStep = fUpFast;
+                            if (fStep > 6.0f * fTime) {
+                                fStep = 6.0f * fTime;
                             }
-                            if (fStep < fDownFast) {
-                                fStep = fDownFast;
+                            if (fStep < -6.0f * fTime) {
+                                fStep = -6.0f * fTime;
                             }
                         } else {
-                            if (fStep > fUp) {
-                                fStep = fUp;
+                            if (fStep > 4.0f * fTime) {
+                                fStep = 4.0f * fTime;
                             }
-                            if (fStep < fDown) {
-                                fStep = fDown;
+                            if (fStep < -4.0f * fTime) {
+                                fStep = -4.0f * fTime;
                             }
                         }
                         lbl_801D3CB0.pObjectStateList[i].f4 += fStep;
@@ -1615,11 +1603,11 @@ void fn_80033744(void) {
                 }
             }
         } else if ((uFlags0 & 2) && (uFlags3 & 0x40)) {
-            lbl_801D3CB0.pObjectStateList[i].nC += nFrames;
+            lbl_801D3CB0.pObjectStateList[i].nC += (u32)(FRAME_RATE * fTime);
             if (lbl_801D3CB0.pObjectStateList[i].n18 == lbl_801D3CB0.pObjectStateList[i].n1C
                 || lbl_801D3CB0.pObjectStateList[i].f14 > 0.0f) {
                 if (lbl_801D3CB0.pObjectStateList[i].n18 == 0) {
-                    lbl_801D3CB0.pObjectStateList[i].f4 -= fDrop;
+                    lbl_801D3CB0.pObjectStateList[i].f4 -= 5.0f * fTime;
                     if (lbl_801D3CB0.pObjectStateList[i].f4 < 0.0f) {
                         lbl_801D3CB0.pObjectStateList[i].f4 = 0.0f;
                     }
@@ -1647,24 +1635,24 @@ void fn_80033744(void) {
                     lbl_801D3CB0.pObjectStateList[i].f14 -= fTime;
                 }
             } else {
-                for (k = 0; k < 2; k++) {
+                for (k = 0; k < sizeof(lbl_80187858) / sizeof(lbl_80187858[0]); k++) {
                     if (lbl_801D3CB0.pObjectStateList[i].n18 == lbl_80187858[k].n0
                         && lbl_801D3CB0.pObjectStateList[i].n1C == lbl_80187858[k].n4) {
                         fStep = lbl_80187858[k].fC - lbl_801D3CB0.pObjectStateList[i].f4;
                         if (lbl_801D3CB0.pObjectStateList[i].n18 == 2
                             || lbl_801D3CB0.pObjectStateList[i].n18 == 3) {
-                            if (fStep > fUpFast) {
-                                fStep = fUpFast;
+                            if (fStep > 6.0f * fTime) {
+                                fStep = 6.0f * fTime;
                             }
-                            if (fStep < fDownFast) {
-                                fStep = fDownFast;
+                            if (fStep < -6.0f * fTime) {
+                                fStep = -6.0f * fTime;
                             }
                         } else {
-                            if (fStep > fUp) {
-                                fStep = fUp;
+                            if (fStep > 4.0f * fTime) {
+                                fStep = 4.0f * fTime;
                             }
-                            if (fStep < fDown) {
-                                fStep = fDown;
+                            if (fStep < -4.0f * fTime) {
+                                fStep = -4.0f * fTime;
                             }
                         }
                         lbl_801D3CB0.pObjectStateList[i].f4 += fStep;
