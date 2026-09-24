@@ -317,8 +317,8 @@ void fn_8012332C(s32 nChan) {
 void fn_80123398(s32 nChan, s32 nCmd, s32 nStat) {
     u32 uCmd = 0x10000000;
     u32 uWord;
-    s32 nValue;
     s32 i;
+    s32 nWhich;
 
     if (fn_80122CFC(nChan, &uCmd) == 0) {
         OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_PADDATA' (chan=%d).\n",
@@ -367,7 +367,7 @@ void fn_80123398(s32 nChan, s32 nCmd, s32 nStat) {
             return;
         }
         lbl_80260E18[nChan].u68 = uWord & 0xFFFFFF;
-        if (nCmd == 0x70) {
+        if (nCmd == 0x70U) {    // EA compared unsigned here (cmplwi), unlike the switch
             break;
         }
         if (lbl_80260E18[nChan].u68 == 0) {
@@ -410,24 +410,26 @@ void fn_80123398(s32 nChan, s32 nCmd, s32 nStat) {
         lbl_80260E18[nChan].n6C = uWord & 0xFFFFFF;
         break;
     case 0xB0:
+        // EA keeps the stat number in nWhich and reuses nStat for the stat's value.
+        nWhich = nStat;
         switch (nStat) {
         case 0:
-            nValue = fn_80077ACC()->nA8;
+            nStat = fn_80077ACC()->nA8;
             break;
         case 1:
-            nValue = fn_80077ACC()->nAC;
+            nStat = fn_80077ACC()->nAC;
             break;
         case 2:
-            nValue = fn_80077ACC()->nA0;
+            nStat = fn_80077ACC()->nA0;
             break;
         case 3:
-            nValue = fn_80077ACC()->nA4;
+            nStat = fn_80077ACC()->nA4;
             break;
         default:
-            nValue = 0;
+            nStat = 0;
             break;
         }
-        uCmd = ((nStat + 0xB0) << 24) | nValue;
+        uCmd = ((nWhich + 0xB0) << 24) | nStat;
         if (fn_80122CFC(nChan, &uCmd) == 0) {
             OSReport("GbaCommunication: An error occurred to command 'FROMGC_REQUEST_STATS' (chan=%d).\n",
                      nChan);
@@ -435,7 +437,7 @@ void fn_80123398(s32 nChan, s32 nCmd, s32 nStat) {
             fn_8012408C(0x12);
             return;
         }
-        if (fn_80122E68(nChan, &uWord) == 0 || uWord >> 24 != nStat + 0xC0) {
+        if (fn_80122E68(nChan, &uWord) == 0 || uWord >> 24 != nWhich + 0xC0) {
             OSReport("GbaCommunication: An error occurred in reading 'FROMGBA_STAT_TRANSFER' (chan=%d).\n",
                      nChan);
             lbl_80260E18[nChan].n0 = 0;
