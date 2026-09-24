@@ -295,17 +295,17 @@ void fn_8010AD50(DynTex* pTex, u64 uId) {
 // are packed to the front.
 void fn_8010ADA4(DynTex* pTex) {
     DynTexHeader* pHdr = pTex->p4;
-    DynTexEntry* pOutEntry = pTex->p0;
     DynTexObj* pOutObj = pHdr->p8;
-    DynTexPalette* pOutPal = pHdr->pC;
-    DynTex40* pOut10 = pHdr->p10;
     DynTex18* pOut14 = pHdr->p14;
+    DynTex40* pOut10 = pHdr->p10;
+    DynTexEntry* pOutEntry = pTex->p0;
     DynTexEntry* pEntry;
-    u32 nSrc = 0;
-    u32 nDst = 0;
+    DynTexPalette* pOutPal = pHdr->pC;
     s32 nKept = 0;
-    s32 nObjs = 0;
+    u32 nDst = 0;
+    u32 nSrc = 0;
     u8 bMoved = 0;
+    s32 nObjs = 0;
     int i;
     int j;
 
@@ -313,7 +313,7 @@ void fn_8010ADA4(DynTex* pTex) {
         pEntry = &pTex->p0[i];
         if (pEntry->uId == 0) {
             bMoved = 1;
-            for (j = 0; j < pEntry->n8; j++) {
+            for (j = 0; pEntry->n8 > j; j++) {     // fake match: operands this way round
                 nSrc += pEntry->aC[j];
             }
             nSrc += pEntry->n1C;
