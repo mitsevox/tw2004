@@ -249,10 +249,10 @@ void fn_8016AEEC(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
                 pEntry->n2 = 1;
             }
         }
-        for (i = 0; i < pNode->nGroups; i++) {
-            UISGroup* pGroup = pNode->ppGroups[i];
-            for (j = 0; j < pGroup->nEntries; j++) {
-                UISEntry* pEntry = &pGroup->pEntries[j];
+        for (j = 0; j < pNode->nGroups; j++) {
+            UISGroup* pGroup = pNode->ppGroups[j];
+            for (i = 0; i < pGroup->nEntries; i++) {
+                UISEntry* pEntry = &pGroup->pEntries[i];
                 if (pEntry->uHandler == 0xFFFF) {
                     fn_8016AEEC(pStudio, pScreen, pEntry->u4.nNode, nMsg);
                 } else if (pEntry->uHandler < pStudio->nHandlers) {
