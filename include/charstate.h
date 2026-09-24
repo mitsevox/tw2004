@@ -171,23 +171,39 @@ LAYOUT_ASSERT(SkinDesc, 0x120);
 // An entry of SkinModel.p44: its first word is an index SkinBurn.c renumbers (fn_80127140).
 typedef struct SkinModel44 {
     s32  n0;                    // 0x0
-    u8   unk4[0x10 - 4];
+    s32* p4;                    // 0x4  n8 of them; fn_801272B4 numbers them 0, 1, 2...
+    s16  n8;                    // 0x8
+    u8   unkA[0x10 - 0xA];
 } SkinModel44;
 LAYOUT_ASSERT(SkinModel44, 0x10);
 
+// An entry of SkinModel.p54, one per bit of Skin.p10CC; SkinBurn.c moves them (fn_801272B4).
+typedef struct SkinModel54 {
+    u8   unk0[0x14];
+} SkinModel54;
+LAYOUT_ASSERT(SkinModel54, 0x14);
+
 // What Skin.pModel points at; only what SkinPart.c and SkinBurn.c read.
 typedef struct SkinModel {
-    u8   unk0[0x14];
-    s32  n14;                   // 0x14  how many matrices Skin.p108C holds (fn_80018710)
+    u8   unk0[8];
+    s32  n08;                   // 0x08  its size with all its arrays once burnt (fn_801276E4)
+    s32  n0C;                   // 0x0C  entries in p3C
+    u8   unk10[4];
+    s32  n14;                   // 0x14  how many matrices Skin.p108C holds (fn_80018710); also
+                                //       the 0x20-byte entries in p34
     u8   unk18[0x34 - 0x18];
     void* p34;                  // 0x34  handed to the character's model (fn_80029A74)
-    u8   unk38[0x40 - 0x38];
+    void* p38;                  // 0x38  one 0x50-byte block
+    void* p3C;                  // 0x3C  n0C 0x50-byte blocks
     s32  n40;                   // 0x40  bits in Skin.p10D0; also the entries in p44
     SkinModel44* p44;           // 0x44
     SkinDesc* pDesc;            // 0x48
     u8   unk4C[4];
-    s32  n50;                   // 0x50  bits in Skin.p10CC
+    s32  n50;                   // 0x50  bits in Skin.p10CC; also the entries in p54
+    SkinModel54* p54;           // 0x54  one per bit
+    u8   unk58[0x140 - 0x58];
 } SkinModel;
+LAYOUT_ASSERT(SkinModel, 0x140);  // fn_801276E4 copies it whole
 
 // A skin (Skin.c): a character's body or one of its attachments; only what the code reads.
 typedef struct Skin {
@@ -441,6 +457,7 @@ void  fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, u8* p);
 u8    fn_800CEE90(void);
 
 // SkinPart.c, as SkinBurn.c uses it: the mesh iterator and an entry's copy.
+void  fn_800CD9EC(Skin* pSkin);
 s32   fn_800CE224(Skin* pSkin, SkinDesc14* pEntry, u8** ppOut, s32* pnOut, int nCopy);
 u8    fn_800CEEC0(SkinIter* pIter);
 void  fn_800CEEC8(SkinIter* pIter);
