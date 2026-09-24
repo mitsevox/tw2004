@@ -687,6 +687,30 @@ typedef struct ScreenCopy {
 extern ScreenCopy* lbl_80281100;
 extern s32 lbl_80281B88;        // bit 0: the video field being drawn
 
+// ---- the depth-of-field blur (DepthField.c) -------------------------------------------------
+
+// One blur layer (0x18 bytes; our name). lbl_801D5110 holds five, set up by fn_80045660.
+typedef struct DFLayer {
+    u8   b0;                    // 0x00  set: the layer is drawn (fn_80045848)
+    u8   unk1[3];
+    f32  f4;                    // 0x04  times f14: the draw's alpha
+    f32  aColour[3];            // 0x08  the draw's red, green and blue
+    f32  f14;                   // 0x14  0..1 (fn_800457B8); 0 turns the layer off
+} DFLayer;
+LAYOUT_ASSERT(DFLayer, 0x18);
+
+// What lbl_80281110 points at (lbl_801D5188, 0x10 bytes; our name).
+typedef struct DFBuffer {
+    u8    unk0[8];
+    void* p8;                   // 0x08  the screen copy's pixels (fn_8002A624)
+    u8    unkC[4];
+} DFBuffer;
+
+extern DFLayer lbl_801D5110[5];
+extern DFBuffer* lbl_80281110;
+extern f32 lbl_80281D90;
+extern f32 lbl_80281D94;        // cleared by fn_80045660
+
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
 
 // An object built from SHOC chunks. The header is 0x34 bytes (LoadData.c copies one with

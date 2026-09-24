@@ -143,4 +143,8 @@ void fn_8002A528(GxTexture* pTex, int nWidth, int nHeight, void* pImage, void* p
                  int eLutFormat, int eWrapS, int eWrapT);
 void fn_8002A608(GxTexture* pTex);  // make pTex the texture of the next draw
 
+// DepthField.c's textures: the half-size screen copy, and the two full-size image buffers.
+extern GxTexture lbl_801D5198;
+extern GxTexture lbl_801D51C8[2];
+
 #endif
