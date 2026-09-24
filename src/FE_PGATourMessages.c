@@ -25,13 +25,13 @@ s16 lbl_80193CFC[11] = { 0, 1, 2, 5, 6, 9, 10, 11, 13, 14, 15 };
 // scores and the money won (empty when none).
 void fn_8010E58C(char* szPlace, char* szName, char* szScore, char* szRounds, char* szMoney,
                  int nEntrant) {
+    int i;
     char szAmount[128];                 // sizes unknown
     char szRound[4];
     int nPlayer = fn_80077B08();
     s32 nGolfer = fn_80119118(nPlayer, nEntrant);
     s32 nRoundScore;
     s32 nMoney;
-    int i;
 
     if (fn_801197A4(nPlayer, nEntrant)) {
         sprintf(szPlace, "CUT");

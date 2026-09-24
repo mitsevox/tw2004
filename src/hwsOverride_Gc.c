@@ -127,6 +127,6 @@ void fn_80112B34(void) {
     HwsRender10* p = &lbl_80223BB0.s10;
 
     memset(p, 0, 4);
-    p->p48 = &p->u0;
+    p->p48 = &p->refs;
     p->p4C = p->a24;
 }

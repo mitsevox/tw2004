@@ -14,6 +14,11 @@ void PostFx_CopyScreenToBuffer(void);   // gomainloop.c
 void fn_8011EB80(void);
 void fn_80112B34(void);                 // hwsOverride_Gc.c
 void fn_80112DD8(s32 nEntry);
+void fn_801132C4(SkinMeshRefs* pRefs);
+void fn_8011368C(SkinMesh* pMesh, SkinMeshRefs* pOut, u16 n0, u16 n2);
+void fn_801136C4(SkinMesh* pMesh, void* pData, SkinMeshRefs* pOut, u16 n0, u16 n2);
+SkinMeshRefs* fn_80113764(void);
+void fn_800738DC(TexBank* pBank, TexEntry* pTex, u8 bFirst);  // GoShaderObjectCommon
 void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut);  // VecMath.c
 void fn_80113BCC(SkinIter* pIter);
 void fn_80113C70(SkinIter* pIter);
@@ -111,9 +116,119 @@ void fn_80112DA0(void) {
 
 // ---- end of sweep code ----
 
+// Draw SkinDesc.p44 entry nEntry: a pass per material of its SkinDesc28, each drawing its meshes
+// n8 times. The first pass may be untextured; a later pass is drawn only for a texture that goes
+// with the next one (TexEntry.b47 bit 0) or kind 9, blended over the first and with its material's
+// texture scale and offset. A mesh the override table replaces is drawn from the table's data.
+void fn_80112DD8(s32 nEntry) {
+    SkinDesc* pDesc;
+    SkinDesc44* pEntry;
+    SkinDesc28* pPasses;
+    s32* pMaterials;
+    s32* pMaterial;
+    s16* pFirst;
+    s16* pCount;
+    s32* pMesh;
+    TexEntry* pTex;
+    f32* pUV;
+    SkinMeshRefs* pRefs;
+    s32 nOverrides;
+    void** apOverride;
+    int nPasses;
+    int nMeshes;
+    int nDraws;
+    int nPass;
+    int nDraw;
+    int nMesh;
+    int i;
+    s16 anFirst[16];            // the size is not known
+    f32 mScale[3][4];
+    f32 mTrans[3][4];
+    HwsRenderState* pState = &lbl_80223BB0;
+
+    if (nEntry < 0) {
+        return;
+    }
+    pDesc = pState->pDesc;
+    pEntry = &pDesc->p44[nEntry];
+    pPasses = &pDesc->p28[pEntry->nC];
+    pMaterials = &pDesc->p20[pEntry->n4];
+    pFirst = &pDesc->pA4[pEntry->n28];
+    nDraws = pEntry->n8;
+    nPasses = pPasses->n0;
+    nOverrides = (pState->pOverride != NULL) ? pState->pOverride->nMeshes : 0;
+    apOverride = (pState->pOverride != NULL) ? pState->pOverride->apMesh : NULL;
+
+    for (nPass = 0, pMaterial = pMaterials; nPass < nPasses; nPass++, pMaterial++) {
+        nMeshes = pPasses->a8[0].n1;
+        for (i = 0; i < nMeshes; i++) {
+            anFirst[i] = pFirst[i];
+        }
+        if (pDesc->p18 == NULL) {
+            return;
+        }
+        pTex = pDesc->p18[*pMaterial].pTex;
+        if (pTex == NULL) {
+            // No texture: the vertex colour alone.
+            GXSetNumTexGens(0);
+            GXSetNumTevStages(1);
+            GXSetTevOrder(0, 0xFF, 0xFF, 4);
+            GXSetTevColorIn(0, 15, 15, 15, 10);
+            GXSetTevColorOp(0, 0, 0, 0, 1, 0);
+            GXSetTevAlphaIn(0, 7, 7, 7, 5);
+            GXSetTevAlphaOp(0, 0, 0, 1, 1, 0);
+        } else if (nPass <= 0 || (pTex->b47 & 1) || pTex->b40 == 9) {
+            fn_800738DC(pDesc->p18[*pMaterial].pBank, pTex, 1);
+            GXSetBlendMode(0, 0, 0, 0);
+            if ((pTex->b47 & 1) || nPass > 0) {
+                GXSetTevColorIn(1, 15, 15, 15, 0);
+                GXSetTevColorOp(1, 0, 0, 0, 1, 0);
+                GXSetTevAlphaIn(1, 7, 7, 7, 4);
+                GXSetTevAlphaOp(1, 0, 0, 1, 1, 0);
+                GXSetBlendMode(1, 4, 5, 0);
+                GXSetAlphaCompare(7, 0, 0, 7, 0x7F);
+                GXSetZCompLoc(1);
+            }
+            pUV = pDesc->p18[*pMaterial].afC;
+            PSMTXIdentity(lbl_80223C14);
+            if (nPass > 0) {
+                PSMTXScale(mScale, pUV[0], pUV[1], 1.0f);
+                PSMTXTrans(mTrans, pUV[2], pUV[3], 1.0f);
+            } else {
+                PSMTXScale(mScale, 1.0f, 1.0f, 1.0f);
+                PSMTXTrans(mTrans, 0.0f, 0.0f, 0.0f);
+            }
+            PSMTXConcat(mTrans, mScale, lbl_80223C14);
+            GXLoadTexMtxImm(lbl_80223C14, 30, 1);
+            GXSetTexCoordGen2(0, 1, 4, 30, 0, 125);
+        } else {
+            return;
+        }
+
+        lbl_802824E8 = 1;
+        pCount = &pDesc->pAC[pEntry->n2C];
+        for (nDraw = 0; nDraw < nDraws; nDraw++) {
+            pRefs = fn_80113764();
+            pRefs->f20 = pDesc->fB0;
+            pMesh = &pDesc->p3C[pEntry->n0];
+            for (i = 0; i < nMeshes; i++) {
+                nMesh = *pMesh++;
+                if (nMesh >= 0) {
+                    if (nMesh < nOverrides && apOverride[nMesh] != NULL) {
+                        fn_801136C4(&pDesc->p34[nMesh], apOverride[nMesh], pRefs, anFirst[i], *pCount);
+                    } else {
+                        fn_8011368C(&pDesc->p34[nMesh], pRefs, anFirst[i], *pCount);
+                    }
+                }
+                anFirst[i] += *pCount++;
+            }
+            fn_801132C4(pRefs);
+        }
+    }
+}
+
 // ---- sweep code (not yet cleaned up) ----
 
-u32* fn_80113764(void);
 void fn_80113840(void);
 void fn_80113844(void);
 void fn_8011387C(void);
@@ -224,15 +339,13 @@ void fn_801132C4(SkinMeshRefs* pRefs) {
     fn_801138E8();
 }
 
-void fn_801136C4(SkinMesh* pMesh, void* pData, SkinMeshRefs* pOut, u16 n0, s16 n2);
-
 // fn_801136C4 with the mesh's own data.
-void fn_8011368C(SkinMesh* pMesh, SkinMeshRefs* pOut, u16 n0, s16 n2) {
+void fn_8011368C(SkinMesh* pMesh, SkinMeshRefs* pOut, u16 n0, u16 n2) {
     fn_801136C4(pMesh, pMesh->pBits, pOut, n0, n2);
 }
 
 // Point pOut at pData by the mesh's flags (nothing for an empty mesh).
-void fn_801136C4(SkinMesh* pMesh, void* pData, SkinMeshRefs* pOut, u16 n0, s16 n2) {
+void fn_801136C4(SkinMesh* pMesh, void* pData, SkinMeshRefs* pOut, u16 n0, u16 n2) {
     if (pMesh->n8 == 0) {
         return;
     }
@@ -261,7 +374,7 @@ void fn_801136C4(SkinMesh* pMesh, void* pData, SkinMeshRefs* pOut, u16 n0, s16 n
 
 // ---- sweep code (not yet cleaned up) ----
 
-u32* fn_80113764(void) {
+SkinMeshRefs* fn_80113764(void) {
     return lbl_80223BB0.s10.p48;
 }
 

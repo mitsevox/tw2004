@@ -167,6 +167,9 @@ typedef struct DynTex {
 LAYOUT_ASSERT(DynTex, 0x50);
 
 DynTex* fn_8010A520(int nC, int nSize, int n2, int n3, int n4);
+DynTexHeader* fn_8010A780(DynTex* pTex);    // its header (SkinPart.c looks textures up in it)
+void  fn_8010ADA4(DynTex* pTex);
+void  fn_8010BCFC(u64 uId, void* p, s32 n);   // a texture a skin uses (DynTexUse)
 s32   fn_8010AD10(DynTex* pTex);        // how many textures it has
 u64   fn_8010AD18(DynTex* pTex, int nTex);  // a texture's name hash (0 out of range)
 void  fn_8010AD50(DynTex* pTex, u64 uId);   // drop the textures named uId

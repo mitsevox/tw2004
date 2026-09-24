@@ -6,20 +6,15 @@
 #include "charstate.h"
 #include "terrain.h"
 #include "camera.h"
+#include "lldyntex.h"
 
-void  fn_80112614(SkinDesc14* pEntry, u8* p, s32 n);
+void  fn_80112614(SkinDesc14* pEntry, SkinDesc18* pMaterial, s32 n);
 void  fn_80113774(int nPart, int nVariant, int nOption);
 void  fn_8011387C(int n);
 void  fn_8011389C(void);
 void  fn_801138CC(SkinDesc* pDesc);
 void  fn_801138D8(void* p);
-s32   fn_8010A780(u8* p);
-s32   fn_8010AD10(u8* p);
-u64   fn_8010AD18(u8* p, int n);
-void  fn_8010AD50(u8* p, u64 uId);
-void  fn_8010ADA4(u8* p);
-void  fn_8010BCFC(u64 uId, void* p, s32 n);
-s32   fn_8001005C(s32 n, u64 uId);
+int   fn_8001005C(TexBank* pBank, u64 uHash);   // LLTex.c: the texture's index, or 0x80000000
 
 void  fn_800CC588(Character* pChar, int nPart, int nVariant);
 void  fn_800CCA1C(void);
@@ -57,7 +52,7 @@ u8    fn_800CEA30(u64 uId, SkinListEntry* aList, int nList);
 u64   fn_800CEA6C(int i, SkinListEntry* aList, int nList);
 u8*   fn_800CEAAC(int i, SkinListEntry* aList, int nList);
 s32   fn_800CEAE4(int i, SkinListEntry* aList, int nList);
-void  fn_800CEDE0(Skin* pSkin, u8* p, u64 uId);
+void  fn_800CEDE0(Skin* pSkin, DynTex* pTex, u64 uId);
 void  fn_800CEE04(Skin* pSkin, int nFrom, int nTo);
 void  fn_800CEE88(u8 b);
 void  fn_800CEE98(void);
@@ -902,7 +897,7 @@ void fn_800CE170(Skin* pSkin, SkinTarget* pTarget) {
         for (i = 0; i < pDesc->n10; i++) {
             Mem_cpy(&entry, &pDesc->p14[i], sizeof(SkinDesc14));
             fn_800CE224(pSkin, &entry, NULL, NULL, 0);
-            fn_80112614(&entry, pDesc->p18 + i * 0x1C, pTarget->n4);
+            fn_80112614(&entry, &pDesc->p18[i], pTarget->n4);
         }
     }
 }
@@ -1144,48 +1139,49 @@ s32 fn_800CEAE4(int i, SkinListEntry* aList, int nList) {
     return aList[i].nC;
 }
 
-// Hands fn_8010AD50 each of p's name codes the skins' chosen options do not use, then calls
+// Hands fn_8010AD50 each of pTex's name codes the skins' chosen options do not use, then calls
 // fn_8010ADA4.
-void fn_800CEB1C(Skin** apSkins, int nSkins, u8* p) {
+void fn_800CEB1C(Skin** apSkins, int nSkins, DynTex* pTex) {
     SkinListEntry* pList;
     s32 nList;
     s32 n;
     int i;
     u64 uId;
 
-    if (p == NULL) return;
+    if (pTex == NULL) return;
     nList = fn_800CE660(apSkins, nSkins, &pList, NULL, 0, 2);
-    n = fn_8010AD10(p);
+    n = fn_8010AD10(pTex);
     for (i = 0; i < n; i++) {
-        uId = fn_8010AD18(p, i);
+        uId = fn_8010AD18(pTex, i);
         if (uId != 0 && !fn_800CEA30(uId, pList, nList)) {
-            fn_8010AD50(p, uId);
+            fn_8010AD50(pTex, uId);
         }
     }
-    fn_8010ADA4(p);
+    fn_8010ADA4(pTex);
     if (pList != NULL) {
         fn_80009E70(pList);
     }
 }
 
-// Hands fn_8010BCFC each name code the skins' chosen options use that p has no entry for. aIds and
-// nIds go on to fn_800CE660.
-void fn_800CEBE8(Skin** apSkins, int nSkins, u8* p, u64* aIds, int nIds) {
+// Hands fn_8010BCFC each name code the skins' chosen options use that pTex has no entry for. aIds
+// and nIds go on to fn_800CE660.
+void fn_800CEBE8(Skin** apSkins, int nSkins, DynTex* pTex, u64* aIds, int nIds) {
     SkinListEntry* pList;
     s32 nList;
-    s32 n;
+    TexBank* pBank;
     s32 nC;
     int i;
     u64 uId;
 
     pList = NULL;
-    if (p == NULL) return;
+    if (pTex == NULL) return;
     nList = fn_800CE660(apSkins, nSkins, &pList, aIds, nIds, 2);
     i = 0;
-    n = fn_8010A780(p);
+    // port: a DynTexHeader has TexBank's layout (lldyntex.h); the two are not merged yet.
+    pBank = (TexBank*)fn_8010A780(pTex);
     for (; i < nList; i++) {
         uId = fn_800CEA6C(i, pList, nList);
-        if (uId != 0 && fn_8001005C(n, uId) == -0x80000000) {
+        if (uId != 0 && fn_8001005C(pBank, uId) == -0x80000000) {
             nC = fn_800CEAE4(i, pList, nList);
             fn_8010BCFC(uId, fn_800CEAAC(i, pList, nList), nC);
         }
@@ -1196,7 +1192,7 @@ void fn_800CEBE8(Skin** apSkins, int nSkins, u8* p, u64* aIds, int nIds) {
 }
 
 // Hands fn_800CEDE0 the name codes a set's variant uses.
-void fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, u8* p) {
+void fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, DynTex* pTex) {
     SkinDesc* pDesc;
     SkinDesc74* pSet;
     int i;
@@ -1210,12 +1206,12 @@ void fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, u8* p) {
     pDesc = pSkin->pModel->pDesc;
     pSet = &pDesc->p74[nSet];
     for (i = 0; i < pSet->n0C; i++) {
-        fn_800CEDE0(pSkin, p, pDesc->p84[i + (nVariant * pSet->n0C + pSet->n14)]);
+        fn_800CEDE0(pSkin, pTex, pDesc->p84[i + (nVariant * pSet->n0C + pSet->n14)]);
     }
 }
 
-void fn_800CEDE0(Skin* pSkin, u8* p, u64 uId) {
-    fn_8010AD50(p, uId);
+void fn_800CEDE0(Skin* pSkin, DynTex* pTex, u64 uId) {
+    fn_8010AD50(pTex, uId);
 }
 
 // Copies one copy of the skin's choices over another.
@@ -1271,7 +1267,7 @@ void fn_800CEF04(SkinDesc* pDesc) {
         pDesc->p14 = (SkinDesc14*)((u8*)pDesc + (uptr)pDesc->p14);
     }
     if (pDesc->p18 != NULL) {
-        pDesc->p18 = (u8*)pDesc + (uptr)pDesc->p18;
+        pDesc->p18 = (SkinDesc18*)((u8*)pDesc + (uptr)pDesc->p18);
     }
     if (pDesc->p20 != NULL) {
         pDesc->p20 = (s32*)((u8*)pDesc + (uptr)pDesc->p20);
@@ -1319,10 +1315,10 @@ void fn_800CEF04(SkinDesc* pDesc) {
         pDesc->p8C = (SkinDesc8C*)((u8*)pDesc + (uptr)pDesc->p8C);
     }
     if (pDesc->pA4 != NULL) {
-        pDesc->pA4 = (u8*)pDesc + (uptr)pDesc->pA4;
+        pDesc->pA4 = (s16*)((u8*)pDesc + (uptr)pDesc->pA4);
     }
     if (pDesc->pAC != NULL) {
-        pDesc->pAC = (u8*)pDesc + (uptr)pDesc->pAC;
+        pDesc->pAC = (s16*)((u8*)pDesc + (uptr)pDesc->pAC);
     }
     if (pDesc->pB8 != NULL) {
         pDesc->pB8 = (SkinDescB8*)((u8*)pDesc + (uptr)pDesc->pB8);

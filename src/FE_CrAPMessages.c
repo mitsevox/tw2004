@@ -71,6 +71,26 @@ void fn_80107998(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- end of sweep code ----
 
+// Set slider pArgs[0] of the created golfer to pArgs[1]; the menu golfer, when there is one, takes
+// the new sliders and part 18 is turned on with the slider's number.
+void fn_8010799C(MsgArg* pArgs, MsgArg* pResult) {
+    SkinChoices* pChoices = &fn_80077ACC()->choices;
+    int n = pArgs[0].i;
+    Character* pChar;
+
+    pChoices->a9B4[n] = pArgs[1].i;
+    if (lbl_80281EE0->pB4 == NULL) {
+        return;
+    }
+    pChar = lbl_80281EE0->pB4->pChar;
+    if (pChar == NULL) {
+        return;
+    }
+    fn_8010E4DC(pChar->p17AC, pChar->pModel, pChar->pSkin, 26, pChoices->a9B4,
+                (SKABlendNode*)pChar->node3E0);
+    FE_CrAP_TurnOnPart(18, 0, n);
+}
+
 // The place, in its part's list, of the asset in the profile's slot for part pArgs[0] (part 12:
 // for its entry pArgs[1]); 0 when the part has no slot or the slot is empty.
 void fn_80107A2C(MsgArg* pArgs, MsgArg* pResult) {
