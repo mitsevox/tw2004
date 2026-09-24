@@ -23,7 +23,9 @@ u8   fn_80126418(int n);
 void fn_8012643C(void);
 void fn_8012645C(int nPlayer);
 s32  fn_80126640(int n);
-void fn_80126EC0();
+s32  fn_80126334(int nPlayer);
+void fn_801260C0(void);
+void fn_80126EC0(void);
 void fn_80126E68(void);
 void fn_80126E88(void);
 void fn_80126F7C(void);
@@ -47,6 +49,21 @@ void fn_801260B8(void) {
 void fn_801260BC(void) {
 }
 
+// Every player on the first tee set, the option n20 off and the mode's state reset.
+void fn_801260C0(void) {
+    s32 i;
+
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        gSession.nTeeSet[i] = 0;
+    }
+    gSession.options.n20 = 0;
+    lbl_80195498.n8 = 5;
+    lbl_80195498.bC = 0;
+    lbl_80195498.f10 = 0.0f;
+    lbl_80195498.n14 = 5;
+    lbl_80195498.n18 = 120;
+}
+
 void fn_80126130(void) {
     GameModeStroke_SetupNextGolfer();
 }
@@ -67,6 +84,34 @@ void fn_801262C4(int nPlayer) {
 
 s32 fn_8012632C(void) {
     return 0;
+}
+
+// The next player after the current one other than nPlayer (5: none); 0 while no player has an
+// nEA0.
+s32 fn_80126334(int nPlayer) {
+    u8 bNone = 1;
+    s32 nNext;
+    s32 i;
+
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        if (gPlayers[i].nEA0 != 0) {
+            bNone = 0;
+        }
+    }
+    if (bNone) {
+        return 0;
+    }
+    nNext = lbl_80282278;
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        nNext++;
+        if (nNext >= gSession.nNumPlayers) {
+            nNext = 0;
+        }
+        if (nNext != nPlayer) {
+            return nNext;
+        }
+    }
+    return 5;
 }
 
 u8 fn_801263C4(int nPlayer, int n) {
@@ -129,6 +174,29 @@ void fn_80126E88(void) {
     fn_80126EC0();
     lbl_80195498.n8 = 5;
     lbl_80195498.bC = 0;
+}
+
+// Every player's mode values cleared (and message 0x42 sent for each); no current player.
+void fn_80126EC0(void) {
+    s32 i;
+
+    for (i = 0; i < 5; i++) {
+        gPlayers[i].nEA0 = 0;
+        gPlayers[i].nEA4 = 0;
+        gPlayers[i].nEA8 = 0;
+        gPlayers[i].nEBC = 0;
+        gPlayers[i].nEC0 = 0;
+        gPlayers[i].nEC4 = 0;
+        gPlayers[i].nEC8 = 0;
+        gPlayers[i].nECC = 0;
+        gPlayers[i].nED0 = 0;
+        gPlayers[i].nED4 = 0;
+        gPlayers[i].nED8 = 0;
+        gPlayers[i].nEDC = 0;
+        fn_800E5CA4(i, gPlayers[i].nEBC, 0, 0, 0, 0, 0, 0.0f);
+    }
+    lbl_80282278 = 5;
+    fn_80126F7C();
 }
 
 void fn_80126F7C(void) {
