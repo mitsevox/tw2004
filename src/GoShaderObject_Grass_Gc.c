@@ -426,8 +426,9 @@ void SD_vShaderObject_Grass_Static_Render(SD_SShaderObject_Static* pObject) {
     GrassRenderData* pData = pObject->pData;
     GrassParams* pParams = SD_gpGrassTypeData->pParams;
     s32 nSet = pParams->n24;
-    s32 nVerts = pData->anVerts[nSet][pParams->a18[nSet]];
-    GrassWord* pVert = pData->apVerts[nSet][pParams->a18[nSet]];
+    s32 nRun = pParams->a18[nSet];
+    s32 nVerts = pData->anVerts[nSet][nRun];
+    GrassWord* pVert = pData->apVerts[nSet][nRun];
     f32 vEye[3];
     f32 vAt[3];
     f32 fDist;
