@@ -9,6 +9,7 @@
 #include "terrain.h"
 #include "camera.h"
 #include "game.h"
+#include "unsorted/cull.h"
 
 void fn_80045FC8(UStreamObject* pObject);   // the 'BALL' stream handler
 void fn_80046FDC(int nView);
@@ -34,6 +35,7 @@ void fn_80047290(void);
 void fn_8004731C(u8* pState);
 void fn_80047C24(int nPlayer);
 void fn_80048184(int nPlayer);
+int  fn_8001005C(TexBank* pBank, u64 uHash);       // LLTex.c: the texture's index, or 0x80000000
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -49,6 +51,42 @@ void fn_80045F74(UStreamObject* arg0) {
         fn_8000B4B8(arg0);
     }
 }
+
+// ---- end of sweep code ----
+
+// The 'BALL' stream handler: a bank of ball logos. Each player's chosen logo (its profile's byte
+// 0x38, from lbl_80187B98's names) is copied over the pixels of that player's logo texture
+// ("logoea", "logonike", ...), then the bank is freed.
+void fn_80045FC8(UStreamObject* pObject) {
+    u64 uLogo;
+    u64 uSlot;
+    TexBank* pSlotBank;
+    TexEntry* pSlot;
+    TexBank* pBank;
+    TexEntry* pLogo;
+    int i;
+    int nLogo;
+
+    pBank = fn_8000FB88(pObject, NULL, -2);
+    for (i = 0; i < gSession.nNumPlayers; i++) {
+        if ((s8)gSession.aProfile[i].nOutfit >= 0) {
+            fn_800CB700(&uLogo, lbl_80187B98[(s8)gSession.aProfile[i].nOutfit]);
+            fn_800CB700(&uSlot, lbl_80187CF8[i]);
+            fn_800102DC(uSlot, &pSlotBank, &pSlot);
+            nLogo = fn_8001005C(pBank, uLogo);
+            pLogo = &pBank->p8[nLogo];
+            // EA bug: this loop counts with the player loop's i
+            while (i < pLogo->n41) {
+                Mem_cpy(pSlotBank->p18 + pSlot->uPixels, pBank->p18 + pLogo->uPixels, pLogo->nC * 16);
+                i++;
+            }
+        }
+    }
+    fn_80009E70(pBank);
+    fn_80009E70(pObject);
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_800460F8(UStreamObject* arg0) {
     void* temp_r31;
@@ -489,7 +527,47 @@ void fn_80047290(void) {
     }
 }
 
-// ---- 0x8004731C..0x80047A24: not yet decompiled ----
+// ---- 0x8004731C..0x8004787C: not yet decompiled ----
+
+// How big nPlayer's ball looks on screen: the distance between the points its radius above and
+// below its centre land on, on a 512 x 448 screen.
+f32 fn_8004787C(int nPlayer) {
+    Vec4 vPos;
+    f32 vDiff[4];
+    Vec4 vAbove;
+    Vec4 vBelow;
+    Vec4 vTop;
+    Vec4 vBottom;
+    Camera* pCamera;
+    CamLens* pLens;
+    f32 fRadius;
+
+    pCamera = fn_8001614C();
+    pLens = fn_80008370(pCamera);
+    fRadius = lbl_80281DA0->pTeo10000->pModel->apLod[0]->pInfo->f64 * lbl_80281128;
+    Vec_Copy(gPlayers[nPlayer].ball.vPos, &vPos.x);
+    vPos.w = 1.0f;
+    fn_800BAD60(pLens->m44, &vPos, &vAbove);
+    Vec_Copy(&vAbove.x, &vBelow.x);
+    vAbove.y += fRadius;
+    vBelow.y -= fRadius;
+    fn_800BAD60(pCamera->m5C, &vAbove, &vTop);
+    fn_800BAD60(pCamera->m5C, &vBelow, &vBottom);
+    if (0.0f != vTop.w) {
+        fn_8000AE28(&vTop.x, 1.0f / vTop.w, &vTop.x);
+    }
+    if (0.0f != vBottom.w) {
+        fn_8000AE28(&vBottom.x, 1.0f / vBottom.w, &vBottom.x);
+    }
+    vTop.z = 0.0f;
+    vTop.x = 256.0f * (1.0f + vTop.x);
+    vTop.y = 224.0f * (1.0f + vTop.y);
+    vBottom.z = 0.0f;
+    vBottom.x = 256.0f * (1.0f + vBottom.x);
+    vBottom.y = 224.0f * (1.0f + vBottom.y);
+    fn_80048680(&vTop.x, &vBottom.x, vDiff);
+    return (f32)fn_80009680(fn_80009744(vDiff));
+}
 
 // Puts the player's 'TEO ' 10002 object at pPos, facing against the aim; the first time it is made
 // (as a type 0 object, flag 0x200).

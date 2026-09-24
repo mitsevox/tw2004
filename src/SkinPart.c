@@ -7,9 +7,6 @@
 #include "terrain.h"
 #include "camera.h"
 
-SkinIter* fn_80113B34(u8* pBuf, SkinIterArgs* pArgs);
-void  fn_80113BAC(SkinIter* pIter);
-void  fn_80127B98(Skin* pSkin, s32* aParts, s32* aList);
 void  fn_80112614(SkinDesc14* pEntry, u8* p, s32 n);
 void  fn_80113774(int nPart, int nVariant, int nOption);
 void  fn_8011387C(int n);
@@ -53,7 +50,6 @@ s32   fn_800CDB70(Skin* pSkin, const char* pName);
 s32   fn_800CDE80(Skin* pSkin, int nSet, int nVariant, const char* pName);
 s32   fn_800CDEF4(Skin* pSkin, int nPart, int nVariant);
 void  fn_800CDF80(Skin* pSkin, int nPart, int nVariant, int nLink);
-s32   fn_800CE224(Skin* pSkin, SkinDesc14* pEntry, u8** ppOut, s32* pnOut, int nCopy);
 void  fn_800CE4B8(u64 uId, SkinListEntry* aList, s32* pnList, u8* p, s32 n);
 void  fn_800CE52C(Skin* pSkin, int n, SkinListEntry* aList, s32* pnList, int nCopy);
 s32   fn_800CE660(Skin** apSkins, int nSkins, SkinListEntry** ppList, u64* aIds, int nIds, int nCopy);
@@ -65,10 +61,6 @@ void  fn_800CEDE0(Skin* pSkin, u8* p, u64 uId);
 void  fn_800CEE04(Skin* pSkin, int nFrom, int nTo);
 void  fn_800CEE88(u8 b);
 void  fn_800CEE98(void);
-u8    fn_800CEEC0(SkinIter* pIter);
-void  fn_800CEEC8(SkinIter* pIter);
-SkinMesh* fn_800CEEF4(SkinIter* pIter);
-s32   fn_800CEEFC(SkinIter* pIter);
 
 s32   lbl_80191748[11] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1};
 char* lbl_80281540[2] = {"Glove", NULL};     // the parts fn_800CC4EC lists
@@ -1291,7 +1283,7 @@ void fn_800CEF04(SkinDesc* pDesc) {
         pDesc->p34 = (SkinMesh*)((u8*)pDesc + (uptr)pDesc->p34);
     }
     if (pDesc->p3C != NULL) {
-        pDesc->p3C = (u8*)pDesc + (uptr)pDesc->p3C;
+        pDesc->p3C = (s32*)((u8*)pDesc + (uptr)pDesc->p3C);
     }
     if (pDesc->p44 != NULL) {
         pDesc->p44 = (SkinDesc44*)((u8*)pDesc + (uptr)pDesc->p44);
