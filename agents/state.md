@@ -1,7 +1,12 @@
 # State (keep this short: current facts only; history goes to docs/journal.md)
 
-Updated 2026-09-24 ~15:15 CDT, at the move to cloud sessions. QUIET: no lanes running, everything
-merged to main, `main.dol: OK`.
+Updated 2026-09-24 ~16:00 CDT. RUNNING (cloud, checkpoint 17:00 CDT), quickest wins first:
+- cam-01: GoGolfCam, GoBreakLine, UStream, Skin, gbacable
+- money-01: Earnings, SunFlr_Gc, uiLoadFile, Ball, DepthField, PsMgr
+
+Held by the owner's PC until ~16:45 CDT (permuters + a closer lane on agent/map-09; hands wins to the
+cloud to apply, never pushes): GoStaticCam, GoShaderObjectCommon_ShaderObjectsData_Gc, UObject,
+TerrainData, GoShaderObject_Rain_Gc, startUp, LLFileIO_Gc, GameMode26, GoDynObj, uiText.
 
 ## Numbers (report.json)
 
