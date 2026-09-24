@@ -12,12 +12,16 @@
 #include "lighting.h"
 #include "camera.h"
 #include "glows.h"
+#include "dynobj.h"
 
 void* fn_800073B4(u8* pData, int n);
 void  fn_800075CC(void* p);         // frees what fn_800073B4 made
 void  fn_80019358(Character* pChar, f32* pDir, f32 f);
 void  fn_8001BE88(Character* pChar, void* pClip, int n, f32 f);
 void  fn_800F199C(f32 x, f32 y, f32 z);
+CamLens* fn_8001F004(void);         // the current camera's lens
+f32   fn_8001414C(u8* p);
+f32   fn_80014280(f32 x);           // tan
 void  fn_80030894(void);
 void  fn_80030A40(void* p, int n);
 f32   fn_800351D8(u32 n, f32 fPeriod);
@@ -32,16 +36,21 @@ void  fn_800341A4(UStreamObject* pObject);
 void  fn_800342B4(UStreamObject* pObject);
 void  fn_800342F0(UStreamObject* pObject);
 void  fn_80035098(u8 b);
+void  fn_80034CAC(int nRenderPass);
+void  fn_80034DE4(void);
+void  fn_80034F28(void* pUnused);
+void  fn_80035490(f32* pA, f32* pB, f32* pOut);
 
-void*    fn_800354BC(TerNode* pNode);
-f32*     fn_800354C4(TerNode* pNode);
-s32      fn_800354D0(TerNode* pNode, s32 n);
-TerNode* fn_800354E4(TerNode* pNode, s32 n);
-s32      fn_800354F4(TerNode* pNode);
-TerNode* fn_80035500(u8* pHoleData);
+void*     fn_800354BC(UObjMesh* pNode);
+f32*      fn_800354C4(UObjMesh* pNode);
+s32       fn_800354D0(UObjMesh* pNode, s32 n);
+UObjMesh* fn_800354E4(UObjMesh* pNode, s32 n);
+s32       fn_800354F4(UObjMesh* pNode);
+UObjMesh* fn_80035500(u8* pHoleData);
+UObjMesh* fn_8003556C(UObjMesh* pGround);
 
 // Fills pPatch from a patch's node: its ground is node 0, its objects come with a second node.
-void fn_80031084(TerNode* pNode, s32 eClipMethod, s32 iRenderPass, Ter_PatchReference* pPatch,
+void fn_80031084(UObjMesh* pNode, s32 eClipMethod, s32 iRenderPass, Ter_PatchReference* pPatch,
                  f32 fDistance) {
     s32 nNodes;
 
@@ -192,7 +201,7 @@ u8 fn_80031E40(void) {
 
 // Whether a ball has settled inside pModel's bounding sphere: a ball that has left where its shot
 // started, has hit something (nCollideCount) and moves slower than 10.
-u8 fn_80032330(TerNode* pModel) {
+u8 fn_80032330(UObjMesh* pModel) {
     f32* pSphere = fn_800354C4(pModel);
     f32 fRadiusSq = pSphere[3] * pSphere[3];
     int i;
@@ -210,7 +219,7 @@ u8 fn_80032330(TerNode* pModel) {
 // Adds a draw of pModel to a draw list: fills pDraw and counts it in *pCount. A model whose flags
 // (bytes 0 and 3) ask for it is skipped in modes 6-8 (fn_800E3A54); one with bits 0 and 1 of byte 0
 // is otherwise drawn as its node chosen by the object's state (n18).
-void fn_8003241C(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, TerNode* pModel, s32 iObject,
+void fn_8003241C(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, UObjMesh* pModel, s32 iObject,
                  s32 eClipMethod, u8 bUseFog, u8 bSetsPrimField, f32 fAlpha, f32 fMipmapBias,
                  f32 fDistanceSquared) {
     s32 uFlags0;
@@ -236,7 +245,7 @@ void fn_8003241C(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, TerNode* p
         if (fn_800E3A54()) return;
     }
     if (pDraw->pObject->p18 != NULL) {
-        pDraw->eShaderObjectType = *pDraw->pObject->p18;
+        pDraw->eShaderObjectType = pDraw->pObject->p18->n0;
     }
     (*pCount)++;
 }
@@ -611,9 +620,9 @@ void fn_800349CC(int n) {
 
 // The model of object list nObjList of patch nPatch: node 1 of the hole data's tree holds one node
 // per patch, and a patch's node 1 holds, in its node 0, its object lists. NULL when out of range.
-TerNode* fn_80034A20(u16 nPatch, u16 nObjList) {
-    TerNode* pModel = NULL;
-    TerNode* pNode;
+UObjMesh* fn_80034A20(u16 nPatch, u16 nObjList) {
+    UObjMesh* pModel = NULL;
+    UObjMesh* pNode;
 
     pNode = fn_800354E4(fn_80035500(lbl_801D3CB0.pCurrentHoleData), 1);
     if (nPatch < fn_800354F4(pNode)) {
@@ -626,6 +635,53 @@ TerNode* fn_80034A20(u16 nPatch, u16 nObjList) {
         }
     }
     return pModel;
+}
+
+// Draws the terrain: sets the renderer up, takes the camera's position and look direction, the
+// flat distance to the nearest ball and the smaller half field of view's tangent, then draws the
+// objects (fn_80034F28) and the grass (fn_80034CAC, fn_80034DE4).
+void fn_80034AE4(void) {
+    int i;
+    void* pHoleData = lbl_801D3CB0.pCurrentHoleData;
+    CamLens* pLens = fn_8001F004();
+    f32 vDiff[4];
+    f32 fDist;
+    f32 fTan;
+    f32 fWideTan;
+
+    fn_80035240(NULL);
+    fn_80016B9C();
+    fn_80016B9C();
+    fn_80016B9C();
+    fn_80035118(4, 5);
+    fn_80012F50(1, 6, 1);
+    fn_80014118(0x70);
+    fn_80012EF8();
+    lbl_801D3CB0.xCameraReferencePos[0] = pLens->v34[0];
+    lbl_801D3CB0.xCameraReferencePos[1] = pLens->v34[1];
+    lbl_801D3CB0.xCameraReferencePos[2] = pLens->v34[2];
+    lbl_801D3CB0.xCameraReferencePos[3] = 1.0f;
+    lbl_801D3CB0.xCameraLookVector[0] = pLens->v24[0];
+    lbl_801D3CB0.xCameraLookVector[1] = pLens->v24[1];
+    lbl_801D3CB0.xCameraLookVector[2] = pLens->v24[2];
+    lbl_801D3CB0.xCameraLookVector[3] = 1.0f;
+    lbl_801D3CB0.fXZDistanceToClosestBallSquared = 1000000.0f;
+    for (i = 0; i < gNumPlayersSetUp; i++) {
+        fn_80035490(gPlayers[i].ball.vPos, lbl_801D3CB0.xCameraReferencePos, vDiff);
+        vDiff[1] = 0.0f;
+        fDist = fn_80009744(vDiff);
+        if (fDist < lbl_801D3CB0.fXZDistanceToClosestBallSquared) {
+            lbl_801D3CB0.fXZDistanceToClosestBallSquared = fDist;
+        }
+    }
+    fTan = fn_80014280(0.5f * pLens->fFov);
+    fWideTan = fn_80014280(0.5f * (0.75f * pLens->fFov * fn_8001414C((u8*)fn_8003526C())));
+    lbl_801D3CB0.fCameraMinHalfFieldOfViewTan =
+        (fTan <= fWideTan / fn_80017028(0)->f54) ? fTan : fWideTan / fn_80017028(0)->f54;
+    fn_80012EF8();
+    fn_80034F28(pHoleData);
+    fn_80034CAC(0);
+    fn_80034DE4();
 }
 
 // Draws the grass patches of render pass nRenderPass that take part in the first pass (bit 0 of
@@ -711,6 +767,46 @@ void fn_80034DE4(void) {
     fn_80012EF8();
 }
 
+// Builds the grass list: every patch in the first pass's lists (bit 0x80 of n1C) or whose ground has
+// flag 8 of byte 3, and that is not off screen, is copied to xpGrassPatchList with its clip method
+// and its distance from the camera (less its radius, at least 0).
+void fn_80034F28(void* pUnused) {
+    Ter_PatchReference* pPatch;
+    void* pCamera;
+    Ter_PatchReference* pGrass;
+    int i;
+    View* pView;
+    f32 fRadius;
+    f32 fDist;
+    s32 nClip;
+
+    // pUnused: the one caller, fn_80034AE4, passes the hole data, which this function does not read
+    pCamera = fn_8001614C();
+    lbl_801D3CB0.iNumGrassPatches = 0;
+    pGrass = lbl_801D3CB0.xpGrassPatchList;
+    for (i = 0; i < lbl_801D3CB0.iTotalPatches; i++) {
+        pPatch = &lbl_801D3CB0.pPatchList[i];
+        if ((pPatch->n1C & 0x80) || (fn_800354D0(fn_8003556C(pPatch->pGround), 3) & 8)) {
+            fRadius = fn_800354C4(fn_8003556C(pPatch->pGround))[3];
+            fDist = Vec_Distance(lbl_801D3CB0.xCameraReferencePos, fn_800354C4(fn_8003556C(pPatch->pGround)))
+                    - fRadius;
+            if (fDist < 0.0f) {
+                fDist = 0.0f;
+            }
+            pView = fn_80017028(lbl_801D3CB0.iCurrentViewContext);
+            nClip = fn_80007B2C(fn_8003556C(pPatch->pGround), pCamera, fDist,
+                                lbl_801D3CB0.fCameraMinHalfFieldOfViewTan, pView->f54);
+            if (nClip != 3) {
+                Mem_cpy(pGrass, pPatch, sizeof(Ter_PatchReference));
+                pGrass->eClipMethod = nClip;
+                pGrass->fDistance = fDist;
+                pGrass++;
+                lbl_801D3CB0.iNumGrassPatches++;
+            }
+        }
+    }
+}
+
 // Sets boManageZUpdate and returns what it was.
 u8 fn_8003505C(u8 b) {
     u8 bOld = lbl_801D3CB0.boManageZUpdate;
@@ -783,7 +879,6 @@ f32 fn_800351D8(u32 n, f32 fPeriod) {
 
 void fn_80013D68();
 void fn_80013D9C();
-void fn_8003526C(void);
 void fn_80035294(void);
 void fn_800352BC(void);
 void fn_80035398(void);
@@ -794,8 +889,8 @@ void fn_80035240(f32 (*pMtx)[4]) {
     fn_80013D9C(*(s32*)((u8*)lbl_80280DF0), pMtx, lbl_80280DF0);
 }
 
-void fn_8003526C(void) {
-    fn_80012EF0(*(void**)lbl_80280DF0);
+f32* fn_8003526C(void) {
+    return fn_80012EF0(*(void**)lbl_80280DF0);
 }
 
 void fn_80035294(void) {
@@ -850,7 +945,6 @@ void fn_800354B4(u8* p, f32 v);
 s32 fn_80035508(u8* p0);
 s32 fn_80035554(u8* p0);
 f32 fn_80035560(u8* p0);
-s32 fn_8003556C(u8* p);
 void fn_80035584(s32 v);
 void fn_80035590(f32* p0);
 void fn_800355B8(f32* p0);
@@ -926,34 +1020,33 @@ void fn_800354B4(u8* p, f32 v) {
 
 // ---- end of sweep code ----
 
-void* fn_800354BC(TerNode* pNode) {
+void* fn_800354BC(UObjMesh* pNode) {
     return pNode->p14;
 }
 
-// The node's bounding sphere: centre, then radius. The data block's layout is not known yet, so
-// the offset stays raw.
-f32* fn_800354C4(TerNode* pNode) {
-    return (f32*)(pNode->pData + 0x58);
+// The node's bounding sphere: centre (v58), then radius (f64).
+f32* fn_800354C4(UObjMesh* pNode) {
+    return pNode->pInfo->v58;
 }
 
-// A flag byte of the node's data (from 0x24 on); the patch code reads bytes 1-3.
-s32 fn_800354D0(TerNode* pNode, s32 n) {
-    return pNode->pData[n + 0x24];
+// A flag byte of the node (a24); the patch code reads bytes 1-3.
+s32 fn_800354D0(UObjMesh* pNode, s32 n) {
+    return pNode->pInfo->a24[n];
 }
 
-TerNode* fn_800354E4(TerNode* pNode, s32 n) {
-    return pNode->ppNodes[n];
+UObjMesh* fn_800354E4(UObjMesh* pNode, s32 n) {
+    return pNode->p8[n];
 }
 
 // How many nodes the node holds.
-s32 fn_800354F4(TerNode* pNode) {
-    return *(s16*)pNode->pData;
+s32 fn_800354F4(UObjMesh* pNode) {
+    return pNode->pInfo->n0;
 }
 
 // The root of the hole data's model tree. The hole data's layout is not known yet, so the offset
 // stays raw.
-TerNode* fn_80035500(u8* pHoleData) {
-    return *(TerNode**)(pHoleData + 0xEC);
+UObjMesh* fn_80035500(u8* pHoleData) {
+    return *(UObjMesh**)(pHoleData + 0xEC);
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -980,8 +1073,9 @@ f32 fn_80035560(u8* p0) {
     return *(f32*)(((u8*)*(s32*)p0) + 0x54);
 }
 
-s32 fn_8003556C(u8* p) {
-    return *(s32*)(p + 0xC);
+// The mesh drawn for a patch's ground.
+UObjMesh* fn_8003556C(UObjMesh* pGround) {
+    return pGround->pC;
 }
 
 u8 fn_80035574(void) {
