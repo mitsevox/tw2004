@@ -193,6 +193,83 @@ typedef struct Skin {
                                 //         tested by fn_80037708
 } Skin;
 
+// A character's body sliders (Character.p17AC, made by CharSlider_CreateDefinitionsFromMem; our
+// names). fn_8010E4DC sets each slider's value, lets the sliders push on each other, then moves
+// the model's bones and the skin's morph targets by them.
+
+// A slider that moves another's range when this one is between fFrom and fTo (fn_8010DF8C).
+typedef struct CharSliderLink {
+    s32  nSlider;               // 0x00  the slider it moves
+    u32  uFlags;                // 0x04  1: moves the other's low end, 2: its high end
+    f32  fFrom;                 // 0x08
+    f32  fTo;                   // 0x0C
+    u8   unk10[0x18 - 0x10];
+} CharSliderLink;
+
+// A slider this one shares a length with: the two values, as a vector, are cut to fLength
+// (fn_8010DE60).
+typedef struct CharSliderLimit {
+    s32  nSlider;               // 0x0
+    f32  fLength;               // 0x4
+} CharSliderLimit;
+
+// A bone a slider scales (fn_800298F4 finds it by uId; fn_80028A70 scales it on uAxes).
+typedef struct CharSliderBone {
+    u64  uId;                   // 0x00
+    f32  fFrom;                 // 0x08  the scale at the range's start
+    f32  fTo;                   // 0x0C  and at its end
+    u32  uAxes;                 // 0x10
+    u8   unk14[4];
+} CharSliderBone;
+
+// A morph target a slider weights (matched against CharSliderDefs.aMorphIds).
+typedef struct CharSliderMorph {
+    u64  uId;                   // 0x00
+    f32  fFrom;                 // 0x08
+    f32  fTo;                   // 0x0C
+} CharSliderMorph;
+
+// A part of a slider's travel, fStart to fEnd, over which its bones (or morph targets) change.
+typedef struct CharSliderRange {
+    f32  fStart;                // 0x0
+    f32  fEnd;                  // 0x4
+    s32  nItems;                // 0x8
+    union {
+        CharSliderBone* pBones;     // in CharSliderDef.pBoneRanges
+        CharSliderMorph* pMorphs;   // in CharSliderDef.pMorphRanges
+    } items;                    // 0xC
+} CharSliderRange;
+
+typedef struct CharSliderDef {
+    s32  nId;                   // 0x00
+    s32  nLinks;                // 0x04
+    CharSliderLink* pLinks;     // 0x08
+    s32  nLimits;               // 0x0C
+    CharSliderLimit* pLimits;   // 0x10
+    s32  nBoneRanges;           // 0x14
+    CharSliderRange* pBoneRanges;   // 0x18
+    s32  nMorphRanges;          // 0x1C
+    CharSliderRange* pMorphRanges;  // 0x20
+    u8   unk24[4];
+} CharSliderDef;
+
+// A slider's state: its range and its value in it.
+typedef struct CharSliderValue {
+    f32  fLow;                  // 0x0
+    f32  fHigh;                 // 0x4
+    f32  fValue;                // 0x8
+    u8   bFixed;                // 0xC  not cut by a CharSliderLimit
+    u8   unkD[3];
+} CharSliderValue;
+
+typedef struct CharSliderDefs {
+    s32  nSliders;              // 0x00
+    CharSliderDef* pDefs;       // 0x04
+    CharSliderValue* pValues;   // 0x08
+    s32  nMorphs;               // 0x0C
+    u64* aMorphIds;             // 0x10  the skin's morph targets, in fn_8011CADC's order
+} CharSliderDefs;
+
 // The iterator fn_80113B34 builds in a buffer: its first word points at its next function.
 typedef struct SkinIter {
     void (**ppfnNext)(struct SkinIter* pIter);  // 0x0
@@ -271,7 +348,8 @@ s32   fn_800CDD5C(Skin* pSkin, int nSet, const char* pName);
 s32   fn_800CDDB0(Skin* pSkin, int nSet, int nVariant, u64 uId);
 void  fn_8001D4A4(Character* pChar, int nSlot);   // dresses the character (its skins and clubs)
 void  fn_8001EE98(Character* pChar, u8 b);    // sets the model's bEE
-void  fn_8010E4DC(void* pDefs, CharModel* pModel, Skin* pSkin, int nSliders, u8* aValues, u8* pNode);
+void  fn_8010E4DC(CharSliderDefs* pDefs, CharModel* pModel, Skin* pSkin, int nSliders, u8* aValues,
+                  u8* pNode);
                                         // applies slider values (Character.p17AC's definitions)
 void  fn_8010D454(void* pDefs);         // CharSliders.c: frees slider definitions
 void  fn_800CE170(Skin* pSkin, SkinTarget* pTarget);
