@@ -174,6 +174,87 @@ void fn_80071F58(SKABlendNode** ppNode, u8 bFreeSources) {
     }
 }
 
+// Put pNew into the tree at *ppNode: its times come from pBlend's window (without one, it moves to
+// start where the tree ends), a source gets a fresh pose from pChar. It takes a free child slot of
+// *ppNode; with both taken, the old node is copied into a new blend node, and that and pNew become
+// *ppNode's children. The node's times then cover its children's.
+void fn_800720C8(Character* pChar, SKABlendNode* pNew, SKABlendNode** ppNode, f32* pBlend,
+                 SKABlendFn pfnBlend, int b) {
+    s32 i = 0;
+    u8 bFree = 0;
+    SKABlendNode* pBlendNode = NULL;
+    s32 j;
+    f32 aBlend[6];
+    SkelPose* pPose;
+
+    if (ppNode == NULL) return;
+    if (*ppNode != NULL) {
+        if (pNew != NULL) {
+            if (pBlend == NULL) {
+                pNew->fEnd -= pNew->fStart;
+                pNew->fStart = fn_80072938(*ppNode);
+                pNew->fEnd += pNew->fStart;
+            } else {
+                pNew->fStart = pBlend[3];
+                pNew->fEnd = pBlend[4];
+                if (pNew->nType == 0) {
+                    pNew->u.src.fFrom = pBlend[0];
+                    pNew->u.src.fTo = pBlend[1];
+                }
+            }
+            if (pChar != NULL && pNew->nType == 0) {
+                if (pNew->nFormat == 0) {
+                    fn_800177A0(pChar, pNew->pPose);
+                } else if (pNew->nFormat == 1) {
+                    fn_80017864(pChar, &((SkelPose1*)pNew->pPose)->pose);
+                    for (j = 0; j < 3; j++) {
+                        memset(&((SkelPose1*)pNew->pPose)->aBlocks[j], 0, sizeof(SkelPoseBlock));
+                        fn_8001E8A4(((SkelPose1*)pNew->pPose)->aBlocks[j].aBits, 20);
+                    }
+                }
+            }
+        }
+        while (i < 2 && !bFree) {
+            if ((*ppNode)->u.blend.apChild[i] != NULL) {
+                i++;
+            } else {
+                bFree = 1;
+            }
+        }
+        if (bFree) {
+            (*ppNode)->u.blend.apChild[i] = pNew;
+            if (pNew->bC == 0) {
+                (*ppNode)->bC = 0;
+            }
+        } else {
+            fn_80071C28(&pBlendNode, 1, (*ppNode)->nFormat, pfnBlend, b);
+            if ((*ppNode)->nFormat == 0) {
+                memcpy(pBlendNode->pPose, (*ppNode)->pPose, sizeof(SkelPose));
+            } else {
+                memcpy(pBlendNode->pPose, (*ppNode)->pPose, sizeof(SkelPose1));
+            }
+            pPose = pBlendNode->pPose;
+            memcpy(pBlendNode, *ppNode, sizeof(SKABlendNode));
+            pBlendNode->bPooled = 1;
+            pBlendNode->pPose = pPose;
+            (*ppNode)->u.blend.apChild[0] = NULL;
+            (*ppNode)->u.blend.apChild[1] = NULL;
+            aBlend[3] = pBlendNode->fStart;
+            aBlend[4] = pBlendNode->fEnd;
+            aBlend[5] = 0.0f;
+            fn_800720C8(NULL, pBlendNode, ppNode, aBlend, pfnBlend, b);
+            fn_800720C8(NULL, pNew, ppNode, pBlend, pfnBlend, pNew->bC);
+        }
+    } else {
+        // EA bug: *ppNode is NULL here, so this reads nFormat through NULL, sets up a node over
+        // ppNode's own slot and stores pNew through NULL; no caller passes an empty slot.
+        fn_80071C28((SKABlendNode**)&ppNode, 1, (*ppNode)->nFormat, pfnBlend, b);
+        (*ppNode)->u.blend.apChild[0] = pNew;
+    }
+    (*ppNode)->fStart = fn_800728D8(*ppNode);
+    (*ppNode)->fEnd = fn_80072938(*ppNode);
+}
+
 // How many source nodes the tree under pNode has; *pppOldest gets the slot of the one that ends
 // first (left alone when it already holds an earlier one).
 int fn_800723E8(SKABlendNode* pNode, SKABlendNode*** pppOldest) {
