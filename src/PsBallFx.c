@@ -65,6 +65,28 @@ void fn_800A2FFC(int nPlayer, int bOn) {
     }
 }
 
+void fn_800A30E4(int nKind, Ball* pBall, int nPlayer, u8 bFlight, f32 fValue) {
+    PsEmitterDef* pDef;
+    int i;
+    PsEmitter* pEmitter;
+
+    for (i = 0; i < 5; i++) {
+        if (lbl_8018C868[nKind][i].nDef != -1 && fValue >= lbl_8018C868[nKind][i].fMin) {
+            pDef = &lbl_8018CA98[lbl_8018C868[nKind][i].nDef];
+            Vec3Copy(pBall->vPos, pDef->v80);
+            if (bFlight) {
+                pDef->f40 = -fn_8000AD78(-gPlayers[nPlayer].ball.vVel[0], gPlayers[nPlayer].ball.vVel[2]);
+            } else {
+                pDef->f40 = -gPlayers[nPlayer].fAim;
+            }
+            pEmitter = fn_80099758(pDef);
+            if (pEmitter != NULL) {
+                fn_80099EA4(pEmitter);
+            }
+        }
+    }
+}
+
 // Start emitter 15 at pPos for nPlayer's view, drifting with a tenth of the wind.
 void fn_800A3CB0(f32* pPos, int nPlayer) {
     f32 vWind[4];

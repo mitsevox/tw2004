@@ -361,6 +361,8 @@ void fn_80055D70(f32* pA, f32* pB, f32 fSin, f32 fCos);   // turns the pair (*pA
 
 void fn_80047B6C(Ball* pBall, int nPlayer);
 void fn_80047BC0(Ball* pBall, int nPlayer);
-void fn_800A30E4(int nKind, Ball* pBall, int nPlayer, int a, f32 f);   // an effect at the ball (the target games)
+// An effect at the ball (the target games): PsBallFx.c starts effect nKind's emitters whose
+// threshold fValue reaches, pointing along the ball's flight (bFlight) or the player's aim.
+void fn_800A30E4(int nKind, Ball* pBall, int nPlayer, u8 bFlight, f32 fValue);
 
 #endif

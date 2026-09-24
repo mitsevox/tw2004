@@ -80,6 +80,13 @@ typedef struct PsEmitterDef {
 } PsEmitterDef;
 LAYOUT_ASSERT(PsEmitterDef, 0x120);
 
+// lbl_8018C868[14][5]: for each kind of ball effect, up to five emitters (fn_800A30E4).
+typedef struct PsBallFxEmit {
+    s32  nDef;                  // 0x0  the emitter (lbl_8018CA98 index); -1: none
+    f32  fMin;                  // 0x4  started only when the caller's value is at least this
+} PsBallFxEmit;
+extern PsBallFxEmit lbl_8018C868[14][5];
+
 // Two vectors per course for emitters 0, 6 and 14 (fn_800A2E68); lbl_8018E958 replaces them on
 // course 18 in some modes.
 extern f32 lbl_8018E6B8[21][2][4];         // 21: NUM_COURSE_DATA (game.h)
