@@ -44,6 +44,25 @@ typedef struct IKChain {
 } IKChain;
 LAYOUT_ASSERT(IKChain, 0x20);
 
+// An IK link's setup (our name): what fn_80028208 copies into an IKLink.
+typedef struct IKLinkDef {
+    s32  nBone;                 // 0x00  a bone id (fn_8001EEE4 gives its index)
+    f32  f4;                    // 0x04  } IKLink's f4, n8, fC and f10
+    s32  n8;                    // 0x08  }
+    f32  fC;                    // 0x0C  }
+    f32  f10;                   // 0x10  }
+} IKLinkDef;
+LAYOUT_ASSERT(IKLinkDef, 0x14);
+
+// An IK chain's setup (our name): what fn_80028208 builds an IKChain from.
+typedef struct IKChainDef {
+    IKLinkDef* pLinks;          // 0x00
+    s32  nLinks;                // 0x04
+    s32  n8;                    // 0x08  IKChain's n18
+    f32  fC;                    // 0x0C  IKChain's f1C
+} IKChainDef;
+LAYOUT_ASSERT(IKChainDef, 0x10);
+
 // A bone's pose in a model (CharModel.p34).
 typedef struct BonePose {
     f32  q0[4];                 // 0x00  its rotation (quaternion)

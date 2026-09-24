@@ -550,6 +550,29 @@ f32 fn_800280E8(Character* pChar, f32* pTarget, int bNormals) {
     return fDrop;
 }
 
+// Builds an IK chain from its setup: a link per bone, each after the one before it.
+void fn_80028208(CharModel* pModel, IKChain* pChain, IKChainDef* pDef) {
+    int i;
+    s8 nPrev = -1;
+    IKLink* pLink;
+
+    pChain->nLinks = pDef->nLinks;
+    pChain->n18 = pDef->n8;
+    pChain->f1C = pDef->fC;
+    pChain->pLinks = fn_80009B34(pChain->nLinks * sizeof(IKLink), 2, 64, "Skeleton.c", 1126);
+    for (i = 0; i < pChain->nLinks; i++) {
+        pLink = &pChain->pLinks[i];
+        pLink->nBone = fn_8001EEE4(pModel, pDef->pLinks[i].nBone);
+        pLink->nPrev = nPrev;
+        nPrev = i;
+        pLink->b0 = 0;
+        pLink->n8 = pDef->pLinks[i].n8;
+        pLink->f4 = pDef->pLinks[i].f4;
+        pLink->fC = pDef->pLinks[i].fC;
+        pLink->f10 = pDef->pLinks[i].f10;
+    }
+}
+
 // Frees a skeleton: its chains' links, the chains, and both rotation sets.
 void fn_800284DC(Skeleton* pSkel) {
     int i;
