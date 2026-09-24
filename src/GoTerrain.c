@@ -754,6 +754,12 @@ u8 fn_80031E40(void) {
 // stay solid, faded in over the near range (pNearbyObjectList), and their fading level into
 // pTranslucentObjectList. Crowd objects (bit 0x20 of word 0, or 0x10 or 0x20 of word 3; not when
 // fn_800172C4 is 0 for the view) use the crowd's fade distances.
+// fake match: EA reads the default mipmap bias through an inline; with the plain array read the
+// compiler schedules the arguments of the fn_8003241C calls differently.
+static inline f32 fn_80031E58_Read(s32 iLOD) {
+    return lbl_801D3CB0.fDefaultObjectMipmapBias[iLOD];
+}
+
 void fn_80031E58(void) {
     UObjMesh* pModel;
     s32 uFlags0;
@@ -808,7 +814,7 @@ void fn_80031E58(void) {
             fn_8003241C(&lbl_801D3CB0.pPostDrawItemsList[lbl_801D3CB0.iPostDrawItems],
                         &lbl_801D3CB0.iPostDrawItems, 400, pRef->apObject[pRef->iOpaqueLOD],
                         pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0, 1.0f,
-                        lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iOpaqueLOD], pRef->fDistanceSquared);
+                        fn_80031E58_Read(pRef->iOpaqueLOD), pRef->fDistanceSquared);
         } else if (lbl_801D3CB0.pObjectSortList[i].fDistanceSquared < fFarSquared) {
             fDistance = fn_80009680(lbl_801D3CB0.pObjectSortList[i].fDistanceSquared);
             if (fDistance > fFar || (uFlags0 & 0x40)
@@ -823,7 +829,7 @@ void fn_80031E58(void) {
                 fn_8003241C(&lbl_801D3CB0.pOpaqueObjectList[lbl_801D3CB0.iOpaqueObjects],
                             &lbl_801D3CB0.iOpaqueObjects, 650, pRef->apObject[pRef->iOpaqueLOD],
                             pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0,
-                            1.0f, lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iOpaqueLOD],
+                            1.0f, fn_80031E58_Read(pRef->iOpaqueLOD),
                             pRef->fDistanceSquared);
             } else {
                 fT = (fDistance - fNear) / fRange;
@@ -835,7 +841,7 @@ void fn_80031E58(void) {
                     fn_8003241C(&lbl_801D3CB0.pNearbyObjectList[lbl_801D3CB0.iNearbyObjects],
                                 &lbl_801D3CB0.iNearbyObjects, 70, pRef->apObject[pRef->iOpaqueLOD],
                                 pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f,
-                                0, fT, lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iOpaqueLOD],
+                                0, fT, fn_80031E58_Read(pRef->iOpaqueLOD),
                                 pRef->fDistanceSquared);
                 }
             }
@@ -847,7 +853,7 @@ void fn_80031E58(void) {
             fn_8003241C(&lbl_801D3CB0.pOpaqueObjectList[lbl_801D3CB0.iOpaqueObjects],
                         &lbl_801D3CB0.iOpaqueObjects, 650, pRef->apObject[pRef->iOpaqueLOD],
                         pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0, 1.0f,
-                        lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iOpaqueLOD], pRef->fDistanceSquared);
+                        fn_80031E58_Read(pRef->iOpaqueLOD), pRef->fDistanceSquared);
         }
         if (gSession.b11 == 0) {
             pRef = &lbl_801D3CB0.pObjectSortList[i];
@@ -855,7 +861,7 @@ void fn_80031E58(void) {
                 fn_8003241C(&lbl_801D3CB0.pTranslucentObjectList[lbl_801D3CB0.iTranslucentObjects],
                             &lbl_801D3CB0.iTranslucentObjects, 200, pRef->apObject[pRef->iTranslucentLOD],
                             pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0,
-                            pRef->fAlpha, lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iTranslucentLOD],
+                            pRef->fAlpha, fn_80031E58_Read(pRef->iTranslucentLOD),
                             pRef->fDistanceSquared);
             }
         }
@@ -915,6 +921,8 @@ void fn_8003241C(Ter_ObjectDrawData* pDraw, s32* pCount, s32 nUnused, UObjMesh* 
 
 // Draws render pass nRenderPass's sorted patches, if it has any: each list (the pass a patch is
 // drawn in, 0..2) one clip method at a time, then the deferred items with the terrain's filters.
+// fake match: the (u32) casts on the clip index; with a signed index the compiler walks one pointer
+// through the lists instead of keeping the list base and a byte offset apart as EA's code does.
 void fn_80032518(int nRenderPass) {
     u8 bFirst = 1;
     u8 bAny;
@@ -925,7 +933,7 @@ void fn_80032518(int nRenderPass) {
     bAny = 0;
     for (nList = 0; nList < 3; nList++) {
         for (nClip = 0; nClip < 3; nClip++) {
-            if (lbl_801D3CB0.pSortedPatchList[nRenderPass][nList][nClip] != NULL) {
+            if (lbl_801D3CB0.pSortedPatchList[nRenderPass][nList][(u32)nClip] != NULL) {
                 bAny = 1;
                 break;
             }
@@ -947,7 +955,7 @@ void fn_80032518(int nRenderPass) {
                 }
             }
             for (nClip = 0; nClip <= 2; nClip++) {
-                if (lbl_801D3CB0.pSortedPatchList[nRenderPass][nList][nClip] != NULL) {
+                if (lbl_801D3CB0.pSortedPatchList[nRenderPass][nList][(u32)nClip] != NULL) {
                     switch (nClip) {
                     case 2:
                         fn_80035138(1);
@@ -960,8 +968,9 @@ void fn_80032518(int nRenderPass) {
                         break;
                     }
                     fn_80012EF8();
-                    for (pPatch = lbl_801D3CB0.pSortedPatchList[nRenderPass][nList][nClip]; pPatch != NULL;
-                         pPatch = pPatch->pNext[nList]) {
+                    for (pPatch =
+                             lbl_801D3CB0.pSortedPatchList[nRenderPass][nList][(u32)nClip];
+                         pPatch != NULL; pPatch = pPatch->pNext[nList]) {
                         fn_80032B7C(pPatch->pGround, nClip, nList, pPatch->n1C, pPatch->n18, pPatch->n20,
                                     &bFirst, 0, 0, pPatch->fDistance,
                                     pPatch->fDistance + 2.0f * pPatch->fBoundingRadius);
@@ -989,22 +998,21 @@ void fn_8003272C(int n) {
 // Draws render pass 0's fourth patch lists (pSortedPatchList[0][3]), if it has any, without z
 // writes; the lens's value at 0xAC is raised by 25 while the renderer is set up, then put back. In
 // split screen, patches with bit 0x8 of n1C are left out.
+// fake match: the (u32) casts on the clip index, as in fn_80032518.
 void fn_80032770(void) {
     u8 bFirst = 1;
     u8 bAny;
     int nClip;
-    Ter_PatchReference** ppHead;
     Ter_PatchReference* pPatch;
     CamLens* pLens;
     f32 fAC;
 
     bAny = 0;
-    if (lbl_801D3CB0.pSortedPatchList[0][3][0] != NULL) {
-        bAny = 1;
-    } else if (lbl_801D3CB0.pSortedPatchList[0][3][1] != NULL) {
-        bAny = 1;
-    } else if (lbl_801D3CB0.pSortedPatchList[0][3][2] != NULL) {
-        bAny = 1;
+    for (nClip = 0; nClip < 3; nClip++) {
+        if (lbl_801D3CB0.pSortedPatchList[0][3][(u32)nClip] != NULL) {
+            bAny = 1;
+            break;
+        }
     }
     if (bAny) {
         fn_8003272C(0);
@@ -1020,8 +1028,7 @@ void fn_80032770(void) {
         fn_80012EF8();
         fn_80014118(0x70);
         for (nClip = 0; nClip <= 2; nClip++) {
-            ppHead = &lbl_801D3CB0.pSortedPatchList[0][3][nClip];
-            if (*ppHead != NULL) {
+            if (lbl_801D3CB0.pSortedPatchList[0][3][(u32)nClip] != NULL) {
                 switch (nClip) {
                 case 2:
                     fn_80035138(1);
@@ -1034,7 +1041,9 @@ void fn_80032770(void) {
                     break;
                 }
                 fn_80012EF8();
-                for (pPatch = *ppHead; pPatch != NULL; pPatch = pPatch->pNext[3]) {
+                for (pPatch =
+                         lbl_801D3CB0.pSortedPatchList[0][3][(u32)nClip];
+                     pPatch != NULL; pPatch = pPatch->pNext[3]) {
                     if (!gSession.nSplitScreen || !(pPatch->n1C & 8)) {
                         fn_80032B7C(pPatch->pGround, nClip, 3, pPatch->n1C, pPatch->n18, pPatch->n20, &bFirst,
                                     0, 0, pPatch->fDistance,
@@ -1477,26 +1486,19 @@ void fn_80033704(u16 nPatch, u16 nObject) {
 // bit 0x1 of word 0: crowd members (bit 0x2) held in iCrowdPose, swaying in their pose or easing to
 // the next one through lbl_801877E0 (lbl_80187858 with bit 0x40 of word 3); bit 0x1 of word 3 rises
 // to 1 once n1C is 1; the trees sway by their period with noise.
+// fake match: `3 == n18` in the two pose-step tests (register order; found by the permuter).
 void fn_80033744(void) {
-    f32 fDrop;
     f32 fTime;
-    f32 fUpFast;
-    f32 fDownFast;
-    f32 fUp;
-    f32 fDown;
-    u32 nFrames;
     s32 i;
     s32 v;
     s32 k;
-    u32 uFlags0;
-    u32 uFlags3;
+    s32 uFlags0;
+    s32 uFlags3;
     f32 fPeriod;
     f32 fStep;
     f32 fNoise;
     f32 fSum;
     f32 fScale;
-    f32 fWave;
-    Ter_ObjectState* pState;
 
     fTime = gSession.fFrameTime;
     if (fTime > 1.0f / 30.0f) {
@@ -1518,12 +1520,6 @@ void fn_80033744(void) {
             fn_800335F8(0);
         }
     }
-    nFrames = FRAME_RATE * fTime;
-    fUpFast = 6.0f * fTime;
-    fDownFast = -6.0f * fTime;
-    fUp = 4.0f * fTime;
-    fDown = -4.0f * fTime;
-    fDrop = 5.0f * fTime;
     for (i = 0; i < TER_NUM_OBJECTS; i++) {
         for (v = 0; v < 2; v++) {
             if (lbl_801D3CB0.pObjectStateList[i].aView[v].n4 == 2) {
@@ -1541,143 +1537,164 @@ void fn_80033744(void) {
                 }
             }
         }
-        pState = &lbl_801D3CB0.pObjectStateList[i];
-        uFlags0 = pState->a20[0];
-        uFlags3 = pState->a20[3];
+        uFlags0 = lbl_801D3CB0.pObjectStateList[i].a20[0];
+        uFlags3 = lbl_801D3CB0.pObjectStateList[i].a20[3];
         if (!(uFlags0 & 1)) {
             continue;
         }
         if ((uFlags0 & 2) && lbl_801D3CB0.iCrowdPose != 0) {
             if (lbl_801D3CB0.iCrowdPose == 1) {
-                pState->n18 = 0;
-                pState->n1C = 0;
+                lbl_801D3CB0.pObjectStateList[i].n18 = 0;
+                lbl_801D3CB0.pObjectStateList[i].n1C = 0;
             } else {
-                pState->n18 = 3;
-                pState->n1C = 3;
+                lbl_801D3CB0.pObjectStateList[i].n18 = 3;
+                lbl_801D3CB0.pObjectStateList[i].n1C = 3;
             }
-            pState->f4 = lbl_801D3CB0.fCrowdInterpValue;
+            lbl_801D3CB0.pObjectStateList[i].f4 = lbl_801D3CB0.fCrowdInterpValue;
         } else if ((uFlags0 & 2) && !(uFlags3 & 0x40)) {
-            pState->nC += nFrames;
-            if (pState->n18 == pState->n1C || pState->f14 > 0.0f) {
-                fPeriod = 4.0f * (pState->f0 - lbl_801D3CB0.fTreeMinPeriod) + 1.5f;
-                if (pState->n18 == 3) {
-                    pState->f4 =
-                        0.5f * fn_800095F0(10.0f * (6.2831855f * fn_800351D8(pState->nC, fPeriod / 10.0f))
-                                           / fPeriod)
+            lbl_801D3CB0.pObjectStateList[i].nC += (u32)(FRAME_RATE * fTime);
+            if (lbl_801D3CB0.pObjectStateList[i].n18 == lbl_801D3CB0.pObjectStateList[i].n1C
+                || lbl_801D3CB0.pObjectStateList[i].f14 > 0.0f) {
+                fPeriod = 4.0f * (lbl_801D3CB0.pObjectStateList[i].f0 - lbl_801D3CB0.fTreeMinPeriod) + 1.5f;
+                if (lbl_801D3CB0.pObjectStateList[i].n18 == 3) {
+                    lbl_801D3CB0.pObjectStateList[i].f4 =
+                        0.5f * fn_800095F0(10.0f
+                                           * (6.2831855f
+                                              * fn_800351D8(lbl_801D3CB0.pObjectStateList[i].nC,
+                                                            fPeriod / 10.0f)
+                                              / fPeriod))
                         + 0.5f;
                 } else {
-                    pState->f4 =
-                        0.5f * fn_800095F0(0.5f * (6.2831855f * fn_800351D8(pState->nC, fPeriod / 0.5f))
-                                           / fPeriod)
+                    lbl_801D3CB0.pObjectStateList[i].f4 =
+                        0.5f * fn_800095F0(0.5f
+                                           * (6.2831855f
+                                              * fn_800351D8(lbl_801D3CB0.pObjectStateList[i].nC,
+                                                            fPeriod / 0.5f)
+                                              / fPeriod))
                         + 0.5f;
                 }
-                pState->f14 -= fTime;
+                lbl_801D3CB0.pObjectStateList[i].f14 -= fTime;
             } else {
-                for (k = 0; k < 6; k++) {
-                    if (pState->n18 == lbl_801877E0[k].n0 && pState->n1C == lbl_801877E0[k].n4) {
-                        fStep = lbl_801877E0[k].fC - pState->f4;
-                        if (pState->n18 == 2 || pState->n18 == 3) {
-                            if (fStep > fUpFast) {
-                                fStep = fUpFast;
+                for (k = 0; k < sizeof(lbl_801877E0) / sizeof(lbl_801877E0[0]); k++) {
+                    if (lbl_801D3CB0.pObjectStateList[i].n18 == lbl_801877E0[k].n0
+                        && lbl_801D3CB0.pObjectStateList[i].n1C == lbl_801877E0[k].n4) {
+                        fStep = lbl_801877E0[k].fC - lbl_801D3CB0.pObjectStateList[i].f4;
+                        if (lbl_801D3CB0.pObjectStateList[i].n18 == 2
+                            || 3 == lbl_801D3CB0.pObjectStateList[i].n18) {
+                            if (fStep > 6.0f * fTime) {
+                                fStep = 6.0f * fTime;
                             }
-                            if (fStep < fDownFast) {
-                                fStep = fDownFast;
+                            if (fStep < -6.0f * fTime) {
+                                fStep = -6.0f * fTime;
                             }
                         } else {
-                            if (fStep > fUp) {
-                                fStep = fUp;
+                            if (fStep > 4.0f * fTime) {
+                                fStep = 4.0f * fTime;
                             }
-                            if (fStep < fDown) {
-                                fStep = fDown;
+                            if (fStep < -4.0f * fTime) {
+                                fStep = -4.0f * fTime;
                             }
                         }
-                        pState->f4 += fStep;
-                        if (fabsf(pState->f4 - lbl_801877E0[k].fC) < 0.01f) {
-                            pState->n18 = lbl_801877E0[k].n8;
-                            pState->f4 = lbl_801877E0[k].f10;
-                            pState->nC = 0;
+                        lbl_801D3CB0.pObjectStateList[i].f4 += fStep;
+                        if (fabsf(lbl_801D3CB0.pObjectStateList[i].f4 - lbl_801877E0[k].fC) < 0.01f) {
+                            lbl_801D3CB0.pObjectStateList[i].n18 = lbl_801877E0[k].n8;
+                            lbl_801D3CB0.pObjectStateList[i].f4 = lbl_801877E0[k].f10;
+                            lbl_801D3CB0.pObjectStateList[i].nC = 0;
                             break;
                         }
                     }
                 }
             }
         } else if ((uFlags0 & 2) && (uFlags3 & 0x40)) {
-            pState->nC += nFrames;
-            if (pState->n18 == pState->n1C || pState->f14 > 0.0f) {
-                if (pState->n18 == 0) {
-                    pState->f4 -= fDrop;
-                    if (pState->f4 < 0.0f) {
-                        pState->f4 = 0.0f;
+            lbl_801D3CB0.pObjectStateList[i].nC += (u32)(FRAME_RATE * fTime);
+            if (lbl_801D3CB0.pObjectStateList[i].n18 == lbl_801D3CB0.pObjectStateList[i].n1C
+                || lbl_801D3CB0.pObjectStateList[i].f14 > 0.0f) {
+                if (lbl_801D3CB0.pObjectStateList[i].n18 == 0) {
+                    lbl_801D3CB0.pObjectStateList[i].f4 -= 5.0f * fTime;
+                    if (lbl_801D3CB0.pObjectStateList[i].f4 < 0.0f) {
+                        lbl_801D3CB0.pObjectStateList[i].f4 = 0.0f;
                     }
-                    pState->f14 -= fTime;
+                    lbl_801D3CB0.pObjectStateList[i].f14 -= fTime;
                 } else {
-                    fPeriod = 4.0f * (pState->f0 - lbl_801D3CB0.fTreeMinPeriod) + 1.5f;
-                    if (pState->n18 == 1) {
-                        pState->f4 =
-                            0.5f * fn_800095F0(10.0f * (6.2831855f * fn_800351D8(pState->nC, fPeriod / 10.0f))
-                                               / fPeriod)
+                    fPeriod =
+                        4.0f * (lbl_801D3CB0.pObjectStateList[i].f0 - lbl_801D3CB0.fTreeMinPeriod) + 1.5f;
+                    if (lbl_801D3CB0.pObjectStateList[i].n18 == 1) {
+                        lbl_801D3CB0.pObjectStateList[i].f4 =
+                            0.5f * fn_800095F0(10.0f
+                                               * (6.2831855f
+                                                  * fn_800351D8(lbl_801D3CB0.pObjectStateList[i].nC,
+                                                                fPeriod / 10.0f)
+                                                  / fPeriod))
                             + 0.5f;
                     } else {
-                        pState->f4 =
-                            0.5f * fn_800095F0(0.5f * (6.2831855f * fn_800351D8(pState->nC, fPeriod / 0.5f))
-                                               / fPeriod)
+                        lbl_801D3CB0.pObjectStateList[i].f4 =
+                            0.5f * fn_800095F0(0.5f
+                                               * (6.2831855f
+                                                  * fn_800351D8(lbl_801D3CB0.pObjectStateList[i].nC,
+                                                                fPeriod / 0.5f)
+                                                  / fPeriod))
                             + 0.5f;
                     }
-                    pState->f14 -= fTime;
+                    lbl_801D3CB0.pObjectStateList[i].f14 -= fTime;
                 }
             } else {
-                for (k = 0; k < 2; k++) {
-                    if (pState->n18 == lbl_80187858[k].n0 && pState->n1C == lbl_80187858[k].n4) {
-                        fStep = lbl_80187858[k].fC - pState->f4;
-                        if (pState->n18 == 2 || pState->n18 == 3) {
-                            if (fStep > fUpFast) {
-                                fStep = fUpFast;
+                for (k = 0; k < sizeof(lbl_80187858) / sizeof(lbl_80187858[0]); k++) {
+                    if (lbl_801D3CB0.pObjectStateList[i].n18 == lbl_80187858[k].n0
+                        && lbl_801D3CB0.pObjectStateList[i].n1C == lbl_80187858[k].n4) {
+                        fStep = lbl_80187858[k].fC - lbl_801D3CB0.pObjectStateList[i].f4;
+                        if (lbl_801D3CB0.pObjectStateList[i].n18 == 2
+                            || 3 == lbl_801D3CB0.pObjectStateList[i].n18) {
+                            if (fStep > 6.0f * fTime) {
+                                fStep = 6.0f * fTime;
                             }
-                            if (fStep < fDownFast) {
-                                fStep = fDownFast;
+                            if (fStep < -6.0f * fTime) {
+                                fStep = -6.0f * fTime;
                             }
                         } else {
-                            if (fStep > fUp) {
-                                fStep = fUp;
+                            if (fStep > 4.0f * fTime) {
+                                fStep = 4.0f * fTime;
                             }
-                            if (fStep < fDown) {
-                                fStep = fDown;
+                            if (fStep < -4.0f * fTime) {
+                                fStep = -4.0f * fTime;
                             }
                         }
-                        pState->f4 += fStep;
-                        if (fabsf(pState->f4 - lbl_80187858[k].fC) < 0.01f) {
-                            pState->n18 = lbl_80187858[k].n8;
-                            pState->f4 = lbl_80187858[k].f10;
-                            pState->nC = 0;
+                        lbl_801D3CB0.pObjectStateList[i].f4 += fStep;
+                        if (fabsf(lbl_801D3CB0.pObjectStateList[i].f4 - lbl_80187858[k].fC) < 0.01f) {
+                            lbl_801D3CB0.pObjectStateList[i].n18 = lbl_80187858[k].n8;
+                            lbl_801D3CB0.pObjectStateList[i].f4 = lbl_80187858[k].f10;
+                            lbl_801D3CB0.pObjectStateList[i].nC = 0;
                             break;
                         }
                     }
                 }
             }
         } else if (uFlags3 & 1) {
-            if (pState->n1C == 1) {
-                pState->f4 += fTime;
-                if (pState->f4 > 1.0f) {
-                    pState->f4 = 1.0f;
+            if (lbl_801D3CB0.pObjectStateList[i].n1C == 1) {
+                lbl_801D3CB0.pObjectStateList[i].f4 += fTime;
+                if (lbl_801D3CB0.pObjectStateList[i].f4 > 1.0f) {
+                    lbl_801D3CB0.pObjectStateList[i].f4 = 1.0f;
                 }
             } else {
-                pState->f4 = 0.0f;
+                lbl_801D3CB0.pObjectStateList[i].f4 = 0.0f;
             }
         } else {
-            fNoise = lbl_801D3CB0.fTreeNoiseAmplitudeScale;
-            fSum = 1.0f + fNoise;
+            fSum = 1.0f + lbl_801D3CB0.fTreeNoiseAmplitudeScale;
             fScale = 1.0f / fSum;
-            fWave = 0.5f * (fScale * fNoise)
+            fNoise = lbl_801D3CB0.fTreeNoiseAmplitudeScale;
+            lbl_801D3CB0.pObjectStateList[i].f4 =
+                0.5f * fScale
                     * fn_800095F0(6.2831855f
-                                  * fn_800351D8(gSession.nFrameCount,
-                                                lbl_801D3CB0.fTreeNoisePeriodScale * pState->f0)
-                                  / (lbl_801D3CB0.fTreeNoisePeriodScale * pState->f0));
-            pState->f4 = 0.5f * fScale
-                             * fn_800095F0(6.2831855f * fn_800351D8(gSession.nFrameCount, pState->f0)
-                                           / pState->f0)
-                       + fWave;
-            pState->f4 = pState->f4 * lbl_801D3CB0.fTreeOverdrive;
-            pState->f4 = pState->f4 + 0.5f;
+                                  * fn_800351D8(gSession.nFrameCount, lbl_801D3CB0.pObjectStateList[i].f0)
+                                  / lbl_801D3CB0.pObjectStateList[i].f0)
+                + 0.5f * (fScale * fNoise)
+                      * fn_800095F0(6.2831855f
+                                    * fn_800351D8(gSession.nFrameCount,
+                                                  lbl_801D3CB0.fTreeNoisePeriodScale
+                                                      * lbl_801D3CB0.pObjectStateList[i].f0)
+                                    / (lbl_801D3CB0.fTreeNoisePeriodScale
+                                       * lbl_801D3CB0.pObjectStateList[i].f0));
+            lbl_801D3CB0.pObjectStateList[i].f4 *= lbl_801D3CB0.fTreeOverdrive;
+            lbl_801D3CB0.pObjectStateList[i].f4 += 0.5f;
         }
     }
 }
@@ -2040,35 +2057,39 @@ void fn_80034AE4(void) {
 
 // Draws the grass patches of render pass nRenderPass that take part in the first pass (bit 0 of
 // n1C), from the end of the list, one clip method at a time.
-// Not exact (97.2%): the original tests bit 0 with `and.` against a register holding 1 (one more
-// saved register); every spelling tried folds the 1 into `clrlwi.` (a local mask of int, s32, u32 or
-// u8, s32/int counters).
+// fake match: the one-pass loop over the passes (as in fn_800329CC) keeps the pass bit in a register
+// for the `and.` test of bit 0.
 void fn_80034CAC(int nRenderPass) {
     u8 bFirst = 1;
     int i;
-    s32 nClip;
     Ter_PatchReference* pPatch;
+    int nPass;
+    int nPassBit;
+    s32 nClip;
 
     fn_80012EF8();
     fn_80014118(0x70);
-    for (nClip = 0; nClip <= 2; nClip++) {
-        switch (nClip) {
-        case 2:
-            fn_80035138(1);
-            break;
-        case 1:
-            fn_80035138(1);
-            break;
-        default:
-            fn_80035138(0);
-            break;
-        }
-        fn_80012EF8();
-        for (i = lbl_801D3CB0.iNumGrassPatches - 1; i >= 0; i--) {
-            pPatch = &lbl_801D3CB0.xpGrassPatchList[i];
-            if (pPatch->eClipMethod == nClip && pPatch->iRenderPass == nRenderPass && (pPatch->n1C & 1)) {
-                fn_80032B7C(pPatch->pGround, nClip, 0, pPatch->n1C, pPatch->n18, pPatch->n20, &bFirst, 0, 1,
-                            pPatch->fDistance, pPatch->fDistance + 2.0f * pPatch->fBoundingRadius);
+    for (nPass = 0, nPassBit = 1; nPass < 1; nPass++, nPassBit <<= 1) {
+        for (nClip = 0; nClip <= 2; nClip++) {
+            switch (nClip) {
+            case 2:
+                fn_80035138(1);
+                break;
+            case 1:
+                fn_80035138(1);
+                break;
+            default:
+                fn_80035138(0);
+                break;
+            }
+            fn_80012EF8();
+            for (i = lbl_801D3CB0.iNumGrassPatches - 1; i >= 0; i--) {
+                pPatch = &lbl_801D3CB0.xpGrassPatchList[i];
+                if (pPatch->eClipMethod == nClip && pPatch->iRenderPass == nRenderPass
+                    && (pPatch->n1C & nPassBit)) {
+                    fn_80032B7C(pPatch->pGround, nClip, nPass, pPatch->n1C, pPatch->n18, pPatch->n20, &bFirst,
+                                0, 1, pPatch->fDistance, pPatch->fDistance + 2.0f * pPatch->fBoundingRadius);
+                }
             }
         }
     }
