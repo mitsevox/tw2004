@@ -8,6 +8,211 @@
 #include "camera.h"
 
 void fn_80045428(f32* pA, f32* pB, f32* pOut);  // pOut = pA - pB (paired singles)
+void fn_8004544C(f32* pA, f32* pB, f32* pOut);  // pOut = pA + pB (paired singles)
+void fn_800418B0(CamShot* pShot, f32* pOut, f32 f1, f32 f2);
+void fn_80041EA8(int nPlayer, f32* pOut, f32* pCam, CamShot* pShot, CamScript* pScript, f32* pVec,
+                 f32 fTime);
+void fn_800422C4(int nPlayer, f32* pOut, f32* pCam, f32* pTarget, CamShot* pShot, CamScript* pScript,
+                 f32 fTime, f32 fLag);
+f32  fn_80043420(int nPlayer, CamScript* pScript, f32* pPos, f32* pCam, CamShot* pShot);
+void fn_8004349C(int nPlayer, f32* pCam, f32* pOut, f32* pTarget, CamScript* pScript, f32 fLag);
+void fn_8004255C(f32* pPos, f32* pTarget, f32 fUp, f32 fSide);
+void fn_8001EB8C(Character* pChar, int nBone, f32* pPos);   // char.c: a bone's position
+
+// Where the camera looks for the shot's bAC, into pOut: the pin (kind 0 in golfer state 18), the
+// ball, Player.vBall, bones of the golfer, the tee, the aim; the look-at point is moved by the
+// shot's f74 up and f70 sideways (fn_8004255C), and by fn_800418B0's offset before and after.
+// fn_80043388 decides between setting the point outright and easing it there.
+void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam, CamScript* pScript,
+                              f32* pVec, f32 fTime) {
+    f32 vPos[4];
+    f32 vDiff[4];
+    f32 vBone47[4];
+    f32 vBone39[4];
+    f32 vMid[4];
+    f32 vBone1[4];
+    f32 vBone10[4];
+    f32 vVel[4];
+    f32 vAim[4];
+    f32 vOffset[4];
+    f32 fY;
+    f32 fLen;
+    f32 fStep;
+    CourseInfo* pCourse;
+
+    if (!fn_80043388(pScript, pShot)) {
+        fn_800418B0(pShot, vOffset, pScript->f9C, pShot->f98);
+        fn_80045428(pOut, vOffset, pOut);
+    }
+    switch (pShot->bAC) {
+    case 0:
+        if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 18) {  // fake match: see game.h
+            pCourse = fn_8000C594();
+            Vec3Copy(&pCourse->pin[Game_CurrentPinSet()].x, pOut);
+        } else if (fn_80043388(pScript, pShot)) {
+            fn_8003D9AC(pScript, pShot, nPlayer, vPos, 0);
+            if (pScript->bCF) {
+                // not steeper than 1 in 5 down to the camera, once it is far enough out
+                fn_80045428(vPos, pCam, vDiff);
+                fY = vDiff[1];
+                vDiff[1] = 0.0f;
+                fLen = fn_80009680(fn_80009744(vDiff));
+                if (fY / fLen < -0.2f && fLen > lbl_80281F78->f128) {
+                    vPos[1] = pCam[1] - 0.2f * fLen;
+                }
+            }
+            Vec3Copy(vPos, pOut);
+            pOut[1] = fn_80043420(nPlayer, pScript, vPos, pCam, pShot);
+            fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+            pScript->fDC = lbl_80281F78->fE4;
+        } else {
+            fn_80041EA8(nPlayer, pOut, pCam, pShot, pScript, pVec, fTime);
+        }
+        break;
+    case 23:
+        Vec3Copy(gPlayers[nPlayer].ball.vVel, vVel);
+        vVel[1] = 0.0f;
+        fn_8001EF34(vVel, pShot->f70, vVel);
+        vVel[1] = pShot->f74 * gPlayers[nPlayer].ball.vVel[1];
+        fn_8004544C(gPlayers[nPlayer].ball.vPos, vVel, vAim);
+        if (fn_80043388(pScript, pShot)) {
+            Vec3Copy(vAim, pOut);
+        } else {
+            fn_800422C4(nPlayer, pOut, pCam, vAim, pShot, pScript, fTime, lbl_80281F78->fE4);
+        }
+        fn_8004349C(nPlayer, pCam, pOut, gPlayers[nPlayer].ball.vPos, pScript, lbl_80281F78->fE4);
+        break;
+    case 15:
+        Vec3Copy(gPlayers[nPlayer].ball.vPos, pOut);
+        break;
+    case 13:
+        if (fn_80043388(pScript, pShot)) {
+            Vec3Copy(gPlayers[nPlayer].ball.vPos, pOut);
+            pOut[1] -= gPlayers[nPlayer].ball.fHeight;
+            fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+        } else if (GameEffects_BallUpdatesThisFrame(nPlayer) != 0) {
+            Vec3Copy(gPlayers[nPlayer].ball.vPos, vPos);
+            vPos[1] -= gPlayers[nPlayer].ball.fHeight;
+            fn_8004255C(vPos, pCam, pShot->f74, pShot->f70);
+            fStep = (vPos[1] - pOut[1]) * lbl_80281F78->f164;
+            pOut[0] = vPos[0];
+            pOut[1] += fStep;
+            pOut[2] = vPos[2];
+            fn_8004349C(nPlayer, pCam, pOut, pOut, pScript, lbl_80281F78->fE4);
+        }
+        break;
+    case 1:
+        Vec3Copy(gPlayers[nPlayer].vBall, pOut);
+        if (fn_800453C8(nPlayer, pShot)) {
+            fn_8004255C(pOut, pCam, pShot->f74, -pShot->f70);
+        } else {
+            fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+        }
+        break;
+    case 2:
+        fn_8001EB8C(gPlayers[nPlayer].pChar, 0x39, vBone39);
+        fn_8001EB8C(gPlayers[nPlayer].pChar, 0x47, vBone47);
+        fn_8004544C(vBone39, vBone47, vMid);
+        fn_8001EF34(vMid, 0.5f, vMid);
+        Vec3Copy(vMid, pOut);
+        if (fn_800453C8(nPlayer, pShot)) {
+            fn_8004255C(pOut, pCam, pShot->f74, -pShot->f70);
+        } else {
+            fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+        }
+        break;
+    case 3:
+        fn_8001EB8C(gPlayers[nPlayer].pChar, 0x39, vBone39);
+        fn_8001EB8C(gPlayers[nPlayer].pChar, 0x47, vBone47);
+        fn_8004544C(vBone39, vBone47, vMid);
+        fn_8001EF34(vMid, 0.5f, vMid);
+        if (fn_80043388(pScript, pShot)) {
+            Vec3Copy(vMid, pOut);
+            if (fn_800453C8(nPlayer, pShot)) {
+                fn_8004255C(pOut, pCam, pShot->f74, -pShot->f70);
+            } else {
+                fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+            }
+        } else {
+            fn_800422C4(nPlayer, pOut, pCam, vMid, pShot, pScript, fTime, lbl_80281F78->fE8);
+        }
+        break;
+    case 4:
+        fn_8001EB8C(gPlayers[nPlayer].pChar, 1, vBone1);
+        Vec3Copy(vBone1, pOut);
+        if (fn_800453C8(nPlayer, pShot)) {
+            fn_8004255C(pOut, pCam, pShot->f74, -pShot->f70);
+        } else {
+            fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+        }
+        break;
+    case 5:
+        fn_8001EB8C(gPlayers[nPlayer].pChar, 1, vBone1);
+        if (fn_80043388(pScript, pShot)) {
+            Vec3Copy(vBone1, pOut);
+            if (fn_800453C8(nPlayer, pShot)) {
+                fn_8004255C(pOut, pCam, pShot->f74, -pShot->f70);
+            } else {
+                fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+            }
+        } else {
+            fn_800422C4(nPlayer, pOut, pCam, vBone1, pShot, pScript, fTime, lbl_80281F78->fE8);
+        }
+        break;
+    case 6:
+        fn_8001EB8C(gPlayers[nPlayer].pChar, 10, vBone10);
+        Vec3Copy(vBone10, pOut);
+        if (fn_800453C8(nPlayer, pShot)) {
+            fn_8004255C(pOut, pCam, pShot->f74, -pShot->f70);
+        } else {
+            fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+        }
+        break;
+    case 7:
+        fn_8001EB8C(gPlayers[nPlayer].pChar, 10, vBone10);
+        if (fn_80043388(pScript, pShot)) {
+            Vec3Copy(vBone10, pOut);
+            if (fn_800453C8(nPlayer, pShot)) {
+                fn_8004255C(pOut, pCam, pShot->f74, -pShot->f70);
+            } else {
+                fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+            }
+        } else {
+            fn_800422C4(nPlayer, pOut, pCam, vBone10, pShot, pScript, fTime, lbl_80281F78->fE8);
+        }
+        break;
+    case 10:
+        Vec3Copy(&fn_8000C594()->pin[Game_CurrentPinSet()].x, pOut);
+        fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+        break;
+    case 11:
+        Vec3Copy(&fn_8000C594()->tee[gSession.nTeeSet[nPlayer]].x, pOut);
+        fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+        break;
+    case 9:
+        if (fn_80043388(pScript, pShot) || pScript->pNextShot != NULL) {
+            Vec3Copy(gPlayers[nPlayer].vTargetCopy, pOut);
+            fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+        } else {
+            CameraScript_LagAimMarker(nPlayer, pOut, pCam, pShot, 1, 0, lbl_80281F78->fD8, 0.0f,
+                                      lbl_80281F78->fDC);
+        }
+        break;
+    case 14:
+        fn_8003D9AC(pScript, pShot, nPlayer, pOut, 0);
+        pOut[1] = pCam[1];
+        fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+        break;
+    case 22:
+    case 24:
+        Vec3Copy(pShot->v30, pOut);
+        fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
+        break;
+    }
+    fn_80043388(pScript, pShot);    // its answer is not used
+    fn_800418B0(pShot, vOffset, pScript->f98, pShot->f98);
+    fn_8004544C(pOut, vOffset, pOut);
+}
 
 // Raises pPos by fUp and moves it fSide sideways, square to the line from pTarget to it.
 void fn_8004255C(f32* pPos, f32* pTarget, f32 fUp, f32 fSide) {

@@ -117,7 +117,7 @@ typedef struct CamScript {
     f32  f90;                   // 0x90  } the move's time so far and its length: fn_80063B98 sets
     f32  f94;                   // 0x94  } 0 and its time
     f32  f98;                   // 0x98
-    u8   unk9C[0xA0 - 0x9C];
+    f32  f9C;                   // 0x9C  CamScript_GetLookAtPoint hands it to fn_800418B0 (f98 at its end)
     f32  fA0;                   // 0xA0
     f32  fA4;                   // 0xA4
     u8   unkA8[0xAC - 0xA8];
@@ -262,9 +262,19 @@ typedef struct CamTuning {
     f32  fC4;                   // 0x0C4
     f32  fC8;                   // 0x0C8
     f32  fCC;                   // 0x0CC
-    u8   unkD0[0xDC - 0xD0];
+    u8   unkD0[0xD8 - 0xD0];
+    f32  fD8;                   // 0x0D8  CamScript_GetLookAtPoint: CameraScript_LagAimMarker's first lag
     f32  fDC;                   // 0x0DC  the green zoom-to-aim camera's aim marker (CameraScript_LagAimMarker)
-    u8   unkE0[0x168 - 0xE0];
+    u8   unkE0[0xE4 - 0xE0];
+    f32  fE4;                   // 0x0E4  CamScript_GetLookAtPoint: the aim's lag on the ball (fn_800422C4,
+                                //        fn_8004349C); also put in CamScript.fDC
+    f32  fE8;                   // 0x0E8  ... its lag on a bone of the golfer (fn_800422C4)
+    u8   unkEC[0x128 - 0xEC];
+    f32  f128;                  // 0x128  CamScript_GetLookAtPoint: the least level distance for the
+                                //        steep-aim limit
+    u8   unk12C[0x164 - 0x12C];
+    f32  f164;                  // 0x164  CamScript_GetLookAtPoint: kind 13's share of the height change
+                                //        a frame
     f32  f168;                  // 0x168  the ground clearance for CamScript_KeepAboveGround
     f32  f16C;                  // 0x16C  the obstruction radius around the ball for the pre-shot routine
     f32  f170;                  // 0x170  a blend for fn_80063B98 / fn_80063BF4
@@ -470,6 +480,8 @@ CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind
 u8       fn_8003C9D0(int nPlayer, u8 b, CamSequence** ppSeq, CamShot** ppShot);
 u8       fn_8003D7A0(CamSequence* pSequence, int nPlayer);   // it suits the player's club and shot
 u8     fn_8003DC78(CamShot* pShot);     // the shot's bAC is 1..6 or 7
+// The ball's position, or the script's v70 when the ball is by the pin (with bKeep v70 follows it).
+void   fn_8003D9AC(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pOut, u8 bKeep);
 // 0 when gSession.nGameType is 3, else fn_8001EDF4 of the player's golfer (Player.pChar) as a flag;
 // the shot is not read.
 u8     fn_800453C8(int nPlayer, CamShot* pShot);
@@ -489,6 +501,8 @@ void     CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int
 void     CameraScript_InterpToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pCam, f32* pSub,
                                         int nA, f32 f1, f32 f2, int nB, f32 f3);
 u8       fn_80043388(CamScript* pScript, CamShot* pShot);
+void     CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot, int a, int b, f32 f1,
+                                   f32 f2, f32 f3);
 void     fn_80043C74(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot* pShot, f32* pSub, int a);
 void     CamScript_PutBackOnFairway(CamScript* pScript, f32* pOut, f32* pCam, int nPlayer, CamShot* pShot,
                                     f32* pSub);

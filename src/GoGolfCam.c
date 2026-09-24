@@ -56,8 +56,6 @@ f32      fn_800D04AC(int nPlayer);                      // Swing.c's declaration
 f32      fn_800C54FC(View* pView, f32* pCam, f32* pSub, int nPlayer);
 f32      fn_800C5A70(View* pView, f32* pCam, f32* pSub, int nPlayer);
 u8       fn_800C7450(void);
-void     CameraScript_LagAimMarker(int nPlayer, f32* pSub, f32* pCam, CamShot* pShot, int a, int b, f32 f1,
-                                   f32 f2, f32 f3);
 u8       fn_8012022C(void);                            // (sweep code) lbl_80281900's +0x370 is nonzero
 void     fn_8001966C(Character* pChar);                 // char.c
 void     fn_8007325C(u8* pAnim);                        // set bit 2 of the animation player's flags
