@@ -6,6 +6,7 @@
 #include "game.h"
 #include "core/card.h"
 #include "discerror.h"
+#include "core/startup.h"
 
 volatile DispSync lbl_801A2350;       // volatile: the GX and VI callbacks change it
 GXTexRegion lbl_801A2364[16];          // the texture cache, in 32 KB regions
@@ -15,6 +16,7 @@ u32 lbl_80281B98;                      // bits per pixel of the frame: 16 or 24
 u8  lbl_80281B8C;                      // cleared when a frame ends, set when the viewport is set
 u8  lbl_80281B8D;                      // copy the frame's colour, not only its alpha
 u32 lbl_80281B90;                      // one image buffer's size in bytes
+u8  lbl_80281BAC;                      // set once fn_800072E8 has stopped the disc and the audio
 
 void VIInit(void);                      // SDK
 void VIConfigure(GXRenderModeObj* pMode);
@@ -30,6 +32,10 @@ void GXSetDispCopyGamma(int eGamma);
 int  PADRecalibrate(u32 uMask);
 s32  OSResetSystem(s32, s32, s32);
 int  OSGetResetButtonState(void);
+int  OSEnableInterrupts(void);
+int  DVDCancelAll(void);
+void AISetStreamVolLeft(u8 uVol);
+void AISetStreamVolRight(u8 uVol);
 void fn_80006A98(void);
 void fn_80006B4C(void);
 void fn_80007328(void);
@@ -331,24 +337,11 @@ void fn_80007264(f32* pGamma) {
     GXSetDispCopyGamma(eGamma);
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
-extern u32 lbl_80281B98;
-s32 fn_800072E0(void);
-extern u8 lbl_80281BAC;
-void AISetStreamVolLeft();
-void AISetStreamVolRight();
-void DVDCancelAll();
-void fn_800072E8(void);
-u8 fn_80007320(void);
-s32 OSEnableInterrupts();
-extern s32* lbl_80281510;
-s32 OSDisableInterrupts();
-
 s32 fn_800072E0(void) {
     return lbl_80281B98;
 }
 
+// Stops the disc and silences the streamed audio, then flags it (fn_80007320).
 void fn_800072E8(void) {
     DVDCancelAll();
     AISetStreamVolLeft(0);
@@ -360,22 +353,23 @@ u8 fn_80007320(void) {
     return lbl_80281BAC;
 }
 
+// Leaves one level of fn_80007368: interrupts come back on when the last level is left.
 void fn_80007328(void) {
     *lbl_80281510 -= 1;
-    if ((s32) *lbl_80281510 == 0) {
+    if (*lbl_80281510 == 0) {
         OSEnableInterrupts();
     }
 }
 
+// Turns interrupts off, counting the levels so that calls can nest.
 void fn_80007368(void) {
-    if ((s32) *lbl_80281510 == 0) {
+    if (*lbl_80281510 == 0) {
         OSDisableInterrupts();
     }
     *lbl_80281510 += 1;
 }
 
+// Resets the FIFO high-water mark (fn_800124CC raises it).
 void fn_800073A8(void) {
     lbl_80281B9C = 0;
 }
-
-// ---- end of sweep code ----
