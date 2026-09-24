@@ -718,6 +718,44 @@ extern f32 lbl_80281118;        // 0.00315
 extern f32 lbl_8028111C;        // 3.13
 extern f32 lbl_80281120[2];     // 1, 0
 
+// ---- the screen effects (GoPostFx.c) ---------------------------------------------------------
+
+// Three effects per view (four views each; our names), each drawn once when set, then cleared.
+// A colour drawn over the view (fn_80038010 sets it, fn_80038438 draws it).
+typedef struct PostFxTint {
+    u8   b0;                    // 0x00  set: draw it this frame
+    u8   unk1[3];
+    f32  aColour[4];            // 0x04  fn_80014194's colour
+} PostFxTint;
+LAYOUT_ASSERT(PostFxTint, 0x14);
+
+// Set by fn_80038054, drawn by fn_80038724.
+typedef struct PostFx5090 {
+    u8   b0;                    // 0x00  set: draw it this frame
+    u8   unk1[3];
+    f32  f4;                    // 0x04  0.035 or more also calls fn_800A6070(0, 1)
+    f32  f8;                    // 0x08
+} PostFx5090;
+LAYOUT_ASSERT(PostFx5090, 0xC);
+
+// Set by fn_800380A8, drawn by fn_80038A90.
+typedef struct PostFx5020 {
+    u8   b0;                    // 0x00  set: draw it this frame
+    u8   b1;                    // 0x01
+    u8   unk2[2];
+    f32  v4[3];                 // 0x04
+    u8   unk10[4];
+    f32  f14;                   // 0x14
+    f32  f18;                   // 0x18
+} PostFx5020;
+LAYOUT_ASSERT(PostFx5020, 0x1C);
+
+extern f32 lbl_801D5010[4];     // per view: fn_80039358 darkens the screen by this share
+extern PostFx5020 lbl_801D5020[4];
+extern PostFx5090 lbl_801D5090[4];
+extern PostFxTint lbl_801D50C0[4];
+extern void* lbl_80281D80;      // a 256 x 224 screen copy, only in game types 4..8
+
 // ---- the file streamer (UStream.c) -----------------------------------------------------------
 
 // An object built from SHOC chunks. The header is 0x34 bytes (LoadData.c copies one with

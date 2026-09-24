@@ -1,28 +1,59 @@
-// GoPostFx.c (EA's name, from its asserts; TW06): not yet decompiled; the sweep code below is the
-// matched small functions.
+// GoPostFx.c (EA's name, from its asserts; TW06): the screen effects drawn over each view: a
+// colour (lbl_801D50C0), and two effects made from a copy of the screen (lbl_801D5090,
+// lbl_801D5020). Not decompiled yet beyond the functions below.
 
 #include "game_types.h"
+#include "engine.h"
+#include "golfer.h"
 #include "gx.h"
+#include "camera.h"
+#include "terrain.h"
+
+void fn_80037E50(void);
+void fn_80038A90(f32* pV, u8 b, int nView, int nField, f32 f14, f32 f18);
+void fn_80038724(int nField, int nView, f32 f8, f32 f4);
+void fn_800A6070(u8 nPlayer, u8 bLimit);      // GameAudio.c
+
+// Makes the screen copy (game types 4..8 only) and clears every effect.
+void PostFx_CopyScreenToBuffer(void) {
+    lbl_80281D80 = NULL;
+    if (gSession.nGameType >= 4 && gSession.nGameType <= 8) {
+        lbl_80281D80 = fn_80009B34(GXGetTexBufferSize(256, 224, 6, 0, 0), 2, 0x20, "GoPostFx.c", 119);
+    }
+    fn_80037E50();
+}
+
+// Clears every view's effects and sets up the textures.
+void fn_80037E50(void) {
+    int i;
+
+    for (i = 0; i < 4; i++) {
+        lbl_801D50C0[i].b0 = 0;
+        lbl_801D5090[i].b0 = 0;
+        lbl_801D5020[i].b0 = 0;
+        lbl_801D5010[i] = 0.0f;
+    }
+    if (gSession.nGameType >= 4 && gSession.nGameType <= 8) {
+        fn_8002A528(&lbl_801D4FB0[0], 256, 224, lbl_80281D80, NULL, 6, 0, 0, 0);
+        fn_8002A528(&lbl_801D4FB0[1], 256, 224, lbl_80281D80, NULL, 6, 0, 0, 0);
+    }
+    if (fn_8002A624() != NULL) {
+        fn_8002A528(&lbl_801D4F80, 256, 128, fn_8002A624(), NULL, 4, 0, 0, 0);
+    }
+}
 
 // ---- sweep code (not yet cleaned up) ----
 
-s32 fn_80009E70();
-extern void* lbl_80281D80;
 void fn_80037F80(void);
-void fn_80038010(u8 arg0, s32 arg1, s32 arg2);
-void fn_80037FB4(u8 arg0, s32 arg1);
+void fn_80038010(u8 b, int nView, f32* pColour);
+void fn_80037FB4(u8 b, f32* pColour);
 u8 fn_8003944C();
-s32 fn_80038314();
-s32 fn_800383A8();
+void fn_80038314(void);
+void fn_800383A8(void);
 s32 fn_80038438();
 void fn_800382E0(void);
-extern u8 lbl_801D50C0[];
-void Vec_Copy();
-void fn_800386F0(s32 p0, s32 p1);
-void fn_8002A024();
-void fn_80038A2C(s32 p0, u8* p1);
-void fn_8002A164();
-void fn_80038A6C(void);
+void fn_80038A2C(int nField, RenderCamera* pCamera);
+void fn_80038A6C(int nField, void* pCamera);
 void fn_800392D0(void);
 
 void fn_80037F80(void) {
@@ -32,15 +63,43 @@ void fn_80037F80(void) {
     }
 }
 
-void fn_80037FB4(u8 arg0, s32 arg1) {
-    s32 var_r31;
+// Sets (b) or clears every view's colour.
+void fn_80037FB4(u8 b, f32* pColour) {
+    int i;
 
-    var_r31 = 0;
-    do {
-        fn_80038010(arg0, var_r31, arg1);
-        var_r31 += 1;
-    } while (var_r31 < 4);
+    for (i = 0; i < 4; i++) {
+        fn_80038010(b, i, pColour);
+    }
 }
+
+// ---- end of sweep code ----
+
+// Sets (b) or clears view nView's colour.
+void fn_80038010(u8 b, int nView, f32* pColour) {
+    lbl_801D50C0[nView].b0 = b;
+    if (b) {
+        Vec_Copy(pColour, lbl_801D50C0[nView].aColour);
+    }
+}
+
+void fn_80038054(u8 b, int nView, f32 f4, f32 f8) {
+    lbl_801D5090[nView].b0 = b;
+    lbl_801D5090[nView].f4 = f4;
+    lbl_801D5090[nView].f8 = f8;
+    if (f4 >= 0.035f) {
+        fn_800A6070(0, 1);
+    }
+}
+
+void fn_800380A8(u8 b, f32* pV, u8 b1, int nView, f32 f14, f32 f18) {
+    lbl_801D5020[nView].b0 = b;
+    Vec_Copy(pV, lbl_801D5020[nView].v4);
+    lbl_801D5020[nView].b1 = b1;
+    lbl_801D5020[nView].f14 = f14;
+    lbl_801D5020[nView].f18 = f18;
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_800382E0(void) {
     if (fn_8003944C() == 0) {
@@ -50,17 +109,78 @@ void fn_800382E0(void) {
     }
 }
 
-void fn_800386F0(s32 p0, s32 p1) {
-    Vec_Copy(((lbl_801D50C0 + (p0 * 20)) + 0x4), p1, (p0 * 20));
+// ---- end of sweep code ----
+
+// Draws the set lbl_801D5020 effects of the views in use, then clears them.
+void fn_80038314(void) {
+    int i;
+
+    for (i = 0; i < 4; i++) {
+        if (lbl_801D5020[i].b0 && fn_800170A0(i)) {
+            fn_80038A90(lbl_801D5020[i].v4, lbl_801D5020[i].b1, i, lbl_80281B88 & 1,
+                        lbl_801D5020[i].f14, lbl_801D5020[i].f18);
+            lbl_801D5020[i].b0 = 0;
+        }
+    }
 }
 
-void fn_80038A2C(s32 p0, u8* p1) {
-    fn_8002A024(1, *(s32*)(p1 + 0x14), *(f32*)((u8*)*(s32*)(p1 + 0x14)), *(f32*)(((u8*)*(s32*)(p1 + 0x14)) + 0x4), (*(f32*)((u8*)*(s32*)(p1 + 0x14)) + *(f32*)(((u8*)*(s32*)(p1 + 0x14)) + 0x8)), (*(f32*)(((u8*)*(s32*)(p1 + 0x14)) + 0x4) + *(f32*)(((u8*)*(s32*)(p1 + 0x14)) + 0xC)));
+// Draws the set lbl_801D5090 effects of the views in use, then clears them.
+void fn_800383A8(void) {
+    int i;
+
+    for (i = 0; i < 4; i++) {
+        if (lbl_801D5090[i].b0 && fn_800170A0(i)) {
+            fn_80038724(lbl_80281B88 & 1, i, lbl_801D5090[i].f8, lbl_801D5090[i].f4);
+            lbl_801D5090[i].b0 = 0;
+        }
+    }
+    fn_8002A2FC();
 }
 
-void fn_80038A6C(void) {
+// ---- sweep code (not yet cleaned up) ----
+
+// Copies view nView's colour to pOut.
+void fn_800386F0(int nView, f32* pOut) {
+    Vec_Copy(lbl_801D50C0[nView].aColour, pOut);
+}
+
+// Turns fn_8002A024 on for the camera's screen rectangle (nField unused).
+void fn_80038A2C(int nField, RenderCamera* pCamera) {
+    fn_8002A024(1, pCamera->pRect[0], pCamera->pRect[1], pCamera->pRect[0] + pCamera->pRect[2],
+                pCamera->pRect[1] + pCamera->pRect[3]);
+}
+
+// nField and pCamera are unused; fn_800389C0 passes them.
+void fn_80038A6C(int nField, void* pCamera) {
     fn_8002A164(1);
 }
+
+// ---- end of sweep code ----
+
+// With any view's lbl_801D5090 effect set, calls fn_80038A2C for the current render camera.
+void fn_80038968(void) {
+    int i;
+
+    for (i = 0; i < 4; i++) {
+        if (lbl_801D5090[i].b0) {
+            fn_80038A2C(lbl_80281B88 & 1, fn_8001614C());
+            return;
+        }
+    }
+}
+
+// Calls fn_80038A6C for the render camera of each view whose lbl_801D5090 effect is set.
+void fn_800389C0(void) {
+    int i;
+
+    for (i = 0; i < 4; i++) {
+        if (lbl_801D5090[i].b0) {
+            fn_80038A6C(lbl_80281B88 & 1, fn_80017004(i));
+        }
+    }
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_800392D0(void) {
     if (lbl_80281D80 != NULL) {
@@ -74,3 +194,7 @@ void fn_800392D0(void) {
 }
 
 // ---- end of sweep code ----
+
+void fn_80039344(int nView, f32 f) {
+    lbl_801D5010[nView] = f;
+}
