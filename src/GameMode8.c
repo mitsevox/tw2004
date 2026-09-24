@@ -12,7 +12,6 @@
 
 // fake match: the (s8) on GOLFERSTATE_GetCurrentState and the (u8) on GOLFERSTATE_Set's player (see game.h).
 
-extern u8  lbl_802823CA;
 // Three values per course, largest first (750, 675 and 600 for the first course).
 typedef struct SGCourse {
     s32 n0;                     // 0x0
@@ -56,8 +55,10 @@ SGCourse lbl_80192C00[21] = {
     {750, 675, 600}, {750, 675, 600}, {750, 675, 600}, {750, 675, 600}, {750, 675, 600},
     {750, 675, 600},
 };
-extern s32 lbl_802823CC;
-extern u8  lbl_802823C8;
+s32 lbl_802823CC;
+u8  lbl_802823CA;
+u8  lbl_802823C9;
+u8  lbl_802823C8;
 u8    fn_800A7720(void);
 void  fn_800FE190(f32* pA, f32* pB, f32* pOut);
 // The run's pace (fCB4): a button press adds lbl_802816B0; it falls by lbl_802816B4 a frame, or

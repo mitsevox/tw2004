@@ -890,6 +890,7 @@ GameMode8.c:
 	.data       start:0x80192908 end:0x80192D00
 	.bss        start:0x802120F8 end:0x80212418
 	.sdata      start:0x802816B0 end:0x802816D0
+	.sbss       start:0x802823C8 end:0x802823D0
 	.sdata2     start:0x80284708 end:0x802847A0
 
 GameModeStableford.c:
