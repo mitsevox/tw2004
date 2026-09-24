@@ -939,25 +939,34 @@ LAYOUT_ASSERT(MalBank, 0x1C);
 
 // An animation library as fn_8001F110 byte-swaps and links it in place (MtaLib, MtaRecord and
 // MtaEntry are our names): a 0x34-byte header, its records, each record's entries, then each
-// entry's data (4-byte aligned).
+// entry's data (4-byte aligned). An entry is a track of one value per frame, a byte each: frame
+// byte b gives fLo + (fHi - fLo) * b / 256 (fn_8001F32C).
 typedef struct MtaEntry {
-    u8     unk00[0x24];
+    u8     unk00[0x20];
+    s32    nMorph;              // 0x20  the morph whose weight it drives (SkelPoseBlock.af8); < 0: none
     s32    nBytes;              // 0x24  the bytes of its data
-    u8     unk28[0x3C - 0x28];
-    u8*    pData;               // 0x3C
+    s32    nLastFrame;          // 0x28
+    f32    fFrameTime;          // 0x2C  the time per frame
+    u8     unk30[4];
+    f32    fLo;                 // 0x34
+    f32    fHi;                 // 0x38
+    u8*    pData;               // 0x3C  a byte per frame
     u8     unk40[0x48 - 0x40];
 } MtaEntry;
 LAYOUT_ASSERT(MtaEntry, 0x48);
 
 typedef struct MtaRecord {
-    u8     unk00[0x24];
+    u8     unk00[0x20];
+    s32    nBlock;              // 0x20  its block of the pose buffer (SkelPose1.aBlocks)
     s32    nEntries;            // 0x24
     MtaEntry* pEntries;         // 0x28
 } MtaRecord;
 LAYOUT_ASSERT(MtaRecord, 0x2C);
 
 typedef struct MtaLib {
-    u8     unk00[0x20];
+    u8     unk00[0x14];
+    s32    nBytes;              // 0x14  the library's size (fn_8001F804 allocates it)
+    u8     unk18[0x20 - 0x18];
     s32    nRecords;            // 0x20
     u8     unk24[0x30 - 0x24];
     MtaRecord* pRecords;        // 0x30
