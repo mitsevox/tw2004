@@ -248,7 +248,9 @@ void fn_8012311C(s32 nChan) {
     u32 uCmd;
     u32 uReply;
 
-    pCh = &lbl_80260E18[nChan];
+    // fake match: set in two steps, so the "connected" store at the end is not folded into pCh
+    pCh = lbl_80260E18;
+    pCh += nChan;
     pSentTick = &pCh->sent.uTick;
     uOld = pCh->got.uTick;
     pCh->got.uTick = *pSentTick;
