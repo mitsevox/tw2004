@@ -1,0 +1,114 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/webofferconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 37 functions, source order. line | PS3 address | size
+
+  136  00629A70     50  void ~WebOfferHttpStrategy(const struct <anon>* this)
+  144  00624E7C      4  void OperationCancel(const struct <anon>* this, const struct Operation* )
+  150  00624E88      4  void OperationTimeout(const struct <anon>* this, const struct Operation* )
+  163  005C26B0     94  bool OperationProcess(const struct <anon>* this, const struct Operation* )
+                         local  bool bContinue
+                         local  int32_t iResult
+  228  0060E9A0    19C  void WebOfferConcrete(const struct <anon>* this)
+                         local  uint32_t index
+                         inlines  RCPointer
+  262  0060ED40    178  void ~WebOfferConcrete(const struct <anon>* this)
+                         inlines  ~RCPointer
+  282  005E2888     F0  bool WebOfferQuery(const struct <anon>* this, bool bTimeCheck, int32_t iScriptType)
+                         local  struct <anon>* pScriptInfo
+                         local  struct <anon>* pFacade
+                         local  struct <anon> WebOfferLobbyConfig
+  327  005E68A4    5FC  bool WebOfferInstigate(const struct <anon>* this, struct <anon>* pCallback, bool bTimeCheck, int32_t iScriptType)
+                         local  char8_t[1024] strInitScript
+                         local  struct <anon>* pScriptInfo
+                         local  struct <anon>* pFacade
+                         local  struct <anon> WebOfferLobbyConfig
+                         local  const struct CoreGameParameters* pParameters
+                         local  uint32_t uMemoryToAllocate
+                         local  const char8_t* pFinalScriptPtr
+                         local  const char8_t* pGameString
+                         local  const char8_t* pFoundString
+                         local  char8_t[1024] strInitScriptTemp
+                         local  char8_t* pTemp
+                         local  const char8_t* pPlatformString
+                         local  const char8_t* pPlatformStringBegin
+                         local  const char8_t* pPlatformStringEnd
+                         local  char8_t[1024] strInitScriptTemp
+                         local  struct <anon> fileOp
+                         inlines  GetInstance, Wait
+  516  005FEBA0    2E0  enum AlertStageE WebOfferProcess(const struct <anon>* this)
+                         local  WebOfferCommandT* pCommand
+                         local  int32_t iResult
+                         local  enum AlertStageE eReturn
+  596  005C4918     34  enum AlertStageE WebOfferProcessAlert(const struct <anon>* this)
+  618  005C4E50     34  enum AlertStageE WebOfferProcessArticles(const struct <anon>* this)
+  640  005FEA38    168  enum AlertStageE WebOfferProcessHTTP(const struct <anon>* this)
+                         local  struct OperationManagerConcrete* pOperationManager
+                         inlines  GetOperationManagerConcrete, WebOfferHttpStrategy, operator=
+  669  005C4A20     34  enum AlertStageE WebOfferProcessCredit(const struct <anon>* this)
+  691  005C5004     34  enum AlertStageE WebOfferProcessMedia(const struct <anon>* this)
+  713  005C4D0C     34  enum AlertStageE WebOfferProcessMenu(const struct <anon>* this)
+  735  005C51E4     34  enum AlertStageE WebOfferProcessForm(const struct <anon>* this)
+  756  005C4B68     34  enum AlertStageE WebOfferProcessPromo(const struct <anon>* this)
+  778  005F28DC     34  enum AlertStageE WebOfferProcessNews(const struct <anon>* this)
+  806  005F2910      4  enum AlertStageE WebOfferProcessStory(const struct <anon>* this)
+  827  005C275C     2C  void AlertRespond(const struct <anon>* this, uint32_t uRsp)
+  849  005C2788     2C  void ArticlesRespond(const struct <anon>* this, uint32_t uRsp)
+  870  005FA96C     E0  void HTTPRespond(const struct <anon>* this, uint32_t uRsp)
+                         local  int32_t iLoop
+                         local  char8_t[16] strEvent
+                         inlines  operator->, operator=
+  916  005C27B4    394  void CreditRespond(const struct <anon>* this, uint32_t uRsp, struct <anon>* pCredit)
+                         local  WebOfferCreditT Credit
+  982  005C2B48     B4  void PromoRespond(const struct <anon>* this, uint32_t uRsp, const char8_t* strPromo)
+                         local  WebOfferPromoT Promo
+ 1026  005C2BFC     2C  void NewsRespond(const struct <anon>* this, uint32_t uRsp)
+ 1053  005C2C28     2C  void StoryRespond(const struct <anon>* this, uint32_t uRsp)
+ 1074  005C2C54     2C  void MediaRespond(const struct <anon>* this, uint32_t uRsp)
+ 1095  005C2C80     2C  void MenuRespond(const struct <anon>* this, uint32_t uRsp)
+ 1115  005C2CAC    234  void FormRespond(const struct <anon>* this, uint32_t uRsp, struct <anon>* pForm)
+                         local  WebOfferFormT Form
+                         local  int32_t iNumberOfFields
+                         local  int32_t iLoop
+ 1201  005C2EE0     C4  void ResourceCleanup(const struct <anon>* this)
+                         local  uint32_t index
+ 1229  005C30A0    170  struct Image* ResourceFindOrCreate(const struct <anon>* this, const char8_t* strName)
+                         local  uint32_t index
+ 1273  005C3210    168  struct Image* ResourceGetSize(const struct <anon>* this, const char8_t* strName)
+                         local  struct Image* pImg
+                         local  WebOfferResourceT dirtyRes
+                         local  int32_t iType
+                         local  bool bGetSizeResult
+ 1356  005C2FA4     FC  struct Image* ResourceCreate(const struct <anon>* this, struct Image* pImg, const char8_t* strName)
+                         local  WebOfferResourceT dirtyRes
+                         local  int32_t type
+ 1408  005FAA4C     E4  void WebOfferClear(const struct <anon>* this)
+                         inlines  operator->, operator=
+ 1452  005E2760    128  bool HasUserSeenScript(const struct <anon>* this, const struct <anon>* pScriptInfo, const struct DictionaryConcrete* pLobbyConfig)
+                         local  struct <anon>* pFacade
+                         local  bool bReturn
+                         local  struct UserLocalConcrete* pLocalUser
+                         local  uint32_t uLoginEpoch
+                         local  uint32_t uAlertEpoch
+                         inlines  GetDateTag, GetInstance, GetLocalUserConcrete, GetString
+ 1501  005CF874    4FC  void FillSetupStruct(const struct <anon>* this, uint32_t uBufferSize)
+                         local  struct <anon>* pFacade
+                         local  const struct CoreGameParameters* pParameters
+                         local  LobbyApiRefT* pLobbyApi
+                         local  struct UserLocalConcrete* pLocalUser
+                         local  int32_t iFavoriteTeam
+                         local  int32_t iFavoritePlayer
+                         local  char8_t[16] strFavoriteTeam
+                         local  char8_t[16] strFavoritePlayer
+                         local  WebOfferSetupT SetupStruct
+                         local  const char8_t* pLocalUserName
+                         local  const char8_t* pSLUS
+                         local  const char8_t* pSKU
+                         local  const char8_t* pCanPurchase
+                         local  const char8_t* pPartition
+                         local  const char8_t* pLoginKey
+                         local  uint32_t uLoginSlot
+                         inlines  GetInstance, GetLobbyApi, GetLocalUserConcrete
+ 1608  005D8A80    2E0  bool GenerateStartupScript(const struct <anon>* this, struct <anon>* pScriptInfo, const struct DictionaryConcrete* pLobbyConfig, char8_t* pFinalScript, uint32_t uFinalScriptSize)
+                         local  char8_t[512] strURL
+                         local  const char8_t* pSuccessGoto
+                         inlines  GetAbortCode, GetFailureCode, GetFailureMessage, GetString, GetTimeoutMessage, GetURLTag, GetWaitContent, GetWaitDirections, GetWaitTitle

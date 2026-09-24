@@ -1,0 +1,5 @@
+// ../ears_trinity/Trinity/Runtime/include/Trinity.h
+// compiled in: TrinityManager.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  238    inline-only   bool8_t IsIGCRunning()

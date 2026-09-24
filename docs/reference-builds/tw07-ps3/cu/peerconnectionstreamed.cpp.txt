@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/peerconnectionstreamed.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    6  005E5590     50  void PeerConnectionStreamed(const struct <anon>* this)
+                         inlines  Observable
+   11  005BD1B8     48  void ~PeerConnectionStreamed(const struct <anon>* this)
+                         inlines  ~Observable

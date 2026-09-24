@@ -1,0 +1,26 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/SkeletonFilter.cpp
+// compiled in: SkeletonFilter.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   23  0059AFF8     2C  void Connect(const struct <anon>* this, int32_t boneIndex)
+   28  0059B024     2C  void Disconnect(const struct <anon>* this, int32_t boneIndex)
+   33  0059B050     10  void SetConnected(const struct <anon>* this, int32_t boneIndex, bool connected)
+   45  0059AE84     58  void ConnectAll(const struct <anon>* this)
+                         local  uint8_t* curr
+                         local  uint8_t* last
+   53  0059AEDC     58  void DisconnectAll(const struct <anon>* this)
+                         local  uint8_t* curr
+                         local  uint8_t* last
+   61  0059ADD8     24  bool IsConnected(const const struct <anon>* this, int32_t boneIndex)
+   70  0059AF34     C4  bool IsEqual(const const struct <anon>* this, const const struct <anon>& comp)
+                         local  const uint8_t* currThis
+                         local  const uint8_t* currComp
+                         local  const uint8_t* lastComp
+   96  0059B060     DC  struct <anon>* Alloc(int boneCount)
+                         local  void* chunk
+                         local  uint8_t* buffer
+                         local  struct <anon>* filter
+                         local  const int32_t bufferSize
+                         local  const int32_t filterSize
+                         inlines  TagValuePair
+  118  0059ADFC     88  void Free(struct <anon>* filter)

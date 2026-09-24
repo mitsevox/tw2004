@@ -1,0 +1,52 @@
+// C:/packages/rwmovie/1.04.01/source/movielib/moviedecoder/cmn/moviedecoder.cpp
+// compiled in: moviedecoder.cpp
+// 18 functions, source order. line | PS3 address | size
+
+    0  006FB320     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   90  006FBE54     3C  struct <anon> GetResourceDescriptor()
+                         local  RwUInt32 alignment
+                         local  RwUInt32 size
+                         inlines  ResourceDescriptor
+   98  006FC578     34  struct MovieDecoder* Initialize(const struct <anon>& resource, struct IResourceAllocator* allocator)
+                         local  struct MovieDecoder* movieDecoder
+  340  006FB098     14  void SetVideoDecoder(const struct MovieDecoder* this, struct IVideoDecoder* videoDecoder)
+  366  006FB0AC     14  void SetAudioDecoder(const struct MovieDecoder* this, struct IAudioDecoder* audioDecoder)
+  393  006FB0C0     14  void SetSubtitleDecoder(const struct MovieDecoder* this, struct ISubtitleDecoder* subtitleDecoder)
+  420  006FB0D4     14  void SetVideoRenderableOperations(const struct MovieDecoder* this, struct IVideoRenderableOperations* videoRenderableOperations)
+  448  006FB0E8     14  void SetVideoStreamTapHandle(const struct MovieDecoder* this, struct <anon>* streamTapHandle)
+  476  006FB0FC     18  void SetAudioStreamTapHandle(const struct MovieDecoder* this, struct <anon>* streamTapHandle, int streamRequestId)
+  504  006FB114     14  void SetSubtitleStreamTapHandle(const struct MovieDecoder* this, struct <anon>* streamTapHandle)
+  538  006FBC2C    228  intptr_t VideoDecodeThreadFcn(void* pContext)
+                         local  struct MovieDecoder* that
+                         local  int res
+                         local  struct <anon>* videoRenderable
+                         inlines  SetFrameNumber, SetReadyToRender
+  680  006FB73C    4F0  void PrepareDecoder(const struct MovieDecoder* this, unsigned int width, unsigned int height, unsigned int totalFrames, int videoDecodeThreadProcessor, unsigned int numVideoRenderables, unsigned int numVideoBuffersPerFrame)
+                         local  enum VideoFormat format
+                         local  unsigned int i
+                         local  struct <anon> threadParameters
+                         local  bool exitFlag
+                         local  unsigned int numSentToDecoder
+                         local  unsigned int i
+                         local  struct <anon> renderableResource
+                         local  struct <anon>* renderable
+                         inlines  Allocate, ResourceDescriptor, ~ResourceDescriptor
+  876  006FB3C0    2B4  void Decode(const struct MovieDecoder* this, FrameNumber frameNumber, struct <anon>** videoRenderable, struct <anon>* subtitleRenderable)
+                         local  struct <anon>* renderable
+                         local  unsigned int numSentToDecoder
+                         local  unsigned int counter
+                         local  unsigned int numFilled
+                         local  unsigned int renderablesChecked
+                         local  unsigned int lastDecodedFrameNumber
+                         local  bool nextFrameIsFlaggedForDrop
+                         inlines  SetFrameNumber
+ 1060  006FB128     48  void AudioDecodeCallback(struct <anon>** ppAudioRenderable, struct IAudioDecoder* pContext)
+ 1074  006FB674     C8  void ReleaseVideoRenderable(struct <anon>* videoRenderable, struct MovieDecoder* pContext)
+                         local  unsigned int numSent
+                         local  unsigned int i
+ 1116  006FB170    1B0  void Shutdown(const struct MovieDecoder* this)
+                         local  bool kicked
+                         local  struct <anon>* renderable
+                         local  struct <anon>* renderable
+ 1190  006FB3A0     10  static void _GLOBAL__I__ZN2rw5movie12MovieDecoder21GetResourceDescriptorEv()
+ 1191  006FB3B0     10  static void _GLOBAL__D__ZN2rw5movie12MovieDecoder21GetResourceDescriptorEv()

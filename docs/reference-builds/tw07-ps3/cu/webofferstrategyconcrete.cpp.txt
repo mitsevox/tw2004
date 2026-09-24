@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/online/osdk/webofferstrategyconcrete.cpp
+// compiled in: golf2_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   24  00184B1C     18  void WebOfferStrategyConcrete::WebOfferStrategyConcrete(const struct WebOfferStrategyConcrete* this)
+   28  0012A314     38  void WebOfferStrategyConcrete::~WebOfferStrategyConcrete(const struct WebOfferStrategyConcrete* this)
+                         inlines  ~WebOfferStrategy
+   32  0012A34C      8  int32_t WebOfferStrategyConcrete::GetFavoriteTeam(const struct WebOfferStrategyConcrete* this, uint32_t uSlot)

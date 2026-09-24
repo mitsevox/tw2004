@@ -1,0 +1,19 @@
+// ../../../../../TIGERCODE/Code/GolfModule/golf_module_allocator_profile.cpp
+// compiled in: golf_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   15  003033A8     C8  void GolfAllocatorProfile::Render(const const struct GolfAllocatorProfile* this)
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetZBufferMode, PR_vSetCurrentUsage
+   31  00233528     D0  void GolfAllocatorProfile::DrawBar(const const struct GolfAllocatorProfile* this, const char* name, unsigned int index, float size, float maxSize, float red, float green, float blue)
+   48  002455A0    2F0  void GolfAllocatorProfile::Init(const struct GolfAllocatorProfile* this, struct Table* table, const unsigned int tableCount)
+                         local  const char[5] __FUNCTION__
+                         local  unsigned int i
+                         local  unsigned int i
+                         inlines  TagValuePair, operator+
+  103  002335F8     E0  void GolfAllocatorProfile::Shutdown(const struct GolfAllocatorProfile* this, struct Table* table, const unsigned int tableCount)
+                         local  unsigned int i
+  118  002304F8     90  void GolfAllocatorProfile::LevelInit(const struct GolfAllocatorProfile* this, struct Table* table, const unsigned int tableCount)
+                         local  unsigned int i
+  126  0023034C    104  void GolfAllocatorProfile::LevelShutdown(const struct GolfAllocatorProfile* this, struct Table* table, const unsigned int tableCount)
+                         local  unsigned int i
+                         local  const unsigned int usedSize

@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/Golf/RNA/Asset/Common/CharacterMaterialXMLAsset.h
+// compiled in: rnaunity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   48  004F86E0     10  int32_t CharacterMaterialXMLAssetC::GetRefCount(const struct CharacterMaterialXMLAssetC* this)
+   53    inline-only   struct MaterialListC* CharacterMaterialXMLAssetC::GetLoadedMaterialList(const struct CharacterMaterialXMLAssetC* this)
+   54    inline-only   struct <anon>* CharacterMaterialXMLAssetC::GetMaterialDefList(const struct CharacterMaterialXMLAssetC* this)

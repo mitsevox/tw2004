@@ -1,0 +1,16 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNAX/include/RNAX/RNABuilder.h
+// compiled in: RNABuilder.cpp, Scrape.cpp
+// 4 functions, source order. line | PS3 address | size
+
+  125  008487D4    100  void BuilderC(const struct <anon>* this, struct DeviceC* pDevice)
+                         inlines  AutoRefCount, operator=
+  126  008489D4    204  void ~BuilderC(const struct <anon>* this)
+                         local  const char[10] __FUNCTION__
+                         local  struct <anon>* pCurrentVertexFormat
+                         inlines  RNADebugBreak, ~AutoRefCount, ~StreamTargetC
+  161    inline-only   void SetElement3f(const struct <anon>* this, enum ElementNameE eName, uint32_t uIndex, float_t x, float_t y, float_t z)
+                         local  const char[13] __FUNCTION__
+                         inlines  RNADebugBreak
+  162  0088176C    11C  void SetElement4f(const struct <anon>* this, enum ElementNameE eName, uint32_t uIndex, float_t x, float_t y, float_t z, float_t w)
+                         local  const char[13] __FUNCTION__
+                         inlines  RNADebugBreak

@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Shared/XceedZip_ZLib64/infutil.c
+// compiled in: other_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   21  003F787C    258  int inflate_flush(inflate_blocks_statef* s, z_streamp z, int r)
+                         local  uInt n
+                         local  Bytef* p
+                         local  Bytef* q

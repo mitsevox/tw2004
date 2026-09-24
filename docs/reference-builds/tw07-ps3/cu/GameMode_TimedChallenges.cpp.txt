@@ -1,0 +1,74 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_TimedChallenges.cpp
+// compiled in: golf_unity.cpp
+// 33 functions, source order. line | PS3 address | size
+
+   46  002051F8     5C  void GameModeTimedChallenges::GameModeTimedChallenges(const struct GameModeTimedChallenges* this)
+   57  0024E394    164  void GameModeTimedChallenges::Init(const struct GameModeTimedChallenges* this)
+                         inlines  GameModeBase::SetUseShotClock
+   99  00305268    18C  void GameModeTimedChallenges::InitForTrainingChallenge(const struct GameModeTimedChallenges* this, const struct TrainingChallengeEvent_t* pEvent)
+                         local  int[6] opposingTees
+                         local  vec4flt opposingTeeLoc
+                         inlines  GM_GetGolferUp, GameModeTimedChallenges::SetTargetPointsToPass, cGAME_GLOBALS::SetShotClockOption, vec4flt_Copy, vec_ld
+  137  001FA240     10  void GameModeTimedChallenges::LoadHole(const struct GameModeTimedChallenges* this)
+  145  001FC5F8     4C  void GameModeTimedChallenges::~GameModeTimedChallenges(const struct GameModeTimedChallenges* this)
+  151  001FA250     50  bool GameModeTimedChallenges::QueryInterface(const struct GameModeTimedChallenges* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bRet
+  170  0026D410     64  bool GameModeTimedChallenges::AllowUserChangingShotType(const struct GameModeTimedChallenges* this, enum PlayerNumber_t PlayerID)
+                         inlines  GameModeTimedChallenges::GetTimedChallengeType
+  181  002D248C     5C  void GameModeTimedChallenges::SetupNextGolfer(const struct GameModeTimedChallenges* this)
+                         inlines  PhysicsBall_t::ClearFlag
+  193  002C7740    2D0  void GameModeTimedChallenges::PreShotInit(const struct GameModeTimedChallenges* this, enum PlayerNumber_t PlayerID)
+                         local  vec4flt vStartPos
+                         local  bool result
+                         local  const struct GameModeDriver* ptr
+                         local  const struct GameModeDriverFacility* pFacility
+                         local  int maxCups
+                         local  int iNextCup
+                         local  float distanceToPin
+                         inlines  vec4flt_Copy, vec_ld, vec_st
+  278  001FA49C      8  enum PlayerNumber_t GameModeTimedChallenges::GetHonors(const struct GameModeTimedChallenges* this, enum PlayerNumber_t ignore, bool doNotIgnoreHoledOut)
+  286  002C74AC    294  void GameModeTimedChallenges::CheckShotAwards(const struct GameModeTimedChallenges* this, enum PlayerNumber_t PlayerID)
+                         local  char* localizedString
+                         local  float endingDistanceToPin
+                         local  int iPoints
+                         local  char[256] tempString
+                         local  char[48] strBuf
+  359  00260824     3C  void GameModeTimedChallenges::EndGolferTurn(const struct GameModeTimedChallenges* this, enum PlayerNumber_t PlayerID)
+  367  002606E8     1C  bool GameModeTimedChallenges::HoleFinished(const struct GameModeTimedChallenges* this, enum PlayerNumber_t PlayerID, bool predict)
+  374  001FA4A4      8  bool GameModeTimedChallenges::GameFinished(const struct GameModeTimedChallenges* this, bool predict)
+  379  001FA4AC      4  void GameModeTimedChallenges::EndHole(const struct GameModeTimedChallenges* this)
+  383  001FA4B0      8  bool GameModeTimedChallenges::GoToPlayoff(const struct GameModeTimedChallenges* this, bool predict)
+  389  002AD354    11C  void GameModeTimedChallenges::EndGame(const struct GameModeTimedChallenges* this)
+                         local  struct OnWinData_t onWinData
+                         local  enum PlayerNumber_t holeWinner
+                         inlines  OnWinData_t::OnWinData_t
+  430  00262F40      8  enum PlayerNumber_t GameModeTimedChallenges::CheckForHoleWinner(const struct GameModeTimedChallenges* this)
+  440  001FA4B8      8  enum PlayerNumber_t GameModeTimedChallenges::CheckForGameWinner(const struct GameModeTimedChallenges* this)
+  452  00260704    118  void GameModeTimedChallenges::UpdateDisplayInfo(const struct GameModeTimedChallenges* this, enum PlayerNumber_t PlayerID)
+                         local  char[256] moneyString
+                         local  char[256] tempString
+                         local  char* localizedString
+  476  0026081C      8  void GameModeTimedChallenges::PreShotUpdateUI(const struct GameModeTimedChallenges* this, enum PlayerNumber_t PlayerID)
+  481  001FA53C     14  bool GameModeTimedChallenges::IsStartOfTurn(const struct GameModeTimedChallenges* this)
+  488  0031B8D0     4C  void GameModeTimedChallenges::ShotClockOut(const struct GameModeTimedChallenges* this)
+  499  001FA550     E4  const char* GameModeTimedChallenges::GetModeSpecificTipString(const struct GameModeTimedChallenges* this)
+  532  0021C8D4     14  const char* GameModeTimedChallenges::GetModeName(const struct GameModeTimedChallenges* this)
+                         local  char* localizedString
+  543  0021C7E0     F4  void GameModeTimedChallenges::GetUIGameFinishedString(const struct GameModeTimedChallenges* this, char* strBuf, int32 bufferSize)
+                         local  char* localizedString
+  569  002792D8    24C  bool GameModeTimedChallenges::GetUIScoreCardField(const struct GameModeTimedChallenges* this, int32_t row, int32_t column, char* strBuf, int32 bufferSize)
+                         local  bool bUpdate
+                         local  char* localizedString
+                         local  char[256] moneyString
+                         local  int iCurrentRound
+                         local  int iZeroBasedRow
+                         local  const char* pMsg
+  647  001FA4C0     7C  void GameModeTimedChallenges::GenerateMoneyString(const struct GameModeTimedChallenges* this, int iAmount, char* finalString, int len)
+                         local  int invertAmount
+  663  001FA634      8  bool GameModeTimedChallenges::SpecialCaseAllowDriver(const struct GameModeTimedChallenges* this)
+  673  001FA2F8    1A4  void GameModeTimedChallenges::CreateLuxorLight(const struct GameModeTimedChallenges* this)
+                         local  GenericActorParams params
+                         local  const float[4]& flagloc
+  706  001FA2A0     58  void GameModeTimedChallenges::DestroyLuxorLight(const struct GameModeTimedChallenges* this)
+  717  001FA63C     3C  void GameModeTimedChallenges::QuitGame(const struct GameModeTimedChallenges* this)
+  728  001FA678     1C  enum PlayerNumber_t GameModeTimedChallenges::GetHoleWinner(const const struct GameModeTimedChallenges* this)

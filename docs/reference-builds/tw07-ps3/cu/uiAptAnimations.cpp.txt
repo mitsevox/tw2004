@@ -1,0 +1,45 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/aptInterface/uiAptAnimations.cpp
+// compiled in: other_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   31  003EA768     14  void AptFillStyles::Initialize(const struct AptFillStyles* this, char* rawData, uint32_t size)
+   44  003EA75C      C  void AptFillStyles::Flush(const struct AptFillStyles* this)
+   76  004131F4     F4  void AptInfo_t::SetAptFileName(const struct AptInfo_t* this, char* name, bool needAlloc)
+  103  00442B58    2A0  void AptInfo_t::InitAptInfo(const struct AptInfo_t* this, uint32_t index)
+                         local  int ruNum
+                         local  const struct AptRUFile_t& ru
+                         local  struct AptStyleTxtGrp* style
+                         inlines  AptFillStyles::GetStypeTxtGrp, AptFillStyles::GoToFirstStyle, AptFillStyles::GoToNextStyle, AptFillStyles::HasMoreStyles, AptStructSwapper::Free, TArrayInternal<AptInt32,AptStructSwapper>::Flush, TArrayInternal<AptRUFile_t,CustomClassSwapper<AptRUFile_t> >::Flush, TArrayInternal<AptRUFile_t,CustomClassSwapper<AptRUFile_t> >::operator[], TArrayInternal<TextureRef,AptStructSwapper>::Flush
+  144  003EA77C      8  void AptInfo_t::SetIsUsed(const struct AptInfo_t* this, int32 use)
+  158  003EA784     18  struct AptAnimations* AptAnimations::GetAptAnimationsManager()
+  166  00442ACC     70  void AptAnimations::InitAptAnimationsManager()
+                         inlines  AptAnimations::operator new
+  177  00480634     88  void AptAnimations::CloseAptAnimationsManager()
+                         inlines  AptAnimations::operator delete
+  221  004806BC    1FC  void AptAnimations::CheckConsistency(const struct AptAnimations* this)
+                         local  int32 i
+                         local  const struct AptInfo_t& aptInfo
+                         local  int32 j
+                         local  const struct AptInfo_t& aptInfo2
+                         inlines  AptAnimations::GetAptInfo
+  248    inline-only   static int stricmp2(const char* a, const char* b)
+  260  004808B8    164  int32_t AptAnimations::GetAnimationIndex(const struct AptAnimations* this, char* name)
+                         local  int32_t index
+                         local  int32 i
+                         local  const struct AptInfo_t& aptInfo
+                         inlines  AptAnimations::GetAptInfo, stricmp2
+  289  00480A1C    10C  int32_t AptAnimations::GetAnimationLevel(const struct AptAnimations* this, char* name)
+                         local  int32_t level
+                         local  int32_t index
+                         inlines  AptAnimations::GetAptInfo, TArrayInternal<AptInt32,AptStructSwapper>::operator[]
+  308  00480B28    348  int32_t AptAnimations::GetIndexFirstNotUsed(const struct AptAnimations* this)
+                         local  int32_t index
+                         local  int32 i
+                         local  const struct AptInfo_t& aptInfo
+                         local  struct AptInfo_t* newAptInfo
+                         inlines  AptAnimations::GetAptInfo, AptInfo_t::AptInfo_t, AptInfo_t::operator new, AptStructSwapper::Swap, TAptArrayClass, TAptArrayStruct, TArrayInternal<AptInt32,AptStructSwapper>::GetElemCount, TArrayInternal<AptInt32,AptStructSwapper>::Push, TArrayInternal<TextureRef,AptStructSwapper>::TArrayInternal
+  346  00480E70    12C  int32_t AptAnimations::GetNextLevelToLoad(const struct AptAnimations* this)
+                         local  int32_t level
+                         local  int32 i
+                         local  const struct AptInfo_t& aptInfo
+                         inlines  AptAnimations::GetAptInfo

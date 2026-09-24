@@ -1,0 +1,38 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Shared/refpack/refencode.cpp
+// compiled in: other_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   15    inline-only   static void refencode_gputm(void* dst, unsigned int data, int bytes)
+   56    inline-only   static unsigned int matchlen(unsigned char* s, unsigned char* d, unsigned int maxmatch)
+                         local  unsigned int current
+   68  003FDF94    7B0  static int refcompress(unsigned char* from, int len, unsigned char* dest, int maxback, int quick)
+                         local  const char[12] __FUNCTION__
+                         local  unsigned int tlen
+                         local  unsigned int tcost
+                         local  unsigned int run
+                         local  unsigned int toffset
+                         local  unsigned int boffset
+                         local  unsigned int blen
+                         local  unsigned int bcost
+                         local  unsigned int mlen
+                         local  unsigned char* tptr
+                         local  unsigned char* cptr
+                         local  unsigned char* to
+                         local  unsigned char* rptr
+                         local  int countliterals
+                         local  int countshort
+                         local  int countint
+                         local  int countvint
+                         local  int hash
+                         local  int hoffset
+                         local  int minhoffset
+                         local  int i
+                         local  int* link
+                         local  int* hashtbl
+                         inlines  TagValuePair, matchlen, operator+
+  261  004384F4     F0  int REF_encode(void* compresseddata, const void* source, int sourcesize, int* opts)
+                         local  int maxback
+                         local  int quick
+                         local  int plen
+                         local  int hlen
+                         inlines  refencode_gputm

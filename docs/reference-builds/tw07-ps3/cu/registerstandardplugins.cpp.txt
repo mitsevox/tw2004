@@ -1,0 +1,6 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/registerstandardplugins.cpp
+// compiled in: registerstandardplugins.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   23  006E42C4    144  void RegisterStandardRunTimePlugIns(const struct PlugInRegistry* this)
+                         local  const char[31] __FUNCTION__

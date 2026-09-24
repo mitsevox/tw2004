@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/ParticleSystem/source/particle_eruption.cpp
+// compiled in: particle_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    3  004AA778     20  void ParticleEruption::Reset(const struct ParticleEruption* this)

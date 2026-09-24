@@ -1,0 +1,42 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/ps3/loginslotconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   83  005D91CC    13C  void ProcessComplete(const struct <anon>* this)
+                         local  const char8_t* strInviteSessionId
+                         local  uint32_t uNumElements
+                         local  struct LoginSlotObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  115  005DBFEC     B4  void StateChanging(const struct <anon>* this, enum OsdkState eOldState, enum OsdkState eNewState)
+                         inlines  RemoveObserver
+  149  005DBA70     C0  void StateChanged(const struct <anon>* this, enum OsdkState eOldState, enum OsdkState eNewState)
+                         inlines  AddObserver
+  180  005C5AF4     74  bool HasObservers(const struct <anon>* this)
+                         local  bool bHasObservers
+                         local  uint32_t uElements
+                         local  struct LoginSlotObserver** pList
+                         local  uint32_t uIndex
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  218  005EC3AC     D4  void LoginSlotConcrete(const struct <anon>* this, uint32_t uSlotIndex)
+                         inlines  GetInstance
+  250  005E4DD8     98  void ~LoginSlotConcrete(const struct <anon>* this)
+                         inlines  GetInstance
+  275  005C5B68    128  enum LoginState GetNetworkLoginStateInternal(const const struct <anon>* this)
+                         local  enum LoginState eState
+                         local  bool bNpReady
+                         local  bool bNpStarted
+                         local  int32_t iConnStatus
+                         local  int32_t iStatus
+                         local  int32_t iErr
+                         local  int32_t iResult
+  349  005CDE88     C8  const char8_t* GetName(const const struct <anon>* this)
+                         local  enum LoginState eState
+                         local  SceNpOnlineName onlineName
+                         local  int32_t ret
+                         inlines  GetInstance
+  401  005C5C90     20  const char8_t* GetAcceptedGameInviteSessionId(const const struct <anon>* this)
+  425  005C5CB0      8  bool IsAcceptedGameInviteFromSameConsole(const const struct <anon>* this)
+  451  005B8454     48  void SetAcceptedGameInviteSessionId(const struct <anon>* this, const char8_t* strSessionId)
+  477  005C5CB8     28  void GetUID(const struct <anon>* this, void* pUID)
+  501  005C5CE0     60  bool IsSameUID(const const struct <anon>* this, void* pUID)
+                         local  SceNpId npid

@@ -1,0 +1,29 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/productupdatedownloadstrategy.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   79  005BD8F8     7C  void UpdateProgress(const struct <anon>* this)
+                         inlines  GetCallback
+  104  005DAC18     A0  void CheckDownloadedData(const struct <anon>* this)
+                         local  struct ProductUpdateInfo* pProductUpdateInfo
+                         local  struct <anon>* pFileInfo
+                         local  uint32_t uConfigCRC
+                         local  uint32_t uDownloadCRC
+                         inlines  GetDownloadChecksum, GetFileHash
+  148  005DACB8    190  void StartDownload(const struct <anon>* this)
+                         local  struct ProductUpdateInfo* pProductUpdateInfo
+                         local  struct <anon>* pFileInfo
+                         local  const char8_t* pURL
+                         local  char8_t[256] strFilename
+                         local  const char8_t* pFilename
+                         local  const char8_t* pRoot
+                         inlines  GetElementAt, GetURL, GetUpdateInfo, SetPatchFileName
+  195  006218B4     90  void ProductUpdateDownloadStrategy(const struct <anon>* this, struct ProductUpdateManagerStrategy* pUpdateStrategy)
+                         inlines  ProductUpdateStage
+  225  006219D4     60  void ~ProductUpdateDownloadStrategy(const struct <anon>* this)
+                         inlines  ~ProductUpdateStage
+  246  005DAE48    1A8  enum ProcessResultE Process(const struct <anon>* this)
+                         local  uint32_t uNumFiles
+                         local  enum DownloadStateE eState
+                         local  enum DownloadStateE eState
+                         local  uint32_t uMaxAttempts

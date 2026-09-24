@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Legacy/LL/Headers/LLSnap.h
+// compiled in: other_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  302    inline-only   bool SN_boIsSequenceCaptureOn()
+  316    inline-only   bool SN_boIsSnapShotRunning()

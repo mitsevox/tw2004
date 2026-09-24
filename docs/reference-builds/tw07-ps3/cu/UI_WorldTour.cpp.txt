@@ -1,0 +1,15 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_WorldTour.cpp
+// compiled in: apt_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   19  000FAEF8     4C  void UIWorldTour::UIWorldTour(const struct UIWorldTour* this)
+   23  00033AB0     24  void UIWorldTour::Init(const struct UIWorldTour* this)
+   30  0004F5A4     34  void UIWorldTour::Show(const struct UIWorldTour* this)
+   37  0004F5D8     78  void UIWorldTour::OnShow(const struct UIWorldTour* this)
+                         local  char[10] szIndex
+   49  000BFFD0    264  enum eAptHandleInput UIWorldTour::HandleInput(const struct UIWorldTour* this, int32 cID)
+                         local  char[10] szIndex
+                         local  int reOrderedTee
+                         local  int iPlayer
+  118  000BFF40     90  void UIWorldTour::StartMiniGame(const struct UIWorldTour* this)
+                         local  struct GameModeDriverFacility* pFacilityDriver

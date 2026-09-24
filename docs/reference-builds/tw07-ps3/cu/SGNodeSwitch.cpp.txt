@@ -1,0 +1,38 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/scenegraph/source/SceneGraph/Runtime/Nodes/SGNodeSwitch.cpp
+// compiled in: SGNodeSwitch.cpp
+// 17 functions, source order. line | PS3 address | size
+
+    0  008BC5D4    140  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  SGNodeSwitchInfoC::SGNodeSwitchInfoC, SGNodeSwitchInfoC::~SGNodeSwitchInfoC
+    0  008BC7D8      C  void SGNodeSwitchInfoC::~SGNodeSwitchInfoC(const struct SGNodeSwitchInfoC* this)
+                         inlines  ~SGNodeInfoC
+   50  008BC748     88  struct SGNodeC* SGNodeSwitchInfoC::Create(const const struct SGNodeSwitchInfoC* this)
+                         inlines  operator new
+   51  008BC734      8  const char* SGNodeSwitchInfoC::GetNodeTypeName(const const struct SGNodeSwitchInfoC* this)
+   52    inline-only   NodeType_t SGNodeSwitchInfoC::GetNodeTypeEnum(const const struct SGNodeSwitchInfoC* this)
+   63  008BC1B4     5C  void SGNodeSwitchC(const struct <anon>* this)
+   70  008BC26C     BC  void ~SGNodeSwitchC(const struct <anon>* this)
+                         inlines  operator delete
+   96  008BC328    244  struct SGNodeC* Clone(const struct <anon>* this, bool8_t recurse, NodeCloneUserDataCallback userDataCallback, struct SGNodeC* baseClone)
+                         local  const char[6] __FUNCTION__
+                         local  struct <anon>* clone
+                         inlines  RNADebugBreak, SGNodeC::GetNodeTypeEnum, SetRandomSelectionFlag, operator new
+  124  008BBE28      8  const struct SGNodeInfoC* GetNodeInfo(const const struct <anon>* this)
+  130  008BBE20      8  const struct SGNodeInfoC* _GetNodeInfo()
+  148  008BBFF0     88  void EnableNthChild(const struct <anon>* this, int32_t nChild)
+                         local  const char[15] __FUNCTION__
+                         inlines  RNADebugBreak
+  154  008BC0C4     F0  void EnableNamedChild(const struct <anon>* this, const char* pName)
+                         local  const char[17] __FUNCTION__
+                         local  int nIndex
+                         local  struct SGNodeC* pNode
+                         inlines  RNADebugBreak, SGNodeC::GetFirstChild, SGNodeC::GetNextSibling
+  174  008BC078     4C  struct SGNodeC* GetEnabledChildPtr(const struct <anon>* this)
+                         local  struct SGNodeC* pNode
+                         local  int i
+                         inlines  SGNodeC::GetFirstChild, SGNodeC::GetNextSibling
+  201  008BBE30     E8  void SerializeIn(const struct <anon>* this, const struct InStreamC& in)
+                         local  int32_t version
+  220  008BBF18     D8  void SerializeOut(const const struct <anon>* this, const struct OutStreamC& out)
+  232  008BC724     10  static void _GLOBAL__I__ZN6SceneX13SGNodeSwitchC16s_ClassAllocatorE()
+  233  008BC714     10  static void _GLOBAL__D__ZN6SceneX13SGNodeSwitchC16s_ClassAllocatorE()

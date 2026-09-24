@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/packages/osdk/2.06.04/core/include/common/osdk/listarray.h
+// compiled in: apt_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   52    inline-only   uint32_t ListArray::GetNumberOfElements(const const struct ListArray* this)

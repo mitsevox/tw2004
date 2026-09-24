@@ -1,0 +1,34 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/Geom/twGeom.cpp
+// compiled in: golf_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+    5  00244860    3A0  bool twGeom_LoadGeom(twGeom** ppGeom, const char* pFileName)
+                         local  const char[16] __FUNCTION__
+                         local  twGeom geomHdr
+                         local  FILE* fp
+                         local  uint32 fileSize
+                         local  uint8* pFileData
+                         inlines  TagValuePair, operator+
+   67  00215D04    134  void twGeom_Init(twGeom* pGeom, uint8* pMemory, uint32 memorySize, bool bFirstInit)
+                         local  uint32 memAddr
+                         local  twOffset* pOffsets
+                         local  uint32 offset
+                         local  uint32 srcAddr
+                         local  uint32 dstAddr
+                         local  uint32* pAddr
+  101  0022849C     3C  void twGeom_Term(twGeom* pGeom)
+  106  00244C00    400  bool twSkel_LoadSkeleton(twSkel** ppSkel, const char* pFileName)
+                         local  const char[20] __FUNCTION__
+                         local  twSkel skelHdr
+                         local  FILE* fp
+                         local  uint32 fileSize
+                         local  uint8* pFileData
+                         inlines  TagValuePair, operator+
+  174  002284D8    120  void twSkel_Init(twSkel* pSkel, uint8* pMemory, uint32 memorySize)
+                         local  uint32 memAddr
+                         local  twOffset* pOffsets
+                         local  uint32 offset
+                         local  uint32 srcAddr
+                         local  uint32 dstAddr
+                         local  uint32* pAddr
+  200  002285F8      4  void twSkel_Term(twSkel* pSkel)

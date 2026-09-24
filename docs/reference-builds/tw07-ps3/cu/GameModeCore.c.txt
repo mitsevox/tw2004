@@ -1,0 +1,137 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameModeCore.c
+// compiled in: golf_unity.cpp
+// 41 functions, source order. line | PS3 address | size
+
+  134  0028753C     88  void GM_SetModeType(enum GM_ModeType_t mode)
+                         inlines  Singleton<GameManager>::GetSingleton
+  151  002FA3C4    1D4  void GM_ClearPlayerHoleData(enum PlayerNumber_t PlayerID, int holeindex)
+                         inlines  GM_SetPlayerHoleStrokes, GM_SetPlayerHoledOut, Singleton<GamePlayerManager>::GetSingleton
+  174  002FA598    6A8  void GM_ClearDataForNewGame()
+                         local  int32 i
+                         local  enum PlayerNumber_t userID
+                         local  int j
+                         local  uint32 green
+                         local  uint32 pin
+                         local  int8_t[18] holeRatings
+                         local  int8_t[18] holeRatingIndices
+                         local  enum GM_CourseType_t course
+                         local  int32 hole
+                         local  int which9
+                         local  bool sorted
+                         local  int hole
+                         local  enum GM_CourseType_t thisCourse
+                         local  enum GM_CourseType_t nextCourse
+                         local  int32 thisHole
+                         local  int32 nextHole
+                         local  enum GM_CourseType_t currCourse
+                         local  int16_t hcapForHoles
+                         inlines  GM_FullRoundOfGolf, GM_HolesSelected, GM_IsCompilationCourse, GM_IsRandomCourse
+  342  002065AC      4  void GM_CalculateD18CourseHandicaps()
+  349  0030F62C      C  int32 GM_GetPlayerRoundScore(enum PlayerNumber_t index)
+  358  0030F028     80  int32 GM_GetPlayerRoundStrokes(enum PlayerNumber_t index)
+                         local  int i
+                         local  int total
+                         inlines  GM_GetPlayerHoleStrokes
+  372  0032E45C    158  int32 GM_GetGolferRelativeCurrentScore(enum PlayerNumber_t PlayerID, bool bIncludeCurrentHole)
+                         local  int totalpar
+                         local  int totalscore
+                         local  int i
+                         local  int hole
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_HolesSelected
+  397  0032E5B4    100  int32 GM_GetGolferRelativeCumulativeScore(enum PlayerNumber_t PlayerID, bool bIncludeCurrentHole)
+                         local  int relscore
+                         local  enum GM_Pga_EntrantId_e entrantID
+                         inlines  GM_GetCurrentRound, GM_GetNumberRoundsToPlay, GM_IsPlayoff
+  423  0030F414     B4  int32 GM_GetPlayerStrokeRoundScoreThroughHole(enum PlayerNumber_t index, int holeNum)
+                         local  int i
+                         local  int total
+                         inlines  GM_GetPlayerHoleStrokes
+  437  00237EF8     B4  int32 GM_GetPlayerStablefordRoundScoreThroughHole(enum PlayerNumber_t index, int holeNum)
+                         local  int i
+                         local  int total
+  456  0030F4C8    164  int32 GM_GetPlayerRoundScoreThroughHole(enum PlayerNumber_t index, int holeNum, enum GM_ModeType_t scoreMode)
+                         local  enum GM_ModeType_t mode
+                         local  int i
+                         local  int total
+                         inlines  GM_GetModeType
+  496  00206434    178  int16_t GM_GetHandicap(enum PlayerNumber_t userID, uint8_t hole)
+                         local  int16_t playerHandicap
+                         local  int nHcap
+                         local  int16_t holeHcap
+                         local  int16_t back9Hcap
+                         local  int16_t front9Hcap
+  560  0032FF7C     B4  bool GM_CurrentlyOnLastHole()
+                         local  int j
+                         local  bool wasLastHole
+                         inlines  GM_GetCurrentHoleIndex, GM_HolesSelected
+  578  002065B0     C0  bool GM_EagledAllPar5OnCourse(Course_t course)
+                         local  int32 i
+                         local  int32 holeIndex
+  601  001FA9B4    430  int32 GM_ConvertCourseAndHoleToPar5EagleIndex(Course_t eCourse, int hole)
+  812  00206670     80  bool GM_UserHasEagledHole(enum PlayerNumber_t userID, Course_t eCourse, int hole)
+                         local  int par5Index
+  827  002066F0     70  int32 GM_GetPar5EagleDate(enum PlayerNumber_t userID, Course_t eCourse, int hole)
+                         local  int par5Index
+  841  002CC624     B4  bool GM_IsTeamMode()
+                         inlines  GM_GetModeType
+  854  00247268     E4  bool GM_IsShotOverLimit(enum PlayerNumber_t PlayerID, int strokes)
+  876  0029F168     D4  bool GM_CanPlayerTakeMulligan(enum PlayerNumber_t PlayerID)
+                         inlines  GM_GetMulligans
+  900  001FB814     60  void GM_ClearMulliganCounters()
+                         local  int32 i
+                         inlines  GamePlayer::SetMulligan
+  913  001FC1B0     44  bool GM_IsValidPostShotGameType()
+  924  00251EA0     AC  int GM_GetElapsedHoleTime()
+                         inlines  cGAME_GLOBALS::GetCumulativeFrames
+  933  002C5ED4     EC  bool GM_CanPlayerTapIn(enum PlayerNumber_t PlayerID)
+  962  001FB874     54  enum PlayerNumber_t GM_GetHonors()
+  970  00206780     98  enum PlayerNumber_t GM_GetSecondHonors()
+                         local  enum PlayerNumber_t honor
+                         local  enum PlayerNumber_t second
+  981  0024FA0C    194  void GM_InitBallsToTee()
+                         local  vec4flt playerTeePosn
+                         local  int i
+                         inlines  vec4flt_Copy, vec_st
+ 1008  0024AA04    150  void GM_SetupGolfer_IfAllWaiting()
+                         local  int32 i
+                         local  bool golferReadyToPlay
+ 1048  0024B1E8     AC  bool GM_IsBallOOB(struct PhysicsBall_t* ball)
+                         local  struct GoTemple* pTemple
+ 1073  00330030    2EC  void GM_Pick_PlayOffHole()
+                         local  int prevHole
+                         local  int newHole
+                         local  int i
+                         local  int[18] holeNums
+                         local  int numSelected
+                         inlines  GM_GetCurrentHoleIndex, GM_GetNeedToBuildPlayoffHoleList, GM_HolesSelected, GM_SelectHoleSet, GM_SelectSingleHole, GM_SetNeedToBuildPlayoffHoleList
+ 1130  0027DC4C     F8  bool GM_CheckForBallInHole(enum PlayerNumber_t PlayerID)
+                         local  TGD_TerrainInfo* pTerrainGameData
+                         local  float x
+                         local  float y
+                         local  float dist
+                         local  bool use3dcup
+                         inlines  std::sqrt
+ 1162  002CC6D8     AC  bool GM_RenderBallTarget(enum PlayerNumber_t PlayerID)
+                         local  int8 currentState
+                         inlines  GM_GetModeType
+ 1174  0024FBA0    11C  void GM_MovePlayerToPosition(enum PlayerNumber_t PlayerID, float* position)
+                         local  int32 playerNum
+                         inlines  vec4flt_Copy
+ 1633  0026E0A8    118  void GM_CheckCurrentSettings()
+                         local  int i
+                         local  bool selection
+                         inlines  GM_HolesSelected
+ 1670  002CC784     70  bool GM_IsCurrentlyValidHcapMode()
+                         inlines  GM_GetModeType
+ 1680  0027793C     64  Course_t GM_GetCurrentCourseID()
+ 1696  001F92EC     7C  enum GM_CourseType_t GM_GetCurrentCourse()
+                         local  int holeIndex
+                         local  enum GM_CourseType_t course
+ 1708  001F7604     94  uint32 GM_GetCurrentHole()
+                         local  int hole
+                         local  enum GM_CourseType_t course
+ 1720  0020687C     70  void GM_GetCurrentHoleName(char* outStr, int32_t outStrLen)
+ 1725  00330A34     34  uint32 GM_GetCurrentHoleNumber()
+                         inlines  GM_GetCurrentHoleIndex
+ 1734  002679B8     44  bool GM_AreWeInFacilityIdleState()
+                         local  bool bRet

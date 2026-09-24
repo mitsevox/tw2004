@@ -1,0 +1,66 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Actors/xplatform_particle_emitter.cpp
+// compiled in: golf_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   15  0022DFA8     D4  void XPlatformParticleEmitter::InitTexture(const struct XPlatformParticleEmitter* this)
+                         local  char[16] textureName
+                         local  char[17] name
+                         local  struct HashString uiTextureID_p
+                         inlines  HashString::HashString
+   33  0022E240     50  void XPlatformParticleEmitter::PlatformInit(const struct XPlatformParticleEmitter* this)
+   49  00303318     90  void XPlatformParticleEmitter::PlatformRender(const struct XPlatformParticleEmitter* this)
+   56  0022E07C     84  void XPlatformParticleEmitter::PlatformDestroy(const struct XPlatformParticleEmitter* this)
+   76  0022E100    140  void XPlatformParticleEmitter::InitVertexBuffer(const struct XPlatformParticleEmitter* this)
+                         local  const bool wasStandardLocked
+                         local  unsigned int vertCount
+  101  00302460    EB8  void XPlatformParticleEmitter::RenderParticles(const struct XPlatformParticleEmitter* this, float[4]* matWorld)
+                         local  mat44flt matProj
+                         local  mat44flt matView
+                         local  vec4flt emitterPos
+                         local  vec4flt emitterUnit
+                         local  struct vtxStruct* pVertices
+                         local  unsigned int particleCount
+                         local  const unsigned int savedParticleCount
+                         local  mat44flt tempMat
+                         local  vec4flt tempVec
+                         local  mat44flt viewTranspose
+                         local  const int isOrientToCamera
+                         local  vec4flt squareA
+                         local  vec4flt squareB
+                         local  vec4flt squareC
+                         local  vec4flt squareD
+                         local  struct ParticleOutput* particleOutput
+                         local  vec4flt widthHeight
+                         local  vec4flt pA
+                         local  vec4flt pB
+                         local  vec4flt pC
+                         local  vec4flt pD
+                         local  vec4flt quat
+                         local  mat44flt xmMtx
+                         local  vec4flt position
+                         local  unsigned char r
+                         local  unsigned char g
+                         local  unsigned char b
+                         local  unsigned char a
+                         local  vec4flt uvA
+                         local  vec4flt uvB
+                         local  vec4flt uvC
+                         local  vec4flt uvD
+                         local  vec4flt quat
+                         local  mat44flt xmMtx
+                         local  vec4flt widthHeight
+                         local  vec4flt pA
+                         local  vec4flt pB
+                         local  vec4flt pC
+                         local  vec4flt pD
+                         local  vec4flt position
+                         local  unsigned char r
+                         local  unsigned char g
+                         local  unsigned char b
+                         local  unsigned char a
+                         local  vec4flt uvA
+                         local  vec4flt uvB
+                         local  vec4flt uvC
+                         local  vec4flt uvD
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaBlendingFunctionSeparate, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetCullMode, DS_vSetZBufferMode, DS_vSetZTestEnable, LLMath_Add, LLMath_CopyMat44, LLMath_MultiplyVec, vec4flt_Copy, vec_ld, vec_st
+  451  0022E290      4  void XPlatformParticleEmitter::PlatformPostTweak(const struct XPlatformParticleEmitter* this)

@@ -1,0 +1,63 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_MenuGFToggle.cpp
+// compiled in: apt_unity.cpp
+// 22 functions, source order. line | PS3 address | size
+
+  114  000442B0     64  struct GFMenuTitles_t* GetPageTitles(enum GFAppFeatureKey inFeatureKey)
+                         local  int32 i
+  162  00044314     A4  enum eGFPageType LookUpPageTypeFromItem(enum eGFToggleType tType)
+                         local  int32 i
+  177    inline-only   bool RightColor(enum eGFToggleType togType)
+  182    inline-only   bool LeftColor(enum eGFToggleType togType)
+  189    inline-only   bool RightHoriz(enum eGFToggleType togType)
+  194    inline-only   bool RightVert(enum eGFToggleType togType)
+  199    inline-only   bool LeftHoriz(enum eGFToggleType togType)
+  204    inline-only   bool LeftVert(enum eGFToggleType togType)
+  228  000F6440     84  void UIMenuGFToggle::UIMenuGFToggle(const struct UIMenuGFToggle* this)
+  244  000EFD00     58  void UIMenuGFToggle::Init(const struct UIMenuGFToggle* this)
+  252  000D0818     60  void UIMenuGFToggle::OnShow(const struct UIMenuGFToggle* this)
+  259  0005D53C     5C  void UIMenuGFToggle::Hide(const struct UIMenuGFToggle* this)
+  266  00059788     94  void UIMenuGFToggle::ShowMenu(const struct UIMenuGFToggle* this, struct UIResponseHandler* inpHandler, struct UIMenuToggleItemConst* inMenuItemArray, int32 nbrElemsInMenu, int32 sizeofItemBaseSrc, enum eMenuAllocType alloctype)
+  275  0008F9C8     88  void UIMenuGFToggle::UpdateItemAndLabel(const struct UIMenuGFToggle* this, struct UIMenuItemBaseDst* dstItem, struct UIMenuItemBaseSrc* srcItem, int32 index, char* inLabel)
+                         local  struct UIMenuToggleItem* itemToUpdate
+  288  0005941C    36C  void UIMenuGFToggle::FigureOutPages(const struct UIMenuGFToggle* this, int32 numOptions, struct UIMenuToggleItemConst* inMenuItemArray)
+                         local  int32 i
+                         local  enum eGFToggleType itemType
+                         local  enum eGFPageType pageType
+                         local  int32 pageNum
+                         local  int32 itemNum
+                         local  struct GFPage_t* page
+                         inlines  UIGameFace::GetToggleType
+  326  000444BC     50  void UIMenuGFToggle::ResetPages(const struct UIMenuGFToggle* this)
+  335  0004450C    13C  bool UIMenuGFToggle::TryAddToExistingPage(const struct UIMenuGFToggle* this, enum eGFPageType pageType, enum eGFToggleType itemType, const int32& pageNum, const int32& itemNum)
+                         local  bool sucess
+                         local  int32 startPage
+                         local  int32 i
+                         local  struct GFPage_t* page
+                         local  bool bEmptySlotFound
+                         local  int32 j
+  379  00044648     74  void UIMenuGFToggle::SetCurrentPageTitles(const struct UIMenuGFToggle* this)
+  395  00037B34     9C  enum GFAppFeatureKey UIMenuGFToggle::GetMenuItemFeatureKey(const struct UIMenuGFToggle* this, int32 index)
+  402  000D70F0    210  enum eAptHandleInput UIMenuGFToggle::HandleInput(const struct UIMenuGFToggle* this, int32 cID)
+  455  000D2184    1B8  void UIMenuGFToggle::ChangePage(const struct UIMenuGFToggle* this, int32 ammount)
+                         local  int32 i
+                         local  struct UIMenuToggleItem* gfitem
+  484  00093774    964  enum AptThreadReturnValue UIMenuGFToggle::CheckThumbSticksThread(const struct UIMenuGFToggle* this)
+                         local  uint32 pad
+                         local  struct Controller_StickInfo* info
+                         local  bool bRightUp
+                         local  bool bRightDown
+                         local  bool bRightLeft
+                         local  bool bRightRight
+                         local  bool bLeftUp
+                         local  bool bLeftDown
+                         local  bool bLeftLeft
+                         local  bool bLeftRight
+                         local  int32 i
+                         local  TI_STimeValue currentTime
+                         local  float secondsElapsed
+                         local  bool bPlaySliderTogSnd
+                         local  bool bResetTime
+                         local  enum eGFToggleType togType
+                         local  struct UIMenuToggleItem* opItemToUpdate
+                         local  struct UIMenuToggleItem* opItemToUpdate
+                         inlines  LeftColor, RightColor, RightVert, TI_fConvertTimeDifToSeconds, sys_time_get_timebase_frequency

@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_OnlinePopupDisconnect.h
+// compiled in: apt_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   25  00125308     B8  void UIOnlinePopupDisconnect::~UIOnlinePopupDisconnect(const struct UIOnlinePopupDisconnect* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   46  000FFDFC      C  uint32 UIOnlinePopupDisconnect::GetSignature(const const struct UIOnlinePopupDisconnect* this)
+   50    inline-only   enum UIDisconnectType UIOnlinePopupDisconnect::GetDisconnectType(const struct UIOnlinePopupDisconnect* this)
+   54  000FFE08     3C  void UIOnlinePopupDisconnect::Show(const struct UIOnlinePopupDisconnect* this)
+   57  001034C8     14  enum TAptSequenceStatus UIOnlinePopupDisconnect::WaitForSaveGameAndGameface_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   58  001035A4     14  enum TAptSequenceStatus UIOnlinePopupDisconnect::WaitForTimeAndHide_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)

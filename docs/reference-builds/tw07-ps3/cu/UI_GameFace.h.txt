@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/Golf/UI_Core/AptRuntime/Headers/UI_GameFace.h
+// compiled in: golf2_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  350    inline-only   bool UIGameFace::AreWeInPreview(const struct UIGameFace* this)

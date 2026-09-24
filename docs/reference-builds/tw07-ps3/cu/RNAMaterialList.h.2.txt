@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNARender/RNAMaterialList.h
+// compiled in: RNADevice.cpp, RNAMaterialList.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   47    inline-only   void MaterialListC::operator delete(void* address)
+   47    inline-only   struct ICoreAllocator* MaterialListC::GetClassAllocator()
+   53    inline-only   int32_t MaterialListC::GetNumMaterials(const const struct MaterialListC* this)
+   54    inline-only   struct MaterialC* MaterialListC::GetMaterial(const const struct MaterialListC* this, int32_t iMaterial)

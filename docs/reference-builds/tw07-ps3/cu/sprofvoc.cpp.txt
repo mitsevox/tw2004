@@ -1,0 +1,9 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sprofvoc.cpp
+// compiled in: sprofvoc.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   31  006DE8E8     54  int SNDPROFILEI_voicesinrange()
+                         local  int voices
+                         local  int i
+   69  006DE93C     40  int SNDPROFILE_voices(SNDPROFVOICES* pspv)
+                         local  int voices

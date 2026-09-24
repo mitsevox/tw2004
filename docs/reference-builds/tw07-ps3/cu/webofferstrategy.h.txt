@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/packages/osdk/2.06.04/core/include/common/osdk/gamefacade/webofferstrategy.h
+// compiled in: golf2_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   40  001E7908      8  int32_t GetFavoriteTeam(const struct WebOfferStrategy* this, uint32_t uSlot)
+   43  001E7910      8  int32_t GetFavoritePlayer(const struct WebOfferStrategy* this, uint32_t uSlot)
+   51  001E7918      4  void ModifyWebOfferScriptInfo(const struct WebOfferStrategy* this, struct WebOfferScriptInfoManager* )
+   58  001E791C     18  void ~WebOfferStrategy(const struct WebOfferStrategy* this)

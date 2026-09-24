@@ -1,0 +1,14 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/texblendadd.cpp
+// compiled in: other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   18  003D0A30     40  void TexBlendAdd::TexBlendAdd(const struct TexBlendAdd* this, const const struct Allocator& allocRef, struct Texture32b* destTexture)
+   25  003D0AB0     18  void TexBlendAdd::~TexBlendAdd(const struct TexBlendAdd* this)
+   30  00410380    394  void TexBlendAdd::BlendNPixels(const struct TexBlendAdd* this, int32_t mipmap, int32_t numTextures, struct RawTexture** textures, TexBlendParams* params, int32_t numPixels, RawTexture_PixelValue** pixelBuffer, RawTexture_PixelValue* destPixels)
+                         local  int iTex
+                         local  bool fastBlend
+                         local  int iPix
+                         local  float r
+                         local  float g
+                         local  float b
+                         local  float alphaPercent

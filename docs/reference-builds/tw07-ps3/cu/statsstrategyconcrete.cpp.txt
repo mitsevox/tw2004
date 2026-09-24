@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/online/osdk/statsstrategyconcrete.cpp
+// compiled in: golf2_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   63  00184ABC     18  void StatsStrategyConcrete::StatsStrategyConcrete(const struct StatsStrategyConcrete* this)
+   87  00129E9C     38  void StatsStrategyConcrete::~StatsStrategyConcrete(const struct StatsStrategyConcrete* this)
+                         inlines  ~StatsStrategy
+  135  00129ED4     30  uint32_t _CountDNFsInLastTenGames(uint32_t dnfBitfield)
+                         local  uint32_t count
+                         local  uint32_t temp
+  148  00129F04    184  int32_t StatsStrategyConcrete::ExtractIntegerStat(const struct StatsStrategyConcrete* this, const struct User* pUser, uint32_t eStat)
+                         local  int32_t iValue
+                         local  PlayerModuleStatT Stats

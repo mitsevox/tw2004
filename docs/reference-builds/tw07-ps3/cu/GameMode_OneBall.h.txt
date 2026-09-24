@@ -1,0 +1,23 @@
+// ../../../../../TIGERCODE/Code/Golf/GameMode/Headers/GameMode_OneBall.h
+// compiled in: golf_unity.cpp
+// 19 functions, source order. line | PS3 address | size
+
+   37  0033E93C     14  enum UIScoreCardDispMode_t GameModeOneBall::GetScoreDisplayMode(const struct GameModeOneBall* this, bool getAlternate)
+   43  0033E950      8  enum eLoadingScreens GameModeOneBall::GetFirstLoadingScreen(const struct GameModeOneBall* this)
+   44  0033E958      8  enum eLoadingScreens GameModeOneBall::GetLastLoadingScreen(const struct GameModeOneBall* this)
+   57  0033E960      8  bool GameModeOneBall::AllowConcedeOption(const struct GameModeOneBall* this)
+   63  0033E968      8  bool GameModeOneBall::IsTeamGame(const struct GameModeOneBall* this)
+   65  0033E970     14  char* GameModeOneBall::NumPlyReqStrID(const struct GameModeOneBall* this)
+   68  0033E984      8  bool GameModeOneBall::AllowMiniHUDGhosting(const struct GameModeOneBall* this)
+   69  0033E98C      8  bool GameModeOneBall::SkipFlashTextShotNumber(const struct GameModeOneBall* this)
+   70  0033E994      8  bool GameModeOneBall::SkipFlashTextScore(const struct GameModeOneBall* this)
+   71  0033E99C      8  bool GameModeOneBall::SkipHoleOutUIDisplay(const struct GameModeOneBall* this)
+   75  0033E9A4      8  bool GameModeOneBall::IsSpudHudUsed(const struct GameModeOneBall* this)
+   82  0033E9AC      8  bool GameModeOneBall::GetAudioCommentaryEnabled(const const struct GameModeOneBall* this)
+   83  0033E9B4      8  bool GameModeOneBall::GetCrowdsEnabled(const const struct GameModeOneBall* this)
+   92  0033E9BC      8  bool GameModeOneBall::AllowUserShotClockOverride(const struct GameModeOneBall* this)
+  109    inline-only   bool GameModeOneBall::CurrentlyTuning(const struct GameModeOneBall* this)
+  110    inline-only   float GameModeOneBall::GetCircleWidthMultiplier(const struct GameModeOneBall* this)
+  111    inline-only   float GameModeOneBall::GetCircleAlphaMultiplier(const struct GameModeOneBall* this)
+  112    inline-only   float GameModeOneBall::GetNumHighlightsMultiplier(const struct GameModeOneBall* this)
+  113    inline-only   void GameModeOneBall::GetCircleRGB(const struct GameModeOneBall* this, const unsigned char& r, const unsigned char& g, const unsigned char& b)

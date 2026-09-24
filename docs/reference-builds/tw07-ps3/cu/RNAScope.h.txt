@@ -1,0 +1,95 @@
+// ../../../../../TIGERCODE/packages/RNA/dev-2.0-golf/RNA/RNACore/include/RNAScope/RNAScope.h
+// compiled in: golf_unity.cpp, headgate_unity.cpp, rnaunity.cpp
+// 21 functions, source order. line | PS3 address | size
+
+   78    inline-only   enum TypeID ScopeParmC::GetTypeID(const const struct ScopeParmC* this)
+   87    inline-only   uint32_t ScopeParmC::GetElementCount(const const struct ScopeParmC* this)
+   91    inline-only   ScopeMaskT ScopeParmC::GetScopeMask(const const struct ScopeParmC* this)
+  164    inline-only   const char* GetName(const const struct <anon>* this)
+  268    inline-only   void Update(const struct ScopeC* this, struct ScopeParmC* pScopeParm)
+  282    inline-only   void ScopeParmC::Set<RNA::TextureC*>(const struct ScopeParmC* this, const const struct TextureC*& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  struct TextureC** pValue
+                         local  bool bLargerThanInt32
+  282    inline-only   void ScopeParmC::Set<rw::math::vpu::Vector4>(const struct ScopeParmC* this, const const struct Vector4& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  struct <anon>* pValue
+                         local  bool bLargerThanInt32
+                         local  bool ret
+  282    inline-only   void ScopeParmC::Set<RNAMath::RNAMatrix44>(const struct ScopeParmC* this, const const RNAMatrix44& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  RNAMatrix44* pValue
+                         local  bool bLargerThanInt32
+                         local  bool ret
+                         local  bool ret
+                         local  bool ret
+                         local  bool ret
+  282    inline-only   void ScopeParmC::Set<std::float_t>(const struct ScopeParmC* this, const const float_t& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  float_t* pValue
+                         local  bool bLargerThanInt32
+  282    inline-only   void ScopeParmC::Set<RNAMath::RNAVector3>(const struct ScopeParmC* this, const const RNAVector3& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  RNAVector3* pValue
+                         local  bool bLargerThanInt32
+                         local  bool ret
+                         local  Vector4Intrinsic_32 v0comp
+                         local  Vector4Intrinsic_32 v1comp
+  282    inline-only   void ScopeParmC::Set<rw::math::vpu::Vector3>(const struct ScopeParmC* this, const const struct Vector3& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  struct <anon>* pValue
+                         local  bool bLargerThanInt32
+                         local  bool ret
+                         local  Vector4Intrinsic_32 v0comp
+                         local  Vector4Intrinsic_32 v1comp
+  282    inline-only   void ScopeParmC::Set<bool8_t>(const struct ScopeParmC* this, const const bool8_t& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  bool8_t* pValue
+                         local  bool bLargerThanInt32
+  282    inline-only   void ScopeParmC::Set<rw::math::vpu::Matrix33>(const struct ScopeParmC* this, const const struct Matrix33& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  struct <anon>* pValue
+                         local  bool bLargerThanInt32
+                         local  bool ret
+                         local  Vector4Intrinsic_32 v0comp
+                         local  Vector4Intrinsic_32 v1comp
+                         local  bool ret
+                         local  Vector4Intrinsic_32 v0comp
+                         local  Vector4Intrinsic_32 v1comp
+                         local  bool ret
+                         local  Vector4Intrinsic_32 v0comp
+                         local  Vector4Intrinsic_32 v1comp
+  282    inline-only   void ScopeParmC::Set<rw::math::vpu::Vector2>(const struct ScopeParmC* this, const const struct Vector2& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  struct <anon>* pValue
+                         local  bool bLargerThanInt32
+                         local  bool ret
+                         local  Vector4Intrinsic_32 v0comp
+                         local  Vector4Intrinsic_32 v1comp
+  282    inline-only   void ScopeParmC::Set<std::uint32_t>(const struct ScopeParmC* this, const const uint32_t& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  uint32_t* pValue
+                         local  bool bLargerThanInt32
+  282    inline-only   void ScopeParmC::Set<int>(const struct ScopeParmC* this, const const int& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  int* pValue
+                         local  bool bLargerThanInt32
+  282    inline-only   void ScopeParmC::Set<bool>(const struct ScopeParmC* this, const const bool& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  bool* pValue
+                         local  bool bLargerThanInt32
+  282    inline-only   void ScopeParmC::Set<rw::math::vpu::Matrix44>(const struct ScopeParmC* this, const const struct Matrix44& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  struct <anon>* pValue
+                         local  bool bLargerThanInt32
+                         local  bool ret
+                         local  bool ret
+                         local  bool ret
+                         local  bool ret
+  367    inline-only   void ScopeParmC::Get<bool>(const const struct ScopeParmC* this, const bool& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+  367    inline-only   void ScopeParmC::Get<std::int32_t>(const const struct ScopeParmC* this, const int32_t& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+  422    inline-only   const RNAMatrix44& ScopeParmC::GetRef<RNAMath::RNAMatrix44>(const const struct ScopeParmC* this, uint32_t uIndex)
+                         local  const char[7] __FUNCTION__
+                         local  const const RNAMatrix44& value

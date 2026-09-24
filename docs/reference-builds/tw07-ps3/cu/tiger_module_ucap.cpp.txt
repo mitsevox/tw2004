@@ -1,0 +1,65 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_ucap.cpp
+// compiled in: tiger_module_ucap.cpp
+// 27 functions, source order. line | PS3 address | size
+
+    0  00342894     38  void ~UCAP(const struct <anon>* this)
+                         inlines  ~Module
+   13  00541844     10  static void StaticLuaStartAnim(const struct <anon>* param, void* object)
+   16  00540DD0     18  bool IsUcapEnabled()
+   21  00540DE8     18  void SetIsUcapEnabled(bool enable)
+   26  00541AA8     48  void UCAP(const struct <anon>* this, const const void** __vtt_parm, struct Lua* lua, float fps)
+   33  00540E00     4C  void LevelInit(const struct <anon>* this)
+                         local  enum LuaType[3] sffType
+   39  00540E4C     64  void Init(const struct <anon>* this)
+                         local  int i
+   58  00540EB0     64  void LevelShutdown(const struct <anon>* this)
+                         local  int i
+   79  00541D8C    1B0  void BlendClipFrame(struct GeoFrame* geoFrame, struct TexFrame* texFrame, const struct Header* header, const struct Clip* clip, const float index)
+                         local  const unsigned int frameCount
+                         local  const float floorIndex
+                         local  unsigned int lowIndex
+                         local  unsigned int highIndex
+                         local  const float highWeight
+                         local  const struct GeoFrame* lowGeo
+                         local  const struct GeoFrame* highGeo
+                         local  const struct TexFrame* lowTex
+                         local  const struct TexFrame* highTex
+  114  00541F3C    23C  void Update(const struct <anon>* this)
+                         local  const float seconds
+                         local  const unsigned int frameCount
+                         local  struct GeoFrame oldGeo
+                         local  struct TexFrame oldTex
+                         local  float oldFraction
+  162  00541044     24  void ClearOldClip(const struct <anon>* this)
+  169  00541258      8  int GetResourceCount(const struct <anon>* this)
+  174  00541260      C  int GetResourceId(const struct <anon>* this, int resourceIndex)
+  179  00541290     6C  void ResourceCallback(const struct <anon>* this, void* resource, int resourceId, unsigned int resourceSize)
+  187  00541834     10  void LuaStartAnim(const struct <anon>* this, const struct <anon>* param)
+  192  00541604    230  void StartAnim(const struct <anon>* this, const char* name, float frameOffset, float blendFrames)
+  232  005412FC     40  void StopAnim(const struct <anon>* this)
+  239  00541490     BC  bool HasClip(const const struct <anon>* this, const char* name)
+                         local  const unsigned int clipCount
+                         local  const struct Clip* clips
+                         local  unsigned int i
+  263  0054154C     B8  const struct Clip* FindClip(const const struct <anon>* this, const char* name)
+                         local  const unsigned int clipCount
+                         local  const struct Clip* clips
+                         local  unsigned int i
+  287  00541978    130  const struct GeoFrame* GetClipGeoFrame(const struct Header* header, const struct Clip* clip, const unsigned int frame)
+                         local  const unsigned int totalFrame
+  298  00540F14    130  const struct TexFrame* GetClipTexFrame(const struct Header* header, const struct Clip* clip, const unsigned int frame)
+                         local  const unsigned int totalFrame
+  309  00541B1C    270  void Blend(float* dest, const float* a, const float* b, float weightB, unsigned int vecCount)
+                         local  float weightA
+                         local  struct <anon> wa
+                         local  struct <anon> wb
+                         inlines  TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecSetAll, TIGER_MATH::VecStore, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx, TIGER_MATH::operator+, Vec, vec_madd
+  326  00541854    124  const struct TexFrame* GetTexFrame(const const struct <anon>* this)
+  333  0054133C    124  const struct GeoFrame* GetGeoFrame(const const struct <anon>* this)
+  341  00541068    1F0  void SetTransposeGeoFrame(const struct <anon>* this)
+                         local  const struct GeoFrame* geoFrame
+                         local  unsigned int i
+                         local  unsigned int j
+  367  0054126C     24  int GetStreamingIndex(const struct <anon>* this)
+                         local  int result
+  379  00541460     30  void ActivateNextStream(const struct <anon>* this)

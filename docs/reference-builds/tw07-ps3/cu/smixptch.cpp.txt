@@ -1,0 +1,8 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/smixptch.cpp
+// compiled in: smixptch.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    7  006E16BC    12C  void MIX_setpitch(int voice, int pitchmult)
+                         local  SNDMIXVOICE* psmv
+                         local  int method
+                         inlines  SNDMEMI_alloc

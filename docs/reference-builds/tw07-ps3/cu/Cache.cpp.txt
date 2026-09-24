@@ -1,0 +1,12 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/source/common/Cache.cpp
+// compiled in: Cache.cpp
+// 5 functions, source order. line | PS3 address | size
+
+    0  008199CC    10C  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   54  008198A0    12C  bool CompareExpression(const struct <anon>* this, struct ExprNode* exprNode)
+                         local  bool isEqual
+   86  00819400    4A0  bool CompareExprValue(const struct <anon>* this, struct <anon> expr1, struct <anon> expr2)
+                         local  const char[17] __FUNCTION__
+                         local  bool isEqual
+  160  00819AD8     3C  static void _GLOBAL__I__ZN2EA4T3db5Cache12sCountCreateE()
+  161  00819B14     3C  static void _GLOBAL__D__ZN2EA4T3db5Cache12sCountCreateE()

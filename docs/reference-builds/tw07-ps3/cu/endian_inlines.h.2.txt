@@ -1,0 +1,7 @@
+// C:/RW45/platform/include/native/ps3-ppu-gcc/rw/core/endian/detail/endian_inlines.h
+// compiled in: movieplayer.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    9    inline-only   uint32_t endian::ConvertLittle(const uint32_t x)
+   23    inline-only   uint16_t endian::ConvertLittle(const uint16_t x)
+  189    inline-only   uint32_t endian::make_id32(uint8_t a, uint8_t b, uint8_t c, uint8_t d)

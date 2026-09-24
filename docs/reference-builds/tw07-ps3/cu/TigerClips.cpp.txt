@@ -1,0 +1,90 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/TigerClips/TigerClips.cpp
+// compiled in: golf_unity.cpp
+// 29 functions, source order. line | PS3 address | size
+
+   19  0021EE00     BC  struct TigerClipsCore* TigerClipsCore::GetSingleton()
+                         local  struct TigerClipsCore coreInstance
+                         inlines  TigerClipsCore::TigerClipsCore
+   25  0021EEBC     50  bool TigerClipsCore::DBG_InTestMode(const struct TigerClipsCore* this)
+   34  00311B54    36C  void TigerClipsCore::DBG_SaveBallLocation(const struct TigerClipsCore* this, float* location)
+                         local  char[128] fileName
+                         local  int32 currentHole
+                         local  int32 strokeCount
+                         local  int32 currentCourse
+                         local  char[128] textBuffer
+                         local  int32 bufferLen
+                         local  float x
+                         local  float y
+                         local  float z
+                         local  vec3flt loc
+                         local  float distance
+                         inlines  GM_GetPlayerHoleStrokes, std::sqrt
+  110  0021EF1C     94  void TigerClipsCore::DBG_SwapTestMode(const struct TigerClipsCore* this)
+  130  0021EFB0     54  void TigerClipsCore::DBG_InitReplayTestWrite(const struct TigerClipsCore* this)
+                         inlines  cGAME_GLOBALS::SetCrowds
+  141  00281BF8     D4  void TigerClipsCore::DGB_InitReplayTestRead(const struct TigerClipsCore* this)
+                         inlines  Singleton<UIGameOptions>::GetSingleton, UIGameOptions::SetCrowds
+  151  00200F34      8  bool TigerClipsCore::DBG_GetReplayTestRead(const struct TigerClipsCore* this)
+  159  0021EF0C      8  void TigerClipsCore::DBG_SetReplayTestRead(const struct TigerClipsCore* this, bool replayRead)
+  166  00200F2C      8  bool TigerClipsCore::DBG_GetReplayTestWrite(const struct TigerClipsCore* this)
+  174  0021EF14      8  void TigerClipsCore::DBG_SetReplayTestWrite(const struct TigerClipsCore* this, bool replayWrite)
+  181  00280044    128  void TigerClipsCore::DBG_RenderReplayTarget(const struct TigerClipsCore* this, float* targetPos)
+                         local  CameraController_t* currCamera
+                         local  vec4flt* camPos
+                         local  vec4flt* camLook
+                         local  vec4flt camToLook
+                         local  vec4flt blue
+                         inlines  LLMath_Subtract3, ShotLinkWaypoint::SetColor
+  215  00311900    12C  void TigerClipsCore::DBG_GetWriteEndLocationFromFile(const struct TigerClipsCore* this, float* location)
+                         local  float x
+                         local  float y
+                         local  float z
+                         local  char[128] fileName
+                         local  char* data
+                         local  int32 fileLength
+                         local  int32 currentHole
+                         local  int32 strokeCount
+                         local  int32 currentCourse
+                         inlines  GM_GetPlayerHoleStrokes
+  248  00311EC0     D0  void TigerClipsCore::DBG_SaveCurrentReplayToFile(const struct TigerClipsCore* this)
+                         local  char[128] fileName
+                         local  int32 currentHole
+                         local  int32 strokeCount
+                         local  int32 currentCourse
+                         inlines  GM_GetPlayerHoleStrokes
+  266  00311F90     D0  void TigerClipsCore::DBG_LoadCurrentReplayFromFile(const struct TigerClipsCore* this)
+                         local  char[128] fileName
+                         local  int32 currentHole
+                         local  int32 strokeCount
+                         local  int32 currentCourse
+                         inlines  GM_GetPlayerHoleStrokes
+  283  00312060    1A8  void TigerClipsCore::DBG_OnImpactSetup(const struct TigerClipsCore* this, struct PhysicsBall_t* ball)
+                         inlines  GamePlayerManager::SetPlayerCount, PhysicsBall_t::SetFlag, cGAME_GLOBALS::SetReplayActive
+  327  0025220C     68  void TigerClipsCore::SaveCurrentReplayToFile(const struct TigerClipsCore* this, char* fileName)
+  347  00311A2C    128  void TigerClipsCore::LoadCurrentReplayFromFile(const struct TigerClipsCore* this, char* fileName)
+                         local  char* data
+                         local  vec4flt waypointLoc
+                         local  vec3flt tmpLoc
+                         local  vec4flt blue
+                         inlines  ShotLinkWaypoint::SetColor, ShotLinkWaypoint::SetCoordinate, ShotLinkWaypoint::SetScale
+  386  0031242C     88  void TigerClipsCore::OnBallStop(const struct TigerClipsCore* this, enum PlayerNumber_t player, float* position_p)
+  401  00200F3C     78  bool TigerClipsCore::IsPlayerClipReplay(const struct TigerClipsCore* this, enum PlayerNumber_t player)
+  406  0021F004      8  bool TigerClipsCore::IsPlayerAllowedToSaveClip(const struct TigerClipsCore* this, enum PlayerNumber_t player)
+  422  001F40E4     28  void TigerClipsCore::Init(const struct TigerClipsCore* this)
+                         local  int32 i
+  433  0021F1D0     80  void TigerClipsCore::DBG_InitDemoMode(const struct TigerClipsCore* this, int* c)
+                         local  int players
+  451  0031E4B0    130  void TigerClipsCore::DBG_ResetDemo(const struct TigerClipsCore* this)
+                         local  int32[4] c
+                         local  int players
+                         local  int32 i
+  491  0031E40C     A4  void TigerClipsCore::DBG_PlayAgainstLatest(const struct TigerClipsCore* this)
+                         local  int32 i
+  517  0021F250      4  void TigerClipsCore::DBG_NextDemoHole(const struct TigerClipsCore* this)
+  523  001FB804      8  bool TigerClipsCore::DBG_IsDemoing(const struct TigerClipsCore* this)
+  532  002FB3B0    1E4  bool TigerClipsCore::DBG_GoToNextDemoHole(const struct TigerClipsCore* this)
+                         local  int32 j
+                         inlines  GM_SetCurrentCourse, GM_SetPlayerHoleStrokes, GamePlayerManager::SetPlayerCount, cGAME_GLOBALS::DisableLoopingDebug
+  573  0031E5E0     E4  void TigerClipsCore::DBG_UpdateInputResponse(const struct TigerClipsCore* this)
+                         local  unsigned int padRead
+  608  0021F254     78  bool TigerClipsCore::DBG_UpdateTargetRenderCondition(const struct TigerClipsCore* this, bool bDraw)

@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/Headers/LLSnap.h
+// compiled in: Legacy_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  302    inline-only   bool SN_boIsSequenceCaptureOn()

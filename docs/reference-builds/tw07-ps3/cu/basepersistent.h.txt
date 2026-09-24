@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/include/common/osdk/basepersistent.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   43    inline-only   void* operator new(size_t size, const char8_t* strFilename, int32_t iLineNum, struct MemoryStrategy* pMemoryStrategy)
+   55    inline-only   void operator delete(void* ptr)

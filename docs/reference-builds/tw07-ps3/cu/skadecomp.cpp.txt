@@ -1,0 +1,35 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/src/Ska/skadecomp.cpp
+// compiled in: skadecomp.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   25  005A7394    1D8  void SKA_DistributePointers(SkeletonAnimation* pSKA, char* pData)
+                         local  int numMaskBytes
+                         local  int numMaskBytes
+                         local  int numMaskBytes
+  126  005A7DE0     FC  void SKA_ExpandFullFrame(TSkeletonState* pTarget, const SkeletonAnimation* pSource, int iFrameIndex)
+                         local  AnimDataCursor cursor
+                         local  int i
+                         local  struct <anon> transform
+                         inlines  Quat_Copy, vec4flt_Copy4
+  140  005A7D38     A8  void SKA_ExpandFullFrame(struct <anon>* pTarget, const SkeletonAnimation* pSource, int iFrameIndex)
+                         local  AnimDataCursor cursor
+                         local  int i
+  151  005A7C8C     AC  void SKA_ExpandSingleBone(struct <anon>* pTarget, const SkeletonAnimation* pSource, int iFrameIndex, int iBoneIndex)
+                         local  AnimDataCursor cursor
+                         local  int i
+  164  005A756C    224  void SKA_InitCursor(AnimDataCursor* pCursor, const SkeletonAnimation* pSKA, int frameNum)
+  252  005A79B0    2DC  void SKA_ExpandNextBone(AnimDataCursor* pCursor, struct <anon>* transform)
+                         local  int index
+                         local  int index
+                         local  int index
+                         local  int index
+                         local  int index
+                         local  int index
+                         inlines  Quat_Identify, vec3flt_Copy
+  312  005A7790    220  void SKA_SkipNextBone(AnimDataCursor* pCursor)
+                         local  int index
+                         local  int index
+                         local  int index
+                         local  int index
+                         local  int index
+                         local  int index

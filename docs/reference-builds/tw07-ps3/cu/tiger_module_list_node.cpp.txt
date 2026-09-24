@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_list_node.cpp
+// compiled in: tiger_module_list_node.cpp
+// 6 functions, source order. line | PS3 address | size
+
+    0  00540D30     18  void ~ListNode(const struct <anon>* this)
+                         inlines  ~Allocatable
+    5  0057FA1C     24  void ListNode(const struct <anon>* this)
+   11  0057FA40     1C  struct <anon>* LinkToStartOfList(const struct <anon>* this, struct <anon>* list)
+   23  0057FA5C     44  struct <anon>* UnlinkFromList(const struct <anon>* this, struct <anon>* list)
+   42  0057FAA0     68  struct <anon>* DeleteFromList(const struct <anon>* this, struct <anon>* list)
+   51  0057FB08     38  struct <anon>* DeleteList(const struct <anon>* this)
+                         local  struct <anon>* node

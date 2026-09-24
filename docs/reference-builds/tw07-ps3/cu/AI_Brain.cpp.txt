@@ -1,0 +1,294 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/AI/AI_Brain.cpp
+// compiled in: golf2_unity.cpp
+// 53 functions, source order. line | PS3 address | size
+
+  112  00182F20    18C  void AIBrain::InitialSetup(const struct AIBrain* this)
+                         inlines  AIMgr
+  151  001989D0    330  void AIBrain::SetupShot(const struct AIBrain* this)
+                         local  struct AIPossibleShot* possShot
+                         inlines  AIBrain::SetState, AIMgr, vec4flt_Copy, vec_st
+  224  001B7B00    1AC  void AIBrain::SetupShot(const struct AIBrain* this, const float* location)
+                         local  struct AIPossibleShot* possShot
+                         local  vec4flt vec
+                         local  float distance
+                         inlines  AIBrain::SetState, AIMgr, LLMath_Subtract3, std::sqrt, vec4flt_Copy
+  352  001B7CE4     38  void AIBrain::SetupTarget(const struct AIBrain* this)
+  365  001B7CAC     38  void AIBrain::SetupTarget_Pin(const struct AIBrain* this)
+  379  001CCB1C    478  bool AIBrain::Think(const struct AIBrain* this, bool mustFinish, bool useSuckaForEstimate)
+                         local  struct Timing_AutoMarker aiThinkMarker
+                         local  uint32 numSteps
+                         local  uint32 steps
+                         inlines  AIBrain::SetState, AIMgr, PhysicsBall_t::ClearFlag, PhysicsBall_t::SetFlag, PhysicsBall_t::SetFlagState, Timing_AutoMarker::Timing_AutoMarker, Timing_AutoMarker::~Timing_AutoMarker
+  595  001B0010    9E0  void AIBrain::ScrewItUp(const struct AIBrain* this)
+                         local  float offset
+                         local  float offset2
+                         local  float accuracy
+                         local  enum STAT_e statType
+                         local  bool makeBadApproachShot
+                         local  struct GamePlayer* Plr_p
+                         local  float maxAngleError
+                         local  float maxDistError
+                         local  uint32 numRolls
+                         local  float distance
+                         local  uint32 i
+                         local  float yardsFromPin
+                         local  float distanceToPin
+                         local  uint32 i
+                         local  float estDist
+                         inlines  AIMgr, GamePlayer::GetSwingInfo, Misc_RandFuncf, std::atan
+  842  00144830     60  void AIBrain::SetPlayer(const struct AIBrain* this, enum PlayerNumber_t playerId)
+  862  00144890      8  void AIBrain::SetShotInfo(const struct AIBrain* this, struct CoreShotInfo_t* shotInfo)
+  874  001B7A28     D8  enum ShotType_t AIBrain::ChooseShotType(const struct AIBrain* this, const float* location)
+                         local  enum ShotType_t shotType
+                         local  float dist
+                         inlines  LLMath_DistanceBetween3
+  904  001B7EC0    1B8  float AIBrain::CalcBounceDist(const struct AIBrain* this, const float* location, enum ShotType_t shotType, enum Club_t club)
+                         local  float bounceDist
+                         local  float dist
+                         local  float power
+                         inlines  LLMath_DistanceBetween3
+  936  0015BB4C    238  void AIBrain::HandleCollision(const struct AIBrain* this, const float* location, const float* normal, const float* linVelocity, const struct TGD_MaterialInfo* materialInfo, const TGD_ObjectInstanceInfo* objectInfo)
+                         inlines  vec4flt_Copy, vec_st
+  970  001830AC     18  void AIBrain::Init(const struct AIBrain* this)
+                         inlines  AIBrain::SetState
+ 1011  001BAF3C    414  float AIBrain::ComparePossibleShots(const struct AIBrain* this, const struct AIPossibleShot& shot1, const struct AIPossibleShot& shot2)
+                         local  float compare
+                         local  float targetToPinDist1
+                         local  float targetToPinDist2
+                         local  int8 aggression
+                         local  int8 IQ
+                         local  int8 accuracy1
+                         local  int8 accuracy2
+                         local  float riskFactor1
+                         local  float riskFactor2
+                         inlines  AINetworkMgr
+ 1096  001B9FD8    388  float AIBrain::CompareAttemptedShots(const struct AIBrain* this, const struct AIAttemptedShots& shot1, const struct AIAttemptedShots& shot2)
+                         local  float compare
+                         local  float targetToPinDist1
+                         local  float targetToPinDist2
+                         local  struct AIPossibleShot* possShot1
+                         local  struct AIPossibleShot* possShot2
+                         local  float targetDist1
+                         local  float targetDist2
+                         inlines  AINetworkMgr, LLMath_DistanceBetween3, vec_madd, vec_sld, vec_sub
+ 1165  00182E2C     F4  float AIBrain::CompareBallLies(const struct AIBrain* this, enum Lie_t lieID1, enum Lie_t lieID2)
+                         inlines  AIMgr
+ 1177  00150388     CC  bool AIBrain::IsAcceptableShot(const struct AIBrain* this, const struct PhysicsBall_t& ball)
+                         local  bool acceptable
+                         local  struct TGD_MaterialInfo* initialSurfaceInfo
+                         local  struct TGD_MaterialInfo* surfaceInfo
+ 1215  001BD958    A04  bool AIBrain::PickPossibleTargets(const struct AIBrain* this)
+                         local  enum ShotType_t shotType
+                         local  enum Club_t club
+                         local  const struct TNetwork* network
+                         local  float* cupLocation
+                         local  const struct Cup** activeCups
+                         local  int8 count
+                         local  void* ptr
+                         local  bool bConsultNetworks
+                         local  enum Club_t club
+                         local  float dist
+                         local  vec4flt closestTarget
+                         local  float minDist
+                         local  enum Club_t club
+                         local  int i
+                         local  struct GameModeOneBall* mode
+                         local  vec4flt wedgeTargetLocation
+                         local  const int greenIndex
+                         local  const int numCups
+                         local  float* otherCupLocation
+                         local  vec4flt diffVec
+                         local  int32 cupIndex
+                         local  int course
+                         local  int hole
+                         local  enum GM_ModeType_t mode
+                         inlines  AIMgr, GM_GetCurrentGreenIndex, GM_GetModeType, LLMath_DistanceBetween3, LLMath_Subtract3, __vec_len_sqr3, std::sqrt, vec4flt_Copy3, vec_madd, vec_sld
+ 1650  001BD038    6F4  bool AIBrain::PickPossibleTargets_OneBall(const struct AIBrain* this)
+                         local  enum ShotType_t shotType
+                         local  enum Club_t club
+                         local  const struct TNetwork* network
+                         local  float* cupLocation
+                         local  void* voidGameModePtr
+                         local  const struct Cup** activeCups
+                         local  int8 count
+                         local  float_t cosAngle
+                         local  float_t sinAngle
+                         local  struct GameModeOneBall* mode
+                         local  int numPoints
+                         local  float radius
+                         local  const float cfAllowBuffer
+                         local  vec4flt circleTarget
+                         local  float dist
+                         local  int32 point
+                         local  vec4flt vCupLoc
+                         local  enum Club_t club
+                         local  int i
+                         inlines  AIMgr, AINetworkMgr, LLMath_DistanceBetween3, std::cosf, std::sinf, vec4flt_Copy
+ 1825  001BA360    BDC  bool AIBrain::EvaluateShot(const struct AIBrain* this)
+                         local  bool tryAgain
+                         local  bool bestShot
+                         local  vec4flt error
+                         local  vec4flt vecToTarget
+                         local  vec4flt relativeError
+                         local  struct AIPossibleShot* possShot
+                         local  float targetDist
+                         local  struct AIPossibleShot* possShot
+                         local  float targetDist
+                         inlines  AICore::CloseEnoughSq, AIMgr, LLMath_DotProduct3, LLMath_Length3, LLMath_LengthSquared3, LLMath_SquareDistanceBetween3, LLMath_Subtract3, __vec_dot3, isLeft, std::sqrt, vec4flt_Copy, vec_ld, vec_madd, vec_sld, vec_st, vec_sub
+ 2120  001B8C48   1390  bool AIBrain::AdjustShot(const struct AIBrain* this)
+                         local  bool tryNextShot
+                         local  bool adjusted
+                         local  uint32 prevAttempt
+                         local  const struct AIFeatureNetwork* bunker1
+                         local  const struct AIFeatureNetwork* bunker2
+                         local  float xDiff
+                         local  float zDiff
+                         local  float dist
+                         local  enum Club_t club
+                         local  vec4flt vecFromWater
+                         local  enum Club_t club
+                         local  float left
+                         local  vec4flt vec
+                         local  vec4flt origin
+                         local  float height
+                         local  float left
+                         local  vec4flt vec
+                         local  vec4flt origin
+                         local  float height
+                         local  enum Club_t club
+                         local  vec4flt vec
+                         local  float dist
+                         local  enum Club_t club
+                         inlines  AIMgr, AINetworkMgr, LLMath_AddScale3, LLMath_Subtract3, __vec_make_from_scalar, isLeft, std::sqrt, vec3flt_Copy, vec3flt_Subtract, vec4flt_Copy, vec_madd, vec_splat, vec_st
+ 2782  001B89C4    284  bool AIBrain::SetupNextShotAttempt(const struct AIBrain* this)
+                         local  float compare
+                         local  float targetToPinDist1
+                         local  struct AIPossibleShot* possShot
+                         local  float targetToPinDist2
+                         local  float targetDist1
+                         inlines  AIMgr, AINetworkMgr, LLMath_DistanceBetween3, __vec_len_sqr3
+ 2852  00144F0C     C0  bool AIBrain::IncrementShot(const struct AIBrain* this, bool allowExtendedThinking)
+                         local  bool incremented
+ 2890  001B33A4    2A0  void AIBrain::CopyAttemptToShotinfo(const struct AIBrain* this, const struct AIAttemptedShots& attempt, struct CoreShotInfo_t* shotInfo)
+                         local  int32 i
+                         inlines  AIMgr, GM_GetModeType, vec4flt_Copy, vec_st
+ 2961  001B3644      C  void AIBrain::SetupBestShot(const struct AIBrain* this)
+ 2995  00182D68     C4  bool AIBrain::ShouldTryNextShot(const struct AIBrain* this)
+                         local  bool tryNextShot
+                         inlines  AIMgr
+ 3015  0018292C    138  enum PhysicsMishitType AIBrain::GetPhysicsMishitType(const struct AIBrain* this, enum AIMishitType mishit)
+                         local  enum PhysicsMishitType physicsMishitType
+                         local  uint32 randNum
+                         inlines  AICore::ForceChiliDip, AIMgr
+ 3091  00182A64    304  void AIBrain::ApplyMishit(const struct AIBrain* this, enum AIMishitType mishit, uint8 severity)
+                         local  struct GolferData_t* golferData
+                         inlines  AIMgr, GamePlayer::GetGolferData
+ 3163  0019FB4C      C  enum AIMishitType AIBrain::ChooseMishit(const struct AIBrain* this, const struct AIAttemptedShots& attemptedShot)
+ 3168  0019FAD4      C  enum AIMishitType AIBrain::ChooseMishit(const struct AIBrain* this, struct CoreShotInfo_t* shotInfo)
+ 3178  0019F6D8    2C0  enum AIMishitType AIBrain::ChooseMishit(const struct AIBrain* this, enum ShotType_t shotType, enum Club_t club)
+                         local  enum AIMishitType mishitType
+                         local  struct GolferData_t* golferData
+                         local  uint8 chance
+                         inlines  GamePlayer::GetGolferData, Misc_RandFuncf
+ 3293  0019FB58     84  enum PhysicsMishitType AIBrain::GetMishitForEstimate(const struct AIBrain* this)
+                         local  struct GolferData_t* golferData
+                         local  enum PhysicsMishitType mishitType
+ 3317  001571BC     80  float AIBrain::GetStanceForEstimate(const struct AIBrain* this, float stance)
+                         local  struct GolferData_t* golferData
+                         inlines  GamePlayer::GetGolferData
+ 3327  0019F998    13C  float AIBrain::GetStrengthForEstimate(const struct AIBrain* this, float shotPower)
+                         local  float strength
+ 3342  00144FCC    110  float AIBrain::CalcRoidRageStrength(const struct AIBrain* this, float strength)
+ 3356  001450DC     1C  float AIBrain::CalcHighHookerStance(const struct AIBrain* this, float stance)
+ 3368  001441F4     E0  struct AIPossibleShot* AIBrain::GetPossibleShot(const struct AIBrain* this, uint32 index)
+                         local  struct AIPossibleShot* possShot
+ 3402  001BCB78    4C0  bool AIBrain::AddPossibleShot(const struct AIBrain* this, const float* location, enum ShotType_t shotType, enum Club_t club, uint32 nodeFlags)
+                         local  bool shotAdded
+                         local  uint32 i
+                         local  float bounceDist
+                         local  float risk
+                         local  float targetToPinDist
+                         local  struct AIPossibleShot tempShot
+                         local  float xDiff
+                         local  float zDiff
+                         local  float dist
+                         local  uint32 j
+                         inlines  AINetworkMgr, std::sqrt, vec4flt_Copy
+ 3482  001BB350    76C  void AIBrain::AddClosestShot(const struct AIBrain* this, const struct AIPossibleShot& shot)
+                         local  bool distOk
+                         local  bool distPreferrable
+                         local  float xDiff
+                         local  float zDiff
+                         local  float dist
+                         local  vec4flt intersection
+                         local  int32 node
+                         local  const struct AIFeatureNetwork* network
+                         local  vec4flt intersection
+                         local  int32 node
+                         local  const struct AIFeatureNetwork* network
+                         local  int32 node
+                         local  const struct AIFeatureNetwork* network
+                         local  vec4flt intersection
+                         local  const struct AIFeatureNetwork* enclosingNetwork
+                         local  float xDiff
+                         local  float zDiff
+                         local  float distToEdge
+                         inlines  AINetworkMgr
+ 3679  001AE1A8    220  enum Club_t AIBrain::ChooseClub(const struct AIBrain* this, const float* location, enum ShotType_t shotType)
+                         local  bool possible
+                         local  enum Club_t lastClub
+                         local  enum Club_t club
+                         inlines  AINetworkMgr
+ 3738  0015CAA8     B0  bool AIBrain::ClubUp(const struct AIBrain* this)
+                         local  enum Club_t club
+ 3752  0015C7B4     B0  bool AIBrain::ClubDown(const struct AIBrain* this)
+                         local  enum Club_t club
+ 3766  0014433C      8  enum ShotShape_t AIBrain::ChooseShotShape(const struct AIBrain* this)
+ 3778  00198730    2A0  void AIBrain::ChooseStrength(const struct AIBrain* this)
+                         local  float targetDistance
+                         local  struct AIPossibleShot* possShot
+                         local  float launchAngle
+                         local  float sinLaunchAngle
+                         local  struct AIPossibleShot* possShot
+                         local  float distMod
+                         inlines  AIMgr, std::sinf
+ 3822  00144A30     A4  bool AIBrain::CheckPower(const struct AIBrain* this, bool checkMinPower)
+                         local  bool powerOk
+ 3845  00144968     C8  float AIBrain::ChooseShotDirection(const struct AIBrain* this)
+                         local  float direction
+ 3872  001AE3C8    794  bool AIBrain::AdjustTarget(const struct AIBrain* this)
+                         local  vec4flt errorVec
+                         local  struct AIPossibleShot* possShot
+                         local  vec4flt vecFromTarget1
+                         local  vec4flt vecFromTarget2
+                         local  uint32 prevShot1
+                         local  enum Club_t club
+                         inlines  LLMath_AddScale3, LLMath_DotProduct3, LLMath_Subtract3, vec4flt_Copy, vec_madd, vec_sld, vec_splat, vec_st, vec_sub
+ 4123  0017B698     48  float AIBrain::CalcDistToTarget(const struct AIBrain* this, float* location)
+                         local  vec4flt vecToTarget
+                         inlines  LLMath_Subtract3, std::sqrt
+ 4135  001A1F80    3CC  void AIBrain::TweekStats(const struct AIBrain* this)
+                         local  int par
+                         local  int strokes
+                         local  struct GamePlayer* Plr_p
+                         inlines  GM_GetCurrentHoleIndex
+ 4219  00144AD4    438  void AIBrain::CheckStats(const struct AIBrain* this)
+ 4301  0014511C     48  struct CoreShotInfo_t* AIBrain::GetShotInfo(const struct AIBrain* this)
+                         local  struct CoreShotInfo_t* shotInfo
+ 4322  001BE35C    1F8  enum Club_t AIBrain::GetPlausibleClub(const struct AIBrain* this, enum PlayerNumber_t player, struct CoreShotInfo_t* coreShot, struct PhysicsBall_t* pBall)
+                         local  enum Club_t club
+                         local  float distToPin
+                         local  uint32 shotNum
+                         local  struct AIPossibleShot* possShot
+                         local  float distToTarget
+                         inlines  LLMath_DistanceBetween3
+ 4382  001BC8E8    290  float AIBrain::CalcRisk(const struct AIBrain* this, float* pCalculatedStraightRisk, float* pCalculatedShapedRisk)
+                         local  float risk
+                         local  float riskTerrainStraight
+                         local  float riskTerrainShaped
+                         local  float bounceDist
+                         local  struct DrawFadeIndicator* shaped
+                         local  bool isShaped
+                         local  vec4flt shapedLocation
+                         local  vec4flt straightLocation
+                         inlines  AINetworkMgr, DrawFadeIndicator::GetInstance, vec4flt_Copy, vec_st

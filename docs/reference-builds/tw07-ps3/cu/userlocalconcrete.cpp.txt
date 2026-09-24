@@ -1,0 +1,15 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/ps3/userlocalconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   64  005CB628     34  void UserLocalConcrete(const struct UserLocalConcrete* this)
+   88  005C5D50      C  void ~UserLocalConcrete(const struct UserLocalConcrete* this)
+  111  005D94BC     4C  const char8_t* GetName(const const struct <anon>* this)
+                         local  struct <anon>* pFacade
+                         local  const char8_t* pName
+  140  005C5DA0      8  enum PermissionLevel GetUserCreatedContentPermission(const const struct <anon>* this)
+  165  005C5DA8      8  enum PermissionLevel GetViewProfilePermission(const const struct <anon>* this)
+  190  005C5DB0      8  bool CanPurchaseContent(const const struct <anon>* this)
+  215  005C5DB8      8  bool CanPlayMultiplayerGames(const const struct <anon>* this)
+  240  005C5DC0     40  enum PermissionLevel GetCommunicationPermission(const const struct <anon>* this)
+  264  005C5E00      8  enum PermissionLevel GetPresencePermission(const const struct <anon>* this)

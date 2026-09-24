@@ -1,0 +1,62 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/online/osdk/leaderboard_impl.cpp
+// compiled in: golf2_unity.cpp
+// 26 functions, source order. line | PS3 address | size
+
+   21  0019CC2C     70  void CLeaderboard(const struct <anon>* this)
+                         inlines  RCPointer
+   30  0019CD0C     88  void ~CLeaderboard(const struct <anon>* this)
+                         inlines  ~RCPointer
+   35  001290C4      C  void InitializeInterface(const struct <anon>* this, const char8_t* view)
+   41  00195698     E0  void TerminateInterface(const struct <anon>* this)
+                         inlines  operator->, operator=
+   60  001758B0    19C  void GetLeaderboards(const struct <anon>* this)
+                         local  enum OsdkState myOsdkState
+                         local  const struct List<OSDK::LeaderboardCategory>* pLeaderboards
+                         local  int32_t count
+                         local  int32_t i
+                         inlines  List<OSDK::LeaderboardCategory>::GetElementAt
+   92  0012AAC0      4  void GetIndices(const struct <anon>* this, int32_t leaderboard)
+   98  0012AAC4      4  void GetVariations(const struct <anon>* this, int32_t leaderboard, int32_t index)
+  104  00195B6C    298  void LoadLeaderboard(const struct <anon>* this, int32_t leaderboard, int32_t index, int32_t variation)
+                         local  enum OsdkState myOsdkState
+                         inlines  List<OSDK::Leaderboard>::GetElementAt, List<OSDK::LeaderboardIndex>::GetElementAt, operator->, operator=
+  129  0015DD60     5C  void GetMetaData(const struct <anon>* this)
+  134  0015DDBC     7C  int32_t GetRowCount(const struct <anon>* this)
+  140  0015DEAC    140  char* GetCell(const struct <anon>* this, int32_t row, int32_t column)
+  154  0015E088     5C  void GetUserRow(const struct <anon>* this)
+  159  00165948     D8  void SortData(const struct <anon>* this, int32_t column)
+  175  0012AAE4     48  bool IsFriendLeaderboard(const struct <anon>* this)
+                         inlines  operator->
+  179  0012AAC8     1C  bool IsLeaderboardValid(const struct <anon>* this)
+  187  00129258     1C  bool IsLeaderboardBusy(const struct <anon>* this)
+  195  00157C9C    144  struct LeaderboardCategory* GetLeaderboard(const struct <anon>* this, int32_t leaderboard)
+                         local  const struct List<OSDK::LeaderboardCategory>* pCategories
+                         local  bool b
+                         local  struct DebugStrategy* pDebug
+                         inlines  List<OSDK::LeaderboardCategory>::GetElementAt
+  202  00195E8C    2E0  void LeaderboardDownloadSpreadSheetSuccess(const struct <anon>* this, struct Leaderboard* pLeaderboard, struct SpreadSheetLeaderboard* pSpreadSheet)
+                         local  int maxRows
+                         local  int maxColumns
+                         local  struct OnlineManagerOSDK* pOnlineMgr
+                         local  int i
+                         local  int j
+                         inlines  OnlineManagerOSDK::GetInstance, operator=
+  246  0014B268     44  void LeaderboardDownloadSpreadSheetFailure(const struct <anon>* this, struct Leaderboard* pLeaderboard, enum Failure eFailure)
+                         inlines  operator=
+  252  0019CEB0     58  void CTicker(const struct <anon>* this)
+                         inlines  RCPointer
+  259  0014B544     6C  void ~CTicker(const struct <anon>* this)
+                         inlines  ~RCPointer
+  264  0014B2AC     F0  void InitializeInterface(const struct <anon>* this)
+                         inlines  AddObserver
+  278  0014B46C     D8  void TerminateInterface(const struct <anon>* this)
+                         inlines  RemoveObserver
+  297  0016DAB0     E0  bool IsMessageAvailable(const struct <anon>* this)
+  318  00158944    2CC  void GetMessage(const struct <anon>* this)
+                         local  struct TickerMessage* pMsg
+                         local  const TickerMessageSectionList* pMsgSectionList
+                         local  int32_t iNumSections
+                         local  struct TickerMessageSection* pMsgSection
+                         local  unsigned int myTickerColour
+                         inlines  List<OSDK::TickerMessage>::GetElementAt, List<OSDK::TickerMessageSection>::GetElementAt
+  409  0012AB2C      8  void MessageReceived(const struct <anon>* this, const TickerMessageList* pNewMessage)

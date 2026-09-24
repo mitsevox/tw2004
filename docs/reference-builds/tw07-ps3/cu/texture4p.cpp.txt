@@ -1,0 +1,66 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/texture4p.cpp
+// compiled in: other_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   18  0041FF44     60  void Texture4P::Texture4P(const struct Texture4P* this, const const struct Allocator& allocRef, const const struct HashString& textureName, int32_t width, int32_t height, int32_t mipmaps, void* texturedata, void* clutData, bool swizzled)
+   25  003D2AB8     18  void Texture4P::~Texture4P(const struct Texture4P* this)
+   32  0043EF40    1D0  void Texture4P::GetPixelValue(const struct Texture4P* this, int32_t x, int32_t y, const RawTexture_PixelValue& value, int32_t mipmap)
+                         local  uint8_t clutEntry
+                         inlines  Texture4P::GetClutValue
+   49  0043F110    1F4  void Texture4P::GetNPixels(const struct Texture4P* this, int32_t startX, int32_t startY, RawTexture_PixelValue* pixels, int32_t mipmap, int32_t numPixels)
+                         local  int32_t pixelIndex
+                         local  uint8_t* textureData
+                         local  int i
+                         local  uint8_t clutEntry
+                         inlines  Texture4P::GetClutValue
+   77  00406A84    198  void Texture4P::GetNPixels(const struct Texture4P* this, int32_t pixelIndex, RawTexture_PixelValue* pixels, int32_t numPixels)
+                         local  uint8_t* textureData
+                         local  int i
+                         local  uint8 clutEntry
+                         inlines  Texture4P::GetClutValue
+  100  003D2B34     A4  void Texture4P::SwizzleClut(const struct Texture4P* this)
+                         local  uint32[16] oldClut
+                         local  int clutEntry
+                         local  int32_t realEntry
+                         local  RawTexture_PixelValue* clutVals
+  143  003D2BD8     F0  char PrepareSoftlightBlend(unsigned char input, float lerpVal)
+                         local  float maskPercent
+  164  0040ADFC    4E4  void* Texture4P::PrepareTextureForBlend(const struct Texture4P* this, enum TXRBlendRule_Mode blendMode, float lerpVal, int texNum)
+                         local  void* oldClut
+                         local  RawTexture_PixelValue* newClut
+                         local  int i
+                         local  void* oldClut
+                         local  RawTexture_PixelValue* newClut
+                         local  int i
+                         local  float alphaPercent
+                         local  RawTexture_PixelValue* oldClut
+                         local  RawTexture_PixelValue* newClut
+                         local  int i
+                         inlines  RawTexture::SetReadyForFastBlend
+  247  0040B2E0     90  void Texture4P::RestoreTextureFromBlend(const struct Texture4P* this, enum TXRBlendRule_Mode blendMode, float lerpVal, void* dataStorage)
+                         inlines  RawTexture::SetReadyForFastBlend
+  269  003D2CC8    274  void Texture4P::TintTexture(const struct Texture4P* this, struct Tinter* tinter, float* tintParams, struct RawTexture* tintMask)
+                         local  uint8* pClutData
+                         local  int32 i
+                         local  vec4flt inputColor
+                         local  vec4flt outputColor
+  299  0040215C    1B0  uint8_t Texture4P::GetClutEntry(const struct Texture4P* this, int32_t x, int32_t y, int32_t mipmap)
+                         local  int32_t pixelIndex
+                         local  void* textureData
+                         local  uint8_t* pixel
+                         local  uint8_t clutEntry
+  325  004020A4     B8  int32_t Texture4P::CalculatePixelIndex(const struct Texture4P* this, int32_t x, int32_t y, int32_t mipmap)
+                         local  int32_t index
+  396  00404EE8    15C  void Texture4P::SetPixelToEntry(const struct Texture4P* this, int32_t x, int32_t y, uint8_t entry, int32_t mipmap)
+                         local  int32_t pixelIndex
+  411  00404ED4     14  void Texture4P::SetPixelToEntryByIndex(const struct Texture4P* this, int32_t index, uint8_t entry)
+                         local  uint8* pixel
+                         local  void* textureData
+  420  003CF374     5C  void Texture4P::SetClutValue(const struct Texture4P* this, uint8_t clutEntry, const RawTexture_PixelValue& value)
+                         local  int32_t realEntry
+  462  00405044     EC  void* Texture4P::GetRawTextureData(const struct Texture4P* this, int32_t mipmap)
+                         local  int32_t width
+                         local  int32_t height
+                         local  uint8_t* data
+                         local  int32_t i
+                         inlines  RawTexture::GetHeight, RawTexture::GetWidth

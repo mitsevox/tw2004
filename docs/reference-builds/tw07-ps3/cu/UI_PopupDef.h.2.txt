@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_PopupDef.h
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   46  000FEAE0      C  uint32 UIPopupDef::GetSignature(const const struct UIPopupDef* this)
+   63  00100AE0     14  enum TAptSequenceStatus UIPopupDef::ShowInSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   64  0011174C     14  void UIPopupDef::NotifySetSizes_func(struct IAptSubscriber* subs)
+   70    inline-only   void UIPopupDef::SetShowNoTipsPrompt(const struct UIPopupDef* this, bool bShowNoTips)

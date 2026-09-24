@@ -1,0 +1,15 @@
+// ../../../../../TIGERCODE/packages/t3db/2.21.03-RW-EAC/include/common/t3db/helper.h
+// compiled in: golf_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+  308    inline-only   enum TDbError Helper::SQL_DestroyTable(DbRef dbRef, TableRef tblRef)
+                         local  enum TDbError eError
+                         local  struct Table* table
+  559    inline-only   enum TDbError Helper::SQL_SetTablePersistentDataFlag(DbRef dbRef, TableRef tableRef, bool bPersistent)
+                         local  enum TDbError eError
+                         local  struct Database* db
+                         local  struct Table* table
+  585    inline-only   bool Helper::SQL_DbExists(DbRef dbRef)
+  591    inline-only   enum TDbError Helper::SQL_LoadTableFromFile(DbRef dbRef, TableRef tableRef, enum LoadType loadType, struct IOCallback* pCallbacks)
+                         local  enum TDbError eError
+                         local  struct Database* db

@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/logintomasterserver.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    6  005E3398     78  void LoginToMasterServer(const struct LoginToMasterServer* this, bool bAutoLogin)
+                         inlines  Observable
+   12  005E3BC0     5C  void ~LoginToMasterServer(const struct LoginToMasterServer* this)
+                         inlines  ~Observable

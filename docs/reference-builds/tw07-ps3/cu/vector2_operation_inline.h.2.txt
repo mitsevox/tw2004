@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/vector2_operation_inline.h
+// compiled in: Scrape.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  424    inline-only   bool vpu::operator==(struct <anon>& a, struct <anon>& b)
+  429    inline-only   bool vpu::operator!=(struct <anon>& a, struct <anon>& b)

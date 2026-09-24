@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Audio/Headers/GameAudio.h
+// compiled in: golf2_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+  450    inline-only   void Gaud_StartRegularComment(uint16 commentID, TCommentPlayMode mode)
+  464    inline-only   void Gaud_StartAnnouncerIntroComment(uint16 commentID, TCommentPlayMode mode)
+  502    inline-only   void Gaud_StartDanceAnimStream(uint16 waveID, TCommentPlayMode mode)

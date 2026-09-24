@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/UI_SkillZone.h
+// compiled in: apt_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   45  001257D4     B8  void UISkillZone::~UISkillZone(const struct UISkillZone* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   49  000FE7E8      C  uint32 UISkillZone::GetSignature(const const struct UISkillZone* this)
+   61  00100FD8     14  enum TAptSequenceStatus UISkillZone::QueueShowText_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   62  00100FEC     14  enum TAptSequenceStatus UISkillZone::SetGameModeFlashStateSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   63  00103160     14  enum TAptSequenceStatus UISkillZone::DelayGhostSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)

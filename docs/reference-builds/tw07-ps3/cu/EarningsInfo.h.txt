@@ -1,0 +1,17 @@
+// ../../../../../TIGERCODE/Code/Golf/Earnings/Headers/EarningsInfo.h
+// compiled in: apt_unity.cpp, golf_unity.cpp, other_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   40    inline-only   struct t_CASH_RatingsCost* EarningsInfo::GetRatingsCost(const struct EarningsInfo* this, int index)
+   41    inline-only   struct t_CASH_StrokeEarnings* EarningsInfo::GetStrokeEarnings(const struct EarningsInfo* this, int index)
+   42    inline-only   struct t_CASH_SkinsEarnings* EarningsInfo::GetSkinsEarnings(const struct EarningsInfo* this, int index)
+   44    inline-only   struct t_CASH_MiniGameEarnings* EarningsInfo::GetMiniGameEarnings(const struct EarningsInfo* this, int index)
+   47    inline-only   struct t_CASH_SpecialShots* EarningsInfo::GetSpecialShots(const struct EarningsInfo* this, int index)
+   48    inline-only   struct t_CASH_TrophyBalls* EarningsInfo::GetTrophyBalls(const struct EarningsInfo* this, int index)
+   49    inline-only   struct t_CASH_CourseUnlockCost* EarningsInfo::GetCourseUnlockCost(const struct EarningsInfo* this, int index)
+   50    inline-only   struct t_Earnings_BonusShot_Rule* EarningsInfo::GetBonusShotRule(const struct EarningsInfo* this, int index)
+   51    inline-only   struct t_Earnings_BonusHole_Rule* EarningsInfo::GetBonusHoleRule(const struct EarningsInfo* this, int index)
+   52    inline-only   struct t_Earnings_BonusGame_Rule* EarningsInfo::GetBonusGameRule(const struct EarningsInfo* this, int index)
+   53    inline-only   int EarningsInfo::GetBirdieStreakPercent(const struct EarningsInfo* this, int index)
+   54    inline-only   struct t_Attributes_Cap* EarningsInfo::GetAttributeCapValues(const struct EarningsInfo* this)
+   56    inline-only   struct t_StatusLevelThreshold EarningsInfo::GetStatusLevelThresholds(const struct EarningsInfo* this)

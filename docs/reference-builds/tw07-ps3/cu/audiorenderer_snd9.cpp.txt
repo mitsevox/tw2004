@@ -1,0 +1,30 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/MoviePlayer/audiorenderer_snd9.cpp
+// compiled in: golf2_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   53  00184EFC     9C  void AudioRenderer_Snd9(const struct <anon>* this)
+                         inlines  PrintMacroHelper
+   68  0014A9EC     38  void ~AudioRenderer_Snd9(const struct <anon>* this)
+                         inlines  ~IAudioRenderer
+   75  0014AA24      8  void Init(const struct <anon>* this, struct IResourceAllocator* allocator)
+   83  0014AA2C     14  float GetRenderingDelay(const struct <anon>* this)
+   93  0014AA40     E4  float GetRenderingPosition(const struct <anon>* this)
+                         local  SNDREQUESTSTATUS status
+                         local  SNDSTREAMSTATUS sndStrmsStatus
+  115  0014AB24      C  void SetAudioDecodeCallback(const struct <anon>* this, AudioDecodeFunc* audioDecodeCallbackFunc, struct IAudioDecoder* pContext)
+  126  0014AB30      C  void SetAudioFinishedCallback(const struct <anon>* this, AudioFinishedFunc* audioFinishedCallbackFunc, void* pContext)
+  134  0015D460    14C  void SetVolume(const struct <anon>* this, float volume)
+                         local  const char[10] __FUNCTION__
+                         inlines  AssertMacroHelper, PrintMacroHelper
+  148  0015426C     68  float GetVolume(const struct <anon>* this)
+                         inlines  PrintMacroHelper
+  156  001542D4     D8  void Begin(const struct <anon>* this)
+                         inlines  PrintMacroHelper
+  178  0014AB3C     54  void SetSndHandles(const struct <anon>* this)
+                         local  struct <anon>* that
+  187  001543AC     88  void Pause(const struct <anon>* this)
+                         inlines  PrintMacroHelper
+  196  00154434     88  void UnPause(const struct <anon>* this)
+                         inlines  PrintMacroHelper
+  206  001544BC     58  void Stop(const struct <anon>* this)
+                         inlines  PrintMacroHelper

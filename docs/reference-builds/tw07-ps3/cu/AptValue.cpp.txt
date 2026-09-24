@@ -1,0 +1,82 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptValue.cpp
+// compiled in: other_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+  138  0040A3E0    380  float float_Atoff(const char* pStr)
+                         local  float val
+                         local  float holder
+                         local  int floatsign
+                         local  int expsign
+                         local  int exp
+                         local  int i
+                         local  const char* s
+                         inlines  std::isdigit, std::isspace, std::tolower
+  207  00401888     A4  int AptValue::toInteger(const const struct AptValue* this)
+                         inlines  AptValue::isUndefined, std::atoi
+  239  0040A760     A8  float AptValue::toFloat(const const struct AptValue* this)
+                         inlines  AptValue::isUndefined
+  271  004676FC    1AC  const char* AptValue::toString(const const struct AptValue* this, char* pBuffer, uint32 bufLen)
+                         local  const char* pRet
+                         inlines  AptString::getData, AptValue::isUndefined
+  361  00468C24   14E0  void AptValue::toString(const const struct AptValue* this, const AptNativeString& sBuf)
+                         local  char[128] szTemp
+                         local  char[16] s
+                         local  const char* s
+                         local  char[16] s
+                         local  char[16] s
+                         local  const char* s
+                         local  char[16] s
+                         local  struct AptFloat* pF
+                         local  const char* s
+                         local  char[16] s
+                         local  const struct AptArray* pA
+                         local  const char* s
+                         local  char[16] s
+                         inlines  AptString::getData, AptValue::isUndefined, BasicString, Capacity, Copy, Copy<char*, char*>, DoingSmallStringOptimization, ReAlloc, Swap, UseCapacity, operator=
+  443  00428388    108  void AptScriptFunction::__dec(struct AptValue* pValue)
+                         local  struct AptScriptFunction* pInst
+                         inlines  AptScriptFunction::operator delete, AptValue::setRefCount, AptValue::subtractReference, checked_delete<AptScriptFunction>
+  459  00425734     8C  void AptFrameStack::__dec(struct AptValue* pValue)
+                         inlines  AptFrameStack::operator delete, AptValue::subtractReference, checked_delete<AptFrameStack>
+  479  0047B21C     9C  void AptCIH::__dec(struct AptValue* pValue)
+                         inlines  AptValue::subtractReference, checked_delete<AptCIH>
+  490  003EFCF0     18  static struct AptValue* _constructorObject(struct AptValue* pThis, int nParams)
+  495  00460B40    188  static struct AptValue* _gObjRegistrationFunc(struct AptValue* pThis, int nParams)
+                         local  struct AptValue* pParam1
+                         local  struct AptValue* pParam2
+                         inlines  AptActionInterpreter::stackAt, AptBoolean::AptBoolean, AptBoolean::operator new, AptHash::AptHash, AptHash::operator new, AptValue::isString
+  544    inline-only   static void _constructBuiltInObjects()
+                         local  uint32_t i
+  653  004662E4    AEC  void AptValueInitialize()
+                         local  const char* s
+                         local  const char* s
+                         local  const char* s
+                         local  const char* s
+                         local  uint32_t i
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptExtern::AptExtern, AptExtern::operator new, AptGlobal::AptGlobal, AptGlobal::operator new, AptMath::AptMath, AptMath::operator new, AptNativeFunction::AptNativeFunction, AptNativeFunction::operator new, AptNone::AptNone, AptNone::operator new, AptRenderingContext::operator new, AptString::AptString, AptString::operator new, AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount, Capacity, Copy, ReAlloc, _constructBuiltInObjects
+  713  004413FC    3A4  void AptValueShutdown()
+                         local  uint32_t i
+                         inlines  checked_delete<AptExtern>, checked_delete<AptGlobal>, checked_delete<AptHash>, checked_delete<AptMath>, checked_delete<AptNativeFunction>, checked_delete<AptNone>, checked_delete<AptRenderingContext>
+  792  00478B50     DC  void AptCIH::destroy(const struct AptCIH* this)
+                         inlines  AptValue::setIsDefined
+  819  00477E38    D18  void AptCIH::__delete(struct AptCIH* pValue)
+                         local  int i
+                         inlines  AptCIH::getAnimationInst, AptCIH::getShapeInst, AptCIH::getSpriteInst, AptCIH::getTextInst, AptValueSet<AptCIH*,512>::remove, AptValueSet<AptValue*,64>::remove, checked_delete<AptCharacterAnimationInst>, checked_delete<AptCharacterShapeInst>, checked_delete<AptCharacterSpriteInst>, checked_delete<AptCharacterTextInst>, ~AptCharacterShapeInst
+  928  004678A8    51C  AptNativeString AptValue::urlEncode(const struct AptValue* this)
+                         local  struct <anon>& sProperties
+                         local  AptNativeString sProperties
+                         local  struct AptNativeHash* pObjHash
+                         local  char[2048] urlStr
+                         local  uint32 urlStrPos
+                         local  struct AptHashItem* pInitItem
+                         local  const char* pKeyData
+                         local  char[256] valueBuf
+                         local  const char* pVal
+                         local  int newSize
+                         local  char* iter
+                         local  int newCapacity
+                         local  int insertPos
+                         local  char* string
+                         local  char* currentEnd
+                         inlines  AptString::getData, BasicString, Begin, Capacity, Copy<char*, char*>, End, Insert<char*>, Move<char*, char*>, ReAlloc, Reserve

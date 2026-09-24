@@ -1,0 +1,48 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/SitDev/SitDev.c
+// compiled in: golf2_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   74  00130EB4    130  void SitDev_vInitModule()
+                         local  bool[4] saveEquipment
+                         local  bool[4] saveClothes
+                         local  int i
+                         local  int i
+  104  00130FE4    110  void SitDev_vCloseModule()
+  130  001310F4     1C  void SitDev_vInitBeforeHole()
+  139  00131110     44  void SitDev_vRegisterStreamClients()
+  148  00131154     2C  void SitDev_vUnregisterStreamClients()
+  165  001E243C    718  void SitDev_QueueEvent(enum PlayerNumber_t PlayerID, uint8 situation)
+                         local  enum PlayerNumber_t ePlayer
+                         local  int i
+                         local  SitDev_EventQueueEntry* qEntry
+                         local  int32 gender
+                         local  int32 value
+                         local  struct GamePlayer* plr
+                         local  struct PhysicsBall_t* estBall
+                         local  int32 estBallSurfaceID
+                         local  vec4flt delta
+                         local  float fDistance
+                         inlines  GM_IsCompilationCourse, GM_IsCustomCourse, GM_IsRandomCourse, GamePlayer::GetEstimatedBall, LLMath_Length3, LLMath_Subtract3, OnlineManagerOSDK::GetInstance, OnlineManagerOSDK::WaitingForChallenge, _SetStateVecAndCondition, vec_madd, vec_sld
+  388  001D80E0     84  void SitDev_SetupAnimationStateVector(enum PlayerNumber_t playerID)
+                         inlines  _SetStateVecAndCondition
+  422  001E3E70    508  void SitDev_ProcessEventQueue()
+                         local  int i
+                         local  int j
+                         local  Situation* s
+                         local  bool bSituationMatches
+                         local  enum PlayerNumber_t PlrPredictionDone
+                         local  enum PlayerNumber_t PlrAnimEmotionUpdate
+                         local  const bool& isPredictionDoneEvent
+                         local  const bool& isCorrection
+                         local  const bool& isEstBallFirstBounceEvent
+                         local  SitDev_EventQueueEntry* e
+                         local  struct GamePlayer* plr
+                         local  struct PhysicsBall_t* estBall
+                         local  uint8 situation
+                         inlines  GM_GetCurrentHoleIndex, GamePlayer::GetEstimatedBall, Situation::ConditionTested, _SetStateVecAndCondition
+  637  001312D4     D8  bool SitDev_AnyStickMovement()
+                         local  struct Controller_StickInfo* info
+                         local  bool bSwingLeft
+                         local  bool bSwingRight
+                         local  int i
+  674  001313AC     48  bool SitDev_AnyControllerInput()

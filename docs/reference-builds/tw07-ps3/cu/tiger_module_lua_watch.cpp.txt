@@ -1,0 +1,18 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_lua_watch.cpp
+// compiled in: tiger_module_lua_watch.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   50  00537EB0    118  enum WatchError ToWatchString(const const struct <anon>* this, char* watch, unsigned int maxSize)
+                         local  unsigned int size
+   65  00537E68     48  unsigned int WatchStringSize(const const struct <anon>* this)
+   71  005378AC     84  enum WatchError Verify(const char* watch)
+                         local  const char* commaAfterName
+                         local  size_t nameLength
+                         local  size_t valueLength
+  100  00537FC8      C  const char* GetValue(const const struct <anon>* this)
+  106  00537FD4      4  const char* GetName(const const struct <anon>* this)
+  111  00537FD8     38  const struct <anon>* Find(const struct <anon>* key, const struct <anon>* sortedArray, unsigned int count)
+  116  00538010     50  int Compare(const void* voidA, const void* voidB)
+  125  00538060     44  void SetValue(const struct <anon>* this, const char* value)
+  131  005380A4     C4  void SetNumber(const struct <anon>* this, float value)
+  143  00538168     88  void SetBoolean(const struct <anon>* this, bool value)

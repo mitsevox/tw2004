@@ -1,0 +1,10 @@
+// C:/packages/rwaudiocore/2.08.01/source/plugins/rechannel.cpp
+// compiled in: rechannel.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    0  006E5C38      C  void ~Rechannel(const struct <anon>* this)
+                         inlines  ~PlugIn
+   67  006E5C14      8  struct <anon>* GetPlugInDescRunTime()
+   73  006E5C1C     14  bool CreateInstance(struct PlugIn* pPlugIn, void* pConstructorParams)
+                         local  struct <anon>* pThis
+                         inlines  Initialize<rw::audio::core::Rechannel>

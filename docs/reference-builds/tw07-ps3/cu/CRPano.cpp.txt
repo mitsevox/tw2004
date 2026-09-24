@@ -1,0 +1,18 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/CRPano.cpp
+// compiled in: headgate_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   35  0035046C     18  void LoadPanoDataFromMemory(unsigned char* streamData)
+   41  0034BB94     14  void UnloadPanoData()
+   47  0034D8FC     2C  bool HavePanoData()
+   53  00378C74    2BC  void RenderPano()
+                         local  vec4flt eyePoint
+                         local  struct TerMesh* pMesh
+                         local  struct TerMesh* pMeshEndPoint
+                         local  struct SFrustum frustum
+                         local  TextureRef prevBaseRef
+                         local  struct TerStrip* pStrip
+                         local  struct TerStrip* pStripEndPoint
+                         local  enum ClipTest clipTest
+                         local  TextureRef baseRef
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaTestMode, SFrustum::cullAABBStrip

@@ -1,0 +1,67 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptExternalContext.cpp
+// compiled in: other_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   47  003EF71C     E8  bool AptExternalContext::IsLeafNode(const struct AptExternalContext* this, const char* szName)
+                         local  int32 length
+                         local  bool leafnode
+                         local  int32 i
+   72  003EF804      8  bool AptExternalContext::IsValidContext(const struct AptExternalContext* this)
+   78  004737E4    474  void AptExternalContext::SetVariableInContext(const struct AptExternalContext* this, const char* szName, const char* szValue)
+                         local  struct AptValue* pValue
+                         local  const char* s
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  AptNativeString sVar
+                         local  struct AptValue* pSubContext
+                         local  AptNativeString sLeafNode
+                         inlines  AptString::AptString, AptString::operator new, AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount, BasicString, Capacity, Copy, DoingSmallStringOptimization, ReAlloc, UseCapacity, ~BasicString
+  120  004733DC    408  void AptExternalContext::SetVariableInContext(const struct AptExternalContext* this, const char* szName, int32 iValue)
+                         local  AptNativeString sVar
+                         local  struct AptInteger* pValue
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  struct AptValue* pSubContext
+                         local  AptNativeString sLeafNode
+                         local  struct AptInteger* pValue
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptInteger::AptInteger, AptInteger::operator new, AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount, BasicString, Capacity, DoingSmallStringOptimization, ReAlloc, UseCapacity, ~BasicString
+  164  00472FD4    408  void AptExternalContext::SetVariableInContext(const struct AptExternalContext* this, const char* szName, float fValue)
+                         local  AptNativeString sVar
+                         local  struct AptFloat* pValue
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  struct AptValue* pSubContext
+                         local  AptNativeString sLeafNode
+                         local  struct AptFloat* pValue
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptFloat::AptFloat, AptFloat::operator new, AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount, BasicString, Capacity, DoingSmallStringOptimization, ReAlloc, UseCapacity, ~BasicString
+  206  0046CA0C    460  void AptExternalContext::GetVariableInContext(const struct AptExternalContext* this, const char* szName, char* szValue, int32 iMaxLength)
+                         local  AptNativeString sVar
+                         local  struct AptValue* pVal
+                         local  const char* pStr
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  struct AptValue* pSubContext
+                         local  AptNativeString sLeafNode
+                         local  char* cpName
+                         local  struct AptValue* pVal
+                         local  const char* pStr
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount, BasicString, Capacity, DoingSmallStringOptimization, ReAlloc, UseCapacity, ~BasicString
+  250  0046C60C    400  void AptExternalContext::GetVariableInContext(const struct AptExternalContext* this, const char* szName, int32* iValue)
+                         local  AptNativeString sVar
+                         local  struct AptValue* pVal
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  struct AptValue* pSubContext
+                         local  AptNativeString sLeafNode
+                         local  char* cpName
+                         local  struct AptValue* pVal
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount, BasicString, Capacity, DoingSmallStringOptimization, ReAlloc, UseCapacity, ~BasicString
+  293  0046C20C    400  void AptExternalContext::GetVariableInContext(const struct AptExternalContext* this, const char* szName, float* fValue)
+                         local  AptNativeString sVar
+                         local  struct AptValue* pVal
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  struct AptValue* pSubContext
+                         local  AptNativeString sLeafNode
+                         local  char* cpName
+                         local  struct AptValue* pVal
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount, BasicString, Capacity, DoingSmallStringOptimization, ReAlloc, UseCapacity, ~BasicString

@@ -1,0 +1,23 @@
+// ../../../../packages/rwmovie/1.04.01/include/rwmovie/renderable.h
+// compiled in: golf2_unity.cpp
+// 19 functions, source order. line | PS3 address | size
+
+   38    inline-only   void SetData(const struct <anon>* this, uint8_t* data, unsigned int bufNum)
+   47    inline-only   uint8_t* GetData(const struct <anon>* this, unsigned int bufNum)
+   52    inline-only   void SetSize(const struct <anon>* this, uint32_t size, unsigned int bufNum)
+   57    inline-only   uint32_t GetSize(const struct <anon>* this, unsigned int bufNum)
+   65    inline-only   void SetStride(const struct <anon>* this, uint32_t stride, unsigned int bufNum)
+   73    inline-only   uint32_t GetStride(const struct <anon>* this, unsigned int bufNum)
+   78    inline-only   void SetWidth(const struct <anon>* this, unsigned int width)
+   88    inline-only   void SetHeight(const struct <anon>* this, unsigned int height)
+  110    inline-only   void SetFormat(const struct <anon>* this, enum VideoFormat format)
+  115    inline-only   enum VideoFormat GetFormat(const struct <anon>* this)
+  120    inline-only   void SetFrameNumber(const struct <anon>* this, FrameNumber frameNumber)
+  125    inline-only   FrameNumber GetFrameNumber(const struct <anon>* this)
+  151    inline-only   void SetNumBuffersUsed(const struct <anon>* this, unsigned int numBuffers)
+  156    inline-only   unsigned int GetNumBuffersUsed(const struct <anon>* this)
+  213    inline-only   void SetContext(const struct <anon>* this, void* pContext, unsigned int bufNum)
+  225    inline-only   void SetReadyToRender(const struct <anon>* this, bool ready)
+  232    inline-only   bool CheckValidity(const struct <anon>* this)
+  256    inline-only   void SetFrameContentFlippedFlag(const struct <anon>* this, bool flag)
+  308  001E7D80     18  void ~IVideoRenderableOperations(const struct IVideoRenderableOperations* this)

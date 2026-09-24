@@ -1,0 +1,24 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/settingstringconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   81  005EC998    120  void SettingStringConcrete(const struct <anon>* this, const char8_t* strIdentifier, uint32_t uMaxBufferLen, uint32_t uMaxStringLen, const char8_t* strDefault, enum Persistence ePersistence, uint32_t uMinStringLen)
+                         inlines  RCPointer
+  116  005ECB84     B8  struct SettingString* CreateSetting(const char8_t* strIdentifier, uint32_t uMaxStringLen, const char8_t* strDefault, enum Persistence ePersistence, uint32_t uMinStringLen)
+                         local  struct <anon>* pSetting
+  146  005ECAB8     CC  struct SettingString* CreateSetting(const char8_t* strIdentifier, uint32_t uMaxBufferLen, uint32_t uMaxStringLen, const char8_t* strDefault, enum Persistence ePersistence, uint32_t uMinStringLen)
+                         local  struct <anon>* pSetting
+  173  005DE078     84  void ~SettingStringConcrete(const struct <anon>* this)
+                         inlines  ~RCPointer
+  194  005BF5DC     88  void SetValue(const struct <anon>* this, const char8_t* strValue)
+  221  005BF664     88  void SetDefault(const struct <anon>* this, const char8_t* strDefault)
+  249  005BF6EC     64  bool IsValueValid(const struct <anon>* this, const char8_t* strValue)
+                         local  bool bValid
+                         inlines  operator->
+  279  005BF750     44  void SetValidator(const struct <anon>* this, struct SettingStringValidator* pValidator)
+                         inlines  operator=
+  303  005BF794     74  void RestoreDefault(const struct <anon>* this)
+  325  005CCA94    1BC  void TriggerEvent(const struct <anon>* this, enum EventE eEvent)
+                         local  uint32_t uNumElements
+                         local  struct SettingObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList

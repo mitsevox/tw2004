@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/packages/osdk/2.06.04/extensions/silentsignin/include/common/OSDK/silentsignin/silentsigninobserver.h
+// compiled in: golf2_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   48  001E75EC     18  void ~SilentSigninObserver(const struct SilentSigninObserver* this)

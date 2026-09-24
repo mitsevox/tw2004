@@ -1,0 +1,25 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/lua-5.0.2/src/lstring.c
+// compiled in: lstring.c
+// 5 functions, source order. line | PS3 address | size
+
+   21  0054D7C4     38  void luaS_freeall(lua_State* L)
+   27  0054D7FC    184  void luaS_resize(lua_State* L, int newsize)
+                         local  GCObject** newhash
+                         local  stringtable* tb
+                         local  int i
+                         local  GCObject* p
+                         local  GCObject* next
+                         local  lu_hash h
+                         local  int h1
+   51    inline-only   static TString* newlstr(lua_State* L, const char* str, size_t l, lu_hash h)
+                         local  TString* ts
+                         local  stringtable* tb
+   72  0054D980    220  TString* luaS_newlstr(lua_State* L, const char* str, size_t l)
+                         local  GCObject* o
+                         local  lu_hash h
+                         local  size_t step
+                         local  size_t l1
+                         local  TString* ts
+                         inlines  newlstr
+   90  0054DBA0     80  Udata* luaS_newudata(lua_State* L, size_t s)
+                         local  Udata* u

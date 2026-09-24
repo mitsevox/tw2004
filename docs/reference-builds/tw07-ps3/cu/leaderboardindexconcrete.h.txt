@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/./leaderboardindexconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   53  006244BC     4C  void ~LeaderboardIndexConcrete(const struct <anon>* this)
+                         inlines  ~RCPointer

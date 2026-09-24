@@ -1,0 +1,193 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/source/common/Parser/Compiler.cpp
+// compiled in: Compiler.cpp
+// 42 functions, source order. line | PS3 address | size
+
+    0  007BD258    174  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+    0  007BD79C     A8  void ~SqlStack(const struct <anon>* this)
+    0  007BD844     A8  void SqlStack(const struct <anon>* this)
+  207  007B230C     E4  void InitializeMembers(const struct <anon>* this)
+  292  007BD6D0     CC  void CheckArgEnd(va_list arg)
+                         local  const char[12] __FUNCTION__
+                         local  uint32_t val
+  412  007BB334   1818  void Start(const struct <anon>* this, bool8_t isCached, struct <anon>* ret)
+                         local  const char[6] __FUNCTION__
+                         local  struct <anon>* token
+                         local  DbRef dbRef
+                         local  struct Database* database
+                         local  bool8_t unique
+                         local  struct <anon>[8] colSort
+                         local  struct Table* table
+                         local  struct Database* db
+                         local  char8_t[2048] buffer
+                         local  struct Database* db
+                         local  struct Database* db
+                         local  struct Table* table
+  874  007B77E4    5CC  void Equivalent(const struct <anon>* this, struct ExprNode** exprNode)
+                         local  const char[11] __FUNCTION__
+                         local  uint32_t idxExpr
+                         local  struct <anon>* token
+                         local  int8_t bParan
+                         local  int32_t iLogical
+                         local  struct ExprNode* pLogicalExpr
+                         local  struct ExprNode* pLeftExpr
+                         local  struct ExprNode* pRightExpr
+ 1013  007B36A0    60C  void OrderBy(const struct <anon>* this, struct <anon>* colSort, int sorts)
+                         local  const char[8] __FUNCTION__
+                         local  struct <anon>* token
+                         local  bool8_t bAnd
+ 1128  007BA748    BEC  void Declare(const struct <anon>* this, bool8_t* unique)
+                         local  const char[8] __FUNCTION__
+                         local  struct <anon>* token
+                         local  struct <anon>* pObjectToken
+                         local  struct <anon>* pJoinExpr
+                         local  uint32_t idxJoin
+ 1318  007B2938    354  uint32_t Ref32(const struct <anon>* this, struct <anon>* token)
+                         local  const char[6] __FUNCTION__
+                         local  uint32_t iValue
+                         local  char8_t* strData
+ 1376  007B3410    290  void TableColumn(const struct <anon>* this, struct <anon>* token, TableRef* tableRef, ColRef* colRef)
+                         local  const char[12] __FUNCTION__
+ 1434  007B3CAC    904  void Aggregate(const struct <anon>* this, struct Database* database, struct <anon>* ret)
+                         local  const char[10] __FUNCTION__
+                         local  struct <anon> colStats
+                         local  struct <anon>* pFirstLit
+                         local  struct <anon>* pCurLit
+                         local  uint32_t nItems
+                         local  TableColRef tblColRef
+                         local  ColNum curCol
+                         local  ColNum firstCol
+                         local  uint32_t[4] aryIntoType
+                         local  enum TokenType eToken
+                         local  uint32_t idxInto
+                         local  uint32_t nProcessed
+                         local  struct Table* pTable
+ 1635  007B512C    3C4  void CreateOutputTable(const struct <anon>* this, struct Database* database, struct <anon>* colSort, struct <anon>* ret)
+                         local  const char[18] __FUNCTION__
+                         local  struct Query* qry
+                         local  TableColRef[254] tableColList
+                         local  struct Database* pDb
+                         local  char8_t[2048] buffer
+ 1721  007B484C    2EC  void FillPartialTableColRefs(const struct <anon>* this)
+                         local  const char[24] __FUNCTION__
+                         local  uint32_t idx
+                         local  TableRef tblRef
+                         local  ColRef colRef
+                         local  struct ExprNode* pExpr
+ 1800  007B4B38    5F4  void EnumColumnLiterals(const struct <anon>* this, struct Database* database, char* valueBuffer, uint32_t bufferSize)
+                         local  const char[19] __FUNCTION__
+                         local  enum TDbError dbResult
+                         local  char8_t* pStrBuffer
+                         local  uint32_t iBuffUsed
+                         local  uint32_t iOffset
+                         local  struct <anon>[254] colDefs
+                         local  struct <anon>* pDef
+                         local  struct <anon>* pLit
+                         local  ColNum iMaxCols
+                         local  struct Table* pTable
+ 1901  007B54F0    AD0  void Into(const struct <anon>* this, struct <anon>* intoType)
+                         local  const char[5] __FUNCTION__
+                         local  struct <anon>* token
+ 2030  007B5FC0    2BC  void TableColumnName(const struct <anon>* this, struct <anon>* colLiteral, struct <anon>* intoType, int needInto)
+                         local  const char[16] __FUNCTION__
+                         local  struct <anon>* token
+                         local  TableRef tblRef
+                         local  ColRef colRef
+                         local  union <anon> data
+ 2105  007B627C    360  void TableColumnNames(const struct <anon>* this, int needInto)
+                         local  struct <anon>* token
+                         local  int32_t nCol
+ 2166  007B7EFC    450  void Join(const struct <anon>* this)
+                         local  const char[5] __FUNCTION__
+                         local  uint32_t idxJoin
+                         local  struct <anon>* token
+                         local  struct <anon>* pJoinExpr
+                         local  struct ExprNode* exprNode
+ 2254  007B6AC8    364  void Comparison(const struct <anon>* this, enum ExprOp* op)
+                         local  const char[11] __FUNCTION__
+                         local  struct <anon>* token
+ 2334  007B6E2C    880  void Value(const struct <anon>* this, struct <anon>* val)
+                         local  const char[6] __FUNCTION__
+                         local  struct <anon>* token
+                         local  TableRef tblRef
+                         local  ColRef colRef
+                         local  bool8_t bParen
+                         local  int32_t iData
+                         local  uint32_t uData
+                         local  float32_t f32Data
+                         local  char8_t* strData
+                         local  void* binData
+ 2588  007B32A8    168  void Logical(const struct <anon>* this, int* logical)
+                         local  const char[8] __FUNCTION__
+                         local  struct <anon>* token
+ 2632  007B76AC    138  void SubEquivalent(const struct <anon>* this, struct ExprNode* exprNode)
+                         local  union <anon> data
+ 2679  007B7DB0    14C  void Where(const struct <anon>* this)
+                         local  const char[6] __FUNCTION__
+                         local  struct <anon>* token
+ 2719  007B834C    290  void From(const struct <anon>* this)
+                         local  const char[5] __FUNCTION__
+                         local  uint32_t idxJoin
+                         local  struct <anon>* token
+                         local  struct <anon>* pJoinExpr
+ 2793  007B8630    BA0  void VariableName(const struct <anon>* this, struct <anon>* colLiteral, struct <anon>* colInto)
+                         local  const char[13] __FUNCTION__
+                         local  struct <anon>* token
+                         local  ColRef colRef
+                         local  union <anon> data
+                         local  TableRef tblRef
+ 2986  007B91D0    340  void VariableNames(const struct <anon>* this)
+                         local  struct <anon>* token
+                         local  int32_t nCol
+ 3042  007B9510     DC  void Set(const struct <anon>* this)
+                         local  const char[4] __FUNCTION__
+                         local  struct <anon>* token
+ 3080  007B9D3C    650  void Aggregate(const struct <anon>* this)
+                         local  const char[10] __FUNCTION__
+                         local  struct <anon>* token
+                         local  struct <anon>* pLit
+                         local  enum TokenType eToken
+                         local  uint32_t nCol
+ 3201  007BA38C    3BC  void Select(const struct <anon>* this)
+                         local  const char[7] __FUNCTION__
+                         local  struct <anon>* token
+                         local  TableRef destTable
+ 3314  007B85DC     54  void Delete(const struct <anon>* this)
+ 3343  007B65DC    4EC  void Fetch(const struct <anon>* this)
+                         local  const char[6] __FUNCTION__
+                         local  struct <anon>* token
+                         local  struct <anon>* pFastParseInfo
+ 3431  007B9B98    1A4  void Update(const struct <anon>* this)
+                         local  struct <anon>* token
+                         local  struct <anon>* pJoinExpr
+ 3489  007B95EC    5AC  void Insert(const struct <anon>* this)
+                         local  const char[7] __FUNCTION__
+                         local  struct <anon>* token
+                         local  struct <anon>* pJoinExpr
+                         local  TableRef destTable
+ 3611  007B2C8C    48C  void FillFetchedValues(const struct <anon>* this)
+                         local  const char[18] __FUNCTION__
+                         local  struct <anon>* pColLit
+                         local  struct <anon>* pInfo
+ 3715  007B45B0    29C  void PatchTableRef(const struct <anon>* this)
+                         local  const char[14] __FUNCTION__
+                         local  int numColumns
+                         local  struct <anon>* colLiteral
+                         local  TableRef tblRef
+ 3766  007BCB4C    2C8  enum TDbError InitStack(uint32_t iMaxRecursion, uint32_t iMaxCols, uint32_t iMaxIntoCols, uint32_t iMaxJoins, uint32_t iMaxExpressions)
+                         local  const char[10] __FUNCTION__
+                         local  struct <anon> lock
+                         local  enum TDbError dbResult
+ 3824  007BCE14    138  void DeInitStack()
+                         local  const char[12] __FUNCTION__
+                         local  struct <anon> lock
+ 3862  007BCF4C    30C  enum TDbError PerformQuery(struct <anon>* ret, bool isCached, char8_t* filename, uint32_t lineNum, char8_t* strOp)
+                         local  const char[13] __FUNCTION__
+                         local  struct <anon> lock
+                         local  struct <anon>* pParserInfo
+                         local  struct <anon>* pLexer
+                         local  struct <anon> dbRet
+                         local  va_list arglist
+ 3941  007B3118    190  enum TDbError ResolveCheckDbRef(const struct <anon>* this, DbRef dbRef, TableRef tableRef, struct Database** database)
+                         local  const char[18] __FUNCTION__
+ 3963  007BD3CC     3C  static void _GLOBAL__I__ZN2EA4T3db8Compiler7sIsInitE()
+ 3964  007BD408     3C  static void _GLOBAL__D__ZN2EA4T3db8Compiler7sIsInitE()

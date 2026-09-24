@@ -1,0 +1,48 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_SkillZone.cpp
+// compiled in: apt_unity.cpp
+// 27 functions, source order. line | PS3 address | size
+
+   55  000FA5A0     6C  void UISkillZone::UISkillZone(const struct UISkillZone* this)
+   66  00040060     3C  void UISkillZone::Init(const struct UISkillZone* this)
+   73  0004C0F8     24  void UISkillZone::Show(const struct UISkillZone* this)
+   78  0004C11C     38  void UISkillZone::Hide(const struct UISkillZone* this)
+   88  0004C154     48  void UISkillZone::BuildCustomOpenScreenSequence(const struct UISkillZone* this)
+   93  0004C56C     50  void UISkillZone::OnShow(const struct UISkillZone* this)
+  100  0004C60C     24  enum TAptSequenceStatus UISkillZone::SetGameModeFlashStateSequence(const struct UISkillZone* this, bool inbFirstTime, void* inData)
+  106  0004C3E8     7C  enum TAptSequenceStatus UISkillZone::QueueShowText(const struct UISkillZone* this, bool inbFirstTime, void* inData)
+                         local  enum SZ_txtField field
+  122  0004C1C0     AC  bool UISkillZone::StoreTextField(const struct UISkillZone* this, enum SZ_txtField field, char* text)
+                         local  bool result
+  139  0004C19C     24  void UISkillZone::ClearTextField(const struct UISkillZone* this, enum SZ_txtField field)
+  146  00057E2C    104  void UISkillZone::ShowText(const struct UISkillZone* this, enum SZ_txtField field, char* text)
+                         local  bool result
+  168  0004C324     68  void UISkillZone::HideText(const struct UISkillZone* this, enum SZ_txtField field)
+  177  00057F30     48  enum TAptSequenceStatus UISkillZone::DelayGhostSequence(const struct UISkillZone* this, bool inbFirstTime, void* inData)
+  188  0003F70C     48  void UISkillZone::GhostSkillZoneHUD(const struct UISkillZone* this)
+  193  000580A0     5C  void UISkillZone::UnGhostSkillZoneHUD(const struct UISkillZone* this)
+  207  0004C26C      8  enum eAptHandleInput UISkillZone::HandleInput(const struct UISkillZone* this, int32 cID)
+  212  0004C274     64  char* UISkillZone::LookUpTextFieldLabel(const struct UISkillZone* this, enum SZ_txtField field)
+                         local  int32 i
+  226  0004C464     64  char* UISkillZone::LookUpGameModeLabel(const struct UISkillZone* this, enum SZ_GameMode mode)
+                         local  int32 i
+  240  0004C38C     5C  void UISkillZone::ShowTextField(const struct UISkillZone* this, enum SZ_txtField field, char* text)
+                         local  char* tempBuf
+  248  0004C2D8     4C  void UISkillZone::HideTextField(const struct UISkillZone* this, enum SZ_txtField field)
+                         local  char* tempBuf
+  257  00058094      C  void UISkillZone::Activate(const struct UISkillZone* this)
+  266  00057F78    11C  void UISkillZone::ShowAllBufferedText(const struct UISkillZone* this)
+                         local  int32 i
+  290  0004C0AC     4C  void UISkillZone::Reset(const struct UISkillZone* this)
+                         local  int32 i
+  306  0004C630      8  void UISkillZone::SetGameMode(const struct UISkillZone* this, enum SZ_GameMode mode)
+  313  0004C5BC     50  void UISkillZone::SetGameModeInFlash(const struct UISkillZone* this)
+                         local  char* tempBuf
+  322  0004C4C8     A4  void UISkillZone::SetPlayerTurn(const struct UISkillZone* this, int32 player)
+                         local  char[8] tempBuf
+                         local  char* modeBuf
+  333  0004C638    3A0  void UISkillZone::UpdateLetters(const struct UISkillZone* this, enum PlayerNumber_t player, int32 letters)
+                         local  int MAX_LETTERS
+                         local  char[8] playerBuf
+                         local  char[8] letterBuf
+                         local  char[32] stateBuf
+                         local  int i

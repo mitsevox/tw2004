@@ -1,0 +1,142 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/audio/engine/special/HLAudEmitterPool.c
+// compiled in: other_unity.cpp
+// 69 functions, source order. line | PS3 address | size
+
+   98    inline-only   TAudEmitInst* CheckEmitterInstance(uint8 instID)
+                         local  TAudEmitInst* pemit
+  129  003E48A4    11C  bool Aud_EmiInitOnce()
+                         local  uint32 i
+                         local  TAudEmitInst* pemit
+  166  003E3F90      4  void Aud_EmiExitOnce()
+  171  003E3F94      8  bool Aud_EmiInitSession(uint8 sessionID, uint8 subsessID)
+  200  0045009C     8C  void Aud_EmiExitSession(uint8 subsessID)
+                         local  TAudEmitInst* pemit
+                         local  int32 i
+                         local  TAudEmitInst* pnext
+  227  00458E94     E0  void Aud_EmiCycle()
+                         local  TAudEmitInst* pemit
+  258  0045098C    3AC  uint8 Aud_EmiAdd(uint32 tmplID, int16 alias, EAudPosType type, EAudPosMode mode, FAudEmiTrkCB cb)
+                         local  TAudEmitInst* pemit
+                         local  bool bDisableRuntimeAudio
+                         local  int currentflags
+                         local  TAudEmitInst* pemitalias
+                         inlines  cGAME_GLOBALS::SetDebugFlags, vec4flt_Zero3
+  390  0044FD3C    29C  void Aud_EmiDel(uint8 instID)
+                         local  TAudEmitInst* pemit
+                         local  TAudEmitInst* pemitalias
+                         local  TAudEmitInst* prevalias
+  481  003E0E20     24  bool Aud_EmiGetAliasInfo(uint32 tmplID, int16* palias, uint8* pflags)
+  488  0045B18C     44  void Aud_EmiStartTrack(uint8 instID, uint8 trackID, uint8 rangeID, uint8 varID)
+  496  00456E14    138  bool Aud_EmiGetTrackStatus(uint8 instID, uint8 trackID)
+                         local  TAudEmitInst* pemit
+                         inlines  CheckEmitterInstance
+  511  004573C0    208  void Aud_EmiSetTrackStatus(uint8 instID, uint8 trackID, bool status)
+                         local  TAudEmitInst* pemit
+                         local  uint8 trackMask
+                         inlines  CheckEmitterInstance
+  543  00457F44    118  void Aud_EmiSetAllTrackStatus(uint8 instID, uint8 trackStatus)
+                         local  TAudEmitInst* pemit
+                         inlines  CheckEmitterInstance
+  558  0045810C    1D4  void Aud_EmiToggleTrackStatus(uint8 instID, uint8 trackID)
+                         local  TAudEmitInst* pemit
+                         local  uint8 trackMask
+                         inlines  CheckEmitterInstance
+  580  00458390    160  void Aud_EmiSetControllerInt(uint8 instID, uint8 ctrlID, int32 val)
+                         local  TAudEmitInst* pemit
+                         inlines  CheckEmitterInstance
+  597  00458B54    270  void Aud_EmiSet3DPos(uint8 instID, const float* pos, float* lastpos, uint8 micID)
+                         local  TAudEmitInst* pemit
+                         local  struct RC_SRenderCtx* pctx
+                         local  struct CA_SCamera* pcam
+                         local  vec4flt localpos
+                         local  float* vec
+                         local  float[4] p
+                         inlines  CheckEmitterInstance, vec4flt_Copy3
+  659  0045AB60    134  void Aud_EmiSetTrackVariation(uint8 instID, uint8 trackID, uint8 varID)
+                         local  TAudEmitInst* pemit
+                         inlines  CheckEmitterInstance
+  670  0045AD54    134  void Aud_EmiSetTrackVarRange(uint8 instID, uint8 trackID, uint8 rangeID)
+                         local  TAudEmitInst* pemit
+                         inlines  CheckEmitterInstance
+  681  0040765C      4  void Aud_EmiSetTrackVarRangeTmpl(uint32 tmplID, uint8 trackID, uint8 rangeID)
+  688  0045B800    148  void Aud_EmiSetTrackStep(uint8 instID, uint8 trackID, uint8 step, EAudStepMode mode)
+                         local  TAudEmitInst* pemit
+                         inlines  CheckEmitterInstance
+  699  0045BAD0    198  void Aud_EmiSetTrackAttenuation(uint8 instID, uint8 trackID, float attn)
+                         local  TAudEmitInst* pemit
+                         inlines  CheckEmitterInstance
+  717  0045E7C8    134  void Aud_EmiSetTrackPitchFactor(uint8 instID, uint8 trackID, float pitch)
+                         local  TAudEmitInst* pemit
+                         inlines  CheckEmitterInstance
+  728  0045ED48    134  void Aud_EmiSetTrackPitchRamp(uint8 instID, uint8 trackID, float rampRate)
+                         local  TAudEmitInst* pemit
+                         inlines  CheckEmitterInstance
+  739  003DFA8C      4  void Aud_EmiFlushStreamerTrackQueue(uint8 instID, uint8 trackID)
+  749  0044FFD8     C4  void Aud_EmiAliasDel(int16 alias)
+                         local  TAudEmitInst* pemit
+                         local  TAudEmitInst* pnextalias
+  767  004575C8     C0  void Aud_EmiAliasSetTrackStatus(int16 alias, uint8 trackID, bool status)
+                         local  TAudEmitInst* pemit
+  782  0045805C     B0  void Aud_EmiAliasSetAllTrackStatus(int16 alias, uint8 trackStatus)
+                         local  TAudEmitInst* pemit
+  797  004582E0     B0  void Aud_EmiAliasToggleTrackStatus(int16 alias, uint8 trackID)
+                         local  TAudEmitInst* pemit
+  812  00458A94     C0  void Aud_EmiAliasSetControllerInt(int16 alias, uint8 ctrlID, int32 val)
+                         local  TAudEmitInst* pemit
+  828  00458DC4     D0  void Aud_EmiAliasSet3DPos(int16 alias, float* pos, float* lastpos, uint8 micID)
+                         local  TAudEmitInst* pemit
+  843  0045AC94     C0  void Aud_EmiAliasSetTrackVariation(int16 alias, uint8 trackID, uint8 varID)
+                         local  TAudEmitInst* pemit
+  858  0045AE88    138  void Aud_EmiAliasSetTrackVarRange(int16 alias, uint8 trackID, uint8 rangeID)
+                         local  TAudEmitInst* pemit
+  884  0045B948     D0  void Aud_EmiAliasSetTrackStep(int16 alias, uint8 trackID, uint8 step, EAudStepMode mode)
+                         local  TAudEmitInst* pemit
+  899  0045BC68     C0  void Aud_EmiAliasSetTrackAttenuation(int16 alias, uint8 trackID, float attn)
+                         local  TAudEmitInst* pemit
+  914  0045E8FC     C0  void Aud_EmiAliasSetTrackPitchFactor(int16 alias, uint8 trackID, float pitch)
+                         local  TAudEmitInst* pemit
+  929  0045EE7C     C0  void Aud_EmiAliasSetTrackPitchRamp(int16 alias, uint8 trackID, float rampRate)
+                         local  TAudEmitInst* pemit
+  947  0044F9D4    13C  void Aud_EmiSetSoloID(uint32 guid, bool bEmitter)
+                         local  bool bFound
+  987  003E3CEC    13C  void Aud_EmiTrkCB(uint8 instID, uint8 trkID, EAudTrkCBReason reason)
+                         local  TAudEmitInst* pemit
+                         inlines  CheckEmitterInstance
+ 1010  003E3FA0      4  void Aud_InitMovie()
+ 1011  003E3FA4      4  void Aud_ExitMovie()
+ 1012  003E3FA8      4  void Aud_StartMovie()
+ 1013  003E3FAC      4  void Aud_CycleMovie()
+ 1019  003E3FB0      8  bool Aud_MicInitOnce()
+ 1031  003E3FB8      4  void Aud_MicExitOnce()
+ 1032  003E3FBC      8  bool Aud_MicInitSession(uint8 nmics)
+ 1043  003E3FC4      4  void Aud_MicExitSession()
+ 1044  003E3FC8      4  void Aud_MicSet3DInfo(uint8 micID, float* pos, float[4]* ort)
+ 1045  003E3FCC      4  void Aud_MicSetControllerInt(uint8 micID, uint8 ctrlID, int32 val)
+ 1046  003E3F9C      4  void Aud_MicCycle()
+ 1047  003E3FD0      4  void Aud_MicSetRvbPreset(uint8 micID, uint8 presetID)
+ 1067  00407D98     7C  static bool onPreDownload(Drive3DChunkHdrPtr pHeader)
+                         local  bool bDisableRuntimeAudio
+ 1096  003E3FD4     78  static void HLAudEmitterPool_onDownloadHeader(TStreamDataPtr pStrmData)
+ 1115  003E404C     78  static void HLAudEmitterPool_onDownloadInstrHeader(TStreamDataPtr pStrmData)
+ 1135  003FCD44     90  static void HLAudEmitterPool_onDownloadInstrDebug(TStreamDataPtr pStrmData)
+ 1158  00437140     78  static void HLAudEmitterPool_onDownloadBank(TStreamDataPtr pStrmData)
+ 1175  004584F0     18  void Aud_EmiSetTrackStream(uint8 instID, uint8 trackID, uint8 listID, uint16 stmID, EStmPlayMode mode)
+ 1183  00415104    250  bool Aud_InitSession(uint8 sessionID, uint8 subsessID, uint8 nLocalPlayers, uint8 options)
+                         local  int ret
+                         local  bool bEnteringFrontEnd
+                         inlines  Ses_HasStreamingAudio
+ 1233  00450128    134  void Aud_ExitSession(uint8 subsessID)
+ 1265  003E40C4      4  void Aud_SesTmplOvrTrackRvbMode(uint32 tmplID, uint8 trackID, bool reverbOn)
+ 1275  003FD038     EC  bool Aud_InitOnce(uint8 fps)
+                         local  bool ok
+ 1306  003E4EE8     3C  void Aud_ExitOnce()
+ 1325  003E1148      4  void Aud_Pause(bool on, bool spinupDelay)
+ 1331  003E0780     24  void Aud_Mute(bool globalMuted, bool localMuted)
+                         local  bit32 chanmask
+ 1339  003DFB60      4  void Aud_SetOutputmode(uint8 mode)
+ 1340  003DFBE8      4  void Aud_SetSubmixAttn(uint8 chan, float attn)
+ 1341  003E069C      4  void Aud_SetSubmixAll(uint8 nchans, float* attns)
+ 1342  003E4108      4  void Aud_SetSubmixMute(uint8 chan, bool muted)
+ 1343  003E410C      4  void Aud_SetSubmixMuteAll(bit32 chanmask)
+ 1344  003DC508    104  float Aud_GetSubmixAttn(uint8 chan)
+                         inlines  Mas_GetSubmix, Mas_IsChanMuted

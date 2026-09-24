@@ -1,0 +1,31 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/online/osdk/telemetrystrategyconcrete.cpp
+// compiled in: golf2_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   73    inline-only   static void ZeroFile()
+  109  0012A088     40  void TelemetryLog(uint32_t uModuleID, uint32_t uGroupID, const char8_t* strEvent)
+  138  00184A5C     18  void TelemetryStrategyConcrete::TelemetryStrategyConcrete(const struct TelemetryStrategyConcrete* this)
+  157  0012A0C8     38  void TelemetryStrategyConcrete::~TelemetryStrategyConcrete(const struct TelemetryStrategyConcrete* this)
+                         inlines  ~TelemetryStrategy
+  180  001E867C      4  void TelemetryStrategyConcrete::DataReadyForSave(const struct TelemetryStrategyConcrete* this)
+  205  0014C094    274  void TelemetryStrategyConcrete::SaveTelemetryData()
+                         local  const char[18] __FUNCTION__
+                         local  struct Logger* pLogger
+                         local  uint32_t uiBufferSize
+                         local  void* pBuffer
+                         inlines  TagValuePair, operator+
+  278  0012A100     C0  bool TelemetryStrategyConcrete::SaveToFile(void* buffer, uint32_t bufSize)
+                         local  FILE* fp
+  359  0014C308    258  bool TelemetryStrategyConcrete::LoadTelemetryData()
+                         local  const char[18] __FUNCTION__
+                         local  struct <anon> pParams
+                         local  FILE* fp
+                         local  unsigned int fileSize
+                         local  int c
+                         local  void* tempBuffer
+                         inlines  TagValuePair, operator+
+  489  0012A1C0     D0  bool TelemetryStrategyConcrete::SetTelemetryBuffer(const void* pvBuffer, uint32_t uiBufSize)
+                         local  struct Logger* pLogger
+  522  0012A290     84  char* TelemetryStrategyConcrete::GenerateStaticString(unsigned int maxlen, const char* fmt)
+                         local  char[512] strBuf
+                         local  va_list ap

@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/core/resource/resourceallocator.h
+// compiled in: MemoryManager.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   90    inline-only   struct <anon> Allocate(const struct IResourceAllocator* this, const const struct <anon>& resourceDescriptor, const char8_t* name)
+                         local  struct <anon> checkedResource
+                         local  const char[9] __FUNCTION__
+                         local  struct <anon> checkedResource
+                         local  size_t i
+  131  0081E9BC     B4  void Free(const struct IResourceAllocator* this, void* ptr)

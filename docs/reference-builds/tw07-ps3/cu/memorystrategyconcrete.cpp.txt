@@ -1,0 +1,16 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/online/osdk/memorystrategyconcrete.cpp
+// compiled in: golf2_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   63  0018D208     24  void MemoryStrategyConcrete::MemoryStrategyConcrete(const struct MemoryStrategyConcrete* this, uint64_t uHeapSize, bool persistent)
+   89  0018D250     18  void MemoryStrategyConcrete::~MemoryStrategyConcrete(const struct MemoryStrategyConcrete* this)
+                         inlines  ~MemoryStrategy
+  113  0014BFA8     EC  void* MemoryStrategyConcrete::MemoryAllocate(const struct MemoryStrategyConcrete* this, size_t iSize, const char8_t* strFilename, int32_t iLineNum, bool bFragmenting)
+                         local  const char[15] __FUNCTION__
+                         local  void* pRetVal
+                         inlines  TagValuePair, operator+
+  147  00129CF4     44  void MemoryStrategyConcrete::MemoryDeallocate(const struct MemoryStrategyConcrete* this, void* pMem)
+  173  00129A70      C  void MemoryStrategyConcrete::EnableHeap(const struct MemoryStrategyConcrete* this)
+  198  00129C40      C  void MemoryStrategyConcrete::DisableHeap(const struct MemoryStrategyConcrete* this)
+  208  00129D38     5C  int32_t MemoryStrategyConcrete::CreateMemoryContainer(const struct MemoryStrategyConcrete* this, sys_memory_container_t* cid, size_t size, int32_t type)
+  215  00129D94      8  int32_t MemoryStrategyConcrete::DestroyMemoryContainer(const struct MemoryStrategyConcrete* this, sys_memory_container_t cid, int32_t type)

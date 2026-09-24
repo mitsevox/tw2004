@@ -1,0 +1,12 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/loginstageabstract.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   46  005BBC0C     58  void LoginStageAbstract(const struct <anon>* this, bool bAutoLogin)
+   51  005DBE48     68  void ~LoginStageAbstract(const struct <anon>* this)
+                         inlines  RemoveObserver
+   56  005BBCBC     A0  void ProcessComplete(const struct <anon>* this)
+   69  005DBA14     5C  void Start(const struct <anon>* this)
+                         inlines  AddObserver
+   77  005DBF90     5C  void Stop(const struct <anon>* this)
+                         inlines  RemoveObserver

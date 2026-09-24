@@ -1,0 +1,160 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/MainLoop/GoMainLoop.c
+// compiled in: other_unity.cpp
+// 53 functions, source order. line | PS3 address | size
+
+  309  004A6984    164  void GO_vMinimalMainLoop()
+                         local  struct Timing_AutoMarker timing_ROOT
+                         local  bool dashboardAutoUpdating
+                         local  struct Timing_AutoMarker uiMarker
+                         local  struct Timing_AutoMarker aptMarker
+                         inlines  Timing_AutoMarker::Timing_AutoMarker, Timing_AutoMarker::~Timing_AutoMarker
+  352  003F691C     50  void GO_vSwapAllBuffers()
+  367  0049F840     A8  void GO_vLoadGlobals()
+                         local  bool dashboardAutoUpdating
+  396  0047521C    104  void GO_vOpenONCE()
+                         inlines  Singleton<UserManager>::GetSingleton
+  521  0040C228     FC  void GO_vCloseONCE()
+                         local  struct OnlineManagerOSDK* pTemp
+                         inlines  OnlineManagerOSDK::GetInstance, Singleton<UserManager>::GetSingleton
+  571  0047EC48    248  void GO_vInitModules()
+                         inlines  Singleton<TalkyManager>::GetSingleton, cGAME_GLOBALS::SetRandomSeed
+  745  003F696C     34  void GO_vInitGlobalLoadedSettings()
+  755  0049EFE4    1F4  void GO_vCloseModules()
+                         inlines  Singleton<TalkyManager>::GetSingleton, cGAME_GLOBALS::GetResetGame
+  908  0040B9C8     7C  static void GO_vSetGenericViewStates(int32_t iViewID_p)
+                         local  VM_SViewport* pViewport
+                         inlines  RC_spGetRenderCtxViewport, RC_vSetCurrentRenderCtx
+  929  00488E68     5C  void GO_vSetGenericFrameStates()
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetZBufferMode
+  945  0047FC5C    2EC  void GO_vInitClubHouse()
+                         inlines  ClubHouseMgr, RC_vSetCurrentRenderCtx
+ 1123  0049F6FC    144  void GO_vCloseClubHouse()
+ 1266  0047F9B0    2AC  void GO_vInitFE()
+                         local  bool dashboardAutoUpdating
+                         inlines  RC_vSetCurrentRenderCtx
+ 1452  003F69A0     24  void GO_vCloseFacility()
+ 1467  0049F598    164  void GO_vCloseFE()
+ 1585  00409E00     7C  void GO_vCommandOnline()
+                         inlines  OnlineManagerOSDK::GetInstance
+ 1663  0047F068    948  void GO_vInitIG()
+                         local  int flags
+                         local  bool dashboardAutoUpdating
+                         local  int32_t numAIPlayers
+                         local  int32_t i
+                         local  char[16] strBuf
+                         local  int32_t numHoles
+                         local  struct GoTemple* pTemple
+                         inlines  AIMgr, ClubHouseMgr, RC_vSetCurrentRenderCtx, Singleton<ShotHistory>::GetSingleton, cGAME_GLOBALS::SetGlobalFlags
+ 2122  0049F28C    30C  void GO_vCloseIG()
+                         local  struct GoTemple* pTemple
+                         inlines  AIMgr
+ 2337  0047EE90    1D8  void GO_vInitStartup()
+                         local  bool dashboardAutoUpdating
+                         inlines  RC_vSetCurrentRenderCtx
+ 2417  0049F1D8     B4  void GO_vCloseStartup()
+ 2469    inline-only   static bool GO_vSwitchGameMode()
+                         local  bool return_value
+ 2601    inline-only   static bool GO_drawCharacterInViewPortTest(int viewport)
+                         local  enum PlayerNumber_t PlayerID
+ 2631    inline-only   static void GO_vRenderAptTestRenderOnly()
+                         local  struct Timing_AutoMarker aptRenderMarker
+ 2668  004A5724     2C  void GO_vUpdateApt()
+                         local  int aptTicks
+                         inlines  cGAME_GLOBALS::GetElapsedTicks
+ 2676  00488924     BC  void GO_vRenderApt()
+                         local  struct Timing_AutoMarker aptRenderMarker
+                         inlines  ThumbNailManager::GetTexFactory, Timing_AutoMarker::Timing_AutoMarker, Timing_AutoMarker::~Timing_AutoMarker
+ 2702  003F69C4     70  void GO_vRenderDarknessForMCSystemUI()
+                         local  vec4flt tintColor
+ 2790  004A695C     28  void GO_vRenderAptTest()
+ 2803  004A43D4   1350  static void GO_vRenderInGame(const struct ProfileBars& profileBars)
+                         local  int viewport
+                         local  int j
+                         local  int currentState
+                         local  const bool isGreenMorph
+                         local  bool bShowPip
+                         local  enum PlayerNumber_t playerNum
+                         local  struct GoTemple* pTemple
+                         local  int32_t nRenderLoops
+                         local  struct Timing_AutoMarker objectMarker
+                         local  struct Timing_AutoMarker objectUpdateMarker
+                         local  struct TCharacter* pCharacter
+                         local  int renderLoop
+                         local  bool bRenderingPip
+                         local  bool bTakingSnapshot
+                         local  bool bRenderingTemple
+                         local  enum TempleStateE eCurrTempleState
+                         local  struct GoTempleEnv* pTempleEnv
+                         local  VM_SViewport* pv
+                         local  struct CA_SCamera* camera_main
+                         local  struct CA_SCamera* camera_pip
+                         local  float fdot
+                         local  struct Timing_AutoMarker uiMarker
+                         local  struct Timing_AutoMarker aptMarker
+                         local  uint32_t aptTicks
+                         inlines  BallPathPreviewMgr::GetInstance, CharPreBeginUpdate, DrawFadeIndicator::GetInstance, GM_GetModeType, GO_drawCharacterInViewPortTest, GO_vRenderAptTestRenderOnly, GamePlayer::GetCharacter, GoTemple::GetCurrentState, GoTemple::GetTemplEnv, GoTempleEnv::GetVideoPlayer, GoTempleEnv::SetTempleEnvState, LLMath_DotProduct3, RC_spGetRenderCtxCamera, RC_vSetCurrentRenderCtx, Singleton<TalkyManager>::GetSingleton, ThumbNailManager::GetTexFactory, Timing_AutoMarker::Timing_AutoMarker, Timing_AutoMarker::~Timing_AutoMarker, cGAME_GLOBALS::GetElapsedTicks
+ 3867    inline-only   static void GO_vRenderStartup()
+ 3883    inline-only   static void GO_vRenderClubHouse()
+ 3892  0042E6CC    18C  void GO_vPreRenderFE()
+                         local  bool bRenderGolfer
+                         local  struct TCharacter* pCharacter
+                         local  struct RC_SRenderCtx* pRenderCtx
+                         inlines  RC_spGetCurrentRenderCtx, Singleton<TalkyManager>::GetSingleton
+ 3956  00488EC4    220  void GO_vRenderFE()
+                         local  bool bRenderGolfer
+                         local  vec4flt xClearAlphaColor
+                         local  float[2][4] xVertices
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetColorWriteEnable, DS_vSetZBufferMode, Gcm::cellGcmSetBlendFunc, PR_vSetCurrentColor, PR_vSetCurrentUsage, ThumbNailManager::GetTexFactory
+ 4053  0040F78C    1A0  static void SetDPadAnalogEmulationFlag()
+                         local  bool bEmulateDPad
+                         local  bool bInTitleScreen
+                         local  struct IAptControllerListener* pControllerListener
+                         local  struct AptScreenSubscriber* pScreenSubscriber
+                         local  struct AptScreenSubscriber* pScreenSubscriber
+                         local  enum GolferState curGolferState
+                         inlines  GM_GetGolferUp
+ 4141  004A5750    634  static void GO_vRenderSceneForMainLoop(const struct ProfileBars& profileBars, int* pSkipFirstFrame)
+                         local  unsigned int presentInterval
+                         local  int once
+                         inlines  DS_vSetAlphaTestMode, GO_vRenderStartup, RC_vSetCurrentRenderCtx, TI_uiReadCP0Count
+ 4471  0041D484    28C  static void GO_vPreHackTheTimer()
+                         local  bool time_is_hacked
+                         local  bool time_was_hacked
+                         local  float curFrame
+                         inlines  GolfTimer::ForceFixedTime, GolfTimer::SetElapsedTimeScale, SN_boIsSnapShotRunning
+ 4576    inline-only   static void GO_vPostHackTheTimer()
+                         local  enum PlayerNumber_t curplayer
+ 4604  003F6A3C     54  void _ShutdownMatch()
+ 4650  004A5D84    BD8  void GO_vRunMainLoop()
+                         local  struct ProfileBars profileBars
+                         local  int skipFirstFrame
+                         local  void* pGMPtr
+                         local  uint64 chronoAfterWait
+                         local  struct Timing_AutoMarker sfxMarker
+                         local  struct Timing_AutoMarker sfxUpdateMarker
+                         local  struct RC_SRenderCtx* pRenderCtx
+                         local  enum PlayerNumber_t curplayer
+                         local  struct Timing_AutoMarker animationMarker
+                         local  CameraController_t* pCamControl
+                         inlines  GM_GetGolferUp, GO_vPostHackTheTimer, GO_vSwitchGameMode, TI_uiReadCP0Count, Timing_AutoMarker::Timing_AutoMarker, Timing_AutoMarker::~Timing_AutoMarker, cGAME_GLOBALS::GetGamePaused, cGAME_GLOBALS::GetResetGame, cGAME_GLOBALS::GetSecondsFraction, cGAME_GLOBALS::SetElapsedTimeNonAdjusted, cGAME_GLOBALS::SetEndGame, cGAME_GLOBALS::SetMainLoopStartFrameIndex, cGAME_GLOBALS::SetSecondsFraction
+ 5228  004890E4     68  void GO_vMinimalFEIStudioMainLoop()
+ 5250  003F6A90      4  void GO_vDrawLoadingText()
+ 5257  003F6A94      4  void GO_vDrawWaitingTextToScreen(float x, float y, char* text)
+ 5264  00427B0C     98  void Go_vPauseGame(enum GloPause_e pause)
+                         inlines  cGAME_GLOBALS::SetGamePaused
+ 5277  00427BA4     68  void GO_vUnPauseGame()
+                         inlines  cGAME_GLOBALS::SetGamePaused
+ 5373  003F6A98     E0  static void SpectatorBeginUpdate(bool start)
+                         local  bool doDisableSpectators
+ 5407  003F6A34      4  static void SpectatorWaitUpdate()
+ 5416    inline-only   static void SpectatorInitThread()
+ 5431    inline-only   static void SpectatorCloseThread()
+ 5448    inline-only   static void CharPreInitThread()
+ 5462    inline-only   static void CharPreCloseThread()
+ 5479    inline-only   static void CharPreBeginUpdate()
+                         local  struct Timing_AutoMarker charPreRenderMarker
+ 5490  003F6A38      4  static void CharPreWaitUpdate()
+ 5497  003F6B78     38  bool WaitCharacterShadows()
+                         local  bool doRenderShadows
+ 5512  003F6BB0     38  bool WaitSpectatorShadows()
+                         local  bool doRenderShadows

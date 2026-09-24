@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/gameuser.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    5  005B716C     34  void GameUser(const struct GameUser* this)
+    9  005B71D4      C  void ~GameUser(const struct GameUser* this)

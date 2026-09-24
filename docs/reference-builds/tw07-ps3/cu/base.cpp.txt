@@ -1,0 +1,18 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/base.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 10 functions, source order. line | PS3 address | size
+
+  117  005B3080     24  void Base(const struct Base* this)
+  146  005B30A4      C  void ~Base(const struct Base* this)
+  190  005B2AD0     6C  void* operator new(size_t size, const char8_t* strFilename, int32_t iLineNum, struct MemoryStrategy* pMemoryStrategy)
+                         local  struct <anon>* pTotalMemory
+  222  005B2B3C     50  void operator delete(void* pObject)
+                         local  struct <anon>* pTotalMemory
+  253  005B3824     6C  void* operator new [](size_t size, const char8_t* strFilename, int32_t iLineNum, struct MemoryStrategy* pMemoryStrategy)
+                         local  struct <anon>* pTotalMemory
+  265  005B3890     50  void operator delete [](void* pObject)
+                         local  struct <anon>* pTotalMemory
+  274  005B38E0      4  void operator delete(void* , const char8_t* , int32_t , struct MemoryStrategy* )
+  299  005B3BCC     60  void IncrementReferenceCount(const const struct Base* this)
+  334  005B3994     8C  void DecrementReferenceCount(const const struct Base* this)
+  374  005B3C2C     60  void AssignmentReferenceCounts(const struct Base* pOld, const struct Base* pNew)

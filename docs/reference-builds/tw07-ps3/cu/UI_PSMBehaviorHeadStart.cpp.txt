@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_PSMBehaviorHeadStart.cpp
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+    6  00065B80     84  void PSMBehavior_HeadStart::OnInit(const struct PSMBehavior_HeadStart* this, int32 instanceData)
+   18  00065C04     F8  void PSMBehavior_HeadStart::UpdateMovieClip(const struct PSMBehavior_HeadStart* this, int32 curMenuItemIndex, const char* mDestMenuItemClipName, int32 instanceData)
+                         local  int32 ageGroup
+                         local  char gender
+                         local  int32 skinColor
+                         local  char[32] strBuf
+   42  0004F978      4  void PSMBehavior_HeadStart::OnMoveSelection(const struct PSMBehavior_HeadStart* this, int32 index, int32 instanceData)
+   50  0004F97C     1C  bool PSMBehavior_HeadStart::OnInput(const struct PSMBehavior_HeadStart* this, const int32& button, int32 curActiveItemIndex, int32 instanceData)

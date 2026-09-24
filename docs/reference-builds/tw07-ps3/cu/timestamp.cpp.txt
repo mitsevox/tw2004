@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/timestamp.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    5  005C11EC     34  void Timestamp(const struct <anon>* this)
+    9  005C1254      C  void ~Timestamp(const struct <anon>* this)

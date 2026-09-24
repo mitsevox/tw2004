@@ -1,0 +1,11 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/core/debug/debug.h
+// compiled in: Compiler.cpp, MemoryManager.cpp
+// 4 functions, source order. line | PS3 address | size
+
+  499  0081DEDC     7C  void PrintMacroHelper(const struct <anon>* this, const char* file, unsigned int line, struct Channel* channel)
+  521    inline-only   void PrintFormattedChannel(const struct <anon>* this, const char* pFormat)
+                         local  va_list argList
+  546  007BD444     94  void AssertMacroHelper(const struct <anon>* this, const char* condition, const char* file, const char* function, unsigned int line, unsigned int flags)
+  558    inline-only   bool AssertFormatted(const struct <anon>* this, const char* pFormat)
+                         local  va_list argList
+                         local  const bool ret

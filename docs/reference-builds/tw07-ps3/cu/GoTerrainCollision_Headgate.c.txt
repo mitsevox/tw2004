@@ -1,0 +1,109 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/GoTerrainCollision_Headgate.c
+// compiled in: golf_unity.cpp
+// 35 functions, source order. line | PS3 address | size
+
+   11  001EDA24     18  bool Ter_GetHitSpectatorThisShot()
+   16  00217E74     18  void Ter_SetHitSpectatorThisShot(bool bHit)
+   35  00217E8C     3C  void Ter_HeadgateInit()
+   44  00217EF0     24  void Ter_HeadgateClose()
+   53  00217F40      4  void Ter_VerifyHoleData(TGD_TerrainInfo* pTerrainData)
+   58  00206864     18  bool Ter_Use3DCupGeometry()
+   67  00217F44     14  float Ter_GetAmbientLight(TGD_TerrainInfo* pTerrainData, float* position)
+   79  00217F58     14  float Ter_GetAmbientLightExact(TGD_TerrainInfo* pTerrainData, float* position)
+   91  00217F6C     28  bool Ter_CheckObjectAndHazardObstruction(float* position, float obstructionDistance, bool bOnlyCheckNonFadingObjects, bool bCheckLie, float hazardDistance, bool bCheckHeight, float fMaxSlope)
+  103  00217F94     24  float Ter_LowestPlayableWorldHeight(TGD_TerrainInfo* pTerrainData)
+  118  00218384     D4  uint32 Ter_GetTerrainLayers(TGD_TerrainInfo* pTerrainData, float* location, struct TGD_MaterialInfo** pSurfaceInfoList, float* pHeightList, uint32 iMaxResults, unsigned int excludedPhysicsObjectTypeFlags)
+                         local  int* intArray
+                         local  uint32 count
+                         local  uint32 i
+  151  00261250    1AC  bool Ter_CheckForPinCollision(TGD_TerrainInfo* pTerrainData, int32 playerID, float* fPoint0, float* fPoint1, vec4flt* pCollisionPoint, vec4flt* pSurfaceNormal, struct TGD_MaterialInfo** pSurfaceInfo, TGD_ObjectInstanceInfo** pSurfaceObject)
+                         local  vec4flt startToPin
+                         local  const float* cupLocation
+                         local  const float pinRadiusSqr
+                         inlines  LLMath_LengthSquared3, __vec_len_sqr3, vec_madd, vec_sld
+  213  002D2840    24C  bool Actor_CheckForCollision(float* fPoint0, float* fPoint1, float* pCollisionPoint, float* pSurfaceNormal, const int& terrainID, const float& fClosest, OriginatorType eCollType)
+                         local  bool bCollision
+                         local  struct <anon>* pHitPool
+                         local  const int nNumCollisionTests
+                         local  const uint32_t hitCount
+                         local  uint32_t i
+                         local  const const struct <anon>& hit
+                         inlines  GetCollisionCount, LLMath_SquareDistanceBetween3, __vec_len_sqr3, operator const float*, vec_sub
+  271  002D2A8C    3B8  bool Ter_CheckForWorldCollision(TGD_TerrainInfo* pTerrainData, int32 playerID, float* fPoint0, float* fPoint1, bool bIsEstimating, vec4flt* pCollisionPoint, vec4flt* pSurfaceNormal, struct TGD_MaterialInfo** pSurfaceInfo, TGD_ObjectInstanceInfo** pSurfaceObject)
+                         local  float fClosest
+                         local  vec4flt fRayUnitVector
+                         local  int terrainID
+                         inlines  LLMath_DotProduct3, LLMath_Negate, LLMath_SquareDistanceBetween3, LLMath_Subtract3, vec_madd, vec_sld, vec_sub
+  392  002752BC    268  bool Ter_CheckForSolidWorldCollision(TGD_TerrainInfo* pTerrainData, int32 playerID, float* fPoint0, float* fPoint1, vec4flt* pCollisionPoint, vec4flt* pSurfaceNormal, struct TGD_MaterialInfo** pSurfaceInfo, TGD_ObjectInstanceInfo** pSurfaceObject)
+                         local  float fClosest
+                         local  vec4flt fRayUnitVector
+                         local  int terrainID
+                         inlines  LLMath_DotProduct3, LLMath_Negate, LLMath_SquareDistanceBetween3, LLMath_Subtract3, vec_madd, vec_sld, vec_sub
+  460  00275524    1FC  bool Ter_CheckForGroundCollisionWithFlags(TGD_TerrainInfo* pTerrainData, float* fPoint0, float* fPoint1, unsigned int physicsObjectTypeFlags, vec4flt* pCollisionPoint, vec4flt* pSurfaceNormal, struct TGD_MaterialInfo** pSurfaceInfo, TGD_ObjectInstanceInfo** pSurfaceObject, int* terrainID)
+                         local  float fClosest
+                         local  vec4flt fRayUnitVector
+                         inlines  LLMath_DotProduct3, LLMath_Negate, LLMath_Subtract3, vec_madd, vec_sld, vec_sub
+  512  00275720    1F0  bool Ter_CheckForGroundCollision(TGD_TerrainInfo* pTerrainData, float* fPoint0, float* fPoint1, vec4flt* pCollisionPoint, vec4flt* pSurfaceNormal, struct TGD_MaterialInfo** pSurfaceInfo, TGD_ObjectInstanceInfo** pSurfaceObject, int* terrainID)
+                         local  float fClosest
+                         local  vec4flt fRayUnitVector
+                         inlines  LLMath_DotProduct3, LLMath_Negate, LLMath_Subtract3, vec_madd, vec_sld, vec_sub
+  562  00275A98    1D8  bool Ter_CheckForObjectCollision(TGD_TerrainInfo* pTerrainData, float* fPoint0, float* fPoint1, vec4flt* pCollisionPoint, vec4flt* pSurfaceNormal, struct TGD_MaterialInfo** pSurfaceInfo, TGD_ObjectInstanceInfo** pSurfaceObject)
+                         local  float fClosest
+                         local  vec4flt fRayUnitVector
+                         local  int terrainID
+                         inlines  LLMath_DotProduct3, LLMath_Negate, LLMath_Subtract3, vec_madd, vec_sld, vec_sub
+  602  002B1548    12C  void Ter_SetupCupPlacement(TGD_TerrainInfo* pTerrainData)
+                         local  int day
+                         local  int iPlacement
+                         inlines  GM_GetCurrentFlagPositionIndex, GM_SetTargetCup
+  639  00218458     28  float Ter_GetHighestGroundHeight_Tournament(TGD_TerrainInfo* pTerrainData, float* location)
+  649  00218480     28  float Ter_GetHighestGroundHeight(TGD_TerrainInfo* pTerrainData, float* location)
+  659  002184A8     30  float Ter_GetHighestPlayableGroundHeight(TGD_TerrainInfo* pTerrainData, float* location)
+                         local  int terrainId
+  670  00256BA0     E0  float Ter_GetHighestPlayableGroundData(TGD_TerrainInfo* pTerrainData, float* location, struct TGD_MaterialInfo** pSurfaceInfo, float* normal)
+                         local  int terrainId
+                         local  float height
+                         inlines  LLMath_Negate3, vec_sub
+  685  002182FC     88  float Ter_GetLowestGroundHeight(TGD_TerrainInfo* pTerrainData, float* location)
+                         local  float[32] fHeightList
+                         local  unsigned int count
+  700  00257808      C  float Ter_GetSupportingGroundHeight(TGD_TerrainInfo* pTerrainData, float* location)
+  710  00257308      8  float Ter_GetCoveringGroundHeight(TGD_TerrainInfo* pTerrainData, float* location)
+  720  00257158    1B0  float Ter_GetCoveringGroundHeightAndNormal(TGD_TerrainInfo* pTerrainData, float* location, float* normal)
+                         local  float[32] fHeightList
+                         local  float[32][4] normalList
+                         local  unsigned int count
+                         local  int minGreaterNdx
+                         local  unsigned int i
+                         inlines  LLMath_Negate3
+  766  002577C0     48  bool Ter_GetSupportingGroundNormal(TGD_TerrainInfo* pTerrainData, float* location, float* normal)
+                         local  float height
+  777  00275DE0     34  struct TGD_MaterialInfo* Ter_GetSupportingWorldMaterial(TGD_TerrainInfo* pTerrainData, float* location)
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+  789  00257310    120  float Ter_GetSupportingGroundData(const TGD_TerrainInfo* pTerrainData, const float* location, struct TGD_MaterialInfo** pSurfaceInfo, float* normal)
+                         local  float[1] fHeightList
+                         local  float[1][4] normalList
+                         local  int[1] ids
+                         inlines  LLMath_Negate3
+  821  002182E4     18  void Ter_GetEnclosingGroundHeight(TGD_TerrainInfo* pTerrainData, float* location, float* fSupportingGroundHeight, float* fCoveringGroundHeight)
+  835  00217FB8    32C  void Ter_GetEnclosingGroundData(TGD_TerrainInfo* pTerrainData, float* location, float* fSupportingGroundHeight, struct TGD_MaterialInfo** pSupportingSurfaceInfo, float* supportingNormal, float* fCoveringGroundHeight, struct TGD_MaterialInfo** pCoveringSurfaceInfo, float* coveringNormal)
+                         local  float[32] fHeightList
+                         local  float[32][4] normalList
+                         local  int[32] ids
+                         local  unsigned int count
+                         local  unsigned int i
+  903  00275C70    170  float Ter_GetSupportingWorldData(TGD_TerrainInfo* pTerrainData, float* location, struct TGD_MaterialInfo** pSurfaceInfo, float* normal)
+                         local  float[1] fHeightList
+                         local  float[1][4] normalList
+                         local  int[1] ids
+                         local  float retHeight
+                         local  unsigned int excludedPhysicsObjectTypeFlags
+                         local  vec4flt lowPoint
+                         local  vec4flt treeNormal
+                         local  vec4flt treeCollision
+                         local  struct TGD_MaterialInfo* pTreeMaterial
+                         local  TGD_ObjectInstanceInfo* pTreeObj
+                         inlines  vec4flt_Copy
+  952  0025778C     34  struct TGD_MaterialInfo* Ter_GetSupportingGroundMaterial(const TGD_TerrainInfo* pTerrainData, const float* location)
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+  976  002184D8      8  int32 Ter_GetGroundPolyList(TGD_TerrainInfo* pTerrainData, float* p1, float* p2, float* p3, float* p4, TGD_PolygonReference* pReturnResult, int32 iListSize, uint32 uiIgnoreFlags)

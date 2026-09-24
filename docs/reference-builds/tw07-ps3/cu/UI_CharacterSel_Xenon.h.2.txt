@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_CharacterSel_Xenon.h
+// compiled in: apt_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   77  00122FD8     B8  void UICharacterSel::~UICharacterSel(const struct UICharacterSel* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   79  000FEE60      C  uint32 UICharacterSel::GetSignature(const const struct UICharacterSel* this)
+   84  000FEE6C     48  void UICharacterSel::OnHide(const struct UICharacterSel* this)
+   90  001157B8     14  enum AptThreadReturnValue UICharacterSel::PollForPulledController_func(struct IAptSubscriberBase* subs)
+   92  000FEEB4     24  void UICharacterSel::RegainFocus(const struct UICharacterSel* this, uint32 )
+   93  000FEED8     58  void UICharacterSel::LooseFocus(const struct UICharacterSel* this, uint32 )
+  168    inline-only   void UICharacterSel::ResetCPUDefault(const struct UICharacterSel* this)

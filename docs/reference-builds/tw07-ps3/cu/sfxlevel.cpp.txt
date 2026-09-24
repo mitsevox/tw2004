@@ -1,0 +1,10 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sfxlevel.cpp
+// compiled in: sfxlevel.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   29  006DD904    270  int SNDfxlevel(int shandle, int bus, int level)
+                         local  int setvoice
+                         local  int voice
+                         local  struct CHANPUB* ppubv
+                         local  int i
+                         local  struct CHANPUB* ppubvTemp

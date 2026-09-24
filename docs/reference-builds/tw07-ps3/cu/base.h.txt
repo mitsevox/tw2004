@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/include/common/osdk/base.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   63    inline-only   uint32_t GetReferenceCount(const const struct Base* this)
+   81    inline-only   void ClearOwnedByGarbageCollector(const struct Base* this)
+   84    inline-only   void SetOwnedByGarbageCollector(const struct Base* this)

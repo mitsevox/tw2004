@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Database/db_manager.cpp
+// compiled in: golf_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   78  0029C6C8    2E0  enum TDbError Init()
+                         local  enum TDbError error
+                         local  struct CorePoolDescriptor poolDescriptor
+                         local  struct <anon> stringFuncs
+                         local  struct <anon> initParms
+                         local  enum TDbError error
+                         inlines  SetDefaultInitParms
+  170  00214FC8    140  void Shutdown()

@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/career/source/common/careerviewconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   66  005C9118     44  void CareerViewConcrete(const struct <anon>* this, const LobbyStatbookViewInfoT* pViewInfo)
+   91  005C91E4      C  void ~CareerViewConcrete(const struct <anon>* this)

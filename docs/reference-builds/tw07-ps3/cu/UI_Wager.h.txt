@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_Wager.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   22  001264A4     D4  void UIWager::~UIWager(const struct UIWager* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStaticCharBuffer<20u>::~AptStaticCharBuffer, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   24  0010050C      C  uint32 UIWager::GetSignature(const const struct UIWager* this)
+   29  00100518     44  void UIWager::ShowHelpText(const struct UIWager* this)

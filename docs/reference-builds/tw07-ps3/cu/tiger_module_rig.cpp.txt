@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_rig.cpp
+// compiled in: tiger_module_rig.cpp
+// 4 functions, source order. line | PS3 address | size
+
+    0  00540D30     18  void ~ListNode(const struct <anon>* this)
+                         inlines  ~Allocatable
+   10  00580570     64  void Rig(const struct Rig* this, void* binary, unsigned int binarySize)
+                         inlines  NamedListNode
+   16  005804F0     38  void ~Rig(const struct Rig* this)
+                         inlines  ~NamedListNode
+   21  00580528     48  bool IsNameEqual(const const struct <anon>* this, const char* name)
+                         local  unsigned int id
+                         inlines  Common::CommonHash

@@ -1,0 +1,36 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/settingintegerconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   84  005ECDC4    104  void SettingIntegerConcrete(const struct <anon>* this, const char8_t* strIdentifier, uint32_t uMaxValues, uint32_t uCount, const int32_t* aValues, int32_t iValue, int32_t iDefault, enum Persistence ePersistence, uint32_t uFieldWidth)
+                         inlines  RCPointer
+  125  005ECEC8     EC  struct SettingInteger* CreateSetting(const char8_t* strIdentifier, uint32_t uMaxValues, uint32_t uCount, const int32_t* aValues, int32_t iValue, int32_t iDefault, enum Persistence ePersistence, uint32_t uFieldWidth)
+                         local  struct <anon>* pSetting
+  153  005DE14C     98  void ~SettingIntegerConcrete(const struct <anon>* this)
+                         inlines  ~RCPointer
+  179  005BEC8C     54  void SetValue(const struct <anon>* this, int32_t iValue)
+  191  005BECE0     54  void SetDefault(const struct <anon>* this, int32_t iValue)
+  203  005CB3C0    184  void SetValidValues(const struct <anon>* this, uint32_t uCount, const int32_t* aValues, int32_t iValue, int32_t iDefault)
+                         local  bool bRangeUpdate
+                         local  bool bValueUpdate
+                         local  bool bDefaultUpdate
+                         local  uint32_t uIndex
+  260  005BED34      8  uint32_t GetValueCount(const const struct <anon>* this)
+  265  005BED3C     3C  int32_t GetValueByIndex(const const struct <anon>* this, uint32_t uIndex)
+                         local  int32_t iValue
+  299  005BED78     EC  bool IsValueValid(const struct <anon>* this, int32_t iValue)
+                         local  bool bValid
+                         local  uint32_t uIndex
+                         inlines  operator->
+  344  005BEE64     44  void SetValidator(const struct <anon>* this, struct SettingIntegerValidator* pValidator)
+                         inlines  operator=
+  368  005BEEA8     E8  void IncrementValue(const struct <anon>* this)
+                         local  uint32_t uCurrentIndex
+  415  005BEF90     DC  void DecrementValue(const struct <anon>* this)
+                         local  uint32_t uCurrentIndex
+  464  005BF06C     74  void RestoreDefault(const struct <anon>* this)
+  486  005D9978    150  void TriggerEvent(const struct <anon>* this, enum EventE eEvent)
+                         local  uint32_t uNumElements
+                         local  struct SettingObserver** pList
+                         local  char8_t[16] strEvent
+                         inlines  GetMaxNumberOfObservers, GetObserverList

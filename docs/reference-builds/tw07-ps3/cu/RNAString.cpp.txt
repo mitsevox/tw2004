@@ -1,0 +1,22 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNABase/RNAString.cpp
+// compiled in: RNAString.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   38  0081F678     3C  uint32_t Length(const const struct <anon>* this)
+   47  0081F9EC    1D4  struct <anon> substr(const struct <anon>* this, uint32_t index, uint32_t num)
+                         local  const char[7] __FUNCTION__
+                         local  char[256] temp
+                         local  uint32_t i
+                         inlines  RNADebugBreak, String
+   63  0081F770    27C  struct <anon>& erase(const struct <anon>* this, uint32_t index, uint32_t num)
+                         local  const char[6] __FUNCTION__
+                         local  char[256] temp
+                         local  uint32_t orgLength
+                         local  uint32_t front
+                         local  uint32_t back
+                         local  uint32_t i
+                         local  uint32_t j
+                         inlines  Clear, Copy, RNADebugBreak
+   92  0081F6B4     BC  bool IsEqual(const const struct <anon>* this, const char* pString1, const char* pString2)
+                         local  const char[8] __FUNCTION__
+                         inlines  RNADebugBreak

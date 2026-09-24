@@ -1,0 +1,33 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnax/source/RNAX/RNAChunkReader.cpp
+// compiled in: RNAChunkReader.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   64  0084A450     10  bool8_t IsRSFDataBigEndian(const void* pData)
+   71  0084A584    420  bool BeginFile(const struct <anon>* this, struct InStreamC* pInStream)
+                         local  const char[10] __FUNCTION__
+                         local  const struct InStreamC& in
+                         local  uint8_t[4] fileTag
+                         local  uint8_t uPad8
+                         local  uint8_t uPlatTag1
+                         inlines  RNADebugBreak
+  130  0084A9A4     B8  void EndFile(const struct <anon>* this)
+                         local  const char[8] __FUNCTION__
+                         inlines  RNADebugBreak
+  137  0084AA5C    284  bool BeginChunk(const struct <anon>* this)
+                         local  const char[11] __FUNCTION__
+                         inlines  InStreamC::SetVersion, RNADebugBreak
+  177  0084ACE0     A4  void EndChunk(const struct <anon>* this)
+                         local  const char[9] __FUNCTION__
+                         inlines  RNADebugBreak
+  187  0084AD84     64  uint32_t GetChunkPos(const const struct <anon>* this)
+                         local  const char[12] __FUNCTION__
+                         inlines  RNADebugBreak
+  193  0084ADE8     68  int32_t GetChunkVersion(const const struct <anon>* this)
+                         local  const char[16] __FUNCTION__
+                         inlines  RNADebugBreak
+  199  0084AE50     68  int32_t GetChunkID(const const struct <anon>* this)
+                         local  const char[11] __FUNCTION__
+                         inlines  RNADebugBreak
+  205  0084A460     64  uint32_t GetChunkFlags(const const struct <anon>* this)
+                         local  const char[14] __FUNCTION__
+                         inlines  RNADebugBreak

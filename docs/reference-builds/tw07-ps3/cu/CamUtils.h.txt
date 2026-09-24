@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Shared/Headers/CamUtils.h
+// compiled in: golf_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   32    inline-only   bool CamUtils_VectorIsVertical(float* vector)
+   41    inline-only   bool CamUtils_PositionsAreVertical(float* pos1, float* pos2)

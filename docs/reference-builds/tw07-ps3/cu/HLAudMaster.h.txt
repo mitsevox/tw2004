@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/Audio/Engine/HL/Headers/HLAudMaster.h
+// compiled in: golf2_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   59    inline-only   bool Mas_IsChanMuted(uint8 chan)
+   64    inline-only   audfrac Mas_GetSubmix(uint8 chan)

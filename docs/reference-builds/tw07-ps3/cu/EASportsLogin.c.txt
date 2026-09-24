@@ -1,0 +1,28 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/EASportsShared/EASportsLogin.c
+// compiled in: golf_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+  158  001F3848     44  void EASLogin_RegisterStreamClients()
+  174  001F388C     2C  void EASLogin_UnregisterStreamClients()
+  191  001F38B8     24  int EASLogin_ConvertError(enum SLoginErrorE eError)
+  206  001F38DC      8  int EASLogin_WaitForAsyncProcessToComplete()
+  245  001F38E4     88  void EASLogin_LoadEASLfromStream(struct TStreamData* pStreamData)
+  268  001F396C      4  void EASLogin_Entry()
+  309  001F3970      4  void EASLogin_Exit()
+  342  002415D4     F8  void EASLogin_InitFE()
+                         local  const char[16] __FUNCTION__
+                         inlines  TagValuePair, operator+
+  377  001F3974     64  void EASLogin_CloseFE()
+  414  001F39D8      8  int EASLogin_MCFileExists(MC_ArgsNumFilesOnCardT* spArgs)
+  455  001F39E0      8  int EASLogin_MCSaveFile(MC_ArgsSaveT* spArgs)
+  507  001F39E8      8  int EASLogin_MCCreateFile(int port, int slot)
+  544  001F39F0      8  int EASLogin_MCLoadFile(MC_ArgsLoadT* spArgs)
+  583  001F39F8      8  int EASLogin_MCIsDataCorrupt(MC_ArgsDataCorruptT* spArgs)
+  606  001F3A00      8  int EASLogin_MCMemoryRequired(MC_ArgsMemoryRequiredT* spArgs)
+  617  001F3A08    108  int EASLogin_Test()
+                         local  MC_ArgsNumFilesOnCardT sArg1
+                         local  MC_ArgsLoadT sArg2
+                         local  MC_ArgsSaveT sArg3
+                         local  int error
+                         local  char[256] temp
+                         inlines  EASLogin_SetCurrentName, EASLogin_SetCurrentPassword

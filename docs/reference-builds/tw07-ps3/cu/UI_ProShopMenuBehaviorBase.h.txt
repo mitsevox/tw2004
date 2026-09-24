@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/Headers/UI_ProShopMenuBehaviorBase.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   11  00100BD4     18  void IProShopMenuBehavior::~IProShopMenuBehavior(const struct IProShopMenuBehavior* this)
+   28  00100C24      8  bool IProShopMenuBehavior::OnInput(const struct IProShopMenuBehavior* this, const int32& button, int32 curActiveItemIndex, int32 instanceData)
+   33    inline-only   struct UIProShopMenu* IProShopMenuBehavior::GetPSM(const struct IProShopMenuBehavior* this)

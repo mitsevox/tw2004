@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/Golf/GameMode/Headers/GameModeDriver_TigerChallengeDefs.h
+// compiled in: apt_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   75    inline-only   bool TigerChallengeEvent_t::IsRequiredForBoss(const struct TigerChallengeEvent_t* this)

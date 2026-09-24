@@ -1,0 +1,15 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/GameMode/Headers/GameEffects.h
+// compiled in: golf_unity.cpp, other_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+  153    inline-only   bool GameEffects_IsDoubleTimeOn()
+  158    inline-only   void GameEffects_SetDoubleTime(bool on, enum PlayerNumber_t ePlayerID)
+  183    inline-only   bool GameEffects_IsHalfTimeOn()
+  188    inline-only   void GameEffects_SetHalfTime(bool on, enum PlayerNumber_t ePlayerID)
+  216    inline-only   bool GameEffects_IsGameBreakerOn()
+  221    inline-only   bool GameEffects_IsLetterboxOn()
+  228    inline-only   bool GameEffects_IsPredictedGameBreakerOn()
+  233    inline-only   bool GameEffects_IsScriptedMomentOn()
+  248    inline-only   bool GameEffects_StartOfSlowMoFrame()
+  263    inline-only   enum GameBreakerTrigger_e GameEffects_GetCurrentTriggerType()
+                         local  int i

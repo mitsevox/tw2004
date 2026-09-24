@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/Headers/UI_PSMBehaviorProShop.h
+// compiled in: apt_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   17  00115330     18  void PSMBehavior_ProShop::~PSMBehavior_ProShop(const struct PSMBehavior_ProShop* this)
+                         inlines  IProShopMenuBehavior::~IProShopMenuBehavior

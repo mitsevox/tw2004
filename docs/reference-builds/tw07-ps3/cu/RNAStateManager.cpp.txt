@@ -1,0 +1,200 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/PS3/RNAStateManager.cpp
+// compiled in: RNAStateManager.cpp
+// 60 functions, source order. line | PS3 address | size
+
+    0  008394E8     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   56    inline-only   uint32_t StateManager_FLOAT_RGBA_TO_A8R8G8B8(float fRed, float fGreen, float fBlue, float fAlpha)
+   75    inline-only   uint32_t endian_swap(uint32_t val)
+   93    inline-only   void SETBITS(const uint64_t& var, uint64_t bits)
+  103    inline-only   uint64_t TESTANDCLEARBITS(const uint64_t& var, uint64_t bits)
+                         local  uint64_t result
+  110    inline-only   uint64_t RENDERSTATEBITS(enum RSStateE eState1)
+  115    inline-only   uint64_t RENDERSTATEBITS(enum RSStateE eState1, enum RSStateE eState2)
+  120    inline-only   uint64_t RENDERSTATEBITS(enum RSStateE eState1, enum RSStateE eState2, enum RSStateE eState3)
+  125    inline-only   uint64_t RENDERSTATEBITS(enum RSStateE eState1, enum RSStateE eState2, enum RSStateE eState3, enum RSStateE eState4)
+  154  00839588     48  bool DeviceC::SaveEffectRenderState(const struct DeviceC* this)
+                         local  const char[22] __FUNCTION__
+                         inlines  RNADebugBreak
+  160  008395D0     48  bool DeviceC::RestoreEffectRenderState(const struct DeviceC* this)
+                         local  const char[25] __FUNCTION__
+                         inlines  RNADebugBreak
+  172    inline-only   enum CellGcmEnum ConvertRNACompareFuncToGCM(int32_t eVal)
+                         local  const char[27] __FUNCTION__
+  189    inline-only   enum CellGcmEnum ConvertRNAStencilOpToGCM(enum RSStencilOpE eVal)
+                         local  const char[25] __FUNCTION__
+  206    inline-only   enum CellGcmEnum ConvertRNABlendModeToGCM(int32_t eVal)
+                         local  const char[25] __FUNCTION__
+  233    inline-only   enum CellGcmEnum ConvertRNABlendOpToGCM(int32_t eVal)
+                         local  const char[23] __FUNCTION__
+  247    inline-only   uint8_t ConvertRNAAddressModeToGCM(enum RSAddressModeE eVal)
+                         local  const char[27] __FUNCTION__
+  267    inline-only   uint8_t ConvertRNAMagFilterModeToGCM(enum RSFilterModeE eVal)
+                         local  const char[29] __FUNCTION__
+  280    inline-only   uint8_t ConvertRNAMinAndMipFilterModeToGCM(enum RSFilterModeE eMinFilter, enum RSFilterModeE eMipFilter)
+                         local  const char[35] __FUNCTION__
+                         local  uint8_t gcmMinFilter
+  316    inline-only   uint32_t FLOAT_RGBA_TO_A8R8G8B8(float fRed, float fGreen, float fBlue, float fAlpha)
+                         local  const char[23] __FUNCTION__
+  335  0083B04C    258  void DeviceC::SetSamplerAddressModes(const struct DeviceC* this, int32_t iSampler, enum RSAddressModeE eUMode, enum RSAddressModeE eVMode, enum RSAddressModeE eWMode)
+                         local  const char[23] __FUNCTION__
+                         inlines  ConvertRNAAddressModeToGCM, Gcm::cellGcmSetTextureAddress, RNADebugBreak
+  357  00839618     44  void DeviceC::GetSamplerAddressModes(const struct DeviceC* this, int32_t iSampler, const enum RSAddressModeE& eUMode, const enum RSAddressModeE& eVMode, const enum RSAddressModeE& eWMode)
+                         local  const char[23] __FUNCTION__
+                         inlines  RNADebugBreak
+  363  0083CF78    1A8  void DeviceC::SetSamplerFilterModes(const struct DeviceC* this, int32_t iSampler, enum RSFilterModeE eMinFilter, enum RSFilterModeE eMagFilter, enum RSFilterModeE eMipFilter)
+                         local  const char[22] __FUNCTION__
+                         inlines  ConvertRNAMagFilterModeToGCM, ConvertRNAMinAndMipFilterModeToGCM, Gcm::cellGcmSetTextureFilter, RNADebugBreak
+  378  0083965C     44  void DeviceC::GetSamplerFilterModes(const struct DeviceC* this, int32_t iSampler, const enum RSFilterModeE& eMinFilter, const enum RSFilterModeE& eMagFilter, const enum RSFilterModeE& eMipFilter)
+                         local  const char[22] __FUNCTION__
+                         inlines  RNADebugBreak
+  384  0083D120    214  void DeviceC::SetSamplerBorderColor(const struct DeviceC* this, int32_t iSampler, float fRed, float fGreen, float fBlue, float fAlpha)
+                         local  const char[22] __FUNCTION__
+                         inlines  FLOAT_RGBA_TO_A8R8G8B8, Gcm::cellGcmSetTextureBorderColor, RNADebugBreak
+  390  008396A0     44  void DeviceC::GetSamplerBorderColor(const struct DeviceC* this, int32_t iSampler, const float& fRed, const float& fGreen, const float& fBlue, const float& fAlpha)
+                         local  const char[22] __FUNCTION__
+                         inlines  RNADebugBreak
+  397  008396E4     44  void DeviceC::SetSamplerMipMapBias(const struct DeviceC* this, int32_t iSampler, float fBias)
+                         local  const char[21] __FUNCTION__
+                         inlines  RNADebugBreak
+  403  00839728     48  float DeviceC::GetSamplerMipMapBias(const struct DeviceC* this, int32_t iSampler)
+                         local  const char[21] __FUNCTION__
+                         inlines  RNADebugBreak
+  410  00839770     44  void DeviceC::SetSamplerLargestMipLevel(const struct DeviceC* this, int32_t iSampler, int32_t iMipLevel)
+                         local  const char[26] __FUNCTION__
+                         inlines  RNADebugBreak
+  415  008397B4     48  int32_t DeviceC::GetSamplerLargestMipLevel(const struct DeviceC* this, int32_t iSampler)
+                         local  const char[26] __FUNCTION__
+                         inlines  RNADebugBreak
+  422  008397FC     44  void DeviceC::SetSamplerMaxAnisotropy(const struct DeviceC* this, int32_t iSampler, int32_t iMaxAnisotropy)
+                         local  const char[24] __FUNCTION__
+                         inlines  RNADebugBreak
+  427  00839840     48  int32_t DeviceC::GetSamplerMaxAnisotropy(const struct DeviceC* this, int32_t iSampler)
+                         local  const char[24] __FUNCTION__
+                         inlines  RNADebugBreak
+  433  0083B2A4    2A4  void DeviceC::SetSamplerTexture(const struct DeviceC* this, int32_t iSampler, struct TextureC* pRNATexture)
+                         local  const char[18] __FUNCTION__
+                         local  const CellGcmTexture* pGCMTexture
+                         local  uint8_t gcmTextureFormat
+                         inlines  Gcm::cellGcmSetTexture, Gcm::cellGcmSetTextureControl, RNADebugBreak, TexturePlatC::GetGcmTexture
+  501  00839430      4  void DeviceC::SetHalfPixelOffsetEnable(const struct DeviceC* this, bool bEnable)
+  508  00839434      4  void DeviceC::SetFillMode(const struct DeviceC* this, enum RSFillModeE eMode)
+  514  00839888     48  enum RSFillModeE DeviceC::GetFillMode(const struct DeviceC* this)
+                         local  const char[12] __FUNCTION__
+                         inlines  RNADebugBreak
+  545  00839E20    204  void DeviceC::SetViewport(const struct DeviceC* this, const const struct <anon>& Viewport)
+                         local  const char[12] __FUNCTION__
+                         local  float[4] scale
+                         local  float[4] offset
+                         local  float min
+                         local  float max
+                         local  int32_t x
+                         local  int32_t y
+                         local  int32_t w
+                         local  int32_t h
+                         inlines  Gcm::cellGcmSetScissor, Gcm::cellGcmSetViewport, GetHeight, GetMaxZ, GetMinZ, GetWidth, GetX, GetY, RNADebugBreak
+  592  0083A024     34  void DeviceC::GetViewport(const struct DeviceC* this, const struct <anon>& Viewport)
+  620  0083A058    114  void DeviceC::SetScissor(const struct DeviceC* this, const const struct <anon>& Scissor)
+                         local  const char[11] __FUNCTION__
+                         inlines  Gcm::cellGcmSetScissor, RNADebugBreak
+  650  0083A16C     24  void DeviceC::GetScissor(const struct DeviceC* this, const struct <anon>& Scissor)
+  675  008398D0     A4  struct SurfaceC* DeviceC::GetRenderTarget(const struct DeviceC* this, enum RenderTargetE eRenderTarget)
+                         local  const char[16] __FUNCTION__
+                         inlines  RNADebugBreak
+  705  0083A190    300  void DeviceC::SetRenderTarget(const struct DeviceC* this, enum RenderTargetE eRenderTarget, struct SurfaceC* pSurface)
+                         local  const char[16] __FUNCTION__
+                         local  const CellGcmSurface& surface
+                         local  uint32_t targetBit
+                         local  int32_t iTarget
+                         inlines  DevicePlatC::GetGCMSurface, DevicePlatC::SetRenderTargetChanged, RNADebugBreak
+  810  0083B548    480  void DevicePlatC::SetRenderTargetTexture(const struct DevicePlatC* this, enum RenderTargetE eRenderTarget, struct TextureC* pTexture, uint32_t uLayer, uint32_t uMipmapLevel)
+                         local  const char[23] __FUNCTION__
+                         local  const CellGcmSurface& surface
+                         local  const const CellGcmTexture& texture
+                         local  uint32_t offset
+                         local  uint32_t pitch
+                         local  uint32_t width
+                         local  uint32_t height
+                         local  uint32_t targetBit
+                         local  struct SurfaceC* pSurface
+                         local  int32_t iTarget
+                         inlines  DevicePlatC::GetAuxillarySurface, DevicePlatC::GetGCMSurface, DevicePlatC::SetRenderTargetChanged, RNADebugBreak, TextureC::GetFormat, TexturePlatC::GetGcmTexture
+  951  00839438     54  void DevicePlatC::FlushRenderTargets(const struct DevicePlatC* this)
+                         inlines  Gcm::cellGcmSetSurface
+ 1022  00839D60     C0  void DeviceC::InitRenderStateManager(const struct DeviceC* this)
+                         local  const char[23] __FUNCTION__
+                         local  uint32_t i
+                         inlines  RNADebugBreak
+ 1040  00839CE4     7C  void DeviceC::SetDefaultRenderState(const struct DeviceC* this)
+                         local  uint32_t i
+ 1053  0083948C     10  bool DeviceC::IsRenderStateDirty(const struct DeviceC* this)
+ 1058  00839C2C     14  void DeviceC::InvalidateRenderState(const struct DeviceC* this)
+ 1068  0083949C      8  bool DeviceC::IsShadowedStateConsistentWithHWState(const struct DeviceC* this)
+ 1076  00839C40     A4  void DeviceC::SetRenderState_typeless(const struct DeviceC* this, enum RSStateE eState, int32_t iValue)
+                         local  const char[24] __FUNCTION__
+                         inlines  RNADebugBreak, SETBITS
+ 1084  00839974     B8  void DeviceC::GetRenderState_typeless(const struct DeviceC* this, enum RSStateE eState, void* pValue)
+                         local  const char[24] __FUNCTION__
+                         inlines  RNADebugBreak
+ 1095  0083B9C8   15B0  void DeviceC::FlushRenderState(const struct DeviceC* this)
+                         local  const char[17] __FUNCTION__
+                         local  enum CellGcmEnum gcmSrcColorBlendFactor
+                         local  enum CellGcmEnum gcmDstColorBlendFactor
+                         local  enum CellGcmEnum gcmSrcAlphaBlendFactor
+                         local  enum CellGcmEnum gcmDstAlphaBlendFactor
+                         local  enum CellGcmEnum gcmStencilCompareFunc
+                         local  enum CellGcmEnum gcmStencilFailOp
+                         local  enum CellGcmEnum gcmStencilPassZFailOp
+                         local  enum CellGcmEnum gcmStencilPassZPASSOp
+                         local  enum CellGcmEnum gcmStencilCompareFunc
+                         local  enum CellGcmEnum gcmStencilFailOp
+                         local  enum CellGcmEnum gcmStencilPassZFailOp
+                         local  enum CellGcmEnum gcmStencilPassZPASSOp
+                         local  int32_t val1
+                         local  int32_t val2
+                         local  int32_t val3
+                         local  int32_t val
+                         local  enum CellGcmEnum gcmColorBlendOp
+                         local  enum CellGcmEnum gcmAlphaBlendOp
+                         inlines  ConvertRNABlendModeToGCM, ConvertRNABlendOpToGCM, ConvertRNACompareFuncToGCM, ConvertRNAStencilOpToGCM, Gcm::cellGcmSetAlphaFunc, Gcm::cellGcmSetAlphaTestEnable, Gcm::cellGcmSetBackStencilFunc, Gcm::cellGcmSetBackStencilMask, Gcm::cellGcmSetBackStencilOp, Gcm::cellGcmSetBlendEnable, Gcm::cellGcmSetBlendEquation, Gcm::cellGcmSetBlendFunc, Gcm::cellGcmSetColorMask, Gcm::cellGcmSetColorMaskMrt, Gcm::cellGcmSetCullFace, Gcm::cellGcmSetCullFaceEnable, Gcm::cellGcmSetDepthFunc, Gcm::cellGcmSetDepthMask, Gcm::cellGcmSetDepthTestEnable, Gcm::cellGcmSetPolygonOffset, Gcm::cellGcmSetPolygonOffsetFillEnable, Gcm::cellGcmSetStencilFunc, Gcm::cellGcmSetStencilMask, Gcm::cellGcmSetStencilOp, Gcm::cellGcmSetStencilTestEnable, Gcm::cellGcmSetTwoSidedStencilTestEnable, RNADebugBreak, TESTANDCLEARBITS
+ 1403  00839A2C    11C  bool RNA::FindRenderStateEnumAndTypeFromString(const char* pShaderStateName, const enum RSStateE& eState, const enum RSStateTypeE& eStateType)
+                         local  const char[37] __FUNCTION__
+                         local  uint32_t i
+                         inlines  RNADebugBreak
+ 1424  00839B48     E4  const char* RNA::GetStateNameFromStateEnum(const enum RSStateE& eState)
+                         local  const char[26] __FUNCTION__
+                         inlines  RNADebugBreak
+ 1431  0083ADCC    280  bool RNA::FindRenderStateValueFromStateTypeAndString(const char* pValueString, enum RSStateTypeE eStateType, const int32_t& iResultValue)
+                         local  const char[43] __FUNCTION__
+                         local  float fTemp
+                         local  const struct NameAndValue* pNameToValueTable
+                         local  int32_t iNumEntriesInTable
+                         local  int32_t i
+                         inlines  RNADebugBreak, std::atof
+ 1515  008393D8     58  void ResetToDefaults(const struct <anon>* this)
+ 1538  008394A4     44  bool ValidateSamplerState(const struct <anon>* this)
+                         local  bool bValid
+ 1552  0083A490    734  bool SetNamedSamplerState(const struct <anon>* this, const char* pSamplerState, const char* pSamplerValue)
+                         local  const char[21] __FUNCTION__
+                         local  bool bSuccess
+                         local  int32_t iValue
+                         local  uint32_t val
+                         local  int numScanned
+                         local  int32_t iValue
+                         local  float fVal
+                         local  uint32_t val
+                         local  int numScanned
+                         local  float fR
+                         local  float fG
+                         local  float fB
+                         local  float fA
+                         local  uint32_t val
+                         local  int numScanned
+                         local  uint8_t[17] aAnisostropyLookup
+                         local  uint32_t val
+                         local  int numScanned
+                         inlines  RNADebugBreak, StateManager_FLOAT_RGBA_TO_A8R8G8B8, std::atof
+ 1807  0083ABC4    208  void TestSamplerDataParsing()
+                         local  struct <anon> test
+                         inlines  PS3SamplerDataC
+ 1845  00839568     10  static void _GLOBAL__I__ZN3RNA7DeviceC21SaveEffectRenderStateEv()
+ 1846  00839578     10  static void _GLOBAL__D__ZN3RNA7DeviceC21SaveEffectRenderStateEv()

@@ -1,0 +1,19 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/Headers/GameMode_GreenToGreen.h
+// compiled in: golf_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   48  0033ED50      8  bool GameModeGreenToGreen::SkipFlashTextShotNumber(const struct GameModeGreenToGreen* this)
+   52  0033ED58      8  int8 GameModeGreenToGreen::GetStateAfterBallLands(const struct GameModeGreenToGreen* this, enum PlayerNumber_t PlayerID)
+   54  0033ED60      8  bool GameModeGreenToGreen::SpecialCaseAllowDriver(const struct GameModeGreenToGreen* this)
+   61  0033ED68     14  enum UIScoreCardDispMode_t GameModeGreenToGreen::GetScoreDisplayMode(const struct GameModeGreenToGreen* this, bool getAlternate)
+   62  0033ED7C      8  bool GameModeGreenToGreen::PopulateScoreCardUI(const struct GameModeGreenToGreen* this)
+   69    inline-only   enum TRC_RoundType_t GameModeGreenToGreen::GetRoundType(const struct GameModeGreenToGreen* this)
+   74  0033ED84      8  bool GameModeGreenToGreen::IsShotClockForSinglePlayer(const struct GameModeGreenToGreen* this)
+   77  0033ED8C      8  bool GameModeGreenToGreen::ResetShotClockAfterEachHit(const struct GameModeGreenToGreen* this)
+   85    inline-only   void GameModeGreenToGreen::SetShotsToPass(const struct GameModeGreenToGreen* this, int iShots)
+   86    inline-only   int GameModeGreenToGreen::GetShotsToPass(const struct GameModeGreenToGreen* this)
+   88    inline-only   int GameModeGreenToGreen::GetShotsPassed(const struct GameModeGreenToGreen* this)
+   90    inline-only   void GameModeGreenToGreen::SetBallLimit(const struct GameModeGreenToGreen* this, int balllimit)
+   91    inline-only   void GameModeGreenToGreen::SetStartingBallLimit(const struct GameModeGreenToGreen* this, int startingBalls)
+   92    inline-only   int GameModeGreenToGreen::GetBallLimit(const struct GameModeGreenToGreen* this)
+   94  0033ED94      8  bool GameModeGreenToGreen::IsShotClockPermanent(const struct GameModeGreenToGreen* this)

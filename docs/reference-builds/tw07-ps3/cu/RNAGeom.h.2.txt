@@ -1,0 +1,14 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNARender/RNAGeom.h
+// compiled in: RNABuilder.cpp, RNAGeom.cpp, RNAMeshProcessorImmediate.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   44    inline-only   void GeomC::operator delete(void* address)
+   44    inline-only   struct ICoreAllocator* GeomC::GetClassAllocator()
+   44    inline-only   void* GeomC::operator new(size_t size, const char* text, struct ICoreAllocator* allocator, enum AllocFlags allocator_flags, uint32_t alignment)
+   50    inline-only   int32_t GeomC::GetNumMeshes(const const struct GeomC* this)
+   71    inline-only   struct MeshC* GeomC::GetMesh(const const struct GeomC* this, int32_t iMesh)
+                         local  const char[8] __FUNCTION__
+   77    inline-only   MatIndexT GeomC::GetMeshMatIndex(const const struct GeomC* this, int32_t iMesh)
+                         local  const char[16] __FUNCTION__
+   83    inline-only   void GeomC::SetMeshMatIndex(const struct GeomC* this, int32_t iMesh, MatIndexT MatIndex)
+                         local  const char[16] __FUNCTION__

@@ -1,0 +1,86 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/source/common/DbManager.cpp
+// compiled in: DbManager.cpp
+// 24 functions, source order. line | PS3 address | size
+
+    0  007CD904    354  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+  139  007CD1F4    710  enum TDbError Setup(struct <anon>* initParms)
+                         local  const char[6] __FUNCTION__
+                         local  struct <anon> lock
+                         local  enum TDbError dbError
+                         local  uint32_t counter
+  276  007CCFA0    254  enum TDbError Teardown()
+                         local  const char[9] __FUNCTION__
+                         local  struct <anon> lock
+  300  007CB0F8    174  void AddDatabase(struct Database* db)
+                         local  const char[12] __FUNCTION__
+                         local  struct Database* temp
+  341  007CCD98    208  enum TDbError ListAllDatabases(struct Database** databaseList, int* maxItems)
+                         local  const char[17] __FUNCTION__
+                         local  struct <anon> lock
+                         local  uint32_t realMax
+                         local  struct Database* db
+                         local  enum TDbError ret
+  387  007CCC28    170  enum TDbError GetUnusedDbRef(DbRef* pDbRef)
+                         local  const char[15] __FUNCTION__
+                         local  struct <anon> lock
+                         local  uint8_t uDbNum
+  442  007CC710    518  enum TDbError PushAsDefaultDb(DbRef defaultDb, TableRef* pTableList, DbRef* pDbList)
+                         local  const char[16] __FUNCTION__
+                         local  struct <anon> lock
+                         local  struct Database* pDb
+                         local  uint32_t stackCount
+                         local  enum TDbError ret
+  523  007CC50C    204  enum TDbError PopDefaultDb()
+                         local  const char[13] __FUNCTION__
+                         local  struct <anon> lock
+                         local  uint32_t stackCount
+                         local  enum TDbError ret
+  559  007CBDE0    174  DbRef GetDefaultDb()
+                         local  const char[13] __FUNCTION__
+                         local  struct <anon> lock
+                         local  uint32_t stackCount
+                         local  DbRef dbRef
+  589  007CBCEC     F4  struct Query* FindQuery(QueryRef qref)
+                         local  struct <anon> lock
+                         local  struct Query* pQry
+  612  007CB26C    114  int GetNumDatabases()
+                         local  const char[16] __FUNCTION__
+                         local  int entryCnt
+                         local  struct Database* temp
+  643  007CB380     E4  QueryRef GetUnusedQueryRef()
+                         local  struct Query* pQry
+                         local  QueryRef qryRef
+  702  007CBA40    2AC  enum TDbError RegisterQueryCallback(QueryCallback callbackFunc, const uint32_t qryName)
+                         local  const char[22] __FUNCTION__
+                         local  struct <anon> lock
+                         local  enum TDbError dbResult
+                         local  uint32_t counter
+  755  007CB89C    1A4  enum TDbError UnRegisterQueryCallback(uint32_t qryName)
+                         local  const char[24] __FUNCTION__
+                         local  struct <anon> lock
+                         local  uint32_t counter
+  794  007CC2A4    268  struct Database* GetDefaultDbForTable(TableRef tableRef)
+                         local  const char[21] __FUNCTION__
+                         local  DbRef defaultDbRef
+                         local  DbRef dbRef
+                         local  uint32_t stackCount
+                         local  struct Database* database
+  841  007CC220     84  struct Database* FindDatabase(DbRef dbRef)
+                         local  struct <anon> lock
+  849  007CBF54    158  struct Database* FindDbWithoutLockCheck(DbRef dbRef)
+                         local  const char[23] __FUNCTION__
+                         local  struct Database* pDb
+  877  007CC0AC     C4  struct Table* FindTable(DbRef dbRef, TableRef tbRef)
+                         local  struct <anon> lock
+                         local  struct Database* db
+  903  007CC170     B0  struct TableIndex* FindIndex(DbRef dbRef, TableRef tbRef, IndexRef indexRef)
+                         local  struct Table* table
+  931  007CB73C    160  void ClearModFlags()
+                         local  struct <anon> lock
+                         local  struct Query* pQry
+  992  007CB464    2D8  void MutexLock()
+                         local  const char[10] __FUNCTION__
+ 1019  007CAFA8    150  void MutexUnlock()
+                         local  const char[12] __FUNCTION__
+ 1032  007CDC58     3C  static void _GLOBAL__I__ZN2EA4T3db9DbManager15sStringCallbackE()
+ 1033  007CDC94     3C  static void _GLOBAL__D__ZN2EA4T3db9DbManager15sStringCallbackE()

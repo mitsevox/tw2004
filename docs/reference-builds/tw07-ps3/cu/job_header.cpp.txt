@@ -1,0 +1,6 @@
+// C:/packages/job_manager/1.11.00/source/common/detail/job_header.cpp
+// compiled in: job_header.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   19  00705D48      8  struct Job* GetJob(const const struct <anon>* this)
+   28  00705D50     40  JobRawPtr GetDependency(const const struct <anon>* this, int i)

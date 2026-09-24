@@ -1,0 +1,50 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_Terrain.cpp
+// compiled in: shader_unity.cpp
+// 36 functions, source order. line | PS3 address | size
+
+   40  0051BA7C    1B8  void SM_TerrainClass::SM_TerrainClass(const struct SM_TerrainClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base, vec4flt_Zero, vec_st
+  112  00509C58    88C  void SM_TerrainClass::Load(const struct SM_TerrainClass* this)
+  198  0050A4E4    314  void SM_TerrainClass::Activate(const struct SM_TerrainClass* this)
+  241  0050A7F8     50  void SM_TerrainClass::Deactivate(const struct SM_TerrainClass* this)
+  256  0051294C     AC  void SM_TerrainClass::TurnOffBaseLayer(const struct SM_TerrainClass* this, bool altShader)
+  279  005129F8     74  void SM_TerrainClass::SetHighResUVScale(const struct SM_TerrainClass* this, float s0, float s1)
+  289  00512A6C     8C  void SM_TerrainClass::SetHasHighResTexture(const struct SM_TerrainClass* this, bool hhrt)
+  299  00512AF8     8C  void SM_TerrainClass::SetHasOverlayTexture(const struct SM_TerrainClass* this, bool hot)
+  309  00512B84     8C  void SM_TerrainClass::SetIsStructure(const struct SM_TerrainClass* this, bool is)
+  319  00512C10     60  void SM_TerrainClass::SetBaseTerrainMipBias(const struct SM_TerrainClass* this, float mipbias)
+  329  00512C70     64  void SM_TerrainClass::SetColorTerrainTexture(const struct SM_TerrainClass* this, TextureRef tr)
+  339  00512CD4     60  void SM_TerrainClass::SetCloudShadowContribution(const struct SM_TerrainClass* this, float contribution)
+  349  00512D34     64  void SM_TerrainClass::SetCloudShadowTexture(const struct SM_TerrainClass* this, TextureRef tr)
+  359  00518064     6C  void SM_TerrainClass::SetFogColor(const struct SM_TerrainClass* this, float* camPos)
+                         inlines  vec4flt_Copy
+  369  005180D0     6C  void SM_TerrainClass::SetFogCameraPos(const struct SM_TerrainClass* this, float* camPos)
+                         inlines  vec4flt_Copy
+  379  00512D98     60  void SM_TerrainClass::SetFogDensity(const struct SM_TerrainClass* this, float f)
+  389  00512DF8     60  void SM_TerrainClass::SetFogStartRadius(const struct SM_TerrainClass* this, float f)
+  399  00512E58     60  void SM_TerrainClass::SetFogHeightTop(const struct SM_TerrainClass* this, float f)
+  409  00512EB8     64  void SM_TerrainClass::SetHighResColorTexture(const struct SM_TerrainClass* this, TextureRef tr)
+  430  00512F1C     64  void SM_TerrainClass::SetOverlayTexture(const struct SM_TerrainClass* this, TextureRef tr)
+  450  00512F80     64  void SM_TerrainClass::SetShadowTexture(const struct SM_TerrainClass* this, TextureRef tr)
+  460  00512FE4     64  void SM_TerrainClass::SetHRShadowTexture(const struct SM_TerrainClass* this, TextureRef tr)
+  470  00513048     64  void SM_TerrainClass::SetTerLightmapTexture(const struct SM_TerrainClass* this, TextureRef tr)
+  490  005130AC     60  void SM_TerrainClass::SetHRTextureFadeFactor(const struct SM_TerrainClass* this, float f)
+  500  0051310C     60  void SM_TerrainClass::SetDistToStopFadingStructures(const struct SM_TerrainClass* this, float dist)
+  510  0051316C     60  void SM_TerrainClass::SetStructureFadeAlpha(const struct SM_TerrainClass* this, float a)
+  520  0051813C     6C  void SM_TerrainClass::SetHRCamPos(const struct SM_TerrainClass* this, float* camPos)
+                         inlines  vec4flt_Copy
+  530  005131CC     70  void SM_TerrainClass::SetHRShadowDispUnscaled(const struct SM_TerrainClass* this, float dx, float dy, float dz)
+  540  0051323C     60  void SM_TerrainClass::SetHRShadowDist(const struct SM_TerrainClass* this, float d)
+  550  0051329C     60  void SM_TerrainClass::SetLodRcpDist(const struct SM_TerrainClass* this, float d)
+  561  005181A8     6C  void SM_TerrainClass::SetLowResShadowsColor(const struct SM_TerrainClass* this, float* c)
+                         inlines  vec4flt_Copy
+  572  00518214     6C  void SM_TerrainClass::SetShadowsColor(const struct SM_TerrainClass* this, const vec4flt& c)
+                         inlines  vec4flt_Copy
+  582  00518280     B4  void SM_TerrainClass::SetMshadow(const struct SM_TerrainClass* this, float[4]* pShadow)
+                         inlines  vec4flt_Copy, vec_st
+  594  00518334     B4  void SM_TerrainClass::SetMshadowHR(const struct SM_TerrainClass* this, float[4]* pShadow)
+                         inlines  vec4flt_Copy, vec_st
+  606  005183E8     B4  void SM_TerrainClass::SetMshadowGolfer(const struct SM_TerrainClass* this, float[4]* pShadow)
+                         inlines  vec4flt_Copy, vec_st
+  619  0051849C     88  void SM_TerrainClass::SetMcloudShadows(const struct SM_TerrainClass* this, float[4]* pShadow)
+                         inlines  vec4flt_Copy, vec_st

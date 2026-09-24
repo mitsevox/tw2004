@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_FilterFast.cpp
+// compiled in: shader_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   34  0051B854     4C  void SM_FilterFastClass::SM_FilterFastClass(const struct SM_FilterFastClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base
+   44  005095B0    108  void SM_FilterFastClass::Load(const struct SM_FilterFastClass* this)
+   58  005096B8     74  void SM_FilterFastClass::Activate(const struct SM_FilterFastClass* this)
+   67  0050972C     38  void SM_FilterFastClass::Deactivate(const struct SM_FilterFastClass* this)
+   74  0051254C     74  void SM_FilterFastClass::SetFilterSampleBase(const struct SM_FilterFastClass* this, float b0, float b1)
+   84  005125C0     74  void SM_FilterFastClass::SetFilterOffset3(const struct SM_FilterFastClass* this, float v0, float v1)
+   94  00512634     64  void SM_FilterFastClass::SetFilterTexture(const struct SM_FilterFastClass* this, TextureRef texRef)

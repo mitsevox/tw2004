@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/kickstart/source/common/./kickstartfacadeconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   44    inline-only   struct <anon>* GetInstance()
+   45  0062657C      8  struct KickStartExtension* GetKickStartExtension(const const struct <anon>* this)
+   46  006259F0      8  struct KickStartExtensionConcrete* GetKickStartExtensionConcrete(const const struct <anon>* this)

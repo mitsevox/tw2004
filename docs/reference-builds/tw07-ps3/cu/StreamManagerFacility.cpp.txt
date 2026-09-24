@@ -1,0 +1,30 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/streaming/StreamManagerFacility.cpp
+// compiled in: golf2_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   28  00140348     6C  void StreamManagerFacility::RegisterStreamClients(const struct StreamManagerFacility* this)
+   78  001401E8     5C  void StreamManagerFacility::UnregisterStreamClients(const struct StreamManagerFacility* this)
+  121  00135F78     34  void StreamManagerFacility::BeginStreamCallbackFacilityChar(void* pData)
+  148  00135FAC      4  void StreamManagerFacility::EndStreamCallbackFacilityChar(void* pData)
+  158  0018E4FC    2FC  void StreamManagerFacility::SetupFileStream(const struct StreamManagerFacility* this)
+                         local  char[128] newCharBuff
+                         local  int32[2] haveGenderFlags
+                         local  const char*[2] genderStreams
+                         local  int j
+                         local  int i
+                         local  int32 gender
+                         local  enum Golfer_t golfer
+                         local  struct GolferData_t* golferData
+                         local  int32 gender
+                         local  int i
+                         local  int32 charHandle
+                         inlines  CharModelMgr::IncrementMaxCharacterInUse, Singleton<GolferStats>::GetSingleton
+  232  00135FB0     5C  void StreamManagerFacility_RenderProgressBar(float completion)
+                         local  struct UILoadingScreen* lScreen
+  242  0013600C    1BC  void StreamManagerFacility::StreamFiles(const struct StreamManagerFacility* this)
+                         local  bool bStillStreaming
+                         local  bool dashboardAutoUpdating
+                         local  int32 curFile
+                         local  int32 curOffset
+                         local  int32 fileSize
+                         local  float completion

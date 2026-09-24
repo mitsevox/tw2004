@@ -1,0 +1,97 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_OnlineLobbyRoomMatches.cpp
+// compiled in: apt_unity.cpp
+// 21 functions, source order. line | PS3 address | size
+
+   76  000F72B4     A0  void UIOnlineLobbyRoomMatches::UIOnlineLobbyRoomMatches(const struct UIOnlineLobbyRoomMatches* this)
+                         inlines  TArrayInternal<UIOnlineLobbyRoomMatches::MatchesMenuItem,AptStructSwapper>::TArrayInternal, TExternArray<UIOnlineLobbyRoomMatches::MatchesMenuItem>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   84  000F05F0     90  void UIOnlineLobbyRoomMatches::Init(const struct UIOnlineLobbyRoomMatches* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   98  00067298     88  void UIOnlineLobbyRoomMatches::Show(const struct UIOnlineLobbyRoomMatches* this)
+  119  000C4778     90  void UIOnlineLobbyRoomMatches::OnShow(const struct UIOnlineLobbyRoomMatches* this)
+  141  00047F18     90  void UIOnlineLobbyRoomMatches::Hide(const struct UIOnlineLobbyRoomMatches* this)
+  158  0006FE20    43C  void UIOnlineLobbyRoomMatches::_SetLobbyRoomMatchesGameInformation(const struct UIOnlineLobbyRoomMatches* this)
+                         local  char[32] sGolfer
+                         local  char[32] sHoles
+                         local  char[20] sDiff
+                         local  char[5] sRanked
+                         local  char[5] sHandicapped
+                         local  char[5] sShotClock
+                         local  char[5] sHeadset
+                         local  char[16] sWager
+                         local  char* pGame
+                         local  struct LobbyMatchupOSDK* pLobbyMatchup
+                         local  struct OnlineMatchParams* pParams
+                         inlines  LobbyMatchupOSDK::GetSearchParamsRef, OnlineManagerOSDK::GetLobbyMatchup
+  240  000C4608    170  void UIOnlineLobbyRoomMatches::UpdateItemAndLabel(const struct UIOnlineLobbyRoomMatches* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct GameSession* pGame
+                         local  struct LobbyMatchupOSDK* pLobbyMatchup
+                         local  struct MatchesMenuItem* dest
+                         inlines  OnlineManagerOSDK::GetLobbyMatchup
+  301  000C4348    2C0  enum eAptHandleInput UIOnlineLobbyRoomMatches::HandleInput(const struct UIOnlineLobbyRoomMatches* this, int32 cID)
+                         local  struct LobbyMatchupOSDK* pLobbyMatchup
+                         local  struct OnlineMatchParams* pParams
+                         local  int32 wager
+                         local  char[32] money
+                         local  char[32] moneyString
+                         inlines  LobbyMatchupOSDK::GetSearchParamsRef, OnlineManagerOSDK::GetLobbyMatchup
+  403  000C3DB8    310  void UIOnlineLobbyRoomMatches::RefreshLobbyMatchesList(const struct UIOnlineLobbyRoomMatches* this, int32 numUsers, int32 activeUserIndex)
+                         local  int32 savefirstRowIndex
+                         local  int32 savemLastUpdateRowIndex
+                         local  float saveTargerMenuPos
+                         local  float saveMenuPos
+                         local  float saveMenuVel
+                         local  int32 saveAnimFrames
+                         local  int32 i
+                         local  struct LobbyMatchupOSDK* pLobbyMatchup
+                         local  struct GameSession* pGame
+                         local  struct LobbyMatchupOSDK* pLobbyMatchup
+                         local  struct GameSession* pGame
+                         inlines  UIExternScrollMenuIterator::GetActiveItemIndex
+  486  00047E60     A0  void UIOnlineLobbyRoomMatches::HandleOwnInput(const struct UIOnlineLobbyRoomMatches* this)
+  500  000C3CD4     E4  bool UIOnlineLobbyRoomMatches::UpdateGameInfo(const struct UIOnlineLobbyRoomMatches* this, int index)
+                         local  bool bRet
+                         local  struct GameSession* pGame
+                         local  struct LobbyMatchupOSDK* pLobbyMatchup
+                         inlines  OnlineManagerOSDK::GetLobbyMatchup
+  552  0005CFF8     4C  bool UIOnlineLobbyRoomMatches::CheckIfOwnGameExists(const struct UIOnlineLobbyRoomMatches* this)
+                         local  struct LobbyMatchupOSDK* pLobbyMatchup
+                         inlines  OnlineManagerOSDK::GetLobbyMatchup
+  584  00077664    164  static void _AcceptWager()
+                         local  struct GameSession* pGame
+                         local  struct LobbyMatchupOSDK* pLobbyMatchup
+                         local  struct OnlineMatchParams* pParams
+                         local  uint32_t iWagerAmount
+                         local  struct User* pUser
+                         local  struct <anon>* pStatStrategy
+                         inlines  LobbyMatchupOSDK::GetSearchParamsRef, OnlineManagerOSDK::GetLobbyMatchup
+  624  00047FA8      4  static void _DontAccept()
+  631  00077510    154  static void _CheckCreatedContent()
+                         local  struct GameSession* pGame
+                         local  struct LobbyMatchupOSDK* pLobbyMatchup
+                         local  struct OnlineMatchParams* pParams
+                         inlines  LobbyMatchupOSDK::GetSearchParamsRef, OnlineManagerOSDK::GetLobbyMatchup
+  679  00077430     E0  static void _CheckValidGame()
+                         local  struct LobbyMatchupOSDK* pLobbyMatchup
+                         local  struct GameSession* pGame
+                         inlines  LobbyMatchupOSDK::GetCurAdvertName, OnlineManagerOSDK::GetLobbyMatchup
+  700  00067320     A0  void UIOnlineLobbyRoomMatches::LooseFocus(const struct UIOnlineLobbyRoomMatches* this, uint32 gointTo_Signature)
+  710  0006FB28     E4  void UIOnlineLobbyRoomMatches::RegainFocus(const struct UIOnlineLobbyRoomMatches* this, uint32 comeFrom_Signature)
+                         local  char[256] stringBuffer
+  730  000C420C    13C  void UIOnlineLobbyRoomMatches::SelectPreviousInGameList(const struct UIOnlineLobbyRoomMatches* this)
+                         local  struct LobbyMatchupOSDK* pLobbyMatchup
+                         local  int numInList
+                         local  int iUserPos
+                         local  struct GameSession* pGame
+                         inlines  OnlineManagerOSDK::GetLobbyMatchup
+  757  000C40C8    144  void UIOnlineLobbyRoomMatches::SelectNextInGameList(const struct UIOnlineLobbyRoomMatches* this)
+                         local  struct LobbyMatchupOSDK* pLobbyMatchup
+                         local  int numInList
+                         local  int iUserPos
+                         local  struct GameSession* pGame
+                         inlines  OnlineManagerOSDK::GetLobbyMatchup
+  785  0005D044    10C  int UIOnlineLobbyRoomMatches::GetLocationInGameList(const struct UIOnlineLobbyRoomMatches* this, char* nameToFind)
+                         local  struct LobbyMatchupOSDK* pLobbyMatchup
+                         local  int numInList
+                         local  int posInList
+                         local  struct GameSession* pGame
+                         inlines  OnlineManagerOSDK::GetLobbyMatchup

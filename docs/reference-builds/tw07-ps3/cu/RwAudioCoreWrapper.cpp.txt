@@ -1,0 +1,410 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/audio/RwAudioCoreWrapper.cpp
+// compiled in: other_unity.cpp
+// 98 functions, source order. line | PS3 address | size
+
+   61  003DC850     80  int32_t PS3SysUtilInit()
+                         local  CellAudioOutConfiguration a_config
+                         local  int32_t ret
+  265  003DC8D0     E0  void RwAudioCoreWrapper_DumpSample(void* pRamDataBegin, void* pRamDataEnd)
+                         local  char* pByteDataBegin
+                         local  char* pByteDataEnd
+                         local  int numbytes
+                         local  char byte
+                         local  int count
+  298  003DC9B0     74  void RwAudioCoreWrapper_TSNDBank_DebugPrint(const float& x, const float& y, PRINTFFN PrintfFn, const struct TSNDBank& bank)
+                         local  const float LINE
+                         local  int index
+  333  003DCA24     FC  void RwAudioCoreWrapper_TSNDBank_DebugPrint(const float& x, const float& y, PRINTFFN PrintfFn)
+                         local  const float LINE
+                         local  float xindent
+                         local  int i
+                         local  const struct TSNDBank& bank
+  356  003DCB20     78  void RwAudioCoreWrapper_TManagedBank_DebugPrint(const float& x, const float& y, PRINTFFN PrintfFn, const struct TManagedBank*& managedbank)
+                         local  const float LINE
+                         local  int index
+  380  003DCB98     FC  void RwAudioCoreWrapper_TManagedBank_DebugPrint(const float& x, const float& y, PRINTFFN PrintfFn)
+                         local  const float LINE
+                         local  float xindent
+                         local  int i
+                         local  const struct TManagedBank*& managedbank
+  410  003DCC94     20  float LowPassFilter(float y0, float y1, float k)
+  653  003E6D48    764  int RwAudioCoreWrapper_InitOnce()
+                         local  int err
+                         local  const uint32 nNumAudioPools
+                         local  struct CorePoolDescriptor[26] desc
+                         local  uint32 n
+                         local  uint32 nNumTiny
+                         local  uint32 nNumSmall
+                         local  uint32 nNumMedium
+                         local  struct DecoderRegistry* pDecoderRegistry
+                         local  struct PlugInRegistry* pPlugInRegistry
+                         local  struct <anon>* subMixHandle
+                         local  struct <anon>* dacHandle
+                         local  struct ConstructorParams subMixConstructorParams
+                         local  struct <anon>[2] masterPlugInConfig
+                         local  struct PlugIn** pMasterPlugInPtrs
+  901  003DCCB4     C0  void RwAudioCoreWrapper_ExitOnce()
+  945  00414DD4    330  int RwAudioCoreWrapper_InitModule(bool bEnteringFrontEnd)
+                         local  int numTimesEnteringGame
+                         local  int i
+                         inlines  CorePoolAllocator::SetPoolType
+ 1054  0040DC4C     1C  double RwAudioCoreWrapper_GetSysTime()
+ 1065  00436068    218  static void FreeSNDVoices()
+                         local  TI_STimeValue start
+                         inlines  TI_fConvertTimeDifToSeconds, TI_uiReadCP0Count
+ 1115    inline-only   static void FreeStreamPools()
+                         local  int numEntriesFree_StreamPool1
+                         local  int numEntriesFree_StreamPool2
+                         local  int i
+                         local  TI_STimeValue start
+ 1182  00436490    56C  void RwAudioCoreWrapper_ExitModule()
+                         local  int i
+                         inlines  FreeStreamPools
+ 1239  003DCEEC     5C  int RwAudioCoreWrapper_InitHole()
+ 1254  00436400     90  void RwAudioCoreWrapper_ExitHole()
+ 1282  003E6778     B8  uint32 RwAudioCoreWrapper_GetStreamFileGuid()
+                         local  uint32 guid
+                         local  char[64] buf
+                         local  int32 uberStrmFile
+                         local  uint32 bytesRead
+ 1307  003DCF48    1D4  static bool loadBank(TStreamDataPtr pStrmData, struct TSNDBank* pBankSlot)
+                         local  uint16* pdata
+                         local  uint32* pSample
+                         local  int i
+ 1349  003DCE50     9C  static void freeBank(struct TSNDBank* pBankSlot)
+ 1387  004369FC    57C  bool RwAudioCoreWrapper_InitManagedBank(TStreamDataPtr pBankStrmData, TStreamDataPtr pInstrStrmData, TBankDebugInfo* pInstrDebugData, uint32 resType)
+                         local  struct TManagedBank* pBank
+                         local  int bankIndex
+                         local  int bankToneIndex
+                         local  bool bSuccess
+                         local  uint32 offset
+                         local  uint32* ptr
+                         local  uint32 numptrs
+                         local  uint32 i
+                         local  int j
+                         local  int j
+                         local  int k
+                         local  bool bIslooper
+ 1504  00436280     E0  void RwAudioCoreWrapper_FreeManagedBank(int bankIndex)
+                         local  struct TManagedBank* pBankSlot
+ 1534  003DD11C     BC  TInstr* RwAudioCoreWrapper_GetInstrument(uint32 guid)
+                         local  int i
+                         local  struct TManagedBank* pBank
+                         local  int j
+ 1567  00435AD4     14  int GetSndPlayerNumChans(void* pRamData)
+ 1581  00435AE8    120  static bool GetSndPlayerIsLooper(void* pRamData)
+                         local  struct <anon> bitGetter
+                         local  unsigned char loopFlag
+                         inlines  GetBits, SetBitBuffer
+ 1596  00435C08     B8  bool RwAudioCoreWrapper_IsLooper(int bankIndex, int toneIndex)
+                         local  struct TManagedBank* pBank
+ 1607  0045173C    154  bool Debug_PlayManagedBankSample(int bankIndex, int sampleIndex)
+                         local  struct VoiceData* pv
+                         local  uint16 azimuth
+                         local  uint16 vol
+ 1639  0044AE38    424  static bool playManagedBankSample(struct VoiceData* pv, int bankIndex, int sampleIndex, uint16 vol, uint16 azimuth, uint16 initPitch, bool bReverb, uint16 lowpass, Chandle ch, uint32 flags)
+                         local  struct TManagedBank* pBank
+                         local  int voiceInitFlags
+                         local  int instrIndex
+                         local  const char* lastPlayedInstrName
+                         local  const char* lastPlayedToneName
+                         local  int numChans
+                         local  float fAttackDuration
+ 1700  004074BC     7C  static bool preDownloadBank(Drive3DChunkHdrPtr pHeader)
+                         local  bool bDisableRuntimeAudio
+ 1720  003DD23C     D4  static void onDownloadBank(TStreamDataPtr pStrmData)
+ 1742  003DD310    124  bool RwAudioCoreWrapper_IgnoreBudget(bool bIgnore)
+                         local  bool bRet
+ 1772  00449E68    FD0  static bool playSample(struct VoiceData* pv, struct TSNDBank* pBankSlot, int sampleIndex, uint16 vol, uint16 azimuth, uint16 initPitch, uint16 lowpass, int voiceInitFlags, uint32 flags)
+                         local  const char* toneName
+                         local  bool bDisableRuntimeAudio
+                         local  float fAzi
+                         local  float fVol
+                         local  void* pRamData
+                         local  int numChans
+                         local  int origNumChans
+                         local  struct <anon>[14] plugInConfig
+                         local  int pluginCount
+                         local  int[14] pi_indeces
+                         local  int source_plugin
+                         local  int rechannel_plugin
+                         local  int resample_plugin
+                         local  int gain_plugin
+                         local  int gainfader_plugin
+                         local  int route_plugin
+                         local  bool bMirrorStereo
+                         local  int pan2d_plugin
+                         local  int send_plugin
+                         local  struct PlugIn** pPlugInPtrs
+                         local  float fDefaultSendGain
+                         local  struct PlayParams playParams
+                         local  struct ConnectByPointerParams connectByPointerParams
+                         local  int* p
+                         local  int* start
+                         local  int* end
+                         local  int i
+                         local  int i
+                         local  int index
+                         local  struct ConnectByPointerParams routeParams
+                         local  vec4flt teepos
+                         local  vec4flt holepos
+                         local  float tee_to_hole_distance
+                         local  float min_dist
+                         local  float max_dist
+                         local  uint32 min_distance
+                         local  uint32 max_distance
+                         local  uint32 diff_distance
+                         local  uint32 random_distance
+                         local  float fRandomDistance
+                         local  const float fMinDistClamp
+                         local  const float fMaxDistClamp
+                         local  uint32 random_azimuth
+                         local  float fAzimuthDegrees
+                         local  float fAzimuthRadians
+                         local  float x
+                         local  float z
+                         local  vec4flt camerapos
+                         local  int* p
+                         local  int* start
+                         local  int* end
+                         local  struct TSpuChannel* pChannel
+                         local  vec4flt cameraPos
+                         local  vec4flt cameraOr
+                         local  vec4flt cameraUp
+                         local  struct CA_SCamera* pcam
+                         local  vec4flt cameraOrCrossUp
+                         local  vec4flt position3d
+                         local  float distance
+                         local  float maxdist
+                         local  float attenuation
+                         local  float gain
+                         local  float volume
+                         inlines  Attenuation3D, LLMath_CrossProduct3W0, LLMath_DistanceBetween3, Mas_GetSubmix, audfrac_Mul, std::cosf, std::sinf, vec_madd, vec_nmsub, vec_perm
+ 2334  003DD1D8     64  static struct VoiceData* GetFreeTrackedVoice()
+                         local  int i
+ 2354  00412470    10C  static void FreeTrackedVoices(bool bKillAll)
+                         local  int i
+ 2386  00451890    140  bool RwAudioCoreWrapper_PlaySample(int bankIndex, int sampleIndex, uint16 vol, uint32 flags)
+                         local  struct VoiceData* pv
+ 2408  0041257C      8  void RwAudioCoreWrapper_StopSample(int bankIndex, int sampleIndex)
+ 2421  003DDB4C     7C  void RwAudioCoreWrapper_UpdateStreamMirroredVolume()
+                         local  const struct VoiceData& vd
+ 2442  003DDBEC    17C  static bool createRearSubmixVoice(struct VoiceData* pv, float fVol)
+                         local  struct <anon>[5] plugInConfig
+                         local  int pluginCount
+                         local  int numChans
+                         local  struct PlugIn** pPlugInPtrs
+                         local  struct ConnectByPointerParams RouteVoiceParams
+ 2512  0040E1A4    A64  static bool PrimeOrPlayStream(const char* strmName, int offset_strm, int offset_ram, int type, bool bLoop, bool bPrime, uint16 vol, float timeMult, AudStmStatusCallbackPtr pCallback, int callbackUserData, bool bIsMusic, uint32 flags)
+                         local  bool bDisableRuntimeAudio
+                         local  float fVol
+                         local  float fOrigVol
+                         local  struct <anon>[11] plugInConfig
+                         local  int numChans
+                         local  const struct VoiceData& vd
+                         local  int pluginCount
+                         local  int source_plugin
+                         local  struct ConstructorParams cparams
+                         local  int rechannel_plugin
+                         local  int resample_plugin
+                         local  int gain_plugin
+                         local  int gainfader_plugin
+                         local  int musicarbitrator_plugin
+                         local  bool bMirrorStereo
+                         local  int matrixpan_plugin
+                         local  int submix_plugin
+                         local  int send_plugin
+                         local  struct PlugIn** pPlugInPtrs
+                         local  struct PlayParams playParams
+                         local  struct ConnectByPointerParams connectByPointerParams
+                         local  struct ConnectByPointerParams routeParams
+ 2820  0040EFE4    17C  bool RwAudioCoreWrapper_PlayStream(const char* strmName, int type, bool bLoop, uint16 vol, AudStmStatusCallbackPtr pCallback, int callbackUserData, uint32 flags)
+ 2850  0040EF84     60  bool RwAudioCoreWrapper_PrimeStream(const char* strmName, int type, AudStmStatusCallbackPtr pCallback, int callbackUserData, uint32 flags)
+ 2860  0040EC80     94  bool RwAudioCoreWrapper_PlayStreamEntry(int offset_strm, int offset_ram, int type, bool bLoop, uint16 vol, float timeMult, AudStmStatusCallbackPtr pCallback, int callbackUserData, uint32 flags)
+ 2870  0040EC08     78  bool RwAudioCoreWrapper_PrimeStreamEntry(int offset_strm, int offset_ram, int type, AudStmStatusCallbackPtr pCallback, int callbackUserData, bool bIsMusic, uint32 flags)
+ 2881  003DD774    3A4  bool RwAudioCoreWrapper_PlayPrimedStream(int type, bool bLoop, uint16 vol, float timeMult)
+                         local  float fVol
+ 2958  0040DC68    3CC  void RwAudioCoreWrapper_StopStream(int type, int msFade)
+                         local  struct StartFadeParams fadeParams
+ 3028  003DCD9C     68  static void resetVoiceData(struct VoiceData* pData)
+                         local  int i
+ 3052  003DCE04     4C  static void resetStreamData(struct AudioStreamData* pData)
+ 3072  003DCD74     28  static void resetBankData(struct TSNDBank* pData)
+ 3089  00411F28    548  static void ServiceStreams()
+                         local  int i
+                         local  struct Voice* pVoice
+                         local  bool bVoiceExpelled
+                         local  float curRequest
+                         local  double samplePos
+                         local  double sampleLen
+                         local  struct PlugIn* pSndPlayer
+                         local  int prevState
+                         local  float gameTime
+                         local  enum eAudStrmCallbackReason reason
+                         local  struct PlayParams playParams
+ 3233  00444CFC    5DC  void RwAudioCoreWrapper_Service()
+                         local  bool bPlatformMusicPlayerStatus
+                         local  bool bSnd9PlayerStatus
+                         local  int frame
+                         local  int ch
+                         local  const struct TSpuChannel& c
+                         local  float fVol
+                         local  struct PlugIn* pPanPlugin
+                         local  struct PlugIn* pGainPlugin
+                         local  vec4flt position3d
+                         local  float azimuth
+                         local  float distance
+                         local  float maxdist
+                         local  float attenuation
+                         local  float gain
+                         local  float volume
+                         local  float newVolume
+                         inlines  Attenuation3D, LLMath_CrossProduct3W0, Mas_GetSubmix, ServiceSpuSamples, __vec_cross, audfrac_Mul, vec_madd, vec_nmsub, vec_perm
+ 3430  003DDE04     18  bool RwAudioCoreWrapper_EnableReverb(bool bEnable)
+ 3461  003DDE1C     1C  int RwAudioCoreWrapper_SetReverbPreset(int val)
+ 3693  003DDE38     78  void RwAudioCoreWrapper_VoiceData_DebugPrint(const float& x, const float& y, PRINTFFN PrintfFn, const struct VoiceData& voicedata)
+                         local  const float LINE
+                         local  int index
+ 3720  00476A04    390  void RwAudioCoreWrapper_SpuChannel_DebugPrint(const float& x, const float& y, PRINTFFN PrintfFn, const struct TSpuChannel& spuchannel)
+                         local  const float LINE
+                         local  const char* toneName
+                         local  int index
+                         local  const int length
+                         local  char[512] buffer
+                         local  float fAzi
+                         local  int i
+                         local  vec4flt emitter_location
+                         local  vec4flt blue
+ 3793  003DDEB0     84  void RwAudioCoreWrapper_StreamData_DebugPrint(const float& x, const float& y, PRINTFFN PrintfFn, const struct AudioStreamData& streamdata)
+                         local  const float LINE
+                         local  int index
+ 3829  00476D94    314  void RwAudioCoreWrapper_SpuChannel_DebugPrint(const float& x, const float& y, PRINTFFN PrintfFn)
+                         local  const float LINE
+                         local  int32 currentflags
+                         local  float xindent
+                         local  int i
+                         local  const struct TSpuChannel& spuchannel
+                         local  const struct VoiceData& voicedata
+                         local  const struct AudioStreamData& streamdata
+                         local  float x
+                         local  float y
+ 3925  0040F58C     44  static void RwAudioCoreWrapper_Spu_Reset()
+                         local  int ch
+ 3936  0040F1B8    148  void RwAudioCoreWrapper_Spu_ParkChan(Chandle ch, bool bLooping)
+                         local  const struct TSpuChannel& c
+ 3988    inline-only   static float CalcPitchMult(const struct TSNDBank& bank, uint8 sampleIndex)
+                         local  float fPitchMult
+                         local  int16 detune
+                         local  int16 randDetune
+                         local  int thisDetune
+ 4017  0041259C    21C  void RwAudioCoreWrapper_Spu_Release(Chandle ch, uint32 msFade)
+                         local  int ch
+                         local  const struct TSpuChannel& c
+                         local  struct Voice* pv
+                         local  struct StartFadeParams fadeParams
+ 4069  0044B25C    688  void RwAudioCoreWrapper_Spu_SwitchChan(Chandle ch, bool bOn, uint32 flags)
+                         local  const struct TSpuChannel& c
+                         local  int bankIndex
+                         local  struct TManagedBank* pBank
+                         local  float fAttackEnvDuration
+                         local  uint16 modPitch
+                         local  bool bReverb
+                         local  bool bSuccess
+                         local  int instrIndex
+                         local  int sampleIndex
+                         local  int msFade
+                         local  int thisDetune
+                         local  int32 player
+                         local  int32 bank
+                         inlines  CalcPitchMult
+ 4202  0041DEB4    514  void GetAzimuthAndDistance(const float& azi, const float& dist, const vec4flt& emiPos, const vec4flt& micPos, const vec4flt& micOr, const vec4flt& micOrCrossUp)
+                         local  float fbCosAngle
+                         local  float lrCosAngle
+                         local  float fbAngle
+                         local  float lrAngle
+                         local  vec4flt d
+                         local  float lengthSq
+                         local  float length
+                         inlines  LLMath_DotProduct3, LLMath_Subtract, __vec_dot3, vec_madd, vec_sld, vec_sub
+ 4353    inline-only   static void ServiceSpuSamples()
+                         local  vec4flt cameraPos
+                         local  vec4flt cameraOr
+                         local  vec4flt cameraUp
+                         local  vec4flt cameraOrCrossUp
+                         local  int ch
+                         local  const struct TSpuChannel& c
+                         local  float fVol
+                         local  struct PlugIn* pPanPlugin
+                         local  struct PlugIn* pGainPlugin
+                         local  vec4flt position3d
+                         local  float azimuth
+                         local  float distance
+                         local  float maxdist
+                         local  float attenuation
+                         local  float gain
+                         local  float volume
+                         local  float newVolume
+ 4448  00435DD4    294  void RwAudioCoreWrapper_Spu_Dump()
+                         local  char[64] strReleaseData
+                         local  double curSysTime
+                         local  int ch
+                         local  const struct TSpuChannel& c
+                         local  int azi
+                         inlines  GetTime
+ 4483  003DE088     B4  bool RwAudioCoreWrapper_Spu_ChanDone(Chandle ch)
+                         local  bool bDone
+                         local  float gameTime
+ 4529  003DE13C     A0  void RwAudioCoreWrapper_Spu_SetChanSampleInfo(Chandle ch, TTone* ptone)
+ 4540  003DE1DC     E4  void RwAudioCoreWrapper_Spu_SwitchChanRvb(Chandle ch, bool reverbon)
+ 4556  003DE2C0      4  void RwAudioCoreWrapper_Spu_SetLowPassFreq(Chandle ch, uint16 lowpassFreq)
+ 4590  003DE2C4    37C  void RwAudioCoreWrapper_Spu_SetChanVol(Chandle ch, uint16 vol)
+                         local  float fVol
+ 4635  003DE640     30  uint16 RwAudioCoreWrapper_Spu_GetChanVol(Chandle ch)
+ 4645  003DE670    298  void RwAudioCoreWrapper_Spu_SetChan3dPos(Chandle ch, uint16 azimuth)
+                         local  struct PlugIn* pPanPlugin
+                         local  float fAzi
+ 4682  003DE908     30  uint16 RwAudioCoreWrapper_Spu_GetChan3dPos(Chandle ch)
+ 4692  003DE938    158  void RwAudioCoreWrapper_Spu_SetChanPitch(Chandle ch, uint16 pitch, bool bFilter)
+                         local  uint16 modPitch
+ 4713  003DEA90    124  void RwAudioCoreWrapper_Spu_PauseChan(Chandle ch, bool bPause)
+                         local  float fPitch
+ 4729  003DEBB4    190  void RwAudioCoreWrapper_PauseStream(int type, bool bPause)
+                         local  struct Voice* pVoice
+                         local  int t
+ 4764  003DD568    20C  void RwAudioCoreWrapper_SetStreamVol(int type, float fVol)
+ 4788  003DC1B0     44  bool RwAudioCoreWrapper_StreamChanInUse(int type)
+ 4798  003DC1F4     44  bool RwAudioCoreWrapper_StreamChanIsPrimed(int type)
+ 4809  003DC238     3C  bool RwAudioCoreWrapper_StreamChanIsPlaying(int type)
+ 4819  003DC34C     3C  bool RwAudioCoreWrapper_StreamChanIsReleasing(int type)
+ 4829  003DD434    130  void RwAudioCoreWrapper_SetStreamTimeMult(int type, float timeMult)
+ 4865  003FC8C4    2C4  bool RwAudioCoreWrapper_InitStreamTap(struct <anon>* strmHandle, int reqID)
+                         local  const char[33] __FUNCTION__
+                         local  SNDPLAYOPTS spo
+                         local  int overheadSize
+                         local  int ret
+                         inlines  TagValuePair, operator+
+ 4898  003DED44    10C  bool RwAudioCoreWrapper_PlayStreamTap(struct <anon>* strmHandle)
+                         local  int nRet
+ 4918  003DEE50     FC  void RwAudioCoreWrapper_StopStreamTap(struct <anon>* strmHandle, int msFade)
+                         local  int ret
+ 4949  003DEF4C     F4  void RwAudioCoreWrapper_CloseStreamTap(struct <anon>* strmHandle)
+ 4975  003DF040     98  void RwAudioCoreWrapper_DisplayMemoryUsage()
+ 4990  0040F45C    130  void RwAudioCoreWrapper_KillAll()
+                         local  int i
+                         local  int ch
+ 5028  003DF0D8     C8  void RwAudioCoreWrapper_PlayThruBank(int bankIndex)
+ 5098  004515D4    168  void RwAudioCoreWrapper_DebugCmd(int param1, int param2, int param3)
+                         local  bool bDone
+ 5175  003DF1A0     60  void RwAudioCoreWrapper_DebugPrint(const float& x, const float& y, PRINTFFN PrintfFn)
+                         local  const float LINE
+ 5182  003DDDE4      8  bool GetPlatformMusicPlayerStatus()
+ 5199  0040E034     74  void PausePlatformMusicPlayer()
+ 5215  003DF200     54  void ContinuePlatformMusicPlayer()
+ 5235  0040E0A8     FC  void RwAudioCoreWrapper_Snd9Play(void* pDataFile, int size)
+ 5262  003DF254    118  void RwAudioCoreWrapper_Snd9SetVolume(float volume)
+ 5289  003DF36C     24  void RwAudioCoreWrapper_Snd9On(bool on)
+ 5296  003DF390     9C  bool RwAudioCoreWrapper_Snd9GetStatus()
+                         local  enum Status status
+ 5322  003DF534     A0  bool RwAudioCoreWrapper_Snd9Update()
+                         local  enum Status status
+ 5350  003DF42C    108  void RwAudioCoreWrapper_Snd9Stop()

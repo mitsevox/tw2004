@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/Headers/UBitArray.h
+// compiled in: Legacy_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   25    inline-only   void BitArray_SetBit(BitArray_t* bitArray, uint32 bit)
+   37    inline-only   void BitArray_ClearBit(BitArray_t* bitArray, uint32 bit)
+   43    inline-only   bool BitArray_TestBit(BitArray_t* bitArray, uint32 bit)
+   56    inline-only   void BitArray_ClearArray(BitArray_t* bitArray, uint32 numBits)
+                         local  uint32 i

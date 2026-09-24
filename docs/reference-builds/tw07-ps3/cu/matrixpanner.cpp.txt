@@ -1,0 +1,11 @@
+// C:/packages/rwaudiocore/2.08.01/source/plugins/matrixpanner.cpp
+// compiled in: matrixpanner.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    0  006D94F8      C  void ~MatrixPanner(const struct <anon>* this)
+                         inlines  ~PlugIn
+  137  006D9464      8  struct <anon>* GetPlugInDescRunTime()
+  143  006D946C     84  bool CreateInstance(struct PlugIn* pPlugIn, void* pConstructorParams)
+                         local  struct <anon>* pThis
+                         local  unsigned int i
+                         inlines  GetOutputChannels, Initialize<rw::audio::core::MatrixPanner>

@@ -1,0 +1,31 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_XBoxLiveSettings.cpp
+// compiled in: apt_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   36  00077218     68  void XBoxLiveSettingsMemCardCB(int32 iResult)
+   60  0006FD34     2C  void UI_XBoxLiveSettingsStruct::Init(const struct UI_XBoxLiveSettingsStruct* this)
+   66  000F44BC     94  void UIXBoxLiveSettings::UIXBoxLiveSettings(const struct UIXBoxLiveSettings* this)
+                         inlines  TExternArray<UIXBoxLiveSettings::DstMenuItem_xbls>::TExternArray
+   70  00041FAC     78  void UIXBoxLiveSettings::Init(const struct UIXBoxLiveSettings* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList
+   79  0004F650      4  void UIXBoxLiveSettings::SetupSourceMenuItems(const struct UIXBoxLiveSettings* this)
+   83  0006FD60     B8  void UIXBoxLiveSettings::Show(const struct UIXBoxLiveSettings* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, UIXBoxLiveSettings::ShowMenu
+   98  0004F654     88  void UIXBoxLiveSettings::ShowHelpText(const struct UIXBoxLiveSettings* this)
+  107  0004F6DC     A0  void UIXBoxLiveSettings::InitMenuParams(const struct UIXBoxLiveSettings* this)
+  117  0004F77C    1B4  void UIXBoxLiveSettings::UpdateItemAndLabel(const struct UIXBoxLiveSettings* this, struct UIMenuItemBaseDst* DstMenuItem_xblsToUpdate, struct UIMenuItemBaseSrc* SrcMenuItem_xblsArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_xbls* dest
+                         local  char* tempBuffer
+  166  000ACBF8    3DC  enum eAptHandleInput UIXBoxLiveSettings::HandleInput(const struct UIXBoxLiveSettings* this, int32 cID)
+                         local  bool isFlashUpdateNeeded
+                         inlines  cGAME_GLOBALS::ClearOnlineOptionsFlagsBits, cGAME_GLOBALS::SetOnlineOptionsFlagsBits
+  339  000AEA24     88  void UIXBoxLiveSettings::UpdateMenuItems(const struct UIXBoxLiveSettings* this)
+                         inlines  UIMenuBase::mMenu_StartUpdate_func
+  349  000AEF9C    13C  enum AptThreadReturnValue UIXBoxLiveSettings::UpdateMenuItemsThread(const struct UIXBoxLiveSettings* this)
+                         local  int i
+                         local  int32 old
+                         inlines  UIMenuBase::mMenu_UpdateNextElement_func
+  373  0006938C     94  void UIXBoxLiveSettings::RestoreOptions(const struct UIXBoxLiveSettings* this)
+                         inlines  cGAME_GLOBALS::ClearOnlineOptionsFlagsBits, cGAME_GLOBALS::SetOnlineOptionsFlagsBits
+  396  0004F930     24  void UIXBoxLiveSettings::LooseFocus(const struct UIXBoxLiveSettings* this, uint32 goingTo_Signature)
+  401  0004F954     24  void UIXBoxLiveSettings::RegainFocus(const struct UIXBoxLiveSettings* this, uint32 comeFrom_Signature)

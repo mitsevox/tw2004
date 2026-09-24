@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/silentsignin/source/common/silentsigninextension.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    6  005E5744     4C  void SilentSigninExtension(const struct SilentSigninExtension* this)
+                         inlines  Observable
+   11  005E5128     48  void ~SilentSigninExtension(const struct SilentSigninExtension* this)
+                         inlines  operator delete, ~Observable

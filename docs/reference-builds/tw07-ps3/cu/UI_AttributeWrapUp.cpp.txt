@@ -1,0 +1,30 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_AttributeWrapUp.cpp
+// compiled in: apt_unity.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   47  000F209C     88  void UIAttributeWrapUp::UIAttributeWrapUp(const struct UIAttributeWrapUp* this)
+                         inlines  AptStaticCharBuffer<64u>::AptStaticCharBuffer
+   65  00031698     58  void UIAttributeWrapUp::Init(const struct UIAttributeWrapUp* this)
+   75  00062DF8     BC  void UIAttributeWrapUp::Show(const struct UIAttributeWrapUp* this)
+  100  00031704     48  void UIAttributeWrapUp::ShowPostGameface(const struct UIAttributeWrapUp* this)
+  109  000316F0     14  void UIAttributeWrapUp::ResetVars(const struct UIAttributeWrapUp* this)
+  118  000C3014      4  void UIAttributeWrapUp::OnShow(const struct UIAttributeWrapUp* this)
+  125  000CE870    1F8  enum eAptHandleInput UIAttributeWrapUp::HandleInput(const struct UIAttributeWrapUp* this, int32 cID)
+  193  0003174C     20  bool UIAttributeWrapUp::IsDone(const struct UIAttributeWrapUp* this)
+  201  0003176C     6C  void UIAttributeWrapUp::SkipToEnd(const struct UIAttributeWrapUp* this)
+  211  000B0C24    200  void UIAttributeWrapUp::ShowHelpText(const struct UIAttributeWrapUp* this)
+  247  000317D8     68  char* UIAttributeWrapUp::GetDevTypeName(const struct UIAttributeWrapUp* this, int32 type)
+  256  00031840     64  char* UIAttributeWrapUp::GetStatusName(const struct UIAttributeWrapUp* this, enum TourCard card)
+  265  00063550     9C  void UIAttributeWrapUp::GrabCurrentModLevels(const struct UIAttributeWrapUp* this)
+  274  00071730     FC  bool UIAttributeWrapUp::DidModsChange(const struct UIAttributeWrapUp* this)
+                         local  bool retVal
+                         local  int32 i
+  296  000C2B80    494  void UIAttributeWrapUp::UpdateFlashData(const struct UIAttributeWrapUp* this)
+                         local  const struct UserInfo& userInfo
+                         local  char[16] tempStr
+                         local  int32 i
+                         inlines  UserInfo::GetDevLevel, UserInfo::GetUnlockInfo
+  388  000318EC     44  void UIAttributeWrapUp::NotifyStartUpdate(const struct UIAttributeWrapUp* this)
+  394  00022580     B0  enum AptThreadReturnValue UIAttributeWrapUp::UpdateFlashThread(const struct UIAttributeWrapUp* this)
+                         local  enum AptThreadReturnValue retVal
+  418  000B0B94     90  bool UIAttributeWrapUp::GoDirectlyToAttributeHelp(const struct UIAttributeWrapUp* this)

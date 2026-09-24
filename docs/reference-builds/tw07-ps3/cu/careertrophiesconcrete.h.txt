@@ -1,0 +1,12 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/career/source/common/./careertrophiesconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   70  006257E0      C  void ~CareerTrophiesLoadUserInternalCallback(const struct CareerTrophiesLoadUserInternalCallback* this)
+   88  00625818      8  uint32_t GetNumTrophies(const struct <anon>* this)
+   89  00625820     1C  int32_t GetTrophyIdentifier(const struct <anon>* this, uint32_t uIndex)
+   90  0062583C     14  const char8_t* GetTrophyTitle(const struct <anon>* this, uint32_t uIndex)
+   91  00625850     14  const char8_t* GetTrophyDescription(const struct <anon>* this, uint32_t uIndex)
+   92  00625864     14  const char8_t* GetTrophyImage(const struct <anon>* this, uint32_t uIndex)
+   93  00625878     18  uint32_t GetTrophyDate(const struct <anon>* this, uint32_t uIndex)
+   94  00625890     1C  int32_t GetTrophyCount(const struct <anon>* this, uint32_t uIndex)

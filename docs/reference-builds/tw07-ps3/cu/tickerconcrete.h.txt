@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/./tickerconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   72  0062341C      C  const TickerMessageList* GetMessageListReference(const const struct <anon>* this)
+   75  00623428      C  const TickerFilterOptionList* GetFilterOptions(const const struct <anon>* this)
+   87  00623434      8  bool IsConnected(const const struct <anon>* this)
+   90    inline-only   TickerApiT* GetApi(const const struct <anon>* this)

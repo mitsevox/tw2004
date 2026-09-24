@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/SceneGraph/include/SceneGraph/SGInterfaces.h
+// compiled in: SGNodeGroup.cpp, SGNodeJoint.cpp, SGNodeTransform.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   43  008B0B24      C  void ~IVisibility(const struct <anon>* this)
+   44    inline-only   InterfaceID GetInterfaceID()
+   54  008BD194      C  void ~ITransform(const struct <anon>* this)
+   55    inline-only   InterfaceID GetInterfaceID()
+   67  008B2AB0      C  void ~IJoint(const struct <anon>* this)
+   68    inline-only   InterfaceID GetInterfaceID()

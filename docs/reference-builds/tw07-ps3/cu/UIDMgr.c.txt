@@ -1,0 +1,87 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/UIDMgr.c
+// compiled in: Legacy_unity.cpp
+// 28 functions, source order. line | PS3 address | size
+
+   63  0038CBA8     30  static struct UIDHash_t _UIDGetHash(UID_t id)
+                         local  struct UIDHash_t hash
+                         local  struct UIDHash_t hash
+                         local  uint8* pInfo
+   76  0037B318      8  static int32 _UIDGetHashBucket(struct UIDHash_t hash)
+   81    inline-only   static UIDHashEntryT* _UIDLookupEntry(UIDHashTableT* pList, UID_t id)
+                         local  int32 iBucket
+                         local  UIDHashEntryT* pEntry
+   99  0038CA60     BC  static UIDHashEntryT* _UIDGetEntry(UIDHashTableT* pList, int32 index)
+  111  003B21B4     B0  UIDListT* UIDListBegin(int32 nMaxElements, struct Allocator* a)
+                         local  UIDHashTableT* pTable
+  128  0038CEB4     EC  void UIDListAdd(UIDHashTableT* pList, UID_t id, char* strDebugName)
+                         local  UIDHashEntryT* pEntry
+                         local  int32 iBucket
+  159  0037B320      4  void UIDListEnd(UIDHashTableT* pList)
+  168  003AAF84     B0  void UIDListFree(UIDHashTableT* pList)
+                         local  int32 i
+  190  0038CBD8     A0  int32 UIDLookup(UIDHashTableT* pList, UID_t id)
+                         local  UIDHashEntryT* pEntry
+                         inlines  _UIDLookupEntry
+  206  0037B324      C  int32 UIDGetNumElements(UIDHashTableT* pList)
+  211  0038CB74     34  UID_t UIDGetElementID(UIDHashTableT* pList, int32 index)
+                         local  UIDHashEntryT* pEntry
+  224  0038CB1C     58  char* UIDGetElementStr(UIDHashTableT* pList, int32 index)
+                         local  UIDHashEntryT* pEntry
+  239  0038C964     FC  UID_t UIDConvertFromString(char* pStr)
+                         local  UID_t id
+                         local  char* pID
+                         inlines  std::toupper
+  263  0038C92C     38  void UIDConvertToString(char* pStr, UID_t id)
+                         local  char* pID
+  287  003B20DC     D8  UIDSetT* UIDSetCreate(UIDListT* pList, struct Allocator* a)
+                         local  UIDSetT* pSet
+                         local  int32 iSize
+                         inlines  BitArray_ClearArray
+  315  003AAF78      C  void UIDSetFree(UIDSetT* pSet)
+  323  0038CE50     64  void UIDSetAddElement(UIDSetT* pSet, UID_t id)
+                         local  int32 index
+                         inlines  BitArray_SetBit
+  331  0038CDEC     64  void UIDSetRemoveElement(UIDSetT* pSet, UID_t id)
+                         local  int32 index
+                         inlines  BitArray_ClearBit
+  339  0038CD78     74  bool UIDSetCheck(UIDSetT* pSet, UID_t id)
+                         local  int32 index
+  349  0038C808    124  bool UIDSetCheckByIndex(UIDSetT* pSet, int32 index)
+  361  003B3B3C      4  void UIDStreamWriteID(struct ByteStreamT* pStream, UID_t id)
+  368  003B37EC      4  UID_t UIDStreamReadID(struct ByteStreamT* pStream)
+  375  003B4058     E0  void UIDList_WriteStream(UIDListT* pList, struct ByteStreamT* pStream)
+                         local  int32 i
+  408  003B4004     54  int32 UIDList_GetStreamSize(UIDListT* pList)
+                         local  struct ByteStreamT Stream
+  419  003B3DB0    1A8  UIDListT* UIDList_CreateFromStream(struct ByteStreamT* pStream, struct Allocator* a, bool bAllocStrings)
+                         local  UIDListT* pList
+                         local  ByteStreamPosT pos
+                         local  uint32 version
+                         local  int32 iSize
+                         local  int32 iElm
+                         local  int32 nElms
+                         local  UID_t id
+                         local  char* str
+                         local  char* strAlloc
+                         local  int local_bufSize
+  481  003B3B70    104  void UIDSet_WriteStream(struct ByteStreamT* pStream, UIDSetT* pSet)
+                         local  int32 iElm
+                         local  int32 nElms
+                         local  int32 nTotalElms
+  510  003B381C     B4  UIDSetT* UIDSet_CreateFromStream(struct ByteStreamT* pStream, UIDListT* pList, struct Allocator* a)
+                         local  UIDSetT* pSet
+                         local  int32 iElm
+                         local  int32 nElms
+  528  003B4138    6BC  int32 UIDTest()
+                         local  const char[8] __FUNCTION__
+                         local  struct ByteStreamT WriteStream
+                         local  struct ByteStreamT ReadStream
+                         local  void* pStreamData
+                         local  UIDListT* pList
+                         local  int32 iSize
+                         local  int32 iEndSize
+                         local  UIDSetT* pSet
+                         local  char[5] s
+                         local  int numErrors
+                         local  struct Allocator a
+                         inlines  TagValuePair, operator+

@@ -1,0 +1,99 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/audio/engine/hl/HLAudSession.c
+// compiled in: other_unity.cpp
+// 24 functions, source order. line | PS3 address | size
+
+   85  003E0A48     24  bool Ses_InitModule()
+                         local  bool ok
+  101  003E09E0     68  void Ses_ExitModule()
+  117  003DC120     90  void Ses_ExitNicknames()
+                         local  int i
+  135  0044FB14    164  void Ses_Exit(uint8 subsessID)
+  186  003E0A7C    110  bool Ses_Init(uint8 sessionID, uint8 subsessID, uint8 nmics)
+                         local  bool ok
+  251  003E0B8C     8C  static TAudLookupTableItem* sesBinarySearch(uint32 key, TAudLookupTableItem* pTable, int32 numEntries)
+                         local  int32 nFirst
+                         local  int32 nLast
+                         local  int32 nMid
+                         local  uint32 val
+  280  003E0CB4     28  static TAudLookupTableItem* getItemFromSession(uint32 tmplID, TSesHdr* pses)
+                         local  TAudLookupTableItem* pItem
+  294  003E0CDC     E8  TEmitter* Ses_GetEmitterTemplateFromID(uint32 tmplID)
+                         local  uint32 emindex
+                         local  TAudLookupTableItem* pItem
+                         local  TSesHdr* pses
+  325  003E10CC     7C  void Ses_Pause(bool on, bool spinupDelay)
+  343  003E244C    48C  void Ses_ProcessArticulationData(TStreamDataPtr pStrmData)
+                         local  uint8 i
+                         local  uint8* pemitpool
+                         local  uint8* ptrackcmdpool
+                         local  uint32 restype
+                         local  bool global
+                         local  TSesHdr* psesbase
+                         local  bool nickname
+                         local  TEmitter* ptmpl
+                         local  TTrack* ptrk
+                         local  TTrack* ptrkend
+  460  003E11D8     C8  void Ses_ProcessInstrData(TStreamDataPtr pStrmData)
+                         local  uint32 restype
+                         local  bool global
+                         local  bool nickname
+  489  003FCB88    1BC  void Ses_ProcessInstrDebugData(TStreamDataPtr pStrmData)
+                         local  const char[26] __FUNCTION__
+                         local  uint32 restype
+                         local  bool global
+                         local  bool nickname
+                         inlines  TagValuePair, operator+
+  525  00436F78    1C8  void Ses_ProcessSampleData(TStreamDataPtr pStrmData)
+                         local  uint32 restype
+                         local  bool global
+                         local  bool nickname
+  572  003E21B0    29C  void Ses_ResolveInstrumentRefs(uint32 restype)
+                         local  bool global
+                         local  TSesHdr* psesbase
+                         local  bool nickname
+                         local  uint32 i
+                         local  TEmitter* ptmpl
+                         local  TTrack* ptrk
+                         local  TTrack* ptrkend
+                         local  uint32 guid
+                         local  TInstr* pInstr
+  650  00407660    464  void Ses_ProcessStreamFileHdr(TStreamDataPtr pStrmData)
+                         local  const char[25] __FUNCTION__
+                         local  bool bDisableRuntimeAudio
+                         local  TStmFileHdr* phdr
+                         local  uint32 guid
+                         local  uint32 i
+                         local  TStmPlayList* plist
+                         local  uint16 j
+                         local  uint16 j
+                         local  uint16 strmIndex
+                         inlines  TagValuePair, operator+
+  741  00407AC4    2D4  void Ses_ProcessStreamRamFile(TStreamDataPtr pStrmData)
+                         local  const char[25] __FUNCTION__
+                         local  bool bDisableRuntimeAudio
+                         local  uint32 ram_guid
+                         inlines  TagValuePair, operator+
+  794  003DC3AC    15C  uint32 Ses_GetStreamFromPlayListID(uint8 plid, uint16 streamID, uint32* pRamOffset)
+                         local  TStmPlayList* plist
+                         local  TStmPlayListEntry* pentry
+  819  003E0C18     9C  uint32 Ses_GetStreamFromGuid(uint32 guid, uint32* pRamOffset)
+                         local  TAudLookupTableItem* pItem
+                         local  uint16 strmIndex
+  833  003E12A0     B8  bool Ses_GetStreamIDFromGuid(uint32 guid, uint8* pPlayListID, uint16* pStreamIndex)
+                         local  TAudLookupTableItem* pItem
+  849  00430870    278  TStmPlayListEntry* Ses_GetStreamFromPlayList(TInstr* pinstr, uint16 streamID, uint32* psize)
+                         local  TStmPlayList* plist
+                         local  TStmPlayListEntry* pentry
+                         local  uint32 endoffset
+                         local  TStmPlayList* pnextlist
+                         inlines  Ses_GetStreamPlayList
+  897  003DDD68     7C  void* Ses_GetStreamRamData(uint32 offset_ram)
+                         local  uint8* pRamData
+  907  003E1358    174  void Ses_TmplOvrTrackRvbMode(uint32 tmplID, uint8 trackID, bool reverbOn)
+                         local  TEmitter* ptmpl
+                         local  TTrack* ptrk
+  924  00435CC0    114  TTone Ses_GetInstrumentTone(TInstr* pinstr, uint8 toneID)
+                         local  struct TTone_S tone
+                         local  TTone tone
+  948  003E14CC     60  void Ses_DebugPrint(const float& x, const float& y, PRINTFFN PrintfFn)
+                         local  const float LINE

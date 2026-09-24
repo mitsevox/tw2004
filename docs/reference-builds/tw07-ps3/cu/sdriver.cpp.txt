@@ -1,0 +1,70 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sdriver.cpp
+// compiled in: sdriver.cpp
+// 24 functions, source order. line | PS3 address | size
+
+   41  006DC75C     24  void SNDDRV_mixvoicefree(int voice)
+   53  006DD2BC     EC  void* SetCustomFx(void* pData, void* pFxDefinition)
+                         local  void* retVal
+                         local  struct <anon>* pfxData
+                         inlines  FToI::Round, GetSampleRate
+   70  006DC780     4C  void Reset(void* pData)
+                         local  struct <anon>* pfxData
+   82  006DC7CC     C8  int SetFxOutputLevel(void* pData, enum Channel outputChannel)
+                         local  int output
+                         local  struct <anon>* pfxData
+  104  006DC894    120  void SetVolInternal(int voice)
+                         local  int i
+                         local  float MixerGain
+                         local  struct CHANPUB* pVoice
+                         local  SNDDRVVOICE* pHalVoice
+  125  006DC9B4     24  void SetDry(int voice)
+  135  006DC9D8    114  void SetPan(int voice)
+                         local  struct CHANPUB* pVoice
+                         local  SNDDRVVOICE* pHalVoice
+                         local  int i
+  170  006DCAEC      8  int SNDPLATFORM_outputcaps()
+  184  006DCAF4     6C  int SNDPLATFORM_outputset()
+                         local  int resamplequality
+  220  006DCB60     B0  int SNDPLATFORM_init()
+                         inlines  SNDMEMI_alloc
+  234  006DCC10     58  int SNDPLATFORM_restore()
+                         inlines  SNDMEMI_free
+  247  006DD6C0    244  int SNDPLATFORM_playtimbre(SNDIPATCHHEADER* sndiph, void* psampledata, int voice, int lowpasscutoff, int highpasscutoff)
+                         local  struct CHANPUB* ppubv
+                         local  int i
+  286  006DD4A4    21C  int SNDPLATFORM_packetplay(int voice, int timemult, int lowpasscutoff, int highpasscutoff, SNDSAMPLEATTR* pssa)
+                         local  struct CHANPUB* ppubv
+                         local  int i
+  317  006DD3A8     FC  int SNDPLATFORM_setpitch(int voice)
+                         local  long unsigned int pitch
+                         local  struct CHANPUB* ppubv
+                         local  int i
+  344  006DCC68     CC  int SNDPLATFORM_timemult(int voice, int timemult)
+                         local  struct CHANPUB* ppubv
+                         local  int i
+  364  006DCD34     F0  void SNDPLATFORM_lowpass(int voice, int lowpasscutoff)
+                         local  struct CHANPUB* ppubv
+                         local  int i
+                         local  float leakage
+  387  006DCE24     C4  void SNDPLATFORM_highpass(int voice, int highpasscutoff)
+                         local  struct CHANPUB* ppubv
+                         local  int i
+  405  006DCEE8     34  int SNDDRV_getmastervoice(int voice)
+                         local  struct CHANPUB* pv
+  419  006DCF1C     80  int SNDDRV_getsamplechan(int voice)
+                         local  struct CHANPUB* pv
+                         local  int i
+  448  006DCF9C     60  int SNDPLATFORM_setfxlevel(int voice, int bus)
+                         local  struct CHANPUB* ppubv
+                         local  float gain
+  467  006DCFFC     24  int SNDPLATFORM_getcurframe(int voice)
+                         local  struct CHANPUB* ppubv
+  483  006DD020    100  int SNDPLATFORM_stop(int voice)
+                         local  struct CHANPUB* ppubv
+                         local  int i
+  508  006DD120     D0  int SNDPLATFORM_filteradd(int voice, SNDFILTERDEF* psfd)
+                         local  struct CHANPUB* ppubv
+                         local  int i
+  528  006DD1F0     CC  int SNDPLATFORM_filterremove(int voice, int priority)
+                         local  struct CHANPUB* ppubv
+                         local  int i

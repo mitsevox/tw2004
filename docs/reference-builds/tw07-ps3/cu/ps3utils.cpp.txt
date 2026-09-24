@@ -1,0 +1,44 @@
+// C:/packages/job_manager/1.11.00/source/ps3/ppu/ps3utils.cpp
+// compiled in: ps3utils.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   28  0070A138     68  void PrintVec(OutputCallback func, const char* format)
+                         local  va_list arglist
+   43  0070951C     8C  bool ParseSPUProgram(char* prog, sys_spu_image_t* image_ptr, OutputCallback func)
+                         local  int ret
+                         inlines  sys_spu_image_open
+   65  007095A8     C8  bool ParseEmbeddedSPUProgram(char* prog, sys_spu_image_t* image_ptr, char* binary_spu_kernel_elf_start, OutputCallback func)
+                         local  sys_addr_t elf
+                         local  int ret
+   88  00709670      4  void CleanUpParse(sys_spu_thread_attribute_t* threadAttr)
+  102  00709674    140  void* SimpleFileSysLoadFileAlloc(const char* fileName, unsigned int* fileSize)
+                         local  void* fileData
+                         local  size_t length
+                         local  char[256] fileNameBuffer
+                         local  FILE* fp
+                         local  size_t actualLength
+  145  00709EFC    134  bool ParseSPUExecutable(const sys_addr_t execData, uint32_t size, struct SPUExecutableInfo* info)
+  164  00709A84    478  bool ParseSPUElf(const sys_addr_t execData, uint32_t size, struct SPUExecutableInfo* info)
+                         local  struct Elf32_Ehdr* elf_ehdr
+                         local  uint32_t entry
+                         local  uint32_t lowest_code_start_pt
+                         local  uint32_t totalSize
+                         local  uint32_t lsUsage
+                         local  uint32_t lastSegmentEnd
+                         local  uint32_t data_sec_start_pt
+                         local  uint32_t data_sec_size
+                         local  uint32_t i
+                         local  struct Elf32_Shdr* names_shdr
+                         local  uint32_t i
+                         local  struct Elf32_Phdr* elf_phdr
+                         local  int pad
+                         local  struct Elf32_Shdr* elf_shdr
+  332  007097B4    17C  bool ParseSPUBin(const sys_addr_t execData, uint32_t size, struct SPUExecutableInfo* info)
+                         local  struct jm_spu_mod_hdr* binHeader
+  378  00709930    154  bool ParseSPUWrappedBin(const sys_addr_t execData, uint32_t size, struct SPUExecutableInfo* info)
+                         local  bool ret
+                         local  struct jm_spu_wrapped_bin_hdr* wrappedBinHeader
+  414  0070A030    108  bool ParseElf(const sys_addr_t elf, sys_addr_t* startAddr, uint32_t* size, int32_t* entryPoint)
+                         local  struct SPUExecutableInfo info
+                         local  bool ret
+                         inlines  SPUExecutableInfo::SPUExecutableInfo

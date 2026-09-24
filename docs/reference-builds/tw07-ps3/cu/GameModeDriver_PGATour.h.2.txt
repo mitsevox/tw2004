@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/GameMode/Headers/GameModeDriver_PGATour.h
+// compiled in: apt_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  330    inline-only   void GameModeDriverPGATour::SetJustFinishedPGATourRound(const struct GameModeDriverPGATour* this, bool finished)
+  418    inline-only   int32 GM_PgaTourMode_GetNEvents()

@@ -1,0 +1,309 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/Geom/twChar_Skin_PS3.cpp
+// compiled in: golf_unity.cpp
+// 40 functions, source order. line | PS3 address | size
+
+   63  0022BE04     B0  void TaskFIFO_Put(const DMADispatchControlEntry& entry)
+   76  0022BEB4     2C  void PPU_LockAtomicTaskFIFO()
+                         local  uint32_t old
+                         local  uint32_t value
+   94  0022BEE0     20  void PPU_UnlockAtomicTaskFIFO()
+  100  0022BFB0     A0  void PPU_AddModelTasks(const DMADispatchControlEntry& newTaskEntry)
+  140    inline-only   static void spu_MailboxSend(sys_raw_spu_t spuID, uint32_t data)
+                         local  uint8_t polling
+  163  0026339C    1E8  void PS3_SkinMeshRender::spuIntrHandler(uint64_t arg)
+                         local  int ret
+                         local  uint64_t reg_stat
+                         local  uint32_t reg_val
+                         local  BoneMeshCommandPacket* pCommandPkt
+                         inlines  sys_interrupt_thread_eoi, sys_raw_spu_get_int_stat, sys_raw_spu_read_puint_mb, sys_raw_spu_set_int_stat
+  229  00268A98    15C  int PS3_SkinMeshRender::Init(const struct PS3_SkinMeshRender* this)
+                         local  int ret
+                         local  uint32_t iEvent
+                         inlines  spu_MailboxSend
+  263  0022C110      4  void PS3_SkinMeshRender::Release(const struct PS3_SkinMeshRender* this)
+  270  00268884    214  int PS3_SkinMeshRender::InitSPU(const struct PS3_SkinMeshRender* this)
+                         local  int ret
+                         local  sys_ppu_thread_t hThread
+                         local  uint32_t intrMask
+                         inlines  sys_interrupt_thread_establish, sys_raw_spu_create, sys_raw_spu_create_interrupt_tag, sys_raw_spu_mmio_write, sys_raw_spu_set_int_mask
+  353  0022C050     C0  void PS3_SkinMeshRender::ReleaseSPU(const struct PS3_SkinMeshRender* this)
+                         inlines  sys_interrupt_tag_destroy, sys_raw_spu_destroy
+  382    inline-only   uint32_t UTIL_CalcNumDMABlockTransfers(uint32_t blockSize, uint32_t bufferSize)
+                         local  uint32_t nTransfers
+  396  0022C178     D4  BoneMeshCommandPacket* FindCommand_BeginGeom(void* pDMAList, uint32_t geomID)
+                         local  BoneMeshCommandPacket* pFoundCommand
+                         local  BoneMeshCommandPacket* pCurrCommand
+                         local  uint32_t nCommands
+                         local  uint32_t iGeom
+                         local  uint32_t iCmd
+  425  0022C610    138  BoneMeshCommandPacket* FindCommand_BeginMesh(void* pDMAList, uint32_t geomID, uint32_t meshID)
+                         local  BoneMeshCommandPacket* pFoundCommand
+                         local  BoneMeshCommandPacket* pCurrCommand
+                         local  uint32_t nCommands
+                         local  uint32_t iGeom
+                         local  uint32_t iMesh
+                         local  uint32_t iCmd
+                         local  bool bInGeomBlock
+  473  0022C748     80  void PS3_SkinMeshRender::PatchCommand_SetVBOs(const struct PS3_SkinMeshRender* this, void* pDMAList, uint32_t geomID, uint32_t meshID, struct LS_VertexBuffer* pVBO_1, struct LS_VertexBuffer* pVBO_2)
+                         local  BoneMeshCommandPacket* pCommandPkt
+  490  0022C24C     6C  void PS3_SkinMeshRender::PatchCommand_SetActiveMeshes(const struct PS3_SkinMeshRender* this, void* pDMAList, uint32_t geomID, uint32_t activeMeshes)
+                         local  BoneMeshCommandPacket* pCommandPkt
+  504  0022C7C8    15C  void PS3_SkinMeshRender::DummyLockUpdateModelVBOs(const struct PS3_SkinMeshRender* this, void* pDMAList)
+                         local  BoneMeshCommandPacket* pCommandPkt
+                         local  uint32_t vboID
+                         local  uint32_t nCommands
+                         local  uint32_t iCmd
+                         local  struct LS_VertexBuffer* pVBO
+  553  0022C924    1A4  void PS3_SkinMeshRender::LockUpdateModelVBOs(const struct PS3_SkinMeshRender* this, void* pDMAList)
+                         local  BoneMeshCommandPacket* pCommandPkt
+                         local  uint32_t vboID
+                         local  uint32_t nCommands
+                         local  uint32_t iCmd
+                         local  struct LS_VertexBuffer* pVBO
+  618  0022CAC8    100  void PS3_SkinMeshRender::UnlockModelVBOs(const struct PS3_SkinMeshRender* this, void* pDMAList)
+                         local  BoneMeshCommandPacket* pCommandPkt
+                         local  uint32_t vboID
+                         local  uint32_t nCommands
+                         local  uint32_t iCmd
+  650  0022CBC8     A8  void PS3_SkinMeshRender::PatchCommand_SetReducedSkinProcessing(const struct PS3_SkinMeshRender* this, void* pDMAList, bool bEnable)
+                         local  BoneMeshCommandPacket* pCommandPkt
+  668  0026DBE4     9C  void PS3_SkinMeshRender::PatchCommand_SelectVBO(const struct PS3_SkinMeshRender* this, void* pDMAList, uint32_t vboID)
+                         local  BoneMeshCommandPacket* pCommandPkt
+                         local  const struct GolfModuleUCAP& ucap
+                         local  int32 ucapActiveBuffer
+  687  0022CC70     AC  void PS3_SkinMeshRender::PatchCommand_BeginModel(const struct PS3_SkinMeshRender* this, void* pDMAList, uint32_t nCommands, uint32_t size, vec4flt* pGlobalTranslation, uint32_t vboID)
+                         local  BoneMeshCommandPacket* pCommandPkt
+  704  0022AD60     F4  void PS3_SkinMeshRender::PatchCommand_LoadSkinningMatrices(const struct PS3_SkinMeshRender* this, void* pDMAList, float[4][4]* pSkinningMatrices, int32_t nMatrices)
+                         local  BoneMeshCommandPacket* pCommandPkt
+                         local  uint32_t size
+  723  0022CD1C     A4  void PS3_SkinMeshRender::PatchCommand_LoadUCAPGeoFrameXForms(const struct PS3_SkinMeshRender* this, void* pDMAList, const struct TransposeGeoFrame* pGeoFrame)
+                         local  BoneMeshCommandPacket* pCommandPkt
+                         local  uint32_t size
+  741  0022CDC0    104  uint32_t PS3_SkinMeshRender::BuildCommand_LoadSkinningMatrices(const struct PS3_SkinMeshRender* this, float[4][4]* pSkinningMatrices, int32_t nMatrices)
+                         local  BoneMeshCommandPacket* pCommandPkt
+                         local  uint32_t size
+  763  0022CEC4     D8  uint32_t PS3_SkinMeshRender::BuildCommand_LoadMorphBlendWeights(const struct PS3_SkinMeshRender* this, float* pBlendWeights, int32_t nBlendWeights)
+                         local  BoneMeshCommandPacket* pCommandPkt
+                         local  uint32_t size
+  787  0022CF9C     CC  uint32_t PS3_SkinMeshRender::BuildCommand_LoadUCAPGeoFrameXForms(const struct PS3_SkinMeshRender* this, const struct TransposeGeoFrame* pGeoFrame)
+                         local  BoneMeshCommandPacket* pCommandPkt
+                         local  uint32_t size
+  809  0022D068     E8  uint32_t PS3_SkinMeshRender::BuildCommand_BeginGeom(const struct PS3_SkinMeshRender* this, const struct CharGeom* pCharGeom, BoneMeshCommandPacket_BeginGeom** ppGeomPacket)
+  829  002690FC    910  uint32_t PS3_SkinMeshRender::BuildCommand_BeginMesh(const struct PS3_SkinMeshRender* this, const struct CharMesh* pCharMesh, bool bUCAP, uint32_t nActiveMorphs, uint32_t nTotalMorphs, uint32_t vboID)
+                         local  uint32_t dmaListIDStart
+                         local  const twMesh* pMesh
+                         local  uint32_t numVertices
+                         local  uint32_t numIndices
+                         local  BoneMeshCommandPacket* pBeginMeshCommandPkt
+                         local  BoneMeshCommandPacket* pCommandPkt
+                         local  const struct GolfModuleUCAP& ucap
+                         local  struct GeoComponent* pUCAPComponents_0
+                         local  struct GeoComponent* pUCAPComponents_1
+                         local  uint32_t baseBatchID
+                         local  uint32_t processedVerts
+                         local  uint32_t iMicroMesh
+                         local  uint32_t nBatchSkinVerts
+                         local  uint8_t lastBatch
+                         local  uint32_t batchSize
+                         local  uint32_t nCommands
+                         local  uint32_t dmaSize
+                         local  uint32_t iDMABlock
+                         local  uint32_t dmaSize
+                         local  uint32_t iDMABlock
+                         local  const twMicroMesh* pMMesh
+                         local  uint32_t nBatchMorphs
+                         local  uint32 iMorph
+                         local  twMorphMesh* pMorphMesh
+                         local  const int32 animChanIdx
+                         local  uint32_t numMorphVerts
+                         local  twMorphVert* pStartingMorphVert
+                         local  twMorphVert* pMorphVert
+                         local  uint32_t dmaSize
+                         local  uint32_t iMorphVert
+                         local  uint32_t iDMABlock
+                         inlines  GolfModuleUCAP::GetComponentBuffersForSubMesh, UTIL_CalcNumDMABlockTransfers
+ 1116  0022D150     F8  void PS3_SkinMeshRender::InstanceModelDMAList(const struct PS3_SkinMeshRender* this, void* pDMAList, uint32_t maxNumCommands, const struct CharModelMgrCharacterInstance& charModel)
+                         local  BoneMeshCommandPacket* pSrcDMAList
+                         local  BoneMeshCommandPacket* pCommandPkt
+                         inlines  CharModelMgrCharacterInstance::GetDMAListPtr
+ 1143  0026D4FC    594  void* PS3_SkinMeshRender::CreateModelDMAList(const struct PS3_SkinMeshRender* this, const struct CharModelMgrCharacterInstance& charModel, struct TSkeleton* pSkeleton, SkinMorphStateT* pMorphState, vec4flt* pGlobalTranslation)
+                         local  const char[19] __FUNCTION__
+                         local  const struct GolfModuleUCAP& ucap
+                         local  bool bRequiresUCAP
+                         local  uint32_t nCommands
+                         local  void* pDMAList
+                         local  uint32_t iGeom
+                         local  const struct TransposeGeoFrame* pGeoFrame
+                         local  struct CharGeom* pCharGeom
+                         local  BoneMeshCommandPacket_BeginGeom* pGeomCmdPacket
+                         local  uint32_t activeMeshes
+                         local  uint32_t iMesh
+                         local  struct CharMesh* pCharMesh
+                         local  const twMesh* pMesh
+                         local  uint32_t nActiveMorphs
+                         local  uint32_t nTotalMorphs
+                         local  uint32 iMorph
+                         local  twMorphMesh* pMorphMesh
+                         local  const int32 animChanIdx
+                         local  const float blendFactor
+                         inlines  TagValuePair, operator+
+ 1269  0022D248     14  void PS3_SkinMeshRender::InsertGPUEventSyncToken(const struct PS3_SkinMeshRender* this)
+ 1277  0022BF00     80  void PS3_SkinMeshRender::WaitOnSPU(const struct PS3_SkinMeshRender* this, void* pDMAList)
+                         local  BoneMeshCommandPacket* pCommandPkt
+ 1288  0022D25C     88  void PS3_SkinMeshRender::BeginBoneMeshProcessing(const struct PS3_SkinMeshRender* this, void* pDMAList)
+                         local  BoneMeshCommandPacket* pCommandPkt
+                         local  DMADispatchControlEntry kickStartEntry
+ 1335  00263DB4    2A0  void PS3_SkinMeshRender::SkinVertices(const struct PS3_SkinMeshRender* this, const twSkinVert_Ps3* pSrcVertices, const uint32 nVertices, float[4][4]* pSkinningMatrices, const float* globalTranslation, struct LS_VertexBuffer* pDestVBO, const vec4flt& vecMin, const vec4flt& vecMax)
+                         local  TWCHAR_SKINVERTEX* pDestVertices
+                         local  float[4] vec128_WorldTrans
+                         local  float[4] vec128_Min
+                         local  float[4] vec128_Max
+                         local  uint32 iVtx
+                         local  const float* pMat0
+                         local  const float* pMat1
+                         local  const float* pMat2
+                         local  const float* pMat3
+                         local  float[4] vec128_Weights
+                         local  float[4] vec128_Pos
+                         local  short int[8] vec128_NrmTan
+                         local  int[4] vec128_intNrm
+                         local  int[4] vec128_intTan
+                         local  float[4] vec128_Nrm
+                         local  float[4] vec128_Tan
+                         local  float[4] vec128_PosXXXX
+                         local  float[4] vec128_PosYYYY
+                         local  float[4] vec128_PosZZZZ
+                         local  float[4] vec128_NrmXXXX
+                         local  float[4] vec128_NrmYYYY
+                         local  float[4] vec128_NrmZZZZ
+                         local  float[4] vec128_TanXXXX
+                         local  float[4] vec128_TanYYYY
+                         local  float[4] vec128_TanZZZZ
+                         local  float[4] accRow0
+                         local  float[4] accRow1
+                         local  float[4] accRow2
+                         local  float[4] accRow3
+                         local  float[4] vec128_Weight
+                         local  float[4] row0
+                         local  float[4] row1
+                         local  float[4] row2
+                         local  float[4] row3
+                         local  float[4] vec128_temp
+                         inlines  vec_add, vec_ctf, vec_cts, vec_ld, vec_madd, vec_max, vec_min, vec_packs, vec_splat, vec_st, vec_unpackh, vec_unpackl, vec_vspltw
+ 1587    inline-only   float[4] UCAP_PcaDecompressTransposed(const float[4]& w0, const float[4]& w1, const float[4]& w2, const float[4]& w3, const float[4]& c)
+                         local  float[4] cx
+                         local  float[4] cy
+                         local  float[4] cz
+                         local  float[4] cw
+ 1607  002645D0    5AC  void PS3_SkinMeshRender::SkinVerticesUCAP(const struct PS3_SkinMeshRender* this, const twSkinVert_Ps3* pSrcVertices, const uint32 nVertices, float[4][4]* pSkinningMatrices, const uint32 ucapMeshID, const float* globalTranslation, struct LS_VertexBuffer* pDestVBO, const vec4flt& vecMin, const vec4flt& vecMax)
+                         local  const struct GolfModuleUCAP& ucap
+                         local  const struct GeoComponent* pComponents
+                         local  const struct TransposeGeoFrame* geoFrame
+                         local  TWCHAR_SKINVERTEX* pDestVertices
+                         local  float[4] vec128_WorldTrans
+                         local  float[4] vec128_Min
+                         local  float[4] vec128_Max
+                         local  float[4] gf00
+                         local  float[4] gf01
+                         local  float[4] gf02
+                         local  float[4] gf03
+                         local  float[4] gf10
+                         local  float[4] gf11
+                         local  float[4] gf12
+                         local  float[4] gf13
+                         local  float[4] gf20
+                         local  float[4] gf21
+                         local  float[4] gf22
+                         local  float[4] gf23
+                         local  float[4] gf30
+                         local  float[4] gf31
+                         local  float[4] gf32
+                         local  float[4] gf33
+                         local  uint32 iVtx
+                         local  const float* pMat0
+                         local  const float* pMat1
+                         local  const float* pMat2
+                         local  const float* pMat3
+                         local  float[4] vec128_Weights
+                         local  float[4] vec128_Pos
+                         local  short int[8] vec128_NrmTan
+                         local  int[4] vec128_intNrm
+                         local  int[4] vec128_intTan
+                         local  float[4] vec128_Nrm
+                         local  float[4] vec128_Tan
+                         local  float[4] vec128_PosXXXX
+                         local  float[4] vec128_PosYYYY
+                         local  float[4] vec128_PosZZZZ
+                         local  float[4] vec128_NrmXXXX
+                         local  float[4] vec128_NrmYYYY
+                         local  float[4] vec128_NrmZZZZ
+                         local  float[4] vec128_TanXXXX
+                         local  float[4] vec128_TanYYYY
+                         local  float[4] vec128_TanZZZZ
+                         local  float[4] accRow0
+                         local  float[4] accRow1
+                         local  float[4] accRow2
+                         local  float[4] accRow3
+                         local  float[4] vec128_Weight
+                         local  float[4] row0
+                         local  float[4] row1
+                         local  float[4] row2
+                         local  float[4] row3
+                         local  float[4] vec128_temp
+                         inlines  GolfModuleUCAP::GetActiveComponentBuffer, UCAP::GetTransposeGeoFrame, UCAP_PcaDecompressTransposed, vec_add, vec_ctf, vec_cts, vec_ld, vec_madd, vec_packs, vec_splat, vec_st, vec_unpackh, vec_unpackl, vec_vspltw
+ 1907  0025DF14    1FC  void PS3_SkinMeshRender::SkinVerticesReduced(const struct PS3_SkinMeshRender* this, const twSkinVert_Ps3* pSrcVertices, const uint32 nVertices, float[4][4]* pSkinningMatrices, const float* globalTranslation, struct LS_VertexBuffer* pDestVBO)
+                         local  TWCHAR_SKINVERTEX* pDestVertices
+                         local  float[4] vec128_WorldTrans
+                         local  uint32 iVtx
+                         local  const float* pMat0
+                         local  const float* pMat1
+                         local  float[4] vec128_Weights
+                         local  float[4] vec128_Pos
+                         local  short int[8] vec128_NrmTan
+                         local  int[4] vec128_intNrm
+                         local  int[4] vec128_intTan
+                         local  float[4] vec128_Nrm
+                         local  float[4] vec128_Tan
+                         local  float[4] vec128_PosXXXX
+                         local  float[4] vec128_PosYYYY
+                         local  float[4] vec128_PosZZZZ
+                         local  float[4] vec128_NrmXXXX
+                         local  float[4] vec128_NrmYYYY
+                         local  float[4] vec128_NrmZZZZ
+                         local  float[4] vec128_TanXXXX
+                         local  float[4] vec128_TanYYYY
+                         local  float[4] vec128_TanZZZZ
+                         local  float[4] accRow0
+                         local  float[4] accRow1
+                         local  float[4] accRow2
+                         local  float[4] accRow3
+                         local  float[4] vec128_Weight
+                         local  float[4] row0
+                         local  float[4] row1
+                         local  float[4] row2
+                         local  float[4] row3
+                         local  float[4] vec128_temp
+                         inlines  vec_add, vec_ctf, vec_cts, vec_ld, vec_madd, vec_packs, vec_splat, vec_st, vec_unpackh, vec_unpackl
+ 2086  0026DC80     4C  void PS3_SkinMeshRender::SPU_PreRender(const struct PS3_SkinMeshRender* this, void* pDMAList, uint32 bufferIdx)
+ 2100  0026C4B0    3C8  void PS3_SkinMeshRender::PreRender(const struct PS3_SkinMeshRender* this, struct CharGeom** ppGeoms, uint32 nGeoms, float[4][4]* pSkinningMatrices, uint32 nBones, const float* pBlendAmts, uint32 nBlends, const float* globalTranslation, uint32 bufferIdx)
+                         local  uint32 iGeom
+                         local  struct CharGeom* pCharGeom
+                         local  uint32 iMesh
+                         local  struct CharMesh* pCharMesh
+                         local  const twMesh* pMesh
+                         local  struct LS_VertexBuffer* pVertexBuffer
+                         local  twSkinVert_Ps3* pSkinVerts
+                         local  twCharMorphMgr morphMgr
+                         local  uint32 iMorph
+                         local  twMorphMesh* pMorph
+                         local  const int32 animChanIdx
+                         local  const float blendAmt
+                         local  twSkinVert_Ps3* pBlendBuffer
+                         local  uint32 iMorph
+                         local  const twMorphMesh* pMorphMesh
+                         inlines  twCharMorphMgr::AddMorph
+ 2179  002F6180    104  void PS3_SkinMeshRender::Render(const struct PS3_SkinMeshRender* this, struct CharGeom** ppGeoms, uint32 nGeoms, int32 pass, uint32 bufferIdx, void* pDMAList)
+                         local  const int32 kInvSortKey
+                         local  int32 curSortKey
+                         local  int32 nextSortKey
+                         local  uint32 iGeom

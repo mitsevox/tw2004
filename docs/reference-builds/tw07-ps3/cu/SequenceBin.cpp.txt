@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_trinity/trinity/Runtime/src/SequenceBin.cpp
+// compiled in: SequenceBin.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   25  005893A0     84  bool8_t Verify(const const struct <anon>* this)
+   46  00589424     10  void CorrectOffsets(const struct <anon>* this)
+   57  00589434     5C  bool8_t ContainsCamera(const struct <anon>* this)
+                         local  struct Operation* pOperation
+   91  00589490     70  bool8_t Verify(const const struct <anon>* this)
+  111  00589500     58  void CorrectOffsets(const struct <anon>* this)
+                         local  uint32_t i

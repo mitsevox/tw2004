@@ -1,0 +1,66 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/CRManager.cpp
+// compiled in: headgate_unity.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   60  00351C58     9C  struct CRManager* GetCourseManager()
+   69  0034CB94     64  void DeleteCourseManager()
+   77  0034BCA8     3C  void Ter_UnloadRenderGeo()
+   95  00350658    1E0  static void Ter_LoadRenderGeoFromStream(struct TStreamData* pStreamData)
+  132  003551B0     50  static void Ter_LoadTreeFromStream(struct TStreamData* pStreamData)
+  139  0034ACE4     7C  void Ter_vRegisterStreamClients()
+  150  0034AD60     4C  void Ter_vUnregisterStreamClients()
+  207  0034AE54     48  void CRManager::SettingsChanged(const struct CRManager* this)
+  219  0034AE9C      4  void CRManager::SetRenderStates(const struct CRManager* this)
+  230  0034AEA0     8C  void CRManager::UpdateWind(const struct CRManager* this)
+                         inlines  std::logf
+  237  00362CD8    3C4  void CRManager::CalculateSun(const struct CRManager* this)
+                         local  mat44flt m
+                         local  bool g_bForceNoonShadow
+                         local  const float oneOverSunY
+                         local  const float sx
+                         local  const float sz
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         inlines  CRManager::SetSunPosition, LLMath_mat44fltMultiply33, RNADebugBreak, ScopeParmC::Set<RNAMath::RNAVector3>, Update, Vector3, cGAME_GLOBALS::SetSunPos, operator=, vec_madd, vec_splat
+  299  00377100    2C8  void CRManager::Update(const struct CRManager* this, struct RC_SRenderCtx* pCtx, bool bFirstCall)
+                         local  const bool bRenderingPip
+  402  00378F30    D24  void CRManager::Render(const struct CRManager* this, uint32_t flags)
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         local  vec4flt min
+                         local  bool useRNARenderTerrain
+                         local  struct DeviceC* pDevice
+                         local  const struct ScopeC& scope
+                         local  struct ScopeParmC* parm_useRNARenderTerrain
+                         local  bool useTerrain
+                         local  bool useVegetation
+                         local  bool useRSF
+                         local  bool renderRSF
+                         local  bool renderLegacy
+                         local  bool templeExists
+                         local  bool renderTempleOnly
+                         inlines  DS_vSetStencilWriteMask, RNADebugBreak, ScopeParmC::Get<bool>, ScopeParmC::Set<RNAMath::RNAMatrix44>
+  561  0037890C    338  void CRManager::PostRender(const struct CRManager* this, uint32_t flags)
+                         local  struct DeviceC* pDevice
+                         local  const struct ScopeC& scope
+                         local  bool useTerrain
+                         local  bool useVegetation
+                         local  bool useRSF
+                         local  bool templeExists
+                         local  bool renderTempleOnly
+                         local  bool renderingLegacy
+                         inlines  RNADebugBreak, ScopeParmC::Get<bool>
+  628  00365D98     8C  void CRManager::LoadHole(const struct CRManager* this)
+  664  00367144     3C  void CRManager::PostHoleLoad(const struct CRManager* this)
+  677  00365E9C     7C  void CRManager::UnloadHole(const struct CRManager* this)
+  705  0034AF68     3C  void CRManager::InitiateRipple(const struct CRManager* this, float x, float z, float fPower, float fSize, float dwDuration, float dwRippleFrequency, unsigned int dwPriority)

@@ -1,0 +1,15 @@
+// ../../../../../TIGERCODE/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/matrix44_operation_inline.h
+// compiled in: golf_unity.cpp, rnaunity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   34    inline-only   bool vpu::operator!=(struct <anon>& a, struct <anon>& b)
+  249    inline-only   struct <anon> vpu::Inverse(struct <anon>& m)
+                         local  struct <anon> determinant
+  743    inline-only   void vpu::Mult(struct <anon>& v, struct <anon>& m, const struct <anon>& result)
+  749    inline-only   void vpu::Mult(struct <anon>& m, struct <anon>& b, const struct <anon>& result)
+  765    inline-only   void vpu::Transpose(struct <anon>& m, const struct <anon>& result)
+  770    inline-only   struct <anon> vpu::Inverse(struct <anon>& m, const struct <anon>& result)
+                         local  struct <anon>& determinant
+                         local  struct <anon> determinant
+ 1065    inline-only   struct <anon> vpu::operator*(struct <anon>& v, struct <anon>& m)
+ 1107    inline-only   struct <anon> vpu::operator*(struct <anon>& a, struct <anon>& b)

@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/Golf/Lo-Rendering/GoBlendNormals.h
+// compiled in: golf_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   49    inline-only   TextureRef S2dRenderTarget::GetDstTextureRef(const const struct S2dRenderTarget* this)
+   64    inline-only   void UV_EndMinMax::Build(const struct UV_EndMinMax* this, int32 xOff, int32 yOff, int32 xDim, int32 yDim, int32 xEnd, int32 yEnd)
+  113    inline-only   int32 SBlendCtrl::getNumActiveChannels(const struct SBlendCtrl* this)

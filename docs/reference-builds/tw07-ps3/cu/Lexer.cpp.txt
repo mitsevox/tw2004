@@ -1,0 +1,39 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/source/common/Parser/Lexer.cpp
+// compiled in: Lexer.cpp
+// 10 functions, source order. line | PS3 address | size
+
+    0  007C52AC    10C  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+  125  007C3DE0     70  void Init(const struct <anon>* this, char* sourceText)
+  156  007C1CB8   2078  void GetTokens(const struct <anon>* this, uint32_t iFirstOffset)
+                         local  const char[10] __FUNCTION__
+                         local  enum TokenType TempToken
+                         local  char8_t* pSourceText
+  485  007C3E50   145C  void PrintTokens(const struct <anon>* this)
+                         local  struct <anon>* pToken
+                         local  int32_t idxToken
+                         local  int32_t nTokens
+                         local  int8_t nLength
+                         local  int8_t location
+                         local  char[48] pSourceText
+  772  007BD97C   3608  char* GetIdentifier(const struct <anon>* this, char* pSourceText)
+                         local  const char[14] __FUNCTION__
+                         local  char8_t[48] LocalBuffer
+                         local  char8_t value
+                         local  int32_t idxLocalBuffer
+ 1215  007C0F84    804  char* GetNumber(const struct <anon>* this, char* pSourceText)
+                         local  const char[10] __FUNCTION__
+                         local  int8_t value
+                         local  int32_t idxIntegerPart
+                         local  int32_t idxFloatPart
+                         local  int32_t WholePart
+                         local  int32_t Factor
+                         local  float64_t FractionalPart
+                         local  bool8_t bNegative
+ 1346  007C1788    530  char* GetStringLiteral(const struct <anon>* this, char* pSourceText)
+                         local  const char[17] __FUNCTION__
+                         local  char value
+                         local  uint32_t idxLocalBuffer
+ 1424  007C3D30     B0  struct <anon>* GetNextToken(const struct <anon>* this)
+                         local  struct <anon>* source
+ 1435  007C53B8     3C  static void _GLOBAL__I__ZN2EA4T3db5LexerC2Ev()
+ 1436  007C53F4     3C  static void _GLOBAL__D__ZN2EA4T3db5LexerC2Ev()

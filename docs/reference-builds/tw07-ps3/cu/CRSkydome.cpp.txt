@@ -1,0 +1,25 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/CRSkydome.cpp
+// compiled in: headgate_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   36  00350454     18  void LoadSkydomeDataFromMemory(unsigned char* streamData)
+   42  0034BB80     14  void UnloadSkydomeData()
+   48  0034D928     2C  bool HaveSkydomeData()
+   54  0034D2A8     3C  void UpdateSkydomeRotation(float dt)
+   69  00360DBC    38C  void RenderSkydome(float minY_we_should_look_up_this_dumb_thing_ourselves)
+                         local  vec4flt trans
+                         local  mat44flt transMatrix
+                         local  mat44flt skyMatrix
+                         local  mat44flt tempMatrix
+                         local  vec4flt eyePoint
+                         local  float fHieghtHack
+                         local  vec4flt vFogCamPos
+                         local  struct TerMesh* pMesh
+                         local  struct TerMesh* pMeshEndPoint
+                         local  TextureRef prevBaseRef
+                         local  struct TerStrip* pStrip
+                         local  struct TerStrip* pStripEndPoint
+                         local  TextureRef baseRef
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetZTestEnable, LLMath_Add, LLMath_IdentifyMat, LLMath_Scale, __vec_mul, vec4flt_Copy, vec_ld, vec_st
+  180  0036894C     10  static void _GLOBAL__I__ZN10BezierPathC2Ev()
+  181  0036893C     10  static void _GLOBAL__D__ZN10BezierPathC2Ev()

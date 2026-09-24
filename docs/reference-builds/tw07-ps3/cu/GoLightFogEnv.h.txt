@@ -1,0 +1,19 @@
+// ../../../../../TIGERCODE/Code/Golf/Hi-Rendering/Headers/GoLightFogEnv.h
+// compiled in: apt_unity.cpp, golf2_unity.cpp, golf_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+  210    inline-only   void LF_vSetCurrentLightFogEnvironment(int32 iLightFogEnvironment_p)
+  230    inline-only   LF_SLightFogEnvironment* LF_spGetCurrentLightFogEnvironment()
+  243    inline-only   void LF_vApplyLightingEnvironment()
+  257    inline-only   void LF_vSetGeneralColorationColorModifier(float fColorModifier_p)
+  329    inline-only   float LF_fComputeAngleBetweenLightAndCamera(enum LI_ELightIndex eLightIndex_p, struct CA_SCamera* spCamera_p)
+  360    inline-only   void LF_vInitLightFogEnvironment(struct GameXmlSettings xmlSettings, LF_SLightFogEnvironment* spLightFogEnvironment_p, enum eGameXml_TuneFlags tuneFlags)
+  369    inline-only   void LF_vFreeLightFogEnvironment(LF_SLightFogEnvironment* spLightFogEnvironment_p)
+  377    inline-only   void LF_vInitStandardLightingEnvironment()
+                         local  struct GameXmlSettings xmlSettings
+  386    inline-only   void LF_vGetLightColor(enum LI_ELightIndex index, float* color)
+                         local  struct LI_SLightingEnvironment* spLightingEnvironment
+                         local  struct LI_SLight* spLight
+  408    inline-only   void LF_vSetLightColor(enum LI_ELightIndex index, float* color)
+                         local  struct LI_SLightingEnvironment* spLightingEnvironment
+                         local  struct LI_SLight* spLight

@@ -1,0 +1,9 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/ssysserv.cpp
+// compiled in: ssysserv.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    6  006CF9B0     88  void iSNDserveraddclient(void(*)()* pfunc)
+   20  006CFA38    140  void iSNDserverremoveclient(void(*)()* pfunc)
+                         local  int i
+   45  006CFB78     B8  void SNDSYS_service()
+                         local  int i

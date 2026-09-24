@@ -1,0 +1,46 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/netradio/source/common/netradioextensionconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 12 functions, source order. line | PS3 address | size
+
+  112  005C9E7C     D8  const char8_t* GetTagFromServer(const struct NetRadioExtensionConcrete* this, const struct Dictionary* pDictionary, const char8_t* pRegion, const char8_t* pTag, char8_t* pBuf, uint32_t uBufSize)
+  146  005FB828    320  bool StartDownload(const struct NetRadioExtensionConcrete* this)
+                         local  struct NetRadioStrategy* pNetRadionStrategy
+                         local  const char8_t* pRegion
+                         local  char8_t[256] strURL
+                         local  char8_t[36] strTag
+                         local  uint32_t uTimeout
+                         local  bool bDownloading
+                         local  const struct Dictionary* pConfiguration
+                         local  struct MemoryStrategy* pMemoryStrategy
+                         inlines  GetInstance, operator=
+  222  005FBB48    150  void ProcessComplete(const struct NetRadioExtensionConcrete* this)
+                         local  uint32_t uCurrentTime
+                         local  uint32_t uLastDownloadTime
+                         local  uint32_t uCurrentTime
+                         inlines  GetLastDownloadTime, operator->, operator=
+  299  005C9F54     18  void ResourceProgress(const struct NetRadioExtensionConcrete* this, void* , const char8_t* , uint32_t uSize, uint32_t uCompleted)
+  330  005FBC98    140  void ResourceSuccess(const struct NetRadioExtensionConcrete* this, void* , const char8_t* strURL, struct Resource* pResource)
+                         local  uint32_t uMediaSize
+                         local  void* pMedia
+                         inlines  GetInstance, SetLastDownloadTime, operator=
+  375  005FBDD8     68  void ResourceFailure(const struct NetRadioExtensionConcrete* this, void* , const char8_t* strURL, enum Failure )
+                         inlines  operator=
+  407  005FBFC4     10  void SettingEvent(const struct NetRadioExtensionConcrete* this, struct Setting* pSetting, enum EventE eEvent)
+  436  005FBE40    184  void SettingChanged(const struct NetRadioExtensionConcrete* this, struct Setting* pSetting)
+                         local  struct SettingInteger* pSettingInteger
+                         local  enum SettingEnabled eEnabled
+                         inlines  GetInstance, operator->, operator=
+  493  00610084    134  void NetRadioExtensionConcrete(const struct NetRadioExtensionConcrete* this)
+                         inlines  NetRadioExtension, RCPointer, operator=
+  526  006103BC     F8  void ~NetRadioExtensionConcrete(const struct NetRadioExtensionConcrete* this)
+                         local  struct SettingManagerConcrete* pSettingManager
+                         inlines  GetSettingManagerConcrete, RemoveObserver, ~NetRadioExtension, ~RCPointer
+  556  005D500C    294  void Startup(const struct NetRadioExtensionConcrete* this)
+                         local  uint32_t uLoginSlotIndex
+                         local  struct NetRadioStrategy* pNetRadionStrategy
+                         local  const char8_t* pRegion
+                         local  char8_t[36] strTag
+                         local  const struct Dictionary* pConfiguration
+                         inlines  AddObserver, GetInstance
+  616  005FBFD4     F0  void Shutdown(const struct NetRadioExtensionConcrete* this)
+                         inlines  GetInstance, RemoveObserver, operator->, operator=

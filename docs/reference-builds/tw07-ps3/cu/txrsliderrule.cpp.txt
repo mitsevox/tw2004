@@ -1,0 +1,54 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/txrsliderrule.cpp
+// compiled in: other_unity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   23  00439834     68  void TXRSliderRule::TXRSliderRule(const struct TXRSliderRule* this, const const struct Allocator& allocatorRef)
+                         inlines  TXRRule::TXRRule
+   30  00439904    1F4  void TXRSliderRule::~TXRSliderRule(const struct TXRSliderRule* this)
+                         local  int i
+                         local  int j
+                         local  int j
+                         inlines  TXRRule::~TXRRule
+   61  00439F94    69C  void TXRSliderRule::ReadFromBuffer(const struct TXRSliderRule* this, char** buffer)
+                         local  const char[15] __FUNCTION__
+                         local  int i
+                         local  int numTintRulesParsed
+                         local  int numBlendRulesParsed
+                         local  int j
+                         local  uint8 ruleType
+                         local  struct TXRBlendRule* blendRule
+                         local  struct TXRTintRule* tintRule
+                         inlines  TagValuePair, operator+
+  158  0043A660    42C  void TXRSliderRule::RunRule(const struct TXRSliderRule* this, struct TextureGroup* pTexGroup, struct TXRRule_TEXStateInfo* texState, TextureRef workspace, int32 mipLevel)
+                         local  int endPos
+                         local  float range
+                         local  float lerpVal
+                         local  const int kMaxBlendRules
+                         local  struct TXRBlendRuleParams[32] blendRuleParams
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  struct TXRBlendRule blend
+                         local  int i
+                         local  int i
+                         local  struct TXRTintRule tint
+  226  003D3E9C     20  bool TXRSliderRule::SetSliderValue(const struct TXRSliderRule* this, float val)
+  239  003D3EE0     48  bool TXRSliderRule::SetSliderPosition(const struct TXRSliderRule* this, int32_t position)
+  255  003D3F28     C8  bool TXRSliderRule::SetSliderPosition(const struct TXRSliderRule* this, const char* name)
+                         local  int i
+  271  003D40B0     78  int32_t TXRSliderRule::GetSliderPosition(const struct TXRSliderRule* this)
+                         local  int i
+  283  0040C4E0     F4  bool TXRSliderRule::GetTintValueAtIndex(const struct TXRSliderRule* this, int32_t index, int32_t* r, int32_t* g, int32_t* b)
+  297  003D4CC0    18C  void TXRSliderRule::CopyTintsFromSlider(const struct TXRSliderRule* this, const struct TXRSliderRule* slider)
+                         local  int i
+                         local  int i
+                         local  int j
+  325  00420EFC    260  void TXRSliderRule::ChangeNamesByPattern(const struct TXRSliderRule* this, const char* oldName, const char* newName)
+                         local  char* instance
+                         local  unsigned int i
+                         local  int i
+                         local  int j
+                         local  int j
+                         inlines  std::strstr
+  356  003D46D8     84  void TXRSliderRule::Randomize(const struct TXRSliderRule* this, float minValue, float maxValue)
+                         inlines  Misc_RandFuncf

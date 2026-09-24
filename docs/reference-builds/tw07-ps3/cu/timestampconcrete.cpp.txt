@@ -1,0 +1,12 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/timestampconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   73  005C137C     48  void TimestampConcrete(const struct <anon>* this)
+   97  005C1458     48  void TimestampConcrete(const struct <anon>* this, uint32_t nTime)
+  122  005C1260      C  void ~TimestampConcrete(const struct <anon>* this)
+  145  005C152C      8  uint32_t GetTime(const const struct <anon>* this)
+  170  005E04D0     A0  void GetTimeAsString(const const struct <anon>* this, char8_t* strBuffer, uint32_t uBufferLen)
+                         local  char8_t[16] strTemp
+  196  005C1450      8  void SetTime(const struct <anon>* this, uint32_t nTime)
+  222  005C1534     58  int32_t GetDifference(const const struct <anon>* this, const struct Timestamp* pTime)

@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/Golf/Online/OSDK/Kickstart.h
+// compiled in: golf2_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   43    inline-only   struct KickStart* KickStart::GetInstance()
+   44    inline-only   uint8 KickStart::GetNumPlayers(const struct KickStart* this)
+   48    inline-only   struct OnlineMatchParams* KickStart::GetGameParams(const struct KickStart* this)

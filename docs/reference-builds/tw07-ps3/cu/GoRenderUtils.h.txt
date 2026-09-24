@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/Golf/Lo-Rendering/GoRenderUtils.h
+// compiled in: golf_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   48    inline-only   TextureRef CharTexController::GetFaceBlendNormalMap(const struct CharTexController* this)
+   67    inline-only   float lerpf(float a, float b, float interpolant)
+   72    inline-only   float clampf(float a, float min, float max)

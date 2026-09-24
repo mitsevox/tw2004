@@ -1,0 +1,21 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/texblendlerp.cpp
+// compiled in: other_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   18  003D0BC4     40  void TexBlendLerp::TexBlendLerp(const struct TexBlendLerp* this, const const struct Allocator& allocRef, struct Texture32b* destTexture)
+   25  003D0C44     18  void TexBlendLerp::~TexBlendLerp(const struct TexBlendLerp* this)
+   30  00410714    5A4  void TexBlendLerp::BlendNPixels(const struct TexBlendLerp* this, int32_t mipmap, int32_t numTextures, struct RawTexture** textures, TexBlendParams* params, int32_t numPixels, RawTexture_PixelValue** pixelBuffer, RawTexture_PixelValue* destPixels)
+                         local  int iTex
+                         local  bool fastBlend
+                         local  int iPix
+                         local  float r
+                         local  float g
+                         local  float b
+                         local  float a
+                         local  int iPix
+                         local  float r
+                         local  float g
+                         local  float b
+                         local  float a
+  142  003D0CC0     48  void* TexBlendLerp::PrepareTextureForBlend(const struct TexBlendLerp* this, struct RawTexture* texture, float lerpVal, int32_t texNum)
+  147  003D0D08     48  void TexBlendLerp::RestoreTextureFromBlend(const struct TexBlendLerp* this, struct RawTexture* texture, float lerpVal, void* dataStorage)

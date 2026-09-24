@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/GoViewport.c
+// compiled in: golf_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   58  001E94CC     5C  void VM_vUpdateInternalViewportRectData(VM_SViewport* spViewport_p)
+   95  00215990      4  void VM_vInitModule()
+  110  00215994      4  void VM_vCloseModule()
+  125  00243958    118  VM_SViewport* VM_spCreateViewport()
+                         local  const char[20] __FUNCTION__
+                         local  VM_SViewport* spViewport
+                         inlines  TagValuePair, VM_vSetDefaultViewport, operator+
+  161  002158F0     3C  void VM_vReleaseViewport(VM_SViewport* spViewport_p)

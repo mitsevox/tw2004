@@ -1,0 +1,51 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_RivalsChallengeBoard.cpp
+// compiled in: apt_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+  101  000F10FC     98  void UIRivalsChBoard::Init(const struct UIRivalsChBoard* this)
+                         local  int32 i
+                         inlines  FlashUpdateItem::SetFlashUpdateList, UIMenuBase::SetMaxRefCount
+  117  0006F078    110  void UIRivalsChBoard::Show(const struct UIRivalsChBoard* this)
+                         local  int32 nbrItemInMenu
+                         local  int32 nbrItemInMenu
+                         local  int32 nbrItemInMenu
+  149  00049D28     D4  void UIRivalsChBoard::InitMenuParams(const struct UIRivalsChBoard* this)
+                         local  int32 numVisibleItems
+  171  000A1918    5C8  void UIRivalsChBoard::UpdateItemAndLabel(const struct UIRivalsChBoard* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  char[32] tempString
+                         local  struct RivalChRankItem2* dst
+                         local  int golferID
+                         local  struct RivalChStatsItem3* dst
+                         local  char* tempStr
+                         local  char* valuestr
+                         local  int golferID
+                         local  uint32 valueV
+                         local  struct RivalChChallengeItem1* dst
+                         local  struct GameModeDriverEra* curRivalsGameDriver
+                         local  const struct Era_MainData_t* pMainData
+                         local  char[16] moneyAmountString
+                         local  int32 golferId
+                         local  char[16] moneyAmountString
+  307  000892F4    338  enum eAptHandleInput UIRivalsChBoard::HandleInput(const struct UIRivalsChBoard* this, int32 cID)
+                         local  int32 index
+                         local  struct RivalChChallengeItem1* dst
+                         local  int32 playableEventId
+                         local  int32 index
+  394  0008962C    19C  void UIRivalsChBoard::onClose(const struct UIRivalsChBoard* this, void* inData)
+                         local  const int32 index
+  425  00049DFC     40  struct IExternArray* UIRivalsChBoard::GetExternArray(const struct UIRivalsChBoard* this)
+  440  0006EEE0    198  void UIRivalsChBoard::SetUpPlayableEventsIds(const struct UIRivalsChBoard* this)
+                         local  struct GameModeDriverEra* curRivalsGameDriver
+                         local  int32 numTotalEvents
+                         local  int32 numPlayableEvents
+                         local  int32 i
+                         local  int32 i
+                         inlines  GameModeDriverEra::GetNumEvents
+  468  000890D0    178  void UIRivalsChBoard::OnSelectChallenge(const struct UIRivalsChBoard* this, int32 playableEventId)
+                         local  struct GameModeDriver* gameModeDriver
+                         inlines  cGAME_GLOBALS::SetNextGame
+  496  00089248     AC  void UIRivalsChBoard::OnSelectChBrdBoastChallenge(const struct UIRivalsChBoard* this)
+                         local  int32 boastId
+  509  00080790    144  void UIRivalsChBoard::GetAvailableBoastChallenges(const struct UIRivalsChBoard* this, int32 eventnum)
+                         local  struct GameModeDriverEra* curRivalsGameDriver
+                         local  int numAvailBoasts

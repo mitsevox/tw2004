@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/packages/tiger_module/include/tiger_module_global.h
+// compiled in: golf_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   38  0033EA7C      4  void Global::FirstUpdate(const struct Global* this)
+   39  0033EA94      8  int Global::GetResourceCount(const struct Global* this)
+   40  0033EAB0      4  void Global::ResourceCallback(const struct Global* this, void* resource, int resourceId, unsigned int resourceSize)
+   41  0033EAC8      8  int Global::GetResourceId(const struct Global* this, int resourceIndex)

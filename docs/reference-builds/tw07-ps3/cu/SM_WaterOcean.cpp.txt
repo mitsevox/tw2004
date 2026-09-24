@@ -1,0 +1,70 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_WaterOcean.cpp
+// compiled in: shader_unity.cpp
+// 51 functions, source order. line | PS3 address | size
+
+   28  0051C1AC    250  void SM_WaterOceanBaseClass::SM_WaterOceanBaseClass(const struct SM_WaterOceanBaseClass* this)
+                         inlines  LLMath_IdentifyMat, SM_Shader_Base::SM_Shader_Base, vec4flt_Zero, vec_st
+  110  0050B490    878  void SM_WaterOceanBaseClass::Load(const struct SM_WaterOceanBaseClass* this)
+  193  0050BD08    228  void SM_WaterOceanBaseClass::Activate(const struct SM_WaterOceanBaseClass* this)
+  229  0050BF30     44  void SM_WaterOceanBaseClass::Deactivate(const struct SM_WaterOceanBaseClass* this)
+  239  00513B7C     70  void SM_WaterOceanBaseClass::SetNoiseTexture(const struct SM_WaterOceanBaseClass* this, TextureRef texRef)
+  252  00513BEC     70  void SM_WaterOceanBaseClass::SetPCATexture(const struct SM_WaterOceanBaseClass* this, TextureRef texRef)
+  265  00513C5C     78  void SM_WaterOceanBaseClass::SetReflectEnvTexture(const struct SM_WaterOceanBaseClass* this, TextureRef texRef)
+  279  00513CD4     70  void SM_WaterOceanBaseClass::SetRefractEnvTexture(const struct SM_WaterOceanBaseClass* this, TextureRef texRef)
+  292  00513D44     6C  void SM_WaterOceanBaseClass::SetTick(const struct SM_WaterOceanBaseClass* this, float tick)
+  305  00519FF8     94  void SM_WaterOceanBaseClass::SetTextureMatrix(const struct SM_WaterOceanBaseClass* this, const float[4][4]& matTexture)
+                         inlines  LLMath_CopyMat44, vec_ld, vec_st
+  318  00518978     6C  void SM_WaterOceanBaseClass::SetEysPosPS(const struct SM_WaterOceanBaseClass* this, const float[4]& vecEyePos)
+                         inlines  vec4flt_Copy
+  331  005189E4     6C  void SM_WaterOceanBaseClass::SetPCAMean(const struct SM_WaterOceanBaseClass* this, const float[4]& vecPCAMean)
+                         inlines  vec4flt_Copy
+  344  00518A50     6C  void SM_WaterOceanBaseClass::SetPCAVecR(const struct SM_WaterOceanBaseClass* this, const float[4]& vecPCA_R)
+                         inlines  vec4flt_Copy
+  357  00518ABC     6C  void SM_WaterOceanBaseClass::SetPCAVecG(const struct SM_WaterOceanBaseClass* this, const float[4]& vecPCA_G)
+                         inlines  vec4flt_Copy
+  370  00518B28     6C  void SM_WaterOceanBaseClass::SetPCAVecB(const struct SM_WaterOceanBaseClass* this, const float[4]& vecPCA_B)
+                         inlines  vec4flt_Copy
+  383  00518B94     6C  void SM_WaterOceanBaseClass::SetLightDir(const struct SM_WaterOceanBaseClass* this, const float[4]& vecLightDir)
+                         inlines  vec4flt_Copy
+  396  00518C00     6C  void SM_WaterOceanBaseClass::SetWorldMin(const struct SM_WaterOceanBaseClass* this, const float[4]& vecWorldMin)
+                         inlines  vec4flt_Copy
+  409  00518C6C     6C  void SM_WaterOceanBaseClass::SetFogColor(const struct SM_WaterOceanBaseClass* this, float* camPos)
+                         inlines  vec4flt_Copy
+  419  00518CD8     6C  void SM_WaterOceanBaseClass::SetFogCameraPos(const struct SM_WaterOceanBaseClass* this, float* camPos)
+                         inlines  vec4flt_Copy
+  429  00513DB0     60  void SM_WaterOceanBaseClass::SetFogDensity(const struct SM_WaterOceanBaseClass* this, float f)
+  439  00513E10     60  void SM_WaterOceanBaseClass::SetFogStartRadius(const struct SM_WaterOceanBaseClass* this, float f)
+  449  00513E70     60  void SM_WaterOceanBaseClass::SetFogHeightTop(const struct SM_WaterOceanBaseClass* this, float f)
+  459  00518D44     6C  void SM_WaterOceanBaseClass::SetUvScale(const struct SM_WaterOceanBaseClass* this, float* uvScale)
+                         inlines  vec4flt_Copy
+  469  00518DB0     6C  void SM_WaterOceanBaseClass::SetUvOffset(const struct SM_WaterOceanBaseClass* this, float* uvOffset)
+                         inlines  vec4flt_Copy
+  479  00513ED0     60  void SM_WaterOceanBaseClass::SetWw_trail_core_side_falloffexp(const struct SM_WaterOceanBaseClass* this, float f)
+  489  00513F30     60  void SM_WaterOceanBaseClass::SetWaveDistance(const struct SM_WaterOceanBaseClass* this, float f)
+  499  00513F90     60  void SM_WaterOceanBaseClass::SetWw_trail_faint_side_falloffexp(const struct SM_WaterOceanBaseClass* this, float f)
+  509  00513FF0     60  void SM_WaterOceanBaseClass::SetGerstnerWave_amplitude(const struct SM_WaterOceanBaseClass* this, float f)
+  519  00514050     7C  void SM_WaterOceanBaseClass::SetGerstnerWave_steepness(const struct SM_WaterOceanBaseClass* this, float f)
+  532  005140CC     60  void SM_WaterOceanBaseClass::SetGerstnerWave_phase_const(const struct SM_WaterOceanBaseClass* this, float f)
+  542  0051412C     60  void SM_WaterOceanBaseClass::SetGerstnerWave_frequency(const struct SM_WaterOceanBaseClass* this, float f)
+  552  0051418C     60  void SM_WaterOceanBaseClass::SetNormalFactor(const struct SM_WaterOceanBaseClass* this, float f)
+  562  00518E1C     6C  void SM_WaterOceanBaseClass::SetWaterColor(const struct SM_WaterOceanBaseClass* this, float* WaterColor)
+                         inlines  vec4flt_Copy
+  572  00518E88     6C  void SM_WaterOceanBaseClass::SetCamb(const struct SM_WaterOceanBaseClass* this, float* Camb)
+                         inlines  vec4flt_Copy
+  582  005141EC     60  void SM_WaterOceanBaseClass::SetDiff(const struct SM_WaterOceanBaseClass* this, float f)
+  592  0051424C     60  void SM_WaterOceanBaseClass::SetRoughness(const struct SM_WaterOceanBaseClass* this, float f)
+  602  005142AC     60  void SM_WaterOceanBaseClass::SetDepthFallOffExp(const struct SM_WaterOceanBaseClass* this, float f)
+  612  0051430C     60  void SM_WaterOceanBaseClass::SetFft_map_freq(const struct SM_WaterOceanBaseClass* this, float f)
+  622  0051436C     60  void SM_WaterOceanBaseClass::SetFft_map_freq_low(const struct SM_WaterOceanBaseClass* this, float f)
+  634  0051C4CC     40  void SM_WaterOceanLoResClass::SM_WaterOceanLoResClass(const struct SM_WaterOceanLoResClass* this)
+  640  0050BF74     50  void SM_WaterOceanLoResClass::Load(const struct SM_WaterOceanLoResClass* this)
+  648  0050BFC4      4  void SM_WaterOceanLoResClass::Activate(const struct SM_WaterOceanLoResClass* this)
+  653  0050BFC8      4  void SM_WaterOceanLoResClass::Deactivate(const struct SM_WaterOceanLoResClass* this)
+  660  0051C3FC     68  void SM_WaterOceanHiResClass::SM_WaterOceanHiResClass(const struct SM_WaterOceanHiResClass* this)
+  675  0050BFCC    150  void SM_WaterOceanHiResClass::Load(const struct SM_WaterOceanHiResClass* this)
+  692  0050C11C     54  void SM_WaterOceanHiResClass::Activate(const struct SM_WaterOceanHiResClass* this)
+  700  0050C170     38  void SM_WaterOceanHiResClass::Deactivate(const struct SM_WaterOceanHiResClass* this)
+  708  005143CC     78  void SM_WaterOceanHiResClass::SetColorTexture(const struct SM_WaterOceanHiResClass* this, TextureRef texRef)
+  722  00514444     70  void SM_WaterOceanHiResClass::SetWhiteWaterTexture(const struct SM_WaterOceanHiResClass* this, TextureRef texRef)
+  734  005144B4     60  void SM_WaterOceanHiResClass::SetWw_trail_core_direction_falloffexp(const struct SM_WaterOceanHiResClass* this, float f)
+  745  00514514     60  void SM_WaterOceanHiResClass::SetWw_trail_faint_direction_falloffexp(const struct SM_WaterOceanHiResClass* this, float f)

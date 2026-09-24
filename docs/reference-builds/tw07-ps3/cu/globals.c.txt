@@ -1,0 +1,99 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/globals/globals.c
+// compiled in: golf_unity.cpp
+// 62 functions, source order. line | PS3 address | size
+
+  191  002604C8     F8  static void RECORDS_LoadFromStream(struct TStreamData* pStreamData)
+  227  00213DE4    174  static void BranchName_StartCallback(const char* name, const char** attrs)
+                         local  const char** c
+  247  0027D2E0    1DC  static void BranchName_LoadFromStream(struct TStreamData* pStreamData)
+                         local  char* xml
+  281  002605C0    128  void cGAME_GLOBALS::RegisterStreamClients(const struct cGAME_GLOBALS* this)
+                         local  int32 filesize
+                         local  void* pFileData
+  317  00213F58     3C  void cGAME_GLOBALS::UnRegisterStreamClients(const struct cGAME_GLOBALS* this)
+  331  00282170     6C  void cGAME_GLOBALS::SetVibration(const struct cGAME_GLOBALS* this, bool val)
+                         local  int i
+  346  002821DC    508  void cGAME_GLOBALS::SetDefaultOptions(const struct cGAME_GLOBALS* this, struct GAME_OPTIONS_t* options)
+                         local  int j
+                         local  const size_t MAXCHARSIZE
+  529  0021B504    1D0  void cGAME_GLOBALS::SetQuickOnlineMessages(const struct cGAME_GLOBALS* this, struct GAME_OPTIONS_t* options)
+                         local  const size_t MAXCHARSIZE
+  550  002826E4    2A4  void cGAME_GLOBALS::OpenONCE(const struct cGAME_GLOBALS* this)
+                         local  int i
+                         local  int j
+                         local  uint32 tutID
+                         inlines  cGAME_GLOBALS::SetGreen, cGAME_GLOBALS::SetPin
+  659  0029D39C    3D8  void cGAME_GLOBALS::SetCharacterStyle(const struct cGAME_GLOBALS* this)
+                         local  int i
+                         local  int j
+                         local  int userID
+                         local  int8 spin
+                         inlines  HashString::operator=, Singleton<GolferStats>::GetSingleton
+  733  00214C9C     4C  void cGAME_GLOBALS::Init(const struct cGAME_GLOBALS* this)
+                         inlines  cGAME_GLOBALS::SetPipEnabled
+  754  0026E558     54  void cGAME_GLOBALS::QuitApplicationHardIfRequested(const struct cGAME_GLOBALS* this)
+                         inlines  cGAME_GLOBALS::IsQuitApplicationRequested
+  770  002776E8    254  enum GM_CourseType_t cGAME_GLOBALS::GetHoleBinCourse(const struct cGAME_GLOBALS* this)
+                         local  enum GM_CourseType_t courseType
+                         inlines  std::strstr
+  841  001F401C     58  void cGAME_GLOBALS::SetNumberOfPlayers(const struct cGAME_GLOBALS* this, int numPlayers)
+  847  001F3C84     1C  int cGAME_GLOBALS::GetNumberOfPlayers(const struct cGAME_GLOBALS* this)
+  857  0021401C      4  void cGAME_GLOBALS::ByteSwapRecordsFile(const struct cGAME_GLOBALS* this)
+  889  00214020    134  void cGAME_GLOBALS::InitTimeOfDayAndSeason(const struct cGAME_GLOBALS* this)
+                         local  int8 hour
+  941  001FE5E8     1C  void cGAME_GLOBALS::SetTimeOfDay(const struct cGAME_GLOBALS* this, int8 hour, int8 minute)
+  946  00214154     14  void cGAME_GLOBALS::GetTimeOfDay(const struct cGAME_GLOBALS* this, int8* hour, int8* minute)
+  953  00214168    114  void cGAME_GLOBALS::IncrementTimeOfDay(const struct cGAME_GLOBALS* this)
+  979  00282104     6C  void cGAME_GLOBALS::SetOptionFlag(const struct cGAME_GLOBALS* this, enum OptionFlags flag, bool val)
+                         inlines  BitArray_ClearBit, BitArray_SetBit
+ 1091  0027723C     48  bool cGAME_GLOBALS::GetOptionFlag(const struct cGAME_GLOBALS* this, enum OptionFlags flag)
+ 1102  00277284     F8  bool cGAME_GLOBALS::GetOptionFlagForPlayer(const struct cGAME_GLOBALS* this, enum PlayerNumber_t PlayerID, enum OptionFlags flag)
+ 1122  001F55A8     84  bool cGAME_GLOBALS::IsExpertMode(const struct cGAME_GLOBALS* this, enum PlayerNumber_t PlayerID)
+ 1148  0021427C     40  enum eAimingType cGAME_GLOBALS::GetAimingMarkerType(const struct cGAME_GLOBALS* this)
+                         local  enum eAimingType returnVal
+ 1169  001ED20C     18  float cGAME_GLOBALS::GetFramesPerSec(const struct cGAME_GLOBALS* this)
+ 1174  00206768     18  float cGAME_GLOBALS::GetSecondsPerFrame(const struct cGAME_GLOBALS* this)
+ 1179  002142BC     18  float cGAME_GLOBALS::GetTicksPerFrame(const struct cGAME_GLOBALS* this)
+ 1184  00213F94     88  void cGAME_GLOBALS::SetForNTSCPALPlay(const struct cGAME_GLOBALS* this, bool flag)
+                         local  int already_set
+ 1210  002142D4     30  int cGAME_GLOBALS::GetElapsedMS(const struct cGAME_GLOBALS* this)
+ 1217  00214304     18  enum WIND_e cGAME_GLOBALS::GetWindOption(const struct cGAME_GLOBALS* this)
+ 1223  0020CDBC     6C  void cGAME_GLOBALS::SetGreensOption(const struct cGAME_GLOBALS* this, enum GREEN_SPEEDS_e green)
+ 1233  0020CD24     6C  void cGAME_GLOBALS::SetGreenHardnessOption(const struct cGAME_GLOBALS* this, enum GREEN_HARDNESS_e greenHardness)
+ 1243  0021431C     6C  void cGAME_GLOBALS::SetRoughsOption(const struct cGAME_GLOBALS* this, enum ROUGH_LENGTHS_e roughs)
+ 1253  0020CD90     2C  void cGAME_GLOBALS::SetFairwayOption(const struct cGAME_GLOBALS* this, enum FAIRWAY_SPEEDS_e fairway)
+ 1263  001E9674     18  enum GAME_MODE_e cGAME_GLOBALS::GetGameMode(const struct cGAME_GLOBALS* this)
+ 1270  001ED60C     18  float cGAME_GLOBALS::GetElapsedTime(const struct cGAME_GLOBALS* this)
+ 1277  00211C04     18  void cGAME_GLOBALS::SetElapsedTime(const struct cGAME_GLOBALS* this, float t)
+ 1284  001F5030     68  enum Golfer_t cGAME_GLOBALS::GetGolfer(const struct cGAME_GLOBALS* this, enum PlayerNumber_t playerNumber)
+ 1293  00214388     6C  int32 cGAME_GLOBALS::GetGolferHandle(const struct cGAME_GLOBALS* this, enum PlayerNumber_t playerNumber)
+ 1302  002143F4     14  enum Golfer_t* cGAME_GLOBALS::GetGolferPtr(const struct cGAME_GLOBALS* this)
+ 1308  0021447C     C0  void cGAME_GLOBALS::SetGolfer(const struct cGAME_GLOBALS* this, int player, enum Golfer_t golfer)
+ 1319  00214408     74  void cGAME_GLOBALS::SetGolferHandle(const struct cGAME_GLOBALS* this, int player, int32 handle)
+ 1327  001F3CA0     70  enum PlayerCtrl_t cGAME_GLOBALS::GetController(const struct cGAME_GLOBALS* this, int playerIx)
+ 1336  00201F80     74  void cGAME_GLOBALS::SetController(const struct cGAME_GLOBALS* this, int playerIx, enum PlayerCtrl_t controller)
+ 1344  001F50B4     DC  struct GLOBAL_RECORD_t& cGAME_GLOBALS::GetCourseRecord(const struct cGAME_GLOBALS* this, enum GM_CourseType_t course, int record, int place)
+ 1356  001FC348     A8  struct GLOBAL_RECORD_t& cGAME_GLOBALS::GetOverallRecord(const struct cGAME_GLOBALS* this, int record, int place)
+ 1368  00211B30     70  bit32 cGAME_GLOBALS::GetClubSelection(const struct cGAME_GLOBALS* this, enum PlayerNumber_t player)
+ 1376  00214648     24  bool cGAME_GLOBALS::GetEATraxPlaylistOption(const struct cGAME_GLOBALS* this, int gameMode, int trax)
+ 1382  0021466C     24  void cGAME_GLOBALS::SetEATraxPlaylistOption(const struct cGAME_GLOBALS* this, int gamemode, int trax, bool set)
+ 1388  00214690     6C  bool cGAME_GLOBALS::GetEnableEATraxOption(const struct cGAME_GLOBALS* this, int playList)
+ 1395  002146FC     78  void cGAME_GLOBALS::SetEnableEATraxOption(const struct cGAME_GLOBALS* this, int playList, bool bSet)
+ 1407  00210C08     7C  void cGAME_GLOBALS::SetCumulativeFrames(const struct cGAME_GLOBALS* this, uint32 timeInFixedPointFrames, uint32 timeInWholeFrames)
+ 1415  00214774     A8  void cGAME_GLOBALS::UpdateCumulativeFrames(const struct cGAME_GLOBALS* this, float deltaTimeInseconds)
+ 1423  0024734C     A0  int cGAME_GLOBALS::GetTee(const struct cGAME_GLOBALS* this, int player)
+ 1437  0026A12C    1A0  void cGAME_GLOBALS::SetTee(const struct cGAME_GLOBALS* this, int player, int teeNum)
+                         inlines  cGAME_GLOBALS::AreWeGoingIntoFacility
+ 1456  0026A2CC    12C  void cGAME_GLOBALS::SetTee(const struct cGAME_GLOBALS* this, int player, enum GM_TeeFacilityIndex_t teeNum)
+                         inlines  cGAME_GLOBALS::AreWeGoingIntoFacility
+ 1467  00251C8C    118  void cGAME_GLOBALS::SetTee(const struct cGAME_GLOBALS* this, int player, enum GM_TeeColorType_t teeNum)
+                         inlines  cGAME_GLOBALS::AreWeGoingIntoFacility
+ 1480  0021481C     48  void cGAME_GLOBALS::SetHoleBinName(const struct cGAME_GLOBALS* this, char* name)
+ 1486  00214864     E4  void cGAME_GLOBALS::SetCharacterStyleBallStripColor(const struct cGAME_GLOBALS* this, int charIndex, int stripeIndex, int colorspot, int8 color)
+ 1497  00214948     A0  void cGAME_GLOBALS::DebugMetricOut(const struct cGAME_GLOBALS* this, char* filename, char* fmt)
+                         local  va_list arglist
+                         local  char[256] s
+ 1512  002149E8    1BC  void cGAME_GLOBALS::DebugMetricOut(const struct cGAME_GLOBALS* this, enum OUTPUT_METRIC_e type, char* fmt)
+                         local  va_list arglist
+                         local  char[256] s
+                         local  char[80] filename

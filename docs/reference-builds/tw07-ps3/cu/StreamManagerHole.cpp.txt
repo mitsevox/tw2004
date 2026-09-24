@@ -1,0 +1,23 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/streaming/StreamManagerHole.cpp
+// compiled in: golf2_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   30  00135BD0     3C  void StreamManagerHole::RegisterStreamClients(const struct StreamManagerHole* this)
+   57  00135C0C     3C  void StreamManagerHole::UnregisterStreamClients(const struct StreamManagerHole* this)
+   85  001995D4    3E0  void StreamManagerHole::StreamFiles(const struct StreamManagerHole* this)
+                         local  enum GUI_ScoreCardType_t scType
+                         local  const struct UILoadingScreen& lScreen
+                         local  char[128] temp
+                         local  int32 curFile
+                         local  int32 curOffset
+                         local  int32 fileSize
+                         local  float completion
+                         local  bool bStillStreaming
+                         local  bool dashboardAutoUpdating
+                         local  char[128] temp
+                         local  const char* course
+                         local  const char* holetxt
+                         local  int holenum
+                         inlines  GM_GetCourseName, GM_GetHoleName, UILoadingScreen::SetState
+  191  00135C48     58  void StreamManagerHole::BeginStreamCallback(void* pData)
+  228  00135CA0      4  void StreamManagerHole::EndStreamCallback(void* pData)

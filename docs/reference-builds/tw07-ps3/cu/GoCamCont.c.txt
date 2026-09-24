@@ -1,0 +1,103 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/cameras/GoCamCont.c
+// compiled in: golf_unity.cpp
+// 31 functions, source order. line | PS3 address | size
+
+  104    inline-only   void CameraController_ProcessCameraShake(enum PlayerNumber_t ePlayerID, CameraController_t* pCameraController)
+                         local  int i
+  137  002414D8      4  void CameraController_Init()
+  145  001ED674      4  void CameraController_DeInit()
+  155  001ED678     F8  void CameraController_InitOneCamera(CameraController_t* pCameraController)
+  190  001ED770     20  void CameraController_ResetCameraState(CameraController_t* pCameraController)
+  206  003264A8    C48  void CameraController_Idle(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  enum CameraFadeType_e oldFadeType
+                         local  enum GolferState state
+                         local  enum GolferState state
+                         inlines  CameraController_ProcessCameraShake, LLMath_Length
+  605  00254B64    214  void CameraController_CopyCameraController(CameraController_t* pNewController, CameraController_t* pOldController, int32 viewControllerID)
+                         inlines  LLMath_CopyMat44, vec3flt_Copy, vec4flt_Copy, vec_ld, vec_st
+  670  002EABCC    5C4  void CameraController_SetCameraMode(CameraController_t* pCameraController, enum CameraMode_t eCameraMode, enum PlayerNumber_t ePlayerID, int32 viewControllerID)
+                         local  int32 oldId
+                         local  int i
+                         local  bool success
+  990    inline-only   bool CameraController_PointIsOnScreen(enum PlayerNumber_t ePlayerID, float* worldPoint, float errMargin)
+                         local  float textX
+                         local  float textY
+                         local  float textZ
+                         local  bool inFrontOfScreen
+ 1014  00293F2C    228  bool CameraController_TargetIsOnScreen(enum PlayerNumber_t ePlayerID)
+                         inlines  CameraController_PointIsOnScreen, LLMath_Scale, RC_vComputeRenderCtxWorldToPrimitiveCoordinate, __vec_mul
+ 1021  00294234    228  bool CameraController_BallIsOnScreen(enum PlayerNumber_t ePlayerID)
+                         inlines  CameraController_PointIsOnScreen, LLMath_Scale, RC_vComputeRenderCtxWorldToPrimitiveCoordinate, __vec_mul
+ 1033  00257DF0     90  int CameraController_GetClippedGolfer()
+                         local  int32 currentView
+                         local  int i
+ 1058  00257D60     90  int CameraController_GetClippedShadow()
+                         local  int32 currentView
+                         local  int i
+ 1082  00257C4C    114  static bool CameraController_HideGolfer(enum PlayerNumber_t ePlayerID, int32 viewID)
+                         local  CameraController_t* camCont
+ 1137  002ED994    188  void CameraController_ResetSwingCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  CameraChainLink* swingCam
+                         local  CameraSequence_t* newSeq
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  enum CameraInterpType_e interpType
+                         local  float interpTime
+                         local  float interpSpeed
+                         local  enum Lie_t startLie
+                         local  enum CameraEvent_e timeTrigger
+                         local  float timeTriggerTime
+                         inlines  CameraController_GetCameraLookPoint
+ 1202  001EDBF0     C0  void CameraController_CheckForEvents(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+ 1219  002E4974    374  void CameraController_CameraCollision(int32 viewID, float* centerPos)
+                         local  CameraController_t* pCameraController
+                         local  enum PlayerNumber_t plr
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt objectPos
+                         local  vec4flt camToObj
+                         local  vec4flt camToLook
+                         local  float dotP
+                         local  float lookDotP
+                         local  float fVelocity
+                         local  vec4flt xzCamVel
+                         inlines  CameraController_GetCameraLookPoint, LLMath_DotProduct3, LLMath_Length3, LLMath_Subtract3, __vec_len_sqr3, vec_madd, vec_sld, vec_sub
+ 1298  0024ACF0     30  void CameraController_FadeIn(CameraController_t* pCameraController, float* color, float time)
+ 1314  001EDFF8     30  void CameraController_FadeOut(CameraController_t* pCameraController, float* color, float time)
+ 1330  001ED958     4C  bool CameraController_IsFadeDone(CameraController_t* pCameraController)
+ 1347  001ED9A4     5C  bool CameraController_IsFadeOutDone(CameraController_t* pCameraController)
+ 1362  001EDA00     24  bool CameraController_IsFadeOn(CameraController_t* pCameraController)
+ 1387  001EDA3C    1B4  void CameraController_PostEvent(CameraController_t* pCameraController, enum CameraEvent_e event, enum PlayerNumber_t ePlayerID)
+                         local  struct TGD_MaterialInfo* g_terMostRecentSurfaceInfoPtr
+ 1493  00273EEC    3C8  void CameraController_LagVector(float* current, float* desired, float lagAngle, float* result)
+                         local  float angleDiff
+                         local  Quat rotationQuat
+                         local  vec4flt rotationAxis
+                         local  vec4flt currentNorm
+                         local  vec4flt desiredNorm
+                         inlines  LLMath_CrossProduct3W0, LLMath_DotProduct3, LLMath_Scale3, __vec_dot3, __vec_mul, vec4flt_Copy3, vec_ld, vec_madd, vec_nmsub, vec_sld
+ 1551  002742B4    364  void CameraController_LagSideVector(float* current, float* desired, float* result)
+                         local  float angleDiff
+                         local  Quat rotationQuat
+                         local  vec4flt rotationAxis
+                         local  vec4flt currentNorm
+                         local  vec4flt desiredNorm
+                         local  float lagAmount
+                         inlines  LLMath_CrossProduct3W0, LLMath_DotProduct3, LLMath_Scale3, __vec_dot3, __vec_mul, vec4flt_Copy3, vec_ld, vec_madd, vec_nmsub, vec_sld
+ 1613  0026CD88    1F0  static void CameraController_ComputeCurrentSideVector(CameraController_t* pCameraController)
+                         local  vec4flt targetToPos
+                         local  vec4flt upVector
+                         local  vec4flt crossP
+                         local  Quat rotationQuat
+                         inlines  LLMath_CrossProduct3W0, LLMath_Scale3, LLMath_Subtract3, vec_nmsub, vec_perm, vec_sub
+ 1648  0029F23C    120  void CameraController_ShakeCamera(CameraController_t* pCameraController)
+                         inlines  Misc_RandFuncf
+ 1656  001ED600      C  void CameraController_SetShakeAmount(CameraController_t* pCameraController, float length, float intensity)
+ 1662  001EDCD8     24  bool CameraController_bDontClearFrameBuffer()
+ 1674  002ED934     60  void CameraController_ResetAimMarkerInSwingCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+ 1689  002ED85C     D8  void CameraController_FreezeCurrentCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         inlines  CameraController_GetCameraLookPoint

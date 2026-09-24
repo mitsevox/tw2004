@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/CRCloudShadows.h
+// compiled in: headgate_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   18    inline-only   float[4][4]& CRCloudShadows::GetShadowMatrix(const struct CRCloudShadows* this)
+   19    inline-only   float CRCloudShadows::GetShadowContribution(const struct CRCloudShadows* this)
+   20    inline-only   TextureRef CRCloudShadows::GetCloudShadowTexture(const struct CRCloudShadows* this)

@@ -1,0 +1,60 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_MenuToggle.cpp
+// compiled in: apt_unity.cpp
+// 22 functions, source order. line | PS3 address | size
+
+   60  000F6384     BC  void UIMenuToggle::UIMenuToggle(const struct UIMenuToggle* this)
+                         inlines  TArrayInternal<UIMenuToggleItem,AptStructSwapper>::TArrayInternal, TExternArray<UIMenuToggleItem>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   73  00024B54     8C  void UIMenuToggle::NotifySetText(const struct UIMenuToggle* this)
+                         local  const struct UIMenuToggleItem& item
+   81  00032360     44  void UIMenuToggle::SetCBItemText(const struct UIMenuToggle* this, const char* text)
+   92  000EFA94    26C  void UIMenuToggle::Init(const struct UIMenuToggle* this)
+                         inlines  BitArray_FillArray, FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init
+  120  000446BC     4C  void UIMenuToggle::OnHide(const struct UIMenuToggle* this)
+  127  000443B8    104  void UIMenuToggle::ShowMenu(const struct UIMenuToggle* this, struct UIResponseHandler* inpHandler, struct UIMenuItemBaseSrc* inMenuItemArray, int32 nbrElemsInMenu, int32 sizeofItemBaseSrc, enum eMenuAllocType alloctype)
+                         local  int32 i
+                         local  enum eToggleItemType type
+  150  0005D460     DC  void UIMenuToggle::Hide(const struct UIMenuToggle* this)
+  183  000D060C    20C  void UIMenuToggle::OnShow(const struct UIMenuToggle* this)
+                         local  int32 firstElement
+                         local  int32 i
+                         inlines  TArrayInternal<UIMenuToggleItem,AptStructSwapper>::operator[], TExternArray<UIMenuToggleItem>::vGetElemCount
+  209  00037D74     98  int32_t UIMenuToggle::GetToggleIndexFromUniqueID(const struct UIMenuToggle* this, int32_t id)
+                         local  int32_t returnIdx
+                         local  int32_t numMenuItems
+                         local  int32_t i
+                         local  struct UIMenuToggleItem* pMenuItem
+  230  00044738     78  int32_t UIMenuToggle::GetToggleIndexFromUniqueID(const const struct UIMenuToggleItemConst* menu, int32_t numMenuItems, int32_t id)
+                         local  int32_t returnIdx
+                         local  int32_t i
+  249  0008F8C4    104  void UIMenuToggle::UpdateItemAndLabel(const struct UIMenuToggle* this, struct UIMenuItemBaseDst* dstItem, struct UIMenuItemBaseSrc* srcItem, int32 index, char* inLabel)
+                         local  struct UIMenuToggleItemConst* menuItemIn
+                         local  struct UIMenuToggleItem* itemToUpdate
+  278  00093544    230  void UIMenuToggle::ToggleItem(const struct UIMenuToggle* this, int32 toggleAmount, bool bForceNoWrap, bool bPlaySound)
+                         local  int32 iSoundToPlay
+                         local  struct UIMenuToggleItem* opItemToUpdate
+                         local  bool bWrapAround
+                         inlines  UIExternScrollMenuIterator::GetActiveItemIndex
+  355  0008FA50     A8  bool UIMenuToggle::IsToggleEnabled(const struct UIMenuToggle* this, const uint8_t toggleIndex)
+  364  000D0878    120  void UIMenuToggle::SetToggleEnabledState(const struct UIMenuToggle* this, const uint8_t toggleIndex, const bool toggleState, bool forceUpdateToggleArray)
+                         inlines  BitArray_ClearBit, BitArray_SetBit, TArrayInternal<UIMenuToggleItem,AptStructSwapper>::operator[]
+  380  0005D150     A0  void UIMenuToggle::SetUpToggleMenu(const struct UIMenuToggle* this, const char* menuTitle, enum eToggleMenuType typeOfMenu, const char* flashOptArray, int32 numVisibleRows, const char* helpTextId, bool inbsaveOptions, bool playBackSound)
+                         inlines  UIMenuVertBase::SetNumVisibleVertRows
+  394  000447B0     80  void UIMenuToggle::ShowHelpText(const struct UIMenuToggle* this)
+  407  00044708      C  void UIMenuToggle::ResetAllTogglesEnabledState(const struct UIMenuToggle* this)
+                         inlines  BitArray_FillArray
+  415  000D2134     50  void UIMenuToggle::ForceCloseToggleMenu(const struct UIMenuToggle* this)
+  424  000D1FCC    168  void UIMenuToggle::OnCloseToggleMenu(const struct UIMenuToggle* this)
+                         local  const int32 count
+                         local  int i
+                         local  int32 activeOption
+                         inlines  TArrayInternal<UIMenuToggleItem,AptStructSwapper>::operator[], TExternArray<UIMenuToggleItem>::vGetElemCount
+  469  00058B18     24  void _MenuToggleSaveCB(int32 nRst)
+  481  000D6B0C    5E4  enum eAptHandleInput UIMenuToggle::HandleInput(const struct UIMenuToggle* this, int32 cID)
+                         local  enum eAptHandleInput retVal
+                         local  int32_t startingIdx
+                         local  int32_t curIdx
+                         local  int32_t numElems
+                         local  int32_t startingIdx
+                         local  int32_t curIdx
+                         inlines  TArrayInternal<UIMenuToggleItem,AptStructSwapper>::operator[]
+  637  00044714     24  bool UIMenuToggle::IsSliderType(const struct UIMenuToggle* this, enum eToggleItemType type)

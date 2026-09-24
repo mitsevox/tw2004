@@ -1,0 +1,72 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/other_unity.cpp
+// compiled in: other_unity.cpp
+// 35 functions, source order. line | PS3 address | size
+
+    0    inline-only   struct AptFileSavedInputState& operator=(const struct AptFileSavedInputState* this, const const struct AptFileSavedInputState& )
+    0  00475B98    D10  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  AptActionInterpreter, AptLLMemPool::AptLLMemPool, AptSmartMemoryPool::AptSmartMemoryPool, AptSmartMemoryPool::~AptSmartMemoryPool, AptValueStack<AptFrameStack*,32>::AptValueStack, AptValueStack<AptValue*,32>::AptValueStack, ArrayAllocTracker::ArrayAllocTracker, EarningsManager::EarningsManager, EarningsManager::~EarningsManager, GameManager::~GameManager, GameModeBloodGreenSome::GameModeBloodGreenSome, GameModeBloodGreenSome::~GameModeBloodGreenSome, GamePlayerManager::~GamePlayerManager, GetRow, GolferData_t, GolferStats::GolferStats, GolferStats::~GolferStats, HashString::HashString, HighScoreRecords::HighScoreRecords, HighScoreRecords::~HighScoreRecords, Matrix44, Quaternion, Set, ThumbNailManager::ThumbNailManager, ThumbNailManager::~ThumbNailManager, UserManager::UserManager, UserManager::~UserManager, Vector2, Vector3, Vector4, X0Y0X1Y1::X0Y0X1Y1
+    0  004A7C6C     38  void AptLLMemPool::~AptLLMemPool(const struct AptLLMemPool* this)
+    0  004A7CF4     68  void GameManager::~GameManager(const struct GameManager* this)
+                         inlines  Singleton<GameManager>::~Singleton
+    0  004A7D5C     68  void GamePlayerManager::~GamePlayerManager(const struct GamePlayerManager* this)
+                         inlines  Singleton<GamePlayerManager>::~Singleton
+    0  004A8940     88  void AptSubscriberVariable::~AptSubscriberVariable(const struct AptSubscriberVariable* this)
+                         inlines  AptStructSwapper::Free, IAptSubscriber::~IAptSubscriber, ~TAptArrayStruct
+    0  004A8A54     18  void AptSubscriberBasic::~AptSubscriberBasic(const struct AptSubscriberBasic* this)
+                         inlines  IAptSubscriber::~IAptSubscriber
+    0  004A8AA0     58  void TRefObj<AptShareTextData>::~TRefObj(const struct TRefObj<AptShareTextData>* this)
+                         inlines  AptShareTextData::~AptShareTextData, HoldString::~HoldString
+    0  004A8B60     68  void ThumbNailManager::~ThumbNailManager(const struct ThumbNailManager* this)
+                         inlines  Singleton<ThumbNailManager>::~Singleton
+    0  004A8C48     68  void GolferStats::~GolferStats(const struct GolferStats* this)
+                         inlines  Singleton<GolferStats>::~Singleton
+    0  004A8D30     68  void HighScoreRecords::~HighScoreRecords(const struct HighScoreRecords* this)
+                         inlines  Singleton<HighScoreRecords>::~Singleton
+    0  004A8E18     68  void UserManager::~UserManager(const struct UserManager* this)
+                         inlines  Singleton<UserManager>::~Singleton
+    0  004A8F00     68  void EarningsManager::~EarningsManager(const struct EarningsManager* this)
+                         inlines  Singleton<EarningsManager>::~Singleton
+    0  004A980C     88  void AptDebugSubscriber::~AptDebugSubscriber(const struct AptDebugSubscriber* this)
+                         inlines  AptStructSwapper::Free, AptSubscriberVariable::~AptSubscriberVariable, IAptSubscriber::~IAptSubscriber
+    0  004A9920     C8  void Apt1By1AnimationSubscriber::~Apt1By1AnimationSubscriber(const struct Apt1By1AnimationSubscriber* this)
+                         inlines  AptStructSwapper::Free, AptSubscriberVariable::~AptSubscriberVariable, IAptSubscriber::~IAptSubscriber, ~TAptArrayStruct
+    0  004A9AB4     88  void AptSubscriberVariableGrp::~AptSubscriberVariableGrp(const struct AptSubscriberVariableGrp* this)
+                         inlines  AptStructSwapper::Free, AptSubscriberVariable::~AptSubscriberVariable, IAptSubscriber::~IAptSubscriber
+    0  004A9EDC     B8  void AptScreenSubscriber::~AptScreenSubscriber(const struct AptScreenSubscriber* this)
+                         inlines  AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::operator delete, IAptSubscriber::~IAptSubscriber
+    0  004AA060     18  void AptTxtAnimatedSubscriber::~AptTxtAnimatedSubscriber(const struct AptTxtAnimatedSubscriber* this)
+                         inlines  AptSubscriberBasic::~AptSubscriberBasic
+    0  004AA090     18  void AptProShop3DItemSubscriber::~AptProShop3DItemSubscriber(const struct AptProShop3DItemSubscriber* this)
+                         inlines  AptSubscriberBasic::~AptSubscriberBasic
+    0  004AA0C0     18  void AptCharThumbSubscriber::~AptCharThumbSubscriber(const struct AptCharThumbSubscriber* this)
+                         inlines  AptSubscriberBasic::~AptSubscriberBasic
+    0  004AA0F0     18  void AptGradientSubscriber::~AptGradientSubscriber(const struct AptGradientSubscriber* this)
+                         inlines  AptSubscriberBasic::~AptSubscriberBasic
+    0  004AA120     18  void AptFadeSubscriber::~AptFadeSubscriber(const struct AptFadeSubscriber* this)
+                         inlines  AptSubscriberBasic::~AptSubscriberBasic
+    0  004AA150     18  void AptBGColorTweenSubscriber::~AptBGColorTweenSubscriber(const struct AptBGColorTweenSubscriber* this)
+                         inlines  AptSubscriberBasic::~AptSubscriberBasic
+    0  004AA180     18  void AptScreenRegistrationSubscriber::~AptScreenRegistrationSubscriber(const struct AptScreenRegistrationSubscriber* this)
+                         inlines  AptSubscriberBasic::~AptSubscriberBasic
+    0  004AA1B0     18  void AptClipSubscriber::~AptClipSubscriber(const struct AptClipSubscriber* this)
+                         inlines  AptSubscriberBasic::~AptSubscriberBasic
+    0  004AA1E0     18  void AptAutoSizeSubscriber::~AptAutoSizeSubscriber(const struct AptAutoSizeSubscriber* this)
+                         inlines  AptSubscriberBasic::~AptSubscriberBasic
+    0  004AA210     18  void AptBlurSubscriber::~AptBlurSubscriber(const struct AptBlurSubscriber* this)
+                         inlines  AptSubscriberBasic::~AptSubscriberBasic
+    0  004AA240     18  void AptStencilCommitSubscriber::~AptStencilCommitSubscriber(const struct AptStencilCommitSubscriber* this)
+                         inlines  AptSubscriberBasic::~AptSubscriberBasic
+    0  004AA270     18  void AptAlphaMaskSubscriber::~AptAlphaMaskSubscriber(const struct AptAlphaMaskSubscriber* this)
+                         inlines  AptSubscriberBasic::~AptSubscriberBasic
+    0  004AA2A0     18  void AntiAliasSubscriber::~AntiAliasSubscriber(const struct AntiAliasSubscriber* this)
+                         inlines  AptSubscriberBasic::~AptSubscriberBasic
+    0  004AA2D0     18  void AptWebImageSubscriber::~AptWebImageSubscriber(const struct AptWebImageSubscriber* this)
+                         inlines  AptSubscriberBasic::~AptSubscriberBasic
+    0  004AA300     18  void AptSphereizerSubscriber::~AptSphereizerSubscriber(const struct AptSphereizerSubscriber* this)
+                         inlines  AptSubscriberBasic::~AptSubscriberBasic
+    0  004AA330     18  void AptGridSubscriber::~AptGridSubscriber(const struct AptGridSubscriber* this)
+                         inlines  AptSubscriberBasic::~AptSubscriberBasic
+    0  004AA360     50  void AptGameSubscriber::~AptGameSubscriber(const struct AptGameSubscriber* this)
+                         inlines  AptSubscriberBasic::~AptSubscriberBasic
+    0  004AA404     18  void AptSoundSubscriber::~AptSoundSubscriber(const struct AptSoundSubscriber* this)
+                         inlines  AptSubscriberBasic::~AptSubscriberBasic

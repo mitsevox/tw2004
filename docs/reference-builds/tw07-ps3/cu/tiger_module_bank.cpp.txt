@@ -1,0 +1,15 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_bank.cpp
+// compiled in: tiger_module_bank.cpp
+// 6 functions, source order. line | PS3 address | size
+
+    0  00540D30     18  void ~ListNode(const struct <anon>* this)
+                         inlines  ~Allocatable
+   13  0057F914     6C  void Bank(const struct Bank* this, void* bnkFile, unsigned int resourceTag)
+                         inlines  NamedListNode
+   21  0057F60C    1D8  void Init(const struct Bank* this)
+   32  0057F7E4     B0  void Shutdown(const struct Bank* this)
+   41  0057F894     38  void ~Bank(const struct Bank* this)
+                         inlines  ~NamedListNode
+   45  0057F8CC     48  bool IsNameEqual(const const struct <anon>* this, const char* name)
+                         local  int hashValue
+                         inlines  Common::CommonHash

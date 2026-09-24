@@ -1,0 +1,94 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/animation/AnimBlender.c
+// compiled in: golf2_unity.cpp
+// 42 functions, source order. line | PS3 address | size
+
+   41  00138728     5C  bool AnimBlender_AreAllBlendPoolsFull()
+   48  00158D98    124  void AnimBlender_InitModule()
+                         local  const int numEntries
+                         inlines  Allocator::GetTempAllocator
+   57  00138784     9C  void AnimBlender_CloseModule()
+   68  00138820     40  void* TSKABlendData::operator new(size_t size)
+                         local  struct TSKABlendData* pSkaBlendDataNULL
+   75  00127218     3C  void TSKABlendData::operator delete(void* ptr)
+   80  00138860     38  void* TSKAChannel::operator new(size_t dataSize)
+   85  00138898     3C  void TSKAChannel::operator delete(void* ptr)
+   90  001388D4     38  void* TSKABlender::operator new(size_t dataSize)
+   95  0013890C     3C  void TSKABlender::operator delete(void* ptr)
+  100  00138948     38  void* TSkeletonState::operator new(size_t dataSize)
+  105  00138980     3C  void TSkeletonState::operator delete(void* ptr)
+  110  0017F0E8     8C  void TSKABlendData::Init(const struct TSKABlendData* this, bool _bFreeASAP)
+                         inlines  TSkeletonState::TSkeletonState
+  123  001389BC     60  void TSKABlendData::Shutdown(const struct TSKABlendData* this)
+  130  0017F54C     54  void TSKAChannel::InitChannel(const struct TSKAChannel* this, bool _bFreeASAP)
+  140  00138A1C     10  void TSKAChannel::Shutdown(const struct TSKAChannel* this)
+  147  00188810     44  void TSKABlender::TSKABlender(const struct TSKABlender* this)
+                         local  int i
+  156  0017F174     58  void TSKABlender::InitBlender(const struct TSKABlender* this, bool _bFreeASAP)
+                         local  int i
+  166  00138A2C     D0  void TSKABlender::Shutdown(const struct TSKABlender* this)
+                         local  int i
+  181  00138AFC    1F0  void TSkeletonState::CopyBlendState(const struct TSkeletonState* this, const struct TSKABlendState* _pSrc)
+                         local  const struct TSkeletonState* pSrc
+  196  00138CEC     E8  void TSKABlender::FreeChildBlendData(const struct TSKABlender* this, int iBlendDataIndex)
+  209  00138DD4     24  void TSKABlender::SetChildBlendData(const struct TSKABlender* this, int iIndex, struct TSKABlendData* pSrc)
+  218  00188898    394  void TSKABlender::AddBlenderData(const struct TSKABlender* this, struct TSKABlendData* pSrc, struct TCharacter* pCharacter, struct TSKABlendInfo* pInfo, bool freeASAP)
+                         local  int iFreeNode
+                         local  int i
+                         local  struct TSKABlender* pNewBlend
+                         local  struct TSKABlendInfo info
+                         local  int i
+                         inlines  TSKABlender::IsBlenderFull
+  318  0017F1CC     64  void TSKABlender::ResetBlender(const struct TSKABlender* this, bool newBFreeASAP)
+  326  00138EF4     28  void TSKAChannel::SetChannel(const struct TSKAChannel* this, struct TSKATag* _pTags, int32 _numTags, float animPlayTime, float _blendWeight)
+  335  00138EB8     3C  void TSKABlender::SetBlender(const struct TSKABlender* this)
+  342  00139068    1D4  void TSKABlender::Update(const struct TSKABlender* this, struct TCharacter* pCharacter, struct TSkeleton* pSkeleton, float time)
+                         local  int nChannels
+                         local  int i
+  387  0013923C    20C  void TSKAChannel::Update(const struct TSKAChannel* this, struct TCharacter* pCharacter, struct TSkeleton* pSkeleton, float time)
+                         local  float localTime
+                         local  float timeDiff
+                         local  float timeScale
+                         local  TSwingProfile* pSwingProfile
+                         local  float arcLen
+                         local  float swingFrameArcLen
+                         local  float fIndex
+                         local  int32 i0
+                         local  int32 i1
+                         local  float fBlend
+  451  00138F1C     7C  int TSKABlender::GetCurrentChannel(const const struct TSKABlender* this, float time)
+                         local  int i
+                         local  int channel
+  478  00138E4C     6C  float TSKABlender::GetStartTime(const const struct TSKABlender* this)
+                         local  float startTime
+                         local  bool bIsFirstValidBlendData
+                         local  int i
+  496  00138DF8     54  float TSKABlender::GetEndTime(const const struct TSKABlender* this)
+                         local  float endTime
+                         local  int i
+  508  00138F98     D0  void TSKABlender::BlendLinear(const struct TSKABlender* this, struct TSkeleton* pSkeleton, float time)
+                         local  int32 channel
+  527  00139448     80  float TSKAChannel::GetTagTime(const const struct TSKAChannel* this, uint64 tag)
+                         local  int32 i
+  542  001394C8     B0  float TSKABlender::GetTagTime(const const struct TSKABlender* this, uint64 tag)
+                         local  float time
+                         local  int i
+  560  00139578     3C  void SKATime_Init(struct TSKATime* pTime)
+  575  001395B4    164  void SKATime_Update(struct TSKATime* pTime, struct TSKABlender* pBlender, float dt)
+  628  0018B85C    1D8  void SKATime_Idle(struct TCharacter* pCharacter, int32 playerID, struct TSKATime* pTime, struct TSKABlender* pBlender, float dt)
+                         local  float smoothRand
+                         local  float destTime
+                         inlines  std::cosf
+  676  001397B8     10  void SKATime_Pause(struct TSKATime* pTime)
+  681  00132DAC     10  void SKATime_UnPause(struct TSKATime* pTime)
+  686    inline-only   float SKATime_MapTime(float srcT, float currT, float startT, float endT)
+  694  001397C8     68  void SKATime_SetTime(struct TSKATime* pTime, float time)
+                         inlines  SKATime_MapTime
+  702  0017F3B4    198  void TSKABlender::ClampT1(const struct TSKABlender* this, struct TSKATime* pTime, float time)
+                         local  int32 nChannels
+                         local  int i
+                         local  struct TSKAChannel* pChannel
+                         local  float localTime
+                         local  float timeScale
+  753  00139830     98  int TSKABlender::NumSKAsInBlender(const const struct TSKABlender* this)
+                         local  int numBlends
+                         local  int i

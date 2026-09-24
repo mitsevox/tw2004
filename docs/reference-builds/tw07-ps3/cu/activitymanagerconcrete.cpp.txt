@@ -1,0 +1,36 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/activitymanagerconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   65  005D78C4     74  bool HasObservers(const struct ActivityManagerConcrete* this)
+                         local  bool bHasObservers
+                         local  uint32_t uElements
+                         local  struct DisconnectObserver** pList
+                         local  uint32_t uIndex
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  100  005EC648     78  void ActivityManagerConcrete(const struct ActivityManagerConcrete* this)
+                         inlines  AddObserver
+  126  005E36F0     70  void ~ActivityManagerConcrete(const struct ActivityManagerConcrete* this)
+                         inlines  RemoveObserver, operator delete
+  148  005D7938     E4  void TriggerDisconnect(const struct ActivityManagerConcrete* this, enum DisconnectReason eReason)
+                         local  uint32_t uNumElements
+                         local  struct DisconnectObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  161  005D7A1C    164  void TriggerMissedDisconnects(const struct ActivityManagerConcrete* this)
+                         local  uint32_t uNumElements
+                         local  struct DisconnectObserver** pList
+                         local  uint32_t uNumElements
+                         local  struct DisconnectObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  194  005B359C     98  void TriggerVoiceDisconnect(const struct ActivityManagerConcrete* this)
+                         local  uint32_t uNumElements
+                         local  struct VoiceDisconnectObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  216  005B3634     24  void TriggerNetworkActivityStart(const struct ActivityManagerConcrete* this)
+  251  005B3658     30  void TriggerNetworkActivityEnd(const struct ActivityManagerConcrete* this)
+  267  005D8F78    158  void ProcessComplete(const struct ActivityManagerConcrete* this)
+                         local  uint32_t uNumElements
+                         local  struct NetworkActivityObserver** pList
+                         local  uint32_t uNumElements
+                         local  struct NetworkActivityObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList

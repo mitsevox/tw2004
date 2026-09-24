@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/ps3/logintomasterserverconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   49  005D5834     DC  struct DictionaryConcrete* GetParametersForLoginContext(const struct LoginToMasterServerConcrete* this)
+                         local  struct MemoryStrategy* pMemory
+                         local  struct DictionaryConcrete* pParameters
+   62  0060C188     4C  void LoginToMasterServerConcrete(const struct LoginToMasterServerConcrete* this, uint32_t uUserIndex, bool bAutoLogin)
+   67  0060C0F0     50  void ~LoginToMasterServerConcrete(const struct LoginToMasterServerConcrete* this)
+                         inlines  operator delete

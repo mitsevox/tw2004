@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/settingabstract.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   68  005CB2E0     70  void SettingAbstract(const struct <anon>* this, const char8_t* strIdentifier, enum Persistence ePersistence)
+   93  005C0278     48  void ~SettingAbstract(const struct <anon>* this)
+  116  005B3168     54  void Enable(const struct <anon>* this)
+  143  005B31BC     54  void Disable(const struct <anon>* this)

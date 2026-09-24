@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/Golf/Replay/Headers/ReplayCameraMgr.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   14    inline-only   struct ReplayCameraMgr* ReplayCameraMgr::GetInstance()

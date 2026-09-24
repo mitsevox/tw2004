@@ -1,0 +1,32 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_CharEye.cpp
+// compiled in: shader_unity.cpp
+// 20 functions, source order. line | PS3 address | size
+
+   46  0051D45C     F0  void SM_CharEyeClass::SM_CharEyeClass(const struct SM_CharEyeClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base, vec4flt_Zero
+   94  0050E644     6C  void SM_CharEyeClass::Load(const struct SM_CharEyeClass* this)
+  104  0051EF9C     D0  void SM_CharEyeClass::ResetPSMode(const struct SM_CharEyeClass* this)
+                         inlines  GM_IsFrontEnd
+  111  0051F06C    53C  void SM_CharEyeClass::LoadParams(const struct SM_CharEyeClass* this)
+                         inlines  GM_IsFrontEnd
+  156  0051F5A8    244  void SM_CharEyeClass::Activate(const struct SM_CharEyeClass* this)
+                         local  int32 i
+                         inlines  GM_IsFrontEnd
+  193  0050E6B0     58  void SM_CharEyeClass::Deactivate(const struct SM_CharEyeClass* this)
+  208  005198A0     6C  void SM_CharEyeClass::SetTexTransform0(const struct SM_CharEyeClass* this, const float[4]& transForm)
+                         inlines  vec4flt_Copy
+  218  00515E94     6C  void SM_CharEyeClass::SetShadowParams(const struct SM_CharEyeClass* this, float shadowMapBias, float shadowMapGain)
+  229  0051F7EC    1A4  void SM_CharEyeClass::SetTintingParams(const struct SM_CharEyeClass* this, int32 tintMode, float* pTintValues)
+                         local  int32 i
+                         inlines  GM_IsFrontEnd
+  254  00515F00     64  void SM_CharEyeClass::SetBaseTexture(const struct SM_CharEyeClass* this, TextureRef texRef)
+  264  00515F64     64  void SM_CharEyeClass::SetNormalMap(const struct SM_CharEyeClass* this, TextureRef texRef)
+  274  00515FC8     64  void SM_CharEyeClass::SetLensTexture(const struct SM_CharEyeClass* this, TextureRef texRef)
+  284  0051602C     64  void SM_CharEyeClass::SetLensNormalMap(const struct SM_CharEyeClass* this, TextureRef texRef)
+  294  00516090     64  void SM_CharEyeClass::SetPackedMap(const struct SM_CharEyeClass* this, TextureRef texRef)
+  304  005160F4     64  void SM_CharEyeClass::SetShadowMap(const struct SM_CharEyeClass* this, TextureRef texRef)
+  314  00516158     64  void SM_CharEyeClass::SetAmbientCubeMap(const struct SM_CharEyeClass* this, TextureRef texRef)
+  324  005161BC     64  void SM_CharEyeClass::SetSpecEnvCubeMap(const struct SM_CharEyeClass* this, TextureRef texRef)
+  334  00516220     64  void SM_CharEyeClass::SetSpecCubeMap(const struct SM_CharEyeClass* this, TextureRef texRef)
+  344  00516284     64  void SM_CharEyeClass::SetEnvCubeMap(const struct SM_CharEyeClass* this, TextureRef texRef)
+  354  005162E8     64  void SM_CharEyeClass::SetFilmLookLUTMap(const struct SM_CharEyeClass* this, TextureRef texRef)

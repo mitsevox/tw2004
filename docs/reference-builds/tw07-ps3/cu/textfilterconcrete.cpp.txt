@@ -1,0 +1,19 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/textfilterconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   46  0062A2C0     50  void ~FilterTextStrategy(const struct <anon>* this)
+                         inlines  ~OperationStrategy
+   97  00603CE4     C0  void FilterTextStrategy(const struct <anon>* this, ProtoFilterRefT* pFilterRef, const char8_t* strText, struct TextFilterCallback* pCallback)
+                         local  int32_t iRequest
+  133  005C0C94     58  void OperationCancel(const struct <anon>* this, const struct Operation* )
+  162  005D1FC8    130  bool OperationProcess(const struct <anon>* this, const struct Operation* )
+                         local  bool bContinue
+                         local  enum FilterResults eResults
+                         local  int32_t iResult
+  232  005E44D0     40  void TextFilterConcrete(const struct TextFilterConcrete* this)
+  257  005E4594     40  void ~TextFilterConcrete(const struct TextFilterConcrete* this)
+  281  00603E64     F8  struct Operation* FilterText(const struct TextFilterConcrete* this, const char8_t* strText, struct TextFilterCallback* pCallback)
+                         local  struct MemoryStrategy* pMemoryStrategy
+                         local  struct <anon>* pStrategy
+                         inlines  GetOperationManagerConcrete

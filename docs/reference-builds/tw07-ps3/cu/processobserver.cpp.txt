@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/processobserver.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    6  005B3584      C  void ProcessObserver(const struct ProcessObserver* this)
+   10  005B3590      C  void ~ProcessObserver(const struct ProcessObserver* this)

@@ -1,0 +1,81 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Spectator/spectatorCollision.cpp
+// compiled in: golf2_unity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   41  00143DA4    10C  int CSpectatorCollision::GetBucketIndexFromPos(const struct CSpectatorCollision* this, float x, float z)
+                         local  float fSlotX
+                         local  float fSlotZ
+                         local  int col
+                         local  int row
+                         local  int index
+   74  00174600    174  void CSpectatorCollision::UpdateInstanceBucket(const struct CSpectatorCollision* this, struct CSpectatorInstance* instance, float x, float z)
+                         local  int index
+                         inlines  CSpectatorCollisionBucket::AddInstance
+   93  001565F4    42C  void CSpectatorCollision::PutInstancesIntoBuckets(const struct CSpectatorCollision* this, struct CSpectatorInstance* instanceList, int32 numInstances)
+                         local  int i
+                         local  float minX
+                         local  float minZ
+                         local  float maxX
+                         local  float maxZ
+                         local  struct CPovVector3 vPos
+                         local  int index
+                         local  struct CPovVector3 vPos
+                         inlines  CPovVector3::CPovVector3, CSpectatorCollisionBucket::AddInstance, CSpectatorCollisionBucket::ClearInstances, CSpectatorInstance::GetPosition
+  196    inline-only   void ClosestPointOnLine(float* vA, float* vB, float* vPoint, float* vClosestPoint)
+                         local  vec4flt vTemp
+                         local  vec4flt vVector1
+                         local  vec4flt vVector2
+                         local  float d
+                         local  float t
+                         local  vec4flt vVector3
+  251  001AC3F4    AC8  bool CSpectatorCollision::CheckForCollision(const struct CSpectatorCollision* this, float* fPoint0, float* fPoint1, bool bIsEstimating, float* pCollisionPoint, float* pSurfaceNormal)
+                         local  vec4flt fCenter
+                         local  vec4flt pClosestPoint
+                         local  vec4flt pClosestPointFlatten
+                         local  vec4flt vTopDownNormal
+                         local  vec4flt fA
+                         local  bool bFoundCollision
+                         local  int bucket1
+                         local  int bucket2
+                         local  struct CSpectatorInstance* instance
+                         local  struct CSpectatorInstance* next
+                         local  int pass
+                         local  int bucket
+                         local  struct CPovVector3 vPos
+                         local  float fHalf
+                         local  bool bHieghtInCylinder
+                         local  int i
+                         local  struct CPovVector3 vPos
+                         local  vec4flt vRoughCheck
+                         local  float fRoughCheck
+                         local  float fHalf
+                         local  bool bHieghtInCylinder
+                         inlines  CPovVector3::CPovVector3, CSpectatorInstance::GetPosition, ClosestPointOnLine, LLMath_Add3, LLMath_DotProduct3, LLMath_Length3, LLMath_Scale3, LLMath_Subtract3, __vec_len_sqr3, __vec_mul, vec4flt_Copy, vec4flt_Copy3, vec_ld, vec_madd, vec_sld, vec_splat, vec_sub
+  429  0015280C     40  int SpectatorCollision_SampleSpecInZoneLeftOrRight()
+  445  00156A9C     BC  bool CSpectatorCollision::AreSpectatorsInZone(const struct CSpectatorCollision* this, float x, float z)
+                         local  bool bFoundInstance
+                         local  int index
+                         local  struct CSpectatorInstance* instance
+                         local  struct CSpectatorInstance* next
+  484  00156D4C    114  bool CSpectatorCollision::IsSpectatorInRadius(const struct CSpectatorCollision* this, struct CSpectatorInstance* pInstance, float x, float z, float radius)
+                         local  int index
+                         local  struct CSpectatorInstance* instance
+                         local  struct CSpectatorInstance* next
+                         local  float diffx
+                         local  float diffz
+                         local  float distance
+                         inlines  CSpectatorInstance::GetPosition
+  521  00156E60     D4  bool CSpectatorCollision::IsSpectatorInRadius(const struct CSpectatorCollision* this, struct CSpectatorInstance* pInstance, float radius)
+                         local  int index
+                         local  struct CSpectatorInstance* instance
+                         local  struct CSpectatorInstance* next
+                         local  float x
+                         local  float z
+                         local  float diffx
+                         local  float diffz
+                         local  float distance
+                         inlines  CPovVector3::GetX, CPovVector3::GetZ, CSpectatorInstance::GetPosition
+  566  00143EB0     58  struct CSpectatorInstance* CSpectatorCollision::GetSpectatorsInZone(const struct CSpectatorCollision* this, float x, float z)
+                         local  int index
+  578  00143F08      4  void CSpectatorCollision::RenderCollisionDataAt(const struct CSpectatorCollision* this, float* vPos)
+  610  00143308      4  void CSpectatorCollision::RenderCollisionData(const struct CSpectatorCollision* this)

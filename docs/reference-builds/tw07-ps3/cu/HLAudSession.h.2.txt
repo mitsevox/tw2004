@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/golf/audio/engine/HL/headers/HLAudSession.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  147    inline-only   bool Ses_HasStreamingAudio()

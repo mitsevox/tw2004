@@ -1,0 +1,5 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/netradio/include/common/osdk/netradio/netradioextension.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   45  00628418      C  void ~NetRadioExtension(const struct NetRadioExtension* this)

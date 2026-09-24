@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_lua/tiger_lua_dynamic_program.cpp
+// compiled in: tiger_lua_dynamic_program.cpp
+// 7 functions, source order. line | PS3 address | size
+
+    8  00542548    280  void TigerLuaDynamicProgram::Init(const struct TigerLuaDynamicProgram* this, struct Lua* lua, struct TigerLuaDynamicProgram* prev, struct TigerLuaDynamicProgram* next, const char* name, const char* programText)
+                         inlines  TagValuePair
+   33  00542204    120  void TigerLuaDynamicProgram::Shutdown(const struct TigerLuaDynamicProgram* this)
+   50  00542324      8  const char* TigerLuaDynamicProgram::GetName(const const struct TigerLuaDynamicProgram* this)
+   55  0054232C      8  const char* TigerLuaDynamicProgram::GetProgramText(const const struct TigerLuaDynamicProgram* this)
+   60  00542334      8  struct TigerLuaDynamicProgram* TigerLuaDynamicProgram::GetPrev(const const struct TigerLuaDynamicProgram* this)
+   65  0054233C      8  struct TigerLuaDynamicProgram* TigerLuaDynamicProgram::GetNext(const const struct TigerLuaDynamicProgram* this)
+   70  00542344    204  void TigerLuaDynamicProgram::ReplaceProgramText(const struct TigerLuaDynamicProgram* this, const char* programText)
+                         inlines  TagValuePair

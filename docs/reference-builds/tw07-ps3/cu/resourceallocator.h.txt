@@ -1,0 +1,22 @@
+// ../../../../../TIGERCODE/RW45/platform/include/native/ps3-ppu-gcc/rw/core/resource/resourceallocator.h
+// compiled in: Legacy_unity.cpp, golf2_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   77  003CDEC0     18  void ~IResourceAllocator(const struct IResourceAllocator* this)
+   90    inline-only   struct <anon> Allocate(const struct IResourceAllocator* this, const const struct <anon>& resourceDescriptor, const char8_t* name)
+                         local  struct <anon> checkedResource
+                         local  const char[9] __FUNCTION__
+                         local  struct <anon> checkedResource
+                         local  const char[23] __FUNCTION__
+                         local  const char[23] __FUNCTION__
+                         local  size_t i
+                         local  const char[24] __FUNCTION__
+  119    inline-only   void Free(const struct IResourceAllocator* this, const const struct <anon>& resource)
+  131    inline-only   void Free(const struct IResourceAllocator* this, void* ptr)
+  158    inline-only   MemoryResource AllocateMemoryResource(const struct IResourceAllocator* this, uint32_t size, uint32_t alignment, const char8_t* name)
+  168    inline-only   void FreeMemoryResource(const struct IResourceAllocator* this, MemoryResource memoryResource)
+                         local  struct <anon> resource
+  281  003CDD6C     C8  void DoFreeDisposable(const struct IResourceAllocator* this, const struct <anon>& resource)
+                         local  struct <anon> newResource
+                         local  uint32_t i
+                         inlines  GetBaseResource, IsBaseResourceTypeDisposable, Resource

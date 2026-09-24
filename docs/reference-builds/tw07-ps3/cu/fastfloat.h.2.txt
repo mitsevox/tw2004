@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/fastfloat.h
+// compiled in: DebugMenu.cpp, Scrape.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  394    inline-only   float operator float(const const struct <anon>* this)
+  403    inline-only   struct <anon>& operator=(const struct <anon>* this, float f)

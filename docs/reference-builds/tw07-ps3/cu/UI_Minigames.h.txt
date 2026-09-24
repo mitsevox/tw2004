@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/UI_Minigames.h
+// compiled in: apt_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   53  00125B0C     C0  void UIMinigames::~UIMinigames(const struct UIMinigames* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStaticCharBuffer<64u>::~AptStaticCharBuffer, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   55  000FE8F8      C  uint32 UIMinigames::GetSignature(const const struct UIMinigames* this)
+   88  00101028     14  enum TAptSequenceStatus UIMinigames::QueueShowText_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   89  00101014     14  enum TAptSequenceStatus UIMinigames::SetGameModeFlashStateSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   90  00103188     14  enum TAptSequenceStatus UIMinigames::DelayGhostSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)

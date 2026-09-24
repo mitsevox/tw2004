@@ -1,0 +1,27 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_trinity/trinity/Runtime/src/TrinityManager.cpp
+// compiled in: TrinityManager.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   41  005914C0     2C  void TrinityManager(const struct TrinityManager* this)
+   65  00591518     D0  bool8_t Initialize(const struct TrinityManager* this, struct TrinityCore* coreInterface, struct TrinityMath* mathInterface, struct TrinityCreationInterface* creationInterface, struct TrinityAudioManager* audioManagerInterface, struct TrinityScriptedEvents* scriptedEventsInterface, struct TrinityScreenFx* screenFxInterface)
+   99  005915E8     24  void Shutdown(const struct TrinityManager* this)
+  124  0059160C     18  void ~TrinityManager(const struct TrinityManager* this)
+  128  00591674      8  void SetTrinityCreationInterface(const struct TrinityManager* this, struct TrinityCreationInterface* creationInterface)
+  143  0059167C      8  void SetAudioManagerInterface(const struct TrinityManager* this, struct TrinityAudioManager* newAudioManagerInterface)
+  158  00591684      8  void SetScriptedEventsInterface(const struct TrinityManager* this, struct TrinityScriptedEvents* newScriptedEventsInterface)
+  173  0059168C      8  void SetScreenFxInterface(const struct TrinityManager* this, struct TrinityScreenFx* newScreenFxInterface)
+  188  00591694      8  struct TrinityCreationInterface* GetTrinityCreationInterface(const struct TrinityManager* this)
+  203  0059169C      8  struct TrinityAudioManager* GetAudioManagerInterface(const struct TrinityManager* this)
+  218  005916A4      8  struct TrinityScriptedEvents* GetScriptedEventsInterface(const struct TrinityManager* this)
+  233  005916AC      8  struct TrinityScreenFx* GetScreenFxInterface(const struct TrinityManager* this)
+  246  005916B4     8C  void Process(const struct TrinityManager* this, float_t timeStep)
+                         local  float_t fDeltaSec
+  286  00591740     28  uint32_t ParseSequenceMaster(const struct TrinityManager* this, struct <anon>* seqMaster)
+  311  00591768    2D0  struct Sequence* StartSequenceFromMasterByIndex(const struct TrinityManager* this, struct <anon>* sequenceMaster, uint32_t sequenceBinIndex)
+                         local  struct <anon>* pSeqBin
+                         local  struct <anon> seqParams
+                         local  vec4flt trans
+                         local  quat rot
+                         local  mat44flt mat
+                         inlines  SequenceParams
+  376  00591A38     50  void StopSequence(const struct TrinityManager* this, struct Sequence* sequence)

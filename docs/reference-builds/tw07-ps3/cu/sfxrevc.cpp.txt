@@ -1,0 +1,76 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/sfxrevc.cpp
+// compiled in: sfxrevc.cpp
+// 10 functions, source order. line | PS3 address | size
+
+  137  006DF598     1C  void* MIX_getwetbuffer(int fxBusIndex)
+  144  006DF5B4     34  int remap(int validstructoutputs, int wantedoutputchannels, int validheadvalue)
+  159  006DF608    560  void SNDMIXI_modlapifxadd(int frames)
+                         local  float* psrc
+                         local  float* pdst
+                         local  int numfilts
+                         local  int i
+                         local  int j
+                         local  int k
+                         local  int[6] processed
+                         local  signed char* copyindex
+                         local  BUSNODE_INSTANCE* pBusNodeInstance
+                         local  struct CListNode* pNextNode
+                         inlines  CListNode::GetNext, CListStack::IsEmpty
+  293  006E0924    244  void SNDMIXI_restorefx2(int fxBusIndex, BUSNODE_INSTANCE* pBusNodeInstance)
+                         local  int numfilt
+                         local  int i
+                         local  int j
+                         inlines  SNDMEMI_free
+  352  006DFB68    758  void SNDMIXI_initfx(int samplerate, void* pFxFile, int fxBusIndex, BUSNODE_INSTANCE* pBusNodeInstance)
+                         local  char* pcurModule
+                         local  MIXFXCONNECTION* pcurcon
+                         local  SRCSTATE* psrc
+                         local  LPFRCSTATE* plpfrc
+                         local  LPFSTATE* plpf
+                         local  HPFSTATE* phpf
+                         local  BPFSTATE* pbpf
+                         local  RESONSTATE* pres
+                         local  AMPLFSTATE* pamp
+                         local  MIXERSTATE* pmix
+                         local  ECHOSTATE* pecho
+                         local  SPLITSTATE* psplit
+                         local  MIXFXMODLOWRC* plowrcmod
+                         local  MIXFXMODLOWFIR* plowfirmod
+                         local  MIXFXMODHIGHFIR* phighfirmod
+                         local  MIXFXMODBANDFIR* pbandfirmod
+                         local  MIXFXMODRESON* presonmod
+                         local  MIXFXMODAMP* ampmod
+                         local  MIXFXMODECHO* pechomod
+                         local  FIXED24P8[4] params
+                         local  int i
+                         local  int j
+                         local  int k
+                         local  int numfilt
+                         local  unsigned char tempHeadVal
+                         inlines  SNDMEMI_alloc
+  575  006E02C0    110  void MIX_createFxglobals()
+                         local  int memAllocSize
+                         inlines  SNDMEMI_alloc
+  594  006E0B68    178  void MIX_destroyFxglobals()
+                         local  int i
+                         local  BUSNODE_INSTANCE* pBusNodeInstance
+                         local  struct CListNode* pNextNode
+                         inlines  CListNode::GetNext, CListStack::IsEmpty, SNDMEMI_free
+  633  006E03D0    554  void* MIX_initreverb(int outputrate, int fxBusIndex, void* pFxFile)
+                         local  char* pcur
+                         local  int i
+                         local  int j
+                         local  int k
+                         local  int temp
+                         local  void* retVal
+                         local  MIXFXFILTHEADER* pMixFxFiltHeader
+                         local  BUSNODE_INSTANCE* pBusNodeInstance
+                         inlines  CListStack::Push, MemCpy, SNDMEMI_alloc
+  748  006E0CE0    174  void MIX_restorereverb(int fxBusIndex, void* instanceHandle)
+                         local  struct CListNode* pPrevNode
+                         local  struct CListNode* pNextNode
+                         local  int nodeFound
+                         local  BUSNODE_INSTANCE* pBusNodeInstance
+                         inlines  CListNode::GetNext, CListNode::SetNext, CListStack::GetHead, CListStack::Pop, SNDMEMI_free
+  809  006DF5E8     20  void MIX_setFxOutputLevel(int channel, SNDMIXGAIN outputLevels, void* instanceHandle)
+                         local  BUSNODE_INSTANCE* pBusNodeInstance

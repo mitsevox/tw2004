@@ -1,0 +1,178 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/AI/Expert.c
+// compiled in: golf2_unity.cpp
+// 66 functions, source order. line | PS3 address | size
+
+  320  001AF6D4     C8  enum STAT_e EXPERT_AccuracyType(enum Club_t club, enum Lie_t lie, enum ShotType_t type, struct CoreShotInfo_t* shotInfo)
+  349  0015CB58     94  bool EXPERT_ClubAvailable(enum PlayerNumber_t PlayerID, enum Club_t club, enum ShotType_t type, struct AIBrain* pBrain)
+  359  0015BF70    190  bool EXPERT_ClubAvailable(struct CoreShotInfo_t* shotInfo, enum Club_t club, enum ShotType_t type, struct AIBrain* pBrain)
+  401  0015CA08     A0  void EXPERT_ClubUp(enum PlayerNumber_t PlayerID, enum ShotType_t shotType, enum Club_t* club, int32 howMany, struct AIBrain* pBrain)
+  417  0015C864    1A4  void EXPERT_ClubUp(struct CoreShotInfo_t* shotInfo, enum ShotType_t shotType, enum Club_t* club, int32 howMany, struct AIBrain* pBrain)
+                         local  enum Club_t tempClub
+                         local  bool found
+  461  0015C714     A0  void EXPERT_ClubDown(enum PlayerNumber_t PlayerID, enum ShotType_t shotType, enum Club_t* club, int32 howMany, struct AIBrain* pBrain)
+  477  0015C58C    188  void EXPERT_ClubDown(struct CoreShotInfo_t* shotInfo, enum ShotType_t shotType, enum Club_t* club, int32 howMany, struct AIBrain* pBrain)
+                         local  enum Club_t tempClub
+                         local  bool found
+  521  0015C510     7C  enum Club_t EXPERT_FindAnyClub(enum PlayerNumber_t PlayerID, enum ShotType_t type, struct AIBrain* pBrain)
+  531  0015C100    114  enum Club_t EXPERT_FindAnyClub(struct CoreShotInfo_t* shotInfo, enum ShotType_t type, struct AIBrain* pBrain)
+                         local  int32 i
+                         local  int32 j
+  566  0015CBEC     D0  enum Club_t EXPERT_ShortestClub(enum PlayerNumber_t PlayerID, struct AIBrain* pBrain)
+                         local  int32 i
+                         local  struct CoreShotInfo_t* playerShotInfo
+  597  00147204     80  float EXPERT_Aim(enum PlayerNumber_t PlayerID)
+  607  001448E0     88  float EXPERT_Aim(float* origPos, float* targetPos)
+                         local  float angle
+                         local  float x
+                         local  float z
+                         inlines  std::atan2
+  638  001473C4     74  bool EXPERT_IsPointOnGreen(enum PlayerNumber_t PlayerID, float distance)
+  648  00147284    140  bool EXPERT_IsPointOnGreen(struct CoreShotInfo_t* shotInfo, float distance)
+                         local  bool return_value
+                         local  vec4flt vec
+                         local  TGD_TerrainInfo* pTerrainGameData
+                         local  struct TGD_MaterialInfo* material
+                         local  float tempf
+                         local  const float[4]& vCupLoc
+  702  00161BFC     64  bool EXPERT_IsChipShotAvailable(enum PlayerNumber_t PlayerID)
+  712  001619C0     28  bool EXPERT_IsChipShotAvailable(struct CoreShotInfo_t* shotInfo)
+  725  00147438     AC  bool EXPERT_IsShotTypeAvailable(struct CoreShotInfo_t* shotInfo, enum ShotType_t shotType)
+                         local  enum PlayerNumber_t playerID
+  746  001BD72C    22C  enum Club_t EXPERT_ChooseWedgeWithinRange(struct CoreShotInfo_t* shotInfo, const float* location, const vec4flt& actualTarget)
+                         local  enum Club_t wedge
+                         local  float targetDist
+                         local  float closest
+                         local  float diff
+                         local  vec4flt vec
+                         local  int clubi
+                         inlines  AICore::GetBufferDistToCup, AIMgr, LLMath_AddScale3, LLMath_DistanceBetween3, LLMath_Subtract, std::fabs, vec4flt_Copy3, vec_madd, vec_sld, vec_splat, vec_sub
+  796  00161B90     6C  enum ShotType_t EXPERT_ChooseShotType(enum PlayerNumber_t PlayerID, float distance)
+  806  001619E8    1A8  enum ShotType_t EXPERT_ChooseShotType(struct CoreShotInfo_t* shotInfo, float distance)
+                         local  enum ShotType_t return_value
+                         local  float targetDistance
+                         local  int clubi
+  867  00198254    158  bool EXPERT_PlrPutterUp(enum PlayerNumber_t PlayerID)
+                         local  int nextPutter
+                         local  bool validPutter
+                         inlines  Singleton<DifficultySettings>::GetSingleton
+  899  001983AC    160  bool EXPERT_PlrPutterDown(enum PlayerNumber_t PlayerID)
+                         local  int prevPutter
+                         local  bool validPutter
+                         inlines  Singleton<DifficultySettings>::GetSingleton
+  931  001478DC     7C  float EXPERT_GetPlrPuttDistance(enum PlayerNumber_t PlayerID)
+  940  001474E4     20  float EXPERT_GetPlrPuttDistance(struct CoreShotInfo_t* shotInfo, enum Putter_t putter)
+  944  00147958     14  float EXPERT_GetMaxPutterDistance()
+  951  0014796C     7C  float EXPERT_GetPlrPuttDistanceInYards(enum PlayerNumber_t PlayerID)
+  960  0012B178     28  float EXPERT_GetPlrPuttDistanceInYards(struct CoreShotInfo_t* shotInfo, enum Putter_t putter)
+  971  00147830     AC  float EXPERT_PlrClubDistance(enum PlayerNumber_t PlayerID, enum ShotType_t type, enum Club_t club, bool inYards)
+  981  00147504    32C  float EXPERT_PlrClubDistance(struct CoreShotInfo_t* shotInfo, enum ShotType_t type, enum Club_t club, float stance, bool inYards)
+                         local  float power
+                         local  float dist
+                         local  float return_value
+                         local  float driveDist
+                         local  float minDist
+                         local  float max_dist
+                         local  float dist_100
+                         local  float diff
+                         local  int32 fracIndex
+                         local  float lerpFrac
+                         local  float deltaDist
+                         local  float powerFrac
+ 1078  001615C8     AC  float EXPERT_PlrClubMaxDistance(enum PlayerNumber_t PlayerID, enum ShotType_t shotType, enum Club_t club, bool inYards)
+ 1099  00161464    164  float EXPERT_PlrClubMaxDistance(struct CoreShotInfo_t* shotInfo, enum ShotType_t shotType, enum Club_t club, float stance, bool inYards)
+                         local  float maxDist
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  vec4flt surfaceNormal
+                         local  float adjImpactScale
+                         local  float adjSpinImpactScale
+                         local  float maxPower
+ 1136  001613F4     70  float EXPERT_PlrBounceDistance(enum PlayerNumber_t PlayerID, enum ShotType_t type, enum Club_t club)
+ 1141  00161324     D0  float EXPERT_PlrBounceDistance(struct CoreShotInfo_t* shotInfo, enum ShotType_t type, enum Club_t club, float stance)
+                         local  float return_value
+ 1193  0015C464     AC  enum Club_t EXPERT_ChooseClub(enum PlayerNumber_t PlayerID, enum ShotType_t type, float distance, bool longest, struct AIBrain* pBrain)
+ 1210  0015C214    250  enum Club_t EXPERT_ChooseClub(struct CoreShotInfo_t* shotInfo, enum ShotType_t type, float distance, bool longest, struct AIBrain* pBrain)
+                         local  enum Club_t return_value
+                         local  float closest
+                         local  float check
+                         local  int32 i
+                         local  float plrclubdist
+ 1342  0019850C    224  enum Putter_t EXPERT_ChoosePutter(float distance, bool longest)
+                         local  float distFeet
+                         local  enum Putter_t optimalPutter
+                         inlines  Singleton<DifficultySettings>::GetSingleton
+ 1395  001479E8     5C  float EXPERT_ChooseStance(enum PlayerNumber_t PlayerID)
+ 1405  001442D4     40  float EXPERT_ChooseStance(struct CoreShotInfo_t* shotInfo)
+                         local  float return_value
+ 1431  001AF5D8     FC  float EXPERT_GetDistanceToPin(struct CoreShotInfo_t* shotInfo)
+                         local  vec4flt ballToPin
+                         local  float distanceToPin
+                         local  TGD_TerrainInfo* pTerrainData
+                         inlines  LLMath_Length3, LLMath_Subtract3, vec_madd, vec_sld
+ 1457  00161758     70  float EXPERT_ChooseStrength(enum PlayerNumber_t PlayerID)
+                         local  struct CoreShotInfo_t* shotInfo
+ 1473  00161674     E4  float EXPERT_ChooseStrength(struct CoreShotInfo_t* shotInfo, enum ShotType_t shotType, enum Club_t club, enum Putter_t putter, float stance, float targetDistance)
+                         local  float power
+ 1515  001612BC     68  float EXPERT_StrengthMultiplier(enum PlayerNumber_t PlayerID)
+                         local  struct CoreShotInfo_t* shotInfo
+ 1526  001611E8     D4  float EXPERT_StrengthMultiplier(struct CoreShotInfo_t* shotInfo, enum ShotType_t shotType, enum Club_t club, float stance)
+                         local  float result
+                         local  float desiredDist
+ 1559  00144314     28  void EXPERT_SetClubDirection(float* normal)
+ 1572  00147E7C     C8  void EXPERT_SetAIStrokeDirection(enum PlayerNumber_t PlayerID, float* vec)
+ 1582  00147A44    434  enum ShotShape_t EXPERT_SetAIStrokeDirection(struct CoreShotInfo_t* shotInfo, enum Club_t club, enum ShotShape_t shape, float* vec)
+                         local  struct GolferData_t* golferData
+                         local  enum CLUB_TYPE_t clubType
+                         local  uint8 trajectory
+                         inlines  GamePlayer::GetGolferData
+ 1681  00147F44     A8  void EXPERT_SetStrokeDirection(enum PlayerNumber_t PlayerID, float* normal)
+ 1691  00147E78      4  void EXPERT_SetStrokeDirection(struct CoreShotInfo_t* shotInfo, enum Club_t club, enum ShotShape_t shape, float* normal)
+ 1710  0018CBA4    11C  void EXPERT_ResetTargetToTargetLocation(enum PlayerNumber_t PlayerID)
+                         local  struct CoreShotInfo_t* playerShotInfo
+                         inlines  AIMgr, vec4flt_Copy, vec_ld
+ 1731  0018CE34     64  void EXPERT_AdjustTargetForClub(enum PlayerNumber_t PlayerID)
+                         local  struct CoreShotInfo_t* shotInfo
+ 1757  0018CCC0    174  void EXPERT_AdjustTargetForClub(struct CoreShotInfo_t* shotInfo, enum ShotType_t shotType, enum Club_t club)
+                         local  vec4flt vec
+                         local  float sinp
+                         local  float cosp
+                         local  float distance
+                         inlines  AIMgr, DrawFadeIndicator::GetInstance, std::cosf, std::sinf
+ 1823  00147FEC    1FC  void EXPERT_Init()
+                         local  int id
+                         local  int catId
+ 1891  001481E8      8  void* SW_vUpdateExpertStats(void* ptr, TU_eCallbackReason reason, void* data, void* userType)
+ 1904  00169C8C     3C  uint32 EXPERT_GetBlingBlingChance(enum PlayerNumber_t playerID)
+                         local  const struct UserInfo& userInfo
+ 1913  00166648     54  int EXPERT_GetMinBling(enum PlayerNumber_t playerID)
+                         local  int userID
+                         local  int minBling
+                         local  const struct UserInfo& userInfo
+ 1940  00167708     5C  void EXPERT_ResetBlingBling(enum PlayerNumber_t playerID)
+                         local  int32_t userID
+                         local  const struct UserInfo& userInfo
+                         inlines  UserInfo::SetBlingBlingChance
+ 1962  00167764     70  void EXPERT_PlayerGotBling(enum PlayerNumber_t playerID)
+                         local  int userID
+                         local  const struct UserInfo& userInfo
+                         inlines  UserInfo::SetBling
+ 1977  00169D98     5C  void EXPERT_UpdateBlingBling()
+                         local  int32_t i
+ 1994  00169CC8     D0  void EXPERT_UpdateBlingBling(enum PlayerNumber_t playerID)
+                         local  int32_t userID
+                         local  const struct UserInfo& userInfo
+                         inlines  UserInfo::IncBlingBlingChance, UserInfo::SetBlingBlingChance
+ 2014  00133778      8  bool EXPERT_Perfect(enum PlayerNumber_t playerID, enum ShotType_t shotType, int32_t curBlingBlingChance)
+ 2190  001481F0     40  bool EXPERT_CanSpinna(enum PlayerNumber_t playerID)
+ 2207  00148230     A4  static int EXPERT_GetExpertLieRangeClubID(enum Club_t club)
+ 2242  001482D4     78  static int EXPERT_GetExpertLieRangeLieID(enum Lie_t lie)
+ 2268  00148440     F0  bool EXPERT_GetLieReadModifier_Impact(enum PlayerNumber_t playerID, float* impact)
+                         local  int clubID
+                         local  int lieID
+ 2293  0014834C     F4  bool EXPERT_GetLieReadModifier_Modifier(enum PlayerNumber_t playerID, float* modifier)
+                         local  int clubID
+                         local  int lieID
+ 2314  00148630    1C0  float EXPERT_GetLiePowerPercentage(enum PlayerNumber_t playerID)
+                         local  float impactV
+                         local  float impactV_Modifier
+                         local  float liePercent
+                         local  struct PhysicsBall_t* pBall

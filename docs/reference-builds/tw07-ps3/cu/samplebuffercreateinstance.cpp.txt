@@ -1,0 +1,12 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/samplebuffercreateinstance.cpp
+// compiled in: samplebuffercreateinstance.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   15  006D49A0     18  unsigned int GetSize(unsigned int numChannels, unsigned int maxLocks, unsigned int maxSamples, unsigned int* pAlignment, struct <anon>* pSystem)
+                         local  unsigned int memRequired
+   46  006D492C     74  struct <anon>* CreateInstance(unsigned int numChannels, unsigned int maxLocks, unsigned int maxSamples, void* pMem, void* pStorage, struct <anon>* pSystem)
+                         local  struct <anon>* pThis
+                         local  uintptr_t pMemBlock
+                         local  unsigned int* pChannelSlotArray
+                         local  unsigned int i
+                         inlines  core::LinearAlloc<unsigned int*, std::uintptr_t>

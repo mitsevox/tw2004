@@ -1,0 +1,155 @@
+// C:/packages/rwmovie/1.04.01/source/movielib/private/slist.cpp
+// compiled in: slist.cpp
+// 34 functions, source order. line | PS3 address | size
+
+    0  00700BB8     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+    0  00704198      C  void ~SListSortExtractor(const struct <anon>* this)
+                         inlines  ~IComparator
+   33  00700F0C     3C  struct <anon> GetResourceDescriptor()
+                         local  RwUInt32 alignment
+                         local  RwUInt32 size
+                         inlines  ResourceDescriptor
+   41  00703054     34  struct <anon>* Initialize(const struct <anon>& resource)
+                         local  struct <anon>* slist
+   53  00702FFC     2C  void SList(const struct <anon>* this)
+   74  00703088     2C  void SList(const struct <anon>* this, struct IResourceAllocator* allocator, unsigned int dataSize, unsigned int dataAlign)
+   95  007015F8     4C  void ~SList(const struct <anon>* this)
+                         inlines  ~IList
+  171  007006F4     BC  struct IListNode* GetNode(const const struct <anon>* this, const unsigned int nodeNum)
+                         local  struct IListNode* node
+                         local  unsigned int count
+  215  007007B0    18C  struct IListNode* FindNode(const const struct <anon>* this, const void* item, struct IComparator* comp)
+                         local  struct IListNode* node
+                         local  const void* dataPtr
+                         local  enum Relation result
+                         local  const unsigned char* ptr1
+                         local  const unsigned char* ptr2
+                         local  unsigned int size
+                         local  bool equal
+  285  0070093C     B4  struct IListNode* GetPrev(const const struct <anon>* this, const struct IListNode* node)
+                         local  struct IListNode* prev
+  316  007009F0     B4  bool IsMember(const const struct <anon>* this, struct IListNode* node)
+                         local  bool found
+                         local  const struct IListNode* listNode
+  360  00703404    20C  enum Status Append(const struct <anon>* this, const void* item, struct ICloner* cloner)
+                         local  struct SNode* node
+                         inlines  Allocate, Free, LoadNewNode, ~ResourceDescriptor
+  409  00703610    20C  enum Status Prepend(const struct <anon>* this, const void* item, struct ICloner* cloner)
+                         local  struct SNode* node
+                         inlines  Allocate, Free, LoadNewNode, ~ResourceDescriptor
+  473  00701644    344  enum Status Append(const struct <anon>* this, const struct IList* sublist, struct ICloner* cloner)
+                         local  unsigned int dataSize
+                         local  unsigned int otherSize
+                         local  const struct IListNode* node
+                         local  struct <anon> nodeResource
+                         local  struct SNode* newNode
+                         inlines  Allocate, Free, ~ResourceDescriptor
+  577  00701988    360  enum Status Prepend(const struct <anon>* this, const struct IList* sublist, struct ICloner* cloner)
+                         local  unsigned int dataSize
+                         local  unsigned int otherSize
+                         local  struct SNode* prev
+                         local  struct SNode* oldHead
+                         local  const struct IListNode* node
+                         local  struct <anon> nodeResource
+                         local  struct SNode* newNode
+                         inlines  Allocate, Free, ~ResourceDescriptor
+  680  0070381C    2F4  enum Status InsertBefore(const struct <anon>* this, const void* item, struct IListNode* beforeMe, struct ICloner* cloner)
+                         local  struct SNode* newNode
+                         local  struct IListNode* prev
+                         inlines  Allocate, Free, LoadNewNode, ~ResourceDescriptor
+  747  00703B10    220  enum Status InsertAfter(const struct <anon>* this, const void* item, struct IListNode* afterMe, struct ICloner* cloner)
+                         local  struct SNode* newNode
+                         inlines  Allocate, Free, LoadNewNode, ~ResourceDescriptor
+  784  00701CE8    398  enum Status InsertBefore(const struct <anon>* this, const struct IList* sublist, struct IListNode* beforeMe, struct ICloner* cloner)
+                         local  unsigned int dataSize
+                         local  unsigned int otherSize
+                         local  struct IListNode* prev
+                         local  struct SNode* dupeHead
+                         local  struct SNode* dupeTail
+                         local  const struct IListNode* node
+                         local  struct <anon> nodeResource
+                         local  struct SNode* newNode
+                         inlines  Allocate, ~ResourceDescriptor
+  896  00702080    33C  enum Status InsertAfter(const struct <anon>* this, const struct IList* sublist, struct IListNode* afterMe, struct ICloner* cloner)
+                         local  unsigned int dataSize
+                         local  unsigned int otherSize
+                         local  struct SNode* dupeHead
+                         local  struct SNode* dupeTail
+                         local  const struct IListNode* node
+                         local  struct <anon> nodeResource
+                         local  struct SNode* newNode
+                         inlines  Allocate, ~ResourceDescriptor
+  989  00703D30    30C  enum Status InsertAt(const struct <anon>* this, const void* item, const unsigned int position, struct ICloner* cloner)
+                         local  struct SNode* newNode
+                         local  struct IListNode* prev
+                         inlines  Free, LoadNewNode
+ 1056  007023BC    3E4  enum Status InsertAt(const struct <anon>* this, const struct IList* sublist, const unsigned int position, struct ICloner* cloner)
+                         local  unsigned int dataSize
+                         local  unsigned int otherSize
+                         local  struct SNode* dupeHead
+                         local  struct SNode* dupeTail
+                         local  const struct IListNode* node
+                         local  struct <anon> nodeResource
+                         local  struct SNode* newNode
+                         local  struct IListNode* prev
+                         inlines  Allocate, ~ResourceDescriptor
+ 1169  007027A0    384  enum Status InsertSorted(const struct <anon>* this, const void* item, struct IComparator* comp, struct ICloner* cloner)
+                         local  struct SNode* newNode
+                         local  struct IListNode* prev
+                         local  struct IListNode* node
+                         local  bool found
+                         inlines  Allocate, Free, LoadNewNode, ~ResourceDescriptor
+ 1248  00702B24    4D8  enum Status Merge(const struct <anon>* this, const struct IList* sublist, struct IComparator* comp, struct ICloner* cloner)
+                         local  unsigned int dataSize
+                         local  unsigned int otherSize
+                         local  struct IListNode* dupeHead
+                         local  struct IListNode* dupeTail
+                         local  struct IListNode* node
+                         local  struct IListNode* prev
+                         local  struct <anon> nodeResource
+                         local  struct SNode* newNode
+                         local  struct IListNode* temp
+                         inlines  Allocate, ~ResourceDescriptor
+ 1375  00700F48    204  enum Status Remove(const struct <anon>* this, struct IListNode* node, struct IDestructor* freer)
+                         local  struct IListNode* prev
+                         inlines  Free
+ 1448  0070114C    328  enum Status Remove(const struct <anon>* this, void* item, struct IComparator* comp, struct IDestructor* freer)
+                         local  struct IListNode* prev
+                         local  struct IListNode* node
+                         local  void* data
+                         inlines  Free
+ 1534  00701474    184  void Clear(const struct <anon>* this, struct IDestructor* freer)
+                         local  struct IListNode* node
+                         local  struct IListNode* next
+                         inlines  Free
+ 1574  00700AA4    114  enum Status Reverse(const struct <anon>* this)
+                         local  struct IListNode* prev
+                         local  struct IListNode* node
+                         local  struct IListNode* temp
+                         local  struct SNode* temp2
+ 1616  007040E0     B8  enum Relation Compare(const struct <anon>* this, const void* lhs, const void* rhs)
+                         local  const const struct SNode** ptr
+                         local  const struct SNode* left
+                         local  const struct SNode* right
+ 1627    inline-only   void SetComparator(const struct <anon>* this, struct IComparator* comparator)
+ 1661  00703160    2A4  enum Status Sort(const struct <anon>* this, struct ISorter* sorter, struct IComparator* comp)
+                         local  enum Status result
+                         local  struct <anon> wrapper
+                         local  struct <anon> nodeArrayResource
+                         local  struct SNode** nodeArray
+                         local  struct SNode* node
+                         local  unsigned int i
+                         inlines  Allocate, Free, ResourceDescriptor, SListSortExtractor, SetComparator, ~ResourceDescriptor, ~SListSortExtractor
+ 1751  00700C58    2B4  enum Status Permute(const struct <anon>* this, const const unsigned int* table)
+                         local  enum Status result
+                         local  struct <anon> nodeArrayResource
+                         local  struct IListNode** nodeArray
+                         local  struct IListNode* node
+                         local  unsigned int i
+                         local  const unsigned int j
+                         inlines  Allocate, Free, ResourceDescriptor, ~ResourceDescriptor
+ 2000    inline-only   struct SNode* LoadNewNode(const struct <anon>* this, const void* item, struct ICloner* cloner)
+                         local  struct <anon> nodeResource
+                         local  struct SNode* newNode
+ 2018  00700C38     10  static void _GLOBAL__I__ZN2rw5SList21GetResourceDescriptorEv()
+ 2019  00700C48     10  static void _GLOBAL__D__ZN2rw5SList21GetResourceDescriptorEv()

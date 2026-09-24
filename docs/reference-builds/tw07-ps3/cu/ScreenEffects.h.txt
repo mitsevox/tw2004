@@ -1,0 +1,11 @@
+// ../../../../../TIGERCODE/Code/ScreenEffects/ScreenEffects.h
+// compiled in: golf2_unity.cpp, golf_unity.cpp, other_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   42  0022D7D0     50  void ScreenEffects::ScreenEffects(const struct ScreenEffects* this)
+                         inlines  FadeValues::FadeValues
+   48    inline-only   void ScreenEffects::SetRecoverRenderStatesMode(const struct ScreenEffects* this, bool flag)
+   65    inline-only   enum eFadeType ScreenEffects::CurrFadeType(const struct ScreenEffects* this)
+   66    inline-only   enum eFadeType ScreenEffects::PrevFadeType(const struct ScreenEffects* this)
+  102    inline-only   TextureRef ScreenEffects::GetSmallTexture(const const struct ScreenEffects* this)
+  118    inline-only   float ScreenEffects::GetUpdateAlphaFadeIgnoreMultiplier(const struct ScreenEffects* this)

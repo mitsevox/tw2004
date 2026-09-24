@@ -1,0 +1,16 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/quick_spu/dev-football/include/quick_spu/ps3/types.h
+// compiled in: managerplat.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   93    inline-only   bool IsCompletionChecksumValid(const const struct <anon>* this)
+   98    inline-only   void SignalCompletion(const struct <anon>* this)
+  105    inline-only   bool IsComplete(const const struct <anon>* this)
+  144    inline-only   uint64_t GetSubmissionIndex(const struct <anon>* this)
+  151    inline-only   uint64_t GetWriteValue(const struct <anon>* this, bool bEnabled, bool bStarted, uint8_t uPrio, uint64_t uSubmissionIndex)
+  163    inline-only   void GetJobEnablePatchValue32(const struct <anon>* this, uint32_t** ppReadyWrite, uint32_t* puReadyValue)
+  171    inline-only   void GetJobEnablePatchValue64(const struct <anon>* this, uint64_t** ppReadyWrite, uint64_t* puReadyValue)
+  178    inline-only   void SetSubmissionInfo(const struct <anon>* this, bool bEnabled, uint8_t uPrio, uint64_t uSubmissionIndex)
+  197    inline-only   void GetJobEnablePatchValue32(const struct <anon>* this, uint32_t** ppReadyWrite, uint32_t* puReadyValue)
+  205    inline-only   void GetJobEnablePatchValue64(const struct <anon>* this, uint64_t** ppReadyWrite, uint64_t* puReadyValue)
+  212    inline-only   uint64_t GetSubmissionIndex(const struct <anon>* this)
+  218    inline-only   void SetSubmissionInfo(const struct <anon>* this, uint64_t uPrioOpenValue, bool bEnabled)

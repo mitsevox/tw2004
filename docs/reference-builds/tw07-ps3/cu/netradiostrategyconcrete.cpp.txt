@@ -1,0 +1,23 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/online/osdk/netradiostrategyconcrete.cpp
+// compiled in: golf2_unity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   64  0018D2B8     24  void NetRadioMemoryStrategy::NetRadioMemoryStrategy(const struct NetRadioMemoryStrategy* this)
+   90  0012AB78     78  void NetRadioMemoryStrategy::~NetRadioMemoryStrategy(const struct NetRadioMemoryStrategy* this)
+                         inlines  ~MemoryStrategy
+  120  0014C560    1AC  void* NetRadioMemoryStrategy::MemoryAllocate(const struct NetRadioMemoryStrategy* this, size_t iSize, const char8_t* pFilename, int32_t iLineNum, bool bFragmenting)
+                         local  const char[15] __FUNCTION__
+                         inlines  TagValuePair, operator+
+  162  0012ABF0      4  void NetRadioMemoryStrategy::MemoryDeallocate(const struct NetRadioMemoryStrategy* this, void* ptr)
+  177  0012ABF4     58  void NetRadioMemoryStrategy::FreeBuffer(const struct NetRadioMemoryStrategy* this)
+  186  00157944     98  void NetRadioMemoryStrategy_PlaybackCompletionFreeBuffer()
+                         local  struct GameFacadeConcrete* pFacade
+                         local  struct NetRadioStrategy* pS
+                         local  struct NetRadioMemoryStrategy* p
+  224  0018D4D4     24  void NetRadioStrategyConcrete::NetRadioStrategyConcrete(const struct NetRadioStrategyConcrete* this)
+  248  0018D3D8     5C  void NetRadioStrategyConcrete::~NetRadioStrategyConcrete(const struct NetRadioStrategyConcrete* this)
+                         inlines  ~NetRadioStrategy
+  271  0012AC4C      C  struct MemoryStrategy* NetRadioStrategyConcrete::GetMemoryStrategy(const struct NetRadioStrategyConcrete* this)
+  299  00156FD8    100  void NetRadioStrategyConcrete::MediaAvailable(const struct NetRadioStrategyConcrete* this, void* pMedia, uint32_t uMediaSize, struct MediaInfo* pMediaInfo, enum MediaPriority ePriority)
+  342  0012AC70     3C  void NetRadioStrategyConcrete::CancelMedia(const struct NetRadioStrategyConcrete* this)
+  368  0012ACAC      4  void NetRadioStrategyConcrete::StartStream(const struct NetRadioStrategyConcrete* this, void* pBuffer, uint32_t uActualClipSize, uint32_t uBufferSize, struct MediaInfo* pMediaInfo)

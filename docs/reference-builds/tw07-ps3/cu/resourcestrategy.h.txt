@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/packages/osdk/2.06.04/core/include/common/osdk/gamefacade/resourcestrategy.h
+// compiled in: golf2_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   38  001E77B8      4  void CreateProtocols(const struct ResourceStrategy* this)
+   41  001E77BC      4  void DestroyProtocols(const struct ResourceStrategy* this)
+   48  001E77C0     18  void ~ResourceStrategy(const struct ResourceStrategy* this)

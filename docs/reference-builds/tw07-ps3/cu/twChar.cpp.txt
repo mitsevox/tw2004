@@ -1,0 +1,569 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/Geom/twChar.cpp
+// compiled in: golf_unity.cpp
+// 87 functions, source order. line | PS3 address | size
+
+   30    inline-only   const twHash makeTwHashFromString(const char* pHashString)
+                         local  const struct twHash tmpHash
+                         local  twHash tmpHash
+   92  00268BF4    148  void CharModelMgr::SetupPS3CharRender()
+                         local  const char[19] __FUNCTION__
+                         inlines  TagValuePair, operator+
+  111  0022C114     64  void CharModelMgr::ShutdownPS3CharRender()
+  122  0026DB58     8C  void CharModelMgr::CreateModelDMAList(const struct CharModelMgr* this, int modelIdx, struct TSkeleton* pSkeleton, SkinMorphStateT* pMorphState)
+  129  0026DA90     C8  void CharModelMgrCharacterInstance::CreateModelDMAList(const struct CharModelMgrCharacterInstance* this, struct TSkeleton* pSkeleton, SkinMorphStateT* pMorphState)
+  140  00228620     8C  void CharModelMgrCharacterInstance::DestroyModelDMAList(const struct CharModelMgrCharacterInstance* this)
+  154  0022BF80     30  void CharModelMgrCharacterInstance::WaitOnSPU(const struct CharModelMgrCharacterInstance* this)
+  177  002835C4    370  void CharShaderDefDB::LoadFromStream(const struct CharShaderDefDB* this, struct TStreamData* streamPtr)
+                         local  const char[15] __FUNCTION__
+                         local  char* dataPtr
+                         local  struct HashString hash
+                         local  twShaderConstants* pShaderParams
+                         inlines  HashString::HashString, TagValuePair, operator+
+  215  002286C8     88  void CharShaderDefDB::UnLoad(const struct CharShaderDefDB* this)
+  227  00282A04     BC  twShaderConstants* CharShaderDefDB::GetParamsByName(const struct CharShaderDefDB* this, twHash* pShaderName)
+                         local  struct HashString hash
+                         local  int32 i
+                         inlines  HashString::HashString, operator==
+  256  00245000    17C  void CharTintDefDB::LoadFromStream(const struct CharTintDefDB* this, struct TStreamData* streamPtr)
+                         local  const char[15] __FUNCTION__
+                         local  char* dataPtr
+                         inlines  TagValuePair, operator+
+  275  00228768     68  void CharTintDefDB::UnLoad(const struct CharTintDefDB* this)
+  283  002287D0     70  struct TintDef* CharTintDefDB::GetTintByNameHash(const struct CharTintDefDB* this, int32 nameHash)
+                         local  int i
+  312  00228840     B8  void CharMaterial::Init(const struct CharMaterial* this)
+  331  00228900      4  void CharMaterial::Term(const struct CharMaterial* this)
+  335  0022890C    274  void CharMaterial::SetTintingParams(const struct CharMaterial* this, int32 tintMode, int32 tintR, int32 tintG, int32 tintB)
+  352  00228B80      8  void CharMaterial::SetCharacter(const struct CharMaterial* this, struct TCharacter* pCharacter)
+  357  00228B88      8  void CharMaterial::SetHasAnimatedNormalMap(const struct CharMaterial* this, bool hasNormalMap)
+  362  00228B90     30  void CharMaterial::SetTextureTransform(const struct CharMaterial* this, const float* transform, int32 whichXForm)
+  367  00228BC0     CC  void CharMaterial::SetTextureTransforms(const struct CharMaterial* this, const twMaterial* pMaterial, int32 whichLogoXForm)
+  375  00228C8C     48  void CharMaterial::SetTextures(const struct CharMaterial* this, TextureRef baseTex, TextureRef normalMap, TextureRef packMap, TextureRef logoTex)
+  389  00228CD4      C  void CharMaterial::SetEyeLensTextures(const struct CharMaterial* this, TextureRef lensBaseTex, TextureRef lensNormalMap)
+  395  00228CE0      8  void CharMaterial::BindShaderParams(const struct CharMaterial* this, twShaderConstants* pShaderParams)
+  400  00282AC0    B04  void CharMaterial::SetShaderParams(const struct CharMaterial* this)
+                         local  TextureRef baseNormalMap
+                         local  TextureRef blendNormalMap
+                         local  const float shadowMapBias
+                         local  const float shadowMapGain
+                         local  vec4flt ambientColor
+                         local  vec4flt diffuseColor
+                         local  vec4flt specularColor
+                         local  vec4flt gamma
+                         local  vec4flt bumpMapScale
+                         local  vec4flt ambientParams
+                         local  vec4flt diffSpec
+                         local  vec4flt specFres
+                         local  vec4flt specExtra
+                         local  vec4flt rigAmbient
+                         local  vec4flt gamma
+                         local  vec4flt bumpMapScale
+                         local  vec4flt diffSpec
+                         local  vec4flt specFres
+                         local  vec4flt ambientColor
+                         local  vec4flt diffuseColor
+                         local  vec4flt specularColor
+                         local  vec4flt gamma
+                         local  vec4flt bumpMapScale
+                         local  vec4flt specExtra
+                         local  vec4flt ambientParams
+                         local  vec4flt diffSpec
+                         local  vec4flt specFres
+                         local  vec4flt wrapParams
+                         local  float wrapAmt
+                         local  vec4flt rigAmbient
+                         local  vec4flt matAmbient
+                         inlines  CharTexController::GetFaceBlendNormalMap, LLMath_MultiplyVec, __vec_mul
+  743  00228CE8     98  void CharMesh::Init(const struct CharMesh* this)
+  751  00228DF0    150  void CharMesh::Term(const struct CharMesh* this)
+  811  0025CBA0    3E8  void CharMesh::CreateRenderBuffers(const struct CharMesh* this, bool requiresDoubleBufferedIndices, bool bSystemMemVertexBuffers)
+                         local  const char[20] __FUNCTION__
+                         local  uint32 numVertices
+                         local  uint32 numUVs
+                         local  uint32 numIndices
+                         local  const twMesh* pMesh
+                         local  const uint32 uvStride
+                         local  const uint32 cActiveMicroMeshes
+                         local  const uint32 vtxDataSize
+                         local  const uint32 uvDataSize
+                         local  uint32 microMesh
+                         local  const twMicroMesh* pMMesh
+                         inlines  TagValuePair, operator+
+  886  0025CA20    180  void CharMesh::UpdateVB_Vtx(const struct CharMesh* this, uint32 bufferIdx)
+                         local  TWCHAR_SKINVERTEX* pVertices
+                         local  TWCHAR_SKINVERTEX* pV
+                         local  const twMesh* pMesh
+                         local  uint32 numVertices
+                         local  uint32 microMesh
+                         local  const twMicroMesh* pMMesh
+                         local  const twSkinVert* pSkinVerts
+                         local  uint32 v
+                         local  const twSkinVert* pSV
+                         inlines  TWCHAR_SKINVERTEX::Set
+  923  00228F48    12C  void CharMesh::UpdateVB_UVs(const struct CharMesh* this)
+                         local  twUV* pUVs
+                         local  twUV* pUV
+                         local  const twMesh* pMesh
+                         local  const uint32 uvStride
+                         local  uint32 microMesh
+                         local  const twMicroMesh* pMMesh
+                         local  const twUV* pSkinUVs
+                         local  uint32 v
+  963  00229074    120  void CharMesh::UpdateIB(const struct CharMesh* this, uint32 bufferIdx)
+                         local  uint16* pIndices
+                         local  uint16* pIdx
+                         local  const twMesh* pMesh
+                         local  const uint32 cActiveMicroMeshes
+                         local  uint32 numIndices
+                         local  uint32 microMesh
+                         local  const twMicroMesh* pMMesh
+                         local  const uint16* pMeshIndices
+                         local  uint32 i
+  996    inline-only   void CharMesh::Render(const struct CharMesh* this, uint32 bufferIdx)
+                         local  const uint32 uvStride
+ 1018  002292D8     54  void CharGeom::Init(const struct CharGeom* this)
+ 1025  00229194     D8  void CharGeom::Term(const struct CharGeom* this)
+                         local  uint32 mesh
+ 1048  00229334      8  void CharGeom::SetRenderingEnabled(const struct CharGeom* this, uint32 bEnabled)
+ 1053  00229274     64  void CharGeom::ResetBBox(const struct CharGeom* this)
+ 1080  0025E110    1A4  void CharGeom::GetBBox(const struct CharGeom* this, float* pMin, float* pMax)
+                         local  uint32 mesh
+                         local  const twMesh* pMesh
+                         local  uint32 microMesh
+                         local  const twMicroMesh* pMMesh
+                         local  const twSkinVert* pSkinVerts
+                         local  uint32 v
+                         local  const twSkinVert* pSV
+                         local  vec4flt pos
+                         inlines  LLMath_MaxVec4, LLMath_MinVec4, vec4flt_Copy, vec_st
+ 1113  0025CF88    188  void CharGeom::CreateRenderBuffers(const struct CharGeom* this)
+                         local  const char[20] __FUNCTION__
+                         local  const uint32 matrixPaletteDataSize
+                         local  uint32 mesh
+                         local  struct CharMesh* pCharMesh
+                         local  const struct CharMaterial* pMaterial
+                         local  const int32 materialType
+                         local  bool needDoubleBufferIndices
+                         local  bool needSystemMemVertexBuffers
+                         inlines  TagValuePair, operator+
+ 1142  002F56A0    AE0  void CharGeom::Render(const struct CharGeom* this, enum eRenderPass pass, uint32 bufferIdx)
+                         local  struct CharTexController* gCurrentTexController
+                         local  struct DeviceC* pDevice
+                         local  const struct ScopeC& scope
+                         local  struct ScopeParmC* parmBaseTexture
+                         local  struct ScopeParmC* parmBaseNormalMap
+                         local  struct ScopeParmC* parmBlendNormalMap
+                         local  struct ScopeParmC* parmPackedTexture
+                         local  struct ScopeParmC* UseRNAMaterials
+                         local  bool usingRNAMaterial
+                         local  uint32 mesh
+                         local  struct CharMesh* pCharMesh
+                         local  bool bRestoreDefaultCubemap
+                         local  bool useRNAMaterial
+                         local  struct MaterialC* pMaterial
+                         local  struct DeviceC* pDevice
+                         local  TextureRef blendNormalMap
+                         local  struct TCharacter* character
+                         inlines  CharMesh::Render, CharTexController::GetFaceBlendNormalMap, DS_vSetColorWriteEnable, DS_vSetCullMode, DeviceC::Flush, RNADebugBreak, ScopeParmC::Get<bool>, ScopeParmC::Set<RNA::TextureC*>
+ 1328  00298610    49C  void CharGeom::RenderShadows(const struct CharGeom* this, uint32 bufferIdx, uint32 flags)
+                         local  struct ShaderC* rnaShader
+                         local  struct DeviceC* pDevice
+                         local  const struct ScopeC& scope
+                         local  struct ScopeParmC* UseRNAMaterials
+                         local  bool useRNAMaterial
+                         local  uint32 mesh
+                         local  struct CharMesh* pCharMesh
+                         local  const struct CharMaterial* pMaterial
+                         local  const float shadowBiasOverride
+                         local  float slopeScaleBias
+                         local  struct MaterialC* rnaMat
+                         local  struct ShaderC* newShader
+                         local  int32_t technique
+                         inlines  CharMesh::Render, DS_vSetZBias, DeviceC::Flush, Gcm::cellGcmSetPolygonOffsetFillEnable, MaterialC::GetShader, RNADebugBreak, ScopeParmC::Get<bool>, ShaderC::ClearOverrideTechnique, ShaderC::SetOverrideTechnique
+ 1428  0022933C    11C  bool CharGeom::CullMesh(const struct CharGeom* this, const const twHash& cullTag)
+                         local  bool didCulling
+                         local  twGeom* pGeom
+                         local  uint32 cull
+                         local  twCullGroup* pCull
+                         local  twMesh* pMesh
+ 1446  00229458    11C  bool CharGeom::UncullMesh(const struct CharGeom* this, const const twHash& cullTag)
+                         local  bool didCulling
+                         local  twGeom* pGeom
+                         local  uint32 cull
+                         local  twCullGroup* pCull
+                         local  twMesh* pMesh
+ 1482  00229654    11C  void CharModelMgrCharacterInstance::Init(const struct CharModelMgrCharacterInstance* this)
+                         local  uint32 g
+ 1523  00229770     60  void CharModelMgr::Init(const struct CharModelMgr* this)
+                         local  uint32 i
+ 1533  00229574      4  void CharModelMgr::Term(const struct CharModelMgr* this)
+ 1537  00229848     C8  void CharModelMgrCharacterInstance::Unload(const struct CharModelMgrCharacterInstance* this)
+                         local  uint32 j
+ 1558  002295F0     64  void CharModelMgrCharacterInstance::ResetBBox(const struct CharModelMgrCharacterInstance* this)
+ 1564  00251790     24  void CharModelMgrCharacterInstance::SetBBox(const struct CharModelMgrCharacterInstance* this, const float* pMin, const float* pMax)
+                         inlines  vec4flt_Copy
+ 1570  0025E2B4    134  void CharModelMgrCharacterInstance::GetBBox(const struct CharModelMgrCharacterInstance* this, float* pMin, float* pMax)
+                         local  uint32 g
+                         local  vec4flt min
+                         local  vec4flt max
+                         inlines  LLMath_MaxVec4, LLMath_MinVec4, vec4flt_Copy, vec_st
+ 1589  0025D110     90  void CharModelMgrCharacterInstance::CreateRenderBuffers(const struct CharModelMgrCharacterInstance* this)
+                         local  uint32 g
+ 1597  00229910      4  void CharModelMgr::Update(const struct CharModelMgr* this, float timeDelta)
+ 1601  00229914     2C  void CharModelMgrCharacterInstance::SetGlobalTranslation(const struct CharModelMgrCharacterInstance* this, const float* trans)
+ 1607  002618C0    23C  void CharModelMgrCharacterInstance::SortHairPolys(const struct CharModelMgrCharacterInstance* this)
+                         local  uint32 g
+                         local  struct CharGeom* pCharGeom
+                         local  uint32 m
+                         local  struct CharMesh* pCharMesh
+                         local  const struct LS_VertexBuffer* pVB
+                         local  const struct LS_IndexBuffer* pIB
+                         local  const twMesh* pMesh
+                         local  const uint32 numTriangles
+                         local  const uint32 numVerts
+                         local  const TWCHAR_SKINVERTEX* pSrcVerts
+                         local  bool bIsPipDisplaying
+                         local  bool bIsCharacterInPip
+                         local  mat44flt_p viewMat
+                         local  int32 currentCharacterViewController
+                         inlines  LLMath_CopyMat44, vec_ld, vec_st
+ 1650  0026DCCC     DC  void CharModelMgrCharacterInstance::PreRender(const struct CharModelMgrCharacterInstance* this, float[4][4]* pSkinningMatrices, uint32 numBones, const float* pBlendAmts, uint32 numBlends)
+ 1776  00229940      8  void CharModelMgrCharacterInstance::SetFadeOut(const struct CharModelMgrCharacterInstance* this, float value)
+ 1781  00229948      8  void CharModelMgrCharacterInstance::SetTexturesFadeToBlack(const struct CharModelMgrCharacterInstance* this, float value)
+ 1786  002FE6F8    4C0  void CharModelMgrCharacterInstance::Render(const struct CharModelMgrCharacterInstance* this, bool bFullBright)
+                         local  int32 i
+                         local  struct TCharacter* pCharacter
+                         inlines  DS_vSetAlphaBlendingFunction, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetCullMode
+ 1915  00298AAC    128  void CharModelMgrCharacterInstance::RenderShadows(const struct CharModelMgrCharacterInstance* this, uint32 flags)
+                         local  uint32 g
+ 1947  00229964     B0  uint32 CharModelMgrCharacterInstance::FindGeomByName(const struct CharModelMgrCharacterInstance* this, const char* geomName)
+                         local  uint32 handle
+                         local  uint32 g
+ 1962  00229A14     6C  struct CharGeom* CharModelMgrCharacterInstance::FindGeomByHandle(const struct CharModelMgrCharacterInstance* this, uint32 handle)
+                         local  uint32 g
+ 1975  0024517C    2C4  uint32 CharModelMgrCharacterInstance::AttachGeom(const struct CharModelMgrCharacterInstance* this, twGeom* pGeom)
+                         local  const char[11] __FUNCTION__
+                         local  const int32 cGeomAlignment
+                         local  uint32 dataSize
+                         local  uint8* pAllocatedData
+                         local  uint8* pData
+                         local  struct CharGeom* pCharGeom
+                         local  struct CharMesh* pCharMeshes
+                         local  uint32 ucapMeshIndex
+                         local  uint32 mesh
+                         inlines  TagValuePair, operator+
+ 2022  00229A80    210  void CharModelMgrCharacterInstance::ReplaceGeom(const struct CharModelMgrCharacterInstance* this, struct CharGeom* pCharGeom, twGeom* pGeom)
+                         local  uint32 ucapMeshIndex
+                         local  uint32 mesh
+                         local  uint32 mesh
+ 2056  00229C90    16C  void CharModelMgrCharacterInstance::RemoveGeom(const struct CharModelMgrCharacterInstance* this, uint32 handle)
+                         local  uint32 g
+                         local  uint32 moveGeom
+ 2082  00229EC4     EC  bool CharModelMgrCharacterInstance::CullMesh(const struct CharModelMgrCharacterInstance* this, const char* cullTag)
+                         local  twHash tmpHash
+ 2090  00229DFC     C8  bool CharModelMgrCharacterInstance::CullMesh(const struct CharModelMgrCharacterInstance* this, const const twHash& cullTag)
+                         local  bool didCulling
+                         local  uint32 g
+ 2105  0022A078     EC  bool CharModelMgrCharacterInstance::UncullMesh(const struct CharModelMgrCharacterInstance* this, const char* cullTag)
+                         local  twHash tmpHash
+ 2113  00229FB0     C8  bool CharModelMgrCharacterInstance::UncullMesh(const struct CharModelMgrCharacterInstance* this, const const twHash& cullTag)
+                         local  bool didCulling
+                         local  uint32 g
+ 2128  0022A164     A8  void CharModelMgrCharacterInstance::UncullAllMeshes(const struct CharModelMgrCharacterInstance* this)
+                         local  uint32 g
+                         local  twGeom* pGeom
+                         local  uint32 cull
+                         local  twCullGroup* pCull
+                         local  twMesh* pMesh
+ 2158  0022A20C    124  void MorphVertRemapper::MorphVertRemapper(const struct MorphVertRemapper* this, const twMesh* pMesh)
+                         local  const uint32 cActiveMicroMeshes
+                         local  uint32 origNumVertsForMesh
+                         local  uint32 remapNumVertsForMesh
+                         local  uint32 microMesh
+                         local  const twMicroMesh* pMMesh
+ 2205    inline-only   bool MorphVertRemapper::IsActiveVert(const struct MorphVertRemapper* this, uint16 vertIndex)
+                         local  uint32 r
+ 2217    inline-only   uint16 MorphVertRemapper::RemapVert(const struct MorphVertRemapper* this, uint16 vertIndex)
+                         local  uint32 r
+                         local  uint16 remappedIndex
+ 2235  0022A454    1C0  uint32 newNumMicroMeshesForMesh(const twGeom* pGeom, const uint32 meshNum, const twHash** pSavedCullList, const uint32 numCullsToSave)
+                         local  const twMesh* pMesh
+                         local  const uint32 cActiveMicroMeshes
+                         local  uint32 numMicroMeshes
+                         local  uint32 microMesh
+                         local  bool bInCull
+                         local  uint32 cull
+                         local  const twCullGroup* pCull
+                         local  uint32 test
+ 2287  002964D4   2090  void CharModelMgrCharacterInstance::BurnGeometry(const struct CharModelMgrCharacterInstance* this, const struct CharDefBlendShape* pBlendShapes, uint32 numBlendShapes, const float* pBlendAmts, uint32 numBlendAmts, struct igMeshAlloc* pMeshAllocs, int32* pMeshAllocListSize)
+                         local  const char[13] __FUNCTION__
+                         local  const twHash hashGloveRight
+                         local  const twHash hashGloveLeft
+                         local  const twHash hashGloveHand
+                         local  const twHash*[3] pSavedCullList
+                         local  const uint32 numCullsToSave
+                         local  const int32 cDataAlignment
+                         local  uint32 g
+                         local  bool bNeedsBurn
+                         local  bool bNeedsMorphBurn
+                         local  twGeom* pGeom
+                         local  int32 origAllocIdx
+                         local  bool bCull_RightGlove
+                         local  bool bCull_LeftGlove
+                         local  bool bCull_GloveHand
+                         local  bool bPreserveCullTags
+                         local  uint32 mesh
+                         local  twMesh* pMesh
+                         local  const uint32 cActiveMicroMeshes
+                         local  uint32 allMicroMeshMask
+                         local  twCharMorphMgr morphMgr
+                         local  uint32 microMesh
+                         local  uint32 morph
+                         local  twMorphMesh* pMorph
+                         local  float appliedMorphValue
+                         local  uint32 testMorph
+                         local  int32 cAnimChanIdx
+                         local  const float blendAmt
+                         local  const twMesh* pBaseMesh
+                         local  uint32 blend
+                         local  const float blendAmt
+                         local  twMorphMesh* pMorphMesh
+                         local  twMorphVert* pMorphVerts
+                         local  uint32 numMeshes
+                         local  uint32 numMaterials
+                         local  uint32 numMatrixGroups
+                         local  uint32 numCullGroups
+                         local  uint32 numVertices
+                         local  uint32 numUVs
+                         local  uint32 numIndices
+                         local  uint32 numMorphVerts
+                         local  uint32 numMorphMeshes
+                         local  uint32 numMicroMeshes
+                         local  uint32 newDataSize
+                         local  const int32 allocIdx
+                         local  uint8* pNewAllocData
+                         local  uint8* pNewData
+                         local  twGeom* pNewGeom
+                         local  twMesh* pNewMeshes
+                         local  twMaterial* pNewMaterials
+                         local  twMatrixGroup* pNewMatrixGroups
+                         local  twCullGroup* pNewCullGroups
+                         local  twMicroMesh* pNewMicroMeshes
+                         local  twMorphMesh* pNewMorphMeshes
+                         local  twSkinVert* pNewSkinVerts
+                         local  twUV* pNewUVs
+                         local  uint16* pNewIndices
+                         local  twMorphVert* pNewMorphVerts
+                         local  uint32 mesh
+                         local  const twMesh* pMesh
+                         local  const struct CharMesh* charMesh
+                         local  const bool hasUCAP
+                         local  const int32 uvStride
+                         local  const uint32 cActiveMicroMeshes
+                         local  bool bActiveMesh
+                         local  struct MorphVertRemapper mvRemapper
+                         local  uint32 microMesh
+                         local  const twMicroMesh* pMMesh
+                         local  uint32 morph
+                         local  const twMorphMesh* pMorph
+                         local  const twMorphVert* pMorphVerts
+                         local  uint32 mv
+                         local  uint32 cull
+                         local  const twCullGroup* pCull
+                         local  uint32 test
+                         local  int32 newMeshId
+                         local  int32 newMicroMeshId
+                         local  uint32 activeMeshId
+                         local  char[17] buff
+                         local  uint32 mesh
+                         local  uint32 mesh
+                         local  const twMesh* pMesh
+                         local  const struct CharMesh* charMesh
+                         local  const bool hasUCAP
+                         local  const uint32 uvStride
+                         local  const uint32 cActiveMicroMeshes
+                         local  bool bActiveMesh
+                         local  uint32 numVertsForMesh
+                         local  uint32 numUVsForMesh
+                         local  uint32 numIndicesForMesh
+                         local  uint32 numMorphsForMesh
+                         local  uint32 numMorphVertsForMesh
+                         local  struct MorphVertRemapper mvRemapper
+                         local  uint32 numMicroMeshesForMesh
+                         local  uint32 newActiveMicroMeshes
+                         local  twMesh* pNewMesh
+                         local  uint32 vertOffset
+                         local  uint32 uvOffset
+                         local  uint32 indexOffset
+                         local  uint32 morphOffset
+                         local  uint32 morphVertOffset
+                         local  uint32 microMesh
+                         local  const twMicroMesh* pMMesh
+                         local  uint32 morph
+                         local  const twMorphMesh* pMorph
+                         local  const twMorphVert* pMorphVerts
+                         local  uint32 mv
+                         local  uint32 microMesh
+                         local  twMicroMesh* pNewMicroMesh
+                         local  uint32 vertOffset
+                         local  uint32 indexOffset
+                         local  uint32 microMesh
+                         local  const twMicroMesh* pMMesh
+                         local  uint32 microMesh
+                         local  const twMicroMesh* pMMesh
+                         local  const uint32 uvDataSize
+                         local  const uint32 microMeshUVOffset
+                         local  uint32 index
+                         local  uint16 oldIndex
+                         local  uint16 newIndex
+                         local  uint32 morph
+                         local  const twMorphMesh* pMorph
+                         local  twMorphMesh* pNewMorphMesh
+                         local  uint32 numActiveMorphVerts
+                         local  const twMorphVert* pMorphVerts
+                         local  twMorphVert* pNewMorphVerts
+                         local  uint32 mv
+                         local  uint32 mv
+                         local  twMicroMesh* pNewMicroMesh
+                         local  const uint32 uvDataSize
+                         local  const uint32 microMeshUVOffset
+                         local  const twMesh* pMesh
+                         local  const uint32 cActiveMicroMeshes
+                         local  bool bActiveMesh
+                         local  uint32 activeMicroMeshId
+                         local  uint32 microMesh
+                         local  uint32 cull
+                         local  const twCullGroup* pCull
+                         local  uint32 test
+                         local  uint32 mesh
+                         local  const int32 allocIdx
+                         local  int32 newDataSize
+                         local  twGeom* pNewGeom
+                         inlines  CharMesh::HasUcap, MorphVertRemapper::IsActiveVert, MorphVertRemapper::RemapVert, TagValuePair, makeTwHashFromString, operator+, twCharMorphMgr::AddMorph, twGeom_RoundUpPtr, twGeom_RoundUpSize
+ 3047  0022A614     BC  void CharModelMgr::LoadCharacterDefinition(const struct CharModelMgr* this, int32 charIndex, void* rawData, int32 rawDataSize)
+                         local  struct CharacterDefinition* pCharDef
+                         local  const struct CrAP_TransformModInfo_t& crAPTransformInfo
+                         inlines  CharModelMgr::SetCurrentCharacterInUse
+ 3061    inline-only   static const twHash* getTextureSubst(const twHash* hashID, struct twHashSubstitution* pTextureSubstitutions)
+                         local  struct twHashSubstitution* pCurSubst
+                         local  const char* pOrigName
+ 3079  0022A6D0    2A0  void CharModelMgrCharacterInstance::BindTexturesToMeshes(const struct CharModelMgrCharacterInstance* this, const char* texGroupName, struct twHashSubstitution* pTextureSubstitutions)
+                         local  struct TextureGroup* pTextureGroup
+                         local  uint32 geomIndex
+                         local  struct CharGeom* pGeom
+                         local  uint32 mesh
+                         local  struct CharMesh* pMesh
+                         local  const uint32 materialIdx
+                         local  const twMaterial* pMaterial
+                         local  const twHash* pTexRegionName
+                         local  TextureRef baseTex
+                         local  TextureRef normalMapTex
+                         local  TextureRef packedMapTex
+                         local  TextureRef logoTex
+                         inlines  getTextureSubst
+ 3120  00283934    708  void CharModelMgrCharacterInstance::BindTexturesToGeom(const struct CharModelMgrCharacterInstance* this, struct CharGeom* pGeom, struct meshListEntry* pMeshData, struct TextureGroup* pTextureGroup, struct TCharacter* pCharacter, struct dynTexMapEntry* pDynTexMap, int32 dynTexMapSize)
+                         local  uint32 mesh
+                         local  struct CharMesh* pMesh
+                         local  const uint32 materialIdx
+                         local  const twMaterial* pMaterial
+                         local  const twHash* pTexRegionName
+                         local  struct regTexListEntry* regData
+                         local  struct MaterialC* rnaMat
+                         local  struct MaterialC* oldRNAMat
+                         local  const char* rnaBaseName
+                         local  const char* rnaVariationName
+                         local  const char* shName
+                         local  struct HashString hsShaderID
+                         local  twShaderConstants* pShaderParams
+                         local  struct CharMaterial* pCharMat
+                         local  const twHash* pLogoSRegionName
+                         local  struct regTexListEntry* logoSData
+                         local  const twHash* pLogoWRegionName
+                         local  struct regTexListEntry* logoWData
+                         local  int32 logoXFormId
+                         local  const char* pTattooTexID
+                         local  bool bHaveTattoo
+                         local  const char* pBaseTexID
+                         local  const char* pLogoTexID
+                         local  struct HashString hsBaseTex
+                         local  struct HashString hsLogoTex
+                         local  int32 dynIdx
+                         local  struct CharMesh* pMesh
+                         local  struct MaterialC* rnaMat
+                         local  struct ShaderC* rnaShader
+                         local  struct TechniqueInfo rnaTech
+                         inlines  HashString::HashString, MaterialC::GetShader
+ 3380  00272408    2F8  void CharModelMgrCharacterInstance::CustomizeShaderParams(const struct CharModelMgrCharacterInstance* this, twShaderConstants* pShaderParams, const char* shName)
+                         local  struct TCharacter* pCharacter
+                         local  struct GameXmlSettings matSettings
+ 3398  00258220    9A4  void CharModelMgrCharacterInstance::BindTexturesToMesh(const struct CharModelMgrCharacterInstance* this, struct CharMesh* pMesh, struct TextureGroup* pTextureGroup, struct TCharacter* pCharacter, struct HashString* pBaseTexID, struct HashString* pLogoTexID, const char* pCharAbrv, enum eRenderPass renderPass)
+                         local  const int32 cNameBuffLen
+                         local  char[32] baseStr
+                         local  char[32] baseTexStr
+                         local  char[32] normMapStr
+                         local  char[32] packMapStr
+                         local  char[32] logoTexStr
+                         local  TextureRef baseTex
+                         local  TextureRef normalMapTex
+                         local  TextureRef packedMapTex
+                         local  TextureRef logoTex
+                         local  const char* normalMapTexturePrefix
+                         local  struct <anon>[8] normalTextData
+                         local  uint32 i
+                         local  char[64] normalMapTextureName
+                         local  TextureRef texture
+                         local  const int32 xOff
+                         local  const int32 yOff
+                         local  const int32 xDim
+                         local  const int32 yDim
+                         local  const int32 xSrc
+                         local  const int32 ySrc
+                         local  struct UV_EndMinMax uv
+                         local  char[32] lensBaseTexStr
+                         local  char[32] lensNormMapStr
+                         local  TextureRef lensBaseTex
+                         local  TextureRef lensNormalMapTex
+                         inlines  UV_EndMinMax::Build
+ 3560  0022A970    14C  void CharModelMgrCharacterInstance::GetTextureNames(const struct CharModelMgrCharacterInstance* this, const struct HashString* pBaseTexID, char* baseStr, char* baseTexStr, char* normMapStr, char* packMapStr, int32 bufLen)
+ 3586  0022AABC     7C  void CharModelMgrCharacterInstance::SetRenderPassType(const struct CharModelMgrCharacterInstance* this, enum eRenderPass newPass)
+                         local  uint32 geomIndex
+                         local  struct CharGeom* pGeom
+                         local  uint32 mesh
+                         local  struct CharMesh* pCharMesh
+ 3599  0022AB38    228  void CharModelMgrCharacterInstance::ProcessCullTags(const struct CharModelMgrCharacterInstance* this, int32 gender)
+                         local  uint32 geomIndex
+                         local  struct CharGeom* pGeom
+                         local  char[17] meshName
+                         local  const FE_CrAP_Asset_Gender_e crapGender
+                         local  struct meshListEntry* pMeshData
+                         local  int32 cullIdx
+                         local  const char* cullTagStr
+ 3626  0022C2B8    1B0  void CharModelMgrCharacterInstance::ForceUpdateRenderBuffers(const struct CharModelMgrCharacterInstance* this)
+                         local  uint32 geom
+                         local  struct CharGeom* pCharGeom
+                         local  uint32_t activeMeshes
+                         local  uint32 mesh
+                         local  struct CharMesh* pCharMesh
+ 3674  0022AE54     3C  void CharModelMgrCharacterInstance::PatchDMA_SwapSkinningMatrices(const struct CharModelMgrCharacterInstance* this, float[4][4]* pSkinningMatrices, int32_t nMatrices)
+ 3683  0022C468    1A8  void CharModelMgrCharacterInstance::SelectClubType(const struct CharModelMgrCharacterInstance* this, int32 clubType)
+                         local  int32 i
+                         local  int32 j
+                         local  twHash cullTag
+ 3714  00265F88    108  void CharModelMgrCharacterInstance::SetPocketGloveState(const struct CharModelMgrCharacterInstance* this, int32 pocketGloveOn)
+                         local  struct TCharacter* pCharacter
+ 3754  0022AE90     C8  void CharModelMgr::FreeCharacters(const struct CharModelMgr* this)
+                         local  uint32 i
+                         local  const struct CharModelMgrCharacterInstance& instance
+ 3770  00299F1C    1C4  struct XMLRPC_Value* XMLRPC_UpdateFacialTextureBlend(struct XMLRPC_Value* params)
+                         local  const char* szCharName
+                         local  const char* szBlendName
+                         local  float blendVal
+                         local  struct XMLRPC_Value* fault
+                         local  const struct CrAPInfo_t& crapInfo
+                         local  const struct CrAP_CharacterSettings_t& blendSettings
+                         local  bool bFound
+                         local  int32 i
+                         local  struct HashString hsSliderName
+                         local  struct FaceBlend* faceBlender
+                         local  int32 i
+                         inlines  HashString::HashString, operator==

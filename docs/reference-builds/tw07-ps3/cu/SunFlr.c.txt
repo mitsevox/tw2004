@@ -1,0 +1,90 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/SunFlare/SunFlr.c
+// compiled in: golf_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+ 1819    inline-only   static void SF_vBuildSaturationPolys()
+                         local  int32 iPointCnt
+                         local  int32 iPoint
+ 1975    inline-only   static void SF_vUpdateAlphaAmplitudeTable()
+                         local  int32 i
+ 2005  00303704    4F4  static void SF_vAddSaturationPolys(float* xSunColor_p, float fSaturationLevel_p, float fPositionX_p, float fPositionY_p)
+                         local  float fCurAlpha
+                         local  int32 iPoint
+                         local  int32 iCurAlphaAmplitudeTableEntry
+                         local  bool bSetAlphaEnable
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaBlendingFunction, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetZBufferMode, PR_vSetCurrentUsage, SF_vUpdateAlphaAmplitudeTable, vec4flt_Copy
+ 2132  00235FD0     90  int32 SF_iGetColorFromVector(float* v)
+                         local  float fAlphaScale
+                         local  int32 color
+                         local  uint8* pColor
+ 2152  00303BF8    F14  static void SF_vLocalAddSunFlareToDisplayList(int32 iViewportID)
+                         local  vec4flt xVecView
+                         local  vec4flt xVecWorld
+                         local  vec4flt xOuterColor
+                         local  vec4flt xInnerColor
+                         local  vec4flt xSunPositionInView
+                         local  float fNormPositionFactorX
+                         local  float fNormPositionFactorY
+                         local  float fNormAbsPositionFactorX
+                         local  float fNormAbsPositionFactorY
+                         local  float fPositionFactorX
+                         local  float fPositionFactorY
+                         local  float fAbsPositionFactorX
+                         local  float fAbsPositionFactorY
+                         local  struct CA_SCamera* pCamera
+                         local  SF_SSunFlareListForSun* spSunFlareListForSun
+                         local  SF_SSunFlareListForGlows* spSunFlareListForGlows
+                         local  SF_SSunFlareListForFlares* spSunFlareListForFlares
+                         local  SF_SSunFlareDesc* spSunFlareDesc
+                         local  SF_SSunFlareViewportInfo* spSunFlareViewportInfo
+                         local  int32 iDesc
+                         local  float fCurrentFlareIntensity
+                         local  float fPositionIntensityChange
+                         local  float fPositionIntensityChangeForGlows
+                         local  float fAverageZBufferCoverage
+                         local  float fCurrentFlareRadiusScaleFactor
+                         local  float fSunPositionZ
+                         local  float fRandomFactor1
+                         local  float fRandomFactor2
+                         local  float fPositionAngle
+                         local  float fSaturationPolyIntensity
+                         local  float fDistanceFlareRadiusScaleFactor
+                         local  float fPositionDistance
+                         local  float fTunedSunBloomTunerIntensity
+                         local  float fTunedSunFlareTunerIntensity
+                         local  VM_SViewport* pv
+                         local  FB_SFrameBuffer* pFrameBuffer
+                         local  float fHalfFieldOfViewTan
+                         local  bool bAddFlare
+                         local  bool bAddSun
+                         local  TGlowDef* pGD
+                         local  TGlowDef* pGD
+                         local  bool bAddGlow
+                         local  TGlowDef* pGD
+                         inlines  ColGlow_AddGlowToCurrentListWithSortingInfo, LLMath_MultiplyVec, LLMath_Scale, LLMath_mat44fltMultiply33, Misc_RandFuncf, RC_spGetCurrentRenderCtxCamera, RC_spGetRenderCtxFrameBuffer, __vec_mul, std::sqrt, vec4flt_Copy, vec_ld, vec_madd, vec_splat
+ 5073  002553D0    76C  void SF_vInitModule(int32 iNumberOfViewports_p)
+                         local  const char[15] __FUNCTION__
+                         local  int32 iList
+                         local  int32 iDesc
+                         local  int32 iBuffer
+                         local  int32 iViewport
+                         local  SF_SSunFlareListForSun* spSunFlareListForSun
+                         local  SF_SSunFlareDesc* spSunFlareDesc
+                         local  SF_SSunFlareViewportInfo* spSunFlareViewportInfo
+                         local  vec4flt xSunColor
+                         local  vec4flt xSunPos
+                         local  mat44flt xSunRotation
+                         inlines  LLMath_IdentifyMat, SF_vBuildSaturationPolys, SF_vEnableSunFlare, SF_vSetFlareType, SF_vSetSunColor, SF_vSetSunRotation, TagValuePair, operator+, vec4flt_Copy, vec_ld, vec_st
+ 5236  0023619C     E4  void SF_vCloseModule()
+                         local  int32 iViewport
+ 5270  00236284     5C  void SF_vDownloadZBufferData()
+                         local  int32 iViewport
+ 5307  00304B0C     74  void SF_vAddSunFlareToDisplayList(int32 iViewportID)
+ 5340  00272788    2B0  void SF_vInitSunFlareHole()
+                         local  struct GameXmlSettings xmlSettings
+ 5361  0025F8D0    394  void SF_vUpdateSunFlare(int32 iViewportID)
+                         local  SF_SSunFlareViewportInfo* spSunFlareViewportInfo
+                         local  mat44flt m
+                         local  float sunDistance
+                         local  vec4flt eyePoint
+                         inlines  LLMath_Add, LLMath_Scale, LLMath_mat44fltMultiply33, RC_vComputeRenderCtxWorldToPrimitiveCoordinate, __vec_mul, vec4flt_Copy, vec_ld, vec_madd, vec_splat, vec_st

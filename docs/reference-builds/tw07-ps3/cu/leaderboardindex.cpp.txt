@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/leaderboardindex.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    5  005B8CF4     34  void LeaderboardIndex(const struct <anon>* this)
+    9  005B8C10      C  void ~LeaderboardIndex(const struct <anon>* this)

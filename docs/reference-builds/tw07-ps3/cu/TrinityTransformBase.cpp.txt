@@ -1,0 +1,37 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_trinity/trinity/Runtime/src/TrinityTransformBase.cpp
+// compiled in: TrinityTransformBase.cpp
+// 20 functions, source order. line | PS3 address | size
+
+   28  00592BE4     9C  void InitBase(const struct <anon>* this, struct Sequence* pSequence)
+   53  00592C80     78  void TickTransBase(const struct <anon>* this, float_t fDeltaSec)
+   71  00592CF8     78  void TickRotBase(const struct <anon>* this, float_t fDeltaSec)
+   90  00592D70     AC  void SetTranslationKeys(const struct <anon>* this, int32_t numKeys, const struct Key3d* pKeys)
+  105  00592E1C     B4  void SetRotationKeys(const struct <anon>* this, int32_t numKeys, const struct Key4d* pKeys)
+  120  00592ED0     B4  void SetXTransKeys(const struct <anon>* this, int32_t numKeys, const struct Key4d* pKeys)
+  135  00592F84     B4  void SetYTransKeys(const struct <anon>* this, int32_t numKeys, const struct Key4d* pKeys)
+  150  00593038     B4  void SetZTransKeys(const struct <anon>* this, int32_t numKeys, const struct Key4d* pKeys)
+  165  005930EC     B4  void SetXRotKeys(const struct <anon>* this, int32_t numKeys, const struct Key4d* pKeys)
+  180  005931A0     B4  void SetYRotKeys(const struct <anon>* this, int32_t numKeys, const struct Key4d* pKeys)
+  195  00593254     B4  void SetZRotKeys(const struct <anon>* this, int32_t numKeys, const struct Key4d* pKeys)
+  210  00593308     B4  void SetXTransKeys(const struct <anon>* this, int32_t numKeys, const struct Coeff* pKeys)
+  225  005933BC     B4  void SetYTransKeys(const struct <anon>* this, int32_t numKeys, const struct Coeff* pKeys)
+  240  00593470     B4  void SetZTransKeys(const struct <anon>* this, int32_t numKeys, const struct Coeff* pKeys)
+  255  00593524     B4  void SetXRotKeys(const struct <anon>* this, int32_t numKeys, const struct Coeff* pKeys)
+  270  005935D8     B4  void SetYRotKeys(const struct <anon>* this, int32_t numKeys, const struct Coeff* pKeys)
+  285  0059368C     B4  void SetZRotKeys(const struct <anon>* this, int32_t numKeys, const struct Coeff* pKeys)
+  299  00593968    1BC  void GetPosition(const struct <anon>* this, float_t* vPos)
+                         local  bool8_t done
+                         local  vec3flt vPos3
+                         local  vec4flt vTempPos
+  338  00593B24    2F4  void GetRotation(const struct <anon>* this, float* vEulers)
+                         local  bool8_t done
+                         local  quat q
+                         local  mat44flt matRot
+                         local  mat44flt matResult
+                         local  mat44flt matRot
+                         local  mat44flt matResult
+  402  00593740    228  void GetRotation34(const struct <anon>* this, float_t[4]* mat)
+                         local  bool8_t done
+                         local  vec3flt vEulers
+                         local  quat q
+                         local  mat44flt tempMat

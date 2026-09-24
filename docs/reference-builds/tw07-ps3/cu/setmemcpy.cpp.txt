@@ -1,0 +1,5 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/extern/coda/cmn/setmemcpy.cpp
+// compiled in: setmemcpy.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   15  006DEBE4     10  enum Result SetMemCpy(void*(*)()* memcpy)

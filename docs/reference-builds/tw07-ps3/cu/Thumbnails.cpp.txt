@@ -1,0 +1,25 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Thumbnails/Thumbnails.cpp
+// compiled in: other_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   27  003E5470     78  struct ThumbNailManager& ThumbnailMgr()
+                         inlines  Singleton<ThumbNailManager>::GetSingleton
+   34  003FD124    17C  void ThumbNailManager::OpenOnce(const struct ThumbNailManager* this)
+                         local  const char[9] __FUNCTION__
+                         local  int i
+                         inlines  TagValuePair, operator+
+   52  003E54E8      4  void ThumbNailManager::CloseOnce(const struct ThumbNailManager* this)
+   59  0042AB18    2D4  void ThumbNailManager::Init(const struct ThumbNailManager* this)
+                         local  const char[5] __FUNCTION__
+                         local  int i
+                         local  int j
+                         local  int index
+                         local  int userIndex
+                         local  int thumbnailIndex
+                         inlines  TagValuePair, UserInfo::SetThumbnails, operator+
+  111  0042A92C    1EC  void ThumbNailManager::Shutdown(const struct ThumbNailManager* this)
+                         local  int i
+                         local  int j
+                         local  int valid_user_check_start
+                         local  int index
+                         inlines  UserInfo::SetThumbnails

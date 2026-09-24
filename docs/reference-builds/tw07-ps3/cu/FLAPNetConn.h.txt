@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/Golf/RNA/FLAP/FLAPNetConn.h
+// compiled in: rnaunity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   82  004C7264     D0  void NetConn(const struct <anon>* this, enum ConnectionType eConnType, uint32_t uSendBufferSize)
+   83  004C7404     80  void NetConn(const struct <anon>* this, SOCKET socket, uint32_t uSendBufferSize)
+   84  004C7560     30  void ~NetConn(const struct <anon>* this)

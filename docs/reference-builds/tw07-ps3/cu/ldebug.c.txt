@@ -1,0 +1,101 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/lua-5.0.2/src/ldebug.c
+// compiled in: ldebug.c
+// 32 functions, source order. line | PS3 address | size
+
+   36  00544E04     94  static int currentpc(CallInfo* ci)
+   45  00544E98     74  static int currentline(CallInfo* ci)
+                         local  int pc
+   54  00544F0C     64  void luaG_inithooks(lua_State* L)
+                         local  CallInfo* ci
+   65  00544F70     3C  int lua_sethook(lua_State* L, lua_Hook func, int mask, int count)
+   79  00544FAC      8  lua_Hook lua_gethook(lua_State* L)
+   84  00544FB4      8  int lua_gethookmask(lua_State* L)
+   89  00544FBC      C  int lua_gethookcount(lua_State* L)
+   94  00544FC8     A4  int lua_getstack(lua_State* L, int level, lua_Debug* ar)
+                         local  int status
+                         local  CallInfo* ci
+  117  0054506C     30  static Proto* getluaproto(CallInfo* ci)
+  122  0054509C     CC  const char* lua_getlocal(lua_State* L, const lua_Debug* ar, int n)
+                         local  const char* name
+                         local  CallInfo* ci
+                         local  Proto* fp
+  140  00545168     E0  const char* lua_setlocal(lua_State* L, const lua_Debug* ar, int n)
+                         local  const char* name
+                         local  CallInfo* ci
+                         local  Proto* fp
+                         local  const TObject* o2
+                         local  TObject* o1
+  161    inline-only   static void funcinfo(lua_Debug* ar, StkId func)
+                         local  Closure* cl
+  177    inline-only   static const char* travglobals(lua_State* L, const TObject* o)
+                         local  Table* g
+                         local  int i
+                         local  Node* n
+  189    inline-only   static void info_tailcall(lua_State* L, lua_Debug* ar)
+  201  00545A3C    3A4  static int auxgetinfo(lua_State* L, const char* what, lua_Debug* ar, StkId f, CallInfo* ci)
+                         local  int status
+                         local  const TObject* o2
+                         local  TObject* o1
+                         inlines  funcinfo, getfuncname, travglobals
+  238  00546238    198  int lua_getinfo(lua_State* L, const char* what, lua_Debug* ar)
+                         local  int status
+                         local  CallInfo* ci
+                         local  StkId f
+                         inlines  info_tailcall
+  275    inline-only   static int precheck(const Proto* pt)
+  284    inline-only   static int checkopenop(const Proto* pt, int pc)
+                         local  Instruction i
+  299  00545248     3C  static int checkRK(const Proto* pt, int r)
+  304  00545284    58C  static Instruction luaG_symbexec(const Proto* pt, int lastpc, int reg)
+                         local  int pc
+                         local  int last
+                         local  const Instruction i
+                         local  OpCode op
+                         local  int a
+                         local  int b
+                         local  int c
+                         local  int nup
+                         local  int dest
+                         local  OpCode op1
+                         inlines  checkopenop, precheck
+  438  00545810     10  int luaG_checkcode(const Proto* pt)
+  443  00545820     58  static const char* kname(Proto* p, int c)
+  452  00545878    1C4  static const char* getobjname(CallInfo* ci, int stackpos, const char** name)
+                         local  Proto* p
+                         local  int pc
+                         local  Instruction i
+                         local  int a
+                         local  int b
+                         local  int k
+                         local  int g
+                         local  int k
+  493    inline-only   static const char* getfuncname(CallInfo* ci, const char** name)
+                         local  Instruction i
+  507    inline-only   static int isinstack(CallInfo* ci, const TObject* o)
+                         local  StkId p
+  515  00546064    10C  void luaG_typeerror(lua_State* L, const TObject* o, const char* op)
+                         local  const char* name
+                         local  const char* t
+                         local  const char* kind
+                         inlines  isinstack
+  528  00546214     24  void luaG_concaterror(lua_State* L, StkId p1, StkId p2)
+  535  00546170     A4  void luaG_aritherror(lua_State* L, const TObject* p1, const TObject* p2)
+                         local  TObject temp
+  543  00545FC8     9C  int luaG_ordererror(lua_State* L, const TObject* p1, const TObject* p2)
+                         local  const char* t1
+                         local  const char* t2
+  554    inline-only   static void addinfo(lua_State* L, const char* msg)
+                         local  CallInfo* ci
+                         local  char[60] buff
+                         local  int line
+  565  00545DE0     FC  void luaG_errormsg(lua_State* L)
+                         local  StkId errfunc
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  const TObject* o2
+                         local  TObject* o1
+  578  00545EDC     EC  void luaG_runerror(lua_State* L, const char* fmt)
+                         local  va_list argp
+                         local  char[60] buff
+                         local  int line
+                         inlines  addinfo

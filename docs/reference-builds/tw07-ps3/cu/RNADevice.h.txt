@@ -1,0 +1,14 @@
+// ../../../../../TIGERCODE/packages/RNA/dev-2.0-golf/RNA/RNACore/include/RNARender/RNADevice.h
+// compiled in: Legacy_unity.cpp, golf_unity.cpp, rnaunity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   83    inline-only   struct DevicePlatC& DeviceC::GetPlatform(const struct DeviceC* this)
+  103    inline-only   struct ScopeC& DeviceC::GetScope(const struct DeviceC* this)
+  124    inline-only   struct MaterialListC* DeviceC::GetMaterialList(const const struct DeviceC* this)
+  136    inline-only   void DeviceC::SetErrorShader(const struct DeviceC* this, struct ShaderC* pShader)
+  474    inline-only   void DeviceC::BindMapping(const struct DeviceC* this, struct MappingC* pMapping)
+  479    inline-only   void DeviceC::UnbindMapping(const struct DeviceC* this, struct MappingC* pMapping)
+  484    inline-only   void DeviceC::Flush(const struct DeviceC* this)
+  499    inline-only   void DeviceC::Render(const struct DeviceC* this, enum RenderCallbackID idCallback, void* pObject, uintptr_t userData)
+                         local  const char[7] __FUNCTION__
+  507    inline-only   void DeviceC::Render<RNA::GeomC>(const struct DeviceC* this, struct GeomC* pGeom)

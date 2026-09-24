@@ -1,0 +1,5 @@
+// ../ears_common/dev/include/ears_common/hash.h
+// compiled in: ChrCntl_Character.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   68    inline-only   uint32_t Common::CommonHash(const char* cStr)

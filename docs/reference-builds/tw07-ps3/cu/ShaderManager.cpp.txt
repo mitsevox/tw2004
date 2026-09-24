@@ -1,0 +1,73 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderManager.cpp
+// compiled in: golf_unity.cpp
+// 31 functions, source order. line | PS3 address | size
+
+  140  00226264     78  void SM_OpenOnce()
+                         local  unsigned int id
+  155  002262DC     78  void SM_CloseOnce()
+                         local  unsigned int id
+  173  00254D78     A0  void SM_SetLightMatrix_ColMjr(float[4]* lightMatrix)
+                         inlines  LLMath_CopyMat44, vec_ld, vec_st
+  183  002512CC     78  void SM_SetEyePos(const float* eyePos)
+                         inlines  vec4flt_Copy
+  193  00254E18     A0  void SM_SetWorldLightTexMatrix(float[4]* matLightWVPTex)
+                         inlines  LLMath_CopyMat44, vec_ld, vec_st
+  203  00251344     78  void SM_SetZeroRegister(const float* zeroHalfTwoOne)
+                         inlines  vec4flt_Copy
+  226  002B9CE8    1E4  void SM_SetModel(float[4]* model)
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         inlines  LLMath_CopyMat44, RNADebugBreak, ScopeParmC::Set<RNAMath::RNAMatrix44>, vec_ld, vec_st
+  236  002B9ECC    1E4  void SM_SetView(float[4]* view)
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         inlines  LLMath_CopyMat44, RNADebugBreak, ScopeParmC::Set<RNAMath::RNAMatrix44>, vec_ld, vec_st
+  246  002BA0B0    1E4  void SM_SetProj(float[4]* proj)
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         inlines  LLMath_CopyMat44, RNADebugBreak, ScopeParmC::Set<RNAMath::RNAMatrix44>, vec_ld, vec_st
+  263  002BA294    1E4  void SM_SetModelView(float[4]* modelView)
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         inlines  LLMath_CopyMat44, RNADebugBreak, ScopeParmC::Set<RNAMath::RNAMatrix44>, vec_ld, vec_st
+  273  00254EB8     9C  void SM_SetViewProj(float[4]* viewProj)
+                         inlines  LLMath_CopyMat44, vec_ld, vec_st
+  289  00254F54     A0  void SM_SetInvModelView(float[4]* invModelView)
+                         inlines  LLMath_CopyMat44, vec_ld, vec_st
+  298  002BA478    1E4  void SM_SetModelViewProj(float[4]* modelViewProj)
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         inlines  LLMath_CopyMat44, RNADebugBreak, ScopeParmC::Set<RNAMath::RNAMatrix44>, vec_ld, vec_st
+  320  00254FF4     A0  void SM_SetOrientation(float[4]* orientation)
+                         inlines  LLMath_CopyMat44, vec_ld, vec_st
+  329  002513BC     78  void SM_SetTranslation(const float* translation)
+                         inlines  vec4flt_Copy
+  338  00255094     A0  void SM_SetTranlationViewProj(float[4]* translationViewProj)
+                         inlines  LLMath_CopyMat44, vec_ld, vec_st
+  350  00291BA8    1F4  void SM_SetWorldLightDir(const float* lightDir)
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         inlines  GM_IsFrontEnd, RNADebugBreak, ScopeParmC::Set<rw::math::vpu::Vector4>, Update, Vector4, operator=, vec4flt_Copy
+  369  00251434     78  void SM_SetCameraDir(const float* cameraDir)
+                         inlines  vec4flt_Copy
+  379  00255134     A0  void SM_SetLightColors(float[4]* lightColorArray)
+                         inlines  LLMath_CopyMat44, vec_ld, vec_st
+  389  002514AC     78  void SM_SetAmbientColor(const float* ambientColor)
+                         inlines  vec4flt_Copy
+  399  002263E4     90  void SM_SetDiffuseColor(const float* diffuseColor)
+  410  00226354     90  void SM_SetSpecularColor(const float* specularColor)
+  421  00251524     78  void SM_SetGamma(const float* gamma)
+                         inlines  vec4flt_Copy
+  431  0025159C     78  void SM_SetBumpMapScale(const float* bumpMapScale)
+                         inlines  vec4flt_Copy
+  441  00251614     78  void SM_SetDiffSpec(const float* diffSpec)
+                         inlines  vec4flt_Copy
+  451  0025168C     78  void SM_SetSpecFres(const float* specFres)
+                         inlines  vec4flt_Copy
+  466  00226688     68  void SM_Shader_Base::Load(const struct SM_Shader_Base* this, const void* pVScode, struct LS_VertexAttribute* pVertDesc, uint32 vertDescSize, const void* pPScode)
+  479  00226474    214  void SM_Shader_Base::LoadBaseParams(const struct SM_Shader_Base* this)
+  514  0026E1E0    378  void SM_Shader_Base::Activate(const struct SM_Shader_Base* this)
+                         inlines  SM_NoteActiveShader
+  629  002266F0      4  void SM_Shader_Base::Free(const struct SM_Shader_Base* this)
+  642  00267AD8     9C  void SM_Shader_Base::Deactivate(const struct SM_Shader_Base* this)
+                         inlines  SM_NoteActiveShader

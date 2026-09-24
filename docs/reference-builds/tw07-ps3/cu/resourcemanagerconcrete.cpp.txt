@@ -1,0 +1,122 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/resourcemanagerconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 39 functions, source order. line | PS3 address | size
+
+  134  0061D7BC    130  void ResourceMultiUrlLoader(const struct <anon>* this, uint32_t uNumUrls, const char8_t** aUrls, uint32_t uTimeout, struct ResourceCallback* pCallback, void* pContext, void* pBuffer, uint32_t uBufferLength)
+                         inlines  List, OperationStrategy, RCPointer
+  173  0061DA1C    124  void ResourceMultiUrlLoader(const struct <anon>* this, uint32_t uNumUrls, const char8_t** aUrls, uint32_t uTimeout, struct ResourceCallback* pCallback, void* pContext, struct MemoryStrategy* pMemoryStrategy)
+                         inlines  List, OperationStrategy, RCPointer
+  206  005D67B8    11C  void Initialize(const struct <anon>* this, uint32_t uNumUrls, const char8_t** aUrls)
+                         local  uint32_t uIndex
+                         inlines  InsertElement
+  237  0061DE48     F8  void ~ResourceMultiUrlLoader(const struct <anon>* this)
+                         inlines  RemoveAllInternal, operator->, operator=, ~List, ~OperationStrategy, ~RCPointer
+  264  005F9BB4     9C  bool OperationProcess(const struct <anon>* this, const struct Operation* )
+                         local  bool bContinue
+  309  005BE0B8     3C  void OperationTimeout(const struct <anon>* this, const struct Operation* pOperation)
+  333  005CDF58     68  void OperationCancel(const struct <anon>* this, const struct Operation* )
+                         inlines  operator->
+  363  005F99C4    1F0  bool LoadNextUrl(const struct <anon>* this)
+                         local  const char8_t* strUrl
+                         local  struct <anon>* pResourceManager
+                         local  bool bLoading
+                         inlines  GetElementAt, GetInstance, operator=
+  415  005BE0F4     44  void ResourceProgress(const struct <anon>* this, void* pContext, const char8_t* strURL, uint32_t uSize, uint32_t uCompleted)
+  441  005F9C50     B0  void ResourceSuccess(const struct <anon>* this, void* pContext, const char8_t* strURL, struct Resource* pResource)
+                         inlines  operator=
+  469  005F9D00     F4  void ResourceFailure(const struct <anon>* this, void* pContext, const char8_t* strURL, enum Failure eFailure)
+                         inlines  operator=
+  509  005EEB40     A4  void ResourceRequest(const struct ResourceRequest* this, const char8_t* strURL, struct ResourceCallback* pCallback, void* pContext, struct ResourceRequest* pNext)
+                         inlines  RCPointer
+  535  005EEE34     50  void ~ResourceRequest(const struct ResourceRequest* this)
+                         inlines  ~RCPointer
+  557  005BE138     C0  void ProgressCallback(const struct ResourceRequest* this, uint32_t uSize, uint32_t uCompleted)
+  582  005BE1F8     B0  void SuccessCallback(const struct ResourceRequest* this, struct Resource* pResource)
+  607  005BE2A8     B0  void FailureCallback(const struct ResourceRequest* this, enum Failure eFailure)
+  634  005BE358     A0  void Cancel(const struct ResourceRequest* this)
+  668  00603264    128  void ResourceLoader(const struct ResourceLoader* this, struct ResourceProtocol* pProtocol, const char8_t* strURL, void* pBuffer, uint32_t uLength)
+                         inlines  RCPointer, operator->
+  710  006034B4    114  void ResourceLoader(const struct ResourceLoader* this, struct ResourceProtocol* pProtocol, const char8_t* strURL, struct MemoryStrategy* pMemoryStrategy)
+                         inlines  RCPointer, operator->
+  741  005D4760     7C  void Initialize(const struct ResourceLoader* this)
+                         local  char8_t* strAt
+                         local  uint32_t uLength
+                         inlines  GetBuffer
+  777  00603A78     CC  void ~ResourceLoader(const struct ResourceLoader* this)
+                         inlines  ~OperationStrategy, ~RCPointer
+  814  005EEC88    1AC  struct Operation* AsynchronousLoad(const struct ResourceLoader* this, const char8_t* strURL, uint32_t uTimeout, struct ResourceCallback* pCallback, void* pContext)
+                         local  struct ResourceRequest* pRequest
+                         inlines  GetOperationManagerConcrete, operator OSDK::ResourceRequest*, operator->, operator=
+  860  005D7820     A4  bool SynchronousLoad(const struct ResourceLoader* this)
+                         inlines  operator->
+  888  005E71E0    2A4  bool OperationProcess(const struct ResourceLoader* this, const struct Operation* pOperation)
+                         local  struct ResourceRequest* pPrev
+                         local  struct ResourceRequest* pRequest
+                         local  bool bContinue
+                         local  struct ResourceRequest* pNext
+                         local  enum Failure eFailure
+                         local  uint32_t uSize
+                         local  uint32_t uCompleted
+                         local  struct ResourceRequest* pRequest
+                         inlines  GetNext, SetNext, operator OSDK::ResourceRequest*, operator->, operator=
+ 1020  005E7484     B4  void OperationTimeout(const struct ResourceLoader* this, const struct Operation* pOperation)
+                         inlines  GetNext, operator=
+ 1062  005D3D30     B4  void OperationCancel(const struct ResourceLoader* this, const struct Operation* pOperation)
+                         inlines  GetNext, operator=
+ 1104  005D7BBC    12C  struct ResourceProtocol* GetProtocol(const struct ResourceManagerConcrete* this, const char8_t* strURL)
+                         local  char8_t[64] strProtocol
+                         local  const char8_t* strSrc
+                         local  char8_t* strDst
+                         local  uint32_t uListSize
+                         local  struct ResourceProtocol* pProtocol
+                         local  uint32_t uPosition
+                         local  uint32_t uIndex
+                         local  struct ResourceProtocol* pElement
+                         inlines  GetElementAt, GetNumberOfElements
+ 1154  005DCF00    160  uint32_t FindResource(const struct ResourceManagerConcrete* this, const char8_t* strURL)
+                         local  struct <anon> Path
+                         local  char8_t* strAt
+                         local  uint32_t uLength
+                         local  uint32_t uListSize
+                         local  uint32_t uIndex
+                         local  struct ResourceLoader* pElement
+                         inlines  GetBuffer, GetNumberOfElements, GetResource
+ 1207  005DD7E0     B8  void ProcessComplete(const struct ResourceManagerConcrete* this)
+                         local  uint32_t uResource
+                         local  struct ResourceLoader* pLoader
+                         local  bool bRemove
+                         inlines  GetElementAt, GetNumberOfElements, GetState, RemoveElementAt
+ 1262  00618404    26C  void ResourceManagerConcrete(const struct ResourceManagerConcrete* this)
+                         local  int32_t iErr
+                         local  char8_t[128] strNetResource
+                         local  const struct Dictionary* pConfiguration
+                         local  uint32_t uCacheSize
+                         inlines  AddObserver, GetInstance, List
+ 1307  0061C258    1E4  void ~ResourceManagerConcrete(const struct ResourceManagerConcrete* this)
+                         local  uint32_t uResource
+                         local  uint32_t uProtocol
+                         inlines  GetNumberOfElements, RemoveElementAt, RemoveObserver, ~List
+ 1345  005D6684    134  void Startup(const struct ResourceManagerConcrete* this)
+ 1355  005CAF9C     40  void Shutdown(const struct ResourceManagerConcrete* this)
+ 1381  005BE420      C  void AddProtocol(const struct ResourceManagerConcrete* this, struct ResourceProtocol* pProtocol)
+                         inlines  InsertElement
+ 1406  005D0734      C  void RemoveProtocol(const struct ResourceManagerConcrete* this, struct ResourceProtocol* pProtocol)
+                         inlines  RemoveElement
+ 1432  005D7CE8     34  bool CanHandleURL(const struct ResourceManagerConcrete* this, const char8_t* strURL)
+ 1459  00603894    1E4  struct Resource* LoadSynchronous(const struct ResourceManagerConcrete* this, const char8_t* strURL, void* pBuffer, uint32_t uLength, struct MemoryStrategy* pMemoryStrategy)
+                         local  struct ResourceProtocol* pProtocol
+                         local  struct Resource* pResource
+                         local  uint32_t uIndex
+                         local  struct <anon> pLoader
+                         local  struct ResourceLoader* pLoader
+                         inlines  GetElementAt, GetResource, InsertElement, operator=, ~RCPointer
+ 1518  0061DC64    1E4  struct Operation* LoadAsynchronous(const struct ResourceManagerConcrete* this, uint32_t uNumUrls, const char8_t** aUrls, uint32_t uTimeout, struct ResourceCallback* pCallback, void* pContext, void* pBuffer, uint32_t uLength, struct MemoryStrategy* pMemoryStrategy)
+                         local  struct <anon>* pStrategy
+                         local  struct <anon>* pStrategy
+                         inlines  GetOperationManagerConcrete
+ 1561  006036DC    1B8  struct Operation* LoadAsynchronous(const struct ResourceManagerConcrete* this, const char8_t* strURL, uint32_t uTimeout, struct ResourceCallback* pCallback, void* pContext, void* pBuffer, uint32_t uLength, struct MemoryStrategy* pMemoryStrategy)
+                         local  struct ResourceProtocol* pProtocol
+                         local  struct Operation* pOperation
+                         local  uint32_t uIndex
+                         local  struct <anon> pLoader
+                         inlines  GetElementAt, InsertElement, operator=, ~RCPointer

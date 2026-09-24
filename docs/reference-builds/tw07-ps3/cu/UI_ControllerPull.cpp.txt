@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_ControllerPull.cpp
+// compiled in: apt_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   21  000F27B8     5C  void UIControllerPull::UIControllerPull(const struct UIControllerPull* this)
+   27  00033450     6C  void UIControllerPull::Init(const struct UIControllerPull* this)
+   39  000334BC     24  void UIControllerPull::Show(const struct UIControllerPull* this)
+   44  000334E0      8  enum eAptHandleInput UIControllerPull::HandleInput(const struct UIControllerPull* this, int32 cID)
+   50  0002E7E4     EC  void UIControllerPull::SendMessage(const struct UIControllerPull* this, enum PullMessage message, int32 controllerNum)

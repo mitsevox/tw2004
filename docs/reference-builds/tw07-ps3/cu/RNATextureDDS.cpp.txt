@@ -1,0 +1,91 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnax/source/RNAX/PS3/RNATextureDDS.cpp
+// compiled in: RNATextureDDS.cpp
+// 12 functions, source order. line | PS3 address | size
+
+    0  008AC74C     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   47  008AC7EC    6E0  static bool ReadHeader(const struct InStreamC& in, struct DDSURFACEDESC2* pSurfaceDesc, const enum SurfaceFormatE& surfaceFormat, const enum TextureTypeE& eType)
+                         local  const char[11] __FUNCTION__
+                         inlines  RNADebugBreak
+  192  008AC6B0     10  uint32_t GetSurfaceFlagsFromDDSHeader(struct DDSURFACEDESC2* pSurfaceDesc)
+                         local  uint32_t eFlags
+  217  008AC6C0     40  static uint32_t CalcNumMips(uint32_t uWidth, uint32_t uHeight, uint32_t uDepth)
+                         local  uint32_t uMipCount
+  245  008AC700     4C  static uint8_t* AddRowPadding(uint8_t* data, uint32_t bytes)
+  264    inline-only   static void Serialize3BppTo4Bpp(const struct InStreamBinaryC& in, uint8_t* pTextureData, int32_t iNumPixels)
+                         local  const int32_t BUFFER_LEN
+                         local  uint8_t[768] aBuffer
+                         local  int32_t iBlockLen
+                         local  int32_t iPixel
+  301  008ACECC    A20  static void SerializeInTextureData(const struct InStreamBinaryC& in, struct TextureC* pTexture, bool bits24)
+                         local  const char[23] __FUNCTION__
+                         local  enum SurfaceFormatE surfaceFormat
+                         local  int32_t numCubeFaces
+                         local  uint8_t* pTextureData
+                         local  int32_t cubeFace
+                         local  int32_t iMipWidth
+                         local  int32_t iMipHeight
+                         local  int32_t iMipDepth
+                         local  int32_t mipMapLevel
+                         local  int32_t depth
+                         local  int32_t y
+                         local  int32_t iBlockLen
+                         local  int32_t iPixel
+                         local  int32_t iMipWidth
+                         local  int32_t iMipHeight
+                         local  int32_t iMipDepth
+                         local  int32_t iBlockSize
+                         local  int32_t iTotalDataSize
+                         local  int8_t* pTempBuffer
+                         local  int8_t* pDstBuffer
+                         local  int8_t* pSrcMipData
+                         local  int32_t iMip
+                         local  int32_t iDXTBlocksInMip
+                         local  int32_t iSliceSize
+                         local  int32_t iMipSize
+                         local  int32_t iDepthStep
+                         local  int32_t iBytesRemainining
+                         local  int32_t iZBlock
+                         local  int8_t* pSrc
+                         local  int32_t iBlock
+                         local  int32_t iZInterleave
+                         local  int32_t numCubeFaces
+                         local  uint8_t* pTextureData
+                         local  uint32_t nBpp
+                         local  int32_t cubeFace
+                         local  int32_t iMipWidth
+                         local  int32_t iMipHeight
+                         local  int32_t iMipDepth
+                         local  int32_t mipMapLevel
+                         local  int32_t depth
+                         local  int32_t y
+                         local  int32_t numCubeFaces
+                         local  uint8_t* pTextureData
+                         local  int32_t cubeFace
+                         local  int32_t iMipWidth
+                         local  int32_t iMipHeight
+                         local  int32_t iMipDepth
+                         local  int32_t mipMapLevel
+                         local  uint32_t uNumBytes
+                         inlines  RNADebugBreak, Serialize3BppTo4Bpp, TextureC::GetDepth, TextureC::GetFormat, TextureC::GetHeight, TextureC::GetWidth
+  516  008AD8EC    258  static bool LoadTextureCommon(const struct InStreamBinaryC& in, struct DeviceC* pDevice, struct TextureC* pTexture)
+                         local  const char[18] __FUNCTION__
+                         local  struct DDSURFACEDESC2 desc
+                         local  enum TextureTypeE eType
+                         local  enum SurfaceFormatE surfaceFormat
+                         local  uint32_t uNumMips
+                         local  uint32_t eFlags
+                         inlines  RNADebugBreak
+  556  008ADD04    158  bool RNAX::LoadTextureFromDDS(struct DeviceC* pDevice, struct TextureC* pTexture, void* pDDSData, uint32_t uDDSSize)
+                         local  const char[19] __FUNCTION__
+                         local  struct InStreamBinaryC in
+                         local  uint32_t magicNumber
+                         local  bool bRet
+                         inlines  RNADebugBreak
+  575  008ADB44    1C0  bool RNAX::LoadTextureFromP3S(struct DeviceC* pDevice, struct TextureC* pTexture, void* pDDSData, uint32_t uDDSSize)
+                         local  const char[19] __FUNCTION__
+                         local  struct InStreamBinaryC in
+                         local  uint32_t magicNumber
+                         local  bool bRet
+                         inlines  RNADebugBreak
+  594  008AC7CC     10  static void _GLOBAL__I__Z28GetSurfaceFlagsFromDDSHeaderP14DDSURFACEDESC2()
+  595  008AC7DC     10  static void _GLOBAL__D__Z28GetSurfaceFlagsFromDDSHeaderP14DDSURFACEDESC2()

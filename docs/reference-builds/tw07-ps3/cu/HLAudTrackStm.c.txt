@@ -1,0 +1,49 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/audio/engine/hl/HLAudTrackStm.c
+// compiled in: other_unity.cpp
+// 21 functions, source order. line | PS3 address | size
+
+   50    inline-only   void ResetStreamPerf(TPerfStm* pperf)
+   66  0044D99C    160  static bool CheckQueue(TPerfStm* pperf)
+                         local  bool restart
+                         local  TStmPlayList* plist
+  108  003E36E4     98  static void StartStreamVoices(TPerfStm* pperf)
+                         local  TVoice* pv
+  137  0044D210    150  static void SNDStatusCallback(int streamChan, enum eAudStrmCallbackReason reason, int userData)
+                         local  TPerfStm* pperf
+  168    inline-only   static uint8 GetStreamChanForPlaylist(uint8 plid)
+                         local  uint8 chan
+  203  0044DE10    3CC  static void PrimeStreamer(TPerfStm* pperf)
+                         local  TTrack* ptrk
+                         local  TStmPlayList* plist
+                         local  TVocAlloc vocalloc
+                         local  uint8 streamChan
+                         local  TEmitInst* pemit
+                         local  bool bIsMusic
+                         local  uint32 flags
+                         local  bool bSuccess
+                         inlines  GetStreamChanForPlaylist
+  327  003E172C      8  bool Stm_InitModule()
+  337  003E1738      4  void Stm_ExitModule()
+  342  003E377C      8  bool Stm_InitSession()
+  349  003E3784      4  void Stm_ExitSession()
+  358  0041DD68     8C  void Stm_Init(TPerfStm* pperf)
+                         inlines  ResetStreamPerf
+  371  003E3620     A4  void Stm_Exit(TPerfStm* pperf)
+                         inlines  ResetStreamPerf
+  389  0044E54C     E4  void Stm_Prime(TPerfStm* pperf)
+  408  0044E1DC     FC  void Stm_Start(TPerfStm* pperf)
+  444  003E19CC      4  void Stm_Stop(TPerfStm* pperf)
+  453  0044E2D8    110  bool Stm_Tick(TPerfStm* pperf)
+  514  0044DAFC     4C  bool Stm_IsFinished(TPerfStm* pperf)
+  520  003DF5D4    28C  void Stm_SetPlayList(TPerfStm* pperf, uint8 playlistID)
+                         local  TTrack* ptrk
+                         local  TStmPlayList* pnewlist
+                         local  TStmPlayList* poldlist
+                         inlines  Ses_GetStreamPlayList
+  587  0044D69C    300  void Stm_SetStream(TPerfStm* pperf, uint16 streamID, EStmPlayMode mode)
+                         local  TTrack* ptrk
+                         local  const char* paction
+                         local  TStmPlayList* plist
+  677  003DF9A4     94  void Stm_FlushQueue(TPerfStm* pperf)
+  688  003E3788     60  void Stm_DebugPrint(const float& x, const float& y, PRINTFFN PrintfFn)
+                         local  const float LINE

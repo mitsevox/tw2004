@@ -1,0 +1,48 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/URes.c
+// compiled in: Legacy_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   53  0037B8E8     50  void Resources_InitModule()
+   75  0037B938     18  void Resources_vSetCurrentResourceClass(enum Resources_EResourceClass eClass)
+   84  0038AB90     F0  void Resources_Add(TStreamDataPtr TheRes)
+                         local  char[80] s
+  120  0037B950     64  bool Resources_IsAlreadyThere(TStreamDataPtr TheRes)
+                         local  TStreamDataPtr TheCurrentRes
+  138  0037B9B4     5C  bool Resources_IsIDRefAlreadyThere(uint32 ResID, uint32 ResREF)
+                         local  TStreamDataPtr TheRes
+  158  003AA060    11C  void Resources_Del(TStreamDataPtr TheRes)
+  199  003AA24C     74  void Resources_CloseModule()
+                         local  TStreamDataPtr TheRes
+                         local  TStreamDataPtr TheRes2
+  219  003AA17C     D0  void Resources_DelAllClassResources(enum Resources_EResourceClass eClass)
+                         local  TStreamDataPtr TheRes
+                         local  TStreamDataPtr TheRes2
+  251  003A2BD0     E0  TStreamDataPtr Resources_Get(uint32 ResID, uint32 ResREF)
+                         local  TStreamDataPtr TheRes
+                         local  char[8] tempString
+  281  0037BA10     5C  TStreamDataPtr Resources_GetFirst(uint32 ResID)
+                         local  TStreamDataPtr TheRes
+  300  0037BA6C     4C  TStreamDataPtr Resources_GetNext(uint32 ResID, TStreamDataPtr TheResFrom)
+                         local  TStreamDataPtr TheRes
+  318  0037BAB8     4C  TStreamDataPtr Resources_GetOptionnal(uint32 ResID, uint32 ResREF)
+                         local  TStreamDataPtr TheRes
+  339  003942F0     CC  void* Resources_GetDataInBuffer(char* Buffer, uint32 BuffSize, uint32 ChunkID, uint32 ChunkRef)
+                         local  char* ptr
+                         local  char* data
+                         local  TChunkR* theChunk
+                         local  bool found
+  374  00394240     B0  void* Resources_GetChunkInBuffer(char* Buffer, uint32 BuffSize, uint32 ChunkID, uint32 ChunkRef)
+                         local  char* ptr
+                         local  TChunkR* theChunk
+                         local  bool found
+  409  003A9C10    12C  void Resources_UpdateOldResourceTime(TStreamDataPtr pUpdateStreamClass)
+                         local  TStreamDataPtr TheRes
+                         local  char[80] s
+  443  003940E4    15C  void Resources_ReportInfo(int32 ResID, int32 maxMem, char* name)
+                         local  TStreamDataPtr TheRes
+                         local  int32 NbResourcesFound
+                         local  int32 SizeResourcesFound
+                         local  int32 theSize
+                         local  int32 MinSizeResourceFound
+                         local  int32 MaxSizeResourceFound
+                         local  char[128] tempString

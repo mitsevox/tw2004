@@ -1,0 +1,11 @@
+// ../../../../../TIGERCODE/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/vector2_type_inline.h
+// compiled in: rnaunity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   97    inline-only   struct <anon>& operator=(const struct <anon>* this, struct <anon>& v)
+  211    inline-only   void Set(const struct <anon>* this, float _x, float _y)
+                         local  Vector4Intrinsic_32 vi_temp
+  216    inline-only   VecFloatRefX X(const struct <anon>* this)
+  221    inline-only   const VecFloatRefX X(const const struct Vector2* this)
+  226    inline-only   VecFloatRefY Y(const struct <anon>* this)
+  231    inline-only   const VecFloatRefY Y(const const struct Vector2* this)

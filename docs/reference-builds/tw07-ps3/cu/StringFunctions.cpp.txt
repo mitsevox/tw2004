@@ -1,0 +1,11 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnax/source/RNAUtils/StringFunctions.cpp
+// compiled in: StringFunctions.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   52  008F093C    190  bool8_t Utils::WildcardMatch(const char* pPattern, const char* pString, bool8_t bCaseSensitive)
+                         local  const char* p
+                         local  const char* s
+                         local  bool8_t bStar
+                         inlines  std::toupper
+  128  008F085C     E0  bool8_t Utils::GetNextLine(const char8_t* pFileData, uint32_t uFileDataSize, const uint32_t& uCurrentOffset, char8_t* pRetBuffer, uint32_t uBufferSize)
+                         local  uint32_t destOffset

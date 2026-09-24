@@ -1,0 +1,16 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_PrimTextured.cpp
+// compiled in: shader_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   43  0051AA34     48  void SM_PrimTexturedClass::SM_PrimTexturedClass(const struct SM_PrimTexturedClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base
+   56  00506080    2B0  void SM_PrimTexturedClass::Load(const struct SM_PrimTexturedClass* this)
+   88  00506330    198  void SM_PrimTexturedClass::Activate(const struct SM_PrimTexturedClass* this)
+  123  005064C8     50  void SM_PrimTexturedClass::Deactivate(const struct SM_PrimTexturedClass* this)
+  137  0051066C    120  void SM_PrimTexturedClass::SelectTextureMode(const struct SM_PrimTexturedClass* this, enum TextureMode mode)
+  163  0051078C     68  void SM_PrimTexturedClass::SetColorTexture(const struct SM_PrimTexturedClass* this, TextureRef colorTexture)
+  175  005107F4     68  void SM_PrimTexturedClass::SetAlphaTexture(const struct SM_PrimTexturedClass* this, TextureRef alphaTexture)
+  186  0051085C     68  void SM_PrimTexturedClass::SetDepthTexture(const struct SM_PrimTexturedClass* this, TextureRef depthTexture)
+  198  005108C4     68  void SM_PrimTexturedClass::SetYUVTexture(const struct SM_PrimTexturedClass* this, TextureRef yuvTexture)
+  213  0051092C     E0  void SM_PrimTexturedClass::SetYUV2Textures(const struct SM_PrimTexturedClass* this, TextureRef yTexture, TextureRef uTexture, TextureRef vTexture, float yW, float yH, float uvW, float uvH)
+  229  00510A0C     60  void SM_PrimTexturedClass::SetTextureLODBias(const struct SM_PrimTexturedClass* this, float bias)

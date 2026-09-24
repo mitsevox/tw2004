@@ -1,0 +1,23 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/RNAMesh.cpp
+// compiled in: RNAMesh.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   54  0082DD60    138  void MeshC::MeshC(const struct MeshC* this, enum PrimTypeE ePrimType, int32_t iMaxStreams, struct UserData* pUserData, uint32_t uFlags)
+                         inlines  Object::SetAllocated, RNARef, operator new []
+   97  0082DFD0    20C  void MeshC::MeshC(const struct MeshC* this, const struct MeshC* pSrcMesh, struct UserData* pUserData)
+                         local  int32_t iStream
+                         inlines  GetPtr, Object::SetAllocated, RNARef, SetPtr, operator new []
+  132  0082D394    1C4  void MeshC::~MeshC(const struct MeshC* this)
+                         local  const char[7] __FUNCTION__
+                         inlines  RNADebugBreak, operator delete [], ~RNARef
+  145  0082D8EC    474  void MeshC::AddStream(const struct MeshC* this, struct StreamC* pStream)
+                         local  const char[10] __FUNCTION__
+                         local  int32_t newMaxStreams
+                         local  struct <anon>* newStreamRefs
+                         local  int32_t ctr
+                         inlines  GetPtr, RNADebugBreak, RNARef, SetPtr, operator delete [], operator new [], ~RNARef
+  185  0082D228    108  void MeshC::SetStream(const struct MeshC* this, int32_t iStream, struct StreamC* stream)
+                         local  const char[10] __FUNCTION__
+                         inlines  RNADebugBreak, SetPtr
+  192  0082D330     64  void MeshC::SetVertexFormat(const struct MeshC* this, struct VertexFormatC* pVertexFormat)
+                         inlines  SetPtr

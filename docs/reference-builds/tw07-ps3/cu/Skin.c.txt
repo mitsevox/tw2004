@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/animation/Skin.c
+// compiled in: golf2_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   32  00164174    1D4  void SKN_InitDefaultPose(struct TSkin* pSkin, struct TSkeleton* pSkeleton, const twSkel* pTWSkel, int32 skelOffset, int32 skelOffsetStart)
+                         local  const char[20] __FUNCTION__
+                         local  const int32 numBones
+                         local  int32 i
+                         inlines  LLMath_CopyMat44, TagValuePair, operator+, vec_ld, vec_st
+  230  0013FECC     68  void SKN_Free(struct TSkin* pSKN, struct TCharacter* pChar)
+  244  0013B938     E4  void SKN_ResetBoundingInfo(struct TSkin* pSkin)
+                         local  int32 geom
+                         inlines  TGeomBV::Seed

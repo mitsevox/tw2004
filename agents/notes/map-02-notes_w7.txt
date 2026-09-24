@@ -1,0 +1,87 @@
+map-02 wave 3 (2026-09-24 05:05-05:30), range 0x80116DD8 .. SDK. Tried lists for the next lane.
+
+DONE
+- SkinMorph fn_8011C27C exact -> unit linked. Key: the index block's address as integers, size first:
+  uptr uNrmSize = nVerts * 4; ... pIndex = (s16*)(uNrmSize + (uptr)pNrm). Pointer + int is put
+  pointer-first whatever the source order; an integer add keeps it. (Link also needed fn_8011C580..5A8
+  moved before fn_8011C5B4: address order.)
+- gbacable fn_80123ABC exact: no pWord pointer; each loop passes (u32*)((u8*)&lbl[nChan].sent + i).
+- GoShaderObject_Grass_Gc GrassPacket_vAddVert exact: GrassWord.b is s8 (Render reads b[2] with extsb,
+  AddVert stores (nInRow == 0) unmasked); pRow line written through SD_gpGrassTypeData.
+  Render nRow is now int (s8 nRow dropped it to 95.6 with the signed bytes).
+- TibExtCurrentTimeGet 88.0 -> 88.6: nDays local, 86400 * nDays.
+
+TRIED, NO GAIN
+- TibExt: all 24 left-assoc term orders; int/u32 locals (with casts); u16 order; 86400L; statement splits.
+  GC/2.0 not tried here.
+- GameMode22 fn_801264B8: GC/2.0 (identical to 2.5); pPlayer local + pScore = &pPlayer->nEBC at the top,
+  compares via pPlayer->nEBC, nBest = *pScore gives 88.1 (not kept, unnatural); count local
+  (s32/int/u32/u8/s8/u16/s16) drops to 50-64 (frame r31 vanishes); && with else-return 87.2.
+- gbacable fn_8012311C: end store n0 is stwx base+off in EA (not CSE'd with pCh): inline helper,
+  (lbl + nChan)->n0, pCh = lbl + nChan, no pCh at all, *(s32*)&lbl[nChan] -> all 99.36; pCh via
+  (u8*) arithmetic 90.6; n0 before u48 95.9.
+- Grass Render: nRun local kept (96.8); vEye/vAt swap, fDist/fPerX/fPerZ order -> no gain.
+- gbacable fn_80123E34: pType decl position (only swaps with uReset; first = 98.67), block-scoped
+  pType/uStart, pType from lbl[nChan], pType set before the if -> no.
+- PGATour fn_80118B0C (add r23, r3, r29 order): s32/int params, int nPar, casts, 4 * fn, statement splits.
+- PGATour fn_8011B978: declperm (3), nEntrant block-scoped, int nEntrant/i, i + nFirstRow.
+- PGATour fn_801178C8: uFlags u32/s32/u8, bQuick local; int nPlayer prototype -> 99.54 and breaks
+  GameModeDriverPGATour fn_800EF130 (97.2).
+- PGATour fn_80117E98: each s32 local as int, all int, Rand result in a local (u32/s32), u32 nPick.
+
+==== map-02 link wave round 2 (2026-09-24 12:53-14:00), units FE_MessageTable .. UIStudio ====
+
+DONE
+- FE_MessageTable fn_8007F8A0 86.1 -> 100: SaveProfile.aReplay is `Replay aReplay[5]` (was u8[5][0xF28] with
+  *(Replay*) casts). The Replay typedef moved from game.h to game/save.h (game.h includes save.h). A struct
+  copy from a typed member adds base + index first; from a cast byte array CW folds the offset in first.
+- FE_MessageTable fn_8007E204 99.09 -> 100 (permuter find, cleaned): `s32 n = pArgs[1].i; n = mask & (1 << n);
+  pResult->i = n;` (one local for the club and the result; marked fake match).
+- FE_MessageTable LINKED: .rodata 0x80183870-950, .data 0x801896F0-7E8, .bss 0x801D77A8-83B0, .sdata
+  0x802812A0-2D0, .sdata2 0x80283AD8-B10. Needed: fn_8007F0D0 defined before fn_8007F2C0 (address order),
+  and lbl_80281374 (0.25f) is NOT this file's: it sits at .sdata 0x80281374 past GameUICommands, in the
+  uiProcessInterface/fe_movies area (data-scout: out-of-order) -> extern in frontend/fe.h, defined by the asm.
+- FE_CrAPDB fn_801070F4 99.64 -> 100: no walking p in the first loop (`pBase[nAssets] = nAsset; nAssets++;`)
+  PLUS a quicktrial declclimb on that variant (7 -> 0): aAssets, nSlot, pProfile = fn_80077ACC(), pBase,
+  nAsset, i, j, nAssets. (Neither change alone was enough; climb a variant by monkeypatching
+  quicktrial.base: w10_70f4c.py.)
+- FE_CrAPDB LINKED: its tables now in C (lbl_80193228 SwapField[20], lbl_801932C8/801935C8/801937C8 name
+  tables, dumped from the DOL with w10_dump.py; \xAE / \xA6 escapes), lbl_802816E8/EC = -1, the .sbss
+  pointers in reverse order. Ranges: .data 0x80193228-9D0, .sdata 0x802816E8-758, .sbss 0x80282460-488,
+  .sdata2 0x80284838-848.
+- GameHoleContests fn_800DA6D0: a quicktrial climb "finds" 430 -> 183 aligned by moving szName above aRank,
+  but in the build that puts aRank at sp+0x8 (EA: 0x28) and objdiff stays 85.25: quicktrial aligned counts
+  can mislead when the stack layout changes. Reverted.
+- UIStudio fn_80168918 96.55 -> 96.74: quicktrial declclimb 15 (pScreen moved after nSlot). Then nEvent
+  s32/int/u32/s16/u8 and nNode u16/s32/int: none better.
+- GameMode22 fn_801264B8: climb on the map-03 loop body (M3): 53 -> 49 aligned, base is 26. No.
+- uiText fn_800922A8: permuter 12 min "score 0" = `uFlags |= 0x400;` moved out of the if. FALSE: the
+  permuter masks branch targets; EA's ble skips both ori (+0x17c), the moved form sets 0x400 always
+  (ble lands on it). A behaviour change, not applied. Nothing else found.
+- GameMode26 fn_8010CA2C: permuter 13 min with the fixed flags: nothing below base (195).
+
+TRIED, NO GAIN
+- FE_CrAPDB fn_801070F4 (pProfile r29/i share, p r26/j share in EA; ours swapped): inner loop through p
+  (p = pBase; *p; p++) 16, first loop pBase[nAssets] 7, p first 9, nAssets first 13, pProfile last 11.
+- uiProcessInterface fn_8008F820 (99.6; k r24 and aButtons/aPressed pointer regs r22/r23 in EA): uMask &
+  fn() swapped (no change), k -> i (worse, 25), k first, arrays swapped, declclimb 12: all 21 raw.
+- GameMode22 fn_801264B8: GameMode22State.n8 int/u32/PlayerNumber_t/volatile: no change. Loop 2 written
+  gPlayers[i].nEBC (any spelling without the u8* PLAYER cast) keeps nNumPlayers in r9 like EA but unrolls
+  with fixed offsets (0x1db4...) instead of EA's add base+off; PLAYER/char*/uptr spellings keep EA's loop
+  shape but reload the count. Count local: 118-172 aligned (worse).
+- GameHoleContests fn_800DA6D0 (EA indexes aRank/lbl_80202884 with lwzx/lfsx off one offset reg): pRank/pDist
+  locals set before the outer loop 413 vs 430 aligned (still two pointer IVs), fDist local: no.
+- Earnings fn_800D477C: one function-level nSlot (12 decl slots) 28 vs 19; nHoles as the slot 39; prize
+  slot = nHoles 33.
+- GameMode26 fn_8010CA2C: nTotal/nPick merged with nPick/nLength/nPoints/nKind/nLead: all 39 (no change);
+  quicktrial declclimb 14 (fixed flags): 39; nPlayer as a copy of the parameter (int, 3 places) 39, s32 worse;
+  nEA0++/nLead through pPlayer: worse.
+- uiProcessInterface fn_8008F488 (EA loads p8 into r6 and does addi r3 before the count load): permuter (4 min)
+  hits 0 with a dead `if (!p8->apTables && !p8->apTables) {}` before the 2nd call (also with `||` x3; one
+  `if (!x) {}`, two ifs, (void)x, if (nCount) {}: 3). NOT applied (junk dead code). pTables/void* locals,
+  &nCount + 1, (u32*)p8 + 1 with *(u32*)p8, volatile count: 3. Suggests EA had something there (an assert?).
+- uiProcessInterface fn_8008F820: EA's stack has aButtons at 0x30 and aPressed at 0x10 (declare aButtons
+  first: same score 21 but EA's layout). Pointer locals pButtons/pPressed (4 forms): 34-49, worse.
+- uiText fn_800922A8: comma `|=, |=`, `if (uFlags & 4)`, split `uFlags = (uFlags | n)`, 0x200 + 0x200, block
+  int b, goto label between: all fold to 0x404 (2); nested `if (t.f60 > 0)` gives both ori but adds a ble (1).
+- FE_CrAPDB fn_801070F4: reuse nAsset as i/j (or i/j as nAsset): 10-13 vs 5; permuter (fixed flags) 3 min: no.

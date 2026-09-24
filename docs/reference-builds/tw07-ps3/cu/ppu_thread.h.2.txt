@@ -1,0 +1,14 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/target/ppu/include/sys/ppu_thread.h
+// compiled in: managerplat.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  138    inline-only   static int sys_ppu_thread_join(sys_ppu_thread_t thread_id, uint64_t* vptr)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n

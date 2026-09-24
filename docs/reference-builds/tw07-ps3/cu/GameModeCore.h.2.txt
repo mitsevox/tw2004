@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/Code/golf/GameMode/Headers/GameModeCore.h
+// compiled in: headgate_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+  133    inline-only   uint32 GM_GetCurrentHoleIndex()
+  369    inline-only   int8 GM_GetFlagPositionIndex()
+  375    inline-only   int8 GM_GetCurrentGreenIndex()
+  393    inline-only   enum PlayerNumber_t GM_GetGolferUp()

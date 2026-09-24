@@ -1,0 +1,156 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/gamesessionconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 51 functions, source order. line | PS3 address | size
+
+   77  0062A22C     40  void ~StartGameOperation(const struct <anon>* this)
+   80  00623F44     5C  void GameManagerOperationFailedToSend(const struct <anon>* this)
+   88  00623FA0      C  void GameManagerOperationCancel(const struct <anon>* this)
+  128  0062A0C4     B0  void ~JoinGameOperation(const struct <anon>* this)
+                         inlines  ~LobbyDispatchObserver
+  137  00623FAC     B0  void GameManagerOperationFailedToSend(const struct <anon>* this)
+  149  0062915C     6C  void GameManagerOperationCancel(const struct <anon>* this)
+  192  0062A058     40  void ~LeaveGameOperation(const struct <anon>* this)
+  196  0062405C      C  void GameManagerOperationCancel(const struct <anon>* this)
+  219  0062AAE4     40  void ~SetGameStateOperation(const struct <anon>* this)
+  222  00624068     64  void AriesOperationFailure(const struct <anon>* this, int32_t )
+  231  006240CC     64  void AriesOperationCancel(const struct <anon>* this)
+  258  0062AA80     40  void ~GameSessionLockOperation(const struct <anon>* this)
+  261  00624130     64  void AriesOperationFailure(const struct <anon>* this, int32_t )
+  270  00624194     64  void AriesOperationCancel(const struct <anon>* this)
+  297  0062AA1C     40  void ~GameSessionUnlockOperation(const struct <anon>* this)
+  300  006241F8     64  void AriesOperationFailure(const struct <anon>* this, int32_t )
+  309  0062425C     64  void AriesOperationCancel(const struct <anon>* this)
+  356  0062030C    13C  bool AriesOperationResult(const struct <anon>* this, LobbyApiMsgT* pMsg)
+  417  006201E8    124  bool GameManagerOperationResult(const struct <anon>* this, LobbyApiMsgT* pMsg)
+  474  0061FF30    2B8  bool GameManagerOperationResult(const struct <anon>* this, LobbyApiMsgT* pMsg)
+                         local  bool bKeepWaiting
+                         local  struct <anon>* pFacadeConcrete
+                         local  struct GameSessionManagerConcrete* pGameSessionManager
+                         local  struct GameSession* pGameSession
+                         local  LobbyApiRefT* pLobbyApi
+                         local  const LobbyApiUserT* pUserInfo
+                         local  struct LobbyConcrete* pLobbyConcrete
+                         inlines  GetGameSessionManagerConcrete, GetInstance, GetJoinedGameSession
+  575  005E1364    144  bool OperationProcess(const struct <anon>* this, const struct Operation* pOperation)
+                         local  struct GameSessionManagerConcrete* pGameSessionManager
+                         inlines  GetGameSessionManagerConcrete
+  627  005F32D4     94  void LobbyDispatch(const struct <anon>* this, const struct Lobby* , LobbyApiMsgT* pMesg)
+                         local  struct <anon> Message
+                         local  struct LobbyConcrete* pLobbyConcrete
+  661  005B67C4     50  void GameManagerOperationFailedToSend(const struct <anon>* this)
+  687  005E14A8    110  bool GameManagerOperationResult(const struct <anon>* this, LobbyApiMsgT* pMsg)
+                         local  bool bKeepWaiting
+                         local  struct GameSessionManagerConcrete* pGameSessionManager
+  754  0061FDC8    168  bool OperationProcess(const struct <anon>* this, const struct Operation* pOperation)
+                         local  struct <anon>* pFacadeConcrete
+                         local  GameManagerRefT* pGameManager
+                         local  ConnApiRefT* pConnApi
+                         local  int32_t iGameManagerStatus
+                         local  int32_t iConnApiStatus
+                         local  LobbyApiMsgT* pMsg
+                         local  struct GameSessionManagerConcrete* pGameSessionManager
+                         inlines  GetConnApi, GetInstance, GetLastLobbyMsg, IsGameSessionManagerConcreteAvailable
+  811  0061FC8C    13C  bool AriesOperationResult(const struct <anon>* this, LobbyApiMsgT* pMsg)
+  872  0061FB50    13C  bool AriesOperationResult(const struct <anon>* this, LobbyApiMsgT* pMsg)
+  934  005F1A10    45C  bool SetGameSessionState(const struct GameSessionConcrete* this, const char8_t* strData)
+                         local  LobbyApiPlayT tempRecord
+                         local  bool bChanged
+                         local  struct <anon> Wrapper
+                         local  struct GameSessionManagerConcrete* pManager
+                         local  bool bMyGameSession
+                         local  bool bKicked
+                         local  bool bJoined
+                         local  struct User* pSelf
+                         local  int32_t iIndex
+                         local  LobbyApiPlayerT* currPlayer
+                         local  struct <anon> pFormatting
+                         local  struct GameUser* pUser
+                         local  const char8_t* strUserName
+                         local  bool bUserIsLocalUser
+                         inlines  GetGameSessionManagerConcrete, InsertElement, RemoveAll, operator=, ~RCPointer
+ 1065  005CDAE4     F0  bool IsLocalUserHost(const struct GameSessionConcrete* this)
+                         local  struct User* pLocalUser
+                         inlines  GetInstance
+ 1093  0061F310     D0  void GameSessionConcrete(const struct GameSessionConcrete* this, const char8_t* strData)
+                         inlines  List
+ 1125  0062061C     80  void ~GameSessionConcrete(const struct GameSessionConcrete* this)
+                         inlines  ~List
+ 1146  005EF960     90  struct Dictionary* GetGameStateCopy(const const struct GameSessionConcrete* this)
+ 1171  005DE6E0     70  struct LobbyRoom* GetChatRoom(const const struct GameSessionConcrete* this)
+                         local  struct LobbyConcrete* pLobby
+                         inlines  GetLobbyConcrete
+ 1204  005DE384    128  struct GameUser* GetHost(const const struct GameSessionConcrete* this)
+                         local  uint32_t uNumberOfPlayers
+                         local  struct UserManagerConcrete* pUserManager
+                         local  struct User* hostUser
+                         local  uint32_t i
+                         local  struct GameUser* pCurrentUser
+                         inlines  GetElementAt, GetNumberOfElements, GetUserManagerConcrete
+ 1248  00608A94    190  struct Operation* SetGameState(const struct GameSessionConcrete* this, const struct Dictionary* pState, struct GameSessionStateCallback* pCallback)
+                         local  struct <anon> EncodedState
+                         local  struct <anon> SetStateParams
+                         local  struct <anon>* pOp
+                         inlines  ConvertToString, SetGameStateOperation
+ 1285  0060301C    19C  struct Operation* Start(const struct GameSessionConcrete* this, struct GameSessionStartCallback* pCallback)
+                         local  struct <anon> SetStateParams
+                         local  struct <anon>* pOp
+                         inlines  ConvertToString, GetOperationManagerConcrete, StartGameOperation
+ 1312  00602CC8    354  struct Operation* Join(const struct GameSessionConcrete* this, bool bJoinPrivateSlot, const char8_t* strPassword, const struct Dictionary* pUserSettings, struct <anon>* pCallback)
+                         local  struct <anon> SetStateParams
+                         local  struct <anon>* pLocalUser
+                         local  struct GameSession* pGameSession
+                         local  int32_t iTotalSlots
+                         local  int32_t iPrivateSlots
+                         local  struct PeerConnectionManagerConcrete* pPeerMgr
+                         local  struct <anon>* pOp
+                         inlines  ConvertToString, GetOperationManagerConcrete, JoinGameOperation
+ 1370  00602AD4    1F4  struct Operation* Leave(const struct GameSessionConcrete* this, struct GameSessionLeaveCallback* pCallback)
+                         local  struct <anon> SetStateParams
+                         local  struct <anon>* pOp
+                         inlines  ConvertToString, GetOperationManagerConcrete, LeaveGameOperation
+ 1399  00608C24    168  struct Operation* KickUser(const struct GameSessionConcrete* this, struct GameUser* pUser, struct GameSessionStateCallback* pCallback)
+                         local  const char8_t* strUsername
+                         local  struct <anon> SetStateParams
+                         local  struct <anon>* pOp
+                         inlines  ConvertToString, SetGameStateOperation
+ 1430  0060892C    168  struct Operation* SetUserState(const struct GameSessionConcrete* this, const struct Dictionary* pState, struct GameSessionStateCallback* pCallback)
+                         local  struct <anon> SetStateParams
+                         local  struct <anon>* pOp
+                         inlines  ConvertToString, SetGameStateOperation
+ 1459  006087E4    148  struct Operation* Lock(const struct GameSessionConcrete* this, struct <anon>* pCallback)
+                         local  uint32_t uSysFlags
+                         local  struct <anon> SetStateParams
+                         local  struct <anon>* pOp
+                         inlines  ConvertToString, GameSessionLockOperation
+ 1491  00608698    14C  struct Operation* Unlock(const struct GameSessionConcrete* this, struct <anon>* pCallback)
+                         local  uint32_t uSysFlags
+                         local  struct <anon> SetStateParams
+                         local  struct <anon>* pOp
+                         inlines  ConvertToString, GameSessionUnlockOperation
+ 1527  005EFAE0    4CC  void CreateGameSessionState(struct DictionaryConcrete* pGameSessionState, int32_t iGameMode, const char8_t* strName, const char8_t* strPassword, uint32_t uMinimumUsers, uint32_t uMaximumUsers, bool bRanked, bool bChallenge, bool bKeepHistory, uint32_t uPrivateSlots, uint32_t uFlags, uint32_t uMaximumDnf, uint32_t uLevelRange, const struct Dictionary* pConfiguration, const struct Dictionary* pUserSettings, const struct LobbyRoom* pParentRoom)
+                         local  uint32_t uSysFlags
+                         local  struct <anon> NewCustomParams
+                         local  const struct DictionaryConcrete* pPassedInCustomParams
+                         local  uint32_t uHostLevel
+                         local  struct <anon> EncodedState
+ 1660  005DAFF0    134  struct GameUser* GetLocalUser(const const struct GameSessionConcrete* this)
+                         local  struct GameUser* pLocalUser
+                         local  uint32_t uIndex
+                         inlines  GetElementAt, GetNumberOfElements
+ 1697  005DB124     E4  bool ContainsUser(const const struct GameSessionConcrete* this, const struct User* pUser)
+                         local  uint32_t uIndex
+                         inlines  GetElementAt, GetNumberOfElements
+ 1729  005B6A30      8  bool IsReadyToJoin(const struct GameSessionConcrete* this)
+ 1764  00620FE4     80  struct GameSessionPersistent* CreatePersistentGameSession(const const struct GameSessionConcrete* this)
+                         inlines  operator new
+ 1788  005CEA4C     40  int32_t GetLobbyHostAddress(const const struct GameSessionConcrete* this)
+ 1812  005B6920    110  void EncodeServerGameState(struct Dictionary* pState)
+                         local  int32_t[16] aGS
+                         local  uint32_t uIndex
+                         local  char8_t[8] strField
+ 1851  005B6814    10C  void DecodeServerGameState(struct Dictionary* pState)
+                         local  int32_t[16] aGS
+                         local  uint32_t uIndex
+                         local  char8_t[8] strField
+ 1894  005D9B9C     10  void MarkAsDeleted(const struct GameSessionConcrete* this)
+                         inlines  MarkDirty

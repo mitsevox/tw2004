@@ -1,0 +1,31 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/streamconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   90  0060D024     E0  void StreamConcrete(const struct <anon>* this, const char8_t* pURL, int32_t iMemGroup)
+                         inlines  RCPointer
+  110  005FA168     D0  void StreamClear(const struct <anon>* this)
+                         inlines  AbortStream, operator->, operator=
+  133  005BFC68     1C  void SetNextURL(const struct <anon>* this, const char8_t* pNextURL)
+  143  005FA23C    180  void StreamStartup(const struct <anon>* this, const char8_t* pURL)
+                         inlines  GetOperationManagerConcrete, operator=
+  219  0060D26C     80  void ~StreamConcrete(const struct <anon>* this)
+                         inlines  ~RCPointer
+  251  005BFF20    254  int32_t ProtoStreamCallback(ProtoStreamRefT* pProtoStream, ProtoStreamStatusE eStatus, const uint8_t* pBuffer, int32_t iBufSize, void* pUserData)
+                         local  const int32_t FILE_BUFFER_SIZE
+                         local  const uint32_t TICKS_PER_SECOND
+                         local  const int32_t STALL_COUNT_MAX
+                         local  struct <anon>* pSingleton
+                         local  int32_t iAmountConsumed
+                         local  uint32_t uCurrentTick
+                         local  uint32_t uTotalSize
+                         local  uint32_t uBufSize
+                         local  int32_t iDataLeftForThisSecond
+  336  005FA238      4  void Stop(const struct <anon>* this)
+  343  005FA3BC      8  void Restart(const struct <anon>* this)
+  351  005C0174     30  void GetInfo(const struct <anon>* this, struct StreamInfoT* pInfo)
+                         inlines  GetTotalConsumed, GetTotalRead
+  402  005FA3C4     AC  bool OperationProcess(const struct <anon>* this, const struct Operation* )
+                         inlines  operator=
+  438  005FA470     40  void OperationCancel(const struct <anon>* this, const struct Operation* )
+                         inlines  operator=

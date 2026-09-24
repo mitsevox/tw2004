@@ -1,0 +1,68 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/CourseTable.cpp
+// compiled in: golf_unity.cpp
+// 46 functions, source order. line | PS3 address | size
+
+  155  001F80FC     98  void CourseTable::RegisterStreamClients()
+  194  001F8194     5C  int CourseTable::numCourses()
+  203  001F3E7C    1A0  int CourseTable::numRealCourses()
+                         local  int numCourses
+                         local  int i
+  230  0021CA28     EC  const char* CourseTable::getCourseLongName(enum GM_CourseType_t course)
+                         local  const char* pRet
+  263  001F8328     94  char* CourseTable::getCourseShortName(enum GM_CourseType_t course)
+  269  001F83BC     94  const const char* CourseTable::getCourseLogo(enum GM_CourseType_t course)
+  275  001F8450     94  const const char* CourseTable::getCourseShot(enum GM_CourseType_t course)
+  281  001F84E4     94  const const char* CourseTable::getCourseFlag(enum GM_CourseType_t course)
+  287  001F8578     9C  int8* CourseTable::getPar5Holes(enum GM_CourseType_t course)
+  293  001F8614     B4  int8 CourseTable::getDefaultTimeOfDay(enum GM_CourseType_t course, int hole)
+  308  001F86C8     98  int8 CourseTable::getDefaultSeason(enum GM_CourseType_t course)
+  314  001F8760     98  int8 CourseTable::getDefaultTees(enum GM_CourseType_t course)
+  319  001F87F8     98  int8 CourseTable::getDefaultPins(enum GM_CourseType_t course)
+  324  001F8890     98  int8 CourseTable::getDefaultGreenSpeed(enum GM_CourseType_t course)
+  329  001F8928     98  int8 CourseTable::getDefaultGreenHardness(enum GM_CourseType_t course)
+  334  001F89C0     98  int8 CourseTable::getDefaultFairwaySpeed(enum GM_CourseType_t course)
+  339  001F8A58     98  int8 CourseTable::getDefaultRoughLength(enum GM_CourseType_t course)
+  344  001F8AF0     98  int8 CourseTable::getDefaultWind(enum GM_CourseType_t course)
+  350  001F8B88     98  int CourseTable::getLegendCoinCost(enum GM_CourseType_t course)
+  358  001F8C20     74  bool CourseTable::IsRealCourse(enum GM_CourseType_t courseNum)
+  375  001F8280     A8  bool CourseTable::IsCourseValid(enum GM_CourseType_t courseNum)
+  392  001F1E1C     24  bool CourseTable::IsCourseValid(int courseNum)
+  398  001F8C94     94  char* CourseTable::getMovieName(enum GM_CourseType_t course)
+  404  001F8D28     F8  float* CourseTable::getMipmapCourseDefaults(enum GM_CourseType_t course)
+  419  001F8E20     9C  int8 CourseTable::getCourseSelectUIOrder(Course_t course)
+  425  001F8EBC     9C  int8 CourseTable::getPar5EagleTrophyUIOrder(Course_t course)
+  431  001F8F58     AC  uint8* CourseTable::getLeafColor(enum GM_CourseType_t course, int leafIndex)
+  437  001F9004     9C  float* CourseTable::getRainColor(enum GM_CourseType_t course)
+  448    inline-only   static void SetCourseToCommandLineCourse()
+  456  001F90A0     38  void CourseTable::setCommandLineCourse(char* courseID)
+  461  001F90D8     38  void CourseTable::getCommandLineCourse(char* courseID)
+  494  002CDD60    3D8  static void LoadCourseTablefromStream(struct TStreamData* pStreamData)
+                         local  const char[26] __FUNCTION__
+                         local  int32 tableSize
+                         local  struct Allocator* a
+                         local  int32 i
+                         local  int32 j
+                         local  int i
+                         inlines  InitCalculatedFields, SetCourseToCommandLineCourse, TagValuePair, operator+
+  562  002416CC    134  static void LoadCourseNameLongfromStream(struct TStreamData* pStreamData)
+                         local  const char[29] __FUNCTION__
+                         inlines  TagValuePair, operator+
+  579  00241800    178  static void LoadCourseTableIndfromStream(struct TStreamData* pStreamData)
+                         local  const char[29] __FUNCTION__
+                         local  int32 tableSize
+                         inlines  TagValuePair, operator+
+  603  001F9110     3C  static void LoadWeatherFromStream(struct TStreamData* pStreamData)
+  611  001F81F0     90  Course_t CourseTable::getRandomCourse(enum eRandomType type)
+  616  001F914C    150  enum GM_CourseType_t CourseTable::getCourseIndex(Course_t course)
+                         local  enum GM_CourseType_t retVal
+  676  001F3D10     28  Course_t CourseTable::getCourseID(enum GM_CourseType_t oldCourse)
+  681  001F9AC8     80  const char* CourseTable::getCourseAbbrev(enum GM_CourseType_t oldCourse)
+  689  001F9B48     1C  int CourseTable::numLockedCourses()
+  695  001F9B64     24  int CourseTable::FE_LockedCourses(int i)
+  700    inline-only   static void InitCalculatedFields()
+                         local  int j
+                         local  int i
+  714  001F9B88     44  bool CourseTable::getLocked(enum GM_CourseType_t course)
+  729  001F9BCC     48  int CourseTable::loadingScreenIndex(enum GM_CourseType_t course)
+  743  001F9C14     48  int CourseTable::loadingTPScreenIndex(enum GM_CourseType_t course)
+  758  001F9C5C     70  int8_t CourseTable::getTemperature(enum GM_CourseType_t course, enum SEASON_e season, bool lowTemp)

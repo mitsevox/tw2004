@@ -1,0 +1,6 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/systemgetdecoderregistry.cpp
+// compiled in: systemgetdecoderregistry.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   13  006D6BD4     98  struct DecoderRegistry* GetDecoderRegistry(const struct <anon>* this)
+                         local  const char[19] __FUNCTION__

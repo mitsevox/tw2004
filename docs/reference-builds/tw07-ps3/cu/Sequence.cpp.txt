@@ -1,0 +1,268 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_trinity/trinity/Runtime/src/Sequence.cpp
+// compiled in: Sequence.cpp
+// 53 functions, source order. line | PS3 address | size
+
+   87  005944C4     7C  void Initialize(const struct <anon>* this)
+  120  00594540     74  void SetInterfacesFromManager(const struct <anon>* this, struct TrinityManager* trinityManager)
+  136  00594E8C    2E8  void Start(const struct <anon>* this, const const struct SequenceParams& seqParams, struct <anon>* pSequenceBin)
+                         local  vec4flt trans
+                         local  quat rot
+                         local  mat44flt worldKeysToLocal
+  203  005945B4    2DC  void Stop(const struct <anon>* this, bool8_t wasInterrupted, float_t fSlackDelta)
+                         local  int32_t index
+                         local  int32_t index
+                         local  int32_t index
+                         local  struct TrinityVfx* pSequenceVfx
+                         local  struct TrinityCamera* pSequenceCamera
+                         local  struct TrinityActor* pSequenceActor
+  281  00594AB8    3D4  void Tick(const struct <anon>* this, float_t fDeltaSec)
+                         local  bool8_t bLooping
+                         local  const uint32_t* pActorId
+                         local  const uint32_t* pType
+                         local  uint32_t actorId
+                         local  struct TrinityActor* pSequenceActor
+                         local  int32_t i
+                         local  float_t* pfTotalWaitDT
+                         local  const float_t fTotalWaitDT
+                         local  const float_t fEndWaitDiff
+                         local  const float_t fSlackDT
+  433  0059494C    16C  void TickObjects(const struct <anon>* this, float_t fDeltaSec)
+                         local  int32_t index
+                         local  int32_t index
+                         local  int32_t index
+                         local  struct TrinityActor* pSequenceActor
+                         local  struct TrinityCamera* pSequenceCamera
+                         local  struct TrinityVfx* pSequenceVfx
+  470  00595174     30  bool8_t InterruptRequest(const struct <anon>* this)
+  489  005951A4     40  struct TrinityCamera* GetCameraList(const struct <anon>* this)
+  501  00594890     BC  struct TrinityActor* GetSequenceActor(const struct <anon>* this, uint32_t actorId)
+                         local  int32_t index
+                         local  struct TrinityActor* pSequenceActor
+  522  005951E4     A4  struct TrinityCamera* GetSequenceCamera(const struct <anon>* this, int32_t cameraId)
+                         local  int32_t index
+                         local  struct TrinityCamera* pSequenceCamera
+  543  00595288     A4  struct TrinityVfx* GetSequenceVfx(const struct <anon>* this, int32_t vfxId)
+                         local  int32_t index
+                         local  struct TrinityVfx* pSequenceVfx
+  565  0059532C    1F8  uint32_t BaseTransformSpline(const struct <anon>* this, struct TrinityTransformBase* pObject, void* pDataStart)
+                         local  uint8_t* pData
+                         local  int32_t numXkeys
+                         local  int32_t numYkeys
+                         local  int32_t numZkeys
+                         local  int32_t numRXkeys
+                         local  int32_t numRYkeys
+                         local  int32_t numRZkeys
+                         local  const struct Coeff* pKeysX
+                         local  const struct Coeff* pKeysY
+                         local  const struct Coeff* pKeysZ
+                         local  const struct Coeff* pKeysRX
+                         local  const struct Coeff* pKeysRY
+                         local  const struct Coeff* pKeysRZ
+  604  00595524    2E4  void ActorCreate(const struct <anon>* this)
+                         local  const uint32_t* pActorId
+                         local  const char8_t* pActorName
+                         local  const float_t* pActorScale
+                         local  const int32_t* pRestoreActorState
+                         local  const int32_t* pSpawnedActorPersist
+                         local  const float_t* pInitSpawnPosX
+                         local  const float_t* pInitSpawnPosY
+                         local  const float_t* pInitSpawnPosZ
+                         local  vec3flt initSpawnPos
+                         local  int32_t newIndex
+                         local  struct TrinityActor* pSequenceActor
+                         local  uint32_t actorId
+  686  00595808    154  void ActorTranslate(const struct <anon>* this)
+                         local  const uint32_t* pActorId
+                         local  const int32_t* pNumKeys
+                         local  const struct Key3d* pKeys
+                         local  uint32_t actorId
+                         local  struct TrinityActor* pSequenceActor
+  715  0059595C    15C  void ActorRotate(const struct <anon>* this)
+                         local  const uint32_t* pActorId
+                         local  const int32_t* pNumKeys
+                         local  const struct Key4d* pKeys
+                         local  uint32_t actorId
+                         local  struct TrinityActor* pSequenceActor
+  744  00598118    354  void ActorSetTargetPosition(const struct <anon>* this)
+                         local  const uint32_t* pActorId
+                         local  float[3]* pTargetPos
+                         local  const struct TargetPosFlags* pFlags
+                         local  const char8_t* pMoveAnim
+                         local  const float_t* pMoveSpeed
+                         local  const int32_t* pMoveStartFrame
+                         local  const int32_t* pMoveBlendDuration
+                         local  const float_t* pTurnRate
+                         local  const char8_t* pStopAnim
+                         local  const float_t* pStopSpeed
+                         local  const int32_t* pStopStartFrame
+                         local  const int32_t* pStopBlendDuration
+                         local  const float_t* pStopDist
+                         local  const float_t* pLerpDuration
+                         local  uint32_t actorId
+                         local  struct TrinityActor* pSequenceActor
+                         local  vec4flt vTargetPos
+                         local  struct TargetPosParams params
+                         inlines  TrinityActor::SetBlendDuration, TrinityActor::SetDestBehavior, TrinityActor::SetSourceBehavior, TrinityActor::SetStartFrame, TrinityActor::SetTurnRate
+  828  00595AB8    198  void ActorSetTargetRotation(const struct <anon>* this)
+                         local  const uint32_t* pActorId
+                         local  const float_t* pTargetRot
+                         local  const float_t* pTurnRate
+                         local  uint32_t actorId
+                         local  struct TrinityActor* pSequenceActor
+                         local  quat q
+                         inlines  TrinityActor::SetTurnRate
+  861  00595C50    22C  void ActorPlayAnim(const struct <anon>* this)
+                         local  const uint32_t* pActorId
+                         local  const char8_t* pAnimName
+                         local  const float_t* pAnimSpeed
+                         local  const int32_t* pUseCustomTransition
+                         local  const int32_t* pStartFrame
+                         local  const int32_t* pBlendDuration
+                         local  const int32_t* pSourceBehavior
+                         local  const int32_t* pDestBehavior
+                         local  uint32_t actorId
+                         local  struct TrinityActor* pSequenceActor
+  909  00595E7C    190  void ActorTransformSampled(const struct <anon>* this)
+                         local  const uint32_t* pActorId
+                         local  const int32_t* pNumKeys
+                         local  const struct Key3d* pTranslateKeys
+                         local  const struct Key4d* pRotateKeys
+                         local  uint32_t actorId
+                         local  struct TrinityActor* pSequenceActor
+  943  0059600C     E4  void ActorTransformSpline(const struct <anon>* this)
+                         local  uint8_t* pData
+                         local  const uint32_t* pActorId
+                         local  uint32_t actorId
+                         local  struct TrinityActor* pSequenceActor
+  975  005960F0    14C  void ActorHeadTrack(const struct <anon>* this)
+                         local  const uint32_t* pActorId
+                         local  const int32_t* pNumKeys
+                         local  const struct Key3d* pKeys
+                         local  uint32_t actorId
+                         local  struct TrinityActor* pSequenceActor
+ 1005  0059623C    164  void ActorLipSync(const struct <anon>* this)
+                         local  const uint32_t* pActorId
+                         local  const float_t* pMaxJawAngle
+                         local  const int32_t* pNumKeys
+                         local  const struct Key1d* pKeys
+                         local  uint32_t actorId
+                         local  struct TrinityActor* pSequenceActor
+ 1037  005963A0    17C  void ActorEyeBlink(const struct <anon>* this)
+                         local  const uint32_t* pActorId
+                         local  const int32_t* pBlinkType
+                         local  const int32_t* pNumKeys
+                         local  const struct Key3d* pKeys
+                         local  uint32_t actorId
+                         local  struct TrinityActor* pSequenceActor
+ 1083  0059651C    274  void ActorAttach(const struct <anon>* this)
+                         local  const uint32_t* pActorId
+                         local  const uint32_t* pActorAttachId
+                         local  char* pChildBoneName
+                         local  char* pParentBoneName
+                         local  int32_t* pState
+                         local  uint32_t actorId
+                         local  struct TrinityActor* pSequenceActor
+                         local  uint32_t attachId
+                         local  struct TrinityActor* pSequenceAttachActor
+ 1147  00596790    14C  void ActorShowHide(const struct <anon>* this)
+                         local  const uint32_t* pActorId
+                         local  const int32_t* pState
+                         local  uint32_t actorId
+                         local  struct TrinityActor* pSequenceActor
+ 1186  005968DC    174  void ActorEvent(const struct <anon>* this)
+                         local  const uint32_t* pActorId
+                         local  const char* pEventID
+                         local  const char* pDataSize
+                         local  const char* pData
+                         local  uint32_t actorId
+                         local  struct TrinityActor* pSequenceActor
+ 1225  00596A50    1D8  void CameraCreate(const struct <anon>* this)
+                         local  const int32_t* pCameraActorId
+                         local  const char8_t* pCameraName
+                         local  const float_t* pLerpOutTime
+                         local  struct TrinityCamera* pSequenceCamera
+ 1266  00596C28    16C  void CameraTransformSampled(const struct <anon>* this)
+                         local  const int32_t* pCameraActorId
+                         local  const int32_t* pNumKeys
+                         local  const struct Key3d* pTranslateKeys
+                         local  const struct Key4d* pRotateKeys
+                         local  struct TrinityCamera* pSequenceCamera
+ 1295  00596D94     D0  void CameraTransformSpline(const struct <anon>* this)
+                         local  uint8_t* pData
+                         local  int32_t cameraActorId
+                         local  struct TrinityCamera* pSequenceCamera
+ 1330  00596E64    128  void CameraFOVSampled(const struct <anon>* this)
+                         local  const int32_t* pCameraActorId
+                         local  const int32_t* pNumKeys
+                         local  const struct Key1d* pFOVKeys
+                         local  struct TrinityCamera* pSequenceCamera
+ 1356  00596F8C     F0  void CameraFOVSpline(const struct <anon>* this)
+                         local  uint8_t* pData
+                         local  int32_t cameraActorId
+                         local  struct TrinityCamera* pSequenceCamera
+                         local  int32_t numFOVkeys
+                         local  const struct Coeff* pKeys
+ 1390  0059707C     64  void ScriptExecute(const struct <anon>* this)
+ 1404  005970E0      4  void ScriptExecuteText(const struct <anon>* this)
+ 1420  005970E4     EC  void ScriptEvent(const struct <anon>* this)
+                         local  const char* pEventID
+                         local  const char* pDataSize
+                         local  const char* pData
+ 1448  005971D0     90  void NoInterrupt(const struct <anon>* this)
+                         local  char* pFlag
+ 1464  00597260     E4  void LetterBox(const struct <anon>* this)
+                         local  const int32_t* pLetterBox
+                         local  const float_t* pDuration
+ 1491  00597344    104  void ScreenFade(const struct <anon>* this)
+                         local  const int32_t* pScreenFade
+                         local  const float_t* pDuration
+                         local  const float_t* pColor
+ 1521  00597448    128  void ScreenBlur(const struct <anon>* this)
+                         local  const int32_t* pNumKeys
+                         local  const struct Key1d* pIntensityKeys
+                         local  const struct Key3d* pColorKeys
+ 1546  00597570    128  void ScreenBloom(const struct <anon>* this)
+                         local  const int32_t* pNumKeys
+                         local  const struct Key1d* pIntensityKeys
+                         local  const struct Key3d* pColorKeys
+ 1570  00597698    14C  void ScreenDepth(const struct <anon>* this)
+                         local  const int32_t* pNumKeys
+                         local  const struct Key1d* pIntensityKeys
+                         local  const struct Key1d* pDistanceKeys
+                         local  const struct Key3d* pColorKeys
+ 1598  005977E4    1C4  void VfxCreate(const struct <anon>* this)
+                         local  const int32_t* pVfxId
+                         local  const char* pVfxName
+                         local  float[3]* pInitialPos
+                         local  struct TrinityVfx* pSequenceVfx
+ 1637  005979A8    16C  void VfxTransformSampled(const struct <anon>* this)
+                         local  const int32_t* pVfxId
+                         local  const int32_t* pNumKeys
+                         local  const struct Key3d* pTranslateKeys
+                         local  const struct Key4d* pRotateKeys
+                         local  struct TrinityVfx* pSequenceVfx
+ 1666  00597B14     D0  void VfxTransformSpline(const struct <anon>* this)
+                         local  uint8_t* pData
+                         local  int32_t vfxId
+                         local  struct TrinityVfx* pSequenceVfx
+ 1694  00597BE4    124  void VfxOnOff(const struct <anon>* this)
+                         local  const int32_t* pVfxId
+                         local  const int32_t* pVfxState
+                         local  struct TrinityVfx* pSequenceVfx
+ 1730  00597D08    18C  void VfxAttachToActor(const struct <anon>* this)
+                         local  const int32_t* pVfxId
+                         local  const uint32_t* pActorId
+                         local  char* pBoneName
+                         local  float[3]* pOffset
+                         local  struct TrinityVfx* pSequenceVfx
+                         local  uint32_t actorId
+                         local  struct TrinityActor* pSequenceActor
+ 1766  00597E94     58  void VfxAttachToScreen(const struct <anon>* this)
+ 1776  00597EEC     58  void VfxAttachToAlert(const struct <anon>* this)
+ 1786  00597F44     64  void AudioPlaySeq(const struct <anon>* this)
+ 1803  00597FA8      4  void AudioPlayStream(const struct <anon>* this)
+ 1821  00597FAC      4  void AudioPrimeStream(const struct <anon>* this)
+ 1839  00597FB0     64  void TimeGradient(const struct <anon>* this)
+ 1863  00598014     64  void FadeAlpha(const struct <anon>* this)
+ 1908  00598078     A0  void VoidCallback(const struct <anon>* this)
+                         local  const SequenceVoidCallback callback

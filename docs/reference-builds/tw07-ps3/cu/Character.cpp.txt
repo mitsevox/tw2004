@@ -1,0 +1,146 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/Character.cpp
+// compiled in: Character.cpp
+// 88 functions, source order. line | PS3 address | size
+
+   44  0059894C    120  void Clear(const struct Character* this)
+                         local  uint32_t bonemodSize
+                         local  int i
+                         local  int i
+   83  00598A6C     88  bool Init(const struct Character* this)
+   98  00598AF4     64  void Deinit(const struct Character* this)
+  107  00598B58     30  bool SetDefinition(const struct Character* this, struct Definition* definition)
+  112  00598B88      8  struct Definition* GetDefinition(const const struct <anon>* this)
+  117  00598BE8     80  bool AttachBank(const struct Character* this, struct <anon>* bank)
+  122  00598B90     2C  bool DetachBank(const struct Character* this, struct <anon>* bank)
+  127  00598BBC     2C  bool ReserveInstVarSpace(const struct Character* this, int32_t number)
+  133  00598D5C     30  void AdvanceAnimationByFrames(const struct Character* this, float frames)
+  138  00598C68     24  void AdvanceAnimationBySeconds(const struct Character* this, float deltaSeconds)
+  143  00598C8C     24  void AdvanceAnimationWithoutSecondariesByFrames(const struct Character* this, float frames)
+  148  00598CFC     30  void AdvanceAnimationWithoutSecondariesBySeconds(const struct Character* this, float seconds)
+  153  00598CB0     1C  float GetFPS(const const struct <anon>* this)
+  158  00598D2C     30  float SecondsFromFrames(const const struct <anon>* this, float frames)
+  163  00598CCC     30  float FramesFromSeconds(const const struct <anon>* this, float seconds)
+  168  00598D8C      8  float GetLengthInFrames(const const struct <anon>* this)
+  173  00598D94     30  float GetLengthInSeconds(const const struct <anon>* this)
+  178  00598DC4     18  void ClearState(const struct Character* this)
+  185  00598DDC     14  const char* GetModelName(const const struct <anon>* this)
+  194  00598DF0     3C  StateID GetStateID(const const struct <anon>* this, const char* name)
+  203  0059A3A8     28  StateID MakeStateID(const char* name)
+                         inlines  Common::CommonHash
+  208  00598E2C     3C  bool IsValidStateID(const const struct <anon>* this, StateID id)
+  217  00598E68     3C  const char* GetStateName(const const struct <anon>* this, StateID state)
+  226  00598EA4     28  bool SetState(const struct Character* this, StateID state)
+  231  00598ECC     28  bool TransitionToState(const struct Character* this, StateID state, bool blend, bool ignoreGM)
+  236  00598EF4     28  bool TransitionToStateDynamic(const struct Character* this, StateID state, float startFrame, const struct <anon>* info)
+  241  00598F1C     1C  bool HasSecondaries(const const struct <anon>* this)
+  246  00598F38     44  int32_t AddSecondary(const struct Character* this, struct Character* other)
+                         local  int32_t s
+                         local  struct Character* c
+  259  00598F7C     80  struct Character* RemoveSecondary(const struct Character* this, int32_t slot)
+                         local  struct Character* c
+                         local  struct Character* removed
+  283  00598FFC     28  int32_t GetSecondaryCount(const const struct <anon>* this)
+                         local  const struct <anon>* c
+                         local  int32_t amt
+  295  00599024     6C  struct Character* GetSecondary(const struct Character* this, int32_t slot)
+                         local  struct Character* c
+  307  00599090     6C  const struct <anon>* GetSecondary(const const struct <anon>* this, int32_t slot)
+                         local  const struct <anon>* c
+  319  005990FC      4  struct Character* GetSecondarySafe(const struct Character* this, int32_t slot)
+                         local  struct Character* c
+  326  00599100      4  const struct <anon>* GetSecondarySafe(const const struct <anon>* this, int32_t slot)
+                         local  const struct <anon>* c
+  334  0059A560    14C  float GetSecondaryBlendFactor(const struct Character* this, float blend_out_duration)
+                         local  float ratio
+                         inlines  std::sinf
+  371  005997BC     68  bool SetSecondaryState(const struct Character* this, int32_t slot, StateID state, BoneIndex filter_root)
+                         local  struct Character* sec
+  384  00599110     44  StateID GetSecondaryCurrentState(const const struct <anon>* this, int32_t slot)
+                         local  const struct <anon>* sec
+  396  005995E0    1DC  bool TransitionSecondaryToState(const struct Character* this, StateID stateId, int32_t slot, bool blendin, BoneIndex filter_root, bool noFrames)
+                         local  struct Character* sec
+                         local  int oldStateId
+                         local  bool ret
+                         local  int oldHead
+                         local  int saveDirection
+                         local  float saveElapsed
+  451  00599154     50  StateID GetSecondaryStateID(const const struct <anon>* this, int32_t slot, const char* name)
+                         local  const struct <anon>* sec
+  462  005991A4     48  bool IsValidSecondaryStateID(const const struct <anon>* this, int32_t slot, StateID id)
+                         local  const struct <anon>* sec
+  473  00599598     48  bool SetSecondaryFilterRoot(const struct Character* this, int32_t slot, BoneIndex filter_root)
+                         local  struct Character* sec
+  484  00599208     44  BoneIndex GetSecondaryFilterRoot(const const struct <anon>* this, int32_t slot)
+                         local  const struct <anon>* sec
+  495  0059924C     2C  struct Frame* GetCurrentFrameWithoutSecondaryAnimations(const struct Character* this)
+  500  00599278     20  void BlendOutAsSecondary(const struct Character* this, float blend_time)
+  508  00599298     58  void BlendSecondaryOut(const struct Character* this, int32_t slot, float blend_time)
+                         local  struct Character* sec
+  519  005992F0     54  void BlendAllSecondariesOut(const struct Character* this, float blend_time)
+                         local  struct Character* c
+  530  00599344     44  void DisableSecondary(const struct Character* this, int32_t slot)
+                         local  struct Character* sec
+  541  00599388     44  void DisableAllSecondaries(const struct Character* this)
+                         local  struct Character* c
+  552  005993CC     6C  void SetSecondaryBlendOutOnEnd(const struct Character* this, int32_t slot, bool resetOnEnd, float blend_time)
+                         local  struct Character* sec
+  572  00599440     58  void SetSecondaryAnimationSpeed(const struct Character* this, int32_t slot, float speed)
+                         local  struct Character* sec
+  583  005994A0     58  float GetSecondaryAnimationSpeed(const const struct <anon>* this, int32_t slot)
+                         local  const struct <anon>* sec
+  595  005994F8     48  bool InitDynamicFiltering(const struct Character* this)
+  602  00599540     24  void DeinitDynamicFiltering(const struct Character* this)
+  607  00599564     34  bool SetFilterRoot(const struct Character* this, BoneIndex root)
+  614  005991EC     1C  BoneIndex GetFilterRoot(const const struct <anon>* this)
+  624  00599824    1C8  void AddBoneMod(const struct Character* this, BoneIndex bone, struct <anon>* transform, int flags)
+                         local  int gap
+  652  005999EC    13C  void RemoveBoneMod(const struct Character* this, struct <anon>* transform)
+                         local  bool scoot
+                         local  int m
+  681  00599B28     94  void GetBoneModForBone(const const struct <anon>* this, BoneIndex bone, struct <anon>** trans, int* flags)
+                         local  int i
+  702  00599BBC     54  const struct Skeleton* GetCurrentSkeleton(const const struct <anon>* this)
+  713  00599C10     AC  bool SetSkeleton(const struct Character* this, const char* name)
+                         local  const uint32_t nameID
+                         local  int32_t skeletonIndex
+                         local  const struct Skeleton* skeleton
+                         inlines  Common::CommonHash
+  730  00599CBC      8  const struct ModelDefinition* GetCurrentModelDefinition(const const struct <anon>* this)
+  737  0059A1E0     B4  struct Frame* GetCurrentFrame(const struct Character* this)
+                         local  struct Frame* frame
+                         inlines  GetFilter
+  753  0059A294     3C  void OutputFrame(const struct Character* this)
+                         local  struct Frame* frame
+  759  00599CC4      C  const struct <anon>* GetGameMovement(const const struct <anon>* this)
+  764  00599104      C  StateID GetCurrentState(const const struct <anon>* this)
+  769  00599CD0     1C  bool IsLooping(const const struct <anon>* this)
+  775  00599CEC     20  bool IsFinished(const const struct <anon>* this)
+  780  00599D0C     40  bool IsTransitioning(const const struct <anon>* this)
+  785  00599D4C     28  int32_t GetLocatorCount(const const struct <anon>* this)
+  795  00599D74     34  LocatorIndex GetLocatorIndex(const const struct <anon>* this, const char* name)
+  800  00599DA8     34  LocatorIndex GetLocatorIndex(const const struct <anon>* this, uint32_t hashedName)
+  805  00599DDC     88  bool GetLocatorMatrix(const const struct <anon>* this, LocatorIndex id, float[4]* out)
+                         local  struct IBuildMatrices* buildMatrices
+  816  00599E64     88  bool GetLocatorPosition(const const struct <anon>* this, LocatorIndex id, float* out)
+                         local  struct IBuildMatrices* buildMatrices
+  827  00599EEC     4C  const struct Locator* GetLocator(const const struct <anon>* this, LocatorIndex id)
+  837  00599F38     34  uint32_t GetBoneCount(const const struct <anon>* this)
+                         local  const struct Skeleton* skel
+  848  00599F6C     50  BoneIndex GetBoneIndex(const const struct <anon>* this, const char* name)
+                         local  const struct Skeleton* skel
+  859  00599FBC     50  BoneIndex GetBoneIndex(const const struct <anon>* this, int32_t hashedName)
+                         local  const struct Skeleton* skel
+  869  0059A00C     88  bool GetBoneMatrix(const const struct <anon>* this, BoneIndex id, float[4]* out)
+                         local  struct IBuildMatrices* buildMatrices
+  880  0059A094     88  bool GetBonePosition(const const struct <anon>* this, BoneIndex id, float* out)
+                         local  struct IBuildMatrices* buildMatrices
+  893  0059A2D0     D8  void NormalizeBoneMatrix(const const struct <anon>* this, float[4]* in, float[4]* out)
+                         inlines  __vec_make_from_scalar, __vec_mul, vec4flt_Copy4, vec4flt_Scale4, vec_ld, vec_splat
+  902  00599438      8  void SetAnimationSpeed(const struct Character* this, float speed)
+  907  00599498      8  float GetAnimationSpeed(const const struct <anon>* this)
+  912  0059A11C      C  bool GetOnlyGameMovement(const const struct <anon>* this)
+  917  0059A128     38  void SetOnlyGameMovement(const struct Character* this, bool onlyGameMovement)
+  934  0059A160      C  bool GetNoTransitionLogic(const const struct <anon>* this)
+  939  0059A16C     2C  void SetNoTransitionLogic(const struct Character* this, bool noTransitionLogic)
+  951  0059A198     24  float ChangeNumFrames(const struct Character* this, const struct AnimNode* node, struct InstVars* vars, float newNumFrames, float prevNumFrames, float frameNum, int flags)
+  956  0059A1BC     24  void AddNumFramesFrameRateAdjust(float delta)

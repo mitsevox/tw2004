@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_OnlineMyQuickMessages.h
+// compiled in: apt_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   15  00119EB0    160  void UIOnlineMyQuickMessages::~UIOnlineMyQuickMessages(const struct UIOnlineMyQuickMessages* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIOnlineMyQuickMessages::DstMenuItem_olqm>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+   17  000FFD90      C  uint32 UIOnlineMyQuickMessages::GetSignature(const const struct UIOnlineMyQuickMessages* this)
+   18  000FFD9C     44  void UIOnlineMyQuickMessages::ShowHelpText(const struct UIOnlineMyQuickMessages* this)
+   27  000FFDE8      C  struct IExternArray* UIOnlineMyQuickMessages::GetExternArray(const struct UIOnlineMyQuickMessages* this)
+   47    inline-only   char* UIOnlineMyQuickMessages::GetSavedMessage(const struct UIOnlineMyQuickMessages* this, int32 iIdx)

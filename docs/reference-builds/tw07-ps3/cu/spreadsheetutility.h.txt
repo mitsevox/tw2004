@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/packages/osdk/2.06.04/core/include/common/osdk/spreadsheetutility.h
+// compiled in: golf2_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   59    inline-only   const struct CellComparatorString* GetStringComparator()

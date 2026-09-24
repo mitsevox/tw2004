@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/SunFlare/ColGlow.c
+// compiled in: golf_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   24  00291128     FC  void ColGlow_InitModule()
+                         local  const char[19] __FUNCTION__
+                         inlines  TagValuePair, operator+
+   37  0023653C     48  void ColGlow_CloseModule()
+   47  002FF48C    15C  void ColGlow_RenderAllGlowInCurrentList()
+                         local  bool bSetAlphaEnable
+                         local  bool bSetZTestEnable
+                         inlines  DS_vSetAlphaBlendingFunction, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetZTestEnable

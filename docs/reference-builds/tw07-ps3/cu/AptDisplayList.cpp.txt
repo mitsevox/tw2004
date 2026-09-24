@@ -1,0 +1,111 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptDisplayList.cpp
+// compiled in: other_unity.cpp
+// 29 functions, source order. line | PS3 address | size
+
+    7  00401490    164  void AptDisplayListState::findInst(const struct AptDisplayListState* this, int nDepth, const char* szName, struct AptCIH** ppPrev, struct AptCIH** ppItem)
+                         local  struct AptCIH* pCur
+                         local  struct AptCIH* pLast
+   52  0045F9E8     90  struct AptCIH* AptDisplayListState::insert(const struct AptDisplayListState* this, struct AptCIH* pPrev, struct AptCIH* pNewItem)
+                         inlines  AptValue::__inc
+   64  004605A0    11C  struct AptCIH* AptDisplayListState::insert(const struct AptDisplayListState* this, int nDepth, enum AptVirtualFunctionTable_Indices eType, struct AptCharacterInst* pInst)
+                         local  struct AptCIH* pPrev
+                         local  struct AptCIH* pItem
+                         local  struct AptCIH* pNewItem
+                         inlines  AptCIH::AptCIH, AptCIH::operator new
+   79  0045FA78     64  struct AptCIH* AptDisplayListState::insert(const struct AptDisplayListState* this, int nDepth, struct AptCIH* pItem)
+                         local  struct AptCIH* pPrev
+                         local  struct AptCIH* pOldItem
+                         local  struct AptCIH* pNewItem
+   91  004015F4     34  struct AptCIH* AptDisplayListState::remove(const struct AptDisplayListState* this, int nDepth)
+                         local  struct AptCIH* pPrev
+                         local  struct AptCIH* pItem
+   98  003EF508     3C  struct AptCIH* AptDisplayListState::remove(struct AptCIH* pItem)
+  119  0047A844    8D4  void AptDisplayList::instantiateCharacter(const struct AptDisplayList* this, int nTargetDepth, struct AptCharacter* pCharacter, const char* szName, struct AptCIH* pParent, int bForceNewInstance, int nClipDepth, struct AptCIH** ppCIH, int* pbNeedNewInst)
+                         local  bool bNeedNewInst
+                         local  struct AptCIH* pItemPrev
+                         local  struct AptCIH* pItemAtDepth
+                         local  struct AptCIH* pCurCIH
+                         local  struct AptCharacterInst* pInst
+                         local  enum AptVirtualFunctionTable_Indices eNewType
+                         local  struct AptString* pStr
+                         local  int i
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  struct AptCharacterTextInst* pTextInst
+                         local  struct AptCharacterSpriteInst* pSprInst
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  struct AptValue* pTempVar
+                         local  struct AptCharacterTextInst* pTextInst
+                         local  struct AptCharacterShapeInst* pShapeInst
+                         inlines  AptCIH::getTextInst, AptCIH::isSpriteInstBase, AptCharacterShapeInst, AptCharacterShapeInst::operator new, AptCharacterSpriteInst, AptCharacterSpriteInst::operator new, AptCharacterTextInst::AptCharacterTextInst, AptCharacterTextInst::operator new, AptHash::AptHash, AptHash::operator new, AptString::AptString, AptString::operator new, AptValue::__inc, AptValue::getVtblIndex, AptValue::setIsDefined, AptValue::setRefCount, Capacity, UseCapacity
+  318  004127C8    270  void _convertToCXForm(struct AptCXForm* pCXFormdst, struct AptnCXForm* pnCXFormsrc)
+                         local  const uint32 color
+                         inlines  LLMath_MultiplyVec, __vec_mul
+  351  00498C6C    158  void AptDisplayList::placeObjectNCXForm(const struct AptDisplayList* this, struct AptCIH* pItem, int nTargetDepth, struct AptCharacter* pCharacter, const char* szName, struct AptCIH* pParent, int bForceNewInstance, int nClipDepth, struct AptnCXForm* pnCXForm, struct AptMatrix* pMatrix, struct AptEventActionSet* pActions, float fRatio)
+                         local  struct AptCXForm cxform
+                         local  struct AptCXForm* pCXForm
+  368  004982CC     84  void AptDisplayList::_addToSetCaches(const struct AptDisplayList* this, struct AptCIH* pItem, int bQueueClipEvents)
+                         local  struct AptCharacter* pCharacter
+                         inlines  AptValueSet<AptCIH*,512>::has
+  417  00498A68    204  void AptDisplayList::placeObject(const struct AptDisplayList* this, struct AptCIH* pItem, int nTargetDepth, struct AptCharacter* pCharacter, const char* szName, struct AptCIH* pParent, int bForceNewInstance, int nClipDepth, struct AptCXForm* pCXForm, struct AptMatrix* pMatrix, struct AptEventActionSet* pActions, float fRatio, struct AptValue* pInitObject)
+                         local  int bNeedNewInst
+                         local  struct AptNativeHash* pObjHash
+                         local  struct AptHashItem* pInitItem
+                         inlines  AptCIH::isSpriteInstBase
+  495  00498DC4    240  void AptDisplayList::placeObject(const struct AptDisplayList* this, struct AptControlPlaceObject2* pPlaceObject2, struct AptCIH* pParent)
+                         local  struct AptCharacter* pCharacter
+                         local  struct AptCIH* pPrev
+                         local  struct AptCIH* pCur
+  544  00478C2C     A8  void AptDisplayList::removeObject(const struct AptDisplayList* this, struct AptCIH* pItem)
+                         local  struct AptValue* pParent
+                         local  struct AptNativeHash* pHash
+  562  00478E48     48  void AptDisplayList::removeObject(const struct AptDisplayList* this, int nRemovalDepth)
+                         local  struct AptCIH* pPrev
+                         local  struct AptCIH* pCur
+  570  00478D30     6C  void AptDisplayList::removeClonedObject(const struct AptDisplayList* this, struct AptCIH* pObject)
+                         local  struct AptCIH* pLast
+                         local  struct AptCIH* pCur
+  583  00478E90      C  void AptDisplayList::removeObject(const struct AptDisplayList* this, struct AptControlRemoveObject2* pRemoveObject2)
+  613    inline-only   void SortedArrayMask::insert(const struct SortedArrayMask* this, struct AptCIH* pMask)
+                         local  int i
+                         local  int j
+  628    inline-only   void SortedArrayMask::remove(const struct SortedArrayMask* this, int i)
+  639    inline-only   struct AptCIH* SortedArrayMask::getElement(const struct SortedArrayMask* this, int i)
+  645    inline-only   int SortedArrayMask::getNumElements(const struct SortedArrayMask* this)
+  650  00415354     4C  void AptDisplayList::deallocAssetStringRecursive(const struct AptDisplayList* this)
+                         local  struct AptCIH* pCur
+                         local  struct SortedArrayMask masks
+  663  0046FDA8    3C8  void AptDisplayList::render(const struct AptDisplayList* this, struct AptRenderingContext* pRenderingContext, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  struct AptCIH* pCur
+                         local  struct SortedArrayMask masks
+                         local  int j
+                         local  struct AptCIH* pCIH
+                         local  struct AptCIH* pCIH
+                         inlines  AptCIH::isLevelInst, SortedArrayMask::getElement, SortedArrayMask::insert, SortedArrayMask::remove
+  712  004390AC     C8  void AptDisplayList::_getBoundingRect(const struct AptDisplayList* this, struct AptRenderingContext* pRenderingContext, struct AptRect* pRect)
+                         local  struct AptCIH* pCur
+                         inlines  AptCIH::isLevelInst
+  727  00499608     B0  void AptDisplayList::tick(const struct AptDisplayList* this)
+                         local  struct AptCIH* pCur
+                         inlines  AptCIH::isSpriteInstBase
+  752  00478CD4     5C  void AptDisplayList::clear(const struct AptDisplayList* this)
+                         local  struct AptCIH* pCur
+                         local  struct AptCIH* pNext
+  767  003EF544      8  struct AptDisplayListState* AptDisplayList::getState(const struct AptDisplayList* this)
+  773  003EF54C      8  void AptDisplayList::useState(const struct AptDisplayList* this, struct AptDisplayListState* pNewState)
+  778  00498350    718  void AptDisplayList::mergeState(const struct AptDisplayList* this, struct AptDisplayListState* pNewState, struct AptHash* pNewObject, struct AptHash* pOrigObject)
+                         local  struct AptCIH* pNewCur
+                         local  struct AptCIH* pNewLast
+                         local  struct AptCIH* pOrigCur
+                         local  struct AptCIH* pOrigLast
+                         local  struct AptCIH* pOrigCurNext
+                         local  struct AptCIH* pNext
+                         local  struct AptCIH* pDel
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptCIH::isSpriteInstBase, AptCIH::isTextInst, AptValue::__inc, AptValue::getIsDefined, AptValue::getVtblIndex, AptValue::setIsDefined, AptValue::setRefCount, AptValue::setVtblIndex, AptValueSet<AptCIH*,512>::remove, checked_delete<AptDisplayListState>, checked_delete<AptHash>
+  990  0040C38C    154  void AptDisplayList::validate(const struct AptDisplayList* this, struct AptCIH* pParent)
+                         local  struct AptCIH* pSourceCur
+                         local  struct AptCIH* pParentInst
+                         local  struct AptHashItem* pItem
+                         local  int bFound
+                         inlines  AptCIH::isSpriteInstBase, AptValue::isCIH

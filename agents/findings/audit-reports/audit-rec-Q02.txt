@@ -1,0 +1,10 @@
+audit-rec-Q02: 74 functions (mtalib, ska_shared, target, OBFData, animblender, ShaderObjectsData, FE_MessageTable, uiLoadFile, uiProcessInterface); namecheck 7 rows 0 flags; all 21 comment `old`s match exactly once in current main.
+Names: kept 2 (PlaceBall_UpdateMomentums T1, Anim_SetTime T2), renamed 7 T1 (TARGET_Init, TARGET_RenderBallTarget, TARGET_UpdateMomentums, PlaceBall_RenderBallTarget, SKATime_UnPause by TW07; SKATime_Update, SKATime_Idle by TW06=TW07 with both lanes on the same name), T3 0, demoted 0, unnamed 65.
+Comments: ok 44 rows, fixed 20 rows (21 edits, incl. the animblender header's stale "only part is decompiled" and the uiProcessInterface header), stripped 0, none 10.
+Worst: fn_80069CDC's comment promised a Ball distance that can never print and its bob comment had the shadow backwards; fn_800905A8 said "screen state" for a controller reset; fn_8008F820 invented "lone/many-player forms".
+Findings: 80067DAC [i] vs nPlayer - real (i==4 after the loop), exact code, already marked "EA bug"; left as is.
+Findings: 800720C8 NULL root - real (reads (*ppNode)->nFormat through NULL, passes &ppNode), exact code, already marked "EA bug"; no caller passes an empty slot.
+Findings: 80069CDC unreachable text - real: "Ball %0.0fyds" sits inside if (!bBall), fBallDist unused; EA's dead code (exact); comment fixed to promise tee/hole only.
+Findings: 800907AC comma after minus - real: -123 -> "-,123" (the '-' counts as a digit); EA's code (exact), money only in practice; no comment added (no new comments).
+Also: lane 1 misread fn_800736D8 (fn_8001EB6C clears the bit); GoGolfCam.c:55 says "set bit 2" for flag value 2 (bit 1 in animblender's 0-based numbering): out of scope, not edited.
+Unclear: Anim_SetTime - lane 2 fits TW07 SKATime_SetTime, lane 1 pointed to it but would not confirm (no machine row): kept, orchestrator may rename; lane-2-only TW07 names (AnimBlender_Init/CloseModule, SKATime_Init/Pause/MapTime) are in ledger notes.

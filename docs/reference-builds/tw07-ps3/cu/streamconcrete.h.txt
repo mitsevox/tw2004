@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/././streamconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   52  00623720     2C  bool IsStreamDataReady(const struct <anon>* this)
+   53  0062374C      C  const uint8_t* GetBufferHead(const struct <anon>* this)
+   54  00623758     14  uint32_t GetValidBufferLength(const struct <anon>* this)
+                         inlines  GetValidBufferLength
+   55  0062376C     28  bool IsActive(const struct <anon>* this)
+                         inlines  IsActive

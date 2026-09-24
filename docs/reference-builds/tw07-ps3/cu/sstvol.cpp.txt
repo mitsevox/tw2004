@@ -1,0 +1,18 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sstvol.cpp
+// compiled in: sstvol.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   40    inline-only   static void Snd9::StreamVolSetState(StreamSourceChannelState* pSourceChannelState, float vol)
+  132  006CE6B0    408  int SNDSTRM_setvol(int sndStrmHandle, enum Channel sourceChannel, float volume)
+                         local  int i
+                         local  SNDSTREAMCHANNEL* pssc
+                         local  int voice
+                         local  struct CHANPUB* pVoice
+                         local  int channelIndex
+                         local  struct CHANPUB* pv
+                         local  int sourceVoice
+                         local  struct CHANPUB* pVoice
+                         local  bool volChanged
+                         local  struct CHANPUB* pv
+                         local  int sourceVoice
+                         inlines  FastVol, RemoveVariableTimerClient, Snd9::StreamVolSetState

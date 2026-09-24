@@ -1,0 +1,87 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/animation/CharacterDefinition.cpp
+// compiled in: golf2_unity.cpp
+// 30 functions, source order. line | PS3 address | size
+
+   34  001866C8    1BC  bool CharacterDefinition::LoadFromFile(const struct CharacterDefinition* this, const char* filePath)
+                         local  const char[13] __FUNCTION__
+                         local  bool bExists
+                         local  int32 handle
+                         local  int32 numBytesRead
+                         inlines  TagValuePair, operator+
+   63  00186554    174  bool CharacterDefinition::LoadFromMem(const struct CharacterDefinition* this, void* rawData, int32 rawDataSize)
+                         local  const char[12] __FUNCTION__
+                         inlines  TagValuePair, operator+
+   77  00137BAC     64  void CharacterDefinition::UnLoad(const struct CharacterDefinition* this)
+   88  00137C10      8  bool CharacterDefinition::IsValid(const struct CharacterDefinition* this)
+   93  00137C18     78  struct HashString* CharacterDefinition::GetCharacterID(const struct CharacterDefinition* this)
+   99  001273C0     80  struct HashString* CharacterDefinition::GetCharacter2ChAbrv(const struct CharacterDefinition* this)
+  105  00137C90     10  int32 CharacterDefinition::GetCharacterGender(const struct CharacterDefinition* this)
+  110  00137CA0      C  float CharacterDefinition::GetUpperLidScale(const struct CharacterDefinition* this)
+  115  00137CAC      C  float CharacterDefinition::GetLowerLidScale(const struct CharacterDefinition* this)
+  120  00137CB8      C  int32 CharacterDefinition::GetBoneTransformCount(const const struct CharacterDefinition* this)
+  125  00137CC4      8  struct CharDefBoneTransform* CharacterDefinition::GetBoneTransformList(const struct CharacterDefinition* this)
+  130  00137CCC      C  int32 CharacterDefinition::GetBlendShapeCount(const struct CharacterDefinition* this)
+  135  00137CD8      8  struct CharDefBlendShape* CharacterDefinition::GetBlendShapeList(const struct CharacterDefinition* this)
+  140  00137CE0      C  int32 CharacterDefinition::GetTextureBlendCount(const struct CharacterDefinition* this)
+  145  00137CEC      8  struct CharDefTextureBlend* CharacterDefinition::GetTextureBlendList(const struct CharacterDefinition* this)
+  150  001861F4    360  void CharacterDefinition::ParseRawData(const struct CharacterDefinition* this)
+                         local  int32 offset
+                         local  struct HashString chunkBones
+                         local  struct HashString chunkBlends
+                         local  struct HashString chunkTextureBlends
+                         local  struct HashString chunkAssetList
+                         local  struct HashString chunkTattoos
+                         local  struct HashString chunkHeader
+                         inlines  HashString::HashString, operator==
+  229  00137D88     A8  int32 CharacterDefinition::GetAssetCount(const struct CharacterDefinition* this, int32 playerIndex)
+  236  00137E30     EC  const char* CharacterDefinition::GetAssetName(const struct CharacterDefinition* this, int32 playerIndex, int32 assetIndex)
+                         local  int32 totalSize
+                         local  uint16* pAssetNamesList
+                         local  int32 i
+  250  00137CF4     94  int32 CharacterDefinition::GetTotalAssetListSize(const struct CharacterDefinition* this)
+                         local  int32 totalSize
+                         local  int32 i
+  264  00186884    358  void CharacterDefinition::Test()
+                         local  struct CharacterDefinition def
+                         local  bool defOK
+                         local  int i
+                         local  int count
+                         local  char[32] strBuf
+                         local  struct CharDefBoneTransform* charBoneInfo
+                         local  struct CharDefBlendShape* charBlendInfo
+                         local  char[32] debugStr
+  315  00137F1C     18  int32 CharacterDefinition::GetHandleFromRawData(void* rawData)
+                         local  uint8* pCharAbrv
+                         local  int32 charHandle
+  322  00137F34    120  void CharacterDefinition::GotCharDefsFromStream(struct TStreamData* spStreamData_p)
+                         local  uint8* pRawData
+                         local  int32 charDefCount
+                         local  int32 i
+                         local  int32 size
+  348  00138054     6C  void CharacterDefinition::GotBoneDefsFromStream(struct TStreamData* spStreamData_p)
+  355  001380C0     74  int32 CharacterDefinition::GetBoneCount()
+                         local  int32 count
+  367  00138134     AC  const char* CharacterDefinition::GetBoneName(int32 index)
+                         local  const char* bname
+                         local  uint8* pListData
+                         local  const char* pSymbols
+                         local  int32 nameOffset
+  384  001381E0     90  int32 CharacterDefinition::GetBoneHierarchicalScaling(int32 index)
+                         local  int32 useHScale
+                         local  uint8* pListData
+  399  00138270     BC  void CharacterDefinition::FreeCharDefs()
+  412  0013832C    19C  uint8* CharacterDefinition::FindCharDefByHandle(int32 charHandle, int32* pSizeOut)
+                         local  uint8* pRawData
+                         local  int32 charDefCount
+                         local  int32 i
+                         local  int32 handle
+                         local  int32 size
+  450  001384C8     B4  const char* CharacterDefinition::GetTattooName(const struct CharacterDefinition* this, int32 index)
+                         local  const char* pTexName
+  461  0013857C    1AC  const char* CharacterDefinition::GetTattooTexture(const struct CharacterDefinition* this, struct HashString* pRegionName)
+                         local  const char*[4] regions
+                         local  const int32 numRegions
+                         local  int32 i
+                         local  const char* pTexName
+                         local  char lastTexChar
+                         local  char regionShapeChar

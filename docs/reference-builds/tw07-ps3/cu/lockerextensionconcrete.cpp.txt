@@ -1,0 +1,101 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/locker/source/common/lockerextensionconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 28 functions, source order. line | PS3 address | size
+
+   74  00625BC4      C  void LockerViewLockerAction::~LockerViewLockerAction(const struct LockerViewLockerAction* this)
+   77  00625C08      8  bool LockerViewLockerAction::DoIsShownForUser(const const struct LockerViewLockerAction* this, const struct User* )
+   83  00625C10     B4  bool LockerViewLockerAction::DoIsEnabledForUser(const const struct LockerViewLockerAction* this, const struct User* pUser)
+  108  0062A5C0     5C  void LockerFileUploadOperation::~LockerFileUploadOperation(const struct LockerFileUploadOperation* this)
+                         inlines  ~LockerFileOperationAbstract, ~RCPointer
+  113  0062889C    560  void LockerFileUploadOperation::UploadBuffer(const struct LockerFileUploadOperation* this)
+                         local  LockerApiFileInfoT fileInfo
+                         local  struct LockerExtensionConcrete* pLocker
+                         local  const char8_t* strGame
+                         local  const char8_t* strPersona
+                         local  uint32_t uActualSize
+                         local  uint32_t uRawSize
+                         local  uint32_t uBytesAvailable
+                         local  const struct List<OSDK::LockerFile>* pFiles
+                         local  uint32_t uNumFiles
+                         local  uint32_t uIndex
+                         local  struct LockerStrategy* pStrategy
+                         local  int32_t iAttribute
+                         local  int32_t iPlatforms
+                         local  struct LockerFile* pCurFile
+                         inlines  GetElementAt, GetInstance, GetNumberOfElements, GetRawDataSize, NotifyProgress, operator->
+  205  00628DFC     DC  void LockerFileUploadOperation::WriteData(const struct LockerFileUploadOperation* this)
+                         local  struct LockerExtensionConcrete* pLocker
+                         local  int32_t iBytesWritten
+                         inlines  GetInstance, NotifyProgress
+  262  00629DBC     40  void LockerChangeOperation::~LockerChangeOperation(const struct LockerChangeOperation* this)
+  267  00625CC4     64  void LockerChangeOperation::ClearCallback(const struct LockerChangeOperation* this)
+  277  00625D28     4C  void LockerChangeOperation::NotifySuccess(const struct LockerChangeOperation* this, struct LockerFile* )
+  286  00625D74     78  void LockerChangeOperation::NotifyFailure(const struct LockerChangeOperation* this, struct LockerFile* , int32_t iLockerError)
+                         local  enum FailureCode eFailureCode
+  370  0061C80C    76C  void LockerExtensionConcrete(const struct LockerExtensionConcrete* this)
+                         local  struct <anon>* pFacade
+                         local  struct <anon>* pLobby
+                         local  const struct Dictionary* pServerConfiguration
+                         local  const struct Dictionary* pNews7
+                         local  char8_t[64] strLoginKey
+                         local  char8_t[128] strServer
+                         local  char8_t[1024] strSupressedFileTypes
+                         local  const char8_t* strPersona
+                         local  struct LockerParameters* pLockerParams
+                         local  uint32_t uNumFileTypes
+                         local  uint32_t uIndex
+                         local  const char8_t* curToken
+                         local  uint32_t uTokenLength
+                         local  char8_t[64] strToken
+                         local  uint32_t uDownloadOnlyTokenLength
+                         local  const char8_t* curDownloadOnlyToken
+                         local  uint32_t uFileIndex
+                         local  uint32_t uFileIndex
+                         local  struct <anon>* strCurFileType
+                         local  struct <anon>* strCurLocFileType
+                         inlines  GetInstance, GetUserManagerConcrete, InsertElement, List, LockerExtension, LockerViewLockerAction::LockerViewLockerAction, RCPointer, RemoveElementAt, operator=
+  504  005DD660     AC  uint32_t FindFileType(const const struct <anon>* this, struct List<OSDK::String>* pList, const char8_t* strFiletype)
+                         local  uint32_t uNumFileTypes
+                         local  uint32_t uIndex
+                         local  struct String* curFileType
+                         inlines  GetElementAt, GetNumberOfElements
+  539  005F18CC    144  void ~LockerExtensionConcrete(const struct LockerExtensionConcrete* this)
+                         local  struct LockerParameters* pLockerParams
+                         inlines  GetInstance, GetUserManagerConcrete, ~LockerExtension, ~RCPointer
+  574  005FE248    278  struct Operation* ChangeToLocker(const struct LockerExtensionConcrete* this, struct User* pUser, bool bIgnoreUserCreatedContentFlag, struct LockerChangeCallback* pCallback)
+                         local  struct OperationManagerConcrete* pOperationManager
+                         local  struct Operation* pCurrentOperation
+                         local  struct <anon>* pLocalUser
+                         local  enum PermissionLevel eLevel
+                         inlines  GetOperationManagerConcrete, LockerChangeOperation::LockerChangeOperation, MarkAsFailed
+  600  005F65D0    250  const struct List<OSDK::LockerFile>* GetFiles(const const struct <anon>* this)
+                         local  const LockerApiDirectoryT* pCurDirectory
+                         local  const char8_t* strThisGameName
+                         local  struct <anon>* pList
+                         local  bool bMyLocker
+                         local  int32_t iIndex
+                         local  struct <anon>* pFile
+                         inlines  InsertElement, List
+  652  005C96FC     F4  int8_t SortFiles(const struct LockerExtensionConcrete* this, enum LockerField eField)
+                         local  LockerApiCategoryE eLockerField
+  715  005D3BE0      8  const struct List<OSDK::String>* GetFileTypes(const const struct <anon>* this)
+  739  005D3BE8      8  const struct List<OSDK::String>* GetLocalizedFileTypes(const const struct <anon>* this)
+  767  005D3BF0      8  const struct List<OSDK::String>* GetUploadableFileTypes(const const struct <anon>* this)
+  792  005C97F0      8  uint32_t GetBytesUsed(const const struct <anon>* this)
+  819  005C97F8     2C  uint32_t GetMaximumBytes(const const struct <anon>* this)
+                         local  const LockerApiDirectoryT* pCurDirectory
+  847  005C9824     2C  uint32_t GetMaximumFiles(const const struct <anon>* this)
+                         local  const LockerApiDirectoryT* pCurDirectory
+  873  005C9850     2C  uint32_t GetNumberOfFiles(const const struct <anon>* this)
+                         local  const LockerApiDirectoryT* pCurDirectory
+  900  005C987C     30  const char8_t* GetGameName(const const struct <anon>* this)
+                         local  const LockerApiDirectoryT* pCurDirectory
+  927  005C98AC     30  const char8_t* GetOwner(const const struct <anon>* this)
+                         local  const LockerApiDirectoryT* pCurDirectory
+  954  005CBD8C     AC  bool IsLoadedLockerForLocalUser(const const struct <anon>* this)
+                         local  struct <anon>* pFacade
+  980  00605150    154  struct Operation* Upload(const struct LockerExtensionConcrete* this, struct LockerBuffer* pBuffer, struct LockerFileOperationCallback* pCallback, bool bOverwrite)
+                         local  struct OperationManagerConcrete* pOperationManager
+                         local  struct Operation* pCurrentOperation
+                         inlines  GetOperationManagerConcrete, LockerFileUploadOperation::LockerFileUploadOperation
+ 1007  005C98DC     3C  bool IsUserInside(const const struct <anon>* this)

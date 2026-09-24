@@ -1,0 +1,38 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/pluginregistryruntime.cpp
+// compiled in: pluginregistryruntime.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   13  006D41D8     64  const char* GetPlugInName(const struct PlugInRegistry* this, struct <anon>* plugInHandle)
+                         local  const char[14] __FUNCTION__
+   21  006D423C     64  int GetNumConstructorParameters(const struct PlugInRegistry* this, struct <anon>* plugInHandle)
+                         local  const char[28] __FUNCTION__
+   30  006D42A0     7C  struct <anon>* GetConstructorParameter(const struct PlugInRegistry* this, struct <anon>* plugInHandle, int parameter)
+                         local  const char[24] __FUNCTION__
+   38  006D431C     64  int GetNumAttributes(const struct PlugInRegistry* this, struct <anon>* plugInHandle)
+                         local  const char[17] __FUNCTION__
+   46  006D4380     84  struct <anon>* GetAttribute(const struct PlugInRegistry* this, struct <anon>* plugInHandle, int attribute)
+                         local  const char[13] __FUNCTION__
+                         local  int ParamDescArrayIndex
+   56  006D4404     64  int GetNumEvents(const struct PlugInRegistry* this, struct <anon>* plugInHandle)
+                         local  const char[13] __FUNCTION__
+   64  006D4468     84  int GetNumParameters(const struct PlugInRegistry* this, struct <anon>* plugInHandle, int event)
+                         local  const char[17] __FUNCTION__
+   73  006D44EC     D8  struct <anon>* GetEventParameter(const struct PlugInRegistry* this, struct <anon>* plugInHandle, int event, int parameter)
+                         local  const char[18] __FUNCTION__
+                         local  int EventParamDescIndex
+                         local  int i
+   91  006D46C8     CC  enum ParameterDirection GetParameterDirection(const struct PlugInRegistry* this, struct <anon>* parameterHandle)
+                         local  const char[22] __FUNCTION__
+                         inlines  Assert
+  100  006D4794     CC  enum ParameterType GetParameterType(const struct PlugInRegistry* this, struct <anon>* parameterHandle)
+                         local  const char[17] __FUNCTION__
+                         inlines  Assert
+  109  006D4860     CC  double GetParameterMinExtremeValue(const struct PlugInRegistry* this, struct <anon>* parameterHandle)
+                         local  const char[28] __FUNCTION__
+                         inlines  Assert
+  118  006D45C4     CC  double GetParameterMaxExtremeValue(const struct PlugInRegistry* this, struct <anon>* parameterHandle)
+                         local  const char[28] __FUNCTION__
+                         inlines  Assert
+  128  006D4690     10  bool IsVariableInputChannelsSupported(const struct PlugInRegistry* this, struct <anon>* plugInHandle)
+  137  006D46A0     10  bool IsVariableOutputChannelsSupported(const struct PlugInRegistry* this, struct <anon>* plugInHandle)
+  146  006D46B0     18  bool AreMultiplePlugInsOfThisTypeLegal(const struct PlugInRegistry* this, enum PlugInType type)

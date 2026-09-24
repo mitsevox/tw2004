@@ -1,0 +1,6 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/sx87d16.cpp
+// compiled in: sx87d16.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   80  006D24F4     64  void decode16x87(int frames, short int* psrc, float* pdst)
+                         local  int i

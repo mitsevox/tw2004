@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/packages/tiger_module/include/tiger_module_cct.h
+// compiled in: golf2_unity.cpp, golf_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+  100  0033E9C4      8  const char* CCT::GetForcedIgcActor(const const struct CCT* this)
+  294    inline-only   struct Lua* CCT::GetLua(const const struct CCT* this)
+  298    inline-only   void CCT::SetIsTransFromIGC(const struct CCT* this, bool bIsTransFromIGC)

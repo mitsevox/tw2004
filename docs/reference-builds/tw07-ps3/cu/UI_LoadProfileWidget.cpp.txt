@@ -1,0 +1,23 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_LoadProfileWidget.cpp
+// compiled in: apt_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   31  000F4048     68  void UILoadProfileWidget::UILoadProfileWidget(const struct UILoadProfileWidget* this)
+   42  000335B0     60  void UILoadProfileWidget::Init(const struct UILoadProfileWidget* this)
+   57  0004095C      4  void UILoadProfileWidget::OnShow(const struct UILoadProfileWidget* this)
+   68  000759A4    228  void UILoadProfileWidget::UpdateOnScreenUserInfo(const struct UILoadProfileWidget* this, int32 controllerId, bool bForceUpdate)
+                         local  struct AptScreenSubscriber* screen
+                         local  TI_STimeValue currentTime
+                         local  float secondsSinceLastUpdate
+                         inlines  TI_fConvertTimeDifToSeconds, sys_time_get_timebase_frequency
+   96  00040640     10  void UILoadProfileWidget::ForceHideOnScreenInfo(const struct UILoadProfileWidget* this)
+  103  00040960     88  void UILoadProfileWidget::SuperForceHideOnScreenInfo(const struct UILoadProfileWidget* this)
+                         local  char[14] path
+  114  00075834    170  void UILoadProfileWidget::Update(const struct UILoadProfileWidget* this, int32 controllerId)
+                         local  enum UserNumber defaultUserSlot
+  150  000757C8     6C  enum TAptSequenceStatus UILoadProfileWidget::TimeOutSequence(const struct UILoadProfileWidget* this, bool inbFirstTime, void* inData)
+  171  0007561C    1AC  bool UILoadProfileWidget::OnScreenInfoTimedOut(const struct UILoadProfileWidget* this)
+                         local  TI_STimeValue currentTime
+                         local  float timeDiff
+                         inlines  TI_fConvertTimeDifToSeconds
+  181  00040918     44  void UILoadProfileWidget::PlayAnimation(const struct UILoadProfileWidget* this)

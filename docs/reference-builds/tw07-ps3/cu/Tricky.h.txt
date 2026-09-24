@@ -1,0 +1,6 @@
+// ../ears_rt_cct/dev/codec/Tricky/api/ears_rt_cct/codec/Tricky.h
+// compiled in: Tricky.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   29  0059E484     18  void ~Tricky(const struct <anon>* this)
+                         inlines  ~ICodec

@@ -1,0 +1,120 @@
+// ../../../../../TIGERCODE/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/fastfloat_operation_inline.h
+// compiled in: rnaunity.cpp
+// 18 functions, source order. line | PS3 address | size
+
+  501    inline-only   bool vpu::operator<(struct <anon>& a, const const float& b)
+  960    inline-only   struct <anon> vpu::operator+(struct <anon>& a, struct <anon>& b)
+                         local  Vector4Intrinsic_32 ret
+ 1062    inline-only   struct <anon> vpu::operator+(struct <anon>& a, struct <anon>& b)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 aVF
+                         local  Vector4Intrinsic_32 bVF
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+ 1208    inline-only   struct <anon> vpu::operator-(struct <anon>& a, struct <anon>& b)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 aVF
+                         local  Vector4Intrinsic_32 bVF
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+ 1277    inline-only   struct <anon> vpu::operator*(struct <anon>& a, const const float& b)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 floatVec
+                         local  Vector4Intrinsic_32 vi_temp
+                         local  int[4] zero
+ 1295    inline-only   struct <anon> vpu::operator*<VectorAxisX, VectorAxisX>(struct <anon>& a, struct <anon>& b)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 aVF
+                         local  Vector4Intrinsic_32 bVF
+                         local  int[4] zero
+ 1295    inline-only   struct <anon> vpu::operator*<VectorAxisY, VectorAxisY>(struct <anon>& a, struct <anon>& b)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 aVF
+                         local  Vector4Intrinsic_32 bVF
+                         local  int[4] zero
+ 1295    inline-only   struct <anon> vpu::operator*<VectorAxisZ, VectorAxisZ>(struct <anon>& a, struct <anon>& b)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 aVF
+                         local  Vector4Intrinsic_32 bVF
+                         local  int[4] zero
+ 1369    inline-only   struct <anon> vpu::operator*(const const float& a, struct <anon>& b)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 floatVec
+                         local  Vector4Intrinsic_32 vi_temp
+                         local  int[4] zero
+ 1444    inline-only   struct <anon> vpu::operator/<VectorAxisX, VectorAxisW>(struct <anon>& a, struct <anon>& b)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 aVF
+                         local  Vector4Intrinsic_32 bVF
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  Vector4Intrinsic_32 secondEstimate
+                         local  Vector4Intrinsic_32 vOne
+                         local  Vector4Intrinsic_32 estimate
+                         local  Vector4Intrinsic_32 vOne
+                         local  int[4] zero
+ 1444    inline-only   struct <anon> vpu::operator/<VectorAxisY, VectorAxisW>(struct <anon>& a, struct <anon>& b)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 aVF
+                         local  Vector4Intrinsic_32 bVF
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  Vector4Intrinsic_32 secondEstimate
+                         local  Vector4Intrinsic_32 vOne
+                         local  Vector4Intrinsic_32 estimate
+                         local  Vector4Intrinsic_32 vOne
+                         local  int[4] zero
+ 1444    inline-only   struct <anon> vpu::operator/<VectorAxisZ, VectorAxisW>(struct <anon>& a, struct <anon>& b)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 aVF
+                         local  Vector4Intrinsic_32 bVF
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  Vector4Intrinsic_32 secondEstimate
+                         local  Vector4Intrinsic_32 vOne
+                         local  Vector4Intrinsic_32 estimate
+                         local  Vector4Intrinsic_32 vOne
+                         local  int[4] zero
+ 1468    inline-only   struct <anon> vpu::operator/<VectorAxisX>(struct <anon>& a, const const float& b)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 aVF
+                         local  Vector4Intrinsic_32 bVec
+                         local  Vector4Intrinsic_32 vi_temp
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  float floatRecip
+                         local  Vector4Intrinsic_32 vi_temp
+                         local  int[4] zero
+ 1468    inline-only   struct <anon> vpu::operator/<VectorAxisY>(struct <anon>& a, const const float& b)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 aVF
+                         local  Vector4Intrinsic_32 bVec
+                         local  Vector4Intrinsic_32 vi_temp
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  float floatRecip
+                         local  Vector4Intrinsic_32 vi_temp
+                         local  int[4] zero
+ 1468    inline-only   struct <anon> vpu::operator/<VectorAxisZ>(struct <anon>& a, const const float& b)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 aVF
+                         local  Vector4Intrinsic_32 bVec
+                         local  Vector4Intrinsic_32 vi_temp
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  float floatRecip
+                         local  Vector4Intrinsic_32 vi_temp
+                         local  int[4] zero
+ 1468    inline-only   struct <anon> vpu::operator/<VectorAxisW>(struct <anon>& a, const const float& b)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 aVF
+                         local  Vector4Intrinsic_32 bVec
+                         local  Vector4Intrinsic_32 vi_temp
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  float floatRecip
+                         local  Vector4Intrinsic_32 vi_temp
+                         local  int[4] zero
+ 1520    inline-only   struct <anon> vpu::operator/(const const float& a, struct <anon>& b)
+ 1526    inline-only   struct <anon> vpu::operator/<VectorAxisW>(const const float& a, struct <anon>& b)

@@ -1,0 +1,309 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_lua.cpp
+// compiled in: tiger_module_lua.cpp
+// 189 functions, source order. line | PS3 address | size
+
+    0  0034272C     38  void ~Lua(const struct Lua* this)
+                         inlines  ~Module
+   47  005364D0     68  void Lua(const struct Lua* this, const const void** __vtt_parm, struct Com* com)
+   65  00536590     F8  void Update(const struct Lua* this)
+                         local  struct <anon> ___profScope
+                         inlines  Profile, ~Profile
+   84  00530698      8  enum Runmode GetRunmode(const const struct <anon>* this)
+   89  005306A0      8  void SetRunmode(const struct Lua* this, enum Runmode mode)
+   94  00531E14     28  static int LuaAlertFunc(lua_State* luaState)
+   99  00531D88     28  static int LuaFatalAlertFunc(lua_State* luaState)
+  105  005306A8     30  static struct Lua* LuaFromState(lua_State* luaState)
+  118  00531DB0     64  int Alert(const struct Lua* this)
+                         local  const char* errorString
+  130  00531D24     64  int FatalAlert(const struct Lua* this)
+                         local  const char* errorString
+  142  00535FE4    358  void LevelInit(const struct Lua* this)
+                         inlines  TagValuePair
+  197  0053633C    194  void LevelShutdown(const struct Lua* this)
+                         local  struct TigerLuaDynamicProgram* dynamicProgram
+                         local  struct TigerLuaDynamicProgram* dynamicNext
+  252  005306D8      8  int GetResourceCount(const struct Lua* this)
+  257  005306E0      C  void Init(const struct Lua* this)
+  262  005306EC     98  void ResourceCallback(const struct Lua* this, void* resource, int , unsigned int )
+  270  005321E8     20  void ExposeVoidFunction(const struct Lua* this, const char* functionName, enum LuaType* paramTypes, unsigned int paramCount, void(*)()* function, void* blindPtr, const char* luaNamespace)
+  275  005321C8     20  void ExposeBooleanFunction(const struct Lua* this, const char* functionName, enum LuaType* paramTypes, unsigned int paramCount, int(*)()* function, void* blindPtr, const char* luaNamespace)
+  280  005321A8     20  void ExposeIntFunction(const struct Lua* this, const char* functionName, enum LuaType* paramTypes, unsigned int paramCount, int(*)()* function, void* blindPtr, const char* luaNamespace)
+  285  00532188     20  void ExposeFloatFunction(const struct Lua* this, const char* functionName, enum LuaType* paramTypes, unsigned int paramCount, float(*)()* function, void* blindPtr, const char* luaNamespace)
+  290  00532168     20  void ExposeStringFunction(const struct Lua* this, const char* functionName, enum LuaType* paramTypes, unsigned int paramCount, const char*(*)()* function, void* blindPtr, const char* luaNamespace)
+  296  00530784    12C  void ExecuteLine(const struct Lua* this, const char* line, const const int* numChars)
+                         local  size_t length
+                         local  volatile int luaError
+  324  0053474C    308  int Run(const struct Lua* this, const char* luaProgramName, const struct <anon>* params, unsigned int paramCount)
+                         local  const char* programPtr
+                         local  unsigned int programSize
+                         local  struct TigerLuaDynamicProgram* dynamic
+                         local  int dobufferResult
+                         local  unsigned int pi
+  403  00536688    180  bool IsAvailable(const struct Lua* this, const char* luaFunctionName)
+                         local  struct <anon> ___profScope
+                         local  bool result
+                         inlines  Profile, ~Profile
+  424  00533E98    8B4  int Call(const struct Lua* this, const char* luaFunctionName, const struct <anon>* params, unsigned int paramCount, struct <anon>* returnValue, unsigned int maxReturnValues, unsigned int* returnValueCount)
+                         local  struct <anon> ___profScope
+                         local  int tableIndex
+                         local  const char* name
+                         local  unsigned int returnIndex
+                         local  const char* dot
+                         local  unsigned int nameLen
+                         local  const struct <anon>* p
+                         local  const struct <anon>* end
+                         local  enum LuaType type
+                         local  unsigned int i
+                         local  unsigned int returnIndex
+                         local  int type
+                         local  const char* stringValue
+                         local  float number
+                         local  unsigned int stallCount
+                         inlines  Profile, ~Profile
+  657  00534A54    168  void SetDynamicProgram(const struct Lua* this, const char* luaProgramName, const char* programText)
+                         local  struct TigerLuaDynamicProgram* program
+                         local  struct TigerLuaDynamicProgram* oldList
+                         inlines  TagValuePair
+  679  00530970     40  void EnableDebugging(const struct Lua* this)
+  684  005309B0      4  void DisableDebugging(const struct Lua* this)
+  688  005309B4      8  enum LuaError GetError(const const struct <anon>* this)
+  692  00530968      8  void SetError(const struct Lua* this, enum LuaError error)
+  698  00534BBC    188  void* l_realloc(lua_State* luaState, void* b, unsigned int oldSize, unsigned int newSize)
+                         local  struct Lua* lua
+                         local  struct IAllocator* allocator
+                         local  void* newB
+                         inlines  TagValuePair
+  719  005309BC     90  void l_free(lua_State* luaState, void* b, unsigned int oldSize)
+                         local  struct Lua* lua
+                         local  struct IAllocator* allocator
+  729  00530A4C      C  int GetResourceId(const struct Lua* this, int )
+  734  00530A58    2E0  void AddBreakpoint(const struct Lua* this, const char* breakpoint)
+                         local  struct <anon> bp
+                         local  unsigned int newIndex
+                         local  int compare
+                         local  unsigned int i
+  776  00530D38      C  void RemoveAllBreakpoints(const struct Lua* this)
+  782  00530D44    258  void RemoveBreakpoint(const struct Lua* this, const char* breakpoint)
+                         local  struct <anon> bp
+                         local  unsigned int index
+                         local  int compare
+                         local  unsigned int i
+  820  00530F9C    1B0  void RefreshWatches(const struct Lua* this)
+                         local  unsigned int i
+  847  0053114C    168  void PrintWatches(const struct Lua* this)
+                         local  unsigned int i
+  856  00535000    2C8  void AddWatch(const struct Lua* this, const char* watch)
+                         local  struct <anon> w
+                         local  unsigned int newIndex
+                         local  int compare
+                         local  unsigned int i
+  905  005312B4    254  void RemoveWatch(const struct Lua* this, const char* watch)
+                         local  struct <anon> w
+                         local  unsigned int index
+                         local  int compare
+                         local  unsigned int i
+  949  00531508    1F4  static char* LuaParseValue(char* out, const char* name, lua_State* luaState)
+                         local  float number
+  989  00535640    3C4  void GetStackFrame(const struct Lua* this, struct <anon>* frame, int line, const char* path)
+                         local  char* varString
+                         local  unsigned int varCount
+                         local  char* varStringPtr
+                         local  lua_Debug ar
+                         local  bool stringTooLong
+                         local  const char* name
+                         local  int i
+                         inlines  TagValuePair, operator+
+ 1062  00535CC0     F4  void WaitWhileStopped(const struct Lua* this, bool breakpointHit)
+ 1085  005316FC    17C  void InitAndRunPack(const struct Lua* this, void* luaProgramPack)
+                         local  struct TigerLuaPack* pack
+                         local  const unsigned int programCount
+                         local  unsigned int i
+                         local  const struct Program* program
+                         local  const char* programPtr
+                         local  unsigned int programSize
+ 1115  005322B0    13C  int FunctionFailed(const struct Lua* this, struct TigerLuaFunction* func)
+ 1139  005323EC    4AC  int FunctionHandler(const struct Lua* this, unsigned int functionIndex)
+                         local  struct TigerLuaFunction* func
+                         local  unsigned int expectedParamCount
+                         local  unsigned int paramCount
+                         local  struct <anon>[10] params
+                         local  unsigned int pi
+                         local  enum LuaType expectedType
+                         local  lua_Number number
+ 1243  00535DB4    200  void DebugHook(const struct Lua* this, lua_Debug* ar)
+                         local  int event
+                         local  bool breakpointHit
+ 1317  00535FB4     30  static void LuaDebugHookFunc(lua_State* luaState, lua_Debug* ar)
+ 1322  00531878     DC  bool CheckForBreakpoint(const struct Lua* this, const char* source, int line)
+                         local  struct <anon> bp
+                         local  const struct <anon>* found
+ 1340  00531954     EC  int HandleReceivedMessage(const struct Lua* this, struct Com* com, const char* message, unsigned int messageType)
+                         local  enum TigerComMessageNum type
+ 1366  005352C8    378  int HandleReceivedData(const struct Lua* this, struct Com* com, const void* data, unsigned int size, const char* dataTypeId)
+                         local  const char* fileName
+                         local  unsigned int nameLen
+                         local  const char* program
+                         local  unsigned int programLen
+ 1471  00535A04    2BC  void SendStackFramesToClient(const struct Lua* this, const char* dataTypeId)
+                         local  const struct <anon>* frames
+                         local  const unsigned int frameCount
+                         local  unsigned int bufferSize
+                         local  unsigned int i
+                         local  char* buffer
+                         local  char* bufferPtr
+                         local  enum TigerComErrorNum comError
+                         local  const unsigned int size
+                         inlines  TagValuePair, operator+
+ 1503  00534D44    2BC  void SendWatchesToClient(const struct Lua* this)
+                         local  const size_t watchBufferSize
+                         local  const char* watchBuffer
+                         local  char* watchPtr
+                         local  enum WatchError watchError
+                         local  unsigned int i
+                         local  size_t remainingSize
+                         local  size_t totalSize
+                         local  size_t length
+                         local  enum TigerComErrorNum comError
+                         inlines  TagValuePair, operator+
+ 1545  00533E6C     2C  static int FunctionHandler0(lua_State* luaState)
+ 1546  00533E40     2C  static int FunctionHandler1(lua_State* luaState)
+ 1547  00533E14     2C  static int FunctionHandler2(lua_State* luaState)
+ 1548  00533DE8     2C  static int FunctionHandler3(lua_State* luaState)
+ 1549  00533DBC     2C  static int FunctionHandler4(lua_State* luaState)
+ 1550  00533D90     2C  static int FunctionHandler5(lua_State* luaState)
+ 1551  00533D64     2C  static int FunctionHandler6(lua_State* luaState)
+ 1552  00533D38     2C  static int FunctionHandler7(lua_State* luaState)
+ 1553  00533D0C     2C  static int FunctionHandler8(lua_State* luaState)
+ 1554  00533CE0     2C  static int FunctionHandler9(lua_State* luaState)
+ 1556  00533CB4     2C  static int FunctionHandler10(lua_State* luaState)
+ 1557  00533C88     2C  static int FunctionHandler11(lua_State* luaState)
+ 1558  00533C5C     2C  static int FunctionHandler12(lua_State* luaState)
+ 1559  00533C30     2C  static int FunctionHandler13(lua_State* luaState)
+ 1560  00533C04     2C  static int FunctionHandler14(lua_State* luaState)
+ 1561  00533BD8     2C  static int FunctionHandler15(lua_State* luaState)
+ 1562  00533BAC     2C  static int FunctionHandler16(lua_State* luaState)
+ 1563  00533B80     2C  static int FunctionHandler17(lua_State* luaState)
+ 1564  00533B54     2C  static int FunctionHandler18(lua_State* luaState)
+ 1565  00533B28     2C  static int FunctionHandler19(lua_State* luaState)
+ 1567  00533AFC     2C  static int FunctionHandler20(lua_State* luaState)
+ 1568  00533AD0     2C  static int FunctionHandler21(lua_State* luaState)
+ 1569  00533AA4     2C  static int FunctionHandler22(lua_State* luaState)
+ 1570  00533A78     2C  static int FunctionHandler23(lua_State* luaState)
+ 1571  00533A4C     2C  static int FunctionHandler24(lua_State* luaState)
+ 1572  00533A20     2C  static int FunctionHandler25(lua_State* luaState)
+ 1573  005339F4     2C  static int FunctionHandler26(lua_State* luaState)
+ 1574  005339C8     2C  static int FunctionHandler27(lua_State* luaState)
+ 1575  0053399C     2C  static int FunctionHandler28(lua_State* luaState)
+ 1576  00533970     2C  static int FunctionHandler29(lua_State* luaState)
+ 1578  00533944     2C  static int FunctionHandler30(lua_State* luaState)
+ 1579  00533918     2C  static int FunctionHandler31(lua_State* luaState)
+ 1580  005338EC     2C  static int FunctionHandler32(lua_State* luaState)
+ 1581  005338C0     2C  static int FunctionHandler33(lua_State* luaState)
+ 1582  00533894     2C  static int FunctionHandler34(lua_State* luaState)
+ 1583  00533868     2C  static int FunctionHandler35(lua_State* luaState)
+ 1584  0053383C     2C  static int FunctionHandler36(lua_State* luaState)
+ 1585  00533810     2C  static int FunctionHandler37(lua_State* luaState)
+ 1586  005337E4     2C  static int FunctionHandler38(lua_State* luaState)
+ 1587  005337B8     2C  static int FunctionHandler39(lua_State* luaState)
+ 1589  0053378C     2C  static int FunctionHandler40(lua_State* luaState)
+ 1590  00533760     2C  static int FunctionHandler41(lua_State* luaState)
+ 1591  00533734     2C  static int FunctionHandler42(lua_State* luaState)
+ 1592  00533708     2C  static int FunctionHandler43(lua_State* luaState)
+ 1593  005336DC     2C  static int FunctionHandler44(lua_State* luaState)
+ 1594  005336B0     2C  static int FunctionHandler45(lua_State* luaState)
+ 1595  00533684     2C  static int FunctionHandler46(lua_State* luaState)
+ 1596  00533658     2C  static int FunctionHandler47(lua_State* luaState)
+ 1597  0053362C     2C  static int FunctionHandler48(lua_State* luaState)
+ 1598  00533600     2C  static int FunctionHandler49(lua_State* luaState)
+ 1600  005335D4     2C  static int FunctionHandler50(lua_State* luaState)
+ 1601  005335A8     2C  static int FunctionHandler51(lua_State* luaState)
+ 1602  0053357C     2C  static int FunctionHandler52(lua_State* luaState)
+ 1603  00533550     2C  static int FunctionHandler53(lua_State* luaState)
+ 1604  00533524     2C  static int FunctionHandler54(lua_State* luaState)
+ 1605  005334F8     2C  static int FunctionHandler55(lua_State* luaState)
+ 1606  005334CC     2C  static int FunctionHandler56(lua_State* luaState)
+ 1607  005334A0     2C  static int FunctionHandler57(lua_State* luaState)
+ 1608  00533474     2C  static int FunctionHandler58(lua_State* luaState)
+ 1609  00533448     2C  static int FunctionHandler59(lua_State* luaState)
+ 1611  0053341C     2C  static int FunctionHandler60(lua_State* luaState)
+ 1612  005333F0     2C  static int FunctionHandler61(lua_State* luaState)
+ 1613  005333C4     2C  static int FunctionHandler62(lua_State* luaState)
+ 1614  00533398     2C  static int FunctionHandler63(lua_State* luaState)
+ 1615  0053336C     2C  static int FunctionHandler64(lua_State* luaState)
+ 1616  00533340     2C  static int FunctionHandler65(lua_State* luaState)
+ 1617  00533314     2C  static int FunctionHandler66(lua_State* luaState)
+ 1618  005332E8     2C  static int FunctionHandler67(lua_State* luaState)
+ 1619  005332BC     2C  static int FunctionHandler68(lua_State* luaState)
+ 1620  00533290     2C  static int FunctionHandler69(lua_State* luaState)
+ 1622  00533264     2C  static int FunctionHandler70(lua_State* luaState)
+ 1623  00533238     2C  static int FunctionHandler71(lua_State* luaState)
+ 1624  0053320C     2C  static int FunctionHandler72(lua_State* luaState)
+ 1625  005331E0     2C  static int FunctionHandler73(lua_State* luaState)
+ 1626  005331B4     2C  static int FunctionHandler74(lua_State* luaState)
+ 1627  00533188     2C  static int FunctionHandler75(lua_State* luaState)
+ 1628  0053315C     2C  static int FunctionHandler76(lua_State* luaState)
+ 1629  00533130     2C  static int FunctionHandler77(lua_State* luaState)
+ 1630  00533104     2C  static int FunctionHandler78(lua_State* luaState)
+ 1631  005330D8     2C  static int FunctionHandler79(lua_State* luaState)
+ 1633  005330AC     2C  static int FunctionHandler80(lua_State* luaState)
+ 1634  00533080     2C  static int FunctionHandler81(lua_State* luaState)
+ 1635  00533054     2C  static int FunctionHandler82(lua_State* luaState)
+ 1636  00533028     2C  static int FunctionHandler83(lua_State* luaState)
+ 1637  00532FFC     2C  static int FunctionHandler84(lua_State* luaState)
+ 1638  00532FD0     2C  static int FunctionHandler85(lua_State* luaState)
+ 1639  00532FA4     2C  static int FunctionHandler86(lua_State* luaState)
+ 1640  00532F78     2C  static int FunctionHandler87(lua_State* luaState)
+ 1641  00532F4C     2C  static int FunctionHandler88(lua_State* luaState)
+ 1642  00532F20     2C  static int FunctionHandler89(lua_State* luaState)
+ 1644  00532EF4     2C  static int FunctionHandler90(lua_State* luaState)
+ 1645  00532EC8     2C  static int FunctionHandler91(lua_State* luaState)
+ 1646  00532E9C     2C  static int FunctionHandler92(lua_State* luaState)
+ 1647  00532E70     2C  static int FunctionHandler93(lua_State* luaState)
+ 1648  00532E44     2C  static int FunctionHandler94(lua_State* luaState)
+ 1649  00532E18     2C  static int FunctionHandler95(lua_State* luaState)
+ 1650  00532DEC     2C  static int FunctionHandler96(lua_State* luaState)
+ 1651  00532DC0     2C  static int FunctionHandler97(lua_State* luaState)
+ 1652  00532D94     2C  static int FunctionHandler98(lua_State* luaState)
+ 1653  00532D68     2C  static int FunctionHandler99(lua_State* luaState)
+ 1655  00532D3C     2C  static int FunctionHandler100(lua_State* luaState)
+ 1656  00532D10     2C  static int FunctionHandler101(lua_State* luaState)
+ 1657  00532CE4     2C  static int FunctionHandler102(lua_State* luaState)
+ 1658  00532CB8     2C  static int FunctionHandler103(lua_State* luaState)
+ 1659  00532C8C     2C  static int FunctionHandler104(lua_State* luaState)
+ 1660  00532C60     2C  static int FunctionHandler105(lua_State* luaState)
+ 1661  00532C34     2C  static int FunctionHandler106(lua_State* luaState)
+ 1662  00532C08     2C  static int FunctionHandler107(lua_State* luaState)
+ 1663  00532BDC     2C  static int FunctionHandler108(lua_State* luaState)
+ 1664  00532BB0     2C  static int FunctionHandler109(lua_State* luaState)
+ 1666  00532B84     2C  static int FunctionHandler110(lua_State* luaState)
+ 1667  00532B58     2C  static int FunctionHandler111(lua_State* luaState)
+ 1668  00532B2C     2C  static int FunctionHandler112(lua_State* luaState)
+ 1669  00532B00     2C  static int FunctionHandler113(lua_State* luaState)
+ 1670  00532AD4     2C  static int FunctionHandler114(lua_State* luaState)
+ 1671  00532AA8     2C  static int FunctionHandler115(lua_State* luaState)
+ 1672  00532A7C     2C  static int FunctionHandler116(lua_State* luaState)
+ 1673  00532A50     2C  static int FunctionHandler117(lua_State* luaState)
+ 1674  00532A24     2C  static int FunctionHandler118(lua_State* luaState)
+ 1675  005329F8     2C  static int FunctionHandler119(lua_State* luaState)
+ 1677  005329CC     2C  static int FunctionHandler120(lua_State* luaState)
+ 1678  005329A0     2C  static int FunctionHandler121(lua_State* luaState)
+ 1679  00532974     2C  static int FunctionHandler122(lua_State* luaState)
+ 1680  00532948     2C  static int FunctionHandler123(lua_State* luaState)
+ 1681  0053291C     2C  static int FunctionHandler124(lua_State* luaState)
+ 1682  005328F0     2C  static int FunctionHandler125(lua_State* luaState)
+ 1683  005328C4     2C  static int FunctionHandler126(lua_State* luaState)
+ 1684  00532898     2C  static int FunctionHandler127(lua_State* luaState)
+ 1831  00531ED4    294  void ExposeFunction(const struct Lua* this, const char* functionName, enum LuaType* paramTypes, enum LuaType returnType, unsigned int paramCount, void* functionPtr, void* blindPtr, const char* luaNamespace)
+ 1865  00531A98    28C  void ScriptError(const struct Lua* this, bool inFunction, const char* string)
+                         local  lua_Debug mainInfo
+                         local  unsigned int errorLength
+                         local  va_list args
+                         local  const char* source
+                         local  const char* sourceSlash
+ 1930  005308B0     54  void PushString(const struct Lua* this, const char* string)
+ 1936  00530904     64  void PushLString(const struct Lua* this, const char* string, size_t len)
+ 1943  00531E3C     54  void PushValue(const struct Lua* this, int idx)
+ 1950  00531A40     58  void PushCFunction(const struct Lua* this, void* func)
+ 1957  00531E90     44  void NewTable(const struct Lua* this)
+ 1963  00532208     54  void PushNumber(const struct Lua* this, double number)
+ 1969  0053225C     54  void PushBoolean(const struct Lua* this, int b)

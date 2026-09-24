@@ -1,0 +1,58 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/spktplay.cpp
+// compiled in: spktplay.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   90  006CA328     78  int SNDPKTPLAYI_gethighchannel(int chan, int channels)
+                         local  int highestchan
+                         local  int highestindex
+                         local  int i
+  110  006CA3A0     10  int SNDPKTPLAYI_overhead(int maxpackets)
+  130  006CA3B0      4  int SNDPKTPLAY_overhead(int maxpackets)
+  199  006CA3B4    1B4  int SNDPKTPLAY_create(void(*)()* preleasefunc, void(*)()* pframesfunc, void* pclientdata, void* pmem, int memsize)
+                         local  SNDPACKETCHAN* ppchan
+                         local  int packetinstancehandle
+                         local  int i
+  290  006CA568    5B8  int SNDPKTPLAY_start(int packetinstancehandle, SNDSAMPLEFORMAT* pssf, SNDSAMPLEATTR* pssa, SNDPLAYOPTS* pspo)
+                         local  SNDIPATCHHEADER ph
+                         local  SNDPACKETCHAN* ppchan
+                         local  int shandle
+                         local  int voice
+                         local  int ret
+                         local  int voicesneeded
+                         local  int i
+                         local  int done
+                         local  struct CHANPUB* pVoice
+                         local  struct CHANPUB* pSourceVoice
+                         local  struct CHANPUB* pSourceVoice
+                         inlines  FastVol
+  549  006CAB20    324  int SNDPKTPLAY_submit(int packetinstancehandle, SNDPACKET* psp)
+                         local  SNDPACKETCHAN* ppchan
+                         local  struct SNDPACKETENTRY* pentry
+                         local  int packethandle
+                         local  int i
+  629  006CAE44    18C  int SNDPKTPLAY_submitspace(int packetinstancehandle)
+                         local  SNDPACKETCHAN* ppchan
+                         local  int greatestOutstandingPackets
+                         local  int i
+  676  006CAFD0    150  int SNDPKTPLAY_framesoutstanding(int packetinstancehandle)
+                         local  SNDPACKETCHAN* ppchan
+  716  006CB22C    1B4  int SNDPKTPLAY_stop(int packetinstancehandle)
+                         local  SNDPACKETCHAN* ppchan
+                         local  int i
+                         inlines  SNDMEMI_free
+  767  006CB3E0     90  int SNDPKTPLAY_destroy(int packetinstancehandle)
+  793  006CB470    2E0  void* SNDPKTPLAYI_get(int packetinstancehandle, int chan, int* pframes, int* pcontinuation)
+                         local  SNDPACKETCHAN* ppchan
+                         local  struct SNDPACKETENTRY* pentry
+                         local  struct SNDPACKETENTRY* pspe
+                         local  int i
+                         local  int releaseFlag
+                         local  int increaseMaster
+                         local  SNDIPACKETCALLBACK* pspcb
+  910  006CB750     80  void SNDPKTPLAYI_freeframes(int packetinstancehandle, int chan, int frames)
+                         local  SNDPACKETCHAN* ppchan
+                         local  SNDIPACKETCALLBACK* pspcb
+  958  006CB120    10C  void SNDPKTPLAYI_flushcallbackdata()
+                         local  SNDPACKETCHAN* ppchan
+                         local  SNDIPACKETCALLBACK* pspcb
+                         local  int i

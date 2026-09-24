@@ -1,0 +1,95 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Shared/CrAP/CrAPSharedUtils.cpp
+// compiled in: other_unity.cpp
+// 23 functions, source order. line | PS3 address | size
+
+  110    inline-only   static void sVerifyBlendMapHasCorrectOrdering()
+                         local  int nMapSize
+                         local  int32 i
+  127  003E87A0     8C  static enum FemaleBlendShape_t LookupFemaleBlendIDFrom(enum BlendShape_t maleBlendShapeId)
+  141  003FD2A0    4B4  void CrAP_SetupTempBuffer(bool bones)
+                         local  const char[21] __FUNCTION__
+                         local  int i
+                         local  int j
+                         inlines  TagValuePair, operator+
+  187  003FD754    6A0  void CrAP_SetPresetDataFromStream(enum CrapPresetID_t id, char* dataPtr, int size_to_read)
+                         local  char* start_ptr
+                         local  char* cur_ptr
+                         local  int num_entries
+                         local  int golfer
+                         local  int bytes_read
+                         local  int i
+                         local  int index
+                         local  char* ptr
+                         local  int blendID
+                         local  enum BlendShape_t maleBlendID
+                         local  enum FemaleBlendShape_t femaleBlendID
+                         inlines  sVerifyBlendMapHasCorrectOrdering
+  324  003E882C     DC  float CrAP_GetBoneValue(int golfer, int preset_id, int bone_mod, int axis, float defaultValue)
+  341  003E8908     84  float CrAP_GetPresetData(int golfer, enum CrapPresetID_t preset_type, int preset_id, int aux, int aux2, float defaultValue)
+  363  003E898C     28  struct CrAPPresetBodySpec_t* CrAP_GetBodySpecInfo(int golfer)
+  368  003E89B4     28  struct CrAPPresetCharDesign_t* CrAP_GetCharDesign(int golfer)
+  372  003E89DC     2C  struct CrAPPresetEraWeathers_t* CrAP_GetEraWeather(int golfer)
+  377  003E8A08     18  struct CrAPPresetForGolfer* CrAP_GetGolferPresets()
+  382  003E8A20     B0  void CrAP_FreePresets()
+  403  003E8AD0     5C  void CrAP_FreeBonesBlends()
+  666  00411DB4     E0  bool CrapPresetReaderWriterDebug::OpenFileForWrite(const struct CrapPresetReaderWriterDebug* this, const char* filepathName)
+  681  00411E94     94  void CrapPresetReaderWriterDebug::CloseFile(const struct CrapPresetReaderWriterDebug* this)
+                         local  int nBytes
+  702  003E8C64     14  void CrapPresetReaderWriterDebug::WriteLnToFile(const struct CrapPresetReaderWriterDebug* this)
+  707  003E8B5C    108  void CrapPresetReaderWriterDebug::WriteLnToFile(const struct CrapPresetReaderWriterDebug* this, const char* fmtStr)
+                         local  int nBytes
+                         local  int bytesRemaining
+                         local  va_list ap
+  724  003E8C78    140  void CrapPresetReaderWriterDebug::WriteBlendShapes(const struct CrapPresetReaderWriterDebug* this, const struct TCharacter* pChar)
+                         local  const struct TSkin* pSkin
+                         local  const SkinMorphStateT* pMorphState
+                         local  const int nBlendListSize
+                         local  int iIndex
+                         local  enum BlendShape_t blendID
+                         local  int iTarget
+                         local  const char* blendShapeName
+                         local  float blendFactor
+                         local  enum FemaleBlendShape_t femBlendID
+  758  003E8DB8     4C  void CrapPresetReaderWriterDebug::WriteBoneTranslations(const struct CrapPresetReaderWriterDebug* this, const struct TCharacter* pChar)
+  772  0042AE7C     B0  const char* CrapPresetReaderWriterDebug::LookupAssetName(const const struct CrapPresetReaderWriterDebug* this, int equipListItemSlot, const int& assetID)
+                         local  const struct UserInfo& userInfo
+                         local  const char* assetName
+                         local  struct FE_CrAP_Asset_t* asset
+                         local  struct FE_CrAP_Asset_p pAsset
+                         inlines  FE_CrAP_Asset_p::FE_CrAP_Asset_p
+  792  0042B224    470  void CrapPresetReaderWriterDebug::WriteBodySpec(const struct CrapPresetReaderWriterDebug* this, struct TCharacter* pChar)
+                         local  float value
+                         local  int assetID
+                         local  const char* assetName
+                         local  int rulesCount
+                         local  int i
+                         local  struct TXRFile* pCurFile
+                         local  int nSliders
+                         local  int curSlider
+                         local  float value
+                         local  const char* sliderName
+                         inlines  TXRFile::NumSliders
+  869  003E8E04     4C  void CrapPresetReaderWriterDebug::WriteFixedFantasy(const struct CrapPresetReaderWriterDebug* this, struct TCharacter* pChar)
+  897  0042AF2C    2F8  void CrapPresetReaderWriterDebug::WriteErasAndWeather(const struct CrapPresetReaderWriterDebug* this, struct TCharacter* pChar)
+                         local  int shirtID
+                         local  int pantsID
+                         local  int shoesID
+                         local  int socksID
+                         local  int logoID
+                         local  const char* shirtName
+                         local  const char* pantsName
+                         local  const char* shoesName
+                         local  const char* socksName
+                         local  const char* logoName
+                         local  const int MAX_MISC_ITEMS
+                         local  const char*[4] miscName
+                         local  int[4] miscIds
+                         local  int curMiscCount
+                         local  int nMiscAssets
+                         local  int j
+                         local  int i
+                         local  int equipSlotIndex
+                         local  int assetID
+                         local  const char* curAsset
+  974  0042B694     C0  bool CrapPresetReaderWriterDebug::WriteOutToText(const struct CrapPresetReaderWriterDebug* this, struct TCharacter* pChar, const struct CrAPInfo_t* pCInfo, const char* filepathName)
+                         local  bool bSuccess

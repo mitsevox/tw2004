@@ -1,0 +1,12 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/././imageconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   61  006236CC      C  const char8_t* GetName(const const struct <anon>* this)
+   62  006236D8     10  uint32_t GetHeight(const const struct <anon>* this)
+   63  006236E8     10  uint32_t GetWidth(const const struct <anon>* this)
+   64  006236F8      8  const uint8_t* GetData(const const struct <anon>* this)
+   65  00623700      8  void SetRef1(const struct <anon>* this, void* pRef1)
+   66  00623708      8  void* GetRef1(const const struct <anon>* this)
+   67  00623710      8  void SetRef2(const struct <anon>* this, void* pRef2)
+   68  00623718      8  void* GetRef2(const const struct <anon>* this)

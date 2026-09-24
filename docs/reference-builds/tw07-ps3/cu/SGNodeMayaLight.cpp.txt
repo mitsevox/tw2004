@@ -1,0 +1,32 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/scenegraph/source/SceneGraph/Runtime/Nodes/SGNodeMayaLight.cpp
+// compiled in: SGNodeMayaLight.cpp
+// 14 functions, source order. line | PS3 address | size
+
+    0  008C9710    140  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  SGNodeMayaLightInfoC::SGNodeMayaLightInfoC, SGNodeMayaLightInfoC::~SGNodeMayaLightInfoC
+    0  008C997C      C  void SGNodeMayaLightInfoC::~SGNodeMayaLightInfoC(const struct SGNodeMayaLightInfoC* this)
+                         inlines  ~SGNodeInfoC
+   50  008C98EC     88  struct SGNodeC* SGNodeMayaLightInfoC::Create(const const struct SGNodeMayaLightInfoC* this)
+                         inlines  operator new
+   51  008C98D8      8  const char* SGNodeMayaLightInfoC::GetNodeTypeName(const const struct SGNodeMayaLightInfoC* this)
+   52    inline-only   NodeType_t SGNodeMayaLightInfoC::GetNodeTypeEnum(const const struct SGNodeMayaLightInfoC* this)
+   63  008C92BC     8C  void SGNodeMayaLightC(const struct <anon>* this)
+                         inlines  SetZero
+   79  008C93D4     BC  void ~SGNodeMayaLightC(const struct <anon>* this)
+                         inlines  operator delete
+  105  008C9490    280  struct SGNodeC* Clone(const struct <anon>* this, bool8_t recurse, NodeCloneUserDataCallback userDataCallback, struct SGNodeC* baseClone)
+                         local  const char[6] __FUNCTION__
+                         local  struct <anon>* clone
+                         inlines  RNADebugBreak, SGNodeC::GetNodeTypeEnum, operator new, operator=
+  141  008C8CF4      8  const struct SGNodeInfoC* GetNodeInfo(const const struct <anon>* this)
+  147  008C8CEC      8  const struct SGNodeInfoC* _GetNodeInfo()
+  158  008C8CFC    244  void SerializeIn(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[12] __FUNCTION__
+                         local  int32_t version
+                         local  int32_t iLightType
+                         local  int32_t iDecayRate
+                         inlines  RNADebugBreak
+  189  008C8F40    37C  void SerializeOut(const const struct <anon>* this, const struct OutStreamC& out)
+                         inlines  operator float
+  215  008C9860     10  static void _GLOBAL__I__ZN6SceneX16SGNodeMayaLightC16s_ClassAllocatorE()
+  216  008C9850     10  static void _GLOBAL__D__ZN6SceneX16SGNodeMayaLightC16s_ClassAllocatorE()

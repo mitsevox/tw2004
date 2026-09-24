@@ -1,0 +1,74 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/source/common/T3dbDebug.cpp
+// compiled in: T3dbDebug.cpp
+// 21 functions, source order. line | PS3 address | size
+
+    0  007F1B04    10C  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   79  007ED8CC    460  void DumpColLits(struct Table* pTable, struct <anon>* pColLit)
+                         local  const char[12] __FUNCTION__
+                         local  struct <anon> lock
+                         local  uint32_t count
+                         local  struct <anon>* pDef
+  134  007EDD2C    58C  void QryDumpColLits(struct QuerySearch* pQData, struct <anon>* pColLit, bool bDumpData)
+                         local  const char[15] __FUNCTION__
+                         local  struct <anon> lock
+                         local  uint32_t count
+                         local  uint32_t tblNum
+                         local  struct <anon>* pDef
+  206  007EE2B8    BD8  void QryDumpExpr(struct QuerySearch* pQData, uint32_t tblNum, struct ExprNode* pExpr)
+                         local  const char[12] __FUNCTION__
+                         local  struct <anon> lock
+                         local  char8_t* strOp
+  362  007EEE90    5C0  void QryDumpVal(struct QuerySearch* pQData, struct <anon>* val, uint32_t tblNum)
+                         local  const char[11] __FUNCTION__
+                         local  struct <anon> lock
+  435  007ED7E8     E4  void DumpRef(uint32_t ref)
+                         local  struct <anon> lock
+  464  007EF450    5E4  void QryDumpData(struct QuerySearch* pQData)
+                         local  struct <anon> lock
+                         local  uint32_t tblNum
+  535  007EFA34     B4  void DeleteRow(struct QuerySearch* pQData)
+                         local  struct <anon> lock
+  558  007EFAE8    178  void InsertRow(struct Table* pTable, struct <anon>* pColLitLst)
+                         local  struct <anon> lock
+  589  007EFC60    128  void Callback(struct QuerySearch* pQData, uint32_t callbackName, struct <anon>* pCallbackParams, uint16_t userParm)
+                         local  struct <anon> lock
+  614  007EFD88    14C  void TableRowCopy(struct Table* srcTable, struct Table* destTable)
+                         local  struct <anon> lock
+  641  007EFED4    114  void QryRowCopy(struct QuerySearch* pQData, struct <anon>* pSrcLits, struct Table* destTable)
+                         local  struct <anon> lock
+  667  007EFFE8    188  void SetRow(struct QuerySearch* pQData, struct <anon>* pColLitLst, bool8_t bSingleRow)
+                         local  struct <anon> lock
+  701  007F0170    2B4  void UpdateRows(struct QuerySearch* pQData, TableColRef* pTblColRefList, struct ExprNode** pUpdateList)
+                         local  struct <anon> lock
+                         local  int x
+  742  007F0424    218  void DumpTblGetCount(struct Table* pTable, struct ExprNode* pFilter)
+                         local  struct <anon> lock
+                         local  struct <anon> searchData
+  775  007F141C    6E8  void AnalyzeQuery(struct QuerySearch* pQData)
+                         local  const char[13] __FUNCTION__
+                         local  struct <anon> lock
+                         local  enum TDbError dbResult
+                         local  bool8_t oldSpammage
+                         local  struct ExprNode* pJoinExpr
+                         local  uint32_t tbl1Count
+                         local  uint32_t tbl2Count
+                         local  uint32_t tbl1Cycle
+                         local  uint32_t tbl2Cycle
+                         local  uint32_t startCycle
+                         local  uint32_t[2] tblMaps
+                         local  struct <anon> myData
+                         local  struct ExprNode* pTempNode
+  906  007F0990    88C  enum TDbError ExprCopyRemap(const struct ExprNode* pOrigExpr, struct ExprNode** ppNewExpr, uint32_t* tblMaps)
+                         local  const char[14] __FUNCTION__
+                         local  enum TDbError dbResult
+                         local  uint32_t tblNum
+                         local  uint32_t colNum
+ 1033  007F063C    354  struct ExprNode* ExprDetachJoin(struct ExprNode** ppExpr, uint32_t joinNum)
+                         local  struct ExprNode* pJoinNode
+                         local  struct ExprNode* pExpr
+ 1106  007F121C    200  enum TDbError QueryCheck(struct QuerySearch* pQData, uint32_t* rowCount)
+                         local  struct <anon> lock
+                         local  enum TDbError dbResult
+                         local  struct <anon> filterRes
+ 1145  007F1C10     3C  static void _GLOBAL__I__ZN2EA4T3db9T3dbDebug9sSpammageE()
+ 1146  007F1C4C     3C  static void _GLOBAL__D__ZN2EA4T3db9T3dbDebug9sSpammageE()

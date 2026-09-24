@@ -1,0 +1,65 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_OnlineGameAdvertisement.cpp
+// compiled in: apt_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+  101  00047994     44  void UIOnlineGameAdvertisement::SetWaitingForJoinGameResponse(const struct UIOnlineGameAdvertisement* this, bool waiting)
+  110  000479D8      8  bool UIOnlineGameAdvertisement::GetWaitingForJoinGameResponse(const struct UIOnlineGameAdvertisement* this)
+  115  000F4884     D0  void UIOnlineGameAdvertisement::UIOnlineGameAdvertisement(const struct UIOnlineGameAdvertisement* this)
+                         inlines  TExternArray<UIOnlineGameAdvertisement::DstMenuItem>::TExternArray
+  141  000F03D0     88  void UIOnlineGameAdvertisement::Init(const struct UIOnlineGameAdvertisement* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, FlashUpdateItem::SetFlashUpdateList
+  151  000479E0     44  void UIOnlineGameAdvertisement::ShowForArtIntegration(const struct UIOnlineGameAdvertisement* this)
+  158  00090334    C58  void UIOnlineGameAdvertisement::Show(const struct UIOnlineGameAdvertisement* this)
+                         local  char[32] text
+                         local  struct LobbyMatchupOSDK* pLobbyMatchup
+                         local  struct OnlineMatchParams* pParams
+                         local  char[32] sGameCreator
+                         local  struct User* pUser
+                         local  enum GM_ModeType_t gameMode
+                         local  int iRemapTee
+                         local  const struct InvitationIncoming* pInvitation
+                         local  char[128] sGameName
+                         local  struct <anon>* pStatStrategy
+                         local  int course
+                         local  struct GameSession* pGameSession
+                         local  struct GameUser* pHostUser
+                         inlines  List<OSDK::GameUser>::GetElementAt, LobbyMatchupOSDK::GetGameParamsRef, OnlineManagerOSDK::GetLobbyMatchup, UIOnlineGameAdvertisement::ShowMenu
+  345  00064038    1B4  void UIOnlineGameAdvertisement::OnShow(const struct UIOnlineGameAdvertisement* this)
+                         local  enum GM_CourseType_t course
+                         local  struct LobbyMatchupOSDK* pLobbyMatchup
+                         local  struct OnlineMatchParams* pParams
+                         local  struct GameSession* pGameSession
+                         local  struct User* pUser
+                         local  const struct InvitationIncoming* pInvitation
+                         local  char[60] szCommand
+                         local  struct IAptSubscriber* aptGameSub
+                         inlines  LobbyMatchupOSDK::GetGameParamsRef, OnlineManagerOSDK::GetLobbyMatchup
+  387  00047A24     9C  void UIOnlineGameAdvertisement::InitMenuParams(const struct UIOnlineGameAdvertisement* this)
+  397  00047AC0     C0  void UIOnlineGameAdvertisement::UpdateItemAndLabel(const struct UIOnlineGameAdvertisement* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem* dest
+  435  00047B80      C  void UIOnlineGameAdvertisement::Hide(const struct UIOnlineGameAdvertisement* this)
+  444  00081458    810  enum eAptHandleInput UIOnlineGameAdvertisement::HandleInput(const struct UIOnlineGameAdvertisement* this, int32 cID)
+                         local  int32 newIndex
+                         local  int32 oldIndex
+                         local  TI_STimeValue differenceInTime
+                         local  TI_STimeValue differenceInTime
+                         local  int32 selectedItem
+                         local  int row
+                         local  int newColumn
+                         local  int row
+                         local  int newColumn
+                         local  struct GameSession* pSession
+                         inlines  TI_fConvertTimeDifToSeconds
+  621  000641EC    170  bool UIOnlineGameAdvertisement::BlockCheckOK(const struct UIOnlineGameAdvertisement* this)
+                         local  struct LobbyMatchupOSDK* pLobbyMatchup
+                         local  struct OnlineMatchParams* pParams
+                         local  struct GameSession* pSession
+                         local  struct UIMemCardConfirmPopup* pConfirmPopup
+                         inlines  LobbyMatchupOSDK::GetGameParamsRef
+  676  0005CA20     70  void UIOnlineGameAdvertisement::BlockCheckNotOK(const struct UIOnlineGameAdvertisement* this)
+  684  000AE914     88  void UIOnlineGameAdvertisement::UpdateMenuItems(const struct UIOnlineGameAdvertisement* this)
+                         inlines  UIMenuBase::mMenu_StartUpdate_func
+  694  000AED24    13C  enum AptThreadReturnValue UIOnlineGameAdvertisement::UpdateMenuItemsThread(const struct UIOnlineGameAdvertisement* this)
+                         local  int i
+                         local  int32 old
+                         inlines  UIMenuBase::mMenu_UpdateNextElement_func

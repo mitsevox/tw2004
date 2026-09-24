@@ -1,0 +1,5 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/core/filesys/directory.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   98    inline-only   bool IsValid(const const struct <anon>* this)

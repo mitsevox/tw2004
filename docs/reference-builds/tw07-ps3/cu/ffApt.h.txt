@@ -1,0 +1,10 @@
+// ../../../../../TIGERCODE/Code/AptInterface/AptPackage/aptff/ffApt.h
+// compiled in: other_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   37  00421BF4    118  void CFontFusion::CFontFusion(const struct CFontFusion* this)
+                         local  int nError
+   38  003F5AF0      4  void CFontFusion::~CFontFusion(const struct CFontFusion* this)
+   45    inline-only   int CFontFusion::getNumFonts(const struct CFontFusion* this)
+   92    inline-only   void CFontFusion::operator delete(void* p, size_t size)
+   92    inline-only   void* CFontFusion::operator new(size_t size)

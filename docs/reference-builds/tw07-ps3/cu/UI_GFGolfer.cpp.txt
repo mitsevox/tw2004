@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_GFGolfer.cpp
+// compiled in: apt_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+    8  000F2908     4C  void UIGFGolfer::UIGFGolfer(const struct UIGFGolfer* this)
+   12  000F29A0     B8  void UIGFGolfer::~UIGFGolfer(const struct UIGFGolfer* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   16  0003805C     2C  void UIGFGolfer::Show(const struct UIGFGolfer* this)
+   25  00035EC0     40  void UIGFGolfer::TurnBackOnGolferMask()
+   30  00036094     40  void UIGFGolfer::TurnOffGolferMask()

@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_RivalsChallengeBoard.h
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   62  000FEC50      C  uint32 UIRivalsChBoard::GetSignature(const const struct UIRivalsChBoard* this)
+   73  000FEC64      8  int32 UIRivalsChBoard::GetSizeofArrayStruct(const struct UIRivalsChBoard* this)
+   78  000FEC6C     40  void UIRivalsChBoard::RegainFocus(const struct UIRivalsChBoard* this, uint32 )
+   79  000FECAC     40  void UIRivalsChBoard::LooseFocus(const struct UIRivalsChBoard* this, uint32 )

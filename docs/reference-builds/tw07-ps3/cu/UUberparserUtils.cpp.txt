@@ -1,0 +1,24 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/UUberparserUtils.cpp
+// compiled in: Legacy_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   60  0039504C     BC  void OrderedSubset::printElements(const struct OrderedSubset* this)
+                         local  int i
+   73  0037BF80     FC  void OrderedSubset::filter(const struct OrderedSubset* this, Predicate_t filterFunc)
+                         local  int numNewElements
+                         local  int i
+   89  0037C07C     34  void OrderedSubset::sort(const struct OrderedSubset* this, CompareFunc_t compareFunc)
+  124  0037C0B0     1C  static bool filterFunc(void* row)
+  130  0037C0CC     24  static bool isOdd(void* row)
+  136  0037C0F0     34  static int sortFunc(const void* row1, const void* row2)
+  148  00395020     2C  static void printRow(void* row)
+                         local  struct Test_t* t
+  156  003AF11C    230  int UUberparserUtilsTest()
+                         local  int numErrors
+                         local  bool success
+                         local  const int NUM_ELEMENTS
+                         local  struct Test_t[10] testTable
+                         local  struct Test_t* first
+                         local  struct Test_t* last
+                         local  struct OrderedSubset list
+                         inlines  OrderedSubset::operator[], OrderedSubset::setPrintFunc

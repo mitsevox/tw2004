@@ -1,0 +1,34 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLPrims.c
+// compiled in: Legacy_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   57  003839F4     38  void PR_vInitModule()
+                         inlines  PR_vSetCurrentTexture, PR_vSetCurrentUsage, PR_vSetDefaultCurrentColor
+   73  0037F370      4  void PR_vCloseModule()
+   82  003B9770    14C  void PR_vDrawQuad(float[4]* xpVertices_p, float[4]* xpColors_p, float[4]* xpUVs_p)
+                         local  const unsigned int PR_SPRITE_CONVERSION_VERTS
+                         local  float[4][4] xSpriteVerts
+                         local  float[4][4] xSpriteColors
+                         local  float[4][4] xSpriteUVs
+                         local  vec4flt* pSpriteUVs
+                         local  vec4flt* pSpriteColors
+                         local  float fRectLeft_p
+                         local  float fRectRight_p
+                         inlines  vec4flt_Copy, vec_ld, vec_st
+  195  003B75F0    380  void PR_vAddPrimsToDisplayList(enum LS_PrimType ePrim_p, float[4]* xpVertices_p, float[4]* xpColors_p, float[4]* xpUVs_p, unsigned int iNumberOfVertices_p)
+                         local  unsigned int vertexStride
+                         local  union <anon> vtxElementPtr
+                         local  const TextureInfo* pTexInfo
+                         local  unsigned int i
+  322  003A1EC8    13C  void PR_vAptAddPrimsToDisplayList_TexturedInColor(struct vtxStruct* aptVertices, unsigned int iNumberOfVertices_p, mat44flt* transformMatrix, float* transUV_2x4, enum eAptPrimTexturedSmoothType smooth, vec4flt* rgbaMul, vec4flt* rgbaAdd, TextureRef textureRef)
+  354  003A1DE0     E8  void PR_vAptAddPrimsToDisplayList_Textured(struct vtxStruct* aptVertices, unsigned int iNumberOfVertices_p, mat44flt* transformMatrix, float* transUV_2x4, enum eAptPrimTexturedSmoothType smooth)
+  384  003A1D50     90  void PR_vAptAddPrimsToDisplayList_NonTextured(struct vtxStruct* aptVertices, unsigned int iNumberOfVertices_p, mat44flt* transformMatrix)
+  406  003A1B98    1B8  void PR_vAptAddPrimsToDisplayList_NonTexturedInColor(struct vtxStruct* aptVertices, unsigned int iNumberOfVertices_p, mat44flt* transformMatrix, vec4flt* rgba)
+                         local  int32 gNBR_DRAW_SLOWLY_MAX
+                         local  int32 nbrToSubmitMax
+                         local  int32 nbrLeftToSubmit
+                         local  int32 index
+                         local  int32 nbrToSubmit
+                         local  struct vtxStruct* vertexIndex
+  457  003B67F0     C4  void PR_vAptAddPrimsToDisplayList_NonTexturedInColor(struct LS_VertexBuffer* pvb, unsigned int iNumberOfVertices_p, mat44flt* transformMatrix, vec4flt* rgba)
+  477  003B66A8    148  void PR_vAptAddPrimsToDisplayList_TexturedInColor(struct LS_VertexBuffer* pvb, unsigned int iNumberOfVertices_p, mat44flt* transformMatrix, float* transUV_2x4, enum eAptPrimTexturedSmoothType smooth, vec4flt* rgbaMul, vec4flt* rgbaAdd, TextureRef textureRef)

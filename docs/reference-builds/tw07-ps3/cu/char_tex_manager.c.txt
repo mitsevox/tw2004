@@ -1,0 +1,54 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/animation/char_tex_manager.c
+// compiled in: golf2_unity.cpp
+// 24 functions, source order. line | PS3 address | size
+
+   93  0013D0F0     28  int32 Char_Tex_GetNumTintsInList()
+   98  0013D118     70  struct DynTexList_t* Char_Tex_GetTintList()
+  106  0013D188     60  void Char_Tex_UpdateTintListDoneCount(unsigned int numDone)
+  112  0013D1E8     24  void Char_Tex_ResetTintList()
+  118  00183EA4    180  void Char_Tex_AddToTintList(const const struct HashString& TexID, unsigned int loadListIndex, float* pTint, int32 tintFormula)
+                         local  int32 i
+                         inlines  HashString::operator=, operator==
+  159    inline-only   static int32 sGetUserTextureIdx(const const struct HashString& TexID)
+                         local  char[17] name
+  178    inline-only   static char* sGetUserLogoTexturePtr(const const struct HashString& TexID, struct CrAPInfo_t* pCrapInfo)
+                         local  int32 iUserTextureIdx
+  229    inline-only   static void sApplyUserLogos(struct TCharacter* pCharacter, struct DynTexGroupT* pDynTex, struct CrAPInfo_t* pCrapInfo)
+                         local  int32 iTexture
+                         local  int32 nTextures
+                         local  char* pTexturePtr
+                         local  struct HashString TexID
+  262  00184024    1F0  void CopyCompositedTextures(struct TCharacter* pCharacter)
+                         local  int i
+                         local  int j
+                         local  struct TX_STextureGroupTexture* pTexture
+                         local  uint8* dataPtr
+                         inlines  operator==
+  287  0013D20C     30  void CharacterTex_FreeTextureInfo(struct TCharacter* pCharacter)
+  301  0013D23C     E0  void Character_AddTextureLoadRequest(struct TCharacter* pCharacter, LLDynTex_fnLoadCallbackT pBeginCallbackFunc, LLDynTex_fnLoadCallbackT pEndCallbackFunc)
+                         local  struct DynTexLoadRequestT* pRequest
+  335  0013D31C      4  void Character_ExecuteTextureSwapFE(struct TCharacter* pCharacter)
+  384  0013D320     F8  bool Character_BeginLoadTexturesCallbackIG(struct TCharacter* pCharacter)
+                         local  struct DynTexGroupT* pDynTex
+                         local  bool oldLockState
+  419  001D23D0     3C  bool Character_EndLoadTexturesCallbackIG(struct TCharacter* pCharacter)
+  442  001D2044    38C  bool Character_PostProcessTextureAfterLoading(struct TCharacter* pCharacter)
+                         local  int nextmipmap
+                         local  enum GolferState state
+                         local  bool oldLockState
+                         local  bool dashboardAutoUpdating
+                         inlines  GM_GetGolferUp, HashString::operator=, sApplyUserLogos, sGetUserLogoTexturePtr
+  531  00177778    148  bool Character_BeginLoadCompositeTexturesCallbackIG(struct TCharacter* pCharacter)
+                         local  struct DynTexGroupT* pDynTex
+                         local  struct FaceBlend faceBlender
+                         local  int32_t numTexToLoad
+                         local  struct HashString* loadList
+                         local  int i
+  562  0013D418      8  bool Character_EndLoadCompositeTexturesCallbackIG(struct TCharacter* pCharacter)
+  570  0013D420      4  void CharacterTex_PreCacheCRAPTextures(int32 modelID)
+  582  0013A8F0      4  void CharacterTex_Init()
+  586  0013A928      4  void CharacterTex_Close()
+  592  0013D424      4  void CharacterTex_TextureLoader()
+  607  0013D428     5C  void CharacterTex_PreHoleInit()
+  616  0013D488     38  void CharacterTex_WaitEndOfTextureLoader()
+  622  00132E70      4  void CharacterTex_StartStreamingNextPlayer()

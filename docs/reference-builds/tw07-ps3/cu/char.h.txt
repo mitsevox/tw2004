@@ -1,0 +1,31 @@
+// ../../../../../TIGERCODE/Code/Golf/Animation/Headers/char.h
+// compiled in: apt_unity.cpp, golf2_unity.cpp, other_unity.cpp
+// 19 functions, source order. line | PS3 address | size
+
+  156    inline-only   static OL_EBoundingVolumeResult OL_eTestBoundingSphere(OL_SSphere* spSphereInCamSpace_p, struct RC_SRenderCtx* spRenderCtx_p, OL_EBoundingVolumeTestRatio eBoundingVolumeTestRatio_p)
+                         local  OL_EBoundingVolumeResult eBoundingVolumeResult
+                         local  float fHalfFieldOfViewSinX
+                         local  float fHalfFieldOfViewCosX
+                         local  float fHalfFieldOfViewSinY
+                         local  float fHalfFieldOfViewCosY
+                         local  float fDot
+                         local  float fDotX
+                         local  float fDotY
+  404    inline-only   bool TCharacter::IsAsleep(const const struct TCharacter* this)
+  609    inline-only   OL_EBoundingVolumeResult Character_GetClipResult(struct TCharacter* pCharacter)
+  613    inline-only   OL_EBoundingVolumeResult Character_GetShadowClipResult(struct TCharacter* pCharacter)
+  644    inline-only   void Character_GetPosition(struct TCharacter* pCharacter, float* pos)
+  650    inline-only   bool Character_IsHuman(const struct TCharacter* pCharacter)
+  662    inline-only   mat44flt* Character_GetBoneMatrix_FromIndex(struct TCharacter* pCharacter, int32 boneIndex)
+  670    inline-only   void Character_GetBonePos_FromIndex(struct TCharacter* pCharacter, int32 boneIndex, float* pos)
+  679    inline-only   mat44flt* Character_GetBoneMatrix(struct TCharacter* pCharacter, enum ReferencedBoneID boneID)
+  684    inline-only   void Character_GetBonePos(struct TCharacter* pCharacter, enum ReferencedBoneID boneID, float* pos)
+  689    inline-only   bool Character_IsLeftHanded(struct TCharacter* pCharacter)
+  713    inline-only   float Character_GetTagTime(struct TCharacter* pCharacter, uint64 tag)
+  719    inline-only   bool Character_CheckTag(const struct TCharacter* pCharacter, uint64 tag)
+  725    inline-only   bool Character_IsTagValid(const struct TCharacter* pCharacter, uint64 tag)
+  736    inline-only   void Character_ResetTag(struct TCharacter* pCharacter, uint64 tag)
+  742    inline-only   int32 Character_IsAnimationDone(struct TCharacter* pCharacter)
+  746    inline-only   int32 Character_IsAnimationPaused(struct TCharacter* pCharacter)
+  750    inline-only   float Character_GetReplaySwingStartTime(struct TCharacter* pCharacter)
+  755    inline-only   float Character_GetAnimationTimeLeft(struct TCharacter* pCharacter)

@@ -1,0 +1,190 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/GoDynObj.c
+// compiled in: golf_unity.cpp
+// 60 functions, source order. line | PS3 address | size
+
+   99    inline-only   void LightData::Init(const struct LightData* this)
+  100    inline-only   void LightData::Close(const struct LightData* this)
+  170  0024D5CC     C4  static void DynObj_LoadPropModelfromStream(TStreamDataPtr pStream)
+                         inlines  GolfBall_LoadGeom
+  181  00215C94     44  void DynObj_RegisterStreamClients()
+  187  00215CD8     2C  void DynObj_UnRegisterStreamClients()
+  192  00243A70    298  void DynObj_InitModule()
+                         local  const char[18] __FUNCTION__
+                         local  int i
+                         inlines  LightData::Init, TagValuePair, operator+
+  221  0022B08C     88  void DynObj_CloseModule()
+  237  0028DA58     E0  void DynObj_InitGolfBallRenderSettings(bool bIndoor)
+                         local  struct HashString hash
+                         local  twShaderConstants* pShaderParams
+                         local  struct HashString hash
+                         local  twShaderConstants* pShaderParams
+                         inlines  HashString::HashString
+  290    inline-only   static void GolfBall_LoadGeom(TStreamDataPtr pStream)
+                         local  twGeom* pBallGeom
+  302  00215E38     28  void GolfBall_GetBallTextures(const TextureRef& colorMap, const TextureRef& normalMap)
+  308  00215E60     20  void GolfBall_SetBallTextures(TextureRef colorMap, TextureRef normalMap)
+  314  00215E80     80  void GolfBall_SetPlayerBallTextures(int32 playerIndex, TextureRef colorMap, TextureRef normalMap)
+  321    inline-only   void GolfBall_SetupEnvironmentMaps()
+  329  0025EB44    1F0  void GolfBall_ApplyMaterialPresets(twShaderConstants* pShaderParams)
+                         local  vec4flt diffuseColor
+                         local  vec4flt specularColor
+                         local  vec4flt gamma
+                         local  vec4flt bumpMapScale
+                         local  vec4flt specExtra
+                         local  vec4flt diffSpec
+                         local  vec4flt specFres
+                         local  vec4flt materialAmbient
+                         inlines  LLMath_Scale, __vec_make_from_scalar, __vec_mul, vec_ld
+  383  002BC030    1D8  void GolfBall_Render(float[4]* transform)
+                         local  mat44flt ident
+                         inlines  GolfBall_SetupEnvironmentMaps, LLMath_IdentifyMat, RC_vSetCurrentRenderCtxTransformationMatrix
+  443  002474B0     80  void DynObj_SetActiveFlagActor(struct GenericActor* pFlagActor)
+  452  00215F00     18  struct GenericActor* DynObj_GetActiveFlagActor()
+  457  0028DB38    634  void DynObj_InitForHole()
+                         local  int i
+                         local  int j
+                         local  vec4flt loc
+                         local  struct GenericActor* pDummyTee
+                         local  float[3] color
+                         local  const float[4]& flagLoc
+                         local  const char* flagTextName
+                         local  int id
+  548  00215F3C     1C  void DynObj_DeInitForHole()
+  554  00215F58      4  void DynObj_DeInitForFE()
+  559  0026E00C     9C  void DynObj_UpdateDynamicObjects()
+                         inlines  DynObj_UpdateBallShadows
+  571  00215F5C      4  void DynObj_RenderDynamicObjects(int iViewportID)
+  578  002F53A0     8C  static bool DynObj_bAltShotDrawBall(enum PlayerNumber_t PlayerID)
+                         inlines  GM_GetModeType
+  590    inline-only   static bool DynObj_bDrawBall(enum PlayerNumber_t PlayerID)
+                         local  uint32 lieID
+                         local  enum physicsBallState_t ballState
+  672    inline-only   static bool DynObj_bDrawShadow(enum PlayerNumber_t PlayerID)
+  699    inline-only   static bool DynObj_bDrawMarker(enum PlayerNumber_t PlayerID)
+  713  00300418    1A0  void DynObj_RenderBalls(int iViewportID)
+                         local  bool[4] boBallShadowDraw
+                         inlines  DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetZBufferMode, GM_GetModeType, Gcm::cellGcmSetBlendFunc, LF_vSetCurrentLightFogEnvironment, RC_vSetCurrentRenderCtxTransformationMatrix
+  757    inline-only   static void DynObj_UpdateBallShadows()
+                         local  int32 i
+  767  0030033C     DC  void DynObj_DrawBallShadows(bool* boBallShadowDraw)
+                         local  int32 i
+  778  002FB78C    108  void DynObj_DrawBallMarkers()
+                         local  int32 i
+                         inlines  DynObj_bDrawMarker, GM_GetModeType
+  793  00294998    140  void DynObj_PushLightingColor()
+                         local  int i
+                         inlines  LF_vGetLightColor, LF_vSetCurrentLightFogEnvironment, LLMath_Scale, __vec_make_from_scalar, __vec_mul
+  805  00294AD8    13C  void DynObj_PopLightingColor()
+                         local  int i
+                         inlines  LF_vSetCurrentLightFogEnvironment, LF_vSetLightColor, LLMath_Scale, __vec_mul
+  817  00250E74     2C  static void sDynObj_GetPushedColor(enum LI_ELightIndex index, float* color)
+                         inlines  vec4flt_Copy, vec_st
+  823  00294C14    7C4  void DynObj_ApplyLightingColor(float* color, bool bUseExtremeSpecular)
+                         local  float r
+                         local  float g
+                         local  float b
+                         local  vec4flt stripecolor
+                         local  vec4flt keyColor
+                         local  vec4flt stripecolor
+                         local  vec4flt keyColor
+                         inlines  LF_vSetCurrentLightFogEnvironment, LF_vSetLightColor, LLMath_Scale
+  882  002953D8    8C0  void DynObj_ApplyLightingColorForBalls_FE(float* color, bool bUseExtremeSpecular)
+                         local  float r
+                         local  float g
+                         local  float b
+                         local  vec4flt stripecolor
+                         local  vec4flt keyColor
+                         local  vec4flt stripecolor
+                         inlines  LF_vSetCurrentLightFogEnvironment, LF_vSetLightColor, LLMath_Scale, __vec_make_from_scalar, __vec_mul, vec_ld
+  951  002FB894   1390  void DynObj_DrawGolfBalls(bool* boBallShadowDraw)
+                         local  float pixelSize
+                         local  float scaleFactor
+                         local  vec4flt rotationAxis
+                         local  Quat rotQuat
+                         local  Quat endRot
+                         local  TObject* pBallBaseModel
+                         local  int i
+                         local  enum PlayerNumber_t PlayerID
+                         local  mat44flt ballRotMatrix
+                         local  TObject* pBallLogoModel
+                         local  TObject* pBallLogoModelSide
+                         local  TObject* pBallUpgradeModel
+                         local  vec4flt oldLocation
+                         local  bool bBallPosModified
+                         local  struct GoTemple* pTemple
+                         local  vec4flt ballScale2
+                         local  int8_t iViewController
+                         local  float yScale
+                         local  enum GolferState golferState
+                         local  struct PhysicsBall_t* pBall
+                         local  int catid
+                         local  vec4flt ballLocation
+                         local  int currentCourse
+                         local  int currentHole
+                         local  int histIndex
+                         local  vec4flt ballScale2
+                         local  float yScale
+                         local  vec4flt abDiffuseColor
+                         local  int numStrokes
+                         local  int par
+                         local  float deltaTime
+                         local  Quat ballRotQuat
+                         local  Quat ballRotQuat
+                         local  float offsetPct
+                         local  uint32 lieID
+                         local  float yOffset
+                         local  enum physicsBallState_t ballState
+                         inlines  Character_IsTagValid, DS_vSetAlphaTestMode, DS_vSetCullMode, DynObj_GetBallPixels, DynObj_bDrawBall, DynObj_bDrawShadow, Gcm::cellGcmSetAlphaFunc, LLMath_CopyMat34, LLMath_IdentifyMat, LLMath_Scale, LLMath_Scale3, Object_UpdateO2WComposed33, Singleton<GameModeDriverManager>::GetSingleton, Singleton<ShotHistory>::GetSingleton, __vec_make_from_scalar, __vec_mul, cGAME_GLOBALS::GetCharacterStyleBallID, vec3flt_Copy, vec4flt_Copy, vec_ld, vec_splat, vec_st
+ 1383    inline-only   static float DynObj_GetBallPixels(int player)
+                         local  vec4flt topOfBall
+                         local  vec4flt topToBottom
+                         local  vec4flt topOfBallInViewSpace
+                         local  vec4flt bottomOfBallInViewSpace
+                         local  vec4flt topOfBallInScreenSpace
+                         local  vec4flt bottomOfBallInScreenSpace
+                         local  float pixels
+                         local  float ballModelRadius
+                         local  struct RC_SRenderCtx* pRenderCtx
+                         local  struct CA_SCamera* spCamera_p
+ 1435  00215F68      4  void DynObj_DivotAdd(float* location, enum PlayerNumber_t PlayerID)
+ 1496  001ED228      4  void DynObj_ShotDivotHoleHide(float* location, enum PlayerNumber_t PlayerID)
+ 1512  001ED224      4  void DynObj_DivotHide(float* location, enum PlayerNumber_t PlayerID)
+ 1658  0029D774     FC  void DynObj_TeeHide(enum PlayerNumber_t PlayerID, bool hide)
+                         local  DynObj_sTeeMgr* pMgr
+                         inlines  Singleton<GolferStats>::GetSingleton
+ 1676  00215F6C     5C  bool DynObj_IsTeeAlive(enum PlayerNumber_t PlayerID)
+ 1682  0029D870    354  void DynObj_TeeAdd(float* location, enum PlayerNumber_t PlayerID, bool bSnap)
+                         local  DynObj_sTeeMgr* pMgr
+                         local  int i
+                         local  const float fRadPerSec
+                         inlines  LLMath_IdentifyMat, Singleton<GolferStats>::GetSingleton, vec4flt_Copy, vec_st
+ 1769  00215FC8     34  void DynObj_TeeStruck(enum PlayerNumber_t PlayerID)
+ 1774  00215FFC     14  const char* DynObj_GetGolfBallLogoTextureName(int32 index)
+ 1780  00216010      8  bool DynObj_IsEraGolfBallTexture(int32 ballID)
+ 1786  00215F60      8  bool DynObj_IsPlayerUsingEraGolfBall(int32 index)
+ 1792  00216018      8  bool DynObj_GetIsEraGolfBallUsed(int32 index)
+ 1798  00216020      8  int DynObj_GetEraGolfBallId(int index)
+ 1804  00216028      8  bool DynObj_GetAllPlayersUsingEraGolfBall()
+ 1810  00216030      8  int DynObj_GetGolfBallLogoIndex(const char* name)
+ 1817  0029DBC4     40  void* DynObj_AdjustTeeHeight(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 1825  00255CBC    31C  void DynObj_ApplyBallColorShiftAndScale()
+                         local  float[4] colorShift
+                         local  float[4] colorScale
+                         local  float[3] color
+                         local  int32 i
+                         local  int32 j
+ 1873  0028D714    344  void DynObj_LI_InitBallLightingEnvironment(struct LI_SLightingEnvironment* spLightingEnvironment_p, bool bIndoor)
+                         local  const float keyIntensity
+                         local  const float keyYaw
+                         local  const float keyPitch
+                         local  const float ambientIntensity
+                         local  struct GameXmlSettings xmlSettings
+                         local  struct LI_SLight* spLight
+ 1907  00216038     28  char* DynObj_GetBallTexPlaceHolderName(int index)
+ 1912  002637C0     70  void DynObj_InitBallForFE()
+                         inlines  vec4flt_Zero
+ 1924  002160F0     68  void DynObj_SetPinDisplay(bool display)
+ 1935  00216060     44  void DynObj_SetPinAlpha(float alpha)
+ 1946  002160A4     4C  bool DynObj_GetPinDisplay()
+ 1955  00216160    10C  void DynObj_SetFlagWindProperties(const char* flagAnim, float* windVector)
+                         local  float yaw

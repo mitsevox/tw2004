@@ -1,0 +1,31 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/ps3/hudconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   64  005C5A84      4  void ProcessComplete(const struct HudConcrete* this)
+   84  005D9308    188  void SysUtilCallback(uint64_t status, uint64_t param, void* userdata)
+                         local  struct HudConcrete* pHud
+                         local  uint32_t uNumElements
+                         local  struct HudObserver** pList
+                         local  uint32_t uNumElements
+                         local  struct HudObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  121  005CB8A0     6C  void DestroyMemoryContainer(const struct HudConcrete* this)
+                         local  struct MemoryStrategy* pMemoryStrategy
+  145  005C5A88     54  void FinishLogin(const struct HudConcrete* this)
+                         local  struct CellNetCtlNetStartDialogResult netstart_result
+                         local  int32_t ret
+  178  005ED304     B0  void HudConcrete(const struct HudConcrete* this)
+                         local  int32_t ret
+                         local  int32_t iSlot
+                         inlines  AddObserver
+  206  005E4BD8     A8  void ~HudConcrete(const struct HudConcrete* this)
+                         inlines  RemoveObserver
+  228  005CB90C     D8  void ShowLogin(const struct HudConcrete* this, uint32_t uNumSimultaneousLogins, bool bLocalSignInOnly)
+                         local  int32_t ret
+                         local  struct MemoryStrategy* pMemoryStrategy
+                         local  struct CellNetCtlNetStartDialogParam netstart_param
+  274  005C5ADC      8  struct Operation* ShowSendMessage(const struct HudConcrete* this, struct LoginSlot* pSlot, const char8_t* strUser, struct HudShowSendMessageCallback* pCallback)
+  303  005C5AE4      8  struct Operation* ShowProfile(const struct HudConcrete* this, struct LoginSlot* pSlot, const char8_t* strUser, struct HudShowProfileCallback* pCallback)
+  331  005C5AEC      4  void ShowFriendsList(const struct HudConcrete* this, struct LoginSlot* pSlot)
+  352  005C5AF0      4  void ShowPlayerReview(const struct HudConcrete* this, struct LoginSlot* pSlot, const char8_t* strUser)

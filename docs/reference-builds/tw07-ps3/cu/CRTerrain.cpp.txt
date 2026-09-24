@@ -1,0 +1,223 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/CRTerrain.cpp
+// compiled in: headgate_unity.cpp
+// 20 functions, source order. line | PS3 address | size
+
+   61  0034C4C4     14  struct TerModel* CRTerrain_GetTerrainModel()
+   66  00345EE8     18  unsigned int CRTerrain_GetNumMaterials()
+   71  00345F00    128  int CRTerrain_GetGrassMaterial(unsigned int index, struct TerFileMaterial* pMat)
+                         local  int grassIndex
+   95  00350484    1A4  void LoadTerrainDataFromMemory(unsigned char* streamData)
+                         local  unsigned int excludeFlags
+                         local  unsigned int noLightMapData
+                         local  unsigned int noOverlayData
+                         local  unsigned int noBaseTerrainData
+                         local  struct GoTemple* pTemple
+                         local  unsigned int noCloudShadowsData
+  151  0034BBA8     D8  void UnloadTerrainData()
+  172  00359490     84  static float DistanceToStrip(const struct TerStrip* pStrip, float* pos, float* selector, float* cameraDir)
+                         local  short int[8] intMinMax
+                         local  unsigned char[16] charSelector
+                         local  int[4] intMin
+                         local  int[4] intMax
+                         local  int[4] intBoxPoint
+                         local  float[4] floatBoxPoint
+                         local  float[4] floatPos
+                         local  float[4] floatStripToPos
+                         local  float[4] floatCameraDir
+                         local  float[4] projectedDir
+                         local  union <anon> len
+                         local  float result
+                         inlines  __fsel, vec_madd, vec_perm, vec_sub, vec_unpackh, vec_unpackl, vec_vcfsx
+  248  0034D66C     C0  static void CameraDirToSelector(float* dir, float* out)
+                         local  uint32[4] selector
+  270    inline-only   static float StripFadeDistance(struct TerDefaultMaterial* pMat, float hrShadowMapDist)
+  276  0034D72C    1D0  static void RenderTerrainMeshesWithColor()
+                         local  vec4flt color
+                         local  struct TerMesh* pMesh
+                         local  struct TerMesh* pMeshEndPoint
+                         local  struct TerStrip* pStrip
+                         local  struct TerStrip* pStripEndPoint
+                         local  float temp
+  325  00359514    270  static void RenderTerrainMeshesWithColorFromLOD()
+                         local  vec4flt cameraPos
+                         local  struct RC_SRenderCtx* renderCtx
+                         local  struct CA_SCamera* camera
+                         local  const mat44flt& cameraMat
+                         local  vec4flt cameraDir
+                         local  float hrShadowMapDist
+                         local  struct CRShadowMap* pShadowMap
+                         local  vec4flt selector
+                         local  vec4flt color
+                         local  struct TerMesh* pMesh
+                         local  struct TerMesh* pMeshEndPoint
+                         local  struct TerStrip* pStrip
+                         local  struct TerStrip* pStripEndPoint
+                         local  float distance
+                         local  struct TerDefaultMaterial* pMat
+                         local  float fadeDist
+                         inlines  StripFadeDistance, vec4flt_Copy, vec_ld
+  596  0036C2F0    634  static void DrawHiResStrips()
+                         local  struct CRShadowMap* pShadowMap
+                         local  float[2][4] myMCloudShadow
+                         local  vec4flt eyePoint
+                         local  struct GoTemple* pTemple
+                         local  bool bStructuresBlockingView
+                         local  struct TerMesh* lastMesh
+                         local  const float fadeDist
+                         local  int i
+                         local  struct HiResStripInfo* info
+                         local  const struct TerStrip* pStrip
+                         local  struct TerDefaultMaterial* pMat
+                         local  const bool bIsStructure
+                         local  struct TerDefaultMaterial* bTempleBottomMat
+                         local  float fadeDist
+                         local  float uvScale
+                         local  float[2][4] myMShadow
+                         local  float[4][4] myMShadowHR
+                         local  float[4][4] myGolferShadow
+                         local  vec4flt fogColor
+                         inlines  CRData::IsGolferObjstructedByStructure, CRManager::GetCRShadowMap, CRShadowMap::GetHRShadowFadeDist, CRShadowMap::GetShadowMapTexture, DS_vSetStencilEnable, DS_vSetStencilOp, DS_vSetStencilTest
+  780  0036BAA0    458  void RenderMeshWithCulling(struct TerMesh* pMesh, const TextureRef& prevBase, const TextureRef& prevLight, const TextureRef& prevOverlay, const TextureRef& prevHires, const const struct SFrustum& frustum, bool bStructuresBlockingView, bool forceLowLOD, float* cameraPos, float* selector, float* cameraDir)
+                         local  float hrShadowMapDist
+                         local  struct CRShadowMap* pShadowMap
+                         local  const uint32 numStrips
+                         local  const struct TerStrip* pStrips
+                         local  uint8[512] s_BITFIELD
+                         local  uint8* pBitField
+                         local  struct GoTemple* pTemple
+                         local  bool bRenderingTemple
+                         local  uint32 currStrip
+                         local  uint32 wordOffset
+                         local  uint32 bitOffset
+                         local  uint32 cullResult
+                         local  const struct TerStrip* pStrip
+                         local  struct TerDefaultMaterial* pMat
+                         local  const bool bIsStructure
+                         local  TextureRef ref
+                         local  float stripDistance
+                         local  float fadeDistance
+                         local  bool useHiShader
+                         local  unsigned int endianSwappedMatHash
+                         inlines  DS_vSetStencilEnable, DS_vSetStencilOp, DS_vSetStencilTest
+  928  0036BEF8    3F8  void RenderMeshNoCulling(struct TerMesh* pMesh, const TextureRef& prevBase, const TextureRef& prevLight, const TextureRef& prevOverlay, const TextureRef& prevHires, bool bStructuresBlockingView, bool forceLowLOD, float* cameraPos, float* selector, float* cameraDir)
+                         local  float hrShadowMapDist
+                         local  struct CRShadowMap* pShadowMap
+                         local  struct TerStrip* pStrip
+                         local  struct TerStrip* pStripEndPoint
+                         local  struct GoTemple* pTemple
+                         local  bool bRenderingTemple
+                         local  struct TerDefaultMaterial* pMat
+                         local  const bool bIsStructure
+                         local  TextureRef ref
+                         local  float stripDistance
+                         local  float fadeDistance
+                         local  bool useHiShader
+                         local  unsigned int endianSwappedMatHash
+                         inlines  DS_vSetStencilEnable, DS_vSetStencilOp, DS_vSetStencilTest
+ 1047  0036C924    434  static void OldRenderMeshWithCulling(struct TerMesh* pMesh, const TextureRef& prevBase, const TextureRef& prevLight, const TextureRef& prevOverlay, const TextureRef& prevHires, const const struct SFrustum& frustum, bool bStructuresBlockingView)
+                         local  const uint32 numStrips
+                         local  const struct TerStrip* pStrips
+                         local  struct GoTemple* pTemple
+                         local  uint8[512] s_BITFIELD
+                         local  uint8* pBitField
+                         local  uint32 currStrip
+                         local  uint32 wordOffset
+                         local  uint32 bitOffset
+                         local  uint32 cullResult
+                         local  const struct TerStrip* pStrip
+                         local  struct TerDefaultMaterial* pMat
+                         local  const bool bIsStructure
+                         local  TextureRef ref
+                         local  unsigned int endianSwappedMatHash
+                         local  float fadeDist
+                         local  float uvScale
+                         inlines  DS_vSetStencilEnable, DS_vSetStencilOp, DS_vSetStencilTest
+ 1189    inline-only   static void OldRenderMeshNoCulling(struct TerMesh* pMesh, const TextureRef& prevBase, const TextureRef& prevLight, const TextureRef& prevOverlay, const TextureRef& prevHires, bool bStructuresBlockingView)
+                         local  struct TerStrip* pStrip
+                         local  struct TerStrip* pStripEndPoint
+                         local  struct GoTemple* pTemple
+                         local  struct TerDefaultMaterial* pMat
+                         local  const bool bIsStructure
+                         local  TextureRef ref
+                         local  unsigned int endianSwappedMatHash
+                         local  float fadeDist
+                         local  float uvScale
+ 1319  003774F8    89C  static void OldRenderTerrain()
+                         local  struct CRShadowMap* pShadowMap
+                         local  float[2][4] myMCloudShadow
+                         local  vec4flt eyePoint
+                         local  struct GoTemple* pTemple
+                         local  bool bStructuresBlockingView
+                         local  struct TerMesh* pMesh
+                         local  struct TerMesh* pMeshEndPoint
+                         local  TextureRef prevBase
+                         local  TextureRef prevLight
+                         local  TextureRef prevOverlay
+                         local  TextureRef prevHires
+                         local  struct SFrustum frustum
+                         local  const float fadeDist
+                         local  float[2][4] myMShadow
+                         local  float[4][4] myMShadowHR
+                         local  float[4][4] myGolferShadow
+                         local  enum ClipTest clipTest
+                         inlines  CRManager::GetCRShadowMap, CRShadowMap::GetHRShadowFadeDist, CRShadowMap::GetShadowMapTexture, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetStencilEnable, DS_vSetStencilOp, DS_vSetStencilTest, OldRenderMeshNoCulling
+ 1449  00377D94    668  void RenderTerrain(bool forceLowLOD)
+                         local  struct CRShadowMap* pShadowMap
+                         local  float[2][4] myMCloudShadow
+                         local  vec4flt eyePoint
+                         local  struct GoTemple* pTemple
+                         local  bool bStructuresBlockingView
+                         local  struct RC_SRenderCtx* renderCtx
+                         local  struct CA_SCamera* camera
+                         local  const mat44flt& cameraMat
+                         local  vec4flt cameraPos
+                         local  vec4flt cameraDir
+                         local  vec4flt selector
+                         local  struct TerMesh* pMesh
+                         local  struct TerMesh* pMeshEndPoint
+                         local  TextureRef prevBase
+                         local  TextureRef prevLight
+                         local  TextureRef prevOverlay
+                         local  TextureRef prevHires
+                         local  struct SFrustum frustum
+                         local  const float fadeDist
+                         local  float[2][4] myMShadow
+                         local  float[4][4] myMShadowHR
+                         local  float[4][4] myGolferShadow
+                         local  enum ClipTest clipTest
+                         inlines  CRManager::GetCRShadowMap, CRShadowMap::GetHRShadowFadeDist, CRShadowMap::GetShadowMapTexture, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetStencilEnable, DS_vSetStencilOp, DS_vSetStencilTest, vec4flt_Copy, vec_ld
+ 1706  003783FC    510  void CRTerrain_PostRender()
+                         local  vec4flt eyePoint
+                         local  struct CRShadowMap* pShadowMap
+                         local  const unsigned char alphaTestRef
+                         local  struct SFrustum frustum
+                         local  struct GoTemple* pTemple
+                         local  int j
+                         local  struct TerMesh* pMesh
+                         local  struct TerMesh* pMeshEndPoint
+                         local  struct TerStrip* pStrip
+                         local  struct TerStrip* pStripEndPoint
+                         local  struct TerDefaultMaterial* pMat
+                         local  const bool bIsStructure
+                         local  enum ClipTest clipTest
+                         local  unsigned int endianSwappedMatHash
+                         inlines  CRManager::GetCRShadowMap, CRShadowMap::GetShadowMapTexture, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetCullMode, SFrustum::cullAABBStrip, vec_unpackh, vec_unpackl, vec_vcfsx
+ 1865  0036205C    340  void CRTerrain_DrawForGrassClipping(enum TerrainRenderFlags what, bool bSetLightMapTexture, float[4]* pShadowMat, vec4flt* pMin, vec4flt* pMax)
+                         local  TextureRef curLightmap
+                         local  struct TerMesh* pMesh
+                         local  struct TerMesh* pMeshEndPoint
+                         local  struct SFrustum frustum
+                         local  struct TerStrip* pStrip
+                         local  struct TerStrip* pStripEndPoint
+                         local  struct TerDefaultMaterial* pMat
+                         local  bool bRender
+                         local  enum ClipTest clipTest
+                         inlines  SFrustum::cullAABBStrip
+ 1951  0034C4D8    374  void CRTerrain_GetMinMax(bool structsOnly, float* minX, float* minY, float* minZ, float* maxX, float* maxY, float* maxZ)
+                         local  vec4flt max
+                         local  vec4flt min
+                         local  struct TerMesh* pMesh
+                         local  struct TerMesh* pMeshEndPoint
+                         local  struct TerStrip* pStrip
+                         local  struct TerStrip* pStripEndPoint
+                         inlines  LLMath_MaxVec4, LLMath_MinVec4, vec_min

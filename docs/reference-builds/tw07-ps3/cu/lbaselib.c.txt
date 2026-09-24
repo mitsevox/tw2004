@@ -1,0 +1,88 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/lua-5.0.2/src/lib/lbaselib.c
+// compiled in: lbaselib.c
+// 41 functions, source order. line | PS3 address | size
+
+   30  00554498    164  static int luaB_print(lua_State* L)
+                         local  int n
+                         local  int i
+                         local  const char* s
+   51  005545FC    1B4  static int luaB_tonumber(lua_State* L)
+                         local  int base
+                         local  const char* s1
+                         local  char* s2
+                         local  long unsigned int n
+   79  005547B0    100  static int luaB_error(lua_State* L)
+                         local  int level
+   93  005548B0     98  static int luaB_getmetatable(lua_State* L)
+  104  00554948     D4  static int luaB_setmetatable(lua_State* L)
+                         local  int t
+  117  00554A1C    194  static void getfunc(lua_State* L)
+                         local  lua_Debug ar
+                         local  int level
+  133  00554BB0     88  static int aux_getfenv(lua_State* L)
+  141  00554C38     50  static int luaB_getfenv(lua_State* L)
+  149  00554C88    138  static int luaB_setfenv(lua_State* L)
+  165  00554DC0     6C  static int luaB_rawequal(lua_State* L)
+  173  00554E2C     5C  static int luaB_rawget(lua_State* L)
+  180  00554E88     6C  static int luaB_rawset(lua_State* L)
+  189  00554EF4     80  static int luaB_gcinfo(lua_State* L)
+  196  00554F74     64  static int luaB_collectgarbage(lua_State* L)
+  202  00554FD8     68  static int luaB_type(lua_State* L)
+  209  00555040     78  static int luaB_next(lua_State* L)
+  221  005550B8     88  static int luaB_pairs(lua_State* L)
+  231  00555140    12C  static int luaB_ipairs(lua_State* L)
+                         local  lua_Number i
+  250  0055526C     54  static int load_aux(lua_State* L, int status)
+  261  005552C0     80  static int luaB_loadstring(lua_State* L)
+                         local  size_t l
+                         local  const char* s
+                         local  const char* chunkname
+  269  00555340     54  static int luaB_loadfile(lua_State* L)
+                         local  const char* fname
+  275  00555394     AC  static int luaB_dofile(lua_State* L)
+                         local  const char* fname
+                         local  int n
+                         local  int status
+  285  00555440     B0  static int luaB_assert(lua_State* L)
+  294  005554F0     D4  static int luaB_unpack(lua_State* L)
+                         local  int n
+                         local  int i
+  305  005555C4     90  static int luaB_pcall(lua_State* L)
+                         local  int status
+  315  00555654     A0  static int luaB_xpcall(lua_State* L)
+                         local  int status
+  327  005556F4    224  static int luaB_tostring(lua_State* L)
+                         local  char[128] buff
+  364  00555918    178  static int luaB_newproxy(lua_State* L)
+                         local  int validproxy
+  416  00555A90     AC  static const char* getpath(lua_State* L)
+                         local  const char* path
+  432    inline-only   static const char* pushnextpath(lua_State* L, const char* path)
+                         local  const char* l
+  443    inline-only   static void pushcomposename(lua_State* L)
+                         local  const char* path
+                         local  const char* wild
+                         local  int n
+  460  00555B3C    44C  static int luaB_require(lua_State* L)
+                         local  const char* path
+                         local  int status
+                         inlines  pushcomposename, pushnextpath
+  548  00555F88    11C  static int auxresume(lua_State* L, lua_State* co, int narg)
+                         local  int status
+                         local  int nres
+  568  005560A4    100  static int luaB_coresume(lua_State* L)
+                         local  lua_State* co
+                         local  int r
+  586  005561A4     E0  static int luaB_auxwrap(lua_State* L)
+                         local  lua_State* co
+                         local  int r
+  601  00556284     B8  static int luaB_cocreate(lua_State* L)
+                         local  lua_State* NL
+  611  0055633C     50  static int luaB_cowrap(lua_State* L)
+  618  0055638C     40  static int luaB_yield(lua_State* L)
+  623  005563CC    124  static int luaB_costatus(lua_State* L)
+                         local  lua_State* co
+                         local  lua_Debug ar
+  651    inline-only   static void base_open(lua_State* L)
+  672  005564F0    1A8  int luaopen_base(lua_State* L)
+                         inlines  base_open

@@ -1,0 +1,65 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/lua-5.0.2/src/lundump.c
+// compiled in: lundump.c
+// 21 functions, source order. line | PS3 address | size
+
+   30  0054F078     3C  static void unexpectedEOZ(LoadState* S)
+   35  0054F0B4     A4  static int ezgetc(LoadState* S)
+                         local  int c
+   42  0054F158     58  static void ezread(LoadState* S, void* b, int n)
+                         local  int r
+   48  0054F1B0     B8  static void LoadBlock(LoadState* S, void* b, size_t size)
+                         local  char* p
+                         local  int n
+   60  0054F268    124  static void LoadVector(LoadState* S, void* b, int m, size_t size)
+                         local  char* q
+                         local  char* p
+                         local  int n
+   77  0054F38C     84  static int LoadInt(LoadState* S)
+                         local  int x
+   85    inline-only   static size_t LoadSize(LoadState* S)
+                         local  size_t x
+   92  0054F410     2C  static lua_Number LoadNumber(LoadState* S)
+                         local  lua_Number x
+   99  0054F43C     94  static TString* LoadString(LoadState* S)
+                         local  size_t size
+                         local  char* s
+                         inlines  LoadSize
+  112    inline-only   static void LoadCode(LoadState* S, Proto* f)
+                         local  int size
+  120    inline-only   static void LoadLocals(LoadState* S, Proto* f)
+                         local  int i
+                         local  int n
+  134    inline-only   static void LoadLines(LoadState* S, Proto* f)
+                         local  int size
+  142    inline-only   static void LoadUpvalues(LoadState* S, Proto* f)
+                         local  int i
+                         local  int n
+  156    inline-only   static void LoadConstants(LoadState* S, Proto* f)
+                         local  int i
+                         local  int n
+                         local  TObject* o
+                         local  int t
+                         local  TObject* i_o
+                         local  TObject* i_o
+  188  0054F4D0    434  static Proto* LoadFunction(LoadState* S, TString* p)
+                         local  Proto* f
+                         local  TObject* o
+                         local  int t
+                         local  TObject* i_o
+                         local  TObject* i_o
+                         inlines  LoadCode, LoadConstants, LoadLines, LoadLocals, LoadUpvalues
+  208    inline-only   static void LoadSignature(LoadState* S)
+                         local  const char* s
+  216  0054F904     7C  static void TestSize(LoadState* S, int s, const char* what)
+                         local  int r
+  227    inline-only   static void LoadHeader(LoadState* S)
+                         local  int version
+                         local  lua_Number x
+                         local  lua_Number tx
+  255    inline-only   static Proto* LoadChunk(LoadState* S)
+  264  0054F994    24C  Proto* luaU_undump(lua_State* L, ZIO* Z, Mbuffer* buff)
+                         local  LoadState S
+                         local  const char* s
+                         inlines  LoadChunk
+  283  0054F980     14  int luaU_endianness()
+                         local  int x

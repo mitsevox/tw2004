@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/ps3/LLRTClock_PS3.c
+// compiled in: Legacy_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   22  0037CB8C     40  bool RTClock_GetCurrentTime(int* pMonth, int* pDay, int* pYear, int* pHour, int* pMinute, int* pSecond, int* pMillisecond)

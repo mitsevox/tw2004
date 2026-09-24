@@ -1,0 +1,138 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/frontend/FE_Calendar.c
+// compiled in: apt_unity.cpp
+// 50 functions, source order. line | PS3 address | size
+
+  235  00010664     34  void Online_Init()
+  242  00010698      8  bool Online_AtEarliest()
+  251  000106A0      8  bool Online_AtLatest()
+  260  000106A8      8  int Online_FillCell(char* dayCellText, size_t dayCellTextBufLen, CalendarDate date, int* cellColor, int* cellState)
+  351  000106B0      4  void Online_GetLine(int lineIndex, char* lineText, size_t lineTextBufLen)
+  427  000106B4      4  void Online_GetBottomLine(CalendarDate date, int lineIndex, char* lineText, size_t lineTextBufLen)
+  450  000106B8      8  int Online_GetVal(int lineIndex)
+  500  000106C0      8  int Online_GetPopupType(CalendarDate date)
+  527  000106C8      4  void Online_GetPopupRow(int row, char* title, size_t titleBufLen, char* text, size_t textBufLen)
+  972  000106CC     28  CalendarDate Online_GetCurrentDay()
+  989  000106F4     14  const char* Online_GetEventName(CalendarDate date)
+ 1009  00010708      4  void Online_Play()
+ 1017  0001070C      8  bool Online_IsSimulationNecessary()
+ 1024  00010714     68  void GetCurMonthRange_ServerEvents(CalendarDate* startDate, uint32* totalDays)
+ 1033  0001077C     34  void PGATour_Init()
+ 1040  000107B0     7C  bool PGATour_AtEarliest()
+                         local  uint32 month
+                         local  uint32 day
+                         local  uint32 year
+ 1050  0001082C     7C  bool PGATour_AtLatest()
+                         local  uint32 month
+                         local  uint32 day
+                         local  uint32 year
+ 1060  00010A24     FC  void PGATour_GetLine(int lineIndex, char* lineText, size_t lineTextBufLen)
+ 1102  00010B20    12C  void PGATour_GetBottomLine(CalendarDate date, int lineIndex, char* lineText, size_t lineTextBufLen)
+                         local  const char* eventName
+                         local  GM_PgaTourEventID_t eventID
+                         local  int32 eventDayNum
+ 1122  00010C4C      8  int PGATour_GetVal(int lineIndex)
+ 1127    inline-only   static void GetRankText(int rank, char* rankStr, size_t rankStrBufLen)
+ 1152  00010C54    420  int PGATour_FillCell(char* dayCellText, size_t dayCellTextBufLen, CalendarDate date, int* cellColor, int* cellState)
+                         local  GM_PgaTourEventID_t eventID
+                         local  int32 eventDayNum
+                         local  int32 curEventDayNum
+                         local  const struct GM_PgaTour_EventSlot_t* eventInfo
+                         local  int32 dummy
+                         local  uint32 month
+                         local  uint32 day
+                         local  uint32 year
+                         local  int32 yearIndex
+                         local  bool onCurrentTournament
+                         local  int rank
+                         inlines  GetRankText
+ 1248  00011074    1F0  int PGATour_GetPopupType(CalendarDate date)
+                         local  GM_PgaTourEventID_t cursorEventID
+                         local  GM_PgaTourEventID_t currentEventID
+                         local  int32 currentDayNum
+                         local  int32 cursorDayNum
+                         local  CalendarDate next
+                         local  CalendarDate cursor
+                         local  uint32 month
+                         local  uint32 day
+                         local  uint32 year
+                         local  int32 yearIndex
+ 1296  000133D0    2FC  void PGATour_GetPopupRow(int row, char* title, size_t titleBufLen, char* text, size_t textBufLen)
+                         local  CalendarDate startDate
+                         local  CalendarDate endDate
+                         local  GM_PgaTourEventID_t eventID
+                         local  int32 dayNum
+                         local  char[11] startDateStr
+                         local  char[11] endDateStr
+ 1343  00011264     A8  CalendarDate PGATour_GetCurrentDay()
+                         local  CalendarDate date
+                         local  int32 dayNum
+                         local  GM_PgaTourEventID_t eventID
+ 1358  0001130C     8C  const char* PGATour_GetEventName(CalendarDate date)
+                         local  GM_PgaTourEventID_t eventID
+                         local  int32 dayNum
+ 1377  0002D318     90  void PGATour_Play()
+                         local  GM_PgaTourEventID_t eventID
+                         local  int32 dayNum
+ 1411  00011398     94  bool PGATour_IsSimulationNecessary()
+                         local  GM_PgaTourEventID_t eventID
+                         local  GM_PgaTourEventID_t selEventID
+                         local  int32 dayNum
+ 1428  0001142C     34  void RealTime_Init()
+ 1435  00011460     7C  bool RealTime_AtEarliest()
+                         local  uint32 month
+                         local  uint32 day
+                         local  uint32 year
+ 1445  000114DC     80  bool RealTime_AtLatest()
+                         local  uint32 month
+                         local  uint32 day
+                         local  uint32 year
+ 1455  0001155C     80  int RealTime_FillCell(char* dayCellText, size_t dayCellTextBufLen, CalendarDate date, int* cellColor, int* cellState)
+                         local  GM_RealtimeEventID_t eventID
+                         local  int eventDayNum
+                         local  const struct CalendarEntry_t* eventInfo
+ 1476  000115DC     F8  void RealTime_GetLine(int lineIndex, char* lineText, size_t lineTextBufLen)
+                         local  char[20] dayTimeStr
+ 1501  000116D4      C  void RealTime_GetBottomLine(CalendarDate date, int lineIndex, char* lineText, size_t lineTextBufLen)
+ 1507  000116E0      8  int RealTime_GetVal(int lineIndex)
+ 1512  000116E8     A8  int RealTime_GetPopupType(CalendarDate date)
+                         local  bool completed
+ 1534  000516FC    1E0  void RealTime_GetPopupRow(int row, char* title, size_t titleBufLen, char* text, size_t textBufLen)
+                         local  char[11] date
+ 1574  00011790     28  CalendarDate RealTime_GetCurrentDay()
+ 1581  000117B8     68  const char* RealTime_GetEventName(CalendarDate date)
+                         local  GM_RealtimeEventID_t eventID
+                         local  int dayNum
+ 1598  000C839C     9C  void RealTime_Play()
+                         local  bool ok
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+ 1615  00011820      8  bool RealTime_IsSimulationNecessary()
+ 1627  000118EC    160  void ResetCalendarState()
+                         local  CalendarDate date
+                         local  uint32 month
+                         local  uint32 day
+                         local  uint32 year
+                         local  GM_PgaTourEventID_t eventID
+ 1672  000108A8    17C  void Calendar_GetEventNameLine(CalendarDate date, char* lineText, size_t lineTextBufLen)
+                         local  const char* eventName
+                         local  GM_PgaTourEventID_t eventID
+                         local  int32 eventDayNum
+ 1701  00011828     C4  void UpdateCalendarState()
+                         local  CalendarDate firstOfMonth
+                         local  enum CalendarMonth prevMonth
+                         local  uint32 prevMonthYear
+                         local  uint32 daysInMonth
+ 1729  00011A4C    144  CalendarDate GetDateFromCellIndex(uint32 gridCellIndex)
+                         local  CalendarDate date
+                         local  enum CalendarMonth month
+                         local  uint32 day
+                         local  uint32 year
+ 1772    inline-only   static bool IsAMonthAhead(uint32 month1, uint32 month2)
+ 1779    inline-only   static bool IsAMonthBehind(uint32 month1, uint32 month2)
+ 1788  00011B90    154  int32 GetCellIndexFromDate(CalendarDate date)
+                         local  uint32 month
+                         local  uint32 day
+                         local  uint32 year
+                         local  uint32 prevMonthDay
+                         inlines  IsAMonthAhead, IsAMonthBehind
+ 1828  00011CE4      8  bool GetCurrentOnlineTourn_PasswordProtected(bool playnow)
+ 1856  00011CEC      8  bool GetCurrentOnlineTourn_PasswordCheck(char* password)

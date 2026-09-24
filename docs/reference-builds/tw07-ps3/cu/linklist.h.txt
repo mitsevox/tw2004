@@ -1,0 +1,25 @@
+// C:/packages/rwaudiocore/2.08.01/include/rw/audio/core/private/linklist.h
+// compiled in: collection.cpp, decoderregistry.cpp, streampool.cpp, systemtimer.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   40    inline-only   void SetNext(const struct <anon>* this, struct <anon>* pnode)
+   45    inline-only   struct <anon>* GetNext(const struct <anon>* this)
+   62    inline-only   void SetNext(const struct <anon>* this, struct <anon>* pnode)
+   67    inline-only   void SetPrev(const struct <anon>* this, struct <anon>* pnode)
+   72    inline-only   struct <anon>* GetNext(const struct <anon>* this)
+   77    inline-only   struct <anon>* GetPrev(const struct <anon>* this)
+  154    inline-only   void Reset(const struct <anon>* this)
+  159    inline-only   bool IsEmpty(const struct <anon>* this)
+  164    inline-only   struct <anon>* GetHead(const struct <anon>* this)
+  169    inline-only   void Push(const struct <anon>* this, struct <anon>* pnode)
+  185    inline-only   struct <anon>* Pop(const struct <anon>* this)
+                         local  struct <anon>* pnode
+  204    inline-only   void Remove(const struct <anon>* this, struct <anon>* pnode)
+                         local  struct <anon>* ptempnode
+                         local  struct <anon>* ptempnode
+  254    inline-only   void Reset(const struct <anon>* this)
+  266    inline-only   struct <anon>* GetHead(const struct <anon>* this)
+  281    inline-only   void Push(const struct <anon>* this, struct <anon>* pnode)
+  298    inline-only   void PushTail(const struct <anon>* this, struct <anon>* pnode)
+  325    inline-only   struct <anon>* Pop(const struct <anon>* this)
+                         local  struct <anon>* pnode

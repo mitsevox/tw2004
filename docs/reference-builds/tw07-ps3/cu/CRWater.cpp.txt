@@ -1,0 +1,183 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/CRWater.cpp
+// compiled in: headgate_unity.cpp
+// 44 functions, source order. line | PS3 address | size
+
+  106    inline-only   static float sign(float x)
+  117  00350640     18  void LoadRunningWaterDataFromMemory(unsigned char* streamData)
+  122  00350628     18  void LoadStillWaterDataFromMemory(unsigned char* streamData)
+  127  0034BC94     14  void UnloadRunningWaterData()
+  132  0034BC80     14  void UnloadStillWaterData()
+  137  0034AC50     70  void BEMHandler::InvalidateDeviceObjects(const struct BEMHandler* this)
+  143  0034CF70     EC  int BEMHandler::RestoreDeviceObjects(const struct BEMHandler* this)
+                         local  TextureFormat defaultFormat
+                         local  TextureOptions opts
+  170  0034D05C      C  int BEMHandler::Initialize(const struct BEMHandler* this, const unsigned int width, const unsigned int height)
+  178  0034BCE4     80  void BEMHandler::SetupEnvMapRenderPass(const struct BEMHandler* this)
+  187  0034BD64     80  void BEMHandler::SetupUnderwaterMapRenderPass(const struct BEMHandler* this)
+  199  00374534    5D4  void BEMHandler::BeginPondRenderPass(const struct BEMHandler* this, const float[4][4]& matWVP, const float[4][4]& matTexture, const float[4]& vecCameraPos, const float[4]& vecLight)
+                         local  mat44flt matProjTexture
+                         local  float TexDistH
+                         local  float rippleScale
+                         local  mat44flt matRipple
+                         local  vec4flt vecWind1
+                         local  vec4flt vecWind2
+                         local  mat44flt m1
+                         local  mat44flt m2
+                         local  vec4flt light
+                         local  vec4flt vecSpecColor
+                         local  vec4flt eyePoint
+                         inlines  DS_vSetAlphaTestMode, DS_vSetCullMode, LLMath_IdentifyMat, LLMath_Scale, LLMath_mat44fltMultiply33, __vec_make_from_scalar, __vec_mul, vec_ld, vec_madd, vec_splat, vec_st
+  297  0034BDE4     38  void BEMHandler::ResolveRenderTarget(const struct BEMHandler* this)
+  306  0034BE1C     38  void BEMHandler::RestoreRenderTarget(const struct BEMHandler* this)
+  314  00374B08     74  void BEMHandler::EndPondRenderPass(const struct BEMHandler* this)
+                         inlines  DS_vSetAlphaTestMode, DS_vSetCullMode
+  327  0034BE54     1C  float clamp(float val, float min, float max)
+  339  0035BD24    11C  float BEMHandler::ComputeOceanWaveHeight(const struct BEMHandler* this, float U, float V)
+                         local  float[2] UVMult
+                         local  float[2] UVmod
+                         local  float wave_dir_val
+                         local  float wave_phase
+                         local  float temp_var
+                         local  float wave_def
+                         local  float wave_id
+                         local  float wave_side_offset
+                         local  float testAmpSide
+                         local  float uv_wave_amp
+                         local  float new_wave_amp
+                         local  float disp
+                         inlines  std::sinf
+  384  0034BE70     80  void BEMHandler::SetBaseOceanTextures(const struct BEMHandler* this, struct TerWaterMaterial* pMat, const struct SM_WaterOceanBaseClass& shader)
+  393  0034BEF0     14  void BEMHandler::SetLoResOceanTextures(const struct BEMHandler* this, struct TerWaterMaterial* pMat)
+  398  0034BF04     68  void BEMHandler::SetHiResOceanTextures(const struct BEMHandler* this, struct TerWaterMaterial* pMat)
+  406  0034BF6C    20C  void BEMHandler::SetPondMaterialConstants(const struct BEMHandler* this, struct TerWaterMaterial* pMat)
+                         local  bool bStream
+                         local  float fTexCoordScale
+                         local  vec4flt vecTexOff0
+                         local  vec4flt vecTexOff1
+                         local  vec4flt vecTexOff2
+                         local  vec4flt waterColor
+                         local  vec2flt offset
+                         local  vec2flt offset1
+                         local  vec2flt offset2
+  456  0034C178     D8  void BEMHandler::SetPondTextures(const struct BEMHandler* this, struct TerWaterMaterial* pMat)
+  475  00353224    4B8  int BEMHandler::BeginHiResOceanRenderPass(const struct BEMHandler* this, const float[4][4]& matWVP, const float[4][4]& matTexture, const float[4]& vecCameraPos, const float[4]& vecLight)
+                         local  vec4flt vec4WorldMin
+                         local  mat44flt matProjTexture
+                         local  unsigned int dwPCAFrame
+                         local  const int RedOffset
+                         local  const int GreenOffset
+                         local  const int BlueOffset
+                         local  float scale
+                         local  vec4flt vecPCAMean
+                         local  vec4flt vecPCA_R
+                         local  vec4flt vecPCA_G
+                         local  vec4flt vecPCA_B
+                         local  vec4flt eyePoint
+                         inlines  CTerrainMesh::GetWorldMin
+  581  003536DC    490  int BEMHandler::BeginLoResOceanRenderPass(const struct BEMHandler* this, const float[4][4]& matWVP, const float[4][4]& matTexture, const float[4]& vecCameraPos, const float[4]& vecLight)
+                         local  vec4flt vec4WorldMin
+                         local  mat44flt matProjTexture
+                         local  unsigned int dwPCAFrame
+                         local  const int RedOffset
+                         local  const int GreenOffset
+                         local  const int BlueOffset
+                         local  float scale
+                         local  vec4flt vecPCAMean
+                         local  vec4flt vecPCA_R
+                         local  vec4flt vecPCA_G
+                         local  vec4flt vecPCA_B
+                         local  vec4flt eyePoint
+                         inlines  CTerrainMesh::GetWorldMin
+  683  0034C250     38  int BEMHandler::EndHiResOceanRenderPass(const struct BEMHandler* this)
+  690  0034C288     38  int BEMHandler::EndLoResOceanRenderPass(const struct BEMHandler* this)
+  712  0034ADAC     44  void CROcean::CROcean(const struct CROcean* this)
+  723  0034C304     18  void CROcean::~CROcean(const struct CROcean* this)
+  728  00375034    214  void CROcean::Draw(const struct CROcean* this)
+                         local  const float[4][4]& matWVP
+                         local  const vec4flt& eyePos
+                         inlines  DS_vSetAlphaBlendingFunction, DS_vSetAlphaEnable, DS_vSetAlphaFunction, Gcm::cellGcmSetBlendFunc
+  785  00374B7C    238  void CROcean::Update(const struct CROcean* this, bool bCameraXZChanged, bool bCameraYChanged)
+                         inlines  BEMHandler::UpdateTime, DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetCullMode, DS_vSetZBufferMode
+  862  00351808    150  void CROcean::LoadHole(const struct CROcean* this)
+                         local  bool dashboardAutoUpdating
+                         local  struct GameXmlSettings waterSettings
+  880  0035BA34     78  void CROcean::UnloadHole(const struct CROcean* this)
+                         inlines  BEMHandler::~BEMHandler
+  896  00359E28    36C  void CROcean::ActivateWaterReflectionPlane(const struct CROcean* this)
+                         local  vec4flt viewClipPlane
+                         local  vec4flt viewClipNormal
+                         local  vec4flt viewClipDist
+                         local  const float d
+                         local  mat44flt matClipProj
+                         local  vec4flt q
+                         local  float dotClip
+                         local  float scale
+                         local  mat44flt viewMatrixRefl
+                         inlines  LLMath_CopyMat44, LLMath_DotProduct, LLMath_Scale, LLMath_mat44fltMultiply33, __vec_make_from_scalar, __vec_mul, sign, vec_add, vec_ld, vec_madd, vec_sld, vec_splat, vec_st
+  994  0034C36C     34  void CROcean::DeactivateWaterReflectionPlane(const struct CROcean* this)
+ 1013  0034C3A0    124  void CROcean::CalculateWaterHeight(const struct CROcean* this)
+                         local  struct TerMesh* pMesh
+                         local  struct TerMesh* pMeshEndPoint
+ 1049  00374DB4    280  void CROcean::RenderRunningWater(const struct CROcean* this, unsigned int propsFlags)
+                         local  struct SFrustum frustum
+                         local  struct TerMesh* pMesh
+                         local  struct TerMesh* pMeshEndPoint
+                         local  struct TerStrip* pStrip
+                         local  struct TerStrip* pStripEndPoint
+                         local  unsigned int waterTypeFlag
+                         local  enum ClipTest clipTest
+                         inlines  DS_vSetAlphaTestMode, DS_vSetCullMode, Gcm::cellGcmSetAlphaTestEnable, SFrustum::cullAABBStrip, vec_unpackh, vec_unpackl, vec_vcfsx
+ 1101  003619B8    224  void CROcean::RenderStillWater(const struct CROcean* this, unsigned int propsFlags)
+                         local  struct SFrustum frustum
+                         local  struct TerMesh* pMesh
+                         local  struct TerMesh* pMeshEndPoint
+                         local  struct TerStrip* pStrip
+                         local  struct TerStrip* pStripEndPoint
+                         local  unsigned int waterTypeFlag
+                         local  enum ClipTest clipTest
+                         inlines  SFrustum::cullAABBStrip, vec_unpackh, vec_unpackl, vec_vcfsx
+ 1148  00361BDC    258  void CROcean::RenderTerrainReflection(const struct CROcean* this)
+                         local  struct TerModel* pTerrainModel
+                         local  bool bReflectBaseTerrain
+                         local  struct SFrustum frustum
+                         local  struct TerMesh* pMesh
+                         local  struct TerMesh* pMeshEndPoint
+                         local  struct TerStrip* pStrip
+                         local  struct TerStrip* pStripEndPoint
+                         local  struct TerDefaultMaterial* pMat
+                         local  const bool bIsStructure
+                         local  enum ClipTest clipTest
+                         inlines  SFrustum::cullAABBStrip, vec_unpackh, vec_unpackl, vec_vcfsx
+ 1221  00361E34    228  void CROcean::RenderUWTerrainRefraction(const struct CROcean* this)
+                         local  struct TerModel* pTerrainModel
+                         local  struct TerMesh* pMesh
+                         local  struct TerMesh* pMeshEndPoint
+                         local  struct SFrustum frustum
+                         local  struct TerStrip* pStrip
+                         local  struct TerStrip* pStripEndPoint
+                         local  enum ClipTest clipTest
+                         inlines  SFrustum::cullAABBStrip, vec_unpackh, vec_unpackl, vec_vcfsx
+ 1284  00370164      8  void CROcean::RenderLowObjectsReflection(const struct CROcean* this)
+ 1290  00361148     18  void CROcean::RenderSkyDomeReflection(const struct CROcean* this)
+                         local  vec4flt vMin
+ 1299  00351558    2B0  void CROcean::InitWater(const struct CROcean* this)
+                         local  int err
+                         inlines  BEMHandler::BEMHandler, BEMHandler::SetFirstRender, BEMHandler::~BEMHandler, LLMath_IdentifyMat, vec_st
+ 1366  0034AF40     28  void CROcean::InitiateRipple(const struct CROcean* this, float x, float z, float fPower, float fSize, unsigned int dwDuration, unsigned int dwRippleFrequency, unsigned int dwPriority)
+                         inlines  BEMHandler::SetRipplePos, BEMHandler::SetRippleTime
+ 1376  0036B634    3EC  void CROcean::InitOceanEmitters(const struct CROcean* this, float* positions, unsigned int* oceanEmittersLaunch, int maxOceanEmitters)
+                         local  bool oldLockStatus
+                         local  int i
+                         local  struct TerrainHeightInfo info
+                         local  vec4flt p1
+                         local  vec4flt p2
+                         local  vec4flt p3
+                         local  vec4flt pos
+                         local  float a
+                         local  float b
+                         local  float c
+                         inlines  TerrainHeightInfo::TerrainHeightInfo
+ 1426  0035BE40    174  void CROcean::UpdateOceanEmitters(const struct CROcean* this)
+                         local  int i
+                         local  vec4flt rot
+                         local  const char[2][32] names

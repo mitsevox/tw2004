@@ -1,0 +1,10 @@
+// C:/packages/rwaudiocore/2.08.01/source/plugins/usermusicarbiter.cpp
+// compiled in: usermusicarbiter.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    0  006DAE10      C  void ~UserMusicArbiter(const struct <anon>* this)
+                         inlines  ~PlugIn
+   96  006DADEC      8  struct <anon>* GetPlugInDescRunTime()
+  119  006DADF4     14  bool CreateInstance(struct PlugIn* pPlugIn, void* pConstructorParams)
+                         local  struct <anon>* pThis
+                         inlines  Initialize<rw::audio::core::UserMusicArbiter>

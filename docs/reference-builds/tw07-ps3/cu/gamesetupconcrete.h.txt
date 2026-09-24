@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/./././gamesetupconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 4 functions, source order. line | PS3 address | size
+
+  100  00622CE8      4  void GameSessionAdded(const struct GameSetupConcrete* this, struct GameSession* )
+  123  00622CF4      4  void PeerConnectVoiceSuccess(const struct GameSetupConcrete* this)
+  125  00622D00      4  void PeerConnectVoiceFailed(const struct GameSetupConcrete* this)
+  127  00622D0C      4  void PeerConnectVoiceDisconnected(const struct GameSetupConcrete* this)

@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/UI_IngameMessageBG.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   23  00123EE8     B8  void UIIngameMessageBG::~UIIngameMessageBG(const struct UIIngameMessageBG* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   25  000FE8D0      C  uint32 UIIngameMessageBG::GetSignature(const const struct UIIngameMessageBG* this)
+   34  0011627C     14  enum AptThreadReturnValue UIIngameMessageBG::UpdateBG_func(struct IAptSubscriberBase* subs)

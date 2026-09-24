@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/Lo-Rendering/Geom/twChar_Skin_PS3.h
+// compiled in: golf2_unity.cpp, golf_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   31    inline-only   void TWCHAR_SKINVERTEX::Set(const struct TWCHAR_SKINVERTEX* this, const twSkinVert* pSV)
+   82    inline-only   void PS3_SkinMeshRender::EnableReducedSkinning(const struct PS3_SkinMeshRender* this, bool bEnable)

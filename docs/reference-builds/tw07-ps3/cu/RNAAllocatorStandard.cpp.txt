@@ -1,0 +1,15 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNABase/RNAAllocatorStandard.cpp
+// compiled in: RNAAllocatorStandard.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   61  0081EE8C     20  void AllocatorStandard(const struct <anon>* this, const char* name, int enable_debug_print)
+   69  0081EC88     44  void* Alloc(const struct <anon>* this, size_t size, const char* name, unsigned int flags)
+   74  0081ECCC    134  void* Alloc(const struct <anon>* this, size_t size, const char* name, unsigned int flags, unsigned int align, unsigned int alignOffset)
+                         local  const char[6] __FUNCTION__
+                         local  size_t allocSize
+                         local  uintptr_t real_address
+                         local  uintptr_t new_address
+                         inlines  RNADebugBreak
+   97  0081EE00     8C  void Free(const struct <anon>* this, void* block, size_t size)
+                         local  char* alloc_name
+                         local  char* real_address

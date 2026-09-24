@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptFF/core/ffstub.c
+// compiled in: other_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   18  003EC358     28  void FFInitStub(ALLOC_FUNC allocptr, FREE_FUNC freeptr, REALLOC_FUNC reallocptr)
+   25  003F034C     5C  void* malloc_stub(size_t s)
+   34  003F04B4     48  void free_stub(void* ptr)
+   41  003F0CE8     5C  void* realloc_stub(void* ptr, size_t s)

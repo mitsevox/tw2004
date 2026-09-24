@@ -1,0 +1,38 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/silentsignin/source/common/silentsigninextensionconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   58  005EA670     54  void UserLocalLoginSuccess(const struct SilentSigninExtensionConcrete* this)
+                         inlines  operator=
+   64  005EA6C4     54  void UserLocalLoginFailure(const struct SilentSigninExtensionConcrete* this, enum Failure , uint32_t )
+                         inlines  operator=
+   70  005C9E44      8  void UserLocalLoginAlert(const struct SilentSigninExtensionConcrete* this, const struct Alert* )
+   75  005EA718     54  void UserLocalLoginAborted(const struct SilentSigninExtensionConcrete* this)
+                         inlines  operator=
+   81  005C9E4C      8  void UserLocalTOSNotAccepted(const struct SilentSigninExtensionConcrete* this)
+   86  005C9E54      8  void UserLocalSharingInfoNotSet(const struct SilentSigninExtensionConcrete* this)
+   91  005C9E5C      8  void UserLocalForeignRegAlert(const struct SilentSigninExtensionConcrete* this)
+   96  005C9E64      8  void UserLocalProductUpdateAlert(const struct SilentSigninExtensionConcrete* this, uint32_t )
+  101  005EA834    218  void AttemptLogin(const struct SilentSigninExtensionConcrete* this)
+                         local  uint32_t uIndex
+                         local  struct LoginSlot* pLoginSlot
+                         local  struct LoginSlot* pLoginSlot
+                         local  struct LoginSlot* pLoginSlot
+                         inlines  GetInstance, operator=
+  158  005C9E6C      4  void CheckLogin(const struct SilentSigninExtensionConcrete* this)
+  175  005C9E3C      8  void SetState(const struct SilentSigninExtensionConcrete* this, enum StateE eState)
+  200  005EAA4C    23C  void ProcessComplete(const struct SilentSigninExtensionConcrete* this)
+                         local  uint32_t uNumElements
+                         local  struct SilentSigninObserver** pList
+                         local  uint32_t uNumElements
+                         local  struct SilentSigninObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList, operator->, operator=
+  258  005EA76C     C4  void Cleanup(const struct SilentSigninExtensionConcrete* this)
+                         inlines  RemoveObserver, operator->, operator=
+  301  005F1674     68  void SilentSigninExtensionConcrete(const struct SilentSigninExtensionConcrete* this)
+                         inlines  RCPointer
+  326  005E57D0     CC  void ~SilentSigninExtensionConcrete(const struct SilentSigninExtensionConcrete* this)
+                         inlines  operator delete, operator->, operator=, ~RCPointer
+  355  005DBB30     30  void Startup(const struct SilentSigninExtensionConcrete* this)
+                         inlines  AddObserver
+  388  005EA830      4  void Shutdown(const struct SilentSigninExtensionConcrete* this)

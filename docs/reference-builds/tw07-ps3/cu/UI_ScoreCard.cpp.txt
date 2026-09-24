@@ -1,0 +1,339 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_ScoreCard.cpp
+// compiled in: apt_unity.cpp
+// 77 functions, source order. line | PS3 address | size
+
+   49  0006FAF8     18  void UIScoreCardBase::UIScoreCardBase(const struct UIScoreCardBase* this)
+   57  000786F4     18  void UIScoreCardBase::~UIScoreCardBase(const struct UIScoreCardBase* this)
+   67  0004A474     5C  void UIScoreCardBase::StartUpdateDataThread(const struct UIScoreCardBase* this, enum eUpdateDataClearScore doClearScores)
+   90  000224D4     AC  enum AptThreadReturnValue UIScoreCardBase::UpdateDataThread(const struct UIScoreCardBase* this)
+  104  0004A4F0      8  bool UIScoreCardBase::PageChange(const struct UIScoreCardBase* this)
+  114  0004A4F8      C  void UIScoreCardBase::Reset(const struct UIScoreCardBase* this)
+  123  0004A504      4  void UIScoreCardBase::ClearScores(const struct UIScoreCardBase* this, int32 column)
+  138  0007898C     40  void UIScoreCardStroke::UIScoreCardStroke(const struct UIScoreCardStroke* this)
+  146  00078A5C     18  void UIScoreCardStroke::~UIScoreCardStroke(const struct UIScoreCardStroke* this)
+  153  000E4B90    6BC  void UIScoreCardStroke::SetupStrokeScoreCardDisplay(const struct UIScoreCardStroke* this, int32 hole, int32 numPlayers, int32 columnToUpdate, struct AptExternalContext* pContext)
+                         local  char[32] strBuf
+                         local  char[64] aptBuf
+                         local  int32 golferIndex
+                         local  int32 golferTee
+                         local  uint32 i
+                         local  int32 holeIndex
+                         local  void* pVoidGameMode
+                         local  char* label
+                         local  int32 player
+                         local  int32 par
+  290  000E5E88    2F4  void UIScoreCardStroke::UpdateData(const struct UIScoreCardStroke* this, int32 columnToUpdate)
+                         local  char[32] strBuf
+                         local  char[64] aptBuf
+                         local  uint32 hole
+                         local  int32 numPlayers
+                         local  struct AptExternalContext pContext
+                         local  uint32 i
+                         local  int32 holeIndex
+                         local  int32 player
+                         local  struct AptExternalContext pLineContext
+                         local  int32 par
+                         local  int32 frontTotal
+                         local  int32 grandTotal
+                         local  int32 total
+  347  0004A5CC     68  bool UIScoreCardStroke::PageChange(const struct UIScoreCardStroke* this)
+  369  00066D40    210  void UIScoreCardStroke::ClearScores(const struct UIScoreCardStroke* this, int32 column)
+                         local  char[64] aptBuf
+                         local  int32 numPlayers
+                         local  uint32 hole
+                         local  int32 player
+                         local  struct AptExternalContext pLineContext
+  420  000BEBC0    1D8  void UIScoreCardStroke::UpdatePlayerScores(const struct UIScoreCardStroke* this, struct AptExternalContext* pContext, int32 hole, int32 par, int32 player)
+                         local  char[32] strBuf
+                         local  char[64] aptBuf
+                         local  int32 score
+                         inlines  GM_GetPlayerHoleStrokes
+  462  000D9224    1BC  bool UIScoreCardStroke::ShouldShowHoleScore(const struct UIScoreCardStroke* this, uint32 hole)
+                         local  bool shouldShow
+                         local  int32 playerID
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes
+  516  0004A508     C4  void UIScoreCardStroke::SetHoleSet(const struct UIScoreCardStroke* this, int32 hole)
+  535  0004A634     F0  uint32 UIScoreCardStroke::GetCurrentHoleIndex(const struct UIScoreCardStroke* this)
+  580  00078C94     58  void UIScoreCardSkins::UIScoreCardSkins(const struct UIScoreCardSkins* this)
+  588  00078DA8     18  void UIScoreCardSkins::~UIScoreCardSkins(const struct UIScoreCardSkins* this)
+  595  000D99C0    960  void UIScoreCardSkins::UpdateData(const struct UIScoreCardSkins* this, int32 columnToUpdate)
+                         local  char[256] aptBuf
+                         local  char[256] strBuf
+                         local  char[256] strBuf2
+                         local  int32[4] totals
+                         local  struct AptExternalContext pContext
+                         local  int32 numPlayers
+                         local  int32 holeJustPlayed
+                         local  int32 counter
+                         local  int32 i
+                         local  int32 i
+                         local  int32 player
+                         local  int32 nextHole
+                         local  int i
+                         local  int32 i
+                         local  int32 bestGolfer
+                         local  int[4] playerOrder
+                         local  int32 nextBestGolfer
+                         local  char[16] tempBufferC
+                         local  int32 player
+                         local  int32 player
+                         local  int32 player
+                         local  int32 playerUsed
+                         inlines  GM_GetPlayerHoleStrokes, Singleton<GameModeDriverManager>::GetSingleton
+  812  000C25F8    588  void UIScoreCardSkins::UpdatePlayerScores(const struct UIScoreCardSkins* this, struct AptExternalContext* pContext, int32 hole, int32 par, int32 numPlayers)
+                         local  char[256] aptBuf
+                         local  char[256] strBuf
+                         local  int[4] totals
+                         local  struct AptExternalContext pPlayer1
+                         local  struct AptExternalContext pPlayer2
+                         local  struct AptExternalContext pPlayer3
+                         local  struct AptExternalContext pPlayer4
+                         local  struct AptExternalContext*[4] pPlayers
+                         local  int32[4] sortedTotals
+                         local  int32 i
+                         local  int32 i
+                         local  int32 player
+                         local  int32 player
+                         local  int32 i
+                         local  int32 best
+                         local  int32 player
+                         local  int32 player
+                         local  char[16] tempBuffer
+                         local  struct AptExternalContext pLineContext
+                         inlines  GM_GetPlayerHoleStrokes
+  925  0004A724     1C  int32 UIScoreCardSkins::MapSelectedNumber(const struct UIScoreCardSkins* this, int32 selectedNumber)
+  942  00078BF4     50  void UIScoreCardMatch::UIScoreCardMatch(const struct UIScoreCardMatch* this)
+  951  00078E24     18  void UIScoreCardMatch::~UIScoreCardMatch(const struct UIScoreCardMatch* this)
+  959  000E4B28     68  void UIScoreCardMatch::InitForPlayoff(const struct UIScoreCardMatch* this)
+                         local  uint32 hole
+                         inlines  UISavedHoleInfo::SetUseSavedHoleInfo
+  973  0004A79C      C  void UIScoreCardMatch::OnClose(const struct UIScoreCardMatch* this)
+  981  000E5A20    330  void UIScoreCardMatch::SetupStrokeScoreCardDisplay(const struct UIScoreCardMatch* this, int32 hole, int32 numPlayers, int32 columnToUpdate, struct AptExternalContext* pContext)
+                         local  uint32 i
+                         local  int32 holeIndex
+                         local  char[32] strBuf
+                         local  char[64] aptBuf
+ 1049  000E5D50    138  void UIScoreCardMatch::UpdateData(const struct UIScoreCardMatch* this, int32 columnToUpdate)
+                         local  uint32 hole
+                         local  int32 numPlayers
+                         local  struct AptExternalContext pContext
+ 1071  000C1C38    9C0  void UIScoreCardMatch::UpdatePlayerScores(const struct UIScoreCardMatch* this, struct AptExternalContext* pContext, int32 hole, int32 par, int32 numPlayers)
+                         local  char[32] strBuf
+                         local  char[64] aptBuf
+                         local  int32 score1
+                         local  int32 score2
+                         local  int32 scoreDiff
+                         local  int32 frontscore1
+                         local  int32 frontscore2
+                         local  int32 backscore1
+                         local  int32 backscore2
+                         local  int32 teams
+                         local  struct AptExternalContext pPlayer1
+                         local  struct AptExternalContext pPlayer2
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         local  uint32 holeIndex
+                         local  bool bDormie
+                         local  int32 holesRemaining
+                         local  int32 golferIndex
+                         local  int32 holeIndexRemain
+                         local  int localScore1
+                         local  int localScore2
+                         local  int localScoreDiff
+ 1273  00066F50      4  void UIScoreCardMatch::ClearScores(const struct UIScoreCardMatch* this, int32 column)
+ 1282  0004A790      C  void UIScoreCardMatch::ClearData(const struct UIScoreCardMatch* this)
+ 1290  000D93E0    128  bool UIScoreCardMatch::ShouldShowHoleScore(const struct UIScoreCardMatch* this, uint32 hole)
+                         local  bool shouldShow
+                         inlines  GM_GetCurrentHoleIndex
+ 1340  0007890C     40  void UIScoreCardPGATour::UIScoreCardPGATour(const struct UIScoreCardPGATour* this)
+ 1348  00078EA0     18  void UIScoreCardPGATour::~UIScoreCardPGATour(const struct UIScoreCardPGATour* this)
+ 1355  000CF7D0    4AC  void UIScoreCardPGATour::UpdateData(const struct UIScoreCardPGATour* this, int32 columnToUpdate)
+                         local  char[32] strBuf
+                         local  char[64] aptBuf
+                         local  int32 curEventID
+                         local  int iNumRoundsInTournament
+                         local  int32 numToDisplay
+                         local  struct AptExternalContext pContext
+                         local  struct GameModeDriverPGATour* pGMDriver
+                         local  struct AptExternalContext pPlayerLine
+                         local  int32 playerRank
+                         local  int32 total
+                         local  int32 score
+                         local  int32 player
+                         local  int32 round
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+ 1441  0004A7A8    364  void UIScoreCardPGATour::UpdatePlayerScores(const struct UIScoreCardPGATour* this, struct AptExternalContext* pContext, int32 player)
+                         local  char[32] strBuf
+                         local  char[64] aptBuf
+                         local  int32 curEventID
+                         local  int32 iNumRoundsInTournament
+                         local  struct AptExternalContext lineContext
+                         local  int32 rank
+                         local  int32 total
+                         local  int32 score
+                         local  int32 round
+ 1509  00078B74     40  void UIScoreCardSkinsStroke::UIScoreCardSkinsStroke(const struct UIScoreCardSkinsStroke* this)
+ 1517  00078F1C     18  void UIScoreCardSkinsStroke::~UIScoreCardSkinsStroke(const struct UIScoreCardSkinsStroke* this)
+ 1525  000E589C    184  void UIScoreCardSkinsStroke::UpdateData(const struct UIScoreCardSkinsStroke* this, int32 columnToUpdate)
+                         local  uint32 hole
+                         local  int32 numPlayers
+                         local  struct AptExternalContext pContext
+                         local  uint32 i
+                         local  int32 holeIndex
+                         local  int32 player
+                         local  int32 par
+ 1563  0004AB0C    238  void UIScoreCardSkinsStroke::UpdatePlayerScores(const struct UIScoreCardSkinsStroke* this, struct AptExternalContext* pContext, int32 hole, int32 par, int32 player)
+                         local  char[32] strBuf
+                         local  char[64] aptBuf
+                         local  struct AptExternalContext pLineContext
+                         local  int32 skinsWinner
+ 1621  00078AF4     40  void UIScoreCardStableford::UIScoreCardStableford(const struct UIScoreCardStableford* this)
+ 1630  00078F98     18  void UIScoreCardStableford::~UIScoreCardStableford(const struct UIScoreCardStableford* this)
+ 1638  000E55B4    2E8  void UIScoreCardStableford::UpdateData(const struct UIScoreCardStableford* this, int32 columnToUpdate)
+                         local  char[32] strBuf
+                         local  char[64] aptBuf
+                         local  uint32 hole
+                         local  int32 numPlayers
+                         local  struct AptExternalContext pContext
+                         local  uint32 i
+                         local  int32 holeIndex
+                         local  int32 player
+                         local  struct AptExternalContext pLineContext
+                         local  int32 par
+                         local  int32 frontTotal
+                         local  int32 grandTotal
+                         local  int32 total
+ 1695  000632D8    278  void UIScoreCardStableford::UpdatePlayerScores(const struct UIScoreCardStableford* this, struct AptExternalContext* pContext, int32 hole, int32 par, int32 player)
+                         local  char[32] strBuf
+                         local  char[64] aptBuf
+                         local  int32 points
+                         local  void* pVoidGameMode
+ 1774  00078A74     40  void UIScoreCardBestBall::UIScoreCardBestBall(const struct UIScoreCardBestBall* this)
+ 1782  00079014     18  void UIScoreCardBestBall::~UIScoreCardBestBall(const struct UIScoreCardBestBall* this)
+ 1789  000E524C    368  void UIScoreCardBestBall::UpdateData(const struct UIScoreCardBestBall* this, int32 columnToUpdate)
+                         local  char[32] strBuf
+                         local  char[64] aptBuf
+                         local  uint32 hole
+                         local  int32 numPlayers
+                         local  struct AptExternalContext pContext
+                         local  uint32 i
+                         local  int32 holeIndex
+                         local  int32 lineClip
+                         local  int32 player
+                         local  struct AptExternalContext pLineContext
+                         local  int32 frontTotal
+                         local  int32 grandTotal
+                         local  int32 total
+                         local  int32 par
+ 1847  0004AD44    1E4  void UIScoreCardBestBall::UpdatePlayerScores(const struct UIScoreCardBestBall* this, struct AptExternalContext* pContext, int32 hole, int32 par, int32 player)
+                         local  char[32] strBuf
+                         local  char[64] aptBuf
+                         local  int32 lineClip
+                         local  int32 score
+ 1895  0004AF28    1B8  void UIScoreCardBestBall::ClearScores(const struct UIScoreCardBestBall* this, int32 column)
+                         local  char[64] aptBuf
+                         local  uint32 hole
+                         local  int32 player
+                         local  struct AptExternalContext pLineContext
+ 1944  0007888C     40  void UIScoreCardChallenge::UIScoreCardChallenge(const struct UIScoreCardChallenge* this)
+ 1952  00079090     18  void UIScoreCardChallenge::~UIScoreCardChallenge(const struct UIScoreCardChallenge* this)
+ 1959  000DBED0    5B8  void UIScoreCardChallenge::UpdateData(const struct UIScoreCardChallenge* this, int32 columnToUpdate)
+                         local  struct AptExternalContext pContext
+                         local  int32 numPlayers
+                         local  int32 teams
+                         local  struct GameSkillsChallenge* mode
+                         local  int currentRound
+                         local  char[32] p1Name
+                         local  char[32] p2Name
+                         local  char* label
+                         local  char[32] p3Name
+                         local  char[32] p4Name
+                         local  int32 player
+                         local  int32 score1
+                         local  int32 score2
+                         local  char* name
+                         local  char* formatString
+                         local  char* leaderString
+                         local  enum PlayerNumber_t winner
+                         local  int32 score1
+                         local  int32 score2
+                         local  char* winnerString
+                         local  void* ptr
+                         local  char[32] winnerName
+                         local  char* formatString
+                         local  char* tieString
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+ 2091  000DBA0C    4C4  void UIScoreCardChallenge::UpdatePlayerScores(const struct UIScoreCardChallenge* this, struct AptExternalContext* pContext, int32 player, int32 currentRound, struct GameSkillsChallenge* mode)
+                         local  char[32] strBuf
+                         local  char[64] aptBuf
+                         local  enum PlayerNumber_t winner
+                         local  int32 score1
+                         local  int32 score2
+                         local  int32 shot
+                         local  float score
+                         local  char* distanceString
+                         local  char[16] cShot
+                         inlines  GM_GetModeType
+ 2197  0007880C     40  void UIScoreCardFourPlayer::UIScoreCardFourPlayer(const struct UIScoreCardFourPlayer* this)
+ 2206  0007910C     18  void UIScoreCardFourPlayer::~UIScoreCardFourPlayer(const struct UIScoreCardFourPlayer* this)
+ 2213  000CFC7C    290  void UIScoreCardFourPlayer::UpdateData(const struct UIScoreCardFourPlayer* this, int32 columnToUpdate)
+                         local  struct AptExternalContext pContext
+                         local  struct GameModeDriver* driver
+                         local  struct GameModeBase* mode
+                         local  int32 numPlayers
+                         local  char[256] aptBuf
+                         local  char[256] strBuf
+                         local  int32 winner
+                         local  int32 i
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+ 2268  0004B0E0     C4  void UIScoreCardFourPlayer::UpdatePlayerScores(const struct UIScoreCardFourPlayer* this, struct AptExternalContext* pContext, int32 player)
+                         local  char[256] aptBuf
+                         local  char[256] strBuf
+                         local  int32 j
+ 2294  0004B1A4     C0  void UIScoreCardFourPlayer::SetWinner(const struct UIScoreCardFourPlayer* this, int32 winningPlayerIndex)
+                         local  char[256] strBuf
+ 2316  0004B264     3C  void UIScoreCardSeve::UpdatePlayerScores(const struct UIScoreCardSeve* this, struct AptExternalContext* pContext, int32 player)
+ 2458  0004B2A0      4  void UIScoreCardSeve::GetDistanceToCupString(const struct UIScoreCardSeve* this, char* strBuf, int32 bufSize, enum Lie_t ballLie, float distFromPin)
+ 2507  0007878C     40  void UIScoreCardGameMode::UIScoreCardGameMode(const struct UIScoreCardGameMode* this)
+ 2515  00079188     18  void UIScoreCardGameMode::~UIScoreCardGameMode(const struct UIScoreCardGameMode* this)
+ 2543  0004B2A4    288  void UIScoreCardGameMode::SetBodyText(const struct UIScoreCardGameMode* this, struct AptExternalContext* pContext, int32 row, int32 col, const char* text)
+ 2606  0004B52C     38  void UIScoreCardGameMode::SetFooter(const struct UIScoreCardGameMode* this, struct AptExternalContext* pContext, const char* footer)
+ 2614  0004B564     38  void UIScoreCardGameMode::SetTitle(const struct UIScoreCardGameMode* this, struct AptExternalContext* pContext, const char* title)
+ 2625  0004B59C     C0  void UIScoreCardGameMode::SetWinner(const struct UIScoreCardGameMode* this, int32 winningPlayerIndex)
+                         local  char[256] strBuf
+ 2641  000C1878    3C0  void UIScoreCardGameMode::UpdateData(const struct UIScoreCardGameMode* this, int32 columnToUpdate)
+                         local  struct AptExternalContext pContext
+                         local  struct GameModeBase* mode
+                         local  char[32] szField
+                         local  int32_t row
+                         local  char[32] szGameFinsishedStr
+                         local  char* label
+                         local  int32 winner
+                         local  const int32 numPlayers
+                         local  int32 player
+ 2712  000C1770    108  void UIScoreCardGameMode::UpdatePlayerScores(const struct UIScoreCardGameMode* this, struct AptExternalContext* pContext, int32 player, int32 columnToUpdate, struct GameModeBase* mode)
+                         local  char[32] strBuf
+                         local  bool bUpdate
+ 2743  0007870C     40  void UIScoreCardOnePlayer::UIScoreCardOnePlayer(const struct UIScoreCardOnePlayer* this)
+ 2751  00079204     18  void UIScoreCardOnePlayer::~UIScoreCardOnePlayer(const struct UIScoreCardOnePlayer* this)
+ 2775  0004B65C    1D4  void UIScoreCardOnePlayer::SetBodyText(const struct UIScoreCardOnePlayer* this, struct AptExternalContext* pContext, int32 row, int32 col, const char* text)
+ 2820  0004B830     38  void UIScoreCardOnePlayer::SetFooter(const struct UIScoreCardOnePlayer* this, struct AptExternalContext* pContext, const char* footer)
+ 2828  0004B868     38  void UIScoreCardOnePlayer::SetTitle(const struct UIScoreCardOnePlayer* this, struct AptExternalContext* pContext, const char* title)
+ 2837  000C14B8    2B8  void UIScoreCardOnePlayer::UpdateData(const struct UIScoreCardOnePlayer* this, int32 columnToUpdate)
+                         local  struct AptExternalContext pContext
+                         local  struct GameModeBase* mode
+                         local  char[32] szField
+                         local  int32_t row
+                         local  char[32] szGameFinsishedStr
+                         local  const int32 numPlayers
+                         local  int32 player
+ 2887  000C13B0    108  void UIScoreCardOnePlayer::UpdatePlayerScores(const struct UIScoreCardOnePlayer* this, struct AptExternalContext* pContext, int32 player, int32 columnToUpdate, struct GameModeBase* mode)
+                         local  char[32] strBuf
+                         local  bool bUpdate
+ 2914  0004A740     4C  void UISavedHoleInfo::Clear(const struct UISavedHoleInfo* this)
+                         local  int32 i
+ 2927  0006E4B8    1C0  void UISavedHoleInfo::SaveHoleData(const struct UISavedHoleInfo* this, uint32 holeIndex, int32 golferIndex)
+                         local  bool bPlayerStroked
+                         local  int i
+                         inlines  GM_GetPlayerHoleStrokes

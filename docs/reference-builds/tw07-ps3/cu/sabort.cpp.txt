@@ -1,0 +1,8 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sabort.cpp
+// compiled in: sabort.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   13  006DAE48     B8  void iSNDabortmsg(char* format)
+                         local  char[256] msgbuf
+                         local  va_list val
+                         inlines  Assert

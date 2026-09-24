@@ -1,0 +1,15 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/UIInterface/UIGlobals.cpp
+// compiled in: apt_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+    7  0002D0DC     78  struct UIGameOptions& GetUIGameOptions()
+                         inlines  Singleton<UIGameOptions>::GetSingleton
+   14  0002D3A8    120  void UIGameOptions::OpenONCE(const struct UIGameOptions* this)
+                         local  int32 i
+   36  0002D4C8     60  void UIGameOptions::Init(const struct UIGameOptions* this)
+   46  0007DDC8    1C0  void UIGameOptions::TransferToGlobalOptions(const struct UIGameOptions* this)
+                         local  int32 i
+                         inlines  UIGameOptions::GetTee, UIGameOptions::GetWindOption, cGAME_GLOBALS::SetClubSelection, cGAME_GLOBALS::SetCrowds, cGAME_GLOBALS::SetGreen, cGAME_GLOBALS::SetPin, cGAME_GLOBALS::SetSeasonOption, cGAME_GLOBALS::SetWeatherOption, cGAME_GLOBALS::SetWindOption
+   77  0002D528     4C  void UIGameOptions::SetSaveOptionsAndRestoreOnReEntryFlag(const struct UIGameOptions* this)
+   84  0007B638     20  void UIGameOptions::SetUpDummyUser(const struct UIGameOptions* this, enum PlayerNumber_t player)
+                         inlines  UIGameOptions::SetGolfer

@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/rawtexture.cpp
+// compiled in: other_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   22  0041F97C     F0  void RawTexture::RawTexture(const struct RawTexture* this, const const struct Allocator& refAlloc, const const struct HashString& textureName, int32_t width, int32_t height, int32_t mipmap, void* texturedata)
+                         inlines  HashString::HashString
+   41  003D04C8     60  void RawTexture::~RawTexture(const struct RawTexture* this)
+   49  00400EE8    188  void RawTexture::TurnOnTinting(const struct RawTexture* this, struct RawTexture* tintMask, float* tintParams, enum TXRTintRule_Mode tintMode)
+   79  003D0640     98  void RawTexture::SetActiveDimensions(const struct RawTexture* this, int32_t width, int32_t height)
+   89  003D06D8     64  void RawTexture::SetActiveMipmap(const struct RawTexture* this, int32_t mipmap)

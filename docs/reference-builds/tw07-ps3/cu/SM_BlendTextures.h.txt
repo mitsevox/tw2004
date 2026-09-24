@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/Lo-Rendering/ShaderWrappers/SM_BlendTextures.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   81    inline-only   void vtxStruct::Set(const struct vtxStruct* this, float x, float y, float z, float baseU, float baseV, float blendU, float blendV)
+                         local  int i

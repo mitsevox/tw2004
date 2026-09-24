@@ -1,0 +1,211 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/GoGreenGrid.c
+// compiled in: golf_unity.cpp
+// 28 functions, source order. line | PS3 address | size
+
+  190  0027E6E0    89C  void GR_vInit()
+                         local  const char[9] __FUNCTION__
+                         local  struct HashString textureID
+                         local  struct HashString dotTextureID
+                         local  unsigned int numgreens
+                         local  struct TextureGroup* pTexGrp
+                         local  unsigned int i
+                         local  unsigned int i
+                         local  int id
+                         local  int catId
+                         inlines  GridPointColorShader_Constructor, HashString::HashString, TagValuePair, operator+
+  343  002B7900    280  void GR_vInitAllGreens(bool inFacility)
+                         local  int i
+                         local  vec4flt vCup
+                         local  TI_STimeValue start
+                         inlines  TI_fConvertTimeDifToSeconds, TI_uiReadCP0Count, vec4flt_Copy
+  383  002B71A8    758  void GR_vInitForHole(int greenNdx, float* vCup)
+                         local  float deltaX
+                         local  float deltaZ
+                         local  vec4flt testLoc
+                         local  vec4flt prevLoc
+                         local  bool done
+                         local  int i
+                         local  float minX
+                         local  float maxX
+                         local  float minZ
+                         local  float maxZ
+                         local  float maxY
+                         local  struct TGD_MaterialInfo* pSurface
+                         local  uint32 prevLie
+                         local  TGD_TerrainInfo* pTerrainGameData
+                         local  vec4flt normal
+                         local  float height
+                         local  const struct AIFeatureNetwork* pGreenEdgeNetwork
+                         local  float validRowHt
+                         local  int[96] fixHeightLater
+                         local  int numFixHeight
+                         local  float maxheightdiff
+                         local  float x
+                         local  float y
+                         local  float z
+                         local  int j
+                         local  struct GR_GridLookupColType* cptr
+                         local  int fix
+                         local  int fixcol
+                         local  struct GR_GridLookupColType* fixptr
+                         local  float height_under
+                         local  float height_above
+                         local  float height_under
+                         local  float height_above
+                         inlines  LLMath_DistanceBetween3, Singleton<AIFeatureNetworkMgr>::GetSingleton, std::fabs, vec4flt_Copy3
+  669  00216960     E0  void GR_vClose()
+                         local  unsigned int i
+                         local  unsigned int i
+  701  001EF2B8     28  void GR_vSetCurrGreen(int greenIdx)
+  711  00286E08    1EC  bool GR_GetGreenIndex(float* pos, int* greenIndex)
+                         local  int i
+                         local  float minX
+                         local  float maxX
+                         local  float minZ
+                         local  float maxZ
+                         local  float maxY
+                         inlines  Singleton<AIFeatureNetworkMgr>::GetSingleton
+  750  00286FF4     48  bool GR_PointOnValidGreen(float* pos)
+                         local  int greenIndex
+  763    inline-only   bool GR_PlayerIsTargetingGreen(enum PlayerNumber_t PlayerID)
+                         local  int s
+  775    inline-only   bool GR_ShouldDrawGrid(enum PlayerNumber_t PlayerID)
+                         local  vec4flt cup
+                         local  float dist
+  829    inline-only   static void GR_OrientGreenGrid(int viewport, bool bPutting, const float* pBallPos, const float* pTargetPos)
+                         local  float w
+                         local  float h
+                         local  float len
+                         local  vec4flt cupPosition
+                         local  bool b_outside
+                         local  vec4flt gridSideVector
+                         local  float refHeight
+                         local  enum GREENGRID_REFERENCE_HEIGHT_MODE mode
+                         local  vec4flt xTempVec
+                         local  float len2
+  992    inline-only   void GR_SetupPoint(const int viewport, const unsigned int row, const unsigned int col, const float nx, const float ny, const float cx, const float cy, const float beadAlpha, struct GridPoint* currPoint)
+                         local  const float s
+                         local  const float t
+                         local  const float h
+ 1023    inline-only   unsigned int GR_InsertNextSegment(struct vtxStruct* pStartVert, float beadTextureRowSelect, struct GridPoint* p1, struct GridPoint* p2)
+                         local  struct vtxStruct* pVerts
+                         local  const float dh
+                         local  unsigned int step
+                         local  const float t
+                         local  const float tinv
+                         local  const float x
+                         local  const float z
+                         local  vec4flt testPoint
+                         local  bool oob
+ 1108  002AD664    EC8  static void GR_BuildGridRenderData(int viewport, bool showDots)
+                         local  const enum PlayerNumber_t playerNum
+                         local  const float nx
+                         local  const float ny
+                         local  const float cx
+                         local  const float cy
+                         local  const float beadAlpha
+                         local  const float columnsV
+                         local  float rowsV
+                         local  struct vtxStruct* pVerts
+                         local  struct GridPoint prevPoint
+                         local  int point
+                         local  const unsigned int row
+                         local  const unsigned int col
+                         local  struct GridPoint currPoint
+                         local  unsigned int vertsAdded
+                         local  const float t
+                         local  const float tinv
+                         local  const float x
+                         local  const float z
+                         local  vec4flt testPoint
+                         local  bool oob
+                         local  int point
+                         local  const unsigned int row
+                         local  const unsigned int col
+                         local  struct GridPoint currPoint
+                         local  unsigned int vertsAdded
+                         local  const float t
+                         local  const float tinv
+                         local  const float x
+                         local  const float z
+                         local  vec4flt testPoint
+                         local  bool oob
+                         inlines  GR_InsertNextSegment, GR_SetupPoint
+ 1198  002C9A44    650  void GR_ResetGreenGrid(int viewport)
+                         local  const enum PlayerNumber_t playerNum
+                         local  const struct CoreShotInfo_t* playerShotInfo
+                         local  const bool bPutting
+                         local  vec4flt cup
+                         local  float dist
+                         inlines  GR_OrientGreenGrid, GR_PlayerIsTargetingGreen, GR_ShouldDrawGrid, LLMath_DistanceBetween3, vec4flt_Copy
+ 1219  002CA094    5A0  void GR_UpdateGreenGrid(int viewport)
+                         local  vec4flt fTestPoint
+                         local  unsigned int numLookups
+                         local  bool b_outside
+                         local  bool bPutting
+                         local  float ht
+                         local  const enum PlayerNumber_t playerNum
+                         local  const struct CoreShotInfo_t* playerShotInfo
+                         local  bool targetMoved
+                         local  bool showDotsLastTime
+                         local  bool longDotsLastTime
+                         local  const bool showDots
+                         local  const bool longDots
+                         local  const bool dotsNeedRebuild
+                         local  vec4flt cup
+                         local  float dist
+                         local  const float nx
+                         local  const float ny
+                         local  const int point
+                         local  const unsigned int row
+                         local  const unsigned int col
+                         local  const float s
+                         local  const float t
+                         inlines  GR_PlayerIsTargetingGreen, GR_ShouldDrawGrid, LLMath_DistanceBetween3, vec4flt_Copy
+ 1331  002FCE0C    5F0  void GR_DrawGreenGrid(int viewport)
+                         local  const enum PlayerNumber_t PlayerID
+                         local  const int8 currentState
+                         local  vec4flt direction
+                         local  vec4flt offset
+                         local  vec4flt saveOffset
+                         local  float scaleoffset
+                         local  int i
+                         local  vec4flt cup
+                         local  float dist
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, GR_PlayerIsTargetingGreen, GR_ShouldDrawGrid, LLMath_Add, LLMath_DistanceBetween3, LLMath_Scale3, __vec_mul, vec4flt_Copy, vec_add, vec_st
+ 1442    inline-only   static void GridPointColorShader_Constructor()
+ 1463    inline-only   static void GridPointColorShader_Destructor()
+ 1472  00216BBC     20  static void GridPointColorShader_SetBaseColor(uint8 red, uint8 green, uint8 blue)
+ 1485  00216BDC     20  static void GridPointColorShader_SetHiColor(uint8 red, uint8 green, uint8 blue)
+ 1498  00216BFC     20  static void GridPointColorShader_SetLoColor(uint8 red, uint8 green, uint8 blue)
+ 1511  00216B78     44  static void GridPointColorShader_ComputeColorDeltas()
+                         local  int i
+ 1528    inline-only   static void GridPointColorShader_SetHeightClampRange(float range)
+ 1544    inline-only   static void GridPointColorShader_SetReferenceHeight(float height)
+ 1555  00216A40    138  static void GridPointColorShader_GetColor(float height, uint8* colorRGB)
+                         local  const float dHt
+                         local  float t
+                         local  const int* colorDelta
+                         local  unsigned int i
+ 1596  00216C1C    10C  int GR_GridLookupRow(int row, float x)
+                         local  struct GR_GridLookupRowType* rptr
+                         local  int c
+                         local  float delta
+ 1642  00216D28    334  static float GR_GridLookupHeight(const float* loc, bool* outside)
+                         local  int i
+                         local  int r
+                         local  float ht
+                         local  int row0
+                         local  int row1
+                         local  int col0
+                         local  int col1
+                         local  float ht0
+                         local  float ht1
+                         local  float ratio
+                         local  float delta
+                         local  struct GR_GridLookupRowType* rptr
+ 1748  0025105C     68  float GR_GetDeltaHeightToPin(enum PlayerNumber_t PlayerID)
+                         local  vec4flt vCup
+                         local  struct CoreShotInfo_t* shotInfo
+                         local  float delta
+                         inlines  vec4flt_Copy

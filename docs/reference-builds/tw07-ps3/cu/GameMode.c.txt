@@ -1,0 +1,285 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode.c
+// compiled in: golf_unity.cpp
+// 75 functions, source order. line | PS3 address | size
+
+  215  002D2454     38  void GM_vInitModuleONCE()
+  225  001FB7A8      4  void GM_vCloseModuleONCE()
+  302  002FAC40    104  void GM_InitModule_PreDataStream()
+                         inlines  GM_SetNeedToBuildPlayoffHoleList, Singleton<GameModeDriverManager>::GetSingleton
+  324  001FB7AC     58  void GM_InitModule_PostDataStream()
+  336  00211198     7C  void GM_CheckForAndReturnWager()
+  347  00211214     60  void GM_DeInitModule()
+  362  00319E50    464  bool GM_GotoNextSelectedHole()
+                         local  int32 i
+                         local  int32 hole_index
+                         local  int32 j
+                         local  bool temp
+                         local  int32 j
+                         local  int32 j
+                         inlines  GM_GetCurrentHoleIndex, GM_GetMulligans, GM_HolesSelected, GM_SetPlayerHoleStrokes
+  458  003278F0    130  void GM_InitForHole_SitDev()
+                         local  vec4flt fadeColor
+                         inlines  GM_GetGolferUp
+  491  002D3560    304  void GM_InitForHole()
+                         local  void* gameModePtr
+                         local  int32 j
+                         local  int32 j
+                         inlines  GamePlayer::SetShotLimitExceeded, GamePlayer::SetUsedMulliganThisHole, Singleton<GameModeDriverManager>::GetSingleton
+  577  0033A5C8    2FC  void GM_EndOfGolferTurn(enum PlayerNumber_t PlayerID, bool bAllowCutsceneTrigger)
+                         local  CameraController_t* pCameraController
+                         local  bool playerWait
+                         inlines  AIMgr, Singleton<GameModeDriverManager>::GetSingleton, Singleton<ShotHistory>::GetSingleton
+  660  0033A288    340  void GM_EndOfGolferTurn_HoleFinished(enum PlayerNumber_t PlayerID)
+                         local  int32 i
+                         local  bool bGameFinished
+                         local  CameraController_t* pCameraController
+                         local  vec4flt color
+                         local  float fadeTime
+                         inlines  GM_IsPlayoff, ScreenEffects::CurrFadeType, Singleton<GameModeDriverManager>::GetSingleton
+  757  0031A6E4    368  void GM_EndOfGolferTurn_GameFinished(enum PlayerNumber_t PlayerID)
+                         local  int32 i
+                         local  int32 numHolesPlayed
+                         local  uint32 i
+                         inlines  GM_DisplayScorecard, GM_GetCurrentHoleIndex, Singleton<GameModeDriverManager>::GetSingleton, cGAME_GLOBALS::SetEndGame
+  895  0031A544    1A0  void GM_HoleFinished_GameNotFinished(enum PlayerNumber_t PlayerID)
+                         local  enum GUI_ScoreCardType_t scorecardType
+                         inlines  GM_DisplayScorecard
+  951  0031B91C    2AC  bool GM_CheckForAIConcede(enum PlayerNumber_t PlayerID)
+                         local  bool concede
+                         local  int32 i
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes
+  998  00252010     8C  void GM_BallHit(enum PlayerNumber_t PlayerID)
+ 1037  0031BBC8    184  void GM_PlayerAddStroke(enum PlayerNumber_t PlayerID)
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_SetPlayerHoleStrokes, GamePlayer::GetGolferScore
+ 1053  0031BD4C    5C8  bool GM_CheckForBallOOB(enum PlayerNumber_t PlayerID)
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  bool unplayableLie
+                         local  bool outOfBounds
+                         local  bool forceOutOfBounds
+                         local  float distanceToPin
+                         local  int course
+                         local  int hole
+                         local  char[32] tempString
+                         inlines  GM_GetCurrentHoleIndex, GM_GetModeType, GM_GetPlayerHoleStrokes, GM_SetPlayerHoleStrokes, GamePlayer::GetGolferScore, GamePlayer::SetOBCount
+ 1207  0031C314    3E0  void GM_CheckBallForUIHints(enum PlayerNumber_t PlayerID)
+                         local  int16_t holeStrokes
+                         local  int diff
+                         local  void* rawGameModePointer
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes
+ 1272  001FBD20     50  bool GM_IsShotClockPermanent()
+ 1279  002470E0     D0  bool GM_UseShotClock()
+                         local  bool bUseShotClock
+ 1299  0027DB78     CC  void GM_ShowYardage(enum PlayerNumber_t PlayerID)
+                         local  float x
+                         local  float y
+                         local  float hitDist
+                         inlines  std::sqrt
+ 1319  002B9210    1BC  void GM_BumpBallForObstructions(enum PlayerNumber_t PlayerID)
+                         local  vec4flt dropPosition
+                         local  vec4flt playerBallPosn
+                         local  vec4flt teePosn
+ 1363  00263234     E0  bool GM_CanStartReplay(enum PlayerNumber_t PlayerID)
+                         local  bool retVal
+ 1390  0031D26C    66C  void GM_PlayerTookShot(enum PlayerNumber_t PlayerID)
+                         local  const bool ballOOB
+                         inlines  EarningsManager::SetAwardGivenFlag, GM_GetCurrentHoleIndex, GM_GetModeType, GM_GetPlayerHoleStrokes, GM_SetPlayerHoleStrokes, GUI_ToggleMulligan, GUI_ToggleReplay, GamePlayer::GetGolferScore, GamePlayer::SetShotLimitExceeded
+ 1651  0029EDCC    39C  bool GM_PlayerTakeMulligan(enum PlayerNumber_t playerID)
+                         local  bool currControllerTiltSpinna
+                         local  int i
+                         inlines  GM_GetMulligans, GamePlayer::SetControllerTiltSpinnaOption, GamePlayer::SetMulligan, GamePlayer::SetUsedMulligan, GamePlayer::SetUsedMulliganThisHole, PhysicsBall_t::ClearFlag, cGAME_GLOBALS::SetAllPlayersOnGreen
+ 1811  002779A0     E4  static bool GameMode_IsExcludedAnimationTeeBox(enum PlayerNumber_t iPlayer)
+                         local  int numExcludes
+                         local  int i
+ 1832  00277A84    19C  int GM_DoPreshotAnimation(enum PlayerNumber_t index)
+ 1892  002CC0E4    540  bool GM_ShowPostShotAnimation(enum PlayerNumber_t index)
+                         local  vec4flt endOfAnimPos
+                         local  struct TGD_MaterialInfo* pSupportingSurfaceInfo
+                         local  struct TGD_MaterialInfo* pCoveringSurfaceInfo
+                         local  struct TGD_MaterialInfo* pSurface
+                         local  float fSupportingTerrainHeight
+                         local  float fCoveringTerrainHeight
+                         local  vec4flt supportingNormal
+                         local  vec4flt coveringNormal
+                         local  float fHeight
+                         local  float slope
+                         local  float startToEndLength
+                         local  float startToEndHeight
+                         local  vec4flt startToEnd
+                         local  TGD_TerrainInfo* pTerrainData
+                         local  enum PlayerEmotionPostShotAnimationType_e type
+                         local  enum PlayerEmotionPostShotAnimationType_e type
+                         inlines  GM_GetModeType, LLMath_Length3, LLMath_Subtract3, vec_madd, vec_sld
+ 2128  001FBDD8     6C  bool GM_ShowPostShotCrowdFlyby()
+ 2144  00254478     84  void GM_FlyByMode_Init()
+                         local  enum PlayerNumber_t honor
+ 2164  003053F4     98  bool GM_AllowNextGolfer()
+                         inlines  GM_GetGolferUp
+ 2190  0033D108     FC  void GM_Update()
+ 2239  001FBED0     84  void GM_DisplayGameModeInfo()
+ 2250  0031C6F4    16C  void GM_RestartHole()
+                         local  int32 i
+                         inlines  GM_GetCurrentHoleIndex, GUI_ToggleTargetInfo
+ 2302  002C74A8      4  float GM_GetGolferDistanceToPin(enum PlayerNumber_t PlayerID)
+ 2310  002B9004    20C  void GM_ReplaceOOBBall(enum PlayerNumber_t PlayerID)
+                         local  vec4flt dropPosition
+                         local  vec4flt playerBallPosn
+                         local  vec4flt playerTeePosn
+ 2340  001FBF5C     18  void GM_SetFreeDrop(bool flag)
+ 2341  001FBF74     18  bool GM_IsFreeDrop()
+ 2346  002B8EA8    15C  void GM_ReplaceLateralHazardBall(enum PlayerNumber_t PlayerID)
+                         local  vec4flt dropPosition
+                         local  vec4flt playerBallPosn
+                         local  vec4flt playerTeePosn
+ 2372  001FBF8C     30  bool GM_IsGolferConceding()
+ 2380  001FBFBC     3C  void GM_SetGolferConceding(bool val)
+ 2388  0031C860    2B4  void GM_GolferConcede_Hole(enum PlayerNumber_t PlayerID)
+                         local  int32 i
+                         local  int numStillPlaying
+                         inlines  GM_GetCurrentHoleIndex, GM_GetModeType, GM_GetScoringType, GM_SetPlayerHoleStrokes
+ 2458  0024ECC0    184  void GM_MovePlayerToBall(enum PlayerNumber_t PlayerID)
+                         local  TGD_TerrainInfo* pTID
+                         local  float h
+                         local  float fSupportingGroundHeight
+                         local  float fCoveringGroundHeight
+                         local  vec4flt playerBallPosn
+                         inlines  vec4flt_Copy, vec4flt_Copy3, vec_st
+ 2493  001FC050     A0  int GM_NumLocalHumanGolfers()
+                         local  int numHumans
+                         local  int i
+ 2514  00288C44     E0  int32 GM_GetDormieCount()
+                         local  int32 bTeams
+                         local  enum PlayerNumber_t player2ID
+                         local  int32 points1
+                         local  int32 points2
+                         local  int32 scoreDiff
+                         local  int32 holesRemaining
+                         inlines  GM_GetNumHolesRemainingInRound
+ 2536  0031E7BC    440  void GM_ForceHoleoutNM(enum PlayerNumber_t PlayerID, char* playerString, char* holeString, char* balanceString)
+                         local  int32 players
+                         local  int32 holes
+                         local  int32 target
+                         local  int32 holeIndex
+                         local  char[64] curPlayerResult
+                         local  char[64] nextPlayerResult
+                         local  char[8] scoreBuff
+                         local  int32 par
+                         local  int32 score
+                         local  int32 score1
+                         local  int32 balance
+                         local  int32 i
+                         inlines  GM_GetCurrentHoleIndex, std::atoi
+ 2617  0031D8D8    910  void GM_ForceHoleout(enum PlayerNumber_t PlayerID, char* curPlayerScoreString, char* nextPlayer1ScoreString)
+                         local  char* pch
+                         local  int holeIndex
+                         local  int originalHoleIndex
+                         local  int currentHoleIndex
+                         local  void* ptr
+                         local  enum PlayerNumber_t otherPlayerID
+                         local  int par
+                         local  int relHoleScore
+                         local  int i
+                         local  int holeScore
+                         local  void* ptr
+                         local  int holeScore
+                         local  enum PlayerNumber_t nextPlayerID
+                         local  char* pch
+                         local  int holeScore
+                         local  int holeScore
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_HolesSelected, GM_SetPlayerHoleStrokes, GamePlayer::GetGolferScore, std::atoi
+ 2796  0031E6C4     F8  void GM_ForceHoleoutAll()
+                         local  enum PlayerNumber_t currentPlayerId
+                         local  int i
+ 2824  001FC0F0     18  void GM_Signal_AllowTargetingMarkerMovement(bool allowMovement)
+ 2829  0030548C     CC  bool GM_AllowTargetingMarkerMovement()
+                         inlines  GM_GetGolferUp
+ 2856  0031B08C    844  void GM_CheckForShotChanges(enum PlayerNumber_t PlayerID)
+                         local  bool changed
+                         local  bool bIsPuttingInTemple
+                         local  CameraController_t* cameraController
+                         local  enum CameraMode_t switchToMode
+                         inlines  AIMgr, GM_TargetCycling, GUI_UpdateShotUIData
+ 3025  0033BFB0    508  void GM_DoPostShotInHoleUI(enum PlayerNumber_t PlayerID)
+                         local  CameraController_t* pCameraController
+                         local  bool stillAnimating
+                         local  enum CharacterAnimStateE curState
+                         inlines  GUI_HidePostShotUI
+ 3178  0031CC10    438  bool GM_ChooseRemoveBallState(enum PlayerNumber_t PlayerID)
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_SetPlayerHoleStrokes
+ 3272  00315624    8D0  void GM_SimulateBallMovement(enum PlayerNumber_t PlayerID)
+                         local  TI_STimeValue startOfPhysicsTime
+                         local  TI_STimeValue endOfPhysicsTime
+                         local  int physicsTimes
+                         local  int i
+                         local  float timeLeft
+                         local  float distToPin
+                         local  float distToCheck
+                         local  float millisecondsLeft
+                         local  enum PlayerEmotionPostShotAnimationType_e type
+                         local  bool isPredictedAnimationState
+                         local  bool postShotAnimsAllowed
+                         local  int32 numEstimates
+                         local  struct GoTemple* pTemple
+                         local  bool bIsDrivingInTemple
+                         local  int32_t iTicks
+                         inlines  GamePlayer::GetEstimatedBall, GamePlayer::SetReplayFlags, GamePlayer::SetTapInFound, GamePlayer::SetTimedReactionDist, GoTemple::EnableMaterialFiltering, PhysicsBall_t::ClearFlag, PhysicsBall_t::SetFlag, TI_fConvertTimeDifToSeconds
+ 3492  00210BB4     34  void GM_SetupCustomHoleSelection()
+ 3503  001FC2AC     9C  bool GM_bIsMidholeFlybyButtonPressed(enum PlayerNumber_t PlayerID)
+ 3553  001FC108     68  bool GM_bIsZoomButtonPressed(enum PlayerNumber_t PlayerID)
+ 3605  001FC178      8  bool GM_bIsAltSwingButtonPressed(enum PlayerNumber_t PlayerID)
+ 3623  001FC170      8  bool GM_bIsElevatorCamButtonPressed(enum PlayerNumber_t PlayerID)
+ 3664  0024D698    10C  int GM_vGetAllTimeRecordsHeld(const struct UserInfo& userInfo)
+                         local  int numRecords
+                         local  int i
+                         local  int j
+ 3692  002ACBB0    1F0  float GM_GetGameProgress(const struct UserInfo& userInfo)
+                         local  float fRet
+                         local  enum GM_DriverType_t[2] driverTypes
+                         local  size_t nNumDrivers
+                         local  float[3] fCategoryPercentages
+                         local  const struct GameModeDriver* pDriver
+                         local  size_t i
+ 3747  0024D7A4    14C  float GM_GetBonusProgress(const struct UserInfo& userInfo)
+                         local  int i
+                         local  float totalProgress
+                         local  int32 allTime
+ 3804  0031D048    224  void GM_Golfer_LostBoast(enum PlayerNumber_t PlayerID)
+                         local  int32 i
+                         local  int numStillPlaying
+                         inlines  GM_GetCurrentHoleIndex, GM_GetScoringType, GM_SetPlayerHoleStrokes
+ 3874  00281724    464  static void GM_Attributes_AutoLevel(enum PlayerNumber_t PlayerID)
+                         local  int32 level
+                         local  int32 bracket
+                         local  int32 cost
+                         local  int32 devPoints
+                         local  const enum STAT_e[9] DEVPTS_TO_STAT
+                         local  int32 i
+                         inlines  GamePlayer::GetGolferBonus, GeneralUserData::GetDevLevel, UserInfo::GetDevLevel, UserInfo::GetDevPoints, UserInfo::GetGolferData, UserInfo::IncDevLevel, UserInfo::SetDevPoints
+ 3948  002A0DA0     9C  bool GM_IsValidDropSurface(enum PlayerNumber_t PlayerID, uint32 lieID)
+                         local  bool valid
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+ 3957  001FC3F8      8  int GM_GetNumberOfTotalTrophyBalls()
+ 3963  001FC400    15C  float GM_GetTrophyBallCompletionPercentage(const struct UserInfo& userInfo)
+                         local  float fRet
+                         local  int nNumTrophyBallsWon
+                         local  int nTotalTrophyBallsPossible
+                         local  const float dPercent
+ 3996  002C5B80    110  bool GM_IsSpecialMoment(enum PlayerNumber_t PlayerID)
+                         local  struct <anon> luaParam
+                         local  struct <anon> retVal
+                         local  unsigned int count
+                         local  int val
+ 4035  001FC55C     18  bool GM_SpecialMoment_SkipReaction()
+ 4040  001F220C     18  void GM_SpecialMoment_SetSkipReaction(bool val)
+ 4048  002A0E3C     A0  bool GM_IsTrainingChallengeDriver()
+                         local  void* ptr
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+ 4060  002A1274     A0  bool GM_IsFacilityDriver()
+                         local  void* ptr
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+ 4072  002A1760     A0  bool GM_IsTigerChallengeDriver()
+                         local  void* ptr
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+ 4085  002A1800     A0  bool GM_IsPGATourDriver()
+                         local  void* ptr
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+ 4098  001FC574     54  bool GM_IsGolferDisabledInFrontEnd(enum Golfer_t golferID)

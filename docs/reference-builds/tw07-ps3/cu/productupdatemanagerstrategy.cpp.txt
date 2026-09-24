@@ -1,0 +1,15 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/productupdatemanagerstrategy.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   60  005CEF7C     88  uint32_t GetNumberOfUpdateFiles(const const struct <anon>* this)
+                         local  const char8_t* pLobbyConfig
+   83  006221A4     CC  void ProductUpdateManagerStrategy(const struct ProductUpdateManagerStrategy* this, struct ProductUpdateDownloadCallback* pCallback, struct MemoryStrategy* pMemoryStrategy)
+                         inlines  OperationStrategy, RCPointer, operator=
+  108  0061824C     6C  void ~ProductUpdateManagerStrategy(const struct ProductUpdateManagerStrategy* this)
+                         inlines  ~OperationStrategy, ~RCPointer
+  128  00622050    154  bool OperationProcess(const struct ProductUpdateManagerStrategy* this, const struct Operation* )
+                         local  bool bContinue
+                         inlines  operator->, operator=
+  184  005BDDD8     5C  void OperationCancel(const struct ProductUpdateManagerStrategy* this, const struct Operation* )
+  206  005BDE34     5C  void OperationTimeout(const struct ProductUpdateManagerStrategy* this, const struct Operation* )

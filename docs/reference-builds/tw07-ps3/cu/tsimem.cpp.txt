@@ -1,0 +1,29 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptFF/core/tsimem.cpp
+// compiled in: other_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   38  003F05E0    178  struct tsiMemObject* tsi_NewMemhandler(int* errCode)
+                         local  struct tsiMemObject* t
+                         local  int i
+   89  003F109C    120  void* tsi_FastAllocN(struct tsiMemObject* t, size_t size, int N)
+                         local  void* p
+  109  003F2B04     8C  void tsi_FreeFastMemBlocks(struct tsiMemObject* t)
+                         local  int i
+  123  003F2B90     38  void tsi_DeleteMemhandler(struct tsiMemObject* t)
+  146  003F2148      4  void tsi_EmergencyShutDown(struct tsiMemObject* t)
+  235  003F03A8    10C  void* tsi_AllocMem(struct tsiMemObject* t, size_t size)
+                         local  int i
+                         local  int maxPointers
+                         local  uint8_t* p
+                         local  uint32_t* plong
+                         local  void** base
+                         local  uint32_t index
+  311  003F053C     A4  void* tsi_ReAllocMem2(struct tsiMemObject* t, void* pIn, size_t size2, size_t size1)
+                         local  void* buf
+                         local  const int32_t minSize
+  390  003F04FC     40  void tsi_DeAllocMem(struct tsiMemObject* t, void* pIn)
+                         local  void** base
+                         local  uint32_t* plong
+                         local  int8_t* p
+                         local  uint32_t size
+                         local  uint32_t index

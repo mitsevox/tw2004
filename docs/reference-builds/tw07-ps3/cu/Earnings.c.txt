@@ -1,0 +1,199 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/Earnings.c
+// compiled in: golf_unity.cpp
+// 50 functions, source order. line | PS3 address | size
+
+  139  0029E0F0     44  bool GM_Earnings_IgnoreEarningsDueToMulligans()
+                         inlines  GM_GetMulligans
+  154  001FA694    14C  int32 roundToNearest25Or5(int num)
+                         local  int i
+  178  001FA7E0    1D4  int GM_Earnings_TournamentPayout(int purse, int firstPrize, int place)
+                         local  int result
+                         local  float firstPrizeRatio
+                         local  float otherPrizesScalar
+  203  002D68FC     74  void GM_Earnings_AwardSpecialsWinnings(enum PlayerNumber_t winner, int32 cashEarned)
+                         local  struct CourseMoneyTracking_t moneyTracking
+  212  002D5270    1D4  void GM_Earnings_AwardMoney(enum PlayerNumber_t winner, int32 moneyWon, enum MoneyRewareType moneyType)
+                         local  struct CourseMoneyTracking_t moneyTracking
+  295  002D4588    3E4  void GM_Earnings_AwardWinnings(enum PlayerNumber_t winner, int32 totalearned, struct CourseMoneyTracking_t* tracking, int32 LegendCoinsEarned)
+                         local  enum PlayerNumber_t userID
+                         local  int32 previousTotalCash
+                         local  const struct UserInfo& userInfo
+                         inlines  GamePlayer::GetGolferBonus, GamePlayer::GetPlayerID
+  391  0029EC7C    150  int32 GM_Earnings_GetStrokeWinnings(enum PlayerNumber_t winner, enum PlayerNumber_t loser, int pointsAhead, int32* baseearned)
+                         local  int32 earned
+                         local  int loserRanking
+                         inlines  EarningsInfo::GetStrokeEarnings
+  427  0029EA70    20C  int32 GM_Earnings_GetStrokeWinningsTeam(enum PlayerNumber_t winner, enum PlayerNumber_t loser, int pointsAhead, int32* baseearned)
+                         local  int32 earned
+                         local  int loser1Ranking
+                         local  int loser2Ranking
+                         local  enum PlayerNumber_t loser1
+                         local  enum PlayerNumber_t loser2
+                         local  int32 baseearned1
+                         local  int32 baseearned2
+                         inlines  EarningsInfo::GetStrokeEarnings
+  565  002D4394    1F4  int GM_Earnings_CheckUnlockCourses(enum PlayerNumber_t userID, enum PlayerNumber_t winner, bool queUI)
+                         local  int i
+                         local  int numUnlocks
+                         local  int numCourses
+                         local  const struct UserInfo& userInfo
+                         local  void* gamePtr
+                         inlines  UserInfo::GetTotalCash
+  643  0024A3B0     78  int GM_GetHighestRatedGolfer()
+                         local  int32 i
+                         local  int highest
+                         local  int rating
+  662  0024A35C     54  int GM_Earnings_RateGolfer(enum PlayerNumber_t PlayerID)
+  700  0029CC18     88  int GM_GetGolferMoneyRating(enum Golfer_t golfer)
+                         inlines  Singleton<GolferStats>::GetSingleton
+  723  0025FC84    17C  int GM_Earnings_GetSkinsHoleValue(int CPUGolferLevel, int holeNum)
+  741  0030DE44    1EC  bool GM_Earnings_CheckEagleEveryPar5(enum PlayerNumber_t PlayerID, bool predicted)
+                         local  bool par5eagles
+                         local  enum PlayerNumber_t userID
+                         local  int j
+                         local  int totalPar5Eagles
+                         local  int missing
+                         local  int num_par5_holes
+                         inlines  GM_GetPlayerHoleStrokes
+  797  0032F6CC    17C  bool GM_Earnings_CheckWinAllTournaments(enum PlayerNumber_t PlayerID, bool predicted)
+                         local  enum PlayerNumber_t userID
+                         local  bool finished
+                         local  uint32 i
+                         local  uint32 tourncount
+                         local  const struct UserInfo& userInfo
+  840  0032F5C4    108  bool GM_Earnings_CheckFirstTournamentWin(enum PlayerNumber_t PlayerID, bool predicted)
+                         local  enum PlayerNumber_t userID
+                         local  bool finished
+                         local  uint32 i
+                         local  const struct UserInfo& userInfo
+  875  0029E454    524  int32 GM_Earnings_ComputeBonusModifiers(int32 bonus, enum PlayerNumber_t PlayerID, bool course, bool tee, bool pin, struct CourseMoneyTracking_t* tracking)
+                         local  int32 modBonus
+                         local  float courseMod
+                         local  float teeMod
+                         local  float pinMod
+                         local  float tourDifficultyMod
+                         local  float courseBonus
+                         local  float teeBonus
+                         local  float pinBonus
+                         local  float tourDifficultyBonus
+                         local  float coursePercent
+                         local  float teePercent
+                         local  float pinPercent
+                         inlines  EarningsInfo::GetSpecialShots, GM_GetFlagPositionIndex
+ 1021  001FADE4     14  float GM_Earnings_GetCourseModifier()
+ 1081  0029E280    1D4  int32 GM_Earnings_ComputeTOURCardModifiers(int32 bonus, enum PlayerNumber_t PlayerID, struct CourseMoneyTracking_t* tracking)
+                         local  int32 modBonus
+                         local  float tourMod
+                         local  enum PlayerNumber_t userID
+                         local  const struct UserInfo& userInfo
+                         local  enum t_SSEnum mod
+ 1141  002AD19C    1B8  int32 GM_Earnings_ComputeExpertModeModifiers(int32 bonus, enum PlayerNumber_t PlayerID, struct CourseMoneyTracking_t* tracking)
+                         local  int32 modBonus
+                         local  float expertMod
+                         local  enum PlayerNumber_t userID
+                         inlines  EarningsInfo::GetSpecialShots
+ 1197  002AD0D4     C8  bool GM_Earnings_AwardShotBonusToUser(enum PlayerNumber_t PlayerID, bool allowAI)
+                         local  int userID
+ 1222  001F5B2C     2C  void GM_Earnings_SetUpTheAnteExperienceMultiplier(enum PlayerNumber_t playerId, int32 experienceMultiplier)
+ 1227  001FAE00     30  int32 GM_Earnings_GetUpTheAnteExperienceMultiplier(enum PlayerNumber_t playerId)
+ 1232  001F5BA8     30  void GM_Earnings_SetUpTheAntePurseExperience(enum PlayerNumber_t playerId, enum STAT_e experienceType, int32 experienceAmount)
+ 1238  001FAE30     38  void GM_Earnings_GetUpTheAntePurseExperience(enum PlayerNumber_t playerId, enum STAT_e* experienceType, int32* experienceAmount)
+ 1244  001FAE68     30  void GM_Earnings_AddEndGameAward_TourCard(enum PlayerNumber_t winner, enum TourCard tourCard)
+ 1250  001F5B58     50  void GM_Earnings_AddEndGameAward_EquipmentToken(enum PlayerNumber_t winner, enum STAT_e equipmentToken)
+                         local  int32 numEquipmentTokensWon
+ 1260  001FAE98     50  void GM_Earnings_AddEndGameAward_GolferUnlock(enum PlayerNumber_t winner, enum Golfer_t golfer)
+                         local  int32 numGolfersUnlocked
+ 1270  001FAEE8     50  void GM_Earnings_AddEndGameAward_CourseUnlock(enum PlayerNumber_t winner, enum GM_CourseType_t course)
+                         local  int32 numCoursesUnlocked
+ 1280  001FAF38     48  void GM_Earnings_AddEndGameAward_TrophyBall(enum PlayerNumber_t winner, int8 ball)
+                         local  int32 numTrophysWon
+ 1293  002A0BC4    1DC  bool GM_Earnings_AwardTrophyBall(enum PlayerNumber_t winner, enum TrophyBall_t ball)
+                         local  enum PlayerNumber_t userID
+                         local  enum TrophyBallReplay saveReplayIndex
+                         local  void* ptr
+                         local  const struct UserInfo& userInfo
+                         inlines  GamePlayer::GetPlayerID, Singleton<GameModeDriverManager>::GetSingleton
+ 1350  0029E1CC     B4  bool GM_Earnings_AwardThisTrophyBallToUser(enum PlayerNumber_t PlayerID, enum TrophyBall_t trophy)
+                         local  int userID
+ 1383  0029E134     98  bool GM_Earnings_GiveAwardToUser(enum PlayerNumber_t PlayerID, AwardInfoBase* pBaseInfo)
+                         local  int userID
+ 1422  001FAF80     58  bool IsBallStoppedOnFairway(struct PhysicsBall_t* ball)
+ 1435  0023D084    13C  void GM_ClearShotBonusStats(enum PlayerNumber_t PlayerID)
+ 1453  0023D1C0    104  void GM_ClearHoleBonusStats(enum PlayerNumber_t PlayerID)
+ 1471  0023D2C4    2CC  void GM_ClearGameBonusStats(enum PlayerNumber_t PlayerID)
+                         local  int32_t i
+ 1532  00318518    4F8  void GM_RecordIndividualShotStats(enum PlayerNumber_t PlayerID)
+                         local  float x
+                         local  float y
+                         local  uint32 initialLie
+                         local  float hitDist
+                         local  int par
+                         local  struct PhysicsBall_t* ball
+                         local  enum Lie_t ballLie
+                         local  int strokesAfterHit
+                         local  struct TGD_MaterialInfo* playerSurface
+                         local  enum PlayerNumber_t userID
+                         local  int feetToPin
+                         local  const struct UserInfo& userInfo
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GamePlayer::SetDriveDist, UserInfo::SetLongestDrive, UserInfo::SetLongestPutt, UserInfo::SetNumHolesDriven, UserInfo::SetTotalYardsDriven, std::sqrt
+ 1645  00318A10    338  void GM_RecordBonusShotStats(enum PlayerNumber_t PlayerID)
+                         local  enum Lie_t ballLie
+                         local  int strokesAfterHit
+                         local  int par
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GamePlayer::GetGolferBonus, GamePlayer::GetGolferScore
+ 1699  00318D48    5C4  void GM_RecordIndividualHoleStats(enum PlayerNumber_t PlayerID)
+                         local  float x
+                         local  float y
+                         local  float hitDist
+                         local  struct PhysicsBall_t* ball
+                         local  enum PlayerNumber_t userID
+                         local  int relScore
+                         local  int par
+                         local  int32 currDate
+                         local  int month
+                         local  int day
+                         local  int year
+                         local  int hour
+                         local  int minute
+                         local  int second
+                         local  int millisecond
+                         local  void* rawGameModePointer
+                         local  const struct UserInfo& userInfo
+                         local  int par5Index
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_SetPlayerHoledOut, UserInfo::IncNumFairwayAttempts, UserInfo::IncNumGIRAttemps, UserInfo::IncNumHolesPutting, UserInfo::IncNumTotalPutts, UserInfo::IncTotalFairwaysMade, UserInfo::IncTotalGIRMade
+ 1815  0030F2BC    158  void GM_RecordIndividualRoundStats(enum PlayerNumber_t PlayerID)
+                         local  enum PlayerNumber_t userID
+                         local  int roundScore
+                         local  const struct UserInfo& userInfo
+                         inlines  GM_FullRoundOfGolf, UserInfo::GetBestRound, UserInfo::IncNumGameRounds, UserInfo::IncNumRounds, UserInfo::IncTotalScore, UserInfo::SetBestRound
+ 1904  0020EECC      8  bool GM_TestShotWinMessages(int userID)
+ 2000  0020EEC4      8  bool GM_TestHoleWinMessages(int userID)
+ 2325  0020EEBC      8  bool GM_TestGameWinMessages(int userID)
+ 2383  002CC0AC     38  bool GM_IsArcadeMode()
+                         local  enum GM_ModeType_t gameMode
+                         inlines  GM_GetModeType
+ 2399  001FAFE8     24  int GM_Earnings_GetTrophyBallMovieIndex(enum TrophyBall_t trophy)
+ 2404  001FB00C      8  int32 GM_Earnings_GetNumberOfUnlockableCoursesForTP(enum PlayerNumber_t userID)
+ 2417  002D496C    418  void GM_Earnings_ProcessGameWager(bool isTeamPlay, uint8_t plr1, uint8_t plr2, uint8_t plr3, uint8_t plr4)
+                         local  uint32_t wagerAmount
+                         local  uint8_t numPlayers
+                         local  uint8_t[4] playerPlaces
+                         local  uint8_t[4] numEachPlace
+                         local  uint8_t curIndex
+                         local  uint8_t[4] finalPlayerPlaces
+                         local  const float* wagerBreakdownLUT
+                         local  uint8_t place
+                         local  uint8_t placeFound
+                         local  uint8_t plr
+                         local  enum PlayerNumber_t plrNum
+                         local  uint8_t i
+                         local  float_t totalMultiplier
+                         local  int32_t totalEarned
+                         local  struct CourseMoneyTracking_t tracking
+                         local  uint8_t j
+ 2512  001FB088    208  void GM_Earnings_ReturnWager()
+                         local  uint8_t plr
+ 2701  002ACE58     68  int32 GM_Earnings_CalcPlayerLevelExperienceMultiplier(enum PlayerNumber_t plyrID)
+                         local  enum PlayerNumber_t userID
+                         local  const struct UserInfo& userInfo
+                         local  int32 experienceMultiplier

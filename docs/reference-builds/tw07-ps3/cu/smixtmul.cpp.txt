@@ -1,0 +1,6 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/smixtmul.cpp
+// compiled in: smixtmul.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    7  006E17E8     48  void MIX_settimemult(int voice, int timemult)
+                         local  SNDMIXVOICE* psmv

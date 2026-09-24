@@ -1,0 +1,11 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/scrsfc.cpp
+// compiled in: scrsfc.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   38  006F6BC8    120  void rsfcc(int frames, float* psrc, float* pdst, unsigned int* paccwhole, unsigned int* paccfrac, unsigned int incwhole, unsigned int incfrac)
+                         local  int i
+                         local  float frac
+                         local  float a
+                         local  float b
+                         local  float c
+                         local  unsigned int incrementor

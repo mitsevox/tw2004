@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/ScreenEffects/ScreenEffects.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   68    inline-only   void ScreenEffects::StartIgnoreFadeMode(const struct ScreenEffects* this, float spedeInSec)
+   69    inline-only   void ScreenEffects::StopIgnoreFadeMode(const struct ScreenEffects* this, float spedeInSec)
+  102    inline-only   TextureRef ScreenEffects::GetSmallTexture(const const struct ScreenEffects* this)

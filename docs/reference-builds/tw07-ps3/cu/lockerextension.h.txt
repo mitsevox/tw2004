@@ -1,0 +1,5 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/locker/include/common/osdk/locker/lockerextension.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  108  00625A7C      C  void ~LockerExtension(const struct LockerExtension* this)

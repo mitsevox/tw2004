@@ -1,0 +1,58 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/spreadsheetleaderboardconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   78  005E0850    108  const char8_t* GetCellRaw(const const struct <anon>* this, int32_t iRow, int32_t iColumn)
+                         local  const char8_t* pCell
+                         inlines  GetElementAt
+  107  005BF8F0     2C  int32_t GetSortRow(const const struct <anon>* this, int32_t iRow)
+  119  006045BC     B0  void SpreadSheetLeaderboardConcrete(const struct <anon>* this, uint32_t uLobbyRankCategoryIndex, uint32_t uLobbyRankIndexIndex, uint32_t uLobbyRankVariationIndex, struct List<OSDK::StringConcrete>* pLocalUserData)
+                         local  uint32_t uIndex
+                         inlines  RCPointer
+  133  006044E8     4C  void ~SpreadSheetLeaderboardConcrete(const struct <anon>* this)
+                         inlines  ~RCPointer
+  156  005E0958    1A0  const char8_t* GetCell(const const struct <anon>* this, int32_t iRow, int32_t iColumn)
+                         local  const char8_t* pCell
+                         local  LobbyRankT* pLobbyRank
+                         local  int32_t iType
+                         local  char8_t[32] strParameter
+                         local  uint32_t uParam
+                         local  int32_t iValue
+                         inlines  GetInstance, GetLobbyRank, TranslateLeaderboardCellData
+  189  005E0810     40  uint32_t GetNumberOfRows(const const struct <anon>* this)
+  195  005E07D0     40  uint32_t GetNumberOfColumns(const const struct <anon>* this)
+  201  005E062C    1A4  struct SpreadSheetColumnFormat GetColumnFormat(const const struct <anon>* this, int32_t iColumn)
+                         local  LobbyRankT* pLobbyRank
+                         local  enum Type eType
+                         local  enum Alignment eAlignment
+                         local  const char8_t* strParam
+                         local  char8_t[2] strAlign
+                         local  int32_t iTagErr
+                         local  int32_t iStyle
+                         local  uint32_t uColumnWidth
+                         inlines  GetLobbyRank
+  265  005E05E8     44  const char8_t* GetColumnHeader(const const struct <anon>* this, int32_t iColumn)
+                         local  LobbyRankT* pLobbyRank
+  273  005E05A4     44  const char8_t* GetColumnDescription(const const struct <anon>* this, int32_t iColumn)
+                         local  LobbyRankT* pLobbyRank
+  281  005CDCDC     A4  const char8_t* GetRowPersona(const const struct <anon>* this, int32_t iRow)
+                         inlines  GetInstance
+  295  005DE5C8     F8  const struct User* GetRowUser(const const struct <anon>* this, int32_t iRow)
+                         inlines  GetInstance, GetUserManagerConcrete
+  307  005E00D8    3F8  void Sort(const struct <anon>* this, int32_t iColumn, bool bDescending)
+                         local  const StringComparator* pComparator
+                         local  uint32_t uRows
+                         local  uint32_t[100] aTempIndex
+                         local  char8_t[128] strUnranked
+                         local  char8_t[128] strFirst
+                         local  char8_t[128] strSecond
+                         local  uint32_t uIndex
+                         local  LobbyRankT* pRanker
+                         local  struct LobbyConcrete* pLobby
+                         local  uint32_t uStartIndex
+                         local  uint32_t uMinIndex
+                         local  int32_t i
+                         local  uint32_t i
+                         local  uint32_t uDestIndex
+                         local  int32_t iCmp
+                         inlines  GetComparator, GetInstance, GetLobbyConcrete

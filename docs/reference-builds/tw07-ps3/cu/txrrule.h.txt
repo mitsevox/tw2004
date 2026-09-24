@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/TextureFX/Headers/txrrule.h
+// compiled in: other_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   44  004A73E4     18  void TXRRule::~TXRRule(const struct TXRRule* this)
+   56    inline-only   bool TXRRule::IsWorskspaceTextureName(const char* name)

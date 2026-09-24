@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/Code/Golf/Earnings/Headers/UnlockInfo.h
+// compiled in: Legacy_unity.cpp, apt_unity.cpp, other_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   56  003D594C      4  void UnlockInfo::UnlockInfo(const struct UnlockInfo* this)
+   57  003D5950      4  void UnlockInfo::~UnlockInfo(const struct UnlockInfo* this)
+   72    inline-only   enum TourCard UnlockInfo::GetTourCard(const struct UnlockInfo* this)
+   79    inline-only   void UnlockInfo::SetTourCard(const struct UnlockInfo* this, enum TourCard tourCard)

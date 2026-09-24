@@ -1,0 +1,13 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sgparse.cpp
+// compiled in: sgparse.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   22  006E8BA4    2A4  void SNDI_patchtohdrgen(void* pbank, struct <anon>* ptp, SNDSAMPLEFORMAT* pssf, SNDSAMPLEATTR* pssa, SNDSAMPLEDESC* pssd)
+                         local  int[43] stc
+                         local  void*[43] pstc
+                         local  int[40] stp
+                         local  void*[40] pstp
+                         local  int userdatachunks
+                         local  SNDTAGINFO sti
+                         local  int moretags
+                         local  int i

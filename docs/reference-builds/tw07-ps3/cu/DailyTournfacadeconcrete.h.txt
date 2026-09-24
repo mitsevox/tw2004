@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/dailytourn/source/common/./DailyTournfacadeconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   42    inline-only   struct <anon>* GetInstance()
+   43  0062656C      8  struct DailyTournExtension* GetDailyTournExtension(const const struct <anon>* this)
+   44  00625E60      8  struct DailyTournExtensionConcrete* GetDailyTournExtensionConcrete(const const struct <anon>* this)

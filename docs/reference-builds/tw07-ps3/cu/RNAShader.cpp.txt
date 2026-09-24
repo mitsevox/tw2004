@@ -1,0 +1,50 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/RNAShader.cpp
+// compiled in: RNAShader.cpp
+// 23 functions, source order. line | PS3 address | size
+
+    0  0082E85C     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   69  0082E3E8     70  void ShaderInterfaceC(const struct ShaderInterfaceC* this)
+   76  0082E4C8     D4  void ~ShaderInterfaceC(const struct ShaderInterfaceC* this)
+                         inlines  ParmBlockC::operator delete
+   82  0082E59C      8  bool8_t GetAnnotation(const const struct <anon>* this, const struct <anon>* pParm, const char* pAnnotName, const float_t& fValue)
+   88  0082E5A4      8  bool8_t GetAnnotation(const const struct <anon>* this, const struct <anon>* pParm, const char* pAnnotName, const int32_t& iValue)
+   94  0082E5AC      8  bool8_t GetAnnotation(const const struct <anon>* this, const struct <anon>* pParm, const char* pAnnotName, const const char*& pValue)
+  101  0082E5B4     44  bool8_t IsParmUsed(const const struct <anon>* this, const struct <anon>* pParm)
+  108  0082E5F8     40  bool8_t IsParmUsed(const const struct <anon>* this, struct ScopeParmC* pScopeParm)
+  115  0082E638     54  struct <anon>* AddParm(const struct ShaderInterfaceC* this, struct ScopeParmC* pScopeParm, int32_t Offset)
+                         local  struct <anon>* pParm
+  127  0082E68C     60  void DeleteAllParms(const struct ShaderInterfaceC* this)
+  137  0082E6EC     64  void Print(const const struct <anon>* this)
+  149  0082E9EC    194  void ShaderC::ShaderC(const struct ShaderC* this, struct DeviceC* pDevice, struct UserData* pUserData)
+                         inlines  Init, RNADebugBreak, Vector
+  158  0082E8FC     F0  void ShaderC::~ShaderC(const struct ShaderC* this)
+                         inlines  ~Vector
+  165  0082E750      C  ScopeMaskT ShaderC::GetInputMask(const struct ShaderC* this)
+  171  0082ED48     E8  void ShaderC::Print(const const struct ShaderC* this)
+                         local  int i
+                         local  const struct <anon>* pInterface
+                         inlines  ShaderC::GetInterface, ShaderC::GetNumInterfaces
+  187  0082EE30    104  const struct <anon>* ShaderC::FindInterfaceByName(const const struct ShaderC* this, const char* pName)
+                         local  int32_t i
+                         local  const struct <anon>* pInterface
+                         inlines  ShaderC::GetInterface, ShaderC::GetNumInterfaces
+  200  0082F178    2E4  void ShaderC::AddInterface(const struct ShaderC* this, struct ShaderInterfaceC* pInterface)
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct ShaderInterfaceC** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct ShaderInterfaceC** newData
+                         inlines  Construct, PushBack, RNADebugBreak
+  209  0082E75C      8  bool8_t ShaderC::GetAnnotation(const const struct ShaderC* this, const char* pAnnotName, const float_t& fValue)
+  215  0082E764      8  bool8_t ShaderC::GetAnnotation(const const struct ShaderC* this, const char* pAnnotName, const int32_t& iValue)
+  221  0082E76C      8  bool8_t ShaderC::GetAnnotation(const const struct ShaderC* this, const char* pAnnotName, const const char*& pValue)
+  229  0082E774     E8  int32_t ShaderC::FindTechniqueByName(const struct ShaderC* this, const char* pStrName)
+                         local  int32_t nTechs
+                         local  int32_t iTech
+                         local  struct TechniqueInfo info
+  245  0082E8DC     10  static void _GLOBAL__I__ZN3RNA16ShaderInterfaceCC2Ev()
+  246  0082E8EC     10  static void _GLOBAL__D__ZN3RNA16ShaderInterfaceCC2Ev()

@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/packages/coreAllocator/1.02.03/include/coreallocator/icoreallocator_interface.h
+// compiled in: rnaunity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   66  004F77D0     18  void ~ICoreAllocator(const struct ICoreAllocator* this)

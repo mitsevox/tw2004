@@ -1,0 +1,159 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/extern/coda/cmn/mpegl3base.cpp
+// compiled in: mpegl3base.cpp
+// 17 functions, source order. line | PS3 address | size
+
+ 1617  006EDFD0     40  void CMpegLayer3Base(const struct <anon>* this)
+ 1625  006EDF64     6C  void ~CMpegLayer3Base(const struct <anon>* this)
+ 1638  006EE134    320  static void Snd::ScaleSamples(float* pSamples, float scale, int numSamples)
+ 1725  006EE454    384  void Dequantize(const struct <anon>* this, unsigned int ch, unsigned int gr, float* samples)
+                         local  GranuleInfo* pGranuleInfo
+                         local  Layer3ScaleFactors* pScaleFactors
+                         local  const SBI* pCriticalBandIndexes
+                         local  int criticalBands
+                         local  int i
+                         local  float scale
+                         local  int sampleIndex
+                         local  int numSamples
+                         local  unsigned int idx
+                         local  float scale
+                         local  int sampleIndex
+                         local  int numSamples
+                         local  unsigned int idx
+ 1844    inline-only   static void Snd::MidSideStereo(float[576]* samples)
+                         local  float* pSamples
+                         local  float* pEnd
+                         local  float l0
+                         local  float r0
+                         local  float l1
+                         local  float r1
+                         local  float l2
+                         local  float r2
+ 1961  006EE7D8     98  void i_stereo_k_values(const struct <anon>* this, unsigned int is_pos, unsigned int io_type, unsigned int i, float[576]* k)
+ 1982  006EE870    F98  void Stereo(const struct <anon>* this, int gr, float[32][18]* samples)
+                         local  int sb
+                         local  int ss
+                         local  bool i_stereo
+                         local  bool ms_stereo
+                         local  float l
+                         local  float r
+                         local  Layer3ScaleFactors* pScaleFactors
+                         local  unsigned int[576] is_pos
+                         local  float[576] is_ratio
+                         local  float[2][576] k
+                         local  GranuleInfo* pGranuleInfo
+                         local  int sfb
+                         local  int i
+                         local  int lines
+                         local  int temp
+                         local  int temp2
+                         local  unsigned int io_type
+                         local  int max_sfb
+                         local  unsigned int j
+                         local  int sfbcnt
+                         local  float* pSamples
+                         local  unsigned int j
+                         local  int sfbcnt
+                         local  float* pSamples
+                         inlines  Snd::MidSideStereo
+ 2407  006EF808    434  void Reorder(const struct <anon>* this, unsigned int ch, unsigned int gr, float* inputSamples, float* outputSamples)
+                         local  GranuleInfo* pGranuleInfo
+                         local  unsigned int freq
+                         local  unsigned int freq3
+                         local  int index
+                         local  int sfb
+                         local  int sfb_start
+                         local  int sfb_lines
+                         local  int src_line
+                         local  int des_line
+                         local  const unsigned char[9][10] reorderMap
+                         local  const unsigned char* pReorderMap
+                         local  int mapIndex
+                         local  int inputIndex
+                         local  int outputIndex
+                         local  int i
+                         local  const int REORDER_BLOCKS
+                         local  float* pInput
+                         local  float* pOutput
+                         local  int reorderStep
+                         local  int reorderStepx2
+                         local  int j
+                         local  float* pInput
+                         local  float* pOutput
+                         local  int sfb_start3
+ 2599  006EFC3C    3DC  void AntiAlias(const struct <anon>* this, unsigned int ch, unsigned int gr, float* samples)
+                         local  GranuleInfo* pGranuleInfo
+                         local  float* pSubBandLimit
+                         local  float* pSrc
+                         local  float temp
+ 2881  006F0018    12C  void Snd::ReorderForVectoring(float* source, float[18][4]* dest)
+                         local  float* pDst
+                         local  float* pSrc
+                         local  float* pEnd
+                         local  float temp0
+                         local  float temp1
+                         local  float temp2
+                         local  float temp3
+ 2975  006F0144    600  static void Snd::Imdct12X1(float[4]* input, float[4]* output)
+                         local  float[18] tmp
+                         local  int i
+                         local  int six_i
+                         local  float pp1
+                         local  float pp2
+                         local  float sum
+                         local  float save
+ 3134  006F0744    820  static void Snd::Imdct36X1(float[4]* input, float[4]* output, const float* window)
+                         local  float[18] tmp
+                         local  float tmp0
+                         local  float tmp1
+                         local  float tmp2
+                         local  float tmp3
+                         local  float tmp4
+                         local  float tmp0_
+                         local  float tmp1_
+                         local  float tmp2_
+                         local  float tmp3_
+                         local  float tmp0o
+                         local  float tmp1o
+                         local  float tmp2o
+                         local  float tmp3o
+                         local  float tmp4o
+                         local  float tmp0_o
+                         local  float tmp1_o
+                         local  float tmp2_o
+                         local  float tmp3_o
+                         local  float e
+                         local  float o
+                         local  float i0x2
+                         local  float i0x2pi12
+                         local  float i6_
+                         local  float i0x2
+                         local  float i0x2pi12
+                         local  float i6_
+ 3416    inline-only   static void Snd::Imdct36X4(float[4]* input, float[4]* output, const float* window)
+                         local  int i
+ 3965  006F0F64    BD8  static void Snd::OverlapAddX4(float[4]* outputBand, float[4]* imdctOutput, float[4]* prevBand)
+                         local  int i
+ 4160  006F1B3C    328  void Hybrid(const struct <anon>* this, int ch, int gr, float[18][4]* outputSamples)
+                         local  GranuleInfo* pGranuleInfo
+                         local  float[8][18][4]* pPrevChannelBlockX4
+                         local  float[36][4] imdctOutputX4
+                         local  int bands
+                         local  int i
+                         inlines  Snd::Imdct36X4
+ 4275  006F1E64    1B0  void Snd::FrequencyInversionX4(float[18][4]* samples)
+                         local  float[18][4]* pSamples
+                         local  float[18][4]* pEnd
+                         local  float temp0
+                         local  float temp1
+                         local  float temp2
+                         local  float temp3
+                         local  float temp4
+                         local  float temp5
+ 4559  006F2014    12C  void Snd::ReorderForFPolySynth(float[18][4]* source, float[32]* dest)
+                         local  float* pDst
+                         local  float* pSrc
+                         local  float* pEnd
+                         local  float temp0
+                         local  float temp1
+                         local  float temp2
+                         local  float temp3

@@ -1,0 +1,198 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameModeConsole.c
+// compiled in: golf_unity.cpp
+// 41 functions, source order. line | PS3 address | size
+
+  242  0020592C    11C  bool GM_Console_HandleCommand(int argc, char** argv)
+                         local  int i
+                         local  bool result
+                         local  bool found
+  272  002F542C    274  static bool GM_Console_CmdHandler_Mode(int argc, char** argv)
+                         local  int i
+                         local  bool result
+                         local  char[256] outstr
+                         inlines  GM_GetModeType
+  330  00298BD4    13C  bool GM_Console_CmdHandler_NPlayers(int argc, char** argv)
+                         local  bool result
+                         local  char[256] outstr
+                         inlines  std::atoi
+  357  00298D10    1B8  bool GM_Console_CmdHandler_Tees(int argc, char** argv)
+                         local  bool result
+                         local  char[256] outstr
+                         local  int i
+                         inlines  std::atoi
+  388  00298EC8    12C  bool GM_Console_CmdHandler_Pin(int argc, char** argv)
+                         local  bool result
+                         local  char[256] outstr
+                         inlines  cGAME_GLOBALS::SetPin, std::atoi
+  416  002CC9EC     F0  static bool GM_Console_CmdHandler_Course(int argc, char** argv)
+                         local  bool result
+                         local  char[256] outstr
+                         inlines  GM_SetCurrentCourse, std::atoi
+  442  00205A48     C8  static char* GM_Console_GetControllerName(int plrID)
+                         local  int i
+                         local  char* result
+  461  00205B10    118  void GM_Console_SetControllerName(int plrID, char* name)
+                         local  int i
+                         local  bool found
+                         local  char[256] outstr
+  486  00205C28     B0  static void DisplayControllers()
+                         local  char[256] outstr
+  499  00205CD8     D4  static bool GM_Console_CmdHandler_Controllers(int argc, char** argv)
+                         local  int i
+                         local  bool result
+  532  00205DAC    118  static void DisplayHoles()
+                         local  bool foundHoles
+                         local  char[256] outstr
+                         local  char[3] numstr
+                         local  int i
+  560  0020FFBC    160  static bool GM_Console_CmdHandler_Holes(int argc, char** argv)
+                         local  bool result
+                         local  char[256] outstr
+                         local  int i
+                         inlines  GM_SelectHoleSet
+  603    inline-only   static void DisplayClubs(enum PlayerNumber_t plrID)
+                         local  char[256] outstr
+                         local  bool found
+                         local  int i
+  632  0029ACC4    260  static bool GM_Console_CmdHandler_Clubs(int argc, char** argv)
+                         local  bool result
+                         local  enum PlayerNumber_t plrID
+                         inlines  DisplayClubs, std::atoi
+  657  002875C4     70  static bool GM_Console_CmdHandler_Start(int argc, char** argv)
+                         local  bool result
+                         local  enum GM_ModeType_t mode
+                         inlines  GM_GetModeType, UserInfo::SetValid, cGAME_GLOBALS::SetDemoMode
+  685  00205EC4      8  static bool GM_Console_CmdHandler_Event(int argc, char** argv)
+  693  002A1D14    164  static bool GM_Console_CmdHandler_PGAEvent(int argc, char** argv)
+                         local  char[256] outstr
+                         local  bool result
+                         local  int32 dayNum
+                         local  GM_PgaTourEventID_t eventID
+                         inlines  std::atoi
+  725  002AB360    240  static bool GM_Console_CmdHandler_PGAInfo(int argc, char** argv)
+                         local  char[256] outstr
+                         local  bool result
+                         local  int yearoffset
+                         local  GM_PgaTourEventID_t eventID
+                         local  const struct GM_PgaTour_EventSlot_t* pSlot
+                         local  uint32 month
+                         local  uint32 day
+                         local  uint32 year
+                         inlines  std::atoi
+  773  002A1B98    17C  static bool GM_Console_CmdHandler_PGADate(int argc, char** argv)
+                         local  char[256] outstr
+                         local  bool result
+                         local  GM_PgaTourEventID_t eventID
+                         local  int32 dayNum
+                         inlines  std::atoi
+  814  002A3210    134  static bool GM_Console_CmdHandler_RTEvent(int argc, char** argv)
+                         local  char[256] outstr
+                         local  bool result
+                         local  int dayNum
+                         local  GM_RealtimeEventID_t eventID
+                         inlines  std::atoi
+  846  002A2FCC    1F4  static bool GM_Console_CmdHandler_RTInfo(int argc, char** argv)
+                         local  char[256] outstr
+                         local  bool result
+                         local  int yearoffset
+                         local  GM_RealtimeEventID_t eventID
+                         local  const struct CalendarEntry_t* pSlot
+                         local  uint32 month
+                         local  uint32 day
+                         local  uint32 year
+                         inlines  std::atoi
+  893  002A2C08    164  static bool GM_Console_CmdHandler_RTDate(int argc, char** argv)
+                         local  char[256] outstr
+                         local  bool result
+                         local  GM_RealtimeEventID_t eventID
+                         local  int dayNum
+                         inlines  std::atoi
+  934  002A33AC     A4  static bool GM_Console_CmdHandler_RTToday(int argc, char** argv)
+                         local  char[256] outstr
+                         local  GM_RealtimeEventID_t eventID
+                         local  int dayNum
+  956  00205ED4      8  static bool GM_Console_CmdHandler_AddClub(int argc, char** argv)
+  962  00205EDC      8  static bool GM_Console_CmdHandler_RemoveClub(int argc, char** argv)
+  968  002A3EC4     48  static bool GM_Console_CmdHandler_InitRivalEvent(int argc, char** argv)
+                         local  bool result
+  979  002A3DC8     FC  static bool GM_Console_CmdHandler_SetNextRivalMode(int argc, char** argv)
+                         local  bool result
+                         local  struct GameModeDriver* gameModeDriver
+                         local  enum ERA_EventModeType_e modeType
+ 1009  002A3C50    178  static bool GM_Console_CmdHandler_RivalEvent(int argc, char** argv)
+                         local  char[256] outstr
+                         local  bool result
+                         local  struct GameModeDriver* gameModeDriver
+                         inlines  std::atoi
+ 1045  002A3724    110  static bool GM_Console_CmdHandler_ShowEvents(int argc, char** argv)
+                         local  char[256] outstr
+                         local  bool result
+                         local  struct GameModeDriver* gameModeDriver
+                         local  uint32 i
+ 1072  002A3B7C     D4  static bool GM_Console_CmdHandler_StartRival(int argc, char** argv)
+                         local  bool result
+                         local  struct GameModeDriver* gameModeDriver
+                         inlines  UserInfo::SetValid, cGAME_GLOBALS::SetDemoMode
+ 1099  002D3FF0    268  static bool GM_Console_CmdHandler_StartTutorial(int argc, char** argv)
+                         local  bool result
+                         local  void* ptr
+                         local  struct GameModeDriverFacility* pFacility
+                         local  struct GameModeDriver* gameModeDriver
+                         inlines  cGAME_GLOBALS::SetDemoMode, std::atoi
+ 1158  00205EF4     D0  static bool GM_Console_CmdHandler_WorldRanking(int argc, char** argv)
+                         local  char[256] outstr
+                         local  char* rankName
+                         local  bool result
+                         local  int i
+ 1180  0029AF24    15C  static bool GM_Console_CmdHandler_WorldRankingWin(int argc, char** argv)
+                         local  char[256] outstr
+                         local  bool result
+                         inlines  std::atoi
+ 1199  0029B59C    184  static bool GM_Console_CmdHandler_MoveToTee(int argc, char** argv)
+                         local  bool result
+                         local  char[256] outstr
+                         local  int player
+                         local  int tee
+                         local  void* driverPtr
+                         local  struct GameModeDriverFacility* pFacilityDriver
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton, std::atoi
+ 1235  0029B720     F0  static bool GM_Console_CmdHandler_SetUserFedExRank(int argc, char** argv)
+                         local  bool result
+                         local  char[256] outstr
+                         local  int rank
+                         inlines  std::atoi
+ 1269  002061AC     F0  static bool GM_Console_CmdHandler_SetUserSimmedScoreAdjustment(int argc, char** argv)
+                         local  bool result
+                         local  char[256] outstr
+                         local  int nStrokes
+                         inlines  std::atoi
+ 1303  0029B080    160  static bool GM_Console_CmdHandler_PgaSeason(int argc, char** argv)
+                         local  bool result
+                         local  char[256] outstr
+                         local  int season
+                         inlines  std::atoi
+ 1335  0029B43C    160  static bool GM_Console_CmdHandler_pgaRank1Count(int argc, char** argv)
+                         local  bool result
+                         local  char[256] outstr
+                         local  int rank1Count
+                         inlines  std::atoi
+ 1367  002A3834    348  static bool GM_Console_CmdHandler_PgaCourseInfo(int argc, char** argv)
+                         local  char[256] outstr
+                         local  bool result
+                         local  int yearoffset
+                         local  GM_PgaTourEventID_t eventID
+                         local  const struct GM_PgaTour_EventSlot_t* pSlot
+                         local  enum GM_CourseType_t[4] courses
+                         local  int i
+                         local  void* ptr
+                         local  struct GameModeDriverPGATour* pPGA
+                         local  struct GameModeDriver* gameModeDriver
+                         inlines  std::atoi
+ 1449  0029B1E0    154  static bool GM_Console_CmdHandler_SetERA(int argc, char** argv)
+                         local  char[256] outstr
+                         local  int eraNum
+                         local  bool result
+                         inlines  std::atoi
+ 1483  0029B334    108  static bool GM_Console_CmdHandler_SetTrophies(int argc, char** argv)
+                         local  bool result
+                         inlines  std::atoi

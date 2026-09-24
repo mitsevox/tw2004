@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/Headers/BallPathPreviewMgr.h
+// compiled in: golf_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    9  00263930     94  void BallPathPreviewMgr::BallPathPreviewMgr(const struct BallPathPreviewMgr* this)
+                         local  int playerNum
+   10  00217330     60  void BallPathPreviewMgr::~BallPathPreviewMgr(const struct BallPathPreviewMgr* this)
+                         local  int playerNum
+   14    inline-only   struct BallPathPreviewMgr* BallPathPreviewMgr::GetInstance()

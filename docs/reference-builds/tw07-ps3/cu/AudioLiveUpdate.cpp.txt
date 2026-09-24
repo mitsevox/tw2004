@@ -1,0 +1,44 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/audio/AudioLiveUpdate.cpp
+// compiled in: other_unity.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   63  003FBA10     38  void AudioLiveUpdate_SetIPAddress(char* host)
+   68  003FBA48     18  void AudioLiveUpdate_SetPort(int port)
+   73  003FBA60     14  char* AudioLiveUpdate_GetIPAddress()
+   78  003FBA74     1C  int AudioLiveUpdate_GetPort()
+   84  003DDDEC     18  bool AudioLiveUpdate_IsConnected()
+   91  00420A24    1AC  bool AudioLiveUpdate_Connect(const char* host, int port, bool block)
+                         local  struct <anon> sa
+                         local  int result
+                         inlines  Resource, ~BaseResourceDescriptors, ~ResourceDescriptor
+  131  004205AC     A8  void AudioLiveUpdate_Send(const void* send_buf, int send_size)
+                         local  int once
+                         local  int ret
+  158  003FBA90     A0  int AudioLiveUpdate_itoa(char* buf, unsigned int value, int base)
+                         local  char[32] tempbuf
+                         local  const char* table
+                         local  char* t
+                         local  char* b
+  182  00420234    2E8  int AudioLiveUpdate_vsprintf(char* buf, const char* fmt, va_list va)
+                         local  char* o
+                         local  const char* i
+                         local  unsigned int d
+                         local  void* p
+                         local  const char* s
+                         local  const char* a
+                         local  const char* b
+                         local  const char* s
+                         inlines  std::strrchr
+  241  0042051C     90  void AudioLiveUpdate_Consolef(const char* fmt)
+                         local  char[512] buf
+                         local  va_list va
+  253  003FBB30     2C  voidpf AudioLiveUpdate_zcalloc(voidpf opaque, unsigned int items, unsigned int size)
+  257  003FBB5C     28  void AudioLiveUpdate_zcfree(voidpf opaque, voidpf ptr)
+  262  003FBB84     30  int AudioLiveUpdate_Compress2(Bytef* dest, uLongf* destLen, const Bytef* source, uLong sourceLen, int level)
+  295  003FBBB4     6C  void AudioLiveUpdate_Write(char* buffer, int length)
+  302  00420BD0    158  void AudioLiveUpdate_Flush()
+                         local  int recursing
+                         local  char[8196] send_buf
+                         local  uLongf send_size
+  382  004768B8     10  static void _GLOBAL__I_SFIO_gErrorMap()
+  383  004768A8     10  static void _GLOBAL__D_SFIO_gErrorMap()

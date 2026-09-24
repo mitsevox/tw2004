@@ -1,0 +1,17 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/host-win32/ppu/lib/gcc/ppu-lv2/4.0.2/include/altivec.h
+// compiled in: RNADevice.cpp, SGNodeBSPCulledRenderable.cpp, SGNodeJoint.cpp
+// 13 functions, source order. line | PS3 address | size
+
+  521    inline-only   int[4] vec_add(int[4] a1, int[4] a2)
+  545    inline-only   float[4] vec_add(float[4] a1, float[4] a2)
+  949    inline-only   int[4] vec_and(int[4] a1, int[4] a2)
+ 1331    inline-only   unsigned int[4] vec_cmpeq(int[4] a1, int[4] a2)
+ 1567    inline-only   float[4] vec_ctf(int[4] a1, const int a2)
+ 1591    inline-only   int[4] vec_cts(float[4] a1, const int a2)
+ 2833    inline-only   float[4] vec_madd(float[4] a1, float[4] a2, float[4] a3)
+ 3925    inline-only   float[4] vec_nmsub(float[4] a1, float[4] a2, float[4] a3)
+ 4327    inline-only   float[4] vec_perm(float[4] a1, float[4] a2, unsigned char[16] a3)
+ 4505    inline-only   float[4] vec_sel(float[4] a1, float[4] a2, unsigned int[4] a3)
+ 5091    inline-only   float[4] vec_splat(float[4] a1, const int a2)
+ 5097    inline-only   int[4] vec_splat(int[4] a1, const int a2)
+ 7022    inline-only   unsigned int[4] vec_xor(unsigned int[4] a1, unsigned int[4] a2)

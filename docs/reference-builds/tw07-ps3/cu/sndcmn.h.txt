@@ -1,0 +1,14 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sndcmn.h
+// compiled in: satospkr.cpp, sgp.cpp, smixer.cpp, spktplay.cpp
+// 9 functions, source order. line | PS3 address | size
+
+  978    inline-only   void* SNDMEMI_alloc(char* id, int size)
+  984    inline-only   void SNDMEMI_free(void* pAddr)
+ 1041    inline-only   static int SNDI_ftoiround(float val)
+                         local  int result
+ 1202    inline-only   static int SNDI_ftoifast(float val)
+ 1278    inline-only   void* MemCpy(void* pDst, const void* pSrc, size_t bytes)
+ 1293    inline-only   float Az65536To360(short unsigned int azimuth)
+ 1298    inline-only   void FastVol(struct CHANPUB* pVoice)
+ 1306    inline-only   void AddVariableTimerClient(VariableTimerClient* pClient)
+ 1315    inline-only   void RemoveVariableTimerClient(VariableTimerClient* pClient)

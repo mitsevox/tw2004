@@ -1,0 +1,39 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Temple/GoTemple.cpp
+// compiled in: golf_unity.cpp
+// 22 functions, source order. line | PS3 address | size
+
+   51  001EF2A4     14  struct GoTemple* GoTempleGetTemple()
+  114  002A3F0C    190  bool GoTemple::Load(const struct GoTemple* this)
+                         local  struct GameModeDriverFacility* pFacility
+                         local  struct GameModeDriver* gameModeDriver
+                         local  void* ptr
+                         local  enum GM_ModeType_t gamemodeType
+                         inlines  GoTempleEnv::SetTempleScreenTexture
+  178  00236DC4     78  void GoTemple::Unload(const struct GoTemple* this)
+  212  002017EC     3C  int8_t GoTemple::GetCurrTargetPinId(const struct GoTemple* this)
+  234  00201854     40  int8_t GoTemple::GotoNextHole(const struct GoTemple* this)
+  257  002017B8     14  void GoTemple::SelectHole(const struct GoTemple* this, int8_t iHoleIndex)
+  282  0020685C      8  bool GoTemple::IsBallOOB(const struct GoTemple* this, struct PhysicsBall_t* pBall)
+  305  00236E3C     6C  void GoTemple::ActivateAllCups(const struct GoTemple* this, bool bActive)
+                         local  int i
+  331  0023D008     7C  void GoTemple::MoveGolferToLastBallPos(const struct GoTemple* this, enum PlayerNumber_t playerNum)
+  356  00258BC4     D0  bool GoTemple::IsMaterialPresentable(const struct GoTemple* this, unsigned int materialHash)
+  406  00253880     C0  void GoTemple::SelectCamera(const struct GoTemple* this)
+                         local  enum CameraMode_t currCamMode
+                         inlines  GoTempleEnv::SetCamera
+  447  00236CBC     5C  void GoTemple::PreShotInit(const struct GoTemple* this)
+                         inlines  PhysicsBall_t::SetFlag
+  485  00236C3C     74  void GoTemple::SetCurrentState(const struct GoTemple* this, enum TempleStateE eState)
+  513  001FC1F4     B0  void GoTemple::RecordCurrBallPosition(const struct GoTemple* this, enum PlayerNumber_t playerNum)
+                         inlines  vec4flt_Copy, vec_st
+  552  002525BC    260  void GoTemple::BallHasCollided(const struct GoTemple* this)
+                         inlines  GoTempleEnv::TriggerCollisionEffect, LLMath_DotProduct3, LLMath_Subtract3, std::acos, vec_madd, vec_sld, vec_sub
+  583  00236EA8     A0  void GoTemple::StartTrinitySeq(const struct GoTemple* this, const char* pSeq)
+                         local  char[32] sequenceName
+  614  0020D52C      8  void GoTemple::SetAreWeGoingToMiniGames(const struct GoTemple* this, bool bVal)
+  637  00236F4C     30  void GoTemple::PerformPostTrinityActions(const struct GoTemple* this)
+  683  00236F90     68  void GoTemple::ReEnterTemple(const struct GoTemple* this)
+                         inlines  cGAME_GLOBALS::SetPlayFacilityFlyby
+  720  00236F48      4  void GoTemple::ExitTemple(const struct GoTemple* this)
+  751  00236DB0     14  void GoTemple::Sleep(const struct GoTemple* this)
+  777  00236F7C     14  void GoTemple::WakeUp(const struct GoTemple* this)

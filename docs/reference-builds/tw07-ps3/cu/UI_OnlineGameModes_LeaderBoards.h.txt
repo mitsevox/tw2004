@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_OnlineGameModes_LeaderBoards.h
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   16  0011A6E4    160  void UIOnlineGameModes_LeaderBoards::~UIOnlineGameModes_LeaderBoards(const struct UIOnlineGameModes_LeaderBoards* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIOnlineGameModes_LeaderBoards::DstMenuItem_olgl>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+   18  000FF7A0      C  uint32 UIOnlineGameModes_LeaderBoards::GetSignature(const const struct UIOnlineGameModes_LeaderBoards* this)
+   24  000FF7AC     44  void UIOnlineGameModes_LeaderBoards::ShowHelpText(const struct UIOnlineGameModes_LeaderBoards* this)
+   26  000FF7F8      C  struct IExternArray* UIOnlineGameModes_LeaderBoards::GetExternArray(const struct UIOnlineGameModes_LeaderBoards* this)

@@ -1,0 +1,13 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/core/resource/resource.h
+// compiled in: MemoryManager.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   61  0081E458     88  void BaseResourceDescriptors(const struct <anon>* this)
+   77  0081E77C     48  const struct <anon>& GetBaseResourceDescriptor(const const struct <anon>* this, uint32_t i)
+   86  0081E56C     48  struct <anon>& GetBaseResourceDescriptor(const struct <anon>* this, uint32_t i)
+   96  0081E998     24  uint32_t GetNumberOfBaseResourceTypes()
+  232    inline-only   RwBool rw::operator==<4u>(const const struct <anon>& lhs, const const struct <anon>& rhs)
+                         local  uint32_t i
+  304  0081E80C     6C  void BaseResources(const struct <anon>* this)
+                         local  uint32_t i
+  349  0081E878     48  BaseResource& GetBaseResource(const struct <anon>* this, uint32_t i)

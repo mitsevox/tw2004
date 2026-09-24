@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/Spectator/SpectatorModel.h
+// compiled in: golf2_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   83    inline-only   TSpectatorModel* CSpectatorModel::GetModel(const struct CSpectatorModel* this)
+   84    inline-only   void CSpectatorModel::SetModel(const struct CSpectatorModel* this, TSpectatorModel* model)

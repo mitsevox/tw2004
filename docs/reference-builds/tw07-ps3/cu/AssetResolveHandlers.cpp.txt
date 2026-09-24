@@ -1,0 +1,20 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Rna/Asset/AssetResolveHandlers.cpp
+// compiled in: rnaunity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   71  004C7030     18  void SetResolvePathMode(bool8_t bStrip)
+  129  004EF9A8     B8  struct ShaderC* GameResolveShader(const char* pStrName, bool stripPath)
+                         local  struct <anon> path
+  145  004EC524     A8  struct TextureC* GameResolveTexture(const char* pStrName, bool stripPath)
+                         local  struct <anon> path
+  162  004E6A1C    1CC  struct TextureC* TextureAssetC::GolfCreateTexture(const struct TextureAssetC* this, const char* pStrName)
+                         local  struct UserData* pUserData
+                         inlines  RNADebugBreak, TexturePlatC::operator new, UserData::UserData, UserData::operator new
+  383  004F7A20     38  void GameCGFXShaderC::~GameCGFXShaderC(const struct GameCGFXShaderC* this)
+  387  00503EC8      C  struct TextureC* GameCGFXShaderC::ResolveTexture(const struct GameCGFXShaderC* this, const char* pTextureName)
+  443  004E6884    198  struct CGFXShaderC* ShaderAssetC::GolfCreateShader(const struct ShaderAssetC* this, struct DeviceC* pDevice, const char* pStrName)
+                         local  struct UserData* pUserData
+                         inlines  GameCGFXShaderC::GameCGFXShaderC, RNADebugBreak, UserData::UserData, UserData::operator new
+  461  004C7048      4  void TestbedIncrementShaderVersion(struct ShaderC* pShader)
+  466  004C704C      4  void GameSetDebugDisplayTexture(struct TextureC* pTexture)
+  471  004C7050      4  void GameSetDebugDisplayTexture(struct TextureC* pTexture, bool m_bRotate, bool bAlphaOverlay, float m_fXScale, float m_fYScale)

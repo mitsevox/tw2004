@@ -1,0 +1,33 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/src/HighLevel/HighLevel_Character.c
+// compiled in: HighLevel_Character.c
+// 14 functions, source order. line | PS3 address | size
+
+   90  005A1E78    198  bool Character_InitAnimViewInfo(struct Character* viewInfo, void* parentObj, struct Definition* character)
+                         local  int i
+                         local  int j
+  169  005A18F4      4  void Character_DeInitAnimViewInfo(struct Character* viewInfo)
+  201  005A18F8     2C  void Character_ActivateAnimViewInfo(struct Character* viewInfo)
+  217  005A1924     18  static void Character_ExecuteDeactivateAnimViewInfo(struct Character* viewInfo)
+  223  005A193C    104  void Character_ProcessPendingDeactivations()
+                         local  int i
+  236  005A1A40     70  void Character_DeactivateAnimViewInfo(struct Character* viewInfo)
+  254  005A1AB0     18  void Character_DeactivateAnimViewInfoImmediately(struct Character* viewInfo)
+  298  005A1AC8     68  int Character_HookUpPointers(void* chb)
+                         local  struct Definition* character
+                         local  char* baseAddr
+                         local  int* relocs
+  321  005A1B30     90  bool Character_StateIdFromName(const char* toAnimStateName, const struct <anon>* definition, int32_t* stateId)
+                         local  int testIndex
+                         inlines  Common::CommonHash
+  348  005A1BC0     2C  int Character_RegisterCompressedData(struct MotionDefinition* motionRef, struct <anon>* bankHeader, struct Definition* character)
+                         local  const int alignment
+                         local  const int overlap
+                         local  const int padding
+  387  005A1BEC    11C  void Character_RegisterMotionBank(struct <anon>* header, struct Definition* character)
+                         local  int i
+  437  005A1D08    108  void Character_UnregisterMotionBank(struct <anon>* header, struct Definition* character)
+                         local  int i
+  465  005A1E10     4C  static uint32_t _RemoveInvalidSourceStateTransitionCB(const struct TransitionDefinition* transition, void* data)
+                         local  struct Definition* character
+  482  005A1E5C     1C  uint32_t _RemoveMatchingTargetStateTransitionCB(const struct TransitionDefinition* transition, void* data)
+                         local  struct TransitionDefinition* matching

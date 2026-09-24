@@ -1,0 +1,119 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/Engine.cpp
+// compiled in: headgate_unity.cpp
+// 49 functions, source order. line | PS3 address | size
+
+  121  00360828     A0  void* GrassTuneCallback(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  bool oldLockStatus
+  137  0034D288     20  void* ShadowGenTuneCallback(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+  146  0037283C   1CF8  void HGS_vInitForHole()
+                         local  struct GameXmlSettings treeSettings
+                         local  struct GameXmlSettings xmlSettings
+                         local  struct GameXmlSettings terrainSettings
+                         local  struct GameXmlSettings xmlSettings
+                         local  struct GameXmlSettings xmlSettings
+                         local  struct GameXmlSettings xmlSettings
+                         local  struct GameXmlSettings xmlSettings
+                         local  struct GameXmlSettings xmlSettings
+                         local  struct GameXmlSettings xmlSettings
+                         local  struct GameXmlSettings xmlSettings
+                         local  struct GameXmlSettings xmlSettings
+                         local  struct GameXmlSettings xmlSettings
+                         local  struct GameXmlSettings xmlSettings
+                         local  struct GameXmlSettings waterSettings
+                         local  struct GameXmlSettings xmlSettings
+                         local  struct GameXmlSettings xmlSettings
+                         local  struct GameXmlSettings xmlSettings
+                         local  struct GameXmlSettings xmlSettings
+                         local  struct GameXmlSettings xmlSettings
+                         local  int distRegistered
+  476  00365F40     5C  void HGS_DeInitForHole()
+  497  0036539C    108  void HGS_GetInitialPosition(float* fromPoint, float* direction, float* dirAngle)
+                         inlines  LLMath_Add3, LLMath_Subtract, std::atan2, vec4flt_Copy, vec_st
+  522  0034F52C     4C  void HGS_SetCharacterPos(float* ptGolferLoc)
+                         inlines  CRData::SetGolferPos
+  530  0036BA20     80  void HGS_InitOceanEmitters(float* positions, unsigned int* oceanEmittersLaunch, int maxOceanEmitters)
+  539  003773C8    130  void HGS_MoveFrame(float fTime, struct RC_SRenderCtx* pRenderCtx, bool bFirstCall)
+                         inlines  CRManager::DrawGrass, CRManager::DrawOcean, CRManager::DrawPan, CRManager::DrawShadowmap, CRManager::DrawSkydome, CRManager::DrawTerrain, CRManager::DrawVegetation
+  566  00378C44     30  void HGS_PostRender(unsigned int flags)
+  574  00379C54     30  void HGS_RenderFrame(unsigned int flags)
+                         local  struct CRManager* courseRender
+  612  00351D7C     C8  void HGS_InitiateRipple(float x, float z, float fPower, float fSize, float dwDuration, float dwRippleFrequency, unsigned int dwPriority)
+  622  00351D78      4  void HGS_InitOnce()
+  629  0034D2E4      4  void HGS_CloseOnce()
+  636  00358D3C     28  bool HGS_IsNearTree(float x, float y, float z, float maxDistance)
+  643  00358BD4     6C  bool HGS_IsNearTreePosition(float x, float y, float z, float maxDistance, float* treeX, float* treeY, float* treeZ)
+                         local  bool bRetVal
+                         local  vec4flt treePos
+  662  00351CF4     84  void HGS_GetLowResLighMapBounds(float* v1, float* v2)
+                         inlines  CRShadowMap::GetMaxShadowCoords, CRShadowMap::GetMinShadowCoords
+  670  00364FBC     A8  void HGS_CupManagerInit(int8 nNumGreens, int8 nNumCupsPerGreen)
+                         inlines  Singleton<CCupManager>::GetSingleton
+  678  00365064     8C  void HGS_CupManagerInitFlagActors()
+                         inlines  Singleton<CCupManager>::GetSingleton
+  689  00366B08     A0  void HGS_ShowFlagsOnGreen(int8 nGreenIndex)
+                         inlines  Singleton<CCupManager>::GetSingleton
+  700  003650F0     8C  void HGS_HideFlagsOnAllGreens()
+                         inlines  Singleton<CCupManager>::GetSingleton
+  711  00366480     EC  bool HGS_AddCup(int8 nGreenIndex, int8 nCupIndex, float* loc)
+                         inlines  Singleton<CCupManager>::GetSingleton
+  724  0036517C     A0  int8 HGS_GetActiveCups(const const struct Cup**& activeCups)
+                         inlines  Singleton<CCupManager>::GetSingleton
+  732  0036521C     88  int8 HGS_GetCupCount()
+                         inlines  Singleton<CCupManager>::GetSingleton
+  740  003666AC     B8  int8 HGS_GetCupCountOnGreen(int8 nGreenIndex, bool activeOnly)
+                         inlines  Singleton<CCupManager>::GetSingleton
+  748  0036688C     A8  float[4]& HGS_GetCupLocation(int8 nGreenIndex, int8 nCupIndex)
+                         inlines  Singleton<CCupManager>::GetSingleton
+  756  00366CD0     A8  float[4]& HGS_GetCupLocationAtGroundLevel(int8 nGreenIndex, int8 nCupIndex)
+                         inlines  Singleton<CCupManager>::GetSingleton
+  764  003652A4     78  float[4]& HGS_GetTargetCupLocation()
+                         inlines  Singleton<CCupManager>::GetSingleton
+  772  0036531C     80  float[4]& HGS_GetTargetLocation()
+                         inlines  Singleton<CCupManager>::GetSingleton
+  779  003654A4     E0  bool HGS_IsActiveCup(int8 nGreenIndex, int8 nCupIndex)
+                         inlines  CCupManager::IsActiveCup, Singleton<CCupManager>::GetSingleton
+  784  0034D63C     18  int8 HGS_MaxNumGreens(bool bTraditional)
+                         local  int8 result
+  794  0034D654     18  int8 HGS_MaxNumCupsPerGreen(bool bTraditional)
+                         local  int8 result
+  804  00365584     88  int8 HGS_NumGreens()
+                         inlines  Singleton<CCupManager>::GetSingleton
+  809  0036560C     88  int8 HGS_NumCupsPerGreen()
+                         inlines  Singleton<CCupManager>::GetSingleton
+  814  003659A0     90  void HGS_RegisterGreenSelectionMarker(TBasicParamPtr pActorData)
+                         inlines  Singleton<CCupManager>::GetSingleton
+  819  00365A30     90  float[4]& HGS_GetGreenMarkerLocation(int8 nGreenIndex)
+                         inlines  Singleton<CCupManager>::GetSingleton
+  824  00365AC0     94  void HGS_SetCurrentGreen(int8 nGreenIndex)
+                         inlines  CCupManager::SetCurrentGreen, Singleton<CCupManager>::GetSingleton
+  829  00365B54     A4  int8 HGS_GetCurrentGreen()
+                         inlines  CCupManager::GetCurrentGreen, Singleton<CCupManager>::GetSingleton
+  834  00365BF8     88  int8 HGS_GetGreenCount()
+                         inlines  Singleton<CCupManager>::GetSingleton
+  840  00365C80     A0  void HGS_SetTargetLocation(const float[4]& loc)
+                         inlines  CCupManager::SetTargetLocation, Singleton<CCupManager>::GetSingleton
+  849  00367434     E4  void HGS_ActivateCup(int8 nGreenIndex, int8 nCupIndex, bool bActive, bool bPostLoad)
+                         inlines  Singleton<CCupManager>::GetSingleton
+  857  003675C4     D0  void HGS_ActivateCups(bool bActive, bool bPostLoad)
+                         local  int numCupsPerGreen
+                         local  int numGreens
+                         local  int greenIndex
+                         local  int cupIndex
+  871  00367518     AC  void HGS_ActivateCups(int8 nGreenIndex, bool bActive, bool bPostLoad)
+                         local  int numCupsPerGreen
+                         local  int cupIndex
+  883  00367840    120  bool HGS_SetTargetCup(int8 nGreenIndex, int8 nCupIndex, bool bPostLoad)
+                         local  bool result
+                         inlines  GM_GetCurrentHoleIndex, Singleton<CCupManager>::GetSingleton
+  909  0036F624     90  void HGS_DrawCups(bool bActiveOnly)
+                         inlines  Singleton<CCupManager>::GetSingleton
+  914  00366110     C0  void HGS_MoveCup(int8 nGreenIndex, int8 nCupIndex, const float* pos)
+                         inlines  Singleton<CCupManager>::GetSingleton
+  919  003670B4     90  void HGS_MoveCups(bool bActiveOnly)
+                         inlines  Singleton<CCupManager>::GetSingleton
+  924  00365D20     78  void HGS_CupManagerLoadHoles()
+                         inlines  Singleton<CCupManager>::GetSingleton
+  929  00365E24     78  void HGS_CupManagerUnLoadHoles()
+                         inlines  Singleton<CCupManager>::GetSingleton
+  934  0034D2E8    100  bool HGS_ValidCupIndex(int8 nGreenIndex, int8 nCupIndex)
+                         inlines  CCupManager::ValidIndex, Singleton<CCupManager>::GetSingleton

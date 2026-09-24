@@ -1,0 +1,13 @@
+// C:/packages/job_manager/1.11.00/include/job_manager/detail/job_header.h
+// compiled in: job.cpp, job_scheduler.cpp, job_thread.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   62    inline-only   uint32_t GetNumDependencies(const const struct <anon>* this)
+   64    inline-only   void IncrementNumDependencies(const struct <anon>* this)
+   65    inline-only   void DecrementNumDependencies(const struct <anon>* this)
+   67    inline-only   bool IsReadyValidSPUJob(const const struct <anon>* this)
+   68    inline-only   bool IsReadyValidPPUJob(const const struct <anon>* this)
+   70    inline-only   bool IsReadyValidJob(const const struct <anon>* this)
+   74    inline-only   bool IsSPUJob(const const struct <anon>* this)
+   75    inline-only   bool IsPPUJob(const const struct <anon>* this)
+   76    inline-only   bool IsQueued(const const struct <anon>* this)

@@ -1,0 +1,33 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnax/source/RNAX/RNAGeomList.cpp
+// compiled in: RNAGeomList.cpp
+// 8 functions, source order. line | PS3 address | size
+
+    0  0085C458     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   52  0085C4F8    18C  void GeomListC::GeomListC(const struct GeomListC* this, uint32_t flags)
+                         inlines  Object::SetAllocated, RNADebugBreak, Vector
+   59  0085C684    1EC  void GeomListC::ReleaseAll(const struct GeomListC* this)
+                         local  int32_t iGeom
+                         inlines  Clear, RNADebugBreak, operator[]
+   72  0085C870    1AC  void GeomListC::~GeomListC(const struct GeomListC* this)
+                         local  const char[11] __FUNCTION__
+                         inlines  GeomListC::operator delete, RNADebugBreak, ~Vector
+   81  0085CF84    348  void GeomListC::AddGeom(const struct GeomListC* this, struct GeomC* pGeom)
+                         local  const char[8] __FUNCTION__
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct GeomC** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct GeomC** newData
+                         inlines  Construct, PushBack, RNADebugBreak
+   88  0085CC74    184  struct GeomC* GeomListC::FindGeomByName(const struct GeomListC* this, const char* pStrName)
+                         local  const char[15] __FUNCTION__
+                         local  int32_t iGeom
+                         local  struct GeomC* pGeom
+                         local  const char* pName
+                         inlines  GeomListC::GetGeom, RNADebugBreak, operator[]
+  105  0085C4D8     10  static void _GLOBAL__I__ZN4RNAX9GeomListC16s_ClassAllocatorE()
+  106  0085C4E8     10  static void _GLOBAL__D__ZN4RNAX9GeomListC16s_ClassAllocatorE()

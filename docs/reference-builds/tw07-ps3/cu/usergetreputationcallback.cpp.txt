@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/usergetreputationcallback.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    5  005C16C4      C  void UserGetReputationCallback(const struct UserGetReputationCallback* this)
+    9  005C16D0      C  void ~UserGetReputationCallback(const struct UserGetReputationCallback* this)

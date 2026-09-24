@@ -1,0 +1,24 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/vector4_type_inline.h
+// compiled in: DebugMenu.cpp, IOStream.cpp, RNADevice.cpp, RNADevicePlat.cpp, RNAScene.cpp, RNAType.cpp, SGNodeMayaLight.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   24    inline-only   void Set(const struct <anon>* this, float x, float y, float z, float w)
+                         local  Vector4Intrinsic_32 vi_temp
+   60    inline-only   void SetComponent(const struct <anon>* this, int i, struct <anon>& value)
+                         local  Vector4Intrinsic_32 permuteControl
+                         local  int[4] asmSwizzleStore_I_V_a
+                         local  int[4] asmSwizzleStore_I_V_b
+                         local  signed char[16] asmSwizzleStore_I_V_c
+                         local  int[4] tempResult
+  175    inline-only   void SetZero(const struct <anon>* this)
+  298    inline-only   struct <anon>& operator=(const struct <anon>* this, struct <anon>& v)
+  345    inline-only   VecFloatRefX X(const struct <anon>* this)
+  350    inline-only   const VecFloatRefX X(const const struct Vector4* this)
+  355    inline-only   VecFloatRefY Y(const struct <anon>* this)
+  360    inline-only   const VecFloatRefY Y(const const struct Vector4* this)
+  365    inline-only   VecFloatRefZ Z(const struct <anon>* this)
+  370    inline-only   const VecFloatRefZ Z(const const struct Vector4* this)
+  375    inline-only   VecFloatRefW W(const struct <anon>* this)
+  380    inline-only   const VecFloatRefW W(const const struct Vector4* this)
+  426    inline-only   struct <anon> GetComponent(const struct <anon>* this, int i)
+  431    inline-only   const struct VecFloatRefIndex GetComponent(const const struct Vector4* this, int i)

@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_TerrainReflection.cpp
+// compiled in: shader_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   41  0051C0DC     44  void SM_TerrainReflectionClass::SM_TerrainReflectionClass(const struct SM_TerrainReflectionClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base
+   56  0050B200    148  void SM_TerrainReflectionClass::Load(const struct SM_TerrainReflectionClass* this)
+   72  0050B348     80  void SM_TerrainReflectionClass::Activate(const struct SM_TerrainReflectionClass* this)
+   83  0050B3C8     40  void SM_TerrainReflectionClass::Deactivate(const struct SM_TerrainReflectionClass* this)
+   92  005139EC     64  void SM_TerrainReflectionClass::SetHasOverlayTexture(const struct SM_TerrainReflectionClass* this, bool hot)
+  103  00513A50     64  void SM_TerrainReflectionClass::SetColorTerrainTexture(const struct SM_TerrainReflectionClass* this, TextureRef tr)
+  124  00513AB4     64  void SM_TerrainReflectionClass::SetOverlayTexture(const struct SM_TerrainReflectionClass* this, TextureRef tr)
+  144  00513B18     64  void SM_TerrainReflectionClass::SetTerLightmapTexture(const struct SM_TerrainReflectionClass* this, TextureRef tr)

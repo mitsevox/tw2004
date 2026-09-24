@@ -1,0 +1,23 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/RNAGeom.cpp
+// compiled in: RNAGeom.cpp
+// 7 functions, source order. line | PS3 address | size
+
+    0  008298F8     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   69  008297F0    108  void GeomC::GeomC(const struct GeomC* this, int32_t iMaxMeshs, struct UserData* pUserData, uint32_t flags)
+                         local  uint32_t uAllocSize
+                         local  char* pData
+                         inlines  Object::SetAllocated
+  117  00829998    1D0  void GeomC::~GeomC(const struct GeomC* this)
+                         local  const char[7] __FUNCTION__
+                         local  int iMesh
+                         local  char* pData
+                         inlines  GeomC::operator delete, RNADebugBreak
+  160  00829B68    124  void GeomC::AddMesh(const struct GeomC* this, struct MeshC* pMesh, MatIndexT MatIndex)
+                         local  const char[8] __FUNCTION__
+                         inlines  RNADebugBreak
+  192  0082A034    1A8  void GeomC::RemapMaterials(const struct GeomC* this, struct <anon>& aRemapTable)
+                         local  int32_t meshIndex
+                         local  int32_t oldIndex
+                         inlines  GeomC::GetMeshMatIndex, GeomC::SetMeshMatIndex, RNADebugBreak, operator[]
+  203  00829978     10  static void _GLOBAL__I__ZN3RNA5GeomC16s_ClassAllocatorE()
+  204  00829988     10  static void _GLOBAL__D__ZN3RNA5GeomC16s_ClassAllocatorE()

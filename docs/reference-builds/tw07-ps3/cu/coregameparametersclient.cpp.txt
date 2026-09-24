@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/gamefacade/coregameparametersclient.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   89  005C576C    144  void CoreGameParametersClient(const struct <anon>* this)
+  142  005B2CE8      4  void Validate(const const struct <anon>* this)
+  217  005B2CEC      4  void Print(const const struct <anon>* this)
+  280  005B2BF4      C  void ~CoreGameParametersClient(const struct <anon>* this)
+  300  005B2D3C     68  const char8_t* GetNetworkStartupString(const const struct <anon>* this)
+                         local  const struct <anon>* pPlatformParams

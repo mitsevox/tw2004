@@ -1,0 +1,27 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_IngameMessageBG.cpp
+// compiled in: apt_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   35  000F3FB0     4C  void UIIngameMessageBG::UIIngameMessageBG(const struct UIIngameMessageBG* this)
+   39  000400D4     60  void UIIngameMessageBG::Init(const struct UIIngameMessageBG* this)
+   46  00040380     54  void UIIngameMessageBG::Show(const struct UIIngameMessageBG* this)
+   56  000403D4     AC  void UIIngameMessageBG::OnShow(const struct UIIngameMessageBG* this)
+                         local  char[20] szParam
+   66  00040480      8  enum eAptHandleInput UIIngameMessageBG::HandleInput(const struct UIIngameMessageBG* this, int32 cID)
+   75  000E617C    480  enum AptThreadReturnValue UIIngameMessageBG::UpdateBG(const struct UIIngameMessageBG* this)
+                         local  TI_STimeValue currentTime
+                         local  int i
+                         local  char[48] nameBuf
+                         local  int32 iMessageHeight
+                         local  int32 iTotalMessageHeight
+                         local  int32 iMessageClipY
+                         local  int32 iMessageClipHeight
+                         local  int32 iBGY
+                         local  int32 iBottomMessageY
+                         local  int32 iOffsetY
+                         inlines  TI_fConvertTimeDifToSeconds, sys_time_get_timebase_frequency
+  200  000404F4      C  int32 UIIngameMessageBG::GetMessageCount(const struct UIIngameMessageBG* this)
+  210  0003ED84     D0  void UIIngameMessageBG::SetHeight(const struct UIIngameMessageBG* this, int32 iHeight, float fDelayTime)
+  232  00040500     70  void UIIngameMessageBG::AddNewMessage(const struct UIIngameMessageBG* this, enum GUI_MessageQue_t message, int32 iParam1, int32 iParam2, int32 iParam3)
+  253  0003ED60     24  void UIIngameMessageBG::GhostBG(const struct UIIngameMessageBG* this)
+  262  00040488     6C  void UIIngameMessageBG::UnghostBG(const struct UIIngameMessageBG* this)

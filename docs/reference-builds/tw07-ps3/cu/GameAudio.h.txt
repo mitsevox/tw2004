@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/Code/Golf/audio/Headers/GameAudio.h
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+  468    inline-only   void Gaud_StartPgaRecordComment(uint16 commentID, TCommentPlayMode mode)
+  476    inline-only   void Gaud_StartStatisticsLeadersComment(uint16 commentID, TCommentPlayMode mode)
+  480    inline-only   void Gaud_StartTrackingTigerComment(uint16 commentID, TCommentPlayMode mode)
+  484    inline-only   void Gaud_StartScenariosComment(uint16 commentID, TCommentPlayMode mode)

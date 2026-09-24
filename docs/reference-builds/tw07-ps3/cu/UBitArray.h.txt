@@ -1,0 +1,15 @@
+// ../../../../../TIGERCODE/Code/Legacy/Lib/Headers/UBitArray.h
+// compiled in: apt_unity.cpp, golf2_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   25    inline-only   void BitArray_SetBit(BitArray_t* bitArray, uint32 bit)
+   37    inline-only   void BitArray_ClearBit(BitArray_t* bitArray, uint32 bit)
+   43    inline-only   bool BitArray_TestBit(BitArray_t* bitArray, uint32 bit)
+   56    inline-only   void BitArray_ClearArray(BitArray_t* bitArray, uint32 numBits)
+                         local  uint32 i
+   65    inline-only   void BitArray_FillArray(BitArray_t* bitArray, uint32 numBits)
+                         local  uint32 i
+   90    inline-only   void BitArray_CopyArray(BitArray_t* sourceArray, BitArray_t* destArray, uint32 numBits)
+                         local  uint32 i
+  102    inline-only   void BitArray_MergeArrayWithOr(BitArray_t* sourceArray1, BitArray_t* sourceArray2, BitArray_t* destArray, uint32 numBits)
+                         local  uint32 i

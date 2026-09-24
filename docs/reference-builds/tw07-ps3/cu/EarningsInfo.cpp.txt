@@ -1,0 +1,46 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/earnings/EarningsInfo.cpp
+// compiled in: other_unity.cpp
+// 20 functions, source order. line | PS3 address | size
+
+   43  003D8D34     78  struct EarningsInfo& EarningsInfoMgr()
+                         inlines  Singleton<EarningsInfo>::GetSingleton
+   51  0043ED50     90  void EarningsInfo::EarningsInfo(const struct EarningsInfo* this)
+                         inlines  Singleton<EarningsInfo>::Singleton
+   61  003D8E48     80  void EarningsInfo::~EarningsInfo(const struct EarningsInfo* this)
+                         inlines  Singleton<EarningsInfo>::~Singleton
+   69  003D8EC8    1D4  void EarningsInfo::RegisterStreamClients(const struct EarningsInfo* this)
+                         local  char* pStrTable
+                         local  uint32 datasize
+  113  003D909C     28  void EarningsInfo::LoadEBSnFromStream(struct TStreamData* pStreamData)
+  121  003D90C4     28  void EarningsInfo::LoadEBHnFromStream(struct TStreamData* pStreamData)
+  129  003D90EC     28  void EarningsInfo::LoadEBGnFromStream(struct TStreamData* pStreamData)
+  137  003D9114     28  void EarningsInfo::LoadERNFromStream(struct TStreamData* pStreamData)
+  145  003D913C     5C  void EarningsInfo::UnRegisterStreamClients(const struct EarningsInfo* this)
+  154  003D9198     40  void EarningsInfo::Locale_Earnings_LoadERNFromStream(struct TStreamData* pStreamData)
+  162  003FC360    138  void EarningsInfo::Locale_Earnings_LoadEBSnFromStream(struct TStreamData* pStreamData)
+                         local  const char[35] __FUNCTION__
+                         local  char* pStrTable
+                         local  uint32 datasize
+                         inlines  TagValuePair, operator+
+  182  003FC498    138  void EarningsInfo::Locale_Earnings_LoadEBHnFromStream(struct TStreamData* pStreamData)
+                         local  const char[35] __FUNCTION__
+                         local  char* pStrTable
+                         local  uint32 datasize
+                         inlines  TagValuePair, operator+
+  202  003FC5D0    138  void EarningsInfo::Locale_Earnings_LoadEBGnFromStream(struct TStreamData* pStreamData)
+                         local  const char[35] __FUNCTION__
+                         local  char* pStrTable
+                         local  uint32 datasize
+                         inlines  TagValuePair, operator+
+  242  003D91D8     20  char* EarningsInfo::GetBonusShotString(const struct EarningsInfo* this, int32 nIndex)
+  247  003D91F8     20  char* EarningsInfo::GetBonusHoleString(const struct EarningsInfo* this, int32 nIndex)
+  252  003D9218     20  char* EarningsInfo::GetBonusGameString(const struct EarningsInfo* this, int32 nIndex)
+  260  00414BC4     2C  char* EarningsInfo::GetBonusShotName(const struct EarningsInfo* this, int32 shotID)
+  265  00414BF0     2C  char* EarningsInfo::GetBonusHoleName(const struct EarningsInfo* this, int32 holeID)
+  270  00414C1C     2C  char* EarningsInfo::GetBonusGameName(const struct EarningsInfo* this, int32 gameID)
+  278  00412A38     6C  int32 EarningsInfo::GetRatingsBracket(const struct EarningsInfo* this, int32 level)
+                         local  int32 bracket
+                         local  int32 i
+                         local  int32 min
+                         local  int32 max
+                         inlines  EarningsInfo::GetRatingsCost

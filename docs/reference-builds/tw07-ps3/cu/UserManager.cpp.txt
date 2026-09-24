@@ -1,0 +1,105 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/User/UserManager.cpp
+// compiled in: other_unity.cpp
+// 43 functions, source order. line | PS3 address | size
+
+   24  0042D164     30  bool CO_2bc(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         inlines  UserInfo::SetTwoButtonClickModeRequested
+   30  0042D134     30  bool CO_3bc(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         inlines  UserInfo::SetTwoButtonClickModeRequested
+   37  0042A8B4     78  struct UserManager& USERMgr()
+                         inlines  Singleton<UserManager>::GetSingleton
+   44  004750E4    138  void UserManager::OpenOnce(const struct UserManager* this)
+                         local  uint32_t i
+                         inlines  ConfidenceTracker::AssignProfile
+   81  0040C198     90  void UserManager::CloseOnce(const struct UserManager* this)
+                         local  uint32_t i
+   93  0040BA44    62C  void UserManager::AllocUserInfoMemory(const struct UserManager* this, struct UserInfo* pUserInfo)
+                         local  const char[20] __FUNCTION__
+                         local  uint32_t j
+                         inlines  TagValuePair, UserInfo::GetGamePlayUserData, UserInfo::GetVitalInfo, operator+
+  116  0040C070    128  void UserManager::FreeUserInfoMemory(const struct UserManager* this, struct UserInfo* pUserInfo)
+                         local  uint32_t j
+                         inlines  UserInfo::GetGamePlayUserData, UserInfo::GetVitalInfo
+  134  0040C324     68  void UserManager::SetUpTempUserInfo(const struct UserManager* this, struct UserInfo* pUserInfo)
+                         local  uint32_t i
+                         inlines  UserInfo::GetGamePlayUserData, UserInfo::GetVitalInfo
+  160  0043C554    1DC  void UserManager::FrontEndInit(const struct UserManager* this)
+                         local  int32 i
+                         local  int32 i
+                         local  char[32] userName
+                         inlines  GamePlayer::GetController
+  223  003D899C      4  void UserManager::FrontEndClose(const struct UserManager* this)
+  230  0040D668     CC  void UserManager::FacilityInit(const struct UserManager* this)
+                         local  int32 i
+  246  0040D734     DC  bool UserManager::FacilityValidateLoadedUsers(const struct UserManager* this)
+                         local  bool retVal
+                         local  int32 i
+  273  003D8904     28  void UserManager::ClearUserMgrControllerMap(const struct UserManager* this)
+                         local  int32 i
+  283  003D89A0      4  void UserManager::Init(const struct UserManager* this)
+  289  003D89A4      4  void UserManager::Shutdown(const struct UserManager* this)
+  295  00425AB8     48  void UserManager::SetCurrentUser(const struct UserManager* this, enum UserNumber userNumber)
+                         inlines  UserManager::CurrentUserSlot
+  302  00411104     90  void UserManager::AssignPlayerNumberToLoadedUser(const struct UserManager* this, enum PlayerNumber_t plr, enum UserNumber userNumber)
+                         local  enum UserNumber userBeingSwappedOut
+                         inlines  UserInfo::SetValid
+  318  003D8A14     70  enum UserNumber UserManager::GetControllersDefaultProfileSlot(const struct UserManager* this, int32 ctr)
+  326  003D8A84     5C  void UserManager::SetControllersDefaultProfileSlot(const struct UserManager* this, int32 ctr, enum UserNumber userSlot)
+                         local  int32 i
+  343  0043C3A0    148  enum UserNumber UserManager::GetNextEmptyUserNumber(const struct UserManager* this)
+                         local  int32 num
+  391  0043C344     5C  void UserManager::SetAllUserInfoDefaults(const struct UserManager* this)
+                         local  int i
+  402  003D892C     70  struct UserInfo& UserManager::GetUserInfo(const struct UserManager* this, enum PlayerNumber_t inPlayerNumber)
+                         local  enum UserNumber userNumber
+  412  003CE1F4     44  enum UserNumber UserManager::LookUpPlayerSlot(const struct UserManager* this, enum PlayerNumber_t playerNumber)
+                         local  int32 i
+  426  003D8AE0     2C  enum PlayerNumber_t UserManager::GetUserCurrPlayerNbr(const struct UserManager* this, enum UserNumber id)
+  437  003D89A8     6C  struct UserInfo& UserManager::GetUserInfoSlot(const struct UserManager* this, enum UserNumber userNumber)
+  447  003D8BD0    108  void UserManager::SwapUsers(const struct UserManager* this, enum UserNumber id1, enum UserNumber id2)
+                         local  enum PlayerNumber_t id1_playerNumber
+  462  003D8B0C     C4  void UserManager::CheckUserMap(const struct UserManager* this)
+                         local  int32 i
+                         local  int32 j
+  482  003D8CD8      8  struct UserInfo& UserManager::GetCurrentUserInfo(const struct UserManager* this)
+  490  0042ED8C     F0  enum eSaveUserFlow UserManager::SaveUserAfterGameCompletion(const struct UserManager* this, const int32& controllerOut)
+                         local  int32 i
+                         inlines  UserManager::CurrentUserSlot
+  520  003D8CE0     28  void UserManager::ClearNeedToSaveStates(const struct UserManager* this)
+                         local  int32 i
+  528  0043C4E8     6C  void UserManager::StartNewUser(const struct UserManager* this, int32 activeController)
+                         local  enum UserNumber emptySlot
+                         inlines  UserManager::CurrentUserSlot
+  540  0043C1D8    16C  void UserManager::DiscardNewUserInfo(const struct UserManager* this)
+                         local  enum UserNumber oldSlot
+                         local  int32 i
+                         inlines  UserManager::CurrentUserSlot
+  576  00425B48     44  void UserManager::RestoreStatesAfterCharSelectNew(const struct UserManager* this)
+  588  00425B00     48  void UserManager::StartNewPersona(const struct UserManager* this, enum UserNumber userSlot, int personaIndex)
+  598  003D8D08     2C  void UserManager::ResetUsersValidStatus(const struct UserManager* this)
+                         local  uint32_t i
+                         inlines  UserInfo::SetValid
+  609  004113AC      4  int32 UserManager::SetUpForDemoMode(const struct UserManager* this)
+  614  00411310     9C  int32 UserManager::PushValidUsersToBackOfMgr(const struct UserManager* this)
+                         local  int32 numEmptySlots
+                         local  int32 i
+  642  00411194    17C  int32 UserManager::SetUpForGame(const struct UserManager* this, const int numGolfers, const enum Golfer_t* golferArray, enum PlayerNumber_t* userNumbersBeingStompedArray)
+                         local  int32 numStopmedUsers
+                         local  int32 i
+                         local  bool foundSlotToMoveUserTo
+                         local  int32 j
+                         local  enum PlayerNumber_t currentPlayer
+                         local  enum PlayerNumber_t nextPlayer
+  678  0041EEC8     94  bool UserManager::IsTourDifficultyUnlocked(const struct UserManager* this)
+                         local  bool unlocked
+                         local  int i
+  710  00425B8C     D0  int32 UserManager::GetLowestUserCurrentCash(const struct UserManager* this)
+                         local  int32 lowestCash
+                         local  int i
+                         inlines  UserInfo::GetCurrentCash, UserManager::CurrentUserSlot
+  730  0040D810     90  bool UserManager::IsUniqueUserName(const struct UserManager* this, const char* name)
+                         local  int32 i
+  743  0042ADEC     90  struct UserInfo& GetUserInfo(uint8_t playerNumber)
+                         inlines  Singleton<UserManager>::GetSingleton
+  750  0042D0BC     78  struct UserInfo& GetCurrentUserInfo()
+                         inlines  Singleton<UserManager>::GetSingleton

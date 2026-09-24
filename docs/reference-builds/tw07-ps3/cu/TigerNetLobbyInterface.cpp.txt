@@ -1,0 +1,65 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/TigerNet/TigerNetLobbyInterface.cpp
+// compiled in: golf_unity.cpp
+// 29 functions, source order. line | PS3 address | size
+
+   44  00224088     F0  struct TigerNetLobbyInterface* TigerNetLobbyInterface::GetSingleton()
+                         local  struct TigerNetLobbyInterface lobbyInterface
+                         inlines  TigerNetLobbyInterface::TigerNetLobbyInterface
+   62  00223FEC     6C  bool TigerNetLobbyInterface::CanPerformLobbyOperation(const struct TigerNetLobbyInterface* this)
+   88  00224074     14  void TigerNetLobbyInterface::Init(const struct TigerNetLobbyInterface* this)
+  108  00223830      4  void TigerNetLobbyInterface::InitOnce(const struct TigerNetLobbyInterface* this)
+  128  00224178     34  void TigerNetLobbyInterface::UnsuspendSuccess(const struct TigerNetLobbyInterface* this)
+  145  002241AC     34  void TigerNetLobbyInterface::UnsuspendFailure(const struct TigerNetLobbyInterface* this)
+  162  002241E0     34  void TigerNetLobbyInterface::GameSessionStartSuccess(const struct TigerNetLobbyInterface* this)
+  179  00224214     5C  void TigerNetLobbyInterface::GameSessionStartFailure(const struct TigerNetLobbyInterface* this, enum FailureCode eFailureCode)
+  197  00225224     6C  void TigerNetLobbyInterface::LobbyCreateGameSuccess(const struct TigerNetLobbyInterface* this, struct GameSession* pGame)
+  224  002251C0     64  void TigerNetLobbyInterface::LobbyCreateGameFailure(const struct TigerNetLobbyInterface* this, enum Failure eFailure)
+  244  002254F8    1A4  void TigerNetLobbyInterface::LeaderboardDownloadSpreadSheetSuccess(const struct TigerNetLobbyInterface* this, struct Leaderboard* pLeaderboard, struct SpreadSheetLeaderboard* pSpreadSheet)
+                         local  int32 rows
+                         local  int32 columns
+                         local  int i
+                         local  int j
+  286  00224270     3C  void TigerNetLobbyInterface::LeaderboardDownloadSpreadSheetFailure(const struct TigerNetLobbyInterface* this, struct Leaderboard* pLeaderboard, enum Failure eFailure)
+  305  0027B1B0     C0  void TigerNetLobbyInterface::LobbyCustomAriesCommandResults(const struct TigerNetLobbyInterface* this, int32_t iCommandCode, int32_t iResultCode, struct Dictionary* pResults)
+  337  0027B0E4     CC  void TigerNetLobbyInterface::OnCanDownladFinished(const struct TigerNetLobbyInterface* this, int32_t iResultCode, struct Dictionary* pResults)
+                         local  bool success
+  363  00224308     B8  void TigerNetLobbyInterface::OnCanUploadEpisdeFinished(const struct TigerNetLobbyInterface* this, int32_t iResultCode, struct Dictionary* pResults)
+  387  00237514     F8  void TigerNetLobbyInterface::OnUploadEpisodeFinished(const struct TigerNetLobbyInterface* this, int32_t iResultCode, struct Dictionary* pResults)
+                         local  int32 episodeID
+  411  002243C0     58  void TigerNetLobbyInterface::LobbyCustomAriesCommandFailedToSend(const struct TigerNetLobbyInterface* this, int32_t iCommandCode)
+                         local  char[64] mTextBuffer
+  430  00224418     F4  bool TigerNetLobbyInterface::StartCanUploadEpisode(const struct TigerNetLobbyInterface* this, int32 stylePoints)
+                         local  const uint32_t CUSTOMARIES_DICTIONARY_SIZE
+                         local  struct Dictionary* pData
+  464  0022450C    258  bool TigerNetLobbyInterface::StartUploadEpisode(const struct TigerNetLobbyInterface* this, struct TigerNetLobbyUploadParams* uploadParams)
+                         local  const uint32_t CUSTOMARIES_DICTIONARY_SIZE
+                         local  struct Dictionary* pData
+  507  00224764    150  bool TigerNetLobbyInterface::StartCanDownloadEpisode(const struct TigerNetLobbyInterface* this, char8_t* owner, int32 episodeID)
+                         local  const uint32_t CUSTOMARIES_DICTIONARY_SIZE
+                         local  struct Dictionary* pData
+  546  002248B4    104  bool TigerNetLobbyInterface::StartStartedEpisode(const struct TigerNetLobbyInterface* this)
+                         local  struct CreateGameParams pParams
+                         local  struct Dictionary* pGameStateParameters
+                         local  struct Facade* pFacade
+                         local  struct Lobby* pLobby
+  589  00224BB8    230  bool TigerNetLobbyInterface::StartFinishedEpisode(const struct TigerNetLobbyInterface* this, struct TigerNetEpisodeGameReport* gameReport)
+                         local  enum OsdkState state
+                         local  struct GameSessionPersistent* pGameSession
+                         local  struct Dictionary* pGameStats
+  633  0027B788    434  bool TigerNetLobbyInterface::StartGetLeaderboard(const struct TigerNetLobbyInterface* this)
+                         local  enum OsdkState myOsdkState
+                         local  const struct List<OSDK::LeaderboardCategory>* pLeaderboards
+                         local  int32_t index
+                         local  int32_t variation
+                         local  int32_t leaderboard
+                         local  int32_t count
+                         local  int32_t i
+                         local  const struct List<OSDK::LeaderboardIndex>* pIndexList
+                         local  const struct List<OSDK::Leaderboard>* pVariations
+                         inlines  List<OSDK::Leaderboard>::GetElementAt, List<OSDK::LeaderboardCategory>::GetElementAt, List<OSDK::LeaderboardIndex>::GetElementAt
+  743  00224058     1C  void TigerNetLobbyInterface::ResetResponses(const struct TigerNetLobbyInterface* this)
+  765  00224DE8      C  int32 TigerNetLobbyInterface::GetCanUploadEpisodeResponse(const struct TigerNetLobbyInterface* this)
+  782  00224DF4      C  int32 TigerNetLobbyInterface::GetUpladEpisodeResponse(const struct TigerNetLobbyInterface* this)
+  800  00224E00      C  int32 TigerNetLobbyInterface::GetCanDownloadEpisodeResponse(const struct TigerNetLobbyInterface* this)
+  817  00224E0C      C  int32 TigerNetLobbyInterface::GetStartEpisodeResponse(const struct TigerNetLobbyInterface* this)
+  834  00224E18      C  int32 TigerNetLobbyInterface::GetStartFinishedEpisdeResponse(const struct TigerNetLobbyInterface* this)

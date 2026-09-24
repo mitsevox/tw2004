@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/Golf/UI_Core/AptRuntime/Headers/UI_RivalsMessenger.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   37    inline-only   void UIRivalsMessenger::SetEventIDToFindAndDisplayFirst(const struct UIRivalsMessenger* this, int32 iID)

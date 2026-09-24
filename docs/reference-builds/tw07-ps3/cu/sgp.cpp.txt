@@ -1,0 +1,86 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sgp.cpp
+// compiled in: sgp.cpp
+// 28 functions, source order. line | PS3 address | size
+
+    0  006C6B70     30  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  CListDStack::CListDStack
+   76  006C67F0     2C  void Snd9::registerMemFormatHandler(FormatIDHandler* pFormatIDHandler)
+                         inlines  CListDStack::Push
+   82  006C681C     2C  void Snd9::registerFileFormatHandler(FormatIDHandler* pFormatIDHandler)
+                         inlines  CListDStack::Push
+   98  006C6848    328  enum ParseReturnValue Snd9::gp_GenericParser(void* pData, uint32_t datasize, int reqid, void* parsecontext, bool(*)()* , void* , uint32_t* blocksize)
+                         local  FormatIDHandler* pFormatIDHandler
+                         local  PlayerDriver* pPlayerDriver
+                         local  char* pInData
+                         local  int certainty
+                         local  int fileFormat
+                         local  struct <anon>* tempGPp
+                         local  unsigned int sizeParsed
+                         inlines  CListDNode::GetNext, CListDStack::GetHead
+  249  006C7488      C  enum Result PlayFile(const struct <anon>* this, const char* file)
+  311  006C72B8    1D0  enum Result PlayFile(const struct <anon>* this, const char* file, int offset, int bytes)
+                         local  struct <anon>* mp
+  380  006C6BB0    118  void Snd9::gp_AutoVolServer(void* pData)
+                         local  float newVol
+                         local  struct <anon>* tempGPp
+                         inlines  RemoveVariableTimerClient
+  422  006C5474     78  enum Result Snd9::InitializeClass(struct <anon>* pGenericPlayerPrivate)
+                         local  char* ptemp
+  447  006C54EC     C0  enum Result CreateInstance(struct <anon>** ppGenericPlayer)
+                         local  enum Result result
+                         local  struct <anon>* pGenericPlayerPrivate
+                         inlines  SNDMEMI_alloc
+  477  006C777C     C4  enum Result Release(const struct <anon>* this)
+                         local  struct <anon>* mp
+  548  006C55B4    1F4  enum Result SetStreamBuffer(const struct <anon>* this, void* pMem, int size, int readBlockSize)
+                         local  struct <anon>* mp
+  657  006C6FF4    2C4  enum Result PlayMem(const struct <anon>* this, void* pMem, int size)
+                         local  FormatIDHandler* pFormatIDHandler
+                         local  PlayerDriver* pPlayerDriver
+                         local  int certainty
+                         local  int fileFormat
+                         local  struct <anon>* mp
+                         inlines  CListDNode::GetNext, CListDStack::GetHead
+  758  006C57A8    154  enum Result Pause(const struct <anon>* this)
+                         local  struct <anon>* mp
+                         local  enum Result ret
+  813  006C58FC    15C  enum Result Resume(const struct <anon>* this)
+                         local  struct <anon>* mp
+                         local  enum Result ret
+  871  006C6CC8    1A0  enum Result Stop(const struct <anon>* this)
+                         local  struct <anon>* mp
+                         local  enum Result ret
+                         inlines  RemoveVariableTimerClient
+  938  006C5A58    150  enum Result SetDry(const struct <anon>* this, float volume)
+                         local  struct <anon>* mp
+                         local  enum Result ret
+  993  006C5BA8    170  enum Result SetWet(const struct <anon>* this, int bus, float volume)
+                         local  struct <anon>* mp
+                         local  enum Result ret
+ 1044  006C5D18    138  enum Result SetPitch(const struct <anon>* this, float pitch)
+                         local  struct <anon>* mp
+                         local  enum Result ret
+ 1091  006C7494    1B0  enum Result SetVolume(const struct <anon>* this, float volume)
+                         local  struct <anon>* mp
+                         local  enum Result ret
+                         inlines  RemoveVariableTimerClient
+ 1167  006C6578    278  enum Result SetAutoVolume(const struct <anon>* this, float seconds, float volume)
+                         local  struct <anon>* mp
+                         inlines  AddVariableTimerClient, CListDNode::SetPrev, RemoveVariableTimerClient, SNDI_ftoifast
+ 1243  006C5E50    164  enum Result SetLowPass(const struct <anon>* this, float frequency)
+                         local  struct <anon>* mp
+                         local  enum Result ret
+ 1297  006C5FB4    164  enum Result SetHighPass(const struct <anon>* this, float frequency)
+                         local  struct <anon>* mp
+                         local  enum Result ret
+ 1349  006C6118    100  enum Result GetVolume(const struct <anon>* this, float* pvolume)
+                         local  struct <anon>* mp
+ 1390  006C6E68    18C  enum Result GetPlayStatus(const struct <anon>* this, enum Status* pstatus)
+                         local  struct <anon>* mp
+ 1444  006C6218    128  enum Result GetCurPosInTime(const struct <anon>* this, float* pseconds)
+                         local  struct <anon>* mp
+ 1489  006C6340    128  enum Result GetLengthInTime(const struct <anon>* this, float* pseconds)
+                         local  struct <anon>* mp
+ 1528  006C6468    110  enum Result GetFileFormat(const struct <anon>* this, enum FileFormat* pfileFormat)
+                         local  struct <anon>* mp
+ 1566  006C6BA0     10  static void _GLOBAL__I__ZN4Snd917memFormatHandlersE()

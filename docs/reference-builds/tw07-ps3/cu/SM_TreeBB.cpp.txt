@@ -1,0 +1,14 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_TreeBB.cpp
+// compiled in: shader_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   35  0051B8EC     58  void SM_TreeBBClass::SM_TreeBBClass(const struct SM_TreeBBClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base, vec4flt_Zero
+   51  00509764    180  void SM_TreeBBClass::Load(const struct SM_TreeBBClass* this)
+   69  005098E4     A4  void SM_TreeBBClass::Activate(const struct SM_TreeBBClass* this)
+   80  00509988     38  void SM_TreeBBClass::Deactivate(const struct SM_TreeBBClass* this)
+   87  00512698     60  void SM_TreeBBClass::SetReflectionHeight(const struct SM_TreeBBClass* this, float ReflectionHeight)
+   97  00517EEC     A0  void SM_TreeBBClass::SetTFactor(const struct SM_TreeBBClass* this, const float[4]& tFactor)
+                         inlines  vec4flt_Copy
+  108  005126F8     6C  void SM_TreeBBClass::SetColorTexture(const struct SM_TreeBBClass* this, TextureRef texRef)
+  131  00512764     64  void SM_TreeBBClass::SetBReflecting(const struct SM_TreeBBClass* this, bool bReflecting)

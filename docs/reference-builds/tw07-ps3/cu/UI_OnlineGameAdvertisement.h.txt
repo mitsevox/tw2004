@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/Golf/UI_Core/AptRuntime/Headers/UI_OnlineGameAdvertisement.h
+// compiled in: golf2_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   59    inline-only   void UIOnlineGameAdvertisement::SetFromLobbyChallenge(const struct UIOnlineGameAdvertisement* this)

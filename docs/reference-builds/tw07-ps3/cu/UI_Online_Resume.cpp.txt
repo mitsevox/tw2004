@@ -1,0 +1,24 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_Online_Resume.cpp
+// compiled in: apt_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+  106  000F992C     B8  void UIOnlineResume::UIOnlineResume(const struct UIOnlineResume* this)
+  137  000F9A9C     B8  void UIOnlineResume::~UIOnlineResume(const struct UIOnlineResume* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+  141  0005CDCC     60  void UIOnlineResume::Init(const struct UIOnlineResume* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen
+  149  00046C70      8  void UIOnlineResume::ViewOwn(const struct UIOnlineResume* this, bool flag)
+  154  00047F00     18  void UIOnlineResume::SetSelectedName(const struct UIOnlineResume* this, char* name)
+  159  000549EC    240  void UIOnlineResume::Show(const struct UIOnlineResume* this)
+                         local  struct User* pUser
+                         local  char* szPlayerName
+                         inlines  OnlineManagerOSDK::GetInstance
+  192  00033DAC     24  void UIOnlineResume::Close(const struct UIOnlineResume* this)
+  197  0006D634     C4  enum eAptHandleInput UIOnlineResume::HandleInput(const struct UIOnlineResume* this, int32 cID)
+                         inlines  OnlineManagerOSDK::GetInstance
+  217  000A0D8C    63C  void UIOnlineResume::RefreshRanks(const struct UIOnlineResume* this)
+                         local  uint32 dnfBitField
+                         local  uint32_t count
+                         local  uint32_t temp
+                         local  uint16_t numDNF10
+                         inlines  std::atoi

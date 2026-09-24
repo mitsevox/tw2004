@@ -1,7 +1,7 @@
 """Set up a decomp-permuter directory for one function of a tw2004 unit.
     python tools/match/perm_setup.py <Unit> <fn> [suffix]    e.g.  ... Ball fn_80050D34
 Creates build/perm/<fn>/ in this checkout with base.c, target.o, compile.sh, settings.toml.
-Run:  timeout 2700 python C:/dev/tools/decomp-permuter/permuter.py build/perm/<fn> -j6 --best-only
+Run it through tools/match/permute.py (time limit, process cleanup).
 """
 import os, pathlib, re, shlex, subprocess, sys
 
@@ -14,7 +14,8 @@ os.makedirs(out, exist_ok=True)
 def unit_flags(unit):
     """The compiler and cflags build.ninja uses for this unit's object (per-object extra_cflags included)."""
     nj = re.sub(r'\$\n\s*', '', open(ROOT + '/build.ninja', encoding='utf-8').read())
-    obj = 'build\\GW4E69\\src\\%s.o:' % unit.replace('/', '\\')
+    sep = '\\' if os.name == 'nt' else '/'          # build.ninja writes native paths
+    obj = sep.join(['build', 'GW4E69', 'src', '%s.o:' % unit.replace('/', sep)])
     i = nj.index('build ' + obj)
     block = nj[i:nj.find('\nbuild ', i + 1)]
     ver = re.search(r'^\s*mw_version = (\S+)', block, re.M).group(1).replace('\\', '/')
@@ -23,6 +24,9 @@ def unit_flags(unit):
 
 
 CC, ALL = unit_flags(unit)
+# The compiler is a Windows program: on Linux/macOS it runs through wibo (downloaded by the build) or wine.
+WRAP = [] if os.name == 'nt' else [ROOT + '/build/tools/wibo' if os.path.exists(ROOT + '/build/tools/wibo') else 'wine']
+EXE = '.exe' if os.name == 'nt' else ''
 CFLAGS, DEFS, k = [], [], 0             # compile.sh gets no -i/-D: base.c is already preprocessed
 while k < len(ALL):
     if ALL[k] in ('-i', '-I', '-ir'):
@@ -45,7 +49,7 @@ def bracket_end(s, i):
 
 
 # 1. preprocessed source, other functions reduced to prototypes (inline helpers kept whole)
-pp = subprocess.run([CC] + CFLAGS + ['-i', 'include', '-i', 'build/GW4E69/include'] + DEFS
+pp = subprocess.run(WRAP + [CC] + CFLAGS + ['-i', 'include', '-i', 'build/GW4E69/include'] + DEFS
                     + ['-EP', f'src/{unit}.c'], cwd=ROOT, capture_output=True, text=True, check=True).stdout
 pp = '\n'.join(l for l in pp.splitlines() if not l.startswith('#pragma'))
 res, pos = [], 0
@@ -74,13 +78,13 @@ asm = open(f'{ROOT}/build/GW4E69/asm/{unit}.s', encoding='utf-8').read()
 m = re.search(r'^\.fn ' + re.escape(fn) + r',.*?^\.endfn ' + re.escape(fn) + r'$', asm, re.M | re.S)
 open(out + '/target.s', 'w', encoding='utf-8', newline='\n').write(
     '.include "macros.inc"\n.text\n.balign 4\n' + m.group(0) + '\n')
-subprocess.run([ROOT + '/build/binutils/powerpc-eabi-as.exe', '-mgekko', '-I', ROOT + '/build/GW4E69/include',
+subprocess.run([ROOT + '/build/binutils/powerpc-eabi-as' + EXE, '-mgekko', '-I', ROOT + '/build/GW4E69/include',
                 out + '/target.s', '-o', out + '/target.o'], check=True)
 
 # 3. compile.sh and settings.toml
 flags = ' '.join("'%s'" % f for f in CFLAGS)
 open(out + '/compile.sh', 'w', newline='\n').write(
-    '#!/bin/bash\n"%s" %s -c "$1" -o "$3" >/dev/null 2>&1\n' % (CC, flags))
+    '#!/bin/bash\n%s"%s" %s -c "$1" -o "$3" >/dev/null 2>&1\n' % (''.join('"%s" ' % w for w in WRAP), CC, flags))
 open(out + '/settings.toml', 'w', newline='\n').write(
     'func_name = "%s"\ncompiler_type = "mwcc"\nobjdump_command = "python %s/perm_objdump.py %s"\n' % (fn, HERE, fn))
 print('ready:', out)

@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/istudio_runtime/uiEATrax.c
+// compiled in: apt_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   55  0002C5D4     44  void UI_vEATraxRegisterStreamClients()
+   63  0002C618     2C  void UI_vEATraxUnRegisterStreamClients()
+   71  0002C644    1A4  void UI_vEATraxLoadfromStream(TStreamDataPtr pStream)
+                         local  int32 i
+  109  0002C7E8     5C  int UI_GetNumberOfMusicTracks()
+  120  0002C844     84  char* UI_EATraxGetTitle(int songIndex)
+  133  0002C8C8     88  char* UI_EATraxGetArtist(int songIndex)
+  146  0002C950     88  char* UI_EATraxGetAlbum(int songIndex)

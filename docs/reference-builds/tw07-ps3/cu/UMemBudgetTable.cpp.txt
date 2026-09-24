@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/UMemBudgetTable.cpp
+// compiled in: Legacy_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  237  003A3694     C0  ChunkTypeBudgetMapping_t* GetChunkToBudgetMapping(uint32 chunkID)
+                         local  int chunkCount

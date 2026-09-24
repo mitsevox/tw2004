@@ -1,0 +1,64 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_LogoEditor.cpp
+// compiled in: apt_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   11  000F3458     68  void UILogoEditor::UILogoEditor(const struct UILogoEditor* this)
+   20  000F3528     B8  void UILogoEditor::~UILogoEditor(const struct UILogoEditor* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   24  000337E4     24  void UILogoEditor::Init(const struct UILogoEditor* this)
+   28  00033CCC     24  void UILogoEditor::Close(const struct UILogoEditor* this)
+   33  0009AFC0    208  void UILogoEditor::FSCommand(const struct UILogoEditor* this, const char* szCommand, const char* szParams)
+                         local  char[32] strBuf
+                         local  int32 i
+                         local  uint32 r
+                         local  uint32 g
+                         local  uint32 b
+                         local  uint32 a
+   61  0003A198    1A8  void UILogoEditor::Show(const struct UILogoEditor* this)
+   94  0003A340     8C  void UILogoEditor::Hide(const struct UILogoEditor* this)
+  103  0009A980    640  enum AptThreadReturnValue UILogoEditor::ControlThread(const struct UILogoEditor* this)
+                         local  int8[4] analogLastState
+                         local  int8[4] analogCurState
+                         local  struct Controller_StickInfo* info
+                         local  const uint32 thresh
+                         local  const int32 deadZone
+                         local  const float kZoomRate
+                         local  const float kMaxZoom
+  254  0009B1C8    528  enum eAptHandleInput UILogoEditor::HandleInput(const struct UILogoEditor* this, int32 cID)
+                         local  int32 moveX
+                         local  int32 moveY
+  374  0009A49C    4E4  void UILogoEditor::PositionCaret(const struct UILogoEditor* this)
+                         local  int32 curX
+                         local  int32 curY
+                         local  float w
+                         local  float h
+                         local  float horzBuff
+                         local  float vertBuff
+                         local  float newX
+                         local  float newY
+                         local  float pixW
+                         local  float pixH
+                         local  float texX
+                         local  float texY
+  436  0003A3CC    18C  void UILogoEditor::SetPalSel(const struct UILogoEditor* this, int32 x, int32 y)
+                         local  float x1
+                         local  float x2
+                         local  float y1
+                         local  float y2
+                         local  float spaceX
+                         local  float spaceY
+  462  00039FD4    1C4  void UILogoEditor::NextToolMode(const struct UILogoEditor* this)
+                         local  char[64] aptBuf
+  491  00039ED4    100  void UILogoEditor::NextBrushSize(const struct UILogoEditor* this)
+                         local  char[64] aptBuf
+  506  0009A25C    240  void UILogoEditor::ApplyCurrentTool(const struct UILogoEditor* this, int32 x, int32 y)
+                         local  uint8[3] sizes
+                         local  int32 i
+                         local  int32 j
+                         local  int32 sx
+                         local  int32 sy
+                         local  int32 color
+                         local  uint32 r
+                         local  uint32 g
+                         local  uint32 b
+                         local  uint32 a

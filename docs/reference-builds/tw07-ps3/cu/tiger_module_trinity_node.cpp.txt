@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_trinity_node.cpp
+// compiled in: tiger_module_trinity_node.cpp
+// 6 functions, source order. line | PS3 address | size
+
+    0  00540D30     18  void ~ListNode(const struct <anon>* this)
+                         inlines  ~Allocatable
+    9  00582194     5C  void TrinityNode(const struct <anon>* this, struct Global* global)
+   16  00581F4C     C8  void ComputeContextName(char* result, const char* name, unsigned int maxSize)
+   22  00582124     70  void Init(const struct <anon>* this, const char* name)
+   32  00582014     BC  void Shutdown(const struct <anon>* this)
+   46  005820D0     54  void ~TrinityNode(const struct <anon>* this)
+                         inlines  ~ListNode

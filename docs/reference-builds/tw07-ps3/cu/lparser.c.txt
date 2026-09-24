@@ -1,0 +1,199 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/lua-5.0.2/src/lparser.c
+// compiled in: lparser.c
+// 70 functions, source order. line | PS3 address | size
+
+   57  00549F78     7C  static void next(LexState* ls)
+   68    inline-only   static void lookahead(LexState* ls)
+   74  00549FF4     6C  static void error_expected(LexState* ls, int token)
+   80  0054A060     4C  static int testnext(LexState* ls, int c)
+   89  0054A0AC     60  static void check(LexState* ls, int c)
+   99  0054A10C     F4  static void check_match(LexState* ls, int what, int who, int where)
+  112  0054A200     5C  static TString* str_checkname(LexState* ls)
+                         local  TString* ts
+  121  0054A25C     18  static void init_exp(expdesc* e, expkind k, int i)
+  128  0054A274     44  static void codestring(LexState* ls, expdesc* e, TString* s)
+  133  0054A2B8     44  static void checkname(LexState* ls, expdesc* e)
+  138    inline-only   static int luaI_registerlocalvar(LexState* ls, TString* varname)
+                         local  FuncState* fs
+                         local  Proto* f
+  148  0054A2FC    120  static void new_localvar(LexState* ls, TString* name, int n)
+                         local  FuncState* fs
+                         inlines  luaI_registerlocalvar
+  155  0054A41C     88  static void adjustlocalvars(LexState* ls, int nvars)
+                         local  FuncState* fs
+  164  0054A4A4     6C  static void removevars(LexState* ls, int tolevel)
+                         local  FuncState* fs
+  171  0054A510     78  static void new_localvarstr(LexState* ls, const char* name, int n)
+  176  0054A588     38  static void create_local(LexState* ls, const char* name)
+  182    inline-only   static int indexupvalue(FuncState* fs, TString* name, expdesc* v)
+                         local  int i
+                         local  Proto* f
+  201    inline-only   static int searchvar(FuncState* fs, TString* n)
+                         local  int i
+  211    inline-only   static void markupval(FuncState* fs, int level)
+                         local  BlockCnt* bl
+  218  0054A5C0    378  static void singlevaraux(FuncState* fs, TString* n, expdesc* var, int base)
+                         local  int v
+                         inlines  indexupvalue, markupval, searchvar
+  243  0054A938     68  static TString* singlevar(LexState* ls, expdesc* var, int base)
+                         local  TString* varname
+  250  0054A9A0    104  static void adjust_assign(LexState* ls, int nvars, int nexps, expdesc* e)
+                         local  FuncState* fs
+                         local  int extra
+                         local  int reg
+  270    inline-only   static void code_params(LexState* ls, int nparams, int dots)
+                         local  FuncState* fs
+  282  0054AAA4     2C  static void enterblock(FuncState* fs, BlockCnt* bl, int isbreakable)
+  293  0054AAD0     94  static void leaveblock(FuncState* fs)
+                         local  BlockCnt* bl
+  305    inline-only   static void pushclosure(LexState* ls, FuncState* func, expdesc* v)
+                         local  FuncState* fs
+                         local  Proto* f
+                         local  int i
+                         local  OpCode o
+  320  0054AB64     C4  static void open_func(LexState* ls, FuncState* fs)
+                         local  Proto* f
+  342  0054AC28    198  static void close_func(LexState* ls)
+                         local  lua_State* L
+                         local  FuncState* fs
+                         local  Proto* f
+  366  0054BAE8     DC  Proto* luaY_parser(lua_State* L, ZIO* z, Mbuffer* buff)
+                         local  struct LexState lexstate
+                         local  struct FuncState funcstate
+  390  0054ADC0     84  static void luaY_field(LexState* ls, expdesc* v)
+                         local  FuncState* fs
+                         local  expdesc key
+  401  0054C320     5C  static void luaY_index(LexState* ls, expdesc* v)
+  426  0054C37C    13C  static void recfield(LexState* ls, struct ConsControl* cc)
+                         local  FuncState* fs
+                         local  int reg
+                         local  expdesc key
+                         local  expdesc val
+  447    inline-only   static void closelistfield(FuncState* fs, struct ConsControl* cc)
+  459    inline-only   static void lastlistfield(FuncState* fs, struct ConsControl* cc)
+  474  0054C4B8     7C  static void listfield(LexState* ls, struct ConsControl* cc)
+  482  0054C534    31C  static void constructor(LexState* ls, expdesc* t)
+                         local  FuncState* fs
+                         local  int line
+                         local  int pc
+                         local  struct ConsControl cc
+                         inlines  closelistfield, lastlistfield, lookahead
+  528    inline-only   static void parlist(LexState* ls)
+                         local  int nparams
+                         local  int dots
+  545  0054BBC4    300  static void body(LexState* ls, expdesc* e, int needself, int line)
+                         local  FuncState new_fs
+                         inlines  parlist, pushclosure
+  562  0054C850     84  static int explist1(LexState* ls, expdesc* v)
+                         local  int n
+  575  0054C8D4    1CC  static void funcargs(LexState* ls, expdesc* f)
+                         local  FuncState* fs
+                         local  expdesc args
+                         local  int base
+                         local  int nparams
+                         local  int line
+  633    inline-only   static void prefixexp(LexState* ls, expdesc* v)
+                         local  int line
+  668  0054CAA0    1AC  static void primaryexp(LexState* ls, expdesc* v)
+                         local  FuncState* fs
+                         local  expdesc key
+                         local  expdesc key
+                         local  int line
+                         inlines  prefixexp
+  705    inline-only   static void simpleexp(LexState* ls, expdesc* v)
+  751    inline-only   static UnOpr getunopr(int op)
+  760    inline-only   static BinOpr getbinopr(int op)
+  799  0054BEC4    3E4  static BinOpr subexpr(LexState* ls, expdesc* v, int limit)
+                         local  BinOpr op
+                         local  UnOpr uop
+                         local  expdesc v2
+                         local  BinOpr nextop
+                         inlines  getbinopr, getunopr, simpleexp
+  827  0054C2A8      8  static void expr(LexState* ls, expdesc* v)
+  842  0054AE44     38  static int block_follow(int token)
+  852  0054CEE8     54  static void block(LexState* ls)
+                         local  FuncState* fs
+                         local  BlockCnt bl
+  879    inline-only   static void check_conflict(LexState* ls, struct LHS_assign* lh, expdesc* v)
+                         local  FuncState* fs
+                         local  int extra
+                         local  int conflict
+  902  0054CC4C    238  static void assignment(LexState* ls, struct LHS_assign* lh, int nvars)
+                         local  expdesc e
+                         local  struct LHS_assign nv
+                         local  int nexps
+                         inlines  check_conflict
+  934  0054C2B0     70  static void cond(LexState* ls, expdesc* v)
+  961    inline-only   static void whilestat(LexState* ls, int line)
+                         local  Instruction[105] codeexp
+                         local  int lineexp
+                         local  int i
+                         local  int sizeexp
+                         local  FuncState* fs
+                         local  int whileinit
+                         local  int blockinit
+                         local  int expinit
+                         local  expdesc v
+                         local  BlockCnt bl
+ 1003    inline-only   static void repeatstat(LexState* ls, int line)
+                         local  FuncState* fs
+                         local  int repeat_init
+                         local  expdesc v
+                         local  BlockCnt bl
+ 1019  0054CE84     64  static int exp1(LexState* ls)
+                         local  expdesc e
+                         local  int k
+ 1029  0054CF90    154  static void forbody(LexState* ls, int base, int line, int nvars, int isnum)
+                         local  BlockCnt bl
+                         local  FuncState* fs
+                         local  int prep
+                         local  int endfor
+ 1047    inline-only   static void fornum(LexState* ls, TString* varname, int line)
+                         local  FuncState* fs
+                         local  int base
+ 1070    inline-only   static void forlist(LexState* ls, TString* indexname)
+                         local  FuncState* fs
+                         local  expdesc e
+                         local  int nvars
+                         local  int line
+                         local  int base
+ 1091    inline-only   static void forstat(LexState* ls, int line)
+                         local  FuncState* fs
+                         local  TString* varname
+                         local  BlockCnt bl
+ 1109  0054CF3C     54  static void test_then_block(LexState* ls, expdesc* v)
+ 1118    inline-only   static void ifstat(LexState* ls, int line)
+                         local  FuncState* fs
+                         local  expdesc v
+                         local  int escapelist
+ 1142    inline-only   static void localfunc(LexState* ls)
+                         local  expdesc v
+                         local  expdesc b
+                         local  FuncState* fs
+ 1156    inline-only   static void localstat(LexState* ls)
+                         local  int nvars
+                         local  int nexps
+                         local  expdesc e
+ 1175    inline-only   static int funcname(LexState* ls, expdesc* v)
+                         local  int needself
+ 1189    inline-only   static void funcstat(LexState* ls, int line)
+                         local  int needself
+                         local  expdesc v
+                         local  expdesc b
+ 1201    inline-only   static void exprstat(LexState* ls)
+                         local  FuncState* fs
+                         local  struct LHS_assign v
+ 1216    inline-only   static void retstat(LexState* ls)
+                         local  FuncState* fs
+                         local  expdesc e
+                         local  int first
+                         local  int nret
+ 1249    inline-only   static void breakstat(LexState* ls)
+                         local  FuncState* fs
+                         local  BlockCnt* bl
+                         local  int upval
+ 1267    inline-only   static int statement(LexState* ls)
+                         local  int line
+ 1320  0054AE7C    C6C  static void chunk(LexState* ls)
+                         local  int islast
+                         inlines  breakstat, forlist, fornum, forstat, funcstat, ifstat, localfunc, localstat, repeatstat, retstat, statement, whilestat

@@ -1,0 +1,5 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/math/fpu/scalar.h
+// compiled in: CGFXShader.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  186    inline-only   unsigned int fpu::Max<unsigned int>(const const unsigned int& a, const const unsigned int& b)

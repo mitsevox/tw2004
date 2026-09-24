@@ -1,0 +1,103 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/specif/UFont.c
+// compiled in: Legacy_unity.cpp
+// 27 functions, source order. line | PS3 address | size
+
+  395  00380350     2C  static void FO_vClearPacketLists()
+                         local  int32 iFont
+  418  003C30C4    210  void FO_vInitModule()
+                         local  const char[15] __FUNCTION__
+                         local  int32 i
+                         inlines  TagValuePair, operator+
+  458  003C1DBC     C4  void FO_vCloseModule()
+                         local  int32 i
+                         inlines  FO_vFreeFont
+  486  0037F78C     2C  bool FO_bModuleReady()
+  495  00380460     74  void FO_vSetDefaultStates()
+                         local  FO_SFontPacket* spCurStatePacket
+  535  0037B418     1C  float FO_fGetFontHeight()
+  545  00380430     30  void FO_vSetCurrentColor(FO_EColors eColorID_p)
+  555  003804D4     BC  void FO_vSetCurrentColorRGB(const float* xColorVector_p)
+  587  0037AE14     18  void FO_vSetCurrentAddMode(FO_EAddMode eAddMode_p)
+  597  0037C61C     18  FO_EAddMode FO_eGetCurrentAddMode()
+  610    inline-only   static char* FO_chpCopyString(char* chpString_p)
+                         local  char* chpBase
+                         local  char* chpCurrent
+  649  003A545C    240  void FO_vAddStringToDisplayList(float fPositionX_p, float fPositionY_p, char* chpString_p)
+                         local  FO_SFontPacket* spListPacket
+                         local  FO_SFontPacket* spCurStatePacket
+                         local  struct FO_SFont* spCurFont
+                         inlines  FO_chpCopyString
+  741  003A540C     50  void FO_vAddAllToDisplayList()
+  761  003A182C     88  void FO_vAddAllToDisplayListNoMessWithRenderStates()
+                         local  int32 iFont
+                         local  FO_SFontPacket* spFontPacket
+                         local  struct FO_SFont* spFont
+  817  00380400     30  void FO_vSetCurrentSpacingScaleFactor(float fSpacingScaleFactor_p)
+                         local  FO_SFontPacket* spCurPacket
+  832  003803C0     40  void FO_vSetCurrentScaleFactor(float fWidthScaleFactor_p, float fHeightScaleFactor_p)
+                         local  FO_SFontPacket* spCurPacket
+  848  00380620     54  float FO_fGetStringSize(char* chpString_p)
+                         local  FO_SFontPacket* spCurPacket
+                         local  float fStringSize
+  866  00380390     30  void FO_vSetCurrentTextMode(FO_FTextMode flTextMode_p)
+  882  0038037C     14  static FO_SFontPacket* FO_spGetCurrentPacket()
+  892  0038DE98     CC  static void FO_vSetFontContext()
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetCullMode, DS_vSetZTestEnable
+  912  003A5350     BC  static void FO_vRestoreFontContext()
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetZTestEnable, Gcm::cellGcmSetAlphaTestEnable
+  926    inline-only   static void FO_vFreeFont(struct FO_SFont* spFont_p)
+  939  003A1068    7C4  static void FO_vAddPacketToFontSequence(struct FO_SFont* spFont_p, FO_SFontPacket* spPacket_p, char* chpOverString_p)
+                         local  struct FO_SFontCharacterExtra* spCharacterExtra
+                         local  char* chpString
+                         local  float fCurPosX
+                         local  float fCurPosY
+                         local  float fOffsetX
+                         local  float fOffsetY
+                         local  float fWidthScaleFactor
+                         local  float fSpacingScaleFactor
+                         local  float fHeightScaleFactor
+                         local  float fStringSize
+                         local  float fStdVpOffsetX
+                         local  float fStdVpOffsetY
+                         local  float fCurStdVpPosX
+                         local  float fCurStdVpPosY
+                         local  float fScaledStdVpAdvance
+                         local  float fStdWidthScaleFactor
+                         local  float fStdHeightScaleFactor
+                         local  float fMoveRatioX
+                         local  float fMoveRatioY
+                         local  float fStdScaledVpDescent
+                         local  uint32 uiCurColor
+                         local  bool boStringSizeUpToDate
+                         local  int[4] uArray
+                         local  int[4] vArray
+                         local  float[4] xAdd
+                         local  float[4] yAdd
+                         local  float[4][3] pos
+                         local  float[4][2] uv
+                         local  uint32_t i
+                         local  unsigned int i
+                         inlines  FO_vDrawFontPacket
+ 1226  00380590     90  static float FO_fComputeStringSize(struct FO_SFont* spFont_p, FO_SFontPacket* spPacket_p, char* chpString_p)
+                         local  struct FO_SFontCharacterExtra* spCharacterExtra
+                         local  float fAdvanceScalingFactor
+                         local  char* chpString
+                         local  float fCurPosX
+ 1310  003C2A7C    648  static struct FO_SFont* FO_vLoadDefaultFont()
+                         local  const char[20] __FUNCTION__
+                         local  unsigned int i
+                         local  struct FO_SFont* spFont
+                         local  void* vpGenPtr
+                         local  float fLeftU
+                         local  float fRightU
+                         local  float fTopV
+                         local  float fBotV
+                         inlines  TagValuePair, operator+
+ 1447    inline-only   static void FO_vDrawFontPacket(struct FO_SFont* spFont, vec3flt* pos, vec2flt* uv, uint32_t color)
+                         local  uint8 uiR
+                         local  uint8 uiG
+                         local  uint8 uiB
+                         local  uint8 uiA
+                         local  struct vtxStruct* vertices
+                         local  unsigned int i
+ 1479  003A0F9C     CC  static void FO_vFlushText(struct FO_SFont* spFont)

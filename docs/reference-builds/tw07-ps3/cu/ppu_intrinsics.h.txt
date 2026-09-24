@@ -1,0 +1,6 @@
+// C:/dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/target/ppu/include/ppu_intrinsics.h
+// compiled in: headgate_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  466    inline-only   static double __fsel(double x, double y, double z)
+                         local  double r

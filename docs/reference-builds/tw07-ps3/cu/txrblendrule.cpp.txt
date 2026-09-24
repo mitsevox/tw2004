@@ -1,0 +1,42 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/txrblendrule.cpp
+// compiled in: other_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   32  00439550     94  void TXRBlendRule::TXRBlendRule(const struct TXRBlendRule* this, const const struct Allocator& allocRef, struct TXRBlendRuleParams* paramMemory, int maxParamsAllocated)
+                         inlines  TXRRule::TXRRule
+   41  00439678     8C  void TXRBlendRule::~TXRBlendRule(const struct TXRBlendRule* this)
+                         inlines  TXRRule::~TXRRule
+   53  00405C00    378  void TXRBlendRule::ReadFromBuffer(const struct TXRBlendRule* this, char** buffer)
+                         local  const char[15] __FUNCTION__
+                         local  uint8 mode
+                         local  int i
+                         inlines  TagValuePair, operator+
+  116  00426128    814  void TXRBlendRule::RunRule(const struct TXRBlendRule* this, struct TextureGroup* pTexGroup, struct TXRRule_TEXStateInfo* texState, TextureRef workspace, int32 mipLevel)
+                         local  TextureRef* blendTextures
+                         local  int32_t* blendScales
+                         local  bool doBlend
+                         local  bool abortBlend
+                         local  int i
+                         local  const TextureInfo* info
+                         local  TexBlendRect destRect
+                         local  int32 asserted
+                         local  TexBlendParams* blendParams
+                         local  int32_t numParams
+                         local  int i
+                         local  int i
+                         local  int j
+                         local  enum GoBlendTextures_BlendOp blendOp
+                         local  int32 bTintEnable
+                         local  enum TXRTintRule_Mode tintMode
+                         local  float[9] tintParams
+  374  00415650    344  void TXRBlendRule::MergeBlendRules(const struct TXRBlendRule* this, const struct TXRBlendRule* blend1, const struct TXRBlendRule* blend2, float percent)
+                         local  int i
+                         local  const struct TXRBlendRuleParams* param1
+                         local  const struct TXRBlendRuleParams* param2
+                         inlines  TXRBlendRule::GetDestRect, TXRBlendRule::GetNumParams, TXRBlendRule::GetParam
+  411  00420D28    1D4  void TXRBlendRule::ChangeNamesByPattern(const struct TXRBlendRule* this, const char* oldName, const char* newName)
+                         local  char* instance
+                         local  unsigned int i
+                         local  int i
+                         local  unsigned int i
+                         inlines  std::strstr

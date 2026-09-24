@@ -1,0 +1,114 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_Options.cpp
+// compiled in: apt_unity.cpp
+// 43 functions, source order. line | PS3 address | size
+
+  370  00048FC4      8  static void AudioOptionsEATraxMMCallback(int32 toggleIdx, int32 activeOption)
+  401  000D0C1C     A0  static void PlayNowOptionsGolferProfileCallback(int32 toggleIdx, int32 activeOption)
+                         local  int32_t playNowProfileIndex2
+  425  000D0B28     9C  static void EnableMenuItem(enum eToggleArrayUniqueIds eItemID, bool bEnable)
+                         local  int32_t itemIndex
+  438  000D0998     DC  static void ToggleOnOffMenuItem(enum eToggleArrayUniqueIds eItemID, bool bValue, bool bEnable)
+                         local  int32_t itemIndex
+  455  00048FCC     24  static bool DifficultyLevelOptionsShouldEnable(enum eToggleArrayUniqueIds eItemID, int32 diffOption)
+                         local  bool retVal
+  478  000D0BC4     58  static void DifficultyLevelOptionsGetTextCallback(int32 menuItemIndex, int32 activeOption)
+  489  000D0A74     B4  static void DifficultyLevelOptionsChangeCallback(int32 toggleIdx, int32 activeOption)
+                         local  bool bIsEasyMode
+  519  000D0CBC    308  static void PlayNowOptionsGameModeChangeCallback(int32 toggleIdx, int32 activeOption)
+                         local  enum GM_ModeType_t gameMode
+                         local  int32_t mulliganIndex
+                         local  int32_t multiSingleIndex
+                         local  int32_t playNowProfileIndex
+                         local  int32_t playNowGolferIndex
+                         local  int32_t activeOptionb
+  582  00059260     88  static void PlayNowGetCourseText(int32 menuItemIndex, int32 itemOptionindex)
+                         local  const char* courseName
+                         local  enum GM_CourseType_t course
+  596  000C3040     4C  static void PlayNowGetGolferText(int32 menuItemIndex, int32 itemOptionindex)
+                         local  enum Golfer_t golfer
+                         local  const char* golferName
+  737  00060B70     98  void PassWordOptionCB()
+                         local  char[32] stringBuffer
+  797  000CA144     FC  void UIOptions::ShowNumPGAPlayersOption()
+                         local  struct UIMenuToggleItemConst[1] numPGAPlayersArray
+                         local  int maxNumGuests
+                         local  int32 eventID
+                         local  int32 round
+  859  000DB190    250  void UIOptions::ShowCourseOptions(const struct UIOptions* this)
+                         local  int32 numOptionsShown
+                         local  int32_t toggleIdx
+                         local  int32_t iCrowdsIdx
+                         local  void* voidGameModePtr
+                         local  int32_t iHolesIdx
+                         inlines  GM_GetModeType, GM_IsCustomCourse
+ 1023  0007B1F4     24  void UIOptions::ShowHoleSelectOptions(const struct UIOptions* this)
+ 1030  0007B218     24  void UIOptions::ShowHoleSelectOptions2(const struct UIOptions* this, enum GM_CourseType_t courseNum)
+                         local  bool allowMultipleSelect
+ 1041  000D13CC    170  void UIOptions::ShowGameOptions(const struct UIOptions* this)
+                         local  char* titleText
+                         local  int32_t itemIdx
+ 1067  0005D340    120  void UIOptions::ShowAudioOptions(const struct UIOptions* this)
+                         local  char* titleText
+ 1091  00061104     70  void UIOptions::ShowPasswordOption(const struct UIOptions* this)
+                         inlines  UIVirtualKeyboard::SetInPasswordFlag, UIVirtualKeyboard::TurnOffBackSound
+ 1105  00048FF0     18  void UIOptions::ShowSportsTraxOptions(const struct UIOptions* this)
+ 1114  00049008      4  void UIOptions::ShowHighlights(const struct UIOptions* this)
+ 1123  000D10FC    2D0  void UIOptions::ShowQuickPlayOptions(const struct UIOptions* this)
+                         local  char* titleText
+                         local  int32 courseIndex
+                         local  int32 golferChoiceIndex
+                         local  int32_t gameModeIndex
+                         local  enum GM_ModeType_t gameMode
+                         local  int32_t multiSingleIndex
+                         local  int32_t playNowProfileIndex
+                         local  int32_t playNowProfileIndex2
+                         local  int32_t activeOptionb
+ 1186  000D0FC4    138  void UIOptions::ShowIngameOptionsArray(const struct UIOptions* this)
+                         local  void* voidGameModePtr
+                         local  int32 tappinToggleIndex
+ 1205  0005D2C0     80  void UIOptions::ShowOnlineMatchFilterOptions(const struct UIOptions* this)
+ 1214  000D18E4     EC  void UIOptions::ShowOnlineGameSetupPreferenceOptions(const struct UIOptions* this)
+                         local  char* titleText
+ 1229  0005D1F0     D0  void UIOptions::ShowESPNPreferenceOptions(const struct UIOptions* this)
+                         local  char* titleText
+ 1241  0004900C      4  void UIOptions::ShowUpgradeProfile(const struct UIOptions* this)
+ 1255  000D7300    580  void OnlineMatchFilterResponseHandler::onClose(const struct OnlineMatchFilterResponseHandler* this, void* inData)
+                         local  const struct TExternArray<UIMenuToggleItem>& toggleArray
+                         local  struct OnlineMatchParams* pParams
+                         local  int elemCount
+                         local  bool bRanked
+                         local  int32 i
+                         inlines  LobbyMatchupOSDK::GetSearchParamsRef, TArrayInternal<UIMenuToggleItem,AptStructSwapper>::operator[]
+ 1332  00089920     14  void UIOptions::PGALaunchGame()
+ 1337  000CA0C8     7C  static void PGADoneCut()
+                         local  int32 eventID
+                         local  int32 round
+                         local  int nGuests
+ 1347  00032A88     1C  int32 PGAGetCrazyWeirdStaticRefactorLaterNumGuests()
+ 1353  000C69A0    100  static void PGACutGuestCB(int32 index)
+ 1374  000C68FC     A4  static void PGACutGuests()
+ 1390  000D7880    1A0  void NumPGAPlrsOptResponseHandler::onClose(const struct NumPGAPlrsOptResponseHandler* this, void* inData)
+                         local  const struct TExternArray<UIMenuToggleItem>& toggleArray
+                         local  const struct SeasonInfo& tourData
+                         local  int nOldGuests
+                         local  int i
+                         inlines  TArrayInternal<UIMenuToggleItem,AptStructSwapper>::operator[], UserInfo::GetPGATourData
+ 1421  000CEFCC    194  bool ShouldWagerScreenBeShown()
+                         local  bool bShouldWagerScreenBeShown
+                         local  void* driverPointer
+                         local  int iNumHumanPlayersWithProfiles
+                         local  int i
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+ 1471  000CF160     CC  void CourseSelectOptResponseHandler::onClose(const struct CourseSelectOptResponseHandler* this, void* inData)
+                         local  enum eLoadingScreenToShow loadingToShow
+ 1523  0009854C     B0  void HoleSelOptResponseHandler2::onClose(const struct HoleSelOptResponseHandler2* this, void* inData)
+                         local  int32 index
+ 1533  00049010      4  void ESPNOptResponseHandler::onClose(const struct ESPNOptResponseHandler* this, void* pInData)
+ 1538  00049014      4  void ToggleOptResponseHandler::onClose(const struct ToggleOptResponseHandler* this, void* pInData)
+ 1543  00049018     48  void ToggleOptResponseHandler::onHide(const struct ToggleOptResponseHandler* this)
+ 1554  00066248     B8  void OptionsResponseHandler::onClose(const struct OptionsResponseHandler* this, void* inData)
+                         local  int32 index
+                         local  char[16] param1
+ 1574  00049060     8C  void OptionsResponseHandler::onHide(const struct OptionsResponseHandler* this)
+ 1596  000490EC     70  void UIOptions::ShowFEGameOptions(const struct UIOptions* this)
+ 1602  00044CD8     20  char* UIOptions::GetFEGameOptionsElement(const struct UIOptions* this, int32 index)

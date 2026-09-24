@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/Internal/NameNode.cpp
+// compiled in: NameNode.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   18  005AB168      C  bool AddNode(const struct <anon>* this, const struct AnimNode* pNode)
+   25  005AB174     20  void RemoveNode(const struct <anon>* this, const struct AnimNode* pNode)
+   35  005AB194      8  const struct AnimNode* GetNode(const const struct <anon>* this)

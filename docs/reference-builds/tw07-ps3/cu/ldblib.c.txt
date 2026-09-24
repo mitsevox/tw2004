@@ -1,0 +1,41 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/lua-5.0.2/src/lib/ldblib.c
+// compiled in: ldblib.c
+// 16 functions, source order. line | PS3 address | size
+
+   21  00556698     5C  static void settabss(lua_State* L, const char* i, const char* v)
+   28  005566F4     6C  static void settabsi(lua_State* L, const char* i, int v)
+   35  00556760    378  static int getinfo(lua_State* L)
+                         local  lua_Debug ar
+                         local  const char* options
+   83  00556AD8    114  static int getlocal(lua_State* L)
+                         local  lua_Debug ar
+                         local  const char* name
+  101  00556BEC     F8  static int setlocal(lua_State* L)
+                         local  lua_Debug ar
+  111  00556CE4    120  static int auxupvalue(lua_State* L, int get)
+                         local  const char* name
+                         local  int n
+  124  00556E04      8  static int getupvalue(lua_State* L)
+  129  00556E0C     3C  static int setupvalue(lua_State* L)
+  139  00556E48    114  static void hookf(lua_State* L, lua_Debug* ar)
+                         local  const const char*[5] hooknames
+  157    inline-only   static int makemask(const char* smask, int count)
+                         local  int mask
+  167    inline-only   static char* unmakemask(int mask, char* smask)
+                         local  int i
+  177  00556F5C    198  static int sethook(lua_State* L)
+                         local  const char* smask
+                         local  int count
+                         inlines  makemask
+  195  005570F4    160  static int gethook(lua_State* L)
+                         local  char[5] buff
+                         local  int mask
+                         local  lua_Hook hook
+                         inlines  unmakemask
+  211  00557254     B8  static int debug(lua_State* L)
+                         local  char[250] buffer
+  227  0055730C    30C  static int errorfb(lua_State* L)
+                         local  int level
+                         local  int firstpart
+                         local  lua_Debug ar
+  292  00557618     84  int luaopen_debug(lua_State* L)

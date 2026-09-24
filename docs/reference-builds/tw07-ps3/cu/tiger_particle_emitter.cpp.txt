@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Actors/tiger_particle_emitter.cpp
+// compiled in: golf_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+    4  0022D918      8  void TigerParticleEmitter::SetParentBall(const struct TigerParticleEmitter* this, struct PhysicsBall_t* ball)
+    9  0022D920      8  struct PhysicsBall_t* TigerParticleEmitter::GetParentBall(const const struct TigerParticleEmitter* this)
+   14  0022D928     3C  void TigerParticleEmitter::PlatformUpdate(const struct TigerParticleEmitter* this)
+   27  0022D964      C  void TigerParticleEmitter::PlatformInit(const struct TigerParticleEmitter* this)

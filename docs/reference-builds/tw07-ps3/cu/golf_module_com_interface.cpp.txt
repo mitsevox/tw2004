@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/GolfModule/golf_module_com_interface.cpp
+// compiled in: golf_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    7  00253778     E4  void GolfModuleComInterface::HandleReceivedData(const struct GolfModuleComInterface* this, struct Com* com, const void* data, unsigned int size, const char* dataTypeId)
+   27  0022F888     60  void GolfModuleComInterface::HandleReceivedMessage(const struct GolfModuleComInterface* this, struct Com* com, const char* message, unsigned int messageType)
+   36  0022F8E8     64  void GolfModuleComInterface::HandleAcceptedConnection(const struct GolfModuleComInterface* this, struct Com* com, const char* fromIP)

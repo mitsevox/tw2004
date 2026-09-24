@@ -1,0 +1,107 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/aptInterface/uiAptInterface.cpp
+// compiled in: other_unity.cpp
+// 40 functions, source order. line | PS3 address | size
+
+  158  003EC6C8     18  float AptGetSafeZoneX()
+  163  003EC6E0     18  float AptGetSafeZoneY()
+  172  003EC6F8     1C  void AptResetFrameRate()
+  198  003EC488     18  struct AptStreamSupport* GetAptStreamSupport()
+  208  003EA5B4     8C  void aptCaptureDebugPrint(const char* szFormat)
+                         local  char[2048] szBuf
+                         local  va_list arg
+  225  003EC714      4  static void aptCaptureDebugAddSavedInput(struct AptSavedInputRecord* pRecord, int nSize)
+  232  003EC718     60  static void aptNoMessageBoxAssert(const char* szMessage, const char* szFile, unsigned int nLine)
+  237  003EC778     78  float GetScale(enum eAptScreenMode aptScreenMode)
+                         local  float scale
+  256  003EC7F0     1C  void AptMultMatrixScale(mat44flt* matrix, float scale)
+  266  003EC80C      8  bool Is480pWide()
+  288  004142A8    91C  void APT_SetupScaleXform()
+                         local  const TextureInfo* infoFront
+                         local  int reso
+                         local  const float authoredFlashSizeX
+                         local  const float authoredFlashSizeY
+                         local  const float oneOverAuthoredFlashSizeX
+                         local  const float oneOverAuthoredFlashSizeY
+                         local  const float sizeWideX
+                         local  const float sizeWideY
+                         local  const float scale
+                         local  const float usedSizeScreenX
+                         local  const float usedSizeScreenY
+                         local  const float left
+                         local  const float top
+                         local  const float right
+                         local  const float bottom
+                         local  const float centerX
+                         local  const float centerY
+                         local  mat44flt* currentResMatricesArray
+                         local  int i
+                         local  float useScale
+                         local  const float usedSizeScreenX
+                         local  const float usedSizeScreenY
+                         local  const float centerX
+                         local  const float centerY
+                         local  int reso
+                         local  int sreReg
+                         local  mat44flt srcMatrix
+                         local  mat44flt PR_gxMatrix2D
+                         local  float useScale
+                         inlines  LLMath_CopyMat44, LLMath_IdentifyMat, vec_st
+  594  003EC840      4  static void aptFreeConstantTable(void* pConstantTable)
+  600  0049E93C     68  static void aptFreeAnimation(void* pUserHandle)
+                         local  struct AptInfo_t* aptInfo
+  615  0047E9C0     40  static void aptCommand(const char* szCommand, const char* szParams)
+  620  0047E928     58  static bool aptGetExternVariable(const char* szVar, const enum AptExternVariable& outVariableType, const void*& outVariable)
+  625  0047E980     40  static void aptSetExternVariable(const char* szVar, const char* value)
+  630  003EC844      4  static void aptDebugSetScreenGrabPending(const char* szScreenGrabName)
+  634  003EC848      8  static AptAssetTexture aptLoadTexture(void* pUserData, int nID)
+  639  003EC850      4  static void aptFreeTextureAsset(AptAssetTexture texture)
+  646  003EC854      4  static void aptBindTexture(void* pUserData, int nID, AptAssetTexture texture)
+  674  004359E0     F4  static AptAssetRenderingUnit aptLoadRenderingUnit(void* pUserData, int nID)
+                         local  struct AptInfo_t* aptInfo
+                         inlines  TArrayInternal<AptInt32,AptStructSwapper>::operator[], TArrayInternal<AptRUFile_t,CustomClassSwapper<AptRUFile_t> >::operator[]
+  685  003EC858      4  static void aptFreeRenderingUnit(AptAssetRenderingUnit renderingUnit)
+  692  003EC85C     E0  static void aptSetColourTransform(struct AptCXForm* pCXForm)
+  746  003EC93C     44  static void aptSetVertexMatrix(struct AptMatrix* pMatrix)
+  761  003EC980     18  static void aptSetBackgroundColour(unsigned int nColour)
+  848  003EC998    144  void AptGameMode::FE_TakeBackBufferScreenShot()
+                         local  const TextureInfo* info
+                         local  const int width
+                         local  const int height
+                         local  TextureOptions options
+  896  003ECADC     2C  bool AptGameMode::GetIsBackBufferScreenShotValid()
+  901  003ECB08     1C  enum eAptGameMode AptGameMode::GetAptGameMode_Now()
+  905  003ECB24     1C  enum eAptGameMode AptGameMode::GetAptGameMode_Old()
+  910  003ECB40    13C  void AptGameMode::GetAptGameMode_Initialize()
+  952  0047EA00    248  void APT_vInitModule()
+                         inlines  AptFontFusion::operator new, AptStreamSupport::operator new, LLMath_IdentifyMat
+ 1079  0049EEC4    120  void APT_vCloseModule()
+                         local  enum eAptShutdown shutDownType
+                         inlines  AptFontFusion::operator delete, AptStreamSupport::operator delete
+ 1124  003ECC94     94  void APT_ResetMaskStencilStates()
+ 1145  004886EC    238  void APT_Render()
+                         local  float scale
+                         local  float safeW
+                         local  float safeH
+                         inlines  CO_SCommandAPT::GetSafeZoneH, CO_SCommandAPT::GetSafeZoneW, CO_SCommandAPT::GetScale
+ 1299  003ECC7C     18  void SetAptUpdateMode(enum eAptUpdateMode updateMode)
+ 1308  004A41EC    1E8  void APT_vUpdate(uint32_t ticksSinceLastFrame)
+                         local  struct Timing_AutoMarker aptUpdateMarker
+                         local  uint32 tic
+                         local  int once
+                         inlines  Timing_AutoMarker::Timing_AutoMarker, Timing_AutoMarker::~Timing_AutoMarker
+ 1391  003ECD28     1C  void UI_DisableAptInput(bool disabled)
+ 1397  003EC814     2C  void Apt_PipView::HidePipView()
+                         local  const mat44flt& currentResMatricesArray
+ 1409  00414210     98  void Apt_PipView::UpdatePipViewMatrix(float x0, float y0, float w, float h)
+                         local  const mat44flt& currentResMatricesArray
+                         local  mat44flt srcMatrix
+                         local  mat44flt PR_gxMatrix2D
+                         inlines  LLMath_CopyMat44, vec_ld, vec_st
+ 1427  00410CB8    140  void Apt_TargetView::UpdateTargetViewMatrix(float x0, float y0)
+                         local  const mat44flt& currentResMatricesArray
+                         local  const float fFrameBufferSizeX
+                         local  const float fFrameBufferSizeY
+                         local  const float scale
+                         local  mat44flt srcMatrix
+                         local  mat44flt PR_gxMatrix2D
+                         inlines  LLMath_CopyMat44, vec_ld, vec_st

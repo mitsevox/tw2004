@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNARender/PS3/RNARender/RNASurfacePlat.h
+// compiled in: RNASurfacePlat.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   38    inline-only   void operator delete(void* address)
+   38    inline-only   struct ICoreAllocator* GetClassAllocator()

@@ -1,0 +1,73 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/SunFlare/GlowsRenderData.c
+// compiled in: golf_unity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   91  002363B8     AC  static void _AddVertex(struct GlowStripT* pStrip, float* v, uint32 vertexStatus)
+                         local  struct GlowVertexT* pVertex
+  108  00245B58    1FC  static struct GlowStripT* _StartGlowStrip(int32 glowDefIndex, int32 nbVertices)
+                         local  const char[16] __FUNCTION__
+                         inlines  TagValuePair, operator+
+  125  00236464     24  static void _EndGlowStrip(struct GlowStripT* pStrip)
+  137    inline-only   static void _FreeGlowStrip(struct GlowStripT* pStrip)
+  153  00290E98    1D4  static void _CreateRing(int32 glowIndex, int32 nbSegments)
+                         local  vec4flt v
+                         local  vec4flt vFirst
+                         local  float angle
+                         local  int32 i
+                         local  struct GlowStripT* pStrip
+                         inlines  std::cosf, std::sinf
+  192  00290B64    334  static void _CreateStarSmooth(int32 glowIndex, int32 nbDoubleBranches)
+                         local  vec4flt v
+                         local  float angle
+                         local  float angleBase
+                         local  float scale
+                         local  int32 i
+                         local  int32 j
+                         local  int32 over
+                         local  uint32 flags
+                         local  struct GlowStripT* pStrip
+                         inlines  std::cosf, std::sinf
+  248  002365AC     20  float fConvertToPrimModeSpace(float value)
+  253  002BB9DC    2D8  static void _RenderGlow(struct GlowRenderDataT* pRenderData)
+                         local  int32 i
+                         local  int32 verts
+                         local  struct vtxStruct[512] vertices
+                         local  int32 iVertex
+                         local  struct GlowStripT* pStrip
+                         local  struct GlowVertexT* pVert
+                         local  float x
+                         local  float y
+                         local  float vx
+                         local  float vy
+                         local  float cx
+                         local  float cy
+                         local  float cz
+                         local  float cosA_def
+                         local  float sinA_def
+                         local  float cosA_tag
+                         local  float sinA_tag
+                         local  unsigned int color_def
+                         local  unsigned int color_tag
+                         local  unsigned int color
+                         local  uint8* pColor
+                         local  uint8* pColor
+  358  002BBCB4    378  static void _RenderGlows(TGlowRenderList* pGlowList, int iNoZtest)
+                         local  TGlowDef* pGD
+                         local  int32 i
+                         local  vec4flt centerInCameraRef
+                         local  float sinR
+                         local  float cosR
+                         local  int32 glowType
+                         local  int32 lod
+                         local  struct GlowRenderDataT RenderData
+                         local  bool bSkipTest
+                         local  int32 discType
+                         local  int32 starType
+                         local  int32 ringType
+                         local  float radius
+                         inlines  LLMath_mat44fltMultiply33, std::cosf, std::sinf
+  457  0029106C     BC  void GlowsRenderData_InitModule()
+  478  00236488     B4  void GlowsRenderData_CloseModule()
+                         local  int i
+                         inlines  _FreeGlowStrip
+  489  002BC02C      4  void GlowsRenderData_RenderGlows(TGlowRenderList* pGlowList, int iNoZtest)

@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/matrix33.h
+// compiled in: rnaunity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  342  004F8EBC     C4  struct <anon>& GetRow(const struct <anon>* this, int i)
+                         local  const char[7] __FUNCTION__
+                         inlines  AssertMacroHelper

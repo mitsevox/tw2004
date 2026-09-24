@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/src/Ska/XBox/SKA_Util_XBox.c
+// compiled in: SKA_Util_XBox.c
+// 8 functions, source order. line | PS3 address | size
+
+   18  005A7EDC    160  void SKAUtil_8BitExpandAngles_R(float* pDest, uint8_t* pDelta, uint16_t* pBase)
+   27  005A803C    160  void SKAUtil_8BitExpandAngles_P(float* pDest, uint8_t* pDelta, uint16_t* pBase)
+   36  005A819C    160  void SKAUtil_8BitExpandAngles_Y(float* pDest, uint8_t* pDelta, uint16_t* pBase)
+   45  005A82FC    1E0  void SKAUtil_8BitExpandAngles_RPY(float* pDest, uint8_t* pDelta, uint16_t* pBase)
+   54  005A84DC    114  void SKAUtil_16BitExpandAngles_R(float* pDest, uint16_t* pData, uint16_t* pBase)
+   63  005A85F0    118  void SKAUtil_16BitExpandAngles_P(float* pDest, uint16_t* pData, uint16_t* pBase)
+   72  005A8708    114  void SKAUtil_16BitExpandAngles_Y(float* pDest, uint16_t* pData, uint16_t* pBase)
+   81  005A881C    114  void SKAUtil_16BitExpandAngles_RPY(float* pDest, uint16_t* pData)

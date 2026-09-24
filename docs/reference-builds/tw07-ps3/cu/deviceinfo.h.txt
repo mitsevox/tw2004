@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/RW45/platform/include/native/ps3-ppu-gcc/rw/core/controller/deviceinfo.h
+// compiled in: Legacy_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   93    inline-only   enum Type GetType(const const struct <anon>* this)
+  104    inline-only   unsigned int GetNumberButtons(const const struct <anon>* this)

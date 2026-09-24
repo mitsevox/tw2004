@@ -1,0 +1,80 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNAScope/RNAParmBlock.h
+// compiled in: CGFXShader.cpp, RNADebugMenus.cpp, RNAMaterial.cpp, RNAParmBlock.cpp, RNAScene.cpp, RNAScope.cpp
+// 26 functions, source order. line | PS3 address | size
+
+   64    inline-only   void ParmBlockC::operator delete(void* address)
+   64    inline-only   struct ICoreAllocator* ParmBlockC::GetClassAllocator()
+   71    inline-only   const struct <anon>* ParmBlockC::GetParmList(const const struct ParmBlockC* this)
+   73    inline-only   struct <anon>* ParmBlockC::GetFirstParm(const const struct ParmBlockC* this)
+   81    inline-only   uint32_t ParmBlockC::GetMemSize(const const struct ParmBlockC* this)
+   82    inline-only   void* ParmBlockC::GetMemBlock(const const struct ParmBlockC* this)
+  111    inline-only   const union <anon>* ParmBlockC::ReadValue(const const struct ParmBlockC* this, const struct <anon>* pParm)
+                         local  const char[10] __FUNCTION__
+  122    inline-only   union <anon>* ParmBlockC::WriteValue(const struct ParmBlockC* this, const struct <anon>* pParm)
+                         local  const char[11] __FUNCTION__
+  138    inline-only   void ParmBlockC::Set<RNAMath::RNAVector2>(const struct ParmBlockC* this, struct <anon>* pParm, const const RNAVector2& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  RNAVector2* pValue
+  138    inline-only   void ParmBlockC::Set<RNAMath::RNAVector3>(const struct ParmBlockC* this, struct <anon>* pParm, const const RNAVector3& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  RNAVector3* pValue
+  138    inline-only   void ParmBlockC::Set<RNAMath::RNAVector4>(const struct ParmBlockC* this, struct <anon>* pParm, const const RNAVector4& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  RNAVector4* pValue
+  138    inline-only   void ParmBlockC::Set<std::float_t>(const struct ParmBlockC* this, struct <anon>* pParm, const const float_t& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  float_t* pValue
+  138    inline-only   void ParmBlockC::Set<std::int32_t>(const struct ParmBlockC* this, struct <anon>* pParm, const const int32_t& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  int32_t* pValue
+  138    inline-only   void ParmBlockC::Set<bool8_t>(const struct ParmBlockC* this, struct <anon>* pParm, const const bool8_t& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  bool8_t* pValue
+  138    inline-only   void ParmBlockC::Set<RNAMath::RNAMatrix44>(const struct ParmBlockC* this, struct <anon>* pParm, const const RNAMatrix44& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  RNAMatrix44* pValue
+  138    inline-only   void ParmBlockC::Set<bool>(const struct ParmBlockC* this, struct <anon>* pParm, const const bool& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  bool* pValue
+  138    inline-only   void ParmBlockC::Set<float>(const struct ParmBlockC* this, struct <anon>* pParm, const const float& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  float* pValue
+  155    inline-only   void ParmBlockC::Set<RNA::TextureC*>(const struct ParmBlockC* this, struct <anon>* pParm, const const RNATexturePtr& value, uint32_t uIndex)
+                         local  const char[20] __FUNCTION__
+                         local  RNATexturePtr* pValue
+  183    inline-only   struct TextureC* ParmBlockC::Get<RNA::TextureC*>(const const struct ParmBlockC* this, const struct <anon>* pParm, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  struct TextureC* value
+                         local  const char[10] __FUNCTION__
+  183    inline-only   bool ParmBlockC::Get<bool>(const const struct ParmBlockC* this, const struct <anon>* pParm, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  bool value
+                         local  const char[10] __FUNCTION__
+  183    inline-only   int32_t ParmBlockC::Get<std::int32_t>(const const struct ParmBlockC* this, const struct <anon>* pParm, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  int32_t value
+                         local  const char[10] __FUNCTION__
+  183    inline-only   float_t ParmBlockC::Get<std::float_t>(const const struct ParmBlockC* this, const struct <anon>* pParm, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  float_t value
+                         local  const char[10] __FUNCTION__
+  183    inline-only   RNAMatrix44 ParmBlockC::Get<RNAMath::RNAMatrix44>(const const struct ParmBlockC* this, const struct <anon>* pParm, uint32_t uIndex)
+                         local  struct <anon>& value
+                         local  const char[4] __FUNCTION__
+                         local  RNAMatrix44 value
+                         local  const char[10] __FUNCTION__
+  183    inline-only   RNAVector4 ParmBlockC::Get<RNAMath::RNAVector4>(const const struct ParmBlockC* this, const struct <anon>* pParm, uint32_t uIndex)
+                         local  struct <anon>& value
+                         local  const char[4] __FUNCTION__
+                         local  RNAVector4 value
+                         local  const char[10] __FUNCTION__
+  183    inline-only   RNAVector3 ParmBlockC::Get<RNAMath::RNAVector3>(const const struct ParmBlockC* this, const struct <anon>* pParm, uint32_t uIndex)
+                         local  struct <anon>& value
+                         local  const char[4] __FUNCTION__
+                         local  RNAVector3 value
+                         local  const char[10] __FUNCTION__
+  183    inline-only   RNAVector2 ParmBlockC::Get<RNAMath::RNAVector2>(const const struct ParmBlockC* this, const struct <anon>* pParm, uint32_t uIndex)
+                         local  struct <anon>& value
+                         local  const char[4] __FUNCTION__
+                         local  RNAVector2 value
+                         local  const char[10] __FUNCTION__

@@ -1,0 +1,49 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Rna/GolfRender/Terrain.cpp
+// compiled in: rnaunity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  192  004E8FBC   14E8  void RNA_RenderTerrain()
+                         local  struct CRShadowMap* pShadowMap
+                         local  float[2][4] myMCloudShadow
+                         local  vec4flt eyePoint
+                         local  struct GoTemple* pTemple
+                         local  bool bRenderingTemple
+                         local  bool bStructuresBlockingView
+                         local  struct TerMesh* pMesh
+                         local  struct TerMesh* pMeshEndPoint
+                         local  struct DeviceC* pDevice
+                         local  const struct ScopeC& scope
+                         local  struct ScopeParmC* parmBaseTexture
+                         local  struct ScopeParmC* parmLightTexture
+                         local  struct ScopeParmC* parmOverlayTexture
+                         local  struct ScopeParmC* parmHighresTexture
+                         local  struct ScopeParmC* parmIsStructure
+                         local  struct ScopeParmC* parmHasHRTexture
+                         local  struct ScopeParmC* parmHasOverlayTex
+                         local  struct ScopeParmC* parmHRTexFade
+                         local  struct ScopeParmC* parmHRUVScale
+                         local  struct ScopeParmC* UseRNAMaterials
+                         local  bool usingRNAMaterial
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         local  const float fadeDist
+                         local  float[2][4] myMShadow
+                         local  float[4][4] myMShadowHR
+                         local  float[4][4] myGolferShadow
+                         local  struct TerStrip* pStrip
+                         local  struct TerStrip* pStripEndPoint
+                         local  struct TerDefaultMaterial* pMat
+                         local  const bool bIsStructure
+                         local  bool useRNAMaterial
+                         local  struct MaterialC* pMaterial
+                         local  unsigned int mVal
+                         local  unsigned int aVal
+                         local  bool bob
+                         local  float fadeDist
+                         local  float uvScale
+                         local  bool once
+                         local  int testing123
+                         local  float overrideValue
+                         local  struct DeviceC* pDevice
+                         local  vec4flt fogColor
+                         inlines  CRData::IsGolferObjstructedByStructure, CRManager::GetCRShadowMap, CRShadowMap::GetHRShadowFadeDist, CRShadowMap::GetShadowMapTexture, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetColorWriteEnable, DS_vSetStencilEnable, DS_vSetStencilOp, DS_vSetStencilTest, DeviceC::Flush, RNADebugBreak, ScopeParmC::Get<bool>, ScopeParmC::Set<RNA::TextureC*>, ScopeParmC::Set<bool>, ScopeParmC::Set<rw::math::vpu::Vector3>, ScopeParmC::Set<std::float_t>, Update, Vector3, operator=

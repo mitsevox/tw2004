@@ -1,0 +1,47 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_WaterPond.cpp
+// compiled in: shader_unity.cpp
+// 31 functions, source order. line | PS3 address | size
+
+   24  0051C79C    270  void SM_WaterPondClass::SM_WaterPondClass(const struct SM_WaterPondClass* this)
+                         inlines  LLMath_IdentifyMat, SM_Shader_Base::SM_Shader_Base, vec4flt_Zero, vec_st
+  108  0050C1A8    96C  void SM_WaterPondClass::Load(const struct SM_WaterPondClass* this)
+  196  0050CB14    368  void SM_WaterPondClass::Activate(const struct SM_WaterPondClass* this)
+  245  0050CE7C     48  void SM_WaterPondClass::Deactivate(const struct SM_WaterPondClass* this)
+  256  00514574     6C  void SM_WaterPondClass::SetColorTexture(const struct SM_WaterPondClass* this, TextureRef texRef)
+  267  005145E0     6C  void SM_WaterPondClass::SetNormalTexture(const struct SM_WaterPondClass* this, TextureRef texRef)
+  278  0051464C     6C  void SM_WaterPondClass::SetRippleTexture(const struct SM_WaterPondClass* this, TextureRef texRef)
+  289  005146B8     60  void SM_WaterPondClass::SetRippleTime(const struct SM_WaterPondClass* this, float f)
+  299  00518EF4     6C  void SM_WaterPondClass::SetRipplePos(const struct SM_WaterPondClass* this, float* v)
+                         inlines  vec4flt_Copy
+  309  00514718     6C  void SM_WaterPondClass::SetReflectEnvTexture(const struct SM_WaterPondClass* this, TextureRef texRef)
+  320  00514784     6C  void SM_WaterPondClass::SetRefractEnvTexture(const struct SM_WaterPondClass* this, TextureRef texRef)
+  331  005147F0     64  void SM_WaterPondClass::SetStreamFlag(const struct SM_WaterPondClass* this, bool bStream)
+  341  00514854     60  void SM_WaterPondClass::SetVertAlpha(const struct SM_WaterPondClass* this, float f)
+  351  00518F60     E0  void SM_WaterPondClass::SetPondTextureOffsets(const struct SM_WaterPondClass* this, const float[4]& vecTexOff0, const float[4]& vecTexOff1, const float[4]& vecTexOff2)
+                         inlines  vec4flt_Copy
+  367  00519040     E0  void SM_WaterPondClass::SetStreamTextureOffsets(const struct SM_WaterPondClass* this, const float[4]& vecTexOff0, const float[4]& vecTexOff1, const float[4]& vecTexOff2)
+                         inlines  vec4flt_Copy
+  383  00519120     B0  void SM_WaterPondClass::SetRippleTextureXForms(const struct SM_WaterPondClass* this, const float[4]& vecTexOff0, const float[4]& vecTexOff1)
+                         inlines  vec4flt_Copy
+  396  00519A50     94  void SM_WaterPondClass::SetTextureMatrix(const struct SM_WaterPondClass* this, const float[4][4]& matTexture)
+                         inlines  LLMath_CopyMat44, vec_ld, vec_st
+  406  005191D0     6C  void SM_WaterPondClass::SetEysPosPS(const struct SM_WaterPondClass* this, const float[4]& vecEyePos)
+                         inlines  vec4flt_Copy
+  416  0051923C     6C  void SM_WaterPondClass::SetLightDir(const struct SM_WaterPondClass* this, const float[4]& vecLightDir)
+                         inlines  vec4flt_Copy
+  426  005148B4     64  void SM_WaterPondClass::SetRippleFlag(const struct SM_WaterPondClass* this, bool bRipple)
+  436  00514918     88  void SM_WaterPondClass::SetBumpScales(const struct SM_WaterPondClass* this, float reflectScale, float refractScale)
+  448  005149A0     88  void SM_WaterPondClass::SetLightingCoeffs(const struct SM_WaterPondClass* this, float kDiff, float kAmb)
+  460  00514A28     60  void SM_WaterPondClass::SetReflectionFactor(const struct SM_WaterPondClass* this, float reflectFactor)
+  470  005192A8     94  void SM_WaterPondClass::SetWaterColorVars(const struct SM_WaterPondClass* this, const float[4]& underwaterColor, float contribution)
+                         inlines  vec4flt_Copy
+  482  0051933C     B0  void SM_WaterPondClass::SetSpecularVars(const struct SM_WaterPondClass* this, const float[4]& specularColor, float specularPower, float specularRefHeight)
+                         inlines  vec4flt_Copy
+  496  005193EC     6C  void SM_WaterPondClass::SetFogColor(const struct SM_WaterPondClass* this, float* camPos)
+                         inlines  vec4flt_Copy
+  506  00519458     6C  void SM_WaterPondClass::SetFogCameraPos(const struct SM_WaterPondClass* this, float* camPos)
+                         inlines  vec4flt_Copy
+  516  00514A88     60  void SM_WaterPondClass::SetFogDensity(const struct SM_WaterPondClass* this, float f)
+  526  00514AE8     60  void SM_WaterPondClass::SetFogStartRadius(const struct SM_WaterPondClass* this, float f)
+  536  00514B48     60  void SM_WaterPondClass::SetFogHeightTop(const struct SM_WaterPondClass* this, float f)
+  546  00514BA8     60  void SM_WaterPondClass::SetReflectionTextureContribution(const struct SM_WaterPondClass* this, float f)

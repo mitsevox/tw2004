@@ -1,0 +1,16 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/memorypool.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   68  005EA020    128  void MemoryPool(const struct MemoryPool* this, uint32_t uSizeOfBlock, uint32_t uNumberOfBlocks, struct MemoryStrategy* pMemory)
+                         local  uint32_t uActualSizeOfBlock
+                         local  char8_t* pCurBlock
+                         local  uint32_t i
+  107  005BC14C     7C  void ~MemoryPool(const struct MemoryPool* this)
+                         inlines  ~MemoryStrategy
+  132  005D084C     68  void* GetMemoryBlock(const struct MemoryPool* this)
+                         local  uint32_t uBlockIndex
+                         local  void* pNextBlock
+  163  005BC1C8     30  void ReturnMemoryBlock(const struct MemoryPool* this, void* pBlock)
+  193  005D08B4      4  void* MemoryAllocate(const struct MemoryPool* this, size_t size, const char8_t* , int32_t , bool )
+  220  005BC1F8      4  void MemoryDeallocate(const struct MemoryPool* this, void* ptr)

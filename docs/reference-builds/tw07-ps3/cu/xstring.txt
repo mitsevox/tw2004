@@ -1,0 +1,24 @@
+// C:/dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/target/ppu/include/xstring
+// compiled in: golf_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+  691    inline-only   struct <anon>& assign(const struct <anon>* this, const const struct <anon>& _Right, size_t _Roff, size_t _Count)
+                         local  size_t _Num
+  709    inline-only   struct <anon>& assign(const struct <anon>* this, const char* _Ptr, size_t _Num)
+  722    inline-only   struct <anon>& assign(const struct <anon>* this, const char* _Ptr)
+  903    inline-only   struct <anon>& erase(const struct <anon>* this, size_t _Off, size_t _Count)
+                         local  size_t _Newsize
+ 1221    inline-only   const char* c_str(const const struct <anon>* this)
+ 1236    inline-only   size_t size(const const struct <anon>* this)
+ 1241    inline-only   size_t max_size(const const struct <anon>* this)
+                         local  size_t _Num
+ 1593    inline-only   void _Copy(const struct <anon>* this, size_t _Newsize, size_t _Oldlen)
+                         local  size_t _Newres
+                         local  char* _Ptr
+ 1623    inline-only   void _Eos(const struct <anon>* this, size_t _Newsize)
+ 1629    inline-only   bool _Grow(const struct <anon>* this, size_t _Newsize, bool _Trim)
+ 1643    inline-only   bool _Inside(const struct <anon>* this, const char* _Ptr)
+ 1659    inline-only   void _Tidy(const struct <anon>* this, bool _Built, size_t _Newsize)
+                         local  char* _Ptr
+ 1680    inline-only   char* _Myptr(const struct <anon>* this)
+ 1685    inline-only   const char* _Myptr(const const struct <anon>* this)

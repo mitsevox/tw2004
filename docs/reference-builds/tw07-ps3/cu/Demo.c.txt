@@ -1,0 +1,35 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/MainLoop/Demo.c
+// compiled in: other_unity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   77  003F6BE8     78  enum Golfer_t GetRandomGolfer()
+                         local  enum Golfer_t[25] golferList
+                         local  int32_t index
+  120  003F6C60     44  enum GM_CourseType_t DEMO_GetCourseID()
+                         local  Course_t courseID
+  134  0043E25C    92C  void DEMO_Start()
+                         local  const char[11] __FUNCTION__
+                         local  int32_t numAvailableUserSlots
+                         local  Course_t courseID
+                         inlines  GM_SelectHoleSet, GM_SelectSingleHole, GM_SetCurrentCourse, GM_SetCurrentCourseID, GM_SetTargetCup, TagValuePair, cGAME_GLOBALS::SetCharacterStyleShirt, cGAME_GLOBALS::SetCrowds, cGAME_GLOBALS::SetDemoMode, cGAME_GLOBALS::SetEndGame, cGAME_GLOBALS::SetGamePaused, cGAME_GLOBALS::SetPin, cGAME_GLOBALS::SetReplayActive, cGAME_GLOBALS::SetWeatherOption, cGAME_GLOBALS::SetWindOption, operator+
+  336  003F6CA4     1C  void DEMO_ResetFrontendDemoTiming()
+  344  003F6CC0     B8  void DEMO_FrontendDemoMainMenu(bool mainmenu)
+                         local  bool titleScreen
+                         local  struct IAptControllerListener* pControllerListener
+                         local  struct AptScreenSubscriber* pScreenSubscriber
+  366  003F6D80     E4  bool DEMO_IsFrontendDemoTimedOut()
+                         local  int32_t demoTime
+  385  003F6D78      8  int32_t DEMO_GetFrontendDemoTime()
+  393  0040F92C     A4  void DEMO_CheckStartDemoFrontend()
+                         inlines  cGAME_GLOBALS::SetDemoMode
+  418  003F6E64     5C  void DEMO_ResetE3DemoTiming()
+  431  003F6EC0    24C  bool DEMO_IsE3DemoTimedOut()
+                         local  float elapsedTime
+                         inlines  TI_fConvertTimeDifToSeconds, sys_time_get_timebase_frequency
+  466  003F710C     18  bool DEMO_EnterE3AttractMode()
+  474  0043C0C8    110  void DEMO_Restore()
+                         local  int saveGameCount
+                         local  int numPlayers
+                         local  enum RESET_t resetGame
+                         local  int32_t i
+                         inlines  cGAME_GLOBALS::GetGameCount, cGAME_GLOBALS::GetResetGame, cGAME_GLOBALS::SetGameCount, cGAME_GLOBALS::SetResetGame

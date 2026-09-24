@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/CRSharedTypes.h
+// compiled in: headgate_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   23  0034A724      4  void PatchInfoS::~PatchInfoS(const struct PatchInfoS* this)

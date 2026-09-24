@@ -1,0 +1,255 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/istudio_runtime/FEgolferanim.c
+// compiled in: apt_unity.cpp
+// 106 functions, source order. line | PS3 address | size
+
+  197  0002A5EC     48  static void sFE_SwitchCrAPCamera(CameraController_t* pCameraController, const char* camName, enum FE_eCrAPCameraState idleState, bool interp, bool zoom, bool undoInterp)
+                         inlines  FE_sCharRenderMgr::SetLastCameraState
+  204  0006878C     8C  void FE_QueueAnimation(const char* animName, const char* camName, enum eSkaClub clubID, int32 numTimesToPlay, bool idleAnim, bool blendTrans, bool allowZoom, bool allowRotate, bool playImmediately)
+  295  0006EB5C     1C  void FE_vGetGolferPosition(float* vec)
+                         inlines  vec4flt_Copy, vec_st
+  304    inline-only   static void FE_CharMgrInit()
+  328    inline-only   static void FE_CharMgrClose()
+  348  00068960     EC  void FE_setupStreaming(int midModel)
+                         local  enum Golfer_t golfer_TID
+                         local  struct HashString charPreset
+  386    inline-only   static bool FE_StreamManageCRaPMemory()
+                         local  bool bAllFree
+  419  0002A6E4      8  static int32 FE_StreamFunc_IdleInit(void* pData)
+  427  0002A6EC      4  static void FE_StreamFunc_IdleClose(void* pData)
+  434  0002A70C     8C  static void FE_StreamFunc_IdleUpdate(void* pData)
+                         inlines  FE_StreamManageCRaPMemory
+  468  0002A798      4  static void FE_StreamFunc_IdleInterrupt(void* pData)
+  475  0002BB38    204  static int32 FE_StreamFunc_SkinInit(void* pData)
+                         local  int32 streamID
+                         local  int32 curFile
+                         local  int32 curOffset
+                         local  int32 fileSize
+                         inlines  FE_SetupCharState, StreamManagerFEChar::SetModelIDAndTextureID
+  504  0002A79C     6C  static void FE_StreamFunc_SkinClose(void* pData)
+  518  0002A808     8C  static void FE_StreamFunc_SkinUpdate(void* pData)
+  536  0002A894      4  static void FE_StreamFunc_SkinInterrupt(void* pData)
+  544  000AB2F0     A0  static int32 FE_StreamFunc_ChannelDataInit(void* pData)
+                         local  struct TCharacter* pCharacter
+                         local  const struct UserInfo& userInfo
+                         local  const struct CrAPInfo_t& crapInfo
+  572  0002A8D0      4  static void FE_StreamFunc_ChannelDataClose(void* pData)
+  580  000A73F0     70  static void FE_StreamFunc_ChannelDataUpdate(void* pData)
+                         local  struct TCharacter* pCharacter
+  598  0002A8D4      4  static void FE_StreamFunc_ChannelDataInterrupt(void* pData)
+  605  0002A8D8     D8  static int32 FE_StreamFunc_TexturesInit(void* pData)
+                         local  struct TCharacter* pCharacter
+                         inlines  FE_sCharRenderMgr::ReinitCrapOnTexLoad
+  630  00068894     88  static void FE_StreamFunc_TexturesClose(void* pData)
+                         inlines  FE_CRAPSetHandednessForScreen
+  643  0002AA34     70  static void FE_StreamFunc_TexturesUpdate(void* pData)
+  670  0002AAA4     48  static void FE_StreamFunc_TexturesInterrupt(void* pData)
+  679  000241FC     70  void FE_StreamInterruptState()
+  688  000241E4     18  void FE_StreamSetNextState(enum FE_eCharStreamState eState)
+  697  0002ACCC     34  void FE_StreamStopAllStreaming()
+  707    inline-only   static void FE_StreamInitStateMgr()
+  720  0002AC6C     60  void FE_StreamWaitForState(enum FE_eCharStreamState eState)
+  744  0002A6F0     1C  static void FE_StreamPopState()
+  750  00096000      4  void FE_DebugUpdate()
+  761  0002AAEC    180  void FE_StreamUpdateState()
+                         local  int32 initOk
+  801  0002AD00     20  bool FE_PauseFECharStreaming(bool pause)
+                         local  bool old
+  814  0002AD20     18  enum FE_eCharStreamState FE_StreamGetCurrentState()
+  822  0002AD9C     18  enum FE_eCharStreamState FE_StreamGetNextState()
+  830  0006EACC     90  void FE_SetupCamera()
+                         inlines  LLMath_IdentifyMat
+  843    inline-only   static void sFE_vUpdateCrAPGolferState(float currTime, float endTime)
+                         local  const struct FEAnimManager& animMan
+                         local  const char* ballTex
+                         local  int ballIndex
+  875    inline-only   static void sFE_ChangeLightDirection()
+                         local  struct Controller_StickInfo* pInfo
+                         local  mat44flt m
+  903  0009EA38    53C  static void sFE_vUpdateCrapGolferCameraControls()
+                         local  const int iExitDebugCamMode
+                         local  int32 inDebugCam
+                         local  uint32 lastPad
+                         local  uint32 pad
+                         local  bool bDoZoomModel
+                         local  bool bDoRotateRight
+                         local  bool bDoRotateLeft
+                         local  struct Controller_StickInfo* info
+                         inlines  sFE_ChangeLightDirection
+ 1006  0006D3A0    1AC  void sFE_vUpdateRenderGolfer()
+                         local  const struct TCharacter* pCharacter
+                         local  struct LI_SLightingEnvironment* spCharacterLight
+ 1055    inline-only   static void sFE_AdjustAndSetGolferPosition()
+                         local  float iron3Offset
+                         local  float iron7Offset
+                         local  float wedgeOffset
+                         local  float putterOffset
+                         local  vec4flt defaultPos
+ 1093  0001CEE4    3F4  void SetTWCharRenderState(enum FE_eCrapRenderState renderState)
+                         local  const int32[8] clubSlots
+                         local  const int32 numClubSlots
+                         local  const struct CrAPInfo_t& crapInfo
+                         local  int32 genderIdx
+                         local  int32 charIndex
+                         local  int32 slot
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  int32 meshIdx
+                         local  int32 meshListIndex
+                         local  struct meshListEntry* pMeshData
+                         local  const char* meshResourceName
+                         local  uint32 geomHandle
+                         local  struct CharGeom* pCGeom
+                         local  int32 slot
+                         local  int32 isClubSlot
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  int32 clubSearch
+                         local  int32 meshIdx
+                         local  int32 meshListIndex
+                         local  struct meshListEntry* pMeshData
+                         local  const char* meshResourceName
+                         local  uint32 geomHandle
+                         local  struct CharGeom* pCGeom
+ 1219  0009EF74    420  void FE_vUpdateGolferAll()
+                         local  float endTime
+                         local  float currTime
+                         local  float startTime
+                         local  const char* ballTex
+                         local  int ballIndex
+                         local  vec4flt defaultPos
+                         inlines  FEAnimManager::SetCurrentChar, FEAnimManager::SetSettingRenderState, FE_sCharRenderMgr::GetDisplayBallLogoName, FE_sCharRenderMgr::SetUpdateBallTexture, sFE_AdjustAndSetGolferPosition, sFE_vUpdateCrAPGolferState, vec4flt_Copy
+ 1289  0002AF18     CC  void FE_vRenderGolferAllPhase1()
+                         local  const struct UserInfo& userInfo
+ 1311  000DD480    24C  void FE_vRenderGolferAllPhase2()
+                         local  bool[4] boBallShadowDraw
+                         inlines  FE_RenderGolfer, LLMath_IdentifyMat, vec_st
+ 1333    inline-only   static void FE_RenderGolfer()
+                         local  bool[4] boBallShadowDraw
+ 1378  0002AFE4     F8  const char* FE_ChooseAnimationToPlay(struct TCharacter* pCharacter, int8 gender, int32 skaStateID)
+                         local  const char* animName
+ 1396    inline-only   static void FE_SetupCharState()
+ 1434  00089B34    234  static void FE_CharPositionOverwrite()
+                         local  struct TSkeleton* pSkeleton
+                         local  TBone* waistBone
+                         local  TBone* clubBone
+                         local  vec4flt clubPos
+                         local  TBone* ballBone
+                         local  vec4flt ballPos
+                         local  bool ballExists
+                         inlines  LLMath_Subtract
+ 1503  0002A8B4     1C  void FE_ShowGolfer()
+ 1511  0002A898     1C  void FE_HideGolfer()
+ 1520  0002AF00     18  bool FE_isGolferVisible()
+ 1530  0002A634     B0  void FE_vCloseFECharModule()
+                         inlines  FE_CharMgrClose
+ 1538  00071948     F8  void FE_vInitFECharModule()
+                         inlines  FE_CharMgrInit, FE_StreamInitStateMgr
+ 1559  0002B138     44  void FE_lite_vRegisterStreamClients()
+ 1570  00098C40    2A8  void FE_lite_vStreamCallback(struct TStreamData* xpStreamData_p)
+                         local  const char[24] __FUNCTION__
+                         local  char* src
+                         local  char* dest
+                         local  TByteSwapDataElementDef[2] lightHeaderDef
+                         local  TByteSwapDataElementDef[4] lightElemDef
+                         inlines  BYTESWAP_SWAPDATASTRUCTURE, LF_vSetCurrentLightFogEnvironment, TagValuePair, operator+
+ 1614  00025270     60  void FE_vClearGolferCache()
+ 1625  0002AD38     64  void FE_vExecuteClearGolferCache()
+ 1635  0002B17C    188  void FE_vFreeUnusedCharacters()
+                         local  int charI
+ 1681  00068818     7C  static void FE_vLoadNextCrAPAnim(bool blend, bool doFade)
+                         local  const char* animName
+                         local  const char* cameraName
+ 1695  0002B704    150  const char* FE_CrapGetIdleAnimName(enum FE_eCrapRenderState renderState, enum FE_eCrAPCameraState cameraState)
+                         local  enum eFESkaStates crapState
+ 1746  00077CDC    250  static void FE_RotateCrAPModel(float rotationAmount)
+                         local  float diff
+                         local  const char* animName
+                         local  const char* cameraName
+                         inlines  FEAnimManager::IsPlayingIdleAnim, FEAnimManager::SetForceRestart
+ 1824  0002AED0     20  static void FE_ResetCrAPZoom()
+ 1829  0009E998     A0  static void FE_ZoomCrAPModel(bool zoom)
+                         local  CameraController_t* pCameraController
+                         inlines  FEAnimManager::SetForceRestart
+ 1844  0002A9B0     84  void FE_SetCrapRotation(float rotAmount, bool blend)
+ 1861  000252D0     18  void FE_SetOffscreenBufferRender(bool bOn)
+ 1867  0006AC8C     F4  void FE_SetCrAPCameraIdleState(enum FE_eCrAPCameraState state)
+                         local  bool bHasCameraStateChanged
+                         local  const char* animName
+                         local  const char* cameraName
+                         inlines  FE_sCharRenderMgr::IsPlayingDefaultCamera
+ 1888  00019078     70  void FE_SetCrapClub(int32 club)
+ 1898  0002B854     5C  void FE_SetTempCrapClub(int32 club)
+ 1905  00068BDC    238  void FE_QueueCrAPAssetAnim(const char* anim, const char* camera, int32 itemSlot, int32 category, int32 subcategory, bool blendTrans)
+                         local  enum eSkaClub assetClubID
+                         local  enum eSkaClub idleClubID
+                         local  int32 numTimesToPlay
+                         local  bool isIdleAnimation
+                         local  bool blendToIdle
+                         local  const struct <anon>[9] mapping
+                         local  uint32 i
+                         local  const char* idleAnimName
+                         local  const char* idleCameraName
+                         local  struct <anon>[3] mapping
+                         local  uint32 i
+ 1994  00068ADC    100  void FE_QueueCustomAnim(const char* anim, const char* camera, bool waitForFinish, bool bIsIdleAnim, bool bBlend)
+                         local  const char* idleAnimName
+                         local  const char* idleCameraName
+ 2020  00068A4C     90  void FE_vTriggerCrAPAnimAndCamera(const char* anim, const char* camera, bool blend)
+                         local  const char* idleAnimName
+                         local  const char* idleCameraName
+ 2034  0002B8B0     C0  void FE_SwitchCurrentCamera(const char* camera, bool blend)
+                         local  CameraController_t* pCameraController
+ 2047  00018FF8     80  void FE_SetCrapRenderState(enum FE_eCrapRenderState eState)
+ 2063  000148C0     78  void FE_SetTempCrapRenderState(enum FE_eCrapRenderState eState)
+ 2079  0002B0DC     5C  void FE_SetTextureSwapState(enum FE_CrapTextureSwap_e swapState)
+ 2089  0002B970     28  bool FE_IsTextureSwapDone()
+ 2098  0001483C     2C  bool FE_SetDelayTextureSwap(bool delay, float time)
+                         local  bool old
+ 2108  0006EB78     4C  void FE_QueueBallChange(const char* texName)
+                         inlines  FE_sCharRenderMgr::SetUpdateBallTexture
+ 2114  000148A4     1C  enum FE_eCrapRenderState FE_GetCrapRenderState()
+ 2119    inline-only   static void FE_CRAPSetHandednessForScreen(bool bLefty)
+ 2127  00014888     1C  void FE_SetLastCrAPAsset(int32 lastCrapAssetUsed)
+ 2132  00014868     20  int32 FE_GetLastCrAPAsset()
+ 2137  0001499C     1C  void FE_SetLastCrAPCategory(int32 lastCrapCategoryUsed)
+ 2142  0001497C     20  int32 FE_GetLastCrAPCategory()
+ 2147  0002B9F0     50  bool FE_IsGolferRenderAllowed()
+                         local  bool result
+ 2161  0006891C     44  void FE_ResetCrAPGolferFromPreview()
+ 2173  0007182C    11C  void FE_sCharRenderMgr::FE_sCharRenderMgr(const struct FE_sCharRenderMgr* this)
+                         inlines  FE_sCharRenderMgr::ReinitCrapOnTexLoad, FE_sCharRenderMgr::SetUpdateBallTexture, GamePlayer::SetCharacterAnim
+ 2218  0002BA48     3C  void FE_sCharRenderMgr::~FE_sCharRenderMgr(const struct FE_sCharRenderMgr* this)
+ 2225  0006AB98     F4  bool FE_sCharRenderMgr::IsPlayingCamName(const const struct FE_sCharRenderMgr* this, const char* camName)
+                         local  const char* curCam
+                         local  bool bIsCurCamNotNULL
+                         local  bool bIsNewCamNotNULL
+                         inlines  FE_sCharRenderMgr::GetCurrentCamName
+ 2236  0006B4A0     F0  bool FE_sCharRenderMgr::IsPlayingAnimation(const const struct FE_sCharRenderMgr* this, const char* animName)
+                         local  const char* curAnim
+                         local  bool bIsCurAnimNotNULL
+                         local  bool bIsNewAnimNotNULL
+                         inlines  FE_sCharRenderMgr::GetCurrentAnimName
+ 2246  0002B998     58  void FE_sCharRenderMgr::SetDisplayBallLogoName(const struct FE_sCharRenderMgr* this, const char* name)
+ 2254  0006D95C      8  bool FE_sCharRenderMgr::IsPlayingBallAnimation(const const struct FE_sCharRenderMgr* this)
+ 2285  0002BD3C     1C  void FEAnimManager::Init(const struct FEAnimManager* this)
+ 2292  0002BA40      4  void FEAnimManager::Shutdown(const struct FEAnimManager* this)
+ 2296  0007B4A4    14C  void FEAnimManager::Update(const struct FEAnimManager* this)
+                         local  struct Event* info
+                         local  const bool stateLoopsForever
+                         local  const bool stateNotUnexpired
+                         local  const bool stateForceRestart
+                         inlines  Event::ClearFlag, Event::SetFlag, Event::TestFlag
+ 2355  0002BB2C      C  void FEAnimManager::ClearQueue(const struct FEAnimManager* this)
+ 2361  00068568    224  void FEAnimManager::QueueAnimation(const struct FEAnimManager* this, const char* animName, const char* camName, enum eSkaClub clubID, int32 numTimesToPlay, bool idleAnim, bool blendTrans, bool allowZoom, bool allowRotate, bool playImmediately)
+                         local  struct Event* info
+                         local  const bool hasValidAnimName
+                         local  const bool hasValidCamName
+                         inlines  Event::SetFlag
+ 2420  0002BF3C     28  void Event::Clear(const struct Event* this)
+ 2441  0002BE04     AC  bool EventQueue::Push(const struct EventQueue* this)
+ 2455  0002BD58     AC  bool EventQueue::Pop(const struct EventQueue* this)
+ 2469  00013760     8C  const struct Event* EventQueue::PeekHead(const const struct EventQueue* this)
+ 2476  000136D4     8C  struct Event* EventQueue::PeekHead(const struct EventQueue* this)
+ 2483  0002C0F4     8C  const struct Event* EventQueue::PeekTail(const const struct EventQueue* this)
+ 2490  0002BEB0     8C  struct Event* EventQueue::PeekTail(const struct EventQueue* this)
+ 2497  0002BB14     18  void EventQueue::Clear(const struct EventQueue* this)
+ 2510  000A80B8     B0  void FE_CleanupGameface()
+                         inlines  FEAnimManager::SetCurrentChar

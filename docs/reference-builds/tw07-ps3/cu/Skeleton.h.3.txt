@@ -1,0 +1,5 @@
+// ../ears_rt_cct/dev/api/ears_rt_cct/Skeleton.h
+// compiled in: Character.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   48    inline-only   int32_t GetBoneCount(const const struct Skeleton* this)

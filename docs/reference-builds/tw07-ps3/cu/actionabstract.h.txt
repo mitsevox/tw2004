@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/./actionabstract.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   43  006227C0      8  const char8_t* GetIdentifier(const const struct <anon>* this)
+   44  006227C8      8  bool IsEnabled(const const struct <anon>* this)

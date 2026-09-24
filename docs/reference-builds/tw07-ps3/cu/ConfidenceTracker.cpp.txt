@@ -1,0 +1,113 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/ConfidenceTracker/ConfidenceTracker.cpp
+// compiled in: golf_unity.cpp
+// 34 functions, source order. line | PS3 address | size
+
+  247  002B9780    18C  float ConfidenceTracker::GetConfidence(const struct ConfidenceTracker* this, uint8 course_index, uint8 hole_index, enum Club_t club, enum ShotType_t type, float risk)
+                         local  float course_percentage
+                         local  float club_percentage
+                         local  float type_percentage
+                         local  float return_value
+  272  0021DA64     BC  float ConfidenceTracker::GetHoleConfidence(const struct ConfidenceTracker* this, uint8 course_index, uint8 hole_index)
+  296  0021DC28    20C  float ConfidenceTracker::GetClubConfidence(const struct ConfidenceTracker* this, enum Club_t club)
+                         local  int i
+                         local  float modifier
+  324  002B94EC    294  float ConfidenceTracker::GetShotConfidence(const struct ConfidenceTracker* this, enum ShotType_t type)
+                         local  float modifier
+                         local  enum ShotConfidenceType SCShotType
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  enum ShotConfidenceType SCSitShotType
+                         local  int i
+  371  0021DE3C    234  void ConfidenceTracker::SetPerformance(const struct ConfidenceTracker* this, uint8 course_index, uint8 hole_index, int8 score)
+                         local  int counter
+                         local  int i
+                         local  int i
+                         local  int i
+  412  0021E070     48  uint8 ConfidenceTracker::GetPerformanceHistory(const struct ConfidenceTracker* this, uint8 course_index, uint8 hole_index, uint8 value)
+  430  00311444     F4  void ConfidenceTracker::AddShotToQueue(const struct ConfidenceTracker* this)
+                         local  struct ShotRatingQueueEntryType temp
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+  449  0021E41C    100  void ConfidenceTracker::ClearQueue(const struct ConfidenceTracker* this)
+                         local  int i
+                         local  float modifier
+  469  0021E51C    124  void ConfidenceTracker::ClearQueue(const struct ConfidenceTracker* this, int entry)
+                         local  int i
+                         local  float modifier
+  488  0021E640      C  void ConfidenceTracker::ResetQueue(const struct ConfidenceTracker* this)
+  493  0021E0B8    2A8  void ConfidenceTracker::PopQueue(const struct ConfidenceTracker* this)
+                         local  float modifier
+  520  0021E360     BC  void ConfidenceTracker::PushQueue(const struct ConfidenceTracker* this, const struct ShotRatingQueueEntryType& entry)
+                         local  int i
+  536  0021E64C    330  void ConfidenceTracker::UpdateHoleConfidence(const struct ConfidenceTracker* this, uint8 course_index, uint8 hole_index, int8 score)
+                         local  uint8 MaxScore
+                         local  uint8 LastScore
+                         local  int8 strokes
+                         local  float AvgScore
+                         local  float modifier
+                         local  int i
+  580  00311538    218  void ConfidenceTracker::UpdateShotClubConfidence(const struct ConfidenceTracker* this)
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         inlines  LLMath_DistanceBetween3, vec_madd, vec_sld, vec_sub
+  602  002B990C    204  int8 ConfidenceTracker::UpdatePlayerStat(const struct ConfidenceTracker* this, float value, enum PlayerNumber_t PlayerID)
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  float risk
+                         local  float confidence_percentage
+                         local  float stat_percentage
+                         local  uint8 confidence
+  625  0021DE34      8  enum ShotConfidenceType ConfidenceTracker::ConvertToConfidenceShotType(const struct ConfidenceTracker* this, enum ShotType_t type)
+  630  002B93CC    120  enum ShotConfidenceType ConfidenceTracker::ConvertToSituationShotType(const struct ConfidenceTracker* this, enum Club_t club, enum ShotType_t type, enum Lie_t lie)
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  enum ShotConfidenceType return_value
+                         local  float distance
+                         inlines  LLMath_DistanceBetween3
+  679  0021E97C     D8  enum ShotConfidenceLieType ConfidenceTracker::ConvertToConfidenceLie(const struct ConfidenceTracker* this, enum Lie_t lie)
+                         local  enum ShotConfidenceLieType return_value
+  717  0021EA54      4  void ConfidenceTracker::DisplayDetailOnScreen(const struct ConfidenceTracker* this, float risk)
+  799  0021EA58      4  void ConfidenceTracker::DisplayDriveData(const struct ConfidenceTracker* this)
+  922  0021EA5C     BC  void ConfidenceTracker::ClearHoleHistory(const struct ConfidenceTracker* this)
+                         local  int i
+                         local  int j
+                         local  int k
+  942  0021EB18     B8  void ConfidenceTracker::ClearHoleStats(const struct ConfidenceTracker* this)
+                         local  int i
+                         local  int j
+                         local  int k
+  962  0021EBD0     E4  void ConfidenceTracker::ResetConfidence(const struct ConfidenceTracker* this)
+                         local  int i
+ 1139  0027F268    154  void ConfidenceTracker::CalculateQueueScalingFactor(const struct ConfidenceTracker* this)
+                         local  int i
+                         local  float temp
+                         inlines  std::cos
+ 1151  0021DB20    108  float ConfidenceTracker::CalculateDecay(const struct ConfidenceTracker* this, int pos, float value)
+                         local  float temp
+                         local  float decay
+                         inlines  std::cos
+ 1161  00310CFC    748  float ConfidenceTracker::CalculateShotRating(const struct ConfidenceTracker* this, enum ShotConfidenceType shottype, enum ShotConfidenceType situation)
+                         local  float rating
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  enum ShotConfidenceLieType previous_lie
+                         local  enum ShotConfidenceLieType current_lie
+                         local  int composite_type
+                         local  float Drive
+                         local  float Pin
+                         local  float liescore
+                         local  float drivedistance
+                         local  float pindistance
+                         local  uint8 strokes
+                         local  uint8 par
+                         local  vec4flt initial_to_pin
+                         local  vec4flt initial_to_target
+                         inlines  GM_GetPlayerHoleStrokes, LLMath_DistanceBetween3, LLMath_DotProduct3, LLMath_Subtract3, vec_madd
+ 1307  002816A0     10  float ConfidenceTracker::CalculateShotRisk(const struct ConfidenceTracker* this, enum PlayerNumber_t PlayerID, float* pCalculatedStraightRisk, float* pCalculatedShapedRisk)
+ 1323  00281598    108  float ConfidenceTracker_CalculateShotRisk(enum PlayerNumber_t PlayerID, float* pCalculatedStraightRisk, float* pCalculatedShapedRisk)
+                         local  float risk
+                         local  struct AIBrain* brain
+                         inlines  AIMgr
+ 1518  001FB7A4      4  void ConfidenceRegisterCommands()
+ 1545  003117B4    14C  void ConfidenceOnHoleFinish(enum PlayerNumber_t PlayerID)
+                         local  uint8 strokes
+                         local  uint8 par
+                         inlines  GM_GetPlayerHoleStrokes
+ 1559  00311750     64  void ConfidenceOnShotFinish(enum PlayerNumber_t PlayerID, float sim_time)
+ 1567  0021ECB4      4  void ConfidenceOnScreen(enum PlayerNumber_t PlayerID)
+ 1588  0021ECB8     18  void ConfidenceTracker::StartShotTimer(const struct ConfidenceTracker* this)
+ 1593  0021ECD0     10  void ConfidenceTracker::UpdateShotTimer(const struct ConfidenceTracker* this, float elapsed)

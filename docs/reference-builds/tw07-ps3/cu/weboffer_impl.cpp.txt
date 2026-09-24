@@ -1,0 +1,99 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/online/osdk/weboffer_impl.cpp
+// compiled in: golf2_unity.cpp
+// 29 functions, source order. line | PS3 address | size
+
+   19  001608F0     4C  void OnCloseWebOfferAlert(int32 rslt)
+   36  0017EE38     A0  void CWebOffer(const struct <anon>* this)
+                         local  struct Facade* pFacade
+                         inlines  RCPointer
+   44  0015F378     C4  void ~CWebOffer(const struct <anon>* this)
+                         local  struct Facade* pFacade
+                         inlines  ~RCPointer
+   55  00176984     AC  void InitializeInterface(const struct <anon>* this)
+                         inlines  operator->, operator=
+   73  0015F1B8     F8  void TerminateInterface(const struct <anon>* this)
+                         local  bool b
+                         local  struct DebugStrategy* pDebug
+                         inlines  operator=
+   90  00176A30     84  bool Query(const struct <anon>* this, bool bTimeCheck, uint32_t uQuery)
+                         local  bool retVal
+                         inlines  operator->
+  100  0017E25C     A4  bool Instigate(const struct <anon>* this, bool bTimeCheck, uint32_t uQuery)
+                         local  bool retVal
+                         inlines  operator->
+  117  0017DDB0    320  uint32_t Process(const struct <anon>* this)
+                         local  uint32_t retVal
+                         inlines  operator->
+  206  0015F43C     58  void ResourceCleanup(const struct <anon>* this)
+                         inlines  operator->
+  214  0015F494     58  void ClearOffer(const struct <anon>* this)
+                         inlines  operator->
+  222  0017DCC4     EC  void ErrorLeaveESPN(const struct <anon>* this, const char8_t* strMsg)
+  244  0017E248      C  void LoadArticle(const struct <anon>* this, uint32_t articlenum)
+  251  0017E224     1C  void GetNextArticles(const struct <anon>* this)
+  259  0017E200     1C  void GetPrevArticles(const struct <anon>* this)
+  267  0017E1DC     1C  void ArticlesBack(const struct <anon>* this)
+  275  00155424    274  void ArticlesGetInfo(const struct <anon>* this)
+                         local  struct WebOfferArticles* pDetails
+                         local  uint32_t uMaxButtons
+                         local  uint32_t i
+                         local  uint32_t uLoop
+                         local  struct WebOfferButton* pButton
+                         inlines  operator->
+  305  0016093C    350  void ArticlesList(const struct <anon>* this)
+                         local  struct UIESPNNews* pNewsUI
+                         local  const uint32_t MAX_TITLE_LENGTH
+                         local  struct WebOfferArticles* pDetails
+                         local  uint32_t uNumArticles
+                         local  uint32_t uIndex
+                         local  struct WebOfferArticle* pArticle
+                         local  char8_t[67] strTitle
+                         local  const char8_t* pTitle
+                         local  struct Image* pImg
+                         inlines  operator->
+  339  0017E0D0    10C  void ArticlesRespond(const struct <anon>* this, uint32_t response)
+                         inlines  operator->
+  358  0016BE10    51C  void ESPNewsGetInfo(const struct <anon>* this)
+                         local  struct UIESPNNewsDetail* pNewsDetail
+                         local  struct WebOfferNews* pDetails
+                         local  char8_t[102400] newsdetail
+                         local  uint32_t curwordlength
+                         local  uint32_t uMaxButtons
+                         local  uint32_t i
+                         local  uint32_t uLoop
+                         local  struct Image* pImg
+                         local  struct WebOfferButton* pButton
+                         inlines  UIESPNNewsDetail::SetStyle, operator->
+  411  0012AB34      4  void ESPNewsRespond(const struct <anon>* this, uint32_t response)
+  420  0015F6AC    120  void UpdateTOS(const struct <anon>* this, bool bLegalScreen)
+                         local  struct WebOfferNews* pDetails
+                         local  uint32_t curwordlength
+                         local  const char8_t* pWord
+                         inlines  operator->
+  441  0015F5CC     E0  void UpdateNews(const struct <anon>* this)
+                         local  struct WebOfferNews* pDetails
+                         local  uint32_t curwordlength
+                         local  const char8_t* pWord
+                         inlines  operator->
+  455  0015F4EC     E0  void UpdateFAQ(const struct <anon>* this)
+                         local  struct WebOfferNews* pDetails
+                         local  uint32_t curwordlength
+                         local  const char8_t* pWord
+                         inlines  operator->
+  469  00155698    274  void AlertGetInfo(const struct <anon>* this)
+                         local  struct WebOfferAlert* pAlert
+                         local  uint32_t iNumEntries
+                         local  int32_t iMenuCount
+                         local  uint32_t uLoop
+                         inlines  operator->
+  501  0015590C    1B8  void AlertRespond(const struct <anon>* this, uint32_t response)
+                         local  struct WebOfferAlert* pAlert
+                         local  uint32_t uNumEntries
+                         local  uint32_t uMenuCount
+                         local  uint32_t uLoop
+                         inlines  operator->
+  530  0015F2B0     C8  void StateChanging(const struct <anon>* this, enum OsdkState eOldState, enum OsdkState eNewState)
+                         inlines  operator->
+  550  0012AB38      4  void StateChanged(const struct <anon>* this, enum OsdkState eOldState, enum OsdkState eNewState)
+  558  0014E590     4C  void WebOfferTransferSuccess(const struct <anon>* this)
+  564  0012AB3C     3C  void WebOfferTransferFailure(const struct <anon>* this)

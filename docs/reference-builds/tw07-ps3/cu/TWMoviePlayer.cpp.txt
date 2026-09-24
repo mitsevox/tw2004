@@ -1,0 +1,32 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/MoviePlayer/TWMoviePlayer.cpp
+// compiled in: golf2_unity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   77  001E6EC0    34C  bool MP_PlayModalMovie(const char* fmvpath, bool bAllowButtonThru)
+                         local  bool bSuccess
+                         local  uint32 movieStart_time
+                         local  float fVol
+                         local  bool bAbortPlayback
+                         inlines  DS_vSetAlphaTestMode, DS_vSetZBufferMode, GetCurrentFrameNumber, Mas_GetSubmix, OnlineManagerOSDK::GetInstance, OnlineManagerOSDK::WaitingForChallenge, cGAME_GLOBALS::IsQuitApplicationRequested, mp_playbackLoop
+  124  00185C78     64  bool MP_InitNonModalMovie(const char* fmvpath)
+  140  00157C64     38  void MP_StopCurrentNonModalMovie()
+  149  0014A710    100  bool MP_RenderNextFrame()
+                         local  float fVol
+                         inlines  Mas_GetSubmix
+  186  0018592C    34C  static void mp_init()
+                         local  struct CorePoolDescriptor[2] desc
+  254  0012AC58     18  bool MP_IsPlayingMovie()
+  261  0014A810    154  static bool mp_prepare(const char* fmvpath)
+                         local  bool bSuccess
+                         local  const int32_t MY_MOVIE_STREAM_BUFFER_SIZE
+  310    inline-only   static void mp_playbackLoop(bool bAllowButtonThru)
+                         local  bool bDebounceInput
+                         local  float fVol
+                         local  bool bAbortPlayback
+  446  001579DC    288  static void mp_cleanup()
+                         local  bool gHackToDeleteESPNRadioAfterMovie
+  499  0014A964     18  uint32 MP_GetMoviePlayedLength()
+  504  0014A97C     1C  void MP_ResetMoviePlayedLength()
+  537  001E720C     78  void MP_PlayAllMovies()
+                         local  uint32 i
+                         local  char[128] buff

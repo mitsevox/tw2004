@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/texblendmultiply.cpp
+// compiled in: other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   19  003D0D50     40  void TexBlendMultiply::TexBlendMultiply(const struct TexBlendMultiply* this, const const struct Allocator& refAlloc, struct Texture32b* destTexture)
+   26  003D0DD0     18  void TexBlendMultiply::~TexBlendMultiply(const struct TexBlendMultiply* this)
+   31  003D0E4C    310  void TexBlendMultiply::BlendNPixels(const struct TexBlendMultiply* this, int32_t mipmap, int32_t numTextures, struct RawTexture** textures, TexBlendParams* params, int32_t numPixels, RawTexture_PixelValue** pixelBuffer, RawTexture_PixelValue* destPixels)
+                         local  int i
+                         local  RawTexture_PixelValue* pix1
+                         local  RawTexture_PixelValue* pix2
+                         local  float maxColor
+                         local  float curColor
+                         local  float alphaPercent

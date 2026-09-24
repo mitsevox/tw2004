@@ -1,0 +1,24 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_trinity_creation_interface.cpp
+// compiled in: tiger_module_trinity_creation_interface.cpp
+// 10 functions, source order. line | PS3 address | size
+
+    0  00540D30     18  void ~ListNode(const struct <anon>* this)
+                         inlines  ~Allocatable
+   10  00581C00     9C  void TrinityCreationInterface(const struct <anon>* this, struct Global* global, struct CCT* cct, struct Trinity* trinity)
+                         inlines  Allocatable
+   20  00581D38     98  void ~TrinityCreationInterface(const struct <anon>* this)
+                         inlines  ~Allocatable
+   29  005817FC     80  struct TrinityActor* CreateTrinityActor(const struct <anon>* this)
+                         local  struct TrinityActor* actor
+   36  0058187C     84  struct TrinityCamera* CreateTrinityCamera(const struct <anon>* this)
+                         local  struct TrinityCamera* camera
+   44  00581AF0    110  struct TrinityVfx* CreateTrinityVfx(const struct <anon>* this)
+                         local  struct TrinityVfx* vfx
+                         inlines  TrinityVfx::TrinityVfx
+   51  00581900     4C  void DeleteTrinityActor(const struct <anon>* this, struct TrinityActor* pActor)
+   56  0058194C     4C  void DeleteTrinityCamera(const struct <anon>* this, struct TrinityCamera* pCamera)
+   61  00581998     4C  void DeleteTrinityVfx(const struct <anon>* this, struct TrinityVfx* pTrinityVfx)
+   66  005819E4    10C  const struct TrinityCamera* GetCameraByName(const struct <anon>* this, const char* name)
+                         local  char[64] contextName
+                         local  int32_t i
+                         local  struct TrinityCamera* pCam

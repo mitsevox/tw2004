@@ -1,0 +1,16 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/UI_ScoreCard.h
+// compiled in: apt_unity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   60  0004A78C      4  void UISavedHoleInfo::UISavedHoleInfo(const struct UISavedHoleInfo* this)
+   64    inline-only   int32 UISavedHoleInfo::GetHandicap(const struct UISavedHoleInfo* this, uint32 holeIndex)
+   65    inline-only   bool UISavedHoleInfo::GetHolePlayed(const struct UISavedHoleInfo* this, uint32 holeIndex)
+   66    inline-only   int32 UISavedHoleInfo::GetPar(const struct UISavedHoleInfo* this, uint32 holeIndex)
+   67    inline-only   int32 UISavedHoleInfo::GetYardage(const struct UISavedHoleInfo* this, uint32 holeIndex)
+   68    inline-only   bool UISavedHoleInfo::UseSavedHoleInfo(const struct UISavedHoleInfo* this)
+   71    inline-only   void UISavedHoleInfo::SetUseSavedHoleInfo(const struct UISavedHoleInfo* this, bool bUseSaved)
+   99  000FE464      4  void UIScoreCardBase::InitForPlayoff(const struct UIScoreCardBase* this)
+  100  000FE468      4  void UIScoreCardBase::OnClose(const struct UIScoreCardBase* this)
+  107  000FE46C      4  enum AptThreadReturnValue UIScoreCardBase::UpdateDataThread_func(struct IAptSubscriberBase* subs)
+  110  000FE470      8  int32 UIScoreCardBase::MapSelectedNumber(const struct UIScoreCardBase* this, int32 selectedNumber)
+  120  000FE478      4  void UIScoreCardBase::SetWinner(const struct UIScoreCardBase* this, int32 winningPlayerIndex)

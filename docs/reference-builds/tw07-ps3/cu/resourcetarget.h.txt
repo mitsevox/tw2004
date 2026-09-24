@@ -1,0 +1,10 @@
+// ../../../../../TIGERCODE/RW45/platform/include/native/ps3-ppu-gcc/rw/core/resource/resourcetarget.h
+// compiled in: Legacy_unity.cpp, golf2_unity.cpp, golf_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+  111    inline-only   const MemoryResourceDescriptor& GetMemoryResourceDescriptor(const const struct <anon>* this)
+  196    inline-only   uint32_t GetSize(const const struct <anon>* this)
+  270    inline-only   MemoryResource& GetMemoryResource(const struct <anon>* this)
+  337    inline-only   const RwChar* GetBaseResourceTypeName(uint32_t index)
+                         local  const char[24] __FUNCTION__
+  358    inline-only   bool IsBaseResourceTypeDisposable(uint32_t index)

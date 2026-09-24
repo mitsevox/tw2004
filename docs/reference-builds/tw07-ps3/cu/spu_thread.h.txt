@@ -1,0 +1,54 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/target/ppu/include/sys/spu_thread.h
+// compiled in: managerplat.cpp
+// 5 functions, source order. line | PS3 address | size
+
+  172    inline-only   static int sys_spu_thread_initialize(sys_spu_thread_t* thread, sys_spu_thread_group_t group, unsigned int spu_num, sys_spu_image_t* img, sys_spu_thread_attribute_t* attr, sys_spu_thread_argument_t* arg)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n
+  211    inline-only   static int sys_spu_thread_connect_event(sys_spu_thread_t id, sys_event_queue_t eq, sys_event_type_t et, uint8_t spup)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n
+  224    inline-only   static int sys_spu_thread_disconnect_event(sys_spu_thread_t id, sys_event_type_t et, uint8_t spup)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n
+  278    inline-only   static int sys_spu_thread_read_ls(sys_spu_thread_t id, uint32_t address, uint64_t* value, size_t type)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n
+  327    inline-only   static int sys_spu_thread_write_spu_mb(sys_spu_thread_t id, uint32_t value)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n

@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Legacy_unity.cpp
+// compiled in: Legacy_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+    0  003AA9AC    38C  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  CO_SConsoleMgr, FakeResourceAllocator::FakeResourceAllocator, FakeResourceAllocator::~FakeResourceAllocator, FileHandleWrapper, GetRow, JobScheduler, Matrix44, Quaternion, Set, SpinLock, TextureWorkerPool, Vector2, Vector3, Vector4, ~FileHandleWrapper, ~GolfAllocator, ~JobScheduler, ~TextureWorkerPool
+    0  003CDEF0     18  void ~CustomGolfAllocator(const struct <anon>* this)
+                         inlines  ~GolfAllocator
+    0  003CDF08     18  void ~GolfAllocator(const struct <anon>* this)
+                         inlines  ~IAllocator
+    0  003CDF38     18  void FakeResourceAllocator::~FakeResourceAllocator(const struct FakeResourceAllocator* this)
+                         inlines  ~IResourceAllocator

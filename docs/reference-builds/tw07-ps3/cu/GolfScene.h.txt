@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/Code/Golf/RNA/Scene/GolfScene.h
+// compiled in: rnaunity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   42  004FF5F0     F8  void GolfSceneC::~GolfSceneC(const struct GolfSceneC* this)
+                         inlines  RNADebugBreak, Release, ~AutoRefCount
+   49    inline-only   struct SGNodeC* GolfSceneC::GetSGRootNode(const const struct GolfSceneC* this)
+   50    inline-only   void GolfSceneC::SetSGRootNode(const struct GolfSceneC* this, struct SGNodeC* pNode)

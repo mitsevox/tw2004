@@ -1,0 +1,37 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/online/Online.c
+// compiled in: golf2_unity.cpp
+// 29 functions, source order. line | PS3 address | size
+
+ 1008  001A13C8     18  void Online_Update(bool recordControllerUpdates)
+ 1137  00128404      4  void Online_GetMyIPAddress(char* myAddrStr, size_t myAddrStrBufLen)
+ 1177  00128408     2C  void Online_InitResults(OnlineGameDataT* results)
+ 1186  00128434     2C  void Online_InitTourneyData(OnlineTourneyDataT* data)
+ 1192  00128460     3C  void Online_SetUser0Results(OnlineGameDataT* results)
+ 1196  0012849C     14  OnlineGameDataT* Online_GetUser0Results()
+ 1201  001284B0     3C  void Online_SetUser1Results(OnlineGameDataT* results)
+ 1205  001284EC     14  OnlineGameDataT* Online_GetUser1Results()
+ 1210  00128500     3C  void Online_SetUser2Results(OnlineGameDataT* results)
+ 1214  0012853C     14  OnlineGameDataT* Online_GetUser2Results()
+ 1219  00128550     3C  void Online_SetUser3Results(OnlineGameDataT* results)
+ 1223  0012858C     14  OnlineGameDataT* Online_GetUser3Results()
+ 1231  001285A0     3C  void Online_SetTourneyData(OnlineTourneyDataT* data)
+ 1240  001285DC     40  void Online_MarkUser0AsQuitter()
+ 1245  0012861C     40  void Online_MarkUser1AsQuitter()
+ 1250  0012865C     40  void Online_MarkUser2AsQuitter()
+ 1255  0012869C     40  void Online_MarkUser3AsQuitter()
+ 1264  001286DC     20  void Online_MarkUser0AsCheater(int cheatFlag)
+ 1268  001286FC     20  void Online_MarkUser1AsCheater(int cheatFlag)
+ 1272  0012871C     20  void Online_MarkUser2AsCheater(int cheatFlag)
+ 1276  0012873C     20  void Online_MarkUser3AsCheater(int cheatFlag)
+ 1286  0012875C     58  char* Online_GetQuickMessage(int index)
+                         inlines  cGAME_GLOBALS::GetOnlineOptionsQuickMesgStr
+ 1305  001287B4     B4  int Online_SetQuickMessage(int index, char* inputMsgStr)
+                         inlines  cGAME_GLOBALS::SetOnlineOptionsQuickMesgStr
+ 1504  00128868      8  bool Online_GetHardwareStatusFlags(int* flags, int* tested)
+ 1557  0016D8C8    1E8  void Online_SetDefaultOptions()
+                         local  int32 globalFlags
+                         inlines  cGAME_GLOBALS::SetGlobalFlags
+ 1602  00128870     3C  void Online_RestoreOptions()
+ 1610  001288AC     24  uint32 Online_TimingFunction()
+ 1625  001288D0      8  bool Online_bCurrentPlayerIsLegend()
+ 1637  001288D8      4  void Online_SendDisconnectedHint(int duplicateLogin)

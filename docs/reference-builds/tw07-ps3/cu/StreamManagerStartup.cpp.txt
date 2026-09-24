@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/streaming/StreamManagerStartup.cpp
+// compiled in: golf2_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   32  0018E2C4    128  void StreamManagerStartup::RegisterStreamClients(const struct StreamManagerStartup* this)
+                         inlines  Singleton<EarningsInfo>::GetSingleton, Singleton<GolferStats>::GetSingleton
+  112  0018E3EC    110  void StreamManagerStartup::UnregisterStreamClients(const struct StreamManagerStartup* this)
+                         inlines  Singleton<EarningsInfo>::GetSingleton, Singleton<GolferStats>::GetSingleton

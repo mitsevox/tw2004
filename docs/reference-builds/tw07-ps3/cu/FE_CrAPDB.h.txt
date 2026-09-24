@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/UI_Core/FrontEnd/Headers/FE_CrAPDB.h
+// compiled in: apt_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  300    inline-only   struct FE_CrAP_Asset_p FE_CrAP_GetRow(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum)
+  308    inline-only   struct FE_CrAP_Asset_p FE_CrAP_GetRow(int32 assetID)

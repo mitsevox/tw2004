@@ -1,0 +1,11 @@
+// ../../../../../TIGERCODE/Code/AptInterface/uiAptDrawText.h
+// compiled in: other_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   46    inline-only   void HoldString::SetString(const struct HoldString* this, char* str)
+                         local  uint32_t len
+   61    inline-only   char* HoldString::GetString(const const struct HoldString* this)
+   63    inline-only   bool HoldString::operator==(const const struct HoldString* this, const struct HoldString& a)
+   85  003EB5BC     18  void DrawTextRenderBase::DrawTextRenderBase(const struct DrawTextRenderBase* this)
+   86  003EB5EC     6C  void DrawTextRenderBase::~DrawTextRenderBase(const struct DrawTextRenderBase* this)
+  104    inline-only   TextureRef DrawTextRenderBase::GetTextureRef(const struct DrawTextRenderBase* this)

@@ -1,0 +1,9 @@
+// ../../../../../TIGERCODE/Code/Golf/AI/Headers/Difficulty.h
+// compiled in: apt_unity.cpp, golf2_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   29  001E7CA8     68  void DifficultySettings::~DifficultySettings(const struct DifficultySettings* this)
+                         inlines  Singleton<DifficultySettings>::~Singleton
+   43    inline-only   void DifficultySettings::ResetStreakValue(const struct DifficultySettings* this)
+   44    inline-only   void DifficultySettings::IncStreakValue(const struct DifficultySettings* this)
+   45    inline-only   void DifficultySettings::DecStreakValue(const struct DifficultySettings* this)

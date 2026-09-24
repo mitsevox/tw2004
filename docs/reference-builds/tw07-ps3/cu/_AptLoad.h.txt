@@ -1,0 +1,47 @@
+// ../../../../../TIGERCODE/Code/AptInterface/AptPackage/_AptLoad.h
+// compiled in: other_unity.cpp
+// 35 functions, source order. line | PS3 address | size
+
+   15    inline-only   void* Allocator::Alloc(size_t size)
+   21    inline-only   void Allocator::Free(void* ptr)
+   32    inline-only   void AptLoader::operator delete(void* p, size_t size)
+   32    inline-only   void* AptLoader::operator new(size_t size)
+   54    inline-only   void AptLoader::GetFileVector(const struct AptLoader* this, AptFilePtr* aFilePtrs, int nMaxSize)
+                         local  int j
+                         local  struct <anon> i
+   70    inline-only   int AptSharedPtrRefCount::IncRef(const struct AptSharedPtrRefCount* this)
+   71    inline-only   int AptSharedPtrRefCount::DecRef(const struct AptSharedPtrRefCount* this)
+   79    inline-only   void AptFile::operator delete(void* p, size_t size)
+   79    inline-only   void* AptFile::operator new(size_t size)
+  111    inline-only   const AptNativeString& AptFile::GetName(const const struct AptFile* this)
+  112    inline-only   const enum State AptFile::GetState(const const struct AptFile* this)
+  114    inline-only   struct AptCharacter* AptFile::FindExport(const struct AptFile* this, const char* szName)
+                         local  int i
+                         local  struct AptCharacter* pRet
+  133    inline-only   struct AptCharacter* AptFile::GetMainCharacter(const const struct AptFile* this)
+  134    inline-only   void* AptFile::GetUserData(const const struct AptFile* this)
+  138    inline-only   void AptFile::setState(const struct AptFile* this, enum State s)
+  139    inline-only   void AptFile::setDataPointers(const struct AptFile* this, void* aptData, struct AptCharacter* mainCharacter, void* userData)
+  156    inline-only   void AptLinkerThingy::operator delete(void* p, size_t size)
+  156    inline-only   void* AptLinkerThingy::operator new(size_t size)
+  161    inline-only   AptFilePtr AptLinkerThingy::GetFile(const const struct AptLinkerThingy* this)
+  162    inline-only   struct AptCIH* AptLinkerThingy::GetTarget(const const struct AptLinkerThingy* this)
+  164    inline-only   bool AptLinkerThingy::IsAttachedToMovie(const const struct AptLinkerThingy* this)
+  165    inline-only   void AptLinkerThingy::SetAttachedToMovie(const struct AptLinkerThingy* this, bool attached)
+  173    inline-only   void AptLinker::operator delete(void* p, size_t size)
+  173    inline-only   void* AptLinker::operator new(size_t size)
+  182    inline-only   struct Iterator AptLinker::findThingy(const struct AptLinker* this, struct AptCIH* pCIH)
+                         local  struct <anon> i
+  215    inline-only   enum State AptFileSavedInputState::GetState(const const struct AptFileSavedInputState* this)
+  216    inline-only   void AptFileSavedInputState::SetState(const struct AptFileSavedInputState* this, enum State state)
+  217    inline-only   const AptNativeString& AptFileSavedInputState::GetName(const const struct AptFileSavedInputState* this)
+  231    inline-only   void AptSavedInputCheckpoints::operator delete(void* p, size_t size)
+  231    inline-only   void* AptSavedInputCheckpoints::operator new(size_t size)
+  236    inline-only   void AptSavedInputCheckpoints::updateState(const struct AptSavedInputCheckpoints* this, const const AptNativeString& name, enum State lookFor, enum State setTo, enum State ifNotFound)
+                         local  struct AptFileSavedInputState* i
+  253    inline-only   bool AptSavedInputCheckpoints::allStatesAre1(const struct AptSavedInputCheckpoints* this, enum State state0)
+                         local  struct AptFileSavedInputState* i
+  302    inline-only   void AptSavedInputCheckpoints::FileLoaded(const struct AptSavedInputCheckpoints* this, const const AptNativeString& s)
+  309    inline-only   void AptSavedInputCheckpoints::AllLinked(const struct AptSavedInputCheckpoints* this)
+                         local  FileSavedInputStateVector x
+  315    inline-only   bool AptSavedInputCheckpoints::CanLinkPendingFiles(const struct AptSavedInputCheckpoints* this)

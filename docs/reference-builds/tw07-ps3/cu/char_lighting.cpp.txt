@@ -1,0 +1,32 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/animation/char_lighting.cpp
+// compiled in: golf2_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   48  0013CBE8     4C  bool CharLighting::RequestLightingEval(struct TCharacter* pCharacter, int8_t* pLightingIndex)
+   71  001E51A4    370  void CharLighting::DrawCharacterIntoAuxBuffer()
+                         local  struct RC_SRenderCtx* pCurrentRenderCtx
+                         local  float[2][4] clearVertices
+                         local  vec4flt clearColor
+                         local  struct LI_SLightingEnvironment noLight
+                         local  float colorMod
+                         local  vec4flt cameraOrigin
+                         local  vec4flt cameraLook
+                         local  vec4flt xCharacterPosition
+                         inlines  CA_vSetCameraFieldOfView, Character_GetPosition, DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetZBufferMode, LF_spGetCurrentLightFogEnvironment, LF_vApplyLightingEnvironment, LF_vSetCurrentLightFogEnvironment, LF_vSetGeneralColorationColorModifier, PR_vSetCurrentColor, PR_vSetCurrentUsage, RC_spGetCurrentRenderCtx, RC_spGetRenderCtxCamera, vec4flt_Copy, vec_st
+  249  0013CCD0    18C  void CharLighting::ProcessCharacter()
+                         local  bool memAllocLocked
+                         local  vec4uint8* pWorkBuffer
+                         local  vec4uint8* pPixel
+                         local  float numPixelsProcessed
+                         local  float averageLuminance
+                         local  float maxLuminance
+                         local  float minLuminance
+                         local  float pixelLuminance
+  340  0013CC34     9C  int8_t CharLighting::DetermineCharacterLightingIndex(float avgLuminance, float minLuminance, float maxLuminance)
+                         local  float maxScore
+                         local  int8_t bestIndex
+                         local  float curScore
+                         local  float diff
+                         local  int8_t i
+  445  0013A930    124  void CharLighting::Init()
+  492  0013AA54     38  void CharLighting::Close()

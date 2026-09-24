@@ -1,0 +1,385 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLConCmd.c
+// compiled in: Legacy_unity.cpp
+// 129 functions, source order. line | PS3 address | size
+
+  161  003B2D20    1A0  static bool CO_boMEMCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  char[128] chpString
+                         local  char[128] chpParamString
+                         local  int32 iAvailable
+                         local  int32 iBiggestBlockInCirc
+                         local  int32 iNumberOfFreeBlocks
+                         local  int32 maxAlloc
+                         local  int32 poolSize
+  286  003CBC74    130  static void CO_vCOORDCommandManage(void* vpUserData_p)
+                         local  char[128] chpString
+                         local  vec4flt* xpCoord
+                         local  CameraController_t* xpCameraController
+                         inlines  CameraController_GetCameraLookPoint
+  354  0037C69C     14  static bool CO_boCOORDCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+  375  003CBBD8     9C  static void CO_vFOVCommandManage(void* vpUserData_p)
+                         local  char[128] chpString
+  408  0037C6B0     14  static bool CO_boFOVCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+  428  0039D070    110  static bool CO_boLOOKATCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  vec4flt xCamCoord
+                         local  vec4flt xLookPoint
+                         inlines  std::atof, vec4flt_Copy
+  487  003CBA2C    1AC  static void CO_vFPSCommandManage(void* vpUserData_p)
+                         local  char[128] chpString
+                         local  float x
+                         local  float y
+                         local  unsigned int counter
+                         local  unsigned int counter
+  541  0037C6E0     14  static bool CO_boFPSCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+  554  003861C0     80  static bool CO_vGameCompletionPercentageCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  bool bRet
+                         local  float_t gameCompletionPercentage
+                         inlines  std::atof
+  569  00398618    35C  static bool CO_vGameSetPGAUserStatsCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  bool bRet
+                         local  GM_Pga_UserStats* pUserStats
+                         local  int i
+                         local  int eventID
+                         inlines  std::atoi
+  651  00398974     DC  static bool CO_vGamePlayerStatusCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  bool bRet
+                         local  int gamePlayerStatus
+                         inlines  UnlockInfo::SetTourCard, std::atoi
+  681  0037C6F4     30  static bool CO_boEnvInfMapCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+  697  0037C724     14  static bool CO_boSAFEZONECommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+  717  0039D040     30  static bool CO_boVERSIONCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+  785  0037C738      4  static void CO_vSTATECommandManage(void* vpUserData_p)
+  817  0037C73C      8  static bool CO_boSTATECommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+  838  003CB5D8    454  static void CO_vCPUDMACommandManage(void* vpUserData_p)
+                         local  CO_SCommandCPUDMA* spCommandCPUDMA
+                         local  char[128] chpString
+                         local  char[128] chpString2
+                         local  uint32 dmaToVif1Duration
+                         local  uint32 cpuWorkDuration
+                         inlines  sys_time_get_timebase_frequency
+  908  0037C744     14  static bool CO_boCPUDMACommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1087  003C82A0    304  bool CO_boPRINTCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  char* commandName
+                         local  char* strLogChan
+                         local  char* strPhysChan
+                         local  UID_t logChan
+                         local  int physChan
+                         local  char* strLogChan
+                         local  UID_t logChan
+                         local  bool status
+                         local  bool status
+                         local  char* strLogChan
+                         local  UID_t logChan
+                         inlines  std::atoi
+ 1213  0037C7B0     B8  bool CO_boFMVCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  char[128] buff
+ 1236  0039CA38    608  static bool CO_boSITDEVCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  char* commandName
+                         local  CO_SCommandSITDEV* commandState
+                         local  char[256] buff
+                         local  bool console_output
+                         local  int condNum
+                         local  bool status
+                         inlines  std::atoi
+ 1389  0039C4C0    578  static bool CO_boMEMCARDCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  char* commandName
+                         local  CO_SCommandMEMCARD* commandState
+                         local  char[256] buff
+                         local  bool console_output
+                         local  char[32] name1
+                         local  char[32] name2
+                         local  char[32] name3
+                         local  char[32] name4
+                         local  int errorCode
+                         local  MC_ArgsSaveT argsSave
+                         local  MC_ArgsLoadT argsLoad
+                         inlines  std::atoi
+ 1594  0039C2E8    1D8  static bool CO_boUSERCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  char[256] buff
+                         local  bool console_output
+                         local  bool[4] valid
+                         local  char[4][32] name
+                         local  char* commandName
+                         local  int32_t i
+                         local  const struct UserInfo& userInfo
+ 1655  0037C868     28  static bool CO_boDEBUGHOOKCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1669  0037C890      8  static bool CO_boENDJOURNALCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1685  0037C898    148  static bool CO_boBONESCALESCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  CO_SCommandBONESCALES* pBoneScaleUserData
+                         local  const char* option1
+                         local  const char* option1
+                         local  const char* option2
+ 1745  0037C9E0     30  static bool sIsStrEqual(const char* str1, const char* str2)
+ 1750  00398CF0    12C  static bool CO_boCRAPCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  struct CO_SCommandCRAP* pCmdData
+                         local  bool bPrintHelp
+                         local  const char* cmdStr
+                         local  const char* filename
+                         inlines  CO_SCommandCRAP::SetHasCommand, CO_SCommandCRAP::SetShouldLoad, CO_SCommandCRAP::SetShouldSave
+ 1796  0037CA10     24  void CO_SCommandCRAP::Init(const struct CO_SCommandCRAP* this)
+                         inlines  CO_SCommandCRAP::ClearFilename
+ 1804  0037AE2C     6C  void CO_SCommandCRAP::SetFilename(const struct CO_SCommandCRAP* this, const char* filename)
+ 1863  0037CA3C      8  static bool CO_boIPADDRCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1890  00398A50     EC  static bool CO_CrowdStats(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  char[64] buf
+ 1911  0037CA44     28  static bool CO_CrowdIdle(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1920  00386174     4C  static bool CO_WindSpeed(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         inlines  std::atof
+ 1935  0037CA6C     3C  static bool CO_CrowdCheer(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1943  0037CAA8     3C  static bool CO_CrowdCheerQuiet(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1951  0037CAE4     3C  static bool CO_CrowdLament(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1963  0037CB20      8  static bool CO_boLOBBYIPCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 2039  0037CB28     34  static bool CO_boONLINEQUITCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 2062  0037CB5C      8  static bool CO_boVOIPCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 2097  0037CB64     28  static bool CO_boGMCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  bool result
+ 2115  0039C224     C4  static bool CO_boRTCCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  int month
+                         local  int day
+                         local  int year
+                         local  int hour
+                         local  int minute
+                         local  int second
+                         local  int millisecond
+                         local  char[32] clockStr
+ 2139  0037CBCC     24  static bool CO_boMEMHUDCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 2162  003A2D24     2C  static bool CO_boMEMTRKCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 2184  0037CBF0     28  static bool CO_boBUDGETCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 2199  0039BC94    590  static bool CO_boDISPCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  bool on
+                         local  int32 i
+                         local  const char* cmd
+ 2325  0039B32C    4D4  static bool CO_boCAMCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  char* command
+                         local  vec4flt pos
+                         local  int i
+                         local  CameraController_t* pCameraController
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt pos
+                         local  int i
+                         local  CameraController_t* pCameraController
+                         local  vec4flt* pCameraLookPoint
+                         local  int seqNum
+                         inlines  CameraController_GetCameraLookPoint, CameraController_GetCameraOrigin, GolfTimer::SetElapsedTimeScale, std::atof, std::atoi, vec4flt_Copy
+ 2466  0037CC18      8  static bool CO_boBLURCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 2500  0039BAE8    1AC  static bool CO_boCHEATCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  bool on
+                         local  int index
+                         inlines  cGAME_GLOBALS::SetAIUseRegulationClubs, std::atoi
+ 2557  0039B968    180  static bool CO_boCUPSCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  int8 greenIndex
+                         local  int8 cupIndex
+                         inlines  std::atoi
+ 2613  0039B800    168  static bool CO_boGAMEMODEDRIVERCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  int eventIndex
+                         inlines  std::atoi
+ 2696  0037CC20      8  static bool CO_boTIGERCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 2717  0037CC28      8  static bool CO_boFORCETIECommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 2739  0037CC30    19C  static bool CO_boHOLEOUTCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  enum PlayerNumber_t currentPlayerId
+                         local  char* playerString
+                         local  char* holeString
+                         local  char* resultString
+                         local  char* userHoleString
+                         local  char* nextPlayer1HoleString
+ 2809  0037CDCC      8  static bool CO_boDBGLIGHTCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 2849  0039AF30    108  static bool CO_boINGAMETUNECommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  float val
+                         inlines  std::atof
+ 2896  0037CDD4     34  static bool CO_bBind(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 2905  0039AD28     B0  static bool CO_bSpeedTest(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  uint32 debugFlags
+                         inlines  GolfTimer::SetElapsedTimeScale, cGAME_GLOBALS::GetDebugFlags, cGAME_GLOBALS::SetDebugFlags
+ 2930  0039AED0     60  static bool CO_bRecordApt(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 2946  0039AE54     7C  static bool CO_bSaveApt(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  const struct GolfModuleAptDebug& debug
+ 2997  0039ADD8     7C  static bool CO_bDriveApt(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  const struct GolfModuleAptDebug& debug
+ 3069  0037CE08     34  static bool CO_bUnbind(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 3078  0037CE3C     34  static bool CO_bBindFace(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 3087  0037CE70     34  static bool CO_bUnbindFace(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 3101  0039AC74     B4  static bool CO_boCROWDIOCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  int varRangeID
+                         inlines  std::atoi
+ 3128  0037CEA4      8  static bool CO_boWINDIOCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 3161  0037CEAC      8  static bool CO_boTREEDIOCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 3190  0037CEB4      8  static bool CO_boRAINDIOCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 3219  0037CEBC      8  static bool CO_boSTMDIOCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 3263  0039AB88     EC  static bool CO_boLENSCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  float angle
+                         inlines  CA_vSetCameraFieldOfView, RC_spGetRenderCtxCamera, std::atof
+ 3310  0039AAC4     C4  static bool CO_boGAMMACommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  vec3flt xGammaValues
+                         inlines  std::atof
+ 3389  0037CEC4      8  static bool CO_boGRAPHCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 3454  0039B038    2F4  static bool CO_boPIPCameraCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  int bShow
+                         local  int mode
+                         local  int bShow
+                         local  float width
+                         local  float ht
+                         local  float x
+                         local  float y
+                         local  int val
+                         inlines  cGAME_GLOBALS::SetPipEnabled, std::atof, std::atoi
+ 3533  0037CECC     14  static bool CO_boAUDGRAPHCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 3555  00399A08   10BC  static bool CO_boAUDIOCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  int32 flags
+                         local  int instID
+                         local  int trackID
+                         local  int rangeID
+                         local  int varID
+                         local  int bankIndex
+                         local  int toneIndex
+                         local  char[64] instName
+                         local  char* c
+                         local  TInstr* pinst
+                         local  int bankID
+                         local  int sampleID
+                         local  bool bPrime
+                         local  int type
+                         local  bool bLoop
+                         local  char* strmName
+                         local  char* c
+                         local  uint8 plid
+                         local  uint16 strmid
+                         local  uint32 offset_ram
+                         local  uint32 offset_strm
+                         local  uint32 guid
+                         local  uint32 offset_ram
+                         local  uint32 offset_strm
+                         local  int type
+                         local  int msFade
+                         local  bool bLoop
+                         local  int type
+                         local  char[256] buf
+                         local  int degrees
+                         local  int rad
+                         local  int val
+                         local  int param
+                         local  bool bMale
+                         local  int voiceStyle
+                         local  float pitch
+                         local  int param2
+                         local  int param1
+                         local  int param2
+                         local  int param3
+                         local  uint32 guid
+                         local  char[64] buf
+                         local  bool bEmitter
+                         local  int val
+                         local  int val
+                         local  int val
+                         local  int bOn
+                         local  int val
+                         local  int submixChan
+                         local  float attn
+                         inlines  cGAME_GLOBALS::SetDebugFlags, std::atof, std::atoi, std::strchr
+ 3943  0037CEE0     14  static bool CO_boCOLORCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 3960  0037CEF4     14  static bool CO_boNETWORKCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 3980  00399984     84  static bool CON_bFADECULLCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  float fYards
+                         inlines  std::atof
+ 4017  003995D4     88  static bool CON_bCRAPCharCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  long unsigned int rank
+ 4046  003994FC     D8  static bool CON_bLIMITCLUBSCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  int32 iLimit
+                         inlines  std::atoi
+ 4086  0037CF08     14  static bool CO_boTERSTATSCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 4106  0037CF1C     14  static bool CO_boCLUBVARCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 4123  0037CF30      8  static bool CO_boFileComCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 4152  0039994C     38  static bool CON_bSNAPSHOTCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 4225  003997FC    150  static bool CON_bSNAPControllerCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 4280  00399714     E8  static bool CON_bSNAPNameCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 4333  0039965C     B8  static bool CON_bSNAPTileCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  long unsigned int tileCount
+ 4372  003C9A20     34  static bool CO_boMEMDUMPCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 4388  00399478     84  static bool CO_boDNASCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  char* command
+                         inlines  std::atoi
+ 4411  0037D07C     20  struct CO_SCommandAPT* CO_vGetAPTConsole()
+ 4416  00398E1C    65C  static bool CO_boAPTCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  uint32 color
+                         local  uint32 color
+                         inlines  std::atof, std::atoi
+ 4582  00398B3C    1B4  static bool CO_boSCREENTINTCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  vec4flt xTintValues
+                         local  bool bShowUsage
+                         local  bool bError
+                         inlines  std::atof, std::atoi
+ 4790  0037D09C     28  static bool CO_boSPECNORMCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 4801  0037D0C4     28  static bool CO_boSPECTINTCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 4809  0037D0EC     28  static bool CO_boSPECSTOPCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 4819  0037D114     28  static bool CO_boHEADTRACKCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 4826  0037D13C     28  static bool CO_boBIGHEADCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 4839  0037D164     EC  static bool CO_boSWINGCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  char* command
+ 4864  00397840    2EC  static bool CO_vPSLISTCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  char[6][17] emitterName
+                         local  float[6] emitterDist
+                         local  struct ParticleEmitter* emitter
+                         local  float* camPos
+                         local  int i
+                         local  float* emitterPos
+                         local  float dist
+                         local  int i
+                         local  int i
+                         local  int j
+                         inlines  LLMath_DistanceBetween3, ParticleManager::GetEmitterList
+ 4909  00386240     CC  static bool CO_boDISKTESTCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         inlines  cGAME_GLOBALS::SetDemoMode, cGAME_GLOBALS::SetEndGame, cGAME_GLOBALS::SetNextGame, std::atoi
+ 4930  00398484    194  static bool CO_TalkieCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  char* talkieName
+                         local  int talkyIndex
+                         local  struct TCharacter* pCharacter
+                         local  ChannelID id
+                         inlines  GM_GetGolferUp, GamePlayer::GetCharacter, Singleton<TalkyManager>::GetSingleton, std::atoi
+ 4975  0039831C    168  static bool CO_UcapStartCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  char* clipName
+                         local  float frameOffset
+                         local  float blendFrames
+                         inlines  std::atof
+ 5016  00398220     FC  static bool CO_TrinityLoadCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  char* streamName
+                         local  enum PlayerNumber_t player
+                         inlines  GM_GetGolferUp
+ 5046  0039817C     A4  static bool CO_TrinityDispCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  bool bDisplay
+                         inlines  Trinity::SetDisplayDebugInfo, std::atoi
+ 5064  00397D80    3FC  static bool CO_TrinityCrowdCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  int camMode
+                         local  int loc
+                         local  float fOffset
+                         local  bool bIsDebug
+                         local  float fDistance
+                         local  int camPosRefPoint
+                         inlines  GolfModuleTrinity::SetIsDisplayCrowdCamDebug, Trinity::GetCrowdCamMode, Trinity::SetCrowdCamDistance, Trinity::SetCrowdCamFocalLength, Trinity::SetCrowdCamHeight, Trinity::SetCrowdCamLocation, Trinity::SetCrowdCamMode, Trinity::SetCrowdCamPosRefPoint, Trinity::SetCrowdCamTargetOffset, std::atof, std::atoi
+ 5146  00397C80    100  static bool CO_CCTDispCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         inlines  GolfModuleCCT::SetDrawDebugBoneAxis
+ 5170  00397B2C    154  static bool CO_TrinityPlayCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  unsigned int activeResTag
+                         inlines  std::strstr
+ 5200  0037D250     50  static bool CO_FadeInCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 5208  003B9F08     84  static bool CO_boANISOCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         inlines  std::atoi
+ 5226  003977F8     48  static bool CO_TnRegisterTestModule(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 5233  003977B0     48  static bool CO_TcRegisterDBModule(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 5245  003A031C     CC  void CO_vRegisterGenericButtons()
+ 5324  0039F648    AF0  void CO_vRegisterGenericCommands(CO_SGenericCommands* spGenericCommands_p)
+                         local  char*[3] enableAll
+ 6177  0037D320     40  void CO_vClearAllMEMTRKSections()
+                         local  int32 iSection
+ 6208  0037D2F0     30  void CO_vClearMEMTRKSection(CO_EMemTrkSection eMemTrkSection_p)
+ 6233  0037D360     30  int32 CO_iGetMEMTRKSectionMem(CO_EMemTrkSection eMemTrkSection_p)
+ 6260  0037D390     34  void CO_vAddToMEMTRKSection(CO_EMemTrkSection eMemTrkSection_p, int32 iMemoryAmountToAdd_p)
+ 6291  0037D3C4     1C  void CO_vSetCurrentMEMTRKGSSection(CO_EMemTrkSection eMemTrkSection_p)
+ 6316  0037D3E0     1C  void CO_vSetCurrentMEMTRKCPUSection(CO_EMemTrkSection eMemTrkSection_p)
+ 6341  0037D3FC     1C  CO_EMemTrkSection CO_eGetCurrentMEMTRKGSSection()
+ 6367  0037D418     1C  CO_EMemTrkSection CO_eGetCurrentMEMTRKCPUSection()
+ 6422  0037D434     28  bool CO_boDISPCommandGetDisplayStatus(EDisp eDisp_p)
+ 6433  0037BDC0     28  void CO_boDISPCommandSetDisplayStatus(EDisp eDisp_p, bool on)
+ 6442  0037D45C     28  bool CO_boCHEATCommandGetCheatStatus(ECheat eCheat_p)
+ 6455  0037D484     1C  bool CO_boTERSTATSCommandGetDisplayStatus()
+ 6467  0037D4A0     1C  bool CO_boCLUBVARCommandGetDisplayStatus()
+ 6477  0037D4BC     1C  bool CO_boNETWORKCommandGetStatus()
+ 6488  0037D4D8     1C  bool CO_boCOLORPCommandGetDisplayStatus()
+ 6504  0037D4F4     1C  bool CO_boSAFEZONECommandGetDisplayStatus()

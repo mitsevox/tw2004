@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/./voiceuserconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   45  0062498C      8  const char8_t* GetName(const const struct <anon>* this)
+   58    inline-only   bool IsStickyMuteEnabled(const const struct <anon>* this)
+   60    inline-only   bool IsLocalUser(const const struct <anon>* this)
+   62    inline-only   int32_t GetVoiceChannel(const const struct <anon>* this)

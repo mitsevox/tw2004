@@ -1,0 +1,152 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/earnings/EarningsManager.cpp
+// compiled in: other_unity.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   55  003D9238     78  struct EarningsManager& EarningsMgr()
+                         inlines  Singleton<EarningsManager>::GetSingleton
+   74  0048914C   1188  void EarningsManager::GetEndOfShotBonus(const struct EarningsManager* this, enum PlayerNumber_t PlayerID, struct PhysicsBall_t* ball, bool predicted)
+                         local  int once
+                         local  bool replaceBonus
+                         local  bool ignoreBonus
+                         local  bool giveDevBonus
+                         local  int i
+                         local  int j
+                         local  int newBonusIndex
+                         local  int newTrophyIndex
+                         local  int newDevBonusIndex
+                         local  int[20] shotBonusID
+                         local  int[20] trophyID
+                         local  int[20] devBonusID
+                         local  struct PhysicsBall_t tempBall
+                         local  int predictionScoreMod
+                         local  bool noballtesting
+                         local  float shot_power
+                         local  int8 hook
+                         local  int8 slice
+                         local  int backswingY2
+                         local  float hookslice
+                         local  bool checkGameMode
+                         local  const struct t_Earnings_BonusShot_Rule* currentBonusShotRule
+                         local  int par45count
+                         local  int index
+                         local  bool over_par
+                         local  float factor
+                         inlines  GM_GetCurrentHoleIndex, GM_GetModeType, GM_GetPlayerHoleStrokes
+  625  0048A308   12F8  void EarningsManager::GetEndOfHoleBonus(const struct EarningsManager* this, enum PlayerNumber_t PlayerID, bool predicted)
+                         local  bool replaceBonus
+                         local  bool ignoreBonus
+                         local  bool giveDevBonus
+                         local  int i
+                         local  int j
+                         local  int newBonusIndex
+                         local  int newTrophyIndex
+                         local  int newDevBonusIndex
+                         local  int[20] holeBonusID
+                         local  int[20] trophyID
+                         local  int[20] devBonusID
+                         local  bool checkGameMode
+                         local  struct t_Earnings_BonusHole_Rule* currentBonusHoleRule
+                         local  int index
+                         local  bool over_par
+                         local  int pid
+                         local  int pscore
+                         local  int aiscore
+                         local  bool match
+                         inlines  EarningsInfo::GetBonusHoleRule, GM_GetCurrentHoleIndex, GM_GetModeType, GM_GetPlayerHoleStrokes, GM_SetPlayerHoleStrokes, GamePlayer::GetGolferScore
+ 1177  0048B638   1208  void EarningsManager::GetEndOfGameBonus(const struct EarningsManager* this, enum PlayerNumber_t PlayerID, bool predicted, bool bGameIsOver, bool bEndOfHole)
+                         local  bool replaceBonus
+                         local  bool ignoreBonus
+                         local  bool isMidRound
+                         local  bool giveDevBonus
+                         local  int i
+                         local  int j
+                         local  int newBonusIndex
+                         local  int newTrophyIndex
+                         local  int newDevBonusIndex
+                         local  int num_holes
+                         local  int[20] gameBonusID
+                         local  int[20] trophyID
+                         local  int[20] devBonusID
+                         local  int percentage
+                         local  int max_comeback
+                         local  bool checkGameMode
+                         local  void* pTigerModeDrvPtr
+                         local  struct t_Earnings_BonusGame_Rule* currentBonusGameRule
+                         local  struct TigerChallengeEvent_t* pTigerBossEvent
+                         local  int32 newTrophyIndex
+                         local  int fairwaysHit
+                         local  int par45count
+                         local  int index
+                         local  float factor
+                         local  int longdrive
+                         local  int playerlg
+                         local  int pid
+                         local  int hole
+                         local  int pscore
+                         local  int[4] aiscore
+                         local  int max_down
+                         local  int diff
+                         local  int down
+                         inlines  EarningsInfo::GetBonusGameRule, EarningsInfo::GetTrophyBalls, GM_FullRoundOfGolf, GM_GetCurrentHoleIndex, GM_GetModeType, GM_GetPlayerHoleStrokes, GM_SetPlayerHoleStrokes, GamePlayer::GetGolferScore, Singleton<GameModeDriverManager>::GetSingleton
+ 1766  003D9424     98  enum t_BonusShot_Lies EarningsManager::ConvertLieTerrainID(const struct EarningsManager* this, uint32 terrainID)
+ 1790  003D92B0     9C  enum t_BonusShot_Lies EarningsManager::ConvertLieType(const struct EarningsManager* this, enum Lie_t terrainType)
+ 1835  0048CC0C    7E4  void EarningsManager::CheckShotAwards(const struct EarningsManager* this, enum PlayerNumber_t PlayerID)
+                         local  int userID
+                         local  int i
+                         local  int once
+                         local  int gBonusDebug
+                         local  int i
+                         local  const struct UserInfo& userInfo
+                         local  int ta_bits
+                         local  enum TourCard statusLevel
+                         local  int streak
+                         local  int index
+                         local  int modifiedDevPoints
+                         local  int index
+                         inlines  EarningsManager::SetAwardGivenFlag, GamePlayer::GetGolferBonus, Singleton<HighScoreRecords>::GetSingleton
+ 2040  0048D748    770  void EarningsManager::CheckEndOfHoleAwards(const struct EarningsManager* this, enum PlayerNumber_t PlayerID)
+                         local  int userID
+                         local  int i
+                         local  const struct UserInfo& userInfo
+                         local  int index
+                         local  int modifiedDevPoints
+                         local  int index
+                         inlines  EarningsManager::SetAwardGivenFlag, GM_IsPlayoff, GamePlayer::GetGolferBonus, Singleton<HighScoreRecords>::GetSingleton
+ 2227  0048E61C    5CC  void EarningsManager::CheckEndOfGameAwards(const struct EarningsManager* this, enum PlayerNumber_t PlayerID, bool bGameIsOver)
+                         local  int userID
+                         local  int i
+                         local  const struct UserInfo& userInfo
+                         local  int index
+                         local  int32 devCapLevel
+                         local  enum TourCard tourCard
+                         inlines  EarningsInfo::GetStatusLevelThresholds, GamePlayer::GetGolferBonus, Singleton<HighScoreRecords>::GetSingleton, UnlockInfo::SetTourCard, UserInfo::GetUnlockInfo
+ 2383  0042CA04    6B8  bool EarningsManager::CheckTrackingTigerStats(const struct EarningsManager* this, enum PlayerNumber_t PlayerID, enum TrophyBall_t trophy)
+                         local  bool bLastRoundOfSeason
+                         local  bool bPlayedEnoughTournaments
+                         local  const GM_Pga_StatCounts* pCurrentRoundStats
+                         local  GM_Pga_StatCounts* pCompletedRoundStats
+                         local  GM_Pga_StatCounts* pMergedRoundStats
+                         local  GM_Pga_UserStats* pUserStats
+                         local  int32_t i
+                         local  const struct UserInfo& userInfo
+                         local  void* ptr
+                         local  struct GameModeDriverPGATour* pPGADriver
+                         local  const struct GameModeDriver* pDriver
+                         local  int wonCount
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton, UserInfo::GetPGATourData
+ 3367  0048A2D4     34  int EarningsManager::GetEndOfShotTrophyBall(const struct EarningsManager* this, enum PlayerNumber_t PlayerID, struct PhysicsBall_t* ball, bool predicted)
+ 3376  0048B600     38  int EarningsManager::GetEndOfHoleTrophyBall(const struct EarningsManager* this, enum PlayerNumber_t PlayerID, struct PhysicsBall_t* ball, bool predicted)
+ 3385  0048C840     3C  int EarningsManager::GetEndOfGameTrophyBall(const struct EarningsManager* this, enum PlayerNumber_t PlayerID, bool predicted)
+ 3396  003D9588     38  void EarningsManager::CopyCalculatedAwardsToCurrent(const struct EarningsManager* this)
+ 3401  003D934C     34  int EarningsManager::GM_Earnings_DevPointShotBonusTotal(const struct EarningsManager* this, const struct t_Earnings_BonusShot_Rule* shotRule)
+                         local  int total
+                         local  int i
+ 3413  003D93BC     34  int EarningsManager::GM_Earnings_DevPointHoleBonusTotal(const struct EarningsManager* this, struct t_Earnings_BonusHole_Rule* holeRule)
+                         local  int total
+                         local  int i
+ 3425  003D93F0     34  int EarningsManager::GM_Earnings_DevPointGameBonusTotal(const struct EarningsManager* this, struct t_Earnings_BonusGame_Rule* gameRule)
+                         local  int total
+                         local  int i
+ 3437  003D9380     3C  int EarningsManager::GM_Earnings_DevPointCurrentTotal(const struct EarningsManager* this, const struct BonusesAndTrophies_t& calculatedAwards, int index)
+                         local  int total
+                         local  int i

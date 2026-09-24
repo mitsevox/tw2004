@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/AI/Headers/ShotHistory.h
+// compiled in: golf2_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   29  001E7B3C     68  void ShotHistory::~ShotHistory(const struct ShotHistory* this)
+                         inlines  Singleton<ShotHistory>::~Singleton

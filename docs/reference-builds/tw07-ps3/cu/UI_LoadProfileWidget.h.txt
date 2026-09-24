@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_LoadProfileWidget.h
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   20  0012407C     B8  void UILoadProfileWidget::~UILoadProfileWidget(const struct UILoadProfileWidget* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   24  000FEE44      C  uint32 UILoadProfileWidget::GetSignature(const const struct UILoadProfileWidget* this)
+   25  000FEE50      8  enum eAptHandleInput UILoadProfileWidget::HandleInput(const struct UILoadProfileWidget* this, int32 cID)
+   27  00103568     14  enum TAptSequenceStatus UILoadProfileWidget::TimeOutSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)

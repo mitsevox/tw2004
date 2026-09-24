@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/aptInterface/uiAptDebugInfo.h
+// compiled in: other_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   27    inline-only   void AutoResetMax::Increment(const struct AutoResetMax* this)
+   29    inline-only   int32 AutoResetMax::GetValue(const const struct AutoResetMax* this)
+   30    inline-only   int32 AutoResetMax::GetMaxValue(const const struct AutoResetMax* this)
+   36    inline-only   int AutoResetMax::operator>(const struct AutoResetMax* this, const int t)
+   38    inline-only   void AutoResetMax::operator++(const struct AutoResetMax* this, int )
+   48  00402734    284  void AptDebugInfo::AptDebugInfo(const struct AptDebugInfo* this)
+                         inlines  AutoResetMax::AutoResetMax
+   73    inline-only   struct AptDebugInfo& AptDebugInfo::GetAptDebugInfo()

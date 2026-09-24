@@ -1,0 +1,6 @@
+// C:/RW45/platform/include/native/ps3-ppu-gcc/rw/core/base/ostypes.h
+// compiled in: movieplayer.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  490    inline-only   uint32_t rw::SizeAlign(uint32_t size, uint32_t align)
+                         local  const uint32_t alignMask

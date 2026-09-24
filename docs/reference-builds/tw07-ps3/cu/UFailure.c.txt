@@ -1,0 +1,36 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/UFailure.c
+// compiled in: Legacy_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   51  0037ACD8     20  bool FailureEnableGraphicalAssert(bool useGraphicalAssert)
+                         local  bool currentValue
+   57  0037ACF8     1C  void FailureForceContinue()
+   74  0038D504     A4  void FailureStrXFunc(char* errorString, intptr_t v1, intptr_t v2, intptr_t v3, intptr_t v4, intptr_t v5, intptr_t v6, char* fName, short int line)
+                         local  char[256] tempString
+   86  0037ADD4     20  void FailureStrVLocation(char* fName, short int line)
+   97  0038D46C     98  void FailureStrVFunc(const char* errorString)
+                         local  char[256] tempString
+                         local  va_list va
+  109  0037ADF4      8  void FailureBreakInDebugger()
+  132  0037ADFC     18  bool FailureIsInFailureLoop()
+  154  003865F0    564  static bool FailureStrLoop(bool allowContinue, const char* errorMessage, const char* fName, short int line)
+                         local  const float startX
+                         local  const float startY
+                         local  const float dy
+                         local  char[256] message
+                         local  char[256] errorBuffer
+                         local  int assertCount
+                         local  float startYOffset
+                         local  char* errorString
+                         local  bool dashboardAutoUpdating
+                         local  uint32 padLast
+                         local  float[2][4] pVertex
+                         local  const float[4] pColor
+                         local  struct SM_Shader_Base* old_shader
+                         local  uint32 pad
+                         local  float x
+                         local  int yi
+                         local  char* space
+                         local  float size
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetZBufferMode, PR_vSetCurrentColor, SM_GetLastActivedShader, std::strchr
+  367  00386B54    140  void FailureStrFunc(const char* errorString, const char* fName, short int line)

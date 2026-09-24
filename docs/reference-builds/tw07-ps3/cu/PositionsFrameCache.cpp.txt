@@ -1,0 +1,46 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/Internal/PositionsFrameCache.cpp
+// compiled in: PositionsFrameCache.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   29  0059D27C    244  void PositionsFrameCache(const struct <anon>* this, struct IAllocator* pAllocator, uint32_t maxFrameListEntries, uint32_t bufferMemory)
+                         local  struct <anon> align
+                         local  uint32_t i
+                         local  uint32_t i
+                         inlines  Singleton<EA::CCT::Internal::PositionsFrameCache>::Singleton, TagValuePair
+   68  0059CB68    104  void ~PositionsFrameCache(const struct <anon>* this)
+                         local  struct AnimFrameListEntry* pEntry
+                         local  uint32_t i
+                         inlines  Singleton<EA::CCT::Internal::PositionsFrameCache>::~Singleton
+   83  0059D088    1BC  bool CacheFrame(const struct <anon>* this, uint32_t id1, uint32_t id2, int32_t frameNum, int32_t numBones, struct <anon>** ppAnimFrame)
+                         local  struct AnimFrameKey key
+                         local  uint32_t hashIndex
+                         local  struct AnimFrameListEntry* pEntry
+                         local  bool bFound
+                         local  uint32_t numBytes
+                         local  uint32_t bufOffset
+                         inlines  AnimFrameKey::AnimFrameKey
+  155  0059CA94     D4  void ClearCache(const struct <anon>* this)
+                         local  struct AnimFrameListEntry* pEntry
+                         local  uint32_t i
+                         local  struct AnimFrameListEntry* pEntry
+                         local  struct AnimFrameListEntry* pNext
+                         local  struct AnimFrameListEntry* pNext
+  196  0059CD9C     28  uint32_t GetHashTableIndex(const const struct <anon>* this, const const struct AnimFrameKey& key)
+                         local  uint32_t hashVal
+  206  0059CCA4     A0  struct AnimFrameListEntry* FindFrameEntry(const struct <anon>* this, uint32_t hashIndex, const const struct AnimFrameKey& key)
+                         local  bool bHit
+                         local  struct AnimFrameListEntry* pEntry
+                         inlines  AnimFrameKey::operator==
+  226  0059CC6C     38  void AddToHashTable(const struct <anon>* this, struct AnimFrameListEntry* pEntry, uint32_t hashIndex)
+                         local  struct AnimFrameListEntry* pHashTableEntry
+  247  0059CED0    1B8  uint32_t AllocBufferSpace(const struct <anon>* this, uint32_t numBytes)
+                         local  uint32_t retVal
+                         local  uint32_t stolenSpace
+                         local  struct AnimFrameListEntry* pEntry
+  305  0059CE5C     74  uint32_t StealSpace(const struct <anon>* this)
+                         local  struct AnimFrameListEntry* pVictim
+  333  0059CDC4     98  void RemoveEntryFromHashTable(const struct <anon>* this, struct AnimFrameListEntry* pEntry)
+                         local  uint32_t hashIndex
+  409  0059CD44     58  uint32_t AnimFrameKey::GetHashed(const const struct AnimFrameKey* this)
+                         local  struct <anon> hashMe
+  422    inline-only   bool AnimFrameKey::operator==(const const struct AnimFrameKey* this, const const struct AnimFrameKey& rhs)

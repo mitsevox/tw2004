@@ -1,0 +1,47 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/src/Ska/SKA_Base.c
+// compiled in: SKA_Base.c
+// 8 functions, source order. line | PS3 address | size
+
+   37  005A2D80    390  void SKA_DistributePointers(TSkeletonAnimation* pSKA)
+                         local  char* pData
+                         local  int numMaskBytes
+                         local  int numMaskBytes
+                         local  int numMaskBytes
+                         local  int numMaskBytes
+                         local  int numMaskBytes
+  195  005A3110     E4  TSkeletonAnimation* SKA_LoadFromMem(char* pData, int32_t* iSize, uint32_t align, bool8_t bigEndianSwap, uint8_t* pShared)
+                         local  TSkeletonAnimation* pSKA
+                         local  uint32_t iOffset
+                         local  SkeletonAnimation* pNewSKA
+  261  005A3A28     FC  void SKA_ExpandFullFrame(TSkeletonState* pTarget, const TSkeletonAnimation* pSource, int iFrameIndex)
+                         local  TAnimDataCursor cursor
+                         local  int i
+                         local  struct <anon> transform
+                         inlines  Quat_Copy, vec4flt_Copy4
+  275  005A3980     A8  void SKA_ExpandFullFrame(struct <anon>* pTarget, const TSkeletonAnimation* pSource, int iFrameIndex)
+                         local  TAnimDataCursor cursor
+                         local  int i
+  286  005A38D4     AC  void SKA_ExpandSingleBone(struct <anon>* pTarget, const TSkeletonAnimation* pSource, int iFrameIndex, int iBoneIndex)
+                         local  TAnimDataCursor cursor
+                         local  int i
+  299  005A31F4    2DC  void SKA_InitCursor(TAnimDataCursor* pCursor, const TSkeletonAnimation* pSKA, int frameNum)
+  412  005A36BC    218  void SKA_ExpandNextBone(TAnimDataCursor* pCursor, struct <anon>* transform)
+                         local  vec3flt scale
+                         local  int index
+                         local  int index
+                         local  int index
+                         local  int index
+                         local  int index
+                         local  int index
+                         local  int index
+                         local  int index
+                         inlines  Quat_Identify
+  479  005A34D0    1EC  void SKA_SkipNextBone(TAnimDataCursor* pCursor)
+                         local  int index
+                         local  int index
+                         local  int index
+                         local  int index
+                         local  int index
+                         local  int index
+                         local  int index
+                         local  int index

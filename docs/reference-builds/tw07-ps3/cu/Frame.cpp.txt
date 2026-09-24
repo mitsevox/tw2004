@@ -1,0 +1,111 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/Frame.cpp
+// compiled in: Frame.cpp
+// 34 functions, source order. line | PS3 address | size
+
+   19    inline-only   int32_t _ExtractNumBones(const struct Character* character)
+   28    inline-only   int32_t _ExtractNumBlendShapes(const struct Character* character)
+   38  005AA154    1F8  void FramePerEltBinaryOp<<unnamed>::TransformCopyOp, <unnamed>::TransformCopyOp, <unnamed>::BlendWeightCopyOp>(const struct Character* character, struct <anon>* me, const struct <anon>* other, int flags)
+                         local  const struct <anon>* in_filter
+                         local  struct <anon>* out_filter
+                         local  int numBones
+                         local  const struct <anon>* in
+                         local  struct <anon>* out
+                         local  const float* last
+                         local  const float* w_in
+                         local  int32_t bone
+                         local  float* w_out
+                         inlines  GetBoneCount, GetFilter, Op, _ExtractNumBlendShapes, _ExtractNumBones
+   38  005AA34C    27C  void FramePerEltBinaryOp<<unnamed>::TransformAddOp, <unnamed>::TransformAddOp, <unnamed>::BlendWeightAddOp>(const struct Character* character, struct <anon>* me, const struct <anon>* other, int flags)
+                         local  const struct <anon>* in_filter
+                         local  struct <anon>* out_filter
+                         local  int numBones
+                         local  const struct <anon>* in
+                         local  struct <anon>* out
+                         local  const float* last
+                         local  const float* w_in
+                         local  int32_t bone
+                         local  float* w_out
+                         inlines  GetBoneCount, GetFilter, Op, _ExtractNumBlendShapes, _ExtractNumBones
+   38  005AA5C8    28C  void FramePerEltBinaryOp<<unnamed>::TransformSubtractOp, <unnamed>::TransformSubtractOp, <unnamed>::BlendWeightSubtractOp>(const struct Character* character, struct <anon>* me, const struct <anon>* other, int flags)
+                         local  const struct <anon>* in_filter
+                         local  struct <anon>* out_filter
+                         local  int numBones
+                         local  const struct <anon>* in
+                         local  struct <anon>* out
+                         local  const float* last
+                         local  const float* w_in
+                         local  int32_t bone
+                         local  float* w_out
+                         inlines  GetBoneCount, GetFilter, Op, _ExtractNumBlendShapes, _ExtractNumBones
+   38  005AA854    200  void FramePerEltBinaryOp<<unnamed>::TransformOverlayOp, <unnamed>::TransformOverlayOp, <unnamed>::BlendWeightOverlayOp>(const struct Character* character, struct <anon>* me, const struct <anon>* other, int flags)
+                         local  const struct <anon>* in_filter
+                         local  struct <anon>* out_filter
+                         local  int numBones
+                         local  const struct <anon>* in
+                         local  struct <anon>* out
+                         local  const float* last
+                         local  const float* w_in
+                         local  int32_t bone
+                         local  float* w_out
+                         inlines  GetBoneCount, GetFilter, Op, _ExtractNumBlendShapes, _ExtractNumBones
+   38  005AAA54    218  void FramePerEltBinaryOp<<unnamed>::GMBlendedOverlayOp, <unnamed>::TransformSlerpOp, <unnamed>::BlendWeightSlerpOp>(const struct Character* character, struct <anon>* me, const struct <anon>* other, int flags)
+                         local  const struct <anon>* in_filter
+                         local  struct <anon>* out_filter
+                         local  int numBones
+                         local  const struct <anon>* in
+                         local  struct <anon>* out
+                         local  const float* last
+                         local  const float* w_in
+                         local  int32_t bone
+                         local  float* w_out
+                         inlines  GetBoneCount, GetFilter, Op, _ExtractNumBlendShapes, _ExtractNumBones
+   38  005AAC6C    2D0  void FramePerEltBinaryOp<<unnamed>::GMSlerpOp, <unnamed>::TransformSlerpOp, <unnamed>::BlendWeightSlerpOp>(const struct Character* character, struct <anon>* me, const struct <anon>* other, int flags)
+                         local  const struct <anon>* in_filter
+                         local  struct <anon>* out_filter
+                         local  int numBones
+                         local  const struct <anon>* in
+                         local  struct <anon>* out
+                         local  const float* last
+                         local  const float* w_in
+                         local  int32_t bone
+                         local  float* w_out
+                         inlines  GetBoneCount, GetFilter, Op, _ExtractNumBlendShapes, _ExtractNumBones
+   70  005A9F90    1C4  void FramePerEltUnaryOp<<unnamed>::TransformScaleOp, <unnamed>::TransformScaleOp, <unnamed>::BlendWeightScaleOp>(const struct Character* character, struct <anon>* me, int flags)
+                         local  struct <anon>* filter
+                         local  int numBones
+                         local  struct <anon>* transform
+                         local  const float* last
+                         local  int32_t bone
+                         local  float* w
+                         inlines  GetFilter, Op, _ExtractNumBlendShapes, _ExtractNumBones
+  103    inline-only   void Op(int32_t bone, const struct <anon>* in_filter, struct <anon>* out_filter, const struct <anon>* in, struct <anon>* out)
+  111    inline-only   void Op(const float* in, float* out)
+  118  005A9E04     38  void Copy(const struct <anon>* this, const struct Character* character, const struct <anon>* other, int flags)
+  134    inline-only   void Op(int32_t bone, const struct <anon>* in_filter, struct <anon>* out_filter, const struct <anon>* in, struct <anon>* out)
+  152    inline-only   void Op(const float* in, float* out)
+  163  005A9E3C     38  void Add(const struct <anon>* this, const struct Character* character, const struct <anon>* other, int flags)
+  181    inline-only   void Op(int32_t bone, const struct <anon>* in_filter, struct <anon>* out_filter, const struct <anon>* in, struct <anon>* out)
+  199    inline-only   void Op(const float* in, float* out)
+  210  005A9E74     38  void Subtract(const struct <anon>* this, const struct Character* character, const struct <anon>* other, int flags)
+  230    inline-only   void Op(int32_t bone, const struct <anon>* in_filter, struct <anon>* out_filter, const struct <anon>* in, struct <anon>* out)
+  251    inline-only   void Op(int32_t bone, const struct <anon>* in_filter, struct <anon>* out_filter, const struct <anon>* in, struct <anon>* out)
+  270    inline-only   void Op(const float* in, float* out)
+  277  005A9F34     5C  void Slerp(const struct <anon>* this, const struct Character* character, const struct <anon>* other, float ratioThisThat, int flags)
+  297    inline-only   void Op(int32_t bone, const struct <anon>* in_filter, struct <anon>* out_filter, const struct <anon>* in, struct <anon>* out)
+  308    inline-only   void Op(const float* in, float* out)
+  315  005A9EAC     38  void Overlay(const struct <anon>* this, const struct Character* character, const struct <anon>* other, int flags)
+  332    inline-only   void Op(int32_t bone, const struct <anon>* in_filter, struct <anon>* out_filter, const struct <anon>* in, struct <anon>* out)
+  339  005A9EE4     50  void BlendedOverlay(const struct <anon>* this, const struct Character* character, const struct <anon>* other, float ratioThisThat, int flags)
+  359    inline-only   void Op(int32_t bone, const struct <anon>* filter, struct <anon>* transform)
+  369    inline-only   void Op(float* weight)
+  380  005A9DD0     34  void Scale(const struct <anon>* this, const struct Character* character, float scale, int flags)
+  387  005A9C20    144  void PoseAdjust(const struct <anon>* this, const struct Character* character, int poseAdjustmentId, int flags)
+                         local  const struct <anon>* lastPoseAdjustment
+                         local  const struct <anon>* poseAdjustment
+                         local  const struct <anon>* lastPoseDelta
+                         local  const struct <anon>* poseDelta
+                         local  struct <anon>* transform
+                         inlines  vec4flt_Add3
+  422  005A9D64     24  struct <anon>* CCT::AllocateTempFrame()
+  427  005A9D88     24  void CCT::FreeTempFrame(struct <anon>* frame)
+  432  005A9DAC     24  void CCT::ResetTempFrames()

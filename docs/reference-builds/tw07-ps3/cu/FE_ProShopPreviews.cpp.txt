@@ -1,0 +1,225 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/frontend/FE_ProShopPreviews.cpp
+// compiled in: apt_unity.cpp
+// 19 functions, source order. line | PS3 address | size
+
+   41  0001E4D0     70  void ProShopAssetPreviewManager::CreateLoadingTexture(const struct ProShopAssetPreviewManager* this)
+                         local  RawTexture_PixelValue color
+   54  0001E540     4C  void ProShopAssetPreviewManager::FreeLoadingTexture(const struct ProShopAssetPreviewManager* this)
+   63  0001EBA4     10  void ProShopAssetPreviewManager::ResetPreviewBoxByIndex(const struct ProShopAssetPreviewManager* this, int32 previewIndex)
+                         local  struct PreviewBox* pBox
+   70  0008A02C    E60  void ProShopAssetPreviewManager::PreviewAssetByID(const struct ProShopAssetPreviewManager* this, int32 previewIndex, int32 assetID)
+                         local  struct PreviewBox* pBox
+                         local  int32 genderIdx
+                         local  struct TextureGroup* pTexGroup
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  int32 numMeshes
+                         local  int32 meshIdx
+                         local  int32 meshListIndex
+                         local  struct meshListEntry* pMeshData
+                         local  const char* meshResourceName
+                         local  int32 texIdx
+                         local  int32 texListIndex
+                         local  struct regTexListEntry* pTexData
+                         local  char[32] baseName
+                         local  const char* origBaseTexName
+                         local  char* resourceName
+                         local  char[3] texSuffixes
+                         local  const int32 texNumSuffixes
+                         local  bool bDoAllSuffixes
+                         local  int32 numTex
+                         local  int32 i
+                         local  TextureRef testRef
+                         local  struct TintDef* pTintDef
+                         local  int32 shoeAssetID
+                         local  struct FE_CrAP_Asset_t* pShoeAsset
+                         local  int32 smeshIdx
+                         local  int32 shoeMeshListIndex
+                         local  struct meshListEntry* pShoeMeshData
+                         local  const char* shoeMeshName
+                         local  int32 stexIdx
+                         local  int32 shoeTexListIndex
+                         local  struct regTexListEntry* pShoeTexData
+                         local  char[32] baseName
+                         local  const char* shoeTexName
+                         local  char* resourceName
+                         local  char[3] texSuffixes
+                         local  const int32 texNumSuffixes
+                         local  bool bDoAllSuffixes
+                         local  int32 numTex
+                         local  int32 i
+                         local  TextureRef testRef
+                         local  struct TintDef* pTintDef
+                         inlines  std::strstr
+  318  000B3290    64C  void ProShopAssetPreviewManager::RenderPreview(const struct ProShopAssetPreviewManager* this, int32 previewIndex, float left, float top, float right, float bottom, float fadeValue)
+                         local  struct PreviewBox* pBox
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  int32 bIsBallPreview
+                         local  vec4flt min
+                         local  vec4flt max
+                         local  float fov
+                         local  float nearClip
+                         local  float farClip
+                         local  mat44flt cameraMatrix
+                         local  vec4flt lightDir
+                         local  struct LI_SLightingEnvironment* pLights
+                         local  vec4flt saveLightDir
+                         local  float aspect
+                         local  struct TCharacter* pCharacter
+                         local  mat44flt id
+                         local  struct TextureGroup* pTexGroup
+                         local  TextureRef saveBallColorMap
+                         local  TextureRef saveBallNormalMap
+                         local  int32 i
+                         local  int32 rightHandCamFlip
+                         inlines  LLMath_IdentifyMat, std::strstr, vec4flt_Copy
+  455  000AB4E4    984  void ProShopAssetPreviewManager::Tick(const struct ProShopAssetPreviewManager* this)
+                         local  const char[5] __FUNCTION__
+                         local  int32 previewIndex
+                         local  struct PreviewBox* pBox
+                         local  char[4][20] meshNames
+                         local  char[32][20] texNames
+                         local  int32 i
+                         local  int32 i
+                         local  uint8* pMeshData
+                         local  int32 meshDataSize
+                         local  struct TCharacter* pCharacter
+                         local  int32 mesh
+                         local  int32 boneCount
+                         local  mat44flt* pSkinMats
+                         local  int32 i
+                         local  int32 mesh
+                         local  twGeom* pGeom
+                         local  int32 mesh
+                         local  uint32 geomHandle
+                         local  struct CharGeom* pCGeom
+                         local  uint32 geomHandle
+                         local  struct CharGeom* pCGeom
+                         local  int32 genderIdx
+                         inlines  LLMath_IdentifyMat, TagValuePair, operator+
+  600  0001EB4C     58  void ProShopAssetPreviewManager::ClosePreviews(const struct ProShopAssetPreviewManager* this)
+                         local  int32 i
+  610  0001E60C     BC  void ProShopAssetPreviewManager::BindToLoadingTexture(const struct ProShopAssetPreviewManager* this, struct CharGeom* pGeom)
+                         local  int32 mesh
+                         local  struct CharMesh* pMesh
+                         local  struct CharMaterial* pCharMat
+  625  0001CCAC    104  int32 ProShopAssetPreviewManager::IsTextureUsedInPreview(const struct ProShopAssetPreviewManager* this, const char* textureName)
+                         local  int32 retVal
+                         local  int32 i
+                         local  int32 tex
+  646  0001E770    314  void ProShopAssetPreviewManager::BindTexturesToMesh(const struct ProShopAssetPreviewManager* this, struct PreviewBox* pBox, struct CharGeom* pGeom, struct meshListEntry* pMeshData)
+                         local  int32 genderIdx
+                         local  struct TextureGroup* pTexGroup
+                         local  int32 i
+                         local  int32 texListIndex
+                         local  struct regTexListEntry* pTexData
+                         local  const char* texName
+                         local  struct reqTexListEntry* pTexEntry
+  683  0001E6C8     A8  struct reqTexListEntry* ProShopAssetPreviewManager::FindTex(const struct ProShopAssetPreviewManager* this, struct PreviewBox* pBox, const char* texName)
+                         local  int32 i
+  696  0001EA84     C8  void ProShopAssetPreviewManager::ResetPreviewBox(const struct ProShopAssetPreviewManager* this, struct PreviewBox* pBox)
+                         local  int32 i
+  712  0001E58C     80  enum ePreviewBoxCamera ProShopAssetPreviewManager::GetCamTypeFromItemSlot(const struct ProShopAssetPreviewManager* this, int8 itemSlot)
+                         local  enum ePreviewBoxCamera cam
+  754  000B1F48    428  void ProShopAssetPreviewManager::SetupDefaultCamera(const struct ProShopAssetPreviewManager* this, const vec4flt& min, const vec4flt& max, float time, const mat44flt& cameraMatrixOut, const vec4flt& lightDirOut, const float& fovOut, const float& nearClipOut, const float& farClipOut)
+                         local  vec4flt lookPoint
+                         local  vec4flt tmp
+                         local  float boundingRadius
+                         local  float fov
+                         local  float sinangle
+                         local  float camDistance
+                         local  float nearClip
+                         local  float farClip
+                         local  vec4flt camPos
+                         local  float angle
+                         local  mat44flt rotMat
+                         local  vec4flt lightDir
+                         local  float lightYaw
+                         local  float lightPitch
+                         local  int32 tuneSetup
+                         local  struct CA_SCamera tmpCam
+                         local  int catId
+                         inlines  LLMath_Add, LLMath_CopyMat44, LLMath_IdentifyMat, LLMath_Length3, LLMath_Scale, LLMath_Subtract, __vec_len_sqr3, __vec_make_from_scalar, std::pow, std::sin, vec4flt_Copy, vec_add, vec_ld, vec_madd, vec_st, vec_sub
+  830  000B2370    3B8  void ProShopAssetPreviewManager::SetupBallsCamera(const struct ProShopAssetPreviewManager* this, const vec4flt& min, const vec4flt& max, float time, const mat44flt& cameraMatrixOut, const vec4flt& lightDirOut, const float& fovOut, const float& nearClipOut, const float& farClipOut)
+                         local  vec4flt lookPoint
+                         local  vec4flt tmp
+                         local  float boundingRadius
+                         local  float fov
+                         local  float sinangle
+                         local  float camDistance
+                         local  float nearClip
+                         local  float farClip
+                         local  vec4flt camPos
+                         local  float angle
+                         local  mat44flt rotMat
+                         local  vec4flt lightDir
+                         local  struct CA_SCamera tmpCam
+                         inlines  LLMath_Add, LLMath_CopyMat44, LLMath_IdentifyMat, LLMath_Length3, LLMath_Scale, LLMath_Subtract, __vec_len_sqr3, __vec_make_from_scalar, std::pow, std::sin, vec4flt_Copy, vec_add, vec_ld, vec_madd, vec_st, vec_sub
+  891  000B2728    428  void ProShopAssetPreviewManager::SetupGlovesCamera(const struct ProShopAssetPreviewManager* this, const vec4flt& min, const vec4flt& max, float time, const mat44flt& cameraMatrixOut, const vec4flt& lightDirOut, const float& fovOut, const float& nearClipOut, const float& farClipOut)
+                         local  vec4flt lookPoint
+                         local  vec4flt tmp
+                         local  float boundingRadius
+                         local  float fov
+                         local  float sinangle
+                         local  float camDistance
+                         local  float nearClip
+                         local  float farClip
+                         local  vec4flt camPos
+                         local  float angle
+                         local  mat44flt rotMat
+                         local  vec4flt lightDir
+                         local  float lightYaw
+                         local  float lightPitch
+                         local  int32 tuneSetup
+                         local  struct CA_SCamera tmpCam
+                         local  int catId
+                         inlines  LLMath_Add, LLMath_CopyMat44, LLMath_IdentifyMat, LLMath_Length3, LLMath_Scale, LLMath_Subtract, __vec_len_sqr3, __vec_make_from_scalar, std::pow, std::sin, vec4flt_Copy, vec_add, vec_ld, vec_madd, vec_st, vec_sub
+  967  000B2B50    3A0  void ProShopAssetPreviewManager::SetupClubHeadsCamera(const struct ProShopAssetPreviewManager* this, const vec4flt& realMin, const vec4flt& realMax, float time, const mat44flt& cameraMatrixOut, const vec4flt& lightDirOut, const float& fovOut, const float& nearClipOut, const float& farClipOut)
+                         local  vec4flt min
+                         local  vec4flt max
+                         local  vec4flt lookPoint
+                         local  vec4flt tmp
+                         local  float boundingRadius
+                         local  float fov
+                         local  float sinangle
+                         local  float camDistance
+                         local  float nearClip
+                         local  float farClip
+                         local  vec4flt camPos
+                         local  vec4flt camSideVec
+                         local  float angle
+                         local  mat44flt rotMat
+                         local  vec4flt lightDir
+                         local  struct CA_SCamera tmpCam
+                         inlines  LLMath_Add, LLMath_CopyMat44, LLMath_IdentifyMat, LLMath_Length3, LLMath_Scale, LLMath_Subtract, __vec_len_sqr3, __vec_make_from_scalar, std::pow, std::sin, vec4flt_Copy, vec_add, vec_ld, vec_madd, vec_st, vec_sub
+ 1035  000B2EF0    3A0  void ProShopAssetPreviewManager::SetupShaftsCamera(const struct ProShopAssetPreviewManager* this, const vec4flt& min, const vec4flt& max, float time, const mat44flt& cameraMatrixOut, const vec4flt& lightDirOut, const float& fovOut, const float& nearClipOut, const float& farClipOut)
+                         local  vec4flt lookPoint
+                         local  vec4flt tmp
+                         local  float boundingRadius
+                         local  float fov
+                         local  float sinangle
+                         local  float camDistance
+                         local  float nearClip
+                         local  float farClip
+                         local  vec4flt camPos
+                         local  float angle
+                         local  mat44flt rotMat
+                         local  vec4flt lightDir
+                         local  struct CA_SCamera tmpCam
+                         inlines  LLMath_Add, LLMath_CopyMat44, LLMath_IdentifyMat, LLMath_Length3, LLMath_Scale, LLMath_Subtract, __vec_len_sqr3, __vec_make_from_scalar, std::pow, std::sin, vec4flt_Copy, vec_add, vec_ld, vec_madd, vec_st, vec_sub
+ 1099  00097314    434  void ProShopAssetPreviewManager::SetupWatchesCamera(const struct ProShopAssetPreviewManager* this, int32 rightHandFlip, const vec4flt& min, const vec4flt& max, float time, const mat44flt& cameraMatrixOut, const vec4flt& lightDirOut, const float& fovOut, const float& nearClipOut, const float& farClipOut)
+                         local  vec4flt lookPoint
+                         local  vec4flt tmp
+                         local  float boundingRadius
+                         local  float bobAmount
+                         local  float fov
+                         local  float sinangle
+                         local  float camDistance
+                         local  float nearClip
+                         local  float farClip
+                         local  vec4flt camPos
+                         local  vec4flt camSideVec
+                         local  float angle
+                         local  mat44flt rotMat
+                         local  vec4flt lightDir
+                         local  struct CA_SCamera tmpCam
+                         inlines  LLMath_Add, LLMath_CopyMat44, LLMath_IdentifyMat, LLMath_Length3, LLMath_Scale, LLMath_Subtract, __vec_len_sqr3, __vec_mul, std::pow, std::sin, vec4flt_Copy, vec_add, vec_ld, vec_madd, vec_st, vec_sub

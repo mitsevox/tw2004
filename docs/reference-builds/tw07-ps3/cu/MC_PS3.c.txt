@@ -1,0 +1,286 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Memory_Card/PS3/MC_PS3.c
+// compiled in: apt_unity.cpp
+// 146 functions, source order. line | PS3 address | size
+
+   76  00103630    120  void MCPS3_ThreadLogger::~MCPS3_ThreadLogger(const struct MCPS3_ThreadLogger* this)
+                         inlines  MCPS3_ThreadLogger::IndentStr
+   81    inline-only   const char* MCPS3_ThreadLogger::IndentStr(const struct MCPS3_ThreadLogger* this)
+                         local  const char* szStr
+  240    inline-only   int MemcardOpPs3::GetLastError()
+  241    inline-only   void MemcardOpPs3::SetLastError(int nError)
+  243    inline-only   int MemcardOpPs3::GetCallbackError()
+  244    inline-only   void MemcardOpPs3::SetCallbackError(int nError)
+  249    inline-only   void MemcardOpPs3::SetLastSavedUserIndex(int nIndex)
+  250    inline-only   int MemcardOpPs3::GetLastSavedUserIndex()
+  492  00051B4C     40  int MC_SaveFile(int port, int slot, const char* name, void* data, int size, const char* backup)
+  493  00051D94     40  int MC_SaveFile_User(int isAutoSave, int unused1, const char* name, struct MC_DATA_BUFFER_INFO* buffers, int numBuffers, const char* backup)
+  500  00052DD4     18  void MemcardOpPs3::MemcardOpPs3(const struct MemcardOpPs3* this)
+  508  00052E04     18  void MemcardOpPs3::~MemcardOpPs3(const struct MemcardOpPs3* this)
+  516  0005C6FC     68  int MemcardOpPs3::Init()
+                         local  int nRslt
+                         inlines  sys_memory_container_create
+  535  00052F08     70  void MemcardOpPs3::DeInit()
+                         inlines  sys_memory_container_destroy
+  555  0005C594    168  void MemcardOpPs3::CreateFileStatBuffer()
+                         local  const char[21] __FUNCTION__
+                         local  unsigned int buffNeededForDirEntries
+                         local  unsigned int buffNeededForFileEntries
+                         inlines  TagValuePair, operator+
+  576  00052EAC     5C  void MemcardOpPs3::ReleaseFileStatBuffer()
+  589  00052EA8      4  void MemcardOpPs3::ReleaseCopyBuffer()
+  605  00080074     70  void MemcardOpPs3::Tick()
+  619  00052F78     24  void MemcardOpPs3::Begin()
+  629  0007E9E0     BC  void MemcardOpPs3::End()
+  660  00052E6C     18  bool MemcardOpPs3::IsThreadActive()
+  669  0005303C     48  enum tTigerSavedGameType MemcardOpPs3::GetTypeFromFileName(const char* szFileName)
+  685  00053084    1A0  int MemcardOpPs3::GetFileIndexFromDirName(const char* szDirName)
+                         local  size_t rootLen
+                         local  int nIndex
+                         inlines  std::atoi
+  701  00053224     9C  void MemcardOpPs3::UpdateLastSavedUserIndex()
+                         local  int nIndex
+                         inlines  MemcardOpPs3::SetLastSavedUserIndex
+  725  000532C0     38  const char* MemcardOpPs3::GetHeaderStr_Settings_Title()
+  734  000532F8     38  const char* MemcardOpPs3::GetHeaderStr_Settings_SubTitle()
+  743  00053330     38  const char* MemcardOpPs3::GetHeaderStr_Settings_Detail()
+  752  00053368     38  const char* MemcardOpPs3::GetHeaderStr_User_Title()
+  761  000533A0     38  const char* MemcardOpPs3::GetHeaderStr_User_SubTitle()
+  770  000533D8     38  const char* MemcardOpPs3::GetHeaderStr_User_Detail()
+  779  00053410    248  void MemcardOpPs3::SavePrep(enum tTigerSavedGameType nType, const char* szUserName, const char* szDescr, void* buff, unsigned int size)
+  832  00053658     24  void MemcardOpPs3::LoadPrep(enum tTigerSavedGameType nType)
+  842  0005367C     24  void MemcardOpPs3::DeletePrep()
+  852  0007F7F8     74  void MemcardOpPs3::ListSaveUser(enum tTigerSavedGameType nType, const char* szUserName, const char* szDescr, void* buff, unsigned int size)
+                         local  int ret
+                         local  sys_ppu_thread_t tid
+  879  0007F770     88  void MemcardOpPs3::FixedSaveSettings(enum tTigerSavedGameType nType, const char* szDescr, void* buff, unsigned int size)
+                         local  int ret
+                         local  sys_ppu_thread_t tid
+  906  0007F6DC     94  void MemcardOpPs3::AutoSave(enum tTigerSavedGameType nType, const char* szUserName, const char* szDescr, void* buff, unsigned int size)
+                         local  int ret
+                         local  sys_ppu_thread_t tid
+  937  0007EDFC    10C  void MemcardOpPs3::ListLoadUser(void* buff, unsigned int buffSz)
+                         local  int ret
+                         local  sys_ppu_thread_t tid
+  971  0007EC04     74  void MemcardOpPs3::ListDeleteUsers()
+                         local  int ret
+                         local  sys_ppu_thread_t tid
+  997  0007EB88     78  void MemcardOpPs3::RefreshUserInfo()
+                         local  int ret
+                         local  sys_ppu_thread_t tid
+ 1023  000536A0     3C  void MemcardOpPs3::TakeUserDirSnapshot()
+ 1032  000536E0      4  void MemcardOpPs3::ReconcileUserDirsToUserMgr()
+ 1080  000536E8     CC  bool MemcardOpPs3::CheckSpaceToSaveUser(const char* szUserName)
+                         local  int i
+ 1097  00053898     D8  void MemcardOpPs3::FindStorageDirForAutoSaveUser()
+                         local  int i
+ 1114  0007EA9C     EC  void MemcardOpPs3::AutoLoad(enum tTigerSavedGameType nType, const char* szSavedGameDir, void* buff, unsigned int buffSz)
+                         local  int ret
+                         local  sys_ppu_thread_t tid
+ 1150  000DE6B0    218  void MemcardOpPs3::thrListSaveUser(uint64_t arg)
+                         local  struct MCPS3_ThreadLogger __mcThreadLogger__
+                         local  int ret
+                         inlines  MCPS3_ThreadLogger::MCPS3_ThreadLogger, MCPS3_ThreadLogger::~MCPS3_ThreadLogger
+ 1198  000DE8C8    1DC  void MemcardOpPs3::thrAutoSave(uint64_t arg)
+                         local  struct MCPS3_ThreadLogger __mcThreadLogger__
+                         local  int ret
+                         inlines  MCPS3_ThreadLogger::MCPS3_ThreadLogger, MCPS3_ThreadLogger::~MCPS3_ThreadLogger
+ 1237  000DEAA4    240  void MemcardOpPs3::thrFixedSaveSettings(uint64_t arg)
+                         local  struct MCPS3_ThreadLogger __mcThreadLogger__
+                         local  int ret
+                         inlines  MCPS3_ThreadLogger::MCPS3_ThreadLogger, MCPS3_ThreadLogger::~MCPS3_ThreadLogger
+ 1286  000DECE4    204  void MemcardOpPs3::thrListLoadUser(uint64_t arg)
+                         local  struct MCPS3_ThreadLogger __mcThreadLogger__
+                         local  int ret
+                         inlines  MCPS3_ThreadLogger::MCPS3_ThreadLogger, MCPS3_ThreadLogger::~MCPS3_ThreadLogger
+ 1331  000DEEE8    1C8  void MemcardOpPs3::thrAutoLoad(uint64_t arg)
+                         local  struct MCPS3_ThreadLogger __mcThreadLogger__
+                         local  int ret
+                         inlines  MCPS3_ThreadLogger::MCPS3_ThreadLogger, MCPS3_ThreadLogger::~MCPS3_ThreadLogger
+ 1367  000DF0B0    2BC  void MemcardOpPs3::thrRefreshUserInfo(uint64_t arg)
+                         local  struct MCPS3_ThreadLogger __mcThreadLogger__
+                         local  char[33] szSavedTargetDir
+                         inlines  MCPS3_ThreadLogger::MCPS3_ThreadLogger, MCPS3_ThreadLogger::~MCPS3_ThreadLogger, MemcardOpPs3::SetLastError
+ 1419  000DF36C    2D8  void MemcardOpPs3::thrLoadUsrRefresh_StatCallback(struct CellSaveDataCBResult* cbResult, struct CellSaveDataStatGet* get, struct CellSaveDataStatSet* set)
+                         local  struct MCPS3_ThreadLogger __mcThreadLogger__
+                         inlines  MCPS3_ThreadLogger::IndentStr, MCPS3_ThreadLogger::MCPS3_ThreadLogger, MCPS3_ThreadLogger::~MCPS3_ThreadLogger
+ 1445  00053970     50  void MemcardOpPs3::thrLoadUsrRefresh_FileCallback(struct CellSaveDataCBResult* cbResult, struct CellSaveDataFileGet* get, struct CellSaveDataFileSet* set)
+ 1455  000DF644    16C  void MemcardOpPs3::thrDeleteUsers(uint64_t arg)
+                         local  struct MCPS3_ThreadLogger __mcThreadLogger__
+                         local  int ret
+                         inlines  MCPS3_ThreadLogger::MCPS3_ThreadLogger, MCPS3_ThreadLogger::~MCPS3_ThreadLogger
+ 1480  000DF7B0    438  void MemcardOpPs3::thrSaveMode_ListCallback_User(struct CellSaveDataCBResult* cbResult, struct CellSaveDataListGet* get, struct CellSaveDataListSet* set)
+                         local  struct MCPS3_ThreadLogger __mcThreadLogger__
+                         local  bool[4] userNbrIndex
+                         local  int nLoadRslt
+                         local  bool bFound
+                         local  unsigned int i
+                         local  int i
+                         local  int nFileNbr
+                         inlines  MCPS3_ThreadLogger::IndentStr, MCPS3_ThreadLogger::MCPS3_ThreadLogger, MCPS3_ThreadLogger::~MCPS3_ThreadLogger
+ 1606  000DFBE8    2BC  void MemcardOpPs3::thrSaveMode_FixedCallback(struct CellSaveDataCBResult* cbResult, struct CellSaveDataListGet* get, struct CellSaveDataFixedSet* set)
+                         local  struct MCPS3_ThreadLogger __mcThreadLogger__
+                         local  bool bExists
+                         local  unsigned int i
+                         local  unsigned int nThumbSize
+                         local  int nLoadRslt
+                         inlines  MCPS3_ThreadLogger::MCPS3_ThreadLogger, MCPS3_ThreadLogger::~MCPS3_ThreadLogger
+ 1657  000DFEA4    3B4  void MemcardOpPs3::thrSaveMode_StatCallback(struct CellSaveDataCBResult* cbResult, struct CellSaveDataStatGet* get, struct CellSaveDataStatSet* set)
+                         local  struct MCPS3_ThreadLogger __mcThreadLogger__
+                         local  int nIconKb
+                         local  int nUserKb
+                         local  int nNewFreeSpace
+                         local  int nKbDiff
+                         local  int nNewFreeSpace
+                         local  int nDirIndex
+                         inlines  MCPS3_ThreadLogger::MCPS3_ThreadLogger, MCPS3_ThreadLogger::~MCPS3_ThreadLogger, MemcardOpPs3::SetCallbackError
+ 1751  000E0258    274  void MemcardOpPs3::thrSaveMode_FileCallback(struct CellSaveDataCBResult* cbResult, struct CellSaveDataFileGet* get, struct CellSaveDataFileSet* set)
+                         local  struct MCPS3_ThreadLogger __mcThreadLogger__
+                         local  struct tFileSaveState* oldState
+                         inlines  MCPS3_ThreadLogger::MCPS3_ThreadLogger, MCPS3_ThreadLogger::~MCPS3_ThreadLogger, cGAME_GLOBALS::IsQuitApplicationRequested
+ 1783  0006CD1C    134  void MemcardOpPs3::ProcessReturnValue(int nRet)
+                         inlines  MemcardOpPs3::SetCallbackError, MemcardOpPs3::SetLastError
+ 1822  00053E04     3C  void MemcardOpPs3::ResetSaveStage()
+                         local  struct CellSaveDataCBResult cbResult
+ 1833  00053D64     A0  void MemcardOpPs3::SetNextSaveStage(struct CellSaveDataCBResult* cbResult)
+ 1861  00053E40      4  void tFileSaveState_NULL::Enter(const struct tFileSaveState_NULL* this, struct CellSaveDataCBResult* cbResult, struct CellSaveDataFileGet* get, struct CellSaveDataFileSet* set)
+ 1862  00053E44      4  void tFileSaveState_NULL::DoState(const struct tFileSaveState_NULL* this, struct CellSaveDataCBResult* cbResult, struct CellSaveDataFileGet* get, struct CellSaveDataFileSet* set)
+ 1863  00053E48      4  void tFileSaveState_NULL::Exit(const struct tFileSaveState_NULL* this, struct CellSaveDataCBResult* cbResult, struct CellSaveDataFileGet* get, struct CellSaveDataFileSet* set)
+ 1869  00053E4C      4  void tFileSaveState_Start::Enter(const struct tFileSaveState_Start* this, struct CellSaveDataCBResult* cbResult, struct CellSaveDataFileGet* get, struct CellSaveDataFileSet* set)
+ 1877  00053E50      8  void tFileSaveState_Start::DoState(const struct tFileSaveState_Start* this, struct CellSaveDataCBResult* cbResult, struct CellSaveDataFileGet* get, struct CellSaveDataFileSet* set)
+ 1887  00053E58      4  void tFileSaveState_Start::Exit(const struct tFileSaveState_Start* this, struct CellSaveDataCBResult* cbResult, struct CellSaveDataFileGet* get, struct CellSaveDataFileSet* set)
+ 1895  000E04CC    1C0  void tFileSaveState_Icon0::Enter(const struct tFileSaveState_Icon0* this, struct CellSaveDataCBResult* cbResult, struct CellSaveDataFileGet* get, struct CellSaveDataFileSet* set)
+                         local  struct MCPS3_ThreadLogger __mcThreadLogger__
+                         inlines  MCPS3_ThreadLogger::MCPS3_ThreadLogger, MCPS3_ThreadLogger::~MCPS3_ThreadLogger
+ 1911  000E068C    240  void tFileSaveState_Icon0::DoState(const struct tFileSaveState_Icon0* this, struct CellSaveDataCBResult* cbResult, struct CellSaveDataFileGet* get, struct CellSaveDataFileSet* set)
+                         local  struct MCPS3_ThreadLogger __mcThreadLogger__
+                         inlines  MCPS3_ThreadLogger::MCPS3_ThreadLogger, MCPS3_ThreadLogger::~MCPS3_ThreadLogger
+ 1937  000E08CC    178  void tFileSaveState_Icon0::Exit(const struct tFileSaveState_Icon0* this, struct CellSaveDataCBResult* cbResult, struct CellSaveDataFileGet* get, struct CellSaveDataFileSet* set)
+                         local  struct MCPS3_ThreadLogger __mcThreadLogger__
+                         inlines  MCPS3_ThreadLogger::MCPS3_ThreadLogger, MCPS3_ThreadLogger::~MCPS3_ThreadLogger
+ 1948  000E0A44    1B0  void tFileSaveState_Data::Enter(const struct tFileSaveState_Data* this, struct CellSaveDataCBResult* cbResult, struct CellSaveDataFileGet* get, struct CellSaveDataFileSet* set)
+                         local  struct MCPS3_ThreadLogger __mcThreadLogger__
+                         inlines  MCPS3_ThreadLogger::MCPS3_ThreadLogger, MCPS3_ThreadLogger::~MCPS3_ThreadLogger
+ 1960  000E0BF4    274  void tFileSaveState_Data::DoState(const struct tFileSaveState_Data* this, struct CellSaveDataCBResult* cbResult, struct CellSaveDataFileGet* get, struct CellSaveDataFileSet* set)
+                         local  struct MCPS3_ThreadLogger __mcThreadLogger__
+                         inlines  MCPS3_ThreadLogger::MCPS3_ThreadLogger, MCPS3_ThreadLogger::~MCPS3_ThreadLogger
+ 1987  00053E5C      4  void tFileSaveState_Data::Exit(const struct tFileSaveState_Data* this, struct CellSaveDataCBResult* cbResult, struct CellSaveDataFileGet* get, struct CellSaveDataFileSet* set)
+ 1995  000E0E68    330  void MemcardOpPs3::thrLoadMode_ListCallback_User(struct CellSaveDataCBResult* cbResult, struct CellSaveDataListGet* get, struct CellSaveDataListSet* set)
+                         local  struct MCPS3_ThreadLogger __mcThreadLogger__
+                         local  unsigned int nNumEntries
+                         local  unsigned int i
+                         local  int nDirIndex
+                         inlines  MCPS3_ThreadLogger::MCPS3_ThreadLogger, MCPS3_ThreadLogger::~MCPS3_ThreadLogger
+ 2055  000E1198    268  void MemcardOpPs3::thrLoadMode_StatCallback(struct CellSaveDataCBResult* cbResult, struct CellSaveDataStatGet* get, struct CellSaveDataStatSet* set)
+                         local  struct MCPS3_ThreadLogger __mcThreadLogger__
+                         inlines  MCPS3_ThreadLogger::MCPS3_ThreadLogger, MCPS3_ThreadLogger::~MCPS3_ThreadLogger
+ 2091  000E1400    2A0  void MemcardOpPs3::thrLoadMode_FileCallback(struct CellSaveDataCBResult* cbResult, struct CellSaveDataFileGet* get, struct CellSaveDataFileSet* set)
+                         local  struct MCPS3_ThreadLogger __mcThreadLogger__
+                         inlines  MCPS3_ThreadLogger::MCPS3_ThreadLogger, MCPS3_ThreadLogger::~MCPS3_ThreadLogger
+ 2270  000539C0    28C  void MemcardOpPs3::DumpCellSaveDataStatGet(struct CellSaveDataStatGet* get)
+                         local  unsigned int i
+ 2304  00053C4C    118  void MemcardOpPs3::DumpCellThreadResult(int ret)
+                         local  struct tErrNameTable[7] errTbl
+                         local  bool bIsCritical
+                         local  char[16] genericError
+                         local  const char* szDescr
+                         local  unsigned int i
+ 2349  00052F9C     A0  void MemcardOpPs3::DumpUserNameIndex()
+                         local  int i
+ 2383  0005C764    230  void MC_Init()
+                         local  const char[8] __FUNCTION__
+                         local  unsigned int nThumbNailOfs
+                         inlines  TagValuePair, operator+
+ 2416  00053E80     A0  void MC_DeInit()
+ 2441  00053E60     20  int32 MC_PS3_ComputeComboUserDataBuffSz(unsigned int struct1Sz, unsigned int struct2Sz, unsigned int* pStruct2StartOfs)
+                         local  unsigned int struct1SzA
+                         local  unsigned int struct2SzA
+ 2456  0005234C      4  void MC_PlatformInitONCE()
+ 2457  00028AC0      4  void MC_Connect()
+ 2458  00028ABC      4  void MC_Disconnect()
+ 2459  00053F20      8  int MC_CreateFile(int port, int slot, char* name, int* fd)
+ 2460  00028AB8      4  void MC_ConnectCard(int port, int slot)
+ 2461  00053F28      8  int MC_FindFiles(int port, int slot, const char* pSearchStr, char** pFilenames, size_t filenameBufLen, int iNumFilenames, int* iNumMatching)
+ 2462  00053F30      8  int MC_GetFreeSpace(int port, int slot, uint64_t* iSpaceInBytes64)
+ 2463  00053F38      8  int MC_GotoDirectory(int port, int slot, char* directory)
+ 2464  00053F40      8  int MC_GetNumFreeEntries(int port, int slot, char* pPath, uint64_t* iNumEntries)
+ 2465  00051974      8  int MC_MountCard(int32 port, int32 slot)
+ 2466  00051984      8  int MC_UnmountCard(int32 port, int32 slot)
+ 2467  00053F48      8  int MC_OpenFile(int port, int slot, char* pFilename, int flags, int* fd)
+ 2468  00053F50      8  int MC_CloseFile(int fd)
+ 2469  00053F58      8  int MC_CreateDirectory(int port, int slot, char* directory, int size)
+ 2470  00051BB0      8  int MC_DeleteDirectory(int port, int slot, char* directory)
+ 2471  0002FBAC      8  int MC_NumEASaveGames(int port, int slot)
+ 2472  00053F60      8  int MC_ReadFile(int32 fd, void* pBuffer, uint32 uiNumBytes, int32* bytesRead)
+ 2473  00053F68      8  int MC_WriteFile(int32 fd, void* pBuffer, uint32 uiNumBytes)
+ 2474  00053F70      8  int MC_SeekFile(int32 fd, int32 iOffset, bool bSeekFromStart)
+ 2475  00053F78      8  int MC_FlushFile(int32 fd)
+ 2476  00053F80      8  int MC_SetAttributesOnFile(int32 fd, uint32 attrFlags)
+ 2477  00053F88      8  int MC_SelectDevice(int nGamerID, bool bForceReselect, bool bForceUI)
+ 2478  00030DD0      8  bool MC_CheckSigninState(int nGamerID)
+ 2479  00053F90      4  void MC_SetDeviceInfoStale(int nGamerID)
+ 2480  00053F94      8  int MC_GetCardName(int port, int slot, char* name, size_t nameSz)
+ 2481  00053F9C      8  bool MC_IsDeviceInfoValid(long unsigned int nGamerID)
+ 2482  00053FA4      8  bool MC_GetLoggedInUserName(int nLoginIndex, char* nameBuff, size_t nameBuffSz, bool bMakeDefault)
+ 2483  0005196C      8  int MC_CheckSaveGame_WithRestore(int port, int slot, const char* name)
+ 2484  0005197C      8  int MC_FileExists(int port, int slot, const char* name)
+ 2485  000309D8      4  char* MC_BuildFilename(const char* pChar, int iIndex)
+ 2486  00052A8C      4  void Locale_UTF8ToWChar(int16* wszUserName, const char* szUserName, int32 buffSz)
+ 2487  00052A84      4  void Locale_WCharToUTF8(char* charStrOut, const int16* wCharStrIn, int nChars)
+ 2488  00052350      8  int MC_FormatCard_Ps3(int port, int slot)
+ 2489  0002E98C      4  void MC_Update()
+ 2490  00053FAC      8  int MC_ActualBlocksNeededForSave(int port, int slot, MC_FileTypeE eType)
+ 2491  00051BB8      8  int MC_GetUserProfileIndex(int port, int slot, const char* szUserName)
+ 2492  00051AC8      8  int MC_BlocksNeededForSave(int port, int slot, int id, MC_FileTypeE eType)
+ 2493  00053FB4      8  int32 MC_DeleteFile(int port, int slot, char* name)
+ 2502  0007EF08     C0  int MC_LoadFile(int isAutoLoad, int unused1, const char* name, void* data, int size)
+                         local  enum tTigerSavedGameType nType
+ 2532  0007F86C    198  int MC_SaveFile_Ps3(bool isAutoSave, enum tTigerSavedGameType nSaveType, const char* szUserName, void* data, int size)
+                         local  char[128] descr
+ 2571  00053FBC     44  void MC_RegisterStreamClients()
+ 2585  00054000     2C  void MC_UnRegisterStreamClients()
+ 2599  0007F108     F8  int MC_LoadFile_User(int bAutoLoad, int unused1, const char* name, struct MC_DATA_BUFFER_INFO* buffers, int numBuffers)
+ 2620  00053890      8  char* MC_BuildUserFilename(const char* pChar, int iIndex, enum UserNumber userNbr)
+ 2633  000537DC     B4  char* MC_BuildUserFilename_Ps3(int iIndex)
+                         local  char[24] sUserFileNameBuffer
+                         local  char* p
+                         inlines  std::toupper
+ 2646  0007FB08    108  int MC_SaveFile_User_Ps3(bool bAutoSave, const char* szUserName, struct MC_DATA_BUFFER_INFO* buffers, int numBuffers)
+                         local  unsigned int nBuffer2Ofs
+ 2683  0007EFC8     48  int MC_LoadOptions_Ps3(MC_ArgsLoadT* spArgs, bool bAutoLoad)
+ 2695  0007FA04    104  int MC_SaveOptions_Ps3(MC_ArgsSaveT* spArgs)
+                         local  int return_value
+ 2730  0007FC10    2EC  int MC_SaveUser_Ps3(MC_ArgsSaveT* spArgs)
+                         local  int return_value
+                         local  int port
+                         local  int slot
+                         local  enum UserNumber nSaveUser
+                         local  struct MC_DATA_BUFFER_INFO[2] buffers
+ 2811  0007F200     A8  int MC_LoadUser_Ps3(MC_ArgsLoadT* spArgs)
+                         local  int return_value
+                         local  struct MC_DATA_BUFFER_INFO[2] buffers
+                         local  const char* szUserDir
+ 2868  000B82FC     B4  void MC_ProcessLoadedOptions_Ps3()
+                         local  bool optionsLoaded
+ 2895  00079938    330  enum tLoadedUserStatus MC_ProcessLoadedUser_Ps3(MC_ArgsLoadT* spArgs)
+                         local  enum tLoadedUserStatus retStatus
+                         local  int return_value
+                         local  enum UserNumber destUserMgrSlot
+                         local  int i
+                         local  const struct UserInfo& userInfo
+                         local  const char* name
+                         local  int savedGameBufferIndex
+                         local  bool bFoundUser
+                         inlines  UserInfo::GetUserName, UserInfo::SetLoginIndex
+ 3002  00052E84     24  bool MC_IsThreadActive_Ps3()
+ 3011  00052DB8     1C  int MC_GetLastSaveLoadThreadErr_Ps3()
+ 3020  000800E4      4  void MC_Tick()
+ 3029  0005402C     1C  int MC_LastSavedUserFileIndex()
+ 3038  000537B4     28  bool MC_UserSaveExceedsMaxFileLimit(const char* szProfile)
+ 3047  0007EC78      4  void MC_DeleteFiles_Ps3()
+ 3056  0007EC00      4  void MC_RefreshUserInfo_Ps3()
+ 3065  000536DC      4  void MC_UserDirs_TakeSnapshot()
+ 3074  000536E4      4  void MC_UserDirs_ReconcileWithUserMgr()
+ 3085  00054048     14  sys_memory_container_t* MemcardOpPs3::GetMemoryCardMemoryContainer()
+ 3089  0005405C      4  sys_memory_container_t* TigerMC_GetMemoryCardMemoryContainer()
+ 3092  000FDBD0     10  static void _GLOBAL__I_CalendarState()
+ 3093  000FDBC0     10  static void _GLOBAL__D_CalendarState()

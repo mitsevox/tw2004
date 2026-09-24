@@ -1,0 +1,20 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/include/common/osdk/listsorted.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   55  00628624     8C  void ~ListSorted(const struct ListSorted<OSDK::ActionUserStrategy>* this)
+                         local  struct MemoryStrategy* pMemory
+                         inlines  ~RCPointer
+   66    inline-only   uint32_t GetNumberOfElements(const const struct ListSorted<OSDK::ActionUserStrategy>* this)
+   72    inline-only   struct ActionUserStrategy* GetElementAt(const const struct ListSorted<OSDK::ActionUserStrategy>* this, uint32_t uIndex)
+                         local  uint32_t uActualIndex
+   81    inline-only   void Sort(const struct ListSorted<OSDK::ActionUserStrategy>* this, const struct TemplateComparator<OSDK::Base>* pComparator)
+                         local  uint32_t uIndex
+                         local  uint32_t uStartIndex
+                         local  uint32_t uActualStartIndex
+                         local  struct ActionUserStrategy* pFirstObject
+                         local  uint32_t uDestIndex
+                         local  uint32_t uActualDestIndex
+                         local  struct ActionUserStrategy* pSecondObject
+  121    inline-only   void Sort(const struct ListSorted<OSDK::ActionUserStrategy>* this, const struct List<OSDK::ActionUserStrategy>* pList)
+  132    inline-only   void Sort(const struct ListSorted<OSDK::ActionUserStrategy>* this, const struct List<OSDK::ActionUserStrategy>* pList, const struct TemplateComparator<OSDK::Base>* pComparator)

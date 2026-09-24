@@ -1,0 +1,132 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/EventManager/event.c
+// compiled in: golf_unity.cpp
+// 92 functions, source order. line | PS3 address | size
+
+   85  001F410C     1C  void EVENT_InitForGame()
+   90  001F4128     1C  void EVENT_ResetIdleSeconds()
+   95  001F4144     18  uint32 EVENT_GetIdleSeconds()
+  105  001F415C      4  static void EVENT_BreaklinePassedCup(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  109  001F4160     28  static void EVENT_BreaklineDone(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  115  001F4188     28  static void EVENT_BeginHole(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  122  001F41B0     30  static void EVENT_EndHole(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  130  001F41E0     44  static void EVENT_RestartHole(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+                         local  int i
+  141  001F4224     40  static void EVENT_BeginTurn(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  148  002AD568     34  static void EVENT_EndTurn(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  157  001F42B0     28  static void EVENT_ShotSetup(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  162  001F4324     64  static void EVENT_PreSwing(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  173  001F4388      4  static void EVENT_Delay(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  177  001F438C     28  static void EVENT_PracticeSwing(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  184  00254308    100  static void EVENT_HitBall(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+                         local  CameraController_t* cameraController
+  209  001F4400     28  static void EVENT_SwingDone(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  215  001F4428      4  static void EVENT_BallBounce(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  220  00287B10    338  static void EVENT_NextClub(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+                         local  bool found
+                         local  int count
+                         local  enum Club_t saveClub
+                         inlines  GUI_ClubSelected, GUI_UpdateLieUIData, GUI_UpdateShotUIData, vec4flt_Copy, vec_st
+  315  00287E48    338  static void EVENT_PrevClub(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+                         local  bool found
+                         local  int count
+                         local  enum Club_t saveClub
+                         inlines  GUI_ClubSelected, GUI_UpdateLieUIData, GUI_UpdateShotUIData, vec4flt_Copy, vec_st
+  408  00288180    798  static void EVENT_NextShotType(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+                         local  bool done
+                         local  bool done
+                         local  enum ShotType_t origShotType
+                         local  int32_t i
+                         inlines  AICore::IsPhantomAvailable, AIMgr, GUI_ClubSelected, NextShotType, cGAME_GLOBALS::SetAllPlayersOnGreen
+  419  00288918     F8  static void EVENT_PrevStance(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+                         inlines  GUI_UpdateShotUIData
+  437  00288A10     B8  static void EVENT_NextStance(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+                         inlines  GUI_UpdateShotUIData
+  454  001F442C     5C  static void EVENT_RotateRight(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  461  001F4488     5C  static void EVENT_RotateLeft(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  468  001F44E4     5C  static void EVENT_MoveTargetForward(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  475  001F4540     5C  static void EVENT_MoveTargetBack(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  482  002C7C30     A8  static void EVENT_GreenSelectionMove(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+                         local  int8 greenIdx
+                         local  float distanceToGreen
+                         local  char* playerName
+  495  001F459C     A0  static void EVENT_GreenCupSelectionSelect(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+                         local  int8 cupSelect_currentGreen
+                         local  int8 cupSelect_currentCup
+  514  001F46B8     74  static void EVENT_CupSelectionMove(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+                         local  int8 cupSelect_currentCup
+                         local  int8 cupSelect_currentGreen
+                         local  const float[4]& cupLocation
+  528  001F472C     24  static void EVENT_PlaceBallRotateRight(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  539  001F4750     24  static void EVENT_PlaceBallRotateLeft(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  550  001F4774     24  static void EVENT_PlaceBallMoveTargetForward(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  557  001F4798     24  static void EVENT_PlaceBallMoveTargetBack(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  563  00211274     F0  static void EVENT_Idle(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  582  00254274     94  static void EVENT_TopOfArc(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  606  00254100    174  static void EVENT_FirstBounce(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+                         local  float fSideSpin
+                         local  float fForwardSpin
+  658  001F47BC      4  static void EVENT_NonFirstBounce(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  663  001F47C0     5C  static void EVENT_LastBounceForSpinna(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  686  003124B4     A4  static void EVENT_BallStop(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  709  0025407C     84  static void EVENT_InHole(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  728  00254014     68  static void EVENT_OutOfBounds(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  748  00254010      4  static void EVENT_Collision(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  754  0025400C      4  static void EVENT_CollisionObject(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  760  0031776C     78  static void EVENT_CollisionTree(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  776  00254008      4  static void EVENT_CollisionPin(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  782  002C5B0C     74  static void EVENT_EstimatedBallFirstBounce(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  797  001F484C     AC  static void EVENT_CollisionActor(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  813  001F48F8      4  static void EVENT_PlayerEmotionUpdated(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  817  001F48FC     40  static void EVENT_BallMoving(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  827  00249778      4  static void EVENT_SpinWindowFinished(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  833  001F4980      4  static void EVENT_BeganBackswing(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  839  001F4984     28  static void EVENT_SpinnaSpinnaSpinna(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  851  001F49AC     28  static void EVENT_TappaTappaTappa(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  863  001F49D4     88  static void EVENT_BeganDownSwing(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  872  001F4A5C     28  static void EVENT_StartCameraZoom(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  877  001F4A84     28  static void EVENT_EndCameraZoom(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  884  001F4AAC      4  static void EVENT_StartMatrixCam(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  889  001F4AB0      4  static void EVENT_EndMatrixCam(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  894  001F4AB4      4  static void EVENT_3ShotSwingStarted(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  899  001F4AB8      4  static void EVENT_SlowMotionStart(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  903  001F4ABC      4  static void EVENT_SlowMotionEnd(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  907  001F4AC0      4  static void EVENT_FastMotionStart(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  911  001F4AC4      4  static void EVENT_FastMotionEnd(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  915  001F4AC8      4  static void EVENT_StartSuperZoomCam(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  919  001F4ACC      4  static void EVENT_EndSuperZoomCam(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  923  001F4AD0      4  static void EVENT_BasicHandler(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  927  001F4AD4     28  static void EVENT_SpecialSwingEnded(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  934  001F4AFC     40  static void EVENT_SpecialSwingDone(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  944  00312F08     B4  static void EVENT_BallPredictionDone(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  969  002738C0     F4  static void EVENT_ScriptedGameBreakerStarted(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+                         inlines  GameEffects_GetCurrentTriggerType
+  980  001F4B3C     28  static void EVENT_ScriptedGameBreakerEnd(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  985  001F4B64     2C  static void EVENT_PredictedGameBreakerStarted(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  990  001F4B90     28  static void EVENT_PredictedGameBreakerEnd(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+  995  001F4BB8     28  static void EVENT_EndGame(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+ 1000  001F4BE0     28  static void EVENT_LeaderboardDisplay(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+ 1005  001F4C08     28  static void EVENT_UnlockedNewCharacter(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+ 1010  001F4C30     28  static void EVENT_UnlockedNewCourse(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+ 1015  001F4C58      4  static void EVENT_SpeedgolfReady(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+ 1019  001F4C5C      4  static void EVENT_SpeedgolfGo(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+ 1023  001F4C60      4  static void EVENT_ScoreCardDone(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+ 1027  001F4C64      4  static void EVENT_AnimationSkinReset(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+ 1031  001F4C68     44  static void EVENT_NewAnimationPlayed(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+ 1053  001F4CAC     28  static void EVENT_FlyByEvent(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+ 1058  001F4CD4      4  static void EVENT_TrinityBigHit(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+ 1062  001F4CD8      4  static void EVENT_FlyByEventDone(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+ 1066  001F4CDC      4  static void EVENT_PlayerWonGame(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+ 1070  001F4CE0     28  static void EVENT_BallHitDelayed(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+ 1075  001F4D08     28  static void EVENT_RandomBounce(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+ 1211  002D2604    15C  void EVENT_Trigger(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+ 1252  00253CE8    320  static void Collision(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+ 1339  001F4D88    198  enum ShotType_t NextDefaultShotType(enum ShotType_t type, enum PlayerNumber_t PlayerID)
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  enum ShotType_t nextType
+ 1390    inline-only   static void NextShotType(enum PlayerNumber_t PlayerID)
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  enum ShotType_t nextShotType
+                         local  bool done
+                         local  bool done
+                         local  enum ShotType_t origShotType
+                         local  int32_t i

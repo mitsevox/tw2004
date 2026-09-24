@@ -1,0 +1,5 @@
+// C:/packages/rwaudiocore/2.08.01/include/rw/audio/core/samplebuffer.h
+// compiled in: decoderregistry.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   51    inline-only   unsigned int CalculateStorageSize(unsigned int numChannels, unsigned int maxSamples)

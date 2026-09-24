@@ -1,0 +1,19 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptFF/core/sniffer.cpp
+// compiled in: other_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   71  003F5280    2B4  int16_t ff_FontTypeFromStream(struct InputStream* in)
+                         local  struct sfntClass* tmp_sfnt
+                         local  struct tsiMemObject* tmp_mem
+                         local  int errCode
+                         inlines  IsPFR, IsTT
+  121  003F2130      8  int16_t FF_FontTypeFromStream(struct InputStream* in, int* errCode)
+  193    inline-only   static int IsPFR(struct InputStream* in)
+                         local  int isMe
+                         local  uint8_t[10] aBuffer
+  275    inline-only   static int IsTT(struct InputStream* in)
+                         local  int isMe
+                         local  uint8_t[10] aBuffer
+                         local  struct sfntClass* tmp_sfnt
+                         local  struct tsiMemObject* tmp_mem
+                         local  int errCode

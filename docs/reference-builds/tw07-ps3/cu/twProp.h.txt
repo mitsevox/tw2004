@@ -1,0 +1,10 @@
+// ../../../../../TIGERCODE/Code/Golf/Lo-Rendering/Geom/twProp.h
+// compiled in: golf_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   18    inline-only   void TWPROP_VERTEX::Set(const struct TWPROP_VERTEX* this, const twRigidVert* pRV)
+   44  0022AF6C      4  void PropMesh::PropMesh(const struct PropMesh* this)
+   45  0022B114      4  void PropMesh::~PropMesh(const struct PropMesh* this)
+   53    inline-only   bool PropMesh::IsActive(const const struct PropMesh* this)
+   66  0024D690      4  void PropGeom::PropGeom(const struct PropGeom* this)
+   67  0022B61C      4  void PropGeom::~PropGeom(const struct PropGeom* this)

@@ -1,0 +1,15 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/invitationstrategyabstract.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   68  005F816C     A4  void Cleanup(const struct <anon>* this)
+                         inlines  MarkForRemoval
+  107  00601350     80  void InvitationStrategyAbstract(const struct <anon>* this, struct InvitationAbstract* pInvitation)
+  139  006011CC     8C  void ~InvitationStrategyAbstract(const struct <anon>* this)
+  166  005F8268     90  bool OperationProcess(const struct <anon>* this, const struct Operation* )
+                         local  bool bContinue
+                         local  LobbyApiMsgT msg
+  207  005F8210     58  void OperationCancel(const struct <anon>* this, const struct Operation* )
+                         local  LobbyApiRefT* pLobbyApi
+  237  005B7E24     3C  void OperationTimeout(const struct <anon>* this, const struct Operation* pOperation)
+  262  005B7E08     1C  void InitiateLobbyAction(const struct <anon>* this, int32_t iStatus, LobbyApiCallbackT* pCallback)

@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_RivalsMessenger.h
+// compiled in: apt_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   18  000FECF4      C  uint32 UIRivalsMessenger::GetSignature(const const struct UIRivalsMessenger* this)
+   73  000FED08      C  struct IExternArray* UIRivalsMenuVert::GetExternArray(const struct UIRivalsMenuVert* this)
+   74  000FED1C      8  int32 UIRivalsMenuVert::GetSizeofArrayStruct(const struct UIRivalsMenuVert* this)
+   76    inline-only   void UIRivalsMenuVert::SetCurrentEventIDLookup(const struct UIRivalsMenuVert* this, int32 lookup)
+   79  000FED2C      C  uint32 UIRivalsMenuVert::GetSignature(const const struct UIRivalsMenuVert* this)

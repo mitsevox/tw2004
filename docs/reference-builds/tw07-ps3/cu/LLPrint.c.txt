@@ -1,0 +1,65 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLPrint.c
+// compiled in: Legacy_unity.cpp
+// 22 functions, source order. line | PS3 address | size
+
+  165  003B22D8     50  void Print_InitModule()
+  176  003AB034     28  void Print_CloseModule()
+                         local  UIDListT* temp
+  189  003912A4    330  void Print_ToChannel(UID_t logicalChan, char* fmt)
+                         local  va_list arglist
+                         local  TI_STimeValue curTime
+                         local  float fSecs
+                         local  uint32 nsecs
+                         local  char[32] tm
+                         local  char[5] s
+                         inlines  TI_fConvertTimeDifToSeconds
+  233  0037C798     18  void Print_SetChannelFunc(UID_t chan)
+  240  003947F8     8C  void Print_ToDefaultChannel(char* fmt)
+                         local  va_list arglist
+  256  0037C758     20  bool Print_ToggleChannelDisplay()
+  264  0037C778     20  bool Print_ToggleTimeDisplay()
+  275  00394A6C    118  bool Print_RedirectChannel(UID_t logicalChan, int physicalChannel)
+                         local  int logicalChannel
+                         local  char[5] logChan
+  297  0039491C    150  void Print_DisplayChannelStatus()
+                         local  char[5] UIDname
+                         local  char[4] status
+                         local  int i
+                         local  struct LogicalChannel* ch
+  323  0038CC78     80  bool Print_ShowOnlyThisChannel(UID_t logicalChan)
+                         local  int logicalChannel
+                         local  int i
+  340  003C8278     28  void Print_ResetRouting()
+  355  003C8098    1E0  void Print_LoadLocalConfig()
+                         local  char[128] fullPath
+                         local  int32 fileLength
+                         local  int32 i
+                         local  char* data
+                         local  bool atNewCommand
+                         local  char[80] commandLine
+  406  0037DE10     30  static void ResetRouting()
+                         local  int i
+  412  0038CCF8     80  static bool IsChannelEnabled(UID_t logicalChan)
+                         local  bool bEnabled
+                         local  int logicalChannel
+  430  00394618    150  static void Print_ToLogical(UID_t logicalChan, char* fmt, va_list arglist)
+                         local  int logicalChannel
+                         local  char[5] strLogChan
+                         local  int physChannel
+                         inlines  Print_ToPhysical
+  453    inline-only   static void Print_ToPhysical(int physChannel, char* fmt, va_list arglist)
+                         local  char[1025] s
+  478  003B2264     74  void InitLogicalChannels()
+                         local  struct Allocator* a
+                         local  int i
+  512  003911F8     AC  static void alwaysVprintf(char* fmt, va_list arglist)
+                         local  char[1025] s
+  539  0037DE40     38  static void JustPrint(char* s)
+  559  00395108     D0  void alwaysPrintf(char* fmt)
+                         local  char[1025] s
+                         local  va_list arglist
+  577  00394768     90  void OnlinePrintf(char* fmt)
+                         local  va_list arglist
+  602  00392A38     94  void LegacyPrintf(char* s)
+                         local  char[1025] buf
+                         local  va_list va

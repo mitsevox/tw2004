@@ -1,0 +1,19 @@
+// ../../../../../TIGERCODE/Code/Golf/GameMode/Headers/GameMode_ClubHouse.h
+// compiled in: apt_unity.cpp, golf_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+  132    inline-only   int32 ClubHouseManager::GetRoomPortalNumNetworks(const struct ClubHouseManager* this)
+  136    inline-only   int32 ClubHouseManager::GetTrophyViewNumNetworks(const struct ClubHouseManager* this)
+  141    inline-only   bool ClubHouseManager::GetEnterClubHouse(const struct ClubHouseManager* this)
+  142    inline-only   bool ClubHouseManager::GetExitClubHouse(const struct ClubHouseManager* this)
+  143    inline-only   float ClubHouseManager::GetCameraSwitchTimer(const struct ClubHouseManager* this)
+  145    inline-only   void ClubHouseManager::SetRoomPortalNumNetworks(const struct ClubHouseManager* this, int32 numNetworks)
+  146    inline-only   void ClubHouseManager::SetRoomPortalNetworkInfo(const struct ClubHouseManager* this, int portalNetwork, GM_ClubHouse_SRoomPortalNetwork* networkPtr)
+  147    inline-only   void ClubHouseManager::SetRoomPortalNetworkStreamList(const struct ClubHouseManager* this, int portalNetwork, struct TNetwork* networkPtr)
+  148    inline-only   void ClubHouseManager::SetTrophyViewNumNetworks(const struct ClubHouseManager* this, int32 numNetworks)
+  151    inline-only   void ClubHouseManager::SetTrophyViewNetworkStreamList(const struct ClubHouseManager* this, int trophyViewNetwork, struct TNetwork* networkPtr)
+  152    inline-only   void ClubHouseManager::SetTrophyViewNetworkInfo(const struct ClubHouseManager* this, int trophyViewNetwork, GM_ClubHouse_STrophyViewNetwork* networkPtr)
+  153    inline-only   void ClubHouseManager::SetEnterClubHouse(const struct ClubHouseManager* this, bool enterclubhouse)
+  154    inline-only   void ClubHouseManager::SetExitClubHouse(const struct ClubHouseManager* this, bool exitclubhouse)
+  155    inline-only   void ClubHouseManager::SetCameraSwitchTimer(const struct ClubHouseManager* this, float fCameraSwitchTimer)
+  161    inline-only   struct ClubHouseManager& ClubHouseMgr()

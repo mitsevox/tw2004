@@ -1,0 +1,29 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/animation/Skeleton.c
+// compiled in: golf2_unity.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   34  0013A8F4     1C  void SKEL_EnableIK(bool enable)
+   39  0016C32C     C4  void SKEL_SetExtraRightShoulderRotation(struct TSkeleton* pSkeleton, float* rot)
+                         inlines  Quat_Copy
+   53  0016C970    140  void SKEL_PreTransformIKSkeleton(struct TSkeleton* pSkeleton)
+                         local  Quat Q
+                         inlines  Quat_Copy, SKEL_GetBoneIDIndex, SKEL_GetBoneIDSwapIfLefty
+   69  00139F8C     84  void SKEL_RelaxIK(TIKSkeleton* pIKSkeleton)
+   79  0013CFE8     B4  void SKEL_TransitionIK(TIKSkeleton* pIKSkeleton, bool relax, float relaxTime)
+   96  0013FA70     60  void SKEL_ResetAnimTraits(struct TSkeleton* pSkeleton)
+  106  0013F838     14  void SKEL_ApplyDistanceFromBall(struct TSkeleton* pSkeleton, float distance, uint32 axisFlag)
+  115  0013C2F0     14  void SKEL_ApplyElbowsOut(struct TSkeleton* pSkeleton, float angle, uint32 axisFlag)
+  124  0016CAB0     2C  void SKEL_SetBoneRotation(struct TSkeleton* pSkeleton, int32 id, float* Q)
+                         inlines  Quat_Copy
+  132  0015BB20     2C  void SKEL_SetBoneTranslation(struct TSkeleton* pSkeleton, int32 id, float* T)
+                         inlines  vec4flt_Copy
+  140  001644E4     28  void SKEL_InitModule()
+                         inlines  Quat_IdentifyForMul
+  145  0013AA90      4  void SKEL_CloseModule()
+  149  0013C304     90  int32 SKEL_GetBoneIDFromNameID(struct TSkeleton* pSkeleton, const const struct HashString& boneName)
+                         local  int i
+                         inlines  operator==
+  166  0013A010      4  void SKEL_UpdateDynChains(struct TSkeleton* pSkeleton, float dt)
+  183  0013A048      8  void SKEL_SetDefaultWorld2BoneMatrices(struct TSkeleton* pSkel, mat44flt* pMat)
+  193  0013A050     10  float SKEL_GetHeightChangeDueToScaling(struct TSkeleton* pSkeleton)
+  202  0013F81C     1C  void SKEL_SetHunchOver(struct TSkeleton* pSkeleton, float fTargetHunchOver, bool bAnimate)

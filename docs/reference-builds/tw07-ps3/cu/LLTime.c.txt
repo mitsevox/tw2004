@@ -1,0 +1,39 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLTime.c
+// compiled in: Legacy_unity.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   89  0037F238     18  void TI_vSetCurrentTimeManager(TI_STimeManager* spTimeManager_p)
+  128  00388160     E0  void TI_vInitModule()
+                         local  int32 i
+                         inlines  TI_uiReadCP0Count
+  170  0037F250      4  void TI_vCloseModule()
+  191  0037D58C     38  TI_STimeValue TI_sRead()
+                         inlines  TI_uiReadCP0Count
+  207  003885E4     AC  void TI_vStartCounter(int32 iCounterID_p)
+                         local  TI_SCounter* spCounter
+  253  00388574     70  bool TI_bCounterIsRunning(int32 iCounterID_p)
+                         local  TI_SCounter* spCounter
+  275  003884CC     A8  TI_STimeValue TI_sStopCounter(int32 iCounterID_p)
+                         local  TI_SCounter* spCounter
+  321  00388240     D8  TI_STimeValue TI_sReadCounter(int32 iCounterID_p)
+                         local  TI_SCounter* spCounter
+                         local  TI_STimeValue sRefTimeValue
+  371  003880E0     80  void TI_vResetCounter(int32 iCounterID_p)
+                         local  TI_SCounter* spCounter
+  409  00388050     90  void TI_vSetCounter(int32 iCounterID_p, TI_STimeValue sTimeValue_p)
+                         local  TI_SCounter* spCounter
+  445  0037D2A0     50  void TI_vStartCountingFPS()
+                         local  int32 i
+  477  0037C6C4     1C  float TI_iGetCurrentFPS()
+  497  0037F254     20  int32 TI_iGetCurrentFrameCount()
+  501  003818B0     1C  uint64_t TI_GetBaseClockFrequency()
+                         inlines  sys_time_get_timebase_frequency
+  512  003818CC    1B8  void TI_vUpdateFPSCounter()
+                         local  float clockFreq
+                         local  TI_STimeValue currentTime_m
+                         inlines  sys_time_get_timebase_frequency
+  526  00381A84    1B4  uint32 TI_iGetCurrentTimeMS()
+                         local  float currentTime_m
+                         inlines  sys_time_get_timebase_frequency
+  534  0037F064     54  void ThreadYield(float milliseconds)
+                         local  const double kMinThreadSleep

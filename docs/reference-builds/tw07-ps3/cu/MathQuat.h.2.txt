@@ -1,0 +1,7 @@
+// ../ears_rt_math/dev/include/ears_rt_math/MathQuat.h
+// compiled in: HighLevel_AnimFrame.c, Transform.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   70    inline-only   static void Quat_Set(float x, float y, float z, float w, float* Q)
+   85    inline-only   static void Quat_Copy(const float* Q0, float* Q)
+   99    inline-only   static void Quat_Identify(float* Q)

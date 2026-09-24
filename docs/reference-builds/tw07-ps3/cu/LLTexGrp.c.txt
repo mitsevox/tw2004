@@ -1,0 +1,79 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLTexGrp.c
+// compiled in: Legacy_unity.cpp
+// 30 functions, source order. line | PS3 address | size
+
+   53    inline-only   static int32 TG_iGetFreeTextureGroupDesc()
+                         local  int32 iTextureGroupIndex
+                         local  TG_STextureGroupDesc* spTextureGroupDesc
+  264  0037EB1C     4C  void TG_vClearAssocChkRefTable(TG_SAssocChkRefTableEntry* spAssocChkRefTableEntries_p, int32 iNumberOfAssocChkRefTableEntries_p)
+                         local  int32 iTableEntry
+  304  0037EB84     24  void TG_vSetPointerToAssocChkRefTable(TG_SAssocChkRefTableEntry* spAssocChkRefTableEntries_p, int32 iNumberOfAssocChkRefTableEntries_p)
+  337  00393FA8     24  bool CO_ShowTG(int32 , char** , void* )
+  349  0039F5EC     5C  void TG_vRegisterStreamClients()
+                         local  int once
+  386  0037EBA8      4  void TG_vUnregisterStreamClients()
+  412  00393AEC    218  void TG_vCheckTextureGroupForDuplicatedTextures(int32 iTextureGroupDesc_p)
+                         local  TG_STextureGroupDesc* spTextureGroupDesc
+                         local  int32 iTextureGroupIndex
+                         local  uint32 uiTextureIndex
+                         local  int32 iTextureIndexToCheck
+                         local  int32 iNumberOfTexturesInTextureGroupToCheck
+                         local  struct HashString uiTextureIDOfTextureToCheck
+                         local  char[17] chpTextureIDString
+                         inlines  HashString::HashString, HashString::operator=, TX_uiGetTextureIDFromTextureIndex
+  508  00393830    2BC  void TG_vCheckTextureGroupForDuplicatedTexturesInSomeGroups(int32 iTextureGroupDesc_p, int32* piGroupsToIgnore_p, int32 iNumGroupsToIgnore_p)
+                         local  TG_STextureGroupDesc* spTextureGroupDesc
+                         local  int32 iTextureGroupIndex
+                         local  uint32 uiTextureIndex
+                         local  int32 iTextureIndexToCheck
+                         local  int32 iNumberOfTexturesInTextureGroupToCheck
+                         local  struct HashString uiTextureIDOfTextureToCheck
+                         local  int32 i
+                         local  bool bIgnoreGroup
+                         local  char[17] chpTextureIDString
+                         inlines  HashString::HashString, HashString::operator=, TX_uiGetTextureIDFromTextureIndex
+  611  00393D04     E4  void TG_vCheckTextureGroupsForDuplicatedTextures()
+                         local  TG_STextureGroupDesc* spTextureGroupDesc
+                         local  int32 iTextureGroupIndex
+  656  00392274    200  int32 TG_iFindTextureGroupAndTexture(const const struct HashString& uiTextureID_p, struct TX_STextureGroup** sppTextureGroup_p, struct TX_STextureGroupTexture** sppTextureGroupTexture_p, bool bPrintWarnings, int32 texturePass)
+                         local  TG_STextureGroupDesc* spTextureGroupDesc
+                         local  int32 iTextureGroupIndex
+                         local  uint32 uiTextureIndex
+                         local  char[17] chpTextureIDString
+  807  0037EBAC     18  void TG_vSetCurrentTextureGroupManager(TG_STextureGroupManager* spTextureGroupManager_p)
+  831  0037EBC4     18  TG_STextureGroupManager* TG_spGetCurrentTextureGroupManager()
+  855  003ADCB4    1EC  void TG_vInitModule()
+                         local  const char[15] __FUNCTION__
+                         local  int32 i
+                         local  const int32 MAX_TEX_GROUPS
+                         inlines  TagValuePair, operator+
+  936  003A98D4    12C  void TG_vCloseModule()
+                         local  int32 i
+  994  003C87C8     94  int32 TG_iLoadTextureGroupFromFile(char* chpFileName_p, int32 iVRAMOffset_p)
+                         local  struct TX_STextureGroup* spTextureGroup
+ 1057  00390D34     CC  void TG_vRemoveTextureGroupID(int32 iTextureGroupDesc_p)
+ 1094  003A9794    140  void TG_vFreeTextureGroupID(int32 iTextureGroupDesc_p)
+ 1149  003A96D0     C4  void TG_vFreeAllTextureGroups()
+                         local  int32 i
+ 1181  003A95D4     FC  void TG_vFreeClassTextureGroups(enum TG_ETextureGroupClass eClass)
+                         local  int32 i
+ 1214  0037D6D8     24  enum TG_ETextureGroupClass TG_vSetCurrentTextureGroupClass(enum TG_ETextureGroupClass eClass)
+                         local  enum TG_ETextureGroupClass eOld
+ 1225  0037EBF8     1C  void TG_vSetCurrentReferenceID(int32 iCurrentReferenceID_p)
+ 1250  0037EBDC     1C  void TG_vEnableReferenceIDManagement(bool boEnableReferenceIDMgt_p)
+ 1264  00390C6C     C8  struct TX_STextureGroup* TG_spGetTextureGroup(int32 iTextureGroupDesc_p)
+ 1301  00390BA0     CC  int32 TG_iGetTextureGroupReferenceID(int32 iTextureGroupDesc_p)
+ 1339  00390ACC     D4  void TG_vSetTextureGroupReferenceID(int32 iTextureGroupDesc_p, int32 iReferenceID_p)
+ 1376  003898BC    164  int32 TG_iAddTextureGroup(struct TX_STextureGroup* spTextureGroup_p)
+                         local  int32 iTextureGroupDesc
+                         inlines  TG_iGetFreeTextureGroupDesc
+ 1413  0037EB68     1C  void TG_vEnableAssocChkRefTableManagement(bool boEnableAssocChkRefTableMgt_p)
+ 1428  0037EC14     A8  int32 TG_iFindAssocChkRefTableEntry(uint32 uiAssocChkRef_p, int32 uiLastAssocChkRefTableEntry_p)
+                         local  int32 iTableEntry
+                         local  TG_SAssocChkRefTableEntry* spAssocChkRefTableEntries
+ 1469  003AE1EC     28  int32 TG_iAddTextureGroupFromStreamData(const const struct Allocator& allocRef, struct TStreamData* xpStreamData_p, struct TX_STextureGroup* pTextureGroupSrc, int32 iVRAMOffset_p)
+                         local  struct TX_STextureGroup* spTextureGroup
+ 1541  00393EBC     EC  void TG_vPrintCurrentlyLoadedTextures()
+                         local  TG_STextureGroupDesc* spTextureGroupDesc
+                         local  int32 iTextureGroupIndex
+                         local  int tg_count

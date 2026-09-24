@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/packages/RNA/dev-2.0-golf/RNA/RNAX/include/RNAUtils/DebugMenu.h
+// compiled in: rnaunity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   62    inline-only   struct DebugMenuViewC* DebugMenuManagerC::GetActiveView(const struct DebugMenuManagerC* this)
+  111    inline-only   bool DebugMenuViewC::GetVisible(const struct DebugMenuViewC* this)
+  121    inline-only   bool DebugMenuViewC::HasMenu(const struct DebugMenuViewC* this)

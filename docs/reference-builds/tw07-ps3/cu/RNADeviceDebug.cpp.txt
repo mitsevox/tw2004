@@ -1,0 +1,47 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/PS3/RNADeviceDebug.cpp
+// compiled in: RNADeviceDebug.cpp
+// 10 functions, source order. line | PS3 address | size
+
+    0  00845A04     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   44  0084539C     7C  static char GetNextFormatChar(const char* string)
+   70  00845AA4    3B8  void DevicePlatC::LogEvent(const struct DevicePlatC* this, enum DebugLogE eType, const char* pStr)
+                         local  const char[9] __FUNCTION__
+                         local  uint32_t[4] aLogData
+                         local  int32_t iCurrentParameter
+                         local  va_list args
+                         local  int32_t iStrLen
+                         local  int i
+                         local  char cFormatChar
+                         local  union <anon> converter
+                         local  double_t dVal
+                         local  uint32_t uDestOffset
+                         local  struct RSXGPU r
+                         local  uint32_t* pDest
+                         inlines  RNADebugBreak
+  215  00845418     B0  void DevicePlatC::EnableDebugWatchdogThread(const struct DevicePlatC* this, uint32_t uProcessor)
+                         local  struct <anon> threadParameters
+  241  008454C8     A4  void DevicePlatC::InitDebugLogging(const struct DevicePlatC* this)
+  271  008458B8    14C  intptr_t DevicePlatC::WatchDogRunFunction(void* pContext)
+                         local  float_t sWatchdogTimeout
+                         local  struct DevicePlatC* pDevice
+                         local  volatile CellGcmControl* control
+                         local  struct <anon> timer
+                         local  CellGcmControl lastControl
+  332  0084579C    11C  void DevicePlatC::DumpMachineStateToConsole(const struct DevicePlatC* this)
+                         local  int32_t iCount
+                         local  int32_t iOffset
+                         local  int32_t iCount
+                         local  int32_t iOffset
+  382  0084556C    230  void DevicePlatC::PrintLogEntry(const struct DevicePlatC* this, int32_t iOffset, const uint32_t* pEntry)
+                         local  char* formatString
+                         local  char[64] vaBuffer
+                         local  int currentVaOffset
+                         local  int currentParameter
+                         local  char[8192] stringBuffer
+                         local  int i
+                         local  char formatChar
+                         local  uint64_t u64Val
+                         local  union <anon> converter
+                         local  double_t dVal
+  468  00845A84     10  static void _GLOBAL__I__ZN3RNA11DevicePlatC8LogEventENS0_9DebugLogEEPKcz()
+  469  00845A94     10  static void _GLOBAL__D__ZN3RNA11DevicePlatC8LogEventENS0_9DebugLogEEPKcz()

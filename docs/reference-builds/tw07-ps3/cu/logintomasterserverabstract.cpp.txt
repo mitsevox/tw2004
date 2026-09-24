@@ -1,0 +1,96 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/logintomasterserverabstract.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 27 functions, source order. line | PS3 address | size
+
+   97  00628FC0     54  void ~LoginAlert(const struct <anon>* this)
+  137  005F9870     54  void ProductUpdateDownloadSuccess(const struct LoginToMasterServerAbstract* this)
+                         inlines  operator=
+  143  005F98C4     54  void ProductUpdateDownloadFailure(const struct LoginToMasterServerAbstract* this, enum Failure eFailure)
+                         inlines  operator=
+  149  005BBFB4      C  void ProductUpdateDownloadProgress(const struct LoginToMasterServerAbstract* this, uint32_t uFileNum, uint32_t uProgress)
+  155  005BBFC0     3C  bool LoginStageAlertOccurred(const struct LoginToMasterServerAbstract* this)
+  160  005D32C4     A8  void LoginStageAlertLoginAborted(const struct LoginToMasterServerAbstract* this)
+                         local  uint32_t uNumElements
+                         local  struct LoginToMasterServerObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  165  005D336C     A8  void GenerateLoginStageAlertOccurredEvent(const struct LoginToMasterServerAbstract* this)
+                         local  uint32_t uNumElements
+                         local  struct LoginToMasterServerObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  170  005BBFFC      4  void LoginSubmitCallback(LobbyLoginRefT* pLogin, LobbyLoginContextE eContext, LobbyLoginStatusE eStatus, void* pCallbackData)
+  233  00619DEC    2C0  void CheckForChangeInContext(const struct LoginToMasterServerAbstract* this)
+                         local  LobbyLoginStatusE eStatus
+                         local  struct DictionaryConcrete* pLoginContextParams
+                         local  uint32_t uNumElements
+                         local  struct LoginToMasterServerObserver** pList
+                         local  enum HardwareRegion eRegion
+                         local  uint32_t uNumElements
+                         local  struct LoginToMasterServerObserver** pList
+                         local  uint32_t uNumElements
+                         local  struct LoginToMasterServerObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList, GetTagField
+  313  00619A28    3C4  void CheckInternalState(const struct LoginToMasterServerAbstract* this)
+                         local  uint32_t uNumElements
+                         local  struct LoginToMasterServerObserver** pList
+                         local  uint32_t uNumUpdateFiles
+                         local  uint32_t uNumElements
+                         local  struct LoginToMasterServerObserver** pList
+                         local  uint32_t uNumElements
+                         local  struct LoginToMasterServerObserver** pList
+                         local  uint32_t uNumElements
+                         local  struct LoginToMasterServerObserver** pList
+                         local  uint32_t uNumElements
+                         local  struct LoginToMasterServerObserver** pList
+                         inlines  GetInstance, GetMaxNumberOfObservers, GetObserverList, operator->, operator=
+  381  00622350     80  void BeginUpdateDownload(const struct LoginToMasterServerAbstract* this)
+                         inlines  operator=
+  396  005F0A78    148  void AcceptTOS(const struct LoginToMasterServerAbstract* this)
+                         local  uint32_t uNumElements
+                         local  struct LoginToMasterServerObserver** pList
+                         local  struct <anon> _Parameters
+                         inlines  GetMaxNumberOfObservers, GetObserverList, GetTagField
+  410  005F0BC0     A8  void DeclineTOS(const struct LoginToMasterServerAbstract* this)
+                         local  struct <anon> _Parameters
+                         inlines  GetTagField
+  417  005F0C68     F4  void SetShareInfo(const struct LoginToMasterServerAbstract* this, bool bEASpam, bool bPartnerSpam)
+                         local  struct <anon> _Parameters
+                         local  char8_t[3] strSpam
+                         inlines  GetTagField
+  450  005BC000     44  void AcceptForeignRegistration(const struct LoginToMasterServerAbstract* this)
+  456  006223D0      4  void AcceptProductUpdate(const struct LoginToMasterServerAbstract* this)
+  461  005BC044      C  void DeclineProductUpdate(const struct LoginToMasterServerAbstract* this)
+  466  0060BF68     90  void LoginToMasterServerAbstract(const struct LoginToMasterServerAbstract* this, uint32_t uUserIndex, bool bAutoLogin)
+                         inlines  RCPointer
+  481  005CC808     EC  char8_t* GetServerAddress(char8_t* pDest, uint32_t uDestSize)
+                         local  const struct CoreGameParameters* pCoreGameParams
+                         local  const char8_t* pSource
+                         local  const char8_t cSecurePrefix
+                         local  bool bSecure
+  529  005F0E64     A4  void DoStart(const struct LoginToMasterServerAbstract* this)
+  548  005F0D5C    108  void DoStartDirtySockLogin(const struct LoginToMasterServerAbstract* this)
+                         local  struct <anon> Parameters
+                         local  const struct CoreGameParameters* pCoreGameParams
+                         local  char8_t[64] strServerName
+                         inlines  GetTagField
+  561  005F99C0      4  void DoStop(const struct LoginToMasterServerAbstract* this)
+  566  0060C088     68  void ~LoginToMasterServerAbstract(const struct LoginToMasterServerAbstract* this)
+                         inlines  ~ProductUpdateDownloadCallback, ~RCPointer
+  571  005F9918     A8  void Shutdown(const struct LoginToMasterServerAbstract* this)
+                         inlines  operator->, operator=
+  587  00619930     F8  void AbortCurrentOperation(const struct LoginToMasterServerAbstract* this)
+                         local  uint32_t uNumElements
+                         local  struct LoginToMasterServerObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList, LoginFailed
+  601  005D6CCC     84  const struct Dictionary* GetServerConfig(const const struct <anon>* this)
+                         local  LobbyApiMsgT LobbyApiMessage
+                         local  struct MemoryStrategy* pMemory
+  630  005FD650    224  const struct Alert* GetAlert(const const struct <anon>* this)
+                         local  const LobbyLoginAlertT* pNetworkAlert
+                         local  struct LoginToMasterServerAbstract* pMasterServer
+                         local  struct List<OSDK::Action>* pButtonList
+                         local  const char8_t* pButtonName
+                         local  struct MemoryStrategy* pMemory
+                         local  const char8_t* pBody
+                         local  char8_t[16] cAlertString
+                         local  LobbyApiMsgT LobbyApiMessage
+                         inlines  InsertElement, List, LoginAlert

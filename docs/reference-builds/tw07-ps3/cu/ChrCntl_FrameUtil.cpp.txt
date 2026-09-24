@@ -1,0 +1,30 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/src/ChrCntl_FrameUtil.cpp
+// compiled in: ChrCntl_FrameUtil.cpp
+// 4 functions, source order. line | PS3 address | size
+
+  459  005B03D4     3C  struct Frame* ChrCntl_AnimFrame_AdjustFrameRate(struct Character* viewInfo, const struct AnimNode* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float scaleFactor, float frameRateScale)
+                         local  float adjustedFrameNum
+                         local  float adjustedPrevFrameNum
+  472  005B0410    1E8  struct Frame* ChrCntl_AnimFrame_AdjustFrameRateInt(struct Character* viewInfo, const struct AnimNode* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float scaleFactor, float frameRateScale)
+                         local  float scaledCurrFrameNum
+                         local  float scaledPrevFrameNum
+                         local  float floatFrameCount
+                         local  int intFrameCount
+                         local  struct <anon> fullSlerp
+                         local  struct Frame* fullFrameRef
+                         local  struct <anon> gmSlerp
+                         local  struct Frame* gmFrameRef
+  677  005B072C    268  void FrameUtil_CombineSkeletonFilters(const int32_t& numEvaluatedBones, const int32_t& numExtractedBones, struct Flags8* targetFlags, struct <anon>* targetFilter, const struct Skeleton* currentSkeleton, const struct <anon>* primaryFilter, const struct <anon>** secondaryFilters, int32_t numSecondaryFilters)
+                         local  int32_t commonBoneCount
+                         local  int secondaryFilterIdx
+                         local  int32_t skelBoneIdx
+                         local  bool expandBone
+                         local  bool connectBone
+                         local  int secondaryFilterIdx
+                         inlines  Flags8::Clear, Flags8::Set, GetBoneCount
+  746  005B05F8    134  void FrameUtil_AssembleAnimationFrame(struct <anon>* animationFrame, const struct <anon>* extractedFrame, const struct <anon>* animationFilter, int32_t numEvaluatedBones, int32_t numBlendShapes)
+                         local  int32_t extractedIdx
+                         local  int32_t animatedIdx
+                         local  int blendShapeIdx
+                         local  struct <anon>* animatedTransform
+                         local  const struct <anon>* extractedTransform

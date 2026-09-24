@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/include/tiger_module_trinity.h
+// compiled in: tiger_module_trinity.cpp, tiger_module_trinity_camera.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   27  0033E3FC      4  void StartIGC(const struct <anon>* this)
+   28  0033E400      4  void StopIGC(const struct <anon>* this)
+   69    inline-only   bool Trinity::IsRelative(const const struct Trinity* this)
+  107    inline-only   bool Trinity::GetIsActorLeftHanded(const const struct Trinity* this)
+  120  0033E404      8  bool TestStartSequence(const struct <anon>* this, const char* sequenceName, unsigned int resourceTag)

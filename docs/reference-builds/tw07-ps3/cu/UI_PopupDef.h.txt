@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/Golf/UI_Core/AptRuntime/Headers/UI_PopupDef.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   70    inline-only   void UIPopupDef::SetShowNoTipsPrompt(const struct UIPopupDef* this, bool bShowNoTips)

@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/./messagechatconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   48  006232D4     44  const char8_t* GetText(const const struct <anon>* this)
+   51    inline-only   uint32_t GetFlags(const const struct <anon>* this)
+   54  00623318     44  const char8_t* GetName(const const struct <anon>* this)
+   55  0062335C      C  const struct Timestamp* GetTimeReceived(const const struct <anon>* this)

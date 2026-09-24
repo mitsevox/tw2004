@@ -1,0 +1,18 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/animation/CharTimeOfDayTable.cpp
+// compiled in: golf2_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   21  00135A94     44  void CharTimeOfDayTable::RegisterStreamClients()
+   28  0013CA2C     1C  int CharTimeOfDayTable::numTimes()
+   34  0013CA88     8C  int CharTimeOfDayTable::getTime(int timeIndex)
+   40  0013CB14     D4  int CharTimeOfDayTable::getClosestTimeIndex(int hour)
+                         local  int closestTOD
+                         local  int closestDifference
+                         local  int i
+                         local  int currTime
+                         local  int currDifference
+   80  0013CA48     40  bool CharTimeOfDayTable::IsTimeOfDayValid(int timeIndex)
+   89  0014D5E8    168  static void LoadCharTimeOfDayTablefromStream(struct TStreamData* pStreamData)
+                         local  const char[33] __FUNCTION__
+                         local  int32 tableSize
+                         inlines  TagValuePair, operator+

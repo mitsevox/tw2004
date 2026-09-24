@@ -1,0 +1,6 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/smixfram.cpp
+// compiled in: smixfram.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    7  006E12EC     64  int MIX_getframe(int voice)
+                         local  SNDMIXVOICE* psmv

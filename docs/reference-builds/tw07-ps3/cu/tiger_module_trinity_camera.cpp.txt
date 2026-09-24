@@ -1,0 +1,26 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_trinity_camera.cpp
+// compiled in: tiger_module_trinity_camera.cpp
+// 7 functions, source order. line | PS3 address | size
+
+    0  005883D8     58  void ~TrinityCamera(const struct <anon>* this)
+                         inlines  TrinityCamera::~TrinityCamera
+   17  00586B4C    370  void TrinityCamera(const struct <anon>* this, struct Trinity* trinity, struct Global* global)
+                         inlines  Interpolator, TIGER_MATH::MtxIdentity, TIGER_MATH::MtxSet, TIGER_MATH::MtxStore, TIGER_MATH::VecSet, TIGER_MATH::VecStore, TIGER_MATH::__vmx_stvx, TrinityCamera::TrinityCamera, TrinityTransformBase, Vec, operator[]
+   23  00586A98     B4  void InitCamera(const struct <anon>* this, struct Sequence* pSequence, int32_t cameraId, float_t lerpOutTime, const char* cameraName)
+                         local  float fAspectRatio
+   35  0058722C   1194  void BeginUpdate(const struct <anon>* this)
+                         local  bool bIsLeftHanded
+                         local  const float* relativeMtxPtr
+                         local  struct <anon> euler
+                         local  struct <anon> quat
+                         local  struct <anon> mtx
+                         local  struct <anon> pos
+                         local  struct <anon> relMtx
+                         inlines  TIGER_MATH::MtxLoad, TIGER_MATH::MtxMul, TIGER_MATH::MtxSet, TIGER_MATH::MtxStore, TIGER_MATH::QuatToMtx, TIGER_MATH::VecFromOneX, TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecMulByY, TIGER_MATH::VecMulByZ, TIGER_MATH::VecSet, TIGER_MATH::operator*, TIGER_MATH::operator+, Vec, operator float __vector__, operator[]
+   94  0058690C      4  void EndUpdate(const struct <anon>* this)
+   98  005869D4     C4  void StopCamera(const struct <anon>* this)
+                         local  const struct <anon>* main
+                         local  const struct <anon>* pip
+  121  00586910     C4  void GetFOV(const struct <anon>* this, const float_t& fFOV)
+                         local  float fFocalLength
+                         local  float fAspectRatio

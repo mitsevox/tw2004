@@ -1,0 +1,42 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/UMatFlt.c
+// compiled in: Legacy_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+  159  00385AF0    408  void mat44flt_EulerAngles(float y, float p, float r, float[4]* M)
+                         local  float cosy
+                         local  float siny
+                         local  float cosp
+                         local  float sinp
+                         local  float cosr
+                         local  float sinr
+                         local  float sinr_sinp
+                         local  float cosr_sinp
+                         inlines  std::cosf, std::sinf
+  274  0038C620    1E8  void mat44flt_InvEulerAngles(float y, float p, float r, float[4]* M)
+                         local  mat44flt matY
+                         local  mat44flt matP
+                         local  mat44flt matR
+                         inlines  LLMath_IdentifyMat, std::cosf, std::sinf, vec_st
+  302  00385EF8    1F8  void mat44flt_ExtractEulerAngles(float[4]* M, float* pYaw, float* pPitch, float* pRoll)
+                         local  float y
+                         local  float p
+                         local  float r
+                         inlines  std::cosf
+  463    inline-only   static int32 mat44flt_gaussj(float[4]* a, float[4]* b)
+                         local  int32[4] indxc
+                         local  int32[4] indxr
+                         local  int32[4] ipiv
+                         local  int32 i
+                         local  int32 icol
+                         local  int32 irow
+                         local  int32 j
+                         local  int32 k
+                         local  int32 l
+                         local  int32 ll
+                         local  float big
+                         local  float dum
+                         local  float pivinv
+                         local  float temp
+  549  0038C160    4C0  void mat44flt_Invert(float[4]* A, float[4]* invA)
+                         local  mat44flt b
+                         inlines  LLMath_CopyMat44, LLMath_IdentifyMat, mat44flt_gaussj, vec_ld, vec_st

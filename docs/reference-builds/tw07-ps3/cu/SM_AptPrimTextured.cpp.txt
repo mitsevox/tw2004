@@ -1,0 +1,31 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_AptPrimTextured.cpp
+// compiled in: shader_unity.cpp
+// 23 functions, source order. line | PS3 address | size
+
+   35  00506910     14  void* SM_AptPrimTexturedClass::GetVertexShaderToUse(const struct SM_AptPrimTexturedClass* this)
+   36  00506924     14  void* SM_AptPrimTexturedInColorClass::GetVertexShaderToUse(const struct SM_AptPrimTexturedInColorClass* this)
+   38  00506938     14  void* SM_AptPrimTexturedClass::GetPixelShaderToUse(const struct SM_AptPrimTexturedClass* this)
+   39  0050694C     14  void* SM_AptPrimTexturedInColorClass::GetPixelShaderToUse(const struct SM_AptPrimTexturedInColorClass* this)
+   41  00506960     14  void* SM_AptPrimTexturedClass::GetPixelShaderAntiAliasToUse(const struct SM_AptPrimTexturedClass* this)
+   42  00506974     14  void* SM_AptPrimTexturedInColorClass::GetPixelShaderAntiAliasToUse(const struct SM_AptPrimTexturedInColorClass* this)
+   44  00506988     14  void* SM_AptPrimTexturedClass::GetPixelShaderBlurAlphaToUse(const struct SM_AptPrimTexturedClass* this)
+   45  0050699C     14  void* SM_AptPrimTexturedInColorClass::GetPixelShaderBlurAlphaToUse(const struct SM_AptPrimTexturedInColorClass* this)
+   48  005069B0     14  struct LS_VertexAttribute* SM_AptPrimTexturedClass::GetVertexAttributeToUse(const struct SM_AptPrimTexturedClass* this)
+   49  005069C4     14  struct LS_VertexAttribute* SM_AptPrimTexturedInColorClass::GetVertexAttributeToUse(const struct SM_AptPrimTexturedInColorClass* this)
+   68  005069D8      8  uint32 SM_AptPrimTexturedClass::GetVertexAttributeSizeToUse(const struct SM_AptPrimTexturedClass* this)
+   69  005069E0      8  uint32 SM_AptPrimTexturedInColorClass::GetVertexAttributeSizeToUse(const struct SM_AptPrimTexturedInColorClass* this)
+   73  005069E8    23C  void SM_AptPrimTexturedBaseClass::Load(const struct SM_AptPrimTexturedBaseClass* this)
+   94  00519E24     B0  void SM_AptPrimTexturedBaseClass::SetTextureRef(const struct SM_AptPrimTexturedBaseClass* this, TextureRef textureref)
+                         local  const TextureInfo* info
+  116  00510AEC     AC  void SM_AptPrimTexturedBaseClass::EnableExtraBlur(const struct SM_AptPrimTexturedBaseClass* this, enum eAptPrimTexturedSmoothType useAntiAliasPixelShader)
+                         local  LS_ShaderHandle oldPsHandle
+  141  00510B98     90  void SM_AptPrimTexturedBaseClass::SetTransformU(const struct SM_AptPrimTexturedBaseClass* this, const float* transUx4)
+  152  00510C28     90  void SM_AptPrimTexturedBaseClass::SetTransformV(const struct SM_AptPrimTexturedBaseClass* this, const float* transVx4)
+  163  00510CB8     78  void SM_AptPrimTexturedInColorClass::SetColorAdd(const struct SM_AptPrimTexturedInColorClass* this, const float* rgba)
+  171  00510D30     78  void SM_AptPrimTexturedInColorClass::SetColorMul(const struct SM_AptPrimTexturedInColorClass* this, const float* rgba)
+  180  00506D7C     C8  void SM_AptPrimTexturedInColorClass::Load(const struct SM_AptPrimTexturedInColorClass* this)
+  187  00519ED4    124  void SM_AptPrimTexturedInColorClass::Activate(const struct SM_AptPrimTexturedInColorClass* this)
+                         local  const const TextureInfo& info
+                         local  float[2] delta
+  207  00506F2C      C  LS_ShaderHandle& SM_AptPrimTexturedInColorClass::GetvsHandle(const struct SM_AptPrimTexturedInColorClass* this)
+  211  00506F38    15C  void SM_AptPrimTexturedInColorClass::LoadParamsVsShader(const struct SM_AptPrimTexturedInColorClass* this)

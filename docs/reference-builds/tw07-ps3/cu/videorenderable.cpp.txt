@@ -1,0 +1,12 @@
+// C:/packages/rwmovie/1.04.01/source/movielib/movieplayer/cmn/videorenderable.cpp
+// compiled in: videorenderable.cpp
+// 7 functions, source order. line | PS3 address | size
+
+    0  006FA25C     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   64  006FA134     10  void IncrementUseCount(const struct <anon>* this)
+   71  006FA144     10  void DecrementUseCount(const struct <anon>* this)
+   92  006FA154     B0  void GetDataBufSizes(unsigned int width, unsigned int height, enum VideoFormat format, unsigned int numBuffers, uint32_t* sizes)
+  150  006FA204     58  uint32_t GetDataBufSize(unsigned int width, unsigned int height, enum VideoFormat format)
+                         local  uint32_t size
+  179  006FA2DC     10  static void _GLOBAL__I__ZN2rw5movie15VideoRenderableC2ERKNS_8ResourceE()
+  180  006FA2EC     10  static void _GLOBAL__D__ZN2rw5movie15VideoRenderableC2ERKNS_8ResourceE()

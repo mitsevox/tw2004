@@ -1,0 +1,7 @@
+// ../../../../rw45/platform/include/native/ps3-ppu-gcc/rw/core/resource/resourcetarget.h
+// compiled in: tiger_module_com.cpp
+// 3 functions, source order. line | PS3 address | size
+
+  111    inline-only   const MemoryResourceDescriptor& GetMemoryResourceDescriptor(const const struct <anon>* this)
+  196    inline-only   uint32_t GetSize(const const struct <anon>* this)
+  206    inline-only   uint32_t GetAlignment(const const struct <anon>* this)

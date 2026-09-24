@@ -1,0 +1,9 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/inline.h
+// compiled in: T3dbDebug.cpp, TableIndex.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   39  007F1C88     7C  DbRef GetRef(const struct Database* this)
+                         local  struct <anon> lock
+   45  007CAE58     A0  bool IsLocked(const struct Database* this)
+                         local  struct <anon> lock
+  179  00800D20     78  static struct <anon>* T3db::ColSortFill(struct <anon>* pColSort, TableRef tableRef, ColRef colRef, enum ColumnSortOrder eOrder)

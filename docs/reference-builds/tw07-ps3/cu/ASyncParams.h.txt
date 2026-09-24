@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/ASyncParams.h
+// compiled in: Database.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   72  007CAEF8     38  enum TDbError GetError(const struct ASyncParams* this)
+   96  007CAF30     3C  void SetStatus(const struct ASyncParams* this, enum TDbError status)
+  101  007CAF6C     3C  void SetError(const struct ASyncParams* this, enum TDbError err)

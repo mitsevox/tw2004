@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/Headers/GameMode_Stableford.h
+// compiled in: golf_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   30  0033F120     14  enum UIScoreCardDispMode_t GameModeStableford::GetScoreDisplayMode(const struct GameModeStableford* this, bool getAlternate)
+   47  0033F134      8  bool GameModeStableford::TrackingShotHistory(const struct GameModeStableford* this, enum PlayerNumber_t PlayerID)
+   48  0033F13C      8  bool GameModeStableford::AllowUserShotClockOverride(const struct GameModeStableford* this)

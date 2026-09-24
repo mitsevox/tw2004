@@ -1,0 +1,19 @@
+// C:/packages/rwaudiocore/2.08.01/include/rw/audio/core/private/pbase.h
+// compiled in: cpuloadbalancer.cpp, dac.cpp, decealayer3.cpp, send.cpp, smixer.cpp, system.cpp
+// 11 functions, source order. line | PS3 address | size
+
+  130    inline-only   unsigned int core::AlignUp<unsigned int>(unsigned int value, unsigned int alignment)
+                         local  uintptr_t mask
+  130    inline-only   struct EALayer3Core* core::AlignUp<rw::audio::core::EALayer3Core*>(struct EALayer3Core* value, unsigned int alignment)
+                         local  uintptr_t mask
+  130    inline-only   int core::AlignUp<int>(int value, unsigned int alignment)
+                         local  uintptr_t mask
+  157    inline-only   unsigned int core::GetCpuCycle()
+                         local  unsigned int time
+  284    inline-only   void Reset(const struct <anon>* this)
+  294    inline-only   void Start(const struct <anon>* this)
+  304    inline-only   void Stop(const struct <anon>* this)
+  314    inline-only   unsigned int GetCycles(const struct <anon>* this)
+  346    inline-only   void OverRide(const struct <anon>* this, float cycles)
+  359    inline-only   void Average(const struct <anon>* this, float newCycles)
+  371    inline-only   float GetAverage(const struct <anon>* this)

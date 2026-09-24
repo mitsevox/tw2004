@@ -1,0 +1,39 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/productupdateinfo.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   92  005BDA48    210  void FixRwFilePath(char8_t* strPath)
+                         local  const uint32_t MOUNTTBLSIZE
+                         local  struct HostToMount[8] HostToMountTable
+                         local  uint32_t uPathLen
+                         local  uint32_t uHostIndex
+                         local  uint32_t uLenHost
+                         local  uint32_t uLenMountPoint
+  151  005BD3EC     60  char8_t* ConvertPathToPlatformFormat(char8_t* pPathToConvert)
+                         local  char8_t* pReturn
+  226  005BDC58     98  void ProductUpdateInfoFile(const struct <anon>* this)
+  251  005BDD88      C  void ~ProductUpdateInfoFile(const struct <anon>* this)
+  269  005BD54C      4  void Print(const const struct <anon>* this, const char8_t* pTag)
+  298  005BD7EC     F0  char8_t* GetPath(const char8_t* pFullPath, char8_t* pDest, uint32_t uDestSize)
+                         local  const char8_t* pFilePtr
+                         local  uint32_t uAmountToCopy
+  336  005BD44C    100  char8_t* GetFileName(const char8_t* pFullPath, char8_t* pDest, uint32_t uDestSize)
+                         local  const char8_t* pFilePtr
+                         local  uint32_t uAmountToCopy
+  379  005BD8DC     1C  const char8_t* GetTargetRoot(const const struct <anon>* this, enum FileTypeE eType)
+                         local  const char8_t* pRoot
+                         inlines  GetContentInfoPath, GetGameDataPath
+  418  00617EFC    134  void ProductUpdateInfo(const struct ProductUpdateInfo* this, uint32_t uNumFiles, struct MemoryStrategy* pMemoryStrategy)
+                         local  uint32_t uIndex
+                         inlines  InsertElement, List
+  449  00618164     74  void ~ProductUpdateInfo(const struct ProductUpdateInfo* this)
+                         inlines  ~List
+  472  005D0A00    208  void Initialize(const struct ProductUpdateInfo* this, const struct Dictionary* pConfig)
+                         local  uint32_t uNumFiles
+                         local  uint32_t uCurrentFile
+                         local  struct <anon>* pFileInfo
+                         local  char8_t[64] strTag
+                         local  char8_t[256] strURL
+                         local  int32_t iType
+                         local  uint32_t uCRC
+                         inlines  GetElementAt, GetNumberOfElements, SetDownloadChecksum, SetFileType, SetURL

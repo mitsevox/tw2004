@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_ProShopMenu.h
+// compiled in: apt_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   17  00036C8C      4  void UIProShopMenuStopMultipleInit::UIProShopMenuStopMultipleInit(const struct UIProShopMenuStopMultipleInit* this)
+   18  00036C90      4  void UIProShopMenuStopMultipleInit::~UIProShopMenuStopMultipleInit(const struct UIProShopMenuStopMultipleInit* this)
+   43  0010001C      C  uint32 UIProShopMenu::GetSignature(const const struct UIProShopMenu* this)
+   49  00100028     14  void UIProShopMenu::NotifyGo_func(struct IAptSubscriber* subs)
+   54  00100C80     14  void UIProShopMenu::NotifyClipUpdate_func(struct IAptSubscriber* subs)
+   56  0010319C     14  enum TAptSequenceStatus UIProShopMenu::CheckNoResults_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)

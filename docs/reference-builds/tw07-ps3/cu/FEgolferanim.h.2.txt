@@ -1,0 +1,24 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/iStudio_Runtime/Headers/FEgolferanim.h
+// compiled in: golf_unity.cpp
+// 20 functions, source order. line | PS3 address | size
+
+  123    inline-only   struct TCharacter* FEAnimManager::GetCurrentChar(const const struct FEAnimManager* this)
+  129    inline-only   void FEAnimManager::SetAnimationEnded(const struct FEAnimManager* this)
+  134    inline-only   void FEAnimManager::ClearSettingRenderState(const struct FEAnimManager* this)
+  135    inline-only   void FEAnimManager::ClearSettingAnimation(const struct FEAnimManager* this)
+  136    inline-only   void FEAnimManager::ClearSettingCamera(const struct FEAnimManager* this)
+  137    inline-only   void FEAnimManager::ClearSettingClub(const struct FEAnimManager* this)
+  138    inline-only   void FEAnimManager::ClearRestartingState(const struct FEAnimManager* this)
+  140    inline-only   bool FEAnimManager::IsBlendingTransition(const const struct FEAnimManager* this)
+  144    inline-only   bool FEAnimManager::IsSettingRenderState(const const struct FEAnimManager* this)
+  145    inline-only   bool FEAnimManager::IsSettingAnimation(const const struct FEAnimManager* this)
+  146    inline-only   bool FEAnimManager::IsSettingCamera(const const struct FEAnimManager* this)
+  147    inline-only   bool FEAnimManager::IsSettingClub(const const struct FEAnimManager* this)
+  148    inline-only   bool FEAnimManager::IsRestartingState(const const struct FEAnimManager* this)
+  151    inline-only   const char* FEAnimManager::GetCurAnimName(const const struct FEAnimManager* this)
+  152    inline-only   const char* FEAnimManager::GetCurCameraName(const const struct FEAnimManager* this)
+  153    inline-only   const int32 FEAnimManager::GetCurClubID(const const struct FEAnimManager* this)
+  190    inline-only   void Event::SetFlag(const struct Event* this, uint32 flag)
+  191    inline-only   void Event::ClearFlag(const struct Event* this, uint32 flag)
+  192    inline-only   bool Event::TestFlag(const const struct Event* this, uint32 flag)
+  218    inline-only   bool EventQueue::IsEmpty(const const struct EventQueue* this)

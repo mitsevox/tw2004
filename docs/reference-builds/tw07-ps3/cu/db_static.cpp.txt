@@ -1,0 +1,24 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Database/db_static.cpp
+// compiled in: golf_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   66  0021521C    114  enum TDbError Init(char8_t* dbPath)
+                         local  enum TDbError error
+   98  00214EB0     8C  void Shutdown()
+  130  002154E8     FC  enum TDbError Create()
+                         local  enum TDbError error
+                         local  struct Database* db
+                         local  struct ExtIoCallback ioCallback
+  172  002155E4     BC  enum TDbError Destroy()
+                         local  enum TDbError error
+                         local  struct Database* db
+  209  00288F24    244  enum TDbError LoadTable(DbRef dbRef, TableRef tableRef)
+                         local  enum TDbError error
+                         local  bool8_t dbCreated
+                         inlines  Helper::SQL_DbExists, Helper::SQL_SetTablePersistentDataFlag
+  295  00289168    35C  enum TDbError LoadFlaggedTables(DbRef dbRef, TableRef tableRef, TableRef flagColRef)
+                         local  enum TDbError error
+                         local  bool8_t dbCreated
+                         local  struct <anon> queryCursor
+                         local  TableRef staticTableRef
+                         inlines  Helper::SQL_DbExists

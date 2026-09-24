@@ -1,0 +1,207 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptCharacter.cpp
+// compiled in: other_unity.cpp
+// 28 functions, source order. line | PS3 address | size
+
+  289  00438AA8    1E4  void AptCharacter::render(const struct AptCharacter* this, struct AptRenderingContext* pRenderingContext, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth, struct AptMatrix* pMatrix)
+                         inlines  AptRenderingContext::appendVertexMatrix, AptRenderingContext::multMatrix, AptRenderingContext::popVertexMatrix, AptRenderingContext::pushVertexMatrix
+  325  00438C8C    1C0  void AptCharacter::_getBoundingRect(const struct AptCharacter* this, struct AptRenderingContext* pRenderingContext, struct AptRect* pRect, struct AptMatrix* pMatrix)
+                         inlines  AptRenderingContext::appendVertexMatrix, AptRenderingContext::multMatrix, AptRenderingContext::popVertexMatrix, AptRenderingContext::pushVertexMatrix
+  385  0045F068    210  void AptCharacterSpriteInstBase::updateObjectMethods(const struct AptCharacterSpriteInstBase* this, const char* szVar, struct AptCIH* pCIH, int bRemove)
+                         local  const struct SpriteMembers* pProp
+                         local  int nTableIndex
+                         local  int nFlag
+                         inlines  AptValueSet<AptCIH*,512>::add, AptValueSet<AptCIH*,512>::has
+  412  0046DFEC    FD0  void AptCIH::ensureStringAllocated(const struct AptCIH* this, struct AptCIH* pParent)
+                         local  const char* instName
+                         local  struct AptCharacterTextInst* pTextInst
+                         local  AptNativeString sString
+                         local  const char* pLiteral
+                         local  int bDoAllocate
+                         local  struct AptCharacter* pChar
+                         local  struct AptValue* text
+                         local  struct AptValue* pValue
+                         local  const char* variableName
+                         local  bool isExtern
+                         local  bool bypassStrCompare
+                         local  char* str
+                         local  const char* variableName
+                         local  bool ok
+                         local  void* outVariable
+                         local  enum AptExternVariable outVariableType
+                         local  struct AptCharacterAnimation* pParentAnim
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  const char* s
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  struct AptAllocateStringParameters asp
+                         local  char* instNameMove
+                         local  const int32 value
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptCIH::getTextInst, AptCIH::isSpriteInstBase, AptString::AptString, AptString::getData, AptString::operator new, AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount, BasicString, Capacity, ConstRawPtr, Copy, Copy<char*, char*>, RawPtr, ReAlloc, Size, UseCapacity, ~BasicString
+  777  0040A2C4     F8  void AptCIH::FillAptAllocateStringParameters(const struct AptCIH* this, const struct AptAllocateStringParameters& asp)
+                         local  struct AptCharacterTextInst* pTextInst
+                         local  struct AptCharacter* pChar
+                         local  struct AptCharacterAnimation* pParentAnim
+                         inlines  AptCIH::getTextInst
+  814  004153A0     F4  void AptCIH::deallocAssetStringRecursive(const struct AptCIH* this)
+                         local  struct AptCharacterSpriteInstBase* pSpriteInst
+                         local  struct AptCharacterTextInst* pTextInst
+                         inlines  AptCIH::getTextInst, AptCIH::isSpriteInstBase, AptCIH::isTextInst
+  902  0046EFBC    DEC  void AptCIH::render(const struct AptCIH* this, struct AptRenderingContext* pRenderingContext, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  struct AptCharacterSpriteInstBase* pSpriteInst
+                         local  struct AptValue* pType
+                         local  bool bTypeQueried
+                         local  struct AptCIH* pRectObject
+                         local  char* szType
+                         local  int32 needTarget
+                         local  int32 needCustomProp
+                         local  int32 needMatrix
+                         local  char* target
+                         local  struct AptValue* pTarget
+                         local  char* customProp
+                         local  AptNativeString sCustomProp1
+                         local  struct AptCharacterTextInst* pTextInst
+                         local  struct AptCharacterShapeInst* pShapeInst
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptCIH::getSpriteInstBase, AptCIH::getTextInst, AptCIH::isShapeInst, AptCIH::isSpriteInstBase, AptCIH::isTextInst, AptRenderingContext::appendVertexMatrix, AptRenderingContext::multMatrix, AptRenderingContext::popColourTransform, AptRenderingContext::popVertexMatrix, AptRenderingContext::pushAppendColourTransform, AptRenderingContext::pushAppendVertexMatrix, AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount, BasicString, Capacity, Copy<char*, char*>, LLMath_Add, LLMath_MultiplyVec, ReAlloc, Size, Swap, UseCapacity, operator=, vec_add, ~BasicString
+ 1109  00438E4C    260  void AptCIH::_getBoundingRect(const struct AptCIH* this, struct AptRenderingContext* pRenderingContext, struct AptRect* pRect)
+                         local  struct AptCharacterInst* pInst
+                         local  struct AptCharacterSpriteInstBase* pSpriteInst
+                         local  struct AptCharacterTextInst* pTextInst
+                         inlines  AptCIH::getCharacterInst, AptCIH::isLevelInst, AptCIH::isSpriteInstBase, AptCIH::isTextInst, AptRenderingContext::appendVertexMatrix, AptRenderingContext::multMatrix, AptRenderingContext::popVertexMatrix, AptRenderingContext::pushVertexMatrix
+ 1149  00439174     34  void AptCIH::getBoundingRect(const struct AptCIH* this, struct AptRect* pRect)
+ 1159  004391A8    220  void AptCIH::getGlobalBoundingRect(const struct AptCIH* this, struct AptRect* pRect)
+                         local  struct AptCIH* pCur
+                         local  struct AptMatrix cur
+                         inlines  AptRenderingContext::appendVertexMatrix, AptRenderingContext::multMatrix, AptRenderingContext::popVertexMatrix, AptRenderingContext::pushVertexMatrix
+ 1179  003EF3D4     BC  void AptCIH::getGlobalTranslation(const struct AptCIH* this, float* pfX, float* pfY)
+                         local  struct AptCIH* pCur
+                         local  struct AptMatrix cur
+                         inlines  AptRenderingContext::multMatrix
+ 1196  003EF490     64  static float fnorm_angle(float f)
+ 1205  00428490    2BC  void AptCIH::setupProceduralProperty(const struct AptCIH* this)
+                         local  float fRot1
+                         local  float fRot2
+                         local  float fRot
+                         local  const float EPS
+                         local  float c
+                         local  float s
+                         inlines  AptProceduralSettings::operator new, std::cosf, std::sinf
+ 1259  003EF4F4     14  float AptCIH::getProceduralProperty(const struct AptCIH* this, enum AptProceduralProperty eProperty)
+ 1266  0042874C    1B8  void AptCIH::setProceduralProperty(const struct AptCIH* this, enum AptProceduralProperty eProperty, float fValue, bool bASFlag)
+                         local  float fRot
+                         local  float xs
+                         local  float ys
+                         local  float c
+                         local  float s
+                         inlines  std::cosf, std::sinf
+ 1326  004997B4    11C  struct AptValue* AptCharacterInst::_gotoAndX(struct AptValue* pThis, int nParams, int bPlay)
+                         local  struct AptValue* pFrame
+                         local  int nFrame
+                         inlines  AptActionInterpreter::stackAt, AptCIH::isLevelInst, AptValue::isString
+ 1352  004998D8      8  struct AptValue* AptCharacterInst::sMethod_gotoAndStop(struct AptValue* pThis, int nParams)
+ 1357  004998D0      8  struct AptValue* AptCharacterInst::sMethod_gotoAndPlay(struct AptValue* pThis, int nParams)
+ 1442  0047B7AC    658  struct AptValue* AptCharacterInst::sMethod_loadMovie(struct AptValue* pThis, int nParams)
+                         local  struct AptValue* pNewMovie
+                         local  AptNativeString sMovieName
+                         local  int nLength
+                         local  AptNativeString sBuf
+                         inlines  AptActionInterpreter::stackAt, BasicString, Capacity, Copy<char*, char*>, End, Erase, ReAlloc, Size, Swap, UseCapacity, operator=, operator[], ~BasicString
+ 1473  00478E9C     48  struct AptValue* AptCharacterInst::sMethod_unloadMovie(struct AptValue* pThis, int nParams)
+                         local  struct AptCIH* pCIH
+                         local  struct AptCharacterSpriteInstBase* pParentInst
+ 1482  00499B0C     BC  struct AptValue* AptCharacterInst::sMethod_duplicateMovieClip(struct AptValue* pThis, int nParams)
+                         local  struct AptValue* pTarget
+                         local  struct AptValue* pDepth
+                         local  struct AptValue* pInitObject
+                         local  int nDepthInt
+                         inlines  AptActionInterpreter::stackAt
+ 1496  00478D9C     AC  struct AptValue* AptCharacterInst::sMethod_removeMovieClip(struct AptValue* pThis, int nParams)
+                         local  struct AptValue* pObject
+                         local  struct AptCIH* pCIH
+                         local  struct AptCharacterSpriteInstBase* pParentInst
+                         inlines  AptValue::isCIH
+ 1640  00424580     B4  struct AptValue* AptCharacterInst::sMethod_getDepth(struct AptValue* pThis, int nParams)
+                         inlines  AptInteger::AptInteger, AptInteger::operator new, AptValue::isCIH
+ 1650  0046DCC4    328  struct AptValue* AptCharacterInst::sMethod_swapDepths(struct AptValue* pThis, int nParams)
+                         local  struct AptCIH* pThisInst
+                         local  struct AptValue* pTarget
+                         local  struct AptCIH* pTargetCIH
+                         local  struct AptCIH* pPrevCIH
+                         local  AptNativeString sInstName
+                         local  int nTargetDepth
+                         inlines  AptActionInterpreter::stackAt, AptValue::isCIH, AptValue::isInteger, AptValue::isString, BasicString, ~BasicString
+ 1891  0040AD84     60  struct AptValue* AptCharacterInst::sMethod_stop(struct AptValue* pThis, int nParams)
+                         inlines  AptCIH::isSpriteInstBase
+ 1976  00471C50    F44  int AptCharacterInst::objectMemberSet(const struct AptCharacterInst* this, struct AptValue* pContext, const char* szVar, struct AptValue* pValue)
+                         local  struct AptCIH* pCIH
+                         local  float fFloat
+                         local  struct AptRect rect
+                         local  float fScaleScale
+                         local  struct TextMembers* pProp
+                         local  struct AptCharacterTextInst* pTextInst
+                         local  bool bResetString
+                         local  AptNativeString szBuf
+                         local  int nVal
+                         local  int nVal
+                         local  int nVal
+                         local  int nNewScroll
+                         local  struct AptCIH* pParent
+                         local  int i
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  struct AptValue* pValue
+                         local  AptNativeString szBuf
+                         local  struct AptValue* pTempVar
+                         local  int i
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  int nVal
+                         local  struct AptRect rect
+                         local  float fScaleScale
+                         local  char[256] szBuf
+                         local  const char* pStr
+                         local  AptNativeString sString
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptCIH::getTextInst, AptCIH::isSpriteInstBase, AptCIH::isTextInst, AptString::AptString, AptString::SetFrom, AptString::operator new, AptValue::AptValue, AptValue::__inc, AptValue::getVtblIndex, AptValue::isFloat, AptValue::isInteger, AptValue::setRefCount, BasicString, Capacity, Copy<char*, char*>, ReAlloc, Size, UseCapacity, ~BasicString
+ 2284  0046A590   1868  struct AptValue* AptCharacterInst::objectMemberLookup(const struct AptCharacterInst* this, struct AptValue* pContext, const char* szName)
+                         local  const struct SpriteMembers* pProp
+                         local  struct AptCIH* pCIH
+                         local  struct AptCharacterInst* pCharInst
+                         local  float fFloat
+                         local  struct TextMembers* pProp
+                         local  struct AptCharacterTextInst* pTextInst
+                         local  float fRetVal
+                         local  struct AptString* pTemp
+                         local  int i
+                         local  struct AptCIH* pParent
+                         local  struct AptValue* pValue
+                         local  struct AptString* pTemp
+                         local  int i
+                         local  AptNativeString szBuf
+                         local  struct AptRect rect
+                         local  char[256] nameBuf
+                         local  struct AptString* pRet
+                         local  const char* s
+                         local  struct AptRect rect
+                         local  AptNativeString sString
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptBoolean::AptBoolean, AptBoolean::operator new, AptCIH::getCharacterInst, AptCIH::getTextInst, AptCIH::isSpriteInstBase, AptCIH::isTextInst, AptFloat::AptFloat, AptFloat::operator new, AptInteger::AptInteger, AptInteger::operator new, AptNativeFunction::AptNativeFunction, AptNativeFunction::operator new, AptString::AptString, AptString::operator new, AptValue::AptValue, AptValue::__inc, AptValue::c_cih, AptValue::getVtblIndex, AptValue::isCIH, AptValue::setRefCount, BasicString, Capacity, Copy, Copy<char*, char*>, ReAlloc, Size, UseCapacity, ~BasicString
+ 2897  0049A774    1F4  void AptCIH::associateInstToClass(const struct AptCIH* this)
+                         local  struct AptCharacterInst* pCharInst
+                         local  struct AptCharacterAnimation* pAnim
+                         local  struct AptCharacter* pCharacter
+                         local  int iFound
+                         local  struct AptNativeHash* pNativeHash
+                         local  int i
+                         local  struct AptValue* pValue1
+                         local  struct AptScriptFunction* pFuncDef
+                         inlines  AptActionInterpreter::stackPop, AptCIH::getCharacterInst, AptCIH::isAnimationInst, AptCIH::isSpriteInst

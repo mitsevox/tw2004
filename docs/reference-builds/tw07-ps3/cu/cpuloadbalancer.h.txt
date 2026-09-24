@@ -1,0 +1,7 @@
+// C:/packages/rwaudiocore/2.08.01/include/rw/audio/core/private/cpuloadbalancer.h
+// compiled in: cpuloadbalancer.cpp, dac.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   44    inline-only   void ResumeOverheadCounting(const struct <anon>* this)
+   52    inline-only   void PauseOverheadCounting(const struct <anon>* this)
+   95    inline-only   struct <anon>* GetSystem(const struct <anon>* this)

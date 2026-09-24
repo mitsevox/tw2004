@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptMiscObjects.cpp
+// compiled in: other_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   81  003EEB3C      8  struct AptValue* AptMath::objectMemberLookup(const struct AptMath* this, struct AptValue* pContext, const char* szName)
+  732  003EEB44     4C  struct AptValue* AptObject::objectMemberLookup(const struct AptObject* this, struct AptValue* pContext, const char* szName)

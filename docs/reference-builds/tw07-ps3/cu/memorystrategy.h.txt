@@ -1,0 +1,9 @@
+// ../../../../../TIGERCODE/packages/osdk/2.06.04/core/include/common/osdk/gamefacade/memorystrategy.h
+// compiled in: golf2_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   55  001E7550     28  int32_t CreateMemoryContainer(const struct MemoryStrategy* this, sys_memory_container_t* cid, size_t size, int32_t type)
+                         inlines  sys_memory_container_create
+   61  001E7578     24  int32_t DestroyMemoryContainer(const struct MemoryStrategy* this, sys_memory_container_t cid, int32_t type)
+                         inlines  sys_memory_container_destroy
+   73  001E759C     18  void ~MemoryStrategy(const struct MemoryStrategy* this)

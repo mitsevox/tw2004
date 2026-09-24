@@ -1,0 +1,5 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/././logintomasterserverabstract.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   60  006231C0      8  uint32_t GetUserIndex(const const struct <anon>* this)

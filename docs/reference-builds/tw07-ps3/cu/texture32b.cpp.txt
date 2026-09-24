@@ -1,0 +1,50 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/texture32b.cpp
+// compiled in: other_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   17  004200A4     50  void Texture32b::Texture32b(const struct Texture32b* this, const const struct Allocator& allocRef, const const struct HashString& textureName, int32_t width, int32_t height, int32_t mipmaps, void* texturedata, bool swizzled)
+   24  003D265C     18  void Texture32b::~Texture32b(const struct Texture32b* this)
+   29  00406764    118  void Texture32b::GetNPixels(const struct Texture32b* this, int32_t startX, int32_t startY, RawTexture_PixelValue* pixels, int32_t mipmap, int32_t numPixels)
+                         local  int32_t index
+                         local  RawTexture_PixelValue* data
+   42  0040687C     B4  void Texture32b::GetNPixels(const struct Texture32b* this, int32_t pixelIndex, RawTexture_PixelValue* pixels, int32_t numPixels)
+                         local  RawTexture_PixelValue* data
+   54  00406930    154  void Texture32b::GetPixelValue(const struct Texture32b* this, int32_t x, int32_t y, const RawTexture_PixelValue& value, int32_t mipmap)
+                         local  int32_t index
+   72  00404C90    15C  void Texture32b::SetPixelValue(const struct Texture32b* this, int32_t x, int32_t y, const RawTexture_PixelValue& value, int32_t mipmap)
+                         local  int32_t index
+   84  00403768    4F0  void Texture32b::TintTexture(const struct Texture32b* this, struct Tinter* tinter, float* tintParams, struct RawTexture* tintMask)
+                         local  int iMipmap
+                         local  int32_t width
+                         local  int32_t height
+                         local  RawTexture_PixelValue* pixels
+                         local  int ih
+                         local  int iw
+                         local  float[16][4] inputColor
+                         local  float[16][4] outputColor
+                         local  float[16] scale
+                         local  int numPixels
+                         local  int iPix
+                         local  RawTexture_PixelValue maskVal
+                         local  int iPix
+                         inlines  RawTexture::GetHeight, RawTexture::GetWidth
+  162  00401EA0    204  int32_t Texture32b::CalculatePixelIndex(const struct Texture32b* this, int32_t x, int32_t y, int32_t mipmap)
+                         local  int32_t index
+                         local  int32 i
+                         local  int32 j
+                         local  int32 k
+                         local  int32 maskU
+                         local  int32 maskV
+                         local  int32 swizU
+                         local  int32 swizV
+                         inlines  RawTexture::GetHeight, RawTexture::GetWidth
+  240  00404C58     1C  void Texture32b::GetPixelValueFromIndex(const struct Texture32b* this, int32_t index, const RawTexture_PixelValue& value)
+                         local  uint32_t* val
+  250  00404C74     1C  void Texture32b::SetPixelValueFromIndex(const struct Texture32b* this, int32_t index, const RawTexture_PixelValue& value)
+                         local  RawTexture_PixelValue* val
+  261  00404DEC     E8  void* Texture32b::GetRawTextureData(const struct Texture32b* this, int32_t mipmap)
+                         local  int32_t width
+                         local  int32_t height
+                         local  uint32_t* data
+                         local  int32_t i
+                         inlines  RawTexture::GetHeight, RawTexture::GetWidth

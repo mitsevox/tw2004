@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/Animation/Headers/Skin.h
+// compiled in: golf2_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  145    inline-only   void TGeomBV::Seed(const struct TGeomBV* this)
+  181    inline-only   TGeomBV* SKN_NextGeomBounds(struct TSkin* pSkin)

@@ -1,0 +1,727 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Physics/Physics.c
+// compiled in: golf2_unity.cpp
+// 119 functions, source order. line | PS3 address | size
+
+  814    inline-only   float Physics_CalcReynoldsNumber(float velocity)
+  819    inline-only   float Physics_CalcSpinParam(float velocity, float angVel)
+  824    inline-only   float Physics_CalcCL(float spinParam)
+  834  0012B0D4     1C  bool Physics_BallIsSimulating(struct PhysicsBall_t* pBall)
+  841  0012B0F0     20  bool Physics_BallIsStopped(struct PhysicsBall_t* pBall)
+  850  0012B110     68  static int32 Physics_GetSurfaceID(struct TGD_MaterialInfo* pSurfaceInfo)
+                         local  int32 surfaceID
+  863  001B6E64     84  static void Physics_ForceBallInHole(struct PhysicsBall_t* pBall)
+                         inlines  PhysicsBall_t::SetFlag, vec4flt_Copy3
+  875  001B6EE8     A4  static void Physics_OutOfBounds(struct PhysicsBall_t* pBall, bool sendEvent)
+  907  0012B2F4     74  float Physics_EstimatePuttPower(float targetDistance, int32 playerID)
+                         local  struct CoreShotInfo_t* shotInfo
+  919  0012B1A0    154  float Physics_EstimatePuttPower(float targetDistance, enum Putter_t putterID, struct CoreShotInfo_t* shotInfo)
+                         local  float targetPower
+                         local  float weatherFactor
+                         local  float maxDistance
+  985  0012B368    2AC  static bool Physics_GetShotTableAndSurfaceID(enum ShotType_t whichShot, enum Club_t whichClub, bool getBounceTable, const float** shotEstimateTablePtr, int32* surfaceID)
+ 1085  0012B614     64  float Physics_ApplyBallInStanceEstModifier(float dist, enum Club_t whichClub, float stance)
+                         local  const float* BISTargetClubDistances
+ 1098  0012B678     8C  float Physics_EstimateShotDistance100(enum ShotType_t whichShot, enum Club_t whichClub, float stance)
+                         local  const float* shotEstimateTable
+                         local  float dist
+ 1113  0012B704    1A8  float Physics_EstimateShotDistance(float shotPowerPercent, enum ShotType_t whichShot, enum Club_t whichClub, float stance)
+                         local  int32 i
+                         local  float curPower
+                         local  float targetDistance
+                         local  float minDistance
+                         local  float maxDistance
+                         local  const float* shotEstimateTable
+ 1142  0012B8AC     8C  float Physics_EstimateBounceDistance100(enum ShotType_t whichShot, enum Club_t whichClub, float stance)
+                         local  const float* shotEstimateTable
+ 1153  0012B938    1A8  float Physics_EstimateBounceDistance(const struct PhysicsBall_t* pBall, float shotPowerPercent, enum ShotType_t whichShot, enum Club_t whichClub, float stance)
+                         local  int32 i
+                         local  float curPower
+                         local  float targetDistance
+                         local  float minDistance
+                         local  float maxDistance
+                         local  const float* shotEstimateTable
+ 1180  00160F78    270  float Physics_EstimateShotPower(const struct PhysicsBall_t* pBall, float targetDistance, enum ShotType_t whichShot, enum Club_t whichClub)
+                         local  int32 i
+                         local  int32 surfaceID
+                         local  float targetPower
+                         local  float minDistance
+                         local  float maxDistance
+                         local  vec4flt surfaceNormal
+                         local  const float* shotEstimateTable
+                         local  float adjustedImpactScale
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  struct TGD_MaterialInfo* pTableSurfaceInfo
+                         local  float tableAdjustedImpactScale
+                         local  float adjustedImpactSpinScale
+ 1233  00148530    100  float Physics_GetLiePowerPercentage(struct PhysicsBall_t* pBall)
+                         local  float impactV
+                         local  float impactV_Modifier
+ 1265    inline-only   static float Physics_GetFeetAngle_RightLeft(const struct PhysicsBall_t* pBall, float shotAngle, float* surfaceNormal)
+                         local  vec4flt tempNormal
+                         local  float feetAngle
+                         local  float tempSin
+                         local  float tempCos
+                         local  float epsilon
+ 1287    inline-only   static float Physics_GetFeetAngle_ForwardBackward(const struct PhysicsBall_t* pBall, float shotAngle, float* surfaceNormal)
+                         local  vec4flt tempNormal
+                         local  float feetAngle
+                         local  float tempSin
+                         local  float tempCos
+                         local  float epsilon
+ 1312  001A2D80    C00  bool Physics_GetShotData(const struct PhysicsBall_t* pBall, enum Club_t clubID, enum Putter_t putterID, enum ShotType_t shotTypeID, float stanceID, float shotPowerPercent, float shotAngle, float* clubFaceDirection, float* strokeDirection, enum PhysicsMishitType mishitType, uint8 mishitSeverity, float* linearVelocity, float* angularVelocity)
+                         local  float shotVelocity
+                         local  float adjustedImpactScale
+                         local  float adjustedImpactSpinScale
+                         local  float sinHeading
+                         local  float cosHeading
+                         local  float temp
+                         local  float clubImpact
+                         local  float sideHillAngle
+                         local  float sideHillSin
+                         local  float sideHillCos
+                         local  vec4flt surfaceNormal
+                         local  vec4flt ClubStroke
+                         local  vec4flt ClubFace
+                         local  vec4flt Vn
+                         local  vec4flt Vt
+                         local  vec4flt Vf
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  bool leftHanded
+                         inlines  LLMath_Add3, LLMath_AddScale3, LLMath_CrossProduct3W0, LLMath_DotMul3, LLMath_DotProduct3, LLMath_Scale3, LLMath_Subtract3, RotateXY, __vec_dot3, __vec_make_from_scalar, __vec_mul, mySinCos, std::cosf, vec_ld, vec_madd, vec_nmsub, vec_perm, vec_sld, vec_splat, vec_sub
+ 1521  001645B4    1A0  void Physics_ThrowBall(struct PhysicsBall_t* pBall, float speed, float* direction, float* initialLocation)
+                         inlines  LLMath_Scale3, PhysicsBall_t::SetFlag, __vec_mul, vec4flt_Copy, vec_ld, vec_splat
+ 1568  001CC574    5A8  void Physics_ShotImpact(struct PhysicsBall_t* pBall, enum Club_t clubID, enum Putter_t putterID, enum ShotType_t shotTypeID, float stanceID, float shotPowerPercent, float shotAngle, float* clubFaceDirection, float* strokeDirection, enum PhysicsMishitType mishitType, uint8 mishitSeverity)
+                         inlines  PhysicsBall_t::ClearFlag, PhysicsBall_t::SetFlag, vec4flt_Copy, vec4flt_Copy3
+ 1677  0012BB00     BC  void Physics_SetSpin(struct PhysicsBall_t* pBall, float sideSpin, float forwardSpin)
+ 1694    inline-only   static void Physics_BallFlying(struct PhysicsBall_t* pBall, float deltaTime)
+                         local  vec4flt tWind
+                         local  vec4flt Ve
+                         local  vec4flt Ad
+                         local  vec4flt Ld
+                         local  vec4flt Al
+                         local  float st1
+                         local  float st2
+                         local  float st3
+                         local  float temp
+                         local  float ReNum
+                         local  float Cd
+                         local  float drag
+                         local  float spinParam
+                         local  float ballAltitude
+                         local  float Cl
+                         local  float lift
+                         local  vec4flt rotationAxis
+                         local  vec4flt velocityAxis
+ 1933  001B6F8C    3A0  static bool Physics_GetSurfaceInfo(struct PhysicsBall_t* pBall, struct TGD_MaterialInfo** ppSurfaceInfo, float* pSurfaceNormal)
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  struct TGD_MaterialInfo* pSurfaceInfo2
+                         local  vec4flt surfaceNormal
+                         local  vec4flt surfaceNormal2
+                         local  float temp
+                         local  float y
+                         inlines  vec4flt_Copy, vec4flt_Copy3, vec_st
+ 2021    inline-only   static void Physics_BallRollingandSlipping(struct PhysicsBall_t* pBall, float deltaTime)
+                         local  vec4flt surfaceNormal
+                         local  vec4flt Ac
+                         local  vec4flt T
+                         local  vec4flt Nt
+                         local  vec4flt Aa
+                         local  float temp
+                         local  float st1
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  vec4flt impulse
+ 2149  0014D0C0     34  bool CO_Physics_HandleCollision_LoadLuaTuningScript(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 2155  0012BCB4    164  bool CO_Physics_ToggleTW08Physics(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  char[8] enabled_text
+                         local  char[9] disabled_text
+ 2166  001A45FC   2628  static float Physics_HandleCollision(struct PhysicsBall_t* pBall, float* surfaceNormal, struct TGD_MaterialInfo* pSurfaceInfo)
+                         local  float t
+                         local  float surfaceFriction
+                         local  float temp
+                         local  float VMag
+                         local  float NvMag
+                         local  float PtMag
+                         local  float soilFactor
+                         local  float bankAngle
+                         local  float sinBankAngle
+                         local  float cosBankAngle
+                         local  float restitution
+                         local  float grip
+                         local  float pitchAngle
+                         local  float sinPitch
+                         local  float cosPitch
+                         local  float headingAngle
+                         local  float sinHeading
+                         local  float cosHeading
+                         local  bool upsideDownCollison
+                         local  vec4flt bTemp
+                         local  vec4flt bTemp1
+                         local  vec4flt bTemp2
+                         local  vec4flt R
+                         local  vec4flt Vc
+                         local  vec4flt Vt
+                         local  vec4flt Nt
+                         local  vec4flt Pnt
+                         local  vec4flt modSurfaceNormal
+                         local  float termVel
+                         local  float newNvMag
+                         local  vec4flt R
+                         local  vec4flt Vn
+                         local  float Vn_length
+                         local  vec4flt Vt
+                         local  float Vt_length
+                         local  vec4flt Wc
+                         local  vec4flt Vc
+                         local  float Vc_length
+                         local  float grip
+                         local  float restitution
+                         local  float surfaceFriction
+                         local  float terminalVy
+                         local  vec4flt jL
+                         local  const float kStaticFrictionThreshold
+                         local  float I
+                         local  float I_inverse
+                         local  vec4flt jR
+                         local  const float kRollingVerThreshold
+                         local  const float kRollingHorThreshold
+                         local  vec4flt suckaTarget
+                         local  vec4flt ballToSuckaTargetXZ
+                         local  vec4flt linearVelocityXZ
+                         local  float ballSpeedXZ
+                         local  float randomValue
+                         local  float treeDensityModFactor
+                         local  vec4flt cupPosition
+                         local  vec4flt vecToCup
+                         local  vec4flt normVel
+                         local  float speed
+                         local  float length
+                         local  float grassWeedDampen
+                         local  float treeDensityPercent
+                         local  float treeDensityModifier
+                         local  float luckPercent
+                         local  float luckModifier
+                         local  float u
+                         inlines  LLMath_Add3, LLMath_AddScale3, LLMath_CrossProduct3W0, LLMath_DotProduct3, LLMath_Length3, LLMath_LengthSquared3, LLMath_Negate3, LLMath_Scale3, LLMath_Subtract3, LuaTuningFileManager::Call<float, uint32, float>, Misc_RandFuncf, RotateXY, __vec_dot3, __vec_len_sqr3, __vec_make_from_scalar, __vec_mul, std::cosf, std::sinf, std::sqrt, vec4flt_Copy, vec4flt_Copy3, vec_ld, vec_madd, vec_nmsub, vec_perm, vec_sld, vec_splat, vec_st, vec_sub
+ 2863  001B732C     FC  static bool Physics_CheckPreConditionsForCollision(struct PhysicsBall_t* pBall, const vec4flt& oldLocation, const vec4flt& newLocation)
+                         inlines  LLMath_SquareDistanceBetween3, __vec_len_sqr3, vec4flt_Copy3, vec_madd, vec_sld
+ 2882  001B6384    2BC  static void Physics_SendCollisionEvents(struct PhysicsBall_t* pBall, struct TGD_MaterialInfo* pSurfaceInfo, TGD_ObjectInstanceInfo* pSurfaceObject)
+                         local  vec4flt src
+                         local  vec4flt dest
+                         local  float dist2d
+                         inlines  LLMath_DistanceBetween3, PhysicsBall_t::SetFlag, vec4flt_Copy, vec_madd, vec_sld, vec_sub
+ 2942    inline-only   static bool Physics_CheckObjectCollisions(struct PhysicsBall_t* pBall, float deltaTime)
+                         local  vec4flt collisionLocation
+                         local  vec4flt surfaceNormal
+                         local  vec4flt oldLocation
+                         local  vec4flt newLocation
+                         local  float NvMagSqr
+                         local  float distanceToPin
+                         local  TGD_ObjectInstanceInfo* pSurfaceObject
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  bool result
+                         local  float speed
+ 3040  0012BE30    104  uint32 Physics_GetAnticipatedLieFromSurface(const struct TGD_MaterialInfo* pSurfaceInfo)
+ 3084  0019E24C    53C  static void Physics_SetLie(struct PhysicsBall_t* pBall, struct TGD_MaterialInfo* pSurfaceInfo)
+                         local  uint32 randValue
+                         local  uint32 luckRating
+                         local  uint32 expertCheck
+                         local  int32 tempLuckRating
+                         local  int32 newSurfacID
+                         inlines  PhysicsBall_t::SetFlag
+ 3287  0019E03C    210  void Physics_ComputeBallLieModifier(struct PhysicsBall_t* pBall)
+                         local  uint32 posNeg
+                         local  float buryModifier
+                         local  uint32 luckRating
+                         local  int32 tempLuckRating
+                         inlines  Misc_RandFuncf
+ 3325    inline-only   static bool Physics_ProcessCollision(struct PhysicsBall_t* pBall, float deltaTime, float* collisionLocation, float* surfaceNormal, struct TGD_MaterialInfo* pSurfaceInfo, TGD_ObjectInstanceInfo* pSurfaceObject, float* percentBeforeBounce)
+                         local  float distanceBeforeBounce
+                         local  float totalDistance
+                         local  const int maxPassThroughCollisions
+                         local  int i
+                         local  int[5] index
+                         local  int numPassThroughCollisions
+                         local  int32 tempRand
+                         local  int32 rand1
+                         local  int32 rand2
+                         local  float sinAngle
+                         local  float cosAngle
+                         local  float sinAngle
+                         local  float cosAngle
+                         local  float randomX
+                         local  float randomZ
+                         local  int32 luckRating
+                         local  float luckApplication
+                         local  float speed
+                         local  vec4flt temp
+                         local  vec4flt src
+                         local  vec4flt dest
+                         local  float dist2d
+                         local  vec4flt newW
+                         local  float tempSpin
+                         local  float shotAngle
+                         local  float shotSin
+                         local  float shotCos
+                         local  vec4flt newW
+                         local  float shotAngle
+                         local  float shotSin
+                         local  float shotCos
+ 3573  001B6640    654  static void Physics_FixBallHeight(struct PhysicsBall_t* pBall, float deltaTime, bool ballStopped)
+                         local  float groundHeight
+                         local  bool didSafetyCheck
+                         local  float speed
+                         inlines  AIMgr, LLMath_AddScale3, LLMath_Length3, LLMath_SquareDistanceBetween3, Physics_CheckObjectCollisions, vec4flt_Copy3, vec_madd, vec_sld
+ 3657  001B6C94    1D0  static void Physics_StopBall(struct PhysicsBall_t* pBall)
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+ 3742  001C7548   1524  static bool Physics_CheckTerrainCollisions(struct PhysicsBall_t* pBall, float deltaTime)
+                         local  vec4flt collisionLocation
+                         local  vec4flt surfaceNormal
+                         local  vec4flt oldLocation
+                         local  vec4flt newLocation
+                         local  float NvMagSqr
+                         local  float percentBeforeBounce
+                         local  float timeAfterBounce
+                         local  int32 surfaceID
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  TGD_ObjectInstanceInfo* pSurfaceObject
+                         local  int32 surfaceID
+                         local  bool result
+                         local  float speed
+                         local  vec4flt temp
+                         local  float velocity2D
+                         local  float sinAngle
+                         local  float cosAngle
+                         local  float randomX
+                         local  float randomZ
+                         local  int32 luckRating
+                         local  float luckApplication
+                         local  vec4flt newW
+                         local  float shotAngle
+                         local  float shotSin
+                         local  float shotCos
+                         local  int32 tempRand
+                         local  int32 rand1
+                         local  int32 rand2
+                         local  float sinAngle
+                         local  float cosAngle
+                         local  float speed
+                         local  vec4flt newW
+                         local  float tempSpin
+                         local  float shotAngle
+                         local  float shotSin
+                         local  float shotCos
+                         local  vec4flt src
+                         local  vec4flt dest
+                         local  float dist2d
+                         inlines  AIMgr, GM_GetGolferUp, LLMath_Add3, LLMath_AddScale3, LLMath_DistanceBetween3, LLMath_Length3, LLMath_Scale, Misc_RandFuncf, PhysicsBall_t::SetFlag, Physics_ProcessCollision, RotateXY, __vec_len_sqr3, mySinCos, std::cosf, std::sinf, std::sqrt, vec4flt_Copy, vec4flt_Copy3, vec_madd, vec_sld, vec_sub
+ 4009  001B6268     90  static float Physics_GetDistanceToCup(struct PhysicsBall_t* pBall)
+                         inlines  LLMath_DistanceBetween3
+ 4015  001B62F8     8C  void Physics_InitShotData(struct PhysicsBall_t* pBall)
+                         local  int i
+                         inlines  PhysicsBall_t::ClearFlag, vec4flt_Copy
+ 4032  001A6C24    5F8  static void Physics_ApplySuperSucka(struct PhysicsBall_t* pBall, float deltaTime, float* impulse)
+                         local  vec4flt vecToHole
+                         local  vec4flt ballVel
+                         local  vec4flt cupPosition
+                         local  vec4flt vecToCup
+                         local  vec4flt normVel
+                         local  float speedTweak
+                         local  float speed
+                         local  float distance
+                         local  float maxSpeed
+                         local  float dot
+                         local  vec4flt projVec
+                         local  vec4flt diffVec
+                         inlines  LLMath_AddScale3, LLMath_DotMul3, LLMath_DotProduct3, LLMath_Length3, LLMath_Scale3, LLMath_Subtract3, PhysicsBall_t::SetFlag, __vec_dot3, __vec_len_sqr3, __vec_mul, vec4flt_Copy, vec4flt_Copy3, vec_ld, vec_madd, vec_sld, vec_splat, vec_st, vec_sub
+ 4178    inline-only   static void Physics_BallRolling(struct PhysicsBall_t* pBall, float deltaTime)
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  vec4flt surfaceNormal
+                         local  vec4flt Ac
+                         local  vec4flt T
+                         local  vec4flt R
+                         local  vec4flt Nt
+                         local  vec4flt precession
+                         local  float temp
+                         local  float rollingFriction
+                         local  float torqueX
+                         local  float torqueZ
+                         local  float precessionMag
+                         local  float bankAngle
+                         local  float pitchAngle
+                         local  float sinAngle
+                         local  float cosAngle
+                         local  float x
+                         local  float y
+                         local  float z
+                         local  bool precessionNegFlag
+                         local  float tanVel
+                         local  vec4flt impulse
+ 4458    inline-only   static float Physics_GetBallAltitude(struct PhysicsBall_t* pBall)
+                         local  float groundHeight
+                         local  float coveringHeight
+                         local  vec4flt supportingNormal
+                         local  vec4flt coveringNormal
+                         local  struct TGD_MaterialInfo* pSupportingSurfaceInfo
+                         local  struct TGD_MaterialInfo* pCoveringSurfaceInfo
+                         local  vec4flt cupPosition
+                         local  float distToCup
+                         local  float lowestHeight
+ 4531  0012BF34     6C  float Physics_GetBallAltitudeForIGC(struct PhysicsBall_t* pBall)
+                         local  float groundHeight
+                         local  float coveringHeight
+                         local  vec4flt supportingNormal
+                         local  vec4flt coveringNormal
+                         local  struct TGD_MaterialInfo* pSupportingSurfaceInfo
+                         local  struct TGD_MaterialInfo* pCoveringSurfaceInfo
+ 4549  001C8A6C   1CB4  static void Physics_QuickSimulate(struct PhysicsBall_t* pBall, float deltaTime)
+                         local  float temp
+                         local  float curDist
+                         local  float deltaDist
+                         local  vec4flt cupPosition
+                         local  float distToCup
+                         local  float Cl
+                         local  float lift
+                         local  vec4flt rotationAxis
+                         local  vec4flt velocityAxis
+                         local  float lowestHeight
+                         inlines  LLMath_AddScale3, LLMath_CrossProduct3W0, LLMath_DistanceBetween3, LLMath_Length3, LLMath_Negate3, LLMath_Scale3, PhysicsBall_t::SetFlag, Physics_BallFlying, Physics_BallRolling, Physics_BallRollingandSlipping, Physics_CalcCL, Physics_GetBallAltitude, RotateXY, __vec_len_sqr3, __vec_make_from_scalar, __vec_mul, mySinCos, std::cosf, std::sqrt, vec4flt_Copy, vec4flt_Copy3, vec_ld, vec_madd, vec_nmsub, vec_perm, vec_sld, vec_splat, vec_sub
+ 4677  001CA82C    260  int32 Physics_Simulate(struct PhysicsBall_t* pBall, int32 simuTicksElapsed)
+                         local  float deltaTime
+                         local  bool isAcceptable
+                         local  bool isPreferred
+                         inlines  vec4flt_Copy3
+ 4756    inline-only   static void Physics_TimedSimulation_local(struct PhysicsBall_t* pBall, float totalTime, float timeInterval)
+                         local  bool wasEstimated
+ 4811  001CA720    10C  void Physics_TimedSimulation(struct PhysicsBall_t* pBall, float totalTime, float timeInterval)
+                         inlines  PhysicsBall_t::SetFlag, PhysicsBall_t::SetFlagState, PhysicsBall_t::TestFlag, Physics_TimedSimulation_local
+ 4845  001D0D34     68  void Physics_EstimateShot(struct PhysicsBall_t* pBall, enum Club_t clubID, enum Putter_t putterID, enum ShotType_t shotTypeID, float shotPowerPercent, float shotAngle, float* clubFaceDirection, float* strokeDirection)
+ 4898  0015B4D8     B8  void Physics_UpdateNonTeeShotBallHeight(struct PhysicsBall_t* pBall, const float* posn)
+                         local  vec4flt tempPos
+                         local  vec4flt tempNormal
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  float height
+                         inlines  vec4flt_Copy
+ 4920  0019E788    28C  bool Physics_DropBall(struct PhysicsBall_t* pBall, const float* where)
+                         local  vec4flt newLocation
+                         local  float groundHeight
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         inlines  PhysicsBall_t::ClearFlag, vec4flt_Copy3
+ 4961  001518B8    19C  bool Physics_CalculateDropLocation(struct PhysicsBall_t* pBall, float* initialPos, float* newLocation)
+                         local  float groundHeight
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         inlines  vec4flt_Copy3
+ 4992  00151A54    114  bool Physics_KeepBallAboveGround(struct PhysicsBall_t* pBall)
+                         local  vec4flt newLocation
+                         local  float groundHeight
+                         inlines  vec4flt_Copy3
+ 5056  001576CC    14C  bool Physics_SetBallPosition(struct PhysicsBall_t* pBall, const float* where)
+                         local  float groundHeight
+                         local  vec4flt newLocation
+                         inlines  PhysicsBall_t::ClearFlag, vec4flt_Copy3
+ 5085  0018D990    2E8  int32 Physics_InitBall(struct PhysicsBall_t* pBall, const float* initialPosition, int32 playerID, bool estimated)
+                         local  float groundHeight
+                         local  float kTeeHeight
+                         local  int i
+                         local  float fSupportingGroundHeight
+                         inlines  PhysicsBall_t::ClearAllFlags, PhysicsBall_t::SetFlagState, Singleton<GolferStats>::GetSingleton, vec4flt_Copy, vec_st
+ 5223  0012BFA0     20  void Physics_SetMinFloor(bool on, float height)
+ 5230  0012BFC0     9C  void Physics_SetWetScaleByType(int32 whatValue)
+                         local  float theValue
+ 5243  0012C05C     70  void Physics_SetWetScale(float value)
+ 5251  0012C0CC     88  void Physics_SetWetScalePercent(float value)
+ 5259  0012C154     40  enum SFX_GROUND_CONDITION_e Physics_GetWetScaleGroundCondition()
+ 5267  0012C194     64  float Physics_GetWetScalePercent()
+                         local  float wetPercent
+ 5282  00128CAC     9C  void Physics_SetGreenSpeedByType(int32 whatValue)
+                         local  float theValue
+ 5305  0012C1F8     18  void Physics_SetGreenSpeed(float speed)
+ 5311  0012C210     88  void Physics_SetGreenSpeedPercent(float value)
+ 5318  0012C298     7C  void Physics_GetGreenSpeedPercent(float* speed)
+ 5328  0012C314     1C  void Physics_GetGreenSpeed(float* speed)
+ 5334  0012C330     30  enum SFX_GROUND_CONDITION_e Physics_GetGreenGroundCondition()
+ 5343    inline-only   static int Physics_GetGreenSpeedType()
+                         local  int i
+ 5358  00128D48     BC  void Physics_SetGreenHardnessByType(int32 whatValue)
+                         local  float theValue
+ 5381  0012C360     20  void Physics_SetGreenHardness(float hardness, float BounceOffset)
+ 5388  0012C380     A8  void Physics_SetGreenHardnessPercent(float value)
+ 5396  0012C428     7C  void Physics_GetGreenHardnessPercent(float* hardness)
+ 5407  0012C4A4     28  void Physics_GetGreenHardness(float* hardness, float* BounceOffset)
+ 5434  00128EA0     BC  void Physics_SetFairwaySpeedByType(int32 whatValue)
+                         local  float theValue
+ 5454  0012C4CC     20  void Physics_SetFairwaySpeed(float speed, float BounceOffset)
+ 5461  0012C4EC     A8  void Physics_SetFairwaySpeedPercent(float value)
+ 5469  0012C594     7C  void Physics_GetFairwaySpeedPercent(float* speed)
+ 5479  0012C610     28  void Physics_GetFairwaySpeed(float* speed, float* BounceOffset)
+ 5486  0012C638     30  enum SFX_GROUND_CONDITION_e Physics_GetFairwayGroundCondition()
+ 5497  00128E04     9C  void Physics_SetRoughLengthByType(int32 whatValue)
+                         local  float theValue
+ 5515  0012C668     18  void Physics_SetRoughLength(float value)
+ 5521  0012C680     88  void Physics_SetRoughLengthPercent(float value)
+ 5528  0012C708     E8  void Physics_GetRoughLengthPercent(float* length)
+ 5541  0012C7F0     18  float Physics_GetRoughLength()
+ 5548  0012C808     9C  void Physics_SetTreeDensityByType(int32 whatValue)
+                         local  float theValue
+ 5566  0012C8A4     18  void Physics_SetTreeDensity(float whatValue)
+ 5572  0012C8BC     84  void Physics_SetTreeDensityPercent(float value)
+ 5578  0012BE18     18  float Physics_GetTreeDensity()
+ 5584  0012C940     9C  void Physics_SetSandSpeedByType(int32 whatValue)
+                         local  float theValue
+ 5602  0012C9DC     18  void Physics_SetSandSpeed(float whatValue)
+ 5608  0012C9F4     88  void Physics_SetSandSpeedPercent(float value)
+ 5615  0012CA7C     7C  void Physics_GetSandSpeedPercent(float* speed)
+ 5625  0012CAF8     18  float Physics_GetSandSpeed()
+ 5632  0012CB10    170  void* Physics_MaterialSpeedsCallback(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 5648  0012CC80     98  void Physics_InitOnce()
+ 5667  0012E848   103C  void Physics_InitModule()
+                         local  int id
+                         local  int catId
+                         local  int32 tuneId
+                         local  int id2
+ 5904  0012CD18      4  void Physics_CloseModule()
+ 5926  0019EA7C    69C  float Physics_CalcClubImpact(enum Club_t clubID, enum Putter_t putterID, enum ShotType_t shotTypeID, float stanceID, float shotPowerPercent, enum PhysicsMishitType mishitType, uint8 mishitSeverity)
+                         local  float clubImpact
+                         local  float mishitPowerMod
+                         local  int greenspeedtype
+                         local  float targetDist
+                         local  int index_low
+                         local  int index_high
+                         local  float ratio
+                         local  int i
+                         inlines  Misc_RandFuncf, Physics_GetGreenSpeedType
+ 6230  0012CD1C    1D0  float Physics_CalcFaceAngle(enum Club_t clubID, enum ShotType_t shotTypeID, float stanceID)
+                         local  float faceAngle
+ 6307  001A234C    4C4  float Physics_CalcClubStroke(const struct PhysicsBall_t* pBall, enum Club_t clubID, enum ShotType_t shotTypeID, float* strokeDirection, float shotAngle, float stanceID, float* surfaceNormal, float* ClubStroke, bool leftHanded, enum PhysicsMishitType mishitType, uint8 mishitSeverity)
+                         local  float shotVelocityMod
+                         local  float sinAngle
+                         local  float cosAngle
+                         local  float mishitStrokeAngle
+                         local  float feetAngle
+                         local  const float HILL_EFFECT_SCALE
+                         local  float magicAngle
+                         local  float strokeAngle
+                         inlines  Misc_RandFuncf, Physics_GetFeetAngle_ForwardBackward, RotateXY, mySinCos, std::cosf, vec4flt_Copy3
+ 6420  001A2810    164  float Physics_CalcSidehillAngle(const struct PhysicsBall_t* pBall, float shotAngle, float* surfaceNormal)
+                         local  float sideHillAngle
+                         inlines  Physics_GetFeetAngle_RightLeft, RotateXY, std::cosf, vec4flt_Copy3
+ 6448  001A2974    40C  void Physics_CalcClubFace(enum Club_t clubID, enum ShotType_t shotTypeID, float stanceID, float sideHillAngle, float* clubFaceDirection, float* ClubFace, struct TGD_MaterialInfo* pSurfaceInfo, bool leftHanded, enum PhysicsMishitType mishitType, uint8 mishitSeverity)
+                         local  float sinAngle
+                         local  float cosAngle
+                         local  float faceAngle
+                         local  struct PhysicsBall_t* theBall
+                         local  float rotAngle
+                         inlines  Misc_RandFuncf, RotateXY, mySinCos, std::cosf, vec4flt_Copy3
+ 6550  00160C8C    2EC  void Physics_CalcAdjImpactScale(const struct PhysicsBall_t* pBall, struct TGD_MaterialInfo* pSurfaceInfo, enum Club_t clubID, enum ShotType_t shotTypeID, float stanceID, const float& adjustedImpactScale, const float& adjustedImpactSpinScale)
+                         local  float expertRoughMod
+                         local  float impactV_Modifier
+ 6627  0012BBDC     D8  float Physics_GetCd(float ReynoldsNumber)
+                         local  float Cd
+                         local  int32 i
+                         local  float frac
+ 6644  0012CEEC    158  float Physics_CalcFadeAngle(enum Club_t clubID, float dist)
+                         local  const float* clubFadeAngles
+                         local  int i
+                         local  float hiDist
+                         local  float loDist
+                         local  float hiAngle
+                         local  float loAngle
+                         local  float interpScale
+                         local  float interpAngle
+ 6701  0012D044    158  float Physics_CalcDistFromFadeAngle(enum Club_t clubID, float angle)
+                         local  const float* clubFadeAngles
+                         local  int i
+                         local  float hiDist
+                         local  float loDist
+                         local  float hiAngle
+                         local  float loAngle
+                         local  float interpScale
+                         local  float interpDist
+ 6845  001D194C     44  static void* Physics_TestCB(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 6872  0012D19C    110  static char* Physics_GetSurfaceName(int32 surfaceID)
+ 6887  001D0D9C    BB0  void Physics_Test(uint32 test)
+                         local  int32 i
+                         local  int32 currentShot
+                         local  int32 currentClub
+                         local  int32 startTerrain
+                         local  int32 endTerrain
+                         local  struct PhysicsBall_t testBall
+                         local  vec4flt initLocation
+                         local  vec4flt strokeDirection
+                         local  vec4flt clubFaceDirection
+                         local  vec4flt initialW
+                         local  float currentPower
+                         local  int tableSize
+                         local  const float* constShotEstimateTable
+                         local  float* shotEstimateTable
+                         local  int32 index
+                         local  float sinAngle
+                         local  float cosAngle
+                         local  int tableSize
+                         inlines  RotateXY, mySinCos, std::cosf, vec4flt_Copy3
+ 7222  001D0494    8A0  void Physics_ChipRatioTest()
+                         local  int32 i
+                         local  int32 j
+                         local  int32 currentShot
+                         local  int32 currentClub
+                         local  int32 startTerrain
+                         local  int32 endTerrain
+                         local  struct PhysicsBall_t testBall
+                         local  vec4flt initLocation
+                         local  vec4flt strokeDirection
+                         local  vec4flt clubFaceDirection
+                         local  vec4flt initialW
+                         local  float currentPower
+                         local  vec4flt gTCR_InitialBallPos
+                         local  vec4flt gTCR_ImpactBallPos
+                         local  vec4flt gTCR_FinalBallPos
+                         local  vec4flt gTCR_TopArcPos
+                         local  char[32] tempBuff
+                         local  float fCarryDist
+                         local  float fRollDist
+                         local  float fTopArcHeight
+                         local  bool ballImpacted
+                         local  bool topArcRecorded
+                         local  float finalShotLength
+                         local  float[26] gChipShotTargetRollDistances
+                         local  float[26] gChipShotTargetCarryDistances
+                         local  float[26] gRecordedClubAngles
+                         local  float[26] gRecordedClubImpacts
+                         local  float testRollDist
+                         local  float testCarryDist
+                         inlines  LLMath_DistanceBetween3, __vec_len_sqr3, vec4flt_Copy, vec_st
+ 7489  001CFF38    55C  void Physics_ClubImpactTest()
+                         local  int32 i
+                         local  int32 j
+                         local  int32 currentShot
+                         local  int32 currentClub
+                         local  int32 startTerrain
+                         local  int32 endTerrain
+                         local  struct PhysicsBall_t testBall
+                         local  vec4flt initLocation
+                         local  vec4flt strokeDirection
+                         local  vec4flt clubFaceDirection
+                         local  vec4flt initialW
+                         local  float currentPower
+                         local  vec4flt gTCR_InitialBallPos
+                         local  vec4flt gTCR_ImpactBallPos
+                         local  vec4flt gTCR_FinalBallPos
+                         local  char[32] tempBuff
+                         local  bool ballImpacted
+                         local  float finalShotLength
+                         local  float targetDistance
+                         local  enum Putter_t currentPutter
+                         local  float[26] gRecordedClubImpacts
+                         local  float diff
+                         local  float inc
+                         inlines  LLMath_DistanceBetween3, std::fabs, vec4flt_Copy, vec_st
+ 7632  001CF8F4    644  void Physics_BallInStanceImpactRatio()
+                         local  int32 i
+                         local  int32 j
+                         local  int32 currentShot
+                         local  int32 currentClub
+                         local  int32 startTerrain
+                         local  int32 endTerrain
+                         local  struct PhysicsBall_t testBall
+                         local  vec4flt initLocation
+                         local  vec4flt strokeDirection
+                         local  vec4flt clubFaceDirection
+                         local  vec4flt initialW
+                         local  float currentPower
+                         local  vec4flt gTCR_InitialBallPos
+                         local  vec4flt gTCR_ImpactBallPos
+                         local  vec4flt gTCR_FinalBallPos
+                         local  char[32] tempBuff
+                         local  bool ballImpacted
+                         local  float finalShotLength
+                         local  float targetDistance
+                         local  enum Putter_t currentPutter
+                         local  float stance
+                         local  int32 count
+                         local  float* BISTargetDistanceTable
+                         local  int frontBack
+                         local  float diff
+                         local  float inc
+                         inlines  LLMath_DistanceBetween3, std::fabs, vec4flt_Copy, vec_st
+ 7808  001CEFAC    948  void Physics_PutterImpactTest()
+                         local  int32 i
+                         local  int32 j
+                         local  int32 k
+                         local  int32 currentShot
+                         local  int32 currentClub
+                         local  int32 startTerrain
+                         local  int32 endTerrain
+                         local  struct PhysicsBall_t testBall
+                         local  vec4flt initLocation
+                         local  vec4flt strokeDirection
+                         local  vec4flt clubFaceDirection
+                         local  vec4flt initialW
+                         local  float currentPower
+                         local  vec4flt gTCR_InitialBallPos
+                         local  vec4flt gTCR_ImpactBallPos
+                         local  vec4flt gTCR_FinalBallPos
+                         local  char[32] tempBuff
+                         local  bool ballImpacted
+                         local  float finalShotLength
+                         local  float targetDistance
+                         local  float inc
+                         local  enum Putter_t currentPutter
+                         local  int t
+                         local  float[28] gRecordedPutterImpacts
+                         local  float[28] gRecordedPutterDistance
+                         local  float[64] finalShotLengthHistory
+                         local  int history_start
+                         local  int history_end
+                         local  bool history_wrapped
+                         local  float delta_scale
+                         local  float min_delta
+                         local  float prevClubImpactLower
+                         local  float prevClubImpactHigher
+                         local  char*[5] gGreenSpeedStr
+                         local  int p
+                         local  int n
+                         local  float diff
+                         inlines  LLMath_DistanceBetween3, std::fabs, vec4flt_Copy, vec_st
+ 8153  001CE70C    1F0  void Physics_SimulateBallForFadeDraw(int currentClub, int currentShot, float* clubFaceDirection, const vec4flt& initialPos, const vec4flt& impactPos, const vec4flt& finalPos)
+                         local  bool ballImpacted
+                         local  int j
+                         local  vec4flt initLocation
+                         local  vec4flt strokeDirection
+                         local  vec4flt initialW
+                         local  struct PhysicsBall_t testBall
+                         local  enum Putter_t currentPutter
+                         inlines  vec4flt_Copy, vec_st
+ 8197  001CE8FC    6B0  void Physics_BuildFadeDrawTable()
+                         local  int32 i
+                         local  int32 currentShot
+                         local  int32 currentClub
+                         local  int32 startTerrain
+                         local  int32 endTerrain
+                         local  vec4flt clubFaceDirection
+                         local  float currentPower
+                         local  int savePerfectShotSetting
+                         local  vec4flt gTCR_InitialBallPos
+                         local  vec4flt gTCR_ImpactBallPos
+                         local  vec4flt gTCR_FinalBallPos
+                         local  vec4flt gPerfectShotPos
+                         local  float gClubRadius
+                         local  float gDistToCenter
+                         local  float gTestFadeDrawAngle
+                         local  float gPrevTestFadeDrawAngle
+                         local  float prevFadeDrawLower
+                         local  float prevFadeDrawHigher
+                         local  float inc
+                         local  float delta_scale
+                         local  float min_delta
+                         local  float[12] gRecordedFade
+                         local  float[12] gRecordedFadeDist
+                         local  float fSin
+                         local  float fCos
+                         local  float diff
+                         inlines  LLMath_DistanceBetween3, std::cosf, std::fabs, std::sinf, vec4flt_Copy
+ 8405  0016D868     60  void Physics_InitOptionsForInGame()
+ 8418  001B7428    130  float Physics_GetLeftRightCrowdCollision(enum PlayerNumber_t PlayerID)
+                         local  float crowdCollision
+                         local  float dist
+                         local  struct PhysicsBall_t* pBall
+                         local  bool left
+                         inlines  GamePlayer::GetEstimatedBall, LLMath_DistanceBetween3

@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/headers/LLParse.h
+// compiled in: Legacy_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   40  0038E7A8      4  void CFParser::CFParser(const struct CFParser* this)
+   41  0037DC44      4  void CFParser::~CFParser(const struct CFParser* this)
+   75    inline-only   void CFParser::SelectCommand(const struct CFParser* this, int index)
+   76    inline-only   int CFParser::GetSelectedCommand(const const struct CFParser* this)
+   77    inline-only   void CFParser::UnselectCommand(const struct CFParser* this)
+   80    inline-only   int CFParser::NumCommands(const const struct CFParser* this)

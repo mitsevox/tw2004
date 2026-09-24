@@ -1,0 +1,44 @@
+map-01 near-miss wave (2026-09-24 06:29-07:40), range 0x80116DD8 .. SDK (fresh eyes after map-02/map-09).
+
+DONE
+- gbacable fn_8012311C exact: pCh = lbl_80260E18; pCh += nChan; (two steps). With pCh = &lbl[nChan] CW
+  folds the later lbl_80260E18[nChan].n0 = 2 store into pCh (stw 0(r30)); EA's is stwx base+off.
+- UIS: fn_8016C614/fn_8016C674 take the event as u32 (like fn_8016C5C4), cast (u16) in the compare:
+  fn_80168918 no longer masks nEvent at the calls. fn_8016A2D4 87.5 -> 90.3, fn_8016A030 93.4 -> 94.4.
+- UISEvent fn_80165B90 83.9 -> 99.6: the event data pointer is NOT const (const let CW hoist the
+  16-byte copy's loads above the header stores). Left: extsh nB before nA.
+- The event-args count is s32 through fn_80168DB0 / fn_80168CD8 / UIStudio_Send / fn_8016A2D4 (EA's
+  callers pass it unmasked); fn_80168FC8 returns u8 (caller clrlwi.). fn_80165670 91.2 -> 96.5:
+  pTop walked (pData = (UISEventData*)(pTop -= 7); pTop -= 1; pTop -= nArgs; pArgs = pTop;),
+  NoneWaiting reads type/uA/uB into locals before testing, pData declared before nArgs.
+
+- UISScreen fn_8016B6BC exact: UIS_NodeLinks / UIS_LinkedOn declare pGroup, pEntry (and pLinked)
+  at the top, before i/j, instead of block-scoped (98.86 -> 99.52 -> 100).
+- UISApi fn_80169858 97.0 -> 97.6: bFixed is s32 (EA tests fn_80169DC4's result unmasked).
+
+TRIED, NO GAIN
+- UISScreen fn_8016AEEC (97.27): function-level pEntry/pGroup/pfnHandler, 7 orders: best 97.59 (not kept).
+- UISApi fn_80169308 (96.8): pRecords[i]./pStudio->p60[i]. in the while loop (worse), 8 decl orders.
+- GameMode22 fn_801264B8: EA keeps gSession.nNumPlayers in r9 across both loops (a count local), but
+  map-02 found a count local drops it to 50-64.
+- gbacable fn_80123E34: pType removed (pCh->u5C / lbl[nChan].u5C in the inner loop) 97.2.
+- UIStudio fn_80168918 (96.5, nEvent u16 best; s32 96.25): (s16)nNode operand swap, pHandler local,
+  const s32* p, int/u32 uScreen/uGroup, int bOn. Param registers rank differently from EA's
+  (EA: p > pInfo > nId > pStudio > locals > uGroup/uScreen/bOn).
+- UISScreen fn_8016C614 / fn_8016C6C4 (EA masks the 3rd u16 param after `i = 0`): local copy,
+  operand swaps, nested ifs, i = 0 split, u32 param + cast. GC/2.0 on UISScreen+UISApi: identical.
+  -O4,s on UIS files: much worse. -inline auto on UIStudio/UISEvent and pool_data on for the rest:
+  identical.
+- UISApi fn_80169D90 (66.8): statement splits, operand orders, s32/int params.
+- UISApi fn_80168F5C (88.1): store order, casts, local copies, an inline helper for the queue call.
+- UISApi fn_80168FC8 (99.64, uScreen/pScreen regs swapped): pScreen decl first/last, two-step pScreen.
+- UISEvent fn_80165528 (99.57, r0/r3 swap): switch (p[0]), int/u32 nType, statement moves, 40 decl
+  orders.
+- UISEvent fn_80165ACC: uScreen u32 + (u16) cast (same; hurts fn_80168FC8).
+- UISEvent fn_80165670 bUnloading stwx: only the raw-offset form gives it (not kept).
+- UISEvent fn_80165E9C (95.6): fStep split into statements, pRateFn->u10 / ->fTarget reads. The
+  string pool offsets differ by 0x28 (data layout).
+- UISScreen fn_8016B4D4 (98.2): nIndex before nScreens (no change).
+- PGATour fn_80118B0C: nPar = fn*4 + n, 4*fn + n, <<2, split statements: add stays r29,r3.
+- Grass Static_Init: nBits is a signed int in EA (srawi/addze for /32, no extsh). s32 nBits makes that
+  block right but drops the function 82 -> 68.6 (allocation shifts); s16 82.5 (adds an extsh). Kept u16.

@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/lua-5.0.2/src/ltm.c
+// compiled in: ltm.c
+// 3 functions, source order. line | PS3 address | size
+
+   28  0054EEBC     C0  void luaT_init(lua_State* L)
+                         local  const const char*[15] luaT_eventname
+                         local  int i
+   48  0054EF7C     7C  const TObject* luaT_gettm(Table* events, TMS event, TString* ename)
+                         local  const TObject* tm
+   59  0054EFF8     80  const TObject* luaT_gettmbyobj(lua_State* L, const TObject* o, TMS event)
+                         local  TString* ename

@@ -1,0 +1,221 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/GoTerrainCollision.c
+// compiled in: golf_unity.cpp
+// 29 functions, source order. line | PS3 address | size
+
+  324  00218504     7C  void Ter_Init()
+  355  00218580     38  void Ter_Close()
+  376  002B1E24    1D8  void Ter_InitTGD(TGD_TerrainInfo* pTerrainData)
+                         local  int i
+                         local  int num
+                         local  uint32 offset
+  567  00218A40     80  void Ter_FreeDropNetworkLoadCallback(struct TNetwork* netPtr)
+  601  001FBBC4     C4  bool Ter_PointInFreeDropNetwork(float* location)
+                         local  int i
+  620  002184E0     24  void Ter_ResetNetworkCounters()
+  634  00218AC0     80  void Ter_OOBNetworkLoadCallback(struct TNetwork* netPtr)
+  645  00218B40     1C  int32 Ter_iNumOOBNetworksLoaded()
+  655  001EE548     E4  bool Ter_PointInOOBNetwork(float* location)
+                         local  int i
+  674  00218B5C    144  float Ter_GetClosestTerNetwork(const float* location, struct TNetwork* pClosestTerNetwork)
+                         local  float closestDistance
+                         local  float distance
+                         local  int i
+  708  002510C4    190  bool Ter_CollisionWithOOBNetwork(const float* start, const float* end, float* intersect)
+                         local  bool foundIntersect
+                         local  float minDist
+                         local  float dist
+                         local  float xDiff
+                         local  float zDiff
+                         local  vec4flt tempIntersect
+                         local  int i
+                         inlines  vec4flt_Copy
+  741  00218CA0     40  const struct TNetwork* Ter_GetOOBNetwork(int32 index)
+                         local  struct TNetwork* oobNetwork
+  842    inline-only   bool Ter_LieIsPreferred(uint32 lieID)
+  875  002B8504    9A4  bool Ter_FindDropLocation(int PlayerID, bool bUsePreferredLies, bool bRevertToTee, float* dropPosition)
+                         local  bool found
+                         local  struct CoreShotInfo_t* playerCoreShotInfo
+                         local  const struct AIFeatureNetwork* waterEdge
+                         local  vec4flt entryPoint
+                         local  float maxConeSearchDist
+                         local  struct TGD_MaterialInfo* pDropMaterial
+                         local  const struct AIFeatureNetwork* islandEdge
+                         local  int32 searchStep
+                         local  bool bIsAcceptable
+                         local  bool bIsPreferred
+                         local  TGD_TerrainInfo* pTerrainData
+                         local  float minDistSq
+                         local  float distSq
+                         local  float dist
+                         local  int32 testNode
+                         local  int32 fairwayNode
+                         local  const struct AIFeatureNetwork* testNetwork
+                         local  const struct AIFeatureNetwork* fairwayNetwork
+                         local  vec4flt fairwayIntersect
+                         local  vec4flt testIntersect
+                         local  vec4flt vecFromPin
+                         local  vec4flt testPoint
+                         local  vec4flt vecToFairway
+                         local  vec4flt normVec
+                         local  float dist
+                         local  int32 i
+                         local  uint32 i
+                         inlines  AIFeatureNetwork::GetNextNetwork, AINetworkMgr, LLMath_Add3, LLMath_AddScale3, LLMath_DotProduct3, LLMath_SquareDistanceBetween3, LLMath_Subtract3, RotateXY, vec4flt_Copy3, vec_madd, vec_sld, vec_splat, vec_sub
+ 1118  00290718    2E0  bool Ter_SearchAreaForDropLocation(int PlayerID, float* location, bool bUsePreferredLies, uint32 desiredLie, float dropPositionDistance, float* dropPosition, struct TGD_MaterialInfo** ppDropMaterial)
+                         local  struct CoreShotInfo_t* playerCoreShotInfo
+                         local  TGD_TerrainInfo* pTerrainData
+                         local  bool bIsAcceptable
+                         local  bool bIsPreferred
+                         local  struct TGD_MaterialInfo* pMaterialTowardsPin
+                         local  int32 i
+                         local  vec4flt delta
+                         local  float angleToCup
+                         local  float distanceFromBall
+                         local  float angle
+                         local  float tempSin
+                         local  float tempCos
+                         local  vec4flt testPosition
+                         local  float fTerrainHeight
+                         inlines  LLMath_Subtract3, std::cosf, std::sinf, vec4flt_Copy
+ 1200  002B806C    498  bool Ter_SearchForDropLocation(int PlayerID, bool bUsePreferredLies, bool bRevertToTee, float* dropPosition)
+                         local  TGD_TerrainInfo* pTerrainData
+                         local  struct TGD_MaterialInfo* pNormalDropLocationMaterial
+                         local  vec4flt testPosition
+                         local  float dropPositionDistance
+                         local  const float fRevertToTeeDistanceSquared
+                         local  struct CoreShotInfo_t* playerCoreShotInfo
+                         local  vec4flt cupLoc
+                         local  vec4flt playerTeePosn
+                         local  float fPreferredDropDistance
+                         local  float fAcceptableDropDistance
+                         inlines  LLMath_DistanceBetween3, LLMath_SquareDistanceBetween3, __vec_len_sqr3, vec4flt_Copy, vec_madd, vec_sld, vec_sub
+ 1297  00257560    22C  float Ter_CheckForDropLocation(TGD_TerrainInfo* pTerrainData, float* location, bool networksOnly, bool* pbIsAcceptable, bool* pbIsPreferred, struct TGD_MaterialInfo** pDropMaterial)
+                         local  vec4flt testPosition
+                         local  vec4flt normal
+                         local  float fTerrainHeight
+                         local  struct TGD_MaterialInfo* pMaterialInfo
+                         local  bool acceptable
+ 1362  00218CE0     98  bool Ter_IsValidDropSurface(int32 surfaceID)
+ 1458  00218864    1DC  float Ter_CalcLowestPlayableWorldHeight(TGD_TerrainInfo* pTerrainData)
+                         local  int i
+                         local  int k
+                         local  float fLowestHeight
+                         local  TGD_PolygonReference* pPolyRef
+                         local  float** pVertexData
+                         local  uint8* pDrawKickData
+ 1831  002B0AD8    35C  static float Ter_GetSupportingWorldTriangle(TGD_TerrainInfo* pTerrainData, float* location, TGD_Cell** pCellResult, TGD_PolygonReference** pPolyRefResult, float*** pTriangleVertices)
+                         local  uint8 uiDrawKick
+                         local  int iCurrentPlacementMask
+                         local  float fHighestPoint
+                         local  int gx
+                         local  int gy
+                         local  int gridNum
+                         local  TGD_Cell* pCell
+                         local  TGD_PolygonReference* pPolyRef
+                         local  float** pVertexData
+                         local  uint8* pDrawKickData
+                         local  int j
+                         local  int k
+                         local  float fHeight
+ 1929    inline-only   static float Ter_GetCoveringGroundTriangle(TGD_TerrainInfo* pTerrainData, float* location, TGD_Cell** pCellResult, TGD_PolygonReference** pPolyRefResult, float*** pTriangleVertices, uint32* iFirstVertexIndex)
+                         local  int iCurrentPlacementMask
+                         local  float fLowestPoint
+                         local  int gx
+                         local  int gy
+                         local  int gridNum
+                         local  TGD_Cell* pCell
+                         local  TGD_PolygonReference* pPolyRef
+                         local  float** pVertexData
+                         local  uint8* pDrawKickData
+                         local  uint8 uiDrawKick
+                         local  int j
+                         local  int k
+                         local  float fHeight
+ 2290  002B100C    53C  bool Ter_GetCoveringGroundNormal(TGD_TerrainInfo* pTerrainData, float* location, float* normal)
+                         local  TGD_Cell* pCell
+                         local  TGD_PolygonReference* pPolyRef
+                         local  float** pVertexData
+                         local  vec4flt v0
+                         local  vec4flt v1
+                         local  vec4flt v2
+                         local  float fHeight
+                         local  uint32 iFirstVertexIndex
+                         local  vec4flt edge1
+                         local  vec4flt edge2
+                         local  int gridNum
+                         local  TGD_Cell* pCell
+                         local  TGD_PolygonReference* pPolyRef
+                         local  float** pVertexData
+                         local  uint8* pDrawKickData
+                         local  uint8 uiDrawKick
+                         local  int j
+                         local  int k
+                         local  float fHeight
+                         inlines  LLMath_CrossProduct3W0, LLMath_Negate3, LLMath_Subtract3, Ter_GetCoveringGroundTriangle, vec4flt_Copy3, vec_madd, vec_nmsub, vec_perm, vec_sub
+ 2415  002B0FE0     2C  float Ter_GetSupportingWorldHeight(TGD_TerrainInfo* pTerrainData, float* location)
+                         local  TGD_Cell* pCell
+                         local  TGD_PolygonReference* pPolyRef
+                         local  float** pVertexData
+ 2429  002B0E34    1AC  bool Ter_GetSupportingWorldNormal(TGD_TerrainInfo* pTerrainData, float* location, float* normal)
+                         local  TGD_Cell* pCell
+                         local  TGD_PolygonReference* pPolyRef
+                         local  float** pVertexData
+                         local  vec4flt v0
+                         local  vec4flt v1
+                         local  vec4flt v2
+                         local  float fHeight
+                         local  vec4flt edge1
+                         local  vec4flt edge2
+                         inlines  LLMath_CrossProduct3W0, LLMath_Negate3, LLMath_Subtract3, vec4flt_Copy3, vec_nmsub, vec_perm, vec_sub
+ 4425  002185B8    2AC  void Ter_ComputeHighestPointInEveryTriangle(TGD_TerrainInfo* pTerrainData)
+                         local  uint32 uiPolygonReference
+                         local  uint32 uiVertex
+                         local  uint8 uiMax
+                         local  uint8 uiMin
+                         local  uint8 uiDrawKick
+                         local  float** pVertices
+                         local  uint8* pDrawKicks
+                         local  TGD_PolygonReference* pPolygonReference
+ 4538    inline-only   static void Ter_ClearVertexProcessedBit(TGD_TerrainInfo* pTerrainData)
+                         local  uint32 x
+                         local  uint32 y
+                         local  int gridNum
+                         local  TGD_Cell* pCell
+                         local  TGD_PolygonReference* pPolyRef
+                         local  float** pVertexData
+                         local  uint8* pDrawKickData
+                         local  int j
+                         local  int k
+ 4588  002B1674    7B0  void Ter_UpdateTerrainCollisionMorphData(struct Ter_TerrainGameDataMgr* pTGDMgr)
+                         local  TGD_TerrainInfo* pTerrainData
+                         local  uint32 x
+                         local  uint32 y
+                         local  uint32 numVertsMorphed
+                         local  BitArray_t* vertProcessed
+                         local  int gridNum
+                         local  TGD_Cell* pCell
+                         local  TGD_PolygonReference* pPolyRef
+                         local  bool bFoundMorphStrip
+                         local  int j
+                         local  int k
+                         local  TGD_ObjectInstanceInfo* pTempObjectInfo
+                         local  uint8* pVertexDeltaData
+                         local  float** pVertexData
+                         local  float oldMorph
+                         local  float currentMorph
+                         local  TGD_ObjectInstanceInfo* pObjectInfo
+                         local  uint8 morphRangeData
+                         local  int8 morphType
+                         local  float deltaPos
+                         inlines  BitArray_ClearArray, BitArray_SetBit, Ter_ClearVertexProcessedBit
+ 4775  002B06E4    388  void Ter_UpdateTerrainCollisionWidthData(TGD_TerrainInfo* pTerrainData)
+                         local  int8 cupIndex
+                         local  int8 greenIndex
+                         local  bool[7][6] bEligibleCups
+                         local  const int8 maxNumGreens
+                         local  const int8 maxNumCupsPerGreen
+                         local  vec4flt cupLocation
+                         local  struct TGD_MaterialInfo* pMatInfo
+                         inlines  GM_GetCurrentFlagPositionIndex, GM_GetCurrentGreenIndex, GM_SetTargetCup
+ 5213  002192FC     A4  void Ter_DrawOOBNetworks()
+                         local  int32 i

@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_ESPNNewsDetail.h
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   23  0011B580    198  void UIESPNNewsDetail::~UIESPNNewsDetail(const struct UIESPNNewsDetail* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIESPNNewsDetail::DstMenuItem_esnd>::~TExternArray, UIMenuVertBase::~UIMenuVertBase, ~TAptArrayStruct
+   25  00100774      C  uint32 UIESPNNewsDetail::GetSignature(const const struct UIESPNNewsDetail* this)
+   36  00100788      C  struct IExternArray* UIESPNNewsDetail::GetExternArray(const struct UIESPNNewsDetail* this)
+   67    inline-only   TextureRef UIESPNNewsDetail::GetTexture(const struct UIESPNNewsDetail* this)

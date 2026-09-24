@@ -1,0 +1,6 @@
+// C:/RW45/platform/include/native/ps3-ppu-gcc/rw/core/resource/resource.h
+// compiled in: system.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   86    inline-only   struct <anon>& GetBaseResourceDescriptor(const struct <anon>* this, uint32_t i)
+  349    inline-only   BaseResource& GetBaseResource(const struct <anon>* this, uint32_t i)

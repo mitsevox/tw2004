@@ -1,0 +1,18 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/ps3/LLSnap_ps3.c
+// compiled in: Legacy_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   10  0037FA3C     84  bool SN_LL_boFileExists(char* chpFilename)
+                         local  char[256] filename
+                         local  FILE* fp
+   23  0037FC0C     98  void SN_LL_WriteFile(int8* ipPictureData_p, int32 iDataSize_p, char* chpFileName_p)
+                         local  char[256] filename
+                         local  FILE* fp
+   35  003BEBCC    1BC  void SN_LL_vStoreFrameBuffer(int32 iBufferNum_p, int8* ipBufferAddr_p)
+                         local  unsigned int[2][1280] copyBuffers
+                         local  unsigned int* bp1
+                         local  unsigned int* bp2
+                         local  struct TextureLockInfo lockInfo
+                         local  int i
+                         local  int j
+                         local  int j

@@ -1,0 +1,90 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLSnap.c
+// compiled in: Legacy_unity.cpp
+// 29 functions, source order. line | PS3 address | size
+
+  152  0037CFE4     40  void SN_SnapshotName(char* newname)
+  161  0037CFA4     40  void SN_SequenceName(char* newname)
+  171  00393FE0     70  void SN_vInitModule()
+  212  00393FCC     14  void SN_vCloseModule()
+  230  0037E3A0     28  void SN_SetProcessingCrop(bool bUseCrop, int32 iCropX, int32 iCropY, int32 iCropWidth, int32 iCropHeight)
+  240  0037E3C8     1C  void SN_SetProcessingChromaKey(bool bUseChromaKey, uint32 iColorOxAABBGGRR)
+  251  0037CF6C     38  void SN_vActivateToggle(int32 iController)
+  293  00390204    11C  static void SN_vCheckActivateToggle()
+                         local  int32 iController
+                         local  int32 iCount
+                         local  int32 i
+  334  003BF408    21C  void SN_vManageSnapshot()
+                         local  uint32 uiPadSnap
+                         local  uint32 uiPadSeq
+                         local  uint32 uiPadSnapIL
+                         local  uint32 uiPadSeqIL
+                         local  int gDebugForceSnapShot
+                         local  uint32 tmpUiPadSnap
+                         local  uint32 tmpUiPadSeq
+  538  003AE214     E8  void* SN_Alloc(int32 iSize, uint32 iType, int32 iAlign)
+                         local  const char[9] __FUNCTION__
+                         local  void* ptr
+                         inlines  TagValuePair, operator+
+  560  003A9A00     1C  void SN_Free(void* ptr)
+  584  0037E410     B0  static void SN_vMakeSnapshotFileName(char* buffer, size_t bufSize, int nIndex, char cTypeCode)
+  607  0037E4C0     D8  static void SN_vMakeSequenceFileName(char* buffer, size_t bufSize, int nIndex, int nSequence, char cTypeCode)
+  654    inline-only   static int32 SN_iFindFirstSequenceCaptureNumberAvailable()
+                         local  int32 i
+                         local  char[64] chpFileNameOdd
+                         local  char[64] chpFileNameEvn
+                         local  char[64] chpFileNameInt
+  687  0037FAC0    14C  static int32 SN_iFindFirstSnapshotFileNumberAvailable()
+                         local  int32 gLastIndex
+                         local  int32 i
+                         local  char[64] chpFileNameOdd
+                         local  char[64] chpFileNameEvn
+                         local  char[64] chpFileNameInt
+                         local  char[64] chpFileNameNoI
+  727  00382614    1DC  static void SN_WriteExtraSnapshotInfo(char* chpFileName)
+                         local  char[256] chpData
+                         local  char[256] chpTextFileName
+                         local  CameraController_t* pCameraController
+                         local  vec4flt vPos
+                         local  vec4flt vLookAt
+                         local  int32 iLength
+                         inlines  LLMath_Add3, vec3flt_Copy
+  775  003AE2FC    3C4  static void SN_WriteFrameBuffer(int8* ipPictureData_p, int32 iWidth, int32 iHeight, char* chpFileName_p, void* readyBuffer)
+                         local  int8* ipTGAData
+                         local  struct SN_TGAHeaderT* pTGAHdr
+                         local  int32 iSize
+                         local  int32 x
+                         local  int32 y
+                         local  int32 iTgaX
+                         local  int32 iTgaY
+                         local  int32 iTgaWidth
+                         local  int32 iTgaHeight
+                         local  int8* pPicData
+  916  003BED88      4  static void SN_vStoreFrameBuffer(int32 iBufferNum_p, int8* ipBufferAddr_p)
+  930  003BED8C    190  static void SN_vStoreFrameBufferAndInterleave(int32 iBufferNum_p, int32 iDisplayOddEven_p, int8* ipBufferAddr_p, bool boStoreInterleaved_p)
+                         local  int8* ipTempBuffer
+                         local  int32 iLine
+                         local  int32 iStoreBuffer
+  997  003BF1D0    164  void SN_vGetSnapShot(bool boStoreInterleaved_p)
+                         local  int8* ipPictureData
+                         local  char[64] chpFileName
+ 1065    inline-only   static void SN_vSaveAndClearCaptureBuffer()
+                         local  int32 i
+                         local  int8* ipCurrentFrameBuffer
+                         local  char[64] chpFileName
+ 1127  003AE6C0    204  void SN_vStartSequenceCapture(int32 iCaptureFrameRate_p, int32 iCaptureBufferDuration_p, bool boStoreInterleaved_p)
+                         inlines  SN_iFindFirstSequenceCaptureNumberAvailable
+ 1197  003BEF1C    2B4  void SN_vRunSequenceCapture()
+                         inlines  SN_vSaveAndClearCaptureBuffer
+ 1262  003A9A1C     7C  void SN_vEndSequenceCapture()
+ 1299  0037CF38     34  bool SN_bEnabled()
+ 1304  0037E598     1C  bool SN_bActive()
+ 1540  0037E5B4    34C  void SN_ModifyProjectionForTiledScreenSnaps()
+                         local  int32 iSnapNum
+                         local  mat44flt projMat
+                         local  int32 curXTile
+                         local  int32 curYTile
+ 1565  0037D024     58  void SN_vGetTiledSnapShot(int32 iTileCountX, int32 iTileCountY)
+ 1578  003BF334     D4  static void SN_UpdateTiledCapture()
+                         local  const int32 delayTime
+                         local  int32 counter
+                         local  int32 iTotalTiles

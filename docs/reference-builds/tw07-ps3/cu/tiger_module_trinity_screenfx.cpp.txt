@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_trinity_screenfx.cpp
+// compiled in: tiger_module_trinity_screenfx.cpp
+// 6 functions, source order. line | PS3 address | size
+
+    0  0054082C     40  void ~TrinityScreenFx(const struct <anon>* this)
+                         inlines  TrinityScreenFx::~TrinityScreenFx, ~Allocatable
+    7  00540594     E4  void TrinityScreenFx(const struct <anon>* this, struct Module* pParentModule)
+                         inlines  Allocatable, Interpolator, TrinityScreenFx::TrinityScreenFx
+   12  005404F4      4  void Initialize(const struct <anon>* this)
+   16  005404F8      4  void Shutdown(const struct <anon>* this)
+   20  005404FC     4C  void ScreenFadeIn(const struct <anon>* this, float_t r, float_t g, float_t b, float_t duration)
+   26  00540548     4C  void ScreenFadeOut(const struct <anon>* this, float_t r, float_t g, float_t b, float_t duration)

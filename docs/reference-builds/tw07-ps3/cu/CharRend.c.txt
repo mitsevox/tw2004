@@ -1,0 +1,72 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/animation/CharRend.c
+// compiled in: golf2_unity.cpp
+// 19 functions, source order. line | PS3 address | size
+
+   93  0013B730     44  void CharacterRender_SetCurrentBuffer(int32 iOBFBuffer_p)
+  104  0013A66C      4  void CharacterRender_StartNewFrame()
+  108  0013B774      4  void CharacterRender_SetSkinType(int32 type)
+  112  001BF820    178  void CharacterRender_RenderSetup(uint32 flags)
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetCullMode, DS_vSetZTestEnable, Gcm::cellGcmSetAlphaTestEnable, RC_vSetCurrentRenderCtxTransformationMatrix
+  153  001BF998     CC  void CharacterRender_RenderCleanup(uint32 flags)
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetCullMode, DS_vSetZTestEnable, Gcm::cellGcmSetAlphaTestEnable
+  173    inline-only   void CharacterRender_SetupEnvironmentMaps()
+  209  0013B778    1B8  void CharacterRender_SetupRuntimeMaterials(struct CharTexController* pTexController)
+                         inlines  CharacterRender_SetupEnvironmentMaps
+  218  0013B930      8  static bool CharacterRender_vShouldDrawBone(int boneIndex)
+  295  001E4378    788  void CharacterRender_vDrawSkeleton(struct TCharacter* pCharacter)
+                         local  float[400][4] verts
+                         local  float[100][4] groundPlanVerts
+                         local  vec4flt* curVert
+                         local  int32 i
+                         local  vec4flt xpcolors
+                         local  int32 numBones
+                         local  int32 numDrawn
+                         local  struct TSkeleton* pSkeleton
+                         local  float fAxisLength
+                         local  float[3][4] vXAxis
+                         local  float[3][4] vYAxis
+                         local  float[3][4] vZAxis
+                         local  mat44flt M
+                         local  TBone* pBone
+                         local  TBone* pBone
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetZBufferMode, Gcm::cellGcmSetBlendFunc, LLMath_AddScale, LLMath_CopyMat44, PR_vSetCurrentColor, PR_vSetCurrentUsage, vec4flt_Copy, vec4flt_Copy3, vec_ld, vec_madd, vec_splat, vec_st
+  471  001E4B00    16C  static void Character_RenderSkinTestPoints(struct TCharacter* pCharacter)
+                         local  float[3][4] triVerts
+                         local  vec4flt xColor
+                         local  int i
+                         inlines  DS_vSetAlphaEnable, DS_vSetZBufferMode, PR_vSetCurrentColor, PR_vSetCurrentUsage, vec4flt_Copy, vec_ld, vec_st
+  718  001E4C6C    200  void CharacterRender_Render(struct TCharacter* pCharacter, uint32 flags)
+                         local  struct CharModelMgr gCharModelMgr
+                         local  struct CharModelMgrCharacterInstance* pCharModel
+                         local  mat44flt charModelMtx
+                         inlines  LLMath_IdentifyMat, vec_st
+  804  0015B7E0    214  void CharacterRender_UpdateCharacterBoundingBox(struct CharModelMgrCharacterInstance* pModel, struct TCharacter* pLegacyModel)
+                         local  vec4flt bboxMin
+                         local  vec4flt bboxMax
+                         local  struct TSkin* pSkin
+                         local  uint32 geom
+                         local  struct CharGeom* pCharGeom
+                         local  uint32 mesh
+                         local  struct CharMesh* pMesh
+                         local  TGeomBV* pBV
+                         inlines  LLMath_MaxVec4, LLMath_MinVec4, SKN_NextGeomBounds, vec4flt_Copy, vec_st
+  852  0013BA1C     3C  void CharacterRender_SortCharacterHair(struct CharModelMgrCharacterInstance* pModel)
+  873  0015B9F4    12C  void CharacterRender_PreRender(struct TCharacter* pCharacter, uint32 flags)
+                         local  struct CharModelMgr gCharModelMgr
+                         local  struct CharModelMgrCharacterInstance* pCharModel
+                         local  struct TSkeleton* pSkel
+                         local  const SkinMorphStateT* pMorphState
+                         local  const int32 numBlends
+                         local  const float* pBlendAmts
+  914  0013BA58      4  void CharacterRender_InitModule()
+  918  0013BA5C      4  void CharacterRender_CloseModule()
+  950  001B7558    1C8  void CharacterRender_InitPinDisplay(int PlayerID)
+                         local  float distToCup
+                         local  vec4flt vCup
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         inlines  LLMath_DistanceBetween3
+  991  0013BA60     60  bool CharacterRender_RenderFlagWithAlpha(uint8* flag_alpha, uint8* pole_alpha)
+ 1001  001B78C4    164  void CharacterRender_UpdateFlagAlpha(float* pos)
+                         local  float distToCup
+                         local  vec4flt vCup
+                         inlines  LLMath_DistanceBetween3

@@ -1,0 +1,48 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/locker/source/common/lockerversiontwofile.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   86  0061EA6C     4C  void ParseBuffer(const struct <anon>* this)
+  113  005C9B8C     8C  bool VerifyTag(const struct <anon>* this)
+                         local  uint32_t uTag
+  157  0061E9E4     88  void ParsePhysicalFilenameSize(const struct <anon>* this)
+  200  0061E950     94  void ParsePhysicalFilename(const struct <anon>* this)
+  236  0061E82C    124  void ParseNumberOfBlocks(const struct <anon>* this)
+                         inlines  operator=
+  273  005D5694     88  void ParseBlockNameSize(const struct <anon>* this)
+  316  005D5600     94  void ParseBlockName(const struct <anon>* this)
+  352  005D5588     78  void ParseBlockSize(const struct <anon>* this)
+  387  005D5460    128  void ParseBlock(const struct <anon>* this)
+                         inlines  operator->
+  432  005C9C18     58  void ParseEnd(const struct <anon>* this)
+                         inlines  operator=
+  465  0061EAB8     F0  void LockerVersionTwoFile(const struct <anon>* this, struct LockerFile* pFile, char8_t* pBuffer, uint32_t uBufferSize)
+                         inlines  RCPointer
+  496  005C9C70     5C  void ~LockerVersionTwoFile(const struct <anon>* this)
+                         inlines  ~RCPointer
+  519  005D409C     1C  bool IsValid(const struct <anon>* this)
+  543  005C9918      8  struct LockerBuffer* GetBuffer(const struct <anon>* this)
+  571  005DCAEC    280  void PrepareVersionTwoFile(struct LockerBufferConcrete* pBuffer)
+                         local  char8_t* curBuffer
+                         local  const char8_t* strPhysicalFilename
+                         local  uint32_t uPhysicalFilenameLength
+                         local  uint32_t uTag
+                         local  const struct List<OSDK::LockerBufferSection>* pSections
+                         local  uint32_t uNumSections
+                         local  uint32_t uIndex
+                         local  struct <anon>* pCurrentSection
+                         local  const char8_t* strBlockName
+                         local  uint32_t uBlockNameLength
+                         local  uint32_t uBlockSize
+  646  005C9CCC    170  uint32_t GetVersionTwoFileSize(const struct LockerBuffer* pBuffer)
+                         local  const char8_t* strPhysicalFilename
+                         local  uint32_t uPhysicalFilenameLength
+                         local  uint32_t uRequiredBufferSize
+                         local  const struct List<OSDK::LockerBufferSection>* pSections
+                         local  uint32_t uNumSections
+                         local  uint32_t uIndex
+                         local  struct <anon>* pCurrentSection
+                         local  const char8_t* strBlockName
+                         local  int32_t iBlockNameLength
+                         local  uint32_t uBlockSize
+                         inlines  GetNumberOfElements

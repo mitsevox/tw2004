@@ -1,0 +1,24 @@
+// C:/dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/target/ppu/include/memory
+// compiled in: golf_unity.cpp, rnaunity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   80    inline-only   struct Course* std::_Uninit_copy<Course*, Course*, std::allocator<Course> >(struct Course* _First, struct Course* _Last, struct Course* _Dest, const struct <anon>& _Al, struct <anon> )
+                         local  struct Course* _Next
+   80    inline-only   struct MeshSortStruct* std::_Uninit_copy<MeshSortStruct*, MeshSortStruct*, std::allocator<MeshSortStruct> >(struct MeshSortStruct* _First, struct MeshSortStruct* _Last, struct MeshSortStruct* _Dest, const struct <anon>& _Al, struct <anon> )
+                         local  struct MeshSortStruct* _Next
+   80    inline-only   struct MeshSortStruct* std::_Uninit_copy<std::_Vector_iterator<MeshSortStruct, std::allocator<MeshSortStruct> >, MeshSortStruct*, std::allocator<MeshSortStruct> >(struct <anon> _First, struct <anon> _Last, struct MeshSortStruct* _Dest, const struct <anon>& _Al, struct <anon> )
+                         local  struct MeshSortStruct* _Next
+  110    inline-only   BaseRenderObjPtr* std::_Uninit_copy<TwRenderObj::BaseRenderObj*, TwRenderObj::BaseRenderObj*>(BaseRenderObjPtr* _First, BaseRenderObjPtr* _Last, BaseRenderObjPtr* _Dest, const struct <anon>& , struct <anon> )
+                         local  size_t _Count
+  139    inline-only   struct Course* std::_Uninitialized_copy<Course*, Course*, std::allocator<Course> >(struct Course* _First, struct Course* _Last, struct Course* _Dest, const struct <anon>& _Al)
+  139    inline-only   struct MeshSortStruct* std::_Uninitialized_copy<MeshSortStruct*, MeshSortStruct*, std::allocator<MeshSortStruct> >(struct MeshSortStruct* _First, struct MeshSortStruct* _Last, struct MeshSortStruct* _Dest, const struct <anon>& _Al)
+  139    inline-only   BaseRenderObjPtr* std::_Uninitialized_copy<TwRenderObj::BaseRenderObj**, TwRenderObj::BaseRenderObj**, std::allocator<TwRenderObj::BaseRenderObj*> >(BaseRenderObjPtr* _First, BaseRenderObjPtr* _Last, BaseRenderObjPtr* _Dest, const struct <anon>& _Al)
+  139    inline-only   struct MeshSortStruct* std::_Uninitialized_copy<std::_Vector_iterator<MeshSortStruct, std::allocator<MeshSortStruct> >, MeshSortStruct*, std::allocator<MeshSortStruct> >(struct <anon> _First, struct <anon> _Last, struct MeshSortStruct* _Dest, const struct <anon>& _Al)
+  227    inline-only   void std::_Uninit_fill_n<Course*, unsigned int, Course, std::allocator<Course> >(struct Course* _First, unsigned int _Count, const const struct Course& _Val, const struct <anon>& _Al, struct <anon> )
+                         local  struct Course* _Next
+  227    inline-only   void std::_Uninit_fill_n<MeshSortStruct*, unsigned int, MeshSortStruct, std::allocator<MeshSortStruct> >(struct MeshSortStruct* _First, unsigned int _Count, const const struct MeshSortStruct& _Val, const struct <anon>& _Al, struct <anon> )
+                         local  struct MeshSortStruct* _Next
+  263    inline-only   void std::_Uninit_fill_n<TwRenderObj::BaseRenderObj*, unsigned int, TwRenderObj::BaseRenderObj*>(BaseRenderObjPtr* _First, unsigned int _Count, const const struct BaseRenderObj*& _Val, const struct <anon>& , struct <anon> )
+  287    inline-only   void std::_Uninitialized_fill_n<Course*, unsigned int, Course, std::allocator<Course> >(struct Course* _First, unsigned int _Count, const const struct Course& _Val, const struct <anon>& _Al)
+  287    inline-only   void std::_Uninitialized_fill_n<MeshSortStruct*, unsigned int, MeshSortStruct, std::allocator<MeshSortStruct> >(struct MeshSortStruct* _First, unsigned int _Count, const const struct MeshSortStruct& _Val, const struct <anon>& _Al)
+  287    inline-only   void std::_Uninitialized_fill_n<TwRenderObj::BaseRenderObj**, unsigned int, TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >(BaseRenderObjPtr* _First, unsigned int _Count, const const struct BaseRenderObj*& _Val, const struct <anon>& _Al)

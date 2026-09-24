@@ -1,0 +1,19 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/UDynMemPool.c
+// compiled in: Legacy_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   54  003B1D08    2EC  struct DynMemPool_Manager* DynMemPool_xCreateMemPool(const const struct Allocator& allocRef, int32 iMaxNumSections_p, int32 iSizeOfPool_p)
+                         local  const char[26] __FUNCTION__
+                         local  struct DynMemPool_Manager* newManager
+                         local  int32 i
+                         local  struct Allocator tempAlloc
+                         inlines  TagValuePair, operator+
+   91  003AAF08     58  void DynMemPool_vFreeMemPool(struct DynMemPool_Manager* pMemPool_p)
+   97  003A6800    1F4  int32 DynMemPool_iGetNewSection(struct DynMemPool_Manager* pMemPool_p, int32 iSize_p)
+                         local  int i
+                         local  int j
+                         local  bool bBlockFound
+                         local  int32 iNewEnd
+  151  003A662C    1D4  void DynMemPool_vFreeSection(struct DynMemPool_Manager* pMemPool_p, int32 iSectionStart_p)
+                         local  int i
+                         local  int j

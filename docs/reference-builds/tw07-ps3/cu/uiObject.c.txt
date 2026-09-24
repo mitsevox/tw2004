@@ -1,0 +1,89 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/istudio_runtime/uiObject.c
+// compiled in: apt_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+  116  000B4FAC    2C4  void UI_Obj_InitModule()
+                         local  struct HashString textureID
+                         local  int i
+                         local  struct GameXmlSettings xmlSettings
+                         local  struct LI_SLight* spLight
+                         inlines  CA_vSetCameraViewToWorldMatrix, CA_vSetDefaultCamera, HashString::HashString
+  200  0002CB64     60  void UI_Obj_CloseModule()
+  213  0002CBC4    12C  void UI_Obj_InitForRender()
+                         local  struct GenericActor* actor
+                         local  GenericActorParams params
+  240  0002CCF0     34  void UI_Obj_ResetBoostRings(enum PlayerNumber_t PlayerID)
+                         local  int i
+  257  000914E8     A4  void UI_Obj_ComputePrimitiveCoordinateToWorld(float[4]* screenToWorldMatrix, float* primitiveCoordinate, float* worldVec)
+                         local  vec4flt pointInScreenSpace
+                         inlines  LLMath_Scale, __vec_mul, vec_ld
+  273  0002CD24     1C  void UI_Obj_SignalReadyToSetupTappaSpinnaData()
+  278  000AE38C    478  bool UI_Obj_SetupTappaSpinnaData()
+                         local  bool successfullSetup
+                         local  vec4flt sourceZero
+                         local  mat44flt* worldToScreen
+                         local  mat44flt screenToWorld
+                         local  vec4flt destZero_WorldToPrimitive
+                         local  vec4flt destZero_WorldToScreen
+                         local  vec4flt maxPixels
+                         local  vec4flt maxSizePrimitive
+                         local  vec4flt minPixels
+                         local  vec4flt minSizePrimitive
+                         local  vec4flt minPositionPrimitive
+                         local  vec4flt maxPositionPrimitive
+                         local  vec4flt minSizeWorld
+                         local  vec4flt maxSizeWorld
+                         local  vec4flt scalarSize
+                         local  vec4flt minPositionWorld
+                         local  vec4flt maxPositionWorld
+                         local  vec4flt scalarPosition
+                         local  float normalizedWidth
+                         local  float normalizedHeight
+                         local  float normalizedPositionX
+                         local  float normalizedPositionY
+                         local  float worldSpaceBallWidth
+                         local  float worldSpaceBallHeight
+                         local  int i
+                         inlines  LLMath_Scale, LLMath_Subtract, RC_spGetCurrentRenderCtx, RC_spGetRenderCtxFrameBuffer, RC_spGetRenderCtxViewport, RC_vComputeRenderCtxWorldToPrimitiveCoordinate, RC_vCoordPixelToPrimitive, __vec_mul, vec_ld
+  364  000DD6CC    FE4  void UI_Obj_RenderBoostUI(int viewport)
+                         local  enum PlayerNumber_t PlayerID
+                         local  float fBoostRingMaxSize
+                         local  int i
+                         local  int j
+                         local  float[4][4] ballVerts
+                         local  vec4flt idVec
+                         local  vec4flt ballColorFG
+                         local  float[4][4] ballUVs
+                         local  float[2][4] xpClearVertices
+                         local  vec4flt xClearColor
+                         local  struct CA_SCamera* temp_camera
+                         local  vec4flt ui_cameraPosition
+                         local  float fBoostFactor
+                         local  float[4][3] ballVertData
+                         local  float objYLocation
+                         local  vec4flt objLoc
+                         local  vec4flt ballColorBG
+                         local  float fBoostRingMaxSizeNoAlpha
+                         local  float fBoostRingStay
+                         local  bool somethingToShow
+                         local  float r
+                         local  float spinSpeedSide
+                         local  float spinSpeedForward
+                         local  vec4flt dirVec
+                         local  const float spinAngle
+                         local  mat44flt rotMatX
+                         local  mat44flt rotMatZ
+                         local  mat44flt rotMat
+                         local  mat44flt scaleMat
+                         local  float SPINNA_ARROW_SCALE
+                         local  float xScale
+                         local  float spinRot
+                         local  const float zRot
+                         local  float fSinx
+                         local  float fCosx
+                         local  float fSinz
+                         local  float fCosz
+                         local  mat44flt savedMatSpinnaActor
+                         local  mat44flt tmpMatrix
+                         local  int maxBoostNum
+                         inlines  CA_vSetCameraFieldOfView, CA_vSetCameraViewToWorldMatrix, CA_vSetDefaultCamera, CA_vSetDefaultScalingVectors, DS_vEnableZBufferUpdate, DS_vSetAlphaBlendingFunction, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetZBufferMode, DS_vSetZTestEnable, Gcm::cellGcmSetBlendFunc, LLMath_CopyMat44, LLMath_DotProduct3, LLMath_IdentifyMat, PR_vSetCurrentColor, PR_vSetCurrentTexture, PR_vSetCurrentUsage, RC_spGetCurrentRenderCtxCamera, RC_vSetCurrentRenderCtxTransformationMatrix, RC_vSetRenderCtxCamera, std::cosf, std::sinf, vec4flt_Copy, vec_ld, vec_madd, vec_st

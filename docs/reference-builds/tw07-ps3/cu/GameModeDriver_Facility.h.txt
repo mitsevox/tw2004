@@ -1,0 +1,13 @@
+// ../../../../../TIGERCODE/Code/Golf/GameMode/Headers/GameModeDriver_Facility.h
+// compiled in: apt_unity.cpp, golf_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   82  0033EAD0      C  int32 GameModeDriverFacility::GetNextEvent(const struct GameModeDriverFacility* this)
+   97    inline-only   void GameModeDriverFacility::SetFirstTimeFlag(const struct GameModeDriverFacility* this, bool bSet)
+  110    inline-only   enum GM_ModeType_t GameModeDriverFacility::FacilityGetGameMode(const struct GameModeDriverFacility* this)
+  117  0033EADC      8  bool GameModeDriverFacility::IsGreenSelectionEnabled(const const struct GameModeDriverFacility* this)
+  122    inline-only   bool GameModeDriverFacility::GetPendingTutorial(const struct GameModeDriverFacility* this)
+  133    inline-only   void GameModeDriverFacility::SetFacilityMiniGameIndex(const struct GameModeDriverFacility* this, int iGame)
+  134    inline-only   int GameModeDriverFacility::GetFacilityMiniGameIndex(const const struct GameModeDriverFacility* this)
+  141    inline-only   void GameModeDriverFacility::SetForce2p(const struct GameModeDriverFacility* this, bool bSet)
+  142    inline-only   bool GameModeDriverFacility::GetForce2p(const struct GameModeDriverFacility* this)

@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/hudshowprofilecallback.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   68  005B75C0      C  void HudShowProfileCallback(const struct HudShowProfileCallback* this)
+   92  005B75D8      C  void ~HudShowProfileCallback(const struct HudShowProfileCallback* this)

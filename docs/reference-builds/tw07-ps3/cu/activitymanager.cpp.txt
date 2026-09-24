@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/activitymanager.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    6  005E3830     7C  void ActivityManager(const struct ActivityManager* this)
+                         inlines  Observable
+   13  005E35E0     60  void ~ActivityManager(const struct ActivityManager* this)
+                         inlines  operator delete, ~Observable

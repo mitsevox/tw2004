@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_RivalsTrophies.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   17  000FED38     44  void UITrophyList::ShowHelpText(const struct UITrophyList* this)
+   21  000FED84      C  uint32 UITrophyList::GetSignature(const const struct UITrophyList* this)
+   22  000FED98      C  struct IExternArray* UITrophyList::GetExternArray(const struct UITrophyList* this)

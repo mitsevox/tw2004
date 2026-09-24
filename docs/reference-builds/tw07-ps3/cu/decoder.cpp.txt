@@ -1,0 +1,8 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/decoder.cpp
+// compiled in: decoder.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   13  006F5EC4     EC  unsigned char Feed(const struct Decoder* this, void* pSrc, int numSamples, enum FeedType feedType)
+                         local  struct RequestDesc* pRequestDesc
+                         local  unsigned char requestHandle
+                         inlines  AdvanceSlot, GetRequestDesc

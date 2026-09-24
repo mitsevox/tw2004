@@ -1,0 +1,98 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/career/source/common/careerstatbookconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 31 functions, source order. line | PS3 address | size
+
+   58  006298E8     6C  void ~CareerStatbookLoadUserStrategy(const struct <anon>* this)
+                         inlines  ~RCPointer
+   96  0062985C     84  void ~CareerStatbookLoadUserListStrategy(const struct <anon>* this)
+                         inlines  ~RCPointer
+  163  005FE4C0     C4  void CareerStatbookLoadUserStrategy(const struct <anon>* this, struct CareerStatbookConcrete* pStatbook, uint32_t uSlot, const char8_t* strUserName, struct CareerStatbookCallback* pCallback)
+                         inlines  RCPointer
+  194  005CC384    1F4  bool CheckProfilePermission(const struct <anon>* this)
+                         local  struct <anon>* pFacade
+                         local  struct <anon>* pLocalUser
+                         local  struct User* pUser
+                         local  enum PermissionLevel eLevel
+  229  005E5D68    250  bool OperationProcess(const struct <anon>* this, const struct Operation* )
+                         local  LobbyStatbookT* pLobbyStatbookApi
+                         local  bool bContinue
+                         local  int32_t iStatus
+                         local  int32_t iStatus
+                         local  int32_t iStatus
+                         inlines  GetLobbyStatbookApi, GetViewName
+  340  005D7B80     3C  void OperationCancel(const struct <anon>* this, const struct Operation* )
+                         local  LobbyStatbookT* pLobbyStatbookApi
+  368  005C82EC     58  void OperationTimeout(const struct <anon>* this, const struct Operation* )
+  396  0060F52C     BC  void CareerStatbookLoadUserListStrategy(const struct <anon>* this, struct CareerStatbookConcrete* pStatbook, struct ListArray* pUserList, struct CareerStatbookCallback* pCallback)
+                         inlines  RCPointer
+  426  005FACA0    118  bool LoadNextUser(const struct <anon>* this)
+                         local  bool bLoaded
+                         local  uint32_t uNumUsers
+                         local  const char8_t* strUserName
+                         local  uint32_t uSlot
+                         inlines  GetNumberOfElements, operator->, operator=
+  468  005FADB8     D4  bool OperationProcess(const struct <anon>* this, const struct Operation* )
+                         local  bool bContinue
+  518  005CDFC0     58  void OperationCancel(const struct <anon>* this, const struct Operation* )
+                         inlines  operator->
+  544  005CE018     58  void OperationTimeout(const struct <anon>* this, const struct Operation* )
+                         inlines  operator->
+  572  005FAE8C     40  void CareerStatbookLoadSuccess(const struct <anon>* this, struct CareerStatbook* )
+                         inlines  operator=
+  596  005FAECC     54  void CareerStatbookLoadFailure(const struct <anon>* this, enum Failure eFailure)
+                         inlines  operator=
+  686  005CFD70     C0  void CareerStatbookConcrete(const struct CareerStatbookConcrete* this, const char8_t* strView, uint32_t uNumSlots)
+  720  005C83D8     70  void ~CareerStatbookConcrete(const struct CareerStatbookConcrete* this)
+  749  005FE584    1E4  struct Operation* LoadUser(const struct CareerStatbookConcrete* this, const char8_t* strUserName, uint32_t uSlot, struct CareerStatbookCallback* pCallback)
+                         local  uint32_t uGroupID
+                         local  struct OperationStrategy* pStrategy
+                         local  struct Operation* pOperation
+                         inlines  GetOperationManagerConcrete
+  782  005C8530     18  void QueueLoadUser(const struct CareerStatbookConcrete* this, const char8_t* strUserName, uint32_t uSlot)
+  806  0060F6A4     E8  struct Operation* ExecuteQueuedLoad(const struct CareerStatbookConcrete* this, struct CareerStatbookCallback* pCallback)
+                         local  struct OperationStrategy* pStrategy
+                         local  struct Operation* pOperation
+                         inlines  GetOperationManagerConcrete
+  834  005C8344     94  void ClearQueuedUserList(const struct CareerStatbookConcrete* this)
+                         local  uint32_t uIndex
+                         inlines  RemoveAll
+  862  005C8588     68  uint32_t GetNumRows(const const struct <anon>* this)
+                         local  int32_t iNumRows
+                         local  int32_t iAdminRow
+  904  005C85F0     28  const char8_t* GetRowName(const const struct <anon>* this, uint32_t uRow)
+                         local  const LobbyStatbookRowInfoT* pRowInfo
+  934  005C8618    1B4  const char8_t* GetRowData(const const struct <anon>* this, uint32_t uRow, uint32_t uSlot)
+                         local  const char8_t* strParams
+                         local  char8_t[24] strParam
+                         local  int32_t iErr
+                         local  uint32_t uParam
+                         local  char8_t* pParam
+                         local  const char8_t* strData
+                         inlines  GetInstance, GetViewName
+  990  005C87CC     30  const char8_t* GetRowDescription(const const struct <anon>* this, uint32_t uRow)
+                         local  const LobbyStatbookRowInfoT* pRowInfo
+ 1019  005C87FC     30  const char8_t* GetRowParams(const const struct <anon>* this, uint32_t uRow)
+                         local  const LobbyStatbookRowInfoT* pRowInfo
+ 1049  005C882C     74  int32_t GetRowParam(const const struct <anon>* this, uint32_t uRow, uint32_t uIndex)
+                         local  const LobbyStatbookRowInfoT* pRowInfo
+                         local  char8_t[25] strBuffer
+                         local  int32_t iErr
+ 1084  005C88A0     C8  void GetColumnHeader(const const struct <anon>* this, uint32_t uColumn, char8_t* strBuffer, uint32_t uBufferSize)
+                         local  int32_t iAdminRow
+                         local  const char8_t* strDesc
+                         local  int32_t iErr
+ 1118  005C8548     40  int32_t GetFirstAdminRow(const const struct <anon>* this)
+ 1142  005C8968    144  int32_t GetAdminRow(const const struct <anon>* this, const char8_t* strName)
+                         local  int32_t iStatus
+                         local  int32_t iAdminRow
+                         local  char8_t[25] strParam
+                         local  int32_t iErr
+                         local  uint32_t uRow
+                         local  const char8_t* strParams
+ 1190  005C8AAC     C4  int32_t GetAdminParam(const const struct <anon>* this, const char8_t* strName, uint32_t uIndex)
+                         local  int32_t iAdminRow
+                         local  int32_t iParam
+                         local  const char8_t* strParams
+                         local  char8_t[25] strBuffer
+                         local  int32_t iErr
+ 1229  005C8B70      8  void SetActiveSlot(const struct CareerStatbookConcrete* this, uint32_t uSlot)

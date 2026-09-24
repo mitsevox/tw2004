@@ -1,0 +1,46 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_Grass.cpp
+// compiled in: shader_unity.cpp
+// 32 functions, source order. line | PS3 address | size
+
+   36  0051A3EC    1F0  void SM_GrassClass::SM_GrassClass(const struct SM_GrassClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base, vec4flt_Zero, vec_st
+  129  00504DE4    78C  void SM_GrassClass::Load(const struct SM_GrassClass* this)
+  328  00505570    334  void SM_GrassClass::Activate(const struct SM_GrassClass* this)
+  394  005058A4     48  void SM_GrassClass::Deactivate(const struct SM_GrassClass* this)
+  412  0050FA7C     64  void SM_GrassClass::SetGrassClippingTexture(const struct SM_GrassClass* this, TextureRef textureRef)
+  426  005058EC      4  void SM_GrassClass::SetNoiseTexture(const struct SM_GrassClass* this, TextureRef textureRef)
+  442  00516B84     6C  void SM_GrassClass::SetWindAmplitude(const struct SM_GrassClass* this, const float[4]& amplitude)
+                         inlines  vec4flt_Copy
+  454  00516BF0     6C  void SM_GrassClass::SetWindFrequency(const struct SM_GrassClass* this, const float[4]& frequency)
+                         inlines  vec4flt_Copy
+  466  00516C5C     6C  void SM_GrassClass::SetWindDir(const struct SM_GrassClass* this, const float[4]& frequency)
+                         inlines  vec4flt_Copy
+  479  0050FAE0     64  void SM_GrassClass::SetGrassBladeTexture(const struct SM_GrassClass* this, TextureRef textureRef)
+  493  0050FB44     64  void SM_GrassClass::SetHRShadowTexture(const struct SM_GrassClass* this, TextureRef textureRef)
+  507  0050FBA8     64  void SM_GrassClass::SetShadowTexture(const struct SM_GrassClass* this, TextureRef textureRef)
+  521  0050FC0C     60  void SM_GrassClass::SetGrassID(const struct SM_GrassClass* this, float grassID)
+  534  0050FC6C     88  void SM_GrassClass::SetShadowMinMaxY(const struct SM_GrassClass* this, float minY, float maxY)
+  551  0050FCF4     70  void SM_GrassClass::SetMinWorldCoords(const struct SM_GrassClass* this, float x, float y, float z)
+  566  0050FD64     70  void SM_GrassClass::SetHasNoiseMap(const struct SM_GrassClass* this, bool bHasNoiseMap)
+  581  0050FDD4     6C  void SM_GrassClass::SetGrassNoiseMapFreq(const struct SM_GrassClass* this, float freq)
+  596  0050FE40     70  void SM_GrassClass::SetGrassGridMinCoords(const struct SM_GrassClass* this, float x, float y, float z)
+  611  00516CC8     6C  void SM_GrassClass::SetGrassPatchCoords(const struct SM_GrassClass* this, const vec4flt& patch)
+                         inlines  vec4flt_Copy
+  626  0050FEB0     60  void SM_GrassClass::SetGrassClipMult(const struct SM_GrassClass* this, float clipMult)
+  640  00519D54     D0  void SM_GrassClass::SetGrassWindVector(const struct SM_GrassClass* this, const float[3]& v0, const float[3]& v1, const float[3]& v2)
+                         inlines  vec3flt_Copy
+  663  0050FF10     60  void SM_GrassClass::SetGrassAlphaFadeDistMult(const struct SM_GrassClass* this, float alphaFadeDistMult)
+  677  0050FF70     88  void SM_GrassClass::SetGrassHeightMinMax(const struct SM_GrassClass* this, float minHeight, float maxHeight)
+  694  0050FFF8     A4  void SM_GrassClass::SetGrassNoiseColor(const struct SM_GrassClass* this, float lowR, float lowG, float lowB, float highR, float highG, float highB)
+  714  00516D34     B4  void SM_GrassClass::SetShadowMatrix(const struct SM_GrassClass* this, float[4]* pRows)
+                         inlines  vec4flt_Copy, vec_st
+  735  00516DE8     B4  void SM_GrassClass::SetHRShadowMatrix(const struct SM_GrassClass* this, float[4]* pRows)
+                         inlines  vec4flt_Copy, vec_st
+  756  0051009C     70  void SM_GrassClass::SetHRCamPos(const struct SM_GrassClass* this, float x, float y, float z)
+  771  0051010C     70  void SM_GrassClass::SetHRShadowDispUnscaled(const struct SM_GrassClass* this, float x, float y, float z)
+  786  0051017C     60  void SM_GrassClass::SetHRShadowFadeDist(const struct SM_GrassClass* this, float dist)
+  800  00516E9C     B4  void SM_GrassClass::SetGolferShadowMatrix(const struct SM_GrassClass* this, float[4]* pRows)
+                         inlines  vec4flt_Copy, vec_st
+  821  00516F50     6C  void SM_GrassClass::SetShadowsColor(const struct SM_GrassClass* this, const vec4flt& color)
+                         inlines  vec4flt_Copy
+  836  005101DC     78  void SM_GrassClass::Set08GrassTempHacks(const struct SM_GrassClass* this, float distFadeMultiplier, float baseFadeScale, float baseFadeBias)

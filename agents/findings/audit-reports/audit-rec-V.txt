@@ -1,0 +1,14 @@
+EASportsBio (42 functions; the EA SPORTS Bio screens and their memory-card calls): kept 12 (all T1, TW06 names the behaviour confirms), renamed 0, T3 0, demoted 0, unnamed 30.
+Comments: 16 ok, 22 none, 4 fixed (7 edits: 3 in EASportsBio.c, 4 in core/easb.h), 0 stripped. namecheck: 0 rows, 0 flags. No line moves; all lines under 110 columns.
+Error codes (EASB_gErrorMap): -44 = CANNOT_REOPEN, -43 = WRONG_FILE (tag-file error 9, bad map checksum), -18 = every library error with no card code of its own (corrupt file/section, file already open, not initialised, out of memory, image not supported...); -12 no file, -3 no card, -5 card full.
+Roles that follow: fn_80125118 = TRUE when a Bio file is there, readable or damaged (open gave 0 or -18); fn_80125280 = deletes the Bio file (storage op 1), and the save flow only calls it for -43/-44 (an unusable file) before re-creating it; fn_8012555C (no callers) = TRUE only for -18 (damaged Bio).
+Worst comment: fn_80125118 "TRUE when the card could be opened" (it opens the Bio, and -18 is not a card code). Also: fn_80124C10 and the two countdown globals said every 15 frames; it is 16. The easb.h group comment said the Bio "always goes to card 0" (only the mount probe uses 0, 0).
+Names: the 12 EASBio_* names are TW06's (commits be5383a4/960fe239) but are not in docs/tw06-names.md, so lane 1 could not see them as hints; T1 rests on the reconciler matching them to lane 2's behaviour.
+Unclear rule: comments on global declarations in a header (easb.h lbl_8028198C/lbl_80281990). I fixed them on fn_80124C10's row because they repeated the off-by-one; audit-rec-Q left similar ones for phase 3.
+Findings (no code changes):
+- fn_80124C10 nDays (already "EA bug"): the asm confirms it. fn_8012881C stores a halfword (sth) into the u32 slot and it is read back with lwz, so 0xB1 and 0xB2 get days << 16.
+- fn_80124C10 msg 0xB1: the asm converts uBioLevel (lhz 0x26) for the float argument. fProgress at 0x2C is fetched but never read, so the level is sent twice where progress was probably meant (EA's code, not our decomp).
+- fn_80124C10 game list: the fill loop writes rows 0..nProducts-start-1 and the pad loop writes rows nProducts..10. With start > 0, rows nProducts-start..nProducts-1 keep old text. There is no 11-row cap on the fill loop (up to 25 games). 0xB3 (the name) is also sent twice in branch 4.
+- fn_801251EC / fn_80125434: when fn_8012D794 / fn_8012D6C8 fails they return without closing, so the Bio file stays open. The next open then fails with FILE_OPEN, which maps to -18, which the save flow and fn_80125118 treat as fine. After a failed fn_8012D6C8 the product buffer can stay allocated.
+- fn_80124BDC / fn_801258E8 / fn_80125528: library errors are ignored, so the out value is read unset when the library is not running (fn_80125528 already has an "EA bug" comment).
+- fn_801256B8: a level-up overwrites a pending NewAccomplishment that was already cleared, so that message is lost.

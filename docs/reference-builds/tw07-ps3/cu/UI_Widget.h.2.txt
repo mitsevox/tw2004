@@ -1,0 +1,20 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_Widget.h
+// compiled in: apt_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   19  00126670     C0  void UIWidget::~UIWidget(const struct UIWidget* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStaticCharBuffer<64u>::~AptStaticCharBuffer, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   21  00100578      C  uint32 UIWidget::GetSignature(const const struct UIWidget* this)
+   39  00103C58     14  enum TAptSequenceStatus UIWidget::ShowWidgetBGSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   40  00100A88     14  enum TAptSequenceStatus UIWidget::HideWidgetBGSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   41  00100584     14  enum TAptSequenceStatus UIWidget::WidgetOpenAndGoodSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   42  001010A4     14  enum TAptSequenceStatus UIWidget::LaunchMMRightAwaySequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   43  001010B8     14  enum TAptSequenceStatus UIWidget::LaunchCSPRightAwaySequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   44  00100598     14  enum TAptSequenceStatus UIWidget::HideForIngameRightAwaySequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   45  001005AC     14  enum TAptSequenceStatus UIWidget::FixAlphaSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   46  001005C0     14  enum AptThreadReturnValue UIWidget::UpdateFlash_func(struct IAptSubscriberBase* subs)
+   58    inline-only   bool UIWidget::IsWidgOpenAndGood(const struct UIWidget* this)
+   62    inline-only   void UIWidget::SetForceReLoadOfFacility(const struct UIWidget* this, bool bForceReLoad)
+   63    inline-only   bool UIWidget::GetForceReLoadOfFacility(const struct UIWidget* this)
+   95    inline-only   void UIWidgetBG::Init(const struct UIWidgetBG* this)
+   96  001005DC      C  uint32 UIWidgetBG::GetSignature(const const struct UIWidgetBG* this)

@@ -1,0 +1,8 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/smixc.cpp
+// compiled in: smixc.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    6  006E0F14     4C  void mixc(int frames, float gain, void* psrcp, void* pdstp)
+                         local  float* psrc
+                         local  float* pdst
+                         local  int i

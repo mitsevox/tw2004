@@ -1,0 +1,178 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/cameras/GoStaticCam.c
+// compiled in: golf_unity.cpp
+// 34 functions, source order. line | PS3 address | size
+
+   81  001F2D88     44  void StaticCam_RegisterStreamClients()
+   95  001F2DCC     2C  void StaticCam_UnRegisterStreamClients()
+  108  00293B24    408  static void StaticCam_LoadCAMCfromStream(struct TStreamData* pStreamData)
+                         local  const char[29] __FUNCTION__
+                         local  char* pSrc
+                         local  char* pDst
+                         local  uint32 i
+                         local  uint32 j
+                         local  TByteSwapDataElementDef[2] headerElmDef
+                         local  TByteSwapDataElementDef[4] curveElmDef
+                         local  TByteSwapDataElementDef[3] nodeElmDef
+                         inlines  BYTESWAP_SWAPDATASTRUCTURE, TagValuePair, operator+
+  167  001F2DF8    248  void StaticCam_ParseStaticCameras()
+                         local  int i
+                         local  int j
+                         local  bool matchFound
+  231  002AE52C    9C4  void StaticCam_ParseStaticCameraActor(TBasicParamPtr pCameraActor)
+                         local  TStaticCamParam* camPtr
+                         local  vec4flt straightAheadVec
+                         local  mat44flt eulerMatrix
+                         local  const char* course
+                         local  int holenum
+                         local  char[16] holename
+                         local  uint8* ptr
+                         inlines  GM_GetCourseName, LLMath_Add3, LLMath_mat44fltMultiply33, StaticCam_OverrideValues, vec_madd, vec_splat
+  344  002414DC     F8  void StaticCam_Init()
+                         local  const char[15] __FUNCTION__
+                         inlines  TagValuePair, operator+
+  363  001F30B0     54  void StaticCam_DeInit()
+  380  001F3040     70  void StaticCam_Reset()
+  400  0023CD04     B0  void StaticCam_ProcessScript(CameraChainLink* link, enum PlayerNumber_t ePlayerID, float* position, struct CameraScriptSettings_t* settings)
+                         local  float interp
+                         inlines  vec4flt_Copy3
+  429  002492D4    318  CameraChainLink* StaticCam_ChooseScript(enum PlayerNumber_t ePlayerID, enum StaticCam_EventType_e event, bool dontShowGolfer, CameraChainLink* ignoreLink)
+                         local  int i
+                         local  int[30] possibleScripts
+                         local  int scriptsFound
+                         local  int randomScript
+                         local  bool isAI
+                         local  uint8 val
+                         local  uint8* ptr
+  513  001EB998     20  int32 StaticCam_GetNumberOfScripts()
+  518  001EB9B8     2C  CameraChainLink* StaticCam_GetScriptByNum(int script)
+  523  001EB9E4     3C  bool StaticCam_IsTowerCam(int script)
+  538  001EF2E0     C8  CameraChainLink* StaticCam_GetNextScript(CameraChainLink* link)
+                         local  int i
+  573    inline-only   void StaticCam_ParseFlybyCams()
+                         local  int i
+                         local  int j
+                         local  bool matchFound
+                         local  CameraChainLink* pCurCamera
+                         local  CameraChainLink* pNextCamera
+                         local  CameraChainLink* pPrevCamera
+                         local  CameraChainLink* pNextNextCamera
+                         local  bool[10] disableGolferDraw
+                         local  int route
+  738  001F3104    518  CameraChainLink* StaticCam_GetFlyByCam(int iRouteNum_p)
+                         local  bool[10] disableGolferDraw
+                         local  int route
+                         inlines  StaticCam_ParseFlybyCams
+  760  001EE3E0     90  Curve* StaticCam_GetFlybyTimeCurve(uint32 iRouteNum_p)
+                         local  uint32 i
+  777  001F1FB8     2C  float StaticCam_GetFlybyTotalDistance(uint32 iRouteNum_p)
+  791  002C3CD4    76C  void StaticCam_GetFlybyInformation(float fParam, struct CameraScriptSettings_t* settings, float* position, float* lookat, float* fov, enum PlayerNumber_t ePlayerID)
+                         local  float idealDist
+                         local  CameraChainLink* pPrevCamera
+                         local  CameraChainLink* pNextCamera
+                         local  CameraChainLink* pNextNextCamera
+                         local  CameraChainLink* pCurCamera
+                         local  vec4flt origPos
+                         local  vec4flt origPosDiff
+                         local  float sectionPercent
+                         local  float currentDist
+                         local  float prevDist
+                         local  float prevPercent
+                         local  float startPercent
+                         local  float endPercent
+                         local  float lastUnderDist
+                         local  float lastUnderPercent
+                         local  float lastOverDist
+                         local  float lastOverPercent
+                         local  float testPercent
+                         local  float percentDiff
+                         local  float distDiff
+                         local  int i
+                         inlines  LLMath_Length3, LLMath_Subtract3, __vec_len_sqr3, vec4flt_Copy, vec_madd, vec_sld
+  968  001F37B4     88  void StaticCam_SetupFlybyCameraPointers(CameraChainLink* pCurCamera, CameraChainLink** pPrevCamera, CameraChainLink** pNextCamera, CameraChainLink** pNextNextCamera)
+ 1018  001E9584     7C  int StaticCam_GetNextFlybyRoute(int routeNum)
+                         local  uint32 i
+                         local  int32 curBestRoute
+ 1037  001F1FB0      8  CameraChainLink* StaticCam_ChooseTrophyViewCam(int32 cameraID)
+ 1153  001F0010    258  CameraChainLink* StaticCam_ChooseClubHouseDestination(enum StaticCam_EventType_e currentEvent)
+                         local  int i
+                         local  char* eventName
+                         local  char[64] buffer
+ 1230  002C4440    7AC  void StaticCam_GetCrACInformation(float fParam, struct CameraScriptSettings_t* settings, float* position, float* lookat, float* fov, enum PlayerNumber_t ePlayerID)
+                         local  float idealDist
+                         local  CameraChainLink* pPrevCamera
+                         local  CameraChainLink* pNextCamera
+                         local  CameraChainLink* pNextNextCamera
+                         local  CameraChainLink* pCurCamera
+                         local  vec4flt origPos
+                         local  vec4flt origPosDiff
+                         local  float sectionPercent
+                         local  float currentDist
+                         local  float prevDist
+                         local  float prevPercent
+                         local  float startPercent
+                         local  float endPercent
+                         local  float lastUnderDist
+                         local  float lastUnderPercent
+                         local  float lastOverDist
+                         local  float lastOverPercent
+                         local  float testPercent
+                         local  float percentDiff
+                         local  float distDiff
+                         local  float origDistDiff
+                         local  float deltaSign
+                         local  int i
+                         inlines  LLMath_Length3, LLMath_Subtract3, __vec_len_sqr3, vec4flt_Copy, vec_madd, vec_sld
+ 1442  0023CDB4    134  bool StaticCam_CheckHotZone(CameraScript_t* script, struct TNetwork* net, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt trackingPos
+                         local  int i
+                         inlines  vec4flt_Copy3
+ 1487  001F383C      4  void StaticCam_DrawHotZones(CameraScript_t* currentScript)
+ 1560  001F3840      4  void StaticCam_DrawAllHotZones()
+ 1637  001F3844      4  void StaticCam_LoadFromMemory()
+ 1644  002AEEF0    5DC  void StaticCam_SaveToFile()
+                         local  const char[21] __FUNCTION__
+                         local  char* camBuffer
+                         local  char* loadBuffer
+                         local  char* curBuf
+                         local  int i
+                         local  CameraScript_t* camPtr
+                         local  CameraChainLink* curLink
+                         local  bool oldState
+                         local  int curBufLen
+                         local  const char* course
+                         local  int holenum
+                         local  char[16] holename
+                         local  char[256] linestr
+                         local  int num_cams
+                         local  int j
+                         local  int[256] cam_ids
+                         local  uint8* ptr
+                         local  int32 filesize
+                         local  char* loadptr
+                         local  char[256] str
+                         inlines  GM_GetCourseName, TagValuePair, operator+
+ 1798  002AF4CC    464  void StaticCam_LoadFromMemory(char* pData, int32 filesize)
+                         local  const char[25] __FUNCTION__
+                         local  int i
+                         local  char* loadptr
+                         local  const char* course
+                         local  int holenum
+                         local  char[16] holename
+                         local  char[256] linestr
+                         local  struct StaticCamOverrideType* o
+                         inlines  GM_GetCourseName, TagValuePair, operator+
+ 1861  002B04C0     58  void StaticCam_LoadCAMTfromStream(struct TStreamData* pStreamData)
+ 1868  002AF930     E0  void StaticCam_LoadFromDisk()
+                         local  int32 filesize
+                         local  char* loadptr
+                         local  char* loadBuffer
+                         local  bool oldState
+ 1893    inline-only   static void StaticCam_OverrideValues(int i)
+                         local  int j
+                         local  CameraScript_t* camPtr
+                         local  CameraChainLink* curLink
+                         local  const char* course
+                         local  int holenum
+                         local  char[16] holename
+                         local  uint8* ptr
+ 1951  001F0544     58  void StaticCam_FreeOverrides()

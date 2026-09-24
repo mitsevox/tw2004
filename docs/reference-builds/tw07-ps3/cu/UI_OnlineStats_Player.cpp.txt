@@ -1,0 +1,27 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_OnlineStats_Player.cpp
+// compiled in: apt_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+  110  000F7DB4     C0  void UIOnlineStats_Player::UIOnlineStats_Player(const struct UIOnlineStats_Player* this)
+                         inlines  OnlineFlashItem::OnlineFlashItem, TArrayInternal<UIOnlineStats_Player::OnlineFlashItem,AptStructSwapper>::TArrayInternal, TExternArray<UIOnlineStats_Player::OnlineFlashItem>::TExternArray, UIMenuVertBase::UIMenuVertBase
+  116  000F0ABC     98  void UIOnlineStats_Player::Init(const struct UIOnlineStats_Player* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetDefaultMenuOption, UIMenuVertBase::SetNumVisibleVertRows
+  130  00055268    134  void UIOnlineStats_Player::Show(const struct UIOnlineStats_Player* this)
+                         inlines  OnlineManagerOSDK::GetInstance
+  148  000484B4     6C  void UIOnlineStats_Player::ShowWithoutResetingActiveGolfer(const struct UIOnlineStats_Player* this)
+  158  00048520     18  bool UIOnlineStats_IsValidCategory(int32 category)
+  166  0009BF58    244  void UIOnlineStats_Player::StatsNowValid(const struct UIOnlineStats_Player* this)
+                         local  int index
+                         local  struct User* pUser
+                         inlines  AptScreenSubscriber::IsSequenceComplete, OnlineManagerOSDK::GetInstance
+  190  00048538    220  int UIOnlineStats_Player::MapStatToRanklist(const struct UIOnlineStats_Player* this, int32 category)
+  233  00048758     20  char* UIOnlineStats_Player::GetLocalizedStringHeader(const struct UIOnlineStats_Player* this, int category)
+  238  00086524    1B8  void UIOnlineStats_Player::PlayerStatsHandleInput(const struct UIOnlineStats_Player* this, int32 cID)
+                         local  struct OnlineFlashItem* activeItem
+                         inlines  UIExternScrollMenuIterator::GetActiveItemIndex, UIMenuVertBase::SetDefaultMenuOption
+  287  000866DC     24  enum eAptHandleInput UIOnlineStats_Player::HandleInput(const struct UIOnlineStats_Player* this, int32 cID)
+  293  00048778     9C  void UIOnlineStats_Player::PlayerStatsUpdateItem(const struct UIOnlineStats_Player* this, struct OnlineFlashItem* dest, int32 index, char* label)
+  303  00048814      C  void UIOnlineStats_Player::UpdateItemAndLabel(const struct UIOnlineStats_Player* this, struct UIMenuItemBaseDst* destItem, struct UIMenuItemBaseSrc* srcItem, int32 index, char* label)
+                         local  struct OnlineFlashItem* dest
+  311  000483D8     DC  void UIOnlineStats_Player::UpdateHeaderStrings(const struct UIOnlineStats_Player* this)
+                         local  char* szPlayerName

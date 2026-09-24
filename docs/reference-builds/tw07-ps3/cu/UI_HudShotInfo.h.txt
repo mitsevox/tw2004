@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/UI_HudShotInfo.h
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   20  00123D54     B8  void UIHudShotInfo::~UIHudShotInfo(const struct UIHudShotInfo* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   22  000FE874      C  uint32 UIHudShotInfo::GetSignature(const const struct UIHudShotInfo* this)
+   32  000FE880     24  void UIHudShotInfo::LooseFocus(const struct UIHudShotInfo* this, uint32 )
+   33  000FE8A4     24  void UIHudShotInfo::RegainFocus(const struct UIHudShotInfo* this, uint32 )

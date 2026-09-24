@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/./peerconnectionmanagerconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   62  006235F8      8  const struct List<OSDK::PeerConnection>* GetConnections(const const struct <anon>* this)
+   63  00623600      8  const struct List<OSDK::VoiceUser>* GetVoiceUsers(const const struct <anon>* this)
+   66  00623608      8  struct GameSessionPersistent* GetSuspendedGameSession(const const struct <anon>* this)
+   70    inline-only   ConnApiRefT* GetConnApi(const const struct <anon>* this)

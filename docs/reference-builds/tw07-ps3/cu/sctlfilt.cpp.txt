@@ -1,0 +1,10 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sctlfilt.cpp
+// compiled in: sctlfilt.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  268  006DC278    120  int SNDCTRL_filteradd(int shandle, SNDFILTERDEF* psfd)
+                         local  int voice
+                         local  int setvoice
+  318  006DC398    120  int SNDCTRL_filterremove(int shandle, int priority)
+                         local  int voice
+                         local  int setvoice

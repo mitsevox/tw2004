@@ -1,0 +1,7 @@
+// ../ears_common/dev/include/ears_common/Singleton.h
+// compiled in: CCT.cpp, HighLevel_AnimFrame.c, PositionsFrameCache.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   66  0059D8F4     24  void Singleton<EA::CCT::Internal::PositionsFrameCache>::~Singleton(const struct Singleton<EA::CCT::Internal::PositionsFrameCache>* this)
+   73    inline-only   struct PositionsFrameCache& Singleton<EA::CCT::Internal::PositionsFrameCache>::GetSingleton()
+   80    inline-only   struct PositionsFrameCache* Singleton<EA::CCT::Internal::PositionsFrameCache>::GetSingletonPtr()

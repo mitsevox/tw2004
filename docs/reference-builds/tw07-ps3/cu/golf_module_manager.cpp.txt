@@ -1,0 +1,23 @@
+// ../../../../../TIGERCODE/Code/GolfModule/golf_module_manager.cpp
+// compiled in: golf_unity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   14  0022F1E0     4C  void GolfModuleManager::RegisterManagerResourceCallback(const struct GolfModuleManager* this, int resourceId)
+   25  0022F244    1D4  void GolfModuleManager::GolfResourceCallback(TStreamDataPtr pStream)
+                         local  unsigned int tagIndex
+   79  002F6284     98  void GolfModuleManager::GolfModuleManager(const struct GolfModuleManager* this, const const void** __vtt_parm, struct IAllocator* allocator)
+                         inlines  Manager::Manager
+   83  0022F418     18  void GolfModuleManager::EnableResourceTagging(bool enable)
+   88  0022F430     20  void GolfModuleManager::ToggleResourceTag()
+   93  0022F22C     18  unsigned int GolfModuleManager::StaticResourceTag()
+  102  0022F450    114  void GolfModuleManager::FreeTaggedResources(unsigned int tag, unsigned int resourceType, void(*)()* callback, void* userPtr)
+                         local  TStreamDataPtr ptr
+                         local  TStreamDataPtr next
+  126  0022F564    104  void GolfModuleManager::FreeLevelGlobalResource(unsigned int resourceType, void(*)()* callback, void* userPtr)
+                         local  TStreamDataPtr ptr
+                         local  TStreamDataPtr next
+  149  0022F668     6C  void GolfModuleManager::LevelInit(const struct GolfModuleManager* this)
+  159  0022F6D4     78  void GolfModuleManager::LevelShutdown(const struct GolfModuleManager* this, bool ignoreAdditionalStreams)
+  170  0022F74C     6C  void GolfModuleManager::Init(const struct GolfModuleManager* this)
+  182  0022F7B8     D0  void GolfModuleManager::Shutdown(const struct GolfModuleManager* this)
+                         local  unsigned int i

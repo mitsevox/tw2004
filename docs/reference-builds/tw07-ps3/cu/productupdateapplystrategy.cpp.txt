@@ -1,0 +1,15 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/productupdateapplystrategy.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   78  006215EC     4C  void ProductUpdateApplyStrategy(const struct <anon>* this, struct ProductUpdateManagerStrategy* pUpdateStrategy)
+                         inlines  ProductUpdateStage
+  104  00621684      C  void ~ProductUpdateApplyStrategy(const struct <anon>* this)
+                         inlines  ~ProductUpdateStage
+  128  005DA960    124  enum ProcessResultE Process(const struct <anon>* this)
+                         local  uint32_t uNumUpdates
+                         local  uint32_t uUpdateNum
+                         local  struct <anon>* pInfo
+                         local  char8_t[256] strTempFile
+                         local  char8_t* pTempFile
+                         inlines  GetElementAt, GetNumberOfFiles, SetTargetFileName, SetUnpackedFileName

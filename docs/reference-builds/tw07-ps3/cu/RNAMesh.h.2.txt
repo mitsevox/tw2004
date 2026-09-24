@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNARender/RNAMesh.h
+// compiled in: RNABuilder.cpp, RNAMesh.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   46    inline-only   struct MeshPlatC& MeshC::GetPlatform(const struct MeshC* this)
+   54    inline-only   enum PrimTypeE MeshC::GetPrimType(const const struct MeshC* this)
+   55    inline-only   int32_t MeshC::GetNumStreams(const const struct MeshC* this)
+   56    inline-only   struct StreamC* MeshC::GetStream(const const struct MeshC* this, int32_t iStream)
+   58    inline-only   struct VertexFormatC* MeshC::GetVertexFormat(const const struct MeshC* this)
+   59    inline-only   struct IndicesC* MeshC::GetIndices(const const struct MeshC* this)

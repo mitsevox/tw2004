@@ -1,0 +1,26 @@
+// C:/packages/job_manager/1.11.00/source/common/job_scheduler.cpp
+// compiled in: job_scheduler.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   37  007055D4     50  void BeginEditSession(const struct JobScheduler* this)
+   54  00705624     74  void EndEditSession(const struct JobScheduler* this)
+                         local  struct <anon> state
+                         inlines  SpuState
+   81  00705B4C    1FC  bool AddTree(const struct JobScheduler* this, const struct <anon>& job)
+                         local  uint32_t h
+                         local  unsigned int i
+                         local  int ret
+                         inlines  ClearAllFreeJobs, IsReadyValidPPUJob, sys_event_port_send
+  158  007056F0    45C  bool AddJobs(const struct JobScheduler* this, struct Job* jobs, uint32_t numJobs)
+                         local  uint32_t h
+                         local  uint32_t index
+                         local  uint32_t stack_begin
+                         local  uint32_t stack_end
+                         local  uint64_t* stack_begin_ptr
+                         local  uint64_t* stack_end_ptr
+                         local  uint32_t h
+                         local  uint32_t i
+                         local  unsigned int i
+                         local  int ret
+                         inlines  ClearAllFreeJobs, IsPPUJob, sys_event_port_send
+  264  00705698     58  void PrintJobList(const struct JobScheduler* this, int32_t outputFilter)

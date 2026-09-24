@@ -1,0 +1,5 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/kickstart/include/common/osdk/kickstart/kickstartextension.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   51  00628300      C  void ~KickStartExtension(const struct KickStartExtension* this)

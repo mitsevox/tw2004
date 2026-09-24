@@ -1,0 +1,43 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/ParticleSystem/source/particle_emitter.cpp
+// compiled in: particle_unity.cpp
+// 20 functions, source order. line | PS3 address | size
+
+   10  004AA4CC      8  void* ParticleEmitter::operator new(size_t size)
+   16  004AA4D4      8  void* ParticleEmitter::operator new(size_t size, const char* lpszFileName, int nLine)
+   21  004AA524      4  void ParticleEmitter::operator delete(void* ptr)
+   26  004AA528      4  void ParticleEmitter::operator delete(void* ptr, const char* lpszFileName, int nLine)
+   32  004B0458    158  void ParticleEmitter::Init(const struct ParticleEmitter* this, struct IParticleSpawn* spawnInterface, struct ParticleEmitter* prev, struct ParticleEmitter* next, void* fileData, float posX, float posY, float posZ, float rotX, float rotY, float rotZ, int isImmortal)
+   77  004AA5E0     80  void ParticleEmitter::Destroy(const struct ParticleEmitter* this)
+  101  004AA660      C  const struct ParticleSystem* ParticleEmitter::GetParticleSystem(const const struct ParticleEmitter* this)
+  106  004AA66C     14  const float* ParticleEmitter::GetTransformRow(const const struct ParticleEmitter* this, unsigned int row)
+  111  004B07D4     58  void ParticleEmitter::TweakParticleSystem(const struct ParticleEmitter* this, const void* data)
+  118  004AA680      8  void ParticleEmitter::SetParent(const struct ParticleEmitter* this, struct ParticleEmitter* parent)
+  123  004AC3F4    1A4  void ParticleEmitter::SetPosition(const struct ParticleEmitter* this, float posX, float posY, float posZ)
+                         local  struct _FVEC transform
+                         local  struct _FVEC[4] parentTransform
+  143  004AE8AC    34C  void ParticleEmitter::SetTransform(const struct ParticleEmitter* this, float posX, float posY, float posZ, float rotX, float rotY, float rotZ)
+                         local  struct _FVEC quat
+                         local  struct _FVEC[4] transform
+                         local  struct _FVEC[4] parentTransform
+  172  004AC270    184  void ParticleEmitter::SetVelocity(const struct ParticleEmitter* this, const float* velocity)
+                         local  struct _FVEC velVec
+                         local  struct _FVEC[3] parentTransform
+  189  004AC0EC    184  void ParticleEmitter::SetGravity(const struct ParticleEmitter* this, const float* gravity)
+                         local  struct _FVEC gravVec
+                         local  struct _FVEC[3] parentTransform
+  206  004AA68C     3C  void ParticleEmitter::Render(const struct ParticleEmitter* this)
+  211  004AA6C8      8  struct ParticleEmitter* ParticleEmitter::Next(const const struct ParticleEmitter* this)
+  216  004AA6D0      8  struct ParticleEmitter* ParticleEmitter::Prev(const const struct ParticleEmitter* this)
+  222  004AA6D8     7C  void ParticleEmitter::SwapWithPrev(const struct ParticleEmitter* this)
+                         local  struct ParticleEmitter* prev
+                         local  struct ParticleEmitter* next
+                         local  struct ParticleEmitter* prevPrev
+  248  004B0B3C    284  int ParticleEmitter::Update(const struct ParticleEmitter* this, float deltaTime, const float* viewDir)
+                         local  float lifeTime
+                         local  float lifeElapsed
+                         local  int systemStillAlive
+                         local  struct _FVEC pos
+                         local  struct _FVEC vel
+                         local  struct _FVEC scaledVel
+                         local  struct _FVEC scaledGrav
+  299  004AA76C      C  int ParticleEmitter::IsImmortal(const const struct ParticleEmitter* this)

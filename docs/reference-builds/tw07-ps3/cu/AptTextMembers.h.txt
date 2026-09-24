@@ -1,0 +1,11 @@
+// ../../../../../TIGERCODE/Code/AptInterface/AptPackage/AptTextMembers.h
+// compiled in: other_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   20    inline-only   unsigned int TextMembersIndex::hash(const char* str, unsigned int len)
+                         local  int hval
+   43  003EF1A4    104  struct TextMembers* TextMembersIndex::in_word_set(const char* str, unsigned int len)
+                         local  struct TextMembers[30] wordlist
+                         local  int key
+                         local  const char* s
+                         inlines  TextMembersIndex::hash

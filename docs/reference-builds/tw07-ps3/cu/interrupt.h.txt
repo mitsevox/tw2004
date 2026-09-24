@@ -1,0 +1,35 @@
+// C:/dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/target/ppu/include/sys/interrupt.h
+// compiled in: golf_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   69    inline-only   static int sys_interrupt_tag_destroy(sys_interrupt_tag_t intrtag)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n
+   86    inline-only   static int _sys_interrupt_thread_establish(sys_interrupt_thread_handle_t* ih, sys_interrupt_tag_t intrtag, uint64_t intrthread, uint64_t arg1, uint64_t arg2)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n
+  123    inline-only   static int sys_interrupt_thread_establish(sys_interrupt_thread_handle_t* ih, sys_interrupt_tag_t intrtag, sys_ppu_thread_t intrthread, uint64_t arg)
+  129    inline-only   static void sys_interrupt_thread_eoi()
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n

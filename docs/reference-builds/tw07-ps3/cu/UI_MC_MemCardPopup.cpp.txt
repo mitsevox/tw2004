@@ -1,0 +1,71 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_MC_MemCardPopup.cpp
+// compiled in: apt_unity.cpp
+// 44 functions, source order. line | PS3 address | size
+
+   62  0007074C    134  void KillAllMCPopups()
+                         inlines  UIMemCardBrowsePopup::NullAllCallbacks, UIMemCardConfirmPopup::NullAllCallbacks, UIMemCardMenuPopup::SetForceClose, UIMemCardPopup::NullAllCallbacks
+  104  000EF8E0     A8  void UIMemCardMenuPopup::Init(const struct UIMemCardMenuPopup* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+  126  00056C24    1F8  void UIMemCardMenuPopup::ShowQueryPopup(const struct UIMemCardMenuPopup* this, char* stringId, char* menuOpt0Id, MemCardActionFuncPtr* onSelectOpt0, char* menuOpt1Id, MemCardActionFuncPtr* onSelectOpt1, char* menuOpt2Id, MemCardActionFuncPtr* onSelectOpt2, char* menuOpt3Id, MemCardActionFuncPtr* onSelectOpt3, int32_t defaultOption)
+                         local  int32 numElements
+  171  00056EEC     50  void UIMemCardMenuPopup::ShowQueryPopupWithAllowBack(const struct UIMemCardMenuPopup* this, char* stringId, char* menuOpt0Id, MemCardActionFuncPtr* onSelectOpt0, char* menuOpt1Id, MemCardActionFuncPtr* onSelectOpt1, char* menuOpt2Id, MemCardActionFuncPtr* onSelectOpt2, char* menuOpt3Id, MemCardActionFuncPtr* onSelectOpt3, int32_t defaultOption)
+  183  00056E8C     60  void UIMemCardMenuPopup::ShowQueryPopup(const struct UIMemCardMenuPopup* this, char* stringId, MemCardResponseFuncPtr* onCloseFunc, char* menuOpt0Id, char* menuOpt1Id, char* menuOpt2Id, char* menuOpt3Id, int32_t defaultOption)
+  193  00056E1C     70  void UIMemCardMenuPopup::ShowQueryPopup(const struct UIMemCardMenuPopup* this, char* stringId, MemCardActionFuncPtr* closeFunc, char* menuOpt0Id, MemCardActionFuncPtr* onSelectOpt0, char* menuOpt1Id, MemCardActionFuncPtr* onSelectOpt1, char* menuOpt2Id, MemCardActionFuncPtr* onSelectOpt2, int32_t defaultOption)
+  204  0006EBC4     B8  void UIMemCardMenuPopup::ShowConfirmAcceptChallenge(const struct UIMemCardMenuPopup* this, MemCardActionFuncPtr* onSelectNo, MemCardActionFuncPtr* onSelectYes)
+                         inlines  UIMenuTutorial::SetShowTryThisTutorial
+  213  0007A3C0     78  bool UIMemCardMenuPopup::IsThisUserWaitingOnConfirmAcceptChallenge(const const struct UIMemCardMenuPopup* this, enum PlayerNumber_t PlayerID)
+                         local  bool rval
+  234  00040FA8     80  void UIMemCardMenuPopup::ShowHelpText(const struct UIMemCardMenuPopup* this)
+  245  00086798     24  enum eAptHandleInput UIMemCardMenuPopup::HandleInput(const struct UIMemCardMenuPopup* this, int32 cID)
+                         local  enum eAptHandleInput retVal
+  264  00041028    164  void UIMemCardMenuPopup::onClose(const struct UIMemCardMenuPopup* this, void* inData)
+                         local  const int32 index
+  295  000665E4    128  void UIMemCardMenuPopup::Hide(const struct UIMemCardMenuPopup* this)
+                         inlines  AptControllerListener::StopPortLocking
+  323  00040F74     34  void UIMemCardMenuPopup::NullAllCallbacks(const struct UIMemCardMenuPopup* this)
+                         local  int32 i
+  337  0005CC50     70  void UIMemCardConfirmPopup::Init(const struct UIMemCardConfirmPopup* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen
+  348  00033C84     24  void UIMemCardConfirmPopup::Close(const struct UIMemCardConfirmPopup* this)
+  354  0004118C     80  void UIMemCardConfirmPopup::ShowHelpText(const struct UIMemCardConfirmPopup* this)
+  363  00056F3C     80  void UIMemCardConfirmPopup::LooseFocus(const struct UIMemCardConfirmPopup* this, uint32 id)
+  379  00056FBC    170  void UIMemCardConfirmPopup::ShowConfirmPopup(const struct UIMemCardConfirmPopup* this, const char* stringId, MemCardActionFuncPtr* onSelect, bool localize, int32 delaytime, bool allowBack)
+  412  00075BCC    214  enum TAptSequenceStatus UIMemCardConfirmPopup::CountDownAndShowPopup(const struct UIMemCardConfirmPopup* this, bool inbFirstTime, void* inData)
+                         local  TI_STimeValue currentTime
+                         local  float secsRemaining
+                         inlines  TI_fConvertTimeDifToSeconds, sys_time_get_timebase_frequency
+  433  0004120C     D0  enum eAptHandleInput UIMemCardConfirmPopup::HandleInput(const struct UIMemCardConfirmPopup* this, int32 cID)
+  449  0005712C     78  void UIMemCardConfirmPopup::Hide(const struct UIMemCardConfirmPopup* this)
+  463  0005CCC0     70  void UIMemCardPopup::Init(const struct UIMemCardPopup* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen
+  477  000571A4     E0  void UIMemCardPopup::ShowMCPopup(const struct UIMemCardPopup* this, char* stringId, MemCardActionFuncPtr* OnShowResponseFunc)
+  500  000572F8     48  void UIMemCardPopup::ShowMCPopupWithUpDown(const struct UIMemCardPopup* this, char* stringId, char* dpadText)
+  507  00057284     74  void UIMemCardPopup::ShowTimedMCPopup(const struct UIMemCardPopup* this, char* stringId, MemCardActionFuncPtr* onCloseFunc)
+  516  000412DC     54  void UIMemCardPopup::OnShow(const struct UIMemCardPopup* this)
+  525  00075DE0    238  enum TAptSequenceStatus UIMemCardPopup::CountDownAndClosePopup(const struct UIMemCardPopup* this, bool inbFirstTime, void* inData)
+                         local  TI_STimeValue currentTime
+                         local  float secsRemaining
+                         inlines  TI_fConvertTimeDifToSeconds, sys_time_get_timebase_frequency
+  542  00041330      8  enum eAptHandleInput UIMemCardPopup::HandleInput(const struct UIMemCardPopup* this, int32 cID)
+  557  00057340     74  void UIMemCardPopup::Hide(const struct UIMemCardPopup* this)
+  572  00041338     5C  void UIMemCardPopup::editMessage(const struct UIMemCardPopup* this, char* inMessageId)
+  578  00041394     44  void UIMemCardPopup::editDpadMessage(const struct UIMemCardPopup* this, char* inMessageId)
+  584  000413D8      C  void UIMemCardPopup::EnableXboxLivePassCodeSounds(const struct UIMemCardPopup* this)
+  589  000413E4      C  void UIMemCardPopup::DisableXboxLivePassCodeSounds(const struct UIMemCardPopup* this)
+  602  000EF988     8C  void UIMemCardBrowsePopup::Init(const struct UIMemCardBrowsePopup* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+  616  000573B4    158  void UIMemCardBrowsePopup::ShowBrowsePopup(const struct UIMemCardBrowsePopup* this, char* string, MemCardResponseFuncPtr* responseFunc, struct UIMenuItemDefaultSrc* memCardMenuArray, int32 sizeMenu, int32 sizeofMenu, int32_t defaultOption, char* bottomText, bool bShowBackButton, bool bLocalize)
+  645  000413F0     88  void UIMemCardBrowsePopup::UpdateItemAndLabel(const struct UIMemCardBrowsePopup* this, struct UIMenuItemBaseDst* dst, struct UIMenuItemBaseSrc* src, int32 index, char* inLabel)
+                         local  struct UIMenuItemDefaultSrc* menuItemIn
+                         local  struct UiMenuItemDefaultDst* menuItem
+  663  0005750C     84  void UIMemCardBrowsePopup::ShowHelpText(const struct UIMemCardBrowsePopup* this)
+  674  00041478     3C  void UIMemCardBrowsePopup::onClose(const struct UIMemCardBrowsePopup* this, void* inData)
+                         local  int32 activeIndex
+  680  00057590     78  void UIMemCardBrowsePopup::Hide(const struct UIMemCardBrowsePopup* this)
+  695  00086700     98  enum eAptHandleInput UIMemCardBrowsePopup::HandleInput(const struct UIMemCardBrowsePopup* this, int32 cID)
+                         local  enum eAptHandleInput retVal
+  721  0005CD30     40  void UIMemCardAction::Init(const struct UIMemCardAction* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen
+  731  00057608     E8  void UIMemCardAction::Show(const struct UIMemCardAction* this)
+  747  000576F0     30  void UIMemCardAction::Hide(const struct UIMemCardAction* this)
+  756  000414B4     44  void UIMemCardAction::ShowHelpText(const struct UIMemCardAction* this)

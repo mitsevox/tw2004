@@ -1,0 +1,147 @@
+// C:/packages/rwaudiocore/2.08.01/source/plugins/sndplayer1.cpp
+// compiled in: sndplayer1.cpp
+// 24 functions, source order. line | PS3 address | size
+
+    0  006E89C4     54  void ~SndPlayer1(const struct <anon>* this)
+                         inlines  ~PlugIn
+  507  006E5D7C      8  struct <anon>* GetPlugInDescRunTime()
+  513  006E7B50    290  void GetFileInfo(void* pRamData, struct FileInfo* pFileInfo)
+                         local  struct <anon> bitGetter
+                         local  unsigned int version
+                         inlines  Assert, GetBits
+  558  006E6CA0    1D0  enum ParseReturnValue SndPlayer1ChunkParser(void* pData, uint32_t dataSize, int , void* pParseContext, bool(*)()* , void* , uint32_t* pBlockSize)
+                         local  struct <anon>* pThis
+                         local  struct <anon>* pSndPlayerChunkHeader
+                         local  unsigned int numBytes
+                         local  unsigned int isEndChunk
+                         inlines  Assert, GetSystem, PutUB<unsigned int, unsigned int>
+  611  006E63C0     C0  void RequestCleanup(const struct <anon>* this)
+                         inlines  GetRequestInternal, core::IncrementCircularIndex<unsigned char>
+  622  006E7868    2E8  void RwacTimerClient(void* pContext, float timeToNextCall)
+                         local  struct <anon>* pThis
+                         local  struct RequestInternal* pRequestInternal
+                         local  struct RequestExternal* pRequestExternal
+                         local  unsigned char requestIndex
+                         local  bool requestCompleted
+                         inlines  GetRequestInternal, IsRequestActive, SetStreamPriority, core::IncrementCircularIndex<unsigned char>
+  790  006E5FC4     BC  void StreamLostCallback(void* pContext)
+                         local  struct <anon>* pThis
+                         local  unsigned int requestIndex
+  814  006E64D4     40  unsigned int GetSize(struct PlugInConfig* pPlugInConfig)
+                         local  unsigned int maxRequests
+                         local  unsigned int size
+                         inlines  core::LinearAllocAddSize
+  842  006E60E0    15C  void FeedCleanup(const struct <anon>* this)
+                         local  int i
+                         local  struct RequestInternal* pRequestInternal
+                         local  struct RequestExternal* pRequestExternal
+                         inlines  GetSamplesRemaining
+  884  006E6480     54  bool GetFeedSlot(const struct <anon>* this, int* pSlot)
+                         inlines  core::IncrementCircularIndex<unsigned char>
+  900  006E6E70    204  bool CreateInstance(struct PlugIn* pPlugIn, void* pConstructorParams)
+                         local  unsigned int maxRequests
+                         local  struct <anon>* pThis
+                         local  uintptr_t pMemBlock
+                         local  uintptr_t pDeclickBuffer
+                         local  uintptr_t pRequestInternalArray
+                         local  unsigned int i
+                         local  int i
+                         inlines  Initialize<rw::audio::core::SndPlayer1>, SetCallback, SetContext, core::LinearAlloc<std::uintptr_t, std::uintptr_t>
+ 1003  006E6080     60  void ReleaseEvent(const struct <anon>* this)
+ 1016  006E7074    580  void EventEvent(const struct <anon>* this, int event, void* pParameterBuffer)
+                         local  const char[11] __FUNCTION__
+                         local  struct <anon>* pSystem
+                         local  struct PlayParams* pPlayParams
+                         local  size_t stringLength
+                         local  int sizeOfCommand
+                         local  struct PlayCommand* pCommand
+                         local  struct ModifyStartTimeParams* pParams
+                         local  struct ModifyStartTimeCommand* pCommand
+                         local  struct GetRequestBufferedParams* pParams
+                         local  unsigned int i
+                         local  struct RequestInternal* pRequestInternal
+                         local  struct RequestExternal* pRequestExternal
+                         local  struct IsRequestDoneParams* pParams
+                         local  float requestHandle
+                         local  float ret
+                         local  int bytes
+                         local  int bytes
+                         inlines  Assert, GetCommandSlot, GetRequestInternal, GetSystem, IsRequestActive, SetHandler, core::AlignUp<int>
+ 1287  006E8438    58C  int PlayHandler(struct <anon>* pCommand)
+                         local  struct <anon>* pThis
+                         local  struct PlayCommand* pPlayCommand
+                         local  struct <anon>* pSystem
+                         local  struct RequestInternal* pRequestInternal
+                         local  struct RequestExternal* pRequestExternal
+                         local  unsigned int requestIndex
+                         local  const char* pFileName
+                         local  int64_t fileOffset
+                         local  bool queueHead
+                         local  int requestId
+                         local  size_t stringLength
+                         local  bool queueTail
+                         local  int i
+                         inlines  Assert, GetRequestInternal, GetSystem, HandlerGetThis<rw::audio::core::SndPlayer1, rw::audio::core::SndPlayer1::PlayCommand>, IsRequestActive, core::IncrementCircularIndex<unsigned char>, core::MemCpy
+ 1560  006E623C     E0  int StopHandler(struct <anon>* pCommand)
+                         local  struct <anon>* pThis
+                         local  unsigned int requestIndex
+ 1590  006E631C     A4  int ModifyStartTimeHandler(struct <anon>* pCommand)
+                         local  struct <anon>* pThis
+                         local  struct ModifyStartTimeCommand* pModifyStartTimeCommand
+                         local  unsigned int i
+                         local  struct RequestInternal* pRequestInternal
+                         inlines  HandlerGetThis<rw::audio::core::SndPlayer1, rw::audio::core::SndPlayer1::ModifyStartTimeCommand>, IsRequestActive
+ 1633  006E6514    164  void* GetDecoderHandle(const struct <anon>* this, struct DecoderRegistry* pDecoderRegistry, int codec)
+                         local  void* decoderHandle
+                         local  char[256] message
+                         inlines  Assert, GetSystem
+ 1665  006E679C    194  bool StreamNextChunk(const struct <anon>* this, unsigned int requestIndex, bool resetDecoder)
+                         local  struct ChunkInfo* pChunkInfo
+                         local  struct RequestInternal* pRequestInternal
+                         local  struct RequestExternal* pRequestExternal
+                         local  int slot
+                         local  bool slotObtained
+                         inlines  Assert, GetRequestInternal, GetSystem
+ 1722  006E6678    124  char* SubmitChunk(const struct <anon>* this, char* pChunk, unsigned int requestIndex, bool resetDecoder)
+                         local  struct <anon>* pChunkHeader
+                         local  struct RequestInternal* pRequestInternal
+                         local  struct RequestExternal* pRequestExternal
+                         local  int numBytes
+                         local  int numSamples
+                         local  struct SndPlayer1FeedDesc* pSndPlayer1FeedDesc
+                         inlines  GetRequestInternal, PutUB<int, unsigned int>
+ 1769  006E7DE0    658  void UnpackHeader(const struct <anon>* this, unsigned int requestIndex, void* pPackedHeader)
+                         local  struct <anon> bitGetter
+                         local  struct RequestInternal* pRequestInternal
+                         local  struct RequestExternal* pRequestExternal
+                         local  unsigned int version
+                         local  unsigned int sampleRate
+                         local  unsigned char loopFlag
+                         inlines  Assert, GetBits, GetRequestInternal, GetSystem
+ 1866  006E6BAC     F4  bool HandleLoopStart(const struct <anon>* this, unsigned int requestIndex)
+                         local  struct RequestInternal* pRequestInternal
+                         local  struct RequestExternal* pRequestExternal
+                         local  int slot
+                         inlines  GetRequestInternal
+ 1945  006E6930    27C  bool HandleSampleEnd(const struct <anon>* this, unsigned int requestIndex, bool* requestCompleted)
+                         local  int requestId
+                         local  struct RequestInternal* pRequestInternal
+                         local  struct RequestExternal* pRequestExternal
+                         local  bool queueTail
+                         local  int slot
+                         local  int slot
+                         inlines  GetRequestInternal
+ 2079  006E75F4    274  bool StartRequest(const struct <anon>* this, unsigned int requestIndex)
+                         local  struct <anon>* pSystem
+                         local  struct RequestInternal* pRequestInternal
+                         local  struct RequestExternal* pRequestExternal
+                         local  struct DecoderRegistry* pDecoderRegistry
+                         local  void* decoderHandle
+                         local  int slot
+                         inlines  Assert, GetRequestInternal, GetSystem, Release
+ 2161  006E5D84    240  void RemoveRequest(const struct <anon>* this, unsigned int requestIndex)
+                         local  struct <anon>* pSystem
+                         local  struct RequestInternal* pRequestInternal
+                         local  struct RequestExternal* pRequestExternal
+                         local  int i
+                         inlines  ExpelAfterDecay, GetRequestInternal, GetSystem, Release

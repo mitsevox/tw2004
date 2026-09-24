@@ -1,0 +1,36 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnax/source/RNAX/PS3/RNAMeshProcessorImmediate.cpp
+// compiled in: RNAMeshProcessorImmediate.cpp
+// 7 functions, source order. line | PS3 address | size
+
+    0  008ABF38     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   38  008AC16C    32C  static void RenderMesh(struct DeviceC* pDevice, struct MeshC* pMesh)
+                         local  const char[11] __FUNCTION__
+                         local  uint32_t numStreams
+                         local  struct MeshPlatC* pMeshPlat
+                         local  struct VertexFormatC* pVF
+                         local  struct IndicesC* pIndices
+                         local  bool bUsesIndices
+                         local  uint32_t uNumVerts
+                         local  int32_t gcmPrimType
+                         local  uint8_t* pIndexBuffer
+                         local  uint32_t indexBufferOffset
+                         local  struct StreamC*[] pStream
+                         local  uint32_t i
+                         local  uint32_t count
+                         local  float tmp
+                         local  uint32_t loop
+                         local  uint32_t rest
+                         inlines  Gcm::cellGcmSetDrawArrays, Gcm::cellGcmSetDrawIndexArray, Gcm::cellGcmSetInvalidateVertexCache, Gcm::cellGcmSetVertexProgramConstants, MeshC::GetIndices, MeshC::GetNumStreams, MeshC::GetVertexFormat, MeshPlatC::GetIndicesOffset, MeshPlatC::GetStartIndex, RNA::GetGCMPrimEnum, RNADebugBreak
+  139  008AC534     9C  void RNAX::MeshRenderImmediate(struct DeviceC* pDevice, void* pContext, struct MeshC* pMesh, struct MaterialC* pMaterial)
+                         inlines  DeviceC::Flush
+  155  008AC498     9C  void RNAX::MeshRenderImmediateMultipass(struct DeviceC* pDevice, void* pContext, struct MeshC* pMesh, struct MaterialC* pMaterial)
+                         inlines  DeviceC::Flush
+  168  008ABFD8    194  void RNAX::GeomRenderImmediate(struct DeviceC* pDevice, void* pContext, struct GeomC* pGeom, void* pUserData)
+                         local  const char[20] __FUNCTION__
+                         local  int32_t iMesh
+                         local  int32_t nMeshes
+                         local  struct MaterialC* pMaterial
+                         local  struct MeshC* pMesh
+                         inlines  DeviceC::Render<RNA::MeshC, RNA::MaterialC*>, GeomC::GetMesh, GeomC::GetMeshMatIndex, GeomC::GetNumMeshes, RNADebugBreak
+  185  008ABFB8     10  static void _GLOBAL__I__ZN4RNAX19MeshRenderImmediateEPN3RNA7DeviceCEPvPNS0_5MeshCEPNS0_9MaterialCE()
+  186  008ABFC8     10  static void _GLOBAL__D__ZN4RNAX19MeshRenderImmediateEPN3RNA7DeviceCEPvPNS0_5MeshCEPNS0_9MaterialCE()

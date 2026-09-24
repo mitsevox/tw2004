@@ -1,0 +1,25 @@
+// ../ears_rt_cct/dev/api_src/Internal/FastMap.h
+// compiled in: ChrCntl_Character.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   31    inline-only   void FastMap<int,int>::Resize(const struct FastMap<int,int>* this, int newAllocated)
+                         local  int* newkeys
+                         local  int* newvalues
+   31    inline-only   void FastMap<int,const EA::CCT::Internal::MotionDefinition*>::Resize(const struct FastMap<int,const EA::CCT::Internal::MotionDefinition*>* this, int newAllocated)
+                         local  int* newkeys
+                         local  const struct MotionDefinition** newvalues
+   56    inline-only   void FastMap<int,const EA::CCT::Internal::MotionDefinition*>::Free(const struct FastMap<int,const EA::CCT::Internal::MotionDefinition*>* this)
+   68    inline-only   uint32_t FastMap<int,const EA::CCT::Internal::MotionDefinition*>::Size(const const struct FastMap<int,const EA::CCT::Internal::MotionDefinition*>* this)
+   69    inline-only   void FastMap<int,int>::Clear(const struct FastMap<int,int>* this)
+   76    inline-only   const struct MotionDefinition*& FastMap<int,const EA::CCT::Internal::MotionDefinition*>::GetValue(const struct FastMap<int,const EA::CCT::Internal::MotionDefinition*>* this, int index)
+   76    inline-only   int& FastMap<int,int>::GetValue(const struct FastMap<int,int>* this, int index)
+   81    inline-only   int FastMap<int,int>::Find(const struct FastMap<int,int>* this, int key)
+                         local  int i
+   81    inline-only   int FastMap<int,const EA::CCT::Internal::MotionDefinition*>::Find(const struct FastMap<int,const EA::CCT::Internal::MotionDefinition*>* this, int key)
+                         local  int i
+   90    inline-only   int FastMap<int,int>::Insert(const struct FastMap<int,int>* this, int key, int value)
+                         local  int index
+   90    inline-only   int FastMap<int,const EA::CCT::Internal::MotionDefinition*>::Insert(const struct FastMap<int,const EA::CCT::Internal::MotionDefinition*>* this, int key, const struct MotionDefinition* value)
+                         local  int index
+  104    inline-only   bool FastMap<int,const EA::CCT::Internal::MotionDefinition*>::Remove(const struct FastMap<int,const EA::CCT::Internal::MotionDefinition*>* this, int key)
+                         local  int i

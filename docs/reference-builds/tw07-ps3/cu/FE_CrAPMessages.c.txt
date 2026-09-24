@@ -1,0 +1,70 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/frontend/GameMessages/FE_CrAPMessages.c
+// compiled in: apt_unity.cpp
+// 17 functions, source order. line | PS3 address | size
+
+  143  0009E17C     F4  void GM_vSetCRAPSlider(enum CrAP_Slider_e sliderID, int8 newSliderValue, bool setUpdate, bool doTurnOnPart)
+                         local  const struct UserInfo& userInfo
+                         local  struct CrAPInfo_t* userCrapInfo
+  176  0002799C    150  uint8 GM_GetFeatureSliderVal(const char* sliderName)
+                         local  uint8 retVal
+                         local  struct FaceBlend* faceBlender
+                         local  const char*[4] suffixes
+                         local  char[64] sname
+                         local  int32 i
+  206  0009DBB4    160  void GM_SetFeatureSlider(const char* sliderName, float value)
+                         local  struct FaceBlend* faceBlender
+                         local  char[64] sname
+                         local  const struct UserInfo& userInfo
+                         local  struct CrAPInfo_t* userCrapInfo
+  239  00027AEC     60  int32 GM_GetCurrentFeatureState(const char* stateName)
+                         local  int32 retVal
+                         local  struct FaceBlend* faceBlender
+  257  00027B4C     60  int32 GM_GetFeatureStates(const char* stateName)
+                         local  int32 retVal
+                         local  struct FaceBlend* faceBlender
+  276  0009DB04     B0  void GM_SetFeatureState(const char* stateName, int32 stateNum)
+                         local  struct FaceBlend* faceBlender
+                         local  const struct UserInfo& userInfo
+                         local  struct CrAPInfo_t* userCrapInfo
+  295  000219A8     88  int8 GM_Gameface_Get_UI_Toggle_Setting(int32 index)
+                         local  const struct UserInfo& userInfo
+  304  00021A30     90  void GM_Gameface_Set_UI_Toggle_Setting(int32 index, int32 value)
+                         local  const struct UserInfo& userInfo
+  316  00021690    318  int32 GM_vGetCRAPItem(FE_CrAP_Asset_Category_e category, int32 subCategory)
+                         local  int32 result
+                         local  int32 hairSub
+                         local  int32 sideburnsSub
+                         local  int32 mustacheSub
+                         local  int32 beardSub
+                         local  int32 lashesSub
+                         local  int32 browsSub
+                         local  FE_CrAP_Asset_Slot_e eSlot
+  446  0006C364     88  bool GM_vIsCrAPItemLocked(FE_CrAP_Asset_Category_e category, int32 subCategory, int32 itemID)
+                         local  const struct UserInfo& userInfo
+                         local  int32 assetID
+  466  00027BAC    1C8  bool GM_vIsCrAPItemOnSale(FE_CrAP_Asset_Category_e category, int32 subCategory, int32 itemID)
+                         local  int i
+                         local  enum FE_eCrAP_Sale_Categories saleCategory
+                         local  int saleID
+                         local  FE_CrAP_Asset_Gender_e gender
+                         local  int32 assetID
+  522  0008EE64     EC  bool GM_vIsCrAPItemOwned(FE_CrAP_Asset_Category_e category, int32 subCategory, int32 itemID)
+                         local  const struct UserInfo& userInfo
+                         local  int32 assetID
+  542  000B6934    164  void GM_vPurchaseCrAPItem(FE_CrAP_Asset_Category_e category, int32 subCategory, int32 itemID, int32 cost)
+                         local  const struct UserInfo& userInfo
+                         local  int32 assetID
+                         local  int32 bonus1
+                         local  int32 bonus2
+                         local  const struct UserInfo& ui
+                         inlines  BitArray_SetBit, BitArray_TestBit
+  594  0009E050    12C  void GM_vPreviewItem(FE_CrAP_Asset_Category_e category, int32 subCategory, int32 itemID)
+                         local  int32 assetID
+  631  000A6538      4  void GM_vRestoreAfterPreview()
+  641  00099C48    170  void GM_vCRAPCreatingLogo(int iCreatingLogo)
+                         local  int currLogo
+                         local  char[32] logoName
+                         local  char* pLogoData
+  682  000AF790    148  void GM_vCRAPTryOnItem(FE_CrAP_Asset_Category_e category, int32 subCategory, int32 itemID)
+                         local  int32 assetID
+                         local  const struct UserInfo& userInfo

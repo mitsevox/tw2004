@@ -1,0 +1,19 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/lo-math/golftimer.cpp
+// compiled in: golf_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   16  00282988     7C  static bool GolfTimer_SetTimeScale(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         inlines  GolfTimer::SetElapsedTimeScale, std::atof
+   27  00214BA4     F8  void GolfTimer::Init()
+                         local  int once
+   50  00214CE8     54  TI_STimeValue GolfTimer::ReadTheHackyTimer()
+   59  00214D3C     28  TI_STimeValue GolfTimer::ReadTheGlobalTimer()
+   63  00214D64     68  void GolfTimer::Update()
+   71  00214DCC     3C  void GolfTimer::RestartHackyTimer()
+   75  0026ACB4    2F8  void GolfTimer::Tick()
+                         local  bool fixTime
+                         inlines  TI_fConvertTimeDifToSeconds, cGAME_GLOBALS::SetElapsedTimeNonAdjusted
+  114  00214E08     1C  void GolfTimer::HackTheElapsedTimeFromOnline(float in_value)
+  120  0026BAF4     DC  void GolfTimer::PostTick()
+                         local  float spf
+                         inlines  cGAME_GLOBALS::SetElapsedTicks

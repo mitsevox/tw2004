@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/include/common/osdk/spreadsheet.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   60    inline-only   const StringComparator* GetComparator(const const struct <anon>* this, int32_t iColumn)
+   67  00624478      C  void ~SpreadSheet(const struct <anon>* this)

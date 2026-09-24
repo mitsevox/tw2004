@@ -1,0 +1,16 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/core/resource/baseresource.h
+// compiled in: MemoryManager.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   58  0081DF58     CC  void BaseResourceDescriptor(const struct <anon>* this)
+                         local  const char[23] __FUNCTION__
+   73  0081E0F0     DC  void BaseResourceDescriptor(const struct <anon>* this, uint32_t size, uint32_t alignment)
+                         local  const char[23] __FUNCTION__
+   85  0081E1CC     24  void ~BaseResourceDescriptor(const struct <anon>* this)
+  111  0081E214     38  uint32_t GetSize(const const struct <anon>* this)
+  132  0081E24C     38  uint32_t GetAlignment(const const struct <anon>* this)
+  243  0081E284     D8  bool rw::operator==(const const struct <anon>& lhs, const const struct <anon>& rhs)
+  253  0081E35C     6C  bool rw::operator!=(const const struct <anon>& lhs, const const struct <anon>& rhs)
+  301  0081E3C8     48  void BaseResourceDescriptorType(const struct <anon>* this)
+  313  0081E63C     70  void BaseResourceDescriptorType(const struct <anon>* this, uint32_t size, uint32_t alignment)
+  323  0081E410     48  void ~BaseResourceDescriptorType(const struct <anon>* this)

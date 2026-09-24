@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/dashboardutil.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    5  005B4670     34  void DashBoardUtil(const struct DashBoardUtil* this)
+    9  005B46D8      C  void ~DashBoardUtil(const struct DashBoardUtil* this)

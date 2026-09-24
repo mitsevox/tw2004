@@ -1,0 +1,35 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_MenuTutorial.cpp
+// compiled in: apt_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   46  000F5324     FC  void UIMenuTutorial::UIMenuTutorial(const struct UIMenuTutorial* this)
+                         inlines  TArrayInternal<UIMenuItemDefaultDst_Tutorial,AptStructSwapper>::TArrayInternal, TExternArray<UIMenuItemDefaultDst_Tutorial>::TExternArray, UIMenuCircDefault::UIMenuCircDefault, UIMenuTutorial::SetShowTryThisTutorial
+   58  000EFD58     A0  void UIMenuTutorial::Init(const struct UIMenuTutorial* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList
+   77  00060930     7C  void UIMenuTutorial::ExitTutorialMenu(const struct UIMenuTutorial* this)
+   94  00034778     C4  void UIMenuTutorial::RestoreFocusPosition(const struct UIMenuTutorial* this)
+                         local  int i
+  119  000BAD84    1B8  enum eAptHandleInput UIMenuTutorial::HandleInput(const struct UIMenuTutorial* this, int32 cID)
+                         local  enum eAptHandleInput retVal
+                         inlines  OnlineManagerOSDK::GetInstance
+  185  0007D540     60  void TutorialMenuArrayUpdate_UpdateItemAndLabel(struct UIMenuItemBaseDst* inMenuItemToUpdate, struct UIMenuItemBaseSrc* inMenuItemArray, int32 index, char* label)
+                         local  struct UIMenuItemDefaultSrc* menuItemIn
+                         local  struct UIMenuItemDefaultDst_Tutorial* menuItem
+                         inlines  UIMenuTutorial::SetAlreadyShownFlag
+  202  0007D5A0    340  void TutorialMenuArrayUpdate_UpdateItemAndLabelFlash(struct UIMenuItemBaseDst* inMenuItem, int32 index, char* label, struct UIResponseHandlerFromFlash* flashHandler)
+                         local  struct UIMenuItemDefaultDst_Tutorial* menuItem
+                         local  char[32] integerStr
+                         local  char[256] myTempString
+                         local  char*[6] aszOptionStrings
+                         local  int iTutIdx
+                         inlines  UIMenuCircBase::GetMenuOpenLevels, UIMenuTutorial::SetAlreadyShownFlag
+  336  00044830     7C  int32 UIMenuTutorial::GetSelectedItem(const struct UIMenuTutorial* this, int iLevel)
+  346  00034728      8  void UIMenuTutorial::SetStartFrom(const struct UIMenuTutorial* this, int32 iTutorialIdx)
+  355  00034730     40  void UIMenuTutorial::SetShotType(const struct UIMenuTutorial* this, int32 iTutorialIdx)
+  376  00034770      8  void UIMenuTutorial::SetTutorialType(const struct UIMenuTutorial* this, int32 iTutorialIdx)
+  387  000448AC    174  void UIMenuTutorial::SetMenuItems_FromFlash(const struct UIMenuTutorial* this)
+                         local  int sizeMenu
+                         local  char* tempString
+                         local  int32 sizeMenu
+  426  00024BE0     80  void UIMenuTutorial::NotifyGetTitleText(const struct UIMenuTutorial* this)
+  439  00057980    100  void UIMenuTutorial::ShowHelpText(const struct UIMenuTutorial* this)

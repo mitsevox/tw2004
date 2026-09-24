@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/locker/source/common/./lockeroperationabstract.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   74    inline-only   LockerApiRefT* GetApi(const const struct <anon>* this)
+   76    inline-only   void MarkAsFailed(const struct LockerOperationAbstract* this, int32_t iFailureCode)

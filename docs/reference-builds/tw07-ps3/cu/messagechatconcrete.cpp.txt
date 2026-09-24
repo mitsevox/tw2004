@@ -1,0 +1,14 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/messagechatconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   79  005CACEC     AC  void MessageChatConcrete(const struct <anon>* this, const char8_t* strName, const char8_t* strText, uint32_t uTimeReceived, uint32_t uFlags)
+  107  005C126C     60  void ~MessageChatConcrete(const struct <anon>* this)
+  111  005D8390      C  bool IsFromAdmin(const const struct <anon>* this)
+  116  005D839C      C  bool IsFromModerator(const const struct <anon>* this)
+  121  005BC2B4      C  bool IsFromMe(const const struct <anon>* this)
+  145  005D6BBC    110  struct <anon>* Construct(const char8_t* strTagField)
+                         local  char8_t[17] strName
+                         local  char8_t[1028] strText
+                         local  uint32_t uFlags
+                         local  struct <anon>* pMessage

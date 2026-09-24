@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/Internal/MotionDefinition.cpp
+// compiled in: MotionDefinition.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    6  005B1ED8      C  int32_t GetModelIndex(const const struct <anon>* this)
+   11  005B1EE4     54  float GetNumFrames(const const struct <anon>* this)
+   16  005B1F38     24  void ProcessEvents(const const struct <anon>* this, struct Character* character, float frameNum, float prevFrameNum, float numFrames, int flags)

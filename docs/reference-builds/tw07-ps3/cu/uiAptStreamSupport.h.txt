@@ -1,0 +1,22 @@
+// ../../../../../TIGERCODE/Code/AptInterface/uiAptStreamSupport.h
+// compiled in: other_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   73  003ED33C      4  void AptStreamTableOfContent::AptStreamTableOfContent(const struct AptStreamTableOfContent* this)
+   79    inline-only   int32 AptStreamTableOfContent::GetCurrentOffset(const struct AptStreamTableOfContent* this)
+  119  004236F8     8C  void StreamMemoryReleaseManager::~StreamMemoryReleaseManager(const struct StreamMemoryReleaseManager* this)
+                         inlines  AptStructSwapper::Free, ~TAptArrayStruct
+  148  003ED894      4  void AptLoadNotifier::AptLoadNotifier(const struct AptLoadNotifier* this)
+  281    inline-only   void PreLoadItem::MarkPreloadItemAvailable(const struct PreLoadItem* this)
+  336    inline-only   bool AptStreamAction::operator==(const const struct AptStreamAction* this, const struct AptStreamAction& a)
+  363  00435858     C4  void AptStreamSupport::AptStreamSupport(const struct AptStreamSupport* this)
+                         inlines  StreamMemoryReleaseManager::StreamMemoryReleaseManager, TAptArrayStruct, TChainList<AptStreamAction>::TChainList
+  364  0042DDA4    224  void AptStreamSupport::~AptStreamSupport(const struct AptStreamSupport* this)
+                         inlines  AptStructSwapper::Free, Next, TArrayInternal<PreLoadItem,AptStructSwapper>::~TArrayInternal, TChainList<AptStreamAction>::~TChainList, ~TAptArrayStruct
+  389    inline-only   void AptStreamSupport::AddStreamToReleaseLater(const struct AptStreamSupport* this, struct TStreamData* stream)
+  398    inline-only   bool AptStreamSupport::IsStreamingOpen(const struct AptStreamSupport* this)
+  400    inline-only   int AptStreamSupport::GetNbrApxToStream(const const struct AptStreamSupport* this)
+  418    inline-only   struct AptStreamTableOfContent* AptStreamSupport::GetTableOfContentObj(const struct AptStreamSupport* this)
+  431    inline-only   void AptStreamSupport::FindMemoryNow(const struct AptStreamSupport* this, struct TStreamData* pStreamData)
+  517    inline-only   void* AptStreamSupport::operator new(size_t size)
+  517    inline-only   void AptStreamSupport::operator delete(void* p, size_t size)

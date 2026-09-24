@@ -1,0 +1,12 @@
+// ../../../../../TIGERCODE/Code/Golf/user/Headers/UserInfoStructs.h
+// compiled in: golf_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+  140    inline-only   uint16_t GeneralUserData::GetDevPoints(const const struct GeneralUserData* this, enum UserDevPointType devPointType)
+  141    inline-only   int8_t GeneralUserData::GetDevLevel(const const struct GeneralUserData* this, enum UserDevPointType devPointType)
+  142    inline-only   int8_t GeneralUserData::IncDevLevel(const struct GeneralUserData* this, enum UserDevPointType devPointType, int8_t incAmnt)
+  143    inline-only   void GeneralUserData::IncDevPoints(const struct GeneralUserData* this, enum UserDevPointType devPointType, uint16_t incAmnt)
+  146    inline-only   void GeneralUserData::SetDevPoints(const struct GeneralUserData* this, enum UserDevPointType devPointType, uint16_t val)
+  259    inline-only   void UCAPSkillChallengesUserData::SetWon(const struct UCAPSkillChallengesUserData* this, int eventIndex, bool bWon)
+  264    inline-only   bool UCAPSkillChallengesUserData::Won(const struct UCAPSkillChallengesUserData* this, int eventIndex)
+  266    inline-only   bool UCAPSkillChallengesUserData::Hidden(const struct UCAPSkillChallengesUserData* this, int eventIndex)

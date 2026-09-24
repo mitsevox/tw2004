@@ -1,0 +1,40 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/locker/source/common/lockerversiononefile.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   79  0061EE6C     4C  void ParseBuffer(const struct <anon>* this)
+  106  005C9B00     8C  bool VerifyTag(const struct <anon>* this)
+                         local  uint32_t uTag
+  150  0061EDE4     88  void ParsePhysicalFilenameSize(const struct <anon>* this)
+  193  0061EC98    14C  void ParsePhysicalFilename(const struct <anon>* this)
+                         inlines  operator=
+  231  005E631C     78  void ParseHeaderSize(const struct <anon>* this)
+  266  005E6234     E8  void ParseHeader(const struct <anon>* this)
+                         inlines  operator->
+  303  005E61BC     78  void ParseBodySize(const struct <anon>* this)
+  338  005E60D4     E8  void ParseBody(const struct <anon>* this)
+                         inlines  operator->
+  375  005E607C     58  void ParseEnd(const struct <anon>* this)
+                         inlines  operator=
+  408  0061EEB8     F0  void LockerVersionOneFile(const struct <anon>* this, struct LockerFile* pFile, char8_t* pBuffer, uint32_t uBufferSize)
+                         inlines  RCPointer
+  439  005EF464     54  void ~LockerVersionOneFile(const struct <anon>* this)
+                         inlines  ~RCPointer
+  462  005D4078     1C  bool IsValid(const struct <anon>* this)
+  486  005D4094      8  struct LockerBuffer* GetBuffer(const struct <anon>* this)
+  514  005DC768    25C  void PrepareVersionOneFile(struct LockerBufferConcrete* pBuffer)
+                         local  char8_t* curBuffer
+                         local  const char8_t* strPhysicalFilename
+                         local  int32_t iPhysicalFilenameLength
+                         local  struct <anon>* pHeader
+                         local  struct <anon>* pBody
+                         local  int32_t iHeaderLength
+                         local  int32_t iBodyLength
+                         local  uint32_t uTag
+  579  005DC9C4    128  uint32_t GetVersionOneFileSize(const struct LockerBuffer* pBuffer)
+                         local  const char8_t* strPhysicalFilename
+                         local  int32_t iPhysicalFilenameLength
+                         local  int32_t iHeaderLength
+                         local  int32_t iBodyLength
+                         local  uint32_t uRequiredBufferSize
+                         inlines  GetElementAt

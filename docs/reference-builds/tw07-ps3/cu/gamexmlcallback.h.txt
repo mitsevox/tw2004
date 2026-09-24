@@ -1,0 +1,21 @@
+// ../../../../../TIGERCODE/Code/golf/gamexml/gamexmlcallback.h
+// compiled in: golf_unity.cpp, rnaunity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   65  004F7998      8  struct GameXMLCallback* GameXMLCallbackParameter::GetCallback(const struct GameXMLCallbackParameter* this)
+   66  004F79A0      8  void GameXMLCallbackParameter::SetCallback(const struct GameXMLCallbackParameter* this, struct GameXMLCallback* callback)
+   69  004F79A8     38  void GameXMLCallbackParameter::~GameXMLCallbackParameter(const struct GameXMLCallbackParameter* this)
+                         inlines  ~RefCounter
+   93  00340E44     18  void GameXMLCallback::~GameXMLCallback(const struct GameXMLCallback* this)
+                         inlines  ~ICallback
+   95  0033EE40     A8  void GameXMLCallback::StartElement(const struct GameXMLCallback* this, const char8_t* name, uint32_t nameLen, uint32_t nameHash, const struct GameXMLAttribute* attributes, uint32_t attributeCount)
+                         local  struct <anon>[64] tempAttributes
+                         local  uint32_t ctr
+  108  0033EEE8     3C  void GameXMLCallback::EndElement(const struct GameXMLCallback* this, const char8_t* name, uint32_t nameLen, uint32_t nameHash)
+  113  0033EF24      4  void GameXMLCallback::StartDocument(const struct GameXMLCallback* this)
+  114  0033EF28      4  void GameXMLCallback::EndDocument(const struct GameXMLCallback* this)
+  115  0033EF2C      4  void GameXMLCallback::StartElement(const struct GameXMLCallback* this, const char8_t* name, uint32_t nameLen, const struct <anon>* attributes, uint32_t attributeCount)
+  116  0033EF30      4  void GameXMLCallback::EndElement(const struct GameXMLCallback* this, const char8_t* name, uint32_t nameLen)
+  117  0033EF34      4  void GameXMLCallback::Cdata(const struct GameXMLCallback* this, const char8_t* data, uint32_t dataLen)
+  118  0033EF38      4  void GameXMLCallback::Characters(const struct GameXMLCallback* this, const char8_t* characters, uint32_t charLen)
+  120  0033EF3C      8  uint32_t GameXMLCallback::GetErrorCount(const struct GameXMLCallback* this)

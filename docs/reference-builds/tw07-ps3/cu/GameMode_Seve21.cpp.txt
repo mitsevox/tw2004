@@ -1,0 +1,169 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_Seve21.cpp
+// compiled in: golf_unity.cpp
+// 58 functions, source order. line | PS3 address | size
+
+    7  00204660     44  void GameModeSeve21::GameModeSeve21(const struct GameModeSeve21* this)
+   12  00202460     18  void GameModeSeve21::~GameModeSeve21(const struct GameModeSeve21* this)
+   16  0024E8F8    20C  void GameModeSeve21::Init(const struct GameModeSeve21* this)
+                         inlines  GameModeBase::SetUseShotClock
+   56  002AC0D4     7C  int32 GameModeSeve21::GetEndGameSequence(const struct GameModeSeve21* this)
+                         local  int32 sequence
+                         local  void* ptr
+   70  003066DC    1F4  void GameModeSeve21::Update(const struct GameModeSeve21* this)
+                         local  char[64] szTargetText
+                         local  bool bValidTarget
+                         local  vec4flt vCurMarkerPos
+                         local  float fDistToPin
+                         local  enum GolferState curGolferState
+                         inlines  GM_GetGolferUp
+  118  00248BD4    110  enum PlayerNumber_t GameModeSeve21::GetHonors(const struct GameModeSeve21* this, enum PlayerNumber_t ignore, bool doNotIgnoreHoledOut)
+                         local  enum PlayerNumber_t rval
+                         local  uint32 playerOrder
+  145  002024DC     70  bool GameModeSeve21::HoleFinished(const struct GameModeSeve21* this, enum PlayerNumber_t PlayerID, bool predict)
+  160  0020254C      8  bool GameModeSeve21::GameFinished(const struct GameModeSeve21* this, bool bPredict)
+  166  0024AEC8     5C  void GameModeSeve21::QuitGame(const struct GameModeSeve21* this)
+                         local  uint32 i
+                         inlines  PhysicsBall_t::ClearFlag
+  175  002ABF9C    138  void GameModeSeve21::EndGame(const struct GameModeSeve21* this)
+                         local  enum PlayerNumber_t winner
+                         local  enum PlayerNumber_t loser
+                         local  int rank
+                         local  int highest
+                         local  struct OnWinData_t onWinData
+                         local  int i
+                         inlines  OnWinData_t::OnWinData_t
+  218  0024FD20    280  void GameModeSeve21::PreShotInit(const struct GameModeSeve21* this, enum PlayerNumber_t PlayerID)
+                         local  struct GreenSelection_t greenSelection
+                         local  uint32 i
+                         local  char[48] strBuf
+                         local  char[48] msgPlayer
+                         local  char[48] msgScore
+                         local  int32 i
+                         inlines  PhysicsBall_t::ClearFlag, PhysicsBall_t::SetFlag
+  270  00252D0C     44  void GameModeSeve21::PreShotUpdate(const struct GameModeSeve21* this, enum PlayerNumber_t PlayerID)
+  276  00252D50     48  int8 GameModeSeve21::HaltStateUpdate(const struct GameModeSeve21* this, enum PlayerNumber_t PlayerID)
+  284  002025B8     74  void GameModeSeve21::EndGolferTurn(const struct GameModeSeve21* this, enum PlayerNumber_t PlayerID)
+  298  002C6748    294  int32 GameModeSeve21::GetClosestPlayersToTargetOnValidGreen(const struct GameModeSeve21* this, enum PlayerNumber_t* players)
+                         local  uint32 playerID
+                         local  int32 numPlayersClosestToPin
+                         local  float currentDistance
+                         local  float closestDistance
+                         local  enum PlayerNumber_t closestPlayer
+  364  002C6618    130  void GameModeSeve21::FlashDistanceToPin(const struct GameModeSeve21* this, enum PlayerNumber_t playerID)
+                         local  char* szFlashText
+                         local  char[48] szBuf
+                         local  float fDistToPin
+  392  0024AF24     84  void GameModeSeve21::DisplayPointAwards(const struct GameModeSeve21* this, enum PlayerNumber_t playerID, uint32 pointAward)
+                         local  char[48] accuAward
+  406  00248CE4    13C  enum PlayerNumber_t GameModeSeve21::GetNextPlayerUp(const struct GameModeSeve21* this)
+                         local  enum PlayerNumber_t nextPlayer
+  423  00248E20     C8  enum PlayerNumber_t GameModeSeve21::GetWinner(const struct GameModeSeve21* this, int32 winningScore)
+                         local  enum PlayerNumber_t winningPlayer
+                         local  uint32 playerID
+  449  0020262C     88  void GameModeSeve21::ResetPlayerOrderList(const struct GameModeSeve21* this)
+                         local  uint32 i
+  463  0021C194    114  void GameModeSeve21::GetUIGameFinishedString(const struct GameModeSeve21* this, char* strBuf, int32 bufferSize)
+  481  002C64D4    144  void GameModeSeve21::UpdateGolferScores(const struct GameModeSeve21* this)
+                         local  uint32 playerID
+  525  002026B4     34  bool GameModeSeve21::RenderBallTarget(const struct GameModeSeve21* this, enum PlayerNumber_t PlayerID)
+  530  002026E8     10  bool GameModeSeve21::RenderBallTargetText(const struct GameModeSeve21* this, enum PlayerNumber_t PlayerID, bool* bHideMarker)
+  536  003068D0     50  bool GameModeSeve21::AllowMiniHUDGhosting(const struct GameModeSeve21* this)
+                         inlines  GM_GetGolferUp
+  541  002026F8     78  void GameModeSeve21::DisplayEndOfRoundScorecard(const struct GameModeSeve21* this)
+  551  00202770     78  void GameModeSeve21::DisplayMidRoundScorecard(const struct GameModeSeve21* this)
+  561  002027E8     FC  bool GameModeSeve21::IsRoundedUIDistanceEqual(const struct GameModeSeve21* this, float a, float b)
+                         local  const uint32 strBufferSize
+                         local  char[32] strRoundedA
+                         local  char[32] strRoundedB
+  582  002028E4      8  bool GameModeSeve21::WaitForCaddieTipGreenSelect(const struct GameModeSeve21* this)
+  590  0024AFA8     88  bool GameModeSeve21::GoToGreenSelection(const struct GameModeSeve21* this)
+                         local  bool rval
+                         local  uint32 i
+                         inlines  PhysicsBall_t::SetFlag
+  614  002028EC      8  bool GameModeSeve21::SkipFlashTextPlayerName(const struct GameModeSeve21* this)
+  619  0021B798    1AC  void GameModeSeve21::GetDistanceToCupString(const struct GameModeSeve21* this, char* strBuf, int32 bufSize, enum Lie_t ballLie, float distFromPin)
+                         local  const char* locStr
+                         local  char[128] distStr
+  652  0024A428     60  void GameModeSeve21::SavePlayerClubs(const struct GameModeSeve21* this)
+                         local  uint32 playerID
+  659  00202554     64  void GameModeSeve21::RestorePlayerClubs(const struct GameModeSeve21* this)
+                         local  uint32 playerID
+  672  00204778     48  void GameModeSeve::GameModeSeve(const struct GameModeSeve* this)
+  677  002028F4     18  void GameModeSeve::~GameModeSeve(const struct GameModeSeve* this)
+  681  0024EB5C     58  void GameModeSeve::Init(const struct GameModeSeve* this)
+  688  00202970      4  void GameModeSeve::Shutdown(const struct GameModeSeve* this)
+  692  00202974     1C  bool GameModeSeve::QueryInterface(const struct GameModeSeve* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bRet
+  706  002C60A8    42C  void GameModeSeve::AfterShotButBeforePostReaction(const struct GameModeSeve* this, enum PlayerNumber_t playerID)
+                         local  enum PlayerNumber_t[4] players
+                         local  int32 numPlayersClosestToPin
+                         local  int32 playerID
+  799  0021BE20    374  bool GameModeSeve::GetUIScoreCardField(const struct GameModeSeve* this, int32_t row, int32_t column, char* strBuf, int32 bufferSize)
+                         local  bool bFieldActive
+                         local  enum PlayerNumber_t playerID
+                         local  int32 curAward
+                         local  char[32] playerBuf
+  911  00248EE8    150  enum PlayerNumber_t GameModeSeve::GetHonoredPlayer(const struct GameModeSeve* this)
+                         local  uint32 playerID
+                         local  enum PlayerNumber_t honoredPlayer
+                         local  enum PlayerNumber_t[4] players
+  950  00202990     50  void GameModeSeve::SetClubRestrictions(const struct GameModeSeve* this)
+                         local  const bit32 availableClubs
+                         local  uint32 playerID
+  959  0029FF74    344  void GameModeSeve::GetAIGreenSelection(const struct GameModeSeve* this, struct GreenSelection_t* greenSelection)
+                         local  float* cupLocation
+                         local  const float randomRadiusOuterLimit
+                         local  const float randomRadiusInnerLimit
+                         local  const struct AIFeatureNetwork* pGreenNetwork
+                         local  bool bNonGreenShotFound
+                         local  const struct AIFeatureNetwork* enclosingNetwork
+                         inlines  Misc_RandFuncf, Singleton<AIFeatureNetworkMgr>::GetSingleton, vec4flt_Copy
+ 1004  0032CDB8     EC  void GameModeSeve::PrepareForNewRound(const struct GameModeSeve* this)
+                         local  uint32 playerID
+                         inlines  GM_GetCurrentHoleIndex, GM_SetPlayerHoleStrokes
+ 1020  002046E8     48  void GameModeTwentyOne::GameModeTwentyOne(const struct GameModeTwentyOne* this)
+ 1025  002029E0     18  void GameModeTwentyOne::~GameModeTwentyOne(const struct GameModeTwentyOne* this)
+ 1029  0024EB04     58  void GameModeTwentyOne::Init(const struct GameModeTwentyOne* this)
+ 1036  00202A5C      4  void GameModeTwentyOne::Shutdown(const struct GameModeTwentyOne* this)
+ 1040  00202A60     1C  bool GameModeTwentyOne::QueryInterface(const struct GameModeTwentyOne* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bRet
+ 1053  0032CEA4    69C  void GameModeTwentyOne::AfterShotButBeforePostReaction(const struct GameModeTwentyOne* this, enum PlayerNumber_t playerID)
+                         local  uint32 numPlayersFinished
+                         local  uint32 playerIdFinished
+                         local  int32 numStrokes
+                         local  uint32 numPlayersFinished
+                         local  uint32 playerIdFinished
+                         local  enum PlayerNumber_t[4] closestPlayers
+                         local  int32 numPlayersClosestToPin
+                         local  int32 curPlayer
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes
+ 1212  0021B944    4DC  bool GameModeTwentyOne::GetUIScoreCardField(const struct GameModeTwentyOne* this, int32_t row, int32_t column, char* strBuf, int32 bufferSize)
+                         local  bool bFieldActive
+                         local  enum PlayerNumber_t playerID
+                         local  char[32] playerBuf
+                         local  int32 curAward
+ 1373  00202A7C     40  bool GameModeTwentyOne::AllowUserChangingShotType(const struct GameModeTwentyOne* this, enum PlayerNumber_t PlayerID)
+ 1381  0032D540    110  enum PlayerNumber_t GameModeTwentyOne::GetHonoredPlayer(const struct GameModeTwentyOne* this)
+                         local  enum PlayerNumber_t leastStrokePlayer
+                         local  uint32 leastStroke
+                         local  uint32 curLeastStroke
+                         local  uint32 playerID
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes
+ 1401  00202ABC     50  void GameModeTwentyOne::SetClubRestrictions(const struct GameModeTwentyOne* this)
+                         local  const bit32 availableClubs
+                         local  uint32 playerID
+ 1409  002A02B8    2DC  void GameModeTwentyOne::GetAIGreenSelection(const struct GameModeTwentyOne* this, struct GreenSelection_t* greenSelection)
+                         local  float* cupLocation
+                         local  const float randomRadiusOuterLimit
+                         local  const float randomRadiusInnerLimit
+                         local  const struct AIFeatureNetwork* pGreenNetwork
+                         local  bool bGreenShotFound
+                         inlines  Misc_RandFuncf, Singleton<AIFeatureNetworkMgr>::GetSingleton, vec4flt_Copy
+ 1440  0032D650    174  void GameModeTwentyOne::PrepareForNewRound(const struct GameModeTwentyOne* this)
+                         local  uint32 playerID
+                         inlines  GM_GetCurrentHoleIndex, GM_SetPlayerHoleStrokes
+ 1468  002C5FC0     E8  enum PlayerNumber_t GameModeTwentyOne::GetFurthestPlayerFromPin(const struct GameModeTwentyOne* this)
+                         local  enum PlayerNumber_t furthestPlayer
+                         local  float fFurthestDist
+                         local  float fCurrentDist
+                         local  uint32 playerID

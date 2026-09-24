@@ -1,0 +1,76 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/Common/PS3/SaveGameSM_TW_PS3.cpp
+// compiled in: apt_unity.cpp
+// 28 functions, source order. line | PS3 address | size
+
+   72  00030DB8     18  static void SaveGameSM_SaveAllUsers_CB(int32 nRslt)
+   81  00065738    194  bool SaveGameSM_SaveAllUsers(struct SavedGameTask* pTask)
+                         local  bool bActive
+                         local  MCCompletionCB sOriginalCompletionCB
+                         local  bool bNeedToAsk
+                         local  enum PlayerNumber_t PlayerID
+                         inlines  SavedGameTask::SetTaskState
+  157  000B04BC    58C  bool SaveGameSM_Save(struct SavedGameTask* pTask)
+                         local  bool bActive
+                         inlines  SGTaskHelper_Save_AskUserResult, SGTaskHelper_Save_CleanupForExit, SGTaskHelper_Save_FreeSpaceCompleted, SGTaskHelper_Save_Initial, SGTaskHelper_Save_StartSettingsCurtainDown, SGTaskHelper_Save_StartSilentSettingsSave, SGTaskHelper_Save_WarningBoxUp, SGTaskHelper_Save_WriteUserDataToCardRslt_Cleanup, SGTaskHelper_Save_WriteUserDataToCardRslt_Settings, SGTaskHelper_Save_WriteUserDataToCardRslt_User, SavedGameTask::GetLastSubTaskRslt, SavedGameTask::SetCurrentContext, SavedGameTask::SetResult, SavedGameTask::SetTaskState
+  251    inline-only   static bool SGTaskHelper_Save_Initial(struct SavedGameTask* pTask)
+                         local  bool bActive
+                         local  int nPortLockedController
+  300    inline-only   static bool SGTaskHelper_Save_AskUserResult(struct SavedGameTask* pTask)
+                         local  bool bActive
+  339    inline-only   static bool SGTaskHelper_Save_WarningBoxUp(struct SavedGameTask* pTask)
+                         local  bool bActive
+  356  000635EC     78  bool SGTaskHelper_Save_WarningBoxDown(struct SavedGameTask* pTask)
+                         local  bool bActive
+  383    inline-only   static bool SGTaskHelper_Save_CleanupForExit(struct SavedGameTask* pTask)
+                         local  bool bActive
+  400    inline-only   static bool SGTaskHelper_Save_WriteUserDataToCardRslt_User(struct SavedGameTask* pTask)
+                         local  bool bActive
+  444    inline-only   static bool SGTaskHelper_Save_StartSilentSettingsSave(struct SavedGameTask* pTask)
+                         local  bool bActive
+  458    inline-only   static bool SGTaskHelper_Save_StartSettingsCurtainDown(struct SavedGameTask* pTask)
+                         local  bool bActive
+  474    inline-only   static bool SGTaskHelper_Save_WriteUserDataToCardRslt_Settings(struct SavedGameTask* pTask)
+                         local  bool bActive
+  498    inline-only   static bool SGTaskHelper_Save_WriteUserDataToCardRslt_Cleanup(struct SavedGameTask* pTask)
+                         local  bool bActive
+  534    inline-only   static bool SGTaskHelper_Save_FreeSpaceCompleted(struct SavedGameTask* pTask)
+  553  0009158C    198  bool SaveGameSM_Save_AskUser(struct SavedGameTask* pTask)
+                         local  bool bActive
+                         inlines  SavedGameTask::GetLastSubTaskRslt, SavedGameTask::SetResult
+  654  000605AC     18  bool SaveGameSM_Save_CheckDiskspace(struct SavedGameTask* pTask)
+                         local  bool bActive
+                         inlines  SavedGameTask::SetResult
+  668  00091724     A8  bool SaveGameSM_Save_ShowMaxUsersPrompt(struct SavedGameTask* pTask)
+                         local  bool bActive
+                         inlines  SavedGameTask::GetLastSubTaskRslt, SavedGameTask::GetResult, SavedGameTask::SetResult
+  701  000605C4     18  bool SaveGameSM_Save_PromptToFreeSpace(struct SavedGameTask* pTask)
+                         local  bool bActive
+                         inlines  SavedGameTask::SetResult
+  728  000B034C    170  bool SaveGameSM_Save_WriteToStorage(struct SavedGameTask* pTask)
+                         local  bool bActive
+                         inlines  SGTaskHelper_WriteToStorage_WaitForPs3SaveGameThread, SavedGameTask::SetResult, SavedGameTask::SetTaskState, cGAME_GLOBALS::IsQuitApplicationRequested
+  784    inline-only   static bool SGTaskHelper_WriteToStorage_WaitForPs3SaveGameThread(struct SavedGameTask* pTask)
+                         local  bool bActive
+  815    inline-only   static bool SGTaskHelper_WriteToStorage_Finished(struct SavedGameTask* pTask)
+                         local  bool bActive
+  847  000B83B0    39C  bool SaveGameSM_Load(struct SavedGameTask* pTask)
+                         local  bool bActive
+                         local  bool bLoadInitialUser
+                         inlines  SGTaskHelper_Load_ReadFromStorageRslt, SavedGameTask::SetResult, SavedGameTask::SetSaveOrLoadOperationCompleted, SavedGameTask::SetTaskState, SavedGameTask::SetTickHandler
+ 1003    inline-only   static bool SGTaskHelper_Load_ReadFromStorageRslt(struct SavedGameTask* pTask)
+                         local  bool bActive
+ 1049  000658CC     74  bool SaveGameSM_WaitForSystemUI(struct SavedGameTask* pTask)
+                         local  bool bActive
+                         inlines  SavedGameTask::SetTaskState
+ 1091  0007E89C     BC  bool SaveGameSM_MonitorSigninUI(struct SavedGameTask* pTask)
+                         local  bool bActive
+                         inlines  SavedGameTask::SetCanPause, SavedGameTask::SetResult
+ 1136  0007F4D0    20C  bool SaveGameSM_Load_ReadFromStorage(struct SavedGameTask* pTask)
+                         local  bool bActive
+                         inlines  SavedGameTask::SetResult, SavedGameTask::SetSaveOrLoadOperationCompleted, SavedGameTask::SetTaskState, SavedGameTask::SetTickHandler
+ 1233  00065940    12C  bool SaveGameSM_FreeSpace(struct SavedGameTask* pTask)
+                         local  bool bActive
+                         inlines  SavedGameTask::GetLastSubTaskRslt, SavedGameTask::SetResult
+ 1284  0007EC7C    180  bool SaveGameSM_DeleteFiles(struct SavedGameTask* pTask)
+                         local  bool bActive
+                         inlines  SavedGameTask::SetSaveOrLoadOperationCompleted, SavedGameTask::SetTaskState, SavedGameTask::SetTickHandler

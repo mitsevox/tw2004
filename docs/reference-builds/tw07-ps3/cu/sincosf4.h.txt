@@ -1,0 +1,21 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/target/ppu/include/bits/sincosf4.h
+// compiled in: SGNodeJoint.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   12    inline-only   void std::sincosf4(float[4] x, float[4]* s, float[4]* c)
+                         local  float[4] xl
+                         local  float[4] xl2
+                         local  float[4] xl3
+                         local  int[4] q
+                         local  int[4] offsetSin
+                         local  int[4] offsetCos
+                         local  float[4] qf
+                         local  float[4] p1
+                         local  float[4] ct1
+                         local  float[4] st1
+                         local  float[4] ct2
+                         local  float[4] st2
+                         local  float[4] cx
+                         local  float[4] sx
+                         local  unsigned int[4] sinMask
+                         local  unsigned int[4] cosMask

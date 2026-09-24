@@ -1,0 +1,46 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/GameData/GameXml.cpp
+// compiled in: golf_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   26  00270040     EC  static void GameXml_pathLowerCopy(char* dst, const char* src)
+                         local  char* c
+                         inlines  std::tolower
+   41  0021A2C0    108  static struct GameXmlCategory* GameXml_recurseGetNode(struct GameXmlCategory* node, char* next)
+                         local  char* token
+                         local  uint16 i
+   59  0021A3C8    164  struct GameXmlCategory* GameXml_getStartNode(struct GameXmlCategory* node, const char* startName)
+                         local  uint32 i
+                         local  uint16 i
+   82  00271E5C     CC  struct GameXmlCategory* GameXml_findNode(struct GameXmlCategory* node, const char* path)
+                         local  char* parsePath
+                         local  char* token
+                         local  char* next
+  106  0027012C    158  static struct GameXmlVariable* GameXml_findValueNode(struct GameXmlCategory* node, const char* path)
+                         local  char* parsePath
+                         local  char* token
+                         local  char* next
+                         local  char* last
+                         local  uint16 i
+                         inlines  std::strrchr
+  138  002709A0     A0  float GameXml_findValue(struct GameXmlCategory* node, const char* path, float fDefault)
+                         local  struct GameXmlVariable* var
+  146  0027051C     A8  int32 GameXml_findValue(struct GameXmlCategory* node, const char* path, int32 iDefault)
+                         local  struct GameXmlVariable* var
+  154  00270284     9C  const char* GameXml_findStringValue(struct GameXmlCategory* node, const char* path, const char* s)
+                         local  struct GameXmlVariable* var
+  162  0021A52C    10C  const char* GameXml_memLevelFileName(enum eGameXmlMemLevel memLevel)
+                         local  const char* rootName
+                         local  uint32 i
+  177  00298FF4     BC  void GameXml_SetVariableFromStr(struct GameXmlVariable* pVar, const char* szValue)
+                         inlines  std::atof, std::atoi
+  200  0021A638    368  static void LoadGameXmlFromStream(struct TStreamData* pStreamData)
+                         local  struct GameXmlHeader* xmlHeader
+                         local  uint32 i
+                         local  const char* rootName
+                         local  struct GameXmlCategory* cat
+                         local  struct GameXmlVariable* var
+  259  0021A21C     A4  void GameXml_DeInitForHole()
+                         local  int x
+  275  0021A9A0     44  void GameXml_registerStreamClients()
+  280  0021A144     D8  void GameXml_Free(enum eGameXmlMemLevel memLevel)
+                         local  uint32 i

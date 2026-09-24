@@ -1,0 +1,53 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/SpudUI.c
+// compiled in: golf_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   49  0020DC24     40  void GUI_ClearSpecialHUDCounters()
+                         local  int i
+   56  00213528     38  void GUI_TriggerSpecialHUD_GameBreaker(enum GUI_SpecialHudStats_t stat)
+   65  00213560     A0  bool GUI_CanTriggerSpecialHUD(enum GUI_SpecialHudStats_t stat)
+                         inlines  GM_IsPlayoff
+   86  00213600     30  void GUI_RegisterSpecialHUDStat(enum GUI_SpecialHudStats_t stat)
+  100  0033DC14    23C  enum GUI_SpecialHudStats_t GUI_ChooseARelevantStatForSPUD()
+                         local  int i
+                         local  enum GUI_SpecialHudStats_t stat
+                         local  bool showable
+                         local  bool statfound
+                         inlines  GM_GetModeType
+  149  002A409C     A0  bool GUI_SPUDStatUsableByGameMode(enum GM_ModeType_t mode, enum GUI_SpecialHudStats_t stat)
+  191  0033DB68     AC  bool GUI_SPUDStatInterestingData(enum GUI_SpecialHudStats_t stat)
+                         local  int32 i
+  212  00237FAC    120  int _NumPuttsSoFarThisRound(enum PlayerNumber_t playerID)
+                         local  int i
+                         local  int putts
+  227  00310BD4    128  int _CountHoleScores(enum PlayerNumber_t playerID, int add)
+                         local  int i
+                         local  int numCount
+                         inlines  GM_GetPlayerHoleStrokes
+  242  0033D204    128  int _CountOverHoleScores(enum PlayerNumber_t playerID, int add)
+                         local  int i
+                         local  int numCount
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes
+  257  0033D32C    100  int _CountGIRs(enum PlayerNumber_t playerID)
+                         local  int i
+                         local  int numCount
+                         inlines  GM_GetCurrentHoleIndex
+  273  0033D42C    100  int _CountFairways(enum PlayerNumber_t playerID)
+                         local  int i
+                         local  int numCount
+                         inlines  GM_GetCurrentHoleIndex
+  289  0033D52C     B0  int _CountHoles()
+                         local  int i
+                         local  int numCount
+                         inlines  GM_GetCurrentHoleIndex
+  304  0033D5DC    104  int _CountPuttHoles(enum PlayerNumber_t playerID)
+                         local  int i
+                         local  int numCount
+                         inlines  GM_GetCurrentHoleIndex
+  321  0033D6E0    488  float GUI_GetSPUDStat(enum PlayerNumber_t PlayerID, enum GUI_SpecialHudStats_t stat)
+                         local  float returnVal
+                         local  int holes
+                         local  int puttholes
+                         local  int numGIRputts
+                         local  int i
+                         inlines  GM_GetCurrentHoleIndex

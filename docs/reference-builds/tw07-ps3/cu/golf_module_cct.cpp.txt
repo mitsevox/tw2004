@@ -1,0 +1,160 @@
+// ../../../../../TIGERCODE/Code/GolfModule/golf_module_cct.cpp
+// compiled in: golf_unity.cpp
+// 35 functions, source order. line | PS3 address | size
+
+  152  002F65E8    208  void GolfModuleCCT::GolfModuleCCT(const struct GolfModuleCCT* this, const const void** __vtt_parm, struct IAllocator* allocator, struct Allocator* levelAllocator, struct CCTInterface* cctInterface, struct Lua* lua)
+                         local  int i
+                         inlines  GolfModuleCCT::ResetFirstGameFaceUpdate, HitPool
+  168  0022F9D8      8  unsigned int GolfModuleCCTInterface::GetMirrorSwapCount(const struct GolfModuleCCTInterface* this)
+  173  0022F9E0     20  const char* GolfModuleCCTInterface::GetMirrorSwapLeftName(const struct GolfModuleCCTInterface* this, unsigned int swapIndex)
+  178  0022FA00     24  const char* GolfModuleCCTInterface::GetMirrorSwapRightName(const struct GolfModuleCCTInterface* this, unsigned int swapIndex)
+  183  0022FA24      8  unsigned int GolfModuleCCTInterface::GetMirrorSpecialMaskCount(const struct GolfModuleCCTInterface* this)
+  188  0022FA2C     20  const char* GolfModuleCCTInterface::GetMirrorSpecialMaskName(const struct GolfModuleCCTInterface* this, unsigned int index)
+  193  0022FA4C     24  unsigned int GolfModuleCCTInterface::GetMirrorSpecialMask(const struct GolfModuleCCTInterface* this, unsigned int index)
+  199  002642E8     C4  static struct TCharacter* GolfModuleCCTInterface_GetCharacter()
+                         local  struct TCharacter* character
+                         local  const enum GAME_MODE_e mode
+                         inlines  FEAnimManager::GetCurrentChar, GamePlayer::GetCharacter
+  217    inline-only   static struct TSkeleton* GolfModuleCCTInterface_GetSkeleton()
+                         local  struct TCharacter* character
+                         local  struct TSkeleton* skeleton
+  225  00264420     80  unsigned int GolfModuleCCTInterface::GetRemappedBoneHashedName(const struct GolfModuleCCTInterface* this, unsigned int boneI)
+                         local  struct TCharacter* character
+                         local  const twSkel* skeleton
+                         local  const unsigned int boneCount
+                         local  const twBone* bone
+  242  002643AC     74  unsigned int GolfModuleCCTInterface::GetRemappedBoneCount(const struct GolfModuleCCTInterface* this)
+                         inlines  GolfModuleCCTInterface_GetSkeleton
+  248  0026A054     D8  void GolfModuleCCT::FirstUpdate(const struct GolfModuleCCT* this)
+                         local  unsigned int i
+                         local  struct TCharacter* pCharacter
+                         inlines  GamePlayer::GetCharacter
+  267  0022E4B4     60  const char* GolfModuleCCT::GetPlayerName(unsigned int index)
+                         local  char*[4] names
+  283  0022FA70     70  const char* GolfModuleCCT::GetIgcName(int gender)
+  301  0022FAE0     70  const char* GolfModuleCCT::GetRigName(int gender)
+  318  0022FB50     70  const char* GolfModuleCCT::GetFrontendPlayerName(int gender)
+  335  0022FBC0     60  const char* GolfModuleCCT::GetSwingFrameContext(unsigned int index)
+                         local  const char*[4] swingFrameText
+  350  0022FC20     60  const char* GolfModuleCCT::GetBallHitContext(unsigned int index)
+                         local  const char*[4] ballHitText
+  365  0022E514     94  unsigned int GolfModuleCCT::GetPlayerIndex(const char* name)
+                         local  unsigned int i
+  380  0028580C    154  float GolfModuleCCT::GetPurchasedSwingSetForCrAPChar(const struct GolfModuleCCT* this, float defaultSwingChar, enum PlayerNumber_t playerID)
+                         local  float finalSwingChar
+                         local  int32 golferHandle
+                         local  struct GamePlayer* pPlayer
+                         local  struct TCharacter* pChar
+                         local  int swingCharSetting
+                         inlines  GamePlayer::GetCharacter
+  429  00308DC4    AF8  void GolfModuleCCT::Update(const struct GolfModuleCCT* this)
+                         local  bool bDoNotUpdateBallAnim
+                         local  enum PlayerNumber_t upGolfer
+                         local  enum GolferState golferState
+                         local  struct TCharacter* pCurrentFEChar
+                         local  const char* actorName
+                         local  const char* luaInit
+                         local  int setResult
+                         local  struct CrAPInfo_t* pCrAPInfo
+                         local  const struct CrAP_TransformModInfo_t& transformInfo
+                         local  int i
+                         local  const struct CrAP_BoneTransform_t* pBone
+                         local  int i
+                         local  struct TCharacter* character
+                         local  const char* playerName
+                         local  int i
+                         local  struct TCharacter* character
+                         local  const char* playerName
+                         local  char[32] strBuf
+                         local  int32 boneIdx
+                         local  Quat zeroRot
+                         local  vec3flt unitScale
+                         local  vec3flt zeroTrans
+                         local  enum PlayerNumber_t upGolfer
+                         local  struct GamePlayer* upPlayer
+                         local  enum Golfer_t upGolferId
+                         local  struct TCharacter* upCharacter
+                         local  float swingChar
+                         local  unsigned int i
+                         local  const char* playerName
+                         local  int setResult
+                         local  const unsigned int upGolfer
+                         local  mat44flt rootMtx
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  struct <anon> param
+                         local  bool translateBall
+                         local  bool rotateBall
+                         local  const char* playerName
+                         local  struct GamePlayer* gamePlayer
+                         local  struct PhysicsBall_t* ball
+                         local  vec4flt ballPosScale
+                         local  vec4flt ballPos
+                         local  vec4flt ballRot
+                         local  struct <anon> param
+                         inlines  FEAnimManager::GetCurrentChar, GM_GetGolferUp, GamePlayer::GetCharacter, Quat_IdentifyForMul, vec_st
+  783  0022FC80      8  int GolfModuleCCT::GetCollisionTestCount(const const struct GolfModuleCCT* this)
+  798  002B9B10    19C  void GolfModuleCCT::UpdateBallRay(const struct GolfModuleCCT* this, const struct <anon>& ballRay)
+                         local  enum PlayerNumber_t playerID
+                         local  struct CoreShotInfo_t* pShotInfo
+                         local  struct <anon> vBallOrigin
+                         local  vec4flt v4BallDir
+                         local  float fLen
+                         local  struct <anon> vBallDirection
+                         inlines  LLMath_DistanceBetween3, LLMath_Subtract3, SetDirection, SetLength, SetOrigin, vec_sub
+  822  0025D534    4FC  void GolfModuleCCT::UpdateFrontEndAnimation(const struct GolfModuleCCT* this)
+                         local  const bool blendingTransition
+                         local  const char* curAnimName
+                         local  const char* reqAnimName
+                         local  const char* reqCameraName
+                         local  const bool switchingCamera
+                         local  const int32 reqClubID
+                         local  const bool selectingClub
+                         local  const bool settingRenderState
+                         local  const bool changingAnim
+                         local  const bool settingAnim
+                         local  const bool restartingState
+                         inlines  FEAnimManager::ClearRestartingState, FEAnimManager::ClearSettingAnimation, FEAnimManager::ClearSettingCamera, FEAnimManager::ClearSettingClub, FEAnimManager::ClearSettingRenderState, FEAnimManager::GetCurAnimName, FEAnimManager::GetCurCameraName, FEAnimManager::GetCurClubID, FEAnimManager::IsBlendingTransition, FEAnimManager::IsRestartingState, FEAnimManager::IsSettingAnimation, FEAnimManager::IsSettingCamera, FEAnimManager::IsSettingClub, FEAnimManager::IsSettingRenderState, FEAnimManager::SetAnimationEnded
+  906  002B9CAC     38  const struct <anon>* GolfModuleCCT::GetBallCollisionRays(const struct GolfModuleCCT* this)
+  914  002B9CE4      4  const struct <anon>* GolfModuleCCT::GetCollisionRays(const const struct GolfModuleCCT* this)
+  936  0022FC88      C  struct <anon>* GolfModuleCCT::GetCollisionHitPool(const struct GolfModuleCCT* this)
+  951  0022FC94     44  unsigned int GolfModuleCCT::GetStreamingResourceTag(const struct GolfModuleCCT* this)
+  955  0022FCD8     44  unsigned int GolfModuleCCT::GetActiveResourceTag(const struct GolfModuleCCT* this)
+  960  003098BC     78  const char* GolfModuleCCT::GetForcedIgcActor(const const struct GolfModuleCCT* this)
+                         local  const unsigned int upGolfer
+                         local  const char* playerName
+                         inlines  GM_GetGolferUp
+  976  0022FD1C     9C  void GolfModuleCCT::SetPlayersIsBindPose(const struct GolfModuleCCT* this, bool isBind)
+                         local  int i
+  985  0022FDB8    460  void GolfModuleCCT::SetPlayerFacesIsBindPose(const struct GolfModuleCCT* this, bool isBind)
+                         local  int i
+ 1045  00309934    3D0  void GolfModuleCCT::DrawDebugBoneAxis(const struct GolfModuleCCT* this)
+                         local  enum PlayerNumber_t golferUp
+                         local  struct GamePlayer* playerUp
+                         local  struct TCharacter* character
+                         local  unsigned int boneCount
+                         local  const short unsigned int* remapping
+                         local  mat44flt boneMtx
+                         local  vec4flt color
+                         local  const float[4] vecScale
+                         local  unsigned int j
+                         local  int boneI
+                         inlines  DS_vSetAlphaBlendingFunction, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, GM_GetGolferUp, GamePlayer::GetCharacter, LLMath_IdentifyMat, PR_vSetCurrentColor, PR_vSetCurrentUsage, vec_st
+ 1124  00230218     34  void GolfModuleCCT::SetNameOfBoneToDraw(const struct GolfModuleCCT* this, const char* boneName)
+ 1130  00269A0C    648  void GolfModuleCCT::InitActorsForLevel(const struct GolfModuleCCT* this)
+                         local  enum GAME_MODE_e mode
+                         local  int32 numPlayers
+                         local  int i
+                         local  struct TCharacter* character
+                         local  const int gender
+                         local  const int blendShapeCount
+                         local  const struct CrAP_TransformModInfo_t& transformModInfo
+                         local  int32 numBoneTransforms
+                         local  int i
+                         local  const struct CrAP_BoneTransform_t* pBoneTransform
+                         local  char[32] boneName
+                         local  int boneIdx
+                         local  const int blendShapeCount
+                         local  const int kNumCrowdActors
+                         local  int i
+                         local  char[16] actname
+                         inlines  GamePlayer::GetCharacter, GolfModuleCCT::ResetFirstGameFaceUpdate, cGAME_GLOBALS::GetCrowds

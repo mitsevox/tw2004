@@ -1,0 +1,82 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/specif/UStreamScheduler.c
+// compiled in: Legacy_unity.cpp
+// 34 functions, source order. line | PS3 address | size
+
+   31  00380D18     60  char* DebugGetStringFrom4Letters(uint32 letter4)
+                         local  char[5] strGetStringFrom4Letters
+  147  00380D78     18  enum UStreamSchedulerState StreamScheduler_GetState()
+  154  0037D69C     3C  bool StreamScheduler_IsFinished()
+  164  00380D90     80  static int StreamScheduler_GetTableIndex(uint32 tableChkRef)
+                         local  int i
+  177    inline-only   int StreamScheduler_BinarySearch(uint32 needle, uint32* haystack, int elems)
+                         local  int head
+                         local  int tail
+                         local  int mid
+  201    inline-only   static int StreamScheduler_GetAssetIndex(struct wsiTable* table, uint32 assetChkRef)
+  211  00380E10     FC  static int StreamScheduler_GetRequestIndex(uint32 tableChkRef, uint32 assetChkRef)
+                         local  int i
+                         local  int i
+  238  0038102C     1C  void StreamScheduler_ResolveOffsets(struct wsiTable* table)
+  248  003A871C    104  static void StreamScheduler_UnloadTableByIndex(int tableIndex)
+  271  003A88E4     B4  bool StreamScheduler_UnloadTable(uint32 tableChkRef)
+                         local  int index
+                         local  int i
+  294  003A8820     C4  bool StreamScheduler_UnloadAllTables()
+                         local  int i
+  311  0038D5A8    170  void StreamScheduler_LoadTable(uint32 tableChkRef, void* table, void* freeTable, const char* streamName)
+                         local  int index
+                         local  struct UStreamSchedulerTableData* tableData
+  340  003916D0     C8  static bool StreamScheduler_CheckWSICallback(Drive3DChunkHdrPtr pHeader)
+                         local  int index
+  358  0038D718     18  static void StreamScheduler_LoadWSICallback(TStreamDataPtr pStreamClass)
+  365  0037E248     44  uint32 StreamScheduler_CalculateAssetChkRef(const char* assetName)
+  372  003AF994     DC  void StreamScheduler_InitModule()
+                         inlines  Allocator::GetTempAllocator
+  398  003C5878     A4  void StreamScheduler_CloseModule()
+  429  00387130     B8  bool StreamScheduler_AssignStreamName(uint32 tableChkRef, const char* streamName)
+                         local  int index
+  448  0038106C     4C  static int StreamScheduler_SortRequestsCallback(const void* a, const void* b)
+                         local  const struct UStreamSchedulerRequest* ra
+                         local  const struct UStreamSchedulerRequest* rb
+  474  00386C94    15C  static void StreamScheduler_SortRequests()
+  500  003A8CCC    2E0  static bool StreamScheduler_RequestNextBlock()
+                         local  int startOffset
+                         local  int endOffset
+                         local  enum StreamSchedulerPriority highestPriority
+                         local  enum StreamSchedulerPriority ourHighestPriority
+                         local  const char*[6] priorityNames
+                         local  bool loadStatus
+                         local  int i
+                         local  struct UStreamSchedulerRequest* request
+  628  003915D4     FC  static bool StreamScheduler_GlobalChunkCheckerCallback(Drive3DChunkHdrPtr pHeader)
+                         local  int index
+  658  0038EB9C    124  static TStreamDataPtr StreamScheduler_GlobalChunkDataCallback(Drive3DChunkHdrPtr pHeader)
+                         local  int index
+                         local  TStreamDataPtr pTempHeader
+  687  003C55D0    2A8  void StreamScheduler_Update()
+                         local  int32 curFile
+                         local  int32 curOffset
+                         local  int32 fileSize
+                         local  int index
+                         local  bool streaming
+                         local  int streamClosed
+  810  00386DF0    2D0  bool StreamScheduler_Request(uint32 tableChkRef, uint32 assetChkRef, enum StreamSchedulerPriority priority, void* overrideDestination, int32 overrideSize)
+                         local  int requestIndex
+                         local  int tableIndex
+                         local  int assetIndex
+                         local  struct wsiTableEntry* tableEntry
+                         local  struct UStreamSchedulerRequest* request
+                         inlines  StreamScheduler_GetAssetIndex
+  886  003870C0     70  bool StreamScheduler_RequestByName(uint32 tableChkRef, const char* assetName, enum StreamSchedulerPriority priority, void* overrideDestination, int32 overrideSize)
+  894  00380F0C     7C  bool StreamScheduler_UpdateRequestPriority(uint32 tableChkRef, uint32 assetChkRef, enum StreamSchedulerPriority priority)
+                         local  int requestIndex
+  913  003810B8     50  bool StreamScheduler_UpdateRequestPriorityByName(uint32 tableChkRef, const char* assetName, enum StreamSchedulerPriority priority)
+  920  00381108     70  bool StreamScheduler_CancelRequest(uint32 tableChkRef, uint32 assetChkRef)
+                         local  int index
+  936  00381178     40  bool StreamScheduler_CancelRequestByName(uint32 tableChkRef, const char* assetName)
+  940  0037D604     98  void StreamScheduler_CancelRequestsFromTable(uint32 tableChkRef)
+                         local  int i
+  957  00381048     24  void StreamScheduler_CancelAllRequests()
+  966  0038EB24     78  struct TStreamData* StreamScheduler_AllocTempStreamHeader()
+                         local  TStreamDataPtr pTempHeader
+  977  0038E95C     1C  void StreamScheduler_FreeTempStreamHeader(struct TStreamData* pHeader)

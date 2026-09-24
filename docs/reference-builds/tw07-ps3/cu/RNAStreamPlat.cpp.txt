@@ -1,0 +1,29 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/PS3/RNAStreamPlat.cpp
+// compiled in: RNAStreamPlat.cpp
+// 11 functions, source order. line | PS3 address | size
+
+    0  008E9724     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   52  008E9580     48  void StreamPlatC(const struct <anon>* this, struct UserData* pUserData, uint32_t uFlags)
+   61  008E9668     BC  void ~StreamPlatC(const struct <anon>* this)
+                         inlines  operator delete
+   67  008E97C4     60  void* Lock(const struct <anon>* this, uint32_t uFlags)
+                         local  const char[5] __FUNCTION__
+                         local  void* pData
+                         inlines  RNADebugBreak
+   79  008E9610      4  void Unlock(const struct <anon>* this)
+   83  008E9824    118  void Create(const struct <anon>* this, struct DeviceC* pDevice, int32_t nVertices, int32_t iStride, VertexElementMaskT ElementMask, enum MemoryLocationE eLocation)
+                         local  const char[7] __FUNCTION__
+                         local  bool bForceToMainMem
+                         inlines  RNADebugBreak
+  110  008E993C    178  void CreateWithUserMem(const struct <anon>* this, struct DeviceC* pDevice, int32_t nVertices, int32_t iStride, VertexElementMaskT ElementMask, enum MemoryLocationE eLocation, void* pAllocatedMemory, int32_t iAllocatedSize)
+                         local  const char[18] __FUNCTION__
+                         local  int32_t iRqrdSize
+                         local  int32_t iRqrdAlignment
+                         inlines  RNADebugBreak
+  139  008E9614     54  void Destroy(const struct <anon>* this)
+  152  008E9AB4    13C  void WriteData(const struct <anon>* this, const void* pData, int32_t iOffset, int32_t nVertices)
+                         local  const char[10] __FUNCTION__
+                         local  uint8_t* pBufferData
+                         inlines  RNADebugBreak
+  165  008E97A4     10  static void _GLOBAL__I__ZN3RNA11StreamPlatC16s_ClassAllocatorE()
+  166  008E97B4     10  static void _GLOBAL__D__ZN3RNA11StreamPlatC16s_ClassAllocatorE()

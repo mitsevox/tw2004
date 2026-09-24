@@ -1,0 +1,69 @@
+map-03 wave 7 (link run), 2026-09-24 12:53-14:00 CDT. Scores: quicktrial instruction diffs unless % given.
+Scratch tools: w7_var.py <fn> <variants.py> [label] (OLD/V dict, indentation ignored), w7_ver.py <fn>
+(base.c under GC 2.5/2.0/2.0p1/1.3.2/2.6/2.7).
+
+DONE
+- SitDevFile fn_800BD580 exact: case 11's sound id read into a block local before the nArg if
+  (`u16 uSound = pDo->n4; nArg = 2; if (nPlayer == 0) nArg = 0; fn_800BD868(uSound, nArg);`).
+  Ternary / if-else forms: 77-85 (worse).
+- SitDevFile SitDev_SetupStateVector 99.01 -> exact, three steps:
+  1. the 3 aSetBits / 14 abPlayed clears are two `for (i...)` loops (CW unrolls them fully, but the
+     zero goes to r5 and lbl to r4 like the original); the written-out stores give li r0.
+  2. `(int)nMode` and `(int)fn_800BB3F8(nMode)` as fn_80067B1C's u16 argument: the original masks
+     again (clrlwi r5 then mr r21,r5). Marked fake match. int/s32/u32 nMode (with or without a (u16)
+     cast on Game_GetMode) is worse.
+  3. the gSurfaceTypes index reloads the surface after the inline SurfaceType_IsValid test at three
+     sites (nStartSurface x2, pPlayer->nSurface): `*(volatile s32*)&field` at the index, fake match.
+     Inline body forms (expr / if-return / u8) do not do it.
+- SitDevFile fn_800BCF84 98.81 -> exact: the deck-reset loop has its own `s32 j` counter (int j: no
+  change; s32 gives `cmpwi n,0; li; ble` like the original), and the sort loop's increment is
+  `anCount[(u32)nKind]++` (fake match: a second spelling of the index so the two anCount[nKind]
+  addresses are not shared; permuter find, 14 min -j2: `j = nKind; anCount[j]` also works).
+- SitDevFile fn_800BB52C 97.9 -> 99.44: `n11 = uRaw & 0x7FF; n5 = (uRaw >> 11) & 0x1F` (the masks make
+  CW keep uRaw and rotate it straight into n5, like the original), decl order pSrc, pDst, pEntry, i,
+  pEntry8, uRaw + a separate `u32 j` for the second loop. Left: 1 instruction, loop 2's offset IV is
+  zeroed `li r6,0` (orig `mr r6,r8` from the counter). Shared i gives the mr but swaps i/pEntry8 in loop
+  2 (7 diffs, all 720 decl orders); j int/s32/uint, `j = 0;` before, `j = i = 0`, pointer-free loop 2,
+  one SitDevBits* pointer for both loops (16), block-scoped pointer in loop 2 (7), counters swapped
+  (loop 1 on j, loop 2 on i) x all 5040 decl orders (best 1): no. Next: permuter (>= 99%), or find
+  what gives the IV its `mr` from a fresh counter. SitDevFile is 46/47: this is its last function.
+
+TRIED, NO GAIN
+- skalib AnimLib_WasLastPlayed (11): pointer local, offset sums in orig order (club first / explicit
+  0x600.. sum), *ppSlot reuse, (*(lbl + n)), &[..][0], !strcmp, nKind u32/s32/uint/u8/char/short. The
+  orig loads the table base (lwz) before the kind multiply, keeping nKind out of r0.
+- skalib fn_80026844 (13 positional): `((s16*)(pTree + nGroupOff))[1]`, pointer local, AnimClubNode
+  ->nDefault: all give 4 (aligned) but still addi+lhax, not the orig add+lha 2(r9).
+- skalib AnimLib_PlanBank (91.6, 0x9d0 bytes): register colouring over the whole function; not tried.
+- SitDevFile fn_800BCF84 sort loop (orig r9/r10/r11 for the invariants, ours r8/r9/r10): postinc,
+  +1, == 0, u16 entry local, s32 j for the sort loop (45), zero loop on j / nKind / pointer / down
+  (45-133), int/s32 sweep of all 5 locals, positional decl climb: no.
+- SitDevFile fn_800BB52C (19): n5 as uRaw / 2048, (int)uRaw >> 11, (uRaw & 0xF800) >> 11, (u8) cast,
+  n11 & 0x7FF; GC 2.0/2.0p1/1.3.2/2.6/2.7 all 19 (not a compiler-version difference).
+- rcmp_mad_codec fn_800B8DF4 (35 aligned): decl climb 20 -> 24 aligned (not applied); variable reuse
+  like libjpeg (z5 for t12, z13 for s/o0): 40-53, worse.
+- rcmp_mad_codec fn_800B8AA0: orig clears 63 words with ctr=3 x 21 stores; ours ctr=7 x 9. Tried
+  count types (u32/s32/uint/u8/s16/u16/long), index loops (1..63, i+1), p[i], *++p, pointer-end
+  loops (!= / <), do/while, while (i--), `*p = 0; p++;`, GC versions: always 9-way (or not unrolled).
+- TerrainData fn_8000C278 (1): `(fDx - fCx) * (fBz - fAz)` (the twin fn_8000C328's order) fixes the
+  fmuls operands but swaps the f0/f1 loads (4); + decl climb, + 400 random orders of the 8 loads,
+  + fn_8000C328's decl order (11): no.
+- GoShaderObject_Rain_Gc fn_800B52D4 (14): block-scoped k (int/s32), int/s32 sweep of i/nHalf/j/nBuf/k.
+- hlaudmovie fn_800A8AD4 (11): uRight before uLeft (14), u* before pData* (11), pDataR from pBlock (13).
+- LLFont fn_80011D0C (9): &pLine[n], `= 0`, for-init form, pCut = p - 1 first (105); char/u8/s8/int
+  for cSaved and c x int/s32/u32 n; positional climb 12: no.
+- char fn_8001A14C (15): chained p60 = pModel = ..., pModel from p60 (43), decl swap: no.
+- skalib fn_80026844: the first group offset in its own block-scoped int (`int nOff20 = ...groups[20]`)
+  gives the orig add+lha shape (nOff20 in r0), but `add r4,r0,r3` operand order and pWork r9 (orig r4):
+  13 positional (same as base). Spellings (off+2)+p, p+(2+off), node->nDefault, [1]: 4 or 13.
+- target TARGET_Init (19): pointer walk (for-increment), &arr[i] local, down loop, pointer-end, (arr+i)->,
+  u32 j: no (orig mixes base-offset stores with a stfsu walker).
+- LLDisp_Gc fn_80006A98 (31): 600 random statement orders x 3 size spellings (VIPad (u16) forms) x 3
+  OSSetArenaLo args: best 26 (reordered, stores then wrong). Size written three times (CSE): 38; global
+  as call arg: 41; s32 copy / (s32) cast / u8* arithmetic: 31.
+- AnimStream fn_800CAA7C (7): int/s32/u32/uint for nStyle/nClub (all 16: 7), nStyle = 0 before the reload.
+- hlaudmovie fn_800A8FFC: &pSounds[..], uptr sum, ppGroups fix-up first, sum operand order: no.
+- DepthField DF_vDrawBufferToScreen (orig: lfs 1.0 into the result register f0 at each clamp, 0.0 from
+  f31): macro clamps on aXY/fZ (f32/f64 fZ), if/else clamps, inline bodies with if-returns / result
+  local / f64 hi: none better; the f64-parameter ternary (all three f64) is 51 aligned (79 base) but
+  144 positional (not applied). mac on fZ with f64 fZ gives the exact branch shape but compares in double.

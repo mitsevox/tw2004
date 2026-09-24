@@ -1,0 +1,13 @@
+// ../../../../../TIGERCODE/packages/t3db/2.21.03-RW-EAC/include/common/t3db/inline.h
+// compiled in: golf_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   59    inline-only   struct Table* FindTable(const struct Database* this, TableRef tblRef)
+                         local  const char[10] __FUNCTION__
+                         local  struct <anon> lock
+   70    inline-only   enum TDbError Load(const struct Database* this, enum LoadType eLoadType, struct IOCallback* pCallbacks)
+                         local  const char[5] __FUNCTION__
+                         local  struct <anon> lock
+   81    inline-only   enum TDbError Save(const struct Database* this, struct IOCallback* pCallbacks)
+                         local  const char[5] __FUNCTION__
+                         local  struct <anon> lock

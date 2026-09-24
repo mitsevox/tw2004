@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/packages/rwaudiocore/2.08.01/include/rw/audio/core/voice.h
+// compiled in: other_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  442    inline-only   bool IsExpelled(const struct Voice* this)

@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/Code/Golf/Temple/GoTempleVideoPlayer.h
+// compiled in: golf_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   71  00236818     1C  void GoTempleVideoPlayer::GoTempleVideoPlayer(const struct GoTempleVideoPlayer* this)
+   72  002369E0      4  void GoTempleVideoPlayer::~GoTempleVideoPlayer(const struct GoTempleVideoPlayer* this)
+   73    inline-only   bool GoTempleVideoPlayer::IsPlayerBusy(const struct GoTempleVideoPlayer* this)
+   74    inline-only   bool GoTempleVideoPlayer::IsSequencePlaying(const struct GoTempleVideoPlayer* this)

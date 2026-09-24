@@ -1,0 +1,15 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/texture16b.cpp
+// compiled in: other_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   18  00420004     50  void Texture16b::Texture16b(const struct Texture16b* this, const const struct Allocator& allocRef, const const struct HashString& textureName, int32_t width, int32_t height, int32_t mipmaps, void* texturedata, bool swizzled)
+  338  003D2A10     18  void Texture16b::~Texture16b(const struct Texture16b* this)
+  355  003D2A8C      4  void Texture16b::GetNPixels(const struct Texture16b* this, int32_t startX, int32_t startY, RawTexture_PixelValue* pixels, int32_t mipmap, int32_t numPixels)
+  359  003D2A90      4  void Texture16b::GetNPixels(const struct Texture16b* this, int32_t pixelIndex, RawTexture_PixelValue* pixels, int32_t numPixels)
+  363  003D2A94      4  void Texture16b::GetPixelValue(const struct Texture16b* this, int32_t x, int32_t y, const RawTexture_PixelValue& value, int32_t mipmap)
+  367  003D2A98      4  void Texture16b::SetPixelValue(const struct Texture16b* this, int32_t x, int32_t y, const RawTexture_PixelValue& value, int32_t mipmap)
+  371  003D2A9C      4  void Texture16b::TintTexture(const struct Texture16b* this, struct Tinter* tinter, float* tintParams, struct RawTexture* tintMask)
+  376  003D2AA0      8  int32_t Texture16b::CalculatePixelIndex(const struct Texture16b* this, int32_t x, int32_t y, int32_t mipmap)
+  382  003D2AA8      4  void Texture16b::GetPixelValueFromIndex(const struct Texture16b* this, int32_t index, const RawTexture_PixelValue& value)
+  386  003D2AAC      4  void Texture16b::SetPixelValueFromIndex(const struct Texture16b* this, int32_t index, const RawTexture_PixelValue& value)
+  390  003D2AB0      8  void* Texture16b::GetRawTextureData(const struct Texture16b* this, int32_t mipmap)

@@ -1,0 +1,26 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/encoderregistry.cpp
+// compiled in: encoderregistry.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   13  006E3748     98  struct EncoderRegistry* CreateInstance(struct <anon>* pSystem)
+                         local  const char[15] __FUNCTION__
+                         local  struct EncoderRegistry* pThis
+                         inlines  New2<rw::audio::core::EncoderRegistry>
+   34  006E37E0     68  void Release(const struct EncoderRegistry* this)
+                         local  const char[8] __FUNCTION__
+                         inlines  Delete<rw::audio::core::EncoderRegistry*>
+   42  006E3848     C4  void* GetEncoderHandle(const struct EncoderRegistry* this, Guid guid)
+                         local  const char[17] __FUNCTION__
+                         local  struct <anon>* pNext
+                         local  struct <anon>* pEncoderDesc
+                         inlines  GetEncoderDescFromNode, GetHead, GetNext
+   67  006E355C     F8  void* RegisterEncoder(const struct EncoderRegistry* this, struct <anon>* pEncoderDesc)
+                         local  const char[16] __FUNCTION__
+                         local  struct <anon>* pNext
+                         local  struct <anon>* pNode
+                         inlines  GetEncoderDescFromNode, GetHead, GetNext, Push
+   98  006E3654     F4  struct Encoder* EncoderFactory(const struct EncoderRegistry* this, void* encoderHandle, int numChannels, int sampleRate, struct <anon>* pSystem)
+                         local  const char[15] __FUNCTION__
+                         local  struct <anon>* pEncoderDesc
+                         local  struct Encoder* pEncoder
+                         inlines  Assert, Encoder::SetChannels, Encoder::SetSampleRate, Encoder::SetSystem

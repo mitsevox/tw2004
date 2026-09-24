@@ -1,0 +1,24 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_PgaTournament_TourWins.cpp
+// compiled in: apt_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   33  000F87F4     94  void UIPgaTournament_TourWins::UIPgaTournament_TourWins(const struct UIPgaTournament_TourWins* this)
+                         inlines  TArrayInternal<UIPgaTournament_TourWins::DstMenuItem_pgtw,AptStructSwapper>::TArrayInternal, TExternArray<UIPgaTournament_TourWins::DstMenuItem_pgtw>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   38  000F0EB4     78  void UIPgaTournament_TourWins::Init(const struct UIPgaTournament_TourWins* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   48  00049514     18  void UIPgaTournament_TourWins::Show(const struct UIPgaTournament_TourWins* this)
+                         local  int32 numElements
+   56  0005D8A4    2A4  void UIPgaTournament_TourWins::UpdateItemAndLabel(const struct UIPgaTournament_TourWins* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_pgtw* dest
+                         local  struct GameModeDriverPGATour* driver
+                         local  int season
+                         local  CalendarDate startDate
+                         local  CalendarDate endDate
+                         local  char[16] startDateString
+                         local  char[16] endDateString
+                         local  char[32] champName
+                         local  char* startToEndDateString
+                         local  char* eventNameString
+                         local  char* champNameString
+  114  00083720     F8  enum eAptHandleInput UIPgaTournament_TourWins::HandleInput(const struct UIPgaTournament_TourWins* this, int32 cID)
+  143  000808D4     7C  void UIPgaTournament_TourWins::RefreshRankList(const struct UIPgaTournament_TourWins* this)

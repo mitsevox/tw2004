@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/include/common/osdk/lobby.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   98  005B9958     44  void CreateGameParams::CreateGameParams(const struct CreateGameParams* this)
+   99  005B99E0      4  void CreateGameParams::~CreateGameParams(const struct CreateGameParams* this)

@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/RNA/Asset/PS3/ShaderAsset.h
+// compiled in: rnaunity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   44    inline-only   struct CGFXShaderC* ShaderAssetC::GetShader(const struct ShaderAssetC* this)
+   84    inline-only   bool ShaderAssetMgrC::GetShaderDumpEnable()

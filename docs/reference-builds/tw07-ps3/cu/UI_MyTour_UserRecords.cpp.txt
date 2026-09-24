@@ -1,0 +1,17 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_MyTour_UserRecords.cpp
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   37  000F92D8     B0  void UIMyTour_UserRecords::UIMyTour_UserRecords(const struct UIMyTour_UserRecords* this)
+                         inlines  AptStaticCharBuffer<8u>::AptStaticCharBuffer
+   55  00033808     58  void UIMyTour_UserRecords::Init(const struct UIMyTour_UserRecords* this)
+   61  000BBC68    5DC  void UIMyTour_UserRecords::Show(const struct UIMyTour_UserRecords* this)
+                         local  const struct UserInfo& userInfo
+                         local  uint32 iDrivingAccuracy
+                         local  uint32 iGIRPercentage
+                         local  float averageScore
+                         local  float averagePutts
+                         local  float averagePutts
+                         local  float averageScore
+                         inlines  Singleton<UserManager>::GetSingleton, UserInfo::GetNumFairwayAttempts, UserInfo::GetNumGIRAttemps, UserInfo::GetNumHolesDriven, UserInfo::GetNumHolesPutting, UserInfo::GetNumRounds
+  128  00044E00     AC  enum eAptHandleInput UIMyTour_UserRecords::HandleInput(const struct UIMyTour_UserRecords* this, int32 cID)

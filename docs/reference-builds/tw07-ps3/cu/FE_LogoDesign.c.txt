@@ -1,0 +1,73 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/frontend/FE_LogoDesign.c
+// compiled in: apt_unity.cpp
+// 39 functions, source order. line | PS3 address | size
+
+   35  00022AC4     2C  bool FE_LogoDesign_IsActive()
+   46  00022AF0     2C  struct UserInfo& FE_LogoDesign_GetCurUser()
+   66  00022B1C     8C  bool FE_LogoDesign_DoesLogoExist(int32_t index)
+   86  00022BA8     44  bool FE_LogoDesign_GetCreatingLogo()
+  101  00022BEC     4C  void FE_LogoDesign_SetCreatingLogo(bool creating)
+  114  00022CE4     70  bool FE_LogoDesign_GetCurUserLogoValid()
+  135  00022C38     AC  bool FE_LogoDesign_IsLogoValid(int32_t index)
+  164  00022D54     C8  void FE_LogoDesign_SetCurUserLogoValid(bool valid)
+  190  00022E1C    11C  void FE_LogoDesign_SetCurUserLogoType(int32 type)
+  222  00022F38     E8  int32 FE_LogoDesign_GetUserLogoType(int32_t num)
+  257  00023180     E4  void FE_LogoDesign_SetCurUserLogoName(char* name)
+  278  00023020    160  void FE_LogoDesign_SetUserLogoName(int32_t index, char* name)
+  308  00023264     E0  char* FE_LogoDesign_GetUserLogoName(int32_t index)
+                         local  char* name
+  336  000233DC     80  char* FE_LogoDesign_GetCurUserLogoData()
+  359  00023344     98  char* FE_LogoDesign_GetUserLogoData(int32_t index)
+  380  00099B68     E0  void FE_LogoDesign_SetCurUserLogoData(char* pData)
+                         local  int32_t width
+                         local  int32_t height
+  418  00099A48    120  void FE_LogoDesign_SetUserLogoData(int32_t index, char* pData)
+                         local  int32_t width
+                         local  int32_t height
+  458  00099E34     AC  void FE_LogoDesign_CurUserLogoFinish()
+  477  0002345C      4  void FE_LogoDesign_OpenOnce()
+  484  00023460      4  void FE_LogoDesign_CloseOnce()
+  492  0005B620    120  void FE_LogoDesign_InitModule(int32_t mode)
+                         local  const char[25] __FUNCTION__
+                         inlines  TagValuePair, operator+
+  506  00023464     50  void FE_LogoDesign_CloseModule()
+  516  000235AC     D4  void FE_LogoDesign_SetCurrentLogoNumber(int32 num)
+  539  00023680     48  int32_t FE_LogoDesign_GetCurrentLogoNumber()
+  550  000234F8     B4  void FE_LogoDesign_SetCurrentLogoMode(int32_t mode)
+  577  000236C8     48  int32_t FE_LogoDesign_GetCurrentLogoMode()
+  617  00023738     98  void FE_LogoDesign_GetClutEntry(int32 clutEntry, uint32* red, uint32* green, uint32* blue, uint32* alpha)
+                         local  uint32* pCLUT
+                         local  uint32 color
+  635  000234B4     44  void FE_LogoDesign_RefreshLogo()
+  649  000237D0      4  void FE_LogoDesign_SetLogoToPremadeTexture(char* textureName)
+  662  00099DB8     7C  void FE_LogoDesign_SetLogoToUserTexture(int32_t index)
+                         local  char* replacedTexData
+  684  00099EE0    1D8  void FE_LogoDesign_SetPixel(int32 x, int32 y, int32 clutEntry)
+                         local  int width
+                         local  int height
+                         local  struct HashString hashedName
+                         local  struct Texture8P tex
+                         inlines  Allocator::GetTempAllocator, HashString::HashString
+  730  000237D4     70  void FE_LogoDesign_UploadCustomLogo()
+  758  0009A0B8    1A4  int32 FE_LogoDesign_GetPixelColor(int32 x, int32 y, uint32* r, uint32* g, uint32* b, uint32* a)
+                         local  uint8 clutEntry
+                         local  int width
+                         local  int height
+                         local  struct HashString hashedName
+                         local  struct Texture8P tex
+                         local  RawTexture_PixelValue val
+                         inlines  Allocator::GetTempAllocator, HashString::HashString
+  803  000998B8    190  static void FE_LogoDesign_FixLogoEdge(char* src, int32_t width, int32_t height)
+                         local  struct HashString hashedName
+                         local  struct Texture8P tex
+                         local  int Ypos
+                         local  int Xpos
+                         inlines  Allocator::GetTempAllocator, HashString::HashString
+  820  00023844     D0  static void FE_LogoDesign_FixEdgeInTempData(uint8* data)
+                         local  int32 pos
+                         local  int32 width
+                         local  int32 height
+  848  00023914     A4  void GM_LogoEditor_UserTextureEdit(int index)
+  872  000239B8      4  void FE_LogoDesign_RegisterMessages()
+  878  000239BC      4  void FE_LogoDesign_CreateLogoTex_XBOX(bool createCLUT, int8 logotype)
+  882  000239C0      4  void FE_LogoDesign_DestroyLogoTex_XBOX()

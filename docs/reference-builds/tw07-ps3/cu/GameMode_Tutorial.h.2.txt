@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/Headers/GameMode_Tutorial.h
+// compiled in: golf_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   54  0033F144      8  int32 GameModeTutorial::GetEndGameSequence(const struct GameModeTutorial* this)
+   79  0033F14C      8  bool GameModeTutorial::SkipFlashTextPlayerName(const struct GameModeTutorial* this)
+   80  0033F154      8  bool GameModeTutorial::SkipFlashTextShotNumber(const struct GameModeTutorial* this)
+   94  0033F15C     14  const char* GameModeTutorial::GetName(const struct GameModeTutorial* this)

@@ -1,0 +1,47 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_PopupDef.cpp
+// compiled in: apt_unity.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   43  000F9CD8     94  void UIPopupDef::UIPopupDef(const struct UIPopupDef* this)
+                         inlines  AptStaticCharBuffer<1024u>::AptStaticCharBuffer, UIResponseHandlerFromFlash::UIResponseHandlerFromFlash
+   57  0006D964     78  void UIPopupDef::Init(const struct UIPopupDef* this)
+   67  00033DD0     24  void UIPopupDef::Close(const struct UIPopupDef* this)
+   73  000A15DC     C4  void UIPopupDef::NotifySetSizes(const struct UIPopupDef* this)
+                         local  int32 outW
+                         local  int32 outH
+                         local  int32 outNbrLines
+                         local  char* outvariable
+                         local  int32 tipLines
+                         inlines  std::atoi
+   93  000EC444    1D0  enum eAptHandleInput UIPopupDef::HandleInput(const struct UIPopupDef* this, int32 cID)
+                         local  enum PlayerNumber_t golferUp
+                         local  enum PlayerNumber_t userID
+                         local  const struct UserInfo& userInfo
+                         local  int32 controller
+                         inlines  GM_GetGolferUp
+  148  000E7F9C    11C  void UIPopupDef::ShowCaddyTipPopup(const struct UIPopupDef* this, struct UIResponseHandler* inpHandler, char* inMessageId, bool bLocalize, bool SuperSizeIt)
+  179  0007A1E8     54  void UIPopupDef::editMessage(const struct UIPopupDef* this, char* inMessageId)
+  186  00069790     B4  void UIPopupDef::Show(const struct UIPopupDef* this)
+  202  000A16A0    10C  void UIPopupDef::OnShow(const struct UIPopupDef* this)
+                         local  int32 lines
+                         local  char* outvariable
+                         local  int32 outW
+                         local  int32 outH
+                         local  int32 outNbrLines
+                         inlines  std::atoi
+  221  000315E4     28  enum TAptSequenceStatus UIPopupDef::ShowInSequence(const struct UIPopupDef* this, bool inbFirstTime, void* inData)
+  227  000763B0    270  enum TAptSequenceStatus UIPopupDef::CountDownAndClosePopup(const struct UIPopupDef* this, bool inbFirstTime, void* inData)
+                         local  TI_STimeValue currentTime
+                         local  float secsRemaining
+                         inlines  TI_fConvertTimeDifToSeconds, sys_time_get_timebase_frequency
+  250  000495D4     44  void UIPopupDef::hidePopup(const struct UIPopupDef* this)
+  256  00049618     80  void UIPopupDef::ShowHelpText(const struct UIPopupDef* this)
+  264  0003F080     50  void UIPopupDef::ChangeTopText(const struct UIPopupDef* this, char* newText)
+  270  0004952C     A8  void UIPopupDef::ChangeTopHeight(const struct UIPopupDef* this)
+                         local  int32 heightType
+                         local  char* tmpBuf
+                         local  char* outvariable
+  283  000ECF84     84  void UIPopupDef::Hide(const struct UIPopupDef* this)
+  302  00049698    128  void UIPopupDef::OnHide(const struct UIPopupDef* this)
+                         local  void* ptr
+                         local  struct GameModeOneBall* mode

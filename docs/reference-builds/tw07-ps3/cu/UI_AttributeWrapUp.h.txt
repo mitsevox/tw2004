@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/UI_AttributeWrapUp.h
+// compiled in: apt_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   19  00122C90     C0  void UIAttributeWrapUp::~UIAttributeWrapUp(const struct UIAttributeWrapUp* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStaticCharBuffer<64u>::~AptStaticCharBuffer, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   21  000FE700      C  uint32 UIAttributeWrapUp::GetSignature(const const struct UIAttributeWrapUp* this)
+   34  000FE70C     24  void UIAttributeWrapUp::RegainFocus(const struct UIAttributeWrapUp* this, uint32 )
+   35  000FE730     24  void UIAttributeWrapUp::LooseFocus(const struct UIAttributeWrapUp* this, uint32 )
+   43  00100B14     14  void UIAttributeWrapUp::NotifyStartUpdate_func(struct IAptSubscriber* subs)
+   44  000FE754     14  enum AptThreadReturnValue UIAttributeWrapUp::UpdateFlashThread_func(struct IAptSubscriberBase* subs)

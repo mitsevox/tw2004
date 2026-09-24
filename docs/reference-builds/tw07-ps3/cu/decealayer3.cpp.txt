@@ -1,0 +1,22 @@
+// C:/packages/rwaudiocore/2.08.01/source/decoders/ealayer31/decealayer3.cpp
+// compiled in: decealayer3.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   31  006D8694      8  struct <anon>* EaLayer31Dec::GetDecoderDesc()
+   37  006D88B4     38  unsigned int EaLayer31Dec::GetSize(unsigned int numChannels, unsigned int* pAlignment)
+                         local  unsigned int memRequired
+                         local  int numEaLayer3CoreInstances
+                         inlines  core::LinearAllocAddSize
+   67  006D8754    160  bool EaLayer31Dec::CreateInstanceEvent(struct Decoder* pDecoder)
+                         local  struct EaLayer31Dec* pThis
+                         local  uintptr_t pMemBlock
+                         local  unsigned int sizeOfEALayer3Core
+                         local  unsigned int memRequired
+                         local  struct EALayer3Core* pEALayer3Cores
+                         local  int i
+                         local  int i
+                         local  int numChannelsThisDecoder
+                         inlines  core::LinearAlloc<rw::audio::core::EALayer3Core**, std::uintptr_t>, core::LinearAlloc<rw::audio::core::EALayer3Core*, rw::audio::core::EALayer3Core*>, core::LinearAllocAddSize
+  137  006D869C     B8  void EaLayer31Dec::ReleaseEvent(struct Decoder* pDecoder)
+                         local  struct EaLayer31Dec* pThis
+                         local  int i

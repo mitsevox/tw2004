@@ -1,0 +1,43 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_Trunk.cpp
+// compiled in: shader_unity.cpp
+// 28 functions, source order. line | PS3 address | size
+
+   35  0051B134    1B4  void SM_TrunkClass::SM_TrunkClass(const struct SM_TrunkClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base, vec4flt_Zero, vec_st
+   96  00508274    69C  void SM_TrunkClass::Load(const struct SM_TrunkClass* this)
+  158  00508910    28C  void SM_TrunkClass::Activate(const struct SM_TrunkClass* this)
+  192  00508B9C     40  void SM_TrunkClass::Deactivate(const struct SM_TrunkClass* this)
+  201  00511968     60  void SM_TrunkClass::SetTrunkWindStartHeight(const struct SM_TrunkClass* this, float height)
+  208  005119C8     60  void SM_TrunkClass::SetFullWindTreeHeight(const struct SM_TrunkClass* this, float fullWindTreeHeight)
+  218  00517970     6C  void SM_TrunkClass::SetWindAmplitude(const struct SM_TrunkClass* this, const float[4]& amplitude)
+                         inlines  vec4flt_Copy
+  225  005179DC     6C  void SM_TrunkClass::SetWindFrequency(const struct SM_TrunkClass* this, const float[4]& frequency)
+                         inlines  vec4flt_Copy
+  232  00517A48     6C  void SM_TrunkClass::SetWindDir(const struct SM_TrunkClass* this, const float[4]& windDir)
+                         inlines  vec4flt_Copy
+  240  00511A28     70  void SM_TrunkClass::SetLightDir(const struct SM_TrunkClass* this, float lx, float ly, float lz)
+  249  00511A98     60  void SM_TrunkClass::SetDiffuseFactor(const struct SM_TrunkClass* this, float diffuseFactor)
+  258  00511AF8     60  void SM_TrunkClass::SetAmbientFactor(const struct SM_TrunkClass* this, float ambientFactor)
+  268  00517AB4     6C  void SM_TrunkClass::SetTFactor(const struct SM_TrunkClass* this, const float[4]& TFactor)
+                         inlines  vec4flt_Copy
+  278  00511B58     70  void SM_TrunkClass::SetHRCamPos(const struct SM_TrunkClass* this, float x, float y, float z)
+  288  00511BC8     70  void SM_TrunkClass::SetHRShadowDispUnscaled(const struct SM_TrunkClass* this, float x, float y, float z)
+  298  00511C38     60  void SM_TrunkClass::SetHRShadowDist(const struct SM_TrunkClass* this, float dist)
+  308  00517B20     B4  void SM_TrunkClass::SetMshadow(const struct SM_TrunkClass* this, float[4]* pShadow)
+                         inlines  vec4flt_Copy, vec_st
+  320  00517BD4     B4  void SM_TrunkClass::SetMshadowHR(const struct SM_TrunkClass* this, float[4]* pShadow)
+                         inlines  vec4flt_Copy, vec_st
+  332  00517C88     B4  void SM_TrunkClass::SetMshadowGolfer(const struct SM_TrunkClass* this, float[4]* pShadow)
+                         inlines  vec4flt_Copy, vec_st
+  344  00517D3C     6C  void SM_TrunkClass::SetShadowsColor(const struct SM_TrunkClass* this, const float[4]& shadowsColor)
+                         inlines  vec4flt_Copy
+  354  00511C98     64  void SM_TrunkClass::SetColorTexture(const struct SM_TrunkClass* this, TextureRef texRef)
+  364  00511CFC     64  void SM_TrunkClass::SetShadowTexture(const struct SM_TrunkClass* this, TextureRef texRef)
+  374  00511D60     64  void SM_TrunkClass::SetShadowHRTexture(const struct SM_TrunkClass* this, TextureRef texRef)
+  397  00517DA8     6C  void SM_TrunkClass::SetFogColor(const struct SM_TrunkClass* this, float* camPos)
+                         inlines  vec4flt_Copy
+  407  00517E14     6C  void SM_TrunkClass::SetFogCameraPos(const struct SM_TrunkClass* this, float* camPos)
+                         inlines  vec4flt_Copy
+  417  00511DC4     60  void SM_TrunkClass::SetFogDensity(const struct SM_TrunkClass* this, float f)
+  427  00511E24     60  void SM_TrunkClass::SetFogStartRadius(const struct SM_TrunkClass* this, float f)
+  437  00511E84     60  void SM_TrunkClass::SetFogHeightTop(const struct SM_TrunkClass* this, float f)

@@ -1,0 +1,33 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_Credits.cpp
+// compiled in: apt_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   51  000F5C1C     94  void UICredits::UICredits(const struct UICredits* this)
+                         inlines  TArrayInternal<UICredits::DstMenuItem_cred,AptStructSwapper>::TArrayInternal, TExternArray<UICredits::DstMenuItem_cred>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   57  000EF468     78  void UICredits::Init(const struct UICredits* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   71  0004281C     9C  void UICredits::Show(const struct UICredits* this)
+   87  00042F24      4  void UICredits::Hide(const struct UICredits* this)
+  103  0008B18C      8  void UICredits::UpdateItemAndLabel(const struct UICredits* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_cred* dest
+  114  0003420C     38  void UICredits::Timer_Start(const struct UICredits* this)
+  119  000751E0     24  enum AptThreadReturnValue UICredits::TimerUpdateThread(const struct UICredits* this)
+  125  00074FB0    230  void UICredits::Timer_Update(const struct UICredits* this)
+                         local  TI_STimeValue currentTime
+                         local  float secsRemaining
+                         inlines  TI_fConvertTimeDifToSeconds, sys_time_get_timebase_frequency
+  140  00034244     7C  void UICredits::NextPage(const struct UICredits* this)
+  150  000342C0     7C  void UICredits::PreviousPage(const struct UICredits* this)
+  158  0003433C     A4  char* UICredits::GetStringFromC3P0(const struct UICredits* this, int32 creditsIndex)
+                         local  char[32] creditsID
+                         local  const char* credits
+  177  0008AE8C    300  void UICredits::GetItemOnPage(const struct UICredits* this, struct DstMenuItem_cred* opItem)
+                         local  const char[2] newline
+                         local  int32 count
+                         local  char* pch
+                         local  char* tokenEnd
+                         local  int strLen
+                         local  char* tempStr
+                         inlines  std::strstr
+  277  000343E0    14C  void UICredits::NotifyChangePage(const struct UICredits* this)
+  316  0003452C    13C  enum eAptHandleInput UICredits::HandleInput(const struct UICredits* this, int32 cID)

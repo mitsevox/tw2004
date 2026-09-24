@@ -1,0 +1,113 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_math/dev/src/MathQuat.c
+// compiled in: MathQuat.c
+// 23 functions, source order. line | PS3 address | size
+
+   25  008E6DA8    15C  void Quat_Multiply(const float* Q1, const float* Q2, float* Q)
+                         local  Quat q
+                         inlines  vec4flt_AddScale3, vec4flt_CrossProduct3, vec4flt_DotProduct3, vec_madd, vec_nmsub, vec_perm
+   41  008E76E4    1D8  void Quat_Slerp(float fFactor_p, const float* Q1, const float* Q2, float* dest)
+                         local  const float tlC_SLERP_EPSILON
+                         local  Quat cTempQuat
+                         local  float tlOmega
+                         local  float tlCosOmega
+                         local  float tlOneOverSinOmega
+                         local  float tlScale0
+                         local  float tlScale1
+                         local  vec4flt s0
+                         inlines  __vec_mul, std::sinf, vec4flt_AddScale4, vec4flt_Copy4, vec4flt_DotProduct4, vec4flt_Negate4, vec4flt_Scale4, vec_madd, vec_sld, vec_splat, vec_sub
+  109  008E70DC     A4  void Quat_Invert(const float* src, float* dest)
+                         local  float tlOneOverNorm
+                         inlines  Quat_GetNorm, __vec_mul, vec4flt_Copy3, vec4flt_Scale4, vec_madd, vec_sld
+  124  008E6D7C     2C  void Quat_Conjugate(const float* src, float* dest)
+                         inlines  vec4flt_Negate3
+  132  008E6F60     88  void Quat_RotateVector4(const float* Q0, const float* V0, float* V)
+                         local  vec4flt cTempVectorQuat
+                         local  vec4flt cConjugateOfVectorQuatSrc
+  144  008E69A8     E8  void Quat_ToMatrix34(const float* Q, float[4]* M)
+                         local  float xx
+                         local  float yy
+                         local  float zz
+                         local  float xy
+                         local  float zw
+                         local  float xz
+                         local  float xw
+                         local  float yz
+                         local  float yw
+  222  008E791C    214  void Quat_BuildFromEulerAnglesPYR(float fYaw_p, float fPitch_p, float fRoll_p, float* Q)
+                         local  vec4flt a
+                         local  vec4flt b
+                         local  vec4flt c
+                         local  vec4flt d
+                         local  vec4flt e
+                         local  vec4flt f
+                         local  float s1
+                         local  float c1
+                         local  float s2
+                         local  float c2
+                         local  float s3
+                         local  float c3
+                         inlines  __vec_mul, float_SinCos, std::cosf, vec4flt_Add4, vec4flt_Multiply4, vec4flt_Scale3, vec4flt_Set3, vec4flt_Set4, vec_ld
+  263  008E7508    1DC  void Quat_BuildFromVector4(const float* v, float* Q)
+                         local  float magnitude
+                         local  float scale
+                         inlines  Quat_Identify, __vec_len_sqr3, std::cosf, std::sqrt, vec4flt_Length3, vec4flt_Scale3, vec_madd, vec_sld
+  286  008E7B30    13C  void Quat_BuildFromAxisAndAngle(float x, float y, float z, float angle, float* quat)
+                         local  float sinHalfAngle
+                         local  float squaredLength
+                         local  float scale
+                         inlines  __vec_mul, float_SinCos, std::cosf, vec4flt_LengthSquared3, vec4flt_Scale3, vec4flt_Set3, vec_madd, vec_sld
+  298  008E7C6C    218  void Quat_BuildFromEulerAnglesRPY(float fYaw_p, float fPitch_p, float fRoll_p, float* Q)
+                         local  vec4flt a
+                         local  vec4flt b
+                         local  vec4flt c
+                         local  vec4flt d
+                         local  vec4flt e
+                         local  vec4flt f
+                         local  float s1
+                         local  float c1
+                         local  float s2
+                         local  float c2
+                         local  float s3
+                         local  float c3
+                         inlines  __vec_mul, float_SinCos, std::cosf, vec4flt_Add4, vec4flt_Multiply4, vec4flt_Scale3, vec4flt_Set3, vec4flt_Set4, vec_ld
+  338  008E7200    2A4  void Quat_BuildFromMatrix44(float[4]* M, float* Q)
+                         local  float trace
+                         local  float s
+                         local  int[3] nxt
+                         local  int i
+                         local  int j
+                         local  int k
+                         local  Quat q
+                         inlines  std::sqrt, vec4flt_Copy4
+  398  008E6F04     5C  void Quat_Multiply3(const float* Q0, const float* Q1, const float* Q2, float* Q)
+                         local  Quat tmp
+  408  008E7E84     98  void Quat_BuildFromYaw(float r, float* Q)
+                         inlines  Quat_Zero4, float_SinCos, std::cosf
+  416  008E7F1C     90  void Quat_BuildFromPitch(float r, float* Q)
+                         inlines  Quat_Zero4, float_SinCos, std::cosf
+  424  008E6A90     98  void Quat_BuildFromRoll(float r, float* Q)
+                         inlines  Quat_Zero4, float_SinCos, std::cosf
+  432  008E6B28    144  void Quat_ExtractEulerAngles(const float* Q, float* fYaw_p, float* fPitch_p, float* fRoll_p)
+                         local  float xx
+                         local  float yy
+                         local  float zz
+                         local  float xy
+                         local  float zw
+                         local  float xz
+                         local  float xw
+                         local  float yz
+                         local  float yw
+  458  008E704C     90  void QuatTrans_Multiply(const QuatTrans* Q0, const QuatTrans* Q1, QuatTrans* dest)
+                         inlines  vec4flt_Add4
+  469  008E7180     80  void QuatTrans_Invert(const QuatTrans* Q0, QuatTrans* dest)
+                         inlines  vec4flt_Negate4
+  480  008E6CD0     AC  void QuatTrans_TransLerp(float fBlend, const QuatTrans* Q1, const QuatTrans* Q2, QuatTrans* dest)
+                         local  float W2
+                         inlines  __vec_make_from_scalar, __vec_mul, vec4flt_AddScale4, vec4flt_Scale4, vec_madd, vec_splat
+  492  008E78BC     60  void QuatTrans_Slerp(float fBlend, const QuatTrans* Q1, const QuatTrans* Q2, QuatTrans* dest)
+  500  008E74A4     64  void QuatTrans_BuildFromMatrix44(float[4]* mat, QuatTrans* QT)
+                         inlines  vec4flt_Copy4, vec_st
+  510  008E6C6C     64  void QuatTrans_ToMatrix44(const QuatTrans* QT, float[4]* M)
+                         inlines  vec4flt_Copy4, vec_st
+  520  008E6FE8     64  void QuatTrans_RotateVector4(const QuatTrans* QT, const float* src, float* dest)
+                         inlines  vec4flt_Add4

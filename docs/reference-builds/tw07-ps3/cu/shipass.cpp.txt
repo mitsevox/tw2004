@@ -1,0 +1,7 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/shipass.cpp
+// compiled in: shipass.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   42  006C9E24    154  int SNDCTRL_highpass(int shandle, int highPassCutOff)
+                         local  int setvoice
+                         local  int voice

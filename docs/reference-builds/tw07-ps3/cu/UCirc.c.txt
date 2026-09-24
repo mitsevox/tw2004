@@ -1,0 +1,127 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/UCirc.c
+// compiled in: Legacy_unity.cpp
+// 45 functions, source order. line | PS3 address | size
+
+  245  003B2F2C     C8  bool Circular_LockMemAlloc(CircularBuffer_t* pBuffer, bool lockMemAlloc, const char* file, int line)
+                         local  bool oldState
+  269  003B2EC0     6C  bool Circular_AllocationsLocked(CircularBuffer_t* pBuffer)
+  276  003B2C8C     94  enum TFragState Circular_GetFragmentationState(CircularBuffer_t* pBuffer)
+  290  003B2B1C     E4  void Circular_DestroyBuffer(CircularBuffer_t* pBuffer, CircularBuffer_t* pMemBudgetBuffer, enum TMemoryType memoryType)
+  318    inline-only   static void Circular_InitCircularBufferVars(CircularBuffer_t* pBuffer)
+  348  003B25EC    28C  CircularBuffer_t* Circular_CreateBuffer(uint32 bufferSize, CircularBuffer_t* pMemBudgetBuffer, enum TMemoryType memoryType)
+                         local  CircularBuffer_t* pBuffer
+                         local  enum TMemoryType headerMemType
+                         local  struct <anon> params
+                         local  MemBudgetTracker_InitInfo initInfo
+                         inlines  Circular_InitCircularBufferVars
+  417  0037AB7C     18  void Circular_SetDefaultCircularBuffer(CircularBuffer_t* pBuffer)
+  424  0037AB94     38  bool Circular_IsPointerInBuffer(CircularBuffer_t* pBuffer, void* ptr)
+                         local  uintptr_t maxAddress
+                         local  uintptr_t minAddress
+  441  0037ABCC      8  struct MemBudgetTracker* Circular_GetMemBudgetTracker(CircularBuffer_t* pBuffer)
+  445  0037ABD4      8  void Circular_SetCurrentBudgetType(CircularBuffer_t* pBuffer, MemBudgetTypeE eType)
+  449  0037ABDC      8  MemBudgetTypeE Circular_GetCurrentBudgetType(CircularBuffer_t* pBuffer)
+  462  003B248C    160  void Circular_InitBuffer(CircularBuffer_t* pBuffer, MemBudgetTracker_Budget* pBudgetInfo)
+                         local  int32 BufferSize
+  510  0037AC44     14  void Circular_CloseBuffer(CircularBuffer_t* pBuffer)
+  525    inline-only   static int32 Circular_FindNextFreeBloc(CircularBuffer_t* pBuffer, unsigned int MemSize)
+                         local  TInfoBlock* pInfoBloc
+                         local  int32 i
+  545  003B23D8     B4  int32 Circular_ComputeTotalFreeMem(CircularBuffer_t* pBuffer)
+                         local  TInfoBlock* pInfoBloc
+                         local  int32 i
+                         local  int32 freeMem
+  563  003B2328     B0  int Circular_CountFreeBlocks(CircularBuffer_t* pBuffer)
+                         local  int iBlocksFree
+                         local  TInfoBlock* pInfoBloc
+                         local  int32 i
+  591    inline-only   static int32 Circular_FindPreviousFreeBloc(CircularBuffer_t* pBuffer, unsigned int MemSize)
+                         local  TInfoBlock* pInfoBloc
+                         local  int32 i
+  614    inline-only   static int32 Circular_FindPreviousSmallestFreeBloc(CircularBuffer_t* pBuffer, int32 MemSize)
+                         local  TInfoBlock* pInfoBloc
+                         local  int32 i
+                         local  int32 freeSize
+                         local  int32 minFreeSize
+                         local  int32 memIndex
+  651  0037AC58     30  void Circular_ResetNetMemTracking()
+                         local  int32 i
+  661  00394598     80  void Circular_PrintNetMemTracking()
+                         local  int32 i
+  704  003AB05C    938  void* Circular_MemAllocFunc(CircularBuffer_t* pBuffer, int32 MemSize, MemBudgetTypeE eBudgetType, TTypeAcces TypeMem, int32 align, char* filename, int32 lineNumber)
+                         local  uint8 eBudgetSubType
+                         local  int32 Nb
+                         local  int32* Ptr
+                         local  int32* RealPtr
+                         local  int32 CanRetry
+                         local  uintptr_t memAddr
+                         local  uintptr_t userSize
+                         local  int32 ExtraInfoMemOffset
+                         local  int32 padNeeded
+                         local  int32 MemSizeToFind
+                         local  uint32 gMemoryTrack
+                         local  MemBudgetTracker_AllocHeaderInfo* si
+                         local  MemBudgetTracker_AllocHeaderInfo* si
+                         inlines  Circular_FindNextFreeBloc, Circular_FindPreviousFreeBloc
+ 1093  003A7D4C     E8  static int32 Circular_FindBloc(CircularBuffer_t* pBuffer, void* Ptr)
+                         local  TInfoBlock* pInfoBloc
+                         local  unsigned int Value
+                         local  unsigned int Begin
+                         local  unsigned int End
+                         local  unsigned int Mid
+ 1116  003A80D8    59C  void Circular_MemFreeFunc(CircularBuffer_t* pBuffer, void* Ptr)
+                         local  int32 Nb
+                         local  uintptr_t Begin
+                         local  uintptr_t End
+                         local  uintptr_t memSize
+                         local  unsigned int paddingAmount
+                         local  MemBudgetTracker_AllocHeaderInfo* si
+                         local  const int64 value
+                         local  uintptr_t address
+ 1306  003A7E34    2A4  void Circular_MemShrink(CircularBuffer_t* pBuffer, void* ptr, int32 iSize)
+                         local  uintptr_t Begin
+                         local  uintptr_t End
+                         local  intptr_t SizeDiff
+                         local  intptr_t MemSize
+                         local  intptr_t NewMemSize
+                         local  intptr_t CurSize
+                         local  int32 BlockNum
+ 1412  00395E68     F8  MemRecord* Fill(int32* size)
+                         local  uint32 AllocatedMem
+                         local  int32 BlockSize
+                         local  int32 BlockNumber
+                         local  MemRecord* First
+                         local  MemRecord* Current
+                         local  MemRecord* Next
+ 1452  00389BA4     48  void Release(MemRecord* Current)
+                         local  uint32 BlockSize
+                         local  MemRecord* Next
+ 1467  003A7CA8     A4  void Circular_Status(CircularBuffer_t* pBuffer, int32* circ, int32* std)
+ 1474  0037AC88     10  int32 Circular_NbBlocks(CircularBuffer_t* pBuffer)
+ 1479  003A6D38     BC  int32 Circular_GetBiggestBlockSize(CircularBuffer_t* pBuffer)
+                         local  int32 MaxBlockSize
+                         local  int32 aBlockSize
+                         local  int32 j
+ 1495  003A6CBC     7C  void Circular_SetCurrentMemType(CircularBuffer_t* pBuffer, TTypeAcces eType)
+ 1504  003A6C48     74  TTypeAcces Circular_GetCurrentMemType(CircularBuffer_t* pBuffer)
+ 1510  003A6BC4     84  int32 Circular_FreeSpace(CircularBuffer_t* pBuffer)
+ 1520  003A6B50     74  void Circular_ClearMemorySizeRecorder(CircularBuffer_t* pBuffer)
+ 1526  003A6ADC     74  void Circular_StartMemorySizeRecorder(CircularBuffer_t* pBuffer)
+ 1532  003A6A68     74  void Circular_StopMemorySizeRecorder(CircularBuffer_t* pBuffer)
+ 1538  003A69F4     74  int32 Circular_GetCurrentMemorySizeRecorder(CircularBuffer_t* pBuffer)
+ 1546  0039F080    350  void Circular_FragDump(CircularBuffer_t* pBuffer)
+                         local  int32* address
+                         local  int iBlocksFree
+                         local  MemBudgetTracker_AllocHeaderInfo* lastSi
+                         local  MemBudgetTracker_AllocHeaderInfo* si
+                         local  const MemBudgetTracker_AllocInfo* pInfo
+                         local  TInfoBlock* pInfoBloc
+                         local  int i
+ 1664  003C9AF4     14  void Circular_CheckUnfreedFastAllocations(CircularBuffer_t* pBuffer)
+ 1673  0039F3D0     68  void Circular_DumpAllInfo(CircularBuffer_t* pBuffer)
+ 1687  0039E2E8     14  void Circular_SendMemInfoToConsole(CircularBuffer_t* pBuffer)
+ 1695  0038BF9C     74  void Circular_GetBudgetInfo(CircularBuffer_t* pBuffer, MemBudgetTypeE eType, int32* budget, int32* memUsed)
+ 1704  003A3230     38  bool Circular_EnableBudgetTracking(CircularBuffer_t* pBuffer, bool bEnable, MemBudgetTypeE eBudget)
+ 1712  003AA81C     44  void Circular_ReleaseBudgetTracker(CircularBuffer_t* pBuffer)
+ 1723  0037ACB8      C  int32 Circular_GetMaxAllocatedMemory(CircularBuffer_t* pBuffer)
+ 1728  0037ACC4      C  int32 Circular_GetBufferSize(CircularBuffer_t* pBuffer)

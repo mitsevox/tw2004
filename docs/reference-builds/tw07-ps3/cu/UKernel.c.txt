@@ -1,0 +1,27 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/specif/UKernel.c
+// compiled in: Legacy_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   40  003B4A94    4E0  static void Kernel_DownloadActors(TStreamDataPtr pData)
+                         local  int nNumGreens
+                         local  int nNumCupsPerGreen
+                         local  bool bTraditional
+                         local  bool bFacility
+                         local  uint32* pCurData
+                         local  uint32 streamVer
+                         local  uint32 actIndexTableOffset
+                         local  uint32 actTotalActInStream
+                         local  uint32* actIndexTable
+                         local  TBasicParamPtr pActorData
+                         local  int8 nGreenIndex
+                         local  int8 nCupIndex
+                         local  int8 startGreenIndex
+                         local  int8 startCupIndex
+                         local  uint32 actNum
+                         local  const struct GameModeDriver* pDriver
+                         local  struct GameModeDriverFacility* pFacilityDriver
+                         local  void* driverPtr
+                         local  struct GameModeDriverFacility* pFacilityDriver
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+  213  00392D94     24  void Kernel_InitModule()
+  219  0038DA10      C  void Kernel_CloseModule()

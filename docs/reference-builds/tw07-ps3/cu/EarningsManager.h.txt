@@ -1,0 +1,9 @@
+// ../../../../../TIGERCODE/Code/Golf/Earnings/Headers/EarningsManager.h
+// compiled in: golf2_unity.cpp, golf_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   41    inline-only   int EarningsManager::GetNumTrophies(const struct EarningsManager* this)
+   42    inline-only   enum TrophyBall_t EarningsManager::GetShotTrophyIndex(const struct EarningsManager* this, int index)
+   43    inline-only   enum TrophyBall_t EarningsManager::GetHoleTrophyIndex(const struct EarningsManager* this, int index)
+   44    inline-only   enum TrophyBall_t EarningsManager::GetGameTrophyIndex(const struct EarningsManager* this, int index)
+   49    inline-only   void EarningsManager::SetAwardGivenFlag(const struct EarningsManager* this, bool flag)

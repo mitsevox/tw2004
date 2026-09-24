@@ -1,0 +1,131 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/txrfile.cpp
+// compiled in: other_unity.cpp
+// 44 functions, source order. line | PS3 address | size
+
+   59    inline-only   static void TXRFile_CPUHogCounterMeasures()
+  117  0043AB84    5D8  char* TXRFile::ReadFromStream(const struct TXRFile* this, char* stream)
+                         local  int streamSize
+                         local  int i
+                         local  int rulesRead
+                         local  int texRulesRead
+                         local  int sliderRulesRead
+                         local  int paletteRulesRead
+                         local  uint8 ruleType
+                         local  struct TXRTexRule* texRule
+                         local  struct TXRBlendRule* blendRule
+                         local  struct TXRTintRule* tintRule
+                         local  struct TXRPaletteRule* paletteRule
+                         local  struct TXRSliderRule* sliderRule
+  252  00410DF8     5C  const char* TXRFile::GetNthActiveTextureName(const struct TXRFile* this, int32_t index)
+                         inlines  TXRTexRule::GetActiveTextureName
+  259  00412AA4     5C  int32_t TXRFile::GetTotalNumTexturesInFile(const struct TXRFile* this)
+                         local  int numTextures
+                         local  int i
+                         inlines  TXRFile::GetNumTexStates
+  270  00412B00    190  const char* TXRFile::GetNthTotalTextureName(const struct TXRFile* this, int32_t index)
+                         local  int numTextures
+                         local  int textureIndex
+                         inlines  TXRFile::GetNumTexStates, TXRTexRule::GetNumStates
+  295  00459B84    130  void TXRFile::RunRule(const struct TXRFile* this, struct TexComp* texcomp, struct TextureGroup* pTexGroup, TextureRef texWorkspace, uint32 width, uint32 height, TextureFormat texFormat)
+                         local  int i
+                         local  int32 mip
+                         inlines  TXRFile_CPUHogCounterMeasures
+  330  00411928    188  bool TXRFile::SetSliderValue(const struct TXRFile* this, const char* sliderName, float val)
+                         local  bool somethingChanged
+                         local  int i
+  357  00412D2C    17C  bool TXRFile::GetSliderValue(const struct TXRFile* this, const char* sliderName, const float& val)
+                         local  int i
+  379  0041D448     3C  const char* TXRFile::GetSliderNameByIndex(const const struct TXRFile* this, int index)
+                         inlines  TXRFile::IsValidSlider, TXRSliderRule::GetSliderName
+  384  004117EC     48  float TXRFile::GetSliderValueByIndex(const const struct TXRFile* this, int index)
+                         inlines  TXRFile::IsValidSlider, TXRSliderRule::GetSliderValue
+  389  00411AB0     20  const char* TXRFile::GetPaletteNameByIndex(const const struct TXRFile* this, int index)
+  394  00412EA8     68  float TXRFile::GetPaletteValueByIndex(const const struct TXRFile* this, int index)
+  399  00407E14    11C  bool TXRFile::SetSliderPosition(const struct TXRFile* this, const char* sliderName, int32_t position)
+                         local  bool sliderSet
+                         local  int i
+  416  0040C5D4    104  bool TXRFile::GetSliderIndexTintValue(const struct TXRFile* this, const char* sliderName, int32_t index, int32_t* r, int32_t* g, int32_t* b)
+                         local  int i
+  431  003D3FF0     C0  int32_t TXRFile::SetSliderStates(const struct TXRFile* this, const char* stateName)
+                         local  int32_t numSet
+                         local  int i
+  444  00407F30     D0  int32_t TXRFile::GetSliderPosition(const struct TXRFile* this, const char* sliderName)
+                         local  int i
+  456  00408000     BC  int32_t TXRFile::GetNumSliderPositions(const struct TXRFile* this, const char* sliderName)
+                         local  int i
+                         inlines  TXRSliderRule::GetNumPositions
+  468  0040D5B4     B4  int32_t TXRFile::GetNumStates(const struct TXRFile* this, const char* stateName)
+                         local  int i
+                         inlines  TXRTexRule::GetNumStates
+  481  00409448     18  const char* TXRFile::GetTEXNameByIndex(const const struct TXRFile* this, int index)
+  486  00411458     1C  uint8 TXRFile::GetTEXValueByIndex(const const struct TXRFile* this, int index)
+  491  003D4128     20  int32 TXRFile::GetTEXStateCountByIndex(const const struct TXRFile* this, int index)
+  496  00409460    114  bool TXRFile::SetVariable(const struct TXRFile* this, const char* varName, int32_t stateNum)
+                         local  bool somethingChanged
+                         local  int i
+  513  003D424C     84  void TXRFile::SetTEXState(const struct TXRFile* this, uint32 index, const char* textureName)
+  519  00410E54    1E8  int32_t TXRFile::CreateCurrentTextureList(const struct TXRFile* this, const char*** textures)
+                         local  int numTextures
+                         local  int i
+                         local  int i
+  548  003D42D0     C0  int32_t TXRFile::SetTEXState(const struct TXRFile* this, const char* stateName)
+                         local  int32_t numSet
+                         local  int i
+  562  00411474     B4  int32_t TXRFile::GetCurrentState(const struct TXRFile* this, const char* stateName)
+                         local  int i
+                         inlines  TXRTexRule::GetCurrentState
+  576  00411528    110  int32_t TXRFile::WriteTEXState(const struct TXRFile* this, uint8_t* texState, int32_t texStateSize)
+                         local  int i
+                         local  int32_t curState
+                         inlines  TXRTexRule::GetCurrentState
+  590  00411834     F4  int32_t TXRFile::WriteSliderState(const struct TXRFile* this, uint8_t* sliderState, int32_t sliderStateSize)
+                         local  int i
+                         local  float curState
+                         local  float roundedState
+  604  003D4390     A0  void TXRFile::ReadTEXState(const struct TXRFile* this, uint8_t* texState)
+                         local  int i
+  613  003D4430     F4  void TXRFile::ReadSliderState(const struct TXRFile* this, uint8_t* sliderState)
+                         local  int i
+  621  004080BC    128  void TXRFile::CopySameNameSliderRulesFromOtherTXRFile(const struct TXRFile* this, struct TXRFile* otherFile)
+                         local  int i
+                         local  int j
+  636  00421250    164  void TXRFile::ChangeNamesByPattern(const struct TXRFile* this, const char* oldName, const char* newName)
+                         local  int i
+                         local  int i
+  652  003D4524     98  static int32_t FindParamIndex(const char* name, int32_t numParams, const struct TXRFile_RandomizeParameter* params)
+                         local  int32_t i
+  666  00409574    428  void TXRFile::Randomize(const struct TXRFile* this, int32_t numSliders, int32_t numSliderParams, const struct TXRFile_RandomizeParameter* sliderParams, int32_t numTexStates, int32_t numTEXParams, const struct TXRFile_RandomizeParameter* texParams)
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int randState
+                         local  int index
+                         local  int i
+                         local  int i
+                         local  int randState
+                         local  int index
+                         local  int index
+                         local  int index
+  745  003D475C     E4  void TXRFile::SetDefaults(const struct TXRFile* this)
+                         local  int i
+                         local  int i
+  760  0040999C    220  bool TXRFile::CopySettings(const struct TXRFile* this, struct TXRFile* otherFile)
+                         local  bool somethingChanged
+                         local  int i
+                         local  int j
+                         local  int i
+                         local  int j
+  794  003D4840      8  void TXRFile::AttatchWorkspaceTexture(const struct TXRFile* this, TextureRef wsTexRef)
+  799  003D4848      8  TextureRef TXRFile::GetWorkspaceTexture(const struct TXRFile* this)
+  804  003D4850      8  bool TXRFile::GetEnabled(const struct TXRFile* this)
+  809  003D4858      8  void TXRFile::SetEnabled(const struct TXRFile* this, bool enabled)
+  814  003D4860     B4  void TXRFile::SetRuleMaskMode(const struct TXRFile* this, const char* ruleName, int32 maskMode)
+                         local  int32 i
+                         inlines  TXRPaletteRule::SetMaskMode
+  826  00412C90     9C  bool TXRFile::TextureIsTEXOption(const struct TXRFile* this, const char* textureName)
+                         local  int32 count
+                         local  int32 i
+  840  003D4B10     9C  void TXRFile::GetPaletteCurrentColor(const struct TXRFile* this, const int32& r, const int32& g, const int32& b)
+                         local  int32 palState
+  847  003D4BAC      8  void TXRFile::SetExtraMipLevels(const struct TXRFile* this, int32 mipLevels)

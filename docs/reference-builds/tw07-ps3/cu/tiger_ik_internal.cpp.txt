@@ -1,0 +1,661 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_ik/tiger_ik_internal.cpp
+// compiled in: tiger_ik_internal.cpp
+// 43 functions, source order. line | PS3 address | size
+
+   17  005672F8     18  unsigned int TigerIK_Internal::GetMemorySize(unsigned int boneCount)
+   25  00568C58   1674  void TigerIK_Internal::Init(const struct TigerIK_Internal* this, const struct <anon>* cctSkel)
+                         local  unsigned int solutionIndex
+                         local  struct <anon> zeroQuat
+                         local  struct <anon> zero
+                         local  struct <anon> zeroPos
+                         local  struct <anon> one
+                         local  struct <anon> idMtx
+                         local  unsigned int i
+                         local  struct TigerIK_Bone* bone
+                         local  struct <anon> invBind
+                         local  struct <anon> bind
+                         inlines  TIGER_MATH::Dot, TIGER_MATH::MtxCofactor, TIGER_MATH::MtxCofactorColumn, TIGER_MATH::MtxDet, TIGER_MATH::MtxIdentity, TIGER_MATH::MtxInverse, TIGER_MATH::MtxLoad, TIGER_MATH::MtxScalarMul, TIGER_MATH::MtxSet, TIGER_MATH::MtxStore, TIGER_MATH::VecMul, TIGER_MATH::VecOne, TIGER_MATH::VecSet, TIGER_MATH::VecStore, TIGER_MATH::VecZero, TIGER_MATH::__vmx_stvx, TIGER_MATH::operator/, Vec, operator float __vector__, operator[], vec_madd, vec_sld, vec_st
+  114  00567424     54  void TigerIK_Internal::SetLocalTransSource(const struct TigerIK_Internal* this, unsigned int dstI, unsigned int srcI)
+  119  005673BC     68  void TigerIK_Internal::ResetLocalTransSources(const struct TigerIK_Internal* this)
+                         local  struct TigerIK_Bone* bone
+                         local  unsigned int count
+  130  0056894C    30C  void TigerIK_Internal::SetRootMtx(const struct TigerIK_Internal* this, const float* rootMtx)
+                         inlines  TIGER_MATH::MtxLoad, TIGER_MATH::MtxStore, TIGER_MATH::VecStore, TIGER_MATH::__vmx_stvx, operator[]
+  135  00567478     B0  int TigerIK_Internal::SetBoneMirrorSwap(const struct TigerIK_Internal* this, unsigned int boneA, unsigned int boneB)
+                         local  struct TigerIK_Bone* bone
+  153  00576AB4   16C0  unsigned int TigerIK_Internal::SetBoneParent(const struct TigerIK_Internal* this, unsigned int boneI, unsigned int parentI, int recomputeLocalTransforms)
+                         local  struct <anon> oldParentQuat
+                         local  struct <anon> oldParentMtx
+                         local  struct TigerIK_Bone* bone
+                         local  struct TigerIK_Bone* oldParent
+                         local  unsigned int oldParentI
+                         local  struct TigerIK_Bone* newParent
+                         local  struct <anon> oldLocalQuat
+                         local  struct <anon> oldObjectQuat
+                         local  struct <anon> newParentQuat
+                         local  struct <anon> newParentQuatConj
+                         local  struct <anon> newLocalQuat
+                         local  struct <anon> newParentMtx
+                         local  struct <anon> oldLocalPos
+                         local  struct <anon> oldObjectPos
+                         local  struct <anon> newLocalPos
+                         local  struct <anon> oldLocalQuat
+                         local  struct <anon> newLocalQuat
+                         local  struct <anon> oldLocalPos
+                         local  struct <anon> newLocalPos
+                         inlines  Mtx, TIGER_MATH::Dot, TIGER_MATH::MtxCofactor, TIGER_MATH::MtxCofactorColumn, TIGER_MATH::MtxDet, TIGER_MATH::MtxIdentity, TIGER_MATH::MtxInverse, TIGER_MATH::MtxLoad, TIGER_MATH::MtxScalarMul, TIGER_MATH::MtxSet, TIGER_MATH::QuatCompose, TIGER_MATH::QuatConj, TIGER_MATH::VecAdd, TIGER_MATH::VecCross, TIGER_MATH::VecDot, TIGER_MATH::VecFromOneW, TIGER_MATH::VecFromOneZ, TIGER_MATH::VecLoad, TIGER_MATH::VecLoad_W1, TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecMulByY, TIGER_MATH::VecMulByZ, TIGER_MATH::VecRsqrt, TIGER_MATH::VecSet, TIGER_MATH::VecStore, TIGER_MATH::VecSub, TIGER_MATH::VecX, TIGER_MATH::VecY, TIGER_MATH::VecZ, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx, TIGER_MATH::operator*, TIGER_MATH::operator+, TIGER_MATH::operator/, Vec, operator float __vector__, operator[], vec_madd, vec_sld
+  229  005675B8     60  void TigerIK_Internal::SetLocalTwistSwingAxes(const struct TigerIK_Internal* this, unsigned int boneI, float axesQuatX, float axesQuatY, float axesQuatZ, float axesQuatW)
+                         local  struct TigerIK_Bone* bone
+  240  00567618     6C  void TigerIK_Internal::SetLocalConstraint(const struct TigerIK_Internal* this, unsigned int boneI, float twistMin, float twistMax, float swingMaxX, float swingMaxY)
+                         local  struct TigerIK_Bone* bone
+  252  0056A2CC    114  void TigerIK_Internal::SetLocalTransform(const struct TigerIK_Internal* this, unsigned int boneI, const float* quat, const float* trans)
+                         local  struct TigerIK_Bone* bone
+                         inlines  TIGER_MATH::VecLoad, TIGER_MATH::VecStore, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx
+  262  00567D84    5A0  void TigerIK_Internal::SetTransformMod(const struct TigerIK_Internal* this, unsigned int boneI, const float* pQuat, const float* pTrans, const float* pScale, int useHierarchicalScaling)
+                         local  struct TigerIK_Bone* bone
+                         local  struct <anon> scaleVec
+                         local  struct <anon> quatVec
+                         local  struct <anon> transVec
+                         inlines  TIGER_MATH::Len, TIGER_MATH::MtxStore, TIGER_MATH::VecOne, TIGER_MATH::VecRcp, TIGER_MATH::VecSet, TIGER_MATH::VecSetAll, TIGER_MATH::VecStore, TIGER_MATH::__vmx_stvx, TIGER_MATH::operator*, TIGER_MATH::operator-, Vec, operator[]
+  296  0056A3E0    378  void TigerIK_Internal::CopyLocalTransformsFromCCT(const struct TigerIK_Internal* this, const struct <anon>* frame)
+                         local  const const struct <anon>& positions
+                         local  struct TigerIK_Bone* bone
+                         local  const unsigned int boneCount
+                         local  struct <anon> one
+                         local  unsigned int i
+                         local  struct <anon> quat
+                         local  struct <anon> vecLen2
+                         local  struct <anon> trans
+                         inlines  TIGER_MATH::VecDot, TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecOne, TIGER_MATH::VecRsqrt, TIGER_MATH::VecSet, TIGER_MATH::VecStore, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx, vec_st
+  328  0056A758    438  void TigerIK_Internal::BlendLocalTransformsFromCCT(const struct TigerIK_Internal* this, float prevWeight, const struct <anon>* frame)
+                         local  const const struct <anon>& positions
+                         local  struct TigerIK_Bone* bone
+                         local  const unsigned int boneCount
+                         local  struct <anon> blend0
+                         local  struct <anon> one
+                         local  struct <anon> blend1
+                         local  unsigned int i
+                         local  struct <anon> quat
+                         local  struct <anon> prev
+                         local  struct <anon> trans
+                         local  struct <anon> prevTrans
+                         inlines  TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecOne, TIGER_MATH::VecSetAll, TIGER_MATH::VecStore, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx, TIGER_MATH::operator+, TIGER_MATH::operator-, Vec, operator float __vector__
+  378  00567684    1F8  int TigerIK_Internal::AddTarget(const struct TigerIK_Internal* this, unsigned int solutionIndex, unsigned int boneI, float quatX, float quatY, float quatZ, float quatW, float transX, float transY, float transZ, unsigned int boneToReparent, unsigned int newParent)
+                         local  struct TigerIK_Bone* bone
+                         local  struct TigerIK_Target* target
+  411  005782D4     88  void TigerIK_Internal::ComputeSolution(const struct TigerIK_Internal* this, unsigned int maxIterationCount, unsigned int solutionIndex)
+  431  00567C34    150  void TigerIK_Internal::ResetSolution(const struct TigerIK_Internal* this, unsigned int solutionIndex)
+                         local  unsigned int boneCount
+                         local  struct TigerIK_Bone* bone
+                         local  struct <anon> zero
+                         inlines  TIGER_MATH::VecStore, TIGER_MATH::VecZero
+  453  0057835C    644  void TigerIK_Internal::ApplySolution(const struct TigerIK_Internal* this, float ikWeight, unsigned int solutionIndex)
+                         local  const struct <anon> quatOne
+                         local  unsigned int targetedCount
+                         local  struct TigerIK_Target* target
+                         local  unsigned int boneToReparent
+                         local  unsigned int newParent
+                         local  unsigned int oldParent
+                         local  struct TigerIK_Bone* targetedBone
+                         local  unsigned int boneCount
+                         local  struct TigerIK_Bone* bone
+                         local  struct <anon> newWeight
+                         local  struct <anon> oldWeight
+                         local  struct <anon> oldLocalQuat
+                         local  struct <anon> changeQuat
+                         local  struct <anon> localQuat
+                         inlines  TIGER_MATH::Dot, TIGER_MATH::QuatCompose, TIGER_MATH::VecAdd, TIGER_MATH::VecDot, TIGER_MATH::VecFromOneW, TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecOne, TIGER_MATH::VecRsqrt, TIGER_MATH::VecSet, TIGER_MATH::VecSetAll, TIGER_MATH::VecStore, TIGER_MATH::VecSub, TIGER_MATH::VecX, TIGER_MATH::VecY, TIGER_MATH::VecZ, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx, TIGER_MATH::operator-, Vec, vec_madd, vec_sld, vec_sub
+  517  0056AB90    338  void TigerIK_Internal::DoMirrorTransform(const struct TigerIK_Internal* this)
+                         local  unsigned int boneCount
+                         local  struct TigerIK_Bone* bone
+                         local  struct TigerIK_Bone* boneBase
+                         local  unsigned int attr
+                         local  struct TigerIK_Bone* partner
+                         local  struct <anon> boneQuat
+                         local  struct <anon> partnerQuat
+                         inlines  TIGER_MATH::VecLoad, TIGER_MATH::VecStore, TIGER_MATH::__vmx_lvx
+  712  00570714   1FF8  void TigerIK_Internal::ComputeObjectTransforms(const struct TigerIK_Internal* this, bool saveCache)
+                         local  const uint8_t[16] _uvrcA
+                         local  const uint8_t[16] _uvrcB
+                         local  const uint8_t[16] _uvrcC
+                         local  unsigned char[16] _vrcA
+                         local  unsigned char[16] _vrcB
+                         local  unsigned char[16] _vrcC
+                         local  struct <anon> _zero
+                         local  struct <anon> local0
+                         local  struct <anon> local1
+                         local  struct <anon> local2
+                         local  const uint8_t[16] _qmpWZYX
+                         local  const uint8_t[16] _qmpZWXY
+                         local  const uint8_t[16] _qmpYXWZ
+                         local  const float[4] _qmsA
+                         local  const float[4] _qmsB
+                         local  const float[4] _qmsC
+                         local  unsigned char[16] _vqmpWZYX
+                         local  unsigned char[16] _vqmpZWXY
+                         local  unsigned char[16] _vqmpYXWZ
+                         local  struct <anon> _vqmsA
+                         local  struct <anon> _vqmsB
+                         local  struct <anon> _vqmsC
+                         local  const float[16] identity
+                         local  unsigned int boneCount
+                         local  struct TigerIK_Bone* bone
+                         local  struct TigerIK_Bone* parent
+                         local  const unsigned int attr
+                         local  struct <anon> parent0
+                         local  struct <anon> parent1
+                         local  struct <anon> parent2
+                         local  struct <anon> parent3
+                         local  struct <anon> parentQuat
+                         local  struct <anon> localTrans
+                         local  struct <anon> localQuat
+                         local  struct TigerIK_Bone* transSrc
+                         local  struct <anon> localScale
+                         local  struct <anon> _qx
+                         local  struct <anon> _qy
+                         local  struct <anon> _qz
+                         local  struct <anon> _qw
+                         local  struct <anon> _sqw
+                         local  struct <anon> _sqx
+                         local  struct <anon> _sqy
+                         local  struct <anon> _sqz
+                         local  struct <anon> _m00
+                         local  struct <anon> _m11
+                         local  struct <anon> _m22
+                         local  struct <anon> _tmp1
+                         local  struct <anon> _tmp2
+                         local  struct <anon> _m10
+                         local  struct <anon> _m01
+                         local  struct <anon> _m20
+                         local  struct <anon> _m02
+                         local  struct <anon> _m21
+                         local  struct <anon> _m12
+                         local  struct <anon> bind
+                         local  struct <anon> mod0
+                         local  struct <anon> mod1
+                         local  struct <anon> mod2
+                         local  struct <anon> mod3
+                         local  struct <anon> invParentScale
+                         local  struct TigerIK_Bone* bone
+                         local  unsigned int boneCount
+                         inlines  TIGER_MATH::MtxLoad, TIGER_MATH::MtxStore, TIGER_MATH::VecApplyMatrix, TIGER_MATH::VecFromOneW, TIGER_MATH::VecFromOneX, TIGER_MATH::VecFromOneY, TIGER_MATH::VecFromOneZ, TIGER_MATH::VecLoad, TIGER_MATH::VecLoad_W1, TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecMulByX, TIGER_MATH::VecMulByY, TIGER_MATH::VecMulByZ, TIGER_MATH::VecSet, TIGER_MATH::VecStore, TIGER_MATH::VecZero, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx, TIGER_MATH::operator+, TIGER_MATH::operator-, Vec, operator float __vector__, operator[], vec_madd, vec_perm
+  865  0056AEC8    2C8  void TigerIK_Internal::SaveCachedTransformsWithIK(const struct TigerIK_Internal* this)
+                         local  struct TigerIK_Bone* bone
+                         local  unsigned int boneCount
+                         inlines  TIGER_MATH::VecLoad, TIGER_MATH::VecStore, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx
+  882  0057270C   10F8  void TigerIK_Internal::ComputeObjectTransformsSimple(const struct TigerIK_Internal* this)
+                         local  const uint8_t[16] _uvrcA
+                         local  const uint8_t[16] _uvrcB
+                         local  const uint8_t[16] _uvrcC
+                         local  unsigned char[16] _vrcA
+                         local  unsigned char[16] _vrcB
+                         local  unsigned char[16] _vrcC
+                         local  struct <anon> _zero
+                         local  struct <anon> local0
+                         local  struct <anon> local1
+                         local  struct <anon> local2
+                         local  const uint8_t[16] _qmpWZYX
+                         local  const uint8_t[16] _qmpZWXY
+                         local  const uint8_t[16] _qmpYXWZ
+                         local  const float[4] _qmsA
+                         local  const float[4] _qmsB
+                         local  const float[4] _qmsC
+                         local  unsigned char[16] _vqmpWZYX
+                         local  unsigned char[16] _vqmpZWXY
+                         local  unsigned char[16] _vqmpYXWZ
+                         local  struct <anon> _vqmsA
+                         local  struct <anon> _vqmsB
+                         local  struct <anon> _vqmsC
+                         local  unsigned int boneCount
+                         local  struct TigerIK_Bone* bone
+                         local  struct <anon> localQuat
+                         local  struct <anon> localTrans
+                         local  struct <anon> _qx
+                         local  struct <anon> _qy
+                         local  struct <anon> _qz
+                         local  struct <anon> _qw
+                         local  struct <anon> _sqw
+                         local  struct <anon> _sqx
+                         local  struct <anon> _sqy
+                         local  struct <anon> _sqz
+                         local  struct <anon> _m00
+                         local  struct <anon> _m11
+                         local  struct <anon> _m22
+                         local  struct <anon> _tmp1
+                         local  struct <anon> _tmp2
+                         local  struct <anon> _m10
+                         local  struct <anon> _m01
+                         local  struct <anon> _m20
+                         local  struct <anon> _m02
+                         local  struct <anon> _m21
+                         local  struct <anon> _m12
+                         local  struct TigerIK_Bone* parent
+                         local  struct <anon> parent0
+                         local  struct <anon> parent1
+                         local  struct <anon> parent2
+                         local  struct <anon> parent3
+                         local  struct <anon> parentQuat
+                         local  struct <anon> localQuat
+                         local  struct <anon> localTrans
+                         local  struct <anon> _qx
+                         local  struct <anon> _qy
+                         local  struct <anon> _qz
+                         local  struct <anon> _qw
+                         local  struct <anon> _sqw
+                         local  struct <anon> _sqx
+                         local  struct <anon> _sqy
+                         local  struct <anon> _sqz
+                         local  struct <anon> _m00
+                         local  struct <anon> _m11
+                         local  struct <anon> _m22
+                         local  struct <anon> _tmp1
+                         local  struct <anon> _tmp2
+                         local  struct <anon> _m10
+                         local  struct <anon> _m01
+                         local  struct <anon> _m20
+                         local  struct <anon> _m02
+                         local  struct <anon> _m21
+                         local  struct <anon> _m12
+                         inlines  TIGER_MATH::VecApplyMatrix, TIGER_MATH::VecFromOneW, TIGER_MATH::VecFromOneX, TIGER_MATH::VecFromOneY, TIGER_MATH::VecFromOneZ, TIGER_MATH::VecLoad, TIGER_MATH::VecLoad_W1, TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecMulByY, TIGER_MATH::VecMulByZ, TIGER_MATH::VecStore, TIGER_MATH::VecZero, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx, TIGER_MATH::operator+, TIGER_MATH::operator-, Vec, operator float __vector__, vec_madd, vec_perm
+  938  0056787C     28  const float* TigerIK_Internal::GetTargetPos(const const struct TigerIK_Internal* this, unsigned int boneI)
+  943  0056B190    248  void TigerIK_Internal::GetObjectTransform(const const struct TigerIK_Internal* this, float* mtx4, float* quat, unsigned int boneI)
+                         local  const struct TigerIK_Bone* bone
+                         inlines  TIGER_MATH::VecLoad, TIGER_MATH::VecStore, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx
+  955  005678A4     28  const float* TigerIK_Internal::GetObjectQuat(const const struct TigerIK_Internal* this, unsigned int boneI)
+  960  0056B3D8    394  void TigerIK_Internal::GetCachedObjectTransform(const const struct TigerIK_Internal* this, float* mtx4, float* quat, unsigned int boneI)
+                         local  const struct TigerIK_Bone* bone
+                         inlines  TIGER_MATH::MtxLoad, TIGER_MATH::MtxStore, TIGER_MATH::VecLoad, TIGER_MATH::VecStore, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx, operator[]
+  969  00568638    314  void TigerIK_Internal::GetInvBindTransform(const const struct TigerIK_Internal* this, float* mtx4, unsigned int boneI)
+                         local  const struct TigerIK_Bone* bone
+                         inlines  TIGER_MATH::MtxLoad, TIGER_MATH::MtxStore, TIGER_MATH::VecStore, TIGER_MATH::__vmx_stvx, operator[]
+  976  00568324    314  void TigerIK_Internal::GetBindTransform(const const struct TigerIK_Internal* this, float* mtx4, unsigned int boneI)
+                         local  const struct TigerIK_Bone* bone
+                         inlines  TIGER_MATH::MtxLoad, TIGER_MATH::MtxStore, TIGER_MATH::VecStore, TIGER_MATH::__vmx_stvx, operator[]
+  984  00567310     AC  struct TigerIK_Bone* TigerIK_Internal::GetBone(const struct TigerIK_Internal* this, unsigned int boneI)
+  991  0056724C     AC  const struct TigerIK_Bone* TigerIK_Internal::GetBone(const const struct TigerIK_Internal* this, unsigned int boneI)
+  998  0056B76C    CDC  void TigerIK_Internal::SetBasePose(const struct TigerIK_Internal* this, const float* invBindMatrices)
+                         local  unsigned int boneCount
+                         local  struct TigerIK_Bone* bone
+                         local  struct <anon> noRotMtx
+                         local  struct <anon> noRotQuat
+                         local  struct <anon> noScale
+                         local  struct <anon> inv
+                         local  struct <anon> bind
+                         local  struct <anon> objectTrans
+                         local  struct TigerIK_Bone* parent
+                         local  struct <anon> parentObjectTrans
+                         inlines  TIGER_MATH::Dot, TIGER_MATH::MtxCofactor, TIGER_MATH::MtxCofactorColumn, TIGER_MATH::MtxDet, TIGER_MATH::MtxIdentity, TIGER_MATH::MtxInverse, TIGER_MATH::MtxLoad, TIGER_MATH::MtxScalarMul, TIGER_MATH::MtxSet, TIGER_MATH::MtxStore, TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecSet, TIGER_MATH::VecStore, TIGER_MATH::VecSub, TIGER_MATH::__vmx_stvx, TIGER_MATH::operator/, Vec, operator float __vector__, operator[], vec_madd, vec_sld
+ 1034  00573804   1DD0  void TigerIK_Internal::ComputeObjectTransformsOfChain(const struct TigerIK_Internal* this, struct TigerIK_Bone* endBone)
+                         local  const float[16] identity
+                         local  const uint8_t[16] _uvrcA
+                         local  const uint8_t[16] _uvrcB
+                         local  const uint8_t[16] _uvrcC
+                         local  unsigned char[16] _vrcA
+                         local  unsigned char[16] _vrcB
+                         local  unsigned char[16] _vrcC
+                         local  struct <anon> _zero
+                         local  struct <anon> local0
+                         local  struct <anon> local1
+                         local  struct <anon> local2
+                         local  struct TigerIK_Bone* parent
+                         local  struct <anon> parent0
+                         local  struct <anon> parent1
+                         local  struct <anon> parent2
+                         local  struct <anon> parent3
+                         local  struct <anon> parentQuat
+                         local  const unsigned int attr
+                         local  struct <anon> bind
+                         local  struct <anon> localQuat
+                         local  struct <anon> localTrans
+                         local  struct TigerIK_Bone* transSrc
+                         local  struct <anon> localScale
+                         local  struct <anon> _qx
+                         local  struct <anon> _qy
+                         local  struct <anon> _qz
+                         local  struct <anon> _qw
+                         local  struct <anon> _sqw
+                         local  struct <anon> _sqx
+                         local  struct <anon> _sqy
+                         local  struct <anon> _sqz
+                         local  struct <anon> _m00
+                         local  struct <anon> _m11
+                         local  struct <anon> _m22
+                         local  struct <anon> _tmp1
+                         local  struct <anon> _tmp2
+                         local  struct <anon> _m10
+                         local  struct <anon> _m01
+                         local  struct <anon> _m20
+                         local  struct <anon> _m02
+                         local  struct <anon> _m21
+                         local  struct <anon> _m12
+                         local  struct <anon> mod0
+                         local  struct <anon> mod1
+                         local  struct <anon> mod2
+                         local  struct <anon> mod3
+                         local  struct <anon> invParentScale
+                         inlines  TIGER_MATH::Dot, TIGER_MATH::MtxLoad, TIGER_MATH::MtxStore, TIGER_MATH::QuatCompose, TIGER_MATH::VecAdd, TIGER_MATH::VecApplyMatrix, TIGER_MATH::VecCross, TIGER_MATH::VecDot, TIGER_MATH::VecFromOneW, TIGER_MATH::VecFromOneY, TIGER_MATH::VecFromOneZ, TIGER_MATH::VecLoad, TIGER_MATH::VecLoad_W1, TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecMulByY, TIGER_MATH::VecMulByZ, TIGER_MATH::VecRsqrt, TIGER_MATH::VecSet, TIGER_MATH::VecStore, TIGER_MATH::VecSub, TIGER_MATH::VecX, TIGER_MATH::VecY, TIGER_MATH::VecZ, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx, TIGER_MATH::operator+, TIGER_MATH::operator-, Vec, operator float __vector__, operator[], vec_madd, vec_perm, vec_sld
+ 1156  005755D4   14E0  void TigerIK_Internal::CyclicCoordinateDescentSingle(const struct TigerIK_Internal* this, unsigned int iterationCount, struct TigerIK_Bone* bone, unsigned int solutionIndex)
+                         local  struct TigerIK_Bone* testBone
+                         local  struct <anon> currentPos
+                         local  struct <anon> currentQuat
+                         local  struct <anon> targetPos
+                         local  struct <anon> targetQuat
+                         local  struct <anon> ___profScope
+                         local  const uint8_t[16] _uvrcA
+                         local  const uint8_t[16] _uvrcB
+                         local  const uint8_t[16] _uvrcC
+                         local  unsigned char[16] _vrcA
+                         local  unsigned char[16] _vrcB
+                         local  unsigned char[16] _vrcC
+                         local  struct <anon> _zero
+                         local  struct <anon> local0
+                         local  struct <anon> local1
+                         local  struct <anon> local2
+                         local  struct <anon> prevCurrentPos
+                         local  struct TigerIK_Bone* centerBone
+                         local  const struct <anon> improvementDiff
+                         local  const float improvementDist2
+                         local  struct <anon> centerPos
+                         local  struct <anon> toCurrent
+                         local  struct <anon> toCurrentLen2
+                         local  struct <anon> toTarget
+                         local  struct <anon> toTargetLen2
+                         local  struct <anon> unitToCurrent
+                         local  struct <anon> unitToTarget
+                         local  struct <anon> cross
+                         local  struct <anon> crossLen2
+                         local  struct <anon> centerObjectQuat
+                         local  struct <anon> crossLenRcp
+                         local  struct <anon> axis
+                         local  struct <anon> crossLen
+                         local  struct <anon> dot
+                         local  float angle
+                         local  struct <anon> angleAxis
+                         local  struct <anon> centerObjectQuatChange
+                         local  struct <anon> newCenterObjectQuat
+                         local  struct TigerIK_Bone* centerParent
+                         local  struct <anon> centerParentObjectQuat
+                         local  struct <anon> newCenterLocalQuat
+                         local  struct <anon> _qx
+                         local  struct <anon> _qy
+                         local  struct <anon> _qz
+                         local  struct <anon> _qw
+                         local  struct <anon> _sqw
+                         local  struct <anon> _sqx
+                         local  struct <anon> _sqy
+                         local  struct <anon> _sqz
+                         local  struct <anon> _m00
+                         local  struct <anon> _m11
+                         local  struct <anon> _m22
+                         local  struct <anon> _tmp1
+                         local  struct <anon> _tmp2
+                         local  struct <anon> _m10
+                         local  struct <anon> _m01
+                         local  struct <anon> _m20
+                         local  struct <anon> _m02
+                         local  struct <anon> _m21
+                         local  struct <anon> _m12
+                         local  struct <anon> savedLocalQuat
+                         local  struct <anon> computedLocalQuat
+                         local  struct <anon> changeQuat
+                         inlines  Profile, TIGER_MATH::Dot, TIGER_MATH::QuatCompose, TIGER_MATH::QuatConj, TIGER_MATH::VecAdd, TIGER_MATH::VecApplyMatrix, TIGER_MATH::VecCross, TIGER_MATH::VecDot, TIGER_MATH::VecFromOneW, TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecMulByY, TIGER_MATH::VecMulByZ, TIGER_MATH::VecRcp, TIGER_MATH::VecRsqrt, TIGER_MATH::VecSet, TIGER_MATH::VecStore, TIGER_MATH::VecSub, TIGER_MATH::VecX, TIGER_MATH::VecY, TIGER_MATH::VecZ, TIGER_MATH::VecZero, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx, TIGER_MATH::__vmx_sub, TIGER_MATH::operator*, TIGER_MATH::operator+, TIGER_MATH::operator-, Vec, operator float __vector__, vec_madd, vec_perm, vec_sld, vec_splat, vec_sub, ~Profile
+ 1302  00578174    160  void TigerIK_Internal::CyclicCoordinateDescentAll(const struct TigerIK_Internal* this, unsigned int maxIterationCount, unsigned int solutionIndex)
+                         local  unsigned int targetedCount
+                         local  struct TigerIK_Target* target
+                         local  unsigned int boneToReparent
+                         local  unsigned int newParent
+                         local  unsigned int oldParent
+ 1342  005678CC     FC  int TigerIK_Internal::SetBoneIsTerminal(const struct TigerIK_Internal* this, unsigned int boneI, int isTerminal)
+                         local  struct TigerIK_Bone* bone
+ 1362  005679C8     9C  int TigerIK_Internal::SetBoneIsNoIK(const struct TigerIK_Internal* this, unsigned int boneI, int isNoIK)
+                         local  struct TigerIK_Bone* bone
+ 1385  00567528     90  unsigned int TigerIK_Internal::GetBoneParent(const const struct TigerIK_Internal* this, unsigned int boneI)
+                         local  const struct TigerIK_Bone* bone
+ 1406  00567A64     F4  void TigerIK_Internal::SetBoneIsBindPose(const struct TigerIK_Internal* this, unsigned int boneI, int isBindPose)
+                         local  struct TigerIK_Bone* bone
+ 1421  00567B58     C4  int TigerIK_Internal::SetBoneMirrorMask(const struct TigerIK_Internal* this, unsigned int boneI, unsigned int mask)
+                         local  struct TigerIK_Bone* bone
+                         local  unsigned int attr
+ 1435  00567C1C     18  void TigerIK_Internal::EnableBlendedSolutions(bool enable)
+ 1443  0056C448    390  void TigerIK_Internal::DoClubIK(const struct TigerIK_Internal* this, unsigned int handleI, unsigned int breakI, unsigned int headI, float penetration)
+                         local  struct TigerIK_Bone* handleBone
+                         local  struct TigerIK_Bone* breakBone
+                         local  struct TigerIK_Bone* headBone
+                         local  struct <anon> handlePos
+                         local  struct <anon> breakPos
+                         local  struct <anon> headPos
+                         local  struct <anon> moveDir
+                         local  const float dirY
+                         local  const float dist
+                         local  struct <anon> move
+                         local  const float oldLen
+                         local  const float newLen
+                         local  const float handleScale
+                         local  struct <anon> handleVecScale
+                         local  struct <anon> handle4
+                         inlines  TIGER_MATH::Len, TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecRsqrt, TIGER_MATH::VecSet, TIGER_MATH::VecSqrt, TIGER_MATH::VecStore, TIGER_MATH::VecUnit, TIGER_MATH::VecX, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx, TIGER_MATH::operator*, TIGER_MATH::operator+, TIGER_MATH::operator-, Vec, operator float __vector__, vec_madd, vec_sld, vec_sub
+ 1512  0056C7D8   36CC  void TigerIK_Internal::DoFootIK(const struct TigerIK_Internal* this, unsigned int root, unsigned int toe, unsigned int foot, unsigned int knee, unsigned int legTwist, unsigned int leg, float toePenetration, float footPenetration)
+                         local  const uint8_t[16] _uvrcA
+                         local  const uint8_t[16] _uvrcB
+                         local  const uint8_t[16] _uvrcC
+                         local  unsigned char[16] _vrcA
+                         local  unsigned char[16] _vrcB
+                         local  unsigned char[16] _vrcC
+                         local  struct <anon> _zero
+                         local  struct <anon> local0
+                         local  struct <anon> local1
+                         local  struct <anon> local2
+                         local  struct TigerIK_Bone* toeBone
+                         local  struct TigerIK_Bone* footBone
+                         local  struct TigerIK_Bone* kneeBone
+                         local  struct TigerIK_Bone* legTwistBone
+                         local  struct TigerIK_Bone* legBone
+                         local  struct <anon> oldToePos
+                         local  struct <anon> oldFootPos
+                         local  struct <anon> oldKneePos
+                         local  struct <anon> legPos
+                         local  struct <anon> localFoot
+                         local  const float hypot2
+                         local  const float side
+                         local  const float out
+                         local  const float newSide
+                         local  const float newOut2
+                         local  const float newOut
+                         local  const float kneeOutDist
+                         local  float rootX
+                         local  float rootZ
+                         local  float rcpRootLen
+                         local  struct <anon> newToePos
+                         local  struct <anon> newFootPos
+                         local  struct <anon> newKneePos
+                         local  struct <anon> oldFromLeg
+                         local  struct <anon> oldFromKnee
+                         local  struct <anon> oldFromFoot
+                         local  struct <anon> newFromLeg
+                         local  struct <anon> newFromKnee
+                         local  struct <anon> newFromFoot
+                         local  struct <anon> oldToeLen
+                         local  struct <anon> legAxis
+                         local  struct <anon> kneeAxis
+                         local  struct <anon> footAxis
+                         local  struct <anon> legLen2
+                         local  struct <anon> kneeLen2
+                         local  struct <anon> footLen2
+                         local  struct <anon> oldLegTwistPos
+                         local  struct <anon> oldLegTwistLen
+                         local  struct <anon> oldKneeLen
+                         local  struct <anon> ratio
+                         local  struct <anon> legTwistPos
+                         local  struct <anon> legLen
+                         local  struct <anon> legDot
+                         local  float legAngle
+                         local  struct <anon> legChangeQuat
+                         local  struct <anon> _newQuat
+                         local  struct <anon> mod0
+                         local  struct <anon> mod1
+                         local  struct <anon> mod2
+                         local  struct <anon> _qx
+                         local  struct <anon> _qy
+                         local  struct <anon> _qz
+                         local  struct <anon> _qw
+                         local  struct <anon> _sqw
+                         local  struct <anon> _sqx
+                         local  struct <anon> _sqy
+                         local  struct <anon> _sqz
+                         local  struct <anon> _m00
+                         local  struct <anon> _m11
+                         local  struct <anon> _m22
+                         local  struct <anon> _tmp1
+                         local  struct <anon> _tmp2
+                         local  struct <anon> _m10
+                         local  struct <anon> _m01
+                         local  struct <anon> _m20
+                         local  struct <anon> _m02
+                         local  struct <anon> _m21
+                         local  struct <anon> _m12
+                         local  struct <anon> _newQuat
+                         local  struct <anon> mod0
+                         local  struct <anon> mod1
+                         local  struct <anon> mod2
+                         local  struct <anon> _qx
+                         local  struct <anon> _qy
+                         local  struct <anon> _qz
+                         local  struct <anon> _qw
+                         local  struct <anon> _sqw
+                         local  struct <anon> _sqx
+                         local  struct <anon> _sqy
+                         local  struct <anon> _sqz
+                         local  struct <anon> _m00
+                         local  struct <anon> _m11
+                         local  struct <anon> _m22
+                         local  struct <anon> _tmp1
+                         local  struct <anon> _tmp2
+                         local  struct <anon> _m10
+                         local  struct <anon> _m01
+                         local  struct <anon> _m20
+                         local  struct <anon> _m02
+                         local  struct <anon> _m21
+                         local  struct <anon> _m12
+                         local  struct <anon> kneeLen
+                         local  struct <anon> kneeDot
+                         local  float kneeAngle
+                         local  struct <anon> kneeChangeQuat
+                         local  struct <anon> _newQuat
+                         local  struct <anon> mod0
+                         local  struct <anon> mod1
+                         local  struct <anon> mod2
+                         local  struct <anon> _qx
+                         local  struct <anon> _qy
+                         local  struct <anon> _qz
+                         local  struct <anon> _qw
+                         local  struct <anon> _sqw
+                         local  struct <anon> _sqx
+                         local  struct <anon> _sqy
+                         local  struct <anon> _sqz
+                         local  struct <anon> _m00
+                         local  struct <anon> _m11
+                         local  struct <anon> _m22
+                         local  struct <anon> _tmp1
+                         local  struct <anon> _tmp2
+                         local  struct <anon> _m10
+                         local  struct <anon> _m01
+                         local  struct <anon> _m20
+                         local  struct <anon> _m02
+                         local  struct <anon> _m21
+                         local  struct <anon> _m12
+                         local  struct <anon> footLen
+                         local  struct <anon> footDot
+                         local  float footAngle
+                         local  struct <anon> footChangeQuat
+                         local  struct <anon> _newQuat
+                         local  struct <anon> mod0
+                         local  struct <anon> mod1
+                         local  struct <anon> mod2
+                         local  struct <anon> _qx
+                         local  struct <anon> _qy
+                         local  struct <anon> _qz
+                         local  struct <anon> _qw
+                         local  struct <anon> _sqw
+                         local  struct <anon> _sqx
+                         local  struct <anon> _sqy
+                         local  struct <anon> _sqz
+                         local  struct <anon> _m00
+                         local  struct <anon> _m11
+                         local  struct <anon> _m22
+                         local  struct <anon> _tmp1
+                         local  struct <anon> _tmp2
+                         local  struct <anon> _m10
+                         local  struct <anon> _m01
+                         local  struct <anon> _m20
+                         local  struct <anon> _m02
+                         local  struct <anon> _m21
+                         local  struct <anon> _m12
+                         local  struct <anon> _newQuat
+                         local  struct <anon> mod0
+                         local  struct <anon> mod1
+                         local  struct <anon> mod2
+                         local  struct <anon> _qx
+                         local  struct <anon> _qy
+                         local  struct <anon> _qz
+                         local  struct <anon> _qw
+                         local  struct <anon> _sqw
+                         local  struct <anon> _sqx
+                         local  struct <anon> _sqy
+                         local  struct <anon> _sqz
+                         local  struct <anon> _m00
+                         local  struct <anon> _m11
+                         local  struct <anon> _m22
+                         local  struct <anon> _tmp1
+                         local  struct <anon> _tmp2
+                         local  struct <anon> _m10
+                         local  struct <anon> _m01
+                         local  struct <anon> _m20
+                         local  struct <anon> _m02
+                         local  struct <anon> _m21
+                         local  struct <anon> _m12
+                         inlines  TIGER_MATH::Dot, TIGER_MATH::QuatCompose, TIGER_MATH::VecAdd, TIGER_MATH::VecApplyMatrix, TIGER_MATH::VecCross, TIGER_MATH::VecDot, TIGER_MATH::VecLen, TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecMulByY, TIGER_MATH::VecMulByZ, TIGER_MATH::VecRcp, TIGER_MATH::VecRsqrt, TIGER_MATH::VecSet, TIGER_MATH::VecSqrt, TIGER_MATH::VecStore, TIGER_MATH::VecSub, TIGER_MATH::VecUnit, TIGER_MATH::VecX, TIGER_MATH::VecY, TIGER_MATH::VecZ, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_re, TIGER_MATH::__vmx_stvx, TIGER_MATH::operator*, TIGER_MATH::operator+, TIGER_MATH::operator-, Vec, operator float __vector__, vec_madd, vec_perm, vec_sld, vec_splat, vec_st, vec_sub
+ 1682  0056FEA4     C8  void TigerIK_Internal::CopyObjectTranslation(const struct TigerIK_Internal* this, unsigned int dstBoneI, unsigned int srcBoneI)
+                         local  struct TigerIK_Bone* dstBone
+                         local  struct TigerIK_Bone* srcBone
+                         inlines  TIGER_MATH::VecLoad, TIGER_MATH::VecStore, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx
+ 1690  0056FF6C    7A8  void TigerIK_Internal::BlendObjectRotation(const struct TigerIK_Internal* this, unsigned int dstBoneI, unsigned int srcA, unsigned int srcB, float weightA)
+                         local  const uint8_t[16] _uvrcA
+                         local  const uint8_t[16] _uvrcB
+                         local  const uint8_t[16] _uvrcC
+                         local  unsigned char[16] _vrcA
+                         local  unsigned char[16] _vrcB
+                         local  unsigned char[16] _vrcC
+                         local  struct <anon> _zero
+                         local  struct <anon> local0
+                         local  struct <anon> local1
+                         local  struct <anon> local2
+                         local  struct <anon> vecWeightA
+                         local  struct TigerIK_Bone* dstBone
+                         local  struct TigerIK_Bone* srcBoneA
+                         local  struct TigerIK_Bone* srcBoneB
+                         local  struct <anon> srcQuatA
+                         local  struct <anon> srcQuatB
+                         local  struct <anon> dstQuat
+                         local  struct <anon> mod0
+                         local  struct <anon> mod1
+                         local  struct <anon> mod2
+                         local  struct <anon> _qx
+                         local  struct <anon> _qy
+                         local  struct <anon> _qz
+                         local  struct <anon> _qw
+                         local  struct <anon> _sqw
+                         local  struct <anon> _sqx
+                         local  struct <anon> _sqy
+                         local  struct <anon> _sqz
+                         local  struct <anon> _m00
+                         local  struct <anon> _m11
+                         local  struct <anon> _m22
+                         local  struct <anon> _tmp1
+                         local  struct <anon> _tmp2
+                         local  struct <anon> _m10
+                         local  struct <anon> _m01
+                         local  struct <anon> _m20
+                         local  struct <anon> _m02
+                         local  struct <anon> _m21
+                         local  struct <anon> _m12
+                         inlines  TIGER_MATH::VecApplyMatrix, TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecMulByY, TIGER_MATH::VecMulByZ, TIGER_MATH::VecOne, TIGER_MATH::VecSetAll, TIGER_MATH::VecStore, TIGER_MATH::VecZero, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx, TIGER_MATH::operator+, TIGER_MATH::operator-, Vec, operator float __vector__, vec_madd, vec_perm, vec_st

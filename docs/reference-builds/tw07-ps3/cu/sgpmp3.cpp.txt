@@ -1,0 +1,137 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sgpmp3.cpp
+// compiled in: sgpmp3.cpp
+// 26 functions, source order. line | PS3 address | size
+
+  188    inline-only   int Snd9::ValidateChunkHeader(int hdr)
+  207  006C88F8    1F4  int Snd9::parseLayer3(const unsigned char* pHdr, MP3STATE* pMp3State)
+                         local  unsigned int layer
+                         local  unsigned int samplerateindex
+                         local  unsigned int bitRateindex
+                         local  unsigned int mode
+                         local  unsigned int crc
+                         local  unsigned int padded
+                         local  int hdr
+                         inlines  Snd9::ValidateChunkHeader
+  293  006C7840     3C  int Snd9::skipID3Tag(const unsigned char* pMem)
+                         local  int tagsize
+  322  006C8FF8    11C  const unsigned char* Snd9::FindSyncHeader(const unsigned char* data, unsigned int numBytesToCheck)
+                         local  bool foundSync
+                         local  const unsigned char* endOfData
+                         local  unsigned int header
+                         inlines  Snd9::ValidateChunkHeader
+  350  006C94EC    174  void Snd9::mp3MemPacketRelease(void* pSamples, void* pClientData)
+                         local  MP3STATE* pMp3State
+                         local  SNDPACKET sp
+                         local  bool didSubmitPacket
+                         local  const unsigned char* pMem
+                         local  int frameSize
+  419  006C9660    7C4  void* Snd9::mp3PlayMem(PlayerState* pPlayerState, unsigned char* pMem, int memSize)
+                         local  SNDPACKET sp
+                         local  int packetOverhead
+                         local  MP3STATE* pMp3State
+                         local  const unsigned char* pm
+                         local  int frameSize
+                         local  bool foundSyncHeader
+                         local  const unsigned char* pAzimuth
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  unsigned int riffSize
+                         local  int riffType
+                         local  const unsigned char* endOfData
+                         local  int chunkId
+                         local  unsigned int chunkSize
+                         local  short unsigned int formatTag
+                         inlines  PutUB<int, unsigned int>, PutUL<short unsigned int, short unsigned int>, PutUL<unsigned int, unsigned int>, SNDI_ftoifast, SNDMEMI_alloc
+  638  006C787C    26C  void Snd9::mp3FileSubmitChunk(struct ChunkInfo* pChunk, MP3STATE* pMp3State)
+                         local  int frameSize
+                         local  SNDPACKET sp
+                         local  int ret
+                         local  unsigned char* inputData
+                         local  const int header
+                         local  const unsigned char* pAzimuth
+                         local  int i
+  706  006C8DB0    1DC  void Snd9::SubmitAllPendingChunks(MP3STATE* pMp3State)
+                         local  int i
+                         local  struct ChunkInfo* pChunk
+                         local  unsigned char* inputData
+                         local  const int header
+                         local  unsigned char* pm
+                         local  int frameSize
+                         inlines  Snd9::ValidateChunkHeader
+  764  006C8F8C     6C  void Snd9::VariableTimerServer(void* pdata)
+                         local  MP3STATE* pMp3State
+  782  006C9114    3D8  enum ParseReturnValue Snd9::mp3ParseStreamerChunk(void* pData, unsigned int datasize, int , void* pDriverData, uint32_t* blocksize)
+                         local  MP3STATE* pMp3State
+                         local  unsigned char* pm
+                         local  int frameSize
+                         local  unsigned int riffSize
+                         local  int riffType
+                         local  const unsigned char* endOfData
+                         local  const unsigned char* synced_pm
+                         local  int chunkId
+                         local  unsigned int chunkSize
+                         local  short unsigned int formatTag
+                         inlines  PutUB<int, unsigned int>, PutUL<short unsigned int, short unsigned int>, PutUL<unsigned int, unsigned int>
+  944  006C7AE8    15C  void Snd9::mp3FilePacketRelease(void* pSamples, void* pClientData)
+                         local  MP3STATE* pMp3State
+                         local  bool wasChunkReleased
+                         local  int i
+ 1007  006C80DC    4D0  void* Snd9::mp3PlayFile(PlayerState* pPlayerState, unsigned char* pMem, int memSize, char* , struct <anon>* pStream, unsigned int* pSizeParsed, int fileSize)
+                         local  SNDPACKET sp
+                         local  int packetOverhead
+                         local  MP3STATE* pMp3State
+                         local  int i
+                         inlines  AddVariableTimerClient, CListDNode::SetPrev, SNDI_ftoifast, SNDMEMI_alloc
+ 1098  006C85AC     9C  enum Result Snd9::mp3SetPitch(PlayerState* pPlayerState, void* pformatstate)
+                         local  MP3STATE* pMp3State
+                         inlines  SNDI_ftoifast
+ 1112  006C8680     9C  enum Result Snd9::mp3SetDry(PlayerState* pPlayerState, void* pformatstate)
+                         local  MP3STATE* pMp3State
+                         inlines  SNDI_ftoifast
+ 1126  006C871C     AC  enum Result Snd9::mp3SetWet(PlayerState* pPlayerState, int bus, void* pformatstate)
+                         local  MP3STATE* pMp3State
+                         inlines  SNDI_ftoifast
+ 1140  006C7C44     48  enum Result Snd9::mp3Pause(void* pformatstate)
+                         local  MP3STATE* pMp3State
+ 1154  006C8648     38  enum Result Snd9::mp3Resume(PlayerState* pPlayerState, void* pformatstate)
+                         local  MP3STATE* pMp3State
+ 1167  006C7F6C    170  enum Result Snd9::mp3Stop(void* pformatstate)
+                         local  MP3STATE* pMp3State
+                         local  int i
+                         local  struct CListDNode* ptempnode
+                         local  struct CListDNode* ptempnode
+                         inlines  CListDNode::GetNext, CListDNode::GetPrev, CListDNode::SetNext, CListDNode::SetPrev, RemoveVariableTimerClient, SNDMEMI_free
+ 1213  006C87C8     9C  enum Result Snd9::mp3SetVolume(PlayerState* pPlayerState, void* pformatstate)
+                         local  MP3STATE* pMp3State
+                         inlines  SNDI_ftoifast
+ 1227  006C8864     94  enum Result Snd9::mp3SetLowPass(PlayerState* pPlayerState, void* pformatstate)
+                         local  MP3STATE* pMp3State
+                         inlines  SNDI_ftoifast
+ 1241  006C7C8C     94  enum Result Snd9::mp3SetHighPass(PlayerState* pPlayerState, void* pformatstate)
+                         local  MP3STATE* pMp3State
+                         inlines  SNDI_ftoifast
+ 1255  006C7D20     10  enum Result Snd9::mp3GetStatus(void* pformatstate, enum Status* pstatus)
+                         local  MP3STATE* pMp3State
+ 1283  006C7D30     54  enum Result Snd9::mp3GetCurPosInTime(void* pformatstate, float* pseconds)
+                         local  MP3STATE* pMp3State
+ 1301  006C7D84    15C  enum Result Snd9::mp3GetLengthInTime(void* pformatstate, float* pseconds)
+                         local  MP3STATE* pMp3State
+                         local  float mframes
+                         local  float frameBytes_div2
+                         local  int continue_func
+ 1387  006C8AEC    2C4  int Snd9::mp3FormatIdFunc(void* psample, int samplesize, PlayerDriver** ppPlayerDriver, int* pfileformat)
+                         local  MP3STATE mp3state
+                         local  int score
+                         local  const unsigned char* pMem
+                         local  const unsigned char* endOfSample
+                         local  int retbytes
+                         local  int format
+                         local  bool isWave
+                         local  const unsigned char* chunkPtr
+                         local  int chunkId
+                         local  unsigned int chunkSize
+                         local  short unsigned int formatTag
+                         inlines  PutUB<int, int>, PutUB<int, unsigned int>, PutUL<short unsigned int, short unsigned int>, PutUL<unsigned int, unsigned int>
+ 1503  006C7EE0     8C  enum Result EnableMP3()
+                         local  bool inited

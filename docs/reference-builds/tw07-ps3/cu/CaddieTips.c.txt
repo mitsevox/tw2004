@@ -1,0 +1,72 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/CaddieTips.c
+// compiled in: golf_unity.cpp
+// 22 functions, source order. line | PS3 address | size
+
+   69  001F5D80     18  void CTIP_SetCareerScenarioInstructionalCaddyTipShownFlag(bool bState)
+   77  001F5D98     64  bool CTIP_CheckForGameModeTip(enum PlayerNumber_t PlayerID)
+   89  001F5DFC     38  bool CTIP_CheckTourMode(enum PlayerNumber_t PlayerID)
+  100  001F5E34     44  bool CTIP_CheckMulligans(enum PlayerNumber_t PlayerID)
+  111  001F5E78     70  bool CTIP_CheckGeneralWindTrigger(enum PlayerNumber_t PlayerID)
+  126  0027737C     F4  bool CTIP_CheckIntoWindTrigger(enum PlayerNumber_t PlayerID)
+                         local  vec4flt windDir
+                         local  float plrAngle
+                         local  float windAngle
+                         local  float diff
+                         inlines  std::atan2
+  161  00277470     F4  bool CTIP_CheckWithWindTrigger(enum PlayerNumber_t PlayerID)
+                         local  vec4flt windDir
+                         local  float plrAngle
+                         local  float windAngle
+                         local  float diff
+                         inlines  std::atan2
+  196  001F5EE8     80  bool CTIP_CheckPenaltyLieTrigger(enum PlayerNumber_t PlayerID)
+  210  00268F1C     74  bool CTIP_CheckRoughLieTrigger(enum PlayerNumber_t PlayerID)
+  224  001F5F68     74  bool CTIP_CheckSandLieTrigger(enum PlayerNumber_t PlayerID)
+  238  001F5FDC     AC  bool CTIP_CheckDownhillLieTrigger(enum PlayerNumber_t PlayerID)
+                         local  float elevft
+  257  001F6088     AC  bool CTIP_CheckUphillLieTrigger(enum PlayerNumber_t PlayerID)
+                         local  float elevft
+  277  003177E4     D0  bool CTIP_LongDistanceTeeShotTrigger(enum PlayerNumber_t PlayerID)
+                         local  int strokes
+                         local  int holeyardage
+                         local  int par
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes
+  299  003178B4     D0  bool CTIP_MediumDistanceTeeShotTrigger(enum PlayerNumber_t PlayerID)
+                         local  int strokes
+                         local  int holeyardage
+                         local  int par
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes
+  321  002C7A10     E0  bool CTIP_SpinnaShotTrigger(enum PlayerNumber_t PlayerID)
+                         local  float clubdistance
+                         local  float pindistance
+  342  00317984     D0  bool CTIP_TeeSpinnaShotTrigger(enum PlayerNumber_t PlayerID)
+                         local  int strokes
+                         local  int holeyardage
+                         local  int par
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes
+  364  001F6134     DC  bool CTIP_FlopShotTrigger(enum PlayerNumber_t PlayerID)
+                         local  float targetHeight
+                         local  float targetDistance
+  384  00317A54     B4  bool CTIP_AnalogPuttingTrigger(enum PlayerNumber_t PlayerID)
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHolePutts
+  396  001F6210      8  bool CTIP_GamebreakerMeterTrigger(enum PlayerNumber_t PlayerID)
+  404  001F6218      8  bool CTIP_ShapeStickTrigger(enum PlayerNumber_t PlayerID)
+  412  002CC01C     90  void TipShown(enum PlayerNumber_t PlayerID)
+                         inlines  GM_GetModeType, GUI_ToggleTargetInfo
+  425  00317B08    A0C  void CTIP_ShowCaddieTip(enum PlayerNumber_t PlayerID)
+                         local  int i
+                         local  int j
+                         local  int userID
+                         local  int numtips
+                         local  int randomnum
+                         local  bool bTipShown
+                         local  bool bControllerIsPulled
+                         local  bool bUsingQue
+                         local  CaddieTip[20] primaryTip
+                         local  CaddieTip_StringIndex_t[20] primaryTipStr
+                         local  CaddieTip_StringIndex_t[20] secondaryTipStr
+                         local  int numPrimaryTips
+                         local  int numSecondaryTips
+                         local  int chooseTip
+                         local  const struct UserInfo& userInfo
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton, UIPopupDef::SetShowNoTipsPrompt

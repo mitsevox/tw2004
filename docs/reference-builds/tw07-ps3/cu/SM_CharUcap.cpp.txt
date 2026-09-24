@@ -1,0 +1,20 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_CharUcap.cpp
+// compiled in: shader_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   36  0051D0A8     88  void SM_UcapClass::SM_UcapClass(const struct SM_UcapClass* this)
+                         local  int i
+   47  0050E9D4    21C  void SM_UcapClass::Load(const struct SM_UcapClass* this)
+                         local  char[256] handleName
+                         local  int i
+   73  0050EBF0     D0  void SM_UcapClass::SetShaderWithComponentTextures(const struct SM_UcapClass* this, const LS_ShaderHandle& handle, TextureRef* textures, LS_ParamHandle* params, uint32 size)
+                         local  uint32 i
+   81  0051EA40    110  void SM_UcapClass::Activate(const struct SM_UcapClass* this)
+                         local  const struct GolfModuleUCAP& ucapModule
+                         local  const struct TexFrame* activeTexFrame
+   97  0050ED7C     50  void SM_UcapClass::Deactivate(const struct SM_UcapClass* this)
+                         local  int i
+  107  0050ECC0     BC  void SM_UcapClass::SetShaderWithWeightGroup(const struct SM_UcapClass* this, const LS_ShaderHandle& handle, vec4flt* m_WeightGroup, LS_ParamHandle* param_WeightGroup, uint32 wgSize)
+                         local  uint32 i
+  114  0051E058     10  static void _GLOBAL__I_SM_SpectatorMeshNormal()
+  115  0051E048     10  static void _GLOBAL__D_SM_SpectatorMeshNormal()

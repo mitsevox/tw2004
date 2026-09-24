@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/Thumbnails/Headers/Thumbnails.h
+// compiled in: apt_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   57    inline-only   bool ThumbNailManager::IsSecretThumbnailLoad(const struct ThumbNailManager* this)
+   59    inline-only   struct FEGolferThumbnail& ThumbNailManager::GetTexFactory(const struct ThumbNailManager* this)

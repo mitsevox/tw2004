@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_SpectatorCardShadow.cpp
+// compiled in: shader_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   33  0051A264     24  void SM_SpectatorCardShadowClass::SM_SpectatorCardShadowClass(const struct SM_SpectatorCardShadowClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base
+   38  00504770     40  void SM_SpectatorCardShadowClass::Load(const struct SM_SpectatorCardShadowClass* this)
+   46  005047B0     24  void SM_SpectatorCardShadowClass::Activate(const struct SM_SpectatorCardShadowClass* this)
+   51  005047D4     24  void SM_SpectatorCardShadowClass::Deactivate(const struct SM_SpectatorCardShadowClass* this)

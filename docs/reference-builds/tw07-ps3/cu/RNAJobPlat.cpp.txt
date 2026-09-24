@@ -1,0 +1,117 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnax/source/RNAX/PS3/RNAJobPlat.cpp
+// compiled in: RNAJobPlat.cpp
+// 28 functions, source order. line | PS3 address | size
+
+    0  008A7A7C     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+    0  008AB444    1A8  void ~JobChainC(const struct <anon>* this)
+                         inlines  RNADebugBreak, ~Vector
+    0  008AB7DC    1A8  void ~JobGroupC(const struct <anon>* this)
+                         inlines  RNADebugBreak, ~Vector
+   56  008A9EC4    1D0  struct JobInstanceC* JobManager::CreateJobGroup(struct DeviceC* pDevice, const struct <anon>& mInstancesList)
+                         local  struct <anon>* pJ
+                         inlines  JobGroupC, RNADebugBreak, operator new
+   63  008A98E0    1D0  struct JobInstanceC* JobManager::CreateJobChain(struct DeviceC* pDevice, const struct <anon>& mInstancesList)
+                         local  struct <anon>* pJ
+                         inlines  JobChainC, RNADebugBreak, operator new
+   70  008A8354     A0  void ~JobInstancePlatC(const struct <anon>* this)
+                         inlines  JobInstanceC::~JobInstanceC, RNADebugBreak
+   80  008A7BC4    12C  enum TypeID MakeRNATypeID(enum ScopeVarType eType)
+                         local  const char[14] __FUNCTION__
+                         inlines  RNADebugBreak
+  122  008AAF58    118  void UpdateBinaryFile(const struct <anon>* this, void* pBin, size_t nBinSize)
+  137  008AA4D4    A84  void RefreshScopeTagsAndParms(const struct <anon>* this)
+                         local  const char[25] __FUNCTION__
+                         local  size_t nScopeBlockSize
+                         local  const void* pTemp
+                         local  size_t i
+                         local  struct ScopeParmC* pParm
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::ScopeParmC>* newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::ScopeParmC>* newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::ScopeParmC>* newData
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::ScopeParmC>* newData
+                         local  int32_t i
+                         inlines  AutoRefCount, Clear, Construct, Destroy, DeviceC::GetScope, GetTagCount, PushBack, RNADebugBreak, Reserve, ~AutoRefCount
+  164  008A8678    134  struct JobInstanceC* GetRunnableInstance(const struct <anon>* this)
+                         inlines  AutoRefCount, JobInstanceC::JobInstanceC, JobInstanceHandle, JobSimpleC, operator new
+  170  008A8E40    218  void ~JobPlatC(const struct <anon>* this)
+                         inlines  JobC::~JobC, RNADebugBreak, ~Vector
+  179  008A7CF0     AC  void BlockGpuOnCompletion(const struct <anon>* this)
+                         local  const char[21] __FUNCTION__
+                         inlines  Gcm::cellGcmSetWaitLabel, RNADebugBreak
+  202  008A7B1C     A8  void BlockOnCompletion(const struct <anon>* this)
+                         inlines  Gcm::cellGcmFlush
+  215  008A83F4    12C  void ~JobSimpleC(const struct <anon>* this)
+                         inlines  operator delete, ~AutoRefCount
+  226  008A88E8    558  void ResolveScopeData(const struct <anon>* this)
+                         local  const struct <anon>* pScopeBlock
+                         local  struct <anon>* pParms
+                         local  const struct <anon>* pScopeTags
+                         local  size_t nScopeTags
+                         local  size_t nRawDataBlockSize
+                         local  const struct <anon>& parms
+                         local  size_t i
+                         local  struct TextureC* pTexture
+                         local  CellGcmTexture retrievedGcmTexture
+                         local  CellGcmTexture* modifiedGcmTexture
+                         inlines  GetScopeBlockAndParms, GetTagCount, JobC::GetPlatform, RNADebugBreak, ScopeParmC::Get<RNA::TextureC*>, ScopeParmC::GetValuePtr, TextureC::GetPlatform, TexturePlatC::GetGcmTexture, operator[]
+  307  008A78C0    138  struct <anon> CreateJobInstanceHandle(const struct <anon>* this)
+                         inlines  JobC::GetPlatform
+  322  008A7F9C    1DC  struct <anon> CreateJobInstanceHandle(const struct <anon>* this)
+                         local  struct <anon> h
+                         local  int i
+                         local  struct <anon> jh
+                         inlines  JobInstanceC::GetPlatform, operator[]
+  335  008A94CC    414  void SetJobList(const struct <anon>* this, const const struct <anon>& instancesList)
+                         local  uint32_t arraySize
+                         local  const char* buf
+                         local  int32_t i
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  AutoRefCount, Clear, Construct, Copy, Destroy, RNADebugBreak, operator=
+  340  008A8178    1DC  struct <anon> CreateJobInstanceHandle(const struct <anon>* this)
+                         local  struct <anon> h
+                         local  int i
+                         local  struct <anon> jh
+                         inlines  JobInstanceC::GetPlatform, operator[]
+  354  008A9AB0    414  void SetJobList(const struct <anon>* this, const const struct <anon>& instancesList)
+                         local  uint32_t arraySize
+                         local  const char* buf
+                         local  int32_t i
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  AutoRefCount, Clear, Construct, Copy, Destroy, RNADebugBreak, operator=
+  359    inline-only   void HandleGPUBlocking(const struct <anon>* this)
+                         local  const char[18] __FUNCTION__
+                         local  uint32_t* pLabelAddr
+                         local  volatile uint32_t* pLabelAddr
+                         local  struct RSXFriendlyBusyWait wait
+  413  008A7D9C    104  void ClearGpuPastCriticalSection(const struct <anon>* this)
+                         local  const char[28] __FUNCTION__
+                         inlines  Gcm::cellGcmSetWriteBackEndLabel, RNADebugBreak
+  432  008A79F8     84  bool IsComplete(const struct <anon>* this)
+  446  008AA094    220  void Run(const struct <anon>* this)
+                         local  volatile uint32_t* pLabelAddr
+                         local  struct RSXFriendlyBusyWait wait
+                         local  uint32_t* pLabelAddr
+                         inlines  Gcm::cellGcmFlush, HandleGPUBlocking, RNADebugBreak
+  457  008AA2B4    220  void RunWhenGpuGetsHere(const struct <anon>* this)
+                         local  volatile uint32_t* pLabelAddr
+                         local  struct RSXFriendlyBusyWait wait
+                         local  uint32_t* pLabelAddr
+                         inlines  Gcm::cellGcmFlush, HandleGPUBlocking, RNADebugBreak
+  468  008A7EA0     FC  void RunWhenGpuGetsHereBlockGpu(const struct <anon>* this)
+  489  008A7AFC     10  static void _GLOBAL__I__ZN4RNAX10JobSimpleC16s_ClassAllocatorE()
+  490  008A7B0C     10  static void _GLOBAL__D__ZN4RNAX10JobSimpleC16s_ClassAllocatorE()

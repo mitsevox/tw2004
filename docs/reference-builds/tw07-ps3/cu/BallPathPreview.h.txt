@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/Headers/BallPathPreview.h
+// compiled in: golf_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   47  0021705C     3C  void BallPathColor::BallPathColor(const struct BallPathColor* this, float redBase, float redDest, float greenBase, float greenDest, float blueBase, float blueDest, float alphaBase, float alphaDest, float timeStep)
+   94  00263830    100  void BallPathPreview::BallPathPreview(const struct BallPathPreview* this, enum PlayerNumber_t playerNum)
+                         inlines  BallPathPreviewMeter::BallPathPreviewMeter, vec4flt_Zero
+   95  002171C8      4  void BallPathPreview::~BallPathPreview(const struct BallPathPreview* this)

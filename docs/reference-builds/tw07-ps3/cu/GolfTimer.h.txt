@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/Golf/Lo-Math/Headers/GolfTimer.h
+// compiled in: Legacy_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   45    inline-only   void GolfTimer::SetElapsedTimeScale(float timescale)

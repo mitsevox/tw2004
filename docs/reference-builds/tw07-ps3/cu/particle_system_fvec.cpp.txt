@@ -1,0 +1,74 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/ParticleSystem/source/particle_system_fvec.cpp
+// compiled in: particle_unity.cpp
+// 28 functions, source order. line | PS3 address | size
+
+   42  004AAB78     64  void _FVecStore(float* p, const const struct _FVEC& a)
+   50  004AC088     64  struct _FVEC _FVecLoad(const float* p)
+   55  004ABF7C    10C  struct _FVEC _FVecMul(const const struct _FVEC& a, const const struct _FVEC& b)
+   60  004AB99C     D4  struct _FVEC _FVecScalarMul(const const struct _FVEC& a, float s)
+   65  004ABBE4     7C  struct _FVEC _FVecMulByX(const const struct _FVEC& a, const const struct _FVEC& x)
+   71  004ABB68     7C  struct _FVEC _FVecMulByY(const const struct _FVEC& a, const const struct _FVEC& y)
+   77  004ABAEC     7C  struct _FVEC _FVecMulByZ(const const struct _FVEC& a, const const struct _FVEC& z)
+   83  004ABA70     7C  struct _FVEC _FVecMulByW(const const struct _FVEC& a, const const struct _FVEC& w)
+   89  004AB658     30  struct _FVEC _FVecSet(float x, float y, float z, float w)
+   95  004AC5B4     A0  float FVecDot3(const const struct _FVEC& a, const const struct _FVEC& b)
+                         local  struct _FVEC p
+  102  004AC660     BC  float FVecDot4(const const struct _FVEC& a, const const struct _FVEC& b)
+                         local  struct _FVEC p
+  109  004AC71C    104  struct _FVEC _FVecCross(const const struct _FVEC& a, const const struct _FVEC& b)
+  121  004AB890    10C  struct _FVEC _FVecAdd(const const struct _FVEC& a, const const struct _FVEC& b)
+  126  004AC820    10C  struct _FVEC _FVecSub(const const struct _FVEC& a, const const struct _FVEC& b)
+  132  004AC92C     DC  struct _FVEC FVecUnit3(const const struct _FVEC& a)
+                         local  float len2
+                         local  float rcp
+  147  004ACA08     40  float FVecLen3(const const struct _FVEC& a)
+  153  004ABDBC    1C0  struct _FVEC _FVecApplyMtx4(const const struct _FVEC& v, const struct _FVEC* matrix)
+                         local  struct _FVEC temp
+                         local  struct _FVEC result
+  168  004ABC60    15C  struct _FVEC _FVecApplyMtx3(const const struct _FVEC& v, const struct _FVEC* matrix)
+                         local  struct _FVEC temp
+                         local  struct _FVEC result
+  193  004AAB58      8  float _FVecX(const const struct _FVEC& a)
+  194  004AAB60      8  float _FVecY(const const struct _FVEC& a)
+  195  004AAB68      8  float _FVecZ(const const struct _FVEC& a)
+  196  004AAB70      8  float _FVecW(const const struct _FVEC& a)
+  197  004AC598      4  float& _FVecX(const struct _FVEC& a)
+  198  004AC59C      C  float& _FVecY(const struct _FVEC& a)
+  199  004AC5A8      C  float& _FVecZ(const struct _FVEC& a)
+  200  004AC654      C  float& _FVecW(const struct _FVEC& a)
+  204  004AE1D8    394  struct _FVEC FVecEulerToQuatXYZ(const const struct _FVEC& euler)
+                         local  float halfX
+                         local  float halfY
+                         local  float halfZ
+                         local  float cx
+                         local  float cy
+                         local  float cz
+                         local  float sx
+                         local  float sy
+                         local  float sz
+                         local  struct _FVEC t0
+                         local  struct _FVEC t1
+                         local  struct _FVEC t2
+                         local  struct _FVEC product0
+                         local  struct _FVEC product1
+                         inlines  std::cosf, std::sinf
+  236  004AB688    208  void FVecQuatToMatrix(struct _FVEC* matrix, const const struct _FVEC& quat)
+                         local  float qx
+                         local  float qy
+                         local  float qz
+                         local  float qw
+                         local  float sqw
+                         local  float sqx
+                         local  float sqy
+                         local  float sqz
+                         local  float m00
+                         local  float m11
+                         local  float m22
+                         local  float tmp1
+                         local  float tmp2
+                         local  float m10
+                         local  float m01
+                         local  float m20
+                         local  float m02
+                         local  float m21
+                         local  float m12

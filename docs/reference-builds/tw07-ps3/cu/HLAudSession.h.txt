@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/Audio/Engine/HL/Headers/HLAudSession.h
+// compiled in: apt_unity.cpp, other_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  147    inline-only   bool Ses_HasStreamingAudio()
+  156    inline-only   TStmPlayList* Ses_GetStreamPlayList(uint8 playlistID)

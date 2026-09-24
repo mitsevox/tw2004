@@ -1,0 +1,64 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_InTheBag.cpp
+// compiled in: apt_unity.cpp
+// 20 functions, source order. line | PS3 address | size
+
+   21  000F3764     54  void UIInTheBag::UIInTheBag(const struct UIInTheBag* this)
+   26  000F380C     B8  void UIInTheBag::~UIInTheBag(const struct UIInTheBag* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   30  00033728     60  void UIInTheBag::Init(const struct UIInTheBag* this)
+   36  00033D14     24  void UIInTheBag::Close(const struct UIInTheBag* this)
+   41  0006A0BC     84  void UIInTheBag::Show(const struct UIInTheBag* this)
+                         local  int32 nOwnerIndex
+                         inlines  UserInfo::SetLoginIndex
+   53  00066520     A8  void UIInTheBag::Hide(const struct UIInTheBag* this)
+                         inlines  AptControllerListener::StopPortLocking
+   69  0008C99C    2F0  void UIInTheBag::NotifyGo(const struct UIInTheBag* this)
+                         local  int32 i
+                         local  int32 j
+                         local  int32 position
+                         local  const struct UserInfo& userInfo
+                         local  char[64] aptBuf
+                         local  char[16] strBuf
+                         local  int32 equipListIndex
+                         local  int32 club
+                         local  bool bIsAlreadyInBag
+  140  0003A9F4     68  void UIInTheBag::RefreshClubCountString(const struct UIInTheBag* this)
+                         local  char[16] strBuf
+  151  0006D1A4     18  void FinishBagSaveCBProxy(int32 rslt)
+  157  0003AA5C     5C  void UIInTheBag::FinishBagSaveCB(const struct UIInTheBag* this, int32 rslt)
+  169  000ADA9C    380  enum eAptHandleInput UIInTheBag::HandleInput(const struct UIInTheBag* this, int32 cID)
+                         local  int32 menuSelUpDown
+                         local  int32 menuSelLeftRight
+                         local  int32 clubTypeIndex
+                         local  int32 numCols
+                         local  int32 colCount
+  259  0003A558     BC  void UIInTheBag::SetHighlight(const struct UIInTheBag* this, int32 x, int32 y, bool highlightOn)
+                         local  char[32] aptBuf
+  270  0003A70C     CC  int32 UIInTheBag::GetNumColsForRow(const struct UIInTheBag* this, int32 row)
+                         local  uint8[11] colCounts
+  277  0003A614     F8  bool UIInTheBag::RowIsClubSetSelector(const struct UIInTheBag* this, int32 row, int32* clubType)
+  307  0008C76C    230  void UIInTheBag::SelectClubSet(const struct UIInTheBag* this, int32 clubType, int32 entryNum)
+                         local  char[64] strBuf
+                         local  char[32] aptBuf
+                         local  int32 unfilteredEntryNum
+                         local  int32 id
+                         local  const struct UserInfo& userInfo
+                         local  int32 equipListIndex
+                         local  char* tmp
+  362  0003AAB8     A0  int32 UIInTheBag::GetMenuRowForClubType(const struct UIInTheBag* this, int32 clubType)
+                         local  int32 row
+  377  0003A930     C4  void UIInTheBag::SetSelectedState(const struct UIInTheBag* this, int32 x, int32 y, bool isChecked, bool isLocked)
+                         local  char[64] aptBuf
+  393  0003AB58    23C  void UIInTheBag::ToggleSelectedState(const struct UIInTheBag* this, int32 x, int32 y)
+                         local  int32 club
+                         local  int32 tmpVal
+                         local  int32 newState
+                         local  const struct UserInfo& userInfo
+                         local  int32 i
+  442  0003A7D8     DC  int32 UIInTheBag::GetClubFromRowCol(const struct UIInTheBag* this, int32 row, int32 col)
+                         local  int32 counter
+                         local  int32 j
+                         local  int32 cols
+  458  0003A8B4     7C  bool UIInTheBag::ClubIsLocked(const struct UIInTheBag* this, enum Club_t club)
+                         local  int32 drivers
+                         local  bool singleDriver

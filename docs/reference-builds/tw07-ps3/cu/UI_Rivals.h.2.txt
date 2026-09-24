@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_Rivals.h
+// compiled in: apt_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   65  000FEAF4      C  uint32 UIRivals::GetSignature(const const struct UIRivals* this)
+   67  00103458     14  void UIRivals::NotifyRivalsMode_func(struct IAptSubscriber* subs)
+   68  0010E468     14  enum AptThreadReturnValue UIRivals::InitialGoToMessenger_func(struct IAptSubscriberBase* subs)
+   71  000FEB08      C  struct IExternArray* UIRivals::GetExternArray(const struct UIRivals* this)
+   72  000FEB1C      8  int32 UIRivals::GetSizeofArrayStruct(const struct UIRivals* this)

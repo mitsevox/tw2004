@@ -1,0 +1,76 @@
+// C:/dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/target/ppu/include/sys/raw_spu.h
+// compiled in: golf_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+  163    inline-only   static int sys_raw_spu_create(sys_raw_spu_t* id, sys_raw_spu_attribute_t* attr)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n
+  173    inline-only   static int sys_raw_spu_destroy(sys_raw_spu_t id)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n
+  187    inline-only   static int sys_raw_spu_create_interrupt_tag(sys_raw_spu_t id, sys_class_id_t class_id, sys_hw_thread_t hwthread, sys_interrupt_tag_t* intrtag)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n
+  200    inline-only   static int sys_raw_spu_set_int_mask(sys_raw_spu_t id, sys_class_id_t class_id, uint64_t mask)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n
+  224    inline-only   static int sys_raw_spu_set_int_stat(sys_raw_spu_t id, sys_class_id_t class_id, uint64_t stat)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n
+  236    inline-only   static int sys_raw_spu_get_int_stat(sys_raw_spu_t id, sys_class_id_t class_id, uint64_t* stat)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n
+  247    inline-only   static int sys_raw_spu_read_puint_mb(sys_raw_spu_t id, uint32_t* value)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n
+  330    inline-only   static void sys_raw_spu_mmio_write(int id, int offset, uint32_t value)
+  343    inline-only   static uint32_t sys_raw_spu_mmio_read(int id, int offset)

@@ -1,0 +1,24 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/matrix44_operation_inline.h
+// compiled in: RNADevice.cpp, SGNodeBoundingVolume.cpp, SGNodeJoint.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   34    inline-only   bool vpu::operator!=(struct <anon>& a, struct <anon>& b)
+  309    inline-only   struct <anon> vpu::Matrix44FromQuaternion(struct <anon>& q)
+                         local  Vector4Intrinsic_32 zero
+                         local  Vector4Intrinsic_32 x
+                         local  Vector4Intrinsic_32 y
+                         local  Vector4Intrinsic_32 z
+                         local  Vector4Intrinsic_32 w
+  414    inline-only   struct <anon> vpu::Matrix44FromTranslation(struct <anon>& trans)
+                         local  Vector4Intrinsic_32 row0
+                         local  Vector4Intrinsic_32 row1
+                         local  Vector4Intrinsic_32 row2
+                         local  Vector4Intrinsic_32 row3
+                         local  Vector4Intrinsic_32 one
+  778    inline-only   void vpu::Matrix44FromQuaternion(struct <anon>& q, const struct <anon>& result)
+  827    inline-only   void vpu::Matrix44FromTranslation(struct <anon>& trans, const struct <anon>& result)
+  847    inline-only   void vpu::Matrix44RotationX(struct <anon>& angle, const struct <anon>& result)
+  852    inline-only   void vpu::Matrix44RotationY(struct <anon>& angle, const struct <anon>& result)
+  857    inline-only   void vpu::Matrix44RotationZ(struct <anon>& angle, const struct <anon>& result)
+ 1065    inline-only   struct <anon> vpu::operator*(struct <anon>& v, struct <anon>& m)
+ 1107    inline-only   struct <anon> vpu::operator*(struct <anon>& a, struct <anon>& b)

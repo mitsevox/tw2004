@@ -1,0 +1,58 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/smixer.cpp
+// compiled in: smixer.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   58  006CFF10    1EC  void MIXI_interpolateto0(float* acc, float* pdst)
+   84  006D00FC    230  void MIXI_interpolatemix(SNDMIXGAIN gain, SNDMIXGAIN gaintarget, float* psrc, float* pdst)
+                         local  float gainincr
+  112  006D032C    33C  int SNDMIXI_volramp(SNDMIXVOICE* psmv)
+                         local  int samplesdecoded
+                         local  int i
+  201  006D1114     54  void* SNDI_New(size_t s, const char* n)
+                         inlines  SNDMEMI_alloc
+  214  006D0FA8     40  void SNDI_Delete(void* p)
+                         inlines  SNDMEMI_free
+  220  006D1168    360  void MIX_create(MIXCONFIG* pmc)
+                         local  int i
+                         local  int pingPongBufSize
+                         local  int bufsize
+                         local  char* ptemp
+                         inlines  SNDMEMI_alloc
+  342  006D0FE8    12C  void MIX_destroy()
+                         local  int i
+                         inlines  SNDMEMI_free
+  382  006D0668     18  void MIX_reset()
+  401  006D0680      C  void MIX_setresamplequality(int quality)
+  409  006D14C8    4AC  void MIX_playinit(int voice, int samplerep, int playtype, void* psample, void* ploopstart, void* ptsdata, int numchan, int totalframes, int sustainstart, int sustainend, int platformver, int requester)
+                         local  UNPACKINITPARAMS upip
+                         local  SNDMIXVOICE* psmv
+                         local  int upindex
+                         local  int unpackType
+                         local  int err
+                         inlines  SNDMEMI_alloc
+  602  006D068C     C0  void MIX_play(int voice)
+                         local  SNDMIXVOICE* psmv
+                         local  int i
+  625  006D08B4     50  void MIXI_stop(int voice)
+  632  006D074C    168  void MIX_stop(int voice)
+                         local  SNDMIXVOICE* psmv
+                         local  SFILTERNODE* psfn
+                         local  int i
+                         inlines  SNDMEMI_free
+  677  006D0904     44  void SNDMIX_setdrygain(int voice, int channel, SNDMIXGAIN gain)
+  689  006D0948     44  void SNDMIX_setwetgain(int voice, int bus, SNDMIXGAIN gain)
+  701  006D098C    520  void MIX_audioslice(void** poutput, int frames)
+                         local  SNDMIXVOICE* psmv
+                         local  int framesnotramped
+                         local  int framesramped
+                         local  int framestomix
+                         local  int voice
+                         local  int i
+                         local  float* tempPoint
+                         local  int j
+                         local  float tempVal
+                         inlines  MemCpy
+  867  006D0EAC     FC  void MIX_audio(void** poutputpassed, int frames)
+                         local  void*[6] poutput
+                         local  int framestomix
+                         local  int i

@@ -1,0 +1,65 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/lobbyroomconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 28 functions, source order. line | PS3 address | size
+
+  108  005BAC50     44  void LobbyRoomConcrete(const struct <anon>* this, int32_t iIdentifier)
+  130  005BAD1C      C  void ~LobbyRoomConcrete(const struct <anon>* this)
+  151  005CEC84     58  bool IsValid(const const struct <anon>* this)
+  174  005E00A0     38  int32_t GetIdentifier(const const struct <anon>* this)
+                         local  LobbyApiRoomT* pRoom
+  199  005E005C     44  const char8_t* GetName(const const struct <anon>* this)
+                         local  LobbyApiRoomT* pRoom
+  224  005E0018     44  const char8_t* GetDisplayName(const const struct <anon>* this)
+                         local  LobbyApiRoomT* pRoom
+                         local  const char8_t* strDisplayName
+  266  005DF214     8C  struct LobbyCategory* GetCategory(const const struct <anon>* this)
+                         local  struct <anon>* pLobby
+                         local  struct LobbyCategory* pLobbyCategory
+  293  005DFFC0     58  bool IsPrivate(const const struct <anon>* this)
+                         local  LobbyApiRoomT* pRoom
+  316  005DFF7C     44  const char8_t* GetHost(const const struct <anon>* this)
+                         local  LobbyApiRoomT* pRoom
+  339  005DFF3C     40  uint32_t GetPopulation(const const struct <anon>* this)
+                         local  LobbyApiRoomT* pRoom
+  364  005DFF08     34  uint32_t GetTotalPopulation(const const struct <anon>* this)
+                         local  LobbyApiRoomT* pRoom
+  390  005DFED4     34  uint32_t GetInGamePopulation(const const struct <anon>* this)
+                         local  LobbyApiRoomT* pRoom
+  414  005FC438     64  const struct List<OSDK::User>* GetUsers(const const struct <anon>* this)
+                         local  LobbyApiRoomT* pRoom
+                         local  const struct List<OSDK::User>* pList
+                         inlines  GetLobbyConcrete
+  439  005DFE90     44  const char8_t* GetDescription(const const struct <anon>* this)
+                         local  LobbyApiRoomT* pRoom
+  462  005DFDAC     E4  uint32_t GetDnfRestriction(const const struct <anon>* this)
+                         local  const struct Dictionary* pConfiguration
+                         local  int32_t iDnfIndex
+                         local  LobbyApiRoomT* pRoom
+                         local  uint32_t uDNF
+                         inlines  GetInstance
+  506  005DFC64    148  void GetLevelRestriction(const const struct <anon>* this, uint32_t* pMinimum, uint32_t* pMaximum)
+                         local  const struct Dictionary* pConfiguration
+                         local  int32_t iRankIndex
+                         local  LobbyApiRoomT* pRoom
+                         inlines  GetInstance
+  556  006000AC     28  struct Operation* LocalUserJoin(const struct <anon>* this, const char8_t* strPassword, struct <anon>* pCallback)
+  582  00608354     18  struct Operation* LocalUserLeave(const struct <anon>* this, struct <anon>* pCallback)
+  607  005DF0E0     20  LobbyApiRoomT* GetApiRoom(const const struct <anon>* this)
+                         local  LobbyApiRoomT* pRoom
+  632  005DF1B8     5C  int32_t GetApiCategoryIndex(const const struct <anon>* this)
+                         local  LobbyApiRoomT* pRoom
+                         local  int32_t iCategory
+                         local  LobbyRoomlistT* pRoomListApi
+  672  006066A4     F8  struct Operation* SendMessage(const struct <anon>* this, const char8_t* strMessage, struct <anon>* pCallback)
+                         local  struct <anon>* pTempOp
+                         local  struct <anon> TagField
+                         inlines  GetTagField
+  705  00606638     6C  void LobbyRoomSendMessageOperation(const struct <anon>* this, const char8_t* strParameters, struct <anon>* pCallback)
+  729  006065D0     40  void ~LobbyRoomSendMessageOperation(const struct <anon>* this)
+  734  005BAD6C     44  void AriesOperationFailure(const struct <anon>* this, int32_t )
+  759  005BADB0     6C  bool AriesOperationResult(const struct <anon>* this, LobbyApiMsgT* pMsg)
+  796  005BAE1C     44  void AriesOperationCancel(const struct <anon>* this)
+  821  005DF160     58  bool IsFriendOnly(const const struct <anon>* this)
+                         local  LobbyApiRoomT* pRoom
+  846  005DF100     60  bool CanLocalUserEnter(const struct <anon>* this)
+                         inlines  GetLobbyApi

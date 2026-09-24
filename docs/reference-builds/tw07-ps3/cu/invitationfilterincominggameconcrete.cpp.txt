@@ -1,0 +1,15 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/invitationfilterincominggameconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   77  005B7D50     34  void InvitationFilterIncomingGameConcrete(const struct <anon>* this)
+  101  005B7DB8      C  void ~InvitationFilterIncomingGameConcrete(const struct <anon>* this)
+  123  005E22C4    248  enum FilterResponse Filter(const struct <anon>* this, struct InvitationAbstract* pInvitation)
+                         local  const struct User* pUser
+                         local  struct InvitationManagerConcrete* pInvitationManager
+                         local  struct <anon>* pFacade
+                         local  struct <anon>* pLocalUser
+                         local  struct GameSession* pCurrentGameSession
+                         local  int32_t iInvitedToSessionId
+                         local  int32_t iCurrentSessionId
+                         inlines  GetInstance, GetInvitationManagerConcrete

@@ -1,0 +1,8 @@
+// C:/dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/target/ppu/include/iosfwd
+// compiled in: golf_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+  353    inline-only   void assign(const char& _Left, const const char& _Right)
+  376    inline-only   size_t length(const char* _First)
+  383    inline-only   char* copy(char* _First1, const char* _First2, size_t _Count)
+  398    inline-only   char* move(char* _First1, const char* _First2, size_t _Count)

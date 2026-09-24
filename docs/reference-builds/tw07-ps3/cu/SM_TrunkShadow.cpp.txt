@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_TrunkShadow.cpp
+// compiled in: shader_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   35  0051B49C     2C  void SM_TrunkShadowClass::SM_TrunkShadowClass(const struct SM_TrunkShadowClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base
+   43  00508BDC     88  void SM_TrunkShadowClass::Load(const struct SM_TrunkShadowClass* this)
+   52  00508C64     44  void SM_TrunkShadowClass::Activate(const struct SM_TrunkShadowClass* this)
+   59  00508CA8     38  void SM_TrunkShadowClass::Deactivate(const struct SM_TrunkShadowClass* this)
+   66  00511EE4     64  void SM_TrunkShadowClass::SetColorTexture(const struct SM_TrunkShadowClass* this, TextureRef texRef)

@@ -1,0 +1,10 @@
+// C:/packages/job_manager/1.11.00/include/job_manager/detail/job_scheduler_internal.h
+// compiled in: job_scheduler_internal.cpp, spu_printf_server.cpp
+// 4 functions, source order. line | PS3 address | size
+
+  119  00705D90     38  void ~JobSchedulerInternal(const struct JobSchedulerInternal* this)
+  140    inline-only   uint64_t& GetThreadHandle(const struct JobSchedulerInternal* this)
+  141    inline-only   unsigned int& GetPrintfQueueHandle(const struct JobSchedulerInternal* this)
+  172  00705DC8     E0  void JobSchedulerInternal(const struct JobSchedulerInternal* this)
+                         local  uint32_t i
+                         inlines  JobHeader, JobThread, SpuState

@@ -1,0 +1,48 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_ik/tiger_ik.cpp
+// compiled in: tiger_ik.cpp
+// 40 functions, source order. line | PS3 address | size
+
+   10  00566FEC     BC  void IK(const struct <anon>* this, const struct Skeleton* cctSkel)
+                         local  unsigned int internalSize
+                         inlines  TagValuePair
+   17  00566980     80  void ~IK(const struct <anon>* this)
+                         inlines  ~Allocatable
+   23  00566A00     28  unsigned int SetBoneParent(const struct <anon>* this, unsigned int boneI, unsigned int parentI, int recomputeLocalTransforms)
+   28  00566A28     28  unsigned int GetBoneParent(const const struct <anon>* this, unsigned int boneI)
+   40  00566A50     28  void SetLocalTwistSwingAxes(const struct <anon>* this, unsigned int boneI, float axesQuatX, float axesQuatY, float axesQuatZ, float axesQuatW)
+   46  00566A78     28  void SetLocalConstraint(const struct <anon>* this, unsigned int boneI, float twistMin, float twistMax, float swingMaxX, float swingMaxY)
+   52  00566AA0     28  void SetLocalTransform(const struct <anon>* this, unsigned int boneI, const float* quat, const float* trans)
+   72  00566AC8     38  int AddTarget(const struct <anon>* this, unsigned int solutionIndex, unsigned int boneI, float quatX, float quatY, float quatZ, float quatW, float transX, float transY, float transZ, unsigned int boneToReparent, unsigned int newParent)
+   77  00566B00     28  void ComputeSolution(const struct <anon>* this, unsigned int maxIterationCount, unsigned int solutionIndex)
+   82  00566B28     28  void ResetSolution(const struct <anon>* this, unsigned int solutionIndex)
+   86  00566B50     28  void ApplySolution(const struct <anon>* this, float ikWeight, unsigned int solutionIndex)
+   91  00566B78     28  void SaveCachedTransformsWithIK(const struct <anon>* this)
+   97  00566BA0     28  const float* GetObjectQuat(const const struct <anon>* this, unsigned int boneI)
+  102  00566BC8     28  void GetObjectTransform(const const struct <anon>* this, float* mtx4, float* quat, unsigned int boneI)
+  107  00566BF0     28  void GetCachedObjectTransform(const const struct <anon>* this, float* mtx4, float* quat, unsigned int boneI)
+  113  00566C18     28  void SetBasePose(const struct <anon>* this, const float* invBindMatrices)
+  118  00566C40     28  int SetBoneIsTerminal(const struct <anon>* this, unsigned int boneI, int isTerminal)
+  125  00566C68     28  int SetBoneIsNoIK(const struct <anon>* this, unsigned int boneI, int isNoIK)
+  130  00566C90     28  void SetBoneIsBindPose(const struct <anon>* this, unsigned int boneI, int isBindPose)
+  135  00566CB8     28  void ComputeObjectTransforms(const struct <anon>* this, bool saveCache)
+  140  00566CE0     28  void ComputeObjectTransformsSimple(const struct <anon>* this)
+  146  00566D08     28  void DoMirrorTransform(const struct <anon>* this)
+  151  00566D30     28  int SetBoneMirrorSwap(const struct <anon>* this, unsigned int boneA, unsigned int boneB)
+  156  00566D58     28  int SetBoneMirrorMask(const struct <anon>* this, unsigned int boneI, unsigned int mask)
+  161  00566D80     28  void SetRootMtx(const struct <anon>* this, const float* rootMtx)
+  166  00566DA8     10  const float* GetRootMtx(const const struct <anon>* this)
+  171  00566DB8     28  void CopyLocalTransformsFromCCT(const struct <anon>* this, const struct Frame* frame)
+  176  00566DE0     28  void BlendLocalTransformsFromCCT(const struct <anon>* this, float prevWeight, const struct Frame* frame)
+  181  00566E08     28  void ResetLocalTransSources(const struct <anon>* this)
+  186  00566E30     28  void SetLocalTransSource(const struct <anon>* this, unsigned int dstI, unsigned int srcI)
+  191  00566E58     28  void SetTransformMod(const struct <anon>* this, unsigned int boneI, const float* quat, const float* trans, const float* scale, int useHierarchicalScaling)
+  196  00566E80     28  void GetBindTransform(const const struct <anon>* this, float* mtx4, unsigned int boneI)
+  201  00566EA8     28  void GetInvBindTransform(const const struct <anon>* this, float* mtx4, unsigned int boneI)
+  206  00566ED0     28  const float* GetTargetPos(const const struct <anon>* this, unsigned int boneI)
+  212  00566EF8     24  void EnableBlendedSolutions(bool enable)
+  217  00566F1C     28  void DoClubIK(const struct <anon>* this, unsigned int handleI, unsigned int breakI, unsigned int headI, float penetration)
+  222  00566F44     28  void DoFootIK(const struct <anon>* this, unsigned int root, unsigned int toe, unsigned int foot, unsigned int knee, unsigned int legTwist, unsigned int leg, const float toePenetration, const float footPenetration)
+  227  00566F6C     30  const float* GetObjectPos(const const struct <anon>* this, unsigned int boneI)
+                         inlines  TigerIK_Internal::GetObjectPos
+  232  00566F9C     28  void CopyObjectTranslation(const struct <anon>* this, unsigned int dstBoneI, unsigned int srcBoneI)
+  237  00566FC4     28  void BlendObjectRotation(const struct <anon>* this, unsigned int dstBoneI, unsigned int srcA, unsigned int srcB, float weightA)

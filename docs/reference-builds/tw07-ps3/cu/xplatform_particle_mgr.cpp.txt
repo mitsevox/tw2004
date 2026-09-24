@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Actors/xplatform_particle_mgr.cpp
+// compiled in: golf_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   14  0022E294     74  void XPlatformParticleManager::XPlatformParticleManager(const struct XPlatformParticleManager* this)
+                         inlines  TigerParticleManager::TigerParticleManager
+   21  0022E308     24  void XPlatformParticleManager::~XPlatformParticleManager(const struct XPlatformParticleManager* this)
+   28  0022E394      4  void XPlatformParticleManager::PlatformInit(const struct XPlatformParticleManager* this)
+   33  0022E398      4  void XPlatformParticleManager::PlatformShutdown(const struct XPlatformParticleManager* this)
+   38  0022E39C      4  void XPlatformParticleManager::PlatformPreRender(const struct XPlatformParticleManager* this)
+   43  0022E3A0      4  void XPlatformParticleManager::PlatformPostRender(const struct XPlatformParticleManager* this)
+   48  0022E3A4     64  struct ParticleEmitter* XPlatformParticleManager::PlatformNewEmitter(const struct XPlatformParticleManager* this)
+                         inlines  XPlatformParticleEmitter::XPlatformParticleEmitter

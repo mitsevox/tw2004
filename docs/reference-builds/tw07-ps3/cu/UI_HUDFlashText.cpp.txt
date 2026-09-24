@@ -1,0 +1,28 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_HUDFlashText.cpp
+// compiled in: apt_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   27  000F3E48     68  void UIHUDFlashText::UIHUDFlashText(const struct UIHUDFlashText* this)
+                         inlines  TAptArrayStruct
+   32  000A29B0    398  void UIHUDFlashText::Init(const struct UIHUDFlashText* this)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIHUDFlashText::FlashTextToShow,AptStructSwapper>::SetNbrElems
+   43  000A2DC8     80  void UIHUDFlashText::Close(const struct UIHUDFlashText* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIHUDFlashText::FlashTextToShow,AptStructSwapper>::Flush
+   49  00040158     24  void UIHUDFlashText::Show(const struct UIHUDFlashText* this)
+   55  0004017C     44  void UIHUDFlashText::OnShow(const struct UIHUDFlashText* this)
+   61  000401C0     24  void UIHUDFlashText::Hide(const struct UIHUDFlashText* this)
+   68  000401E4      8  enum eAptHandleInput UIHUDFlashText::HandleInput(const struct UIHUDFlashText* this, int32 cID)
+   78  000A2584    42C  void UIHUDFlashText::ShowText(const struct UIHUDFlashText* this, char* text, enum eHudFlashText textType, SoundPlayBackFunc* pFunc, enum eHudFlashTextMod modType, char* text1, char* text2)
+                         local  int32 oIndex
+                         local  const struct FlashTextToShow& oItem
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIHUDFlashText::FlashTextToShow,AptStructSwapper>::GetElemCount, TArrayInternal<UIHUDFlashText::FlashTextToShow,AptStructSwapper>::SetNbrElems, TArrayInternal<UIHUDFlashText::FlashTextToShow,AptStructSwapper>::operator[]
+  114  000929E4    1EC  void UIHUDFlashText::ClearTextToShowArray(const struct UIHUDFlashText* this)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIHUDFlashText::FlashTextToShow,AptStructSwapper>::SetNbrElems
+  120  000401EC     AC  char* UIHUDFlashText::GetCupFlashLabelFromMod(const struct UIHUDFlashText* this, enum eHudFlashTextMod modType)
+  145  00092CD0    318  enum TAptSequenceStatus UIHUDFlashText::ShowNextTextSequence(const struct UIHUDFlashText* this, bool inbFirstTime, void* inData)
+                         local  const struct FlashTextToShow& oItem
+                         inlines  TArrayInternal<UIHUDFlashText::FlashTextToShow,AptStructSwapper>::operator[]
+  220  0003E9E8     34  bool UIHUDFlashText::IsFlashTextShowing(const struct UIHUDFlashText* this)
+  225  00040298     2C  void UIHUDFlashText::AddStall(const struct UIHUDFlashText* this, int32 inFrameCount)
+  230  00092BD0    100  void UIHUDFlashText::StopAllPendingFlashText(const struct UIHUDFlashText* this)
+                         local  int32 i

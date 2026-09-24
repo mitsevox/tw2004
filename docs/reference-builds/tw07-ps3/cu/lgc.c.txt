@@ -1,0 +1,87 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/lua-5.0.2/src/lgc.c
+// compiled in: lgc.c
+// 24 functions, source order. line | PS3 address | size
+
+   70  0054833C     C4  static void reallymarkobject(GCState* st, GCObject* o)
+  103    inline-only   static void marktmu(GCState* st)
+                         local  GCObject* u
+  113  00548400    144  size_t luaC_separateudata(lua_State* L)
+                         local  size_t deadmem
+                         local  GCObject** p
+                         local  GCObject* curr
+                         local  GCObject* collected
+                         local  GCObject** lastcollected
+  143  00548544     20  static void removekey(Node* n)
+  150    inline-only   static void traversetable(GCState* st, Table* h)
+                         local  int i
+                         local  int weakkey
+                         local  int weakvalue
+                         local  const TObject* mode
+                         local  GCObject** weaklist
+                         local  Node* n
+  190    inline-only   static void traverseproto(GCState* st, Proto* f)
+                         local  int i
+  208    inline-only   static void traverseclosure(GCState* st, Closure* cl)
+                         local  int i
+                         local  int i
+                         local  UpVal* u
+  230    inline-only   static void checkstacksizes(lua_State* L, StkId max)
+                         local  int used
+  242  00548564    1D0  static void traversestack(GCState* st, lua_State* L1)
+                         local  StkId o
+                         local  StkId lim
+                         local  CallInfo* ci
+                         inlines  checkstacksizes
+  261  00548734    60C  static void propagatemarks(GCState* st)
+                         local  Table* h
+                         local  Proto* p
+                         local  Closure* cl
+                         local  lua_State* th
+                         local  GCObject** weaklist
+                         local  Node* n
+                         inlines  traverseclosure, traverseproto, traversetable
+  294  00548D40     50  static int valismarked(const TObject* o)
+  304  00548D90     D0  static void cleartablekeys(GCObject* l)
+                         local  Table* h
+                         local  int i
+                         local  Node* n
+  322  00548E60    12C  static void cleartablevalues(GCObject* l)
+                         local  Table* h
+                         local  int i
+                         local  TObject* o
+                         local  Node* n
+  343    inline-only   static void freeobj(lua_State* L, GCObject* o)
+  367  00548F8C    17C  static int sweeplist(lua_State* L, GCObject** p, int limit)
+                         local  GCObject* curr
+                         local  int count
+                         inlines  freeobj
+  385    inline-only   static void sweepstrings(lua_State* L, int all)
+                         local  int i
+  393    inline-only   static void checkSizes(lua_State* L, size_t deadmem)
+                         local  size_t newsize
+  407    inline-only   static void do1gcTM(lua_State* L, Udata* udata)
+                         local  const TObject* tm
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  TObject* i_o
+  418  00549108    14C  void luaC_callGCTM(lua_State* L)
+                         local  lu_byte oldah
+                         local  GCObject* o
+                         local  Udata* udata
+                         local  TObject* i_o
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  TObject* i_o
+                         inlines  do1gcTM
+  438  00549254    104  void luaC_sweep(lua_State* L, int all)
+                         inlines  sweepstrings
+  447    inline-only   static void markroot(GCState* st, lua_State* L)
+                         local  global_State* g
+  457    inline-only   static size_t mark(lua_State* L)
+                         local  size_t deadmem
+                         local  GCState st
+                         local  GCObject* wkv
+  484  00549358    250  void luaC_collectgarbage(lua_State* L)
+                         local  size_t deadmem
+                         inlines  checkSizes, mark, markroot, marktmu
+  492  005495A8     24  void luaC_link(lua_State* L, GCObject* o, lu_byte tt)

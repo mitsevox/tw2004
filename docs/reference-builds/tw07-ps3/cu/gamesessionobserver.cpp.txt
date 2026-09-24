@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/gamesessionobserver.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    5  005B3CD8      C  void GameSessionObserver(const struct GameSessionObserver* this)
+    9  005B3CE4      C  void ~GameSessionObserver(const struct GameSessionObserver* this)

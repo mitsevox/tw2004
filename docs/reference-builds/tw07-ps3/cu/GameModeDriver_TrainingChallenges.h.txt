@@ -1,0 +1,14 @@
+// ../../../../../TIGERCODE/Code/Golf/GameMode/Headers/GameModeDriver_TrainingChallenges.h
+// compiled in: apt_unity.cpp, golf_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   37    inline-only   void GameModeDriverTrainingChallenges::SetCurrentEventIndex(const struct GameModeDriverTrainingChallenges* this, int iGame)
+   38    inline-only   int GameModeDriverTrainingChallenges::GetCurrentEventIndex(const struct GameModeDriverTrainingChallenges* this)
+   41    inline-only   bool GameModeDriverTrainingChallenges::IsTrainingChallengeOver(const struct GameModeDriverTrainingChallenges* this)
+   47    inline-only   void GameModeDriverTrainingChallenges::SetPrimaryAttribute(const struct GameModeDriverTrainingChallenges* this, enum UserDevPointType attributeType)
+   73  0033F3FC      8  bool GameModeDriverTrainingChallenges::AIUseDisplayStats(const struct GameModeDriverTrainingChallenges* this)
+   76  0033F404      8  bool GameModeDriverTrainingChallenges::GiveExperience(const struct GameModeDriverTrainingChallenges* this)
+   83    inline-only   void GameModeDriverTrainingChallenges::SetForce2p(const struct GameModeDriverTrainingChallenges* this, bool bSet)
+   84    inline-only   bool GameModeDriverTrainingChallenges::GetForce2p(const struct GameModeDriverTrainingChallenges* this)
+   87  0033F40C     14  const char* GameModeDriverTrainingChallenges::GetModeSpecificTipString(const struct GameModeDriverTrainingChallenges* this)
+   90  0033F420      8  bool GameModeDriverTrainingChallenges::ShowShotInfo(const struct GameModeDriverTrainingChallenges* this)

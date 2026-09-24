@@ -1,0 +1,6 @@
+// ../ears_rt_math/dev/include/ears_rt_math/umath.h
+// compiled in: ChrCntl_Transition.cpp, MathQuat.c
+// 2 functions, source order. line | PS3 address | size
+
+  734    inline-only   static float float_Min(float a, float b)
+  774    inline-only   static void float_SinCos(float _a, float* _sinAngle, float* _cosAngle)

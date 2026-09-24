@@ -1,0 +1,13 @@
+// ../../../../../TIGERCODE/packages/osdk/2.06.04/core/include/common/osdk/rcpointer.h
+// compiled in: golf2_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   89    inline-only   struct Dictionary* operator->(const const struct <anon>* this)
+   95    inline-only   struct Operation* operator OSDK::Operation*(const const struct <anon>* this)
+   95    inline-only   struct SpreadSheetLeaderboard* operator OSDK::SpreadSheetLeaderboard*(const const struct <anon>* this)
+   95    inline-only   struct KickStartOperation* operator OSDK::KickStartOperation*(const const struct <anon>* this)
+   95    inline-only   struct LoginOperation* operator OSDK::LoginOperation*(const const struct <anon>* this)
+   95    inline-only   struct WebOffer* operator OSDK::WebOffer*(const const struct <anon>* this)
+   95    inline-only   struct Dictionary* operator OSDK::Dictionary*(const const struct <anon>* this)
+   95    inline-only   const struct Alert* operator const OSDK::Alert*(const const struct <anon>* this)
+  101    inline-only   const struct <anon>& operator=(const struct <anon>* this, struct Operation* pObject)

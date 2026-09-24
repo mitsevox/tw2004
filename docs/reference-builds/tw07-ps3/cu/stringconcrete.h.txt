@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/././stringconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   73    inline-only   uint32_t GetBufferSize(const const struct <anon>* this)
+   76    inline-only   char8_t* GetBuffer(const const struct <anon>* this)
+   81    inline-only   const char8_t* GetConstBuffer(const const struct <anon>* this)
+   84  006227D8      8  const char8_t* operator const char8_t*(const const struct <anon>* this)

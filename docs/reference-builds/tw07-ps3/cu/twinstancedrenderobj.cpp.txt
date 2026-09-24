@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/RenderObjects/instanced/ps3/twinstancedrenderobj.cpp
+// compiled in: rnaunity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   51  004CDD00     40  void InstancedRenderObj(const struct <anon>* this, struct DeviceC* device, struct GeomC* geom, struct MaterialListC* materialList, uint32_t numInstances)
+   66  004C9B34     18  void ~InstancedRenderObj(const struct <anon>* this)
+   81  004C9BB0      4  void Render(const struct <anon>* this, struct DeviceC* device, double_t timeStamp)
+   96  004C68B0      4  void BeginSetTransform(const struct <anon>* this)
+  111  004C68B8      4  void EndSetTransform(const struct <anon>* this)
+  127  004C68B4      4  void SetTransform(const struct <anon>* this, uint32_t index, RNAMatrix44& transform)

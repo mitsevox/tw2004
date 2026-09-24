@@ -1,0 +1,6 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sstsetgl.cpp
+// compiled in: sstsetgl.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   27  006CE46C     A0  int SNDSTRM_setgreedylevel(int sndstreamhandle, int greedylevel)
+                         local  SNDSTREAMCHANNEL* pssc

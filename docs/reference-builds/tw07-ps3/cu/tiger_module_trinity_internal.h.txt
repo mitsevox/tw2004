@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_trinity_internal.h
+// compiled in: tiger_module_trinity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   49    inline-only   const struct TrinityCamera* TrinityInternal::GetMainCam(const const struct TrinityInternal* this)
+   50    inline-only   const struct TrinityCamera* TrinityInternal::GetPipCam(const const struct TrinityInternal* this)
+   56    inline-only   struct TrinitySequence* TrinityInternal::GetSequenceList(const struct TrinityInternal* this)

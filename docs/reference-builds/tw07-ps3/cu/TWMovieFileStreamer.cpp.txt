@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/MoviePlayer/TWMovieFileStreamer.cpp
+// compiled in: golf2_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   44  0015D1FC    190  enum ParseReturnValue MyFileStreamerParseFunc(void* pData, unsigned int dataSize, int reqId, void* context, bool(*)()* filterFunc, void* filterContext, unsigned int* chunkSize)
+                         local  const char[24] __FUNCTION__
+                         local  struct <anon>* streamContext
+                         local  struct EAC_CHUNK_DEF* chunk
+                         local  uint32_t size
+                         inlines  AssertMacroHelper, endian::ConvertLittle
+   92  0014A998     2C  bool MyStreamerVideoFilterFunc(void* pData, void* filterContext)
+                         local  struct EAC_CHUNK_DEF* chunk
+  108  0014A9C4     1C  bool MyStreamerAudioFilterFunc(void* pData, void* filterContext)

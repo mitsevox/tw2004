@@ -1,0 +1,17 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_OnlineUserFeedback.cpp
+// compiled in: apt_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   48  000F823C     94  void UIOnlineUserFeedback::UIOnlineUserFeedback(const struct UIOnlineUserFeedback* this)
+                         inlines  TArrayInternal<UIOnlineUserFeedback::DstMenuItem_oluf,AptStructSwapper>::TArrayInternal, TExternArray<UIOnlineUserFeedback::DstMenuItem_oluf>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   52  000F0CA8     84  void UIOnlineUserFeedback::Init(const struct UIOnlineUserFeedback* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   63  00062264     88  void UIOnlineUserFeedback::Show(const struct UIOnlineUserFeedback* this)
+                         local  int32 numElements
+   79  000622EC     4C  void UIOnlineUserFeedback::OnShow(const struct UIOnlineUserFeedback* this)
+   85  00048BEC    3D8  void UIOnlineUserFeedback::UpdateItemAndLabel(const struct UIOnlineUserFeedback* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_oluf* dest
+  199  00083990    12C  enum eAptHandleInput UIOnlineUserFeedback::HandleInput(const struct UIOnlineUserFeedback* this, int32 cID)
+                         local  int err
+                         local  char* msg
+                         local  int32 activeItem

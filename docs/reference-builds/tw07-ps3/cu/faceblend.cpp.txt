@@ -1,0 +1,202 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/animation/faceblend.cpp
+// compiled in: golf2_unity.cpp
+// 46 functions, source order. line | PS3 address | size
+
+  141  0013AE98     24  void FaceBlend::SetToTXRFile(const struct FaceBlend* this, struct TXRFile* txrFiles, int32_t numFiles)
+  156  0013AEBC      C  void FaceBlend::SetTXUFile(const struct FaceBlend* this, struct TXUFile* txuFiles, int32_t numFiles)
+  163  00169DF4     90  int32_t sFindTXRFileIndex(const char* txrFileName, struct TXRFile* txrFiles, int32_t numFiles)
+                         local  int i
+  175  00187C58    1C8  void FaceBlend::RunBlends(const struct FaceBlend* this)
+                         local  int i
+                         local  int j
+                         local  int32_t txrIndex
+                         local  struct HashString hashedName
+                         inlines  HashString::HashString, TXUFile::GetTXRFileName, TXUFile::GetTextureName
+  206  0016AB64    18C  void FaceBlend::FreeOutputTexturesPerTXR(const struct FaceBlend* this)
+                         local  int i
+                         local  int j
+                         local  int32_t txrIndex
+                         local  TextureRef ref
+                         inlines  TXUFile::GetNumPairs, TXUFile::GetTXRFileName
+  223  0017E6E8    218  void FaceBlend::CreateOutputTexturesPerTXR(const struct FaceBlend* this)
+                         local  int i
+                         local  int j
+                         local  int32_t txrIndex
+                         local  TextureRef ref
+                         local  TextureRef txrWorkTex
+                         inlines  TXUFile::GetTXRFileName, TX_TextureIsAllocated
+  247  0016AADC     88  TextureRef FaceBlend::GetOutputTextureForTXR(const struct FaceBlend* this, int32 txrFileIndex)
+                         local  int32_t txrIndex
+                         inlines  TXUFile::GetTXRFileName
+  260  0013E3AC     C4  void FaceBlend::RunBlend(const struct FaceBlend* this, int32_t txrIndex, const struct HashString& outputTexture)
+                         local  TextureRef outTex
+                         local  const TextureInfo* info
+                         local  uint32 width
+                         local  uint32 height
+                         local  TextureFormat texFormat
+  299  0013E4B8    220  void FaceBlend::RequestTexturesPerTXR(const struct FaceBlend* this, uint32 tableChkRef)
+                         local  int32 i
+                         local  int32 j
+                         local  int32 texCount
+                         local  const char* texName
+                         local  char[64] lowerBuffer
+                         local  TextureRef ref
+                         inlines  TX_TextureIsAllocated
+  337  0013E6D8     70  struct TXRFile* FaceBlend::GetTXRFile(const struct FaceBlend* this, uint32 index)
+  343  0015EDA4     B8  const char* FaceBlend::GetNthDynamicTextureName(const struct FaceBlend* this, int32 txrFileIndex)
+                         inlines  TXUFile::GetTextureName
+  350  0016A9A0    13C  const char* FaceBlend::GetNthRawDynamicTextureName(const struct FaceBlend* this, int32 txrFileIndex)
+                         local  int32 txrIndex
+                         local  int i
+                         inlines  TXUFile::GetTXRFileName, TXUFile::GetTextureName
+  367  0016A8C4     DC  void FaceBlend::EnableTXRFile(const struct FaceBlend* this, int32 txrFileIndex, int32 bEnabled)
+                         local  int32_t txrIndex
+                         inlines  TXUFile::GetTXRFileName
+  376  0016A800     C4  bool FaceBlend::GetTXRFileEnabled(const struct FaceBlend* this, int32 txrFileIndex)
+                         local  int32_t txrIndex
+                         inlines  TXUFile::GetTXRFileName
+  386  00177130    3F4  void FaceBlend::LoadTextures(const struct FaceBlend* this, struct TX_STextureGroup* pTextureGroup, uint32 streamTable, const char* streamName, bool loadPlaceholderTextures)
+                         local  struct HashString* loadList
+                         local  int numTex
+                         local  int numLoaded
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int j
+                         local  int i
+                         local  int j
+                         inlines  HashString::HashString, TXUFile::GetNumPairs, TXUFile::GetTextureName
+  453  0013E748     28  void FaceBlend::CancelLoadRequests(const struct FaceBlend* this)
+  459  0013E770     2C  bool FaceBlend::ProgressAsyncLoading(const struct FaceBlend* this)
+  464  0013E79C     28  void FaceBlend::WaitForLoad(const struct FaceBlend* this)
+  469  0013EA00    10C  void FaceBlend::SetSliderValue(const struct FaceBlend* this, const char* sliderName, float value)
+                         local  bool sliderFound
+                         local  int i
+  489  0013EB0C    10C  void FaceBlend::SetSliderIndex(const struct FaceBlend* this, const char* sliderName, int32_t index)
+                         local  bool sliderFound
+                         local  int i
+  502  0013EC18     9C  int32_t FaceBlend::GetSliderIndex(const struct FaceBlend* this, const char* sliderName)
+                         local  int i
+                         local  int32 sliderPos
+  515  0013ECB4     9C  int32_t FaceBlend::GetNumSliderIndices(const struct FaceBlend* this, const char* sliderName)
+                         local  int i
+                         local  int32 sliderPos
+  528  0013ED50    104  void FaceBlend::GetSliderIndexRGB(const struct FaceBlend* this, const char* sliderName, int32_t index, int32_t* r, int32_t* g, int32_t* b)
+                         local  int i
+  540  0013EE54     C0  float FaceBlend::GetSliderValue(const struct FaceBlend* this, const char* sliderName)
+                         local  float val
+                         local  int i
+  557  00187E20     58  void* FaceBlend_TunerCallback(void* ptr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  float val
+  573  0013E030     CC  void FaceBlend::FaceBlend_InitModule(struct DynTex* pGlobalDynTex, TTypeAcces memType)
+                         local  int id
+  592  0013E21C     54  void FaceBlend::FaceBlend_CloseModule()
+  597  0013AE80     18  struct FaceBlend* FaceBlend::FaceBlend_GetCurrentFaceBlender()
+  602  00177524    254  struct HashString* FaceBlend::CreateTXULoadList(const struct FaceBlend* this, const int32_t& numTexturesToLoad)
+                         local  struct HashString* loadList
+                         local  int numLoaded
+                         local  int i
+                         local  int i
+                         local  int j
+                         inlines  HashString::HashString, TXUFile::GetNumPairs, TXUFile::GetTextureName
+  634  00187E78    228  void FaceBlend::BlendUpdate(const struct FaceBlend* this)
+                         local  int i
+                         local  bool blendFound
+                         local  int j
+                         local  int k
+                         local  int32_t txrIndex
+                         local  struct HashString hashedName
+                         inlines  FaceBlend::SetIsBlending, HashString::HashString, TXUFile::GetTextureName
+  700  0013EF14     9C  int32_t FaceBlend::GetNumStates(const struct FaceBlend* this, const char* stateName)
+                         local  int i
+                         local  int numStates
+  713  0013EFB0    10C  void FaceBlend::SetFeatureState(const struct FaceBlend* this, const char* stateName, int32_t stateNum)
+                         local  int i
+  724  0013F0BC     9C  int32_t FaceBlend::GetCurrentFeatureState(const struct FaceBlend* this, const char* stateName)
+                         local  int i
+                         local  int state
+  739  001880A0    228  void FaceBlend::StartNewSwapTexStream(const struct FaceBlend* this, struct DynTex* charDynTex, struct DynTexGroupT* pDynTexGroup)
+                         local  int i
+                         local  int i
+                         local  int32 txrIndex
+                         local  int j
+                         local  struct HashString textureName
+                         local  unsigned int k
+                         inlines  FaceBlend::Pause, HashString::HashString, TXUFile::GetNumPairs, TXUFile::GetTXRFileName, TXUFile::GetTextureName, operator==
+  773  001882C8    2D0  void FaceBlend::EndNewSwapTexStream(const struct FaceBlend* this, struct DynTex* charDynTex, struct DynTexGroupT* pDynTexGroup)
+                         local  int i
+                         local  int txuNum
+                         local  int j
+                         local  int i
+                         local  struct HashString textureName
+                         local  unsigned int k
+                         inlines  FaceBlend::Resume, HashString::HashString, TXUFile::GetTextureName, operator==
+  822  0013E950     B0  void FaceBlend::SetDefaultPositions(const struct FaceBlend* this)
+                         local  int i
+  834  0013E7C4    18C  void FaceBlend::SetDefaultByUISelection(const struct FaceBlend* this)
+                         local  int i
+  849  0016A4B4    34C  void FaceBlend::SetDefaultByAge(const struct FaceBlend* this, enum FE_CrAP_Age_e ageindex, int gender)
+                         local  int i
+                         local  struct FE_CrAP_Gender_Vitals_t* gendervitals
+                         local  struct FE_CrAP_VitalsInfo_t* vitals
+                         local  enum FE_CrAP_SliderType_e slidertype
+                         local  struct FE_CrAP_AgeInfo_t* ageinfo
+                         local  float val
+                         local  int32 state
+                         local  struct FE_CrAP_SliderSettings_t* default_settings
+                         local  int32_t txrIndex
+                         local  int hatShadowState
+                         local  int i
+                         inlines  TXUFile::GetTXRFileName
+  925  0016A1E8    2CC  void FaceBlend::SetDefaultByBuild(const struct FaceBlend* this, enum FE_CrAP_BuildType_e buildtype, int gender)
+                         local  int i
+                         local  struct FE_CrAP_GenderBuild_t* genderbuild
+                         local  struct FE_CrAP_VitalsBuild_t* buildvitals
+                         local  enum FE_CrAP_SliderType_e slidertype
+                         local  float val
+                         local  struct FE_CrAP_SliderSettings_t* default_settings
+                         local  int32_t txrIndex
+                         local  int hatShadowState
+                         local  int i
+                         inlines  TXUFile::GetTXRFileName
+  987  0019F118    5C0  void FaceBlend::Randomize(const struct FaceBlend* this, enum FE_CRAP_Randomize_Age age)
+                         local  int i
+                         local  struct FE_CrAP_Gender_Vitals_t* gendervitals
+                         local  struct FE_CrAP_VitalsInfo_t* vitals
+                         local  enum FE_CrAP_SliderType_e slidertype
+                         local  int gender
+                         local  struct FE_CrAP_SliderSettings_t* default_settings
+                         local  float min
+                         local  float range
+                         local  float randFloat
+                         local  int32 intrange
+                         local  int32 randstate
+                         local  int32_t txrIndex
+                         local  int hatShadowState
+                         local  int i
+                         local  float randSkinSetting
+                         local  float randSkinSetting
+                         local  float randSkinSetting
+                         inlines  Misc_RandFuncf, TXUFile::GetTXRFileName
+ 1121  0013F158     78  void FaceBlend::SetShadowState(const struct FaceBlend* this, const char* shadowName, int32_t shadowState)
+                         local  int i
+ 1138  0013F1D0      C  void FaceBlend::ActivateCurrentShadowState(const struct FaceBlend* this)
+ 1143  0013E470     48  char* FaceBlend::LowerCaseInPlace(char* string)
+                         local  char* pos
+ 1157  0013F1DC     C4  FE_CrAP_Asset_Slot_e FaceBlend::GetAssetSlotForTXR(const struct FaceBlend* this, const char* txrName)
+                         local  int32 mapSize
+                         local  int32 i
+ 1171  00169F44    2A4  void FaceBlend::SelectTEXStates(const struct FaceBlend* this)
+                         local  int32 tex
+                         local  int32 i
+                         local  int32 txrIndex
+                         local  int32 texCount
+                         local  const char*[6] txrNames
+                         local  const char*[6] texNames
+                         local  const int32 count
+                         local  const char* texName
+                         local  char[64] lowerBuffer
+                         local  TextureRef texRef
+                         inlines  TXUFile::SetTextureName
+ 1219  00169E84     C0  bool FaceBlend::IsTXRDirty(const struct FaceBlend* this, const char* txrName)
+                         local  int32_t txrIndex

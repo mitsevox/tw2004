@@ -1,0 +1,61 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNARender/RNADevice.h
+// compiled in: RNADevice.cpp, RNADevicePlat.cpp, RNAMapping.cpp, RNAMeshProcessorImmediate.cpp, RNAStateManager_common.cpp, Scrape.cpp
+// 34 functions, source order. line | PS3 address | size
+
+   83    inline-only   struct <anon>& DeviceC::GetPlatform(const struct DeviceC* this)
+   95    inline-only   bool IsInFrame(const struct <anon>* this)
+   95    inline-only   bool DeviceC::IsInFrame(const struct DeviceC* this)
+   98  00829368      4  void UnbindHardwareResources(const struct <anon>* this)
+   98  00829368      4  void DeviceC::UnbindHardwareResources(const struct DeviceC* this)
+  103    inline-only   struct ScopeC& DeviceC::GetScope(const struct DeviceC* this)
+  115    inline-only   struct ShaderC* DeviceC::GetShader(const const struct DeviceC* this)
+  124    inline-only   struct MaterialListC* DeviceC::GetMaterialList(const const struct DeviceC* this)
+  283    inline-only   enum RSCullModeE DeviceC::EasyGetRenderState<RNA::RSCullModeE>(const struct DeviceC* this, enum RSStateE eState)
+                         local  enum RSCullModeE value
+  283    inline-only   bool DeviceC::EasyGetRenderState<bool>(const struct DeviceC* this, enum RSStateE eState)
+                         local  bool value
+  283    inline-only   enum RSCompareFuncE DeviceC::EasyGetRenderState<RNA::RSCompareFuncE>(const struct DeviceC* this, enum RSStateE eState)
+                         local  enum RSCompareFuncE value
+  469    inline-only   void SetParmBlock(const struct <anon>* this, struct ParmBlockC* pParmBlock)
+  484    inline-only   void Flush(const struct <anon>* this)
+  484    inline-only   void DeviceC::Flush(const struct DeviceC* this)
+  499    inline-only   void DeviceC::Render(const struct DeviceC* this, enum RenderCallbackID idCallback, void* pObject, uintptr_t userData)
+                         local  const char[7] __FUNCTION__
+  515    inline-only   void DeviceC::Render<RNA::MeshC, RNA::MaterialC*>(const struct DeviceC* this, struct MeshC* pMesh, struct MaterialC* pMaterial)
+  524    inline-only   void DeviceC::SetRenderState(const struct DeviceC* this, enum RSStateE eState, int32_t iValue)
+                         local  const char[15] __FUNCTION__
+  532    inline-only   void DeviceC::SetRenderState(const struct DeviceC* this, enum RSStateE eState, uint32_t uValue)
+                         local  const char[15] __FUNCTION__
+  540    inline-only   void DeviceC::SetRenderState(const struct DeviceC* this, enum RSStateE eState, float_t fValue)
+                         local  const char[15] __FUNCTION__
+  546    inline-only   void DeviceC::SetRenderState(const struct DeviceC* this, enum RSStateE eState, bool bValue)
+                         local  const char[15] __FUNCTION__
+  552    inline-only   void DeviceC::SetRenderState(const struct DeviceC* this, enum RSStateE eState, enum RSBlendModeE eValue)
+                         local  const char[15] __FUNCTION__
+  558    inline-only   void DeviceC::SetRenderState(const struct DeviceC* this, enum RSStateE eState, enum RSBlendOpE eValue)
+                         local  const char[15] __FUNCTION__
+  564    inline-only   void DeviceC::SetRenderState(const struct DeviceC* this, enum RSStateE eState, enum RSStencilOpE eValue)
+                         local  const char[15] __FUNCTION__
+  570    inline-only   void DeviceC::SetRenderState(const struct DeviceC* this, enum RSStateE eState, enum RSCompareFuncE eValue)
+                         local  const char[15] __FUNCTION__
+  576    inline-only   void DeviceC::SetRenderState(const struct DeviceC* this, enum RSStateE eState, enum RSCullModeE eValue)
+                         local  const char[15] __FUNCTION__
+  591    inline-only   void DeviceC::GetRenderState(const struct DeviceC* this, enum RSStateE eState, const int32_t& iValue)
+                         local  const char[15] __FUNCTION__
+  599    inline-only   void DeviceC::GetRenderState(const struct DeviceC* this, enum RSStateE eState, const uint32_t& uValue)
+                         local  const char[15] __FUNCTION__
+  607    inline-only   void DeviceC::GetRenderState(const struct DeviceC* this, enum RSStateE eState, const float_t& fValue)
+                         local  const char[15] __FUNCTION__
+  613    inline-only   void DeviceC::GetRenderState(const struct DeviceC* this, enum RSStateE eState, const bool& bValue)
+                         local  const char[15] __FUNCTION__
+                         local  int32_t iVal
+  622    inline-only   void DeviceC::GetRenderState(const struct DeviceC* this, enum RSStateE eState, const enum RSBlendModeE& eValue)
+                         local  const char[15] __FUNCTION__
+  628    inline-only   void DeviceC::GetRenderState(const struct DeviceC* this, enum RSStateE eState, const enum RSBlendOpE& eValue)
+                         local  const char[15] __FUNCTION__
+  634    inline-only   void DeviceC::GetRenderState(const struct DeviceC* this, enum RSStateE eState, const enum RSStencilOpE& eValue)
+                         local  const char[15] __FUNCTION__
+  640    inline-only   void DeviceC::GetRenderState(const struct DeviceC* this, enum RSStateE eState, const enum RSCompareFuncE& eValue)
+                         local  const char[15] __FUNCTION__
+  646    inline-only   void DeviceC::GetRenderState(const struct DeviceC* this, enum RSStateE eState, const enum RSCullModeE& eValue)
+                         local  const char[15] __FUNCTION__

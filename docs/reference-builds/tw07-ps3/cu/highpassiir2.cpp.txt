@@ -1,0 +1,10 @@
+// C:/packages/rwaudiocore/2.08.01/source/plugins/highpassiir2.cpp
+// compiled in: highpassiir2.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    0  006E5B1C      C  void ~HighPassIir2(const struct <anon>* this)
+                         inlines  ~PlugIn
+   85  006E5A94      8  struct <anon>* GetPlugInDescRunTime()
+   91  006E5A9C     78  bool CreateInstance(struct PlugIn* pPlugIn, void* pConstructorParams)
+                         local  struct <anon>* pThis
+                         inlines  GetVoice, Initialize<rw::audio::core::HighPassIir2>, SetDecay

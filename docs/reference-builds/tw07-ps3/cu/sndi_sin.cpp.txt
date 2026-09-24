@@ -1,0 +1,12 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sndi_sin.cpp
+// compiled in: sndi_sin.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    6  006DDF44     6C  float SNDI_sin(float input)
+                         local  float x2
+                         local  float x3
+                         local  float x5
+                         local  float x7
+                         local  float x9
+                         local  float x11
+                         local  float x13

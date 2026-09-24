@@ -1,0 +1,5 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/scalar_operation_inline.h
+// compiled in: RNABuilderTarget.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  167    inline-only   float vpu::Clamp(const const float& value, const const float& min, const const float& max)

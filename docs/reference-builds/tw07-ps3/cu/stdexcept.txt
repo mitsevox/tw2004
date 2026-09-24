@@ -1,0 +1,14 @@
+// C:/dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/target/ppu/include/stdexcept
+// compiled in: golf_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   22  003412D0     94  void ~logic_error(const struct <anon>* this)
+                         local  char* _Ptr
+                         inlines  assign, deallocate, ~basic_string
+   26  003407C4     28  const char* what(const const struct <anon>* this)
+                         inlines  c_str
+   36  0033EDF8     24  void _Doraise(const const struct <anon>* this)
+  110  0034117C     94  void ~length_error(const struct <anon>* this)
+                         local  char* _Ptr
+                         inlines  assign, deallocate, ~basic_string, ~logic_error
+  119  0033EE1C     24  void _Doraise(const const struct <anon>* this)

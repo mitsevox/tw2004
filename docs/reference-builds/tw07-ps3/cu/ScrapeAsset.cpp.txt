@@ -1,0 +1,32 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Rna/Asset/Common/ScrapeAsset.cpp
+// compiled in: rnaunity.cpp
+// 20 functions, source order. line | PS3 address | size
+
+   58  004E7C3C     48  void ScrapeAssetC::ScrapeAssetC(const struct ScrapeAssetC* this, struct AssetMgrC* pAssetMgr, const char* pFilePath, MemBudgetTypeE budget, enum eMemoryPools memPool)
+   63  004D96E8     A0  void ScrapeAssetC::~ScrapeAssetC(const struct ScrapeAssetC* this)
+   73  004CDA00    294  bool ScrapeAssetC::Load(const struct ScrapeAssetC* this)
+                         local  uint32_t uFileSize
+                         local  void* pPusData
+                         local  bool success
+                         inlines  AddRef, TigerScrapeProcess::TigerScrapeProcess
+  158  004C9338     1C  bool ScrapeAssetC::IsLoaded(const const struct ScrapeAssetC* this)
+  164  004D95C4    124  void ScrapeAssetC::Unload(const struct ScrapeAssetC* this)
+                         inlines  RNADebugBreak, Release
+  182  004C9354      4  void ScrapeAssetC::Print(const struct ScrapeAssetC* this)
+  189  004C9358      4  void ScrapeAssetC::MenuPrint(const struct ScrapeAssetC* this, const char8_t* pLinePrefixTabString)
+  196  004EEF94     30  struct ShaderC* TigerScrapeProcess::ResolveShader(const struct TigerScrapeProcess* this, const char* pFileName)
+  202  004EC51C      8  struct TextureC* TigerScrapeProcess::ResolveTexture(const struct TigerScrapeProcess* this, const char* pFileName)
+  211  004C935C      4  void TigerScrapeProcess::BeginEvent(const struct TigerScrapeProcess* this, uint32_t uColor, const char* pStrName)
+  219  004C9360      4  void TigerScrapeProcess::EndEvent(const struct TigerScrapeProcess* this, const char* pStrName)
+  227  004C9364      4  void TigerScrapeProcess::SetMarker(const struct TigerScrapeProcess* this, uint32_t uColor, const char* pStrName)
+  238  004EE628    1C8  void ScrapeAssetMgrC::ScrapeAssetMgrC(const struct ScrapeAssetMgrC* this)
+                         inlines  Clear, Copy, RNADebugBreak, String, operator=, ~String
+  245  004EE9B8     9C  struct ScrapeAssetMgrC* ScrapeAssetMgrC::GetInstance()
+  254  004C9368     6C  void ScrapeAssetMgrC::DestroyInstance()
+  262  004E7C84     88  struct ScrapeAssetC* ScrapeAssetMgrC::CreateNew(const struct ScrapeAssetMgrC* this, const char* pFilePath)
+  270  004EEEA0     6C  struct ScrapeAssetC* ScrapeAssetMgrC::ResolveScrapeAsset(const struct ScrapeAssetMgrC* this, const char* pFilePath)
+                         inlines  AssetMgrC::SetCurrentBudget, AssetMgrC::SetCurrentMemPool
+  284  004C93D4    118  bool TigerScrapeProcess::ResolveConstant(const struct TigerScrapeProcess* this, const char* pStrName, const int32_t& iConst)
+                         local  struct DeviceC* pDevice
+  311  004C94EC      4  void TigerScrapeProcess::RenderBin(const struct TigerScrapeProcess* this, struct DeviceC* pDevice, int32_t idBin, int32_t parm0, int32_t parm1)
+  319  004C94F0     44  int32_t TigerScrapeProcess::ResolveBin(const struct TigerScrapeProcess* this, const char* pStrName)

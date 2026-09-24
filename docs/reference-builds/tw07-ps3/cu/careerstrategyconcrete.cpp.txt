@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/online/osdk/careerstrategyconcrete.cpp
+// compiled in: golf2_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   75  001856F4     18  void CareerStrategyConcrete::CareerStrategyConcrete(const struct CareerStrategyConcrete* this)
+   99  0012ACB0     38  void CareerStrategyConcrete::~CareerStrategyConcrete(const struct CareerStrategyConcrete* this)
+                         inlines  ~CareerStrategy
+  130  0012ACE8     98  void CareerStrategyConcrete::TranslateStatbookRowData(const struct CareerStrategyConcrete* this, const char8_t* , uint32_t uParam, const char8_t* strValue, char8_t* strBuffer, uint32_t iBufferLen)
+                         local  int32_t iResult
+                         local  char8_t* strResult
+                         local  int32_t iResult
+                         local  char8_t* strResult

@@ -1,0 +1,15 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_SpectatorMeshNormal.cpp
+// compiled in: shader_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   36  0051A08C     28  void SM_SpectatorMeshNormalClass::SM_SpectatorMeshNormalClass(const struct SM_SpectatorMeshNormalClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base
+   42  00503ED4    170  void SM_SpectatorMeshNormalClass::Load(const struct SM_SpectatorMeshNormalClass* this)
+   78  00504044     3C  void SM_SpectatorMeshNormalClass::Activate(const struct SM_SpectatorMeshNormalClass* this)
+   87  00504080     38  void SM_SpectatorMeshNormalClass::Deactivate(const struct SM_SpectatorMeshNormalClass* this)
+   94  0050EDCC     70  void SM_SpectatorMeshNormalClass::SetColorTexture(const struct SM_SpectatorMeshNormalClass* this, TextureRef colorTexture)
+  107  0050EE3C     70  void SM_SpectatorMeshNormalClass::SetNormalMap(const struct SM_SpectatorMeshNormalClass* this, TextureRef normalMapTexture)
+  120  0050EEAC     60  void SM_SpectatorMeshNormalClass::SetTintMap(const struct SM_SpectatorMeshNormalClass* this, TextureRef tintTexture)
+  128  0050EF0C     60  void SM_SpectatorMeshNormalClass::SetVarIndices(const struct SM_SpectatorMeshNormalClass* this, const float* var_indices)
+  137  0050EF6C     64  void SM_SpectatorMeshNormalClass::SetTintColor(const struct SM_SpectatorMeshNormalClass* this, const float* tint_array)
+  145  0050EFD0     60  void SM_SpectatorMeshNormalClass::SetWorldLightDirection(const struct SM_SpectatorMeshNormalClass* this, const float* light_dir)

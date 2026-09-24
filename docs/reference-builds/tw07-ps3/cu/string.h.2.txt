@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/target/ppu/include/string.h
+// compiled in: CGFXShader.cpp, RNADebugMenus.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   66    inline-only   char* std::strchr(char* _Str, int _Ch)
+   81    inline-only   char* std::strstr(char* _Str1, const char* _Str2)

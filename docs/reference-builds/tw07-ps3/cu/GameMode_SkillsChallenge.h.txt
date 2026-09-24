@@ -1,0 +1,14 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/GameMode/Headers/GameMode_SkillsChallenge.h
+// compiled in: golf_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   63  0033EBEC      8  bool GameSkillsChallenge::SkipHoleOutUIDisplay(const struct GameSkillsChallenge* this)
+   66  0033EBF4     14  bool GameSkillsChallenge::SpecialCaseAllowDriver(const struct GameSkillsChallenge* this)
+   68  0033EC08      8  bool GameSkillsChallenge::TrackingShotHistory(const struct GameSkillsChallenge* this, enum PlayerNumber_t PlayerID)
+   71  0033EC10     14  enum UIScoreCardDispMode_t GameSkillsChallenge::GetScoreDisplayMode(const struct GameSkillsChallenge* this, bool getAlternate)
+   92  0033EC24      8  bool GameSkillsChallenge::IsConfidenceMeterUsed(const struct GameSkillsChallenge* this)
+  102  0033EC2C      8  bool GameSkillsChallenge::SkipFlashTextShotNumber(const struct GameSkillsChallenge* this)
+  103  0033EC34      8  bool GameSkillsChallenge::ShowShotInfo(const struct GameSkillsChallenge* this)
+  104  0033EC3C      8  bool GameSkillsChallenge::ShowShotNumber(const struct GameSkillsChallenge* this)
+  106  0033EC44     74  int GameSkillsChallenge::GetBestShotIndex(const struct GameSkillsChallenge* this, enum PlayerNumber_t player)
+  107    inline-only   void GameSkillsChallenge::SetBestShotIndex(const struct GameSkillsChallenge* this, enum PlayerNumber_t player, int iShotIx)

@@ -1,0 +1,56 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptFF/core/cachemanager/cachemgr.cpp
+// compiled in: other_unity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+  103    inline-only   static void CmInitializeCache(struct FF_CM_Class** pCacheContext, int32_t len, int8_t* cacheptr)
+                         local  struct FF_CM_Class* pCmGlobals
+                         local  chardata_hdr** hashtemp
+                         local  int index
+  158  003F0758    130  struct FF_CM_Class* FF_CM_New(int32_t sizeofCache, int* errCode)
+                         local  struct FF_CM_Class* pCmGlobals
+                         local  struct tsiMemObject* mem
+                         local  int8_t* cacheptr
+                         inlines  CmInitializeCache
+  231  003F2BC8     40  void FF_CM_Delete(struct FF_CM_Class* theCache, int* errCode)
+                         local  struct tsiMemObject* tempmem
+  260  003EFD1C     10  void FF_CM_SetFilter(struct FF_CM_Class* theCache, uint8_t theFilterTag, FF_T2K_FilterFuncPtr BitmapFilter, void* filterParamsPtr)
+  283  004192BC    4E0  void FF_CM_RenderGlyph(struct FF_CM_Class* theCache, uint16_t font_code, struct T2K** theScaler, int32_t char_code, int8_t xFracPenDelta, int8_t yFracPenDelta, uint8_t greyScaleLevel, uint16_t cmd, int* errCode)
+                         local  struct T2K* tScaler
+                         local  chardata_hdr* tempReturnChar
+                         local  char_desc_t request
+                         local  char_desc_t* prequest
+                         local  uint32_t inst_code
+                         inlines  CmMakeChar
+  429  003EFDF8    15C  int16_t FF_CM_GlyphInCache(struct FF_CM_Class* theCache, uint16_t font_code, struct T2K** theScaler, int32_t char_code, int8_t xFracPenDelta, int8_t yFracPenDelta, uint8_t greyScaleLevel, uint16_t cmd, int* errCode)
+                         local  struct T2K* tScaler
+                         local  chardata_hdr* tempReturnChar
+                         local  char_desc_t request
+                         local  char_desc_t* prequest
+                         local  uint32_t inst_code
+                         local  int16_t found
+  536  003EFF58    254  static void* ff_cm_GetMemory(void* cache, int32_t length)
+                         local  chardata_hdr* tempReturnChar
+                         inlines  CmAllocMem, CmFreeMem
+  576  003EFF54      4  void FF_CM_Flush(struct FF_CM_Class* cache, int* errCode)
+  701  003EFD2C     CC  static chardata_hdr* CmFindChar(struct FF_CM_Class* pCmGlobals, char_desc_t* prequest)
+                         local  uint32_t hashidx
+                         local  chardata_hdr* current
+                         local  chardata_hdr* temp
+                         local  char_desc_t* curreq
+                         local  int match
+  775    inline-only   static chardata_hdr* CmMakeChar(struct T2K** theScaler, int32_t char_code, int8_t xFracPenDelta, int8_t yFracPenDelta, uint8_t greyScaleLevel, uint16_t cmd, uint16_t font_code, uint32_t inst_code, int* errCode)
+                         local  uint32_t hashidx
+                         local  chardata_hdr* temp
+                         local  char_desc_t* curreq
+                         local  struct T2K* tScaler
+                         local  struct FF_CM_Class* tempCache
+                         local  void* theFM
+  901    inline-only   static chardata_hdr* CmAllocMem(struct FF_CM_Class* pCmGlobals, int32_t len)
+                         local  memory_hdr* curseg
+                         local  chardata_hdr* temp
+                         local  uint32_t hashidx
+  996    inline-only   static memory_hdr* CmFreeMem(struct FF_CM_Class* pCmGlobals, chardata_hdr* p)
+                         local  memory_hdr* curseg
+                         local  memory_hdr* freemem
+                         local  memory_hdr* prev
+                         local  memory_hdr* next

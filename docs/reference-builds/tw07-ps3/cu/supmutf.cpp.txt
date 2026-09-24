@@ -1,0 +1,15 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/supmutf.cpp
+// compiled in: supmutf.cpp
+// 4 functions, source order. line | PS3 address | size
+
+    8  006E1AD0      C  int SFILTER_unpackgetframemtf(void* pstate)
+   19  006E1ADC     CC  int SFILTER_unpackmtf(void* pstate, int framestoup, void* psrcp, void* pdstp, int requester)
+                         local  struct UNPACKMTFSTATE* pups
+                         local  float* pdst
+                         local  int retVal
+                         local  int framesdecoded
+   76  006E1BA8     34  void SFILTER_unpackmtfrestore(void* pstate)
+                         local  struct UNPACKMTFSTATE* pups
+   85  006E1BDC     F4  void SFILTER_unpackmtfinit(void* pstate, UNPACKINITPARAMS* pupip)
+                         local  struct UNPACKMTFSTATE* pups
+                         local  MTFSTATE mts

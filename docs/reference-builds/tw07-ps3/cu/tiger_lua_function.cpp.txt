@@ -1,0 +1,16 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_lua/tiger_lua_function.cpp
+// compiled in: tiger_lua_function.cpp
+// 10 functions, source order. line | PS3 address | size
+
+    6  005427C8    254  void TigerLuaFunction::Init(const struct TigerLuaFunction* this, enum LuaType* paramTypes, enum LuaType returnType, unsigned int paramCount, void* functionPtr, void* blindPtr)
+                         local  unsigned int pi
+                         local  enum LuaType type
+   31  00542A1C      8  unsigned int TigerLuaFunction::GetParamCount(const const struct TigerLuaFunction* this)
+   36  00542A24     9C  enum LuaType TigerLuaFunction::GetParamType(const const struct TigerLuaFunction* this, unsigned int paramIndex)
+   43  00542AC0      8  enum LuaType TigerLuaFunction::GetReturnType(const const struct TigerLuaFunction* this)
+   48  00542AD0     5C  void TigerLuaFunction::CallVoid(const const struct TigerLuaFunction* this, const struct <anon>* params)
+   53  00542B2C     5C  int TigerLuaFunction::CallInt(const const struct TigerLuaFunction* this, const struct <anon>* params)
+   58  00542B88     5C  int TigerLuaFunction::CallBoolean(const const struct TigerLuaFunction* this, const struct <anon>* params)
+   64  00542BE4     5C  float TigerLuaFunction::CallFloat(const const struct TigerLuaFunction* this, const struct <anon>* params)
+   69  00542C40     5C  const char* TigerLuaFunction::CallString(const const struct TigerLuaFunction* this, const struct <anon>* params)
+   74  00542AC8      8  void* TigerLuaFunction::GetBlindPtr(const const struct TigerLuaFunction* this)

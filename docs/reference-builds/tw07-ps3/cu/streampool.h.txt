@@ -1,0 +1,7 @@
+// C:/packages/rwaudiocore/2.08.01/include/rw/audio/core/streampool.h
+// compiled in: sndplayer1.cpp, streampool.cpp
+// 3 functions, source order. line | PS3 address | size
+
+  316    inline-only   void SetStreamPriority(const struct <anon>* this, void* streamHandle, float priority)
+  365    inline-only   struct <anon>* GetRwCoreStream(const struct <anon>* this, void* streamHandle)
+  396    inline-only   struct StreamDesc* AllocateStream(const struct <anon>* this, struct StreamDesc* pStreamDesc, float priority, void(*)()* pStreamLostCallback, void* pStreamLostContext)

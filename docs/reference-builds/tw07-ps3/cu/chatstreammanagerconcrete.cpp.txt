@@ -1,0 +1,23 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/chatstreammanagerconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   67  005F708C    170  struct ChatStream* AddChatStream(const struct ChatStreamManagerConcrete* this, const char8_t* strID, enum ChatStreamType eType)
+                         local  struct ChatStream* pChatStream
+                         inlines  InsertElement
+  113  005DBB60     EC  void RemoveChatStream(const struct ChatStreamManagerConcrete* this, const char8_t* strID)
+                         local  uint32_t uListSize
+                         local  uint32_t uIndex
+                         local  struct ChatStream* pElement
+                         inlines  GetElementAt, GetNumberOfElements, RemoveElementAt
+  147  005D4E8C     D4  struct ChatStream* GetChatStream(const struct ChatStreamManagerConcrete* this, const char8_t* strID)
+                         local  uint32_t uListSize
+                         local  struct ChatStream* pChatStream
+                         local  uint32_t uIndex
+                         local  struct ChatStream* pElement
+                         inlines  GetElementAt, GetNumberOfElements
+  185  005E780C     D0  void ChatStreamManagerConcrete(const struct ChatStreamManagerConcrete* this)
+                         inlines  List, RCPointer, operator=
+  209  005D368C     C4  void ~ChatStreamManagerConcrete(const struct ChatStreamManagerConcrete* this)
+                         local  uint32_t uChatStream
+                         inlines  GetNumberOfElements, RemoveElementAt, ~RCPointer

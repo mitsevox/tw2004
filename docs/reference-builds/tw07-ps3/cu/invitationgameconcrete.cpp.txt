@@ -1,0 +1,52 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/invitationgameconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 23 functions, source order. line | PS3 address | size
+
+   63  00629FC4     40  void ~InvitationGameSendStrategy(const struct <anon>* this)
+   87  00629F60     40  void ~InvitationGameRevokeStrategy(const struct <anon>* this)
+  112  00629EFC     40  void ~InvitationGameAcceptStrategy(const struct <anon>* this)
+  137  00629E98     40  void ~InvitationGameDeclineStrategy(const struct <anon>* this)
+  187  00601D88     90  void InvitationGameSendStrategy(const struct <anon>* this, struct InvitationAbstract* pInvitation, struct InvitationSendCallback* pCallback)
+                         local  struct InvitationManagerConcrete* pInvitationManager
+  214  005B7E60     AC  void OperationTimeout(const struct <anon>* this, const struct Operation* pOperation)
+  244  005B7F0C    248  void LobbyOpCallback(LobbyApiRefT* , LobbyApiMsgT* pMsg, void* pContext)
+                         local  struct <anon>* pStrategy
+                         local  bool bContinue
+                         inlines  MarkForRetention
+  297  00601ABC     8C  void InvitationGameRevokeStrategy(const struct <anon>* this, struct InvitationAbstract* pInvitation, struct <anon>* pCallback)
+                         local  struct InvitationManagerConcrete* pInvitationManager
+  323  005B8154     AC  void OperationTimeout(const struct <anon>* this, const struct Operation* pOperation)
+  353  005B8200    1A8  void LobbyOpCallback(LobbyApiRefT* , LobbyApiMsgT* pMsg, void* pContext)
+                         local  struct <anon>* pStrategy
+  399  006017E8     90  void InvitationGameAcceptStrategy(const struct <anon>* this, struct InvitationAbstract* pInvitation, struct InvitationAcceptCallback* pCallback)
+                         local  struct InvitationManagerConcrete* pInvitationManager
+  425  005B83A8     AC  void OperationTimeout(const struct <anon>* this, const struct Operation* pOperation)
+  455  005D9530    248  void LobbyOpCallback(LobbyApiRefT* , LobbyApiMsgT* pMsg, void* pContext)
+                         local  struct <anon>* pStrategy
+                         local  char8_t[16] strSessionId
+  507  00601450     E8  void InvitationGameDeclineStrategy(const struct <anon>* this, struct InvitationAbstract* pInvitation, bool bBusy, struct InvitationDeclineCallback* pCallback)
+                         local  struct InvitationManagerConcrete* pInvitationManager
+                         inlines  GetInvitationManagerConcrete
+  541  005B849C     AC  void OperationTimeout(const struct <anon>* this, const struct Operation* pOperation)
+  571  005B8548    1A8  void LobbyOpCallback(LobbyApiRefT* , LobbyApiMsgT* pMsg, void* pContext)
+                         local  struct <anon>* pStrategy
+  615  005D6FC8    1C8  const struct Dictionary* EncodeGameParameters(const struct <anon>* this, const struct Dictionary* pParameters, enum InvitationContext eContext)
+                         local  struct DictionaryConcrete* pNewParameters
+                         local  struct <anon>* pLocalUser
+                         local  struct GameSession* pGameSession
+                         inlines  GetInstance
+  657  0060924C     B4  void InvitationGameConcrete(const struct <anon>* this, struct User* pUser, const struct Dictionary* pParameters, enum InvitationContext eContext)
+                         inlines  GetParameters, SetIdentifier
+  683  006091CC     48  void ~InvitationGameConcrete(const struct <anon>* this)
+  705  00601E18    1B4  struct Operation* Send(const struct <anon>* this, struct InvitationSendCallback* pCallback)
+                         local  struct OperationStrategy* pStrategy
+                         inlines  GetCurrentOperation, GetOperationManagerConcrete, PrepareForOperation, SetCurrentOperation
+  742  00601B48    1B4  struct Operation* Revoke(const struct <anon>* this, struct <anon>* pCallback)
+                         local  struct OperationStrategy* pStrategy
+                         inlines  GetCurrentOperation, GetOperationManagerConcrete, PrepareForOperation, SetCurrentOperation
+  780  00601878    1B4  struct Operation* Accept(const struct <anon>* this, struct InvitationAcceptCallback* pCallback)
+                         local  struct OperationStrategy* pStrategy
+                         inlines  GetCurrentOperation, GetOperationManagerConcrete, PrepareForOperation, SetCurrentOperation
+  817  00601538    1C8  struct Operation* Decline(const struct <anon>* this, bool bBusy, struct InvitationDeclineCallback* pCallback)
+                         local  struct OperationStrategy* pStrategy
+                         inlines  GetCurrentOperation, GetOperationManagerConcrete, PrepareForOperation, SetCurrentOperation

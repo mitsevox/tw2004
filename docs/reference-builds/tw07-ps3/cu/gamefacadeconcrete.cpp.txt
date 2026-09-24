@@ -1,0 +1,15 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/online/osdk/gamefacadeconcrete.cpp
+// compiled in: golf2_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+  114  001A024C    230  void GameFacadeConcrete::GameFacadeConcrete(const struct GameFacadeConcrete* this)
+                         local  struct DebugStrategy* pDebug
+                         inlines  CareerGameFacade, CoreGameFacade::CoreGameFacade, LockerGameFacade, LockerParametersConcrete::LockerParametersConcrete, NetRadioGameFacade
+  144  0019D020    1F0  void GameFacadeConcrete::~GameFacadeConcrete(const struct GameFacadeConcrete* this)
+                         local  struct DebugStrategy* pDebug
+                         inlines  CoreGameFacade::~CoreGameFacade, LockerParametersConcrete::~LockerParametersConcrete, ~CareerGameFacade, ~LockerGameFacade, ~NetRadioGameFacade
+  167  00129A7C     C8  void GameFacadeConcrete::FillOutCoreGameParameters(const struct GameFacadeConcrete* this, struct CoreGameParametersClient* pParams)
+  239  0015792C     18  struct GameFacadeConcrete* GameFacadeConcrete::GetInstance()
+  262  00129B44     3C  struct MemoryStrategyConcrete* GameFacadeConcrete::GetOnlineMemoryHeap(const struct GameFacadeConcrete* this, enum OnlineHeapId eHeapId)
+  302  00129B80     C0  void GameFacadeConcrete::StateChanging(const struct GameFacadeConcrete* this, enum OsdkState eOldState, enum OsdkState eNewState)
+  340  00129C4C     A8  void GameFacadeConcrete::StateChanged(const struct GameFacadeConcrete* this, enum OsdkState eOldState, enum OsdkState eNewState)

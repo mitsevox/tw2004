@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/Startup/startUp.c
+// compiled in: apt_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   23  0002A5E4      4  void startup_RegisterStreamClients()
+   35  0002A5E8      4  void startup_UnregisterStreamClients()

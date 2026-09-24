@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameModeDriver_PGAGrudgeMatch.cpp
+// compiled in: golf_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   13  00256544     40  void GameModeDriverPGAGrudgeMatch::GameModeDriverPGAGrudgeMatch(const struct GameModeDriverPGAGrudgeMatch* this)
+   18  0020B6B0     18  void GameModeDriverPGAGrudgeMatch::~GameModeDriverPGAGrudgeMatch(const struct GameModeDriverPGAGrudgeMatch* this)
+   23  00287634    134  void GameModeDriverPGAGrudgeMatch::StartEvent(const struct GameModeDriverPGAGrudgeMatch* this)
+                         local  int32 i
+   58  0020B72C     1C  bool GameModeDriverPGAGrudgeMatch::QueryInterface(const struct GameModeDriverPGAGrudgeMatch* this, enum GM_DriverType_t typeID, const void*& ptr)
+                         local  bool bRet
+   71  00239D58     E0  void GameModeDriverPGAGrudgeMatch::EndGame(const struct GameModeDriverPGAGrudgeMatch* this)
+                         local  GM_Pga_UserStats* pUserStats

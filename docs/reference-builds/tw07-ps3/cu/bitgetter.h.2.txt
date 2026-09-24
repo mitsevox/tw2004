@@ -1,0 +1,11 @@
+// C:/packages/rwaudiocore/2.08.01/include/rw/audio/core/private/bitgetter.h
+// compiled in: sndplayer1.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   34    inline-only   void SetBitBuffer(const struct <anon>* this, void* pBuffer)
+   40    inline-only   unsigned int GetBitPosition(const struct <anon>* this)
+   46    inline-only   unsigned int GetBits(const struct <anon>* this, unsigned int numBits)
+                         local  unsigned int val
+                         local  unsigned int index
+                         local  unsigned int bitpos
+                         local  unsigned int nbits

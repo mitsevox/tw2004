@@ -1,0 +1,23 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/extern/coda/cmn/lbmpeg.cpp
+// compiled in: lbmpeg.cpp
+// 15 functions, source order. line | PS3 address | size
+
+    0  006F6B90     28  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  CMpegBase_DecodeMethod
+   56  006F64B8     1C  void Seek(const struct <anon>* this, void* buf)
+  122  006F6A28     4C  void ~CMpegBase(const struct <anon>* this)
+  128  006F64D4     1C  void CMpegBase(const struct <anon>* this)
+  140  006F650C     9C  void OpenSynth(const struct <anon>* this)
+  174  006F65A8     40  void CloseSynth(const struct <anon>* this)
+  182  006F65E8    204  int ProcessHeader(const struct <anon>* this, unsigned int hdr)
+                         local  unsigned int sampleRateIndex
+  253  006F67EC     CC  int DecodeHeader(const struct <anon>* this)
+                         local  unsigned int hdr
+  277  006F68B8     98  int GetHeader(const struct <anon>* this)
+                         local  unsigned int hdr
+  294  006F6950     94  int OpenLayer(const struct <anon>* this)
+  315  006F69E4      8  int CloseLayer(const struct <anon>* this)
+  343  006F6ABC     D4  int Open(const struct <anon>* this, void* mybuf, int )
+  369  006F6AA4     18  void Reset(const struct <anon>* this)
+  377  006F69EC     3C  int Close(const struct <anon>* this)
+  392  006F6BB8     10  static void _GLOBAL__I__ZN3Snd11MPEGuse_MMXE()

@@ -1,0 +1,16 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnax/source/RNAUtils/ExtraMath.cpp
+// compiled in: ExtraMath.cpp
+// 5 functions, source order. line | PS3 address | size
+
+    0  0086D6A8     F0  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   63  0086D598     94  half_t ExtraMath::FloatToHalf(float_t floatVal)
+                         local  union IntFloat val
+                         local  uint32_t intValue
+                         local  uint32_t sign
+                         local  half_t result
+  124  0086D62C     7C  float_t ExtraMath::HalfToFloat(half_t val)
+                         local  uint32_t mantissa
+                         local  uint32_t exponent
+                         local  union IntFloat intResult
+  166  0086D798     10  static void _GLOBAL__I__ZN9ExtraMath11FloatToHalfEf()
+  167  0086D7A8     10  static void _GLOBAL__D__ZN9ExtraMath11FloatToHalfEf()

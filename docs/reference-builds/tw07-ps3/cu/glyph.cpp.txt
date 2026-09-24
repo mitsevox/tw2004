@@ -1,0 +1,37 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptFF/core/glyph.cpp
+// compiled in: other_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   38  003F0D44      8  int ReadDeltaXYValue(struct InputStream* in, int16_t* dxPtr, int16_t* dyPtr)
+  216  003F0D4C      4  void TEST_T2K_GLYPH(struct tsiMemObject* mem)
+  224  003F0D50    114  void glyph_AllocContours(struct GlyphClass* t, int16_t contourCountMax)
+                         local  int16_t ctr
+                         local  int16_t* sp
+                         local  int16_t* ep
+  246  003F0E64    238  void glyph_CloseContour(struct GlyphClass* t)
+                         local  int16_t ctr
+                         local  int16_t point
+                         local  int16_t ptA
+                         local  int16_t ptB
+  343  003F1250    1C0  void glyph_AddPoint(struct GlyphClass* t, int32_t x, int32_t y, uint8_t onCurveBit)
+                         local  int16_t* oox
+                         local  int16_t* ooy
+                         local  int16_t* ooxOld
+                         local  int16_t* ooyOld
+                         local  uint8_t* onCurve
+                         local  uint8_t* onCurveOld
+                         local  F26Dot6* memBase
+                         local  int i
+                         local  int limit
+  373  003F1410     6C  void glyph_StartLine(struct GlyphClass* t, int32_t x, int32_t y)
+                         local  int prevPoint
+  388  003F147C    11C  struct GlyphClass* New_EmptyGlyph(struct tsiMemObject* mem, int16_t lsb, uint16_t aw, int16_t tsb, uint16_t ah)
+                         local  int16_t* oox
+                         local  int16_t* ooy
+                         local  int pointCount
+                         local  struct GlyphClass* t
+  505  003F1598      8  struct GlyphClass* New_GlyphClassT2K(struct tsiMemObject* mem, struct InputStream* in, int8_t readHints, int16_t lsb, uint16_t aw, int16_t tsb, uint16_t ah, void* model)
+  742  003F15A0      4  void Add_GlyphClass(struct GlyphClass** tPtr, struct GlyphClass* addMe, uint16_t flags, int32_t arg1, int32_t arg2)
+  878  003F11BC     94  void AllocGlyphPointMemory(struct GlyphClass* t, int32_t pointCountMax)
+                         local  int32_t n
+  892  003F15A4     CC  void Delete_GlyphClass(struct GlyphClass* t)

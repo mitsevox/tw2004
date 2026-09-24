@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/ProfileBars/profile_bars.h
+// compiled in: other_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   35    inline-only   int ProfileBars::ShouldShowBars(const const struct ProfileBars* this)

@@ -1,0 +1,74 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/audio/engine/utils/UAudVector.c
+// compiled in: other_unity.cpp
+// 26 functions, source order. line | PS3 address | size
+
+   44  003E5330     6C  audfrac audvec2_FastLength(audfrac* v)
+                         local  audfrac x
+                         local  audfrac y
+   57  004132E8     E8  audfrac audvec2_ApproxLength(audfrac* v)
+                         local  audfrac result
+                         local  audfrac x
+                         local  audfrac y
+                         local  audfrac tmp
+   82  00402464     14  audfrac audvec2_SquaredLength(audfrac* v)
+  121  00402478     1C  audfrac audvec2_DotProduct(audfrac* v1, audfrac* v2)
+  131  00402494     24  void audvec2_audvec2_Scale(audfrac* dest, audfrac factor)
+  142  004024B8      4  void audvec2_ScaleNormalized(audfrac* dest, audfrac factor)
+  161  0041DAE4     98  void audvec2_AxialSymmetry(audfrac* dest, audfrac* axis, audfrac* v)
+                         local  audfrac dot
+                         inlines  audvec2_Copy, audvec2_Decumulate
+  175  003E539C     54  void audvec2_CentralSymmetry(audfrac* dest, audfrac* center, audfrac* v)
+                         inlines  audvec2_Copy, audvec2_Decumulate, audvec2_Shl
+  185  003E7A50     C0  void audvec2_Print(audfrac* v)
+                         local  char[64] aStr
+  204  004024BC     2C  void audvec2_Lerp(audfrac* dest, audfrac* lo, audfrac* hi, audfrac alpha)
+                         local  audfrac nl
+                         local  audfrac nh
+  217  0041DB7C     78  bool audvec2_FastSphereIntersect(audfrac* center1, audfrac* center2, audfrac radius1, audfrac radius2)
+                         local  audvec2 dv
+                         local  audfrac dist
+                         local  audfrac inters
+                         inlines  audvec3_Sub
+  243  00413410     8C  audfrac audvec3_FastLength(audfrac* v)
+                         local  audfrac maxc
+                         local  audfrac medc
+                         local  audfrac minc
+  263  004133D0     40  audfrac audvec3_ApproxLength(audfrac* v)
+                         local  audvec2 tmpv
+                         local  audfrac tmp
+                         inlines  audvec2_Set
+  307  0040254C      8  audfrac audvec3_SquaredLength(audfrac* v)
+  359  0041DBF4    174  void audvec3_Normalize(audfrac* dest)
+                         local  audvec3 tmp
+                         local  audfrac magnitude
+                         local  audfrac x
+                         local  audfrac y
+                         local  audfrac z
+                         local  audfrac maxCoord
+                         inlines  audvec3_Copy, audvec3_Shl, audvec3_Shr
+  441  004024E8     38  void audvec3_Scale(audfrac* dest, audfrac factor)
+  454  00402520      4  void audvec3_ScaleNormalized(audfrac* dest, audfrac factor)
+  480  00402524     28  audfrac audvec3_DotProduct(audfrac* v1, audfrac* v2)
+  539  00402554     78  void audvec3_CrossProduct(audfrac* dest, audfrac* v1, audfrac* v2)
+  552  004025CC     74  void audvec3_audmat33Multiply(audfrac* dest, audfrac[3]* m, audfrac* v)
+                         local  audfrac vx
+                         local  audfrac vy
+                         local  audfrac vz
+  571  00402640     B4  void audvec3_audmat34Multiply(audfrac* dest, audfrac[3]* m, audfrac* v)
+                         local  audfrac vx
+                         local  audfrac vy
+                         local  audfrac vz
+  590  0041DDF4     C0  void audvec3_AxialSymmetry(audfrac* dest, audfrac* axis, audfrac* v)
+                         local  audfrac dot
+                         inlines  audvec3_Copy, audvec3_Decumulate
+  604  003E53F0     80  void audvec3_CentralSymmetry(audfrac* dest, audfrac* center, audfrac* v)
+                         inlines  audvec3_Copy, audvec3_Decumulate, audvec3_Shl
+  615  003E7974     DC  char* audvec3_Print(audfrac* v)
+  644  004026F4     40  void audvec3_Lerp(audfrac* dest, audfrac* lo, audfrac* hi, audfrac alpha)
+                         local  audfrac nl
+                         local  audfrac nh
+  660  0041349C     78  bool audvec3_FastSphereIntersection(audfrac* center1, audfrac* center2, audfrac radius1, audfrac radius2)
+                         local  audvec2 dv
+                         local  audfrac dist
+                         local  audfrac inters
+                         inlines  audvec3_Sub

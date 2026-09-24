@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/Golf/TextureFX/Headers/txrtintrule.h
+// compiled in: other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   42    inline-only   const char* TXRTintRule::GetTexName(const const struct TXRTintRule* this)
+   46    inline-only   enum TXRTintRule_Mode TXRTintRule::GetTintMode(const const struct TXRTintRule* this)
+   48    inline-only   float TXRTintRule::GetTintParam(const const struct TXRTintRule* this, int32_t index)

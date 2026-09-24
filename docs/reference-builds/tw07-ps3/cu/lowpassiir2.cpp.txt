@@ -1,0 +1,10 @@
+// C:/packages/rwaudiocore/2.08.01/source/plugins/lowpassiir2.cpp
+// compiled in: lowpassiir2.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    0  006E5BDC      C  void ~LowPassIir2(const struct <anon>* this)
+                         inlines  ~PlugIn
+   84  006E5B54      8  struct <anon>* GetPlugInDescRunTime()
+   90  006E5B5C     78  bool CreateInstance(struct PlugIn* pPlugIn, void* pConstructorParams)
+                         local  struct <anon>* pThis
+                         inlines  GetVoice, Initialize<rw::audio::core::LowPassIir2>, SetDecay

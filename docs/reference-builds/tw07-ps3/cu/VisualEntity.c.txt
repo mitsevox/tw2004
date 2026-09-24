@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Actors/VisualEntity.c
+// compiled in: golf2_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   26  001361C8     B8  void VisualEntity_DownloadInstance(TBasicParamPtr pActor)
+                         local  VisualEntityParamsPtr pParams

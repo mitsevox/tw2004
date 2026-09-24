@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNAX/include/RNAX/RNABuilderTarget.h
+// compiled in: RNABuilder.cpp, RNABuilderTarget.cpp, RNADrawImmediate.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   64    inline-only   uint8_t* BuilderTargetC::GetBuffer(const const struct BuilderTargetC* this)
+   66    inline-only   struct <anon>* BuilderTargetC::GetVertexFormat(const const struct BuilderTargetC* this)
+   68    inline-only   void BuilderTargetC::ResetVertexCounter(const struct BuilderTargetC* this)
+   69    inline-only   void AddVertexCount(const struct BuilderTargetC* this, int32_t iValue)
+   69    inline-only   void BuilderTargetC::AddVertexCount(const struct BuilderTargetC* this, int32_t iValue)
+   70    inline-only   int32_t BuilderTargetC::GetVertexCount(const const struct BuilderTargetC* this)

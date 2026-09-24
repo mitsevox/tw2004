@@ -1,0 +1,74 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/system.cpp
+// compiled in: system.cpp
+// 32 functions, source order. line | PS3 address | size
+
+  914  006D64B8    634  struct <anon>* CreateInstance(struct IResourceAllocator* pAllocator, int commandBufferSize)
+                         local  struct <anon> mutexParameters
+                         local  unsigned int size
+                         local  struct <anon>* pThis
+                         local  uintptr_t pMemBlock
+                         inlines  Allocate, Assert, Free, Resource, ResourceDescriptor, core::LinearAlloc<rw::core::thread::Mutex*, std::uintptr_t>, core::LinearAlloc<void*, std::uintptr_t>, ~ResourceDescriptor, ~System
+ 1119  006D54B8      C  struct <anon>* GetInstance()
+ 1125  006D5550      C  int GetCommandBufferHighWater(const struct <anon>* this)
+ 1131  006D5548      8  int GetProcessorsCount(const struct <anon>* this)
+ 1152  006D6000     9C  void SetThreadProcessor(const struct <anon>* this, int processor)
+                         local  const char[19] __FUNCTION__
+                         inlines  Assert
+ 1162  006D555C     2C  void ExecuteCommandsLock(const struct <anon>* this)
+ 1169  006D5588     28  void ExecuteCommandsUnlock(const struct <anon>* this)
+ 1176  006D55B0     14  void AddRef(const struct <anon>* this)
+ 1182  006D55C4     14  void DecRef(const struct <anon>* this)
+ 1188  006D55D8      C  int GetRefCount(const struct <anon>* this)
+ 1194  006D6170    348  void Release(const struct <anon>* this)
+                         local  const char[8] __FUNCTION__
+                         inlines  Assert, Free, Resource, SetHandler, ~System
+ 1281  006D59CC     A8  int ReleaseHandler(struct <anon>* pCommand)
+                         local  struct <anon>* pThis
+                         local  struct <anon>* pNext
+                         local  struct Voice* pVoice
+                         inlines  GetHead, GetNext
+ 1316  006D5A74     7C  void EnableDebugFeature(const struct <anon>* this, enum DEBUGFEATURE debugFeature)
+                         inlines  Assert
+ 1323  006D613C     34  void EnableAllDebugFeatures(const struct <anon>* this)
+                         inlines  core::MemSet
+ 1329  006D5604     28  void DisableAllDebugFeatures(const struct <anon>* this)
+                         inlines  core::MemSet
+ 1335  006D562C     10  void SetRwAudioCoreThreadId(const struct <anon>* this, void* pThreadId)
+ 1342  006D563C      8  void* GetRwAudioCoreThreadId(const struct <anon>* this)
+ 1348  006D56E8     88  void Lock(const struct <anon>* this)
+ 1374  006D5770     98  void Unlock(const struct <anon>* this)
+ 1395  006D5644     A4  bool IsLocked(const struct <anon>* this)
+ 1426  006D5808     18  bool IsCommandComplete(const struct <anon>* this, unsigned int commandTimeStamp)
+ 1461  006D58DC     F0  void UpdateExpellingVoices(const struct <anon>* this)
+                         local  int i
+                         local  struct Voice* pVoice
+                         inlines  GetDecayInSamples, OverRide
+ 1499  006D5AF0    1F0  void ExecuteCommands(const struct <anon>* this)
+                         local  struct ITask* pITask
+                         local  struct <anon>* pCommand
+                         local  struct <anon>* pBufferEnd
+                         local  struct ITask* pNextITask
+                         local  int sizeOfCommand
+                         inlines  Assert, GetHead, GetITaskFromNode, GetNext
+ 1633  006D5820     1C  bool IsMutexVectoredToCsis(const struct <anon>* this)
+ 1642  006D55E4     20  bool CommandBufferEmpty(const struct <anon>* this)
+ 1651  006D5CE0    190  void* Alloc(const struct <anon>* this, unsigned int size, const char* name, unsigned int alignment, struct IResourceAllocator* pAllocator)
+                         local  void* pMem
+                         local  char[256] message
+                         inlines  Allocate, Assert, ResourceDescriptor, ~ResourceDescriptor
+ 1679  006D54C4     84  void Free(const struct <anon>* this, void* pMem, struct IResourceAllocator* pAllocator)
+                         inlines  Free, Resource
+ 1688  006D5F68     98  void SetJobScheduler(const struct <anon>* this, struct JobScheduler* pJobScheduler)
+                         local  const char[16] __FUNCTION__
+                         inlines  Assert
+ 1697  006D5F10     58  void SetAssertHandler(const struct <anon>* this, bool(*)()* pAssertHandler)
+                         local  const char[17] __FUNCTION__
+ 1709  006D5E70     A0  void core::VerifyLockedHelper(const char* pFunctionName, const char* pFile, int line, struct <anon>* pSystem)
+                         local  char[256] message
+                         inlines  Assert
+ 1722  006D609C     A0  void core::VerifyUnlockedHelper(const char* pFunctionName, const char* pFile, int line, struct <anon>* pSystem)
+                         local  char[256] message
+                         inlines  Assert
+ 1735  006D583C     A0  void core::VerifyCommandsExecutingHelper(const char* pFunctionName, const char* pFile, int line, struct <anon>* pSystem)
+                         local  char[256] message
+                         inlines  Assert

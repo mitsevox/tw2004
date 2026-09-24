@@ -1,0 +1,23 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/txrpaletterule.cpp
+// compiled in: other_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   16  0043AAC4     60  void TXRPaletteRule::TXRPaletteRule(const struct TXRPaletteRule* this, const const struct Allocator& allocRef)
+                         inlines  TXRRule::TXRRule
+   23  003D505C     38  void TXRPaletteRule::~TXRPaletteRule(const struct TXRPaletteRule* this)
+                         inlines  TXRRule::~TXRRule
+   29  003D5094    12C  void TXRPaletteRule::ReadFromBuffer(const struct TXRPaletteRule* this, char** buffer)
+                         local  uint8 mode
+                         local  int32 i
+   58  00425DE0    21C  void TXRPaletteRule::RunRule(const struct TXRPaletteRule* this, struct TextureGroup* pTexGroup, struct TXRRule_TEXStateInfo* texState, TextureRef workspace, int32 mipLevel)
+                         local  float[9] tintParams
+                         local  enum GoBlendTextures_TintOp tintOp
+                         local  int32_t scale
+                         local  TextureRef srcTex
+  105  00421510     F8  void TXRPaletteRule::ChangeNamesByPattern(const struct TXRPaletteRule* this, const char* oldName, const char* newName)
+                         local  char* instance
+                         local  unsigned int i
+                         inlines  std::strstr
+  122  003D3EBC     24  bool TXRPaletteRule::SetState(const struct TXRPaletteRule* this, int32 newState)
+                         local  int32 oldState
+  129  003D4914    1FC  void TXRPaletteRule::GetColorByState(const struct TXRPaletteRule* this, int32 state, const int32& r, const int32& g, const int32& b)

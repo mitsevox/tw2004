@@ -1,0 +1,16 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/SceneGraph/include/SceneGraph/Runtime/Nodes/SGNodeBSPCulledRenderable.h
+// compiled in: SGNodeBSPCulledRenderable.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   46    inline-only   void SetVisiblity(const struct <anon>* this, bool8_t bVisibility)
+   62    inline-only   struct <anon>** GetBackChild(const struct <anon>* this)
+   63    inline-only   struct <anon>** GetFrontChild(const struct <anon>* this)
+   64    inline-only   struct <anon>** GetSpanChild(const struct <anon>* this)
+   65    inline-only   int32_t GetIndex(const struct <anon>* this)
+   66    inline-only   struct <anon>& GetVertIDList(const struct <anon>* this)
+  109    inline-only   int32_t GetNumNodes(const struct <anon>* this)
+  131    inline-only   void* operator new(size_t size, const char* text, struct ICoreAllocator* allocator, enum AllocFlags allocator_flags, uint32_t alignment)
+  131    inline-only   struct ICoreAllocator* GetClassAllocator()
+  131    inline-only   void operator delete(void* address)
+  150    inline-only   void SetCullerID(const struct <anon>* this, int32_t iCullerID)
+  153    inline-only   void SetCuller(const struct <anon>* this, struct <anon>* pCuller)

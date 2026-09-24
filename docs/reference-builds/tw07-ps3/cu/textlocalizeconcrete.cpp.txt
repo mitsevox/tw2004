@@ -1,0 +1,32 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/textlocalizeconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 9 functions, source order. line | PS3 address | size
+
+  103  00605BA4    2E8  void LocalizeTextOperation(const struct <anon>* this, struct Dictionary* pTags, const char8_t* strLocality, struct TextLocalizeCallback* pCallback, struct MemoryStrategy* pMemoryStrategy)
+                         local  struct <anon> dict
+                         local  char8_t[56] strTagName
+                         local  char8_t[8] strTextTag
+                         local  uint32_t uTagNum
+                         local  const char8_t* pTagField
+                         inlines  RCPointer, operator->
+  150  00605AB8     54  void ~LocalizeTextOperation(const struct <anon>* this)
+                         inlines  ~RCPointer
+  171  005C0D48     48  void AriesOperationFailure(const struct <anon>* this, int32_t )
+  196  005D494C     B4  bool AriesOperationResult(const struct <anon>* this, LobbyApiMsgT* pMsg)
+  237  005C0D90     48  void AriesOperationCancel(const struct <anon>* this)
+  261  005D47DC    170  void ParseResults(const struct <anon>* this, const char8_t* pData)
+                         local  struct <anon> resp
+                         local  char8_t[56] strTagName
+                         local  uint32_t uTagNum
+                         local  int32_t iMaxLen
+                         local  const char8_t* pTagField
+                         local  struct <anon> strValue
+                         local  int32_t iLen
+                         inlines  operator->
+  318  005E4668     34  void TextLocalizeConcrete(const struct TextLocalizeConcrete* this)
+  342  005E4714      C  void ~TextLocalizeConcrete(const struct TextLocalizeConcrete* this)
+  368  00605E8C    2D8  struct Operation* LocalizeText(const struct TextLocalizeConcrete* this, struct Dictionary* pTags, const char8_t* strLocality, struct TextLocalizeCallback* pCallback, struct MemoryStrategy* pMemoryStrategy)
+                         local  char8_t[5] strTmpLocality
+                         local  const struct CoreGameParameters* pParameters
+                         local  struct UserLocalConcrete* pLocalUser
+                         inlines  GetInstance, GetLocalUserConcrete

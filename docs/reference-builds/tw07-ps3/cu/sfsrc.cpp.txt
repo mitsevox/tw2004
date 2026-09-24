@@ -1,0 +1,9 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/sfsrc.cpp
+// compiled in: sfsrc.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   10  006F59D4     64  int SFILTER_src(void* pstate, int frames, void* psrcp, void* pdstp, int requester)
+                         local  SRCSTATE* pss
+                         inlines  MemCpy
+   32  006F5A38     18  void SFILTER_initSOURCE(SRCSTATE* psrcs, void* psrc)
+   56  006F5A50     28  int SFILTER_createSOURCE(SRCSTATE* pnew)

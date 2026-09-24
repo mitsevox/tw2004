@@ -1,0 +1,33 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/scenegraph/source/SceneGraph/Runtime/Nodes/SGNodeReference.cpp
+// compiled in: SGNodeReference.cpp
+// 16 functions, source order. line | PS3 address | size
+
+    0  008CDD68    140  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  SGNodeReferenceInfoC::SGNodeReferenceInfoC, SGNodeReferenceInfoC::~SGNodeReferenceInfoC
+    0  008CE5CC      C  void SGNodeReferenceInfoC::~SGNodeReferenceInfoC(const struct SGNodeReferenceInfoC* this)
+                         inlines  ~SGNodeInfoC
+   55  008CE604     88  struct SGNodeC* SGNodeReferenceInfoC::Create(const const struct SGNodeReferenceInfoC* this)
+                         inlines  operator new
+   56  008CE5B8      8  const char* SGNodeReferenceInfoC::GetNodeTypeName(const const struct SGNodeReferenceInfoC* this)
+   57    inline-only   NodeType_t SGNodeReferenceInfoC::GetNodeTypeEnum(const const struct SGNodeReferenceInfoC* this)
+   68  008CDEC8     54  void SGNodeReferenceC(const struct <anon>* this)
+                         inlines  AutoRefCount
+   73  008CE298    160  void ~SGNodeReferenceC(const struct <anon>* this)
+                         inlines  RNADebugBreak, operator delete, ~AutoRefCount
+  100  008CE058    240  struct SGNodeC* Clone(const struct <anon>* this, bool8_t recurse, NodeCloneUserDataCallback userDataCallback, struct SGNodeC* baseClone)
+                         local  const char[6] __FUNCTION__
+                         local  struct <anon>* clone
+                         inlines  RNADebugBreak, SGNodeC::GetNodeTypeEnum, operator new
+  127  008CDCD0      8  const struct SGNodeInfoC* GetNodeInfo(const const struct <anon>* this)
+  133  008CDCC8      8  const struct SGNodeInfoC* _GetNodeInfo()
+  138  008CDD60      8  struct SGNodeC* GetReference(const struct <anon>* this)
+  148  008CDF70     E8  void SetReference(const struct <anon>* this, struct SGNodeC* reference)
+                         inlines  RNADebugBreak, operator=
+  166  008CDD1C     44  void SerializeIn(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[12] __FUNCTION__
+                         inlines  RNADebugBreak
+  171  008CDCD8     44  void SerializeOut(const const struct <anon>* this, const struct OutStreamC& out)
+                         local  const char[13] __FUNCTION__
+                         inlines  RNADebugBreak
+  180  008CDEB8     10  static void _GLOBAL__I__ZN6SceneX16SGNodeReferenceC16s_ClassAllocatorE()
+  181  008CDEA8     10  static void _GLOBAL__D__ZN6SceneX16SGNodeReferenceC16s_ClassAllocatorE()

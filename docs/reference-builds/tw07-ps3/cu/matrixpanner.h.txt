@@ -1,0 +1,5 @@
+// C:/packages/rwaudiocore/2.08.01/include/rw/audio/core/plugins/matrixpanner.h
+// compiled in: matrixpanner.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   45  006D94F0      8  unsigned int GetSize(struct PlugInConfig* )

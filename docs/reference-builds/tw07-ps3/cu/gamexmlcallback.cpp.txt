@@ -1,0 +1,128 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/gamexml/gamexmlcallback.cpp
+// compiled in: rnaunity.cpp
+// 33 functions, source order. line | PS3 address | size
+
+   61  004C5EA4     7C  result_type GameXMLCallbackParameter::QueryInterface32(const struct GameXMLCallbackParameter* this, GUID32_t iid, void** ppv)
+   92  004C5F20     C0  uint32_t GameXMLCallback::FindAttributeIdx(const char8_t* attributeName, const struct <anon>* attributes, uint32_t attributeCount)
+                         local  uint32_t ctr
+  122  004C5FE0     64  uint32_t GameXMLCallback::FindAttributeIdx(const uint32_t attributeNameHash, const struct GameXMLAttribute* attributes, uint32_t attributeCount)
+                         local  uint32_t ctr
+  149  004C60E8     64  bool8_t GameXMLCallback::GetAttributeValue(const char8_t* attributeName, const struct <anon>* attributes, uint32_t attributeCount, const struct <anon>& valueStr)
+                         local  bool8_t success
+                         local  uint32_t attribIdx
+  162  004C607C     6C  bool8_t GameXMLCallback::GetAttributeValue(const uint32_t attributeNameHash, const struct GameXMLAttribute* attributes, uint32_t attributeCount, const struct <anon>& valueStr)
+                         local  bool8_t success
+                         local  uint32_t attribIdx
+  190  004CDEE4     74  bool8_t GameXMLCallback::GetAttributeValue(const char8_t* attributeName, const struct <anon>* attributes, uint32_t attributeCount, char8_t* valueBuffer, uint32_t valueLen)
+                         local  bool8_t success
+                         local  uint32_t attribIdx
+  202  004CDE68     7C  bool8_t GameXMLCallback::GetAttributeValue(const uint32_t attributeNameHash, const struct GameXMLAttribute* attributes, uint32_t attributeCount, char8_t* valueBuffer, uint32_t valueLen)
+                         local  bool8_t success
+                         local  uint32_t attribIdx
+  229  004CF814     CC  bool8_t GameXMLCallback::GetAttributeValue(const char8_t* attributeName, const struct <anon>* attributes, uint32_t attributeCount, struct <anon>* vector2)
+                         local  const char[18] __FUNCTION__
+                         local  bool8_t success
+                         local  uint32_t attribIdx
+  243  004CF740     D4  bool8_t GameXMLCallback::GetAttributeValue(const uint32_t attributeNameHash, const struct GameXMLAttribute* attributes, uint32_t attributeCount, struct <anon>* vector2)
+                         local  const char[18] __FUNCTION__
+                         local  bool8_t success
+                         local  uint32_t attribIdx
+  271  004D0074     CC  bool8_t GameXMLCallback::GetAttributeValue(const char8_t* attributeName, const struct <anon>* attributes, uint32_t attributeCount, struct <anon>* vector3)
+                         local  const char[18] __FUNCTION__
+                         local  bool8_t success
+                         local  uint32_t attribIdx
+  285  004CFFA0     D4  bool8_t GameXMLCallback::GetAttributeValue(const uint32_t attributeNameHash, const struct GameXMLAttribute* attributes, uint32_t attributeCount, struct <anon>* vector3)
+                         local  const char[18] __FUNCTION__
+                         local  bool8_t success
+                         local  uint32_t attribIdx
+  314  004CFC94     CC  bool8_t GameXMLCallback::GetAttributeValue(const char8_t* attributeName, const struct <anon>* attributes, uint32_t attributeCount, struct <anon>* vector4)
+                         local  const char[18] __FUNCTION__
+                         local  bool8_t success
+                         local  uint32_t attribIdx
+  328  004CFBC0     D4  bool8_t GameXMLCallback::GetAttributeValue(const uint32_t attributeNameHash, const struct GameXMLAttribute* attributes, uint32_t attributeCount, struct <anon>* vector4)
+                         local  const char[18] __FUNCTION__
+                         local  bool8_t success
+                         local  uint32_t attribIdx
+  357  004D184C     CC  bool8_t GameXMLCallback::GetAttributeValue(const char8_t* attributeName, const struct <anon>* attributes, uint32_t attributeCount, struct <anon>* matrix33)
+                         local  const char[18] __FUNCTION__
+                         local  bool8_t success
+                         local  uint32_t attribIdx
+  371  004D1778     D4  bool8_t GameXMLCallback::GetAttributeValue(const uint32_t attributeNameHash, const struct GameXMLAttribute* attributes, uint32_t attributeCount, struct <anon>* matrix33)
+                         local  const char[18] __FUNCTION__
+                         local  bool8_t success
+                         local  uint32_t attribIdx
+  400  004CF4DC     CC  bool8_t GameXMLCallback::GetAttributeValue(const char8_t* attributeName, const struct <anon>* attributes, uint32_t attributeCount, struct <anon>* matrix44)
+                         local  const char[18] __FUNCTION__
+                         local  bool8_t success
+                         local  uint32_t attribIdx
+  414  004CF408     D4  bool8_t GameXMLCallback::GetAttributeValue(const uint32_t attributeNameHash, const struct GameXMLAttribute* attributes, uint32_t attributeCount, struct <anon>* matrix44)
+                         local  const char[18] __FUNCTION__
+                         local  bool8_t success
+                         local  uint32_t attribIdx
+  443  004C62B4     CC  bool8_t GameXMLCallback::GetAttributeValue(const char8_t* attributeName, const struct <anon>* attributes, uint32_t attributeCount, float32_t* floatVal)
+                         local  const char[18] __FUNCTION__
+                         local  bool8_t success
+                         local  uint32_t attribIdx
+  457  004C61E0     D4  bool8_t GameXMLCallback::GetAttributeValue(const uint32_t attributeNameHash, const struct GameXMLAttribute* attributes, uint32_t attributeCount, float32_t* floatVal)
+                         local  const char[18] __FUNCTION__
+                         local  bool8_t success
+                         local  uint32_t attribIdx
+  473  004C671C     CC  bool8_t GameXMLCallback::GetAttributeValue(const char8_t* attributeName, const struct <anon>* attributes, uint32_t attributeCount, int32_t* intVal)
+                         local  const char[18] __FUNCTION__
+                         local  bool8_t success
+                         local  uint32_t attribIdx
+  487  004C6648     D4  bool8_t GameXMLCallback::GetAttributeValue(const uint32_t attributeNameHash, const struct GameXMLAttribute* attributes, uint32_t attributeCount, int32_t* intVal)
+                         local  const char[18] __FUNCTION__
+                         local  bool8_t success
+                         local  uint32_t attribIdx
+  503  004C64E8     CC  bool8_t GameXMLCallback::GetAttributeValue(const char8_t* attributeName, const struct <anon>* attributes, uint32_t attributeCount, uint32_t* intVal)
+                         local  const char[18] __FUNCTION__
+                         local  bool8_t success
+                         local  uint32_t attribIdx
+  517  004C6414     D4  bool8_t GameXMLCallback::GetAttributeValue(const uint32_t attributeNameHash, const struct GameXMLAttribute* attributes, uint32_t attributeCount, uint32_t* intVal)
+                         local  const char[18] __FUNCTION__
+                         local  bool8_t success
+                         local  uint32_t attribIdx
+  546  004C6044     38  void GameXMLCallback::AssignValue(const char8_t* value, const uint32_t valueLen, const struct <anon>& valueStr)
+  551  004CDDA4     C4  void GameXMLCallback::AssignValue(const char8_t* value, const uint32_t valueLen, char8_t* valueBuffer, uint32_t valueBufferLen)
+                         local  const char[12] __FUNCTION__
+                         inlines  AssertMacroHelper
+  560  004CF5A8    198  void GameXMLCallback::AssignValue(const char8_t* value, struct <anon>* vector2)
+                         local  char8_t[128] floatBuffer
+                         local  const char8_t* floatStringStart
+                         local  const char8_t* floatStringEnd
+                         inlines  operator=
+  581  004CFD60    240  void GameXMLCallback::AssignValue(const char8_t* value, struct <anon>* vector3)
+                         local  char8_t[128] floatBuffer
+                         local  const char8_t* floatStringStart
+                         local  const char8_t* floatStringEnd
+                         inlines  operator=
+  609  004CF8E0    2E0  void GameXMLCallback::AssignValue(const char8_t* value, struct <anon>* vector4)
+                         local  char8_t[128] floatBuffer
+                         local  const char8_t* floatStringStart
+                         local  const char8_t* floatStringEnd
+                         inlines  operator=
+  644  004D13AC    3CC  void GameXMLCallback::AssignValue(const char8_t* value, struct <anon>* matrix33)
+                         local  char8_t[128] floatBuffer
+                         local  const char8_t* floatStringStart
+                         local  const char8_t* floatStringEnd
+                         local  uint32_t row
+                         inlines  AssertMacroHelper, SetComponent, SetElem, VecFloat
+  674  004CF0C4    344  void GameXMLCallback::AssignValue(const char8_t* value, struct <anon>* matrix44)
+                         local  char8_t[128] floatBuffer
+                         local  const char8_t* floatStringStart
+                         local  const char8_t* floatStringEnd
+                         local  uint32_t row
+                         inlines  SetElem
+  709  004C614C     94  void GameXMLCallback::AssignValue(const char8_t* value, float32_t* floatVal)
+                         local  char8_t[128] floatBuffer
+                         local  const char8_t* floatStringStart
+                         local  const char8_t* floatStringEnd
+  723  004C65B4     94  void GameXMLCallback::AssignValue(const char8_t* value, int32_t* intVal)
+                         local  char8_t[128] intBuffer
+                         local  const char8_t* intStringStart
+                         local  const char8_t* intStringEnd
+  737  004C6380     94  void GameXMLCallback::AssignValue(const char8_t* value, uint32_t* intVal)
+                         local  char8_t[128] intBuffer
+                         local  const char8_t* intStringStart
+                         local  const char8_t* intStringEnd

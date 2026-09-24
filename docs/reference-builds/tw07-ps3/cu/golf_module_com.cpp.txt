@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/GolfModule/golf_module_com.cpp
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    6  002F63A4     9C  void GolfModuleCom::GolfModuleCom(const struct GolfModuleCom* this, const const void** __vtt_parm, struct IAllocator* allocator, struct ComInterface* iface, short unsigned int port)

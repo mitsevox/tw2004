@@ -1,0 +1,79 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/GameData/GameXmlSettings.cpp
+// compiled in: golf_unity.cpp
+// 27 functions, source order. line | PS3 address | size
+
+   12  0026FFD4     6C  void __strlwr(char* str)
+                         local  int ch
+                         inlines  std::tolower
+   25  00272E7C     D4  void HoleXml_Init()
+                         local  const char* courseName
+                         local  const char* holeName
+                         local  char[16] buffer
+   47  0021AA10     74  void HoleXml_UnInit()
+                         local  struct GameXmlSettings initialSettings
+   53  00272700     88  struct GameXmlSettings HoleXml_GetNode(const char* path)
+   63  0021A9E4     28  void GameXmlSettings::Init(const struct GameXmlSettings* this)
+   68  001FB79C      8  void GameXmlSettings::SetDisable(const struct GameXmlSettings* this, bool bDisabled)
+   73  00215810      8  void GameXmlSettings::SetDisableTune(const struct GameXmlSettings* this, bool bDisableTune)
+   79  00272AD0    104  void GameXmlSettings::SetDefault(const struct GameXmlSettings* this, struct GameXmlCategory* rootNode, const char* path, enum GameXmlDefaultEnum whichDefault)
+   89  0021AA88     48  int GameXmlSettings::NumDefaults(const struct GameXmlSettings* this)
+                         local  int count
+                         local  int i
+  102  00272A38     98  void GameXmlSettings::SetModifier(const struct GameXmlSettings* this, struct GameXmlCategory* rootNode, const char* path)
+  110  0021AAD0     D8  void GameXmlSettings::SetTuner(const struct GameXmlSettings* this, const char* path, int catId)
+  129  002720A0    1BC  struct GameXmlSettings GameXmlSettings::GetNode(const struct GameXmlSettings* this, const char* path)
+                         local  int i
+                         local  struct GameXmlSettings result
+  157  00270A40    1F0  void GameXmlSettings::GetValue(const struct GameXmlSettings* this, const char* path, float fDefault, float min, float max, float* result, enum eGameXml_TuneFlags tuneFlags)
+                         local  bool bAccumulate
+                         local  int i
+                         local  TU_eTuneType type
+  195  00270740    1F0  void GameXmlSettings::GetValue(const struct GameXmlSettings* this, const char* path, int32 iDefault, float min, float max, int32* result, enum eGameXml_TuneFlags tuneFlags)
+                         local  bool bAccumulate
+                         local  int i
+                         local  TU_eTuneType type
+  233  002705C4    170  void GameXmlSettings::GetValue(const struct GameXmlSettings* this, const char* path, bool iDefault, bool* result, enum eGameXml_TuneFlags tuneFlags)
+                         local  int i
+                         local  TU_eTuneType type
+  261  00270D58     70  void GameXmlSettings::AdjValue(const struct GameXmlSettings* this, const char* path, float fDefault, float min, float max, float* result, enum eGameXml_TuneFlags tuneType)
+                         local  float fVal
+  272  00270930     70  void GameXmlSettings::AdjValue(const struct GameXmlSettings* this, const char* path, int32 nDefault, int32 min, int32 max, int32* result, enum eGameXml_TuneFlags tuneType)
+                         local  int32 nVal
+  282  00270734      C  void GameXmlSettings::AdjValue(const struct GameXmlSettings* this, const char* path, bool fDefault, bool* result, enum eGameXml_TuneFlags tuneType)
+  289  00270320    1FC  bool GameXmlSettings::GetValueCopy(const struct GameXmlSettings* this, const char* path, int maxSize, char* sDst, char* sDefault, enum eGameXml_TuneFlags tuneFlags)
+                         local  const char* found
+                         local  int i
+  325  0021ABA8     DC  void GameXmlSettings::SetTunerCallback(const struct GameXmlSettings* this, const char* path, void* userTypeData, TU_vTuneCallBack pFunk)
+  336  0021AC84     50  void GameXmlSettings::SetIterName(const struct GameXmlSettings* this, struct GameXmlIter* iter)
+  345  0021ACD4     A0  struct GameXmlIter GameXmlSettings::Begin(const struct GameXmlSettings* this)
+                         local  struct GameXmlIter iter
+                         local  struct GameXmlIter iter
+                         local  int i
+  362  0021AD74     1C  bool GameXmlSettings::End(const struct GameXmlSettings* this, struct GameXmlIter iter)
+  367  0021AD90     A0  void GameXmlSettings::IncrementIter(const struct GameXmlSettings* this, struct GameXmlIter* iter)
+  382  00271F28    178  struct GameXmlIter GameXmlSettings::Next(const struct GameXmlSettings* this, struct GameXmlIter iter)
+                         local  int i
+  405  0021AE30     E4  void XMLRPC_PokeLightingEnvironment(const char* szVarName, float fVal, bool bReplace)
+                         local  int nCategory
+                         local  int nVariable
+                         local  void* pOldVal
+                         local  TU_eTuneType nType
+                         local  float newVal
+  432  0029A0E0    3CC  struct XMLRPC_Value* XMLRPC_UpdateGameXml(struct XMLRPC_Value* params)
+                         local  struct XMLRPC_Value* pRet
+                         local  struct XMLRPC_Value* pFault
+                         local  const char* szCmd
+                         local  char[64] respBuffer
+                         local  char[16] szCourseID
+                         local  const char*[7] szParams
+                         local  struct GameXmlCategory* pCharLightingNode
+                         local  struct GameXmlVariable* pVar
+                         local  struct GameXmlCategory* pNode
+                         local  struct HashString hashedType
+                         local  twShaderConstants* pPreset
+                         local  float oldAdj
+                         local  float newAdj
+                         local  struct GameXmlCategory* pNode
+                         local  float newVal
+                         local  float newVal
+                         inlines  GM_GetCourseName, HashString::HashString, std::atof

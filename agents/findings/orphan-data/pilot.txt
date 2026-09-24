@@ -1,0 +1,20 @@
+Data scout, 2026-09-24 (branch agent/map-01, commit 07e4084d)
+
+Files: datamap.tsv (one row per orphan block, owner runs in address order), symbols.tsv (per symbol:
+resolved owner + every referencing unit), summary.txt (KB per class / per owner status).
+Regenerate from the worktree root: python C:/dev/scratch/tw/agents/data-scout/resolve.py
+(runs.txt and scan2_head.tmp are stale leftovers of the first pass.)
+
+Method: owners = units whose asm references the symbol; one owner picked per symbol by link order
+(every data section follows .text order in this DOL, checked on all 94 .bss units), bounded by the
+linked neighbours on both sides of the block.
+
+Pilot: GameModeBattle .bss 0x80203148-0x80203170 (lbl_8020315C[5], lbl_80203148[5]).
+  src/GameModeBattle.c: dropped `extern` on both (already in reverse address order: 8020315C first).
+  splits.txt: `.bss start:0x80203148 end:0x80203170` under GameModeBattle.c.
+  main.dol OK (sha1 bbbc5548...), complete_data 331955 -> 331995 (+40 B), lint 0 findings.
+Recipe: define the owner's globals non-static in reverse address order, add the .bss range under the
+  unit in splits.txt, configure + ninja. graduate.py doesn't handle .bss, so edit splits.txt by hand.
+
+Biggest wins waiting (bss only, owner already linked): PGATourSimulation 181 KB (4 arrays),
+SkinMorph 66 KB, MC_Gc 57 KB, CourseData 22 KB, hlaudemitter 13 KB, GameMode5 11 KB, Code8009AA28 10 KB (.data).

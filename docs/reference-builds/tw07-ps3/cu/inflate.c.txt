@@ -1,0 +1,22 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Shared/XceedZip_ZLib64/inflate.c
+// compiled in: other_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   10  003F8500     D0  int inflateReset(z_streamp z)
+   23  003F85D0     D8  int inflateEnd(z_streamp z)
+   36  003F86A8    1C4  int inflateInit3_(z_streamp z, int method, int w, const char* version, int stream_size)
+  102  003F886C     18  int inflateInit2_(z_streamp z, int w, const char* version, int stream_size)
+  108  003F8884     10  int inflateInit_(z_streamp z, const char* version, int stream_size)
+  117  003FB360    680  int inflate(z_streamp z, int f)
+                         local  int r
+                         local  uInt b
+  253  003F8894     D8  int inflateSetDictionary(z_streamp z, const Bytef* dictionary, uInt dictLength)
+                         local  uInt length
+  274  003F896C    188  int inflateSync(z_streamp z)
+                         local  uInt n
+                         local  Bytef* p
+                         local  uInt m
+                         local  uLong r
+                         local  uLong w
+                         local  const Byte[4] mark
+  331  003F8AF4     30  int inflateSyncPoint(z_streamp z)

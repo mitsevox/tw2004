@@ -1,0 +1,14 @@
+// ../../../../../TIGERCODE/Code/Golf/UI_Core/AptRuntime/Headers/UI_HUDComponentManager.h
+// compiled in: golf2_unity.cpp, other_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+  171    inline-only   struct UIHud* UI_HUDComponentManager::getUIHud()
+  172    inline-only   struct UIScoreCardManager* UI_HUDComponentManager::getUIScoreCard()
+  174    inline-only   struct UISecondAnalogStick* UI_HUDComponentManager::getUISecondAnalogStick()
+  179    inline-only   struct UIBattleGolf_ChooseAddRemove* UI_HUDComponentManager::getUIBattleGolf_ChooseAddRemove()
+  180    inline-only   struct UIBattleGolf_ChooseClub* UI_HUDComponentManager::getUIBattleGolf_ChooseClub()
+  181    inline-only   struct UIBloodSome* UI_HUDComponentManager::getUIBloodSome()
+  182    inline-only   struct UIAttributeWrapUp* UI_HUDComponentManager::getUIAttributeWrapUp()
+  183    inline-only   struct UIHUDFlashText* UI_HUDComponentManager::getUIHUDFlashText()
+  184    inline-only   struct UITutorial* UI_HUDComponentManager::getUITutorial()
+  189    inline-only   struct UIHudShotInfo* UI_HUDComponentManager::getUIHudShotInfo()

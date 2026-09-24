@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/ParticleSystem/source/particle_system_fvec.h
+// compiled in: particle_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  158  004AA688      4  void _FVEC::_FVEC(const struct _FVEC* this)
+  164  004AB644     14  void _FVEC::_FVEC(const struct _FVEC* this, float x, float y, float z, float w)

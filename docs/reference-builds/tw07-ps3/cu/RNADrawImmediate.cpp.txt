@@ -1,0 +1,60 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnax/source/RNAX/PS3/RNADrawImmediate.cpp
+// compiled in: RNADrawImmediate.cpp
+// 31 functions, source order. line | PS3 address | size
+
+    0  008A6AD0    1A4  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  GetRow, Matrix44, Quaternion, Set, Vector2, Vector3, Vector4
+    0  008A7540     2C  void ~PS3DrawTargetC(const struct <anon>* this)
+    0  008A75B0     44  void ~PS3DrawTriFanC(const struct <anon>* this)
+                         inlines  ~PS3DrawTargetC
+    0  008A75F4     2C  void ~PS3DrawLineListC(const struct <anon>* this)
+                         inlines  ~PS3DrawTargetC
+    0  008A7664     2C  void ~PS3DrawPointListC(const struct <anon>* this)
+                         inlines  ~PS3DrawTargetC
+    0  008A76D4     2C  void ~PS3DrawLineStripC(const struct <anon>* this)
+                         inlines  ~PS3DrawTargetC
+    0  008A7744     2C  void ~PS3DrawTriListC(const struct <anon>* this)
+                         inlines  ~PS3DrawTargetC
+    0  008A77B4     2C  void ~PS3DrawQuadListC(const struct <anon>* this)
+                         inlines  ~PS3DrawTargetC
+    0  008A7824     2C  void ~PS3DrawTriStripC(const struct <anon>* this)
+                         inlines  ~PS3DrawTargetC
+   79  008A63CC     50  void PS3DrawTargetC(const struct <anon>* this, struct DeviceC* pDevice)
+   86  008A6C94     EC  void Begin(const struct <anon>* this, struct VertexFormatC* pVertexFormat, uint8_t*(*)()* pFlushVertexFunc)
+                         local  const char[6] __FUNCTION__
+                         inlines  DeviceC::Flush, RNADebugBreak
+  104  008A646C     68  void End(const struct <anon>* this)
+  137  008A6538    214  void FlushVertex(const struct <anon>* this, struct <anon>* pVertexState)
+                         local  const char[12] __FUNCTION__
+                         local  uint32_t uVertexSize
+                         inlines  BuilderTargetC::AddVertexCount, GetVertexSize, RNADebugBreak
+  173  008A674C    154  void DrawViaCircularBuffer(const struct <anon>* this, uint8_t uGcmPrimType)
+                         local  struct <anon>* pCircularBuffer
+                         local  int32_t iVertexCount
+                         local  int32_t iVertexSize
+                         local  int32_t iTotalSize
+                         local  int32_t offset
+                         local  uint8_t* pWrite
+                         inlines  DeviceC::Flush, Gcm::cellGcmSetDrawArrays, Gcm::cellGcmSetInvalidateVertexCache
+  202  008A64D4     64  void BindStreamsToShader(const struct <anon>* this)
+                         local  struct CGFXShaderC* pShader
+                         local  struct VertexFormatC* pVF
+                         local  int32_t offset
+                         local  int32_t stride
+                         inlines  BuilderTargetC::GetVertexFormat
+  220  008A6F50     34  void PS3DrawLineListC(const struct <anon>* this, struct DeviceC* pDevice)
+  227  008A6A80     50  void Flush(const struct <anon>* this)
+  240  008A6FB8     34  void PS3DrawPointListC(const struct <anon>* this, struct DeviceC* pDevice)
+  246  008A6A30     50  void Flush(const struct <anon>* this)
+  259  008A7020     34  void PS3DrawLineStripC(const struct <anon>* this, struct DeviceC* pDevice)
+  265  008A69E0     50  void Flush(const struct <anon>* this)
+  279  008A7088     34  void PS3DrawTriListC(const struct <anon>* this, struct DeviceC* pDevice)
+  285  008A6990     50  void Flush(const struct <anon>* this)
+  300  008A70F0     34  void PS3DrawQuadListC(const struct <anon>* this, struct DeviceC* pDevice)
+  306  008A6940     50  void Flush(const struct <anon>* this)
+  321  008A7158     34  void PS3DrawTriStripC(const struct <anon>* this, struct DeviceC* pDevice)
+  327  008A68F0     50  void Flush(const struct <anon>* this)
+  341  008A71C0     34  void PS3DrawTriFanC(const struct <anon>* this, struct DeviceC* pDevice)
+  347  008A68A0     50  void Flush(const struct <anon>* this)
+  390  008A6C84     10  static void _GLOBAL__I__ZN4RNAX14PS3DrawTargetCC2EPN3RNA7DeviceCE()
+  391  008A6C74     10  static void _GLOBAL__D__ZN4RNAX14PS3DrawTargetCC2EPN3RNA7DeviceCE()

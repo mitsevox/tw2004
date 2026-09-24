@@ -1,0 +1,13 @@
+// C:/packages/rwaudiocore/2.08.01/source/decoders/ealayer31/mpeg.cpp
+// compiled in: mpeg.cpp
+// 6 functions, source order. line | PS3 address | size
+
+    0  006D8D20     28  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  CMpegBase_DecodeMethod
+   96  006D8B78     30  void CMpegBase(const struct <anon>* this)
+  111  006D8CC8     40  void ~CMpegBase(const struct <anon>* this)
+  116  006D8BD8     A4  int AllocateSynth(const struct <anon>* this, int numChannels)
+                         local  unsigned int sizeOfPolySynthHistoryF
+                         inlines  core::MemSet
+  162  006D8C7C     4C  void FreeSynth(const struct <anon>* this)
+  174  006D8D48     10  static void _GLOBAL__I__ZN2rw5audio4core9CMpegBaseC2Ev()

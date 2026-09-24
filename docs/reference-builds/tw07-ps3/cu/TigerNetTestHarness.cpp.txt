@@ -1,0 +1,46 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/TigerNet/TigerNetTestHarness.cpp
+// compiled in: golf_unity.cpp
+// 23 functions, source order. line | PS3 address | size
+
+   27  002258CC     60  struct TigerNetTestHarness* TigerNetTestHarness::GetSingleton()
+                         local  struct TigerNetTestHarness testHarness
+                         inlines  TigerNetTestHarness::TigerNetTestHarness
+   48  002258C4      4  void TigerNetTestHarness::Reset(const struct TigerNetTestHarness* this)
+   67  0022592C     64  void TigerNetTestHarness::StartLockerServerTest(const struct TigerNetTestHarness* this)
+                         local  bool ret
+   93  00225990     44  void TigerNetTestHarness::StartLobbyServerTest(const struct TigerNetTestHarness* this)
+  108  002259D4     28  bool CO_TnStartLockerTest(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+  114  002259FC     28  bool CO_TnStartLobbyTest(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+  120  00225A24     6C  bool CO_TnLockerFetch(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  bool ret
+  133  00225A90     70  bool CO_TnLockerFetchUser(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  bool ret
+  146  002373F4     78  bool CO_TnLockerUpload(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  bool ret
+  160  00260AE0     70  bool CO_TnLockerRem(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  bool ret
+  173  0027B710     78  bool CO_TnLockerClean(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  bool ret
+  185  0027AD60     70  bool CO_TnLockerDownloadEpisode(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  bool ret
+  197  00225B00     74  bool CO_TnCanDownload(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  bool ret
+  209  00225B74     70  bool CO_TnCanUpload(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  bool ret
+  221  00225BE4     A4  bool CO_TnUpload(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  struct TigerNetLobbyUploadParams uploadParams
+                         local  bool ret
+  243  0027BBBC     6C  bool CO_TnGetLeaderboard(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  bool ret
+  255  00225C88     6C  bool CO_TnStartGame(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  bool ret
+  267  00225CF4     90  bool CO_TnEndGame(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  struct TigerNetEpisodeGameReport gameReport
+                         local  bool ret
+  285  0027BCBC     2C  bool CO_TnRequestLeaderboard(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  struct LeaderBoardOptions options
+  293  0027B0A8     3C  bool CO_TnPlayAgainst(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+  300  00225D84     74  bool CO_TnManagedUploadEpisode(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  struct TigerNetLobbyUploadParams uploadParams
+  320  00225DF8     EC  bool CO_TnTestHelp(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+  374  002256A0    224  void TigerNetTestHarness::InitOnce(const struct TigerNetTestHarness* this)

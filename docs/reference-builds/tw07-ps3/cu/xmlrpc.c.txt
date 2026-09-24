@@ -1,0 +1,163 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Network/xmlrpc.c
+// compiled in: golf_unity.cpp
+// 57 functions, source order. line | PS3 address | size
+
+   97  00233CA8     A4  char* xmlrpc_strncpy(char* dest, const char* src, size_t n)
+                         local  size_t s
+  105  00233D4C     28  size_t xmlrpc_vsnprintf(char* str, size_t size, const char* format, va_list ap)
+  115  00233D74     40  size_t xmlrpc_snprintf(char* str, size_t size, const char* format)
+                         local  va_list ap
+                         local  size_t wrote
+  125  00233DB4     A8  static void XMLRPC_Warning(const char* fmt)
+                         local  char[256] buf
+                         local  va_list va
+  159    inline-only   static int XMLRPC_SocketInit()
+                         local  int ret
+  177    inline-only   static int XMLRPC_SocketCreateListen(const char* address, short unsigned int port)
+                         local  struct <anon>* newsock
+                         local  struct <anon> addr
+                         local  RwUInt32 non_blocking
+  199    inline-only   static SOCKET XMLRPC_SocketAccept(SOCKET socket)
+                         local  struct <anon> addr
+                         local  struct <anon>* newsock
+  212  00233E5C     94  static int XMLRPC_SocketSend(SOCKET socket, const const void* data, int size, int sockopts)
+                         local  int ret
+  227    inline-only   static int XMLRPC_SocketReceive(intptr_t socket, void* data, int size, int sockopts, bool wait)
+                         local  int ret
+  242    inline-only   static int XMLRPC_SocketClose(SOCKET socket)
+                         local  int ret
+  253  0029A4AC     A8  static const char* XMLRPC_SocketGetLocalAddress()
+                         local  struct <anon> addr
+                         local  int ret
+                         inlines  std::atoi
+  274  00233EF0     40  static void* XMLRPC_Alloc(size_t size)
+  282  00233F30     40  static void XMLRPC_Free(void* ptr)
+  290  00233F70     74  static char* XMLRPC_strdup(const char* str)
+                         local  int size
+                         local  char* newstr
+  301  00233FE4     18  enum XMLRPC_Type XMLRPC_ValueType(struct XMLRPC_Value* value)
+  309  00233FFC     F8  const char* XMLRPC_TypeName(enum XMLRPC_Type type)
+  330  00277564    184  static int XMLRPC_Unescape(char* buf)
+                         local  char* s
+                         local  char* amp
+                         local  char* semi
+                         local  int hexcode
+                         inlines  std::strchr
+  360  0027CE94    44C  int XMLRPC_Parse(char* buf, XML_ParseStartCallback* start_callback, XML_ParseCallback* end_callback, XML_ParseCallback* cdata_callback, int ignore_whitespace)
+                         local  char*[20] attrs
+                         local  char* s
+                         local  char* start
+                         local  int end_tag
+                         local  char* end
+                         local  int both_tag
+                         local  char* attr_search
+                         local  int attr_i
+                         local  char* attr_name
+                         local  char* attr_data
+                         local  const char* w
+                         inlines  std::isspace, std::strchr
+  476  002340F4     B4  static struct XMLRPC_Function* XMLRPC_GetFunction(const char* name)
+                         local  int32 i
+                         local  struct XMLRPC_Function* f
+  489  002341A8    138  void XMLRPC_RegisterFunction(const char* name, XMLRPC_Call* function)
+                         local  struct XMLRPC_Function* f
+  507  00234B70     A4  struct XMLRPC_Value* XMLRPC_Fault(int code, const char* fmt)
+                         local  char[512] buffer
+                         local  va_list va
+  521  002342E0     5C  static struct XMLRPC_Value* XMLRPC_AllocValue(const char* name, enum XMLRPC_Type type)
+                         local  struct XMLRPC_Value* value
+  531  0023433C    19C  void XMLRPC_FreeValue(struct XMLRPC_Value* value)
+                         local  int i
+  560  002344D8     34  struct XMLRPC_Value* XMLRPC_CreateInt(const char* name, int value)
+                         local  struct XMLRPC_Value* v
+  566  0023450C     34  struct XMLRPC_Value* XMLRPC_CreateDouble(const char* name, double value)
+                         local  struct XMLRPC_Value* v
+  572  00234540     34  struct XMLRPC_Value* XMLRPC_CreateBoolean(const char* name, bool value)
+                         local  struct XMLRPC_Value* v
+  578  00234574      8  struct XMLRPC_Value* XMLRPC_CreateNone(const char* name)
+                         local  struct XMLRPC_Value* v
+  583  0023457C     DC  struct XMLRPC_Value* XMLRPC_CreateString(const char* name, const char* value)
+                         local  struct XMLRPC_Value* v
+                         local  char* c
+  596  00234658     54  struct XMLRPC_Value* XMLRPC_CreateArray(const char* name, enum XMLRPC_Type type, int max_elements)
+                         local  struct XMLRPC_Value* v
+  604  002346AC     14  bool XMLRPC_ValueIsFault(struct XMLRPC_Value* value)
+  608  002346C0     1C  bool XMLRPC_ValueIsArray(struct XMLRPC_Value* value)
+  612  002346DC     70  struct XMLRPC_Value* XMLRPC_ArrayValue(struct XMLRPC_Value* array, int index)
+  619  0023474C     40  int XMLRPC_ArrayLength(struct XMLRPC_Value* array)
+  628  0023478C     B4  void XMLRPC_Push(struct XMLRPC_Value* parent, struct XMLRPC_Value* child)
+  641    inline-only   static int XMLRPC_PrecalcArraySize(const char* fmt)
+                         local  int elems
+  672  00234840    330  struct XMLRPC_Value* XMLRPC_BuildValue(enum XMLRPC_Type type, const char* fmt)
+                         local  struct XMLRPC_Value* root
+                         local  va_list va
+                         local  const char* name
+                         local  const char* c
+                         inlines  XMLRPC_PrecalcArraySize
+  751  00299558    698  struct XMLRPC_Value* XMLRPC_ParseValue(struct XMLRPC_Value* value, const char* fmt)
+                         local  va_list va
+                         local  int current
+                         local  const char* c
+                         local  unsigned int digit
+                         local  char[32] digit_buf
+                         local  struct XMLRPC_Value* cur
+                         local  char* d
+                         inlines  std::atoi
+  865  00234C14    1AC  static void XMLRPC_StartCallback(const char* tag, const char** )
+                         local  struct XMLRPC_Value* newarray
+  893  00234DC0    52C  static void XMLRPC_EndCallback(const char* tag)
+                         local  int t_int
+                         local  int t_boolean
+                         local  double t_double
+  970  002352EC     8C  static void XMLRPC_CDataCallback(const char* data)
+  980    inline-only   static struct XMLRPC_Value* XMLRPC_ProcessRequest(char* buf)
+                         local  struct XMLRPC_Function* f
+                         local  struct XMLRPC_Value* ret
+ 1019  00235378    50C  static int XMLRPC_Serialize(char* buf, char* buf_end, struct XMLRPC_Value* value)
+                         local  char* response
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  double xv_double
+                         local  uint64 bits
+ 1125  00235884    248  static void XMLRPC_Send(int fd, struct XMLRPC_Value* value)
+                         local  char* response_buffer
+                         local  char* response_end
+                         local  char* response
+                         local  int response_length
+                         local  char[256] response_header
+                         local  int response_header_length
+                         local  int sent
+                         local  int ret
+                         local  struct XMLRPC_Value* fault
+                         local  int ret
+ 1175    inline-only   static struct XMLRPC_Value* XMLRPC_Receive(int fd)
+                         local  char* incoming_buffer
+                         local  char* header
+                         local  char* xmlchunk
+                         local  int bytes
+                         local  int content_length
+                         local  int found_post
+                         local  struct XMLRPC_Value* ret
+                         local  int read
+                         local  char* next
+                         local  char* w
+ 1255    inline-only   static void XMLRPC_HandleRequest(int fd)
+                         local  struct XMLRPC_Value* value
+ 1266  00235ACC     1C  static struct XMLRPC_Value* XMLRPC_TestCallback(struct XMLRPC_Value* params)
+ 1273  00235AE8     18  static struct XMLRPC_Value* XMLRPC_FaultCallback(struct XMLRPC_Value* params)
+ 1280  00235B00     4C  static struct XMLRPC_Value* XMLRPC_SimDeltaCallback(struct XMLRPC_Value* params)
+ 1287  00235B4C     1C  static struct XMLRPC_Value* XMLRPC_VersionCallback(struct XMLRPC_Value* params)
+ 1298  00235B68     44  static struct XMLRPC_Value* XMLRPC_GetCourse(struct XMLRPC_Value* params)
+ 1308  00235BAC     78  static struct XMLRPC_Value* XMLRPC_GetHole(struct XMLRPC_Value* params)
+ 1405  0029AC34     90  static bool XMLRPC_ShowIP(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  char[255] buf
+ 1419  00235C24    188  void XMLRPC_InitOnce()
+                         inlines  GetSize, XMLRPC_SocketInit, ~ResourceDescriptor
+ 1464  00235DAC      4  void XMLRPC_CloseOnce()
+ 1470  00235DB0      4  void XMLRPC_InitModule()
+ 1476  00235DB4      4  void XMLRPC_CloseModule()
+ 1482  0029A554    6E0  void XMLRPC_Tick()
+                         local  int fd
+                         inlines  Resource, XMLRPC_HandleRequest, XMLRPC_SocketAccept, XMLRPC_SocketCreateListen

@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_GFLoading.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   23  000FFF1C     44  void UIGFLoading::ShowHelpText(const struct UIGFLoading* this)
+   28  000FFF68      C  uint32 UIGFLoading::GetSignature(const const struct UIGFLoading* this)
+   33  00100A74     14  enum TAptSequenceStatus UIGFLoading::Enable3DDrawingSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)

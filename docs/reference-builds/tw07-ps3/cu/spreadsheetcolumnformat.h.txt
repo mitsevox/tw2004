@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/include/common/osdk/spreadsheetcolumnformat.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   71    inline-only   enum Type GetType(const const struct SpreadSheetColumnFormat* this)
+   74    inline-only   int32_t GetStyle(const const struct SpreadSheetColumnFormat* this)

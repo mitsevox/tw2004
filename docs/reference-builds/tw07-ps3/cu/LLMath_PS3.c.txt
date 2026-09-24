@@ -1,0 +1,167 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/ps3/LLMath_PS3.c
+// compiled in: Legacy_unity.cpp
+// 21 functions, source order. line | PS3 address | size
+
+   28  00383D5C     98  void LLMath_Normalize(const float* A, float* dest)
+                         local  float[4] source
+                         local  float[4] target
+                         local  float[4] lengthSqr
+                         local  unsigned int[4] compMask
+                         inlines  __vec_len_sqr4, __vec_rsqrt, vec_add, vec_cmpeq, vec_ld, vec_madd, vec_nmsub, vec_rsqrte, vec_sel, vec_sld, vec_splat
+   50  00383DF4     AC  void LLMath_Normalize3(const float* A, float* dest)
+                         local  float[4] source
+                         local  float[4] target
+                         local  float[4] lengthSqr
+                         local  unsigned int[4] compMask
+                         local  uint32_t savedW
+                         inlines  __vec_len_sqr3, __vec_rsqrt, vec_cmpeq, vec_ld, vec_madd, vec_nmsub, vec_rsqrte, vec_sel, vec_sld, vec_splat
+   77  00383F98    110  float LLMath_NormalizeReturnLength(const float* A, float* dest)
+                         local  union <anon> length
+                         local  float[4] source
+                         local  float[4] target
+                         local  float[4] lengthSqr
+                         local  float[4] lengthRcp
+                         local  unsigned int[4] compMask
+                         inlines  __vec_len_sqr4, __vec_make_from_scalar, __vec_recip, __vec_rsqrt, vec_add, vec_cmpeq, vec_ld, vec_madd, vec_nmsub, vec_re, vec_rsqrte, vec_sel, vec_sld, vec_splat
+  107  00383EA0     F8  float LLMath_NormalizeReturnLength3(const float* A, float* dest)
+                         local  union <anon> length
+                         local  float[4] source
+                         local  float[4] target
+                         local  float[4] lengthSqr
+                         local  float[4] lengthRcp
+                         local  unsigned int[4] compMask
+                         local  uint32_t savedW
+                         inlines  __vec_len_sqr3, __vec_make_from_scalar, __vec_recip, __vec_rsqrt, vec_cmpeq, vec_ld, vec_madd, vec_nmsub, vec_re, vec_rsqrte, vec_sel, vec_sld, vec_splat
+  142  00382AAC     D8  float LLMath_NormalizeDiffVec3(const float* A, const float* B, float* dest)
+                         local  union <anon> lengthRcp
+                         local  float[4] sourceA
+                         local  float[4] sourceB
+                         local  float[4] target
+                         local  float[4] rawDiff
+                         local  float[4] lengthSqr
+                         local  unsigned int[4] compMask
+                         local  uint32_t savedW
+                         inlines  __vec_len_sqr3, __vec_rsqrt, vec_cmpeq, vec_ld, vec_madd, vec_nmsub, vec_rsqrte, vec_sel, vec_sld, vec_splat, vec_sub
+  201  003827F0     C8  void LLMath_InvertNormalized(float[4]* A, float[4]* invA)
+                         local  union <anon> tmp0
+                         local  union <anon> tmp1
+                         local  union <anon> tmp2
+                         local  float[4] translation
+                         local  float[4] invA0
+                         local  float[4] invA1
+                         local  float[4] invA2
+                         local  float[4] invA3
+                         inlines  __vec_mul, vec_madd, vec_perm, vec_splat, vec_sub, vec_vmrghw
+  259  003828B8     E0  void LLMath_InvertScaled(float[4]* A, float[4]* invA, const float* oneOverScale)
+                         local  union <anon> tmp0
+                         local  union <anon> tmp1
+                         local  union <anon> tmp2
+                         local  float[4] oneOverScaleSq
+                         local  float[4] translation
+                         local  float[4] scl0
+                         local  float[4] scl1
+                         local  float[4] invA0
+                         local  float[4] invA1
+                         local  float[4] invA2
+                         local  float[4] invA3
+                         inlines  __vec_mul, vec_ld, vec_madd, vec_perm, vec_splat, vec_sub, vec_vmrghw
+  305  00381518     C4  void LLMath_mat44flt_Multiply(float[4]* A, float[4]* B, float[4]* dest)
+                         local  float[4] matLineX
+                         local  float[4] matLineY
+                         local  float[4] matLineZ
+                         local  float[4] matLineW
+                         local  float[4] tmp
+                         local  float[4] tmp0
+                         local  float[4] tmp1
+                         local  float[4] tmp2
+                         local  float[4] tmp3
+                         inlines  __vec_mul, vec_madd, vec_splat
+  352  003815DC     AC  void LLMath_mat44flt_Multiply33(float[4]* A, float[4]* B, float[4]* dest)
+                         local  float[4] matLineX
+                         local  float[4] matLineY
+                         local  float[4] matLineZ
+                         local  float[4] tmp
+                         local  float[4] tmp0
+                         local  float[4] tmp1
+                         local  float[4] tmp2
+                         local  uint32_t savedW
+                         inlines  __vec_mul, vec_madd, vec_splat
+  396  00381688     9C  void LLMath_mat44fltMultiplyList(float[4]* M, float[4]* Alist, vec4flt_p* Blist, int32_t nb)
+                         local  float[4] _mat_LineX
+                         local  float[4] _mat_LineY
+                         local  float[4] _mat_LineZ
+                         local  float[4] _mat_LineW
+                         local  float[4]* src
+                         local  float[4]* dest
+                         local  float[4] tmp
+                         local  float[4] vec
+                         inlines  __vec_mul, vec_madd, vec_splat
+  436  00381724     A4  void LLMath_mat44fltMultiplyList33(float[4]* M, float[4]* Alist, vec4flt_p* Blist, int32_t nb)
+                         local  float[4] _mat_LineX
+                         local  float[4] _mat_LineY
+                         local  float[4] _mat_LineZ
+                         local  float[4]* src
+                         local  float[4]* dest
+                         local  float[4] tmp
+                         local  float[4] vec
+                         local  uint32_t savedW
+                         inlines  __vec_mul, vec_madd, vec_splat
+  473  003817C8     58  void LLMath_ScaleMat(const float* scale, float[4]* A, float[4]* dest)
+                         local  float[4] vscale
+                         inlines  __vec_mul, vec_ld, vec_splat
+  494  00381820     44  void LLMath_ScaleMat34(const float* scale, float[4]* A, float[4]* dest)
+                         local  float[4] vscale
+                         inlines  __vec_mul, vec_ld, vec_splat
+  512  00381864     4C  void LLMath_mat44fltMultiply(float[4]* M, const float* A, float* dest)
+                         local  float[4] a
+                         local  float[4] tmp
+                         inlines  __vec_mul, vec_ld, vec_madd, vec_splat
+  532  00382280     C8  void LLMath_Transpose33(float[4]* src, float[4]* dst)
+                         local  union <anon> tmp0
+                         local  union <anon> tmp1
+                         local  union <anon> tmp2
+                         local  const uint32_t savedW0
+                         local  const uint32_t savedW1
+                         local  const uint32_t savedW2
+                         inlines  vec_perm, vec_vmrghw
+  562  00382348     78  void LLMath_Transpose44(float[4]* src, float[4]* dst)
+                         local  float[4] tmp0
+                         local  float[4] tmp1
+                         local  float[4] tmp2
+                         local  float[4] tmp3
+                         inlines  vec_sld, vec_vmrghw, vec_vmrglw
+  585  003824B8     7C  void LLMath_AddTwoVecScale(float Amul, const float* A, float Bmul, const float* B, float* dest)
+                         local  float[4] AmulAll
+                         local  float[4] BmulAll
+                         local  float[4] tmp
+                         inlines  __vec_make_from_scalar, __vec_mul, vec_madd, vec_splat
+  605  00382534     9C  void LLMath_AddTwoVecScale3(float Amul, const float* A, float Bmul, const float* B, float* dest)
+                         local  float[4] AmulAll
+                         local  float[4] BmulAll
+                         local  float[4] tmp
+                         local  uint32_t savedW
+                         inlines  __vec_make_from_scalar, __vec_mul, vec_madd, vec_splat
+  628  003825D0     44  void LLMath_AddTwoVecOneScale(const float* A, const float* B, float mul, float* dest)
+                         local  float[4] mulAll
+                         local  float[4] tmp
+                         inlines  __vec_make_from_scalar, __vec_mul, vec_madd
+  649  003823C0     78  void LLMath_mat44fltInverseMultiply(float[4]* M, const float* src, float* dest)
+                         local  float[4] vec
+                         local  float[4] mul0
+                         local  float[4] mul1
+                         local  float[4] mul2
+                         local  float[4] mul3
+                         local  float[4] tmp0
+                         local  float[4] tmp1
+                         local  float[4] tmp2
+                         local  float[4] tmp3
+                         inlines  __vec_mul, vec_add, vec_ld, vec_sld, vec_vmrghw, vec_vmrglw
+  686  00382438     80  void LLMath_mat44fltInverseMultiply33(float[4]* M, const float* src, float* dest)
+                         local  float[4] vec
+                         local  float[4] mul0
+                         local  float[4] mul1
+                         local  float[4] mul2
+                         local  float[4] tmp0
+                         local  float[4] tmp1
+                         local  uint32_t savedW
+                         inlines  __vec_mul, vec_add, vec_ld, vec_perm, vec_vmrghw

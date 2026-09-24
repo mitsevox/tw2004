@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_PopupMenuVert.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   17  00100050     24  void UIPopupMenuVert::RegainFocus(const struct UIPopupMenuVert* this, uint32 )
+   18  00100074     24  void UIPopupMenuVert::LooseFocus(const struct UIPopupMenuVert* this, uint32 )
+   23  001000A0      C  uint32 UIPopupMenuVert::GetSignature(const const struct UIPopupMenuVert* this)

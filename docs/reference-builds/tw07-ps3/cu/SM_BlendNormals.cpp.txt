@@ -1,0 +1,21 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_BlendNormals.cpp
+// compiled in: shader_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   42  0051CC7C     9C  void SM_BlendNormalsClass::SM_BlendNormalsClass(const struct SM_BlendNormalsClass* this)
+                         local  int i
+                         local  int i
+                         inlines  SM_Shader_Base::SM_Shader_Base, vec4flt_Zero
+   64  0050D3D0    28C  void SM_BlendNormalsClass::Load(const struct SM_BlendNormalsClass* this)
+                         local  char[15] sBlendTexture
+                         local  const int lastChar
+                         local  int i
+   88  005150D4     78  void SM_BlendNormalsClass::SetBaseColor(const struct SM_BlendNormalsClass* this, float r, float g)
+  101  0051514C     9C  void SM_BlendNormalsClass::SetNumBlendValues(const struct SM_BlendNormalsClass* this, int numBlendValues)
+  114  005151E8    120  void SM_BlendNormalsClass::SetBlendValues(const struct SM_BlendNormalsClass* this, float* blendValues, int numActiveBlends)
+                         local  int i
+  132  00515308     E4  void SM_BlendNormalsClass::SetBlendNormals(const struct SM_BlendNormalsClass* this, TextureRef* textureSample, int numActiveBlends)
+                         local  int i
+  151  0050D65C    13C  void SM_BlendNormalsClass::Activate(const struct SM_BlendNormalsClass* this)
+                         local  int i
+  169  0050D798     24  void SM_BlendNormalsClass::Deactivate(const struct SM_BlendNormalsClass* this)

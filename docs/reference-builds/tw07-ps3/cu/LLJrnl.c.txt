@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLJrnl.c
+// compiled in: Legacy_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   32  0037D9B4      4  void Jrnl_InitModule(enum JrnlMode mode)
+   75  0037D9B8      4  void Jrnl_CloseModule()
+   84  0037D9BC      8  enum JrnlMode Jrnl_GetMode()
+   93  0037D9C4      8  int Jrnl_RecordOrPlayback(JrnlItem* pItem)

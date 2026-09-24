@@ -1,0 +1,60 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_SkillZoneTimed.cpp
+// compiled in: golf_unity.cpp
+// 31 functions, source order. line | PS3 address | size
+
+   20  002043E0     40  void GameModeSkillZoneTimed::GameModeSkillZoneTimed(const struct GameModeSkillZoneTimed* this)
+   24  001FFC04     18  void GameModeSkillZoneTimed::~GameModeSkillZoneTimed(const struct GameModeSkillZoneTimed* this)
+   32  002103EC    1FC  void GameModeSkillZoneTimed::Init(const struct GameModeSkillZoneTimed* this)
+   78  001FFC80      4  void GameModeSkillZoneTimed::Update(const struct GameModeSkillZoneTimed* this)
+   82  001FFC84      4  void GameModeSkillZoneTimed::Shutdown(const struct GameModeSkillZoneTimed* this)
+   86  001FFC88     24  bool GameModeSkillZoneTimed::QueryInterface(const struct GameModeSkillZoneTimed* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bRet
+  103  00329734    1BC  enum PlayerNumber_t GameModeSkillZoneTimed::GetHonors(const struct GameModeSkillZoneTimed* this, enum PlayerNumber_t ignore, bool doNotIgnoreHoledOut)
+                         local  int32 i
+                         local  int32 nextup
+                         local  bool juststarted
+                         inlines  GM_GetCurrentHoleIndex, GM_GetGolferUp
+  146  0023866C     C4  void GameModeSkillZoneTimed::EndGolferTurn(const struct GameModeSkillZoneTimed* this, enum PlayerNumber_t PlayerID)
+                         inlines  GamePlayer::GetSkillZoneData
+  167  003298F0    C20  void GameModeSkillZoneTimed::CheckShotAwards(const struct GameModeSkillZoneTimed* this, enum PlayerNumber_t PlayerID)
+                         local  int multiplier
+                         local  int32 collisionSurfaceID
+                         local  int greenIndex
+                         local  float distance
+                         local  float alreadyHitBonus
+                         local  int i
+                         local  int commentID
+                         local  int timeAwarded
+                         local  int saveTimeBonus
+                         inlines  GM_GetCurrentHoleIndex, GamePlayer::GetSkillZoneData
+  534  001FFCAC     14  void GameModeSkillZoneTimed::GetIDScore(const struct GameModeSkillZoneTimed* this, int32 surfaceID, int32* bonusAmount, int* time, int* multiplier)
+  563  002D11F0     E8  void GameModeSkillZoneTimed::SetupNextGolfer(const struct GameModeSkillZoneTimed* this)
+                         local  int32 i
+  598  00305E64     50  void GameModeSkillZoneTimed::LoadHole(const struct GameModeSkillZoneTimed* this)
+  607  0032A510     AC  bool GameModeSkillZoneTimed::InitialFlyByDone(const struct GameModeSkillZoneTimed* this, enum PlayerNumber_t PlayerID)
+                         local  int32 i
+                         inlines  GM_GetCurrentHoleIndex
+  630  001FFCC8     44  void GameModeSkillZoneTimed::RestartHole(const struct GameModeSkillZoneTimed* this)
+  650  0032A5BC     88  void GameModeSkillZoneTimed::ClearPerHoleData(const struct GameModeSkillZoneTimed* this)
+                         local  int32 i
+                         inlines  GM_GetCurrentHoleIndex
+  664  001FFD0C      C  bool GameModeSkillZoneTimed::GameFinished(const struct GameModeSkillZoneTimed* this, bool predict)
+  676  001FFD18      C  int GameModeSkillZoneTimed::GetShotEarned(const struct GameModeSkillZoneTimed* this, enum PlayerNumber_t PlayerID)
+  684  001FFD24      C  int GameModeSkillZoneTimed::GetTimeEarned(const struct GameModeSkillZoneTimed* this, enum PlayerNumber_t PlayerID)
+  692  001FFD30     30  void GameModeSkillZoneTimed::TenSecWarning(const struct GameModeSkillZoneTimed* this)
+  705  00305F74    164  void GameModeSkillZoneTimed::TimerOut(const struct GameModeSkillZoneTimed* this)
+                         inlines  GM_GetGolferUp
+  741  001FFD60     64  bool GameModeSkillZoneTimed::BallOOB(const struct GameModeSkillZoneTimed* this, enum PlayerNumber_t PlayerID)
+  750  00238730     50  void GameModeSkillZoneTimed::Mulligan(const struct GameModeSkillZoneTimed* this, enum PlayerNumber_t PlayerID)
+  760  0032A644     68  void GameModeSkillZoneTimed::SetTimer(const struct GameModeSkillZoneTimed* this, enum PlayerNumber_t PlayerID, int timer)
+                         inlines  GM_GetCurrentHoleIndex
+  768  0032A6AC     B8  bool GameModeSkillZoneTimed::HoleFinished(const struct GameModeSkillZoneTimed* this, enum PlayerNumber_t PlayerID, bool predict)
+                         local  int32 i
+                         inlines  GM_GetCurrentHoleIndex
+  791  001FFDC4      C  void GameModeSkillZoneTimed::TurnClockOff(const struct GameModeSkillZoneTimed* this)
+  804  001FFDD0      4  void GameModeSkillZoneTimed::CollisionActor(const struct GameModeSkillZoneTimed* this, enum PlayerNumber_t PlayerID, int32 actorID)
+  817  00238780     B8  int GameModeSkillZoneTimed::GreenType(const struct GameModeSkillZoneTimed* this, enum PlayerNumber_t PlayerID, int iGreenIndex)
+  832  001FFDD4      C  int GameModeSkillZoneTimed::GetDriveMultiplier(const struct GameModeSkillZoneTimed* this, enum PlayerNumber_t PlayerID)
+  840  0025209C      8  void GameModeSkillZoneTimed::EndGame(const struct GameModeSkillZoneTimed* this)
+  850  001FFDE0      8  int32 GameModeSkillZoneTimed::GetHitAllTargetsBonus(const struct GameModeSkillZoneTimed* this)
+  867  001FFDE8     14  const char* GameModeSkillZoneTimed::GetName(const struct GameModeSkillZoneTimed* this)

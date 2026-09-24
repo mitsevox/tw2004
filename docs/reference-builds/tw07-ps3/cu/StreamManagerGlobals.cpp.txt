@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/streaming/StreamManagerGlobals.cpp
+// compiled in: golf2_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   36  0018DC78    1B0  void StreamManagerGlobals::RegisterStreamClients(const struct StreamManagerGlobals* this)
+                         inlines  Singleton<EarningsInfo>::GetSingleton, Singleton<GolferStats>::GetSingleton, Singleton<TalkyManager>::GetSingleton
+  122  0018DE28    160  void StreamManagerGlobals::UnregisterStreamClients(const struct StreamManagerGlobals* this)
+                         inlines  Singleton<EarningsInfo>::GetSingleton, Singleton<GolferStats>::GetSingleton, Singleton<TalkyManager>::GetSingleton
+  192  00135B98     34  void StreamManagerGlobals::BeginStreamCallback(void* pData)
+  219  00135BCC      4  void StreamManagerGlobals::EndStreamCallback(void* pData)

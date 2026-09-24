@@ -1,0 +1,14 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_TigerChallenge.h
+// compiled in: apt_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   18  00116710    160  void UITigerChallenge::~UITigerChallenge(const struct UITigerChallenge* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UITigerChallenge::DstMenuItem_tigr>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+   20  00100810      C  uint32 UITigerChallenge::GetSignature(const const struct UITigerChallenge* this)
+   28  00100824      C  struct IExternArray* UITigerChallenge::GetExternArray(const struct UITigerChallenge* this)
+   35  00101050     14  enum TAptSequenceStatus UITigerChallenge::InitAnimVars_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   36  001033E4     14  enum TAptSequenceStatus UITigerChallenge::StartListenForSkipBackThreadSeq_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   37  00100830     14  enum TAptSequenceStatus UITigerChallenge::RemoveListenForSkipBackThreadSeq_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   38  00100D90     14  enum AptThreadReturnValue UITigerChallenge::ListenForSkipBackThread_func(struct IAptSubscriberBase* subs)
+   39  001035B8     14  enum AptThreadReturnValue UITigerChallenge::UpdateTigerFlash_func(struct IAptSubscriberBase* subs)
+   40  00101064     14  void UITigerChallenge::NotifyUpdateGlobeAnimVars_func(struct IAptSubscriber* subs)

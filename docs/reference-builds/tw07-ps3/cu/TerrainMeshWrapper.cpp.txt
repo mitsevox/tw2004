@@ -1,0 +1,87 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/TerrainMeshWrapper.cpp
+// compiled in: headgate_unity.cpp
+// 20 functions, source order. line | PS3 address | size
+
+   19  00346F04     18  void TerrainMeshWrapper_LoadCollisionGelTFromStream(struct TStreamData* pStreamData)
+   26  00346F1C     20  void TerrainMeshWrapper_CreateCollisionFromStream()
+   33  00346F3C     5C  void TerrainMeshWrapper_DeInitForHole()
+   45  00346F98      4  void TerrainMeshWrapper_InitForHole()
+   49  00346F9C      4  void HGSTerXenonInit()
+   53  00346FA0      4  void HGSTerXenonClose()
+   72  0036A960    3B0  bool HGSCheckObjectAndHazardObstruction(float* position, float obstructionDistance, bool bOnlyCheckNonFadingObjects, bool bCheckLie, float hazardDistance, bool bCheckHeight, float fMaxSlope)
+                         local  float x
+                         local  float y
+                         local  float z
+                         local  const int kNumCheckPoints
+                         local  float[5][4] checkPoints
+                         local  struct TerrainHeightInfo[5] thInfos
+                         local  int i
+                         local  const int kInfoSize
+                         local  struct tagSurfaceStructure*[128] surfArray
+                         local  vec4flt Min
+                         local  vec4flt Max
+                         local  int treeCount
+                         local  int i
+                         inlines  TerrainHeightInfo::TerrainHeightInfo
+  150  00353128     18  float HGSGetLowestPlayableWorldHeight()
+  162  0036AD10    228  unsigned int HGSGetTerrainLayers(const float* position, int* idArray, float* pHeightList, vec4flt* pNormalList, unsigned int iMaxResults, unsigned int excludedPhysicsObjectTypeFlags)
+                         local  float x
+                         local  float z
+                         local  bool succeeded
+                         local  float maxY
+                         local  struct TerrainHeightInfo info
+                         local  unsigned int count
+                         local  float length
+                         inlines  TerrainHeightInfo::TerrainHeightInfo
+  203  00362A98    240  bool HGSCheckForPinCollision(float* fPoint0, float* fPoint1, float* pCollisionPoint, float* pSurfaceNormal)
+                         local  struct RayS ray
+                         local  float maxDist
+                         local  struct CylinderS cylinder
+                         local  const float[4]& curPinLocation
+                         local  float t
+                         inlines  LLMath_Length3, SphereS::SetRadius, __vec_len_sqr3, vec_madd, vec_sld
+  262  0036AF38    250  bool HGSCheckForCollision(float* fPoint0, float* fPoint1, float* pCollisionPoint, float* pSurfaceNormal, const int& terrainID, const float& fClosest, unsigned int attributeMask, enum FlagOp op, unsigned int propsMask)
+                         local  struct TerrainHeightInfo info
+                         local  vec4flt distVct
+                         local  float tempT
+                         local  float length
+                         inlines  LLMath_Length3, LLMath_Subtract, TerrainHeightInfo::TerrainHeightInfo, vec_madd, vec_sld, vec_sub
+  300  0036B1CC    1C0  bool HGSCheckForWorldCollision(float* fPoint0, float* fPoint1, float* pCollisionPoint, float* pSurfaceNormal, const int& terrainID, const float& fClosest, bool bDoLeaves)
+                         local  vec4flt vTerrainNormal
+                         local  vec4flt vTreeNormal
+                         local  bool retVal
+                         local  bool bTreeIntersect
+                         local  int treeId
+                         inlines  vec4flt_Copy
+  361  0036B188     44  bool HGSCheckForGroundCollision(float* fPoint0, float* fPoint1, unsigned int physicsObjectTypeFlags, float* pCollisionPoint, float* pSurfaceNormal, const int& terrainID, const float& fClosest)
+  375  0035D810    150  bool HGSCheckForObjectCollision(float* fPoint0, float* fPoint1, float* pCollisionPoint, float* pSurfaceNormal, const int& terrainID, const float& fClosest)
+                         local  int treeId
+                         local  vec4flt tempPoint1
+                         inlines  LLMath_DistanceBetween3, vec4flt_Copy, vec_madd, vec_sld, vec_sub
+  395  0036B38C     B4  float HGSGetHighestGroundHeight(float* position)
+                         local  struct TerrainHeightInfo info
+                         inlines  TerrainHeightInfo::TerrainHeightInfo
+  407  0036B440     B4  float HGSGetHighestGroundHeightTournament(float* position)
+                         local  struct TerrainHeightInfo info
+                         inlines  TerrainHeightInfo::TerrainHeightInfo
+  419  0036B4F4    140  float HGSGetHighestPlayableGroundHeight(float* position, const int& terrainId, float* pNormal)
+                         local  struct TerrainHeightInfo info
+                         local  float a
+                         local  float b
+                         local  float c
+                         local  float mag
+                         inlines  TerrainHeightInfo::TerrainHeightInfo
+  447  00364B9C     D8  bool HGSCheckForStructureCollision(float* pos, float* dir, float dist, struct TerrainHeightInfo* tInfo)
+                         local  uint32 propsMask
+                         local  Course_t course
+                         local  uint32 hole
+  467  00364B30     6C  bool HGSCheckForWaterCollision(float* pos, float* dir, float dist, struct TerrainHeightInfo* tInfo)
+                         local  uint32 propsMask
+  479  00358C40     FC  bool HGSCheckForTreeCollision(float* pos, float* dir, float dist)
+                         local  bool collides
+                         local  vec4flt treePos
+                         local  vec4flt treeVec
+                         local  vec4flt t
+                         local  vec4flt d
+                         local  float cosTheta
+                         inlines  LLMath_Subtract, vec_sub

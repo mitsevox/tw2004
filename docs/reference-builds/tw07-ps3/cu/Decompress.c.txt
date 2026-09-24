@@ -1,0 +1,105 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/animation/Decompress.c
+// compiled in: golf2_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   31  0013DDC4     1C  struct tCTHeader dcmpGetCTHeader(const unsigned char* ptr)
+                         local  struct tCTHeader buf
+                         local  struct tCTHeader buf
+   46    inline-only   struct tCTHeader _getCTHeader(char* ptr)
+                         local  struct tCTHeader ah
+                         local  struct tCTHeader ah
+                         local  union <anon> v
+   58    inline-only   int _getType(struct tCTHeader* header)
+   63    inline-only   int _getNum(struct tCTHeader* header)
+   72  00170C3C    82C  static void _loadCache(unsigned char* pData, float findex, struct tCTHeader* header, uint32 aType, TCurveCache* pCache)
+                         local  int32 nextCurveOffset
+                         local  const float[17] kIndexMult
+                         local  int index
+                         local  short unsigned int s
+                         local  int index
+                         inlines  _getNum, _getType, dcmpGet3Float, dcmpGetShort
+  214  00170824    418  static float _computeFloatFromCache(float findex, uint32 aType, TCurveCache* pCache)
+                         local  float value
+                         local  unsigned char* pData
+                         local  int index
+                         local  float pVal
+                         local  float slop
+                         local  float nVal
+                         local  float slop
+                         local  int index
+                         local  short unsigned int s
+                         local  float slop
+                         local  unsigned char* pChar
+                         local  int index
+                         inlines  dcmpGetFloat, dcmpGetShort
+  365  00171890    8D0  static float _computeFloat(unsigned char** chanHeaderPtr, struct tCTHeader* header, float findex)
+                         local  float value
+                         local  int32 nextCurveOffset
+                         local  unsigned char* pData
+                         local  const float[17] kIndexMult
+                         local  int index
+                         local  float pVal
+                         local  float slop
+                         local  float nVal
+                         local  float MinValue
+                         local  float Slope
+                         local  int index
+                         local  short unsigned int s
+                         local  float pVal
+                         local  float slop
+                         local  float nVal
+                         local  float MinValue
+                         local  float Slope
+                         local  int index
+                         local  float pVal
+                         local  float slop
+                         local  float nVal
+                         local  float f0
+                         local  float f1
+                         local  float f2
+                         local  float f0
+                         local  float f1
+                         local  float f2
+                         local  float f3
+                         local  float f0
+                         local  float f1
+                         inlines  _getType, dcmpGet3Float, dcmpGetFloat, dcmpGetShort
+  616  00171468    428  float Decompress_GetCachedChannelAtIndex(char** chanHeaderPtr, float findex, TCurveCache* pCache)
+                         local  uint32 aType
+                         local  unsigned char* pData
+                         local  struct tCTHeader curveHeader
+                         local  float value
+                         local  int numSubCurves
+                         local  int GroupIndex
+                         local  int subNumFrames
+                         local  struct tCTHeader subCurveHeader
+                         local  int nextCurveOffset
+                         inlines  _getNum, _getType
+  715  00172160    4A0  float Decompress_GetChannelAtIndex(char** chanHeaderPtr, float findex)
+                         local  int gi
+                         local  int nextCurveOffset
+                         local  struct tCTHeader curveHeader
+                         local  struct tCTHeader subCurveHeader
+                         local  int foundFrame
+                         local  float value
+                         local  unsigned char* pData
+                         local  int subNumFrames
+                         inlines  _getNum, sizeofQuantizeByte, sizeofQuantizeByte2, sizeofQuantizeByte3, sizeofQuantizeByte4, sizeofQuantizeByte5, sizeofQuantizeByte6, sizeofQuantizeByte7, sizeofQuantizeByte8, sizeofQuantizeShort, sizeofQuantizeShort2, sizeofRaw
+  791  0013DDE0    100  void Decompress_InitChannelCache(char** chanHeaderPtr, TChannelCache* pCache)
+                         local  int32 i
+                         local  char* pData
+                         local  TCurveLibHeader* pHeader
+  809  00170504    180  static int32 Decompress_SwapFrames(char** pSrc)
+                         local  int subNumFrames
+                         local  struct tCTHeader subCurveHeader
+                         local  char* pData
+                         inlines  _getCTHeader, _getNum
+  869    inline-only   static int32 Decompress_SwapChannel(char** chanHeaderPtr)
+                         local  char* pData
+                         local  char* pSrc
+                         local  struct tCTHeader curveHeader
+                         local  int numSubCurves
+                         local  int GroupIndex
+  907  00170684     78  void Decompress_Swap(char* pData, int32 iCurveDataByteSize)
+                         local  int32 numCurves
+                         local  TCurveLibHeader* pHeader

@@ -1,0 +1,6 @@
+// ../../../../rw45/platform/include/native/ps3-ppu-gcc/rw/core/resource/resource.h
+// compiled in: tiger_module_com.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   77    inline-only   const struct <anon>& GetBaseResourceDescriptor(const const struct <anon>* this, uint32_t i)
+  349    inline-only   BaseResource& GetBaseResource(const struct <anon>* this, uint32_t i)

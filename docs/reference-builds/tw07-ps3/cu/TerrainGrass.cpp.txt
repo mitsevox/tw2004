@@ -1,0 +1,262 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/TerrainGrass.cpp
+// compiled in: headgate_unity.cpp
+// 44 functions, source order. line | PS3 address | size
+
+   74  00347B94     48  bool IsGrassMaterial(struct TerFileMaterial* pMat)
+   83  00347BDC     40  unsigned int GetGrassID(struct TerFileMaterial* pMat)
+  428  00347D94    2A8  bool VBResource::CreateGrassIndexBuffers(const struct VBResource* this)
+                         local  int[3] vertsPerPrim
+                         local  int lod
+                         local  int size
+                         local  struct LS_IndexBuffer* result
+                         local  LS_Index* pOutputIndices
+                         local  unsigned int n
+                         local  unsigned int i
+                         local  int j
+                         local  int j
+  480  0034803C     D8  bool VBResource::Matches(const struct VBResource* this, struct TerrainGrass* pGrassEffect)
+  533  00348334     14  void THGridResource::SetMaxBladeHeight(const struct THGridResource* this, float height)
+  548  00357680    730  void THGridResource::Update(const struct THGridResource* this, unsigned int frame, float x, float z, int ilow, int ihigh, int jlow, int jhigh, int istart, int iend, int iincr, int jstart, int jend, int jincr, int colsRecalc, int rowsRecalc)
+                         local  float cellX
+                         local  float cellZ
+                         local  int halfGridW
+                         local  unsigned int dontConsider
+                         local  const float minFudge
+                         local  const float maxFudge
+                         local  const float xzFudge
+                         local  int i
+                         local  int j
+                         local  int index1
+                         local  const struct TerrainHeightInfoLite& info
+                         local  int i
+                         local  int j
+                         local  int[4] index
+                         local  int ind
+                         local  int i2
+                         local  int j2
+                         local  int index2
+  678  00345EC0     28  void TerrainGrass::ResetHighestGridWidth()
+  687  00348348      8  void TerrainGrass::DoDrawGrass(const struct TerrainGrass* this, bool b)
+  694  00348350     18  void TerrainGrass::DoShadowMap(bool b)
+  789  00348514    1A0  void TerrainGrass::InvalidateDeviceObjects(const struct TerrainGrass* this)
+                         local  bool dashboardAutoUpdating
+                         local  int i
+                         local  int i
+  830  003486B4     C4  void TerrainGrass::InvalidateGrassGrid(const struct TerrainGrass* this)
+                         local  int i
+  860  0036D4B4    DEC  void TerrainGrass::Draw(const struct TerrainGrass* this)
+                         local  struct CRShadowMap* pShadowMap
+                         local  float distFadeMultiplier
+                         local  float baseFadeScale
+                         local  float baseFadeBias
+                         local  vec4flt camPos
+                         local  vec4flt windVct
+                         local  struct CCourse* pCourse
+                         local  float windSpeed
+                         local  float elapsedTime
+                         local  float fpsMult
+                         local  const float windExp
+                         local  const float windYFactor
+                         local  float factor
+                         local  vec3flt wv0
+                         local  vec3flt wv1
+                         local  vec3flt wv2
+                         local  vec4flt amplitudes
+                         local  vec4flt frequencies
+                         local  vec4flt windDir
+                         local  bool bFastGrassActivated
+                         local  bool bGrassActivated
+                         local  struct RC_SRenderCtx* spRenderCtx_p
+                         local  struct SFrustum frustum
+                         local  int lod
+                         local  float fadeDist
+                         local  vec4flt minShadCoords
+                         local  int lod
+                         local  float alphaCells
+                         local  float alphaFadeDist
+                         local  float alphaFadeDistSquared
+                         local  unsigned int patch
+                         local  const struct GrassBB& bbox
+                         local  const vec4flt& pos
+                         local  enum ClipTest test
+                         local  float camHeight
+                         local  float patchAlphaFade
+                         local  vec4flt myVec
+                         local  enum LS_PrimType[3] primType
+                         local  int[3] vertsPerPrim
+                         local  unsigned int numIndices
+                         local  const float xzFudge
+                         local  vec4flt min
+                         local  vec4flt max
+                         local  vec4flt halfGrid
+                         local  struct LS_VertexBuffer* pVB
+                         inlines  CRManager::GetCRShadowMap, CRShadowMap::GetHRCamOffset, CRShadowMap::GetShadowMapTexture, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetColorWriteEnable, DS_vSetCullMode, LLMath_Add, LLMath_Scale, LLMath_Subtract, __vec_make_from_scalar, __vec_mul, std::cosf, std::sinf, std::sqrt, vec_ld, vec_splat
+ 1220  00348CC4     28  int CompareDist(const void* elem1, const void* elem2)
+                         local  struct PatchTableEntryS* e1
+                         local  struct PatchTableEntryS* e2
+ 1229  00358344    704  bool TerrainGrass::NextFrame(const struct TerrainGrass* this)
+                         local  vec4flt camPos
+                         local  vec4flt camDir
+                         local  float dirX
+                         local  float dirZ
+                         local  float mag
+                         local  float densityMult
+                         local  int i
+                         local  int i
+                         local  float x
+                         local  float z
+                         local  int halfGridW
+                         local  int rowsRecalc
+                         local  int colsRecalc
+                         local  float finalMinY
+                         local  float finalMaxY
+                         local  int i
+                         local  float minY
+                         local  float maxY
+                         local  int i
+                         local  const vec4flt& p
+                         inlines  vec4flt_Copy
+ 1390  00357DB0    594  void TerrainGrass::UpdateGridCells(const struct TerrainGrass* this, int lod, int rowsRecalc, int colsRecalc, float x, float z, const float& minY, const float& maxY)
+                         local  int halfGridW
+                         local  int istart
+                         local  int iend
+                         local  int iincr
+                         local  int jstart
+                         local  int jend
+                         local  int jincr
+                         local  int ilow
+                         local  int ihigh
+                         local  int jlow
+                         local  int jhigh
+                         local  int i
+                         local  int j
+                         local  int index
+                         local  const struct TerrainHeightInfoLite* pInfo
+                         local  const vec4flt& p
+ 1492  003510E4    374  void TerrainGrass::UpdateGridVisibility(const struct TerrainGrass* this, float* camPos, float* camDir, float dirX, float dirZ)
+                         local  bool bRecalcDist
+                         local  float highestGrass
+                         local  float dotThreshold
+                         local  int i
+                         local  int lod
+                         local  int j
+                         local  int index
+                         local  int lod
+                         local  const float[4]& p
+                         local  const float space
+                         local  const float halfSpace
+                         local  float dist
+                         local  float distX
+                         local  float distZ
+                         inlines  std::sqrt, vec4flt_Copy
+ 1581  003461D4      C  void TerrainGrass::InitClustering(const struct TerrainGrass* this, int clusterMin, int clusterMax)
+ 1590  003461E0     34  void TerrainGrass::InitBladeShape(const struct TerrainGrass* this, float midMin, float midMax, float topMin, float topMax)
+ 1601  0034D198     F0  bool TerrainGrass::LoadGrassEffectTexture(const struct TerrainGrass* this, const char* fname)
+                         local  struct TerFileMaterial info
+ 1629  0035FE40    2BC  void TerrainGrass::InitBlades(const struct TerrainGrass* this, float width, float height, int polysPerBlade)
+                         local  int i
+                         local  int lod
+ 1690  00345EA8     14  void TerrainGrass::SetupGrassLODs(const struct TerrainGrass* this, float highlodDist, float minDensity, float fallOff, float lowLODDensity)
+ 1702  00348778    400  void TerrainGrass::SetupGrassGrid(const struct TerrainGrass* this, unsigned int terrainID, unsigned int gridwidth, float bladeHeight, float spacing, int bladesPerPatch, bool bUnderwater)
+                         local  int i
+                         local  int lod
+                         inlines  GrassPatchInfoS::GrassPatchInfoS
+ 1799  00348CEC     AC  float TerrainGrass::GetGridSpan(const const struct TerrainGrass* this)
+                         local  float maxSpacing
+                         local  uint32_t i
+ 1893  0036EADC    57C  void CRGrass::Update(const struct CRGrass* this, bool bCamXZChangd, bool bCamYChanged, bool bFirstCall)
+                         local  bool[8] bClippingRendered
+                         local  int i
+                         local  float curYMin
+                         local  float curYMax
+                         local  uint32_t clippingIndex
+                         local  int i
+                         local  uint32_t clippingIndex
+                         local  int i
+                         local  uint32_t clippingIndex
+                         local  int i
+                         local  uint32_t clippingIndex
+                         local  int lod
+                         local  GrassProcessRequest_t* pReq
+                         local  uint32_t numFilled
+                         inlines  TerrainGrass::GetYRange, TerrainGrass::SetClippingTextureDataPtr, TerrainGrass::SetGridMax, TerrainGrass::SetGridMin, TerrainGrass::SetYRange, vec_ld, vec_st
+ 1991  0036E2D8    218  void CRGrass::Draw(const struct CRGrass* this, bool bCamXZChangd, bool bCamYChanged)
+                         local  uint32_t waitOK
+                         local  uint32_t i
+                         local  uint32_t i
+                         local  uint32_t i
+                         local  uint32_t clippingIndex
+                         inlines  TerrainGrass::SetGridMax, TerrainGrass::SetGridMin, TerrainGrass::SetYRange, vec_ld, vec_st
+ 2028  0036E2A0     38  void CRGrass::DrawUW(const struct CRGrass* this)
+                         local  uint32_t i
+ 2039  00349060     78  void CRGrass::LoadHole(const struct CRGrass* this)
+ 2048  00349190    2C4  void CRGrass::UnloadHole(const struct CRGrass* this)
+                         local  int i
+                         local  int i
+                         local  uint32_t i
+                         local  uint32_t i
+                         local  uint32_t i
+ 2102  00359784    2E4  void CRGrass::AddTerrainGrass(const struct CRGrass* this, struct TerrainGrass* tg)
+                         local  uint32_t index
+                         local  float span
+                         local  bool bFound
+                         local  uint32_t i
+                         inlines  TerrainGrass::SetClippingTexture, std::fabs
+ 2160  00353B6C     FC  void CRGrass::AddUnderwaterGrass(const struct CRGrass* this, struct TerrainGrass* tg)
+                         local  uint32_t index
+ 2179  00349534     44  TextureRef CRGrass::AllocateClippingTexture(const struct CRGrass* this)
+                         local  TextureFormat format
+                         local  TextureOptions options
+ 2202  0036E4F0    5EC  void CRGrass::RenderClippingTexture(const struct CRGrass* this, TextureRef tex, float minY, float maxY, const vec4flt& gridMin, const vec4flt& gridMax)
+                         local  vec4flt oldPos
+                         local  mat44flt newWorld
+                         local  mat44flt m
+                         local  mat44flt r
+                         local  mat44flt s
+                         local  mat44flt mr
+                         local  mat44flt myMat
+                         local  float halfWidthHeight
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetColorWriteEnable, DS_vSetStencilEnable, DS_vSetStencilOp, DS_vSetStencilTest, DS_vSetZBufferMode, DS_vSetZTestEnable, LLMath_IdentifyMat, vec_st
+ 2303  003490D8     B8  uint32_t CRGrass::WaitSPU(const struct CRGrass* this)
+                         local  uint32_t i
+ 2318  00349578     CC  void CRGrass::StartSPU(const struct CRGrass* this, GrassProcessRequest_t* pReq)
+                         local  LLJob* pJob
+ 2335  00350838     78  GrassProcessRequest_t* CRGrass::GetFastGrassRequest(const struct CRGrass* this, struct TerrainGrass* pGrass, int lod)
+                         local  uint32_t index
+ 2350  00348D98    1A0  void CRGrass::CleanupProcessedVertexBuffers(const struct CRGrass* this)
+                         local  uint32_t ci
+                         local  uint32_t lod
+                         local  uint32_t b
+ 2377  0034E12C    2F8  void CRGrass::FinalInitialization(const struct CRGrass* this)
+                         local  const char[20] __FUNCTION__
+                         local  uint32_t ci
+                         local  uint32_t lod
+                         local  uint32_t size
+                         local  uint32_t b
+                         local  struct LS_VertexBuffer* result
+                         inlines  TagValuePair, operator+
+ 2407  00349644     FC  struct LS_VertexBuffer* CRGrass::AllocateProcessedVertexBuffer(const struct CRGrass* this, uint32_t grassIndex, uint32_t lod)
+                         local  uint32_t ci
+                         local  uint32_t bufferIndex
+                         local  struct LS_VertexBuffer* pRetVal
+ 2426  00348C60     64  struct LS_VertexBuffer* CRGrass::GetProcessedVertexBuffer(const struct CRGrass* this, uint32_t grassIndex, uint32_t lod, uint32_t index)
+                         local  uint32_t ci
+                         local  uint32_t numBuffers
+ 2438  00349740     38  uint32_t CRGrass::GetCurrentProcessedVertexBufferIndex(const struct CRGrass* this, uint32_t grassIndex, uint32_t lod)
+ 2450  00353C68    148  void CRGrass::GetCoordRange(const struct CRGrass* this, uint32_t clippingIndex, const vec4flt& min, const vec4flt& max)
+                         local  uint32_t i
+                         local  vec4flt patchMin
+                         local  vec4flt patchMax
+                         inlines  LLMath_MaxVec4, LLMath_MinVec4, TerrainGrass::GetGridMax, TerrainGrass::GetGridMin, vec_st
+ 2477  003520B0    3A8  uint32_t TerrainGrass::FillRequests(const struct TerrainGrass* this, GrassProcessRequest_t* pReq, int lod)
+                         local  uint32_t numRequests
+                         local  uint32_t numPatchesPerRequest
+                         local  uint32_t numRemainderPatches
+                         local  uint32_t curPatch
+                         local  uint32_t relPatchNum
+                         local  uint32_t p
+                         local  const vec4flt& pos
+                         local  struct LS_VertexBuffer* pVB
+ 2548  00349454     6C  void TerrainGrass::CalcMaxVertsPerPatch(const struct TerrainGrass* this, uint32_t* pMaxVertsLod0, uint32_t* pMaxVertsLod1)
+ 2561  003494C0     74  void TerrainGrass::CalcNumVertexBuffers(const struct TerrainGrass* this, uint32_t* pNumBuffers)
+                         local  uint32_t numBuffers

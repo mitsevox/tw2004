@@ -1,0 +1,66 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLTex.c
+// compiled in: Legacy_unity.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   32    inline-only   static bool IsPointerAlignCheck(uint32 sizeOfEntry, uint32 alignment)
+                         local  uint32 s2
+  131  0037E900      4  void TX_vInitModule()
+  146  0037E904      4  void TX_vCloseModule()
+  160  0037E908      4  void TX_vSetupTexture(struct TX_STextureGroup* spTextureGroup, struct TX_STextureGroupTexture* spTextureGroupTexture)
+  175  003AE1E4      8  struct TX_STextureGroup* TX_spDownloadData(const const struct Allocator& allocRef, struct TStreamData* spStreamData_p, struct TX_STextureGroup* spTextureGroupSrc, int32 iVRAMOffset_p)
+  194  003AE1E0      4  struct TX_STextureGroup* TX_spDownloadDirectData(const const struct Allocator& allocRef, void* spTextureData_p, struct TX_STextureGroup* spTextureGroupSrc, int32 iVRAMOffset_p)
+                         local  struct TX_STextureGroup* spTextureGroup
+  234  003C86E8     E0  struct TX_STextureGroup* TX_spLoadTextureGroupFromFile(char* chpFileName_p, int32 iVRAMOffset_p)
+                         local  int32 iFileLength
+                         local  void* vpFilePtr
+                         local  struct TX_STextureGroup* spTextureGroup
+                         inlines  Allocator::GetTempAllocator
+  306  003ADEA0    340  struct TX_STextureGroup* TX_spParseTextureGroupFromStream(const const struct Allocator& allocRef, void* vpStreamData_p, struct TX_STextureGroup* spTextureGroupSrc, int32 iVRAMOffset_p)
+                         local  const char[33] __FUNCTION__
+                         local  void* vpGenPtr
+                         local  void* vpTexturesData
+                         local  struct TX_STextureGroupTexture* spTexture
+                         local  int32 iTexture
+                         local  struct TX_STextureGroup* spTextureGroup
+                         local  struct TX_STextureGroupHeader* spTextureGroupHeader
+                         local  TX_SFileChukHeader* spChunkDesc
+                         local  TX_STextureGroupFileDesc* spTextureGroupFileDesc
+                         local  int32 iTextureDescsSize
+                         local  int32 iTextureGroupSize
+                         local  struct Allocator tempAlloc
+                         inlines  TagValuePair, operator+
+  621  003A9530     60  void TX_vFreeTextureDataInTextureGroup(struct TX_STextureGroup* spTextureGroup_p)
+  682  003A9590     44  void TX_vFreeTextureGroup(struct TX_STextureGroup* spTextureGroup_p)
+  719  003821D0     B0  uint32 TX_uiFindTextureIndexFromID(struct TX_STextureGroup* spTextureGroup_p, const const struct HashString& uiTextureID_p)
+                         local  uint32 ui
+                         local  struct TX_STextureGroupTexture* spTexture
+                         inlines  operator==
+  753  0037E90C    204  uint32 TX_CalculateTintValue(uint32 startR, uint32 startG, uint32 startB, float R, float G, float B)
+                         local  uint32 r255
+                         local  uint32 g255
+                         local  uint32 b255
+                         local  uint32 endVal
+                         local  float percentR
+                         local  float percentG
+                         local  float percentB
+                         local  float rContribution
+                         local  float gContribution
+                         local  float bContribution
+  796  0038E700     64  void TX_vInitEmptyDataTextureGroup(struct TX_STextureGroup* spTextureGroup_p, struct TX_STextureGroupTexture* spTextureDesc_p, TX_STextureGroupTextureExtra* spTextureExtraInfo_p, int32 iNumTextures)
+                         inlines  TX_STextureGroupHeader::SetNumTexturesInFile
+  808  0037EB10      4  void TX_ReplaceTextureData(struct TX_STextureGroup* pDstGroup, struct TX_STextureGroupTexture* pDstTex, const struct TX_STextureGroupTexture* pSrcTex, const struct TX_STextureGroup* pSrcGroup)
+  829  0037EB14      8  uint32 TX_CalcTotalTextureSize(const struct TX_STextureGroupTexture* spTextureGroupTexture_p)
+  857  00393DE8     D4  void TX_vPrintTextureNamesInGroup(struct TX_STextureGroup* spTextureGroup_p)
+                         local  uint32 ui
+                         local  struct TX_STextureGroupTexture* spTexture
+                         local  char[17] name
+  876  00384CB8    208  void TX_vByteSwapTextureData(struct TX_STextureGroupTexture* pInput, int32 total_size)
+                         local  TByteSwapDataElementDef[3] elmDef1
+                         local  TByteSwapDataElementDef[22] elmDef
+                         local  char* pSrc
+                         local  char* pDest
+                         local  char* pData
+                         local  int32 num_tex
+                         local  int32 i
+                         local  int32 j
+                         inlines  BYTESWAP_SWAPDATASTRUCTURE

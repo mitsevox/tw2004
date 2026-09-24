@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_SponsorPopup.h
+// compiled in: apt_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   24  00125E44     C0  void UISponsorPopup::~UISponsorPopup(const struct UISponsorPopup* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStaticCharBuffer<32u>::~AptStaticCharBuffer, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   28  00100564      C  uint32 UISponsorPopup::GetSignature(const const struct UISponsorPopup* this)

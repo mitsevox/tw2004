@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/packages/rwaudiocore/2.08.01/include/rw/audio/core/system.h
+// compiled in: other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+  692    inline-only   int GetThreadProcessor(const struct <anon>* this)
+ 1740    inline-only   double GetTime(const struct <anon>* this)
+ 1776    inline-only   unsigned int GetCommandTimeStamp(const struct <anon>* this)

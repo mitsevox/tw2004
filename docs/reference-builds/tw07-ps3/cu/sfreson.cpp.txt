@@ -1,0 +1,18 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/sfreson.cpp
+// compiled in: sfreson.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   47  006F501C    148  void resonx87(RESONSTATE* prs, int frames, void* psrcp, void* pdstp)
+                         local  float* psrc
+                         local  float* pdst
+                         local  int i
+  100  006F5164     A8  int SFILTER_reson(void* pstate, int frames, void* psrcp, void* pdstp, int requester)
+                         local  RESONSTATE* prs
+                         local  int temp
+  133  006F520C     3C  int SFILTER_createRESON(RESONSTATE* prs)
+  150  006F5248    130  void SFILTER_modifyRESON(RESONSTATE* prs, FIXED24P8* params)
+                         local  int centrefreq
+                         local  int samplerate
+                         local  int bandwidth
+                         local  float gain
+                         local  float rsquare

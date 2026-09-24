@@ -1,0 +1,30 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_global_context.cpp
+// compiled in: tiger_module_global_context.cpp
+// 19 functions, source order. line | PS3 address | size
+
+   14  00530258    178  struct <anon>* Create(const char* name, unsigned int nameLength, struct <anon>* parent, struct IAllocator* allocator, struct GlobalUpdate* update)
+                         local  struct <anon>* context
+                         inlines  TagValuePair
+   42  005304A0     DC  void RecursiveDestroy(struct <anon>* context, struct IAllocator* allocator)
+                         local  struct <anon>* child
+                         local  struct GlobalUpdate* update
+   67  005301B8     A0  void Zero(const struct <anon>* this)
+   86  00530148     70  void InsertChild(const struct <anon>* this, struct <anon>* child)
+                         local  struct <anon>* parent
+  109  005303D8     C8  void RemoveChild(const struct <anon>* this, struct <anon>* child)
+                         local  struct <anon>* parent
+  137  0053057C     10  void SetFloat(const struct <anon>* this, float value)
+  143  0053058C     10  void SetBoolean(const struct <anon>* this, bool value)
+  149  0053059C     44  void SetString(const struct <anon>* this, const char* value)
+  156  005305E0      8  float GetFloat(const const struct <anon>* this)
+  161  005305E8      8  enum GlobalType GetType(const const struct <anon>* this)
+  167  005305F0      8  bool GetBoolean(const const struct <anon>* this)
+  171  005305F8      4  const char* GetString(const const struct <anon>* this)
+  177  00530130      8  struct <anon>* GetChildList(const const struct <anon>* this)
+  182  005303D0      8  struct <anon>* GetPrevChild(const const struct <anon>* this)
+  187  00530138      8  struct <anon>* GetNextChild(const const struct <anon>* this)
+  192  00530140      8  struct <anon>* GetParent(const const struct <anon>* this)
+  197  005305FC      C  const char* GetName(const const struct <anon>* this)
+  202  00530608      8  struct GlobalUpdate* GetUpdate(const const struct <anon>* this)
+  207  00530610     88  void Update(const struct <anon>* this)
+                         local  struct <anon>* child

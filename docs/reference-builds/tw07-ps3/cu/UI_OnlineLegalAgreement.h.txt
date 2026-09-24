@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_OnlineLegalAgreement.h
+// compiled in: apt_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   19  0011B24C    198  void UIOnlineLegalAgreement::~UIOnlineLegalAgreement(const struct UIOnlineLegalAgreement* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TArrayInternal<char*,AptStructSwapper>::~TArrayInternal, TExternArray<UIOnlineLegalAgreement::DstMenuItem_olla>::~TExternArray, UIMenuVertBase::~UIMenuVertBase, ~TAptArrayStruct
+   21  000FF594      C  uint32 UIOnlineLegalAgreement::GetSignature(const const struct UIOnlineLegalAgreement* this)
+   34  000FF5A0     44  void UIOnlineLegalAgreement::ShowHelpText(const struct UIOnlineLegalAgreement* this)
+   36  000FF5EC      C  struct IExternArray* UIOnlineLegalAgreement::GetExternArray(const struct UIOnlineLegalAgreement* this)
+   49  000FF5F8     3C  void UIOnlineLegalAgreement::Show(const struct UIOnlineLegalAgreement* this)
+   76  00115760     14  enum AptThreadReturnValue UIOnlineLegalAgreement::WaitForHideToShowEuropeanAgreement_func(struct IAptSubscriberBase* subs)

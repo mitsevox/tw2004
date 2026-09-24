@@ -1,0 +1,9 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/RBTree.h
+// compiled in: RBTree.cpp
+// 4 functions, source order. line | PS3 address | size
+
+  101  0080D570     70  struct <anon>* GetLastNode(const struct <anon>* this)
+  103  0080D5E0     70  struct <anon>* GetFirstNode(const struct <anon>* this)
+  134  0080D514     5C  struct <anon>* Convert(const struct <anon>* this, struct <anon>* node)
+  145  0080D650     6C  struct <anon>* Convert(const struct <anon>* this, struct <anon>* node)
+                         local  char8_t* pos

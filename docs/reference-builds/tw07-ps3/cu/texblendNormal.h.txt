@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/Headers/texblendNormal.h
+// compiled in: other_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   28  004A744C      8  void* TexBlendNormal::PrepareTextureForBlend(const struct TexBlendNormal* this, struct RawTexture* texture, float lerpVal, int32_t texNum)
+   29  004A7454      4  void TexBlendNormal::RestoreTextureFromBlend(const struct TexBlendNormal* this, struct RawTexture* texture, float lerpVal, void* dataStorage)

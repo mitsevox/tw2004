@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/stream.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   10  005BFBB0     34  void Stream(const struct <anon>* this)
+   14  005BFC18      C  void ~Stream(const struct <anon>* this)
+   18  0060D1E4     88  struct <anon>* CreateInstance(const char8_t* pStrURL)

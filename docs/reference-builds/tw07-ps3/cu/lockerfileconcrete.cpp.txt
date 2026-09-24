@@ -1,0 +1,58 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/locker/source/common/lockerfileconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 22 functions, source order. line | PS3 address | size
+
+   60  0062A828     14  void ~LockerDeleteFileOperation(const struct <anon>* this)
+                         inlines  ~LockerFileOperationAbstract
+   75  0062A88C     14  void ~LockerSetFileInfoOperation(const struct <anon>* this)
+                         inlines  ~LockerFileOperationAbstract
+  107  0062A690     C0  void ~LockerGetFileOperation(const struct <anon>* this)
+                         local  struct MemoryStrategy* pMemoryStrategy
+                         inlines  GetInstance, ~LockerFileOperationAbstract, ~RCPointer
+  118  0062B2C4    28C  void NotifySuccess(const struct <anon>* this, struct LockerFile* pInFile)
+                         local  struct <anon>* pFile
+                         local  const int32_t* pTag
+                         local  struct <anon> pBuffer
+                         local  struct <anon> decodedFile
+                         local  struct <anon> decodedFile
+                         inlines  NotifyFailure, NotifySuccess, SetRawDataPointer, operator=, ~RCPointer
+  179  00628ED8     D8  void ReadData(const struct <anon>* this)
+                         local  int32_t iNumBytesRead
+                         inlines  GetApi, NotifyProgress
+  234  005F61CC    10C  void LockerFileConcrete(const struct <anon>* this, const LockerApiFileT* pFileInfo)
+                         local  struct LockerExtensionConcrete* pLocker
+                         local  const struct List<OSDK::String>* pFileTypes
+                         local  uint32_t uNumFileTypes
+                         inlines  FindFileType, GetInstance, GetNumberOfElements, LockerFile
+  275  005C9920     50  void ~LockerFileConcrete(const struct <anon>* this)
+                         inlines  ~LockerFile
+  298  005C9970      C  const int32_t GetIdentifier(const const struct <anon>* this)
+  321  005C997C      C  const char8_t* GetGameName(const const struct <anon>* this)
+  344  005C9988      C  const char8_t* GetName(const const struct <anon>* this)
+  368  005C9994      C  const char8_t* GetDescription(const const struct <anon>* this)
+  391  005C99A0      C  const char8_t* GetType(const const struct <anon>* this)
+  413  005DD70C     D4  const char8_t* GetLocalizedType(const const struct <anon>* this)
+                         local  struct LockerExtensionConcrete* pLocker
+                         local  const struct List<OSDK::String>* pFileTypes
+                         inlines  FindFileType, GetElementAt, GetInstance
+  438  005C99AC      C  const struct Timestamp* GetTime(const const struct <anon>* this)
+  461  005C99B8     20  uint32_t GetSize(const const struct <anon>* this)
+                         local  int32_t iSize
+  487  005C99D8      8  uint32_t GetLockerSize(const const struct <anon>* this)
+  510  005C99E0     34  bool IsPublic(const const struct <anon>* this)
+  533  005C9A14      C  bool IsEaFile(const const struct <anon>* this)
+  557  005C9A20      8  bool IsSuppressed(const const struct <anon>* this)
+  580  006052A4    244  struct Operation* Download(const const struct <anon>* this, struct LockerFileOperationCallback* pCallback)
+                         local  struct OperationManagerConcrete* pOperationManager
+                         local  struct Operation* pCurrentOperation
+                         inlines  GetOperationManagerConcrete, LockerGetFileOperation
+  604  006054E8    1D0  struct Operation* Delete(const const struct <anon>* this, struct LockerFileOperationCallback* pCallback)
+                         local  struct OperationManagerConcrete* pOperationManager
+                         local  struct Operation* pCurrentOperation
+                         local  char8_t[16] strEvent
+                         inlines  GetOperationManagerConcrete, LockerDeleteFileOperation
+  632  005FE080    1C8  struct Operation* SetFileInfo(const const struct <anon>* this, const char8_t* strDescription, bool bPublic, struct LockerFileOperationCallback* pCallback)
+                         local  int32_t iAttributes
+                         local  struct OperationManagerConcrete* pOperationManager
+                         local  struct Operation* pCurrentOperation
+                         inlines  GetOperationManagerConcrete, LockerSetFileInfoOperation

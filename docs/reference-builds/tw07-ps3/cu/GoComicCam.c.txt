@@ -1,0 +1,60 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/cameras/GoComicCam.c
+// compiled in: golf_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   87  00240718     E8  void ComicCam_InitComicCam()
+                         local  const char[22] __FUNCTION__
+                         inlines  TagValuePair, operator+
+   97  001EE7DC     40  void ComicCam_CloseComicCam()
+  102  002EA07C    1B4  void ComicCam_StartComicCam(enum eComicCamModes eMode, CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  CameraChainLink* pLink
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  enum CameraShotState_e eStartCamera
+                         local  int i
+                         inlines  CameraController_GetCameraLookPoint
+  154  002E9DF0    28C  bool ComicCam_UpdateComicCam(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID, float fTimeStep)
+                         local  struct RC_SRenderCtx* renderContext_p
+                         local  VM_SViewport* viewport_p
+                         local  vec4flt blackColor
+                         local  int32 viewContID
+                         local  struct sComicCamFrame* curFrame
+                         inlines  RC_spGetRenderCtxViewport
+  261  001EE8AC     A8  void ComicCam_ModeSpecificUpdate(struct sComicCamFrame* curFrame, VM_SViewport* pViewport, enum PlayerNumber_t ePlayerID, float fTimeStep)
+                         local  float fLeft
+                         local  float fTop
+                         local  float fHeight
+                         local  float fWidth
+                         local  float fRight
+                         local  float fBottom
+                         local  bool bMakeTaller
+                         local  bool bMakeWider
+                         local  float fTimeMultiplier
+  387  002864C8    170  bool ComicCam_IsFrameOver(struct sComicCamFrame* curFrame, enum PlayerNumber_t ePlayerID)
+                         inlines  Character_GetTagTime, GamePlayer::GetCharacter
+  428  0024ADA0      4  void ComicCam_PerformTransition(struct sComicCamFrame* curFrame, CameraController_t* pCameraController, float fTimeStep)
+  456  001EE820     8C  void ComicCam_PerformFadeOuts(struct sComicCamFrame* curFrame, VM_SViewport* pViewport, float fTimeStep)
+                         local  int i
+                         local  vec4flt blackColor
+                         local  float fTop
+                         local  float fLeft
+                         local  float fHeight
+                         local  float fWidth
+  495  001EE81C      4  void ComicCam_SetViewportToSize(VM_SViewport* pViewport, float fTop, float fLeft, float fWidth, float fHeight)
+  510  001EF0A8    180  void ComicCam_Init3ScreenMode()
+  557  001EE954    754  void ComicCam_Init9ScreenRapidMode()
+                         local  int32[4][9] frameOrders
+                         local  int32 whichFrameOrder
+  677  00286638    178  bool ComicCam_IsComicCamOver(VM_SViewport* viewport_p, enum PlayerNumber_t ePlayerID)
+                         inlines  Character_GetTagTime, GamePlayer::GetCharacter
+  723  001EF228     1C  bool ComicCam_IsScreenFrozen()
+  730  002E9B78    278  void ComicCam_CheckForCameraSwitch(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  CameraChainLink* pLink
+                         local  int32 nextCamType
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  struct sComicCamFrame* curFrame
+                         local  uint8 frameID
+                         inlines  CameraController_GetCameraLookPoint
+  796  002867B0     A0  bool ComicCam_HasBallBeenHit()
+                         inlines  Character_GetTagTime, GamePlayer::GetCharacter

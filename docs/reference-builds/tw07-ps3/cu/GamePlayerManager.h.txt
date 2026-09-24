@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/Code/Golf/GamePlayer/Headers/GamePlayerManager.h
+// compiled in: apt_unity.cpp, golf_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   31    inline-only   uint8 GamePlayerManager::GetPlayerCount(const const struct GamePlayerManager* this)
+   35    inline-only   void GamePlayerManager::SetPlayerCount(const struct GamePlayerManager* this, uint8 count)
+   90    inline-only   bool PLR_HoledOut(enum PlayerNumber_t PlayerID)
+  101    inline-only   int32 GetGamePlayerTeam(enum PlayerNumber_t plr)

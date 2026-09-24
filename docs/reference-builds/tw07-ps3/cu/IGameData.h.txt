@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/Golf/GameMode/Headers/IGameData.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   33  0020FA74      4  void IGameData::IGameData(const struct IGameData* this)

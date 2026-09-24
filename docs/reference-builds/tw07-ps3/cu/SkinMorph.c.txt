@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/animation/SkinMorph.c
+// compiled in: golf2_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+    9  00139ACC     70  void SkinMorph_SetTargetWeight(struct TSkin* pSkin, int32 iTarget, float fWeight)
+                         local  SkinMorphStateT* pMorphState
+                         inlines  BitArray_SetBit
+   33  0013FF34     50  float SkinMorph_GetTargetWeight(struct TSkin* pSkin, int32 iTarget)
+                         local  SkinMorphStateT* pMorphState
+   49  0013FE38     94  void SkinMorph_Destroy(struct TSkin* pSkin)
+   61  00176544     64  void SkinMorph_UpdateAllTargets(struct TSkin* pSkin)
+                         inlines  BitArray_FillArray

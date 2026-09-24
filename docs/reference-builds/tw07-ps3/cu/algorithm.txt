@@ -1,0 +1,58 @@
+// C:/dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/target/ppu/include/algorithm
+// compiled in: rnaunity.cpp
+// 18 functions, source order. line | PS3 address | size
+
+  425    inline-only   void std::iter_swap<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >, std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> > >(struct <anon> _Left, struct <anon> _Right)
+  841    inline-only   void std::_Rotate<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >, std::ptrdiff_t, TwRenderObj::BaseRenderObj*>(struct <anon> _First, struct <anon> _Mid, struct <anon> _Last, ptrdiff_t* , BaseRenderObjPtr* )
+                         local  ptrdiff_t _Shift
+                         local  ptrdiff_t _Count
+                         local  ptrdiff_t _Factor
+                         local  ptrdiff_t _Tmp
+                         local  struct <anon> _Hole
+                         local  struct <anon> _Next
+                         local  BaseRenderObjPtr _Holeval
+                         local  struct <anon> _Next1
+  874    inline-only   void std::_Rotate<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> > >(struct <anon> _First, struct <anon> _Mid, struct <anon> _Last, struct <anon> )
+  880    inline-only   void std::rotate<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> > >(struct <anon> _First, struct <anon> _Mid, struct <anon> _Last)
+ 1127    inline-only   void std::_Push_heap<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >, int, TwRenderObj::BaseRenderObj*, bool (*)(TwRenderObj::BaseRenderObj* const&, TwRenderObj::BaseRenderObj* const&)>(struct <anon> _First, int _Hole, int _Top, struct BaseRenderObj* _Val, bool(*)()* _Pred)
+                         local  int _Idx
+ 1226    inline-only   void std::_Adjust_heap<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >, int, TwRenderObj::BaseRenderObj*, bool (*)(TwRenderObj::BaseRenderObj* const&, TwRenderObj::BaseRenderObj* const&)>(struct <anon> _First, int _Hole, int _Bottom, struct BaseRenderObj* _Val, bool(*)()* _Pred)
+                         local  int _Top
+                         local  int _Idx
+ 1251    inline-only   void std::_Pop_heap<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >, std::ptrdiff_t, TwRenderObj::BaseRenderObj*, bool (*)(TwRenderObj::BaseRenderObj* const&, TwRenderObj::BaseRenderObj* const&)>(struct <anon> _First, struct <anon> _Last, struct <anon> _Dest, struct BaseRenderObj* _Val, bool(*)()* _Pred, ptrdiff_t* )
+ 1260    inline-only   void std::_Pop_heap_0<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >, TwRenderObj::BaseRenderObj*, bool (*)(TwRenderObj::BaseRenderObj* const&, TwRenderObj::BaseRenderObj* const&)>(struct <anon> _First, struct <anon> _Last, bool(*)()* _Pred, BaseRenderObjPtr* )
+ 1268    inline-only   void std::pop_heap<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >, bool (*)(TwRenderObj::BaseRenderObj* const&, TwRenderObj::BaseRenderObj* const&)>(struct <anon> _First, struct <anon> _Last, bool(*)()* _Pred)
+ 1303    inline-only   void std::_Make_heap<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >, std::ptrdiff_t, TwRenderObj::BaseRenderObj*, bool (*)(TwRenderObj::BaseRenderObj* const&, TwRenderObj::BaseRenderObj* const&)>(struct <anon> _First, struct <anon> _Last, bool(*)()* _Pred, ptrdiff_t* , BaseRenderObjPtr* )
+                         local  ptrdiff_t _Bottom
+                         local  ptrdiff_t _Hole
+ 1316    inline-only   void std::make_heap<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >, bool (*)(TwRenderObj::BaseRenderObj* const&, TwRenderObj::BaseRenderObj* const&)>(struct <anon> _First, struct <anon> _Last, bool(*)()* _Pred)
+ 1335    inline-only   void std::sort_heap<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >, bool (*)(TwRenderObj::BaseRenderObj* const&, TwRenderObj::BaseRenderObj* const&)>(struct <anon> _First, struct <anon> _Last, bool(*)()* _Pred)
+ 1988    inline-only   void std::_Insertion_sort<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >, bool (*)(TwRenderObj::BaseRenderObj* const&, TwRenderObj::BaseRenderObj* const&)>(struct <anon> _First, struct <anon> _Last, bool(*)()* _Pred)
+                         local  struct <anon> _Next
+                         local  struct <anon> _Next1
+                         local  struct <anon> _Dest
+                         local  struct <anon> _Dest0
+                         local  struct <anon> _Next1
+ 2013    inline-only   void std::_Med3<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >, bool (*)(TwRenderObj::BaseRenderObj* const&, TwRenderObj::BaseRenderObj* const&)>(struct <anon> _First, struct <anon> _Mid, struct <anon> _Last, bool(*)()* _Pred)
+ 2025    inline-only   void std::_Median<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >, bool (*)(TwRenderObj::BaseRenderObj* const&, TwRenderObj::BaseRenderObj* const&)>(struct <anon> _First, struct <anon> _Mid, struct <anon> _Last, bool(*)()* _Pred)
+                         local  int _Step
+ 2042  004FCD94    9C0  struct <anon> std::_Unguarded_partition<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >, bool (*)(TwRenderObj::BaseRenderObj* const&, TwRenderObj::BaseRenderObj* const&)>(struct <anon> _First, struct <anon> _Last, bool(*)()* _Pred)
+                         local  struct <anon> _Mid
+                         local  struct <anon> _Pfirst
+                         local  struct <anon> _Plast
+                         local  struct <anon> _Gfirst
+                         local  struct <anon> _Glast
+                         local  int _Step
+                         inlines  operator+, operator++, operator-, operator--, std::_Med3<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >, bool (*)(TwRenderObj::BaseRenderObj* const&, TwRenderObj::BaseRenderObj* const&)>, std::_Median<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >, bool (*)(TwRenderObj::BaseRenderObj* const&, TwRenderObj::BaseRenderObj* const&)>, std::iter_swap<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >, std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> > >
+ 2101  004FD754    8B0  void std::_Sort<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >, int, bool (*)(TwRenderObj::BaseRenderObj* const&, TwRenderObj::BaseRenderObj* const&)>(struct <anon> _First, struct <anon> _Last, int _Ideal, bool(*)()* _Pred)
+                         local  int _Count
+                         local  struct <anon> _Mid
+                         local  struct <anon> _Dest0
+                         local  ptrdiff_t _Factor
+                         local  ptrdiff_t _Tmp
+                         local  struct <anon> _Hole
+                         local  struct <anon> _Next
+                         local  BaseRenderObjPtr _Holeval
+                         local  struct <anon> _Next1
+                         inlines  operator+, operator-, operator--, std::_Insertion_sort<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >, bool (*)(TwRenderObj::BaseRenderObj* const&, TwRenderObj::BaseRenderObj* const&)>, std::make_heap<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >, bool (*)(TwRenderObj::BaseRenderObj* const&, TwRenderObj::BaseRenderObj* const&)>, std::sort_heap<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >, bool (*)(TwRenderObj::BaseRenderObj* const&, TwRenderObj::BaseRenderObj* const&)>
+ 2127    inline-only   void std::sort<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >, bool (*)(TwRenderObj::BaseRenderObj* const&, TwRenderObj::BaseRenderObj* const&)>(struct <anon> _First, struct <anon> _Last, bool(*)()* _Pred)

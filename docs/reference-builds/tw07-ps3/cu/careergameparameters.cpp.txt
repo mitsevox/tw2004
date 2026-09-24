@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/career/source/common/gamefacade/careergameparameters.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   63  005C5E08     38  void CareerGameParameters(const struct CareerGameParameters* this)
+   88  005C5E78      4  void Validate(const const struct CareerGameParameters* this)
+  111  005C5E7C      4  void Print(const const struct CareerGameParameters* this)
+  135  005C5E80      C  void ~CareerGameParameters(const struct CareerGameParameters* this)

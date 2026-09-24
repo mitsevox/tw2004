@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNARender/ps3/RNARender/RNACmdBuffer.h
+// compiled in: RNACmdBuffer.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   57    inline-only   bool IsCreated(const struct CmdBufferC* this)
+   58    inline-only   enum CmdBufferStateE GetState(const struct CmdBufferC* this)
+  101    inline-only   uint32_t GetBufferCapacityInBytes(const const struct <anon>* this)

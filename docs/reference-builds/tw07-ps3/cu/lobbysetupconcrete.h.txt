@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/./lobbysetupconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   58  0062ACA0     44  void ~LobbySetupElement(const struct LobbySetupElement* this)
+                         inlines  ~RCPointer

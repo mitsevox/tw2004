@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/Internal/TranstionInfo.cpp
+// compiled in: TranstionInfo.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    7  005B1F5C     24  float PrevFrameNum(const const struct <anon>* this, float timeOfTransition, float prevNumFrames, float frameNum)
+   13  005B1F80     34  float TreeEvaluateNumFrames(const const struct <anon>* this, const struct AnimNode* destination, struct Character* viewInfo, struct InstVars* instVars)

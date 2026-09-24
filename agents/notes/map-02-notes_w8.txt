@@ -1,0 +1,43 @@
+map-02 link wave 8 (2026-09-24 13:50-15:00 CDT). Units: Ball, gocamscripts, GoGolfCam, GoStaticCam, GoDynObj,
+GoTerrainCollision, shadow, GoShaderObject_Rain_Gc. Scratch: x8_var.py FN variants.py [label] (quicktrial,
+indentation-insensitive snippets; the shown variant is saved to x8_last.c).
+
+DONE
+- shadow fn_800B2FB0 99.27 -> exact: `pRef = &aList[i];` at the top of the strip loop (no walked pRef in the
+  for-increment) + `nCount` declared before `i`. shadow LINKED with all its data: .data 0x8018FF68-78,
+  .bss 0x801F5E20-0x801F6320 (Shadow lbl_801F5E20 defined), .sdata 0x802814A8-B8 (lbl_802814A8 =
+  &lbl_801F5E20, 0.01f, 0.08f), .sbss 0x80282158-78 (reverse order), .sdata2 0x802840B8-F8 with two stripped
+  stand-ins (1.0f before fn_800B24E0, 0.5f before fn_800B28D4).
+- GolfCamera_ProcessPlaceBallCamera 99.52 -> exact: the height differences are built in a local
+  (`fDiff = fUp; fDiff -= pCam[1]; pCam[1] += (1.0f - f98) * fDiff;`, the first pCam[1] lerp and the pSub[1]
+  one; the second pCam[1] lerp stays in one expression).
+- GolfCamera_ProcessZoomToAimCamera 99.37 -> 99.53 (2 insns left): `f = fDist / fTotal; f *= 2.0f;` and
+  `fCamY = fD8; fCamY += f14;`. Left: the `bMirror != 0` srwi is scheduled earlier than EA's.
+- GoDynObj fn_8004731C 99.26 -> 99.43: spin turn as `fT = 59.94f/60.0f; fT *= 59.94f*fFrameTime; fT *= r;
+  fTurn = 60.0f; fTurn *= fT / 36.0f;` (the float block is now exact). Left: pState r23 / pLogoB r24 swapped.
+- StaticCam_GetFlybyInformation 99.94 -> 99.95: the path-end branch is a `break` (EA jumps past the loop
+  test; ours `continue` went to it). Left: block 2's fmadds into f3 (EA f31).
+
+RULE (verified 4 times): EA builds values in a variable: `x = a; x op= b;` instead of `x = a op b`. It puts
+the first operand's register as the result register (fmuls/fsubs/fmadds dest = the start value's register).
+
+TRIED, NO GAIN
+- Ter_SearchForDropLocation (6, f22/f25 swap): fLift block-scoped / declared in the ring loop, turn locals
+  block-scoped, ring search as a static inline (fDist a parameter; vPos own or passed): worse; fLift/fAngle/
+  vPos[1] accumulator forms; permuter 14 min -j2: nothing.
+- CameraScript_LagAimMarker (11, fMinDist/fMin/fAimY rotate f30/f26/f27): fAimY/fMin block-scoped (inner if,
+  outer if), fMin first/last, fMinDist copied to a local, fMin split/one-expression, f64 fAimY: none.
+- GoTerrainCollision fn_80050794 pass 2 (30-35): `p = arr; p += idx` (30), pRef->nVertex + (hi << 16) (30),
+  u32/s32/int casts, idx local k, dead pVert beside it, index loops pTriFlags[k + j + 2] (51-56): none exact.
+- GoDynObj fn_8004731C pState/pLogoB: walked pState, pState[0], *(pState + i), s32/long i, logo decl orders,
+  decl climb 13: none. Permuter 14 min -j2: see below.
+- StaticCam_GetFlybyInformation block 2: chained fT = fEnd = ..., ratio/diff/product locals, fT +=: 7-17.
+- GoShaderObject_Rain_Gc fn_800B52D4 (14): pData const/late/first, apA/apB `p = arr; p += n`, arr + n: 14-16.
+- Permuter 14 min -j2: fn_8004731C (only nonsense new_var = pLogoB copies, not usable), ZoomToAim (after the
+  fixes above): nothing. Flyby (break form) 12 min: nothing.
+- ZoomToAim bMirror arg: > 0, & 1, (int)/(u32) casts, 0U, 0 != x, u8/int local before the call: all 2.
+- LagAimMarker height formula split into locals (fH = vGoal[1]; fH -= fAimY; ratio local; whole local): 11-53.
+- fn_8003F2E0 case 2 as if/else accumulators (f = v40[3]; f -= f * ratio): 10-28 aligned (base 8).
+- Ter_CheckObjectAndHazardObstruction: fWide/fTop accumulators, nX computed later, for (nX = nX;...): 41-100.
+- Physics_HandleCollision: TW07's nine angle locals (bank/pitch/heading angle, sin, cos) at 5 decl places:
+  182-209 (base 92), worse.

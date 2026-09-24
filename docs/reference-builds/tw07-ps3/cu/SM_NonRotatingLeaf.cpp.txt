@@ -1,0 +1,31 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_NonRotatingLeaf.cpp
+// compiled in: shader_unity.cpp
+// 20 functions, source order. line | PS3 address | size
+
+   34  0051AE24    104  void SM_NonRotatingLeafClass::SM_NonRotatingLeafClass(const struct SM_NonRotatingLeafClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base, vec4flt_Zero, vec_st
+   73  005079C4    408  void SM_NonRotatingLeafClass::Load(const struct SM_NonRotatingLeafClass* this)
+  112  00507DCC    194  void SM_NonRotatingLeafClass::Activate(const struct SM_NonRotatingLeafClass* this)
+  134  00507F60     38  void SM_NonRotatingLeafClass::Deactivate(const struct SM_NonRotatingLeafClass* this)
+  140  005113EC     60  void SM_NonRotatingLeafClass::SetFullWindTreeHeight(const struct SM_NonRotatingLeafClass* this, float fullWindTreeHeight)
+  149  005175A4     6C  void SM_NonRotatingLeafClass::SetWindAmplitude(const struct SM_NonRotatingLeafClass* this, const float[4]& amplitude)
+                         inlines  vec4flt_Copy
+  156  00517610     6C  void SM_NonRotatingLeafClass::SetWindFrequency(const struct SM_NonRotatingLeafClass* this, const float[4]& frequency)
+                         inlines  vec4flt_Copy
+  163  0051767C     6C  void SM_NonRotatingLeafClass::SetWindDir(const struct SM_NonRotatingLeafClass* this, const float[4]& frequency)
+                         inlines  vec4flt_Copy
+  171  0051144C     74  void SM_NonRotatingLeafClass::SetLeafCenter(const struct SM_NonRotatingLeafClass* this, float cx, float cy, float cz, float radius)
+  180  005114C0     70  void SM_NonRotatingLeafClass::SetLightDir(const struct SM_NonRotatingLeafClass* this, float lx, float ly, float lz)
+  189  00511530     60  void SM_NonRotatingLeafClass::SetDiffuseFactor(const struct SM_NonRotatingLeafClass* this, float diffuseFactor)
+  198  00511590     60  void SM_NonRotatingLeafClass::SetAmbientFactor(const struct SM_NonRotatingLeafClass* this, float ambientFactor)
+  207  005115F0     70  void SM_NonRotatingLeafClass::SetLeafCenterColor(const struct SM_NonRotatingLeafClass* this, float cx, float cy, float cz)
+  216  005176E8     6C  void SM_NonRotatingLeafClass::SetTFactor(const struct SM_NonRotatingLeafClass* this, const float[4]& TFactor)
+                         inlines  vec4flt_Copy
+  225  00511660     64  void SM_NonRotatingLeafClass::SetColorLeafTexture(const struct SM_NonRotatingLeafClass* this, TextureRef texRef)
+  235  00517754     6C  void SM_NonRotatingLeafClass::SetFogColor(const struct SM_NonRotatingLeafClass* this, float* camPos)
+                         inlines  vec4flt_Copy
+  245  005177C0     6C  void SM_NonRotatingLeafClass::SetFogCameraPos(const struct SM_NonRotatingLeafClass* this, float* camPos)
+                         inlines  vec4flt_Copy
+  255  005116C4     60  void SM_NonRotatingLeafClass::SetFogDensity(const struct SM_NonRotatingLeafClass* this, float f)
+  265  00511724     60  void SM_NonRotatingLeafClass::SetFogStartRadius(const struct SM_NonRotatingLeafClass* this, float f)
+  275  00511784     60  void SM_NonRotatingLeafClass::SetFogHeightTop(const struct SM_NonRotatingLeafClass* this, float f)

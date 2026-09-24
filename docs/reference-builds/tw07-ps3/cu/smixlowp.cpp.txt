@@ -1,0 +1,9 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/smixlowp.cpp
+// compiled in: smixlowp.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   10  006E14E4    1D8  void MIX_setlowpass(int voice, float leakage)
+                         local  SNDMIXVOICE* psmv
+                         local  FIXED24P8[3] params
+                         local  float outputSampleRate
+                         inlines  FToI::Fast, GetSampleRate, SNDMEMI_alloc, SNDMEMI_free

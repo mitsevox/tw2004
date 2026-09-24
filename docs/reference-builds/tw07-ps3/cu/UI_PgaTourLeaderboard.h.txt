@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_PgaTourLeaderboard.h
+// compiled in: apt_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   20  00117CF0    160  void UIPgaTourLeaderboard::~UIPgaTourLeaderboard(const struct UIPgaTourLeaderboard* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIPgaTourLeaderboard::DstMenuItem_ptlb>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+   22  000FF148      C  uint32 UIPgaTourLeaderboard::GetSignature(const const struct UIPgaTourLeaderboard* this)
+   28  000FF154     44  void UIPgaTourLeaderboard::ShowHelpText(const struct UIPgaTourLeaderboard* this)
+   29  000FF1A0      C  struct IExternArray* UIPgaTourLeaderboard::GetExternArray(const struct UIPgaTourLeaderboard* this)
+   45    inline-only   void UIPgaTourLeaderboard::SetSimFromCalendarFlag(const struct UIPgaTourLeaderboard* this, bool bFlag)
+   55  000FF1AC     24  void UIPgaTourLeaderboard::LooseFocus(const struct UIPgaTourLeaderboard* this, uint32 )
+   56  000FF1D0     24  void UIPgaTourLeaderboard::RegainFocus(const struct UIPgaTourLeaderboard* this, uint32 )

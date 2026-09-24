@@ -1,0 +1,9 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNARender/RNASurface.h
+// compiled in: RNADevicePlat.cpp, RNAStateManager.cpp, RNATexturePlat.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   64    inline-only   struct SurfacePlatC& SurfaceC::GetPlatform(const struct SurfaceC* this)
+   77    inline-only   int32_t SurfaceC::GetWidth(const const struct SurfaceC* this)
+   78    inline-only   int32_t SurfaceC::GetHeight(const const struct SurfaceC* this)
+   79    inline-only   enum SurfaceFormatE SurfaceC::GetFormat(const const struct SurfaceC* this)
+   80    inline-only   struct TextureC* SurfaceC::GetTexture(const const struct SurfaceC* this)

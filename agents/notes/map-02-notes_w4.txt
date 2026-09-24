@@ -1,0 +1,40 @@
+map-02 wave3 TW07 pass (2026-09-24 09:35-10:15), ranges 09+10. Tried lists for the next lane.
+
+DONE (exact)
+- PGATourSimulation fn_8011B978 (TW07 SplitWinnings): `int i; s32 nShare;` and `int nEntrant` block-scoped
+  in the loop (TW07 lists entrantID after i/splitCash). s32 nEntrant or int nShare: no.
+- PGATourSimulation fn_80118B0C (TW07 inline DetermineTargetScores has roundParScore):
+  nRoundPar = fn_800D2FB4(...) * 4; nPar = nRoundPar + n;
+- Earnings fn_800D750C, fn_800D9834: the profile index local is PlayerNumber_t (TW07: enum PlayerNumber_t
+  userID); fn_800D68CC, fn_800D69B8: new PlayerNumber_t nProfile = gPlayers[nPlayer].nIndex local.
+
+- PGATourSimulation fn_801178C8: nPlayer int in fn_801178C8, fn_800EF130 AND fn_800EF0E0 (an s32 value
+  passed to an int parameter inside a loop gets a hoisted copy register); then decls
+  nEntrants, pEntrant, int nHole, int i. fn_80117E98 then 99.2 with nWinner declared first; left:
+  orig `subf r0; mr r30,r0` for nPick (helper, casts, int/u32 nPick: no).
+- fn_8011BDF8: int nPlayer + order nEntrantA, nEntrantB, nScoreA, int nPlayer gives 24 -> 19 aligned
+  (not applied: orig still has lwz r0; mr r26,r0 copy).
+
+TRIED, NO GAIN
+- fn_80117E98 (SimTournamentWinner; nPlayer r26/nWinner r29 swapped): TW07 decl order (int/s32, purse
+  first), climb, types of nWinner/i/nPick, bInPlayoff local, PlayerNumber_t param, block-scoped
+  nPick/i. A `static inline u32 X(u32 n) { return Rand_Next(0) % n; }` (TW07 Misc_RandFunc) removes the
+  extra `mr r30,r0` (18 -> 16 aligned) but not applied (new helper name).
+- fn_801180C4 / Earnings fn_800D9998: orig keeps pProfile+0x10000 (addis) in a saved register across
+  calls. pTour (TourSeason*) local 61 -> 34 but gives the exact tour address (wrong). const pProfile,
+  gpSaveData + nPlayer, pUserStats local, all uses via pProfile (250), greedy pProfile/gpSaveData
+  toggles (best 54): no. D9998 if/else / ternary / && season flag: worse.
+- fn_8011BDF8: TW07 order (pMC0, pMC1, id0, id1, rel0, rel1, userID), PlayerNumber_t nPlayer, all init
+  orders x types: no (best = base 24 aligned).
+- fn_801178C8: int prototype -> callee 99.5, caller GameModeDriverPGATour fn_800EF130 97.2 (adds a copy);
+  caller int param: no. PlayerNumber_t param: worse.
+- GameModeBestBall fn_800E8A68: TW07 EndGame order with PlayerNumber_t plr1/plr3/loseteam/player,
+  nSum/nOther2 at 4 positions: no (best 28 vs base 20).
+- GameMode22 fn_801264B8: PlayerNumber_t nWinner, TW07 order (minStrokes first) 45 -> 38 aligned only.
+- GameHoleContests fn_800DADC0 (orig reloads lbl_80282264 before fn_800D0478): Player* local, inline
+  helper, nested ifs: no.
+- GameMode26 fn_8010CA2C: PlayerNumber_t/s32 param, climb 11: no.
+- hwsBurn fn_8011172C/11658/10FB4/10A38: const pointer params: no.
+- Earnings fn_800D4F14 (CW's hoisted address temps vs i): s32 i, separate hole counter, climb 10: no.
+- UISEvent fn_80165B90 (extsh order): inline store order, int/u16 params: no. fn_80165528 (p[0]/p[-8]
+  load registers): nType int/block/first/last/none, *pNext, via pData: no.

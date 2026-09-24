@@ -1,0 +1,35 @@
+// ../../../../../TIGERCODE/Code/Golf/Lo-Rendering/Frustum.h
+// compiled in: golf_unity.cpp, headgate_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   28    inline-only   void SSphere::set(const struct SSphere* this, float x, float y, float z, float rad)
+   44    inline-only   void SPlane::set(const struct SPlane* this, float x, float y, float z, float dist)
+  110  003404D0     84  void SFrustum::makeAABB(vec4flt* pBoxCorners, const float* minPoint, const float* maxPoint)
+                         local  uint32[4] s_AXBYBZAW
+                         local  uint32[4] s_BXBYAZAW
+                         local  uint32[4] s_AXBYAZAW
+                         local  float[4] vMin
+                         local  float[4] vMax
+                         local  unsigned char[16] vAXBYBZAW
+                         local  unsigned char[16] vBXBYAZAW
+                         local  unsigned char[16] vAXBYAZAW
+                         local  float[4]* pBoxArray
+                         inlines  vec_perm
+  117    inline-only   const float* SFrustum::cameraPos(const const struct SFrustum* this)
+  118    inline-only   float[4]* SFrustum::getCameraPos(const const struct SFrustum* this)
+  136    inline-only   void SFrustum::makeAABB(vec4flt* pBoxCorners, const float* minPoint, const float* maxPoint)
+                         local  uint32[4] s_AXBYBZAW
+                         local  uint32[4] s_BXBYAZAW
+                         local  uint32[4] s_AXBYAZAW
+                         local  float[4] vMin
+                         local  float[4] vMax
+                         local  unsigned char[16] vAXBYBZAW
+                         local  unsigned char[16] vBXBYAZAW
+                         local  unsigned char[16] vAXBYAZAW
+                         local  float[4]* pBoxArray
+  250    inline-only   enum ClipTest SFrustum::cullAABBStrip(const const struct SFrustum* this, const struct SStrip* pStrip)
+                         local  vec4flt vMin
+                         local  vec4flt vMax
+                         local  short int[8] tmpMinMax
+                         local  int[4] tmpMin
+                         local  int[4] tmpMax

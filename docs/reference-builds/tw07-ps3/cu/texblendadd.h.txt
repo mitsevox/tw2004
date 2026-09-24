@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/Headers/texblendadd.h
+// compiled in: other_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   28  004A7434      8  void* TexBlendAdd::PrepareTextureForBlend(const struct TexBlendAdd* this, struct RawTexture* texture, float lerpVal, int32_t texNum)
+   29  004A743C      4  void TexBlendAdd::RestoreTextureFromBlend(const struct TexBlendAdd* this, struct RawTexture* texture, float lerpVal, void* dataStorage)

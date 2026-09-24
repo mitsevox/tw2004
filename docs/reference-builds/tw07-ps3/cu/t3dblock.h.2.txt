@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/t3dblock.h
+// compiled in: MemoryManager.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   38  007BD658     3C  void T3dbLock(const struct <anon>* this)
+   42  007BD694     3C  void ~T3dbLock(const struct <anon>* this)

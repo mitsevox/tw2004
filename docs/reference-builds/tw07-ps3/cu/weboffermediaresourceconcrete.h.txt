@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/./././weboffermediaresourceconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   45  00623794      C  const char8_t* GetURL(const const struct <anon>* this)
+   46  006237A0      8  bool IsSkippable(const const struct <anon>* this)
+   47  006237A8      8  struct WebOfferMediaResource* GetNext(const const struct <anon>* this)
+   48    inline-only   void SetNext(const struct WebOfferMediaResourceConcrete* this, struct WebOfferMediaResourceConcrete* pNext)

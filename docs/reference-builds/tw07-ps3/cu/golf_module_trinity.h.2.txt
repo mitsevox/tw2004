@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/GolfModule/golf_module_trinity.h
+// compiled in: golf_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   47    inline-only   bool GolfModuleTrinity::TestTrinityFlag(const const struct GolfModuleTrinity* this, enum TrinityFlag_t flag)
+   50    inline-only   bool GolfModuleTrinity::IsStreamValid(const struct GolfModuleTrinity* this)

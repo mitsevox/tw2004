@@ -1,0 +1,85 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/scenegraph/source/SceneGraph/Runtime/Nodes/SGNodeJoint.cpp
+// compiled in: SGNodeJoint.cpp
+// 30 functions, source order. line | PS3 address | size
+
+    0  008B10D4    140  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  SGNodeJointInfoC::SGNodeJointInfoC, SGNodeJointInfoC::~SGNodeJointInfoC
+    0  008B2B34      C  void SGNodeJointInfoC::~SGNodeJointInfoC(const struct SGNodeJointInfoC* this)
+                         inlines  ~SGNodeInfoC
+   49  008B2B84     88  struct SGNodeC* SGNodeJointInfoC::Create(const const struct SGNodeJointInfoC* this)
+                         inlines  operator new
+   50  008B2AE8      8  const char* SGNodeJointInfoC::GetNodeTypeName(const const struct SGNodeJointInfoC* this)
+   51    inline-only   NodeType_t SGNodeJointInfoC::GetNodeTypeEnum(const const struct SGNodeJointInfoC* this)
+   63  008B12BC    124  void SGNodeJointC(const struct <anon>* this)
+                         inlines  SetIdentity, SetZero, operator=
+   78  008B1008     CC  void ~SGNodeJointC(const struct <anon>* this)
+                         inlines  operator delete, ~IJoint
+  104  008B1504    398  struct SGNodeC* Clone(const struct <anon>* this, bool8_t recurse, NodeCloneUserDataCallback userDataCallback, struct SGNodeC* baseClone)
+                         local  const char[6] __FUNCTION__
+                         local  struct <anon>* clone
+                         inlines  RNADebugBreak, SGNodeC::GetNodeTypeEnum, SetCachedJointID, operator new
+  138  008B0C80      8  const struct SGNodeInfoC* GetNodeInfo(const const struct <anon>* this)
+  144  008B0C50      8  const struct SGNodeInfoC* _GetNodeInfo()
+  149  008B0E00     38  void SetJointOrient(const struct <anon>* this, const const RNAMatrix44& mat)
+                         inlines  operator=
+  154  008B0C58      C  RNAMatrix44& GetJointOrient(const struct <anon>* this)
+  160  008B0E38     38  void SetCachedPoseToWorld(const struct <anon>* this, const const RNAMatrix44& mat)
+                         inlines  operator=
+  165  008B0C64      C  RNAMatrix44& GetCachedPoseToWorld(const struct <anon>* this)
+  171  008B0EA8     10  RNAVector3 GetJointTranslation(const const struct <anon>* this)
+                         inlines  Vector3
+  176  008B0EC8     10  void SetJointTranslation(const struct <anon>* this, const const RNAVector3& v3)
+                         inlines  operator=
+  185  008B189C    258  void ComposeLocalToParentMatrix(const struct <anon>* this, const const RNAMatrix44& rotationMatrix)
+                         local  RNAMatrix44 mTranslate
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         inlines  Matrix44, Vector3, operator=, vec_splat, vpu::Matrix44FromTranslation, vpu::Mult, vpu::_asmGetZero, vpu::_asmSwizzleStore<VectorAxisW, VectorAxisW>, vpu::_asmSwizzleStore<VectorAxisX, VectorAxisX>, vpu::_asmSwizzleStore<VectorAxisY, VectorAxisY>, vpu::_asmSwizzleStore<VectorAxisZ, VectorAxisZ>, vpu::operator*
+  193  008B1AF4    2D4  void ComposeLocalToParentMatrix(const struct <anon>* this, const const RNAQuaternion& rotationQuat)
+                         local  RNAMatrix44 mRot
+                         local  RNAMatrix44 mTranslate
+                         local  Vector4Intrinsic_32 result
+                         local  Vector4Intrinsic_32 result
+                         local  Vector4Intrinsic_32 result
+                         local  unsigned char[16] permuteControl
+                         local  unsigned char[16] permuteControl
+                         local  unsigned char[16] permuteControl
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         inlines  Matrix44, Quaternion, Vector3, operator=, vec_perm, vec_splat, vpu::Matrix44FromQuaternion, vpu::Matrix44FromTranslation, vpu::Mult, vpu::_asmGetOne, vpu::_asmGetZero, vpu::_asmSplat<VectorAxisW>, vpu::_asmSwizzleStore<VectorAxisW, VectorAxisX>, vpu::_asmSwizzleStore<VectorAxisX, VectorAxisX>, vpu::_asmSwizzleStore<VectorAxisY, VectorAxisY>, vpu::operator*
+  201  008B1DC8    CE8  void ComposeLocalToParentMatrix(const struct <anon>* this, const const RNAVector3& rotationEulers)
+                         local  RNAMatrix44 mRotateX
+                         local  RNAMatrix44 mRotateY
+                         local  RNAMatrix44 mRotateZ
+                         local  RNAMatrix44 mTranslate
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         inlines  Matrix44, Set, VecFloat, VecFloat<VectorAxisX>, VecFloat<VectorAxisY>, VecFloat<VectorAxisZ>, Vector3, operator float, operator=, vec_add, vec_and, vec_cmpeq, vec_ctf, vec_cts, vec_madd, vec_nmsub, vec_sel, vec_splat, vec_xor, vpu::Matrix44FromTranslation, vpu::Matrix44RotationX, vpu::Matrix44RotationY, vpu::Matrix44RotationZ, vpu::Mult, vpu::SinCos, vpu::_asmGetOne, vpu::_asmGetZero, vpu::_asmSwizzleStore<VectorAxisX, VectorAxisX>, vpu::_asmSwizzleStore<VectorAxisY, VectorAxisY>, vpu::_asmSwizzleStore<VectorAxisZ, VectorAxisZ>, vpu::operator*
+  217  008B0EB8     10  RNAVector3 GetTempVec3(const const struct <anon>* this)
+                         inlines  Vector3
+  222  008B0C70     10  void SetTempVec3(const struct <anon>* this, const const RNAVector3& v3)
+                         inlines  operator=
+  230  008B0E70     38  void SetJointToBindPose(const struct <anon>* this, const const RNAMatrix44& mat)
+                         inlines  operator=
+  236  008B0C88      C  const RNAMatrix44& GetJointToBindPose(const struct <anon>* this)
+  242  008B0C94     38  void SetBindPoseToJoint(const struct <anon>* this, const const RNAMatrix44& mat)
+                         inlines  operator=
+  248  008B0CCC      C  const RNAMatrix44& GetBindPoseToJoint(const struct <anon>* this)
+  253  008B0CD8     44  void* GetVoidInterface(const const struct <anon>* this, InterfaceID id)
+  265  008B0ED8    130  void SerializeIn(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[12] __FUNCTION__
+                         local  int32_t version
+                         inlines  RNADebugBreak, Set
+  282  008B0D1C     E4  void SerializeOut(const const struct <anon>* this, const struct OutStreamC& out)
+  301  008B1224     10  static void _GLOBAL__I__ZN6SceneX12SGNodeJointC16s_ClassAllocatorE()
+  302  008B1214     10  static void _GLOBAL__D__ZN6SceneX12SGNodeJointC16s_ClassAllocatorE()

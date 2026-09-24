@@ -1,0 +1,59 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/llinput_rw.c
+// compiled in: Legacy_unity.cpp
+// 27 functions, source order. line | PS3 address | size
+
+   58  003B0554    23C  void Input_vInitOnce()
+                         local  int i
+                         local  struct <anon> options
+                         local  struct CorePoolDescriptor[2] desc
+                         local  int j
+  111  0037F374     20  int32 Input_iInitModule()
+  123  0037F394      4  void Input_vCloseModule()
+  127  0037F398     74  void Input_vCloseOnce()
+  141  0037F40C     44  uint32 Input_iActiveControllers()
+                         local  int count
+                         local  int i
+  156  0037F450     80  void Input_sPrintButtons(char* str)
+                         local  int i
+                         local  int mask
+  175  0038E60C     F4  void Input_SetInputSeqOverride(bool override, bool resetController)
+                         local  int32 i
+                         local  int j
+  206  00390578     D4  void Input_PostInputForOverride(int32 joyPad, uint32 buttonData, struct Controller_StickInfo* stickInfo)
+  220  0037F4D0     D0  void Input_UpdateInputOverride(int32 joyPad)
+  265  00396D00    AB0  void Input_vUpdate()
+                         local  uint32 pressedButtons
+                         local  float fX1
+                         local  float fY1
+                         local  float fX2
+                         local  float fY2
+                         local  const struct <anon>* device
+                         local  const struct DeviceState* deviceState
+                         local  struct _rwControllerState* pGamepads
+                         local  int32 xmlrpc_joystick_frame
+                         local  int i
+                         local  bool bWasConnected
+                         local  int buttonCount
+                         local  int j
+                         local  int buttonMask
+                         local  int j
+  504  00390188     7C  uint32 Input_ReadControlPad(int32 joyPad)
+  516  00390108     80  uint32 Input_ReadControlPadNoEmu(int32 joyPad)
+  524  00390090     78  struct _rwControllerState* Input_spReadController(int joyPad)
+  534  00390010     80  int32 Input_iGetPadType(int32 joyPad)
+  545  0038FEB8     80  bool Input_bDoesPadExist(int32 joyPad)
+  556  0037F5A0     88  void Input_vEmulateDPad(unsigned char emulate)
+                         local  struct _rwControllerState* pGamepads
+                         local  int i
+                         local  const uint32 DPadMash
+  577  0038FDAC    10C  void Input_vVibrateBuzz(int32 joyPad, int32 vibOn)
+  608  0038FC9C    110  void Input_vVibrateWave(int32 joyPad, int32 vibRate)
+  634  0038FC10     8C  bool Input_bGetVibrationStatus(int32 joyPad)
+  643  0038FB30     E0  void Input_vSetVibrationStatus(int32 joyPad, int32 vibOn)
+  661  0038F994    15C  void Input_vStopVibration(int32 joyPad)
+  680  0038F8C4     D0  bool Input_bCanPadVibrate(int32 joyPad)
+  698  00388014     3C  void* Input_vGetPressureInfo(int32 joyPad)
+  708  0038F848     7C  struct Controller_StickInfo* Input_sGetStickInfo(int32 joyPad)
+  721  0038F764     E4  void Input_vPostVirtualControllerData(int32 whichController, uint32 buttonData, struct Controller_StickInfo* stickInfo)
+  733  0037F628     78  uint16_t Input_GetSensorData(int32_t whichController, int32_t sensor)
+  748  0037F6A0     34  bool Input_HasSensorData(int32_t whichController)

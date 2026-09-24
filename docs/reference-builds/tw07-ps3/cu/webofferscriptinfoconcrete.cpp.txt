@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/webofferscriptinfoconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   71  005E8E30     E8  void WebOfferScriptInfoConcrete(const struct <anon>* this, int32_t iScriptType)
+                         inlines  RCPointer
+   98  005E90FC     98  void ~WebOfferScriptInfoConcrete(const struct <anon>* this)
+                         inlines  ~RCPointer

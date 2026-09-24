@@ -1,0 +1,16 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Utils/BezierPath.cpp
+// compiled in: headgate_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   15  00343EC8     AC  void BezierPath::SetNumPaths(const struct BezierPath* this, int count)
+   26  00343F74     CC  void BezierPath::SetControlPoint(const struct BezierPath* this, int index, const const struct APosition& pos, int pathNum)
+   35  00344040     C4  void BezierPath::SetControlPoints(const struct BezierPath* this, struct APosition& p1, struct APosition& p2, struct APosition& p3, struct APosition& p4, int pathNum)
+   52  00344124     E0  struct APosition BezierPath::GetControlPoint(const const struct BezierPath* this, int index, int pathNum)
+                         local  struct APosition& ret
+                         local  struct APosition ret
+   64  00344204    254  struct APosition BezierPath::PointInPath(const const struct BezierPath* this, float t)
+                         local  struct APosition& ret
+                         local  int pathNum
+                         local  struct APosition ret
+                         local  float t2
+                         local  float t3

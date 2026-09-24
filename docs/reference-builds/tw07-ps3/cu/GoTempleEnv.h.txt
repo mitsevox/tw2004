@@ -1,0 +1,19 @@
+// ../../../../../TIGERCODE/Code/Golf/Temple/GoTempleEnv.h
+// compiled in: golf2_unity.cpp, golf_unity.cpp, other_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   73  00251874    20C  void GoTempleEnv::GoTempleEnv(const struct GoTempleEnv* this)
+                         local  const TextureInfo* info
+                         inlines  vec4flt_Copy, vec_st
+   74  002369E8     9C  void GoTempleEnv::~GoTempleEnv(const struct GoTempleEnv* this)
+   77    inline-only   struct GoTempleVideoPlayer* GoTempleEnv::GetVideoPlayer(const struct GoTempleEnv* this)
+   79    inline-only   float[4]* GoTempleEnv::GetCharacterPos(const struct GoTempleEnv* this)
+   80    inline-only   float[4]* GoTempleEnv::GetCharacterPosInBunker(const struct GoTempleEnv* this)
+   81    inline-only   float[4]* GoTempleEnv::GetCharLookAtOnScreen(const struct GoTempleEnv* this)
+   83    inline-only   bool GoTempleEnv::IsMaterialOfType(const struct GoTempleEnv* this, unsigned int uMaterialHash, enum TempleMaterialE eMaterialType)
+   84    inline-only   bool GoTempleEnv::IsRenderingTemple(const struct GoTempleEnv* this)
+   85    inline-only   bool GoTempleEnv::IsInTransition(const struct GoTempleEnv* this)
+   88    inline-only   void GoTempleEnv::SetTempleScreenTexture(const struct GoTempleEnv* this, TextureRef screenTexture)
+   90    inline-only   void GoTempleEnv::SetTempleEnvState(const struct GoTempleEnv* this, enum TempleEnvStateE eState)
+   92    inline-only   void GoTempleEnv::SetCamera(const struct GoTempleEnv* this, enum CameraMode_t camMode)
+   96    inline-only   float_t GoTempleEnv::GetFovForMiniGame(const struct GoTempleEnv* this)

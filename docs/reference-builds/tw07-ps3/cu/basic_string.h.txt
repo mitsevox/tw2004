@@ -1,0 +1,92 @@
+// ../../../../../TIGERCODE/Code/AptInterface/AptPackage/ea/string/basic_string.h
+// compiled in: other_unity.cpp
+// 35 functions, source order. line | PS3 address | size
+
+   65    inline-only   void Capacity(const struct <anon>* this, int c)
+   68    inline-only   int Capacity(const const struct <anon>* this)
+  186    inline-only   char* ReAlloc(const char* ptr, int oldNum, int newNum)
+  378    inline-only   struct <anon>& operator=(const struct <anon>* this, const const struct <anon>& rhs)
+                         local  struct <anon> tmp
+  386    inline-only   struct <anon>& operator=(const struct <anon>* this, const char* rhs)
+                         local  struct <anon> tmp
+  412  004A85F4     64  void ~BasicString(const struct <anon>* this)
+                         inlines  ReAlloc
+  426    inline-only   struct <anon>& operator+=<AptStringPolicy>(const struct <anon>* this, const const struct <anon>& rhs)
+  433    inline-only   struct <anon>& operator+=(const struct <anon>* this, const char* rhs)
+                         local  const char* end
+  441    inline-only   struct <anon>& operator+=(const struct <anon>* this, const char rhs)
+  456    inline-only   int Size(const const struct <anon>* this)
+  485    inline-only   void Swap(const struct <anon>* this, const struct <anon>& other)
+                         local  int size
+                         local  int capa
+                         local  bool doingSmallString
+                         local  bool otherDoingSmallString
+                         local  char* otherString
+                         local  char* string
+                         local  char[16] s
+  638    inline-only   const char* RawPtrIteratorFactory::Begin(const const struct RawPtrIteratorFactory* this)
+  639    inline-only   const char* RawPtrIteratorFactory::End(const const struct RawPtrIteratorFactory* this)
+  640    inline-only   char* RawPtrIteratorFactory::Begin(const struct RawPtrIteratorFactory* this)
+  641    inline-only   char* RawPtrIteratorFactory::End(const struct RawPtrIteratorFactory* this)
+  661    inline-only   char* Begin(const struct <anon>* this)
+  664    inline-only   char* End(const struct <anon>* this)
+  667    inline-only   const char* Begin(const const struct <anon>* this)
+                         local  const struct RawPtrIteratorFactory factory
+  670    inline-only   const char* End(const const struct <anon>* this)
+                         local  const struct RawPtrIteratorFactory factory
+  676    inline-only   const char* ConstRawPtr(const const struct <anon>* this)
+  679    inline-only   char* RawPtr(const struct <anon>* this)
+  684    inline-only   const char& operator[](const const struct <anon>* this, int i)
+  698    inline-only   char& operator[](const struct <anon>* this, int i)
+  712    inline-only   char* Erase(const struct <anon>* this, const const char*& begin, const const char*& end)
+                         local  int distance
+                         local  int i
+  750    inline-only   void Reserve(const struct <anon>* this, int capacity)
+                         local  char* string
+  776    inline-only   void Insert<const char*>(const struct <anon>* this, const const const char*& begin, const const const char*& end, const const char*& at)
+                         local  int distance
+                         local  int newSize
+                         local  char* iter
+                         local  int newCapacity
+                         local  int insertPos
+                         local  char* currentEnd
+  776    inline-only   void Insert<const AptFilePtr*>(const struct <anon>* this, const const const AptFilePtr*& begin, const const const AptFilePtr*& end, const const AptFilePtr*& at)
+                         local  int distance
+                         local  int newSize
+                         local  AptFilePtr* iter
+                         local  int newCapacity
+                         local  int insertPos
+                         local  AptFilePtr* currentEnd
+  776    inline-only   void Insert<const AptFileSavedInputState*>(const struct <anon>* this, const const const struct AptFileSavedInputState*& begin, const const const struct AptFileSavedInputState*& end, const const struct AptFileSavedInputState*& at)
+                         local  int distance
+                         local  int newSize
+                         local  struct AptFileSavedInputState* iter
+                         local  int newCapacity
+                         local  int insertPos
+                         local  struct AptFileSavedInputState* currentEnd
+  776    inline-only   void Insert<char*>(const struct <anon>* this, const const char*& begin, const const char*& end, const const char*& at)
+                         local  int distance
+                         local  int newSize
+                         local  char* iter
+                         local  int newCapacity
+                         local  int insertPos
+                         local  char* currentEnd
+  817    inline-only   void PushBack(const struct <anon>* this, const const char& c)
+  828    inline-only   AptNativeStringUCS2 To<AptNativeStringUCS2>(const const struct <anon>* this, const AptNativeStringUCS2* deductionHelper)
+                         local  struct BoolToType<false> overloadResolver
+  841    inline-only   AptNativeStringUCS2 To<AptNativeStringUCS2>(const const struct <anon>* this, const AptNativeStringUCS2* deductionHelper, struct BoolToType<false> )
+                         local  struct <anon>& ret
+                         local  const char* srcIter
+                         local  const char* srcEnd
+                         local  int dstSize
+                         local  AptNativeStringUCS2 ret
+                         local  short unsigned int* dstIter
+                         local  const char* i
+  871    inline-only   bool DoingSmallStringOptimization(const const struct <anon>* this)
+  923  004A8558     9C  bool String::operator==<EA::String::Utf8, AptStringPolicy, AptStringPolicy>(const const struct <anon>& lhs, const const struct <anon>& rhs)
+                         local  bool equal
+                         local  int i
+                         inlines  Size, operator[]
+  940  004A84AC     AC  bool String::operator==<EA::String::Utf8, AptStringPolicy>(const const struct <anon>& lhs, const char* rhs)
+                         local  int i
+                         inlines  Size, operator[]

@@ -1,0 +1,14 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_SecondAnalogStick.cpp
+// compiled in: apt_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   56  0003FE1C     2C  void UISecondAnalogStick::UISecondAnalogStick(const struct UISecondAnalogStick* this)
+   68  0003FEA0     24  void UISecondAnalogStick::Init(const struct UISecondAnalogStick* this)
+   77  0004BEC8      C  void UISecondAnalogStick::ShowSecondAnalogStick(const struct UISecondAnalogStick* this, float x, float y, float penaltyRingRadialWidth, float perfectRingRadialWidth)
+   95  0004BED4     24  void UISecondAnalogStick::ResetSecondAnalogStick(const struct UISecondAnalogStick* this)
+  102  000653AC     6C  void UISecondAnalogStick::SetTargetPosition(const struct UISecondAnalogStick* this, float x, float y)
+                         local  float oldTargetY
+  118  0004BEA4     24  void UISecondAnalogStick::ComputeTargetDistFromCenter(const struct UISecondAnalogStick* this)
+  130  0004BEF8     28  bool UISecondAnalogStick::TargetInPenaltyZone(const struct UISecondAnalogStick* this)
+  138  0004BF20     78  bool UISecondAnalogStick::TargetInPerfectZone(const struct UISecondAnalogStick* this)
+  147  0004BF98     28  bool UISecondAnalogStick::TargetInSafeZone(const struct UISecondAnalogStick* this)

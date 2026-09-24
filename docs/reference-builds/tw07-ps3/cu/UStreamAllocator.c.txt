@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/specif/UStreamAllocator.c
+// compiled in: Legacy_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    2  003ABB10    370  void* UStream_DefaultAllocator(Drive3DChunkHdrPtr dataPtr)
+                         local  TStreamDataPtr curParseStreamData
+                         local  uint32 padding
+                         local  uint32 padToAlignment
+                         local  char[256] functionBuf
+                         inlines  TagValuePair, operator+

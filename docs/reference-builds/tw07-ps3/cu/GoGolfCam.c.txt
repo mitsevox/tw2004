@@ -1,0 +1,1213 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/cameras/GoGolfCam.c
+// compiled in: golf_unity.cpp
+// 203 functions, source order. line | PS3 address | size
+
+  575  001F1D78     A0  void GolfCamera_InitOnce()
+                         local  int i
+                         local  struct BIGHIT_CAMERA_HISTORY_t* pBHgroup
+  598  001F1E18      4  void GolfCamera_CloseOnce()
+  602  00241358    180  void GolfCamera_Init()
+                         local  const char[16] __FUNCTION__
+                         local  int i
+                         inlines  TagValuePair, operator+
+  637  001ED624     50  void GolfCamera_DeInit()
+  657  001F1E40      8  bool GolfCamera_ShouldCrACCameraCut(enum StaticCam_EventType_e prevEvent, enum StaticCam_EventType_e newEvent)
+  692  002DCE2C    1F4  void GolfCamera_InitShotSetupCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  CameraChainLink* setupLink
+                         local  enum CameraInterpType_e interpType
+                         local  float interpTime
+                         local  float interpSpeed
+                         local  enum Lie_t startLie
+                         local  enum CameraEvent_e timeTrigger
+                         local  float timeTriggerTime
+                         inlines  CameraController_GetCameraLookPoint
+  779  002E7B80     84  void GolfCamera_ProcessShotSetupCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+  795  002DA1F8    398  void GolfCamera_InitZoomToAimCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt targetPos
+                         local  vec4flt originToTarget
+                         local  vec4flt originToLook
+                         local  float originToTargetDist
+                         local  float fStartGroundHeight
+                         local  CameraChainLink* finalLink
+                         local  float fSupportingGroundHeight
+                         local  float fCoveringGroundHeight
+                         inlines  CameraController_GetCameraLookPoint, LLMath_Add3, LLMath_Length3, LLMath_Scale3, LLMath_Subtract3, vec4flt_Copy, vec4flt_Copy3, vec_ld, vec_madd, vec_sld
+  906  002D8078    A24  void GolfCamera_ProcessZoomToAimCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID, vec4flt* pOverrideEndPosition, float camRiseHeight)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt position
+                         local  vec4flt endPosition
+                         local  vec4flt playerToEndPos
+                         local  vec4flt posToCam
+                         local  vec4flt targetPos
+                         local  vec4flt origCamToEnd
+                         local  bool validTerrain
+                         local  float camToPosDist
+                         local  float curDist
+                         local  float totalDist
+                         local  float maxDist
+                         local  float zoomAmount
+                         local  TGD_TerrainInfo* pTerrainGameData
+                         local  float fStartGroundHeight
+                         local  float fEndGroundHeight
+                         local  float zoomSpeed
+                         local  float idealZoomSpeed
+                         local  float blurAmount
+                         local  vec4flt oldCameraPos
+                         local  vec4flt startingPosition
+                         local  float endHeight
+                         local  float heightDiff
+                         local  float aimLag
+                         local  float easeOut
+                         local  float heightVal
+                         local  float elevatorCamHeight
+                         local  float fSupportingGroundHeight
+                         local  float fCoveringGroundHeight
+                         local  float fZoomHeight
+                         local  float flatDist
+                         local  bool keepFlat
+                         local  bool outsideBounds
+                         local  float highestplayable
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  vec4flt tempNormal
+                         inlines  CameraController_GetCameraLookPoint, LLMath_Add3, LLMath_DotProduct3, LLMath_Length3, LLMath_Scale3, LLMath_Subtract3, __vec_len_sqr3, __vec_mul, std::sqrt, vec4flt_Copy, vec4flt_Copy3, vec_ld, vec_madd, vec_sld, vec_splat
+ 1218  002B3C70    3E8  void GolfCamera_GetZoomToAimSmartCameraOriginAndLookPoint(enum PlayerNumber_t ePlayerID, vec4flt* destLook, vec4flt* destPos)
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  vec4flt cupPos
+                         local  vec4flt ballToLookSpotVec
+                         local  float distToCup
+                         local  float distToTarget
+                         local  float cameraDistFromBall
+                         local  float cupToTargetDistance
+                         inlines  LLMath_Add3, LLMath_DistanceBetween3, LLMath_Scale3, LLMath_Subtract3, __vec_len_sqr3, __vec_make_from_scalar, vec4flt_Copy, vec_ld, vec_st, vec_sub
+ 1256  002B4200     6C  void GolfCamera_InitZoomToAimSmartCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         inlines  vec4flt_Copy, vec_st
+ 1277  002B4058    1A8  void GolfCamera_ProcessZoomToAimSmartCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID, vec4flt* pOverrideEndPosition, float camRiseHeight)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt startToDestVec
+                         inlines  LLMath_Add3, LLMath_Scale3, LLMath_Subtract, __vec_mul, vec_ld, vec_sub
+ 1305  0025EFD8     D8  void GolfCamera_GetZoomToAimFreeCameraLook(enum PlayerNumber_t ePlayerID, vec4flt* destLook)
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         inlines  LLMath_Add3, LLMath_Scale3, LLMath_Subtract3, __vec_mul, vec_ld
+ 1317  002B426C    42C  void GolfCamera_GetZoomToAimFreeCameraOrigin(enum PlayerNumber_t ePlayerID, vec4flt* destPos)
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  vec4flt offsetVec
+                         local  float distToTarget
+                         local  float distBack
+                         local  float unmodifiedAngle
+                         local  float angleDiff
+                         local  vec4flt lookToCam
+                         inlines  LLMath_Add3, LLMath_DistanceBetween3, LLMath_Subtract3, LuaTuningFileManager::Call<float, float>, LuaTuningFileManager::GetParamValue<float>, LuaTuningFileManager::SetParamValue, RotateXY, std::cosf, std::sinf, vec_sub
+ 1362  002B4BA0    158  void GolfCamera_InitZoomToAimFreeCamera(CameraController_t* cameraController, enum PlayerNumber_t playerNum)
+                         local  vec4flt* cameraOrigin
+                         local  vec4flt* cameraLookPoint
+                         inlines  LLMath_DistanceBetween3, vec4flt_Copy, vec_madd, vec_sld, vec_st, vec_sub
+ 1402  002B4698    508  void GolfCamera_ProcessZoomToAimFreeCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID, vec4flt* pOverrideEndPosition, float camRiseHeight)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  bool useZoom
+                         local  int32 joypadID
+                         local  struct Controller_StickInfo* stickInfo
+                         local  const int kStickZero
+                         local  float rotateStick
+                         local  float zoomStick
+                         local  float pitchStick
+                         local  TGD_TerrainInfo* terrainInfo
+                         local  float groundHeight
+                         local  float newHeight
+                         local  struct RC_SRenderCtx* renderContext
+                         local  struct CA_SCamera* cam
+                         local  float newFov
+                         local  vec4flt startToDestVec
+                         inlines  CA_vSetCameraFieldOfView, CameraController_GetCameraLookPoint, LLMath_Add3, LLMath_Scale3, LLMath_Subtract, RC_spGetRenderCtxCamera, __vec_mul, vec4flt_Copy, vec_ld, vec_sub
+ 1513  0028AEFC    234  void GolfCamera_MoveZoomToAimFreeTarget(enum PlayerNumber_t playerNum, int32 leftRight, int32 backForward)
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  float cos
+                         local  float sin
+                         local  vec4flt moveVec
+                         local  bool updated
+                         inlines  std::cosf, std::sinf, vec4flt_Copy3
+ 1556  002D7C14    464  void GolfCamera_InitGreenZoomToAimCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt targetPos
+                         local  vec4flt originToLook
+                         local  vec4flt originToTarget
+                         local  float originToTargetDist
+                         local  struct TGD_MaterialInfo* pSupportingSurfaceInfo
+                         local  struct TGD_MaterialInfo* pCoveringSurfaceInfo
+                         local  vec4flt coveringNormal
+                         local  vec4flt supportingNormal
+                         local  float fStartGroundHeight
+                         local  float fSupportingGroundHeight
+                         local  float fCoveringGroundHeight
+                         local  CameraChainLink* finalLink
+                         inlines  CameraController_GetCameraLookPoint, LLMath_Add3, LLMath_Length3, LLMath_Scale3, LLMath_Subtract3, vec4flt_Copy, vec4flt_Copy3, vec_ld, vec_madd, vec_sld
+ 1703  002D728C    988  void GolfCamera_ProcessGreenZoomToAimCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt position
+                         local  vec4flt endPosition
+                         local  vec4flt playerToEndPos
+                         local  vec4flt posToCam
+                         local  vec4flt targetPos
+                         local  vec4flt origCamToEnd
+                         local  float camToPosDist
+                         local  float curDist
+                         local  float totalDist
+                         local  float maxDist
+                         local  float zoomAmount
+                         local  float zoomSpeed
+                         local  float idealZoomSpeed
+                         local  float blurAmount
+                         local  vec4flt oldCameraPos
+                         local  vec4flt startingPosition
+                         local  vec4flt cupToAim
+                         local  vec4flt playerToAim
+                         local  vec4flt desiredSide
+                         local  float cupToAimDist
+                         local  float cupAndAimHeight
+                         local  float aimLag
+                         local  float easeOut
+                         local  float fZoomHeight
+                         local  float heightDiff
+                         local  struct CA_SCamera* pCam
+                         local  bool raisedOffGround
+                         local  bool zoomDone
+                         inlines  CameraController_GetCameraLookPoint, LLMath_Add3, LLMath_DotProduct3, LLMath_Length3, LLMath_Scale3, LLMath_Subtract3, RC_spGetRenderCtxCamera, __vec_len_sqr3, __vec_mul, std::sqrt, vec4flt_Copy, vec4flt_Copy3, vec_ld, vec_madd, vec_sld, vec_sub
+ 1952  002C3258     88  void GolfCamera_InitSteepSlopeCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+ 1980  002E7AF8     88  void GolfCamera_ProcessSteepSlopeCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+ 2001  002DCD18    114  void GolfCamera_InitElevatorCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         inlines  CameraController_GetCameraLookPoint
+ 2022  002E7A74     84  void GolfCamera_ProcessElevatorCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+ 2035  002DA590     64  void GolfCamera_InitShotgunOverheadCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+ 2051  002D9328    ED0  void GolfCamera_ProcessShotgunOverheadCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt playerPos
+                         local  vec4flt targetPos
+                         local  vec4flt cameraPosition
+                         local  vec4flt originalCameraPosition
+                         local  float targetDistance
+                         local  float camDistFromTarget
+                         local  const float TARGET_TAN_ANGLE
+                         local  const float MAX_YAW_ANGLE
+                         local  const float ROTATION_RATE
+                         local  TGD_TerrainInfo* terrainInfo
+                         local  float targetCircleRadius
+                         local  int32 joypadID
+                         local  struct Controller_StickInfo* stickInfo
+                         local  vec4flt* pCameraLookPoint
+                         local  float percentageToMarker
+                         local  const int kStickLow
+                         local  const int kStickHigh
+                         local  const int kStickRange
+                         local  const int kStickZero
+                         local  const float pitchFactor
+                         local  bool useZoom
+                         local  uint8 yaw
+                         local  uint8 zoom
+                         local  uint8 pitch
+                         local  vec4flt vecCamToTarget
+                         local  float distOriginalCamToTarget
+                         local  float distCamToTarget
+                         local  float zoomStep
+                         local  float sinp
+                         local  float cosp
+                         local  vec4flt workVector
+                         local  bool isPitchPos
+                         local  float dist
+                         local  float pitchStep
+                         local  float rotationStep
+                         local  vec4flt debugCamLengthInfo
+                         local  vec4flt distProjCamToTarget
+                         local  vec4flt postZoomCamPos
+                         local  float projCamDistToTarget
+                         local  float rotationStep
+                         local  vec4flt intersect
+                         local  vec4flt startPosition
+                         local  bool intersectedBoundary
+                         local  struct TNetwork* network
+                         local  float terrainBelowCameraHeight
+                         local  float baseHeight
+                         local  float distOob
+                         local  vec4flt oob2Target
+                         local  vec4flt newCamPos
+                         local  vec4flt newCamToOriginalCam
+                         inlines  LLMath_Add3, LLMath_AddScale3, LLMath_DistanceBetween3, LLMath_Length, LLMath_Length3, LLMath_Subtract3, LuaTuningFileManager::Call<float, float>, LuaTuningFileManager::GetParamValue<float>, __vec_len_sqr3, __vec_make_from_scalar, std::cosf, std::sinf, std::sqrt, vec4flt_Copy, vec4flt_Zero3, vec_ld, vec_madd, vec_sld, vec_splat, vec_st, vec_sub
+ 2448  001ED8C4     30  void GolfCamera_InitPlaceBallCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+ 2466  0028B130    A60  void GolfCamera_ProcessPlaceBallCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID, float camDistAdjust)
+                         local  float sinp
+                         local  float cosp
+                         local  float tempf
+                         local  float angle
+                         local  float newAngle
+                         local  vec4flt vec
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt origCamPos
+                         local  vec4flt camPos1
+                         local  vec4flt playerBPTargetPos
+                         local  struct TGD_MaterialInfo* pSurface
+                         local  float actualTerrainHeight
+                         local  float newHeight
+                         local  float heightDiff
+                         local  float hgt
+                         local  float dis
+                         local  TGD_TerrainInfo* pTerrainGameData
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  vec4flt collisionPoint
+                         local  vec4flt surfaceNormal
+                         local  TGD_ObjectInstanceInfo* pSurfaceObject
+                         local  vec4flt pSavedCameraOrigin
+                         local  vec4flt pSavedCameraLookPoint
+                         local  float pSavedBPRotation
+                         local  float pSavedFOV
+                         local  int terrainID
+                         local  vec4flt vCup
+                         local  vec4flt viewVec
+                         inlines  CameraController_GetCameraLookPoint, GamePlayer::GetBPRotation, GamePlayer::SetBPRotation, LLMath_Subtract, std::cosf, std::sinf, vec4flt_Copy, vec4flt_Copy3, vec_sub
+ 3199  0027A104    1F8  void GolfCamera_InitGreenCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt xLook
+                         inlines  CA_vSetCameraFieldOfView, CameraController_GetCameraLookPoint, LLMath_Add3, LLMath_Subtract3, RC_spGetRenderCtxCamera, vec4flt_Copy, vec_sub
+ 3263  002781B0    638  void GolfCamera_ProcessGreenCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  float terrainHeight
+                         local  float lookHeightAdjust
+                         local  vec4flt origCamPos
+                         local  vec4flt pt1
+                         local  vec4flt pt2
+                         local  vec4flt* endPoint
+                         local  vec4flt* startPoint
+                         local  float fParam
+                         inlines  CameraController_GetCameraLookPoint, vec4flt_Copy, vec4flt_Copy3
+ 3458  0026BA28     90  void GolfCamera_InitGreenCrowdCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  const struct Trinity& trinity
+                         inlines  Trinity::SetCrowdCamDistance, Trinity::SetCrowdCamFocalLength, Trinity::SetCrowdCamHeight, Trinity::SetCrowdCamLocation, Trinity::SetCrowdCamMode, Trinity::SetCrowdCamPosRefPoint
+ 3473  001ED850     48  void GolfCamera_ProcessGreenCrowdCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+ 3478  001F1E8C     30  bool GolfCamera_IsGreenCrowdCameraDone(CameraController_t* pCameraController)
+ 3487  001F1EBC     3C  void GolfCamera_ExitGreenCrowdCamera(CameraController_t* pCameraController)
+                         local  const struct Trinity& trinity
+                         inlines  Trinity::SetCrowdCamMode
+ 3514  002BF920    608  void GolfCamera_InitGreenRollCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt lastLocation
+                         local  struct AIshot_t currentShot
+                         local  bool done
+                         local  float distToCup
+                         local  float ballY
+                         local  float timeStep
+                         local  float timeInterval
+                         local  struct PhysicsBall_t* pSimBall
+                         local  bool passedCup
+                         local  vec4flt trajectory
+                         inlines  CA_vSetCameraFieldOfView, CameraController_GetCameraLookPoint, LLMath_Add3, LLMath_DistanceBetween3, LLMath_Length3, LLMath_Scale, LLMath_Subtract3, RC_spGetRenderCtxCamera, __vec_len_sqr3, vec4flt_Copy, vec4flt_Copy3, vec_splat, vec_st, vec_sub
+ 3721  002C000C    F84  void GolfCamera_ProcessGreenRollCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt origCamPos
+                         local  int currentCup
+                         local  bool cameraOriginAtDest
+                         local  vec4flt delta
+                         local  float deltaY
+                         local  vec4flt curr
+                         local  vec4flt next
+                         local  float dist2D
+                         local  float deltaSlope
+                         local  vec4flt offset
+                         local  float distMoved
+                         local  float desiredDistance
+                         local  float distToNext
+                         local  float accel
+                         local  float scale
+                         local  bool closeEnough
+                         local  vec4flt trajectory
+                         local  vec4flt cvector
+                         local  vec4flt lagLookAtVector
+                         local  vec4flt lastLocation
+                         local  int aheadframe
+                         local  float max_angle
+                         local  vec4flt trajectory
+                         inlines  CameraController_GetCameraLookPoint, GM_GetCurrentFlagPositionIndex, LLMath_Add3, LLMath_DistanceBetween3, LLMath_Scale, LLMath_Subtract, LLMath_Subtract3, __vec_len_sqr3, __vec_mul, vec4flt_Copy, vec4flt_Copy3, vec_madd, vec_sld, vec_sub
+ 4341  001F1EF8     A0  int GolfCamera_GreenRollInitialPause(CameraController_t* pCameraController)
+ 4363  002BFF28     E4  bool GolfCamera_GreenRollDone(CameraController_t* pCameraController, float minDist)
+                         local  vec4flt delta
+                         local  float dist
+                         local  vec4flt* pCameraOrigin
+                         inlines  LLMath_Length3, LLMath_Subtract, vec_madd, vec_sld
+ 4385  00245D54     1C  void GolfCamera_GreenRollGetCamOrigin(CameraController_t* pCameraController, float* camOrigin)
+                         local  vec4flt* pCameraOrigin
+ 4498  002C0F90    5D0  void GolfCamera_InitEllipseOrbitCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID, bool initRotation)
+                         local  float fGroundHeight
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt referencePos
+                         local  vec4flt vCup
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  vec4flt midPos
+                         local  vec4flt ballAdj
+                         local  vec4flt ballToCup
+                         local  vec4flt ballToAim
+                         local  bool badHeight
+                         local  float distToCup
+                         local  float distToAim
+                         inlines  CameraController_GetCameraLookPoint, LLMath_Add, LLMath_Length3, LLMath_Scale, LLMath_Subtract, __vec_len_sqr3, __vec_mul, vec4flt_Copy, vec_ld, vec_madd, vec_sld, vec_splat, vec_st, vec_sub
+ 4673  002C1560    44C  void GolfCamera_InitBloodGreenSomeZoomCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  enum PlayerNumber_t otherPlayerID
+                         local  float fFOV_half
+                         local  vec4flt vPrimaryBallPosition
+                         local  vec4flt vSecondaryBallPosition
+                         local  float fPullbackLength
+                         local  vec4flt vLookDirection
+                         local  vec4flt vLookDirection_ProjXZ
+                         local  vec4flt vLookDirection_OrthProjXZ
+                         local  vec4flt vPriToSecBall_ProjXZ
+                         inlines  LLMath_AddScale3, LLMath_DotProduct, LLMath_Length3, LLMath_Subtract3, std::sinf, vec4flt_Copy, vec4flt_Zero, vec_add, vec_ld, vec_madd, vec_sld, vec_splat, vec_st, vec_sub
+ 4754  002D8A9C    88C  void GolfCamera_ProcessBloodGreenSomeZoomCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt vNewCameraPosition
+                         local  enum PlayerNumber_t selectingPlayer
+                         local  enum PlayerNumber_t teammateSelectingPlayer
+                         local  int32 joypadID
+                         local  struct Controller_StickInfo* stickInfo
+                         local  int32 joypadID2
+                         local  struct Controller_StickInfo* stickInfo2
+                         local  float fNewCameraHeight
+                         local  vec4flt vLkTransition
+                         local  vec4flt vLkDiff
+                         local  struct SSphere spOtherBall
+                         local  struct RC_SRenderCtx* spRenderCtx_p
+                         local  struct SFrustum frustum
+                         local  enum ClipTest clipTest
+                         local  void* gameModePtr
+                         local  const int kStickLow
+                         local  const int kStickHigh
+                         local  const int kStickRange
+                         local  const float MAX_YAW_ANGLE
+                         local  const float ROTATION_RATE
+                         local  vec4flt vLookVector
+                         local  float orgCamDist
+                         local  float sinp
+                         local  float cosp
+                         local  vec4flt workVector
+                         local  float zoomStep
+                         local  float rotationStep
+                         local  uint8 axis
+                         local  void* gameModePtr
+                         local  float zoomStep
+                         local  float rotationStep
+                         inlines  LLMath_Add3, LLMath_AddScale3, LLMath_Length3, LLMath_Subtract3, SSphere::set, __vec_make_from_scalar, std::cosf, std::sinf, vec4flt_Copy, vec4flt_Zero, vec_madd, vec_sld, vec_st, vec_sub
+ 4908  002C19AC    2A8  void GolfCamera_ProcessEllipseOrbitCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  float fRotateStep
+                         local  float fGroundHeight
+                         local  vec4flt referencePos
+                         local  vec4flt fCameraToOrigin
+                         local  struct Controller_StickInfo* stickInfo
+                         local  int32 iPadID
+                         local  vec4flt newCameraOffset
+                         local  vec4flt rotCameraOffset
+                         local  float currdist
+                         local  float delta_scale
+                         inlines  CameraController_GetCameraLookPoint, LLMath_Length3, LLMath_Subtract3, std::cosf, std::sinf, vec_madd, vec_sld
+ 5018  002EAAE8     E4  void GolfCamera_InitTrophyViewCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  CameraChainLink* pCamera
+                         inlines  CameraController_GetCameraLookPoint
+ 5032  001ED7A8      4  void GolfCamera_ProcessTrophyViewCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+ 5037  002EA990    158  void GolfCamera_InitMuseumNavCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  CameraChainLink* pCamera
+                         local  vec4flt xOffset
+                         inlines  CA_vSetCameraFieldOfView, CameraController_GetCameraLookPoint, LLMath_Add3, RC_spGetRenderCtxCamera, vec4flt_Copy3
+ 5070  0028BB90    E3C  void GolfCamera_ProcessMuseumNavCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  float fGenericMovementStep
+                         local  float fUpDownMovementStep
+                         local  float fRotateStep
+                         local  vec4flt fDelta
+                         local  int32 iPadID
+                         local  struct Controller_StickInfo* stickInfo
+                         local  struct TGD_TerrainInfo* pTerrainGameData
+                         local  float fGroundHeight
+                         local  vec4flt oldCameraPos
+                         local  vec4flt oldLookPos
+                         local  const int kStickLow
+                         local  const int kStickHigh
+                         local  const int kStickRange
+                         local  vec4flt referencePos
+                         local  float heightMax
+                         local  float fAngle
+                         local  float fOffset
+                         local  float fBaseLength
+                         local  float fPitch
+                         local  float fBaseLength
+                         local  float fPitch
+                         local  float fAngle
+                         inlines  CameraController_GetCameraLookPoint, LLMath_Subtract3, std::cosf, std::sinf, std::sqrt, vec4flt_Copy3
+ 5274  0026858C    2F8  void GolfCamera_RotateGreenCamRight(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt aimToCam
+                         local  vec4flt rotationAxis
+                         local  vec4flt curPosition
+                         local  vec4flt targetPosition
+                         local  Quat rotationQuat
+                         local  float rotationAmount
+                         inlines  CameraController_RotatingBall, LLMath_Add3, LLMath_Scale3, LLMath_Subtract3, __vec_mul, vec4flt_Copy3, vec_ld
+ 5346  002682B0    2DC  void GolfCamera_RotateGreenCamLeft(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt aimToCam
+                         local  vec4flt rotationAxis
+                         local  Quat rotationQuat
+                         local  float rotationAmount
+                         local  vec4flt targetPosition
+                         local  vec4flt curPosition
+                         inlines  CameraController_RotatingBall, LLMath_Add3, LLMath_Scale3, LLMath_Subtract3, __vec_mul, vec4flt_Copy3, vec_ld
+ 5414  002C1FF0    39C  void GolfCamera_MoveGreenCamForward(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt aimToCam
+                         local  float camHeight
+                         local  float aimToCamLength
+                         local  vec4flt targetPosition
+                         local  vec4flt curPosition
+                         inlines  CameraController_RotatingBall, LLMath_Add3, LLMath_Length3, LLMath_Scale3, LLMath_Subtract3, vec4flt_Copy3, vec_madd, vec_sld
+ 5496  002C1C54    39C  void GolfCamera_MoveGreenCamBack(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt aimToCam
+                         local  float aimToCamLength
+                         local  vec4flt curPosition
+                         local  vec4flt targetPosition
+                         local  float camHeight
+                         inlines  CameraController_RotatingBall, LLMath_Add3, LLMath_Length3, LLMath_Scale3, LLMath_Subtract3, vec4flt_Copy3, vec_madd, vec_sld
+ 5583  002C238C    1D0  void GolfCamera_StopGreenCam(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID, bool forwards, bool sideways)
+ 5677  001F361C    104  void GolfCamera_InitFlyByCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  CameraChainLink* link
+                         local  int flybyNum
+ 5714  002ED58C    1B4  void GolfCamera_ProcessFlyByCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt fadeColor
+                         local  float fadeLength
+                         local  struct CameraScriptSettings_t* settings
+                         local  enum CameraFadeType_e prev_fade
+                         inlines  CameraController_GetCameraLookPoint, vec4flt_Copy, vec_ld
+ 5874  002EA8E4     AC  void GolfCamera_InitClubHouseCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         inlines  CamScript_SetCurrentCrACEvent, CameraController_GetCameraLookPoint
+ 5900  002E77E4    290  void GolfCamera_ProcessClubHouseCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  float timeStep
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  struct CameraScriptSettings_t* settings
+                         local  vec4flt oldCameraPos
+                         local  vec4flt unRaisedCameraPos
+                         local  int32_t eventPair
+                         inlines  CameraController_GetCameraLookPoint, vec4flt_Copy3
+ 5978  002DC9DC    33C  void GolfCamera_InitPreShotCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  CameraChainLink* preShotCam
+                         local  enum CameraInterpType_e interpType
+                         local  float interpTime
+                         local  float interpSpeed
+                         local  enum Lie_t startLie
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  enum CameraEvent_e timeTrigger
+                         local  float timeTriggerTime
+                         inlines  CameraController_GetCameraLookPoint
+ 6107  002E7660    184  void GolfCamera_ProcessPreShotCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  float interpTime
+                         local  float interpSpeed
+                         local  enum CameraEvent_e timeTrigger
+                         local  float timeTriggerTime
+                         local  enum CameraInterpType_e interpType
+                         local  CameraChainLink* preShotCam
+                         local  bool switchCams
+                         inlines  CameraController_GetCameraLookPoint, GamePlayer::GetCharacter
+ 6170  002DC668    374  void GolfCamera_InitTigerVisionCam(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt cupLoc
+                         local  vec4flt ballLoc
+                         local  vec4flt movedBallLoc
+                         local  vec4flt cupVec
+                         local  vec4flt idVec
+                         inlines  LLMath_CrossProduct3W0, vec3flt_Add, vec3flt_Scale, vec3flt_Subtract, vec4flt_Copy, vec_madd, vec_nmsub, vec_perm, vec_st
+ 6246  002E75DC     84  void GolfCamera_ProcessTigerVisionCam(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+ 6260  0024EBB4     30  void GolfCamera_InitTempleCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         inlines  vec4flt_Copy, vec_st
+ 6272  0024EBE4      4  void GolfCamera_ProcessTempleCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+ 6282  002E94A0    6D8  void GolfCamera_InitSwingCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  CameraChainLink* swingCam
+                         local  CameraChainLink* closeLink
+                         local  CameraSequence_t* closeSeq
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  enum CameraInterpType_e interpType
+                         local  float interpTime
+                         local  float interpSpeed
+                         local  enum Lie_t startLie
+                         local  CameraSequence_t* prevSequence
+                         local  enum CameraEvent_e timeTrigger
+                         local  float timeTriggerTime
+                         local  CameraSequence_t* tapinSeq
+                         local  CameraChainLink* tapinLink
+                         local  enum CameraShotState_e eState
+                         inlines  CA_vSetCameraFieldOfView, CameraController_GetCameraLookPoint, RC_spGetRenderCtxCamera, vec4flt_Copy3
+ 6622  0025F0B0    184  void GolfCamera_InitDrawFadeSwingCamera(CameraController_t* pCameraController, enum PlayerNumber_t playerNum)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  vec4flt offsetVec
+                         inlines  CameraController_GetCameraLookPoint, LLMath_Add3, LLMath_Scale3, LLMath_Subtract3, __vec_mul, vec4flt_Copy3
+ 6657  002E8DF0    6B0  void GolfCamera_InitOutlawPuttCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  CameraChainLink* swingCam
+                         local  CameraChainLink* closeLink
+                         local  CameraSequence_t* closeSeq
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  enum CameraInterpType_e interpType
+                         local  float interpTime
+                         local  float interpSpeed
+                         local  enum Lie_t startLie
+                         local  CameraSequence_t* prevSequence
+                         local  enum CameraEvent_e timeTrigger
+                         local  float timeTriggerTime
+                         local  CameraSequence_t* tapinSeq
+                         local  CameraChainLink* tapinLink
+                         inlines  CA_vSetCameraFieldOfView, CameraController_GetCameraLookPoint, RC_spGetRenderCtxCamera, vec4flt_Copy3
+ 6993  002E71F0    3EC  void GolfCamera_ProcessSwingCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  float timeStep
+                         local  struct GoTemple* pTemple
+                         local  enum TempleStateE eTempleState
+                         local  vec4flt vTarget
+                         local  vec4flt teePos
+                         local  vec4flt vAimVector
+                         local  vec4flt vNormAimVector
+                         local  vec4flt vLookPointDisp
+                         local  float_t fDist
+                         inlines  CameraController_GetCameraLookPoint, GoTemple::GetCurrentState, LLMath_Add3, LLMath_Scale3, LLMath_Subtract3, __vec_make_from_scalar, __vec_mul, vec4flt_Copy, vec_ld, vec_splat, vec_sub
+ 7086  0025F234    194  void GolfCamera_ProcessDrawFadeSwingCamera(CameraController_t* pCameraController, enum PlayerNumber_t playerNum)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  vec4flt offsetVec
+                         inlines  CameraController_GetCameraLookPoint, LLMath_Add3, LLMath_Scale3, LLMath_Subtract3, __vec_mul, vec4flt_Copy3
+ 7116  002B4CF8    2CC  void GolfCamera_CalculateOutlawPuttOriginAndLookPoint(enum PlayerNumber_t ePlayerID, vec4flt* origin, vec4flt* lookAt)
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  vec4flt ballPos2D
+                         local  vec4flt targetPos2D
+                         local  float distToTarget
+                         local  float lerpPct
+                         local  vec4flt lerpVector
+                         local  vec4flt posAlongLerpVector
+                         local  float cameraMoveMultiplier
+                         local  float startPct
+                         inlines  LLMath_Add3, LLMath_DistanceBetween3, LLMath_Scale3, LLMath_Subtract3, __vec_mul, vec_ld, vec_madd, vec_sld
+ 7159  002E6CDC    514  void GolfCamera_ProcessOutlawPuttCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt outlawCameraOrigin
+                         local  vec4flt outlawCameraLookPoint
+                         local  float timeStep
+                         local  enum SW_eSwingState swingState
+                         local  bool isSwingStickInCenter
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  float distToTarget
+                         local  vec4flt lerpVector
+                         local  vec4flt posAlongLerpVector
+                         inlines  CameraController_GetCameraLookPoint, LLMath_Add3, LLMath_DistanceBetween3, LLMath_Scale3, LLMath_Subtract3, __vec_make_from_scalar, vec4flt_Copy, vec_ld
+ 7315  002EC1B8     40  void GolfCamera_InitReplaySwingCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+ 7331  002EBE08    3B0  void GolfCamera_ProcessReplaySwingCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt fadeColor
+                         local  float alpha
+                         local  CameraChainLink* origLink
+                         local  enum CameraInterpType_e origInterpType
+                         inlines  CameraController_GetCameraLookPoint, Character_GetTagTime, GamePlayer::GetCharacter, GolfCamera_UpdateSwingSlowMoCamera, vec4flt_Copy
+ 7407  0029B810    140  float GolfCamera_ReplayReverseCalculateLockedFov(float currentDist)
+                         inlines  LuaTuningFileManager::Call<float, float>
+ 7419  002B4FC4    488  void GolfCamera_LoadReplayReverseCamParamaters(struct CoreShotInfo_t* coreShotInfo, vec4flt* cameraOrigin)
+                         local  float distance
+                         inlines  LLMath_DistanceBetween3, LuaTuningFileManager::Call<float, float>, LuaTuningFileManager::Call<float>, vec_madd, vec_sld
+ 7444  002B544C    2E4  void GolfCamera_InitReplayReverseCamera(CameraController_t* cameraController, enum PlayerNumber_t playerNum)
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  vec4flt* cameraOrigin
+                         local  vec4flt* cameraLookPoint
+                         local  vec4flt ballFinalPos
+                         local  vec4flt newCamPos
+                         local  vec4flt sideVec
+                         local  vec4flt up
+                         local  TGD_TerrainInfo* terrainGameData
+                         local  struct CA_SCamera* cam
+                         inlines  CA_vSetCameraFieldOfView, LLMath_Add3, LLMath_CrossProduct3W0, LLMath_Scale3, LLMath_Subtract3, RC_spGetRenderCtxCamera, __vec_cross, __vec_make_from_scalar, __vec_mul, vec4flt_Copy3, vec_ld, vec_madd, vec_nmsub, vec_perm, vec_splat, vec_sub
+ 7500  002B5730    16C  void GolfCamera_ProcessReplayReverseCamera(CameraController_t* cameraController, enum PlayerNumber_t playerNum)
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  vec4flt* cameraLookPoint
+                         local  vec4flt* cameraOrigin
+                         local  vec4flt finalPos
+                         local  struct CA_SCamera* cam
+                         local  float currentFov
+                         local  float distance
+                         local  float newFov
+                         local  float fovInterp
+                         inlines  CA_fGetCameraFieldOfView, CA_vSetCameraFieldOfView, LLMath_DistanceBetween3, RC_spGetRenderCtxCamera, vec4flt_Copy3, vec_madd, vec_sld
+ 7529  002EA230     68  void GolfCamera_Init3ScreenCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+ 7546  00313A8C     FC  void GolfCamera_Process3ScreenCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  int32 viewContID
+                         inlines  CameraController_GetCameraLookPoint
+ 7572  001F1FE4      4  void GolfCamera_TurnOffComicCam(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+ 7605  002E8BD4    21C  void GolfCamera_InitHeartBeatCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt fadeColor
+                         local  CameraChainLink* link
+                         local  float hitTime
+                         local  float topTime
+                         local  float timeDiff
+                         local  float camTime
+                         local  float numFramesForCompleteSwing
+                         local  float numFramesForCompleteCam
+                         local  float gameSpeed
+                         inlines  CameraController_GetCameraLookPoint
+ 7668  002E896C    268  void GolfCamera_ProcessHeartBeatCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt fadeColor
+                         local  CameraChainLink* link
+                         inlines  CameraController_GetCameraLookPoint
+ 7771  002DC574     F4  void GolfCamera_InitShutterCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  CameraChainLink* link
+                         inlines  CameraController_GetCameraLookPoint
+ 7805  002E6A90    24C  void GolfCamera_ProcessShutterCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt fadeColor
+                         local  float origFade
+                         local  float topTime
+                         local  float hitTime
+                         local  float timeDiff
+                         local  CameraChainLink* link
+                         inlines  CameraController_GetCameraLookPoint
+ 7902  002DBE5C    718  void GolfCamera_InitBallFlightCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt shotDirection
+                         local  CameraSequence_t* pFlopSeq
+                         local  uint32 endLie
+                         local  enum Lie_t startLie
+                         local  float shotDist
+                         local  vec4flt shotPath
+                         local  CameraChainLink* newLink
+                         local  float interpTime
+                         inlines  CameraController_GetCameraLookPoint, LLMath_Add3, LLMath_Length3, LLMath_Scale3, LLMath_Subtract3, __vec_mul, vec_madd, vec_sld
+ 8166  00312FBC    AD0  void GolfCamera_ProcessBallFlightCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  CameraChainLink* newLink
+                         local  float interpTime
+                         local  enum CameraInterpType_e interpType
+                         local  float timeStep
+                         local  int iClosestTimeTrigger
+                         local  int i
+                         local  float fClosestTimeTrigger
+                         local  float interpSpeed
+                         local  enum CameraEvent_e timeTrigger
+                         local  float timeTriggerTime
+                         local  bool wasManual
+                         local  bool scriptChanged
+                         local  float estimatedBallFlight
+                         local  float distanceToPin
+                         local  vec4flt originalPos
+                         local  struct RC_SRenderCtx* renderContext_p
+                         local  VM_SViewport* viewport_p
+                         local  int32 viewContID
+                         local  bool usingDebugCamera
+                         local  struct GoTemple* pTemple
+                         local  bool bSelectScript
+                         local  int i
+                         local  CameraSequence_t* newSeq
+                         local  int i
+                         local  int i
+                         local  uint32 endLie
+                         local  const struct AIFeatureNetwork* pGreenEdgeNetwork
+                         local  struct TGD_MaterialInfo* endLieInfo
+                         inlines  CamScript_DoesScriptTrackGolfer, CameraController_GetCameraLookPoint, GameEffects_IsPredictedGameBreakerOn, GoTemple::GetTemplEnv, GoTempleEnv::TriggerCollisionEffect, Singleton<AIFeatureNetworkMgr>::GetSingleton
+ 8750  002DBBB8    2A4  void GolfCamera_InitPostShotCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  CameraChainLink* newLink
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  enum CameraInterpType_e interpType
+                         local  float interpTime
+                         local  float interpSpeed
+                         local  enum CameraEvent_e timeTrigger
+                         local  float timeTriggerTime
+                         inlines  CameraController_GetCameraLookPoint, GamePlayer::GetCharacter
+ 8880  002ED07C    510  void GolfCamera_ProcessPostShotCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt camToBall
+                         local  vec4flt straightAheadVec
+                         local  mat44flt eulerMatrix
+                         local  float fGroundHeight
+                         local  CameraChainLink* newLink
+                         local  float offset
+                         local  enum GolferState curr_state
+                         inlines  CamScript_DoesScriptTrackBall, CameraController_GetCameraLookPoint, LLMath_Add3, LLMath_Length3, LLMath_Subtract3, LLMath_mat44fltMultiply33, vec_madd, vec_sld, vec_splat
+ 9003  002DBBB4      4  void GolfCamera_InitPsycheOutCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+ 9008  002E6A0C     84  void GolfCamera_ProcessPsycheOutCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+ 9024  002DBA58    15C  void GolfCamera_InitInHoleCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  bool removeBallCam
+ 9096  002E6978     94  void GolfCamera_ProcessInHoleCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         inlines  CameraController_GetCameraLookPoint
+ 9129  0024AD20     80  void GolfCamera_InitScoreCardCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt fadeColor
+ 9143  00264C8C     88  void GolfCamera_ProcessScoreCardCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+ 9159  00252F50    244  void GolfCamera_InitTutorialWaitCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt fadeColor
+                         local  char[14] name
+                         inlines  cGAME_GLOBALS::SetAllPlayersOnGreen
+ 9239  002E6888     F0  void GolfCamera_ProcessTutorialWaitCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+ 9265  002DB4D0    19C  void GolfCamera_InitInactivityCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  CameraChainLink* inActivityCam
+                         local  enum CameraInterpType_e interpType
+                         local  float interpTime
+                         local  float interpSpeed
+                         local  enum Lie_t startLie
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  enum CameraEvent_e timeTrigger
+                         local  float timeTriggerTime
+                         local  float shotDist
+                         local  uint32 endLie
+ 9327  002E653C    34C  void GolfCamera_ProcessInactivityCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  float interpTime
+                         local  float interpSpeed
+                         local  enum CameraEvent_e timeTrigger
+                         local  float timeTriggerTime
+                         local  enum CameraInterpType_e interpType
+                         local  CameraChainLink* inActivityCam
+                         local  bool switchCams
+                         local  bool newCamOK
+                         local  int i
+                         local  enum Lie_t startLie
+                         local  float shotDist
+                         local  uint32 endLie
+                         local  int randnum
+                         local  CameraSequence_t* newseq
+                         inlines  CameraController_GetCameraLookPoint, GamePlayer::GetCharacter
+ 9443  001F1E5C     30  float TransitionSimple(float fStartValue, float fEndValue, float fFactor)
+                         local  float fDeltaValue
+ 9454  0024A5A8    17C  float TransitionAngle(float fStartValue, float fEndValue, float fFactor)
+                         local  float fDeltaValue
+                         local  float sign
+                         inlines  std::fabs
+ 9493  0024A724    190  bool AngleWithinRange(float rangeAngle, float rangeEpsilon, float checkAngle)
+                         local  float delta
+                         inlines  std::fabs
+ 9527  002469C4     98  void GolfCamera_InitGreenSelectCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+ 9542  0025F5C0    310  void GolfCamera_ProcessGreenSelectCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt pSavedCameraOrigin
+                         local  vec4flt pSavedCameraLookPoint
+                         local  vec4flt greenPos
+                         local  vec4flt teeLocation
+                         local  vec4flt dir
+                         local  int greenIdx
+                         inlines  CameraController_GetCameraLookPoint, LLMath_AddScale3, LLMath_Negate3, LLMath_Subtract3, __vec_make_from_scalar, vec4flt_Copy, vec_ld, vec_madd, vec_splat, vec_sub
+ 9612  00246A5C     5C  void GolfCamera_InitCupSelectCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+ 9621  0028C9CC    2B0  void GolfCamera_ProcessCupSelectCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt pSavedCameraOrigin
+                         local  vec4flt pSavedCameraLookPoint
+                         local  vec4flt dir
+                         local  float sinp
+                         local  float cosp
+                         local  const float[4]& cupLocation
+                         inlines  CameraController_GetCameraLookPoint, LLMath_AddScale3, LLMath_Negate3, std::cosf, std::sinf, vec4flt_Copy, vec_madd, vec_splat, vec_sub
+ 9682  001F2224     90  void GolfCamera_InitSpecialMomentsCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+ 9693  002C255C    4D4  void GolfCamera_ProcessSpecialMomentsCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt playerPos
+                         local  vec4flt cupPos
+                         local  vec4flt playerToCupVec
+                         local  vec4flt lookAtPos
+                         local  vec4flt lookAtToCameraVec
+                         local  vec4flt upVec
+                         local  vec4flt cameraPos
+                         local  vec4flt crowdPos
+                         local  vec4flt playerToCrowdVec
+                         local  float FOV_radians
+                         local  float halfFOV_radians
+                         local  float distanceFromLookAt
+                         local  float playerToCupDistance
+                         local  float halfDistance
+                         local  float newFOV
+                         local  float tempHeight
+                         local  vec3flt focus_point
+                         inlines  CA_vSetCameraFieldOfView, CameraController_GetCameraLookPoint, LLMath_CrossProduct3W0, LLMath_DotProduct3, LLMath_Length3, LLMath_Negate3, LLMath_Subtract3, RC_spGetRenderCtxCamera, vec4flt_Copy, vec_madd, vec_sld, vec_sub
+ 9812  002DB3B0    120  void GolfCamera_InitFECamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  CameraChainLink* pLink
+                         inlines  CameraController_GetCameraLookPoint
+ 9848  002EC1F8    20C  void GolfCamera_ProcessFECamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  CameraChainLink* pLink
+                         inlines  CameraController_GetCameraLookPoint
+ 9904  001F22B4      C  void GolfCamera_ResetFECamera(CameraController_t* pCameraController)
+ 9909  002E55D8    4A8  void GolfCamera_SwitchCrAPCamera(CameraController_t* pCameraController, const char* camName, enum FE_eCrAPCameraState idleState, bool interp, bool zoom, bool undoInterp)
+                         local  CameraChainLink* pLink
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  char oldCamChar
+                         local  char[33] tmpCamName
+                         inlines  CameraController_GetCameraLookPoint
+10092  002C34F4    624  static bool GolfCamera_ZoomCamGetStartAndEndVecs(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID, vec4flt* pCameraOrigin, float* startingPosition, float* endPosition)
+                         local  bool intersectedBoundary
+                         local  vec4flt targetPos
+                         local  vec4flt playerToAim
+                         local  vec4flt playerToAimScaled
+                         local  vec4flt position
+                         local  vec4flt playerToEndPos
+                         local  vec4flt intersect
+                         local  float zoomToAimDist
+                         local  float playerToAimDist
+                         local  float zoomToAimPercent
+                         local  struct TNetwork* network
+                         local  vec4flt xVector
+                         local  vec4flt zVector
+                         inlines  LLMath_Add3, LLMath_DotProduct3, LLMath_Length3, LLMath_Scale3, LLMath_Subtract3, __vec_dot3, vec4flt_Copy, vec_madd, vec_sld, vec_sub
+10261  0025C99C     84  bool GolfCamera_AllowSpecialCameraType(uint32 specialCam)
+                         local  uint32 testBits
+10298  0026BAB8     3C  void GolfCamera_DisableSpecialCameraType(uint32 specialCam)
+                         local  uint32 testBits
+                         local  uint32 option
+                         inlines  cGAME_GLOBALS::GetSpecCameraDisabledOption, cGAME_GLOBALS::SetSpecCameraDisabledOption
+10321  001F22C0     38  void GolfCamera_EnableSpecialCameraType(uint32 specialCam)
+                         local  uint32 testBits
+                         local  uint32 finalBits
+                         inlines  cGAME_GLOBALS::GetSpecCameraDisabledOption, cGAME_GLOBALS::SetSpecCameraDisabledOption
+10344    inline-only   static bool GolfCamera_ChooseImpactMatrixCam(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+10363  001F22F8     C0  bool GolfCamera_Choose3ShotCam(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+10408  001EE028      8  bool GolfCamera_ChooseExtendedReplayCam(CameraController_t* pCameraController)
+10417  001F213C     14  bool GolfCamera_ChooseLowBallCam(CameraController_t* pCameraController)
+10425  001F2128     14  bool GolfCamera_ChooseSwitchOnImpactReplayCam(CameraController_t* pCameraController)
+10436  001F23B8     14  bool GolfCamera_ChooseMultiShotCam(CameraController_t* pCameraController)
+10450  001F23CC     68  bool GolfCamera_ChooseSingleReplay(CameraController_t* pCameraController)
+10480  001F245C     C8  bool GolfCamera_StartReplayAnimAtStart(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+10599  001F2524    150  enum CameraShotState_e GolfCamera_GetBaseReplayCameraState(enum CameraSpecialSwings_t specialSwing)
+                         local  enum CameraShotState_e state
+10693  001F2674     80  enum CameraShotState_e GolfCamera_GetBallImpactReplayCameraState(enum CameraSpecialSwings_t specialSwing)
+                         local  enum CameraShotState_e state
+10723  001F2150      8  bool GolfCamera_Choose3ScreenCam(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+10738  001F2434     14  bool GolfCamera_ChooseHeartBeatCam(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+10752  001F2448     14  bool GolfCamera_ChooseShutterCam(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+10766    inline-only   static bool GolfCamera_ChooseSuperZoomCam(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+10782  001F26F4      C  int GolfCamera_NumCompletedReplayCams(CameraController_t* pCameraController)
+10794  0024A8B4    108  bool GolfCamera_SteepSlopeCamCheckSlope(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID, float inclineSlope, float declineSlope)
+                         local  float slope
+                         local  float dx
+                         local  float dy
+                         inlines  std::fabs
+10831  00275A14     84  bool GolfCamera_SteepSlopeCamCheckCollision(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt collisionPoint
+                         local  vec4flt surfaceNormal
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  TGD_ObjectInstanceInfo* pSurfaceObject
+                         local  bool gotCollision
+                         local  int terrainID
+10853  00294154     E0  bool GolfCamera_NeedSteepSlopeCam(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  bool runThisCamera
+10910  002C2C18    640  void GolfCamera_ComputeSteepSlopeCamVectors(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt targetPos
+                         local  vec4flt lastGoodCamPos
+                         local  vec4flt lastGoodCamLookPoint
+                         local  vec4flt prevCamPos
+                         local  vec4flt prevTarget
+                         local  vec4flt camPos
+                         local  vec4flt offsetPlayerPos
+                         local  vec4flt lookVect
+                         local  vec4flt lookVectNormalized
+                         local  float targetDiff
+                         local  float distBack
+                         local  vec4flt origTargetPos
+                         local  float epsilonSquared
+                         local  bool gotCollision
+                         local  bool ballOnScreen
+                         local  struct PhysicsBall_t* pBall
+                         local  bool lookingUp
+                         local  vec4flt collisionPoint
+                         local  vec4flt surfaceNormal
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  TGD_ObjectInstanceInfo* pSurfaceObject
+                         local  int32 iter
+                         local  int32 maxIter
+                         local  int32 lastIter
+                         local  bool done
+                         local  bool almostDone
+                         local  int terrainID
+                         inlines  LLMath_AddScale3, LLMath_SquareDistanceBetween3, LLMath_Subtract3, __vec_len_sqr3, __vec_make_from_scalar, vec3flt_Copy, vec4flt_Copy, vec_madd, vec_sld, vec_splat, vec_sub
+11086  00274B08    3E4  static void GolfCamera_ClampLookAngle(float* origin, float* target, float* newTarget)
+                         local  Quat rotationQuat
+                         local  vec4flt rotationAxis
+                         local  vec4flt xzVect
+                         local  vec4flt xzVectNormalized
+                         local  vec4flt lookVect
+                         local  vec4flt lookVectNormalized
+                         local  vec4flt newLook
+                         local  float angle
+                         local  float rotateLookBy
+                         local  bool boClampLookAngle
+                         local  bool up
+                         local  float maxUpAngle
+                         local  float maxDownAngle
+                         inlines  LLMath_Add3, LLMath_CrossProduct3W0, LLMath_DotProduct3, LLMath_Scale, LLMath_Subtract3, __vec_dot3, __vec_mul, vec_ld, vec_madd, vec_sld, vec_sub
+11169  002C2A30    1E8  static bool GolfCamera_LimitPositionChange(float* fromPos, float* toPos, float maxDist, float* newToPos)
+                         local  vec4flt diff
+                         local  vec4flt scaledDiff
+                         local  float dist
+                         local  bool retValue
+                         inlines  LLMath_Add3, LLMath_Length3, LLMath_Scale3, LLMath_Subtract3, __vec_make_from_scalar, __vec_mul, vec4flt_Copy3, vec_ld, vec_madd, vec_sld, vec_splat
+11194  001F2700     1C  void GolfCamera_SetCurrentFlybyRoute(int routeNum)
+11199  001F271C     20  int GolfCamera_GetCurrentFlybyRoute()
+11205  001F1FE8     70  static CameraChainLink* GolfCamera_GetAlternateSwingCamera(int num, enum PlayerNumber_t ePlayerID)
+                         local  int i
+                         local  CameraChainLink* newLink
+11229  002DB31C     94  void GolfCamera_vSwitchToDefaultSwingCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  CameraChainLink* newLink
+                         local  enum CameraInterpType_e interpType
+                         local  float interpTime
+                         inlines  CameraController_GetCameraLookPoint
+11267  002E8758    214  void GolfCamera_vSwitchToNextAlternateSwingCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  CameraChainLink* newLink
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  int32_t origSwingMode
+                         local  enum CameraInterpType_e interpType
+                         local  float interpTime
+                         inlines  CameraController_GetCameraLookPoint
+11351  002495EC     AC  bool GolfCamera_AreThereMorePostShotCamsLeft(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  CameraChainLink* newLink
+11399    inline-only   static void GolfCamera_CreateMatrixCamera(CameraController_t* pCameraController, float* cameraOrigin, float* lookAt, enum PlayerNumber_t ePlayerID)
+11583    inline-only   static float GolfCamera_UpdateMatrixCamera(CameraController_t* pCameraController, float* cameraOrigin, float* lookAt, enum PlayerNumber_t ePlayerID)
+                         local  float timeStep
+11655    inline-only   static void GolfCamera_CreateSuperZoomCamera(CameraController_t* pCameraController, float* cameraOrigin, float* lookAt, enum PlayerNumber_t ePlayerID)
+11773    inline-only   static float GolfCamera_UpdateSuperZoomCamera(CameraController_t* pCameraController, float* cameraOrigin, float* lookAt, enum PlayerNumber_t ePlayerID)
+                         local  float timeStep
+11865  002EBDD4     34  void GolfCamera_PickNextSwingReplayCam(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+11885  002EB810    5C4  static void GolfCamera_CreateReplayCamera(CameraController_t* pCameraController, float* cameraOrigin, float* lookAt, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  CameraChainLink* link
+                         local  enum CameraShotState_e cameraShotState
+                         local  float time
+                         local  struct TCharacter* pCharacter
+                         local  enum CameraShotState_e cameraShotState
+                         local  float time_swingTop
+                         local  float adj_swingtop
+                         local  float time_swingTop
+                         local  float adj_swingtop
+                         local  float time_ballHit
+                         local  float time_swingTop
+                         local  float adj_swingtop
+                         local  float time_ballHit
+                         inlines  CameraController_GetCameraLookPoint, Character_GetTagTime, GamePlayer::GetCharacter
+12114    inline-only   static void GolfCamera_UpdateSwingSlowMoCamera(CameraController_t* pCameraController, float* cameraOrigin, float* lookAt, enum PlayerNumber_t ePlayerID)
+                         local  float hitTime
+                         local  float startTime
+                         local  float topTime
+                         local  float curTime
+                         local  float percent
+12144  001F27A8      8  bool GolfCamera_ChooseSuperSwing(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+12158  001F27B0     14  bool GolfCamera_IsSuperSwing(CameraController_t* pCameraController)
+12175  002C32E0    214  void GolfCamera_ZoomGreenCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt playerToTarget
+                         inlines  LLMath_Length3, LLMath_Subtract3, vec_madd, vec_sld
+12200  001F27C4     38  void GolfCamera_UnZoomGreenCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+12208  002DB66C    3EC  static void GolfCamera_ChooseReactionCam(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  uint32 endLie
+                         local  enum Lie_t startLie
+                         local  float shotDist
+                         local  vec4flt shotPath
+                         local  CameraSequence_t* pairedSeq
+                         local  CameraChainLink* newLink
+                         local  enum CameraInterpType_e interp
+                         local  float time
+                         local  float speed
+                         local  enum CameraEvent_e timeTrigger
+                         local  float timeTriggerTime
+                         inlines  CameraController_GetCameraLookPoint, LLMath_Length3, LLMath_Subtract3, vec_madd, vec_sld
+12318  002DAFF4    328  void GolfCamera_CutToGolferDoneAnimatingCam(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  CameraChainLink* newLink
+                         local  enum CameraInterpType_e interpType
+                         local  float interpTime
+                         local  float interpSpeed
+                         local  enum CameraEvent_e timeTrigger
+                         local  float timeTriggerTime
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         inlines  CameraController_GetCameraLookPoint
+12422  001F27FC     18  bool GolfCamera_IsPostShotCamFinalCutDone(CameraController_t* pCameraController)
+12434  002AACF8     E0  enum CameraSpecialSwings_t GolfCamera_GetNextSpecialSwing(enum PlayerNumber_t ePlayerID, float chance, float shotPower)
+                         local  enum CameraSpecialSwings_t specialSwing
+                         local  int randNum
+12489  002AADD8    3DC  void GolfCamera_ChooseSpecialSwing(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  bool useSpecialSwing
+                         local  bool driverOrWood
+                         local  float shotPower
+                         local  vec4flt* pCameraOrigin
+12739  00263CC0     F4  void GolfCamera_SetSpecialSwingAnimTimeScale(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  const float SWING_DOWN_SWING_TIME
+                         local  const float SWING_BALL_HIT_TIME
+                         local  struct TCharacter* pCharacter
+                         local  float time_downSwing
+                         local  float newTimeScale
+                         inlines  Character_GetReplaySwingStartTime, GamePlayer::GetCharacter, SKATime_SetTimeScale
+12768  001F273C     6C  int GolfCamera_HowManyReplaySwings(CameraController_t* pCameraController)
+12828  002918AC    2FC  float GolfCamera_ReplaySwingSpeed(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  struct TCharacter* pCharacter
+                         local  struct TCharacter* pCharacter
+                         local  struct TCharacter* pCharacter
+                         local  struct TCharacter* pCharacter
+                         inlines  Character_CheckTag
+13001  001F286C     28  void GolfCamera_RestartHole()
+13007  002C3B18     E0  float GolfCamera_ZoomCamTotalDist(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt playerToEndPos
+                         local  vec4flt startingPosition
+                         local  vec4flt endPosition
+                         local  vec4flt* pCameraOrigin
+                         inlines  LLMath_Length3, LLMath_Subtract3, vec_madd, vec_sld
+13021  002C3BF8     DC  float GolfCamera_ZoomCamDistLeft(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt camToEndPos
+                         local  vec4flt startingPosition
+                         local  vec4flt endPosition
+                         local  vec4flt* pCameraOrigin
+                         inlines  LLMath_Length3, LLMath_Subtract3, vec_madd, vec_sld
+13036  00265C60    23C  void GolfCamera_SwitchToSlowHitCam(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  char[13] name
+                         inlines  CameraController_GetCameraLookPoint
+13096  001F2894     A8  void GolfCamera_SwitchToSlowHitCamPart2(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+13117  001EDCB0     28  bool GolfCamera_bIs3ScreenCamOn()
+13123  001F293C     70  bool GolfCamera_bIs3ScreenFreezeOn()
+13129  001F2158     48  bool GolfCamera_IsMatrixCamActive()
+13135  001F21A0     28  bool GolfCamera_IsSuperZoomCamActive()
+13141  001F2070     28  bool GolfCamera_IsSlowMoSwingCamActive()
+13147  001EE4FC     4C  bool GolfCamera_IsFreezeTimeActive()
+13161  001F281C     28  void GolfCamera_DisableMatrixCam()
+13167  001F2844     28  void GolfCamera_DisableSuperZoomCam()
+13173  001F29AC     28  void GolfCamera_DisableSlowMoSingCam()
+13179  001F29D4     28  void GolfCamera_DisableHeartBeatCam()
+13185  001F29FC     4C  bool GolfCamera_IsPostShotCamDone(CameraController_t* pCameraController)
+13200  001F2A48     64  bool GolfCamera_IsPreShotCamDone(CameraController_t* pCameraController)
+13217  0027705C     74  bool GolfCamera_IsThereAPostPreShotCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+13248  00276FE8     74  bool GolfCamera_IsThereACameraGoingToBeTimeTriggered(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+13295  002770D0    16C  bool GolfCamera_IsPreShotCamReadyForFade(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID, float fadeTime)
+13357  001F2AAC      C  void GolfCamera_ForcePreShotEnding(CameraController_t* pCameraController)
+13362  0026A58C     B0  bool GolfCamera_IsCameraTrackingPlayer(CameraController_t* pCameraController)
+                         inlines  CamScript_DoesScriptTrackGolfer
+13392  001F2AB8      8  void GolfCamera_SetSkipFancyPreshotCams(CameraController_t* pCameraController, bool bOn)
+13398  001F2AC0     14  void GolfCamera_ResetSwingCamInfo(CameraController_t* pCameraController)
+13405  001F2AD4     44  bool GolfCamera_IsSetUpCameraDone(CameraController_t* pCameraController)
+13415  001F2B18      8  enum CameraSpecialSwings_t GolfCamera_GetSpecialSwingType(CameraController_t* pCameraController)
+13420  001F2B20      8  float GolfCamera_GetMatrixCamLength(CameraController_t* pCameraController)
+13425  001EE4E0     1C  void GolfCamera_SetCameraMatrixMode(bool bOn)
+13430  001EE0D4     1C  bool GolfCamera_IsScriptMatrixModeOn()
+13435  001F2B28      8  void GolfCamera_SetPostShowPostShotAnimations(CameraController_t* pCameraController, bool bOn)
+13440  001F21F0      8  bool GolfCamera_ShowPostShotAnimations(CameraController_t* pCameraController)
+13445  001F2B30      8  void GolfCamera_SetPostShowRemoveBall(CameraController_t* pCameraController, bool bOn)
+13450  001F2B38      8  bool GolfCamera_ShowPostRemoveBall(CameraController_t* pCameraController)
+13455  001F2B40     2C  void GolfCamera_AbortAllSpecialSwings(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+13465  00274EEC    1C0  bool GolfCamera_IsBallFlightPaused(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt cameraToTarget
+                         local  vec4flt cameraToBall
+                         local  float dotP
+                         inlines  LLMath_DotProduct3, LLMath_Subtract3, vec_sub
+13499  001ED934     1C  bool GolfCamera_IsGolferDoneAnimating(CameraController_t* pCameraController)
+13516  00266090     9C  bool GolfCamera_DoMonochromeEffect()
+                         inlines  GameEffects_IsPredictedGameBreakerOn
+13543  00304F28    19C  float GolfCamera_GetMonochromeEffectValue()
+                         local  float distanceToPin
+                         local  float startDistance
+                         local  float desiredPercent
+                         local  float distanceTravelled
+                         local  float halfDistance
+                         inlines  GM_GetGolferUp, GameEffects_IsPredictedGameBreakerOn
+13609  001F2B6C     44  void GolfCamera_ResetSpecialCameraStates()
+13624  001F2BB0     4C  bool GolfCamera_IsZoomCamDone(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+13664  00249214     C0  bool GolfCamera_ShouldSwitchToBallFlight(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  bool switchCam
+13689  001F1CF4     84  void GolfCamera_ResetAvailCameras(struct BIGHIT_CAMERA_HISTORY_t* pBHgroup, enum CameraSpecialSwingGroups_t grp)
+                         local  int i
+13711  001F2BFC    184  enum CameraSpecialSwings_t GolfCamera_RandomizeCameraInGroup(enum CameraSpecialSwingGroups_t grp)
+                         local  enum CameraSpecialSwings_t newbighitcamera
+                         local  struct BIGHIT_CAMERA_HISTORY_t* pBHgroup
+                         local  int i
+                         local  int ndx
+13750  002AA720    328  enum CameraSpecialSwings_t GolfCamera_RandomizeCrowdCamera()
+                         local  uint32_t courseID
+                         local  uint32_t holeNum
+                         local  int i
+                         local  int j
+                         local  int numAvailCrowdCams
+                         local  enum CameraSpecialSwings_t[3] availBHcrowdCam
+                         local  enum CameraSpecialSwings_t crowdBHcam
+                         local  int k
+                         local  int ndx
+                         inlines  BitArray_TestBit
+13846  002AAA48    2B0  enum CameraSpecialSwings_t GolfCamera_RandomizeBigHitCamera(float shotPower)
+                         local  enum CameraSpecialSwingGroups_t newGrp
+                         local  int i
+                         local  int ndx
+                         local  enum CameraSpecialSwings_t bighitcamera

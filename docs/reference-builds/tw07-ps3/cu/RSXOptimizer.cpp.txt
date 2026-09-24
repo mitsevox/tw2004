@@ -1,0 +1,61 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/rsxgpu/dev/source/rsxgpu/RSXOptimizer.cpp
+// compiled in: RSXOptimizer.cpp
+// 19 functions, source order. line | PS3 address | size
+
+  135  008D6F50     1C  void RSXOptimizer::Begin(const struct RSXOptimizer* this, uint32_t* pList, uint32_t listSizeInWords)
+  154  008D77C0     54  uint32_t RSXOptimizer::End(const struct RSXOptimizer* this)
+                         local  uint32_t listSize
+  175    inline-only   void RSXOptimizer::EmitWord(const struct RSXOptimizer* this, uint32_t data)
+  184  008D6AF4     9C  bool RSXOptimizer::IsFlushRegister(const struct RSXOptimizer* this, uint32_t channel, enum RSXRegister reg)
+  232  008D6B90     18  uint32_t RSXOptimizer::CalculateInlineTransferHash(const struct RSXOptimizer* this, uint32_t addr)
+                         local  uint32_t hash
+  246  008D6F6C    294  void RSXOptimizer::EmitInlineTransfer(const struct RSXOptimizer* this)
+                         local  int transferSize
+                         local  int i
+                         local  uint32_t transferAddr
+                         local  uint32_t* transferData
+                         local  uint32_t transferHash
+                         inlines  RSXOptimizer::EmitWord
+  317  008D6BA8    1F0  void RSXOptimizer::WriteCh0(const struct RSXOptimizer* this, enum RSXRegister reg, uint32_t value)
+                         local  uint32_t vpReg
+                         local  uint32_t vpInst
+  397  008D6D98     6C  void RSXOptimizer::WriteCh3(const struct RSXOptimizer* this, enum RSXRegister reg, uint32_t value)
+  420  008D7200     70  void RSXOptimizer::WriteCh5(const struct RSXOptimizer* this, enum RSXRegister reg, uint32_t value)
+                         local  int transferSize
+  457  008D7270     34  void RSXOptimizer::WriteReg(const struct RSXOptimizer* this, uint32_t channel, enum RSXRegister reg, uint32_t value)
+  483  008D6E04    14C  void RSXOptimizer::Reset(const struct RSXOptimizer* this)
+                         local  int i
+                         local  int i
+  515  008D72A4     64  void RSXOptimizer::EmitRegisterRange(const struct RSXOptimizer* this, uint32_t reg, uint32_t count)
+                         inlines  RSXOptimizer::EmitWord
+  530  008D7308    114  void RSXOptimizer::FlushRegisters(const struct RSXOptimizer* this)
+                         local  int i
+                         local  uint64_t dirtyMask
+                         local  int reg
+                         local  int32_t nonDirtyCount
+                         local  int32_t dirtyCount
+  567  008D741C    120  void RSXOptimizer::FlushVertexProgram(const struct RSXOptimizer* this)
+                         local  int reg
+                         local  int count
+                         local  uint32_t numInsts
+                         inlines  RSXOptimizer::EmitWord
+  615  008D753C    13C  void RSXOptimizer::EmitVertexConstants(const struct RSXOptimizer* this, uint32_t reg, uint32_t count)
+                         local  uint32_t numConsts
+                         inlines  RSXOptimizer::EmitWord
+  653  008D7678     F8  void RSXOptimizer::FlushVertexConstants(const struct RSXOptimizer* this)
+                         local  uint32_t reg
+                         local  int count
+                         local  int regEnd
+  692  008D7770     50  void RSXOptimizer::Flush(const struct RSXOptimizer* this)
+  704  008D7814    21C  void RSXOptimizer::ProcessList(const struct RSXOptimizer* this, const uint32_t* pList, uint32_t listSizeInWords)
+                         local  const uint32_t* pListIn
+                         local  const uint32_t* pListEnd
+                         local  uint32_t cmd
+                         local  uint32_t regAddr
+                         local  uint32_t regCount
+                         local  uint32_t channel
+                         local  uint32_t flags1
+                         local  bool bFlush
+                         inlines  RSXOptimizer::EmitWord
+  798  008D7A30     7C  uint32_t RSXOptimizeList(const uint32_t* pListInputBase, uint32_t listInputSizeInWords, uint32_t* pListOutputBase, uint32_t listOutputSizeInWords, bool bVerbose)
+                         local  struct RSXOptimizer rsxopt

@@ -1,0 +1,39 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/peerconnectionconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   76  005D97B8     A8  void NotifyDisconnect(const struct PeerConnectionConcrete* this)
+                         local  uint32_t uNumElements
+                         local  struct PeerConnectionObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  101  005BCB94     3C  void Cleanup(const struct PeerConnectionConcrete* this)
+  128  005F3C08     78  void PeerConnectionConcrete(const struct PeerConnectionConcrete* this, ConnApiRefT* pConnApi, const ConnApiClientT* , uint32_t , struct GameUser* pGameUser)
+                         inlines  RCPointer
+  155  005F43E8     54  void ~PeerConnectionConcrete(const struct PeerConnectionConcrete* this)
+                         inlines  ~RCPointer
+  180  005BCD78     34  NetGameUtilRefT* GetNetGameUtil(const const struct <anon>* this)
+                         local  const ConnApiClientT* pClient
+  206  005BCD44     34  NetGameLinkRefT* GetNetGameLink(const const struct <anon>* this)
+                         local  const ConnApiClientT* pClient
+  232  005BCE24     D4  NetGameDistRefT* GetNetGameDist(const const struct <anon>* this)
+                         local  const ConnApiClientT* pClient
+                         local  NetGameDistRefT* pGameDist
+  268  005BCDAC     78  void DestroyNetGameDist(const struct PeerConnectionConcrete* this)
+                         local  const ConnApiClientT* pClient
+  298  005D4F68     A4  void SendChatMessage(const struct PeerConnectionConcrete* this, const char8_t* strMessage)
+                         local  struct GameSessionPersistent* pGameSession
+  324  005D1B54     C4  void SetIncomingChatMessage(const struct PeerConnectionConcrete* this, const char8_t* strMessage)
+                         local  uint32_t uNumElements
+                         local  struct PeerConnectionObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  349  005BCBDC     FC  uint32_t GetConnApiClientId(const const struct <anon>* this)
+                         local  const ConnApiClientListT* pConnApiClientList
+                         local  uint32_t uConnApiNumClients
+                         local  struct GameUser* pGameUser
+                         local  const char8_t* strGameUserName
+                         local  uint32_t uIndex
+                         local  const char8_t* strCurrentConnApiClientName
+  393  005BCCD8     6C  const ConnApiClientT* GetConnApiClient(const const struct <anon>* this)
+                         local  const ConnApiClientListT* pConnApiClientList
+                         local  uint32_t uClientId
+                         local  const ConnApiClientT* pConnApiClient

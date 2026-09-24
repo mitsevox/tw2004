@@ -1,0 +1,15 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/supxalf.cpp
+// compiled in: supxalf.cpp
+// 4 functions, source order. line | PS3 address | size
+
+    8  006E2670     F0  int SFILTER_unpackxalf(void* pstate, int framestoup, void* psrcp, void* pdstp, int requester)
+                         local  struct UNPACKXALFSTATE* pups
+                         local  float* ptmpdst
+                         local  int retVal
+                         local  int framesdecoded
+                         local  int frames
+  179  006E2760      C  int SFILTER_unpackgetframexalf(void* pstate)
+  189  006E276C     34  void SFILTER_unpackxalfrestore(void* pstate)
+                         local  struct UNPACKXALFSTATE* pups
+  198  006E27A0    114  void SFILTER_unpackxalfinit(void* pstate, UNPACKINITPARAMS* pupip)
+                         local  struct UNPACKXALFSTATE* pups

@@ -1,0 +1,57 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_math/dev/source/tiger_mtx.cpp
+// compiled in: tiger_mtx.cpp
+// 15 functions, source order. line | PS3 address | size
+
+    8    inline-only   static struct <anon> TIGER_MATH::MtxToEulerXYZ(const const struct <anon>& m)
+                         local  float SY
+   41    inline-only   static struct <anon> TIGER_MATH::MtxToEulerZYX(const const struct <anon>& m)
+                         local  float SY
+   75    inline-only   static struct <anon> TIGER_MATH::MtxToEulerXZY(const const struct <anon>& m)
+                         local  float SZ
+  108    inline-only   static struct <anon> TIGER_MATH::MtxToEulerYXZ(const const struct <anon>& m)
+                         local  float SX
+  140    inline-only   static struct <anon> TIGER_MATH::MtxToEulerYZX(const const struct <anon>& m)
+                         local  float SZ
+  172    inline-only   static struct <anon> TIGER_MATH::MtxToEulerZXY(const const struct <anon>& m)
+                         local  float SX
+  205  008E0188    8CC  struct <anon> TIGER_MATH::MtxToEuler(const const struct <anon>& mtx, enum TigerEulerOrder order)
+                         inlines  TIGER_MATH::MtxToEulerXYZ, TIGER_MATH::MtxToEulerXZY, TIGER_MATH::MtxToEulerYXZ, TIGER_MATH::MtxToEulerYZX, TIGER_MATH::MtxToEulerZXY, TIGER_MATH::MtxToEulerZYX, TIGER_MATH::VecSet, Vec
+  226  008E0BC0    33C  struct <anon> TIGER_MATH::MtxDominantEigenVector(const const struct <anon>& a, unsigned int maxIterations)
+                         local  struct <anon> v
+                         local  struct <anon> diff
+                         local  struct <anon> v
+                         inlines  TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecMulByY, TIGER_MATH::VecMulByZ, TIGER_MATH::VecOne, TIGER_MATH::operator*=, TIGER_MATH::operator+, TIGER_MATH::operator-=, TIGER_MATH::operator/=, Vec
+  247  008E1810   10C4  float TIGER_MATH::MtxImproveEigenValueAndVector(float value, const struct <anon>& vector, const const struct <anon>& A, unsigned int maxIterations)
+                         local  struct <anon> error
+                         local  struct <anon> B
+                         local  float detB
+                         local  struct <anon> invB
+                         local  struct <anon> newVector
+                         local  float newValue
+                         local  struct <anon> newError
+                         inlines  TIGER_MATH::Dot, TIGER_MATH::MtxAdjoint, TIGER_MATH::MtxCofactor, TIGER_MATH::MtxDet, TIGER_MATH::MtxIdentity, TIGER_MATH::MtxSet, TIGER_MATH::VecDot, TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecMulByX, TIGER_MATH::VecMulByY, TIGER_MATH::VecMulByZ, TIGER_MATH::VecSet, TIGER_MATH::VecSub, TIGER_MATH::VecUnit, TIGER_MATH::VecX, TIGER_MATH::operator*, TIGER_MATH::operator+, TIGER_MATH::operator-, TIGER_MATH::operator/, Vec, operator float __vector__, operator[], vec_madd, vec_sld, vec_splat
+  280  008E28D4   1718  void TIGER_MATH::MtxEigenValuesAndVectors(const struct <anon>& values, const struct <anon>& vectors, const const struct <anon>& A, unsigned int maxIterations)
+                         local  struct <anon> v0
+                         local  float e0
+                         local  struct <anon> b
+                         local  struct <anon> v1
+                         local  float e1
+                         local  struct <anon> v2
+                         local  float e2
+                         local  struct <anon> v3
+                         local  float e3
+                         inlines  TIGER_MATH::MtxDotTranspose, TIGER_MATH::MtxSet, TIGER_MATH::VecDot, TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecMulByY, TIGER_MATH::VecMulByZ, TIGER_MATH::VecRsqrt, TIGER_MATH::VecSet, TIGER_MATH::VecSub, TIGER_MATH::VecUnit, TIGER_MATH::VecX, TIGER_MATH::operator*, TIGER_MATH::operator+, TIGER_MATH::operator-, Vec, operator float __vector__, operator[], vec_madd, vec_sld
+  303  008E0A54    16C  struct <anon> TIGER_MATH::MtxTranspose(const const struct <anon>& a)
+                         local  struct <anon> a0
+                         local  struct <anon> a1
+                         local  struct <anon> a2
+                         local  struct <anon> a3
+                         inlines  TIGER_MATH::MtxSet, TIGER_MATH::VecFromW, TIGER_MATH::VecFromX, TIGER_MATH::VecFromY, TIGER_MATH::VecFromZ, TIGER_MATH::VecSet, TIGER_MATH::VecX, TIGER_MATH::VecZ, operator[]
+  318  008DFCB4    4D4  float TIGER_MATH::MtxMinor(const const struct <anon>& a, unsigned int i, unsigned int j)
+                         inlines  TIGER_MATH::MtxMinorElement, TIGER_MATH::VecIndex, operator[]
+  336  008DFC80     1C  float operator()(const const struct <anon>* this, unsigned int i, unsigned int j)
+  341  008DFC9C     18  float& operator()(const struct <anon>* this, unsigned int i, unsigned int j)
+  346  008E0EFC    914  struct <anon> TIGER_MATH::MtxSQT(const const struct <anon>& scale, const const struct <anon>& quat, const const struct <anon>& trans)
+                         local  struct <anon> quatTrans
+                         local  struct <anon> scaleMtx
+                         inlines  TIGER_MATH::MtxMul, TIGER_MATH::MtxSet, TIGER_MATH::QuatToMtx, TIGER_MATH::VecFromOneX, TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecMulByY, TIGER_MATH::VecMulByZ, TIGER_MATH::VecSet, TIGER_MATH::operator*, TIGER_MATH::operator+, Vec, operator float __vector__, operator[]

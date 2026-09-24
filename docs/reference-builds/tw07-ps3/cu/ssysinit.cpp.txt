@@ -1,0 +1,20 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/ssysinit.cpp
+// compiled in: ssysinit.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   32  006CF330    108  int SNDSYS_getopts(SNDSYSOPTS* psso)
+                         local  int gotcaps
+                         local  int ret
+   75  006CF438     D8  int SNDSYS_setopts(SNDSYSOPTS* psso)
+  111  006CF668    204  int SNDSYSI_init()
+                         local  int rc
+                         local  MIXCONFIG mc
+                         inlines  FToI::Round, GetSampleRate, SNDMEMI_alloc
+  222  006CF86C    144  int SNDSYS_restore()
+                         inlines  SNDMEMI_free
+  279  006CF510    158  int SNDSYSI_chanpubinit()
+                         local  int i
+                         local  int j
+                         local  int chanAllocSize
+                         local  char* ptemp
+                         inlines  SNDMEMI_alloc

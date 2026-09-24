@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/Golf/Audio/Headers/GameAudio.h
+// compiled in: other_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  498    inline-only   void Gaud_StartBigHitStream(uint16 waveID, TCommentPlayMode mode)

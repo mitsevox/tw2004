@@ -1,0 +1,9 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/SceneGraph/include/SceneGraph/Runtime/Nodes/SGNodeLocator.h
+// compiled in: SGNodeLocator.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   47    inline-only   void* operator new(size_t size, const char* text, struct ICoreAllocator* allocator, enum AllocFlags allocator_flags, uint32_t alignment)
+   47    inline-only   struct ICoreAllocator* GetClassAllocator()
+   47    inline-only   void operator delete(void* address)
+   64    inline-only   RNAVector3 GetLocalPosition(const const struct <anon>* this)
+   65    inline-only   void SetLocalPosition(const struct <anon>* this, const const RNAVector3& v3)

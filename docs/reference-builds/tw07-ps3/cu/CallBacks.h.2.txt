@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/CallBacks.h
+// compiled in: DbManager.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  300  007CA948     2C  struct IMemoryManager* GetMemoryManager()
+  321  007CDDD4     30  void SetMemoryManager(struct IMemoryManager* manager)

@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLUIWidget.c
+// compiled in: Legacy_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   38  0037F274      4  void WG_vInitModule()
+   42  0037F278      4  void WG_vCloseModule()
+   51  003860F0     84  void WG_vInitCanvas(WG_SCanvas* spCanvas_p)
+                         inlines  PR_vFillVerticesWith2DRect
+   83  003CD160    2D0  void WG_vRenderCanvas(WG_SCanvas* spCanvas_p)
+                         local  float[2][4] xpVertices
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetZBufferMode, PR_vFillVerticesWith2DRect, PR_vSetCurrentColor, PR_vSetCurrentUsage, PR_vSetDefaultCurrentColor, WG_vRestoreRenderingContext, WG_vSetRenderingContext, vec4flt_Copy
+  211    inline-only   static void WG_vSetRenderingContext()
+  240    inline-only   static void WG_vRestoreRenderingContext()

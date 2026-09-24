@@ -1,0 +1,9 @@
+// ../../../../../TIGERCODE/RW45/platform/include/native/ps3-ppu-gcc/rw/core/thread/spinlock.h
+// compiled in: Legacy_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+  139    inline-only   bool TryLock(const struct <anon>* this)
+  145    inline-only   bool IsLocked(const struct <anon>* this)
+  151    inline-only   void Unlock(const struct <anon>* this)
+                         local  const char[7] __FUNCTION__
+                         local  int32_t nOriginalValue

@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_CharHair.h
+// compiled in: shader_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   21  005212B8     18  void SM_CharHairClass::~SM_CharHairClass(const struct SM_CharHairClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base

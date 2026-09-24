@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/UI_HUDFlashText.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   57  00123B30    100  void UIHUDFlashText::~UIHUDFlashText(const struct UIHUDFlashText* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber, ~TAptArrayStruct
+   59  000FE3F8      C  uint32 UIHUDFlashText::GetSignature(const const struct UIHUDFlashText* this)
+   79  0010C628     14  enum TAptSequenceStatus UIHUDFlashText::ShowNextTextSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)

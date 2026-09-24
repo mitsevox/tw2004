@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/packages/osdk/2.06.04/core/include/common/osdk/gamefacade/spreadsheetstrategy.h
+// compiled in: golf2_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   41  001E7810      8  const StringComparator* GetComparator(const struct SpreadSheetStrategy* this, const struct SpreadSheetColumnFormat* )
+   51  001E7818     18  void ~SpreadSheetStrategy(const struct SpreadSheetStrategy* this)

@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/Physics/Headers/PhysicsDefinitions.h
+// compiled in: golf_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   76    inline-only   float Rotate1(float x, float y, float sinAngle, float cosAngle)
+   81    inline-only   float Rotate2(float x, float y, float sinAngle, float cosAngle)
+   86    inline-only   void RotateXY(float* x, float* y, float sinAngle, float cosAngle)
+                         local  float tempx

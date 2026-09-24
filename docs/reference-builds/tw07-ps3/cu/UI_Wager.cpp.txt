@@ -1,0 +1,22 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_Wager.cpp
+// compiled in: apt_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   30  000FAC40     98  void UIWager::UIWager(const struct UIWager* this)
+                         inlines  AptStaticCharBuffer<20u>::AptStaticCharBuffer
+   34  000338DC     58  void UIWager::Init(const struct UIWager* this)
+   41  00069ADC    398  void UIWager::Show(const struct UIWager* this)
+                         local  char[20] tempBuffer
+                         local  int iWagerChoice
+                         local  int i
+                         local  int i
+                         local  int iPlayerAmount
+                         inlines  AptStaticCharBuffer<20u>::operator char*, Singleton<GolferStats>::GetSingleton
+  127  0004F148    10C  int32 UIWager::ComputeWagerFromToggleIndex(const struct UIWager* this, int32 index)
+                         local  int32 iWagerAmount
+  142  00069A20     BC  void UIWager::SetChoiceTextFromIndex(const struct UIWager* this, int32 index)
+                         local  char[20] tempBuffer
+                         local  int iWagerAmount
+  157  0008844C    254  enum eAptHandleInput UIWager::HandleInput(const struct UIWager* this, int32 cID)
+                         local  enum eLoadingScreenToShow loadingToShow
+                         local  int i

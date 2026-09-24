@@ -1,0 +1,50 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_lua_breakpoint.cpp
+// compiled in: tiger_module_lua_breakpoint.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   10  00536944    160  enum LuaBreakpointError Verify(const char* breakpoint)
+                         local  int line
+                         local  int scanResult
+                         local  const char* comma
+                         local  const char* comma2
+                         local  const int pathLength
+                         local  const char* varCountPtr
+                         local  int varCount
+                         local  const char* comma3
+                         local  const char* varString
+   84  00536894     B0  enum LuaBreakpointError VerifyVarString(unsigned int varCount, const char* varString)
+                         local  int varStringLength
+                         local  unsigned int varCommaCount
+                         local  const char* varComma
+  111  00536AA4     A0  const char* GetPath(char* path, const char* breakpoint)
+                         local  const char* comma
+                         local  const char* pathStart
+                         local  const char* comma2
+                         local  int pathLength
+  131  00536B44     54  int GetLine(const char* breakpoint)
+                         local  int line
+                         local  int scanResult
+  216  00536C78     70  void PathToLower(const struct <anon>* this)
+                         local  char* p
+                         inlines  std::tolower
+  226  00536CE8     5C  void PathConsistentSlashes(const struct <anon>* this)
+                         local  char* p
+  241  0053736C      C  int GetLine(const const struct <anon>* this)
+  246  00537378      C  const char* GetPath(const const struct <anon>* this)
+  251  00537384      8  unsigned int GetVarCount(const const struct <anon>* this)
+  256  0053738C      C  const char* GetVarString(const const struct <anon>* this)
+  261  00537398     58  int Compare(const void* voidA, const void* voidB)
+                         local  const struct <anon>* a
+                         local  const struct <anon>* b
+                         local  int lcomp
+  274  005373F0     38  const struct <anon>* Find(const struct <anon>* key, const struct <anon>* sortedArray, unsigned int count)
+  279  00537428     38  void Sort(struct <anon>* array, unsigned int count)
+  284  00537588    134  enum LuaBreakpointError ToBreakpointString(const const struct <anon>* this, char* breakpoint, unsigned int maxSize)
+  303  00537460    128  unsigned int GetBreakpointStringSize(const const struct <anon>* this)
+                         local  unsigned int lineLength
+                         local  unsigned int pathLength
+                         local  unsigned int varCountLength
+                         local  unsigned int varStringLength
+                         local  unsigned int lineLength
+                         local  unsigned int pathLength
+                         local  unsigned int varCountLength

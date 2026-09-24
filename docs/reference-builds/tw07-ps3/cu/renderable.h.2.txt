@@ -1,0 +1,19 @@
+// C:/packages/rwmovie/1.04.01/include/rwmovie/renderable.h
+// compiled in: audiorenderable.cpp, moviedecoder.cpp, movieplayer.cpp, subtitlerenderable.cpp, videorenderable.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   28  006FA074     A8  void VideoRenderable(const struct <anon>* this, const const struct <anon>& storage)
+                         inlines  Resource
+   29  006FA11C      C  void ~VideoRenderable(const struct <anon>* this)
+   57    inline-only   uint32_t GetSize(const struct <anon>* this, unsigned int bufNum)
+  120    inline-only   void SetFrameNumber(const struct <anon>* this, FrameNumber frameNumber)
+  125    inline-only   FrameNumber GetFrameNumber(const struct <anon>* this)
+  146    inline-only   int GetUseCount(const struct <anon>* this)
+  221    inline-only   bool IsReadyToRender(const struct <anon>* this)
+  225    inline-only   void SetReadyToRender(const struct <anon>* this, bool ready)
+  230    inline-only   struct <anon> GetStorage(const const struct <anon>* this)
+  239    inline-only   bool GetDropFrameFlag(const struct <anon>* this)
+  360  006F6EB8     20  void AudioRenderable(const struct <anon>* this)
+  361  006F6EF8      4  void ~AudioRenderable(const struct <anon>* this)
+  438  006F9F8C     20  void SubtitleRenderable(const struct <anon>* this)
+  439  006F9FAC      4  void ~SubtitleRenderable(const struct <anon>* this)

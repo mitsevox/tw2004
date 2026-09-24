@@ -1,0 +1,23 @@
+// ../../../../../TIGERCODE/Code/AptInterface/uiAptSFXSubscriber.h
+// compiled in: golf_unity.cpp, other_unity.cpp
+// 19 functions, source order. line | PS3 address | size
+
+   26  004A76E4      C  uint32 AptTxtAnimatedSubscriber::GetSignature(const const struct AptTxtAnimatedSubscriber* this)
+   41  004A76F0      C  uint32 AptGradientSubscriber::GetSignature(const const struct AptGradientSubscriber* this)
+   52  004A76FC      C  uint32 AptFadeSubscriber::GetSignature(const const struct AptFadeSubscriber* this)
+   67  004A7708      C  uint32 AptBGColorTweenSubscriber::GetSignature(const const struct AptBGColorTweenSubscriber* this)
+   73    inline-only   bool AptBGColorTweenSubscriber::AreWeShowingTheMemCardBgColor(const struct AptBGColorTweenSubscriber* this)
+   92  004A7714      C  uint32 AptSphereizerSubscriber::GetSignature(const const struct AptSphereizerSubscriber* this)
+  106  004A7720      C  uint32 AptCharThumbSubscriber::GetSignature(const const struct AptCharThumbSubscriber* this)
+  117  004A772C      C  uint32 AptProShop3DItemSubscriber::GetSignature(const const struct AptProShop3DItemSubscriber* this)
+  128  004A7738      C  uint32 AptScreenRegistrationSubscriber::GetSignature(const const struct AptScreenRegistrationSubscriber* this)
+  139  004A7744      C  uint32 AptBlurSubscriber::GetSignature(const const struct AptBlurSubscriber* this)
+  151  004A7750      C  uint32 AptStencilCommitSubscriber::GetSignature(const const struct AptStencilCommitSubscriber* this)
+  176  004A775C      C  uint32 AptAlphaMaskSubscriber::GetSignature(const const struct AptAlphaMaskSubscriber* this)
+  190  004A7768      C  uint32 AptClipSubscriber::GetSignature(const const struct AptClipSubscriber* this)
+  205  004A7774      C  uint32 AntiAliasSubscriber::GetSignature(const const struct AntiAliasSubscriber* this)
+  217  004A7780      C  uint32 AptGridSubscriber::GetSignature(const const struct AptGridSubscriber* this)
+  230  004A778C      C  uint32 AptAutoSizeSubscriber::GetSignature(const const struct AptAutoSizeSubscriber* this)
+  241  004A7798      C  uint32 AptWebImageSubscriber::GetSignature(const const struct AptWebImageSubscriber* this)
+  292  004A77A4      C  uint32 Apt1By1AnimationSubscriber::GetSignature(const const struct Apt1By1AnimationSubscriber* this)
+  299  004AA480      4  void Apt1By1AnimationSubscriber::NotifyNext_func(struct IAptSubscriber* subs)

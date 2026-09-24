@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameModeDriver_Traditional.cpp
+// compiled in: golf_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+    7  002564C4     40  void GameModeDriverTraditional::GameModeDriverTraditional(const struct GameModeDriverTraditional* this)
+   14  0020B698     18  void GameModeDriverTraditional::~GameModeDriverTraditional(const struct GameModeDriverTraditional* this)
+   19  0020D068      4  void GameModeDriverTraditional::StartEvent(const struct GameModeDriverTraditional* this)
+   24  0020D06C     1C  bool GameModeDriverTraditional::QueryInterface(const struct GameModeDriverTraditional* this, enum GM_DriverType_t typeID, const void*& ptr)
+                         local  bool bRet
+   37  0020D088     74  void GameModeDriverTraditional::GetCurrentScoreString(const struct GameModeDriverTraditional* this, char* strBuf, int32 bufferSize)
+                         local  struct GameModeBase* mode
+   46  002AD078     5C  void GameModeDriverTraditional::EndGame(const struct GameModeDriverTraditional* this)

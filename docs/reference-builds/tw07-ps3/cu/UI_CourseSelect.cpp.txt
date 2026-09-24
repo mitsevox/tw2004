@@ -1,0 +1,84 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_CourseSelect.cpp
+// compiled in: apt_unity.cpp
+// 27 functions, source order. line | PS3 address | size
+
+   67  000F502C     D0  void UICourseSelect::UICourseSelect(const struct UICourseSelect* this)
+                         local  int32 i
+                         inlines  AptStaticCharBuffer<64u>::AptStaticCharBuffer, TExternArray<UICourseItem>::TExternArray, UICourseItem
+   78  000429DC     20  void UICourseSelect::Show(const struct UICourseSelect* this)
+   88  00033DF4     40  void UICourseSelect::ShowOutOfNormalFlow(const struct UICourseSelect* this, UICourseSelectOnCloseFunc* funcPointer)
+   97  000EF2C4     B4  void UICourseSelect::Init(const struct UICourseSelect* this)
+                         inlines  AptScreenSubscriber::SetCanShowOptionsScreen, FlashUpdateItem::SetFlashUpdateList, UIMenuCircBase::SetNbrItemsVisibleInMenu
+  129  00067214     84  void UICourseSelect::ShowHelpText(const struct UICourseSelect* this)
+  140  00038864     44  void UICourseSelect::OnShow(const struct UICourseSelect* this)
+  149  000DB6F4    318  enum eAptHandleInput UICourseSelect::HandleInput(const struct UICourseSelect* this, int32 cID)
+                         local  int32 activeController
+                         local  enum PlayerNumber_t playerNum
+                         local  int32 activeController
+                         local  enum UserNumber userNumber
+                         local  int32 i
+                         local  const char* msg
+  229  000DB5C8    12C  void UICourseSelect::UISelectCourse(const struct UICourseSelect* this)
+                         local  struct UICourseItem* activeItem
+  264  000DB3E0    1E8  void UICourseSelect::UIShowCourseOptions(const struct UICourseSelect* this)
+                         local  struct UICourseItem* activeItem
+                         local  int32 activeItemId
+                         local  int32 index
+                         local  int32 customIndex
+                         local  enum PlayerNumber_t playerId
+                         local  int32 player
+                         local  const struct UserInfo& userInfo
+                         local  uint32 i
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen
+  328  00033E34     BC  static void LoadCourseDispInfoCallBack(struct TStreamData* pStreamData)
+                         local  int32_t tableSize
+  340  00033EF0     7C  static void LoadCourseDispSymbolInfoCallBack(struct TStreamData* pStreamData)
+  352  0002CDBC     60  void UICourseSelect::RegisterStreamClients()
+  362  0002CF4C     3C  void UICourseSelect::UnregisterStreamClients()
+  371  00023AE8     64  void UICourseSelect::FreeCourseDisplayStreamMem()
+  381  0006E1A4    1C4  void UICourseSelect::GetCourseDetails(const struct UICourseSelect* this, int32_t courseIndex, const struct UICourseItem& pCourseInfo)
+                         local  struct CourseDispInfo_s* displayInfo
+                         local  char* stringData
+  414  00086E7C    7CC  void UICourseSelect::SetMenuItems(const struct UICourseSelect* this, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 sizeMenu)
+                         local  int32 numCourses
+                         local  int32 i
+                         local  int playerNum
+                         local  const struct UserInfo& userInfo
+                         local  uint32 i
+                         local  int32 sizeOfArray
+                         local  struct UICourseItem* dst
+                         local  int32 sizeOfArray
+                         local  struct UICourseItem* dst
+                         local  enum GM_CourseType_t oCourse
+                         local  int8 order
+                         local  struct UICourseItem* dst
+                         local  struct CourseDispInfo_s* displayInfo
+                         local  char* stringData
+                         local  uint32_t j
+                         local  int32 numBucks
+                         local  char[16] tempBuffer
+                         local  char[16] strBuf
+                         inlines  AptStaticCharBuffer<64u>::operator char*
+  583  00066C74     CC  enum eCourseSelStatus UICourseSelect::GM_vGetCourseStatus(const struct UICourseSelect* this, enum GM_CourseType_t courseID)
+                         local  enum eCourseSelStatus autoRetVal
+                         local  int i
+                         local  const struct UserInfo& userInfo
+  616  00033F6C     5C  void UICourseSelect::SaveCourseLockConditions(const struct UICourseSelect* this, Course_t iCourse, int32 pointsToUnlock)
+                         local  int32 i
+  631  00033FC8     58  int32 UICourseSelect::GetUnlockConditions(const struct UICourseSelect* this, Course_t iCourse)
+                         local  int32 i
+  645  00034020     30  void UICourseSelect::LooseFocus(const struct UICourseSelect* this, uint32 gointTo_Signature)
+  654  00034050     44  void UICourseSelect::RegainFocus(const struct UICourseSelect* this, uint32 comeFrom_Signatur)
+  693  000EF378     74  void UIHoleSelect::Init(const struct UIHoleSelect* this)
+                         inlines  AptScreenSubscriber::SetCanShowOptionsScreen, FlashUpdateItem::SetFlashUpdateList
+  702  000428B8    124  void UIHoleSelect::ShowHoleSelect(const struct UIHoleSelect* this, struct UIResponseHandler* inpHandler, enum GM_CourseType_t courseNum, bool allowMultipleSelect)
+                         local  int32 i
+  726  0006D83C     78  void UIHoleSelect::InitMenuParams(const struct UIHoleSelect* this)
+  737  0003409C     EC  void UIHoleSelect::UpdateItemAndLabel(const struct UIHoleSelect* this, struct UIMenuItemBaseDst* inMenuItemToUpdate, struct UIMenuItemBaseSrc* inMenuItemArray, int32 index, char* label)
+                         local  struct UiMenuItemDefaultDst* menuItem
+  755  00086C7C    200  enum eAptHandleInput UIHoleSelect::HandleInput(const struct UIHoleSelect* this, int32 cID)
+                         local  int32 index
+  814  000CF22C    1FC  void UIHoleSelect::onClose(const struct UIHoleSelect* this, void* inData)
+                         local  int32 selected
+                         local  bool noHoleHasBeenSelected
+                         local  int32 i

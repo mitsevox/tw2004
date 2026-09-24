@@ -1,0 +1,29 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptFF/core/t2kstrm.cpp
+// compiled in: other_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   74  003F5194     48  int32_t ReadInt32(struct InputStream* t)
+                         local  uint8_t* ptr
+                         local  uint32_t pos
+                         local  uint32_t lword
+  120  003F19F4     30  int16_t ReadInt16(struct InputStream* t)
+                         local  uint8_t* ptr
+                         local  uint32_t pos
+                         local  uint16_t word
+  193  003F1988     6C  void ReadSegment(struct InputStream* t, uint8_t* dest, int32_t numBytes)
+                         local  uint32_t pos
+                         local  uint8_t* ptr
+  229  003F1AD0     30  void ReadSegmentNoAlloc(struct InputStream* t, const uint8_t*& dest, int32_t numBytes)
+                         local  uint32_t pos
+                         local  uint8_t* ptr
+  249  003F51DC      8  int32_t SizeInStream(struct InputStream* stream)
+  259  003F51E4      8  uint8_t* GetEntireStreamIntoMemory(struct InputStream* stream)
+  291  003F51EC      8  struct InputStream* New_InputStream(struct tsiMemObject* mem, uint8_t* dataPtr, uint32_t length, int* errCode)
+  330  003F51F4      8  struct InputStream* New_InputStream2(struct tsiMemObject* mem, struct InputStream* in, uint32_t offset, uint32_t length, int fastIndex, int* errCode)
+  376  003F21F4     84  struct InputStream* New_InputStream3(struct tsiMemObject* mem, uint8_t* dataPtr, uint32_t length, int* errCode)
+                         local  struct InputStream* t
+  444  003F51FC      4  void Rewind_InputStream(struct InputStream* t)
+  460  003F01B4     10  void Seek_InputStream(struct InputStream* t, uint32_t offset)
+  473  003F1A24     14  uint32_t Tell_InputStream(struct InputStream* t)
+  483  003F214C     A8  void Delete_InputStream(struct InputStream* t, int* errCode)
+  689  003F5200      8  uint32_t ReadUnsignedNumber(struct InputStream* in)

@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/CourseData/structs.cpp
+// compiled in: headgate_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   11  0034524C     18  static bool IsValidAddress(const void* lp, unsigned int nBytes, bool bReadWrite)

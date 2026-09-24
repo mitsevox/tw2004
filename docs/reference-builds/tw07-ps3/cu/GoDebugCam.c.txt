@@ -1,0 +1,247 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/cameras/GoDebugCam.c
+// compiled in: golf_unity.cpp
+// 36 functions, source order. line | PS3 address | size
+
+  159  00254408     4C  void* CameraDebug_CurCamCallback(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  CameraController_t* pCameraController
+  178  001ED0CC     5C  void CameraDebug_AddTuningVariables()
+  184  001EF244     60  void CameraDebug_Init()
+                         inlines  WG_vSetCanvasPosition
+  211  00279D3C    350  void CameraDebug_InitFreeCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt pCamToLook
+                         local  float fGroundHeight
+                         local  struct TGD_TerrainInfo* pTerrainGameData
+                         inlines  CA_vSetCameraFieldOfView, CameraController_GetCameraLookPoint, LLMath_Add3, LLMath_Subtract3, RC_spGetRenderCtxCamera
+  318  00324D84   1724  void CameraDebug_ProcessFreeCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  float sCameraRate
+                         local  bool sInitCameraRate
+                         local  float fGenericMovementStep
+                         local  float fUpDownMovementStep
+                         local  float fRotateStep
+                         local  vec4flt fDelta
+                         local  int32 iPadID
+                         local  struct Controller_StickInfo* stickInfo
+                         local  struct TGD_TerrainInfo* pTerrainGameData
+                         local  float fGroundHeight
+                         local  vec4flt oldCameraPos
+                         local  struct RC_SRenderCtx* renderContext
+                         local  struct CA_SCamera* cam
+                         local  bool bRegistered
+                         local  int32 freeCam
+                         local  float newFov
+                         local  const int kStickLow
+                         local  const int kStickHigh
+                         local  const int kStickRange
+                         local  vec4flt referencePos
+                         local  float newFov
+                         local  vec4flt camOrig
+                         local  vec4flt camLook
+                         local  float fAngle
+                         local  vec4flt camOrig
+                         local  vec4flt camLook
+                         local  float fOffset
+                         local  void* ptr
+                         local  float fBaseLength
+                         local  float fPitch
+                         local  float fBaseLength
+                         local  float fPitch
+                         local  float fAngle
+                         local  struct GameModeOneBall* mode
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  vec4flt pos
+                         local  int greenIdx
+                         inlines  AIMgr, CA_vSetCameraFieldOfView, CameraController_GetCameraLookPoint, GR_ShouldDrawGrid, LLMath_Subtract3, RC_spGetRenderCtxCamera, cGAME_GLOBALS::SetAllPlayersOnGreen, std::cosf, std::sinf, std::sqrt, vec4flt_Copy, vec4flt_Copy3, vec_st, vec_sub
+  712  00245D70    1C4  void CameraDebug_InitLimitedFreeCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  float fGroundHeight
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  struct TGD_TerrainInfo* pTerrainGameData
+                         local  vec4flt referencePos
+                         inlines  CameraController_GetCameraLookPoint
+  763  00289B68    EB4  void CameraDebug_ProcessLimitedFreeCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  float fGenericMovementStep
+                         local  float fUpDownMovementStep
+                         local  float fRotateStep
+                         local  float fGroundHeight
+                         local  vec4flt fDelta
+                         local  vec4flt lastCameraOrigin
+                         local  vec4flt lastCameraLookPoint
+                         local  int32 iPadID
+                         local  struct Controller_StickInfo* stickInfo
+                         local  const int kStickLow
+                         local  const int kStickHigh
+                         local  const int kStickRange
+                         local  float fAngle
+                         local  vec4flt referencePos
+                         local  struct TGD_TerrainInfo* pTerrainGameData
+                         local  float fBaseLength
+                         local  float fPitch
+                         local  float fBaseLength
+                         local  float fPitch
+                         local  float fAngle
+                         local  float fOffset
+                         local  float fOffset
+                         inlines  CameraController_GetCameraLookPoint, LLMath_Subtract3, std::cosf, std::sinf, std::sqrt, vec4flt_Copy3, vec_sub
+  985  00245F34    124  void CameraDebug_InitOrbitGolferCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  float fGroundHeight
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt referencePos
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         inlines  CameraController_GetCameraLookPoint
+ 1024  0028AA1C    4E0  void CameraDebug_ProcessOrbitGolferCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  float fMovementStep
+                         local  float zoomStep
+                         local  float fRotateStep
+                         local  float fGroundHeight
+                         local  float newLookY
+                         local  vec4flt referencePos
+                         local  vec4flt fDelta
+                         local  vec4flt fCameraToOrigin
+                         local  vec4flt fNormalizedDelta
+                         local  vec4flt fxzNormalized
+                         local  struct Controller_StickInfo* stickInfo
+                         local  int32 iPadID
+                         inlines  CameraController_GetCameraLookPoint, LLMath_Subtract3, std::cosf, std::sinf, vec4flt_Copy3, vec_sub
+ 1157  002E84B4     B0  bool CameraDebug_InitStaticDebugCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  CameraChainLink* link
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         inlines  CameraController_GetCameraLookPoint
+ 1179  002E835C    158  void CameraDebug_ProcessStaticDebugCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  CameraChainLink* link
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  int32 iPadID
+                         inlines  CameraController_GetCameraLookPoint
+ 1217  001F3720     94  bool CameraDebug_InitFlyByDebugCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  CameraChainLink* link
+                         local  int flybyNum
+ 1246  002ED740    11C  void CameraDebug_ProcessFlyByDebugCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  CameraChainLink* link
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  int flybyNum
+                         inlines  CameraController_GetCameraLookPoint
+ 1295  002E8208    154  bool CameraDebug_InitDynamicDebugCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  CameraChainLink* link
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         inlines  CameraController_GetCameraLookPoint, vec4flt_Copy3
+ 1338  002E7C04    604  void CameraDebug_ProcessDynamicDebugCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  CameraChainLink* link
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  int32 iPadID
+                         local  vec4flt clubDir
+                         local  vec4flt strokeDir
+                         local  bool ballMoving
+                         inlines  CameraController_GetCameraLookPoint, GamePlayer::GetCharacter, vec4flt_Copy3
+ 1493  0027A08C     78  bool CameraDebug_InitFEDebugCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         inlines  CA_vSetCameraFieldOfView, CameraController_GetCameraLookPoint, RC_spGetRenderCtxCamera
+ 1518  00284444    BE4  void CameraDebug_ProcessFEDebugCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  int32 iPadID
+                         local  float sCameraRate
+                         local  float fGenericMovementStep
+                         local  float fUpDownMovementStep
+                         local  float fRotateStep
+                         local  int32 disableDebugControl
+                         local  struct Controller_StickInfo* stickInfo
+                         local  const int kStickLow
+                         local  const int kStickHigh
+                         local  const int kStickRange
+                         local  float fAngle
+                         local  vec4flt tmp
+                         local  vec4flt tmp2
+                         local  Quat rotQuat
+                         local  vec4flt tmp
+                         local  vec4flt tmp
+                         local  float fAngle
+                         local  vec4flt tmp
+                         local  vec4flt tmp2
+                         local  Quat rotQuat
+                         local  vec4flt tmp
+                         local  vec4flt tmp
+                         local  vec4flt tmp
+                         local  float fAngle
+                         local  vec4flt tmp
+                         local  vec4flt tmp2
+                         local  Quat rotQuat
+                         local  float fAngle
+                         local  vec4flt tmp
+                         local  vec4flt tmp2
+                         local  Quat rotQuat
+                         local  vec4flt tmp
+                         local  float len
+                         inlines  CameraController_GetCameraLookPoint, LLMath_Add, LLMath_Add3, LLMath_CrossProduct3W0, LLMath_Length, LLMath_Scale, LLMath_Scale3, LLMath_Subtract, __vec_mul, vec4flt_Copy, vec_ld, vec_madd, vec_nmsub, vec_perm, vec_sld, vec_splat, vec_sub
+ 1718  001ED8F4     14  void CameraDebug_InitAIShotCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+ 1726  0025EDD8    200  void CameraDebug_ProcessAIShotCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt targetToPlayer
+                         local  float fGroundHeight
+                         inlines  CameraController_GetCameraLookPoint, LLMath_Add3, LLMath_Scale3, LLMath_Subtract3, __vec_mul, vec4flt_Copy3
+ 1765  002EC5A0     30  void CameraDebug_NextDebugCamera(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  enum CameraMode_t currentCamera
+ 1786  00286A90    374  void CameraDebug_DisplayCameraInfo(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID, int32 iViewController)
+                         local  char[64] displayString
+                         local  char[64] camCoordinates
+                         local  struct RC_SRenderCtx* pRenderContext
+                         local  VM_SViewport* pViewport_m
+                         local  float x
+                         local  float y
+                         local  FO_EAddMode oldMode
+                         local  int i
+                         inlines  AINetworkMgr
+ 1855  002DD020     C4  void CameraDebug_SetDebugCamera(int camID)
+                         local  CameraController_t* pCameraController
+                         local  CameraChainLink* newLink
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         inlines  CameraController_GetCameraLookPoint
+ 1881  002EC404    19C  void CameraDebug_SetDebugAndPlaceCamera(enum PlayerNumber_t ePlayerID, float* location, float* lookpoint)
+                         local  CameraController_t* pCameraController
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  vec4flt lookToCam
+                         inlines  CameraController_GetCameraLookPoint, LLMath_Add3, LLMath_Subtract3, vec4flt_Copy3, vec_sub
+ 1922  001ED790     18  bool CameraDebug_bIsFreezeCamOn()
+ 1927  001ED908     18  bool CameraDebug_bIsFreezeSwingCamOn()
+ 1932  001EF574     18  bool CameraDebug_bIsDebugBallMoved()
+ 1937  001EF58C     14  vec4flt* CameraDebug_xGetFreezeSwingLoc()
+ 1942  001EF5A0     14  vec4flt* CameraDebug_xGetFreezeSwingLook()
+ 1947  001EF5B4     18  float CameraDebug_fGetFreezeCamFov()
+ 1954  001EF5CC     C0  void SteepSlope_StartPrints(bool start)
+                         local  FO_EAddMode oldMode
+ 1977  001EF68C     68  void SteepSlope_PrintString(float x, float y, char* str)
+ 1988  0029445C    3BC  void CameraDebug_DisplaySteepSlopeCamStates(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID, int32 iter, bool gotCollision, bool ballOnScreen, float* lookVectNormalized, float* offsetPlayerPos, bool done)
+                         local  char[64] str
+ 2034  001EF6F4     18  void CameraDebug_DisplayCamName(bool on)
+ 2039  001EF70C     18  bool CameraDebug_GetDisplayCamName()
+ 2044  00286E04      4  void CameraDebug_Render(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID, int32 iViewController)
+ 2051  002B00D0    3F0  void CameraDebug_HandleCameraConsoleCommands(CameraController_t* pCameraController, enum PlayerNumber_t ePlayerID)
+                         local  int32 curCamScript
+                         local  int32 curCamSeq
+                         local  int32 lastLinkChosen
+                         local  int32 next
+                         local  float Xpos
+                         local  float YPos
+                         local  FO_EAddMode oldMode
+                         local  CameraChainLink* pLink
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  char[256] display
+                         local  char[256] textStr
+                         inlines  CameraController_GetCameraLookPoint

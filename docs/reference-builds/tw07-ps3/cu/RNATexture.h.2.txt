@@ -1,0 +1,13 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNARender/RNATexture.h
+// compiled in: RNAStateManager.cpp, RNATextureDDS.cpp, Scrape.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   55    inline-only   struct TexturePlatC& TextureC::GetPlatform(const struct TextureC* this)
+   59    inline-only   int32_t TextureC::GetNumLayers(const const struct TextureC* this)
+   60    inline-only   int32_t TextureC::GetNumMipmapLevels(const const struct TextureC* this)
+   61    inline-only   enum TextureTypeE TextureC::GetType(const const struct TextureC* this)
+   62    inline-only   enum SurfaceFormatE TextureC::GetFormat(const const struct TextureC* this)
+   63    inline-only   SurfaceFlagsT TextureC::GetSurfaceFlags(const const struct TextureC* this)
+   64    inline-only   int32_t TextureC::GetWidth(const const struct TextureC* this)
+   65    inline-only   int32_t TextureC::GetHeight(const const struct TextureC* this)
+   66    inline-only   int32_t TextureC::GetDepth(const const struct TextureC* this)

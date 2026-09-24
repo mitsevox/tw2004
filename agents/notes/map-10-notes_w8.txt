@@ -1,0 +1,70 @@
+map-10 wave 8 (link run), 2026-09-24 13:51- CDT. Scores: quicktrial instruction diffs unless % given.
+Scratch: perm_custom.py (permute.py with a hand-made base.c, -j2, time limit), w8_*.py variant scripts.
+
+DONE
+- SitDevFile fn_800BB52C 99.44 -> exact (unit 47/47): one shared `u32 i` for both loops (gives the orig
+  `mr r6,r8` IV start, 7 diffs from swapped i/pEntry8 regs), plus the permuter's find (15 min -j2 on the
+  shared-i base, score 0 in ~6 min): in the n08 swap block `pEntry8 = p1C; pSrc = pEntry8; pDst = p1C;`
+  (fake match comment). `pSrc = pDst = p1C` (65/66) and pDst = pEntry8 (65): no.
+
+SitDevFile LINK: NOT DONE, the unit looks like TWO original files.
+- graduate.py with .data 0x80191230-0x80191308, .sbss 0x802821F8-0x80282208, .sdata2 0x80284290-0x802842C0:
+  DOL fails only at jumptable_801912D0: the original has 4 zero bytes at 0x801912CC between
+  jumptable_80191240 (0x8C, ends 0x801912CC) and jumptable_801912D0; ours packs the tables. Nothing
+  references the 4 bytes (a __declspec(section ".data") static stand-in lands at the right offset in the
+  .o, but the linker strips it). Only 4 such jumptable->jumptable gaps exist in the whole DOL; the other
+  three are at unit boundaries (GameManager/GameRound, scanf). So: 8-aligned .data start of a second
+  file whose first table is jumptable_801912D0 (fn_800BD580's switch). The split is somewhere between
+  the last .sdata2 user (0x800BCA24's function) and 0x800BD580 (fn_800BD580); "---- running a script's
+  actions" (fn_800BCD68 on) is the natural boundary but not proven. The .sbss (0x80282208 / 10 / 18 at
+  8-byte strides, lbl_80282200 u8 "size 8") may also be per-file 8-alignment.
+  Not split: guessed extent + hand edit of splits/configure; left for the orchestrator. Reverted.
+- Attaching .sbss also needs lbl_80282208/10/18 defined here (Code80067710.c and event.c use them via sitdev.h).
+
+- target TARGET_UpdateMomentums 96.41 -> exact (unit 31/33), three steps:
+  1. no pTarget local: `gPlayers[nPlayer].vTarget` written out at each use (quicktrial 93 -> 35);
+  2. the aim distance read into a local BEFORE the `fA60 < 0.0f &&` test (EA's TW07 local
+     playerToAimDist): `fAimDist = fn_80009680(fn_80009744(vDir)); if (fA60 < 0.0f && fAimDist >= fMin)`
+     (35 -> 20; the orig calls the length before loading fA60);
+  3. decl order from a random sweep (w8_rnd.py, 300 orders, seed 5; float regs rotated): 20 -> 0.
+  (EA's TW07 decl order mapped onto ours: 97-117, worse. PlayerNumber_t param: no change.)
+
+TRIED, NO GAIN
+- skalib fn_80026844: `*(s16*)(pTree + nGroupOff + 2)` (no inner parens) 13 -> 4 (pWork now r4, like the
+  orig); left 4: orig `add r9,pTree,nOff; lha r9,2(r9)`, ours `addi r0,r9,2; lhax`. 8 spellings
+  ([1], nOff+pTree, &pTree[n], AnimClubNode->nDefault, pNode local), pTree before the first read,
+  separate first-group local int/s32/long x 12 decl positions, block-scoped local: all 4. Not applied
+  (skalib has 4 other non-exact fns; can't link this wave).
+- target PlaceBall_UpdateMomentums (12): fStep = -0.5f then *= each (26), fStep chained (12),
+  one product (13), fTicks split (21), fSpeed * (-0.5f * fTicks) (12): no. 150 random decl orders
+  (base best), EA TW07 order (30).
+- target TARGET_Init (93.8): not retried (map-03 list); orig mixes r3-offset stores with the stfsu walker
+  in the unrolled 5x loop.
+- char Character_SetupForShot (6: nPlayer/u10 load regs swapped): gPlayers + n, (u32) index, pModel
+  first, u10 through a u32 local: all 6.
+- char fn_80017DDC (aligned 1: orig has a dead second `b end` after the fUnder<0 return): split ifs,
+  `if (..) return; else {rest}`, empty else, `;` after the block, negated condition with the body
+  inside: 1-3. Not found.
+- char Character_PlaceFeetOnGround (orig loads fLow into f1 and copies it into fY with fmr, then tests
+  fLow; ours tests fY): if-forms, else-forms, negated ternaries, whole-block rewrites: 33 or worse; 200
+  random decl orders: none better.
+- char fn_80019EF4 (73: orig copies pChar through r0 before stmw, pChar r26 / pModel r25; ours swapped):
+  30 decl orders, pModel assigned inside the call arg (72), a64 read twice (74-76): no.
+- GoTerrain fn_80034CAC (orig `li r28,1` hoisted, `and. r0,r6,r28`): a mask local = 1 (u32/s32/int/u8,
+  first/last): identical code (CW folds the constant). Needs a non-constant source; not found.
+- GoTerrain fn_80032F88 (r29/r30 pDraw vs the index swap): for-init pDraw (both orders), i = 0 before,
+  decl-init pDraw (202), walking pList itself (207): no. Permuter 15 min -j2: best 120 (from ~?),
+  both outputs clobber a live variable (nCount / i = iGlobalObjectIndex): unusable.
+- target PlaceBall_UpdateMomentums: permuter ~8 min -j2 (stopped early for fn_80032F88): nothing.
+
+SitDevFile SPLIT + LINK DONE (14:50, commit aa78cf15): five units, all Matching, main.dol OK.
+  SitDevMisc 800BB0A8-800BB42C (.bss FA198-FA1C0, .sbss 821F8-82208, .sdata2 84290-842A0)
+  SitDevFile 800BB42C-800BB6DC (.data 91230-91240, .sbss 82208-82210)
+  SitDevCommentaryZones 800BB6DC-800BB7AC (.bss FA1C0-FA1E8, .sbss 82210-82218)
+  SitDevStateVector 800BB7AC-800BCD68 (.data 91240-912D0, .sbss 82218-82220, .sdata2 842A0-842C0)
+  SitDevTrigger 800BCD68-800BD894 (.data 912D0-91308)
+  Evidence: .data pad at 0x801912CC; .sbss 4-byte vars at 8-byte strides (80282200/08/10/18 = one
+  file each); TW06 Xbox PDB lists sitdevmisc/file/commentaryzones/statevector/trigger.c (unity build
+  there); TW07 source order fits (Misc: OnMulligan..TranslateGameMode; Trigger: InvokeMultipleActions..).
+  fn_800BCB88..fn_800BCD5C (no data) put with StateVector: not proven either way.
+  Left: .data tables 0x801910F8-0x80191230 (lbl_801910F8, the SwapField tables) still orphan (need values).

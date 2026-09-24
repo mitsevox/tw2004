@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/packages/tiger_module/include/tiger_module_cct_interface.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    9  0033E9CC     18  void ~CCTInterface(const struct CCTInterface* this)

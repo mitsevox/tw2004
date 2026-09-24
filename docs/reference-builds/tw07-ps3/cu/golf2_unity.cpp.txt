@@ -1,0 +1,20 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf2_unity.cpp
+// compiled in: golf2_unity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+    0  00199CBC    5C0  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  AICore::~AICore, CPovMatrix4x3::CPovMatrix4x3, CPovMatrix4x4::CPovMatrix4x4, CPovQuaternion::CPovQuaternion, CPovVector3::CPovVector3, CPovVector3::operator=, CPovVector4::CPovVector4, CPovVector4::operator=, CSpectatorSystem::CSpectatorSystem, DifficultySettings::~DifficultySettings, DynTexList_t, HashString::HashString, REPLAY_MOMENT_t, ShotHistory::~ShotHistory, TSkeletonAnimation, TSpectatorModel, ~TSpectatorModel
+    0  001E7D68     18  void TSKABlender::~TSKABlender(const struct TSKABlender* this)
+                         inlines  TSKABlendData::~TSKABlendData
+    0  001E8344     18  void TSkeletonState::~TSkeletonState(const struct TSkeletonState* this)
+                         inlines  TSKABlendState::~TSKABlendState
+    0  001E835C     18  void StreamManagerFacility::~StreamManagerFacility(const struct StreamManagerFacility* this)
+    0  001E83C0     18  void StreamManagerStartup::~StreamManagerStartup(const struct StreamManagerStartup* this)
+    0  001E8424     18  void StreamManagerIngame::~StreamManagerIngame(const struct StreamManagerIngame* this)
+    0  001E8488     18  void StreamManagerHole::~StreamManagerHole(const struct StreamManagerHole* this)
+    0  001E84EC     18  void StreamManagerGlobals::~StreamManagerGlobals(const struct StreamManagerGlobals* this)
+    0  001E8550     18  void StreamManagerFrontend::~StreamManagerFrontend(const struct StreamManagerFrontend* this)
+    0  001E85B4     18  void StreamManagerFEChar::~StreamManagerFEChar(const struct StreamManagerFEChar* this)
+    0  001E8618     18  void StreamManagerDNAS::~StreamManagerDNAS(const struct StreamManagerDNAS* this)
+    0  001E8D64     18  void TSKAChannel::~TSKAChannel(const struct TSKAChannel* this)
+                         inlines  TSKABlendData::~TSKABlendData

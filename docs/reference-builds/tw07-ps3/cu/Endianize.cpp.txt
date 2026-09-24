@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/CourseData/Endianize.cpp
+// compiled in: headgate_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    6  0034578C     18  void SetGlobalEndianFlag(int g)
+   10  003457A4     EC  void Endianize1(void* data, int size)
+                         local  int i
+                         inlines  std::swap<unsigned char>
+   27  00345890     88  void GenericEndianize(void* data, int size)
+                         local  unsigned int i

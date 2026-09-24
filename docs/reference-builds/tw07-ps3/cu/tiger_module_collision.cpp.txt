@@ -1,0 +1,79 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_collision.cpp
+// compiled in: tiger_module_collision.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   31  00529C1C     60  bool IsEqual(const const struct <anon>* this, const const struct <anon>& v, float thresh)
+   56  00529194     7C  int32_t Compare(const const struct <anon>* this, const const struct <anon>& v, float thresh)
+                         local  int32_t i
+                         local  const float delta
+  113  00529550     98  void Normalize(const struct <anon>* this)
+                         local  float sumValues
+                         local  int i
+                         local  int i
+  131  005295E8     1C  void ResolveOffsets(const struct <anon>* this, const char* base)
+  151  005296B0     10  struct <anon>* FromData(void* data)
+                         local  const char* base
+                         local  struct <anon>* name
+  161  005296C0     10  void ResolveOffsets(const struct <anon>* this, const char* base)
+  202  00529C7C     48  void ClearHits(const struct <anon>* this)
+                         local  uint32_t i
+                         inlines  SetActorID, SetValid
+  212  00529CC4    11C  struct <anon>& GetNextAvailableHit(const struct <anon>* this)
+  224  005298EC     9C  const struct <anon>& GetHit(const const struct <anon>* this, uint32_t hitIndex)
+  247  00529BE8     34  struct <anon>* FromData(void* data)
+                         local  struct <anon>* mesh
+  256  00529A70    178  void ResolveOffsets(const struct <anon>* this, const char* base)
+                         local  int32_t vertexIdx
+                         local  int32_t jointIdx
+                         local  int32_t materialIdx
+  279  00529DE0    544  void SkinVertices(const const struct <anon>* this, struct <anon>* trgVertices, const struct <anon>* jointTransforms)
+                         local  int vertexIdx
+                         local  struct <anon> skinnedVert
+                         local  const struct <anon> bindPoseVert
+                         local  const const struct <anon>& weight
+                         local  int weightIdx
+                         local  const float value
+                         local  const int32_t jointIdx
+                         local  const struct <anon> jointMtx
+                         inlines  GetPtr, GetValue, TIGER_MATH::MtxLoad, TIGER_MATH::VecAdd, TIGER_MATH::VecApplyMatrix, TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecMulByX, TIGER_MATH::VecMulByY, TIGER_MATH::VecMulByZ, TIGER_MATH::VecScalarMul, TIGER_MATH::VecStore, TIGER_MATH::__vmx_lvx, TIGER_MATH::operator+, TIGER_MATH::operator+=
+  304  0052AA38    5D4  void TestCollision(const const struct <anon>* this, struct <anon>* hitPool, const struct <anon>* rays, int32_t count, const struct <anon>* skinnedVertices, const const struct <anon>& ownerPosition, const char* actorID)
+                         local  int32_t rayIdx
+                         local  const const struct <anon>& ray
+                         local  const struct <anon>& hit
+                         local  int32_t triangleIdx
+                         local  const const struct <anon>& triangle
+                         local  const const struct <anon>& vert0
+                         local  const const struct <anon>& vert1
+                         local  const const struct <anon>& vert2
+                         local  float t
+                         local  float w1
+                         local  float w2
+                         local  bool collides
+                         local  const float w0
+                         local  const struct <anon> tmV0
+                         local  const struct <anon> tmV1
+                         local  const struct <anon> tmV2
+                         inlines  SetActorID, SetDistance, SetMaterialId, SetTriangleIdx, SetValid, TIGER_MATH::VecCross, TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecRsqrt, TIGER_MATH::VecScalarMul, TIGER_MATH::VecStore, TIGER_MATH::VecSub, TIGER_MATH::VecUnit, TIGER_MATH::VecX, TIGER_MATH::VecZ, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx, TIGER_MATH::operator+, Vec, operator float __vector__, vec_madd, vec_sld
+  374  0052A324    23C  bool RaySphereCast(const const struct <anon>* this, const const struct <anon>& ray, const const struct <anon>& ownerPosition)
+                         local  struct <anon> rayOrigin
+                         local  struct <anon> rayDirection
+                         local  struct <anon> spherePosition
+                         local  struct <anon> rayToSphere
+                         local  float B
+                         local  float C
+                         local  float D
+                         inlines  TIGER_MATH::VecAdd, TIGER_MATH::VecDot3, TIGER_MATH::VecLoad, TIGER_MATH::VecSub, TIGER_MATH::VecX, TIGER_MATH::__vmx_lvx, Vec, operator const float*, vec_madd, vec_sld
+  408  0052A560    4D8  bool RayTriangleCast(const const struct <anon>* this, const float& t, const float& u, const float& v, const const struct <anon>& ray, const const struct <anon>& vert0, const const struct <anon>& vert1, const const struct <anon>& vert2)
+                         local  const struct <anon> orig
+                         local  const struct <anon> dir
+                         local  const struct <anon> tmV0
+                         local  const struct <anon> tmV1
+                         local  const struct <anon> tmV2
+                         local  const struct <anon> edge1
+                         local  const struct <anon> edge2
+                         local  const struct <anon> pvec
+                         local  const float det
+                         local  const struct <anon> tvec
+                         local  const struct <anon> qvec
+                         local  float inv_det
+                         inlines  TIGER_MATH::VecCross, TIGER_MATH::VecDot, TIGER_MATH::VecDot3, TIGER_MATH::VecLoad, TIGER_MATH::VecSet, TIGER_MATH::VecSub, TIGER_MATH::VecX, TIGER_MATH::VecY, TIGER_MATH::VecZ, TIGER_MATH::__vmx_lvx, Vec, operator const float*, operator float __vector__, vec_madd, vec_sld, vec_sub

@@ -1,0 +1,103 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_global.cpp
+// compiled in: tiger_module_global.cpp
+// 59 functions, source order. line | PS3 address | size
+
+    0  00342934     38  void ~Global(const struct <anon>* this)
+                         inlines  ~Module
+   12  0052F51C     10  static void StaticLuaSetFloat(const struct <anon>* param, void* object)
+   13  0052F36C     10  static void StaticLuaSetString(const struct <anon>* param, void* object)
+   14  0052F6F0     10  static void StaticLuaSetBoolean(const struct <anon>* param, void* object)
+   16  0052FB38     10  static void StaticLuaDir(const struct <anon>* param, void* object)
+   17  0052E5F8     10  static void StaticLuaMakeContext(const struct <anon>* param, void* object)
+   18  0052DFD8     10  static void StaticLuaSaveContext(const struct <anon>* param, void* object)
+   19  0052E098     10  static void StaticLuaRestoreContext(const struct <anon>* param, void* object)
+   20  0052E860     10  static void StaticLuaRemoveCurrentContext(const struct <anon>* param, void* object)
+   22  0052F048     10  static float StaticLuaGetFloat(const struct <anon>* param, void* object)
+   23  0052F208     10  static const char* StaticLuaGetString(const struct <anon>* param, void* object)
+   24  0052EB30     10  static const char* StaticLuaGetContext(const struct <anon>* param, void* object)
+   25  0052EE7C     10  static int StaticLuaGetBoolean(const struct <anon>* param, void* object)
+   26  0052FC74     10  static int StaticLuaChangeContext(const struct <anon>* param, void* object)
+   28  00530084     2C  void Global(const struct <anon>* this, const const void** __vtt_parm, struct Lua* lua)
+   35  0052DDB4     14  void Zero(const struct <anon>* this)
+   42  0052FEE0     70  void Init(const struct <anon>* this)
+                         inlines  Allocator::SetLock
+   50  0052FF50    134  void LevelInit(const struct <anon>* this)
+                         inlines  Allocator::SetLock
+   63  0052DDC8     8C  void LevelShutdown(const struct <anon>* this)
+                         inlines  Allocator::SetLock
+   72  0052DE54     8C  void Shutdown(const struct <anon>* this)
+   82  0052DEE0     CC  void Update(const struct <anon>* this)
+                         local  struct <anon> ___profScope
+                         inlines  Profile, ~Profile
+   89  0052DFAC     1C  bool IsInitialized(const const struct <anon>* this)
+   94  0052E68C     5C  bool DoesContextExist(const struct <anon>* this, const char* context)
+                         local  const char* result
+  103  0052FB48    100  bool ChangeContext(const struct <anon>* this, const char* context, bool assertOnFail)
+                         local  const char* result
+  130  0052E608     84  int ChangeOrMakeContextInternal(const struct <anon>* this, const char* context)
+  145  0052E0A8    2E8  const char* ChangeContextInternal(const struct <anon>* this, const char* context)
+                         local  int ch
+                         local  const char* nextSlash
+                         local  size_t length
+                         local  struct <anon>* childContext
+                         local  struct <anon>* foundContext
+                         local  const char* childName
+                         local  size_t childNameLength
+  237  0052E6E8    174  void RemoveCurrentContext(const struct <anon>* this)
+                         local  struct <anon>* parent
+  254  0052F37C     50  void MakeContext(const struct <anon>* this, const char* context, struct GlobalUpdate* update, const char* defaultString)
+  260  0052F52C     50  void MakeContext(const struct <anon>* this, const char* context, struct GlobalUpdate* update, float defaultFloat)
+  267  0052E390    25C  void MakeContext(const struct <anon>* this, const char* context, struct GlobalUpdate* update)
+                         local  const char* newContext
+                         local  struct <anon>* parentCreated
+                         local  const char* nextSlash
+                         local  unsigned int nameLength
+  320  0052E870    200  void MakeAndChangeContext(const struct <anon>* this, const char* context, struct GlobalUpdate* update)
+                         local  const char* newContext
+                         local  const char* nextSlash
+                         local  unsigned int nameLength
+  360  0052EA70     BC  const char* GetContext(const const struct <anon>* this)
+  367  0052F058    1A8  const char* GetString(const struct <anon>* this, const char* relativeContext)
+                         local  const char* result
+  405  0052EE8C    1B4  float GetFloat(const struct <anon>* this, const char* relativeContext)
+                         local  float result
+                         local  const char* changeResult
+  443  0052ECA0    1B4  bool GetBoolean(const struct <anon>* this, const char* relativeContext)
+                         local  bool result
+  477  0052EB40    160  enum GlobalType GetType(const struct <anon>* this, const char* relativeContext)
+                         local  enum GlobalType type
+  508  0052DFC8      C  void SaveContext(const struct <anon>* this)
+  513  0052DFE8     AC  void RestoreContext(const struct <anon>* this)
+  519  0052F218    118  void SetString(const struct <anon>* this, const char* relativeContext, const char* value)
+  541  0052F3CC    114  void SetFloat(const struct <anon>* this, const char* relativeContext, float value)
+  564  0052F57C    118  void SetBoolean(const struct <anon>* this, const char* relativeContext, bool value)
+  589  0052F700     A0  static const char* TabString(unsigned int tabCount)
+                         local  const unsigned int maxTabs
+                         local  char[49] tab
+  603  0052F7A0    280  void PrintContext(const struct <anon>* this, unsigned int tabCount, struct <anon>* context)
+                         local  const char* tab
+                         local  enum GlobalType type
+  632  0052FA20    10C  void Dir(const struct <anon>* this, unsigned int tabCount, struct <anon>* context)
+                         local  struct <anon>* child
+  652  0052FC84    250  void InitLuaFunctions(const struct <anon>* this)
+                         local  enum LuaType[2] stringFloatType
+                         local  enum LuaType[2] stringBoolType
+                         local  enum LuaType[2] stringStringType
+                         local  enum LuaType stringType
+  680  0052E85C      4  void LuaRemoveCurrentContext(const struct <anon>* this, const struct <anon>* )
+  685  0052DFD4      4  void LuaSaveContext(const struct <anon>* this, const struct <anon>* )
+  690  0052E094      4  void LuaRestoreContext(const struct <anon>* this, const struct <anon>* )
+  695  0052FC48     2C  int LuaChangeContext(const struct <anon>* this, const struct <anon>* param)
+  700  0052E5EC      C  void LuaMakeContext(const struct <anon>* this, const struct <anon>* param)
+  705  0052FED4      C  void LuaMakeAndChangeContext(const struct <anon>* this, const struct <anon>* param)
+  711  0052FB2C      C  void LuaDir(const struct <anon>* this, const struct <anon>* )
+  716  0052EB2C      4  const char* LuaGetContext(const struct <anon>* this, const struct <anon>* )
+  721  0052F040      8  float LuaGetFloat(const struct <anon>* this, const struct <anon>* param)
+  726  0052F200      8  const char* LuaGetString(const struct <anon>* this, const struct <anon>* param)
+  731  0052EE54     28  int LuaGetBoolean(const struct <anon>* this, const struct <anon>* param)
+  737  0052F4E0     3C  void LuaSetFloat(const struct <anon>* this, const struct <anon>* param)
+                         local  const char* context
+  750  0052F330     3C  void LuaSetString(const struct <anon>* this, const struct <anon>* param)
+                         local  const char* context
+  763  0052F694     5C  void LuaSetBoolean(const struct <anon>* this, const struct <anon>* param)
+                         local  const char* context

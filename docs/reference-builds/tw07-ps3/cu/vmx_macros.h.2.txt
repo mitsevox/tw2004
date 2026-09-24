@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/vmx_macros.h
+// compiled in: DebugMenu.cpp, RNADevice.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   43    inline-only   static signed char[16] detail::CastToVectorSignedChar(float[4] vec)
+   48    inline-only   static int[4] detail::CastToVectorSignedInt(float[4] vec)
+   53    inline-only   static float[4] detail::CastToVectorFloat(int[4] vec)

@@ -1,0 +1,30 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptCharacterInstSprite.cpp
+// compiled in: other_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+    7  004991A8    2EC  void AptCIH::jumpToFrame(const struct AptCIH* this, int nTargetFrame)
+                         local  struct AptCharacterSpriteInstBase* pSprInstBase
+                         local  struct AptDisplayListState* pOldState
+                         local  struct AptDisplayListState* pNewState
+                         local  struct AptHash* pNewObject
+                         local  struct AptHash* pOldObject
+                         inlines  AptCIH::getSpriteInstBase, AptCIH::operator new, AptDisplayListState::AptDisplayListState, AptDisplayListState::operator new, AptHash::AptHash, AptHash::operator new, AptValue::AptValue, AptValue::setIsDefined
+  172  00497C70    65C  bool AptCIH::queueClipEvents(const struct AptCIH* this, int nEventFlags, AptInput input, int bFromListenerSet)
+                         local  struct AptCharacterSpriteInstBase* pSprInstBase
+                         local  bool bQueuedClipEvent
+                         local  struct AptNativeHash* pThisHash
+                         local  int i
+                         local  int s
+                         local  struct AptValueStack<AptValue*,32> nStap
+                         local  int kk
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  int i
+                         local  struct AptValue* pValue
+                         inlines  AptCIH::getSpriteInstBase, AptFrameStack::AptFrameStack, AptFrameStack::operator new, AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount, AptValueStack<AptFrameStack*,32>::pop, AptValueStack<AptFrameStack*,32>::push, AptValueStack<AptValue*,32>::pop, AptValueStack<AptValue*,32>::push, AptValueStack<AptValue*,32>::top, AptValueStack<AptValue*,384>::pop, AptValueStack<AptValue*,384>::push, AptValueStack<AptValue*,384>::size, AptValueStack<AptValue*,384>::top
+  325  00499494    174  void AptCIH::tick(const struct AptCIH* this)
+                         local  struct AptCharacterSpriteInstBase* pSpriteInst
+                         inlines  AptCIH::getSpriteInstBase, AptCIH::isSpriteInstBase
+  405  00499DA0     3C  void AptCIH::doInitActions(const struct AptCIH* this)
+                         local  struct AptCharacterSpriteInstBase* pSpriteInst
+                         inlines  AptCIH::isSpriteInstBase

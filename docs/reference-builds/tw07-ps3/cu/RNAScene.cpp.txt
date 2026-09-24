@@ -1,0 +1,318 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnax/source/RNAX/RNAScene.cpp
+// compiled in: RNAScene.cpp
+// 23 functions, source order. line | PS3 address | size
+
+    0  0085E8EC    1A4  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  GetRow, Matrix44, Quaternion, Set, Vector2, Vector3, Vector4
+   94  0085D694    7E4  static void ReadElement(const struct InStreamC& in, const const struct ElementT& Element, union <anon>* pValue)
+                         local  const char[12] __FUNCTION__
+                         local  uint32_t tmp
+                         local  union Vector_11_11_10 vector_11_11_10
+                         local  union Vector_10_10_10 vector_10_10_10
+                         inlines  RNADebugBreak
+  324  0085EAB0    1CC  void SerializeInVertexData(const struct <anon>* this, const struct InStreamC& in, const struct <anon>& vertexFormat, uint8_t* pData, int32_t nVertices)
+                         local  bool bSerializeBytes
+                         local  int32_t iVert
+                         local  int32_t iElement
+                         local  const struct ElementT* pElement
+                         inlines  GetElement
+  367  0085EF64    39C  struct StreamC* SerializeInStream(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[18] __FUNCTION__
+                         local  struct <anon> strFormat
+                         local  uint32_t tag
+                         local  int nVertices
+                         local  uint32_t uVertexSize
+                         local  enum MemoryLocationE nLocation
+                         local  struct UserData* pUserData
+                         local  int32_t idVertexFormat
+                         local  struct VertexFormatC* pVF
+                         local  struct StreamPlatC* pStreamPlat
+                         local  uint8_t* pDataPtr
+                         local  bool8_t bMainMem
+                         inlines  GetVertexFormat, RNADebugBreak, StreamPlatC::operator new, String, operator RNA::VertexFormatC*, operator[]
+  426  0085E2E0    40C  struct IndicesC* SerializeInIndices(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[19] __FUNCTION__
+                         local  struct IndicesC* pIndices
+                         local  uint32_t tag
+                         local  int nIndices
+                         local  uint32_t uFormat
+                         local  enum MemoryLocationE nLocation
+                         local  struct UserData* pUserData
+                         local  bool8_t is32Bit
+                         local  bool8_t bMainMem
+                         local  void* pDataPtr
+                         local  uint32_t* p32DataPtr
+                         local  uint16_t* p16DataPtr
+                         local  int iIndex
+                         local  int iIndex
+                         inlines  IndicesC::operator new, RNADebugBreak
+  601  0085DE78    1C4  struct VertexFormatC* SerializeInVertexFormat(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[24] __FUNCTION__
+                         local  uint32_t tag
+                         local  char[512] str
+                         local  struct VertexFormatC* pVertexFormat
+                         local  struct <anon> vf
+                         inlines  RNADebugBreak
+  637  0085F300    514  struct MeshC* SerializeInMesh(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[16] __FUNCTION__
+                         local  struct MeshC* pMesh
+                         local  uint32_t tag
+                         local  struct UserData* pUserData
+                         local  uint32_t uPrimTag
+                         local  int32_t BaseVertexIndex
+                         local  uint32_t StartIndex
+                         local  uint32_t PrimitiveCount
+                         local  int32_t idVertexFormat
+                         local  int32_t nIndices
+                         local  int32_t nStreams
+                         local  int i
+                         local  int i
+                         local  int32_t idStream
+                         local  int32_t idIndices
+                         inlines  GetIndices, GetStream, GetVertexFormat, MeshPlatC::operator new, RNADebugBreak, operator[]
+  827  0085EC7C    2E8  struct GeomC* SerializeInGeom(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[16] __FUNCTION__
+                         local  struct GeomC* pGeom
+                         local  uint32_t tag
+                         local  struct UserData* pUserData
+                         local  int32_t nMeshs
+                         local  int iMesh
+                         local  int32_t idMesh
+                         local  int32_t idMaterial
+                         inlines  GeomC::operator new, GetMesh, RNADebugBreak
+  876  00864D70   1B3C  bool8_t SerializeInGeomChunk(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[21] __FUNCTION__
+                         local  int iNumVertexFormats
+                         local  int iNumStreams
+                         local  int iNumIndices
+                         local  int iNumMeshs
+                         local  int iNumGeoms
+                         local  int iVertexFormat
+                         local  int iStream
+                         local  struct StreamC* pStream
+                         local  int iIndices
+                         local  struct IndicesC* pIndices
+                         local  int iMesh
+                         local  struct MeshC* pMesh
+                         local  int iGeom
+                         local  struct GeomC* pGeom
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::StreamC>* newData
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::IndicesC>* newData
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::MeshC>* newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::IndicesC>* newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::MeshC>* newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::StreamC>* newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  struct VertexFormatC* pVertexFormat
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::VertexFormatC>* newData
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::VertexFormatC>* newData
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::MeshC>* newData
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::StreamC>* newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::VertexFormatC>* newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::StreamC>* newData
+                         local  int32_t i
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::MeshC>* newData
+                         local  int32_t i
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::VertexFormatC>* newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  AutoRefCount, Construct, Destroy, PushBack, RNADebugBreak, Reserve, ~AutoRefCount
+  970  0086207C    914  struct MaterialC* SerializeInMaterial(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[20] __FUNCTION__
+                         local  struct MaterialC* pMaterial
+                         local  uint32_t tag
+                         local  int nParms
+                         local  struct UserData* pUserData
+                         local  int32_t idShader
+                         local  struct ShaderC* pShader
+                         local  int32_t iVersion
+                         local  char[256] strTechName
+                         local  int iParm
+                         local  uint32_t idType
+                         local  char[256] name
+                         local  uint32_t uCount
+                         local  uint32_t uIndex
+                         local  int32_t idTexture
+                         local  struct TextureC* pTexture
+                         local  struct <anon> str
+                         local  float_t f32
+                         local  RNAVector4 v4
+                         local  bool8_t b8
+                         local  RNAVector2 v2
+                         local  int32_t i32
+                         local  RNAVector3 v3
+                         local  int32_t iTech
+                         inlines  GetShader, GetTexture, MaterialC::SetTechnique, MaterialC::operator new, RNADebugBreak, String, operator RNA::ShaderC*, operator[], ~String
+ 1180  0085E6EC    200  bool8_t SerializeInMaterialChunk(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[25] __FUNCTION__
+                         local  int nMaterials
+                         local  int iMaterial
+                         local  struct MaterialC* pMaterial
+                         inlines  RNADebugBreak
+ 1211  0085E03C    170  struct TextureC* SerializeInTexture(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[19] __FUNCTION__
+                         local  uint32_t tag
+                         local  struct UserData* pUserData
+                         local  char[512] strName
+                         local  char[512] strFileName
+                         inlines  RNADebugBreak
+ 1240  00862990    844  bool8_t SerializeInTextureChunk(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[24] __FUNCTION__
+                         local  int nTextures
+                         local  int iTexture
+                         local  struct TextureC* pTexture
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::TextureC>* newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::TextureC>* newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::TextureC>* newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::TextureC>* newData
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  AutoRefCount, Construct, Destroy, PushBack, RNADebugBreak, Reserve, ~AutoRefCount
+ 1266  0085E1AC    134  struct ShaderC* SerializeInShader(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[18] __FUNCTION__
+                         local  uint32_t tag
+                         local  struct UserData* pUserData
+                         local  char[512] strName
+                         inlines  RNADebugBreak
+ 1292  008668AC    820  bool8_t SerializeInShaderChunk(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[23] __FUNCTION__
+                         local  int nShaders
+                         local  int iShader
+                         local  struct ShaderC* pShader
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::ShaderC>* newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::ShaderC>* newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::ShaderC>* newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::ShaderC>* newData
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  AutoRefCount, Construct, Destroy, PushBack, RNADebugBreak, Reserve, ~AutoRefCount
+ 1316  0085D5D8     BC  bool8_t SerializeChunk(const struct <anon>* this, const struct InStreamC& in, uint32_t chunkID)
+ 1340  008603E8    544  void RNASceneC(const struct <anon>* this)
+                         inlines  Init, RNADebugBreak, RefCountTemplate, Vector
+ 1346  0085F814    630  void ~RNASceneC(const struct <anon>* this)
+                         local  const char[11] __FUNCTION__
+                         inlines  Init, RNADebugBreak, ~RefCountTemplate, ~Vector
+ 1354  0085FE44    5A4  void Unload(const struct <anon>* this)
+                         inlines  Clear, Init
+ 1394  008631D4   1B9C  bool8_t MoveInSceneObjects(const struct <anon>* this, struct <anon>* sourceScene, bool8_t bMergeMaterialsByName, bool8_t bCopyOnly)
+                         local  const char[19] __FUNCTION__
+                         local  struct <anon> remapTable
+                         local  int32_t newMaterialListSize
+                         local  int32_t index
+                         local  int32_t index
+                         local  int32_t index
+                         local  int32_t index
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::MeshC>* newData
+                         local  int32_t index
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::TextureC>* newData
+                         local  int32_t index
+                         local  int32_t matIndex
+                         local  int32_t geomIndex
+                         local  struct GeomC* pGeom
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::TextureC>* newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::MeshC>* newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::MeshC>* newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::MeshC>* newData
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Clear, Construct, Destroy, GeomListC::GetGeom, Grow, Init, MaterialListC::GetMaterial, PushBack, RNADebugBreak, Reserve, Vector, operator[], ~Vector
+ 1523  00861AF8    584  int32_t GetMaterialMergeRemapTable(struct MaterialListC* pDestList, struct MaterialListC* pSrcList, bool8_t bMergeMaterialsByName, const struct <anon>& table)
+                         local  int32_t iNumAdded
+                         local  int32_t idx
+                         local  int32_t i
+                         local  int32_t srcIndex
+                         local  struct MaterialC* pMaterial
+                         local  int32_t destIndex
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  int32_t* newData
+                         inlines  Construct, Grow, MaterialListC::GetMaterial, MaterialListC::GetNumMaterials, RNADebugBreak, Resize, operator[]
+ 1560  0085EAA0     10  static void _GLOBAL__I_bForceToMainMem()
+ 1561  0085EA90     10  static void _GLOBAL__D_bForceToMainMem()

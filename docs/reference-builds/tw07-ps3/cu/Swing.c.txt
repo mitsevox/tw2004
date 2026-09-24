@@ -1,0 +1,618 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/AI/Swing.c
+// compiled in: golf2_unity.cpp
+// 117 functions, source order. line | PS3 address | size
+
+ 1258  0016B4D8    1A0  float Lua_SW_TuneSwingPower(float shotPower, enum SW_eSwingInputStyle_t inputStyle, float targetDistance, float targetPower)
+                         inlines  LuaTuningFileManager::Call<float, float, SW_eSwingInputStyle_t, float, float>
+ 1265  001B5D5C     68  bool CO_LoadSwingTuningValues(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1276  00198D00     88  bool CO_SetDiffEasy(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         inlines  Singleton<DifficultySettings>::GetSingleton
+ 1284  00198D88     88  bool CO_SetDiffMedium(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         inlines  Singleton<DifficultySettings>::GetSingleton
+ 1292  00198E10     88  bool CO_SetDiffHard(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         inlines  Singleton<DifficultySettings>::GetSingleton
+ 1300  00198E98     88  bool CO_SetDiffTour(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         inlines  Singleton<DifficultySettings>::GetSingleton
+ 1308  001D6D00     AC  void SetStat(float fraction)
+                         local  enum PlayerNumber_t PlayerID
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  GolferStat_t value
+                         local  int8 stat
+                         inlines  GM_GetGolferUp
+ 1322  001D6FB4     34  bool CO_SetStat000(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1328  001D6F80     34  bool CO_SetStat010(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1334  001D6F4C     34  bool CO_SetStat020(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1340  001D6F18     34  bool CO_SetStat030(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1346  001D6EE4     34  bool CO_SetStat040(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1352  001D6EB0     34  bool CO_SetStat050(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1358  001D6E7C     34  bool CO_SetStat060(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1364  001D6E48     34  bool CO_SetStat070(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1370  001D6E14     34  bool CO_SetStat080(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1376  001D6DE0     34  bool CO_SetStat090(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1382  001D6DAC     34  bool CO_SetStat100(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1390  001487F0    1A8  void SW_InitOnce()
+ 1412  00148998      4  void SW_CloseOnce()
+ 1416  0017796C   392C  void SW_vInitModule()
+                         local  int i
+                         local  int id
+                         local  int catId
+                         local  int catId2
+                         local  float INPUTRW_DEADZONE_LEFT
+                         local  float INPUTRW_DEADZONE_RIGHT
+                         local  int cvid
+                         local  int cmmid
+                         local  int stid
+                         local  int id
+                         local  int catId
+ 2055  0014899C     48  void SW_vCloseModule()
+ 2077  00150954     60  void SW_vDeInitForHole()
+                         local  int i
+ 2087  001B5D1C     40  void SW_ClubChanged(enum PlayerNumber_t PlayerID)
+ 2099  001489E4     1C  float SW_vGetControllerTopOfSwing(SW_sSwingData* pSwingInfo)
+ 2103  00148A00     1C  float SW_vGetControllerStartOfSwing(SW_sSwingData* pSwingInfo)
+ 2118  00148A1C     54  struct Controller_StickInfo* SW_vGetStickInfo(enum PlayerNumber_t PlayerID, int32 joyPad)
+                         local  struct Controller_StickInfo* info
+ 2142  00150454     90  int SW_vGetStickX(enum PlayerNumber_t PlayerID, struct Controller_StickInfo* info, bool reverse, bool invert)
+                         local  int xPos
+                         local  SW_sSwingData* pSwingInfo
+ 2187  001504E4     9C  int SW_vGetStickY(enum PlayerNumber_t PlayerID, struct Controller_StickInfo* info, bool reverse)
+                         local  int yPos
+                         local  SW_sSwingData* pSwingInfo
+ 2227  001815F8    458  bool SW_vUpdateSwing(enum PlayerNumber_t PlayerID)
+                         local  bool ballHit
+                         local  SW_sSwingData* pSwingInfo
+                         local  char[1000] debugChar
+                         local  float x
+                         local  FO_EAddMode oldMode
+                         inlines  GamePlayer::GetSwingInfo
+ 2314  001B5C10    10C  void SW_vInitSwing(enum PlayerNumber_t PlayerID)
+                         local  SW_sSwingData* pSwingInfo
+                         inlines  EarningsManager::SetAwardGivenFlag, GamePlayer::GetSwingInfo
+ 2365    inline-only   static void SW_vUpdateSwingTagTimes(enum PlayerNumber_t PlayerID)
+                         local  struct TCharacter* pCharacter
+                         local  SW_sSwingData* pSwingInfo
+ 2383  001A7F14    268  void SW_vStateInitBackSwing(enum PlayerNumber_t PlayerID)
+                         local  int i
+                         local  struct TCharacter* pCharacter
+                         local  SW_sSwingData* pSwingInfo
+                         inlines  Character_GetTagTime, GamePlayer::GetCharacter, GamePlayer::GetSwingInfo, SW_vUpdateSwingTagTimes
+ 2443  001D7080    210  void SW_ProcessStateIdleSwingAnalogStick(enum PlayerNumber_t PlayerID)
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  SW_sSwingData* pSwingInfo
+                         local  enum PlayerCtrl_t controllerNumber
+                         local  bool bSwingLeft
+                         local  bool bSwingRight
+                         local  struct Controller_StickInfo* info
+                         inlines  GamePlayer::GetSwingInfo
+ 2535  001D793C     18  void SW_ProcessStateIdleSwingThreeButtonClick(enum PlayerNumber_t PlayerID)
+ 2546  001D7954    10C  bool SW_vStateIdleSwing(enum PlayerNumber_t PlayerID)
+                         local  struct TCharacter* pCharacter
+                         local  SW_sSwingData* pSwingInfo
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         inlines  GM_GetModeType, GamePlayer::GetCharacter, GamePlayer::GetSwingInfo
+ 2596  00148A70    1A4  static void SW_GetSwingProfileInfo(TSwingProfile* pSwingProfile, float time, TSwingProfileFrame* pSPF)
+                         local  float fIndex
+                         local  int32 i0
+                         local  int32 i1
+                         local  float fBlend
+ 2631  001A7E58     B8  void SW_BeginDownSwingAI(SW_sSwingData* pSwingInfo, struct TCharacter* pCharacter)
+                         local  float localTime
+                         inlines  SKATime_SetTimeScale
+ 2656  001A7F10      4  void SW_BeginDownSwingThreeButtonClick(SW_sSwingData* pSwingInfo, struct TCharacter* pCharacter)
+ 2661  001CBC28    568  void SW_ProcessStateBackSwingAnalogStick(enum PlayerNumber_t PlayerID)
+                         local  int i
+                         local  int iStickX
+                         local  int iStickY
+                         local  float fDist
+                         local  float fSpeedCalibration
+                         local  float fTime
+                         local  float fDiff
+                         local  float fControllerTargetTime
+                         local  float fSwingSpeed
+                         local  float fTop
+                         local  float fStart
+                         local  float fPctDiff
+                         local  float fTarget
+                         local  struct Controller_StickInfo* info
+                         local  enum PlayerCtrl_t controllerNumber
+                         local  struct TCharacter* pCharacter
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  SW_sSwingData* pSwingInfo
+                         local  float localTime
+                         local  int32 tmpY
+                         local  int32 tmpX
+                         inlines  GamePlayer::GetCharacter, GamePlayer::GetSwingInfo, SKATime_SetTimeScale, std::sqrt
+ 2957  001CC190    274  bool SW_vStateBackSwing(enum PlayerNumber_t PlayerID)
+                         local  float fTime
+                         local  float fTarget
+                         local  enum PlayerCtrl_t controllerNumber
+                         local  struct TCharacter* pCharacter
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  SW_sSwingData* pSwingInfo
+                         inlines  GM_GetModeType, GamePlayer::GetCharacter, GamePlayer::GetSwingInfo
+ 3073  001CBB70     B8  void SW_vStateInitBackSwingFigit(enum PlayerNumber_t PlayerID)
+                         local  struct TCharacter* pCharacter
+                         local  SW_sSwingData* pSwingInfo
+                         inlines  GamePlayer::GetCharacter, GamePlayer::GetSwingInfo, SKATime_SetTimeScale
+ 3105  001B4A74    27C  bool SW_vStateBackSwingFigit(enum PlayerNumber_t PlayerID)
+                         local  float fTop
+                         local  float fStart
+                         local  float fTime
+                         local  struct Controller_StickInfo* info
+                         local  enum PlayerCtrl_t controllerNumber
+                         local  struct TCharacter* pCharacter
+                         local  SW_sSwingData* pSwingInfo
+                         local  int iStickX
+                         local  int iStickY
+                         inlines  GamePlayer::GetCharacter, GamePlayer::GetSwingInfo, SKATime_SetTimeScale
+ 3220  001DD1E4    630  bool SW_vStateDownSwing(enum PlayerNumber_t PlayerID)
+                         local  struct Controller_StickInfo* info
+                         local  enum PlayerCtrl_t controllerNumber
+                         local  struct TCharacter* pCharacter
+                         local  int iStickX
+                         local  int iStickY
+                         local  float fMagnitude
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  SW_sSwingData* pSwingInfo
+                         local  float fTappaBoost
+                         local  float fPowerScale
+                         local  float fExplosiveDownsing_SpeedMultiplyer_Min
+                         local  float fExplosiveDownsing_SpeedMultiplyer_Max
+                         local  float fExplosiveDownsing_Acceleration_Min
+                         local  float fExplosiveDownsing_Acceleration_Max
+                         local  float fExplosiveDownsing_PctPerTappa
+                         local  int catId
+                         local  int id
+                         local  float fExplosiveDownsing_SpeedMultiplyer
+                         local  float fExplosiveDownsing_Acceleration
+                         local  float nextFrameSKATime
+                         local  float dt
+                         inlines  DrawFadeIndicator::GetInstance, GM_GetModeType, GamePlayer::GetCharacter, GamePlayer::GetSwingInfo, SKATime_SetTimeScale
+ 3417  00150650     9C  void SW_KillVibration(enum PlayerNumber_t PlayerID)
+                         local  int temp
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  SW_sSwingData* pSwingInfo
+                         inlines  GamePlayer::GetSwingInfo
+ 3445  001506EC     9C  void SW_UpdateVibration(enum PlayerNumber_t PlayerID)
+                         local  SW_sSwingData* pSwingInfo
+                         inlines  GamePlayer::GetSwingInfo
+ 3468  00148C14      8  bool SW_vStateThroughSwing(enum PlayerNumber_t PlayerID)
+ 3482  0018CE98    1B0  bool SW_vStatePostSwing(enum PlayerNumber_t PlayerID)
+                         local  enum PlayerCtrl_t controllerNumber
+                         local  struct Controller_StickInfo* stickInfo
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  SW_sSwingData* pSwingInfo
+                         local  int iStickX
+                         local  int iStickY
+                         local  struct TCharacter* pCharacter
+                         local  float fHit
+                         local  float fStart
+                         local  float weight
+                         local  float curTime
+                         local  float T1
+                         local  float ballHitTime
+                         inlines  GamePlayer::GetCharacter, SKATime_SetTimeScale
+ 3554  00148C1C      8  bool SW_vStateCancelSwing(enum PlayerNumber_t PlayerID)
+ 3577  00148C24     14  float SW_GetSecondAnalogSwingAttributeMod(enum PlayerNumber_t PlayerID)
+ 3582  00150788     28  bool SW_IsSecondAnalogStickActive(enum PlayerNumber_t PlayerID)
+ 3596  001507B0    124  void SW_AdjustBallInStance(enum PlayerNumber_t PlayerID)
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  SW_sSwingData* pSwingInfo
+ 3679  00150580     D0  float SW_GetSwingStickYPosNormalized(enum PlayerNumber_t ePlayerID)
+                         local  int iStickY
+ 3690  001778C0     AC  void SW_vUIInit(enum PlayerNumber_t PlayerID)
+                         local  struct HashString iTextureID
+                         local  SW_sSwingData* pSwingInfo
+                         local  struct TextureGroup* pTexGrp
+                         inlines  HashString::HashString
+ 3710  001508D4     4C  void SW_vUIBlurReset(enum PlayerNumber_t PlayerID)
+ 3726  0015BED0     A0  void SW_vUIAddToBlurQueue(SW_sSwingData* pSwingInfo, const float* club, const float* hand)
+                         local  int blurHead
+                         local  int blurCount
+                         inlines  vec4flt_Copy
+ 3752  00188598    278  int SW_iGetSwingEffectBoneId(enum PlayerNumber_t PlayerID, struct TSkeleton* pSkeleton, int topOrBottom)
+                         local  struct HashString[5] clubBoneNames
+                         local  struct HashString[5] clubHeadBoneNames
+                         local  int clubTypeIndex
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  int boneID
+                         inlines  HashString::HashString
+ 3828  001B0A1C    4DC  void SW_vUIUpdateBlurBuffer(enum PlayerNumber_t PlayerID)
+                         local  struct TCharacter* pCharacter
+                         local  int32 handI
+                         local  int32 clubI
+                         local  vec4flt hand1
+                         local  vec4flt club1
+                         local  SW_sSwingData* pSwingInfo
+                         local  const int blurCount
+                         local  bool bAddSmooth
+                         local  int i
+                         local  int prevHead
+                         local  vec4flt hand0
+                         local  vec4flt club0
+                         local  vec4flt diff0
+                         local  vec4flt diff1
+                         local  float dist0
+                         local  float dist1
+                         local  unsigned int curveStepCountStart
+                         local  unsigned int curveStepCount
+                         local  float curveStepFraction
+                         local  vec4flt handStep
+                         local  vec4flt clubStep
+                         local  float distStep
+                         local  vec4flt club
+                         inlines  GamePlayer::GetCharacter, GamePlayer::GetSwingInfo, LLMath_Add, LLMath_Length3, LLMath_Scale, LLMath_Subtract, __vec_len_sqr3, __vec_make_from_scalar, __vec_mul, vec4flt_Copy, vec_ld, vec_madd, vec_sld, vec_splat, vec_st, vec_sub
+ 3901  0016C588    3E8  void SW_vUIUpdateIK(enum PlayerNumber_t PlayerID)
+                         local  struct Timing_AutoMarker swingMarker
+                         local  struct TCharacter* pCharacter
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  SW_sSwingData* pSwingInfo
+                         local  struct Controller_StickInfo* info
+                         local  enum PlayerCtrl_t controllerNumber
+                         local  vec4flt xHeadPosOld
+                         local  int iStickX
+                         local  int iStickY
+                         local  int iCalibrateX
+                         local  int32 aSW_SKEL_CLUBHEAD_INDEX
+                         inlines  GamePlayer::GetCharacter, GamePlayer::GetSwingInfo, SKEL_GetBoneIDIndex, Timing_AutoMarker::Timing_AutoMarker, Timing_AutoMarker::~Timing_AutoMarker, vec4flt_Copy, vec_st
+ 4025  00150920     34  void SW_vSetDisplayBoostUI(enum PlayerNumber_t PlayerID, bool bDisplay)
+ 4030  001667A8    1F0  void SW_vUIRender2D(enum PlayerNumber_t PlayerID)
+                         local  SW_sSwingData* pSwingInfo
+                         local  enum SW_eSwingState swingState
+                         local  int32 shotTypeIndex
+                         local  enum PlayerNumber_t currentPlayerId
+                         local  enum GolferState currentGolferState
+                         local  bool isAllowedInGolferState
+                         local  bool isSecondAnalogStickAcitve
+                         local  bool isPreSwing
+                         local  bool isPostSwing
+                         local  bool isSwingingTheClub
+                         inlines  GamePlayer::GetSwingInfo
+ 4119  001BFDE4    6AC  void SW_vUIRender3D(enum PlayerNumber_t PlayerID)
+                         local  int i
+                         local  float fFadeOutTime
+                         local  float fadeAlpha
+                         local  struct TCharacter* pCharacter
+                         local  SW_sSwingData* pSwingInfo
+                         local  const int blurCount
+                         local  int blurHead
+                         local  int activeBlurCount
+                         local  uint8 handR
+                         local  uint8 handG
+                         local  uint8 handB
+                         local  uint8 handA
+                         local  uint8 clubR
+                         local  uint8 clubG
+                         local  uint8 clubB
+                         local  uint8 clubA
+                         local  float u
+                         local  float stepU
+                         local  float textureVSpaceToUse
+                         local  int vertNdx
+                         local  uint16* uiIndices
+                         local  struct vtxStruct* SwingEffectVertices
+                         local  int numIndex
+                         local  vec4flt club
+                         local  vec4flt hand
+                         local  int i0
+                         local  int i1
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, GamePlayer::GetCharacter, GamePlayer::GetSwingInfo, vec4flt_Copy, vec_st
+ 4309  0016CE74      4  void SW_vUIAdjustShoulderTurn(struct TCharacter* pCharacter, SW_sSwingData* pSwingInfo, int offsetX)
+ 4381  0016C3F0    198  void SW_vUIAdjustClub(struct TCharacter* pCharacter, SW_sSwingData* pSwingInfo, int offsetX)
+                         local  Quat qOff
+                         local  float fClubOff
+                         local  float fScale
+                         local  float ds
+                         local  float abs_ds
+                         local  float fTop
+                         local  float fHit
+                         local  float fCur
+ 4463  00157818     70  static void SW_CopySuperSuckaFlags(struct PhysicsBall_t* dest, const struct PhysicsBall_t* src)
+                         inlines  PhysicsBall_t::ClearFlag, PhysicsBall_t::SetFlag
+ 4484  001509B4    294  void SW_FillInShotFeedBackValues(enum PlayerNumber_t PlayerID)
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  SW_sSwingData* pSwingInfo
+                         local  float tempo
+                         local  float combined_angle
+                         inlines  GamePlayer::GetSwingInfo
+ 4543  001DC870    974  void SW_vImpact(enum PlayerNumber_t PlayerID)
+                         local  struct PhysicsBall_t* theBall
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  SW_sSwingData* pSwingInfo
+                         local  enum Club_t clubID
+                         local  float stanceID
+                         local  enum ShotType_t shotTypeID
+                         local  float shotAngle
+                         local  float angleDiff
+                         local  enum Putter_t putterID
+                         local  struct PhysicsBall_t* estimatedBall
+                         local  struct GoTemple* pTemple
+                         local  int angleFix
+                         local  float fadeDistance
+                         local  float fadeAngle
+                         local  float fSin
+                         local  float fCos
+                         local  float stance
+                         local  int randomFadeDraw
+                         inlines  AIMgr, AINetworkMgr, GM_GetModeType, GamePlayer::GetEstimatedBall, GamePlayer::GetSwingInfo, Misc_RandFuncf, PhysicsBall_t::SetFlags, std::cosf, std::sinf
+ 4883  001B483C    238  void SW_vSetSwingStrength(enum PlayerNumber_t PlayerID)
+                         local  SW_sSwingData* pSwingInfo
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  float fStrength
+                         local  float fPowerBoost
+                         inlines  GamePlayer::GetSwingInfo, std::sqrt
+ 4964  0019FBDC    428  float SW_vCalculateShotPower(enum PlayerNumber_t PlayerID)
+                         local  float shotPower
+                         local  float fMishitAngle
+                         local  float fPowerWindow
+                         local  float fPowerScale
+                         local  SW_eAttributeType eScaleAttribute
+                         local  SW_eAttributeType eWindowAttribute
+                         local  int iStat
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  SW_sSwingData* pSwingInfo
+                         local  SW_sSwingData* pSwingInfo
+                         inlines  GamePlayer::GetSwingInfo, Misc_RandFuncf, std::fabs
+ 5190  00150C48     28  float SW_vGetShotPower(enum PlayerNumber_t PlayerID)
+ 5200  001D7D5C    384  void SW_vGetClubDirection(enum PlayerNumber_t PlayerID, float* vec)
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  SW_sSwingData* pSwingInfo
+                         local  float angle
+                         local  float fSin
+                         local  float fCos
+                         local  float startX
+                         local  float startZ
+                         local  float centerX
+                         local  float centerZ
+                         local  float fAngle
+                         local  float fSin
+                         local  float fCos
+                         local  float fScale
+                         inlines  DrawFadeIndicator::GetInstance, GamePlayer::GetSwingInfo, std::cosf, std::sinf
+ 5362  00150C70    1E8  void SW_vGetStrokeDirection(enum PlayerNumber_t PlayerID, float* vec)
+                         local  SW_sSwingData* pSwingInfo
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  float clubmodifier
+                         inlines  GamePlayer::GetSwingInfo
+ 5417  00151C38    130  float SW_fCalculateSliceAmount(struct AIshot_t* spShot_p, float fAngle)
+                         local  float fSliceScale
+                         local  float fMaxSlice
+                         local  float fNormalizedAngle
+                         inlines  std::fabs
+ 5497  0015E6AC    580  float SW_vCalculateMishitAngle(enum PlayerNumber_t PlayerID)
+                         local  float startX
+                         local  float startZ
+                         local  float centerX
+                         local  float centerZ
+                         local  float endX
+                         local  float endZ
+                         local  float fAngle
+                         local  vec4flt xBackVec
+                         local  vec4flt xThroughVec
+                         local  vec4flt xDiffVec
+                         local  vec4flt vec
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  SW_sSwingData* pSwingInfo
+                         inlines  DrawFadeIndicator::GetInstance, GamePlayer::GetSwingInfo, LLMath_Add, LLMath_Subtract, vec_add
+ 5613  00161C60    228  float SW_vCalculateMishitWindow(enum PlayerNumber_t PlayerID)
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  SW_eAttributeType eWindowAttribute
+                         local  int iStat
+                         local  int clubOffset
+ 5766  00150E58    228  float SW_vGetShotAngle(enum PlayerNumber_t PlayerID)
+                         local  float centerX
+                         local  float centerZ
+                         local  float endX
+                         local  float endZ
+                         local  float fAngle
+                         local  vec4flt xVec
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  SW_sSwingData* pSwingInfo
+                         inlines  GamePlayer::GetSwingInfo
+ 5831  00151D68     EC  float SW_fPowerAdjustForDraw(enum PlayerNumber_t PlayerID, float power)
+                         local  float fNormalizedAngle
+                         local  SW_sSwingData* pSwingInfo
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  float fBoost
+                         local  float fPerfectAngle
+                         inlines  GamePlayer::GetSwingInfo
+ 5873  0017B6E0    25C  void SW_vCheckForSwingBoost(enum PlayerNumber_t PlayerID)
+                         local  uint32 padRead
+                         local  float fDist
+                         local  int iStickX
+                         local  int iStickY
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  SW_sSwingData* pSwingInfo
+                         inlines  GamePlayer::GetSwingInfo, std::sqrt
+ 5933  00166998    2DC  void SW_vCheckForSecondAnalogStick(enum PlayerNumber_t PlayerID, struct Controller_StickInfo* info)
+                         local  int iStick2X
+                         local  int iStick2Y
+                         local  SW_sSwingData* pSwingInfo
+                         local  float xPosition
+                         inlines  GamePlayer::GetSwingInfo
+ 6082  00151080     74  void SW_vResetSecondAnalogStick(enum PlayerNumber_t PlayerID)
+                         local  SW_sSwingData* pSwingInfo
+                         inlines  GamePlayer::GetSwingInfo
+ 6096  001510F4     7C  void SW_vCheckForSecondAnalogStickReset(enum PlayerNumber_t PlayerID, struct CoreShotInfo_t* pCoreShotInfo)
+                         local  int32 padRead
+ 6110  00151170     78  void SW_vClearBoosts(enum PlayerNumber_t PlayerID)
+                         local  SW_sSwingData* pSwingInfo
+                         inlines  GamePlayer::GetSwingInfo
+ 6135  001511E8     E0  float SW_fPowerBoostAdjustment(enum PlayerNumber_t PlayerID, float power)
+                         local  float boost
+                         local  float fBoostFactor
+                         local  int iStat
+                         local  SW_sSwingData* pSwingInfo
+ 6164  0015312C     94  void SW_vGetCurrentSpin(enum PlayerNumber_t PlayerID, float* fpSide, float* fpForward)
+                         local  SW_sSwingData* pSwingInfo
+                         inlines  GamePlayer::GetSwingInfo
+ 6189  001512C8     94  float SW_vGetHookSlice(enum PlayerNumber_t PlayerID)
+                         local  SW_sSwingData* pSwingInfo
+                         inlines  GamePlayer::GetSwingInfo
+ 6200  0015135C     28  float SW_vGetMishitAngle(enum PlayerNumber_t PlayerID)
+ 6209  00151384     28  float SW_vGetNonPowerAttributeAffectedShotPower(enum PlayerNumber_t PlayerID)
+ 6218  001513AC     2C  void SW_vCloseSpinWindow(enum PlayerNumber_t PlayerID)
+ 6224  001513D8    394  void SW_vUpdateSpinControl(enum PlayerNumber_t PlayerID)
+                         local  unsigned int padRead
+                         local  int iStickX
+                         local  int iStickY
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  SW_sSwingData* pSwingInfo
+                         local  int16_t pitch
+                         local  int16_t roll
+                         local  float fpitch
+                         local  float froll
+                         inlines  GamePlayer::GetSwingInfo
+ 6381  001531C0    1F8  void SW_vCalculateSpinFactor(enum PlayerNumber_t PlayerID)
+                         local  SW_sSwingData* pSwingInfo
+                         local  float fNormalizedX
+                         local  float fNormalizedY
+                         local  float fAttributeFactor
+                         local  int8 iStat
+                         inlines  GamePlayer::GetSwingInfo
+ 6437  00151E54    41C  void SW_vAdjustMishitFromAttribute(enum PlayerNumber_t PlayerID)
+                         local  float fMishitAngle
+                         local  float fMishitWindow
+                         local  float fMishitScale
+                         local  SW_eAttributeType eScaleAttribute
+                         local  SW_eAttributeType eWindowAttribute
+                         local  int iStat
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  SW_sSwingData* pSwingInfo
+                         local  int clubOffset
+                         inlines  GamePlayer::GetSwingInfo
+ 6674  00152270    1C8  void SW_vAdjustVibrationFromAttribute(enum PlayerNumber_t PlayerID)
+                         local  enum PlayerCtrl_t controllerNumber
+                         local  float fVibrationFactor
+                         local  int iStat
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  SW_sSwingData* pSwingInfo
+                         local  float tuner_scale
+                         local  int tuner_maxcount
+                         inlines  GamePlayer::GetSwingInfo
+ 6750  00148C38     D0  void* SW_vUpdatePlayerStats(void* ptr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+ 6766  0015176C     2C  int SW_fGetBoostMagnitude(enum PlayerNumber_t iPlayerID)
+ 6771  00151798     2C  int SW_fGetSpinMagnitude(enum PlayerNumber_t iPlayerID)
+ 6798  00148D08     20  float* SW_GetAttributeTable(enum PlayerNumber_t playerId, SW_eAttributeRange attribRange)
+ 6811  00148D28    154  float SW_GetAttribForStat(enum PlayerNumber_t playerId, SW_eAttributeType attrib, int32 stat)
+                         local  float* attribTableMin
+                         local  float* attribTableMax
+                         local  float interpParam
+                         local  float retValue
+ 6842  001AF79C    1E8  float SW_GetClubVariability(enum PlayerNumber_t PlayerID, int32 currentClub, SW_eClubVariability eCV)
+                         local  float ret
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  enum STAT_e statType
+                         local  float accuracy
+ 6886  00148E7C     20  float SW_GetClubVariabilityEllipseAxis(SW_eEllipseAxis axis)
+ 6979  00148E9C     C4  float SW_GetSkillLevel(enum PlayerNumber_t playerID)
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  enum STAT_e statType
+                         local  float accuracy
+ 7000  001A0004    248  int SW_GetFadeDrawSegment(enum PlayerNumber_t playerID)
+                         local  int segment_num
+                         local  int accuracy_floor
+                         local  float* randomfreqTable
+                         local  float randVal
+                         local  int i
+                         local  float prevFreq
+                         local  float freq
+                         local  int diffLevel
+                         inlines  Misc_RandFuncf, Singleton<DifficultySettings>::GetSingleton
+ 7072  001AF984    68C  int SW_ApplyRandomFadeDrawPower(enum PlayerNumber_t playerID, float* vec, float* power)
+                         local  float arctan
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  float radius
+                         local  float fadeRadius
+                         local  float fadeAngle
+                         local  float minfadeAngle
+                         local  float maxfadeAngle
+                         local  float randScale
+                         local  float randAngle
+                         local  float minfadeRadius
+                         local  float maxfadeRadius
+                         local  float segmentLen
+                         local  float segmentHt
+                         local  float powerRadius
+                         local  float maxpowerRadius
+                         local  float minpowerRadius
+                         local  float fAngle
+                         local  float fSin
+                         local  float fCos
+                         local  int segment
+                         local  float dist
+                         local  float maxpowerDist
+                         local  float minpowerDist
+                         local  float randpowerDist
+                         local  float deltaPowerDist
+                         local  float endPowerDist
+                         local  float estPower
+                         local  float majAxis
+                         local  float minAxis
+                         local  uint32 negate
+                         local  SW_sSwingData* pSwingInfo
+                         local  float delta_power
+                         local  vec4flt targetPos
+                         local  vec4flt ballPos
+                         inlines  Misc_RandFuncf, Singleton<DifficultySettings>::GetSingleton, std::cosf, std::fabs, std::sinf, vec4flt_Copy, vec_st
+ 7291  00148F60     F4  void* SW_UsePerfectShotCallback(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 7311  0012BAE0     20  int SW_TuningUsingPerfectShot()
+ 7316  0012BBBC     20  int SW_TuningFadeDraw()
+ 7321  0012D2AC     1C  void SW_SetTuningUsingPerfectShot(int set)
+ 7465  00149054     5C  char* SW_SkipToNextLine(char* pBuffer, char* pEOF)
+                         local  char* pBuf
+                         local  int i
+ 7482  00181284    268  void SW_LoadAttributeAndFadeSettings()
+                         local  char* pInputBuffer
+                         local  char* pEOF
+                         local  char* curBuf
+                         local  char* token
+                         local  int32 filesize
+                         local  int i
+                         local  int j
+                         local  bool fileLoaded
+                         local  float deadzVal
+                         local  float attribVal
+                         local  float val1
+                         local  float val2
+                         inlines  std::atof
+ 7587  001490B0    1FC  void SW_LoadRandomFadeDrawFrequencyTable()
+                         local  char* pInputBuffer
+                         local  char* pEOF
+                         local  char* curBuf
+                         local  char* lineBuf
+                         local  char* token
+                         local  int32 filesize
+                         local  int i
+                         local  int j
+                         local  int k
+                         local  bool fileLoaded
+                         local  float freq
+                         inlines  std::atof
+ 7659  001492AC     B8  void SW_UpdateBufferPtr(char** buffptr, int* bufsize, char* bufstart, int buffmax)
+ 7670  0014DA1C    434  void SW_SaveAttributeAndFadeSettings()
+                         local  const char[32] __FUNCTION__
+                         local  char* pOutputBuffer
+                         local  char* curBuf
+                         local  int i
+                         local  int j
+                         local  bool oldState
+                         local  int curBufLen
+                         inlines  TagValuePair, operator+
+ 7751  0014DE50    398  void SW_SaveRandomFadeDrawFrequencyTable()
+                         local  const char[36] __FUNCTION__
+                         local  char* pOutputBuffer
+                         local  char* curBuf
+                         local  int i
+                         local  int j
+                         local  int k
+                         local  bool oldState
+                         local  int curBufLen
+                         inlines  TagValuePair, operator+
+ 7822  001814EC    10C  void SW_HandleSwingConsoleCommands()
+ 7856  00149364     20  float SW_GetSwingSpeedByShotType(enum ShotType_t shotType)
+ 7861  00149384     1C  float SW_GetExplosiveDownSwingTimeScale()
+ 7866  001493A0     2C  bool SW_IsBackSwingDist_GT_SlowdownDist()
+ 7871  001517C4     2C  int SW_GetStickXAtTopFiget(enum PlayerNumber_t PlayerID)
+                         local  SW_sSwingData* pSwingInfo

@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/SceneGraph/include/SceneGraph/SGManager.h
+// compiled in: SGManager.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  110  008BF14C    154  void SGManagerC(const struct <anon>* this)
+                         local  const char[11] __FUNCTION__
+                         inlines  Init, RNADebugBreak, Vector
+  111  008BED94    108  void ~SGManagerC(const struct <anon>* this)
+                         local  const char[12] __FUNCTION__
+                         inlines  RNADebugBreak, ~Vector

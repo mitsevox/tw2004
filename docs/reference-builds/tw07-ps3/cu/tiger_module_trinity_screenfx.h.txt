@@ -1,0 +1,18 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_trinity_screenfx.h
+// compiled in: tiger_module_trinity_screenfx.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   22  00540764      4  void LetterBoxOn(const struct <anon>* this, float_t duration)
+   23  00540770      4  void LetterBoxOff(const struct <anon>* this, float_t duration)
+   24  0054077C      4  void BlurStart(const struct <anon>* this, bool8_t direction, bool8_t hold, float_t duration)
+   25  00540788      4  void BlurStop(const struct <anon>* this, float_t duration)
+   26  00540794      4  void BlurSetIntensity(const struct <anon>* this, float_t intensity)
+   27  005407A0      4  void BlurSetColor(const struct <anon>* this, float_t r, float_t g, float_t b)
+   28  005407AC      4  void BloomStart(const struct <anon>* this, bool8_t direction, bool8_t hold, float_t duration)
+   29  005407B8      4  void BloomStop(const struct <anon>* this, float_t duration)
+   30  005407C4      4  void BloomSetIntensity(const struct <anon>* this, float_t intensity)
+   31  005407D0      4  void BloomSetColor(const struct <anon>* this, float_t r, float_t g, float_t b)
+   32  005407DC      4  void DepthStart(const struct <anon>* this, bool8_t direction, bool8_t hold, float_t duration)
+   33  005407E8      4  void DepthStop(const struct <anon>* this, float_t duration)
+   34  005407F4      4  void DepthSetIntensity(const struct <anon>* this, float_t intensity)
+   35  00540800      4  void DepthSetColor(const struct <anon>* this, float_t r, float_t g, float_t b)

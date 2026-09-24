@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/Code/Golf/Animation/Headers/Skeleton.h
+// compiled in: apt_unity.cpp, golf2_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+  108    inline-only   void* TSkeletonState::operator new(size_t dataSize, void* ptr)
+  402    inline-only   int SKEL_GetBoneIDIndex(enum ReferencedBoneID refID)
+  409    inline-only   int32 SKEL_GetBoneIDSwapIfLefty(struct TSkeleton* pSkeleton, enum ReferencedBoneID refID)
+                         local  int bindRefIndex

@@ -1,0 +1,43 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/decoderregistry.cpp
+// compiled in: decoderregistry.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   15  006D26B8     98  struct DecoderRegistry* CreateInstance(struct <anon>* pSystem)
+                         local  const char[15] __FUNCTION__
+                         local  struct DecoderRegistry* pThis
+                         inlines  New2<rw::audio::core::DecoderRegistry>
+   32  006D2558     68  void Release(const struct DecoderRegistry* this)
+                         local  const char[8] __FUNCTION__
+                         inlines  Delete<rw::audio::core::DecoderRegistry*>
+   40  006D2750     C4  void* GetDecoderHandle(const struct DecoderRegistry* this, Guid guid)
+                         local  const char[17] __FUNCTION__
+                         local  struct <anon>* pNext
+                         local  struct <anon>* pDecoderDesc
+                         inlines  GetDecoderDescFromNode, GetHead, GetNext
+   64  006D25C0     F8  void* RegisterDecoder(const struct DecoderRegistry* this, struct <anon>* pDecoderDesc)
+                         local  const char[16] __FUNCTION__
+                         local  struct <anon>* pNext
+                         local  struct <anon>* pNode
+                         inlines  GetDecoderDescFromNode, GetHead, GetNext, Push
+   94  006D2814    450  struct Decoder* DecoderFactory(const struct DecoderRegistry* this, void* decoderHandle, unsigned int numChannels, unsigned int maxRequests, struct <anon>* pSystem)
+                         local  const char[15] __FUNCTION__
+                         local  struct <anon>* pDecoderDesc
+                         local  unsigned int decoderAlignment
+                         local  unsigned int decoderMemRequired
+                         local  unsigned int memRequired
+                         local  const unsigned int requestDescMemRequired
+                         local  unsigned char isBlockBased
+                         local  unsigned int minAlignment
+                         local  struct Decoder* pDecoder
+                         local  uintptr_t pMemBlock
+                         local  uintptr_t pRequestDescAddr
+                         local  struct RequestDesc* pRequestDescArray
+                         local  int i
+                         local  struct RequestDesc* pRequestDesc
+                         local  unsigned int sampleBufferAlignment
+                         local  unsigned int sampleBufferInstanceSize
+                         local  unsigned int sampleBufferAlignment
+                         local  unsigned int sampleBufferInstanceSize
+                         local  uintptr_t pSampleBuffer
+                         local  unsigned int storageSize
+                         inlines  Assert, GetRequestDescArray, New2<rw::audio::core::Decoder>, Release, SetChannels, SetSystem, core::AlignUp<unsigned int>, core::LinearAlloc<std::uintptr_t, std::uintptr_t>, core::LinearAllocAddSize

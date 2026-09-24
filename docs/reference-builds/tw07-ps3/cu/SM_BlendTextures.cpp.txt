@@ -1,0 +1,27 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_BlendTextures.cpp
+// compiled in: shader_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   71  0050CEC4     14  void* SM_BlendTexturesClass::GetVertexShaderToUse(const struct SM_BlendTexturesClass* this, enum eBlendTexturesTypes )
+   77  0050CED8     14  struct LS_VertexAttribute* SM_BlendTexturesClass::GetVertexAttributeToUse(const struct SM_BlendTexturesClass* this, enum eBlendTexturesTypes )
+   82  0050CEEC     20  void* SM_BlendTexturesClass::GetPixelShaderToUse(const struct SM_BlendTexturesClass* this, enum eBlendTexturesTypes typeUsed)
+  118  0050CF0C      8  uint32 SM_BlendTexturesClass::GetVertexAttributeSizeToUse(const struct SM_BlendTexturesClass* this, enum eBlendTexturesTypes )
+  123  0050CF14    188  void SM_BlendTexturesClass::GetPixelShaderParameterHandle(const struct SM_BlendTexturesClass* this)
+                         local  char[15] sBlendTexture
+                         local  const int lastChar
+                         local  int i
+  144  0050D2E4     EC  void SM_BlendTexturesClass::Load(const struct SM_BlendTexturesClass* this)
+                         local  int typeUsed
+  163  00514C08     E8  void SM_BlendTexturesClass::SetNumBlendValues(const struct SM_BlendTexturesClass* this, int numBlendValues)
+  177  00514CF0    120  void SM_BlendTexturesClass::SetBlendValues(const struct SM_BlendTexturesClass* this, float* blendValues, int numActiveBlends)
+                         local  int i
+  193  00514E10    104  void SM_BlendTexturesClass::SetBlendTextures(const struct SM_BlendTexturesClass* this, TextureRef* textureSample, int numActiveBlends)
+                         local  int i
+  210  00514F14    154  void SM_BlendTexturesClass::SetTintParams(const struct SM_BlendTexturesClass* this, float* tintPArams, int numActiveTints)
+                         local  int i
+  236  0050D09C    178  void SM_BlendTexturesClass::Activate(const struct SM_BlendTexturesClass* this)
+                         local  int i
+  265  0050D2B0     34  void SM_BlendTexturesClass::Deactivate(const struct SM_BlendTexturesClass* this)
+  274  0050D214     9C  void SM_BlendTexturesClass::InitializeParameters(const struct SM_BlendTexturesClass* this)
+                         local  int i
+  297  00515068     6C  void SM_BlendTexturesClass::EnablePixelShaderType(const struct SM_BlendTexturesClass* this, enum eBlendTexturesTypes typeUsed)

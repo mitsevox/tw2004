@@ -1,0 +1,144 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/CourseInfo.c
+// compiled in: golf_unity.cpp
+// 70 functions, source order. line | PS3 address | size
+
+   73  00244338      8  static void Locale_vCourseInfo_Callback(struct TStreamData* spStreamData_p)
+   81  001F6220     88  void GM_CourseInfo_RegisterStreamClients()
+  101  001F62A8     3C  void GM_CourseInfo_UnRegisterStreamClients()
+  113  001F62E4     40  static void GM_CourseInfo_LoadCRIfromStream(struct TStreamData* pStreamData)
+  121  001F6324     40  void GM_CourseInfo_LoadCMPSfromStream(struct TStreamData* pStreamData)
+  130  001F6364     9C  int GM_GetHolePar(enum GM_CourseType_t course, int hole)
+  137  001F649C     E8  int GM_GetHoleIndexPar(int holeindex)
+                         local  int32 hole
+                         local  enum GM_CourseType_t course
+  157  001F97A0     98  int GM_GetCurrentHolePar()
+                         local  enum GM_CourseType_t course
+  176  001F6584     A0  int GM_GetHoleHandicap(enum GM_CourseType_t course, int hole)
+  183  001F6690     44  int GM_GetHoleIndexHandicap(int holeindex)
+  189  001F9704     9C  int GM_GetCurrentHoleHandicap()
+                         local  enum GM_CourseType_t course
+  201  00246AB8    1DC  int GM_GetHoleTeeDistance(enum GM_CourseType_t course, int hole, int tee)
+                         local  int nHole
+                         local  int nCourse
+  237  001F66D4     38  bool GM_HoleHasWater(enum GM_CourseType_t course, int hole)
+  245  001F670C     3C  int GM_HoleDogLeg(enum GM_CourseType_t course, int hole)
+  253  001F6748     3C  int GM_HoleGreenSlope(enum GM_CourseType_t course, int hole)
+  261  001F6784     38  int GM_HoleFairwaySlope(enum GM_CourseType_t course, int hole)
+  269  001F67BC     3C  int GM_GetHoleSlope(enum GM_CourseType_t course, int hole)
+  278  00246E64     90  int GM_GetHoleIndexTeeDistance(int holeindex, int tee)
+                         local  enum GM_CourseType_t course
+                         local  int32 hole
+  305  00246E1C     48  int GM_GetCurrentHoleTeeDistance(int tee)
+  314  001F67F8     A0  enum WIND_t GM_GetHolePrevailingWindDir(enum GM_CourseType_t course, int hole)
+  321  001F6898     C4  enum WIND_t GM_GetHoleIndexPrevailingWindDir(int holeindex)
+                         local  enum GM_CourseType_t course
+                         local  int32 hole
+  331  001F9668     9C  enum WIND_t GM_GetCurrentHolePrevailingWindDir()
+                         local  enum GM_CourseType_t course
+  342  001F695C     A0  float GM_GetHolePrevailingWindSpeed(enum GM_CourseType_t course, int hole)
+  349  001F69FC     B0  float GM_GetHoleIndexPrevailingWindSpeed(int holeindex)
+                         local  enum GM_CourseType_t course
+                         local  int32 hole
+  359  001F95CC     9C  float GM_GetCurrentHolePrevailingWindSpeed()
+                         local  enum GM_CourseType_t course
+  370  001F6AAC     98  int GM_GetTotalYardage(enum GM_CourseType_t course, enum GM_TeeColorType_t tee)
+  377  00246EF4     A4  int GM_GetCurrentCourseTotalYardage(enum GM_TeeColorType_t tee)
+                         local  int totalyards
+                         local  int i
+  393  00246D58     C4  int GM_GetFront9Yardage(enum GM_CourseType_t course, enum GM_TeeColorType_t tee)
+                         local  int totalyards
+                         local  int i
+  404  00246F98     A4  int GM_GetCurrentCourseFront9Yardage(enum GM_TeeColorType_t tee)
+                         local  int totalyards
+                         local  int i
+  419  00246C94     C4  int GM_GetBack9Yardage(enum GM_CourseType_t course, enum GM_TeeColorType_t tee)
+                         local  int totalyards
+                         local  int i
+  430  0024703C     A4  int GM_GetCurrentCourseBack9Yardage(enum GM_TeeColorType_t tee)
+                         local  int totalyards
+                         local  int i
+  445  001F6B44     B0  int GM_GetFront9Par(enum GM_CourseType_t course)
+                         local  int totalpar
+                         local  int i
+  456  001F6BF4     58  int GM_GetCurrentCourseFront9Par()
+                         local  int totalpar
+                         local  int i
+  469  001F6C4C     B0  int GM_GetBack9Par(enum GM_CourseType_t course)
+                         local  int totalpar
+                         local  int i
+  480  001F6CFC     58  int GM_GetCurrentCourseBack9Par()
+                         local  int totalpar
+                         local  int i
+  493  001F6D54    128  int GM_GetTotalPar(enum GM_CourseType_t course, enum GM_TeeColorType_t tee)
+  510  001F6E7C     58  int GM_GetCurrentCourseTotalPar()
+                         local  int totalpar
+                         local  int i
+  523  001F6ED4     30  float GM_GetRating(enum GM_CourseType_t course, enum GM_TeeColorType_t tee)
+  530  001F6F04     30  float GM_GetSlope(enum GM_CourseType_t course, enum GM_TeeColorType_t tee)
+  539  001F6F34     38  bool GM_GetHoleDrivingSideGame(enum GM_CourseType_t course, int hole)
+  544  001F6F6C     84  bool GM_GetHoleIndexDrivingSideGame(int holeindex)
+                         local  int32 hole
+                         local  enum GM_CourseType_t course
+  552  001F9568     64  bool GM_GetCurrentHoleDrivingSideGame()
+                         local  enum GM_CourseType_t course
+                         local  uint32 hole
+  563  001F6FF0     38  bool GM_GetHoleClosestPinSideGame(enum GM_CourseType_t course, int hole)
+  568  001F7028     5C  bool GM_GetHoleIndexClosestPinSideGame(int holeindex)
+                         local  int32 hole
+                         local  enum GM_CourseType_t course
+  576  001F9504     64  bool GM_GetCurrentHoleClosestPinSideGame()
+                         local  enum GM_CourseType_t course
+                         local  uint32 hole
+  587  001F7084     3C  int GM_GetHoleDriveDistance1SideGame(enum GM_CourseType_t course, int hole)
+  592  001F70C0     88  int GM_GetHoleIndexDriveDistance1SideGame(int holeindex)
+                         local  int32 hole
+                         local  enum GM_CourseType_t course
+  600  001F949C     68  int GM_GetCurrentHoleDriveDistance1SideGame()
+                         local  enum GM_CourseType_t course
+                         local  uint32 hole
+  611  001F7148     38  int GM_GetHoleDriveDistance2SideGame(enum GM_CourseType_t course, int hole)
+  616  001F7180     84  int GM_GetHoleIndexDriveDistance2SideGame(int holeindex)
+                         local  int32 hole
+                         local  enum GM_CourseType_t course
+  624  001F9438     64  int GM_GetCurrentHoleDriveDistance2SideGame()
+                         local  enum GM_CourseType_t course
+                         local  uint32 hole
+  635  001F7204     3C  int GM_GetHoleDriveDistance3SideGame(enum GM_CourseType_t course, int hole)
+  640  001F7240     88  int GM_GetHoleIndexDriveDistance3SideGame(int holeindex)
+                         local  int32 hole
+                         local  enum GM_CourseType_t course
+  648  001F93D0     68  int GM_GetCurrentHoleDriveDistance3SideGame()
+                         local  enum GM_CourseType_t course
+                         local  uint32 hole
+  660  001F72C8     3C  int GM_GetHoleDriveDistance4SideGame(enum GM_CourseType_t course, int hole)
+  665  001F7304     88  int GM_GetHoleIndexDriveDistance4SideGame(int holeindex)
+                         local  int32 hole
+                         local  enum GM_CourseType_t course
+  673  001F9368     68  int GM_GetCurrentHoleDriveDistance4SideGame()
+                         local  enum GM_CourseType_t course
+                         local  uint32 hole
+  683  001F738C     38  bool GM_GetHoleCountsForDrivingStat(enum GM_CourseType_t course, int hole)
+  687  001F73C4     84  bool GM_GetHoleIndexCountsForDrivingStat(int holeindex)
+                         local  int32 hole
+                         local  enum GM_CourseType_t course
+  698  001F7448     8C  bool GM_HoleHasBunkers(Course_t course, int hole)
+                         local  int32 nHole
+                         local  enum GM_CourseType_t nCourse
+  709  001F74D4     D8  static enum CompilationCourseType_t GM_CourseInfo_MapCompilationCourse(enum GM_CourseType_t compilationCourse)
+                         local  enum CompilationCourseType_t result
+  757  001F929C     50  enum GM_CourseType_t GM_CourseInfo_GetCompilationCourse(enum GM_CourseType_t compilationCourse, int holeIndex)
+                         local  enum CompilationCourseType_t compCourse
+  768  001F75AC     58  int GM_CourseInfo_GetCompilationHole(enum GM_CourseType_t compilationCourse, int holeIndex)
+                         local  enum CompilationCourseType_t compCourse
+  776  001F7698     24  const char* GM_CourseInfo_GetCompilationName(int compilationCourseIndex)
+  785  001F76BC     84  int GM_TotalParXHoles(enum GM_CourseType_t course, int par)
+                         local  int result
+                         local  int i
+  800  001F7740     74  int GM_CurrentCourseTotalParXHoles(int par)
+                         local  int result
+                         local  int i
+  815  001F77B4     50  int GM_TotalPar4andPar5Holes(enum GM_CourseType_t course)
+  821  001F7804     40  int GM_CurrentCourseTotalPar4andPar5Holes()
+  894  0021B468     9C  const char* GM_GetCourseText(enum eCourseTextCategory cat, int index)
+                         local  const char* str
+  921  001F7844     14  const struct CD_CourseInfoData_t* GM_GetGlobalCourseInfo()

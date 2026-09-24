@@ -1,0 +1,24 @@
+audit-rec-AG: LLTexGrp (21: texture banks) + emotion (21: golfer emotions) + AudTable (20: the sound table, 3D sound, Doppler) + UFstPart (18: particle emitters) = 80 functions.
+- Names: 1 kept (Emotion_UpdatePlayerEmotion, T1: TW06 strong name, both lanes agree), 0 renamed, 0 T3, 0 demoted, 79 unnamed. The lanes' agreed guesses are in the ledger notes. namecheck: 0 rows, 0 errors, 0 flags.
+- Comments: 47 ok, 25 none, 8 fixed (9 edits: 4 in emotion.c, 1 in engine.h, 1 in AudTable.c, 2 in UFstPart.c, 1 in psmgr.h), 0 stripped. verify.py simulated the edits: each old text occurs once, no line is over 100 columns, and no __LINE__ files are touched. UFstPart.c gains 1 line.
+- Worst: fn_8006B87C said the direction reaction uses "where [the ball] ended". It runs on ball event 3 (event 28, the ball past its apex), so it uses the ball's position in mid-flight. Also fixed: fn_8006BDC8 "would count for the mode" is really the hole's stroke limit (fn_800E23B0), and fn_8006B2C4's "a mode's special case" is the same check. engine.h's "(0..4, 8+)" left out 5, the neutral result the unit sets most often. fn_8006ACF8 "Sets the reaction to play" (n18 plays nothing; it chooses which reaction fn_8006B250 works out).
+- Also fixed: fn_800A7C30 "Starts" (it only clears an entry and binds it to a sound). fn_80099758 "Start an emitter" (it is not on the list until fn_80099EA4). fn_80099344 "on to fTime" (fTime is the frame step, and the 0x2000 off-screen skip was left out).
+- L1 refuted twice: fn_8006BDC8 is a stroke-limit check, not a record check. fn_80099B74 draws the mesh (the Skin.c draw hook); it is not a flush.
+- Out of scope (phase 3, field comments): golfer.h:689 n14 "(0..4, 8+...)" and golfer.h:690 n18 "the reaction to play" carry the same wrong claims I fixed here.
+- Unclear rule: none this time. The first function is the same in file order and callgraph order for all four units.
+
+Findings (no code changes):
+1. AudTable: the Doppler pitch is always 1.0 (confirmed). fn_800A7CA4 (AudTable.c:80) stores pSource->fDist = nearest before it calls fn_800A7F2C. fn_800A7F2C then computes 32 * (pSource->fDist - nearest) = 0, so the pitch is 345/345 for every 3D sound. This is an EA ordering bug, and the Doppler effect is dead in the shipped game. Keep it for parity.
+2. UFstPart fn_80099758 uses its new memory before the NULL check (confirmed). In the n54 < 0 branch, fn_80036054(&pEmitter->mesh) runs on fn_80009B34's result (UFstPart.c:443) before the NULL test at :453. A failed allocation would crash in the mesh init.
+3. LLTexGrp: adding a texture bank never checks for a full slot table (confirmed). fn_800106F0 does not test fn_8001013C's -1. With all 100 slots in use, it writes pBank/n8/n4 into pSlots[-1], 12 bytes before the array. That path is reached through fn_80010180 ('txf ' objects), fn_800107C0 (fe_movies, Trax) and LLDynTex.
+4. LLTexGrp record mode is never switched on (confirmed). bUseRecs is only set by fn_800103C0 through fn_80010754(0). lbl_80280DD8 is file-static, and pRecs/nNumRecs are written nowhere except nNumRecs = 0 at init. So fn_80010760 and fn_80010180's record path are dead.
+5. fn_8006ACF8's TW06 hint is Emotion_PostBallEvent (medium, PS2 nbr). Both lanes agree, and the code fits: it sets ball event n18 from event.c (28 apex -> 3, 29 first bounce -> 2, 33 holed -> 4, 35..38 landing -> 1) and from Swing (0, 5). It stays fn_ under the no-fresh-names rule; the guess is in the ledger.
+6. fn_800A7C30 is called through a 7-argument cast of a 2-argument function (confirmed, hlaudemitter.c:111, which already has a port note). It is harmless on PPC because the extra zeros in r5-r9 are ignored. For the TYPE pass: EA's prototype may have had more parameters.
+7. New (reconciler): gomainloop.c:200 declares fn_80099BA0(void) and calls it with no argument (:878), but the function takes Camera* pCamera. It only works because r3 still holds the fn_80017004(nView) result from :877. A port must pass fn_80017004(nView). This is worth a TYPE/port note.
+8. Smaller L2 quirks (checked in source):
+   - fn_8006B87C normalises only when x != 0 && z != 0 (looks like || was meant).
+   - fn_8006B57C tests fn_8005B64C(n) > 1.0 twice.
+   - fn_800A8134 honours uMask bits 3-7 only when a bit 0-2 is also set.
+   - fn_80099758 writes into the caller's params (PsBallFx's static tables), and the pool fails when the next round-robin slot is busy.
+   - fn_80098CDC's 0x400 path without 0x800 gives a non-unit vector.
+   - fn_800A8524's n parameter is unused.

@@ -1,0 +1,28 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/cpuloadbalancer.cpp
+// compiled in: cpuloadbalancer.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   18  006F5CF8     3C  void Init(const struct <anon>* this, struct <anon>* pSystem)
+                         inlines  SetCpuFrequency
+   64  006F5D34     24  void Stop(const struct <anon>* this)
+                         inlines  Stop
+   70  006F5CD4     24  void Reset(const struct <anon>* this)
+                         inlines  OverRide, Reset
+   94  006F5D58    16C  void Balance(const struct <anon>* this)
+                         local  float mixFrameCycleBudget
+                         local  float cyclesToCull
+                         inlines  Average, Reset, Start, Stop
+  161  006F5C88     4C  float GetCyclesRequired(const struct <anon>* this)
+                         local  float cyclesRequired
+                         local  int i
+                         inlines  GetAverage
+  178  006F5B30     D8  struct Voice* FindLowestPriorityVoice(const struct <anon>* this)
+                         local  float lowestPriority
+                         local  unsigned int lowestTimeStamp
+                         local  struct Voice* pLowestPriorityVoice
+                         local  unsigned int newVoiceCommandTimeStamp
+                         local  int i
+                         local  struct Voice* pVoice
+                         local  unsigned int voiceTimeStamp
+  242  006F5C08     80  void CullVoices(const struct <anon>* this, float numCycles)
+                         local  struct Voice* pVoice

@@ -1,0 +1,27 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/Geom/twChar_Morph_PS3.cpp
+// compiled in: golf_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    9  0022D374     7C  twSkinVert_Ps3* twChar_MorphBegin(const twSkinVert_Ps3* pSrcVerts, const uint32 numVertices)
+                         local  twSkinVert_Ps3* pDstVerts
+   21  0022D2E4     90  void twChar_MorphPopulateBuffer(twSkinVert_Ps3* pDstVerts, const twSkinVert_Ps3* pSrcVerts, const uint32 numVertices)
+                         local  uint32 v
+   32  0026C3D8     D8  void twChar_MorphAccumulate(twSkinVert_Ps3* pDstVerts, const twMorphVert* pSrcMorphVerts, const uint32 numVertices, const float blendAmt)
+                         local  float[4] blendWeight
+                         local  unsigned char[16] mask_XYZ
+                         local  unsigned char[16] mask_NrmTan
+                         local  uint32 v
+                         local  twSkinVert_Ps3* pDstVert
+                         local  float[4] morph_Pos
+                         local  short int[8] morph_packedNrmTan
+                         local  int[4] morph_intNrm
+                         local  int[4] morph_intTan
+                         local  float[4] morph_Nrm
+                         local  float[4] morph_Tan
+                         local  float[4] dest_Pos
+                         local  short int[8] dest_packedNrmTan
+                         local  int[4] dest_intNrm
+                         local  int[4] dest_intTan
+                         local  float[4] dest_Nrm
+                         local  float[4] dest_Tan
+                         inlines  vec_ctf, vec_cts, vec_ld, vec_madd, vec_packs, vec_splat, vec_st, vec_unpackh, vec_unpackl

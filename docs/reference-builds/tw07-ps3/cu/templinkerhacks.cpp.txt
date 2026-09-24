@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Misc/Ps3/templinkerhacks.cpp
+// compiled in: templinkerhacks.cpp
+// 4 functions, source order. line | PS3 address | size
+
+    0  005213A4     90  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   21  00521390     14  int isascii(unsigned int a)
+   23  00521434     10  static void _GLOBAL__I__Z7isasciij()
+   24  00521444     10  static void _GLOBAL__D__Z7isasciij()

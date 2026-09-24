@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/packages/t3db/2.21.03-RW-EAC/include/common/t3db/table.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  167    inline-only   enum TDbError Destroy(const struct Table* this)
+                         local  const char[8] __FUNCTION__
+                         local  struct <anon> lock

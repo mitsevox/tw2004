@@ -1,0 +1,5 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/registerstandardruntimedecoders.cpp
+// compiled in: registerstandardruntimedecoders.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   20  006E4408     58  void RegisterStandardRunTimeDecoders(const struct DecoderRegistry* this)

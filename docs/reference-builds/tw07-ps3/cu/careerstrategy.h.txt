@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/packages/osdk/2.06.04/extensions/career/include/common/osdk/career/gamefacade/careerstrategy.h
+// compiled in: golf2_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   46  001E79D0     18  void ~CareerStrategy(const struct CareerStrategy* this)

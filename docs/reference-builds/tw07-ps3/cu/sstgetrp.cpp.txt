@@ -1,0 +1,7 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sstgetrp.cpp
+// compiled in: sstgetrp.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    7  006CDD94     78  struct SNDSTREAMREQUEST* SNDSTRMI_getrequestptr(int sndrequesthandle)
+                         local  SNDSTREAMCHANNEL* pssc
+                         local  struct SNDSTREAMREQUEST* pssr

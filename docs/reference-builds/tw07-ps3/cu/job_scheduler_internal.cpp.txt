@@ -1,0 +1,57 @@
+// C:/packages/job_manager/1.11.00/source/common/detail/job_scheduler_internal.cpp
+// compiled in: job_scheduler_internal.cpp
+// 13 functions, source order. line | PS3 address | size
+
+  103  00706FAC    138  void _CleanupTree(const struct JobSchedulerInternal* this, const struct <anon>& job)
+                         local  int i
+                         local  struct Job* jp
+                         local  int i
+                         local  struct Job* djp
+                         inlines  GetDependency, GetDependent
+  136  007068EC    2B4  bool ConfirmDepsForAdd(const struct JobSchedulerInternal* this, struct Job* jp, bool addToTree)
+                         local  bool retVal
+                         local  int numDependents
+                         local  int numDependencies
+                         local  int k
+                         local  int k
+                         local  struct Job* djp
+                         local  struct Job* djp
+                         inlines  GetDependency, GetDependent
+  177  00706C5C    350  void _PrintJobList(const struct JobSchedulerInternal* this, int32_t outputFilter)
+                         local  uint32_t i
+                         local  struct Job* jp
+                         local  int j
+                         local  struct Job* djp
+                         local  uint32_t dependentJobIndex
+                         local  struct Job* djp
+  468  007065D4    228  void _AddJob(const struct JobSchedulerInternal* this, struct Job* job, uint32_t index, uint8_t flags)
+                         local  const struct <anon>& jobHeader
+                         inlines  IncrementFreePPUJobs, IncrementFreeSPUJobs
+  519  00706518     BC  uint32_t _TryMakeAvailableSlot(const struct JobSchedulerInternal* this, enum _JobPriorityInternal priority)
+                         local  uint32_t index
+                         local  uint32_t newIndex
+  546  00705EE0    150  uint32_t _FindFirstPotentiallyAvailableSlot(const struct JobSchedulerInternal* this, enum _JobPriorityInternal priority)
+                         local  uint32_t index
+                         local  int32_t index
+  579  00706030     64  struct Job* _RemoveJob(const struct JobSchedulerInternal* this, uint32_t index)
+                         local  struct Job* job
+  633  00706094     88  uint32_t GetSPUId(const struct JobSchedulerInternal* this, uint32_t threadID)
+                         local  uint32_t spuID
+  655  00706240    2D8  void _MoveJob(const struct JobSchedulerInternal* this, uint32_t index, uint32_t newIndex)
+                         local  struct Job* job
+                         local  int i
+                         local  struct Job* dep
+                         local  uint32_t j
+  695  0070611C     94  void _RemoveMultiAddJobs(const struct JobSchedulerInternal* this)
+                         local  uint32_t j
+                         local  struct Job* job
+  713  00706BA0     BC  bool _AddTree(const struct JobSchedulerInternal* this, const struct <anon>& job)
+                         local  bool retFlag
+                         local  uint32_t index
+  744  007061B0     90  void PrintOutput(const struct JobSchedulerInternal* this, int32_t debugFilter, const char* format)
+                         local  va_list arglist
+  761  007067FC     F0  void PrintSPUState(const struct JobSchedulerInternal* this)
+                         local  unsigned int maxSPUs
+                         local  struct <anon> sc
+                         local  unsigned int i
+                         inlines  GetState, SpuState

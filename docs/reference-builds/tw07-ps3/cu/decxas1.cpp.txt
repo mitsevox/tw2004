@@ -1,0 +1,8 @@
+// C:/packages/rwaudiocore/2.08.01/source/decoders/decxas1.cpp
+// compiled in: decxas1.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   32  006E455C      8  struct <anon>* Xas1Dec::GetDecoderDesc()
+   38  006E4564     18  bool Xas1Dec::CreateInstanceEvent(struct Decoder* pDecoder)
+                         local  struct Xas1Dec* pThis
+                         inlines  Xas1Dec::Reset

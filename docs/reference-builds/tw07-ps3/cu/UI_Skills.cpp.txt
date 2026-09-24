@@ -1,0 +1,74 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_Skills.cpp
+// compiled in: apt_unity.cpp
+// 20 functions, source order. line | PS3 address | size
+
+    8  000F3184     4C  void UISkills::UISkills(const struct UISkills* this)
+   12  000F321C     B8  void UISkills::~UISkills(const struct UISkills* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   16  0008FDD8    12C  void UISkills::Show(const struct UISkills* this)
+                         local  int32 i
+                         local  int32 curStatType
+                         inlines  UserInfo::GetDevLevel
+   52  00059398     84  void UISkills::ShowHelpText(const struct UISkills* this)
+   60  000337C0     24  void UISkills::Init(const struct UISkills* this)
+   64  00033CF0     24  void UISkills::Close(const struct UISkills* this)
+   69  00096F20    1C0  enum eAptHandleInput UISkills::HandleInput(const struct UISkills* this, int32 cID)
+                         local  int32 navAmount
+  132  00039858    268  void UISkills::RefreshEffectInfo(const struct UISkills* this)
+                         local  char[64] strBuf
+                         local  int32 i
+                         local  int32 numEquip
+                         local  int[16] tokensEquippedPerStatType
+                         local  const struct UserInfo& userInfo
+                         local  struct IAptSubscriber* aptGameSub
+                         local  int32 assetID
+  191  00039C70     80  void UISkills::SetActive(const struct UISkills* this, bool bIsActive)
+                         local  int32 i
+  202  000397A4     B4  void UISkills::SetHighlightSkills(const struct UISkills* this, int32 row, bool bIsOn)
+                         local  char[32] aptBuf
+  213  00039AC0     B4  void UISkills::SetHighlightExp(const struct UISkills* this, int32 row, bool bIsOn)
+                         local  char[32] aptBuf
+  224  00039BD0     A0  void UISkills::RefreshExpHighlights(const struct UISkills* this)
+                         local  const struct UserInfo& userInfo
+                         local  int32 statType
+                         local  int32 pointType
+                         local  int32 i
+  237  000902A4     90  void UISkills::FSCommand(const struct UISkills* this, const char* szCommand, const char* szParams)
+  249  00039CF0    128  void UISkills::SetText(const struct UISkills* this)
+                         local  int32 i
+  273  00036318     DC  const char* UISkills::GetStatName(int32 statType)
+                         local  const char*[11] keyList
+  293  00039E18     BC  const char* UISkills::GetDevTypeName(int32 type)
+                         local  const char*[9] keyList
+  308  0008FF04    3A0  void UISkills::SetData(const struct UISkills* this)
+                         local  const struct UserInfo& userInfo
+                         local  int32 pw
+                         local  int32 a
+                         local  int32 s
+                         local  int32 pt
+                         local  int32 m
+                         local  int32 g
+                         local  int32 pointType
+                         local  int32 curStatType
+                         local  int32 curLevel
+                         local  int32 i
+                         local  int32 j
+                         local  int32 nextCost
+                         local  char[48] clipBuf
+                         local  const char* label
+                         inlines  UserInfo::GetDevLevel, UserInfo::GetDevPoints
+  380  00035640     5C  int32 UISkills::RowToStatType(uint32 row)
+                         local  const uint8[9] map
+  398  00039B74     5C  int32 UISkills::RowToDevPtType(const struct UISkills* this, uint32 row)
+                         local  const uint8[6] map
+  413  00096AA4    47C  void UISkills::PointAlloc(const struct UISkills* this, int32 val)
+                         local  const struct UserInfo& userInfo
+                         local  int32 statType
+                         local  int32 pointType
+                         local  int32 pointHave
+                         local  int32 genPoints
+                         local  int32 curLevel
+                         local  float pct
+                         local  int32 nextCost
+                         local  int32 prevCost
+                         inlines  GeneralUserData::GetDevLevel, GeneralUserData::SetDevPoints, UserInfo::DecDevLevel, UserInfo::GetDevLevel, UserInfo::GetDevPoints, UserInfo::GetGolferData, UserInfo::IncDevLevel, UserInfo::SetDevPoints

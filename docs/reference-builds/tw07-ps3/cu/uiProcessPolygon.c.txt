@@ -1,0 +1,35 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/istudio_runtime/uiProcessPolygon.c
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   60  00097748    4D0  static void DrawUpdateProgressBarCompletion(float completion)
+                         local  const TextureInfo* infoS
+                         local  const TextureInfo* infoD
+                         local  const TextureInfo* infoF
+                         local  const float coef
+                         local  const float infoSWidth
+                         local  const float l
+                         local  const float h
+                         local  const float t
+                         local  float w
+                         local  vec4flt srcRect
+                         local  vec4flt dstRect
+                         local  int32 maxindex
+                         local  float length
+                         local  float completionLength
+                         local  float length2
+                         local  int i
+                         local  int j
+                         local  const struct X0Y0X1Y1& rect
+                         local  const float length3
+                         local  const float r
+                         local  const struct X0Y0X1Y1& rect
+                         inlines  AptGameSubscriber::GetRect
+  171  00073968     50  void UI_InitLoadingBar(float )
+                         inlines  ModulateProgressCompletion::Init
+  191  000DD268    124  void UI_DrawLoadingScreenAndProgressBar(enum UI_LoadScreen_state state, bool bCalledWithinRenderFrame, float completion)
+                         local  const float newCompletion
+                         inlines  ModulateProgressCompletion::GetRightCompletion, ModulateProgressCompletion::SetCompletion1
+  233  000DD16C     FC  void DrawLoadingScreenProgressBar(float completion, bool bCalledWithinRenderFrame)
+                         local  const bool dashboardAutoUpdating
+                         inlines  DS_vSetAlphaTestMode

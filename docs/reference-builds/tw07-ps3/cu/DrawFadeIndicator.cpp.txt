@@ -1,0 +1,106 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/DrawFadeIndicator.cpp
+// compiled in: golf_unity.cpp
+// 21 functions, source order. line | PS3 address | size
+
+   38  00263C20     A0  void DrawFadeIndicator::CreateInstance()
+   50  00217578     64  void DrawFadeIndicator::DestroyInstance()
+   61  00263AEC    134  void DrawFadeIndicator::Init(const struct DrawFadeIndicator* this)
+                         local  int ringNum
+                         local  struct TextureGroup* pTexGrp
+                         inlines  vec4flt_Zero
+   96  00217504     74  void DrawFadeIndicator::Shutdown(const struct DrawFadeIndicator* this)
+                         local  int ringNum
+  108  002903B8    144  void DrawFadeIndicator::Update(const struct DrawFadeIndicator* this)
+                         local  enum PlayerNumber_t PlayerID
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  bool wasUpdated
+                         local  enum GolferState currentState
+                         local  TGD_TerrainInfo* terrainGameData
+  163  002B7B80    4EC  void DrawFadeIndicator::UpdateArc(const struct DrawFadeIndicator* this)
+                         local  bool bRecalculateTerrainHeights
+                         local  float_t inRadius
+                         local  float_t outRadius
+                         local  float_t cosAngle
+                         local  float_t sinAngle
+                         local  float_t yVal
+                         local  enum PlayerNumber_t PlayerID
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  vec4flt arcRotateCenter
+                         local  float fCircleHoverHeight
+                         local  CameraController_t* pCameraController
+                         local  vec4flt vLookVector
+                         local  float fNewCircleHoverHeight
+                         local  int alphaLevel
+                         local  unsigned char r
+                         local  unsigned char g
+                         local  unsigned char b
+                         local  unsigned char a
+                         local  struct vtxStruct* pVerts
+                         local  int32_t ctrlidx
+                         local  vec4flt ringPt
+                         local  float pct
+                         local  unsigned int sec
+                         local  vec4flt newPos
+                         local  float pct
+                         inlines  LLMath_Add3, LLMath_DistanceBetween3, LLMath_Scale3, LLMath_Subtract3, __vec_len_sqr3, std::cosf, std::sinf, vec_sub
+  300  0030175C    184  void DrawFadeIndicator::RenderVertexPool(const struct DrawFadeIndicator* this, struct DrawFadeVertexPool* vertexPool)
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetZBufferMode
+  330  00254520     44  bool DrawFadeIndicator::CanUpdate(const struct DrawFadeIndicator* this)
+                         local  CameraController_t* currCamera
+                         local  enum PlayerNumber_t playerNum
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  bool update
+  348  0028FB10    16C  void DrawFadeIndicator::CalculatePointOnArc(const struct DrawFadeIndicator* this, enum PlayerNumber_t playerNum, float pct, vec4flt* result)
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  vec4flt offsetVec
+                         local  float angle
+                         local  float sin
+                         local  float cos
+                         inlines  LLMath_Add3, std::cosf, std::sinf, vec4flt_Copy3
+  376  00290028    170  void DrawFadeIndicator::CheckForToggle(const struct DrawFadeIndicator* this, enum PlayerCtrl_t controller)
+  399  00290198    220  void DrawFadeIndicator::UpdateDrawFade(const struct DrawFadeIndicator* this, enum PlayerNumber_t playerNum)
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  bool needUpdate
+                         local  float maxArcPct
+                         inlines  AIMgr, LLMath_Subtract3, vec4flt_Copy
+  439  00263584    128  void DrawFadeIndicator::OnShow(const struct DrawFadeIndicator* this)
+                         local  enum PlayerNumber_t playerNum
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         inlines  LLMath_Add3, vec4flt_Copy3, vec4flt_Zero
+  474  0028FFA8     74  void DrawFadeIndicator::OnHide(const struct DrawFadeIndicator* this)
+                         local  enum PlayerNumber_t playerNum
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         inlines  LLMath_Subtract3
+  494  0028FE28     58  void DrawFadeIndicator::UpdateAndGetTrueTargetPosition(const struct DrawFadeIndicator* this, float* newPos)
+                         inlines  vec4flt_Copy3
+  505  0028FC7C    1AC  void DrawFadeIndicator::UpdateTrueTargetPosition(const struct DrawFadeIndicator* this)
+                         local  enum PlayerNumber_t playerNum
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  TGD_TerrainInfo* terrainGameData
+                         inlines  LLMath_Add3, LLMath_Subtract3
+  541  002636AC     A4  void DrawFadeIndicator::ResetDrawFade(const struct DrawFadeIndicator* this)
+                         local  enum PlayerNumber_t playerNum
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         inlines  vec4flt_Copy3, vec4flt_Zero3
+  559  002904FC    21C  void DrawFadeIndicator::FindDrawFadeStickValues(const struct DrawFadeIndicator* this, enum PlayerNumber_t playerNum, int* startX, int* startZ, int* endX, int* endZ, const const float* forceAngle)
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  float stickAngle
+                         local  float errorAngle
+                         local  float sin
+                         local  float cos
+                         local  vec4flt origTargetPos
+                         local  vec4flt drawFadeTargetPos
+                         local  float angleToOrigTarget
+                         local  float angleToDrawFadeTarget
+                         inlines  std::cosf, std::sinf
+  626  0029001C      C  void DrawFadeIndicator::ForceHide(const struct DrawFadeIndicator* this)
+  635  0028FE80    128  void DrawFadeIndicator::RestoreOriginalTargetPosition(const struct DrawFadeIndicator* this, enum PlayerNumber_t playerNum)
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         inlines  AIMgr, vec4flt_Copy
+  659  00216940     20  float32_t DrawFadeIndicator::GetFadeOffset(const struct DrawFadeIndicator* this)
+  669  0025D20C    210  void DrawFadeIndicator::GetClubAndTerrainModFromScript(const struct DrawFadeIndicator* this, enum PlayerNumber_t playerNum, struct CoreShotInfo_t* coreShotInfo)
+                         local  struct TGD_MaterialInfo* surfaceInfo
+                         local  vec4flt surfaceNormal
+                         local  float maxPowerForTerrain
+                         local  float adjSpinImpactScale
+                         inlines  LuaTuningFileManager::Call<float, PlayerNumber_t, float, float>, LuaTuningFileManager::GetParamValue<float>

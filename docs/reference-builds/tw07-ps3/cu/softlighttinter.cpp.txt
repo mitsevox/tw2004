@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/softlighttinter.cpp
+// compiled in: other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   15  003D07F8     40  void SoftlightTinter::SoftlightTinter(const struct SoftlightTinter* this)
+   20  003D0878     18  void SoftlightTinter::~SoftlightTinter(const struct SoftlightTinter* this)
+   25  00422828    444  void SoftlightTinter::Tint(const struct SoftlightTinter* this, int32_t numPixels, vec4flt* input, vec4flt* output, float* tintParams, float* scale)
+                         local  vec4flt zeroVec
+                         local  vec4flt oneVec
+                         local  int i
+                         local  int i
+                         inlines  LLMath_ClampVec

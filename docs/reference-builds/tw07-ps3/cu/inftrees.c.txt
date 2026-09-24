@@ -1,0 +1,33 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Shared/XceedZip_ZLib64/inftrees.c
+// compiled in: other_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+  100  003F8B24    7F4  static int huft_build(uIntf* b, uInt n, uInt s, const uIntf* d, const uIntf* e, inflate_huft** t, uIntf* m, inflate_huft* hp, uInt* hn, uIntf* v)
+                         local  uInt a
+                         local  uInt[16] c
+                         local  uInt f
+                         local  int g
+                         local  int h
+                         local  uInt i
+                         local  uInt j
+                         local  int k
+                         local  int l
+                         local  uInt mask
+                         local  uIntf* p
+                         local  inflate_huft* q
+                         local  struct inflate_huft_s r
+                         local  inflate_huft*[15] u
+                         local  int w
+                         local  uInt[16] x
+                         local  uIntf* xp
+                         local  int y
+                         local  uInt z
+  291  003F9544    188  int inflate_trees_bits(uIntf* c, uIntf* bb, inflate_huft** tb, inflate_huft* hp, z_streamp z)
+                         local  int r
+                         local  uInt hn
+                         local  uIntf* v
+  313  003F9318    22C  int inflate_trees_dynamic(uInt nl, uInt nd, uIntf* c, uIntf* bl, uIntf* bd, inflate_huft** tl, inflate_huft** td, inflate_huft* hp, z_streamp z)
+                         local  int r
+                         local  uInt hn
+                         local  uIntf* v
+  391  003F7AD4     3C  int inflate_trees_fixed(uIntf* bl, uIntf* bd, inflate_huft** tl, inflate_huft** td, z_streamp z)

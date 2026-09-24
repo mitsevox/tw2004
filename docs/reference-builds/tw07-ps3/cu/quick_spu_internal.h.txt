@@ -1,0 +1,48 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/quick_spu/dev-football/source/quick_spu/ppu/quick_spu_internal.h
+// compiled in: managerplat.cpp
+// 37 functions, source order. line | PS3 address | size
+
+   58    inline-only   void InitObject(const struct <anon>* this, const char* jobName, const void* pBinData, size_t nBinSize, uint32_t param0, uint32_t param1)
+   76    inline-only   void SetJobName(const struct <anon>* this, const char* jobName)
+                         local  size_t len
+   93    inline-only   void ClearObject(const struct <anon>* this)
+  101    inline-only   void SetJobData(const struct <anon>* this, uint32_t param0, uint32_t param1)
+  107    inline-only   void GetJobData(const const struct <anon>* this, uint32_t* param0, uint32_t* param1)
+  115    inline-only   void SetJobBinData(const struct <anon>* this, const void* pData, size_t nDataSize)
+  121    inline-only   void GetJobBinData(const const struct <anon>* this, const void** pData, size_t* nDataSize)
+  129    inline-only   void GetJobBinCopyData(const const struct <anon>* this, const void** pData, size_t* nDataSize)
+                         local  struct <anon>* pHeader
+  138    inline-only   bool GetJobBinMetaDataBlock(const const struct <anon>* this, const char* pBlockName, const void** pData, size_t* nDataSize)
+                         local  size_t spuCopyDataSize
+                         local  const struct <anon>* pEh
+  171    inline-only   bool IsFree(const const struct <anon>* this)
+  176    inline-only   struct <anon>* GetNextFree(const const struct <anon>* this)
+  181    inline-only   void SetNextFree(const struct <anon>* this, struct <anon>* pNext)
+  188    inline-only   uint32_t GetVerifyWord(const const struct <anon>* this)
+  193    inline-only   const char* GetJobName(const struct <anon>* this)
+  198    inline-only   void JobFinished(const struct <anon>* this, const struct <anon>& metrics)
+  205    inline-only   double GetCumulativeTimeInSeconds(const struct <anon>* this)
+  210    inline-only   uint64_t GetCumulativeJobCount(const struct <anon>* this)
+  214    inline-only   void ResetMetrics(const struct <anon>* this)
+  272    inline-only   void InitObject(const struct <anon>* this, struct <anon>* pJobType, uint32_t nJobIndex, uint32_t nInstanceParam0, uint32_t nInstanceParam1, uint32_t* pWriteOnComplete, uint32_t nWriteValueOnComplete)
+                         local  uint32_t jtp0
+                         local  uint32_t jtp1
+  299    inline-only   void SetParams(const struct <anon>* this, uint32_t instanceParam0, uint32_t instanceParam1, uint32_t typeParam0, uint32_t typeParam1)
+  310    inline-only   void GetParams(const struct <anon>* this, uint32_t* instanceParam0, uint32_t* instanceParam1, uint32_t* typeParam0, uint32_t* typeParam1)
+  318    inline-only   void SetWriteOnJobComplete(const struct <anon>* this, uint32_t* pWriteOnComplete, uint32_t nWriteValueOnComplete)
+  324    inline-only   void GetWriteOnJobComplete(const struct <anon>* this, uint32_t** pWriteOnComplete, uint32_t* nWriteValueOnComplete)
+  341    inline-only   void ClearObject(const struct <anon>* this)
+  346    inline-only   void SetPending(const struct <anon>* this)
+  353    inline-only   enum ExecutionStatus GetStatus(const const struct <anon>* this)
+                         local  enum ExecutionStatus e
+  365    inline-only   uint32_t GetJobTypeIndex(const struct <anon>* this)
+  370    inline-only   void GetJobMetrics(const struct <anon>* this, const struct <anon>& metrics)
+  383    inline-only   bool IsComplete(const const struct <anon>* this)
+  388    inline-only   struct <anon>* GetNextFree(const const struct <anon>* this)
+  393    inline-only   void SetNextFree(const struct <anon>* this, struct <anon>* pNext)
+  404    inline-only   void SetMasterJob(const struct <anon>* this, struct <anon>* pMasterJob)
+  409    inline-only   uint32_t IncChildJobs(const struct <anon>* this)
+  414    inline-only   uint32_t GetChildJobs(const struct <anon>* this)
+  419    inline-only   uint32_t GetLastChainItem(const struct <anon>* this)
+  424    inline-only   uint8_t GetLastChainItemAffinity(const struct <anon>* this)
+  429    inline-only   void SetLastChainItem(const struct <anon>* this, uint32_t nIndex, uint8_t nAffinity)

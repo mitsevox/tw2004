@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/RNAViewport.cpp
+// compiled in: RNAViewport.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   61  00834438     14  void SetExtents(const struct <anon>* this, int32_t iX, int32_t iY, int32_t iWidth, int32_t iHeight)
+   89  0083449C     14  void SetExtents(const struct <anon>* this, int32_t iX, int32_t iY, int32_t iWidth, int32_t iHeight)
+   97  008344B0      C  void SetZRange(const struct <anon>* this, float_t fMin, float_t fMax)

@@ -1,0 +1,20 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/gamesetuplocaluserconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   51  005ED528     70  void GameSetupLocalUserConcrete(const struct GameSetupLocalUserConcrete* this)
+                         inlines  RCPointer, operator=
+   61  005F3438     F8  struct <anon>* GetGameSetupUser(const const struct <anon>* this)
+                         local  struct GameSession* pGameSession
+   75  005F7C84     20  struct Operation* SetRTPState(const struct GameSetupLocalUserConcrete* this, bool bReady, struct <anon>* pCallback)
+   82  005E185C     18  struct Operation* Leave(const struct GameSetupLocalUserConcrete* this, struct GameSessionLeaveCallback* pCallback)
+   88  005F7C00     84  struct Operation* SetUserSettings(const struct GameSetupLocalUserConcrete* this, const struct Dictionary* pUserSettings, bool bPeersRTPStateShouldBeReset, struct <anon>* pCallback)
+                         inlines  operator=
+   96  005F7BE0     20  struct Operation* SetPresence(const struct GameSetupLocalUserConcrete* this, enum Presence ePresence, struct <anon>* pCallback)
+  102  0060709C     18  struct Operation* SendChatMessage(const struct GameSetupLocalUserConcrete* this, const char8_t* pMessage, struct <anon>* pCallback, bool bFilter)
+  107  0060702C     18  struct Operation* SendPrivateMessage(const struct GameSetupLocalUserConcrete* this, const char8_t* pMessage, struct <anon>* pCallback, bool bFilter)
+  112  005D0270     18  void SendMessage(const struct GameSetupLocalUserConcrete* this, int32_t iKind, const void* pMessage, uint32_t uSize)
+  117  005E6EA0     D4  const struct Dictionary* GetUserSettings(const const struct <anon>* this)
+                         inlines  operator=
+  127  005E6F74     40  void ClearUserSettingsCache(const struct GameSetupLocalUserConcrete* this)
+                         inlines  operator=

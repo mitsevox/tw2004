@@ -1,0 +1,16 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/././settingintegerconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   49  00622960      C  void Enable(const struct <anon>* this)
+   49  0062296C      C  void Disable(const struct <anon>* this)
+   49  00622980      4  struct Setting* GetSettingInterface(const struct <anon>* this)
+   49  006265CC      8  bool IsEnabled(const const struct <anon>* this)
+   49  0062702C     14  bool IsPersistent(const const struct <anon>* this)
+   49  006285B0     44  const char8_t* GetIdentifier(const const struct <anon>* this)
+                         inlines  GetIdentifier
+   52  00622984      8  enum Type GetType(const const struct <anon>* this)
+   56  0062298C      C  int32_t GetValue(const const struct <anon>* this)
+   58  00622998      C  int32_t GetDefault(const const struct <anon>* this)
+   60  006229A4      8  uint32_t GetFieldWidth(const const struct <anon>* this)
+   61  006229AC      8  uint32_t GetMaxValueCount(const const struct <anon>* this)

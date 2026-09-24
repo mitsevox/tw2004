@@ -1,0 +1,19 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/sfrsf.cpp
+// compiled in: sfrsf.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   12  006F5378      8  void SFILTER_rsfsetpitch(RSFSTATE* prss, int incrementor)
+   19  006F5380    3BC  int SFILTER_rsf(void* pstate, int outputframes, void* psrcp, void* pdstp, int requester)
+                         local  RSFSTATE* prss
+                         local  unsigned int incwhole
+                         local  unsigned int incfrac
+                         local  unsigned int accfrac
+                         local  float* psrc
+                         local  float* pdst
+                         local  float* ptemp
+                         local  int inputframes
+                         local  int temp
+                         local  int i
+                         local  unsigned int accwhole
+  223  006F573C     68  void SFILTER_rsfinit(RSFSTATE* prss, int cpu, int method)
+                         local  int i

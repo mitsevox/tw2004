@@ -1,0 +1,51 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_Widget.cpp
+// compiled in: apt_unity.cpp
+// 34 functions, source order. line | PS3 address | size
+
+   34  000FAE08     78  void UIWidget::UIWidget(const struct UIWidget* this)
+                         inlines  AptStaticCharBuffer<64u>::AptStaticCharBuffer
+   47  0003398C     68  void UIWidget::Init(const struct UIWidget* this)
+   57  00033C04     5C  void UIWidget::Close(const struct UIWidget* this)
+   67  0006A85C     A8  void UIWidget::Show(const struct UIWidget* this)
+   85  0006EA6C     60  void UIWidget::Hide(const struct UIWidget* this)
+   95  0004F2E4     44  void UIWidget::OnShow(const struct UIWidget* this)
+  103  0004F328     78  void UIWidget::BuildCustomOpenScreenSequence(const struct UIWidget* this)
+  111  0004F3A0     48  void UIWidget::BuildCustomCloseScreenSequence(const struct UIWidget* this)
+  119  0003483C     48  void UIWidget::OnShowExpandRightAway(const struct UIWidget* this)
+  127  00041E1C     48  void UIWidget::OnShowLaunchCSP(const struct UIWidget* this)
+  135  00058864     D0  void UIWidget::ShowForIngame(const struct UIWidget* this)
+  151  000C0234    224  enum eAptHandleInput UIWidget::HandleInput(const struct UIWidget* this, int32 cID)
+                         local  void* driverPtr
+                         local  struct GameModeDriverFacility* pFacilityDriver
+                         inlines  OnlineManagerOSDK::GetInstance, Singleton<GameModeDriverManager>::GetSingleton
+  216  0006A824     38  void UIWidget::RegainFocus(const struct UIWidget* this, uint32 )
+  227  0006A79C     88  void UIWidget::UpdatePressThisButtonText(const struct UIWidget* this)
+                         inlines  AptStaticCharBuffer<64u>::GetBuffer
+  236  0004F29C     48  void UIWidget::GetRandomBGImage(const struct UIWidget* this)
+                         local  enum GM_CourseType_t randomCourse
+  245  000882BC     54  enum TAptSequenceStatus UIWidget::ShowWidgetBGSequence(const struct UIWidget* this, bool inbFirstTime, void* inData)
+  253  000251E8     54  enum TAptSequenceStatus UIWidget::HideWidgetBGSequence(const struct UIWidget* this, bool inbFirstTime, void* inData)
+  262  00024E5C     20  enum TAptSequenceStatus UIWidget::WidgetOpenAndGoodSequence(const struct UIWidget* this, bool inbFirstTime, void* inData)
+  280  00024E7C     48  enum TAptSequenceStatus UIWidget::HideForIngameRightAwaySequence(const struct UIWidget* this, bool inbFirstTime, void* inData)
+  289  00024EC4     48  enum TAptSequenceStatus UIWidget::FixAlphaSequence(const struct UIWidget* this, bool inbFirstTime, void* inData)
+  298  0004F434     24  enum TAptSequenceStatus UIWidget::LaunchMMRightAwaySequence(const struct UIWidget* this, bool inbFirstTime, void* inData)
+  307  0004F4F8     24  enum TAptSequenceStatus UIWidget::LaunchCSPRightAwaySequence(const struct UIWidget* this, bool inbFirstTime, void* inData)
+  316  00024F0C     54  enum AptThreadReturnValue UIWidget::UpdateFlash(const struct UIWidget* this)
+  327  0004F3E8     4C  void UIWidget::ExpandAndLaunchMainMenu(const struct UIWidget* this)
+  336  0004F4AC     4C  void UIWidget::ExpandAndLaunchCSP(const struct UIWidget* this)
+  346  0004F458     54  void UIWidget::ResetToMinimal(const struct UIWidget* this)
+  357  00041DBC     60  void UIWidget::HideForIngame(const struct UIWidget* this)
+  366  00043D9C     44  void UIWidget::HidePressStartButtonPrompt(const struct UIWidget* this)
+  374  00043D20     44  void UIWidget::ShowPressStartButtonPrompt(const struct UIWidget* this)
+  381  00041E64     44  void UIWidget::UBERHidePressStartButtonPrompt(const struct UIWidget* this)
+  390  0004F51C     44  void UIWidget::ShowCopyrightText(const struct UIWidget* this)
+  400  0004F560     44  void UIWidget::HideCopyrightText(const struct UIWidget* this)
+  411  000BFB70    3D0  void UIWidget::UI_GoFromUIToFacilityGame(const struct UIWidget* this)
+                         local  int i
+                         local  const struct GameModeDriver* pDriver
+                         local  struct GameModeDriverFacility* pFacilityDriver
+                         local  int32 i
+                         local  int32 i
+                         inlines  GM_GetModeType, OnlineManagerOSDK::GetInstance, UIWidget::GetForceReLoadOfFacility, UIWidget::SetForceReLoadOfFacility, UserInfo::SetValid, cGAME_GLOBALS::SetFacilityBootingToTheFeUi, cGAME_GLOBALS::SetNextGame
+  512  00065418     DC  void UIWidget::UI_GoFromFacilityGameBackToUI(const struct UIWidget* this)
+                         local  int i

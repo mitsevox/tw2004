@@ -1,0 +1,8 @@
+// C:/packages/job_manager/1.11.00/include/job_manager/detail/job_thread.h
+// compiled in: job_scheduler_platform.cpp, job_thread.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   41  00708D60     10  void ~JobThread(const struct <anon>* this)
+   49    inline-only   void Die(const struct <anon>* this)
+   50    inline-only   bool KeepRunning(const struct <anon>* this)
+   51    inline-only   uint32_t Id(const struct <anon>* this)

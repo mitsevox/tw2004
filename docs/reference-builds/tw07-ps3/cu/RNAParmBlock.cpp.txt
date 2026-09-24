@@ -1,0 +1,30 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNAScope/RNAParmBlock.cpp
+// compiled in: RNAParmBlock.cpp
+// 12 functions, source order. line | PS3 address | size
+
+    0  00820E18     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   89  00821414     70  void ParmBlockC::ParmBlockC(const struct ParmBlockC* this, struct ParmListC* pParmList, void* pUserData, uint32_t uFlags)
+                         inlines  Object::SetAllocated
+  119  008212C8    14C  void ParmBlockC::~ParmBlockC(const struct ParmBlockC* this)
+                         local  const char[12] __FUNCTION__
+                         inlines  ParmBlockC::operator delete, RNADebugBreak
+  157  0082119C     B0  void ParmBlockC::AutoResize(const struct ParmBlockC* this)
+                         local  const char[11] __FUNCTION__
+                         inlines  GetSize, RNADebugBreak
+  194  0082124C     7C  void ParmBlockC::SetParmList(const struct ParmBlockC* this, const struct <anon>* pParmList)
+  237  00820F98    204  void ParmBlockC::AllocateMemBlock(const struct ParmBlockC* this, uint32_t uMemSize)
+                         local  const char[17] __FUNCTION__
+                         local  uint32_t uOldSize
+                         local  uint8_t* pNewBlock
+                         inlines  Object::SetFlags, RNADebugBreak
+  301  00820EB8     E0  void ParmBlockC::BindMemBlock(const struct ParmBlockC* this, void* pMemBlock, uint32_t uMemSize)
+                         local  const char[13] __FUNCTION__
+                         inlines  RNADebugBreak
+  333  00820DC8     28  struct <anon>* ParmBlockC::FindParm(const struct ParmBlockC* this, enum TypeID idType, const char* pStrName, uint32_t uCount)
+  359  00820DF0     28  struct <anon>* ParmBlockC::ResolveParm(const struct ParmBlockC* this, enum TypeID idType, const char* pStrName, uint32_t uCount)
+  388  00821694    1B8  void ParmBlockC::Print(const const struct ParmBlockC* this)
+                         local  int i
+                         local  struct <anon>* pParm
+                         inlines  GetNext, ParmBlockC::GetFirstParm, ParmBlockC::ReadValue, RNADebugBreak
+  404  00820E98     10  static void _GLOBAL__I__ZN3RNA10ParmBlockC16s_ClassAllocatorE()
+  405  00820EA8     10  static void _GLOBAL__D__ZN3RNA10ParmBlockC16s_ClassAllocatorE()

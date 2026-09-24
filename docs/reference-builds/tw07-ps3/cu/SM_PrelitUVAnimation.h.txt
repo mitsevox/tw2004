@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_PrelitUVAnimation.h
+// compiled in: shader_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   22  005209C0     18  void SM_PrelitUVAnimationClass::~SM_PrelitUVAnimationClass(const struct SM_PrelitUVAnimationClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base

@@ -1,0 +1,110 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Shared/Cameras/CamUtils.c
+// compiled in: other_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   44  00408788     24  void CamUtils_SplineCamerasByPositionAndLook(float* pos0, float* pos1, float* pos2, float* pos3, float* look0, float* look1, float* look2, float* look3, float fov0, float fov1, float param, float* finalPos, float* finalLook, float* finalFOV)
+   54  0040835C    42C  void CamScript_SplineCamerasByPositionAndLook(float* pos0, float* pos1, float* pos2, float* pos3, float* look0, float* look1, float* look2, float* look3, float fov0, float fov1, float param, float* finalPos, float* finalLook, float* finalFOV)
+                         local  vec4flt paramVec
+                         local  vec4flt resultVec
+                         local  vec4flt paramMultCatmulVec
+                         local  mat44flt pointMatrix
+                         local  vec4flt adjustedLook1
+                         local  vec4flt adjustedLook2
+                         local  vec4flt adjustedLook3
+                         local  float completeCircle
+                         local  float halfCircle
+                         inlines  vec4flt_Copy3
+  130  00408358      4  void CamUtils_SplineCamerasByPosition(float* pos0, float* pos1, float* pos2, float* pos3, float param, float* finalPos)
+  136  004081E4    174  void CamScript_SplineCamerasByPosition(float* pos0, float* pos1, float* pos2, float* pos3, float param, float* finalPos)
+                         local  vec4flt paramVec
+                         local  vec4flt resultVec
+                         local  vec4flt paramMultCatmulVec
+                         local  mat44flt pointMatrix
+                         inlines  vec4flt_Copy3
+  180  003E929C     5C  float CamScript_GetFlybyTimeStep(float rate0, float rate1, float time1, float accelParam, float currentTime, float timeStep)
+                         local  float rateDiff
+                         local  float accelPercent
+                         local  float adjustedRate
+                         local  float adjustedRatePercent
+                         local  float finalTimeStep
+  205  00434920      4  float CamUtils_fGetDistanceBetweenSplinePoints(float* pos0, float* pos1, float* pos2, float* pos3)
+  218  004348F4     2C  float CamScript_fGetDistanceBetweenSplinePoints(float* pos0, float* pos1, float* pos2, float* pos3)
+  231  0043471C    1D8  float CamScript_fGetPartialDistanceBetweenSplinePoints(float param, float* pos0, float* pos1, float* pos2, float* pos3)
+                         local  float sampleParam
+                         local  int i
+                         local  float distance
+                         local  float curParam
+                         local  vec4flt prevLocation
+                         local  vec4flt newLocation
+                         local  vec4flt newToPrev
+                         local  float newToPrevDist
+                         inlines  LLMath_Length3, LLMath_Subtract3, __vec_len_sqr3, vec4flt_Copy3
+  266  003E9594      4  float CamUtils_fEvaluateCurve(CurvePtr c, float time)
+  271  003E92F8    29C  float CamScript_fEvaluateCurve(CurvePtr c, float time)
+                         local  float s
+                         local  float h1
+                         local  float h2
+                         local  float h3
+                         local  float h4
+                         local  uint32 num1
+                         local  uint32 t
+                         local  float y
+                         local  float steps
+                         local  float w1
+                         local  float w2
+                         local  CurvePoint2D p
+                         local  CurvePoint2D lastP
+  350  003E9598    29C  float CamScript_fEvaluateCurveParam(CurvePtr c, float param)
+                         local  float s
+                         local  float h1
+                         local  float h2
+                         local  float h3
+                         local  float h4
+                         local  uint32 num1
+                         local  uint32 t
+                         local  float x
+                         local  float steps
+                         local  float w1
+                         local  float w2
+                         local  CurvePoint2D p
+                         local  CurvePoint2D lastP
+  441  00413940    254  bool CamUtils_vGetPositionBetweenTwoPoints(float* pt1, float* pt2, float param, float sideOffset, bool use3D, bool usePercent, float* endPt)
+                         local  vec4flt pointDiff
+                         inlines  LLMath_AddScale3, LLMath_Subtract3, vec_sub
+  503  00434924    328  void CamUtils_vCalcArcPosition(float* pt1, float* pt2, float* centerPoint, float param, enum CameraArcMode_e arcMode, float* endPoint)
+                         local  vec4flt dest1
+                         local  vec4flt dest2
+                         local  float angle1
+                         local  float angle2
+                         local  float newAngle
+                         local  float angleDiff
+                         local  float r1
+                         local  float r2
+                         local  float newR
+                         inlines  LLMath_Length3, LLMath_Subtract3, std::cosf, std::sinf, vec_sub
+  612  00413864     DC  void CamUtils_vConvertYawPitchRollToLookPoint(float* camOrigin, float* lookPoint, float yaw, float pitch, float roll, float scale)
+                         local  vec4flt straightAhead
+                         local  mat44flt yprMat
+                         inlines  LLMath_AddScale3
+  624  00434C4C    524  void CamUtils_vConvertLookPointToYawPitchRoll(float* camOrigin, float* lookPoint, float* yaw, float* pitch, float* roll, float* scale)
+                         local  vec4flt straightAhead
+                         local  vec4flt upVector
+                         local  vec4flt camToLook
+                         local  vec4flt camToLookXZPlane
+                         local  vec4flt camToLookXYZPlane
+                         local  vec4flt yawCross
+                         local  vec4flt pitchCross
+                         local  float pitchDot
+                         local  float yawDot
+                         inlines  LLMath_CrossProduct3W0, LLMath_DotProduct3, LLMath_Length3, LLMath_Subtract3, __vec_len_sqr3, vec4flt_Copy3, vec_madd, vec_nmsub, vec_perm, vec_sld, vec_sub
+  724  00435170    128  void CamUtils_vLerpPosAndLookByYawPitchRoll(float* camOrigin1, float* camOrigin2, float* finalPos, float* lookPoint1, float* lookPoint2, float* finalLook, float fParam)
+                         local  float yaw1
+                         local  float yaw2
+                         local  float pitch1
+                         local  float pitch2
+                         local  float roll1
+                         local  float roll2
+                         local  float finalYaw
+                         local  float finalPitch
+                         local  float finalRoll
+                         local  float scale

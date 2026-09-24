@@ -1,0 +1,140 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLTextureDebug.c
+// compiled in: Legacy_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   29  003BAFEC     B8  void TX_SetTextureName_dbg(TextureRef ref, const char* name)
+                         local  struct TextureInfoNative* info
+                         inlines  TX_GetNativeTextureInfo
+   35  003BB8C0     BC  const char* TX_GetTextureName_dbg(TextureRef ref)
+                         local  struct TextureInfoNative* info
+                         inlines  TX_GetNativeTextureInfo
+   41  0038885C    314  char* TX_OptionsGetString_dbg(TextureOptions options)
+                         local  char[256] buf
+                         local  TextureOptions filterOptions
+                         local  const char* filter
+                         local  TextureOptions edgeOptions
+                         local  const char* edge
+   89  003BB97C    22C  char* TX_GetTextureInfoString_dbg(TextureRef ref)
+                         local  char[512] buf
+                         local  TextureInfo* info
+                         local  const char* name
+                         local  size_t len
+                         local  const char* c
+                         inlines  TX_GetNativeTextureInfo
+  125  003CAC18    1E4  TextureRef TX_LoadPlaceholderTexture_dbg(TextureOptions options, bool diamond, TextureRef reservedTexture)
+                         local  uint32[32][32] placeholderTextureSquare
+                         local  uint32[64][64] placeholderTextureDiamond
+                         local  int placeHolderSetup
+                         local  TextureRef ref
+                         local  int i
+                         local  int j
+                         local  int i
+                         local  int j
+  185  003CA8A8    2B0  TextureRef TX_LoadFloatPlaceholderTexture_dbg(TextureOptions options, bool diamond, TextureRef reservedTexture)
+                         local  float[32][32][4] placeholderTextureSquare
+                         local  float[64][64][4] placeholderTextureDiamond
+                         local  int placeHolderSetup
+                         local  TextureRef ref
+                         local  int i
+                         local  int j
+                         local  int i
+                         local  int j
+  237  00389454    35C  void TX_ReverseTexture_dbg(TextureFormat format, uint32 width, uint32 height, uint32 dataSize, void* data)
+                         local  uint8* pixels
+                         local  size_t fullSize
+                         local  size_t rowSize
+                         local  void* workBuf
+                         local  size_t rows
+                         local  uint32 i
+                         local  uint32 i
+                         local  uint8* block
+                         local  uint8 tmpRow
+                         local  uint8 tmpRow2
+                         local  uint32 i
+                         local  uint32 i
+                         local  uint64* block
+                         local  uint64 inBlock
+                         local  uint64 outBlock
+                         local  int j
+                         local  void* a
+                         local  void* b
+                         local  uint32 i
+                         local  uint8* block
+                         local  uint8 tmpRow
+                         local  uint8 tmpRow2
+                         local  uint16* block
+                         local  uint16 tmpRow
+                         local  uint16 tmpRow2
+  322  0038938C     C8  void TX_SwapTextureToRGBA_dbg(TextureFormat format, uint32 width, uint32 height, uint32 dataSize, void* data)
+                         local  uint8* pixels
+                         local  size_t fullSize
+                         local  size_t pixelSize
+                         local  uint32 i
+                         local  uint8 tmpPixel
+  337  003897B0     DC  void TX_MakeTextureDataPlatformNative_dbg(int OriginIsBottom, int IsARGB, TextureFormat format, uint32 width, uint32 height, int32 numLayers, uint32 dataSize, void* data)
+  351  003CA508    3A0  TextureRef TX_LoadFromTGA_dbg(const char* filename, TextureRef reservedTexture)
+                         local  int32 tgaSize
+                         local  struct TX_TgaHeader* tga
+                         local  struct TX_TgaFooter* foot
+                         local  uint8* data
+                         local  uint32 dataSize
+                         local  TextureFormat format
+                         local  TextureOptions options
+                         local  int OriginIsTop
+                         local  TextureRef ref
+  415  003C8860    2DC  bool TX_WriteToTGA_dbg(const char* filename, TextureRef texture)
+                         local  int32 tgaFile
+                         local  struct TextureLockInfo lockInfo
+                         local  int locked
+                         local  struct TX_TgaHeader tgaHeader
+                         local  unsigned int* pixels
+                         local  uint32[512] buffer
+                         local  uint32 buffPos
+                         local  uint16 h
+                         local  uint16 w
+  501  003C9BF0    918  TextureRef TX_LoadFromDDS_dbg(const char* filename, TextureRef reservedTexture)
+                         local  int32 ddsSize
+                         local  struct TX_DdsHeader* dds
+                         local  TextureFormat format
+                         local  TextureOptions options
+                         local  int IsARGB
+                         local  uint8* data
+                         local  uint32 dataSize
+                         local  int layers
+                         local  TextureRef ref
+                         local  char* fourcc
+  625  003B9E8C     7C  void TX_ForceAnisoFiltering_dbg(bool enable)
+                         local  TextureOptions newFilter
+                         local  TextureRef i
+                         local  const TextureInfo* info
+  659  003BB720    168  static bool TX_ViewTexturesConsole(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  TextureRef found
+                         inlines  std::atoi
+  700  003CC4B4    CAC  void TX_ViewTexturesInGame_dbg()
+                         local  int once
+                         local  uint32 buttons
+                         local  float XL
+                         local  float XR
+                         local  float YT
+                         local  float YB
+                         local  float z
+                         local  struct vtxStruct[4] texVerts
+                         local  struct vtxStruct[4] boxVerts
+                         local  float xscale
+                         local  float yscale
+                         local  vec4flt scale
+                         local  TextureRef curTexture
+                         local  int row
+                         local  int col
+                         local  const TextureInfo* info
+                         local  int drawDepth
+                         local  vec4flt pos
+                         local  enum TextureMode texMode
+                         local  TextureOptions oldFilter
+                         local  char* text
+                         local  float widthScale
+                         local  float depth
+                         local  struct vtxStruct[4] tex3DVerts
+                         local  float heightScale
+                         local  struct TextureGroup* group
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetColorWriteEnable, DS_vSetCullMode, DS_vSetZBufferMode, DS_vSetZTestEnable, TX_FormatHasDepth

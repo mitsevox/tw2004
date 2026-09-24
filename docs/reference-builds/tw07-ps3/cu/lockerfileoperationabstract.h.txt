@@ -1,0 +1,11 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/locker/source/common/./lockerfileoperationabstract.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   52  00629D58     40  void ~LockerFileOperationAbstract(const struct <anon>* this)
+   57  00625AC8     68  void ClearCallback(const struct <anon>* this)
+   67    inline-only   void NotifyProgress(const struct <anon>* this, uint32_t uProgressPercent)
+   76  00625B30     50  void NotifySuccess(const struct <anon>* this, struct LockerFile* pFile)
+   85    inline-only   void NotifySuccess(const struct <anon>* this, struct LockerFile* pFile, struct LockerBuffer* pBuffer)
+   94    inline-only   void NotifyFailure(const struct <anon>* this, struct LockerFile* pFile, int32_t iLockerError)
+                         local  enum FailureCode eFailureCode

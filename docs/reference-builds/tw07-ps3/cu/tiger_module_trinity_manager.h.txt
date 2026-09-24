@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_trinity_manager.h
+// compiled in: tiger_module_trinity_internal.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   19    inline-only   void TrinityManager::SetTrinity(const struct TrinityManager* this, struct Trinity* pTrinity)

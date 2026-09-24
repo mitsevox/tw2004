@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_OnlineFAQ.h
+// compiled in: apt_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   16  0011AC5C    198  void UIOnlineFAQ::~UIOnlineFAQ(const struct UIOnlineFAQ* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TArrayInternal<char*,AptStructSwapper>::~TArrayInternal, TExternArray<UIOnlineFAQ::DstMenuItem_olfq>::~TExternArray, UIMenuVertBase::~UIMenuVertBase, ~TAptArrayStruct
+   18  000FFD20      C  uint32 UIOnlineFAQ::GetSignature(const const struct UIOnlineFAQ* this)
+   19  000FFD2C     44  void UIOnlineFAQ::ShowHelpText(const struct UIOnlineFAQ* this)
+   23  000FFD70      4  void UIOnlineFAQ::Show(const struct UIOnlineFAQ* this)
+   30  000FFD7C      C  struct IExternArray* UIOnlineFAQ::GetExternArray(const struct UIOnlineFAQ* this)

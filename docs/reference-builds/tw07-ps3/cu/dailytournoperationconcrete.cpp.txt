@@ -1,0 +1,11 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/dailytourn/source/common/dailytournoperationconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   70  005F4E1C     68  void DailyTournOperationConcrete(const struct <anon>* this, struct OperationConcrete* pOperation)
+                         inlines  RCPointer
+   95  005E53A8     4C  void ~DailyTournOperationConcrete(const struct <anon>* this)
+                         inlines  operator delete, ~RCPointer
+  115  005CA114     64  void StartGame(const struct <anon>* this)
+  119  005F6E4C     10  static void _GLOBAL__I__ZN4OSDK14CoreGameFacade28GetProductUpdateStrategyImplEv()
+  120  005F6E3C     10  static void _GLOBAL__D__ZN4OSDK14CoreGameFacade28GetProductUpdateStrategyImplEv()

@@ -1,0 +1,13 @@
+// ../../../../../TIGERCODE/Code/Golf/Hi-Rendering/Headers/GoViewport.h
+// compiled in: apt_unity.cpp, golf2_unity.cpp, golf_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+  221    inline-only   float VM_fGetViewportHeightOverWidth(VM_SViewport* spViewport_p)
+  305    inline-only   float VM_fGetViewportOneOverWidthRatio(VM_SViewport* spViewport_p)
+  317    inline-only   float VM_fGetViewportOneOverHeightRatio(VM_SViewport* spViewport_p)
+  329    inline-only   float VM_fGetViewportLeft(VM_SViewport* spViewport_p)
+  341    inline-only   float VM_fGetViewportTop(VM_SViewport* spViewport_p)
+  353    inline-only   float VM_fGetViewportWidth(VM_SViewport* spViewport_p)
+  365    inline-only   float VM_fGetViewportHeight(VM_SViewport* spViewport_p)
+  402    inline-only   void VM_vSetViewportRect(VM_SViewport* spViewport_p, float fLeft_p, float fTop_p, float fWidth_p, float fHeight_p)
+  426    inline-only   void VM_vSetDefaultViewport(VM_SViewport* spViewport_p)

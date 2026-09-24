@@ -1,0 +1,24 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_PropGeneric.cpp
+// compiled in: shader_unity.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   36  0051CE04     C0  void SM_PropGenericClass::SM_PropGenericClass(const struct SM_PropGenericClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base
+   78  0050E2D0     50  void SM_PropGenericClass::Load(const struct SM_PropGenericClass* this)
+   84  0050DFD0    300  void SM_PropGenericClass::LoadParams(const struct SM_PropGenericClass* this)
+  116  0050E320    174  void SM_PropGenericClass::Activate(const struct SM_PropGenericClass* this)
+  146  0050E494     50  void SM_PropGenericClass::Deactivate(const struct SM_PropGenericClass* this)
+  159  00519530     6C  void SM_PropGenericClass::SetMatAmbient(const struct SM_PropGenericClass* this, const float[4]& col)
+                         inlines  vec4flt_Copy
+  169  0051959C     6C  void SM_PropGenericClass::SetSpecExtra(const struct SM_PropGenericClass* this, const float[4]& specExtraParams)
+                         inlines  vec4flt_Copy
+  179  005156B0     6C  void SM_PropGenericClass::SetShadowParams(const struct SM_PropGenericClass* this, float shadowMapBias, float shadowMapGain)
+  190  0051571C     68  void SM_PropGenericClass::SetGlobalFadeOut(const struct SM_PropGenericClass* this, float value)
+  199  00515784     64  void SM_PropGenericClass::SetBaseTexture(const struct SM_PropGenericClass* this, TextureRef texRef)
+  209  005157E8     64  void SM_PropGenericClass::SetNormalMap(const struct SM_PropGenericClass* this, TextureRef texRef)
+  219  0051584C     64  void SM_PropGenericClass::SetPackedMap(const struct SM_PropGenericClass* this, TextureRef texRef)
+  229  005158B0     64  void SM_PropGenericClass::SetShadowMap(const struct SM_PropGenericClass* this, TextureRef texRef)
+  239  00515914     64  void SM_PropGenericClass::SetAmbientCubeMap(const struct SM_PropGenericClass* this, TextureRef texRef)
+  249  00515978     64  void SM_PropGenericClass::SetSpecEnvCubeMap(const struct SM_PropGenericClass* this, TextureRef texRef)
+  259  005159DC     64  void SM_PropGenericClass::SetEnvCubeMap(const struct SM_PropGenericClass* this, TextureRef texRef)
+  270  00515A40     64  void SM_PropGenericClass::SetHaveAmbientCube(const struct SM_PropGenericClass* this, bool bHaveAmbientCube)

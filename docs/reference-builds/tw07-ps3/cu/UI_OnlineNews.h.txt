@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_OnlineNews.h
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   16  00119B7C    198  void UIOnlineNews::~UIOnlineNews(const struct UIOnlineNews* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TArrayInternal<char*,AptStructSwapper>::~TArrayInternal, TExternArray<UIOnlineNews::DstMenuItem_olns>::~TExternArray, UIMenuVertBase::~UIMenuVertBase, ~TAptArrayStruct
+   18  000FFCF4      C  uint32 UIOnlineNews::GetSignature(const const struct UIOnlineNews* this)
+   27  000FFD00      4  void UIOnlineNews::Show(const struct UIOnlineNews* this)
+   33  000FFD0C      C  struct IExternArray* UIOnlineNews::GetExternArray(const struct UIOnlineNews* this)

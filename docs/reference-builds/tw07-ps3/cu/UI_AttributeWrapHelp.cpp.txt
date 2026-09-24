@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_AttributeWrapHelp.cpp
+// compiled in: apt_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   18  000F2004     4C  void UIAttributeWrapHelp::UIAttributeWrapHelp(const struct UIAttributeWrapHelp* this)
+   22  00031580     64  void UIAttributeWrapHelp::Init(const struct UIAttributeWrapHelp* this)
+   32  000B0A48    14C  void UIAttributeWrapHelp::Show(const struct UIAttributeWrapHelp* this)
+   50  0003160C     8C  void UIAttributeWrapHelp::ShowHelpText(const struct UIAttributeWrapHelp* this)
+   58  000CE368    114  enum eAptHandleInput UIAttributeWrapHelp::HandleInput(const struct UIAttributeWrapHelp* this, int32 cID)
+   87  000250CC     78  void UIAttributeWrapHelp::NotifyGetDescriptionText(const struct UIAttributeWrapHelp* this)

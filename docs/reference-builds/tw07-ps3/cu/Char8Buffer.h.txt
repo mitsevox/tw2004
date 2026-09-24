@@ -1,0 +1,15 @@
+// ../../../../../TIGERCODE/Code/Golf/Lo-Rendering/Xenon/Char8Buffer.h
+// compiled in: golf2_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   67    inline-only   const char* Char8Buffer<64>::c_str(const const struct Char8Buffer<64>* this)
+   71    inline-only   int Char8Buffer<64>::length(const struct Char8Buffer<64>* this)
+   74    inline-only   int Char8Buffer<64>::max_size(const const struct Char8Buffer<64>* this)
+   83    inline-only   char& Char8Buffer<64>::operator[](const struct Char8Buffer<64>* this, int i)
+  112  001E8AF0     B8  void Char8Buffer<64>::append(const struct Char8Buffer<64>* this, const char* text)
+                         local  int bufferLength
+                         local  int textLength
+                         local  int charsToCopy
+  169  001E81C8     4C  void Char8Buffer<64>::VSprintf(const struct Char8Buffer<64>* this, const char* format, va_list argList)
+  186  001E8214     48  void Char8Buffer<64>::Sprintf(const struct Char8Buffer<64>* this, const char* format)
+                         local  va_list argList

@@ -1,0 +1,10 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/mixwithgain.cpp
+// compiled in: mixwithgain.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   74    inline-only   void core::MixWithGainOptimizedImplementation(float* pDst, float* pSrc, float gain, unsigned int numSamples)
+                         local  float* pEndDst
+  259    inline-only   void core::MixWithGainImplementation(float* pDst, float* pSrc, float gain, unsigned int numSamples)
+                         local  float* pEndDst
+  278  006F6020     FC  void core::MixWithGain(float* pDst, float* pSrc, float gain, unsigned int numSamples)
+                         inlines  core::MixWithGainImplementation, core::MixWithGainOptimizedImplementation

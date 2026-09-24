@@ -1,0 +1,19 @@
+ViewController (26; the four on-screen views and their cameras) + FE_PGATourMessages (26; PGA TOUR menu message handlers) + SkinMorph (26; golfer face/body morph-target blending) = 78 functions.
+Names: kept 0, renamed 0, T3 0, demoted 0, unnamed 78 (every function was already fn_<ADDR>; agreed guesses are in the ledger notes). renames.tsv header only; namecheck: 0 rows, 0 errors, 0 flags.
+Comments: 10 edits over 9 functions (7 in FE_PGATourMessages.c, 2 in camera.h prototypes, 1 in the SkinMorph.c header), 0 stripped, 50 ok, 19 none. Each old text found exactly once in map-06 (da548c8e); no __LINE__ files involved.
+Worst: "sponsor offers" (FE unit header, fn_8010EEE4, fn_8010EF8C, lbl_80193CFC). No code, data or string says "sponsor". The handlers work SaveProfile.a1054C lock entries, and fn_8010EEE4 writes test text ("S n", "I n", "$ n00,000").
+Also wrong: fn_8010F440 said "the winner's earnings", but GameModeDriverPGATour_GetPurseString gives the total purse (audit-rec-A swap, EA label "Purse:"). fn_8010EBDC said "all-around rank" (line 8 is the career-money RANK) and did not mention line 5. camera.h fn_800172C4 said "the camera move has finished", which neither lane supports.
+Stale status fixed: SkinMorph.c header said "not yet decompiled; the sweep code below". The unit is Matching, all 26 functions are in C and it has no sweep block.
+Lane accuracy: L1 had line 8 as career winnings (it is the rank). L1 said fn_8001E938 "marks" the bitsets (it clears them). L1 missed the TW06 SetStatsDirty/SetScoresDirty hints behind fn_8010F52C/F550. L2 was right on all three.
+Unclear: lbl_80193CFC's comment sits between fn_8010EEE4 and fn_8010EF80. I booked it on fn_8010EEE4, the nearer one by lines.
+Findings (no code changes):
+- fn_80016CFC and fn_80016E28 are byte-identical (&lbl_801B8BA8[nView]). Other units call CFC and ViewController calls E28. They are two EA functions and both must stay for the match; a port can alias them.
+- gomainloop.c:58 declares fn_80016CD8(void), and fn_8006C8EC (gomainloop.c:500) calls fn_80016CD8() with no argument. That only works because r3 still holds nView, and there is no fake-match note. Port bug: pass nView. The fn_8006C8EC comment also leaves out that it sets the current view.
+- fn_8010EBDC line 8 prints GM_PgaTourSim_GetStatRankFromGolferID(.., CAREER_WINNINGS), which is the rank, not the amount. The code is probably EA's choice; the comment is fixed now.
+- fn_8010EEE4/fn_8010EF80 (messages 559/560): placeholder text and a constant 25. They look like an unfinished or test list. The comment now says test text.
+- fn_8010F574 calls fn_80117DE0 (u8 (void), PGATourSimulation.c:212) through a (u8(*)(int)) cast with 0. That is EA's extra argument, and the existing port note is accurate. Port: call fn_80117DE0() directly.
+- fn_8010EEA8 is defined (void) but declared (MsgArg*, MsgArg*) in FE_MessageTable.c:188 and stored in message slot 553. Harmless on PPC; the prototypes should be unified in the type pass.
+- SkinMorph fn_8011C504 rounds the float weight to a 16.16 integer, (s32)(65536*w+0.5f), then passes it as fn_8011C27C's f32 fScale. The maths is correct (s16 delta * w*65536 lands in 16.16), but the weight loses its fraction below 1/65536, and the +0.5 rounds negative weights toward zero (off by one step). The f32 parameter is right, because it matches. Keep it as is.
+- No limit checks: aVerts[0x800] (2048 vertices), with fn_8011C068 looping nVerts and fn_8011C27C indexing aVerts[*pIndex] unchecked; apTargets/afTargets[64], which fn_8011C5B4 fills up to n14 entries. A port should assert both.
+- fn_8011C84C is empty and is called at the end of fn_8011CB5C and fn_8011CC40 (the two finish sites). It is probably a platform flush stub. Both lanes agree; there is no name evidence.
+- Phase 3 (fields): camera.h:257 View.v10 "where it looks" has the same one-sided claim; v10 is also the angle vector in scripted shots. Local szEarnings in fn_8010F440 holds the purse.

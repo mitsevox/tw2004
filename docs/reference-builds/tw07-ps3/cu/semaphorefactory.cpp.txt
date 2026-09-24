@@ -1,0 +1,12 @@
+// C:/packages/rwmovie/1.04.01/source/movielib/private/semaphorefactory.cpp
+// compiled in: semaphorefactory.cpp
+// 8 functions, source order. line | PS3 address | size
+
+    0  00700654     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   22  00700560     48  struct <anon>* CreateSemaphore()
+   27  007005A8     44  void DestroySemaphore(struct <anon>* pSemaphore)
+   32  007005EC      8  size_t GetSemaphoreSize()
+   37  007005F4     3C  struct <anon>* ConstructSemaphore(void* pMemory)
+   42  00700630     24  void DestructSemaphore(struct <anon>* pSemaphore)
+   48  007006D4     10  static void _GLOBAL__I__ZN2rw16SemaphoreFactory15CreateSemaphoreEv()
+   49  007006E4     10  static void _GLOBAL__D__ZN2rw16SemaphoreFactory15CreateSemaphoreEv()

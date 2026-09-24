@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_trinity/trinity/runtime/src/Sequence.h
+// compiled in: tiger_module_trinity_internal.cpp
+// 4 functions, source order. line | PS3 address | size
+
+  131    inline-only   bool8_t IsRunning(const const struct <anon>* this)
+  173    inline-only   float_t GetTime(const const struct <anon>* this)
+  181    inline-only   float_t GetEndTime(const const struct <anon>* this)
+  189    inline-only   struct <anon>* GetSeqBin(const const struct <anon>* this)

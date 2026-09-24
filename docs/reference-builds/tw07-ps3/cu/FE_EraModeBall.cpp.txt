@@ -1,0 +1,21 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/frontend/FE_EraModeBall.cpp
+// compiled in: apt_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   22  00020FC4     78  struct FEEraModeBall& FEEraModeBallMgr()
+                         inlines  Singleton<FEEraModeBall>::GetSingleton
+   29  000B874C     90  void FEEraModeBall::FEEraModeBall(const struct FEEraModeBall* this)
+                         inlines  Singleton<FEEraModeBall>::Singleton
+   38  000211F0     8C  void FEEraModeBall::~FEEraModeBall(const struct FEEraModeBall* this)
+                         inlines  Singleton<FEEraModeBall>::~Singleton
+   43  0002103C      8  bool FEEraModeBall::Update(const struct FEEraModeBall* this)
+   48  00021044     44  void FEEraModeBall::RegisterStreamClients(const struct FEEraModeBall* this)
+   53  00021088     2C  void FEEraModeBall::UnRegisterStreamClients(const struct FEEraModeBall* this)
+   58  000210B4     3C  void FEEraModeBall::OpenStreamFile(const struct FEEraModeBall* this)
+   63  00021194     5C  void FEEraModeBall::LoadBall(const struct FEEraModeBall* this, int32 resID)
+   71  00021154     40  void FEEraModeBall::CreateBallObject(const struct FEEraModeBall* this)
+   93  000210F0     64  void FEEraModeBall::DestroyBallObject(const struct FEEraModeBall* this)
+                         local  struct TStreamData* pResorceData
+  108  0002127C     9C  bool FEEraModeBall::CheckStreamCallback(Drive3DChunkHdr* pHeader)
+  125  00021318     3C  void FEEraModeBall::LoadStreamCallback(TStreamDataPtr pStream)
+  154  00021354     3C  void FEEraModeBall::FreeBallResource(void* aStreamDataPtr)

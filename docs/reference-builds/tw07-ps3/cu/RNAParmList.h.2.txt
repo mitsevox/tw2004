@@ -1,0 +1,12 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNAScope/RNAParmList.h
+// compiled in: RNAMapping.cpp, RNAParmBlock.cpp, RNAParmList.cpp, RNAScope.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   57  0082202C     24  void ParmListC(const struct ParmListC* this)
+                         inlines  SetPtr
+   58  0082221C     C8  void ~ParmListC(const struct ParmListC* this)
+                         inlines  RNADebugBreak, ~RNARef
+   61    inline-only   struct <anon>* GetFirstParm(const const struct <anon>* this)
+   77    inline-only   uint32_t GetSize(const const struct <anon>* this)
+   79    inline-only   ScopeMaskT GetScopeMask(const const struct <anon>* this)
+   82    inline-only   struct ScopeParmC* GetBoundScopeParm(const const struct <anon>* this)

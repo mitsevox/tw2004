@@ -1,0 +1,10 @@
+// ../../source/tiger_module_actor.h
+// compiled in: tiger_cct_internal.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   77    inline-only   unsigned int Actor::GetAttr(const const struct Actor* this)
+   78    inline-only   const short unsigned int* Actor::GetBoneRemapping(const const struct Actor* this)
+   83    inline-only   unsigned int Actor::GetContextIndex(const const struct Actor* this)
+   89    inline-only   const char* Actor::GetIgcName(const const struct Actor* this)
+   90    inline-only   const char* Actor::GetRigName(const const struct Actor* this)
+  128    inline-only   void Actor::IncrementFramesInState(const struct Actor* this)

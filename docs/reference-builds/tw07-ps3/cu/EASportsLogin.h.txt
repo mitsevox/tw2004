@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/EASportsShared/Headers/EASportsLogin.h
+// compiled in: golf_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   66    inline-only   void EASLogin_SetCurrentName(char* pName)
+   72    inline-only   char* EASLogin_GetCurrentName()
+   77    inline-only   void EASLogin_SetCurrentPassword(char* pPass)
+   83    inline-only   char* EASLogin_GetCurrentPassword()

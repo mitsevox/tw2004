@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/GoFrameBuf.c
+// compiled in: golf_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   58  001E9528     5C  void FB_vUpdateInternalFrameBufferData(FB_SFrameBuffer* spFrameBuffer_p)
+   95  002157A8      4  void FB_vInitModule()
+  110  002157AC      4  void FB_vCloseModule()
+  125  002437D0    188  FB_SFrameBuffer* FB_spCreateFrameBuffer()
+                         local  const char[23] __FUNCTION__
+                         local  FB_SFrameBuffer* spFrameBuffer
+                         inlines  FB_vSetDefaultFrameBuffer, FB_vSetFrameBuffer, TagValuePair, operator+
+  161  002157B0     3C  void FB_vReleaseFrameBuffer(FB_SFrameBuffer* spFrameBuffer_p)

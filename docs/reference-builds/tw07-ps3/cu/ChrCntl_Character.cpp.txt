@@ -1,0 +1,65 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/src/ChrCntl_Character.cpp
+// compiled in: ChrCntl_Character.cpp
+// 23 functions, source order. line | PS3 address | size
+
+  121  0059F0C0    264  void Character_SyncSkeletonFilters(struct <anon>* character)
+                         local  int index
+                         local  uint32_t id
+                         inlines  FastMap<int,int>::Clear, FastMap<int,int>::Insert, FastMap<int,int>::Resize
+  133  0059F740     94  int Character_GetSkeletonFilterIndex(struct <anon>* character, int id)
+                         local  int i
+                         inlines  FastMap<int,int>::Find
+  151  0059ECAC     98  bool Character_IsValidSkeletonFilterId(struct <anon>* character, int id)
+                         inlines  FastMap<int,int>::Find
+  156  0059ED44     28  int Character_MakeStateId(const char* name)
+                         inlines  Common::CommonHash
+  161  0059ED6C      C  int Character_CountSkeletonFilters(struct <anon>* character)
+  357  0059F324    190  void Character_Init(struct <anon>* character, struct IAllocator* allocator)
+                         local  void* buffer
+                         local  void* buffer
+                         local  void* buffer
+                         local  void* buffer
+                         inlines  TagValuePair
+  387  0059FF28    3C4  void Character_DeInit(struct <anon>* character, struct IAllocator* allocator)
+                         inlines  GetAllocator, ~MotionDefinitionMap, ~NameNodeHash, ~TransitionDefinitionList
+  402  0059ED78      4  void Character_InitSkeletonFilters(struct <anon>* character, int filterCount, struct IAllocator* allocator)
+  407  0059ED7C      4  void Character_DeInitSkeletonFilters(struct <anon>* character, struct IAllocator* allocator)
+  412  0059F934    398  void Character_AddState(struct <anon>* character, const char* name, const struct AnimNode* node)
+                         local  int id
+                         local  struct <anon>* pCandidate
+                         local  struct <anon> nameNode
+                         local  struct EntryBlock* pBlock
+                         local  uint32_t i
+                         inlines  Add, EntryBlock, GetBin, Grow, Lookup, TagValuePair
+  427  0059F4C4    27C  void Character_AddMotionRef(struct <anon>* character, int id, const struct MotionDefinition* motion)
+                         local  int i
+                         inlines  FastMap<int,const EA::CCT::Internal::MotionDefinition*>::Find, FastMap<int,const EA::CCT::Internal::MotionDefinition*>::Insert, FastMap<int,const EA::CCT::Internal::MotionDefinition*>::Resize
+  439  0059EF94    12C  void Character_AddTransition(struct <anon>* character, const struct TransitionDefinition* transition)
+                         inlines  Get, GetAllocator, List<const EA::CCT::Internal::TransitionDefinition*>::Append, ListNode
+  445  0059FCCC    154  void Character_RemoveState(struct <anon>* character, const char* name, const struct AnimNode* node)
+                         local  int id
+                         local  struct <anon>* pCandidate
+                         inlines  Lookup, Remove
+  461  0059EED0     C4  void Character_RemoveMotionRef(struct <anon>* character, int id)
+                         inlines  FastMap<int,const EA::CCT::Internal::MotionDefinition*>::Remove
+  468  0059FE20     70  const char* Character_GetStateName(const struct <anon>* character, int id)
+                         local  const struct <anon>* namenode
+                         inlines  GetNodeName, Lookup
+  475  0059FE90     98  const struct AnimNode* Character_GetStateNode(const struct <anon>* character, StateID id)
+                         local  const struct <anon>* namenode
+                         inlines  Lookup
+  481  0059ED80     94  const struct MotionDefinition* Character_GetMotionRef(struct <anon>* character, int id)
+                         local  int i
+                         inlines  FastMap<int,const EA::CCT::Internal::MotionDefinition*>::Find
+  495  0059EE44     8C  bool Character_IsValidStateId(const struct <anon>* character, int id)
+                         inlines  Lookup
+  501  0059F4B4     10  int Character_CountStateNames(struct <anon>* character)
+  507  0059EE14     10  int Character_CountStateNodes(struct <anon>* character)
+  513  0059EE24     10  int Character_CountMotionRefs(struct <anon>* character)
+  519  0059EE34     10  int Character_CountTransitions(struct <anon>* character)
+  575  0059F7D4    160  int32_t Character_EnumerateTransitions(struct <anon>* character, TransitionEnumerationCallback callback, void* data)
+                         local  struct <anon> iterCurr
+                         local  struct <anon> iterEnd
+                         local  int32_t index
+                         local  uint32_t flags
+                         inlines  List<const EA::CCT::Internal::TransitionDefinition*>::Erase, operator++

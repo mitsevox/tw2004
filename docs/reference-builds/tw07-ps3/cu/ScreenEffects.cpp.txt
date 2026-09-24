@@ -1,0 +1,91 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/ScreenEffects/ScreenEffects.cpp
+// compiled in: golf_unity.cpp
+// 43 functions, source order. line | PS3 address | size
+
+   28  0022D820     90  void ScreenEffects::InitModule(const struct ScreenEffects* this)
+                         local  const int width
+                         local  const int height
+                         local  TextureOptions options
+   65  00272BD4    2A8  void ScreenEffects::InitGammaCorrection(const struct ScreenEffects* this)
+                         local  vec3flt sHiDef720pGammaValues
+                         local  vec3flt sHiDef1080iGammaValues
+                         local  vec3flt sStd480pGammaValues
+                         local  struct GameXmlSettings xmlSettings
+                         local  struct GameXmlSettings hidef720pSettings
+                         local  struct GameXmlSettings hidef1080iSettings
+                         local  struct GameXmlSettings std480pSettings
+                         local  bool fIsHiDef
+                         local  bool fIsInterlaced
+  108  0022D8B0     2C  void* ScreenEffects::TuneGamma(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  float* gammaValues
+  116  00270C30    128  void ScreenEffects::GetGammaSettings(const struct ScreenEffects* this, float* gVal, struct GameXmlSettings* gxml)
+  128  0022D8DC      4  void ScreenEffects::CloseModule(const struct ScreenEffects* this)
+  135  002FEBB8    170  void ScreenEffects::Tint(const struct ScreenEffects* this, float* tintColor)
+                         inlines  DS_vSetAlphaBlendingFunctionSeparate, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetZTestEnable, Gcm::cellGcmSetAlphaTestEnable
+  157  0026806C     4C  void ScreenEffects::DrawQuadFull(const struct ScreenEffects* this)
+  167  00267B74    1D4  void ScreenEffects::DrawQuadNormalized(const struct ScreenEffects* this, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1)
+                         local  mat44flt PR_gxMatrix2D
+                         local  vec4flt coord1
+                         local  vec4flt coord2
+                         local  struct vtxStruct[4] vertices
+                         local  struct vtxStructP[4] vertices
+  233  002FED28    120  void ScreenEffects::FadeAndUpdate(const struct ScreenEffects* this, float elapsed)
+                         local  vec4flt color
+                         inlines  ScreenEffects::GetUpdateAlphaFadeIgnoreMultiplier, vec4flt_Copy
+  269  001ED7D0     68  bool ScreenEffects::FadeCompleted(const struct ScreenEffects* this)
+  275  001ED7AC     24  bool ScreenEffects::FadeActive(const struct ScreenEffects* this)
+  280  0024AB54     F8  void ScreenEffects::StartFadeIn(const struct ScreenEffects* this, float seconds, float red, float green, float blue, float startingAlpha, bool forceTimeReset)
+  305  001EDF00     F8  void ScreenEffects::StartFadeOut(const struct ScreenEffects* this, float seconds, float red, float green, float blue, float endingAlpha, bool forceTimeReset)
+  329  001F2098     90  void ScreenEffects::SetConstantTint(const struct ScreenEffects* this, float red, float green, float blue, float alpha)
+  341  0022D8E0     34  void ScreenEffects::SetManualMode(const struct ScreenEffects* this, bool enable)
+  347  002FF3A0     EC  void ScreenEffects::DrawBlurTexture(const struct ScreenEffects* this, int doAlphaBlend)
+                         inlines  DS_vSetAlphaBlendingFunction, DS_vSetAlphaEnable, DS_vSetAlphaFunction
+  365  002FEF58    228  void ScreenEffects::Blur(const struct ScreenEffects* this, unsigned int passCount, enum eBlurKind blurKind)
+                         local  TextureRef backBuffer
+                         local  uint32 i
+  448  002FEE48    110  void ScreenEffects::CopyColor(const struct ScreenEffects* this, TextureRef colorTexture)
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaTestMode, Gcm::cellGcmSetAlphaTestEnable
+  468  002FF180    110  void ScreenEffects::CopyColorBlurEdges(const struct ScreenEffects* this, TextureRef colorTexture)
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaTestMode, Gcm::cellGcmSetAlphaTestEnable
+  489  002FF290    110  void ScreenEffects::BlendColor(const struct ScreenEffects* this, TextureRef colorTexture)
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaTestMode, Gcm::cellGcmSetAlphaTestEnable
+  510  00267FA8     C4  void ScreenEffects::MaybeBlendColorFromSubrect(const struct ScreenEffects* this, TextureRef colorTexture, float u0, float v0, float u1, float v1)
+  518  0029B950     E0  void ScreenEffects::BlurHorizontal5Samples(const struct ScreenEffects* this, TextureRef texture)
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetZTestEnable
+  537  0029BA30     C0  void ScreenEffects::BlurVertical5Samples(const struct ScreenEffects* this, TextureRef texture)
+                         inlines  DS_vSetAlphaEnable
+  554  0029BAF0     B4  void ScreenEffects::CopyAlpha(const struct ScreenEffects* this, TextureRef colorTexture)
+                         inlines  DS_vSetAlphaEnable
+  569  0029BBA4     D8  void ScreenEffects::CopyDepth(const struct ScreenEffects* this, TextureRef depthTexture)
+                         inlines  DS_vSetAlphaEnable, DS_vSetZTestEnable
+  587  0029BC7C     90  void ScreenEffects::CopyDepthToColor(const struct ScreenEffects* this, TextureRef depthTexture)
+                         inlines  DS_vSetAlphaEnable
+  597  0029BD0C     D4  void ScreenEffects::CopyPixelColor(const struct ScreenEffects* this, TextureRef colorTexture, float* dstRect)
+                         inlines  DS_vSetAlphaEnable
+  613  0029BE68    168  void ScreenEffects::CopyPixelColor(const struct ScreenEffects* this, TextureRef colorTexture, float* dstRect, float* srcRect)
+                         local  const TextureInfo* info
+                         inlines  DS_vSetAlphaEnable
+  629  0029BFD0     D4  void ScreenEffects::CopyPixelColor_Normalized(const struct ScreenEffects* this, TextureRef colorTexture, float* dstRect, float* srcRect)
+                         inlines  DS_vSetAlphaEnable
+  643  0029C0A4     B0  void ScreenEffects::CopyPixelAlpha(const struct ScreenEffects* this, TextureRef colorTexture, float* dstRect)
+                         inlines  DS_vSetAlphaEnable
+  653  0029C154     B0  void ScreenEffects::CopyPixelDepthToColor(const struct ScreenEffects* this, TextureRef depthTexture, float* dstRect)
+                         inlines  DS_vSetAlphaEnable
+  663  0029C30C    124  void ScreenEffects::ClearAlpha(const struct ScreenEffects* this, float alpha)
+                         local  vec4flt color
+                         inlines  DS_vSetAlphaEnable, DS_vSetColorWriteEnable, Gcm::cellGcmSetClearSurface
+  686  00267D48    124  void ScreenEffects::DrawPixelQuad(const struct ScreenEffects* this, float* notNormalized, float u0, float v0, float u1, float v1)
+                         local  const TextureInfo* info
+  692  00268240     70  void ScreenEffects::CopyStencilToColor(const struct ScreenEffects* this, TextureRef depthTexture)
+  699  002681D0     70  void ScreenEffects::CopyColorToSRGBGamma(const struct ScreenEffects* this, TextureRef colorTexture)
+  706  0029C430     D4  void ScreenEffects::CopyPixelDepth(const struct ScreenEffects* this, TextureRef depthTexture, float* dstRect)
+                         inlines  DS_vSetAlphaEnable, DS_vSetColorWriteEnable
+  716  00267EFC     AC  void ScreenEffects::CopyPixelColorAndDepth(const struct ScreenEffects* this, TextureRef colorTexture, TextureRef depthTexture, float* dstRect)
+  725  00267E6C     90  void ScreenEffects::CopyPixelStencilToColor(const struct ScreenEffects* this, TextureRef depthTexture, float* dstRect)
+  732  00268144     8C  void ScreenEffects::RemapColor(const struct ScreenEffects* this, TextureRef colorTexture, TextureRef colorRemapTexture)
+  740  002680B8     8C  void ScreenEffects::CopyColorAndDepth(const struct ScreenEffects* this, TextureRef colorTexture, TextureRef depthTexture)
+  749  0022D914      4  void ScreenEffects::ColorMap(const struct ScreenEffects* this)
+  775  00287768     60  void ScreenEffects::TurnOFF_Z(const struct ScreenEffects* this)
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetZTestEnable
+  784  002877C8     60  void ScreenEffects::TurnON_Z(const struct ScreenEffects* this)
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetZTestEnable

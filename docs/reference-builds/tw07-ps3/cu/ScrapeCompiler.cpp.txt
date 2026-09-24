@@ -1,0 +1,421 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnax/source/scrape/ScrapeCompiler.cpp
+// compiled in: ScrapeCompiler.cpp
+// 12 functions, source order. line | PS3 address | size
+
+    0  00883150    1A4  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  GetRow, Matrix44, Quaternion, Set, Vector2, Vector3, Vector4
+   47  00882E50    148  static void SCRAPE::StringCopyForGpuProf(char** pDest, const char* pSrc)
+                         local  int32_t uPos
+                         local  char* pTempDest
+                         local  int i
+   85  00894E6C    664  bool Process::Compile(const struct Process* this, const char* pMem, uint32_t uMemSize)
+                         local  const char[8] __FUNCTION__
+                         local  uint32_t uPos
+                         local  int32_t iLine
+                         local  bool inComment
+                         local  char[256] lineBuffer
+                         local  uint32_t uLineStart
+                         local  uint32_t lineLength
+                         local  uint32_t i
+                         local  int32_t i
+                         local  int32_t gotoLabelIndex
+                         inlines  RNADebugBreak, operator[]
+  201  0088453C    68C  static bool SCRAPE::TokenizeLine(const char* pLine, const struct <anon>& aTokens)
+                         local  const char[13] __FUNCTION__
+                         local  char[256] token
+                         local  uint32_t uPos
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct <anon>* newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct <anon>* newData
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Clear, Construct, Destroy, Init, PushBack, RNADebugBreak, std::isspace, ~String
+  239  00884BC8    180  int32_t Process::ScanFloatArray(const struct Process* this, const struct <anon>& aTokens, int32_t iStartToken, float_t* pFloats, int32_t maxFloats)
+                         local  int i
+                         local  const char* pToken
+                         inlines  CStr, RNADebugBreak, operator[]
+  267  00884D48    180  int32_t Process::ScanIntArray(const struct Process* this, const struct <anon>& aTokens, int32_t iStartToken, int32_t* pInts, int32_t maxInts)
+                         local  int i
+                         local  const char* pToken
+                         inlines  CStr, RNADebugBreak, operator[]
+  296  00882F98    1B8  static enum SurfaceFormatE SCRAPE::TranslateFormat(const char* pFormat)
+                         local  const char[16] __FUNCTION__
+                         local  enum SurfaceFormatE Format
+                         inlines  RNADebugBreak
+  375  00884EC8   FFA4  bool Process::CompileLine(const struct Process* this, int32_t iLine, const char* pLine)
+                         local  struct <anon> aTokens
+                         local  const struct <anon>& strCommand
+                         local  bool bStatic
+                         local  const struct <anon>& strType
+                         local  const struct <anon>& strName
+                         local  const struct <anon>& strSubType
+                         local  struct SurfaceVar* pSurfaceVar
+                         local  int32_t idProc
+                         local  struct ProcVar* pProcVar
+                         local  struct Command* pCmd
+                         local  struct Command* pCmd
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  uint32_t* newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  struct Command* pCmd
+                         local  const struct <anon>& strSubType
+                         local  enum TextureTypeE eType
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  uint32_t* newData
+                         local  struct ShaderVar* pShaderVar
+                         local  struct ProcVar* pProcVar
+                         local  struct TextureVar* pTextureVar
+                         local  const struct <anon>& strSubType
+                         local  struct Command* pCmd
+                         local  struct SceneVar* pSceneVar
+                         local  int32_t idShader
+                         local  struct Command* pCmd
+                         local  struct CameraVar* pCameraVar
+                         local  struct TextureVar* pTextureVar
+                         local  const struct <anon>& strSubType
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct SurfaceVar** newData
+                         local  struct MatrixVar* pMatrixVar
+                         local  int32_t idCamera
+                         local  struct Command* pCmd
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct SurfaceVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  struct TextureVar* pTextureVar
+                         local  struct TextureVar* pTextureVar
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct CameraVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct MatrixVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct MatrixVar** newData
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct CameraVar** newData
+                         local  int32_t idMatrix
+                         local  struct Command* pCmd
+                         local  int32_t idTexture
+                         local  int32_t idSurface
+                         local  int32_t idTarget
+                         local  struct Command* pCmd
+                         local  int32_t idSurface
+                         local  struct Command* pCmd
+                         local  int32_t idTexture
+                         local  struct Command* pCmd
+                         local  enum SurfaceFormatE targetFormat
+                         local  int32_t idTexture
+                         local  struct Command* pCmd
+                         local  int32_t numMips
+                         local  struct Command* pCmd
+                         local  struct Command* pCmd
+                         local  int32_t idTexture
+                         local  struct Command* pCmd
+                         local  int32_t numIntsRead
+                         local  struct Command* pCmd
+                         local  struct Command* pCmd
+                         local  struct Command* pCmd
+                         local  struct Command* pCmd
+                         local  bool bSetViewport
+                         local  struct ParmVar* pParmVar
+                         local  struct Command* pCmd
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct ParmVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct ParmVar** newData
+                         local  struct ParmVar* pParmVar
+                         local  int32_t idTexture
+                         local  struct Command* pCmd
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct ParmVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct ParmVar** newData
+                         local  struct Command* pCmd
+                         local  char[256] newProfileDescription
+                         local  struct Command* pCmd
+                         local  struct Command* pCmd
+                         local  struct Command* pCmd
+                         local  struct RenderBinVar* pRenderBinVar
+                         local  struct Command* pCmd
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct RenderBinVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  struct RenderObjectVar* pRenderObjectVar
+                         local  struct Command* pCmd
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct RenderObjectVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct RenderObjectVar** newData
+                         local  int32_t idScene
+                         local  struct Command* pCmd
+                         local  int32_t idScene
+                         local  struct Command* pCmd
+                         local  struct EventVar* pEventVar
+                         local  enum CommandType eCommandType
+                         local  struct Command* pCmd
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct RenderBinVar** newData
+                         local  struct Command* pCmd
+                         local  struct Command* pCmd
+                         local  struct LabelVar* pLabelVar
+                         local  struct ParmVar* pParmVar
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct LabelVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct LabelVar** newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct ParmVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct ParmVar** newData
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct EventVar** newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct EventVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  struct Command* pCmd
+                         local  struct ParmVar* pParmVar
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct ParmVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct ParmVar** newData
+                         local  struct Command* pCmd
+                         local  int32_t i
+                         local  const char* pMaskName
+                         local  struct <anon> labelString
+                         local  struct LabelVar* pLabelVar
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct LabelVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct LabelVar** newData
+                         local  struct Command* pCmd
+                         local  struct Command* pCmd
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct LabelVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  struct Command* pCmd
+                         local  struct LabelVar* pLabelVar
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct LabelVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct LabelVar** newData
+                         local  struct Command* pCmd
+                         local  struct LabelVar* pLabelVar
+                         local  struct Command* pCmd
+                         local  bool retVal
+                         local  struct Command* pCmd
+                         local  struct LabelVar* pLabelVar
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct LabelVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct LabelVar** newData
+                         local  struct Command* pCmd
+                         local  struct Command* pCmd
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct LabelVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct LabelVar** newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct ProcVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct ProcVar** newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct TextureVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct TextureVar** newData
+                         local  struct ParmVar* pParmVar
+                         local  struct ScopeBoundTextureVar* pTextureVar
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct ShaderVar** newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct ShaderVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct SceneVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct SceneVar** newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct TextureVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct TextureVar** newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct TextureVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct TextureVar** newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct TextureVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct TextureVar** newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct ParmVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct ParmVar** newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct TextureVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct TextureVar** newData
+                         inlines  Back, CStr, CameraVar, Clear, Command::operator delete, Command::operator new, Construct, Copy, EventVar, Init, LabelVar, MatrixVar, ParmVar, PopBack, ProcVar, PushBack, RNADebugBreak, RenderBinVar, RenderObjectVar, SceneVar, ScopeBoundTextureVar::ScopeBoundTextureVar, Set, SetIdentity, ShaderVar, Size, SurfaceVar, TextureVar::SetTexture, TextureVar::TextureVar, Variable::operator delete, Variable::operator new, Vector, operator=, operator==, operator[], ~LabelVar, ~String, ~SurfaceVar, ~Vector
+ 1789  00883314    F18  void Process::Disassemble(const struct Process* this)
+                         local  const char[12] __FUNCTION__
+                         local  int i
+                         local  struct ShaderVar* pShaderVar
+                         local  int i
+                         local  struct SurfaceVar* pSurfaceVar
+                         local  int i
+                         local  struct TextureVar* pTextureVar
+                         local  int i
+                         local  struct CameraVar* pCameraVar
+                         local  int i
+                         local  struct SceneVar* pSceneVar
+                         local  int i
+                         local  struct MatrixVar* pMatrixVar
+                         local  int i
+                         local  struct Command* pCmd
+                         local  struct TextureVar* pTextureVar
+                         local  struct ShaderVar* pShaderVar
+                         local  struct ParmVar* pParmVar
+                         local  struct TextureVar* pTextureVar
+                         local  struct SurfaceVar* pSurfaceVar
+                         local  struct SurfaceVar* pSurfaceVar
+                         local  struct ParmVar* pParmVar
+                         local  const char* pStrName
+                         local  struct TextureVar* pTextureVar
+                         local  const char8_t* surfaceName
+                         local  bool8_t bClear
+                         inlines  CStr, RNADebugBreak, operator[]
+ 2101  0088422C    310  bool Process::AddCommand(const struct Process* this, struct Command* pCmd)
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct Command** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct Command** newData
+                         inlines  Construct, PushBack, RNADebugBreak
+ 2116  00883304     10  static void _GLOBAL__I__ZN6SCRAPE7Process7CompileEPKcj()
+ 2117  008832F4     10  static void _GLOBAL__D__ZN6SCRAPE7Process7CompileEPKcj()

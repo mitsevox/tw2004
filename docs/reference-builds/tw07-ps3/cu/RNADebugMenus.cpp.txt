@@ -1,0 +1,121 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnax/source/rnadebugmenus/RNADebugMenus.cpp
+// compiled in: RNADebugMenus.cpp
+// 10 functions, source order. line | PS3 address | size
+
+    0  0089796C    1A4  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  GetRow, Matrix44, Quaternion, Set, Vector2, Vector3, Vector4
+    0  008989FC     B4  static void __tcf_1()
+                         inlines  Init, ~Vector
+    0  00898AB0     B4  static void __tcf_0()
+                         inlines  Init, ~Vector
+    0  00898B64     B4  static void __tcf_2()
+                         inlines  Init, ~Vector
+   77  00897960      C  void RNADebugMenu_RNAMaterials_SelectMaterial(struct MaterialC* pMaterial)
+   82  00899A00   26A0  void RNADebugMenu_RNAMaterials(void* pUserData)
+                         local  struct MaterialListC* pMatList
+                         local  struct <anon> aLineExpanded
+                         local  void* pLastUserData
+                         local  bool bShowUnusedParms
+                         local  int32_t i
+                         local  int32_t iMaterial
+                         local  struct MaterialC* pMat
+                         local  bool bLineSelected
+                         local  char[512] shaderFileName
+                         local  MenuColorT oldColor
+                         local  struct ShaderC* pShader
+                         local  struct <anon> shaderPath
+                         local  const struct ShaderInterfaceC* pIntf
+                         local  struct <anon>* pParm
+                         local  int32_t iTech
+                         local  struct TechniqueInfo techinfo
+                         local  bool bAdjustable
+                         local  int32_t idx
+                         local  float_t value
+                         local  float_t fMin
+                         local  float_t fMax
+                         local  float_t fStep
+                         local  int32_t value
+                         local  int32_t iMin
+                         local  int32_t iMax
+                         local  int32_t iStep
+                         local  float_t fMin
+                         local  float_t fMax
+                         local  float_t fStep
+                         local  RNAMatrix44 m44
+                         local  int len
+                         local  bool value
+                         local  char[256] FileName
+                         local  struct TextureC* pTexture
+                         local  struct <anon> texPath
+                         local  bool isExpanded
+                         local  RNAVector2 v2
+                         local  RNAVector4 v4
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  bool* newData
+                         local  RNAVector3 v3
+                         local  bool bDebugExpanded
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  bool* newData
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Clear, Construct, GetNext, Grow, Init, MaterialC::GetShader, MaterialC::SetTechnique, MaterialListC::GetMaterial, MaterialListC::GetNumMaterials, ParmBlockC::Get<RNA::TextureC*>, ParmBlockC::Get<RNAMath::RNAMatrix44>, ParmBlockC::Get<RNAMath::RNAVector2>, ParmBlockC::Get<RNAMath::RNAVector3>, ParmBlockC::Get<RNAMath::RNAVector4>, ParmBlockC::Get<bool>, ParmBlockC::Get<std::float_t>, ParmBlockC::Get<std::int32_t>, ParmBlockC::GetFirstParm, ParmBlockC::Set<RNA::TextureC*>, ParmBlockC::Set<RNAMath::RNAMatrix44>, ParmBlockC::Set<RNAMath::RNAVector2>, ParmBlockC::Set<RNAMath::RNAVector3>, ParmBlockC::Set<RNAMath::RNAVector4>, ParmBlockC::Set<bool>, ParmBlockC::Set<std::float_t>, ParmBlockC::Set<std::int32_t>, ParmBlockC::WriteValue, RNADebugBreak, Resize, Vector, operator RNA::MaterialC*, operator=, operator[], std::strstr
+  483  00897B30    ECC  static void PrintScopeParm(struct ScopeParmC* pParm, uint32_t index, bool bAdjustable)
+                         local  char[256] strType
+                         local  float_t value
+                         local  float_t fMin
+                         local  float_t fMax
+                         local  float_t fStep
+                         local  float_t fMin
+                         local  float_t fMax
+                         local  float_t fStep
+                         local  RNAVector3 v3
+                         local  float_t fMin
+                         local  float_t fMax
+                         local  float_t fStep
+                         local  RNAVector4 v4
+                         local  float_t fMin
+                         local  float_t fMax
+                         local  float_t fStep
+                         local  RNAVector2 v2
+                         local  bool value
+                         local  int32_t value
+                         local  RNAMatrix44 m4
+                         local  int32_t i
+                         local  char[256] FileName
+                         local  struct TextureC* pTexture
+                         inlines  GetNameByTypeID, RNADebugBreak, ScopeParmC::Get<RNA::TextureC*>, ScopeParmC::Get<RNAMath::RNAMatrix44>, ScopeParmC::Get<RNAMath::RNAVector2>, ScopeParmC::Get<RNAMath::RNAVector3>, ScopeParmC::Get<RNAMath::RNAVector4>, ScopeParmC::Get<bool>, ScopeParmC::Get<std::float_t>, ScopeParmC::Get<std::int32_t>, ScopeParmC::GetName, ScopeParmC::Set<RNA::TextureC*>, ScopeParmC::Set<RNAMath::RNAVector2>, ScopeParmC::Set<RNAMath::RNAVector3>, ScopeParmC::Set<RNAMath::RNAVector4>, ScopeParmC::Set<bool>, ScopeParmC::Set<std::float_t>, ScopeParmC::Set<std::int32_t>, Update, operator float, operator=
+  637  00898C18    DE8  void RNADebugMenu_RNAScope(void* pUserData)
+                         local  struct ScopeC* pScope
+                         local  struct <anon> aLineExpanded
+                         local  struct <anon> aParmExpanded
+                         local  void* pLastUserData
+                         local  int32_t i
+                         local  int32_t idx
+                         local  int32_t i
+                         local  int iBlock
+                         local  struct <anon>* pBlock
+                         local  bool bLineSelected
+                         local  struct ScopeParmC* pParm
+                         local  bool bAdjustable
+                         local  int32_t i
+                         local  char[256] strType
+                         local  uint32_t index
+                         local  int32_t idx
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  bool* newData
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  bool* newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  bool* newData
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Clear, Construct, GetBlock, GetFirstParm, GetNameByTypeID, GetNumBlocks, GetNumScopeParms, Grow, Init, RNADebugBreak, Resize, ScopeParmC::GetID, ScopeParmC::GetNext, Vector, operator[]
+  712  00897B20     10  static void _GLOBAL__I__Z40RNADebugMenu_RNAMaterials_SelectMaterialPN3RNA9MaterialCE()
+  713  00897B10     10  static void _GLOBAL__D__Z40RNADebugMenu_RNAMaterials_SelectMaterialPN3RNA9MaterialCE()

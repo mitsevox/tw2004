@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNARender/ps3/RNARender/RNATexturePlat.h
+// compiled in: RNADevicePlat.cpp, RNAStateManager.cpp, RNATextureDDS.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   42    inline-only   void* TexturePlatC::operator new(size_t size, const char* text, struct ICoreAllocator* allocator, enum AllocFlags allocator_flags, uint32_t alignment)
+   42    inline-only   struct ICoreAllocator* TexturePlatC::GetClassAllocator()
+   73    inline-only   uint32_t TexturePlatC::GetDataSize(const struct TexturePlatC* this)
+   78    inline-only   const CellGcmTexture& TexturePlatC::GetGcmTexture(const const struct TexturePlatC* this)
+                         local  const char[14] __FUNCTION__
+   80    inline-only   void* TexturePlatC::GetDataPtr(const const struct TexturePlatC* this)

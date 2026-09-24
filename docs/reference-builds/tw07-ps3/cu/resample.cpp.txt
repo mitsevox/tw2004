@@ -1,0 +1,14 @@
+// C:/packages/rwaudiocore/2.08.01/source/plugins/resample.cpp
+// compiled in: resample.cpp
+// 4 functions, source order. line | PS3 address | size
+
+    0  006E5D44      C  void ~Resample(const struct <anon>* this)
+                         inlines  ~PlugIn
+   82  006E5C70      8  struct <anon>* GetPlugInDescRunTime()
+   88  006E5D28     1C  unsigned int GetSize(struct PlugInConfig* pPlugInConfig)
+  100  006E5C78     B0  bool CreateInstance(struct PlugIn* pPlugIn, void* pConstructorParams)
+                         local  struct <anon>* pThis
+                         local  unsigned int historyBufferSize
+                         local  uintptr_t pMemBlock
+                         local  uintptr_t pHistoryBuffer
+                         inlines  Initialize<rw::audio::core::Resample>, Resample, core::MemSet

@@ -1,0 +1,328 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/aptInterface/uiAptDrawText_FF.cpp
+// compiled in: other_unity.cpp
+// 65 functions, source order. line | PS3 address | size
+
+   81  003EB90C     18  struct AptFontFusion* GetFontFusion()
+  158    inline-only   static void LineBlurColor8(uint8* dst, uint8* src, const int32 dpInc, const int32 spInc, const int32 fixed, uint32 size)
+                         local  int32 g
+  193    inline-only   static void Vertical4BlursColor8(uint8* dst, uint8* src, const int32 dpInc, const int32 spInc, const int32 fixed, uint32 size)
+                         local  int32 g0
+                         local  int32 g1
+                         local  int32 g2
+                         local  int32 g3
+                         local  int32 tg0
+                         local  int32 tg1
+                         local  int32 tg2
+                         local  int32 tg3
+  287    inline-only   uint8* SimpleImage::RowPtr0(const const struct SimpleImage* this)
+  288    inline-only   uint8* SimpleImage::RowPtr(const const struct SimpleImage* this, uint32 y)
+  289    inline-only   uint32 SimpleImage::Height(const const struct SimpleImage* this)
+  290    inline-only   uint32 SimpleImage::Height1(const const struct SimpleImage* this)
+  292    inline-only   uint32 SimpleImage::Width(const const struct SimpleImage* this)
+  293    inline-only   uint32 SimpleImage::Width1(const const struct SimpleImage* this)
+  295    inline-only   uint32 SimpleImage::RowInc(const const struct SimpleImage* this)
+  306  0042E1EC    4E0  void FastBlur8(struct SimpleImage* dstImage, struct SimpleImage* srcImage, float radius, bool h, bool v)
+                         local  const float falloff
+                         local  const int32 fixed
+                         local  uint32 y
+                         local  uint8* dp
+                         local  uint8* sp
+                         local  const uint32 x
+                         local  const uint32 sizeX
+                         local  uint32 sizeXStart
+                         local  const uint32 y
+                         local  const int32 rb
+                         local  const int32 srb
+                         local  const uint32 size4
+                         local  uint8* dpTB
+                         local  uint8* spTB
+                         local  uint8* spBT
+                         local  uint8* dpBT
+                         local  uint32 x
+                         local  int32 tg0
+                         local  int32 tg1
+                         local  int32 tg2
+                         local  int32 tg3
+                         inlines  LineBlurColor8, SimpleImage::Height1, SimpleImage::RowPtr, SimpleImage::RowPtr0, SimpleImage::Width1, Vertical4BlursColor8
+  405  003EB924    200  int UTF16ToUTF8(unsigned char* out, int outlen, short unsigned int* in, int inlen)
+                         local  unsigned char* outstart
+                         local  unsigned char* outend
+                         local  short unsigned int* inend
+                         local  unsigned int c
+                         local  unsigned int d
+                         local  int bits
+  475  003EBB24     60  char* TestUnicodeConversion(int32 unicode)
+                         local  short unsigned int[2] in
+                         local  unsigned char[8] out
+                         local  int outlen
+  495  003EBB84    358  void UTF8ToUNICODE(const unsigned char* utf8, short unsigned int* unicode, uint32 unicodeArraySize)
+                         local  const int nLen
+                         local  unsigned char* pSrc
+                         local  short unsigned int* pDst
+                         local  short unsigned int* pDstEnd
+  660  003EC078      C  int32 UTF8_strlen(const unsigned char* utf8)
+  665  003EBEDC    19C  int32 UTF8_NbrBytes(const unsigned char* utf8, int stopAtCharacter)
+                         local  const int nLen
+                         local  unsigned char* pSrc
+                         local  int pDst
+  829  00423254    2E4  void AptAuxFontList::AddFont(const struct AptAuxFontList* this, char* fontName, enum eFontType fontType, int32 id)
+                         local  const struct FontNameType& fontNameType
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<AptAuxFontList::FontNameType,AptStructSwapper>::Push
+  849  004301A8    2E8  int32 AptAuxFontList::GetFontIdByName(const struct AptAuxFontList* this, const char* name, const enum eFontType& outfontType)
+                         local  int32 nFontIndex
+                         local  const int32 len
+                         local  int i
+                         local  char* fontName
+                         inlines  TArrayInternal<AptAuxFontList::FontNameType,AptStructSwapper>::operator[]
+  941  004448F4     64  void AptFontFusion::SetConversationLength(const struct AptFontFusion* this, char* str, int length)
+  952  003EC0DC     18  enum eFFIcon AptFontFusion::GetIconCoordinates(const struct AptFontFusion* this, const int& x, const int& y)
+  987  0040A3BC     24  void AptTextCacheElem::SetFastRetreive(const struct AptTextCacheElem* this, bool flag)
+                         inlines  TRefPtr<AptShareTextData>::operator->
+ 1033  0042A730    12C  void AptTextCacheManager::SetTextureCacheSize(const struct AptTextCacheManager* this, int32 x, int32 y, int32 bitDepth)
+ 1057  0042A5AC    184  void AptTextCacheManager::ClearTextCache(const struct AptTextCacheManager* this)
+                         inlines  Next, TChainList<AptTextCacheElem>::Purge
+ 1077  00443398    260  void AptTextCacheManager::DefragmentTextCache(const struct AptTextCacheManager* this)
+                         local  struct AptTextCacheElem* elem
+                         inlines  GetElem, Next, TChainList<AptTextCacheElem>::GetCurrent, TChainList<AptTextCacheElem>::GotoFirst, TChainList<AptTextCacheElem>::GotoNext_, TChainList<AptTextCacheElem>::RemoveCurrent, TChainList<AptTextCacheElem>::SetCurrent_, operator delete, ~T2
+ 1109  0042DA8C    318  struct AptTextCacheElem* AptTextCacheManager::AddTextToCache(const struct AptTextCacheManager* this, struct AptShareTextData* shareData)
+                         local  struct AptTextCacheElem* retreived
+                         local  struct AptTextCacheElem* cacheElem
+                         inlines  TChainList<AptTextCacheElem>::AddElemBC, TChainList<AptTextCacheElem>::GotoFirst, TRefPtr<AptShareTextData>::operator=
+ 1139  0040A124    1A0  void AptTextCacheElem::AdjustP0P1(const struct AptTextCacheElem* this, float* p0, float* p1, uint32 textProperty_alignmentMask)
+                         local  const float scale
+                         local  const float deltaX
+                         local  const float deltaY
+                         local  const float bigDelta
+                         local  const float bigDelta
+ 1213  00456BD0    238  void AptTextCacheManager::CallMeEndOfFrame(const struct AptTextCacheManager* this)
+                         local  struct AptTextCacheElem* elem
+                         local  float ffAlphaLast
+                         inlines  CO_SCommandAPT::GetFontFusionAlphaCorrection, CO_SCommandAPT::SetFontFusionPurge, GetElem, TChainList<AptTextCacheElem>::GetCurrent, TChainList<AptTextCacheElem>::GotoFirst, TChainList<AptTextCacheElem>::GotoNext_, TChainList<AptTextCacheElem>::SetCurrent_
+ 1297  003EC0F4      4  void AptTextCacheManager::DEBUG_FastRetreiveCheckConsistency(const struct AptTextCacheManager* this)
+ 1313  003EC0F8      4  void AptTextCacheManager::DEBUG_VerifyIntegrity(const struct AptTextCacheManager* this)
+ 1360  00443854    1FC  enum eAssignSpot AptTextCacheManager::AssignSpot(const struct AptTextCacheManager* this, struct AptTextCacheElem* elemIn, struct AptTextCacheElem* elemToStartFrom, int32 findposition, int32 cacheState)
+                         local  const int32 textureWidth
+                         local  const int32 textureHeight
+                         local  int32 x
+                         local  int32 y
+                         local  const uint32 bitsZone
+                         inlines  AptTextCacheElem::Height, AptTextCacheElem::Width
+ 1412  00413514    190  bool AptTextCacheManager::GetSpotPosition(const struct AptTextCacheManager* this, struct AptTextCacheElem* elemToStartFrom, int32 findposition, int32 textureWidth, int32 textureHeight, const int32& x, const int32& y)
+ 1451  004435F8    25C  bool AptTextCacheManager::IsSpotFree(const struct AptTextCacheManager* this, int32 x, int32 y, int32 cacheState, int32 textureWidth, int32 textureHeight, uint32 bitsZone)
+                         local  struct AptTextCacheElem* elem
+                         local  bool ret
+                         inlines  AptTextCacheElem::Intersect, AptTextCacheElem::Right, TChainList<AptTextCacheElem>::GotoFirst, TChainList<AptTextCacheElem>::GotoNext_
+ 1486  003EC0FC    20C  uint32 AptTextCacheManager::ComputeBitsZoneLocation(const const struct AptTextCacheManager* this, int32 x, int32 y, int32 w, int32 h)
+                         local  const int32 Xincrement
+                         local  int32 bitPosition
+                         local  uint32 zoneBitsCaculated
+                         local  const int32 right
+                         local  const int32 bottom
+                         local  const int32 Yincrement
+                         local  int32 xMin
+                         local  int32 xMax
+                         local  int xx
+                         local  const int32 bitPositionNext
+                         local  int32 yMin
+                         local  int32 yMax
+                         local  int yy
+ 1583  00443A50    C14  bool AptTextCacheManager::FindSpotForText(const struct AptTextCacheManager* this, struct AptTextCacheElem* elemIn)
+                         local  struct AptTextCacheElem* lastElem
+                         local  bool foundSlot
+                         local  struct AptTextCacheElem* elemToErase
+                         local  const int32 textureWidth
+                         local  const int32 textureHeight
+                         local  const int32 outX
+                         local  const int32 outY
+                         local  const uint32 bitsZone
+                         local  struct AptTextCacheElem* elem
+                         local  struct AptTextCacheElem* elem
+                         local  const enum eAssignSpot assignType
+                         local  struct AptTextCacheElem* elem
+                         local  int find
+                         local  struct AptTextCacheElem* elem
+                         inlines  AptTextCacheElem::Height, AptTextCacheElem::Intersect, AptTextCacheElem::Width, GetElem, Next, TChainList<AptTextCacheElem>::GetCurrent, TChainList<AptTextCacheElem>::GetNext, TChainList<AptTextCacheElem>::GotoFirst, TChainList<AptTextCacheElem>::GotoLast, TChainList<AptTextCacheElem>::GotoNext_, TChainList<AptTextCacheElem>::GotoPrev, TChainList<AptTextCacheElem>::RemoveCurrent, TChainList<AptTextCacheElem>::SetCurrent_, operator delete, ~T2
+ 1761  00444664    290  void AptTextCacheManager::SetConversationLength(const struct AptTextCacheManager* this, char* str, int length)
+                         local  struct AptTextCacheElem* elem
+                         inlines  AptTextCacheElem::GetString, Next, TChainList<AptTextCacheElem>::GotoFirst, TChainList<AptTextCacheElem>::GotoNext_, TChainList<AptTextCacheElem>::RemoveElem_
+ 1790  00429DC4    210  struct AptTextCacheElem* AptTextCacheManager::RetreiveTxtElem(const struct AptTextCacheManager* this, struct AptShareTextData* shareData)
+                         local  struct AptTextCacheElem* elem
+                         inlines  AptShareTextData::operator==, HoldString::operator==, TChainList<AptTextCacheElem>::GotoFirst, TChainList<AptTextCacheElem>::GotoNext_
+ 1816  004565B8     48  void AptTextCacheManager::PreRenderTextAsset(const struct AptTextCacheManager* this, struct AptTextCacheElem* cacheElem)
+                         local  vec4flt_p p0
+                         local  vec4flt_p p1
+                         local  mat44flt worldToScreen
+ 1828  004543DC    C80  bool AptTextCacheManager::RenderTextAsset(const struct AptTextCacheManager* this, struct AptTextCacheElem* cacheElem, const vec4flt_p& p0, const vec4flt_p& p1, const mat44flt& worldToScreen, uint32 color, uint32 align_type, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth, enum eRenderTextAsset doRender)
+                         local  const struct AptTextData& txtData
+                         local  const struct CFontFusion& FF
+                         local  short unsigned int* unicodeStr
+                         local  const bool ok
+                         local  const int32 outX
+                         local  const int32 outY
+                         local  int32 w
+                         local  int32 h
+                         local  unsigned char* pBitsXY
+                         local  int maxX
+                         local  int maxY
+                         local  int maxX
+                         local  int maxY
+                         local  struct SimpleImage image
+                         local  const int32 blurRadius
+                         local  vec4flt uv0
+                         local  vec4flt uv1
+                         local  vec4flt p0_used
+                         local  vec4flt p1_used
+                         inlines  AptFontFusion::GetCFontFusion, AptTextCacheElem::GetString, AptTextCacheElem::GetTextData, AptTextCacheElem::Height, AptTextCacheElem::Width, AptTextData::GetBlurRadius, AptTextData::GetLeadingCoef, Next, Prev, SetNext, SetPrev, TChainList<AptTextCacheElem>::FindElem, TChainList<AptTextCacheElem>::MoveElemToFirstByPtr, TChainList_CheckIsOk, vec4flt_Copy
+ 2109  004131F0      4  void* _allocateMemory(size_t s)
+                         local  void* buf
+ 2143  003EC314      4  void _freeMemory(void* p)
+ 2169  003EC318     40  void* _reallocateMemory(void* p, size_t newSize)
+ 2230  0042A85C     58  void AptFontFusion::SetGameMode(const struct AptFontFusion* this, enum eAptGameMode gmode)
+                         local  const int32 index
+ 2254  00423538    108  void AptFontFusion::AddFont(const struct AptFontFusion* this, char* fontStream, int fileLength)
+                         local  unsigned char[64] fontName
+                         local  short unsigned int[64] fontNameUnicode
+                         local  const int32 fontId
+                         local  int i
+                         inlines  AptAuxFontList::AddFont_FontFusion
+ 2286  004353B8    4A0  struct AptTextAsset* AptFontFusion::AddTextToQueue(const struct AptFontFusion* this, char* str, float x, float y, float x1, float y1, uint32 color, bool bottomAlign, bool shadow, char* fontName, float fontHeight, enum Alignment alignment, bool isMultiline, bool doWordWrap)
+                         local  const float kHorzPixels
+                         local  const float kVertPixels
+                         local  enum eFontType fontType
+                         local  int32 fontId
+                         local  struct AptTextAsset* nextTextAsset
+                         local  const struct AptTextData& txtData
+                         local  struct T2* beforPrev
+                         inlines  AptTextAsset::SetString, AptTextData::SetFontId, GetElem, Prev, SetNext, SetPrev, T2, TChainList<AptTextAsset>::AddElem, TChainList<AptTextAsset>::AddElemBC
+ 2329  00456E08      C  void AptFontFusion::CallMeEndOfFrame(const struct AptFontFusion* this)
+ 2341  004779C4    368  void AptFontFusion::SubmitTextQueue(const struct AptFontFusion* this, bool useRegistration)
+                         local  struct AptTextAsset* current
+                         local  bool identity
+                         local  struct AptTextCacheElem* cacheElem
+                         inlines  AptTextAsset::GetTextData, AptTextCacheManager::ReleaseTextAsset, AptTextData::GetFontType, GetElem, LLMath_IdentifyMat, Next, TChainList<AptTextAsset>::GetCurrent, TChainList<AptTextAsset>::GotoFirst, TChainList<AptTextAsset>::RemoveCurrent, vec_st
+ 2392    inline-only   static void vec4flt_OffsetXY(const vec4flt& p, float x, float y)
+ 2399  003EC380     48  static void SetP0P1(const vec4flt& p0, const vec4flt& p1, struct AptTextAsset* strAsset)
+ 2417  0045505C    2A4  void DrawOutline(struct AptTextCacheElem* cacheElem, struct AptTextAsset* strAsset, uint32 colorOutline, const float delta, const float deltaB, const mat44flt& useMatrix, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  const struct AptTextCacheManager& textCacheManager
+                         local  vec4flt p0
+                         local  vec4flt p1
+                         inlines  AptFontFusion::GetTextCacheManager, vec4flt_OffsetXY
+ 2455  00455300   1168  bool AptFontFusion::RenderText(const struct AptFontFusion* this, struct AptTextAsset* strAsset, const mat44flt& useMatrix, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  const struct AptTextCacheManager& textCacheManager
+                         local  struct AptTextCacheElem* cacheElem
+                         local  vec4flt p0
+                         local  vec4flt p1
+                         local  const int32 outline
+                         local  const int32 outlineBlurOnly
+                         local  const int32 outlineBlur
+                         local  const int32 bold
+                         local  const int32 shadow
+                         local  uint32 color
+                         local  const bool ok
+                         local  const float scaleAlpha
+                         local  float fontHeight
+                         local  uint32 colorOutline1
+                         local  float gOutlineTextOffset1
+                         local  float gOutlineTextOffset2
+                         local  const float fontOffset
+                         local  const float delta1
+                         local  const float delta2
+                         local  bool ok
+                         local  const float scaleAlpha
+                         local  float gOutlineBlurTextOffset
+                         local  const float height
+                         local  const float delta
+                         local  uint32 colorOutline1
+                         local  uint32 colorOutline2
+                         local  float gOutlineBlurTextOffset2
+                         local  const float delta2
+                         local  const float delta3
+                         local  float gShadowTextOffset
+                         local  const float ShadowDeltaX
+                         local  const float ShadowDeltaY
+                         local  vec4flt p0
+                         local  vec4flt p1
+                         local  uint32 colorShadow
+                         local  const bool ok
+                         local  vec4flt rgba
+                         local  float gOutlineTextOffset
+                         local  const float delta
+                         local  uint32 colorOutline
+                         local  vec4flt rgba
+                         local  vec4flt rgba
+                         local  vec4flt rgba
+                         local  vec4flt rgba
+                         local  vec4flt rgba
+                         inlines  AptColorTransform, AptFontFusion::GetTextCacheManager, CO_SCommandAPT::GetColorO3, LLMath_Add, LLMath_ClampVec, LLMath_MultiplyVec, __vec_mul, vec_add, vec_ld, vec_max, vec_min
+ 2659  00437654     CC  bool AptFontFusion::MeasureTextSize(const struct AptFontFusion* this, struct AptTextAsset* txtAsset, enum eMeasureTextSizeType type, char* text, const int32& outW, const int32& outH, const int32& outNbrLines)
+                         inlines  AptTextAsset::GetTextData
+ 2671  0046D2EC    1BC  bool AptFontFusion::MeasureTextSize(const struct AptFontFusion* this, char* instanceNameInFlash, enum eMeasureTextSizeType type, char* text, const int32& outW, const int32& outH, const int32& outNbrLines)
+                         local  struct AptAllocateStringParameters asp
+                         local  bool ok
+                         local  struct AptTextAsset fontData
+                         local  const struct AptTextData& txtData
+                         inlines  AptTextAsset::GetTextData, ~AptTextAsset
+ 2702  0046D120    1CC  bool AptFontFusion::MeasureTextOffsetForCentering(const struct AptFontFusion* this, char* instanceNameInFlash, char* text, const float& outOffset)
+                         local  struct AptAllocateStringParameters asp
+                         local  bool ok
+                         local  struct AptTextAsset fontData
+                         local  const struct AptTextData& txtData
+                         local  int32 outW
+                         local  int32 outH
+                         local  int32 outNbrLines
+                         inlines  AptTextAsset::GetTextData, ~AptTextAsset
+ 2736  0041D068    2B4  bool AptFontFusion::MeasureTextSize(const struct AptFontFusion* this, const struct AptTextData& txtData, enum eMeasureTextSizeType type, char* text, const int32& outW, const int32& outH, const int32& outNbrLines)
+                         local  int32 maxX
+                         local  int32 maxY
+                         local  int32 maxwidth
+                         local  const struct CFontFusion& FF
+                         local  int numberLines
+                         local  short unsigned int* unicodeStr
+                         inlines  AptFontFusion::GetCFontFusion, AptTextData::GetFontType, AptTextData::GetLeadingCoef
+ 2800  00456468     8C  void AptFontFusion::DrawStringFF_Real(const struct AptFontFusion* this, AptAssetString string, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  mat44flt kResultMatrix
+                         local  const struct AptTextCacheManager& textCacheManager
+ 2833  00456AB8    118  AptAssetString AptDrawText::AllocateStringFF(struct AptAllocateStringParameters* pASP)
+                         local  const uint32 savedPropertyMask
+                         local  const int32 isSpecialRender
+                         local  struct AptTextAsset* pFontData
+                         inlines  AptTextAsset::operator new, AptTextAsset::operator new []
+ 2865  00456600    4B8  void AptDrawText::FillStringFFInternal(struct AptAllocateStringParameters* pASP, struct AptTextAsset* pFontData)
+                         local  const struct AptTextCacheManager& textCacheManager
+                         local  struct AptTextCacheElem* cacheElem
+                         local  const float scale
+                         local  const struct AptTextData& txtData
+                         local  int32 outW
+                         local  int32 outH
+                         inlines  AptFontFusion::GetTextCacheManager, AptTextAsset::GetString, AptTextAsset::GetTextData, AptTextData::GetFontType, TRefPtr<AptShareTextData>::operator=
+ 2928  004564F4     C4  void AptDrawText::DrawStringFF(AptAssetString string, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  struct AptTextAsset* strAsset
+                         inlines  AptTextAsset::GetTextData, AptTextData::GetFontType
+ 2951  00437720    28C  void AptDrawText::DeallocateStringFF(AptAssetString string)
+                         local  struct AptTextAsset* strAsset
+                         local  const struct AptTextCacheManager& textCacheManager
+                         local  struct AptTextCacheElem* cacheElem0
+                         local  struct AptTextCacheElem* cacheElem1
+                         local  const struct AptTextCacheManager& textCacheManager
+                         local  struct AptTextCacheElem* cacheElem
+                         inlines  AptFontFusion::GetTextCacheManager, AptTextAsset::GetTextData, AptTextAsset::operator delete, AptTextAsset::operator delete [], AptTextCacheManager::ReleaseTextAsset, AptTextData::GetFontType, ~AptTextAsset
+ 3025  00430490    3E0  void AptTextAsset::FillFontData(const struct AptTextAsset* this, struct AptAllocateStringParameters* pASP)
+                         local  enum eFontType outfontType
+                         local  const int nFontIndex
+                         local  const struct AptTextData& txtData
+                         local  float qualityUsed
+                         local  float fWidth
+                         local  float fHeight
+                         local  const float maxWidth
+                         local  const int32 nWidth
+                         local  const int32 nHeight
+                         inlines  AptFontFusion::GetFontIdByName, AptTextAsset::GetTextData, AptTextAsset::SetString, AptTextData::SetFontId
+ 3132  003EC3C8     C0  uint32 AptTextAsset::GetOutlineColor(const const struct AptTextAsset* this)
+                         local  uint32 outlineColor
+ 3166  00423640     B8  bool FontFusion_ParseFile(char* fontStream, int fileLength)
+ 3180  004389E0     C8  void FontFusion_ParseResource(struct TStreamData* pStreamData)
+                         local  char* ffFile
+                         local  const int32 streamLength
+                         inlines  AptStreamSupport::AddStreamToReleaseLater
+ 3200  003EC4A0      8  bool FontFusion_CheckResource(Drive3DChunkHdrPtr pHeader)
+ 3207  003EC4A8      4  void FontFusion_FreeResource(uint32 id)

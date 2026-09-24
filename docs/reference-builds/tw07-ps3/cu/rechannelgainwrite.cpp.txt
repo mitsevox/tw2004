@@ -1,0 +1,30 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/rechannelgainwrite.cpp
+// compiled in: rechannelgainwrite.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   33    inline-only   void core::ReChannelGainWrite1x1(float** pDstPointers, float** pSrcPointers, float gain, unsigned int numSamples)
+   49    inline-only   void core::ReChannelGainWrite1x2(float** pDstPointers, float** pSrcPointers, float gain, unsigned int numSamples)
+                         local  float equalPowerGain
+   74    inline-only   void core::ReChannelGainWrite1x4(float** pDstPointers, float** pSrcPointers, float gain, unsigned int numSamples)
+                         local  float equalPowerGain
+  105    inline-only   void core::ReChannelGainWrite1x6(float** pDstPointers, float** pSrcPointers, float gain, unsigned int numSamples)
+  136    inline-only   void core::ReChannelGainWrite2x1(float** pDstPointers, float** pSrcPointers, float gain, unsigned int numSamples)
+  159    inline-only   void core::ReChannelGainWrite2x2(float** pDstPointers, float** pSrcPointers, float gain, unsigned int numSamples)
+  182    inline-only   void core::ReChannelGainWrite2x4(float** pDstPointers, float** pSrcPointers, float gain, unsigned int numSamples)
+  209    inline-only   void core::ReChannelGainWrite2x6(float** pDstPointers, float** pSrcPointers, float gain, unsigned int numSamples)
+  244    inline-only   void core::ReChannelGainWrite4x1(float** pDstPointers, float** pSrcPointers, float gain, unsigned int numSamples)
+                         local  float* pDestChan
+  279    inline-only   void core::ReChannelGainWrite4x2(float** pDstPointers, float** pSrcPointers, float gain, unsigned int numSamples)
+                         local  float* pDestChan
+  314    inline-only   void core::ReChannelGainWrite4x4(float** pDstPointers, float** pSrcPointers, float gain, unsigned int numSamples)
+  352    inline-only   void core::ReChannelGainWrite4x6(float** pDstPointers, float** pSrcPointers, float gain, unsigned int numSamples)
+  394    inline-only   void core::ReChannelGainWrite6x1(float** pDstPointers, float** pSrcPointers, float gain, unsigned int numSamples)
+                         local  float* pDestChan
+  440    inline-only   void core::ReChannelGainWrite6x2(float** pDstPointers, float** pSrcPointers, float gain, unsigned int numSamples)
+                         local  float* pDestChan
+  491    inline-only   void core::ReChannelGainWrite6x4(float** pDstPointers, float** pSrcPointers, float gain, unsigned int numSamples)
+  542    inline-only   void core::ReChannelGainWrite6x6(float** pDstPointers, float** pSrcPointers, float gain, unsigned int numSamples)
+  595  006E3A94    830  void core::ReChannelGainWrite(float** pDstPointers, float** pSrcPointers, float gain, unsigned int dstChannels, unsigned int srcChannels, unsigned int numSamples)
+                         local  unsigned int i
+                         local  unsigned int i
+                         inlines  core::MemSet, core::ReChannelGainWrite1x1, core::ReChannelGainWrite1x2, core::ReChannelGainWrite1x4, core::ReChannelGainWrite1x6, core::ReChannelGainWrite2x1, core::ReChannelGainWrite2x2, core::ReChannelGainWrite2x4, core::ReChannelGainWrite2x6, core::ReChannelGainWrite4x1, core::ReChannelGainWrite4x2, core::ReChannelGainWrite4x4, core::ReChannelGainWrite4x6, core::ReChannelGainWrite6x1, core::ReChannelGainWrite6x2, core::ReChannelGainWrite6x4, core::ReChannelGainWrite6x6

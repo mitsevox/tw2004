@@ -1,0 +1,15 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_MyTour_Sponsorships.cpp
+// compiled in: apt_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   35  000F672C     94  void UIMyTour_Sponsorships::UIMyTour_Sponsorships(const struct UIMyTour_Sponsorships* this)
+                         inlines  TArrayInternal<UIMyTour_Sponsorships::DstMenuItem_mtss,AptStructSwapper>::TArrayInternal, TExternArray<UIMyTour_Sponsorships::DstMenuItem_mtss>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   43  000EFF04     78  void UIMyTour_Sponsorships::Init(const struct UIMyTour_Sponsorships* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   57  00045454     94  void UIMyTour_Sponsorships::Show(const struct UIMyTour_Sponsorships* this)
+                         local  int32 numElements
+   75  000454E8     14  void UIMyTour_Sponsorships::OnShow(const struct UIMyTour_Sponsorships* this)
+   88  000454FC     54  void UIMyTour_Sponsorships::UpdateItemAndLabel(const struct UIMyTour_Sponsorships* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_mtss* dest
+  128  00085CF0    190  enum eAptHandleInput UIMyTour_Sponsorships::HandleInput(const struct UIMyTour_Sponsorships* this, int32 cID)
+  166  00081CF8     68  void UIMyTour_Sponsorships::RefreshRankList(const struct UIMyTour_Sponsorships* this, int numRows)

@@ -1,0 +1,5 @@
+// ../ears_rt_cct/dev/api/ears_rt_cct/Internal/EventRecord.h
+// compiled in: EventRecord.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   28  0059BB18      4  void EventRecord(const struct <anon>* this)

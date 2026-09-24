@@ -1,0 +1,19 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_PSMBehaviorMySkills.cpp
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+    6  000B9C44     F4  void PSMBehavior_MySkills::OnInit(const struct PSMBehavior_MySkills* this, int32 instanceData)
+   26  000B8FAC    140  void PSMBehavior_MySkills::UpdateMovieClip(const struct PSMBehavior_MySkills* this, int32 curMenuItemIndex, const char* mDestMenuItemClipName, int32 instanceData)
+                         local  uint16* idList
+                         local  int32 assetID
+                         local  uint16* idMap
+                         local  int8[4] tokenTypePerSlot
+                         inlines  UIGameFace::GetProShopMenuAssetList
+   73  000B8E34    178  void PSMBehavior_MySkills::OnMoveSelection(const struct PSMBehavior_MySkills* this, int32 index, int32 instanceData)
+                         local  char[64] strBuf
+                         local  uint16* idList
+                         local  int32 id
+                         local  SponsorType sp
+                         local  int8[4] tokenTypePerSlot
+                         inlines  UIGameFace::GetProShopMenuAssetList
+  124  000B9EF4     F0  bool PSMBehavior_MySkills::OnInput(const struct PSMBehavior_MySkills* this, const int32& button, int32 curActiveItemIndex, int32 instanceData)

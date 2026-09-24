@@ -1,0 +1,126 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/audio/engine/hl/HLAudTrackSeq.c
+// compiled in: other_unity.cpp
+// 32 functions, source order. line | PS3 address | size
+
+   54    inline-only   void ResetSequencerPerf(TPerfSeq* pperf)
+                         local  TTrack* ptrk
+   72  003E2EF8    398  static void AutoSelectVariation(TPerfSeq* pperf)
+                         local  TTrack* ptrk
+                         local  uint8 var
+                         local  bool bAssignRandom
+                         local  uint32 varFlag
+                         local  uint32 loopCount
+                         local  bool found
+  182  0044D360     84  static void VoiceEndCB(void* p, EVocEndReason reason)
+                         local  TVoice* pv
+                         local  TPerfSeq* pperf
+                         local  uint8 vocID
+  198    inline-only   static void CheckForStolenLoopers(TPerfSeq* pperf)
+                         local  TVoice** ppv
+                         local  TVoice** ppvend
+                         local  TTrackCmd** ppcmd
+                         local  TTrackCmd* pcmd
+  221    inline-only   void SetVarCmdBounds(TPerfSeq* pperf, TTrackCmd** ppbeg, TTrackCmd** ppend)
+                         local  TTrack* ptrk
+                         local  TTrackCmd* pcmd
+                         local  TTrackCmd* pend
+  246  003E3468      4  static void OnNoOp(TTrackCmd* pcmd, TPerfSeq* pperf)
+  256  003E3E58    138  static void OnEnd(TTrackCmd* pcmd, TPerfSeq* pperf)
+                         local  TTrack* ptrk
+  304  0044C018    860  static void OnKeyOn(TTrackCmd* pcmd, TPerfSeq* pperf)
+                         local  TEmitInst* pemit
+                         local  TTrack* ptrk
+                         local  audfrac attnCumul
+                         local  int16 basevol
+                         local  TTone tone
+                         local  bool looper
+                         local  TVocAlloc vocalloc
+                         local  uint8 vocID
+                         local  uint8 i
+                         local  uint8 velocity
+                         local  bool nickname
+                         local  bool crowd
+                         local  int32 velocity_arg
+                         local  uint8 toneID
+                         local  TVoice* pvold
+                         local  TVoice* pvnew
+                         local  TVocMod* pmod
+                         local  uaudfrac rateFactor
+                         local  bool oneshots
+                         local  uint32 gSoloInstrGuid
+                         local  int[2] prevRandTones
+                         local  bool bCalcNewTone
+                         local  int bankIndex
+                         local  int32 player
+                         local  int32 bank
+                         local  int32 randomnumber
+                         local  int numTimesThru
+                         local  int playOnThisTimeThru
+                         inlines  Mas_GetSubmix, Mas_IsChanMuted
+  571  0044D3E4    134  static void OnKeyOff(TTrackCmd* pcmd, TPerfSeq* pperf)
+                         local  TEmitInst* pemit
+                         local  TTrack* ptrk
+                         local  TTone tone
+                         local  TVoice* pv
+                         local  int8 vocID
+                         local  uint8 i
+                         local  bool nickname
+  634  003E346C      4  static void OnPitchBend(TTrackCmd* pcmd, TPerfSeq* pperf)
+  677  0044EC3C    140  static void OnPitchRamp(TTrackCmd* pcmd, TPerfSeq* pperf)
+                         local  uint8 trkindex
+                         local  TPerf* pdestperf
+                         local  TEmitInst* pemit
+  716  004577D0    1A0  static void OnTrackStatus(TTrackCmd* pcmd, TPerfSeq* pperf)
+                         local  TEmitInst* pemit
+                         local  int8 trkindex
+                         local  bit8 trkmask
+                         local  bool on
+  764  0044EA98    1A4  static void OnTrackSetPlayList(TTrackCmd* pcmd, TPerfSeq* pperf)
+                         local  TEmitInst* pemit
+                         local  uint8 trkindex
+                         local  uint8 listID
+                         local  TPerf* pdestperf
+  819  0044E938    160  static void OnTrackSetStream(TTrackCmd* pcmd, TPerfSeq* pperf)
+                         local  TEmitInst* pemit
+                         local  uint8 trkindex
+                         local  uint16 streamID
+                         local  TPerfStm* pdestperf
+  858  003E3470     8C  static void OnModPitch(TTrackCmd* pcmd, TPerfSeq* pperf)
+  875  003E34FC     3C  static void OnModADSRVol(TTrackCmd* pcmd, TPerfSeq* pperf)
+  895  003E3538     3C  static void OnModStartOffset(TTrackCmd* pcmd, TPerfSeq* pperf)
+  909  003E3574     3C  static void OnRvbWetAttn(TTrackCmd* pcmd, TPerfSeq* pperf)
+  924  003E168C     A0  bool Seq_InitModule()
+                         local  bool ok
+  955  003E1734      4  void Seq_ExitModule()
+  960  003E35B0      8  bool Seq_InitSession()
+  974  003E35B8      4  void Seq_ExitSession()
+  986  00428904     8C  void Seq_Init(TPerfSeq* pperf)
+                         inlines  ResetSequencerPerf
+  997  003E2E6C     8C  void Seq_Exit(TPerfSeq* pperf)
+                         inlines  ResetSequencerPerf
+ 1008  003E3418     50  void Seq_Start(TPerfSeq* pperf)
+                         local  TTrack* ptrk
+ 1031  003E19BC     10  void Seq_Stop(TPerfSeq* pperf)
+                         local  TTrack* ptrk
+ 1048  0044C878    624  bool Seq_Tick(TPerfSeq* pperf)
+                         local  TTrack* ptrk
+                         local  TTrackCmd* pcmd
+                         local  TTrackCmd* pend
+                         local  TTrackCmd* pcmd
+                         local  uint8 step
+                         local  int32 randomnumber
+                         local  int32 time_value
+                         inlines  CheckForStolenLoopers, SetVarCmdBounds
+ 1183  003E19D0    108  void Seq_Step(TPerfSeq* pperf, uint8 step, bool debounce)
+                         local  TTrack* ptrk
+ 1220  003E3290     D4  void Seq_SetVariationRange(TPerfSeq* pperf, uint8 rangeID)
+                         local  TTrack* ptrk
+ 1248  003E1C34    320  void Seq_Check(TTrack* ptrk, bool bResolve)
+                         local  int8 i
+                         local  int8 j
+                         local  int8 r
+                         local  TTrackCmd* pvar
+                         local  TTrackCmd* pcmd
+ 1348  003E35BC      4  void Seq_DebugPrint(const float& x, const float& y, PRINTFFN PrintfFn, const TPerfSeq& sequence)
+ 1356  003E35C0     60  void Seq_DebugPrint(const float& x, const float& y, PRINTFFN PrintfFn)
+                         local  const float LINE

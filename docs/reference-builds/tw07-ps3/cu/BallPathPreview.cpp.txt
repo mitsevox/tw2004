@@ -1,0 +1,34 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/BallPathPreview.cpp
+// compiled in: golf_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   87  002170D4     DC  void BallPathColor::Update(const struct BallPathColor* this, float* colors)
+                         local  int colorNum
+                         local  float colorOffset
+  113  002171B0     18  void BallPathColor::Reset(const struct BallPathColor* this)
+  190  002171D0      8  float BallPathPreview::GetPreviewMeterRemaining(const const struct BallPathPreview* this)
+  198  002171D8     24  float BallPathPreview::GetPreviewMeterPercent(const const struct BallPathPreview* this)
+  206  0021727C     24  bool BallPathPreview::GetIfPreviewMeterIsShowing(const const struct BallPathPreview* this)
+  216  0023CEE8     FC  void BallPathPreview::CacheShotVariables(const struct BallPathPreview* this)
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         inlines  vec4flt_Copy3
+  240  0026B044    164  bool BallPathPreview::Update(const struct BallPathPreview* this)
+                         local  bool updated
+                         local  enum GolferState golferState
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         inlines  BallPathPreviewMeter::SetPercent, BallPathPreviewMeter::Show
+  391  002FD84C    138  void BallPathPreview::Render(const struct BallPathPreview* this)
+                         local  bool updateAndShowMeter
+                         inlines  BallPathPreviewMeter::Show, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetCullMode
+  472  00247C04    154  bool BallPathPreview::NeedToRecomputePath(const const struct BallPathPreview* this)
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  bool needToUpdate
+  504  002171FC     80  bool BallPathPreview::ShouldPathBeVisible(const const struct BallPathPreview* this)
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  bool showPath
+  521  002172A0     8C  float BallPathPreview::GetPathPreviewPower(const struct BallPathPreview* this)
+                         local  float pathPreviewPower
+  535  00292C04     2C  void BallPathPreview::Reset(const struct BallPathPreview* this)
+  550  002929A0    264  void BallPathPreview::GetMaxTimerValFromScript(const struct BallPathPreview* this)
+                         inlines  LuaTuningFileManager::Call<float, int, float, float>, Singleton<DifficultySettings>::GetSingleton
+  564  0021732C      4  void BallPathPreview::GetPuttPreviewLineValFromScript(const struct BallPathPreview* this)

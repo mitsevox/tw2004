@@ -1,0 +1,15 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/UI_HighImpactMessages.h
+// compiled in: apt_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   20  00123638    140  void UIHighImpactMessages::~UIHighImpactMessages(const struct UIHighImpactMessages* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber
+   22  000FE770      C  uint32 UIHighImpactMessages::GetSignature(const const struct UIHighImpactMessages* this)
+   27    inline-only   bool UIHighImpactMessages::IsAdvanceMessagesAllowed(const struct UIHighImpactMessages* this)
+   38    inline-only   void UIHighImpactMessages::AddStall(const struct UIHighImpactMessages* this, int32 t)
+   40  000FE77C     3C  void UIHighImpactMessages::Show(const struct UIHighImpactMessages* this)
+  138  00115B78     14  enum AptThreadReturnValue UIHighImpactMessages::WaitForFlashHideThread_func(struct IAptSubscriberBase* subs)
+  139  000FF904     14  enum AptThreadReturnValue UIHighImpactMessages::DisableAdvanceThread_func(struct IAptSubscriberBase* subs)
+  140  00103554     14  enum AptThreadReturnValue UIHighImpactMessages::MessageTimeOutThread_func(struct IAptSubscriberBase* subs)
+  141  001033F8     14  enum AptThreadReturnValue UIHighImpactMessages::StartHighImpactMessagesThread_func(struct IAptSubscriberBase* subs)
+  143  00100B44     14  void UIHighImpactMessages::StartTimeoutThread_func(struct IAptSubscriber* subs)

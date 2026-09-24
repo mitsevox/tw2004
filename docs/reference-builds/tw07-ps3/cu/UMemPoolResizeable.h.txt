@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Legacy/Lib/Headers/UMemPoolResizeable.h
+// compiled in: Legacy_unity.cpp, other_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   52    inline-only   int UMemPoolResizeable::GetElementStride(const const struct UMemPoolResizeable* this)
+   86    inline-only   bool UMemPoolResizeable::InMemoryRange(const struct UMemPoolResizeable* this, struct PoolHeader* pPool, void* pElem)

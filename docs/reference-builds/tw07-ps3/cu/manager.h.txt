@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/RW45/platform/include/native/ps3-ppu-gcc/rw/core/filesys/manager.h
+// compiled in: Legacy_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  174    inline-only   void SetReadFileFailCallback(const struct <anon>* this, bool(*)()* handler)

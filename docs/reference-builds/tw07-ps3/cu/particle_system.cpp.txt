@@ -1,0 +1,42 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/ParticleSystem/source/particle_system.cpp
+// compiled in: particle_unity.cpp
+// 26 functions, source order. line | PS3 address | size
+
+   24  004AABE8     20  void ParticleSystem::SetupAllocation(void*(*)()* allocFunc, void(*)()* freeFunc)
+   30  004AA484     48  void* ParticleSystem::Alloc(unsigned int size, unsigned int align)
+   36  004AA4DC     48  void ParticleSystem::Free(void* ptr)
+   53  004B0360     F8  int ParticleSystem::Init(const struct ParticleSystem* this, const void* file, struct IParticleSpawn* spawnInterface)
+                         local  const struct ParticleSystemFile* desc
+                         local  unsigned int dataSize
+  104  004AA52C     B4  int ParticleSystem::Destroy(const struct ParticleSystem* this)
+  125  004AAC28      8  enum ErrorCode ParticleSystem::GetErrorCode(const const struct ParticleSystem* this)
+  130  004AAC30     1C  int ParticleSystem::IsInitialized(const const struct ParticleSystem* this)
+  135  004C54F8     80  unsigned int ParticleSystem::SetParticleOutput(const struct ParticleSystem* this, struct ParticleOutput* output, const float* camera)
+  148  004B0A78     C4  int ParticleSystem::Update(const struct ParticleSystem* this, float deltaTime, const float* viewDir, void* emitter, int doEruptions)
+                         local  int anyAlive
+  169  004AD4C4     18  unsigned int ParticleSystem::GetParticleCount(const const struct ParticleSystem* this)
+                         local  unsigned int particleCount
+                         inlines  ParticleSystemFile::GetParticleCount
+  182  004AABDC      C  float ParticleSystem::GetSystemLifetime(const const struct ParticleSystem* this)
+  187  004AA754      C  float ParticleSystem::GetElapsedLife(const const struct ParticleSystem* this)
+  193  004B0774     60  void ParticleSystem::Tweak(const struct ParticleSystem* this, const void* file)
+                         local  const struct ParticleSystemFile* fileDesc
+                         local  struct ParticleSystemInternal* internal
+                         local  struct ParticleSystemFile* curDesc
+                         local  unsigned int maxCount
+                         inlines  ParticleSystemFile::SetParticleCount
+  210  004B076C      8  void ParticleSystem::ResetSimulation(const struct ParticleSystem* this)
+  215  004AAC88      8  const char* ParticleSystem::GetFileName(const const struct ParticleSystem* this)
+  221  004AAC84      4  const char* ParticleSystem::GetFileNameFromFile(const void* fileData)
+  226  004AA7F0      8  unsigned int ParticleSystem::GetFileSize()
+  231  004AAC9C      8  const char* ParticleSystem::GetTextureName(const const struct ParticleSystem* this)
+  236  004AACB4      8  int ParticleSystem::IsOrientToCamera(const const struct ParticleSystem* this)
+  241  004AACBC      8  float ParticleSystem::GetVersionFromFile(const void* fileData)
+  246  004AACD0      8  int ParticleSystem::IsConstantRotation(const const struct ParticleSystem* this)
+  251  004AD4DC     14  unsigned int ParticleSystem::GetParticleCountFromFile(const void* fileData)
+                         local  unsigned int particleCount
+                         inlines  ParticleSystemFile::GetParticleCount
+  264  004AACD8      C  int ParticleSystem::IsLocked(const const struct ParticleSystem* this)
+  269  004AA760      C  int ParticleSystem::IsAllDead(const const struct ParticleSystem* this)
+  274  004AACE4     28  void ParticleSystem::SetLocked(const struct ParticleSystem* this, int isLocked)
+  286  004AAC4C     2C  void ParticleSystem::SetAllDead(const struct ParticleSystem* this, int isAllDead)

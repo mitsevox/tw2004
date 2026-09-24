@@ -1,0 +1,38 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_LoadingScreen.cpp
+// compiled in: apt_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   76  0007E1AC    144  enum GM_ModeType_t GetCurrentModeType()
+                         local  enum GM_ModeType_t nGameModeID
+                         local  void* ptr
+                         local  struct GameModeDriverEra* curRivalsGameDriver
+                         local  const struct Era_MainData_t* pMainData
+                         local  const struct EventData_t* pData
+                         local  struct GameModeDriverRTE* curRTEGameDriver
+                         local  const struct EventData_t* pData
+  122    inline-only   bool LoadingScreenInternal::IsVisible(const const struct LoadingScreenInternal* this)
+  123    inline-only   void LoadingScreenInternal::SetVisible(const struct LoadingScreenInternal* this, bool f)
+  128  00103C6C    600  void LoadingScreenInternal::ShowLoadingScreen(const struct LoadingScreenInternal* this, enum eLoadingScreenToShow specificScreenNumber)
+                         local  int32 index
+                         local  int32 bgIndex
+                         local  const char* loadModeString
+                         local  char[4] loadScreenNumber
+                         local  char[4] loadBGNumber
+                         local  int32 remap
+                         local  struct GameModeBase* mode
+                         local  eAptSlot i
+                         inlines  CO_SCommandAPT::GetLoadingScreen, GM_IsCompilationCourse, GM_IsRandomCourse, LoadingScreenInternal::PickLoadingScreen, LoadingScreenInternal::PickLoadingScreenBG, LoadingScreenInternal::PickRandomLoadingScreenBG, cGAME_GLOBALS::AreWeGoingIntoFacility
+  321    inline-only   void LoadingScreenInternal::SetForceLoadingScreen(const struct LoadingScreenInternal* this, bool b)
+  400    inline-only   enum eLoadingScreens LoadingScreenInternal::PickLoadingScreen(const struct LoadingScreenInternal* this)
+                         local  enum eLoadingScreens eStart
+                         local  enum eLoadingScreens eEnd
+                         local  enum eLoadingScreens eScreen
+                         local  int32 swapScreen
+  435    inline-only   enum eLoadingScreenBackgrounds LoadingScreenInternal::PickLoadingScreenBG(const struct LoadingScreenInternal* this)
+                         local  int32 course
+  465    inline-only   enum eLoadingScreenBackgrounds LoadingScreenInternal::PickRandomLoadingScreenBG(const struct LoadingScreenInternal* this)
+  490  00031564     1C  void UI_LoadingScreen::LoadingScreenClose()
+                         inlines  LoadingScreenInternal::SetVisible
+  498  00088358     F4  void UI_LoadingScreen::ShowLoadingScreen(enum eLoadingScreenToShow specificScreen, bool bForceALoadingScreen)
+                         inlines  AptControllerListener::StopPortLocking, LoadingScreenInternal::SetForceLoadingScreen, UIMainMenu::SetForceShowBg
+  543  0003154C     18  bool UI_LoadingScreen::LoadingScreenIsVisible()

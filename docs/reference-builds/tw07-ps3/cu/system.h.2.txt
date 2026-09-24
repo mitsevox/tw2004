@@ -1,0 +1,64 @@
+// C:/packages/rwaudiocore/2.08.01/include/rw/audio/core/system.h
+// compiled in: cpuloadbalancer.cpp, dac.cpp, decoderregistry.cpp, encoderregistry.cpp, gainfader.cpp, plugin.cpp, pluginregistry.cpp, route.cpp, send.cpp, sndplayer1.cpp, ssys.cpp, ssysinit.cpp, streampool.cpp, system.cpp, systemconstructor.cpp, timerclient.cpp, timermanager.cpp, voice.cpp
+// 50 functions, source order. line | PS3 address | size
+
+  164    inline-only   struct ITask* GetITaskFromNode(struct <anon>* pNode)
+  185  006D717C     1C  void TimerClient(const struct <anon>* this)
+                         inlines  ItemHandle::ItemHandle
+  186  006D7198     5C  void ~TimerClient(const struct <anon>* this)
+                         inlines  Assert
+  190    inline-only   void SetCallback(const struct <anon>* this, void(*)()* f)
+  196    inline-only   void SetContext(const struct <anon>* this, void* pContext)
+  219  006D73E8     50  void TimerManager(const struct <anon>* this)
+                         inlines  Collection, ListDStack
+  221    inline-only   void SetTimerPeriod(const struct <anon>* this, float period)
+  386    inline-only   bool IsDebugFeatureEnabled(const struct <anon>* this, enum DEBUGFEATURE debugFeature)
+  646    inline-only   struct JobScheduler* GetJobScheduler(const struct <anon>* this)
+  777    inline-only   int GetThreadPriority(const struct <anon>* this)
+ 1027    inline-only   void Assert(const struct <anon>* this, const char* pExpression, const char* pInfo, const char* pFile, int line)
+ 1740    inline-only   double GetTime(const struct <anon>* this)
+ 1776    inline-only   unsigned int GetCommandTimeStamp(const struct <anon>* this)
+ 1979    inline-only   void SetMixerCpuCycles(const struct <anon>* this, unsigned int cycles)
+ 2033    inline-only   void AdvanceTime(const struct <anon>* this)
+ 2043    inline-only   void SetSampleRate(const struct <anon>* this, float sampleRate)
+ 2078    inline-only   float GetSampleRate(const struct <anon>* this)
+ 2105    inline-only   struct <anon>* GetCommandSlot(const struct <anon>* this, int sizeOfCommand)
+                         local  struct <anon>* pCommand
+ 2144    inline-only   void SetHandler(const struct <anon>* this, int(*)()* pHandler, void* pThis)
+                         local  struct <anon>* pCommand
+ 2155    inline-only   void SetParamHandler<rw::audio::core::Route::ConnectByPointerParams>(const struct <anon>* this, struct ConnectByPointerParams* pParams, int(*)()* pHandler, void* pThis)
+                         local  struct <anon>* pCommand
+ 2155    inline-only   void SetParamHandler<rw::audio::core::Send::ConnectByPointerParams>(const struct <anon>* this, struct ConnectByPointerParams* pParams, int(*)()* pHandler, void* pThis)
+                         local  struct <anon>* pCommand
+ 2155    inline-only   void SetParamHandler<rw::audio::core::Dac::SetModeParams>(const struct <anon>* this, struct SetModeParams* pParams, int(*)()* pHandler, void* pThis)
+                         local  struct <anon>* pCommand
+ 2155    inline-only   void SetParamHandler<rw::audio::core::Dac::SetSampleRateParams>(const struct <anon>* this, struct SetSampleRateParams* pParams, int(*)()* pHandler, void* pThis)
+                         local  struct <anon>* pCommand
+ 2168    inline-only   void HandlerGetThis<rw::audio::core::PlugIn, rw::audio::core::PlugIn::SetAttributeCommand>(struct <anon>* pCommand, struct PlugIn** ppThis, struct SetAttributeCommand** ppThisCommand)
+ 2168    inline-only   void HandlerGetThis<rw::audio::core::PlugInRegistry, rw::audio::core::PlugInRegistry::RegisterPlugInRunTimeCommand>(struct <anon>* pCommand, struct PlugInRegistry** ppThis, struct RegisterPlugInRunTimeCommand** ppThisCommand)
+ 2168    inline-only   void HandlerGetThis<rw::audio::core::Voice, rw::audio::core::Voice::SetPriorityCommand>(struct <anon>* pCommand, struct Voice** ppThis, struct SetPriorityCommand** ppThisCommand)
+ 2168    inline-only   void HandlerGetThis<rw::audio::core::GainFader, rw::audio::core::GainFader::StartFadeCommand>(struct <anon>* pCommand, struct <anon>** ppThis, struct StartFadeCommand** ppThisCommand)
+ 2168    inline-only   void HandlerGetThis<rw::audio::core::Route, rw::audio::core::Route::ConnectByPointerCommand>(struct <anon>* pCommand, struct <anon>** ppThis, struct ConnectByPointerCommand** ppThisCommand)
+ 2168    inline-only   void HandlerGetThis<rw::audio::core::Send, rw::audio::core::Send::ConnectByPointerCommand>(struct <anon>* pCommand, struct <anon>** ppThis, struct ConnectByPointerCommand** ppThisCommand)
+ 2168    inline-only   void HandlerGetThis<rw::audio::core::Dac, rw::audio::core::Dac::SetModeCommand>(struct <anon>* pCommand, struct <anon>** ppThis, struct SetModeCommand** ppThisCommand)
+ 2168    inline-only   void HandlerGetThis<rw::audio::core::Dac, rw::audio::core::Dac::SetSampleRateCommand>(struct <anon>* pCommand, struct <anon>** ppThis, struct SetSampleRateCommand** ppThisCommand)
+ 2168    inline-only   void HandlerGetThis<rw::audio::core::SndPlayer1, rw::audio::core::SndPlayer1::ModifyStartTimeCommand>(struct <anon>* pCommand, struct <anon>** ppThis, struct ModifyStartTimeCommand** ppThisCommand)
+ 2168    inline-only   void HandlerGetThis<rw::audio::core::SndPlayer1, rw::audio::core::SndPlayer1::PlayCommand>(struct <anon>* pCommand, struct <anon>** ppThis, struct PlayCommand** ppThisCommand)
+ 2318    inline-only   void New2<rw::audio::core::DecoderRegistry>(const struct <anon>* this, struct DecoderRegistry** ppThis, const char* name, unsigned int size, unsigned int alignment, struct IResourceAllocator* pAllocator)
+ 2318    inline-only   void New2<rw::audio::core::Decoder>(const struct <anon>* this, struct Decoder** ppThis, const char* name, unsigned int size, unsigned int alignment, struct IResourceAllocator* pAllocator)
+ 2318    inline-only   void New2<rw::audio::core::PlugInRegistry>(const struct <anon>* this, struct PlugInRegistry** ppThis, const char* name, unsigned int size, unsigned int alignment, struct IResourceAllocator* pAllocator)
+ 2318    inline-only   void New2<rw::audio::core::StreamPool>(const struct <anon>* this, struct <anon>** ppThis, const char* name, unsigned int size, unsigned int alignment, struct IResourceAllocator* pAllocator)
+ 2318    inline-only   void New2<rw::audio::core::Voice>(const struct <anon>* this, struct Voice** ppThis, const char* name, unsigned int size, unsigned int alignment, struct IResourceAllocator* pAllocator)
+ 2318    inline-only   void New2<rw::audio::core::EncoderRegistry>(const struct <anon>* this, struct EncoderRegistry** ppThis, const char* name, unsigned int size, unsigned int alignment, struct IResourceAllocator* pAllocator)
+ 2354    inline-only   void Delete<rw::audio::core::DecoderRegistry*>(const struct <anon>* this, struct DecoderRegistry* pClass, struct IResourceAllocator* pAllocator)
+ 2354    inline-only   void Delete<rw::audio::core::Decoder*>(const struct <anon>* this, struct Decoder* pClass, struct IResourceAllocator* pAllocator)
+ 2354    inline-only   void Delete<rw::audio::core::PlugInRegistry*>(const struct <anon>* this, struct PlugInRegistry* pClass, struct IResourceAllocator* pAllocator)
+ 2354    inline-only   void Delete<rw::audio::core::StreamPool*>(const struct <anon>* this, struct <anon>* pClass, struct IResourceAllocator* pAllocator)
+ 2354    inline-only   void Delete<rw::audio::core::Voice*>(const struct <anon>* this, struct Voice* pClass, struct IResourceAllocator* pAllocator)
+ 2354    inline-only   void Delete<rw::audio::core::EncoderRegistry*>(const struct <anon>* this, struct EncoderRegistry* pClass, struct IResourceAllocator* pAllocator)
+ 2383    inline-only   struct <anon>* GetVoiceListNodes(const struct <anon>* this)
+ 2391    inline-only   int GetNumActiveVoices(const struct <anon>* this)
+ 2413    inline-only   void SetCpuFrequency(const struct <anon>* this, float frequency)
+ 2420    inline-only   float GetCpuFrequency(const struct <anon>* this)
+ 2445  006D6B2C     54  void System(const struct <anon>* this)
+                         inlines  ListDStack

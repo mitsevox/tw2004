@@ -1,0 +1,15 @@
+// ../../../../../TIGERCODE/Code/Golf/User/Headers/UserInfoStructs.h
+// compiled in: apt_unity.cpp, golf2_unity.cpp, other_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+  138    inline-only   int8_t GeneralUserData::GetDifficultyStreakValue(const struct GeneralUserData* this)
+  139    inline-only   float GeneralUserData::GetDevCapLevelWins(const const struct GeneralUserData* this)
+  140    inline-only   uint16_t GeneralUserData::GetDevPoints(const const struct GeneralUserData* this, enum UserDevPointType devPointType)
+  141    inline-only   int8_t GeneralUserData::GetDevLevel(const const struct GeneralUserData* this, enum UserDevPointType devPointType)
+  142    inline-only   int8_t GeneralUserData::IncDevLevel(const struct GeneralUserData* this, enum UserDevPointType devPointType, int8_t incAmnt)
+  146    inline-only   void GeneralUserData::SetDevPoints(const struct GeneralUserData* this, enum UserDevPointType devPointType, uint16_t val)
+  147    inline-only   void GeneralUserData::SetDevLevel(const struct GeneralUserData* this, enum UserDevPointType devPointType, int8_t level)
+  259    inline-only   void UCAPSkillChallengesUserData::SetWon(const struct UCAPSkillChallengesUserData* this, int eventIndex, bool bWon)
+  260    inline-only   void UCAPSkillChallengesUserData::SetLock(const struct UCAPSkillChallengesUserData* this, int eventIndex, bool bLock)
+  261    inline-only   void UCAPSkillChallengesUserData::SetHidden(const struct UCAPSkillChallengesUserData* this, int eventIndex, bool bHidden)
+  264    inline-only   bool UCAPSkillChallengesUserData::Won(const struct UCAPSkillChallengesUserData* this, int eventIndex)

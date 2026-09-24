@@ -1,0 +1,31 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/CRCloudShadows.cpp
+// compiled in: headgate_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   13  0034AF38      4  void CRCloudShadows::LoadHole(const struct CRCloudShadows* this)
+   21  00355DD4    1D0  void CRCloudShadows::PostHoleLoad(const struct CRCloudShadows* this)
+                         local  struct GameXmlSettings treeSettings
+                         local  struct GameXmlSettings xmlSettings
+   42  0034AF3C      4  void CRCloudShadows::UnloadHole(const struct CRCloudShadows* this)
+   50  00359C40    1E8  void CRCloudShadows::Update(const struct CRCloudShadows* this)
+                         local  vec4flt vWind
+                         local  float fSpeed
+                         local  int width
+                         local  int height
+                         local  float fU
+                         local  float fV
+                         inlines  LLMath_DotProduct3, vec_madd, vec_sld
+   98  00355C58    17C  void CRCloudShadows::GenerateInitialMatrix(const struct CRCloudShadows* this)
+                         local  vec4flt vCenter
+                         local  int width
+                         local  int height
+                         inlines  LLMath_Add, LLMath_Scale, __vec_mul, vec_ld
+  138  00355994    2C4  void CRCloudShadows::CalculateShadowMatrix(const struct CRCloudShadows* this, float[4]* mat, float minShadX, float minShadY, float maxShadZ, float shadScaleU, float shadScaleV, int shadMapW, int shadMapH)
+                         local  vec4flt light
+                         local  mat44flt translate
+                         local  mat44flt deform
+                         local  float fOffsetX
+                         local  float fOffsetY
+                         local  mat44flt xztouv
+                         local  mat44flt temp
+                         inlines  LLMath_Scale, __vec_mul, vec4flt_Copy, vec_ld

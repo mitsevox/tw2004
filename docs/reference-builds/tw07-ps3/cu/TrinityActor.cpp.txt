@@ -1,0 +1,62 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_trinity/trinity/Runtime/src/TrinityActor.cpp
+// compiled in: TrinityActor.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   26  0058D7B4    164  void InitActor(const struct TrinityActor* this)
+   73  0058D918    1CC  bool8_t InitActor(const struct TrinityActor* this, uint32_t guid, const char* pActorName, struct Sequence* pSequence, float_t actorScale, bool8_t bRestoreActorState, bool8_t bSpawnedActorPersist, const vec3flt& initSpawnPos)
+  117  0058DAE4    230  void ReInitActor(const struct TrinityActor* this)
+  180  0058F498    33C  void Tick(const struct TrinityActor* this, float_t fDeltaSec)
+                         local  vec4flt vActorPos
+                         local  vec4flt vPos0
+                         local  vec4flt vPos1
+                         local  vec4flt vContact
+                         local  vec4flt vNormal
+  236  0058E2F0     D4  void SetHeadTrackKeys(const struct TrinityActor* this, int32_t iNumKeys, const struct Key3d* pKeys)
+  251  0058E3C4     B4  void SetLipSyncKeys(const struct TrinityActor* this, float_t fMaxJawAngle, int32_t iNumKeys, const struct Key1d* pKeys)
+  267  0058E478     48  void SetEyeBlink(const struct TrinityActor* this, int32_t iBlinkType, int32_t iNumKeys, const struct Key3d* pKeys)
+  284  0058E938    1E4  void SetTargetPosition(const struct TrinityActor* this, const const struct TargetPosParams& params)
+                         local  vec4flt vPos
+                         local  const float_t dist
+  320  0058E4C0     7C  void SetTargetRotation(const struct TrinityActor* this, const quat& q)
+  332  0058E53C     8C  void TickTranslate(const struct TrinityActor* this, float_t fDeltaSec)
+                         local  vec4flt vPos
+  351  0058E5C8     B4  void TickRotate(const struct TrinityActor* this, float_t fDeltaSec)
+                         local  mat44flt mat
+  369  0058EB1C    97C  void TickTargetPos(const struct TrinityActor* this, float_t fDeltaSec)
+                         local  vec4flt vPos
+                         local  const float_t dist
+                         local  vec4flt vStartPos
+                         local  vec4flt vEndPos
+                         local  vec4flt vTargetPos
+                         local  vec4flt vNormal
+                         local  vec4flt vCurrentPos
+                         local  vec4flt vTempPos
+                         local  vec4flt vRight
+                         local  vec4flt vFacing
+                         local  vec4flt vUp
+                         local  vec4flt vNormFacing
+                         local  mat44flt mat
+                         local  quat q
+                         local  quat normQ
+                         local  mat44flt invSeqMat
+                         local  mat44flt invSeqMat
+                         local  vec4flt vTempPos
+  503  0058DD80    570  void TickTargetRot(const struct TrinityActor* this, float_t fDeltaSec)
+                         local  const float_t rotAllowed
+                         local  vec4flt vCurFacing
+                         local  vec4flt vNorm
+                         local  mat44flt mat
+                         local  vec4flt vDestFacing
+                         local  float_t dot
+                         local  const float_t radians
+                         local  quat qNew
+                         local  quat qCurr
+                         local  quat qNorm
+                         local  const float_t factor
+  565  0058E67C    1E0  void TickHeadTrack(const struct TrinityActor* this, float_t fDeltaSec)
+                         local  vec4flt vPos
+                         local  vec4flt vTempPos
+                         local  vec3flt vPos3
+  604  0058E85C     DC  void TickLipSync(const struct TrinityActor* this, float_t fDeltaSec)
+                         local  float_t fAmp
+  632  0058DD14     6C  void TickEyeBlink(const struct TrinityActor* this, float_t fDeltaSec)

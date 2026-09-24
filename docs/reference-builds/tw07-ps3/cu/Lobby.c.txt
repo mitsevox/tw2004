@@ -1,0 +1,62 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/online/Lobby.c
+// compiled in: golf2_unity.cpp
+// 23 functions, source order. line | PS3 address | size
+
+ 8410  0019A45C     C8  void LobbyOSDK::LobbyOSDK(const struct LobbyOSDK* this)
+                         inlines  RCPointer
+ 8421  0019A5EC     D4  void LobbyOSDK::~LobbyOSDK(const struct LobbyOSDK* this)
+                         inlines  ~RCPointer
+ 8427  00174F10    130  void LobbyOSDK::Initialize(const struct LobbyOSDK* this)
+                         local  struct Facade* pFacade
+                         local  struct Lobby* pLobby
+                         inlines  AddObserver
+ 8453  001913F4    134  void LobbyOSDK::Destroy(const struct LobbyOSDK* this)
+                         local  struct Facade* pFacade
+                         local  struct Lobby* pLobby
+                         inlines  RemoveObserver, operator->, operator=
+ 8487  00169720    15C  uint32_t LobbyOSDK::GetNumPlayersInRoom(const struct LobbyOSDK* this)
+                         local  const struct List<OSDK::User>* pPlayerList
+                         inlines  List<OSDK::User>::GetNumberOfElements
+ 8505  00191528    170  bool LobbyOSDK::EnterDefaultRoom(const struct LobbyOSDK* this)
+                         local  struct LobbyRoom* pRoom
+                         inlines  operator=
+ 8522  00191A20    144  bool LobbyOSDK::EnterRoom(const struct LobbyOSDK* this, char* roomName)
+                         local  struct LobbyRoom* pRoom
+                         inlines  operator=
+ 8540  0019367C    1AC  void LobbyOSDK::DoPostRoomJoinAction(const struct LobbyOSDK* this)
+                         local  enum OnlinePath path
+                         inlines  LobbyMatchupOSDK::ReadyToAcceptChallenge
+ 8607  00193828     DC  void LobbyOSDK::LobbyRoomJoinSuccess(const struct LobbyOSDK* this, struct LobbyRoom* pRoom)
+                         local  struct Lobby* pLobby
+                         inlines  AddObserver, operator=
+ 8620  00191B64     84  void LobbyOSDK::LobbyRoomJoinFailure(const struct LobbyOSDK* this, enum Failure eFailure)
+                         inlines  operator=
+ 8628  00191BE8     64  void LobbyOSDK::LobbyRoomSendMessageFailure(const struct LobbyOSDK* this)
+                         inlines  operator=
+ 8634  00191C4C     64  void LobbyOSDK::LobbyRoomSendMessageSuccess(const struct LobbyOSDK* this)
+                         inlines  operator=
+ 8640  00191CB0     94  void LobbyOSDK::LobbyRoomLeaveSuccess(const struct LobbyOSDK* this)
+                         inlines  operator=
+ 8650  00191D44     74  void LobbyOSDK::LobbyRoomLeaveFailure(const struct LobbyOSDK* this, enum Failure eFailure)
+                         inlines  operator=
+ 8657  00159608    174  void LobbyOSDK::LobbyRoomMessageReceived(const struct LobbyOSDK* this, struct LobbyRoom* pRoom, struct Message* pMessage)
+ 8669  00127600     44  void LobbyOSDK::LobbyRoomPopulationChanged(const struct LobbyOSDK* this, struct LobbyRoom* pRoom)
+ 8676  00127644     3C  void LobbyOSDK::LobbyRoomLocalUserRemoved(const struct LobbyOSDK* this)
+ 8682  00191868    1B8  void LobbyOSDK::ProcessComplete(const struct LobbyOSDK* this)
+                         local  struct OnlineManagerOSDK* pOnlineMgr
+                         local  struct LobbyRoom* pLobbyRoom
+                         local  const struct List<OSDK::User>* pPlayerList
+                         local  const int32_t numPlayers
+                         inlines  OnlineManagerOSDK::GetInstance
+ 8726  00158214    1C0  struct User* LobbyOSDK::GetPlayerAtIndex(const struct LobbyOSDK* this, uint8_t index)
+                         local  const struct List<OSDK::User>* pPlayerList
+                         local  const int32_t numPlayers
+                         inlines  List<OSDK::User>::GetElementAt
+ 8758  00191DB8     C8  void LobbyOSDK::SendChatMessage(const struct LobbyOSDK* this, const char8_t* msg)
+                         local  struct LobbyRoom* pRoom
+                         inlines  operator=
+ 8765  00191E98     C0  void LobbyOSDK::LeaveChatRoom(const struct LobbyOSDK* this)
+                         local  struct LobbyRoom* pRoom
+                         inlines  operator=
+ 8772  00191698     EC  bool LobbyOSDK::IsInRoom(const struct LobbyOSDK* this)
+ 8784  0012769C      8  int LobbyOSDK::AuxData_GetGolfer(const struct LobbyOSDK* this, const char* auxstr)

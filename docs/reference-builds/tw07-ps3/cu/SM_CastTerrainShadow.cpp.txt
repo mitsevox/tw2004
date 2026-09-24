@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_CastTerrainShadow.cpp
+// compiled in: shader_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   52  00504B58     74  void SM_CastTerrainShadowClass::Load(const struct SM_CastTerrainShadowClass* this)
+   61  00504BCC     48  void SM_CastTerrainShadowClass::Activate(const struct SM_CastTerrainShadowClass* this)
+   68  00504C14     94  void SM_CastTerrainShadowClass::SetDiffuseColor(const struct SM_CastTerrainShadowClass* this, const float* diffuseColor)

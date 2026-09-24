@@ -1,0 +1,21 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_HudHelpers.c
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    7  0003EEFC     C0  void UIHud_GetPutSlopeAndFlip(const uint32& xflip, const uint32& elevIndex)
+                         local  const float PUTT_STEEP_THRESHOLD
+                         local  const float PUTT_MEDIUM_THRESHOLD
+                         local  const int32 golferindex
+                         local  float pinHeight
+   34  000E7428    264  char* UIHud_GetClubString()
+                         local  int32 golferindex
+                         local  int32 clubindex
+                         local  char* clubstr
+                         local  char* tempStr
+  144  000E6DDC    5FC  char* UIHud_GetHoleOutText(int32 textID, float Param2, const enum eHudFlashTextMod& txtMod)
+                         local  int32 iGolferIndex
+                         local  char[32] sGolferName
+                         local  bool messageHandled
+                         local  char[50] copyBuffer
+                         local  char* tempStr
+                         local  char* sHoleOutStr

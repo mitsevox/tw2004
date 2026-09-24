@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/RNASurface.cpp
+// compiled in: RNASurface.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   63  008340E8     58  void SurfaceC::SurfaceC(const struct SurfaceC* this, struct UserData* pUserData, uint32_t uFlags)
+   96  00834198     44  void SurfaceC::~SurfaceC(const struct SurfaceC* this)

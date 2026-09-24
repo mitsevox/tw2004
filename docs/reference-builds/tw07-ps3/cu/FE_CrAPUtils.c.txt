@@ -1,0 +1,297 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/frontend/FE_CrAPUtils.c
+// compiled in: apt_unity.cpp
+// 54 functions, source order. line | PS3 address | size
+
+   60  0006CA48     78  void FE_SetupSaleInfo()
+                         local  FE_CrAP_Asset_Gender_e savedGender
+   77  0001EBB4     2C  int FE_GetSaleIDFromSaleCategory(int saleCategory)
+   99  0006C4A4    5A4  void FE_CrAP_UpdateSaleInfo(int saleCategory, int gender)
+                         local  const struct UserInfo& userInfo
+                         local  int32 i
+                         local  int32 j
+                         local  int32 tempDate
+                         local  int month
+                         local  int day
+                         local  int year
+                         local  int hour
+                         local  int minute
+                         local  int second
+                         local  int millisecond
+                         local  int32[95] possibleCategories
+                         local  int32[200] possibleAssetIDs
+                         local  int32 numAssets
+                         local  int32 numCategories
+                         local  int32 numDBEntries
+                         local  FE_CrAP_Asset_Category_e tempCategory
+                         local  int32 tempSubcategory
+                         local  int32 tempItemID
+                         local  int32 chosenAsset
+                         local  FE_CrAP_Asset_Gender_e savedGender
+                         local  int saleID
+                         local  int32 ndx
+                         inlines  cGAME_GLOBALS::SetRandomSeed
+  238  0006C3EC     B8  bool FE_CrAP_AreAnyItemsLocked(const struct UserInfo& userInfo)
+                         local  bool bLockedAssets
+                         local  int assetCount
+                         local  int assetID
+  264  0006BAEC    878  bool FE_CrAP_IsItemLocked(int assetID, const struct UserInfo& userInfo)
+                         local  uint32 i
+                         local  int totalNum
+                         local  bool isLocked
+                         local  int8 lockMode
+                         local  int16 lockVal
+                         local  struct FE_CrAP_Asset_t* asset
+                         local  FE_CrAP_Asset_Category_e category
+                         local  int32 subCategory
+                         local  int matchID
+                         local  int nOpponentsBeat
+                         local  const struct GameModeDriver* pDriver
+                         local  int nEventsWon
+                         local  const struct GameModeDriver* pDriver
+                         local  struct GameModeDriverUCAPSkillChallenges* SkillChallDriver
+                         local  int nEventsWon
+                         local  const struct GameModeDriver* pDriver
+                         local  struct GameModeDriverPGATour* PGADriver
+                         local  struct GameModeDriverTigerChallenge* TigerDriver
+  640  000B5B48    150  void FE_CrAP_SetupLockedAssets(const struct UserInfo& userInfo)
+                         local  int32 i
+                         local  int32 numDBEntries
+                         local  FE_CrAP_Asset_Gender_e savedGender
+                         inlines  BitArray_ClearBit, BitArray_SetBit
+  671  000AF644    14C  void FE_CrAP_UpdateUserAttributeMods(const struct UserInfo& userInfo)
+                         local  int32 assetID
+                         local  int32 i
+                         local  FE_CrAP_Asset_Slot_e iSlot
+                         local  enum STAT_e statIndex1
+                         local  enum STAT_e statIndex2
+                         local  int32 statMod1
+                         local  int32 statMod2
+  733  0008B550     B0  void FE_CrAP_RandomizeCrAPCategoryInAllSubcategories(const struct UserInfo& userInfo, FE_CrAP_Asset_Category_e category, int32 defaultPercent)
+                         local  int32 i
+                         local  int32 numSubcats
+  748  00067F5C    204  bool FE_CrAP_IsAssetUndesirable(FE_CrAP_Asset_Category_e category, struct FE_CrAP_Asset_t* asset)
+                         local  struct FE_CrAP_Asset_p pAsset
+                         inlines  FE_CrAP_Asset_p::FE_CrAP_Asset_p
+  777  0009E7CC    1CC  void FE_CrAP_RandomizeCategoryWithUndesirableTest(FE_CrAP_Asset_Category_e category, int percentDesirable)
+                         local  int32 i
+                         local  int32 assetID
+                         local  struct FE_CrAP_Asset_t* asset
+                         local  int32 numAssets
+                         local  int32 randItem
+                         local  bool useDesirable
+                         local  int32[250] availableAssets
+                         local  int32 numAvailableAssets
+  823  00068160    144  bool FE_CrAP_IsCrazyHairColor(struct FE_CrAP_Asset_t* _asset)
+                         local  struct FE_CrAP_Asset_p pAsset
+                         inlines  FE_CrAP_Asset_p::FE_CrAP_Asset_p
+  841  000682A4     C8  bool FE_CrAP_IsCrazyHat(struct FE_CrAP_Asset_t* _asset)
+                         local  struct FE_CrAP_Asset_p pAsset
+                         inlines  FE_CrAP_Asset_p::FE_CrAP_Asset_p
+  853  0006836C    144  bool FE_CrAP_IsCrazyFaceHairColor(struct FE_CrAP_Asset_t* _asset)
+                         local  struct FE_CrAP_Asset_p pAsset
+                         inlines  FE_CrAP_Asset_p::FE_CrAP_Asset_p
+  871  000684B0     B8  bool FE_CrAP_IsCrazyAccessorie(struct FE_CrAP_Asset_t* _asset)
+                         local  struct FE_CrAP_Asset_p pAsset
+                         inlines  FE_CrAP_Asset_p::FE_CrAP_Asset_p
+  883  0001EC10     EC  int FE_CrAP_GetRandomSliderValue(enum CrAP_Slider_e slider, enum FE_CRAP_Randomize_Age age)
+  953  0001ECFC    330  static void FE_CrAP_RandomizeHair(const struct UserInfo& userInfo, enum FE_CRAP_Randomize_Age age)
+                         local  const char*[6] normalAssets
+                         local  const int32 numNormalAssets
+                         local  const char*[8] extremeAssets
+                         local  const int32 numExtremeAssets
+                         local  const char* newAssetName
+                         local  int32 assetID
+                         local  int32 rand
+                         local  const char*[11] normalAssets
+                         local  const int32 numNormalAssets
+                         local  const char*[9] extremeAssets
+                         local  const int32 numExtremeAssets
+                         local  const char* newAssetName
+                         local  int32 assetID
+                         local  int32 rand
+                         local  int32 rand
+                         local  int32 rand
+ 1048  0001F02C    1A8  static void FE_CrAP_RandomizeBrow(const struct UserInfo& userInfo, enum FE_CRAP_Randomize_Age age)
+                         local  const char*[2] normalBrows
+                         local  const int32 numNormalBrows
+                         local  const char*[1] extremeBrows
+                         local  const int32 numExtremeBrows
+                         local  const char* newBrowName
+                         local  int32 assetID
+                         local  int32 rand
+                         local  const char*[1] normalBrows
+                         local  const int32 numNormalBrows
+                         local  const char*[2] extremeBrows
+                         local  const int32 numExtremeBrows
+                         local  const char* newBrowName
+                         local  int32 assetID
+                         local  int32 rand
+                         local  int32 rand
+                         local  int32 rand
+ 1114  0001F1D4    440  static void FE_CrAP_RandomizeFacialHair(const struct UserInfo& userInfo, enum FE_CRAP_Randomize_Age age)
+                         local  const char*[4] normalAssets
+                         local  const int32 numNormalAssets
+                         local  const char*[3] extremeAssets
+                         local  const int32 numExtremeAssets
+                         local  const char* newAssetName
+                         local  int32 assetID
+                         local  int32 rand
+                         local  const char*[5] normalAssets
+                         local  const int32 numNormalAssets
+                         local  const char*[4] extremeAssets
+                         local  const int32 numExtremeAssets
+                         local  const char* newAssetName
+                         local  int32 assetID
+                         local  int32 rand
+                         local  const char*[7] normalAssets
+                         local  const int32 numNormalAssets
+                         local  const char*[16] extremeAssets
+                         local  const int32 numExtremeAssets
+                         local  const char* newAssetName
+                         local  int32 assetID
+                         local  int32 rand
+                         local  int32 rand
+                         local  int32 rand
+                         local  int32 rand
+ 1243  0001F614    194  static void FE_CrAP_RandomizeHairColors(const struct UserInfo& userInfo, enum FE_CRAP_Randomize_Age age)
+                         local  int32 hairColor
+                         local  int32 facialHairColor
+                         local  struct FaceBlend* faceBlender
+ 1265    inline-only   static void FE_CrAP_RandomizeTeeth(const struct UserInfo& userInfo, enum FE_CRAP_Randomize_Age age)
+ 1269  0001F7A8     58  void FE_CrAP_RandomizeFace(const struct UserInfo& userInfo, enum FE_CRAP_Randomize_Age age)
+ 1281  0009E6A0    12C  void FE_CrAP_RandomizeAll(const struct UserInfo& userInfo, enum FE_CRAP_Randomize_Age age)
+ 1304  0009E5CC     D4  void FE_CrAP_RandomizeCrAPCategoryWithDefinedValues(const struct UserInfo& userInfo, FE_CrAP_Asset_Category_e category, enum FE_CRAP_Randomize_Age age)
+                         inlines  FE_CrAP_RandomizeTeeth
+ 1333  0008B4C8     88  int FE_CrAP_RandomizeCrAPCategoryInOneSubcategory(const struct UserInfo& userInfo, FE_CrAP_Asset_Category_e category, int32 defaultPercent)
+                         local  int32 numSubcats
+                         local  int32 randSubcat
+ 1348  0008B310    1B8  int FE_CrAP_RandomizeCrAPCategoryAndSubcategoryItem(const struct UserInfo& userInfo, FE_CrAP_Asset_Category_e category, int32 subcategory, int32 defaultPercent)
+                         local  int32 i
+                         local  int32 numAssets
+                         local  int32 numAvailableAssets
+                         local  int32 randItem
+                         local  int32 randDefault
+                         local  int32[250] availableAssets
+                         local  int32 assetID
+                         local  struct FE_CrAP_Asset_t* asset
+                         local  int tempAssetID
+ 1404  0001F800     8C  enum FE_CrAP_Age_e FE_CrAP_GetAgeIndex(const struct UserInfo& userInfo)
+                         local  int32 age
+ 1442    inline-only   static void FE_CrAP_SetDefaultUIToggleSettings(const struct UserInfo& userInfo, const char* attrName, int defaultVal)
+                         local  int minIndex
+                         local  int maxIndex
+                         local  int i
+                         local  int j
+ 1481  0009E320    2AC  void FE_CrAP_SetDefaultsByAge(enum FE_CrAP_Age_e ageindex, int gender)
+                         local  int i
+                         local  struct FE_CrAP_Gender_Vitals_t* gendervitals
+                         local  struct FE_CrAP_VitalsInfo_t* vitals
+                         local  enum FE_CrAP_SliderType_e slidertype
+                         local  struct FE_CrAP_AgeInfo_t* ageinfo
+                         local  int32 crap_slider
+                         local  const struct UserInfo& userInfo
+ 1572  0001F88C    184  void FE_CrAP_SetDefaultBuildByAge(enum FE_CrAP_Age_e ageindex, int gender)
+                         local  int i
+                         local  int j
+                         local  struct FE_CrAP_Gender_Vitals_t* gendervitals
+                         local  struct FE_CrAP_VitalsInfo_t* vitals
+                         local  enum FE_CrAP_SliderType_e slidertype
+                         local  struct FE_CrAP_AgeInfo_t* ageinfo
+                         local  int32 crap_slider
+                         local  const struct UserInfo& userInfo
+                         local  bool overwrite
+ 1632  0001FA10    168  void FE_CrAP_SetDefaultsByBuild(enum FE_CrAP_BuildType_e buildtype, int gender)
+                         local  int i
+                         local  struct FE_CrAP_VitalsBuild_t* buildvitals
+                         local  struct FE_CrAP_GenderBuild_t* genderbuild
+                         local  enum FE_CrAP_SliderType_e slidertype
+                         local  int32 crap_slider
+                         local  const struct UserInfo& userInfo
+ 1665  0001FB78     40  void FE_CrAP_SetBuild(int8 buildtype)
+                         local  const struct UserInfo& userInfo
+ 1674  0001FBB8     5C  void FE_CrAP_SetHeight(int inches)
+                         local  int32 height_slider_percent
+                         local  int32 height_max
+                         local  const struct UserInfo& userInfo
+ 1692  0001FC14     20  void FE_CrAP_SaveOffSkinColorTone(int color_sliderval, int tone_sliderval)
+ 1699  0001FC34    11C  void FE_CrAP_SetUIToggle(const char* attr_name, int32 state)
+                         local  enum FE_CrAP_Toggle_e toggle_index
+                         local  const struct UserInfo& userInfo
+                         local  struct CrAPInfo_t* userCrapInfo
+ 1722  0001FD50    16C  void FE_CrAP_SetUIToggleSlider(const char* attr_name, int sliderVal)
+                         local  const struct UserInfo& userInfo
+                         local  int minIndex
+                         local  int maxIndex
+                         local  int i
+                         local  int j
+                         inlines  FE_CrAP_SetDefaultUIToggleSettings
+ 1731  0008EC04    164  void FE_CrAP_EquipDefaults()
+                         local  int i
+                         local  int32[5] clubSubCats
+                         local  int32 clubCount
+                         local  int32 unfilteredEntryNum
+                         local  int32 id
+                         local  struct FE_CrAP_Asset_t* asset
+                         local  int32 unfilteredEntryNum
+                         local  int32 id
+                         local  struct FE_CrAP_Asset_t* asset
+ 1782  0001FEBC     1C  void FE_CrAP_InitializeCrAPModel()
+ 1794  0001FED8    118  FE_CrAP_Asset_Slot_e FE_CrAP_GetSlot(enum Club_t club)
+ 1854  0005ABA8    110  void FE_CrAP_InitVitalsDefaultSliders()
+                         local  const char[33] __FUNCTION__
+                         inlines  TagValuePair, operator+
+ 1870  00013BD8     B0  void FE_CrAP_CloseVitalsDefaultSliders()
+ 1888  0001FFF0     18  struct FE_CrAP_SliderSettings_t* FE_CrAP_GetDefaultSettings()
+ 1896  0005AFF0    318  void FE_CrAP_LoadVitalsSettingsfromStream(struct TStreamData* pStreamData)
+                         local  const char[37] __FUNCTION__
+                         local  int32 filesize
+                         local  struct FE_CrAP_VitalsInfo_t* tempsettings
+                         inlines  TagValuePair, operator+
+ 1957  0005B308    318  void FE_CrAP_LoadVitalsBuildfromStream(struct TStreamData* pStreamData)
+                         local  const char[34] __FUNCTION__
+                         local  int32 filesize
+                         local  struct FE_CrAP_VitalsBuild_t* tempsettings
+                         inlines  TagValuePair, operator+
+ 2137  00020008     A0  int GetHeightIndex(int gender, int height)
+                         local  int i
+                         local  int max_index
+ 2164  000200A8    25C  int FE_CrAP_GetBuild_ByWeightHeight(int gender, int weight, int height, int curr_build)
+                         local  int htndx
+                         local  struct FE_CrAP_WHrange_e* wtrange
+                         local  int i
+                         local  int try_build
+ 2238  00020304     D0  int FE_CrAP_GetWeight_ByBuildHeight(int gender, int height, int build, int weight)
+                         local  int htndx
+                         local  struct FE_CrAP_WHrange_e* wtrange
+                         local  int newweight
+ 2261  000203D4     C0  void FE_CrAP_GetMinMaxWeight_ByHeight(int gender, int height, int* minweight, int* maxweight)
+                         local  int htndx
+ 2282  00020494    100  void FE_CrAP_InitCrAPInfo(const struct CrAPInfo_t& crapInfo)
+                         local  int i
+                         local  int i
+ 2304  000B5C98    C9C  void FE_CrAP_SetupDefaultAssets(const struct CrAPInfo_t& crapInfo)
+                         local  int32 assetID
+                         local  int32 i
+                         local  struct sliderNameValPair[13] defaultSliderValues
+                         local  struct HashString* pSliderNames
+                         local  int32 sliderIndex
+                         local  const int32 defaultSliderCount
+                         local  int32 i
+                         local  struct HashString hsSliderName
+                         inlines  BitArray_SetBit, HashString::HashString, HashString::operator=
+ 2530  00020594     5C  void FE_CrAP_InitAlterEgoInfo(const struct CRAPAlterEgo_t& egoInfo)
+                         local  int i
+ 2542  00020A5C    1E4  void FE_CrAP_AddCustomAnimation(const struct CrAPInfo_t& crapInfo, enum CustomAnim_Category_e category, struct FE_CrAP_Asset_t* pAsset)
+                         local  const char* animName
+                         local  int32 slotNum
+ 2594  00014594    294  void FE_CrAP_RemoveCustomAnimation(const struct CrAPInfo_t& crapInfo, enum CustomAnim_Category_e category, struct FE_CrAP_Asset_t* pAsset)
+                         local  int32 slotNum
+                         local  int i
+                         local  const char* animName
+                         local  const char* animName
+ 2671  00014828     14  void FE_CrAP_TurnOffFidgetAnimations(const struct CrAPInfo_t& crapInfo)
+ 2680  000205F0    28C  bool FE_CrAP_IsCustomAnimationSelected(const struct CrAPInfo_t& crapInfo, enum CustomAnim_Category_e category, struct FE_CrAP_Asset_t* pAsset)
+                         local  int32 i
+                         local  const char* animName
+                         local  const char* animName
+                         local  char[32] animName

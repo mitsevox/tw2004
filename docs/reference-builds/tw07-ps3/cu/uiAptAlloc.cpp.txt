@@ -1,0 +1,57 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/aptInterface/uiAptAlloc.cpp
+// compiled in: other_unity.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   66  003E9DC0     28  uint32 APT_TrackMemory::GetAptHeapMemoryBudget()
+   67  003E9DE8     28  uint32 APT_TrackMemory::GetAptHeapMemoryAllocated()
+   68  003E9E10     28  uint32 APT_TrackMemory::GetAptHeapMaxMemoryAllocated()
+   73  003EA248     C8  uint32 APT_HE_uiAlloc(HE_SHeap* spHeap_p, uint32 uiSize_p, uint32 uiAlign_p)
+                         local  uint32 ret
+   98  003EA310     A0  void APT_HE_vFree(HE_SHeap* spHeap_p, uint32 uiOffset_p)
+                         local  uint32 size
+  190  004A766C     60  void* AptLLMemPool::_GlobalAlloc(const struct AptLLMemPool* this, int nBytes)
+                         local  const uint32 result
+  204  004A76CC     18  void AptLLMemPool::_GlobalFree(const struct AptLLMemPool* this, void* pMemBlock)
+  235    inline-only   void AptSmartMemoryPool::Close(const struct AptSmartMemoryPool* this)
+                         local  int i
+                         local  const struct AptLLMemPool& elem
+  258    inline-only   void AptSmartMemoryPool::InitAptMemoryPool(const struct AptSmartMemoryPool* this, struct AptLLMemPool* elems, int32* sizeTable, int32 nbrElemsTotal, int32 smartPageSize)
+                         local  int i
+                         local  const struct AptLLMemPool& elem
+                         local  const int32 alignmentInBytes
+  276    inline-only   void* AptSmartMemoryPool::Alloc(const struct AptSmartMemoryPool* this, int32 size)
+                         local  int i
+                         local  const struct AptLLMemPool& elem
+                         local  void* buf
+  314    inline-only   bool AptSmartMemoryPool::Free(const struct AptSmartMemoryPool* this, void* buf)
+                         local  bool ok
+                         local  int i
+                         local  const struct AptLLMemPool& elem
+  398  004130BC    134  void* AptAllocator::aAlloc(size_t size)
+                         local  void* ptr
+                         local  const uint32 result
+                         local  const struct AptLLMemPool& elem
+                         local  void* buf
+                         inlines  AptSmartMemoryPool::Alloc
+  451  003FE744    160  void* AptAllocator::aAllocTexture(size_t size)
+                         local  const char[14] __FUNCTION__
+                         local  void* result
+                         local  const int align
+                         inlines  TagValuePair, operator+
+  494  003EA4E0     78  void AptAllocator::aFreeTexture(void* ptr)
+  521  003EA3B0    130  void AptAllocator::aFree(void* ptr)
+                         local  const bool ok
+                         local  const struct AptLLMemPool& elem
+                         inlines  AptSmartMemoryPool::Free
+  558  003EA558     5C  void AptAllocator::aFreeSize(void* ptr, size_t size)
+  576  003FE924    294  void AptAllocator::Initialize(enum eAptGameMode gameMode)
+                         local  const char[11] __FUNCTION__
+                         local  const int32 heapIndex
+                         local  const int32 sizeHeap
+                         local  const int32 heapCount
+                         local  const struct AptLLMemPool& elem
+                         local  const int32 alignmentInBytes
+                         inlines  Allocator::GetTempAllocator, AptSmartMemoryPool::InitAptMemoryPool, TagValuePair, operator+
+  618  003EA640    11C  void AptAllocator::Close()
+                         local  const struct AptLLMemPool& elem
+                         inlines  AptSmartMemoryPool::Close

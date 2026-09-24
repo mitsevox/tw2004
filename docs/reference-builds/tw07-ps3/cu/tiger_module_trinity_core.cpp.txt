@@ -1,0 +1,54 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_trinity_core.cpp
+// compiled in: tiger_module_trinity_core.cpp
+// 26 functions, source order. line | PS3 address | size
+
+   15  0058119C     3C  void TrinityCore(const struct <anon>* this, struct Module* parentModule)
+                         inlines  TrinityCore
+   20  00580AEC     4C  void ~TrinityCore(const struct <anon>* this)
+                         inlines  ~Allocatable, ~TrinityCore
+   25  00580E34     54  void TrinityAssert(const struct <anon>* this)
+                         inlines  GetParentModule
+   32  00580E88     A4  void TrinityAssertF(const struct <anon>* this, const char* pFormat)
+                         local  va_list args
+                         inlines  GetParentModule
+   46  00580F2C     A4  void TrinityReport(const struct <anon>* this, const char* pFormat)
+                         local  va_list args
+                         inlines  GetParentModule
+   60  00580B38     30  void TrinityMemCopy(const struct <anon>* this, void* pDest, const void* pSrc, const uint32_t size)
+   65  00580B68     30  void TrinityMemMove(const struct <anon>* this, void* pDest, const void* pSrc, const uint32_t size)
+   70  00580FD0     88  void* TrinityMalloc(const struct <anon>* this, uint32_t size)
+                         inlines  GetParentModule, TagValuePair
+   75  00581058     78  void TrinityFree(const struct <anon>* this, void* block)
+                         inlines  GetParentModule
+   80  00580B98     4C  int32_t TrinitySprintf(const struct <anon>* this, char* pDest, const char* pFormat)
+                         local  va_list args
+   88  00580BE4     4C  int32_t TrinitySnprintf(const struct <anon>* this, char* pDest, uint32_t size, const char* pFormat)
+                         local  va_list args
+   97  00580C30     4C  int32_t TrinityPrintf(const struct <anon>* this, const char* pFormat)
+                         local  va_list args
+  107  00580C7C     28  uint32_t TrinityStringLength(const struct <anon>* this, const char* pString)
+  112  00580CA4     2C  int32_t TrinityStringCompare(const struct <anon>* this, const char* pString1, const char* pString2)
+  117  00580CD0     2C  int32_t TrinityStringICompare(const struct <anon>* this, const char* pString1, const char* pString2)
+  122  00580CFC     30  int32_t TrinityStringNCompare(const struct <anon>* this, const char* pString1, const char* pString2, uint32_t size)
+  127  00580D2C     2C  char* TrinityStrStr(const struct <anon>* this, const char* pString, const char* pStringToSearch)
+  132  00580D58     2C  char* TrinityStrChr(const struct <anon>* this, const char* pString, uint32_t c)
+  137  005810D0     44  void TrinityPauseMainLoop(const struct <anon>* this)
+                         inlines  GetParentModule
+  142  00581114     44  void TrinityRunMainLoop(const struct <anon>* this)
+                         inlines  GetParentModule
+  147  00581158     44  void TrinitySetSimTimeScale(const struct <anon>* this, float_t fTimeScale)
+                         inlines  GetParentModule
+  152  00580D84     44  float_t TrinityGetAspectRatio(const struct <anon>* this)
+                         inlines  GetParentModule
+  157  00580DEC     48  int32_t TrinitySscanf(const struct <anon>* this, const char* pString, const char* pFormat)
+                         local  va_list args
+  213  00581324     24  const char8_t* Strchr8Fixed(const char8_t* pString, char8_t c)
+  231  00581348    464  int VsscanfT_<char8_t>(const char8_t* pTextBuffer, const char8_t* pFormat, va_list arguments)
+                         local  const int32_t kMaxParamsHandled
+                         local  int32_t arg_count
+                         local  const char8_t*(*)()* pStrchr
+                         local  const char8_t* pF
+                         local  void*[20] p
+                         local  int32_t n
+                         local  int(*)()* pSscanf
+  357  00580DC8     24  int Vsscanf8(const char8_t* pTextBuffer, const char8_t* pFormat, va_list arguments)

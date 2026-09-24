@@ -1,0 +1,18 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/UI_BattleGolf_ChooseClub.h
+// compiled in: apt_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   15  00120ED4    160  void UIBattleGolf_ChooseClub::~UIBattleGolf_ChooseClub(const struct UIBattleGolf_ChooseClub* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIBattleGolf_ChooseClub::BattleGolf_ChooseClub_DstMenuItem>::~TExternArray, UIMenuCircBase::~UIMenuCircBase
+   22  000FE560     44  void UIBattleGolf_ChooseClub::ShowHelpText(const struct UIBattleGolf_ChooseClub* this)
+   27  000FE5AC      C  uint32 UIBattleGolf_ChooseClub::GetSignature(const const struct UIBattleGolf_ChooseClub* this)
+   28  000FE5C0      8  int32 UIBattleGolf_ChooseClub::GetSizeofArrayStruct(const struct UIBattleGolf_ChooseClub* this)
+   29  000FE5D0      C  struct IExternArray* UIBattleGolf_ChooseClub::GetExternArray(const struct UIBattleGolf_ChooseClub* this)
+   32  000FE5E4     3C  void UIBattleGolf_ChooseClub::UpdateItemAndLabelFlash(const struct UIBattleGolf_ChooseClub* this, struct UIMenuItemBaseDst* menuItemToUpdate, int32 index, char* inLabel)
+   36  000FE620      4  void UIBattleGolf_ChooseClub::SetItemPos(const struct UIBattleGolf_ChooseClub* this, int32 inClipIndex, float inPos)
+   37  000FE624      4  void UIBattleGolf_ChooseClub::SetItemPos(const struct UIBattleGolf_ChooseClub* this, int32 inClipRowIndex, int32 inClipColumnIndex, float inPos)
+   61    inline-only   void UIBattleGolf_ChooseClub::ShowMenu(const struct UIBattleGolf_ChooseClub* this, struct UIResponseHandler* inpHandler, struct UIMenuItemBaseSrc* inMenuItemArray, int32 sizeMenu, int32 sizeofMenu, enum eMenuAllocType alloctype)
+   98  001034F0     1C  void UIBattleGolf_ChooseClub::GenerateBagOwnerText_func(struct IAptSubscriber* subs)
+   99  000FE904     18  enum TAptSequenceStatus UIBattleGolf_ChooseClub::Show_BattleGolfChooseAddRemoveScreen_Sequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+  108  001153A8     1C  void UIBattleGolf_ChooseClub::UpdateMenuItems_func(struct IAptSubscriber* subs)
+  109  00115434     1C  enum AptThreadReturnValue UIBattleGolf_ChooseClub::UpdateMenuItemsThread_func(struct IAptSubscriberBase* subs)

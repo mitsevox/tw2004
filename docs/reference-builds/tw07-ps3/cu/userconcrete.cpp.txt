@@ -1,0 +1,175 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/userconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 71 functions, source order. line | PS3 address | size
+
+   92  0062A378     54  void ~UserSendInviteOperation(const struct <anon>* this)
+                         inlines  ~OperationStrategy, ~RCPointer
+  122  006295B4     64  void ~ActionUserConcrete(const struct <anon>* this)
+                         inlines  ~RCPointer
+  125  00626500     4C  bool IsEnabled(const const struct <anon>* this)
+                         inlines  operator->
+  168  00603F5C    12C  void UserSendInviteOperation(const struct <anon>* this, struct User* pUser, const char8_t* strText, struct <anon>* pCallback)
+                         local  GameManagerRefT* pGameManager
+                         local  int32_t iCallbackId
+                         inlines  GetGameManagerApi, RCPointer, operator->
+  206  005C1688     14  void OperationCancel(const struct <anon>* this, const struct Operation* )
+  233  005D52A0     BC  bool OperationProcess(const struct <anon>* this, const struct Operation* )
+                         local  bool bContinue
+  285  005D1AD4     80  void GameManagerInviteCallback(LobbyApiRefT* , LobbyApiMsgT* pMsg, void* pUserData)
+                         local  struct <anon>* pThis
+                         local  struct <anon>* pFacadeConcrete
+                         local  int32_t iResult
+  369  005FA4B0     7C  void LobbyGetUserSuccess(const struct UserConcrete* this, LobbyApiUserT* pUser)
+                         inlines  operator=
+  402  005FA52C     C4  void LobbyGetUserFailure(const struct UserConcrete* this, const char8_t* , enum Failure eFailure)
+                         local  struct UserManagerConcrete* pUserMgr
+                         inlines  operator=
+  465  005C169C     14  void LobbyGetOnlineStateSuccess(const struct UserConcrete* this, const char8_t* )
+  490  005C16B0     14  void LobbyGetOnlineStateFailure(const struct UserConcrete* this, enum Failure )
+  517  0060D3F4     A8  void UserConcrete(const struct UserConcrete* this, const char8_t* strName)
+                         inlines  LobbyGetUserCallback, RCPointer
+  551  0060E65C    114  void ~UserConcrete(const struct UserConcrete* this)
+                         inlines  operator->, operator=, ~LobbyGetOnlineStateCallback, ~LobbyGetUserCallback, ~RCPointer
+  585  005C16DC     44  const char8_t* GetName(const const struct <anon>* this)
+  608  005C1720     A0  bool IsSameUser(const const struct <anon>* this, const struct User* pUser)
+  638  005C17C0     5C  bool IsSameUser(const const struct <anon>* this, const char8_t* strName)
+  662  005BCEF8     24  bool IsSameUser(const char8_t* strNameA, const char8_t* strNameB)
+  686  005CDD80     B4  bool IsLocalUser(const const struct <anon>* this)
+                         inlines  GetInstance
+  710  005D2C3C     8C  bool IsOnline(const const struct <anon>* this)
+                         local  bool bOnline
+                         local  HLBBudT* pBuddy
+                         local  int32_t iBuddyState
+  747  005D2BEC     50  bool IsBlocked(const const struct <anon>* this)
+                         local  bool bBlocked
+                         local  HLBBudT* pBuddy
+  783  005D2B60     8C  bool IsInSameTitle(const const struct <anon>* this)
+                         local  bool bSameTitle
+                         local  HLBBudT* pBuddy
+  819  005CF664     38  bool IsInSameRoom(const const struct <anon>* this)
+  843  005D2B2C     34  bool IsJoinable(const const struct <anon>* this)
+                         local  bool bJoinable
+                         local  HLBBudT* pBuddy
+  880  005D2A74     B8  void GetPresence(const const struct <anon>* this, char8_t* strBuffer, uint32_t uBufferSize)
+                         local  HLBBudT* pBuddy
+  917  005D29A8     CC  void GetExtendedPresence(const const struct <anon>* this, char8_t* strBuffer, uint32_t uBufferSize)
+                         local  HLBBudT* pBuddy
+  949  005D2974     34  bool IsBuddy(const const struct <anon>* this)
+  973  005D2914     60  bool IsFriend(const const struct <anon>* this)
+                         local  bool bIsFriend
+                         local  HLBBudT* pBuddy
+ 1013  005D28D0     44  const char8_t* GetProductTitle(const const struct <anon>* this)
+                         local  HLBBudT* pBuddy
+ 1044  005D2880     50  bool CanInteract(const const struct <anon>* this)
+                         local  bool bCanInteract
+                         local  HLBBudT* pBuddy
+ 1080  005FC558    260  const struct List<OSDK::Action>* GetActions(const const struct <anon>* this)
+                         local  struct UserManagerConcrete* pUserMgr
+                         local  const struct ListSorted<OSDK::ActionUserStrategy>* pAllActions
+                         local  uint32_t uActions
+                         local  struct List<OSDK::Action>* pValidActions
+                         local  uint32_t uIndex
+                         local  struct ActionUserStrategy* pActionStrategy
+                         inlines  ActionUserConcrete, GetElementAt, GetInstance, GetNumberOfElements, GetUserManagerConcrete, InsertElement, List, RCPointer
+ 1122  005CF5A4     C0  enum PingStatus GetPing(const const struct <anon>* this)
+                         local  const LobbyApiUserT* pLobbyUserInfo
+                         local  uint32_t uPingValue
+ 1168  005CF55C     48  uint32_t GetPingRaw(const const struct <anon>* this)
+                         local  const LobbyApiUserT* pLobbyUserInfo
+                         local  uint32_t uPingValue
+ 1199  005C181C      8  struct Operation* Ping(const struct UserConcrete* this, struct PingCallback* )
+ 1225  005FA5F0     F4  void CacheUserInfo(const struct UserConcrete* this)
+                         inlines  GetLobbyConcrete, operator=
+ 1253  005D3750     14  void ClearCachedUserInfo(const struct UserConcrete* this)
+                         inlines  SetDirty
+ 1280  00606E3C    190  struct Operation* SendPrivateMessage(const struct UserConcrete* this, uint32_t uKind, const char8_t* strMessage, struct MessagePrivateSendCallback* pCallback)
+                         local  struct DictionaryConcrete* pMessage
+                         inlines  GetLobbyConcrete, GetTagField
+ 1309  005CF4FC     60  int32_t GetColor(const const struct <anon>* this)
+                         local  const LobbyApiUserT* pLobbyUserInfo
+ 1344  005CF45C     A0  void GetStats(const const struct <anon>* this, void* pStruct, uint32_t uStructLen, const char8_t* strPattern)
+                         local  const LobbyApiUserT* pLobbyUserInfo
+ 1377  005CF414     48  const char8_t* GetAux(const const struct <anon>* this)
+                         local  const LobbyApiUserT* pLobbyUserInfo
+                         local  const char8_t* strAux
+ 1409  005CF3DC     38  uint32_t GetLocality(const const struct <anon>* this)
+                         local  const LobbyApiUserT* pLobbyUserInfo
+                         local  uint32_t uLocality
+ 1441  005CF384     58  void GetCountry(const const struct <anon>* this, char8_t* strBuf)
+                         local  const LobbyApiUserT* pLobbyUserInfo
+ 1470  005CF004    170  const LobbyApiUserT* GetLobbyUserInfo(const const struct <anon>* this, bool bCheckCache)
+                         local  const LobbyApiUserT* pUserInfo
+                         local  LobbyApiRefT* pLobbyApi
+                         local  uint32_t uTimeout
+                         inlines  GetLobbyApi, GetLobbyUserInfoCacheTimeout
+ 1535  005D26DC     70  HLBBudT* GetHLBBuddy(const const struct <anon>* this)
+                         local  HLBApiRefT* pHLBud
+                         inlines  GetBuddyApi
+ 1562  005CF34C     38  uint32_t GetRank(const const struct <anon>* this)
+                         local  const LobbyApiUserT* pLobbyUserInfo
+ 1596  005CF2E8     64  uint32_t GetProductLevel(const const struct <anon>* this)
+                         local  const LobbyApiUserT* pLobbyUserInfo
+                         local  uint32_t uLevel
+ 1628  005CF284     64  uint32_t GetGamerLevel(const const struct <anon>* this)
+                         local  const LobbyApiUserT* pLobbyUserInfo
+                         local  uint32_t uLevel
+ 1660  005CF220     64  uint32_t GetSocialLevel(const const struct <anon>* this)
+                         local  const LobbyApiUserT* pLobbyUserInfo
+                         local  uint32_t uLevel
+ 1695  005FA6E4    1D8  void RequestReputation(const struct UserConcrete* this)
+                         inlines  GetDashBoardUtil, operator=
+ 1713  005FA8BC     68  void UserGotReputation(const struct UserConcrete* this, float32_t iRep)
+                         local  struct UserManagerConcrete* pUserMgr
+                         inlines  operator=
+ 1721  005FA924     48  void UserFailedReputation(const struct UserConcrete* this)
+                         inlines  operator=
+ 1744  005E2684     DC  float32_t GetReputation(const const struct <anon>* this)
+                         local  const LobbyApiUserT* pLobbyUserInfo
+                         inlines  GetDashBoardUtil
+ 1792  005D3764     E8  void SetCachedLobbyUserInfo(const struct UserConcrete* this, const LobbyApiUserT* pUser)
+                         inlines  SetDirty
+ 1834  005E2184     90  enum VoiceStatus GetVoiceStatus(const const struct <anon>* this)
+                         local  enum VoiceStatus eStatus
+ 1873  005C1824     60  enum VoiceStatus GetLocalUserVoiceStatus(const const struct <anon>* this)
+                         local  enum VoiceStatus eStatus
+                         local  VoipRefT* pVoip
+                         local  int32_t iStatus
+ 1909  005E20F0     94  enum VoiceStatus GetChattingUserVoiceStatus(const const struct <anon>* this)
+                         local  enum VoiceStatus eStatus
+                         local  struct VoiceUser* pUser
+ 1953  005D274C    134  enum VoiceStatus GetRemoteUserVoiceStatus(const const struct <anon>* this)
+                         local  enum VoiceStatus eStatus
+                         local  HLBBudT* pBuddy
+                         local  const LobbyApiUserT* pLobbyUserInfo
+ 2021  005E20BC     34  bool IsInVoiceChat(const const struct <anon>* this)
+ 2047  005CF1E4     3C  const DirtyAddrT* GetMachineAddress(const const struct <anon>* this)
+                         local  const LobbyApiUserT* pLobbyUserInfo
+ 2079  005CF1AC     38  uint32_t GetExternalAddress(const const struct <anon>* this)
+                         local  const LobbyApiUserT* pLobbyUserInfo
+ 2111  005CF174     38  uint32_t GetInternalAddress(const const struct <anon>* this)
+                         local  const LobbyApiUserT* pLobbyUserInfo
+ 2143  005CE198     74  const char8_t* GetSessionId(const const struct <anon>* this)
+                         local  HLBApiRefT* pHLBud
+ 2175  006072DC     F4  enum LobbyState GetLobbyState(const struct UserConcrete* this)
+                         inlines  GetLobbyConcrete
+ 2212  005C1884     50  void ValidateCachedUserInfo(const struct UserConcrete* this)
+ 2240  005C18D4     CC  bool IsInOSDK(const const struct <anon>* this)
+                         local  bool bInOSDK
+                         local  char8_t[128] strExtendedPresence
+                         local  struct <anon> dict
+                         local  int32_t iOSDK
+ 2277  006041B4     F0  struct Operation* SendInvite(const struct UserConcrete* this, const char8_t* strMessage, struct <anon>* pCallback)
+                         local  struct <anon>* pSendInviteStrategy
+                         inlines  GetOperationManagerConcrete
+ 2302  005E1FB0    10C  struct VoiceUser* GetVoiceUser(const const struct <anon>* this)
+                         local  struct PeerConnectionManagerConcrete* pPeerMgr
+                         local  const struct List<OSDK::VoiceUser>* pVoiceUsers
+                         local  uint32_t uNumUsers
+                         local  uint32_t uIndex
+                         local  struct VoiceUser* pCurUser
+                         inlines  GetElementAt, GetNumberOfElements, GetPeerConnectionManagerConcrete
+ 2341  00609870     28  struct Operation* SendGameInvitation(const struct UserConcrete* this, const struct Dictionary* pParameters, struct InvitationSendCallback* pCallback)
+ 2365  005E226C     58  struct InvitationIncoming* GetIncomingGameInvitation(const const struct <anon>* this)
+ 2389  005E2214     58  struct InvitationOutgoing* GetOutgoingGameInvitation(const const struct <anon>* this)
+ 2413  005C19A0     50  bool IsInvitingMeToGame(const const struct <anon>* this)
+ 2437  005C19F0     50  bool IAmInvitingToGame(const const struct <anon>* this)

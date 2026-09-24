@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/packages/RNA/dev-2.0-golf/RNA/RNACore/include/RNARender/PS3/RNARender/RNAIndices.h
+// compiled in: rnaunity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   52    inline-only   struct UserData* GetUserData(const const struct <anon>* this)
+   52    inline-only   void SetUserData(const struct IndicesC* this, struct UserData* pData)

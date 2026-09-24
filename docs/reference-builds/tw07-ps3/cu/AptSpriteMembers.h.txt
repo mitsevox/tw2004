@@ -1,0 +1,10 @@
+// ../../../../../TIGERCODE/Code/AptInterface/AptPackage/AptSpriteMembers.h
+// compiled in: other_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   22    inline-only   unsigned int SpriteMembersIndex::hash(const char* str, unsigned int len)
+                         local  int hval
+   45  003EF0A0    104  const struct SpriteMembers* SpriteMembersIndex::in_word_set(const char* str, unsigned int len)
+                         local  int key
+                         local  const char* s
+                         inlines  SpriteMembersIndex::hash

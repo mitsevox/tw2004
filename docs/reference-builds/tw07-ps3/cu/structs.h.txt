@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/CourseData/structs.h
+// compiled in: headgate_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+  178  00379C84      C  short unsigned int* MAKE_PTR<short unsigned int>(short unsigned int* base, int offset)
+  178  00379C90      C  unsigned char* MAKE_PTR<unsigned char>(unsigned char* base, int offset)
+  266  00345264    198  void tagPolyObject::tagPolyObject(const struct tagPolyObject* this)
+                         inlines  tagPolyGroup::tagPolyGroup
+  267  003453FC    1C8  void tagPolyObject::~tagPolyObject(const struct tagPolyObject* this)
+                         local  int i
+                         local  const struct tagPolyGroup& group
+  311    inline-only   short unsigned int* tagPolyObject::GetPolys(const struct tagPolyObject* this, int i)
+  312    inline-only   void* tagPolyObject::GetPoints(const struct tagPolyObject* this, int i)

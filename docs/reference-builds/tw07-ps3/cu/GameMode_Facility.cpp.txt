@@ -1,0 +1,26 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_Facility.cpp
+// compiled in: golf_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   23  002041A8     40  void GameModeFacility::GameModeFacility(const struct GameModeFacility* this)
+   28  00201F04     18  void GameModeFacility::~GameModeFacility(const struct GameModeFacility* this)
+   34  002CE240    21C  void GameModeFacility::Init(const struct GameModeFacility* this)
+                         local  enum Golfer_t golferOpponent
+                         inlines  GamePlayerManager::SetPlayerCount
+   88  002CE138    108  void GameModeFacility::InitGameStatesForPracticeFacility()
+                         inlines  GM_SelectHoleSet, GM_SelectSingleHole, GM_SetCurrentCourseID
+  108  00201FF4      4  void GameModeFacility::Update(const struct GameModeFacility* this)
+  115  00201FF8     40  void GameModeFacility::Shutdown(const struct GameModeFacility* this)
+  120  00202038     40  void GameModeFacility::EndGame(const struct GameModeFacility* this)
+  128  00202078      8  enum GM_AllowAnimationsTypes_t GameModeFacility::GetPreShotAnimationsMode(const struct GameModeFacility* this)
+  136  00202080     6C  void GameModeFacility::EndGolferTurn(const struct GameModeFacility* this, enum PlayerNumber_t PlayerID)
+  148  002D161C     B4  void GameModeFacility::SetupNextGolfer(const struct GameModeFacility* this)
+                         local  int32 i
+                         local  const bit32 availableClubs
+  179  002020EC     1C  bool GameModeFacility::QueryInterface(const struct GameModeFacility* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bret
+  195  002AC150      4  void GameModeFacility::DisplayGameModeInfo(const struct GameModeFacility* this)
+                         local  struct GameModeDriverFacility* pFacilityDriver
+  202  002CA634    184  void GameModeFacility::ForceGolferToLookSomewhereUseful(const struct GameModeFacility* this)
+                         local  const float[4] vLookPos
+                         inlines  AIMgr, GM_SetTargetCup, GUI_UpdateShotUIData, vec4flt_Copy

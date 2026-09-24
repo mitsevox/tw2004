@@ -1,0 +1,29 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/PS3/RNAVertexElement.cpp
+// compiled in: RNAVertexElement.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   98  00846060     A4  uint32_t RNA::ElementFormatGetVectorSize(enum ElementFormatE eFormat)
+                         local  const char[27] __FUNCTION__
+                         inlines  RNADebugBreak
+  104  00846104     A4  uint32_t RNA::ElementFormatGetSize(enum ElementFormatE eFormat)
+                         local  const char[21] __FUNCTION__
+                         inlines  RNADebugBreak
+  110  008461A8     A4  uint32_t RNA::ElementFormatGetAlignment(enum ElementFormatE eFormat)
+                         local  const char[26] __FUNCTION__
+                         inlines  RNADebugBreak
+  117  0084624C     9C  const char* RNA::ElementFormatGetName(enum ElementFormatE eFormat)
+                         local  const char[21] __FUNCTION__
+                         inlines  RNADebugBreak
+  123  00845E5C     AC  bool8_t RNA::ElementFormatFindByName(const char* pStrName, const enum ElementFormatE& eFormat)
+                         local  int32_t i
+  151  008462E8    230  bool RNA::ElementResolveName(const char* pName, const enum ElementNameE& eElementName, const uint32_t& index)
+                         local  const char[19] __FUNCTION__
+                         local  char[256] name
+                         local  uint32_t i
+                         inlines  RNADebugBreak, std::isdigit, std::toupper
+  195  00846518    128  bool8_t RNA::ElementNameToCharCode(enum ElementNameE eElementName, const char8_t& cName)
+                         local  const char[22] __FUNCTION__
+                         inlines  RNADebugBreak
+  217  00845F08    158  bool8_t RNA::ElementNameFromCharCode(char8_t cName, const enum ElementNameE& eName)
+                         local  const char[24] __FUNCTION__
+                         inlines  RNADebugBreak

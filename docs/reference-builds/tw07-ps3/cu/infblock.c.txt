@@ -1,0 +1,31 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Shared/XceedZip_ZLib64/infblock.c
+// compiled in: other_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   67  003F75A0    120  void inflate_blocks_reset(inflate_blocks_statef* s, z_streamp z, uLongf* c)
+   88  003F76C0    1BC  inflate_blocks_statef* inflate_blocks_new(z_streamp z, check_func c, uInt w)
+                         local  inflate_blocks_statef* s
+  116  003FA244   111C  int inflate_blocks(inflate_blocks_statef* s, z_streamp z, int r)
+                         local  uInt t
+                         local  uLong b
+                         local  uInt k
+                         local  Bytef* p
+                         local  uInt n
+                         local  Bytef* q
+                         local  uInt m
+                         local  inflate_huft* h
+                         local  uInt i
+                         local  uInt j
+                         local  uInt c
+                         local  uInt bl
+                         local  uInt bd
+                         local  inflate_huft* tl
+                         local  inflate_huft* td
+                         local  inflate_codes_statef* c
+                         local  uInt bl
+                         local  uInt bd
+                         local  inflate_huft* tl
+                         local  inflate_huft* td
+  391  003F7BE8     E0  int inflate_blocks_free(inflate_blocks_statef* s, z_streamp z)
+  402  003F7CC8     54  void inflate_set_dictionary(inflate_blocks_statef* s, const Bytef* d, uInt n)
+  413  003F7D1C     14  int inflate_blocks_sync_point(inflate_blocks_statef* s)

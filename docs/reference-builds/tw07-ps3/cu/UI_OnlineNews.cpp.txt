@@ -1,0 +1,28 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_OnlineNews.cpp
+// compiled in: apt_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   36  000F7524     A4  void UIOnlineNews::UIOnlineNews(const struct UIOnlineNews* this)
+                         inlines  TAptArrayStruct, TArrayInternal<char*,AptStructSwapper>::TArrayInternal, TExternArray<UIOnlineNews::DstMenuItem_olns>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   41  000F0710     84  void UIOnlineNews::Init(const struct UIOnlineNews* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   52  0004818C     58  void UIOnlineNews::OnShow(const struct UIOnlineNews* this)
+   63  000B4CA8    304  void UIOnlineNews::Show(const struct UIOnlineNews* this, char* News)
+                         local  const char[5] __FUNCTION__
+                         local  int32 numElements
+                         local  int i
+                         local  char** szNewLine
+                         inlines  AptStructSwapper::Swap, TArrayInternal<char*,AptStructSwapper>::Push, TagValuePair, operator+
+   84  000D8928     B0  void UIOnlineNews::Hide(const struct UIOnlineNews* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<char*,AptStructSwapper>::Flush
+   98  000BE668     94  void UIOnlineNews::UpdateItemAndLabel(const struct UIOnlineNews* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_olns* dest
+                         inlines  TArrayInternal<char*,AptStructSwapper>::operator[]
+  106  00084724    140  enum eAptHandleInput UIOnlineNews::HandleInput(const struct UIOnlineNews* this, int32 cID)
+  136  000D89D8     70  void UIOnlineNews::Close(const struct UIOnlineNews* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<char*,AptStructSwapper>::Flush
+  146  000BE6FC    228  void UIOnlineNews::RefreshNews(const struct UIOnlineNews* this, const char* szNews, int iNewsSize)
+                         local  int index
+                         local  char* szLine
+                         local  char* szNextLine
+                         inlines  TArrayInternal<char*,AptStructSwapper>::operator[]

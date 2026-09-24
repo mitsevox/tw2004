@@ -1,0 +1,24 @@
+// ../../../../../TIGERCODE/Code/Golf/GameMode/Headers/GameModeDriver_Era.h
+// compiled in: apt_unity.cpp, golf_unity.cpp
+// 20 functions, source order. line | PS3 address | size
+
+  272  0033E894      8  int32 GameModeDriverEra::GetPgaTourTournament(const struct GameModeDriverEra* this, GM_PgaTourEventID_t eventID)
+  274  0033E89C      8  int32 GameModeDriverEra::GetAnyRoundLowScore(const struct GameModeDriverEra* this, int32 tour_num)
+  279  0033E8A4     14  const float GameModeDriverEra::GetHistoricStatsData(const struct GameModeDriverEra* this, int golferID, int32 statIndex)
+  280  0033E8B8      8  const char* GameModeDriverEra::GetHistoricStatsGolferName(const struct GameModeDriverEra* this, int golferID)
+  281  0033E8C0      8  const char* GameModeDriverEra::GetInitialChampName(const struct GameModeDriverEra* this, GM_PgaTourEventID_t eventID)
+  282  0033E8C8      8  int32 GameModeDriverEra::GetInitialChampScore(const struct GameModeDriverEra* this, GM_PgaTourEventID_t eventID)
+  283  0033E8D0      8  uint16 GameModeDriverEra::GetCurrentBracket(const struct GameModeDriverEra* this, enum PlayerNumber_t userID)
+  284  0033E8D8      8  GM_PgaTourEventID_t GameModeDriverEra::GetFinalEventOfSeason(const struct GameModeDriverEra* this)
+  285  0033E8E0      8  const struct GM_PgaTour_EventSlot_t* GameModeDriverEra::GetEventInfo(const struct GameModeDriverEra* this, GM_PgaTourEventID_t eventID)
+  286  0033E8E8      8  int32 GameModeDriverEra::GetCourses(const struct GameModeDriverEra* this, const struct GM_PgaTour_EventSlot_t* eventInfo, enum GM_CourseType_t* courses)
+  287  0033E8F0      8  int32 GameModeDriverEra::GetPurseForBracket(const struct GameModeDriverEra* this, GM_PgaTourEventID_t eventID, int32 bracket)
+  288  0033E8F8      8  int32 GameModeDriverEra::GetFirstPrizeForBracket(const struct GameModeDriverEra* this, GM_PgaTourEventID_t eventID, int32 bracket)
+  291  0033E900      8  int32 GameModeDriverEra::GetDevPointsFirstPrizeForBracket(const struct GameModeDriverEra* this, GM_PgaTourEventID_t eventID, int32 bracket)
+  292  0033E908      8  CalendarDate GameModeDriverEra::GetEndDate(const struct GameModeDriverEra* this, GM_PgaTourEventID_t eventID, int32 season)
+  293  0033E910      8  int32 GameModeDriverEra::GetCurrentSeason(const struct GameModeDriverEra* this)
+  294  0033E918      4  void GameModeDriverEra::AwardMoney(const struct GameModeDriverEra* this, enum PlayerNumber_t userID, int32 cash)
+  297    inline-only   int32 GameModeDriverEra::GetNumEvents(const struct GameModeDriverEra* this)
+  310  0033E91C      8  bool GameModeDriverEra::AIUseDisplayStats(const struct GameModeDriverEra* this)
+  312  0033E924      8  bool GameModeDriverEra::GiveExperience(const struct GameModeDriverEra* this)
+  362    inline-only   void GameModeDriverEra::ClearCutsceneTriggeredForEvent(const struct GameModeDriverEra* this)

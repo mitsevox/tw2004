@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_TerrainClipping.cpp
+// compiled in: shader_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   36  0051A9A4     48  void SM_TerrainClippingClass::SM_TerrainClippingClass(const struct SM_TerrainClippingClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base
+   49  00505E80    148  void SM_TerrainClippingClass::Load(const struct SM_TerrainClippingClass* this)
+   67  00505FC8     80  void SM_TerrainClippingClass::Activate(const struct SM_TerrainClippingClass* this)
+   77  00506048     38  void SM_TerrainClippingClass::Deactivate(const struct SM_TerrainClippingClass* this)
+   83  00510520     60  void SM_TerrainClippingClass::SetGrassID(const struct SM_TerrainClippingClass* this, float grassID)
+   92  00510580     88  void SM_TerrainClippingClass::SetShadowInfo(const struct SM_TerrainClippingClass* this, float minShadowY, float heightMult)
+  104  00510608     64  void SM_TerrainClippingClass::SetLightmapTexture(const struct SM_TerrainClippingClass* this, TextureRef texRef)

@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_OnlineEAMessenger.h
+// compiled in: apt_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   57  0011AF90    160  void UIOnlineEAMessenger::~UIOnlineEAMessenger(const struct UIOnlineEAMessenger* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIOnlineEAMessenger::DstMenuItem_omsg>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+   60    inline-only   void UIOnlineEAMessenger::Close(const struct UIOnlineEAMessenger* this)
+   64  000FF920      C  uint32 UIOnlineEAMessenger::GetSignature(const const struct UIOnlineEAMessenger* this)
+   66  000FF934      C  struct IExternArray* UIOnlineEAMessenger::GetExternArray(const struct UIOnlineEAMessenger* this)
+   87  000FF940     14  enum AptThreadReturnValue UIOnlineEAMessenger::CheckConnection_func(struct IAptSubscriberBase* subs)

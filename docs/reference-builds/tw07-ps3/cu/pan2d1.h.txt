@@ -1,0 +1,5 @@
+// C:/packages/rwaudiocore/2.08.01/include/rw/audio/core/plugins/pan2d1.h
+// compiled in: pan2d1.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   90  006D9A64      8  unsigned int GetSize(struct PlugInConfig* )

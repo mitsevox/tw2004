@@ -1,0 +1,15 @@
+// ../ears_rt_cct/dev/api/ears_rt_cct/SkeletonFilter.h
+// compiled in: Character.cpp, ChrCntl_Character.cpp, ChrCntl_FrameUtil.cpp, Frame.cpp, FrameBuilder.cpp, SkeletonFilter.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   59  0059ADB8      C  void SkeletonFilter(const struct <anon>* this, uint8_t* buffer, int32_t boneCount)
+   62  0059ADD0      4  void ~SkeletonFilter(const struct <anon>* this)
+   65    inline-only   const uint8_t* GetBuffer(const const struct <anon>* this)
+   68    inline-only   int32_t GetBoneCount(const const struct <anon>* this)
+   94    inline-only   int32_t Size(int32_t boneCount)
+   99    inline-only   int32_t Slot(int32_t boneIndex)
+  104    inline-only   int32_t Bit(int32_t boneIndex)
+  134    inline-only   int32_t GetID(const const struct SkeletonFilterRef* this)
+  135    inline-only   struct <anon>* GetFilter(const const struct SkeletonFilterRef* this)
+  169    inline-only   struct <anon>* GetFilter(const struct <anon>* this)
+  172    inline-only   const struct <anon>* GetFilter(const const struct <anon>* this)

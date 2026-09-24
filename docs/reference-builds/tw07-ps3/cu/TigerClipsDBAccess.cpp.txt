@@ -1,0 +1,97 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/TigerClips/TigerClipsDBAccess.cpp
+// compiled in: golf_unity.cpp
+// 32 functions, source order. line | PS3 address | size
+
+   27  0021F00C    1C4  struct TigerClipsDBAccess* TigerClipsDBAccess::GetSingleton()
+                         local  struct TigerClipsDBAccess accessInstance
+                         inlines  TigerClipsDBAccess::TigerClipsDBAccess
+   62  0021EDE0     20  void TigerClipsDBAccess::Init(const struct TigerClipsDBAccess* this)
+                         local  int32 i
+   86  00312208    224  void TigerClipsDBAccess::SaveStroke(const struct TigerClipsDBAccess* this, enum PlayerNumber_t playerNumber)
+                         local  int32 zipError
+                         local  uLongf compressedSize
+                         local  int32 uncompressedSize
+                         local  int32 currentHole
+                         local  int32 strokeNum
+                         local  int32 currentCourse
+                         local  uint32 fileID
+                         local  char8_t[64] fileName
+                         local  enum TDbError error
+                         inlines  GM_GetPlayerHoleStrokes
+  163  00312558    1CC  void TigerClipsDBAccess::LoadStroke(const struct TigerClipsDBAccess* this, int32 episodeId)
+                         local  int32 currentHole
+                         local  int32 strokeNum
+                         local  int32 currentCourse
+                         local  char8_t[64] fileName
+                         local  int32 fileLength
+                         local  int32 compressedBufferSize
+                         local  uint32 uncompressedBufferSize
+                         local  char* data
+                         local  enum TDbError error
+                         inlines  GM_GetPlayerHoleStrokes
+  234  002228DC     9C  void TigerClipsDBAccess::SaveEpisode(const struct TigerClipsDBAccess* this, enum EpisodeType_t episodeType, char8_t* episodeName, enum PlayerNumber_t playerNumber)
+  270  002227AC    130  void TigerClipsDBAccess::SaveAllStrokes(const struct TigerClipsDBAccess* this, char8_t* episodeName, enum PlayerNumber_t playerNumber, enum EpisodeType_t episodeType)
+                         local  uint32 episodeID
+                         local  enum TDbError error
+  325  002225AC    200  void TigerClipsDBAccess::SaveSingleShot(const struct TigerClipsDBAccess* this, char8_t* episodeName, enum PlayerNumber_t playerNumber, enum EpisodeType_t episodeType)
+                         local  uint32 episodeID
+                         local  int32 strokeBufferSize
+                         local  int32 holeNum
+                         local  int32 courseNum
+                         local  int32 strokeNum
+                         local  enum TDbError error
+                         local  int32 episodeStrokeCount
+  413  00222580     2C  uint32 TigerClipsDBAccess::CreateNewEpisodeId(const struct TigerClipsDBAccess* this)
+                         local  int32 returnValue
+                         local  time_t rawtime
+  449  00222978     8C  int32 TigerClipsDBAccess::GetNumberOfEpisodes(const struct TigerClipsDBAccess* this)
+                         local  int32 count
+                         local  enum TDbError error
+  483  00222A04    104  int32 TigerClipsDBAccess::GetEpisodeStrokeCount(const struct TigerClipsDBAccess* this, int32 episodeID)
+                         local  int32 countFromStrokeTbl
+                         local  int32 countFromEpisodeTbl
+                         local  enum TDbError error
+  543  00222B08    1C8  bool TigerClipsDBAccess::GetFirstStrokeData(const struct TigerClipsDBAccess* this, int32 episodeID, struct tTcDbStrokeDataInfo* strokeDataInfo)
+                         local  char8_t[64] strokeFileName
+                         local  enum TDbError error
+  637  00222CD0    120  bool TigerClipsDBAccess::GetNextStrokeData(const struct TigerClipsDBAccess* this, struct tTcDbStrokeDataInfo* strokeDataInfo)
+                         local  enum TDbError error
+                         local  char8_t[64] strokeFileName
+  715  00222DF0    180  void TigerClipsDBAccess::GetFirstEpisodeInfo(const struct TigerClipsDBAccess* this, struct tEpisodeInfo* episodeInfo)
+                         local  enum TDbError error
+  770  00222F70    150  void TigerClipsDBAccess::GetNextEpisodeInfo(const struct TigerClipsDBAccess* this, struct tEpisodeInfo* episodeInfo)
+                         local  enum TDbError error
+  825  002230C0     D4  struct tEpisodeInfo* TigerClipsDBAccess::GetEpisodeInfo(const struct TigerClipsDBAccess* this, int32 episodeID, struct tEpisodeInfo* episodeInfoBuffer)
+                         local  enum TDbError error
+  861  00223194     2C  static voidpf myzcalloc_tcdb(voidpf opaque, unsigned int items, unsigned int size)
+  862  002231C0     28  static void myzcfree_tcdb(voidpf opaque, voidpf ptr)
+  882  0022247C    104  int32 TigerClipsDBAccess::mycompress(const struct TigerClipsDBAccess* this, Bytef* dest, uLongf* destLen, const Bytef* source, uLong sourceLen, int level)
+                         local  z_stream stream
+                         local  int err
+  924  002231E8    244  int32 TigerClipsDBAccess::mydecompress(const struct TigerClipsDBAccess* this, unsigned char* src, uint32 srcSize, unsigned char* dst, uint32 dstSize)
+                         local  z_stream stream
+                         local  int zlibret
+  984  0029CB58     80  void TigerClipsDBAccess::LoadPersistentDb(const struct TigerClipsDBAccess* this)
+                         local  enum TDbError error
+                         local  char8_t[64] fullPath
+ 1011  0022342C      4  void TigerClipsDBAccess::RemoveUnsavedStrokeFiles(const struct TigerClipsDBAccess* this)
+ 1025  002913FC    258  void TigerClipsDBAccess::SaveToPersistentDb(const struct TigerClipsDBAccess* this)
+                         local  enum TDbError error
+                         local  char8_t[64] fullPath
+                         local  int32 i
+                         local  int32 count
+                         local  struct <anon> dbCursor
+ 1119  00223430    1BC  bool CO_TcListEpisodes(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  int32 episodeCount
+                         local  int32 i
+                         local  char8_t[128] printBuffer
+                         local  struct tEpisodeInfo episodeInfo
+ 1168  0029CBD8     40  bool CO_TcLoadPersistent(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1176  00291654     28  bool CO_TcSavetoPersistent(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1182  002235EC     64  bool CO_TcSaveLasShotAsEpisode(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1188  00223650     64  bool CO_TcSave18HoleEpisode(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1194  002236B4     64  bool CO_TcSaveLastShotAsDriveEpisode(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1200  00223718     64  bool CO_TcSave9HoleEpisode(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1206  0022377C     24  bool CO_TcCleanup(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1212  002237A0     8C  bool CO_TcHelp(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+ 1242  0021ECE0    100  void TigerClipsDBAccess::InitOnce(const struct TigerClipsDBAccess* this)

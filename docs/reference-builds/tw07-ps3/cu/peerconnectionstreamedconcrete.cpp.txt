@@ -1,0 +1,43 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/peerconnectionstreamedconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   70  005D7F0C     84  NetGameDistStreamT* StreamCreate(const struct <anon>* this, uint32_t uIdent, uint32_t uQueueSize, uint32_t uSyncSize)
+                         local  NetGameDistRefT* pGameDistRef
+                         inlines  operator->
+   96  005D7FE0     64  void StreamDestroy(const struct <anon>* this, NetGameDistStreamT* pStream)
+                         local  NetGameDistRefT* pGameDistRef
+                         inlines  operator->
+  124  005D08B8     A8  NetGameDistStreamT* GetStream(const const struct <anon>* this, uint32_t uIdent)
+                         local  uint32_t uNumStreams
+                         local  NetGameDistStreamT* pStream
+                         local  uint32_t uIndex
+                         inlines  GetNumberOfElements
+  159  005D811C     BC  void ProcessComplete(const struct <anon>* this)
+                         local  NetGameLinkRefT* pGameLinkRef
+                         local  const NetGameLinkStatT* pGameLinkStat
+                         local  NetGameDistRefT* pGameDistRef
+                         inlines  operator->
+  200  005EB0CC     A8  void PeerConnectionStreamedConcrete(const struct <anon>* this, struct PeerConnectionConcrete* pPeerConnection)
+                         inlines  AddObserver, RCPointer
+  227  005E5620     E4  void ~PeerConnectionStreamedConcrete(const struct <anon>* this)
+                         local  uint32_t uNumStreams
+                         local  NetGameDistStreamT* pStream
+                         local  uint32_t uIndex
+                         inlines  GetNumberOfElements, RemoveObserver, ~RCPointer
+  262  005D7F90     50  void CreateStream(const struct <anon>* this, uint32_t uIdent, uint32_t uQueueSize, uint32_t uSyncSize)
+                         local  NetGameDistStreamT* pStream
+  290  005D8044     D8  void DestroyStream(const struct <anon>* this, uint32_t uIdent)
+                         local  uint32_t uNumStreams
+                         local  uint32_t uIndex
+                         local  NetGameDistStreamT* pStream
+                         inlines  GetNumberOfElements
+  328  005D09CC     34  bool StreamExists(const const struct <anon>* this, uint32_t uIdent)
+  354  005D0960     6C  void SendStreamMessage(const struct <anon>* this, uint32_t uIdent, int32_t iKind, const void* pMessage, uint32_t uSize)
+                         local  NetGameDistStreamT* pStream
+  381  005BD2E8     20  void MesgRecv(NetGameDistStreamT* pStream, int32_t iKind, void* pBuffer, int32_t nLength)
+                         local  struct <anon>* pConnection
+  406  005BD200     E8  void HandleMesgRecv(const struct <anon>* this, NetGameDistStreamT* pStream, int32_t iKind, void* pBuffer, int32_t nLength)
+                         local  uint32_t uNumElements
+                         local  struct PeerConnectionStreamedObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList

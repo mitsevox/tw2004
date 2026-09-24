@@ -1,0 +1,34 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_allocator.cpp
+// compiled in: tiger_module_allocator.cpp
+// 19 functions, source order. line | PS3 address | size
+
+    0  005222AC     60  void ~Allocator(const struct <anon>* this)
+                         inlines  ~IAllocator
+   13  00521DD0    2A8  void* Alloc(const struct <anon>* this, size_t size, const const struct <anon>& tags)
+                         local  const struct <anon>* tagPtr
+                         local  unsigned int align
+                         local  void* ptr
+                         inlines  Lock
+   75  00522078    1E4  void Free(const struct <anon>* this, void* block, size_t )
+                         local  const unsigned int blockSize
+                         inlines  Lock
+  102  005215E4      8  int AddRef(const struct <anon>* this)
+  106  005215EC      8  int Release(const struct <anon>* this)
+  112  005215F4     84  void ReInit(const struct <anon>* this)
+  120  00521694     94  void Init(const struct <anon>* this, void* pInitialCore, size_t nInitialCoreSize)
+  131  00521678     1C  void Zero(const struct <anon>* this)
+  140  00521728     18  bool IsEmpty(const struct <anon>* this)
+  145  00521740     3C  void Shutdown(const struct <anon>* this)
+  156  0052177C     24  void TigerModule::AllocatorTraceFunction(const char* pTraceText, void* pContext)
+  162  005217A0     D8  bool VerifyEmpty(const struct <anon>* this)
+  177  00521878      8  unsigned int GetUsedSize(const const struct Allocator* this)
+  182  00521880      8  unsigned int GetInitialSize(const const struct Allocator* this)
+  187  00521888      8  unsigned int GetMaxUsed(const const struct Allocator* this)
+  192  0052189C     18  void AllocatorProfile(const struct <anon>* this)
+  197  00521890      C  void Init(const struct <anon>* this)
+  203  005218CC    318  void AddAllocator(const struct <anon>* this, const char* name, const struct Allocator* allocator, float red, float green, float blue)
+  223  00521BE4    1EC  void Render(const const struct <anon>* this)
+                         local  unsigned int i
+                         local  const struct Allocator* allocator
+                         local  float size
+                         local  float maxSize

@@ -1,0 +1,37 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNAScope/RNAMapping.cpp
+// compiled in: RNAMapping.cpp
+// 17 functions, source order. line | PS3 address | size
+
+    0  0081FD04     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   72  00820560     44  void MapInputC(const struct MapInputC* this)
+   99  0081FBC0      4  void OnExecute(const struct MapInputC* this)
+  104  0081FBC4     34  void BindTo(const struct MapInputC* this, struct ScopeParmC* pScopeParm)
+  155  0081FBF8     24  void BindTo(const struct <anon>* this, struct ScopeParmC* pScopeParm)
+  180  0081FC1C     70  void MappingC(const struct MappingC* this, struct DeviceC* pDevice)
+                         inlines  LinkNodeDouble
+  202  0081FDA4     D0  void ~MappingC(const struct MappingC* this)
+                         local  const char[10] __FUNCTION__
+                         inlines  RNADebugBreak
+  235  0081FCC8     3C  void ResetInputList(const struct MappingC* this)
+  261  0081FC8C     3C  void ResetOutputList(const struct MappingC* this)
+  291  00820384     CC  void AddInput(const struct MappingC* this, const struct MapInputC& MapInput, const char* pScopeBlockName, enum TypeID idType, const char* pStrName, uint32_t uCount)
+                         local  const char[9] __FUNCTION__
+                         inlines  RNADebugBreak
+  322  008200F8     A0  void AddInput(const struct MappingC* this, const struct MapInputC& MapInput, struct ScopeParmC* pScopeParm)
+                         local  const char[9] __FUNCTION__
+                         inlines  RNADebugBreak
+  358  00820198     CC  void AddOutput(const struct MappingC* this, const struct <anon>& MapOutput, const char* pScopeBlockName, enum TypeID idType, const char* pStrName, uint32_t uCount)
+                         local  const char[10] __FUNCTION__
+                         inlines  RNADebugBreak
+  390  00820020     D8  void AddOutput(const struct MappingC* this, const struct <anon>& MapOutput, struct ScopeParmC* pScopeParm)
+                         local  const char[10] __FUNCTION__
+                         inlines  RNADebugBreak
+  428  008204C0     A0  void OnExecute(const struct MappingC* this, ScopeMaskT uScopeMask)
+                         local  struct MapInputC* pMapInput
+                         inlines  GetFirstInput, GetNext
+  462  00820264    120  void Print(const const struct <anon>* this)
+                         local  struct MapInputC* pInput
+                         local  struct <anon>* pOutput
+                         inlines  GetFirstInput, GetFirstOutput, GetNext
+  486  0081FD84     10  static void _GLOBAL__I__ZN3RNA9MapInputCC2Ev()
+  487  0081FD94     10  static void _GLOBAL__D__ZN3RNA9MapInputCC2Ev()

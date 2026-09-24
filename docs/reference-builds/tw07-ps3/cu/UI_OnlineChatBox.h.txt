@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_OnlineChatBox.h
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   20  00118268    160  void UIOnlineChatBox::~UIOnlineChatBox(const struct UIOnlineChatBox* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIOnlineChatBox::DstMenuItem_olcb>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+   22  000FF63C      C  uint32 UIOnlineChatBox::GetSignature(const const struct UIOnlineChatBox* this)
+   29  000FF648      4  void UIOnlineChatBox::ShowHelpText(const struct UIOnlineChatBox* this)
+   39  000FF654      C  struct IExternArray* UIOnlineChatBox::GetExternArray(const struct UIOnlineChatBox* this)

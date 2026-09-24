@@ -1,0 +1,68 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/src/Ska/SKA_Util.c
+// compiled in: SKA_Util.c
+// 25 functions, source order. line | PS3 address | size
+
+   21    inline-only   static uint16_t GetDelta(uint8_t** ppRead, uint8_t* pBitPos)
+                         local  uint8_t* pRead
+                         local  uint16_t delta
+  159    inline-only   static uint64_t _GetAxisMask(uint64_t* fullMask, int32_t fullIndex)
+                         local  int32_t slotIndex
+                         local  uint64_t slotMask
+  176  005A4580    1F8  void SKAUtil_EulerAnglesToQTs8(TAnimDataCursor* pCursor, Quat* pDest, int32_t iBegin, int32_t iEnd)
+                         local  uint64_t axis
+                         local  uint64_t axis
+  239  005A4778    1F4  void SKAUtil_EulerAnglesToQTs16(TAnimDataCursor* pCursor, Quat* pDest, int32_t iBegin, int32_t iEnd)
+                         local  uint64_t axis
+                         local  uint64_t axis
+  301  005A54B0   1EE4  void SKAUtil_EulerAnglesToQTs(AnimDataCursor* pCursor, Quat* pDest, int32_t iBegin, int32_t iEnd)
+                         local  uint16_t yDelta
+                         local  uint16_t pDelta
+                         local  uint16_t rDelta
+                         local  uint64_t axis
+                         local  uint64_t axis
+                         inlines  GetDelta
+  398  005A3B24    19C  void SKAUtil_EulerAnglesToQTsStatic(TAnimDataCursor* pCursor, Quat* pDest, int32_t iBegin, int32_t iEnd)
+  425  005A3CC0    19C  void SKAUtil_EulerAnglesToQTsStatic(AnimDataCursor* pCursor, Quat* pDest, int32_t iBegin, int32_t iEnd)
+  452  005A496C    1E8  void SKAUtil_Expand8BitTrans(TAnimDataCursor* pCursor, vec3flt* pDest, int32_t iBegin, int32_t iEnd)
+                         local  uint64_t axis
+                         local  uint64_t axis
+  512  005A4B54    1E8  void SKAUtil_Expand8BitTrans(AnimDataCursor* pCursor, vec3flt* pDest, int32_t iBegin, int32_t iEnd)
+                         local  uint64_t axis
+                         local  uint64_t axis
+  572  005A4D3C    1E8  void SKAUtil_Expand16BitTrans(TAnimDataCursor* pCursor, vec3flt* pDest, int32_t iBegin, int32_t iEnd)
+                         local  uint64_t axis
+                         local  uint64_t axis
+  632  005A4F24    1E8  void SKAUtil_Expand16BitTrans(AnimDataCursor* pCursor, vec3flt* pDest, int32_t iBegin, int32_t iEnd)
+                         local  uint64_t axis
+                         local  uint64_t axis
+  692  005A52F4     94  void SKAUtil_CopyFloatTrans(TAnimDataCursor* pCursor, vec3flt* pDest, int32_t iBegin, int32_t iEnd)
+                         inlines  vec3flt_Copy
+  715  005A5388     94  void SKAUtil_CopyFloatTrans(AnimDataCursor* pCursor, vec3flt* pDest, int32_t iBegin, int32_t iEnd)
+                         inlines  vec3flt_Copy
+  738  005A541C     94  void SKAUtil_CopyStaticTrans(TAnimDataCursor* pCursor, vec3flt* pDest, int32_t iBegin, int32_t iEnd)
+                         inlines  vec3flt_Copy
+  761  005A43D0     94  void SKAUtil_CopyStaticTrans(AnimDataCursor* pCursor, vec3flt* pDest, int32_t iBegin, int32_t iEnd)
+                         inlines  vec3flt_Copy
+  784  005A510C    1E8  void SKAUtil_Expand16BitScale(TAnimDataCursor* pCursor, vec3flt* pDest, int32_t iBegin, int32_t iEnd)
+                         local  uint64_t axis
+                         local  uint64_t axis
+  845  005A4464    11C  void SKAUtil_ExtractEulerAnglesFromQuatXYZ(const float* Q, float* fYaw_p, float* fPitch_p, float* fRoll_p)
+                         local  float_t xx
+                         local  float_t yy
+                         local  float_t zz
+                         local  float_t xy
+                         local  float_t zw
+                         local  float_t xz
+                         local  float_t xw
+                         local  float_t yz
+                         local  float_t yw
+                         local  float_t cy
+                         inlines  std::sqrt
+  871  005A3E5C     9C  void SKAUtil_8BitExpandOffset_X(float* pDest, uint8_t* pDelta, float* pBase)
+  878  005A3EF8     94  void SKAUtil_8BitExpandOffset_Y(float* pDest, uint8_t* pDelta, float* pBase)
+  885  005A3F8C     8C  void SKAUtil_8BitExpandOffset_Z(float* pDest, uint8_t* pDelta, float* pBase)
+  892  005A4018    100  void SKAUtil_8BitExpandOffset_XYZ(float* pDest, uint8_t* pDelta, float* pBase)
+  899  005A4118     9C  void SKAUtil_16BitExpandOffset_X(float* pDest, uint16_t* pDelta, float* pBase)
+  906  005A41B4     94  void SKAUtil_16BitExpandOffset_Y(float* pDest, uint16_t* pDelta, float* pBase)
+  913  005A4248     8C  void SKAUtil_16BitExpandOffset_Z(float* pDest, uint16_t* pDelta, float* pBase)
+  920  005A42D4     FC  void SKAUtil_16BitExpandOffset_XYZ(float* pDest, uint16_t* pDelta, float* pBase)

@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/animation/skalib.c
+// compiled in: golf2_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   91  0013F730     D4  void BogusSKA::Init()
+  127  00127440     28  TSwingProfile* GetSwingProfile(enum ShotType_t shotType)
+  139  0013CECC     28  struct TSkeletonAnimation* SKA_GetBogus(int32 shotType)
+  152  0013F808     14  struct TSkeletonAnimation* SKA_GetBogus()
+  158  0013F804      4  void SKALIB_InitModule()
+  164  0013AA8C      4  void SKALIB_CloseModule()

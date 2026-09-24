@@ -1,0 +1,23 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNABase/RNAString.h
+// compiled in: Attrib.cpp, RNADevice.cpp, RNAFX.cpp, RNAParm.cpp, RNAString.cpp, Scrape.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   39    inline-only   void operator delete [](void* address)
+   39    inline-only   struct ICoreAllocator* GetClassAllocator()
+   39    inline-only   void* operator new [](size_t size, const char* text, struct ICoreAllocator* allocator, enum AllocFlags allocator_flags, uint32_t alignment)
+   41  00854608     70  void String(const struct <anon>* this)
+                         local  const char[7] __FUNCTION__
+                         inlines  Init, RNADebugBreak
+   48  00853CB0     DC  void String(const struct <anon>* this, const const struct <anon>& s)
+                         local  const char[7] __FUNCTION__
+                         inlines  Copy, Init, RNADebugBreak
+   56  00854928    11C  void String(const struct <anon>* this, const char* cstring)
+                         local  const char[7] __FUNCTION__
+                         inlines  Copy, Init, RNADebugBreak
+   76    inline-only   void Clear(const struct <anon>* this)
+   87    inline-only   struct <anon>& operator=(const struct <anon>* this, const const struct <anon>& s)
+   96    inline-only   struct <anon>& operator=(const struct <anon>* this, const char* cstring)
+  102    inline-only   bool operator==(const const struct <anon>* this, const const struct <anon>& s)
+  121    inline-only   const char* CStr(const const struct <anon>* this)
+  137    inline-only   void Init(const struct <anon>* this)
+  141    inline-only   void Copy(const struct <anon>* this, const char* cstring)

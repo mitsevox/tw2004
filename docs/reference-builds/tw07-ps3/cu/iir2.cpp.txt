@@ -1,0 +1,6 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/iir2.cpp
+// compiled in: iir2.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  201  006F5FB0     70  void ClearBuffer(const struct <anon>* this)
+                         inlines  core::MemSet

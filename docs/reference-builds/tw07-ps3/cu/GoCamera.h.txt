@@ -1,0 +1,15 @@
+// ../../../../../TIGERCODE/Code/Golf/Hi-Rendering/Headers/GoCamera.h
+// compiled in: apt_unity.cpp, golf2_unity.cpp, golf_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+  187    inline-only   void CA_vSetDefaultScalingVectors(struct CA_SCamera* spCamera_p)
+  210    inline-only   void CA_vSetCameraNearZ(struct CA_SCamera* spCamera_p, float fNearZ_p)
+  218    inline-only   float CA_fGetCameraNearZ(struct CA_SCamera* spCamera_p)
+  226    inline-only   float CA_fGetCameraFarZ(struct CA_SCamera* spCamera_p)
+  234    inline-only   void CA_vSetCameraFarZ(struct CA_SCamera* spCamera_p, float fFarZ_p)
+  243    inline-only   float CA_fGetCameraFieldOfView(struct CA_SCamera* spCamera_p)
+  254    inline-only   float CA_fGetCameraFieldOfViewRatio(struct CA_SCamera* spCamera_p)
+  268    inline-only   void CA_vSetCameraViewToWorldMatrix(struct CA_SCamera* spCamera_p, float[4]* xViewToWorldMatrix_p)
+  358    inline-only   void CA_vSetCameraFieldOfView(struct CA_SCamera* spCamera_p, float fFieldOfView_p)
+  374    inline-only   void CA_vSetDefaultCamera(struct CA_SCamera* spCamera_p)
+  393    inline-only   void Camera_SetCameraYawPitchRollAndPosition(struct CA_SCamera* spCamera_p, float* xCameraPosition_p, float* yawPitchRoll_p)

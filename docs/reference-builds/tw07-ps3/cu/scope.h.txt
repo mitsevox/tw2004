@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/quick_spu/dev-football/include/quick_spu/scope.h
+// compiled in: RNAJobPlat.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   97    inline-only   size_t GetTagCount(const const struct <anon>* this)
+  102    inline-only   uint32_t GetVarOffsetFromAddress(const const struct <anon>* this, uint32_t VarAddress)

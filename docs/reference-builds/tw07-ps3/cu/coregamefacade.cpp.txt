@@ -1,0 +1,28 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/gamefacade/coregamefacade.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   41  005B2B8C      8  struct <anon>* GetProductUpdateStrategyImpl(const struct <anon>* this)
+   46  005B2B94      8  struct WebMediaStrategy* GetWebMediaStrategyImpl(const struct <anon>* this)
+   53  005CA178     48  struct DebugStrategy* GetDebugStrategy()
+                         inlines  GetInstance
+   58  005CA1C0     4C  struct MemoryStrategy* GetMemoryStrategy(int32_t iMemGroup)
+                         inlines  GetInstance
+   63  005CA20C     48  struct MemoryStrategy* GetPersistentMemoryStrategy()
+                         inlines  GetInstance
+   68  005CA254     48  struct MemoryStrategy* GetWebOfferMemoryStrategy()
+                         inlines  GetInstance
+   73  005CA29C     48  struct <anon>* GetProductUpdateStrategy()
+                         inlines  GetInstance
+   78  005CA2E4     48  struct <anon>* GetResourceStrategy()
+                         inlines  GetInstance
+   83  005CA32C     48  struct <anon>* GetSpreadSheetStrategy()
+                         inlines  GetInstance
+   88  005CA374     48  struct <anon>* GetStatsStrategy()
+                         inlines  GetInstance
+   93  005CA3BC     48  struct <anon>* GetTelemetryStrategy()
+                         inlines  GetInstance
+   98  005CA404     48  struct <anon>* GetWebOfferStrategy()
+                         inlines  GetInstance
+  103  005CA44C     48  struct WebMediaStrategy* GetWebMediaStrategy()
+                         inlines  GetInstance

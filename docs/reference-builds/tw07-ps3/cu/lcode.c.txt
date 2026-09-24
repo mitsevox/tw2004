@@ -1,0 +1,106 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/lua-5.0.2/src/lcode.c
+// compiled in: lcode.c
+// 48 functions, source order. line | PS3 address | size
+
+   28  00582F80     A8  void luaK_nil(FuncState* fs, int from, int n)
+                         local  Instruction* previous
+                         local  int pfrom
+                         local  int pto
+   44  00582D08     70  int luaK_jump(FuncState* fs)
+                         local  int jpc
+                         local  int j
+   54  00582DA4     30  static int luaK_condjump(FuncState* fs, OpCode op, int A, int B, int C)
+   60  0058238C     A4  static void luaK_fixjump(FuncState* fs, int pc, int dest)
+                         local  Instruction* jmp
+                         local  int offset
+   74  00582430     10  int luaK_getlabel(FuncState* fs)
+   80  00582440     44  static int luaK_getjump(FuncState* fs, int pc)
+                         local  int offset
+   89  00582520     54  static Instruction* getjumpcontrol(FuncState* fs, int pc)
+                         local  Instruction* pi
+  102  00582574     AC  static int need_value(FuncState* fs, int list, int cond)
+                         local  Instruction i
+  111  00582620     3C  static void patchtestreg(Instruction* i, int reg)
+  118  0058265C    124  static void luaK_patchlistaux(FuncState* fs, int list, int ttarget, int treg, int ftarget, int freg, int dtarget)
+                         local  int next
+                         local  Instruction* i
+  143    inline-only   static void luaK_dischargejpc(FuncState* fs)
+  149  005827C8     24  void luaK_patchlist(FuncState* fs, int list, int target)
+  159  00582780     48  void luaK_patchtohere(FuncState* fs, int list)
+  165  00582484     9C  void luaK_concat(FuncState* fs, int* l1, int l2)
+                         local  int list
+                         local  int next
+  179  005827EC     84  void luaK_checkstack(FuncState* fs, int n)
+                         local  int newstack
+  189  00582870     44  void luaK_reserveregs(FuncState* fs, int n)
+  195  005828B4     24  static void freereg(FuncState* fs, int reg)
+  203  005828D8     18  static void freeexp(FuncState* fs, expdesc* e)
+  209  005828F0    158  static int addk(FuncState* fs, TObject* k, TObject* v)
+                         local  const TObject* idx
+                         local  Proto* f
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  TObject* i_o
+  226  00582A48     38  int luaK_stringK(FuncState* fs, TString* s)
+                         local  TObject o
+                         local  TObject* i_o
+  233  00582A80     38  int luaK_numberK(FuncState* fs, lua_Number r)
+                         local  TObject o
+                         local  TObject* i_o
+  240    inline-only   static int nil_constant(FuncState* fs)
+                         local  TObject k
+                         local  TObject v
+                         local  TObject* i_o
+  248  00582AB8     74  void luaK_setcallreturns(FuncState* fs, expdesc* e, int nresults)
+  259  00582E38    148  void luaK_dischargevars(FuncState* fs, expdesc* e)
+  291  00582DD4     64  static int code_label(FuncState* fs, int A, int b, int jump)
+  297  00583028    158  static void discharge2reg(FuncState* fs, expdesc* e, int reg)
+                         local  Instruction* pc
+  332  00583180     74  static void discharge2anyreg(FuncState* fs, expdesc* e)
+  340  00583498    1AC  static void luaK_exp2reg(FuncState* fs, expdesc* e, int reg)
+                         local  int final
+                         local  int p_f
+                         local  int p_t
+                         local  int fj
+  366  00583644     64  void luaK_exp2nextreg(FuncState* fs, expdesc* e)
+  374  005836A8     AC  int luaK_exp2anyreg(FuncState* fs, expdesc* e)
+  388  00583754     18  void luaK_exp2val(FuncState* fs, expdesc* e)
+  396  0058393C     C8  int luaK_exp2RK(FuncState* fs, expdesc* e)
+                         local  TObject* i_o
+                         inlines  nil_constant
+  419  00583F04    15C  void luaK_storevar(FuncState* fs, expdesc* var, expdesc* exp)
+                         local  int e
+                         local  int e
+                         local  int e
+  450  00583E4C     B8  void luaK_self(FuncState* fs, expdesc* e, expdesc* key)
+                         local  int func
+  463  00582B2C     4C  static void invertjump(FuncState* fs, expdesc* e)
+                         local  Instruction* pc
+  471  005831F4     C8  static int jumponcond(FuncState* fs, expdesc* e, int cond)
+                         local  Instruction ie
+  486  005833A4     F4  void luaK_goiftrue(FuncState* fs, expdesc* e)
+                         local  int pc
+  512  005832BC     E8  void luaK_goiffalse(FuncState* fs, expdesc* e)
+                         local  int pc
+  537    inline-only   static void codenot(FuncState* fs, expdesc* e)
+                         local  int temp
+  570  00583E10     3C  void luaK_indexed(FuncState* fs, expdesc* t, expdesc* k)
+  576  0058376C    1D0  void luaK_prefix(FuncState* fs, UnOpr op, expdesc* e)
+                         inlines  codenot
+  593  00583D38     D8  void luaK_infix(FuncState* fs, BinOpr op, expdesc* v)
+  620    inline-only   static void codebinop(FuncState* fs, expdesc* res, BinOpr op, int o1, int o2)
+                         local  OpCode opc
+                         local  const OpCode[6] ops
+                         local  int cond
+                         local  int temp
+  640  00583A04    334  void luaK_posfix(FuncState* fs, BinOpr op, expdesc* e1, expdesc* e2)
+                         local  int o1
+                         local  int o2
+                         local  OpCode opc
+                         inlines  codebinop
+  684  00582B78     24  void luaK_fixline(FuncState* fs, int line)
+  689  00582B9C    148  int luaK_code(FuncState* fs, Instruction i, int line)
+                         local  Proto* f
+                         inlines  luaK_dischargejpc
+  704  00582D78     2C  int luaK_codeABC(FuncState* fs, OpCode o, int a, int b, int c)
+  710  00582CE4     24  int luaK_codeABx(FuncState* fs, OpCode o, int a, unsigned int bc)

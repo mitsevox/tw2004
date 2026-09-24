@@ -1,0 +1,21 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_Money.cpp
+// compiled in: apt_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   91  000F5984     A0  void UIMoney::UIMoney(const struct UIMoney* this)
+                         inlines  TArrayInternal<UIMoney::DstMenuItem_euro,AptStructSwapper>::TArrayInternal, TExternArray<UIMoney::DstMenuItem_euro>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   98  000EF06C     94  void UIMoney::Init(const struct UIMoney* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+  111  000388A8     14  void UIMoney::InitMenuParams(const struct UIMoney* this)
+  117  00062D54     A4  void UIMoney::Show(const struct UIMoney* this)
+  129  0007C83C     F8  void UIMoney::OnShow(const struct UIMoney* this)
+                         local  int32 money
+                         local  char[16] baseMoneyString
+                         local  char* moneyGrandTotalAmount
+  144  0007C60C    230  void UIMoney::UpdateItemAndLabel(const struct UIMoney* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_euro* dest
+                         local  int32 item
+                         local  int32 money
+                         local  char[16] baseMoneyString
+  195  000CEA68    1B0  enum eAptHandleInput UIMoney::HandleInput(const struct UIMoney* this, int32 cID)
+  255  0007C1F8    14C  void UIMoney::ShowHelpText(const struct UIMoney* this)

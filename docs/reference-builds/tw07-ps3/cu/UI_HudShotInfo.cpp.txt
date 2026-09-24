@@ -1,0 +1,38 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_HudShotInfo.cpp
+// compiled in: apt_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   22  000F3F18     4C  void UIHudShotInfo::UIHudShotInfo(const struct UIHudShotInfo* this)
+   26  0004009C     38  void UIHudShotInfo::Init(const struct UIHudShotInfo* this)
+   34  000DB0F8     98  void UIHudShotInfo::Show(const struct UIHudShotInfo* this)
+                         inlines  GM_GetModeType
+   45  000E6DD8      4  void UIHudShotInfo::OnShow(const struct UIHudShotInfo* this)
+   50  000402C4     44  void UIHudShotInfo::ShowHelpText(const struct UIHudShotInfo* this)
+   55  000E65FC    7DC  void UIHudShotInfo::UpdateShotDetails(const struct UIHudShotInfo* this)
+                         local  char[64] strBuf
+                         local  const enum GM_CourseType_t course
+                         local  const char* courseName
+                         local  char* courseFormat
+                         local  struct IGameData* gdat
+                         local  const uint32 curHole
+                         local  GM_Pga_StatCounts* pStats
+                         local  const int32 golferIndex
+                         local  const int32 golferTee
+                         local  enum GM_TeeColorType_t tee
+                         local  int32 teeDistance
+                         local  char*[4] fSpeeds
+                         local  char*[4] gSpeeds
+                         local  float courseSpeed
+                         local  const float finalRot
+                         local  int32 windSpeed
+                         local  struct GameModeDriver* driver
+                         local  int32 weatherIdx
+                         local  float mSpeed
+  246  000ED008    208  enum eAptHandleInput UIHudShotInfo::HandleInput(const struct UIHudShotInfo* this, int32 cID)
+                         local  int32 randomTip
+                         local  enum PlayerNumber_t playerID
+                         local  void* ptr
+                         local  struct GameModeOneBall* mode
+                         inlines  UIPopupDef::SetShowNoTipsPrompt
+  294  00040308     78  bool UIHudShotInfo::CanShowFlyby(const struct UIHudShotInfo* this)
+                         local  CameraController_t* pCameraController

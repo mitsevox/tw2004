@@ -1,0 +1,97 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Rna/Scene/GolfScene.cpp
+// compiled in: rnaunity.cpp
+// 38 functions, source order. line | PS3 address | size
+
+   62  004F2B64      C  struct ShaderC* GolfSceneC::ResolveShader(const struct GolfSceneC* this, const char* pStrName, const char* pStrFileName, struct UserData* pUserData)
+   68  004EC5CC      C  struct TextureC* GolfSceneC::ResolveTexture(const struct GolfSceneC* this, const char* pStrName, const char* pStrFileName, struct UserData* pUserData)
+   75  004D911C    17C  bool8_t GolfSceneC::SerializeInSceneGraphChunk(const struct GolfSceneC* this, const struct InStreamC& in)
+                         local  const char[27] __FUNCTION__
+                         local  struct SGNodeC* pNewSG
+                         inlines  GolfSceneC::SetSGRootNode, RNADebugBreak
+   93  004CCC24     E8  bool8_t GolfSceneC::SerializeInInfoChunk(const struct GolfSceneC* this, const struct InStreamC& in)
+                         local  const char[21] __FUNCTION__
+                         local  char[256] name
+                         inlines  RNADebugBreak
+  113  004D9298     6C  bool8_t GolfSceneC::SerializeChunk(const struct GolfSceneC* this, const struct InStreamC& in, uint32_t chunkID)
+  150  004C8F24     4C  struct UserData* GolfSceneC::SerializeInIndicesUserData(const struct GolfSceneC* this, const struct InStreamC& in)
+                         local  struct UserData* pUserData
+                         local  int id
+  160  004C8F70     4C  struct UserData* GolfSceneC::SerializeInStreamUserData(const struct GolfSceneC* this, const struct InStreamC& in)
+                         local  struct UserData* pUserData
+                         local  int id
+  171  004C8FBC     4C  struct UserData* GolfSceneC::SerializeInMeshUserData(const struct GolfSceneC* this, const struct InStreamC& in)
+                         local  struct UserData* pUserData
+                         local  int id
+  181  004E6BE8    750  struct UserData* GolfSceneC::SerializeInGeomUserData(const struct GolfSceneC* this, const struct InStreamC& in)
+                         local  const char[24] __FUNCTION__
+                         local  struct UserData* pUserData
+                         local  int idGeom
+                         local  char[256] name
+                         local  int32_t skeletonIndex
+                         local  int32_t jointPaletteIndex
+                         local  int32_t lodNum
+                         local  bool8_t putTexturesInArray
+                         local  RNAVector3 v3Center
+                         local  int32_t iNumTargets
+                         local  bool8_t bHaveBlendShape
+                         local  bool8_t bHaveStaticBlendShape
+                         local  int32_t numBodyBlends
+                         local  int32_t numBodyBlends
+                         local  int32_t blendIndex
+                         local  int32_t geomId
+                         inlines  RNADebugBreak, UserData::UserData, UserData::operator new, Vector3
+  333  004E7338    1C0  struct UserData* GolfSceneC::SerializeInMaterialUserData(const struct GolfSceneC* this, const struct InStreamC& in)
+                         local  const char[28] __FUNCTION__
+                         local  struct UserData* pUserData
+                         local  int idMaterial
+                         local  char[256] name
+                         inlines  RNADebugBreak, UserData::UserData, UserData::operator new
+  353  004C9008      8  struct UserData* GolfSceneC::SerializeInTextureUserData(const struct GolfSceneC* this, const struct InStreamC& in)
+  359  004C9010      8  struct UserData* GolfSceneC::SerializeInShaderUserData(const struct GolfSceneC* this, const struct InStreamC& in)
+  367  004CE1B0    24C  bool8_t GolfSceneC::LoadFromStream(const struct GolfSceneC* this, const struct InStreamC& in, struct DeviceC* pDevice, bool8_t bVerbose)
+                         local  const char[15] __FUNCTION__
+                         local  struct <anon> reader
+                         inlines  RNADebugBreak
+  428  004D1288    124  void UpdateMaterials(struct MaterialListC* pMaterialList)
+                         local  int32_t iMaterial
+                         local  struct MaterialC* pMaterial
+                         local  struct ShaderC* pShader
+                         local  struct UserData* pMatUserData
+                         local  struct UserData* pShaderUserData
+                         inlines  GetMaterial, GetShader, GetUserData, UserData::SetVersion, operator[]
+  465  004CDC94     18  const char* GetName(const const struct <anon>* this)
+                         inlines  GetName, GetUserData
+  470  004CDCAC     18  const char* GetName(const const struct <anon>* this)
+                         inlines  GetName, GetUserData
+  475  004CDCC4     18  const char* GetName(const const struct <anon>* this)
+                         inlines  GetName, GetUserData
+  480  004CD9E8     18  const char* GetName(const const struct <anon>* this)
+                         inlines  GetName, GetUserData
+  485  004C9018      8  const char* GetName(const const struct <anon>* this)
+  490  004C9020      8  const char* GetName(const const struct <anon>* this)
+  495  004C9028      8  const char* GetName(const const struct <anon>* this)
+  500  004C9030      8  const char* GetName(const const struct <anon>* this)
+  505  004C9038      8  const char* GetName(const const struct <anon>* this)
+  510  004C9040      8  const char* GetName(const const struct <anon>* this)
+  515  004C9048      8  const char* GetName(const const struct <anon>* this)
+  520  004C9050      8  const char* GetName(const const struct <anon>* this)
+  531  004D1BC4     E4  void DeleteUserData(const struct GeomC* this)
+                         inlines  GetUserData, SetUserData, UserData::operator delete, ~UserData
+  536  004D1AE0     E4  void DeleteUserData(const struct TextureC* this)
+                         inlines  GetUserData, SetUserData, UserData::operator delete, ~UserData
+  548  004D19FC     E4  void DeleteUserData(const struct MaterialC* this)
+                         inlines  GetUserData, SetUserData, UserData::operator delete, ~UserData
+  554  004D1918     E4  void DeleteUserData(const struct ShaderC* this)
+                         inlines  GetUserData, SetUserData, UserData::operator delete, ~UserData
+  566  004CE8FC     94  void DeleteUserData(const struct MeshC* this)
+                         inlines  SetUserData, UserData::operator delete
+  571  004CE9B0     94  void DeleteUserData(const struct StreamC* this)
+                         inlines  SetUserData, UserData::operator delete
+  576  004CE868     94  void DeleteUserData(const struct IndicesC* this)
+                         inlines  SetUserData, UserData::operator delete
+  581  004C9058      4  void DeleteUserData(const struct MaterialListC* this)
+  585  004C905C      4  void DeleteUserData(const struct ParmBlockC* this)
+  589  004C9060      4  void DeleteUserData(const struct <anon>* this)
+  593  004C9064      4  void DeleteUserData(const struct SurfaceC* this)
+  597  004CEDD0     94  void DeleteUserData(const struct JobC* this)
+                         inlines  SetUserData, UserData::operator delete

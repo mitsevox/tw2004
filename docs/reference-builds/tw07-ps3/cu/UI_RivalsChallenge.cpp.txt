@@ -1,0 +1,44 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_RivalsChallenge.cpp
+// compiled in: apt_unity.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   57  00049848     48  int32 LookUpFERivalsBoastIndexInArray(enum eFERivalsChallenges boast)
+                         local  int32 i
+   91  000F891C     9C  void UIRivalsChallenge::UIRivalsChallenge(const struct UIRivalsChallenge* this)
+                         inlines  TArrayInternal<UIRivalsChallenge::RChallengeMenuItem,AptStructSwapper>::TArrayInternal, TExternArray<UIRivalsChallenge::RChallengeMenuItem>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   99  000F100C     78  void UIRivalsChallenge::Init(const struct UIRivalsChallenge* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+  111  00049890     BC  void UIRivalsChallenge::ResetVars(const struct UIRivalsChallenge* this)
+                         local  void* voidMode
+                         local  int32 i
+  148  0004994C     6C  void UIRivalsChallenge::Show(const struct UIRivalsChallenge* this)
+  157  000499B8     CC  void UIRivalsChallenge::UpdateItemAndLabel(const struct UIRivalsChallenge* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct RivalsMenuItemConst* src
+                         local  struct RChallengeMenuItem* dest
+  194  000834CC    254  enum eAptHandleInput UIRivalsChallenge::HandleInput(const struct UIRivalsChallenge* this, int32 cID)
+                         local  struct RChallengeMenuItem* dest
+                         local  struct RChallengeMenuItem* dest
+                         local  struct RChallengeMenuItem* dest
+  275  0007036C     AC  void UIRivalsChallenge::OnSelectRivalsChallenge(const struct UIRivalsChallenge* this, int32 activeItemId)
+                         local  enum eFERivalsChallenges inResultId
+                         local  int32 numInSelection
+                         local  struct RChallengeMenuItem* opActiveItem
+  303  00070418     98  void UIRivalsChallenge::RegainFocus(const struct UIRivalsChallenge* this, uint32 sig)
+  317  00049AD8     98  void UIRivalsChallenge::LooseFocus(const struct UIRivalsChallenge* this, uint32 sig)
+  356  000F8A54     BC  void UIRivalsChallengeToggle::UIRivalsChallengeToggle(const struct UIRivalsChallengeToggle* this)
+                         local  int i
+                         inlines  TArrayInternal<UIRivalsChallengeToggle::RChallengeToggleMenuItem,AptStructSwapper>::TArrayInternal, TExternArray<UIRivalsChallengeToggle::RChallengeToggleMenuItem>::TExternArray, UIMenuVertBase::UIMenuVertBase
+  366  000F1084     78  void UIRivalsChallengeToggle::Init(const struct UIRivalsChallengeToggle* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+  378  00049A84     54  void UIRivalsChallengeToggle::ShowRivalsChallengeToggle(const struct UIRivalsChallengeToggle* this, enum eFERivalsChallenges challenge, int32 numberStrokesOrHandicap)
+  389  000C4DE8     E4  void UIRivalsChallengeToggle::UpdateItemAndLabel(const struct UIRivalsChallengeToggle* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct RChallengeToggleMenuItem* dest
+  420  0008331C    1B0  enum eAptHandleInput UIRivalsChallengeToggle::HandleInput(const struct UIRivalsChallengeToggle* this, int32 cID)
+                         local  int32 activeItemIndex
+  484  00049B70    178  void UIRivalsChallengeToggle::OnSelectDone(const struct UIRivalsChallengeToggle* this)
+                         local  enum BoastChallengeTypes_e boast
+                         local  int boastplayerbitmask
+                         local  int i
+                         local  int32 clubOffMask
+  568  000773E4     4C  void UIRivalsChallengeToggle::RegainFocus(const struct UIRivalsChallengeToggle* this, uint32 sig)
+  576  00049CE8     40  void UIRivalsChallengeToggle::LooseFocus(const struct UIRivalsChallengeToggle* this, uint32 sig)

@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_cct/tiger_cct_internal_event_handler.cpp
+// compiled in: tiger_cct_internal_event_handler.cpp
+// 5 functions, source order. line | PS3 address | size
+
+    6  005668B8     24  void InternalEventHandler::InternalEventHandler(const struct InternalEventHandler* this, struct IAllocator* allocator)
+   12  005667F4      C  void InternalEventHandler::SetFunction(const struct InternalEventHandler* this, void(*)()* function, void* blindPtr)
+   18  00566800     54  void InternalEventHandler::HandleEvent(const struct InternalEventHandler* this, struct Character* character, const struct <anon>* event)
+   27  00566854     64  void* InternalEventHandler::operator new(size_t size, struct IAllocator* allocator)
+                         inlines  TagValuePair
+   32  005667A8     4C  void InternalEventHandler::operator delete(void* ptr)

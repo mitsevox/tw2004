@@ -1,0 +1,14 @@
+// ../../../../../TIGERCODE/Code/AptInterface/AptPackage/ea/string/default_policy.h
+// compiled in: other_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   38    inline-only   float GrowthFactor()
+   60    inline-only   char* Copy<char*, char*>(char* srcBegin, char* srcEnd, char* dstBegin)
+   70    inline-only   void Assert(bool expression, const char* message)
+   78    inline-only   char* Copy(const char* srcBegin, const char* srcEnd, char* dstBegin)
+   91    inline-only   char* Move<char*, char*>(char* srcBegin, char* srcEnd, char* dstBegin)
+                         local  int distance
+   91    inline-only   AptFilePtr* Move<AptFilePtr*, AptFilePtr*>(AptFilePtr* srcBegin, AptFilePtr* srcEnd, AptFilePtr* dstBegin)
+                         local  int distance
+   91    inline-only   struct AptFileSavedInputState* Move<AptFileSavedInputState*, AptFileSavedInputState*>(struct AptFileSavedInputState* srcBegin, struct AptFileSavedInputState* srcEnd, struct AptFileSavedInputState* dstBegin)
+                         local  int distance

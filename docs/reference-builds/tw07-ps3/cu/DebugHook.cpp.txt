@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Misc/DebugHook.cpp
+// compiled in: golf2_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   14  00127254     D8  void DebugHook(int nParams, char** params)
+                         local  int i

@@ -1,0 +1,13 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/invitationabstract.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   74  00608E44    14C  void InvitationAbstract(const struct InvitationAbstract* this, struct User* pUser, const struct Dictionary* pParameters, uint32_t uType, enum InvitationContext eContext)
+                         inlines  RCPointer
+  117  006090DC     F0  void ~InvitationAbstract(const struct InvitationAbstract* this)
+                         inlines  operator->, operator=, ~RCPointer
+  146  005F8120     4C  void ClearCurrentOperation(const struct InvitationAbstract* this)
+                         inlines  operator=
+  173  005B7BC4     1C  void SetState(const struct InvitationAbstract* this, enum InvitationState eState)
+  197  005EF870     F0  void SetParameters(const struct InvitationAbstract* this, const struct DictionaryConcrete* pParameters)
+                         inlines  operator=

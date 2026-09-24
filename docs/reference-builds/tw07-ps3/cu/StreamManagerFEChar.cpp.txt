@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/streaming/StreamManagerFEChar.cpp
+// compiled in: golf2_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   18  0013561C     68  void StreamManagerFEChar::BeginStreamCallback(void* pData)
+   51  00135684     38  void StreamManagerFEChar::EndStreamCallback(void* pData)
+   64  001356BC     DC  void StreamManagerFEChar::SetupFileStream(const struct StreamManagerFEChar* this)
+                         local  int32 currentBodyModelID
+                         local  char[3] handle
+                         local  int32 charHandle
+                         local  char[128] newCharBuff

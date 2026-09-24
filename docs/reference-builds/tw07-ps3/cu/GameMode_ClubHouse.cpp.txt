@@ -1,0 +1,62 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_ClubHouse.cpp
+// compiled in: golf_unity.cpp
+// 32 functions, source order. line | PS3 address | size
+
+   44  00204FD8     44  void GameModeClubHouse::GameModeClubHouse(const struct GameModeClubHouse* this)
+   49  001FD934     18  void GameModeClubHouse::~GameModeClubHouse(const struct GameModeClubHouse* this)
+   54  0028016C    1C0  void GameModeClubHouse::Init(const struct GameModeClubHouse* this)
+                         inlines  ClubHouseManager::SetCameraSwitchTimer, ClubHouseMgr
+   83  001FD9D0      4  void GameModeClubHouse::Shutdown(const struct GameModeClubHouse* this)
+   91  002843A0     A4  void GameModeClubHouse::LoadHole(const struct GameModeClubHouse* this)
+                         inlines  ClubHouseMgr, GUI_ToggleTargetInfo
+  101  003220A0    228  void GameModeClubHouse::StartGamePreData(const struct GameModeClubHouse* this)
+                         local  int holeIndex
+                         inlines  ClubHouseMgr, GM_GetCurrentHoleIndex, GM_InitializeCurrentHoleToFirstSelected, GM_SelectHoleSet, GM_SetCurrentCourseID, GM_SetTargetCup
+  148  002B2F18    1B4  void GameModeClubHouse::Update(const struct GameModeClubHouse* this)
+                         local  struct GameModeDriverEra* curRivalsGameDriver
+                         inlines  ClubHouseManager::GetCameraSwitchTimer, ClubHouseManager::SetCameraSwitchTimer, ClubHouseManager::SetEnterClubHouse, ClubHouseManager::SetExitClubHouse, ClubHouseMgr
+  184  001FDA34     50  bool GameModeClubHouse::QueryInterface(const struct GameModeClubHouse* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bRet
+  203  001FDA84      4  void GameModeClubHouse::SetupNextGolfer(const struct GameModeClubHouse* this)
+  210  00295E2C     84  bool GameModeClubHouse::HoleFinished(const struct GameModeClubHouse* this, enum PlayerNumber_t PlayerID, bool predict)
+                         local  int32 i
+                         inlines  PLR_HoledOut
+  229  003222C8     88  bool GameModeClubHouse::GameFinished(const struct GameModeClubHouse* this, bool predict)
+                         local  int i
+                         inlines  GM_GetCurrentHoleIndex
+  245  002D355C      4  void GameModeClubHouse::EndGame(const struct GameModeClubHouse* this)
+  253  001FD9D4      4  void GameModeClubHouse::CameraInit(const struct GameModeClubHouse* this)
+  268  001FDA88      8  bool GameModeClubHouse::HoleFinishedFromPauseMenu(const struct GameModeClubHouse* this)
+  275  0033AE38     14  void GameModeClubHouse::FinishHole(const struct GameModeClubHouse* this)
+  283  001FDA90      C  void GameModeClubHouse::NextHole(const struct GameModeClubHouse* this)
+  290  0028032C     A4  void GameModeClubHouse::RestartHole(const struct GameModeClubHouse* this)
+                         inlines  ClubHouseMgr, GUI_ToggleTargetInfo
+  300  002D3100     5C  void GameModeClubHouse::EndTurnEndHoleNotGame(const struct GameModeClubHouse* this, enum PlayerNumber_t PlayerID)
+  315  001FDAB8      8  bool GameModeClubHouse::RenderBallTarget(const struct GameModeClubHouse* this, enum PlayerNumber_t PlayerID)
+  321  001FDAC0     14  const char* GameModeClubHouse::GetName(const struct GameModeClubHouse* this)
+  331  001FD9D8     50  void ClubHouseManager::ResetCommonState(const struct ClubHouseManager* this)
+  345  001FDAD4     6C  void ClubHouseManager::Networks_Clear(const struct ClubHouseManager* this)
+                         local  int i
+  369  00254A4C     F4  bool ClubHouseManager::GetTrophyOwnership(const struct ClubHouseManager* this, GM_ClubHouse_TrophyType eType, int index)
+                         local  enum PlayerNumber_t PlayerID
+                         local  const struct UserInfo& userInfo
+  408  001FDC10     80  void ClubHouseManager::Networks_Init(const struct ClubHouseManager* this)
+  419  001FDC90      4  void ClubHouseManager::RenderSFX(const struct ClubHouseManager* this)
+  438  001FDA28      C  int ClubHouseManager::GetHoleIndex(const struct ClubHouseManager* this, GM_ClubHouse_Room eRoom)
+  447  002840D0    168  bool ClubHouseManager::SetNextCamera(const struct ClubHouseManager* this)
+                         local  bool bCameraSwitched
+                         local  enum StaticCam_EventType_e currCamera
+                         local  enum StaticCam_EventType_e nextCamera
+                         inlines  CamScript_SetCurrentCrACEvent, ClubHouseManager::SetCameraSwitchTimer, ClubHouseMgr
+  500  00284238    168  bool ClubHouseManager::SetPreviousCamera(const struct ClubHouseManager* this)
+                         local  bool bCameraSwitched
+                         local  enum StaticCam_EventType_e currCamera
+                         local  enum StaticCam_EventType_e nextCamera
+                         inlines  CamScript_SetCurrentCrACEvent, ClubHouseManager::SetCameraSwitchTimer, ClubHouseMgr
+  551  00253C28     44  void ClubHouseManager::ExitClubHouse(const struct ClubHouseManager* this)
+                         inlines  CamScript_SetCurrentCrACEvent
+  564  002803D0    210  static void Networks_RoomPortalLoadCallback(struct TNetwork* netPtr)
+                         inlines  ClubHouseManager::SetRoomPortalNetworkInfo, ClubHouseManager::SetRoomPortalNetworkStreamList, ClubHouseManager::SetRoomPortalNumNetworks, ClubHouseMgr
+  587  002805E0    210  static void Networks_TrophyViewLoadCallback(struct TNetwork* netPtr)
+                         inlines  ClubHouseManager::SetTrophyViewNetworkInfo, ClubHouseManager::SetTrophyViewNetworkStreamList, ClubHouseManager::SetTrophyViewNumNetworks, ClubHouseMgr
+  609  001FDC94     24  void GM_ClubHouse_Console_SetSolidTrophies(bool solid)

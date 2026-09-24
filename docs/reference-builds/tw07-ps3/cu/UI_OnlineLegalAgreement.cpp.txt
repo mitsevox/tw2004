@@ -1,0 +1,37 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_OnlineLegalAgreement.cpp
+// compiled in: apt_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   39  000778A0     5C  static void _CancelGoingOnline()
+   54  000F6AE4     BC  void UIOnlineLegalAgreement::UIOnlineLegalAgreement(const struct UIOnlineLegalAgreement* this)
+                         inlines  TAptArrayStruct, TArrayInternal<char*,AptStructSwapper>::TArrayInternal, TExternArray<UIOnlineLegalAgreement::DstMenuItem_olla>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   64  000F0178     98  void UIOnlineLegalAgreement::Init(const struct UIOnlineLegalAgreement* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   79  000D8690     78  void UIOnlineLegalAgreement::Close(const struct UIOnlineLegalAgreement* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<char*,AptStructSwapper>::Flush
+   84  000B4764    24C  void UIOnlineLegalAgreement::OnShow(const struct UIOnlineLegalAgreement* this)
+                         local  int32 numElements
+                         local  int i
+                         local  char** szNewLine
+                         inlines  AptStructSwapper::Swap, TArrayInternal<char*,AptStructSwapper>::Push
+  103  000BDA88    3B4  void UIOnlineLegalAgreement::ShowLegalAgreement(const struct UIOnlineLegalAgreement* this, char* legalText)
+                         local  const char[19] __FUNCTION__
+                         local  int32 numElements
+                         local  int i
+                         local  char** szText
+                         inlines  AptStructSwapper::Swap, TArrayInternal<char*,AptStructSwapper>::Push, TArrayInternal<char*,AptStructSwapper>::operator[], TagValuePair, operator+
+  138  000D8708     B8  void UIOnlineLegalAgreement::Hide(const struct UIOnlineLegalAgreement* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<char*,AptStructSwapper>::Flush
+  158  00047008      C  void UIOnlineLegalAgreement::OnHide(const struct UIOnlineLegalAgreement* this)
+  163  000BDE3C    150  void UIOnlineLegalAgreement::UpdateItemAndLabel(const struct UIOnlineLegalAgreement* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_olla* dest
+                         inlines  TArrayInternal<char*,AptStructSwapper>::operator[]
+  180  000854FC    280  enum eAptHandleInput UIOnlineLegalAgreement::HandleInput(const struct UIOnlineLegalAgreement* this, int32 cID)
+  255  000BDF8C    1D8  void UIOnlineLegalAgreement::UpdateTOS(const struct UIOnlineLegalAgreement* this, const char* TOS)
+                         local  int index
+                         local  char* szLine
+                         local  char* szNextLine
+                         inlines  TArrayInternal<char*,AptStructSwapper>::operator[]
+  304  000BE164     88  void UIOnlineLegalAgreement::RefreshTOS(const struct UIOnlineLegalAgreement* this, const char* TOS)
+  313  000BE1EC     8C  enum AptThreadReturnValue UIOnlineLegalAgreement::WaitForHideToShowEuropeanAgreement(const struct UIOnlineLegalAgreement* this)
+  330  00047014     50  void UIOnlineLegalAgreement::SetEuropeanAgreement(const struct UIOnlineLegalAgreement* this, bool bFlag)

@@ -1,0 +1,7 @@
+// C:/packages/rwaudiocore/2.08.01/include/rw/audio/core/private/collection.h
+// compiled in: collection.cpp, timermanager.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   40  006E2B30      4  void ~Collection(const struct <anon>* this)
+   78    inline-only   int GetCapacity(const struct <anon>* this)
+  100    inline-only   struct ItemNode* NodeBlockHeader::GetNodeArray(const struct NodeBlockHeader* this)

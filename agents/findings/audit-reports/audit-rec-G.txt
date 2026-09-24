@@ -1,0 +1,30 @@
+audit-rec-G: GameAudio (105 functions; crowd, wind, music, announcer). Batch in audit-rec-G\batch.
+- Names: all 105 are fn_<ADDR>, so kept 0, renamed 0, T3 0, demoted 0, unnamed 105. renames.tsv is just the header. namecheck: 0 rows, 0 errors, 0 flags. Each ledger row has the behaviour both lanes agree on, plus a "later:" guess, or the two lanes' guesses when they differ.
+- Comments: ok 18, none 78, fixed 9 (8 functions; 7 in GameAudio.c, 2 in include/core/gameaudio.h), stripped 1 (fn_800A64A8). Each edit matches exactly once and keeps its line count. All lines are 100 chars or less. GameAudio.c has no __LINE__. Worktree untouched (git status clean).
+- Unit header checked: ok. Global/data comments checked: ok (the 0x03BC0437 mode list is right). fake match / port notes untouched.
+- Worst comment: fn_800A44A0 "Without music the ambience (sound 8) plays instead". The ambience only plays when music 6 is allowed but off, b288 is set and the effects volume is >0. gameaudio.h's "start what lbl_8028203C says to play" was backwards: the function sets lbl_8028203C.
+- Also wrong: fn_800A64A8 "the calls below only sound when gpGame->b288 is set" (nothing nearby reads b288; removed). fn_800A4084 "modes 0, 1 and 3" (the code tests nGameType, not Game_GetMode). fn_800A573C "while the swing meter runs" (the code means states 1/3 = SW_BACK_SWING/SW_DOWN_SWING). fn_800A6070 "sound 3" (it is variant 3). fn_800A5980 and fn_800A500C called the view pair "the crowd" (see Findings 7). fn_800A72EC "or back on" (only the music restarts).
+- Lanes: L1 read the sound-7 pair (lbl_8028141C/141D) as wind; L2 read it as crowd. L2 is better supported (Findings 7). L1 misprinted fn_800A75F4 as 75F5 in fn_800A7770. Otherwise the two lanes agreed on every body.
+- Unclear rule: does "the comment above it" include a prototype comment or group heading in a header? I fixed two in gameaudio.h (fn_800A44A0, fn_800A7A14). I left struct field comments for the type pass. Parameter names (nMusic) are claims, but the audit can't rename them: Findings 6.
+
+Findings (no code changed)
+1. Dead stubs: CONFIRMED empty. fn_800A4080 is called every frame by fn_800A4BDC. fn_800A6448 and fn_800A644C are event handlers (fn_80066C6C, fn_80066C2C). hlaudemitter.c's fn_800AD1C4 (called by fn_800A7A98) is empty too. They look like compiled-out hooks. Keep them for the match; a port can drop them.
+2. fn_800A5F60 / fn_800A5FE8: CONFIRMED identical bodies: emitter n1 at the ball, volume 1.0, sample 0x17. They are two different event handlers (fn_800670A8, fn_80066A3C) that happen to use the same sound. Keep both; a port could share one body.
+3. Dead loop in fn_800A47A0: CONFIRMED. The first 19-step loop counts enabled songs into nCount, which nothing reads (fake-match stand-in for EA's empty loop). Side effect: if no song in the row is on, nothing plays, and fn_800A4928 rescans the 19 slots every frame. That is harmless.
+4. fn_800A4FD8 drops two sound handles: CONFIRMED. It sets lbl_8028141B and lbl_80281418 to 0xFF without fn_800AD450; the music only has track 0 stopped. It is not a lasting leak: the next fn_800A7A34 runs fn_800AD0C4, which frees every active instance (hlaudemitter.c:53). The window matters only on paths with no audio reload after it (gomainloop.c:1135, GameMode13 with uFlags 0x1000; FE_Manager, FE_MessageTable). Port: free them explicitly.
+5. TYPE, all CONFIRMED:
+   - fn_800A746C is defined with 3 params, but GameMode22/26 call it through a 5-argument cast (15 sites); GameMode26 passes a side of +/-1.
+   - fn_800A7A34 is s32(u8,u8,u8,int). GoEntry.c:40 declares it that way, but gomainloop.c:218 declares void(int,int,u8,int). Inside, it casts fn_800A8DC8 (u8(u8,u8,u8)) to 4 arguments.
+   - fn_800A7A98(s32 n) casts fn_800A8D88(void) so it can pass n (callers pass 0/1: gomainloop, GoEntry, DiscCheck).
+   - Also: fn_800A7664 calls fn_800A7968 through an (int a, int b) cast. fn_800A7528 returns fn_800A7720's u8 as s32.
+6. fn_800A6DCC's "nMusic": CONFIRMED misleading. It never touches the music emitter (lbl_80281418). It sets variant n on tracks 0-1 of the sound-7 pair at +/-21, or saves it in lbl_80281428 while lbl_8028202F or lbl_80282032 is set. Callers pass cue numbers: 0 at hole start, n+4 from emotion fn_8006BAD8, GameEffects 3 / lbl_80202898.n4F, GameMode11 0-5, SitDevFile pDo->n4. It is a generic cue (crowd or ambience), so nCue would fit. lbl_80281424 (the last cue) is written by 5 functions and read nowhere in src/.
+7. Which emitters are the crowd: PLAUSIBLE.
+   - The wind uses emitter groups 0/1 (fn_800A70E4/fn_800A7198, fed options.nWind), plus sound 9 at the pin.
+   - The sound-7 pair behaves like a crowd, so L2 is right. Player emotion drives it (fn_800A43DC). Tracks 4-5 turn on while the ball flies (fn_800A6FE0) and off at the bounce (fn_800A5CA4). A game-mode mask gates it (lbl_80282040).
+   - The per-view pair n2/n3 (sound 4 at +/-2), which the old comments called "the crowd", carries the heartbeat (track 2, fn_800A4170 -> GameEffects) and camera-kind cues. I made those comments neutral.
+8. Minor EA-side oddities (left as is):
+   - In fn_800A44A0, the inner `if (bMusic)` is always true.
+   - fn_800A7198 sets the variant on track 0 but starts track 1. fn_800A70E4 sets and starts track 1. Possible EA bug: the second wind layer may play its default variant.
+   - fn_800A68C0 uses view 0's emitters whatever nPlayer is, while fn_800A6C98 uses nPlayer's view (split screen).
+   - The group-3 variant family (fn_800A62A4-fn_800A640C) has no variant 5.
+   - fn_800A74E4 kind 1 does nothing (kind 1 of fn_800A746C is a one-shot).

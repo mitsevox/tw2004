@@ -1,0 +1,11 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/spat2hdr.cpp
+// compiled in: spat2hdr.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    7  006DE058    7F4  void SNDI_patchtohdr(void* pbank, struct TAGGEDPATCH* ptp, SNDSAMPLEFORMAT* pssf, SNDSAMPLEATTR* pssa, SNDSAMPLEDESC* pssd, unsigned char* isgeneric)
+                         local  SNDTAGINFO sti
+                         local  int userdatachunks
+                         local  int playloc
+                         local  int i
+                         local  unsigned char* tempID
+                         inlines  MemCpy, SNDMEMI_alloc

@@ -1,0 +1,15 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/extern/coda/cmn/mpegl3decf.cpp
+// compiled in: mpegl3decf.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   15  006F215C     40  void* operator new(size_t size)
+   24  006F219C     3C  void operator delete(void* ptr)
+   29  006F21D8     F8  int Feed(const struct <anon>* this, void* pSampleData, int sampleDataSize, int numSamples)
+                         local  const int header
+   54  006F22D0    314  int Decode(const struct <anon>* this, float** pDstBuf, int numSamples)
+                         local  int transferred
+                         local  const int retcode
+                         local  const int consumed
+                         local  const int count
+                         local  int ch
+  128  006F2140     1C  void Reset(const struct <anon>* this)

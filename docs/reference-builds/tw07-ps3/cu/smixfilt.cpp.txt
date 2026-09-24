@@ -1,0 +1,12 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/smixfilt.cpp
+// compiled in: smixfilt.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    6  006E0F60    27C  void MIX_filteradd(int voice, int channel, SNDFILTERDEF* psfd)
+                         local  SNDMIXVOICE* psmv
+                         local  SFILTERNODE* psfn
+                         inlines  SNDMEMI_alloc
+   74  006E11DC    110  void MIX_filterremove(int voice, int priority)
+                         local  SNDMIXVOICE* psmv
+                         local  SFILTERNODE* psfn
+                         inlines  SNDMEMI_free

@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_SimpleTexture.cpp
+// compiled in: shader_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   35  005047F8     40  void SM_SimpleTextureClass::Load(const struct SM_SimpleTextureClass* this)

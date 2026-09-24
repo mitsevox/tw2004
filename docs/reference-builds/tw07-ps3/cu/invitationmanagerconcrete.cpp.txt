@@ -1,0 +1,181 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/invitationmanagerconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 44 functions, source order. line | PS3 address | size
+
+  105  005D0288     A8  uint32_t GetInvitationTypeIndex(const const struct <anon>* this, uint32_t uType)
+                         local  uint32_t uIndex
+                         local  uint32_t uNumTypes
+                         local  uint32_t* pListType
+                         inlines  GetNumberOfElements
+  147  00609B34    158  void InvitationManagerConcrete(const struct InvitationManagerConcrete* this)
+                         local  struct <anon>* pFacade
+                         local  struct LobbyConcrete* pLobby
+                         inlines  AddObserver, LobbyDispatchObserver, RCPointer
+  185  00609DE4    120  void ~InvitationManagerConcrete(const struct InvitationManagerConcrete* this)
+                         local  struct <anon>* pFacade
+                         local  struct LobbyConcrete* pLobby
+                         inlines  GetInstance, GetLobbyConcrete, RemoveObserver, ~LobbyDispatchObserver, ~RCPointer
+  216  005D03AC     40  void SetBusy(const struct InvitationManagerConcrete* this, uint32_t uType)
+                         local  uint32_t uTypeIndex
+  242  005D036C     40  void SetAvailable(const struct InvitationManagerConcrete* this, uint32_t uType)
+                         local  uint32_t uTypeIndex
+  267  005D0330     3C  bool IsBusy(const const struct <anon>* this, uint32_t uType)
+                         local  uint32_t uTypeIndex
+  292  005D9FF0    1FC  struct InvitationIncoming* GetOldestIncomingInvitation(const const struct <anon>* this, uint32_t uType)
+                         local  struct InvitationAbstract* pOldestInvitation
+                         local  uint32_t uTypeIndex
+                         local  uint32_t uNumInvitations
+                         local  uint32_t uIndex
+                         local  struct InvitationAbstract* pInvitation
+                         inlines  GetElementAt, GetNumberOfElements
+  335  005F5044    240  void AddInvitationType(const struct InvitationManagerConcrete* this, uint32_t uType, uint32_t uMaxIncoming, uint32_t uMaxOutgoing)
+                         local  uint32_t uTypeIndex
+                         inlines  List, operator=
+  368  005E5FB8     C4  void RemoveInvitationType(const struct InvitationManagerConcrete* this, uint32_t uType)
+                         local  uint32_t uTypeIndex
+                         inlines  operator=
+  401  005D8908     F4  void AddInvitationIncomingFilter(const struct InvitationManagerConcrete* this, struct InvitationFilter* pFilter, enum InvitationFilterPriority ePriority)
+                         local  uint32_t uTypeIndex
+                         local  struct List<OSDK::InvitationFilter>* pFilterList
+                         inlines  ElementExists, InsertElement, InsertElementAt, operator OSDK::List<OSDK::InvitationFilter>*
+  439  005D89FC     84  void RemoveInvitationIncomingFilter(const struct InvitationManagerConcrete* this, struct InvitationFilter* pFilter)
+                         local  uint32_t uTypeIndex
+                         local  struct List<OSDK::InvitationFilter>* pFilterList
+                         inlines  RemoveElement
+  466  005E594C     CC  void AddOutgoingInvitation(const struct InvitationManagerConcrete* this, struct InvitationAbstract* pInvitation)
+                         local  uint32_t uTypeIndex
+                         local  struct List<OSDK::InvitationAbstract>* pInvitationList
+                         inlines  ElementExists, InsertElement, SetDirty, operator OSDK::List<OSDK::InvitationAbstract>*
+  497  005DD450     CC  void AddIncomingInvitation(const struct InvitationManagerConcrete* this, struct InvitationAbstract* pInvitation)
+                         local  uint32_t uTypeIndex
+                         local  struct List<OSDK::InvitationAbstract>* pInvitationList
+                         inlines  ElementExists, InsertElement, SetDirty, operator OSDK::List<OSDK::InvitationAbstract>*
+  528  005E92CC    148  void RemoveOutgoingInvitation(const struct InvitationManagerConcrete* this, struct InvitationAbstract* pInvitation)
+                         local  uint32_t uTypeIndex
+                         local  struct List<OSDK::InvitationAbstract>* pInvitationList
+                         local  struct <anon> pSavedInvitation
+                         local  uint32_t uNumElements
+                         local  struct InvitationObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList, RCPointer, RemoveElement, SetDirty, operator OSDK::List<OSDK::InvitationAbstract>*, ~RCPointer
+  562  005E9518    148  void RemoveIncomingInvitation(const struct InvitationManagerConcrete* this, struct InvitationAbstract* pInvitation)
+                         local  uint32_t uTypeIndex
+                         local  struct List<OSDK::InvitationAbstract>* pInvitationList
+                         local  struct <anon> pSavedInvitation
+                         local  uint32_t uNumElements
+                         local  struct InvitationObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList, RCPointer, RemoveElement, SetDirty, operator OSDK::List<OSDK::InvitationAbstract>*, ~RCPointer
+  597  006097BC     B4  struct Operation* SendGameInvitation(const struct InvitationManagerConcrete* this, struct User* pUser, const struct Dictionary* pParameters, struct InvitationSendCallback* pCallback)
+                         local  struct <anon>* pInvitation
+  622  005DD51C    144  struct Operation* SendInvitation(const struct InvitationManagerConcrete* this, struct InvitationAbstract* pInvitation, struct InvitationSendCallback* pCallback)
+                         local  uint32_t uTypeIndex
+                         local  struct List<OSDK::InvitationAbstract>* pList
+                         local  uint32_t uNumElements
+                         local  struct InvitationObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList, InsertElement
+  654  005F073C    15C  int32_t SendInvitation(const struct InvitationManagerConcrete* this, struct InvitationAbstract* pInvitation, LobbyApiCallbackT* pCallback, void* pContext)
+                         local  const char8_t* strParams
+                         inlines  GetTagField
+  684  005F0660     DC  int32_t RevokeInvitation(const struct InvitationManagerConcrete* this, struct InvitationAbstract* pInvitation, LobbyApiCallbackT* pCallback, void* pContext)
+  708  005F0578     E8  int32_t AnswerInvitation(const struct InvitationManagerConcrete* this, struct InvitationAbstract* pInvitation, enum InvitationAction eResponse, LobbyApiCallbackT* pCallback, void* pContext)
+  733  00609524    298  void LobbyDispatch(const struct InvitationManagerConcrete* this, const struct Lobby* , LobbyApiMsgT* pMesg)
+                         local  struct <anon> dictMesg
+                         local  struct <anon> strUser
+                         local  struct DictionaryConcrete* pData
+                         local  enum InvitationMessageType eMesgType
+                         local  uint32_t uInvitationType
+                         local  struct Dictionary* pParams
+                         local  struct User* pUser
+                         inlines  GetTagField, GetUserManagerConcrete
+  799  005CA578     E8  enum InvitationMessageType GetMessageType(const const struct <anon>* this, const char8_t* strParams)
+                         local  int32_t eMessageType
+                         local  struct <anon> strMessageType
+  841  005F03F4    184  int32_t SendInvitationMessage(const struct InvitationManagerConcrete* this, const char8_t* strUsername, int32_t eMessageType, uint32_t uInvitationType, const char8_t* strText, LobbyApiCallbackT* pCallback, void* pContext)
+                         local  struct <anon> dictTemp
+                         local  struct <anon> dictMesg
+                         inlines  GetLobbyApi, GetTagField
+  885  00609300    224  void HandleMessageSend(const struct InvitationManagerConcrete* this, struct User* pUser, const struct Dictionary* pParams, uint32_t uType)
+                         local  uint32_t uTypeIndex
+                         local  struct InvitationAbstract* pInvitation
+                         local  struct InvitationAbstract* pPreviousInvitation
+                         local  uint32_t uNumElements
+                         local  struct InvitationObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList, InsertElement, SetDirty
+  944  005E97D4    110  void HandleMessageRevoke(const struct InvitationManagerConcrete* this, const struct User* pUser, const struct Dictionary* , uint32_t uType)
+                         local  struct InvitationAbstract* pInvitation
+                         local  struct <anon> pTempInvitation
+                         local  uint32_t uNumElements
+                         local  struct InvitationObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList, RCPointer, ~RCPointer
+  981  005E98E4    110  void HandleMessageDecline(const struct InvitationManagerConcrete* this, const struct User* pUser, const struct Dictionary* , uint32_t uType)
+                         local  struct InvitationAbstract* pInvitation
+                         local  struct <anon> pTempInvitation
+                         local  uint32_t uNumElements
+                         local  struct InvitationObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList, RCPointer, ~RCPointer
+ 1017  005E9AF0    110  void HandleMessageAccept(const struct InvitationManagerConcrete* this, const struct User* pUser, const struct Dictionary* , uint32_t uType)
+                         local  struct InvitationAbstract* pInvitation
+                         local  struct <anon> pTempInvitation
+                         local  uint32_t uNumElements
+                         local  struct InvitationObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList, RCPointer, ~RCPointer
+ 1053  005E9414    104  void HandleMessageBusy(const struct InvitationManagerConcrete* this, const struct User* pUser, const struct Dictionary* , uint32_t uType)
+                         local  struct InvitationAbstract* pInvitation
+                         local  struct <anon> pTempInvitation
+                         local  uint32_t uNumElements
+                         local  struct InvitationObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList, RCPointer, ~RCPointer
+ 1084  005D03EC    11C  enum FilterResponse FilterInvitation(const struct InvitationManagerConcrete* this, struct InvitationAbstract* pInvitation)
+                         local  enum FilterResponse eResponse
+                         local  uint32_t uTypeIndex
+                         local  struct List<OSDK::InvitationFilter>* pFilterList
+                         local  uint32_t uFilters
+                         local  uint32_t uIndex
+                         local  struct InvitationFilter* pFilter
+                         inlines  GetElementAt, GetNumberOfElements, operator OSDK::List<OSDK::InvitationFilter>*
+ 1129  005DA1EC     D4  struct InvitationAbstract* FindInvitation(const const struct <anon>* this, const struct User* pUser, struct List<OSDK::InvitationAbstract>* pInvitationList)
+                         local  uint32_t uInvitations
+                         local  uint32_t uIndex
+                         local  struct InvitationAbstract* pInvitation
+                         inlines  GetElementAt, GetNumberOfElements
+ 1167  005DA318     58  struct InvitationAbstract* FindIncomingInvitation(const const struct <anon>* this, const struct User* pUser, uint32_t uType)
+                         local  uint32_t uTypeIndex
+ 1194  005DA2C0     58  struct InvitationAbstract* FindOutgoingInvitation(const const struct <anon>* this, const struct User* pUser, uint32_t uType)
+                         local  uint32_t uTypeIndex
+ 1218  005D3BF8     58  bool HasIncomingInvitations(const const struct <anon>* this, uint32_t uType)
+                         local  uint32_t uTypeIndex
+ 1242  005D3C50     58  bool HasOutgoingInvitations(const const struct <anon>* this, uint32_t uType)
+                         local  uint32_t uTypeIndex
+ 1267  005DA4B8    174  void DeclineAndRevokeInvitations(const struct InvitationManagerConcrete* this, uint32_t uType, bool bBusy)
+                         local  uint32_t uTypeIndex
+                         local  uint32_t uNumInvitations
+                         local  int32_t iIndex
+                         local  struct InvitationAbstract* pInvitation
+                         inlines  GetElementAt
+ 1303  005DA370    148  void RevokeOutgoingInvitations(const struct InvitationManagerConcrete* this, uint32_t uType)
+                         local  uint32_t uTypeIndex
+                         local  uint32_t uNumInvitations
+                         local  int32_t iIndex
+                         local  struct InvitationAbstract* pInvitation
+                         inlines  GetElementAt
+ 1338  005E9660    168  void RemovedMarkedInvitations(const struct InvitationManagerConcrete* this, uint32_t uType)
+                         local  uint32_t uTypeIndex
+                         local  struct List<OSDK::InvitationAbstract>* pInvitations
+                         local  uint32_t uNumInvitations
+                         local  int32_t iIndex
+                         local  struct InvitationAbstract* pInvitation
+                         local  int32_t iIndex
+                         local  struct InvitationAbstract* pInvitation
+                         inlines  GetElementAt, operator OSDK::List<OSDK::InvitationAbstract>*
+ 1388  005E97C8      C  void ProcessComplete(const struct InvitationManagerConcrete* this)
+ 1411  005D3174     40  struct List<OSDK::InvitationAbstract>* GetIncomingInvitations(const const struct <anon>* this, uint32_t uType)
+                         local  uint32_t uTypeIndex
+ 1435  005D31B4     40  struct List<OSDK::InvitationAbstract>* GetOutgoingInvitations(const const struct <anon>* this, uint32_t uType)
+                         local  uint32_t uTypeIndex
+ 1461  005D8D60     C0  bool CanAddInvitation(const const struct <anon>* this, uint32_t uType, enum InvitationContext eContext)
+                         local  uint32_t uTypeIndex
+                         local  struct List<OSDK::InvitationAbstract>* pInvitationList
+                         inlines  IsFull, operator OSDK::List<OSDK::InvitationAbstract>*
+ 1498  005E99F4     FC  void HandleDisconnectedUser(const struct InvitationManagerConcrete* this, struct User* pUser)
+                         local  struct InvitationAbstract* pInvitation
+ 1521  005B88D4      C  bool IsUsingInvitationManager(const const struct <anon>* this)
+ 1527  005B88E0      C  bool UseInvitationManager()

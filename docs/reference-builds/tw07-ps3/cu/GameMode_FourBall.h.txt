@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/Headers/GameMode_FourBall.h
+// compiled in: golf_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   30  0033EF7C     10  enum UIScoreCardDispMode_t GameModeFourBall::GetScoreDisplayMode(const struct GameModeFourBall* this, bool getAlternate)
+   47  0033EF8C      8  bool GameModeFourBall::IsTeamGame(const struct GameModeFourBall* this)
+   49  0033EF94     14  char* GameModeFourBall::NumPlyReqStrID(const struct GameModeFourBall* this)
+   50  0033EFA8      8  bool GameModeFourBall::AllowUserShotClockOverride(const struct GameModeFourBall* this)

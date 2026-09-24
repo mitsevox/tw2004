@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/mediaplayer.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    7  005BC0D0     1C  void MediaPlayer(const struct <anon>* this)
+   13  005BC108      C  void ~MediaPlayer(const struct <anon>* this)

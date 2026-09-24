@@ -1,0 +1,10 @@
+// C:/packages/rwmovie/1.04.01/include/rwmovie/supplemental/moviedecoder.h
+// compiled in: moviedecoder.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   48  006FBE90    374  void MovieDecoder(const struct MovieDecoder* this, struct IResourceAllocator* allocator)
+                         inlines  Allocate, BaseResources, Resource, ResourceDescriptor, ~ResourceDescriptor
+   51  006FC5AC    41C  void ~MovieDecoder(const struct MovieDecoder* this)
+                         local  struct <anon>* renderable
+                         local  struct <anon> vrResource
+                         inlines  Free, GetStorage

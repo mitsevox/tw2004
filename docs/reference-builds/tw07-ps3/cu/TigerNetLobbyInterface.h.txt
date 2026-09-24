@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/TigerNet/TigerNetLobbyInterface.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  153  0033FB74     A8  void TigerNetLobbyInterface::~TigerNetLobbyInterface(const struct TigerNetLobbyInterface* this)

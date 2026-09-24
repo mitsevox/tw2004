@@ -1,0 +1,116 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/aptInterface/uiAptLoadApx.cpp
+// compiled in: other_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   13  00422DB8     6C  char* APT_strlwr(char* str)
+                         local  char* str2
+                         inlines  std::tolower
+   94  003ECD44     20  static bool IsPointerAlign(uint32 sizeOfEntry, uint32 alignment)
+  131  00449220    910  bool LoadAPX::ParseApx(const struct LoadAPX* this, char* filename, const struct AptInfo_t& destAptInfo)
+                         local  bool aptFound
+                         local  bool constFound
+                         local  bool fileFound
+                         local  bool ruFound
+                         local  bool alphaFound
+                         local  bool scrRegFound
+                         local  bool versionFound
+                         local  bool streamAPXList
+                         local  bool loadPixelShaderfound
+                         local  bool endBlockFound
+                         local  const bool loaded
+                         local  int32_t saveIndex
+                         local  const uint32_t nextTag
+                         local  const int32_t saveIndexLocal
+                         local  const uint32_t nextTag
+                         inlines  AptInfo_t::SetScreenRegistration, AptInfo_t::SetSmoothRendering, LoadAPX::GetCurrentStreamPtr, LoadAPX::GetIndex, LoadAPX::GetNextTag, LoadAPX::GoToNextBlock, LoadAPX::SkipUint32
+  305  00448F18    308  bool LoadAPX::LoadTexgen4Textures(const struct LoadAPX* this)
+                         local  struct TextureGroup* texturegroup
+                         local  int32 nbrTexturesLoaded
+                         local  char[4] buf
+                         local  TextureRef ref
+                         local  struct LoadAPX apxWithTxtGen4
+                         local  struct TextureGroup* texturegroup
+                         inlines  AptInfo_t::AddTextureRef, AptStructSwapper::Swap
+  359  004465C4    128  bool LoadAPX::LoadConstFile(const struct LoadAPX* this)
+                         local  const char* aptConst
+                         inlines  LoadAPX::GetCurrentStreamPtr, LoadAPX::SkipUint32
+  399  00445A88    1FC  bool LoadAPX::LoadPixelShader(const struct LoadAPX* this)
+                         local  const uint32_t size
+                         local  enum eAptSmoothRendering pixelShader
+                         local  enum eAptPrimTexturedSmoothType smoothType
+                         inlines  AptInfo_t::SetSmoothRendering, LoadAPX::GetNextInt32, LoadAPX::GetNextUint32
+  449  00445C84    25C  bool LoadAPX::LoadVersion(const struct LoadAPX* this)
+                         local  const uint32_t size
+                         local  const int32 versionInApx
+                         local  char[512] szBuf1
+                         inlines  AptInfo_t::SetVersion, LoadAPX::GetNextInt32, LoadAPX::GetNextUint32
+  485  004466EC    15C  bool LoadAPX::LoadStreamAPXList(const struct LoadAPX* this)
+                         local  const uint32_t size
+                         local  char* streamList
+                         inlines  LoadAPX::GetCurrentStreamPtr, LoadAPX::GetNextUint32
+  501  00446848    174  bool LoadAPX::LoadAlpha(const struct LoadAPX* this)
+                         local  const uint32_t size
+                         inlines  LoadAPX::GetCurrentStreamPtr, LoadAPX::GetNextUint32
+  521  00445EE0    1A0  bool LoadAPX::LoadRegisterScreenPos(const struct LoadAPX* this)
+                         local  const uint32_t size
+                         local  const uint32 screenRegistration
+                         inlines  AptInfo_t::SetScreenRegistration, LoadAPX::GetNextUint32
+  540  004469BC    3B8  bool LoadAPX::LoadAptFile(const struct LoadAPX* this)
+                         local  const char* aptPtr
+                         local  int32 indexSaved
+                         local  int32 x
+                         local  int32 y
+                         local  uint32* ptr
+                         local  int i
+                         inlines  AptInfo_t::SetScreenResolution, LoadAPX::GetCurrentStreamPtr, LoadAPX::GetNextUint32, LoadAPX::SkipUint32
+  626  00446D74   12A8  bool LoadAPX::LoadRuFiles(const struct LoadAPX* this)
+                         local  int32_t endRuSize
+                         local  int nbrRu
+                         local  int maxMapToRu
+                         local  int nbrRu
+                         local  int maxMapToRu
+                         local  const int32_t saveIndex
+                         local  const int32_t saveIndex
+                         local  const int32_t ruIndex
+                         local  const int32_t saveIndex
+                         local  const int32_t ruIndex
+                         local  const uint32_t ruSize
+                         local  char* ruData
+                         local  const struct AptRUFile_t& ru
+                         local  struct AptStyleTxtGrp* style
+                         local  float* strips
+                         local  const int32 nbr
+                         local  const int32 stride
+                         local  void* pDataArea
+                         local  struct LS_VertexBuffer* pvb
+                         inlines  AptFillStyles::GetStypeTxtGrp, AptFillStyles::GoToFirstStyle, AptFillStyles::GoToNextStyle, AptFillStyles::HasMoreStyles, AptStructSwapper::AllocArray2, AptStructSwapper::Swap, AptStyleTxtGrp::GetStripList, CustomClassSwapper<AptRUFile_t>::AllocArray2, LoadAPX::GetCurrentStreamPtr, LoadAPX::GetIndex, LoadAPX::GetNextInt32, LoadAPX::GoToNextBlock, TArrayInternal<AptInt32,AptStructSwapper>::CheckNeedAlloc, TArrayInternal<AptInt32,AptStructSwapper>::GetSafeElem, TArrayInternal<AptInt32,AptStructSwapper>::SetNbrElems, TArrayInternal<AptRUFile_t,CustomClassSwapper<AptRUFile_t> >::SetNbrElems, TArrayInternal<AptRUFile_t,CustomClassSwapper<AptRUFile_t> >::operator[]
+  728  003ECDAC      4  void LoadAPX::BuildAlphaTable(const struct LoadAPX* this)
+  775  0044801C    4AC  char* LoadAPX::GetFileName(const struct LoadAPX* this)
+                         local  const int32 indexSaved
+                         local  char* filename
+                         local  bool fileFound
+                         local  int32_t saveIndex
+                         local  const uint32_t nextTag
+                         local  const uint32_t nextTag
+                         inlines  LoadAPX::GetCurrentStreamPtr, LoadAPX::GetNextTag, LoadAPX::GoToNextBlock, LoadAPX::SkipUint32
+  839  00448690    888  struct TextureGroup* LoadAPX::ParseApxForTextGen4Textures(const struct LoadAPX* this, const struct AptInfo_t& destAptInfo)
+                         local  struct TextureGroup* textureGroup
+                         local  int nbrTexturesLoaded
+                         local  int32_t saveIndex
+                         local  const uint32_t nextTag
+                         local  int32 headerSize
+                         local  void* data_header
+                         local  const uint32 groupChkRef
+                         local  const int32 textureSize
+                         local  void* data_texture
+                         local  char[4] buf
+                         local  TextureRef ref
+                         local  const TextureInfo* info
+                         inlines  AptInfo_t::AddTextureRef, AptStructSwapper::Swap, LoadAPX::GetCurrentStreamPtr, LoadAPX::GetIndex, LoadAPX::GetNextTag, LoadAPX::GetNextUint32, LoadAPX::GoToNextBlock, LoadAPX::SkipUint32
+  931  00446080    544  void* LoadAPX::GetTexture(const struct LoadAPX* this, int32* textureSizeOut, int32* prevIndex, const int32& textureIsTextGen4)
+                         local  const int32 indexSaved
+                         local  void* texturePtr
+                         local  int32 textureSize
+                         local  int32_t saveIndex
+                         local  const uint32_t nextTag
+                         inlines  LoadAPX::GetCurrentStreamPtr, LoadAPX::GetIndex, LoadAPX::GetNextTag, LoadAPX::GetNextUint32, LoadAPX::GoToNextBlock, LoadAPX::SkipUint32

@@ -1,0 +1,209 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/PS3/RNADevicePlat.cpp
+// compiled in: RNADevicePlat.cpp
+// 46 functions, source order. line | PS3 address | size
+
+    0  0083630C    1B0  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  GetRow, Matrix44, Quaternion, Set, Vector2, Vector3, Vector4
+   79  0083698C    57C  void DevicePlatC(const struct <anon>* this)
+                         local  const char[12] __FUNCTION__
+                         local  int i
+                         local  int i
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct StateValuePair* newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct StateValuePair* newData
+                         inlines  Construct, Init, RNADebugBreak, RenderStateList, Vector
+  155  008364DC    18C  void ~DevicePlatC(const struct <anon>* this)
+                         inlines  Init, ~RenderStateList, ~Vector
+  162  00837830    658  void Init(const struct <anon>* this, enum RenderBufferModeE eRenderBufferMode, int32_t displayWidth, int32_t displayHeight, int32_t renderWidth, int32_t renderHeight, bool8_t createScratchBuffer, int32_t iMaxPendingFrames)
+                         local  const char[5] __FUNCTION__
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int32_t i
+                         local  int i
+                         local  int i
+                         inlines  RNADebugBreak, SurfacePlatC::operator new, TexturePlatC::operator new
+  296  008357D0    164  void Shutdown(const struct <anon>* this)
+                         local  const char[9] __FUNCTION__
+                         local  int i
+                         inlines  RNADebugBreak
+  330  00837484    3AC  void SetMaxPendingFrames(const struct <anon>* this, int32_t iMaxPendingFrames)
+                         local  const char[20] __FUNCTION__
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  uint32_t* newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  uint32_t* newData
+                         inlines  Clear, Construct, Grow, RNADebugBreak, Reserve
+  345  00835CE0      C  int32_t GetMaxPendingFrames(const struct <anon>* this)
+  351  00837E88    590  void SynchronizeAndQueueFrame(const struct <anon>* this)
+                         local  const char[25] __FUNCTION__
+                         local  uint32_t uFence
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  uint32_t* newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  uint32_t* newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  uint32_t* newData
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Construct, Erase, PushBack, RNADebugBreak, operator[]
+  379  0083459C     88  void SetCircularBuffer(const struct <anon>* this, struct <anon>* pCircularBuffer)
+                         local  const char[18] __FUNCTION__
+                         inlines  RNADebugBreak
+  386  008344BC      8  struct <anon>* GetCircularBuffer(const struct <anon>* this)
+  398  0083617C    190  bool BeginFrame(const struct <anon>* this)
+                         local  const char[11] __FUNCTION__
+                         inlines  Gcm::cellGcmSetWaitFlip, RNADebugBreak, SetRenderTargetChanged
+  445  00834624    124  void EndFrame(const struct <anon>* this)
+                         local  const char[9] __FUNCTION__
+                         local  int i
+                         inlines  Gcm::cellGcmSetWriteBackEndLabel, RNADebugBreak
+  470  00838418    244  bool Present(const struct <anon>* this, bool bReuseFrontBuffer)
+                         local  const char[8] __FUNCTION__
+                         local  int32_t ret
+                         inlines  Gcm::cellGcmFlush, Gcm::cellGcmSetFlip, RNADebugBreak
+  541  00834748     C8  void FlipAndDirtyStates(const struct <anon>* this)
+                         local  const char[19] __FUNCTION__
+                         local  int32_t ret
+                         inlines  Gcm::cellGcmSetFlip, RNADebugBreak, SetRenderTargetChanged
+  560  00834810     A4  struct SurfaceC* GetColorBuffer(const struct <anon>* this, uint32_t index)
+                         local  const char[15] __FUNCTION__
+                         inlines  RNADebugBreak
+  566  008344C4     1C  struct SurfaceC* GetDisplayTarget(const struct <anon>* this)
+  571  008344E0     1C  struct SurfaceC* GetFrontBuffer(const struct <anon>* this)
+  576  008344FC     1C  struct TextureC* GetCurrentScratchBuffer(const struct <anon>* this)
+  581  00834518     1C  struct TextureC* GetPreviousScratchBuffer(const struct <anon>* this)
+  586  00835934     DC  void DeviceC::SetDefaultState(const struct DeviceC* this)
+                         local  struct <anon> vpt
+                         local  struct <anon> scissor
+  602  00834534      4  void DeviceC::SetNullShaders(const struct DeviceC* this)
+  614  00834538     14  void DeviceC::SetVertexFormat(const struct DeviceC* this, struct VertexFormatC* pVertexFormat)
+  623  00835EF4    288  void FlushVertexFormat(const struct <anon>* this, struct VertexFormatC* pVF, struct StreamC** pStreamArray, int32_t iStreamCount)
+                         local  const char[18] __FUNCTION__
+                         local  uint32_t channelUsedHere
+                         local  uint32_t channelFreqOp
+                         local  struct CGFXShaderC* pShader
+                         local  uint32_t mask
+                         local  int i
+                         local  int i
+                         local  const struct ElementT* pElementInfo
+                         local  struct StreamPlatC* pStream
+                         local  int8_t indexChannel
+                         inlines  Gcm::cellGcmSetFrequencyDividerOperation, Gcm::cellGcmSetVertexDataArray, GetElement, RNADebugBreak, StreamC::GetPlatform
+  676  008348B4    244  void FlushVertexFormat(const struct <anon>* this, struct VertexFormatC* pVF, int32_t offset, int32_t iStride, enum MemoryLocationE eLocation)
+                         local  const char[18] __FUNCTION__
+                         local  uint32_t channelUsedHere
+                         local  uint32_t channelFreqOp
+                         local  struct CGFXShaderC* pShader
+                         local  uint32_t mask
+                         local  int i
+                         local  int i
+                         local  const struct ElementT* pElementInfo
+                         local  int8_t indexChannel
+                         inlines  Gcm::cellGcmSetFrequencyDividerOperation, Gcm::cellGcmSetVertexDataArray, GetElement, RNADebugBreak
+  739  00834AF8    11C  int32_t AllocateGCMLabel(const struct <anon>* this)
+                         local  const char[17] __FUNCTION__
+                         local  int32_t i
+                         local  int32_t iFirstFree
+                         inlines  RNADebugBreak
+  765  00834C14    188  void FreeGCMLabel(const struct <anon>* this, int32_t iGCMLabel)
+                         local  const char[13] __FUNCTION__
+                         local  int32_t iArrayEntry
+                         local  int32_t iBit
+                         inlines  RNADebugBreak
+  784  00834D9C     A0  uint8_t AllocateTileRegion(const struct <anon>* this)
+                         local  const char[19] __FUNCTION__
+                         local  int i
+                         inlines  RNADebugBreak
+  799  00834E3C     DC  void FreeTileRegion(const struct <anon>* this, uint8_t index)
+                         local  const char[15] __FUNCTION__
+                         inlines  RNADebugBreak
+  809  00835A10     4C  uint32_t DeviceC::InsertFence(const struct DeviceC* this)
+                         inlines  Gcm::cellGcmSetWriteCommandLabel
+  816  00835BDC     30  bool DeviceC::IsFenceComplete(const struct DeviceC* this, uint32_t uFenceID)
+                         local  uint32_t uFenceSpan
+                         local  uint32_t uLastConsumedFence
+  840  00835C0C     28  bool DeviceC::IsFencePending(const struct DeviceC* this, uint32_t uFenceID)
+  854  00835C34     AC  void DeviceC::WaitForFence(const struct DeviceC* this, uint32_t uFenceID)
+                         local  uint32_t uSleepCount
+                         local  uint32_t uBusyCount
+                         local  struct RSXFriendlyBusyWait wait
+                         inlines  Gcm::cellGcmFlush
+  898  00835CEC    208  void DeviceC::Clear(const struct DeviceC* this, uint32_t uClearSurfaceFlags, const const RNAVector4& Color, float_t fZValue, uint32_t uStencilValue)
+                         local  uint32_t rgba
+                         local  uint32_t depthStencil
+                         local  uint32_t flags
+                         local  Vector4Intrinsic_32 floatVec
+                         local  int[4] zero
+                         local  Vector4Intrinsic_32 vi_temp
+                         inlines  Gcm::cellGcmSetClearColor, Gcm::cellGcmSetClearDepthStencil, Gcm::cellGcmSetClearSurface, operator float, vpu::operator*<VectorAxisW>, vpu::operator*<VectorAxisX>, vpu::operator*<VectorAxisY>, vpu::operator*<VectorAxisZ>
+  953  00834F18     E0  void DeviceC::BeginRecording(const struct DeviceC* this, struct CmdBufferC* pCmdBuffer)
+                         local  const char[15] __FUNCTION__
+                         local  void* ptr
+                         local  uint32_t size
+                         inlines  RNADebugBreak
+  978  00834FF8     F8  void DeviceC::NextBlock(const struct DeviceC* this)
+                         local  const char[10] __FUNCTION__
+                         local  struct CmdBufferC* pCmdBuffer
+                         local  uint32_t* EndBufferAddr
+                         local  uint32_t size
+                         local  void* ptr
+                         inlines  Gcm::cellGcmSetReturnCommand, RNADebugBreak
+ 1010  008350F0     CC  struct CmdBufferC* DeviceC::EndRecording(const struct DeviceC* this)
+                         local  const char[13] __FUNCTION__
+                         local  struct CmdBufferC* pCmdBuffer
+                         local  uint32_t* EndBufferAddr
+                         inlines  Gcm::cellGcmSetReturnCommand, RNADebugBreak
+ 1033  00835A5C    180  void DeviceC::CallBuffer(const struct DeviceC* this, struct CmdBufferC* pCmdBuffer, uint32_t uBlockNum)
+                         local  const char[11] __FUNCTION__
+                         inlines  DeviceC::Flush, Gcm::cellGcmFlush, Gcm::cellGcmSetCallCommand, RNADebugBreak
+ 1071  008351BC    144  void BlockGpuOnTransfer(const struct <anon>* this)
+                         local  const char[19] __FUNCTION__
+                         local  int32_t waitLabel
+                         inlines  Gcm::cellGcmSetWaitLabel, Gcm::cellGcmSetWriteBackEndLabel, RNADebugBreak
+ 1116  0083454C     2C  void GpuFlush(const struct <anon>* this)
+                         inlines  Gcm::cellGcmFlush
+ 1129  00834578     24  void BlockUntilGpuIdle(const struct <anon>* this)
+ 1148  00835300    118  void LockVertShaderConstant(const struct <anon>* this, uint32_t uRegStart, uint32_t uNumRegs)
+                         local  const char[23] __FUNCTION__
+                         local  uint32_t uReg
+                         local  int32_t iVSCElement
+                         local  int32_t iVSCBit
+                         inlines  RNADebugBreak
+ 1173  00835418    118  void UnlockVertShaderConstant(const struct <anon>* this, uint32_t uRegStart, uint32_t uNumRegs)
+                         local  const char[25] __FUNCTION__
+                         local  uint32_t uReg
+                         local  int32_t iVSCElement
+                         local  int32_t iVSCBit
+                         inlines  RNADebugBreak
+ 1198  00835530    150  void VerifyUnmanagedVertShaderConstant(const struct <anon>* this, uint32_t uRegStart, uint32_t uNumRegs)
+                         local  const char[34] __FUNCTION__
+                         local  uint32_t uReg
+                         local  int32_t iVSCElement
+                         local  int32_t iVSCBit
+                         inlines  RNADebugBreak
+ 1222  00835680    150  void VerifyManagedVertShaderConstant(const struct <anon>* this, uint32_t uRegStart, uint32_t uNumRegs)
+                         local  const char[32] __FUNCTION__
+                         local  uint32_t uReg
+                         local  int32_t iVSCElement
+                         local  int32_t iVSCBit
+                         inlines  RNADebugBreak
+ 1235  008364CC     10  static void _GLOBAL__I__ZN3RNA11DevicePlatCC2Ev()
+ 1236  008364BC     10  static void _GLOBAL__D__ZN3RNA11DevicePlatCC2Ev()

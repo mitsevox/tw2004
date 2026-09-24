@@ -1,0 +1,40 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_CharGeneric.cpp
+// compiled in: shader_unity.cpp
+// 22 functions, source order. line | PS3 address | size
+
+   46  0051CF84    124  void SM_CharGenericClass::SM_CharGenericClass(const struct SM_CharGenericClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base, vec4flt_Zero
+   94  0050E4E4     6C  void SM_CharGenericClass::Load(const struct SM_CharGenericClass* this)
+  103  0051E068     D0  void SM_CharGenericClass::ResetPSMode(const struct SM_CharGenericClass* this)
+                         inlines  GM_IsFrontEnd
+  110  0051E138    4B8  void SM_CharGenericClass::LoadParams(const struct SM_CharGenericClass* this)
+                         inlines  GM_IsFrontEnd
+  156  0051E758    2E8  void SM_CharGenericClass::Activate(const struct SM_CharGenericClass* this)
+                         local  int32 i
+                         inlines  DS_vSetAlphaBlendingFunction, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, GM_IsFrontEnd
+  203  0050E550     54  void SM_CharGenericClass::Deactivate(const struct SM_CharGenericClass* this)
+  217  00519608     6C  void SM_CharGenericClass::SetTexTransform0(const struct SM_CharGenericClass* this, const float[4]& transForm)
+                         inlines  vec4flt_Copy
+  227  00519674     6C  void SM_CharGenericClass::SetAmbientParams(const struct SM_CharGenericClass* this, const float[4]& ambientParams)
+                         inlines  vec4flt_Copy
+  237  005196E0     6C  void SM_CharGenericClass::SetWrapLightAmount(const struct SM_CharGenericClass* this, const float[4]& col)
+                         inlines  vec4flt_Copy
+  247  0051974C     6C  void SM_CharGenericClass::SetSpecExtra(const struct SM_CharGenericClass* this, const float[4]& specExtraParams)
+                         inlines  vec4flt_Copy
+  257  00515AA4     6C  void SM_CharGenericClass::SetShadowParams(const struct SM_CharGenericClass* this, float shadowMapBias, float shadowMapGain)
+  268  0051EC10    1BC  void SM_CharGenericClass::SetTintingParams(const struct SM_CharGenericClass* this, int32 tintMode, float* pTintValues)
+                         local  float tintCode
+                         local  int32 i
+                         inlines  GM_IsFrontEnd
+  294  0051EDCC     E8  void SM_CharGenericClass::SetGlobalFadeOut(const struct SM_CharGenericClass* this, float value)
+                         inlines  GM_IsFrontEnd
+  306  0051EEB4     E8  void SM_CharGenericClass::SetGlobalTextureBlackOut(const struct SM_CharGenericClass* this, float value)
+                         inlines  GM_IsFrontEnd
+  318  00515B10     64  void SM_CharGenericClass::SetBaseTexture(const struct SM_CharGenericClass* this, TextureRef texRef)
+  328  00515B74     64  void SM_CharGenericClass::SetBaseNormalMap(const struct SM_CharGenericClass* this, TextureRef texRef)
+  338  00515BD8     64  void SM_CharGenericClass::SetPackedMap(const struct SM_CharGenericClass* this, TextureRef texRef)
+  348  00515C3C     64  void SM_CharGenericClass::SetShadowMap(const struct SM_CharGenericClass* this, TextureRef texRef)
+  358  00515CA0     64  void SM_CharGenericClass::SetAmbientCubeMap(const struct SM_CharGenericClass* this, TextureRef texRef)
+  368  00515D04     64  void SM_CharGenericClass::SetSpecEnvCubeMap(const struct SM_CharGenericClass* this, TextureRef texRef)
+  378  00515D68     64  void SM_CharGenericClass::SetEnvCubeMap(const struct SM_CharGenericClass* this, TextureRef texRef)
+  388  00515DCC     64  void SM_CharGenericClass::SetFilmLookLUTMap(const struct SM_CharGenericClass* this, TextureRef texRef)

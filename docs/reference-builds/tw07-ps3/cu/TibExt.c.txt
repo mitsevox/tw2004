@@ -1,0 +1,25 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Tiburon/Eassdk/TibExt.c
+// compiled in: other_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   32  003CE3B8     18  void TibExt_SetCurrentMemoryPool(int ePool)
+   47  003CE3D0     EC  void* TibExtMemAlloc(uint32 uID, uint32 uSize, uint32 uAlign)
+                         local  void* ptr
+   64  003CE4BC     50  void TibExtMemFree(uint32 uID, void* pMem, uint32 uSize, uint32 uAlign)
+   74  003E6830     6C  void TibExtDebugBreak(Char* strFile, uint32 uLine, Char* strValue, Char* strComment)
+                         local  Char[256] str
+  106  003E68C4     70  int32 TibExtDebugPrintf(const Char* fmt)
+                         local  char[256] buf
+                         local  va_list args
+  136  003CE50C     D8  EASTimeT TibExtCurrentTimeGet()
+                         local  CalendarDate date1970
+                         local  CalendarDate dateToday
+                         local  int numDays
+                         local  int numSeconds
+                         local  int month
+                         local  int day
+                         local  int year
+                         local  int hour
+                         local  int minute
+                         local  int second
+                         local  int milli

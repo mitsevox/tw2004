@@ -1,0 +1,16 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_RivalsChallenge.h
+// compiled in: apt_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   51  00117200    160  void UIRivalsChallenge::~UIRivalsChallenge(const struct UIRivalsChallenge* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIRivalsChallenge::RChallengeMenuItem>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+   53  000FEB2C      C  uint32 UIRivalsChallenge::GetSignature(const const struct UIRivalsChallenge* this)
+   59  000FEB40      C  struct IExternArray* UIRivalsChallenge::GetExternArray(const struct UIRivalsChallenge* this)
+   60  000FEB54      8  int32 UIRivalsChallenge::GetSizeofArrayStruct(const struct UIRivalsChallenge* this)
+   65  000FEB5C     44  void UIRivalsChallenge::ShowHelpText(const struct UIRivalsChallenge* this)
+   97  00116F44    160  void UIRivalsChallengeToggle::~UIRivalsChallengeToggle(const struct UIRivalsChallengeToggle* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIRivalsChallengeToggle::RChallengeToggleMenuItem>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+   99  000FEBA8      C  uint32 UIRivalsChallengeToggle::GetSignature(const const struct UIRivalsChallengeToggle* this)
+  101  000FEBB4     3C  void UIRivalsChallengeToggle::Show(const struct UIRivalsChallengeToggle* this)
+  105  000FEBF8      C  struct IExternArray* UIRivalsChallengeToggle::GetExternArray(const struct UIRivalsChallengeToggle* this)
+  110  000FEC04     44  void UIRivalsChallengeToggle::ShowHelpText(const struct UIRivalsChallengeToggle* this)

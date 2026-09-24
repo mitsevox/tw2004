@@ -1,0 +1,20 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/aptInterface/uiAptLoadFromFile.cpp
+// compiled in: other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+  165  003ECDB0      8  int AptCompareFileTime(const char* filenameA, const char* filenameB)
+  175  003FEBB8    248  int32 GetActualRead(uint32 len, int32 hFileHandle, char** dataBuffer)
+                         local  const char[14] __FUNCTION__
+                         local  int32 iBytesRead
+                         local  const int32 alignMem
+                         local  const int32 streamDataSize
+                         local  const int32 sizeAlloc
+                         local  CircularBuffer_t* circBuffer
+                         local  const bool isLocked
+                         local  char* alignBuf
+                         local  struct TStreamData* streamData
+                         inlines  TagValuePair, operator+
+  231  003FEE00     EC  struct TStreamData* AptLoadFile(const char* filename)
+                         local  int32 iOpenFile
+                         local  uint32 datasize
+                         local  char* data

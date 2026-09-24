@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/Code/Golf/RenderObjects/twfrustum.h
+// compiled in: rnaunity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   44  004E2FA4     10  void ViewFrustum(const struct <anon>* this, const struct <anon>& viewProjMatrix)
+  213    inline-only   bool8_t IsSphereInFrustum(const struct <anon>* this, const const struct Vector4& sphereCenter, float_t radius, const struct <anon>& transform)
+                         local  uint32_t i
+                         local  float32_t dist

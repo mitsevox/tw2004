@@ -1,0 +1,23 @@
+// ../../../../../TIGERCODE/packages/tiger_module/include/tiger_module_collision.h
+// compiled in: golf2_unity.cpp, golf_unity.cpp
+// 19 functions, source order. line | PS3 address | size
+
+  147    inline-only   void SetLength(const struct <anon>* this, float length)
+  210    inline-only   uint32_t GetCollisionCount(const const struct <anon>* this)
+  363    inline-only   float* GetPtr(const struct <anon>* this)
+  368    inline-only   float* operator float*(const struct <anon>* this)
+  378    inline-only   const float* operator const float*(const const struct <anon>* this)
+  383    inline-only   struct <anon>* GetPtr(const struct <anon>* this)
+  418    inline-only   int32_t GetVertexIdx(const const struct <anon>* this, int32_t vertexIdx)
+  443    inline-only   void SetOrigin(const struct <anon>* this, const const struct <anon>& origin)
+  453    inline-only   void SetDirection(const struct <anon>* this, const const struct <anon>& direction)
+  468    inline-only   bool IsValid(const const struct <anon>* this)
+  478    inline-only   const struct <anon>& GetNormal(const const struct <anon>* this)
+  493    inline-only   const struct <anon>& GetPosition(const const struct <anon>* this)
+  518    inline-only   const struct <anon>& GetMaterialId(const const struct <anon>* this)
+  538    inline-only   const char* GetActorID(const const struct <anon>* this)
+  548    inline-only   OriginatorType GetOriginatorType(const const struct <anon>* this)
+  553    inline-only   const char* operator const char*(const const struct <anon>* this)
+  578    inline-only   int32_t GetTriangleCount(const const struct <anon>* this)
+  583    inline-only   const struct <anon>& GetTriangle(const const struct <anon>* this, int32_t triIdx)
+  588    inline-only   int32_t GetJointCount(const const struct <anon>* this)

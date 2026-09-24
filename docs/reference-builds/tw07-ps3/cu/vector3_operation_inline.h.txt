@@ -1,0 +1,9 @@
+// ../../../../../TIGERCODE/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/vector3_operation_inline.h
+// compiled in: headgate_unity.cpp, rnaunity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   23    inline-only   bool vpu::operator==(struct <anon>& a, struct <anon>& b)
+   28    inline-only   bool vpu::operator!=(struct <anon>& a, struct <anon>& b)
+   78    inline-only   struct <anon> vpu::Subtract(struct <anon>& a, struct <anon>& b)
+  103    inline-only   struct <anon> vpu::Magnitude(struct <anon>& v)
+  442    inline-only   struct <anon> vpu::operator-(struct <anon>& a, struct <anon>& b)

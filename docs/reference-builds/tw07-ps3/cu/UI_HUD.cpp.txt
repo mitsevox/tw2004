@@ -1,0 +1,343 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_HUD.cpp
+// compiled in: apt_unity.cpp
+// 119 functions, source order. line | PS3 address | size
+
+  138  00079474     BC  void ForPauseMenu_HideExtraElements()
+                         local  int value
+                         inlines  ScreenEffects::StartIgnoreFadeMode, cGAME_GLOBALS::SetPipEnabled
+  157  00079530     74  void ForPauseMenu_CancelHideExtraElements()
+                         inlines  ScreenEffects::StopIgnoreFadeMode, cGAME_GLOBALS::SetPipEnabled
+  237  000EB460     A0  void ConfirmConcedeCB()
+                         local  enum PlayerNumber_t conceder
+                         inlines  GM_GetGolferUp
+  250  000D9038    1EC  void ConfirmQuit()
+                         local  int32 numHolesPlayed
+                         local  uint32 i
+                         inlines  GM_GetCurrentHoleIndex, OnlineManagerOSDK::SetAsQuitter, cGAME_GLOBALS::SetPipEnabled
+  296  000EDA10     64  void ResumeGameFromPause()
+  311  0003EC00      4  void CancelQuit()
+  318  000ED9A8     68  void CancelChallenge()
+  328  0003EC04      4  void AcceptChallenge()
+  351  000C8BD4     48  void ChangedLoginExit()
+  359  000ED970     38  void UIHud_SaveReplayCompletionCB(int32 nRslt)
+  367  000EB500     7C  void _QuickChatCB()
+                         local  char[128] chatBuf
+                         inlines  GM_GetGolferUp
+  377  000ED95C     14  void _ShowHudCB()
+  410  0003EC08      4  void MuteAll()
+  428  0003EC0C      4  void MuteUser(int index)
+  493  000F3C00    124  void UIHud::UIHud(const struct UIHud* this)
+                         inlines  AptStaticCharBuffer<128u>::AptStaticCharBuffer, AptStaticCharBuffer<64u>::AptStaticCharBuffer, TAptArrayStruct, TArrayInternal<HUDShowHide,AptStructSwapper>::TArrayInternal
+  527  0003EC10    144  void UIHud::Init(const struct UIHud* this)
+  552  000A2D48     80  void UIHud::Close(const struct UIHud* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<HUDShowHide,AptStructSwapper>::Flush
+  572  000E9ECC    1F8  void UIHud::Show(const struct UIHud* this)
+                         inlines  UI_ComponentManager::ShowScreen
+  639  000B7648    134  void UIHud::Hide(const struct UIHud* this)
+                         inlines  UI_ComponentManager::HideScreen
+  680  000E866C    13C  void UIHud::OnShow(const struct UIHud* this)
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+  695  0002248C     48  enum TAptSequenceStatus UIHud::FixVisibilitySequence(const struct UIHud* this, bool inbFirstTime, void* inData)
+  701  00022480      C  void UIHud::GetOnline(const struct UIHud* this)
+  711  0003EFBC     8C  void UIHud::UpdatePuttSlope(const struct UIHud* this)
+                         local  uint32 xflip
+                         local  uint32 elevIndex
+                         local  char[8] arg
+  722  0009CD2C    13C  void UIHud::targetInfoVisibility(const struct UIHud* this, uint32 visibility)
+  746  000EA0C4     74  void UIHud::SetUpPostShot(const struct UIHud* this)
+  757  000EDF4C    D2C  void UIHud::DoMessage(const struct UIHud* this, uint32 hint, void* p1, void* p2, void* p3, void* p4, void* p5)
+                         local  int32 golferindex
+                         local  char* modeString
+                         local  char* driverString
+                         local  char[256] strID
+                         local  void* pPtr
+                         local  int32 shownow
+                         local  int32 hintID
+                         local  char[16] strID
+                         local  bool allowClose
+                         local  const int32 yTop
+                         local  const int32 sPosiAdjustmentY
+                         local  const int32 sPosiAdjustmentX
+                         local  int32 xposi
+                         local  int32 yposi
+                         inlines  OnlineManagerOSDK::GetInstance, OnlineManagerOSDK::WaitingForChallenge, UIPopupDef::SetShowNoTipsPrompt, cGAME_GLOBALS::GetCumulativeFrames
+ 1188  0009C5DC     C8  void UIHud::HUDSetVisible(const struct UIHud* this, const char* movieClip, int32 value)
+ 1209  0009C244    398  void UIHud::PostShowHide(const struct UIHud* this, const char* instance, int32 showOrHide)
+                         local  bool found
+                         local  int i
+                         local  const struct HUDShowHide& hudShowHide
+                         local  int i
+                         local  struct HUDShowHide* hudShowHide
+                         inlines  AptStructSwapper::Swap, TArrayInternal<HUDShowHide,AptStructSwapper>::Push, TArrayInternal<HUDShowHide,AptStructSwapper>::operator[]
+ 1260  00089D68    1D0  enum AptThreadReturnValue UIHud::PostShowHide_AptThread(const struct UIHud* this)
+                         local  int i
+                         local  const struct HUDShowHide& hudShowHide
+                         inlines  TArrayInternal<HUDShowHide,AptStructSwapper>::RemoveElem, TArrayInternal<HUDShowHide,AptStructSwapper>::operator[]
+ 1275  0003F11C    15C  void UIHud::UpdateClubRotation(const struct UIHud* this, float y)
+                         local  const int32 golferindex
+                         local  const int32 myExtraRotation
+                         local  const int32 rotationRange
+                         local  float rotation
+ 1327  0006DAAC    52C  void UIHud::UpdateClubShotData(const struct UIHud* this, bool bForceClubSnap)
+                         local  char[16] strID
+                         local  const int32 golferindex
+                         local  const int32 clubindex
+                         local  int32 shottypeindex
+                         local  const float clubdistance
+                         local  const char* clubNameStr
+                         local  int32 w
+                         local  int32 h
+                         local  int32 l
+                         local  float x
+                         local  float slashWidth
+                         local  char[32] clubDistStr
+                         local  const char* shotTypeStr
+                         local  int32 picIndex
+                         local  char[8] forceParam
+ 1431  000E768C    730  void UIHud::UpdateTargetData(const struct UIHud* this, float targetDistance, float targetFeet, float targetInches, float powerpercent, int32 PlayerID)
+                         local  char[32] strBuf
+                         local  enum TargetInfoState_t elevState
+                         local  const int32 golferindex
+                         local  const int32 shottypeindex
+                         local  char* suffix
+                         local  int32 flags
+                         local  char[64] strBuf2
+                         local  const float fStrongElevThresh
+                         local  const float fWeakElevThresh
+                         local  const char* elevDirStr
+                         local  char* format
+                         local  float meters
+                         local  bool isLevel
+                         local  char* meterFormat
+ 1612  000E99D8    430  void UIHud::UpdateGolferInfo(const struct UIHud* this)
+                         local  char[16] strID
+                         local  char[32] strBuf
+                         local  const int32 hole
+                         local  const int32 golferindex
+                         local  const int32 golferTee
+                         local  const int32 shottypeindex
+                         local  const int32 par
+                         local  void* dummy
+                         local  int32 strokes
+                         local  float distToPin
+                         local  int32 formatFlags
+                         local  char[48] nameBuf
+                         local  struct GameModeDriver* driver
+                         local  struct GameSkillsChallenge* mode
+                         local  char* tempStr
+                         local  enum GM_TeeColorType_t tee
+                         inlines  GM_GetCurrentHoleIndex
+ 1732  000E9904     30  void UIHud::DoPreShotUpdate(const struct UIHud* this)
+ 1742  0003F300     44  void UIHud::ShowClickMeter(const struct UIHud* this)
+ 1751  0003F344     44  void UIHud::HideClickMeter(const struct UIHud* this)
+ 1761  000654F4    244  void UIHud::UpdateClickMeter(const struct UIHud* this)
+                         local  float fPower
+                         local  float fPerfectAccuracyWindow
+                         local  float fAccuracyWindow
+                         local  float fSelectPower
+                         local  float fSelectAccuracy
+                         local  float fDistance
+ 1810  000E8D30     5C  void UIHud::ShowPostShotFeedback(const struct UIHud* this)
+ 1824  0003F388     1C  void UIHud::ShowPostShotFeedbackDelay(const struct UIHud* this, float fSeconds)
+ 1836  000E9934     A4  void UIHud::UpdatePostShotFeedbackDelay(const struct UIHud* this)
+ 1853  0003F0D0     4C  void UIHud::HidePostShotFeedback(const struct UIHud* this)
+ 1863  0003F3A4     44  void UIHud::SetPostShotWideAspect(const struct UIHud* this)
+ 1872  0003F3E8     44  void UIHud::SetPostShotFullAspect(const struct UIHud* this)
+ 1882  0003F42C     50  void UIHud::SetPostShotAngle(const struct UIHud* this, float fAngle)
+ 1889  0003F278     88  void UIHud::UpdateWindSpeedAlert(const struct UIHud* this)
+                         local  float windSpeed
+ 1904  000E93C0    544  void UIHud::ShowFlashyText(const struct UIHud* this)
+                         local  char[48] strBuf
+                         local  const int32 golferindex
+                         local  struct GameModeDriver* driver
+                         local  char[16] strID
+                         local  const int32 hole
+                         local  const int32 shottypeindex
+                         local  const int32 par
+                         local  void* dummy
+                         local  int32 strokes
+                         local  int32 gameModeType
+                         local  char* suffix
+                         local  char* tempStr
+                         local  char* tempStr
+                         local  struct GameSkillsChallenge* mode
+                         inlines  GM_GetCurrentHoleIndex, Singleton<GameModeDriverManager>::GetSingleton
+ 2014  000E8F8C    3B0  void UIHud::UpdateLieInfo(const struct UIHud* this)
+                         local  char[16] strBuf
+                         local  const uint32 golferindex
+                         local  const uint32 lieindex
+                         local  uint8[10] liePicMap
+                         local  int32 picIndex
+                         local  const char* lieStr
+                         local  const float liepct
+                         local  const float liemodifier
+                         local  const float offset
+                         local  int32 lowBound
+                         local  int32 highBound
+                         local  char* format
+                         local  char* format
+ 2130  000E8D8C    200  void UIHud::UpdateWindInfo(const struct UIHud* this)
+                         local  CameraController_t* pCameraController
+                         local  const int32 golferindex
+                         local  float windSpeed
+                         local  int32 shottypeindex
+                         local  const float finalRot
+                         local  float speed
+ 2208  0003F47C    1C8  void UIHud::InitVoipIcons(const struct UIHud* this)
+                         local  char[16] arg
+                         local  int localPlayer
+                         local  int player
+                         local  int i
+                         local  char[64] path
+ 2250  000EA618    464  void UIHud::InitPostShotUI(const struct UIHud* this, int modeHint, float yardage, int playerID)
+                         local  void* pPtr
+                         local  bool bIsTutorialMode
+                         local  enum eHudFlashTextMod modType
+                         local  bool bShowHoleWinText
+                         local  bool isSpecialNonHoleOutMessage
+                         local  enum PlayerNumber_t curPlayer
+                         local  int32 points
+                         local  int32 iGolferIndex
+                         inlines  AptStaticCharBuffer<128u>::GetBuffer
+ 2349  000EA3F0    228  void UIHud::SetPostShotYardage(const struct UIHud* this, int32 iGolferIndex, float fYardsHit)
+                         local  char[32] sDistanceStr
+                         local  char[32] sDistanceToPinStr
+                         local  float fYardsToPin
+                         local  int32 formatPinFlags
+                         local  int32 formatHitFlags
+                         local  char* formatToPin
+                         inlines  GM_GetModeType
+ 2406  000E87A8    588  void UIHud::UpdatePostShotFeedback(const struct UIHud* this)
+                         local  struct CoreShotInfo_t* CoreShotInfo
+                         local  struct ShotFeedbackType* ShotFeedback
+                         local  bool bWideScreen
+                         local  char[48] sFlightStr
+                         local  char[48] sTempoStr
+                         local  char[48] sImpactStr
+                         local  char[48] sSpeedStr
+ 2549  000E73D8     50  bool UIHud::SetHoleOutText(const struct UIHud* this, int32 textID, float Param2, const enum eHudFlashTextMod& modType)
+ 2560  000EB57C    288  void UIHud::UpdatePuttInfo(const struct UIHud* this)
+                         local  const int32 golferindex
+                         local  const int32 clubindex
+                         local  const int32 shottypeindex
+                         local  float m_fYardsToPin
+                         local  bool readingGreen
+                         local  bool unavail
+                         local  const char* label
+                         inlines  GM_GetGolferUp
+ 2635  0007A320     A0  void UIHud::ShowPassivePauseMenu(const struct UIHud* this)
+                         local  struct UIMenuItemDefaultSrc* pauseMenuData
+                         local  int32 pauseMenuArrayNbr
+ 2671  0007A27C     A4  void UIHud::HidePassivePauseMenu(const struct UIHud* this)
+ 2685  000EDA74    134  void UIHud::HideOnlinePauseMenu(const struct UIHud* this)
+ 2732  000EB804    81C  void UIHud::ShowPauseMenu(const struct UIHud* this)
+                         local  struct UIMenuItemDefaultSrc* pauseMenuData
+                         local  int32 pauseMenuArrayNbr
+                         local  void* pPtr
+                         inlines  GM_DisplayScorecard, GM_GetGolferUp, GM_GetModeType
+ 2880  000770D0     2C  bool UIHud::IsGolferIdleHudPertinent(const struct UIHud* this)
+ 2885  000EDD84    1C8  void UIHud::ShowGolferIdleHud(const struct UIHud* this)
+                         local  bool isAiPlayer
+ 2928  000ECDD0    104  void UIHud::UnGhostGolferIdleHud(const struct UIHud* this)
+                         local  bool isAiPlayer
+ 2950  000D011C     44  void UIHud::GhostMiniHUDs(const struct UIHud* this)
+ 2957  0007025C     44  void UIHud::UnGhostMiniHUDs(const struct UIHud* this)
+ 2964  000E7DBC    130  void UIHud::GhostGolferIdleHud(const struct UIHud* this)
+                         local  bool isAiPlayer
+ 2987  0009CE68     3C  void UIHud::TransitionGolferIdleHudToZoomingInHud(const struct UIHud* this)
+ 3002  0009CCE4     48  void UIHud::UnGhostZoomingInHud(const struct UIHud* this)
+ 3009  000D0240     48  void UIHud::GhostZoomingInHud(const struct UIHud* this)
+ 3016  000ECD80     50  void UIHud::TransitionZoomingInHudToGolferIdleHud(const struct UIHud* this)
+ 3031  00066F54     3C  void UIHud::ShowBallFlightHud(const struct UIHud* this)
+ 3037  000D0200     40  void UIHud::GhostBallFlightHud(const struct UIHud* this)
+ 3044  000702A0     40  void UIHud::UnGhostBallFlightHud(const struct UIHud* this)
+ 3051  0003F974      4  void UIHud::HideBallFlightHud(const struct UIHud* this)
+ 3055  0009C930    3B4  void UIHud::ShowPostShotHud(const struct UIHud* this)
+                         local  void* rawGameModePointer
+                         local  bool bIsTimedChallengeGameMode
+                         local  bool bIsSkillZoneHorse
+                         local  bool bIsSkillZoneCapture
+                         local  bool bIsSkillZoneTarget
+                         local  bool bIsSkillZoneTargetToTarget
+                         local  bool bIsTutorialGameMode
+                         local  bool bIsOneBallGameMode
+                         local  bool bIsGreenToGreenMode
+                         inlines  cGAME_GLOBALS::GetCumulativeFrames
+ 3106  0009C89C     94  void UIHud::UnGhostPostShotHud(const struct UIHud* this)
+ 3119  000D0160     A0  void UIHud::GhostPostShotHud(const struct UIHud* this)
+ 3132  00087F1C    194  void UIHud::HidePostShotHud(const struct UIHud* this)
+ 3177  0003F9C8     98  void UIHud::PushHudVisualState(const struct UIHud* this, enum eHudVisualState newState)
+ 3188  0003FA60     7C  void UIHud::PopHudVisualState(const struct UIHud* this)
+ 3198  0003F048     1C  void UIHud::SetHudVisualState(const struct UIHud* this, enum eHudVisualState newState)
+ 3203  0003F064     1C  enum eHudVisualState UIHud::GetHudVisualState(const struct UIHud* this)
+ 3209  000ECED4     B0  void UIHud::UnGhostFullScreenHud(const struct UIHud* this)
+ 3238  000E7EEC     B0  void UIHud::GhostFullScreenHud(const struct UIHud* this)
+ 3265  000EC020    230  bool UIHud::CheckGameStatesAndShowPauseMenu(const struct UIHud* this)
+                         local  bool retVal
+                         local  enum GolferState curGolferState
+                         local  enum PlayerNumber_t golferUp
+                         local  int32 controller
+                         local  enum PlayerCtrl_t golferUpController
+                         inlines  GM_GetGolferUp, GamePlayer::GetController
+ 3348  00022450     30  enum AptThreadReturnValue UIHud::TransitionToZoomTargetPanelHeight_AptThread(const struct UIHud* this)
+                         local  int32 panelDelta
+ 3364  0003FADC      C  int32 UIHud::GetTargetPanelHeight(const struct UIHud* this)
+ 3383  000EC250    1F4  enum eAptHandleInput UIHud::HandleInput(const struct UIHud* this, int32 cID)
+                         local  enum GolferState curGolferState
+                         local  CameraController_t* pCameraController
+                         inlines  GM_GetGolferUp, Singleton<GameModeDriverManager>::GetSingleton
+ 3463  0003FAE8     48  void UIHud::onHide(const struct UIHud* this)
+ 3471  000ED210    74C  void UIHud::onClose(const struct UIHud* this, void* inData)
+                         local  bool showHUD
+                         local  bool bSavedGameUIUp
+                         local  bool bMoreUIUp
+                         local  int32 id
+                         local  char[256] strID
+                         local  enum PlayerNumber_t playerID
+                         local  enum PlayerNumber_t playerID
+                         local  enum PlayerNumber_t playerID
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton, UIPopupDef::SetShowNoTipsPrompt
+ 3692  0003FB40    160  void UIHud::SetupMuteMenu(const struct UIHud* this)
+                         local  int i
+ 3713  0003FB38      8  char* UIHud::HandleMuteAllString(const struct UIHud* this)
+ 3732  0003FB30      8  char* UIHud::HandleMuteString(const struct UIHud* this, int index)
+ 3756  0006E098     20  void UIHud::ExternSet(const struct UIHud* this)
+ 3783  0003FCA0     34  void UIHud::SetDebugText(const struct UIHud* this, const char* str)
+ 3792  0002CD40     64  bool UIHud::GetTappaSpinnaData(const const struct UIHud* this, float* normalizedWidth, float* normalizedHeight, float* normalizedCenterPositionX, float* normalizedCenterPositionY)
+ 3812  000E9E78     54  void UIHud::ResetGolferInfoCycle(const struct UIHud* this)
+ 3823  000660B0     90  void UIHud::PostShotUI_WaitForAudioStreamToFinish(const struct UIHud* this)
+                         inlines  Ses_HasStreamingAudio
+ 3832  000880B0     48  void UIHud::PostShot_NextShotHidePostShot(const struct UIHud* this)
+ 3840  0003ED54      C  void UIHud::ResetClubPic(const struct UIHud* this)
+ 3847  0006A140    2B0  bool UIHud::AdvancePostShotUI(const struct UIHud* this)
+                         local  bool isMorePostShot
+                         local  bool bKillAudio
+ 3975  0003EA1C      C  void UIHud::HighImpactMessageDone(const struct UIHud* this)
+ 3982  0003E780      C  void UIHud::WaitForHighImpactMessage(const struct UIHud* this)
+ 3989  0003FCD4      8  bool UIHud::IsWaitingForHighImpactMessage(const struct UIHud* this)
+ 3994  00066140     2C  bool UIHud::PostShot_PostShotCheckTimerWait(const struct UIHud* this)
+ 4004  0006616C     DC  bool UIHud::PostShot_PostShotWaitDone(const struct UIHud* this)
+ 4071  0006A3F0     A8  enum AptThreadReturnValue UIHud::PostShotManager_AptThread(const struct UIHud* this)
+ 4088  000E9E08     70  enum AptThreadReturnValue UIHud::GolferInfoCycleThread(const struct UIHud* this)
+ 4100  000E933C     84  enum AptThreadReturnValue UIHud::GolferLieCycleThread(const struct UIHud* this)
+ 4115  000EDBA8    1DC  enum AptThreadReturnValue UIHud::WaitForOpportunityAndAskToQuit(const struct UIHud* this)
+                         local  MemCardActionFuncPtr* pPopupCancelFunc
+                         inlines  UIMemCardConfirmPopup::GetMemCardCallback, cGAME_GLOBALS::SetGamePaused
+ 4177  0003FCDC      4  void UIHud::ShowConfirmAcceptChallengePopup(const struct UIHud* this)
+ 4195  0003FCE0     50  void UIHud::ShowConfirmChangedSigninPopup(const struct UIHud* this)
+ 4201  0009C740    15C  void UIHud::TargetSize(const struct UIHud* this, bool bIsLargeMode)
+                         local  const char* label
+ 4225  0009C6A4     9C  void UIHud::ToggleHistoryUI(const struct UIHud* this, bool bOnOff)
+ 4239  0007A23C     40  bool UIHud::IsPassivePauseMenuOpen(const struct UIHud* this)
+ 4440  0003FD30     1C  void UIHud::CustomRenderNeeds(const struct UIHud* this, const char* szType, int32* needTarget, int32* needCustomProp, int32* needMatrix)
+ 4448  0003FD4C     9C  void UIHud::CustomRender(const struct UIHud* this, const char* szType, const char* szTarget, void* renderingUnit, const char* szCustomProperties, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  float x0
+                         local  float x1
+                         local  float y0
+                         local  float y1
+ 4466  0003FDE8     34  void UIHud::UpdateShotHistoryText(const struct UIHud* this, char* textStr)
+ 4477  0006DFD8     C0  void UIHud::UpdateTargetInfoState(const struct UIHud* this, enum TargetInfoState_t state)
+                         local  char[3] colorStr
+ 4496  0003F644     C8  void UIHud::SetShotClockVisible(const struct UIHud* this, bool bVisible)
+ 4508  0003EE54     A8  void UIHud::SetBallsRemainingVisible(const struct UIHud* this, bool bVisible)
+                         local  bool bShouldShow

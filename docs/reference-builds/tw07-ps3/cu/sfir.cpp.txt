@@ -1,0 +1,10 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/sfir.cpp
+// compiled in: sfir.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   12  006F4660    368  void calcFIRCoeffs(SNDFIRSTATE* pfir, int filtType)
+                         local  float sum
+                         local  float tmpFloat
+                         local  int halfLen
+                         local  int cnt
+                         local  int fir_coef_var

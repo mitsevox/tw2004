@@ -1,0 +1,71 @@
+// ../../../../../TIGERCODE/Code/Golf/Spectator/PovVector.h
+// compiled in: golf2_unity.cpp
+// 50 functions, source order. line | PS3 address | size
+
+  263    inline-only   float& CPovVector3::X(const struct CPovVector3* this)
+  264    inline-only   float& CPovVector3::Y(const struct CPovVector3* this)
+  265    inline-only   float& CPovVector3::Z(const struct CPovVector3* this)
+  868    inline-only   void CPovVector3::Set(const struct CPovVector3* this, float _x, float _y, float _z)
+  874    inline-only   void CPovVector3::Set(const struct CPovVector3* this, float _x, float _y, float _z, float _w)
+  891    inline-only   void CPovVector3::SetIdentity(const struct CPovVector3* this)
+  898    inline-only   void CPovVector3::SetZero(const struct CPovVector3* this)
+  908    inline-only   void CPovVector3::SetX(const struct CPovVector3* this, float value)
+  912    inline-only   void CPovVector3::SetY(const struct CPovVector3* this, float value)
+  916    inline-only   void CPovVector3::SetZ(const struct CPovVector3* this, float value)
+  944    inline-only   float CPovVector3::GetX(const const struct CPovVector3* this)
+  948    inline-only   float CPovVector3::GetY(const const struct CPovVector3* this)
+  952    inline-only   float CPovVector3::GetZ(const const struct CPovVector3* this)
+  956    inline-only   float CPovVector3::GetW(const const struct CPovVector3* this)
+  963    inline-only   float& CPovVector3::operator[](const struct CPovVector3* this, uint32 i)
+  968    inline-only   float CPovVector3::operator[](const const struct CPovVector3* this, uint32 i)
+  975    inline-only   struct CPovVector3& CPovVector3::operator=(const struct CPovVector3* this, const const struct CPovVector3& src)
+  982    inline-only   struct CPovVector3& CPovVector3::operator=(const struct CPovVector3* this, const const struct CPovVector4& src)
+ 1000    inline-only   struct CPovVector3 CPovVector3::operator+(const const struct CPovVector3* this, const const struct CPovVector3& src)
+                         local  struct CPovVector3 result
+ 1019    inline-only   struct CPovVector3 CPovVector3::operator-(const const struct CPovVector3* this, const const struct CPovVector3& src)
+                         local  struct CPovVector3 result
+ 1046    inline-only   struct CPovVector3 CPovVector3::operator*(const const struct CPovVector3* this, float value)
+                         local  struct CPovVector3 result
+ 1136    inline-only   struct CPovVector3 CPovVector3::operator-(const const struct CPovVector3* this)
+                         local  struct CPovVector3& result
+                         local  struct CPovVector3 result
+ 1151    inline-only   bool CPovVector3::operator!=(const const struct CPovVector3* this, const const struct CPovVector3& src)
+ 1180    inline-only   float CPovVector3::Dot(const const struct CPovVector3* this, const const struct CPovVector3& src)
+ 1185    inline-only   struct CPovVector3 CPovVector3::Cross(const const struct CPovVector3* this, const const struct CPovVector3& src)
+ 1209    inline-only   float CPovVector3::Normalize(const struct CPovVector3* this)
+                         local  float len
+                         local  float lenInv
+ 1227    inline-only   float CPovVector3::Normalize(const struct CPovVector3* this, const const struct CPovVector3& src)
+                         local  float len
+                         local  float lenInv
+ 1251    inline-only   float CPovVector3::Length(const const struct CPovVector3* this)
+ 1261    inline-only   float CPovVector3::Distance(const const struct CPovVector3* this, const const struct CPovVector3& src)
+                         local  struct CPovVector3 vect
+ 1329    inline-only   void CPovVector4::Set(const struct CPovVector4* this, float _x, float _y, float _z)
+ 1336    inline-only   void CPovVector4::Set(const struct CPovVector4* this, float _x, float _y, float _z, float _w)
+ 1354    inline-only   void CPovVector4::SetIdentity(const struct CPovVector4* this)
+ 1361    inline-only   void CPovVector4::SetZero(const struct CPovVector4* this)
+ 1383    inline-only   void CPovVector4::SetW(const struct CPovVector4* this, float value)
+ 1390    inline-only   float CPovVector4::GetX(const const struct CPovVector4* this)
+ 1394    inline-only   float CPovVector4::GetY(const const struct CPovVector4* this)
+ 1398    inline-only   float CPovVector4::GetZ(const const struct CPovVector4* this)
+ 1402    inline-only   float CPovVector4::GetW(const const struct CPovVector4* this)
+ 1409    inline-only   float& CPovVector4::operator[](const struct CPovVector4* this, uint32 i)
+ 1414    inline-only   float CPovVector4::operator[](const const struct CPovVector4* this, uint32 i)
+ 1421    inline-only   void CPovVector4::MultX(const struct CPovVector4* this, float value)
+ 1443    inline-only   struct CPovVector4& CPovVector4::operator=(const struct CPovVector4* this, const const struct CPovVector4& src)
+ 1451    inline-only   struct CPovVector4& CPovVector4::operator=(const struct CPovVector4* this, const const struct CPovVector3& src)
+ 1470    inline-only   struct CPovVector4 CPovVector4::operator+(const const struct CPovVector4* this, const const struct CPovVector4& src)
+                         local  struct CPovVector4 result
+ 1521    inline-only   struct CPovVector4 CPovVector4::operator*(const const struct CPovVector4* this, float value)
+                         local  struct CPovVector4 result
+ 1622    inline-only   struct CPovVector4 CPovVector4::operator-(const const struct CPovVector4* this)
+ 1666    inline-only   float CPovVector4::Dot(const const struct CPovVector4* this, const const struct CPovVector4& src)
+ 1673    inline-only   struct CPovVector4 CPovVector4::Cross(const const struct CPovVector4* this, const const struct CPovVector4& src)
+ 1678    inline-only   struct CPovVector4 CPovVector4::Normalized(const const struct CPovVector4* this)
+                         local  struct CPovVector4 result
+                         local  float len
+                         local  float lenInv
+ 1700    inline-only   float CPovVector4::Normalize(const struct CPovVector4* this)
+                         local  float len
+                         local  float lenInv

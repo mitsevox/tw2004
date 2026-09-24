@@ -1,0 +1,17 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/locker/source/common/lockerfacadeconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   69  005F5374     9C  void LockerFacadeConcrete(const struct <anon>* this)
+                         inlines  GetInstance, LockerFacade, RCPointer
+   96  005E5078     B0  void ~LockerFacadeConcrete(const struct <anon>* this)
+                         inlines  GetInstance, operator delete, ~LockerFacade, ~RCPointer
+  122  005F54AC     58  void CreateFacade()
+                         inlines  operator new
+  153  005D3A48     50  void DestroyFacade()
+                         inlines  GetInstance
+  180  005D3A98      C  struct <anon>* GetInstance()
+  207  005DE300     64  void StateChanging(const struct <anon>* this, enum OsdkState eOldState, enum OsdkState eNewState)
+                         inlines  operator=
+  235  0061D6E4     D8  void StateChanged(const struct <anon>* this, enum OsdkState eOldState, enum OsdkState eNewState)
+                         inlines  operator=

@@ -1,0 +1,16 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/Common/PS3ControllerPull.c
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   29  00069844     98  bool Golf_PS3ControllerPullIsControlerInGame(int32 ctr)
+                         local  bool retVal
+                         local  int32 i
+   47  000EAE8C    1B4  bool Golf_PS3ControllerPullCanShowUI(int32 ctr)
+                         local  bool retVal
+                         local  bool bUIAlreadyUp
+                         local  int32 i
+                         inlines  GM_GetGolferUp
+   93  0002E7A8     3C  void Golf_PS3ControllerPullInitOnce()
+  101  000EB040    1D4  void Golf_PS3ControllerPullUpdate()
+                         local  int i
+                         local  bool thisPadExists

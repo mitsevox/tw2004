@@ -1,0 +1,29 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/scenegraph/source/SceneGraph/SGTraversals/SGTraversal.cpp
+// compiled in: SGTraversal.cpp
+// 10 functions, source order. line | PS3 address | size
+
+    0  008BD6A4     F0  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   56  008BDCC4    454  void SGTraversalC(const struct SGTraversalC* this, void(*)()* pDefaultFunc)
+                         local  const char[13] __FUNCTION__
+                         local  int32_t idx
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  void(*)()** newData
+                         inlines  Construct, Grow, Init, RNADebugBreak, Resize, Vector
+   65  008BD5C8     DC  void ~SGTraversalC(const struct SGTraversalC* this)
+                         inlines  ~Vector
+   70  008BD93C    154  void BaseSetHandler(const struct SGTraversalC* this, NodeType_t eNodeType, void(*)()* pFunc)
+                         local  const char[15] __FUNCTION__
+                         inlines  RNADebugBreak, operator[]
+   89  008BDCC0      4  void Traverse(const struct SGTraversalC* this, struct SGNodeC* pNode)
+   97  008BDA90    1DC  void Visit(const struct SGTraversalC* this, struct SGNodeC* pNode)
+                         local  const char[6] __FUNCTION__
+                         inlines  RNADebugBreak, SGNodeC::GetNodeTypeEnum, operator[]
+  109  008BDC6C     54  void Handler_VisitChildren(struct SGNodeC* pNode, struct SGTraversalC* pTraversal)
+                         inlines  SGNodeC::GetFirstChild, SGNodeC::GetNextSibling
+  121  008BD584     44  void Handler_Assert(struct SGNodeC* pNode, struct SGTraversalC* pTraversal)
+                         local  const char[15] __FUNCTION__
+                         inlines  RNADebugBreak
+  125  008BD794     10  static void _GLOBAL__I__ZN6SceneX12SGTraversalCC2EPFvPNS_7SGNodeCEPS0_E()
+  126  008BD7A4     10  static void _GLOBAL__D__ZN6SceneX12SGTraversalCC2EPFvPNS_7SGNodeCEPS0_E()

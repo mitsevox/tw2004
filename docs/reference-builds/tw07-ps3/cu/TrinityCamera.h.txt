@@ -1,0 +1,9 @@
+// ../ears_trinity/Trinity/Runtime/include/TrinityCamera.h
+// compiled in: TrinityCamera.cpp, TrinityScreenFx.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   46  005900E4     18  void ~TrinityCamera(const struct <anon>* this)
+   79    inline-only   void TrinityCamera::SetFocusDistance(const struct TrinityCamera* this, float_t fDistance)
+  154  00590134     58  void BeginUpdate(const struct <anon>* this)
+  161  0059018C     58  void EndUpdate(const struct <anon>* this)
+  168  005901E4     58  void StopCamera(const struct <anon>* this)

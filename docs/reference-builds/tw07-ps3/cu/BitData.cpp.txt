@@ -1,0 +1,22 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/source/PS3/BitData.cpp
+// compiled in: BitData.cpp
+// 5 functions, source order. line | PS3 address | size
+
+    0  00809E40    10C  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   74  00809AE0    194  void GetBitData(const uint8_t* pBitBuffer, uintptr_t BitOffset, uint32_t NumBits, uint8_t* bufStart, const bool8_t bSignExtend)
+                         local  const char[11] __FUNCTION__
+                         local  uint64_t BufData
+                         local  uint32_t Offset
+                         local  uint32_t LocalBitOffset
+                         local  uint32_t BitShift
+                         local  uint64_t Output
+  123  00809C74    1CC  void SetBitData(uint8_t* pBitBuffer, uintptr_t BitOffset, uint32_t NumBits, const uint8_t* pData)
+                         local  const char[11] __FUNCTION__
+                         local  uint64_t BufData
+                         local  uint32_t Offset
+                         local  uint32_t LocalBitOffset
+                         local  uint64_t Input
+                         local  uint64_t ReadMask
+                         local  uint64_t WriteMask
+  151  00809F4C     3C  static void _GLOBAL__I__ZN2EA4T3db7BitData10GetBitDataEPKhjjPha()
+  152  00809F88     3C  static void _GLOBAL__D__ZN2EA4T3db7BitData10GetBitDataEPKhjjPha()

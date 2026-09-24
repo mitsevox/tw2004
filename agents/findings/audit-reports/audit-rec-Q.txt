@@ -1,0 +1,14 @@
+GameMessages (55 functions; game -> on-screen UI messages): all 55 are fn_<ADDR> -> 55 unnamed; kept 0, renamed 0, T3 0, demoted 0.
+Comments: 15 ok, 35 none, 5 fixed (6 edits: 5 in GameMessages.c, 1 game.h prototype), 0 stripped. namecheck: 0 rows, 0 flags.
+Worst: fn_800E5240 "A menu screen closes: the next one still open comes up" - the re-mark is a no-op and nothing supports "menu screen"; close second fn_800E5098 "end-of-hole score screen" (unsupported; it is the shot-input gate).
+Also fixed: fn_800E5344 "big message", fn_800E5798 "the other flags" (it sends all six), fn_800E5DE4 "tutorial"/"not when bD4" (bD4 only drops tips below 15).
+fn_800E53B8 (TW06 GUI_IsAwardUIAnimating, medium): stays unnamed by rule; L1 partial, L2 not contradicted; nothing shows "award" -> T2 at best later, noted in ledger.
+fn_800E5228: both lanes confirm empty; sole caller the demoted fn_800DFC18.
+Unclear rule: global comments in headers (game.h:476 lbl_80202B88 "the menu screens still open", golfer.h:473 nPaused field "until the last menu screen closes") repeat the unsupported "menu screen" claim; left for phase 3.
+Findings (no code changes):
+- fn_800E5240: reads lbl_80202B88[i] before the i >= 0 test; the fn_800E522C(k) re-mark sets an already-set slot (no-op); and nothing in src/ or build asm sets any slot except that no-op, so the body looks unreachable in retail (slots stay 0 from bss/fn_800E5314).
+- fn_800E5C08: MsgString.n0 is never set (stack garbage; the memset clears the MsgArg, not the MsgString) - TYPE: check the receiver / the struct's first field.
+- fn_800E5DE4: never checks the mark itself (GameAnalysis fn_800E5E54 does, so tips show once); for n == 14 it writes lbl_80203138[14], one byte past the [14] array fn_800E5DA0 clears. Latent: GameUICommands never passes 14 and event.c passes >= 16.
+- GameUI.c:526 (already "EA bug"): n8 at [count], so at count 10 it reads lbl_80202D74[0].n8 (the next queue).
+- GameUI.c:510 (already "EA bug"): n4/n8 indexed by lbl_802822AC - 1, but the else-if chain only reaches this branch when lbl_802822AC == 0, so they always read lbl_80202EDC[-1] = lbl_80202E64[9] (queue 5's last item).
+- fn_800E5724: one value slot shared by bits 1, 0x10, 0x20 (last write wins); fn_800E573C (game type 3) leaves bits 4..0x20 queued; fn_800E572C clears by XOR (safe only because callers test first).

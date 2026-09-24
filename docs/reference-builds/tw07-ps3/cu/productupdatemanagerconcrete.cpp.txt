@@ -1,0 +1,18 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/productupdatemanagerconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   84  005E30E4     34  void ProductUpdateManagerConcrete(const struct ProductUpdateManagerConcrete* this)
+  108  005E4474      C  void ~ProductUpdateManagerConcrete(const struct ProductUpdateManagerConcrete* this)
+  131  005CEE68    114  uint32_t GetNumberOfUpdateFiles(const struct ProductUpdateManagerConcrete* this)
+                         local  uint32_t uNumFiles
+                         local  struct <anon>* pProductUpdateStrategy
+                         local  LobbyApiRefT* pLobbyApi
+                         local  const char8_t* strConfig
+                         local  struct <anon> serverConfig
+                         local  const uint32_t TAG_SIZE
+                         local  char8_t[64] strVersion
+  176  00622270     E0  struct Operation* DownloadUpdate(const struct ProductUpdateManagerConcrete* this, struct ProductUpdateDownloadCallback* pCallback)
+                         local  struct MemoryStrategy* pMemory
+                         local  struct ProductUpdateManagerStrategy* pStrategy
+                         inlines  GetOperationManagerConcrete

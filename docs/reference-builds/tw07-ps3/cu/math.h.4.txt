@@ -1,0 +1,6 @@
+// C:/packages/PlayStation3GCC/096.002/Installed/target/ppu/include/math.h
+// compiled in: pan2d1.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  695    inline-only   float std::cosf(float _Left)
+  715    inline-only   float std::sinf(float _Left)

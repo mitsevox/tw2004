@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/UI_Awards.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   28  0011D458    160  void UIAwards::~UIAwards(const struct UIAwards* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIAwards::DstMenuItem_awar>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+   30  000FE824      C  uint32 UIAwards::GetSignature(const const struct UIAwards* this)
+   37  000FE838      C  struct IExternArray* UIAwards::GetExternArray(const struct UIAwards* this)

@@ -1,0 +1,38 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Rna/Asset/PS3/TextureAsset.cpp
+// compiled in: rnaunity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   55  004CD25C    2A0  static bool LoadTexture(const char* pFilePath, struct TextureC* pTexture)
+                         local  bool bCreatedTempFile
+                         local  struct <anon> path
+                         local  bool bResult
+                         local  uint32_t uDDSSize
+                         local  void* pDDSData
+                         local  char[256] cmdStr
+                         local  struct DeviceC* pDevice
+                         local  uint16_t i
+  148  004E77B4     84  void TextureAssetC::TextureAssetC(const struct TextureAssetC* this, struct AssetMgrC* pAssetMgr, const char* pFilePath, MemBudgetTypeE budget, enum eMemoryPools memPool)
+  156  004D1DA4    124  void TextureAssetC::~TextureAssetC(const struct TextureAssetC* this)
+                         local  int32_t refsRemaining
+  178  004CD4FC     C8  bool TextureAssetC::Load(const struct TextureAssetC* this)
+                         local  const char[5] __FUNCTION__
+                         local  const char* pPathMissing
+                         inlines  AssetMgrC::GetPath, RNADebugBreak
+  209  004C95BC      8  bool TextureAssetC::IsLoaded(const const struct TextureAssetC* this)
+  216  004C95C4     80  void TextureAssetC::Unload(const struct TextureAssetC* this)
+  231  004CCD0C     6C  void TextureAssetC::Print(const struct TextureAssetC* this)
+  238  004C9644    2C4  void TextureAssetC::MenuPrint(const struct TextureAssetC* this, const char8_t* pLinePrefixTabString)
+                         local  bool isExpanded
+                         local  bool bDebugExpanded
+                         local  const char8_t* format
+  315  004E8AF4    1C8  void TextureAssetMgrC::TextureAssetMgrC(const struct TextureAssetMgrC* this)
+                         inlines  Clear, Copy, RNADebugBreak, String, operator=, ~String
+  324  004E8CBC     9C  struct TextureAssetMgrC* TextureAssetMgrC::GetInstance()
+  333  004C9908     6C  void TextureAssetMgrC::DestroyInstance()
+  340  004C9974    12C  bool TextureAssetMgrC::IsTextureFileName(const char* pStrName)
+                         local  struct <anon> path
+  365  004E7838     64  struct TextureAssetC* TextureAssetMgrC::CreateNew(const struct TextureAssetMgrC* this, const char* pFilePath)
+  373  004EC5D8     38  struct TextureC* TextureAssetMgrC::ResolveTexture(const struct TextureAssetMgrC* this, const char* pFilePath)
+                         local  struct TextureAssetC* pTextureAsset
+  382  004EC4E4     38  struct TextureC* TextureAssetResolve(const char* pFilePath)
+                         local  struct TextureAssetC* pTextureAsset

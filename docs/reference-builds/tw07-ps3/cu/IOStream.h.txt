@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/packages/RNA/dev-2.0-golf/RNA/RNAX/include/RNAUtils/IOStream.h
+// compiled in: rnaunity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  166    inline-only   int32_t InStreamC::GetVersion(const struct InStreamC* this)

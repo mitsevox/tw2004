@@ -1,0 +1,32 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNAScope/RNAType.cpp
+// compiled in: RNAType.cpp
+// 10 functions, source order. line | PS3 address | size
+
+    0  00825140    1A4  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  GetRow, Matrix44, Quaternion, Set, Vector2, Vector3, Vector4
+  121  0082543C     80  struct TypeMgrC* GetInstance()
+  148  008259C4     58  void Close()
+  176  00825BB4    5C0  struct <anon>* Register(const struct TypeMgrC* this, enum TypeID idType, const char* pName, uint32_t uSize, uint32_t uAlignment)
+                         local  const char[9] __FUNCTION__
+                         local  struct <anon>* pTypeInfo
+                         local  int32_t i
+                         local  int32_t idx
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct <anon>** newData
+                         inlines  Construct, Grow, RNADebugBreak, Resize, TypeInfoC, operator new, operator[]
+  235  00825134      C  int32_t GetNumTypes(const const struct <anon>* this)
+  259  00825A1C     B0  struct <anon>* GetByTypeID(const const struct <anon>* this, enum TypeID idType)
+                         inlines  RNADebugBreak, operator[]
+  282  00825ACC     E8  struct <anon>* FindByName(const const struct <anon>* this, const char* pName)
+                         local  int32_t iType
+                         local  struct <anon>* pTypeInfo
+                         inlines  operator[]
+  302  00826174    428  void RegisterBuiltInTypes(const struct TypeMgrC* this)
+                         local  struct TypeMgrC* pTypeMgr
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct <anon>** newData
+                         inlines  RNADebugBreak, Reserve
+  327  008252F4     10  static void _GLOBAL__I__ZN3RNA9TypeInfoC16s_ClassAllocatorE()
+  328  008252E4     10  static void _GLOBAL__D__ZN3RNA9TypeInfoC16s_ClassAllocatorE()

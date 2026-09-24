@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/include/tiger_module_lua_breakpoint.h
+// compiled in: tiger_module_lua_breakpoint.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   39  00536B98     70  void LuaBreakpoint(const struct <anon>* this)
+   40  00536F54    104  void LuaBreakpoint(const struct <anon>* this, const char* breakpoint)
+                         local  char[268] path
+   41  00536D44    210  void LuaBreakpoint(const struct <anon>* this, int line, const char* path, int varCount, const char* varString)
+                         local  const char* at
+                         local  const char* colon

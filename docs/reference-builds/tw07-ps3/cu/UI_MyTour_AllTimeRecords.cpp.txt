@@ -1,0 +1,16 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_MyTour_AllTimeRecords.cpp
+// compiled in: apt_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   47  0003EBA0     60  char* UIMyTour_AllTimeRecords::GetRecordName(int scoreType)
+   54  000F9178     B0  void UIMyTour_AllTimeRecords::UIMyTour_AllTimeRecords(const struct UIMyTour_AllTimeRecords* this)
+                         inlines  AptStaticCharBuffer<16u>::AptStaticCharBuffer, AptStaticCharBuffer<256u>::AptStaticCharBuffer, Records
+   62  00033884     58  void UIMyTour_AllTimeRecords::Init(const struct UIMyTour_AllTimeRecords* this)
+   69  00044CF8     2C  void UIMyTour_AllTimeRecords::Show(const struct UIMyTour_AllTimeRecords* this)
+   75  000B7F34     30  void UIMyTour_AllTimeRecords::OnShow(const struct UIMyTour_AllTimeRecords* this)
+   82  000B7D54    1E0  enum eAptHandleInput UIMyTour_AllTimeRecords::HandleInput(const struct UIMyTour_AllTimeRecords* this, int32 cID)
+  132  000B7AA4    2B0  void UIMyTour_AllTimeRecords::FillInData(const struct UIMyTour_AllTimeRecords* this)
+                         local  int iPlace
+                         local  int32 data
+                         inlines  AptStaticCharBuffer<16u>::GetBuffer, AptStaticCharBuffer<256u>::GetBuffer, GM_SetCurrentCourse
+  181  00044D24     DC  void UIMyTour_AllTimeRecords::SetProperFocus(const struct UIMyTour_AllTimeRecords* this)

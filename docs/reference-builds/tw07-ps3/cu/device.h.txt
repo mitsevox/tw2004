@@ -1,0 +1,18 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/core/filesys/device.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   87  00622570      C  void ~DeviceDriver(const struct DeviceDriver* this)
+  112  006225A8      8  bool Init(const struct DeviceDriver* this)
+  123  006225B0      4  void Restore(const struct DeviceDriver* this)
+  190  006225B4      8  unsigned int Write(const struct DeviceDriver* this, void* , const void* , unsigned int , struct DeviceDriver* , void* )
+  229  006225BC      8  bool Resize(const struct DeviceDriver* this, void* , uint64_t )
+  243  006225C4      8  uint64_t QueryLocation(const struct DeviceDriver* this, void* )
+  259  006225CC      C  unsigned int GetMaxReadSize(const struct DeviceDriver* this)
+  274  006225D8      8  bool Delete(const struct DeviceDriver* this, const char* )
+  287  006225E0      8  bool Move(const struct DeviceDriver* this, const char* , const char* )
+  322  006225E8      8  void* FindBegin(const struct DeviceDriver* this, const char* , struct FindData* )
+  334  006225F0      8  bool FindNext(const struct DeviceDriver* this, void* , struct FindData* )
+  347  006225F8      8  bool FindEnd(const struct DeviceDriver* this, void* )
+  358  00622600      8  bool DirectoryCreate(const struct DeviceDriver* this, const char* )
+  369  00622608      8  bool DirectoryRemove(const struct DeviceDriver* this, const char* )

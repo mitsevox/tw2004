@@ -1,0 +1,26 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/lua-5.0.2/src/lstate.c
+// compiled in: lstate.c
+// 13 functions, source order. line | PS3 address | size
+
+   42  0054D0E4      8  static int default_panic(lua_State* L)
+   48  0054D0EC     30  static lua_State* mallocstate(lua_State* L)
+                         local  lu_byte* block
+   58  0054D11C     2C  static void freestate(lua_State* L, lua_State* L1)
+   64  0054D148     D8  static void stack_init(lua_State* L1, lua_State* L)
+   80  0054D220     74  static void freestack(lua_State* L, lua_State* L1)
+   89  0054D294    1D8  static void f_luaopen(lua_State* L, void* ud)
+                         local  global_State* g
+                         local  TObject* i_o
+                         local  TObject* i_o
+                         local  TObject* i_o
+  126  0054D46C     4C  static void preinit_state(lua_State* L)
+  144  0054D4B8     C4  static void close_state(lua_State* L)
+  162  0054D57C     8C  lua_State* luaE_newthread(lua_State* L)
+                         local  lua_State* L1
+                         local  const TObject* o2
+                         local  TObject* o1
+  173  0054D608     58  void luaE_freethread(lua_State* L, lua_State* L1)
+  181  0054D660     A0  lua_State* lua_open()
+                         local  lua_State* L
+  200  0054D700     24  static void callallgcTM(lua_State* L, void* ud)
+  206  0054D724     A0  void lua_close(lua_State* L)

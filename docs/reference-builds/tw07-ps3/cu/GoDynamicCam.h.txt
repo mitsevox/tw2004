@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/Cameras/Headers/GoDynamicCam.h
+// compiled in: golf_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  236    inline-only   bool DynamicCam_ReferencesBallOrCup(enum CameraTracking_e refPoint)
+  259    inline-only   bool DynamicCam_ReferencesBall(enum CameraTracking_e refPoint)

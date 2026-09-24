@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module.cpp
+// compiled in: tiger_module.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    6  005790F4     88  void* Alloc(const struct <anon>* this, unsigned int size)
+                         inlines  TagValuePair
+   11  0057917C     A0  void* AllocHigh(const struct <anon>* this, unsigned int size)
+                         inlines  TagValuePair, operator+
+   16  00579084     70  void Free(const struct <anon>* this, void* p)

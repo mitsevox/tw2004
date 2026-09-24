@@ -1,0 +1,20 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/audio/engine/hl/HLAudMaster.c
+// compiled in: other_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   31  003DFA90     4C  bool Mas_InitModule()
+                         local  bool ok
+                         local  int32 i
+   54  003DFADC      4  void Mas_ExitModule()
+   59  003DFAE0      8  bool Mas_InitSession()
+   69  003DFAE8      4  void Mas_ExitSession()
+   77  003DFAEC     74  void Mas_SetOutputMode(uint8 outputMode)
+   92  003DFB64     84  void Mas_SetSubmixChan(uint8 submixChan, audfrac attn)
+  107  003E0610     8C  void Mas_SetSubmixAll(uint8 nchans, audfrac* attns)
+  121  003E06A0     C8  void Mas_SetSubmixMute(uint8 chan, bool muted)
+                         local  bit32 mask
+  134  003E0768     18  void Mas_SetSubmixMuteAll(bit32 chanmask)
+  143  003DDF34    154  void Mas_DebugPrint(const float& x, const float& y, PRINTFFN PrintfFn)
+                         local  const float LINE
+                         local  float xindent
+                         local  int i

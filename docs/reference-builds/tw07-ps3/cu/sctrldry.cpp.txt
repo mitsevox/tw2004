@@ -1,0 +1,10 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sctrldry.cpp
+// compiled in: sctrldry.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   42  006DC4B8    1FC  int SNDCTRL_drylevel(int shandle, int level)
+                         local  int setvoice
+                         local  int voice
+                         local  struct CHANPUB* pVoice
+                         local  int i
+                         local  int sourceVoice

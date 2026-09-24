@@ -1,0 +1,16 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/locker/source/common/lockerbuffer.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   68  005C9414     34  void LockerBuffer(const struct LockerBuffer* this)
+   92  005C947C      C  void ~LockerBuffer(const struct LockerBuffer* this)
+  116  005C94CC     34  void LockerBufferSection(const struct LockerBufferSection* this)
+  140  005C9534      C  void ~LockerBufferSection(const struct LockerBufferSection* this)
+  165  0061E500    124  struct LockerBuffer* CreateInstance(const char8_t* pName, const char8_t* pRealName, uint32_t uSize, const char8_t* pType, uint32_t uSectionSize)
+                         local  struct LockerBufferConcrete* pBuffer
+  200  0061E328    1D8  struct LockerBuffer* CreateInstance(const char8_t* pName, const char8_t* pRealName, uint32_t uSize, const char8_t* pType, uint32_t uNumSections, const char8_t* pSectionName0, uint32_t uSectionSize0)
+                         local  struct LockerBufferConcrete* pBuffer
+                         local  const char8_t* pSectionName
+                         local  uint32_t uSectionSize
+                         local  va_list arglist
+                         local  uint32_t uIndex

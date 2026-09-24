@@ -1,0 +1,11 @@
+// ../../../../../TIGERCODE/packages/tiger_module/include/tiger_module_ucap.h
+// compiled in: golf2_unity.cpp, golf_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+  107    inline-only   bool UCAP::IsPlayingAnim(const struct UCAP* this)
+  114    inline-only   const struct TransposeGeoFrame* UCAP::GetTransposeGeoFrame(const const struct UCAP* this)
+  116  0033E40C      4  void UCAP::HandleNewComponents(const struct UCAP* this)
+  117  0033E410      4  void UCAP::SwapComponentBuffers(const struct UCAP* this)
+  120    inline-only   const struct GeoComponent* UCAP::GetComponentsFromHeader(const struct Header* h)
+  145    inline-only   unsigned int UCAP::GetVertCountFromHeader(const struct Header* h)
+  155    inline-only   int UCAP::GetActiveIndex(const const struct UCAP* this)

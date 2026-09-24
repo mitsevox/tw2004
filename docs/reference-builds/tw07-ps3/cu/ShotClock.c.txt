@@ -1,0 +1,41 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/ShotClock.c
+// compiled in: golf_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   44  00213398     74  void UI_ShotClockTimeUpdate(int32 sec)
+   56  0021340C     48  void UI_ClearShotClock()
+   62  0024A188    174  void ShotClock_Init(int shotClockDuration)
+                         local  bool bUserWantsShotClock
+                         inlines  cGAME_GLOBALS::SetShotClockOption
+   84  002471B0     B8  bool ShotClock_IsUsable()
+                         local  bool bUserWantsShotClock
+   98  003073F4    254  void ShotClock_Start()
+                         inlines  GM_GetGolferUp, sys_time_get_timebase_frequency
+  123  00213454     50  void ShotClock_Stop()
+  134  002134A4     1C  void ShotClock_Pause()
+  139  002134C0     1C  void ShotClock_UnPause()
+  145  0033C4B8    C50  void ShotClock_Update()
+                         local  int once
+                         local  int s_bConsoleShotClockOn
+                         local  TI_STimeValue currentTime
+                         local  enum PlayerNumber_t currentGolfer
+                         local  bool isOffLineAndPaused
+                         local  bool bAllowShotClockSpeedUp
+                         local  float secsRemaining
+                         local  enum PlayerNumber_t golferUp
+                         local  int32 localPlayer
+                         local  bool bInChargeOfClock
+                         local  SW_sSwingData* pSwingInfo
+                         local  bool bSpecialWaitCircumstance
+                         local  char[64] buffer
+                         local  TI_STimeValue timeToMoveBack
+                         local  struct IAptSubscriber* subscriber
+                         inlines  GM_GetCurrentHoleIndex, GM_GetGolferUp, GM_GetModeType, GM_GetPlayerHoleStrokes, GamePlayer::GetShotClockData, GamePlayer::GetSwingInfo, TI_fConvertTimeDifToSeconds, cGAME_GLOBALS::GetGamePaused, sys_time_get_timebase_frequency
+  392  002134DC     34  float ShotClock_GetSecondsRemaining()
+  400  00213510     18  bool ShotClock_bIsOn()
+  405  00210F00     80  bool ShotClock_bExceededAllowableViolations()
+                         local  bool exceeded
+                         local  int32 playerIndex
+  422  00210E98     68  bool ShotClock_bExceededAllowableViolations(enum PlayerNumber_t playerID)
+  435  002125A4     18  bool GetReceivedOnlineShotClockExpiredPacket()
+  443  002125BC     18  void SetReceivedOnlineShotClockExpiredPacket(bool expired)

@@ -1,0 +1,40 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_common/dev/src/Hash.cpp
+// compiled in: Hash.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   24  008DF92C     84  uint32_t Common::HashString_SDBM(const char* cStr)
+                         local  uint32_t hashVal
+                         local  unsigned char c
+                         inlines  TOLOWER
+   45  008DF9B0     94  uint32_t Common::HashStringEnd_SDBM(const char* cStr, const char* pEnd)
+                         local  uint32_t hashVal
+                         local  unsigned char c
+                         inlines  TOLOWER
+   67  008DFAC0    16C  uint32_t Common::HashString_SDBM(const char* cStr, int hashFlags)
+                         local  uint32_t hashVal
+                         local  unsigned char c
+                         local  const char* pDelim
+                         inlines  TOLOWER, TOUPPER
+  114  008DF628     74  uint32_t Common::HashMem_SDBM(const void* pVoidData, int dataLen)
+                         local  const uint8_t* pData
+                         local  uint32_t hashVal
+                         local  const uint8_t* pEndOfData
+  129  008DF69C     64  uint32_t Common::HashAdd_SDBM(uint32_t hash, const void* pData, size_t dataLen)
+                         local  const uint8_t* pDataPtr
+                         local  const uint8_t* pEndOfData
+  145  008DFA44     7C  uint32_t Common::HashString_DJB2(const char* cStr)
+                         local  uint32_t hashVal
+                         local  unsigned char c
+                         inlines  TOLOWER
+  162  008DF700    164  uint32_t Common::HashString_DJB2(const char* cStr, int hashFlags)
+                         local  uint32_t hashVal
+                         local  unsigned char c
+                         local  const char* pDelim
+                         inlines  TOLOWER, TOUPPER
+  205  008DF864     6C  uint32_t Common::HashMem_DJB2(const void* pVoidData, int dataLen)
+                         local  const uint8_t* pData
+                         local  uint32_t hashVal
+                         local  const uint8_t* pEndOfData
+  220  008DF8D0     5C  uint32_t Common::HashAdd_DJB2(uint32_t hash, const void* pData, size_t dataLen)
+                         local  const uint8_t* pDataPtr
+                         local  const uint8_t* pEndOfData

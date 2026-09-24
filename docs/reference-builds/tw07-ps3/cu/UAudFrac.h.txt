@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/Code/Golf/Audio/Engine/Utils/Headers/UAudFrac.h
+// compiled in: other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+  194    inline-only   uaudfrac audfrac_MulU(uaudfrac v1, uaudfrac v2)
+  199    inline-only   audfrac audfrac_Mul(audfrac v1, audfrac v2)
+  204    inline-only   void audfrac_Swap(audfrac* pV1, audfrac* pV2)
+                         local  audfrac temp

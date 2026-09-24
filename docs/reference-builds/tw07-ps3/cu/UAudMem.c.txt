@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/audio/engine/utils/UAudMem.c
+// compiled in: other_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   31  003FCF28    110  void AudMem_Init()
+                         local  const char[12] __FUNCTION__
+                         inlines  TagValuePair, operator+
+   39  003E40C8     40  void AudMem_Term()
+   46  003E488C     18  uint32 AudMem_Alloc(uint32 nBytes)
+   53  003E4CC0     18  void AudMem_Free(uint32 addr)

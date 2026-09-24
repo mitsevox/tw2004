@@ -1,0 +1,15 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_XBoxLiveSettings.h
+// compiled in: apt_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   14  0006FE18      4  void UI_XBoxLiveSettingsStruct::UI_XBoxLiveSettingsStruct(const struct UI_XBoxLiveSettingsStruct* this)
+   31  0011F4C0    160  void UIXBoxLiveSettings::~UIXBoxLiveSettings(const struct UIXBoxLiveSettings* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIXBoxLiveSettings::DstMenuItem_xbls>::~TExternArray, UIMenuCircBase::~UIMenuCircBase
+   33  0010079C      C  uint32 UIXBoxLiveSettings::GetSignature(const const struct UIXBoxLiveSettings* this)
+   43  001007B0      C  struct IExternArray* UIXBoxLiveSettings::GetExternArray(const struct UIXBoxLiveSettings* this)
+   46  001007C4     3C  void UIXBoxLiveSettings::UpdateItemAndLabelFlash(const struct UIXBoxLiveSettings* this, struct UIMenuItemBaseDst* menuItemToUpdate, int32 index, char* inLabel)
+   50  00100800      4  void UIXBoxLiveSettings::SetItemPos(const struct UIXBoxLiveSettings* this, int32 inClipIndex, float inPos)
+   51  00100804      4  void UIXBoxLiveSettings::SetItemPos(const struct UIXBoxLiveSettings* this, int32 inClipRowIndex, int32 inClipColumnIndex, float inPos)
+   69    inline-only   void UIXBoxLiveSettings::ShowMenu(const struct UIXBoxLiveSettings* this, struct UIResponseHandler* inpHandler, struct UIMenuItemBaseSrc* inMenuItemArray, int32 sizeMenu, int32 sizeofMenu, enum eMenuAllocType alloctype)
+   93  00115418     1C  void UIXBoxLiveSettings::UpdateMenuItems_func(struct IAptSubscriber* subs)
+   94  001154A4     1C  enum AptThreadReturnValue UIXBoxLiveSettings::UpdateMenuItemsThread_func(struct IAptSubscriberBase* subs)

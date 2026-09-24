@@ -1,0 +1,80 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameModeDriver_TrainingChallenges.cpp
+// compiled in: golf_unity.cpp
+// 33 functions, source order. line | PS3 address | size
+
+   31  002A353C     B8  struct GameModeDriverTrainingChallenges* TrainingChallengesModeDriverPtr()
+                         local  void* ptr
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+   44  0025FEE0     7C  void GameModeDriverTrainingChallenges::GameModeDriverTrainingChallenges(const struct GameModeDriverTrainingChallenges* this)
+                         inlines  GameModeDriverTrainingChallenges::SetForce2p
+   65  0020C850     18  void GameModeDriverTrainingChallenges::~GameModeDriverTrainingChallenges(const struct GameModeDriverTrainingChallenges* this)
+   72  0020C8CC     60  void GameModeDriverTrainingChallenges::RegisterStreamClients()
+   84  0020C92C     3C  void GameModeDriverTrainingChallenges::UnregisterStreamClients()
+   93  00242C98    1DC  void GameModeDriverTrainingChallenges::LoadTRACFromStream(struct TStreamData* pStreamData)
+                         local  const char[19] __FUNCTION__
+                         local  void* dataPtr
+                         local  uint32 size
+                         local  void* pData
+                         inlines  TagValuePair, operator+
+  116  00242E74    180  void GameModeDriverTrainingChallenges::Locale_DriverTrainingChallenges_LoadTRAtFromStream(struct TStreamData* pStreamData)
+                         local  const char[51] __FUNCTION__
+                         local  char* pStrTable
+                         local  uint32 datasize
+                         inlines  TagValuePair, operator+
+  135  0020C968     1C  bool GameModeDriverTrainingChallenges::QueryInterface(const struct GameModeDriverTrainingChallenges* this, enum GM_DriverType_t typeID, const void*& ptr)
+                         local  bool bRet
+  174  0020344C     90  const char* GameModeDriverTrainingChallenges::GetEventText(const struct GameModeDriverTrainingChallenges* this, int eventID)
+  195  00260D14     7C  int GameModeDriverTrainingChallenges::GetNumberOfMenuItems(const struct GameModeDriverTrainingChallenges* this)
+                         local  int iTotalItems
+                         local  int iEventIndex
+  219  00260C64     B0  int GameModeDriverTrainingChallenges::GetEventIndexForMenuItemIndex(const struct GameModeDriverTrainingChallenges* this, int selectedMenuItemIndex)
+                         local  int iEventIndex
+  247  00260B50    114  int GameModeDriverTrainingChallenges::FindNextMatchingRound(const struct GameModeDriverTrainingChallenges* this, int iStartEventIndex)
+  271  0020C984     58  enum UserDevPointType GameModeDriverTrainingChallenges::GetSecondaryAttribute(const struct GameModeDriverTrainingChallenges* this, int eventIndex)
+  284  0020C9DC    124  int GameModeDriverTrainingChallenges::GetNumberOfRoundsRemaining(const struct GameModeDriverTrainingChallenges* this, int eventIndex)
+                         local  int iRoundsRemaining
+  305  0020CB00     A4  int GameModeDriverTrainingChallenges::GetTotalRounds(const struct GameModeDriverTrainingChallenges* this, int eventIndex)
+  312  0020CBA4     48  bool GameModeDriverTrainingChallenges::IsGreenSelectionEnabled(const const struct GameModeDriverTrainingChallenges* this)
+                         local  bool bIsGreenSelectionEnabled
+  332  0020CBEC     B4  void GameModeDriverTrainingChallenges::SelectEvent(const struct GameModeDriverTrainingChallenges* this, int eventID)
+                         inlines  GameModeDriverTrainingChallenges::SetCurrentEventIndex
+  344  0021453C    10C  bool GameModeDriverTrainingChallenges::GetAndSetValidOpponent(const struct GameModeDriverTrainingChallenges* this, enum Golfer_t opponent)
+                         local  bool bNoReloadNeeded
+                         local  enum Golfer_t golferOpponent
+  383  00337090    2A0  void GameModeDriverTrainingChallenges::StartEvent(const struct GameModeDriverTrainingChallenges* this)
+                         local  enum Golfer_t opponent
+                         local  int iNumPlayers
+                         local  const struct TrainingChallengeEvent_t* pEventInfo
+                         local  bool bNeedReload
+                         inlines  GameModeDriverTrainingChallenges::SetForce2p, Singleton<GameManager>::GetSingleton, UIWidget::SetForceReLoadOfFacility
+  478  0020CCA0     84  void GameModeDriverTrainingChallenges::ReStartEvent(const struct GameModeDriverTrainingChallenges* this)
+  493  00337080     10  void GameModeDriverTrainingChallenges::PostHoleLoadInit(const struct GameModeDriverTrainingChallenges* this)
+  504  00336DB0    2D0  void GameModeDriverTrainingChallenges::ActuallyStartEvent(const struct GameModeDriverTrainingChallenges* this)
+                         local  const struct TrainingChallengeEvent_t* pEventInfo
+                         inlines  GameModeDriverTrainingChallenges::SetForce2p, Singleton<GameManager>::GetSingleton, UserInfo::SetValid
+  569  00336AEC    2C4  void GameModeDriverTrainingChallenges::PrepareForTeeOff(const struct GameModeDriverTrainingChallenges* this, const struct TrainingChallengeEvent_t* pEventData)
+                         local  int8 cupIndex
+                         local  int8 greenIndex
+                         local  int iNumPlayers
+                         local  int newflags
+                         inlines  GM_GetCurrentHoleIndex, GM_SetPlayerHoleStrokes, GamePlayer::SetController, GamePlayerManager::SetPlayerCount, cGAME_GLOBALS::SetGlobalFlags, cGAME_GLOBALS::SetGreen, cGAME_GLOBALS::SetPin, cGAME_GLOBALS::SetWindOption
+  653  0020CE28     60  bool GameModeDriverTrainingChallenges::GameFinished(const struct GameModeDriverTrainingChallenges* this, bool bPredict)
+  659  0020CF10      4  void GameModeDriverTrainingChallenges::QuitGame(const struct GameModeDriverTrainingChallenges* this)
+  664  0020CE88     40  void GameModeDriverTrainingChallenges::SaveGamePlayOptions(const struct GameModeDriverTrainingChallenges* this)
+  670  0020CEC8     48  void GameModeDriverTrainingChallenges::RestoreGamePlayOptions(const struct GameModeDriverTrainingChallenges* this)
+  682  0027BF74    348  void GameModeDriverTrainingChallenges::OnWinOfCurrentGame(const struct GameModeDriverTrainingChallenges* this, const struct OnWinData_t& onWinData)
+                         local  int iEventIndexForReward
+                         local  int16 attrType
+                         local  int i
+                         local  int iValueToAdd
+                         local  float fValueToAdd
+                         inlines  GameModeDriver::SetWasLastEventWonByTheUser, GamePlayer::GetGolferBonus, GeneralUserData::IncDevPoints, UserInfo::IncDevPoints
+  751  002D4298     FC  void GameModeDriverTrainingChallenges::OnExitOfFacilityGame(const struct GameModeDriverTrainingChallenges* this)
+  773  0020CF14     2C  int32 GameModeDriverTrainingChallenges::GetEndGameSequence(const struct GameModeDriverTrainingChallenges* this)
+                         local  int32 sequence
+  784  0020CF40     C4  bool GameModeDriverTrainingChallenges::IsValidDropSurface(const struct GameModeDriverTrainingChallenges* this, uint32 lieID)
+                         local  bool valid
+  818  002791F8     E0  void GameModeDriverTrainingChallenges::PossiblyShowRoundNumber(const struct GameModeDriverTrainingChallenges* this)
+                         local  const char* pMsg
+  836  002853B4    110  uint32 GameModeDriverTrainingChallenges::GetPostGameContext(const struct GameModeDriverTrainingChallenges* this, uint32 prevContext)
+                         local  uint32 contextFlag

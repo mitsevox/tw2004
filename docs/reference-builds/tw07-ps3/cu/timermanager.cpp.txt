@@ -1,0 +1,16 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/timermanager.cpp
+// compiled in: timermanager.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   18  006D7438    124  bool AddTimerClient(const struct <anon>* this, struct <anon>* pClient, enum TimerStage stage)
+                         local  bool isError
+                         inlines  Assert
+   41  006D726C     A4  void RemoveTimerClient(const struct <anon>* this, struct <anon>* pClient)
+   58  006D755C    180  void ExecuteTimers(const struct <anon>* this, enum TimerStage stage)
+                         local  struct ItemNode* pNode
+                         local  struct <anon>* pClient
+                         inlines  Assert, GetNext
+   97  006D7310     60  void Defragment(const struct <anon>* this)
+                         local  int stage
+  106  006D7370     78  void Release(const struct <anon>* this)
+                         local  int stage

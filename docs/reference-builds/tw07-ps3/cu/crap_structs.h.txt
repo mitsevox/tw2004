@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/Code/Golf/Animation/Headers/crap_structs.h
+// compiled in: golf2_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+  344    inline-only   void CrAP_TransformModInfo_t::ClearAllFlags(const struct CrAP_TransformModInfo_t* this)
+  345    inline-only   void CrAP_TransformModInfo_t::SetFlag(const struct CrAP_TransformModInfo_t* this, uint32 flag)
+  346    inline-only   void CrAP_TransformModInfo_t::ClearFlag(const struct CrAP_TransformModInfo_t* this, uint32 flag)
+  347    inline-only   bool CrAP_TransformModInfo_t::TestFlag(const const struct CrAP_TransformModInfo_t* this, uint32 flag)

@@ -1,0 +1,366 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/quick_spu/dev-football/source/quick_spu/ppu/managerplat.cpp
+// compiled in: managerplat.cpp
+// 72 functions, source order. line | PS3 address | size
+
+  101  008D7AAC    15C  void QuickSpu::hackGcmSetInlineTransfer(const uint32_t dstOffset, const void* srcAdr, const uint32_t sizeInWords, const uint8_t location)
+                         local  uint32_t paddedSizeInWords
+  141    inline-only   struct <anon>& GetJobInstance(const const struct <anon>* this, struct <anon> jh, enum ExecutionStatus eExpectedStatus)
+                         local  const struct <anon>& job
+  173    inline-only   struct <anon>& GetJobType(const const struct <anon>* this, struct <anon> hJobType)
+                         local  const struct <anon>& currJobType
+  216  008D7C08     40  size_t GetAllocSize(size_t nMaxJobTypes, size_t nMaxJobInstances, size_t nAffinityArraySize, size_t nMaxNumSPUs)
+  263  008DB72C    210  struct <anon>* CreateInstance(const char* pManagerName, struct IMemoryCallback* pMemCallback, struct ISyncCallback* pOptionalSyncCallback, size_t nMaxJobTypes, size_t nMaxJobInstances, size_t nAffinityArraySize, size_t nMaxNumSPUs, size_t nNumSPUs, struct IThreadCreatedCallback* pOptionalThreadCallback)
+                         local  size_t nAllocSize
+                         local  void* pAllocData
+                         local  size_t priorityArrayOpen
+                         local  size_t priorityArrayAffinity
+                         local  size_t jobInstanceArray
+                         local  size_t jobTypeArray
+                         local  size_t cleaners
+                         local  struct <anon>* pOpenArray
+                         local  struct <anon>* pAffinityArray
+                         local  struct <anon>* aJobInstance
+                         local  struct <anon>* aJobType
+                         local  struct <anon>* aCleaners
+                         local  struct <anon>* managerAddress
+                         local  struct <anon>* pInstance
+  331  008D96E8     80  void DestroyInstance(struct <anon>* pInstance)
+                         local  void* pBase
+                         inlines  Free
+  367  008D9E68    318  struct <anon> CreateJobTypeFromBin(const struct <anon>* this, const char* szBinFileName, const void* pBin, size_t nBinSizeBytes, uint32_t nJobTypeParam0, uint32_t nJobTypeParam1)
+                         local  struct <anon> retValue
+                         local  struct <anon> retValue
+                         local  struct <anon>* pJobType
+                         local  const void* pTemp
+                         local  size_t nTemp
+                         inlines  EnterCriticalSection, GetJobBinMetaDataBlock, InitObject, JobTypeHandle, LeaveCriticalSection, SetJobName
+  441  008DD450    1B4  void UpdateJobTypeBin(const struct <anon>* this, struct <anon> hJobType, const void* pBin, size_t nBinSizeBytes, const void** pOldBinData, size_t* nOldBinSize)
+                         local  const struct <anon>& currJobType
+                         inlines  EnterCriticalSection, GetJobBinData, GetJobType, LeaveCriticalSection, SetJobBinData
+  485  008DD604    1C0  void DestroyJobType(const struct <anon>* this, const struct <anon>& hJobType, const void** pBinData, size_t* nBinSize, uint32_t* nJobTypeParam0, uint32_t* nJobTypeParam1)
+                         local  const struct <anon>& currJobType
+                         inlines  ClearObject, EnterCriticalSection, GetJobBinData, GetJobData, GetJobType, Invalidate, LeaveCriticalSection
+  527  008DA850     A0  struct <anon> EnqueueJobReady(const struct <anon>* this, struct <anon> hJobType, uint32_t nInstanceParam0, uint32_t nInstanceParam1, uint8_t nPriority, uint8_t nSPUAffinity, uint32_t* pWriteOnComplete, uint32_t nWriteValueOnComplete)
+  553  008DA7B4     9C  struct <anon> EnqueueJobNotReady(const struct <anon>* this, struct <anon> hJobType, uint32_t nInstanceParam0, uint32_t nInstanceParam1, uint8_t nPriority, uint8_t nSPUAffinity)
+  581  008DDA74    2C8  struct <anon> JobGroupBegin(const struct <anon>* this, uint16_t nJobs, uint8_t nPriority)
+                         local  struct <anon> hJobGroup
+                         local  struct <anon> notUsed
+                         local  struct <anon> hJobGroup
+                         local  struct <anon> jh
+                         local  const struct <anon>& job
+                         inlines  Alloc, GetJobInstance, GetStatus, IsComplete, JobGroupHandle
+  644  008DECC8    354  void JobGroupAdd(const struct <anon>* this, const struct <anon> hJobGroup, const struct <anon>& jh)
+                         local  const struct <anon>& jobMember
+                         local  const struct <anon>& jobMaster
+                         local  int32_t numJobs
+                         local  uint32_t* pWriteArray
+                         local  uint32_t* pJobEnableLocation
+                         local  uint32_t nJobEnableValue
+                         inlines  GetJobInstance, GetStatus, GetSubmissionIndex, IncChildJobs, IsComplete, MakeJobInstanceHandle, SetMasterJob
+  723  008DA6D4     E0  void JobGroupAdd(const struct <anon>* this, const struct <anon> hJobGroup, struct <anon> hJobType, uint32_t nInstanceParam0, uint32_t nInstanceParam1, uint8_t nPriority, uint8_t nSPUAffinity)
+                         local  struct <anon> jh
+  753  008DDD3C    1C4  struct <anon> JobGroupEnd(const struct <anon>* this, const struct <anon>& hJobGroup)
+                         local  struct <anon> jh
+                         local  struct <anon> jh
+                         local  const struct <anon>& jobMaster
+                         inlines  GetChildJobs, GetJobInstance, GetStatus, Invalidate, IsComplete, MakeJobInstanceHandle
+  798  008DDF00    1FC  struct <anon> JobChainBegin(const struct <anon>* this, uint8_t nPriority)
+                         local  struct <anon> hJobChain
+                         local  struct <anon> notUsed
+                         local  struct <anon> hJobChain
+                         local  struct <anon> jh
+                         local  const struct <anon>& jobMaster
+                         local  size_t nJobs
+                         inlines  GetJobInstance, GetStatus, IsComplete, JobChainHandle, SetLastChainItem
+  845  008DE8E4    3E4  void JobChainAdd(const struct <anon>* this, const struct <anon> hJobChain, const struct <anon>& jhCurrent)
+                         local  struct <anon> jhMaster
+                         local  const struct <anon>& jobMaster
+                         local  const struct <anon>& jobCurrent
+                         local  uint32_t indexEnd
+                         local  uint8_t indexEndAffinity
+                         local  uint32_t* pJobEnableLocation
+                         local  uint32_t nJobEnableValue
+                         local  uint32_t* pWriteArray
+                         local  struct <anon> jhPrev
+                         inlines  GetJobInstance, GetLastChainItem, GetLastChainItemAffinity, GetStatus, GetSubmissionIndex, IncChildJobs, IsComplete, MakeJobInstanceHandle, SetLastChainItem, SetMasterJob
+  929  008DA5F0     E4  void JobChainAdd(const struct <anon>* this, const struct <anon> hJobChain, struct <anon> hJobType, uint32_t nInstanceParam0, uint32_t nInstanceParam1, uint8_t nPriority, uint8_t nSPUAffinity)
+                         local  struct <anon> jhCurrent
+  958  008DE0FC    1C4  struct <anon> JobChainEnd(const struct <anon>* this, const struct <anon>& hJobChain)
+                         local  struct <anon> jh
+                         local  struct <anon> jh
+                         local  const struct <anon>& jobMaster
+                         local  uint32_t nJobs
+                         inlines  GetChildJobs, GetJobInstance, GetStatus, Invalidate, IsComplete, MakeJobInstanceHandle
+ 1008  008DE2C0    14C  void SetJobWriteOnComplete(const const struct <anon>* this, struct <anon> jh, uint32_t* pWriteOnComplete, uint32_t nWriteValueOnComplete)
+                         local  const struct <anon>& job
+                         inlines  GetJobInstance, GetStatus, IsComplete, SetWriteOnJobComplete
+ 1038  008DE788    15C  void SetGPUEnableBlockGpuJob(const const struct <anon>* this, struct <anon> jh, uint32_t nLabelIndex, uint32_t nLabelValue)
+                         local  uint32_t* pWriteValue
+                         local  uint32_t nWriteValue
+                         local  uint32_t* pLabelAddr
+                         local  uint32_t destOffset
+                         inlines  Gcm::cellGcmFlush, Gcm::cellGcmSetTransferLocation, Gcm::cellGcmSetWaitLabel
+ 1091  008DE6EC     9C  void SetJobEnableJobOnComplete(const const struct <anon>* this, struct <anon> jhFirst, struct <anon> jhEnabledByFirst)
+                         local  uint32_t* pJobEnableLocation
+                         local  uint32_t nJobEnableValue
+ 1120  008D8FB0     F4  struct <anon>* GetRelatedAffinityEntry(const const struct <anon>* this, struct <anon> jh)
+                         local  uint32_t nStartIndex
+                         local  uint32_t nEndIndex
+                         local  size_t i
+                         local  const struct <anon>& affPriArray
+                         inlines  GetSubmissionIndex
+ 1166  008DE40C    200  void GetJobAsyncEnable32(const const struct <anon>* this, struct <anon> jh, uint32_t** ppReadyWrite, uint32_t* puReadyValue)
+                         local  const struct <anon>& job
+                         local  const struct <anon>& openPriArray
+                         local  const struct <anon>& affPriArray
+                         inlines  GetJobEnablePatchValue32, GetJobInstance, GetStatus, IsComplete, SetPending
+ 1205  008DF01C    200  void GetJobAsyncEnable64(const const struct <anon>* this, struct <anon> jh, uint64_t** ppReadyWrite, uint64_t* puReadyValue)
+                         local  const struct <anon>& job
+                         local  const struct <anon>& openPriArray
+                         local  const struct <anon>& affPriArray
+                         inlines  GetJobEnablePatchValue64, GetJobInstance, GetStatus, IsComplete, SetPending
+ 1243  008DF21C    20C  void GetJobAsyncEnable128(const const struct <anon>* this, struct <anon> jh, struct <anon>** ppReadyWrite, struct <anon>* puReadyValue)
+                         local  const struct <anon>& job
+                         local  const struct <anon>& openPriArray
+                         local  uint64_t* pTemp
+                         local  uint64_t nValue
+                         local  const struct <anon>& affPriArray
+                         local  uint64_t* pTemp
+                         local  uint64_t nValue
+                         inlines  GetJobEnablePatchValue64, GetJobInstance, GetStatus, IsComplete, SetPending
+ 1291  008D7C8C     78  void SetDebugBreakOnThisInstance(const struct <anon>* this, struct <anon> jh)
+                         local  const struct <anon>& openPriArray
+ 1323  008D7D04     84  void SetJobManagerParamHack(const struct <anon>* this, struct <anon> jh, bool isJMJob)
+                         local  const struct <anon>& openPriArray
+ 1347  008DE6A8     44  void JobEnable(const struct <anon>* this, struct <anon> jh)
+                         local  uint32_t* pEnableAddr
+                         local  uint32_t nEnableValue
+ 1384  008DA180    470  struct <anon> EnqueueJobEnableHelper(const struct <anon>* this, bool enabled, bool bMaster, bool bChild, struct <anon> hJobType, uint8_t nPriority, uint8_t nSPUAffinity, uint32_t nInstanceParam0, uint32_t nInstanceParam1, uint32_t* pWriteOnComplete, uint32_t nWriteValueOnComplete)
+                         local  const void* pVoid
+                         local  size_t nSize
+                         local  struct <anon>* pJobType
+                         local  struct <anon>* freeJobInstance
+                         local  uint64_t arrayIndex
+                         local  const struct <anon>& openPriArray
+                         local  struct <anon>* pAffinity
+                         inlines  EnterCriticalSection, GetJobBinCopyData, GetJobData, GetSubmissionIndex, InitObject, LeaveCriticalSection, MakeJobInstanceHandle, SetPending, SetSubmissionInfo
+ 1519  008D9270    144  bool IsJobComplete(const const struct <anon>* this, struct <anon> handle)
+                         local  uint64_t nIndex
+                         inlines  GetSubmissionIndex, IsComplete
+ 1546    inline-only   uint64_t QuickSpu::GetTicks()
+                         local  uint64_t time
+ 1555    inline-only   float QuickSpu::TicksToSeconds(uint64_t ticks)
+                         local  const double frequency
+                         local  double d
+ 1573  008D93B4    334  void BlockUntilJobComplete(const const struct <anon>* this, struct <anon> handle, bool bYield, void(*)()* pCustomYieldFunc)
+                         local  bool bPrintedDeadlockWarning
+                         local  uint64_t nStartTicks
+                         local  const struct <anon>& currJob
+                         inlines  IsComplete, QuickSpu::GetTicks, sys_timer_usleep
+ 1642  008DA8F0    48C  void BlockOnAllJobsComplete(const struct <anon>* this, bool bYield, void(*)()* pCustomYieldFunc)
+                         local  bool bPrintedDeadlockWarning
+                         local  uint32_t nJobsNotCompleteLastTime
+                         local  uint32_t nJobsNotComplete
+                         local  uint64_t nStartTicks
+                         local  size_t x
+                         local  const struct <anon>& currJob
+                         local  size_t x
+                         local  const struct <anon>& currJob
+                         inlines  EnterCriticalSection, IsComplete, LeaveCriticalSection, QuickSpu::GetTicks, sys_timer_usleep
+ 1773  008DF428    168  void OverrideJobParameters(const struct <anon>* this, struct <anon> jh, uint32_t instanceParam0, uint32_t instanceParam1, uint32_t typeParam0, uint32_t typeParam1)
+                         local  const struct <anon>& ji
+                         inlines  GetJobInstance, GetStatus, IsComplete, SetParams
+ 1808  008D9768    178  void GetJobParameters(const struct <anon>* this, struct <anon> jh, uint32_t* instanceParam0, uint32_t* instanceParam1, uint32_t* typeParam0, uint32_t* typeParam1)
+                         local  const struct <anon>& ji
+                         inlines  GetJobInstance, GetParams, GetStatus, IsComplete
+ 1816  008D7D88     9C  void SetJobCleanupRoutine(const struct <anon>* this, struct <anon> jh, struct IJobCleanupCallback* pCleanupCallback, void* pContext)
+                         local  uint64_t nIndex
+ 1848  008D7E24     44  void BlockGPUUntilJobComplete(const const struct <anon>* this, struct <anon> jh)
+ 1880  008DE60C     9C  void SetGPUEnableJob(const const struct <anon>* this, struct <anon> jh)
+                         local  uint32_t* pWriteValue
+                         local  uint32_t nWriteValue
+                         local  uint32_t destOffset
+                         inlines  Gcm::cellGcmFlush, Gcm::cellGcmSetTransferLocation
+ 1930  008D7E68     D8  void BlockGPUUntilJobComplete(const const struct <anon>* this, struct <anon> jh, uint32_t nLabelIndex, uint32_t nLabelValue)
+                         local  uint32_t* pLabelAddr
+                         inlines  Gcm::cellGcmSetWaitLabel
+ 1968  008D7F40     B4  void EnableGPUBlockingOnJob(const const struct <anon>* this, struct <anon> jh, uint32_t nLabelIndex, uint32_t nLabelValue)
+                         local  uint32_t* pLabelAddr
+ 1985  008D7FF4    2CC  const char* QuickSpu::errno_info(int ret)
+ 2091  008DB1C8    564  void ManagerPlat(const struct <anon>* this, const char* pManagerName, struct IMemoryCallback* pMemCallback, struct ISyncCallback* pSyncCallback, struct <anon>* pOpenArray, struct <anon>* aJobInstance, size_t nJobInstanceCount, struct <anon>* aJobType, size_t nJobTypeCount, struct <anon>* pAffinityArray, size_t nAffinityArrayCount, size_t nMaxNumSPUs, uint32_t nNumSPUS, struct <anon>* pCleanupCallbacks, struct IThreadCreatedCallback* pOptionalThreadCallback)
+                         local  int ret
+                         local  size_t x
+                         local  size_t x
+                         local  size_t x
+                         inlines  Alloc, ClearObject, EnterCriticalSection, LeaveCriticalSection, Manager, sys_event_port_connect_local, sys_event_port_create, sys_event_queue_create
+ 2234  008DC2D0    37C  void ~ManagerPlat(const struct <anon>* this)
+                         local  int ret
+                         local  uint64_t exit_status
+                         local  int ret
+                         local  uint64_t exit_status
+                         inlines  EnterCriticalSection, Free, LeaveCriticalSection, sys_event_port_destroy, sys_event_port_disconnect, sys_event_port_send, sys_event_queue_destroy, sys_ppu_thread_join, ~Manager
+ 2327  008DAD7C    44C  void AddChannels(const struct <anon>* this, uint32_t nNumSpusToAdd)
+                         local  uint32_t startValue
+                         local  uint32_t x
+                         local  uint32_t i
+                         local  int ret
+                         local  sys_spu_thread_attribute_t thread_attr
+                         local  const char*[7] thread_names
+                         local  sys_spu_thread_group_attribute_t group_attr
+                         local  sys_spu_thread_argument_t thread_args
+                         inlines  EnterCriticalSection, LeaveCriticalSection, sys_spu_thread_connect_event, sys_spu_thread_group_create, sys_spu_thread_group_start, sys_spu_thread_initialize
+ 2475  008DBEA0    430  void RemoveChannels(const struct <anon>* this, uint32_t nNumSpusToRemove)
+                         local  int ret
+                         local  uint32_t startValue
+                         local  struct <anon>* freeJobInstance
+                         local  uint64_t arrayIndex
+                         local  const struct <anon>& openPriArray
+                         local  int cause
+                         local  int status
+                         local  uint32_t i
+                         local  unsigned int i
+                         local  unsigned int i
+                         local  struct <anon>* pAffinity
+                         local  unsigned int i
+                         inlines  ClearObject, EnterCriticalSection, LeaveCriticalSection, SetSubmissionInfo, sys_spu_thread_disconnect_event, sys_spu_thread_group_destroy, sys_spu_thread_group_join
+ 2593  008DD7C4    1B4  bool GetJobTypeMetaDataBlock(const struct <anon>* this, struct <anon> jh, const char* pBlockName, const void** pData, size_t* nDataSize)
+                         local  const struct <anon>& jobType
+                         inlines  GetJobBinMetaDataBlock, GetJobType
+ 2599  008DD978     FC  void GetJobTypeCopyData(const struct <anon>* this, struct <anon> jh, const void** pCopyBase, size_t* nCopySize)
+                         local  const struct <anon>& jobType
+                         inlines  GetJobBinCopyData, GetJobType
+ 2621  008D98E0    2E0  void ReclaimJobInstances(const struct <anon>* this, bool bCollectMetrics)
+                         local  size_t x
+                         local  const struct <anon>& currJobInstance
+                         local  const struct <anon>& open
+                         local  const struct <anon>& jobType
+                         local  struct <anon> metrics
+                         local  uint32_t tempStart
+                         local  uint64_t pputicksStart
+                         local  uint32_t tempEnd
+                         local  uint64_t pputicksEnd
+                         inlines  Free, GetJobMetrics, GetJobTypeIndex, GetStatus, JobFinished, SetNextFree
+ 2705  008D9BC0    2A8  struct <anon>* GetFreeJobInstance(const struct <anon>* this)
+                         local  struct <anon>* freeJobInstance
+                         local  bool bPrintedDeadlockWarning
+                         local  uint64_t nStartTicks
+                         inlines  GetNextFree, GetStatus, IsComplete, QuickSpu::GetTicks
+ 2768  008D90A4     64  void ReclaimJobTypes(const struct <anon>* this)
+                         local  size_t x
+                         local  const struct <anon>& currJob
+                         inlines  SetNextFree
+ 2796  008D9108     5C  struct <anon>* GetFreeJobType(const struct <anon>* this)
+                         local  struct <anon>* freeJobType
+ 2825  008D9164    10C  struct <anon>* GetFreeAffinityArrayEntry(const struct <anon>* this, uint32_t nSpuNumber)
+                         local  uint32_t nStartIndex
+                         local  uint32_t nEndIndex
+                         local  uint32_t i
+                         local  uint64_t nIndex
+                         local  const struct <anon>& open
+                         local  const struct <anon>& job
+                         inlines  GetSubmissionIndex, IsComplete
+ 2860  008D8EE0     D0  const char* GetJobTypeName(const const struct <anon>* this, struct <anon> jh)
+                         local  const struct <anon>& jobType
+                         inlines  GetJobType
+ 2886  008DCD14    460  void DumpCurrentJobs(const const struct <anon>* this, const char* fileName, bool bDumpCompletedJobs)
+                         local  char[512] fullFileName
+                         local  FILE* fdot
+                         local  size_t i
+                         local  const struct <anon>& jobInstance
+                         local  uint32_t jobTypeindex
+                         local  const struct <anon>& jobType
+                         local  const struct <anon>& jobOpen
+                         local  enum ExecutionStatus eStatus
+                         local  const char* color
+                         local  uint32_t* pNotifyLocation
+                         local  uint32_t* pEnablerArray
+                         local  uint32_t* pEnablerEnd
+                         local  size_t enabledIndex
+                         local  size_t enabledIndex
+                         local  size_t enabledIndex
+                         inlines  EnterCriticalSection, GetJobTypeIndex, GetStatus, GetWriteOnJobComplete, IsComplete, LeaveCriticalSection
+ 3018  008DD174     98  void SetJobMetricCallback(const struct <anon>* this, struct IJobMetricCallback* pMetricCallback)
+                         inlines  EnterCriticalSection, LeaveCriticalSection
+ 3025  008DD20C     94  void FlushJobMetrics(const struct <anon>* this)
+                         inlines  EnterCriticalSection, LeaveCriticalSection
+ 3032  008DD2A0     94  void BeginJobTypeMetrics(const struct <anon>* this)
+                         inlines  EnterCriticalSection, LeaveCriticalSection
+ 3039  008DD334    11C  void EndJobTypeMetrics(const struct <anon>* this, bool bResetMetrics)
+                         local  size_t i
+                         inlines  EnterCriticalSection, LeaveCriticalSection, ResetMetrics
+ 3054  008D82C0      8  size_t GetJobTypeCount(const struct <anon>* this)
+ 3059  008D82C8     A0  bool GetJobTypeMetricsByIndex(const struct <anon>* this, size_t index, struct JobTypeMetrics* pMetrics)
+                         local  const struct <anon>& jt
+ 3088  008D8368    178  void SpuPrintServerEntry(uint64_t arg)
+                         local  int ret
+                         local  sys_event_t event
+                         local  sys_spu_thread_t spu
+                         local  char[1024] printBuf
+                         local  int sret
+                         inlines  sys_event_queue_receive, sys_spu_thread_write_spu_mb
+ 3134  008D84E0    248  void WatchdogThreadEntry(uint64_t arg)
+                         local  struct <anon>* pManager
+                         local  int ret
+                         local  size_t i
+                         local  uint64_t newValue
+                         inlines  EnterCriticalSection, LeaveCriticalSection, sys_spu_thread_group_resume, sys_spu_thread_group_suspend, sys_spu_thread_read_ls, sys_timer_sleep
+ 3298  008D7C48     44  bool IsSpuBinary(const void* pData, size_t nSize)
+                         local  const struct <anon>* header
+ 3319  008D8728     78  bool IsSpuElf(const void* pData, size_t nSize)
+                         local  const struct <anon>* elf_ehdr
+ 3360  008D87A0     44  const struct <anon>* QuickSpu::ElfGetProgramSectionByIndex(struct <anon>* pElfData, uint32_t sectionIndex)
+                         local  const struct <anon>* pPhdr
+                         local  uint32_t sectionOffset
+                         local  uint32_t sectionSize
+                         local  uint32_t numSections
+ 3380  008D87E4     44  const struct <anon>* QuickSpu::ElfGetSectionByIndex(const struct <anon>* pElfData, uint32_t sectionIndex)
+                         local  const struct <anon>* pShdr
+                         local  uint32_t numSections
+                         local  uint32_t sectionOffset
+                         local  uint32_t sectionSize
+ 3401  008D8828     8C  const char* QuickSpu::ElfGetSectionNameByIndex(const struct <anon>* pElfData, uint32_t sectionIndex)
+                         local  char* pSectionName
+                         local  const struct <anon>* pSection
+                         local  const struct <anon>* pStringSection
+                         local  uint32_t sectionOffset
+                         local  uint32_t nameOffset
+ 3422  008D88B4     28  const void* QuickSpu::ElfGetSectionData(const struct <anon>* pElfHeader, const struct <anon>* pSection)
+                         local  const void* sectionData
+ 3435  008D88DC    18C  size_t GetBinarySizeFromElf(const void* pElfData, size_t nElfSize, const char* pElfName)
+                         local  const struct <anon>* pElfHeader
+                         local  uint32_t numSections
+                         local  uint32_t nBinSize
+                         local  uint32_t nBaseOffset
+                         local  uint32_t nEndOffset
+                         local  uint32_t i
+                         local  size_t namelen
+                         local  const struct <anon>* pSection
+                         local  const char* pSectionName
+                         local  uint32_t flags
+                         local  uint32_t stype
+ 3499  008D8A68    478  void FillBinaryFromElf(const void* pElfData, size_t nElfSize, void* pBinData, size_t nUserBinSize, const char* pElfName)
+                         local  const struct <anon>* pElfHeader
+                         local  uint32_t numSections
+                         local  uint32_t nBinSize
+                         local  uint32_t nBaseOffset
+                         local  uint32_t nEndOffset
+                         local  uint32_t nBssOffset
+                         local  uint32_t nBssSize
+                         local  struct <anon>* header
+                         local  uint32_t i
+                         local  size_t namelen
+                         local  uint32_t i
+                         local  uint32_t guidLow
+                         local  struct <anon>* pmdblock
+                         local  size_t namelen
+                         local  const struct <anon>* pSection
+                         local  const char* pSectionName
+                         local  uint32_t flags
+                         local  uint32_t stype
+                         local  const struct <anon>* pSection
+                         local  const char* pSectionName
+                         local  uint32_t flags
+                         local  uint32_t stype
+                         local  const void* tagData
+                         local  uint32_t tagAddr
+                         local  size_t tagSize

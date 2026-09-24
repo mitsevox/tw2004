@@ -1,0 +1,22 @@
+// ../../../../../TIGERCODE/Code/Legacy/LL/PS3/Headers/LLDisSt_gcm.h
+// compiled in: apt_unity.cpp, golf2_unity.cpp, golf_unity.cpp, headgate_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   81    inline-only   void DS_vSetStencilEnable(bool enable)
+   87    inline-only   void DS_vSetStencilOp(enum DC_EStencilOp onPass, enum DC_EStencilOp onFail, enum DC_EStencilOp onZFail)
+   93    inline-only   void DS_vSetStencilTest(enum DS_ECompareFunctions mode, unsigned int ref, unsigned int mask)
+                         local  unsigned int stencilFunc
+  113    inline-only   void DS_vSetStencilWriteMask(unsigned int writemask)
+  133    inline-only   void DS_vSetAlphaEnable(bool bAlphaOn)
+  181    inline-only   void DS_vSetAlphaBlendingFunctionSeparate(enum DC_EBlendOp op, enum DC_EBlendTerm src, enum DC_EBlendTerm dst, enum DC_EBlendOp opAlpha, enum DC_EBlendTerm srcAlpha, enum DC_EBlendTerm dstAlpha)
+  189    inline-only   void DS_vSetAlphaBlendingFunction(enum DC_EBlendOp op, enum DC_EBlendTerm src, enum DC_EBlendTerm dst)
+  199    inline-only   void DS_vSetAlphaTestMode(bool boAlphaTestEnable_p, enum DS_ECompareFunctions eAlphaMode_p, uint8 uiAlphaRefValue_p)
+                         local  unsigned int xAlphaMode
+  230    inline-only   void DS_vSetColorWriteEnable(unsigned int enabled)
+                         local  unsigned int mask
+  260    inline-only   void DS_vEnableZBufferUpdate(bool boZBufferUpdate_p)
+  269    inline-only   void DS_vSetZTestEnable(bool bZTestOn)
+  279    inline-only   void DS_vSetZBufferMode(enum DS_ECompareFunctions eZBufferMode_p)
+  299    inline-only   void DS_vSetCullMode(enum DC_ECullingMode cullMode)
+  317    inline-only   void DS_vSetZBias(float constant, float slopeScaled)
+                         local  const float biasScale

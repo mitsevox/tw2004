@@ -1,0 +1,10 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/copywithgain.cpp
+// compiled in: copywithgain.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   70    inline-only   void core::CopyWithGainOptimizedImplementation(float* pDst, float* pSrc, float gain, int numSamples)
+                         local  float* pEndDst
+  258    inline-only   void core::CopyWithGainImplementation(float* pDst, float* pSrc, float gain, unsigned int numSamples)
+                         local  float* pEndDst
+  276  006F5A78     B8  void core::CopyWithGain(float* pDst, float* pSrc, float gain, unsigned int numSamples)
+                         inlines  core::CopyWithGainImplementation, core::CopyWithGainOptimizedImplementation

@@ -1,0 +1,54 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/UMemPoolResizeable.cpp
+// compiled in: Legacy_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   28  0037B750     40  void UMemPoolResizeable::UMemPoolResizeable(const struct UMemPoolResizeable* this)
+   39  003AA7A8     44  void UMemPoolResizeable::~UMemPoolResizeable(const struct UMemPoolResizeable* this)
+   49  0038BC34     FC  void UMemPoolResizeable::InitUsingPageSize(const struct UMemPoolResizeable* this, int poolPageSizeInBytes, int elemSizeInBytes, int alignment, bool bGrow)
+                         local  int32 stride
+                         local  const uint32 hdrSize
+                         local  const int32 numElem
+   74  0038BB2C    108  void UMemPoolResizeable::Init(const struct UMemPoolResizeable* this, int numElem, int stride, int alignment, bool bGrow)
+                         local  const int32 hdrSize
+                         local  const int32 nBytes
+  116  0038B824    124  struct PoolHeader* UMemPoolResizeable::CreatePool(const struct UMemPoolResizeable* this)
+                         local  const int32 hdrSize
+                         local  const int32 nBytes
+                         local  struct PoolHeader* pPool
+  159  0037B7D0     4C  void UMemPoolResizeable::InitFreeList(const struct UMemPoolResizeable* this, struct MemBlock* pStore)
+                         local  struct MemBlock* pElem
+                         local  int i
+  179  0038B770     B4  void UMemPoolResizeable::Cleanup(const struct UMemPoolResizeable* this)
+                         local  struct PoolHeader* pCurPool
+  199  0037B81C      8  void UMemPoolResizeable::SetPermanent(const struct UMemPoolResizeable* this, bool perm)
+  208  0038B948    1E4  void* UMemPoolResizeable::Alloc(const struct UMemPoolResizeable* this)
+                         local  struct MemBlock* pElem
+                         local  struct PoolHeader* pCurPool
+                         local  struct PoolHeader* pNewPool
+                         inlines  UMemPoolResizeable::InMemoryRange
+  272  0038B6CC     A4  void UMemPoolResizeable::CheckConsistency(const struct UMemPoolResizeable* this)
+                         local  struct PoolHeader* pCurPool
+                         local  struct MemBlock* pElem
+                         inlines  UMemPoolResizeable::InMemoryRange
+  290  003AF524    244  void* UMemPoolResizeable::GetNextPtrInPool(const struct UMemPoolResizeable* this)
+                         local  const char[17] __FUNCTION__
+                         local  struct PoolHeader* pCurPool
+                         local  char* buf
+                         local  struct MemBlock* memBlock
+                         local  int index
+                         local  int32 index
+                         local  int i
+                         inlines  TagValuePair, operator+
+  337  0038B568    164  bool UMemPoolResizeable::Free(const struct UMemPoolResizeable* this, void* pElem)
+                         local  bool didFree
+                         local  struct PoolHeader* pCurPool
+                         local  struct MemBlock* pMemBlock
+  394  0038B450    118  void UMemPoolResizeable::Purge(const struct UMemPoolResizeable* this, bool bPrune)
+                         local  struct PoolHeader* pCurPool
+                         local  struct PoolHeader* pTmpHead
+                         local  struct PoolHeader* p
+                         inlines  UMemPoolResizeable::InMemoryRange
+  423  0037B824     48  bool UMemPoolResizeable::InPoolChain(const struct UMemPoolResizeable* this, void* pElem)
+                         local  struct PoolHeader* pCurPool
+                         inlines  UMemPoolResizeable::InMemoryRange
+  440  0038B3CC     84  int UMemPoolResizeable::GetTotalBytesAlloc(const const struct UMemPoolResizeable* this)

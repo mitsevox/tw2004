@@ -1,0 +1,17 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/specif/UCtrlFct.c
+// compiled in: Legacy_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   58  003943BC    1DC  static void CtrlFct_DownLoad(TStreamDataPtr Data)
+                         local  TChunkR* pChunk
+                         local  char* pTEXT
+                         local  TCtrlFct* pCtrlFct
+                         local  int32 i
+  109  00392DB8     50  void CtrlFct_InitModule()
+  121  00380278     20  void CtrlFct_CloseModule()
+  128  00393790     A0  void CtrlFct_SendMail(int32 ctrlFuncNumber, int32 messageID, int32 messageData)
+                         local  TCtrlFct* pCtrlFct
+  144  00380298     9C  void CtrlFct_Simulate(int32 simuTickLastFrameDuration)
+                         local  TCtrlFct* pCtrlFct
+                         local  int32 k
+  181  00380334     1C  int32 CtrlFct_GetFctNumber()

@@ -1,0 +1,6 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/systemregisterstandardruntime.cpp
+// compiled in: systemregisterstandardruntime.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   11  006D6E88     78  void RegisterStandardRunTime(const struct <anon>* this)
+                         local  const char[24] __FUNCTION__

@@ -1,0 +1,62 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/extern/coda/cmn/mtdecf.cpp
+// compiled in: mtdecf.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   23  006F25E4     40  void* operator new(size_t size)
+   34  006F2624     3C  void operator delete(void* ptr)
+  206  006F2660     6C  static unsigned int Snd::getbits(UTALKSTATE_CODA* state, int count)
+                         local  unsigned int result
+  234  006F26CC     50  void Snd::discardbits(UTALKSTATE_CODA* state, int count)
+  291  006F271C    28C  void Snd::readsamples(UTALKSTATE_CODA* state, int voiced, float* sample, int step)
+                         local  int decode_state
+                         local  int index
+                         local  int run
+                         local  int code
+                         local  int n
+                         local  int i
+                         local  int ps2compilerkludge
+  387    inline-only   static void Snd::interpolate(float* sample)
+                         local  int i
+  408    inline-only   static void Snd::reftolpc(float* ref, float* lpc)
+                         local  float[12] u
+                         local  float[12] y
+                         local  float s
+                         local  int i
+                         local  int j
+  460  006F29A8    9E0  static void Snd::filter(UTALKSTATE_CODA* state, int index, int count)
+                         local  float[12] lpc
+                         local  float* data
+                         local  int i
+                         inlines  Snd::reftolpc
+  707  006F3388    14C  void initmut(const struct <anon>* this, unsigned char* data, UTALKSTATE_CODA* state, int doWholeInit)
+                         local  float gain
+                         local  int i
+  774  006F34D4    554  void Snd::decodemut(UTALKSTATE_CODA* state)
+                         local  float[118] sample
+                         local  float[12] delta
+                         local  float hgain
+                         local  float sgain
+                         local  int lar
+                         local  int voiced
+                         local  int offset
+                         local  int imaging
+                         local  int subwin
+                         local  int hindex
+                         local  int index
+                         local  int i
+                         inlines  Snd::interpolate
+  908  006F3A80     B0  int Feed(const struct <anon>* this, void* pSampleData, int sampleDataSize, int numSamples)
+  946  006F3B70    2D4  int Decode(const struct <anon>* this, float** pDstBuf, int numSamples)
+                         local  int tmpframecnt
+                         local  int maxsamples
+                         local  int count
+                         local  short int i
+                         local  float* pdstdata
+                         local  short int temp
+                         local  unsigned char* mpSrcTemp
+                         inlines  PutU<short int, short int>
+ 1039  006F3B30     1C  MTFSTATE GetState(const struct <anon>* this)
+                         local  struct <anon> mts
+                         local  MTFSTATE mts
+ 1049  006F3B4C     1C  void SetState(const struct <anon>* this, MTFSTATE* pstate, int ignoresamples)
+ 1061  006F3B68      8  void SetCodecVersion(const struct <anon>* this, int codecversion)

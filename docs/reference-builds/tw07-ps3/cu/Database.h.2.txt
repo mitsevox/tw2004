@@ -1,0 +1,13 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/Database.h
+// compiled in: Compiler.cpp, Database.cpp, DbManager.cpp, Query.cpp, Table.cpp
+// 9 functions, source order. line | PS3 address | size
+
+  111  007C5548     84  void Database(const struct <anon>* this)
+  116  007C5650     24  void ~Database(const struct <anon>* this)
+  126  007BD5F0     68  bool InternalIsLocked(const struct Database* this)
+  139  007CA974     38  DbRef InternalGetRef(const struct <anon>* this)
+  161  007E688C     38  enum LockStatus GetLockState(const struct Database* this)
+  167  007CA9AC     38  struct <anon>* GetNext(const struct <anon>* this)
+  172  007CA9E4     3C  void SetNext(const struct <anon>* this, struct <anon>* db)
+  177  00800B88     38  struct Table* GetFirstTable(const struct Database* this)
+  183  007CDF78     3C  int GetSentinel(const struct Database* this)

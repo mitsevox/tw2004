@@ -1,0 +1,66 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Legacy/Main/Main.c
+// compiled in: Legacy_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+  421  003801A0     D0  bool MA_CmdLine_AdvanceCourseHole()
+                         local  struct MA_CourseHole* pCourseHole
+                         inlines  GM_SetCurrentCourseID
+  436  003C5E50   2248  void MA_processCommandLine(int32 nArgs, char** argStrPtr, bool preInit)
+                         local  int32 i
+                         local  int32 j
+                         local  char* argStr
+                         local  int32[4] c
+                         local  int32 cCount
+                         local  int32[4] g
+                         local  int32 gCount
+                         local  int32[4] golferHandles
+                         local  int32 golferHandleCount
+                         local  bool modeDefined
+                         local  bool driverDefined
+                         local  bool numPlayersDefined
+                         local  bool aiClubsDefined
+                         local  bool courseDefined
+                         local  bool holesDefined
+                         local  bool controllersDefined
+                         local  bool golfersDefined
+                         local  bool twoplayerDefined
+                         local  int8 temp_nplayers
+                         local  int32 k
+                         local  int32 plrID
+                         local  int32 h
+                         local  uint32 flags
+                         local  uint32 debugFlags
+                         local  char* data_p
+                         local  int32 len
+                         local  char[128] tempText
+                         local  char* textPtr
+                         local  char*[60] tmpArgPtr
+                         local  int tmpArgPtrCount
+                         local  char[8] formatStr
+                         local  int count
+                         local  bool gDoFailureBreak
+                         local  char* entry
+                         local  int32 gDisableTintsAndBlends
+                         local  int32 event
+                         local  int count
+                         local  char* courseArg
+                         local  int holeNameBufLen
+                         local  uint32 course
+                         local  uint32 i
+                         local  uint32 hole
+                         local  uint32 course
+                         inlines  GM_SelectHoleSet, GM_SelectSingleHole, GM_SetCurrentCourse, cGAME_GLOBALS::EnableLoopingDebug, cGAME_GLOBALS::GetDebugFlags, cGAME_GLOBALS::GetGlobalFlags, cGAME_GLOBALS::SetAIUseRegulationClubs, cGAME_GLOBALS::SetCloudOption, cGAME_GLOBALS::SetDebugFlags, cGAME_GLOBALS::SetDebugOnlineType, cGAME_GLOBALS::SetForcedRandomSeed, cGAME_GLOBALS::SetGlobalFlags, cGAME_GLOBALS::SetHoleBinDefined, cGAME_GLOBALS::SetHostIPAddress, cGAME_GLOBALS::SetPin, cGAME_GLOBALS::SetSeasonOption, cGAME_GLOBALS::SetShotLimit, cGAME_GLOBALS::SetUseDynCameraBudget, cGAME_GLOBALS::SetnRTEAutoLaunchEvent, std::atoi, std::atol, std::strchr
+ 1957    inline-only   static void MA_vOnceInit(int32 c, char** v)
+                         local  int32 iResult
+ 2171    inline-only   static void MA_vOnceClose()
+ 2332  003918C0     FC  int loadPRXModules()
+                         local  int ret
+                         local  int32 i
+ 2347  003917F8     C8  int unloadPRXModules()
+                         local  int ret
+                         local  int32 i
+ 2361  00391798     60  void sysutilCallback(uint64_t status, uint64_t param, void* userdata)
+                         inlines  cGAME_GLOBALS::QuitApplication
+ 2389  003CB064    324  int main(int32 iArgc_p, char** chppArgv_p)
+                         local  int flags
+                         inlines  MA_vOnceClose, MA_vOnceInit, cGAME_GLOBALS::GetGlobalFlags, cGAME_GLOBALS::SetGlobalFlags, cGAME_GLOBALS::SetHDCacheEnabled

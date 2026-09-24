@@ -1,0 +1,19 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNAScope/RNAParm.cpp
+// compiled in: RNAParm.cpp
+// 10 functions, source order. line | PS3 address | size
+
+    0  00820854     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+  102  00820C90    138  void SetScopeParm(const struct <anon>* this, struct ScopeParmC* pScopeParm)
+                         local  const char[13] __FUNCTION__
+                         inlines  AddRef, RNADebugBreak, Release, SetPtr
+  135  008208F4      C  const char* GetName(const const struct <anon>* this)
+  160  00820900      C  enum TypeID GetTypeID(const const struct <anon>* this)
+  187  0082090C      C  uint32_t GetSize(const const struct <anon>* this)
+  213  00820918      C  uint32_t GetElementCount(const const struct <anon>* this)
+  239  00820924      C  uint32_t GetElementSize(const const struct <anon>* this)
+  266  00820930    138  void Print(const const struct <anon>* this, bool8_t bFullName)
+                         local  char[256] fullname
+                         local  struct <anon>* pTypeInfo
+                         inlines  GetScopeParm
+  282  008208D4     10  static void _GLOBAL__I__ZN3RNA5ParmC16s_ClassAllocatorE()
+  283  008208E4     10  static void _GLOBAL__D__ZN3RNA5ParmC16s_ClassAllocatorE()

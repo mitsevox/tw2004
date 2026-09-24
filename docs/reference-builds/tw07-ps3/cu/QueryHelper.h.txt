@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/QueryHelper.h
+// compiled in: QueryHelper.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   62  007E7AB0     24  void QueryHelper(const struct <anon>* this)
+   65  007E7AF8     24  void ~QueryHelper(const struct <anon>* this)

@@ -1,0 +1,35 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/texblender.cpp
+// compiled in: other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   36  003D09D0     48  void TexBlender::TexBlender(const struct TexBlender* this, const const struct Allocator& refAlloc, struct Texture32b* destTexture)
+   43  003D0A18     18  void TexBlender::~TexBlender(const struct TexBlender* this)
+   49  0042487C    CE8  void TexBlender::Blend(const struct TexBlender* this, const TexBlendRect& destRect, int32_t numTextures, struct RawTexture** textures, int32_t* scales, TexBlendParams* params, bool mirrored)
+                         local  RawTexture_PixelValue** pixelBuffer
+                         local  void** tempStorageBuffer
+                         local  int i
+                         local  int iMipmap
+                         local  int i
+                         local  TexBlendRect mipmapRect
+                         local  RawTexture_PixelValue* destPixels
+                         local  RawTexture_PixelValue* origDestPixels
+                         local  int32_t blendRate
+                         local  int32_t destRectMaxX
+                         local  int32_t destRectMaxY
+                         local  int i
+                         local  int i
+                         local  int32_t usedMipmap
+                         local  int iy
+                         local  int ix
+                         local  int i
+                         local  char[32] texname
+                         local  char[32] texname
+                         local  RawTexture_PixelValue* mirroredDest
+                         local  int i
+                         local  int iRev
+                         local  int mirroredX
+                         local  RawTexture_PixelValue temp
+                         local  int i
+                         local  int iScaledPix
+                         local  int i
+                         inlines  RawTexture::GetNumMipmaps, RawTexture::GetTextureName

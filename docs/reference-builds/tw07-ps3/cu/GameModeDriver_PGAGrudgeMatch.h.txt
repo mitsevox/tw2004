@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/GameMode/Headers/GameModeDriver_PGAGrudgeMatch.h
+// compiled in: apt_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   20    inline-only   void GameModeDriverPGAGrudgeMatch::SetRank2PointsAvg(const struct GameModeDriverPGAGrudgeMatch* this, float avg)
+   21    inline-only   void GameModeDriverPGAGrudgeMatch::SetRank3PointsAvg(const struct GameModeDriverPGAGrudgeMatch* this, float avg)

@@ -1,0 +1,136 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/source/common/Database.cpp
+// compiled in: Database.cpp
+// 28 functions, source order. line | PS3 address | size
+
+    0  007CA7C4    10C  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+  105  007C5698    10C  void InitializeMembers(const struct <anon>* this, DbRef dbRef)
+  145  007C57A4    204  struct <anon>* Create(int dbRef, enum TDbError* dbResult)
+                         local  struct <anon> lock
+                         local  struct <anon>* pDb
+  192  007C59A8    468  enum TDbError Destroy(const struct <anon>* this)
+                         local  const char[8] __FUNCTION__
+                         local  struct <anon> lock
+                         local  struct <anon>* pTempDb
+                         local  struct Table* pTable
+                         local  struct Query* pQuery
+                         local  struct Query* pTempQ
+                         local  enum TDbError dbResult
+  260  007C5E10    180  enum TDbError CreateTable(const struct <anon>* this, int tableRef, struct <anon>* pColDefs, RowNum maxRows, struct Table** pTable)
+                         local  const char[12] __FUNCTION__
+                         local  struct <anon> lock
+                         local  enum TDbError dbResult
+                         local  struct Table* localTable
+  278  007C5F90    12C  enum TDbError DestroyTable(const struct <anon>* this, int tableRef)
+                         local  const char[13] __FUNCTION__
+                         local  struct <anon> lock
+                         local  struct Table* table
+  294  007C9BB0    1C8  enum TDbError InternalLoad(const struct <anon>* this, enum LoadType eLoadType, struct IOCallback* pCallbacks)
+                         local  const char[13] __FUNCTION__
+                         local  enum TDbError dbResult
+  323  007C60BC    110  enum TDbError InternalSave(const struct <anon>* this, struct IOCallback* pCallbacks)
+                         local  const char[13] __FUNCTION__
+                         local  enum TDbError dbResult
+  352  007C6460     D0  void AsyncLoad(const struct <anon>* this, struct ASyncParams* loadParams)
+                         local  struct <anon> lock
+  378  007C6390     D0  void AsyncSave(const struct <anon>* this, struct ASyncParams* saveParams)
+                         local  struct <anon> lock
+  392  007C61CC    1C4  void AsyncLoadSave(const struct <anon>* this, struct ASyncParams* pLoadSaveParams)
+                         local  struct <anon> threadParam
+                         local  struct <anon> asyncThread
+  438  007C6530    240  enum TDbError GetCRC(const struct <anon>* this, uint32_t* pCRC)
+                         local  const char[7] __FUNCTION__
+                         local  struct <anon> lock
+                         local  struct Table* pTable
+  478  007C6770    3A4  enum TDbError GetFilledRowsCRC(const struct <anon>* this, TableRef* pTableList, uint32_t uNumTables, uint32_t* pCRC)
+                         local  const char[17] __FUNCTION__
+                         local  struct <anon> lock
+                         local  struct Table* pTable
+                         local  bool8_t bTableIncluded
+                         local  uint32_t i
+  543  007C6B14    258  int Partition(const struct <anon>* this, uint32_t* a, int32_t low, int32_t high)
+                         local  int32_t left
+                         local  int32_t right
+                         local  uint32_t pivot_item
+                         local  uint32_t temp
+  605  007C6D6C    108  void QuickSortUint32(const struct <anon>* this, uint32_t* a, int32_t low, int32_t high)
+                         local  int32_t pivot
+  639  007C6E74    C58  enum TDbError GetDataEquivalenceCRC(const struct <anon>* this, TableRef* pTableList, uint32_t uNumTables, uint8_t uFlags, uint32_t* pCRC)
+                         local  const char[22] __FUNCTION__
+                         local  struct <anon> lock
+                         local  struct Table* pTable
+                         local  bool8_t bTableIncluded
+                         local  uint8_t* pBuffer
+                         local  uint32_t uNumUsedRows
+                         local  uint32_t* pRowsCRC
+                         local  uint32_t idxCol
+                         local  uint32_t i
+                         local  struct <anon>* pCurDef
+                         local  uint32_t uOffset
+                         local  uint32_t uStrSize
+                         local  uint32_t uCRCblob
+  802  007C7ACC    244  enum TDbError GetUnusedTableRef(const struct <anon>* this, TableRef* pTblRef)
+                         local  const char[18] __FUNCTION__
+                         local  struct <anon> lock
+                         local  struct Table* pTable
+  878  007C7F88     AC  enum TDbError ListAllTables(const struct <anon>* this, struct Table** pTableRefLst, int* maxItems)
+                         local  struct <anon> lock
+  939  007C7D10    278  enum TDbError InternalListAllTables(const struct <anon>* this, struct Table** pTableRefLst, int* maxItems)
+                         local  const char[22] __FUNCTION__
+                         local  uint32_t realMax
+                         local  struct Table* pTable
+  991  007C8034    228  enum TDbError Rename(const struct <anon>* this, DbRef newRef)
+                         local  const char[7] __FUNCTION__
+                         local  struct <anon> lock
+                         local  struct <anon>* pDb
+                         local  enum TDbError eDbResult
+                         local  uint32_t uStackCtr
+ 1051  007C988C    324  enum TDbError LoadTableFromFile(const struct <anon>* this, TableRef tblRef, enum LoadType eLoadType, struct IOCallback* pCallbacks)
+                         local  const char[18] __FUNCTION__
+                         local  struct <anon> lock
+                         local  enum TDbError dbResult
+                         local  TableRef[2] tblRefLst
+ 1093  007C94DC    3B0  enum TDbError LoadMultipleTablesFromFile(const struct <anon>* this, TableRef* pTblRefLst, enum LoadType eLoadType, struct IOCallback* pCallbacks)
+                         local  const char[27] __FUNCTION__
+                         local  struct <anon> lock
+                         local  enum TDbError dbResult
+ 1126  007C5430    118  struct Table* InternalFindTable(const struct <anon>* this, TableRef tableRef)
+                         local  const char[18] __FUNCTION__
+                         local  struct Table* table
+ 1205  007C825C   1280  enum TDbError IOLoad(const struct <anon>* this, TableRef* pTblRefLst, enum LoadType eLoadType, struct IOCallback* pCallbacks)
+                         local  const char[7] __FUNCTION__
+                         local  enum TDbError dbResult
+                         local  uint32_t numTbls
+                         local  uint32_t tblCount
+                         local  uint32_t bytesRead
+                         local  TableRef curTblRef
+                         local  uint32_t firstTblOffset
+                         local  struct Table* pTable
+                         local  struct <anon>* tblOffLst
+                         local  uint8_t* pLoadFlags
+                         local  struct <anon> fileHdr
+                         local  struct <anon> savedDb
+                         local  struct <anon> savedTbl
+                         local  struct <anon> hFile
+                         local  uint32_t nCRC
+                         local  uint32_t nCRC
+                         local  int delta
+                         local  uint32_t tblCRC
+                         local  struct <anon> searchData
+                         local  struct <anon> ret
+ 1584  007C9D78    204  intptr_t ThreadAsyncReadWrite(void* funcParams)
+                         local  struct <anon> lock
+                         local  struct ASyncParams* pLoadSaveParams
+ 1632  007C9F7C    848  enum TDbError CopyDatabase(const struct <anon>* this, struct <anon>* pDestDb, bool bCopyTriggers)
+                         local  struct <anon> lock
+                         local  enum TDbError eError
+                         local  struct Table** pTablePtrList
+                         local  int32_t numTables
+                         local  DbRef dbRef
+                         local  int32_t index
+                         local  struct Table* table
+                         local  struct <anon>* pColDefList
+                         local  ColNum numCols
+                         local  RowNum numRows
+                         local  struct <anon> dbReturn
+ 1721  007CA8D0     3C  static void _GLOBAL__I__ZN2EA4T3db8DatabaseC2Ev()
+ 1722  007CA90C     3C  static void _GLOBAL__D__ZN2EA4T3db8DatabaseC2Ev()

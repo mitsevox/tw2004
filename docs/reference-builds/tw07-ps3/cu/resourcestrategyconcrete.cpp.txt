@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/online/osdk/resourcestrategyconcrete.cpp
+// compiled in: golf2_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   62  00185DF4     18  void ResourceStrategyConcrete::ResourceStrategyConcrete(const struct ResourceStrategyConcrete* this)
+   86  00129E10     38  void ResourceStrategyConcrete::~ResourceStrategyConcrete(const struct ResourceStrategyConcrete* this)
+                         inlines  ~ResourceStrategy
+  110  00129E48      4  void ResourceStrategyConcrete::CreateProtocols(const struct ResourceStrategyConcrete* this)
+  135  00129E4C      4  void ResourceStrategyConcrete::DestroyProtocols(const struct ResourceStrategyConcrete* this)

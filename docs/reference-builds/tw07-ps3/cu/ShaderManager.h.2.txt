@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderManager.h
+// compiled in: shader_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   61    inline-only   void SM_NoteActiveShader(struct SM_Shader_Base* pShaderWrapper)
+   62    inline-only   struct SM_Shader_Base* SM_GetLastActivedShader()
+  101  0033E2DC      8  const char* SM_Shader_Base::GetVSSourceFileName_dbg(const struct SM_Shader_Base* this)
+  102  0033E2E4      8  const char* SM_Shader_Base::GetPSSourceFileName_dbg(const struct SM_Shader_Base* this)

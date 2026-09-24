@@ -1,0 +1,55 @@
+// C:/dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/target/ppu/include/vector
+// compiled in: golf_unity.cpp, rnaunity.cpp
+// 35 functions, source order. line | PS3 address | size
+
+   57    inline-only   const struct Course& operator*(const const struct <anon>* this)
+  124    inline-only   ptrdiff_t operator-(const const struct <anon>* this, const const struct <anon>& _Right)
+  139    inline-only   bool operator==(const const struct <anon>* this, const const struct <anon>& _Right)
+  149    inline-only   bool operator!=(const const struct <anon>* this, const const struct <anon>& _Right)
+  154    inline-only   bool operator<(const const struct <anon>* this, const const struct <anon>& _Right)
+  232    inline-only   struct Course& operator*(const const struct <anon>* this)
+  242    inline-only   struct <anon>& operator++(const struct <anon>* this)
+  248    inline-only   struct <anon> operator++(const struct <anon>* this, int )
+                         local  struct <anon> _Tmp
+                         local  struct <anon> _Tmp
+  255    inline-only   struct <anon>& operator--(const struct <anon>* this)
+  268    inline-only   struct <anon>& operator+=(const struct <anon>* this, ptrdiff_t _Off)
+  274    inline-only   struct <anon> operator+(const const struct <anon>* this, ptrdiff_t _Off)
+                         local  struct <anon> _Tmp
+  280    inline-only   struct <anon>& operator-=(const struct <anon>* this, ptrdiff_t _Off)
+  285    inline-only   struct <anon> operator-(const const struct <anon>* this, ptrdiff_t _Off)
+                         local  struct <anon> _Tmp
+  291    inline-only   ptrdiff_t operator-(const const struct <anon>* this, const const struct <anon>& _Right)
+  505    inline-only   void reserve(const struct <anon>* this, size_t _Count)
+                         local  struct MeshSortStruct* _Ptr
+                         local  size_t _Size
+  537    inline-only   size_t capacity(const const struct <anon>* this)
+  564    inline-only   struct _Vector_iterator<Course,std::allocator<Course> > begin(const struct <anon>* this)
+  574    inline-only   struct _Vector_iterator<Course,std::allocator<Course> > end(const struct <anon>* this)
+  618    inline-only   size_t size(const const struct <anon>* this)
+  623    inline-only   size_t max_size(const const struct <anon>* this)
+  663    inline-only   struct Course& operator[](const struct <anon>* this, size_t _Pos)
+  694    inline-only   void push_back(const struct <anon>* this, const const struct Course& _Val)
+  760    inline-only   struct _Vector_iterator<Course,std::allocator<Course> > insert(const struct <anon>* this, struct <anon> _Where, const const struct Course& _Val)
+                         local  size_t _Off
+  904    inline-only   struct _Vector_iterator<TwRenderObj::BaseRenderObj*,std::allocator<TwRenderObj::BaseRenderObj*> > erase(const struct <anon>* this, struct <anon> _Where)
+  937    inline-only   void clear(const struct <anon>* this)
+  969    inline-only   bool _Buy(const struct <anon>* this, size_t _Capacity)
+  985    inline-only   void _Destroy(const struct <anon>* this, struct Course* _First, struct Course* _Last)
+  990    inline-only   void _Tidy(const struct <anon>* this)
+ 1006    inline-only   struct Course* _Ucopy<Course*>(const struct <anon>* this, struct Course* _First, struct Course* _Last, struct Course* _Ptr)
+ 1006    inline-only   struct MeshSortStruct* _Ucopy<MeshSortStruct*>(const struct <anon>* this, struct MeshSortStruct* _First, struct MeshSortStruct* _Last, struct MeshSortStruct* _Ptr)
+ 1006    inline-only   BaseRenderObjPtr* _Ucopy<TwRenderObj::BaseRenderObj**>(const struct <anon>* this, BaseRenderObjPtr* _First, BaseRenderObjPtr* _Last, BaseRenderObjPtr* _Ptr)
+ 1006    inline-only   struct MeshSortStruct* _Ucopy<std::_Vector_iterator<MeshSortStruct, std::allocator<MeshSortStruct> > >(const struct <anon>* this, struct <anon> _First, struct <anon> _Last, struct MeshSortStruct* _Ptr)
+ 1013  00341424   1160  void _Insert_n(const struct <anon>* this, struct <anon> _Where, size_t _Count, const const struct Course& _Val)
+                         local  struct Course _Tmp
+                         local  size_t _Capacity
+                         local  struct Course* _Newvec
+                         local  struct Course* _Ptr
+                         local  char* _Ptr
+                         local  char* _Ptr
+                         local  struct Course* _Oldend
+                         local  char* _Ptr
+                         inlines  Course::Course, _Copy, _Destroy, _Eos, _Myptr, _Tidy, _Ucopy<Course*>, _Ufill, _Xlen, allocate, assign, capacity, construct, copy, deallocate, erase, size, std::copy_backward<Course*, Course*>, std::fill<Course*, Course>, ~basic_string, ~length_error
+ 1103    inline-only   struct Course* _Ufill(const struct <anon>* this, struct Course* _Ptr, size_t _Count, const const struct Course& _Val)
+ 1109    inline-only   void _Xlen(const const struct <anon>* this)

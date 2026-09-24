@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_ParticleEffect.cpp
+// compiled in: shader_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   36  0051CDB4     28  void SM_ParticleEffectClass::SM_ParticleEffectClass(const struct SM_ParticleEffectClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base
+   43  0050DF04     88  void SM_ParticleEffectClass::Load(const struct SM_ParticleEffectClass* this)
+   52  0050DF8C     44  void SM_ParticleEffectClass::Activate(const struct SM_ParticleEffectClass* this)
+   59  0051564C     64  void SM_ParticleEffectClass::SetColorTexture(const struct SM_ParticleEffectClass* this, TextureRef textureref)

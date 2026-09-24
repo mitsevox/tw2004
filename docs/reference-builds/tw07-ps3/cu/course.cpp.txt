@@ -1,0 +1,37 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/course.cpp
+// compiled in: headgate_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   11  00345D4C     18  struct CCourse* GetCurrentCourse()
+   16  00368240    108  void CCourse::CCourse(const struct CCourse* this)
+                         inlines  TerrainData, TerrainHeightInfo::TerrainHeightInfo
+   26  00345D64     64  void CCourse::~CCourse(const struct CCourse* this)
+   37  00367960     D8  void CCourse::LoadHole(const struct CCourse* this)
+                         local  int8 nGreenIndex
+                         local  int8 nCupIndex
+                         inlines  GM_GetCurrentGreenIndex, GM_GetFlagPositionIndex
+   55  00365F18     28  void CCourse::UnloadHole(const struct CCourse* this)
+   65  0036A930     30  float GetTerrainHeight(float x, float z, unsigned int attributeMask, enum FlagOp op, unsigned int propsMask, struct TerrainHeightInfo* info)
+   75    inline-only   static void InitializeGrassGrid(struct TerrainGrass* terrainGrass, const const struct TerFileMaterial& info, float grassDetail, unsigned int terrainID, bool bUnderwater)
+                         local  int spacing
+                         local  int gridSize
+                         local  int gridcells
+                         local  float pcnt
+                         local  int bladesperpatch
+                         local  float MinDensity
+                         local  float LowLODDensity
+  137  00345EBC      4  void CCourse::DestroyTerrainGrass(const struct CCourse* this)
+  144  003600FC    72C  void CCourse::SetupTerrainGrass(const struct CCourse* this)
+                         local  float grassDetail
+                         local  struct CRManager* pCourseRender
+                         local  int curGrassIndex
+                         local  unsigned int matIndex
+                         local  struct TerFileMaterial info
+                         local  int grassIndex
+                         local  float gGrassDensity
+                         local  bool bUnderwater
+                         local  struct TerrainGrass* terrainGrass
+                         local  float bladeHeight
+                         inlines  InitializeGrassGrid
+  218  0036A7D8     8C  float CCourse::GetTerrainHeight(const struct CCourse* this, float x, float z, unsigned int attributeMask, enum FlagOp op, unsigned int propsMask, struct TerrainHeightInfo* info)
+  228  00346214      8  int CCourse::GetNumTextures(const struct CCourse* this)

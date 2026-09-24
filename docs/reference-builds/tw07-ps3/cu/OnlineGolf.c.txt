@@ -1,0 +1,506 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/OnlineGolf.c
+// compiled in: golf_unity.cpp
+// 188 functions, source order. line | PS3 address | size
+
+  316  00211470    660  void OnlineGolf_InitVariables()
+                         local  int i
+                         inlines  OnlineGolf_RegisterCallbackFunctions
+  419  002434BC    1F4  void OnlineGolf_Init(bool frontEnd)
+                         local  const char[16] __FUNCTION__
+                         local  int i
+                         inlines  TagValuePair, operator+
+  459  00210C84     7C  void OnlineGolf_DeInit(bool frontEnd)
+  491  00210D00     94  static uint8 OnlineGolf_FindCurrentHostNumber()
+                         local  int i
+                         local  int playerNumber
+  512  002F2D68    1E8  void OnlineGolf_PostCharacterLoadInitInternal()
+                         local  int localPlayerNumber
+                         local  int32 seed
+                         local  int32 hostNumber
+                         inlines  OnlineGolf_WaitForPreloadData, cGAME_GLOBALS::SetRandomSeed
+  548  002F2F50     B0  void OnlineGolf_PostCharacterLoadInit()
+                         local  int localPlayerNumber
+                         local  bool trysendinginfo
+  575  0033982C     FC  void OnlineGolf_InitForHole()
+                         local  int32 onlinePlayer
+  608  00210D94     34  void OnlineGolf_ResetUpdateCounter()
+  614  00306C8C    220  void OnlineGolf_InitForTurn(enum PlayerNumber_t ePlayerID)
+                         inlines  OnlineGolf_PostShotStartFromOnline
+  649  00211364    10C  void OnlineGolf_InitForSwing(enum PlayerNumber_t ePlayerID)
+                         inlines  PhysicsBall_t::ClearFlag
+  674  00339764     C8  void OnlineGolf_EndTurn(enum PlayerNumber_t ePlayerID)
+                         inlines  GM_GetGolferUp
+  707    inline-only   static void OnlineGolf_RegisterCallbackFunctions()
+  751  0031CB14     FC  void OnlineGolf_PreUpdate()
+                         local  int onlinePlayerNumber
+                         inlines  GM_GetGolferUp
+  790  002EF918    43C  static void OnlineGolf_BattleGolf_Update()
+                         local  const float fTimeOutValue
+                         local  float fClubSelectTimer
+                         local  bool bRunningClubSelectTimer
+                         local  TI_STimeValue last_tick
+                         local  TI_STimeValue cur_tick
+                         local  float elapsed
+                         local  void* ptr
+                         local  struct GameModeBattle* pBattle
+                         local  bool bTimedOut
+                         local  bool bBattleGolfScreenIsShowing
+                         local  enum PlayerNumber_t winner
+                         local  int32 localPlayer
+                         local  bool bInChargeOfClock
+                         local  struct GameModeBattle* pBattle
+                         inlines  TI_fConvertTimeDifToSeconds, sys_time_get_timebase_frequency
+  923  00263314     88  void OnlineGolf_DismissBattleGolfClubSelectionUI()
+  945  0026A63C    330  void OnlineGolf_HandleLostUserMsg()
+                         local  const float fTimeOutValue
+                         local  float fTimer
+                         local  TI_STimeValue last_tick
+                         local  bool bReadyToShowMessage
+                         local  TI_STimeValue cur_tick
+                         local  float elapsed
+                         inlines  TI_fConvertTimeDifToSeconds, sys_time_get_timebase_frequency
+ 1005  0026A96C    18C  void OnlineGolf_ClockUpdate()
+                         inlines  TI_fConvertTimeDifToSeconds, cGAME_GLOBALS::SetOnlineElapsedTime
+ 1010  0033B6F0    564  void OnlineGolf_Update()
+                         local  int32 onlinePlayerNumber
+                         local  int _save_conn_index
+                         local  int i
+                         inlines  GM_GetGolferUp, OnlineGolf_PopPacketQueueIfNeeded, TI_fConvertTimeDifToSeconds, cGAME_GLOBALS::SetOnlineElapsedTime
+ 1100  002F2C7C     EC  void OnlineGolf_SendGolferTextureData(int32 texNum)
+                         local  struct GolferTextureDataPacket_t golferTextureDataPacket
+                         local  int32 localPlayer
+                         local  const struct UserInfo& userInfo
+ 1127  002F2588    648  void OnlineGolf_SendGolferData()
+                         local  struct GolferDataPacket_t golferDataPacket
+                         local  int32 onlinePlayer
+                         local  int32 localPlayer
+                         local  const struct UserInfo& userInfo0
+                         local  const struct UserInfo& userInfo1
+                         local  const struct UserInfo& userInfo2
+                         local  const struct UserInfo& userInfo3
+                         inlines  CrAP_CharacterSettings_t, GolferDataPacket_t, HashString::HashString, Singleton<GolferStats>::GetSingleton, TCharacterStyleS, UserInfo::GetGolferData, cGAME_GLOBALS::GetCharacterStylePtr
+ 1236  002F2480    108  void OnlineGolf_SendPlaceBallData(enum PlayerNumber_t playerID, float* position_p)
+                         local  struct OnlinePlaceBallPacket_t packet
+ 1273  003070F0    170  void OnlineGolf_SendSwingData()
+                         local  ControllerPadAndStickInfo_t* swingPacket
+                         local  bool readingGreen
+                         local  bool unavailable
+ 1319  002F233C    144  void OnlineGolf_SendSyncUpData(enum PlayerNumber_t ePlayerID)
+                         local  struct OnlineSyncUpPacket_t syncUpPacket
+                         inlines  cGAME_GLOBALS::SetRandomSeed
+ 1354  00306B88    104  void OnlineGolf_SendOnlineShotStartData(enum PlayerNumber_t ePlayerID)
+                         local  struct OnlineShotStartPacket_t shotStartPacket
+                         local  int32 localPlayer
+                         inlines  GM_GetGolferUp
+ 1394  002F2278     C4  void OnlineGolf_SendOnlineHoleStartData(int32 iSeed)
+                         local  struct OnlineHoleStartPacket_t holeStartPacket
+                         local  int32 onlinePlayer
+ 1424  002F2000    14C  void OnlineGolf_SendCustomCoursePacket()
+                         local  struct OnlineCustomCoursePacket_t coursePacket
+                         local  int32_t i
+                         local  enum GM_CourseType_t course
+                         local  int32 hole
+ 1458  002F1D48    2B8  void OnlineGolf_SendOnlineShotData(enum PlayerNumber_t ePlayerID, float shotAngle)
+                         local  struct OnlineBallHitPacket_t ballHitPacket
+                         local  int32 onlinePlayer
+                         inlines  vec4flt_Copy
+ 1523  002F1A34    314  void OnlineGolf_SendBallStoppedData(enum PlayerNumber_t ePlayerID)
+                         local  struct OnlineBallStoppedPacket_t ballStoppedPacket
+                         local  int32 onlinePlayer
+                         local  int32 localPlayer
+                         inlines  vec4flt_Copy
+ 1591  002F1978     BC  void OnlineGolf_SendTurnDoneData(enum PlayerNumber_t ePlayerID)
+                         local  struct OnlineTurnDonePacket_t turnDonePacket
+ 1852    inline-only   static void _ChatFilterProfanity(char* strMessage)
+                         local  uint8 uCurString
+                         local  uint8 uCurCharacter
+                         local  char* pcStringToFilter
+                         local  char[201] strUpperString
+                         local  char[201] strTempString
+                         local  char* strFilterString
+                         local  uint8 uBeginFilter
+                         local  uint8 uEndFilter
+                         local  uint8 uFilterSize
+ 1928  002F15C4    3B4  void OnlineGolf_SendChatData(enum PlayerNumber_t ePlayerID, char* msg)
+                         local  int32 iLength
+                         local  struct OnlineChatPacket_t chatPacket
+                         inlines  _ChatFilterProfanity
+ 1963  002F14E0     E4  void OnlineGolf_SendOnlineSpinnaData(enum PlayerNumber_t ePlayerID)
+                         local  struct OnlineBallBouncePacket_t ballBouncePacket
+ 1992  002F0D88    128  void OnlineGolf_SendOnlineCommandData(enum OnlineCommand_e eCommand)
+                         local  struct OnlineCommandPacket_t commandPacket
+                         local  int32 onlinePlayer
+ 2042  002F0CAC     DC  void OnlineGolf_SendPostCharacterLoadPacket(int32 seed)
+                         local  struct OnlinePostCharLoadPacket_t preloadPacket
+                         local  int32 onlinePlayer
+ 2077  00337EF0    138  void OnlineGolf_SendReadyToLoadHolePacket()
+                         local  struct OnlineReadyToLoadHolePacket_t readyToLoadPacket
+                         local  int32 onlinePlayer
+                         local  int32 hostNumber
+                         inlines  GM_GetCurrentHoleIndex, cGAME_GLOBALS::SetSecondsFraction
+ 2133  002F4B10    118  static void OnlineGolf_ReceiveOnlineSpinnaPacket(void* data, unsigned int numBytes)
+                         local  struct OnlineBallBouncePacket_t* pPacket
+ 2166  002F4C28    144  static void OnlineGolf_ReceiveOnlineShotPacket(void* data, unsigned int numBytes)
+                         local  struct OnlineBallHitPacket_t* pPacket
+ 2203  002F4A28     E8  static void OnlineGolf_ReceiveOnlineBallStoppedPacket(void* data, unsigned int numBytes)
+                         local  struct OnlineBallStoppedPacket_t* pPacket
+ 2230  0030699C    1EC  static void OnlineGolf_ReceiveOnlineTurnDonePacket(void* data, unsigned int numBytes)
+                         local  struct OnlineTurnDonePacket_t* pPacket
+                         local  int currConnection
+                         local  int numConnections
+                         local  int i
+                         inlines  GM_GetGolferUp
+ 2283  002F4D6C    1C0  static void OnlineGolf_ReceiveChatPacket(void* data, unsigned int numBytes)
+                         local  struct OnlineChatPacket_t* pChatPacket
+                         local  char[200] finalChatMessage
+                         local  struct OnlineManagerOSDK* pOnlineMgr
+                         inlines  OnlineManagerOSDK::GetInstance
+ 2328  002F4910    118  static void OnlineGolf_ReceiveOnlineHoleStartPacket(void* data, unsigned int numBytes)
+                         local  struct OnlineHoleStartPacket_t* pPacket
+ 2363  002F4800    110  static void OnlineGolf_ReceiveOnlineShotStartPacket(void* data, unsigned int numBytes)
+                         local  struct OnlineShotStartPacket_t* pPacket
+ 2398  002F5138     DC  static void OnlineGolf_ReceivePlaceBallPacketToHost(void* data, unsigned int numBytes)
+                         local  struct OnlinePlaceBallPacket_t* pPacket
+                         local  vec4flt ballLoc
+                         inlines  vec3flt_Copy
+ 2425  002F5068     D0  static void OnlineGolf_ReceivePlaceBallPacketToClients(void* data, unsigned int numBytes)
+ 2442  00307260    194  static void OnlineGolf_ReceiveSwingPacketToHost(void* data, unsigned int numBytes)
+                         local  bool readingGreen
+                         local  bool unavailable
+ 2481  002F4F2C    13C  static void OnlineGolf_ReceiveSwingPacketToClients(void* data, unsigned int numBytes)
+                         local  ControllerPadAndStickInfo_t* pPacket
+                         local  int count
+ 2516  002F46E4    11C  static void OnlineGolf_ReceiveSyncUpPacket(void* data, unsigned int numBytes)
+                         local  struct OnlineSyncUpPacket_t* pPacket
+ 2552  002F4308    3DC  static void OnlineGolf_ReceiveOnlineCommandPacket(void* data, unsigned int numBytes)
+                         local  struct OnlineCommandPacket_t* pCommand
+                         local  int32 currentConnection
+                         inlines  GM_GetModeType
+ 2684  002F41F0    118  static void OnlineGolf_ReceiveOnlinePostCharacterLoadPacket(void* data, unsigned int numBytes)
+                         local  struct OnlinePostCharLoadPacket_t* pPacket
+ 2719  002F3F44    194  static void OnlineGolf_ReceiveGolferDataPacket(void* data, unsigned int numBytes)
+                         local  struct GolferDataPacket_t* pPacket
+                         local  int32 onlinePlayer
+                         local  int32 i
+                         local  int32 currConnection
+ 2768  002F3D88    1BC  static void OnlineGolf_ReceiveGolferTextureDataPacket(void* data, unsigned int numBytes)
+                         local  struct GolferTextureDataPacket_t* pPacket
+                         local  int32 onlinePlayer
+                         local  int32 curr_connection
+                         local  const struct UserInfo& userInfo
+ 2806  002F40D8    118  static void OnlineGolf_ReceiveReadyToLoadHolePacket(void* data, unsigned int numBytes)
+                         local  struct OnlineReadyToLoadHolePacket_t* pPacket
+ 2842  002F3CA8     E0  static void OnlineGolf_ReceiveCustomCoursePacket(void* data, unsigned int numBytes)
+ 2867  002F3890    188  static void OnlineGolf_ReceiveNetworkDebugAssertPacket(void* data, unsigned int numBytes)
+                         local  struct OnlineNetworkDebugAssertPacket_t* pPacket
+                         local  int32 onlinePlayer
+                         local  int32 currConnection
+                         local  uint32 curQueue
+ 2908  002D0A98     F8  void OnlineGolf_ConnectionOutOfSync(char* error)
+                         inlines  GM_GetModeType
+ 2922  00211D28     34  void OnlineGolf_ConnectionOutOfSyncForce(char* error)
+ 2951  0020934C     60  int32 OnlineGolf_GetLocalPlayerNumber()
+                         local  int i
+ 2966  00210DC8     60  int32 OnlineGolf_GetOnlinePlayerNumber()
+                         local  int i
+ 2981  00211AD0     60  int32 OnlineGolf_GetOnlinePlayerNumberFE()
+                         local  int i
+ 2996  00210E28     70  bool OnlineGolf_bIsOnlineGame()
+ 3010  00211D5C     44  bool OnlineGolf_HasShotDataBeenReceived()
+ 3026  00250BE0    294  float OnlineGolf_UseShotDataForPlayer(enum PlayerNumber_t ePlayerID)
+                         local  float timeWaited
+                         inlines  vec4flt_Copy
+ 3071  00211DA0     74  bool OnlineGolf_bGetWeatherFromOnline()
+                         local  int32 hostNumber
+ 3086  002F0BB8     F4  void OnlineGolf_PostWeatherFromOnline()
+                         local  float timeWaited
+ 3117  002F0AC4     F4  void OnlineGolf_PostSpinnaFromOnline(enum PlayerNumber_t ePlayerID)
+                         local  float timeWaited
+ 3148  002B5F84    360  void OnlineGolf_PostBallStoppedFromOnline(enum PlayerNumber_t ePlayerID)
+                         local  float timeWaited
+                         local  float fFinalDiff
+                         inlines  LLMath_DistanceBetween3, PhysicsBall_t::SetFlagState, vec4flt_Copy
+ 3201    inline-only   static void OnlineGolf_PostShotStartFromOnline(enum PlayerNumber_t ePlayerID)
+                         local  float timeWaited
+ 3252  002FFDB0    138  void OnlineGolf_PostSyncUpFromOnline()
+                         local  float timeWaited
+                         inlines  cGAME_GLOBALS::SetRandomSeed
+ 3299  00211E14     50  bool OnlineGolf_bAbortFlyby()
+ 3317  00211E64     AC  bool OnlineGolf_bAllowAbortedFlyby(enum PlayerNumber_t ePlayerID)
+ 3351  00211F10     30  bool OnlineGolf_bHasEnoughOfFlybyPlayed()
+ 3361  00211F40     30  bool OnlineGolf_bAbortGame()
+ 3368  00211F70     E8  void OnlineGolf_ResetError()
+                         local  int i
+ 3392  002FFC20    190  void OnlineGolf_WaitForTurnDone()
+                         local  float timeWaited
+                         local  int32 i
+                         local  bool allRecv
+ 3450    inline-only   static void OnlineGolf_WaitForPreloadData()
+                         local  float timeWaited
+                         local  const struct UILoadingScreen& lScreen
+ 3479  003382FC    268  void OnlineGolf_RemoveUser(enum PlayerNumber_t playerID)
+                         inlines  GM_GetCurrentHoleIndex, GM_GetModeType, GM_SetPlayerHoleStrokes, GamePlayer::SetShotLimitExceeded
+ 3502  00338564    1EC  void OnlineGolf_MarkUserInvalid(enum PlayerNumber_t playerID)
+                         inlines  GM_GetCurrentHoleIndex, GM_GetGolferUp, cGAME_GLOBALS::SetGamePaused
+ 3549  002F5214    154  void OnlineGolf_BootUser(enum PlayerNumber_t playerID)
+                         inlines  GM_GetModeType, cGAME_GLOBALS::SetGamePaused
+ 3568  00338C40    1C0  void OnlineGolf_PreHoleHonorsAdjust(enum PlayerNumber_t playerID)
+                         inlines  GM_GetCurrentHoleIndex, GM_SetPlayerHoleStrokes, GamePlayer::SetShotLimitExceeded
+ 3590  002F1388    158  void OnlineGolf_WaitForLoadingLaunchSync()
+                         local  float timeWaited
+                         local  bool waitDrawn
+                         local  bool allRecv
+                         local  int32 i
+ 3639  002F1170    184  void OnlineGolf_WaitForGeneralSyncInternal()
+                         local  float timeWaited
+                         local  bool waitDrawn
+                         local  bool allRecv
+                         local  int32 i
+ 3688  002F12F4     94  void OnlineGolf_WaitForGeneralSync()
+                         local  bool trysendinginfo
+ 3704  00338750    25C  void OnlineGolf_WaitForPostLoadSyncInternal()
+                         local  float timeWaited
+                         local  bool waitDrawn
+                         local  bool allRecv
+                         local  int32 i
+                         local  int32 player
+                         local  int32 honors
+                         local  const struct UILoadingScreen& lScreen
+ 3794  003389AC     A0  void OnlineGolf_WaitForPostLoadSync()
+                         local  bool trysendinginfo
+ 3811  002F0EF8    1C8  void OnlineGolf_WaitForDoneWithScorecardSyncInternal()
+                         local  float timeWaited
+                         local  int i
+                         local  bool allDoneRecv
+                         local  const struct UILoadingScreen& lScreen
+ 3868  002F10C0     B0  void OnlineGolf_WaitForDoneWithScorecardSync()
+                         local  bool trysendinginfo
+ 3890  00338028    2D4  void OnlineGolf_SyncUpHoleLoad()
+                         local  int32 localPlayer
+                         local  int32 hostNumber
+                         local  bool trysendinginfo
+                         inlines  OnlineGolf_SynchronizeClocks, cGAME_GLOBALS::SetOnlineElapsedTime
+ 3947  002F0888    23C  void OnlineGolf_WaitForReadyToLoadHoleInfo()
+                         local  float timeWaited
+                         local  const struct UILoadingScreen& lScreen
+                         inlines  GM_SetCurrentCourse, cGAME_GLOBALS::SetSecondsFraction
+ 3995  002F06D0    1B8  void OnlineGolf_WaitForCustomCoursePacket()
+                         local  float timeWaited
+                         local  int32_t i
+                         local  enum GM_CourseType_t course
+                         local  int hole
+ 4037  002F00E8    5E8  void OnlineGolf_WaitForGolferData()
+                         local  float timeWaited
+                         local  int32 onlinePlayer
+                         local  int32 localPlayer
+                         local  int32 i
+                         local  const struct UserInfo& onlineUserInfo
+                         local  struct PeerConnectionManager* pConnMgr
+                         local  struct PeerConnection* pCurrConn
+                         inlines  BitArray_SetBit, List<OSDK::PeerConnection>::GetElementAt, UserInfo::GetVitalInfo
+ 4177  002EFF88    160  void OnlineGolf_WaitForGolferTextureData(int32 textureNum)
+                         local  int i
+                         local  float timeWaited
+                         local  bool allDataRecv
+ 4222  002FFC1C      4  void OnlineGolf_DrawEstablishingConnectionText(bool textOn)
+ 4330  0026AAF8    1BC  static float OnlineGolf_fWaitForData()
+                         local  TI_STimeValue startOfLoopTime
+                         local  TI_STimeValue endOfLoopTime
+                         inlines  TI_fConvertTimeDifToSeconds
+ 4343  00212058     30  bool OnlineGolf_DidOnlineWaitForData()
+ 4350  00212088     30  void OnlineGolf_ClearWaitForDataFlag()
+ 4357  002120B8     2C  bool OnlineGolf_bForceElapsedTimeToFrameRate()
+ 4364  002F2BD0     AC  void OnlineGolf_ExchangeGolferData()
+                         local  int i
+ 4384  002F214C    12C  void OnlineGolf_ExchangeCourseData()
+                         local  int32 localPlayerNumber
+                         local  int32 hostNumber
+                         local  enum GM_CourseType_t course
+                         local  int32 hole
+                         inlines  GM_IsCustomCourse, GM_SetCurrentCourse
+ 4424  002926C8    190  void OnlineGolf_ShutdownMatch()
+                         inlines  OnlineManagerOSDK::GetInstance, OnlineManagerOSDK::WaitingForChallenge, Singleton<DifficultySettings>::GetSingleton, UIMainMenu::SetResultReceived, cGAME_GLOBALS::SetDebugOnlineType
+ 4475  002120E4     4C  void OnlineGolf_PostUserQuitPrompt()
+                         inlines  cGAME_GLOBALS::SetDebugOnlineType
+ 4499  00212130     30  bool OnlineGolf_bStartOnlineMatch()
+ 4506  00212160     2C  void OnlineGolf_SetStartOnlineMatch(bool start)
+ 4513  0021218C     48  char* OnlineGolf_GetCurrentErrorString()
+ 4524  00247E74     54  bool OnlineGolf_bIsGamePaused()
+ 4531  002121D4     30  bool OnlineGolf_bHasGamebeenAborted()
+ 4538  00212204     30  void OnlineGolf_AbortGame()
+ 4545  00338E00    964  void OnlineGolf_RecordStats()
+                         local  OnlineGameDataT[4] results
+                         local  OnlineTourneyDataT tourn
+                         local  int32 i
+                         local  bool includeCurrentHole
+                         local  enum GM_ScoringType_t scoringType
+                         local  enum GM_ModeType_t modeType
+                         local  bool gameFinished
+                         local  bool holedOut
+                         local  int rating
+                         inlines  GM_GetCurrentHoleIndex, GM_GetModeType, GM_GetNumHolesInRound, GM_GetScoringType, GM_IsPlayoff, Singleton<GameModeDriverManager>::GetSingleton
+ 4705  0029D048    354  int32 OnlineGolf_CreateCompressedGolferInfoPacket(char* packet, int32 packetSize, const struct UserInfo& userInfo)
+                         local  int32 bytesWritten
+                         local  int32 i
+                         inlines  Singleton<GolferStats>::GetSingleton
+ 4773  00212234    168  void OnlineGolf_DecompressPacketIntoUser(char* packet, const struct UserInfo& userInfo)
+                         local  int32 i
+ 4812  0021239C     C4  void OnlineGolf_DoOnlineUIInput(bool on, enum PlayerNumber_t playerNum)
+ 4839  00211D08     20  char* OnlineGolf_GetPersonaName(enum PlayerNumber_t playerID)
+ 4844  00212460     7C  void OnlineGolf_SetPersonaName(enum PlayerNumber_t playerID, char* name)
+ 4857  002F0EB0     48  void OnlineGolf_ConcedeHole()
+ 4867  001FBFF8     3C  bool OnlineGolf_HaveIConceded()
+ 4880  001FBBC0      4  void OnlineGolf_MarkPlayerAsCheater(enum PlayerNumber_t playerID, int cheatFlag)
+ 4899  002124DC     18  void OnlineGolf_SetRankedGame(bool bRanked)
+ 4904  002124F4     18  bool OnlineGolf_GetRankedGame()
+ 4910  00296478     5C  bool OnlineGolf_bUseSlowLoading()
+                         inlines  GM_OnFirstSelectedHole
+ 4926  00306EAC    13C  bool OnlineGolf_AnyControllerInput()
+                         local  int32 localPlayer
+                         local  struct Controller_StickInfo* info
+                         inlines  GM_GetGolferUp
+ 4977  0021250C     34  bool OnlineGolf_IsNTSCPALGame()
+ 4985  00212540     38  bool OnlineGolf_BypassTurnDoneUI()
+ 4996  001FC180     28  bool OnlineGolf_GetReceiveControllerInput()
+ 5004  002EFEAC     DC  void OnlineGolf_SendUIInputPacket(int32 inputData, enum UIScreen_t whichScreen)
+                         local  struct OnlineUIInputPacket_t UIPacket
+                         local  int32 onlinePlayer
+ 5033  002F3A18    108  static void OnlineGolf_ReceiveUIInputPacket(void* data, unsigned int numBytes)
+                         local  struct OnlineUIInputPacket_t* pPacket
+ 5066  00212578     2C  int OnlineGolf_GetLastUIPlayerAndClearValue()
+                         local  int lastUIPlayer
+ 5074  002F3BE0     C8  static void OnlineGolf_ReceiveShotClockExpiredPacket(void* data, unsigned int numBytes)
+ 5093  002EFE00     AC  void OnlineGolf_SendShotClockExpiredPacket()
+                         local  struct OnlineShotClockExpiredPacket_t shotClockExpiredPacket
+                         local  int32 onlinePlayer
+ 5117  002F3B20     C0  static void OnlineGolf_ReceiveBattleGolfDataPacket(void* data, unsigned int numBytes)
+                         local  struct OnlineBattleGolfPacket_t* pData
+ 5142  002EFD54     AC  void OnlineGolf_SendShotCallerShotClockExpiredPacket()
+                         local  struct OnlineShotCallerShotClockExpiredPacket_t shotCallerShotClockExpiredPacket
+                         local  int32 onlinePlayer
+ 5166  002EF858     C0  void OnlineGolf_SendBattleGolfPacket(int action)
+                         local  struct OnlineBattleGolfPacket_t battleGolfPacket
+                         local  int32 onlinePlayer
+ 5193  002125D4     28  void OnlineGolf_SetCancelGame(bool cancel)
+ 5201  002125FC     28  void OnlineGolf_SetAllowCancelGame(bool allowCancel)
+ 5209  00212624     2C  bool OnlineGolf_bGetAllowCancelGame()
+                         local  bool bAllowCancel
+ 5222  00212650     2C  bool OnlineGolf_bHasGameBeenCancelled()
+                         local  bool bCancelGame
+ 5234  0021267C     24  void OnlineGolf_SetWaitingForShotcaller(bool waiting)
+ 5242  002126A0     24  void OnlineGolf_SetWaitShotCallerEndOfTurn(bool waiting)
+ 5250  002126C4     18  bool OnlineGolf_HostHasCalculatedIdealPuttCam()
+ 5255  002126DC     30  void OnlineGolf_ResetControllerFlags()
+ 5266  0021270C     90  void OnlineGolf_BubbleSort(int32* numbers, int num_entries)
+                         local  int tmp
+                         local  int i
+                         local  int j
+ 5283  0027DD44    3A0  TI_STimeValue OnlineGolf_ProcessClockData()
+                         local  int i
+                         local  int calc_avg_count
+                         local  float avg
+                         local  float deviation
+                         local  float calc_avg
+                         local  int64 median
+                         inlines  std::sqrt
+ 5325    inline-only   static void OnlineGolf_WaitForClockSync()
+                         local  int timeWaited
+ 5353    inline-only   static void OnlineGolf_SynchronizeClocks()
+                         local  struct OnlineSyncrhonizeTimePacket_t time
+                         local  uint32 localPlayer
+ 5390  002F36C0    1D0  static void OnlineGolf_ReceiveSynchronizeClockPacket(void* data, unsigned int numBytes)
+                         local  struct OnlineSyncrhonizeTimePacket_t* pPacket
+                         local  TI_STimeValue timer
+                         local  TI_STimeValue latency
+                         local  TI_STimeValue clock_delta
+ 5446  0024FCBC     64  static void OnlineGolf_PostPlaceBall(struct OnlinePlaceBallPacket_t* packet)
+                         local  vec4flt ballLoc
+ 5457  00306FE8    108  static void OnlineGolf_PostController(ControllerPadAndStickInfo_t* packet)
+                         local  int onlinePlayerNumber
+                         local  struct Controller_StickInfo tempStick
+                         inlines  GM_GetGolferUp
+ 5478  00211C58     B0  static void OnlineGolf_AddToApplyPacketQueue(int type, void* packet, enum PlayerNumber_t playerID)
+                         local  int count
+ 5507  0021279C     4C  void OnlineGolf_PostFlightData(struct OnlineFlightPacket_t* flightPacket)
+ 5513  0033AE4C    8A4  void OnlineGolf_ApplyPacketNow(struct OnlineGolfPacket_t* packet)
+                         inlines  GamePlayer::SetShotLimitExceeded, OnlineGolf_PostBallStoppedData, OnlineGolf_PostControlEvents, OnlineGolf_PostEndTurnData, OnlineGolf_PostLoadHoleData, OnlineGolf_PostSetCurrentGolfer, OnlineGolf_PostState, OnlineGolf_PostTookShotData
+ 5558    inline-only   static void OnlineGolf_PopPacketQueueIfNeeded()
+                         local  int count
+ 5580    inline-only   static void OnlineGolf_SortIncomingPackets(struct OnlineGolfPacket_t* packet, int pkt_array_entires)
+                         local  struct OnlineGolfPacket_t tmp
+                         local  int i
+                         local  int j
+ 5598  002F5368     38  bool OnlineGolf_bIsUserCreatedTourney()
+                         inlines  GM_GetModeType
+ 5602  002127E8     30  bool OnlineGolf_bHasHostReceivedPlaceBallPacket()
+ 5613  002EF714    144  void OnlineGolf_SendStateSwitch(int8 newState, enum PlayerNumber_t PlayerID, enum OnlineStateSwitchType settype)
+                         local  struct OnlineStatePacket_t statePacket
+                         local  struct Controller_StickInfo tempStick
+ 5652    inline-only   static void OnlineGolf_PostState(struct OnlineStatePacket_t* statePacket)
+ 5683  002C8768    60C  void OnlineGolf_UpdateFlightDataFromHost()
+                         local  int ptimes
+                         local  vec4flt dir
+                         local  vec4flt target_pt_for_dist
+                         local  vec4flt target_pt
+                         local  vec4flt test_pt
+                         local  vec4flt location
+                         local  float mag
+                         local  float delta_time
+                         local  struct OnlineFlightPacket_t* packet
+                         local  float diff
+                         inlines  LLMath_AddScale3, LLMath_DistanceBetween3, LLMath_Length3, LLMath_Subtract3, TI_fConvertTimeDifToSeconds, __vec_make_from_scalar, cGAME_GLOBALS::SetOnlineElapsedTime, vec4flt_Copy3, vec_madd, vec_sld, vec_splat
+ 5757  002F356C    154  static void OnlineGolf_ReceiveStatePacket(void* data, unsigned int numBytes)
+                         local  struct OnlineStatePacket_t* statePacket
+                         local  int count
+ 5793  002AD59C     C8  bool OnlineGolf_SwitchStateOk()
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+ 5804  002F3404     78  static void OnlineGolf_ReceiveFlightData(void* data, unsigned int numBytes)
+                         local  struct OnlineFlightPacket_t* flightPacket
+ 5822  002EF4B8    25C  void OnlineGolf_SendFlightData(enum PlayerNumber_t playerID)
+                         local  struct OnlineFlightPacket_t flightPacket
+                         local  struct PhysicsBall_t* ball
+                         inlines  TI_fConvertTimeDifToSeconds, cGAME_GLOBALS::SetOnlineElapsedTime, vec4flt_Copy3
+ 5858  00249CDC     68  static void OnlineGolf_PostHitData(struct OnlineBallHitPacket_t* packet)
+ 5869    inline-only   static void OnlineGolf_PostBallStoppedData(struct OnlineBallStoppedPacket_t* packet)
+                         local  enum PlayerNumber_t playerNum
+ 5900  002F347C     F0  static void OnlineGolf_ReceiveTookShotPacket(void* data, unsigned int numBytes)
+                         local  struct OnlineTookShotPacket_t* tookShotPacket
+ 5923  0033BC54    1F4  void OnlineGolf_SendTookShotData(enum PlayerNumber_t playerID)
+                         local  struct OnlineTookShotPacket_t tookShotPacket
+                         inlines  GM_GetCurrentHoleIndex
+ 5954    inline-only   static void OnlineGolf_PostTookShotData(struct OnlineTookShotPacket_t* packet)
+ 5982  002F3314     F0  static void OnlineGolf_ReceiveLoadHolePacket(void* data, unsigned int numBytes)
+                         local  struct OnlineLoadHolePacket_t* LoadHolePacket
+ 6007  002EF410     A8  void OnlineGolf_SendLoadHoleData(enum PlayerNumber_t playerID)
+                         local  struct OnlineLoadHolePacket_t LoadHolePacket
+ 6029  002F3224     F0  static void OnlineGolf_ReceiveEndTurnPacket(void* data, unsigned int numBytes)
+                         local  struct OnlineEndTurnPacket_t* endTurnPacket
+ 6053  0033BE48    168  void OnlineGolf_SendEndTurnData(enum PlayerNumber_t playerID)
+                         local  struct OnlineEndTurnPacket_t endTurnPacket
+                         inlines  GM_GetCurrentHoleIndex, vec4flt_Copy
+ 6086    inline-only   static void OnlineGolf_PostLoadHoleData(struct OnlineLoadHolePacket_t* packet)
+ 6098    inline-only   static void OnlineGolf_PostEndTurnData(struct OnlineEndTurnPacket_t* packet)
+ 6129  00206838     24  void OnlineGolf_ClearSetupGolfer()
+ 6134  00206818     20  bool OnlineGolf_NeedToSetupGolfer()
+ 6138  00249CA4     38  bool OnlineGolf_IsPlayerHost()
+ 6149  00211C1C     3C  bool OnlineGolf_IsLocalPlayerUp()
+ 6159  002D24E8    11C  void OnlineGolf_SendControlEventsData(enum PlayerNumber_t playerID, enum EVENTID_e id, float* position_p, enum EVENTVALUE_e val)
+                         local  struct OnlineControlEventsPacket_t packet
+                         inlines  vec3flt_Copy
+ 6190  002F30F0    134  static void OnlineGolf_ReceiveControlEventsPacket(void* data, unsigned int numBytes)
+                         local  struct OnlineControlEventsPacket_t* packet
+                         local  int count
+ 6224    inline-only   static void OnlineGolf_PostControlEvents(struct OnlineControlEventsPacket_t* packet)
+ 6237  001F4D30     54  bool OnlineGolf_EventTriggerOk(enum EVENTID_e eventID)
+ 6265  00212818     2C  void OnlineGolf_SetAbortFlag(bool flag)
+ 6273  00212844     3C  bool OnlineGolf_IsPlayerGone(int32_t playerID)
+ 6281  00212880     38  void OnlineGolf_SetPlayerGone(int32_t playerID)
+ 6289  002D0B90     D0  void OnlineGolf_SendSetCurrentGolferData(enum PlayerNumber_t playerID)
+                         local  struct OnlineSetCurrentGolferPacket_t setGolferPacket
+ 6316  002F3000     F0  static void OnlineGolf_ReceiveSetCurrentGolferPacket(void* data, unsigned int numBytes)
+                         local  struct OnlineSetCurrentGolferPacket_t* setGolferPacket
+ 6340    inline-only   static void OnlineGolf_PostSetCurrentGolfer(struct OnlineSetCurrentGolferPacket_t* packet)
+ 6344  0033AAA8    100  void OnlineGolf_ExpectingEndTurn(enum PlayerNumber_t playerID)
+ 6365  001FBAAC     18  void OnlineGolf_ToggleDoNotSendStateSwitch(bool flag)
+ 6370  0024A9BC     48  bool OnlineGolf_OkToSendNextPacket()
+ 6378  002128B8     64  void OnlineGolf_SetPlayerStickSettings(int32_t playerID)

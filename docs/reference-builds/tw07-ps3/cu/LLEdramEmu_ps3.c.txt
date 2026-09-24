@@ -1,0 +1,21 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/ps3/LLEdramEmu_ps3.c
+// compiled in: Legacy_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   10  003C0C4C     7C  void PS3EdramEmu_InitOnce()
+   16  003C1E80     50  void PS3EdramEmu_CloseOnce()
+   23  00387F50     C4  TextureRef PS3EdramEmu_SetTarget(TextureRef ref, int32 layer)
+   49  0037FCA4     18  TextureRef PS3EdramEmu_GetTarget()
+   56  0038E47C     C4  void PS3EdramEmu_AssertNoSamplersAreTargets()
+                         local  int i
+                         local  TextureRef ref
+   73  003BD83C    274  void PS3EdramEmu_PostResolve(float width, float height)
+                         local  TextureRef targetRef
+                         local  int32 targetLayer
+                         local  int32[4] layers
+                         local  TextureRef[4] targets
+                         local  struct SM_Shader_Base* old_shader
+                         local  const TextureInfo* info
+                         local  int i
+                         local  int i
+                         inlines  DS_vSetAlphaEnable, SM_GetLastActivedShader

@@ -1,0 +1,26 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Rna/Asset/Common/SceneAsset.cpp
+// compiled in: rnaunity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   58  004E81C8     48  void SceneAssetC::SceneAssetC(const struct SceneAssetC* this, struct AssetMgrC* pAssetMgr, const char* pFilePath, MemBudgetTypeE budget, enum eMemoryPools memPool)
+   63  004D9424     A0  void SceneAssetC::~SceneAssetC(const struct SceneAssetC* this)
+   73  004EEFC4    1F0  bool SceneAssetC::Load(const struct SceneAssetC* this)
+                         local  bool success
+                         local  uint32_t uFileSize
+                         local  void* pData
+                         local  struct InStreamBinaryC infile
+                         inlines  AddRef, AssetMgrC::SetCurrentBudget, AssetMgrC::SetCurrentMemPool, AutoRefCount, GolfSceneC::GolfSceneC
+  132  004C9148     1C  bool SceneAssetC::IsLoaded(const const struct SceneAssetC* this)
+  138  004D9304    120  void SceneAssetC::Unload(const struct SceneAssetC* this)
+                         local  int32_t refCount
+                         inlines  RNADebugBreak, Release
+  161  004C9164      4  void SceneAssetC::Print(const struct SceneAssetC* this)
+  168  004C9168      4  void SceneAssetC::MenuPrint(const struct SceneAssetC* this, const char8_t* pLinePrefixTabString)
+  178  004ECD94    1C8  void SceneAssetMgrC::SceneAssetMgrC(const struct SceneAssetMgrC* this)
+                         inlines  Clear, Copy, RNADebugBreak, String, operator=, ~String
+  185  004ED124     84  struct SceneAssetMgrC* SceneAssetMgrC::GetInstance()
+  194  004C916C     6C  void SceneAssetMgrC::DestroyInstance()
+  202  004E8210     88  struct SceneAssetC* SceneAssetMgrC::CreateNew(const struct SceneAssetMgrC* this, const char* pFilePath)
+  207  004ED1A8     30  struct SceneAssetC* SceneAssetMgrC::ResolveSceneAsset(const struct SceneAssetMgrC* this, const char* pFilePath)
+                         local  struct AssetC* baseAsset
+                         local  struct SceneAssetC* sceneAsset

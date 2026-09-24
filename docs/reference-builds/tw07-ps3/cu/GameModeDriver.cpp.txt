@@ -1,0 +1,73 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameModeDriver.cpp
+// compiled in: golf_unity.cpp
+// 38 functions, source order. line | PS3 address | size
+
+   18  00256354     34  void GameModeDriver::GameModeDriver(const struct GameModeDriver* this)
+                         inlines  GameModeDriver::SetWasLastEventWonByTheUser
+   31  002068EC     18  void GameModeDriver::~GameModeDriver(const struct GameModeDriver* this)
+   36  00206954     64  void GameModeDriver::OnFlyByInit(const struct GameModeDriver* this, enum PlayerNumber_t PlayerID)
+                         local  struct GameModeBase* mode
+   45  002069B8     60  bool GameModeDriver::UI_AllowMiniHUDGhosting(const struct GameModeDriver* this)
+                         local  bool ret
+                         local  struct GameModeBase* mode
+   57  00206A18     70  enum UIScoreCardDispMode_t GameModeDriver::GetScoreDisplayMode(const struct GameModeDriver* this, bool getAlternate)
+                         local  enum UIScoreCardDispMode_t ret
+                         local  struct GameModeBase* mode
+   69  00206A88     60  int32 GameModeDriver::GetEndGameSequence(const struct GameModeDriver* this)
+                         local  int32 sequence
+                         local  struct GameModeBase* mode
+   78  00206AE8     60  enum eLoadingScreens GameModeDriver::GetFirstLoadingScreen(const struct GameModeDriver* this)
+                         local  enum eLoadingScreens screen
+                         local  struct GameModeBase* mode
+   87  00206B48     60  enum eLoadingScreens GameModeDriver::GetLastLoadingScreen(const struct GameModeDriver* this)
+                         local  enum eLoadingScreens screen
+                         local  struct GameModeBase* mode
+   96  00206BA8     70  bool GameModeDriver::TrackingShotHistory(const struct GameModeDriver* this, enum PlayerNumber_t PlayerID)
+                         local  bool history
+                         local  struct GameModeBase* mode
+  105  00206C18     70  bool GameModeDriver::ShowShotHistory(const struct GameModeDriver* this, enum PlayerNumber_t PlayerID)
+                         local  bool history
+                         local  struct GameModeBase* mode
+  114  00206C88     78  const char* GameModeDriver::GetModeName(const struct GameModeDriver* this)
+                         local  const char* name
+                         local  struct GameModeBase* mode
+  124  00206D00     60  bool GameModeDriver::ShowShotInfo(const struct GameModeDriver* this)
+                         local  bool info
+                         local  struct GameModeBase* mode
+  138  00206D60     60  bool GameModeDriver::ShowShotNumber(const struct GameModeDriver* this)
+                         local  bool info
+                         local  struct GameModeBase* mode
+  149  00206DC0     14  int GameModeDriver::NumActualPlayingGolfers(const const struct GameModeDriver* this)
+  154  00206DD4      8  void GameModeDriver::SetCommonData(const struct GameModeDriver* this, struct CommonData_t* pData)
+  160  00206DDC      8  struct CommonData_t* GameModeDriver::GetCommonData(const struct GameModeDriver* this)
+  165  00206DE4      4  void GameModeDriver::EndCurrentEvent(const struct GameModeDriver* this)
+  170  00206DE8      8  void GameModeDriver::SetEventDate(const struct GameModeDriver* this, CalendarDate date)
+  175  00206DF0      8  CalendarDate GameModeDriver::GetSelectedEventDate(const struct GameModeDriver* this)
+  180  00206DF8      4  void GameModeDriver::PreHoleLoadInit(const struct GameModeDriver* this)
+  186  00206DFC      4  void GameModeDriver::PostHoleLoadInit(const struct GameModeDriver* this)
+  191  00206E00     60  bool GameModeDriver::GameFinished(const struct GameModeDriver* this, bool bPredict)
+  196  00206E60     60  bool GameModeDriver::GoToPlayoff(const struct GameModeDriver* this, bool bPredict)
+  201  00206EC0     4C  void GameModeDriver::StartGamePreData(const struct GameModeDriver* this)
+  206  00206F0C     4C  void GameModeDriver::EndHole(const struct GameModeDriver* this)
+  211  00206F58     4C  void GameModeDriver::UpdateScoreCard(const struct GameModeDriver* this)
+  216  00206FA4     4C  void GameModeDriver::EndGame(const struct GameModeDriver* this)
+  221  00206FF0     60  bool GameModeDriver::IsPuttForLead(const struct GameModeDriver* this, enum PlayerNumber_t PlayerID)
+  226  00207050     60  bool GameModeDriver::IsPuttForWin(const struct GameModeDriver* this, enum PlayerNumber_t PlayerID)
+  231  002070B0     5C  int32 GameModeDriver::GetCurrentLead(const struct GameModeDriver* this, enum PlayerNumber_t playerID)
+  236  0020710C     5C  int32 GameModeDriver::GetPotentialLead(const struct GameModeDriver* this, enum PlayerNumber_t playerID)
+  241  00207168     5C  enum GM_HoleResult_t GameModeDriver::GetPotentialHoleResult(const struct GameModeDriver* this, enum PlayerNumber_t PlayerID)
+  246  002071C4     50  bool GameModeDriver::IsSpudHudUsed(const struct GameModeDriver* this)
+  251  0024AEA8     20  bool GameModeDriver::AIUseDisplayStats(const struct GameModeDriver* this)
+  260  002ACEC0    1B8  void GameModeDriver::AwardExperience(const struct GameModeDriver* this)
+                         local  int32 playerIndex
+                         local  enum PlayerNumber_t userID
+                         local  const struct UserInfo& userInfo
+                         local  int32 experienceMultiplier
+                         local  int32 devPointType
+                         local  int32 devPointType
+                         local  int32 currentDevPoints
+                         local  int32 newDevPoints
+                         inlines  GamePlayer::GetGolferBonus, UserInfo::GetDevPoints, UserInfo::SetDevPoints
+  285  00207214     84  void GameModeDriver::HandleEvent(const struct GameModeDriver* this, enum PlayerNumber_t PlayerID, enum EVENTID_e eventID)
+  293  002D4258     40  void GameModeDriver::OnExitOfFacilityGame(const struct GameModeDriver* this)
+  301  00207298      4  void GameModeDriver::LeaveDriverAndExitHole(const struct GameModeDriver* this)

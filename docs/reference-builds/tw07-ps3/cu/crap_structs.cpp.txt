@@ -1,0 +1,64 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/animation/crap_structs.cpp
+// compiled in: golf2_unity.cpp
+// 18 functions, source order. line | PS3 address | size
+
+    9  0016ED0C     38  void CrAP_TransformModInfo_t::ResetAll(const struct CrAP_TransformModInfo_t* this)
+                         inlines  CrAP_TransformModInfo_t::ClearAllFlags
+   17  00164480     64  void CrAP_TransformModInfo_t::ResetTransforms(const struct CrAP_TransformModInfo_t* this)
+                         local  int i
+                         local  const struct CrAP_BoneTransform_t& bone
+                         inlines  Quat_IdentifyForMul
+   30  0016EC84     88  void CrAP_TransformModInfo_t::ResetNameAndHierarchicalScalingInfo(const struct CrAP_TransformModInfo_t* this)
+                         local  int i
+                         local  const struct CrAP_BoneTransform_t& bone
+                         inlines  CrAP_TransformModInfo_t::ClearFlag
+   44  0016D858     10  void CrAP_TransformModInfo_t::ReApplyGameFaceHierarchicalScalingInfo(const struct CrAP_TransformModInfo_t* this)
+                         inlines  CrAP_TransformModInfo_t::ClearFlag
+   51  0016D758    100  void CrAP_TransformModInfo_t::ApplyGameFaceHierarchicalScalingInfo(const struct CrAP_TransformModInfo_t* this)
+                         local  int i
+                         local  const char* boneName
+                         local  struct CrAP_BoneTransform_t* pBoneTransform
+                         inlines  CrAP_TransformModInfo_t::SetFlag
+   78  0016ED44    20C  void CrAP_TransformModInfo_t::InitFromCharacterDefinition(const struct CrAP_TransformModInfo_t* this, struct CharacterDefinition* pCharDef)
+                         local  int boneTransformCount
+                         local  const struct CharDefBoneTransform* pBoneTransformList
+                         local  int i
+                         local  const const struct CharDefBoneTransform& charBoneTransform
+                         local  struct CrAP_BoneTransform_t* pBoneTransform
+                         local  const float[3]& eulers
+                         inlines  CrAP_TransformModInfo_t::SetFlag, vec3flt_Copy
+  126  00164004     B8  void CrAP_TransformModInfo_t::ApplyBoneTranslate(const struct CrAP_TransformModInfo_t* this, const const struct HashString& boneNameID, float translate, uint32 axisFlag)
+                         local  struct CrAP_BoneTransform_t* pBoneTransform
+                         local  const vec3flt& transVec
+  151  001640BC     B8  void CrAP_TransformModInfo_t::ApplyBoneScale(const struct CrAP_TransformModInfo_t* this, const const struct HashString& boneNameID, float scale, uint32 axisFlag)
+                         local  struct CrAP_BoneTransform_t* pBoneTransform
+                         local  const vec3flt& scaleVec
+  176  0013D6C0     18  float CrAP_TransformModInfo_t::ToRadians(float angleInDegrees)
+  182  0013D6D8     34  void CrAP_TransformModInfo_t::ConvertEulerToQuat(float xInRad, float yInRad, float zInRad, const Quat& quatResult)
+  195  0013D92C    128  void CrAP_TransformModInfo_t::ApplyBoneRotate(const struct CrAP_TransformModInfo_t* this, const const struct HashString& boneNameID, float rotate, uint32 axisFlag)
+                         local  struct CrAP_BoneTransform_t* pBoneTransform
+                         local  float rotationInRad
+                         local  Quat Q
+                         local  const Quat& finalQuat
+  220  0013D70C     14  bool CrAP_TransformModInfo_t::IsBoneIdxInRange(int32 boneID)
+  226  0013D8D4     58  struct CrAP_BoneTransform_t* CrAP_TransformModInfo_t::GetOrCreateBoneTransformFromNameID(const struct CrAP_TransformModInfo_t* this, const const struct HashString& nameID)
+                         local  char[32] strBuf
+  234  0013D728    1AC  struct CrAP_BoneTransform_t* CrAP_TransformModInfo_t::GetOrCreateBoneTransformFromName(const struct CrAP_TransformModInfo_t* this, const char* nameStr)
+                         local  struct CrAP_BoneTransform_t* pReturnedTransform
+                         local  uint32 hash
+                         local  int32 idx
+                         local  int i
+                         local  struct CrAP_BoneTransform_t* pBoneTransform
+  282  0013DA54    108  const struct CrAP_BoneTransform_t* CrAP_TransformModInfo_t::GetBoneTransformByName(const const struct CrAP_TransformModInfo_t* this, const char* name)
+                         local  const struct CrAP_BoneTransform_t* pBoneTransform
+                         local  uint32 hash
+                         local  int32 idx
+                         local  int i
+  317  0013DB5C     58  const struct CrAP_BoneTransform_t* CrAP_TransformModInfo_t::GetBoneTransformByIndex(const const struct CrAP_TransformModInfo_t* this, int idx)
+  323  0013D720      8  int32 CrAP_TransformModInfo_t::GetMaxNumBoneTransforms()
+  331  0013DBB4    210  void CrAP_TransformModInfo_t::OutputTransformInfo(const struct CrAP_TransformModInfo_t* this)
+                         local  int i
+                         local  const struct CrAP_BoneTransform_t* pBoneTransform
+                         local  float[3] eulers
+                         local  float radToDeg
+                         local  char[32] boneName

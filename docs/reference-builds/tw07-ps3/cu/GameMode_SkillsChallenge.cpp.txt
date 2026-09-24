@@ -1,0 +1,116 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_SkillsChallenge.cpp
+// compiled in: golf_unity.cpp
+// 45 functions, source order. line | PS3 address | size
+
+   19  00204B68     5C  void GameSkillsChallenge::GameSkillsChallenge(const struct GameSkillsChallenge* this)
+   27  0024EE44    170  void GameSkillsChallenge::Init(const struct GameSkillsChallenge* this)
+                         local  vec4flt opposingTeeLoc
+                         inlines  vec4flt_Copy
+   64  002AC658     7C  int32 GameSkillsChallenge::GetEndGameSequence(const struct GameSkillsChallenge* this)
+                         local  int32 sequence
+                         local  void* ptr
+   79  001FE6B8     58  bool GameSkillsChallenge::AllowUserChangingShotType(const struct GameSkillsChallenge* this, enum PlayerNumber_t PlayerID)
+   87  00305920    1EC  void GameSkillsChallenge::Update(const struct GameSkillsChallenge* this)
+                         local  char[64] szTargetText
+                         local  bool bValidTarget
+                         local  vec4flt vCurMarkerPos
+                         local  float fDistToPin
+                         local  enum GolferState curGolferState
+                         inlines  GM_GetGolferUp
+  130  001FE710     90  void GameSkillsChallenge::LoadHole(const struct GameSkillsChallenge* this)
+                         local  int32 i
+                         local  int32 j
+  145  001FE7A0     18  void GameSkillsChallenge::~GameSkillsChallenge(const struct GameSkillsChallenge* this)
+  149  001FE81C      C  void GameSkillsChallenge::SetSkillsChallengeMode(const struct GameSkillsChallenge* this, enum SC_ModeType_t mode)
+  155  001F59FC      8  void GameSkillsChallenge::SetNumRounds(const struct GameSkillsChallenge* this, int numRounds)
+  160  001FE828     64  bool GameSkillsChallenge::QueryInterface(const struct GameSkillsChallenge* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bRet
+  187  002A1200     74  bool GameSkillsChallenge::WaitForCaddieTipGreenSelect(const struct GameSkillsChallenge* this)
+  197  002D18C0    174  void GameSkillsChallenge::SetupNextGolfer(const struct GameSkillsChallenge* this)
+                         local  int32 i
+                         local  vec4flt opposingTeeLoc
+                         inlines  PhysicsBall_t::ClearFlag, PhysicsBall_t::SetFlag, vec4flt_Copy
+  235  001FE88C     B4  enum PlayerNumber_t GameSkillsChallenge::GetHonors(const struct GameSkillsChallenge* this, enum PlayerNumber_t ignore, bool doNotIgnoreHoledOut)
+                         local  int32 i
+                         local  int32 nextup
+  255  00269020     DC  void GameSkillsChallenge::AfterShotButBeforePostReaction(const struct GameSkillsChallenge* this, enum PlayerNumber_t PlayerID)
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+  309  002C6E28    3B8  void GameSkillsChallenge::EndGolferTurn(const struct GameSkillsChallenge* this, enum PlayerNumber_t PlayerID)
+                         local  float distanceToPin
+                         local  float distanceTravelled
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  bool bGolferConceding
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+  419  002A11AC     54  bool GameSkillsChallenge::KeepBallOnTee(const struct GameSkillsChallenge* this)
+                         local  bool bKeepBallOnTee
+  443  001FE9B8     9C  bool GameSkillsChallenge::HoleFinished(const struct GameSkillsChallenge* this, enum PlayerNumber_t PlayerID, bool predict)
+  465  002C6D6C     BC  void GameSkillsChallenge::ShowYardage(const struct GameSkillsChallenge* this, enum PlayerNumber_t PlayerID)
+                         local  float distanceToPin
+                         local  float distanceTravelled
+  500  001FEA54      4  void GameSkillsChallenge::CheckShotAwards(const struct GameSkillsChallenge* this, enum PlayerNumber_t PlayerID)
+  504  00268F90     90  bool GameSkillsChallenge::IsOnFoulLie(const struct GameSkillsChallenge* this, enum PlayerNumber_t PlayerID)
+                         local  enum Lie_t lie
+  527  002F9A74    3B0  bool GameSkillsChallenge::GameFinished(const struct GameSkillsChallenge* this, bool predict)
+                         local  int i
+                         local  int j
+                         local  int holecount
+                         local  bool retval
+                         local  enum PlayerNumber_t holeWinner
+                         local  int32 score1
+                         local  int32 score2
+                         inlines  GM_SetPlayerHoleStrokes
+  623  00328104    204  void GameSkillsChallenge::EndHole(const struct GameSkillsChallenge* this)
+                         local  enum PlayerNumber_t winnerID
+                         local  int32 i
+                         inlines  GM_GetCurrentHoleIndex, GamePlayer::GetGolferScore
+  655  002F9E24    274  bool GameSkillsChallenge::GoToPlayoff(const struct GameSkillsChallenge* this, bool predict)
+                         local  int32 i
+                         local  int32 j
+                         inlines  GM_SetPlayerHoleStrokes
+  702  001FEA58     48  CaddieTip GameSkillsChallenge::GetModeSpecificTip(const struct GameSkillsChallenge* this)
+  723  001FEAA0     7C  const char* GameSkillsChallenge::GetModeSpecificTipString(const struct GameSkillsChallenge* this)
+  745  002AC4CC    18C  void GameSkillsChallenge::EndGame(const struct GameSkillsChallenge* this)
+                         local  enum PlayerNumber_t holeWinner
+                         local  int rank
+                         local  int highest
+                         local  enum PlayerNumber_t loser
+                         local  struct OnWinData_t onWinData
+                         local  int i
+                         inlines  OnWinData_t::OnWinData_t
+  782  0027FB38    1F0  enum PlayerNumber_t GameSkillsChallenge::CheckForHoleWinner(const struct GameSkillsChallenge* this)
+                         local  enum PlayerNumber_t leader
+                         local  float distanceCheck
+                         local  float bestDistance
+                         local  int iBestHoleOutCount
+                         local  int32 i
+                         local  float preTruncate
+                         local  int32 i
+                         local  int32 i
+                         local  float preTruncate
+  861  00237CD4     FC  enum PlayerNumber_t GameSkillsChallenge::CheckForGameWinner(const struct GameSkillsChallenge* this)
+                         local  enum PlayerNumber_t winner
+                         local  int matchwins
+                         local  int32 i
+  886  0027F8A4    20C  float GameSkillsChallenge::GetPlayersBestHoleScore(const struct GameSkillsChallenge* this, enum PlayerNumber_t PlayerID, bool bExcludeHoledOut)
+                         local  float fBestDistance
+                         local  int32 i
+                         local  int32 i
+                         inlines  GameSkillsChallenge::SetBestShotIndex
+  923  001FE940     78  void GameSkillsChallenge::SetDidHoleOutThisGame(const struct GameSkillsChallenge* this, enum PlayerNumber_t PlayerID, bool bFlag)
+  929  001FEB1C     6C  bool GameSkillsChallenge::GetDidHoleOutThisGame(const struct GameSkillsChallenge* this, enum PlayerNumber_t PlayerID)
+  935  001FEB88     24  bool GameSkillsChallenge::GoToGreenSelection(const struct GameSkillsChallenge* this)
+  945  001FEBAC     1C  bool GameSkillsChallenge::IsGreenSelectionEnabled(const const struct GameSkillsChallenge* this)
+  950  001FEBC8     1C  bool GameSkillsChallenge::IsCupSelectionEnabled(const const struct GameSkillsChallenge* this)
+  955  001FEBE4     1C  bool GameSkillsChallenge::IsPlaceBallEnabled(const const struct GameSkillsChallenge* this)
+  960  001FEC00     1C  bool GameSkillsChallenge::UseCupPosForInitialPlaceBallPos(const const struct GameSkillsChallenge* this)
+  965  001FEC1C     34  bool GameSkillsChallenge::RenderBallTarget(const struct GameSkillsChallenge* this, enum PlayerNumber_t PlayerID)
+  970  001FEC50     10  bool GameSkillsChallenge::RenderBallTargetText(const struct GameSkillsChallenge* this, enum PlayerNumber_t PlayerID, bool* bHideMarker)
+  976  00305B0C     50  bool GameSkillsChallenge::AllowMiniHUDGhosting(const struct GameSkillsChallenge* this)
+                         inlines  GM_GetGolferUp
+  983  001FEC60      8  enum SC_ModeType_t GameSkillsChallenge::GetCurrentSCMode(const struct GameSkillsChallenge* this)
+  988  001FEC68      C  int GameSkillsChallenge::GetCurrentRound(const struct GameSkillsChallenge* this)
+  993  0021B448     20  const char* GameSkillsChallenge::GetModeName(const struct GameSkillsChallenge* this)
+                         local  const char* modeName
+ 1003  001FEC74     68  float GameSkillsChallenge::GetPlayerScore(const struct GameSkillsChallenge* this, enum PlayerNumber_t PlayerID, int round)
+ 1023  001FECDC      C  void GameSkillsChallenge::QuitGame(const struct GameSkillsChallenge* this)
+ 1028  0024A2FC     60  void GameSkillsChallenge::PreShotInit(const struct GameSkillsChallenge* this, enum PlayerNumber_t PlayerID)

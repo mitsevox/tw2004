@@ -1,0 +1,182 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Rna/Flap/FLAPClient.cpp
+// compiled in: rnaunity.cpp
+// 59 functions, source order. line | PS3 address | size
+
+   64  004CA544     70  static bool RecvPacket(uint32_t packetTag)
+                         local  const struct <anon>& netConn
+                         local  uint32_t tag
+   79  004CA240     7C  static void ReadFileInfo(struct <anon>* pFileInfo, const struct <anon>& netConn)
+   94  004CC9B8    118  bool FLAP::ConnectClient(struct <anon>* pNetConn)
+                         local  uint32_t tag
+                         local  uint32_t serverVersion
+                         local  uint32_t maxReadWrite
+  135  004CA4B0     94  void FLAP::DisconnectClient()
+  149  004C7054     2C  bool FLAP::IsConnected()
+  155  004CC7C8     B0  int32_t FLAP::SetFilePos(HFile hFile, int32_t pos)
+                         local  const struct <anon>& netConn
+                         local  int32_t newpos
+  173  004CC728     A0  int32_t FLAP::GetFilePos(HFile hFile)
+                         local  const struct <anon>& netConn
+                         local  int32_t pos
+  189  004CC688     A0  int32_t FLAP::GetFileSize(HFile hFile)
+                         local  const struct <anon>& netConn
+                         local  int32_t size
+  205  004CA3C4     EC  bool FLAP::GetFileInfo(const char* pFilePath, struct <anon>* pFileInfo)
+                         local  const struct <anon>& netConn
+                         local  uint32_t tag
+  230  004CC500     B8  HFile FLAP::Open(const char* pFilePath, uint32_t uFlags)
+                         local  const struct <anon>& netConn
+                         local  int32_t hFile
+  247  004CC460     A0  int32_t FLAP::Close(HFile hFile)
+                         local  const struct <anon>& netConn
+                         local  int32_t result
+  262  004CC2D0    190  int32_t FLAP::Read(HFile hFile, void* pBuffer, int32_t numBytes)
+                         local  const struct <anon>& netConn
+                         local  int totalRead
+                         local  int packetRead
+                         local  int32_t numRecvBytes
+  314  004CC158    178  int32_t FLAP::Write(HFile hFile, const void* pBuffer, int32_t numBytes)
+                         local  const struct <anon>& netConn
+                         local  int totalWrite
+                         local  int packetWrite
+                         local  int32_t numWriteBytes
+  352  004CC0A0     B8  HDir FLAP::DirOpen(const char* pFileSpec, uint32_t fileAttrMask)
+                         local  const struct <anon>& netConn
+                         local  int32_t hDir
+  369  004CC878    140  int FLAP::DirRead(HDir hDir, struct <anon>* pDirEntry, int32_t maxDirEntries)
+                         local  uint32_t tag
+                         local  int iDir
+                         local  const struct <anon>& netConn
+  410  004CC000     A0  int FLAP::DirClose(HDir hDir)
+                         local  const struct <anon>& netConn
+                         local  int32_t result
+  425  004CBF38     C8  bool FLAP::DeleteFile(const char* pFilePath)
+                         local  const struct <anon>& netConn
+                         local  int32_t result
+  438  004CBE70     C8  bool FLAP::MakeDir(const char* pDirName)
+                         local  const struct <anon>& netConn
+                         local  int32_t result
+  451  004CBDA8     C8  bool FLAP::RemoveDir(const char* pDirName)
+                         local  const struct <anon>& netConn
+                         local  int32_t result
+  468  004CBD10     98  uint32_t FLAP::QueryEvents()
+                         local  const struct <anon>& netConn
+                         local  uint32_t uEventFlags
+  485  004C7FF4     A8  void FLAP::AddWatch(uintptr_t idWatch, const char* pFilePath, bool bFastUpdate)
+                         local  const struct <anon>& netConn
+  495  004C7F80     74  void FLAP::RemoveWatch(uintptr_t idWatch)
+                         local  const struct <anon>& netConn
+  503  004C7D54     50  void FLAP::RemoveAllWatches()
+                         local  const struct <anon>& netConn
+  510  004CBBC8     C8  bool FLAP::QueryWatch(const uintptr_t& idWatch)
+                         local  const struct <anon>& netConn
+                         local  uint32_t count
+                         local  uint32_t data
+  537  004CBAB0    118  int32_t FLAP::QueryKeyBoard(struct <anon>* pKeyBuffer, int32_t maxBufferSize)
+                         local  const struct <anon>& netConn
+                         local  int32_t count
+                         local  int i
+  564  004CB980    130  int32_t FLAP::QueryController(struct <anon>* pBuffer, int32_t maxBufferSize)
+                         local  const struct <anon>& netConn
+                         local  int32_t count
+                         local  int i
+                         local  struct <anon>* pEvent
+                         local  int iAxis
+  600  004CB898     E8  int32_t FLAP::QueryState(uint32_t* pBuffer, int32_t maxBufferSize)
+                         local  const struct <anon>& netConn
+                         local  int32_t count
+                         local  int i
+  620  004CB750    148  int32_t FLAP::QueryMouse(struct <anon>* pBuffer, int32_t maxBufferSize)
+                         local  const struct <anon>& netConn
+                         local  int32_t count
+                         local  int i
+  646  004CB634    11C  bool FLAP::DropQueryFile(const int32_t& idWindow, const int32_t& posX, const int32_t& posY, char* pBuffer, int32_t maxBufferSize)
+                         local  const struct <anon>& netConn
+  662  004CB544     F0  bool FLAP::QueryCommand(char* pBuffer, int32_t maxBufferSize)
+                         local  const struct <anon>& netConn
+                         local  int32_t count
+  683  004CB448     FC  int32_t FLAP::QueryDebugMenu(const int32_t& idActiveView, int32_t* pHeights, int32_t maxBufferSize)
+                         local  const struct <anon>& netConn
+                         local  int32_t count
+                         local  int i
+  703  004C7CF4     60  void FLAP::MouseCapture()
+                         local  const struct <anon>& netConn
+  710  004C7C94     60  void FLAP::MouseRelease()
+                         local  const struct <anon>& netConn
+  718  004C7BE8     AC  bool FLAP::SetMouseExtent(int32_t left, int32_t top, int32_t right, int32_t bottom)
+                         local  const struct <anon>& netConn
+  732  004C7B64     84  bool FLAP::SetWindowTitle(const char* pTitle)
+                         local  const struct <anon>& netConn
+  744  004CB318    130  bool FLAP::GetShellIcon(const char* pFileName, const int32_t& width, const int32_t& height, struct <anon>* pBuffer, int32_t maxBufferPixels)
+                         local  const struct <anon>& netConn
+                         local  int numPixels
+  770  004CB270     A8  int32_t FLAP::ExecuteProcess(const char* pCommandLine)
+                         local  const struct <anon>& netConn
+                         local  int32_t retCode
+  783  004CB1B0     C0  int32_t FLAP::ExecuteProcessInFolder(const char* pCommandLine, const char* pFolderName)
+                         local  const struct <anon>& netConn
+                         local  int32_t retCode
+  797  004C7AF4     70  void FLAP::PlayWave(const char* pWaveFile)
+                         local  const struct <anon>& netConn
+  806  004CACB0     C0  int32_t FLAP::GetClipboardText(char* pBuffer, uint32_t uBufferSize)
+                         local  const struct <anon>& netConn
+  823  004C793C     70  void FLAP::PrintString(const char* pStr)
+                         local  const struct <anon>& netConn
+  832  004C79AC     6C  void FLAP::FlapPrintf(const char* pFormat)
+                         local  va_list args
+                         local  char[1024] printBuf
+                         local  size_t nSize
+  849  004CAB68     8C  void FLAP::DebugMenuText(int32_t idView, const char* pText)
+                         local  const struct <anon>& netConn
+  862  004C78B8     84  void FLAP::DebugMenuSetVisible(int32_t idView, bool bVisible)
+                         local  const struct <anon>& netConn
+  872  004C7850     68  void FLAP::DebugMenuBringToFront(int32_t idView)
+                         local  const struct <anon>& netConn
+  881  004C7DD4     74  void FLAP::SetTextAttributes(uint32_t textAttr)
+                         local  const struct <anon>& netConn
+  892  004C7080     18  uint32_t FLAP::GetTextAttributes()
+  897  004CAA74     F4  enum MessageBoxResult FLAP::ShowMessageBox(const char* pStrText, enum MessageBoxType eType, enum MessageBoxIcon eIcon)
+                         local  const struct <anon>& netConn
+                         local  uint32_t result
+  924  004C7098      4  void FLAP::ClientInit()
+  928  004F45C4    378  void FLAP::ClientProcess(float_t fTime)
+                         local  float_t s_fLastTime
+                         local  struct <anon>* pAcceptedConn
+                         local  char[256] str
+                         local  uint32_t remoteIpAddr
+                         local  int remotePort
+                         local  uint32_t uEventFlags
+                         local  bool bForceQuery
+                         local  uint8_t[256] uPingData
+                         local  uint32_t pingAddr
+                         local  int pingPort
+                         local  int pingDataSize
+                         local  int port
+ 1068  004C7590     78  void FLAP::ClientShutdown()
+ 1162  004CA9BC     B8  int32_t FLAP::RtamOpen(const char* pFilePath, uint32_t uFlags)
+                         local  const struct <anon>& netConn
+                         local  int32_t result
+ 1179  004CA914     A8  int32_t FLAP::RtamClose(const char* pFilePath)
+                         local  const struct <anon>& netConn
+                         local  int32_t result
+ 1194  004CA82C     E8  int32_t FLAP::RtamLoad(const char* pFilePath, void* pBuffer, int32_t numBytes)
+                         local  const struct <anon>& netConn
+                         local  int32_t iSize
+ 1212  004CA724    108  int32_t FLAP::RtamSave(const char* pFilePath, const void* pBuffer, int32_t numBytes)
+                         local  const struct <anon>& netConn
+                         local  int32_t result
+ 1233  004CA2BC    108  bool FLAP::RtamGetFileInfo(const char* pFilePath, struct <anon>* pFileInfo, uint32_t* type)
+                         local  const struct <anon>& netConn
+                         local  uint32_t tag
+ 1259  004CA66C     B8  int32_t FLAP::RtamFindAssetBegin(const char* pFilePath, uint32_t type)
+                         local  const struct <anon>& netConn
+                         local  int32_t index
+ 1276  004CA5B4     B8  int32_t FLAP::RtamFindAssetNext(const char* pFilePath, uint32_t type)
+                         local  const struct <anon>& netConn
+                         local  int32_t index
+ 1293  004C9E64     C8  void FLAPPrintf(const char* pFormat)
+                         local  const char[11] __FUNCTION__
+                         local  va_list args
+                         local  char[1024] printBuf
+                         local  unsigned int nSize
+                         inlines  RNADebugBreak

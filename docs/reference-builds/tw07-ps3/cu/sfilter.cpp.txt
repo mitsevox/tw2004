@@ -1,0 +1,16 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/sfilter.cpp
+// compiled in: sfilter.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   12  006DEBF4     68  void SFILTER_add(SFILTERNODE** pphead, SFILTERNODE* pnew)
+                         local  SFILTERNODE* pprev
+                         local  SFILTERNODE* pnext
+   43  006DEC5C     58  void SFILTER_remove(SFILTERNODE** pphead, SFILTERNODE* pcur)
+                         local  SFILTERNODE* pprev
+   82  006DECB4     44  int SFILTER_destroy(SFILTERNODE* psfn)
+                         local  int result
+  102  006DECF8     98  void SFILTER_cleanup(void* head)
+                         local  SFILTERNODE* psfn
+                         local  SFILTERNODE* pnext
+  140  006DED90     DC  int SFILTER_connect(SFILTERNODE* pnode1, SFILTERNODE* pnode2, int node1output, int node2input)
+  197  006DEE6C     FC  int SFILTER_disconnect(SFILTERNODE* pnode1, SFILTERNODE* pnode2, int node1output, int node2input)

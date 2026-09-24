@@ -1,0 +1,25 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Shared/refpack/refdecode.cpp
+// compiled in: other_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   13    inline-only   static unsigned int ggetm(const void* src, int bytes)
+   50  0042D8AC     50  bool REF_is(const void* compresseddata)
+                         local  bool ok
+                         local  int packtype
+                         inlines  ggetm
+   69  0042D8FC    128  int REF_size(const void* compresseddata)
+                         local  int len
+                         local  int packtype
+                         local  int ssize
+                         inlines  ggetm
+   88  003E8E50    44C  int REF_decode(void* dest, const void* compresseddata, int* compressedsize)
+                         local  unsigned char* s
+                         local  unsigned char* ref
+                         local  unsigned char* d
+                         local  unsigned char first
+                         local  unsigned char second
+                         local  unsigned char third
+                         local  unsigned char forth
+                         local  unsigned int run
+                         local  unsigned int type
+                         local  int ulen

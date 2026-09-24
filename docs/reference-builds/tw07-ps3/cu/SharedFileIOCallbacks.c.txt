@@ -1,0 +1,64 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Tiburon/Eassdk/SharedFileIOCallbacks.c
+// compiled in: other_unity.cpp
+// 22 functions, source order. line | PS3 address | size
+
+  257    inline-only   void SFIO_vSetCurrentError(int MCError)
+  273    inline-only   void SFIO_vSetCurrentResult(int iResult)
+  288  003CE238     F0  SFIOCallbacksT* SFIO_spGetCallbacks()
+  314  003CE328      8  bool SFIOValidateFilename(const Char* pFilename)
+  341  0040A808    1C4  void SFIO_vFindCallback(const Char* pSavename, enum SFIODeviceE eDevice)
+                         local  char[10][64] pFilenames
+                         local  char*[10] ppFilenames
+                         local  int error
+                         local  int iNumMatchingFiles
+                         local  int i
+                         inlines  SFIO_vSetCurrentError, SFIO_vSetCurrentResult
+  440  0040A9CC     7C  void SFIO_vFreeSpaceCallback(enum SFIODeviceE eDevice)
+                         local  int error
+                         local  uint64_t iFreeSpace
+                         inlines  SFIO_vSetCurrentError, SFIO_vSetCurrentResult
+  475  0040AA48     CC  void SFIO_vFreeEntryCallback(enum SFIODeviceE eDevice)
+                         local  int error
+                         local  uint64_t iNumFreeEntries
+                         inlines  SFIO_vSetCurrentError, SFIO_vSetCurrentResult
+  531  0040574C     80  void SFIO_vMountCallback(enum SFIODeviceE eDevice)
+                         local  int error
+                         inlines  SFIO_vSetCurrentError
+  579  004057CC     6C  void SFIO_vUnMountCallback(enum SFIODeviceE eDevice)
+                         local  int error
+                         inlines  SFIO_vSetCurrentError
+  629  0040AB14    14C  void SFIO_vOpenCallback(const Char* pPath, const Char* pFilename, enum SFIODeviceE eDevice, uint32 uMode)
+                         local  int error
+                         local  int id
+                         inlines  SFIO_vSetCurrentError, SFIO_vSetCurrentResult
+  689  00405838     50  void SFIO_vCloseCallback(int32 iHandle)
+                         local  int error
+                         inlines  SFIO_vSetCurrentError
+  723  00405888    104  void SFIO_vCreateCallback(const Char* pSavename, uint32 uSize, enum SFIODeviceE eDevice)
+                         local  int error
+                         inlines  SFIO_vSetCurrentError
+  770  0040598C    15C  void SFIO_vDeleteCallback(const Char* pPath, const Char* pFilename, enum SFIODeviceE eDevice)
+                         local  int error
+                         inlines  SFIO_vSetCurrentError
+  832  00405AE8     6C  void SFIO_vDestroyCallback(const Char* pSavename, enum SFIODeviceE eDevice)
+                         local  int error
+                         inlines  SFIO_vSetCurrentError
+  865  0040AC60     94  void SFIO_vReadCallback(int32 iHandle, void* pBuffer, uint32 uNumBytes)
+                         local  int error
+                         inlines  SFIO_vSetCurrentError, SFIO_vSetCurrentResult
+  904  0040ACF4     90  void SFIO_vWriteCallback(int32 iHandle, const void* pBuffer, uint32 uNumBytes)
+                         local  int error
+                         inlines  SFIO_vSetCurrentError, SFIO_vSetCurrentResult
+  943  00405B54     5C  void SFIO_vSeekCallback(int32 iHandle, int32 iOffset, enum SFIOSeekE eSeek)
+                         local  int error
+                         local  bool bSeekFromStart
+                         inlines  SFIO_vSetCurrentError
+  976  00405BB0     50  void SFIO_vFlushCallback(int32 iHandle)
+                         local  int error
+                         inlines  SFIO_vSetCurrentError
+ 1004  003CE330     50  void SFIO_vSetAttrCallback(int32 iHandle, uint32 uAttr)
+                         local  int error
+                         inlines  SFIO_vSetCurrentError
+ 1034  003CE380     30  enum SFIOErrorE SFIO_eProcessCallback(enum SFIOProcessE* pProcess, int32* pResult)
+ 1060  003E689C     28  void SFIO_vGetFileCallback(Char* pFilename)
+ 1066  003CE3B0      8  enum SFIOTerritoryE SFIO_vGetTerritoryCallback()

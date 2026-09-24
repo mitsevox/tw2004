@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/Headers/ClutGenOpaqFuPlus.h
+// compiled in: other_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   29  003CF3D0     34  void ClutGenOpaqFuPlus::ClutGenOpaqFuPlus(const struct ClutGenOpaqFuPlus* this, const const struct Allocator& allocRef)
+   30  003CF438      4  void ClutGenOpaqFuPlus::~ClutGenOpaqFuPlus(const struct ClutGenOpaqFuPlus* this)

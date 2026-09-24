@@ -1,0 +1,498 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/TerrainMesh.cpp
+// compiled in: headgate_unity.cpp
+// 43 functions, source order. line | PS3 address | size
+
+  233  0035698C    1BC  int32 TerrainMesh_PointInPoly(float* p1, float* p2, float* p3, float* pointXZ, struct TerrainHeightInfoPtInPoly* pInfo)
+                         local  uint32[4] s_permXZXZ
+                         local  uint32[4] s_permZ0X0
+                         local  uint32[4] s_permYZXW
+                         local  uint32[4] s_permZXYW
+                         local  uint32[4] s_permAXYZBX
+                         local  uint32[4] s_permAXBXAZW
+                         local  uint32[4] s_negateX
+                         local  float[4] V0
+                         local  float[4] V1
+                         local  float[4] V2
+                         local  float[4] vPoint
+                         local  unsigned char[16] vPermXZXZ
+                         local  unsigned char[16] vPermZ0X0
+                         local  unsigned char[16] vNegateX
+                         local  float[4] vMin
+                         local  float[4] vMax
+                         local  int[4] vMinTest
+                         local  int[4] vMaxTest
+                         local  int[4] vTrivOut
+                         local  float[4] vZero
+                         local  uint32 compareResult
+                         local  float[4] v0v1
+                         local  float[4] v1v2
+                         local  float[4] v2v0
+                         local  float[4] ptToV0
+                         local  float[4] ptToV1
+                         local  float[4] ptToV2
+                         local  float[4] dot0
+                         local  float[4] dot1
+                         local  float[4] dot2
+                         local  int[4] test0
+                         local  int[4] test1
+                         local  int[4] test2
+                         local  int[4] vIntAngles
+                         local  unsigned char[16] vPermYZXW
+                         local  unsigned char[16] vPermZXYW
+                         local  unsigned char[16] vPermAXYZBX
+                         local  unsigned char[16] vPermAXBXAZW
+                         local  int[4] vOneInt
+                         local  float[4] edge0
+                         local  float[4] edge1
+                         local  float[4] tmp0
+                         local  float[4] tmp1
+                         local  float[4] tmp2
+                         local  float[4] tmp3
+                         local  float[4] vOne
+                         local  float[4] cross
+                         local  float[4] distToPlane
+                         local  float[4] planeB
+                         local  float[4] y0
+                         local  float[4] temp
+                         local  float[4] plane
+                         local  float[4] ooPlaneB
+                         local  float[4] heightY
+                         local  float[4] oldInfoXYZpad
+                         local  float[4] newInfoXYZpad
+                         inlines  vec_add, vec_all_eq, vec_cmpgt, vec_madd, vec_max, vec_min, vec_msum3, vec_msum4, vec_nmsub, vec_or, vec_perm, vec_re, vec_sld, vec_splat, vec_sub, vec_vcfsx, vec_vspltw, vec_xor
+  504  00368450    150  void CTerrainMesh::CTerrainMesh(const struct CTerrainMesh* this)
+                         inlines  TerrainHeightInfo::TerrainHeightInfo
+  522  003463E0     A0  void CTerrainMesh::~CTerrainMesh(const struct CTerrainMesh* this)
+  530  0034621C     18  void CTerrainMesh::EnableTournamentCollisions(bool bEnable)
+  538  00346254      4  void CTerrainMesh::Release(const struct CTerrainMesh* this)
+  546  00346234     20  void CTerrainMesh::FreeLookupTable(const struct CTerrainMesh* this)
+  566  00346258    130  bool CTerrainMesh::FaceHeight(const struct CTerrainMesh* this, unsigned int faceNum, const float& minH, const float& maxH)
+                         local  const struct THTableFace& face
+                         local  int p1
+                         local  int p2
+                         local  int p3
+  583  0034D604     38  void CTerrainMesh::ActivateCup(const struct CTerrainMesh* this, int8 nGreenIndex, int8 nCupIndex, bool bActive)
+                         local  const struct CCupGeo* cupGeo
+                         inlines  CCupGeo::Activate
+  595  0034D588     44  void CTerrainMesh::ResetCup(const struct CTerrainMesh* this, int8 nGreenIndex, int8 nCupIndex)
+                         local  const struct CCupGeo* cupGeo
+  606  0035101C     7C  void CTerrainMesh::SetupCup(const struct CTerrainMesh* this, const float* cupCenter, float cupRadius, float cupBottom, int8 nGreenIndex, int8 nCupIndex)
+                         local  const struct CCupGeo* cupGeo
+  617  0034D4F8     90  void CTerrainMesh::AddCupBevel(const struct CTerrainMesh* this, vec4flt* pVerts, short unsigned int dwVertCount, short int* pIndices, short unsigned int dwIndexCount, int8 nGreenIndex, int8 nCupIndex)
+                         local  const struct CCupGeo* cupGeo
+  628  0034D468     90  void CTerrainMesh::AddCupInterior(const struct CTerrainMesh* this, vec4flt* pVerts, short unsigned int dwVertCount, short int* pIndices, short unsigned int dwIndexCount, int8 nGreenIndex, int8 nCupIndex)
+                         local  const struct CCupGeo* cupGeo
+  635  003465BC     D4  void CTerrainMesh::CalculateMinMax(const struct CTerrainMesh* this)
+                         local  struct THTableVertex* cur
+                         local  float minX
+                         local  float minY
+                         local  float minZ
+                         local  float maxX
+                         local  float maxY
+                         local  float maxZ
+                         local  int i
+  664  00346690    2FC  void CTerrainMesh::LoadFromMem(const struct CTerrainMesh* this, unsigned char* mem)
+                         local  int offset
+                         local  int version
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+  743  0034D3E8     80  const struct CCupGeo* CTerrainMesh::GetCupGeo(const struct CTerrainMesh* this, int8 nGreenIndex, int8 nCupIndex)
+                         local  struct CCupGeo* cupGeo
+  770  0035C958    EB8  bool CTerrainMesh::RayTreeCollisionTest(const struct CTerrainMesh* this, float* LB, float* B, float* N, const int& treeId, const int& physicsId, const float& fClosest, bool bDoLeaves)
+                         local  mat44flt world
+                         local  vec4flt Min
+                         local  vec4flt Max
+                         local  struct SphereS Sphere
+                         local  float[3][4] p
+                         local  bool retVal
+                         local  float tempT
+                         local  float Atemp
+                         local  float Btemp
+                         local  float Ctemp
+                         local  float Dtemp
+                         local  vec4flt intersect
+                         local  vec4flt tempIntersect
+                         local  int i
+                         local  struct TreePatchS* treePatch
+                         local  const float overFlowAmount
+                         local  int ii
+                         local  struct tagSurfaceStructure* struc
+                         local  struct tagPolyObject* polyObj
+                         local  float tBallX
+                         local  float tBallY
+                         local  float tBallZ
+                         local  float tLastBallX
+                         local  float tLastBallY
+                         local  float tLastBallZ
+                         local  struct RayS ray
+                         local  float rayDist
+                         local  int j
+                         local  struct WORDPoly* polys
+                         local  struct TerrainObjectVertex* points
+                         local  bool isRotatingLeaf
+                         local  int k
+                         local  struct WORDPoly* poly
+                         local  bool hasIntersection
+                         local  bool doTest
+                         local  int l
+                         local  bool doTest
+                         local  const int myFlags
+                         local  float Atemp
+                         local  float Btemp
+                         local  float Ctemp
+                         local  float Atemp
+                         local  float Ctemp
+                         inlines  LLMath_IdentifyMat, LLMath_Subtract3, tagPolyObject::GetPoints, tagPolyObject::GetPolys, vec4flt_Copy, vec4flt_Copy3, vec_st
+ 1019  0035B20C    544  int CTerrainMesh::FindTreeVertsInCube(const struct CTerrainMesh* this, float* min, float* max, struct tagSurfaceStructure* pSurf, vec4flt* pVerts, int MaxCount)
+                         local  bool doAdd
+                         local  int count
+                         local  vec4flt pVert
+                         local  vec4flt vertW
+                         local  struct tagPolyObject* pObj
+                         local  mat44flt world
+                         local  int i
+                         local  struct TerrainObjectVertex* points
+                         local  int j
+                         inlines  CTerrainMesh::GetCollisionTree, LLMath_IdentifyMat, tagPolyObject::GetPoints, vec4flt_Copy, vec_st
+ 1079  0034698C    2C0  int CTerrainMesh::FindTreeObstacleRect(const struct CTerrainMesh* this, float x1, float z1, float x2, float z2, struct tagSurfaceStructure** surfs, int MaxCount)
+                         local  bool doAdd
+                         local  int count
+                         local  int i
+                         local  struct TreePatchS* treePatch
+                         local  int i
+                         local  struct tagSurfaceStructure* s
+ 1127  0036A524    108  void CTerrainMesh::GetTerrainNormal(const struct CTerrainMesh* this, const float& nX, const float& nY, const float& nZ)
+                         local  struct TerrainHeightInfo info
+                         local  float magnitude
+                         local  float ooMagnitude
+                         inlines  TerrainHeightInfo::TerrainHeightInfo
+ 1148  0036A864     CC  int CTerrainMesh::GetTerrainType(const struct CTerrainMesh* this, float x, float z, unsigned int dontConsider)
+                         local  struct TerrainHeightInfo info
+                         inlines  TerrainHeightInfo::TerrainHeightInfo
+ 1171  00356B48    B38  bool CTerrainMesh::GridTerrainHeightFromTable(const struct CTerrainMesh* this, struct TerrainHeightInfoLite* gridinfo, int gridwidth, float gridSpacing, int minCol, int maxCol, int minRow, int maxRow, unsigned int attributeMask, enum FlagOp op, unsigned int propsMask)
+                         local  float minx
+                         local  float minz
+                         local  float maxx
+                         local  float maxz
+                         local  float mingridx
+                         local  float maxgridx
+                         local  float mingridz
+                         local  float maxgridz
+                         local  int mincol
+                         local  int minrow
+                         local  int maxcol
+                         local  int maxrow
+                         local  int minindex
+                         local  int maxindex
+                         local  int minGridIndex
+                         local  int maxGridIndex
+                         local  float xspacing
+                         local  float zspacing
+                         local  float ooxspacing
+                         local  float oozspacing
+                         local  int z
+                         local  float cellminz
+                         local  float cellmaxz
+                         local  int x
+                         local  int index
+                         local  float cellminx
+                         local  float cellmaxx
+                         local  struct CBucket* hashTable
+                         local  int count
+                         local  int i
+                         local  int index
+                         local  unsigned int physicsObjectTypeFlags
+                         local  int grassIndex
+                         local  const struct THTableFace& face
+                         local  const int p1
+                         local  const int p2
+                         local  const int p3
+                         local  float polyminx
+                         local  float polymaxx
+                         local  float polyminz
+                         local  float polymaxz
+                         local  int mingx
+                         local  int maxgx
+                         local  int mingz
+                         local  int maxgz
+                         local  vec4flt v1
+                         local  vec4flt v2
+                         local  vec4flt v3
+                         local  int x2
+                         local  int z2
+                         local  int index
+                         local  const struct TerrainHeightInfoLite& info
+                         local  vec4flt v1
+                         local  vec4flt v2
+                         local  vec4flt v3
+                         local  vec4flt pointXZ
+                         inlines  CBucket::GetSize, CTerrainMesh::Column, CTerrainMesh::ColumnToWorldX, CTerrainMesh::Row, CTerrainMesh::RowToWorldZ, vec4flt_Copy, vec_st
+ 1343  00346C4C     14  struct CTerrainMesh* CTerrainMesh::GetTerrainMesh()
+ 1353  0036895C    BFC  bool CTerrainMesh::RayIntersect(const struct CTerrainMesh* this, float* ball, float* lastball, unsigned int attributeMask, enum FlagOp op, unsigned int propsMask, const struct TerrainHeightInfo& info)
+                         local  vec4flt boxMin
+                         local  vec4flt boxMax
+                         local  int c1
+                         local  int c2
+                         local  int r1
+                         local  int r2
+                         local  float dist
+                         local  vec4flt direction
+                         local  float smallestT
+                         local  bool bIntersects
+                         local  struct TerrainHeightInfo temp
+                         local  const struct Cup** activeCups
+                         local  int8 count
+                         local  int8 i
+                         local  int row
+                         local  int col
+                         local  int index
+                         local  struct CBucket* hashTable
+                         local  float[4] hashMin
+                         local  float[4] hashMax
+                         local  int i
+                         local  int index
+                         local  const struct THTableFace& face
+                         local  unsigned int physicsObjectTypeFlags
+                         local  unsigned int physicsId
+                         local  unsigned int gamePlayAttribs
+                         local  const int p1
+                         local  const int p2
+                         local  const int p3
+                         local  vec4flt v1
+                         local  vec4flt v2
+                         local  vec4flt v3
+                         local  float tempT
+                         local  vec4flt edge1
+                         local  vec4flt edge2
+                         local  const struct CCupGeo* cupGeo
+                         inlines  BoxWithinBoundingBox, CBucket::GetSize, CBucket::operator[], CCupGeo::IsActive, CTerrainMesh::Column, CTerrainMesh::IsValidAttributes, CTerrainMesh::Row, LLMath_AddScale, LLMath_CrossProduct3W0, LLMath_MaxVec4, LLMath_MinVec4, LLMath_Subtract, THInfoVertex::operator=, TerrainHeightInfo::TerrainHeightInfo, TriWithinBoundingBox, vec4flt_Copy, vec_all_eq, vec_cmpgt, vec_ld, vec_lvlx, vec_lvrx, vec_madd, vec_max, vec_min, vec_nmsub, vec_or, vec_perm, vec_sub
+ 1542  00369558    7EC  int CTerrainMesh::FindTerrainRect(const struct CTerrainMesh* this, float x1, float z1, float x2, float z2, unsigned int attributeMask, enum FlagOp op, unsigned int propsMask, struct TerrainHeightInfo* infoArray, int count)
+                         local  struct TerrainHeightInfo tempInfo
+                         local  int row1
+                         local  int col1
+                         local  int row2
+                         local  int col2
+                         local  vec4flt pointXZ
+                         local  int findCount
+                         local  int row
+                         local  int col
+                         local  int bucket
+                         local  struct CBucket* hashTable
+                         local  int i
+                         local  int index
+                         local  const struct THTableFace& face
+                         local  unsigned int physicsObjectTypeFlags
+                         local  unsigned int gamePlayAttribs
+                         local  const int p1
+                         local  const int p2
+                         local  const int p3
+                         local  vec4flt v1
+                         local  vec4flt v2
+                         local  vec4flt v3
+                         inlines  CBucket::operator[], CTerrainMesh::Column, CTerrainMesh::IsValidAttributes, CTerrainMesh::Row, THInfoVertex::operator=, TerrainHeightInfo::TerrainHeightInfo, vec4flt_Copy, vec_ld, vec_st
+ 1648  00363BE8    730  int CTerrainMesh::RayIntersect2DBucket(const struct CTerrainMesh* this, int bucket, const float* ball, float* lastball, unsigned int attributeMask, enum FlagOp op, unsigned int propsMask, struct TerrainHeightInfo* infoArray, int count)
+                         local  int findCount
+                         local  int index
+                         local  struct CBucket* hashTable
+                         local  int hashCount
+                         local  float minX
+                         local  float maxX
+                         local  const struct FaceRightOf* pFirst
+                         local  const struct FaceRightOf* pLast
+                         local  int first
+                         local  int last
+                         local  int i
+                         local  const int index
+                         local  const const struct THTableFace& face
+                         local  unsigned int physicsObjectTypeFlags
+                         local  unsigned int gamePlayAttribs
+                         local  const int p1
+                         local  const int p2
+                         local  const int p3
+                         local  vec4flt v1
+                         local  vec4flt v2
+                         local  vec4flt v3
+                         local  float x
+                         local  float z
+                         local  enum IntersectFlagE flag
+                         inlines  CBucket::GetSize, CTerrainMesh::IsValidAttributes, THInfoVertex::operator=, vec4flt_Copy, vec_st
+ 1764  00346C60    29C  float CTerrainMesh::FindNextBucketOnRay(const struct CTerrainMesh* this, float* pos, float* dir, const int& col, const int& row)
+                         local  float bucketX
+                         local  float bucketZ
+                         local  int tdx
+                         local  int tdz
+                         local  float t0
+                         local  float t1
+                         local  float t2
+                         local  float t3
+                         local  float tx
+                         local  float tz
+                         local  const float min_precision
+                         local  const float ooDirX
+                         local  const float ooDirZ
+                         local  int dx
+                         local  int dz
+                         local  float t
+                         inlines  CTerrainMesh::ColumnToWorldX, CTerrainMesh::RowToWorldZ
+ 1827  00364318    2D8  int CTerrainMesh::FindTerrain(const struct CTerrainMesh* this, const float* pos, float* dir, float dist, unsigned int attributeMask, enum FlagOp op, unsigned int propsMask, struct TerrainHeightInfo* infoArray, int count)
+                         local  int row
+                         local  int col
+                         local  vec4flt tempPos
+                         local  struct TerrainHeightInfo* infoPtr
+                         local  int tempCount
+                         local  float tempDist
+                         local  vec4flt endPos
+                         local  int bucket
+                         local  vec4flt nextPos
+                         local  float t
+                         local  int found
+                         inlines  vec4flt_Copy, vec4flt_Copy3
+ 1918    inline-only   int32 CompareKeyWithinPolyX(float[4] vX, const const struct THTableFace& face, struct THTableVertex* pVerts)
+                         local  const int32 p1
+                         local  const int32 p2
+                         local  const int32 p3
+                         local  float[4] v1
+                         local  float[4] v2
+                         local  float[4] v3
+                         local  float[4] vMax
+                         local  int32 compareResult
+ 1962  0035A8F0    294  const struct FaceRightOf* FindFaceFromXPosition(const float x, const struct FaceRightOf* pFaces, const int32 numFaces, const struct THTableFace* pPolys, struct THTableVertex* pVerts)
+                         local  const struct FaceRightOf* pLo
+                         local  const struct FaceRightOf* pHi
+                         local  const struct FaceRightOf* pResult
+                         local  int32 num
+                         local  float[4] vX
+                         local  const int32 half
+                         local  const int32 newHalf
+                         local  const struct FaceRightOf* pMid
+                         local  int32 result
+                         local  const struct FaceRightOf* pSearch
+                         local  int32 result
+                         inlines  CompareKeyWithinPolyX
+ 2102  00369D44    7E0  bool CTerrainMesh::TerrainHeightFromTable(const struct CTerrainMesh* this, float x, float z, unsigned int attributeMask, enum FlagOp op, unsigned int propsMask, const struct TerrainHeightInfo& info, bool bForceHighest, float MaxElev)
+                         local  bool bFound
+                         local  struct TerrainHeightInfo temp
+                         local  float maxY
+                         local  int index
+                         local  struct GoTemple* pTemple
+                         local  bool bIsMaterialFilteringEnabled
+                         local  enum TempleStateE eTempleState
+                         local  struct CBucket* hashTable
+                         local  vec4flt pointXZ
+                         local  int count
+                         local  const struct FaceRightOf* pFirst
+                         local  int first
+                         local  int last
+                         local  int i
+                         local  const struct Cup** activeCups
+                         local  int8 count
+                         local  int8 i
+                         local  int index
+                         local  const struct THTableFace& face
+                         local  unsigned int physicsObjectTypeFlags
+                         local  unsigned int physicsId
+                         local  unsigned int gamePlayAttribs
+                         local  const int p1
+                         local  const int p2
+                         local  const int p3
+                         local  vec4flt v1
+                         local  vec4flt v2
+                         local  vec4flt v3
+                         inlines  CBucket::GetSize, CTerrainMesh::IsValidAttributes, CTerrainMesh::TableValue, GoTemple::GetCurrentState, GoTemple::IsMaterialFilteringEnabled, THInfoVertex::operator=, TerrainHeightInfo::TerrainHeightInfo, vec4flt_Copy, vec_ld
+ 2247  00358FD8     9C  bool CTerrainMesh::CupTerrainHeight(const struct CTerrainMesh* this, float x, float z, const struct TerrainHeightInfo& info, int8 nGreenIndex, int8 nCupIndex)
+                         local  bool result
+                         local  const struct CCupGeo* cupGeo
+ 2260  0034EBB8     B4  float CTerrainMesh::QuickTerrainHeightFromTable(const struct CTerrainMesh* this, float x, float z)
+                         local  float y
+                         local  int index
+                         local  struct CBucket* hashTable
+                         inlines  CTerrainMesh::TableValue
+ 2286  0034EC6C    280  void CTerrainMesh::GetMinMaxYValues(const struct CTerrainMesh* this, const float* Min, const float* Max, const float& minY, const float& maxY)
+                         local  int c1
+                         local  int c2
+                         local  int r1
+                         local  int r2
+                         local  int row
+                         local  int col
+                         local  int index
+                         local  struct CBucket* hashTable
+                         inlines  CTerrainMesh::Column, CTerrainMesh::Row
+ 2314  00350E00     24  void CTerrainMesh::SetCameraWorldBoundaries(const struct CTerrainMesh* this, float* min, float* max)
+                         inlines  vec4flt_Copy
+ 2320  00365694    30C  void CTerrainMesh::ComputeCameraWorldBoundaries(const struct CTerrainMesh* this)
+                         local  vec4flt cmin
+                         local  vec4flt cmax
+                         local  float kMaxShotPathDist
+                         local  float[4][4] cardinalDirectionShotDistances
+                         local  const int NUM_SHOTS_TO_CHECK
+                         local  int h
+                         local  int i
+                         local  int j
+                         local  vec4flt checkPoint
+                         local  unsigned int i
+                         local  int j
+                         local  vec4flt checkPoint
+                         inlines  LLMath_Add, vec4flt_Copy
+ 2393  0034659C     10  void CCupGeo::AddCupBevel(const struct CCupGeo* this, vec4flt* pVerts, short unsigned int dwVertCount, short int* pIndices, short unsigned int dwIndexCount)
+ 2401  003465AC     10  void CCupGeo::AddCupInterior(const struct CCupGeo* this, vec4flt* pVerts, short unsigned int dwVertCount, short int* pIndices, short unsigned int dwIndexCount)
+ 2409  00358D64    274  bool CCupGeo::CupTerrainHeight(const const struct CCupGeo* this, float x, float z, const struct TerrainHeightInfo& info)
+                         local  int col
+                         local  int row
+                         local  vec4flt vec
+                         local  float distSq
+                         local  float dist
+                         local  float radius
+                         local  const float cos45Deg
+                         local  vec4flt vecFromCenter
+                         inlines  CTerrainMesh::Column, CTerrainMesh::Row, LLMath_LengthSquared3, vec_madd, vec_sld
+ 2465  00355200    474  bool CCupGeo::RayIntersectCup(const const struct CCupGeo* this, float* r0, float* rd, float* boxMin, float* boxMax, float dist, const struct TerrainHeightInfo& info)
+                         local  bool bIntersects
+                         local  vec4flt*[2] CupVerts
+                         local  short int*[2] CupIndices
+                         local  short unsigned int[2] CupPolyCounts
+                         local  float smallestT
+                         local  float tempT
+                         local  int i
+                         local  short unsigned int poly
+                         local  short int* indices
+                         local  vec4flt v1
+                         local  vec4flt v2
+                         local  vec4flt v3
+                         local  vec4flt edge1
+                         local  vec4flt edge2
+                         inlines  LLMath_AddScale, LLMath_CrossProduct3W0, LLMath_Subtract, TriWithinBoundingBox, __vec_cross, vec4flt_Copy, vec_madd, vec_nmsub, vec_perm, vec_splat, vec_st
+ 2523  00346388     54  void CCupGeo::Reset(const struct CCupGeo* this)
+ 2537  00350E24    1F8  void CCupGeo::SetupCup(const struct CCupGeo* this, const float* cupCenter, float cupRadius, float cupBottom)
+                         local  vec4flt cupMin
+                         local  vec4flt cupMax
+                         local  int col
+                         local  int row
+                         inlines  CTerrainMesh::Column, CTerrainMesh::Row, vec4flt_Copy
+ 2578  0035C280    6D8  void CTerrainMesh::Debug_DoRenderTreeCollision(const struct CTerrainMesh* this, bool singleTree, bool singlePoly, int singleTreePatch, int singleTreeInstance, int singlePolyGroup, int singlePolyIdx)
+                         local  int treePatchMax
+                         local  int treePatchIdx
+                         local  struct TreePatchS* treePatch
+                         local  int treeInstanceMax
+                         local  int treeInstanceIdx
+                         local  struct tagSurfaceStructure* treeStructure
+                         local  struct tagPolyObject* polyObj
+                         local  mat44flt treeMtx
+                         local  int vertBufferIdx
+                         local  int polyGroupMax
+                         local  int polyGroupIdx
+                         local  struct tagPolyGroup* polyGroup
+                         local  struct WORDPoly* polys
+                         local  struct TerrainObjectVertex* verts
+                         local  int polyMax
+                         local  int polyIdx
+                         local  struct WORDPoly* poly
+                         local  struct TerrainObjectVertex*[3] polyVerts
+                         local  vec4flt* dstVerts
+                         local  int vertIdx
+                         local  int subIdx
+                         inlines  LLMath_IdentifyMat, tagPolyObject::GetPoints, tagPolyObject::GetPolys, vec_st
+ 2648  0036D21C    298  void CTerrainMesh::Debug_RenderTreeCollision(const struct CTerrainMesh* this)
+                         local  vec4flt color
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetCullMode, DS_vSetZBias, DS_vSetZTestEnable, Gcm::cellGcmSetBlendFunc, PR_vSetCurrentColor, PR_vSetCurrentUsage, vec_st

@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/Headers/GameMode_TestEquipment.h
+// compiled in: golf_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   51  0033F504      8  bool GameModeTestEquipment::HoleFinished(const struct GameModeTestEquipment* this, enum PlayerNumber_t PlayerID, bool predict)
+   52  0033F50C      8  bool GameModeTestEquipment::GameFinished(const struct GameModeTestEquipment* this, bool predict)
+   53  0033F514      C  float* GameModeTestEquipment::GetTargetLocation(const struct GameModeTestEquipment* this)
+   55  0033F520      8  enum ShotType_t GameModeTestEquipment::GetShotType(const struct GameModeTestEquipment* this)
+   56  0033F528      8  bit32 GameModeTestEquipment::GetClubSelection(const struct GameModeTestEquipment* this)

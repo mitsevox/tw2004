@@ -1,0 +1,15 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/BallPathPreviewMgr.cpp
+// compiled in: golf_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   44  002639C4     94  void BallPathPreviewMgr::CreateInstance()
+   56  002173F0     64  void BallPathPreviewMgr::DestroyInstance()
+   69  0026B1A8     7C  void BallPathPreviewMgr::Update(const struct BallPathPreviewMgr* this)
+                         local  enum PlayerNumber_t currentGolfer
+   84  002FD984     80  void BallPathPreviewMgr::Render(const struct BallPathPreviewMgr* this)
+                         local  enum PlayerNumber_t currentGolfer
+   99  00292C30     70  void BallPathPreviewMgr::ResetAll(const struct BallPathPreviewMgr* this)
+                         local  int playerNum
+  116  00217454     30  bool BallPathPreviewMgr::GetIfPreviewMeterIsShowing(const struct BallPathPreviewMgr* this, int playerNum)
+  124  00217484     10  float BallPathPreviewMgr::GetPreviewMeterRemaining(const struct BallPathPreviewMgr* this, int playerNum)
+  132  00217494     10  float BallPathPreviewMgr::GetPreviewMeterPercent(const struct BallPathPreviewMgr* this, int playerNum)

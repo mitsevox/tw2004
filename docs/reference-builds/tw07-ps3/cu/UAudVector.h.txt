@@ -1,0 +1,13 @@
+// ../../../../../TIGERCODE/Code/Golf/Audio/Engine/Utils/Headers/UAudVector.h
+// compiled in: other_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   64    inline-only   void audvec2_Set(audfrac* dest, audfrac x, audfrac y)
+   70    inline-only   void audvec2_Copy(audfrac* dest, audfrac* srce)
+   82    inline-only   void audvec2_Decumulate(audfrac* dest, audfrac* srce)
+  112    inline-only   void audvec2_Shl(audfrac* dest, uint8 shift)
+  204    inline-only   void audvec3_Copy(audfrac* dest, audfrac* srce)
+  218    inline-only   void audvec3_Decumulate(audfrac* dest, audfrac* srce)
+  232    inline-only   void audvec3_Sub(audfrac* dest, audfrac* v1, audfrac* v2)
+  253    inline-only   void audvec3_Shl(audfrac* dest, uint8 shift)
+  272    inline-only   void audvec3_Shr(audfrac* dest, uint8 shift)

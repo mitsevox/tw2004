@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Spectator/spectatorTexture.h
+// compiled in: golf2_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   75  00143610      4  void CSpectatorTexture::CSpectatorTexture(const struct CSpectatorTexture* this)
+   76  00143710      4  void CSpectatorTexture::~CSpectatorTexture(const struct CSpectatorTexture* this)
+   83    inline-only   TextureRef CSpectatorTexture::GetTexture(const struct CSpectatorTexture* this)
+   84    inline-only   TextureRef CSpectatorTexture::GetTintTexture(const struct CSpectatorTexture* this)

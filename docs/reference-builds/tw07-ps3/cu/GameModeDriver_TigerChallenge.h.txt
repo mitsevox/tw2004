@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/Headers/GameModeDriver_TigerChallenge.h
+// compiled in: golf_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   28  0033EFB0      8  enum eLoadingScreens GameModeDriverTigerChallenge::GetFirstLoadingScreen(const struct GameModeDriverTigerChallenge* this)
+   29  0033EFB8      8  enum eLoadingScreens GameModeDriverTigerChallenge::GetLastLoadingScreen(const struct GameModeDriverTigerChallenge* this)
+   41    inline-only   void GameModeDriverTigerChallenge::SetCurrentEventIndex(const struct GameModeDriverTigerChallenge* this, int iGame)
+   43    inline-only   int GameModeDriverTigerChallenge::GetNumEvents(const const struct GameModeDriverTigerChallenge* this)
+   47    inline-only   struct TigerChallengeEvent_t* GameModeDriverTigerChallenge::GetTigerChallengeEventInfoPtr()
+   64  0033EFC0      8  bool GameModeDriverTigerChallenge::GiveExperience(const struct GameModeDriverTigerChallenge* this)
+   71  0033EFC8      8  bool GameModeDriverTigerChallenge::AIUseDisplayStats(const struct GameModeDriverTigerChallenge* this)

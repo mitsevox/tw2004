@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/GameMode/Headers/GameMode_BloodGreenSome.h
+// compiled in: golf_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   40  0033EA58      8  bool GameModeBloodGreenSome::AdjustBallTargetToBeInView(const struct GameModeBloodGreenSome* this)
+   59  0033EA60      8  bool GameModeBloodGreenSome::AllowUserShotClockOverride(const struct GameModeBloodGreenSome* this)

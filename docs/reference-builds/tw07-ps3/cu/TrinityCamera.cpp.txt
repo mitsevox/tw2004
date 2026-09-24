@@ -1,0 +1,15 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_trinity/trinity/Runtime/src/TrinityCamera.cpp
+// compiled in: TrinityCamera.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   28  0058FA40     58  void InitCamera(const struct <anon>* this, struct Sequence* pSequence, int32_t cameraId, float_t lerpOutTime, const char* camera)
+   40  0058FA98     FC  void ReInitCamera(const struct <anon>* this)
+   58  0058FB94    1F0  void Tick(const struct <anon>* this, float_t fDeltaSec)
+                         local  float_t fFOV
+                         local  vec4flt vPos
+  127  0058FD84      C  int32_t GetCameraId(const const struct <anon>* this)
+  139  0058FD90     B0  void SetFOVKeys(const struct <anon>* this, int32_t numKeys, const struct Key1d* pKeys)
+  153  0058FE40     B0  void SetFOVKeys(const struct <anon>* this, int32_t numKeys, const struct Key4d* pKeys)
+  167  0058FEF0     B0  void SetFOVKeys(const struct <anon>* this, int32_t numKeys, const struct Coeff* pKeys)
+  180  0058FFA0    144  void GetFOV(const struct <anon>* this, const float_t& fFOV)
+                         local  float_t fAspectRatio

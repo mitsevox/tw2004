@@ -1,0 +1,33 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/GoTerrain_TGD.c
+// compiled in: golf_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   24  002B21EC     18  static void Ter_LoadTGDFromStreamStatic(struct TStreamData* pStreamData)
+   32  002B1FFC    1F0  void Ter_TerrainGameDataMgr::Ter_LoadTGDFromStream(const struct Ter_TerrainGameDataMgr* this, struct TStreamData* pStreamData)
+                         local  int i
+                         local  int j
+                         inlines  LF_vInitStandardLightingEnvironment, LF_vSetCurrentLightFogEnvironment
+  199  002B2204     C4  void Ter_TerrainGameDataMgr::Ter_LoadTGDFromFile(const struct Ter_TerrainGameDataMgr* this, char* pFilepath)
+                         local  int32 iFileLength
+                         local  void* vpFilePtr
+                         local  struct TStreamData streamData
+  221  00217C20     1C  static int Ter_PtrComp(const void* ptr1, const void* ptr2)
+  226  0024BE78    45C  void Ter_TerrainGameDataMgr::CopyMorphedVerts(const struct Ter_TerrainGameDataMgr* this)
+                         local  const char[17] __FUNCTION__
+                         local  uint32 i
+                         local  uint32 maxVertCount
+                         local  vec3flt*** vertMorphPtrsBase
+                         local  vec3flt*** vertMorphPtr
+                         local  uint32 uniqueVerts
+                         local  vec3flt* pMorphedTGDVerts
+                         inlines  TagValuePair, operator+, vec3flt_Copy
+  320  00217C3C      8  uint32 Ter_TerrainGameDataMgr::GetNumMorphedVerts(const struct Ter_TerrainGameDataMgr* this)
+  329  00217C44     50  int32 Ter_TerrainGameDataMgr::GetMorphedVertIndex(const struct Ter_TerrainGameDataMgr* this, vec3flt* vertPtr)
+                         local  intptr_t offset
+  344  00217C94     48  bool Ter_TerrainGameDataMgr::IsMorphableVert(const struct Ter_TerrainGameDataMgr* this, vec3flt* vertPtr)
+  353  001EE470      8  TGD_TerrainInfo* Ter_TerrainGameDataMgr::GetTGD(const struct Ter_TerrainGameDataMgr* this)
+  358  00217CDC     88  void Ter_TerrainGameDataMgr::Ter_vCloseModule(const struct Ter_TerrainGameDataMgr* this)
+  374  00217D64     88  void Ter_TerrainGameDataMgr::Ter_DeInitForHole(const struct Ter_TerrainGameDataMgr* this)
+  390  00217DEC     18  void Ter_TerrainGameDataMgr::Ter_vInitModule(const struct Ter_TerrainGameDataMgr* this)
+  401  00217E04     44  void Ter_TerrainGameDataMgr::Ter_vRegisterStreamClients(const struct Ter_TerrainGameDataMgr* this)
+  412  00217E48     2C  void Ter_TerrainGameDataMgr::Ter_vUnregisterStreamClients(const struct Ter_TerrainGameDataMgr* this)

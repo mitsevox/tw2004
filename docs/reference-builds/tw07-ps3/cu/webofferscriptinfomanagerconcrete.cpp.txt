@@ -1,0 +1,16 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/webofferscriptinfomanagerconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   69  005D40B8    598  void CreateDefaultList(const struct <anon>* this)
+                         local  struct <anon>* pItem
+                         inlines  SetDateDefault, SetFailureMessageDefault, SetTimeoutMessageDefault, SetURLTagDefault, SetWaitContentDefault, SetWaitTitleDefault
+  192  005D4650     88  void WebOfferScriptInfoManagerConcrete(const struct <anon>* this)
+  227  005E6598     94  void ~WebOfferScriptInfoManagerConcrete(const struct <anon>* this)
+                         inlines  operator=
+  256  005E9000     FC  struct WebOfferScriptInfo* AddNewEntry(const struct <anon>* this, int32_t iScriptType)
+                         local  struct <anon>* pNewItem
+                         local  struct WebOfferScriptInfo* pLast
+                         inlines  SetNext, operator OSDK::WebOfferScriptInfo*, operator=
+  299  005D8618    100  struct WebOfferScriptInfo* FindEntry(const struct <anon>* this, int32_t iScriptType, bool bTimeCheck)
+                         local  struct <anon>* pFound

@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/CRWater.h
+// compiled in: headgate_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   40    inline-only   void BEMHandler::UpdateTime(const struct BEMHandler* this, float elapsedSeconds)
+   75    inline-only   void BEMHandler::SetFirstRender(const struct BEMHandler* this, bool b)
+   83    inline-only   void BEMHandler::SetRippleTime(const struct BEMHandler* this, float f)
+   84    inline-only   void BEMHandler::SetRipplePos(const struct BEMHandler* this, float x, float z)

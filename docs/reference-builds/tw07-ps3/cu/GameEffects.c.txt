@@ -1,0 +1,92 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameEffects.c
+// compiled in: golf_unity.cpp
+// 29 functions, source order. line | PS3 address | size
+
+  102  001FB4A8     4C  void GameEffects_InitGameEffectSettings()
+  121  002D3380    120  void GameEffects_ResetGameEffectSettings()
+                         local  int i
+  157  001FB4F4     30  void GameEffects_ResetGameEffectTimeSettings()
+  173  001EE0F0    188  int GameEffects_BallUpdatesThisFrame(enum PlayerNumber_t playerID)
+                         inlines  GameEffects_StartOfSlowMoFrame
+  219  0030F0A8    214  void GameEffects_ScriptedGameBreakerTrigger(enum PlayerNumber_t playerID, enum GameBreakerTrigger_e triggerType)
+  286  002EF1F4    21C  void GameEffects_ScriptedGameBreakerBallHitTrigger(enum PlayerNumber_t playerID)
+                         local  CameraController_t* pCameraController
+                         local  enum Lie_t startLie
+                         local  uint32 endLie
+                         local  float shotDist
+                         inlines  GameEffects_SetDoubleTime, GameEffects_SetHalfTime
+  340  00315EF4    398  bool GameEffects_IsScriptedGameBreaker(enum PlayerNumber_t playerID)
+                         local  int par
+                         local  int strokes
+                         local  float distanceToPin
+                         local  bool isGameBreaker
+                         local  struct TGD_MaterialInfo* aimLie
+                         local  TGD_TerrainInfo* pTerrainData
+                         inlines  GM_GetPlayerHoleStrokes, GM_IsPuttForLead, GM_IsPuttForWin, Singleton<HighScoreRecords>::GetSingleton
+  450  003129E4    524  void GameEffects_InFlightGameBreakerTrigger(enum PlayerNumber_t playerID)
+                         local  float shotDistance
+                         local  enum Lie_t startLie
+                         local  uint32 endLie
+                         local  float interpTime
+                         local  float interpSpeed
+                         local  enum CameraInterpType_e interpType
+                         local  CameraController_t* pCameraController
+                         local  CameraSequence_t* pCameraSeq
+                         local  CameraChainLink* newLink
+                         local  enum CameraEvent_e timeTrigger
+                         local  float timeTriggerTime
+                         local  vec4flt startToEnd
+                         local  TGD_TerrainInfo* pTerrainData
+                         local  vec4flt actualBallToEnd
+                         local  float actualDistanceLeft
+                         inlines  CamScript_DoesScriptTrackGolfer, GameEffects_SetDoubleTime, GameEffects_SetHalfTime, LLMath_Length3, LLMath_Subtract3, vec_madd, vec_sld
+  634  0031930C    4A0  bool GameEffects_IsInFlightGameBreaker(enum PlayerNumber_t playerID, struct PhysicsBall_t* ball, float* shotDistance, struct TGD_MaterialInfo** startLie, struct TGD_MaterialInfo** endLie)
+                         local  float distanceToPin
+                         local  vec4flt startToEnd
+                         local  int par
+                         local  int strokes
+                         local  bool isGameBreaker
+                         local  TGD_TerrainInfo* pTerrainData
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, LLMath_Length3, LLMath_Subtract3, Singleton<HighScoreRecords>::GetSingleton, vec_madd, vec_sld
+  813  00319BA8    1C4  void GameEffects_EndGameBreaker(enum PlayerNumber_t playerID)
+                         inlines  Gaud_StartRegularComment
+  880  00319D6C     E4  void GameEffects_RenderGameBreakerEffects()
+  921  002FF918    304  void GameEffects_RenderPredictedGB()
+                         local  float letterBoxHeight
+                         local  vec4flt distToBallVec
+                         local  float distToBall
+                         inlines  GameEffects_SetHalfTime, LLMath_Length3, LLMath_Subtract3, vec_madd, vec_sld
+ 1144  002FF7EC    12C  void GameEffects_RenderScriptedGB()
+                         local  float letterBoxHeight
+ 1203  002FF5E8    204  void GameEffects_DrawLetterBoxes(float height)
+                         local  float[2][4] boxVerts
+                         local  float[2][4] boxUVs
+                         local  vec4flt color
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetZBufferMode, PR_vFillVerticesWith2DRect, PR_vSetCurrentColor, PR_vSetCurrentUsage, vec_st
+ 1246  00247D58     C4  float GameEffects_FieldOfViewChange()
+ 1311  001EE3CC     14  float GameEffects_DepthOfFieldChange(float curDOF)
+ 1359  001EE498     48  bool GameEffects_SimulateBall(enum PlayerNumber_t playerID)
+ 1373  00249698     E0  void GameEffects_SpinWindowDone(enum PlayerNumber_t playerID)
+ 1392  001F2058     18  bool GameEffects_IsSlowDownSwingOn(enum PlayerNumber_t playerID)
+ 1397  0027D938    240  void GameEffects_UpdateSlowDownEffect(enum PlayerNumber_t playerID)
+                         local  float percentSwingDone
+                         local  float earlyBallHit
+                         local  CameraController_t* pCameraController
+                         inlines  GamePlayer::GetCharacter, std::sqrt
+ 1440  00253C6C     7C  void GameEffects_SlowDownBallHit(enum PlayerNumber_t playerID)
+ 1457  002D3240    140  void GameEffects_SetSuperSlowMo(bool on, float amount, enum PlayerNumber_t ePlayerID)
+ 1508  001FB52C     24  void GameEffects_SpeedyTimeStart()
+ 1519  001FB550     94  void GameEffects_UpdateGameEffects(enum PlayerNumber_t PlayerID)
+                         local  enum PlayerCtrl_t controllerNumber
+ 1547  001FB5E4     C8  void GameEffects_VibrateControllerForHeartbeat(enum PlayerNumber_t PlayerID)
+                         local  enum PlayerCtrl_t controllerNumber
+ 1577  00319AFC     AC  bool GameEffects_SkipOtherCommentary()
+ 1608  003197AC    350  bool GameEffects_ScriptedGBDidIt(struct PhysicsBall_t* ball, enum PlayerNumber_t ePlayerID, bool predicted)
+                         local  bool par5in2
+                         local  int recordBall
+                         local  int trophyBall
+                         local  int numStrokes
+                         local  bool bTriggerIncludesGoingForGreenIn2
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, Singleton<HighScoreRecords>::GetSingleton
+ 1682  002D2E44     AC  void GameEffects_Pause(bool pauseOn)
+ 1721  001FB748     54  float GameEffects_GetLetterboxHeight()

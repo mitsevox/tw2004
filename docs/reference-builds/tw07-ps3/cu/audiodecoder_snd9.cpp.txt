@@ -1,0 +1,23 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/MoviePlayer/audiodecoder_snd9.cpp
+// compiled in: golf2_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   40  00184B7C    120  void AudioDecoder_Snd9(const struct <anon>* this, struct IResourceAllocator* allocator)
+                         local  const char[18] __FUNCTION__
+                         inlines  AssertMacroHelper, PrintMacroHelper
+   55  0015414C     AC  void ~AudioDecoder_Snd9(const struct <anon>* this)
+                         inlines  PrintMacroHelper, ~IAudioDecoder
+   64  001541F8     74  void Init(const struct <anon>* this, struct IResourceAllocator* allocator)
+                         inlines  PrintMacroHelper
+   73  0017E900     F0  void Shutdown(const struct <anon>* this)
+                         inlines  Free, PrintMacroHelper
+   95  001BE554    474  void SetStreamTapHandle(const struct <anon>* this, struct <anon>* streamTapHandle, int streamRequestId)
+                         local  const int STRMTAP_MAX_REQUESTS
+                         local  const int STRMTAP_MAX_CHUNKS
+                         local  int overhead
+                         local  SNDPLAYOPTS spo
+                         inlines  Allocate, AssertMacroHelper, Free, PrintMacroHelper, Resource, ResourceDescriptor, ~BaseResourceDescriptors, ~ResourceDescriptor
+  158  0015D38C     D4  void Decode(const struct <anon>* this, struct <anon>** ppAudioRenderable)
+                         local  const char[7] __FUNCTION__
+                         inlines  AssertMacroHelper, PrintMacroHelper
+  175  0014A9E0      C  int GetSndStrmHandle(const struct <anon>* this)

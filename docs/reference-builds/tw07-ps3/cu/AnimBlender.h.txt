@@ -1,0 +1,15 @@
+// ../../../../../TIGERCODE/Code/Golf/Animation/Headers/AnimBlender.h
+// compiled in: golf2_unity.cpp, golf_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   48  001E7448     18  void TSKABlendState::~TSKABlendState(const struct TSKABlendState* this)
+   51  001E7498      4  void TSKABlendState::Init(const struct TSKABlendState* this)
+   75  001E74D0     18  void TSKABlendData::~TSKABlendData(const struct TSKABlendData* this)
+   78  001E749C      8  int TSKABlendData::NumSKAsInBlender(const const struct TSKABlendData* this)
+   80  001E74A4     14  float TSKABlendData::GetTagTime(const const struct TSKABlendData* this, uint64 tag)
+  104  001E74B8      8  enum SKABLENDTYPE TSKABlender::GetBlendType(const const struct TSKABlender* this)
+  111    inline-only   bool TSKABlender::IsBlenderFull(const const struct TSKABlender* this)
+  145  001E74C0      8  int TSKAChannel::NumSKAsInBlender(const const struct TSKAChannel* this)
+  151  001E74C8      8  enum SKABLENDTYPE TSKAChannel::GetBlendType(const const struct TSKAChannel* this)
+  220    inline-only   void SKATime_SetTimeScale(struct TSKATime* pTime, float scale)
+  225    inline-only   float SKATime_GetTimeScale(struct TSKATime* pTime)

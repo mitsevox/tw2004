@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_Chiron.cpp
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   19  00033330     68  void UIChiron::Init(const struct UIChiron* this)
+   27  00033398     B8  void UIChiron::Show(const struct UIChiron* this, int32 songIndex)
+   48  0006CAC0    25C  enum TAptSequenceStatus UIChiron::HideAfterFiveSec(const struct UIChiron* this, bool inbFirstTime, void* inData)
+                         local  TI_STimeValue thisTime
+                         inlines  sys_time_get_timebase_frequency
+   66  00024A10      C  void UIChiron::NotifyOnGetText(const struct UIChiron* this)

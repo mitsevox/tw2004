@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/ProfileBars/profile_bars.h
+// compiled in: golf_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   28  00228318     B4  void ProfileBars::ProfileBars(const struct ProfileBars* this)
+                         local  unsigned int i
+   29  00228480      4  void ProfileBars::~ProfileBars(const struct ProfileBars* this)

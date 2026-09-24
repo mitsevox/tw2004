@@ -1,0 +1,5 @@
+// C:/packages/rwaudiocore/2.08.01/include/rw/audio/core/plugins/send.h
+// compiled in: send.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   63  006DA2F0      8  unsigned int GetSize(struct PlugInConfig* )

@@ -1,0 +1,21 @@
+// C:/packages/rwaudiocore/2.08.01/source/plugins/gainfader.cpp
+// compiled in: gainfader.cpp
+// 5 functions, source order. line | PS3 address | size
+
+    0  006D942C     2C  void ~GainFader(const struct <anon>* this)
+                         inlines  ~PlugIn
+  140  006D925C      8  struct <anon>* GetPlugInDescRunTime()
+  146  006D93F4     30  bool CreateInstance(struct PlugIn* pPlugIn, void* pConstructorParams)
+                         local  struct <anon>* pThis
+                         inlines  Initialize<rw::audio::core::GainFader>
+  162  006D9264    11C  void EventEvent(const struct <anon>* this, int event, void* pParameterBuffer)
+                         local  const char[11] __FUNCTION__
+                         local  struct <anon>* pSystem
+                         local  struct StartFadeParams* pParams
+                         local  struct StartFadeCommand* pCommand
+                         local  int fadeType
+                         inlines  GetCommandSlot, GetSystem
+  190  006D9380     74  int StartFadeHandler(struct <anon>* pCommand)
+                         local  struct <anon>* pThis
+                         local  struct StartFadeCommand* pStartFadeCommand
+                         inlines  HandlerGetThis<rw::audio::core::GainFader, rw::audio::core::GainFader::StartFadeCommand>

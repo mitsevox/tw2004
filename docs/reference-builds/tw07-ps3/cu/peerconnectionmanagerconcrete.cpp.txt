@@ -1,0 +1,185 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/peerconnectionmanagerconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 38 functions, source order. line | PS3 address | size
+
+   81  00624994      C  void ~RecentPlayers(const struct <anon>* this)
+   85    inline-only   void AddRecentPlayer(const struct <anon>* this, const char8_t* strName, const char8_t* strMachineAddr)
+                         local  int32_t iPrevIndex
+                         local  int32_t iIndex
+                         local  int32_t iCurSlot
+                         local  struct RecentPlayerT* pPlayer
+                         local  struct RecentPlayerT* pPlayer
+  143    inline-only   const char8_t* GetRecentPlayerAddress(const const struct <anon>* this, const char8_t* strName)
+                         local  const char8_t* strAddr
+                         local  int32_t iSlot
+  163    inline-only   int32_t FindRecentPlayer(const const struct <anon>* this, const char8_t* strName)
+                         local  int32_t iPlayerIndex
+                         local  uint32_t uIndex
+  179    inline-only   void SetRecentPlayer(const struct <anon>* this, uint32_t uIndex, const char8_t* strName, const char8_t* strAddr)
+  236  005DB208    1E8  struct GameUser* GetGameUserFromClientList(const struct PeerConnectionManagerConcrete* this, uint32_t uClientIndex)
+                         local  const ConnApiClientListT* pClients
+                         local  const char8_t* strClientName
+                         local  const struct List<OSDK::GameUser>* pGameUsers
+                         local  uint32_t uNumGameUsers
+                         local  uint32_t uIndex
+                         local  struct GameUser* pGameUser
+                         local  struct <anon>* pLocalUser
+                         local  struct GameSession* pGameSession
+                         inlines  GetElementAt, GetNumberOfElements, operator->
+  303  005DCE14     EC  struct VoiceUser* GetVoiceUserFromClientList(const struct PeerConnectionManagerConcrete* this, uint32_t uClientIndex)
+                         local  const ConnApiClientListT* pClients
+                         local  const char8_t* strClientName
+                         local  uint32_t uNumVoiceUsers
+                         local  uint32_t uIndex
+                         local  struct VoiceUser* pVoiceUser
+                         inlines  GetElementAt, GetNumberOfElements
+  342  0060DFE0     D0  struct VoiceUser* CreateVoiceUserFromClientList(const struct PeerConnectionManagerConcrete* this, uint32_t uClientIndex)
+                         local  const ConnApiClientListT* pClients
+                         local  const ConnApiClientT* pClient
+                         local  const char8_t* strClientName
+                         local  uint32_t uVoipId
+                         local  struct UserConcrete* pUser
+                         inlines  operator new
+  378  0060E3C0     80  void ConnApiCallback(ConnApiRefT* , ConnApiCbInfoT* pCbInfo, void* pUserData)
+                         local  struct PeerConnectionManagerConcrete* pPeerConnectionManager
+  421  0060E0B0    310  void HandleConnApiVoiceCallback(const struct PeerConnectionManagerConcrete* this, ConnApiCbInfoT* pCbInfo)
+                         local  uint32_t uNumElements
+                         local  struct PeerConnectSessionObserver** pList
+                         local  const ConnApiClientListT* pClients
+                         local  struct VoiceUser* pVoiceUser
+                         local  uint32_t uNumElements
+                         local  struct PeerConnectSessionObserver** pList
+                         local  struct VoiceUser* pVoiceUser
+                         local  uint32_t uNumElements
+                         local  struct PeerConnectSessionObserver** pList
+                         local  struct UserConcrete* pLocalUser
+                         inlines  GetMaxNumberOfObservers, GetObserverList, operator new
+  492  005F3CF8    6F0  void HandleConnApiGameCallback(const struct PeerConnectionManagerConcrete* this, ConnApiCbInfoT* pCbInfo)
+                         local  uint32_t uNumElements
+                         local  struct PeerConnectSessionObserver** pList
+                         local  struct <anon>* pFacade
+                         local  struct <anon>* pLocalUser
+                         local  struct <anon>* pFacade
+                         local  struct <anon>* pLocalUser
+                         local  uint32_t uNumElements
+                         local  struct PeerConnectSessionObserver** pList
+                         local  const ConnApiClientListT* pClients
+                         local  struct GameUser* pGameUser
+                         local  struct PeerConnection* pPeerConnection
+                         local  struct <anon>* pGameUserConcrete
+                         local  uint32_t uNumElements
+                         local  struct PeerConnectSessionObserver** pList
+                         local  const ConnApiClientListT* pClients
+                         local  const char8_t* strClientName
+                         local  struct PeerConnection* pPeerConnection
+                         local  uint32_t uNumElements
+                         local  struct PeerConnectSessionObserver** pList
+                         local  struct RecentPlayerT* pPlayer
+                         local  struct RecentPlayerT* pPlayer
+                         inlines  AddRecentPlayer, FindRecentPlayer, GetMaxNumberOfObservers, GetObserverList, InsertElement, RegisterConnection, SetRecentPlayer, operator new
+  581  005D38CC     AC  void HandleConnApiGlobalCallback(const struct PeerConnectionManagerConcrete* this)
+                         local  uint32_t uNumElements
+                         local  struct PeerConnectSessionObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  609  005BCF1C      4  void GameSessionAdded(const struct PeerConnectionManagerConcrete* this, struct GameSession* )
+  633  005CC654     A4  void GameSessionChanged(const struct PeerConnectionManagerConcrete* this, struct GameSession* pGameSession)
+  660  005CC578     DC  void GameSessionDeleted(const struct PeerConnectionManagerConcrete* this, struct GameSession* pGameSession)
+  690  005E2978    1A4  void GameSessionJoined(const struct PeerConnectionManagerConcrete* this, struct GameSession* pGameSession)
+                         local  const struct List<OSDK::GameUser>* pGameUsers
+                         local  uint32_t uNumGameUsers
+                         local  const char8_t* pLocalUserName
+                         local  char8_t[16] strEvent
+                         local  uint32_t uIndex
+                         local  struct GameUser* pGameUser
+                         local  const char8_t* pGameUserName
+                         inlines  GetElementAt, GetNumberOfElements
+  729  005EF250    214  void GameSessionLeft(const struct PeerConnectionManagerConcrete* this, struct GameSession* , enum GameSessionLeftReason eReason)
+                         inlines  Instance, cOsdkBase
+  763  005BCF20      4  void GameSessionStarted(const struct PeerConnectionManagerConcrete* this, struct GameSession* )
+  788  005D68D4    2E8  void Init(const struct PeerConnectionManagerConcrete* this)
+                         local  const struct CoreGameParameters* pParameters
+                         local  struct <anon>* pFacade
+                         local  LobbyApiRefT* pLobbyApi
+                         local  const char8_t* strPersona
+                         local  const char8_t* strPartition
+                         local  DirtyAddrT* pDirtyAddr
+                         local  uint32_t uBufSize
+                         local  const char8_t* strConfig
+                         local  int32_t iTimeout
+                         local  uint32_t uGamePort
+                         local  uint32_t uMaxPeerConnections
+                         local  struct MemoryStrategy* pMemory
+                         inlines  GetInstance, GetLobbyApi, List, operator=
+  857  005BCF68     C0  void UpdateSession(const struct PeerConnectionManagerConcrete* this, struct GameSession* pGameSession)
+                         inlines  EnterGame
+  886  005BCF24     44  bool IsInGame(const const struct <anon>* this)
+  910    inline-only   void EnterGame(const struct PeerConnectionManagerConcrete* this, struct GameSession* )
+                         local  VoipRefT* pVoip
+  946  005BD028     7C  void CreateConnectionApi(const struct PeerConnectionManagerConcrete* this, uint32_t uGamePort, uint32_t uMaxPeerConnections)
+  979  005CE69C    180  bool AreAllPeersInState(const const struct <anon>* this, uint32_t uState)
+                         local  const ConnApiClientListT* pClients
+                         local  const char8_t* strPersona
+                         local  bool bInState
+                         local  int32_t iStatus
+                         local  bool bCheckGameConnection
+                         local  bool bCheckVoipConnection
+                         local  uint32_t uClientIndex
+                         local  uint32_t uGameStatus
+                         local  uint32_t uVoipStatus
+ 1034  005CE51C    180  bool AreAllPeerConnectionsComplete(const struct PeerConnectionManagerConcrete* this)
+                         local  const ConnApiClientListT* pClients
+                         local  const char8_t* strPersona
+                         local  bool bCompleted
+                         local  int32_t iStatus
+                         local  bool bCheckGameConnection
+                         local  bool bCheckVoipConnection
+                         local  uint32_t uClientIndex
+                         local  uint32_t uGameStatus
+                         local  uint32_t uVoipStatus
+ 1092  005E81FC     C4  void PeerConnectionManagerConcrete(const struct PeerConnectionManagerConcrete* this)
+                         inlines  GetInstance, Observable, RCPointer
+ 1119  005E42F0    114  void ~PeerConnectionManagerConcrete(const struct PeerConnectionManagerConcrete* this)
+                         local  ProtoUpnpRefT* pProtoUpnp
+                         inlines  GetInstance, operator delete, ~Observable, ~RCPointer
+ 1156  005DD198    1C8  void Disconnect(const struct PeerConnectionManagerConcrete* this, enum DisconnectReasonE eReason)
+                         local  uint32_t uNumElements
+                         local  VoipRefT* pVoip
+                         inlines  GetNumberOfElements
+ 1217    inline-only   void RegisterConnection(const struct PeerConnectionManagerConcrete* this, struct PeerConnection* pPeerConnection)
+ 1245  005D9860    118  void UnregisterConnection(const struct PeerConnectionManagerConcrete* this, struct PeerConnection* pPeerConnection, enum DisconnectReasonE eReason)
+                         local  struct PeerConnectionConcrete* pPeerConnectionConcrete
+                         local  struct <anon> pTempPeerConnection
+                         local  uint32_t uNumElements
+                         local  struct PeerConnectSessionObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList, RCPointer, RemoveElement, ~RCPointer
+ 1278  005D3CA8     88  void RegisterVoiceUser(const struct PeerConnectionManagerConcrete* this, struct VoiceUser* pVoiceUser)
+                         inlines  ElementExists, InsertElement
+ 1308  005D0740    10C  void UnregisterVoiceUser(const struct PeerConnectionManagerConcrete* this, struct VoiceUser* pVoiceUser)
+                         local  uint32_t uNumElements
+                         local  struct PeerConnectSessionObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList, RemoveElement
+ 1342  005CE81C     28  bool AreAllPeersConnected(const const struct <anon>* this)
+ 1367  00621064    334  void StateChanging(const struct PeerConnectionManagerConcrete* this, enum OsdkState eOldState, enum OsdkState eNewState)
+                         local  struct <anon>* pFacade
+                         local  struct GameSessionConcrete* pJoinedGameSession
+                         local  const struct List<OSDK::GameUser>* pNewGameUsers
+                         local  uint32_t uNumPeerConnections
+                         local  uint32_t uNumNewGameUsers
+                         local  uint32_t uConnectionIndex
+                         local  struct PeerConnectionConcrete* pPeerConnection
+                         local  struct <anon> pPeerGameUser
+                         local  uint32_t uGameUserIndex
+                         local  struct GameUser* pCurrentGameUser
+                         inlines  GetElementAt, GetInstance, GetJoinedGameSession, GetNumberOfElements, RCPointer, RemoveObserver, SetGameUser, operator->, operator=, ~RCPointer
+ 1448  005E16C4     90  void StateChanged(const struct PeerConnectionManagerConcrete* this, enum OsdkState eOldState, enum OsdkState eNewState)
+                         local  struct <anon>* pFacade
+                         inlines  AddObserver, GetInstance, operator=
+ 1478  005DD360     F0  struct PeerConnection* GetPeerConnection(const const struct <anon>* this, const char8_t* strPeerName)
+                         local  struct PeerConnection* pPeerConnection
+                         local  uint32_t uNumElements
+                         local  uint32_t uIndex
+                         local  struct PeerConnection* pThisPeerConnection
+                         inlines  GetElementAt, GetNumberOfElements
+ 1517  005B6B4C     4C  bool IsGameDoneProcessing(const const struct <anon>* this)
+ 1541  005BD0A4     B8  const char8_t* GetRecentPlayerAddress(const char8_t* strName)
+                         inlines  GetRecentPlayerAddress

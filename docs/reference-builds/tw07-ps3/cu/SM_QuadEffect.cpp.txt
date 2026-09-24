@@ -1,0 +1,22 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_QuadEffect.cpp
+// compiled in: shader_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+  104  0050D968     20  void* SM_QuadEffectClass::GetVertexShaderToUse(const struct SM_QuadEffectClass* this, enum eQuadEffect quadEffect)
+  109  0050D988     24  void* SM_QuadEffectClass::GetPixelShaderToUse(const struct SM_QuadEffectClass* this, enum eQuadEffect quadEffect)
+  114  0050D9AC     54  struct LS_VertexAttribute* SM_QuadEffectClass::GetVertexAttributeToUse(const struct SM_QuadEffectClass* this, enum eQuadEffect quadEffect)
+  120  0050DA00     54  uint32 SM_QuadEffectClass::GetVertexAttributeSizeToUse(const struct SM_QuadEffectClass* this, enum eQuadEffect quadEffect)
+  126  0050DA54     40  bool SM_QuadEffectClass::GetUsevtxStruct(const struct SM_QuadEffectClass* this)
+  131  0050DA94     4C  bool SM_QuadEffectClass::GetUsevtxSturctP(const struct SM_QuadEffectClass* this)
+  139  0050DAFC     E0  void SM_QuadEffectClass::Load(const struct SM_QuadEffectClass* this)
+                         local  int typeUsed
+  152  0050DAE0     1C  void SM_QuadEffectClass::InitializeParameters(const struct SM_QuadEffectClass* this)
+  161  0050DBDC     98  void SM_QuadEffectClass::GetShaderParameterHandle(const struct SM_QuadEffectClass* this)
+  170  005194C4     6C  void SM_QuadEffectClass::SetClearColor(const struct SM_QuadEffectClass* this, const float* color)
+                         inlines  vec4flt_Copy
+  181  00515480     64  void SM_QuadEffectClass::SetTextureRef(const struct SM_QuadEffectClass* this, TextureRef textureref)
+  191  005154E4     64  void SM_QuadEffectClass::SetTextureRef3D(const struct SM_QuadEffectClass* this, TextureRef textureref)
+  201  00515548     64  void SM_QuadEffectClass::SetDepthTextureRef(const struct SM_QuadEffectClass* this, TextureRef textureref)
+  212  0050DE2C     D8  void SM_QuadEffectClass::Activate(const struct SM_QuadEffectClass* this)
+  232  0050DC74    1B8  void SM_QuadEffectClass::SetTexelSize(const struct SM_QuadEffectClass* this)
+  251  005155AC     A0  void SM_QuadEffectClass::SetQuadEffect(const struct SM_QuadEffectClass* this, enum eQuadEffect quadEffect)

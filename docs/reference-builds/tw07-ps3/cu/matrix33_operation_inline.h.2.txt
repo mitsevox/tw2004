@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/matrix33_operation_inline.h
+// compiled in: RNADevice.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   84    inline-only   struct <anon> vpu::Mult(struct <anon>& v, struct <anon>& m)
+                         local  Vector4Intrinsic_32 tmp
+                         local  VecFloatRefX refX
+                         local  VecFloatRefY refY
+                         local  VecFloatRefZ refZ
+                         local  Vector4Intrinsic_32 result

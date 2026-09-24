@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_AptFontFusion.cpp
+// compiled in: shader_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   33  0050D7BC     14  void* SM_AptFontFusionClass::GetVertexShaderToUse(const struct SM_AptFontFusionClass* this)
+   34  0050D7D0     14  void* SM_AptFontFusionClass::GetPixelShaderToUse(const struct SM_AptFontFusionClass* this)
+   35  0050D7E4     14  struct LS_VertexAttribute* SM_AptFontFusionClass::GetVertexAttributeToUse(const struct SM_AptFontFusionClass* this)
+   36  0050D7F8      8  uint32 SM_AptFontFusionClass::GetVertexAttributeSizeToUse(const struct SM_AptFontFusionClass* this)
+   39  0050D800     CC  void SM_AptFontFusionClass::Load(const struct SM_AptFontFusionClass* this)
+   47  005153EC     94  void SM_AptFontFusionClass::SetTextureRef(const struct SM_AptFontFusionClass* this, TextureRef textureref)

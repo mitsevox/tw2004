@@ -1,0 +1,47 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/voiceuserconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   78  005E4770     D8  void VoiceUserConcrete(const struct <anon>* this, struct UserConcrete* pUser, int32_t m_iVoiceChannel)
+                         local  const char8_t* strUserName
+                         local  uint32_t uUsernameBufferLength
+                         local  struct MemoryStrategy* pPersistentMemory
+  121  005E4964     5C  void ~VoiceUserConcrete(const struct <anon>* this)
+                         local  struct MemoryStrategy* pPersistentMemory
+  146  005C25AC     A4  bool IsMuted(const const struct <anon>* this)
+                         local  VoipRefT* pVoip
+                         local  bool bMuted
+                         local  uint32_t uRecvMask
+                         local  uint32_t uSendMask
+  196  0060DE38    148  void Mute(const struct <anon>* this)
+                         local  VoipRefT* pVoip
+                         local  bool bIsMuted
+                         local  struct UserConcrete* pUser
+                         local  uint32_t uRecvMask
+                         local  uint32_t uSendMask
+                         local  bool bLocalUserMuted
+                         inlines  SetDirty
+  260  0060DCCC    16C  void Unmute(const struct <anon>* this)
+                         local  VoipRefT* pVoip
+                         local  bool bIsMuted
+                         local  struct UserConcrete* pUser
+                         local  uint32_t uRecvMask
+                         local  uint32_t uSendMask
+                         local  bool bLocalUserMuted
+                         local  uint32_t uRecvMask
+                         inlines  SetDirty
+  324  005C2650      8  bool IsTalking(const const struct <anon>* this)
+  379  0060DA84     C0  void UpdateDirtyFlag(const struct <anon>* this)
+                         local  bool bCurTalkingStatus
+                         local  bool bCurMutedStatus
+                         local  struct UserConcrete* pUser
+                         inlines  SetDirty
+  416  0060DA64     20  struct User* GetAsUser(const const struct <anon>* this)
+  440  0060DA04     60  struct UserConcrete* GetAsUserConcrete(const const struct <anon>* this)
+                         local  struct UserConcrete* pUser
+                         local  struct UserManagerConcrete* pUserManager
+  476  005C2658     44  void StickyMuteEnable(const struct <anon>* this)
+  502  005C269C      C  void StickyMuteDisable(const struct <anon>* this)
+  527  005CDE34     54  bool IsAvailable(const const struct <anon>* this)
+                         inlines  GetInstance
+  551  005C26A8      8  bool HasHeadset(const const struct <anon>* this)

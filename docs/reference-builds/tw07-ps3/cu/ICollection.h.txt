@@ -1,0 +1,5 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/ICollection.h
+// compiled in: RBTree.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   82  0080D3D0     6C  void ~ICollection(const struct ICollection* this)

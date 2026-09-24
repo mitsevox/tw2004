@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_WaterOcean.h
+// compiled in: shader_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    8  00520FB0     18  void SM_WaterOceanBaseClass::~SM_WaterOceanBaseClass(const struct SM_WaterOceanBaseClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base
+  159  00520420     38  void SM_WaterOceanLoResClass::~SM_WaterOceanLoResClass(const struct SM_WaterOceanLoResClass* this)
+                         inlines  SM_WaterOceanBaseClass::~SM_WaterOceanBaseClass
+  175  00520408     18  void SM_WaterOceanHiResClass::~SM_WaterOceanHiResClass(const struct SM_WaterOceanHiResClass* this)
+                         inlines  SM_WaterOceanBaseClass::~SM_WaterOceanBaseClass

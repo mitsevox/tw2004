@@ -1,0 +1,7 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/slowpass.cpp
+// compiled in: slowpass.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   43  006C9F78    154  int SNDCTRL_lowpass(int shandle, int lowpasscutoff)
+                         local  int setvoice
+                         local  int voice

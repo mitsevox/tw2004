@@ -1,0 +1,52 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_Tutorial.cpp
+// compiled in: apt_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+  352  0005C294    288  void _ReorderArray()
+                         local  const char[14] __FUNCTION__
+                         local  int[17] aiRemap
+                         local  const int32 kSizeAiRemap
+                         local  struct tAnimPlayer* aCopiedPlayers
+                         local  int i
+                         local  int32 iStartRemapIdx
+                         local  int32 iStartIdx
+                         local  int j
+                         inlines  TagValuePair, operator+
+  406  000FAB88     5C  void UITutorial::UITutorial(const struct UITutorial* this)
+  417  0005C51C     78  void UITutorial::Init(const struct UITutorial* this)
+  435  0004E770     C0  void UITutorial::Show(const struct UITutorial* this)
+  462  0004E830      4  void UITutorial::OnShow(const struct UITutorial* this)
+  466  0004E834     5C  void UITutorial::Hide(const struct UITutorial* this)
+  477  0004E890      8  enum eAptHandleInput UITutorial::HandleInput(const struct UITutorial* this, int32 cID)
+  486  000567D0    3B0  enum AptThreadReturnValue UITutorial::UpdateControllerIcon(const struct UITutorial* this)
+                         local  char[40] szTutorialType
+                         local  int iTutorialTypeIdx
+                         local  int32 iFurthestTime
+                         local  int i
+                         local  int j
+  656  00076FB0     E0  void UITutorial::StartAnimation(const struct UITutorial* this)
+                         inlines  OnlineManagerOSDK::GetInstance, OnlineManagerOSDK::WaitingForChallenge
+  692  000554BC   1314  void UITutorial::AnimateControllerIcons(const struct UITutorial* this)
+                         local  int iTutorialTypeIdx
+                         local  TI_STimeValue currentTime
+                         local  int[14][14] aiAnimTimes
+                         local  struct tAnimFrame[14][14] aAnimFrames
+                         local  uint32 curControllerButtons
+                         local  struct Controller_StickInfo curControllerStickInfo
+                         local  int32 iConvertedLeftThumbX
+                         local  int32 iConvertedLeftThumbY
+                         local  int32 iConvertedRightThumbX
+                         local  int32 iConvertedRightThumbY
+                         local  int i
+                         local  int j
+                         local  int i
+                         local  int j
+                         local  int i
+                         local  int32 iStartInterval
+                         local  int32 iEndInterval
+                         local  int j
+                         local  struct tAnimFrame startFrame
+                         local  int32 iTimeDuration
+                         local  struct tAnimFrame diffFrame
+                         local  float fTimePct
+                         inlines  OnlineManagerOSDK::GetInstance, OnlineManagerOSDK::WaitingForChallenge, TI_fConvertTimeDifToSeconds

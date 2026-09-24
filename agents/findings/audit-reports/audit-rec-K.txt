@@ -1,0 +1,17 @@
+FE_CrAPMessages (89 functions: the Create-A-Player screen's message handlers). audit-rec-K, 2026-09-24.
+Names: kept 0 / renamed 0 / T3 0 / demoted 0 / unnamed 89. Every handler was already fn_<ADDR>, so none are named yet; the lanes' agreed guesses are in the ledger notes.
+Comments: ok 36 / fixed 11 / stripped 0 / none 42 (plus the unit header and the two declaration comments, lines 13 and 16: accurate). namecheck: 0 rows, 0 flags.
+Worst wrong comment: four comments said fn_8007873C "saves the profile" (80107FAC, 80108070, 8010840C, 801098B0). It saves nothing. It recomputes the created golfer's equipment tiers from its 53 slots (FE_Manager.c:757). Lane 1 made the same mistake.
+Other fixes: 80107C3C writes five values, not four. 80108E9C shows "And more..." when there are more than five categories, not four. 80108690's aPart holds the entry (b), not the part. 801098B0 did not do "what fn_80109FB4 does, with more parts". "Demo session" became "the session's 0x4000 mode" (only deduced). 801084F4 now splits by part 13. 80109CBC and 80109D5C also randomise the golfer.
+Unclear rule: a comment that is accurate but leaves out the main effect (80109CBC/D5C: "camera to shot" only). I treated it as misleading and rewrote it.
+
+Findings (no code changes):
+- 80108904 and 80109618: confirmed exact duplicates. Both pass (args0, args1..4) straight to fn_8010F7FC (palette colour to R, G, B, A). Two message slots use the same handler.
+- fn_800D256C (called by 8010A3C8): confirmed. It counts 1900 as a leap year. This is already marked as an EA bug in Calendar.c, and the day numbers depend on it. The declaration comment at line 16 is accurate.
+- 801093B4: confirmed. Lock kind 2 gives "Game Boy(R) Advance Link Required" (EA text in fn_8010651C; the string has the \xAE registered mark). Other lock kinds get the asset's CR_S text n110. The string is left unchanged when there is none or when i is out of range.
+- 80109EAC: not a bug. fn_801072CC takes (part, pLocked, pB1CC, pB344, pAll). The handler passes args3, args2, args4 and args1, so the message's order is total, owned, locked, new.
+- 8010A238: not a bug. It uses the same (part, entry) scheme as the other handlers, with fn_801062C8 finding the first slotted asset of the part that fits the entry. It needs no choice index. Small point: fn_801062C8 does not apply the fn_801061C8 "offered" filter that fn_801060F0 uses when it counts places.
+- 8010A3C8: its only oddity is the callee in Calendar.c (outside the unit's range). It has no indexing problem: args0 goes through as a u32 year.
+- 80109D5C and 80109FB4 skip the call their siblings make. That call is fn_8007873C, the equipment-tier recompute, not a save. Both randomise parts, so createdGolfer.tier can stay stale until the next select, buy or randomise. Possibly an EA oversight. Check before calling it an EA bug.
+- 8010A400: lane 1's "is unlocked" reading is wrong. fn_801074D4 is true for part 13 or for slot n2E in {2, 4..14}; it is not a lock test.
+- Process note: early on I read callees with `sed -n` in the worktree (read-only; nothing was edited). After that I used the tools the rules allow.

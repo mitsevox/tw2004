@@ -1,0 +1,16 @@
+// ../../../../../TIGERCODE/Code/Golf/Cameras/Headers/GoCamCont.h
+// compiled in: golf2_unity.cpp, golf_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+  379    inline-only   vec4flt* CameraController_GetCameraOrigin(CameraController_t* pCameraController)
+  384    inline-only   vec4flt* CameraController_GetCameraLookPoint(CameraController_t* pCameraController)
+  389    inline-only   vec3flt* CameraController_GetCameraViewScale(CameraController_t* pCameraController)
+  394    inline-only   vec3flt* CameraController_GetCameraViewOffset(CameraController_t* pCameraController)
+  411    inline-only   bool CameraController_IsFlybyDone(CameraController_t* pCameraController)
+                         local  bool bResult
+  479    inline-only   bool CameraController_RotatingBall(CameraController_t* pCameraController)
+  510    inline-only   float CameraController_GetInterpTimeLeft(CameraController_t* pCameraController)
+  525    inline-only   void CameraController_vResetDelayCounter(CameraController_t* pCameraController)
+  530    inline-only   float CameraController_fGetDelayCounter(CameraController_t* pCameraController)
+  535    inline-only   void CameraController_SetDelayCounter(CameraController_t* pCameraController, bool bOn)
+  540    inline-only   bool CameraController_bIsDelayCounterOn(CameraController_t* pCameraController)

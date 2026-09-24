@@ -1,0 +1,59 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_LowImpactMessages.cpp
+// compiled in: apt_unity.cpp
+// 27 functions, source order. line | PS3 address | size
+
+   30  000F4118     54  void UILowImpactMessages::UILowImpactMessages(const struct UILowImpactMessages* this)
+   35  0003FFA8     60  void UILowImpactMessages::Init(const struct UILowImpactMessages* this)
+   43  000409E8     38  void UILowImpactMessages::Show(const struct UILowImpactMessages* this)
+   52  00040B40     6C  void UILowImpactMessages::Hide(const struct UILowImpactMessages* this)
+   61  00040AA0     A0  void UILowImpactMessages::HideMessages(const struct UILowImpactMessages* this)
+   74  0003F870      C  void UILowImpactMessages::ShowMidShotMessages(const struct UILowImpactMessages* this)
+   79  0003F978     50  void UILowImpactMessages::ShowPostShotMessages(const struct UILowImpactMessages* this)
+   86  0003F87C     7C  void UILowImpactMessages::GhostLowImpactMessages(const struct UILowImpactMessages* this)
+   96  0003F8F8     7C  void UILowImpactMessages::UnGhostLowImpactMessages(const struct UILowImpactMessages* this)
+  106  0006E9C4     A8  enum AptThreadReturnValue UILowImpactMessages::CheckForNewMessagesThread(const struct UILowImpactMessages* this)
+                         local  enum GUI_MessageQue_t messageType
+                         local  int32 param1
+                         local  int32 param2
+                         local  int32 param3
+  125  00040BAC     28  char* UILowImpactMessages::MapLabelToString(const struct UILowImpactMessages* this, enum eLowImpactMessageLabel label)
+  145  00040BD4      C  int32 UILowImpactMessages::GetNumMessagesShown(const struct UILowImpactMessages* this)
+  151  00040BE0     A0  void UILowImpactMessages::CallFlashFunction_ShowMessage(const struct UILowImpactMessages* this, int32 messageId, enum eLowImpactMessageLabel label)
+                         local  char[4] messageIdString
+  158  00040A20     80  void UILowImpactMessages::CallFlashFunction_HideMessages(const struct UILowImpactMessages* this, int32 numMessages)
+                         local  char[4] numMessagesString
+  169  00050348     F8  void UILowImpactMessages::FormatShotEarningsString(const struct UILowImpactMessages* this, int32 ruleId, int32 earningAmount, int32 user, char* stringBuffer, int32 stringBufferSize)
+                         local  char* bonusShotString
+                         local  char[16] moneyAmountString
+                         local  char[16] finalMoneyString
+  180  0007CD2C     F8  void UILowImpactMessages::FormatHoleEarningsString(const struct UILowImpactMessages* this, int32 ruleId, int32 earningAmount, int32 user, char* stringBuffer, int32 stringBufferSize)
+                         local  char* bonusHoleString
+                         local  char[16] moneyAmountString
+                         local  char[16] finalMoneyString
+  190  00050250     F8  void UILowImpactMessages::FormatGameEarningsString(const struct UILowImpactMessages* this, int32 ruleId, int32 earningAmount, int32 user, char* stringBuffer, int32 stringBufferSize)
+                         local  char* bonusGameString
+                         local  char[16] moneyAmountString
+                         local  char[16] finalMoneyString
+  200  00050158     F8  void UILowImpactMessages::FormatSpecialsString(const struct UILowImpactMessages* this, int32 ruleId, int32 earningAmount, int32 user, char* stringBuffer, int32 stringBufferSize)
+                         local  char* specialsString
+                         local  char[16] moneyAmountString
+                         local  char[16] finalMoneyString
+  210  00071CC4    340  void UILowImpactMessages::FormatSpecialsCustomString(const struct UILowImpactMessages* this, int32 ruleId, int32 earningAmount, int32 user, char* stringBuffer, int32 stringBufferSize)
+                         local  char* specialsCustomString
+                         local  char[16] moneyAmountString
+                         local  char[16] finalMoneyString
+                         local  char* playerSpecificFormat
+                         local  char[32] nameBuffer
+  295  00040C80    1E0  void UILowImpactMessages::FormatDevPtsString(const struct UILowImpactMessages* this, int32 devID, int32 multiplier, int32 user, char* stringBuffer, int32 stringBufferSize)
+                         local  char* devPtsString
+  351  0007D12C     98  void UILowImpactMessages::AddMidShotMessage(const struct UILowImpactMessages* this, enum GUI_MidShotMessage_t messageType, int32 param1, int32 param2, int32 param3)
+  358  0007D0C8     64  void UILowImpactMessages::ShowMidShotMessage(const struct UILowImpactMessages* this, enum GUI_MidShotMessage_t midShotMessageType, int32 param1, int32 param2, int32 param3)
+                         local  enum eLowImpactMessageType messageType
+  364  0007D064     64  void UILowImpactMessages::ShowQueueMessage(const struct UILowImpactMessages* this, enum GUI_MessageQue_t queueMessageType, int32 param1, int32 param2, int32 param3)
+                         local  enum eLowImpactMessageType messageType
+  370  0007CE24    240  void UILowImpactMessages::ShowMessage(const struct UILowImpactMessages* this, enum eLowImpactMessageType messageType, int32 param1, int32 param2, int32 param3)
+                         local  enum eLowImpactMessageLabel label
+                         local  char* stringBuffer
+  415  00040E60      8  enum eLowImpactMessageType UILowImpactMessages::ConvertMidShotMessageTypeToLowImpactMessageType(const struct UILowImpactMessages* this, enum GUI_MidShotMessage_t midShotMessageType)
+  421  00040E68    104  enum eLowImpactMessageType UILowImpactMessages::ConvertQueueMessageTypeToLowImpactMessageType(const struct UILowImpactMessages* this, enum GUI_MessageQue_t queueMessageType)
+  450  00040F6C      8  enum eAptHandleInput UILowImpactMessages::HandleInput(const struct UILowImpactMessages* this, int32 cID)

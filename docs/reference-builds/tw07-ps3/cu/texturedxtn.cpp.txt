@@ -1,0 +1,119 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/texturedxtn.cpp
+// compiled in: other_unity.cpp
+// 26 functions, source order. line | PS3 address | size
+
+   24  0041FB0C     D0  void TextureDXTn::TextureDXTn(const struct TextureDXTn* this, const const struct Allocator& allocRef, const const struct HashString& textureName, int32_t width, int32_t height, int32_t mipmaps, void* texturedata, TextureDXTnType type, bool useCache)
+   38  003D3564     68  void TextureDXTn::~TextureDXTn(const struct TextureDXTn* this)
+   98    inline-only   static unsigned char Repeat5(unsigned int v)
+  107    inline-only   static unsigned char Repeat6(unsigned int v)
+  111    inline-only   static unsigned int Repeat565to8888(unsigned int temp)
+                         local  unsigned int r
+                         local  unsigned int g
+                         local  unsigned int b
+  144    inline-only   static void decodeAlpha(uint32* d, int rowbytes, const uint8* blockbuf, TextureDXTnType dxtType)
+                         local  unsigned char alphas
+                         local  unsigned char alpha1
+                         local  unsigned char alpha2
+                         local  int i
+                         local  unsigned int i
+                         local  uint8[8] alpha
+                         local  const uint8* curPtr
+                         local  int32 i32Alpha1
+                         local  int32 i32Alpha0
+                         local  uint32* dst
+                         local  uint64 block
+                         local  int i
+  243  00428990    28C  static void decodeRGB(int rowbytes, const unsigned char* blockBuf, unsigned int* decoded)
+                         local  unsigned int[4] clut
+                         local  uint32 pixels
+                         local  short unsigned int temp1
+                         local  short unsigned int temp2
+                         local  int i
+                         local  int j
+                         local  int index
+                         inlines  DxtSwap, Repeat565to8888
+  283  004071BC    248  void TextureDXTn::GetNPixels(const struct TextureDXTn* this, int32_t startX, int32_t startY, RawTexture_PixelValue* pixels, int32_t mipmap, int32_t numPixels)
+                         local  int fourPixelBlocks
+                         local  int32_t x
+                         local  RawTexture_PixelValue* pixelPtr
+                         local  int remainder
+                         local  int i
+                         local  int j
+                         local  int i
+  322  00407404     B8  void TextureDXTn::GetNPixels(const struct TextureDXTn* this, int32_t pixelIndex, RawTexture_PixelValue* pixels, int32_t numPixels)
+  331  00428C1C    400  void TextureDXTn::DecodePixelBlock(const struct TextureDXTn* this, int32_t x, int32_t y, RawTexture_PixelValue* value, int32_t mipmap)
+                         local  int blockX
+                         local  int blockY
+                         local  const uint8* blockPtr
+                         local  uint32* val
+                         local  uint32* val
+                         local  unsigned char alphas
+                         local  unsigned char alpha1
+                         local  unsigned char alpha2
+                         local  int i
+                         local  unsigned int i
+                         inlines  RawTexture::GetWidth, decodeAlpha
+  362  00429184    27C  void TextureDXTn::Decode(const struct TextureDXTn* this, RawTexture_PixelValue* dst, int32_t mipmap)
+                         local  int32 width
+                         local  int32 height
+                         local  RawTexture_PixelValue[16] pixels
+                         local  int y
+                         local  int x
+                         inlines  RawTexture::GetHeight, RawTexture::GetWidth
+  388  0042901C    168  void TextureDXTn::GetPixelValue(const struct TextureDXTn* this, int32_t x, int32_t y, const RawTexture_PixelValue& value, int32_t mipmap)
+                         local  RawTexture_PixelValue[16] pixels
+                         local  int32_t blockStartX
+                         local  int32_t blockStartY
+  414  0041D990    154  short unsigned int PrepareColorForLerp(short unsigned int val, float lerpVal, int texNum)
+                         local  uint32 colorval
+                         local  RawTexture_PixelValue* pixel
+                         local  short int endVal
+                         inlines  Repeat565to8888
+  434  00403F8C    344  void* TextureDXTn::ManipulateColors(const struct TextureDXTn* this, DXTnColorManipulator manipulator, float lerpVal, int texNum)
+                         local  int numBlocks
+                         local  short int* oldBlocks
+                         local  short int* curOldBlock
+                         local  int iMipmap
+                         local  int iMipmap
+                         local  short int* textureData
+                         local  int iy
+                         local  int ix
+                         local  short unsigned int* color1
+                         local  short unsigned int* color2
+                         local  bool alpha
+                         local  short unsigned int* color1
+                         local  short unsigned int* color2
+                         local  bool alpha
+                         local  short unsigned int tempShort
+                         inlines  RawTexture::GetHeight, RawTexture::GetNumMipmaps, RawTexture::GetWidth
+  541  003D36AC      8  void* TextureDXTn::PrepareTextureForBlend(const struct TextureDXTn* this, enum TXRBlendRule_Mode blendMode, float lerpVal, int texNum)
+  571  003D36B4      4  void TextureDXTn::RestoreTextureFromBlend(const struct TextureDXTn* this, enum TXRBlendRule_Mode blendMode, float lerpVal, void* dataStorage)
+  627    inline-only   static void dxtDecompressColor(uint16 color, float* vRGBA)
+  635    inline-only   static RawTexture_PixelValue dxtTintToInt(struct Tinter* tinter, float* tintParams, vec4flt* inColor)
+                         local  struct RawTexture_PixelValue outColor
+                         local  RawTexture_PixelValue outColor
+                         local  vec4flt floatOutColor
+  647    inline-only   static void dxtColorLerp(float* vDst, float* vSrc1, float* vSrc2, float ratio)
+  654    inline-only   static void dxtDecompressAndTintBlock(struct Tinter* tinter, float* tintParams, uint16* srcData, RawTexture_PixelValue* argbTexture, int32 stride)
+                         local  uint16* pColors
+                         local  float[4][4] vDstColor
+                         local  RawTexture_PixelValue[4] dstColor
+  702  003D36B8      8  uint32 TextureDXTn::TypeToNativeFormat(TextureDXTnType type)
+  732  003D36C0      8  TextureDXTnType TextureDXTn::TypeFromNativeFormat(uint32 texFormat)
+  761  003D36C8      8  bool TextureDXTn::IsAlphaFormat(TextureDXTnType type)
+  781  003D36D0      8  bool TextureDXTn::CanTintFormat(TextureDXTnType type)
+  802  00437DF4    700  void TextureDXTn::TintTexture(const struct TextureDXTn* this, struct Tinter* tinter, float* tintParams, struct RawTexture* tintMask)
+                         local  int32 iBlockH
+                         local  int32 iBlockW
+                         local  uint16* pCurPtr
+                         local  bool bHasAlphaBlock
+                         local  int mipmap
+                         local  uint8* pTexData
+                         local  RawTexture_PixelValue[16] argb
+                         inlines  LLMath_AddScale, __vec_mul, dxtColorLerp, dxtDecompressAndTintBlock, vec_ld, vec_madd, vec_splat
+  870  00405544    120  void* TextureDXTn::GetRawTextureData(const struct TextureDXTn* this, int32_t mipmap)
+                         local  int32_t width
+                         local  int32_t height
+                         local  uint8_t* data
+                         local  int32_t i
+                         inlines  RawTexture::GetHeight, RawTexture::GetWidth, TextureDXTn::GetDXTnSize

@@ -1,0 +1,104 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_OnlineGameSetup.cpp
+// compiled in: apt_unity.cpp
+// 38 functions, source order. line | PS3 address | size
+
+   53  00047BF8     B4  static int32_t ComputeWagerFromToggleIndex(int32_t index)
+   64  0004FC18     AC  static void GetWagerToggleText(int32 toggleIndex, int32 activeOption)
+                         local  char* wagerBuffer
+                         local  char[16] moneyBuffer
+   77  00058BF8     64  static void SetActiveMenuItemOption(enum ToggleArrayUniqueID menuUniqueID, int32_t activeOption)
+                         local  int32_t idx
+   84  00058BA0     58  static int32_t GetActiveMenuItemOption(enum ToggleArrayUniqueID menuUniqueID)
+                         local  int32_t idx
+   90  00058B3C     64  static void SetNumMenuItemOptions(enum ToggleArrayUniqueID menuUniqueID, int32_t numOptions)
+                         local  int32_t idx
+  100  000F97C4     5C  void UIOnlineGameSetup::UIOnlineGameSetup(const struct UIOnlineGameSetup* this)
+                         inlines  GameSetupOptionsResponseHandler::GameSetupOptionsResponseHandler
+  104  0005CD70     5C  void UIOnlineGameSetup::Init(const struct UIOnlineGameSetup* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen
+  119  000D19D0    244  void UIOnlineGameSetup::Show(const struct UIOnlineGameSetup* this)
+                         local  int32_t userMoney
+                         local  int32_t numOptions
+                         local  int32_t idx
+                         local  struct OnlineMatchParams* pParams
+                         local  int32_t inc
+                         inlines  LobbyMatchupOSDK::GetGameParamsRef
+  177  00047CAC     2C  void UIOnlineGameSetup::Hide(const struct UIOnlineGameSetup* this)
+  190  00047CD8      4  void UIOnlineGameSetup::OnShow(const struct UIOnlineGameSetup* this)
+  199  0005CF04     F4  enum eAptHandleInput UIOnlineGameSetup::HandleInput(const struct UIOnlineGameSetup* this, int32 cID)
+                         local  struct UIMemCardConfirmPopup* pConfirmPopup
+  218  00080C34     AC  void GameSetupOptionsResponseHandler::onClose(const struct GameSetupOptionsResponseHandler* this, void* inData)
+                         inlines  LobbyMatchupOSDK::CancelAnyChallenge
+  245  0006435C    1B4  void UIOnlineGameSetup::SetGameMode(int32 param1)
+                         local  struct OnlineMatchParams* pParams
+                         inlines  LobbyMatchupOSDK::GetGameParamsRef
+  265  00064510     4C  void UIOnlineGameSetup::SetCourse(int32 param1)
+                         local  struct OnlineMatchParams* pParams
+                         inlines  LobbyMatchupOSDK::GetGameParamsRef
+  273  0006455C     70  void UIOnlineGameSetup::SetNumPlayers(int32 param1)
+                         local  struct OnlineMatchParams* pParams
+                         inlines  LobbyMatchupOSDK::GetGameParamsRef
+  286  000645CC     54  void UIOnlineGameSetup::SetRanked(int32 param1)
+                         local  struct OnlineMatchParams* pParams
+                         inlines  LobbyMatchupOSDK::GetGameParamsRef
+  294  00064620     E8  void UIOnlineGameSetup::SetShotClock(int32 param1)
+                         local  struct OnlineMatchParams* pParams
+                         inlines  LobbyMatchupOSDK::GetGameParamsRef
+  311  00064708     80  void UIOnlineGameSetup::SetHoles(int32 param1)
+                         local  struct OnlineMatchParams* pParams
+                         inlines  LobbyMatchupOSDK::GetGameParamsRef
+  335  00064788     50  void UIOnlineGameSetup::SetDifficulty(int32 param1)
+                         local  struct OnlineMatchParams* pParams
+                         inlines  LobbyMatchupOSDK::GetGameParamsRef
+  344  000647D8     58  void UIOnlineGameSetup::SetWager(int32 param1)
+                         local  struct OnlineMatchParams* pParams
+                         inlines  LobbyMatchupOSDK::GetGameParamsRef
+  352  00064830     B8  void UIOnlineGameSetup::SetTees(int32 param1)
+                         local  struct OnlineMatchParams* pParams
+                         inlines  LobbyMatchupOSDK::GetGameParamsRef
+  368  000648E8     4C  void UIOnlineGameSetup::SetPins(int32 param1)
+                         local  struct OnlineMatchParams* pParams
+                         inlines  LobbyMatchupOSDK::GetGameParamsRef
+  376  00064934     4C  void UIOnlineGameSetup::SetGreenSpeed(int32 param1)
+                         local  struct OnlineMatchParams* pParams
+                         inlines  LobbyMatchupOSDK::GetGameParamsRef
+  384  00064980     4C  void UIOnlineGameSetup::SetFairwaySpeed(int32 param1)
+                         local  struct OnlineMatchParams* pParams
+                         inlines  LobbyMatchupOSDK::GetGameParamsRef
+  392  000649CC     4C  void UIOnlineGameSetup::SetRoughSpeed(int32 param1)
+                         local  struct OnlineMatchParams* pParams
+                         inlines  LobbyMatchupOSDK::GetGameParamsRef
+  400  00064A18     54  void UIOnlineGameSetup::SetSessionType(int32 param1)
+                         local  struct OnlineMatchParams* pParams
+                         inlines  LobbyMatchupOSDK::GetGameParamsRef
+  412  000D1D9C    230  void UIOnlineGameSetup::OnChangeGameMode(int32 toggleIdx, int32 activeOption)
+                         local  int32_t numPlayersIndex
+                         local  int32_t holesIndex
+                         local  int32_t courseIndex
+  488  000D1CC0     DC  void UIOnlineGameSetup::OnChangeRankedGame(int32 iToggleIdx, int32 iActionOption)
+                         local  int32_t wagerToggleIdx
+  529  000D1C14     AC  void UIOnlineGameSetup::OnChangeSession(int32 iToggleIdx, int32 iActionOption)
+                         local  int32_t iRankedID
+  550  000D153C    3A8  void UIOnlineGameSetup::SetUpOnlinePrefArray(const struct UIOnlineGameSetup* this, const struct UIMenuToggleItemConst* toggleArray, int32 numMenuItems)
+                         local  int32_t gameModeIndex
+                         local  int32_t numPlayersIndex
+                         local  int32_t holesIndex
+                         local  int32_t courseIndex
+                         local  int32_t rankedIndex
+                         local  int32_t wagerIndex
+                         local  int32_t activeOption
+                         local  int32_t activeRankedOption
+                         inlines  OnlineManagerOSDK::GetOnlinePath
+  642  00058C5C    114  void UIOnlineGameSetup::GetTeesText(int32 iToggleIdx, int32 iActiveOption)
+                         local  char* szBuffer
+  669  00058D70    134  void UIOnlineGameSetup::GetPinsText(int32 iToggleIdx, int32 iActiveOption)
+                         local  char* szBuffer
+  699  00058EA4    134  void UIOnlineGameSetup::GetGreenSpeedText(int32 iToggleIdx, int32 iActiveOption)
+                         local  char* szBuffer
+  729  00058FD8      4  void UIOnlineGameSetup::GetFairwaySpeedText(int32 iToggleIdx, int32 iActiveOption)
+  738  00058FDC    114  void UIOnlineGameSetup::GetRoughLengthText(int32 iToggleIdx, int32 iActiveOption)
+                         local  char* szBuffer
+  765  000590F0     D8  void UIOnlineGameSetup::GetSessionTypeText(int32 iToggleIdx, int32 iActiveOption)
+                         local  char* szBuffer
+  786  000591C8     4C  void UIOnlineGameSetup::RegainFocus(const struct UIOnlineGameSetup* this, uint32 index)
+  792  00059214     4C  void UIOnlineGameSetup::LooseFocus(const struct UIOnlineGameSetup* this, uint32 index)

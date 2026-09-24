@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/Headers/UI_Minigames.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   85    inline-only   bool UIMinigames::IsBallTargetShown(const const struct UIMinigames* this)

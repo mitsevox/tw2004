@@ -1,0 +1,5 @@
+// ../../include/tiger_module_allocatable.h
+// compiled in: tiger_cct_internal.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   15  0033FD98     18  void ~Allocatable(const struct <anon>* this)

@@ -1,0 +1,36 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_Replay.cpp
+// compiled in: golf_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   13  00204C20     44  void GameModeReplay::GameModeReplay(const struct GameModeReplay* this)
+   18  001FE548     18  void GameModeReplay::~GameModeReplay(const struct GameModeReplay* this)
+   23  002105E8    134  void GameModeReplay::Init(const struct GameModeReplay* this)
+   48  001FE5C4      4  void GameModeReplay::Update(const struct GameModeReplay* this)
+   52  001FE5C8      4  void GameModeReplay::Shutdown(const struct GameModeReplay* this)
+   56  001FE5CC     1C  bool GameModeReplay::QueryInterface(const struct GameModeReplay* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bRet
+   72  001FE604     8C  void GameModeReplay::LoadHole(const struct GameModeReplay* this)
+   83  00327C18    4EC  void GameModeReplay::SetupNextGolfer(const struct GameModeReplay* this)
+                         local  float saveForwardSPin
+                         local  float saveSideSpin
+                         local  int32 saveRandomSeed
+                         local  int16 saveWind
+                         local  float saveWindSpeed
+                         local  int16 saveWeather
+                         local  int16 saveRainIntensity
+                         local  struct PhysicsBall_t tempBall
+                         local  vec4flt playerPreShotBallPosn
+                         local  vec4flt playerTeePosn
+                         local  enum WIND_t direction
+                         local  float speed
+                         inlines  GM_GetCurrentHoleIndex, GM_SetPlayerHoleStrokes, GamePlayer::GetCharacter, GamePlayer::SetReplayFlags, PhysicsBall_t::SetFlags, cGAME_GLOBALS::SetRandomSeed, cGAME_GLOBALS::SetReplayActive, vec4flt_Copy, vec_ld, vec_st
+  176  001FE690      8  bool GameModeReplay::HoleFinished(const struct GameModeReplay* this, enum PlayerNumber_t PlayerID, bool predict)
+  183  001FE698      8  bool GameModeReplay::GameFinished(const struct GameModeReplay* this, bool predict)
+  190  002CECC8    158  void GameModeReplay::StartGamePreData(const struct GameModeReplay* this)
+                         local  int j
+                         local  int holeNum
+                         inlines  GM_SelectHoleSet, GM_SelectSingleHole, GM_SetCurrentCourse, GM_SetTargetCup, cGAME_GLOBALS::SetPin, cGAME_GLOBALS::SetReplayActive, cGAME_GLOBALS::SetSeasonOption, cGAME_GLOBALS::SetWeatherOption
+  224  0025FE00     1C  void GameModeReplay::EndGame(const struct GameModeReplay* this)
+                         inlines  cGAME_GLOBALS::SetEndGame
+  231  001FE6A0      4  void GameModeReplay::RestartHole(const struct GameModeReplay* this)
+  237  001FE6A4     14  const char* GameModeReplay::GetName(const struct GameModeReplay* this)

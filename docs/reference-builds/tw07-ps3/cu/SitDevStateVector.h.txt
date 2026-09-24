@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/SitDev/Headers/SitDevStateVector.h
+// compiled in: golf2_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    6    inline-only   void _SetStateVecAndCondition(uint16* state_vec, int index, uint16 value, uint32* condition_vec)

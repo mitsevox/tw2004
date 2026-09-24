@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/matrix33_operation_inline.h
+// compiled in: rnaunity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   32    inline-only   bool vpu::operator!=(struct <anon>& a, struct <anon>& b)

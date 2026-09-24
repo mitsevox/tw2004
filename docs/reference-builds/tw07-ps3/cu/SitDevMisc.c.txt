@@ -1,0 +1,77 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/SitDev/SitDevMisc.c
+// compiled in: golf2_unity.cpp
+// 32 functions, source order. line | PS3 address | size
+
+   42  001320C8      4  void SitDev_OnMulligan()
+   50  00130E98     1C  void SitDev_ClearBallThatWasHit()
+   57  001320CC     18  bool SitDev_GetCupBevelFlag()
+   64  001311E8     1C  void SitDev_ClearCupBevelFlag()
+   71  001E3238     88  void SitDev_ThrowBallHitDelayedEvent()
+   88  00169918     28  void SitDev_SetBallHitTime(struct PhysicsBall_t* pBall)
+   96  00131204     4C  void SitDev_ClearEmotionStates()
+                         local  int i
+  108  001320E4     6C  bool SitDev_PredictedEmotionAvailable(enum PlayerNumber_t PlayerID)
+  117  00132150     4C  int SitDev_NumEntries(uint16* pArray, int iMaxNumEntries)
+                         local  int i
+                         local  int count
+  129  0013219C     9C  int SitDev_NumEntriesUnusedAnnouncer(uint16* pArray, int numChoices, uint8 previousAnnouncer, uint8* announcerBits)
+                         local  int i
+                         local  int unused
+                         local  uint16* pArraySave
+  154  00132238     88  int SitDev_NumEntriesUnused(uint16* pArray, int numChoices)
+                         local  int i
+                         local  int unused
+                         local  uint16* pArraySave
+  179  001322C0    118  uint16 SitDev_ChooseRandomResponseNoRepeatAnnouncer(uint16* responses, int numChoices, int numUnused, uint32 random_num, uint8 previousAnnouncer, uint8* announcerBits)
+                         local  int i
+                         local  int index
+                         local  uint16 audioID
+                         local  uint16* responsesSave
+  225  001323D8    104  uint16 SitDev_ChooseRandomResponseNoRepeat(uint16* responses, int numChoices, int numUnused, uint32 random_num)
+                         local  int i
+                         local  int index
+                         local  uint16 audioID
+                         local  uint16* responsesSave
+  279  001324DC    100  int SitDev_GetPGARank(enum PlayerNumber_t playerID)
+                         local  int rank
+                         local  enum PlayerNumber_t userID
+                         local  enum GM_Pga_EntrantId_e entrantID
+  305  001325DC     4C  uint32 SitDev_TranslateGameMode(int gameMode)
+                         local  int[40] lookup
+                         local  int i
+  413  00132628     AC  int SitDev_GetTimeOfDayCondition()
+                         local  int8 hour
+                         local  int8 minute
+                         local  int timeOfDayIndex
+  440  0016987C     9C  int SitDev_GetSeasonCondition()
+                         local  int sitdevSeason
+  458  001326D4     18  void SitDev_SetAnimationState(enum PlayerNumber_t playerID, int skaAnimState)
+  463  00131250     1C  int SitDev_GetAnimationState(enum PlayerNumber_t playerID)
+  469  001326EC     18  void SitDev_SetAnimationEmotionState(enum PlayerNumber_t playerID, int animEmotionState)
+  474  0013126C     1C  int SitDev_GetAnimationEmotionState(enum PlayerNumber_t playerID)
+  489  00132704     3C  bool SitDev_GetTourDifficultyCondition(enum PlayerNumber_t playerID)
+  494  00132740     28  uint16 SitDev_GetIdleTimeCondition()
+  499  00132768     74  bool SitDev_GetGameFaceEquipmentCondition(enum PlayerNumber_t playerID)
+  505  0015DB40     C4  void SitDev_SetGameFaceEquipmentCondition()
+                         local  int i
+                         local  int userID
+  524  001327DC     74  bool SitDev_GetGameFaceClothesCondition(enum PlayerNumber_t playerID)
+  530  0015DC04    15C  void SitDev_SetGameFaceClothesCondition()
+                         local  int i
+                         local  int userID
+  556  00132850     30  int SitDev_GetRTEventNumber()
+                         local  int dummy
+  562  001D1990     38  int SitDev_GetPlayerID()
+                         inlines  GM_GetGolferUp
+  567  00132880     34  int SitDev_GetNumPlayers()
+  572  001B3338     6C  bool SitDev_GetRTEWonStroke(enum PlayerNumber_t playerID)
+                         local  int holesLeft
+                         local  int goldScore
+                         local  int score
+                         local  bool strokeMode
+                         inlines  GM_GetModeType
+  605  001903F8     EC  bool SitDev_IsNonTeeStartingPointOrSkillsChallenge()
+                         local  void* ptr
+                         local  bool bNonTeeStartingPointOrChallenge
+                         local  struct GameModeDriverRTE* pRTE
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton

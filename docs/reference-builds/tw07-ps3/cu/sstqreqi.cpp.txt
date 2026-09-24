@@ -1,0 +1,6 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sstqreqi.cpp
+// compiled in: sstqreqi.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   54  006CE188     30  int SNDSTRM_queuerequestid(int sndstreamhandle, int holdtime, int streamrequestid)
+                         local  int ret

@@ -1,0 +1,143 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/ps3/LLDisp_gcm.c
+// compiled in: Legacy_unity.cpp
+// 32 functions, source order. line | PS3 address | size
+
+  159    inline-only   unsigned int Displ_PickAAMode(bool multisampled, unsigned int width)
+  182    inline-only   unsigned int Displ_PickCompressionMode(unsigned int aaMode, TextureFormat format)
+  211    inline-only   unsigned int Displ_SurfaceCanUseZcull(TextureFormat format)
+  218  003AC54C    444  void Displ_CreateDevice()
+                         local  const char[19] __FUNCTION__
+                         local  unsigned int uCodeSize
+                         local  void* uCodeAddr
+                         local  CGparameter textureParameter
+                         local  int i
+                         inlines  TX_AddressToOffset_ps3gcm, TagValuePair, operator+
+  302  0037F734     2C  bool Displ_IsDeviceCreated()
+  317  003C0CC8    438  int32 Displ_OpenOnce()
+                         local  int result
+                         local  CellVideoOutState videoState
+                         local  CellVideoOutResolution resolution
+                         local  bool consoleReg
+                         local  unsigned int width
+                         local  unsigned int height
+                         local  CellVideoOutConfiguration videocfg
+                         local  unsigned int renderTargetModes
+                         local  const unsigned int depthWidth
+                         local  const unsigned int depthHeight
+                         local  vec3flt xGammaValues
+  516  0037F760     2C  bool Displ_IsOpen()
+  521  003C1ED0    104  int32 Displ_CloseOnce()
+  540  003AAE84     84  void Displ_DeleteDevice()
+  571  00395DDC     8C  void Displ_InitMainRAM_ps3()
+                         local  int ret
+  599  003AFDC0    42C  void Displ_InitVRAM_ps3(size_t mainRamBudgeted, size_t vramBudgeted)
+                         local  const char[19] __FUNCTION__
+                         local  CellGcmConfig config
+                         local  MemBudgetTracker_InitInfo initInfo
+                         local  const unsigned int vramHeapOverhead
+                         local  const unsigned int tagHeapOverhead
+                         local  const unsigned int zcullHeapOverhead
+                         local  const unsigned int controlMemSize
+                         local  unsigned int i
+                         inlines  TagValuePair, operator+
+  661  003A49FC     A8  void* _Displ_AllocVRAM_ps3(unsigned int size, unsigned int alignment, MemBudgetTypeE budget, const char* file, int line, const char* func)
+                         local  void* ret
+                         local  void* memBudgetAddr
+  687  003A3FC8     A8  void _Displ_FreeVRAM_ps3(void* ptr, const char* file, int line, const char* func)
+                         local  int i
+  717  003A4AA4    500  void* _Displ_AllocTiledVRAM_ps3(unsigned int size, unsigned int width, unsigned int height, unsigned int pitch, TextureFormat format, bool multisampled, MemBudgetTypeE budget, const char* file, int line, const char* func)
+                         local  unsigned int tileNum
+                         local  const unsigned int antialias
+                         local  const unsigned int compMode
+                         local  const unsigned int useableSize
+                         local  const unsigned int roundedSize
+                         local  void* pMemory
+                         local  unsigned int tagBaseAddress
+                         local  const unsigned int vramOffset
+                         local  unsigned int nextBankToAssign
+                         local  const unsigned int bank
+                         local  const unsigned int tagPagesNeeded
+                         local  const unsigned int zCullWidth
+                         local  const unsigned int zCullHeight
+                         local  unsigned int zCullSlot
+                         local  unsigned int pixelCount
+                         local  unsigned int zCullAddr
+                         inlines  Displ_PickAAMode, Displ_PickCompressionMode, Displ_RoundUpForAlignment, TX_AddressToOffset_ps3gcm
+  890  003A41B8    1F0  void _Displ_FreeTiledVRAM_ps3(void* ptr, const char* file, int line, const char* func)
+                         local  unsigned int tileNum
+                         local  const unsigned int tagAddress
+                         local  const unsigned int zCullAddress
+  950  0037FD48     18  bool Displ_IsBetweenFrameStartAndEnd()
+  956  003BE5D8     58  void Displ_FrameStart()
+  967  00391AD4     3C  void Displ_FrameEnd()
+  980  0037FD60     1C  void Displ_BeginAntiAliasing(bool needExistingColorToStart)
+  992  0037FD7C     1C  void Displ_EndAntiAliasing(bool needExistingColorWhenDone)
+ 1004  003813E8    130  void Displ_SetGamma(float* xGamContBrite)
+                         inlines  Gcm::cellGcmSetFragmentProgramParameter
+ 1028  003BDCCC    90C  void Displ_Present(unsigned int presentInterval)
+                         local  struct TextureInfoNative* info
+                         local  unsigned int minFilter
+                         local  unsigned int magFilter
+                         local  unsigned int filterKernel
+                         local  bool once
+                         local  int BlurOnCopy
+                         local  unsigned int result
+                         local  int zCullForward
+                         local  int zCullBackward
+                         local  bool breakZcull
+                         local  int TrilinearOptimization
+                         local  int once
+                         local  int i
+                         local  const float vblankPeriodUSec
+                         local  const system_time_t minTime
+                         local  const system_time_t lastFlipTime
+                         local  const system_time_t waitStartTime
+                         local  system_time_t now
+                         local  const system_time_t maxStallTime
+                         local  int totalTiles
+                         local  int culledTiles
+                         local  float prev
+                         local  float ratio
+                         local  char[255] buf
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaTestMode, DS_vSetZTestEnable, Gcm::cellGcmFlush, Gcm::cellGcmSetClearReport, Gcm::cellGcmSetDrawArrays, Gcm::cellGcmSetFlip, Gcm::cellGcmSetFragmentProgram, Gcm::cellGcmSetInvalidateTextureCache, Gcm::cellGcmSetInvalidateVertexCache, Gcm::cellGcmSetReport, Gcm::cellGcmSetScullControl, Gcm::cellGcmSetTexture, Gcm::cellGcmSetTextureAddress, Gcm::cellGcmSetTextureControl, Gcm::cellGcmSetTextureFilter, Gcm::cellGcmSetTextureOptimization, Gcm::cellGcmSetVertexDataArray, Gcm::cellGcmSetVertexProgram, Gcm::cellGcmSetWaitFlip, Gcm::cellGcmSetZcullControl, Gcm::cellGcmSetZcullLimit, Gcm::cellGcmSetZcullStatsEnable, TX_GetNativeTextureInfo
+ 1337  003BD09C      4  void Displ_StartDashboardAutoUpdate()
+ 1346  0037ACD0      8  bool Displ_IsDashboardAutoUpdating()
+ 1352  0037F350      4  void Displ_EndDashboardAutoUpdate()
+ 1362  003BD0A0    624  void Displ_UpdateRenderTargetSurface(uint32 target)
+                         local  const char[32] __FUNCTION__
+                         local  int32 layer
+                         local  TextureRef colorTex
+                         local  TextureRef depthTex
+                         local  int i
+                         local  struct TextureInfoNative* info
+                         local  uint16 width
+                         local  uint16 height
+                         local  struct TextureInfoNative* info
+                         local  uint16 width
+                         local  uint16 height
+                         inlines  Displ_PickAAMode, Gcm::cellGcmSetSurface, RNADebugBreak, TX_GetNativeTextureInfo
+ 1512  0037F7B8    1EC  void Displ_SetViewport(int32 x, int32 y, int32 width, int32 height)
+                         local  vec4flt scale
+                         local  vec4flt offset
+                         local  const float clipSpaceNearZ
+                         local  const float clipSpaceFarZ
+                         inlines  Gcm::cellGcmSetScissor, Gcm::cellGcmSetViewport
+ 1549  0037F0B8    10C  void Displ_SetClearValues(float r, float g, float b, float a, float z, uint32 stencil)
+                         local  const unsigned int MAX_ZBUFFER_VALUE
+                         local  const unsigned int MAX_STENCIL_VALUE
+                         local  unsigned int colorARGB
+                         local  unsigned int clearDepth
+                         local  unsigned int clearStencil
+                         inlines  Gcm::cellGcmSetClearColor, Gcm::cellGcmSetClearDepthStencil
+ 1582  003A18B4    2E4  void Displ_Clear(int32 clearFlags)
+                         local  bool needSoftwareClear
+                         local  unsigned int gcmClearFlags
+                         local  struct SM_Shader_Base* old_shader
+                         local  struct vtxStructFloat[4] clearVerts
+                         inlines  Gcm::cellGcmSetClearSurface, SM_GetLastActivedShader
+ 1645  003BDAB0     98  void Displ_Resolve()
+                         local  int i
+                         local  TextureRef ref
+                         inlines  Gcm::cellGcmFlush
+ 1675  0037B344     18  struct MemBudgetTracker* DisplVRAM_GetMemBudgetTracker()
+ 1722  0037FD2C     1C  static void _cellGcmInlineTransferInvalidateDestinationHandle()

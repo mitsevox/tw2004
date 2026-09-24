@@ -1,0 +1,115 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/GOLF/GameMode/GameMode_OneBall.cpp
+// compiled in: golf_unity.cpp
+// 35 functions, source order. line | PS3 address | size
+
+   26  00204E40     44  void GameModeOneBall::GameModeOneBall(const struct GameModeOneBall* this)
+   31  001FDFBC     18  void GameModeOneBall::~GameModeOneBall(const struct GameModeOneBall* this)
+   35  002F9840    234  void GameModeOneBall::Init(const struct GameModeOneBall* this)
+                         local  int i
+                         local  int j
+                         inlines  GM_SetPlayerHoleStrokes
+   90  001FE040      4  void GameModeOneBall::Update(const struct GameModeOneBall* this)
+   95  002497AC    298  void GameModeOneBall::UpdateDisplayInfo(const struct GameModeOneBall* this, enum PlayerNumber_t PlayerID)
+                         local  int32 iNumTurnsToShow
+                         local  bool bSomebodyWonTheHole
+                         local  int i
+                         local  char[32] playerName
+                         local  int iTempCurrentHonors
+                         local  int[4] aiTempBetrayal
+                         local  int i
+                         local  int i
+                         local  char[52] tempPlayerName
+  179  001FE150      4  void GameModeOneBall::Shutdown(const struct GameModeOneBall* this)
+  184  002D1A34    128  void GameModeOneBall::SetupNextGolfer(const struct GameModeOneBall* this)
+                         local  int32 i
+                         inlines  PhysicsBall_t::ClearFlag, PhysicsBall_t::SetFlag
+  205  001FE154     38  int32 GameModeOneBall::GetEndGameSequence(const struct GameModeOneBall* this)
+                         local  int32 sequence
+  214  001FE18C      8  enum PlayerNumber_t GameModeOneBall::GetHonors(const struct GameModeOneBall* this, enum PlayerNumber_t ignore, bool doNotIgnoreHoledOut)
+  219  00295EB0     D8  enum PlayerNumber_t GameModeOneBall::GetHoleWinner(const const struct GameModeOneBall* this)
+                         local  enum PlayerNumber_t winner
+                         local  int32 PlayerID
+                         local  int numWinners
+                         inlines  PLR_HoledOut
+  237  00324D6C     18  void GameModeOneBall::PreShotInit(const struct GameModeOneBall* this, enum PlayerNumber_t PlayerID)
+  250  001FE044    10C  int32 GameModeOneBall::ResolveNextTurn(const struct GameModeOneBall* this, int32 iCurrentHonors, int* aiBetrayal)
+                         local  bool betrayed
+  277  001FE194     68  enum PlayerNumber_t GameModeOneBall::NextHonors(const struct GameModeOneBall* this)
+                         local  int32 currentHonors
+                         local  int[4] betrayal
+                         local  int i
+  293  00324D68      4  void GameModeOneBall::OnFlyByInit(const struct GameModeOneBall* this, enum PlayerNumber_t PlayerID)
+  298  001FE1FC      4  void GameModeOneBall::AfterShotButBeforePostReaction(const struct GameModeOneBall* this, enum PlayerNumber_t PlayerID)
+  303  00295F88    100  void GameModeOneBall::EndGolferTurn(const struct GameModeOneBall* this, enum PlayerNumber_t PlayerID)
+                         local  int32 otherPlayers
+                         inlines  PLR_HoledOut
+  335  00249A44      4  void GameModeOneBall::PreShotUpdateUI(const struct GameModeOneBall* this, enum PlayerNumber_t PlayerID)
+  342  00296088     A4  bool GameModeOneBall::HoleFinished(const struct GameModeOneBall* this, enum PlayerNumber_t PlayerID, bool predict)
+                         local  int32 Player
+                         local  bool ret
+                         local  const int NUM_PLAYERS
+                         inlines  PLR_HoledOut
+  359  00323F1C    1AC  bool GameModeOneBall::GameFinished(const struct GameModeOneBall* this, bool predict)
+                         local  int32 i
+                         local  int32 holecount
+                         inlines  GM_GetCurrentHoleIndex, GM_IsPlayoff
+  440  003240C8    480  bool GameModeOneBall::GoToPlayoff(const struct GameModeOneBall* this, bool predict)
+                         local  int32 i
+                         local  int32 j
+                         local  bool tied
+                         local  int32 max
+                         local  int32 score
+                         inlines  GM_GetCurrentHoleIndex, GM_SetPlayerHoleStrokes
+  541  00324548    49C  void GameModeOneBall::EndHole(const struct GameModeOneBall* this)
+                         local  int32 currHole
+                         local  enum PlayerNumber_t winner
+                         local  int i
+                         inlines  GM_GetCurrentHoleIndex, GM_IsPlayoff, GamePlayer::GetGolferScore
+  617  00310658    1BC  enum PlayerNumber_t GameModeOneBall::GetWinner(const struct GameModeOneBall* this, int place)
+                         local  int32 score
+                         local  int32 score2
+                         local  uint8_t[4] places
+                         local  enum PlayerNumber_t ret
+                         local  int i
+                         local  int j
+                         local  int i
+  645  00310A14    1C0  void GameModeOneBall::EndGame(const struct GameModeOneBall* this)
+                         local  enum PlayerNumber_t winner
+                         local  uint8_t[4] places
+                         local  int place
+                         local  uint8_t i
+                         inlines  GM_FullRoundOfGolf, GM_IsPlayoff
+  687  00310814    200  void GameModeOneBall::AwardWinnings(const struct GameModeOneBall* this)
+                         local  enum PlayerNumber_t winner
+                         local  enum PlayerNumber_t loser
+                         local  int32 pointsAhead
+                         local  int32 totalearned
+                         local  int32 baseearned
+                         local  int32 userID
+                         local  void* driverPointer
+                         inlines  GamePlayer::GetGolferBonus, Singleton<GameModeDriverManager>::GetSingleton
+  730  003105C4     94  void GameModeOneBall::GetCurrentScoreString(const struct GameModeOneBall* this, char* strBuf, int32 bufferSize)
+                         local  int32 totalPoints
+  741  002B589C    15C  int GameModeOneBall::PlayerBetrayed(const struct GameModeOneBall* this, enum PlayerNumber_t PlayerID)
+                         local  int ret
+                         local  float dist
+                         inlines  LLMath_DistanceBetween3
+  763  001FE200     1C  bool GameModeOneBall::QueryInterface(const struct GameModeOneBall* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bRet
+  779  003249E4    384  void GameModeOneBall::SetCircleofTrust(const struct GameModeOneBall* this, enum PlayerNumber_t golfer)
+                         local  bool oneballTunable
+                         local  float totalDistance
+                         local  float radius
+                         local  int specialRadius
+                         local  int catid
+                         local  int id
+                         inlines  GM_GetCurrentHoleIndex, LLMath_DistanceBetween3
+  847  001FE21C      8  int GameModeOneBall::IsSpecialCOTCase(const struct GameModeOneBall* this, int courseIndex, int holeNum, float curRadius)
+  863  001FE224      8  bool GameModeOneBall::UseOneBallAI(const struct GameModeOneBall* this)
+  868  001FE22C      8  void GameModeOneBall::SetUseOneBallAI(const struct GameModeOneBall* this, bool setVal)
+  873  001FE234     1C  void setForceOneBallMode()
+  879  001FE250     30  bool getForceOneBallMode()
+  887  001FE280      4  void GameModeOneBall::DisplayGameModeInfo(const struct GameModeOneBall* this)
+  919  002B59F8    19C  void GameModeOneBall::UpdateBetrayals(const struct GameModeOneBall* this, enum PlayerNumber_t PlayerID)
+                         local  int betrayal
+                         local  SoundPlayBackFunc* pSoundFunc

@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/./chatstreamabstract.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   43  0062324C     44  const char8_t* GetId(const const struct <anon>* this)
+   44  00623290      8  enum ChatStreamType GetType(const const struct <anon>* this)

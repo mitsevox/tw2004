@@ -1,0 +1,10 @@
+// ../ears_trinity/Trinity/Runtime/include/TrinityVfx.h
+// compiled in: TrinityVfx.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   46  005942B8     18  void ~TrinityVfx(const struct TrinityVfx* this)
+  102  00594308     58  void Stop(const struct TrinityVfx* this)
+  109  00594360     58  void Kill(const struct TrinityVfx* this)
+  116  005943B8     58  void UpdateMatrix(const struct TrinityVfx* this, float_t[4]* mat)
+  124  00594410     5C  bool8_t CreateVfx(const struct TrinityVfx* this, char* fxName)
+  134  0059446C     58  void AttachToActor(const struct TrinityVfx* this, struct TrinityActor* pActor, char* pBoneName, float[3]* pOffset)

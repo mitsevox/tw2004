@@ -1,0 +1,5 @@
+// C:/packages/rwaudiocore/2.08.01/include/rw/audio/core/plugins/highpassiir2.h
+// compiled in: highpassiir2.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   45  006E5B14      8  unsigned int GetSize(struct PlugInConfig* pPlugInConfig)

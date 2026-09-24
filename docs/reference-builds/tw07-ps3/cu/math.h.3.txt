@@ -1,0 +1,7 @@
+// c:/dev/tiger/dl_default/tigercode/packages/playstation3gcc/110.006/installed/target/ppu/include/math.h
+// compiled in: tiger_mtx.cpp, tiger_quat.cpp
+// 3 functions, source order. line | PS3 address | size
+
+  695    inline-only   float std::cosf(float _Left)
+  715    inline-only   float std::sinf(float _Left)
+  779    inline-only   float std::fabs(float _Left)

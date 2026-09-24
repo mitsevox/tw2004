@@ -1,0 +1,123 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/animation/skeleton_shared.c
+// compiled in: golf2_unity.cpp
+// 26 functions, source order. line | PS3 address | size
+
+  205    inline-only   static void SKEL_FreeIKSkeleton(TIKSkeleton* pIKSkeleton)
+                         local  int32 i
+  219    inline-only   static void SKEL_twHash2HashString(struct HashString* lhs, const twHash* rhs)
+                         local  const int size
+                         local  char[16] str
+                         local  int i
+  231  0013FAD0    174  void SKEL_Free(struct TSkeleton* pSkeleton)
+                         inlines  SKEL_FreeIKSkeleton
+  448  0013FC44     CC  enum ReferencedBoneID SKEL_GetBoneRefID(const char* nameID)
+                         local  enum ReferencedBoneID ret
+                         local  const int nEntries
+                         local  int i
+  463    inline-only   static const struct BoneIDNameMapEntryT* GetBoneIDNameMapEntry(enum ReferencedBoneID refID)
+                         local  const struct BoneIDNameMapEntryT* pRet
+                         local  const int nEntries
+                         local  int i
+  478    inline-only   static void SKEL_GenerateBoneLookupTable(struct TSkeleton* pSkeleton)
+                         local  int i
+                         local  char[17] name
+                         local  enum ReferencedBoneID refID
+                         local  int j
+  537  001AB524    388  bool SKEL_TransformHalfJoint(const enum ReferencedBoneID boneNum, struct TSkeleton* pSkeleton, T_QT* pQT)
+                         local  bool returnVal
+                         local  uint8_t assocBoneIndex
+                         local  int32_t boneIdx
+                         local  float_t old_S
+                         local  float_t old_C
+                         local  float_t old_angle
+                         local  Quat halfAngleQuat
+                         local  Quat decomposedQuatSq
+                         local  Quat halfAngleQuatSq
+                         local  float_t cosOldHalfAngle
+                         local  float_t sinOldHalfAngle
+                         local  float_t new_angle
+                         local  float_t new_S_halfAngle
+                         local  float_t new_S_decomposed
+                         inlines  LLMath_Length3, LLMath_Scale3, Quat_Copy, SKEL_GetBoneIDSwapIfLefty, __vec_mul, std::cosf, std::sinf, std::sqrt, vec_ld, vec_st
+  607  0016CADC    398  void SKEL_TransformBones(struct TSkeleton* pSkeleton, uint32* changed, uint32* doNoChange, bool bRecomputeUnscaledTranslations)
+                         local  const char* actorName
+                         local  const short unsigned int* remapping
+                         local  int32 iBone
+                         local  vec4flt savedPos
+                         local  bool[200] bUsedBones
+                         local  struct TSkin* pSkin
+                         local  mat44flt rootMtx
+                         local  Quat rootQuat
+                         local  mat44flt worldMtx
+                         local  Quat quat
+                         local  int32 b
+                         inlines  LLMath_CopyMat44, LLMath_IdentifyMat, Quat_Copy, vec_ld, vec_st
+  697  00180770     C4  struct TSkeleton* SKEL_LoadFromFile(const char* pcFilename, int8 numExtraBones, TIKInit* pIKInit)
+                         local  struct TSkeleton* pSkeleton
+                         local  char* pData
+                         local  int32 fileLen
+                         local  uint32 iOffset
+  724  0016450C     A8  void SKEL_UpdateSkinningMatrix(struct TSkeleton* pSkeleton, float[4]* bone2World, int32 index)
+                         local  const float[4] vecScale
+                         inlines  LLMath_MultiplyVec
+  749  0017D6D0    474  void SKEL_UpdateState(struct TSkeleton* pSkeleton, struct TSkeletonState* pSkeletonState, bool bTransform, bool ApplyBoneScaleLengthModifers, int startBoneIndex, int endBoneIndex, float blendFactor, struct TSkeletonState* pPreferredPos)
+                         local  int32 iBone
+                         local  BitArray_t[7] rotChange
+                         local  BitArray_t[7] tranChange
+                         local  BitArray_t[7] mergedChange
+                         local  int startIndex
+                         local  int nBones
+                         inlines  BitArray_ClearArray, BitArray_CopyArray, BitArray_FillArray, BitArray_MergeArrayWithOr, BitArray_SetBit, BitArray_TestBit, LLMath_Interpolate, Quat_Copy, vec_st
+  820  00139F74     18  float SKEL_GetIKSolutionWeight(TIKSkeleton* pIKSkeleton, TIKSolution solution)
+  825  001574B4    218  static void SKEL_CreateIKChain(struct TSkeleton* pSkeleton, TIKChain* pChain, TIKChainParams* pParams)
+                         local  const char[19] __FUNCTION__
+                         local  int32 i
+                         local  int16 parentBoneID
+                         local  TIKBone* pBone
+                         inlines  SKEL_GetBoneIDSwapIfLefty, TagValuePair, operator+
+  851  0017F5A0    6E8  static TIKSkeleton* SKEL_CreateIKSkeleton(struct TSkeleton* pSkeleton, TIKInit* pIKInit)
+                         local  const char[22] __FUNCTION__
+                         local  int32 i
+                         local  TIKChainParams* pParam
+                         local  int8 numIKChains
+                         local  TIKSkeleton* pIKSkeleton
+                         inlines  BitArray_ClearArray, Quat_Copy, Quat_IdentifyForMul, SKEL_GetBoneIDSwapIfLefty, TSkeletonState::TSkeletonState, TagValuePair, operator+, vec4flt_Zero, vec_ld, vec_st
+  965  0013FD10     84  void SKEL_ReadHeaderFromMem(struct TSkeleton* pSkeleton, char** pData)
+  982  001706FC    128  void SKEL_ReadBonesFromMem(struct TSkeleton* pSkeleton, char** pData)
+                         local  int i
+                         local  TBone* pBone
+                         inlines  vec4flt_Zero3, vec_st
+ 1010  0013FD94     1C  void SKEL_ReadHeaderFromSkl(struct TSkeleton* pEA3Skel, const twSkel* pTWSkel)
+ 1017  00164348    138  void SKEL_ReadBonesFromSkl(struct TSkeleton* pEA3Skel, const twSkel* pTWSkel)
+                         local  uint32 iBone
+                         local  TBone* pEA3Bone
+                         local  const twBone* pTWBone
+                         inlines  SKEL_twHash2HashString, vec4flt_Copy, vec4flt_Zero3, vec_st
+ 1034  0017FC88    AE8  struct TSkeleton* SKEL_LoadFromMem(char* pData, const twSkel* pSkl, int8 numExtraBones, TIKInit* pIKInit, bool leftHanded, bool bGenerateSKELBoneTable)
+                         local  const char[17] __FUNCTION__
+                         local  int numBones
+                         local  BitArray_t[7] setAllArray
+                         local  struct TSkeleton* pSkeleton
+                         local  int i
+                         local  const int nEntries
+                         local  int boneIndex
+                         local  const struct BoneIDNameMapEntryT* pEntry
+                         local  char[17] name
+                         local  enum ReferencedBoneID refID
+                         local  int j
+                         inlines  BitArray_FillArray, GetBoneIDNameMapEntry, LLMath_IdentifyMat, Quat_IdentifyForMul, SKEL_GenerateBoneLookupTable, SKEL_GenerateLeftHandedTable, TagValuePair, operator+, vec4flt_Zero, vec_st
+ 1200    inline-only   void SKEL_ApplyBoneScaleLengthModifersToBone(struct TSkeleton* pSkeleton, int32 iBone)
+ 1216    inline-only   static void SKEL_WeightIKChain(TIKSkeleton* pIKSkeleton, TIKChain* pChain, float weight)
+                         local  int32 i
+                         local  int32 iBoneID
+ 1236  00164958    1D8  void SKEL_SetIKSolutionWeight(TIKSkeleton* pIKSkeleton, TIKSolution solution, float weight)
+                         inlines  LLMath_Scale3, Quat_Copy, SKEL_WeightIKChain, __vec_mul, vec_st
+ 1258    inline-only   static void SKEL_GenerateLeftHandedTable(struct TSkeleton* pSkeleton)
+                         local  int i
+                         local  int regBoneID
+                         local  int leftBoneID
+ 1282  001763F8    14C  void TSkeletonState::Init(const struct TSkeletonState* this)
+                         local  int i
+                         inlines  BitArray_ClearArray, BitArray_FillArray, Quat_IdentifyForMul
+ 1297  00139AAC     20  const char* TSkeleton::GetActorName(const const struct TSkeleton* this)
+ 1309  0013FDB0     88  void TSkeleton::SetActorName(const struct TSkeleton* this, const char* name)

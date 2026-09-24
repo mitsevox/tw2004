@@ -1,0 +1,139 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/Common/UI_MemoryCard.cpp
+// compiled in: apt_unity.cpp
+// 89 functions, source order. line | PS3 address | size
+
+   70  0005BCA0    100  void UI_InitMemCardModule()
+                         local  const char[21] __FUNCTION__
+                         inlines  TagValuePair, operator+
+   82  000882B8      4  void UI_UpdateMemCardModule()
+   90  0002E8D4     40  void UI_CloseMemCardModule()
+   98  00030300     18  static void sUIMemcard_ResetMCManager()
+  107  000AC67C    57C  void UI_SetMemCardAction(enum MCAction action, struct MemCardMgrActionParam actionParam, MCCompletionCB cb)
+                         local  int currCard
+                         local  enum UserNumber userNbr
+                         local  enum PlayerNumber_t playeNbr
+                         local  enum PlayerNumber_t playeNbr
+                         inlines  MC_SetCurrentFileType, sUIMemCard_SetupInitialState, sUIMemcard_SetFileType
+  165  0002E914     1C  void UIMemCard_SetMCActionState(enum MCActionState actionState)
+  172  0002E930      4  void UIMemCard_SetupDelayedFunction(enum MCState )
+  202  000B1E9C     AC  void UIMemCard_MemCardLoadedDefaultCallback(int32 nRslt)
+                         inlines  cGAME_GLOBALS::SetEndGame, cGAME_GLOBALS::SetGamePaused
+  236    inline-only   static void sUIMemCard_SetupInitialState()
+                         local  enum PlayerNumber_t playeNbr
+                         local  enum PlayerNumber_t playeNbr
+  318  0002E934     1C  enum MCActionState UI_GetMCActionState()
+  326  0002CA34     20  char* UI_GetMCMessageText()
+  334  0002CA54     70  char* UI_GetMCOptionText(int8_t optionID)
+  343  0002C9D8     20  int8_t UI_GetMCNumOptions()
+  351  0002E950     20  int8_t UI_GetMCDefaultOption()
+  358  0002E970     1C  bool UI_IsMCSelectionAllowed()
+  365  0002E990     24  void UI_RefreshMCStatus()
+  392    inline-only   static void sUIMemcard_SetFileType()
+  449  0002E9B4     38  void UIMemCard_SetupMCSelection(bool val)
+  463  0002E9EC    178  void UIMemCard_Set4Menus(char* s1, enum eMemCardUserResp a1, char* s2, enum eMemCardUserResp a2, char* s3, enum eMemCardUserResp a3, char* s4, enum eMemCardUserResp a4, int8_t defaultOption)
+  480  0002EB64    130  void UIMemCard_Set3Menus(char* s1, enum eMemCardUserResp a1, char* s2, enum eMemCardUserResp a2, char* s3, enum eMemCardUserResp a3, int8_t defaultOption)
+  495  0002EC94     EC  void UIMemCard_Set2Menus(char* s1, enum eMemCardUserResp a1, char* s2, enum eMemCardUserResp a2, int8_t defaultOption)
+  508  0002ED80     94  void UIMemCard_Set1Menus(char* s1, enum eMemCardUserResp a1)
+  519  0002EE14     40  void UIMemCard_SetTimedPopup(enum eMemCardUserResp a1)
+  530  0002EE54     3C  void UIMemCard_NoMenus()
+  540  0002EE90     90  bool UIMemCard_NeedToTestMemorySize()
+  563  0002EF20     F0  bool UIMemCard_NeedToLookForLoadFiles()
+  583  0002F010     C0  bool UIMemCard_NeedToTestForLoadFiles()
+  600  0002F0D0     50  bool UIMemCard_NeedToCheckForOverwrite()
+  618  0002F120     50  int UIMemCard_GetMaxLoadFiles()
+                         local  int maxLoadFiles
+  637  0002F170      8  bool UIMemCard_NeedToCheckForCorruptEABio()
+  644  0002F178      8  bool UIMemCard_NeedToPerformBioTests()
+  651  0002F180      8  bool UIMemCard_NeedToTestForAlreadyDeletedFile()
+  658  0002F188     44  bool UIMemCard_NeedToFinishChecking()
+  669  0002F1CC      8  bool UIMemCard_RetryWithNotEnoughMem()
+  685  0002F8D4     B8  void UIMemCard_CheckForMCs()
+  706  0002F1E8    318  void UIMemCard_SetUserNames()
+                         local  int i
+                         local  int iPort
+                         local  int iSlot
+                         local  struct GolfMemCard_t memCardInfo
+  760  0008F58C    338  void UIMemCard_SetReplays()
+                         local  int iPort
+                         local  int iSlot
+                         local  int iValid
+                         local  int i
+                         local  char* sEmptyStr
+                         local  struct GolfMemCard_t memCardInfo
+  843  0002F678     A8  void UIMemCard_NoDeviceSelected()
+                         inlines  MemCardMgr_UIRequest::SetOptionCount
+  855  0002F720     70  void FindFirstCard()
+  882  0002F790     90  bool FindFirstCardWithLoadFile()
+                         local  bool bFileFound
+  902  0002F824     B0  static void sUIMemcard_SetInitialCard()
+                         local  bool bFileFound
+  925  0002F98C     38  void UIMemCard_BeginMCPolling()
+  939  0002F9C4     28  void UIMemCard_StopMCPolling()
+  945  0002F9EC    108  int UIMemCard_GetRequiredBlocksForFile()
+                         local  int iRequiredMem
+                         local  int iPort
+                         local  int iSlot
+                         local  int iFileID
+                         local  char* sFileName
+                         local  MC_ArgsMemoryRequiredT memRequiredArgs
+                         inlines  MC_CallActionFnMemoryRequired
+ 1010  0002FAF4      4  void UIMemCard_MCCheck()
+ 1017  0002FAF8      4  void UIMemcard_OnStepCard(bool bSkipEmptySlots, bool bStepForward)
+ 1033  0002FAFC      4  void UIMemcard_OnGoLEFT(bool bSkipEmptySlots)
+ 1040  0002FB00      4  void UIMemcard_OnGoRIGHT(bool bSkipEmptySlots)
+ 1047  0007AAD8     20  void UI_HandleMCChoice(enum eMemCardUserResp nResponse, int nListIndex)
+                         inlines  SavedGameTask::ActiveTask, SavedGameTask::SetResult
+ 1054  0002FB04     A8  bool CycleCardsAllowed()
+ 1086  0007AB78     44  void UI_HandleMCRightAction()
+                         inlines  SavedGameTask::ActiveTask, SavedGameTask::SetResult
+ 1095  0006051C     44  void UI_HandleMCLeftAction()
+                         inlines  SavedGameTask::ActiveTask, SavedGameTask::SetResult
+ 1104  000E3FF4    1E8  void UIMemCard_CheckForEAGamesAndOldTigerSaves()
+                         local  int numOldSavesFound
+                         local  int numTW06SavesFound
+                         local  int iPort
+                         local  int iSlot
+                         local  int numSaves
+ 1141  0002FBB4     18  bool UI_IsTW05SaveFound()
+ 1148  0002FBCC     18  bool UI_IsTW06SaveFound()
+ 1155  0002FBE4     1C  void UI_ResetTW05SaveFound()
+ 1162  0002FC00     1C  void UI_ResetTW06SaveFound()
+ 1169  0002FCB4     20  int UI_GetNumEAGamesFound()
+ 1177  0002FCD4     1C  int UI_AtemptedToLoadOptions()
+ 1184  000E2248    14C  void UI_DeleteCorruptSave()
+                         local  int iValid
+                         local  MC_ArgsDeleteFileT args
+ 1229  0002FCF0     1C  uint8 UIMemCard_GetNumClientsForValidFlagChecking()
+ 1240  0002FD0C    110  void UIMemCard_EnableUserAndReplayValidFlagChecking(bool bEnable)
+ 1268  0002FE1C     2C  void UIMemCard_SetUserDataValidFlag()
+ 1280  0002FE48     40  bool UIMemCard_GetUserDataValidFlag()
+ 1291  0002FE88     28  void UIMemCard_SetReplayDataValidFlag(bool bIsValid)
+ 1303  0002FEB0     40  bool UIMemCard_GetReplayDataValidFlag()
+ 1316  0002FEF0     20  int UIMemCard_GetControllerPortLock()
+ 1325  00069E74     58  void UIMemcard_SetControllerPortLock(int32 port)
+ 1338  00066300     90  void UIMemcard_ReleaseControllerPortLock()
+                         inlines  AptControllerListener::StopPortLocking
+ 1358  0002FF10     20  void UIMemCard_ClearPreviousPortLockID()
+ 1367  000B0298     B4  bool UIMemCard_GetAutoSave()
+                         local  bool bAutoSaveFlag
+ 1395  0002FF4C     1C  void UIMemCard_SetAutoSaveDisabled(bool bDisabled)
+ 1404  0002FF30     1C  bool UIMemCard_GetAutoSaveDisabled()
+ 1462  00030048      8  enum eParamType MemCardMgrActionParam::GetDataType(const struct MemCardMgrActionParam* this)
+ 1471  0002FF80      C  void MemCardMgrActionParam::SetPlayerNbr(const struct MemCardMgrActionParam* this, enum PlayerNumber_t playerNbr)
+ 1481  000300C0     70  void MemCardMgrActionParam::GetPlayerNbr(const struct MemCardMgrActionParam* this, enum PlayerNumber_t* pPlayer)
+ 1494  0002FF8C      C  void MemCardMgrActionParam::SetAllowCancel(const struct MemCardMgrActionParam* this, bool bAllowCancel)
+ 1504  00030130     70  void MemCardMgrActionParam::GetAllowCancel(const struct MemCardMgrActionParam* this, bool* pbAllowCancel)
+ 1517  00030018      C  void MemCardMgrActionParam::SetControllerID(const struct MemCardMgrActionParam* this, int32 controllerID)
+ 1527  00030050     70  void MemCardMgrActionParam::GetControllerID(const struct MemCardMgrActionParam* this, int32* pControllerID)
+ 1540  0003002C     14  void MemCardMgrActionParam::SetDriverTypeAndGameMode(const struct MemCardMgrActionParam* this, enum GM_DriverType_t driverType, enum GM_ModeType_t gameMode, bool bOKToLoadLicensed)
+ 1552  000301A0     84  void MemCardMgrActionParam::GetDriverTypeAndGameMode(const struct MemCardMgrActionParam* this, enum GM_DriverType_t* pDriverType, enum GM_ModeType_t* pGameMode)
+ 1578  0003023C     C4  void MemCardMgr::ResetForNewOperation(const struct MemCardMgr* this)
+                         local  struct tPersistentData tempPersistent
+                         inlines  tPersistentData::tPersistentData
+ 1628  00030318     58  bool MemCardMgrActionParam::GetOKToLoadLicensed(const struct MemCardMgrActionParam* this)
+ 1638  0002FF68      8  void MemCardMgrActionParam::StoreType(const struct MemCardMgrActionParam* this, enum eParamType nType)
+ 1661  0002C9F8     3C  void MemCardMgr_UIRequest::RefreshScreen(const struct MemCardMgr_UIRequest* this, enum eMemCardUIType nUiType)
+ 1677  00030224     18  void MemCardMgr_UIRequest::ClearRequest(const struct MemCardMgr_UIRequest* this)
+                         inlines  MemCardMgr_UIRequest::ClearRefreshScreen
+ 1688  0002F500     A8  void MemCardMgr_UIRequest::SetMessageText(const struct MemCardMgr_UIRequest* this, const char* stringID, const char* footerStrID)
+ 1701  0002F5A8     D0  void MemCardMgr_UIRequest::SetOption(const struct MemCardMgr_UIRequest* this, int nIndex, const char* stringID, enum eMemCardUserResp respVal, int32 auxData)

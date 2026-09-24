@@ -1,0 +1,80 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/aptInterface/uiAptDrawText.cpp
+// compiled in: other_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   53  003EAF1C     28  static void APT_Draw_OneText(char* str, float x, float y)
+   67  003EAF44     C4  static void UndoNbspFixups(char* str, int numNbsps, const short int* fixups)
+                         local  int i
+                         local  int pos
+   91    inline-only   static int NbspFixup(char* str, int pos, int numNbsps, short int* fixups)
+  118  003EB008    50C  static int32_t Draw_TextWordWrap(char* str, int32_t fontID, float xScale, float yScale, float x, float y, float fWrapWidth_p, float fSpacing_p, bool bDraw, int32* outW, int32* outH)
+                         local  enum WordWrapState state
+                         local  int32_t linebreak
+                         local  int32_t numlines
+                         local  float linewidth
+                         local  float lineWidthMax
+                         local  int32_t numNbsps
+                         local  short int[64] nbspFixups
+                         local  char* origStr
+                         local  const float fontHeight
+                         local  int32 i
+                         local  bool outputline
+                         local  int32 escape
+                         local  char c
+                         local  float wordwidth
+                         local  float wordwidth
+                         local  float wordwidth
+                         local  float wordwidth
+                         inlines  NbspFixup
+  328  003EB514     A0  void MeasureText_BitmapFont(char* str, int32 fontId, float maxW, float fontHeight, const int32& outW, const int32& outH)
+                         local  float scale
+  352  004089B8    230  float APT_Draw_Text(char* str, float x, float y, float r, float g, float b, float a, int32_t font, uint32_t textMode, float xScale, float yScale, float fWrapWidth_p, float fSpacing_p, bool bTryToSetCorrectRenderStates)
+                         local  int32_t lines
+                         local  FO_EAddMode eOldAddMode
+                         local  vec4flt color
+                         inlines  SM_NoteActiveShader
+  410  004371B8    49C  void AptDrawText::DrawStringFO(AptAssetString string, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  struct AptTextAsset* strAsset
+                         local  char* str
+                         local  const int32 fontId
+                         local  mat44flt kResultMatrix
+                         local  vec4flt p0
+                         local  vec4flt p1
+                         local  float scale
+                         local  const float xScale
+                         local  const float yScale
+                         local  uint32_t textMode
+                         local  float x0
+                         local  float y0
+                         local  const float fWrapWidth_p
+                         local  float a
+                         local  float r
+                         local  float g
+                         local  float b
+                         local  vec4flt rgba
+                         inlines  AptColorTransform, AptTextAsset::GetString, AptTextAsset::GetTextData, LLMath_Add, LLMath_ClampVec, LLMath_MultiplyVec, vec_add, vec_ld, vec_max, vec_min
+  516  003EB5B4      4  void DrawTextRenderBase::SetRenderState(const struct DrawTextRenderBase* this)
+  523  003EB5B8      4  void DrawTextRenderBase::RestoreRenderState(const struct DrawTextRenderBase* this)
+  533  003FE8A4     80  void DrawTextRenderBase::InitTextureDataInfo(const struct DrawTextRenderBase* this, int32 w, int32 h, int32 bitDepth)
+                         local  const uint32 nbrBytes
+  568  00453908    174  void RenderFFTextDisplayList()
+                         inlines  DS_vSetAlphaEnable, DS_vSetStencilEnable, DS_vSetStencilOp, DS_vSetStencilTest
+  619  00453A7C    104  void AddToFFTextDisplayList(TextureRef textureRef, vec4flt* xpVertices, vec4flt* xpUVs, uint32 rgba)
+                         local  int i
+                         local  const struct vtxStruct& vertex
+                         local  int32 index
+  656  00454130    2AC  void DrawTextRenderBase::RenderSprite(const struct DrawTextRenderBase* this, const mat44flt& worldToScreen, const vec4flt& p0_in, const vec4flt& p1_in, const vec4flt& uv0, const vec4flt& uv1, uint32_t color, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  vec4flt p0
+                         local  vec4flt p1
+                         local  vec4flt p2
+                         local  vec4flt p3
+                         local  float[4][4] xpVertices
+                         local  float[4][4] xpUVs
+                         local  enum eAlphaMask gAlphaMaskIsOn
+                         inlines  DS_vSetAlphaBlendingFunction, DS_vSetColorWriteEnable, vec4flt_Copy, vec_ld
+  749  003EB6C4     B8  void* DrawTextRenderBase::GetTextureData(const struct DrawTextRenderBase* this, int32 x, int32 y)
+  758  003EB77C    190  void DrawTextRenderBase::SetRegion(const struct DrawTextRenderBase* this, int32 x, int32 y, int32 w, int32 h, uint8 value)
+                         local  uint8* pBitsDeb
+                         local  uint8* pBitsEnd
+                         local  uint8* pBitsXY
+                         local  int row

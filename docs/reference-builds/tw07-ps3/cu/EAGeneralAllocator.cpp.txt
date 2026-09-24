@@ -1,0 +1,432 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/PPMalloc/1.08.00/source/cmn/EAGeneralAllocator.cpp
+// compiled in: EAGeneralAllocator.cpp
+// 85 functions, source order. line | PS3 address | size
+
+  170  0055BBB4      8  static int PPM_VERIFY(const const struct <anon>* pPPMalloc, bool bExpression)
+  415  0055CE04     80  void* PPMMutexCreate(void* pData)
+                         local  const struct PPMMutex* pMutex
+                         inlines  PPMMutex::PPMMutex, sys_mutex_create
+  419  0055BBBC     20  void PPMMutexDestroy(void* pMutex)
+                         local  struct PPMMutex* pPPMMutex
+                         inlines  PPMMutex::~PPMMutex
+  423  0055BB0C     50  int PPMMutexLock(void* pMutex)
+                         local  struct PPMMutex* pPPMMutex
+                         inlines  sys_mutex_lock
+  432  0055BB5C     58  int PPMMutexUnlock(void* pMutex)
+                         local  struct PPMMutex* pPPMMutex
+                         local  const int n
+                         inlines  sys_mutex_unlock
+  442  0055BBDC      C  int PPMMutexGetLockCount(const void* pMutex)
+                         local  struct PPMMutex* pPPMMutex
+  581  0055BBE8    108  bool Allocator::MemoryFillCheck(const unsigned char* pData, size_t nDataSize, unsigned char c)
+                         local  const unsigned char* pDataEnd
+                         local  const const uint32_t* pDataEnd32
+                         local  const uint32_t nData32
+                         local  const uint32_t* pData32
+ 1026  0055EECC    2C0  bool Init(const struct GeneralAllocator* this, void* pInitialCore, size_t nInitialCoreSize, bool bShouldFreeInitialCore, bool bShouldTrimInitialCore, size_t(*)()* pInitialCoreFreeFunction, void* pInitialCoreFreeFunctionContext)
+                         local  volatile struct InitCallbackNode* pCurrent
+                         local  struct PPMAutoMutex autoMutex
+                         local  int i
+                         local  const struct Chunk* pBin
+                         inlines  GetBin, PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex, SetMaxFastBinDataSize
+ 1109  00561AF0    1A4  bool Shutdown(const struct GeneralAllocator* this)
+                         local  const struct CoreBlock* pCoreBlock
+                         local  const void* pMutex
+                         local  volatile struct InitCallbackNode* pCurrent
+                         inlines  GetFastBinChunksExist, GetInitialTopChunk
+ 1202  0055BD14     20  void* AsInterface(const struct GeneralAllocator* this, int id)
+ 1213  0055BD34      8  const char* GetName(const const struct <anon>* this)
+ 1222  0055BD3C      8  void SetName(const struct GeneralAllocator* this, const char* pName)
+ 1231  005617D0    320  void SetOption(const struct GeneralAllocator* this, int option, int nValue)
+                         local  struct PPMAutoMutex autoMutex
+                         local  struct PPMAutoMutex autoMutex
+                         local  const void* pMutex
+                         inlines  AlignUp, GetChunkSizeFromDataSize, PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex, SetMaxFastBinDataSize
+ 1349  0055BD44     B4  void SetInitCallback(struct InitCallbackNode* pInitCallbackNode, bool bSet)
+                         local  volatile struct InitCallbackNode* pCurrent
+                         local  volatile struct InitCallbackNode* pCurrent
+                         local  volatile struct InitCallbackNode* pPrevious
+ 1397  0055BDF8      C  void SetMallocFailureFunction(const struct GeneralAllocator* this, bool(*)()* pMallocFailureFunction, void* pContext)
+ 1404  0055BE04      4  void SetHookFunction(const struct GeneralAllocator* this, void(*)()* pHookFunction, void* pContext)
+ 1416  0055BE08      C  void SetTraceFunction(const struct GeneralAllocator* this, void(*)()* pTraceFunction, void* pContext)
+ 1423  0055BE14      C  void SetTraceFieldDelimiters(const struct GeneralAllocator* this, unsigned char fieldDelimiter, unsigned char recordDelimiter)
+ 1430  0055BCF0      8  unsigned int GetPageSize()
+ 1448  0055C514     90  struct Chunk* FindPriorChunk(const const struct <anon>* this, const struct Chunk* pChunk)
+                         local  const const struct CoreBlock* pCoreBlock
+                         local  const struct Chunk* pCurrentChunk
+                         local  const struct Chunk* pNextChunk
+ 1486  0055BA9C     70  int GetLargeBinIndexFromChunkSize(uint32_t nSize)
+ 1501  0055C7D8     D4  struct Chunk* FindAndSetNewTopChunk(const struct GeneralAllocator* this)
+                         local  struct Chunk* pBestFit
+                         local  uint32_t nBestFitChunkSize
+                         local  struct CoreBlock* pCoreBlock
+                         local  struct Chunk* pChunk
+                         local  struct Chunk* pFenceChunk
+                         local  const struct Chunk* pNextChunk
+                         local  const uint32_t nChunkSize
+                         inlines  GetChunkSize, GetFenceChunk, GetInitialTopChunk, GetNextChunk, UnlinkChunk
+ 1563  0055CA58     7C  bool GetChunkIsFenceChunk(const const struct <anon>* this, const struct Chunk* pChunk)
+                         local  const uint32_t nChunkSize
+                         local  const const struct CoreBlock* pCoreBlock
+ 1590  0055D1B4    1F4  enum BinType FindChunkBin(const const struct <anon>* this, const struct Chunk* pChunk)
+                         local  const uint32_t nChunkSize
+                         local  int nIndex
+                         local  const struct Chunk* pChunkCurrent
+                         local  const struct Chunk* pChunkCurrent
+                         local  const struct Chunk* pChunkCurrent
+                         local  const struct Chunk* pChunkCurrent
+                         inlines  GetBinIndexFromChunkSize, GetChunkSize
+ 1668  0055C49C     2C  void AdjustHighFence(const struct GeneralAllocator* this)
+ 1680  0055CAD4     60  void SetNewTopChunk(const struct GeneralAllocator* this, struct Chunk* pNewTopChunk, bool bFreePreviousTopChunk)
+                         local  const struct Chunk* pPreviousTopChunk
+                         local  const struct Chunk* pUnsortedBinHeadChunk
+                         inlines  GetUnsortedBin, LinkChunk
+ 1711  0055C4C8     20  void AdjustTopChunk(const struct GeneralAllocator* this, struct Chunk* pTopChunk, uint32_t nChunkSize)
+                         local  const struct Chunk* pNextChunk
+                         inlines  SetChunkSize
+ 1735  0055BE60     3C  bool ChunkMatchesLowHigh(const const struct <anon>* this, int bHigh, const struct Chunk* pChunk, const uint32_t nChunkSize)
+ 1754  0055CE84     98  int ChunkMatchesBlockType(const struct Chunk* pChunk, int nBlockTypeFlags)
+                         local  const int bIsAllocated
+                         inlines  GetChunkIsInUse
+ 1771  0055C4E8     2C  void SetFencepostAfterChunk(const struct Chunk* pChunk, uint32_t nChunkSize)
+                         local  struct Chunk* pFenceChunk
+                         inlines  GetChunkAtOffset, SetChunkSize
+ 1804  0055CB34     5C  void AddDoubleFencepost(struct Chunk* pChunk, int nPrevChunkFlags)
+                         local  size_t nChunkSize
+                         local  struct Chunk* pFenceChunk
+                         inlines  GetChunkAtOffset, SetChunkSize, SetChunkSizePreserveFlags
+ 1838  0055CB90     44  struct Chunk* MakeChunkFromCore(void* pCore, size_t nCoreSize, int nFlags)
+                         local  const struct Chunk* pChunk
+                         inlines  SetChunkSize
+ 1848  0055BE9C     2C  void GetBlockInfoForCoreBlock(const const struct <anon>* this, const struct CoreBlock* pCoreBlock, struct BlockInfo* pBlockInfo)
+ 1858  0055E8AC    158  void GetBlockInfoForChunk(const const struct <anon>* this, const struct Chunk* pChunk, struct BlockInfo* pBlockInfo, const void* pCore)
+                         local  const int bIsAllocated
+                         local  const int bIsMMapped
+                         local  const uint32_t nChunkSize
+                         local  const size_t nUsableSize
+                         inlines  GetChunkIsInUse, GetChunkIsMMapped, GetChunkSize, GetDataPtrFromChunkPtr
+ 1901  0055D3A8    2B0  int CheckChunk(const struct GeneralAllocator* this, const struct Chunk* pChunk)
+                         local  struct PPMAutoMutex autoMutex
+                         local  int nErrorCount
+                         local  const uint32_t nChunkSize
+                         local  const const struct CoreBlock* pCoreBlock
+                         local  const const struct CoreBlock* pCoreBlock
+                         inlines  GetChunkSize, PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex
+ 2088  0055D658    274  int CheckFreeChunk(const struct GeneralAllocator* this, const struct Chunk* pChunk)
+                         local  struct PPMAutoMutex autoMutex
+                         local  int nErrorCount
+                         local  const uint32_t nChunkSize
+                         local  const const struct Chunk* pNextChunk
+                         inlines  GetChunkIsInUse, GetChunkSize, PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex
+ 2150  0055D8CC    160  int CheckUsedChunk(const struct GeneralAllocator* this, const struct Chunk* pChunk)
+                         local  struct PPMAutoMutex autoMutex
+                         local  int nErrorCount
+                         local  const struct Chunk* pNextChunk
+                         local  const struct Chunk* pPrevChunk
+                         inlines  GetChunkIsInUse, GetChunkIsMMapped, PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex
+ 2196  0055DA2C    134  int CheckRemallocedChunk(const struct GeneralAllocator* this, const struct Chunk* pChunk, uint32_t nRequestedChunkSize)
+                         local  struct PPMAutoMutex autoMutex
+                         local  int nErrorCount
+                         local  const uint32_t nChunkSize
+                         inlines  GetChunkSize, PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex
+ 2226  0055DB60    104  int CheckMallocedChunk(const struct GeneralAllocator* this, const struct Chunk* pChunk, uint32_t nRequestedChunkSize, bool bNewlyMalloced, bool bAllowPrevNotInUse)
+                         local  struct PPMAutoMutex autoMutex
+                         local  int nErrorCount
+                         inlines  PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex
+ 2253  0055DC64     F8  int CheckMMappedChunk(const struct GeneralAllocator* this, const struct Chunk* pChunk)
+                         local  struct PPMAutoMutex autoMutex
+                         local  int nErrorCount
+                         local  const struct Chunk* pCurrentChunk
+                         local  const const struct Chunk* pMMappedChunk
+                         inlines  PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex
+ 2286  0055DD5C    798  int CheckState(const struct GeneralAllocator* this, enum HeapValidationLevel heapValidationLevel)
+                         local  struct PPMAutoMutex autoMutex
+                         local  int nErrorCount
+                         local  int i
+                         local  int iEnd
+                         local  unsigned int nSizeTotal
+                         local  const struct Chunk* pChunk
+                         local  int j
+                         local  int jMax
+                         local  const const struct CoreBlock* pCoreBlock
+                         local  const struct Chunk* pChunk
+                         local  int nHeadChunkCount
+                         local  const const struct CoreBlock* pCoreBlock
+                         local  const unsigned int nMaxFastBinChunkSize
+                         local  const unsigned int nLastFastBinIndex
+                         local  const struct Chunk* pChunk
+                         local  const const struct Chunk* pBin
+                         local  const bool bBitmapBitIsSet
+                         local  const bool bBinNotEmpty
+                         local  const struct Chunk* pChunk
+                         local  const uint32_t nChunkSize
+                         local  const int nBinIndex
+                         local  const struct Chunk* pChunk2
+                         local  struct CoreBlock* pCoreBlock
+                         local  const struct Chunk* pChunk
+                         local  const struct Chunk* pFenceChunk
+                         local  const int bIsInUse
+                         inlines  GetBinIndexFromChunkSize, GetChunkIsFastBin, GetChunkIsInUse, GetChunkSize, GetMaxFastBinChunkSize, PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex
+ 2599  0055BEC8    2F0  enum DataType GetDataPreview(const const struct <anon>* this, const void* pDataVoid, size_t nDataSize, char* pBuffer, wchar_t* pBufferW, size_t nBufferLength)
+                         local  const char[16] hexDigits
+                         local  const char* pData
+                         local  size_t nPreviewSize
+                         local  size_t j
+                         local  const char hex0
+                         local  const char hex1
+ 2677  0055C234      4  void AssertionFailureFunctionDefault(const char* pExpression, void* pContext)
+ 2690  0055C1B8      C  void SetAssertionFailureFunction(const struct GeneralAllocator* this, void(*)()* pAssertionFailureFunction, void* pContext)
+ 2700  0055C1C4     4C  void AssertionFailure(const const struct <anon>* this, const char* pExpression)
+ 2711  0055C210     24  void TraceFunctionDefault(const char* pTraceText, void* )
+ 2733  0055C5A4    234  size_t DescribeChunk(const const struct <anon>* this, const struct Chunk* pChunk, char* pBuffer, size_t nBufferLength, bool bAppendLineEnd)
+                         local  int nCount
+                         local  const char* pBufferStart
+                         local  const void* pData
+                         local  const unsigned int nDataSize
+                         local  size_t nRequiredSpace
+                         local  const unsigned int kDataStringCapacity
+                         local  char[256] dataString
+                         inlines  GetChunkIsInternal
+ 2823  0055E554     A8  size_t DescribeData(const struct GeneralAllocator* this, const void* pData, char* pBuffer, size_t nBufferLength)
+                         local  struct PPMAutoMutex autoMutex
+                         inlines  PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex
+ 2838  00561630    1A0  void TraceAllocatedMemory(const struct GeneralAllocator* this, void(*)()* pTraceFunction, void* pTraceFunctionContext, void* pStorage, size_t nStorageSize)
+                         local  char[4000] pTraceBuffer
+                         local  struct PPMAutoMutex autoMutex
+                         local  const const void* pContext
+                         local  const struct BlockInfo* pBlockInfo
+                         local  const struct Chunk* pChunk
+                         inlines  PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex
+ 2889  00561530    100  bool ReportHeap(const struct GeneralAllocator* this, bool(*)()* pHeapReportFunction, void* pContext, int nBlockTypeFlags, bool bMakeCopy, void* pStorage, size_t nStorageSize)
+                         local  bool bReturnValue
+                         local  const struct Snapshot* pSnapshot
+                         local  const struct BlockInfo* pBlockInfo
+ 2919  005614C0     70  const void* ReportBegin(const struct GeneralAllocator* this, void* pContext, int nBlockTypeFlags, bool bMakeCopy, void* pStorage, size_t nStorageSize)
+                         local  struct Snapshot* pSnapshot
+ 2943  0055EA04    290  const struct BlockInfo* ReportNext(const struct GeneralAllocator* this, const void* pContext, int nBlockTypeFlags)
+                         local  const struct Snapshot* pSnapshot
+                         local  const struct Chunk* pFenceChunk
+                         inlines  GetNextChunk
+ 3052  0055D180     34  void ReportEnd(const struct GeneralAllocator* this, const void* pContext)
+                         local  const struct Snapshot* pSnapshot
+ 3093  00560FBC    504  void* TakeSnapshot(const struct GeneralAllocator* this, int nBlockTypeFlags, bool bMakeCopy, void* pStorage, size_t nStorageSize)
+                         local  struct PPMAutoMutex autoMutex
+                         local  struct Snapshot* pSnapshot
+                         local  size_t nBlockCount
+                         local  size_t nPass
+                         local  size_t nBlockIndex
+                         local  struct CoreBlock* pCoreBlock
+                         local  const struct Chunk* pChunk
+                         local  const struct Chunk* pFenceChunk
+                         local  const int bIsInUse
+                         local  const size_t kBlockCountExtra
+                         local  const size_t nSizeOfSnapshot
+                         local  const void* pData
+                         local  const size_t nSizeOfSnapshot
+                         local  const void* pData
+                         inlines  GetChunkIsInUse, GetChunkPtrFromDataPtr, PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex, SetChunkIsInternal
+ 3266  0055D15C     24  void FreeSnapshot(const struct GeneralAllocator* this, void* pContext)
+                         local  const struct Snapshot* pSnapshot
+ 3283  0055E5FC    158  const void* ValidateAddress(const const struct <anon>* this, const void* pAddress, int addressType)
+                         local  struct PPMAutoMutex autoMutex
+                         local  const const struct CoreBlock* pCoreBlock
+                         local  const struct Chunk* pCurrentChunk
+                         local  const struct Chunk* pPrevChunk
+                         local  const struct Chunk* pNextChunk
+                         local  const const void* pData
+                         inlines  GetChunkIsInUse, GetNextChunk, PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex
+ 3381  0055C350     58  bool IsAddressHigh(const struct GeneralAllocator* this, const void* pAddress)
+                         local  struct CoreBlock* pCoreBlock
+ 3403  0055E4F4     60  bool ValidateHeap(const struct GeneralAllocator* this, enum HeapValidationLevel heapValidationLevel)
+                         local  int nErrorCount
+ 3421  0055C3A8     34  void SetAutoHeapValidation(const struct GeneralAllocator* this, enum HeapValidationLevel heapValidationLevel, size_t nFrequency)
+ 3434  00560F2C     90  void* Malloc(const struct GeneralAllocator* this, size_t nSize, int nAllocationFlags)
+                         local  void* pReturnValue
+                         local  struct PPMAutoMutex autoMutex
+                         inlines  PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex
+ 3491  0055F5CC    8B4  void* MallocInternal(const struct GeneralAllocator* this, size_t nSize, int nAllocationFlags)
+                         local  void* pData
+                         local  uint32_t nRequestedChunkSize
+                         local  struct Chunk* pResultChunk
+                         local  uint32_t nResultChunkSize
+                         local  int nResultBinIndex
+                         local  struct Chunk* pRemainderChunk
+                         local  uint32_t nRemainderChunkSize
+                         local  struct Chunk* pBin
+                         local  int nBinIndex
+                         local  struct Chunk* pNextChunk
+                         local  struct Chunk* pPrevChunk
+                         local  unsigned int nBinBitmapWordIndex
+                         local  unsigned int nBinBitmapBitIndex
+                         local  unsigned int nBinBitmapWordValue
+                         local  unsigned int nMallocFailureCount
+                         local  const int bHigh
+                         local  const struct Chunk* pUnsortedBin
+                         local  const struct Chunk** ppFastBin
+                         local  const bool bFlagsMatch
+                         local  int i
+                         local  const int nSavedLockCount
+                         local  const bool bResult
+                         local  const struct Chunk* pNextChunk1
+                         inlines  GetBin, GetChunkAtOffset, GetChunkSize, GetChunkSizeFromDataSize, GetDataPtrFromChunkPtr, GetIsAligned, GetLastChunkInBin, GetNextBin, GetSmallBinIndexFromChunkSize, GetUnsortedBin, MarkBinBitmapBit, SetChunkInUseOffset, SetChunkIsInUse, SetChunkSize, SetNextChunkPrevSize, UnlinkChunk
+ 4125  0055E754     98  void Free(const struct GeneralAllocator* this, void* pData)
+                         local  struct PPMAutoMutex autoMutex
+                         inlines  PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex
+ 4168  0055CF1C    240  void FreeInternal(const struct GeneralAllocator* this, void* pData)
+                         local  struct Chunk* pChunk
+                         local  uint32_t nChunkSize
+                         local  struct Chunk** ppFastBin
+                         local  struct Chunk* pNextChunkContig
+                         local  uint32_t nNextChunkSizeContig
+                         local  uint32_t nPrevChunkSizeContig
+                         local  const struct Chunk* pUnsortedBinHeadChunk
+                         local  const struct Chunk* pNextChunk
+                         inlines  ClearChunkInUseOffset, GetChunkAtOffset, GetChunkInUseOffset, GetChunkPtrFromDataPtr, GetChunkSize, GetUnsortedBin, LinkChunk, SetChunkSize, SetFastBinChunksExist, SetNextChunkPrevSize, UnlinkChunk
+ 4356  00560E7C     B0  void* MallocAligned(const struct GeneralAllocator* this, size_t nSize, size_t nAlignment, size_t nAlignmentOffset, int nAllocationFlags)
+                         local  void* pReturnValue
+                         local  struct PPMAutoMutex autoMutex
+                         inlines  PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex
+ 4398  00560978    504  void* MallocAlignedInternal(const struct GeneralAllocator* this, size_t nSize, size_t nAlignment, size_t nAlignmentOffset, int nAllocationFlags)
+                         local  void* pMallocValue
+                         local  void* pReturnValue
+                         local  struct Chunk* pChunk
+                         local  uint32_t nChunkSize
+                         local  struct Chunk* pReturnChunk
+                         local  uint32_t nNewChunkSize
+                         local  uint32_t nLeadingSize
+                         local  struct Chunk* pRemainderChunk
+                         local  uint32_t nRemainderChunkSize
+                         local  const struct Chunk* pUnsortedBin
+                         local  const struct Chunk* pBin
+                         local  size_t nAlignedAddress
+                         local  void* pAlignedAddress
+                         local  char* pAlignedChunk
+                         local  const enum HeapValidationLevel hvlSaved
+                         local  const struct Chunk* pNextChunk
+                         local  const uint32_t nNextChunkSize
+                         local  const struct Chunk* pUnsortedBinHeadChunk
+                         local  const enum HeapValidationLevel hvlSaved
+                         inlines  AlignUp, GetBinIndexFromChunkSize, GetChunkAtOffset, GetChunkPtrFromDataPtr, GetChunkSize, GetChunkSizeFromDataSize, GetDataPtrFromChunkPtr, GetUnsortedBin, LinkChunk, SetChunkInUseOffset, SetChunkSize, SetChunkSizePreserveFlags, SetNextChunkPrevSize, UnlinkChunk
+ 4645  005608D8     A0  void* Realloc(const struct GeneralAllocator* this, void* pData, size_t nNewSize, int nAllocationFlags)
+                         local  void* pReturnValue
+                         local  struct PPMAutoMutex autoMutex
+                         inlines  PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex
+ 4744  00560490    448  void* ReallocInternal(const struct GeneralAllocator* this, void* pData, size_t nNewSize, int nAllocationFlags)
+                         local  void* pReturnValue
+                         local  struct Chunk* pOldChunk
+                         local  uint32_t nOldChunkSize
+                         local  uint32_t nNewChunkRequestSize
+                         local  struct Chunk* pNewChunk
+                         local  uint32_t nNewChunkSize
+                         local  struct Chunk* pNextChunkContig
+                         local  struct Chunk* pRemainderChunk
+                         local  uint32_t nRemainderChunkSize
+                         local  size_t* pDataDestN
+                         local  size_t* pDataSrcN
+                         local  const enum HeapValidationLevel hvlSaved
+                         inlines  GetChunkAtOffset, GetChunkPtrFromDataPtr, GetChunkSize, GetChunkSizeFromDataSize, GetDataPtrFromChunkPtr, SetChunkInUseOffset, SetChunkSize, SetChunkSizePreserveFlags, SetNextChunkPrevSize, UnlinkChunk
+ 4922  005603F0     A0  void* Calloc(const struct GeneralAllocator* this, size_t nElementCount, size_t nElementSize, int nAllocationFlags)
+                         local  void* pReturnValue
+                         local  struct PPMAutoMutex autoMutex
+                         inlines  PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex
+ 4962  0056026C    184  void* CallocInternal(const struct GeneralAllocator* this, size_t nElementCount, size_t nElementSize, int nAllocationFlags)
+                         local  const void* pReturnValue
+                         local  const const struct Chunk* pChunk
+                         local  const uint32_t nChunkSize
+                         local  size_t* pDataDestN
+                         inlines  GetChunkSize
+ 4995  005601C0     AC  void** MallocMultiple(const struct GeneralAllocator* this, size_t nElementCount, size_t nElementSize, void** pResultArray, int nAllocationFlags)
+                         local  void** ppReturnValue
+                         local  struct PPMAutoMutex autoMutex
+                         inlines  PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex
+ 5035  0056010C     B4  void** MallocMultiple(const struct GeneralAllocator* this, size_t nElementCount, const size_t* pElementSizes, void** pResultArray, int nAllocationFlags)
+                         local  void** ppReturnValue
+                         local  struct PPMAutoMutex autoMutex
+                         inlines  PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex
+ 5078  0055FE80    28C  void** MallocMultipleInternal(const struct GeneralAllocator* this, size_t nElementCount, size_t nSizeCount, const size_t* pElementSizes, void** pResultArray, int nAllocationFlags)
+                         local  struct Chunk* pReturnArrayChunk
+                         local  void** pReturnArray
+                         local  uint32_t nReturnArraySize
+                         local  void* pAggregateMemory
+                         local  uint32_t nAggregateMemorySize
+                         local  struct Chunk* pAggregateMemoryChunk
+                         local  uint32_t nChunkMemorySize
+                         local  uint32_t nRemainderChunkSize
+                         local  size_t i
+                         local  const int nMMapMaxAllowedSaved
+                         inlines  GetChunkAtOffset, GetChunkPtrFromDataPtr, GetChunkSize, GetChunkSizeFromDataSize, SetChunkSize
+ 5183  0055F548     84  void ClearCache(const struct GeneralAllocator* this)
+                         local  struct PPMAutoMutex autoMutex
+                         inlines  PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex
+ 5196  0055F18C    240  void ClearFastBins(const struct GeneralAllocator* this)
+                         local  struct Chunk** ppFastBin
+                         local  struct Chunk** ppFastBinLast
+                         local  struct Chunk* pChunk
+                         local  struct Chunk* pNextChunkClear
+                         local  struct Chunk* pBinUnsorted
+                         local  struct Chunk* pNextChunkContig
+                         local  uint32_t nChunkSize
+                         local  uint32_t nNextChunkSizeContig
+                         local  uint32_t nPrevChunkSizeContig
+                         local  const int bNextChunkContigIsUse
+                         inlines  ClearChunkInUseOffset, GetChunkAtOffset, GetChunkInUseOffset, GetChunkSize, GetUnsortedBin, LinkChunk, SetChunkSize, SetFastBinChunksExist, SetNextChunkPrevSize, UnlinkChunk
+ 5340  0055E7EC     C0  size_t GetUsableSize(const const struct <anon>* this, const void* pData)
+                         local  struct PPMAutoMutex autoMutex
+                         local  const const struct Chunk* pChunk
+                         local  const uint32_t nChunkSize
+                         inlines  GetChunkIsMMapped, GetChunkSize, PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex
+ 5377  0055EC94     74  size_t GetBlockSize(const const struct <anon>* this, const void* pData, bool bNetSize)
+                         local  struct PPMAutoMutex autoMutex
+                         local  const const struct Chunk* pChunk
+                         local  size_t nChunkSize
+                         inlines  GetChunkSize, PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex
+ 5399  0055F3CC    17C  size_t GetLargestFreeBlock(const struct GeneralAllocator* this, bool bClearCache)
+                         local  struct PPMAutoMutex autoMutex
+                         local  size_t nLargest
+                         local  const const struct Chunk* pBegin
+                         local  size_t i
+                         local  const const struct Chunk* pChunk
+                         local  const size_t n
+                         local  const struct Chunk* pChunk
+                         local  const size_t n
+                         local  int i
+                         local  const struct Chunk* pChunk
+                         local  const size_t n
+                         inlines  GetChunkSize, PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex
+ 5463  0055C3DC     1C  void LinkCoreBlock(const struct GeneralAllocator* this, struct CoreBlock* pCoreBlock, struct CoreBlock* pNext)
+ 5472  0055BCF8     1C  void UnlinkCoreBlock(const struct GeneralAllocator* this, struct CoreBlock* pCoreBlock)
+ 5479  0055BE20     40  struct CoreBlock* FindCoreBlockForAddress(const const struct <anon>* this, const void* pAddress)
+                         local  struct CoreBlock* pCoreBlock
+ 5508  0055ED08    1C4  bool AddCore(const struct GeneralAllocator* this, void* pCore, size_t nCoreSize, bool bShouldFreeCore, bool bShouldTrimCore, size_t(*)()* pCoreFreeFunction, void* pCoreFreeFunctionContext)
+                         local  struct PPMAutoMutex autoMutex
+                         local  const struct CoreBlock* pCoreBlock
+                         local  const struct Chunk* pChunk
+                         local  const struct Chunk* pChunk
+                         inlines  PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex
+ 5607  0055CD44     C0  struct Chunk* ExtendCoreInternal(const struct GeneralAllocator* this, size_t nMinSize)
+                         local  bool bShouldSetNewTopChunk
+                         local  struct Chunk* pChunk
+                         local  uint32_t nNewChunkSize
+                         local  const struct Chunk* pRemainderChunk
+                         local  const uint32_t nRemainderChunkSize
+                         inlines  GetChunkAtOffset, GetChunkSize, SetChunkSize, SetNextChunkPrevSize
+ 5777  0055CBD4    170  struct Chunk* AddCoreInternal(const struct GeneralAllocator* this, size_t nMinSize)
+                         local  void* pCore
+                         local  int nChunkFlags
+                         local  size_t nCoreSize
+                         local  const struct CoreBlock* pCoreBlock
+                         local  const struct Chunk* pChunk
+                         inlines  AlignUp
+ 5918  0055C3F8     A4  bool FreeCore(const struct GeneralAllocator* this, struct CoreBlock* pCoreBlock, bool bInShutdown)
+                         local  bool bReturnValue
+ 5971  0055C8AC    1AC  size_t TrimCore(const struct GeneralAllocator* this, size_t nPadding)
+                         local  struct PPMAutoMutex autoMutex
+                         local  size_t nCoreTrimmed
+                         local  struct CoreBlock* pCoreBlock
+                         local  const const struct Chunk* pFenceChunk
+                         local  const struct Chunk* pHighestChunk
+                         local  const struct Chunk* pListPrevSaved
+                         local  const struct Chunk* pListNextSaved
+                         local  const struct CoreBlock* pCoreBlockSaved
+                         local  const size_t nCoreBlockSize
+                         inlines  GetPrevChunk, LinkChunk, PPMAutoMutex::PPMAutoMutex, PPMAutoMutex::~PPMAutoMutex, UnlinkChunk

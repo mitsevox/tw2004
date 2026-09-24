@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/Headers/DrawFadeIndicator.h
+// compiled in: golf_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   13  002174A4     2C  void DrawFadeIndicator::DrawFadeIndicator(const struct DrawFadeIndicator* this)
+   14  002174FC      4  void DrawFadeIndicator::~DrawFadeIndicator(const struct DrawFadeIndicator* this)
+   18    inline-only   struct DrawFadeIndicator* DrawFadeIndicator::GetInstance()

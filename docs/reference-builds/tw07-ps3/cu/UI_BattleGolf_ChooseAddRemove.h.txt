@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/UI_BattleGolf_ChooseAddRemove.h
+// compiled in: apt_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   15  0011CEE0    160  void UIBattleGolf_ChooseAddRemove::~UIBattleGolf_ChooseAddRemove(const struct UIBattleGolf_ChooseAddRemove* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIBattleGolf_ChooseAddRemove::UIBattleGolfDstMenuItem>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+   17  000FE4FC      C  uint32 UIBattleGolf_ChooseAddRemove::GetSignature(const const struct UIBattleGolf_ChooseAddRemove* this)
+   22  000FE508     44  void UIBattleGolf_ChooseAddRemove::ShowHelpText(const struct UIBattleGolf_ChooseAddRemove* this)
+   24  000FE554      C  struct IExternArray* UIBattleGolf_ChooseAddRemove::GetExternArray(const struct UIBattleGolf_ChooseAddRemove* this)
+   57  0010350C     1C  void UIBattleGolf_ChooseAddRemove::GenerateWinnerText_func(struct IAptSubscriber* subs)
+   58  00103BD4     18  enum TAptSequenceStatus UIBattleGolf_ChooseAddRemove::Show_BattleGolfChooseClubScreen_Sequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)

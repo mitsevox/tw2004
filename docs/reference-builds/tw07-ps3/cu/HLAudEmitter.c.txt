@@ -1,0 +1,126 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/audio/engine/hl/HLAudEmitter.c
+// compiled in: other_unity.cpp
+// 28 functions, source order. line | PS3 address | size
+
+   65    inline-only   void PreprocessControllers(TEmitInst* pemit, int32* ctrls, bit16 updateflags)
+                         local  uint8 i
+                         local  bit16 mask
+                         local  TPerf* pperf
+                         local  int32 ctrl
+                         local  EStmPlayMode mode
+                         local  uint8 listID
+                         local  uint16 stmID
+  110    inline-only   audfrac Distance3D(TEmitInst* pemit, audfrac* pos)
+                         local  uint8 micID
+                         local  audfrac minDist
+                         local  audfrac dist
+  132    inline-only   audfrac Attenuation3D(audfrac dist, audfrac distFactor)
+                         local  audfrac attn
+  167    inline-only   void Panning3D(TEmitInst* pemit)
+                         local  float angle
+  187    inline-only   void Doppler3D(TEmitInst* pemit)
+                         local  audfrac dist
+                         local  audfrac doppler
+                         local  audfrac dspeed
+  223    inline-only   void FreeAllPerfs(TEmitInst* pemit)
+                         local  uint8 trkID
+  238  003E4B04     B0  bool Emi_InitModule()
+                         local  bool ok
+                         local  int32 iEmit
+  267  003E4E98     50  void Emi_ExitModule()
+  278  003DF864      8  bool Emi_InitSession()
+  285  003DF860      4  void Emi_ExitSession()
+  319  00420654    3D0  void Emi_Cycle()
+                         local  int frame
+                         local  struct EMITTERINSTANCE* pEmitterInstance
+                         local  int nEmitterInstances
+                         local  char* pMemoryPosition
+                         local  int i
+                         local  const const TEmitInst& emitter
+  372  003E0E44    124  TEmitShared* Emi_AddInstance(uint8 instID, uint32 tmplID, bit8 states, bit8 trackstatus, audfrac* ctrls, audfrac* pos, bit16 updtflags, EAudPosType type, EAudPosMode mode)
+                         local  TEmitter* pres
+                         local  TEmitInst* pemit
+                         local  TEmitShared* pshared
+  406  00450330    65C  void Emi_UpdInstance(uint8 instID, bit8 trkOns, bit8 trkOffs, int32* ctrls, audfrac* pos, bit16 updtflags)
+                         local  TEmitInst* pemit
+                         local  bool hearable
+                         local  audfrac mindist
+                         local  TPerf* pperf
+                         local  int32 ctrl
+                         local  EStmPlayMode mode
+                         local  uint8 listID
+                         local  uint16 stmID
+                         local  uint32 gSoloEmitterGuid
+                         local  TTrack* ptrk
+                         local  TPerf** ppperf
+                         local  TTrack* ptrk
+                         local  uint8 ntracks
+                         local  uint8 trkID
+                         local  bit8 trkMask
+                         local  audfrac distAttn
+                         local  TPerf* pperf
+                         local  bool manualstart
+                         local  bool manualstop
+                         local  audfrac distdiff
+                         local  float angle
+                         local  audfrac dist
+                         local  audfrac dspeed
+                         inlines  Attenuation3D, Distance3D, Doppler3D, FreeAllPerfs, Panning3D, PreprocessControllers, audfrac_Mul, std::atan2
+  499  0044FC78     C4  void Emi_DelInstance(uint8 instID)
+                         local  TEmitInst* pemit
+                         inlines  FreeAllPerfs
+  511  003DB454     60  bool Emi_IsValidInstance(uint8 instID)
+                         local  TEmitInst* pemit
+  526  0044F810    150  void Emi_SetTrackVariation(uint8 instID, uint8 trackID, uint8 varID)
+                         local  TEmitInst* pemit
+                         local  TTrack* ptrk
+                         local  TPerf* pperf
+  556  0044F6CC    144  void Emi_SetTrackVarRange(uint8 instID, uint8 trackID, uint8 rangeID)
+                         local  TEmitInst* pemit
+                         local  TPerf* pperf
+  585  00407538    124  void Emi_SetTrackVarRangeTmpl(uint32 tmplID, uint8 trackID, uint8 rangeID)
+                         local  TEmitter* ptmpl
+                         local  TTrack* ptrk
+                         local  bool bDisableRuntimeAudio
+                         local  char[1024] buffer
+  619  0044F56C    160  void Emi_SetTrackStep(uint8 instID, uint8 trackID, uint8 step, EAudStepMode mode)
+                         local  TEmitInst* pemit
+                         local  TPerf* pperf
+                         local  char[1024] buffer
+  652  0044F428    144  void Emi_SetTrackAttenuation(uint8 instID, uint8 trackID, audfrac attn)
+                         local  TEmitInst* pemit
+                         local  TPerf* pperf
+                         local  char[1024] buffer
+  687  0044F2CC    15C  void Emi_SetTrackPitchFactor(uint8 instID, uint8 trackID, audfrac pitch)
+                         local  TEmitInst* pemit
+                         local  TPerf* pperf
+                         local  char[1024] buffer
+  723  0044F170    15C  void Emi_SetTrackPitchRamp(uint8 instID, uint8 trackID, audfrac rampRate)
+                         local  TEmitInst* pemit
+                         local  TPerf* pperf
+                         local  char[1024] buffer
+  760  003DFA38     54  void Emi_FlushStreamerQueue(uint8 instID, uint8 trackID)
+                         local  TEmitInst* pemit
+                         local  TPerfStm* pperf
+  776  003E20B0    100  void Emi_CheckTemplate(TEmitter* ptmpl, int16 emitID, bool bResolve)
+                         local  uint8 i
+  796  003E3E28     30  void Emi_TrackCallback(TEmitInst* pemit, uint8 trackID, EAudTrkCBReason reason)
+                         local  uint8 instID
+  808  003E0DC4     5C  bool Emi_GetAliasInfo(uint32 tmplID, int16* palias, uint8* pflags)
+                         local  TEmitter* pEmitter
+  823  003E2AF4    22C  void Emi_DebugPrint(const float& x, const float& y, PRINTFFN PrintfFn, const const TEmitInst& emitter)
+                         local  const float LINE
+                         local  const audfrac[3]& location
+                         local  vec4flt emitter_location
+                         local  int index
+                         local  const int length
+                         local  char[512] buffer
+                         local  float xindent
+                         local  int i
+                         local  int i
+                         local  const TPerf& performance
+ 1051  003E2D20     E8  void Emi_DebugPrint(const float& x, const float& y, PRINTFFN PrintfFn)
+                         local  const float LINE
+                         local  float xindent
+                         local  int i
+                         local  const const TEmitInst& emitter

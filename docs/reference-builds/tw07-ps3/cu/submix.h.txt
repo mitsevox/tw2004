@@ -1,0 +1,11 @@
+// C:/packages/rwaudiocore/2.08.01/include/rw/audio/core/plugins/submix.h
+// compiled in: send.cpp, submix.cpp, systemmasteringsubmix.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   47    inline-only   struct <anon>* GetConnectorFromNode(void* pNode)
+   52    inline-only   struct <anon>* GetNode(const struct <anon>* this)
+   69    inline-only   int GetNumSubMixChannels(const struct <anon>* this)
+  116    inline-only   float* GetBuffer(const struct SubMix* this)
+  122    inline-only   void SubMix::EnumerateSubMixReset()
+  130    inline-only   const char* SubMix::GetName(const struct SubMix* this)
+  135  006DADAC      8  unsigned int GetSize(struct PlugInConfig* )

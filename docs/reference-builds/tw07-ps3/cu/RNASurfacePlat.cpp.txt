@@ -1,0 +1,32 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/PS3/RNASurfacePlat.cpp
+// compiled in: RNASurfacePlat.cpp
+// 13 functions, source order. line | PS3 address | size
+
+    0  0083E778     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   70  0083E050     60  void SurfacePlatC(const struct <anon>* this, struct UserData* pUserData, uint32_t uFlags)
+  103  0083E934    104  void ~SurfacePlatC(const struct <anon>* this)
+                         inlines  operator delete
+  143  0083E110    1FC  bool Create(const struct <anon>* this, struct DeviceC* pDevice, int32_t iWidth, int32_t iHeight, enum SurfaceFormatE eFormat, SurfaceFlagsT uSurfaceFlags)
+                         local  int32_t size
+                         local  uint32_t allocSize
+  246  0083E30C    2D0  bool CreateMultipleLinear(struct DeviceC* pDevice, int32_t iWidth, int32_t iHeight, enum SurfaceFormatE eFormat, SurfaceFlagsT uSurfaceFlags, struct <anon>** paSurfaceArray, size_t nSurfaceSount)
+                         local  void* pSurfaceMemory
+                         local  uint32_t pitch
+                         local  int32_t surfacesize
+                         local  int32_t allocSize
+                         local  size_t i
+  358  0083E5DC     B8  void DestroyMultipleLinear(struct <anon>** paSurfaceArray, size_t nSurfaceSount)
+                         local  size_t i
+  399  0083E818    11C  void Destroy(const struct <anon>* this)
+                         local  const char[8] __FUNCTION__
+                         inlines  RNADebugBreak
+  447  0083EA38    150  bool Set(const struct <anon>* this, struct TextureC* pTexture, int32_t iWidth, int32_t iHeight, enum SurfaceFormatE eFormat, SurfaceFlagsT uSurfaceFlags, int32_t iLayer, int32_t iMipmapLevel, uint32_t GCMFormat_unused, uint32_t pitch, void* data, uint32_t offset, uint32_t location)
+                         local  const char[4] __FUNCTION__
+                         inlines  RNADebugBreak
+  495  0083E694     68  bool Emulate(const struct <anon>* this, struct TextureC* pTexture, int32_t iWidth, int32_t iHeight, enum SurfaceFormatE eFormat, SurfaceFlagsT uSurfaceFlags, int32_t iLayer, int32_t iMipmapLevel, uint32_t GCMFormat_unused, uint32_t pitch, void* data, uint32_t offset, uint32_t location)
+  540  0083E6FC     78  void* Lock(const struct <anon>* this, const uint32_t& uPitch, uint32_t uFlags)
+                         local  const char[5] __FUNCTION__
+                         inlines  RNADebugBreak
+  571  0083E774      4  void Unlock(const struct <anon>* this, void* pPtr)
+  574  0083E7F8     10  static void _GLOBAL__I__ZN3RNA12SurfacePlatC16s_ClassAllocatorE()
+  575  0083E808     10  static void _GLOBAL__D__ZN3RNA12SurfacePlatC16s_ClassAllocatorE()

@@ -1,0 +1,18 @@
+// ../../../../../TIGERCODE/Code/Golf/RNA/Asset/Asset.h
+// compiled in: rnaunity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   67  004F7828     18  void WatchObjectC::~WatchObjectC(const struct WatchObjectC* this)
+   84    inline-only   const char* AssetC::GetFilePath(const const struct AssetC* this)
+   88    inline-only   enum AssetError AssetC::GetAssetStatus(const struct AssetC* this)
+   90    inline-only   enum AssetHomeE AssetC::GetAssetHome(const struct AssetC* this)
+   92    inline-only   MemBudgetTypeE AssetC::GetCurrentBudget(const const struct AssetC* this)
+   93    inline-only   enum eMemoryPools AssetC::GetCurrentMemPool(const const struct AssetC* this)
+  103  004F7878      4  void AssetC::Print(const struct AssetC* this)
+  155    inline-only   const struct <anon> AssetMgrC::GetName(const const struct AssetMgrC* this)
+  178    inline-only   int32_t AssetMgrC::GetNumSearchPaths(const const struct AssetMgrC* this)
+  199    inline-only   void AssetMgrC::SetPath(const struct AssetMgrC* this, enum PathE ePath, const char* pPath)
+  200    inline-only   const char* AssetMgrC::GetPath(const const struct AssetMgrC* this, enum PathE ePath)
+  202    inline-only   bool AssetMgrC::CanFastReload(const struct AssetMgrC* this)
+  205    inline-only   void AssetMgrC::SetCurrentBudget(const struct AssetMgrC* this, MemBudgetTypeE budget)
+  206    inline-only   void AssetMgrC::SetCurrentMemPool(const struct AssetMgrC* this, enum eMemoryPools pool)

@@ -1,0 +1,25 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/txrtintrule.cpp
+// compiled in: other_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   24  00439EEC     54  void TXRTintRule::TXRTintRule(const struct TXRTintRule* this, const const struct Allocator& allocRef)
+                         inlines  TXRRule::TXRRule
+   30  0043A630     18  void TXRTintRule::~TXRTintRule(const struct TXRTintRule* this)
+                         inlines  TXRRule::~TXRRule
+   36  003D4F74     E8  void TXRTintRule::ReadFromBuffer(const struct TXRTintRule* this, char** buffer)
+                         local  uint8 mode
+   64  0042693C    1AC  void TXRTintRule::RunRule(const struct TXRTintRule* this, struct TextureGroup* pTexGroup, struct TXRRule_TEXStateInfo* texState, TextureRef workspace, int32 mipLevel)
+                         local  int32_t scale
+                         local  TextureRef tintMask
+                         local  enum GoBlendTextures_TintOp tintOp
+                         local  TextureRef srcTex
+  152  00412F10    184  void TXRTintRule::MergeTintRules(const struct TXRTintRule* this, const struct TXRTintRule* tint1, const struct TXRTintRule* tint2, float percent)
+                         local  int i
+                         inlines  TXRTintRule::GetTexName, TXRTintRule::GetTintParam
+  168  003D4C80     40  void TXRTintRule::CopyTintValues(const struct TXRTintRule* this, const struct TXRTintRule* tint)
+                         local  int i
+  178  004213B4    15C  void TXRTintRule::ChangeNamesByPattern(const struct TXRTintRule* this, const char* oldName, const char* newName)
+                         local  char* instance
+                         local  unsigned int i
+                         local  unsigned int i
+                         inlines  std::strstr

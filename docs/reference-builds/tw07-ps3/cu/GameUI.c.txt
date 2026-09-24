@@ -1,0 +1,121 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameUI.c
+// compiled in: golf_unity.cpp
+// 84 functions, source order. line | PS3 address | size
+
+  177  0020DC64    1EC  void GUI_Init()
+  247  0020DE50     24  void GUI_DeInit()
+  256  00251F4C     B4  void GUI_ShowToggleFullScreenUI(bool show)
+  286  001FBB80     38  void GUI_RegisterHoleLoadNeededAfterEndTurnUi()
+  298  00252008      8  void GUI_ToggleUI(enum PlayerNumber_t PlayerID, bool show)
+  314  00252000      8  void GUI_HideAllToggleUI()
+  322  0020DF5C     18  bool GUI_UIVisible(enum PlayerNumber_t PlayerID)
+  330  00252174     98  int GUI_GetTimeSinceLastUIToggle(enum PlayerNumber_t PlayerID)
+  338  0020DE74     E8  void GUI_UpdateAllUIData()
+                         inlines  GUI_UpdateCourseUIData, GUI_UpdateGolferUIData, GUI_UpdateLieUIData, GUI_UpdateShotUIData, GUI_UpdateWindUIData
+  350  002D315C     E4  void GUI_OpenPauseMenu()
+                         inlines  cGAME_GLOBALS::SetGamePaused
+  377  002D2EF0    15C  void GUI_PauseMenuClosed()
+                         inlines  cGAME_GLOBALS::SetEndGame, cGAME_GLOBALS::SetGamePaused
+  436  001FBEA8     18  bool GUI_IsPauseMenuOpen()
+  445  001FBC90     64  void GUI_StartPostShotUI(int type, float yardage, enum PlayerNumber_t PlayerID)
+                         local  int value3
+  455  001FC034     1C  void GUI_FlagPostShotRequest()
+  464  00211080     80  void GUI_AdvancePostShotUI(enum PlayerNumber_t PlayerID)
+  475  001FBA04     A0  void GUI_HideAllHelpTips()
+                         inlines  GUI_ToggleMulligan, GUI_ToggleReplay, GUI_ToggleTapin
+  485  0020DF74     38  void GUI_PostShotUIStart()
+  499  0024C85C     34  void GUI_SetupSkipMessagesPostShotUI()
+  508  0024C890     A8  bool GUI_IsPostShotUIAnimating(enum PlayerNumber_t PlayerID)
+  552  002631DC     58  bool GUI_CanWeDoAReplayWithOutCrashing()
+                         local  bool retVal
+  573  001FBCF4     2C  void GUI_PostShotUIFinished()
+  587  0020E46C     E0  void GUI_CheckAndSetReplaysAllowed()
+  611  0020DFAC     50  void GUI_ShowMidShotMessage(enum GUI_MidShotMessage_t messageType, int param1, int param2, int param3)
+  616  0020E54C     44  static void GUI_EnqueueEndHoleMessage(enum GUI_MessageQue_t messageType, int32 param1, int32 param2, int32 param3)
+                         local  const struct GUI_MessageQueueElement& queueElement
+  631  0020E590     44  static void GUI_EnqueueEndGameMessage(enum GUI_MessageQue_t messageType, int32 param1, int32 param2, int32 param3)
+                         local  const struct GUI_MessageQueueElement& queueElement
+  647  0020E5D4    8E8  void GUI_QueUIMessageMessage(enum GUI_MessageQue_t messageType, int param1, int param2, int param3)
+                         local  bool used
+                         local  int i
+                         local  int i
+  850  001FC944     1C  void GUI_GolfersTiedUIMessage()
+  855  0020DFFC     80  bool GUI_IsLowImpactMessageQueued()
+  867  0020E07C    1CC  void GUI_GetNextLowImpactMessage(enum GUI_MessageQue_t* messageType, int32* param1, int32* param2, int32* param3)
+  927  0020E420     4C  bool GUI_IsHighImpactMessageQueued()
+  950  0020E248     60  bool GUI_IsEndTurnMessageQueued()
+  962  0020EED4    1E4  void GUI_GetNextEndTurnMessage(enum GUI_MessageQue_t* messageType, int32* param1, int32* param2, int32* param3)
+                         local  const struct GUI_MessageQueueElement& nextMessage
+                         local  const struct GUI_MessageQueueElement& nextMessage
+ 1012  0020E2A8     E0  bool GUI_IsAwardMessageQueued()
+ 1028  0020F0B8    358  void GUI_GetNextAwardMessage(enum GUI_MessageQue_t* messageType, int32* param1, int32* param2, int32* param3)
+                         local  bool messageSent
+ 1146  0020E388     98  bool GUI_GetUIMessageQued()
+ 1160  0031A2B4     B8  void GUI_LoadNextHole()
+                         inlines  GM_IsPlayoff, GM_NoHoleAdvance
+ 1178  00267A20     B8  bool GUI_ShouldCheckMessages()
+ 1196  0031A36C    1D8  bool GUI_CheckMessageQue()
+                         local  bool messageSent
+                         local  int32 none
+                         inlines  OnlineManagerOSDK::GetInstance, OnlineManagerOSDK::WaitingForChallenge
+ 1301  001FBEC0      8  bool GUI_CheckCaddieTipQue()
+ 1320  0020F410     18  bool GUI_IsEndTurnUiShowing()
+ 1325  0020F428     1C  void GUI_RegisterEndTurnUiShowing()
+ 1330  0020F444     5C  void GUI_RegisterEndTurnUiHidden()
+ 1336  001FBB58     28  void GUI_ForcePracticeEOH()
+ 1341  001FBE5C     4C  bool GUI_ScoreCardUp()
+ 1346  0020F4A0     1C  void GUI_SignalScoreCardShowing()
+ 1351  001FBE44     18  bool GUI_IsEndGameUiShowing()
+ 1359  0025D41C    118  void GUI_BetweenHolesScorecard()
+                         local  bool shouldShowBattleGolfScreen
+                         local  void* ptr
+                         local  struct GameModeBattle* pBattle
+ 1400  001F3C14     18  void GUI_QueueBetweenHoleScorecard(enum GUI_ScoreCardType_t scorecardType)
+ 1405  001ED838     18  enum GUI_ScoreCardType_t GUI_GetQueuedBetweenHoleScorecard()
+ 1413  001FDA9C     1C  void GUI_ForceHoleLoadingUI()
+ 1422  0020F4BC     1C  void GUI_CleargIsHoleLoadingUiShowing()
+ 1430  002D34A0     BC  void GUI_EndOfGameScorecard()
+ 1471  0020F4D8     1C  void GUI_SignalLoadingScreenVisible()
+ 1477  0020F4F4      8  bool GUI_IsCaddieTipWindowUseable()
+ 1488  00210F80     28  bool GUI_IsModeCaddieTipWindowUseable()
+ 1501  0020F4FC     68  bool GUI_ShowCaddieTipWindow(int show, int textID)
+ 1518  00210FA8     D8  bool GUI_ShowCaddieTipWindow(const char* modeText, const char* driverText)
+ 1537  00318514      4  void GUI_ShowPreSwingHud(enum PlayerNumber_t PlayerID)
+ 1544  0020F564     1C  void GUI_CaddieTipWindowIsOpen()
+ 1551  0020F580     18  bool GUI_IsCaddieTipWindowOpen()
+ 1573  0020F598     30  void GUI_CaddieTipWindowClosed()
+ 1583  0020F5C8     5C  void GUI_MoveTargetInfo(int x, int y, enum PlayerNumber_t PlayerID)
+                         local  int value3
+ 1593  0020F624     64  void GUI_UpdateTargetInfo(float yardage, float elevfeet, float elevinches, float powerpercent, enum PlayerNumber_t PlayerID)
+                         local  int value4
+ 1602  0020F688     70  bool GUI_IsOnlineScreenShowing()
+                         local  bool bOnlineScreenShowing
+                         local  struct IAptControllerListener* controllerListener
+                         local  struct AptScreenSubscriber* screen
+ 1634  00249BD4     D0  bool GUI_CanShowDeviceSelector()
+                         local  int i
+                         inlines  cGAME_GLOBALS::GetGamePaused
+ 1678  0026D474     88  bool GUI_DimScreenForPS3SystemUI()
+                         local  bool retVal
+                         inlines  AptBGColorTweenSubscriber::AreWeShowingTheMemCardBgColor, AptSubscriberManager::GetBGColorTweenSubscriber
+ 1697  001FB6AC     9C  bool GUI_AreTrophysOrRecordsQueued()
+                         local  int i
+ 1726  0020F6F8     9C  bool GUI_IsPlayerBeingAwarded(enum PlayerNumber_t ePlayerID)
+                         local  int i
+ 1787  001FB290     4C  enum GUI_MovieIndex_t GUI_PopNextMovieToPlay()
+ 1801  0020F794     28  bool GUI_HasQueuedMovies()
+ 1809  0020F7BC     1C  void GUI_StartAwardUI()
+ 1817  001FBD88     18  bool GUI_IsAwardUIAnimating()
+ 1825  0020F7D8     28  void GUI_ScorecardForced()
+ 1833  00247E1C     58  void GUI_OpenSavedGameUI()
+ 1846  002D304C     50  void GUI_SavedGameUIClosed()
+ 1859  0020F800     18  bool GUI_IsSavedGameUIOpen()
+ 1868  0020F818     18  void GUI_EnableKeyPop(bool bOn)
+ 1876  0020F830     18  bool GUI_IsKeypopEnabled()
+ 1884  0024C938     40  void GUI_Online_OpponentQuit(enum PlayerNumber_t PlayerID)
+ 1893  00306920     7C  void GUI_Online_Disconnect(char* errorStr)
+                         inlines  GM_GetGolferUp
+ 1908  0020F848     38  bool GUI_ShowLocalizedTextPopup()
+ 1955  0020F880     30  bool GUI_IsLocalizedTextPopupActive()
+ 1963  0020F8B0      4  void GUI_HideLocalizedTextPopup()
+ 1974  0020F8B4     EC  void GUI_ClearQueuedMsg()

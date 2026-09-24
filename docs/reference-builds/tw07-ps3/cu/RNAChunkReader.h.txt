@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNAX/include/RNAX/RNAChunkReader.h
+// compiled in: RNAChunkReader.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   44  0084A438      C  void RNAChunkReaderC(const struct <anon>* this)
+   45  0084A4C4     60  void ~RNAChunkReaderC(const struct <anon>* this)
+                         local  const char[17] __FUNCTION__
+                         inlines  RNADebugBreak

@@ -1,0 +1,5 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/sinitxa.cpp
+// compiled in: sinitxa.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    8  006E0EDC     38  void MIXI_initunpackxa()

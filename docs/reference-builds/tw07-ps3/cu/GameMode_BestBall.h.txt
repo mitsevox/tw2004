@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/Headers/GameMode_BestBall.h
+// compiled in: golf_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   30  0033EF44     14  enum UIScoreCardDispMode_t GameModeBestBall::GetScoreDisplayMode(const struct GameModeBestBall* this, bool getAlternate)
+   49  0033EF58      8  bool GameModeBestBall::IsTeamGame(const struct GameModeBestBall* this)
+   51  0033EF60     14  char* GameModeBestBall::NumPlyReqStrID(const struct GameModeBestBall* this)
+   52  0033EF74      8  bool GameModeBestBall::AllowUserShotClockOverride(const struct GameModeBestBall* this)

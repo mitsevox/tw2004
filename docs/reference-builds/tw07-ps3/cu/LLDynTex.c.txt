@@ -1,0 +1,130 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLDynTex.c
+// compiled in: Legacy_unity.cpp
+// 43 functions, source order. line | PS3 address | size
+
+   58    inline-only   static void Dyntex_StartStreamTiming(int numTextures)
+   69  00388318    1B4  static void Dyntex_UpdateStreamTiming()
+                         local  TI_STimeValue curLoopTime
+                         inlines  TI_fConvertTimeDifToSeconds
+   76    inline-only   static void Dyntex_EndStreamTiming()
+   88  003A3268     AC  void DynTex_InitModule()
+                         inlines  GM_IsFrontEnd
+   97  0037D510      4  void DynTex_CloseModule()
+  123  003AEA80    4C4  struct DynTexGroupT* DynTex::Create(const struct DynTex* this, int32 iMaxTextures, int32 iTextureBufferSize, uint32 iVramBase, uint32 iVramSize)
+                         local  const char[7] __FUNCTION__
+                         local  struct DynTexGroupT* pDynTex
+                         local  struct TX_STextureGroup* pTextureGroup
+                         inlines  GM_IsFrontEnd, TX_STextureGroupHeader::SetNumBlocksToAllocate, TX_STextureGroupHeader::SetNumTexturesInFile, TagValuePair, operator+
+  166  003A9AF8     E0  void DynTex::Free(const struct DynTex* this, struct DynTexGroupT* pDynTex)
+  192  00395B04     F8  void DynTex::Copy(const struct DynTex* this, struct DynTexGroupT* pDynSrcTex, struct DynTexGroupT* pDynDestTex)
+                         local  unsigned int i
+                         local  uint8* pTexturesData
+                         local  struct TX_STextureGroupTexture* pTexture
+  222  0037D57C      8  struct TX_STextureGroup* DynTex::GetTextureGroup(const struct DynTex* this, struct DynTexGroupT* pDynTex)
+  228  0038A2E0    138  uint8* DynTex::GetTextureData(const struct DynTex* this, struct DynTexGroupT* pDynTex, const const struct HashString& texID, int32 mipmap)
+                         local  uint32 i
+                         local  uint32 iAddrOffset
+                         local  struct TX_STextureGroupTexture* pTexture
+                         inlines  DynTexGroupT::TouchTextureByIndex, operator==
+  258  0037D584      8  uint32 DynTex::GetNumTextures(const struct DynTex* this, struct DynTexGroupT* pDynTex)
+  263  003848E8     70  struct HashString DynTex::GetTexIDByIndex(const struct DynTex* this, struct DynTexGroupT* pDynTex, uint32 iTexture)
+                         inlines  HashString::HashString
+  274  00384B64     A4  bool DynTex::Has(const struct DynTex* this, struct DynTexGroupT* pDynTex, const const struct HashString& TexID)
+                         local  uint32 iTexture
+                         inlines  operator==
+  308  00384C08     B0  void DynTex::Remove(const struct DynTex* this, struct DynTexGroupT* pDynTex, const const struct HashString& TexID)
+                         local  uint32 iTexture
+                         inlines  operator==
+  330  0038F3C8    300  void DynTex::Compact(const struct DynTex* this, struct DynTexGroupT* pDynTex)
+                         local  struct TX_STextureGroup* pTextureGroup
+                         local  struct TX_STextureGroupTexture* pTexture
+                         local  TX_STextureGroupTextureExtra* pTExtra
+                         local  struct DynTextureT* pDynTexture
+                         local  struct DynTextureT* pDynTextureDest
+                         local  uint32 iTexture
+                         local  bool bAnyCompacted
+                         local  uint32 iSizeOffset
+                         local  uint32 iSrcSizeOffset
+                         local  uint32 nNewTextures
+                         local  int32 iMipmap
+                         inlines  TX_STextureGroupHeader::SetNumTexturesInFile
+  420  00382A88     24  void DynTex::Reset(const struct DynTex* this, struct DynTexGroupT* pDynTex)
+                         inlines  TX_STextureGroupHeader::SetNumTexturesInFile
+  434  0038A094     3C  int DynTex::TintDynTexture(const struct DynTex* this, struct DynTexList_t* pTintRule, int iMipmap)
+  440  0038A05C     38  void DynTex::CopyTextureData(const struct DynTex* this, struct DynTexGroupT* pDynTexGrp, int32 iDynTexIndex, void* vpTexturesData)
+                         local  struct DynTextureT* pDynTexture
+                         local  struct TX_STextureGroupTexture* pTexture
+                         local  int32 iAddrOffset
+                         local  int32 iMipmap
+                         local  uint8* pTexData
+  466  0038A0D0    210  void DynTex::DoPatch(const struct DynTex* this, int32 num_items, struct DynTexList_t* tint_list)
+                         local  TI_STimeValue startTime
+                         local  int j
+                         local  int iMipMap
+                         inlines  TI_fConvertTimeDifToSeconds
+  497    inline-only   static bool DynTex_CheckMemAvailable(struct DynTexGroupT* pDynTex, struct TX_STextureGroupTexture* spSrcTexture, int32 iTextureSize)
+                         local  char[17] buf
+  519  0039579C    288  int32 DynTex::AddTexture(const struct DynTex* this, struct DynTexGroupT* pDynTex, struct TX_STextureGroupTexture* spSrcTexture, void* vpTexturesData, int32* textureSize)
+                         local  struct TX_STextureGroupTexture* pTexture
+                         local  uint8* pTexData
+                         local  int32 iDynTexture
+                         local  uint32 iSize
+                         local  int32 iMipmap
+                         local  struct DynTextureT* pDynTexture
+                         local  int32 iAddrOffset
+                         local  char[17] buf
+                         inlines  DynTex_CheckMemAvailable, TX_STextureGroupHeader::IncrNumTexturesInFile
+  590  0038F160    19C  int32 DynTex::AddTextureFromMemory(const struct DynTex* this, struct DynTexGroupT* pDynTex, struct TX_STextureGroupTexture* spSrcTexture)
+                         local  struct TX_STextureGroupTexture* pTexture
+                         local  int32 iDynTexture
+                         local  uint32 iSize
+                         local  int32 iMipmap
+                         local  struct DynTextureT* pDynTexture
+                         inlines  TX_STextureGroupHeader::IncrNumTexturesInFile
+  635  00395A24     E0  int32 DynTex::AddTextureFromTextureGroup(const struct DynTex* this, struct DynTexGroupT* pDynTex, struct TX_STextureGroup* pTextureGroup, struct TX_STextureGroupTexture* pTexture)
+                         local  uint8* vpTexturesData
+  654  0037D5C4      8  int32 DynTex::GetMemorySize(const struct DynTex* this, struct TX_STextureGroup* pTextureGroup, uint32 iTextureIndex)
+  665  0037D514     60  void DynTex::InitLoadRequestQueue(const struct DynTex* this)
+                         local  int i
+  680  00394050     94  struct DynTexLoadRequestT* DynTex::GetFreeLoadRequest(const struct DynTex* this)
+                         local  int i
+  700  00389F6C     F0  void DynTex::AddLoadRequestToQueue(const struct DynTex* this, struct DynTexLoadRequestT* pRequest)
+  718  00389DEC     FC  struct DynTexLoadRequestT* DynTex::PopLoadRequestFromQueue(const struct DynTex* this)
+                         local  int i
+                         local  struct DynTexLoadRequestT* pLoadReq
+  743  00389EE8     84  void DynTex::RemoveAllLoadRequests(const struct DynTex* this)
+                         local  struct DynTexLoadRequestT* pReq
+  762  0037D5CC      8  void DynTex::SetTexLoadInfo(const struct DynTex* this, struct DynTexLoadInfoT* pTexLoadInfo)
+  768  0038F2FC     CC  void DynTex::LoadTexturesFromMemory(const struct DynTex* this, struct DynTexGroupT* pDynTex, uint8* pData)
+                         local  int i
+                         local  struct TX_STextureGroupTexture* spCurTexture
+  786  0039558C    210  unsigned int DynTex::AddTextureToAsyncLoadList(const struct DynTex* this, const const struct HashString& TexID)
+                         local  uint32 uiTexIndex
+                         local  char[17] chpTextureIDString
+                         local  struct TX_STextureGroupTexture* texToAdd
+                         local  int i
+                         inlines  TX_spGetTextureGroupTextureFromIndex
+  850  00389D8C     60  void DynTex::ResetAsyncLoader(const struct DynTex* this)
+  867  0038E978     24  void DynTex::LoadCallback(TStreamDataPtr pStreamClass)
+  872  00395F60    164  void DynTex::RequestTexture(const struct DynTex* this, int textureToLoad, enum StreamSchedulerPriority priority)
+                         local  struct DynTexLoadTextureT* loadAt
+                         local  struct DynTexGroupT* pDynTexGrp
+                         local  int32 textureSize
+                         local  struct TX_STextureGroupTexture* spDynTexCurTexture
+                         local  void* textureData
+                         local  char[17] textureName
+  901  00380F88     A4  void DynTex::UpdateTexturePriorities(const struct DynTex* this, enum StreamSchedulerPriority priority)
+                         local  int i
+  910  003960C4    188  void DynTex::BeginAsyncLoading(const struct DynTex* this)
+                         local  enum StreamSchedulerPriority priority
+                         local  int i
+                         inlines  Dyntex_StartStreamTiming
+  955  0038DA1C     A8  void DynTex::EndAsyncLoading(const struct DynTex* this)
+                         inlines  Dyntex_EndStreamTiming
+  983  0037D5D4     30  bool DynTex::IsAsyncLoadingDone(const struct DynTex* this)
+  989  003C9B68      4  void DynTex::WaitEndOfTextureLoad(const struct DynTex* this)
+ 1025  00394E20    200  bool DynTex::ProgressAsyncLoading(const struct DynTex* this)
+                         local  bool result
+ 1100  00389D0C     80  void DynTex::AddToTextureGroupManager(const struct DynTex* this, struct DynTexGroupT* pDynTex)
+                         local  enum TG_ETextureGroupClass eOld
+ 1108  00390E00     64  void DynTex::RemoveFromTextureGroupManager(const struct DynTex* this, struct DynTexGroupT* pDynTex)

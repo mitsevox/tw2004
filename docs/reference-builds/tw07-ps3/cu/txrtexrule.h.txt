@@ -1,0 +1,14 @@
+// ../../../../../TIGERCODE/Code/Golf/TextureFX/Headers/txrtexrule.h
+// compiled in: other_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   40  003D3D64     44  void TXRTexRule::TXRTexRule(const struct TXRTexRule* this, const const struct Allocator& allocRef)
+   43  003D39B8     E4  void TXRTexRule::~TXRTexRule(const struct TXRTexRule* this)
+                         local  int i
+   46    inline-only   int32 TXRTexRule::GetNumStates(const struct TXRTexRule* this)
+   47    inline-only   const char* TXRTexRule::GetActiveTextureName(const struct TXRTexRule* this)
+   48    inline-only   const char* TXRTexRule::GetActiveSelectionName(const struct TXRTexRule* this)
+   49    inline-only   int32_t TXRTexRule::GetActiveTextureScale(const struct TXRTexRule* this)
+   50    inline-only   const char* TXRTexRule::GetNthTextureName(const struct TXRTexRule* this, int32_t index)
+   51    inline-only   const char* TXRTexRule::GetVariableName(const struct TXRTexRule* this)
+   52    inline-only   int32_t TXRTexRule::GetCurrentState(const struct TXRTexRule* this)

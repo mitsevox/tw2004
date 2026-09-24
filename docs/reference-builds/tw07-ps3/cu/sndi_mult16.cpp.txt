@@ -1,0 +1,6 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sndi_mult16.cpp
+// compiled in: sndi_mult16.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    6  006F6410     38  int SNDI_findmult16(int samplerate, int delay)
+                         local  int retVal

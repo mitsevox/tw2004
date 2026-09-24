@@ -1,0 +1,13 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/weboffermediaresource.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   10  005C33BC     34  void WebOfferMediaResource(const struct WebOfferMediaResource* this)
+   14  005C3424      C  void ~WebOfferMediaResource(const struct WebOfferMediaResource* this)
+   18  005ED9E0    1A4  struct WebOfferMediaResource* CreateList(const char8_t* pString)
+                         local  struct WebOfferMediaResourceConcrete* pFirst
+                         local  struct WebOfferMediaResourceConcrete* pCurrent
+                         local  char8_t[256] strURLTemp
+                         local  int32_t iURLNumLines
+                         local  struct WebOfferMediaResourceConcrete* pTemp
+                         inlines  SetNext, operator=

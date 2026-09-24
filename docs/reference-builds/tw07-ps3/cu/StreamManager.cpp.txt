@@ -1,0 +1,35 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/streaming/StreamManager.cpp
+// compiled in: golf2_unity.cpp
+// 19 functions, source order. line | PS3 address | size
+
+   28  00134DD4     68  void StreamManager::SetCharAdded(uint32_t i, bool bVal)
+   36  00134E3C     5C  bool StreamManager::IsCharAdded(uint32_t i)
+   44  00134E98      4  void StreamManager::BeginStreamCallbackUI(void* pData)
+   50  00134E9C      4  void StreamManager::EndStreamCallbackUI(void* pData)
+   56  00134F74    104  void StreamManager::InitModule(bool rebootIOP)
+                         local  int i
+  100  0015D5AC    1EC  void StreamManager::InitOnce()
+                         inlines  StreamManagerDNAS::StreamManagerDNAS, StreamManagerFEChar::StreamManagerFEChar, StreamManagerFacility::StreamManagerFacility, StreamManagerFrontend::StreamManagerFrontend, StreamManagerGlobals::StreamManagerGlobals, StreamManagerHole::StreamManagerHole, StreamManagerIngame::StreamManagerIngame, StreamManagerStartup::StreamManagerStartup
+  116  00135090     78  void StreamManager::CloseOnce()
+                         local  int i
+  126  00135108     4C  void StreamManager::RegisterStreamClientsTerView()
+  145  00135154     3C  void StreamManager::UnregisterStreamClientsTerView()
+  161  00135190     5C  void StreamManager::RegisterStreamClients(enum StreamFileType fileType)
+  168  001351EC     5C  void StreamManager::UnregisterStreamClients(enum StreamFileType fileType)
+  175  00135268    154  void StreamManager::SetupFileStream(enum StreamFileType fileType)
+                         local  struct GolfModuleManager* moduleManager
+                         local  const int moduleFileCount
+                         local  int i
+                         local  const char* fileName
+  194  001353BC     5C  void StreamManager::StreamFiles(enum StreamFileType fileType)
+  201  0013555C     20  int32 StreamManager::OpenStreamFiles(enum StreamFileType fileType)
+                         local  int32 streamID
+  210  001355E8     20  void StreamManager::CloseStreamFiles(enum StreamFileType fileType)
+  217  00135424     20  void StreamManager::ClearStreamFileNames(enum StreamFileType fileType)
+  224  00135248     20  void StreamManager::AddStreamFileName(enum StreamFileType fileType, const char* fileName, StreamBeginCallback callbackBegin, StreamEndCallback callbackEnd)
+  231  00135444     48  bool StreamManager::IsStreamingNextHole()
+                         local  bool bResult
+                         local  const struct UILoadingScreen& loadScr
+  250  0013548C     3C  void StreamManager::StreamingLoopReadyForNextHole()
+                         local  const struct UILoadingScreen& loadScr
+                         inlines  UILoadingScreen::SetDone

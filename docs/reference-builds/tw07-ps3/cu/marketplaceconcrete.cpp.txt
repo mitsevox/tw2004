@@ -1,0 +1,20 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/ps3/marketplaceconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   73  0062A438     14  void ~MarketplaceStrategy(const struct <anon>* this)
+                         inlines  ~OperationStrategy
+   81  00624EC8      4  void OperationCancel(const struct <anon>* this, const struct Operation* )
+   85  00624ED4      4  void OperationTimeout(const struct <anon>* this, const struct Operation* )
+  113  0062A540     14  void ~MarketplaceInfoStrategy(const struct <anon>* this)
+                         inlines  ~MarketplaceStrategy
+  140  005C5D40      8  bool OperationProcess(const struct <anon>* this, const struct Operation* )
+  161  00624EE8     40  void ~MarketplaceFileExistsStrategy(const struct <anon>* this)
+                         inlines  ~MarketplaceStrategy, ~OperationStrategy
+  192  005C5D48      8  bool OperationProcess(const struct <anon>* this, const struct Operation* )
+  214  00604BA4    124  struct Operation* GetInfo(const struct MarketplaceConcrete* this, uint32_t uUserIndex, struct MarketplaceInfoCallback* pCallback)
+                         local  struct OperationManagerConcrete* pOperationManager
+                         inlines  GetOperationManagerConcrete, MarketplaceInfoStrategy
+  238  00604CC8    134  struct Operation* FileExists(const struct MarketplaceConcrete* this, uint32_t uUserIndex, const char8_t* pFilename, uint32_t uMaxFiles, struct MarketplaceFileExistsCallback* pCallback)
+                         local  struct OperationManagerConcrete* pOperationManager
+                         inlines  GetOperationManagerConcrete, MarketplaceFileExistsStrategy

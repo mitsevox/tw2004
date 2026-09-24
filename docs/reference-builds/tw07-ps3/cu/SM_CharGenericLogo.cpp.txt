@@ -1,0 +1,16 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_CharGenericLogo.cpp
+// compiled in: shader_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   23  0051D250     74  void SM_CharGenericLogoClass::SM_CharGenericLogoClass(const struct SM_CharGenericLogoClass* this)
+                         inlines  vec4flt_Zero
+   38  0050E5A4     6C  void SM_CharGenericLogoClass::Load(const struct SM_CharGenericLogoClass* this)
+   47  0051E664     F4  void SM_CharGenericLogoClass::LoadParams(const struct SM_CharGenericLogoClass* this)
+   63  0051EB90     80  void SM_CharGenericLogoClass::Activate(const struct SM_CharGenericLogoClass* this)
+   82  0050E610     34  void SM_CharGenericLogoClass::Deactivate(const struct SM_CharGenericLogoClass* this)
+   89  005197B8     E8  void SM_CharGenericLogoClass::SetTexTransform3(const struct SM_CharGenericLogoClass* this, const float[4]& transForm)
+                         local  const bool bFlipX
+                         local  const bool bFlipY
+                         local  float preScaleY
+                         inlines  vec4flt_Copy
+  121  00515E30     64  void SM_CharGenericLogoClass::SetLogoTexture(const struct SM_CharGenericLogoClass* this, TextureRef texRef)

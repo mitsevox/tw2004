@@ -1,0 +1,22 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/././gamesessionconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   55    inline-only   uint32_t GetReferenceCount(const const struct GameSessionConcrete* this)
+   61  00622894      C  const char8_t* GetName(const const struct GameSessionConcrete* this)
+   62  006228A0      C  int32_t GetIdentifier(const const struct GameSessionConcrete* this)
+   63  006228AC      C  const char8_t* GetSessionID(const const struct GameSessionConcrete* this)
+   64  006228B8      8  uint32_t GetRandomSeed(const const struct GameSessionConcrete* this)
+   65  006228C0      C  bool IsPrivate(const const struct GameSessionConcrete* this)
+   66  006228CC      C  bool IsLocked(const const struct GameSessionConcrete* this)
+   67  006228D8     18  bool IsFull(const const struct GameSessionConcrete* this)
+   68  006228F0      C  bool IsRanked(const const struct GameSessionConcrete* this)
+   69  006228FC      8  bool IsDeleted(const const struct GameSessionConcrete* this)
+   70  00622904      8  uint32_t GetMaxUsers(const const struct GameSessionConcrete* this)
+   71  0062290C      C  const struct List<OSDK::GameUser>* GetUsers(const const struct GameSessionConcrete* this)
+   72  00622918      C  const struct Dictionary* GetGameState(const const struct GameSessionConcrete* this)
+   74  00622924      C  int32_t GetGameMode(const const struct GameSessionConcrete* this)
+   75  00622930      C  const char8_t* GetPassword(const const struct GameSessionConcrete* this)
+   94    inline-only   bool IsDirty(const const struct GameSessionConcrete* this)
+   95    inline-only   void MarkDirty(const struct GameSessionConcrete* this)
+   96    inline-only   void MarkClean(const struct GameSessionConcrete* this)

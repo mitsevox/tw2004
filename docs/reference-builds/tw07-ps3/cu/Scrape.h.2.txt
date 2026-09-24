@@ -1,0 +1,19 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNAX/include/Scrape/Scrape.h
+// compiled in: Scrape.cpp, ScrapeCompiler.cpp
+// 12 functions, source order. line | PS3 address | size
+
+  212  00873B14     4C  void Command::Command(const struct Command* this, enum CommandType eCommandType)
+  228    inline-only   void* Command::operator new(size_t size)
+  236    inline-only   void Command::operator delete(void* p)
+  254    inline-only   void* Variable::operator new(size_t size)
+  262    inline-only   void Variable::operator delete(void* p)
+  295  00882B44     E4  void ~TextureVar(const struct TextureVar* this)
+                         inlines  Clear, ~String, ~Variable
+  295  00882B44     E4  void TextureVar::~TextureVar(const struct TextureVar* this)
+                         inlines  Clear, ~String, ~Variable
+  297    inline-only   struct TextureC* GetTexture(const struct TextureVar* this)
+  297  008810D8      8  struct TextureC* TextureVar::GetTexture(const struct TextureVar* this)
+  298    inline-only   void SetTexture(const struct TextureVar* this, struct TextureC* pTexture)
+  298    inline-only   void TextureVar::SetTexture(const struct TextureVar* this, struct TextureC* pTexture)
+  413  00882A60     E4  void ScopeBoundTextureVar::~ScopeBoundTextureVar(const struct ScopeBoundTextureVar* this)
+                         inlines  Clear, ~String, ~TextureVar, ~Variable

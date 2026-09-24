@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/Wind1.h
+// compiled in: headgate_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   48  00347024    3D0  void Wind1::Wind1(const struct Wind1* this)
+                         local  int i

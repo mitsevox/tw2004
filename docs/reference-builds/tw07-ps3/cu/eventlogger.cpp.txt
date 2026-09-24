@@ -1,0 +1,55 @@
+// C:/packages/rwmovie/1.04.01/source/movielib/movieplayer/cmn/eventlogger.cpp
+// compiled in: eventlogger.cpp
+// 11 functions, source order. line | PS3 address | size
+
+    0  006FEBA8     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   40  006FF918     3C  struct <anon> GetResourceDescriptor()
+                         local  RwUInt32 alignment
+                         local  RwUInt32 size
+                         inlines  ResourceDescriptor
+   52  0070052C     34  struct <anon>* Initialize(const struct <anon>& resource, struct IResourceAllocator* allocator, struct <anon>* printChannel, unsigned int maxEvents, unsigned int maxEntries)
+                         local  struct <anon>* eventLogger
+  176  006FE9D4     88  void RegisterEvent(const struct <anon>* this, const struct <anon>& e)
+                         local  int res
+                         inlines  Register
+  201  006FEA5C     38  void Start(const struct <anon>* this)
+                         inlines  Start
+  208  006FF658    160  void Log(const struct <anon>* this, const struct <anon>& e, int context)
+                         local  int res
+                         local  float elapsedTime
+  238  006FF7B8    160  void LogStart(const struct <anon>* this, const struct <anon>& e, int context)
+                         local  int res
+                         local  float elapsedTime
+  269  006FEA94    114  void LogStop(const struct <anon>* this, const struct <anon>& e, int context)
+                         local  int res
+                         local  unsigned int numTries
+                         local  unsigned int tries
+                         local  float elapsedTime
+  315  006FEC48    A10  void Dump(const struct <anon>* this)
+                         local  struct Handle* handle
+                         local  struct <anon> op
+                         local  const int MAX_LEN
+                         local  uint64_t ofs
+                         local  char[256] str
+                         local  int res
+                         local  char* str0
+                         local  char* str1
+                         local  unsigned int i
+                         local  bool isDurationEvent
+                         local  unsigned int j
+                         local  unsigned int i
+                         local  unsigned int i
+                         local  char* str3
+                         local  float min
+                         local  float max
+                         local  float sum
+                         local  int num
+                         local  float ave
+                         local  unsigned int j
+                         local  float duration
+                         local  char* str3
+                         local  unsigned int j
+                         local  char* str2
+                         inlines  Tag
+  543  006FEC28     10  static void _GLOBAL__I__ZN2rw5movie11EventLogger21GetResourceDescriptorEv()
+  544  006FEC38     10  static void _GLOBAL__D__ZN2rw5movie11EventLogger21GetResourceDescriptorEv()

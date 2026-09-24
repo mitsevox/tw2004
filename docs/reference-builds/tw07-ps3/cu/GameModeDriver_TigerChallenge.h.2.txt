@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/GameMode/Headers/GameModeDriver_TigerChallenge.h
+// compiled in: other_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   47    inline-only   struct TigerChallengeEvent_t* GameModeDriverTigerChallenge::GetTigerChallengeEventInfoPtr()

@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_trinity/trinity/runtime/include/TrinityMath.h
+// compiled in: tiger_module_trinity_math.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   40  0054039C     18  void ~TrinityMath(const struct <anon>* this)

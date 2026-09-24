@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Shared/XceedZip_ZLib64/crc32.c
+// compiled in: other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+  127  003F7344     14  const uLongf* get_crc_table()
+  142  003F7358    1A4  uLong crc32(uLong crc, const Bytef* buf, uInt len)
+  165  003F74FC     2C  uLong uniqueCrc32(uLong crc, uLong input)

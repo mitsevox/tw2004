@@ -1,0 +1,7 @@
+// C:/packages/rwmovie/1.04.01/source/movielib/movieplayer/cmn/subtitlerenderable.cpp
+// compiled in: subtitlerenderable.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    0  006F9FD4     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   50  006FA054     10  static void _GLOBAL__I__ZN2rw5movie18SubtitleRenderableC2Ev()
+   51  006FA064     10  static void _GLOBAL__D__ZN2rw5movie18SubtitleRenderableC2Ev()

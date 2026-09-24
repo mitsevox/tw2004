@@ -1,0 +1,13 @@
+// C:/packages/job_manager/1.11.00/include/job_manager/detail/spu_state.h
+// compiled in: job_scheduler.cpp, job_scheduler_internal.cpp, job_scheduler_platform.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   39    inline-only   unsigned int GetNextSPUToNotify(const struct <anon>* this, unsigned int start)
+                         local  unsigned int x
+   84    inline-only   void MarkSPURunning(const struct <anon>* this, unsigned int spuId)
+   93    inline-only   void ClearAllFreeJobs(const struct <anon>* this)
+  100    inline-only   void IncrementFreeSPUJobs(const struct <anon>* this)
+  106    inline-only   void DecrementFreeSPUJobs(const struct <anon>* this)
+  112    inline-only   void IncrementFreePPUJobs(const struct <anon>* this)
+  136    inline-only   uint8_t GetFreePPUJobs(const struct <anon>* this)
+  148    inline-only   unsigned int GetState(const struct <anon>* this, unsigned int spuId)

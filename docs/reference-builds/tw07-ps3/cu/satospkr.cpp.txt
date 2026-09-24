@@ -1,0 +1,19 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/satospkr.cpp
+// compiled in: satospkr.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   33  006DB7E8     6C  void SNDI_equalpower(struct SNDGAINPAIR* pair, float theta1, float theta2, float azimuth)
+                         local  float tm
+   47  006DB9A0    490  void SNDI_precalcaztospkrvol()
+                         local  int az
+                         local  int azshift
+                         local  struct SNDGAINPAIR spkrpair
+                         local  int i
+                         local  float az360
+                         inlines  Az65536To360, SNDI_ftoiround, SNDMEMI_alloc
+  155  006DB854     80  void SNDI_aztospkrvol(int azimuth, float* balance)
+                         local  int azshift
+                         local  int i
+  174  006DB8D4     54  void SNDI_freespkrtable()
+                         inlines  SNDMEMI_free
+  185  006DB928     78  void SNDI_spkrconfig()

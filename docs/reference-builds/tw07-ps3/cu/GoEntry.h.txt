@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/Golf/Entry/Headers/GoEntry.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   26    inline-only   bool GameState::IsValidState(const const struct GameState* this, enum GAME_MODE_e state)

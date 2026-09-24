@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_OnlineTournament_TourWins.h
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   20  00118D58    160  void UIOnlineTournament_TourWins::~UIOnlineTournament_TourWins(const struct UIOnlineTournament_TourWins* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIOnlineTournament_TourWins::DstMenuItem_oltw>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+   22  000FF9FC      C  uint32 UIOnlineTournament_TourWins::GetSignature(const const struct UIOnlineTournament_TourWins* this)
+   27  000FFA08     44  void UIOnlineTournament_TourWins::ShowHelpText(const struct UIOnlineTournament_TourWins* this)
+   29  000FFA54      C  struct IExternArray* UIOnlineTournament_TourWins::GetExternArray(const struct UIOnlineTournament_TourWins* this)

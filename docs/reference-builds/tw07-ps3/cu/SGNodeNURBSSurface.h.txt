@@ -1,0 +1,23 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/SceneGraph/include/SceneGraph/Runtime/Nodes/SGNodeNURBSSurface.h
+// compiled in: SGNodeNURBSSurface.cpp
+// 19 functions, source order. line | PS3 address | size
+
+   42    inline-only   void operator delete(void* address)
+   42    inline-only   struct ICoreAllocator* GetClassAllocator()
+   42    inline-only   void* operator new(size_t size, const char* text, struct ICoreAllocator* allocator, enum AllocFlags allocator_flags, uint32_t alignment)
+   62    inline-only   void SetGeomPtr(const struct <anon>* this, void* pGeom)
+   63    inline-only   void* GetGeomPtr(const struct <anon>* this)
+   68    inline-only   void SetControlPoints(const struct <anon>* this, struct <anon>& pPoints)
+   72    inline-only   struct <anon> GetControlPoints(const struct <anon>* this)
+   74    inline-only   void SetUSpans(const struct <anon>* this, int32_t uSpans)
+   75    inline-only   void SetVSpans(const struct <anon>* this, int32_t vSpans)
+   76    inline-only   int32_t GetUSpans(const const struct <anon>* this)
+   77    inline-only   int32_t GetVSpans(const const struct <anon>* this)
+   79    inline-only   void SetUDegree(const struct <anon>* this, int32_t uDegree)
+   80    inline-only   void SetVDegree(const struct <anon>* this, int32_t vDegree)
+   81    inline-only   int32_t GetUDegree(const const struct <anon>* this)
+   82    inline-only   int32_t GetVDegree(const const struct <anon>* this)
+   84    inline-only   void SetUKnots(const struct <anon>* this, struct <anon>& uKnots)
+   85    inline-only   void SetVKnots(const struct <anon>* this, struct <anon>& vKnots)
+   86    inline-only   const struct <anon> GetUKnots(const const struct <anon>* this)
+   87    inline-only   const struct <anon> GetVKnots(const const struct <anon>* this)

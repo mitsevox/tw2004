@@ -1,0 +1,19 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Shared/XceedZip_ZLib64/inffast.c
+// compiled in: other_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   27  003F7D30    7D0  int inflate_fast(uInt bl, uInt bd, inflate_huft* tl, inflate_huft* td, inflate_blocks_statef* s, z_streamp z)
+                         local  inflate_huft* t
+                         local  uInt maxlen
+                         local  uInt e
+                         local  uLong b
+                         local  uInt k
+                         local  Bytef* p
+                         local  uInt n
+                         local  Bytef* q
+                         local  uInt m
+                         local  uInt ml
+                         local  uInt md
+                         local  uInt c
+                         local  uInt d
+                         local  Bytef* r

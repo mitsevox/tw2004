@@ -1,0 +1,27 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/messengerconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 5 functions, source order. line | PS3 address | size
+
+  117  005D26A4     38  void ProcessComplete(const struct MessengerConcrete* this)
+                         local  struct <anon>* pFacade
+                         local  HLBApiRefT* pHLBud
+  148  00615AEC     F8  void MessengerConcrete(const struct MessengerConcrete* this, uint32_t uLoginSlotIndex)
+                         local  HLBApiRefT* pHLBud
+                         local  int32_t iStatus
+                         inlines  AddObserver, GetBuddyApi, List
+  199  00615CDC     CC  void ~MessengerConcrete(const struct MessengerConcrete* this)
+                         local  HLBApiRefT* pHLBud
+                         local  int32_t iStatus
+                         inlines  RemoveObserver, ~List
+  238  005DE5C0      8  void HLBOpCallback(HLBApiRefT* , int32_t , int32_t , void* pContext)
+                         local  struct MessengerConcrete* pMessenger
+  266  005DE4AC    114  void RebuildBuddyList(const struct MessengerConcrete* this)
+                         local  HLBApiRefT* pHLBud
+                         local  struct <anon>* pFacade
+                         local  struct <anon>* pUserManager
+                         local  uint32_t uNumBuddies
+                         local  uint32_t uIndex
+                         local  HLBBudT* pBuddy
+                         local  const char8_t* pBuddyName
+                         local  struct User* pUser
+                         inlines  GetBuddyApi, InsertElement, RemoveAll

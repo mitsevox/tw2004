@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/Legacy/Lib/Headers/UByteSwap.h
+// compiled in: golf2_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   65    inline-only   void BYTESWAP_SWAPDATASTRUCTURE(char** pSrc, char** pDest, TByteSwapDataElementDef* pElm, int32 numElm, int32 count)
+                         local  int32 elm
+                         local  TByteSwapDataElementDef* pElement

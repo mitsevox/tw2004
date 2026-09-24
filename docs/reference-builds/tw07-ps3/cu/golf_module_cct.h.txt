@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/GolfModule/golf_module_cct.h
+// compiled in: Legacy_unity.cpp, golf_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   50    inline-only   void GolfModuleCCT::SetDrawDebugBoneAxis(const struct GolfModuleCCT* this, bool bDraw)
+   68    inline-only   void GolfModuleCCT::ResetFirstGameFaceUpdate(const struct GolfModuleCCT* this)
+                         local  int i

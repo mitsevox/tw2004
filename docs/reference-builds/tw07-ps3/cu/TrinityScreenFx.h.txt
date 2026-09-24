@@ -1,0 +1,21 @@
+// ../ears_trinity/Trinity/Runtime/include/TrinityScreenFx.h
+// compiled in: TrinityScreenFx.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   46  00592528     18  void ~TrinityScreenFx(const struct TrinityScreenFx* this)
+  167  00592578     58  void LetterBoxOn(const struct TrinityScreenFx* this, float_t duration)
+  175  005925D0     58  void LetterBoxOff(const struct TrinityScreenFx* this, float_t duration)
+  185  00592628     58  void BlurStart(const struct TrinityScreenFx* this, bool8_t direction, bool8_t hold, float_t duration)
+  193  00592680     58  void BlurStop(const struct TrinityScreenFx* this, float_t duration)
+  201  005926D8     58  void BlurSetIntensity(const struct TrinityScreenFx* this, float_t intensity)
+  212  00592730     58  void BlurSetColor(const struct TrinityScreenFx* this, float_t r, float_t g, float_t b)
+  222  00592788     58  void BloomStart(const struct TrinityScreenFx* this, bool8_t direction, bool8_t hold, float_t duration)
+  230  005927E0     58  void BloomStop(const struct TrinityScreenFx* this, float_t duration)
+  238  00592838     58  void BloomSetIntensity(const struct TrinityScreenFx* this, float_t intensity)
+  248  00592890     58  void BloomSetColor(const struct TrinityScreenFx* this, float_t r, float_t g, float_t b)
+  258  005928E8     58  void DepthStart(const struct TrinityScreenFx* this, bool8_t direction, bool8_t hold, float_t duration)
+  266  00592940     58  void DepthStop(const struct TrinityScreenFx* this, float_t duration)
+  274  00592998     58  void DepthSetIntensity(const struct TrinityScreenFx* this, float_t intensity)
+  284  005929F0     58  void DepthSetColor(const struct TrinityScreenFx* this, float_t r, float_t g, float_t b)
+  295  00592A48     58  void ScreenFadeIn(const struct TrinityScreenFx* this, float_t r, float_t g, float_t b, float_t duration)
+  306  00592AA0     58  void ScreenFadeOut(const struct TrinityScreenFx* this, float_t r, float_t g, float_t b, float_t duration)

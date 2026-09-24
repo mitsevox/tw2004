@@ -1,0 +1,578 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/frontend/FE_CrAPDB.c
+// compiled in: apt_unity.cpp
+// 204 functions, source order. line | PS3 address | size
+
+  441  000137EC     10  int16 FE_CrAP_Asset_p::getItemSlot(const const struct FE_CrAP_Asset_p* this)
+  446  00013864     10  const char* FE_CrAP_Asset_p::getName(const const struct FE_CrAP_Asset_p* this)
+                         local  const char* name
+  461  00013874     10  const char* FE_CrAP_Asset_p::getSubcategoryName(const const struct FE_CrAP_Asset_p* this)
+  466  00013884     1C  bool FE_CrAP_Asset_p::isValid(const const struct FE_CrAP_Asset_p* this)
+  473  00099130     48  struct HashString FE_CrAP_Asset_p::getSwapPart(const const struct FE_CrAP_Asset_p* this, int index)
+                         inlines  HashString::HashString
+  479  00099178     48  struct HashString FE_CrAP_Asset_p::getSwapNode(const const struct FE_CrAP_Asset_p* this, int index)
+                         inlines  HashString::HashString
+  485  000991C0     48  struct HashString FE_CrAP_Asset_p::getSwapTexture(const const struct FE_CrAP_Asset_p* this, int index)
+                         inlines  HashString::HashString
+  491  00099208     48  struct HashString FE_CrAP_Asset_p::getSwapTextureNode(const const struct FE_CrAP_Asset_p* this, int index)
+                         inlines  HashString::HashString
+  497  000994B0     48  struct HashString FE_CrAP_Asset_p::getSwapTint(const const struct FE_CrAP_Asset_p* this, int index)
+                         inlines  HashString::HashString
+  503  000138A0     10  int32 FE_CrAP_Asset_p::getItemSpecificData(const const struct FE_CrAP_Asset_p* this)
+  508  0009667C    32C  uint8 FE_CrAP_Asset_p::getIconColorRGB(const const struct FE_CrAP_Asset_p* this, int whichCol, enum ColorIndex index)
+                         local  uint8 ret
+                         local  int32 firstBallAssetIndex
+                         local  int32 tempAssetID
+                         local  int32 numBalls
+                         local  struct FE_CrAP_Ball_Asset_t* pBallAsset
+                         local  bool bFoundMatchingID
+                         local  struct FE_CrAP_Asset_p tempAsset
+                         local  bool bFoundFirstBall
+                         local  bool bFoundLastBall
+                         local  struct FE_CrAP_Asset_p tempAsset
+  593  00015B48     64  bool FE_CrAP_Asset_p::isBall(const const struct FE_CrAP_Asset_p* this)
+                         local  FE_CrAP_Asset_Category_e category
+                         local  const int subCategoryIndex
+                         local  int subID
+  607  000138C0      C  uint16 FE_CrAP_Asset_p::getAnimNameSymbolIndex(const const struct FE_CrAP_Asset_p* this)
+  612  000138CC      C  uint16 FE_CrAP_Asset_p::getCameraNameSymbolIndex(const const struct FE_CrAP_Asset_p* this)
+  617  000138B0     10  int32 FE_CrAP_Asset_p::getID(const const struct FE_CrAP_Asset_p* this)
+  622  000138D8     6C  void FE_CrAP_ResetLastCategoryTables()
+                         local  int i
+                         local  int j
+  639  0005ACB8    338  void FE_CrAP_InitModule()
+                         local  const char[19] __FUNCTION__
+                         inlines  TagValuePair, operator+
+  690  00013944      4  void FE_CrAP_FlushLookUpCache()
+  709  00013C88    1F8  void FE_CrAP_CloseModule()
+  795  00013E80     C0  void FE_CrAP_FreeCrAP_DB()
+  826  000139A4    234  void FE_CrAP_InitSpecialAllCategories()
+                         local  const size_t bufLen
+                         local  int i
+  852  00013F40      4  static int32 sGetLinkedAssetID(int32 assetID)
+  880  00014008     2C  static struct FE_CrAP_Asset_t* sGetLinkedAsset(struct FE_CrAP_Asset_t* asset)
+                         local  int32 assetID
+  891  00015FB4     28  int32 FE_CrAP_GetLinkedAssetID(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum)
+                         local  int32 assetID
+  901  00014034     1C  void FE_CrAP_SetTriggerAnims(bool val)
+  909  00014050     1C  bool FE_CrAP_GetTriggerAnims()
+  917  0001406C     B8  void FE_CrAP_SetCurrentGender(FE_CrAP_Asset_Gender_e gender)
+  938  00014124     20  FE_CrAP_Asset_Gender_e FE_CrAP_GetCurrentGender()
+  946  00014144     90  FE_CrAP_Asset_Gender_e FE_CrAP_GetAssetGender(int32 assetID)
+  954  000141D4     68  void FE_CrAP_ClearEquippedAsset(struct FE_CrAP_Asset_t* asset)
+                         local  const struct UserInfo& userInfo
+                         local  FE_CrAP_Asset_Slot_e itemSlot
+  966  00014300    138  void FE_CrAP_EquipAsset(struct FE_CrAP_Asset_t* asset)
+                         local  const struct UserInfo& userInfo
+                         local  FE_CrAP_Asset_Slot_e itemSlot
+                         local  int32 assetID
+  990  00015F8C     28  void FE_CrAP_EquipAssetFromCategoryAndSubCategoryIndexAndEntryNum(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum)
+                         local  struct FE_CrAP_Asset_t* asset
+  998  00014F1C     F8  bool FE_CrAP_IsAssetEquipped(struct FE_CrAP_Asset_t* asset)
+                         local  const struct UserInfo& userInfo
+                         local  FE_CrAP_Asset_Slot_e itemSlot
+                         local  int32 assetID
+ 1034  0001451C     78  int32 FE_CrAP_GetEquippedAsset(FE_CrAP_Asset_Slot_e itemSlot)
+                         local  const struct UserInfo& userInfo
+ 1048  00097274     A0  static bool sIsCurrentlyPlayingCamera(const char* camToPlay)
+                         inlines  FE_sCharRenderMgr::IsPlayingAnAnimation
+ 1053  0006B590    100  static bool sIsCurrentlyPlayingAnim(const char* animToPlay)
+                         local  bool bResult
+                         local  char[16] femAnimName
+ 1076  0002087C     F0  static void sTurnOffAnimation(struct FE_CrAP_Asset_t* asset, int subCategoryIndex)
+                         local  const struct UserInfo& userInfo
+                         local  enum CustomAnim_Category_e customAnimCategory
+ 1098  00015604    184  static void FE_CrAP_TurnOffAsset(struct FE_CrAP_Asset_t* asset)
+                         local  FE_CrAP_Asset_Category_e category
+                         local  bool forceClubReset
+                         local  bool forceGripReset
+                         local  int32 assetID
+                         local  FE_CrAP_Asset_Category_e cat
+                         local  int32 subCat
+                         local  const struct UserInfo& userInfo
+                         local  struct FE_CrAP_Asset_t* prevasset
+                         local  int clubID
+                         local  int itemSlot
+ 1203  0002096C     F0  void FE_CrAP_TurnOffPart(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum)
+                         local  const struct UserInfo& userInfo
+                         local  struct FE_CrAP_Asset_t* asset
+ 1240  0008B238     D8  bool FE_CrAP_IsAssetAvailableForUser(int assetID)
+                         local  const struct UserInfo& userInfo
+                         inlines  BitArray_TestBit
+ 1253  00020C40    148  static void sTurnOnAnimation(struct FE_CrAP_Asset_t* asset)
+                         local  const struct UserInfo& userInfo
+                         local  const char* subCatName
+                         local  enum CustomAnim_Category_e customAnimCategory
+ 1287  0009D7EC    1C4  static void sApplySlider(struct FE_CrAP_Asset_t* asset)
+                         local  const char* animToPlay
+                         local  const char* cameraToPlay
+                         local  const struct FEAnimManager& aMan
+                         inlines  FEAnimManager::SetForceRestart, FE_sCharRenderMgr::IsPlayingAnAnimation
+ 1329  0009D4B0    33C  void FE_CrAP_TurnOnAsset(struct FE_CrAP_Asset_t* asset)
+                         local  FE_CrAP_Asset_Category_e category
+                         local  float delayTexSwapTime
+                         local  bool fadeInWhenDone
+                         local  int32 oldAssetID
+                         local  const char* animToPlay
+                         local  const char* cameraToPlay
+                         local  const struct FEAnimManager& aMan
+                         local  bool bUseBlend
+                         local  const char* cameraToPlay
+                         local  FE_CrAP_Asset_Category_e category
+                         local  int32 subcategory
+                         local  int32 entryNum
+                         inlines  FEAnimManager::IsPlayingIdleAnim, FEAnimManager::SetForceRestart, FE_sCharRenderMgr::IsPlayingAnAnimation
+ 1478  0008B600     8C  void FE_CrAP_LoadTurnOnPart(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum, bool allowLocked)
+                         local  int32 assetID
+                         local  const struct UserInfo& userInfo
+ 1499  0009DD14    270  void FE_CrAP_TurnOnPart(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum, bool allowLocked)
+                         local  int32 assetID
+                         local  struct FE_CrAP_Asset_t* asset
+                         local  const struct UserInfo& userInfo
+                         local  int32 subCat
+                         local  int32 assetID
+ 1575  0009D9B0    154  void FE_CrAP_TurnOnFacialFeature(FE_CrAP_Asset_Category_e category, const char* featureName)
+                         local  int i
+ 1593  00020D88    23C  void FE_CrAP_ForceExitPreviewItem()
+                         local  const struct UserInfo& userInfo
+                         local  struct FE_CrAP_Asset_t* asset
+                         local  struct FE_CrAP_Asset_t* previewAsset
+                         local  FE_CrAP_Asset_Category_e category
+                         local  int32 subCategory
+                         local  int32 entryNum
+                         local  int32 oldAssetID
+ 1693  000A6318    220  void FE_CrAP_RestoreLastRemovedAsset()
+                         local  FE_CrAP_Asset_Category_e category
+                         local  int32 subCategory
+                         local  int32 entryNum
+                         local  const struct UserInfo& userInfo
+                         local  struct FE_CrAP_Asset_t* asset
+                         local  struct FE_CrAP_Asset_t* asset
+ 1766  00014938     44  bool FE_CrAP_IsFadeOutCategory(int32 category, struct FE_CrAP_Asset_t* asset)
+                         local  FE_CrAP_Asset_Category_e cat
+ 1787  00015A28    120  int32 FE_CrAP_GetNumberOfEntriesForCategoryAndSubcategoryIndex(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex)
+                         local  int32 numEntries
+                         local  int32 i
+                         local  int32 subID
+                         local  int32 firsAssetID
+ 1824  0008C114    178  int32 FE_CrAP_GetFilteredNumberOfEntriesForCategoryAndSubcategoryIndex(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex)
+                         local  int32 numEntries
+                         local  int32 i
+                         local  int32 subID
+                         local  int32 firsAssetID
+ 1862  0008C5A0    1CC  int32 FE_CrAP_GetFilteredEntryForCategoryAndSubcategoryIndex(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int topRowTracker)
+                         local  int32 i
+                         local  int32 firsAssetID
+                         local  int32 subCat
+                         local  int32 entryCounter
+                         local  int32 filterCounter
+                         local  int32 numItems
+ 1912  0001591C    10C  int32 FE_CrAP_GetNumFreeItemsInCategoryAndSubcategory(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex)
+                         local  int32 numFreeItems
+                         local  int32 i
+                         local  int32 subID
+                         local  int32 firsAssetID
+ 1934  00015238    188  int32 FE_CrAP_GetNumberOfSubcategoryIndicesForCategory(FE_CrAP_Asset_Category_e category)
+                         local  int32 numEntries
+                         local  int32 i
+                         local  int32 j
+                         local  bool subCatUsed
+ 1988  00015014    224  int32 FE_CrAP_GetSubCategoryIDForCategoryAndSubcategoryIndex(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex)
+                         local  int32 i
+                         local  int32 j
+                         local  int32[64] subCats
+                         local  int32 nSubCats
+                         local  int32 bFoundIt
+                         local  int32 firsAssetID
+ 2060  00014B44    32C  int32 FE_CrAP_GetSubCategoryIndexForCategoryAndSubcategoryID(FE_CrAP_Asset_Category_e category, int32 subCategoryID)
+                         local  int32 i
+                         local  int32 j
+                         local  int32 nSubCats
+                         local  int32 bFoundIt
+                         local  int32 firsAssetID
+                         local  int32 cachedIndex
+ 2146  000153C0    144  int32 FE_CrAP_GetSubCategoryNameForCategoryAndSubcategoryIndex(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, char* subCategoryName, size_t subCatNameBufLen)
+                         local  int32 subID
+ 2183  00015504     B8  int32 FE_CrAP_GetSubCategoryIndexByNameForCategory(FE_CrAP_Asset_Category_e category, const char* pSubCatName)
+                         local  char[64] strBuf
+                         local  int32 subCount
+                         local  int32 i
+ 2207    inline-only   static bool FE_CrAP_CanGlobalSearchAsset(const struct FE_CrAP_Asset_t* asset)
+ 2240  000157E0    13C  static bool FE_CrAP_CheckAsset(const struct FE_CrAP_Asset_t* asset, FE_CrAP_Asset_Category_e category, int32 subID)
+                         inlines  FE_CrAP_CanGlobalSearchAsset
+ 2275  00015F0C     80  struct FE_CrAP_Asset_t* FE_CrAP_GetAssetFromCategoryAndSubCategoryIndexAndEntryNum(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum)
+                         local  int32 assetID
+ 2285  00010578     58  struct FE_CrAP_Asset_t* FE_CrAP_GetAssetFromAssetIndex(int32 assetID)
+ 2294  00013F44     C4  int32 FE_CrAP_GetAssetIndexFromAsset(struct FE_CrAP_Asset_t* asset)
+                         local  int32 assetID
+ 2307  00015BAC     F8  int32 FE_CrAP_GetAssetIDFromAssetName(const char* assetName)
+                         local  int32 i
+ 2322  00015CA4    10C  int32 FE_CrAP_GetAssetIDFromUniqueName(const char* assetUniqueName)
+                         local  int32 i
+ 2341  00015DB0    15C  int32 FE_CrAP_GetAssetIndexFromCategoryAndSubCategoryIndexAndEntryNum(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum)
+                         local  int32 i
+                         local  int32 entryCounter
+                         local  int32 subID
+                         local  int32 firsAssetID
+                         local  char[512] buf
+ 2383  00015FDC     EC  void FE_CrAP_RegisterStreamClients()
+ 2417  000160C8     1C  bool FE_CrAP_IsEraCategory(FE_CrAP_Asset_Category_e category)
+ 2433  000161EC    270  void FE_CrAP_SetupFirstAssetIDs()
+                         local  int i
+                         local  int j
+                         local  int32[31] EraModes_FirstAssetID
+                         local  int32 lowestEraItemIndex
+                         local  int32 firstAssetID
+                         local  int32 subID
+ 2511  00014A78     CC  int FE_CrAP_GetFirstCategoryAssetID(FE_CrAP_Asset_Category_e category)
+ 2528  0001645C     6C  void FE_CrAP_UnRegisterStreamClients()
+ 2549  00016600     98  static void FE_CrAP_LoadHeadStartFromStream(struct TStreamData* pStreamData)
+ 2581  00016698     80  static void FE_CrAP_LoadColorMapFromStream(struct TStreamData* pStreamData)
+ 2606  00016718     8C  static void FE_CrAP_LoadAssetMapFromStream(struct TStreamData* pStreamData)
+ 2638  000167A4     44  static void FE_CrAP_Balls_LoadDBfromStream(struct TStreamData* pStreamData)
+ 2649  00073D78    484  static void FE_CrAP_LoadDBfromStream(struct TStreamData* pStreamData)
+                         local  const char[25] __FUNCTION__
+                         local  uint8* pData
+                         inlines  TagValuePair, operator+
+ 2742  00073AF8    280  void FE_CrAP_PostDBLoad()
+                         local  int32 i
+                         local  int32 gDisableTintsAndBlends
+                         local  int32 i
+                         local  int32 i
+                         local  const char* assetName
+                         local  int32 hash
+ 2809  000678E8     78  const char* FE_CrAP_GetPartName(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum)
+                         local  struct FE_CrAP_Asset_t* asset
+                         inlines  FE_CrAP_Asset_p::FE_CrAP_Asset_p
+ 2827  000167E8     6C  uint32 FE_CrAP_GetPartColor1(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum)
+                         local  struct FE_CrAP_Asset_t* asset
+ 2845  00016854     6C  uint32 FE_CrAP_GetPartColor2(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum)
+                         local  struct FE_CrAP_Asset_t* asset
+ 2863  000168C0     6C  uint32 FE_CrAP_GetPartColor3(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum)
+                         local  struct FE_CrAP_Asset_t* asset
+ 2882  0001692C     70  SponsorType FE_CrAP_GetPartSponsor(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum)
+                         local  struct FE_CrAP_Asset_t* asset
+ 2900  0001699C     70  int32 FE_CrAP_GetPartRetailPrice(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum)
+                         local  struct FE_CrAP_Asset_t* asset
+ 2928  00016A0C     70  int32 FE_CrAP_GetPartSalePrice(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum)
+                         local  struct FE_CrAP_Asset_t* asset
+ 2956  00016A7C     70  int32 FE_CrAP_GetPartLevel(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum)
+                         local  struct FE_CrAP_Asset_t* asset
+ 2974  00016B9C     28  int32 FE_CrAP_GetPartAttributeUpgrade1(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum)
+                         local  int32 assetID
+ 2986  00016C74     28  int32 FE_CrAP_GetPartAttributeModifier1(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum)
+                         local  int32 assetID
+ 2998  00016D4C     28  int32 FE_CrAP_GetPartAttributeUpgrade2(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum)
+                         local  int32 assetID
+ 3010  00016E24     28  int32 FE_CrAP_GetPartAttributeModifier2(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum)
+                         local  int32 assetID
+ 3022  00016AEC     B0  int32 FE_CrAP_GetPartAttributeUpgrade1ByAssetID(int32 assetID)
+ 3032  00016BC4     B0  int32 FE_CrAP_GetPartAttributeModifier1ByAssetID(int32 assetID)
+ 3042  00016C9C     B0  int32 FE_CrAP_GetPartAttributeUpgrade2ByAssetID(int32 assetID)
+ 3052  00016D74     B0  int32 FE_CrAP_GetPartAttributeModifier2ByAssetID(int32 assetID)
+ 3062  00016E4C     70  int8 FE_CrAP_GetPartGMLockID(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum)
+                         local  struct FE_CrAP_Asset_t* asset
+ 3081  00016EBC     70  int16 FE_CrAP_GetPartGMLockVal(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum)
+                         local  struct FE_CrAP_Asset_t* asset
+ 3100  00016F2C     88  int8 FE_CrAP_GetPartGMLockIDByAssetNum(int32 assetNum)
+ 3115  00016FB4     88  int16 FE_CrAP_GetPartGMLockValByAssetNum(int32 assetNum)
+ 3130  000994F8     F4  struct HashString FE_CrAP_GetPartSwapPart(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum, int32 index)
+                         local  struct FE_CrAP_Asset_p asset
+                         inlines  FE_CrAP_GetRow, HashString::HashString
+ 3146  000995EC     E4  struct HashString FE_CrAP_GetPartSwapNode(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum, int32 index)
+                         local  struct FE_CrAP_Asset_p pAsset
+                         inlines  FE_CrAP_GetRow, HashString::HashString
+ 3202  000996D0     F4  struct HashString FE_CrAP_GetPartSwapTexture(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum, int32 index)
+                         local  struct FE_CrAP_Asset_p pAsset
+                         inlines  FE_CrAP_GetRow, HashString::HashString
+ 3219  000997C4     F4  struct HashString FE_CrAP_GetPartSwapTint(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum, int32 index)
+                         local  struct FE_CrAP_Asset_p pAsset
+                         inlines  FE_CrAP_GetRow, HashString::HashString
+ 3235  0001703C     20  int32 FE_CrAP_GetNumEntriesInCrAPDB()
+ 3243  0001705C     70  int32 FE_CrAP_GetPartLevelFromAssetIndex(int32 index)
+                         local  struct FE_CrAP_Asset_t* asset
+ 3261  000170CC     48  bool FE_CrAP_IsCrAPDBLoaded()
+ 3270  00017114      8  int32 FE_CrAP_GetNumberUniqueGeometries(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex)
+ 3313  0001711C      4  void CrAPAssetsByteSwap()
+ 3353  00017304     28  void FE_CrAP_GetCategorySubcategoryAndEntryNumFromAssetID(int32 assetID, FE_CrAP_Asset_Category_e* category, int32* subcategory, int32* entryNum)
+                         local  FE_CrAP_Asset_Slot_e dummySlot
+ 3364  00017120    1E4  void FE_CrAP_GetCategorySubcategorySlotAndEntryNumFromAssetID(int32 assetID, FE_CrAP_Asset_Category_e* category, int32* subcategory, FE_CrAP_Asset_Slot_e* itemSlot, int32* entryNum)
+                         local  int32 i
+                         local  int32 entryCounter
+                         local  int32 firsAssetID
+ 3395  00014E70     AC  void FE_CrAP_GetCategorySubcategoryFromAssetID(int32 assetID, FE_CrAP_Asset_Category_e* category, int32* subcategory)
+ 3412  0001732C    158  void FE_CrAP_GetEntryNumFromAssetIDCategorySubcategory(int32 assetID, FE_CrAP_Asset_Category_e category, int32 subcategory, int32* entryNum)
+                         local  int32 i
+                         local  int32 entryCounter
+                         local  int32 firsAssetID
+                         local  int32 subCat
+ 3433  000149B8     48  bool FE_IsValidCurrentGender(FE_CrAP_Asset_Gender_e eGender)
+ 3447  00015788     58  bool FE_IsMatchingSubCategory(FE_CrAP_Asset_Category_e category, int32 assetSubCategory, int32 matchSubCategory)
+ 3468  00017484     58  bool FE_DoesAssetHaveValidCurrentGender(int32 assetID)
+ 3476  000174DC     98  int32 FE_CrAP_GetFirstEquippedIndexForCategory(FE_CrAP_Asset_Category_e category)
+                         local  FE_CrAP_Asset_Slot_e i
+                         local  int32 assetID
+ 3496  00017574    104  int32 FE_CrAP_GetFirstEquippedIndexForCategoryAndSubcategory(FE_CrAP_Asset_Category_e category, int32 subcategory)
+                         local  FE_CrAP_Asset_Slot_e i
+                         local  int32 assetID
+                         local  int32 subCat
+ 3519  00017678    11C  bool FE_CrAP_IsItemEquipped(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, int32 entryNum)
+                         local  int32 subCat
+                         local  int32 i
+                         local  int32 curEntry
+                         local  int32 firsAssetID
+ 3546  00017794    1B8  bool FE_CrAP_GetColorNameFromID(int32 colorID, char* colorName, size_t colorNameBufLen)
+ 3586  0001794C     9C  int32 FE_CrAP_GetSponsorNameFromID(int32 sponsorID, char* sponsorName, size_t sponsorNameBufLen)
+ 3611  000137FC     68  const char* FE_CrAP_GetStringFromTable(int32 id)
+ 3629  000179E8    174  int32 FE_CrAP_GetUnlockMessageFrom(FE_CrAP_Asset_Category_e category, int32 subCategory, int32 entryNum, char* unlockMsg, size_t unlockMsgBufLen)
+                         local  int32 i
+                         local  int32 entryCounter
+                         local  int32 subID
+                         local  int32 symbolNdx
+ 3690  00017B5C     3C  bool FE_CrAP_GetBallStripColor(int ballID, uint8[3]* destBallStripColor)
+                         local  bool bRet
+                         local  int i
+ 3710  00099250    260  bool FE_CrAP_TryBallSwappingAsset(struct FE_CrAP_Asset_t* asset)
+                         local  bool bRet
+                         local  struct FE_CrAP_Asset_p pAsset
+                         local  char[17] texName
+                         local  int ballIndex
+                         local  int i
+                         local  uint8 r
+                         local  uint8 g
+                         local  uint8 b
+                         local  const int charIndex
+                         inlines  FE_CrAP_Asset_p::FE_CrAP_Asset_p, cGAME_GLOBALS::SetCharacterStyleBallID
+ 3758  00017B98     50  bool FE_CrAP_SponsorForAssetMatches(int32 assetID, SponsorType sponsor)
+                         local  SponsorType assetSponsor
+ 3772  00017BE8     7C  int FE_CrAP_GetNumEquippedItemsWithSponsor(SponsorType sponsor)
+                         local  FE_CrAP_Asset_Slot_e iSlot
+                         local  int numItems
+                         local  int32 assetID
+ 3794  00017C64     F4  int FE_CrAP_GetNumItemsWithLockModeAndLockVal(int mode, int val)
+                         local  int i
+                         local  int numItems
+ 3815  00067960    1E8  int FE_CrAP_GetFirstThreeItemsWithLockModeAndVal(int mode, int val, char* itemName1, int bufLen1, char* itemName2, int bufLen2, char* itemName3, int bufLen3)
+                         local  int i
+                         local  int numItems
+                         local  const char* name
+                         inlines  FE_CrAP_Asset_p::FE_CrAP_Asset_p
+ 3852  00017D58     B0  int FE_CrAP_GetNextUnlockVal(int mode, int val)
+                         local  int i
+                         local  int aReallyBigNumber
+                         local  int nextVal
+ 3932  00017E08     EC  void FE_CrAP_GetSponsorshipItemInfo(int32 itemID, SponsorType* sponsorID, int32* cashBonus, char* itemName, size_t itemNameBufLen)
+ 3944  00017EF4     9C  void FE_CrAP_GetSponsorName(SponsorType sponsorID, char* name, size_t nameBufLen)
+ 3953  0008B68C    248  void FE_CrAP_GetCategoryInfo(FE_CrAP_Asset_Category_e category, int32* numLocked, int32* numOwned, int32* numNew, int32* numTotal)
+                         local  int i
+                         local  const struct UserInfo& userInfo
+                         inlines  BitArray_TestBit
+ 3991  000A5C98     74  void FE_CrAP_UnequipSlot(FE_CrAP_Asset_Slot_e iSlot)
+                         local  int32 assetNum
+ 4008  00017F90     B0  int32 FE_CrAP_IsAssetEquipped(int32 assetID)
+                         local  const struct CrAPInfo_t& crapInfo
+                         local  int32 slot
+ 4025  00018040     20  int32 FE_CrAP_IsSpecialAllCategoryText(FE_CrAP_Asset_Category_e category)
+ 4036  00018060     88  int16 FE_CrAP_GetCategoryFromAssetID(int assetID)
+ 4045  000180E8     8C  int32 FE_CrAP_GetLevelFromAssetID(int assetID)
+ 4054  00018174     F0  void FE_CrAP_GetSubcategoryNameFromAssetID(int assetID, char* subcatName, size_t subcatNameBufLen)
+ 4064  00067B48    1F8  void FE_CrAP_GetAssetNameFromAssetID(int assetID, char* assetName, size_t assetNameBufLen)
+                         local  struct FE_CrAP_Asset_p pAsset
+                         local  int32 srcIdx
+                         local  int32 dstIdx
+                         local  uint8* src
+                         local  uint8* dst
+                         inlines  FE_CrAP_Asset_p::FE_CrAP_Asset_p
+ 4107  00018264     90  bool FE_CrAP_IsAssetRemovable(int assetID)
+                         local  struct FE_CrAP_Asset_t* asset
+                         local  FE_CrAP_Asset_Slot_e itemSlot
+                         local  FE_CrAP_Asset_Category_e category
+ 4150  0008B8D4    178  bool FE_CrAP_UserOwnsNonFreeCategoryItem(int userID, FE_CrAP_Asset_Category_e category)
+                         local  int32 i
+                         local  int32 firsAssetID
+                         local  const struct UserInfo& userInfo
+                         inlines  BitArray_TestBit
+ 4183  000182F4     20  bool filterByAssetID(void* row)
+ 4190  00018314     60  int sortByAssetName(const void* row1, const void* row2)
+                         local  struct FE_CrAP_Asset_t* asset1
+                         local  struct FE_CrAP_Asset_t* asset2
+                         local  const char* name1
+                         local  const char* name2
+ 4201  00067EF8     64  void printAsset(void* row)
+                         local  struct FE_CrAP_Asset_t* asset
+                         local  struct FE_CrAP_Asset_p pAsset
+                         inlines  FE_CrAP_Asset_p::FE_CrAP_Asset_p
+ 4210  00018374     2C  int compareFunc(const void* pi, const void* pj)
+                         local  int i
+                         local  int j
+ 4224  00096004    678  void FE_CrAP_TimingTest()
+                         local  uint64 cycleCount
+                         local  struct OrderedSubset list
+                         local  uint64 uiChronoAfterWait
+                         local  uint64 uiChronoBeforeWait
+                         local  struct OrderedSubset list
+                         local  uint64 uiChronoAfterWait
+                         local  uint64 uiChronoBeforeWait
+                         local  uint64 uiChronoAfterWait
+                         local  uint64 uiChronoBeforeWait
+                         local  uint64 uiChronoAfterWait
+                         local  uint64 uiChronoBeforeWait
+                         inlines  OrderedSubset::setPrintFunc, TI_uiReadCP0Count, sys_time_get_timebase_frequency
+ 4532  000160FC     F0  bool FE_CrAP_CheckGloveHandedness(const struct FE_CrAP_Asset_t* asset, FE_CrAP_Asset_Category_e category, int32 subCategoryIndex)
+                         local  const struct UserInfo& userInfo
+ 4575  000183A0    26C  bool FE_CrAP_AssetColorMatches(int32 assetID, enum ColorSearchID colorID)
+                         local  bool bMatches
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  char[32] colorName
+                         local  bool bHasColor
+                         local  uint8* pMatchName
+                         local  uint32[2] matchWord
+                         local  int32 i
+                         local  char* src
+                         local  char* dst
+                         local  char* end
+                         local  int32 numToSearch
+                         local  uint32[2] matchDest
+ 4645  0008BA4C    588  bool FE_CrAP_CheckSearchFilter(int32 assetID)
+                         local  bool filterResults
+                         local  const struct UserInfo& userInfo
+                         local  int32* eqpList
+                         local  int32* eqpList
+ 4766  0001860C     1C  void FE_CrAP_ApplySearchFilter()
+ 4774  00018628     1C  void FE_CrAP_ClearSearchFilter()
+ 4779  00013948     5C  void FE_CrAP_ResetAllSearchFilters()
+ 4802  00018644    268  void FE_CrAP_SetSearchFilterRules(int globalsearch, int category, int subcategory, int ownership, int status, int brand, int color, int level, int modifier, int maxsearchitems, int era)
+ 4895  000188AC     50  static void CrAPBlendFStreamCallback(struct TStreamData* pStreamData)
+ 4902  000188FC     50  static void CrAPBlendLStreamCallback(struct TStreamData* pStreamData)
+ 4909  0001894C     50  static void CrAPBoneFStreamCallback(struct TStreamData* pStreamData)
+ 4917  0001899C     50  static void CrAPBoneLStreamCallback(struct TStreamData* pStreamData)
+ 4925  000189EC     50  static void CrAPBodySpecFStreamCallback(struct TStreamData* pStreamData)
+ 4932  00018A3C     50  static void CrAPBodySpecLStreamCallback(struct TStreamData* pStreamData)
+ 4939  00018A8C     50  static void CrAPCharDesignFStreamCallback(struct TStreamData* pStreamData)
+ 4946  00018ADC     50  static void CrAPCharDesignLStreamCallback(struct TStreamData* pStreamData)
+ 4953  00018B2C     50  static void CrAPEraWeatherStreamCallback(struct TStreamData* pStreamData)
+ 4959  00018B7C    124  void GM_CrAP_RegisterStreamClients()
+ 4974  00018CA0     AC  void GM_CrAP_UnRegisterStreamClients()
+ 4991    inline-only   static void FE_CrAP_BuildLocalPresetsFilename(char* dest, int bufLen, const char* name, bool bUseDataDir)
+ 5001    inline-only   static void FE_CrAP_PCSaveSettingsForCurrentModel(const char* name)
+                         local  char[256] filename
+                         local  const struct UserInfo& userInfo
+                         local  struct CrAPInfo_t* userCrapInfo
+                         local  struct CrapPresetReaderWriterDebug cpMan
+ 5022    inline-only   static bool FE_CrAP_PCLoadSettingsForCurrentModel(const char* name)
+ 5030  00095E00    200  void FE_CrAP_DebugUpdate()
+                         local  const struct CO_SCommandCRAP& cmdData
+                         local  char[256] filename
+                         local  const struct UserInfo& userInfo
+                         local  struct CrAPInfo_t* userCrapInfo
+                         local  struct CrapPresetReaderWriterDebug cpMan
+                         inlines  CO_SCommandCRAP::ClearFilename, CO_SCommandCRAP::GetFilename, CO_SCommandCRAP::SetHasCommand, CO_SCommandCRAP::SetShouldLoad, CO_SCommandCRAP::SetShouldSave, FE_CrAP_BuildLocalPresetsFilename, FE_CrAP_PCLoadSettingsForCurrentModel, FE_CrAP_PCSaveSettingsForCurrentModel, FE_sCharRenderMgr::ReinitCrapOnTexLoad
+ 5058  00018D4C    2AC  int32 FE_CrAP_GetGenericIcon(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex)
+                         local  int32 iconIndex
+ 5176  0006AE10    350  void FE_CrAP_SetCrAPDrawState(FE_CrAP_Asset_Category_e category, int32 subCategoryIndex, FE_CrAP_Asset_Slot_e itemSlot)
+                         local  FE_CrAP_Asset_Category_e cat
+                         local  int32 subCat
+                         local  bool setByCategory
+                         local  bool setByItemSlot
+ 5328  000190E8     68  void FE_CrAP_GetCategorySubcategoryFromCategorySubcategoryEntryNum(int32 entryNum, FE_CrAP_Asset_Category_e* category, int32* subcategory)
+                         local  struct FE_CrAP_Asset_t* asset
+ 5335  00089F38     F4  void Preset_PrepName(char* mVarSelection, char* oldName, char* newName)
+                         local  char* instance
+                         local  unsigned int i
+                         inlines  std::strstr
+ 5354  000B8CA4    190  void FE_CrAP_GetAssetEquippedTokensForCurrentUser(int assetID, int8* tokenTypePerSlot, int32 bufferSize)
+                         local  const struct UserInfo& userInfo
+                         local  int[16] tokensEquippedPerStatType
+                         local  int32 i
+                         local  int32 j
+                         local  int32 curSlot
+                         inlines  Singleton<UserManager>::GetSingleton
+ 5379  00019150    1C4  static void Preset_ApplyAsset(int assetID, int user_index, struct TCharacter* pCharacter)
+                         local  struct FE_CrAP_Asset_t* asset
+                         local  const struct UserInfo& userInfo
+                         local  FE_CrAP_Asset_Slot_e itemSlot
+ 5425  00019314     5C  bool Preset_IsFemale(int golfer_id)
+ 5445  00019370     18  void Preset_SetupUnlock(uint8 password)
+ 5450  00019388     18  uint8 Preset_CheckUnlock()
+ 5456  00098710    340  void Preset_SetupGolferPreset(struct TCharacter* pChar, int user_index, int golfer_id, int era, int weather, struct CrAPInfo_t* pCrapInfo)
+                         local  int i
+                         local  int var_index
+                         local  const struct UserInfo& userInfo
+                         local  bool saveValid
+                         inlines  UserInfo::SetValid, cGAME_GLOBALS::GetCharacterStyleShirt
+ 5524  0008BFD4    140  int32 FE_CrAP_GetZeroBasedOffsetOfAssetID(int32 assetID, FE_CrAP_Asset_Category_e category, int32 subCategoryIndex)
+                         local  int32 position
+                         local  int32 i
+                         local  int32 subID
+                         local  int32 firsAssetID
+ 5560  000193A0     BC  int32 FE_CrAP_GetSponsorFromAssetID(int assetID)
+ 5571  000164C8    138  uint8* FE_CrAP_FindFirstFemaleHeadStartDef()
+                         local  int32 counter
+                         local  uint8* dataPtr
+                         local  int32 hsVersion
+                         local  int32 dataSize
+ 5620  0001945C    12C  uint8* FE_CrAP_GetHeadStartPresetData(int8 gender, int8 ageGroup, int8 slot)
+                         local  int32 counter
+                         local  uint8* dataPtr
+                         local  int32 numToSkip
+                         local  int32 hsVersion
+                         local  int32 dataSize
+ 5665  000B5270    178  void FE_CrAP_ProcessNewAvailableItems()
+                         local  const struct UserInfo& userInfo
+                         local  uint32 i
+                         inlines  BitArray_SetBit, BitArray_TestBit
+ 5698  00019588     24  void FE_CrAP_ResetPreviewAssetIDs()
+ 5704  000195AC    184  struct regTexListEntry* FE_CrAP_LookupRegionSelection(struct meshListEntry* pMeshData, const char* regionName, int32 maxNameLength)
+                         local  int32 texIdx
+                         local  int32 texListIndex
+                         local  struct regTexListEntry* pTexData
+                         local  const char* regName
+                         local  int32 regNameLen
+                         local  bool bMatch
+ 5736  00019730     D4  struct meshListEntry* FE_CrAP_FindMeshDataFromMeshName(const char* meshName, FE_CrAP_Asset_Gender_e gender)
+                         local  uint32 i
+ 5756  00019804     E4  const char* FE_CrAP_GetCullTagForMesh(struct meshListEntry* pMeshData, int32 cullTagIndex)
+                         local  uint32 cullIdx
+                         local  const char* cullTag
+ 5770  000198E8     E4  const char* FE_CrAP_GetNoLoadTagForMesh(struct meshListEntry* pMeshData, int32 noLoadTagIndex)
+                         local  uint32 noLoadIdx
+                         local  const char* noLoadTag
+ 5784  000199CC     F4  void FE_CrAP_VerifyEquipList(int32 playerIndex, const struct CrAPInfo_t& crapInfo)
+                         local  int32 slot
+                         local  struct FE_CrAP_Asset_t* pAsset
+ 5800  00019AC0    234  bool FE_CrAP_IsNoLoadTagActive(const char* noLoadTag, const struct CrAPInfo_t& crapInfo)
+                         local  int32 slot
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  int32 genderIndex
+                         local  int32 meshIdx
+                         local  int32 meshListIndex
+                         local  struct meshListEntry* pMeshData
+                         local  int32 j
+                         local  const char* cullTagStr
+ 5832  00019CF4     E4  const char* FE_CrAP_LookupAssetNameFromMeshData(struct meshListEntry* pMeshData)
+                         local  int32 i
+                         local  int32 g
+                         local  int32 j
+ 5851  00019DD8     18  int32 FE_CrAP_GetSubCat_Drivers()
+ 5856  00019DF0     18  int32 FE_CrAP_GetSubCat_Fairwaywoods()
+ 5861  00019E08     18  int32 FE_CrAP_GetSubCat_Irons()
+ 5866  00019E20     18  int32 FE_CrAP_GetSubCat_Wedges()
+ 5871  00019E38     18  int32 FE_CrAP_GetSubCat_Putters()
+ 5876  000155EC     18  int32 FE_CrAP_GetSubCat_Shafts()
+ 5881  000155D4     18  int32 FE_CrAP_GetSubCat_Grips()
+ 5886  000155BC     18  int32 FE_CrAP_GetSubCat_Balls()
+ 5891  000160E4     18  int32 FE_CrAP_GetSubCat_Gloves()
+ 5896  00019E50     18  int32 FE_CrAP_GetSubCat_SwingStyle()
+ 5901  00019E68     18  int32 FE_CrAP_GetSubCat_PositiveReactions()
+ 5906  00019E80     18  int32 FE_CrAP_GetSubCat_NegativeReactions()
+ 5911  00014438     E4  int32 FE_CrAP_NameHashToID(int32 assetNameHash)
+                         local  int32 i
+ 5932  0001423C     C4  int32 FE_CrAP_IDToNameHash(int32 assetID)
+                         local  int32 hash
+ 5947  00019E98    268  void FE_CrAP_UpdateEquipped7Iron(const struct CrAPInfo_t& crapInfo)
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  const char* pClubAssetName
+                         local  int32 i
+                         local  const char* pAssetName
+                         local  const char* p7IronStr
+                         local  char[128] newName
+                         local  int32 lenBefore

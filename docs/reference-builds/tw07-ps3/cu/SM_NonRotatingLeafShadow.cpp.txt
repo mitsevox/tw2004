@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_NonRotatingLeafShadow.cpp
+// compiled in: shader_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   35  0051B5BC     2C  void SM_NonRotatingLeafShadowClass::SM_NonRotatingLeafShadowClass(const struct SM_NonRotatingLeafShadowClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base
+   43  00508E40     88  void SM_NonRotatingLeafShadowClass::Load(const struct SM_NonRotatingLeafShadowClass* this)
+   52  00508EC8     44  void SM_NonRotatingLeafShadowClass::Activate(const struct SM_NonRotatingLeafShadowClass* this)
+   59  00508F0C     38  void SM_NonRotatingLeafShadowClass::Deactivate(const struct SM_NonRotatingLeafShadowClass* this)
+   66  00512044     64  void SM_NonRotatingLeafShadowClass::SetColorLeafTexture(const struct SM_NonRotatingLeafShadowClass* this, TextureRef texRef)

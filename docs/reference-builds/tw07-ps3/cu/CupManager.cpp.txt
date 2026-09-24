@@ -1,0 +1,99 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/CupManager.cpp
+// compiled in: headgate_unity.cpp
+// 30 functions, source order. line | PS3 address | size
+
+   22  00367BB0    10C  void CCupManager::CCupManager(const struct CCupManager* this)
+                         inlines  Singleton<CCupManager>::Singleton
+   33  00367DC8    11C  void CCupManager::CCupManager(const struct CCupManager* this, int8 nNumGreens, int8 nNumCupsPerGreen)
+                         inlines  Singleton<CCupManager>::Singleton
+   42  0034A2C0    12C  void CCupManager::~CCupManager(const struct CCupManager* this)
+                         local  int8 i
+                         local  int8 j
+                         inlines  Singleton<CCupManager>::~Singleton
+   56  0034A3EC     60  void CCupManager::CompactCups(const struct CCupManager* this, int8 index, const struct Cup** pCupArray, int8 arraySize)
+                         local  int8 i
+   71  00365F9C     C8  const struct Cup* CCupManager::GetCup(const const struct CCupManager* this, int8 nGreenIndex, int8 nCupIndex)
+                         local  const struct Cup* cup
+                         inlines  CCupManager::ValidIndex
+   80  003661D0    2B0  bool CCupManager::AddCup(const struct CCupManager* this, int8 nGreenIndex, int8 nCupIndex, float* loc)
+                         local  bool result
+                         local  struct Cup* cup
+                         inlines  CCupManager::ValidIndex
+  112  0034A44C     14  int8 CCupManager::GetActiveCups(const struct CCupManager* this, const const struct Cup**& activeCups)
+  122  0036656C    140  int8 CCupManager::CupCountOnGreen(const const struct CCupManager* this, int8 nGreenIndex, bool activeOnly)
+                         local  int8 cupCount
+                         local  int8 cupIndex
+                         inlines  CCupManager::ValidIndex
+  139  0034A460     CC  void CCupManager::RegisterGreenSelectionMarker(const struct CCupManager* this, TBasicParamPtr pActorData)
+                         local  TGreenSelectionMarkerParam* pData
+  153  0034A52C     88  float[4]& CCupManager::GetGreenMarkerLocation(const const struct CCupManager* this, int8 nGreenIndex)
+  160  00366764    128  float[4]& CCupManager::GetCupLocation(const const struct CCupManager* this, int8 nGreenIndex, int8 nCupIndex)
+                         inlines  CCupManager::ValidIndex, CupInfo::GetLoc
+  173  00366BA8    128  float[4]& CCupManager::GetCupGroundLocation(const const struct CCupManager* this, int8 nGreenIndex, int8 nCupIndex)
+                         inlines  CCupManager::ValidIndex, CupInfo::GetGroundLoc
+  184  0035097C     58  float[4]& CCupManager::GetTargetCupLocation(const const struct CCupManager* this)
+                         inlines  CupInfo::GetLoc
+  197  0034A5B4     48  void CCupManager::Init(const struct CCupManager* this, int8 nNumGreens, int8 nNumCupsPerGreen)
+                         local  int i
+  213  003525D8    1D8  void CCupManager::InitFlagActors(const struct CCupManager* this)
+                         local  GenericActorParams params
+                         local  int i
+  250  00366934    1D4  void CCupManager::ShowFlagsOnGreen(const struct CCupManager* this, int8 nGreenIndex)
+                         local  int8 nCups
+                         local  struct GenericActor*[6] apActors
+                         local  int32_t nFlags
+                         local  int i
+                         local  int iActorIndex
+  274  0034A5FC    110  void CCupManager::HideFlagsOnAllGreens(const struct CCupManager* this)
+                         local  struct GenericActor*[6] apActors
+                         local  int nFlags
+                         local  int i
+  290  003527B0     E8  void CCupManager::RemoveActiveCup(const struct CCupManager* this, int8 nGreenIndex, int8 nCupIndex)
+                         local  int cupCount
+                         local  int8 i
+  309  00352A28    114  void CCupManager::AddActiveCup(const struct CCupManager* this, const struct Cup* cup)
+                         local  bool bExists
+                         local  int8 nCupIndex
+                         local  int8 nGreenIndex
+                         local  int8 i
+  337  003672F8    13C  bool CCupManager::ActivateCup(const struct CCupManager* this, int8 nGreenIndex, int8 nCupIndex, bool bActive, bool bPostLoad)
+                         local  bool result
+                         inlines  CCupManager::ValidIndex
+  363  00367AE4     CC  void CCupManager::ActivateCups(const struct CCupManager* this, bool bActive)
+                         local  int8 i
+                         local  int8 j
+  374  00367A38     AC  void CCupManager::ActivateCups(const struct CCupManager* this, int8 nGreenIndex, bool bActive)
+                         local  int8 j
+  382  00367694    1AC  bool CCupManager::SetTargetCup(const struct CCupManager* this, int8 nGreenIndex, int8 nCupIndex, bool bPostLoad)
+                         local  bool result
+                         inlines  CCupManager::SetTargetLocation, CCupManager::ValidIndex, vec_ld
+  408  0036F50C    118  void CCupManager::Draw(const struct CCupManager* this, bool bActiveOnly)
+                         local  int8 i
+                         local  int8 j
+                         local  const struct Cup** activeCups
+                         local  int8 count
+                         local  int8 i
+  437  00366D78    144  void CCupManager::AlignCupToGround(const struct CCupManager* this, int8 nGreenIndex, int8 nCupIndex, float terrainHeight)
+                         local  vec4flt newLoc
+                         local  bool bRepositionTarget
+                         inlines  CCupManager::SetTargetLocation, CCupManager::ValidIndex, vec4flt_Copy, vec_ld
+  469  00367180    178  void CCupManager::MoveCup(const struct CCupManager* this, int8 nGreenIndex, int8 nCupIndex)
+                         local  float cupHeightAtGround
+                         inlines  CCupManager::ValidIndex
+  483  00366064     AC  void CCupManager::MoveCup(const struct CCupManager* this, int8 nGreenIndex, int8 nCupIndex, const float* pos)
+                         local  const struct Cup* cup
+  491  00366EBC    1F8  void CCupManager::MoveCups(const struct CCupManager* this, bool bActiveOnly)
+                         local  struct GoTemple* pTemple
+                         local  int8_t iTempleGreenIdx
+                         local  bool bMaterialFiltering
+                         local  enum TempleStateE ePrevState
+                         local  int8 i
+                         local  int8 j
+                         local  float cupHeightAtGround
+                         inlines  GoTemple::EnableMaterialFiltering, GoTemple::GetCurrentState
+  533  0034D0D4     C4  void CCupManager::LoadHoles(const struct CCupManager* this)
+                         local  int8 i
+                         local  int8 j
+  545  00352898    190  void CCupManager::UnLoadHoles(const struct CCupManager* this)
+                         local  int8 i
+                         local  int8 j

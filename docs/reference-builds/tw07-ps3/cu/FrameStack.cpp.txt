@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/Internal/FrameStack.cpp
+// compiled in: FrameStack.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   19  0059BCB8    1BC  bool AllocateMemory(uint32_t maxFrames)
+                         local  uint32_t f
+                         inlines  Frame, StaticSkeletonFilter, TagValuePair
+   37  0059BB20     E0  void FreeMemory()
+                         local  uint32_t f
+                         inlines  ~Frame
+   51  0059BC00     1C  void Reset()
+   59  0059BC1C     50  struct Frame* Allocate()
+   79  0059BC6C     4C  void Free(struct Frame* frame)

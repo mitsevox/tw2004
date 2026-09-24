@@ -1,0 +1,9 @@
+// C:/packages/job_manager/1.11.00/include/job_manager/job.h
+// compiled in: job.cpp, job_header.cpp, job_scheduler_internal.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   33  007049EC    120  void Job(const struct Job* this, const char* name)
+                         inlines  JobCacheLine1, JobCacheLine2, JobHeader
+   34  0070457C     78  void ~Job(const struct Job* this)
+   63    inline-only   JobRawPtr GetDependent(const struct Job* this, int i)
+   64    inline-only   JobRawPtr GetDependency(const struct Job* this, int i)

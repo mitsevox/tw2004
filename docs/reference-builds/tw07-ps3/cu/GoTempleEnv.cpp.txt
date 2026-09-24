@@ -1,0 +1,45 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Temple/GoTempleEnv.cpp
+// compiled in: golf_unity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+  185  0023CFE4     24  void GoTempleEnv::MoveCharToPosition(const struct GoTempleEnv* this, const float* targetPos)
+                         inlines  vec4flt_Copy3
+  205  00201828     2C  void GoTempleEnv::ResetCharToDefaultPos(const struct GoTempleEnv* this)
+                         inlines  vec4flt_Copy3
+  226  003277D0    120  void GoTempleEnv::BeginScene(const struct GoTempleEnv* this, int8_t viewport, enum PlayerNumber_t playerNum)
+                         local  VM_SViewport* pViewport
+                         inlines  RC_spGetRenderCtxViewport, RC_vSetCurrentRenderCtx
+  275  00236B20     8C  void GoTempleEnv::EndScene(const struct GoTempleEnv* this, int8_t viewport)
+  288  00236BAC     74  void GoTempleEnv::TakeASnapshot(const struct GoTempleEnv* this, TextureRef texRef)
+  316  00304E34     F4  void GoTempleEnv::PlayVideo(const struct GoTempleEnv* this)
+                         local  const char* kMoviePath
+  372  00236C20     1C  void GoTempleEnv::SetInTransition(const struct GoTempleEnv* this, bool bIsInTransition)
+  396    inline-only   void GoTempleEnv::TriggerCollisionEffect(const struct GoTempleEnv* this, bool bStart, float[4]* pCollisionPoint)
+                         local  vec4flt vRadius
+                         local  vec4flt vCollision
+                         local  float_t fRadius
+                         local  float_t angle
+  453  00236CB0      C  void GoTempleEnv::PreShotInit(const struct GoTempleEnv* this)
+  477  002B23D0    944  void GoTempleEnv::UpdateEffectsShaderParams(const struct GoTempleEnv* this)
+                         local  struct DeviceC* pDevice
+                         local  TextureRef topTexture
+                         local  TextureRef bottomTexture
+                         local  int32_t iTechniqueNum
+                         local  struct MaterialC* pMaterial
+                         local  struct ShaderC* pShader
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         local  struct ScopeParmC* pScopeParm
+                         local  struct ScopeParmC* pScopeParm1
+                         local  struct ScopeParmC* pScopeParm2
+                         local  struct ScopeParmC* pScopeParm
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         inlines  MaterialC::SetTechnique, RNADebugBreak, SceneAssetC::GetScene, ScopeParmC::Set<RNA::TextureC*>, ScopeParmC::Set<std::float_t>, Update
+  627  00261AFC     84  float_t GoTempleEnv::GetGolfer2ScreenDist(const struct GoTempleEnv* this)
+                         inlines  LLMath_DistanceBetween3, __vec_len_sqr3, vec_madd, vec_sld
+  649  002BB254    168  void GoTempleEnv::AdjustFovAndAspectRatio(const struct GoTempleEnv* this, int8_t iViewControllerID)
+                         local  struct GoTemple* pTemple
+                         local  struct RC_SRenderCtx* pRenderContext
+                         local  enum TempleStateE eTempleState
+                         inlines  CA_vSetCameraFieldOfView, GoTemple::GetCurrentState, RC_spGetRenderCtxCamera

@@ -1,0 +1,651 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/frontend/FE_twCharResMan.cpp
+// compiled in: apt_unity.cpp
+// 69 functions, source order. line | PS3 address | size
+
+  123  00014A00     78  struct TWCharResMan& GetTWCharResMan()
+  129  0005AA60    148  void TWCharResMan_InitModule(enum eCharResMode mode)
+                         local  const char[24] __FUNCTION__
+                         inlines  TagValuePair, operator+
+  137  0001A3D8     B8  void TWCharResMan_CloseModule()
+  157  0005A9F4     6C  void TWCharResMan::Init(const struct TWCharResMan* this, enum eCharResMode mode)
+                         local  int32 i
+  171  0001A3D4      4  void TWCharResMan::Close(const struct TWCharResMan* this)
+  176  000A3050   1DF8  void TWCharResMan::SyncToCrAPInfo(const struct TWCharResMan* this, int32 charIndex, const struct CrAPInfo_t& crapInfo)
+                         local  const char* charAbrv
+                         local  int32 genderIdx
+                         local  struct perGenderData* pGenData
+                         local  char[64] streamName
+                         local  char[16] texGroupName
+                         local  int32 tintIdx
+                         local  int32 bHasCustomGrip
+                         local  int32 bHasCustomShaft
+                         local  const char* pAnimatedNormalPrefix
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         local  int32 slot
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  int32 meshIdx
+                         local  int32 meshListIndex
+                         local  struct meshListEntry* pMeshData
+                         local  const char* meshResourceName
+                         local  bool bNoLoad
+                         local  const char* occlusionBlendRule
+                         local  int32 tag
+                         local  struct resMeshListEntry* pMeshListEntry
+                         local  int32 existingMeshResIdx
+                         local  int32 existingMeshLoadIdx
+                         local  int32 texIdx
+                         local  int32 texListIndex
+                         local  struct regTexListEntry* pTexData
+                         local  char[32] baseName
+                         local  const char* origBaseTexName
+                         local  char* resourceName
+                         local  char[3] texSuffixes
+                         local  const int32 texNumSuffixes
+                         local  bool bDoAllSuffixes
+                         local  int32 numTex
+                         local  const char* noLoadTagStr
+                         local  int32 i
+                         local  int32 existingResIdx
+                         local  int32 existingLoadIdx
+                         local  TextureRef testRef
+                         local  TextureRef untintedTexRef
+                         local  int32 existingTexResIdx
+                         local  int32 existingTexLoadIdx
+                         local  int32 existingTintIdx
+                         local  char[128] buf
+                         local  TextureRef testRef
+                         local  const char* testPrefix
+                         local  struct resTexListEntry* pListEntry
+                         local  struct FaceBlend* faceBlender
+                         local  struct tintListEntry* pListEntry
+                         local  struct TintDef* pTintDef
+                         local  bool bHaveSourceTex
+                         local  const TextureInfo* info
+                         local  int32 width
+                         local  int32 height
+                         local  const char* mipLevelFlag
+                         local  TextureOptions mipOption
+                         local  int32 i
+                         local  const char* resourceName
+                         local  const char*[8] normalMapRootNames
+                         local  uint32 i
+                         local  char[64] normalMapTextureName
+                         local  const char* resourceName
+                         local  int32 existingResIdx
+                         local  int32 existingLoadIdx
+                         local  struct resTexListEntry* pListEntry
+                         local  int32 existingResIdx
+                         local  int32 existingLoadIdx
+                         local  const char* pClubAssetName
+                         local  char[96] newClubAssetName
+                         local  int32 newClubAssetID
+                         local  char*[2] cctBankNames
+                         local  bool found
+                         local  struct resTexListEntry* pListEntry
+                         inlines  TX_TextureIsAllocated, std::atoi
+  761  0001C38C    218  void TWCharResMan::SyncBlendsToCrAPInfo(const struct TWCharResMan* this, int32 charIndex, const struct CrAPInfo_t& crapInfo)
+                         local  struct FaceBlend* faceBlender
+                         local  int32 i
+                         local  char[17] sliderName
+                         local  int32 i
+                         local  const char* texName
+  786  0009F960   110C  void TWCharResMan::UpdateBlends(const struct TWCharResMan* this, int32 charIndex, const struct CrAPInfo_t& crapInfo)
+                         local  struct TCharacter* pCharacter
+                         local  struct FaceBlend* faceBlender
+                         local  int32 genderIdx
+                         local  struct perGenderData* pGenData
+                         local  int32 i
+                         local  struct TXRFile* pTXR
+                         local  const char* txrFileName
+                         local  const char* txrOutputTexName
+                         local  TextureRef txrOutputTexRef
+                         local  bool bIsStandaloneTXR
+                         local  FE_CrAP_Asset_Slot_e slot
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  struct meshListEntry* pMeshData
+                         local  const char* meshName
+                         local  struct regTexListEntry* pTexData
+                         local  const char* assetTexName
+                         local  int32 existingResIdx
+                         local  int32 existingLoadIdx
+                         local  int32 blendIdx
+                         local  int32 j
+                         local  int32 meshListIndex
+                         local  bool bNoLoad
+                         local  int32 tag
+                         local  int32 j
+                         local  int32 texListIndex
+                         local  struct regTexListEntry* pTestTexData
+                         local  struct blendListEntry* pEntry
+                         local  int32 blendIdx
+                         local  struct meshListEntry* pMeshData
+                         local  int32 txrTexCount
+                         local  bool bHaveAllSrcTextures
+                         local  uint32 maxWidth
+                         local  uint32 maxHeight
+                         local  int32 j
+                         local  struct blendListEntry* pEntry
+                         local  const char* meshName
+                         local  const char* texName
+                         local  int32 existingResIdx
+                         local  int32 existingLoadIdx
+                         local  struct resTexListEntry* pListEntry
+                         local  const TextureInfo* info
+                         local  const char* noLoadTagStr
+                         local  TextureRef untintedTexRef
+                         local  int32 existingTintIdx
+                         local  struct tintListEntry* pListEntry
+                         local  int32 r
+                         local  int32 g
+                         local  int32 b
+                         local  struct blendListEntry* pEntry
+                         local  const TextureInfo* info
+                         local  int32 width
+                         local  int32 height
+                         local  const char* mipLevelFlag
+                         local  TextureOptions mipOption
+                         local  struct blendListEntry* pEntry
+                         inlines  FaceBlend::SetTexGroup, std::atoi
+ 1199  0005A1E0    4B4  void TWCharResMan::RequestResources(const struct TWCharResMan* this)
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         local  struct resMeshListEntry* pListEntry
+                         local  int32 cacheIndex
+                         local  struct resMeshListEntry* pCacheListEntry
+                         local  int8* pData
+                         local  int32 dataSize
+                         local  struct resTexListEntry* pListEntry
+                         local  int32 cacheIndex
+ 1300  0001AD5C    198  void TWCharResMan::FreeMeshResource(const struct TWCharResMan* this, struct resMeshListEntry* pListEntry)
+                         local  int32 i
+                         local  int32 slot
+                         local  int32 subslot
+                         local  int32 doublebuffer
+                         local  uint32 geomHandle
+ 1328  0001AEF4     CC  void TWCharResMan::FreeTexResource(const struct TWCharResMan* this, struct resTexListEntry* pListEntry)
+                         local  int32 cacheIndex
+ 1343  0001AFC0     B0  void TWCharResMan::FreeTintResource(const struct TWCharResMan* this, struct tintListEntry* pListEntry)
+ 1362  0001B070     B0  void TWCharResMan::FreeBlendResource(const struct TWCharResMan* this, struct blendListEntry* pListEntry)
+ 1381  0001B120     B4  void TWCharResMan::BurnTintResource(const struct TWCharResMan* this, struct tintListEntry* pListEntry)
+ 1390  0001B1D4     B4  void TWCharResMan::BurnBlendResource(const struct TWCharResMan* this, struct blendListEntry* pListEntry)
+ 1399  000A2F40     C8  bool TWCharResMan::ReadyToPostLoad(const struct TWCharResMan* this)
+                         local  bool ready
+                         local  int32 i
+                         inlines  TX_TextureIsAllocated
+ 1424  000A726C    184  bool TWCharResMan::MonitorLoading(const struct TWCharResMan* this, bool updateStreamer)
+                         local  int32 i
+ 1471  000A653C    D30  void TWCharResMan::PostLoadProcess(const struct TWCharResMan* this)
+                         local  const uint32 cMaxNumFEGeoms
+                         local  uint32 numNewFECharGeoms
+                         local  struct CharGeom*[128] pNewFECharGeoms
+                         local  bool bGotNewTextures
+                         local  int32 charNewMeshes
+                         local  int32 listIdx
+                         local  bool bCharFreedMeshes
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         local  int32 perCharCount
+                         local  int32 j
+                         local  uint8* pRawMeshData
+                         local  twGeom* pGeom
+                         local  struct CharGeom* pCGeom
+                         local  int32 index
+                         local  int32 i
+                         local  int32 gender
+                         local  uint32 newGeom
+                         local  int32 slot
+                         local  int32 subslot
+                         local  const struct UserInfo& userInfo
+                         local  const struct CrAPInfo_t& crapInfo
+                         local  int32 tintIdx
+                         local  const TextureInfo* info
+                         local  int32 width
+                         local  int32 height
+                         local  const char* mipLevelFlag
+                         local  TextureOptions mipOption
+                         local  char lastChar
+                         local  const TextureInfo* info
+                         inlines  TX_TextureIsAllocated, std::atoi
+ 1754  0001B464    894  void TWCharResMan::BindTexturesToMesh(const struct TWCharResMan* this, int32 charIndex, struct CharGeom* pGeom, struct meshListEntry* pMeshData)
+                         local  int32 genderIdx
+                         local  const char* meshName
+                         local  int32 i
+                         local  int32 texListIndex
+                         local  struct regTexListEntry* pTexData
+                         local  const char* texName
+                         local  int32 i
+                         local  TextureRef srcTex
+                         local  TextureRef dynTex
+                         local  int32 i
+                         local  int32 texResIdx
+                         local  TextureRef srcTex
+                         local  TextureRef dynTex
+                         local  int32 tintListIdx
+                         local  int32 compressedIdx
+ 1875  0001BCF8     F4  int32 TWCharResMan::FindInResMeshList(const struct TWCharResMan* this, struct resMeshListEntry* pList, int32 listSize, const char* resName, int32 gender)
+                         local  int32 i
+ 1891  0001A648    158  int32 TWCharResMan::FindInResTexList(const struct TWCharResMan* this, struct resTexListEntry* pList, int32 listSize, const char* resName, int32 gender)
+                         local  uint32 hash
+                         local  int32 i
+ 1911  0001A7A0     9C  int32 TWCharResMan::FindInTintList(const struct TWCharResMan* this, TextureRef srcTexRef, uint32 tintMode, uint32 rTint, uint32 gTint, uint32 bTint)
+                         local  int32 i
+ 1932  0001A83C     6C  int32 TWCharResMan::FindInTintList(const struct TWCharResMan* this, TextureRef srcTexRef, enum eCharTintStatus status)
+                         local  int32 i
+ 1948  0001B3B4     B0  int32 TWCharResMan::FindInTintList(const struct TWCharResMan* this, TextureRef srcTexRef, uint32 tintMode, uint32 rTint, uint32 gTint, uint32 bTint, enum eCharTintStatus status)
+                         local  int32 i
+ 1970  0001A8A8     D8  int32 TWCharResMan::FindInBlendList(const struct TWCharResMan* this, int32 charIndex, const char* txrName)
+                         local  int32 i
+ 1986  000599B4    82C  void TWCharResMan::GotMeshFromStream(const struct TWCharResMan* this, int8* pDataIn, int32 dataSize)
+                         local  const char[18] __FUNCTION__
+                         local  char[16] meshName
+                         local  twGeom* pTWG
+                         local  int32 gender
+                         local  bool bCached
+                         local  struct resMeshListEntry* pListEntry
+                         local  int32 cacheIndex
+                         local  int32 resIndex
+                         local  uint8* pDest
+                         local  const int32 meshCacheAlign
+                         local  uint8* pCacheMem
+                         local  int32 destSlot
+                         local  int32 destSubSlot
+                         local  int32 doublebuffer
+                         local  int32 slotSizeRemaining
+                         local  int32 i
+                         local  uint8** ppMeshBuffer
+                         inlines  TagValuePair, operator+
+ 2125  0005A694    360  void TWCharResMan::AllocMeshBuffers(const struct TWCharResMan* this)
+                         local  const char[17] __FUNCTION__
+                         local  int32 slot
+                         local  int32 subslot
+                         local  int32 allocSize
+                         local  int32 db
+                         inlines  TagValuePair, operator+
+ 2158  0001A110    2C4  void TWCharResMan::FreeMeshBuffers(const struct TWCharResMan* this)
+                         local  int32 slot
+                         local  int32 subslot
+                         local  int32 db
+                         local  int32 i
+ 2205  000A5D0C    1A0  void TWCharResMan::LoadProshopAsset(const struct TWCharResMan* this, int32 assetID, onLoadCallback callbackFunc)
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  int32 slot
+                         local  const struct UserInfo& userInfo
+                         local  const struct CrAPInfo_t& crapInfo
+ 2236  000A5B2C    16C  void TWCharResMan::UnloadProshopAsset(const struct TWCharResMan* this, int32 assetID)
+                         local  int32 slot
+                         local  const struct UserInfo& userInfo
+                         local  const struct CrAPInfo_t& crapInfo
+                         local  int32 noHatassetID
+ 2270  0001BF84    11C  void TWCharResMan::GetRuntimeResizeParameters(const struct TWCharResMan* this, TextureRef texture, TextureResampleMode* mode)
+                         local  const char* runtime_resizefilter
+ 2289  0007488C    5A4  void TWCharResMan::ProcessTints(const struct TWCharResMan* this, int32 charIndex)
+                         local  bool bStartedTinting
+                         local  bool dashboardAutoUpdating
+                         local  int32 i
+                         local  enum GoBlendTextures_TintOp op
+                         local  float[9] tintParams
+                         local  int32 mip
+                         local  TextureResampleMode resampleMode
+ 2398  00074534    358  void TWCharResMan::ProcessBlends(const struct TWCharResMan* this, int32 charIndex)
+                         local  struct TCharacter* pCharacter
+                         local  struct FaceBlend* faceBlender
+                         local  bool bHaveBlendsToRun
+                         local  int32 i
+                         local  int32 i
+                         local  int32 j
+                         local  struct TXRFile* pTXR
+                         local  const char* txrFileName
+                         local  bool dashboardAutoUpdating
+                         local  struct TXRFile* pTXR
+                         local  int32 i
+ 2479  0001C28C    100  void TWCharResMan::CheckBlends(const struct TWCharResMan* this, int32 charIndex)
+                         local  struct FaceBlend* faceBlender
+                         local  int32 i
+ 2498  0001C0A0     C4  void TWCharResMan::BindTXRToFaceBlender(const struct TWCharResMan* this, int32 charIndex)
+                         local  struct FaceBlend* faceBlender
+ 2512  0001C164    128  bool TWCharResMan::IsTextureABlendTarget(const struct TWCharResMan* this, int32 charIndex, const char* textureName)
+                         local  struct FaceBlend* faceBlender
+                         local  int32 i
+                         local  const char* txrOutputTexName
+ 2537  0001AA7C    2E0  struct meshListEntry* TWCharResMan::FindMeshThatUsesTexture(const struct TWCharResMan* this, const struct CrAPInfo_t& crapInfo, const char* textureName)
+                         local  char[32] baseTexName
+                         local  int32 genderIdx
+                         local  int32 slot
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  int32 meshIdx
+                         local  int32 meshListIndex
+                         local  struct meshListEntry* pMeshData
+                         local  int32 texIdx
+                         local  int32 texListIndex
+                         local  struct regTexListEntry* pTexData
+                         local  const char* texName
+ 2585  0001C5A4     E0  void TWCharResMan::BindCharacter(const struct TWCharResMan* this, int32 index, struct TCharacter* pCharacter)
+ 2592  0001C684     80  void TWCharResMan::SetCharacterHandle(const struct TWCharResMan* this, int32 index, int32 charHandle)
+ 2598  000A76B8    1C8  void TWCharResMan::FreeTextureCache(const struct TWCharResMan* this)
+                         local  int32 i
+                         local  int32 existingTexResIdx
+                         inlines  TX_TextureIsAllocated
+ 2629  000A7CB4    404  void TWCharResMan::FreeCharacters(const struct TWCharResMan* this)
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         local  int32 slot
+                         local  int32 subslot
+                         local  int32 db
+ 2707  0001C704     64  void TWCharResMan::SetNumCharacters(const struct TWCharResMan* this, int32 numCharacters)
+ 2713  000AF0D8    56C  void TWCharResMan::BurnCharacters(const struct TWCharResMan* this)
+                         local  bool dashboardAutoUpdating
+                         local  int32 listIdx
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         local  int iChar
+                         local  const bool nonCrapCharacter
+                         local  const bool crapWithTigerSkin
+                         local  struct CharDefBlendShape* pBlendShapes
+                         local  int32 blendCount
+                         local  int32 j
+                         local  int32 genderIdx
+                         local  struct CharGeom* pCGeom
+                         local  const char* meshName
+                         local  int32 meshResIdx
+                         local  struct meshListEntry* pMeshData
+                         local  const SkinMorphStateT* pMorphState
+                         local  const int32 numBlends
+                         local  const float* pBlendAmts
+                         inlines  UserInfo::GetUserFlag
+ 2813  0001BDEC    120  int32 TWCharResMan::GetDestSubSlot(const struct TWCharResMan* this, int32 destSlot, int32 defaultSubSlot)
+                         local  int32 retVal
+                         local  int32 newForSlot
+                         local  int32 i
+                         local  int32 outIndex
+                         local  int32 outCount
+                         local  int32 i
+ 2851  0001B288    12C  void TWCharResMan::BurnDynamicTextures(const struct TWCharResMan* this)
+                         local  int32 i
+                         local  struct tintListEntry* pEntry
+                         local  int32 i
+                         local  struct blendListEntry* pEntry
+ 2873  0001BF0C     78  int32 TWCharResMan::GetSlotAllocSize(const struct TWCharResMan* this, int32 slot, int32 subslot)
+                         local  const int32 kSlotTableSize
+                         local  int32 allocSize
+                         local  int32 i
+ 2890  0001C768    158  void TWCharResMan::ResetUnusedOcclusionBlends(const struct TWCharResMan* this, int32 charIndex)
+                         local  struct FaceBlend* faceBlender
+                         local  int32 i
+                         local  bool bCharUsesMesh
+                         local  struct meshListEntry* pMeshData
+                         local  const char* occlusionBlendRule
+                         local  float curBlendValue
+ 2913  000744DC     58  void TWCharResMan::WaitForAllTextureCompression(const struct TWCharResMan* this)
+ 2925  0001C8C0    23C  int32 TWCharResMan::CheckTextureCompression(const struct TWCharResMan* this)
+                         local  int32 running
+                         local  int32 i
+                         local  struct tintListEntry* pListEntry
+                         local  int result
+                         local  int32 i
+                         local  struct blendListEntry* pListEntry
+                         local  int result
+ 2974  0001CAFC    1B0  void TWCharResMan::RebindTextures(const struct TWCharResMan* this)
+                         local  int32 i
+                         local  int32 j
+                         local  uint32 geomHandle
+                         local  struct CharGeom* pCGeom
+ 2992  0001A980     FC  TextureFormat TWCharResMan::GetBlendCompressionFormat(const struct TWCharResMan* this, const char* txrFileName)
+                         local  const char*[6] txrsWithAlphaList
+                         local  const int32 listSize
+                         local  const char*[1] txrsThatAreNormals
+                         local  const int32 normalListSize
+                         local  int32 i
+                         local  int32 i
+ 3032  000A83EC    CD4  void TWCharResMan::CacheResourcesForAssetList(const struct TWCharResMan* this, uint16* pAssetIDs, int32 assetCount, int32 maxTextures)
+                         local  int32 charIndex
+                         local  int32 genderIdx
+                         local  int32 forcedTextureCacheCount
+                         local  int32 maxTexToLoad
+                         local  int32 i
+                         local  int32 asset
+                         local  int32 i
+                         local  struct resTexListEntry* pListEntry
+                         local  uint16 assetID
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  int32 meshIdx
+                         local  int32 meshListIndex
+                         local  struct meshListEntry* pMeshData
+                         local  int32 texIdx
+                         local  int32 texListIndex
+                         local  struct regTexListEntry* pTexData
+                         local  char[32] baseName
+                         local  const char* origBaseTexName
+                         local  char* resourceName
+                         local  char[3] texSuffixes
+                         local  const int32 texNumSuffixes
+                         local  bool bDoAllSuffixes
+                         local  int32 numTex
+                         local  int32 i
+                         local  int32 existingTexCacheIdx
+                         local  TextureRef testRef
+                         local  int32 existingTexResIdx
+                         local  int32 existingTexLoadIdx
+                         local  int32 mustCache
+                         local  int32 cacheIndex
+                         local  struct resTexListEntry* pListEntry
+                         local  int32 shoeAssetID
+                         local  struct FE_CrAP_Asset_t* pShoeAsset
+                         local  int32 shoeMeshListIndex
+                         local  struct meshListEntry* pShoeMeshData
+                         local  int32 stexIdx
+                         local  int32 shoeTexListIndex
+                         local  struct regTexListEntry* pShoeTexData
+                         local  char[32] baseName
+                         local  const char* shoeTexName
+                         local  char* resourceName
+                         local  char[3] texSuffixes
+                         local  const int32 texNumSuffixes
+                         local  bool bDoAllSuffixes
+                         local  int32 numTex
+                         local  int32 i
+                         local  int32 existingTexCacheIdx
+                         local  TextureRef testRef
+                         local  int32 cacheIndex
+                         local  struct resTexListEntry* pListEntry
+                         local  int32 existingTexResIdx
+                         inlines  TX_TextureIsAllocated
+ 3305  000A9E94    DFC  void TWCharResMan::UpdateTextureCacheForAssetList(const struct TWCharResMan* this, int32 curListPosition, uint16* pAssetIDs, int32 assetCount, int32 maxTextures, enum StreamSchedulerPriority requestPriority, int32 priorityDirection)
+                         local  int32 genderIdx
+                         local  int32 maxTexToLoad
+                         local  const int32 priorityWindow
+                         local  int32 texturesFromCache
+                         local  int32 asset
+                         local  int32 offset
+                         local  int32 bDone
+                         local  int32 texturesToCache
+                         local  int32 idx
+                         local  int32 i
+                         local  uint16 assetID
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  int32 meshIdx
+                         local  int32 meshListIndex
+                         local  struct meshListEntry* pMeshData
+                         local  int32 texIdx
+                         local  int32 texListIndex
+                         local  struct regTexListEntry* pTexData
+                         local  char[32] baseName
+                         local  const char* origBaseTexName
+                         local  char* resourceName
+                         local  char[3] texSuffixes
+                         local  const int32 texNumSuffixes
+                         local  bool bDoAllSuffixes
+                         local  int32 numTex
+                         local  int32 i
+                         local  int32 i
+                         local  int32 existingTexCacheIdx
+                         local  TextureRef testRef
+                         local  int32 existingTexCacheLoadIdx
+                         local  struct resTexListEntry* pListEntry
+                         local  struct resTexListEntry* pListEntry
+                         local  enum StreamSchedulerPriority priToReq
+                         local  int32 existingTexResIdx
+                         local  int32 existingTexResLoadIdx
+                         local  int32 usedByChar
+                         local  int32 usedByPreview
+                         inlines  TX_TextureIsAllocated
+ 3585  0001CDB0    134  void TWCharResMan::SetFrontEndNoLoads(const struct TWCharResMan* this, int32 charIndex)
+                         local  int32 i
+                         local  uint32 geomHandle
+                         local  struct CharGeom* pCGeom
+ 3602  0001D2D8    134  int32 TWCharResMan::AreMeshResourcesLoaded(const struct TWCharResMan* this, TWResName* pMeshNames, int32 meshCount)
+                         local  int32 bAllLoaded
+                         local  int32 genderIdx
+                         local  int32 i
+                         local  int32 existingMeshCacheIdx
+ 3621  000AB390    154  int32 TWCharResMan::AreTextureResourcesLoaded(const struct TWCharResMan* this, TWResName* pTexNames, int32 texCount)
+                         local  int32 bAllLoaded
+                         local  int32 genderIdx
+                         local  int32 i
+                         local  int32 existingTexCacheIdx
+                         local  int32 existingCharIdx
+                         inlines  TX_TextureIsAllocated
+ 3640  0001D40C    18C  void TWCharResMan::GetCachedMeshResource(const struct TWCharResMan* this, char* pMeshName, uint8** ppMeshData, int32* pMeshDataSize)
+                         local  int32 genderIdx
+                         local  int32 existingMeshCacheIdx
+ 3661  0001A490     D0  int32 TWCharResMan::IsGripMeshName(const struct TWCharResMan* this, const char* meshName)
+                         local  int32 retVal
+ 3681  0001A560     E8  int32 TWCharResMan::IsShaftMeshName(const struct TWCharResMan* this, const char* meshName)
+                         local  int32 retVal
+ 3702  0001D598    27C  const char* TWCharResMan::GetBallTextureName(const struct TWCharResMan* this, int32 playerIndex, struct TextureGroup** ppTexGroup)
+                         local  const char* ballTexName
+                         local  struct CrAPInfo_t* pCrapInfo
+                         local  int32 genderIdx
+                         local  int32 ballAssetID
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  int32 meshListIndex
+                         local  struct meshListEntry* pMeshData
+                         local  int32 texIdx
+                         local  int32 texListIndex
+                         local  struct regTexListEntry* pTexData
+                         local  const char* texName
+                         local  const char* pTexGroup
+ 3753  0001D85C    190  TextureRef TWCharResMan::GetBallColorMapTex(const struct TWCharResMan* this, int32 playerIndex)
+                         local  struct TextureGroup* pTextureGroup
+                         local  const char* ballTexName
+                         local  TextureRef ballColorTex
+                         local  int32 existingResIdx
+                         local  int32 existingLoadIdx
+ 3790  0001D814     48  TextureRef TWCharResMan::GetBallNormalMapTex(const struct TWCharResMan* this, int32 playerIndex)
+                         local  struct TextureGroup* pTextureGroup
+                         local  TextureRef ballNormalTex
+ 3799  0001D9EC    284  void TWCharResMan::UpdateHairTint(const struct TWCharResMan* this)
+                         local  int32 i
+                         local  struct TXRFile* pTXR
+                         local  int32 r
+                         local  int32 g
+                         local  int32 b
+                         local  int32 bChanged
+                         local  uint32 geomHandle
+                         local  struct CharGeom* pCGeom
+                         local  int32 genderIdx
+                         local  int32 existingMeshResIdx
+ 3832  0001DC70    430  void TWCharResMan::CacheAllMeshes(const struct TWCharResMan* this)
+                         local  int32 charIndex
+                         local  int32 genderIdx
+                         local  uint16 numCrapAssets
+                         local  uint16 assetID
+                         local  int32 i
+                         local  struct resMeshListEntry* pListEntry
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  int32 meshIdx
+                         local  int32 meshListIndex
+                         local  struct meshListEntry* pMeshData
+                         local  const char* meshResourceName
+                         local  int32 existingMeshCacheIdx
+                         local  struct resMeshListEntry* pMeshListEntry
+                         local  int32 existingMeshLoadIdx
+ 3919  000ABECC    454  void TWCharResMan::CheckASAPTintBlend(const struct TWCharResMan* this)
+                         local  int32 tex
+                         local  int32 charIdx
+                         local  int32 i
+                         local  TextureRef srcTex
+                         local  const TextureInfo* info
+                         local  int32 width
+                         local  int32 height
+                         local  const char* mipLevelFlag
+                         local  TextureOptions mipOption
+                         inlines  TX_TextureIsAllocated, std::atoi
+ 4003  000AC320    194  void TWCharResMan::CancelTextureCaching(const struct TWCharResMan* this)
+                         local  int32 genderIdx
+                         local  int32 i
+                         local  int32 existingLoadIdx
+                         inlines  TX_TextureIsAllocated
+ 4033  0001E0A0     40  bool TWCharResMan::IsLoadQueueClear(const struct TWCharResMan* this)
+                         local  bool bClear
+                         local  int32 i
+ 4051  0001E0E0    380  void TWCharResMan::CalcWorstCaseBuffers(const struct TWCharResMan* this)
+                         local  int32 genderIdx
+                         local  int32 assetID
+                         local  int32 i
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  int32 meshIdx
+                         local  int32 meshListIndex
+                         local  struct meshListEntry* pMeshData
+                         local  const char* meshResourceName
+                         local  char[128] fileName
+                         local  bool bExists
+                         local  int32 handle
+                         local  int32 fileSize
+                         local  int32 slot
+                         local  int32 kbSize
+ 4109  000A4E48    CE4  void TWCharResMan::MakeWorstCaseCharacter(const struct TWCharResMan* this, int32 badnessRank)
+                         local  const char[23] __FUNCTION__
+                         local  const int32 numNameSizePairs
+                         local  struct sNameSizePair* pTexSizeCache
+                         local  int32 numInNameSizeCache
+                         local  char[32] cmdBuf
+                         local  const int32 numTexTotal
+                         local  const int32 numTexAssets
+                         local  TWResName* pTexturesUsed
+                         local  int32 numTexturesUsed
+                         local  int32 ts
+                         local  int32 genderIdx
+                         local  int32 rank
+                         local  int32 slot
+                         local  int32 biggestAssetIndex
+                         local  int32 biggestAssetSize
+                         local  char[32][20] biggestAssetTextures
+                         local  int32 asset
+                         local  char[32][20] assetTextures
+                         local  int32 numAssetTextures
+                         local  int32 totalAssetSizeBytes
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  int32 meshIdx
+                         local  struct meshListEntry* pMeshData
+                         local  int32 texIdx
+                         local  struct regTexListEntry* pTexData
+                         local  char[32] baseName
+                         local  const char* origBaseTexName
+                         local  char* resourceName
+                         local  char[3] texSuffixes
+                         local  const int32 texNumSuffixes
+                         local  bool bDoAllSuffixes
+                         local  int32 numTex
+                         local  int32 i
+                         local  TextureRef testRef
+                         local  int32 totalSizeThisAsset
+                         local  uint32 texnamehash
+                         local  int32 tc
+                         local  int texAlloced
+                         local  const TextureInfo* info
+                         local  int32 l
+                         local  uint16 w
+                         local  uint16 h
+                         inlines  TX_TextureIsAllocated, TagValuePair, operator+

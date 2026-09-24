@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Hi-Rendering/Headers/GoPostFx.h
+// compiled in: Legacy_unity.cpp, golf2_unity.cpp, other_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+  169    inline-only   void PostFx_SetUpViewsForBlurring()
+  170    inline-only   void PostFx_RestoreViewsForBlurring()
+  176    inline-only   void PostFx_DrawPostFx()
+  177    inline-only   void PostFx_Init()
+  181    inline-only   void PostFx_DeInit()
+  182    inline-only   void PostFx_SetScreenDimmingPercentage(int32 viewController, float fPercent)
+  185    inline-only   void PostFx_SetScreenTintColor(float* color)
+  186    inline-only   void PostFx_SetScreenTintBlendMode(enum BL_ETintBlendMode eMode)
+  187    inline-only   void PostFx_EnableScreenTint(bool bEnable)

@@ -1,0 +1,14 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/source/common/ObjectStack.cpp
+// compiled in: ObjectStack.cpp
+// 7 functions, source order. line | PS3 address | size
+
+    0  007DFAF8    10C  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   88  007DF5C0    284  enum TDbError Init(const struct <anon>* this, uint32_t iObjSize, uint32_t iMaxObjects)
+                         local  const char[5] __FUNCTION__
+  144  007DF844     EC  void DeInit(const struct <anon>* this)
+  168  007DF930     E8  void Pop(const struct <anon>* this)
+                         local  const char[4] __FUNCTION__
+  188  007DFA18     E0  void Detach(const struct <anon>* this, uint32_t nObjects)
+                         local  const char[7] __FUNCTION__
+  200  007DFC04     3C  static void _GLOBAL__I__ZN2EA4T3db11ObjectStackC2Ev()
+  201  007DFC40     3C  static void _GLOBAL__D__ZN2EA4T3db11ObjectStackC2Ev()

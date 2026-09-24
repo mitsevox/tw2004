@@ -1,0 +1,97 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLTextureResize.c
+// compiled in: Legacy_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   70    inline-only   static float box_filter(float x, float support)
+   77    inline-only   static float sinc_filter(float x, float support)
+   84    inline-only   static float lanczos_filter(float x, float support)
+   92    inline-only   static float lanczos3_filter(float x, float support)
+  109    inline-only   static float ResampleGetFilterScale(float scale, float* support)
+                         local  float filterScale
+  123    inline-only   static void ResampleBuildFilter(int value, float scale, float support, int srcEnd, float filterScale, TextureResampleMode mode, float filterSupport, int* fmin, int* fmax, float* waveform)
+                         local  const float center
+                         local  const int t_fmin
+                         local  const int t_fmax
+                         local  const int range
+                         local  float total
+                         local  float multiplier
+                         local  int i
+                         local  float x
+                         local  float ret
+                         local  int i
+  173    inline-only   static float ResampleWeightPixels(uint8* srcPixel, float weight, float* dstValue)
+                         local  vec4flt srcValue
+                         local  float alpha
+  198    inline-only   static void ResampleStorePixel(float* srcValue, float totalAlpha, uint8* dstPixel)
+                         local  const float halfFloat
+                         local  float[4] cHalf
+                         local  const float[4] cMin
+                         local  const float[4] cMax
+                         local  float alphaMultipler
+                         local  float[4] tmp
+                         local  union <anon> tmp
+                         local  float[4] _mTmp
+  234    inline-only   static void ResampleVerticalRGBA8(TextureResizeParams* params)
+                         local  uint32 dstDataStride
+                         local  uint32 srcDataStride
+                         local  const float filterSupport
+                         local  const float y_scale
+                         local  float y_support
+                         local  size_t waveformSize
+                         local  float* waveform
+                         local  float filterScale
+                         local  int y
+                         local  int y_min
+                         local  int y_max
+                         local  int x
+                         local  vec4flt dstValue
+                         local  float totalAlpha
+                         local  uint8* dstPixel
+                         local  int y2
+                         local  uint8* srcPixel
+  297    inline-only   static void ResampleHorizontalRGBA8(TextureResizeParams* params)
+                         local  uint32 dstDataStride
+                         local  uint32 srcDataStride
+                         local  const float filterSupport
+                         local  const float x_scale
+                         local  float x_support
+                         local  size_t waveformSize
+                         local  float* waveform
+                         local  float filterScale
+                         local  int x
+                         local  int x_min
+                         local  int x_max
+                         local  int y
+                         local  vec4flt dstValue
+                         local  float totalAlpha
+                         local  uint8* dstPixel
+                         local  int x2
+                         local  uint8* srcPixel
+  360    inline-only   static void ResampleBothRGBA8(DualTextureResizeParams* params)
+  365  003B4F74   1614  static void ResampleBothRGBA8JobManager(unsigned int TAG, void* data, unsigned int dataSize)
+                         local  int x
+                         local  int x_min
+                         local  int x_max
+                         local  int i
+                         local  float x
+                         local  float ret
+                         local  int i
+                         local  int y
+                         local  vec4flt dstValue
+                         local  float totalAlpha
+                         local  uint8* dstPixel
+                         local  int x2
+                         local  uint8* srcPixel
+                         inlines  LLMath_Add, LLMath_Scale, ResampleBothRGBA8, ResampleBuildFilter, ResampleGetFilterScale, ResampleStorePixel, ResampleVerticalRGBA8, ResampleWeightPixels, TX_WorkBufferAlloc, TX_WorkBufferFree, __vec_mul, box_filter, lanczos3_filter, std::sinf, vec4flt_Zero, vec_ld
+  377  003AFB94     A4  void TexResizeInitOnce()
+                         local  struct <anon> mp
+                         inlines  Allocator::GetTempAllocator
+  388  003B3170    3E4  int ResampleRGBA8(uint8* dst, uint16 dstWidth, uint16 dstHeight, uint32 dstRowStride, uint8* src, uint16 srcWidth, uint16 srcHeight, uint32 srcRowStride, TextureResampleMode mode)
+                         local  TI_STimeValue start
+                         local  uint32 workBufSize
+                         local  uint8* workBuf
+                         local  DualTextureResizeParams params
+                         local  LLJob* job
+                         local  DualTextureResizeParams* jobParams
+                         local  int use_spu
+                         inlines  TI_uiReadCP0Count, TX_WorkBufferAlloc, TX_WorkBufferFree

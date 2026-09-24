@@ -1,0 +1,19 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/stringconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   69  005C06EC     A4  void StringConcrete(const struct <anon>* this, uint32_t uMaxStringLen, struct MemoryStrategy* pMemoryStrategy)
+   99  005C063C     B0  void StringConcrete(const struct <anon>* this, const char8_t* strSource, struct MemoryStrategy* pMemoryStrategy)
+  135  005C0590     AC  void StringConcrete(const struct <anon>* this, const char8_t* strSource, uint32_t uMaxStringLen, struct MemoryStrategy* pMemoryStrategy)
+  169  005C0218     60  void ~StringConcrete(const struct <anon>* this)
+  193  005B88AC     28  int32_t Compare(const const struct <anon>* this, const char8_t* strSource)
+  219  005C0A9C     18  bool IsEmpty(const const struct <anon>* this)
+  243  005BE3F8     28  uint32_t GetLength(const const struct <anon>* this)
+  267  005BCBD0      C  void Set(const struct <anon>* this, const char8_t* strSource)
+  295  005C0AB4     5C  void Append(const struct <anon>* this, const char8_t* strSource)
+  327  005C0B10     88  int32_t Format(const struct <anon>* this, const char8_t* strFormat)
+                         local  int32_t iLen
+                         local  va_list ap
+  368  005B6BE0     5C  void SetFromTagField(const struct <anon>* this, const char8_t* strTagField, const char8_t* strTag, const char8_t* strDefault)
+  393  005C0B98     A0  void Trim(const struct <anon>* this)
+                         local  uint32_t uLen

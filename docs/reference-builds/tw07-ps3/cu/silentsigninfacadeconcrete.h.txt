@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/silentsignin/source/common/./silentsigninfacadeconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   44    inline-only   struct <anon>* GetInstance()
+   45  00626574      8  struct SilentSigninExtension* GetSilentSigninExtension(const const struct <anon>* this)
+   46  00625E20      8  struct SilentSigninExtensionConcrete* GetSilentSigninExtensionConcrete(const const struct <anon>* this)

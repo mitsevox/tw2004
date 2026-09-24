@@ -1,0 +1,27 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/audio/engine/utils/UAudFrac.c
+// compiled in: other_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   73  003E46A8     D0  void audfrac_DecimalFormat(audfrac v, int32* sign, int32* vInteger, int32* vFraction)
+                         local  float fFraction
+                         local  int fraction
+                         local  int i
+  123  003E6718     60  void audfrac_CatenateInString(char* string, size_t strBufLen, audfrac number)
+                         local  int strLen
+                         local  int bufSize
+  133  003E66A4     74  char* audfrac_Print(audfrac v)
+                         local  int nBytes
+  149  003E65F0     B4  void audfrac_PrintToString(char* string, size_t strBufLen, audfrac number)
+                         local  int32 S
+                         local  int32 I
+                         local  int32 D
+  181  003E7B10    274  char* frac_Format(int32 fxp, int8 fracbits, uint8 precision)
+                         local  uint32 fracpart
+                         local  uint32 intres
+                         local  uint32 fracres
+                         local  uint8 clamped
+                         local  char[16] zerobuff
+                         local  int8 i
+                         local  int8 sign
+                         local  int8 zeroflag
+                         local  int bufLen

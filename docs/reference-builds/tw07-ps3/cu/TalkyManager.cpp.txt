@@ -1,0 +1,91 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Talky/TalkyManager.cpp
+// compiled in: other_unity.cpp
+// 30 functions, source order. line | PS3 address | size
+
+   55  0043EB88     7C  void TalkyManager::TalkyManager(const struct TalkyManager* this)
+                         inlines  Singleton<TalkyManager>::Singleton
+   59  003DA764     80  void TalkyManager::~TalkyManager(const struct TalkyManager* this)
+                         inlines  Singleton<TalkyManager>::~Singleton
+   63  004113B0     A8  void TalkyManager::Init(const struct TalkyManager* this)
+                         local  int nChannels
+                         local  int i
+   82  0040FFF8      C  void TalkyManager::Close(const struct TalkyManager* this)
+                         local  int nChannels
+                         local  int i
+   89  0042BFEC     44  void TalkyManager::Update(const struct TalkyManager* this, float elapsedTime)
+                         local  int nChannels
+                         local  int i
+  101  004137DC     4C  ChannelID TalkyManager::GetNextFreeChannel(const const struct TalkyManager* this, bool bFindForcedChannel)
+                         local  int nextFreeChannel
+                         local  int earliesPrimeStartChannel
+                         local  float earliestPrimeStart
+                         local  int nChannels
+                         local  int i
+  130  004136A4     3C  bool TalkyManager::IsPlayingTalky(const const struct TalkyManager* this, ChannelID channelID)
+                         local  bool bRet
+                         inlines  TalkyManager::IsValidChannel
+  138  004100D4     3C  bool TalkyManager::IsPrimingTalky(const const struct TalkyManager* this, ChannelID channelID)
+                         local  bool bRet
+                         inlines  TalkyManager::IsValidChannel
+  146  00413828     3C  bool TalkyManager::IsIdle(const const struct TalkyManager* this, ChannelID channelID)
+                         local  bool bRet
+                         inlines  TalkyManager::IsValidChannel
+  154  0041D40C     3C  bool TalkyManager::IsPrimingDone(const const struct TalkyManager* this, ChannelID channelID)
+                         local  bool bRet
+                         inlines  TalkyManager::IsValidChannel
+  162  00410110     2C  void TalkyManager::PlayTalky(const struct TalkyManager* this, ChannelID channelID)
+                         inlines  TalkyManager::IsValidChannel
+  168  004137AC     30  void TalkyManager::AbortTalky(const struct TalkyManager* this, ChannelID channelID)
+                         inlines  TalkyManager::IsValidChannel
+  178  0042C4DC      8  ChannelID TalkyManager::PrimeAndPlay(const struct TalkyManager* this, int talkyIndex, const char* pAnimName, struct TCharacter* pChar, bool bApplyVoiceStyle, bool bForceTalkyPlay)
+  188  0042C3A0    13C  ChannelID TalkyManager::PrimeTalky(const struct TalkyManager* this, int talkyIndex, const char* pAnimName, struct TCharacter* pChar, bool bApplyVoiceStyle, bool bForceOverride, bool bPlayAfterPrime)
+                         local  int channel
+                         local  bool bSuccess
+  211  003DA7F0     7C  const char* TalkyManager::GetVoiceStyleName(VoiceStyle index)
+  217  003DA86C      4  void TalkyManager::RegisterStreamClients(const struct TalkyManager* this)
+  221  003DA870      4  void TalkyManager::UnregisterStreamClients(const struct TalkyManager* this)
+  228  00413768     44  static void AudioStreamCallback(int strmHandle, enum eAudStrmCallbackReason reason, int userData)
+                         local  struct TalkyChannel* pChannel
+                         inlines  TalkyChannel::ReportPrimingOrPlayingDone
+  260  003DA8BC     14  void TalkyChannel::Init(const struct TalkyChannel* this, int channelID, int audioStreamType)
+  268  003DA880     3C  void TalkyChannel::Reset(const struct TalkyChannel* this)
+  279  003DA7E4      C  void TalkyChannel::Close(const struct TalkyChannel* this)
+  285  0042BDFC    1F0  void TalkyChannel::Update(const struct TalkyChannel* this, float curTimeSecs)
+                         local  bool bIssueNextCommand
+                         local  float expectedPrimDiffSecs
+                         inlines  TalkyChannel::SetState
+  365  0042C0E4    2BC  bool TalkyChannel::PrimeTalky(const struct TalkyChannel* this, int audioIndex, const char* animName, struct TCharacter* pChar, float curTimeSecs, bool bApplyVoiceStyle, bool bPlayAfterPrime)
+                         local  bool bSuccess
+                         local  uint16 playlistID
+                         local  uint8 curPlayerID
+                         local  const struct UserInfo& userInfo
+                         local  bool bMale
+                         local  int baseIndex
+                         local  int numStreamsPerStyle
+                         inlines  Ses_HasStreamingAudio, TalkyChannel::SetCharacter, TalkyChannel::SetState
+  436  0040ADE4     18  void TalkyChannel::PlayTalky(const struct TalkyChannel* this)
+                         inlines  TalkyChannel::SetState
+  442  004136E0     88  void TalkyChannel::AbortTalky(const struct TalkyChannel* this, bool bStopAudio, bool bStopAnimStreaming)
+                         inlines  TalkyChannel::SetState
+  457  0042C030     B4  void TalkyChannel::TalkyTagCallback(enum SKATagT tag, void* pUserData)
+                         local  struct TalkyChannel* pChannel
+  484  0042BBAC     E0  bool TalkyChannel::LaunchAudio(const struct TalkyChannel* this)
+                         local  bool bSuccess
+                         local  float timeMult
+                         local  uint8 curPlayerID
+                         local  const struct UserInfo& userInfo
+  508  0042BC8C    170  void TalkyChannel::LaunchTalky(const struct TalkyChannel* this, float curTimeSecs)
+                         local  bool bAnimSuccess
+                         local  bool bPlayAudioImmediately
+                         local  bool bAudioSuccess
+                         local  const struct GolfModuleCCT& cct
+                         local  const char* playerName
+                         inlines  TalkyChannel::SetState
+  914  00449B30    23C  static void* Talky_PlayTalkyCallback(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+                         local  struct TCharacter* pCharacter
+                         local  ChannelID id
+                         local  int32 value
+                         inlines  GM_GetGolferUp, GamePlayer::GetCharacter, Singleton<TalkyManager>::GetSingleton
+  972  003DA8D0     64  void TalkyManager::Talky_InitTuner(const struct TalkyManager* this)
+                         local  int id

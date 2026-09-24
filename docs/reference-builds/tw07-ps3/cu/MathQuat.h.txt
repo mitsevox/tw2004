@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/Code/Legacy/Lib/Headers/MathQuat.h
+// compiled in: golf2_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+  155    inline-only   void Quat_Copy(float* src, float* dest)
+  163    inline-only   void Quat_IdentifyForMul(float* Q)
+  171    inline-only   void Quat_Clear(float* Q)
+  185    inline-only   void Quat_CopyToVector31(float* Q, float* V)

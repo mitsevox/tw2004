@@ -1,0 +1,138 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Spectator/spectatorBehavior.cpp
+// compiled in: golf2_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   88  00153834      4  void CSpectatorBehavior::PlayAnimation(struct CSpectatorInstance* pInstance, char* anim, float fDelayedStart)
+  107  001AC250    1A4  void CSpectatorBehavior::HitWithBall(struct CSpectatorInstance* pInstance, float deltaTime, float* pCollisionPoint, struct CSpectatorCollision* pSpectatorCollision)
+                         local  int iNumTimesHit
+                         local  vec4flt* ball_loc
+                         local  float height
+                         local  float kHeadHeight
+                         local  float kBodyHeight
+                         local  float[2] xz
+                         local  float z
+                         local  float x
+                         inlines  CSpectatorInstance::GetPosition, CSpectatorInstance::SetNumTimesHit
+  168  00153838     D0  void CSpectatorBehavior::DuckFromBall(struct CSpectatorInstance* pInstance)
+                         local  float fDelayedStart
+  184  00153908     C8  void CSpectatorBehavior::PleaseNo(struct CSpectatorInstance* pInstance)
+                         local  float fDelayedStart
+  200  001539D0     D0  void CSpectatorBehavior::TurnToBall(struct CSpectatorInstance* pInstance)
+                         local  float fDelayedStart
+                         inlines  CSpectatorInstance::GetOverridePose
+  219  001622C4      4  void CSpectatorBehavior::GoIdle(const struct CSpectatorBehavior* this, struct CSpectatorInstance* pInstance)
+  236  001620E0    1D0  void CSpectatorBehavior::Walk(const struct CSpectatorBehavior* this, struct CSpectatorInstance* pInstance)
+                         local  float fDelayedStart
+                         local  struct CSpectatorPose* pOverridePose
+                         inlines  CSpectatorCloneGroup::GetOverridePose, CSpectatorInstance::GetCloneGroup
+  291  001C2530    11C  void CSpectatorBehavior::Update(const struct CSpectatorBehavior* this, float dt)
+                         local  int i
+                         local  struct CSpectatorInstance* pInstance
+                         local  struct CPovVector3 target
+  326  0016E3E8    3E8  void CSpectatorBehavior::AimAtSpectatorUpdate(const struct CSpectatorBehavior* this, struct CSpectatorCollision* pSpectatorCollision, enum PlayerNumber_t PlayerID, float dt)
+                         local  float fUpdateTimer
+                         local  float fDistance
+                         local  float fAngle
+                         local  int iMaxDudesReacting
+                         local  int iNumDudesReacting
+                         local  vec4flt vLocation
+                         local  vec4flt vForward
+                         local  vec4flt vCurLocation
+                         local  vec4flt vInstancePos
+                         local  vec4flt vDistance
+                         local  float fCurDistance
+                         local  float fStep
+                         local  struct CSpectatorInstance* spectatorInstance
+                         local  struct CSpectatorInstance* next
+                         local  struct CSpectatorInstance* head
+                         local  bool bImDone
+                         inlines  CSpectatorInstance::GetPosition, LLMath_Add3, LLMath_DotProduct3, LLMath_Scale3, LLMath_Subtract, vec4flt_Copy
+  427  001ABAFC    440  bool CSpectatorBehavior::AnimateByProximity(struct CSpectatorCollision* pSpectatorCollision, float* vCurLocation, int type)
+                         local  int count
+                         local  float fXOffset
+                         local  float fYOffset
+                         local  float fDistance
+                         local  bool bDone
+                         local  bool someone_moved
+                         local  const int numSpectatorsToConsider
+                         local  struct CSpectatorInstance*[64] spectatorInstanceList
+                         local  float[64] spectatorInstanceListDistance
+                         local  vec4flt vInstancePos
+                         local  vec4flt vDistance
+                         local  struct CSpectatorInstance* spectatorInstance
+                         local  struct CSpectatorInstance* next
+                         local  struct CSpectatorInstance* head
+                         local  struct CSpectatorInstance* swapInstance
+                         local  float fSwapInstanceDistance
+                         local  int i
+                         local  int i
+                         local  int j
+                         local  int i
+                         local  struct CSpectatorPose* pose
+                         inlines  CSpectatorInstance::GetOverridePose, CSpectatorInstance::GetPosition, LLMath_Length3, LLMath_Subtract, __vec_len_sqr3, vec_madd
+  583  001ABF3C    280  void CSpectatorBehavior::BallFlightUpdate(const struct CSpectatorBehavior* this, struct CSpectatorCollision* pSpectatorCollision, enum PlayerNumber_t PlayerID, float dt)
+                         local  float fTimeUntilImpact
+                         local  float fUpdateTimer
+                         local  bool bDidDuckReaction
+                         local  bool bSomeoneDucked
+                         local  bool bFoundTimeUntilImpact
+                         local  float fActualTime
+                         local  float fEstTime
+                         local  struct PhysicsBall_t* realBall
+                         local  vec4flt vCurLocation
+                         local  float fHack
+                         local  float f2H
+                         local  float fG
+                         local  int i
+                         local  float fAlt
+                         local  float fYVel
+                         local  float physicsTimes
+                         inlines  std::sqrt, vec4flt_Copy3
+  683  001ACF74    468  void CSpectatorBehavior::BallBounce(const struct CSpectatorBehavior* this, struct CSpectatorCollision* pSpectatorCollision, enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+                         local  float fDistance
+                         local  struct CSpectatorInstance* spectatorInstance
+                         local  struct CSpectatorInstance* next
+                         local  struct CSpectatorInstance* head
+                         local  vec4flt vCurLocation
+                         local  vec4flt vInstancePos
+                         local  vec4flt vDistance
+                         local  vec4flt vRotationFromBallToInstance
+                         local  vec4flt vInstanceRotatoin
+                         local  const int numSpectatorsToConsider
+                         local  struct CSpectatorInstance*[24] spectatorInstanceList
+                         local  float[24] spectatorInstanceListDistance
+                         local  int count
+                         local  float fXOffset
+                         local  float fYOffset
+                         local  bool bDone
+                         local  struct CSpectatorInstance* swapInstance
+                         local  float fSwapInstanceDistance
+                         local  float fPctReaction
+                         local  int i
+                         local  bool bFacingAwayFromBall
+                         local  float fDot
+                         local  int i
+                         local  int j
+                         local  int i
+                         local  float fSpectatorDistance
+                         local  int iPctReaction
+                         inlines  CSpectatorInstance::GetPosition, LLMath_DotProduct3, LLMath_Length3, LLMath_Subtract, std::acos, vec4flt_Copy3, vec_madd, vec_sld, vec_sub
+  855  001AD73C    2D0  void* CSpectatorBehavior_HitWithBallTunerAnimCallback(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+                         local  int iTunerCurAnim
+                         local  int iTunerNumAnim
+                         local  int32 value
+  942  001AD4AC    290  void CSpectatorBehavior::PlayTunerAnimation(const struct CSpectatorBehavior* this, int group)
+                         local  vec4flt vInstancePos
+                         local  vec4flt vDistance
+                         local  struct CSpectatorInstance* pInstance
+                         local  float fClosest
+                         local  CameraController_t* cam
+                         local  int32 i
+                         local  float fDistance
+                         local  char* animName
+                         inlines  LLMath_Length3, LLMath_Subtract3, vec_madd, vec_sld
+  994  00143318    1DC  void CSpectatorBehavior::AddTunerControls(const struct CSpectatorBehavior* this)
+                         local  int32 catId
+                         local  int32 id
+ 1023  0014330C      C  void CSpectatorBehavior::SetInstanceList(const struct CSpectatorBehavior* this, struct CSpectatorInstance* list, int numInList)

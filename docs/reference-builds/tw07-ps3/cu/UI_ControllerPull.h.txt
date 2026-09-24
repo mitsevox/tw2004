@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_ControllerPull.h
+// compiled in: apt_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   20  00123310     B8  void UIControllerPull::~UIControllerPull(const struct UIControllerPull* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   28  001009D0      C  uint32 UIControllerPull::GetSignature(const const struct UIControllerPull* this)

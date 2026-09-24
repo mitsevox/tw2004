@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/Golf/UI_Core/AptRuntime/Headers/UI_NewsTicker.h
+// compiled in: golf2_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   42    inline-only   int UINewsTicker::GetNumStrings(const const struct UINewsTicker* this)

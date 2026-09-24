@@ -1,0 +1,14 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/svol.cpp
+// compiled in: svol.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    6  006CFCC8    230  int SNDvol(int shandle, int vol)
+                         local  int voice
+                         local  int setvoice
+                         local  float floatVol
+                         local  struct CHANPUB* pVoice
+                         local  int i
+                         local  struct CHANPUB* pSourceVoice
+                         local  int sourceVoice
+   76  006CFC30     98  void SetVol(int voice)
+                         local  int i

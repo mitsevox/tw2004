@@ -1,0 +1,12 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/DbManager.h
+// compiled in: Database.cpp, DbManager.cpp, ExprNode.cpp, Query.cpp
+// 8 functions, source order. line | PS3 address | size
+
+  187  007D9664     94  int StringCompare(char* str1, char* str2, int count)
+  228  007CAA20     2C  struct <anon>* GetFirstDatabase()
+  234  007CAA4C     30  void SetFirstDatabase(struct <anon>* database)
+  239  007CDE04     8C  void StringCopyN(char* dest, char* source, int count)
+  245  007CDE90     70  int StringLength(char* source)
+  251  007CDF00     78  void StringCopy(char* dest, char* source)
+  256  007E67FC     2C  struct Query* GetFirstQuery()
+  261  007E6828     30  void SetFirstQuery(struct Query* query)

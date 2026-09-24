@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/frontend/headers/FE_LoadingScreen.h
+// compiled in: apt_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   39    inline-only   void UILoadingScreen::SetDone(const struct UILoadingScreen* this, bool bState)
+   40    inline-only   bool UILoadingScreen::IsDone(const const struct UILoadingScreen* this)
+   42    inline-only   void UILoadingScreen::SetState(const struct UILoadingScreen* this, enum State newState)
+   43    inline-only   enum State UILoadingScreen::GetState(const const struct UILoadingScreen* this)
+   45    inline-only   void UILoadingScreen::SetDelayedLoadingBalls(const struct UILoadingScreen* this, bool bDelayed)
+   48    inline-only   void UILoadingScreen::ReportFirstRun(const struct UILoadingScreen* this)
+   49    inline-only   bool UILoadingScreen::HasFirstRun(const const struct UILoadingScreen* this)
+   50    inline-only   bool UILoadingScreen::GetDelayedLoadingBalls(const const struct UILoadingScreen* this)
+   85    inline-only   void UILoadingScoreScreen::SetLeaderBoard(const struct UILoadingScoreScreen* this, bool bState)

@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/Headers/GameModeDriver_Traditional.h
+// compiled in: golf_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   30  0033F4EC      8  uint32 GameModeDriverTraditional::GetPostGameContext(const struct GameModeDriverTraditional* this, uint32 prevContext)
+   33  0033F4F4      8  bool GameModeDriverTraditional::GiveExperience(const struct GameModeDriverTraditional* this)

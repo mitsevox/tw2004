@@ -1,0 +1,19 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_CommentaryPopup.cpp
+// compiled in: apt_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   18  000414F8     6C  struct UICommentaryPopup& UICommentaryPopup::Inst()
+                         local  struct UICommentaryPopup theInst
+                         inlines  UICommentaryPopup::UICommentaryPopup
+   28  00062910     C4  void UICommentaryPopup::ShowCommentaryPopup(const struct UICommentaryPopup* this)
+                         local  char* stringValue
+   50  000629D4     50  void UICommentaryPopup::HideCommentaryPopup(const struct UICommentaryPopup* this)
+   63  00062BFC     40  bool UICommentaryPopup::IsPopupActive(const struct UICommentaryPopup* this)
+   77  00062AC4    138  void UICommentaryPopup::Update(const struct UICommentaryPopup* this)
+                         local  bool bQuitNow
+                         local  bool bPreviousPage
+                         local  bool bNextPage
+  108  00062A24      4  void UICommentaryPopup::OnSelect(const struct UICommentaryPopup* this)
+  118  00062A28     9C  void UICommentaryPopup::ShowPage(const struct UICommentaryPopup* this, int nPageOfs)
+                         local  char* stringValue
+  131  00041564     48  void UICommentaryPopup::SetDPadPrompt(const struct UICommentaryPopup* this, int nCurrPage, int nNumPages)

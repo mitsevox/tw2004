@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/Legacy/LL/Headers/LLUIWidget.h
+// compiled in: Legacy_unity.cpp, golf2_unity.cpp, other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   88    inline-only   void WG_vSetCanvasPosition(WG_SCanvas* spCanvas_p, float fUpperLeftX, float fUpperLeftY, float fLowerRightX, float fLowerRightY)
+  101    inline-only   void WG_vSetCanvasBackgroundColor(WG_SCanvas* spCanvas_p, float* xColor)
+  111    inline-only   void WG_vSetCanvasDefaultBackgroundColor(WG_SCanvas* spCanvas_p)

@@ -1,0 +1,70 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/GamePlayer/GamePlayer.cpp
+// compiled in: other_unity.cpp
+// 44 functions, source order. line | PS3 address | size
+
+   27  00404B90     C8  float PLR_GetTargetPowerPercent(enum PlayerNumber_t PlayerID)
+                         local  struct CoreShotInfo_t* shotInfo
+                         local  float powerpercent
+   56  00445A40     48  int8 PLR_GetStat(enum PlayerNumber_t PlayerID, enum STAT_e stat, enum STAT_TYPE_e type)
+   61  004455F0    450  int8 PLR_GetStat(struct CoreShotInfo_t* coreShotInfo, enum STAT_e stat, enum STAT_TYPE_e type)
+                         local  int8 return_value
+                         local  enum PlayerNumber_t playerID
+                         local  float diffModifier
+                         local  float scale
+                         inlines  GM_GetModeType, Singleton<DifficultySettings>::GetSingleton, Singleton<GolferStats>::GetSingleton, cGAME_GLOBALS::GetForcedAttributeVal
+  150  003D9AA0     90  void GamePlayer::ClampStats(const struct GamePlayer* this)
+                         local  int8 statID
+  163  00414D74     60  void GamePlayer::SetClubSelection(const struct GamePlayer* this, bit32 clubSelection)
+                         inlines  GamePlayer::SetClubAvailable
+  212  0043CB4C    1B4  void GamePlayer::CopyGolferStats(const struct GamePlayer* this, enum Golfer_t who)
+                         inlines  GolferStats::GetGolferStats, Singleton<GolferStats>::GetSingleton
+  230  00414124     EC  void GamePlayer::InitDefaultShot(const struct GamePlayer* this)
+                         local  int32 i
+                         inlines  Quat_IdentifyForMul
+  274  0043CD00    168  void GamePlayer::CreatePlayer(const struct GamePlayer* this, enum PlayerNumber_t plrID, enum Golfer_t who, enum PlayerCtrl_t Controller, bit32 clubSelection, bool leftSwingStick, bool rightSliceSwingStick, enum ViewPlacement_t where, bool controllerTiltSpinnaOption)
+                         inlines  GamePlayer::SetCameraRotation, GamePlayer::SetController, GamePlayer::SetControllerTiltSpinnaOption, GamePlayer::SetDriveDist, GamePlayer::SetLeftSwingStick, GamePlayer::SetRightSliceSwingStick
+  319  003D9B30     3C  void GamePlayer::DeletePlayer(const struct GamePlayer* this)
+  331  003D9B6C     54  bool GamePlayer::FinishedHole(const struct GamePlayer* this)
+  344  003D9BC0     34  bool GamePlayer::AddClub(const struct GamePlayer* this, enum Club_t club)
+                         local  bit32 clubMask
+                         local  bool retval
+  362  003D9BF4     34  bool GamePlayer::RemoveClub(const struct GamePlayer* this, enum Club_t club)
+                         local  bit32 clubMask
+                         local  bool retval
+  380  003D9C28     28  bool GamePlayer::HasClub(const struct GamePlayer* this, enum Club_t club)
+  398  003D9C50     40  int GamePlayer::CountClubs(const struct GamePlayer* this)
+                         local  bit32 clubMask
+                         local  int i
+                         local  int clubcount
+  416  003D9C90     10  void GamePlayer::LimitClubs(const struct GamePlayer* this)
+  437  003D9CA0     24  void GamePlayer::GetPreShotBallPosition(const struct GamePlayer* this, const vec4flt& vBall)
+  448  003D9CC4     24  void GamePlayer::SetPreShotBallPosition(const struct GamePlayer* this, const vec4flt& vBall)
+  459  003D9CE8     24  void GamePlayer::GetTeePosition(const struct GamePlayer* this, const vec4flt& vTee)
+  470  003D9D0C     24  void GamePlayer::SetTeePosition(const struct GamePlayer* this, const vec4flt& vTee)
+  481  003D9D30     24  void GamePlayer::GetBPTargetPosition(const struct GamePlayer* this, const vec4flt& vTarget)
+  492  003D9D54     24  void GamePlayer::SetBPTargetPosition(const struct GamePlayer* this, const vec4flt& vTarget)
+  503  003D9D78     24  void GamePlayer::GetBallRotation(const struct GamePlayer* this, const Quat& vRotation)
+  514  003D9D9C     24  void GamePlayer::SetBallRotation(const struct GamePlayer* this, const Quat& vRotation)
+  525  003D9DC0     24  void GamePlayer::GetBallScale(const struct GamePlayer* this, const vec4flt& vScale)
+  536  003D9DE4     24  void GamePlayer::SetBallScale(const struct GamePlayer* this, const vec4flt& vScale)
+  544  00409F08     10  bool GamePlayer::GetIsLeftHanded(const struct GamePlayer* this)
+  552  003D9E08    20C  void GamePlayer::CopyFromMemoryCardData(const struct GamePlayer* this, struct Player_MC_t* memoryCardPlayer)
+                         inlines  GamePlayer::SetBPRotation, GamePlayer::SetBPRotationTargetMomentum, GamePlayer::SetBPRotationX, GamePlayer::SetBPXDistanceTargetMomentum, GamePlayer::SetBPZDistanceTargetMomentum, GamePlayer::SetCharacterAnim, GamePlayer::SetDelayTime, GamePlayer::SetDistanceTargetMomentum, GamePlayer::SetDistanceToPin, GamePlayer::SetDriveDist, GamePlayer::SetMulligan, GamePlayer::SetOBCount, GamePlayer::SetPlayerID, GamePlayer::SetReplayFlags, GamePlayer::SetRotationTargetMomentum, GamePlayer::SetShotLimitExceeded, GamePlayer::SetTCSInitialized, GamePlayer::SetTapInCheat, GamePlayer::SetTapInFound, GamePlayer::SetTimedReactionDist, GamePlayer::SetTimer, GamePlayer::SetUsedMulligan, GamePlayer::SetUsedMulliganThisHole
+  594  00409F18    20C  void GamePlayer::CopyToMemoryCardData(const struct GamePlayer* this, struct Player_MC_t* memoryCardPlayer)
+  633  0042C9CC     38  void GamePlayer::SetTwoButtonClickModeRequested(const struct GamePlayer* this, bool isRequested)
+                         inlines  UserInfo::SetTwoButtonClickModeRequested
+  634  0042C950     2C  bool GamePlayer::IsTwoButtonClickModeRequested(const struct GamePlayer* this)
+  636  0042C97C     50  bool GamePlayer::IsTwoButtonClickModeEnabled(const struct GamePlayer* this)
+  641  003DA014     24  bool PLR_IsHiddenStat(enum STAT_e stat)
+  642  003D9A10     1C  bool PLR_IsAIPlayer(struct CoreShotInfo_t* coreShotInfo)
+  643  003DA038     14  bool PLR_IsShotLinkPlayer(struct CoreShotInfo_t* coreShotInfo)
+  644  003DA04C     50  bool PLR_IsAIOrShotLinkPlayer(struct CoreShotInfo_t* coreShotInfo)
+  645  003DA09C     18  bool PLR_IsAIPlayer(enum PlayerCtrl_t controller)
+  646  003DA0B4     10  bool PLR_IsShotLinkPlayer(enum PlayerCtrl_t controller)
+  647  003DA0C4     50  bool PLR_IsAIOrShotLinkPlayer(enum PlayerCtrl_t controller)
+  648  003DA114     18  bool PLR_IsAIController(enum PlayerCtrl_t controller)
+  649  003DA12C     10  bool PLR_IsShotLinkController(enum PlayerCtrl_t controller)
+  650  003DA13C     50  bool PLR_IsAIOrShotLinkController(enum PlayerCtrl_t controller)
+  651  003DA18C     10  bool PLR_IsOnlineController(enum PlayerCtrl_t controller)
+  652  003DA19C     14  bool PLR_IsLocalHumanController(enum PlayerCtrl_t controller)
+  653  003DA1B0     14  bool PLR_IsHumanController(enum PlayerCtrl_t controller)

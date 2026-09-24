@@ -1,0 +1,19 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/ps3/LLList_gcm.c
+// compiled in: Legacy_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   41  0037FDBC    144  static void gpuCallbackHandler(uint32 cause)
+                         local  int next
+   65  0037FF00     48  void DL_vInitOnce()
+   74  0037FF48      4  void DL_vCloseOnce()
+   87  0037FF4C      4  void DL_vGPUStartCallback(int dwCallbackInfo)
+  100  00387F34     1C  void DL_vGPUEndCallback(int dwCallbackInfo)
+  119  003811C0     38  void DL_vDisplayAllDisplayLists()
+                         inlines  Gcm::cellGcmFlush
+  129  00381C38    164  float DL_vGetTimeSpentWaiting()
+                         inlines  sys_time_get_timebase_frequency
+  143  0037FF50     30  bool DL_vHasFinishedDrawing()
+  161  0037FF80     78  void DL_vWaitForEndOfDrawing()
+                         local  TI_STimeValue startWaiting
+  187  003919BC    118  void DL_vAddInterruptToDisplayList(DL_fnInterruptCallbackT func, void* pData)
+                         inlines  Gcm::cellGcmSetUserCommand

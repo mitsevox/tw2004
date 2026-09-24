@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNAX/include/RNAUtils/Path.h
+// compiled in: Path.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   44  0087305C     5C  void PathC(const struct <anon>* this)
+   45  00872C7C      4  void PathC(const struct <anon>* this, const char* pPath)

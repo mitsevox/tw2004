@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_OnlineTour.cpp
+// compiled in: golf_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    3  00204DB8     44  void GameModeOnlineTour::GameModeOnlineTour(const struct GameModeOnlineTour* this)
+    8  001FE284     18  void GameModeOnlineTour::~GameModeOnlineTour(const struct GameModeOnlineTour* this)
+   12  00210814    108  void GameModeOnlineTour::Init(const struct GameModeOnlineTour* this)

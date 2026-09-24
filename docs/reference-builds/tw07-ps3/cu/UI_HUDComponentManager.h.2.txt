@@ -1,0 +1,24 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/UI_HUDComponentManager.h
+// compiled in: apt_unity.cpp
+// 20 functions, source order. line | PS3 address | size
+
+  171    inline-only   struct UIHud* UI_HUDComponentManager::getUIHud()
+  172    inline-only   struct UIScoreCardManager* UI_HUDComponentManager::getUIScoreCard()
+  173    inline-only   struct UIEndGame* UI_HUDComponentManager::getUIEndGame()
+  175    inline-only   struct UISpudHud* UI_HUDComponentManager::getUISpudHud()
+  176    inline-only   struct UIHighImpactMessages* UI_HUDComponentManager::getUIHighImpactMessages()
+  177    inline-only   struct UILowImpactMessages* UI_HUDComponentManager::getUILowImpactMessages()
+  178    inline-only   struct UISwitchSticks* UI_HUDComponentManager::getUISwitchSticks()
+  179    inline-only   struct UIBattleGolf_ChooseAddRemove* UI_HUDComponentManager::getUIBattleGolf_ChooseAddRemove()
+  180    inline-only   struct UIBattleGolf_ChooseClub* UI_HUDComponentManager::getUIBattleGolf_ChooseClub()
+  182    inline-only   struct UIAttributeWrapUp* UI_HUDComponentManager::getUIAttributeWrapUp()
+  183    inline-only   struct UIHUDFlashText* UI_HUDComponentManager::getUIHUDFlashText()
+  184    inline-only   struct UITutorial* UI_HUDComponentManager::getUITutorial()
+  185    inline-only   struct UISkillZone* UI_HUDComponentManager::getUISkillZone()
+  186    inline-only   struct UIMoney* UI_HUDComponentManager::getUIMoney()
+  187    inline-only   struct UIAwards* UI_HUDComponentManager::getUIAwards()
+  188    inline-only   struct UIPGATourAwards* UI_HUDComponentManager::getUIPGATourAwards()
+  189    inline-only   struct UIHudShotInfo* UI_HUDComponentManager::getUIHudShotInfo()
+  190    inline-only   struct UIIngameMessageBG* UI_HUDComponentManager::getUIIngameMessageBG()
+  191    inline-only   struct UISeveTwentyOne* UI_HUDComponentManager::getUISeveTwentyOne()
+  192    inline-only   struct UIMinigames* UI_HUDComponentManager::getUIMinigames()

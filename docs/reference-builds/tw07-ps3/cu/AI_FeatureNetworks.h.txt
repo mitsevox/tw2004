@@ -1,0 +1,9 @@
+// ../../../../../TIGERCODE/Code/Golf/Ai/Headers/AI_FeatureNetworks.h
+// compiled in: golf2_unity.cpp, golf_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   84    inline-only   int AIFeatureNetworkMgr::GetNumNetworkStrings()
+  212    inline-only   const struct AIFeatureNetwork* AIFeatureNetwork::GetNextNetwork(const const struct AIFeatureNetwork* this)
+  214    inline-only   const bool AIFeatureNetwork::TestFlag(const const struct AIFeatureNetwork* this, int32 flag)
+  215    inline-only   void AIFeatureNetwork::SetFlag(const struct AIFeatureNetwork* this, int32 flag)
+  224    inline-only   struct AIFeatureNetworkMgr& AINetworkMgr()

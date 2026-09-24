@@ -1,0 +1,30 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/resourceprotocolserver.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   58  00626300      8  const char8_t* GetPath(const const struct <anon>* this)
+  143  005CAFDC     A4  void ResourceServer(const struct <anon>* this, const char8_t* strPath, void* pBuffer, uint32_t uLength)
+  172  005CB124     98  void ResourceServer(const struct <anon>* this, const char8_t* strPath, struct MemoryStrategy* pMemoryStrategy)
+  201  005BE970     78  void Initialize(const struct <anon>* this)
+  236  005D4AB8     E8  void ~ResourceServer(const struct <anon>* this)
+                         local  NetResourceT* pNetResource
+                         inlines  GetInstance
+  271  005BE9E8    188  void NetResourceCallback(NetResourceT* , NetResourceXferT* pXfer, void* pDataBuf, int32_t iDataLen)
+                         local  struct <anon>* pResource
+  354  005D4D78    104  enum State Process(const struct <anon>* this, uint32_t* pSize, uint32_t* pCompleted)
+                         local  NetResourceT* pNetResource
+                         local  int32_t iCached
+                         inlines  GetInstance
+  405  005D1F3C     8C  void DownloadResource(const struct <anon>* this)
+                         local  NetResourceT* pNetResource
+                         inlines  GetInstance
+  440  005BEB70     18  void* GetData(const const struct <anon>* this, const char8_t* strURL, uint32_t* pSize)
+  474  005BE4A0     34  void ResourceProtocolServer(const struct <anon>* this)
+  495  005BEBBC      C  void ~ResourceProtocolServer(const struct <anon>* this)
+  516  005BEC0C     38  bool HandlesProtocol(const const struct <anon>* this, const char8_t* strProtocol)
+  543  005E64BC     9C  void CreateResource(const struct <anon>* this, const char8_t* strPath, void* pBuffer, uint32_t uLength, struct <anon>* pRCPointer)
+                         inlines  operator=
+  569  005CB254     8C  void CreateResource(const struct <anon>* this, const char8_t* strPath, struct MemoryStrategy* pMemoryStrategy, struct <anon>* pRCPointer)
+                         inlines  operator=
+  593  005D4E7C     10  enum State ProcessResource(const struct <anon>* this, struct Resource* pResource, uint32_t* pSize, uint32_t* pCompleted)
+                         local  struct <anon>* pResourceServer

@@ -1,0 +1,520 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/cameras/GoCamScripts.c
+// compiled in: golf_unity.cpp
+// 68 functions, source order. line | PS3 address | size
+
+  110    inline-only   float CameraScript_GetSmoothTimeParam(struct CameraScriptSettings_t* settings)
+                         local  float newTime
+                         local  float t
+  131    inline-only   bool CamScript_ProcessScript(CameraChainLink* link, enum PlayerNumber_t ePlayerID, struct CameraScriptSettings_t* settings, float* position, float timeStep, float* lookAt, float* origCamPos)
+                         local  bool success
+  183  002E4CE8    338  bool CamScript_CheckInterpToNextScript(struct CameraScriptSettings_t* settings, enum PlayerNumber_t ePlayerID, float* cameraOrigin, float* lookAt)
+                         local  CameraController_t* pCameraController
+                         local  CameraChainLink* link
+                         local  CameraChainLink* link
+                         local  CameraChainLink* link
+                         local  CameraChainLink* link
+  323  001EE030     A4  bool CamScript_AboveSpectatorZone(CameraController_t* pCameraController, float* cameraOrigin)
+                         local  bool inzone
+  360  002E5A80    ABC  void CamScript_RunScript(enum PlayerNumber_t ePlayerID, float* cameraOrigin, float* lookAt, struct CameraScriptSettings_t* settings, float timeStep, CameraChainLink* linkStorage, bool forceReset)
+                         local  vec4flt origPos
+                         local  vec4flt posDiff
+                         local  vec4flt smoothBallPos
+                         local  float posDiffLength
+                         local  float fieldOfView
+                         local  float dof
+                         local  float blur
+                         local  float shake
+                         local  bool snapToScript
+                         local  int iBallUpdatesThisFrame
+                         local  bool failure
+                         local  CameraController_t* pCameraController
+                         inlines  CA_vSetCameraFieldOfView, CamScript_ProcessScript, CamScript_SetFlag, LLMath_Length3, LLMath_Subtract3, RC_spGetRenderCtxCamera, vec4flt_Copy, vec4flt_Copy3, vec_madd, vec_sld
+  788  002E5020    5B8  void CamScript_RunFEScript(enum PlayerNumber_t ePlayerID, float* cameraOrigin, float* lookAt, struct CameraScriptSettings_t* settings, float timeStep, CameraChainLink* linkStorage, bool forceReset)
+                         local  vec4flt origPos
+                         local  vec4flt posDiff
+                         local  float posDiffLength
+                         local  float fieldOfView
+                         local  bool snapToScript
+                         local  bool failure
+                         inlines  CA_vSetCameraFieldOfView, CamScript_ProcessScript, CamScript_SetFlag, LLMath_Length3, LLMath_Subtract3, RC_spGetRenderCtxCamera, vec4flt_Copy, vec4flt_Copy3, vec_madd, vec_sld
+  953  002ECBAC    4D0  void CamScript_RunFlybyCamera(enum PlayerNumber_t ePlayerID, float* cameraOrigin, float* lookAt, struct CameraScriptSettings_t* settings, float timeStep, CameraChainLink* linkStorage, bool forceReset)
+                         local  vec4flt origPos
+                         local  vec4flt posDiff
+                         local  float posDiffLength
+                         local  float fieldOfView
+                         local  bool snapToScript
+                         local  Curve* flybyCurve
+                         local  float curvePosition
+                         local  float time
+                         local  vec4flt fadeColor
+                         local  float fadeLength
+                         inlines  CA_vSetCameraFieldOfView, LLMath_Length3, LLMath_Subtract3, RC_spGetRenderCtxCamera, vec4flt_Copy, vec4flt_Copy3, vec_madd, vec_sld, vec_st
+ 1165  002C4BEC    174  void CamScript_RunCrACCamera(enum PlayerNumber_t ePlayerID, float* cameraOrigin, struct CameraScriptSettings_t* settings, float timeStep, CameraChainLink* linkStorage, bool forceReset)
+                         local  float fieldOfView
+                         local  Curve* flybyCurve
+                         local  float curvePosition
+                         local  float time
+                         local  vec4flt lookAt
+                         inlines  CA_vSetCameraFieldOfView, RC_spGetRenderCtxCamera
+ 1230  002578D8    28C  void CamScript_SmoothTerrainHeight(struct CameraScriptSettings_t* settings, float* cameraOrigin, bool upOnly, float maxHeightDiff, enum PlayerNumber_t playerID)
+                         local  TGD_TerrainInfo* pTerrainGameData
+                         local  float fGroundHeight
+                         local  float fHeightDiff
+                         local  float fSmoothAmount
+                         local  float minHeight
+                         local  float maxHeight
+                         local  float highestplayable
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  vec4flt tempNormal
+ 1347  00257814     C4  void CamScript_ResetTerrainHeight(struct CameraScriptSettings_t* settings, float* origin)
+                         local  TGD_TerrainInfo* pTerrainGameData
+                         local  float fGroundHeight
+                         local  float highestplayable
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  vec4flt tempNormal
+ 1388  002BC924    114  float CamScript_AccelerateTime(struct CameraScriptSettings_t* settings, float timeStep)
+                         local  float prevCamRate
+                         local  float curCamRate
+                         local  float origCurCamRate
+                         local  float param0
+                         local  float param1
+ 1442  002BC6B8    26C  float CamScript_GetFlybyCamRate(CameraChainLink* link, float param0, float param1, float timeStep)
+                         local  vec4flt pos0
+                         local  vec4flt pos1
+                         local  vec4flt pos2
+                         local  vec4flt pos3
+                         local  vec4flt finalPos0
+                         local  vec4flt finalPos1
+                         local  vec4flt posDiff
+                         local  float posDiffLength
+                         local  CameraChainLink* nextLink
+                         local  float velocity
+                         inlines  LLMath_Length3, LLMath_Subtract3, vec4flt_Copy3, vec_madd, vec_sld
+ 1495    inline-only   void CamScript_SetupCameraPointers(CameraChainLink* pCurCamera, CameraChainLink** pPrevCamera, CameraChainLink** pNextCamera, CameraChainLink** pNextNextCamera)
+ 1542    inline-only   void CamScript_CalcSplinePositionAndLook(enum PlayerNumber_t ePlayerID, struct CameraScriptSettings_t* settings, float timeStep, float* origPos, float* lookAt, SplineProcessingData* splineData)
+ 1583  002E3490    B94  void CamScript_GetSplineInformation(float fParam, float timeStep, struct CameraScriptSettings_t* settings, float* position, float* lookat, float* fov, enum PlayerNumber_t ePlayerID)
+                         local  float idealDist
+                         local  vec4flt origPos
+                         local  vec4flt origPosDiff
+                         local  float sectionPercent
+                         local  float currentDist
+                         local  float prevDist
+                         local  float prevPercent
+                         local  float startPercent
+                         local  float endPercent
+                         local  float lastUnderDist
+                         local  float lastUnderPercent
+                         local  float lastOverDist
+                         local  float lastOverPercent
+                         local  float testPercent
+                         local  float percentDiff
+                         local  float distDiff
+                         local  SplineProcessingData splineData
+                         local  int i
+                         inlines  CamScript_CalcSplinePositionAndLook, CamScript_SetFlag, CamScript_SetupCameraPointers, LLMath_Length3, LLMath_Subtract3, __vec_len_sqr3, vec4flt_Copy, vec_madd, vec_sld
+ 1795  00264B7C    110  void CamScript_Fade(struct CameraScriptSettings_t* settings, float timeStep)
+                         local  vec4flt color
+                         inlines  ScreenEffects::PrevFadeType
+ 1910  0025ED34     A4  void CamScript_LerpPositionByParam(float lerpParam, enum PlayerNumber_t ePlayerID, float timeStep, float* cameraOrigin, struct CameraScriptSettings_t* settings)
+                         local  vec4flt lerpVector
+                         local  vec4flt posAlongLerpVector
+                         inlines  LLMath_Add3, LLMath_Scale3, LLMath_Subtract3, __vec_mul, vec4flt_Copy3, vec_ld, vec_splat
+ 1935  002E26A8    16C  void CamScript_LerpLookByParam(float lerpParam, enum PlayerNumber_t ePlayerID, float* lookAt, struct CameraScriptSettings_t* settings, float timeStep, float* origPos)
+                         local  vec4flt lerpVector
+                         local  vec4flt posAlongLerpVector
+                         inlines  LLMath_Add3, LLMath_Scale3, LLMath_Subtract3, __vec_mul, vec4flt_Copy3, vec_ld
+ 1959  00257E80     6C  void CamScript_LerpBlurDofShakeByParam(float lerpParam, enum PlayerNumber_t ePlayerID, struct CameraScriptSettings_t* settings)
+                         local  float dof
+                         local  float blur
+                         local  float shake
+                         local  CameraScript_t* script
+                         local  CameraScript_t* nextScript
+ 1998  00279C34    108  void CamScript_LerpCamParamsByParam(float lerpParam, enum PlayerNumber_t ePlayerID, struct CameraScriptSettings_t* settings)
+                         local  float fieldOfView
+                         local  CameraScript_t* script
+                         local  CameraScript_t* nextScript
+                         inlines  CA_vSetCameraFieldOfView, RC_spGetRenderCtxCamera
+ 2037  002E2FD4     EC  void CamScript_LerpByParam(enum PlayerNumber_t ePlayerID, float lerpParam, float* cameraOrigin, float* lookAt, struct CameraScriptSettings_t* settings, float timeStep, float* origPos)
+ 2056  002E3370    120  void CamScript_LerpCameras(enum PlayerNumber_t ePlayerID, float* cameraOrigin, float* lookAt, struct CameraScriptSettings_t* settings, float timeStep, float* origPos)
+                         local  float timeParam
+                         inlines  CameraScript_GetSmoothTimeParam, std::cosf
+ 2073  002E3218    158  void CamScript_LerpPercentOfFlightCameras(enum PlayerNumber_t ePlayerID, float* cameraOrigin, float* lookAt, struct CameraScriptSettings_t* settings, float timeStep, float* origPos)
+                         local  float timeParam
+ 2107  002E30C0    158  void CamScript_LerpPercentToPinCameras(enum PlayerNumber_t ePlayerID, float* cameraOrigin, float* lookAt, struct CameraScriptSettings_t* settings, float timeStep, float* origPos)
+                         local  float timeParam
+ 2145  002E2038    670  void CamScript_LerpFixedTargetCameras(enum PlayerNumber_t ePlayerID, float* cameraOrigin, float* lookAt, struct CameraScriptSettings_t* settings, float timeStep, float* origPos)
+                         local  vec4flt look1
+                         local  vec4flt look2
+                         local  vec4flt camToLook1
+                         local  vec4flt camToLook2
+                         local  float distToLook1
+                         local  float distToLook2
+                         local  float scaleAmount
+                         local  float timeParam
+                         local  float rotAngle
+                         local  vec4flt rotationAxis
+                         local  Quat rotationQuat
+                         inlines  CameraScript_GetSmoothTimeParam, LLMath_Add3, LLMath_CrossProduct3W0, LLMath_DotProduct3, LLMath_Length3, LLMath_Scale3, LLMath_Subtract3, __vec_cross, __vec_mul, std::cosf, vec_ld, vec_madd, vec_nmsub, vec_perm, vec_splat, vec_sub
+ 2222  002E2BF4    3E0  void CamScript_LerpSwingToBallFlightCameras(enum PlayerNumber_t ePlayerID, float* cameraOrigin, float* lookAt, struct CameraScriptSettings_t* settings, float timeStep, float* origPos)
+                         local  float timeParam
+                         local  float startzoomdist
+                         local  bool lerpLookAt
+                         local  int iBallUpdatesThisFrame
+                         local  vec4flt tempNext
+                         local  vec4flt lerpVector
+                         local  int i
+                         inlines  CameraScript_GetSmoothTimeParam, LLMath_Add3, LLMath_Scale3, LLMath_Subtract, LLMath_Subtract3, __vec_mul, std::cosf, vec4flt_Copy, vec4flt_Copy3, vec_ld, vec_splat, vec_st, vec_sub
+ 2371  002E4024    6E4  void CamScript_SplineCameras(enum PlayerNumber_t ePlayerID, float* cameraOrigin, float* lookAt, struct CameraScriptSettings_t* settings, float timeStep, float* origPos)
+                         local  float param
+                         local  float finalFOV
+                         local  CameraScript_t* script
+                         local  CameraScript_t* nextLink
+                         local  SplineProcessingData splineData
+                         local  float avgVel
+                         local  float avgVel
+                         local  float newVel
+                         inlines  CA_vSetCameraFieldOfView, CamScript_CalcSplinePositionAndLook, CamScript_SetFlag, CamScript_SetupCameraPointers, RC_spGetRenderCtxCamera, vec4flt_Copy
+ 2490  002E2A58    19C  void CamScript_ArcCameras(enum PlayerNumber_t ePlayerID, float* cameraOrigin, float* lookAt, struct CameraScriptSettings_t* settings, float timeStep, float* origPos)
+                         local  float timeParam
+                         inlines  CameraScript_GetSmoothTimeParam, std::cosf
+ 2517  002E2814    244  void CamScript_CircleCameras(enum PlayerNumber_t ePlayerID, float* cameraOrigin, float* lookAt, struct CameraScriptSettings_t* settings, float timeStep, float* origPos)
+                         local  float fieldOfView
+                         local  float timeParam
+                         local  float halfwayTimeParam
+                         local  CameraScript_t* script
+                         local  CameraScript_t* nextLink
+                         inlines  CA_vSetCameraFieldOfView, CameraScript_GetSmoothTimeParam, RC_spGetRenderCtxCamera, std::cosf
+ 2581  002E1C20    418  void CamScript_PickArcDirection(struct CameraScriptSettings_t* settings, float* lookAt, float timeStep, enum PlayerNumber_t ePlayerID, float* origPos)
+                         local  vec4flt endPos1
+                         local  vec4flt endPos2
+                         local  vec4flt look1
+                         local  vec4flt look2
+                         local  vec4flt midLook
+                         local  vec4flt lerpVector
+                         local  vec4flt posAlongLerpVector
+                         local  bool endPos1OOB
+                         local  bool endPos2OOB
+                         inlines  LLMath_Add3, LLMath_Scale3, LLMath_Subtract3, __vec_mul, vec4flt_Copy3, vec_ld
+ 2674  002E0340   11F8  void CamScript_GetLookAtPoint(CameraChainLink* link, enum PlayerNumber_t ePlayerID, float* lookAt, float* position, struct CameraScriptSettings_t* settings, float timeStep, float* origPosition)
+                         local  vec4flt ballPosition
+                         local  vec4flt camToDest
+                         local  TGD_TerrainInfo* pTerrainGameData
+                         local  float heightDiff
+                         local  vec4flt leftFootPos
+                         local  vec4flt rightFootPos
+                         local  vec4flt footCenterPos
+                         local  vec4flt waistPos
+                         local  vec4flt headPos
+                         local  vec4flt xzVelocity
+                         local  vec4flt targetPos
+                         local  vec4flt shake
+                         local  vec4flt origLook
+                         local  float yDist
+                         local  float xzDist
+                         local  CameraScript_t* script
+                         local  struct TCharacter* pCharacter
+                         local  vec4flt object1Location
+                         local  vec4flt object2Location
+                         local  vec4flt lineOfActon
+                         local  float sphereRadius
+                         local  float zDepth
+                         local  float obj1ZDepth
+                         local  float obj2ZDepth
+                         local  float offsetDistance
+                         local  vec4flt object1Location
+                         local  vec4flt object2Location
+                         local  vec4flt lineOfActon
+                         local  float sphereRadius
+                         local  float zDepth
+                         local  float obj1ZDepth
+                         local  float obj2ZDepth
+                         local  float offsetDistance
+                         local  int32 currentTee
+                         inlines  GamePlayer::GetCharacter, LLMath_Add3, LLMath_AddScale3, LLMath_DistanceBetween3, LLMath_Length3, LLMath_Scale3, LLMath_Subtract3, __vec_make_from_scalar, __vec_mul, vec4flt_Copy, vec4flt_Copy3, vec_ld, vec_madd, vec_sld, vec_st, vec_sub
+ 3141  0029F35C    448  void CameraScript_CalculateShoulderShake(CameraScript_t* script, float scriptTime, float scriptSpeed, float* shake)
+                         local  float smoothRandX
+                         local  float smoothRandY
+                         local  float smoothRandZ
+                         local  float time
+                         inlines  Misc_RandFuncf, std::cosf
+ 3249  002BCA38    8AC  void CameraScript_LagAimMarker(enum PlayerNumber_t ePlayerID, float* lookAt, float* position, CameraScript_t* script, float lagAmount, bool adjustForHeight, bool keepFlat, float distFromCamKeepFlat, float heightLagAmount)
+                         local  float angleDiff
+                         local  float posToDestLength
+                         local  float destHeight
+                         local  float adjustedHeight
+                         local  vec4flt offsetDest
+                         local  vec4flt posToLook
+                         local  vec4flt posToDest
+                         local  vec4flt lookToDest
+                         local  vec4flt camToDest
+                         local  Quat rotationQuat
+                         local  vec4flt rotationAxis
+                         local  float minMarkerDist
+                         local  vec4flt targetPos
+                         local  float distRate
+                         local  float camToDestLength
+                         local  float heightDiff
+                         local  float origHeight
+                         inlines  LLMath_Add3, LLMath_CrossProduct3W0, LLMath_DotProduct3, LLMath_Length3, LLMath_Scale3, LLMath_Subtract3, __vec_cross, __vec_len_sqr3, __vec_mul, vec4flt_Copy3, vec_ld, vec_madd, vec_nmsub, vec_perm, vec_sld
+ 3412  002BD2E4    85C  void CameraScript_LagBallFlight(enum PlayerNumber_t ePlayerID, float* lookAt, float* position, CameraScript_t* script, struct CameraScriptSettings_t* settings, float timeStep, float* origPos)
+                         local  vec4flt lookDiff
+                         local  float lookLength
+                         local  vec4flt ballPosition
+                         local  vec4flt smoothBallPosition
+                         local  float swoopAmount
+                         local  float scaleAmount
+                         local  float easeScale
+                         local  float xzDist
+                         local  float yDist
+                         local  float lookUpAmount
+                         local  float yCamPos
+                         local  int iBallUpdatesThisFrame
+                         local  vec4flt origLook
+                         local  vec4flt camToDest
+                         local  vec4flt oldToNewBall
+                         local  int i
+                         inlines  LLMath_Add3, LLMath_Length3, LLMath_Scale3, LLMath_Subtract3, __vec_len_sqr3, __vec_mul, std::sqrt, vec_ld, vec_splat
+ 3587  002BDB40    42C  void CameraScript_LagTargetPoint(enum PlayerNumber_t ePlayerID, float* lookAt, float* position, float* target, float timeStep, CameraScript_t* script, struct CameraScriptSettings_t* settings, float maxAngle)
+                         local  vec4flt lookDiff
+                         local  vec4flt targetPosition
+                         local  float lookLength
+                         local  float scaleAmount
+                         local  float lagInterpTime
+                         local  vec4flt targetToCam
+                         local  float targetToCamDist
+                         local  float ignoreBodyDist
+                         inlines  LLMath_Add3, LLMath_Length3, LLMath_Scale3, LLMath_Subtract3, __vec_mul, vec4flt_Copy3, vec_ld, vec_madd, vec_sld
+ 3700  00252274    12C  void CameraScript_OffsetLookVector(float* look, float* position, float yOffset, float xOffset)
+                         local  vec4flt lookDiff
+                         inlines  LLMath_Subtract3, vec_sub
+ 3729  002523A0    11C  void CameraScript_NormalizeLookPoint(float* look, float* position)
+                         local  vec4flt lookDiff
+                         inlines  LLMath_Add3, LLMath_Subtract3
+ 3750  0024D154    244  void CameraScript_RecordCurrentCam(CameraChainLink* link, float* origin, float* lookat, enum PlayerNumber_t ePlayerID, struct CameraScriptSettings_t* settings, bool PIP)
+                         local  CameraScript_t* script
+                         inlines  CA_fGetCameraFieldOfView, vec4flt_Copy3
+ 3821  002BDF6C    6D8  void CameraScript_UpdateLandingEstimate(struct CameraScriptSettings_t* settings, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt estimatedCollision
+                         local  vec4flt surfaceNormal
+                         local  vec4flt ballVel
+                         local  vec4flt estimatedLand
+                         local  vec4flt ballEstimate
+                         local  vec4flt startToEnd
+                         local  vec4flt ballUp
+                         local  float fGoUpAmount
+                         local  float frictionAmount
+                         local  float startToEndDist
+                         local  float estimatedShotDist
+                         local  float endHeight
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  TGD_ObjectInstanceInfo* pSurfaceObject
+                         local  struct PhysicsBall_t* bestBall
+                         local  vec4flt targetPos
+                         local  int terrainID
+                         inlines  GamePlayer::GetEstimatedBall, LLMath_Add3, LLMath_Length3, LLMath_Scale3, LLMath_Subtract3, __vec_len_sqr3, __vec_make_from_scalar, __vec_mul, vec4flt_Copy3, vec_ld, vec_splat
+ 4000  002EA298    64C  void CameraScript_GoToNewScript(struct CameraScriptSettings_t* settings, CameraChainLink* newLink, enum PlayerNumber_t ePlayerID, float* cameraOrigin, float* lookAt, CameraChainLink* linkStorage)
+                         local  int oldSpeed
+                         inlines  CamScript_ClearFlag, GameEffects_SetDoubleTime, GameEffects_SetHalfTime, vec4flt_Copy3
+ 4211  002DA8E4    710  void CameraScript_InterpToNewScript(struct CameraScriptSettings_t* settings, CameraChainLink* newLink, enum PlayerNumber_t ePlayerID, float* cameraOrigin, float* lookAt, enum CameraInterpType_e interpType, float interpTime, float maxSpeed, enum CameraEvent_e timeTrigger, float timeTriggerTime)
+                         local  vec4flt oldToNewCam
+                         local  vec4flt newCam
+                         local  float oldToNewLength
+                         local  float oldToNewSpeed
+                         inlines  CamScript_ProcessScript, CamScript_SetFlag, GameEffects_SetDoubleTime, GameEffects_SetHalfTime, LLMath_Length3, LLMath_Subtract3, vec4flt_Copy, vec4flt_Copy3, vec_madd, vec_sld
+ 4464  001EE278     84  bool CameraScript_SnapToScript(struct CameraScriptSettings_t* settings, CameraChainLink* link)
+ 4498  00255BFC     58  float CameraScript_GetBallHeightWithMaxHeight(enum PlayerNumber_t ePlayerID, struct CameraScriptSettings_t* settings, float* ballPos, float* camPos, CameraScript_t* script)
+                         local  float smoothedBallAltitude
+                         local  float ballHeight
+                         local  float heightScale
+ 4527  002895DC    58C  void CameraScript_KeepPointInView(enum PlayerNumber_t ePlayerID, float* camPos, float* lookAt, float* target, struct CameraScriptSettings_t* settings, float maxAngle)
+                         local  vec4flt posToTarget
+                         local  vec4flt posToTargetNormalized
+                         local  vec4flt posToLook
+                         local  vec4flt posToLookNormalized
+                         local  vec4flt posToDest
+                         local  vec4flt rotationAxis
+                         local  mat44flt worldRotation
+                         local  mat44flt worldRotationTranspose
+                         local  mat44flt localRotation
+                         local  float dotProduct
+                         local  float angleDiffInRad
+                         local  float rotAngle
+                         local  float cosRotAngle
+                         local  float sinRotAngle
+                         local  float yzsqrt
+                         local  float yzsqrtinv
+                         inlines  LLMath_Add3, LLMath_CrossProduct3W0, LLMath_DotProduct3, LLMath_IdentifyMat, LLMath_Subtract3, LLMath_mat44fltMultiply33, __vec_mul, std::cosf, std::sqrt, vec_madd, vec_nmsub, vec_perm, vec_splat, vec_st, vec_sub
+ 4677  00274618    1BC  bool CameraScript_IsDefaultSwingCam(CameraChainLink* link, enum PlayerNumber_t ePlayerID, float* camOrigin)
+                         local  vec4flt playerToAim
+                         local  vec4flt playerToCam
+                         inlines  LLMath_DotProduct3, LLMath_Subtract3, vec_madd, vec_sld
+ 4723  001EE2FC     D0  bool CameraScript_DontUpdateCameraDuringSlowMo(struct CameraScriptSettings_t* settings, enum PlayerNumber_t ePlayerID)
+ 4767  002BE644    224  bool CamScript_CheckObstructedCamera(float* cameraOrigin, enum PlayerNumber_t ePlayerID)
+                         local  bool obstructed
+                         local  vec4flt camToCup
+                         local  float camToCupDist
+                         local  int currentPin
+                         local  int8 currentGreen
+                         inlines  GM_GetCurrentFlagPositionIndex, GM_GetCurrentGreenIndex, LLMath_Length3, LLMath_Subtract3, vec_madd, vec_sld
+ 4819  002E4708    26C  void CamScript_CheckOutOfBounds(struct CameraScriptSettings_t* settings, float* cameraOrigin, float* lookAt, enum PlayerNumber_t ePlayerID, CameraChainLink* linkStorage, float* origPos, bool snapToScript)
+                         local  struct TNetwork* network
+                         local  vec4flt endPoint
+                         local  bool quickCut
+                         inlines  LLMath_Add3
+ 4910  002BE868    B0C  void CamScript_GetCameraOnFairwayPos(struct CameraScriptSettings_t* settings, float* cameraOrigin, float* lookAt, enum PlayerNumber_t ePlayerID, CameraChainLink* linkStorage, float* origCamPos, float* terrainHeight)
+                         local  vec4flt ballCamLocation
+                         local  vec4flt targetCamLocation
+                         local  vec4flt pinCamLocation
+                         local  float ballCamDist
+                         local  float targetCamDist
+                         local  float pinCamDist
+                         local  vec4flt newCamLocation
+                         local  vec4flt camLookDir
+                         local  vec4flt newCamLookDir
+                         local  vec4flt teeToPin
+                         local  vec4flt firstChoiceCamPos
+                         local  vec4flt secondChoiceCamPos
+                         local  vec4flt thirdChoiceCamPos
+                         local  vec4flt camToBall
+                         local  float fGroundHeight
+                         local  bool goodSpotFound
+                         local  int currentCup
+                         local  int8 currentGreen
+                         inlines  GM_GetCurrentFlagPositionIndex, GM_GetCurrentGreenIndex, LLMath_Add3, LLMath_DotProduct3, LLMath_Length3, LLMath_Scale3, LLMath_Subtract3, __vec_len_sqr3, __vec_mul, vec4flt_Copy, vec4flt_Copy3, vec_ld, vec_madd, vec_sld, vec_sub
+ 5156  002BF374    210  void CamScript_CheckFlagCollision(struct CameraScriptSettings_t* settings, float* cameraOrigin, float* lookAt, enum PlayerNumber_t ePlayerID, CameraScript_t* scriptStorage, float* origCamPos)
+                         local  vec4flt camToCup
+                         local  float camToCupDist
+                         local  int8 currentPin
+                         local  int8 currentGreen
+                         inlines  GM_GetCurrentFlagPositionIndex, GM_GetCurrentGreenIndex, LLMath_Length3, LLMath_Subtract3, vec_madd, vec_sld
+ 5205  002DD0E4    284  void CamScript_PutBackOnFairway(struct CameraScriptSettings_t* settings, float* cameraOrigin, float* lookAt, enum PlayerNumber_t ePlayerID, CameraChainLink* linkStorage, float* origCamPos)
+                         local  float terrainHeight
+                         local  float highestplayable
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  vec4flt tempNormal
+                         inlines  CA_vSetCameraFieldOfView, RC_spGetRenderCtxCamera
+ 5280  002E181C    404  void CamScript_UpdateFairwayCam(struct CameraScriptSettings_t* settings, float* cameraOrigin, float* lookAt, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt newCamLocation
+                         local  vec4flt origToNew
+                         local  vec4flt ballToCam
+                         local  vec4flt ballToCamNormalized
+                         local  vec4flt ballVelocityNormalized
+                         local  float camDist
+                         local  float dotP
+                         local  float fGroundHeight
+                         local  float oldFOV
+                         inlines  LLMath_DotProduct3, LLMath_Length3, LLMath_Subtract3, vec4flt_Copy3, vec_madd, vec_sld
+ 5374  002B22C8    108  void CamScript_GetNearestAIPoint(float* fromVec, float* point)
+                         local  int currentCup
+                         local  int8 currentGreen
+                         inlines  AINetworkMgr, GM_GetCurrentFlagPositionIndex, GM_GetCurrentGreenIndex, vec4flt_Copy3
+ 5408  002E1538    2E4  void CamScript_BallWentOOB(struct CameraScriptSettings_t* settings, CameraChainLink* linkStorage, float* cameraOrigin, float* lookAt, enum PlayerNumber_t ePlayerID)
+                         local  vec4flt golferToAim
+                         local  vec4flt newCamPos
+                         local  TGD_TerrainInfo* pTerrainGameData
+                         local  float fGroundHeight
+                         inlines  LLMath_Add3, LLMath_Scale3, LLMath_Subtract3, __vec_mul, vec4flt_Copy
+ 5472  002787E8    348  float CamScript_GuessBestPlayableHeight(float* pos, struct TGD_MaterialInfo** pMaterialInfo)
+                         local  struct TGD_MaterialInfo*[20] pSurfaceInfo
+                         local  float[20] fGroundHeights
+                         local  TGD_TerrainInfo* pTerrainGameData
+                         local  vec4flt testPos
+                         local  float fLastHighestHeight
+                         local  float fCurrentHighestHeight
+                         local  float fHighestHeight
+                         local  bool insideCave
+                         local  int32 surfaceID
+                         local  float fLastCaveHeight
+                         local  float fLastHighestUsedHeight
+                         local  int32 iLastCaveIndex
+                         local  uint32 numLayers
+                         local  int32 i
+                         local  uint32 numChecked
+                         local  int32 nextIndex
+                         local  int32 finalIndex
+                         inlines  vec4flt_Copy3
+ 5611  0023CB34    1D0  float CamScript_GuessBestHeightNextFrame(float* pos, float curHeight)
+                         local  TGD_TerrainInfo* pTerrainGameData
+                         local  vec4flt testPos
+                         local  float bestHeight
+                         local  float nextHeight
+                         local  struct TGD_MaterialInfo*[20] pSurfaceInfo
+                         local  float[20] fGroundHeights
+                         local  uint32 numLayers
+                         local  int32 i
+                         local  int nextIndex
+                         local  uint32 numChecked
+                         local  float fCurrentLowestHeight
+                         inlines  vec4flt_Copy3
+ 5685  001EE62C     48  bool CamScript_PlayableSurface(struct TGD_MaterialInfo* pMaterialInfo)
+ 5701  001EE674     88  float CamScript_GetSupportingHeight(float* heights, float curHeight, uint32 numHeights)
+                         local  float lowest
+                         local  bool found
+                         local  uint32 i
+ 5726  001EE6FC     88  float CamScript_GetCoveringHeight(float* heights, float curHeight, uint32 numHeights)
+                         local  float highest
+                         local  bool found
+                         local  uint32 i
+ 5757  00277C98    518  bool CamScript_KeepAboveGround(enum PlayerNumber_t ePlayerID, float* camPos, float* origCamPos, bool collisionTest, float lowestHeight, bool* validTerrain, float* terrainHeight, bool* raised)
+                         local  TGD_TerrainInfo* pTerrainGameData
+                         local  vec4flt collisionPoint
+                         local  vec4flt surfaceNormal
+                         local  TGD_ObjectInstanceInfo* pSurfaceObject
+                         local  float ourGroundHeight
+                         local  bool collisionOccurred
+                         local  float fSupportingGroundHeight
+                         local  float fCoveringGroundHeight
+                         local  struct TGD_MaterialInfo*[20] pSurfaceInfo
+                         local  float[20] fGroundHeights
+                         local  uint32 numLayers
+                         local  bool collision
+                         local  int32 surfaceID
+                         local  CameraController_t* pCameraController
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  struct TGD_MaterialInfo* pSurfaceInfo2
+                         local  vec4flt surfaceNormal
+                         local  vec4flt surfaceNormal2
+                         local  float fHeightOffGround
+                         local  int terrainID
+ 6065  001EE784      8  bool CamScript_IngoreCameraCollisionSurface(int32 surfaceID)
+ 6072  002BF584    1C0  float CamScript_EstimateBallFlightPercent(enum PlayerNumber_t ePlayerID, struct CameraScriptSettings_t* settings)
+                         local  vec4flt ballStartToEstimatedLand
+                         local  vec4flt ballToEstimatedLand
+                         local  float estimatedTotalDist
+                         local  float estimatedDistanceLeft
+                         inlines  LLMath_Length3, LLMath_Subtract3, vec_madd, vec_sld, vec_sub
+ 6095  002BF744    1DC  float CamScript_GetBallToPinPercent(enum PlayerNumber_t ePlayerID, struct CameraScriptSettings_t* settings)
+                         local  vec4flt ballStartToPin
+                         local  vec4flt ballToPin
+                         local  float totalDist
+                         local  float distanceLeft
+                         inlines  LLMath_Length3, LLMath_Subtract3, vec_madd, vec_sld, vec_sub
+ 6126  002E8564    1F4  bool CameraScript_WillGolferBeOccludedInThisView(enum PlayerNumber_t ePlayerID, CameraChainLink* pCameraLink, struct CameraScriptSettings_t* pCameraSettings)
+                         local  TGD_TerrainInfo* pTerrainGameData
+                         local  vec4flt collisionPoint
+                         local  vec4flt surfaceNormal
+                         local  TGD_ObjectInstanceInfo* pSurfaceObject
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  CameraChainLink localLink
+                         local  CameraChainLink localLinkStorage
+                         local  CameraScript_t localScript
+                         local  CameraScript_t localScriptStorage
+                         local  struct CameraScriptSettings_t localSettings
+                         local  vec4flt localCamOrigin
+                         local  vec4flt localCamLookPoint
+                         local  vec4flt playerPos
+                         local  int terrainID
+                         inlines  vec4flt_Copy
+ 6186  00312724    2C0  bool CamScript_SkipLookBackCam(struct CameraScriptSettings_t* pSettings, CameraScript_t* pScript, enum PlayerNumber_t ePlayerID)
+                         inlines  CamScript_DoesScriptTrackBall, CamScript_DoesScriptTrackGolfer, GM_GetCurrentHoleIndex
+ 6326  00265BF4     6C  bool CameraScript_FlipCameraForLefty(enum PlayerNumber_t ePlayerID, CameraScript_t* pCameraScript)
+ 6361  0025F3C8    108  void CameraScript_SphericalLagPoint(const float* origPosition, float* desiredPosition, float radius, float lag, float* newPosition)
+                         local  vec4flt posDiff
+                         local  float distDiff
+                         inlines  LLMath_AddScale3, LLMath_Subtract3, __vec_make_from_scalar, vec_madd
+ 6417  002B2E4C     CC  float CamScript_GetDistanceToClubHouseCamera(enum StaticCam_EventType_e event)
+                         local  float dist
+                         local  CameraChainLink* link
+                         local  CameraController_t* pCameraController
+                         local  vec4flt* pCameraOrigin
+                         inlines  LLMath_DistanceBetween3

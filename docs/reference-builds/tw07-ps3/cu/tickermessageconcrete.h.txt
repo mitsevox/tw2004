@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/./tickermessageconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   53  00624CDC      C  TickerFilterT* GetFilter(const struct <anon>* this)
+   56  00624CE8      8  uint32_t GetDisplayTime(const struct <anon>* this)
+   59  00624CF0      8  uint32_t GetSound(const struct <anon>* this)
+   62  00624CF8      8  uint32_t GetPriority(const struct <anon>* this)

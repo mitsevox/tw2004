@@ -1,0 +1,5 @@
+// C:/packages/rwmovie/1.04.01/include/rwmovie/private/struct.h
+// compiled in: videorenderablemanager.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   65  006FE964      C  void ~IComparator(const struct IComparator* this)

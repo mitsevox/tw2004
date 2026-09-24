@@ -1,0 +1,17 @@
+// ../../../../../TIGERCODE/packages/t3db/2.21.03-RW-EAC/include/common/t3db/database.h
+// compiled in: golf_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   74  00340938     C4  enum TDbError Load(const struct Database* this, enum LoadType eLoadType, struct IOCallback* pCallbacks)
+                         local  const char[5] __FUNCTION__
+                         local  struct <anon> lock
+                         inlines  InternalIsLocked, T3dbLock, ~T3dbLock
+   75  0033F530     B4  enum TDbError Save(const struct Database* this, struct IOCallback* pCallbacks)
+                         local  const char[5] __FUNCTION__
+                         local  struct <anon> lock
+                         inlines  InternalIsLocked, T3dbLock, ~T3dbLock
+  101  0034088C     AC  struct Table* FindTable(const struct Database* this, TableRef tblRef)
+                         local  const char[10] __FUNCTION__
+                         local  struct <anon> lock
+                         inlines  InternalIsLocked, T3dbLock, ~T3dbLock
+  126    inline-only   bool InternalIsLocked(const struct Database* this)

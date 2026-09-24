@@ -1,0 +1,12 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/query.h
+// compiled in: DbManager.cpp
+// 5 functions, source order. line | PS3 address | size
+
+  102  007CDFB4     D8  struct TableIndex* GetTableIndexObject(const struct Query* this)
+                         local  const char[20] __FUNCTION__
+  108  007CE08C     C0  struct <anon>* GetQueryIndexObject(const struct Query* this)
+                         local  const char[20] __FUNCTION__
+  114  007CE14C     C0  struct Table* GetTableObject(const struct Query* this)
+                         local  const char[15] __FUNCTION__
+  152  007CE20C     38  QueryRef InternalGetRef(const struct Query* this)
+  175  007CAE20     38  struct Query* GetNext(const struct Query* this)

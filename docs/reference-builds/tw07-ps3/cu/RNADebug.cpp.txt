@@ -1,0 +1,11 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNAScope/RNADebug.cpp
+// compiled in: RNADebug.cpp
+// 4 functions, source order. line | PS3 address | size
+
+    0  00841334     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   48  0084104C    2E8  void RNAPrintParmValue(enum TypeID idType, const union <anon>* pValue)
+                         local  struct TextureC* pTexture
+                         local  const float_t* pF
+                         local  int32_t i
+  115  008413B4     10  static void _GLOBAL__I__Z17RNAPrintParmValueN3RNA6TypeIDEPKNS_10ParmValueUE()
+  116  008413C4     10  static void _GLOBAL__D__Z17RNAPrintParmValueN3RNA6TypeIDEPKNS_10ParmValueUE()

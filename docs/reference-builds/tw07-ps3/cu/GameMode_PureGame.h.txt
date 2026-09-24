@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/Headers/GameMode_PureGame.h
+// compiled in: golf_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   41  0033F170      8  bool GameModePureGame::GiveOOBPenalty(const struct GameModePureGame* this)
+   44  0033F178      8  enum UIScoreCardDispMode_t GameModePureGame::GetScoreDisplayMode(const struct GameModePureGame* this, bool getAlternate)
+   64  0033F180      8  bool GameModePureGame::ShowShotInfo(const struct GameModePureGame* this)
+   98    inline-only   int GameModePureGame::GetShotsTaken(const struct GameModePureGame* this)

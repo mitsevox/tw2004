@@ -1,0 +1,42 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/lua-5.0.2/src/lib/lmathlib.c
+// compiled in: lmathlib.c
+// 25 functions, source order. line | PS3 address | size
+
+   38  0055769C     48  static int math_abs(lua_State* L)
+   43  005576E4     50  static int math_sin(lua_State* L)
+   48  00557734     50  static int math_cos(lua_State* L)
+   53  00557784     4C  static int math_tan(lua_State* L)
+   58  005577D0     4C  static int math_asin(lua_State* L)
+   63  0055781C     4C  static int math_acos(lua_State* L)
+   68  00557868     4C  static int math_atan(lua_State* L)
+   73  005578B4     70  static int math_atan2(lua_State* L)
+   78  00557924     4C  static int math_ceil(lua_State* L)
+   83  00557970     4C  static int math_floor(lua_State* L)
+   88  005579BC     70  static int math_mod(lua_State* L)
+   93  00557A2C     60  static int math_sqrt(lua_State* L)
+   98  00557A8C     70  static int math_pow(lua_State* L)
+  103  00557AFC     50  static int math_log(lua_State* L)
+  108  00557B4C     50  static int math_log10(lua_State* L)
+  113  00557B9C     4C  static int math_exp(lua_State* L)
+  118  00557BE8     58  static int math_deg(lua_State* L)
+  123  00557C40     58  static int math_rad(lua_State* L)
+  128  00557C98     74  static int math_frexp(lua_State* L)
+                         local  int e
+  135  00557D0C     7C  static int math_ldexp(lua_State* L)
+  142  00557D88     E0  static int math_min(lua_State* L)
+                         local  int n
+                         local  lua_Number dmin
+                         local  int i
+                         local  lua_Number d
+  156  00557E68     E0  static int math_max(lua_State* L)
+                         local  int n
+                         local  lua_Number dmax
+                         local  int i
+                         local  lua_Number d
+  170  00557F48    274  static int math_random(lua_State* L)
+                         local  lua_Number r
+                         local  int u
+                         local  int l
+                         local  int u
+  198  005581BC     40  static int math_randomseed(lua_State* L)
+  236  005581FC     B8  int luaopen_math(lua_State* L)

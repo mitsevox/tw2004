@@ -1,0 +1,5 @@
+// /home/fnami/svn/toolchain/libsupcxx/pure.cc
+// compiled in: pure.cc
+// 1 functions, source order. line | PS3 address | size
+
+   52  008F0ACC     14  void __cxxabiv1::__cxa_pure_virtual()

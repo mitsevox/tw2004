@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_trinity/trinity/Runtime/src/TrinityScriptedEvents.cpp
+// compiled in: TrinityScriptedEvents.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   30  00592AF8     18  void TrinityScriptedEvents(const struct <anon>* this)
+   44  00592B28     18  void ~TrinityScriptedEvents(const struct <anon>* this)
+   58  00592B90     54  void ScriptedEvents(const struct <anon>* this, int32_t eventID, int32_t dataSize, const char* pData)

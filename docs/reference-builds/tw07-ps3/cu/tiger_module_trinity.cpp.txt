@@ -1,0 +1,68 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_trinity.cpp
+// compiled in: tiger_module_trinity.cpp
+// 49 functions, source order. line | PS3 address | size
+
+    0  0034281C     38  void ~Trinity(const struct <anon>* this)
+                         inlines  ~Module
+   15  0053999C     10  static void StaticLuaStartSequence(const struct <anon>* param, void* object)
+   16  0053A0B4     10  static void StaticLuaSetMainCam(const struct <anon>* param, void* object)
+   17  0053A010     10  static void StaticLuaReleaseMainCam(const struct <anon>* param, void* object)
+   18  0053A1EC     10  static void StaticLuaSetPipCam(const struct <anon>* param, void* object)
+   19  0053A148     10  static void StaticLuaReleasePipCam(const struct <anon>* param, void* object)
+   20  005399C4     10  static void StaticLuaSetRelative(const struct <anon>* param, void* object)
+   21  005399EC     10  static void StaticLuaEnableBallAnim(const struct <anon>* param, void* object)
+   22  00539AA0     10  static void StaticLuaSetCrowdCam(const struct <anon>* param, void* object)
+   23  00539B20     10  static void StaticLuaReleaseCrowdCam(const struct <anon>* param, void* object)
+   26  0053A8D8     90  void Trinity(const struct <anon>* this, const const void** __vtt_parm, struct Global* global, struct CCT* cct, struct Lua* lua)
+   49  0053A3F4    1D4  void LevelInit(const struct <anon>* this)
+                         local  enum LuaType sType
+                         local  enum LuaType iType
+                         local  enum LuaType[7] fiType
+   72  00539B30     98  void Init(const struct <anon>* this)
+   77  00539BC8      4  void FirstUpdate(const struct <anon>* this)
+   81  00539BCC     60  void Shutdown(const struct <anon>* this)
+   87  00539C2C    114  void Update(const struct <anon>* this)
+                         local  struct <anon> ___profScope
+                         inlines  Profile, ~Profile
+   94  00539D40      8  int GetResourceCount(const struct <anon>* this)
+   99  0053A784    104  void ResourceCallback(const struct <anon>* this, void* resource, int resourceId, unsigned int resourceSize)
+  111  00539D48     84  int GetResourceId(const struct <anon>* this, int resourceIndex)
+  124  00539DF8    194  void StartSequence(const struct <anon>* this, const char* sequenceName, unsigned int resourceTag, bool bIsRelative)
+  149  00539DCC     2C  bool IsSequencePlaying(const const struct <anon>* this)
+  154  005398F8     A4  void LuaStartSequence(const struct <anon>* this, const struct <anon>* param)
+  160  0053A020     94  void LuaSetMainCam(const struct <anon>* this, const struct <anon>* param)
+  167  00539F8C     84  void LuaReleaseMainCam(const struct <anon>* this, const struct <anon>* )
+  173  0053A158     94  void LuaSetPipCam(const struct <anon>* this, const struct <anon>* param)
+  179  0053A0C4     84  void LuaReleasePipCam(const struct <anon>* this, const struct <anon>* )
+  185  005399FC     A4  void LuaSetCrowdCam(const struct <anon>* this, const struct <anon>* param)
+  197  00539AB0     70  void LuaReleaseCrowdCam(const struct <anon>* this, const struct <anon>* )
+  203  005399D4     18  void LuaEnableBallAnim(const struct <anon>* this, const struct <anon>* param)
+  208  005399AC     18  void LuaSetRelative(const struct <anon>* this, const struct <anon>* param)
+  213  0053A1FC     44  void StopAllSequences(const struct <anon>* this)
+  221  0053A240     28  void RemoveAllSequences(const struct <anon>* this)
+  226  0053A268     28  void RemoveSequenceByMaster(const struct <anon>* this, void* masterPtr)
+  232  0053A888     30  float GetMainCamFov(const const struct <anon>* this)
+                         local  const struct TrinityCamera* camera
+                         inlines  TrinityCamera::GetFov, TrinityInternal::GetMainCam
+  245  0053A734     30  float GetPipCamFov(const const struct <anon>* this)
+                         local  const struct TrinityCamera* camera
+                         inlines  TrinityCamera::GetFov, TrinityInternal::GetPipCam
+  258  0053A8B8     20  const float* GetMainCamMatrix(const const struct <anon>* this)
+                         local  const struct TrinityCamera* camera
+                         inlines  TrinityCamera::GetMtx, TrinityInternal::GetMainCam
+  271  0053A764     20  const float* GetPipCamMatrix(const const struct <anon>* this)
+                         local  const struct TrinityCamera* camera
+                         inlines  TrinityCamera::GetMtx, TrinityInternal::GetPipCam
+  284  0053A290      C  const struct TrinityCamera* GetMainCamera(const const struct <anon>* this)
+  289  0053A29C      C  const struct TrinityCamera* GetPipCamera(const const struct <anon>* this)
+  294  0053A2A8     2C  void SetMainCamera(const const struct <anon>* this, const struct TrinityCamera* camera)
+  299  0053A2D4     2C  void SetPipCamera(const const struct <anon>* this, const struct TrinityCamera* camera)
+  304  0053A300     28  const char* GetRunningSequenceName(const const struct <anon>* this)
+  309  0053A328     3C  void SetHasRemappedClub(const struct <anon>* this, bool bHasRemapped)
+  315  0053A364     34  void DisplayDebugInfo(const struct <anon>* this)
+  321  0053A398     5C  void ResetReactionValue(const struct <anon>* this)
+  329  0053A5C8    110  const char* GetReactionValueString(const struct <anon>* this)
+                         local  float reactionValue
+  355  0053A6D8      C  struct TrinitySequence* GetSequenceList(const struct <anon>* this)
+  360  0053A6E4     28  float GetSequenceTime(const struct <anon>* this)
+  365  0053A70C     28  float GetSequenceEndTime(const struct <anon>* this)

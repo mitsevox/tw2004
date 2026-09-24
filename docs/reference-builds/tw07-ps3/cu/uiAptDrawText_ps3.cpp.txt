@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/aptInterface/uiAptDrawText_ps3.cpp
+// compiled in: other_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   23  003EC4AC    11C  void DrawTextRender::InitTextureDataInfo(const struct DrawTextRender* this, int32 w, int32 h, int32 bitDepth)
+   45  003EC5C8     CC  void DrawTextRender::LockTextureData(const struct DrawTextRender* this)
+                         local  struct SM_Shader_Base* activaShader
+                         inlines  SM_GetLastActivedShader
+   68  003EC308      8  bool DrawTextRender::IsTextureUsedByGPU(const const struct DrawTextRender* this)
+   91  003EC694     34  void DrawTextRender::ReleaseTextureData(const struct DrawTextRender* this, int32 x, int32 y, int32 w, int32 h)
+  100  003EC310      4  void DrawTextRender::MakeTextureAvailableToGPU(const struct DrawTextRender* this)

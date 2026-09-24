@@ -1,0 +1,29 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_OnlineMyQuickMessages.cpp
+// compiled in: apt_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   31  00077174     A4  void QuickMessagesMemCardCB(int32 rslt)
+                         local  int32 i
+   52  000F73F4     98  void UIOnlineMyQuickMessages::UIOnlineMyQuickMessages(const struct UIOnlineMyQuickMessages* this)
+                         inlines  TArrayInternal<UIOnlineMyQuickMessages::DstMenuItem_olqm,AptStructSwapper>::TArrayInternal, TExternArray<UIOnlineMyQuickMessages::DstMenuItem_olqm>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   57  000F0680     90  void UIOnlineMyQuickMessages::Init(const struct UIOnlineMyQuickMessages* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   70  00047FAC     A4  void UIOnlineMyQuickMessages::Show(const struct UIOnlineMyQuickMessages* this)
+                         local  int32 numElements
+                         local  int32 i
+   87  00048050      4  void UIOnlineMyQuickMessages::Hide(const struct UIOnlineMyQuickMessages* this)
+   95  00048054    114  void UIOnlineMyQuickMessages::UpdateItemAndLabel(const struct UIOnlineMyQuickMessages* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_olqm* dest
+  137  00048168     24  void UIOnlineMyQuickMessages::LooseFocus(const struct UIOnlineMyQuickMessages* this, uint32 goingTo_Signature)
+  142  0006FC0C     D4  void UIOnlineMyQuickMessages::RegainFocus(const struct UIOnlineMyQuickMessages* this, uint32 comeFrom_Signature)
+                         local  int32 activeIndex
+                         local  char[256] stringBuffer
+  162  000AD3A4    25C  enum eAptHandleInput UIOnlineMyQuickMessages::HandleInput(const struct UIOnlineMyQuickMessages* this, int32 cID)
+                         local  int32 activeItem
+                         local  char* quickMessageString
+                         local  bool bBlankString
+                         local  int i
+                         inlines  _CountNonWhiteSpaceChar
+  224  000472B0      8  void UIOnlineMyQuickMessages::SetFromMessenger(const struct UIOnlineMyQuickMessages* this, bool flag)
+  229    inline-only   static int32 _CountNonWhiteSpaceChar(const char* szText)
+                         local  int32 iCount

@@ -1,0 +1,49 @@
+// ../../../../../TIGERCODE/packages/RNA/dev-2.0-golf/RNA/RNACore/include/RNABase/RNAVector.h
+// compiled in: rnaunity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+  106    inline-only   void PushBack(const struct <anon>* this, const const struct <anon>& elem)
+  125    inline-only   void Erase(const struct <anon>* this, int32_t i)
+                         local  const char[6] __FUNCTION__
+                         local  int32_t idx
+                         local  const char[7] __FUNCTION__
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AssetC** newData
+                         local  int32_t i
+                         local  int32_t i
+  138    inline-only   void Clear(const struct <anon>* this)
+                         local  int32_t i
+  150    inline-only   void Resize(const struct <anon>* this, int32_t size)
+                         local  int32_t idx
+                         local  int32_t i
+  190    inline-only   void Reserve(const struct <anon>* this, int32_t size)
+  197    inline-only   int32_t Size(const const struct <anon>* this)
+  210    inline-only   struct <anon>& operator[](const const struct <anon>* this, int32_t i)
+                         local  const char[11] __FUNCTION__
+  247    inline-only   void Init(const struct <anon>* this, bool8_t noShrink)
+  254    inline-only   void Grow(const struct <anon>* this, int32_t n, bool bReserve)
+                         local  const char[5] __FUNCTION__
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AssetC** newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AssetC** newData
+                         local  int32_t i
+                         local  int32_t i
+  312    inline-only   void Shrink(const struct <anon>* this)
+                         local  const char[7] __FUNCTION__
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AssetC** newData
+                         local  int32_t i
+                         local  int32_t i
+  349    inline-only   void Copy(const struct <anon>* this, const const struct <anon>& v)
+                         local  const char[5] __FUNCTION__
+                         local  uint32_t arraySize
+                         local  const char* buf
+                         local  int32_t i
+  373    inline-only   void Construct(const struct <anon>* this, struct AssetC** pointer, const const struct AssetC*& value)
+  377    inline-only   void Destroy(const struct <anon>* this, struct AssetC** pointer)

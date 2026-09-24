@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Shared/refpack/refabout.cpp
+// compiled in: other_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   71  003FDDF4    1A0  struct CODEXABOUT* REF_about()
+                         local  const char[10] __FUNCTION__
+                         local  struct CODEXABOUT* info
+                         inlines  TagValuePair, operator+

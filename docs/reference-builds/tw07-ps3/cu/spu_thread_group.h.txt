@@ -1,0 +1,64 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/target/ppu/include/sys/spu_thread_group.h
+// compiled in: managerplat.cpp
+// 6 functions, source order. line | PS3 address | size
+
+  148    inline-only   static int sys_spu_thread_group_create(sys_spu_thread_group_t* id, unsigned int num, int prio, sys_spu_thread_group_attribute_t* attr)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n
+  159    inline-only   static int sys_spu_thread_group_destroy(sys_spu_thread_group_t id)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n
+  170    inline-only   static int sys_spu_thread_group_start(sys_spu_thread_group_t id)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n
+  207    inline-only   static int sys_spu_thread_group_suspend(sys_spu_thread_group_t id)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n
+  217    inline-only   static int sys_spu_thread_group_resume(sys_spu_thread_group_t id)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n
+  263    inline-only   static int sys_spu_thread_group_join(sys_spu_thread_group_t gid, int* cause, int* status)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n

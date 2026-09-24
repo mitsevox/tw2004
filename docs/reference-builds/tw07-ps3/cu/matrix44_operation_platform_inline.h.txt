@@ -1,0 +1,22 @@
+// ../../../../../TIGERCODE/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/matrix44_operation_platform_inline.h
+// compiled in: rnaunity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   63    inline-only   struct <anon> vpu::Mult(struct <anon>& v, struct <anon>& m)
+                         local  Vector4Intrinsic_32 x
+                         local  Vector4Intrinsic_32 y
+                         local  Vector4Intrinsic_32 z
+                         local  Vector4Intrinsic_32 w
+                         local  Vector4Intrinsic_32 result
+                         local  int[4] zero
+   80    inline-only   struct <anon> vpu::Mult(struct <anon>& m, struct <anon>& b)
+  133    inline-only   struct <anon> vpu::Transpose(struct <anon>& m)
+                         local  struct <anon>& r
+                         local  struct <anon> r
+                         local  Vector4Intrinsic_32 temp0
+                         local  Vector4Intrinsic_32 temp1
+                         local  Vector4Intrinsic_32 temp2
+                         local  Vector4Intrinsic_32 temp3
+  141    inline-only   struct <anon> vpu::Inverse(struct <anon>& m, const struct <anon>& determinant)
+                         local  struct <anon>& r
+                         local  struct <anon> r

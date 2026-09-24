@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/Callbacks.h
+// compiled in: Database.cpp, ExtIoCallback.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   68  0081B224     6C  void ~IOCallback(const struct <anon>* this)
+  300  007CA948     2C  struct IMemoryManager* GetMemoryManager()

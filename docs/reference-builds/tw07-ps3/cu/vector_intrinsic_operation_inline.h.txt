@@ -1,0 +1,190 @@
+// ../../../../../TIGERCODE/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/vector_intrinsic_operation_inline.h
+// compiled in: apt_unity.cpp, golf_unity.cpp, headgate_unity.cpp, rnaunity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   67    inline-only   Vector4Intrinsic_32 vpu::_asmCreateVector(float x, float y)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 vi_temp
+   74    inline-only   Vector4Intrinsic_32 vpu::_asmCreateVector(float x, float y, float z)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 vi_temp
+   81    inline-only   Vector4Intrinsic_32 vpu::_asmCreateVector(float x, float y, float z, float w)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 vi_temp
+  121    inline-only   Vector4Intrinsic_32 vpu::_asmCreateVectorAxis<VectorAxisX, VectorAxisY, VectorAxisZ>(Vector4Intrinsic_32_InParam x, Vector4Intrinsic_32_InParam y, Vector4Intrinsic_32_InParam z)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 result
+                         local  unsigned char[16] permuteControl
+  266    inline-only   Vector4Intrinsic_32 vpu::_asmMult(Vector4Intrinsic_32_InParam v0, Vector4Intrinsic_32_InParam v1)
+                         local  Vector4Intrinsic_32 ret
+                         local  int[4] zero
+  480    inline-only   Vector4Intrinsic_32 vpu::_asmAdd(Vector4Intrinsic_32_InParam v0, Vector4Intrinsic_32_InParam v1)
+                         local  Vector4Intrinsic_32 ret
+  489    inline-only   Vector4Intrinsic_32 vpu::_asmSubtract(Vector4Intrinsic_32_InParam v0, Vector4Intrinsic_32_InParam v1)
+                         local  Vector4Intrinsic_32 ret
+  533    inline-only   bool vpu::_asmIsEqualV4(Vector4Intrinsic_32_InParam v0, Vector4Intrinsic_32_InParam v1)
+                         local  bool ret
+  542    inline-only   bool vpu::_asmIsEqualV3(Vector4Intrinsic_32_InParam v0, Vector4Intrinsic_32_InParam v1)
+                         local  bool ret
+                         local  Vector4Intrinsic_32 v0comp
+                         local  Vector4Intrinsic_32 v1comp
+  551    inline-only   bool vpu::_asmIsEqualV2(Vector4Intrinsic_32_InParam v0, Vector4Intrinsic_32_InParam v1)
+                         local  bool ret
+                         local  Vector4Intrinsic_32 v0comp
+                         local  Vector4Intrinsic_32 v1comp
+  796    inline-only   Vector4Intrinsic_32 vpu::_asmDot(Vector4Intrinsic_32_InParam v0, Vector4Intrinsic_32_InParam v1)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 xx_yy_zz_ww
+                         local  Vector4Intrinsic_32 zz_ww
+                         local  Vector4Intrinsic_32 xxpluszz_yyplusww
+                         local  Vector4Intrinsic_32 yyplusww
+  826    inline-only   Vector4Intrinsic_32 vpu::_asmSquareRoot(Vector4Intrinsic_32_InParam x)
+                         local  Vector4Intrinsic_32 ret
+                         local  const Vector4Intrinsic_32 zero
+                         local  Vector4Intrinsic_32 isZeroMask
+                         local  Vector4Intrinsic_32 recipSqrt
+                         local  Vector4Intrinsic_32 result
+                         local  Vector4Intrinsic_32 secondEstimate
+                         local  Vector4Intrinsic_32 vZero
+                         local  Vector4Intrinsic_32 vOne
+                         local  Vector4Intrinsic_32 vHalf
+                         local  Vector4Intrinsic_32 estimate
+                         local  Vector4Intrinsic_32 vZero
+                         local  Vector4Intrinsic_32 vOne
+                         local  Vector4Intrinsic_32 vHalf
+  835    inline-only   Vector4Intrinsic_32 vpu::_asmSquareRootDot(Vector4Intrinsic_32_InParam v0, Vector4Intrinsic_32_InParam v1)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 dotproduct
+                         local  Vector4Intrinsic_32 xx_yy_zz_ww
+                         local  Vector4Intrinsic_32 zz_ww
+                         local  Vector4Intrinsic_32 xxpluszz_yyplusww
+                         local  Vector4Intrinsic_32 yyplusww
+                         local  const Vector4Intrinsic_32 zero
+                         local  Vector4Intrinsic_32 isZeroMask
+                         local  Vector4Intrinsic_32 recipSqrt
+                         local  Vector4Intrinsic_32 result
+                         local  Vector4Intrinsic_32 secondEstimate
+                         local  Vector4Intrinsic_32 vZero
+                         local  Vector4Intrinsic_32 vOne
+                         local  Vector4Intrinsic_32 vHalf
+                         local  Vector4Intrinsic_32 estimate
+                         local  Vector4Intrinsic_32 vZero
+                         local  Vector4Intrinsic_32 vOne
+                         local  Vector4Intrinsic_32 vHalf
+  845    inline-only   Vector4Intrinsic_32 vpu::_asmSquareRootDotV3(Vector4Intrinsic_32_InParam v0, Vector4Intrinsic_32_InParam v1)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 dotproduct
+                         local  Vector4Intrinsic_32 xx_yy_zz
+                         local  Vector4Intrinsic_32 yy
+                         local  Vector4Intrinsic_32 zz
+                         local  const Vector4Intrinsic_32 zero
+                         local  Vector4Intrinsic_32 isZeroMask
+                         local  Vector4Intrinsic_32 recipSqrt
+                         local  Vector4Intrinsic_32 result
+                         local  Vector4Intrinsic_32 secondEstimate
+                         local  Vector4Intrinsic_32 vZero
+                         local  Vector4Intrinsic_32 vOne
+                         local  Vector4Intrinsic_32 vHalf
+                         local  Vector4Intrinsic_32 estimate
+                         local  Vector4Intrinsic_32 vZero
+                         local  Vector4Intrinsic_32 vOne
+                         local  Vector4Intrinsic_32 vHalf
+  875    inline-only   Vector4Intrinsic_32 vpu::_asmReciprocalSquareRootDotV3(Vector4Intrinsic_32_InParam v0, Vector4Intrinsic_32_InParam v1)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 dotproduct
+                         local  Vector4Intrinsic_32 xx_yy_zz
+                         local  Vector4Intrinsic_32 yy
+                         local  Vector4Intrinsic_32 zz
+                         local  Vector4Intrinsic_32 secondEstimate
+                         local  Vector4Intrinsic_32 vZero
+                         local  Vector4Intrinsic_32 vOne
+                         local  Vector4Intrinsic_32 vHalf
+                         local  Vector4Intrinsic_32 estimate
+                         local  Vector4Intrinsic_32 vZero
+                         local  Vector4Intrinsic_32 vOne
+                         local  Vector4Intrinsic_32 vHalf
+ 1159    inline-only   void vpu::_asmInverse(const Vector4Intrinsic_32& od, const Vector4Intrinsic_32& ox, const Vector4Intrinsic_32& oy, const Vector4Intrinsic_32& oz, const Vector4Intrinsic_32& ow, Vector4Intrinsic_32_InParam ix, Vector4Intrinsic_32_InParam iy, Vector4Intrinsic_32_InParam iz, Vector4Intrinsic_32_InParam iw)
+                         local  Vector4Intrinsic_32 shift1X
+                         local  Vector4Intrinsic_32 shift1Y
+                         local  Vector4Intrinsic_32 shift1Z
+                         local  Vector4Intrinsic_32 shift1W
+                         local  Vector4Intrinsic_32 shift2X
+                         local  Vector4Intrinsic_32 shift2Y
+                         local  Vector4Intrinsic_32 shift2Z
+                         local  Vector4Intrinsic_32 shift2W
+                         local  Vector4Intrinsic_32 shift3X
+                         local  Vector4Intrinsic_32 shift3Y
+                         local  Vector4Intrinsic_32 shift3Z
+                         local  Vector4Intrinsic_32 shift3W
+                         local  Vector4Intrinsic_32 productYZW
+                         local  Vector4Intrinsic_32 productZWX
+                         local  Vector4Intrinsic_32 productWXY
+                         local  Vector4Intrinsic_32 productXYZ
+                         local  Vector4Intrinsic_32 x
+                         local  Vector4Intrinsic_32 y
+                         local  Vector4Intrinsic_32 z
+                         local  Vector4Intrinsic_32 w
+                         local  Vector4Intrinsic_32 tmp0
+                         local  Vector4Intrinsic_32 tmp1
+                         local  Vector4Intrinsic_32 tmp2
+                         local  int[4] zero
+                         local  Vector4Intrinsic_32 _asmNegateYW_mask
+                         local  Vector4Intrinsic_32 _asmGetSignMaskYW_zero
+                         local  unsigned char[16] permuteControl
+                         local  unsigned char[16] permuteControl
+                         local  Vector4Intrinsic_32 tmp0
+                         local  Vector4Intrinsic_32 tmp1
+                         local  Vector4Intrinsic_32 tmp2
+                         local  int[4] zero
+                         local  Vector4Intrinsic_32 _asmNegateXZ_mask
+                         local  Vector4Intrinsic_32 _asmGetSignMaskXZ_zero
+                         local  unsigned char[16] permuteControl
+                         local  unsigned char[16] permuteControl
+                         local  Vector4Intrinsic_32 tmp0
+                         local  Vector4Intrinsic_32 tmp1
+                         local  Vector4Intrinsic_32 tmp2
+                         local  int[4] zero
+                         local  Vector4Intrinsic_32 _asmNegateYW_mask
+                         local  Vector4Intrinsic_32 _asmGetSignMaskYW_zero
+                         local  unsigned char[16] permuteControl
+                         local  unsigned char[16] permuteControl
+                         local  Vector4Intrinsic_32 tmp0
+                         local  Vector4Intrinsic_32 tmp1
+                         local  Vector4Intrinsic_32 tmp2
+                         local  int[4] zero
+                         local  Vector4Intrinsic_32 _asmNegateXZ_mask
+                         local  Vector4Intrinsic_32 _asmGetSignMaskXZ_zero
+                         local  unsigned char[16] permuteControl
+                         local  unsigned char[16] permuteControl
+                         local  Vector4Intrinsic_32 xx_yy_zz_ww
+                         local  Vector4Intrinsic_32 zz_ww
+                         local  Vector4Intrinsic_32 xxpluszz_yyplusww
+                         local  Vector4Intrinsic_32 yyplusww
+                         local  Vector4Intrinsic_32 temp0
+                         local  Vector4Intrinsic_32 temp1
+                         local  Vector4Intrinsic_32 temp2
+                         local  Vector4Intrinsic_32 temp3
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  Vector4Intrinsic_32 secondEstimate
+                         local  Vector4Intrinsic_32 vOne
+                         local  Vector4Intrinsic_32 estimate
+                         local  Vector4Intrinsic_32 vOne
+                         local  int[4] zero
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  Vector4Intrinsic_32 secondEstimate
+                         local  Vector4Intrinsic_32 vOne
+                         local  Vector4Intrinsic_32 estimate
+                         local  Vector4Intrinsic_32 vOne
+                         local  int[4] zero
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  Vector4Intrinsic_32 secondEstimate
+                         local  Vector4Intrinsic_32 vOne
+                         local  Vector4Intrinsic_32 estimate
+                         local  Vector4Intrinsic_32 vOne
+                         local  int[4] zero
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  Vector4Intrinsic_32 secondEstimate
+                         local  Vector4Intrinsic_32 vOne
+                         local  Vector4Intrinsic_32 estimate
+                         local  Vector4Intrinsic_32 vOne
+                         local  int[4] zero

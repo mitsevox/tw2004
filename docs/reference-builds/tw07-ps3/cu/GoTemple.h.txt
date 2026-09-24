@@ -1,0 +1,20 @@
+// ../../../../../TIGERCODE/Code/Golf/Temple/GoTemple.h
+// compiled in: golf2_unity.cpp, golf_unity.cpp, other_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   73  00236D40     38  void GoTemple::GoTemple(const struct GoTemple* this)
+   74    inline-only   enum TempleStateE GoTemple::GetCurrentState(const struct GoTemple* this)
+   75    inline-only   bool GoTemple::IsTempleLoaded(const struct GoTemple* this)
+   76    inline-only   struct GoTempleEnv* GoTemple::GetTemplEnv(const struct GoTemple* this)
+   77    inline-only   void GoTemple::EnableMaterialFiltering(const struct GoTemple* this, bool bEnable)
+   78    inline-only   bool GoTemple::IsMaterialFilteringEnabled(const struct GoTemple* this)
+   79    inline-only   int8_t GoTemple::GetGreenIndex(const struct GoTemple* this)
+   81    inline-only   bool GoTemple::HasBallHitTheScreen(const struct GoTemple* this)
+   84    inline-only   float[4]* GoTemple::GetRecPositionArray(const struct GoTemple* this)
+   85    inline-only   int32_t GoTemple::GetNumOfRecs(const struct GoTemple* this)
+   86    inline-only   bool GoTemple::IsSequencePlaying(const struct GoTemple* this)
+   87    inline-only   bool GoTemple::AreWeGoingToMiniGames(const struct GoTemple* this)
+   88    inline-only   const char* GoTemple::GetCurrTrinSequence(const struct GoTemple* this)
+   89    inline-only   bool GoTemple::IsReloadPending(const struct GoTemple* this)
+  104    inline-only   bool GoTemple::IsSleeping(const struct GoTemple* this)
+  107    inline-only   struct PhysicsBall_t* GoTemple::GetBall(const struct GoTemple* this)

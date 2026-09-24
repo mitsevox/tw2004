@@ -1,0 +1,32 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/virtualdriveurl.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   79  005E9DB0     EC  void VirtualDriveURL(const struct <anon>* this, const char8_t* pName)
+  115  005C21A0     58  void ~VirtualDriveURL(const struct <anon>* this)
+                         inlines  ~DeviceDriver
+  142  005C21F8      8  bool Init(const struct <anon>* this)
+  174  005C2200      C  void* Open(const struct <anon>* this, const char8_t* pFileToOpen, uint32_t , struct Handle** )
+  201  005C220C      4  void Close(const struct <anon>* this, void* )
+  234  005C2384    190  uint32_t Read(const struct <anon>* this, void* , void* pDestBuf, uint32_t uDestBufsize, struct DeviceDriver* , void* )
+                         local  const uint32_t FILEBUFSIZE
+                         local  uint32_t uAmountToCopy
+                         local  uint32_t uAmountAvailable
+                         local  uint32_t uAlreadyCopied
+                         local  char8_t* pCharDest
+                         local  uint32_t uPartiallyCopied
+                         local  uint32_t uAmountLeftInFile
+  332  005C2210    174  uint32_t TakeBytesFromCircularBuffer(const struct <anon>* this, void* pDestBuf, uint32_t uAmountToCopy)
+                         local  uint8_t* pDest
+                         local  uint8_t* pSource
+                         local  uint32_t uAmountToMove
+  410  005C2514     18  uint64_t Seek(const struct <anon>* this, void* , uint64_t uOffset, int32_t iWhence, struct DeviceDriver* , void* )
+  453  005C252C      C  uint64_t GetSize(const struct <anon>* this, void* )
+  474  005C2538     18  uint32_t GetMaxReadSize(const struct <anon>* this)
+                         local  uint32_t uReturn
+  505  005BFC84     9C  void RestartStream(const struct <anon>* this)
+  542  005BFD78    1A8  uint32_t CopyToFileBuffer(const struct <anon>* this, const void* pBuf, uint32_t uBufSize)
+                         local  uint32_t uFreeSpace
+                         local  uint32_t uAmountToCopy
+  617  005B5E88     84  bool ReadyToStream(const struct <anon>* this)
+  675  005BFD20     58  void SetupFileBuffer(const struct <anon>* this, uint32_t uFileSize, uint32_t uDirtySockBufferSize)

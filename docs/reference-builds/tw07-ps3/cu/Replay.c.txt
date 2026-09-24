@@ -1,0 +1,58 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Replay/Replay.c
+// compiled in: golf2_unity.cpp
+// 22 functions, source order. line | PS3 address | size
+
+   96  0015D800    158  void REPLAY_InitModule()
+                         local  const char[18] __FUNCTION__
+                         inlines  TagValuePair, operator+
+  118  0012D3C4     50  void REPLAY_CloseModule()
+  127  0012D414     1C  void REPLAY_Init()
+  137  001A1AA4    24C  void REPLAY_Save(enum PlayerNumber_t PlayerID)
+                         inlines  cGAME_GLOBALS::SetReplayActive
+  180  0012D430     18  float REPLAY_GetShotPower()
+  189  0015B5C0     1C  void REPLAY_GetClubDirection(const vec4flt& outDir)
+                         inlines  vec4flt_Copy, vec_st
+  199  001A17A8    2FC  void REPLAY_CaptureMoment(enum PlayerNumber_t PlayerID, const struct REPLAY_MOMENT_t& theReplayMoment)
+                         local  int holeNum
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  struct PhysicsBall_t* ball
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, cGAME_GLOBALS::SetRandomSeed
+  296  0012D448     24  void REPLAY_ResetController(enum PlayerNumber_t PlayerID, enum PlayerCtrl_t controller)
+  307  0012D46C     28  void REPLAY_SaveSpin(enum PlayerNumber_t PlayerID, float forwardSpin, float sideSpin)
+  320  0012D494     44  void REPLAY_GetSpin(enum PlayerNumber_t PlayerID, float* forwardSpin, float* sideSpin)
+  338  001C290C    304  void REPLAY_Play(enum PlayerNumber_t PlayerID)
+                         local  struct PhysicsBall_t ballCopy
+                         local  uint32 oldReplayFlags
+                         local  float oldReactionDist
+                         inlines  GamePlayer::GetReplayFlags, GamePlayer::GetTimedReactionDist, GamePlayer::SetReplayFlags, GamePlayer::SetTCSInitialized, GamePlayer::SetTimedReactionDist, cGAME_GLOBALS::SetReplayActive
+  422  0015EE5C     28  void REPLAY_Stop()
+                         inlines  cGAME_GLOBALS::SetReplayActive
+  434  0015EE84    1E0  void REPLAY_Restore(enum PlayerNumber_t PlayerID)
+                         inlines  GamePlayer::SetTCSInitialized
+  481  00152FA0     34  void REPLAY_RecordStart()
+  495  00152FD4     30  void REPLAY_RecordStop()
+  528    inline-only   static int sCrapLoaded(const char* name)
+                         local  int found
+                         local  int i
+                         local  const struct UserInfo& userInfo
+  545    inline-only   static int sFirstCrapLoaded()
+                         local  int found
+                         local  int i
+                         local  const struct UserInfo& userInfo
+  562    inline-only   static int sCrapPersonaIndex(enum UserNumber userSlot, const char* personaName)
+                         local  int found
+                         local  const struct UserInfo& userInfo
+                         local  uint32_t i
+                         local  const struct CRAPAlterEgo_t& alterEgo
+  584    inline-only   static bool sCrapSlotsFull()
+                         local  int nLoaded
+                         local  int i
+                         local  const struct UserInfo& userInfo
+  600  0016B078    2C4  void REPLAY_ChooseUser()
+                         local  int whoToPlay
+                         local  int userSlotIndex
+                         local  int firstCrapLoadedIndex
+                         local  int personaIndex
+                         inlines  sCrapLoaded, sCrapPersonaIndex, sCrapSlotsFull, sFirstCrapLoaded
+  638  0012D4D8     18  void* REPLAY_GetReplayMgr()
+  643  0012D4F0      C  int32 REPLAY_GetReplayMgrSizeof()

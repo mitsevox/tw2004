@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_SkillChallenge.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   20  001169CC    160  void UISkillChallenge::~UISkillChallenge(const struct UISkillChallenge* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UISkillChallenge::DstMenuItem_skil>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+   23  0010084C      C  uint32 UISkillChallenge::GetSignature(const const struct UISkillChallenge* this)
+   25  00100860      C  struct IExternArray* UISkillChallenge::GetExternArray(const struct UISkillChallenge* this)

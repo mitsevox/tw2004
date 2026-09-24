@@ -1,0 +1,25 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/gameuserconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   78  005B7224     C4  void GameSessionStateSuccess(const struct <anon>* this)
+  116  005B7358     EC  void GameSessionStateFailure(const struct <anon>* this, enum FailureCode eFailureCode)
+  156  005B72E8     44  enum FailureCode ConvertGameStateFailureToUserStateFailure(const struct <anon>* this, enum FailureCode eFailureCode)
+  198  005B732C     2C  enum FailureCode ConvertGameStateFailureToUserKickFailure(const struct <anon>* this, enum FailureCode eFailureCode)
+  242  005F1124     FC  void GameUserConcrete(const struct <anon>* this, LobbyApiPlayerT* pLobbyApiPlayer, const struct DictionaryConcrete* )
+                         inlines  RCPointer, operator=
+  274  005F131C    124  void GameUserConcrete(const struct <anon>* this, struct <anon>* pOtherGameUser)
+                         local  struct MemoryStrategy* pPersistentMemory
+                         inlines  RCPointer, operator=
+  305  005F1564     58  void ~GameUserConcrete(const struct <anon>* this)
+                         inlines  ~RCPointer
+  327  005E15B8     80  struct Operation* Kick(const struct <anon>* this, struct <anon>* pCallback)
+                         local  struct GameSessionManagerConcrete* pGameManager
+                         local  struct GameSessionConcrete* pGameSession
+                         inlines  GetJoinedGameSession
+  362  005E1638     8C  struct Operation* SetState(const struct <anon>* this, const struct Dictionary* pInputState, struct <anon>* pCallback)
+                         local  struct GameSessionManagerConcrete* pGameManager
+                         local  struct GameSessionConcrete* pGameSession
+                         inlines  GetJoinedGameSession
+  396  005CD624     A8  struct User* GetAsUser(const const struct <anon>* this)
+                         local  struct <anon>* pUserManager

@@ -1,0 +1,6 @@
+// ../ears_rt_cct/dev/api_src/Internal/FrameBuilder.h
+// compiled in: FrameBuilder.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   48  005B0C48     60  void FrameBuilder(const struct <anon>* this, struct Character* viewInfo, const struct MotionDefinition* motionRef, const struct SkeletonFilterRef* filterRef)
+   73  005B0AA0     D4  void Params::Params(const struct Params* this, int32_t c, int32_t p, int32_t t)

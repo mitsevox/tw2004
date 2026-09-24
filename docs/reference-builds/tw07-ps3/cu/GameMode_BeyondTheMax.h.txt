@@ -1,0 +1,20 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/Headers/GameMode_BeyondTheMax.h
+// compiled in: golf_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   20  0033F428      8  enum PlayerNumber_t GameModeBeyondTheMax::GetHonors(const struct GameModeBeyondTheMax* this, enum PlayerNumber_t ignore, bool doNotIgnoreHoledOut)
+   28  0033F430      8  bool GameModeBeyondTheMax::SkipPreShotAnimation(const struct GameModeBeyondTheMax* this)
+   29  0033F438     2C  enum PlayerNumber_t GameModeBeyondTheMax::GetHoleWinner(const const struct GameModeBeyondTheMax* this)
+   32  0033F464      8  bool GameModeBeyondTheMax::GoToGreenSelection(const struct GameModeBeyondTheMax* this)
+   34  0033F46C      8  bool GameModeBeyondTheMax::IsGreenSelectionEnabled(const const struct GameModeBeyondTheMax* this)
+   35  0033F474      8  bool GameModeBeyondTheMax::IsCupSelectionEnabled(const const struct GameModeBeyondTheMax* this)
+   36  0033F47C      8  bool GameModeBeyondTheMax::IsPlaceBallEnabled(const const struct GameModeBeyondTheMax* this)
+   39  0033F484     18  const char* GameModeBeyondTheMax::GetModeSpecificTipString(const struct GameModeBeyondTheMax* this)
+   41  0033F49C      8  bool GameModeBeyondTheMax::UseCupPosForInitialPlaceBallPos(const const struct GameModeBeyondTheMax* this)
+   44  0033F4A4      8  enum UIScoreCardDispMode_t GameModeBeyondTheMax::GetScoreDisplayMode(const struct GameModeBeyondTheMax* this, bool getAlternate)
+   53  0033F4AC      8  bool GameModeBeyondTheMax::IsShotClockForSinglePlayer(const struct GameModeBeyondTheMax* this)
+   54  0033F4B4      8  bool GameModeBeyondTheMax::IsShotClockPermanent(const struct GameModeBeyondTheMax* this)
+   55  0033F4BC      8  bool GameModeBeyondTheMax::ResetShotClockAfterEachHit(const struct GameModeBeyondTheMax* this)
+   56  0033F4C4      8  bool GameModeBeyondTheMax::IsTimedMode(const struct GameModeBeyondTheMax* this)
+   64  0033F4CC      8  bool GameModeBeyondTheMax::ShowShotHistory(const struct GameModeBeyondTheMax* this)
+   67  0033F4D4      8  bool GameModeBeyondTheMax::ShowShotInfo(const struct GameModeBeyondTheMax* this)

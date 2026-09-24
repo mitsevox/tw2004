@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/ProfileBars/profile_bars.cpp
+// compiled in: golf_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   61  00228488      4  void ProfileBars::Open(const struct ProfileBars* this, unsigned int barIndex)
+   75  0022848C      4  void ProfileBars::Close(const struct ProfileBars* this, unsigned int barIndex)
+   93  00228490      4  void ProfileBars::Draw(const struct ProfileBars* this)
+  199  00228494      4  void ProfileBars::CloseCallback(uint32 dwCallbackInfo)
+  207  00228498      4  void ProfileBars::OpenCallback(uint32 dwCallbackInfo)

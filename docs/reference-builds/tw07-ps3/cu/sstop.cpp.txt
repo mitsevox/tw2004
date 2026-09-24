@@ -1,0 +1,7 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sstop.cpp
+// compiled in: sstop.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   24  006CDEBC    110  int SNDstop(int shandle)
+                         local  int voice
+                         local  int setvoice

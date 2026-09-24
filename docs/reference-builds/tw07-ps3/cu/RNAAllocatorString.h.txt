@@ -1,0 +1,5 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNABase/RNAAllocatorString.h
+// compiled in: RNAAllocatorString.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   36  0081F3F4      C  void ~IStringAllocator(const struct IStringAllocator* this)

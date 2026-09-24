@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/animation/char_util.c
+// compiled in: golf2_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   71  0013D4C0    104  void ExtractFileName(const char* srcPath, char* dstPath, size_t destBufLen)
+                         local  int32 num1
+                         local  int32 num2
+   90  0013D5C4     FC  void ExtractFilePath(char* srcPath, char* dstPath, size_t destBufLen)
+                         local  int32 num1
+                         local  int32 num2

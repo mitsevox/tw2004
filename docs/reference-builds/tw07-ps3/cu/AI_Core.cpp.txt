@@ -1,0 +1,146 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/AI/AI_Core.cpp
+// compiled in: golf2_unity.cpp
+// 41 functions, source order. line | PS3 address | size
+
+   82  0019616C    1D4  void AICore::AICore(const struct AICore* this)
+                         inlines  Singleton<AICore>::Singleton
+  150  0018EE4C    C00  void AICore::Init(const struct AICore* this)
+                         local  int32 index
+                         local  int id
+                         local  int catId
+                         local  int id
+                         local  int catId
+                         local  int diffLevel
+                         inlines  AINetworkMgr, Singleton<GolferStats>::GetSingleton
+  330  00183654     F4  void AICore::Close(const struct AICore* this)
+  360  001835C8     8C  void AICore::FreeNetworks(const struct AICore* this)
+                         local  struct AIPolylineNetwork* network
+                         inlines  Singleton<AIFeatureNetworkMgr>::GetSingletonPtr
+  384  001DACB0    530  void AICore::InitialSetup(const struct AICore* this, enum PlayerNumber_t playerId, bool updateAnimation, bool useConstantPower)
+                         local  struct AIBrain* brain
+                         local  struct GolferData_t* golferData
+                         local  float distToPin
+                         local  struct GamePlayer* player
+                         local  float dx
+                         local  float dz
+                         local  float distToPin
+                         local  enum ShotType_t shotType
+                         local  enum Club_t club
+                         inlines  AIBrain::SetState, AIMgr, GamePlayer::GetCurrentShot, GamePlayer::GetGolferData, LLMath_DistanceBetween3, Misc_RandFuncf, std::sqrt, vec4flt_Copy
+  518  001CD570     4C  bool AICore::Think(const struct AICore* this, enum PlayerNumber_t playerId, bool mustFinish, bool useSuckaForEstimate)
+  530  001B09F0     2C  void AICore::ScrewItUp(const struct AICore* this, enum PlayerNumber_t playerId)
+  542  0019FAE0     6C  void AICore::ApplyMishit(const struct AICore* this, enum PlayerNumber_t playerId)
+                         local  struct AIBrain* brain
+                         local  enum AIMishitType mishitType
+                         local  uint8 severity
+  569  001830C4    134  struct AIBrain* AICore::GetBrain(const struct AICore* this, enum PlayerNumber_t playerId, bool dontAllocate)
+                         local  struct AIBrain* brain
+                         local  int32 i
+                         local  int32 i
+                         inlines  AIBrain::SetInUse
+  627  001B7E94     2C  void AICore::SetupTarget(const struct AICore* this, enum PlayerNumber_t playerId)
+  639  0018CB54     50  void AICore::SetTarget(const struct AICore* this, enum PlayerNumber_t playerId, const float* target)
+                         local  struct AIBrain* brain
+  655  0018C89C    2B8  void AICore::SetTarget(const struct AICore* this, struct CoreShotInfo_t* shotInfo, enum ShotType_t shotType, enum Club_t club, const float* location)
+                         local  vec4flt vec
+                         local  float tempf
+                         local  float fMaxClubDistance
+                         local  float fPercentOfMaxClubDistance
+                         local  struct TGD_MaterialInfo* pMaterialInfo
+                         local  int matSurf
+                         local  float sinp
+                         local  float cosp
+                         inlines  std::cosf, std::sinf, std::sqrt, vec4flt_Copy
+  777  001832EC     54  void AICore::ReleaseBrain(const struct AICore* this, enum PlayerNumber_t playerId)
+                         local  struct AIBrain* brain
+  794  001452F8     78  void AICore::ReleaseBrain(const struct AICore* this, struct AIBrain* brain)
+                         inlines  AIBrain::SetInUse
+  812  001831F8     F4  void AICore::HandleCollision(const struct AICore* this, struct PhysicsBall_t* pBall, const float* location, const float* normal, const float* linVelocity, const struct TGD_MaterialInfo* materialInfo, const TGD_ObjectInstanceInfo* objectInfo)
+                         local  struct AIBrain* brain
+  836  001B7D1C    178  void AICore::CreatePhantom(const struct AICore* this, enum PlayerNumber_t playerId)
+                         local  struct CoreShotInfo_t* shotInfo
+                         local  struct AIBrain* brain
+                         inlines  AIBrain::SetLimitAttempts
+  886  001CD1AC     40  bool AICore::PhantomThinkOnlineClient(const struct AICore* this)
+  901  001CCF94    218  bool AICore::PhantomThink(const struct AICore* this)
+                         local  struct CoreShotInfo_t* playerShotInfo
+                         local  float dist
+                         inlines  LLMath_SquareDistanceBetween3, vec_madd, vec_sld
+  952  00197A6C    7E8  void AICore::PhantomImpartKnowledge(const struct AICore* this, enum PlayerNumber_t PlayerID)
+                         local  struct CoreShotInfo_t* playerShotInfo
+                         local  const enum ShotType_t phantomShot
+                         local  const enum ShotType_t playerShot
+                         local  bool boostIsOn
+                         local  float boostAmount
+                         local  float diff
+                         local  float blingDirRange
+                         local  float diff_strength
+                         local  float diff_puttPowerRange
+                         local  float diff_puttDirectionRange
+                         local  float diff_directionRange
+                         local  bool skipShotCheck
+                         local  float diffDegrees
+                         local  float diffDegrees
+                         inlines  AICore::DebugPhantom, PhysicsBall_t::SetFlag, Singleton<DifficultySettings>::GetSingleton
+ 1215  00133338    1AC  void AICore::PhantomGiveItToMeNow(const struct AICore* this, enum PlayerNumber_t PlayerID)
+                         local  struct CoreShotInfo_t* playerShotInfo
+ 1249  00153520    11C  void AICore::PhantomForceItIn(const struct AICore* this, enum PlayerNumber_t PlayerID)
+                         inlines  PhysicsBall_t::SetFlag
+ 1289  0015BD84    14C  void AICore::PhantomPuttMe(const struct AICore* this, enum PlayerNumber_t PlayerID, float* vec, bool* readingGreen, bool* unavailable)
+                         local  struct CoreShotInfo_t* playerShotInfo
+                         inlines  vec4flt_Copy
+ 1334  00133A68     44  void AICore::ReleasePhantom(const struct AICore* this)
+ 1346  00144344     54  uint32 AICore::PhysicsStepsPF(const struct AICore* this, const struct AIBrain* brain)
+                         local  uint32 steps
+ 1365  001450F8     24  float AICore::CalcDistModifier(const struct AICore* this, float sinLaunchAngle, float heightDiff)
+ 1378  00144898     48  float AICore::GetLieScore(const struct AICore* this, enum Lie_t lie)
+                         local  float value
+                         local  int32 i
+ 1399  00190B4C     A8  bool AICore::IsCorrectModeForCharNode(const struct AICore* this, uint16 flags)
+                         local  bool correctMode
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+ 1424  00144398    498  bool AICore::GetScrewItUpValues(const struct AICore* this, enum STAT_e statType, uint32 stat, const float& maxAngError, const float& maxDistError, const uint32& numRolls)
+                         local  uint32 upperIndex
+                         local  uint32 lowerIndex
+                         local  uint32 sectionStart
+                         local  float interpFrac
+ 1517  001441DC     18  const struct AIPolylineNetwork* AICore::GetNextAINetwork(const struct AICore* this, const struct AIPolylineNetwork* current)
+                         local  struct AIPolylineNetwork* next
+ 1542  00183340    108  void AICore::LoadAINetworkCB(struct TNetwork* network)
+                         local  struct AIPolylineNetwork* aiNetwork
+                         inlines  Singleton<AICore>::GetSingleton
+ 1563  00145370      8  bool AICore::ShouldLoadAINetworkCB(struct TNetwork* network)
+ 1571  00145378     A8  void* AICore_ChangeAIMultiplier(void* pMgr, TU_eCallbackReason reason, void* data, void* diffLevel)
+                         local  float val
+                         inlines  Singleton<GolferStats>::GetSingleton
+ 1582  00145420     EC  void* AICore_ChangeControllerStatus(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  enum PlayerNumber_t playerID
+                         local  struct CoreShotInfo_t* shotInfo
+                         inlines  GamePlayer::SetTimer
+ 1608  0015A180    9B0  void* AICore_CurrentGolferCB(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  enum PlayerNumber_t playerID
+                         local  struct CoreShotInfo_t* shotInfo
+                         local  struct GolferData_t* golferData
+                         local  int catId
+                         local  int id
+                         inlines  GamePlayer::GetGolferData
+ 1697  00182620    30C  void* AICore_ForcedMishitCB(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+                         local  int32 value
+                         inlines  AIMgr
+ 1739  00182314    30C  void* AICore_ForcedChiliDipCB(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+                         local  int32 value
+                         inlines  AIMgr
+ 1782  0018223C     D8  bool LoadLieTuningScore(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  char[80] buffer
+                         inlines  AIMgr
+ 1797  00182194     A8  bool SaveLieTuningScore(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         inlines  AIMgr
+ 1805  00145164     58  void AICore::RegisterLieTuningCommands(const struct AICore* this)
+ 1811  00180F74    310  int AICore::LoadLieScore(const struct AICore* this)
+                         local  int counter
+                         local  int index
+ 1838  0014550C    560  void AICore::SaveLieScore(const struct AICore* this)
+                         local  char[80] buffer
+                         local  int index

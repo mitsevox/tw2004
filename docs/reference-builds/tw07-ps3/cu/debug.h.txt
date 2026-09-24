@@ -1,0 +1,11 @@
+// ../../../../../TIGERCODE/RW45/platform/include/native/ps3-ppu-gcc/rw/core/debug/debug.h
+// compiled in: golf2_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+  510  001E7284     5C  void PrintFormatted(const struct <anon>* this, const char* pFormat)
+                         local  va_list argList
+  521  001E72E0     5C  void PrintFormattedChannel(const struct <anon>* this, const char* pFormat)
+                         local  va_list argList
+  558  001E733C     68  bool AssertFormatted(const struct <anon>* this, const char* pFormat)
+                         local  va_list argList
+                         local  const bool ret

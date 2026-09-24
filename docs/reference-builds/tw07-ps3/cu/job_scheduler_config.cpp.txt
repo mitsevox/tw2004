@@ -1,0 +1,13 @@
+// C:/packages/job_manager/1.11.00/source/common/job_scheduler_config.cpp
+// compiled in: job_scheduler_config.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   55  0070A704    108  void Initialize(uint32_t totalSPUs, uint32_t totalPPUs)
+                         local  uint32_t i
+   83  0070A80C      4  void Shutdown()
+   89  0070A810     E8  uint32_t RequestSPU()
+                         local  uint32_t i
+  105  0070A8F8     90  void ReleaseSPU(uint32_t id)
+  113  0070A988     78  uint32_t RequestPPU()
+  120  0070AA00     70  void ReleasePPU(uint32_t )
+  127  0070AA70      C  uint32_t GetBaseSPUEventPortID()

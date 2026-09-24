@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/online/osdk/debugstrategyconcrete.cpp
+// compiled in: golf2_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   66  00185EB4     18  void DebugStrategyConcrete::DebugStrategyConcrete(const struct DebugStrategyConcrete* this)
+   99  00129D9C     38  void DebugStrategyConcrete::~DebugStrategyConcrete(const struct DebugStrategyConcrete* this)
+                         inlines  ~DebugStrategy
+  128  00129DD4      4  void DebugStrategyConcrete::DebugAssert(const struct DebugStrategyConcrete* this, enum AssertionType eType, const char8_t* strTest, const char8_t* strFilename, uint32_t uLineNumber)
+  192  00129DD8     1C  void DebugStrategyConcrete::DebugSetAssertionMessage(const struct DebugStrategyConcrete* this, const char8_t* strFormat)
+  230  00129DF4     1C  void DebugStrategyConcrete::DebugPrintText(const struct DebugStrategyConcrete* this, const char8_t* strFormat)

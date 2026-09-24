@@ -1,0 +1,7 @@
+// C:/packages/rwaudiocore/2.08.01/include/rw/audio/core/pluginregistry.h
+// compiled in: dac.cpp, pluginregistry.cpp
+// 3 functions, source order. line | PS3 address | size
+
+  521    inline-only   struct <anon>* GetPlugInRegistryEntries(const struct PlugInRegistry* this)
+  527    inline-only   unsigned int GetNumPlugInsRegistered(const struct PlugInRegistry* this)
+  552    inline-only   struct <anon>* GetPlugInDescRunTimeFromNode(const struct PlugInRegistry* this, struct <anon>* pNode)

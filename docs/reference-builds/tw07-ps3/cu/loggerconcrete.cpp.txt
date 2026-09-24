@@ -1,0 +1,73 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/loggerconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 22 functions, source order. line | PS3 address | size
+
+   91  005CC968    12C  void OSDK_Telemetry(uint32_t uModuleID, uint32_t uGroupID, const char8_t* strEvent)
+                         local  const bool bEnabled
+                         local  struct LoggerConcrete* pLogger
+  133  005BB684    14C  void AbandonFirstUsageBuffer(const struct LoggerConcrete* this)
+                         local  uint32_t uFirstUsageNumEntries
+                         local  uint32_t uNormalUsageMaxEntries
+                         local  uint32_t uNormalUsageNumEntries
+                         local  uint32_t uNormalUsageFreeSpace
+                         local  uint32_t uNumToTransferFromFirstToNormal
+                         local  LobbyLoggerEventT ShuffledEvent
+  218  005CA88C    400  bool MergeLoadedFirstUsageData(const struct LoggerConcrete* this, const void* pBuf, uint32_t uBufSize)
+                         local  uint32_t uFirstUsageNumEntries
+                         local  uint32_t uFirstUsageMaxEntries
+                         local  uint32_t uNormalUsageNumEntries
+                         local  uint32_t uNormalUsageMaxEntries
+                         local  uint32_t uLoadedBufferNumEntries
+                         local  LobbyLoggerRefT* pLoggerLoaded
+                         local  LobbyLoggerEventT TempEvent
+                         local  uint32_t uLoadedToFirst
+                         local  uint32_t uLoadedToNormal
+                         local  uint32_t uFirstToNormal
+                         local  int32_t iResult
+                         local  LobbyLoggerEventT* pResult
+                         local  uint32_t uFirstSpaceLeft
+  409  0060B430    2A8  void LoggerConcrete(const struct LoggerConcrete* this)
+                         local  const struct CoreGameParameters* pCoreGameParams
+                         inlines  AddObserver, GetInstance, RCPointer
+  499  0060BD08     C8  void ~LoggerConcrete(const struct LoggerConcrete* this)
+                         inlines  ~RCPointer
+  522  005BB800     E0  void Event(const struct LoggerConcrete* this, uint32_t uModuleID, uint32_t uGroupID, const char8_t* pEvent)
+                         local  struct LoggerConcreteEventT* pDest
+  563  005CAC8C     60  bool SetFirstUsageData(const struct LoggerConcrete* this, const void* pBuf, uint32_t uBufSize)
+                         local  bool bReturn
+  596  005F9228    18C  void StateChanging(const struct LoggerConcrete* this, enum OsdkState eOldState, enum OsdkState eNewState)
+                         inlines  RemoveObserver, operator->, operator=
+  666  005ECFB4    1B0  void StateChanged(const struct LoggerConcrete* this, enum OsdkState eOldState, enum OsdkState eNewState)
+                         inlines  AddObserver, GetLobbyApi, operator=
+  713  005CA83C     50  void FirstUsageBufferFull(LobbyLoggerRefT* , void* pUserData)
+                         local  struct LoggerConcrete* pLoggerConcrete
+  749  005BB8E0     70  void FirstUsageBufferSendComplete(LobbyLoggerRefT* pLogger, void* pUserData)
+                         local  struct LoggerConcrete* pLoggerConcrete
+  787  005BB950      4  void FirstUsageBufferEmpty(LobbyLoggerRefT* , void* )
+  810  005D3AA4    13C  void SettingEvent(const struct LoggerConcrete* this, struct Setting* pSetting, enum EventE eEvent)
+                         local  const char8_t* pIdentifier
+                         inlines  operator->
+  880  005F93B4     A0  void SettingSaveResult(const struct LoggerConcrete* this, const struct Operation* , enum ResultE eResult)
+                         inlines  RemoveObserver, operator=
+  927  005D9E2C    1C4  void LogStartupTelemetryInfo(const struct LoggerConcrete* this)
+                         local  char8_t[16] strTemp
+  968  005E9C00    1B0  void Shutdown(const struct LoggerConcrete* this)
+                         inlines  GetInstance, RemoveObserver, operator=
+ 1038  005F9454    388  void ProcessComplete(const struct LoggerConcrete* this)
+                         local  struct LoggerConcreteEventT[16] tempEvents
+                         local  uint32_t uNumTempEvents
+                         local  uint32_t uLoop
+                         local  const struct LoggerConcreteEventT* pEvent
+                         inlines  GetSettingManagerConcrete, operator->, operator=
+ 1201  005BB954     54  uint32_t GetFirstUsageDataSize(const struct LoggerConcrete* this)
+                         local  uint32_t uReturn
+ 1229  005BB9A8     1C  uint32_t GetMaxFirstUsageDataSize(const struct LoggerConcrete* this)
+                         local  uint32_t uReturn
+ 1258  005BB9C4     E8  uint32_t GetFirstUsageData(const struct LoggerConcrete* this, void* pBuf, uint32_t uBufSize)
+                         local  uint32_t uReturn
+ 1315  005D9D88     A4  char8_t* SquishIllegalCharactersOutOfEventString(const struct LoggerConcrete* this, const char8_t* pSource, char8_t* pDest, uint32_t uDestSize)
+                         local  char8_t* pDestPtr
+                         inlines  IsLegalCharacter
+ 1367  005BBAAC     98  char8_t* ReplaceIllegalCharactersOutOfEventString(const struct LoggerConcrete* this, const char8_t* pSource, char8_t* pDest, uint32_t uDestSize)
+                         local  char8_t* pDestPtr
+                         inlines  IsLegalCharacter

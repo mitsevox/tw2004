@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/CourseWalk/CourseWalk.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   64  0034013C     A4  void CourseWalk::~CourseWalk(const struct CourseWalk* this)
+                         inlines  GameXMLCallback::~GameXMLCallback, ~vector

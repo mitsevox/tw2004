@@ -1,0 +1,9 @@
+// ../../../../../TIGERCODE/Code/Golf/Memory_Card/Headers/MC.h
+// compiled in: apt_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+  416    inline-only   int MC_CheckParam(int port, int slot)
+  516    inline-only   int MC_CallActionFnSave(MC_ArgsSaveT* pArgs)
+  526    inline-only   int MC_CallActionFnLoad(MC_ArgsLoadT* pArgs)
+  556    inline-only   int MC_CallActionFnMemoryRequired(MC_ArgsMemoryRequiredT* pArgs)
+  566    inline-only   void MC_SetCurrentFileType(MC_FileTypeE eFileType)

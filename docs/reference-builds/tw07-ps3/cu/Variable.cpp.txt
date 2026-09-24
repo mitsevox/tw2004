@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/Variable.cpp
+// compiled in: Variable.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   15  0059B4B8     20  void CCT::SetVariableFunctionTable(struct <anon>* table, int32_t numEntries)
+   22  0059B4D8     9C  float CCT::EvaluateVariable(int32_t index, struct Character* character)
+                         local  float value

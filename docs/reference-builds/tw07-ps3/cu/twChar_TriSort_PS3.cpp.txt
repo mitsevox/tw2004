@@ -1,0 +1,65 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/Geom/twChar_TriSort_PS3.cpp
+// compiled in: golf_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   18  0022D3F0    1B4  void STriangleSorter::init(const struct STriangleSorter* this, const uint32 numVerts, const TWCHAR_SKINVERTEX* pSrcVerts, uint32 numTris, const twIndexTri16* pSrcTris)
+                         local  uint32 t
+   67  0022D5A4     10  void STriangleSorter::term(const struct STriangleSorter* this)
+   82  0022D5B4     DC  void STriangleSorter::updateTriangleBuffer(const struct STriangleSorter* this, const twIndexTri16* pIndexBuffer)
+                         local  int32 t
+                         local  twIndexTri16* pTriIndices
+                         local  const uint16 srcTriIndex
+                         local  const const twIndexTri16& tri
+  126  002613FC    3E8  void STriangleSorter::sort(const struct STriangleSorter* this, float[4]* pMatrix, const float* pGlobalTranslation)
+                         local  uint32_t v
+                         local  uint32_t t
+                         local  const float* pMat
+                         local  float[4] row0
+                         local  float[4] row1
+                         local  float[4] row2
+                         local  float[4] row3
+                         local  union <anon> vec128_Min
+                         local  union <anon> vec128_Max
+                         local  float[4]* pDstVertex
+                         local  float[4] vGlobalTranslation
+                         local  float zMin
+                         local  float zMax
+                         local  float zRange
+                         local  float sBiasAmt
+                         local  float sMinAngle
+                         local  float zBias
+                         local  float zScale
+                         local  float[4]* pVertex
+                         local  union <anon> vec128_Pos
+                         local  float[4] vec128_PosXXXX
+                         local  float[4] vec128_PosYYYY
+                         local  float[4] vec128_PosZZZZ
+                         local  float[4] vec128_temp
+                         local  float vertBias
+                         local  const const twIndexTri16& tri
+                         local  union <anon> centroid
+                         local  float[4] vert0
+                         local  float[4] vert1
+                         local  float[4] vert2
+                         local  float[4] a
+                         local  float[4] b
+                         local  float[4] cross
+                         local  float biasMod
+                         local  float[4] lengthSqr
+                         local  union <anon> crossNrm
+                         local  unsigned int[4] compMask
+                         local  float depth
+                         local  float scaledDepth
+                         inlines  __vec_cross, __vec_len_sqr3, __vec_rsqrt_fast, vec_add, vec_cmpeq, vec_ld, vec_madd, vec_max, vec_min, vec_nmsub, vec_perm, vec_st, vec_sub, vec_vspltw
+  330  0022D690    140  void STriangleSorter::radixSort(const struct STriangleSorter* this, uint32 radixBit, uint32 numElems, struct SSortEntry* pSrc, struct SSortEntry* pDst)
+                         local  uint16[256] count
+                         local  uint16[256] index
+                         local  uint32 i
+                         local  float[4]* pVCount
+                         local  float[4] vZero
+                         local  const uint8 radixByte
+                         local  const uint8 radixByte
+                         local  const uint16 usedIndex
+  378  002617E4     DC  void twChar_SortTriangles(struct LS_IndexBuffer* pDstBuffer, mat44flt_p* pViewMatrix, vec4flt_p* pGlobalTranslation, const TWCHAR_SKINVERTEX* pSrcVerts, const uint32 numVerts, const uint16* pSrcTris, const uint32 numTris)
+                         local  twIndexTri16* pDstTris
+                         local  struct STriangleSorter sorter

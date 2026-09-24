@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/Golf/RNA/Frustum.h
+// compiled in: rnaunity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   45  004DFAD8     38  void Frustum::Frustum(const struct Frustum* this)
+   46  004DF990     1C  void Frustum::Frustum(const struct Frustum* this, const const RNAMatrix44& view, const const RNAMatrix44& proj, int32_t vptWidth, int32_t vptHeight)
+   61    inline-only   const RNAPlane* Frustum::GetPlanes(const const struct Frustum* this)

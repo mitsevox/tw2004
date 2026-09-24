@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/Headers/UI_MC_MemCardPopup.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   62    inline-only   bool UIMemCardMenuPopup::IsConfirmAcceptChallengeShown(const const struct UIMemCardMenuPopup* this)

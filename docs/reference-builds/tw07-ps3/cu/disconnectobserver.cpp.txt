@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/disconnectobserver.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    5  005B54B4      C  void DisconnectObserver(const struct DisconnectObserver* this)
+    9  005B54CC      C  void ~DisconnectObserver(const struct DisconnectObserver* this)

@@ -1,0 +1,74 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_Stableford.cpp
+// compiled in: golf_unity.cpp
+// 19 functions, source order. line | PS3 address | size
+
+   21  00204A58     44  void GameModeStableford::GameModeStableford(const struct GameModeStableford* this)
+   26  00200C94     18  void GameModeStableford::~GameModeStableford(const struct GameModeStableford* this)
+   33  00200D10     E4  void GameModeStableford::Init(const struct GameModeStableford* this)
+   51  00200DF4      4  void GameModeStableford::Update(const struct GameModeStableford* this)
+   56  00200DF8      4  void GameModeStableford::Shutdown(const struct GameModeStableford* this)
+   61  00200DFC     1C  bool GameModeStableford::QueryInterface(const struct GameModeStableford* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bRet
+   75  00200E18     38  int32 GameModeStableford::GetEndGameSequence(const struct GameModeStableford* this)
+                         local  int32 sequence
+   84  002A1990     9C  bool GameModeStableford::TrackingReactiveDifficulty(const struct GameModeStableford* this)
+                         local  void* driverPointer
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+   92  0032C0C0    144  bool GameModeStableford::BallInHole(const struct GameModeStableford* this, enum PlayerNumber_t PlayerID)
+                         local  int32 par
+                         local  int32 delta
+                         local  int32 currHole
+                         local  int32 score
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, PLR_HoledOut
+  116  0032C204    180  void GameModeStableford::EndHole(const struct GameModeStableford* this)
+                         local  int32 par
+                         local  int32 delta
+                         local  int32 currHole
+                         local  int32 score
+                         local  int32 i
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_SetPlayerHoleStrokes, PLR_HoledOut
+  148  0030FE80    288  void GameModeStableford::EndGame(const struct GameModeStableford* this)
+                         local  int32 bestOtherscore
+                         local  int32 otherscore
+                         local  int32 playerscore
+                         local  int j
+                         inlines  GolferStats::GetGolferStats, Singleton<DifficultySettings>::GetSingleton, Singleton<GolferStats>::GetSingleton
+  188  002D0D64      4  void GameModeStableford::SetupNextGolfer(const struct GameModeStableford* this)
+  193  0032C6A4    5B4  enum PlayerNumber_t GameModeStableford::GetHonors(const struct GameModeStableford* this, enum PlayerNumber_t ignore, bool doNotIgnoreHoledOut)
+                         local  int32 i
+                         local  enum PlayerNumber_t furthest
+                         local  float x
+                         local  float y
+                         local  float dist
+                         local  float farthestDist
+                         local  int32 k
+                         local  int32 score
+                         local  int32 slot
+                         local  int32 lowest
+                         local  int32 highest
+                         local  TGD_TerrainInfo* pTerrainGameData
+                         local  enum PlayerNumber_t[4] currentTeeHonors
+                         local  enum PlayerNumber_t[4] nextTeeHonors
+                         local  uint32 j
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, std::sqrt
+  321  0032C384    15C  enum PlayerNumber_t GameModeStableford::GetHoleWinner(const const struct GameModeStableford* this)
+                         local  uint32_t curHole
+                         local  int32_t maxPoints
+                         local  enum PlayerNumber_t winner
+                         local  bool tied
+                         local  int plr
+                         local  int32_t curPoints
+                         inlines  GM_GetCurrentHoleIndex
+  353  0032C63C     68  bool GameModeStableford::HoleFinished(const struct GameModeStableford* this, enum PlayerNumber_t PlayerID, bool predict)
+                         local  bool bRet
+                         local  int32 i
+  368  0032C4E0     88  bool GameModeStableford::GameFinished(const struct GameModeStableford* this, bool bPredict)
+                         local  bool ret
+                         local  int32 i
+                         inlines  GM_GetCurrentHoleIndex
+  386  00310530     94  void GameModeStableford::GetCurrentScoreString(const struct GameModeStableford* this, char* strBuf, int32 bufferSize)
+                         local  int32 totalPoints
+  394  00200E58     14  const char* GameModeStableford::GetName(const struct GameModeStableford* this)
+  403  0032C568     D4  bool GameModeStableford::PlayerDoneHole(const struct GameModeStableford* this, enum PlayerNumber_t plr)
+                         local  bool bRet
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, PLR_HoledOut

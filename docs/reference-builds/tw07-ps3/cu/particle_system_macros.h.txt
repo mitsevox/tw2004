@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/ParticleSystem/source/particle_system_macros.h
+// compiled in: particle_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   33    inline-only   struct _FVEC FRANGE_FVEC(const unsigned int& s, const const struct _FVEC& minVec, const const struct _FVEC& maxVec)
+                         local  struct _FVEC temp
+                         local  float x
+                         local  float y
+                         local  float z
+                         local  float w
+                         local  struct _FVEC temp

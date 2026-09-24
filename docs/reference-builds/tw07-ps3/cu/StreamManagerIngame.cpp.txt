@@ -1,0 +1,34 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/streaming/StreamManagerIngame.cpp
+// compiled in: golf2_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   29  001403B4     6C  void StreamManagerIngame::RegisterStreamClients(const struct StreamManagerIngame* this)
+   79  00140244     5C  void StreamManagerIngame::UnregisterStreamClients(const struct StreamManagerIngame* this)
+  121  00135D9C     34  void StreamManagerIngame::BeginStreamCallbackIGChar(void* pData)
+  148  00135DD0      4  void StreamManagerIngame::EndStreamCallbackIGChar(void* pData)
+  152  0017E630     B8  bool IgnoreExistingTextureChunks(Drive3DChunkHdrPtr pHeader)
+                         local  struct TextureGroup* tGroup
+                         local  TextureRef ref
+                         inlines  TX_TextureIsAllocated
+  173  0018DF88    33C  void StreamManagerIngame::SetupFileStream(const struct StreamManagerIngame* this)
+                         local  int numPlayers
+                         local  int j
+                         local  char[128] newCharBuff
+                         local  int32 charHandle
+                         local  int32[2] haveGenderFlags
+                         local  const char*[2] genderStreams
+                         local  int i
+                         local  int32 gender
+                         local  enum Golfer_t golfer
+                         local  struct GolferData_t* golferData
+                         local  int32 gender
+                         local  int i
+                         inlines  CharModelMgr::IncrementMaxCharacterInUse, Singleton<GolferStats>::GetSingleton
+  255  00135DD4    1A4  void StreamManagerIngame::StreamFiles(const struct StreamManagerIngame* this)
+                         local  bool bStillStreaming
+                         local  bool dashboardAutoUpdating
+                         local  int32 curFile
+                         local  int32 curOffset
+                         local  int32 fileSize
+                         local  float completion
+                         local  struct UILoadingScreen* lScreen

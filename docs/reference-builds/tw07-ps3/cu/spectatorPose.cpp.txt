@@ -1,0 +1,38 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Spectator/spectatorPose.cpp
+// compiled in: golf2_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   89  001405F8     1C  void SpectatorPose_ResetActorCount()
+   94  00154060     9C  void CSpectatorPose::SetActive(const struct CSpectatorPose* this, bool bActive)
+                         local  struct CSpectatorCloneGroup* pCloneGroup
+                         local  CSpectatorInstanceList* pMovers
+                         local  struct CSpectatorInstance* pEnd
+                         local  struct CSpectatorInstance* pMover
+                         inlines  CPovLink<CSpectatorInstance>::GetNext, CPovLinkedList<CSpectatorInstance>::End, CPovLinkedList<CSpectatorInstance>::First
+  125  00140F88    118  void CSpectatorPose::GenerateModelDMAListInstance(const struct CSpectatorPose* this)
+  140  0015FEB4    278  void CSpectatorPose::Init(const struct CSpectatorPose* this, TSpectatorModel* model, bool use_cct)
+                         local  const char[5] __FUNCTION__
+                         local  uint32 size
+                         inlines  LLMath_IdentifyMat, TagValuePair, operator+, vec_st
+  192  001410A0     9C  void CSpectatorPose::FreeResources(const struct CSpectatorPose* this)
+  433  001411D0     20  mat44flt* Spectator_GetBindPoseMatrix(int i)
+  440  001411F0      8  void CSpectatorPose::SetModel(const struct CSpectatorPose* this, TSpectatorModel* model)
+  452  001412BC    270  void CSpectatorPose::UpdateCCT(const struct CSpectatorPose* this, float dt)
+                         local  mat44flt* modelToWorld
+                         local  float[4] quat
+                         local  int nBones
+                         local  const short unsigned int[16] remapping
+                         local  int i
+                         local  mat44flt MBone2Model
+                         local  mat44flt MModel2BoneBind
+                         local  const float scale
+  575  0016BB1C    258  void CSpectatorPose::Update(const struct CSpectatorPose* this, float dt)
+                         local  vec4flt zero_trans
+                         local  int buffer_index
+                         local  const struct CharModelMgrCharacterInstance& instance
+                         local  struct LS_VertexBuffer* pVertexBuffer
+                         inlines  CSpectatorSystem::GetUpdateBufferNum, CharModelMgr::SetCurrentCharacterInUse, CharModelMgrCharacterInstance::SetOverrideDMAListPtr, PS3_SkinMeshRender::EnableReducedSkinning
+  624  00169A88     BC  void CSpectatorPose::RenderSetup(const struct CSpectatorPose* this)
+  639  001411F8      8  bool CSpectatorPose::AnimationEnd(const struct CSpectatorPose* this)
+  644  00141200     48  void CSpectatorPose::SetOverrideBoneMatrix(const struct CSpectatorPose* this, int bone_index, float[4]* matrix)
+  652  00141248     74  void* CSpectatorPose::GetActorPtr(const struct CSpectatorPose* this)

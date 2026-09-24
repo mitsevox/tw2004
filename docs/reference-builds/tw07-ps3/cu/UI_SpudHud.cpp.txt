@@ -1,0 +1,59 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_SpudHud.cpp
+// compiled in: apt_unity.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   65  000FAA30     54  void UISpudHud::UISpudHud(const struct UISpudHud* this)
+   69  0003FEC4     E4  void UISpudHud::Init(const struct UISpudHud* this)
+   81  0004D6C0     60  void UISpudHud::Show(const struct UISpudHud* this)
+   95  0004D720     80  void UISpudHud::Hide(const struct UISpudHud* this)
+  103  000ECA58    328  void UISpudHud::ShowSpudHud(const struct UISpudHud* this)
+                         local  enum GM_ModeType_t gameModeType
+                         local  char* format
+                         local  char* stringBuffer
+                         local  enum PlayerNumber_t activePlayer
+                         local  char[32] nameBuffer
+                         local  int32 currentRound
+                         local  void* gameModePointer
+                         local  char* roundNumber
+                         local  struct GameSkillsChallenge* skillsChallengeMode
+                         inlines  GM_GetGolferUp, GM_GetModeType
+  178  0004D964      C  void UISpudHud::HideSpudHud(const struct UISpudHud* this)
+  186  0004D9C8     58  enum AptThreadReturnValue UISpudHud::GameBreakerAndShotNumberTimeOut_Thread(const struct UISpudHud* this)
+  200  000E4908     C8  enum AptThreadReturnValue UISpudHud::VisibilityTimerThread(const struct UISpudHud* this)
+  234  000E4214    618  void UISpudHud::SetupStatData(const struct UISpudHud* this, enum GUI_SpecialHudStats_t stat)
+                         local  char* line1Text
+                         local  char* line3Text
+                         local  enum SpudHudStatType statType
+                         local  char* extension
+                         local  int32 numPlayers
+                         local  int32 playerIndex
+                         local  char[32] nameText
+                         local  float statValue
+                         local  char* dataBuffer
+                         local  char* dataFormat
+                         local  char[4][32] namesAlreadyUsed
+                         local  int32 playerIndex
+                         local  char[32] name
+                         local  int32 playerRow
+                         local  int32 entrantID
+                         local  int32 scoreRank
+                         local  int32 golferID
+                         local  char* nameFormat
+                         local  int32 position
+                         local  char* nameText
+                         local  bool isUserOrGuest
+                         local  int32 relativeScore
+                         local  char* strokeFormat
+                         local  char* strokeText
+                         local  int32 user
+                         local  int32 userId
+                         local  int32 userRank
+  387  000E49D0    158  void UISpudHud::ShowGameBreaker(const struct UISpudHud* this, enum GUI_SpecialHudStats_t gameBreakerStat)
+  413  0004DA20     78  void UISpudHud::HideGameBreaker(const struct UISpudHud* this)
+  425  000E482C     DC  void UISpudHud::ShowPanel(const struct UISpudHud* this)
+                         local  enum GUI_SpecialHudStats_t stat
+  444  0004D970     58  void UISpudHud::HidePanel(const struct UISpudHud* this)
+  453  0004D870     F4  void UISpudHud::ResetScreen(const struct UISpudHud* this)
+  479  0003F754    11C  void UISpudHud::GhostSpudHud(const struct UISpudHud* this)
+  505  0004D7A0     D0  void UISpudHud::UnGhostScreen(const struct UISpudHud* this)
+  524  0004DA98      8  enum eAptHandleInput UISpudHud::HandleInput(const struct UISpudHud* this, int32 cID)

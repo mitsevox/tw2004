@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_math/dev/source/tiger_vec.cpp
+// compiled in: tiger_vec.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   10  008E68BC     EC  int TIGER_MATH::operator==(const const struct <anon>& a, const const struct <anon>& b)
+                         local  float epsilon
+   16  008E677C     A0  float TIGER_MATH::VecMaxAbsElement(const const struct <anon>& a)
+                         inlines  TIGER_MATH::VecW, TIGER_MATH::VecX, TIGER_MATH::VecY, TIGER_MATH::VecZ
+   21  008E681C     A0  float TIGER_MATH::VecMinAbsElement(const const struct <anon>& a)
+                         inlines  TIGER_MATH::VecW, TIGER_MATH::VecX, TIGER_MATH::VecY, TIGER_MATH::VecZ
+   33  008E6708     74  struct <anon> TIGER_MATH::VecAbs(const const struct <anon>& a)
+                         inlines  TIGER_MATH::VecSet, Vec

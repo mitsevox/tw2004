@@ -1,0 +1,10 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sclcptch.cpp
+// compiled in: sclcptch.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   29  006DC100     D0  int iSNDdetunetolinear(int detune)
+                         local  int pitch
+                         local  int cents256
+   75  006DC1D0     A8  void iSNDcalcpitch(int chan)
+                         local  struct CHANPUB* pchan
+                         local  int detune

@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/./usermanagerconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   73  0062AE50     20  struct User* GetUser(const struct UserManagerConcrete* this, const char8_t* strName)
+   75    inline-only   uint32_t GetLobbyUserInfoCacheTimeout()
+   92    inline-only   struct MemoryPool* GetActionUserPool(const struct UserManagerConcrete* this)

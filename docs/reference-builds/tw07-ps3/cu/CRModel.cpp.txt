@@ -1,0 +1,45 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/CRModel.cpp
+// compiled in: headgate_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   33    inline-only   static unsigned int ReadDefaultMaterialRecord(const unsigned char* streamData, struct TerDefaultMaterial* pCurrentMaterial, struct TerFileMaterial* pGrassMaterialList, unsigned int* pGrassCount)
+                         local  struct TerFileMaterial* pStreamMaterial
+                         local  const TextureInfo* info
+                         local  struct GoTempleEnv* pTempleEnv
+                         local  unsigned int grassID
+                         local  bool bFound
+                         local  unsigned int grassIndex
+                         local  struct TerFileMaterial* pNewGrass
+  107    inline-only   static unsigned int ReadBasicMaterialRecord(const unsigned char* streamData, struct TerDefaultMaterial* pCurrentMaterial)
+                         local  struct TerFileBasicMaterial* pStreamMaterial
+  131    inline-only   static unsigned int ReadWaterMaterialRecord(const unsigned char* streamData, struct TerWaterMaterial* pCurrentMaterial)
+                         local  struct TerFileWaterMaterial* pStreamMaterial
+  166  0034F578    EDC  void LoadTerModelFromMemory(const unsigned char* streamData, struct TerModel* pModel, unsigned int excludeFlags)
+                         local  const char[23] __FUNCTION__
+                         local  struct TerFileHeader* pStreamHeader
+                         local  union TerMaterialPointer pCurrentMaterial
+                         local  struct TerMesh* pCurrentMesh
+                         local  struct TerStrip* pCurrentStrip
+                         local  unsigned int materialNum
+                         local  unsigned int meshNum
+                         local  struct TerFileMesh* pStreamMesh
+                         local  unsigned int vertexSize
+                         local  unsigned int vertexBufferSize
+                         local  void* pVertexMem
+                         local  unsigned int stripNum
+                         local  struct TerFileStrip* pStreamStrip
+                         local  const unsigned int indexBufferSize
+                         local  unsigned int materialFlags
+                         local  void* pIndexMem
+                         local  unsigned int grassID
+                         local  bool bFound
+                         local  unsigned int grassIndex
+                         local  struct TerFileMaterial* pNewGrass
+                         local  const TextureInfo* info
+                         local  struct GoTempleEnv* pTempleEnv
+                         inlines  GoTemple::GetTemplEnv, GoTempleEnv::SetTempleScreenTexture, ReadBasicMaterialRecord, ReadDefaultMaterialRecord, ReadWaterMaterialRecord, TagValuePair, operator+
+  387  0034B9FC    184  void UnloadTerModel(struct TerModel* pModel)
+                         local  struct TerMesh* pMesh
+                         local  struct TerMesh* pMeshEndPoint
+                         local  struct TerStrip* pStrip
+                         local  struct TerStrip* pStripEndPoint

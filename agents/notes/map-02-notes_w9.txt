@@ -1,0 +1,26 @@
+map-02 wave3 pass (2026-09-24 10:12-11:05), ranges 09+10. Tried lists for the next lane.
+
+DONE (exact)
+- PGATourSimulation 119/119, LINKED: .sdata 0x80281840-0x80281880 (lbl_80281840 {-1,0}, lbl_80281848 = 0 under
+  #pragma explicit_zero_data on, gbStatsDirty/gbScoresDirty = 1, the format strings) and .sdata2 0x802849C0-0x80284A18
+  (PGATourSimulation_StrippedFn puts 0.0f before fn_80119B54's 0.25f).
+  - fn_80117E98: the Rand % n pick goes through its own s32 local (nRand), then nPick = nRand.
+  - fn_8011BDF8 (+ fn_8011BF74 kept exact): lbl_80281848 is int (header), locals int, TW07 decl order.
+  - fn_801180C4: no pProfile; TourSeason* pTour = &gpSaveData[n].tour and PgaStatCounts* pStats =
+    &gpSaveData[n].tour.aStats[PGA_USER_GOLFER]: both are pProfile+0x10000+lo, CW keeps ONE addis base in a
+    saved register and folds each lo into the displacement. int i (s32 i adds a cmpwi 0xaf in the 175 loop).
+- Earnings 62/64: fn_800D8750 (pLast/pRec pointer locals = TW07 CheckRecord's GLOBAL_RECORD_t& refs; player
+  index read in `if (nPlayer != 5) { nProfile = ...; if (...) }`), fn_800D588C, fn_800D9998 (same pStats/pTour
+  trick + bSeasonEnd set in if/else).
+- Goal functions (477C/4F14/588C): fn_800D6A70(..., f(uMults,0), f(uMults,1), f(uMults,2), ...) inline
+  (right-to-left evaluation gives the orig's bit2, bit1, bit0 call order); nSlot block-scoped per branch;
+  prize value stored before its id.
+
+LEFT
+- fn_800D4F14 99.78: award-branch bLost/j and prize-branch bLost/j registers swapped. Tried: every subset/order
+  of {nSlot,bReplace,bLost,j} block-scoped per branch, fn-level perms, types. Best non-shadowing 14
+  (block {nSlot,bLost}); 13 only with a shadowing block nSlot.
+- fn_800D477C 99.80: bNoBall (orig r17) vs nHoles/prize-nSlot web (orig r19) swapped. Tried: decl climb,
+  bNoBall types/forms (ternary, &&, set0), nHoles block/types. 13 aligned only with a shadowing award nSlot.
+- GameModeBestBall fn_800E8A68: nBase/nMoney order swap, separate inner loop counter (int/s32/PlayerNumber_t): no.
+- FE_CrAPDB fn_801070F4 (pProfile r29 vs p r26): climb, pProfile as statement, p = aAssets, s32 types: no.

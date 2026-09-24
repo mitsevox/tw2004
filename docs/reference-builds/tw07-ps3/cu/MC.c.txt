@@ -1,0 +1,265 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Memory_Card/MC.c
+// compiled in: apt_unity.cpp
+// 81 functions, source order. line | PS3 address | size
+
+  289  00028ACC     18  bool MC_IsMultitapPluggedIn(int port)
+  298  00028B08     58  struct GolfMemCard_t MC_GetMC(int port, int slot)
+  307  00051940     24  struct GolfMemCard_t* MC_pGetMC(int port, int slot)
+  317  00051964      8  bool MC_QueryInitialUser()
+  355  000E3230    170  bool MC_LoadInitialUser()
+                         local  int port
+                         local  int slot
+                         local  int userNum
+                         local  int result
+                         local  int firstPort
+                         local  int lastPort
+                         inlines  UserInfo::SetLoaded, UserInfo::SetValid
+  430  000B7F64    280  void MC_MergeRecords(struct GAME_RECORDS_t* newRecords)
+                         local  int32 courseID
+                         local  enum GM_CourseType_t saveCourseID
+                         local  int place
+                         local  struct GLOBAL_RECORD_t* pCurrRecord
+                         local  int32 recordIdx
+                         local  int savedHole
+                         inlines  GM_SetCurrentCourse, Singleton<HighScoreRecords>::GetSingleton
+  482  000E16A0    244  int MC_LoadOptionsFromFirstCardFound()
+                         local  int port
+                         local  int slot
+                         local  bool optionsLoaded
+                         local  int return_value
+                         local  int mountCode
+                         local  int errCode
+                         inlines  MC_CheckParam
+  619  000E18E4    1F4  int MC_LoadOptions(MC_ArgsLoadT* spArgs)
+                         local  bool optionsLoaded
+                         local  int mountCode
+                         local  int errCode
+                         local  int port
+                         local  int slot
+                         inlines  MC_CheckParam
+  696  000B81E4    118  void MC_ProcessLoadedOptions()
+  719  000E1AD8    408  int MC_SaveOptions(MC_ArgsSaveT* spArgs)
+                         local  int totalClusters
+                         local  int return_value
+                         local  int mountCode
+                         local  int port
+                         local  int slot
+                         local  int nLastModUserValid
+                         local  int nLastLoadedUser
+                         inlines  MC_CheckParam
+  871  00051B8C      8  int MC_LoadReplay(MC_ArgsLoadT* spArgs)
+  883  00028E20      8  int MC_SaveReplay(MC_ArgsSaveT* spArgs)
+  894  00051B94      8  int MC_DeleteReplay(int port, int slot, int replayID)
+  905  00028E28      8  int MC_ReplaceReplay(int port, int slot, int replayID)
+  917  00051B9C      8  int MC_GetReplay(int port, int slot, int replayID)
+  926  00051BA4      4  void MC_RefreshMCReplayInfo(int port, int slot)
+  934  00051BA8      8  int MC_GetNumReplay(MC_ArgsNumFilesOnCardT* spArgs)
+  946  000E1EE0    13C  int MC_DeleteSaveGame(int port, int slot)
+                         local  int errCode
+                         local  int mountCode
+                         inlines  MC_CheckParam
+ 1006  000E201C    22C  int MC_DeleteFile(MC_ArgsDeleteFileT* spArgs)
+                         local  int errCode
+                         local  int mountCode
+                         local  int port
+                         local  int slot
+                         local  int fileID
+                         local  char* fileName
+                         local  MC_FileTypeE targetFileType
+                         local  MC_FileTypeE secondFileType
+                         local  MC_FileTypeE fileTypeToDelete
+                         inlines  MC_CheckParam, MC_SetCurrentFileType
+ 1099  00051BC0     14  int MC_FindUserInSaveGame(int port, int slot, const char* name, MC_SAVE_USER_t* saveGame)
+ 1119  00051BD4     D0  int MC_GetNextUserIndexInSaveGame(int port, int slot, const char* name, MC_SAVE_USER_t* saveGame)
+                         local  int i
+ 1205  00079894     A4  void MC_SetUserInfoPointers(struct UserInfo* user, struct MC_AUX_SAVEUSER_t* aux)
+                         local  int i
+                         inlines  UserInfo::GetGamePlayUserData, UserInfo::GetVitalInfo
+ 1227  00051CA4     1C  int MC_GetNextUserFileIndex(int nUserFileIndex)
+ 1242  000602C0     9C  bool MC_HasValidLoadedUser(MC_SAVE_USER_t* pTempSaveFileUserData, int savedGameBufferIndex)
+                         local  char* sEmptyStr
+                         local  struct UserInfo* pUser
+                         inlines  UserInfo::GetUserName
+ 1273  000E2394    490  int MC_LoadUser(MC_ArgsLoadT* spArgs)
+                         local  int return_value
+                         local  int32 mountCode
+                         local  int port
+                         local  int slot
+                         local  char* name
+                         local  enum UserNumber destUserMgrSlot
+                         local  int savedGameFileIndex
+                         local  int savedGameBufferIndex
+                         local  bool bFoundUser
+                         local  struct MC_DATA_BUFFER_INFO[2] buffers
+                         inlines  MC_CheckParam, UserInfo::SetLoginIndex
+ 1470  000E2824    624  int MC_SaveUser(MC_ArgsSaveT* spArgs)
+                         local  int return_value
+                         local  int mountCode
+                         local  bool firstSave
+                         local  int port
+                         local  int slot
+                         local  enum UserNumber nSaveUser
+                         local  struct MC_DATA_BUFFER_INFO[2] buffers
+                         local  struct MC_DATA_BUFFER_INFO[2] buffers
+                         inlines  MC_CheckParam
+ 1660  00051CC0     D4  void MC_PrepThumbnailBuffer(MC_ArgsSaveT* spArgs)
+ 1686  00051DD4      8  int MC_GetNumThumbnails(MC_ArgsNumFilesOnCardT* spArgs)
+ 1694  00051DDC      8  int MC_IsThumbnailsDataCorrupt(MC_ArgsDataCorruptT* spArgs)
+ 1704  00051DE4      8  int MC_MemoryRequiredForThumbnails(MC_ArgsMemoryRequiredT* spArgs)
+ 1717  00051DEC     40  int MC_DeleteUser(int port, int slot, char* name)
+ 1728  000E2E48    3E8  int MC_LoadLastUser(int port, int slot, enum UserNumber userID)
+                         local  int return_value
+                         local  int32 mountCode
+                         local  struct MC_DATA_BUFFER_INFO[2] buffers
+                         inlines  MC_CheckParam, MC_SetCurrentFileType
+ 1868  000E33A0    25C  int MC_GetAllUserNames(int port, int slot, char* name1, char* name2, char* name3, char* name4)
+                         local  int return_value
+                         local  int32 mountCode
+                         local  char*[4] pNames
+                         local  int i
+                         inlines  MC_CheckParam
+ 1988  000E35FC    2A4  int MC_GetUser(int port, int slot, int userID, char* username)
+                         local  int return_value
+                         local  int32 mountCode
+                         local  struct MC_DATA_BUFFER_INFO[2] buffers
+                         local  int foundSaveMeta
+                         inlines  MC_CheckParam
+ 2088  00051E2C     3C  int MC_GetNumOptions(MC_ArgsNumFilesOnCardT* spArgs)
+                         local  int port
+                         local  int slot
+ 2110  000E38A0    424  void MC_RefreshMCUserInfo(int port, int slot)
+                         local  int return_value
+                         local  int32 mountCode
+                         local  int userID
+                         local  struct GolfMemCard_t* memCardInfo
+                         local  struct MC_DATA_BUFFER_INFO[2] buffers
+                         inlines  BitArray_ClearArray, BitArray_ClearBit, BitArray_SetBit, MC_CheckParam
+ 2278  000E3CC4     C8  int MC_GetNumUser(MC_ArgsNumFilesOnCardT* spArgs)
+                         local  int port
+                         local  int slot
+                         local  int userID
+                         local  int numUsersFound
+                         local  struct GolfMemCard_t* memCardInfo
+                         inlines  BitArray_TestBit
+ 2312    inline-only   static int MC_HexCharToInt(char c)
+                         local  char* nums
+                         local  char[2] lowerC
+                         local  int val
+ 2328  00051E68    128  int MC_HexStringToInt(char* str)
+                         local  int len
+                         local  int i
+                         local  int retVal
+                         local  int powOfSixteen
+                         inlines  MC_HexCharToInt
+ 2350  00051F90      4  void MC_VerifySize()
+ 2399  00051F94      4  void MC_UpdateSaveSettingsVersion(MC_SAVE_SETTINGS_t* saveSettings)
+ 2421  00051F98      4  void MC_UpdateReplaySettingsVersion(MC_SAVE_REPLAY_t* replaySettings)
+ 2443  00051F9C      4  void MC_UpdateUserSettingsVersion(MC_SAVE_USER_t* userSettings)
+ 2464  00051FA0      4  void MC_UpdateThumbnailsSettingsVersion(MC_SAVE_THUMBNAILS_t* thumbnailsSettings)
+ 2489  00051FA4      4  void MC_DumpSaveGameStructSizes()
+ 2503  00051FA8      4  void MC_Debug()
+ 2512  00051FAC     B4  static int MC_StringLength(char* dataPtr)
+                         local  int i
+ 2532    inline-only   static char* MC_SkipLeadingSpaces(char* dataPtr)
+                         local  char* ptr
+ 2552  00091D94    110  static char* MC_SkipToNextLine(char* dataPtr)
+                         local  char* ptr
+                         inlines  MC_SkipLeadingSpaces
+ 2580    inline-only   static int MC_CountSlusNumbers(char* inputData)
+                         local  char* dataPtr
+                         local  int count
+                         local  bool foundTitle
+ 2618    inline-only   static int MC_CountTitles(char* inputData)
+                         local  char* dataPtr
+                         local  int count
+                         local  bool foundEnd
+ 2646  00052060     D4  void MC_FreeEAGameList()
+                         local  int i
+ 2674  00091EA4    1C8  static void MC_CleanGameString(char* string, size_t strBufLen)
+                         local  char[64] tempStr
+                         local  char* ptr
+                         local  char* endPtr
+                         local  int len
+                         local  int i
+                         inlines  std::isspace
+ 2720  0009206C    664  void MC_LoadEAGameListfromStream(struct TStreamData* pStreamData)
+                         local  const char[28] __FUNCTION__
+                         local  unsigned int size
+                         local  char* dataPtr
+                         local  int i
+                         local  int j
+                         local  int len
+                         inlines  MC_CountSlusNumbers, MC_CountTitles, TagValuePair, operator+
+ 2817  000B6A98    15C  void MC_RecordEATitleByName(char* slusStr)
+                         local  int i
+                         local  int j
+                         inlines  BitArray_SetBit
+ 2852  00052134     D0  void MC_RecordEATitleByIndex(int index)
+                         inlines  BitArray_SetBit
+ 2865  00052204     A4  int MC_TalleyEATitlesFound()
+                         local  int i
+                         local  int count
+ 2892  000522A8     A4  int MC_ListSaveGames(int port, int slot)
+                         local  int count
+                         local  int i
+ 2920  00079D2C    4BC  void MC_OpenONCE()
+                         local  const char[12] __FUNCTION__
+                         inlines  BitArray_ClearArray, MC_FillCRCTable, TagValuePair, operator+
+ 3067  00052358     80  int MC_FormatCard(int port, int slot)
+                         local  int mountCode
+                         local  int return_value
+ 3175  000E3EB8    13C  int MC_TW2005SaveGameExists(int port, int slot)
+                         local  int mountCode
+                         local  int errCode
+                         inlines  MC_CheckParam
+ 3234  0005198C    13C  int MC_TW2006SaveGameExists(int port, int slot)
+                         local  int mountCode
+                         local  int errCode
+                         inlines  MC_CheckParam
+ 3285  000524A4     B4  bool MC_SaveGameIsValid(void* pData, MC_CHECKSUM_INFO_t* info, enum SAVEFILE_TYPE_e saveType, size_t dataSz)
+                         inlines  sMemCard_CheckSavedGameValid
+ 3343    inline-only   static bool sMemCard_CheckSavedGameValid(void* pData, MC_CHECKSUM_INFO_t* info, enum SAVEFILE_TYPE_e saveType, size_t dataSz, bool bLogErrors)
+                         local  unsigned int cs
+ 3409  00051AD0     7C  unsigned int MC_ComputeSaveGameCheckSum(void* pData, size_t len, MC_CHECKSUM_INFO_t* sg)
+                         local  unsigned int crc
+                         local  unsigned int i
+                         local  unsigned char* ptr
+                         local  unsigned int temp
+                         local  unsigned int backupChecksum
+ 3443    inline-only   static void MC_FillCRCTable()
+                         local  unsigned int crc
+                         local  unsigned int num
+                         local  unsigned int i
+                         local  unsigned int j
+ 3477  00052558     78  bool MC_EASaveExists(int id)
+ 3487  000525D0     2C  int32 MC_GetEASaveBitArray(int32 startIndex)
+ 3497  000525FC     B4  char* MC_GetEASaveName(int id)
+ 3509  000526B0     1C  int MC_GetNumEATitles()
+ 3519  000526CC     18  struct MC_EATITLEINFO_t* MC_GetEATitleList()
+ 3528  000526E4     54  void MC_MessageWait(unsigned int numFrames)
+                         local  unsigned int timer
+ 3550  00052738     E8  unsigned int MC_ComputeNumWaitFrames(unsigned int milliseconds)
+                         local  float seconds
+                         local  unsigned int frames
+ 3572  00052820     4C  int MC_IsOptionsDataCorrupt(MC_ArgsDataCorruptT* spArgs)
+ 3595  0005286C     88  int MC_IsReplayDataCorrupt(MC_ArgsDataCorruptT* spArgs)
+                         local  int port
+                         local  int slot
+                         local  int id
+                         local  int returnVal
+ 3619  000528F4     88  int MC_IsUserDataCorrupt(MC_ArgsDataCorruptT* spArgs)
+                         local  int port
+                         local  int slot
+                         local  int id
+                         local  int returnVal
+ 3642  0005297C     1C  int MC_MemoryRequiredForOptions(MC_ArgsMemoryRequiredT* spArgs)
+ 3650  000E3D8C    12C  int MC_MemoryRequiredForUser(MC_ArgsMemoryRequiredT* spArgs)
+                         local  int id
+                         local  MC_ArgsNumFilesOnCardT args
+                         local  int numUsers
+ 3701  00052998     EC  int MC_MemoryRequiredForReplay(MC_ArgsMemoryRequiredT* spArgs)
+                         local  int id
+                         local  int numReplays
+                         local  MC_ArgsNumFilesOnCardT args
+ 3737  00052A88      4  void MC_ConvertWideCharToChar(uint16* wCharStrIn, char* charStrOut, int nChars)
+ 3745  00052A90      4  void MC_ConvertCharToWideChar(char* charStrIn, uint16* wCharStrOut, int nChars)

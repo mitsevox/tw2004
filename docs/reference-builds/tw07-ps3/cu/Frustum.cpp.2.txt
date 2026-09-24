@@ -1,0 +1,116 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Rna/Frustum.cpp
+// compiled in: rnaunity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   77  004DCA00   11C8  void Frustum::ComputePpuScaleTrans(const struct Frustum* this)
+                         local  float_t horzPpu
+                         local  float_t vertPpu
+                         local  float_t farUpp
+                         local  float_t nearUpp
+                         local  float_t farDist
+                         local  Vector4Intrinsic_32 xx_yy_zz_ww
+                         local  Vector4Intrinsic_32 zz_ww
+                         local  Vector4Intrinsic_32 xxpluszz_yyplusww
+                         local  Vector4Intrinsic_32 yyplusww
+                         local  Vector4Intrinsic_32 xx_yy_zz_ww
+                         local  Vector4Intrinsic_32 zz_ww
+                         local  Vector4Intrinsic_32 xxpluszz_yyplusww
+                         local  Vector4Intrinsic_32 yyplusww
+                         local  Vector4Intrinsic_32 xx_yy_zz_ww
+                         local  Vector4Intrinsic_32 zz_ww
+                         local  Vector4Intrinsic_32 xxpluszz_yyplusww
+                         local  Vector4Intrinsic_32 yyplusww
+                         local  Vector4Intrinsic_32 xx_yy_zz_ww
+                         local  Vector4Intrinsic_32 zz_ww
+                         local  Vector4Intrinsic_32 xxpluszz_yyplusww
+                         local  Vector4Intrinsic_32 yyplusww
+                         inlines  AssertMacroHelper, GetFloat, VecFloat, operator float, vpu::Dot, vpu::Magnitude, vpu::Sqrt, vpu::_asmDot, vpu::operator*, vpu::operator+, vpu::operator-, vpu::operator/
+  172  004DDC5C   1CA0  void Frustum::SetViewProj(const struct Frustum* this, const const RNAMatrix44& view, const const RNAMatrix44& proj)
+                         local  RNAMatrix44 viewProj
+                         local  RNAMatrix44 invViewProj
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  int[4] zero
+                         local  Vector4Intrinsic_32 tmp0
+                         local  Vector4Intrinsic_32 tmp1
+                         local  Vector4Intrinsic_32 tmp2
+                         local  Vector4Intrinsic_32 _asmNegateYW_mask
+                         local  Vector4Intrinsic_32 _asmGetSignMaskYW_zero
+                         local  unsigned char[16] permuteControl
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  unsigned char[16] permuteControl
+                         local  Vector4Intrinsic_32 tmp0
+                         local  Vector4Intrinsic_32 tmp1
+                         local  Vector4Intrinsic_32 tmp2
+                         local  Vector4Intrinsic_32 _asmNegateXZ_mask
+                         local  Vector4Intrinsic_32 _asmGetSignMaskXZ_zero
+                         local  unsigned char[16] permuteControl
+                         local  unsigned char[16] permuteControl
+                         local  Vector4Intrinsic_32 tmp0
+                         local  Vector4Intrinsic_32 tmp1
+                         local  Vector4Intrinsic_32 tmp2
+                         local  Vector4Intrinsic_32 tmp0
+                         local  Vector4Intrinsic_32 tmp1
+                         local  Vector4Intrinsic_32 tmp2
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  Vector4Intrinsic_32 xx_yy_zz_ww
+                         local  Vector4Intrinsic_32 zz_ww
+                         local  Vector4Intrinsic_32 xxpluszz_yyplusww
+                         local  Vector4Intrinsic_32 yyplusww
+                         local  Vector4Intrinsic_32 _asmNegateXZ_mask
+                         local  Vector4Intrinsic_32 _asmNegateYW_mask
+                         local  Vector4Intrinsic_32 temp0
+                         local  Vector4Intrinsic_32 temp1
+                         local  Vector4Intrinsic_32 temp2
+                         local  Vector4Intrinsic_32 temp3
+                         local  int[4] zero
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  int[4] zero
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  int[4] zero
+                         local  int32_t iVert
+                         local  int[4] zero
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  int32_t iPlane
+                         local  RNAVector4 vec
+                         inlines  AssertMacroHelper, GetFloat, Matrix44, Set, VecFloat, Vector4, operator float, operator(), operator=, vec_perm, vec_splat, vpu::Inverse, vpu::MagnitudeRecipXYZ, vpu::Mult, vpu::_asmReciprocalSquareRootDotV3, vpu::operator*=, vpu::operator+, vpu::operator-, vpu::operator/<VectorAxisW>
+  245  004DDBC8     94  void Frustum::SetViewportSize(const struct Frustum* this, int32_t width, int32_t height)
+  274  004DF8FC     94  void Frustum::SetViewProjViewportSize(const struct Frustum* this, const const RNAMatrix44& view, const const RNAMatrix44& proj, int32_t vptWidth, int32_t vptHeight)
+  302  004C8EBC     68  int32_t Frustum::GetLodChoice(float_t ppu, const float_t* lodSwitchPpus, int32_t numLods)
+                         local  int32_t lod
+  337  004DFB48     9C  void GlobalFrustum::CreateInstance()
+                         local  const char[15] __FUNCTION__
+                         inlines  GlobalFrustum, RNADebugBreak
+  364  004CCBA0     84  void GlobalFrustum::DestroyInstance()
+                         local  const char[16] __FUNCTION__
+                         inlines  RNADebugBreak

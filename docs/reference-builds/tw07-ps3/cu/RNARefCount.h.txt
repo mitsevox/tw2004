@@ -1,0 +1,19 @@
+// ../../../../../TIGERCODE/packages/RNA/dev-2.0-golf/RNA/RNACore/include/RNABase/RNARefCount.h
+// compiled in: rnaunity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   83    inline-only   const struct <anon>& operator=(const struct <anon>* this, const const struct <anon>& rhs)
+   90    inline-only   const struct <anon>& operator=(const struct <anon>* this, struct MaterialListC* pObject)
+                         local  const struct MaterialListC* pTemp
+  107    inline-only   struct CGFXShaderC* operator->(const const struct <anon>* this)
+  110    inline-only   struct RNAFX* operator RNAX::RNAFX*(const const struct <anon>* this)
+  110    inline-only   struct CGFXShaderC* operator RNAX::CGFXShaderC*(const const struct <anon>* this)
+  110    inline-only   struct SGNodeC* operator SceneX::SGNodeC*(const const struct <anon>* this)
+  110    inline-only   struct MaterialC* operator RNA::MaterialC*(const const struct AutoRefCount<RNA::MaterialC>* this)
+  110    inline-only   struct MaterialListC* operator RNA::MaterialListC*(const const struct <anon>* this)
+  110    inline-only   struct ShaderC* operator RNA::ShaderC*(const const struct AutoRefCount<RNA::ShaderC>* this)
+  110    inline-only   struct TextureC* operator RNA::TextureC*(const const struct AutoRefCount<RNA::TextureC>* this)
+  165    inline-only   int AddRef(const struct <anon>* this)
+  174    inline-only   int Release(const struct <anon>* this)
+                         local  const char[8] __FUNCTION__
+  185    inline-only   int GetRefCount(const struct <anon>* this)

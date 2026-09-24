@@ -1,0 +1,48 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_MyTour_Resume.cpp
+// compiled in: apt_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   24  000F9438     54  void UIMyTour_Resume::UIMyTour_Resume(const struct UIMyTour_Resume* this)
+   30  000F94E0     B8  void UIMyTour_Resume::~UIMyTour_Resume(const struct UIMyTour_Resume* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   34  00033860     24  void UIMyTour_Resume::Init(const struct UIMyTour_Resume* this)
+   41  000BC244    154  void UIMyTour_Resume::Show(const struct UIMyTour_Resume* this)
+                         local  const struct UserInfo& userInfo
+                         local  char* buffer
+                         inlines  Singleton<UserManager>::GetSingleton
+   62  00044EAC     54  void UIMyTour_Resume::OnShow(const struct UIMyTour_Resume* this)
+   68  000BC398    28C  void UIMyTour_Resume::UpdateHeaderRegion(const struct UIMyTour_Resume* this)
+                         local  const struct UserInfo& userInfo
+                         local  struct AptExternalContext pContext
+                         local  char* buffer
+                         inlines  Singleton<UserManager>::GetSingleton
+  104  000BC624    260  void UIMyTour_Resume::UpdateEarningsRegion(const struct UIMyTour_Resume* this)
+                         local  const struct UserInfo& userInfo
+                         local  struct AptExternalContext pContext
+                         local  char* buffer
+                         inlines  Singleton<UserManager>::GetSingleton
+  137  000BC884    3A0  void UIMyTour_Resume::UpdateCompletionRegion(const struct UIMyTour_Resume* this)
+                         local  const struct UserInfo& userInfo
+                         local  struct AptExternalContext pContext
+                         local  char* buffer
+                         local  const struct GameModeDriver* pDriver
+                         inlines  Singleton<UserManager>::GetSingleton
+  184  000BCC24    328  void UIMyTour_Resume::UpdateContentRegion(const struct UIMyTour_Resume* this)
+                         local  const struct UserInfo& userInfo
+                         local  struct AptExternalContext pContext
+                         local  char* buffer
+                         inlines  Singleton<UserManager>::GetSingleton
+  246  000BCF4C    3CC  void UIMyTour_Resume::UpdateAwardsRegion(const struct UIMyTour_Resume* this)
+                         local  const struct UserInfo& userInfo
+                         local  struct AptExternalContext pContext
+                         local  char* buffer
+                         inlines  Singleton<UserManager>::GetSingleton
+  310  00044F00    440  void UIMyTour_Resume::UpdateRecordsRegion(const struct UIMyTour_Resume* this)
+                         local  const struct UserInfo& userInfo
+                         local  struct AptExternalContext pContext
+                         local  char* buffer
+                         local  enum GM_DriverType_t saveDriverType
+                         inlines  Singleton<UserManager>::GetSingleton
+  372  000BD318    164  enum AptThreadReturnValue UIMyTour_Resume::UpdateResumeThread(const struct UIMyTour_Resume* this)
+  408  00033C60     24  void UIMyTour_Resume::Close(const struct UIMyTour_Resume* this)
+  413  00045340     90  enum eAptHandleInput UIMyTour_Resume::HandleInput(const struct UIMyTour_Resume* this, int32 cID)

@@ -1,0 +1,32 @@
+map-10 wave 3 (2026-09-24 08:56-10:15), range 02 0x80021980-0x80066558. Tried lists for the next lane.
+
+DONE
+- Skeleton.c LINKED: fn_80029C60 (no nWords local: `j < (nBits + 31) >> 5`), fn_80029664 (first bone loop
+  counts with nId, not i). Data: lbl_80187418/lbl_8018742C (.data 0x80187400-90), lbl_80281098/A0/A6
+  (.sdata 0x80281080-A8), Skeleton_StrippedFn for the 0.5/3.0 doubles after fn_80026D18's constants.
+  symbols.txt lbl_80281098 size 8 -> 6 (the 2 bytes are alignment; constcheck read it as a string).
+  NB .data 0x801871D0-0x801873E0 (bone name table lbl_80187278 + strings) sits BEFORE "mtalib.c":
+  it belongs to an earlier file (char.c/mtalib.c), not Skeleton.
+- LLPict_Gc.c LINKED: fn_8002F56C (band size `nWidth * sizeof(u32)`: an unsigned operand frees a register).
+- Swing_UpdateDownswing (s32 nX, nY), STATEFUNC_PreShotUpdate (no pState pointer local),
+  GoTerrain fn_80030CC8 (patch loop counts with i), GoDynamicCam fn_8003BDBC + ChoosePreFlightSequence
+  (int nRoll = uRand % ... before the loop; no fWeight local; TW07 has one float + int randomScript).
+
+TOOLS (scratch): w4_loopvar.py <fn> (swap each for-loop counter for every other int local),
+w4_types.py <fn> (int/s32/u32 flips), w4_inline.py <fn> (inline once-assigned locals). Need perm_setup first.
+
+TRIED, NO GAIN
+- UObject fn_800488B4 (1 instr, fmuls operand order of the 0.5 in fn_80014280(min(fFov,fMax)/2)):
+  *0.5f / 0.5f* hoist the lfs (5-7); /2.0f, *=0.5f give (x,c); helpers, if/else temp, extern/defined const,
+  GC/2.0/2.0p1/2.6 all same.
+- GoStaticCam fn_80065488: `if (fT >= fLastT) {fFrom=fLastT; fEnd=fT;} else {fFrom=0; fEnd=fT;} fT=fEnd;`
+  + block1 `fEnd = X; fT = fEnd;` + block2 same -> 2 instrs left (block 2 computes into f3 not f31). Not kept.
+- gocamscripts fn_8003F2E0: case 2 needs the ternary result in f2 with an explicit else fmr; `: 0.0` (double)
+  and f64 casts fix length (5 left); clamp helper with f64 param 13.
+- CameraScript_LagAimMarker: TW07 local order (arrays match EA order), param order (fRate first), fLen/fDY
+  locals, decl climb: none below 11.
+- PictInt_Decode: orig byte swaps are NOT the sthbrx idiom (masked rlwimi 16-23 / clrlslwi); 60+ forms tried.
+- Skeleton-like brute force (types, loop vars, inlines) found nothing for: fn_8004731C, DF_vDrawBufferToScreen,
+  Session_SetupProfiles, Ter_SearchForDropLocation, Ball_SetLie, Ball_FlightStep, fn_8003D414 (fnmsubs order),
+  fn_80026844 (`pTree + nGroupOff + 2` is 4 aligned but objdiff drops 99.18->98.75), fn_80034CAC (orig keeps
+  the `& 1` mask in a register: li r28,1; and.), fn_80031154 (inline nLast 59->41 only).

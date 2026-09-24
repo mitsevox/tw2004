@@ -1,0 +1,134 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/frontend/FE_GolferThumbnail.cpp
+// compiled in: apt_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+  119  000BF584    204  bool FEGolferThumbnail::DoCrAPGolferThumbnailGen(const struct FEGolferThumbnail* this, const struct UserInfo& ui)
+                         local  const char[25] __FUNCTION__
+                         local  const int32 rawDataBytes
+                         local  uint32* pRawData
+                         inlines  TagValuePair, UserManager::CurrentUserSlot, operator+
+  171  00021C64    578  void FEGolferThumbnail::ResizeRawImage(const struct FEGolferThumbnail* this, uint32* pRawData, int32 rawDataBytes)
+                         local  uint32[32768] resizedData
+                         local  int32 smallX
+                         local  int32 smallY
+                         local  float tmp
+                         local  float size
+                         local  int32[128] bigX
+                         local  int32[256] bigY
+                         local  float[128] pctX
+                         local  float[256] pctY
+                         local  uint32* pOut
+                         local  uint32* pTmp
+                         local  uint32[4] orig
+                         local  uint32 newPix
+                         local  uint32 orig01RGB_A0
+                         local  uint32 orig23RGB_A0
+                         local  int32 channel
+  290  000BED98    7EC  bool FEGolferThumbnail::FindCaptureRegion(const struct FEGolferThumbnail* this)
+                         local  vec4flt headPos
+                         local  vec4flt rFootPos
+                         local  vec4flt lFootPos
+                         local  struct TCharacter* pCharacter
+                         local  vec4flt screenPosTop
+                         local  vec4flt screenPosBotR
+                         local  vec4flt screenPosBotL
+                         local  int32 bufferSize
+                         local  int32 bottomPos
+                         inlines  Character_GetBonePos, LLMath_Scale, RC_vComputeRenderCtxWorldToPrimitiveCoordinate, __vec_mul, vec4flt_Copy, vec_ld, vec_st
+  348  000221DC    18C  void FEGolferThumbnail::CreateTexture(const struct FEGolferThumbnail* this, enum UserNumber whichPlayer)
+                         local  const struct UserInfo& ui
+                         local  uint8* pSrcImageData
+                         local  struct TextureLockInfo lockInfo
+                         local  void* pBits
+  384  00021B40     54  void FEGolferThumbnail::DestroyTexture(const struct FEGolferThumbnail* this, enum UserNumber whichPlayer)
+  393  00071340    3F0  void FEGolferThumbnail::GrabImageFromFrameBuffer(const struct FEGolferThumbnail* this, uint32* pDest, int32 bufSize)
+                         local  uint32 mFrameBytesPerPix
+                         local  TextureRef ref
+                         local  const TextureInfo* info
+                         local  struct TextureLockInfo lockInfo
+                         local  char* pBits
+                         local  int y
+                         local  int yBottom
+                         local  uint32* pTmp
+                         local  uint32* pSrc
+                         local  uint32* pEnd
+                         local  float brightness
+                         local  float contrast
+                         local  float intensity
+                         local  float shadows
+                         local  float highlights
+                         local  float saturation
+                         local  uint32* dest
+                         local  int y
+                         local  uint32* yLine
+                         local  int x
+                         local  bool alphaIsZero
+                         local  uint32* pColorPLATFORM_INLINE
+                         local  int x
+                         local  bool alphaIsZero
+                         local  uint32* pColorPLATFORM_INLINE
+                         local  int x
+                         inlines  CO_SCommandAPT::GetThumbnailBrightness, CO_SCommandAPT::GetThumbnailContrast, CO_SCommandAPT::GetThumbnailHighlight, CO_SCommandAPT::GetThumbnailIntensity, CO_SCommandAPT::GetThumbnailShadow
+  554  000797E4     B0  void FEGolferThumbnail::CompressToUserInfo(const struct FEGolferThumbnail* this, uint32* pRawData, int32 rawDataBytes, const struct UserInfo& ui)
+                         local  int32 thumbIndex
+                         local  void* pDestImageData
+  722    inline-only   void ExtendColor(const uint32& aarrggbbDST, const uint16& count, uint32 rSRC, uint32 gSRC, uint32 bSRC)
+                         local  uint32 R
+                         local  uint32 G
+                         local  uint32 B
+  744  000D7A20    914  void FixTextureAlpba::FixAlpbaInImage(uint32* image, int w, int h)
+                         local  const char[16] __FUNCTION__
+                         local  const int totalSize
+                         local  struct FillItem* fillBuffer
+                         local  bool foundAlpha0
+                         local  int pos
+                         local  int actualStep
+                         local  const int nextStep
+                         local  bool needStop
+                         local  int y
+                         local  int pos
+                         local  int x
+                         local  uint32 aarrggbbSRC
+                         local  const uint32 rSRC
+                         local  const uint32 gSRC
+                         local  const uint32 bSRC
+                         local  int pos
+                         inlines  ExtendColor, TagValuePair, operator+
+  843    inline-only   int32 byteclamp(int32 a)
+  848  00070F7C    3C4  void ChangeContrastBrightnessSaturation(uint32* argb, int32 size, float brightness, float contrast, float intensity, float shadows, float highlights, float saturation)
+                         local  const int32 br
+                         local  const int32 co
+                         local  const int32 in
+                         local  const int32 sh
+                         local  const int32 hi
+                         local  const double RW
+                         local  const double RG
+                         local  const double RB
+                         local  const int32 aSAT
+                         local  const int32 bSAT
+                         local  const int32 cSAT
+                         local  const int32 dSAT
+                         local  const int32 eSAT
+                         local  const int32 fSAT
+                         local  const int32 gSAT
+                         local  const int32 hSAT
+                         local  const int32 iSAT
+                         local  int32 x
+                         local  uint32 v
+                         local  int32 a
+                         local  int32 r
+                         local  int32 g
+                         local  int32 b
+                         local  int32 z
+                         local  int32 rh
+                         local  int32 gh
+                         local  int32 bh
+                         local  const int32 r2
+                         local  const int32 g2
+                         local  const int32 b2
+                         local  uint32 z2
+                         local  uint32 z3
+                         local  int32 zi
+                         local  uint32 zb
+                         local  uint32 zb
+                         inlines  byteclamp

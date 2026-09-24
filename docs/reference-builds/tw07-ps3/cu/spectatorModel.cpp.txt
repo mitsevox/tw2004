@@ -1,0 +1,24 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Spectator/spectatorModel.cpp
+// compiled in: golf2_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   37  00140438     3C  void Spectator_InitModels()
+   46  00140500      4  void Spectator_ReleaseModels()
+   55  00140B24     60  TSpectatorModel* Spectator_GetModel(unsigned int id)
+   69  00176E08    248  void Spectator_LoadModelCallback(struct TStreamData* spStreamData_p)
+                         local  uint32 id
+                         local  twGeom* pGeom
+                         local  TSpectatorModel* pModel
+                         local  const struct CharModelMgrCharacterInstance& instance
+                         inlines  CharModelMgr::GetCurrentCharacterInUse, CharModelMgr::IncrementMaxCharacterInUse
+  195  00140BBC    114  TextureRef Spectator_FindModelTexture(SPECTATOR_MODEL model_type)
+                         local  TextureRef tex
+                         local  const char* pTexGroup
+                         local  struct TextureGroup* pTextureGroup
+  211  00140CD0    114  TextureRef Spectator_FindModelNormalMap(SPECTATOR_MODEL model_type)
+                         local  TextureRef tex
+                         local  const char* pTexGroup
+                         local  struct TextureGroup* pTextureGroup
+  228  00140DE4    11C  void CSpectatorModel::RenderSetup(const struct CSpectatorModel* this, bool pre_render)
+  254  00140F00     88  void CSpectatorModel::Render(const struct CSpectatorModel* this)
+                         local  const struct CharModelMgrCharacterInstance& instance

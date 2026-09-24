@@ -1,0 +1,45 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptNativeHash.cpp
+// compiled in: other_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+  113  004607E8    358  void AptNativeHash::set(const struct AptNativeHash* this, struct AptString* pKey, struct AptValue* pValue)
+                         local  uint32_t hashVal
+                         local  uint32_t hashSlot
+                         local  struct AptHashItem* pEntry
+                         local  struct AptHashItem* pEntry
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptHashItem::Allocate, AptString::GetHash, AptString::operator==, AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount
+  168  00461648    3B4  void AptNativeHash::set(const struct AptNativeHash* this, const char* pKey, struct AptValue* pValue)
+                         local  uint32_t hashVal
+                         local  uint32_t hashSlot
+                         local  struct AptHashItem* pEntry
+                         local  struct AptString* pKeyString
+                         local  struct AptHashItem* pEntry
+                         local  int i
+                         inlines  AptHashItem::Allocate, AptString::AptString, AptString::operator new, AptValue::__inc, Capacity, UseCapacity
+  225  00427F6C    1F4  void AptNativeHash::unset(const struct AptNativeHash* this, struct AptString* pKey)
+                         local  uint32_t hashVal
+                         local  uint32_t hashSlot
+                         local  struct AptHashItem* pEntry
+                         local  struct AptHashItem* pPrevEntry
+                         inlines  AptHashItem::Free, AptString::GetHash, AptString::operator==
+  260  00401628    198  void AptNativeHash::unset(const struct AptNativeHash* this, const char* pKey)
+                         local  uint32_t hashVal
+                         local  uint32_t hashSlot
+                         local  struct AptHashItem* pEntry
+                         local  struct AptHashItem* pPrevEntry
+                         inlines  AptHashItem::Free
+  297  004017C0     C8  struct AptValue* AptNativeHash::lookup(const struct AptNativeHash* this, const char* pKey)
+                         local  uint32_t hashVal
+                         local  uint32_t hashSlot
+                         local  struct AptHashItem* pEntry
+  322  00406618    11C  struct AptValue* AptNativeHash::lookup(const struct AptNativeHash* this, struct AptString* pKey)
+                         local  uint32_t hashVal
+                         local  uint32_t hashSlot
+                         local  struct AptHashItem* pEntry
+                         inlines  AptString::GetHash, AptString::operator==
+  346  003EEB90     80  struct AptHashItem* AptNativeHash::getFirstItem(const struct AptNativeHash* this)
+                         local  int i
+  359  003EEC10     B4  struct AptHashItem* AptNativeHash::getNextItem(const struct AptNativeHash* this, struct AptHashItem* pItem)
+                         local  uint32_t hashSlot
+                         local  int32_t i

@@ -1,0 +1,15 @@
+// C:/packages/rwmovie/1.04.01/include/rwmovie/supplemental/eventlogger.h
+// compiled in: eventlogger.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   73    inline-only   unsigned int Tag(const const struct <anon>* this)
+   74    inline-only   const char* Message(const const struct <anon>* this)
+   76    inline-only   bool IsRegistered(const const struct <anon>* this)
+   83    inline-only   unsigned int UnregisteredTag()
+   87    inline-only   void Register(const struct <anon>* this, unsigned int tag)
+   88    inline-only   void Deregister(const struct <anon>* this)
+  111  006FFC94    44C  void EventLogger(const struct <anon>* this, struct IResourceAllocator* allocator, struct <anon>* printChannel, unsigned int maxEvents, unsigned int maxEntries)
+                         inlines  Allocate, BaseResources, Resource, ResourceDescriptor, ~ResourceDescriptor
+  113  006FF954    1A0  void ~EventLogger(const struct <anon>* this)
+                         local  unsigned int i
+                         inlines  Deregister, Free

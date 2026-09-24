@@ -1,0 +1,59 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/MoviePlayer/videorenderer_tw.cpp
+// compiled in: golf2_unity.cpp
+// 26 functions, source order. line | PS3 address | size
+
+   58  0014AB90     C0  unsigned int movie::NextPow2(unsigned int n)
+                         local  union MYFTOI t
+                         local  int l2
+   87  001857B4     BC  void VideoRenderer_TW(const struct <anon>* this)
+                         local  int i
+                         inlines  PrintMacroHelper
+  113  0014AC50     A4  void ~VideoRenderer_TW(const struct <anon>* this)
+                         local  int i
+                         inlines  ~IVideoRenderer
+  123  0018436C    244  void Init(const struct <anon>* this, struct IResourceAllocator* allocator, unsigned int width, unsigned int height)
+                         local  TextureOptions to
+                         local  float fNormWidth
+                         local  float fNormHeight
+                         local  float fRectX1
+                         local  float fRectY1
+                         local  float fScreenWidth
+                         local  float fScreenHeight
+                         local  bool bWideScreen
+                         local  vec4flt xColor
+                         inlines  PR_vFillVerticesWith2DRect, PR_vSetCurrentColor, PR_vSetCurrentUsage
+  201  0014ACF4     28  unsigned int GetNumberOfVideoBuffers(const struct <anon>* this, enum VideoFormat format)
+                         local  unsigned int numBuffers
+  229  0014AD1C     14  float GetRenderingDelay(const struct <anon>* this)
+  236  0014AD30      C  void SetReleaseRenderableCallback(const struct <anon>* this, ReleaseVideoRenderableFunc* releaseFunc, struct MovieDecoder* pContext)
+  244  0014AD3C     68  void SetPositionX(const struct <anon>* this, float x)
+  250  0014ADA4     68  void SetPositionY(const struct <anon>* this, float y)
+  256  0014AE0C      8  void SetPositionZ(const struct <anon>* this, float z)
+  263  0014AE14      8  float GetPositionX(const struct <anon>* this)
+  268  0014AE1C      8  float GetPositionY(const struct <anon>* this)
+  273  0014AE24      8  float GetPositionZ(const struct <anon>* this)
+  280  0014AE2C      8  void SetScaleX(const struct <anon>* this, float sx)
+  285  0014AE34      8  void SetScaleY(const struct <anon>* this, float sy)
+  291  0014AE3C      8  float GetScaleX(const struct <anon>* this)
+  296  0014AE44      8  float GetScaleY(const struct <anon>* this)
+  343  0015CD98    12C  void Render(const struct <anon>* this, struct <anon>* videoRenderable)
+                         local  struct TextureLockInfo[1] lockedRect
+                         local  int i
+                         inlines  PR_vSetCurrentTexture
+  400  0014AE4C      8  void Init(const struct <anon>* this, struct IResourceAllocator* allocator)
+  405  0014AE54      4  void Shutdown(const struct <anon>* this)
+  410  00185754     18  void VideoRenderableOperations_TW(const struct <anon>* this)
+  415  0014AE58     38  void ~VideoRenderableOperations_TW(const struct <anon>* this)
+                         inlines  ~IVideoRenderableOperations
+  429  00181A50    2CC  void Prepare(const struct <anon>* this, struct <anon>* videoRenderable, unsigned int width, unsigned int height, enum VideoFormat videoFormat, unsigned int numVideoBuffersPerFrame)
+                         local  uint32_t[1] bufSizes
+                         local  uint32_t[1] strides
+                         local  unsigned int i
+                         local  uint8_t* pData
+                         inlines  AllocateMemoryResource, ResourceDescriptor, SetData, SetFormat, SetHeight, SetNumBuffersUsed, SetSize, SetStride, SetWidth, ~ResourceDescriptor
+  472  001765A8    15C  void Release(const struct <anon>* this, struct <anon>* videoRenderable)
+                         local  unsigned int numVideoBuffersPerFrame
+                         local  unsigned int i
+                         inlines  FreeMemoryResource, GetNumBuffersUsed, SetContext, SetData, SetFormat, SetHeight, SetSize, SetWidth
+  507  0014AE90      4  void PreModify(const struct <anon>* this, struct <anon>* videoRenderable)
+  516  0014AE94      4  void PostModify(const struct <anon>* this, struct <anon>* videoRenderable)

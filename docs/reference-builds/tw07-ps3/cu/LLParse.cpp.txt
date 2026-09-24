@@ -1,0 +1,41 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLParse.cpp
+// compiled in: Legacy_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   16  0038E764     44  void CFParser::Reset(const struct CFParser* this)
+                         inlines  CFParser::UnselectCommand
+   23  00389A20     C4  void CFParser::AddCommand(const struct CFParser* this, const char* name, const char* description, CFParseCmdCallback* paramHandler, bool bInvokeCBackOnInit)
+                         local  int curCommand
+                         local  const struct CommandDataT& cmdData
+                         inlines  CFParser::NumCommands
+   39  00382FF8     BC  int CFParser::GetCommandIndex(const const struct CFParser* this, const char* commandName)
+                         local  int index
+                         local  int nCommands
+                         local  int i
+                         inlines  CFParser::NumCommands
+   59  0037DC4C     24  bool CFParser::IsWhitespace(const const struct CFParser* this, char chr)
+   64  0037DC70     C8  char* CFParser::EatWhiteSpace(const const struct CFParser* this, const char* inputBuf, int bufLen)
+                         local  const char* pRet
+                         local  int curBufLen
+   83  003830B4     C0  enum CFTokenType CFParser::GetTokenType(const const struct CFParser* this, const char* token)
+                         local  enum CFTokenType tType
+                         local  int sLen
+  105  0037DD38     D8  void CFParser::StripDecorations(const const struct CFParser* this, char* token)
+                         local  int sLen
+                         local  int startChar
+                         local  int i
+  131  00383174    1BC  char* CFParser::GetNextToken(const const struct CFParser* this, char* tokenData, size_t tokenDataBufLen, const enum CFTokenType& tType, const char* inputBuf, int bufLen)
+                         local  const char* pRet
+                         local  const char* endBuf
+                         local  int curDestChar
+  160  00383330    194  void CFParser::ParseBuffer(const struct CFParser* this, const char* tokenBuffer, int bufLen)
+                         local  const char* curBufPtr
+                         local  const char* pEndBuf
+                         local  int fCurBufLen
+                         local  char[256] token
+                         local  enum CFTokenType tokenType
+                         local  int curCommand
+                         local  bool bCallCommand
+                         local  const struct CommandDataT& cmd
+                         local  CFParseCmdCallback* pCBack
+                         inlines  CFParser::GetSelectedCommand, CFParser::SelectCommand

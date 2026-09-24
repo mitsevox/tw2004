@@ -1,0 +1,17 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_OnlineGameAdvertisement.h
+// compiled in: apt_unity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   16  001200F0    160  void UIOnlineGameAdvertisement::~UIOnlineGameAdvertisement(const struct UIOnlineGameAdvertisement* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIOnlineGameAdvertisement::DstMenuItem>::~TExternArray, UIMenuCircBase::~UIMenuCircBase
+   18  000FF668      C  uint32 UIOnlineGameAdvertisement::GetSignature(const const struct UIOnlineGameAdvertisement* this)
+   29  000FF674     24  void UIOnlineGameAdvertisement::RegainFocus(const struct UIOnlineGameAdvertisement* this, uint32 )
+   30  000FF698     24  void UIOnlineGameAdvertisement::LooseFocus(const struct UIOnlineGameAdvertisement* this, uint32 )
+   32  000FF6C4      8  int32 UIOnlineGameAdvertisement::GetSizeofArrayStruct(const struct UIOnlineGameAdvertisement* this)
+   33  000FF6D4      C  struct IExternArray* UIOnlineGameAdvertisement::GetExternArray(const struct UIOnlineGameAdvertisement* this)
+   36  000FF6E8     3C  void UIOnlineGameAdvertisement::UpdateItemAndLabelFlash(const struct UIOnlineGameAdvertisement* this, struct UIMenuItemBaseDst* menuItemToUpdate, int32 index, char* inLabel)
+   40  000FF724      4  void UIOnlineGameAdvertisement::SetItemPos(const struct UIOnlineGameAdvertisement* this, int32 inClipIndex, float inPos)
+   41  000FF728      4  void UIOnlineGameAdvertisement::SetItemPos(const struct UIOnlineGameAdvertisement* this, int32 inClipRowIndex, int32 inClipColumnIndex, float inPos)
+   67    inline-only   void UIOnlineGameAdvertisement::ShowMenu(const struct UIOnlineGameAdvertisement* this, struct UIResponseHandler* inpHandler, struct UIMenuItemBaseSrc* inMenuItemArray, int32 sizeMenu, int32 sizeofMenu, enum eMenuAllocType alloctype)
+  118  001153E0     1C  void UIOnlineGameAdvertisement::UpdateMenuItems_func(struct IAptSubscriber* subs)
+  119  0011546C     1C  enum AptThreadReturnValue UIOnlineGameAdvertisement::UpdateMenuItemsThread_func(struct IAptSubscriberBase* subs)

@@ -1,0 +1,31 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/lobbysettingstorage.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   77  00629BC0     50  void ~LobbySettingStorageStrategy(const struct <anon>* this)
+   84  0062486C     7C  void OperationCancel(const struct <anon>* this, const struct Operation* )
+   97  006248F0      4  void OperationTimeout(const struct <anon>* this, const struct Operation* )
+  111  006248F4      8  void StorageCallback(LobbySettingRefT* pRef, int32_t iError, void* pUserData)
+  146  005BB07C     D8  void PreSaveProcessing(const struct <anon>* this)
+                         local  char8_t[50] strEmail
+                         local  char8_t[50] strSMS
+                         local  int32_t iGameStats
+                         local  int32_t iAlerts
+  182  005BB154      4  void PostLoadProcessing(const struct <anon>* this)
+  187  005BB158    184  bool OperationProcess(const struct <anon>* this, const struct Operation* pOperation)
+                         local  bool bContinue
+  292  005BB05C     20  void HandleStorage(const struct <anon>* this, int32_t iError)
+  335  005EAC88     5C  void LobbySettingStorage(const struct LobbySettingStorage* this)
+  360  005BB2DC     58  void ~LobbySettingStorage(const struct LobbySettingStorage* this)
+                         inlines  ~SettingStorage
+  382  005FF244    12C  struct Operation* SettingStorageLoad(const struct LobbySettingStorage* this, struct SettingLoadCallback* pCallback)
+                         inlines  GetOperationManagerConcrete, LobbySettingStorageStrategy
+  404  005BB334    1DC  void SettingStorageLoadSetting(const struct LobbySettingStorage* this, struct Setting* pSetting)
+                         local  struct SettingString* pString
+                         local  char8_t[512] strValue
+                         local  struct SettingInteger* pInteger
+  448  005BB510    170  void SettingStorageSaveSetting(const struct LobbySettingStorage* this, struct Setting* pSetting)
+                         local  struct SettingString* pString
+                         local  struct SettingInteger* pInteger
+  489  005FF114    130  struct Operation* SettingStorageSave(const struct LobbySettingStorage* this, struct <anon>* pCallback)
+                         inlines  GetOperationManagerConcrete, LobbySettingStorageStrategy

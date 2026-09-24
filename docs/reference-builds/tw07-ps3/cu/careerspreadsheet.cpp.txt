@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/career/source/common/careerspreadsheet.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    6  00604760     34  void CareerSpreadsheet(const struct CareerSpreadsheet* this)
+                         inlines  SpreadSheet
+   10  005C7774     38  void ~CareerSpreadsheet(const struct CareerSpreadsheet* this)
+                         inlines  ~SpreadSheet

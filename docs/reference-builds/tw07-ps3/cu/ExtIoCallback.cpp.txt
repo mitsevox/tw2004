@@ -1,0 +1,37 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db_ext/2.21.04-RW-EAC/source/common/ExtIoCallback.cpp
+// compiled in: ExtIoCallback.cpp
+// 18 functions, source order. line | PS3 address | size
+
+    0  0081B0A0    10C  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+    0  0081B368     38  void IOCallback(const struct <anon>* this)
+   80  0081A1C0     9C  void ExtIoCallback(const struct <anon>* this)
+  100  0081A2F8     80  void ~ExtIoCallback(const struct <anon>* this)
+  116  0081A478     64  void SetFileName(const struct <anon>* this, const char* fileName)
+  132  0081A4DC     34  const char* GetFileName(const const struct <anon>* this)
+  148  0081A510     38  void SetBaseOffset(const struct <anon>* this, uint64_t offset)
+  164  0081A548     34  uint64_t GetBaseOffset(const const struct <anon>* this)
+  181  0081ADA8    280  enum TDbError Open(const struct <anon>* this, uint32_t maxSize, bool8_t bReadOnly)
+                         local  struct <anon> op
+                         local  enum OpStatus status
+                         local  int fileMode
+                         local  char[260] path
+                         local  char[260] file
+  244  0081A57C    114  enum TDbError Close(const struct <anon>* this)
+                         local  struct <anon> op
+                         local  enum OpStatus status
+  279  0081A690    1B8  enum TDbError Read(const struct <anon>* this, void* pBuffer, uint32_t bufSize, uint32_t* bytesRead)
+                         local  struct <anon> op
+                         local  enum OpStatus status
+  318  0081A848    1B8  enum TDbError Write(const struct <anon>* this, void* pBuffer, uint32_t bufSize, uint32_t* bytesWritten)
+                         local  struct <anon> op
+                         local  enum OpStatus status
+  355  0081AA00     BC  enum TDbError Seek(const struct <anon>* this, int32_t seekOffset)
+  382  0081AABC     34  uint32_t CalcPadding(const struct <anon>* this, uint32_t bytesWritten)
+  402  0081AAF0    2B8  void GetDirectoryPath(char* filePath, char* path, char* fileName)
+                         local  const char[17] __FUNCTION__
+                         local  char* slash
+                         local  char* end
+  442  0081B028     78  void T3db::TDbExtSysPrintf(char* format)
+                         local  va_list marker
+  450  0081B1AC     3C  static void _GLOBAL__I__ZN2EA4T3db12userCallbackE()
+  451  0081B1E8     3C  static void _GLOBAL__D__ZN2EA4T3db12userCallbackE()

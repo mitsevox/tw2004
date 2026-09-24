@@ -1,0 +1,6 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/extern/coda/cmn/coda.cpp
+// compiled in: coda.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   36  006DEBCC      C  void Snd::CODASetNew(CODANewFunctionType pNew)
+   42  006DEBD8      C  void Snd::CODASetDelete(CODADeleteFunctionType pDelete)

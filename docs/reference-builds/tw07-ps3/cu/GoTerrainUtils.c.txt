@@ -1,0 +1,93 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/GoTerrainUtils.c
+// compiled in: golf_unity.cpp
+// 27 functions, source order. line | PS3 address | size
+
+   83  002192DC     20  void Ter_SetPinPlacementMaskOverride(int iMask, bool bOverride)
+   89  002B0A6C     6C  int Ter_GetPinPlacementMask()
+                         local  int ret
+                         inlines  GM_GetCurrentFlagPositionIndex
+  402  00218F9C    114  bool GTU_TrackTerrainLookups(int which, float* point)
+                         local  int i
+                         local  int32 x
+                         local  int32 y
+                         local  int32 z
+  451  002190B0     94  float GTU_TrackTerrainLookups_cacheGet(int which, TGD_Cell** pCellResult, TGD_PolygonReference** pPolyRefResult, float*** pTriangleVertices, uint32* iFirstVertexIndex)
+  467  00219144    178  void GTU_TrackTerrainLookups_cacheAdd(int which, float* point, float height, TGD_Cell* pCellResult, TGD_PolygonReference* pPolyRefResult, float** pTriangleVertices, uint32 iFirstVertexIndex)
+                         local  int i
+  506  002193A0     A8  float GTU_TrackTerrainLookups_cacheGet2(int which, TGD_PolygonReference** pPolyRefResult, float*** pTriangleVertices, TGD_PolygonReference** pPolyRefResult2, float*** pTriangleVertices2, float* height2)
+  524  00219448    194  void GTU_TrackTerrainLookups_cacheAdd2(int which, float* point, float height, float height2, TGD_PolygonReference* pPolyRefResult, float** pTriangleVertices, TGD_PolygonReference* pPolyRefResult2, float** pTriangleVertices2)
+                         local  int i
+  561  00243E1C    1D0  void GTU_TrackTerrainLookups_Init()
+                         local  const char[29] __FUNCTION__
+                         local  int i
+                         inlines  TagValuePair, operator+
+  575  002195DC     E4  void GTU_TrackTerrainLookups_Exit()
+                         local  int i
+  593  002196C0    3B4  void GTU_TrackTerrainLookups_Report()
+                         local  int i
+                         local  float callsperframe
+  652  00219A74    41C  float Ter_GetSupportingGroundTriangle(const TGD_TerrainInfo* pTerrainData, const float* location, TGD_Cell** pCellResult, TGD_PolygonReference** pPolyRefResult, float*** pTriangleVertices, uint32* iFirstVertexIndex)
+                         local  int iCurrentPlacementMask
+                         local  float fHighestPoint
+                         local  int gx
+                         local  int gy
+                         local  int gridNum
+                         local  TGD_Cell* pCell
+                         local  TGD_PolygonReference* pPolyRef
+                         local  float** pVertexData
+                         local  uint8* pDrawKickData
+                         local  uint8 uiDrawKick
+                         local  int j
+                         local  int k
+                         local  float fHeight
+                         inlines  GM_GetCurrentFlagPositionIndex
+  905  00218D78    224  bool Ter_PointInTriangleXZpY(float* t0, float* t1, float* t2, float x, float z, float* y)
+                         local  vec3flt edge_t0t1
+                         local  vec3flt edge_t1t2
+                         local  vec3flt edge_t2t0
+                         local  vec3flt vec
+                         local  float A
+                         local  float B
+                         local  float C
+                         local  float D
+                         local  float tCross
+                         local  float xzCross
+                         local  float len
+                         local  float len
+                         local  float len
+                         local  float len
+                         local  float len
+ 1079  002192BC     20  float Ter_GetMorphScale(enum Ter_EUndulationType eType)
+ 1085  00247A50     44  void Ter_ParseTeeActor(TBasicParamPtr pData)
+                         local  TTeeParam* tee
+                         local  vec3flt teeLoc
+ 1108  00219E90     D4  void Ter_ParseCupActor(TBasicParamPtr pData)
+                         local  TPinParam* pin
+                         local  vec4flt pinLoc
+                         local  int8 nGreenIndex
+                         local  int8 nCupIndex
+ 1156  00219F64     98  void Ter_OrientFlagForWindDirection()
+                         local  vec4flt windVector
+                         local  float fWindVel
+                         local  int iFlagAnimIndex
+                         local  char*[3] sFlagAnimNames
+ 1206  00251254     78  void Ter_ResetTeesCups()
+                         local  uint32 i
+                         local  const float[4] originPoint
+                         inlines  vec4flt_Copy
+ 1224  00201B2C     18  uint32 Ter_GetNumTee()
+ 1229  00219FFC     28  uint32 Ter_GetNumCup()
+ 1234  00201B44     A4  float* Ter_GetTeeLocation(uint32 index)
+ 1252  00247918    138  void Ter_SetTeeLocation(uint32 index, float* loc)
+                         inlines  vec4flt_Copy3
+ 1288  00215F18     24  float[4]& Ter_GetTargetCupLocation()
+ 1293  001F463C     24  float[4]& Ter_GetTargetLocation()
+ 1301  0021A0E4      4  float[4]& Ter_GetCupLocation(int8 nGreenIndex, int8 nCupIndex)
+ 1310  0021A024     C0  float[4]& Ter_GetCupLocationAtGroundLevel(int8 nGreenIndex, int8 nCupIndex)
+ 1320  00201B08     24  void Ter_SetTargetLocation(const float[4]& loc)
+ 1325  00257430    130  float Ter_GetTerrainHeightAtLocation(float* pos)
+                         local  struct TGD_MaterialInfo* pMaterialInfo
+                         local  float height
+                         local  int matSurf
+                         local  vec4flt tempPos
+                         inlines  vec4flt_Copy

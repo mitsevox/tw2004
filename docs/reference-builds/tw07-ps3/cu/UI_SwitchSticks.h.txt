@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/UI_SwitchSticks.h
+// compiled in: apt_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   28  000FE660      C  uint32 UISwitchSticks::GetSignature(const const struct UISwitchSticks* this)
+   29  000FE66C     44  void UISwitchSticks::ShowHelpText(const struct UISwitchSticks* this)
+   33  000FE6B0     24  void UISwitchSticks::RegainFocus(const struct UISwitchSticks* this, uint32 )
+   34  000FE6D4     24  void UISwitchSticks::LooseFocus(const struct UISwitchSticks* this, uint32 )
+   37  001162E8     14  void UISwitchSticks::ExternSet_func(struct IAptSubscriber* subs)

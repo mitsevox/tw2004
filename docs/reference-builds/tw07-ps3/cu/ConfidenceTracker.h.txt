@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/Code/Golf/ConfidenceTracker/ConfidenceTracker.h
+// compiled in: golf_unity.cpp, other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   18  0027F3BC    274  void ConfidenceTracker::ConfidenceTracker(const struct ConfidenceTracker* this)
+                         local  int i
+   19  0021DA5C      4  void ConfidenceTracker::~ConfidenceTracker(const struct ConfidenceTracker* this)
+   21    inline-only   void ConfidenceTracker::AssignProfile(const struct ConfidenceTracker* this, struct ConfidenceProfileValueType* profile)

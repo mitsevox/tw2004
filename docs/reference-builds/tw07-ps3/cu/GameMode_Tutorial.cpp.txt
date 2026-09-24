@@ -1,0 +1,126 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_Tutorial.cpp
+// compiled in: golf_unity.cpp
+// 52 functions, source order. line | PS3 address | size
+
+   53  002048A8     50  void GameModeTutorial::GameModeTutorial(const struct GameModeTutorial* this)
+   59  002012A4     18  void GameModeTutorial::~GameModeTutorial(const struct GameModeTutorial* this)
+   63  00201320     44  void GameModeTutorial::RegisterStreamClients()
+   68  00201364     2C  void GameModeTutorial::UnregisterStreamClients()
+   73  00201390     D4  void GameModeTutorial::LoadTUTOFromStream(struct TStreamData* pStreamData)
+                         local  void* dataPtr
+                         local  uint32 size
+   88  002FA098    32C  void GameModeTutorial::Init(const struct GameModeTutorial* this)
+                         local  void* driverPtr
+                         inlines  GM_SetPlayerHoleStrokes, Singleton<GameModeDriverManager>::GetSingleton
+  143  0025807C    168  void GameModeTutorial::Update(const struct GameModeTutorial* this)
+                         local  enum GolferState curState
+  211  0020146C      4  void GameModeTutorial::Shutdown(const struct GameModeTutorial* this)
+  215  00201470     1C  bool GameModeTutorial::QueryInterface(const struct GameModeTutorial* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bRet
+  228  0020148C      4  void GameModeTutorial::LoadHole(const struct GameModeTutorial* this)
+  232  00201490      4  void GameModeTutorial::EndGame(const struct GameModeTutorial* this)
+  236  00201494     58  void GameModeTutorial::QuitGame(const struct GameModeTutorial* this)
+  249  002014EC    14C  CaddieTip GameModeTutorial::GetModeSpecificTip(const struct GameModeTutorial* this)
+                         local  CaddieTip cTip
+  331  00201638    150  const char* GameModeTutorial::GetModeSpecificTipString(const struct GameModeTutorial* this)
+                         local  const char* rval
+  413  00201788     18  bool GameModeTutorial::HoleFinished(const struct GameModeTutorial* this, enum PlayerNumber_t PlayerID, bool predict)
+  418  002017A0     18  bool GameModeTutorial::GameFinished(const struct GameModeTutorial* this, bool predict)
+  423  00292480    110  void GameModeTutorial::PreShotInit(const struct GameModeTutorial* this, enum PlayerNumber_t PlayerID)
+                         inlines  Singleton<DifficultySettings>::GetSingleton
+  438  00292590    138  void GameModeTutorial::SwingInit(const struct GameModeTutorial* this, enum PlayerNumber_t PlayerID)
+                         inlines  Gaud_StartTutorialComment, Singleton<DifficultySettings>::GetSingleton, UITutorial::SetTutorialType
+  463  00252EA4     AC  void GameModeTutorial::EndGolferTurn(const struct GameModeTutorial* this, enum PlayerNumber_t PlayerID)
+                         local  struct GoTemple* pTemple
+  495  002C8348    420  void GameModeTutorial::AfterShotButBeforePostReaction(const struct GameModeTutorial* this, enum PlayerNumber_t PlayerID)
+                         local  int32 iRandomTextIdx
+                         local  char[20] szTextID
+                         local  int32 iRandomTextIdx
+                         local  char[20] szTextID
+                         local  bool allTutorialsCompleted
+                         local  uint32 tutID
+                         inlines  Gaud_StartTutorialComment, Singleton<DifficultySettings>::GetSingleton, cGAME_GLOBALS::SetTutorialStatus
+  590  002017CC     20  int8 GameModeTutorial::GetStateAfterBallLands(const struct GameModeTutorial* this, enum PlayerNumber_t PlayerID)
+  599  0033AC20    204  int8 GameModeTutorial::HaltStateUpdate(const struct GameModeTutorial* this, enum PlayerNumber_t PlayerID)
+                         local  int8 nextState
+                         local  struct GoTemple* pTemple
+                         local  struct GoTemple* pTemple
+                         inlines  GoTemple::GetCurrentState, OnlineManagerOSDK::GetInstance, OnlineManagerOSDK::WaitingForChallenge
+  688  00201894     30  const char* GameModeTutorial::GetCurrentObjective(const struct GameModeTutorial* this)
+  694  002018C4     E0  enum ShotType_t GameModeTutorial::GetShotType(const struct GameModeTutorial* this)
+                         local  enum ShotType_t shotType
+  746  002019A4      C  float* GameModeTutorial::GetTargetLocation(const struct GameModeTutorial* this)
+  752  002019B0     48  float GameModeTutorial::GetFadeDistance(const struct GameModeTutorial* this)
+                         local  float fRetVal
+  766  002019F8     48  float GameModeTutorial::GetStance(const struct GameModeTutorial* this)
+                         local  float fRetVal
+  780  00201A40     24  bool GameModeTutorial::AlwaysShowTrueAimingCirlce(const struct GameModeTutorial* this)
+  792  00253A88    10C  void GameModeTutorial::ShowItTutorial(const struct GameModeTutorial* this, int32 iTutID, int32 iTutSubID)
+                         local  vec4flt fadeColor
+  819  00253984    104  void GameModeTutorial::TryItTutorial(const struct GameModeTutorial* this, int32 iTutID, int32 iTutSubID)
+                         local  vec4flt fadeColor
+                         inlines  cGAME_GLOBALS::SetTutorialStatus
+  846  0023D914     8C  void GameModeTutorial::SetupTutorialPlayer(const struct GameModeTutorial* this)
+  873  002C7F34    414  bool GameModeTutorial::General_IsFinishTut(const struct GameModeTutorial* this)
+                         local  bool bSuccess
+                         local  char[32] szHitDist
+                         local  vec4flt distVector
+                         local  vec4flt distVector
+                         local  char[32] szHitDist
+                         inlines  LLMath_Length3, LLMath_Subtract3, vec_madd, vec_sld
+  919  00201A64     68  void GameModeTutorial::SetControllerToAI(const struct GameModeTutorial* this)
+  931  00201ACC     3C  void GameModeTutorial::RestoreControllerFromAI(const struct GameModeTutorial* this)
+  938  0026C878    50C  void GameModeTutorial::SetTeeCupLocationForLesson(const struct GameModeTutorial* this)
+                         local  struct GoTemple* pTemple
+                         local  const struct TTutorialStreamInData& curLessonStreamInData
+                         local  float[4]* pCharPos
+                         local  vec4flt vTargetLoc
+                         local  vec4flt vTargetLoc
+                         local  vec4flt vTargetLoc
+                         local  vec4flt vTargetLoc
+                         inlines  GoTemple::EnableMaterialFiltering, vec4flt_Copy, vec_ld, vec_st
+ 1079  002524BC    100  uint32 GameModeTutorial::FindClosestTee(const struct GameModeTutorial* this, float* curPos)
+                         local  uint32 closestTeeNum
+                         local  vec4flt distVect
+                         local  float curMinDist
+                         local  float curDist
+                         local  uint32 teeNum
+                         inlines  LLMath_Subtract3
+ 1106  00201BE8     28  void GameModeTutorial::TutorialTryAgain_Yes()
+ 1112  0033ABA8     78  void GameModeTutorial::TutorialTryAgain_No()
+                         local  struct GoTemple* pTemple
+ 1127  00201C10     38  void GameModeTutorial::Drive_SetupTutPlayer()
+                         local  const bit32 availableClubs
+ 1140  00201C48     38  void GameModeTutorial::Aim_SetupTutPlayer()
+                         local  const bit32 availableClubs
+ 1156  00201C80      8  bool GameModeTutorial::Aim_IsFinishTut()
+ 1180  0027F004    264  bool GameModeTutorial::Fade_IsFinishTut()
+                         local  bool rval
+                         local  SW_sSwingData* swingData
+                         local  vec4flt vBackSwing
+                         local  vec4flt vForwardSwing
+                         local  float fBackSwingAngleDeg
+                         local  float fDotProduct
+                         inlines  GamePlayer::GetSwingInfo, LLMath_DotProduct, vec_add, vec_sld
+ 1217  00276768    264  bool GameModeTutorial::Draw_IsFinishTut()
+                         local  bool rval
+                         local  SW_sSwingData* swingData
+                         local  vec4flt vBackSwing
+                         local  vec4flt vForwardSwing
+                         local  float fBackSwingAngleDeg
+                         local  float fDotProduct
+                         inlines  GamePlayer::GetSwingInfo, LLMath_DotProduct, vec_add, vec_sld
+ 1254  00201C88     54  void GameModeTutorial::AllIrons_SetupTutPlayer()
+                         local  const bit32 availableClubs
+ 1267  00201CDC     40  bool GameModeTutorial::AllIrons_IsFinishTut()
+                         local  enum Club_t curClub
+ 1279  00201D1C     5C  bool GameModeTutorial::HighArc_IsFinishTut()
+                         local  bool rval
+ 1287  00201D78     5C  bool GameModeTutorial::LowArc_IsFinishTut()
+                         local  bool rval
+ 1295  00201DD4     50  void GameModeTutorial::AllPutts_SetupTutPlayer()
+                         local  const bit32 availableClubs
+ 1305  00201E24     38  bool GameModeTutorial::Punch_IsFinishTut()
+ 1311  00201E5C     38  bool GameModeTutorial::Pitch_IsFinishTut()
+ 1317  00201E94     38  bool GameModeTutorial::Flop_IsFinishTut()
+ 1323  00201ECC     38  bool GameModeTutorial::Chip_IsFinishTut()

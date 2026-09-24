@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/core/thread/atomic.h
+// compiled in: DbManager.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   37  007CDD78     5C  void AtomicInt(const struct <anon>* this, int32_t n)
+   58  007CF984     50  const int32_t operator const std::int32_t(const const struct <anon>* this)
+  118  007CDCD0     4C  int32_t GetValue(const const struct <anon>* this)
+                         local  int32_t nValue
+  158  007CDD1C     5C  int32_t SetValue(const struct <anon>* this, int32_t n)
+                         local  int32_t nOriginalValue

@@ -1,0 +1,50 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/GoViewCont.c
+// compiled in: golf_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+  138    inline-only   ViewController_t* ViewController_GetDataPtr(int32 iViewControllerID)
+  143  002158A8     30  void ViewController_ResetAll()
+                         local  int i
+  158  001ED898     2C  void ViewController_SetCurrentViewController(int32 iViewControllerID)
+  164  002158D8     18  ViewController_t* ViewController_GetCurrentViewController()
+  169  001EE478     20  ViewController_t* ViewController_GetIndexedViewController(int32 iViewControllerID)
+  174  001EACD4     1C  int32 ViewController_GetCurrentViewControllerID()
+  183  002BB6A8     F4  void ViewController_Init(int32 iViewControllerID, float fLeft, float fTop, float fWidth, float fHeight)
+                         local  ViewController_t* pViewController
+                         local  struct CA_SCamera* pCamera
+                         local  VM_SViewport* pViewport
+                         inlines  VM_vSetViewportRect, ViewController_GetDataPtr
+  257  0025D1A0     6C  void ViewController_Delete(int32 iViewControllerID)
+                         local  ViewController_t* pViewController
+                         inlines  ViewController_GetDataPtr
+  282  003270F0    6E0  void ViewController_Update(int32 iViewControllerID)
+                         local  struct RC_SRenderCtx* pRenderContext
+                         local  CameraController_t* pCameraController
+                         local  const const struct Trinity& trinity
+                         local  struct GoTemple* pTemple
+                         local  bool bIsTempleLoaded
+                         local  enum TempleStateE eCurrState
+                         local  vec4flt vAngles
+                         local  int ndx
+                         local  const float* mainMtx
+                         local  bool bProcessTrinity
+                         local  const float fov
+                         local  mat44flt trinityMtx
+                         local  float groundHeight
+                         local  const float* pipMtx
+                         local  const float fov
+                         local  mat44flt trinityMtx
+                         local  float groundHeight
+                         local  struct CA_SCamera* spCamera_p
+                         local  mat44flt viewToWorld
+                         inlines  CA_vSetCameraFieldOfView, CA_vSetCameraViewToWorldMatrix, CA_vSetDefaultScalingVectors, CameraController_IsFlybyDone, Camera_SetCameraYawPitchRollAndPosition, GoTemple::GetCurrentState, GoTemple::IsTempleLoaded, LLMath_CopyMat44, RC_spGetRenderCtxCamera, vec4flt_Copy3, vec_ld, vec_st
+  570  00253438     24  struct RC_SRenderCtx* ViewController_GetRenderContext(int32 iViewControllerID)
+  575  0025385C     24  CameraController_t* ViewController_GetCameraControl(int32 iViewControllerID)
+  580  00215968     28  CameraController_t* ViewController_GetCurrentCameraController()
+  585  00254454     24  void ViewController_SetActivePlayerNumber(int32 iViewControllerID, enum PlayerNumber_t ePlayerID)
+                         local  ViewController_t* pViewController
+  592  002544FC     24  enum PlayerNumber_t ViewController_GetActivePlayerNumber(int32 iViewControllerID)
+  599  00254B40     24  bool ViewController_IsActive(int32 iViewControllerID)
+  606  00307648     AC  void ViewController_TurnOnViewController(int32 iViewControllerID, bool active)
+                         local  ViewController_t* pViewController
+                         inlines  GM_GetGolferUp, ViewController_GetDataPtr

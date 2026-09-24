@@ -1,0 +1,19 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_PGATourAwards.cpp
+// compiled in: apt_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   43  000F57D0     88  void UIPGATourAwards::UIPGATourAwards(const struct UIPGATourAwards* this)
+                         inlines  TExternArray<UIAwards::DstMenuItem_awar>::TExternArray
+   49  000EEF54     8C  void UIPGATourAwards::Init(const struct UIPGATourAwards* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   62  00062C90     C4  void UIPGATourAwards::Show(const struct UIPGATourAwards* this)
+                         local  int32 numItems
+                         local  int32 numMenuItems
+   79  0007CB7C    1B0  void UIPGATourAwards::OnShow(const struct UIPGATourAwards* this)
+                         local  char[256] strBuf
+                         local  int32 curFedExPoints
+                         local  int32 totalFedExPoints
+                         local  int32 money
+                         local  char[16] baseMoneyString
+                         local  char* moneyGrandTotalAmount
+  114  000CEE08    1C4  enum eAptHandleInput UIPGATourAwards::HandleInput(const struct UIPGATourAwards* this, int32 cID)

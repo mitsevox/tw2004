@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/UI_ScoreCardManager.h
+// compiled in: apt_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   39  000FE484      C  uint32 UIScoreCardManager::GetSignature(const const struct UIScoreCardManager* this)
+   72    inline-only   void UIScoreCardManager::SetProgressBarIsON(const struct UIScoreCardManager* this)
+   73    inline-only   void UIScoreCardManager::SetProgressBarIsOFF(const struct UIScoreCardManager* this)
+   74    inline-only   void UIScoreCardManager::SetProgressBarValue(const struct UIScoreCardManager* this, float val)
+   77  00100FBC     14  void UIScoreCardManager::UpdateFlashData_func(struct IAptSubscriber* subs)
+   81  00111688     14  enum TAptSequenceStatus UIScoreCardManager::WaitForHUDHide_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)

@@ -1,0 +1,9 @@
+// ../../../../../TIGERCODE/Code/Golf/GameMode/Headers/GameMode_AlternateShot.h
+// compiled in: golf_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   31  0033EA1C     10  enum UIScoreCardDispMode_t GameModeAlternateShot::GetScoreDisplayMode(const struct GameModeAlternateShot* this, bool getAlternate)
+   43  0033EA2C      8  bool GameModeAlternateShot::AllowConcedeOption(const struct GameModeAlternateShot* this)
+   52  0033EA34      8  bool GameModeAlternateShot::IsTeamGame(const struct GameModeAlternateShot* this)
+   54  0033EA3C     14  char* GameModeAlternateShot::NumPlyReqStrID(const struct GameModeAlternateShot* this)
+   55  0033EA50      8  bool GameModeAlternateShot::AllowUserShotClockOverride(const struct GameModeAlternateShot* this)

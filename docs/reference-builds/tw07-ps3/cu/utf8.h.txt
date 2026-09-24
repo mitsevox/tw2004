@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/AptInterface/AptPackage/ea/string/utf8.h
+// compiled in: other_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   25    inline-only   int ToUcs4<const char*>(const const char*& iter)
+                         local  int ucs4
+  102    inline-only   bool SizeIsLength()

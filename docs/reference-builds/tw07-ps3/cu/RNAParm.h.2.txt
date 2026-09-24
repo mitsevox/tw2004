@@ -1,0 +1,14 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNAScope/RNAParm.h
+// compiled in: RNAMapping.cpp, RNAParm.cpp, RNAParmBlock.cpp, RNAParmList.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   77    inline-only   void operator delete(void* address)
+   77    inline-only   struct ICoreAllocator* GetClassAllocator()
+   77    inline-only   void* operator new(size_t size, const char* text, struct ICoreAllocator* allocator, enum AllocFlags allocator_flags, uint32_t alignment)
+   80  00820A68    114  void ParmC(const struct <anon>* this, struct ScopeParmC* pScopeParm)
+                         inlines  AddRef, RNADebugBreak, RNARef, Release, SetPtr
+   88    inline-only   struct <anon>* GetNext(const const struct <anon>* this)
+   91    inline-only   struct ScopeParmC* GetScopeParm(const const struct <anon>* this)
+   94    inline-only   uint32_t GetOffset(const const struct <anon>* this)
+   96    inline-only   struct ParmListC* GetParmList(const const struct <anon>* this)
+  109    inline-only   void SetNext(const struct <anon>* this, struct <anon>* pNext)

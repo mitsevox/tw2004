@@ -1,0 +1,13 @@
+// ../../../../../TIGERCODE/Code/Golf/TextureFX/Headers/TXRFile.h
+// compiled in: apt_unity.cpp, golf2_unity.cpp, other_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   45  00411C78     78  void TXRFile::TXRFile(const struct TXRFile* this)
+   46  003D38E8     68  void TXRFile::TXRFile(const struct TXRFile* this, const const struct Allocator& allocatorRef)
+   49  003D3A9C    164  void TXRFile::~TXRFile(const struct TXRFile* this)
+                         local  int i
+   51    inline-only   int32_t TXRFile::GetNumTexStates(const struct TXRFile* this)
+   59    inline-only   const char* TXRFile::GetTXRFileName(const struct TXRFile* this)
+   71    inline-only   bool TXRFile::IsValidSlider(const const struct TXRFile* this, int index)
+   72    inline-only   int TXRFile::NumSliders(const const struct TXRFile* this)
+   74    inline-only   int TXRFile::NumPalettes(const const struct TXRFile* this)

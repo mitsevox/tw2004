@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/GamePlayer/Headers/GolferStats.h
+// compiled in: apt_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  162    inline-only   int GolferStats::DisplayStat(const struct GolferStats* this, int plyrID, int index, int max_level)
+  167    inline-only   struct GolferData_t* GolferStats::GetGolferStats(const struct GolferStats* this, int index)

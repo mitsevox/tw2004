@@ -1,0 +1,8 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sgetdata.cpp
+// compiled in: sgetdata.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    6  006DDB74     C0  int SNDI_getb(void* psrc, int bytes)
+                         local  unsigned char* s
+                         local  int value
+                         local  int origbytes

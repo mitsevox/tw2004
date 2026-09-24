@@ -1,0 +1,15 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNAScope/RNAMapping.h
+// compiled in: RNAMapping.cpp, RNAScope.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   46  00820638     D0  void ~MapInputC(const struct MapInputC* this)
+                         inlines  RNADebugBreak, Release, ~ParmC
+   49    inline-only   struct MapInputC* GetNext(const const struct <anon>* this)
+   50    inline-only   ScopeMaskT GetScopeMask(const const struct <anon>* this)
+   77  008205E8     28  void MapOutputC(const struct <anon>* this)
+   80    inline-only   struct <anon>* GetNext(const const struct <anon>* this)
+  102    inline-only   struct MapInputC* GetFirstInput(const const struct <anon>* this)
+  103    inline-only   struct <anon>* GetFirstOutput(const const struct <anon>* this)
+  105    inline-only   ScopeMaskT MappingC::GetInputMask(const const struct MappingC* this)
+  109    inline-only   bool8_t IsBound(const const struct <anon>* this)
+  109    inline-only   bool8_t MappingC::IsBound(const const struct MappingC* this)

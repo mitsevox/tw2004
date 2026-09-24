@@ -1,0 +1,27 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptMovie.cpp
+// compiled in: other_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   18  004621B4    3EC  void AptMovie::resolve(const struct AptMovie* this, unsigned char* pBase, struct AptConstFile* aConstantFile, int* pnCurrentConstantIndex)
+                         local  int i
+                         local  int j
+                         local  struct AptEventActionSet* pActions
+                         local  int k
+                         inlines  AptHash::AptHash, AptHash::operator new, AptInteger::AptInteger, AptInteger::operator new
+   76  004625AC    380  void AptMovie::unresolve(const struct AptMovie* this, unsigned char* pBase, int* pnCurrentConstantIndex)
+                         local  int i
+                         local  int j
+                         local  struct AptEventActionSet* pActions
+                         local  int k
+                         inlines  checked_delete<AptHash>
+  133  00499004    1A4  void AptMovie::doFrameControls(const struct AptMovie* this, struct AptDisplayList* pDisplayList, struct AptCIH* pInst, int nFrame)
+                         local  int i
+                         local  struct AptControl* pControl
+  211  00497B8C     E4  void AptMovie::runFrameActions(const struct AptMovie* this, struct AptCIH* pInst, int nFrame)
+                         local  int i
+                         local  struct AptControl* pControl
+  226  0045F378    11C  void AptMovie::queueFrameActions(const struct AptMovie* this, struct AptCIH* pInst, int nFrame)
+                         local  int i
+                         local  struct AptControl* pControl
+  241  0040192C     4C  int AptMovie::labelToFrame(const struct AptMovie* this, const char* szLabel)
+                         local  struct AptValue* pFrame

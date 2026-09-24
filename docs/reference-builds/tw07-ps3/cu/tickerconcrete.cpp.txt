@@ -1,0 +1,99 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/tickerconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 17 functions, source order. line | PS3 address | size
+
+  294  006151EC    2EC  void ProcessComplete(const struct TickerConcrete* this)
+                         local  TickerRecordT rec
+                         local  int32_t queryResult
+                         local  struct <anon>* pMessage
+                         local  TickerStringT sec
+                         local  struct <anon> color
+                         local  uint32_t uNumElements
+                         local  struct TickerObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList, InsertElement, IsFull
+  437  005EB654    488  void PopulateTickerFilterOptions(const struct TickerConcrete* this)
+                         local  TickerFilterT Filter
+                         local  int32_t iResult
+                         local  const struct Dictionary* pConfiguration
+                         local  char8_t[256] strIgnoreList
+                         local  char8_t[32] strIgnoreRegionTag
+                         local  const char8_t* strRegion
+                         local  char8_t[256] strIgnoreRegionList
+                         local  char8_t[512] strExclusionList
+                         local  int32_t iPreviousHeader
+                         local  char8_t[4] strParam
+                         local  int32_t iErr
+                         local  uint32_t uIndex
+                         local  int32_t iParam
+                         local  uint32_t uIndex
+                         local  struct <anon> option
+                         local  bool bIgnore
+                         local  struct <anon>* pOption
+                         local  struct <anon> header
+                         local  struct <anon>* pHeaderOption
+                         inlines  GetInstance, InsertElement, RemoveAll, TickerFilterOption
+  575  005C0E20     3C  void EncodeTickerFilter(const struct TickerConcrete* this, TickerFilterT* pFilter, char8_t* pBuffer, uint32_t uBufferSize)
+  600  005C0E5C     B0  void DecodeTickerFilter(const struct TickerConcrete* this, const char8_t* strBuffer, TickerFilterT* pFilter)
+                         local  char8_t[16] strParam
+                         local  int32_t iErr
+  634  005D2CC8    1C0  void UpdateTickerDesires(const struct TickerConcrete* this)
+                         local  TickerFilterT filter
+                         local  const char8_t* pCurrentValue
+                         inlines  operator->
+  709  005D2E88    124  void SettingEvent(const struct TickerConcrete* this, struct Setting* pSetting, enum EventE eEvent)
+  768  00615F48    3F0  void TickerConcrete(const struct TickerConcrete* this, uint32_t uMaximumObservers)
+                         local  TickerFilterT Filter
+                         local  char8_t[32] strFilterDefault
+                         local  uint32_t uLoginSlotIndex
+                         local  const struct CoreGameParameters* pCoreParams
+                         inlines  AddObserver, GetInstance, List, RCPointer, operator=
+  849  00616728    200  void ~TickerConcrete(const struct TickerConcrete* this)
+                         local  struct SettingManagerConcrete* pSettingManager
+                         inlines  GetSettingManagerConcrete, RemoveAllInternal, RemoveObserver, ~List, ~RCPointer
+  895  005EBADC    4A8  bool AttemptConnection(const struct TickerConcrete* this)
+                         local  struct <anon>* pFacade
+                         local  const struct DictionaryConcrete* pServerConfig
+                         local  char8_t[64] strLoginKey
+                         local  char8_t[128] strTickerServer
+                         local  const struct CoreGameParameters* pGameParams
+                         local  char8_t[3] strLang
+                         local  char8_t[8] strCountry
+                         local  struct <anon>* pLocalUser
+                         local  LobbyApiRefT* pLobbyApi
+                         local  const char8_t* strPartition
+                         local  int32_t iTickerError
+                         inlines  GetInstance, GetServerConfiguration
+ 1017  00615140     AC  struct <anon>* CreateTickerMessage(const struct TickerConcrete* this, const TickerFilterT* pFilter, uint32_t uPriority, uint32_t uDisplayTime, uint32_t uSound)
+                         local  struct <anon>* pMessage
+ 1042  005D0E9C    284  void AddMessage(const struct TickerConcrete* this, struct <anon>* pTickerMessage)
+                         local  TickerRecordT Message
+                         local  const struct <anon>* pSectionList
+                         local  uint32_t uSectionCount
+                         local  int32_t iErr
+                         local  uint8_t uIndex
+                         local  TickerStringT DirtySDKSection
+                         local  struct <anon>* pSection
+                         local  const struct Color* pColor
+                         inlines  GetElementAt, GetNumberOfElements
+ 1098  005D0728      C  void RemoveMessage(const struct TickerConcrete* this, struct <anon>* pTickerMessage)
+                         inlines  RemoveElement
+ 1122  005C0F14     60  void LocalizePresence(void* , char8_t* pBuffer, int32_t iBufSize, const char8_t* pPersona, uint32_t bSignedIn)
+                         local  const char8_t* pMessage
+ 1144  005D1120     F0  void RemoveUnwantedMessages(const struct TickerConcrete* this)
+                         local  uint32_t uMessage
+                         local  TickerFilterT* pFilter
+                         inlines  GetElementAt, GetNumberOfElements, RemoveElementAt
+ 1179  005D2FAC     E4  void SetFilterOption(const struct TickerConcrete* this, uint32_t uValue)
+                         local  const char8_t* pCurrentValue
+                         local  TickerFilterT filter
+                         local  char8_t[32] strNewValue
+                         inlines  operator->
+ 1213  005D3090     E4  void ClearFilterOption(const struct TickerConcrete* this, uint32_t uValue)
+                         local  const char8_t* pCurrentValue
+                         local  TickerFilterT filter
+                         local  char8_t[32] strNewValue
+                         inlines  operator->
+ 1246  005C0F74     A0  bool IsFilterOptionSet(const struct TickerConcrete* this, uint32_t uValue)
+                         local  const char8_t* pCurrentValue
+                         local  TickerFilterT filter
+                         inlines  operator->

@@ -1,0 +1,14 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/istudio_runtime/FETextureMgr.c
+// compiled in: apt_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+  106  0002C3B8     4C  void FEtm_InitFETextureMgr()
+  115  0002C404     5C  void FEtm_CloseFETextureMgr()
+  128  0002C460     44  void FEtm_vRegisterStreamClients()
+  137  0002C4A4     2C  void FEtm_vUnregisterStreamClients()
+  146  0002C4D0     AC  void FEtm_vStreamCallback(struct TStreamData* xpStreamData_p)
+                         local  int32 iAssocChkRef
+  166  00023710     28  uint32* FEtm_GetTattooCLUTData()
+                         local  struct tattooTemplateDataStruct* pTat
+  180  0002C57C     58  uint8* FEtm_GetTattooTemplateData(int32 shape, int32 index)
+                         local  struct tattooTemplateDataStruct* pTat

@@ -1,0 +1,42 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_TerrainLo.cpp
+// compiled in: shader_unity.cpp
+// 29 functions, source order. line | PS3 address | size
+
+   38  0051BDEC    178  void SM_TerrainLoClass::SM_TerrainLoClass(const struct SM_TerrainLoClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base, vec4flt_Zero, vec_st
+   97  0050A848    6D8  void SM_TerrainLoClass::Load(const struct SM_TerrainLoClass* this)
+  163  0050AF20    298  void SM_TerrainLoClass::Activate(const struct SM_TerrainLoClass* this)
+  200  0050B1B8     48  void SM_TerrainLoClass::Deactivate(const struct SM_TerrainLoClass* this)
+  211  005132FC     74  void SM_TerrainLoClass::SetHighResUVScale(const struct SM_TerrainLoClass* this, float s0, float s1)
+  221  00513370     8C  void SM_TerrainLoClass::SetHasOverlayTexture(const struct SM_TerrainLoClass* this, bool hot)
+  231  005133FC     8C  void SM_TerrainLoClass::SetIsStructure(const struct SM_TerrainLoClass* this, bool is)
+  241  00513488     64  void SM_TerrainLoClass::SetColorTerrainTexture(const struct SM_TerrainLoClass* this, TextureRef tr)
+  251  005134EC     60  void SM_TerrainLoClass::SetCloudShadowContribution(const struct SM_TerrainLoClass* this, float contribution)
+  261  0051354C     64  void SM_TerrainLoClass::SetCloudShadowTexture(const struct SM_TerrainLoClass* this, TextureRef tr)
+  271  00518524     6C  void SM_TerrainLoClass::SetFogColor(const struct SM_TerrainLoClass* this, float* camPos)
+                         inlines  vec4flt_Copy
+  281  00518590     6C  void SM_TerrainLoClass::SetFogCameraPos(const struct SM_TerrainLoClass* this, float* camPos)
+                         inlines  vec4flt_Copy
+  291  005135B0     60  void SM_TerrainLoClass::SetFogDensity(const struct SM_TerrainLoClass* this, float f)
+  301  00513610     60  void SM_TerrainLoClass::SetFogStartRadius(const struct SM_TerrainLoClass* this, float f)
+  311  00513670     60  void SM_TerrainLoClass::SetFogHeightTop(const struct SM_TerrainLoClass* this, float f)
+  321  005136D0     64  void SM_TerrainLoClass::SetOverlayTexture(const struct SM_TerrainLoClass* this, TextureRef tr)
+  341  00513734     64  void SM_TerrainLoClass::SetShadowTexture(const struct SM_TerrainLoClass* this, TextureRef tr)
+  351  00513798     64  void SM_TerrainLoClass::SetTerLightmapTexture(const struct SM_TerrainLoClass* this, TextureRef tr)
+  371  005137FC     60  void SM_TerrainLoClass::SetHRTextureFadeFactor(const struct SM_TerrainLoClass* this, float f)
+  381  0051385C     60  void SM_TerrainLoClass::SetDistToStopFadingStructures(const struct SM_TerrainLoClass* this, float dist)
+  391  005138BC     60  void SM_TerrainLoClass::SetStructureFadeAlpha(const struct SM_TerrainLoClass* this, float a)
+  401  005185FC     6C  void SM_TerrainLoClass::SetHRCamPos(const struct SM_TerrainLoClass* this, float* camPos)
+                         inlines  vec4flt_Copy
+  411  0051391C     70  void SM_TerrainLoClass::SetHRShadowDispUnscaled(const struct SM_TerrainLoClass* this, float dx, float dy, float dz)
+  421  0051398C     60  void SM_TerrainLoClass::SetHRShadowDist(const struct SM_TerrainLoClass* this, float d)
+  431  00518668     6C  void SM_TerrainLoClass::SetLowResShadowsColor(const struct SM_TerrainLoClass* this, float* c)
+                         inlines  vec4flt_Copy
+  441  005186D4     B4  void SM_TerrainLoClass::SetMshadow(const struct SM_TerrainLoClass* this, float[4]* pShadow)
+                         inlines  vec4flt_Copy, vec_st
+  453  00518788     B4  void SM_TerrainLoClass::SetMshadowHR(const struct SM_TerrainLoClass* this, float[4]* pShadow)
+                         inlines  vec4flt_Copy, vec_st
+  465  0051883C     B4  void SM_TerrainLoClass::SetMshadowGolfer(const struct SM_TerrainLoClass* this, float[4]* pShadow)
+                         inlines  vec4flt_Copy, vec_st
+  478  005188F0     88  void SM_TerrainLoClass::SetMcloudShadows(const struct SM_TerrainLoClass* this, float[4]* pShadow)
+                         inlines  vec4flt_Copy, vec_st

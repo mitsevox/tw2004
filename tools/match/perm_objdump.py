@@ -7,7 +7,8 @@ import json, pathlib, re, subprocess, sys
 ROOT = pathlib.Path(__file__).resolve().parents[2]   # the checkout this script lives in
 
 fn, obj = sys.argv[1], sys.argv[2]
-out = subprocess.run([str(ROOT / 'build/tools/objdiff-cli.exe'), 'diff', '-1', obj, '-2', obj, fn,
+CLI = ROOT / ('build/tools/objdiff-cli' + ('.exe' if sys.platform == 'win32' else ''))
+out = subprocess.run([str(CLI), 'diff', '-1', obj, '-2', obj, fn,
                       '-o', '-', '--format', 'json'], capture_output=True, text=True).stdout
 d = json.loads(out)
 lines = ['', 'Disassembly of section .text:', '', '00000000 <%s>:' % fn]

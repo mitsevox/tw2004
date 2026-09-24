@@ -1,0 +1,6 @@
+// ../ears_common/dev/include/ears_common/commontypes.h
+// compiled in: Hash.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  104    inline-only   int TOLOWER(int x)
+  111    inline-only   int TOUPPER(int x)

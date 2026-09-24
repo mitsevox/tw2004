@@ -1,0 +1,14 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNAX/include/RNAX/RNABuilder.inl
+// compiled in: RNABuilder.cpp, RNABuilderTarget.cpp, Scrape.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   39    inline-only   union <anon>& GetElement(const struct <anon>* this, enum ElementNameE eName, uint32_t uIndex)
+   44    inline-only   enum ElementFormatE GetFormat(const const struct <anon>* this, enum ElementNameE eName, uint32_t uIndex)
+  225    inline-only   void SetElement4f(const struct <anon>* this, enum ElementNameE eName, uint32_t uIndex, float_t x, float_t y, float_t z, float_t w)
+                         local  const char[13] __FUNCTION__
+  237    inline-only   void SetElement3f(const struct <anon>* this, enum ElementNameE eName, uint32_t uIndex, float_t x, float_t y, float_t z)
+                         local  const char[13] __FUNCTION__
+  307    inline-only   void SetPosition3f(const struct <anon>* this, float_t x, float_t y, float_t z)
+  319    inline-only   void SetNormal3f(const struct <anon>* this, float_t x, float_t y, float_t z)
+  349    inline-only   void SetTexCoord3f(const struct <anon>* this, uint32_t uIndex, float_t x, float_t y, float_t z)
+  369    inline-only   void SetColor4f(const struct <anon>* this, const const RNAVector4& v)

@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/actionalertloginabort.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   66  005FD5E0     70  void ActionAlertLoginAbort(const struct <anon>* this, const char8_t* pName, struct LoginToMasterServerAbstract* pLoginToMasterServer)
+                         inlines  RCPointer, operator=
+   88  0061C1BC     9C  void PerformAction(const struct <anon>* this)
+                         inlines  GetInstance, operator->

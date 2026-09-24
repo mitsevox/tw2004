@@ -1,0 +1,47 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/rsxgpu/dev/source/rsxgpu/RSXFifo.cpp
+// compiled in: RSXFifo.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   93  008D46C8     2C  void RSXFIFO_InsertHackNop(struct CellGcmContextData* pContext)
+  103  008D4D34    1C8  int32_t RSXFIFOReferenceCallback(struct CellGcmContextData* pContext, uint32_t size)
+                         local  CellGcmControl* pControl
+                         local  uint32_t* pEnd
+                         local  uint32_t* pBegin
+                         local  bool bFifoWrap
+                         local  uint32_t* pCurrent
+                         local  uint32_t neededSpace
+                         local  uint32_t* pEndTemp
+                         local  uint32_t* pReference
+                         local  uint32_t freeSpace
+  279  008D46F4     20  void RSXFIFODelay()
+                         inlines  sys_timer_usleep
+  287  008D4714      C  void RSXFIFOSetDelayCallback(RSXFIFODelayCallback pFunc)
+  292  008D4720      C  void RSXFIFOSetFlushCallback(RSXFIFOFlushCallback pFunc)
+  297  008D472C     10  void RSXFIFOSetDefaultDelayCallback()
+  302  008D473C     10  void RSXFIFOSetDefaultFlushCallback()
+  311  008D474C    120  int32_t RSXFIFOBegin(uint32_t* pFIFO, uint32_t size)
+                         local  int32_t errorCode
+  349  008D486C    104  int32_t RSXFIFOEnd()
+                         local  int32_t errorCode
+                         local  uint32_t* pFIFOBegin
+                         local  uint32_t* pFIFOEnd
+                         local  uint32_t sliceCount
+                         local  uint32_t sliceIndex
+                         local  uint32_t sliceIndexNext
+                         local  uint32_t sliceWordOffset
+                         local  uint32_t* pBegin
+                         local  uint32_t addressOffset
+  388  008D49D0     7C  void RSXFIFOFinish()
+  406  008D4970     60  void RSXFIFOReserve(uint32_t maxWords)
+  428  008D4A6C     78  uint32_t* RSXFIFOBeginWrite(uint32_t maxWords)
+                         local  uint32_t reserved
+  442  008D4AE4     70  void RSXFIFOEndWrite(uint32_t* endPtr)
+  452  008D4A4C     20  uint32_t RSXFIFOGetSpaceAvailable()
+  463  008D4B54     70  void RSXFIFOCopyData(const uint32_t* ptr, uint32_t numWords)
+                         local  uint32_t* dest
+  492  008D4EFC     6C  void eaFifoStartShadowCommandBuffer(uint32_t* pBase, uint32_t* pEnd)
+                         inlines  Gcm::cellGcmFlush
+  506  008D4CC0     74  void eaFifoStopShadowCommandBuffer(uint32_t** ppEnd)
+                         inlines  Gcm::cellGcmFlush
+  525  008D4BC4     FC  bool eaFifoShadowBufferLogFlush(const uint32_t* pPrevPutPtr, const uint32_t* pNextPutPtr)
+                         local  size_t nWords

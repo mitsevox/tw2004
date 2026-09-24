@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/Headers/UI_ComponentManager.h
+// compiled in: other_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+  529    inline-only   struct UIMainMenu* UI_ComponentManager::getUIMainMenu()
+  543    inline-only   struct UILoadProfileWidget* UI_ComponentManager::getUILoadProfileWidget()
+  560    inline-only   struct UIOnlineGameSetup* UI_ComponentManager::getUIOnlineGameSetup()
+  564    inline-only   struct UIOnlineGameAdvertisement* UI_ComponentManager::getUIOnlineGameAdvertisement()
+  593    inline-only   struct UIOptions* UI_ComponentManager::getUIOptions()
+  594    inline-only   struct UIGameFace* UI_ComponentManager::getUIGameFace()
+  620    inline-only   struct UIChiron* UI_ComponentManager::getUIChiron()

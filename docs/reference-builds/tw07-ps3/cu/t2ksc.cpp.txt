@@ -1,0 +1,183 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptFF/core/t2ksc.cpp
+// compiled in: other_unity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   41  003F2CD8    19C  static struct T2KInterSectType* AllocFreeNodes(struct tsiScanConv* t)
+                         local  struct T2KInterSectType* ptr
+                         local  int32_t N
+                         local  const int32_t oldMaxCount
+                         local  int i
+   84    inline-only   static void FreeAllNodes(struct tsiScanConv* t)
+                         local  int i
+  110    inline-only   static void ComputeScanBBox(struct tsiScanConv* t)
+                         local  int32_t i
+                         local  int32_t first
+                         local  int32_t last
+                         local  int32_t xmin
+                         local  int32_t xmax
+                         local  int32_t ymin
+                         local  int32_t ymax
+                         local  int32_t x
+                         local  int32_t y
+                         local  struct T2KInterSectType* next
+                         local  struct T2KInterSectType* node
+  209    inline-only   static void ComputeOutlineBBox(struct tsiScanConv* t, int32_t* xPtr, int32_t* yPtr, int32_t lastPoint)
+                         local  int32_t i
+                         local  int32_t* ptr
+                         local  int32_t min
+                         local  int32_t max
+                         local  int32_t tmp
+                         local  int32_t direction
+  280  003F4088    600  static void drawLine(struct tsiScanConv* t, int32_t x0, int32_t y0, int32_t x2, int32_t y2)
+                         local  int32_t xA
+                         local  int32_t xB
+                         local  int32_t yA
+                         local  int32_t yB
+                         local  int32_t center
+                         local  int32_t dist
+                         local  uint8_t flagBit0
+                         local  struct T2KInterSectType** head
+                         local  uint32_t utmp32
+                         local  int32_t x
+                         local  int32_t xStep
+                         local  struct T2KInterSectType** headPtr
+                         local  struct T2KInterSectType* node
+                         local  struct T2KInterSectType* newbie
+                         local  int32_t coordinate25Dot6_flag1
+                         local  struct T2KInterSectType* next
+                         local  struct T2KInterSectType** headPtr
+                         local  struct T2KInterSectType* node
+                         local  struct T2KInterSectType* newbie
+                         local  int32_t coordinate25Dot6_flag1
+                         local  int32_t y
+                         local  int32_t yStep
+                         local  struct T2KInterSectType** headPtr
+                         local  struct T2KInterSectType* node
+                         local  struct T2KInterSectType* newbie
+                         local  int32_t coordinate25Dot6_flag1
+                         local  struct T2KInterSectType* next
+                         local  struct T2KInterSectType* next
+                         local  struct T2KInterSectType** headPtr
+                         local  struct T2KInterSectType* node
+                         local  struct T2KInterSectType* newbie
+                         local  int32_t coordinate25Dot6_flag1
+                         local  struct T2KInterSectType* next
+  698  003F4688    320  static void draw3rdDegreeBezierInner(struct tsiScanConv* t, int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, int32_t error)
+                         local  int32_t dZ
+                         local  int32_t count
+                         local  int32_t midX
+                         local  int32_t midY
+                         local  int32_t[144] Arr
+                         local  int32_t* wp
+                         local  int32_t xB
+                         local  int32_t yB
+                         local  int32_t xC
+                         local  int32_t yC
+  775    inline-only   static void draw3rdDegreeBezierOuter(struct tsiScanConv* t, int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3)
+                         local  int32_t midX
+                         local  int32_t midY
+                         local  int32_t xB
+                         local  int32_t yB
+                         local  int32_t xC
+                         local  int32_t yC
+                         local  int32_t dZ
+                         local  int32_t error
+  810    inline-only   static void Make3rdDegreeEdgeList(struct tsiScanConv* t)
+                         local  int startPoint
+                         local  int lastPoint
+                         local  int ctr
+                         local  int ptA
+                         local  int ptB
+                         local  int32_t Ax
+                         local  int32_t Bx
+                         local  int32_t Ay
+                         local  int32_t By
+                         local  int32_t* x
+                         local  int32_t* y
+                         local  int32_t pointCount
+                         local  int8_t* onCurve
+                         local  int32_t Cx
+                         local  int32_t Dx
+                         local  int32_t Cy
+                         local  int32_t Dy
+                         local  int ptC
+                         local  int ptD
+  891    inline-only   static void Make2ndDegreeEdgeList(struct tsiScanConv* t)
+ 1006  003F49A8    7EC  struct tsiScanConv* tsi_NewScanConv(struct tsiMemObject* mem, int16_t numberOfContours, int16_t* startPtr, int16_t* endPtr, int32_t* xPtr, int32_t* yPtr, int8_t* onCurvePtr, uint8_t greyScaleLevel, int8_t curveType, int8_t xDropOutControl, int8_t yDropOutControl, int smart_droput, int include_stubs, F26Dot6 oneHalfFUnit)
+                         local  struct tsiScanConv* t
+                         local  int32_t i
+                         local  int32_t min
+                         local  int32_t max
+                         local  int32_t tmp
+                         local  int32_t direction
+                         local  struct T2KInterSectType** base
+                         inlines  ComputeOutlineBBox, Make3rdDegreeEdgeList
+ 1193  003F2F90   10F8  void MakeBits(struct tsiScanConv* t, int8_t xWeightIsOne, int8_t omitBitMap, FF_GetCacheMemoryPtr funcptr, void* theCache, int bitRange255, uint8_t* remapBits, int extraColumn)
+                         local  int32_t i
+                         local  int32_t N
+                         local  int32_t xmin
+                         local  int32_t xmax
+                         local  int32_t ymin
+                         local  int32_t ymax
+                         local  int32_t w
+                         local  int32_t h
+                         local  int32_t rowBytes
+                         local  uint8_t* baseAddr
+                         local  uint8_t* ptr
+                         local  int32_t xmid
+                         local  int32_t ymid
+                         local  uint8_t greyScaleLevel
+                         local  int windingCount
+                         local  uint32_t* lptr
+                         local  int32_t lim
+                         local  struct T2KInterSectType* node
+                         local  struct T2KInterSectType* next
+                         local  int32_t x1
+                         local  int32_t x2
+                         local  int32_t b1
+                         local  int32_t b2
+                         local  int weDidXDropouts
+                         local  struct T2KInterSectType* node
+                         local  struct T2KInterSectType* next
+                         local  int32_t x1
+                         local  int32_t x2
+                         local  int32_t y
+                         local  int32_t x
+                         local  int32_t k
+                         local  int weDidYDropouts
+                         local  struct T2KInterSectType* node
+                         local  struct T2KInterSectType* next
+                         local  int32_t y1
+                         local  int32_t y2
+                         local  int32_t y
+                         local  int32_t x
+                         local  int32_t k1
+                         local  int32_t k2
+                         local  int32_t h1
+                         local  struct T2KInterSectType* node
+                         local  struct T2KInterSectType* next
+                         local  int32_t x1
+                         local  int32_t x2
+                         local  int32_t xA
+                         local  int32_t xB
+                         local  struct T2KInterSectType* node
+                         local  struct T2KInterSectType* next
+                         local  int32_t y1
+                         local  int32_t y2
+                         local  int32_t x
+                         local  int32_t k
+                         local  int32_t yA
+                         local  int32_t yB
+                         local  uint8_t otherSample
+                         local  uint8_t thisSample
+                         local  uint8_t* otherPtr
+                         local  int32_t w1
+                         local  int32_t w2
+                         local  int32_t w1
+                         local  int32_t w2
+                         local  int32_t w1
+                         local  int32_t w2
+                         local  int tmp8
+                         inlines  ComputeScanBBox
+ 1726  003F2E74    11C  void tsi_DeleteScanConv(struct tsiScanConv* t)
+                         inlines  FreeAllNodes

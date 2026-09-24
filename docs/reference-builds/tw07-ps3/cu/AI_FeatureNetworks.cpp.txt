@@ -1,0 +1,187 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/AI/AI_FeatureNetworks.cpp
+// compiled in: golf2_unity.cpp
+// 41 functions, source order. line | PS3 address | size
+
+   83  00183988     A8  const struct AIFeatureNetwork* AIFeatureNetwork::GetNextInteriorNetwork(const struct AIFeatureNetwork* this, const struct AIFeatureNetwork* curIntNetwork)
+                         inlines  Singleton<AIFeatureNetworkMgr>::GetSingleton
+   94  001999B4    104  void AIFeatureNetworkMgr::AIFeatureNetworkMgr(const struct AIFeatureNetworkMgr* this)
+                         inlines  AIFeatureNetworkList::AIFeatureNetworkList, Singleton<AIFeatureNetworkMgr>::Singleton
+  117  001463B8     8C  void AIFeatureNetworkMgr::~AIFeatureNetworkMgr(const struct AIFeatureNetworkMgr* this)
+                         inlines  Singleton<AIFeatureNetworkMgr>::~Singleton
+  128  001451BC    13C  void AIFeatureNetworkMgr::RegisterLoadNetworkCallbacks()
+  150  00145DD8     50  void AIFeatureNetworkMgr::PostLoadInit(const struct AIFeatureNetworkMgr* this)
+  163  0014632C     8C  void AIFeatureNetworkMgr::Close(const struct AIFeatureNetworkMgr* this)
+  185  001B8078    284  float AIFeatureNetworkMgr::ShotDistanceToHazard(const struct AIFeatureNetworkMgr* this, const float* start, const float* end)
+                         local  float closestDist
+                         local  vec4flt intersect
+                         local  float distToNetwork
+                         local  const struct AIFeatureNetwork* hazardNetwork
+                         local  struct TNetwork* pNetwork
+                         inlines  LLMath_DistanceBetween3
+  250  001BBE9C    A4C  float AIFeatureNetworkMgr::AssessRisk(const struct AIFeatureNetworkMgr* this, const float* start, const float* end, float bounceDist)
+                         local  float risk
+                         local  vec4flt intersect
+                         local  float shotDist
+                         local  vec4flt bounceLoc
+                         local  bool bUseOneBallAI
+                         local  const struct TNetwork* oobNetwork
+                         local  const struct AIFeatureNetwork* greenNetwork
+                         local  const struct AIFeatureNetwork* waterNetwork
+                         local  const struct AIFeatureNetwork* islandNetwork
+                         local  bool targetingIsland
+                         local  const struct AIFeatureNetwork* bunkerNetwork
+                         local  const struct AIFeatureNetwork* fairwayNetwork
+                         local  vec4flt vec
+                         local  int32 i
+                         local  struct AIFeatureNetwork tempFeatNet
+                         local  vec4flt intersect
+                         local  bool intoBunker
+                         local  const struct AIFeatureNetwork* intNetwork
+                         local  float tempRisk
+                         local  bool intoWater
+                         inlines  LLMath_AddScale3, LLMath_DistanceBetween3, LLMath_Subtract, vec4flt_Copy, vec_madd, vec_sld, vec_splat, vec_sub
+  481  001ADA0C    79C  bool AIFeatureNetworkMgr::IsShotPossible(const struct AIFeatureNetworkMgr* this, const float* start, const float* end, struct CoreShotInfo_t* shotInfo, enum ShotType_t shotType, enum Club_t club, float stance)
+                         local  float launchAngle
+                         local  float sinLaunchAngle
+                         local  vec4flt vec
+                         local  vec4flt normVec
+                         local  float shotDist
+                         local  float adjShotDist
+                         local  float maxDist
+                         local  float shotPower
+                         local  float bounceDist
+                         local  float maxPower
+                         local  float maxBounceDist
+                         local  vec4flt bounceLoc
+                         local  vec4flt maxBounceLoc
+                         local  vec4flt intersect
+                         local  enum BounceTest testDir
+                         local  float dist
+                         local  float adjLaunchAngle
+                         local  float adjSinLaunchAngle
+                         local  const struct AIFeatureNetwork* obstructionNetwork
+                         local  const struct AIFeatureNetwork* islandNetwork
+                         local  const struct AIFeatureNetwork* waterNetwork
+                         local  const struct AIFeatureNetwork* bunkerNetwork
+                         local  bool targetingIsland
+                         inlines  AIMgr, LLMath_AddScale3, LLMath_Length3, LLMath_Subtract, __vec_make_from_scalar, std::sinf, vec_madd, vec_sld, vec_splat, vec_sub
+  683  00145ED4     F0  bool AIFeatureNetworkMgr::IsPuttPossible(const struct AIFeatureNetworkMgr* this, const float* start, const float* end, struct CoreShotInfo_t* shotInfo)
+                         local  vec4flt intersect
+                         local  const struct AIFeatureNetwork* greenNetwork
+                         local  const struct AIFeatureNetwork* bunkerNetwork
+  711  001B8500    4C4  float AIFeatureNetworkMgr::CalcDistToPin(const struct AIFeatureNetworkMgr* this, const float* location)
+                         local  float dist
+                         local  vec4flt intersection
+                         local  int32 node
+                         local  const struct AIFeatureNetwork* obstructionNetwork
+                         local  const struct AIFeatureNetwork* distanceNetwork
+                         local  float distToObstruction
+                         local  int16 lastNode
+                         local  int16 node
+                         local  int16 prev
+                         local  int16 next
+                         local  vec4flt vecToNode
+                         local  vec4flt vecToNextNode
+                         local  float dot
+                         inlines  LLMath_DistanceBetween3, LLMath_DotProduct3, LLMath_Subtract3, Network_GetNextNode, __vec_len_sqr3, vec_madd, vec_sld
+  794  001B82FC    204  bool AIFeatureNetworkMgr::TestVsNetworkType(const struct AIFeatureNetworkMgr* this, const float* start, const float* end, int16 netType, float* intersection, const int32& node, const struct AIFeatureNetwork** network, bool bUseRayTest)
+                         local  vec4flt intersect
+                         local  float closestDist
+                         local  int edgeStart
+                         local  bool foundIntersect
+                         local  bool found
+                         local  const struct AIFeatureNetwork* curNetwork
+                         local  float dist
+                         inlines  LLMath_DistanceBetween3, vec4flt_Copy3
+  841  00145E28     34  const struct AIFeatureNetwork* AIFeatureNetworkMgr::GetNetworkList(const struct AIFeatureNetworkMgr* this, int16 netType)
+                         local  const struct AIFeatureNetwork* network
+                         local  struct AIFeatureNetworkList* networkList
+  855  00145FC4     E0  void AIFeatureNetworkMgr::GetNetworkListExtent(const struct AIFeatureNetworkMgr* this, const struct AIFeatureNetwork* network, float* minX, float* maxX, float* minZ, float* maxZ, float* maxY)
+                         local  const struct TNetwork* pNetwork
+                         local  const TNode* nodePtr
+                         local  int i
+  895  001460A4    110  const struct AIFeatureNetwork* AIFeatureNetworkMgr::GetNetworkListAndExtentForLoc(const struct AIFeatureNetworkMgr* this, int16 netType, float* pos, float* minX, float* maxX, float* minZ, float* maxZ, float* maxY)
+                         local  const struct AIFeatureNetwork* network
+                         local  struct AIFeatureNetworkList* networkList
+                         local  bool found
+  931  00183A30    144  void AIFeatureNetworkMgr::LoadNetworkCB(struct TNetwork* pNet)
+                         local  struct AIFeatureNetwork* network
+                         inlines  Singleton<AIFeatureNetworkMgr>::GetSingleton
+  972  00146204     A4  bool AIFeatureNetworkMgr::ShouldLoadNetworkCB(struct TNetwork* pNet)
+                         local  bool shouldLoad
+                         local  struct AIFeatureFields* fields
+ 1007  001461B4     50  struct AIFeatureNetworkList* AIFeatureNetworkMgr::AddToList(const struct AIFeatureNetworkMgr* this, struct AIFeatureNetwork* network)
+                         local  struct AIFeatureNetworkList* networkList
+ 1026  001462F8     34  void AIFeatureNetworkMgr::DeleteList(const struct AIFeatureNetworkMgr* this, int16 netType)
+                         local  struct AIFeatureNetworkList* networkList
+ 1038  001462A8     50  void AIFeatureNetworkMgr::DeleteList(const struct AIFeatureNetworkMgr* this, struct AIFeatureNetworkList* networkList)
+                         local  const struct AIFeatureNetwork* network
+ 1057  00145B50     F8  struct AIFeatureNetworkList* AIFeatureNetworkMgr::GetNetworkListHead(const struct AIFeatureNetworkMgr* this, int16 netType)
+                         local  struct AIFeatureNetworkList* networkList
+ 1108  00145CF4     E4  void AIFeatureNetworkMgr::FindSurroundingNetworks(const struct AIFeatureNetworkMgr* this, int16 intType, int16 extType)
+                         local  struct AIFeatureNetwork* network
+                         local  struct AIFeatureNetwork* extNetwork
+                         local  struct AIFeatureNetworkList* networkList
+                         inlines  AIFeatureNetwork::SetFlag
+ 1139  00145C48     AC  const struct AIFeatureNetwork* AIFeatureNetworkMgr::GetNextInteriorNetwork(const struct AIFeatureNetworkMgr* this, const struct AIFeatureNetwork* network, const struct AIFeatureNetwork* curIntNetwork)
+                         local  const struct AIFeatureNetwork* intNetwork
+                         local  int16 exportType
+                         local  const struct AIFeatureNetworkList* netList
+ 1196  00145E5C     78  const struct AIFeatureNetwork* AIFeatureNetworkMgr::GetEnclosingNetwork(const struct AIFeatureNetworkMgr* this, const float* location, int16 netType)
+                         local  const struct AIFeatureNetwork* enclosingNetwork
+ 1220  001675E4    124  bool AIFeatureNetworkMgr::GetNearestAINode(const struct AIFeatureNetworkMgr* this, const float* location, float* nodeLocation)
+                         local  bool foundNode
+                         local  const struct AIFeatureNetwork* aiNetwork
+                         local  float closestDist
+                         local  float dist
+                         local  const struct TNetwork* network
+                         local  int32 i
+                         inlines  LLMath_SquareDistanceBetween3, __vec_len_sqr3, vec3flt_Copy
+ 1259  001BBABC    2B4  float AIFeatureNetworkMgr::AssessRisk(const struct AIFeatureNetworkMgr* this, const struct AIFeatureNetwork* network, const float* start, const float* end, float shotDist, float outRisk, float inRisk, float crossRisk, float nearRisk)
+                         local  float risk
+                         local  vec4flt intersect
+                         local  float distToEdge
+                         local  bool isIn
+                         local  bool isOut
+                         inlines  LLMath_DistanceBetween3, std::sqrt
+ 1325  001BBD70    12C  float AIFeatureNetworkMgr::AssessRisk(const struct AIFeatureNetworkMgr* this, int16 netType, const float* start, const float* end, float shotDist, float outRisk, float inRisk, float crossRisk, float nearRisk)
+                         local  float risk
+                         local  const struct AIFeatureNetwork* network
+ 1346  00145AC4     8C  bool AIFeatureNetworkMgr::TestMaxBounce(const struct AIFeatureNetworkMgr* this, const float* maxBounceLoc, const float* intersect, enum BounceTest test)
+                         local  bool canClear
+ 1368  00154ED4    234  const struct AIFeatureNetwork* AIFeatureNetworkMgr::GetFacilityGreenNetwork(const struct AIFeatureNetworkMgr* this, int greenIndex)
+                         local  int id
+                         local  int catid
+                         local  const struct AIFeatureNetwork* pGreenNetwork
+                         local  int i
+                         inlines  AIFeatureNetwork::GetNextNetwork
+ 1429  00146444     34  const char* AIFeatureNetworkMgr::GetNetworkName(int netEnum)
+ 1438  00146478     34  char* AIFeatureNetworkMgr::GetNetworkInfoString(const struct AIFeatureNetworkMgr* this, int idx)
+ 1452  001464C4    314  void AIFeatureNetworkMgr::TestEnclosingNetworks(const struct AIFeatureNetworkMgr* this, const float* location)
+                         local  int iInNetwork
+                         local  const struct AIFeatureNetwork* enclosingNetwork
+                         local  struct TNetwork* pbNetwork
+                         local  int i
+                         local  int netType
+ 1577  00180834    3E0  bool TuningFile_GetValue(const char* filename, const char* key, const float& value)
+                         local  int mFileLength
+                         local  int FilePos
+                         local  int counter
+                         local  char* Data
+                         local  char[80] buffer
+                         inlines  std::atof
+ 1632  00180C5C     24  bool TuningFile_GetFloatValue(const char* filename, const char* key, const float& value)
+ 1637  00180C14     48  bool TuningFile_GetIntValue(char* filename, char* key, const int& value)
+                         local  float temp_value
+                         local  bool result
+ 1645  001834F0     D8  bool LoadRiskTuning(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  char[80] buffer
+                         inlines  AINetworkMgr
+ 1660  00183448     A8  bool SaveRiskTuning(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         inlines  AINetworkMgr
+ 1667  00145A6C     58  void AIFeatureNetworkMgr::RegisterRiskTuningCommands(const struct AIFeatureNetworkMgr* this)
+ 1673  00180C80    2F4  int AIFeatureNetworkMgr::LoadRiskTuningValues(const struct AIFeatureNetworkMgr* this)
+                         local  int counter
+ 1702  001467D8    674  void AIFeatureNetworkMgr::SaveRiskTuningValues(const struct AIFeatureNetworkMgr* this)
+                         local  char[80] buffer
+ 1752  00133058     14  float DisplayRiskOnScreen(enum PlayerNumber_t PlayerID)

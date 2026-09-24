@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/TerrainData.cpp
+// compiled in: headgate_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   14  0036A62C    1AC  float TerrainData::TerrainHeightCPP(const struct TerrainData* this, float X, float Z, unsigned int attributeMask, enum FlagOp op, unsigned int propsMask, const struct TerrainHeightInfo& info, float MaxElev)
+                         local  bool bFoundHeight
+                         inlines  TerrainHeightFromTable

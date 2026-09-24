@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/invitationmanager.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    5  005E2C34     50  void InvitationManager(const struct <anon>* this)
+                         inlines  Observable
+   10  005BC5C8     48  void ~InvitationManager(const struct <anon>* this)
+                         inlines  ~Observable

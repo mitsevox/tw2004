@@ -1,0 +1,15 @@
+// ../../../../../TIGERCODE/Code/Legacy/LL/Headers/LLTextureShared.h
+// compiled in: Legacy_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   69    inline-only   int TX_FormatIs64bitDXT(TextureFormat format)
+   73    inline-only   int TX_FormatIs128bitDXT(TextureFormat format)
+   77    inline-only   int TX_FormatIsDXTCompressed(TextureFormat format)
+   81    inline-only   int TX_FormatIs16bitFloatingPoint(TextureFormat format)
+   85    inline-only   int TX_FormatIs24bitFloatingPoint(TextureFormat format)
+   89    inline-only   int TX_FormatIs32bitFloatingPoint(TextureFormat format)
+   93    inline-only   int TX_FormatIsFloatingPoint(TextureFormat format)
+   97    inline-only   int TX_FormatHasAlpha(TextureFormat format)
+  105    inline-only   int TX_FormatHasDepth(TextureFormat format)
+  109    inline-only   static int TX_GetSizeForMipLevel(int size, int level)
+  113    inline-only   static int TX_IsPowerOf2(int size)

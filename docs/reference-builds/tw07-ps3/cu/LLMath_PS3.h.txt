@@ -1,0 +1,111 @@
+// ../../../../../TIGERCODE/Code/Legacy/LL/PS3/Headers/LLMath_PS3.h
+// compiled in: Legacy_unity.cpp, apt_unity.cpp, golf2_unity.cpp, golf_unity.cpp, headgate_unity.cpp, other_unity.cpp
+// 43 functions, source order. line | PS3 address | size
+
+   81    inline-only   static float[4] __vec_dot3(float[4] lhs, float[4] rhs)
+                         local  float[4] result
+   89    inline-only   static float[4] __vec_dot4(float[4] lhs, float[4] rhs)
+                         local  float[4] resultS0
+                         local  float[4] resultS1
+                         local  float[4] resultS2
+                         local  float[4] resultS3
+                         local  float[4] result
+  101    inline-only   static float[4] vec_msum3(float[4] lhs, float[4] rhs)
+                         local  float[4] resultS0
+                         local  float[4] resultS1
+                         local  float[4] resultS2
+                         local  float[4] result
+  113    inline-only   static float[4] vec_msum4(float[4] lhs, float[4] rhs)
+                         local  float[4] resultS0
+                         local  float[4] resultS1
+                         local  float[4] resultS2
+                         local  float[4] resultS3
+                         local  float[4] result
+  125    inline-only   static float[4] __vec_cross(float[4] lhs, float[4] rhs)
+                         local  float[4] tmp0
+                         local  float[4] tmp1
+                         local  float[4] tmp2
+                         local  float[4] tmp3
+                         local  float[4] result
+  136    inline-only   static float[4] __vec_len_sqr3(float[4] src)
+                         local  float[4] lshift
+                         local  float[4] result
+  148    inline-only   static float[4] __vec_len_sqr4(float[4] src)
+                         local  float[4] lshift
+                         local  float[4] result
+  158    inline-only   static float[4] __vec_mul(float[4] lhs, float[4] rhs)
+  163    inline-only   static float[4] __vec_make_from_scalar(float src)
+                         local  union <anon> tmp
+  172    inline-only   static float[4] __vec_rsqrt(float[4] invec)
+                         local  float[4] y0
+                         local  float[4] y1
+                         local  float[4] t0
+                         local  float[4] t1
+                         local  float[4] allZero
+                         local  float[4] allHalf
+                         local  float[4] allOne
+  190    inline-only   static float[4] __vec_rsqrt_fast(float[4] invec)
+                         local  float[4] y0
+  201    inline-only   static float[4] __vec_recip(float[4] invec)
+                         local  float[4] y0
+                         local  float[4] y1
+                         local  float[4] t
+                         local  float[4] allOne
+  244    inline-only   static void LLMath_IdentifyMat(float[4]* dest)
+  314    inline-only   static void LLMath_CopyMat44(float[4]* src, float[4]* dest)
+  328    inline-only   static void LLMath_CopyMat34(float[4]* src, float[4]* dest)
+  371    inline-only   static void LLMath_Scale3(float Amul, const float* A, float* dest)
+                         local  uint32_t savedW
+                         local  float[4] tmp
+  389    inline-only   static void LLMath_Scale(float Amul, const float* A, float* dest)
+                         local  float[4] tmp
+  478    inline-only   static void LLMath_Add(const float* src1, const float* src2, float* dest)
+  493    inline-only   static void LLMath_Add3(const float* src1, const float* src2, float* dest)
+  517    inline-only   static void LLMath_Negate(const float* src, float* dest)
+  531    inline-only   static void LLMath_Negate3(const float* src, float* dest)
+                         local  uint32_t savedW
+  562    inline-only   static void LLMath_Invert3(const float* src, float* dest)
+                         local  uint32_t savedW
+  579    inline-only   static void LLMath_Subtract(const float* src1, const float* src2, float* dest)
+  594    inline-only   static void LLMath_Subtract3(const float* src1, const float* src2, float* dest)
+                         local  uint32_t savedW
+  611    inline-only   static void LLMath_AddScale(const float* A, const float* B, float Bmul, float* dest)
+  625    inline-only   static void LLMath_AddScale3(const float* A, const float* B, float Bmul, float* dest)
+                         local  uint32_t savedW
+  644    inline-only   static void LLMath_Interpolate(const float* A, const float* B, float s, float* dest)
+  701    inline-only   static void LLMath_CrossProduct3W0(const float* A, const float* B, float* dest)
+                         local  float[4] a
+                         local  float[4] b
+  719    inline-only   static void LLMath_mat44fltMultiply33(float[4]* M, const float* A, float* dest)
+                         local  float[4] _mTmp
+                         local  float[4] _mAllX
+                         local  float[4] _mAllY
+                         local  float[4] _mAllZ
+                         local  uint32_t savedW
+  766    inline-only   static void LLMath_DotMul3(const float* A, const float* B, float* dest)
+                         local  float[4] tmp
+                         local  float[4] b
+                         local  uint32_t savedW
+  788    inline-only   static void LLMath_MultiplyVec(const float* A, const float* B, float* dest)
+  856    inline-only   static void LLMath_MulDiff(const float* A, const float* B, const float* C, float* dest)
+                         local  float[4] _mTmp
+  896    inline-only   static void LLMath_ClampVec(const float* minV, const float* maxV, float* dest)
+                         local  float[4] _mTmp
+  936    inline-only   static void LLMath_MinVec4(const float* A, const float* B, float* dest)
+  969    inline-only   static void LLMath_MaxVec4(const float* A, const float* B, float* dest)
+ 1001    inline-only   static float LLMath_Length(const float* A)
+                         local  union <anon> len
+ 1015    inline-only   static float LLMath_Length3(const float* A)
+                         local  union <anon> len
+ 1029    inline-only   static float LLMath_LengthSquared(const float* A)
+                         local  union <anon> dot
+ 1044    inline-only   static float LLMath_LengthSquared3(const float* A)
+                         local  union <anon> dot
+ 1060    inline-only   static float LLMath_SquareDistanceBetween3(const float* A, const float* B)
+                         local  union <anon> tmp
+ 1078    inline-only   static float LLMath_DistanceBetween3(const float* A, const float* B)
+                         local  union <anon> tmp
+ 1094    inline-only   static float LLMath_DotProduct(const float* A, const float* B)
+                         local  union <anon> dot
+ 1109    inline-only   static float LLMath_DotProduct3(const float* A, const float* B)
+                         local  union <anon> dot

@@ -1,0 +1,192 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Utils/Intersect.cpp
+// compiled in: headgate_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+    9    inline-only   bool IsEqual(float x1, float x2)
+   25  0034EEEC    350  enum IntersectFlagE IntersectLine(float x1, float z1, float x2, float z2, float x3, float z3, float x4, float z4, const float& x, const float& z)
+                         local  float m1
+                         local  float m2
+                         local  float b1
+                         local  float b2
+                         local  const float UNDEFINED
+                         local  float c1
+                         local  float c2
+                         local  float c3
+                         local  float c4
+                         local  bool XisX1
+                         local  bool XisX2
+                         local  bool XisX3
+                         local  bool XisX4
+                         local  bool ZisZ1
+                         local  bool ZisZ2
+                         local  bool ZisZ3
+                         local  bool ZisZ4
+                         inlines  IsEqual
+  293  00344458    20C  int IntersectLine(long int x1_, long int y1_, long int x2_, long int y2_, long int x3_, long int y3_, long int x4_, long int y4_, long int* x, long int* y)
+                         local  long long int x1
+                         local  long long int x2
+                         local  long long int x3
+                         local  long long int x4
+                         local  long long int y1
+                         local  long long int y2
+                         local  long long int y3
+                         local  long long int y4
+                         local  long long int a1
+                         local  long long int a2
+                         local  long long int b1
+                         local  long long int b2
+                         local  long long int c1
+                         local  long long int c2
+                         local  long long int r1
+                         local  long long int r2
+                         local  long long int r3
+                         local  long long int r4
+                         local  long long int denom
+                         local  long long int offset
+                         local  long long int num
+  388  00344664    108  float RaySphereIntersect(const const struct RayS& ray, const const struct SphereS& sphere)
+                         local  vec4flt toSO
+                         local  float mag
+                         local  vec4flt rd
+                         local  vec4flt diff
+                         local  float diffmagsqr
+                         local  float asqr
+                         local  float csqr
+                         local  float bsqr
+                         local  float b
+                         local  float t
+  448  00359A68     80  float SphereSphereIntersect(const const struct SphereS& sphere1, const float* v, const const struct SphereS& sphere2)
+                         local  struct RayS ray
+                         local  struct SphereS bigSphere
+                         inlines  SphereS::SetRadius, vec4flt_Copy
+  472  0035B750    224  float RayCylinderIntersect(const const struct RayS& ray, const struct CylinderS& cylinder, float maximumDist)
+                         local  float B
+                         local  const float dx
+                         local  const float dz
+                         local  float C
+                         local  float rad
+                         local  float t0
+                         local  float t1
+                         local  vec4flt i
+                         local  float t
+                         inlines  std::sqrt
+  587  003509D4    42C  float RayPolyIntersect(const float* r0, const float* rd, const float* v1, const float* v2, const float* v3, const float* n, float maximumDist)
+                         local  uint32 sideSignBits
+                         local  uint32 sideDeltaBits
+                         local  uint32 deltas
+                         local  float errDelta
+                         local  float vp1u
+                         local  float vp1v
+                         local  float vp2u
+                         local  float vp2v
+                         local  float vp3u
+                         local  float vp3v
+                         local  float vu
+                         local  float vv
+                         local  float Pointu
+                         local  float Pointv
+                         local  float t
+                         local  float p1u
+                         local  float p1v
+                         local  float p2u
+                         local  float p2v
+                         local  float p3u
+                         local  float p3v
+                         local  float aNx
+                         local  float aNy
+                         local  float aNz
+                         local  float ix
+                         local  float iy
+                         local  float iz
+                         local  int positive
+                         local  vec4flt norm
+                         local  float D
+                         local  float NdotRd
+                         local  float errDeltaSq
+                         local  float crossProd
+                         local  float len
+                         local  float V1x
+                         local  float V1y
+                         local  float V1z
+                         local  float V2x
+                         local  float V2y
+                         local  float V2z
+                         local  float mag
+                         local  float ooMag
+                         inlines  vec4flt_Copy
+  865  0034476C    1E4  bool PointInPoly(float x, float y, const struct PolyS& poly, bool cullBackFacing)
+                         local  float vp1x
+                         local  float vp1y
+                         local  float vp2x
+                         local  float vp2y
+                         local  float vp3x
+                         local  float vp3y
+                         local  float vx
+                         local  float vy
+                         local  int count
+  916  0034F23C    2F0  bool LineIntersectsSquare(float x1, float z1, float x2, float z2, float x3, float z3, float x4, float z4)
+                         local  float x
+                         local  float z
+  950  00344950     40  bool SquareIntersectsSquare(float x1, float z1, float x2, float z2, float x3, float z3, float x4, float z4)
+  964  0036239C    3BC  void GetGouraudInterpolationFactors(float* posPtr, float* p1Ptr, float* p2Ptr, float* p3Ptr, const float& aFactor, const float& bFactor, const float& cFactor)
+                         local  vec4flt nB
+                         local  vec4flt nC
+                         local  vec4flt normal
+                         local  float areaABC
+                         local  float ooAreaABC
+                         local  float areaPAB
+                         local  float areaPBC
+                         local  float areaPCA
+                         local  vec4flt pA
+                         local  vec4flt pB
+                         local  vec4flt pC
+                         local  vec4flt pP
+                         inlines  LLMath_CrossProduct3W0, LLMath_Length3, LLMath_Subtract, __vec_len_sqr3, vec_nmsub, vec_perm, vec_sub
+ 1026  0035A194    2A0  bool RayVsTri3D(float* origin, float* rayDir, float* v0, float* v1, float* v2, float* intersectionPt, float* dist)
+                         local  vec4flt edge1
+                         local  vec4flt edge2
+                         local  vec4flt pVec
+                         local  vec4flt tVec
+                         local  vec4flt qVec
+                         local  float det
+                         local  float ooDet
+                         local  float u
+                         local  float v
+                         local  float t
+                         inlines  LLMath_CrossProduct3W0, LLMath_DotProduct3, LLMath_Subtract, LLMath_Subtract3, __vec_dot3, vec_nmsub, vec_perm, vec_sub
+ 1101  00362758    340  bool GetRaySphereIntersection3D(float* rayStartPt, float* rayDir, float* sphereOrigin, float sphereRadius, float* intersectionPt, float* dist)
+                         local  float a
+                         local  float b
+                         local  float c
+                         local  float disc
+                         local  float sqrtDisc
+                         local  float t0
+                         local  float t1
+                         local  vec4flt vctTemp
+                         local  vec4flt intersectionPt1
+                         local  vec4flt intersectionPt2
+                         inlines  LLMath_Length3, LLMath_Subtract, LLMath_Subtract3, std::sqrt, vec_madd, vec_sld, vec_sub
+ 1184  00344990    2F0  bool GetRayAABoundingBoxIntersection3D(float* rayStartPt, float* rayDir, float* bbLL, float* bbUR, float* intersectionPt, float* dist)
+                         local  float tNear
+                         local  float tFar
+                         local  float t1
+                         local  float t2
+                         local  float numHolderF1
+ 1340  0035A434     EC  void FindGeneralNormalAndSolution(float* p0, float* p1, float* p2, float* normal, float* dSolution)
+                         local  vec4flt n1
+                         local  vec4flt n2
+                         inlines  LLMath_CrossProduct3W0, LLMath_Subtract, __vec_cross, vec_madd, vec_nmsub, vec_perm, vec_sub
+ 1358  0035A520    3D0  bool RayIntersectTri(const float* orig, const float* dir, float* v0, float* v1, float* v2, float* outT, float* outIntersect)
+                         local  float u
+                         local  float v
+                         local  float t
+                         local  vec4flt edge1
+                         local  vec4flt edge2
+                         local  vec4flt pvec
+                         local  float det
+                         local  vec4flt tvec
+                         local  vec4flt qvec
+                         local  float fInvDet
+                         local  vec4flt edge1Scaled
+                         local  vec4flt edge2Scaled
+                         inlines  LLMath_Add3, LLMath_CrossProduct3W0, LLMath_DotProduct3, LLMath_Scale3, LLMath_Subtract3, __vec_dot3, __vec_make_from_scalar, __vec_mul, vec_ld, vec_madd, vec_nmsub, vec_perm, vec_splat, vec_sub

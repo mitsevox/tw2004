@@ -1,0 +1,33 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameModeDriverManager.cpp
+// compiled in: golf_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   34  002A36AC     78  struct GameModeDriverManager& GMDriverMgr()
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+   42  0029167C     84  void GameModeDriverManager::GameModeDriverManager(const struct GameModeDriverManager* this)
+                         inlines  Singleton<GameModeDriverManager>::Singleton
+   52  0020DBB8     6C  void GameModeDriverManager::Init(const struct GameModeDriverManager* this)
+   64  00208938    128  bool GameModeDriverManager::CreateGameModeDriver(const struct GameModeDriverManager* this, enum GM_DriverType_t nGameModeID)
+                         local  bool bRet
+  141  001E973C      8  struct GameModeDriver* GameModeDriverManager::GetGameModeDriver(const struct GameModeDriverManager* this)
+  146  001F3D60    11C  bool GameModeDriverManager::GetGameModeDriver(const struct GameModeDriverManager* this, enum GM_DriverType_t eDriverType, const const struct GameModeDriver*& pDriver)
+                         local  bool result
+  197  001FADF8      8  enum GM_DriverType_t GameModeDriverManager::GetGameModeDriverType(const struct GameModeDriverManager* this)
+  205  001F4264     4C  void GameModeDriverManager::HandleEvent(const struct GameModeDriverManager* this, enum PlayerNumber_t PlayerID, enum EVENTID_e eventID)
+  217  002AA478    2A8  bool AreTournamentStructuresVisible()
+                         local  struct GameModeBase* pGameMode
+                         local  struct GameModeDriverPGATour* driver
+                         local  int32 tour_num
+                         inlines  GM_GetCurrentRound, cGAME_GLOBALS::GetCrowds
+  250  002AA1E4     8C  bool GameModeDriverManager::GetFacilityScenarioMarkerPostion(const const struct GameModeDriverManager* this, int32 scenarioID, int32 markerID, const vec4flt& out)
+                         local  bool result
+                         local  const struct GameModeDriver* ptr
+                         local  const struct GameModeDriverFacility* pFacility
+  267  00268F08     14  void GameModeDriverManager::OnGameCompletionChanged(const struct GameModeDriverManager* this, float fGameCompletionPercentage)
+  272  00257C38     14  void GameModeDriverManager::OnPlayerStatusChanged(const struct GameModeDriverManager* this, uint32_t eStatus)
+  281  002AA270    208  bool GameModeDriverManager::SetBallAndGolferPositionFromScenarioMarker(const const struct GameModeDriverManager* this, int32 scenarioID, int32 markerID, enum GM_ModeType_t gameMode)
+                         local  vec4flt golferPos
+                         local  bool result
+                         local  uint8_t plrCount
+                         local  uint8_t plr
+                         inlines  vec4flt_Copy

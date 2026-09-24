@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_SpectatorCardMaker.cpp
+// compiled in: shader_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   47  0051A214     28  void SM_SpectatorCardMakerClass::SM_SpectatorCardMakerClass(const struct SM_SpectatorCardMakerClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base
+   53  0050468C     88  void SM_SpectatorCardMakerClass::Load(const struct SM_SpectatorCardMakerClass* this)
+   85  00504714     24  void SM_SpectatorCardMakerClass::Activate(const struct SM_SpectatorCardMakerClass* this)
+   90  00504738     38  void SM_SpectatorCardMakerClass::Deactivate(const struct SM_SpectatorCardMakerClass* this)
+   97  0050F638     64  void SM_SpectatorCardMakerClass::SetColorTexture(const struct SM_SpectatorCardMakerClass* this, TextureRef colorTexture)
+  107  0050F69C     60  void SM_SpectatorCardMakerClass::SetVarIndices(const struct SM_SpectatorCardMakerClass* this, const float* var_indices)
+  116  0050F6FC     64  void SM_SpectatorCardMakerClass::SetTintColor(const struct SM_SpectatorCardMakerClass* this, const float* tint_array)
+  124  0050F760     60  void SM_SpectatorCardMakerClass::SetWorldLightDirection(const struct SM_SpectatorCardMakerClass* this, const float* light_dir)

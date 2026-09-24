@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_Chiron.h
+// compiled in: apt_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   18  00126A68     B8  void UIChiron::~UIChiron(const struct UIChiron* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   19  000FEA34      C  uint32 UIChiron::GetSignature(const const struct UIChiron* this)
+   24  0010346C     14  enum TAptSequenceStatus UIChiron::HideAfterFiveSec_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   26  000FEA40     14  void UIChiron::NotifyOnGetText_func(struct IAptSubscriber* subs)
+   29  000FEA54      4  void UIChiron::Show(const struct UIChiron* this)

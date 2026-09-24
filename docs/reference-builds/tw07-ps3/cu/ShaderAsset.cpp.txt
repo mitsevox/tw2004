@@ -1,0 +1,39 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Rna/Asset/PS3/ShaderAsset.cpp
+// compiled in: rnaunity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+  220  004E7920    15C  void ShaderAssetC::ShaderAssetC(const struct ShaderAssetC* this, struct AssetMgrC* pAssetMgr, const char* pFilePath, MemBudgetTypeE budget, enum eMemoryPools memPool)
+                         local  struct DeviceC* pDevice
+                         local  struct <anon> path
+                         local  const struct CGFXShaderC* pTemp
+                         inlines  AutoRefCount, operator=
+  234  004D9980    1DC  void ShaderAssetC::~ShaderAssetC(const struct ShaderAssetC* this)
+                         local  int32_t refsRemaining
+                         inlines  RNADebugBreak, operator=, ~AutoRefCount
+  252  004D8C68    3D0  bool ShaderAssetC::LoadRNAFX(const struct ShaderAssetC* this, const char* pFilePath)
+                         local  const char* shaderFXCompilerPath
+                         local  const char* pPreprocessorPath
+                         local  const char* tmpFile
+                         local  const char* logFile
+                         local  char[256] cmdStr
+                         local  bool bResult
+                         local  int32_t result
+                         local  const struct RNAFX* pTemp
+                         local  uint32_t uSize
+                         local  void* pData
+                         local  struct InStreamBinaryC in
+                         inlines  RNADebugBreak, Release, operator=
+  433  004D9038     E4  bool ShaderAssetC::Load(const struct ShaderAssetC* this)
+                         local  struct <anon> fileInfo
+  472  004C9534     1C  bool ShaderAssetC::IsLoaded(const const struct ShaderAssetC* this)
+  478  004D9888     F8  void ShaderAssetC::Unload(const struct ShaderAssetC* this)
+                         inlines  RNADebugBreak, operator=
+  498  004CCD78     10  int32_t ShaderAssetC::GetRefCount(const struct ShaderAssetC* this)
+  504  004CD98C     5C  void ShaderAssetC::Print(const struct ShaderAssetC* this)
+  516  004EEA54    1C8  void ShaderAssetMgrC::ShaderAssetMgrC(const struct ShaderAssetMgrC* this)
+                         inlines  Clear, Copy, RNADebugBreak, String, operator=, ~String
+  526  004EEDE4     84  struct ShaderAssetMgrC* ShaderAssetMgrC::GetInstance()
+  534  004C9550     6C  void ShaderAssetMgrC::DestroyInstance()
+  542  004EEE68     38  struct ShaderC* ShaderAssetMgrC::ResolveShader(const struct ShaderAssetMgrC* this, const char* pFilePath)
+                         local  struct ShaderAssetC* pShaderAsset
+  550  004E7A7C     64  struct ShaderAssetC* ShaderAssetMgrC::CreateNew(const struct ShaderAssetMgrC* this, const char* pFilePath)

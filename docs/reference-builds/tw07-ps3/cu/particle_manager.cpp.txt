@@ -1,0 +1,52 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/ParticleSystem/source/particle_manager.cpp
+// compiled in: particle_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   12  004ADF60    130  int NamesEqual(const char* str1, const char* str2)
+                         local  unsigned int length
+                         inlines  std::tolower
+   35  004AA7C0     18  void ParticleManager::ParticleManager(const struct ParticleManager* this)
+   40  004AA7F8     D0  void ParticleManager::Init(const struct ParticleManager* this, unsigned int maxFiles, unsigned int maxParticleCount, struct IParticleSpawn* spawnInterface)
+   77  004AA958     C0  void ParticleManager::Shutdown(const struct ParticleManager* this)
+                         local  struct ParticleEmitter* emitter
+                         local  struct ParticleEmitter* next
+  116  004AA798     28  void ParticleManager::Zero(const struct ParticleManager* this)
+  136  004AA8C8     90  void ParticleManager::RemoveEmitter(const struct ParticleManager* this, void* emitterVoid)
+                         local  struct ParticleEmitter* emitter
+  154  004AAA18      8  struct ParticleOutput* ParticleManager::GetParticleOutputPtr(const struct ParticleManager* this)
+  169  004B05B0    1BC  void* ParticleManager::AddEmitter(const struct ParticleManager* this, const char* fileName, float posX, float posY, float posZ, float rotX, float rotY, float rotZ, int isImmortal)
+                         local  void* fileData
+                         local  struct ParticleEmitter* emitter
+                         local  unsigned int i
+                         local  void* testData
+                         local  const char* testName
+  239  004B0DC0    220  void ParticleManager::Update(const struct ParticleManager* this, const float* viewDir, float deltaTime)
+                         local  struct ParticleEmitter* emitter
+                         local  struct _FVEC viewVec
+                         local  struct ParticleEmitter* emitter
+                         local  struct _FVEC pos
+                         local  float dot0
+                         local  struct ParticleEmitter* next
+                         local  float dot1
+                         local  struct ParticleEmitter* nextEmitter
+  301  004AAA20     9C  void ParticleManager::Render(const struct ParticleManager* this)
+                         local  struct ParticleEmitter* emitter
+  319  004AD4F0     C4  int ParticleManager::AddPSF(const struct ParticleManager* this, const void* dataPtr)
+                         local  unsigned int particleCount
+                         local  unsigned int fileSize
+                         local  char* filePtr
+  348  004B082C     B4  unsigned int ParticleManager::TweakEmitters(const struct ParticleManager* this, const char* psfName, const char* psfData)
+                         local  unsigned int emittersTweaked
+                         local  struct ParticleEmitter* emitter
+                         local  const char* emitterSysName
+  370  004AE124     B4  void* ParticleManager::FindPSF(const struct ParticleManager* this, const char* name)
+                         local  unsigned int fileSize
+                         local  unsigned int i
+                         local  char* filePtr
+  386  004AAABC      C  void ParticleManager::ResetFiles(const struct ParticleManager* this)
+  391  004AE090     94  void ParticleManager::RemoveEmittersByName(const struct ParticleManager* this, const char* psfName)
+                         local  struct ParticleEmitter* emitter
+                         local  struct ParticleEmitter* next
+  407  004AAAC8     90  void ParticleManager::RemoveAllEmitters(const struct ParticleManager* this, int alsoRemoveImmortal)
+                         local  struct ParticleEmitter* emitter
+                         local  struct ParticleEmitter* next

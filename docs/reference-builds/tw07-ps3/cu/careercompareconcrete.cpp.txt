@@ -1,0 +1,46 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/career/source/common/careercompareconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   70  005C5FD8     C4  void CareerStatbookLoadSuccess(const struct <anon>* this, struct CareerStatbook* pStatbook)
+  105  005C609C     5C  void CareerStatbookLoadFailure(const struct <anon>* this, enum Failure eFailure)
+  133  005C60F8    108  uint32_t GetRowIndex(const const struct <anon>* this, uint32_t uType, uint32_t uCategory, uint32_t uRow)
+                         local  int32_t iRowIndex
+                         local  uint32_t uIndex
+                         local  uint32_t uRowType
+                         local  uint32_t uRowCategory
+  187  005C73D8     CC  void CareerCompareConcrete(const struct <anon>* this, const char8_t* strView, uint32_t uNumSlots)
+  217  005C6218     78  void ~CareerCompareConcrete(const struct <anon>* this)
+  245  005C6388     B0  struct Operation* LoadUser(const struct <anon>* this, const char8_t* strUserName, uint32_t uSlot, struct CareerCompareCallback* pCallback)
+  279  005C6438     44  void QueueLoadUser(const struct <anon>* this, const char8_t* strUserName, uint32_t uSlot)
+  302  005C647C     B0  struct Operation* ExecuteQueuedLoad(const struct <anon>* this, struct CareerCompareCallback* pCallback)
+  336  005C652C     44  void ClearQueuedUserList(const struct <anon>* this)
+  360  005C6570      8  uint32_t GetNumTypes(const const struct <anon>* this)
+  384  005C6578    130  uint32_t GetNumCategories(const const struct <anon>* this, uint32_t uType)
+                         local  int32_t iCategory
+                         local  uint32_t uRow
+                         local  uint32_t uRowType
+  425  005C66A8     CC  const char8_t* GetTypeLabel(const const struct <anon>* this, uint32_t uType)
+                         local  const char8_t* pLabel
+                         local  char8_t[16] strName
+                         local  int32_t iAdminRow
+  459  005C6774    124  const char8_t* GetCategoryLabel(const const struct <anon>* this, uint32_t uType, uint32_t uCategory)
+                         local  const char8_t* pLabel
+                         local  char8_t[16] strName
+                         local  int32_t iAdminRow
+  505  005C6898     E8  const char8_t* GetTypeView(const const struct <anon>* this, uint32_t uType)
+                         local  const char8_t* pView
+                         local  char8_t[16] strName
+                         local  int32_t iAdminRow
+                         local  const char8_t* strParams
+  545  005C6980    100  uint32_t GetNumRows(const const struct <anon>* this, uint32_t uType, uint32_t uCategory)
+                         local  uint32_t uNumRows
+                         local  uint32_t uIndex
+                         local  uint32_t uRowType
+                         local  uint32_t uRowCategory
+  594  005C6A80     58  const char8_t* GetRowName(const const struct <anon>* this, uint32_t uType, uint32_t uCategory, uint32_t uRow)
+                         local  uint32_t uRowIndex
+  620  005C6AD8     58  const char8_t* GetRowDescription(const const struct <anon>* this, uint32_t uType, uint32_t uCategory, uint32_t uRow)
+                         local  uint32_t uRowIndex
+  647  005C6B30     68  const char8_t* GetRowData(const const struct <anon>* this, uint32_t uType, uint32_t uCategory, uint32_t uRow, uint32_t uSlot)
+                         local  uint32_t uRowIndex

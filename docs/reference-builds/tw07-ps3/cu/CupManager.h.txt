@@ -1,0 +1,22 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/CupManager.h
+// compiled in: headgate_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   18  00351458     60  void CupInfo::CupInfo(const struct CupInfo* this)
+                         local  vec4flt origin
+                         inlines  vec4flt_Copy
+   20    inline-only   float[4]& CupInfo::GetLoc(const const struct CupInfo* this)
+   21    inline-only   float[4]& CupInfo::GetGroundLoc(const const struct CupInfo* this)
+   36  00351518     40  void CupInfo::SetLoc(const struct CupInfo* this, float* loc)
+                         inlines  vec4flt_Copy
+   87    inline-only   int8 CCupManager::CupCount(const const struct CCupManager* this)
+   92    inline-only   void CCupManager::SetCurrentGreen(const struct CCupManager* this, int8 nGreenIndex)
+   93    inline-only   int8 CCupManager::GetCurrentGreen(const const struct CCupManager* this)
+   94    inline-only   int8 CCupManager::GetGreenCount(const const struct CCupManager* this)
+   96    inline-only   int8 CCupManager::GetNumGreens(const const struct CCupManager* this)
+   97    inline-only   int8 CCupManager::GetNumCupsPerGreen(const const struct CCupManager* this)
+  101    inline-only   float[4]& CCupManager::GetTargetLocation(const const struct CCupManager* this)
+  105    inline-only   bool CCupManager::IsActiveCup(const const struct CCupManager* this, int8 nGreenIndex, int8 nCupIndex)
+  113    inline-only   void CCupManager::SetTargetLocation(const struct CCupManager* this, const float[4]& loc)
+  120    inline-only   bool CCupManager::ValidIndex(const const struct CCupManager* this, int8 nGreenIndex, int8 nCupIndex)
+                         local  bool result

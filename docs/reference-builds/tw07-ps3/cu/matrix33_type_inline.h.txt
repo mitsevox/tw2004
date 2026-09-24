@@ -1,0 +1,12 @@
+// ../../../../../TIGERCODE/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/matrix33_type_inline.h
+// compiled in: rnaunity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   22    inline-only   struct <anon>& operator=(const struct <anon>* this, const const struct Matrix33& m)
+   30    inline-only   struct <anon>& GetRow(const struct <anon>* this, int i)
+                         local  const char[7] __FUNCTION__
+   46    inline-only   void Set(const struct <anon>* this, float m0, float m1, float m2, float m3, float m4, float m5, float m6, float m7, float m8)
+  124    inline-only   const struct Vector3& GetX(const const struct Matrix33* this)
+  130    inline-only   const struct Vector3& GetY(const const struct Matrix33* this)
+  136    inline-only   const struct Vector3& GetZ(const const struct Matrix33* this)
+  213    inline-only   void SetElem(const struct <anon>* this, int row, int col, struct <anon>& f)

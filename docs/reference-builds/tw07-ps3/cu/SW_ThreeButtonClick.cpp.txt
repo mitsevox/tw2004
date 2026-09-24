@@ -1,0 +1,91 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/AI/SW_ThreeButtonClick.cpp
+// compiled in: golf2_unity.cpp
+// 36 functions, source order. line | PS3 address | size
+
+   76  0014943C     94  void SW_ThreeButtonClick::CreateInstance()
+   84  001494D0     48  void SW_ThreeButtonClick::DestroyInstance()
+   91  001B5BA0     70  void SW_ThreeButtonClick::Reset(const struct SW_ThreeButtonClick* this)
+  103  001D72F0    64C  void SW_ThreeButtonClick::Update(const struct SW_ThreeButtonClick* this)
+                         local  enum PlayerNumber_t PlayerID
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  enum PlayerCtrl_t controllerNumber
+                         local  struct Controller_StickInfo* info
+                         inlines  GM_GetGolferUp
+  265  00155388     34  void SW_ThreeButtonClick::ShowUI(const struct SW_ThreeButtonClick* this)
+  274  001553BC     34  void SW_ThreeButtonClick::UpdateUI(const struct SW_ThreeButtonClick* this)
+  279  001553F0     34  void SW_ThreeButtonClick::HideUI(const struct SW_ThreeButtonClick* this)
+  288  001D6FE8     98  void SW_ThreeButtonClick::UpdateUIVisiblity(const struct SW_ThreeButtonClick* this)
+                         local  enum PlayerNumber_t PlayerID
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  bool is_enabled
+                         inlines  GM_GetGolferUp, GM_GetModeType
+  297  001B46A8    150  float SW_ThreeButtonClick::GetPowerPerfect(const const struct SW_ThreeButtonClick* this)
+                         inlines  LuaTuningFileManager::Call<float>
+  302  001D7290     60  float SW_ThreeButtonClick::GetPowerTarget(const const struct SW_ThreeButtonClick* this)
+                         local  enum PlayerNumber_t PlayerID
+                         inlines  GM_GetGolferUp
+  309  001B4CF0    150  float SW_ThreeButtonClick::GetPowerMin(const const struct SW_ThreeButtonClick* this)
+                         inlines  LuaTuningFileManager::Call<float>
+  314  001B4E40    150  float SW_ThreeButtonClick::GetPowerMax(const const struct SW_ThreeButtonClick* this)
+                         inlines  LuaTuningFileManager::Call<float>
+  319  001B5350    134  float SW_ThreeButtonClick::GetAccuracyPerfect(const const struct SW_ThreeButtonClick* this)
+                         inlines  LuaTuningFileManager::Call<float>
+  324  001D7A60    170  float SW_ThreeButtonClick::GetAccuracyPerfectRadius(const const struct SW_ThreeButtonClick* this)
+                         local  enum PlayerNumber_t PlayerID
+                         local  float mishitWindow
+                         inlines  GM_GetGolferUp, LuaTuningFileManager::Call<float, float>
+  332  001B5484    150  float SW_ThreeButtonClick::GetAccuracyMin(const const struct SW_ThreeButtonClick* this)
+                         inlines  LuaTuningFileManager::Call<float>
+  337  001B5658    150  float SW_ThreeButtonClick::GetAccuracyMax(const const struct SW_ThreeButtonClick* this)
+                         inlines  LuaTuningFileManager::Call<float>
+  342  001D7BD0    18C  float SW_ThreeButtonClick::GetAccuracyShotRadians(const const struct SW_ThreeButtonClick* this)
+                         local  float accuracy
+                         local  float mishit
+                         local  float mishit_interpolant
+                         local  float interval_lbound
+                         local  float interval_ubound
+                         local  float interval_lbound
+                         local  float interval_ubound
+  384  001B55D4     84  float SW_ThreeButtonClick::GetCurrentValue(const const struct SW_ThreeButtonClick* this)
+                         local  float min
+                         local  float max
+  391  00149520      8  float SW_ThreeButtonClick::GetSelectedPower(const const struct SW_ThreeButtonClick* this)
+  396  001B47F8     44  float SW_ThreeButtonClick::GetSelectedPowerPercent(const const struct SW_ThreeButtonClick* this)
+  401  00149518      8  float SW_ThreeButtonClick::GetSelectedAccuracy(const const struct SW_ThreeButtonClick* this)
+  406  00198F20    1C0  bool SW_ThreeButtonClick::IsPowerTargetEnabled(const const struct SW_ThreeButtonClick* this)
+                         local  enum PlayerNumber_t PlayerID
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  int difficulty
+                         inlines  GM_GetGolferUp, LuaTuningFileManager::Call<bool>, Singleton<DifficultySettings>::GetSingleton
+  415  0014963C     18  bool SW_ThreeButtonClick::IsSelectedPowerEnabled(const const struct SW_ThreeButtonClick* this)
+  420  00149654     18  bool SW_ThreeButtonClick::IsSelectedAccuracyEnabled(const const struct SW_ThreeButtonClick* this)
+  426  001B57A8    134  float SW_ThreeButtonClick::GetValueInit(const const struct SW_ThreeButtonClick* this)
+                         inlines  LuaTuningFileManager::Call<float>
+  431  001B58DC    174  float SW_ThreeButtonClick::GetDeltaValueInit(const const struct SW_ThreeButtonClick* this)
+                         inlines  LuaTuningFileManager::Call<float>
+  436  001B5170    1E0  float SW_ThreeButtonClick::GetDeltaValueBoostPenalty(const const struct SW_ThreeButtonClick* this)
+                         local  float lerp
+                         inlines  LuaTuningFileManager::Call<float, float>
+  443  001B5A50    150  float SW_ThreeButtonClick::GetAccelValueInit(const const struct SW_ThreeButtonClick* this)
+                         inlines  LuaTuningFileManager::Call<float>
+  448  001B4F90    1E0  float SW_ThreeButtonClick::GetAccelValueBoostPenalty(const const struct SW_ThreeButtonClick* this)
+                         local  float lerp
+                         inlines  LuaTuningFileManager::Call<float, float>
+  455  001B5DC4    14C  float SW_ThreeButtonClick::GetAccuracyMaxShotRadians(const const struct SW_ThreeButtonClick* this)
+                         inlines  LuaTuningFileManager::Call<float>
+  460  0016B678    14C  float SW_ThreeButtonClick::ScaleAccuracyMishitInterpolant(const const struct SW_ThreeButtonClick* this, float mishit_interpolant)
+                         inlines  LuaTuningFileManager::Call<float, float>
+  465  00149528    114  bool SW_ThreeButtonClick::IsAccuracyAccelEnabled(const const struct SW_ThreeButtonClick* this)
+                         inlines  LuaTuningFileManager::Call<bool>
+  470  001B5F10    14C  float SW_ThreeButtonClick::GetDeltaDrawFadeRadians(const const struct SW_ThreeButtonClick* this)
+                         inlines  LuaTuningFileManager::Call<float>
+  475  001B61AC     BC  float SW_ThreeButtonClick::GetTwoClickAccuracy(const const struct SW_ThreeButtonClick* this)
+                         local  float interval_max_diameter
+                         local  float interval_radius
+                         local  float randomValue
+                         inlines  Misc_RandFuncf
+  486  001B605C    150  float SW_ThreeButtonClick::GetTwoClickAccuracyMax(const const struct SW_ThreeButtonClick* this)
+                         inlines  LuaTuningFileManager::Call<float>
+  491  001990E0    1A0  float SW_ThreeButtonClick::GetDifficultyScaleFactor(const const struct SW_ThreeButtonClick* this)
+                         local  int difficulty
+                         inlines  LuaTuningFileManager::Call<float>, Singleton<DifficultySettings>::GetSingleton

@@ -1,0 +1,8 @@
+// ../ears_rt_cct/dev/api_src/Internal/FrameSlerp.h
+// compiled in: ChrCntl_AnimTree.cpp, FrameSlerp.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   32  005B1B1C     28  void FrameSlerp(const struct <anon>* this)
+   51    inline-only   int32_t GetLeftFrameNum(const const struct FrameSlerp* this)
+   54    inline-only   int32_t GetRightFrameNum(const const struct FrameSlerp* this)
+   57    inline-only   float GetSlerpFactor(const const struct FrameSlerp* this)

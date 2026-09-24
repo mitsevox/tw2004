@@ -1,0 +1,144 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/lua-5.0.2/src/lib/lstrlib.c
+// compiled in: lstrlib.c
+// 35 functions, source order. line | PS3 address | size
+
+   31  005582B4     5C  static int str_len(lua_State* L)
+                         local  size_t l
+   39  00558310     18  static sint32 posrelat(sint32 pos, size_t len)
+   45  00558328    14C  static int str_sub(lua_State* L)
+                         local  size_t l
+                         local  const char* s
+                         local  sint32 start
+                         local  sint32 end
+   59  00558474    134  static int str_lower(lua_State* L)
+                         local  size_t l
+                         local  size_t i
+                         local  luaL_Buffer b
+                         local  const char* s
+                         local  int __x
+   72  005585A8    134  static int str_upper(lua_State* L)
+                         local  size_t l
+                         local  size_t i
+                         local  luaL_Buffer b
+                         local  const char* s
+                         local  int __x
+   84  005586DC     E4  static int str_rep(lua_State* L)
+                         local  size_t l
+                         local  luaL_Buffer b
+                         local  const char* s
+                         local  int n
+   97  005587C0     F8  static int str_byte(lua_State* L)
+                         local  size_t l
+                         local  const char* s
+                         local  sint32 pos
+  108  005588B8    148  static int str_char(lua_State* L)
+                         local  int n
+                         local  int i
+                         local  luaL_Buffer b
+                         local  int c
+  123  00558A00     2C  static int writer(lua_State* L, const void* b, size_t size, void* B)
+  130  00558A2C     B0  static int str_dump(lua_State* L)
+                         local  luaL_Buffer b
+  172  00558ADC     88  static int check_capture(MatchState* ms, int l)
+  180    inline-only   static int capture_to_close(MatchState* ms)
+                         local  int level
+  188  00558B64    19C  static const char* luaI_classend(MatchState* ms, const char* p)
+  212  00558D00    1EC  static int match_class(int c, int cl)
+                         local  int res
+                         local  int __x
+  231  00558EEC    118  static int matchbracketclass(int c, const char* p, const char* ec)
+                         local  int sig
+  254  00559004     54  static int luaI_singlematch(int c, const char* p, const char* ep)
+  268    inline-only   static const char* matchbalance(MatchState* ms, const char* s, const char* p)
+                         local  int b
+                         local  int e
+                         local  int cont
+  288  005597D4     F8  static const char* max_expand(MatchState* ms, const char* s, const char* p, const char* ep)
+                         local  sint32 i
+                         local  const char* res
+  303    inline-only   static const char* min_expand(MatchState* ms, const char* s, const char* p, const char* ep)
+                         local  const char* res
+  316  005596E4     F0  static const char* start_capture(MatchState* ms, const char* s, const char* p, int what)
+                         local  const char* res
+                         local  int level
+  330    inline-only   static const char* end_capture(MatchState* ms, const char* s, const char* p)
+                         local  int l
+                         local  const char* res
+  340    inline-only   static const char* match_capture(MatchState* ms, const char* s, int l)
+                         local  size_t len
+  351  00559058    68C  static const char* match(MatchState* ms, const char* s, const char* p)
+                         local  const char* ep
+                         local  int m
+                         local  const char* res
+                         local  const char* ep
+                         local  char previous
+                         inlines  end_capture, match_capture, matchbalance, min_expand
+  430    inline-only   static const char* lmemfind(const char* s1, size_t l1, const char* s2, size_t l2)
+                         local  const char* init
+  451  005598CC     F4  static void push_onecapture(MatchState* ms, int i)
+                         local  int l
+  461  005599C0     E8  static int push_captures(MatchState* ms, const char* s, const char* e)
+                         local  int i
+  476  00559AA8    3AC  static int str_find(lua_State* L)
+                         local  size_t l1
+                         local  size_t l2
+                         local  const char* s
+                         local  const char* p
+                         local  sint32 init
+                         local  const char* s2
+                         local  MatchState ms
+                         local  int anchor
+                         local  const char* s1
+                         local  const char* res
+                         local  const char* init
+                         inlines  lmemfind
+  515  00559E54    178  static int gfind_aux(lua_State* L)
+                         local  MatchState ms
+                         local  const char* s
+                         local  size_t ls
+                         local  const char* p
+                         local  const char* src
+                         local  const char* e
+                         local  int newstart
+  541  00559FCC     90  static int gfind(lua_State* L)
+  552    inline-only   static void add_s(MatchState* ms, luaL_Buffer* b, const char* s, const char* e)
+                         local  lua_State* L
+                         local  const char* news
+                         local  size_t l
+                         local  size_t i
+                         local  int level
+                         local  int n
+  586  0055A05C    524  static int str_gsub(lua_State* L)
+                         local  size_t srcl
+                         local  const char* src
+                         local  const char* p
+                         local  int max_s
+                         local  int anchor
+                         local  int n
+                         local  MatchState ms
+                         local  luaL_Buffer b
+                         local  const char* e
+                         local  const char* news
+                         local  size_t l
+                         local  size_t i
+                         local  int n
+                         local  int level
+                         inlines  add_s
+  632    inline-only   static void luaI_addquoted(lua_State* L, luaL_Buffer* b, int arg)
+                         local  size_t l
+                         local  const char* s
+  659    inline-only   static const char* scanformat(lua_State* L, const char* strfrmt, char* form, int* hasprecision)
+                         local  const char* p
+  681  0055A580    7B8  static int str_format(lua_State* L)
+                         local  int arg
+                         local  size_t sfl
+                         local  const char* strfrmt
+                         local  const char* strfrmt_end
+                         local  luaL_Buffer b
+                         local  char[20] form
+                         local  char[512] buff
+                         local  int hasprecision
+                         local  size_t l
+                         local  const char* s
+                         inlines  luaI_addquoted, scanformat
+  766  0055AD38     40  int luaopen_string(lua_State* L)

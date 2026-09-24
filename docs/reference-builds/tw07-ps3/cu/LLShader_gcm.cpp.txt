@@ -1,0 +1,96 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/ps3/LLShader_gcm.cpp
+// compiled in: Legacy_unity.cpp
+// 36 functions, source order. line | PS3 address | size
+
+   84  003AC4AC     A0  void LS_InitModule()
+                         local  unsigned int* pLabel
+  111  003A9104     A0  void LS_CloseModule()
+                         local  uint32 i
+                         local  unsigned int buf
+  149  003A4FA4    1C4  LS_ShaderHandle LS_LoadProgramFromMemory(const void* compiledProgram, struct LS_VertexAttribute* vertexDescArray, uint32 vertexDescSize)
+                         local  const char[25] __FUNCTION__
+                         local  CGprogram programHandle
+                         local  void* programAddress
+                         local  unsigned int programOffset
+                         local  void* uCodeAddress
+                         local  unsigned int uCodeSize
+                         local  uint32 i
+                         inlines  TX_AddressToOffset_ps3gcm
+  221  00387EF8     3C  LS_ShaderHandle LS_ReloadProgramFromFile_dbg(LS_ShaderHandle oldShaderHandle, const char* filename)
+  229  00387D68    190  void LS_ActivateProgram(LS_ShaderHandle shaderHandle)
+                         local  struct LS_VertexAttribute* pAttributeRecord
+                         inlines  Gcm::cellGcmSetVertexDataArray, Gcm::cellGcmSetVertexProgram
+  277  003811F8     C4  void LS_InvalidateCurrentVertexProgram_gcm()
+                         local  struct LS_VertexAttribute* pAttributeRecord
+                         inlines  Gcm::cellGcmSetVertexDataArray
+  301  0037FD98     24  void LS_InvalidateCurrentPixelProgram_gcm()
+  309  003A4070    148  void LS_FreeProgram(LS_ShaderHandle shaderHandle)
+                         local  const char[15] __FUNCTION__
+  346  00387D24     44  const char* LS_GetProgramName(LS_ShaderHandle shaderHandle)
+  356  0038E2AC    1D0  LS_ParamHandle LS_GetParameterHandle(LS_ShaderHandle shaderHandle, const char* paramName)
+                         local  CGparameter handle
+                         local  const char[4] ARRAY_SUFFIX
+                         local  const char* pScratchBuffer
+  409  0038006C     20  const char* LS_GetParameterName(LS_ParamHandle paramHandle)
+  421    inline-only   void LS_SetParameter(LS_ShaderHandle shaderHandle, LS_ParamHandle paramHandle, const float* data)
+  460  003B6A04    1A8  void LS_SetParameterB(LS_ShaderHandle shaderHandle, LS_ParamHandle paramHandle, bool value)
+                         local  float fpEquivalentValue
+                         inlines  Gcm::cellGcmSetFragmentProgramParameter, Gcm::cellGcmSetVertexProgramParameter, LS_SetParameter
+  468  003B6BAC    15C  void LS_SetParameterF(LS_ShaderHandle shaderHandle, LS_ParamHandle paramHandle, float value)
+                         inlines  Gcm::cellGcmSetFragmentProgramParameter, Gcm::cellGcmSetVertexProgramParameter, LS_SetParameter
+  474  0038DF64    348  void LS_SetParameterCF(LS_ShaderHandle shaderHandle, LS_ParamHandle paramHandle, const float* pValues, int count)
+                         local  enum CGtype type
+                         local  const unsigned int width
+                         local  unsigned int regCount
+                         local  CGparameter param
+                         inlines  Gcm::cellGcmSetFragmentProgramParameter, Gcm::cellGcmSetVertexProgramParameter
+  558  003B6D08    1A8  void LS_SetParameter2F(LS_ShaderHandle shaderHandle, LS_ParamHandle paramHandle, const float* pValues)
+                         inlines  Gcm::cellGcmSetFragmentProgramParameter, LS_SetParameter
+  566  003B6EB0    1A8  void LS_SetParameter3F(LS_ShaderHandle shaderHandle, LS_ParamHandle paramHandle, const float* pValues)
+                         inlines  Gcm::cellGcmSetFragmentProgramParameter, LS_SetParameter
+  574  003B7058    1A8  void LS_SetParameterV(LS_ShaderHandle shaderHandle, LS_ParamHandle paramHandle, const float* vec)
+                         inlines  Gcm::cellGcmSetFragmentProgramParameter, LS_SetParameter
+  582  00387B7C    1A8  void LS_SetParameterM(LS_ShaderHandle shaderHandle, LS_ParamHandle paramHandle, float[4]* mat)
+                         inlines  Gcm::cellGcmSetFragmentProgramParameter, LS_SetParameter
+  589  003BCEC4    16C  void LS_SetParameterT(LS_ShaderHandle shaderHandle, LS_ParamHandle paramHandle, TextureRef pTexture)
+                         local  unsigned int sampler
+  639  003AC24C    260  struct LS_VertexBuffer* LS_CreateVertexBuffer(MemBudgetTypeE budget, uint32 sizeInBytes, void* pDataArea, struct LS_VertexBuffer* pVB)
+                         local  const char[22] __FUNCTION__
+                         inlines  TX_AddressToOffset_ps3gcm, TagValuePair, operator+
+  699  003A9040     C4  void LS_FreeVertexBuffer(struct LS_VertexBuffer* pVB)
+                         local  const char[20] __FUNCTION__
+  729  003ABFB4    298  struct LS_IndexBuffer* LS_CreateIndexBuffer(MemBudgetTypeE budget, uint32 indexCount, LS_Index* pDataArea, struct LS_IndexBuffer* pIB)
+                         local  const char[21] __FUNCTION__
+                         inlines  TX_AddressToOffset_ps3gcm, TagValuePair, operator+
+  788  003A8FAC     94  void LS_FreeIndexBuffer(struct LS_IndexBuffer* pIB)
+                         local  const char[19] __FUNCTION__
+  812  00387888     D8  static void LS_MarkBusy(struct LS_VertexBuffer* pVB, unsigned int streamNum)
+  834  0037FFF8     74  static void LS_MarkNotBusy(unsigned int streamNum)
+  845  00387B20     5C  void* LS_GetVertexPointer(struct LS_VertexBuffer* pVB)
+  856  0038008C      8  const void* LS_GetReadOnlyVertexPointer(const struct LS_VertexBuffer* pVB)
+  864  00387AC8     58  void LS_FlushVertexData(struct LS_VertexBuffer* pVB)
+  874  00387854     34  LS_Index* LS_GetIndexPointer(struct LS_IndexBuffer* pIB)
+  883  003800C4      C  void LS_FlushIndexData(struct LS_IndexBuffer* pIB)
+  890  00387960    168  void LS_SetStreamSource(uint32 streamNum, struct LS_VertexBuffer* pVB, uint32 stride)
+                         local  bool streamFound_dbg
+                         local  struct LS_VertexAttribute* pAttributeRecord
+                         local  const unsigned int location
+                         inlines  Gcm::cellGcmSetInvalidateVertexCache, Gcm::cellGcmSetVertexDataArray
+  938    inline-only   void LS_PreDrawChecks()
+  967  003B6588    120  void LS_Draw(enum LS_PrimType primType, uint32 startVertex, uint32 vertexCount)
+                         inlines  Gcm::cellGcmSetDrawArrays, Gcm::cellGcmSetFragmentProgram, LS_PreDrawChecks
+  980  003B68B4    150  void LS_DrawIndexed(enum LS_PrimType primType, struct LS_IndexBuffer* pIB, uint32 startIndex, uint32 indexCount)
+                         local  const unsigned int location
+                         inlines  Gcm::cellGcmSetDrawIndexArray, Gcm::cellGcmSetFragmentProgram, LS_PreDrawChecks
+ 1001  003A0C18    384  void LS_DrawSlowly(enum LS_PrimType primType, uint32 vertexCount, const void* pVerts, uint32 vertexStride)
+                         local  const unsigned int spaceNeeded
+                         local  const unsigned int spaceRemaining
+                         local  unsigned int wrapPoint
+                         local  const unsigned char* pVertBuffer
+                         local  const unsigned char* pFreeSpace
+                         local  const unsigned char* pFreeSpaceEnd
+                         local  volatile unsigned int* pGPUcompleted
+                         local  const unsigned int vertexOffset
+                         local  struct LS_VertexAttribute* pAttributeRecord
+                         local  const unsigned int gpuAddr
+                         inlines  Gcm::cellGcmFlush, Gcm::cellGcmSetDrawArrays, Gcm::cellGcmSetFragmentProgram, Gcm::cellGcmSetInvalidateVertexCache, Gcm::cellGcmSetVertexDataArray, Gcm::cellGcmSetWriteBackEndLabel, LS_PreDrawChecks, TX_AddressToOffset_ps3gcm

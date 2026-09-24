@@ -1,0 +1,405 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Spectator/spectatorPlacement.cpp
+// compiled in: golf2_unity.cpp
+// 37 functions, source order. line | PS3 address | size
+
+   89  001415BC     74  void Spectator_InitPlacement()
+                         local  int i
+  101  0014D750    2CC  void Spectator_PlacementAllocs()
+                         local  const char[26] __FUNCTION__
+                         local  int i
+                         inlines  TagValuePair, operator+
+  114  00140504     C0  void Spectator_PlacementFreeBuffers()
+                         local  int i
+  128  00165C18    2A0  bool ValidSpectatorLocation(struct CPovVector3& Location, bool bInstanceIsGrounded)
+                         local  TGD_TerrainInfo* pTerrainInfo
+                         local  vec4flt Vec4Location
+                         local  vec4flt tempNormal
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  float GroundHeight
+                         local  float DistanceFromGround
+                         local  vec4flt vPos
+                         local  vec4flt vDir
+                         local  float fSpectatorDiameter
+                         local  float fSpectatorRadius
+                         inlines  CPovVector3::Y, CPovVector3::Z
+  206  00141630     38  float vec3flt_DistanceBetween(float* A, float* B)
+                         local  vec3flt diff
+                         local  float val
+  225  00141668     A0  bool Spectator_GetCameraFocusPoint(float* focus_point, int type)
+  236  00141708     78  void Spectator_SetCameraFocusPoint(float* focus_point, int track_depth, int type)
+  251  00141548     74  void Spectator_ResetCameraFocusPoint(int type)
+                         local  int i
+  268  00141780    154  void Spectator_FindClosestCameraPoint(float* location, int type)
+                         local  float distanceToClosestTrackPoint
+                         local  unsigned int closestDividerNum
+                         local  struct SpectatorTrackNetwork* tracks
+                         local  int c
+                         local  unsigned int dividerNum
+                         local  float dist
+  302  001D339C     E8  void Spectator_PreCalcCameraPoints()
+                         local  enum PlayerNumber_t golferUp
+                         local  struct GamePlayer* pGolfer
+                         local  vec4flt teePos
+                         local  vec4flt flagPos
+                         local  const float[4]& flagLoc
+                         inlines  GM_GetGolferUp, Singleton<GamePlayerManager>::GetSingleton
+  322  001D48EC    138  bool Spectator_GetCameraOriginPoint(float* origin_point, int type)
+                         local  enum PlayerNumber_t golferUp
+                         local  struct GamePlayer* pGolfer
+                         local  vec4flt teePos
+                         local  const float[4]& ballLoc
+                         local  const float[4]& flagLoc
+                         inlines  GM_GetGolferUp, Singleton<GamePlayerManager>::GetSingleton
+  370  001C4144    8C4  void Spectator_ClearOut()
+                         local  const bool INSTANCE_IS_GROUNDED
+                         local  bool skip_exclusion_cone
+                         local  bool stop_walkers
+                         local  int stop_walker_spline
+                         local  vec4flt BallLocation_vec4flt
+                         local  struct CPovVector3 BallLocation
+                         local  struct PhysicsBall_t* ball
+                         local  bool bIsOnGreen
+                         local  vec4flt vTeeLocation
+                         local  vec4flt vDistanceFromTeeToBall
+                         local  int currentTee
+                         local  struct CPovVector3 DirectionFromTarget
+                         local  vec4flt vTargetPos
+                         local  vec4flt vTargetDir
+                         local  struct CPovVector3 OffsetBall
+                         local  const CSpectatorCloneGroupList& CloneGroupList
+                         local  struct CSpectatorCloneGroup* pCloneGroup
+                         local  struct CSpectatorCloneGroup* pCloneGroupListEnd
+                         local  struct SpectatorTrackNetwork* tracks
+                         local  float distanceToClosestTrackPoint
+                         local  unsigned int closestDividerNum
+                         local  const CSpectatorInstanceList& InstanceList
+                         local  struct CSpectatorInstance* pInstance
+                         local  struct CSpectatorInstance* pInstanceListEnd
+                         local  struct CPovVector3 SpectatorPosition
+                         local  struct CPovVector3 VectorFromBall
+                         local  struct CPovVector3 DirectionFromBall
+                         local  float DistanceFromBall
+                         local  bool bToCloseInFrontOfTarget
+                         local  struct CPovVector3 OffsetDirFromBall
+                         local  float fDotWithTarget
+                         local  float fDotWithTarget2
+                         local  struct CSpectatorCloneGroup* pCloneGroup
+                         local  struct CSpectatorCloneGroup* pCloneGroupListEnd
+                         local  int c
+                         local  int d
+                         local  unsigned int t
+                         local  struct CPovVector3 trackPos
+                         local  struct CPovVector3 VectorFromBall
+                         local  float distance
+                         local  int c
+                         local  unsigned int dividerNum
+                         local  float dist
+                         local  CSpectatorInstanceList* pWalkers
+                         local  struct CSpectatorInstance* pEnd
+                         local  struct CSpectatorInstance* pWalker
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLink<CSpectatorInstance>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::End, CPovLinkedList<CSpectatorCloneGroup>::First, CPovLinkedList<CSpectatorInstance>::End, CPovLinkedList<CSpectatorInstance>::First, CPovVector3::CPovVector3, CPovVector3::Dot, CPovVector3::Length, CPovVector3::Normalize, CPovVector3::operator-, CPovVector3::operator[], CSpectatorCloneGroup::GetOverridePose, CSpectatorCloneGroup::GetType, CSpectatorCloneGroup::SetAllMoversStopped, CSpectatorCloneGroup::SetIsMoving, CSpectatorInstance::GetPosition, CSpectatorInstance::SetIsHidden, CSpectatorInstance::SetIsMoving, CSpectatorPose::SetLoop, LLMath_Subtract3, vec4flt_Copy, vec4flt_Copy3, vec_ld
+  641  001C4A08    660  void Spectator_RepositionForShot()
+                         local  const bool INSTANCE_IS_GROUNDED
+                         local  bool skip_exclusion_cone
+                         local  struct PhysicsBall_t* ball
+                         local  bool bIsOnGreen
+                         local  vec4flt BallLocation_vec4flt
+                         local  struct CPovVector3 BallLocation
+                         local  vec4flt vTeeLocation
+                         local  vec4flt vDistanceFromTeeToBall
+                         local  int currentTee
+                         local  struct CPovVector3 DirectionFromTarget
+                         local  vec4flt vTargetPos
+                         local  vec4flt vTargetDir
+                         local  struct CPovVector3 OffsetBall
+                         local  const CSpectatorCloneGroupList& CloneGroupList
+                         local  struct CSpectatorCloneGroup* pCloneGroup
+                         local  struct CSpectatorCloneGroup* pCloneGroupListEnd
+                         local  struct SpectatorTrackNetwork* tracks
+                         local  float distanceToClosestTrackPoint
+                         local  unsigned int closestDividerNum
+                         local  const CSpectatorInstanceList& InstanceList
+                         local  struct CSpectatorInstance* pInstance
+                         local  struct CSpectatorInstance* pInstanceListEnd
+                         local  const CSpectatorInstanceList& InstanceList
+                         local  struct CSpectatorInstance* pInstance
+                         local  struct CSpectatorInstance* pInstanceListEnd
+                         local  struct CPovVector3 SpectatorPosition
+                         local  struct CPovVector3 SpectatorPosition
+                         local  struct CPovVector3 VectorFromBall
+                         local  struct CPovVector3 DirectionFromBall
+                         local  float DistanceFromBall
+                         local  bool bToCloseInFrontOfTarget
+                         local  struct CPovVector3 OffsetDirFromBall
+                         local  float fDotWithTarget
+                         local  float fDotWithTarget2
+                         local  int c
+                         local  unsigned int dividerNum
+                         local  float dist
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLink<CSpectatorInstance>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::End, CPovLinkedList<CSpectatorCloneGroup>::First, CPovLinkedList<CSpectatorInstance>::First, CPovVector3::CPovVector3, CPovVector3::Dot, CPovVector3::Length, CPovVector3::Normalize, CPovVector3::operator-, CPovVector3::operator[], CSpectatorInstance::GetPosition, CSpectatorInstance::SetIsHidden, LLMath_Subtract3, vec4flt_Copy, vec4flt_Copy3
+  847  001AB8AC    250  void SpectatorGetBackDirection(const vec4flt& BackDirection, float* Point, float* Sideways, int8 CrowdType)
+                         local  vec4flt vClosetestPin
+                         local  const float[4] UpVector
+                         local  int iClosestPin
+                         local  float fClosestPin
+                         local  float fDistance
+                         local  int i
+                         inlines  LLMath_CrossProduct3W0, LLMath_Length3, LLMath_Subtract3, __vec_len_sqr3
+  899  0014307C    1A0  void Spectator_MakeClosedPoly(struct TNetwork* cp_poly, int num_front_pts, vec4flt* front_control_pts, int num_back_pts, vec4flt* back_control_pts)
+                         local  unsigned int i
+                         local  unsigned int max
+                         local  float[300][4] front_points
+                         local  float[300][4] back_points
+  947  001C32F0    1C0  struct CSpectatorInstance* Spectator_AddNewSpectator(float* pos, float* facing, uint8* color, CLONE_GROUP_TYPE type, int nettype)
+                         local  struct CPovVector3 position
+                         local  struct CPovVector3 lookAtPosition
+                         local  uint32 light_color
+                         local  uint8* u8ptr
+                         local  struct CSpectatorInstance* pInstance
+                         local  TGD_TerrainInfo* pTerrainInfo
+                         inlines  CPovVector3::Set, CSpectatorInstance::SetIsGrounded, CSpectatorInstance::SetNumTimesHit
+ 1030  001C34B0    8F4  void Spectator_PlaceForHole_UsingOldNetworks()
+                         local  struct CSpectatorInstance* instance
+                         local  TNode* node_ptr
+                         local  TNode* next_node
+                         local  unsigned int num_nodes
+                         local  unsigned int n_spectators
+                         local  struct TSpectatorArea* p_area
+                         local  vec4flt pos
+                         local  vec4flt facing
+                         local  vec4flt dir
+                         local  vec4flt offset1
+                         local  vec4flt offset2
+                         local  vec4flt row_offset
+                         local  uint8[4] color
+                         local  int i
+                         local  int j
+                         local  int k
+                         local  int stand
+                         local  int index_offset
+                         local  int num_rows
+                         local  float jitter
+                         local  float jitter_factor
+                         local  float total_space
+                         local  float length
+                         local  unsigned int area
+                         local  float density
+                         local  int n_spectator_rows
+                         local  float crowd_reduction
+ 1208  001D3484   1468  void Spectator_PlaceForHole(float CrowdDensity)
+                         local  int dividerNum
+                         local  unsigned int trackNum
+                         local  int[30] prevPointsDivider
+                         local  float[30][2] prevPointsVector
+                         local  float[2] current_dir
+                         local  float[30][4] prevPoints
+                         local  float[152][4] curve_points
+                         local  vec4flt point
+                         local  struct SpectatorTrackNetwork* tracks
+                         local  bool left_facing
+                         local  int nSpectators
+                         local  int num_spline_spectators
+                         local  vec4flt BallLocation
+                         local  struct TNetwork* cp_poly
+                         local  int c
+                         local  int c
+                         local  float[152][3] divider_offsets
+                         local  int left_count
+                         local  int last_divider
+                         local  float[2] dir_in
+                         local  float[2] dir_out
+                         local  float dist
+                         local  float dot_in
+                         local  float scatter_factor
+                         local  float remainingDistance
+                         local  float distanceFromDivider
+                         local  float distance
+                         local  vec3flt currentPos
+                         local  vec3flt diffPos
+                         local  bool bNewSectionReached
+                         local  struct CSpectatorInstance* prevSpectator
+                         local  int i
+                         local  float diffX
+                         local  float diffZ
+                         local  float dist
+                         local  int count
+                         local  const float kMinDistance
+                         local  int start_div
+                         local  float offsetX
+                         local  float offsetZ
+                         local  float length
+                         local  vec3flt testPoint
+                         local  int div_diff
+                         local  int i
+                         local  TGD_TerrainInfo* pTerrainInfo
+                         local  struct CPovVector3 testpos
+                         local  bool valid_pos
+                         local  bool last_valid_pos
+                         local  struct CPovVector3 testpos
+                         local  float adjustment
+                         local  bool prev_last_valid_pos
+                         local  float jitterX
+                         local  float jitterZ
+                         local  vec4flt actualPoint
+                         local  struct CPovVector3 pos
+                         local  struct CPovVector3 lookAtPos
+                         local  float sdiffx
+                         local  float sdiffz
+                         local  struct CSpectatorInstance* pInstance
+                         local  float factor
+                         inlines  CPovVector3::CPovVector3, CPovVector3::Set, CSpectatorCloneGroup::SetTrack, CSpectatorInstance::SetCanMove, CSpectatorInstance::SetDistanceFromDivider, CSpectatorInstance::SetDividerNum, CSpectatorInstance::SetIsMoving, CSpectatorInstance::SetNextInTrack, CSpectatorInstance::SetNumTimesHit, CSpectatorInstance::SetPlaceInTrack, CSpectatorInstance::SetPrevInTrack, CSpectatorInstance::SetStopDividerNum, CSpectatorInstance::SetStopTrackNum, CSpectatorInstance::SetTrackNum, vec4flt_Copy, vec_st
+ 1781  00140614     C8  bool Spectator_GetTrackPosition(struct SpectatorTrackNetwork* tracks, uint32 currentTrackNum, uint32 currentDividerNum, float* returnPosition)
+                         local  uint32 dividerNum
+                         local  uint32 trackNum
+ 1802  001406DC      8  unsigned int Spectator_GetNumDividers(struct SpectatorTrackNetwork* tracks)
+ 1807  0015E384     90  void Spectator_RemoveFromTrackList(struct CSpectatorInstance* instance, unsigned int numTrack)
+                         local  struct SpectatorTrackNetwork* tracks
+                         inlines  CSpectatorCloneGroup::GetTrack, CSpectatorInstance::GetNextInTrack, CSpectatorInstance::GetPrevInTrack, CSpectatorInstance::SetNextInTrack, CSpectatorInstance::SetPrevInTrack
+ 1824  0015D798     68  void Spectator_InsertInTrackListAfterInstance(struct SpectatorTrackNetwork* tracks, struct CSpectatorInstance* baseInstance, struct CSpectatorInstance* insertedInstance, unsigned int numTrack)
+                         inlines  CSpectatorInstance::GetNextInTrack, CSpectatorInstance::SetNextInTrack, CSpectatorInstance::SetPrevInTrack
+ 1847  0015E414     68  void Spectator_InsertInTrackListBeforeInstance(struct SpectatorTrackNetwork* tracks, struct CSpectatorInstance* baseInstance, struct CSpectatorInstance* insertedInstance, unsigned int numTrack)
+                         inlines  CSpectatorInstance::GetPrevInTrack, CSpectatorInstance::SetNextInTrack, CSpectatorInstance::SetPrevInTrack
+ 1872  0015E47C    230  void Spectator_PlaceInTrackList(struct CSpectatorInstance* instance, unsigned int numTrack)
+                         local  struct SpectatorTrackNetwork* tracks
+                         local  struct CSpectatorInstance* tempInstance
+                         local  float distance
+                         local  float tempDistance
+                         inlines  CSpectatorCloneGroup::GetTrack, CSpectatorInstance::GetDistanceFromDivider, CSpectatorInstance::GetDividerNum, CSpectatorInstance::GetNextInTrack
+ 1942  001D4A24    494  void Spectator_PreCalcStopPoints(float* focalPoint)
+                         local  struct SpectatorTrackNetwork* tracks
+                         local  float distanceToClosestTrackPoint
+                         local  unsigned int closestDividerNum
+                         local  int count
+                         local  struct CSpectatorCloneGroup* pEnd
+                         local  int c
+                         local  unsigned int dividerNum
+                         local  struct CSpectatorCloneGroup* pCloneGroup
+                         local  CSpectatorInstanceList* pWalkers
+                         local  struct CSpectatorInstance* pEnd2
+                         local  struct CSpectatorInstance* pWalkerTemp
+                         local  unsigned int track
+                         local  int divider
+                         local  float jitterX
+                         local  float jitterZ
+                         local  struct CPovVector3 stopPos
+                         local  float dist
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLink<CSpectatorInstance>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::End, CPovLinkedList<CSpectatorCloneGroup>::First, CPovLinkedList<CSpectatorInstance>::End, CPovLinkedList<CSpectatorInstance>::First, CSpectatorCloneGroup::SetIsMoving, CSpectatorInstance::GetTrackNum, CSpectatorInstance::SetIsMoving, CSpectatorInstance::SetIsPlaced, CSpectatorInstance::SetStopDividerNum, GM_GetGolferUp
+ 2035  001D5E2C    6E8  void Spectator_CalculateStopPoints(float* focalPoint)
+                         local  struct SpectatorTrackNetwork* tracks
+                         local  float distanceToClosestTrackPoint
+                         local  unsigned int closestDividerNum
+                         local  int num_points_available
+                         local  struct CSpectatorCloneGroup* pEnd
+                         local  int c
+                         local  int num_moving_spectators
+                         local  int num_walkers_placed
+                         local  int stopTrackNum
+                         local  int stopDividerNum
+                         local  unsigned int dividerNum
+                         local  struct CSpectatorCloneGroup* pCloneGroup
+                         local  CSpectatorInstanceList* pWalkers
+                         local  struct CSpectatorInstance* pEnd2
+                         local  struct CSpectatorInstance* pWalkerTemp
+                         local  float jitterX
+                         local  float jitterZ
+                         local  vec4flt actualPoint
+                         local  float closestDist
+                         local  struct CSpectatorInstance* pClosestWalker
+                         local  vec3flt posit
+                         local  struct CPovVector3 stopPos
+                         local  struct CSpectatorCloneGroup* pCloneGroup
+                         local  CSpectatorInstanceList* pWalkers
+                         local  struct CSpectatorInstance* pEnd2
+                         local  struct CSpectatorInstance* pWalkerTemp
+                         local  float tempDist
+                         local  int track_diff
+                         local  int divider_diff
+                         local  struct CSpectatorCloneGroup* pCloneGroup
+                         local  CSpectatorInstanceList* pWalkers
+                         local  struct CSpectatorInstance* pEnd
+                         local  struct CSpectatorInstance* pWalkerTemp
+                         local  float dist
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLink<CSpectatorInstance>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::End, CPovLinkedList<CSpectatorCloneGroup>::First, CPovLinkedList<CSpectatorInstance>::End, CPovLinkedList<CSpectatorInstance>::First, CPovVector3::GetZ, CPovVector3::Set, CSpectatorInstance::GetPosition, CSpectatorInstance::SetIsPlaced, CSpectatorInstance::SetStopDividerNum, CSpectatorInstance::SetStopTrackNum, GM_GetGolferUp
+ 2238  001D67C0    228  bool Spectator_GetShouldPopIntoPlace()
+                         local  struct TNetwork* cp_poly
+                         local  struct SpectatorTrackNetwork* tracks
+                         local  vec4flt* ballPos
+                         local  vec3flt testPoint
+                         local  float closestDist
+                         local  unsigned int closestDividerNum
+                         local  unsigned int i
+                         local  float distance
+                         inlines  GM_GetGolferUp
+ 2295  00141F38     1C  int Spectator_GetNumSplines()
+ 2303  00154E04     CC  bool Spectator_ShouldLoadNetwork(struct TNetwork* netPtr)
+ 2326  00141F54    180  void Spectator_LoadNetworkCallback(struct TNetwork* netPtr)
+                         local  TNode* nodePtr
+                         local  int i
+                         local  unsigned int j
+ 2369  00154D38     CC  bool Spectator_ShouldLoadSplineNetwork(struct TNetwork* netPtr)
+ 2391  001420D4     E4  void Spectator_LoadSplineNetworkCallback(struct TNetwork* netPtr)
+ 2412  001421B8    3AC  void Spectator_PostNetworkLoadSplineCallback()
+                         local  unsigned int i
+                         local  unsigned int j
+                         local  unsigned int set
+                         local  struct TNetwork* netptr
+                         local  int[12] map
+                         local  unsigned int mask
+                         local  unsigned int mask2
+                         local  uint32 spline
+                         local  uint32 netLoadOrder
+ 2495  001E5514    5A8  void Spectator_RenderNetworkData()
+                         local  float fMinLightScale
+                         local  float fMaxLightScale
+                         local  vec4flt xpcolors
+                         local  vec4flt xpcolorsAx
+                         local  float[2][4] curVert
+                         local  uint32 j
+                         local  TNode* pNode
+                         local  int i
+                         local  int nodeNdx
+                         local  TNode* pConnectingNode
+                         local  float* pVert
+                         local  int axis
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetZBufferMode, Gcm::cellGcmSetBlendFunc, LLMath_Length3, LLMath_Scale3, PR_vSetCurrentColor, PR_vSetCurrentUsage, __vec_len_sqr3, __vec_mul, vec_ld, vec_st
+ 2584  00142564    444  void NURB_Calc_Basis(float t, int num_cp, int order, int* knot_vector, float* basis)
+                         local  int i
+                         local  int j
+                         local  int num
+                         local  float total
+                         local  float[67] value
+ 2629  001429A8    6D4  void NURB_Calc_Points(int num_cp, int order, int num_curve_pts, vec4flt* control_points, vec4flt* curve_points)
+                         local  int i
+                         local  int j
+                         local  int k
+                         local  int num
+                         local  int index
+                         local  int num_test_points
+                         local  int[67] knot_vector
+                         local  float t
+                         local  float step
+                         local  float dist
+                         local  float spacing
+                         local  float remain
+                         local  float[64] basis
+                         local  vec4flt prev
+                         local  vec4flt point
+                         local  vec4flt diff
+ 2751  001418D4    664  int Spectator_SetPlacementPositions(int spline_id, int main_divider)
+                         local  struct SpectatorTrackNetwork* tracks
+                         local  int dividerNum
+                         local  int div_diff
+                         local  float scatter_factor
+                         local  float factor
+                         local  float remainingDistance
+                         local  float distanceFromDivider
+                         local  float distance
+                         local  vec3flt currentPos
+                         local  vec3flt diffPos
+                         local  bool bNewSectionReached
+                         local  struct CSpectatorInstance* prevSpectator
+                         local  int num_spline_spectators
+                         local  unsigned int trackNum
+                         local  bool valid_pos
+                         local  bool last_valid_pos
+                         local  bool prev_last_valid_pos

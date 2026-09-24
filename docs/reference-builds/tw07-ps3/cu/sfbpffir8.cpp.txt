@@ -1,0 +1,12 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/sfbpffir8.cpp
+// compiled in: sfbpffir8.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   10  006F3F78     B0  int SFILTER_bpfFIR8(void* pstate, int outputframes, void* psrcp, void* pdstp, int requester)
+                         local  BPFSTATE* pbs
+                         local  int temp
+   43  006F4028     58  int SFILTER_createBPFFIR8(BPFSTATE* pbs)
+   60  006F4080     A4  void SFILTER_modifyBPFFIR8(BPFSTATE* pbs, FIXED24P8* pparams)
+                         local  int cutLow
+                         local  int cutHigh
+                         local  int samplerate

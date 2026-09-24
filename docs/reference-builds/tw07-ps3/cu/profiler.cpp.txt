@@ -1,0 +1,20 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/profiler.cpp
+// compiled in: profiler.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   16  006F611C     48  struct Profiler* CreateInstance(struct <anon>* pSystem)
+                         local  struct Profiler* pThis
+                         inlines  Profiler
+   44  006F6164      C  void ~Profiler(const struct Profiler* this)
+   48  006F61A8     78  void Release(const struct Profiler* this)
+                         local  const char[8] __FUNCTION__
+   55  006F6368      C  void Start(const struct Profiler* this)
+                         inlines  core::GetCpuCycle
+   61  006F6220    140  void End(const struct Profiler* this)
+                         local  unsigned int currentCycle
+                         local  double timeNow
+                         local  unsigned int usedCycles
+                         local  unsigned int totalCycles
+                         local  float tempcpu
+                         inlines  GetTime, core::GetCpuCycle
+  118  006F6360      8  float GetCpuLastSecond(const struct Profiler* this)

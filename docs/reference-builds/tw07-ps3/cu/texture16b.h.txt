@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/golf/texturefx/headers/texture16b.h
+// compiled in: other_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   44  004A7464      8  void* Texture16b::PrepareTextureForBlend(const struct Texture16b* this, enum TXRBlendRule_Mode blendMode, float lerpVal, int32_t texNum)
+   45  004A746C      4  void Texture16b::RestoreTextureFromBlend(const struct Texture16b* this, enum TXRBlendRule_Mode blendMode, float lerpVal, void* dataStorage)

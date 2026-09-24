@@ -1,0 +1,19 @@
+// C:/dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/target/ppu/include/math.h
+// compiled in: Legacy_unity.cpp, apt_unity.cpp, golf2_unity.cpp, golf_unity.cpp, headgate_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+  695    inline-only   float std::cosf(float _Left)
+  705    inline-only   float std::logf(float _Left)
+  715    inline-only   float std::sinf(float _Left)
+  734    inline-only   float std::abs(float _Left)
+  739    inline-only   float std::acos(float _Left)
+  749    inline-only   float std::atan(float _Left)
+  754    inline-only   float std::atan2(float _Left, float _Right)
+  764    inline-only   float std::cos(float _Left)
+  779    inline-only   float std::fabs(float _Left)
+  784    inline-only   float std::floor(float _Left)
+  819    inline-only   float std::pow(float _Left, float _Right)
+  846    inline-only   float std::sin(float _Left)
+  856    inline-only   float std::sqrt(float _Left)
+  861    inline-only   float std::tan(float _Left)
+  926    inline-only   float std::fmax(float _Left, float _Right)

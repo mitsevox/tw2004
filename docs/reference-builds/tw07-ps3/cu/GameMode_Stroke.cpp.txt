@@ -1,0 +1,79 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_Stroke.cpp
+// compiled in: golf_unity.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   21  00204948     44  void GameModeStroke::GameModeStroke(const struct GameModeStroke* this)
+   26  001FC5E0     18  void GameModeStroke::~GameModeStroke(const struct GameModeStroke* this)
+   31  002102E4    108  void GameModeStroke::Init(const struct GameModeStroke* this)
+   55  00200ED0      4  void GameModeStroke::Update(const struct GameModeStroke* this)
+   59  00200ED4      4  void GameModeStroke::Shutdown(const struct GameModeStroke* this)
+   64  00200ED8     1C  bool GameModeStroke::QueryInterface(const struct GameModeStroke* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bRet
+   78  00200EF4     38  int32 GameModeStroke::GetEndGameSequence(const struct GameModeStroke* this)
+                         local  int32 sequence
+   87  002D16D0     FC  void GameModeStroke::SetupNextGolfer(const struct GameModeStroke* this)
+                         local  int32 i
+  111  0030E66C    66C  enum PlayerNumber_t GameModeStroke::GetHonors(const struct GameModeStroke* this, enum PlayerNumber_t ignore, bool doNotIgnoreHoledOut)
+                         local  int32 i
+                         local  enum PlayerNumber_t furthest
+                         local  float x
+                         local  float y
+                         local  float dist
+                         local  float farthestDist
+                         local  int32 j
+                         local  int32 k
+                         local  int32 score
+                         local  int32 slot
+                         local  int32 lowest
+                         local  int32 highest
+                         local  TGD_TerrainInfo* pTerrainGameData
+                         local  enum PlayerNumber_t[4] currentTeeHonors
+                         local  enum PlayerNumber_t[4] nextTeeHonors
+                         inlines  GM_GetPlayerHoleStrokes, std::sqrt
+  248  0032CC58    160  enum PlayerNumber_t GameModeStroke::GetHoleWinner(const const struct GameModeStroke* this)
+                         local  int32_t minStrokes
+                         local  enum PlayerNumber_t winner
+                         local  bool tied
+                         local  int plr
+                         local  int32_t curStrokes
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes
+  279  00249A48     C4  bool GameModeStroke::HoleFinished(const struct GameModeStroke* this, enum PlayerNumber_t PlayerID, bool predict)
+                         local  int32 i
+                         local  bool bRet
+  295  00200FB4     8C  bool GameModeStroke::GameFinished(const struct GameModeStroke* this, bool predict)
+                         local  int32 i
+                         local  bool bRet
+  323  0030F948    538  void GameModeStroke::EndGame(const struct GameModeStroke* this)
+                         local  int i
+                         local  int j
+                         local  int playerscore
+                         local  int bestOtherscore
+                         local  int otherscore
+                         local  int winByStrokes
+                         local  uint8_t[4] places
+                         local  uint8_t minScore
+                         local  uint8_t floorScore
+                         local  int place
+                         local  int plr
+                         inlines  GM_FullRoundOfGolf, GM_IsPlayoff, GolferStats::GetGolferStats, Singleton<DifficultySettings>::GetSingleton, Singleton<GolferStats>::GetSingleton
+  438  00201040      4  void GameModeStroke::AwardAchievements(const struct GameModeStroke* this)
+  468  0030F6E0    268  void GameModeStroke::AwardWinnings(const struct GameModeStroke* this)
+                         local  int32 i
+                         local  int32 j
+                         local  int highest
+                         local  int rank
+                         local  int strokesAhead
+                         local  int playerscore
+                         local  int cpuscore
+                         local  int32 totalearned
+                         local  int32 baseearned
+                         local  int userID
+                         local  void* driverPointer
+                         inlines  EarningsInfo::GetStrokeEarnings, Singleton<GameModeDriverManager>::GetSingleton
+  525  002A1A2C     9C  bool GameModeStroke::TrackingReactiveDifficulty(const struct GameModeStroke* this)
+                         local  void* driverPointer
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+  531  0032FEB8     C4  void GameModeStroke::GetCurrentScoreString(const struct GameModeStroke* this, char* strBuf, int32 bufferSize)
+                         local  int32 curScore
+                         local  const char* prefix
+  549  00201044     14  const char* GameModeStroke::GetName(const struct GameModeStroke* this)

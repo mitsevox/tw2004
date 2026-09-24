@@ -1,0 +1,250 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Spectator/spectator.c
+// compiled in: golf2_unity.cpp
+// 52 functions, source order. line | PS3 address | size
+
+   42  00140174      4  void SpectatorLock::SpectatorLock(const struct SpectatorLock* this)
+   43  00140178      4  void SpectatorLock::~SpectatorLock(const struct SpectatorLock* this)
+   78  0013FF84    1F0  void Spectator_AddTuning()
+                         local  struct GameXmlSettings xmlSettings
+   90  00154CE4     54  bool Spectator_IsActive()
+  107  00175578     8C  void Spectator_InitModule()
+                         local  struct SpectatorLock lock
+  138  0016F840     64  void Spectator_CloseModule()
+                         local  struct SpectatorLock lock
+  152  001405C4     34  void Spectator_SetDensity(float density)
+  165  001402A0     A8  void Spectator_vRegisterStreamClients()
+                         local  struct SpectatorLock lock
+  189  0014017C     6C  void Spectator_vUnregisterStreamClients()
+                         local  struct SpectatorLock lock
+  208  001D6C64     9C  void Spectator_StartShot()
+  231  0016FB44     68  void Spectator_InitForHole()
+                         local  struct SpectatorLock lock
+  247  00170248     50  void Spectator_DeInitForHole()
+                         local  struct SpectatorLock lock
+  342  00140474     88  void Local_Spectator_InitAnimationCategories()
+                         local  int8 iAnimation
+                         local  int iAnimationCategory
+                         local  uint8 nAnimations
+  374  001C3DA4    1F8  void Local_Spectator_FindEmptySpot(struct CSpectatorInstance* pInstance, struct CPovVector3& TempDestination)
+                         local  bool bDone
+                         local  float fDistance
+                         local  struct CPovVector3 position
+                         local  vec4flt vInstancePos
+                         local  vec4flt vCurLocation
+                         local  vec4flt vDistance
+                         local  struct CSpectatorInstance* spectatorInstance
+                         local  struct CSpectatorInstance* next
+                         local  struct CSpectatorInstance* head
+                         inlines  CSpectatorInstance::GetPosition, LLMath_Length3, LLMath_Subtract, __vec_len_sqr3, vec_madd
+  420  001D240C    DFC  void Local_Spectator_Update(float dt, int SpectatorState, float SpectatorVolume)
+                         local  struct SpectatorLock lock
+                         local  bool AllCloneGroupsStopped
+                         local  struct CSpectatorCloneGroup* pListEnd
+                         local  float fTimeToStartNextGroup
+                         local  bool bStartNextGroup
+                         local  enum PlayerNumber_t PlayerID
+                         local  vec4flt* ballPos
+                         local  struct CSpectatorCloneGroup* pEnd
+                         local  struct CSpectatorCloneGroup* pCloneGroup
+                         local  struct CSpectatorCloneGroup* pCloneGroup
+                         local  struct CSpectatorPose* override
+                         local  CSpectatorInstanceList* pMovers
+                         local  struct CSpectatorInstance* pEnd
+                         local  struct CSpectatorInstance* pMover
+                         local  const struct CPovVector3* pPositionPOVStyle
+                         local  vec4flt Position
+                         local  unsigned int trackNum
+                         local  unsigned int dividerNum
+                         local  unsigned int stopTrackNum
+                         local  unsigned int stopDividerNum
+                         local  unsigned int numDividersAhead
+                         local  struct CSpectatorPose* override
+                         local  bool bInHalfTrack
+                         local  float WalkersDistancePerSecond
+                         local  vec4flt SegmentEndPoint
+                         local  bool bPassable
+                         local  const struct CPovVector3* pStopPositionPOVStyle
+                         local  vec4flt StopPosition
+                         local  float DistanceToStopPoint
+                         local  float DistanceToEndPoint
+                         local  float WalkersDistanceThisFrame
+                         local  bool stop_walker
+                         local  bool walker_collision
+                         local  float slope
+                         local  const struct CPovVector3* pNextSpecPositionPOVStyle
+                         local  vec4flt NextSpecPosition
+                         local  float distance
+                         local  vec4flt NextTrackPoint
+                         local  vec4flt WalkVector
+                         local  struct CPovVector3 NewPosition
+                         local  struct CPovVector3 NewDestination
+                         local  struct CPovVector3 TempPosition
+                         local  struct CPovVector3 TempDestination
+                         local  bool AllStopped
+                         local  CSpectatorInstanceList* pWalkers
+                         local  struct CSpectatorInstance* pListEnd
+                         local  struct CSpectatorInstance* pWalker
+                         local  const struct CPovVector3* pNextSpecPositionPOVStyle
+                         local  vec4flt NextSpecPosition
+                         local  float distance
+                         local  unsigned int temp
+                         local  unsigned int temp
+                         local  vec4flt NextTrackPoint
+                         local  vec4flt Destination
+                         local  struct CPovVector3 TempPosition
+                         local  struct CPovVector3 TempDestination
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLink<CSpectatorInstance>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::End, CPovLinkedList<CSpectatorCloneGroup>::First, CPovLinkedList<CSpectatorInstance>::End, CPovLinkedList<CSpectatorInstance>::First, CPovVector3::CPovVector3, CSpectatorCloneGroup::GetOverridePose, CSpectatorCloneGroup::GetTrack, CSpectatorCloneGroup::SetAllMoversStopped, CSpectatorCloneGroup::SetIsMoving, CSpectatorCloneGroup::SetOverridePose, CSpectatorInstance::GetDividerNum, CSpectatorInstance::GetNextInTrack, CSpectatorInstance::GetOverridePose, CSpectatorInstance::GetPosition, CSpectatorInstance::GetStopDividerNum, CSpectatorInstance::GetStopPosition, CSpectatorInstance::GetStopTrackNum, CSpectatorInstance::GetTrackNum, CSpectatorInstance::SetDistanceFromDivider, CSpectatorInstance::SetDividerNum, CSpectatorInstance::SetInHalfTrack, CSpectatorInstance::SetIsHidden, CSpectatorInstance::SetIsMoving, CSpectatorInstance::SetTrackNum, CSpectatorPose::SetLoop, GM_GetGolferUp, LLMath_Add3, LLMath_DistanceBetween3, LLMath_Scale3, LLMath_Subtract3, __vec_mul, vec_ld, vec_madd, vec_sld, vec_splat, vec_sub
+  871  001D6514     F8  void Spectator_Walk()
+                         local  enum PlayerNumber_t PlayerID
+                         local  vec4flt* ballPos
+                         local  struct CSpectatorCloneGroup* pEnd
+                         local  struct CSpectatorCloneGroup* pCloneGroup
+                         local  CSpectatorInstanceList* pWalkers
+                         local  struct CSpectatorInstance* pEnd
+                         local  struct CSpectatorInstance* pWalker
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLink<CSpectatorInstance>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::End, CPovLinkedList<CSpectatorCloneGroup>::First, CPovLinkedList<CSpectatorInstance>::End, CPovLinkedList<CSpectatorInstance>::First, CSpectatorCloneGroup::SetAllMoversStopped, CSpectatorCloneGroup::SetIsMoving, CSpectatorInstance::SetIsMoving, GM_GetGolferUp
+  906  001D4EB8     98  void Spectator_PreWalk()
+                         local  enum PlayerNumber_t PlayerID
+                         local  vec4flt* ballPos
+                         inlines  GM_GetGolferUp
+  926  00189910    184  void Spectator_StandInPlace()
+                         local  struct CSpectatorCloneGroup* pEnd
+                         local  struct CSpectatorCloneGroup* pCloneGroup
+                         local  CSpectatorInstanceList* pWalkers
+                         local  struct CSpectatorInstance* pEnd
+                         local  struct CSpectatorInstance* pWalker
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLink<CSpectatorInstance>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::End, CPovLinkedList<CSpectatorCloneGroup>::First, CPovLinkedList<CSpectatorInstance>::End, CPovLinkedList<CSpectatorInstance>::First, CSpectatorCloneGroup::GetOverridePose, CSpectatorCloneGroup::SetAllMoversStopped, CSpectatorCloneGroup::SetIsMoving, CSpectatorInstance::SetIsHidden, CSpectatorInstance::SetIsMoving, CSpectatorPose::SetLoop
+  966  001D69E8    214  void Spectator_PopIntoPlace()
+                         local  struct CSpectatorCloneGroup* pEnd
+                         local  struct CSpectatorCloneGroup* pCloneGroup
+                         local  CSpectatorInstanceList* pWalkers
+                         local  struct CSpectatorInstance* pEnd
+                         local  struct CSpectatorInstance* pWalker
+                         local  struct CPovVector3 TempDestination
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLink<CSpectatorInstance>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::End, CPovLinkedList<CSpectatorCloneGroup>::First, CPovLinkedList<CSpectatorInstance>::End, CPovLinkedList<CSpectatorInstance>::First, CPovVector3::CPovVector3, CSpectatorCloneGroup::GetOverridePose, CSpectatorCloneGroup::SetAllMoversStopped, CSpectatorCloneGroup::SetIsMoving, CSpectatorInstance::SetDividerNum, CSpectatorInstance::SetIsHidden, CSpectatorInstance::SetIsMoving, CSpectatorInstance::SetTrackNum, CSpectatorPose::SetLoop
+ 1016  00152608    1CC  static void* Spectator_ViewNextAnim(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  struct SpectatorLock lock
+                         local  void* ret
+                         local  int32 curAnimCounter
+                         local  struct CSpectatorCloneGroup* pCloneGroup
+                         local  int nSkaRefs
+                         local  const char* curAnimName
+                         inlines  CPovLinkedList<CSpectatorCloneGroup>::First
+ 1089  001E5ABC     F4  void Spectator_Draw()
+                         local  struct SpectatorLock lock
+                         local  int catId
+ 1120  001C5A14     90  void Spectator_PreRender()
+                         local  struct Timing_AutoMarker crowdPreRenderMarker
+                         local  struct SpectatorLock lock
+                         inlines  Timing_AutoMarker::Timing_AutoMarker, Timing_AutoMarker::~Timing_AutoMarker
+ 1134  00156CEC     60  bool Spectator_AreSpectatorsInZone(float x, float z)
+                         local  struct SpectatorLock lock
+ 1145  0016E7F0     74  void Spectator_AimAtSpectatorUpdate(enum PlayerNumber_t PlayerID, float dt)
+                         local  struct SpectatorLock lock
+ 1155  001AC1DC     74  void Spectator_BallFlightUpdate(enum PlayerNumber_t PlayerID, float dt)
+                         local  struct SpectatorLock lock
+ 1165  00162A88     5C  void Spectator_ClearOverrides()
+                         local  struct SpectatorLock lock
+ 1175  001AD410     9C  void Spectator_BallBounce(enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+                         local  struct SpectatorLock lock
+ 1185  001ACEE4     90  bool Spectator_CheckForCollision(float* fPoint0, float* fPoint1, bool bIsEstimating, float* pCollisionPoint, float* pSurfaceNormal)
+                         local  struct SpectatorLock lock
+ 1200  0016CE78    29C  unsigned int GetClosestOnscreenSpectators(struct CSpectatorInstance** resultInstances, float* resultDistances, unsigned int maxCount)
+                         local  unsigned int i
+                         local  unsigned int onscreenCount
+                         local  struct CSpectatorCloneGroup* cloneGroup
+                         local  struct CSpectatorCloneGroup* end
+                         local  struct CSpectatorInstance* randomInstance
+                         local  const struct CPovFrustum& viewFrustum
+                         local  const struct CPovVector3& viewPos
+                         local  unsigned int numInstances
+                         local  struct CSpectatorInstance** groupInstances
+                         local  struct CPovVector3 position
+                         local  float distance
+                         local  unsigned int farJ
+                         local  float farDist
+                         local  unsigned int j
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::End, CPovLinkedList<CSpectatorCloneGroup>::First, CPovVector3::CPovVector3, CPovVector3::Distance, CSpectatorCloneGroup::GetNumSortedInstances, CSpectatorCloneGroup::GetSortedInstanceList, CSpectatorInstance::GetPosition
+ 1270  0016D114     D8  int Spectator_GetRandomOnscreenPosition(float* xyz)
+                         local  struct SpectatorLock lock
+                         local  struct CSpectatorInstance*[4] instances
+                         local  float[4] distances
+                         local  const unsigned int onscreenCount
+                         local  unsigned int randomIndex
+                         local  struct CPovVector3 position
+                         inlines  CPovVector3::CPovVector3, CPovVector3::operator[], CSpectatorInstance::GetPosition
+ 1325  001E5DB0     58  void Spectator_PreRenderShadows()
+                         local  struct SpectatorLock lock
+ 1335  00154ED0      4  void Spectator_AddEffects(struct DXEffectManager* effectManager)
+                         local  struct SpectatorLock lock
+ 1346  0016DB90    14C  static void XMLSettings_GetColorRGB(struct GameXmlSettings* xmlSettings, const char* name, const float* defaultColor, float* color)
+                         local  Char8Buffer64 colorName
+                         local  char* lastChar
+                         inlines  Char8Buffer<64>::Char8Buffer, Char8Buffer<64>::operator[]
+ 1361  0016DCDC    3B8  void Spectator_InitLighting()
+                         local  struct SpectatorLock lock
+                         local  vec4flt gSunColor
+                         local  vec4flt gAmbientColor
+                         local  struct GameXmlSettings xmlSettings
+                         local  struct GameXmlSettings tintSettings
+                         local  int i
+                         local  Char8Buffer64 name
+                         local  struct GameXmlSettings variantSettings
+                         local  vec4flt* tintColor
+                         local  vec4flt* tintColorDefault
+                         inlines  Char8Buffer<64>::Char8Buffer
+ 1419  00153478     14  unsigned int Spectator_GetNumInstances()
+                         local  struct SpectatorLock lock
+ 1425  001534C4     14  unsigned int Spectator_GetNumMeshRenders()
+                         local  struct SpectatorLock lock
+ 1431  0016D57C     14  unsigned int Spectator_GetNumCardRenders()
+                         local  struct SpectatorLock lock
+ 1436  0015350C     14  unsigned int Spectator_GetNumCloneGroups()
+                         local  struct SpectatorLock lock
+ 1444  001D3208    194  void Spectator_UpdateAll(float dt)
+                         local  struct Timing_AutoMarker crowdUpdateMarker
+                         local  struct SpectatorLock lock
+                         inlines  Timing_AutoMarker::Timing_AutoMarker, Timing_AutoMarker::~Timing_AutoMarker
+ 1490  00165A4C     F4  void Spectator_FirstFrameInit()
+                         local  struct SpectatorLock lock
+                         local  struct CSpectatorCloneGroup* cloneGroup
+                         local  struct CSpectatorCloneGroup* end
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::End, CPovLinkedList<CSpectatorCloneGroup>::First
+ 1521  0015DAB8     88  void Spectator_SaveWalkerPosRot(vec4flt* positions, vec4flt* rotations, uint32 numValues)
+                         local  struct SpectatorLock lock
+ 1531  001C2884     88  void Spectator_RestoreWalkerPosRot(vec4flt* positions, vec4flt* rotations, uint32 numValues)
+                         local  struct SpectatorLock lock
+ 1541  0014072C     14  uint32 Spectator_GetSpectatorHitStage()
+ 1548  001D6BFC     68  void Spectator_ToggleNormalMap()
+ 1565  001527D4     38  bool Spectator_GetUseNormalMap()
+ 1571  00140758     20  void Spectator_HeadTrackToggle()
+ 1578  00156B80    16C  bool Spectator_CallFore(float x, float z, const bool& left)
+                         local  struct SpectatorLock lock
+                         local  bool crowd
+                         local  int i
+                         local  int dir
+ 1659    inline-only   static void dxtDecompressColor(uint16 color, float* vRGBA)
+ 1667    inline-only   static void dxtColorLerp(float* vDst, float* vSrc1, float* vSrc2, float ratio)
+ 1673    inline-only   static void dxtDecompressBlock(uint16* srcData, RawTexture_PixelValue* argbTexture, int32 stride)
+                         local  uint16* pColors
+                         local  float[4][4] vDstColor
+                         local  RawTexture_PixelValue[4] dstColor
+                         local  int i
+                         local  int32 i
+                         local  uint8 rowI
+ 1719  00189120    73C  void Spectator_ModifyTexturesForVectorTinting()
+                         local  int t
+                         local  TextureRef tex
+                         local  struct SPEC_DXT5_Type* data
+                         local  struct TextureLockInfo info
+                         local  uint16* color
+                         local  uint32* data32
+                         local  RawTexture_PixelValue[16] block
+                         local  uint16[8] dst
+                         local  unsigned int j
+                         local  unsigned int i
+                         local  uint16 swap16
+                         local  int k
+                         local  unsigned char highest
+                         inlines  LLMath_AddScale, LLMath_Scale, __vec_make_from_scalar, __vec_mul, dxtColorLerp, dxtDecompressBlock, vec_ld, vec_madd, vec_splat
+ 1802  00140B0C     18  void Spectator_UpdateTint()

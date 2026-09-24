@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_stored_name_list_node.cpp
+// compiled in: tiger_module_stored_name_list_node.cpp
+// 4 functions, source order. line | PS3 address | size
+
+    0  00540D30     18  void ~ListNode(const struct <anon>* this)
+                         inlines  ~Allocatable
+    8  00580724    170  void StoredNameListNode(const struct <anon>* this, const char* name, unsigned int maxNameSize)
+                         local  unsigned int nameLen
+                         inlines  NamedListNode, TagValuePair
+   20  00580668     80  void ~StoredNameListNode(const struct <anon>* this)
+                         inlines  ~NamedListNode
+   25  005806E8     3C  bool IsNameEqual(const const struct <anon>* this, const char* name)

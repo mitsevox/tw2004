@@ -1,0 +1,14 @@
+// ../../../../../TIGERCODE/Code/Legacy/Lib/Headers/UVecFlt.h
+// compiled in: apt_unity.cpp, golf2_unity.cpp, golf_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+  144    inline-only   void vec4flt_Copy(const float* src, float* dest)
+  162    inline-only   void vec4flt_Swap(float* a, float* b)
+                         local  float[4] tmp
+  186    inline-only   void vec4flt_Zero(float* vec)
+  201    inline-only   void vec4flt_Zero3(float* vec)
+  232    inline-only   void vec4flt_Copy3(const float* src, float* dest)
+  419    inline-only   void vec3flt_Copy(const float* src, float* dest)
+  426    inline-only   void vec3flt_Add(const float* A, const float* B, float* dest)
+  433    inline-only   void vec3flt_Subtract(const float* A, const float* B, float* dest)
+  440    inline-only   void vec3flt_Scale(float scale, const float* src, float* dest)

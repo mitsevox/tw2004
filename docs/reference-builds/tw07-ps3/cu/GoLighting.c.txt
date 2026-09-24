@@ -1,0 +1,105 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/GoLighting.c
+// compiled in: golf_unity.cpp
+// 21 functions, source order. line | PS3 address | size
+
+   65  00263750     70  void LI_vInitModule()
+                         inlines  vec4flt_Zero
+   93  002157FC     14  struct LI_SLightingEnvironment* LI_vGetDefaultLightingEnv()
+   98  002B0518    1CC  void LI_vInitDefaultLightingEnv()
+                         local  struct GameXmlSettings xmlSettings
+                         inlines  GM_GetCourseName
+  111  00215818      4  void LI_vCloseModule()
+  122    inline-only   static void LI_vBuildColoredColorMatrix(struct LI_SLightingMgr* pLightMgr, struct LI_SLightingEnvironment* spLightingEnvironment_p)
+                         local  int32 iLight
+                         local  vec4flt xModifiedGeneralColorationColor
+                         local  vec4flt* xpColorMatrixVec
+                         local  vec4flt* xpColoredColorMatrixVec
+  225  0028CE14    1D0  static void LI_vEulerAnglesRYP(float y, float p, float r, float[4]* M)
+                         local  mat44flt matY
+                         local  mat44flt matP
+                         local  mat44flt matR
+                         inlines  LLMath_IdentifyMat, std::cosf, std::sinf, vec_st
+  255  0028D274     CC  static void* LI_LightDirectionTunerCallback(void* ptr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  struct LI_SLightingEnvironment* spLightingEnvironment_p
+                         local  int i
+                         local  struct LI_SLight* spCurLight
+                         local  LI_SDirectionalLight* pDirectional
+  282  00271C58    204  void LI_InitAmbientLight(struct LI_SLight* spLight, float intensity, struct GameXmlSettings xmlSettings, int32 ndx, enum eGameXml_TuneFlags tuneFlags)
+                         local  const char* name
+                         local  char[64] sMod
+                         local  char[64] sRed
+                         local  char[64] sGreen
+                         local  char[64] sBlue
+                         local  LI_SAmbientLight* pAmbient
+  307  0028D340    3D4  void LI_InitDirectionalLightYPR(struct LI_SLightingEnvironment* pLightingEnv, struct LI_SLight* spLight, float yaw, float pitch, float intensity, struct GameXmlSettings xmlSettings, int32 ndx, enum eGameXml_TuneFlags tuneFlags)
+                         local  const char* name
+                         local  char[64] sMod
+                         local  char[64] sRed
+                         local  char[64] sGreen
+                         local  char[64] sBlue
+                         local  char[64] sYaw
+                         local  char[64] sPitch
+                         local  LI_SDirectionalLight* pDirectional
+                         local  vec4flt xSrcVec
+                         local  mat44flt xLight2World
+                         local  int32 iESBModifier
+                         inlines  LLMath_mat44fltMultiply33, vec_madd, vec_splat
+  358  0021581C     58  void LI_vInitGeneralLighting(struct LI_SLightingEnvironment* spLightingEnvironment_p, int32 iNumLights)
+                         local  LI_SGeneralColoration* pGenColor
+                         local  int iESBModifier
+  379  00215874     18  void LI_vSetTunerLightingEnvironment(struct LI_SLightingEnvironment* pLightingEnvironment)
+  387  0028E16C    3E0  void LI_vInitLightingEnvironment(struct GameXmlSettings xmlSettings, struct LI_SLightingEnvironment* pLightingEnvironment, enum eGameXml_TuneFlags tuneFlags)
+                         local  const float keyIntensity
+                         local  const float keyYaw
+                         local  const float keyPitch
+                         local  const float fillLeftIntensity
+                         local  const float fillLeftYaw
+                         local  const float fillLeftPitch
+                         local  const float fillRightIntensity
+                         local  const float fillRightYaw
+                         local  const float fillRightPitch
+                         local  const float bounceIntensity
+                         local  const float bounceYaw
+                         local  const float bouncePitch
+                         local  const float ambientIntensity
+                         local  struct LI_SLight* spLight
+  447    inline-only   static void LI_vSetLightingEnvironmentStates(struct LI_SLightingMgr* pLightMgr)
+  461    inline-only   static void LI_vBuildLightMatrix(struct LI_SLightingMgr* pLightMgr, struct LI_SLightingEnvironment* spLightingEnvironment_p)
+                         local  int32 iLight
+                         local  bool boAmbientFound
+                         local  int32 iNumMatrixLights
+                         local  struct LI_SLight* spLight
+                         local  LI_SAmbientLight* pAmbient
+                         local  LI_SDirectionalLight* pDirectional
+  573  00291D9C    6C0  void LI_vUseLightingEnvironment(struct LI_SLightingEnvironment* spLightingEnvironment_p)
+                         local  mat44flt lightCols
+                         local  mat44flt lightDirs
+                         local  struct LI_SLight* spAmbientLight
+                         local  struct LI_SLight* spLight0
+                         local  struct LI_SLight* spLight1
+                         local  struct LI_SLight* spLight2
+                         local  struct LI_SLight* spLight3
+                         local  vec4flt ambient
+                         local  mat44flt transposedLightMatrix
+                         local  struct LI_SLight* spLight
+                         local  LI_SAmbientLight* pAmbient
+                         local  LI_SDirectionalLight* pDirectional
+                         inlines  LI_vBuildColoredColorMatrix, LI_vBuildLightMatrix, LLMath_MultiplyVec, LLMath_Scale, LLMath_Scale3, __vec_make_from_scalar, __vec_mul, vec4flt_Copy, vec4flt_Copy3, vec4flt_Zero, vec_ld, vec_st
+  640  002BB3BC      4  void LI_TuneRenderLightRig(struct LI_SLightingEnvironment* spLightingEnvironment_p, float* locWorld, float axisLength, int startLightNdx, int endLightNdx)
+  723  0028CFE4    290  void LI_TuneRotateLightRig(struct LI_SLightingEnvironment* spLightingEnvironment_p, float yaw, float pitch, float roll, int startLightNdx, int endLightNdx, bool bAssign)
+                         local  int i
+                         local  mat44flt rotMatrix
+                         local  vec4flt xSrcVec
+                         local  mat44flt xLight2World
+                         inlines  LLMath_mat44fltMultiply33, vec_madd, vec_splat
+  791  002BB3C0    15C  void LI_RenderDebugLightingEnvironment()
+                         local  int ndx
+                         local  vec4flt locator
+                         local  struct TCharacter* xpCharacter
+                         inlines  Character_GetPosition, GamePlayer::GetCharacter, vec4flt_Zero3, vec_st
+  824  0029245C     24  void LI_vApplyLightingEnvironment(struct LI_SLightingEnvironment* spLightingEnvironment_p)
+  854  0021588C     1C  void LI_vClearCurrentLightingEnvironment()
+  860  0025EA70     D4  void LI_GetCurrentAmbient(vec4flt_p* pAmbient)
+                         local  struct LI_SLightingEnvironment* spLightingEnvironment_p
+                         local  struct LI_SLight* spAmbientLight
+                         inlines  LLMath_Scale, __vec_mul, vec4flt_Copy, vec_st

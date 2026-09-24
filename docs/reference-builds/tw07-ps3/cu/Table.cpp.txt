@@ -1,0 +1,291 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/source/common/Table.cpp
+// compiled in: Table.cpp
+// 56 functions, source order. line | PS3 address | size
+
+    0  00800A04    10C  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+  118  007F23DC    F30  struct Table* Create(struct Database* db, TableRef tableRef, struct <anon>* pColDefs, RowNum maxRows, enum TDbError* dbResult)
+                         local  const char[7] __FUNCTION__
+                         local  struct <anon> lock
+                         local  struct Table* pTable
+                         local  uint32_t uRowSize
+                         local  ColNum colCount
+                         local  bool8_t bHasBlobHuff
+                         local  bool8_t bHasBlobVar
+                         local  enum TDbError eError
+                         local  DbRef dbRef
+  372  007F330C    A8C  enum TDbError InternalDestroy(const struct Table* this)
+                         local  const char[16] __FUNCTION__
+                         local  struct Table* pTempTable
+                         local  struct Query* pQuery
+                         local  enum TDbError dbResult
+                         local  size_t memUsed
+                         local  ColNum colNum
+                         local  uint32_t tblNum
+                         local  struct TableIndex* temp
+                         local  enum TDbError dbError
+  519  007F3D98    474  enum TDbError IncreaseRowNumber(const struct Table* this, RowNum newMaxRows)
+                         local  const char[18] __FUNCTION__
+                         local  struct <anon> lock
+                         local  enum TDbError dbResult
+  582  007F420C    2D4  enum TDbError TruncateRowNumberToZero(const struct Table* this)
+                         local  const char[24] __FUNCTION__
+                         local  struct <anon> lock
+                         local  struct TableIndex* pIndex
+                         local  enum TDbError dbResult
+  653  007F8EDC    64C  void DeleteRow(const struct Table* this, RowNum idxRow)
+                         local  const char[10] __FUNCTION__
+                         local  void* pData
+                         local  uint32_t trigCount
+                         local  struct <anon>* pColLit
+                         local  ColNum colNum
+  764  007F44E0    240  enum TDbError InitTemplate(const struct Table* this)
+                         local  const char[13] __FUNCTION__
+                         local  struct <anon> lock
+                         local  enum TDbError dbResult
+  825  007F4720    288  enum TDbError ChangeTemplate(const struct Table* this, RowNum newMaxRows)
+                         local  const char[15] __FUNCTION__
+                         local  struct <anon> lock
+  879  007F49A8    100  void ClearModFlag(const struct Table* this)
+                         local  const char[13] __FUNCTION__
+                         local  struct <anon> lock
+  907  007FBF64    FCC  enum TDbError CopyRows(const struct Table* this, struct Table* destTable, struct <anon>* pDbRet)
+                         local  const char[9] __FUNCTION__
+                         local  struct <anon> dbRet
+                         local  struct <anon> lock
+                         local  struct TableIndex* pIndex
+                         local  union <anon> data
+                         local  ColNum[255] srcIdxs
+                         local  char8_t* strSrcString
+                         local  uint32_t uMaxSrcString
+                         local  ColNum startCol
+                         local  ColNum colNum
+                         local  enum TDbError dbResult
+                         local  RowNum srcRow
+                         local  RowNum destRow
+                         local  bool8_t bWasDeleted
+ 1121  007FAF48   101C  enum TDbError CopyRowsWithTrigger(const struct Table* this, struct Table* destTable, struct <anon>* pDbRet)
+                         local  const char[20] __FUNCTION__
+                         local  struct <anon> dbRet
+                         local  struct <anon> lock
+                         local  struct TableIndex* pIndex
+                         local  union <anon> data
+                         local  ColNum[255] srcIdxs
+                         local  ColNum startCol
+                         local  ColNum colNum
+                         local  enum TDbError dbResult
+                         local  RowNum srcRow
+                         local  RowNum destRow
+                         local  bool8_t bWasDeleted
+                         local  char8_t* strSrcString
+                         local  uint32_t uMaxSrcString
+ 1349  007F4C40    8B4  enum TDbError AddTrigger(const struct Table* this, TableTrigCallback pTriggerFunc)
+                         local  const char[11] __FUNCTION__
+                         local  struct <anon> lock
+                         local  uint32_t trigCount
+                         local  int trigSlot
+                         local  enum TDbError dbResult
+                         local  size_t memNeeded
+                         local  ColNum colNum
+                         local  struct <anon>* pColDef
+ 1488  007F54F4    1B4  enum TDbError RemoveTrigger(const struct Table* this, TableTrigCallback pTriggerFunc)
+                         local  const char[14] __FUNCTION__
+                         local  struct <anon> lock
+                         local  uint32_t trigCount
+ 1537  007F56A8    3CC  enum TDbError RemoveAllTriggers(const struct Table* this)
+                         local  const char[18] __FUNCTION__
+                         local  struct <anon> lock
+                         local  uint32_t trigCount
+                         local  size_t memUsed
+                         local  ColNum colNum
+ 1610  007F5A74    3B8  enum TDbError GetNumRows(const struct Table* this, struct ExprNode* pFilter, RowNum* pRowCount)
+                         local  const char[11] __FUNCTION__
+                         local  struct <anon> lock
+                         local  enum TDbError dbResult
+                         local  RowNum iNumRows
+                         local  struct <anon> searchData
+                         local  struct Table* localThis
+ 1700  007F62F8     AC  enum TDbError ListAllColumns(const struct Table* this, struct <anon>* pColDefLst, ColNum* maxItems)
+                         local  struct <anon> lock
+ 1731  007F5E2C    4CC  enum TDbError InternalListAllColumns(const struct Table* this, struct <anon>* pColDefLst, ColNum* maxItems)
+                         local  const char[23] __FUNCTION__
+                         local  struct <anon>* pColDef
+                         local  ColNum idxCol
+                         local  ColNum idxUserCol
+ 1817  007F63A4    350  enum TDbError GetColumnDefinitionFromRef(const struct Table* this, ColRef colRef, struct <anon>* pColDef)
+                         local  const char[27] __FUNCTION__
+                         local  struct <anon> lock
+                         local  ColNum idxCol
+ 1881  007F66F4    140  enum TDbError DoesColumnExist(const struct Table* this, ColRef colRef)
+                         local  const char[16] __FUNCTION__
+                         local  struct <anon> lock
+ 1922  007F6834    1E8  enum TDbError IsTemplate(const struct Table* this, bool* isTemplate, RowNum* maxTemplateRows)
+                         local  const char[11] __FUNCTION__
+                         local  struct <anon> lock
+                         local  RowNum maxTRows
+ 1974  007F6A1C     70  enum TDbError IsInUse(const struct Table* this, bool* inUse)
+ 2007  007F6A8C    1B8  enum TDbError IsPersistent(const struct Table* this, bool* persistent)
+                         local  const char[13] __FUNCTION__
+                         local  struct <anon> lock
+ 2043  007F6C44    1A8  enum TDbError GetMaxNumberOfRows(const struct Table* this, RowNum* maxNumRows)
+                         local  const char[19] __FUNCTION__
+                         local  struct <anon> lock
+ 2082  007F6DEC    15C  enum TDbError SetPersistentFlag(const struct Table* this, bool persistent)
+                         local  const char[18] __FUNCTION__
+                         local  struct <anon> lock
+ 2133  007F6F48    2A8  enum TDbError IsCompressed(const struct Table* this, bool* pUsesVarString, bool* pUsesHuffman)
+                         local  const char[13] __FUNCTION__
+                         local  struct <anon> lock
+ 2184  007FD750    198  enum TDbError ExportRawFormat(const struct Table* this, void* pBuffer, int* pBufSize)
+                         local  const char[16] __FUNCTION__
+                         local  struct <anon> lock
+ 2226  007FE710    594  struct Table* ImportRawFormat(DbRef dbRef, TableRef tableRef, void* pBuffer, bool8_t bOverwrite, enum TDbError* dbResult)
+                         local  const char[16] __FUNCTION__
+                         local  struct <anon> lock
+                         local  uint32_t trigNum
+                         local  struct Database* pDb
+                         local  struct Table* pTable
+                         local  TableTrigCallback[4] oldTrigs
+ 2334  007F71F0    378  enum TDbError ListAllColumnsExtended(const struct Table* this, struct <anon>* pColDefLst, ColNum* maxItems)
+                         local  const char[23] __FUNCTION__
+                         local  struct <anon> lock
+                         local  struct <anon>* pColDef
+                         local  ColNum idxCol
+                         local  ColNum idxUserCol
+ 2424  007F7568    250  enum TDbError ListAllIndexes(const struct Table* this, struct TableIndex** indexList, int* maxItems)
+                         local  const char[15] __FUNCTION__
+                         local  struct <anon> lock
+                         local  uint32_t realMax
+                         local  struct TableIndex* pIndex
+ 2472  007F77B8    180  struct TableIndex* FindIndex(const struct Table* this, IndexRef indexRef)
+                         local  const char[10] __FUNCTION__
+                         local  struct <anon> lock
+                         local  struct TableIndex* index
+ 2526  007FA1F0    D58  enum TDbError InsertRow(const struct Table* this, struct <anon>* pColLitLst, struct <anon>* pDbRet)
+                         local  const char[10] __FUNCTION__
+                         local  struct <anon> dbRet
+                         local  struct <anon> lock
+                         local  struct Query* pQuery
+                         local  void* pData
+                         local  struct TableIndex* pIndex
+                         local  struct <anon>* pColLit
+                         local  uint32_t iTrigCount
+                         local  enum TDbError dbResult
+                         local  RowNum rowNum
+                         local  ColNum colNum
+                         local  bool8_t bWasDeleted
+                         local  bool8_t bDataLoaded
+ 2820  007F7938     C4  int GetColumnSize(const struct Table* this, ColRef colRef)
+                         local  ColNum idxCol
+                         local  uint32_t iSize
+ 2863  007F4AA8    198  ColNum ResolveColumnRef(const struct Table* this, ColRef colRef)
+                         local  uint8_t colIdx
+                         local  uint32_t col
+                         local  int32_t InnerIdx
+                         local  int32_t OuterIdx
+                         local  int32_t MiddleIdx
+                         local  int32_t iResult
+ 2981  007F79FC     B4  void ResolveColDefLst(const struct Table* this, struct <anon>* pColDefLst, ColNum* pIdxLst)
+ 3019  007F7AB0     B4  void ResolveColRefLst(const struct Table* this, ColRef* pColRefLst, ColNum* pIdxLst)
+ 3056  007F7B64     A0  void ResolveColLitLst(const struct Table* this, struct <anon>* pColLitLst)
+ 3100  007F9A84    76C  enum TDbError SetRowData(const struct Table* this, RowNum idxRow, struct <anon>* pColLit)
+                         local  const char[11] __FUNCTION__
+                         local  enum TDbError dbResult
+                         local  void* pData
+                         local  uint32_t uTrigCount
+                         local  bool8_t bDataLoaded
+ 3201  007F8C54    288  enum TDbError GetRowData(const struct Table* this, RowNum idxRow, struct <anon>* pColLitLst)
+                         local  const char[11] __FUNCTION__
+                         local  enum TDbError dbResult
+                         local  ColNum colNum
+                         local  uint8_t* pRowData
+ 3257  007F895C    2F8  void GetFullRow(const struct Table* this, RowNum idxRow, struct <anon>* pColLit)
+                         local  const char[11] __FUNCTION__
+                         local  struct <anon> lock
+                         local  void* pData
+                         local  ColNum colNum
+ 3300  007F85E8    374  void CallInsertTriggers(const struct Table* this, RowNum rowNum)
+                         local  const char[19] __FUNCTION__
+                         local  bool8_t bDataLoaded
+                         local  uint32_t trigCount
+                         local  ColNum trigColNum
+                         local  struct <anon>* pTrigLit
+ 3684  007F7C04    3E0  void BlobGetData(const struct Table* this, struct <anon>* pColDef, uint8_t* pRowData, char* strData)
+                         local  const char[12] __FUNCTION__
+                         local  uint32_t uOffset
+                         local  uint32_t uStrSize
+ 3755  007F8254    394  void GetColData(const struct Table* this, struct <anon>* pColDef, uint8_t* pRowData, union <anon>* pData)
+                         local  const char[11] __FUNCTION__
+ 3819  007F96C0    3C4  void SetColData(const struct Table* this, struct <anon>* pColDef, uint8_t* pRowData, union <anon>* pData)
+                         local  const char[11] __FUNCTION__
+ 3887  007F1E1C    5C0  void FillColHeader(const struct Table* this, struct <anon>* colDef)
+                         local  uint32_t uSrcColCount
+                         local  uint32_t uCurSrcCol
+                         local  int32_t iCurDstCol
+                         local  int32_t iFirstDest
+                         local  uint32_t uOff32
+                         local  uint32_t uOff16
+                         local  uint32_t uOff8
+                         local  uint32_t uOff1
+ 3994  007FCF30    39C  void RawExportIdxExpr(const struct Table* this, struct ExprNode* pNode, void** ppBuffer, int* pRealCount)
+                         local  uint8_t* pBuffer
+                         local  ColNum colNum
+                         local  struct <anon> exprNode
+ 4062  007FD2CC    484  void _RawExport(const struct Table* this, void* pLocalBuffer, int* pBufSize)
+                         local  const char[11] __FUNCTION__
+                         local  struct TableIndex* pIndex
+                         local  int realCount
+                         local  struct <anon> savedTbl
+                         local  uint8_t* pBuffer
+ 4144  007FD8E8    498  enum TDbError RawImportIdxExpr(const struct Table* this, struct ExprNode* pNode, void** ppBuffer)
+                         local  const char[17] __FUNCTION__
+                         local  uint8_t* pBuffer
+                         local  enum TDbError dbResult
+ 4206  007FDD80    990  enum TDbError _RawImport(struct Database* pDb, TableRef tableRef, void* pLocalBuffer, struct Table** ppTable)
+                         local  const char[11] __FUNCTION__
+                         local  uint32_t bytesRead
+                         local  struct <anon> savedTbl
+                         local  enum TDbError dbResult
+                         local  struct Table* pTable
+                         local  uint8_t* pBuffer
+ 4337  007F9528    198  void SetPtrData(const struct Table* this, uint8_t* memStart, uint32_t memOffset, const uint32_t memSize, const uint8_t* bufStart, const uint32_t bufSize)
+                         local  const char[11] __FUNCTION__
+                         local  uint32_t shiftVal
+ 4375  007F7FE4    270  void GetPtrData(const struct Table* this, const uint8_t* memStart, uint32_t memOffset, const uint32_t memSize, uint8_t* bufStart, const uint32_t bufSize)
+                         local  const char[11] __FUNCTION__
+                         local  uint32_t byteCount
+ 4432  007FECA4    D4C  struct TableIndex* CreateIndex(const struct Table* this, IndexRef indexRef, struct <anon>* pColSort, struct ExprNode* pFilter, bool bUnique, enum TDbError* dbError)
+                         local  const char[12] __FUNCTION__
+                         local  struct <anon> lock
+                         local  enum TDbError dbResult
+                         local  struct TableIndex* pIndex
+                         local  RowNum rowCount
+                         local  ColNum colCount
+                         local  int32_t initialAllocations
+                         local  struct ICollection* collection
+                         local  struct Table* tempTable
+                         local  int32_t i
+                         local  struct <anon>* indexColSort
+ 4593  007FF9F0    7E0  struct TableIndex* CreateTempIndex(const struct Table* this, struct <anon>* pColSort, struct ExprNode* pFilter, enum TDbError* dbError)
+                         local  const char[16] __FUNCTION__
+                         local  struct TableIndex* pIndex
+                         local  ColNum colCount
+                         local  struct <anon> tempSort
+                         local  int32_t initialAllocations
+                         local  struct ICollection* collection
+                         local  int32_t i
+                         local  struct <anon>* indexColSort
+ 4689  008001D0    4B4  void QryIdxRowDelete(const struct Table* this, RowNum rowNum)
+                         local  const char[16] __FUNCTION__
+                         local  struct Query* pQry
+                         local  struct <anon>* pNode
+                         local  struct <anon>* pNextNode
+                         local  uint32_t tblNum
+                         local  uint32_t loopCnt
+                         local  struct ICollection* collection
+ 4763  00800684    380  void DeleteFix(const struct Table* this, RowNum rowNum)
+                         local  struct Query* pQry
+                         local  struct <anon>* pNode
+                         local  uint32_t tblNum
+                         local  struct ICollection* collection
+ 4814  00800B10     3C  static void _GLOBAL__I__ZN2EA4T3db5TableC2Ev()
+ 4815  00800B4C     3C  static void _GLOBAL__D__ZN2EA4T3db5TableC2Ev()

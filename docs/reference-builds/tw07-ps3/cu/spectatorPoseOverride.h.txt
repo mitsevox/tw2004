@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Spectator/spectatorPoseOverride.h
+// compiled in: golf2_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   17  0016012C    178  void CSpectatorPoseOverride::CSpectatorPoseOverride(const struct CSpectatorPoseOverride* this)
+                         local  const char[23] __FUNCTION__
+                         local  int i
+                         inlines  CSpectatorPose::CSpectatorPose, TagValuePair, operator+
+   18  0014322C     9C  void CSpectatorPoseOverride::~CSpectatorPoseOverride(const struct CSpectatorPoseOverride* this)
+                         local  int i

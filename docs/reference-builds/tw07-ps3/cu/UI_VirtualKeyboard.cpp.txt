@@ -1,0 +1,94 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_VirtualKeyboard.cpp
+// compiled in: apt_unity.cpp
+// 28 functions, source order. line | PS3 address | size
+
+   59  0004E898    194  int32 GetLogicalStrlen(const unsigned char* utf8)
+                         local  int32 logicalLength
+                         local  const int nLen
+                         local  unsigned char* pSrc
+  118  0004EA2C    194  int32 GetLastUtf8CharacterLength(const unsigned char* utf8)
+                         local  int32 lastLength
+                         local  const int nLen
+                         local  unsigned char* pSrc
+  184  0004EBC0    1C8  int32 IndexToUTF8Index(const unsigned char* utf8, int32 index)
+                         local  const int nLen
+                         local  unsigned char* pSrc
+  245  000F45E4     C0  void UIVirtualKeyboard::UIVirtualKeyboard(const struct UIVirtualKeyboard* this)
+                         inlines  AptStaticCharBuffer<256u>::AptStaticCharBuffer, AptStaticCharBuffer<256u>::operator char*, TExternArray<UIMenuItemBaseDst>::TExternArray
+  256  000F1404     7C  void UIVirtualKeyboard::Init(const struct UIVirtualKeyboard* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList
+  268  00060DE0    29C  void UIVirtualKeyboard::ShowVirtualKeyboard(const struct UIVirtualKeyboard* this, char* defaultString, int32 numRawCharactersAllowed, int32 numUtf8CharactersAllowed, char* ringState, enum eQuickMessageKeysVisibility isKeyboardExtended, char* titleText)
+                         local  int32 nbrItemInMenu
+                         local  char* castingVariable
+                         inlines  AptStaticCharBuffer<256u>::operator char*
+  350  00060AF0     80  void UIVirtualKeyboard::CopyOutDataString(const struct UIVirtualKeyboard* this, char* stringBuffer, int32 stringBufferRawLength)
+  361  0006107C     88  void UIVirtualKeyboard::ShowVirtualKeyboardWithCB(const struct UIVirtualKeyboard* this, char* defaultString, int32 numRawCharactersAllowed, int32 numUtf8CharactersAllowed, KeyBoardFuncPtr* KeyBoardCB, enum eQuickMessageKeysVisibility isKeyboardExtended, KeyBoardFuncPtr* onBackFuncPointer, KeyBoardFuncPtr* onHideFuncPointer, char* titleText)
+  371  0005CE2C     4C  void UIVirtualKeyboard::Hide(const struct UIVirtualKeyboard* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen
+  389  0004ED8C      4  void UIVirtualKeyboard::OnShow(const struct UIVirtualKeyboard* this)
+  394  0004ED90     80  void UIVirtualKeyboard::OnHide(const struct UIVirtualKeyboard* this)
+  406  000971AC      4  void UIVirtualKeyboard::Close(const struct UIVirtualKeyboard* this)
+  411  0004EE10     9C  void UIVirtualKeyboard::InitMenuParams(const struct UIVirtualKeyboard* this)
+  422  0004EEAC     C8  void UIVirtualKeyboard::GetActiveKeyLocalizationString(const struct UIVirtualKeyboard* this, int index, char* buffer, int bufferLength)
+                         local  char caseCharacter
+                         local  char alternatesCharacter
+  448  00060C90     D0  void UIVirtualKeyboard::UpdateCursorPosition(const struct UIVirtualKeyboard* this)
+                         local  int textBoxXPosition
+                         local  int32 physicalCharacterInsertionIndex
+                         local  char realChar
+                         local  int32 width
+                         local  int32 height
+                         local  int32 numLines
+                         local  int32 cursorXPosition
+                         inlines  AptStaticCharBuffer<256u>::operator char*
+  466  000611C8    22C  bool UIVirtualKeyboard::InsertUtf8CharacterInTextBox(const struct UIVirtualKeyboard* this, char* utf8Character)
+                         local  bool isInserted
+                         local  int32 characterLength
+                         local  int32 physicalCharacterInsertionIndex
+                         local  int32 stringLength
+                         local  int32 lastCharacterLength
+                         local  int index
+                         local  int characterIndex
+                         inlines  AptStaticCharBuffer<256u>::operator char*
+  528  0004EF74    11C  void UIVirtualKeyboard::UpdateItemAndLabel(const struct UIVirtualKeyboard* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  char[32] tempString
+  553  000613F4    10C  void UIVirtualKeyboard::AddUtf8Character(const struct UIVirtualKeyboard* this, char* utf8Character)
+  581  0004F090     B8  void UIVirtualKeyboard::ToggleCapsLock(const struct UIVirtualKeyboard* this)
+  596  00061514    160  void UIVirtualKeyboard::BackSpace(const struct UIVirtualKeyboard* this)
+                         local  int32 physicalCharacterInsertionIndex
+                         local  int32 physicalCharacterPreInsertionIndex
+                         local  int32 characterLength
+                         local  int index
+                         inlines  AptStaticCharBuffer<256u>::operator char*
+  619  00061500     14  void UIVirtualKeyboard::SpaceKey(const struct UIVirtualKeyboard* this)
+  624  0008260C    6D0  enum eAptHandleInput UIVirtualKeyboard::HandleInput(const struct UIVirtualKeyboard* this, int32 cID)
+                         local  int32 oldIndex
+                         local  int keyIndex
+                         local  int32 activeItemIndex
+                         local  const int tempStringLength
+                         local  char[32] tempString
+                         local  int quickMessageIndex
+                         local  char* quickMessage
+                         local  int32 numBytes
+                         local  int32 numUtf8Characters
+                         local  int32 numBytesInCharacter
+                         local  char* keyCharacter
+                         inlines  AptStaticCharBuffer<256u>::operator char*, cGAME_GLOBALS::GetOnlineOptionsQuickMesgStr
+  835  000AE99C     88  void UIVirtualKeyboard::UpdateMenuItems(const struct UIVirtualKeyboard* this)
+                         inlines  UIMenuBase::mMenu_StartUpdate_func
+  845  000AEE60    13C  enum AptThreadReturnValue UIVirtualKeyboard::UpdateMenuItemsThread(const struct UIVirtualKeyboard* this)
+                         local  int i
+                         local  int32 old
+                         inlines  UIMenuBase::mMenu_UpdateNextElement_func
+  870  00060D60     80  void UIVirtualKeyboard::OnLeftKey(const struct UIVirtualKeyboard* this)
+  883  00061674     D8  void UIVirtualKeyboard::OnRightKey(const struct UIVirtualKeyboard* this)
+                         local  int32 physicalCharacterInsertionIndex
+                         local  int32 physicalCharacterPostInsertionIndex
+  900  0006174C    7D8  void UIVirtualKeyboard::AddKey(const struct UIVirtualKeyboard* this, char c)
+                         local  int charIndex
+                         local  char caseCharacter
+                         local  char alternatesCharacter
+                         local  const int tempStringLength
+                         local  char[32] tempString
+                         local  char* keyCharacter
+ 1242  0004ED88      4  void UIVirtualKeyboard::SetScreensVisibility(const struct UIVirtualKeyboard* this, int32 iVisibility)

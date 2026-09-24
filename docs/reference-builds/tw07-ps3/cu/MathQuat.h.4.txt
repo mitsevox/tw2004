@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/Headers/MathQuat.h
+// compiled in: Legacy_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+  137    inline-only   float Quat_CalcCosine(float* q1, float* q2)
+                         local  float[4] lhs
+                         local  float[4] rhs
+                         local  float[4] tmp
+                         local  union <anon> dot
+  163    inline-only   void Quat_IdentifyForMul(float* Q)
+  171    inline-only   void Quat_Clear(float* Q)

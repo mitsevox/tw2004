@@ -1,0 +1,19 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_TreeSimple.cpp
+// compiled in: shader_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   31  0051B02C     84  void SM_TreeSimpleClass::SM_TreeSimpleClass(const struct SM_TreeSimpleClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base, vec4flt_Zero
+   53  00507F98    1DC  void SM_TreeSimpleClass::Load(const struct SM_TreeSimpleClass* this)
+   75  00508174     C8  void SM_TreeSimpleClass::Activate(const struct SM_TreeSimpleClass* this)
+   89  0050823C     38  void SM_TreeSimpleClass::Deactivate(const struct SM_TreeSimpleClass* this)
+   95  005117E4     64  void SM_TreeSimpleClass::SetColorTexture(const struct SM_TreeSimpleClass* this, TextureRef texRef)
+  104  0051782C     6C  void SM_TreeSimpleClass::SetTFactor(const struct SM_TreeSimpleClass* this, const float[4]& TFactor)
+                         inlines  vec4flt_Copy
+  114  00517898     6C  void SM_TreeSimpleClass::SetFogColor(const struct SM_TreeSimpleClass* this, float* camPos)
+                         inlines  vec4flt_Copy
+  124  00517904     6C  void SM_TreeSimpleClass::SetFogCameraPos(const struct SM_TreeSimpleClass* this, float* camPos)
+                         inlines  vec4flt_Copy
+  134  00511848     60  void SM_TreeSimpleClass::SetFogDensity(const struct SM_TreeSimpleClass* this, float f)
+  144  005118A8     60  void SM_TreeSimpleClass::SetFogStartRadius(const struct SM_TreeSimpleClass* this, float f)
+  154  00511908     60  void SM_TreeSimpleClass::SetFogHeightTop(const struct SM_TreeSimpleClass* this, float f)

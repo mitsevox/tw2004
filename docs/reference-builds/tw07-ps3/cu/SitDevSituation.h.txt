@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/SitDev/Headers/Shared/SitDevSituation.h
+// compiled in: golf2_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   55    inline-only   bool Situation::ConditionTested(const struct Situation* this, int index)
+                         local  int i

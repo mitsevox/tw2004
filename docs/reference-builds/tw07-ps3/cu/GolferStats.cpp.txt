@@ -1,0 +1,44 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/GamePlayer/GolferStats.cpp
+// compiled in: other_unity.cpp
+// 21 functions, source order. line | PS3 address | size
+
+   36  003D9A6C     34  float GolferStats::GetAIStatDiffModifier(int diffLevel)
+   44  003CE060     48  int32 GolferStats::GetBonusStatForModLevel(int32 modLevel)
+                         local  int32 retVal
+   57  003DA458     28  void GolferStats::SetAIStatDiffModifier(int diffLevel, float val)
+   66  003DA480     44  void GolferStats::RegisterStreamClients(const struct GolferStats* this)
+   77  003DA4C4    174  void GolferStats::StreamCallback(struct TStreamData* pStreamData)
+                         local  void* dataPtr
+                         local  uint32 size
+                         local  uint32 copySize
+  123  003DA638     2C  void GolferStats::UnRegisterStreamClients(const struct GolferStats* this)
+  131  003DA664      4  void GolferStats::PostLoad()
+  226  003DA668     5C  int32 GolferStats::GetStatIndexFromModelID(const struct GolferStats* this, int32 modelID)
+                         local  int i
+  260  0041F08C     74  bool GolferStats::GetGolferAvailable(const struct GolferStats* this, int golferIndex)
+                         local  bool returnVal
+  281  003DA6C4     94  bool GolferStats::GolferUsesTee(const struct GolferStats* this, enum PlayerNumber_t playerID)
+                         local  struct GolferData_t* golferData
+                         inlines  GamePlayer::GetGolferData
+  292  003D9A2C     40  int32 GolferStats::GetModLevelStatVal(const struct GolferStats* this, int32 modLevel)
+                         local  int32 returnValue
+  320  00429B3C     48  void GolferStats::SetShirtNodeName(const struct GolferStats* this, int golfer, struct HashString& incoming)
+                         inlines  HashString::operator=
+  328  00429B84     48  void GolferStats::SetShirt1StateName(const struct GolferStats* this, int golfer, struct HashString& incoming)
+                         inlines  HashString::operator=
+  336  00429BCC     48  void GolferStats::SetShirt2StateName(const struct GolferStats* this, int golfer, struct HashString& incoming)
+                         inlines  HashString::operator=
+  344  00429C14     48  void GolferStats::SetShirt3StateName(const struct GolferStats* this, int golfer, struct HashString& incoming)
+                         inlines  HashString::operator=
+  352  00429C5C     48  void GolferStats::SetShirt4StateName(const struct GolferStats* this, int golfer, struct HashString& incoming)
+                         inlines  HashString::operator=
+  360  00429CA4     48  void GolferStats::SetPantNodeName(const struct GolferStats* this, int golfer, struct HashString& incoming)
+                         inlines  HashString::operator=
+  368  00429CEC     48  void GolferStats::SetPant1StateName(const struct GolferStats* this, int golfer, struct HashString& incoming)
+                         inlines  HashString::operator=
+  376  00429D34     48  void GolferStats::SetPant2StateName(const struct GolferStats* this, int golfer, struct HashString& incoming)
+                         inlines  HashString::operator=
+  384  00429D7C     48  void GolferStats::SetPant3StateName(const struct GolferStats* this, int golfer, struct HashString& incoming)
+                         inlines  HashString::operator=
+  392  0041E528     48  void GolferStats::SetPant4StateName(const struct GolferStats* this, int golfer, struct HashString& incoming)
+                         inlines  HashString::operator=

@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/Golf/GameData/Headers/GameXmlSettings.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   41  0021AA0C      4  void GameXmlSettings::GameXmlSettings(const struct GameXmlSettings* this)

@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/addativetinter.cpp
+// compiled in: other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   14  003CE614     40  void AdditiveTinter::AdditiveTinter(const struct AdditiveTinter* this)
+   19  003CE694     18  void AdditiveTinter::~AdditiveTinter(const struct AdditiveTinter* this)
+   24  00421E24    3D0  void AdditiveTinter::Tint(const struct AdditiveTinter* this, int32_t numPixels, vec4flt* input, vec4flt* output, float* tintParams, float* scale)
+                         local  vec4flt zeroVec
+                         local  vec4flt oneVec
+                         local  int i
+                         local  int i
+                         inlines  LLMath_ClampVec, Tinter::ScaleTint

@@ -1,0 +1,18 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLMem.c
+// compiled in: Legacy_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   47    inline-only   void* __Malloc(size_t _Size, enum TMemoryType _Type, size_t _Align)
+                         local  sys_addr_t ptr
+                         local  uint32_t unused
+   65    inline-only   void __Free(void* _MemPtr, enum TMemoryType _Type)
+  190  0037DC3C      4  void Mem_InitOnce()
+  192  0037DC40      4  void Mem_CloseOnce()
+  212  00395C88    154  void* Mem_AllocFunc(uint32 size, int align, enum TMemoryType memoryType)
+                         local  uint32* result
+                         local  sys_addr_t ptr
+                         local  uint32_t unused
+                         inlines  __Malloc, sys_memory_allocate
+  259  00389B20     84  void Mem_FreeFunc(void* memPtr, enum TMemoryType memoryType)
+                         inlines  __Free, sys_memory_free
+  289  00389AE4     3C  uint32 Mem_Size(void* memPtr)

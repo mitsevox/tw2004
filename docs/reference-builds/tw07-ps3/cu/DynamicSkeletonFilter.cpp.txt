@@ -1,0 +1,16 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/Internal/DynamicSkeletonFilter.cpp
+// compiled in: DynamicSkeletonFilter.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   32  0059B840    138  void Activate(const struct <anon>* this, struct Character* animView, int boneIndex)
+                         local  const struct <anon>* skel
+                         local  const int filter
+   71  0059B978     30  struct SkeletonFilter* GetFilter(const struct <anon>* this)
+   79  0059BA34     CC  struct <anon>* Alloc(int boneCount)
+                         local  void* chunk
+                         local  struct SkeletonFilter** list
+                         local  struct <anon>* filter
+                         local  const uint32_t tableSize
+                         local  const uint32_t filterSize
+                         inlines  TagValuePair
+   99  0059B9A8     8C  void Free(struct <anon>* filter)

@@ -1,0 +1,12 @@
+// ../../../../../TIGERCODE/Code/Golf/UI_Core/iStudio_Runtime/Headers/uiProcessPolygon.h
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   28    inline-only   void ModulateProgressCompletion::Init(const struct ModulateProgressCompletion* this)
+   35    inline-only   void ModulateProgressCompletion::SetCompletion1(const struct ModulateProgressCompletion* this)
+   42    inline-only   float ModulateProgressCompletion::GetCompletion(const const struct ModulateProgressCompletion* this)
+   44    inline-only   float ModulateProgressCompletion::GetRightCompletion(const struct ModulateProgressCompletion* this, float completionIn)
+                         local  float completion
+                         local  float factor
+                         local  const float delta
+                         local  float newCompletion

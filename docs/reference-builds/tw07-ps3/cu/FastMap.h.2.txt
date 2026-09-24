@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/Internal/FastMap.h
+// compiled in: Definition.cpp, MotionDefinitionMap.cpp, SkeletonFilterMap.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   56    inline-only   void FastMap<int,const EA::CCT::Internal::MotionDefinition*>::Free(const struct FastMap<int,const EA::CCT::Internal::MotionDefinition*>* this)
+   56    inline-only   void FastMap<int,int>::Free(const struct FastMap<int,int>* this)
+   76    inline-only   int& FastMap<int,int>::GetValue(const struct FastMap<int,int>* this, int index)
+   81    inline-only   int FastMap<int,int>::Find(const struct FastMap<int,int>* this, int key)
+                         local  int i

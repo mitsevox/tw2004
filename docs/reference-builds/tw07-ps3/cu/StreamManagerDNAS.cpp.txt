@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/streaming/StreamManagerDNAS.cpp
+// compiled in: golf2_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   28  0013560C      4  void StreamManagerDNAS::RegisterStreamClients(const struct StreamManagerDNAS* this)
+   37  00135610      4  void StreamManagerDNAS::UnregisterStreamClients(const struct StreamManagerDNAS* this)
+   44  00135614      4  void _vMinimalAptMainLoop()
+   66  00135618      4  void StreamManagerDNAS::StreamFiles(const struct StreamManagerDNAS* this)

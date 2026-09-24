@@ -1,0 +1,43 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/online/Chat.c
+// compiled in: golf2_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   90    inline-only   static void _AddSingleLineToChatBuffer(const char* from, char* str, int flags)
+  165    inline-only   static bool _StringContainsText(const char* str)
+                         local  int i
+                         local  unsigned int len
+                         local  bool foundText
+  189    inline-only   static void _CleanChatString(char* outStr, const char* inStr)
+                         local  int i
+                         local  unsigned int len
+  219    inline-only   static bool _AtBottomOfChatBuffer()
+  230    inline-only   static bool _AtTopOfChatBuffer()
+  248  00159108     D8  void Online_RefreshFE_ChatWindow()
+                         local  int row
+                         local  ChatLineT* chatLine
+                         local  int currChatLine
+                         local  ChatLineT* tempLine
+  279    inline-only   static void sOnline_UpdateChatroomAnalog(int iPadID, const float& rX, const float& rY)
+                         local  struct Controller_StickInfo* stickInfo
+                         local  const float kStickLow
+                         local  const float kStickHigh
+                         local  const float kStickRange
+  318  0016F348    218  void Online_ChatUpdate()
+                         local  int i
+                         local  float rX
+                         local  float rY
+                         inlines  LobbyOSDK::SetChatDirty, sOnline_UpdateChatroomAnalog
+  354  001591E0    344  void Online_AddStringToChatBuffer(const char* from, const char* inStr, int flags)
+                         local  char* remainingStr
+                         local  char[2048] cleanStr
+                         local  int safety
+                         inlines  _AddSingleLineToChatBuffer, _CleanChatString
+  381  0014BDA4    204  void Online_InitChatBuffer()
+                         local  const char[22] __FUNCTION__
+                         local  int i
+                         inlines  TagValuePair, operator+
+  431  00127518     88  void Online_CloseChatBuffer()
+  453  00127468     58  bool Online_MoveChatWindowUpOne()
+                         inlines  _AtTopOfChatBuffer
+  472  001274C0     58  bool Online_MoveChatWindowDownOne()
+                         inlines  _AtBottomOfChatBuffer

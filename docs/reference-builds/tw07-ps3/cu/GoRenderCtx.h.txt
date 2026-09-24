@@ -1,0 +1,29 @@
+// ../../../../../TIGERCODE/Code/Golf/Hi-Rendering/Headers/GoRenderCtx.h
+// compiled in: apt_unity.cpp, golf2_unity.cpp, golf_unity.cpp
+// 20 functions, source order. line | PS3 address | size
+
+  181    inline-only   void RC_vSetCurrentRenderCtx(struct RC_SRenderCtx* spCurrentRenderCtx_p)
+  191    inline-only   struct RC_SRenderCtx* RC_spGetCurrentRenderCtx()
+  201    inline-only   void RC_vSetRenderCtxCamera(struct RC_SRenderCtx* spRenderCtx_p, struct CA_SCamera* spCamera_p)
+  211    inline-only   struct CA_SCamera* RC_spGetRenderCtxCamera(struct RC_SRenderCtx* spRenderCtx_p)
+  220    inline-only   struct CA_SCamera* RC_spGetCurrentRenderCtxCamera()
+  231    inline-only   void RC_vSetRenderCtxViewport(struct RC_SRenderCtx* spRenderCtx_p, VM_SViewport* spViewport_p)
+  241    inline-only   VM_SViewport* RC_spGetRenderCtxViewport(struct RC_SRenderCtx* spRenderCtx_p)
+  254    inline-only   void RC_vSetRenderCtxFrameBuffer(struct RC_SRenderCtx* spRenderCtx_p, FB_SFrameBuffer* spFrameBuffer_p)
+  268    inline-only   FB_SFrameBuffer* RC_spGetRenderCtxFrameBuffer(struct RC_SRenderCtx* spRenderCtx_p)
+  283    inline-only   void RC_vSetRenderCtxTransformationMatrix(struct RC_SRenderCtx* spRenderCtx_p, float[4]* xTransMatrix_p)
+  315    inline-only   void RC_vSetCurrentRenderCtxTransformationMatrix(float[4]* xTransMatrix_p)
+  329    inline-only   float RC_fGetRenderCtxHalfFieldOfViewSinX(struct RC_SRenderCtx* spRenderCtx_p)
+  341    inline-only   float RC_fGetRenderCtxHalfFieldOfViewSinY(struct RC_SRenderCtx* spRenderCtx_p)
+  355    inline-only   float RC_fGetRenderCtxHalfFieldOfViewCosX(struct RC_SRenderCtx* spRenderCtx_p)
+  369    inline-only   float RC_fGetRenderCtxHalfFieldOfViewCosY(struct RC_SRenderCtx* spRenderCtx_p)
+  381    inline-only   float RC_fGetRenderCtxNearZClip(struct RC_SRenderCtx* spRenderCtx_p)
+  391    inline-only   float RC_fGetRenderCtxFarZClip(struct RC_SRenderCtx* spRenderCtx_p)
+  402    inline-only   void RC_vCoordPrimitiveToFrame(struct RC_SRenderCtx* spRenderCtx_p, float* x, float* y)
+                         local  const VM_SViewport* pViewport
+  418    inline-only   void RC_vCoordPixelToPrimitive(struct RC_SRenderCtx* spRenderCtx_p, float* xVecIn, float* xVecOut)
+                         local  const VM_SViewport* pViewport
+                         local  const FB_SFrameBuffer* pFrameBuffer
+  440    inline-only   bool RC_vComputeRenderCtxWorldToPrimitiveCoordinate(struct RC_SRenderCtx* spRenderCtx_p, float* worldVec, float* x, float* y, float* z)
+                         local  vec4flt pointInScreenSpace
+                         local  bool onscreen

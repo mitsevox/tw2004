@@ -1,0 +1,276 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/GoBreakLine.c
+// compiled in: golf_unity.cpp
+// 44 functions, source order. line | PS3 address | size
+
+  273  0021626C     18  void BreakLine::SetRenderGreenHighlights(bool bRGH)
+  326  00243D08    114  void BreakLine::InitModule()
+                         local  const char[11] __FUNCTION__
+                         inlines  TagValuePair, operator+
+  337  002162A0     50  void BreakLine::CloseModule()
+  346  00247530    3E8  void BreakLine::InitForHole()
+                         local  struct TextureGroup* pTexGrp
+                         local  uint8_t i
+                         local  uint8_t j
+                         local  void* pGameMode
+                         local  int catid
+                         local  unsigned int ringNum
+  426  002162F0     C8  void BreakLine::CloseAfterHole()
+                         local  uint8_t i
+                         local  uint8_t j
+                         local  unsigned int ringNum
+  451  002B62E4    520  void BreakLine::GetCaddyTipInfo(int viewport, float* fb1, float* fb2, float* rl1, float* rl2)
+                         local  vec4flt perfectLoc
+                         local  vec4flt cupLoc
+                         local  vec4flt ballLoc
+                         local  vec4flt perfectLocNoY
+                         local  vec4flt cupLocNoY
+                         local  vec4flt ballLocNoY
+                         local  enum PlayerNumber_t PlayerID
+                         local  bool readingGreen
+                         local  bool unavailable
+                         local  float ballToCupDist
+                         local  float ballToPerfectDist
+                         local  vec4flt cupVec
+                         local  vec4flt perfectVec
+                         local  float dotProd
+                         local  float fbDist
+                         local  float angle
+                         local  float lrDist
+                         local  vec4flt crossProd
+                         local  float errorWindowSize
+                         local  float oneInch
+                         local  float centerLoc
+                         local  float halfWindowSize
+                         local  float windowShiftValue
+                         local  float windowRL1
+                         local  float windowRL2
+                         local  float windowFB1
+                         local  float windowFB2
+                         inlines  AIMgr, LLMath_CrossProduct3W0, LLMath_DistanceBetween3, LLMath_DotProduct3, LLMath_Subtract3, Misc_RandFuncf, std::sinf, vec4flt_Copy, vec_madd, vec_nmsub, vec_perm, vec_sld
+  694  00250EA0     54  void BreakLine::GetClosestPointToCupPos(int32_t viewport, vec4flt* location)
+                         local  struct BreakLineData* breakLineData
+                         inlines  vec4flt_Copy
+  705  00300774    FE8  void BreakLine::Render(int32_t viewport)
+                         local  enum PlayerNumber_t PlayerID
+                         local  void* pGameMode
+                         local  struct BreakLineData* breakLineData
+                         local  bool bNewAimingLook
+                         local  CameraController_t* currCamera
+                         local  struct GameModeOneBall* mode
+                         local  int cvIndex
+                         local  int numHighlights
+                         local  struct GameModeOneBall* mode
+                         local  int i
+                         local  int offset
+                         local  int i
+                         local  int offset
+                         local  float cupDist
+                         inlines  GameModeOneBall::GetCircleRGB, GameModeOneBall::GetNumHighlightsMultiplier, HighlightOneBallCircle, LLMath_SquareDistanceBetween3, RenderFacilityGreenSelector, RenderShotArcs, RunPhysicsSimulation, SetPolyArcData, Singleton<DifficultySettings>::GetSingleton, Singleton<GameModeDriverManager>::GetSingleton, Singleton<ShotHistory>::GetSingleton, UpdateSimulation, __vec_len_sqr3, vec4flt_Copy
+  875  00254710    33C  void BreakLine::Reset(int32_t viewport)
+                         local  struct BreakLineData* breakLineData
+                         inlines  GamePlayer::GetCoreShotInfo, ResetIdealPuttVars, StartPhysicsSimulation, vec4flt_Copy, vec_st
+  937  00216284     1C  void BreakLine::SetRendering(bool set)
+  945  00216798     4C  void BreakLine::SetReadyToRender(bool set)
+                         local  int32_t viewport
+                         local  struct BreakLineData* breakLineData
+  959  002B6804    4EC  static void AddBreakLinePoint(float* loc, bool bHighlight, int renderRed, int renderGreen, int renderBlue, float renderAlpha)
+                         local  vec4flt prevLocation
+                         local  vec4flt initialLocation
+                         local  const unsigned int viewport
+                         local  const struct BreakLineData* breakLineData
+                         local  const struct VertexPool* pVertPool
+                         local  unsigned int numPoints
+                         local  struct vtxStruct* pVerts
+                         local  vec4flt ballVec
+                         local  vec4flt idVec
+                         local  vec4flt dirVec
+                         local  float angle
+                         local  float direction
+                         local  float dotProd
+                         local  float sinp
+                         local  float cosp
+                         local  unsigned int i
+                         local  float xVal
+                         local  float zVal
+                         local  float prevDist
+                         inlines  LLMath_CrossProduct3W0, LLMath_DistanceBetween3, LLMath_DotProduct3, LLMath_Subtract, __vec_dot3, std::cosf, std::sinf, vec4flt_Copy, vec_madd, vec_sld
+ 1086  002163B8     2C  static uint8_t GetCurrLine()
+ 1093  002164B4     2C  static void SetCurrLine(uint8_t lineID)
+ 1100  002164E0     20  static int32_t GetCurrentViewport()
+ 1107  002167E4     1C  static struct GamePlayer* GetCurrentPlayer()
+ 1114  002163E4     A8  static struct BreakLineData* GetBreakLineData(int viewport, int lineID)
+ 1124  00216800    11C  float GetDistanceErrorInInches(enum PlayerNumber_t PlayerID, float distanceInFeet)
+                         local  int8 puttingStat
+                         local  int statIndex
+                         local  bool foundError
+                         local  float errorInInches
+                         local  float twoInches
+                         local  int i
+ 1166  002FCC24    1E8  static void RenderBreakLine(struct BreakLineData* breakLineData)
+                         local  CameraController_t* cameraController
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode
+ 1217    inline-only   static void StartPhysicsSimulation()
+                         local  int32_t viewport
+                         local  struct GamePlayer* plr
+                         local  struct BreakLineData* breakLineData
+                         local  float angle
+ 1254    inline-only   static bool RunPhysicsSimulation()
+                         local  int32_t viewport
+                         local  struct BreakLineData* breakLineData
+                         local  float cupDist
+ 1298    inline-only   static void UpdateSimulation(int32_t viewport)
+                         local  enum PlayerNumber_t PlayerID
+                         local  struct BreakLineData* breakLineData
+                         local  bool simulationDone
+ 1341  002165CC    1CC  static void ResetRenderData(float width, uint8_t alpha)
+                         local  int32_t iUVCounter
+                         local  int32_t viewport
+                         local  struct BreakLineData* breakLineData
+                         local  struct vtxStruct* pVerts
+                         local  unsigned int i
+ 1392  0021648C     28  static void ResetBreakLineData(struct BreakLineData* breakLineData)
+ 1404  00254564    1AC  void BreakLine::ResetForGreenRoll(int32_t viewport)
+                         local  struct BreakLineData* breakLineData
+                         inlines  GamePlayer::GetCoreShotInfo, vec4flt_Copy, vec_st
+ 1447  00250EF4    168  void BreakLine::StartGreenRollSimulation()
+                         local  int32_t viewport
+                         local  struct GamePlayer* plr
+                         local  struct BreakLineData* breakLineData
+                         local  struct CoreShotInfo_t* perfectShotInfo
+                         local  float shotAngle
+                         inlines  GamePlayer::GetCoreShotInfo, PhysicsBall_t::SetFlag, vec4flt_Copy, vec_st
+ 1493  002B6F6C    23C  void* BreakLine::GreenRollSim(int32 viewport, float timeStep, float timeInterval, bool* passedCup)
+                         local  struct BreakLineData* breakLineData
+                         local  vec4flt prevBallLoc
+                         local  float cupDist
+                         inlines  LLMath_DistanceBetween3, LLMath_SquareDistanceBetween3, __vec_len_sqr3, vec4flt_Copy, vec_ld, vec_madd, vec_sld, vec_sub
+ 1536  00211BA0     64  void BreakLine::GetIdealLineStatus(bool* readingGreen, bool* unavailable)
+ 1555  001F5098     1C  bool BreakLine::IdealLineCalculated()
+ 1561  00216500     CC  void BreakLine::SetNumPointsToRender(int numpts)
+                         local  int32_t viewport
+                         local  struct BreakLineData* breakLineData
+ 1576  0021691C     24  void BreakLine::AddNumPointsToRender(int addpts)
+ 1583    inline-only   static void ResetIdealPuttVars()
+ 1592  002814E4     B4  static void SetIdealPuttVars(bool available)
+                         local  const struct CoreShotInfo_t* perfectShotInfo
+                         inlines  AIMgr
+ 1724  0028E54C   100C  static void SetCustomRing(enum PlayerNumber_t PlayerID, SW_eClubVariability eCV, bool bFirstLook)
+                         local  vec4flt centerPt
+                         local  float_t[200] terHeights
+                         local  int userXZTracker
+                         local  bool bRecalculateTerrainHeights
+                         local  int currentKeyFrame
+                         local  float_t inRadius
+                         local  float_t outRadius
+                         local  float_t cosAngle
+                         local  float_t sinAngle
+                         local  float_t yVal
+                         local  float fCircleHoverHeight
+                         local  int alphaLevel
+                         local  float majAxis
+                         local  float minAxis
+                         local  unsigned char r
+                         local  unsigned char g
+                         local  unsigned char b
+                         local  unsigned char a
+                         local  float32_t fadePercent
+                         local  struct vtxStruct* pVerts
+                         local  int iSectionsOOBCount
+                         local  int bCheckForOOB
+                         local  bool bUseActualCenterpointForHeight
+                         local  void* tempGMPtr
+                         local  vec4flt diffVec
+                         local  float deltaXZ
+                         local  int32_t ctrlidx
+                         local  vec4flt ringPt
+                         local  unsigned int sec
+                         local  vec4flt checkPos
+                         local  void* ptr
+                         local  int innerAlpha
+                         local  void* pGameMode
+                         local  struct GameModeOneBall* mode
+                         local  int nextKeyFrame
+                         local  float radiusMultiplier
+                         local  struct GameModeOneBall* mode
+                         local  unsigned char oobR
+                         local  unsigned char oobG
+                         local  unsigned char oobB
+                         local  unsigned int sec
+                         local  CameraController_t* pCameraController
+                         local  vec4flt vLookVector
+                         local  vec4flt vGroundVector
+                         local  float angle
+                         local  float angleFraction
+                         local  float fNewCircleHoverHeight
+                         local  int nextKeyFrame
+                         local  void* ptr
+                         local  struct GameModeOneBall* mode
+                         inlines  GameModeOneBall::GetCircleRGB, LLMath_DotProduct3, LLMath_Subtract3, std::cosf, std::sinf, std::sqrt, vec3flt_Copy, vec_madd, vec_sub
+ 2136  003005B8    1BC  static void RenderCustomRing(SW_eClubVariability eCV)
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetZBufferMode
+ 2167    inline-only   static void SetMidpoint(const float* p1, const float* p2, float* mid)
+ 2177    inline-only   static void SetControlPoints(const float* p1, const float* p2, float* c1, float* c2)
+                         local  float arcBaseLength
+ 2189    inline-only   static void ResetForPolyArc(int32_t viewport)
+ 2209  002B6CF0    27C  void SetShotArc(float* p1, float* p2, float* p3, float* p4, int level, int renderRed, int renderGreen, int renderBlue)
+                         local  vec4flt l2
+                         local  vec4flt l3
+                         local  vec4flt l4
+                         local  vec4flt h
+                         local  vec4flt r2
+                         local  vec4flt r3
+                         inlines  SetMidpoint
+ 2232    inline-only   static void SetPolyArcData(int32_t viewport)
+                         local  vec4flt origin
+                         local  vec4flt dest
+                         local  vec4flt ctrlPt1
+                         local  vec4flt ctrlPt2
+                         local  struct sHoleShotHistory holeShotHistory
+                         local  enum PlayerNumber_t PlayerID
+                         local  int currentCourse
+                         local  int currentHole
+                         local  int histIndex
+                         local  int numStrokes
+                         local  int renderRed
+                         local  int renderGreen
+                         local  int renderBlue
+                         local  vec4flt teePos
+                         local  int stroke
+ 2341    inline-only   static void RenderShotArcs(int32_t viewport)
+ 2356    inline-only   static void RenderFacilityGreenSelector()
+ 2373  0028F558    5B8  static void SetFacilityGreenSelector(int greenIndex)
+                         local  SW_eClubVariability eCV
+                         local  unsigned char r
+                         local  unsigned char g
+                         local  unsigned char b
+                         local  unsigned char a
+                         local  const struct AIFeatureNetwork* greenNetwork
+                         local  const struct TNetwork* network
+                         local  float fScalableWidth
+                         local  float fInOutCompareRatio
+                         local  float fInOutRatio
+                         local  unsigned int secIncrement
+                         local  struct vtxStruct* pVerts
+                         local  int node
+                         local  vec4flt innerPos
+                         local  const float[6] siGreenNetworkRotation
+                         local  int numNodes
+                         local  unsigned int sec
+                         local  vec4flt prevPos
+                         local  vec4flt vec
+                         local  int prevNode
+                         local  unsigned int vertIndex
+                         inlines  LLMath_AddScale3, LLMath_Subtract3, RotateXY, Singleton<AIFeatureNetworkMgr>::GetSingleton, std::cosf, std::sinf, vec_madd
+ 2590    inline-only   static void HighlightOneBallCircle(int numHighlights)
+                         local  struct vtxStruct* pVerts
+                         local  int secOffset
+                         local  int sec
+                         local  unsigned char r
+                         local  unsigned char g
+                         local  unsigned char b
+                         local  void* ptr
+                         local  struct GameModeOneBall* mode
+                         local  int i
+                         local  int offset
+                         local  int i
+                         local  int offset

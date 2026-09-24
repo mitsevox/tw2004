@@ -1,0 +1,87 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/TransformStack.c
+// compiled in: golf_unity.cpp
+// 42 functions, source order. line | PS3 address | size
+
+   95  002BC208    130  void TS_Init()
+                         inlines  LLMath_IdentifyMat, vec_st
+  110  002266F4      4  void TS_Shutdown()
+  153  002BA65C    118  void TS_Apply()
+  197    inline-only   void TS_PushMatrix(float[4]* mat, int* stack_depth, mat44flt* stack, const char* stack_name)
+  210    inline-only   void TS_PopMatrix(float[4]* mat, int* stack_depth, mat44flt* stack, const char* stack_name)
+  229  00286850    240  void TS_PushMatrices(int matrix_flags)
+                         inlines  TS_PushMatrix
+  255  002BB79C    240  void TS_PopMatrices(int matrix_flags)
+                         inlines  TS_PopMatrix
+  277  002266F8     14  float[4][4]* TS_GetModel()
+  278  0022670C     14  float[4][4]* TS_GetView()
+  279  00226720     14  float[4][4]* TS_GetProj()
+  280  00226734     14  float[4][4]* TS_GetModelView()
+  281  00226748     14  float[4][4]* TS_GetViewProj()
+  282  002159B8     14  float[4][4]* TS_GetModelViewProj()
+  290  002909F8    16C  void TS_SetMatrixAxisAngle(float radians, float x, float y, float z, float[4]* dst)
+                         local  float ca
+                         local  float sa
+                         local  float inv_ca
+                         local  float mag
+                         local  float inv_mag
+                         inlines  std::cosf, std::sinf, std::sqrt
+  322  002764D8    290  void TS_LookAt(const float* eye, const float* target, const float* up, float[4]* dst)
+                         local  vec4flt forward
+                         local  vec4flt side
+                         local  vec4flt n_up
+                         inlines  LLMath_CrossProduct3W0, LLMath_DotProduct3, LLMath_IdentifyMat, LLMath_Subtract, __vec_cross, vec_madd, vec_nmsub, vec_perm, vec_st, vec_sub
+  358  002551D4     40  void TS_ModelGetMatrix(float[4]* matrix)
+                         inlines  LLMath_CopyMat44, vec_ld, vec_st
+  366  002BB0C4     40  void TS_ModelSetMatrix(float[4]* matrix)
+                         inlines  LLMath_CopyMat44, vec_ld, vec_st
+  377  00255214    13C  void TS_ApplyOrientationTranslate(float[4]* matrix)
+                         local  mat44flt orientation
+                         local  mat44flt translationViewProj
+                         inlines  LLMath_CopyMat44, LLMath_IdentifyMat, vec4flt_Copy, vec_ld, vec_st
+  397  002BAC94     60  void TS_ModelSetIdentity()
+                         inlines  LLMath_IdentifyMat
+  406  00251704     1C  void TS_ModelGetPosition(float* position)
+                         inlines  vec4flt_Copy, vec_st
+  417  002BAC30     64  void TS_ModelSetPosition(const float* position)
+                         inlines  vec4flt_Copy
+  428  002BABC8     68  void TS_ModelSetScale(const float* scale)
+  445  002BAB90     38  void TS_ModelSetRotation(float radians, float x, float y, float z)
+  454  002BAB58     38  void TS_ModelLookAt(const float* eye, const float* target, const float* up)
+  463  00255350     40  void TS_ViewGetMatrix(float[4]* matrix)
+                         inlines  LLMath_CopyMat44, vec_ld, vec_st
+  473  002BAB18     40  void TS_ViewSetMatrix(float[4]* matrix)
+                         inlines  LLMath_CopyMat44, vec_ld, vec_st
+  482  002BAAB8     60  void TS_ViewSetIdentity()
+                         inlines  LLMath_IdentifyMat
+  491  00251720     1C  void TS_ViewGetPosition(float* position)
+                         inlines  vec4flt_Copy, vec_st
+  501  002BAA60     58  void TS_ViewSetPosition(float* position)
+                         inlines  vec4flt_Copy
+  511  0025173C     1C  void TS_ViewGetDirection(float* dir)
+                         inlines  vec4flt_Copy, vec_st
+  519  00251758     1C  void TS_ViewGetLeft(float* dir)
+                         inlines  vec4flt_Copy, vec_st
+  527  00251774     1C  void TS_ViewGetUp(float* dir)
+                         inlines  vec4flt_Copy, vec_st
+  537  002BAA28     38  void TS_ViewSetRotation(float radians, float x, float y, float z)
+  546  002BA9F0     38  void TS_ViewLookAt(const float* eye, const float* target, const float* up)
+  558  00255390     40  void TS_ProjectionGetMatrix_MayNotBePortable(float[4]* matrix)
+                         inlines  LLMath_CopyMat44, vec_ld, vec_st
+  566  002BA9B0     40  void TS_ProjectionSetMatrix_MayNotBePortable(float[4]* matrix)
+                         inlines  LLMath_CopyMat44, vec_ld, vec_st
+  578  0021599C     1C  void TS_ProjectionSetDefaultNearFar(float z_near, float z_far)
+  587  0022675C     18  float TS_ProjectionGetDefaultNear()
+  595  00226774     18  float TS_ProjectionGetDefaultFar()
+  605  002BA864     B4  void TS_ProjectionSetPerspective(float radians, float aspect)
+                         local  const float ha
+                         local  const float sa
+                         local  const float cta
+                         inlines  std::cosf, std::sinf
+  658  002BA918     98  void TS_ProjectionSetOrtho(float left, float right, float bottom, float top, float front, float back)
+                         local  const float dn
+                         local  const float df
+                         local  const float rangeScale
+  712  002BA774     F0  void TS_ProjectionSetPerspectiveCustomNearFar(float cot_half_fov, float aspect, float n, float f)
+                         local  const float dn
+                         local  const float df
+                         local  const float rangeScale

@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/Internal/FrameSlerp.cpp
+// compiled in: FrameSlerp.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   10  005B1B6C    1C8  void CalcForRegularBones(const struct <anon>* this, float animFrameNum, float animFrameCount, int32_t dataFrameCount, float scaleFactor)
+                         local  float scaledFrameNum
+                         local  bool invalidFrameNum
+                         local  float numerator
+                         local  float denominator
+   45  005B1D34    1A4  void CalcForGameMovement(const struct <anon>* this, float animFrameNum, float animFrameCount, int32_t dataFrameCount, float scaleFactor)
+                         local  float scaledFrameNum

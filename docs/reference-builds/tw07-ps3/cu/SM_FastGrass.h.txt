@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_FastGrass.h
+// compiled in: shader_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   25  005207A8     18  void SM_FastGrassClass::~SM_FastGrassClass(const struct SM_FastGrassClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base

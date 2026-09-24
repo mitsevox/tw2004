@@ -1,0 +1,21 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/PS3/RNADebugPrint.cpp
+// compiled in: RNADebugPrint.cpp
+// 7 functions, source order. line | PS3 address | size
+
+    0  008452FC     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+  131  00844F90    1FC  void DevicePlatC::DebugPrintCharacter(const struct DevicePlatC* this, char8_t val)
+                         local  int32_t iChar
+                         local  const unsigned char* pFontData
+                         local  int32_t iNumBuffers
+                         local  int32_t iBuffer
+                         local  struct SurfacePlatC* pSurface
+                         local  uint32_t* pBuffer
+                         local  uint32_t uPitch
+                         local  int32_t iY
+                         local  int32_t iX
+                         inlines  SurfaceC::GetPlatform
+  192  0084518C     28  void DevicePlatC::SetupDebugPrinting(const struct DevicePlatC* this)
+  210  008451B4     10  void DevicePlatC::DebugPrintSetOffset(const struct DevicePlatC* this, int32_t iX, int32_t iY)
+  227  008451C4    138  void DevicePlatC::DebugPrintString(const struct DevicePlatC* this, const char8_t* pString)
+  258  0084537C     10  static void _GLOBAL__I__ZN3RNA11DevicePlatC19DebugPrintCharacterEc()
+  259  0084538C     10  static void _GLOBAL__D__ZN3RNA11DevicePlatC19DebugPrintCharacterEc()

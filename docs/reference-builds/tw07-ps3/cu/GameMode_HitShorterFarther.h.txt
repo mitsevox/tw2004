@@ -1,0 +1,15 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/Headers/GameMode_HitShorterFarther.h
+// compiled in: golf_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   23  0033F324      8  enum PlayerNumber_t GameModeHitShorterFarther::GetHonors(const struct GameModeHitShorterFarther* this, enum PlayerNumber_t ignore, bool doNotIgnoreHoledOut)
+   30  0033F32C      8  bool GameModeHitShorterFarther::SkipPreShotAnimation(const struct GameModeHitShorterFarther* this)
+   36  0033F334      8  bool GameModeHitShorterFarther::GoToGreenSelection(const struct GameModeHitShorterFarther* this)
+   38  0033F33C      8  bool GameModeHitShorterFarther::IsGreenSelectionEnabled(const const struct GameModeHitShorterFarther* this)
+   39  0033F344      8  bool GameModeHitShorterFarther::IsCupSelectionEnabled(const const struct GameModeHitShorterFarther* this)
+   40  0033F34C      8  bool GameModeHitShorterFarther::IsPlaceBallEnabled(const const struct GameModeHitShorterFarther* this)
+   43  0033F354      8  bool GameModeHitShorterFarther::UseCupPosForInitialPlaceBallPos(const const struct GameModeHitShorterFarther* this)
+   46  0033F35C      8  enum UIScoreCardDispMode_t GameModeHitShorterFarther::GetScoreDisplayMode(const struct GameModeHitShorterFarther* this, bool getAlternate)
+   55  0033F364      8  bool GameModeHitShorterFarther::ShowShotHistory(const struct GameModeHitShorterFarther* this)
+   58  0033F36C      8  bool GameModeHitShorterFarther::ShowShotInfo(const struct GameModeHitShorterFarther* this)
+   61  0033F374      8  int8 GameModeHitShorterFarther::GetStateAfterBallLands(const struct GameModeHitShorterFarther* this, enum PlayerNumber_t PlayerID)

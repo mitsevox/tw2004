@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/Hi-Rendering/Headers/GoLighting.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  869    inline-only   float LI_fComputeAngleBetweenLightAndCamera(struct LI_SLight* spLight_p, struct CA_SCamera* spCamera_p)
+                         local  float fDot

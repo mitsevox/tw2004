@@ -1,0 +1,28 @@
+// ../ears_rt_math/dev/include/ears_rt_math/uvecflt.h
+// compiled in: Character.cpp, ChrCntl_AnimView.cpp, HighLevel_AnimFrame.c, MathQuat.c, SKA_Util.c, Transform.cpp
+// 24 functions, source order. line | PS3 address | size
+
+  180    inline-only   static void vec3flt_Copy(const float* src, float* dest)
+  321    inline-only   static void vec4flt_Set4(float x, float y, float z, float w, float* dest)
+  340    inline-only   static void vec4flt_Set3(float x, float y, float z, float* dest)
+  355    inline-only   static void vec3flt_Set(float x, float y, float z, float* dest)
+  404    inline-only   static void vec4flt_ZeroW1(float* dest)
+  431    inline-only   static void vec4flt_Zero4(float* dest)
+  600    inline-only   static void vec4flt_Add3(const float* src1, const float* src2, float* dest)
+  612    inline-only   static void vec4flt_Add4(const float* src1, const float* src2, float* dest)
+  628    inline-only   static void vec4flt_AddScale3(const float* A, const float* B, float Bmul, float* dest)
+  644    inline-only   static void vec4flt_AddScale4(const float* A, const float* B, float Bmul, float* dest)
+  784    inline-only   static void vec4flt_Copy3(const float* src, float* dest)
+  794    inline-only   static void vec4flt_Copy4(const float* src, float* dest)
+  809    inline-only   static void vec4flt_CrossProduct3(const float* A, const float* B, float* dest)
+  884    inline-only   static float vec4flt_DotProduct3(const float* A, const float* B)
+  895    inline-only   static float vec4flt_DotProduct4(const float* A, const float* B)
+  911    inline-only   static void vec4flt_Interpolate3(const float* A, const float* B, float s, float* dest)
+  936    inline-only   static float vec4flt_Length3(const float* A)
+  956    inline-only   static float vec4flt_LengthSquared3(const float* A)
+ 1115    inline-only   static void vec4flt_Multiply4(const float* A, const float* B, float* dest)
+ 1129    inline-only   static void vec4flt_Negate3(const float* src, float* dest)
+ 1142    inline-only   static void vec4flt_Negate4(const float* src, float* dest)
+ 1248    inline-only   static void vec4flt_Scale3(float Amul, const float* A, float* dest)
+ 1258    inline-only   static void vec4flt_Scale4(float Amul, const float* A, float* dest)
+ 1351    inline-only   static void vec4flt_Subtract3(const float* A, const float* B, float* dest)

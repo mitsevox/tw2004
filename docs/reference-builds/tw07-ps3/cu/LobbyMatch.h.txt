@@ -1,0 +1,22 @@
+// ../../../../../TIGERCODE/Code/Golf/Online/LobbyMatch.h
+// compiled in: apt_unity.cpp, golf2_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+  142  00181D1C      C  void OnlineMatchParams::OnlineMatchParams(const struct OnlineMatchParams* this)
+                         inlines  RCPointer
+  143  00182050     80  void OnlineMatchParams::OnlineMatchParams(const struct OnlineMatchParams* this, const const struct OnlineMatchParams& params)
+                         inlines  RCPointer, operator->
+  144  0017CF74     44  void OnlineMatchParams::~OnlineMatchParams(const struct OnlineMatchParams* this)
+                         inlines  ~RCPointer
+  201    inline-only   const struct Dictionary* OnlineMatchParams::GetMatchParams(const struct OnlineMatchParams* this)
+  266    inline-only   char* LobbyMatchupOSDK::GetCurAdvertName(const struct LobbyMatchupOSDK* this)
+  275    inline-only   void LobbyMatchupOSDK::CancelAnyChallenge(const struct LobbyMatchupOSDK* this)
+  276    inline-only   void LobbyMatchupOSDK::ReadyToAcceptChallenge(const struct LobbyMatchupOSDK* this)
+  278    inline-only   const char* LobbyMatchupOSDK::GetCurLobbyChallenger(const struct LobbyMatchupOSDK* this)
+  285    inline-only   struct OnlineMatchParams* LobbyMatchupOSDK::GetGameParamsRef(const struct LobbyMatchupOSDK* this)
+  286    inline-only   struct OnlineMatchParams* LobbyMatchupOSDK::GetSearchParamsRef(const struct LobbyMatchupOSDK* this)
+  330  001E7BAC      4  void LobbyMatchupOSDK::GameSetupCanStartGameStateChanged(const struct LobbyMatchupOSDK* this, struct GameSetup* pGameSetup)
+  332  001E7BB8      4  void LobbyMatchupOSDK::GameSetupExit(const struct LobbyMatchupOSDK* this, struct GameSetup* pGameSetup)
+  334  001E7BC4      4  void LobbyMatchupOSDK::GameSetupSetRTPState(const struct LobbyMatchupOSDK* this, struct GameSetup* pGameSetup, bool bReady)
+  372  001E7BD0      4  void LobbyMatchupOSDK::InvitationDeclineSuccess(const struct LobbyMatchupOSDK* this, const struct User* pSender)
+  373  001E7BDC      4  void LobbyMatchupOSDK::InvitationDeclineFailure(const struct LobbyMatchupOSDK* this, const struct User* pSender, enum Failure eFailure)

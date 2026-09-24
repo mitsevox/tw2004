@@ -1,0 +1,11 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/quick_spu/dev-football/include/quick_spu/handles.h
+// compiled in: RNAJobPlat.cpp, managerplat.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   46    inline-only   bool IsValid(const const struct <anon>* this)
+   47    inline-only   void Invalidate(const struct <anon>* this)
+   59    inline-only   bool IsValid(const const struct <anon>* this)
+   71    inline-only   bool IsValid(const const struct <anon>* this)
+   72    inline-only   void Invalidate(const struct <anon>* this)
+   80    inline-only   bool IsValid(const const struct <anon>* this)
+   81    inline-only   void Invalidate(const struct <anon>* this)

@@ -1,0 +1,27 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_EASportsTrax.cpp
+// compiled in: apt_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   34  0007A8CC     58  void EASportsTraxMemCardCB(int32 rslt)
+   44  000F625C     94  void UIEASportsTrax::UIEASportsTrax(const struct UIEASportsTrax* this)
+                         inlines  TArrayInternal<UIEASportsTrax::DstMenuItem_trax,AptStructSwapper>::TArrayInternal, TExternArray<UIEASportsTrax::DstMenuItem_trax>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   48  000EF558     78  void UIEASportsTrax::Init(const struct UIEASportsTrax* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   57  00042418     64  void UIEASportsTrax::Show(const struct UIEASportsTrax* this, bool doSave)
+                         local  int32 numElements
+   71  00034BA4     44  void UIEASportsTrax::ShowHelpText(const struct UIEASportsTrax* this)
+   76  00034BE8     94  void UIEASportsTrax::UpdateItemAndLabel(const struct UIEASportsTrax* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_trax* dest
+   92  000ADE1C    570  enum eAptHandleInput UIEASportsTrax::HandleInput(const struct UIEASportsTrax* this, int32 cID)
+                         local  int32 traxId
+                         local  bool option
+                         local  int32 saveIndex
+                         local  int32 i
+                         local  bool bOldValue0
+                         local  bool bOldValue1
+                         local  bool bOldValue2
+                         local  bool bOldValue3
+                         local  bool bOldValue4
+                         local  bool bOldValue5
+                         local  int32 saveIndex
+                         local  int32 i

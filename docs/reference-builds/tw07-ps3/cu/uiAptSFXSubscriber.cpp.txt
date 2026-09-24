@@ -1,0 +1,355 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/aptInterface/uiAptSFXSubscriber.cpp
+// compiled in: other_unity.cpp
+// 55 functions, source order. line | PS3 address | size
+
+   66  003ECDB8     24  void Wait_Resolve()
+   77  00422C6C    108  int Apt_atoi(const char* nptr)
+                         local  int total
+                         local  int minus
+                         inlines  std::isspace
+   97  00422E24    3A8  float Apt_atof(const char* _s)
+                         local  float val
+                         local  float holder
+                         local  int floatsign
+                         local  int expsign
+                         local  int exp
+                         local  int i
+                         local  const char* s
+                         local  const float[17] pow10
+                         local  const float* dp
+                         inlines  std::isdigit, std::isspace, std::tolower
+  186  003ECDDC    100  char* GetTagValueAddress(const char* szCustomProperties, const char* tagIn)
+                         local  char[32] tag
+                         local  int32 len
+                         local  char* find
+                         local  char* tagValueFound
+  215  003ECEDC     9C  char* GetValueInTag(const char* szCustomProperties, const char* tag)
+                         local  char* tagValueFound
+                         local  char[64] tagValue
+                         local  char* findAnd
+                         inlines  std::strchr
+  237  00422D74     44  int32 GetValueInTagInt(const char* szCustomProperties, const char* tag)
+                         local  char* tagValue
+  250  004231CC     58  float GetValueInTagFloat(const char* szCustomProperties, const char* tag)
+                         local  char* tagValue
+  275  003ECF78     18  void AptTxtAnimatedSubscriber::CustomRenderNeeds(const struct AptTxtAnimatedSubscriber* this, const char* szType, int32* needTarget, int32* needCustomProp, int32* needMatrix)
+  285  00486828    C40  void AptTxtAnimatedSubscriber::CustomRender(const struct AptTxtAnimatedSubscriber* this, const char* szType, const char* , void* renderingUnit, const char* szCustomProperties, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  TI_STimeValue oTime
+                         local  float mDeltaTimer
+                         local  struct AptRUFile_t* aptRUFile
+                         local  const struct AptFillStyles& styles
+                         local  int32 animationState
+                         local  float minalpha
+                         local  float maxalpha
+                         local  float ratealpha
+                         local  float ydirection
+                         local  float xdirection
+                         local  float offset
+                         local  float scaleamount
+                         local  float rotspeed
+                         local  float redmax
+                         local  float redmin
+                         local  float bluemax
+                         local  float bluemin
+                         local  float greenmax
+                         local  float greenmin
+                         local  const float PROPERTY_SCALE
+                         local  char* animState
+                         local  const float radAlpha
+                         local  const float radRed
+                         local  const float radGreen
+                         local  const float radBlue
+                         local  struct AptStyleTxtGrp* fillStyle
+                         local  const float& tx
+                         local  const float& ty
+                         local  const float& a
+                         local  const float& c
+                         local  const float& b
+                         local  const float& d
+                         local  const float savedA
+                         local  const float savedB
+                         local  const float savedC
+                         local  const float savedD
+                         local  const float savedtX
+                         local  const float savedtY
+                         local  float mySin
+                         local  float myCos
+                         local  struct AptCXForm saveTransform
+                         local  bool isaveIsIdentity
+                         local  const struct AptCXForm& colorTransform
+                         local  float rateScale
+                         local  const struct AptInfo_t& aptInfo
+                         local  TextureRef textureRef
+                         local  char* pPropertyminalpha
+                         local  char* pPropertymaxalpha
+                         local  char* pPropertyredmin
+                         local  char* pPropertyredmax
+                         local  char* pPropertygreenmin
+                         local  char* pPropertygreenmax
+                         local  char* pPropertybluemin
+                         local  char* pPropertybluemax
+                         local  char* pPropertyratealpha
+                         local  char* pPropertyxdirection
+                         local  char* pPropertyydirection
+                         local  char* pPropertyoffset
+                         local  char* pPropertyscaleamount
+                         local  char* pPropertyrotspeed
+                         local  float mySin
+                         local  float myCos
+                         inlines  AptAnimations::GetAptInfo, AptFillStyles::GetStypeTxtGrp, AptFillStyles::GoToFirstStyle, AptFillStyles::HasMoreStyles, AptInfo_t::GetTextureRefFromAptTextureId, TI_fConvertTimeDifToSeconds, std::cosf, std::sinf, sys_time_get_timebase_frequency
+  485  003ECF90     18  void AptProShop3DItemSubscriber::CustomRenderNeeds(const struct AptProShop3DItemSubscriber* this, const char* szType, int32* needTarget, int32* needCustomProp, int32* needMatrix)
+  498  00488D64    104  void AptProShop3DItemSubscriber::CustomRender(const struct AptProShop3DItemSubscriber* this, const char* szType, const char* szTarget, void* renderingUnit, const char* szCustomProperties, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  const int32 menuItemIndexOffset
+                         local  char menuIdxChar
+                         local  int32 menuItemIndex
+                         local  float x0
+                         local  float x1
+                         local  float y0
+                         local  float y1
+                         local  float fadeValue
+  538  003ECFA8     18  void AptCharThumbSubscriber::CustomRenderNeeds(const struct AptCharThumbSubscriber* this, const char* szType, int32* needTarget, int32* needCustomProp, int32* needMatrix)
+  548  00486214    614  void AptCharThumbSubscriber::CustomRender(const struct AptCharThumbSubscriber* this, const char* szType, const char* , void* renderingUnit, const char* szCustomProperties, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  const int32 pnumIndex
+                         local  const int32 whichPlayer
+                         local  enum UserNumber UserIndexInManager
+                         local  TextureRef txtRef
+                         local  struct AptRUFile_t* aptRUFile
+                         local  const struct AptInfo_t& aptInfo
+                         local  enum eAptPrimTexturedSmoothType smooth
+                         local  const struct AptFillStyles& styles
+                         local  struct AptStyleTxtGrp* fillStyle
+                         local  const TextureInfo* info
+                         inlines  AptAnimations::GetAptInfo, AptFillStyles::GetStypeTxtGrp, AptFillStyles::GoToFirstStyle, AptInfo_t::AddTextureRef, AptInfo_t::ClearTextureRef, AptInfo_t::GetSmoothRendering, AptInfo_t::SetSmoothRendering, AptStructSwapper::Swap, DS_vSetAlphaTestMode, FEGolferThumbnail::GetTextureRef, Gcm::cellGcmSetAlphaTestEnable, TArrayInternal<TextureRef,AptStructSwapper>::Push, TArrayInternal<TextureRef,AptStructSwapper>::RemoveElem, TArrayInternal<TextureRef,AptStructSwapper>::operator[], ThumbNailManager::GetTexFactory
+  674    inline-only   void Fast_Scanf08xToVec4flt_Normalized01(const char* str, const vec4flt& rgba)
+                         local  vec4flt high
+                         local  vec4flt low
+  693    inline-only   void IsGoodHexColor(char* str)
+                         local  int i
+                         local  int good
+                         local  const char c
+  710    inline-only   void Fast_Scanf08xToVec4flt_Normalized01_UpperCaseOnly(const char* str, const vec4flt& rgba)
+                         local  vec4flt high
+                         local  vec4flt low
+  734  003ECFC0     2C  void AptGradientSubscriber::CustomRenderNeeds(const struct AptGradientSubscriber* this, const char* szType, int32* needTarget, int32* needCustomProp, int32* needMatrix)
+  749  00482E7C   11BC  void AptGradientSubscriber::CustomRender(const struct AptGradientSubscriber* this, const char* szType, const char* szTarget, void* renderingUnit, const char* szCustomProperties, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  struct AptRUFile_t* aptRUFile
+                         local  const struct AptFillStyles& styles
+                         local  struct AptStyleTxtGrp* fillStyle
+                         local  float* strips
+                         local  struct vtxStruct* vertexStrip
+                         local  const float X1
+                         local  const float Y1
+                         local  const float X2
+                         local  const float Y2
+                         local  float[4][4] xpColors
+                         local  int32[4] order
+                         local  const char c
+                         local  const char c
+                         local  const char c
+                         local  const char c
+                         inlines  AptColorTransform, AptFillStyles::GetStypeTxtGrp, AptFillStyles::GoToFirstStyle, Fast_Scanf08xToVec4flt_Normalized01, Fast_Scanf08xToVec4flt_Normalized01_UpperCaseOnly, LLMath_Add, LLMath_ClampVec, LLMath_MultiplyVec, __vec_make_from_scalar, vec_add, vec_ld, vec_madd, vec_max, vec_min, vec_splat
+  838  003ECFEC     18  void AptFadeSubscriber::CustomRenderNeeds(const struct AptFadeSubscriber* this, const char* szType, int32* needTarget, int32* needCustomProp, int32* needMatrix)
+  850  00485444    50C  void DrawFade(const char* szType, void* renderingUnit, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth, vec4flt* overridenColor)
+                         local  mat44flt kResultMatrix
+                         local  const struct AptFillStyles& styles
+                         local  struct AptStyleTxtGrp* fillStyle
+                         local  vec4flt rgba
+                         local  float* strips
+                         local  const int32_t nbr
+                         local  struct vtxStruct* vertexStrip
+                         local  const float x1
+                         local  const float y0
+                         local  const float x0
+                         local  const float y1
+                         local  float completionA
+                         local  float completionB
+                         local  const float x2
+                         local  const float x3
+                         local  enum eAlphaMask gAlphaMaskIsOn
+                         inlines  AptColorTransform, AptFillStyles::GetStypeTxtGrp, AptFillStyles::GoToFirstStyle, AptStyleTxtGrp::GetStripList, DS_vSetAlphaBlendingFunction, DS_vSetAlphaEnable, DS_vSetColorWriteEnable, DS_vSetStencilEnable, LLMath_Add, LLMath_ClampVec, LLMath_MultiplyVec, vec4flt_Copy, vec_add, vec_ld, vec_max, vec_min
+ 1012  00485A24     8C  void AptFadeSubscriber::CustomRender(const struct AptFadeSubscriber* this, const char* szType, const char* , void* renderingUnit, const char* szCustomProperties, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+ 1024  0047C1FC     AC  void AptBGColorTweenSubscriber::AptBGColorTweenSubscriber(const struct AptBGColorTweenSubscriber* this)
+                         inlines  Fast_Scanf08xToVec4flt_Normalized01, vec_madd
+ 1038  003ED004     18  void AptBGColorTweenSubscriber::CustomRenderNeeds(const struct AptBGColorTweenSubscriber* this, const char* szType, int32* needTarget, int32* needCustomProp, int32* needMatrix)
+ 1046  00485950     D4  void AptBGColorTweenSubscriber::CustomRender(const struct AptBGColorTweenSubscriber* this, const char* szType, const char* , void* renderingUnit, const char* szCustomProperties, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  const float[4] vec4flt_dot14
+                         local  vec4flt tmpVec4flt
+                         inlines  LLMath_Add, LLMath_MulDiff
+ 1059  004087AC    20C  void AptBGColorTweenSubscriber::FSCommand(const struct AptBGColorTweenSubscriber* this, const char* szCommand, const char* szParams)
+                         inlines  Fast_Scanf08xToVec4flt_Normalized01
+ 1070  003ED01C     14  void AptScreenRegistrationSubscriber::CustomRenderNeeds(const struct AptScreenRegistrationSubscriber* this, const char* szType, int32* needTarget, int32* needCustomProp, int32* needMatrix)
+ 1080  00480F9C    1D4  void AptScreenRegistrationSubscriber::CustomRender(const struct AptScreenRegistrationSubscriber* this, const char* szType, const char* , void* renderingUnit, const char* , enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  const int32 matrixIndex
+                         local  struct AptRUFile_t* aptRUFile
+                         local  struct AptInfo_t* aptInfo
+                         inlines  AptAnimations::GetAptInfo
+ 1112  003ED030     14  void AptClipSubscriber::CustomRenderNeeds(const struct AptClipSubscriber* this, const char* szType, int32* needTarget, int32* needCustomProp, int32* needMatrix)
+ 1122  00485314    130  void AptClipSubscriber::CustomRender(const struct AptClipSubscriber* this, const char* szType, const char* , void* renderingUnit, const char* , enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  float x0
+                         local  float y0
+                         local  float x1
+                         local  float y1
+ 1177  003ED044     18  void AptAutoSizeSubscriber::CustomRenderNeeds(const struct AptAutoSizeSubscriber* this, const char* szType, int32* needTarget, int32* needCustomProp, int32* needMatrix)
+ 1187  004A6CA0    738  void AptAutoSizeSubscriber::CustomRender(const struct AptAutoSizeSubscriber* this, const char* szType, const char* szTarget, void* renderingUnit, const char* szCustomProperties, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  char* ok
+                         local  float t
+                         local  float l
+                         local  float b
+                         local  float r
+                         local  char[128] targetParent
+                         local  char[256] pathDynTxt
+                         local  bool foundText
+                         local  float w
+                         local  float h
+                         local  struct MoveMC[9] mcToMove
+                         local  const int nbrElems
+                         local  int index
+                         local  int i
+                         local  char[6] tagDyn
+                         local  char* path
+                         local  int32 outW
+                         local  int32 outH
+                         local  int32 outNbrLines
+                         local  float _x
+                         local  float _y
+                         local  const float _r
+                         local  const float _b
+                         local  int j
+                         local  const const struct MoveMC& mc
+                         local  char* posiProperty
+ 1374  003ED05C     14  void AptBlurSubscriber::CustomRenderNeeds(const struct AptBlurSubscriber* this, const char* szType, int32* needTarget, int32* needCustomProp, int32* needMatrix)
+ 1381  004770A8    324  void AptBlurSubscriber::CustomRender(const struct AptBlurSubscriber* this, const char* szType, const char* , void* renderingUnit, const char* , enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  const int32 count
+                         local  int32 forceBlur
+                         local  int32 forceNoBlur
+                         local  const int32 forceReDoBlur
+                         local  const int32 forceBlurOnce
+                         local  int reuseOldBlur
+                         local  enum eBlurKind blurKind
+                         inlines  DS_vSetAlphaBlendingFunction, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetColorWriteEnable, Gcm::cellGcmSetAlphaTestEnable, SM_NoteActiveShader
+ 1501  003ED070     14  void AptStencilCommitSubscriber::CustomRenderNeeds(const struct AptStencilCommitSubscriber* this, const char* szType, int32* needTarget, int32* needCustomProp, int32* needMatrix)
+ 1511  004773CC    4DC  void AptStencilCommitSubscriber::CustomRender(const struct AptStencilCommitSubscriber* this, const char* szType, const char* , void* renderingUnit, const char* , enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  bool doInvertedMask
+                         inlines  DS_vSetAlphaTestMode, DS_vSetColorWriteEnable, DS_vSetStencilEnable, DS_vSetStencilOp, DS_vSetStencilTest, DS_vSetStencilWriteMask
+ 1670  003ED084     24  void AptAlphaMaskSubscriber::CustomRenderNeeds(const struct AptAlphaMaskSubscriber* this, const char* szType, int32* needTarget, int32* needCustomProp, int32* needMatrix)
+ 1690  00484540    DD4  void AptAlphaMaskSubscriber::CustomRender(const struct AptAlphaMaskSubscriber* this, const char* szType, const char* , void* renderingUnit, const char* , enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  TextureRef backBuffer
+                         local  const TextureInfo* infoD
+                         local  const TextureInfo* infoS
+                         local  const TextureInfo* infoF
+                         local  const float infoDWidth
+                         local  const float l
+                         local  const float h
+                         local  const float t
+                         local  const float td
+                         local  const float td2
+                         local  vec4flt dstRect
+                         local  vec4flt dstRect2
+                         local  vec4flt srcRect
+                         local  const TextureInfo* infoS
+                         local  const TextureInfo* infoD
+                         local  const float width
+                         local  const float height
+                         local  const float widthUsed
+                         local  const float heightUsed
+                         local  vec4flt srcRect
+                         local  const TextureInfo* infoS
+                         local  const TextureInfo* infoD
+                         local  const float width
+                         local  const float height
+                         local  const float widthUsed
+                         local  const float heightUsed
+                         local  vec4flt dstRect
+                         inlines  DS_vSetAlphaBlendingFunction, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetColorWriteEnable, Gcm::cellGcmSetBlendEquation, SM_NoteActiveShader
+ 1961  003ED0A8     14  void AntiAliasSubscriber::CustomRenderNeeds(const struct AntiAliasSubscriber* this, const char* szType, int32* needTarget, int32* needCustomProp, int32* needMatrix)
+ 1974  003ED0BC      4  void AntiAliasSubscriber::CustomRender(const struct AntiAliasSubscriber* this, const char* szType, const char* , void* renderingUnit, const char* , enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+ 2063  003ED0C0     18  void AptWebImageSubscriber::CustomRenderNeeds(const struct AptWebImageSubscriber* this, const char* szType, int32* needTarget, int32* needCustomProp, int32* needMatrix)
+ 2070  00409404     44  void AptWebImageSubscriber::CustomRender(const struct AptWebImageSubscriber* this, const char* szType, const char* szTarget, void* renderingUnit, const char* , enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         inlines  SM_NoteActiveShader
+ 2082  00460E98     68  void Apt1By1AnimationSubscriber::Apt1By1AnimationSubscriber(const struct Apt1By1AnimationSubscriber* this)
+                         inlines  AptSubscriberVariable::AptSubscriberVariable, TAptArrayStruct, TArrayInternal<Apt1By1Repository,AptStructSwapper>::TArrayInternal, TArrayInternal<ValueType,AptStructSwapper>::TArrayInternal
+ 2097  004A6AE8    1B8  void Apt1By1AnimationSubscriber::NotifyNext(const struct Apt1By1AnimationSubscriber* this)
+                         local  int32 index
+                         local  int i
+                         local  const struct Apt1By1Repository& repo
+                         local  const struct Apt1By1Repository& repo
+                         inlines  TArrayInternal<Apt1By1Repository,AptStructSwapper>::operator[]
+ 2138  004A3A5C    2EC  void Apt1By1AnimationSubscriber::NotifyNext(const struct Apt1By1AnimationSubscriber* this, const struct Apt1By1Repository& repo)
+                         local  int trueBytePositionInString
+                         local  char[64] clipName
+                         local  char[64] clipNameDup
+                         local  char[16] depth
+                         local  int32 w
+                         local  int32 h
+                         local  int32 n
+                         local  float wF
+                         local  const int32 byteAtIndex
+ 2198  003ED0D8     18  void Apt1By1AnimationSubscriber::CustomRenderNeeds(const struct Apt1By1AnimationSubscriber* this, const char* szType, int32* needTarget, int32* needCustomProp, int32* needMatrix)
+ 2208  00431764    404  void Apt1By1AnimationSubscriber::CustomRender(const struct Apt1By1AnimationSubscriber* this, const char* szType, const char* szTarget, void* renderingUnit, const char* szCustomProperties, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  int32 index
+                         local  const struct Apt1By1Repository& repo
+                         local  const struct Apt1By1Repository& repo
+                         local  char* variableName
+                         local  int32 align
+                         local  int i
+                         inlines  AptStructSwapper::Swap, TArrayInternal<Apt1By1Repository,AptStructSwapper>::Push, TArrayInternal<Apt1By1Repository,AptStructSwapper>::operator[]
+ 2257  0043169C     C8  int32 Apt1By1AnimationSubscriber::FindInRepository(const struct Apt1By1AnimationSubscriber* this, const char* szTarget)
+                         local  int32 index
+                         local  int i
+                         inlines  TArrayInternal<Apt1By1Repository,AptStructSwapper>::operator[]
+ 2273  004A4030    16C  void Apt1By1AnimationSubscriber::Update(const struct Apt1By1AnimationSubscriber* this)
+                         local  int i
+                         local  const struct Apt1By1Repository& repo
+                         inlines  TArrayInternal<Apt1By1Repository,AptStructSwapper>::operator[]
+ 2298  004A3D48    2E8  void Apt1By1AnimationSubscriber::UpdateAnimation(const struct Apt1By1AnimationSubscriber* this, int32 index)
+                         local  const struct Apt1By1Repository& repo
+                         local  char[64] clipName
+                         local  char[4] oneByOneChar
+                         local  const int32 byteAtIndex
+                         local  const int32 nbrChar
+                         local  int y
+                         inlines  TArrayInternal<Apt1By1Repository,AptStructSwapper>::operator[]
+ 2355  0041E9A4     B0  void Apt1By1AnimationSubscriber::KillAnimation(const struct Apt1By1AnimationSubscriber* this, int32 index)
+                         inlines  AptStructSwapper::Swap, TArrayInternal<Apt1By1Repository,AptStructSwapper>::RemoveElem
+ 2370  003ED0F0     18  void AptSphereizerSubscriber::CustomRenderNeeds(const struct AptSphereizerSubscriber* this, const char* szType, int32* needTarget, int32* needCustomProp, int32* needMatrix)
+ 2381  0048439C    1A4  void AptSphereizerSubscriber::CustomRender(const struct AptSphereizerSubscriber* this, const char* szType, const char* , void* renderingUnit, const char* szCustomProperties, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  float coef
+                         local  const float coef_modulator
+                         local  float x0
+                         local  float x1
+                         local  float y0
+                         local  float y1
+ 2424  003ED108      8  void AptSphereizerSubscriber::ChangeCoefMod(const struct AptSphereizerSubscriber* this, const float mod)
+ 2441  003ED110     18  void AptGridSubscriber::CustomRenderNeeds(const struct AptGridSubscriber* this, const char* szType, int32* needTarget, int32* needCustomProp, int32* needMatrix)
+ 2448  004826F0    43C  void AptGridSubscriber::CustomRender(const struct AptGridSubscriber* this, const char* szType, const char* , void* renderingUnit, const char* szCustomProperties, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  struct AptRUFile_t* aptRUFile
+                         local  const struct AptFillStyles& styles
+                         local  char* savedRawData
+                         local  int32 savedSize
+                         local  struct AptStyleTxtGrp* fillStyle
+                         local  float* strips
+                         local  int32_t nbr
+                         local  struct vtxStruct* vertexStrip
+                         local  const float X2
+                         local  const float Y2
+                         local  const float X1
+                         local  const float Y1
+                         local  const int32 xGrid
+                         local  const int32 yGrid
+                         local  float deltaX
+                         local  float deltaY
+                         local  struct AptStyleTxtGrp* fillStyleNew
+                         local  float* stripsNew
+                         local  struct vtxStruct* verticeGrid
+                         local  int nbrNew
+                         local  float xPos0
+                         local  float yPos0
+                         local  float yPos1
+                         local  int y
+                         local  int x
+                         local  float yPos0
+                         local  float xPos0
+                         local  float xPos1
+                         local  int x
+                         local  int y
+                         inlines  AptFillStyles::GetRawDataSize, AptFillStyles::GetStypeTxtGrp, AptFillStyles::GoToFirstStyle, AptStyleTxtGrp::GetStripList

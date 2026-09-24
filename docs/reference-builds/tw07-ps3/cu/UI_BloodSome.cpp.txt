@@ -1,0 +1,22 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_BloodSome.cpp
+// compiled in: apt_unity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   23  000F21AC     6C  void UIBloodSome::UIBloodSome(const struct UIBloodSome* this)
+                         inlines  AptStaticCharBuffer<64u>::AptStaticCharBuffer
+   33  00032110     60  void UIBloodSome::Init(const struct UIBloodSome* this)
+   43  000EABAC     48  void UIBloodSome::Show(const struct UIBloodSome* this, enum PlayerNumber_t playerID, enum PlayerNumber_t playerSelectingID)
+   57  000EABA8      4  void UIBloodSome::OnShow(const struct UIBloodSome* this)
+   66  000EAA7C    12C  void UIBloodSome::UpdateText(const struct UIBloodSome* this)
+                         local  char[32] strBuf
+                         local  char[32] sDistanceToPinStr
+                         local  float fYardsToPin
+                         local  const uint32 lieindex
+                         local  const char* lieStr
+   93  00032170     58  void UIBloodSome::ShowBallOutOfRange(const struct UIBloodSome* this)
+  102  000321C8     58  void UIBloodSome::HideBallOutOfRange(const struct UIBloodSome* this)
+  112  00032220     58  void UIBloodSome::ShowBallTarget(const struct UIBloodSome* this)
+  121  00032278     58  void UIBloodSome::HideBallTarget(const struct UIBloodSome* this)
+  130  0006A6C4     48  void UIBloodSome::SetTargetText(const struct UIBloodSome* this, char* text)
+  137  00062FF4     14  void UIBloodSome::ClearTargetText(const struct UIBloodSome* this)
+  147  000322D0      8  enum eAptHandleInput UIBloodSome::HandleInput(const struct UIBloodSome* this, int32 cID)

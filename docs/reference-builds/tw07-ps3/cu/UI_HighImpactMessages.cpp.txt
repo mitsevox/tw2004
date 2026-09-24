@@ -1,0 +1,119 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_HighImpactMessages.cpp
+// compiled in: apt_unity.cpp
+// 42 functions, source order. line | PS3 address | size
+
+   59  000F3A48     DC  void UIHighImpactMessages::UIHighImpactMessages(const struct UIHighImpactMessages* this)
+                         local  int32 i
+                         inlines  AptStaticCharBuffer<16u>::AptStaticCharBuffer
+   79  0003E720     60  void UIHighImpactMessages::Init(const struct UIHighImpactMessages* this)
+   86  0006521C     DC  void UIHighImpactMessages::ShowEndTurnMessagesFromCalendar(const struct UIHighImpactMessages* this)
+                         local  char* outvariable
+  100  00065170     AC  void UIHighImpactMessages::ShowEndTurnMessages(const struct UIHighImpactMessages* this)
+  119  000652F8     B4  void UIHighImpactMessages::ShowAwardMessages(const struct UIHighImpactMessages* this)
+  141  0003E844     10  void UIHighImpactMessages::AdvanceMessages(const struct UIHighImpactMessages* this)
+  149  0003E854     C0  void UIHighImpactMessages::Hide(const struct UIHighImpactMessages* this)
+  164  000DB0AC     4C  void UIHighImpactMessages::OnShow(const struct UIHighImpactMessages* this)
+  170  0003E914     D0  void UIHighImpactMessages::OnHide(const struct UIHighImpactMessages* this)
+                         local  char* outvariable
+  192  0003E9E4      4  void UIHighImpactMessages::ShowHelpText(const struct UIHighImpactMessages* this)
+  204  000DADD4    1A0  void UIHighImpactMessages::ShowNextMessage(const struct UIHighImpactMessages* this)
+                         local  enum GUI_MessageQue_t queueMessageType
+                         local  int32 param1
+                         local  int32 param2
+                         local  int32 param3
+  252  0003E78C     B8  void UIHighImpactMessages::HideCurrentMessage(const struct UIHighImpactMessages* this)
+  271  0006A060     5C  enum AptThreadReturnValue UIHighImpactMessages::StartHighImpactMessagesThread(const struct UIHighImpactMessages* this)
+  284  00024CF8     B4  enum AptThreadReturnValue UIHighImpactMessages::DisableAdvanceThread(const struct UIHighImpactMessages* this)
+  299  0003250C     64  void UIHighImpactMessages::StartTimeoutThread(const struct UIHighImpactMessages* this)
+  312  0007547C    1A0  enum AptThreadReturnValue UIHighImpactMessages::MessageTimeOutThread(const struct UIHighImpactMessages* this)
+                         local  TI_STimeValue currentTime
+                         local  float mfSecondsElapsed
+                         inlines  TI_fConvertTimeDifToSeconds
+  340  000DAF74    138  enum AptThreadReturnValue UIHighImpactMessages::WaitForFlashHideThread(const struct UIHighImpactMessages* this)
+  384  0003EA28     A8  enum eAptHandleInput UIHighImpactMessages::HandleInput(const struct UIHighImpactMessages* this, int32 cID)
+  415  00072638     4C  char* UIHighImpactMessages::GetUserName(const struct UIHighImpactMessages* this, int32 userId)
+                         local  char* stringBuffer
+  449  000DA320    198  enum eHighImpactMessageType UIHighImpactMessages::ConvertQueueMessageTypeToHighImpactMessageType(const struct UIHighImpactMessages* this, enum GUI_MessageQue_t queueMessageType)
+                         inlines  GM_GetModeType
+  516  00072484    1B4  void UIHighImpactMessages::SetupEndGameWinMessage(const struct UIHighImpactMessages* this, int32 playerId)
+                         local  char* message
+                         local  char* format
+                         local  char[32] nameBuffer
+                         local  char* format
+                         local  char[32] nameBuffer
+  541  000723CC     B8  void UIHighImpactMessages::SetupEndGameLoseMessage(const struct UIHighImpactMessages* this, int32 playerId)
+                         local  char* message
+                         local  char* format
+                         local  char[32] nameBuffer
+  552  000722B4    118  void UIHighImpactMessages::SetupCareerChallengeCompletionMessage(const struct UIHighImpactMessages* this, enum GUI_CareerChallengeCompletion completionState, int32 playerId)
+                         local  char* message
+                         local  char* format
+                         local  char[32] nameBuffer
+  581  0003EAD0     94  void UIHighImpactMessages::SetupEndHoleTieMessage(const struct UIHighImpactMessages* this, int32 dontShowHalved)
+                         local  char* message
+                         local  char* format
+  591  0003EB64     3C  void UIHighImpactMessages::SetupEndHoleSpecialsSummary(const struct UIHighImpactMessages* this, int32 playerId)
+  597  000720F4    1C0  void UIHighImpactMessages::SetupEndHoleWinMessage(const struct UIHighImpactMessages* this, int32 winnerPlayerId)
+                         local  struct GameModeBase* gameMode
+                         local  enum PlayerNumber_t winner
+                         local  char* message
+                         local  char* format
+                         local  char[32] nameBuffer
+                         local  enum PlayerNumber_t winner
+                         local  char* message
+                         local  char* format
+                         local  char[32] nameBuffer
+  630  00072088     6C  void UIHighImpactMessages::SetupFedExCupWonMessage(const struct UIHighImpactMessages* this, int32 playerId)
+  638  00072004     84  void UIHighImpactMessages::SetupFedExCupLostMessage(const struct UIHighImpactMessages* this, int32 playerId)
+  649  0005FC44    2F0  void UIHighImpactMessages::SetupPgaTourEndTurnMessage(const struct UIHighImpactMessages* this)
+                         local  struct GameModeDriverPGATour* pPGADriver
+                         local  const struct PgaTour_WinInfo* wininfo
+                         local  const struct UserInfo& userInfo
+                         local  char[32] tempStr
+                         local  char[16] moneyString
+                         local  char* formatPgaEndTournament
+                         local  int32 ordinalNumber
+                         local  char* ordinalSuffix
+                         local  const char* userName
+                         local  char* formatWinningsString
+                         local  char* formatTournamentWon
+  715  00073124     B0  void UIHighImpactMessages::SetupPgaTourCutMessage(const struct UIHighImpactMessages* this, bool bMadeTheCut)
+  730  000730BC     68  void UIHighImpactMessages::SetupStatsLeadersMessage(const struct UIHighImpactMessages* this, enum eHighImpactMessageType messageType, int32 bonusType, int32 param2, int32 userId)
+  738  00072E58    264  void UIHighImpactMessages::SetupAllTimePgaTourRecordsMessage(const struct UIHighImpactMessages* this, enum eHighImpactMessageType messageType, int32 bonusType, int32 param2, int32 userId)
+                         local  char* tournamentAward
+                         local  char* format
+                         local  char* format
+                         local  const char* tournamentCupName
+                         local  char* format
+                         local  char* tournamentAward
+  788  00072AC8    390  void UIHighImpactMessages::SetupRecordSetMessage(const struct UIHighImpactMessages* this, enum eHighImpactMessageType messageType, int32 shotType, int32 recordType, int32 userId)
+                         local  char* formatString
+                         local  char* recordId
+                         local  char* recordString
+                         local  int32 rank
+                         local  int32 score
+                         local  float yards
+  849  00072A58     70  void UIHighImpactMessages::SetupUnlockedGolferMessage(const struct UIHighImpactMessages* this, enum eHighImpactMessageType messageType, int32 bonusType, int32 param2, int32 userId)
+  857  000729B8     A0  void UIHighImpactMessages::SetupUnlockedCourseMessage(const struct UIHighImpactMessages* this, enum eHighImpactMessageType messageType, int32 bonusType, int32 param2, int32 userId)
+                         local  char* courseName
+                         local  char* baseUnlockString
+  868  0007293C     7C  void UIHighImpactMessages::SetupRealTimeEventsMessage(const struct UIHighImpactMessages* this, enum eHighImpactMessageType messageType, int32 bonusType, int32 param2, int32 userId)
+  876  00072888     B4  void UIHighImpactMessages::SetupTrophyBallMessage(const struct UIHighImpactMessages* this, enum eHighImpactMessageType messageType, int32 trophyBallType, int32 param2, int32 userId)
+  887  000727FC     8C  void UIHighImpactMessages::SetupTrackingTigerMessage(const struct UIHighImpactMessages* this, enum eHighImpactMessageType messageType, int32 trackingTigerType, int32 param2, int32 userId)
+  895  000726F4    108  void UIHighImpactMessages::SetupTrackingLegendsMessage(const struct UIHighImpactMessages* this, enum eHighImpactMessageType messageType, int32 trackingLegendType, int32 param2, int32 userId)
+  918  00072684     70  void UIHighImpactMessages::SetupScenarioMessage(const struct UIHighImpactMessages* this, enum eHighImpactMessageType messageType, int32 scenarioMedal, int32 param2, int32 userId)
+  926  000DA4B8    410  void UIHighImpactMessages::SetupSkillsChallengeWinMessage(const struct UIHighImpactMessages* this, enum eHighImpactMessageType messageType, int32 param1, int32 param2, int32 userId)
+                         local  char* winnerFormat
+                         local  char* winnerBuffer
+                         local  char[32] nameBuffer
+                         local  enum PlayerNumber_t holeWinner
+                         local  char* challengeName
+                         local  void* gameModeObjectPointer
+                         local  enum GM_ModeType_t gameMode
+                         local  struct GameSkillsChallenge* skillsChallenge
+                         local  char* challengeFormat
+                         local  char* challengeBuffer
+                         local  char* distanceString
+                         local  float bestYardage
+                         inlines  GM_GetModeType
+ 1017  000DA8C8    50C  void UIHighImpactMessages::SetupMessageData(const struct UIHighImpactMessages* this, enum eHighImpactMessageType messageType, int32 param1, int32 param2, int32 userId)

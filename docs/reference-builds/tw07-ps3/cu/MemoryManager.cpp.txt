@@ -1,0 +1,78 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db_ext/2.21.04-RW-EAC/source/common/MemoryManager.cpp
+// compiled in: MemoryManager.cpp
+// 22 functions, source order. line | PS3 address | size
+
+    0  0081DD58    10C  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+    0  0081E4E0     8C  void ~BaseResourceDescriptors(const struct <anon>* this)
+    0  0081E7C4     48  void ~ResourceDescriptor(const struct <anon>* this)
+    0  0081EC50     38  void IMemoryManager(const struct IMemoryManager* this)
+   85  0081B3A0    2CC  void MemoryManager(const struct <anon>* this, int32_t maxNumPush, uint32_t maxNumThreads, struct IResourceAllocator* coreAllocator)
+                         local  struct <anon> rdInfo
+                         local  struct <anon> infoResource
+                         local  struct <anon> rdThreadTable
+                         local  struct <anon> threadTable
+  124  0081B938    1AC  void ~MemoryManager(const struct <anon>* this)
+                         local  const char[15] __FUNCTION__
+  147  0081C444    138  struct IResourceAllocator* SetAllocator(const struct <anon>* this, struct IResourceAllocator* someAllocator)
+                         local  struct <anon> lock
+                         local  int32_t threadId
+                         local  struct IResourceAllocator* oldAllocator
+  180  0081BE3C    190  struct IResourceAllocator* GetCurrentAllocator(const struct <anon>* this)
+                         local  struct <anon> lock
+                         local  struct IResourceAllocator* currentAllocator
+                         local  int32_t threadId
+                         local  int i
+  219  0081C57C    290  void PushMemInfo(const struct <anon>* this, enum MemInfoGlobal flag)
+                         local  const char[12] __FUNCTION__
+                         local  int32_t threadId
+                         local  struct Info* curInfo
+  255  0081C80C    298  void PushMemInfo(const struct <anon>* this, enum MemInfoDatabase flag, DbRef dbRef)
+                         local  const char[12] __FUNCTION__
+                         local  int32_t threadId
+                         local  struct Info* curInfo
+  293  0081CAA4    2A0  void PushMemInfo(const struct <anon>* this, enum MemInfoTable flag, DbRef dbRef, TableRef tableRef)
+                         local  const char[12] __FUNCTION__
+                         local  int32_t threadId
+                         local  struct Info* curInfo
+  329  0081CD44    274  void PopMemInfo(const struct <anon>* this)
+                         local  const char[11] __FUNCTION__
+                         local  int32_t threadId
+  468  0081D86C    238  void* Alloc(const struct <anon>* this, int32_t size, const char* fileName, int32_t lineNum)
+                         local  const char[6] __FUNCTION__
+                         local  char[512] debugInfo
+                         local  char[5] dbRefString
+                         local  char[5] tableRefString
+                         local  struct <anon> rdBuffer
+                         local  struct <anon> bufferRes
+                         local  void* buffer
+                         local  uintptr_t* buff
+  512  0081CFB8     BC  void* AllocTemp(const struct <anon>* this, int32_t size, const char* fileName, int32_t lineNum)
+  548  0081D57C    2F0  void* Realloc(const struct <anon>* this, const void* oldBuffer, int32_t oldSize, int32_t newSize, const char* fileName, int32_t lineNum)
+                         local  const char[8] __FUNCTION__
+                         local  char[512] debugInfo
+                         local  char[5] dbRefString
+                         local  char[5] tableRefString
+                         local  struct <anon> rdNewBuffer
+                         local  struct <anon> newBuffRes
+                         local  void* newBuffer
+                         local  int32_t minSize
+                         local  uintptr_t* buff
+  591  0081D074    508  void CreateLabelStrings(const struct <anon>* this, char8_t* dbRefString, char8_t* tableRefString)
+                         local  const char[19] __FUNCTION__
+                         local  struct Info* curInfo
+                         local  DbRef dbRef
+                         local  TableRef tableRef
+  681  0081DAA4    218  void PrintThreadTable(const struct <anon>* this)
+                         local  int i
+  712  0081DCBC     9C  void Free(const struct <anon>* this, const void* buffer, int32_t size)
+                         local  const void* buff
+                         local  const uintptr_t* allocAddress
+                         local  struct IResourceAllocator* localAllocator
+  736  0081C144    300  void AddAllocatorForThread(const struct <anon>* this, int32_t threadId, struct IResourceAllocator* threadAllocator)
+                         local  const char[22] __FUNCTION__
+                         local  int freeSlot
+                         local  int i
+  787  0081BFCC    178  void RemoveAllocator(const struct <anon>* this, int32_t threadid)
+                         local  int i
+  808  0081DE64     3C  static void _GLOBAL__I__ZN2EA4T3db13MemoryManagerC2EijPN2rw18IResourceAllocatorE()
+  809  0081DEA0     3C  static void _GLOBAL__D__ZN2EA4T3db13MemoryManagerC2EijPN2rw18IResourceAllocatorE()

@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/golf/texturefx/headers/texturedxtn.h
+// compiled in: other_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   52    inline-only   TextureDXTnType TextureDXTn::GetDXTnType(const struct TextureDXTn* this)
+   58    inline-only   int TextureDXTn::GetDXTnSize(int32_t width, int32_t height, TextureDXTnType type)

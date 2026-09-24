@@ -1,0 +1,7 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/spktctoh.cpp
+// compiled in: spktctoh.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    6  006DE84C     9C  int SNDPKTPLAYI_voicetopackethandle(int chan)
+                         local  SNDPACKETCHAN* pspc
+                         local  int i

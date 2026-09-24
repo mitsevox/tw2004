@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/Golf/AI/Headers/SW_ThreeButtonClick.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   16    inline-only   struct SW_ThreeButtonClick* SW_ThreeButtonClick::GetInstance()

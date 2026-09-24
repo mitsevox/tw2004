@@ -1,0 +1,18 @@
+// ../../../../../TIGERCODE/Code/Golf/Ai/Headers/AI_Core.h
+// compiled in: golf2_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   71  001E8CE4     80  void AICore::~AICore(const struct AICore* this)
+                         inlines  Singleton<AICore>::~Singleton
+   96    inline-only   bool AICore::IsPhantomAvailable(const struct AICore* this)
+  100    inline-only   float AICore::CloseEnoughSq(const struct AICore* this, bool bPinShot)
+  101    inline-only   float AICore::Gain(const struct AICore* this)
+  103    inline-only   uint32 AICore::MaxAttemptsPerShot(const struct AICore* this)
+  106    inline-only   float AICore::PuttDistMod(const struct AICore* this)
+  115    inline-only   bool AICore::ForceAccurateAI(const struct AICore* this)
+  116    inline-only   bool AICore::DebugPhantom(const struct AICore* this)
+  117    inline-only   uint32 AICore::ForceChiliDip(const struct AICore* this)
+  118    inline-only   uint32 AICore::Verbosity(const struct AICore* this)
+  119    inline-only   int AICore::GetStreakTrigger(const struct AICore* this)
+  127    inline-only   float AICore::GetBufferDistToCup(const struct AICore* this)
+  235    inline-only   struct AICore& AIMgr()

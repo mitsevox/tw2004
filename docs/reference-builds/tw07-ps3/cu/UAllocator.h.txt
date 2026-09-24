@@ -1,0 +1,11 @@
+// ../../../../../TIGERCODE/Code/Legacy/Lib/Headers/UAllocator.h
+// compiled in: apt_unity.cpp, golf2_unity.cpp, other_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   36    inline-only   MemBudgetTypeE Allocator::GetBudgetType(const struct Allocator* this)
+   45    inline-only   enum eMemoryPools Allocator::GetMemPool(const struct Allocator* this)
+   46    inline-only   TTypeAcces Allocator::GetMemType(const struct Allocator* this)
+   57    inline-only   void Allocator::SetCurrentAllocator(const const struct Allocator& allocRef)
+   58    inline-only   const struct Allocator& Allocator::GetCurrentAllocator()
+   59    inline-only   void Allocator::InvalidateCurrentAllocator()
+   65    inline-only   const struct Allocator& Allocator::GetTempAllocator(MemBudgetTypeE eBudget, enum eMemoryPools pool, TTypeAcces type, int32 align)

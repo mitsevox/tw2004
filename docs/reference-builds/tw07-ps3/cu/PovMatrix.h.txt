@@ -1,0 +1,59 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Spectator/PovMatrix.h
+// compiled in: golf2_unity.cpp
+// 25 functions, source order. line | PS3 address | size
+
+  526    inline-only   void CPovQuaternion::Set(const struct CPovQuaternion* this, const const struct CPovVector4& src)
+  712    inline-only   struct CPovVector3& CPovMatrix4x3::operator[](const struct CPovMatrix4x3* this, uint32 i)
+  718    inline-only   const struct CPovVector3& CPovMatrix4x3::operator[](const const struct CPovMatrix4x3* this, uint32 i)
+  755    inline-only   void CPovMatrix4x3::SetRotateX(const struct CPovMatrix4x3* this, float angle)
+                         local  float cs
+                         local  float sn
+  766    inline-only   void CPovMatrix4x3::SetRotateY(const struct CPovMatrix4x3* this, float angle)
+                         local  float cs
+                         local  float sn
+  777    inline-only   void CPovMatrix4x3::SetRotateZ(const struct CPovMatrix4x3* this, float angle)
+                         local  float cs
+                         local  float sn
+  844    inline-only   void CPovMatrix4x3::RotateY(const struct CPovMatrix4x3* this, float angle)
+                         local  struct CPovMatrix4x3 rot
+  853    inline-only   void CPovMatrix4x3::RotateZ(const struct CPovMatrix4x3* this, float angle)
+                         local  struct CPovMatrix4x3 rot
+  872    inline-only   struct CPovMatrix4x3& CPovMatrix4x3::operator=(const struct CPovMatrix4x3* this, const const struct CPovMatrix4x3& src)
+ 1031    inline-only   struct CPovVector3 CPovMatrix4x3::operator*(const const struct CPovMatrix4x3* this, const const struct CPovVector3& src)
+                         local  struct CPovVector3& result
+                         local  struct CPovVector3 result
+ 1042    inline-only   struct CPovVector3 CPovMatrix4x3::RotateVector(const const struct CPovMatrix4x3* this, const const struct CPovVector3& src)
+                         local  struct CPovVector3& result
+                         local  struct CPovVector3 result
+ 1078    inline-only   struct CPovVector4 CPovMatrix4x3::operator*(const const struct CPovMatrix4x3* this, const const struct CPovVector4& src)
+                         local  struct CPovVector4& result
+                         local  struct CPovVector4 result
+ 1090    inline-only   struct CPovVector4 CPovMatrix4x3::RotateVector(const const struct CPovMatrix4x3* this, const const struct CPovVector4& src)
+                         local  struct CPovVector4& result
+                         local  struct CPovVector4 result
+ 1219    inline-only   struct CPovVector4& CPovMatrix4x4::operator[](const struct CPovMatrix4x4* this, uint32 i)
+ 1224    inline-only   const struct CPovVector4& CPovMatrix4x4::operator[](const const struct CPovMatrix4x4* this, uint32 i)
+ 1265    inline-only   void CPovMatrix4x4::SetRotateX(const struct CPovMatrix4x4* this, float angle)
+                         local  float cs
+                         local  float sn
+ 1276    inline-only   void CPovMatrix4x4::SetRotateY(const struct CPovMatrix4x4* this, float angle)
+                         local  float cs
+                         local  float sn
+ 1287    inline-only   void CPovMatrix4x4::SetRotateZ(const struct CPovMatrix4x4* this, float angle)
+                         local  float cs
+                         local  float sn
+ 1354    inline-only   void CPovMatrix4x4::RotateY(const struct CPovMatrix4x4* this, float angle)
+                         local  struct CPovMatrix4x4 rot
+ 1363    inline-only   void CPovMatrix4x4::RotateZ(const struct CPovMatrix4x4* this, float angle)
+                         local  struct CPovMatrix4x4 rot
+ 1382    inline-only   struct CPovMatrix4x4& CPovMatrix4x4::operator=(const struct CPovMatrix4x4* this, const const struct CPovMatrix4x3& src)
+ 1392    inline-only   struct CPovMatrix4x4& CPovMatrix4x4::operator=(const struct CPovMatrix4x4* this, const const struct CPovMatrix4x4& src)
+ 1533    inline-only   struct CPovVector3 CPovMatrix4x4::operator*(const const struct CPovMatrix4x4* this, const const struct CPovVector3& src)
+                         local  struct CPovVector3& result
+                         local  struct CPovVector3 result
+ 1545    inline-only   struct CPovVector3 CPovMatrix4x4::RotateVector(const const struct CPovMatrix4x4* this, const const struct CPovVector3& src)
+                         local  struct CPovVector3& result
+                         local  struct CPovVector3 result
+ 1568    inline-only   struct CPovVector4 CPovMatrix4x4::operator*(const const struct CPovMatrix4x4* this, const const struct CPovVector4& src)
+                         local  struct CPovVector4& result
+                         local  struct CPovVector4 result

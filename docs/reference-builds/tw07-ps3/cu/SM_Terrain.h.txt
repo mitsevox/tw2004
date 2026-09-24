@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_Terrain.h
+// compiled in: shader_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   23  00520E70     18  void SM_TerrainClass::~SM_TerrainClass(const struct SM_TerrainClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base

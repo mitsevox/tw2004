@@ -1,0 +1,40 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Shared/SafeString.cpp
+// compiled in: other_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   33  003E6280     C0  static void VerifyString(const char* _filename, int _lineNum, const char* destStr, int destBufLen, const char* srcStr, va_list args, int explicitNCharsToCopy)
+                         local  char[2048] tempBuf
+                         local  int nCharsToWrite
+   57  003E6340     F0  static void VerifyNoSrcDstPointerOverlapp(const char* _filename, int _lineNum, const char* destPtr, size_t bufLen, const char* srcPtr, va_list args)
+                         local  int srcPtrLen
+   81  003E7734    17C  void sfReplaceInString(char* dst, size_t bufLen, const char* src, const char* search, const char* replace)
+                         local  size_t i
+                         local  size_t d
+                         local  size_t len
+                         local  size_t slen
+                         local  size_t rlen
+  108  003E6C64     E4  void _sfstrcpy(const char* _filename, int _lineNum, char* dest, const char* src, size_t bufLen)
+  128  003E6934     F0  void _sfstrncpy(const char* _filename, int _lineNum, char* dest, const char* src, int nCharsToCopy, size_t bufLen)
+  148  003E78B0     C4  void _sfstrcat(const char* _filename, int _lineNum, char* dest, const char* src, size_t bufLen)
+  165  003E7D84     D0  void _sfstrncat(const char* _filename, int _lineNum, char* dest, const char* src, int nCharsToCopy, size_t bufLen)
+  182  003E6430     E8  void _sfvsnprintf(const char* _filename, int _lineNum, char* dest, size_t bufLen, const char* fmtStr, va_list args)
+                         local  va_list args_temp
+                         local  int nChars
+  238  003E6518     58  void sfsnprintf(char* dest, size_t bufLen, const char* fmtStr)
+                         local  va_list args
+  247    inline-only   static const char* GetArg(va_list ap, int argIndex)
+                         local  const char* pRet
+                         local  int i
+  257    inline-only   static bool IsDigit(char ch)
+  276  003E7E54    21C  void sfflexprintf(char* dest, size_t bufLen, const char* fmtStr)
+                         local  va_list argList
+                         local  int curDestPos
+                         local  int argNum
+                         local  const char* argStr
+                         local  int len
+                         local  const char* filename
+                         local  int lineNum
+                         inlines  GetArg
+  338  003E8070    130  char* strtok_s(char* strToken, const char* strDelimit, char** context)
+                         local  char* start
+                         local  char* end

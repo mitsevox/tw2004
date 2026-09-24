@@ -1,0 +1,9 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/quick_spu/dev-football/include/quick_spu/ppu/managerplat.h
+// compiled in: managerplat.cpp
+// 3 functions, source order. line | PS3 address | size
+
+  439  008DF5C8      8  uint32_t GetCurrentChannelCount(const struct <anon>* this)
+  444  008DF5D0      8  uint32_t GetMaxChannelCount(const struct <anon>* this)
+  603    inline-only   struct <anon> MakeJobInstanceHandle(const struct <anon>* this, uint32_t nJobInstanceIndex, uint8_t nJobAffinity)
+                         local  struct <anon> retValue
+                         local  struct <anon> retValue

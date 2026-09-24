@@ -1,0 +1,141 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/GoSelfShadow.c
+// compiled in: golf_unity.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   99  002BACF4    154  static void GoSelfShadow_MakeLightProjMatrix(const mat44flt& lightProjTexMatrix, const float* lightDir, const float* ptLookAtWorld, float shadowModelSize)
+                         local  float lightNearZ
+                         local  float objectSize
+                         local  float lightFarZ
+                         local  float orthoDims
+                         local  vec4flt ptLightOrigin
+                         local  const float fTexOffsetX
+                         local  const float fTexOffsetY
+                         local  mat44flt matTexScaleBias
+                         local  vec4flt vLightUpVec
+                         inlines  LLMath_AddScale3, vec_madd
+  148  002BAE48     B0  void ShadowMapGenerator::SetupTransforms(const struct ShadowMapGenerator* this, const float* lightDir, const float* ptLookAtWorld, float shadowModelSize, float distToCam)
+                         inlines  LLMath_CopyMat44, vec4flt_Copy, vec_ld, vec_st
+  166  00227954     10  void ShadowMapGenerator::Create(const struct ShadowMapGenerator* this, int32 size)
+  173  00227964     E0  void GoSelfShadow_InitModule(struct CharTexController* pControllerArray, uint32 numControllers)
+                         local  uint32 i
+                         local  TextureFormat texFormat
+                         local  TextureOptions options
+  197  00227A44     A4  void GoSelfShadow_CloseModule(struct CharTexController* pControllerArray, uint32 numControllers)
+                         local  uint32 i
+  210    inline-only   static void GoSelfShadow_SetShadowMappingState()
+                         local  uint8 shadowMapAlphaTestValue
+  225    inline-only   static void GoSelfShadow_RestoreDefaultState()
+  235    inline-only   static void GoSelfShadow_CalculateDynamicBiasAndSlope(float sphRadius, float distToCam, float* pNewBias, float* pNewSlopeScale)
+                         local  float clampedRad
+                         local  float interpRad
+                         local  float clampedDist
+                         local  float interpDist
+                         local  float interpolant
+                         local  float newBias
+                         local  float newSlope
+  255  003018E0    A10  static void GoSelfShadow_RenderCharIntoShadowMap(struct TCharacter* pCharacter, struct RC_SRenderCtx* pRenderCtx, float* vLightDir, bool bIsFrontEnd)
+                         local  mat44flt* pCharModelMatrix
+                         local  vec4flt ptLookAtWorld
+                         local  float shadowModelSize
+                         local  float distToCam
+                         local  float newBias
+                         local  float newSlope
+                         local  bool bLastUseDynamic
+                         local  float sInitialShadowMapBias
+                         local  float sInitialShadowSlopeScaleBias
+                         local  const uint32 cFlags
+                         local  int32 geom
+                         local  int32 geom
+                         local  float[8][4] boxCorners
+                         local  vec4flt boxCorner
+                         local  mat44flt lightWorldProjTexMatrix
+                         local  const float projCenterX
+                         local  const float projCenterY
+                         local  float maxDistX
+                         local  float maxDistY
+                         local  float maxDist
+                         local  int32 i
+                         local  float distX
+                         local  float distY
+                         local  const float biasScale
+                         local  const TGeomBV* pGeomBV
+                         local  struct SSphere sphere
+                         local  enum ClipTest clipTest
+                         local  vec4flt newBBMin
+                         local  vec4flt newBBMax
+                         local  const TGeomBV* pGeomBV
+                         inlines  Character_GetBoneMatrix, Gcm::cellGcmSetPolygonOffset, Gcm::cellGcmSetPolygonOffsetFillEnable, GoSelfShadow_CalculateDynamicBiasAndSlope, GoSelfShadow_GetCharacterBoundingVolumeForShadowmap, GoSelfShadow_RestoreDefaultState, GoSelfShadow_SetShadowMappingState, LLMath_DistanceBetween3, LLMath_MaxVec4, LLMath_MinVec4, SFrustum::makeAABB, __vec_len_sqr3, clampf, lerpf, vec4flt_Copy, vec_madd, vec_max, vec_min, vec_perm, vec_sld, vec_st
+  367  003023A8     B8  void GoSelfShadow_RenderCharIntoShadowMapWithDefaultSun(struct TCharacter* pCharacter, struct RC_SRenderCtx* pRenderCtx)
+  376  003022F0     B8  void GoSelfShadow_RenderCharIntoShadowMapWithDefaultSunFE(struct TCharacter* pCharacter, struct RC_SRenderCtx* pRenderCtx)
+  385  002BC338    380  void GoSelfShadow_SetupToRenderWithShadowMap(struct CharTexController* pTexController)
+                         local  mat44flt_p* pMatLightWVPTex
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         inlines  RNADebugBreak, ScopeParmC::Set<RNA::TextureC*>, ScopeParmC::Set<RNAMath::RNAMatrix44>
+  416  002FE478    280  void DEBUG_DrawLightFrustum()
+                         local  float[8][4] _bbox
+                         local  vec4flt _bbox_color
+                         local  float[8][4] _bbox_xform
+                         local  int32[24] _bbox_lines
+                         local  mat44flt xInverse
+                         local  float[24][4] line
+                         local  int32 iLine
+                         local  int32 iV0
+                         local  int32 iV1
+                         local  vec4flt _sph_color
+                         local  float[2][4] lightVec
+                         local  vec4flt _light_color
+                         inlines  DS_vSetAlphaBlendingFunction, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, LLMath_AddScale, PR_vSetCurrentColor, PR_vSetCurrentUsage, __vec_make_from_scalar, vec4flt_Copy, vec_ld, vec_madd, vec_st
+  521    inline-only   static void GoSelfShadow_GetCharacterBoundingVolumeForShadowmap(struct TCharacter* pCharacter, struct RC_SRenderCtx* pRenderCtx, float* vLightDir, vec4flt* pSphereCenter, float* pSphereRadius, float* pDistToCam)
+                         local  vec4flt geomMin
+                         local  vec4flt geomMax
+                         local  struct SFrustum frustum
+                         local  int32 numVisibleGeoms
+                         local  struct TSkin* pSkin
+                         local  struct SSphere sphere
+                         local  vec4flt visCenter
+                         local  int32 geom
+                         local  const TGeomBV* pGeomBV
+                         local  struct SSphere sphere
+                         local  enum ClipTest clipTest
+                         local  vec4flt newBBMin
+                         local  vec4flt newBBMax
+                         local  int32 geom
+                         local  const TGeomBV* pGeomBV
+                         local  float[8][4] boxCorners
+                         local  vec4flt boxCorner
+                         local  mat44flt lightWorldProjTexMatrix
+                         local  const float projCenterX
+                         local  const float projCenterY
+                         local  float maxDistX
+                         local  float maxDistY
+                         local  float maxDist
+                         local  int32 i
+                         local  float distX
+                         local  float distY
+  688  00262F48    294  void GoSelfShadow_Debug_ShowInfo()
+                         local  float clampedRad
+                         local  float interpRad
+                         local  float clampedDist
+                         local  float interpDist
+                         local  float interpolant
+                         local  float newBias
+                         local  float newSlope
+                         local  const uint32 cMaxDebugString
+                         local  char[128] shadowInfo
+                         local  char[128] shadowParams
+                         local  struct RC_SRenderCtx* pRenderContext
+                         local  VM_SViewport* pViewport_m
+                         local  float x
+                         local  float y
+                         local  FO_EAddMode oldMode
+                         inlines  clampf, lerpf
+  733  0029C204     84  void GoSelfShadow_Debug_ShowShadowMap(struct CharTexController* pTexController)
+                         local  const float cOffset
+                         local  const float cSize
+                         local  vec4flt dstRect
+  751  00227AE8    320  void TuneShadow()
+                         local  int characterId
+                         local  int parentId

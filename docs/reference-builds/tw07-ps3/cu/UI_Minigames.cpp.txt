@@ -1,0 +1,48 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_Minigames.cpp
+// compiled in: apt_unity.cpp
+// 31 functions, source order. line | PS3 address | size
+
+   69  000FA798     8C  void UIMinigames::UIMinigames(const struct UIMinigames* this)
+                         inlines  AptStaticCharBuffer<64u>::AptStaticCharBuffer
+   80  000D00B8     64  void UIMinigames::Init(const struct UIMinigames* this)
+   89  0004CFCC     24  void UIMinigames::Show(const struct UIMinigames* this)
+   94  0004CFF0     38  void UIMinigames::Hide(const struct UIMinigames* this)
+  100  0004D028     50  void UIMinigames::OnShow(const struct UIMinigames* this)
+  105  0004D488     7C  enum TAptSequenceStatus UIMinigames::QueueShowText(const struct UIMinigames* this, bool inbFirstTime, void* inData)
+                         local  enum MG_txtField field
+  117  0004D09C     AC  bool UIMinigames::StoreTextField(const struct UIMinigames* this, enum MG_txtField field, char* text)
+                         local  bool result
+  134  0004D078     24  void UIMinigames::ClearTextField(const struct UIMinigames* this, enum MG_txtField field)
+  140  0004D148     5C  enum eAptHandleInput UIMinigames::HandleInput(const struct UIMinigames* this, int32 cID)
+  155  00058430     48  enum TAptSequenceStatus UIMinigames::DelayGhostSequence(const struct UIMinigames* this, bool inbFirstTime, void* inData)
+  166  000D0014     A4  void UIMinigames::GhostMinigamesHUD(const struct UIMinigames* this)
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+  181  0005869C     5C  void UIMinigames::UnGhostMinigamesHUD(const struct UIMinigames* this)
+  191  00058690      C  void UIMinigames::Activate(const struct UIMinigames* this)
+  198  0004D2C4      8  void UIMinigames::SetGameMode(const struct UIMinigames* this, enum MG_GameMode mode)
+  204  0004D1A4     48  void UIMinigames::BuildCustomOpenScreenSequence(const struct UIMinigames* this)
+  210  0004D2A0     24  enum TAptSequenceStatus UIMinigames::SetGameModeFlashStateSequence(const struct UIMinigames* this, bool inbFirstTime, void* inData)
+  216  0004D250     50  void UIMinigames::SetGameModeInFlash(const struct UIMinigames* this)
+                         local  char* tempBuf
+  225  0004D1EC     64  char* UIMinigames::LookUpGameModeLabel(const struct UIMinigames* this, enum MG_GameMode mode)
+                         local  int32 i
+  240  00058478     FC  void UIMinigames::ShowText(const struct UIMinigames* this, enum MG_txtField field, char* text)
+                         local  bool result
+  262  0004D3C0     5C  void UIMinigames::HideText(const struct UIMinigames* this, enum MG_txtField field)
+  269  0004D41C     6C  void UIMinigames::ShowTextField(const struct UIMinigames* this, enum MG_txtField field, char* text)
+                         local  char* tempBuf
+  276  0004D330     90  void UIMinigames::HideTextField(const struct UIMinigames* this, enum MG_txtField field)
+                         local  char* tempBuf
+  288  00058574    11C  void UIMinigames::ShowAllBufferedText(const struct UIMinigames* this)
+                         local  int32 i
+  313  0004D2CC     64  char* UIMinigames::LookUpTextFieldLabel(const struct UIMinigames* this, enum MG_txtField field)
+                         local  int32 i
+  327  000586F8     EC  void UIMinigames::ClearAllText(const struct UIMinigames* this, bool hide)
+                         local  int32 i
+  340  0004CF7C     50  void UIMinigames::Reset(const struct UIMinigames* this)
+                         local  int32 i
+  357  0004D504     58  void UIMinigames::ShowBallTarget(const struct UIMinigames* this)
+  366  0004D55C     58  void UIMinigames::HideBallTarget(const struct UIMinigames* this)
+  375  0006A754     48  void UIMinigames::SetTargetText(const struct UIMinigames* this, char* text)
+  381  0004D5B4     18  void UIMinigames::ClearTargetText(const struct UIMinigames* this)
+  387  0004D5CC     58  void UIMinigames::SetTargetBG(const struct UIMinigames* this, bool isValid)

@@ -1,0 +1,13 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/build/Buildable-Packages/OSDK/2.06.04/ps3-gcc-rw-dev-opt/build/source/BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 4 functions, source order. line | PS3 address | size
+
+    0  005EEB30     10  static void __tcf_0()
+                         inlines  ~cOsdkBase
+    0  005F6C78    1C4  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         local  uint32_t uIndex
+                         inlines  CellComparatorNumber, CellComparatorString, RCPointer, RecentPlayers, ~CellComparatorNumber, ~CellComparatorString, ~RCPointer, ~RecentPlayers
+    0  00625F34     38  void ~ActionComparator(const struct <anon>* this)
+                         inlines  ~TemplateComparator
+    0  0062A4D8      C  void ~LobbyCategoryComparator(const struct <anon>* this)
+                         inlines  ~TemplateComparator

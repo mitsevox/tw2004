@@ -1,0 +1,54 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/Geom/twProp.cpp
+// compiled in: golf_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   27  0022AF58     14  void PropMesh::Init(const struct PropMesh* this)
+   32  0022AF74     68  void PropMesh::Term(const struct PropMesh* this)
+   47  0022B37C    13C  void PropMesh::CreateRenderBuffers(const struct PropMesh* this)
+                         local  int32 numVertices
+                         local  int32 numIndices
+                         local  const uint32 cActiveMicroMeshes
+                         local  uint32 microMesh
+                         local  const twMicroMesh* pMMesh
+                         local  const twMicroMesh* pMMesh
+                         local  const uint32 vtxDataSize
+   91  0022B11C    164  void PropMesh::UpdateVB(const struct PropMesh* this)
+                         local  struct TWPROP_VERTEX* pVertices
+                         local  struct TWPROP_VERTEX* pV
+                         local  const twMesh* pMesh
+                         local  uint32 numVertices
+                         local  uint32 microMesh
+                         local  const twMicroMesh* pMMesh
+                         local  const twRigidVert* pRigidVerts
+                         local  uint32 v
+                         local  const twRigidVert* pRV
+                         inlines  TWPROP_VERTEX::Set
+  127  0022B280     FC  void PropMesh::UpdateIB(const struct PropMesh* this)
+                         local  uint16* pIndices
+                         local  uint16* pIdx
+                         local  const twMesh* pMesh
+                         local  const uint32 cActiveMicroMeshes
+                         local  uint32 numIndices
+                         local  uint32 microMesh
+                         local  const twMicroMesh* pMMesh
+                         local  const uint16* pMeshIndices
+                         local  uint32 i
+  160  0022B538     54  void PropMesh::Render(const struct PropMesh* this)
+  183  0024D398     7C  void PropGeom::Init(const struct PropGeom* this)
+                         inlines  LLMath_IdentifyMat, vec_st
+  189  0022AFDC     B0  void PropGeom::Term(const struct PropGeom* this)
+                         local  uint32 mesh
+  203  0024D414    1B8  void PropGeom::CreateFromGeom(const struct PropGeom* this, twGeom* pGeom)
+                         local  const char[15] __FUNCTION__
+                         local  const int32 cGeomAlignment
+                         local  uint32 dataSize
+                         local  uint8* pAllocatedData
+                         local  uint8* pData
+                         local  struct PropMesh* pPropMeshes
+                         local  uint32 mesh
+                         inlines  TagValuePair, operator+
+  228  0022B4B8     80  void PropGeom::CreateRenderBuffers(const struct PropGeom* this)
+                         local  uint32 mesh
+  237  0022B58C     90  void PropGeom::Render(const struct PropGeom* this)
+                         local  uint32 mesh
+                         local  struct PropMesh* pPropMesh

@@ -1,0 +1,69 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLTexture.c
+// compiled in: Legacy_unity.cpp
+// 19 functions, source order. line | PS3 address | size
+
+   11  003CADFC    164  void TX_Init()
+                         local  int format
+                         local  struct TextureFormatNative nativeFormat
+   62  003CAF60     98  void TX_Reset()
+                         local  TextureRef ref
+                         local  struct TextureInfoNative* info
+                         inlines  TX_GetNativeTextureInfo
+   75  003CAFF8     6C  void TX_Shutdown()
+  113  003BCCF0    1D4  void TX_SetTexture(uint32 sampler, TextureRef ref)
+                         local  struct TextureInfoNative* info
+                         inlines  TX_GetNativeTextureInfo
+  172  0037ECBC     50  bool TX_TextureIsInASampler(TextureRef ref)
+                         local  uint32 i
+  185  003BD030     6C  void TX_ResetSamplers()
+                         local  uint32 i
+  196  003BE690    130  void TX_UnSetTexture(TextureRef ref, int checkSamplers, int checkRenderTargets)
+                         local  int i
+                         local  int i
+  225  003C1B74    248  bool TX_Free(TextureRef ref, bool keepReserved)
+                         local  struct TextureInfoNative* info
+                         inlines  TX_GetNativeTextureInfo
+  285  003BA5AC    1A8  void TX_TextureGetLayerSize(TextureRef ref, uint16 layer, uint16* width, uint16* height)
+                         local  struct TextureInfoNative* info
+                         inlines  TX_GetNativeTextureInfo, TX_TextureIsAllocated
+  302  003BA88C    16C  void TX_TextureWasRenderedInto(TextureRef ref)
+                         local  struct TextureInfoNative* info
+                         inlines  TX_GetNativeTextureInfo, TX_TextureIsAllocated
+  320  003C070C    278  int32 TX_ReplaceTextureLayerContents(TextureRef ref, uint32 layer, uint32 dataSize, void* data, bool DirectVRAMUpload)
+                         local  struct TextureInfoNative* info
+                         local  struct TextureLockInfo lockInfo
+                         inlines  TX_GetNativeTextureInfo
+  369  003C1100    1FC  int32 TX_ReplaceTextureContents(TextureRef ref, uint32 dataSize, void* data, bool DirectVRAMUpload)
+                         local  struct TextureInfoNative* info
+                         local  char* curData
+                         local  uint32 sizeLeft
+                         local  int i
+                         local  uint32 bytesUsed
+                         inlines  TX_GetNativeTextureInfo
+  402  003B7200    198  TextureRef TX_ReserveTexture(TextureOptions options, TextureRef wantTexture)
+                         local  TextureRef ref
+                         local  struct TextureInfoNative* info
+                         inlines  TX_GetNativeTextureInfo
+  441  003C0984    2C8  TextureRef TX_AllocTexture(TextureFormat format, TextureOptions options, uint32 width, uint32 height, int32 numLayers, TextureRef reservedTexture)
+                         local  TextureRef ref
+                         local  struct TextureInfoNative* info
+                         local  int w
+                         local  int h
+                         local  int i
+                         inlines  TX_GetNativeTextureInfo
+  517  003B7398    1A4  void TX_ChangeOptions(TextureRef ref, TextureOptions options)
+                         local  struct TextureInfoNative* info
+                         local  TextureOptions filter
+                         local  TextureOptions edge
+                         inlines  TX_GetNativeTextureInfo
+  572  003C29C4     B8  TextureRef TX_LoadTexture(TextureFormat format, TextureOptions options, uint32 width, uint32 height, int32 numLayers, uint32 dataSize, void* data, TextureRef reservedTexture)
+                         local  TextureRef ref
+                         local  int32 bytesUsed
+  589  003BE7C0    40C  int TX_LockTexture(TextureRef ref, TextureLockMode access, uint32 layer, struct TextureLockInfo* lockInfo)
+                         local  struct TextureInfoNative* info
+                         inlines  TX_GetNativeCubemapLayer, TX_GetNativeTextureInfo
+  665  003BC398    184  void TX_UnlockTexture(const struct TextureLockInfo* lockInfo)
+                         local  struct TextureInfoNative* info
+                         inlines  TX_GetNativeTextureInfo
+  721  003B753C     B4  const TextureInfo* TX_GetTextureInfo(TextureRef ref)
+                         inlines  TX_GetNativeTextureInfo

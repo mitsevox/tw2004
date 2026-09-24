@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/Headers/dxtnpixelcache.h
+// compiled in: other_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   30  00400D90     AC  void DXTnPixelCache::DXTnPixelCache(const struct DXTnPixelCache* this, const const struct Allocator& refAlloc, int32_t textureHeight, int32_t textureWidth)
+   31  003D0090     34  void DXTnPixelCache::~DXTnPixelCache(const struct DXTnPixelCache* this)

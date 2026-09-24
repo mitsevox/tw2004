@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNARender/RNAStream.h
+// compiled in: RNABuilder.cpp, RNADevicePlat.cpp, RNAMesh.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   45    inline-only   struct StreamPlatC& StreamC::GetPlatform(const struct StreamC* this)
+   56    inline-only   int32_t StreamC::GetNumVertices(const const struct StreamC* this)
+   57    inline-only   int32_t StreamC::GetStride(const const struct StreamC* this)
+   58    inline-only   VertexElementMaskT StreamC::GetElementMask(const const struct StreamC* this)

@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/LL/Headers/LLPrims.h
+// compiled in: Legacy_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+  122    inline-only   void PR_vSetCurrentUsage(enum PR_EUsage eUsage_p)
+  137    inline-only   void PR_vSetDefaultCurrentColor()
+  150    inline-only   void PR_vSetCurrentColor(const float* xColor_p)
+  174    inline-only   void PR_vSetCurrentTexture(const TextureRef texRef)
+  189    inline-only   void PR_vFillVerticesWith2DRect(vec4flt* xpVertices_p, vec4flt* xpUVs_p, float fRectLeft_p, float fRectTop_p, float fRectRight_p, float fRectBottom_p)

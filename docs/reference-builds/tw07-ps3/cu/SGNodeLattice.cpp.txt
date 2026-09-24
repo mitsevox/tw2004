@@ -1,0 +1,48 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/scenegraph/source/SceneGraph/Runtime/Nodes/SGNodeLattice.cpp
+// compiled in: SGNodeLattice.cpp
+// 15 functions, source order. line | PS3 address | size
+
+    0  008C411C    140  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  SGNodeLatticeInfoC::SGNodeLatticeInfoC, SGNodeLatticeInfoC::~SGNodeLatticeInfoC
+    0  008C6E74      C  void SGNodeLatticeInfoC::~SGNodeLatticeInfoC(const struct SGNodeLatticeInfoC* this)
+                         inlines  ~SGNodeInfoC
+   49  008C6EBC     88  struct SGNodeC* SGNodeLatticeInfoC::Create(const const struct SGNodeLatticeInfoC* this)
+                         inlines  operator new
+   50  008C680C      8  const char* SGNodeLatticeInfoC::GetNodeTypeName(const const struct SGNodeLatticeInfoC* this)
+   51    inline-only   NodeType_t SGNodeLatticeInfoC::GetNodeTypeEnum(const const struct SGNodeLatticeInfoC* this)
+   61  008C4D88    23C  void Reset(const struct <anon>* this)
+                         local  uint32_t flags
+                         inlines  Clear
+   72  008C4FC4    124  void SGNodeLatticeC(const struct <anon>* this)
+                         inlines  Init, RNADebugBreak, Vector
+   84  008C4648    298  void ~SGNodeLatticeC(const struct <anon>* this)
+                         inlines  operator delete, ~Vector
+  110  008C520C    C08  struct SGNodeC* Clone(const struct <anon>* this, bool8_t recurse, NodeCloneUserDataCallback userDataCallback, struct SGNodeC* baseClone)
+                         local  const char[6] __FUNCTION__
+                         local  struct <anon>* clone
+                         inlines  Clear, Destroy, GetFFDPoints, Init, RNADebugBreak, SGNodeC::GetNodeTypeEnum, SetFFDPoints, SetGeomPtr, operator new, ~Vector
+  139  008C4114      8  const struct SGNodeInfoC* GetNodeInfo(const const struct <anon>* this)
+  145  008C410C      8  const struct SGNodeInfoC* _GetNodeInfo()
+  152  008C5E14    9F8  void SerializeIn(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[12] __FUNCTION__
+                         local  int32_t version
+                         local  int32_t inS
+                         local  int32_t inT
+                         local  int32_t inU
+                         local  int32_t s
+                         local  int32_t idx
+                         local  int32_t i
+                         local  int32_t t
+                         local  int32_t u
+                         inlines  Construct, Destroy, Init, RNADebugBreak, Resize, Vector, operator[], ~Vector
+  189  008C427C    3CC  void SerializeOut(const const struct <anon>* this, const struct OutStreamC& out)
+                         local  const char[13] __FUNCTION__
+                         local  int32_t inS
+                         local  int32_t inT
+                         local  int32_t inU
+                         local  int32_t s
+                         local  int32_t t
+                         local  int32_t u
+                         inlines  RNADebugBreak, operator[]
+  224  008C426C     10  static void _GLOBAL__I__ZN6SceneX14SGNodeLatticeC16s_ClassAllocatorE()
+  225  008C425C     10  static void _GLOBAL__D__ZN6SceneX14SGNodeLatticeC16s_ClassAllocatorE()

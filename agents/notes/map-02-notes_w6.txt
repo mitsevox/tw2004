@@ -1,0 +1,65 @@
+map-02 link wave (wave5, 2026-09-24 from 11:55 CDT). Units: LLDisp_Gc .. char. Tried lists for the next lane.
+
+DONE
+- LLObj_Gc fn_800073B4 exact -> LLObj_Gc LINKED: the pData parameter is itself the running cursor
+  (address taken, passed as &pData); a local pStart = pData keeps the start, then pData = pStart + 8
+  (`pData += 8` after the copy: 4 diffs). Range added: .data 0x80186768-78 (.sdata2 was already there).
+- StaticMemory fn_80009E70 exact -> StaticMemory LINKED: in the last else, a block-scoped
+  `s32* pEnd = pSpan + 1;` then `if (nEnd == pSpan[1])` (compare through pSpan, store `*pEnd = nStart`,
+  memmove source pEnd). pEnd at function level: 2; `nEnd == *pEnd`: 2. Ranges: .data 0x80186810-28,
+  .sbss 0x80281BB0-D8.
+- LLFileIO_Gc fn_800065C8 exact: decls info, uSize, nLen, nEntry, pData, nStatus, bRetry; the allocation
+  takes nLen (not uSize); the status wait `if (nStatus == 0) break; bRetry = fn_800B7490();` inside the
+  do/while(nStatus != 0) (marked fake match).
+- char fn_8001F110 98.59 -> 98.85: second loop's own pRecord2 (mtalib twin). Left: pLib / pnSize / nOffset
+  registers rotated (orig pLib r31, nOffset r30, pnSize r29). Tried: decl climbs from 3 starts, int nOffset,
+  pDst = pSrc, if (pnSize), chained pRecords assign, nOffset + pLib, uptr add: all 25 (quicktrial aligned).
+
+- ska_shared fn_8001FCF4 90.0 -> 97.6: aFree kept on the stack by writing the search loop through
+  `pFree = aFree` (marked fake match), pChar->buffers[*pSlot].p0C/.p10 = ...pBuf written out (no pBuf
+  local), pBone = &pPose->aBones[i] per track (no pBone++ / continue walker), decl order from a climb
+  (pRot first, pBone after pB14, pRange after nNext). aTmp[8] adds 0.04 (not applied: size unknown).
+  Left: nKey/nNext and pChar registers (orig pChar r17, nKey r25, nNext r23).
+- UStream UStream_Update 98.76 -> 99.89: `pStream = gStreams; pStream += gnCurStream;` keeps the element
+  address in a saved reg across fn_800A4BDC (with &gStreams[n] CW keeps the index and re-adds after
+  the call); i declared second. Left: mulli/base temps r4/r0 vs r0/r3. Tried: &gStreams[0], pStream =
+  pStream + n, &pStream[n], i = n copy (2 places), (s32)/(u32) index: all 99.89.
+- LLTex fn_8000EA1C 98.88 -> 98.93: case 2 as `a = *pCode; pCode++; a += 0x80;`, abs sign in a local
+  (`nSign = nRand >> 31; b = (nSign + nRand) ^ nSign`). Left: a/b zero li/mr (7 init forms: no), case 4
+  temps (4 spellings: no).
+
+TRIED, NO GAIN
+- LLDisp_Gc fn_80006A98 (18 diffs; orig computes the size in r6 and copies it to r30 with mr late):
+  index local for [1], void** local, 2-step loop, copy var uArg at 4 positions x 3 decl orders (for the
+  call / the arena), u16/u32 width local, (u16) casts, pMode pointer local (2 places), uptr locals,
+  size first, pHi local; GC 1.3.2/2.0/2.0p1/2.5/2.6/2.7 all 18.
+- ska_shared fn_8001FCF4 (aFree is on the stack in the orig at 0x10/0x14, aSlot 0x18; ours keeps aFree in
+  r26/r27; frame 0xC0 vs 0xA0): pBone = &pPose->aBones[i] per iteration (no continue pBone++) 324 -> 311
+  aligned and aTmp[8] -> 301 (orig's frame is bigger); `aSlot[i] = aSlot[0]` in the search loop -> 270.
+  aFree[3], *aFree forms: no. Not applied (still far).
+- Skin fn_800368FC (orig computes n*4 into its own reg r20 BEFORE the first swap call): n4/n8 locals at
+  3 places, `pSrc = pData += n * 8`: no gain (38 -> 38..48).
+- DepthField DF_vDrawBufferToScreen (orig reloads the clamp's 1.0f with lfs instead of reusing f30; the
+  result goes to f0): clamp arg literal forms (0/1/1.0/(f32)1.0), clamp bodies (<=, !(>), if/return,
+  local r) x param types f32/f64 x fZ f32/f64 x arg aXY/fZ: best 51 aligned (all f64 params) vs 79 base,
+  not applied (objdiff not checked). A separate depth temp (fDepth) before 1.0f - fDepth: 79. Permuter
+  15 min: nothing real (its 550 output reuses fX0, a behaviour change).
+- LLFileIO_Gc File_ReadAsyncEx 93.8 -> 99.55 (APPLIED): `pQueue = lbl_8019E868; pQueue += nPrio;
+  pQueue->nCount++;`. Left: base/element regs r4/r5 swapped. Tried (quicktrial, all 6 aligned): pQueue
+  at every decl position and block-scoped x 6 spellings (&[0], = p + n, &p[n], (int), += 1), the update
+  placed at every point among the pReq stores, base-pointer + second pQ, nPrio + base, final sum 3
+  spellings. Before: (&lbl[n])->, lbl + n, ++x, += 1, (int)/(u32) index, byte cast, &lbl[n] local: no.
+  Permuter 8 min: best output (30) reads the final sum through the moved pQueue (a behaviour change), no fix.
+- Skin fn_800368FC: `n4 = n * 4` before the 0x30 branch's first swap gets the orig's early slwi into r20
+  but shifts the other registers (47); decl climb with n4: 39 vs 38 base. Not applied.
+- ska_shared fn_8001FCF4 permuter: ~3 min at 97.6, only a pSlot/pFrame decl swap (no objdiff change);
+  stopped early to give the slot to File_ReadAsyncEx.
+- streammanagerhole fn_80015540: RenderState* pState for the first block + p100/p104 (4 mixes): 3 (CW
+  normalises them all).
+- LLTex TX_spParseTextureGroupFromStream: parameter copy / p = p + n / pHead-based advance: no (111+).
+- char fn_80019DE8: nModel index local, void** base, *(a + n), zero-arg local, model read after the
+  call; GC 1.3.2..2.7: 22 (29 on 1.3.2).
+- TerrainData fn_8000C278: permuter 15 min, no improvement.
+- Golfer Session_SetupProfiles (unrolled name copy scheduling): SaveProfile* / u64* locals, (gp + n)->,
+  pSession->, count-down loop: none better than 14.
+- char Character_SetupForShot: all 360 orders of the 6 head statements: 16 stays (as map-09).

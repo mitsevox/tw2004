@@ -1,0 +1,8 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/smixhip.cpp
+// compiled in: smixhip.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    8  006E1350    194  void MIX_sethighpass(int voice, int cutofffreq)
+                         local  SNDMIXVOICE* psmv
+                         local  FIXED24P8[2] params
+                         inlines  FToI::Fast, GetSampleRate, SNDMEMI_alloc, SNDMEMI_free

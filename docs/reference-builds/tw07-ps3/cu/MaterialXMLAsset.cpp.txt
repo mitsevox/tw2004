@@ -1,0 +1,23 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Rna/Asset/Common/MaterialXMLAsset.cpp
+// compiled in: rnaunity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   59  004E7D54     5C  void MaterialXMLAssetC::MaterialXMLAssetC(const struct MaterialXMLAssetC* this, struct AssetMgrC* pAssetMgr, const char* pFilePath, MemBudgetTypeE budget, enum eMemoryPools memPool, uint32_t type)
+   65  004D3030     BC  void MaterialXMLAssetC::~MaterialXMLAssetC(const struct MaterialXMLAssetC* this)
+                         local  int32_t refsRemaining
+   81  004F748C    17C  bool MaterialXMLAssetC::Load(const struct MaterialXMLAssetC* this)
+                         local  uint32_t uFileSize
+                         local  void* pXMLData
+                         local  struct DeviceC* pDevice
+                         inlines  operator new
+  134  004C92A8     1C  bool MaterialXMLAssetC::IsLoaded(const const struct MaterialXMLAssetC* this)
+  140  004D2F54     DC  void MaterialXMLAssetC::Unload(const struct MaterialXMLAssetC* this)
+  165  004C92C4      4  void MaterialXMLAssetC::Print(const struct MaterialXMLAssetC* this)
+  172  004C92C8      4  void MaterialXMLAssetC::MenuPrint(const struct MaterialXMLAssetC* this, const char8_t* pLinePrefixTabString)
+  183  004EE1A8    1D0  void MaterialXMLAssetMgrC::MaterialXMLAssetMgrC(const struct MaterialXMLAssetMgrC* this)
+                         inlines  Clear, Copy, RNADebugBreak, String, operator=, ~String
+  191  004EE548     9C  struct MaterialXMLAssetMgrC* MaterialXMLAssetMgrC::GetInstance()
+  200  004C92CC     6C  void MaterialXMLAssetMgrC::DestroyInstance()
+  208  004E7DB0     68  struct MaterialXMLAssetC* MaterialXMLAssetMgrC::CreateNew(const struct MaterialXMLAssetMgrC* this, const char* pFilePath)
+  216  004EE5E4     44  struct MaterialListC* MaterialXMLAssetMgrC::ResolveMaterialList(const struct MaterialXMLAssetMgrC* this, const char* pFilePath)
+                         local  struct MaterialXMLAssetC* pMaterialXMLAsset

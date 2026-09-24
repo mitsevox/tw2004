@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_AptPrimNonTextured.cpp
+// compiled in: shader_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   38  00507094     40  void SM_AptPrimNonTexturedClass::Load(const struct SM_AptPrimNonTexturedClass* this)
+   57  005070D4     94  void SM_AptPrimNonTexturedInColorClass::Load(const struct SM_AptPrimNonTexturedInColorClass* this)
+   65  00507168      C  LS_ShaderHandle& SM_AptPrimNonTexturedInColorClass::GetvsHandle(const struct SM_AptPrimNonTexturedInColorClass* this)
+   70  00507174     B0  void SM_AptPrimNonTexturedInColorClass::LoadParamsVsShader(const struct SM_AptPrimNonTexturedInColorClass* this)
+   80  00519B6C     58  void SM_AptPrimNonTexturedInColorClass::Activate(const struct SM_AptPrimNonTexturedInColorClass* this)
+   89  00510DA8     78  void SM_AptPrimNonTexturedInColorClass::SetColor(const struct SM_AptPrimNonTexturedInColorClass* this, const float* rgba)

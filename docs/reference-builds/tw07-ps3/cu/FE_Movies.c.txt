@@ -1,0 +1,48 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/frontend/FE_Movies.c
+// compiled in: apt_unity.cpp
+// 22 functions, source order. line | PS3 address | size
+
+   53  00023D64     80  void FE_MakeMoviePath(const char* movieName, char* moviePathOut, size_t moviePathOutBufLen)
+                         local  const char* pDirName
+                         local  bool bWideScreen
+   73  00023DE4     70  void FE_MakeMoviePathWithSubDir(const char* movieName, const char* subDirName, char* moviePathOut, size_t moviePathOutBufLen)
+  104  00023E54     20  void FE_MakePromoMoviePath(const char* movieName, char* moviePathOut, size_t moviePathOutBufLen)
+  109  00023E74     38  void FE_MakeBioMoviePath(const char* movieName, char* moviePathOut, size_t moviePathOutBufLen, bool IsLegend)
+                         local  const char* pstrDirName
+  115  00023EAC     A4  void FE_MakeTourMoviePath(const char* movieName, char* moviePathOut, size_t moviePathOutBufLen)
+  125  00023F50     20  void FE_MakeTourcardMoviePath(const char* movieName, char* moviePathOut, size_t moviePathOutBufLen)
+  130  00023F70     20  void FE_MakeWorldTourMoviePath(const char* movieName, char* moviePathOut, size_t moviePathOutBufLen)
+  135  00023F90     20  void FE_MakePGASeasonMoviePath(const char* movieName, char* moviePathOut, size_t moviePathOutBufLen)
+  178  00023FB0     D8  FE_MovieInfoEntry* FE_movieGetFreeEntry()
+                         local  FE_MovieInfoEntry* pEntry
+  193  00024088     28  bool FE_movieIsQueueEmpty()
+  202  000240B0    130  static bool FE_GetBIOMovieName(const int movieNum, char* tempMoviePath, size_t tempMoviePathBufLen)
+                         local  char[32] bioNameBuffer
+                         local  bool bIsLegend
+                         local  char*[5] astrLegendPrefix
+                         local  int nIndex
+  245  0002B490    274  void FE_movieFade()
+                         local  char[256] tempMoviePath
+                         local  char[32] bioNameBuffer
+                         local  FE_MovieInfoEntry* pEntry
+                         local  const struct UserInfo& userInfo
+  376  0002B304     3C  void FE_PreMovieSetup()
+  393  000241E0      4  void FE_PostMovieSetup()
+  400  0002426C     3C  void FE_PlayTourMovie()
+  408  000242A8      4  void FE_PlayPGATourMovie()
+  416  0002B3E8     A8  void FE_PlayRTEMovie()
+                         local  char[64] tempMoviePath
+                         local  enum GM_CourseType_t movieNum
+                         local  char* movieName
+  442  0002B340     A8  void FE_PlayOnlineTournamentMovie()
+                         local  char[64] tempMoviePath
+                         local  enum GM_CourseType_t movieNum
+                         local  char* movieName
+  470  000242AC      4  void FE_PlayTCBioMovie()
+  477  000242B0      4  void FE_PlayLegendQuestIntroMovie()
+  484  000242B4     64  void FE_PlayIntroMovies()
+                         local  const char*[1] pMovieNames
+                         local  char[64] tempMoviePath
+                         local  int i
+  511  000B7A1C     88  void FE_PlayTrophyBallHighlight(struct REPLAY_MOMENT_t& replay)
+                         inlines  GM_SetCurrentCourse

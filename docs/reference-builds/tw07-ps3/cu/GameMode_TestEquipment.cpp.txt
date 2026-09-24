@@ -1,0 +1,37 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_TestEquipment.cpp
+// compiled in: golf_unity.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   22  002137D0     44  void GameModeTestEquipment::GameModeTestEquipment(const struct GameModeTestEquipment* this)
+   28  00213858     18  void GameModeTestEquipment::~GameModeTestEquipment(const struct GameModeTestEquipment* this)
+   33  002FB108    2A8  void GameModeTestEquipment::Init(const struct GameModeTestEquipment* this)
+                         local  void* driverPtr
+                         local  bit32 iAvailableClub
+                         inlines  GM_SetPlayerHoleStrokes, Singleton<GameModeDriverManager>::GetSingleton
+   82  0033AA30     78  void GameModeTestEquipment::Update(const struct GameModeTestEquipment* this)
+                         local  struct GoTemple* pTemple
+   98  002138D4      4  void GameModeTestEquipment::Shutdown(const struct GameModeTestEquipment* this)
+  104  002138D8      4  void GameModeTestEquipment::QuitGame(const struct GameModeTestEquipment* this)
+  109  00292858     A8  void GameModeTestEquipment::PreShotInit(const struct GameModeTestEquipment* this, enum PlayerNumber_t PlayerID)
+                         inlines  Singleton<DifficultySettings>::GetSingleton
+  125  00236D18     28  void GameModeTestEquipment::SwingInit(const struct GameModeTestEquipment* this, enum PlayerNumber_t PlayerID)
+  131  0023D9A0     64  void GameModeTestEquipment::SetupPlayer(const struct GameModeTestEquipment* this)
+  138  00260D90    35C  void GameModeTestEquipment::SetupTeeCupLocations(const struct GameModeTestEquipment* this)
+                         local  struct GoTemple* pTemple
+                         local  vec4flt vStartPosition
+                         local  float[4]* pCharPos
+                         inlines  GoTemple::EnableMaterialFiltering, GoTemple::GetBall, GoTempleEnv::GetCharacterPos, vec4flt_Copy, vec_ld, vec_st
+  198  00292900     A0  void GameModeTestEquipment::AfterShotButBeforePostReaction(const struct GameModeTestEquipment* this, enum PlayerNumber_t PlayerID)
+                         inlines  Singleton<DifficultySettings>::GetSingleton
+  204  002138DC     10  int8_t GameModeTestEquipment::GetStateAfterBallLands(const struct GameModeTestEquipment* this, enum PlayerNumber_t PlayerID)
+  214  0033A8C4    16C  int8 GameModeTestEquipment::HaltStateUpdate(const struct GameModeTestEquipment* this, enum PlayerNumber_t PlayerID)
+                         local  int8 nextState
+                         local  struct GoTemple* pTemple
+                         inlines  GoTemple::GetCurrentState
+  261  00249B0C     C8  void GameModeTestEquipment::EndGolferTurn(const struct GameModeTestEquipment* this, enum PlayerNumber_t PlayerID)
+                         local  struct GoTemple* pTemple
+  283  002138EC     1C  bool GameModeTestEquipment::QueryInterface(const struct GameModeTestEquipment* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bRet
+  296  002139AC     90  void GameModeTestEquipment::TestEquipment(const struct GameModeTestEquipment* this, int8_t iEquipmentType)
+  315  00213908     54  void GameModeTestEquipment::TestDriver(const struct GameModeTestEquipment* this)
+  328  0021395C     50  void GameModeTestEquipment::TestPutter(const struct GameModeTestEquipment* this)

@@ -1,0 +1,20 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_PgaTourStats_Player.cpp
+// compiled in: apt_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   30  000F8654     D0  void UIPgaTourStats_Player::UIPgaTourStats_Player(const struct UIPgaTourStats_Player* this)
+                         inlines  PgaFlashItem::PgaFlashItem, TArrayInternal<UIPgaTourStats_Player::PgaFlashItem,AptStructSwapper>::TArrayInternal, TExternArray<UIPgaTourStats_Player::PgaFlashItem>::TExternArray, UIMenuVertBase::SetNumVisibleVertRows, UIMenuVertBase::UIMenuVertBase
+   37  000F0E44     70  void UIPgaTourStats_Player::Init(const struct UIPgaTourStats_Player* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init
+   46  00049444     84  void UIPgaTourStats_Player::Show(const struct UIPgaTourStats_Player* this)
+   62  000494C8      4  void UIPgaTourStats_Player::OnShow(const struct UIPgaTourStats_Player* this)
+   66  000493D4     70  void UIPgaTourStats_Player::ShowWithoutResetingActiveGolfer(const struct UIPgaTourStats_Player* this)
+   76  000494CC     48  void UIPgaTourStats_Player::OnHide(const struct UIPgaTourStats_Player* this)
+   81  000861A4    100  void UIPgaTourStats_Player::PlayerStatsHandleInput(const struct UIPgaTourStats_Player* this, int32 cID)
+                         local  struct PgaFlashItem* activeItem
+                         local  int32 statCategory
+  117  000862A4     24  enum eAptHandleInput UIPgaTourStats_Player::HandleInput(const struct UIPgaTourStats_Player* this, int32 cID)
+  123  000A24E0     98  void UIPgaTourStats_Player::PlayerStatsUpdateItem(const struct UIPgaTourStats_Player* this, struct PgaFlashItem* dest, int32 index, char* label)
+  144  000A2578      C  void UIPgaTourStats_Player::UpdateItemAndLabel(const struct UIPgaTourStats_Player* this, struct UIMenuItemBaseDst* destItem, struct UIMenuItemBaseSrc* srcItem, int32 index, char* label)
+                         local  struct PgaFlashItem* dest
+  151  000493A4     30  void UIPgaTourStats_Player::UpdateHeaderStrings(const struct UIPgaTourStats_Player* this)

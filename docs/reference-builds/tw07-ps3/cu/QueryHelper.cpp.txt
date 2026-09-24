@@ -1,0 +1,93 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/source/common/QueryHelper.cpp
+// compiled in: QueryHelper.cpp
+// 17 functions, source order. line | PS3 address | size
+
+    0  007EAE1C    10C  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   84  007E7B40    208  enum TDbError TDbQryRowCopy(struct Database* database, struct <anon>* pJoinList, struct ExprNode* pFilter, struct <anon>* pSrcLits, struct Table* destTbl, struct <anon>* pRet)
+                         local  const char[14] __FUNCTION__
+                         local  struct <anon> lock
+                         local  enum TDbError dbResult
+                         local  struct <anon> retStruct
+                         local  struct <anon> searchData
+  132  007E7D48    208  enum TDbError TDbQryRowCopyTrig(struct Database* database, struct <anon>* pJoinList, struct ExprNode* pFilter, struct <anon>* pSrcLits, struct Table* destTbl, struct <anon>* pRet)
+                         local  const char[18] __FUNCTION__
+                         local  struct <anon> lock
+                         local  enum TDbError dbResult
+                         local  struct <anon> retStruct
+                         local  struct <anon> searchData
+  180  007E7F50    1B0  enum TDbError TDbQryDeleteRow(struct Database* database, struct <anon>* pJoinList, struct ExprNode* pFilter, bool isCached, struct <anon>* pDbRet)
+                         local  struct <anon> lock
+                         local  enum TDbError dbResult
+                         local  struct <anon> retObj
+                         local  struct <anon> searchData
+  226  007E857C    30C  enum TDbError TDbQryGetSingleColumn(struct Database* database, struct <anon>* pJoinList, struct ExprNode* pFilter, TableColRef tblColRef, void* pBuffer, uint16_t iBuffSize)
+                         local  const char[22] __FUNCTION__
+                         local  struct <anon> lock
+                         local  struct <anon>[2] pLits
+                         local  enum TDbError dbResult
+  287  007E8100    47C  enum TDbError TDbQryGetSingleRow(struct Database* database, struct <anon>* pJoinList, struct ExprNode* pFilter, bool isCached, struct <anon>* pColLitLst)
+                         local  const char[19] __FUNCTION__
+                         local  struct <anon> lock
+                         local  enum TDbError dbResult
+                         local  struct <anon> filterRes
+                         local  struct <anon> searchData
+                         local  bool isDataCached
+  392  007E8888    294  enum TDbError TDbQrySetRow(struct Database* database, struct <anon>* pJoinList, struct ExprNode* pFilter, struct <anon>* pColLitLst, bool isCached, struct <anon>* pDbRet)
+                         local  const char[13] __FUNCTION__
+                         local  struct <anon> lock
+                         local  enum TDbError dbResult
+                         local  struct <anon> retObj
+                         local  struct <anon> searchData
+  446  007E8B1C    294  enum TDbError TDbQrySetSingleRow(struct Database* database, struct <anon>* pJoinList, struct ExprNode* pFilter, struct <anon>* pColLitLst, bool isCached, struct <anon>* pDbRet)
+                         local  const char[19] __FUNCTION__
+                         local  struct <anon> lock
+                         local  enum TDbError dbResult
+                         local  struct <anon> retObj
+                         local  struct <anon> searchData
+  497  007E8DB0    318  enum TDbError TDbQrySetColumn(struct Database* database, struct <anon>* pJoinList, struct ExprNode* pFilter, TableColRef tblColRef, void* pBuffer, uint16_t iBuffSize, struct <anon>* pDbRet)
+                         local  const char[16] __FUNCTION__
+                         local  struct <anon> lock
+                         local  struct <anon>[2] pLits
+                         local  union <anon> data
+  565  007E90C8    318  enum TDbError TDbQrySetSingleColumn(struct Database* database, struct <anon>* pJoinList, struct ExprNode* pFilter, TableColRef tblColRef, void* pBuffer, uint16_t iBuffSize, struct <anon>* pDbRet)
+                         local  const char[22] __FUNCTION__
+                         local  struct <anon> lock
+                         local  struct <anon>[2] pLits
+                         local  union <anon> data
+  647  007E93E0    524  enum TDbError TDbQryUpdateRows(struct Database* database, struct <anon>* pJoinList, struct ExprNode* pFilter, TableColRef* pTblColRefList, struct ExprNode* pUpdateList, struct <anon>* pDbRet)
+                         local  const char[17] __FUNCTION__
+                         local  struct <anon> lock
+                         local  uint32_t counter
+                         local  struct <anon> retObj
+                         local  enum TDbError dbResult
+                         local  struct <anon> searchData
+                         local  struct ExprNode*[32] pInternalUpdates
+  735  007E9904    1FC  enum TDbError TDbQryCreateTbl(struct Database* database, TableRef tableRef, struct Query* pQry, TableColRef* pTblColRefLst, struct <anon>* pDbRet)
+                         local  const char[16] __FUNCTION__
+                         local  struct <anon> lock
+                         local  enum TDbError dbResult
+                         local  struct Table* pTable
+  828  007E9B00    270  enum TDbError TDbQryCallback(struct Database* database, struct <anon>* pJoinList, struct ExprNode* pFilter, uint32_t callbackName, struct <anon>* pCallbackParams, uint16_t userParm, struct <anon>* pRet)
+                         local  const char[15] __FUNCTION__
+                         local  struct <anon> lock
+                         local  enum TDbError dbResult
+                         local  struct <anon> tempRet
+                         local  struct <anon> searchData
+  873  007EAC0C    210  enum TDbError TDbQryColStats(struct Database* database, struct <anon>* pJoinList, struct ExprNode* pFilter, TableColRef tblColRef, struct <anon>* pColStats, struct <anon>* pRet)
+                         local  const char[15] __FUNCTION__
+                         local  struct <anon> lock
+                         local  enum TDbError dbResult
+                         local  struct <anon> tempRet
+  909  007E9D70    E9C  enum TDbError _TDbQryColStats(struct Database* database, struct <anon>* pJoinList, struct ExprNode* pFilter, TableColRef tblColRef, struct <anon>* pColStats, struct <anon>* pRet)
+                         local  const char[16] __FUNCTION__
+                         local  enum TDbError dbResult
+                         local  struct <anon> filterRes
+                         local  struct <anon> searchData
+                         local  ColNum colNum
+                         local  uint32_t tblNum
+                         local  struct <anon>* pDef
+                         local  union <anon> data
+                         local  uint8_t* pData
+                         local  bool8_t gotFirst
+ 1102  007EAF28     3C  static void _GLOBAL__I__ZN2EA4T3db11QueryHelperC2Ev()
+ 1103  007EAF64     3C  static void _GLOBAL__D__ZN2EA4T3db11QueryHelperC2Ev()

@@ -1,0 +1,106 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/facadeconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 56 functions, source order. line | PS3 address | size
+
+  164  005FD938     E8  void LobbyPingStrategy(const struct <anon>* this, uint32_t uTimeout, struct PingCallback* pCallback)
+  210  005FDCC4     50  void ~LobbyPingStrategy(const struct <anon>* this)
+                         inlines  ~OperationStrategy
+  233  005B5FA4     D0  bool OperationProcess(const struct <anon>* this, const struct Operation* )
+                         local  bool bContinue
+                         local  uint32_t uPing
+  289  005B6074     10  void OperationCancel(const struct <anon>* this, const struct Operation* )
+  313  005B6084     58  void OperationTimeout(const struct <anon>* this, const struct Operation* )
+  341  005B60DC     7C  void HudOpened(const struct <anon>* this)
+  369  005B6430     9C  void HudClosed(const struct <anon>* this)
+  401  005DA7B4    1AC  void StateChanging(const struct <anon>* this, enum OsdkState eOldState, enum OsdkState eNewState)
+                         local  LobbyApiRefT* pLobbyApi
+                         local  char8_t[256] strTag
+                         inlines  GetLobbyApi, RemoveObserver
+  452  005DA62C    188  void StateChanged(const struct <anon>* this, enum OsdkState eOldState, enum OsdkState eNewState)
+                         inlines  AddObserver
+  499  0061BDE0    1B4  void FacadeConcrete(const struct <anon>* this)
+                         local  struct <anon>* pGameParams
+                         inlines  AddObserver, GetInstance, LobbySetupObserver, RCPointer, operator new, operator=
+  557  0061BA60    148  void ~FacadeConcrete(const struct <anon>* this)
+                         inlines  RemoveObserver, operator delete, operator=, ~LobbySetupObserver, ~RCPointer
+  602  0061B8CC    194  void LoginToMasterServerComplete(const struct <anon>* this, struct LoginToMasterServer* pLoginToMasterServer)
+                         local  struct MemoryStrategy* pPersistentMemory
+                         local  const struct DictionaryConcrete* pServerConfiguration
+                         local  struct <anon>* pGameParams
+                         local  const char8_t* pLobbyConfig
+                         local  struct <anon> dictLobbyParams
+                         inlines  SetServerConfiguration, operator=
+  625  0061B8BC     10  void LobbySetupComplete(const struct <anon>* this, const struct <anon>* , bool bSuccess)
+  638  005DE6C0     10  struct <anon>* GetTicker(const const struct <anon>* this)
+  639  005DE374     10  struct <anon>* GetUserManager(const const struct <anon>* this)
+  640  005E12C8     10  struct <anon>* GetSettingManager(const const struct <anon>* this)
+  641  005E0E1C     10  struct <anon>* GetStatsManager(const const struct <anon>* this)
+  642  005E1874     10  struct <anon>* GetPeerConnectionManager(const const struct <anon>* this)
+  643  005CE070     10  struct <anon>* GetResourceManager(const const struct <anon>* this)
+  644  005E2B1C     10  struct <anon>* GetLocalUser(const const struct <anon>* this)
+  645  005D9778     20  struct LoginSlot* GetLobbyLoginSlot(const const struct <anon>* this)
+  646  005D9798     20  struct LoginSlot* GetLoginSlot(const const struct <anon>* this, const uint32_t uIndex)
+  647  005DE6D0     10  struct <anon>* GetLobby(const const struct <anon>* this)
+  648  005CE080     10  struct <anon>* GetLogger(const const struct <anon>* this)
+  649  005CE090     10  struct ChatStreamManager* GetChatStreamManager(const const struct <anon>* this)
+  650  005E17E4     10  struct GameSetup* GetGameSetup(const const struct <anon>* this)
+  651  005CE0A0     10  struct <anon>* GetVoip(const const struct <anon>* this)
+  652  005D13A8      C  const struct CoreGameParameters* GetCoreGameParameters(const const struct <anon>* this)
+  653  005CE0B0     10  struct <anon>* GetHud(const const struct <anon>* this)
+  654  005DE364     10  struct <anon>* GetMessenger(const const struct <anon>* this)
+  655  005CE0C0     10  struct <anon>* GetTextFilter(const const struct <anon>* this)
+  656  005CE0D0     10  struct <anon>* GetTextLocalize(const const struct <anon>* this)
+  657  005E2674     10  struct <anon>* GetInvitationManager(const const struct <anon>* this)
+  678  0061B66C    250  void Process(const struct <anon>* this)
+                         local  struct OperationManagerConcrete* pOpManager
+                         local  uint32_t uNumElements
+                         local  struct ProcessObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList, GetOperationManagerConcrete
+  766  0061B350    31C  bool CheckConnection(const struct <anon>* this)
+                         local  bool bDisconnectDetected
+                         local  enum OsdkState eCurState
+                         local  enum OsdkState eNewState
+                         local  int32_t iConnStatus
+                         local  enum DisconnectReason eReason
+                         local  bool bDisconnectNetwork
+                         local  bool bPlugStatus
+                         local  struct LoginSlot* pSlot
+                         local  enum LoginState eLoginState
+                         local  int32_t iOnlnStatus
+  960  005B623C     D0  bool CheckPlugConnection(const struct <anon>* this)
+                         local  bool bConnected
+                         local  int32_t iPlugStatus
+ 1004  0061BF94     74  void CreateFacade()
+                         inlines  operator new
+ 1031  005CBD30     50  void DestroyFacade()
+                         inlines  GetInstance
+ 1055  005B630C     24  uint32_t GetNetTick()
+ 1077  005E12B8     10  struct ActivityManager* GetActivityManager(const const struct <anon>* this)
+ 1101  005CBD80      C  struct <anon>* GetInstance()
+ 1125  005B6330     20  bool IsOsdkAvailable()
+ 1150  0061B24C    104  void Suspend(const struct <anon>* this)
+                         inlines  GetOperationManagerConcrete
+ 1197  0061B198     B4  struct Operation* Unsuspend(const struct <anon>* this, struct <anon>* pCallback)
+                         local  LobbyApiRefT* pLobbyApi
+                         inlines  GetLobbySetupConcrete
+ 1234  006198C8     68  void SetOsdkState(const struct <anon>* this, enum OsdkState eNewState)
+                         inlines  SetServerConfiguration
+ 1265  005CE4E4     38  const char8_t* GetPersona(const const struct <anon>* this)
+                         local  LobbyApiRefT* pLobbyApi
+ 1292  005CE97C     40  const DirtyAddrT* GetLocalDirtysockAddress(const const struct <anon>* this)
+                         local  LobbyApiRefT* pLobbyApi
+                         local  const LobbyApiUserT* pLocalUser
+ 1320  005FDB08     EC  struct Operation* PingLobbyServer(const const struct <anon>* this, uint32_t uTimeout, struct PingCallback* pCallback)
+                         local  struct <anon>* pStrategy
+                         inlines  GetOperationManagerConcrete, operator new
+ 1350  005B6350     80  void StoreArenaDetails(const struct <anon>* this, int32_t iLobbyCategoryID, const char8_t* strLobbyRoomName, const char8_t* strLobbyRoomPassword)
+ 1384  005B63D0     60  bool IsSameUser(const char8_t* strNameA, const char8_t* strNameB)
+ 1417  005B64CC     54  void SetNetworkLoginSlot(const struct <anon>* this, struct <anon>* pLoginSlot)
+ 1447  005D94AC     10  struct <anon>* GetLobbyLoginSlotConcrete(const const struct <anon>* this)
+ 1471  005D9490     1C  struct <anon>* GetLoginSlotConcrete(const const struct <anon>* this, uint32_t uIndex)
+ 1505  005B6520      4  void RelaunchToInvitation(const struct <anon>* this, uint32_t uLoginSlot, const char8_t* strSessionId)
+ 1539  005B6524     64  enum LaunchDataTypeE SetLaunchData(const void* pLaunchData, size_t uDataSize)
+                         local  enum LaunchDataTypeE eType
+                         local  const struct InvitationLaunchData* pInvitationData
+ 1573  005B6588     30  struct InvitationLaunchData* GetInvitationLaunchData(const struct <anon>* this, uint32_t uLoginSlot)
+                         local  struct InvitationLaunchData* pLaunchData

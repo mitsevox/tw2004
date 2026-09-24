@@ -1,0 +1,260 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/frontend/GameMessages/APT_FE_GameMessages.c
+// compiled in: apt_unity.cpp
+// 148 functions, source order. line | PS3 address | size
+
+   79  0005DF74     C8  void FE_MyDeleteAUserCallBack(int32 rslt)
+  101  000639B4    200  bool FE_TestForATwoPlayerGameNeedToResetAUser(MemCardActionFuncPtr* onDeleteUserCB, bool bInclude_Plr_1)
+                         local  bool needReset
+                         local  int32 i
+                         local  int32 sizeMenu
+  157  000C117C    234  void GM_vGetGolferName(int32 param1, char* param2, int32 param2bufSize)
+  204  000C4808     E0  char* GetPointerToPlayerLastName(enum PlayerNumber_t player)
+                         local  char* lastName
+                         inlines  Singleton<GolferStats>::GetSingleton
+  218  000C3018     28  char* GetPointerToGolferLastName(enum Golfer_t golfer)
+                         local  struct GolferData_t* golferData
+  224  000C1114     68  void GetGolferName(enum Golfer_t golfer, char* name, size_t nameBufLen)
+                         local  struct GolferData_t* golferData
+  296  000D9508     30  int32 GM_vGetGameMode()
+                         local  int32 autoRetVal
+                         inlines  GM_GetModeType
+  310  0002523C     34  void GM_vHideCharacter(int32 param1)
+  322  000252E8     2C  void GM_vSetCharState()
+  334  000736A4    10C  void GM_vSetCommentaryOption(int32 param1)
+                         inlines  cGAME_GLOBALS::SetCommentaryVolumeOption
+  344  00073688     1C  int32 GM_vGetCommentaryOption()
+  354  0007DB48    10C  void GM_vSetTalkyVolumeOption(int32 param1)
+                         inlines  cGAME_GLOBALS::SetTalkyVolumeOption
+  364  00025314     1C  int32 GM_vGetTalkyVolumeOption()
+  388  00025330     48  int32 FacilityQuickStartOptionToUIIndex(enum GM_ModeType_t gMode)
+                         local  int32 i
+  398  00025378     20  enum GM_ModeType_t FacilityQuickStartUIIndexToOption(int32 index)
+  403  000737B0     18  int32 GM_vGetFacQuickStartOption()
+  407  000737C8     68  void GM_vSetFacQuickStartOption(int32 param1)
+                         inlines  cGAME_GLOBALS::SetFacilityQuickStartGameMode
+  413  00058934     68  void GM_vGetFacQuickStartText(int32 menuItemIndex, int32 itemOptionindex)
+  421  00025398     68  char* GM_vGetFacQuickStartText(enum GM_ModeType_t gMode)
+                         local  int32 itemOptionindex
+  431  00025400     A4  int32 GM_vGetTapinsOption()
+                         local  void* voidGameModePtr
+  449  000254A4     B0  void GM_vSetTapinsOption(int32 param1)
+  460  0006D9DC     20  int32 GM_vGetMetricOption()
+  468  00025554     98  void GM_vSetMetricOption(int32 param1)
+                         inlines  cGAME_GLOBALS::SetMetricOption
+  476  000255EC     28  void GM_vSetConfidenceMeterOption(int32 param1)
+                         inlines  cGAME_GLOBALS::SetConfidenceMeterOption
+  482  00025614     20  int32 GM_vGetConfidenceMeterOption()
+  490  000B38DC     88  int32 GM_vGetDiffOption()
+                         inlines  Singleton<DifficultySettings>::GetSingleton
+  495  000B3A70     A0  void GM_vSetDiffOption(int32 param1)
+                         inlines  Singleton<DifficultySettings>::GetSingleton
+  504  000B3B10     C4  void GM_OnSelectDifficulty(int32 diffOpt)
+  523  0005899C     68  void GM_vGetDiffText(int32 menuItemIndex, int32 itemOptionindex)
+  532  000258F0     60  char* GM_vGetDiffTextString(DIFFICULTY_LEVEL_e inDiff)
+  539  00025814     DC  char* GM_vGetDiffTextStringId(DIFFICULTY_LEVEL_e inDiff)
+                         local  char* stringId
+  557  0006CE50     34  int32 GM_vGetAnalogStickDir()
+  566  0007969C     48  void GM_vSetAnalogStickDir(int32 param1)
+                         inlines  UserInfo::SetLeftSwingStick
+  575  00025950     9C  void GM_vFormatFloat(char* param1, int32 param1bufSize)
+                         local  int len
+                         local  int i
+                         local  char* str
+  602  000C48E8     E4  void GM_vSaveGolferModel(uint8 modelID)
+                         local  const struct UserInfo& userInfo
+                         local  enum PlayerNumber_t playerID
+                         inlines  Singleton<GolferStats>::GetSingleton, UserInfo::GetGolferData
+  621  00098A50    1F0  void GM_vCharStream(int32 param1, int32 param2, int32 param3)
+                         local  bool[4] shirtsAvailable
+                         local  int i
+                         local  int32 mainCharID
+                         local  int32 rightCharID
+                         local  int32 leftCharID
+                         inlines  cGAME_GLOBALS::GetCharacterStyleShirt, cGAME_GLOBALS::SetCharacterStyleShirt
+  672  000259EC     44  void GM_vSetMulligan(int32 param1)
+  678  00058A04     5C  void GM_vGetHandicapsOptionText(int32 menuItemIndex, int32 itemOptionindex)
+                         local  const int32 BUFFER_LENGTH
+                         local  char[5] outBuf
+  695  00025A30     D0  void GM_vSetVibration(int32 param1)
+  713  0007384C    11C  void GM_vSetMusicVolumeOption(int32 param1)
+                         inlines  cGAME_GLOBALS::SetMusicVolumeOption
+  730  00073830     1C  int32 GM_vGetMusicVolumeOption()
+  739  0007DA3C    10C  void GM_vSetSFXOption(int32 param1)
+                         inlines  cGAME_GLOBALS::SetSfxVolumeOption
+  753  00025B00     1C  int32 GM_vGetSFXOption()
+  763  00025B1C     3C  int32 GM_vGetVibration()
+  771  00025B58     3C  int32 GM_vGetOffLineShotClock()
+  776  00025B94     AC  void GM_vSetOffLineShotClock(int32 inValue)
+  787  00025C40      8  int32 GM_vGetIdealPuttCamOption()
+  797  00025634     80  void GM_vSetIdealPuttCamOption(int32 set)
+  808  00025C48      8  int32 GM_vIdealPuttCamOn()
+  832  00025C50     74  int32 GM_vTrophyBallsWon(const struct UserInfo& userInfo)
+                         local  int32 autoRetVal
+                         local  int won
+                         local  int i
+  855  00025CC4     78  int32 GM_vTrackingTigerBallsWon(const struct UserInfo& userInfo)
+                         local  int32 autoRetVal
+                         local  int won
+                         local  int i
+  874  0008ED68     FC  int32 GM_vGetNumProShopItemsUnlocked(const struct UserInfo& userInfo)
+                         local  uint32 i
+                         local  uint32 num
+  894  00066B3C     A0  int32 GM_vNumUnlockedGolfers(const struct UserInfo& userInfo)
+                         local  int32 autoRetVal
+                         local  int32 i
+  909  00025D3C     64  int32 GM_vNumAvailableGolfers(const struct UserInfo& userInfo)
+                         local  int32 autoRetVal
+                         local  int32 i
+  928  00066BDC     98  int32 GM_vNumUnlockedCourses(const struct UserInfo& userInfo)
+                         local  int32 autoRetVal
+                         local  int32 i
+  966  00025DA0    100  float GM_vGetRivalsModeProgress(const struct UserInfo& userInfo)
+                         local  int32 nEventsPlayed
+                         local  uint32 i
+  981  00025EA0     74  int32 GM_vGetRivalsModeNumAwards(const struct UserInfo& userInfo)
+                         local  int32 nEventsWon
+                         local  uint32 i
+  996  00025F14     C0  int32 GM_vGetRivalsModeNumTrophies(const struct UserInfo& userInfo)
+                         local  int32 nTrophiesWon
+                         local  uint32 i
+ 1015  00025FD4     88  int32 GM_vGetTotalPar5CourseAwards()
+                         local  int32 numPar5Awards
+                         local  int i
+                         local  Course_t course
+ 1034  0002605C     80  int32 GM_vPar5Eagles(const struct UserInfo& userInfo)
+                         local  int32 autoRetVal
+                         local  int completed
+                         local  int i
+                         local  int num_par5_holes
+ 1061  000260DC     B0  void GM_vSetGreenGridOption(int32 param1)
+ 1073  0002618C     48  void GM_vSetCaddieTipsOption(int32 param1)
+ 1084  000261D4     B0  void GM_vSetSwingAidOption(int32 param1)
+ 1096  000256B4     B0  void GM_vSetPowerBoostOption(int32 param1)
+ 1108  00025764     B0  void GM_vSetSpinControlOption(int32 param1)
+ 1121  00026284     3C  int32 GM_vGetGreenGridOption()
+ 1130  000262C0     3C  int32 GM_vGetCaddieTipsOption()
+ 1140  000262FC     3C  int32 GM_vGetBreakLineOption()
+ 1149  00026338     48  void GM_vSetBreakLineOption(int32 param1)
+ 1159  00026380     3C  int32 GM_vGetSwingAidOption()
+ 1168  000263BC     3C  int32 GM_vGetPowerBoostOption()
+ 1177  000263F8     3C  int32 GM_vGetSpinControlOption()
+ 1189  00026434     9C  void GM_vSetMCRewardMoney(int money, bool oldUserLoaded)
+                         local  const struct UserInfo& userInfo
+ 1207  000264D0     3C  int32 GM_vGetEATraxOptionMenus()
+ 1215  0002650C     3C  int32 GM_vGetEATraxOptionCareerMode()
+ 1223  00026548     3C  int32 GM_vGetEATraxOptionFacilityGames()
+ 1231  00026584     3C  int32 GM_vGetEATraxOptionOtherGameMode()
+ 1239  000265C0     3C  int32 GM_vGetEATraxOptionOneBall()
+ 1247  000265FC     3C  int32 GM_vGetEATraxOptionGameFace()
+ 1256  00026638    10C  void GM_vSetEATraxOptionMenus(int32 param1)
+                         local  bool bOldValue
+ 1273  00026744     B0  void GM_vSetEATraxOptionCareerMode(int32 param1)
+ 1284  000267F4     B0  void GM_vSetEATraxOptionFacilityGames(int32 param1)
+ 1293  000268A4     B0  void GM_vSetEATraxOptionOtherGameMode(int32 param1)
+ 1304  00026954     B0  void GM_vSetEATraxOptionOneBall(int32 param1)
+ 1315  00026A04     B0  void GM_vSetEATraxOptionGameFace(int32 param1)
+ 1327  00026AB4     AC  void GM_vSetGamebreakersOption(int32 param1)
+ 1339  00026B60     AC  void GM_vSetBigHitCamsOption(int32 param1)
+ 1351  00026C0C     3C  int32 GM_vGetGamebreakersOption()
+ 1359  00026C48     3C  int32 GM_vGetBigHitCamsOption()
+ 1364  00026C84     74  int32 GM_GetNumPGATournamentTrophiesForResume(const struct UserInfo& userInfo)
+                         local  int32 numPGAAwardsWon
+                         local  int i
+ 1379    inline-only   static bool GM_IsPGATourMajor(uint32 eventID)
+ 1387  00026CF8     A8  int32 GM_GetNumPGAMajorAwardsForResume(const struct UserInfo& userInfo)
+                         local  int32 numPGAAwardsWon
+                         local  int i
+                         inlines  GM_IsPGATourMajor
+ 1400  00026DA0     74  int32 GM_GetNumPGASeasonAwardsTrophiesForResume(const struct UserInfo& userInfo)
+                         local  int32 numPGAAwardsWon
+                         local  int i
+ 1417  00026E14     24  void FE_SetGameMode(enum GM_ModeType_t iGameMode)
+ 1426  00026E38     30  void FE_ResetUser()
+                         local  const struct UserInfo& userInfo
+ 1440  000B896C    10C  void GM_vSetCustomCourse(int32 iValue, int32 iUser, int32 iCourse)
+                         inlines  GM_IsCustomCourse
+ 1459  00026E68     44  void GM_vSetCourse(int32 iCourse)
+ 1485  00026EF0     60  void GM_vSetHoleSetToggle(int32 iHoleSetIndex)
+ 1493  00026EAC     44  void GM_vSetHoleSet(enum GM_HoleSelectType_t eType)
+ 1499  00058A60     74  void GM_vGetHoleSetText(int32 menuItemIndex, int32 itemOptionindex)
+ 1509  000C101C      4  void FE_ExitUI()
+ 1551  00026F50      8  bool GM_vPGATour_DisplaySponsorshipsPopup(int* sponsor, int* startCash, int* bonusCash)
+ 1677  00026F58     EC  void GM_OnlineSetGameMode(int32 param1)
+                         local  enum GM_ModeType_t selectGameMode
+                         inlines  cGAME_GLOBALS::SetOnlineOptionsGameMode
+ 1719  00027044     64  void GM_OnlineSetCourse(int32 param1)
+                         inlines  cGAME_GLOBALS::SetOnlineOptionsCourseIndex
+ 1729  00069194     D0  void GM_OnlineSetNumPlayers(int32 param1)
+                         inlines  cGAME_GLOBALS::ClearOnlineOptionsFlagsBits, cGAME_GLOBALS::SetOnlineOptionsFlagsBits
+ 1760  000270A8     98  void GM_OnlineSetRankedGame(int32 param1)
+                         inlines  cGAME_GLOBALS::SetOnlineOptionsRatedGame
+ 1770  0006B9FC     F0  void GM_OnlineSetShotClock(int32 param1)
+                         inlines  cGAME_GLOBALS::SetShotClockOption
+ 1801  0007D1C4     B0  void GM_OnlineSetHoles(int32 param1)
+                         inlines  cGAME_GLOBALS::SetOnlineOptionsHoles
+ 1818  00027140     68  void GM_OnlineSetDifficulty(int32 param1)
+                         inlines  cGAME_GLOBALS::SetOnlineOptionsDifficulty
+ 1826  000271A8     28  void GM_OnlineSetHandicaps(int32 param1)
+                         inlines  cGAME_GLOBALS::SetOnlineOptionsHandicap
+ 1835  000271D0     1C  void GM_OnlineSetWager(int32 param1)
+                         inlines  cGAME_GLOBALS::SetOnlineOptionsWager
+ 1844  00027298     C8  void GM_OnlineSetGolfer(int32 param1)
+                         local  enum Golfer_t forcedGolfer
+                         inlines  cGAME_GLOBALS::SetOnlineOptionsGolfer
+ 1885  00027360     88  void GM_OnlineSetTees(int32 param1)
+                         local  enum GM_TeeColorType_t tee
+                         inlines  cGAME_GLOBALS::SetOnlineOptionsTee
+ 1911  000273E8     64  void GM_OnlineSetPins(int32 param1)
+                         inlines  cGAME_GLOBALS::SetOnlineOptionsPin
+ 1920  0002744C     64  void GM_OnlineSetGreenSpeed(int32 param1)
+                         inlines  cGAME_GLOBALS::SetOnlineOptionsGreens
+ 1929  000274B0     64  void GM_OnlineSetFairwaySpeed(int32 param1)
+                         inlines  cGAME_GLOBALS::SetOnlineOptionsFairway
+ 1938  00027514     64  void GM_OnlineSetRoughSpeed(int32 param1)
+                         inlines  cGAME_GLOBALS::SetOnlineOptionsRough
+ 1947  00027578     28  void GM_OnlineSetApproval(int32 param1)
+                         inlines  cGAME_GLOBALS::SetOnlineOptionsUseApproval
+ 1956  00069264     44  void GM_OnlineSetAppearOffline(int32 param1)
+                         inlines  cGAME_GLOBALS::ClearOnlineOptionsFlagsBits, cGAME_GLOBALS::SetOnlineOptionsFlagsBits
+ 1967  000692A8     44  void GM_vSetVoiceSpeaker(int32 param1)
+                         inlines  cGAME_GLOBALS::ClearOnlineOptionsFlagsBits, cGAME_GLOBALS::SetOnlineOptionsFlagsBits
+ 1982  000692EC     A0  void GM_OnlineSetSessionType(int32 param1)
+                         inlines  cGAME_GLOBALS::ClearOnlineOptionsFlagsBits, cGAME_GLOBALS::SetOnlineOptionsFlagsBits
+ 1999  000275A0     B0  int32 GM_OnlineGetGameMode()
+                         local  int32 iOption
+ 2042  0006FCE0     54  int32 GM_OnlineGetNumPlayers()
+                         inlines  cGAME_GLOBALS::GetOnlineOptionsFlags
+ 2065  00027650     1C  int32 GM_OnlineGetCourse()
+ 2074  0002766C     18  int32 GM_OnlineGetRankedGame()
+ 2085  00027684    124  int32 GM_OnlineGetShotClock()
+                         local  int iShotClockOption
+ 2122  0007D9F4     2C  int32 GM_OnlineGetHoles()
+                         inlines  cGAME_GLOBALS::GetOnlineOptionsHoles
+ 2139  0007D8E0     2C  int32 GM_OnlineGetDifficulty()
+                         inlines  cGAME_GLOBALS::GetOnlineOptionsDifficulty
+ 2156  000277A8     18  int32 GM_OnlineGetHandicaps()
+ 2166  000277C0      8  int32 GM_OnlineGetWager()
+ 2179  0006A64C     78  int32 GM_OnlineGetGolfer()
+                         inlines  cGAME_GLOBALS::GetOnlineOptionsGolfer
+ 2212  000277C8     3C  int32 GM_OnlineGetTees()
+                         local  int iTeeOption
+ 2236  00027804     1C  int32 GM_OnlineGetPins()
+ 2246  00027820     1C  int32 GM_OnlineGetGreenSpeed()
+ 2256  0002783C     1C  int32 GM_OnlineGetFairwaySpeed()
+ 2266  00027858     1C  int32 GM_OnlineGetRoughSpeed()
+ 2276  00027874     18  int32 GM_OnlineGetApproval()
+ 2286  00077C88     1C  int32 GM_OnlineGetAppearOffline()
+ 2296  00077CA4     1C  int32 GM_vGetVoiceSpeaker()
+ 2305  00077CC0     1C  int32 GM_OnlineGetSessionType()
+ 2314  0002788C      4  void GM_OnlineSetTickerDuringGameplay(int32 param1)
+ 2316  0007E2F0    13C  void GM_OnlineSetTickerOnMenus(int32 param1)
+                         local  struct OnlineManagerOSDK* pOnlineMgr
+                         inlines  OnlineManagerOSDK::GetInstance, cGAME_GLOBALS::ClearOnlineOptionsFlagsBits, cGAME_GLOBALS::SetOnlineOptionsFlagsBits
+ 2338  00054060     B4  void GM_OnlineSetNewsOption(int32 param1)
+                         inlines  cGAME_GLOBALS::SetOnlineOptionsPodCastOn
+ 2347  00027890     A0  void GM_OnlineSetNewsVolume(int32 param1)
+                         inlines  cGAME_GLOBALS::SetOnlineOptionsPodCastVol
+ 2355  00027930      8  int32 GM_OnlineGetTickerDuringGameplay()
+ 2356  00027938     1C  int32 GM_OnlineGetTickerOnMenus()
+ 2363  00027954     18  int32 GM_OnlineGetNewsOption()
+ 2372  0002796C     30  int32 GM_OnlineGetNewsVolume()

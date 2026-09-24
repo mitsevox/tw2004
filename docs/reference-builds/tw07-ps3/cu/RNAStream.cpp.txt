@@ -1,0 +1,9 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/RNAStream.cpp
+// compiled in: RNAStream.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   51  00833EA8     54  void StreamC::StreamC(const struct StreamC* this, struct UserData* pUserData, uint32_t uFlags)
+                         inlines  Object::SetAllocated
+   62  00833EFC     90  void StreamC::~StreamC(const struct StreamC* this)
+                         local  const char[9] __FUNCTION__
+                         inlines  RNADebugBreak

@@ -1,0 +1,24 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/loginoperationconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   66  005F44EC     68  void LoginOperationConcrete(const struct <anon>* this, struct OperationConcrete* pOperation)
+                         inlines  RCPointer
+   90  005F45BC     44  void ~LoginOperationConcrete(const struct <anon>* this)
+                         inlines  ~RCPointer
+  109  005D3E98     20  void Abort(const struct <anon>* this)
+                         inlines  GetStrategy
+  128  005E1230     20  void AcceptTOS(const struct <anon>* this)
+                         inlines  GetStrategy
+  147  005E11A8     20  void DeclineTOS(const struct <anon>* this)
+                         inlines  GetStrategy
+  166  005E10B8     20  void SetShareInfo(const struct <anon>* this, bool bEASpam, bool bPartnerSpam)
+                         inlines  GetStrategy
+  185  005D384C     20  void AcceptForeignRegistration(const struct <anon>* this)
+                         inlines  GetStrategy
+  204  005D386C     20  void AcceptProductUpdate(const struct <anon>* this)
+                         inlines  GetStrategy
+  223  005D388C     20  void DeclineProductUpdate(const struct <anon>* this)
+                         inlines  GetStrategy
+  242  005D38AC     20  void Restart(const struct <anon>* this)
+                         inlines  GetStrategy

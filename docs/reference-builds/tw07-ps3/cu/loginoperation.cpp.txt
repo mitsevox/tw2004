@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/loginoperation.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    5  005E345C     34  void LoginOperation(const struct LoginOperation* this)
+    9  005E3A58      C  void ~LoginOperation(const struct LoginOperation* this)

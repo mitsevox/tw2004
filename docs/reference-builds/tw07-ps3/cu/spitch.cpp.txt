@@ -1,0 +1,8 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/spitch.cpp
+// compiled in: spitch.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   40  006CA180    1A8  int SNDpitchmult(int shandle, int pitchmult)
+                         local  struct CHANPUB* pchan
+                         local  int voice
+                         local  int setvoice

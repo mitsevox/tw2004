@@ -1,0 +1,87 @@
+// ../../../Shared/XceedZip_ZLib64/trees.c
+// compiled in: golf_unity.cpp
+// 22 functions, source order. line | PS3 address | size
+
+  217  002204CC    150  static void send_bits(deflate_state* s, int value, int length)
+  265    inline-only   static void tr_static_init()
+  421  002206AC     60  void _tr_init(deflate_state* s)
+  453  0022061C     90  static void init_block(deflate_state* s)
+                         local  int n
+  496  00220C4C    1CC  static void pqdownheap(deflate_state* s, ct_data* tree, int k)
+                         local  int v
+                         local  int j
+  528    inline-only   static void gen_bitlen(deflate_state* s, tree_desc* desc)
+                         local  ct_data* tree
+                         local  int max_code
+                         local  const ct_data* stree
+                         local  const intf* extra
+                         local  int base
+                         local  int max_length
+                         local  int h
+                         local  int n
+                         local  int m
+                         local  int bits
+                         local  int xbits
+                         local  ush f
+                         local  int overflow
+  613    inline-only   static void gen_codes(ct_data* tree, int max_code, ushf* bl_count)
+                         local  ush[16] next_code
+                         local  ush code
+                         local  int bits
+                         local  int n
+                         local  int len
+  652  00220E18    8C4  static void build_tree(deflate_state* s, tree_desc* desc)
+                         local  ct_data* tree
+                         local  const ct_data* stree
+                         local  int elems
+                         local  int n
+                         local  int m
+                         local  int max_code
+                         local  int node
+                         inlines  gen_bitlen, gen_codes
+  737  002216DC    144  static void scan_tree(deflate_state* s, ct_data* tree, int max_code)
+                         local  int n
+                         local  int prevlen
+                         local  int curlen
+                         local  int nextlen
+                         local  int count
+                         local  int max_count
+                         local  int min_count
+  779  00221820    32C  static void send_tree(deflate_state* s, ct_data* tree, int max_code)
+                         local  int n
+                         local  int prevlen
+                         local  int curlen
+                         local  int nextlen
+                         local  int count
+                         local  int max_count
+                         local  int min_count
+  827    inline-only   static int build_bl_tree(deflate_state* s)
+                         local  int max_blindex
+  861    inline-only   static void send_all_trees(deflate_state* s, int lcodes, int dcodes, int blcodes)
+                         local  int rank
+  888  00221E0C    160  void _tr_stored_block(deflate_state* s, charf* buf, ulg stored_len, int eof)
+                         inlines  copy_block
+  909  00221BF4    154  void _tr_align(deflate_state* s)
+  937  0026EA40    630  void _tr_flush_block(deflate_state* s, charf* buf, ulg stored_len, int eof)
+                         local  ulg opt_lenb
+                         local  ulg static_lenb
+                         local  int max_blindex
+                         inlines  build_bl_tree, send_all_trees, set_data_type
+ 1033  002202E8    1E4  int _tr_tally(deflate_state* s, unsigned int dist, unsigned int lc)
+                         local  unsigned int code
+ 1098  0026E6AC    394  static void compress_block(deflate_state* s, ct_data* ltree, ct_data* dtree)
+                         local  unsigned int dist
+                         local  int lc
+                         local  unsigned int lx
+                         local  unsigned int code
+                         local  int extra
+                         local  int base
+ 1169    inline-only   static void set_data_type(deflate_state* s)
+                         local  int n
+                         local  unsigned int ascii_freq
+                         local  unsigned int bin_freq
+ 1185    inline-only   static unsigned int bi_reverse(unsigned int code, int len)
+                         local  unsigned int res
+ 1198  00221B4C     A8  static void bi_flush(deflate_state* s)
+ 1214  00221D48     C4  static void bi_windup(deflate_state* s)
+ 1232    inline-only   static void copy_block(deflate_state* s, charf* buf, unsigned int len, int header)

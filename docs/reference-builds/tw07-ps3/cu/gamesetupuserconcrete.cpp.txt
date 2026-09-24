@@ -1,0 +1,15 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/gamesetupuserconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   55  005D4F60      8  struct GameUser* GetGameUser(const const struct <anon>* this)
+   61  005D7D1C     70  enum RTPState GetRTPState(const const struct <anon>* this)
+                         inlines  operator->
+   67  005D7D8C     70  enum Presence GetPresence(const const struct <anon>* this)
+                         inlines  operator->
+   73  005D7DFC    110  bool IsHost(const const struct <anon>* this)
+                         inlines  operator->
+   78  005F3368     68  void GameSetupUserConcrete(const struct <anon>* this, struct GameUser* pGameUser)
+                         inlines  RCPointer
+   84  005F3B34     44  void ~GameSetupUserConcrete(const struct <anon>* this)
+                         inlines  ~RCPointer

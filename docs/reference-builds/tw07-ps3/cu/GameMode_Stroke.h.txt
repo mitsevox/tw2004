@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/GameMode/Headers/GameMode_Stroke.h
+// compiled in: golf_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   31  0033EBC4     10  enum UIScoreCardDispMode_t GameModeStroke::GetScoreDisplayMode(const struct GameModeStroke* this, bool getAlternate)
+   49  0033EBD4      8  bool GameModeStroke::TrackingShotHistory(const struct GameModeStroke* this, enum PlayerNumber_t PlayerID)
+   51  0033EBDC      8  bool GameModeStroke::IsSpudHudUsed(const struct GameModeStroke* this)
+   52  0033EBE4      8  bool GameModeStroke::AllowUserShotClockOverride(const struct GameModeStroke* this)

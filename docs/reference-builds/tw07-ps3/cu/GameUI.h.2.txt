@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/GameMode/Headers/GameUI.h
+// compiled in: golf2_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+  261    inline-only   void GUI_UpdateShotUIData()
+  266    inline-only   void GUI_ClubSelected()
+  271    inline-only   void GUI_UpdateLieUIData()
+  276    inline-only   void GUI_UpdateWindUIData()
+  281    inline-only   void GUI_HidePostShotUI(enum PlayerNumber_t PlayerID)
+  287    inline-only   void GUI_ShowReplayLogo(int show)
+  309    inline-only   void GUI_ToggleTargetInfo(int screen, bool show)

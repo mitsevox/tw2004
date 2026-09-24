@@ -1,0 +1,166 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_trinity/trinity/Runtime/src/Trinity.cpp
+// compiled in: Trinity.cpp
+// 47 functions, source order. line | PS3 address | size
+
+    0  0058CDE4     7C  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  SequenceParams
+   78  00589558    1C8  void Initialize(struct TrinityManager* trinityManager)
+                         local  int32_t i
+                         local  int32_t i
+  139  00589F04    164  void Terminate()
+  177  0058D2B8    228  void Simulate(float_t fDeltaSec)
+                         local  int32_t i
+                         local  uint32_t i
+  225  0058D4E0    268  void StartSampleSequence(int32_t index)
+                         local  const struct <anon>* pSeqBin
+                         local  struct <anon> seqParams
+                         local  vec4flt trans
+                         local  quat rot
+                         local  mat44flt mat
+                         inlines  SequenceParams
+  283  0058D748     6C  void StartSampleSequenceID(uint32_t id)
+                         local  int32_t idx
+  304  00589800    10C  int32_t GetSequenceBinIndexFromName(char* pName)
+                         local  int32_t i
+  331  0058990C     4C  struct <anon>* GetSequenceBin(int32_t index)
+  346  00589958     F4  struct <anon>* GetSequenceBin(const char* pName)
+                         local  int32_t i
+  373  0058CE70     5C  struct Sequence* GetRunningSequenceById(uint32_t id)
+                         local  uint32_t i
+  391  00589720     E0  struct <anon>* GetSequenceBinFromId(uint32_t id)
+                         local  int32_t iSequence
+  414  00589A4C     54  bool8_t SequenceBinContainsCamera(int32_t sequenceBinId)
+  430  0058CECC    158  void AdjustTimeScale(float_t fDeltaSec)
+                         local  bool8_t foundAudio
+                         local  uint32_t i
+                         local  int32_t audioTime
+                         local  const float_t maxTimeCorrection
+                         local  const float_t allowableError
+                         local  float_t error
+                         local  float_t timeCorrection
+  507  00589AA0      4  void Display()
+  519  00589BC0    100  uint32_t ParseResource(struct <anon>* pSeqMaster)
+                         local  uint32_t i
+  546  00589AA4    11C  uint32_t ParseResource(struct <anon>* pSequenceBin)
+  583  00589CC0     9C  void FreeResource(struct <anon>* pSequenceBin)
+                         local  int32_t i
+  604  00589D5C     F4  void FreeResource(struct <anon>* pSequenceMaster)
+                         local  uint32_t i
+  626  0058D024    294  struct Sequence* Start(const const struct <anon>& seqParams)
+                         local  struct Sequence* pSequence
+                         local  uint32_t iIndex
+                         local  struct <anon>* pSequenceBin
+  720  00589E50     B4  void Stop()
+                         local  uint32_t i
+  739  0058A068     20  void(*)()* RegisterTrinityEventCallback(void(*)()* cbfn)
+                         local  void(*)()* oldCbfn
+  754  0058A088     28  int32_t AlignBuffer(int32_t bufferSize, int32_t align)
+                         local  const int32_t modBuffer
+  773  0058A0B0     FC  int32_t WriteSystemWaitTime(char* pData, float_t deltaTime)
+                         local  const uint16_t sizeInBytes
+                         local  const uint16_t opCode
+                         local  int32_t opSize
+  820  0058A1AC     C0  int32_t WriteSystemEnd(char* pData)
+                         local  const uint16_t sizeInBytes
+                         local  const uint16_t opcode
+                         local  int32_t opSize
+  846  0058A26C    26C  int32_t WriteActorCreate(char* pData, int32_t actorId, int32_t restoreActorState, int32_t spawnedActorPersist)
+                         local  const uint16_t sizeInBytes
+                         local  const uint16_t opCode
+                         local  int32_t opSize
+                         local  float_t actorScale
+                         local  char[32] weaponName
+                         local  int32_t cullingDisabled
+  895  0058A4D8    190  int32_t WriteActorTranslate(char* pData, int32_t actorId, int32_t numKeys, struct Key3d* pKeys)
+                         local  const uint16_t sizeInBytes
+                         local  const uint16_t opCode
+                         local  int32_t opSize
+  931  0058A668    190  int32_t WriteActorTranslateStartPos(char* pData, int32_t actorId, int32_t numKeys, struct Key3d* pKeys)
+                         local  const uint16_t sizeInBytes
+                         local  const uint16_t opCode
+                         local  int32_t opSize
+  967  0058A7F8    1A8  int32_t WriteActorRotate(char* pData, int32_t actorId, int32_t numKeys, struct Key4d* pKeys)
+                         local  const uint16_t sizeInBytes
+                         local  const uint16_t opCode
+                         local  int32_t opSize
+ 1000  0058A9A0    480  int32_t WriteActorSetTargetPosition(char* pData, const const struct ActorTargetParams& params)
+                         local  const uint16_t sizeInBytes
+                         local  const uint16_t opCode
+                         local  int32_t opSize
+                         local  struct TargetPosFlags flags
+ 1080  0058AE20    180  int32_t WriteActorSetTargetRotation(char* pData, const const struct ActorTargetParams& params)
+                         local  const uint16_t sizeInBytes
+                         local  const uint16_t opCode
+                         local  int32_t opSize
+ 1112  0058AFA0    2A4  int32_t WriteActorPlayAnim(char* pData, const const struct PlayAnimParams& params)
+                         local  const uint16_t sizeInBytes
+                         local  const uint16_t opCode
+                         local  int32_t opSize
+ 1160  0058B244    138  int32_t WriteStartHeadTracking(char* pData, int32_t lookerId, int32_t targetId)
+                         local  const uint16_t sizeInBytes
+                         local  const uint16_t opCode
+                         local  int32_t opSize
+ 1189  0058B37C     FC  int32_t WriteEndHeadTracking(char* pData, int32_t lookerId)
+                         local  const uint16_t sizeInBytes
+                         local  const uint16_t opCode
+                         local  int32_t opSize
+ 1219  0058B478    1EC  int32_t WriteActorFireProjectile(char* pData, int32_t attackerId, int32_t targetId, int32_t targetAreaId, int32_t wantToMiss, float_t projectileLifespan)
+                         local  const uint16_t sizeInBytes
+                         local  const uint16_t opCode
+                         local  int32_t opSize
+ 1259  0058B664    174  int32_t WriteActorAttachProjectile(char* pData, int32_t firingActorId, int32_t targetId, int32_t attachAreaId)
+                         local  const uint16_t sizeInBytes
+                         local  const uint16_t opCode
+                         local  int32_t opSize
+ 1290  0058B7D8    16C  int32_t WriteLuaScript(char* pData, const char* pScript)
+                         local  const uint16_t len
+                         local  uint16_t sizeInBytes
+                         local  const uint16_t opCode
+                         local  uint16_t remainder
+                         local  int32_t opSize
+ 1327  0058B944    174  int32_t WriteAudioSeqEvent(char* pData, uint8_t instID, uint8_t trackID, uint8_t rangeID)
+                         local  uint16_t sizeInBytes
+                         local  const uint16_t opCode
+                         local  int32_t opSize
+ 1383  0058BAB8    144  int32_t WriteCameraCreate(char* pData)
+                         local  const uint16_t sizeInBytes
+                         local  const uint16_t opCode
+                         local  int32_t opSize
+                         local  int32_t cameraId
+                         local  int32_t prevCamWhenDone
+ 1418  0058BBFC    204  int32_t WriteCameraTransformSampled(char* pData, int32_t numKeys, struct Key3d* pTransKeys, struct Key4d* pRotKeys)
+                         local  const uint16_t sizeInBytes
+                         local  const uint16_t opCode
+                         local  int32_t opSize
+                         local  int32_t camId
+ 1457  0058BE00    138  int32_t WriteTimeGradientEvent(char* pData, float_t target, float_t speed)
+                         local  uint16_t sizeInBytes
+                         local  const uint16_t opCode
+                         local  int32_t opSize
+ 1489  0058BF38    1EC  int32_t WriteFadeAlphaEvent(char* pData, int32_t actorEntityID, bool8_t bFadeIn, float_t duration, bool8_t deferred)
+                         local  uint16_t sizeInBytes
+                         local  const uint16_t opCode
+                         local  int32_t opSize
+                         local  int32_t val
+ 1530  0058C124    458  int32_t WriteVfxPlayOnBone(char* pData, int32_t actorID, const char* vfxName, const char* boneName, const vec3flt& offset, int32_t trinityVfxID)
+                         local  uint16_t sizeInBytes
+                         local  uint16_t opCode
+                         local  int32_t opSize
+                         local  vec3flt zeroPos
+ 1591  0058C57C    2FC  int32_t WriteVfxPlayOnScreen(char* pData, const char* vfxName, const vec3flt& screenPos, int32_t trinityVfxID)
+                         local  uint16_t sizeInBytes
+                         local  uint16_t opCode
+                         local  int32_t opSize
+ 1641  0058C878    338  int32_t WriteVfxPlayOnAlert(char* pData, int32_t entityID, const char* vfxName, const vec3flt& offset, int32_t trinityVfxID)
+                         local  uint16_t sizeInBytes
+                         local  uint16_t opCode
+                         local  int32_t opSize
+ 1692  0058CBB0    138  int32_t WriteVfxOnOff(char* pData, int32_t trinityVfxID, int32_t state)
+                         local  uint16_t sizeInBytes
+                         local  uint16_t opCode
+                         local  int32_t opSize
+ 1721  0058CCE8     FC  int32_t WriteVoidCallback(char* pData, SequenceVoidCallback pCallback)
+                         local  uint16_t sizeInBytes
+                         local  uint16_t opCode
+                         local  int32_t opSize
+ 1738  0058CE60     10  static void _GLOBAL__I_gaSequenceList()

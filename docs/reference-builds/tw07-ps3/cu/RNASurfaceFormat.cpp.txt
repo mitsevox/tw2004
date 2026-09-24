@@ -1,0 +1,19 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/PS3/RNASurfaceFormat.cpp
+// compiled in: RNASurfaceFormat.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   51  0083DCAC    118  uint16_t RNA::SurfaceFormatGetFlags(enum SurfaceFormatE eFormat)
+                         local  const char[22] __FUNCTION__
+                         inlines  RNADebugBreak
+   81  0083DDC4    104  uint32_t RNA::SurfaceFormatGetPitch(enum SurfaceFormatE eFormat, uint32_t width)
+                         local  const char[22] __FUNCTION__
+                         inlines  RNADebugBreak
+  136  0083DEC8    118  uint32_t RNA::SurfaceFormatConvertToGCMColorFormat(enum SurfaceFormatE eFormat)
+                         local  const char[37] __FUNCTION__
+                         inlines  RNADebugBreak
+  167  0083DFE0     70  uint32_t RNA::SurfaceFormatConvertToGCMDepthFormat(enum SurfaceFormatE eFormat)
+                         local  const char[37] __FUNCTION__
+                         inlines  RNADebugBreak
+  182  0083DB88    124  uint32_t RNA::SurfaceFormatGetRemap(enum SurfaceFormatE eFormat)
+                         local  const char[22] __FUNCTION__
+                         inlines  RNADebugBreak

@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/packages/tiger_module/source/tiger_module_trinity_sequence.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   18    inline-only   unsigned int TrinitySequence::GetResourceTag(const const struct TrinitySequence* this)

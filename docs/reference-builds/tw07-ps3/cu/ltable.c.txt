@@ -1,0 +1,84 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/lua-5.0.2/src/ltable.c
+// compiled in: ltable.c
+// 20 functions, source order. line | PS3 address | size
+
+   83  0054DC20     68  static Node* hashnum(const Table* t, lua_Number n)
+                         local  unsigned int[2] a
+                         local  int i
+   99  0054DC88    11C  Node* luaH_mainposition(const Table* t, const TObject* key)
+  119  0054DDA4     64  static int arrayindex(const TObject* key)
+                         local  int k
+  135    inline-only   static int luaH_index(lua_State* L, Table* t, StkId key)
+                         local  int i
+                         local  const TObject* v
+  153  0054EB88    334  int luaH_next(lua_State* L, Table* t, StkId key)
+                         local  int i
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  TObject* i_o
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  const TObject* v
+                         inlines  luaH_index
+  180    inline-only   static void computesizes(int* nums, int ntotal, int* narray, int* nhash)
+                         local  int i
+                         local  int a
+                         local  int na
+                         local  int n
+  201    inline-only   static void numuse(const Table* t, int* narray, int* nhash)
+                         local  int[25] nums
+                         local  int i
+                         local  int lg
+                         local  int totaluse
+                         local  int ttlg
+                         local  Node* n
+                         local  int k
+  239  0054DE08     9C  static void setarrayvector(lua_State* L, Table* t, int size)
+                         local  int i
+  248  0054DEA4    16C  static void setnodevector(lua_State* L, Table* t, int lsize)
+                         local  int i
+                         local  int size
+  272    inline-only   static void resize(lua_State* L, Table* t, int nasize, int nhsize)
+                         local  int i
+                         local  int oldasize
+                         local  int oldhsize
+                         local  Node* nold
+                         local  Node[1] temp
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  Node* old
+                         local  const TObject* o2
+                         local  TObject* o1
+  314    inline-only   static void rehash(lua_State* L, Table* t)
+                         local  int nasize
+                         local  int nhsize
+  327  0054E010     C0  Table* luaH_new(lua_State* L, int narray, int lnhash)
+                         local  Table* t
+  343  0054E0D0     90  void luaH_free(lua_State* L, Table* t)
+  379  0054E498    64C  static TObject* newkey(lua_State* L, Table* t, const TObject* key)
+                         local  TObject* val
+                         local  Node* mp
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  TObject* i_o
+                         local  Node* othern
+                         local  Node* n
+                         inlines  rehash
+  421    inline-only   static const TObject* luaH_getany(Table* t, const TObject* key)
+                         local  Node* n
+  437  0054E160     C4  const TObject* luaH_getnum(Table* t, int key)
+                         local  lua_Number nk
+                         local  Node* n
+  456  0054E224     7C  const TObject* luaH_getstr(Table* t, TString* key)
+                         local  Node* n
+  470  0054E2A0    114  const TObject* luaH_get(Table* t, const TObject* key)
+                         local  int k
+                         inlines  luaH_getany
+  485  0054E3B4     E4  TObject* luaH_set(lua_State* L, Table* t, const TObject* key)
+                         local  const TObject* p
+  499  0054EAE4     A4  TObject* luaH_setnum(lua_State* L, Table* t, int key)
+                         local  const TObject* p
+                         local  TObject k
+                         local  TObject* i_o

@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/packages/RNA/dev-2.0-golf/RNA/SceneGraph/include/SceneGraph/Runtime/Nodes/SGNodeRenderable.h
+// compiled in: rnaunity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   95    inline-only   void SGNodeRenderableC::SetGeomPtr(const struct SGNodeRenderableC* this, void* pGeom)
+   96    inline-only   void* SGNodeRenderableC::GetGeomPtr(const struct SGNodeRenderableC* this)

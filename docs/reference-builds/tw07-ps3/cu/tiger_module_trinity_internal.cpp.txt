@@ -1,0 +1,85 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_trinity_internal.cpp
+// compiled in: tiger_module_trinity_internal.cpp
+// 22 functions, source order. line | PS3 address | size
+
+   25  0053BC68    2E0  void TrinityInternal(const struct <anon>* this, struct Global* global, struct CCT* cct, struct Trinity* trinity)
+                         inlines  Global::GetLua, TrinityManager::SetTrinity
+   43  0053AE78     4C  void RemoveAllSequences(const struct <anon>* this)
+   53  0053AEC4    18C  void ~TrinityInternal(const struct <anon>* this)
+                         inlines  ~Allocatable
+   67  0053AA7C      8  unsigned int GetMasterCount(const const struct <anon>* this)
+   72  0053B0F0     AC  void AddSequence(const struct <anon>* this, struct <anon>* sequenceMaster, unsigned int tag)
+                         local  struct TrinitySequence* sequence
+   91  0053BA90     F4  struct TrinitySequence* FindSequence(const const struct <anon>* this, const char* name, unsigned int tag)
+                         local  struct TrinitySequence* seq
+                         inlines  GetNext
+  115  0053B19C     B0  void RemoveSequenceByMaster(const struct <anon>* this, void* masterPtr)
+                         local  struct TrinitySequence* seq
+                         inlines  GetNext
+  132  0053AAD4     FC  void RemoveSequence(const struct <anon>* this, struct TrinitySequence* sequence)
+  150  0053AA84     28  void StartSequence(const struct <anon>* this, struct TrinitySequence* sequence)
+  155  0053AAAC     28  void StopSequence(const struct <anon>* this, struct TrinitySequence* sequence)
+  161  0053BC1C     4C  bool RemoveSequence(const struct <anon>* this, const char* sequenceName, unsigned int tag)
+                         local  struct TrinitySequence* sequence
+  175  0053BBD0     4C  bool StartSequence(const struct <anon>* this, const char* sequenceName, unsigned int tag)
+                         local  struct TrinitySequence* sequence
+  189  0053BB84     4C  bool StopSequence(const struct <anon>* this, const char* sequenceName, unsigned int tag)
+                         local  struct TrinitySequence* sequence
+  204  0053AE10     68  void StopAllSequences(const struct <anon>* this)
+                         local  struct TrinitySequence* sequence
+                         inlines  GetNext
+  215  0053ABD0     44  void Update(const struct <anon>* this, float deltaSeconds)
+  220  0053B050     48  bool IsSequencePlaying(const const struct <anon>* this)
+                         local  struct TrinitySequence* sequence
+                         local  struct Sequence* seq
+                         inlines  GetNext, TrinitySequence::GetSequence
+  237  0053AC14     CC  void SetMainCam(const struct <anon>* this, const char* name)
+                         local  const struct TrinityCamera* camera
+  251  0053ACE0     CC  void SetPipCam(const struct <anon>* this, const char* name)
+                         local  const struct TrinityCamera* camera
+  265  0053B24C     50  const char* GetRunningSequenceName(const const struct <anon>* this)
+                         local  struct TrinitySequence* sequence
+                         local  struct Sequence* seq
+                         inlines  GetNext, TrinitySequence::GetSequence
+  283  0053B29C    7F4  void DisplayDebugInfo(const struct <anon>* this)
+                         local  const uint32_t scTrinityInfoStrLen
+                         local  const float scYStart
+                         local  const float scYSpacer
+                         local  const float scXFrame
+                         local  const float scXTime
+                         local  const float scXLua
+                         local  const float scXName
+                         local  const float scTextColorR
+                         local  const float scTextColorG
+                         local  const float scTextColorB
+                         local  const float scTextColorA
+                         local  const int scFontSize
+                         local  const int scFps
+                         local  float y
+                         local  char[32] secBuf
+                         local  char[32] luaReactionBuf
+                         local  char[32] sequenceNameBuf
+                         local  struct TrinitySequence* sequence
+                         local  struct TrinitySequence* sequence
+                         local  float y
+                         local  char[32] loadedSequencesBuf
+                         local  char[32] sequenceName
+                         local  struct Sequence* pSeq
+                         local  float fTime
+                         local  uint32_t frame
+                         local  uint32_t numFrames
+                         local  char[32] frameStr
+                         local  char[32] curTimeStr
+                         local  uint32_t min
+                         local  char[32] endTimeStr
+                         local  char[32] timeStr
+                         local  char[32] nameStr
+                         inlines  GetEndTime, GetNext, GetTime, TrinitySequence::GetResourceTag, TrinitySequence::GetSequence
+  511  0053B098     58  float GetSequenceTime(const struct <anon>* this)
+                         local  struct TrinitySequence* sequence
+                         local  struct Sequence* pSeq
+                         inlines  GetNext, GetTime, TrinitySequence::GetSequence
+  526  0053ADAC     64  float GetSequenceEndTime(const struct <anon>* this)
+                         local  struct TrinitySequence* sequence
+                         local  struct Sequence* pSeq
+                         inlines  GetEndTime, GetNext, TrinitySequence::GetSequence

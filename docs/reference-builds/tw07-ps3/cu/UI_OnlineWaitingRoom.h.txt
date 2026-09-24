@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/Golf/UI_Core/AptRuntime/Headers/UI_OnlineWaitingRoom.h
+// compiled in: golf2_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   48    inline-only   void UIOnlineWaitingRoom::SetExitedWaitingRoom(const struct UIOnlineWaitingRoom* this, bool flag)

@@ -1,0 +1,404 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/cameras/GoDynamicCam.c
+// compiled in: golf_unity.cpp
+// 99 functions, source order. line | PS3 address | size
+
+  176  001EF724      4  static void DynamicCam_AddMemUsage(int32 MemSize)
+  204  00240800     EC  static void* DynamicCam_AllocMem(int32 MemSize, TTypeAcces TypeMem, int32 align, bool useDebug)
+                         local  const char[20] __FUNCTION__
+                         inlines  TagValuePair, operator+
+  228  001EF728     3C  static void DynamicCam_FreeMem(void* ptr, int32 MemSize, bool debugMem)
+  259  001EF764     EC  void DynamicCam_RegisterStreamClients()
+  294  002B0034     9C  void DynamicCam_UnRegisterStreamClients()
+  332  001EF850     98  void DynamicCam_RegisterStreamClientsFE()
+  354  002938B0     70  void DynamicCam_UnRegisterStreamClientsFE()
+  377  002AFA10    624  void DynamicCam_LoadFilesFromDisk()
+                         local  int32 filesize
+                         local  char* srcPtr
+                         local  char* dstPtr
+                         local  char* fileBuf
+                         local  int32 numElems
+                         local  int32 numTriggers
+                         local  bool fileLoaded
+  557  00293574    33C  void DynamicCam_LoadFilesFromDiskFE()
+                         local  int32 filesize
+                         local  char* srcPtr
+                         local  char* dstPtr
+                         local  int32 numElems
+                         local  bool fileLoaded
+  660  00293128    194  static void DynamicCam_LoadCAMSfromStream(struct TStreamData* pStreamData)
+                         local  int numSeqsToLoad
+                         local  int numTriggersToLoad
+                         local  char* srcPtr
+                         local  char* dstPtr
+  712  00293A1C    108  static void DynamicCam_LoadCAMVfromStream(struct TStreamData* pStreamData)
+                         local  int numViewsToLoad
+                         local  char* srcPtr
+                         local  char* dstPtr
+  749  00293920     FC  static void DynamicCam_LoadCAMVfromStreamFE(struct TStreamData* pStreamData)
+                         local  int numViewsToLoad
+                         local  char* srcPtr
+                         local  char* dstPtr
+  790  00292E08     E4  static void DynamicCam_LoadCAMAfromStream(struct TStreamData* pStreamData)
+                         local  int numPairsToLoad
+                         local  char* srcPtr
+                         local  char* dstPtr
+  824  002933A4     E8  static void DynamicCam_LoadCAMLfromStream(struct TStreamData* pStreamData)
+                         local  int numChainsToLoad
+                         local  char* srcPtr
+                         local  char* dstPtr
+  857  00240A80     F4  static void DynamicCam_LoadCAMNfromStream(struct TStreamData* pStreamData)
+                         local  char* srcPtr
+                         local  char* dstPtr
+  886  00240990     F0  static void DynamicCam_LoadCAMNfromStreamFE(struct TStreamData* pStreamData)
+                         local  char* srcPtr
+                         local  char* dstPtr
+  921  00292EEC    23C  static void DynamicCam_CopySequenceData(char* src, char* dest, int numSeqs)
+                         local  int i
+                         local  char* triggerDest
+                         local  TByteSwapDataElementDef[19] seqElmDef
+                         local  TByteSwapDataElementDef[10] triggerElmDef
+                         inlines  BYTESWAP_SWAPDATASTRUCTURE
+  984  0029348C     E8  static void DynamicCam_CopyScriptData(char* src, char* dest, int numScripts)
+                         local  TByteSwapDataElementDef[32] viewElmDef
+                         inlines  BYTESWAP_SWAPDATASTRUCTURE
+ 1032  002932BC     E8  static void DynamicCam_CopyChainData(char* src, char* dest, int numScripts)
+                         local  TByteSwapDataElementDef[10] viewElmDef
+                         inlines  BYTESWAP_SWAPDATASTRUCTURE
+ 1056  00292CA0    168  static void DynamicCam_CopyAnimPairData(char* src, char* dest, int numPairs)
+                         local  TByteSwapDataElementDef[8] pairElmDef
+                         inlines  BYTESWAP_SWAPDATASTRUCTURE
+ 1082  001EF8E8    1A8  static void DynamicCam_ParseCameraViews(uint32 size)
+                         local  int i
+ 1132  001EFA90    264  static void DynamicCam_ParseCameraChains(uint32 size)
+                         local  int i
+ 1172  001F0408    13C  static void DynamicCam_ParseCameraViewsFE(uint32 size)
+                         local  int i
+ 1205  001F9974    154  static uint32_t DynamicCam_TranslateCourseIndex(uint32_t toolIndex)
+                         local  uint32_t realCourseIndex
+ 1280    inline-only   static void DynamicCam_TranslateExcludeHoles(const struct CameraEventTrigger_t& trigger)
+                         local  uint32_t courseIndex
+                         local  uint32_t realCourseIndex
+                         local  BitArray_t[9] holeExcludes
+                         local  int32_t i
+                         local  int32_t hole
+ 1325    inline-only   static void DynamicCam_TranslateAllowedCourses(const uint32& whichCourses)
+                         local  uint32 tempCourses
+                         local  int32_t i
+                         local  uint32_t shift
+ 1354  00281CCC    438  static void DynamicCam_ParseCameraSeqs(int32 numSeqs)
+                         local  int i
+                         local  int j
+                         local  int k
+                         local  bool matchFound
+                         inlines  DynamicCam_TranslateAllowedCourses, DynamicCam_TranslateExcludeHoles
+ 1415  001EFCF4    10C  static void DynamicCam_ParseNextSeqs()
+                         local  int i
+ 1439  001EFE00    210  static void DynamicCam_ParseAnimPairs(uint32 size)
+                         local  int i
+ 1497  001F0268    15C  static void DynamicCam_ParseCameraNames(int size)
+                         local  int i
+                         local  int i
+ 1530  002408EC     A4  void DynamicCam_Init()
+ 1550  001F059C    1C4  void DynamicCam_DeInit()
+ 1615  002DFECC    474  bool DynamicCam_ProcessScript(CameraChainLink* link, enum PlayerNumber_t ePlayerID, struct CameraScriptSettings_t* settings, float* position, float timeStep, float* lookAt, float* origCamPos)
+                         local  vec4flt origPosition
+                         local  vec4flt origToNewPos
+                         local  vec4flt origToNewPosNormalized
+                         local  float origToNewPosLength
+                         local  float scaleAmount
+                         local  float maxLag
+                         local  bool success
+                         local  CameraScript_t* script
+                         inlines  LLMath_Add3, LLMath_Length3, LLMath_Scale3, LLMath_Subtract3, __vec_mul, vec4flt_Copy3, vec_ld, vec_madd, vec_sld
+ 1713  001F0760     84  bool DynamicCam_IsBigHitCamera(CameraChainLink* link)
+ 1789  001F07E4     74  bool DynamicCam_bIsSwingCamera(CameraChainLink* camLink)
+ 1814  001F15E8    1E0  CameraChainLink* DynamicCam_ChooseScript(enum PlayerNumber_t ePlayerID, enum CameraShotState_e state, CameraChainLink* dontPick)
+                         local  int i
+                         local  int[50] possibleScripts
+                         local  int scriptsFound
+                         local  int randomScript
+                         local  int mustChoose
+                         local  uint32 randomNum
+ 1874  001F0884     CC  CameraChainLink* DynamicCam_ChooseScriptByName(const char* camName)
+                         local  int32 i
+ 1903  00276C74    374  CameraChainLink* DynamicCam_ChooseScriptInSequence(CameraSequence_t* sequence, enum CameraEvent_e event, enum CameraInterpType_e* interp, float* time, float* speed, enum CameraEvent_e* timeTrigger, float* timeTriggerTime, enum PlayerNumber_t playerID)
+                         local  int i
+                         local  int[50] possibleScripts
+                         local  int scriptsFound
+                         local  uint32 randomNum
+ 1994  00276BEC     88  bool DynamicCam_CanUseScriptOnThisHole(struct CameraEventTrigger_t* trigger)
+ 2010  001F0950      8  bool DynamicCam_CanUseScriptOnThisModel(struct CameraEventTrigger_t* trigger, enum PlayerNumber_t playerID)
+ 2049  00216158      8  bool DynamicCam_CanUseScriptForPlatform(struct CameraEventTrigger_t* trigger, enum PlayerNumber_t playerID, enum CameraEvent_e event)
+ 2096  001EF3A8     D4  CameraChainLink* DynamicCam_GetNextScript(CameraChainLink* link)
+                         local  int i
+ 2137  001EF47C     F8  CameraChainLink* DynamicCam_GetPrevScript(CameraChainLink* link)
+                         local  int i
+ 2172  001EA7EC     88  int32 DynamicCam_GetScriptNum(CameraChainLink* link)
+                         local  int i
+ 2185  001EBA20     20  int32 DynamicCam_GetNumberOfScripts()
+ 2190  001EC588     20  int32 DynamicCam_GetNumberOfSequences()
+ 2194  001EA260     88  int32 DynamicCam_GetSeqNum(CameraSequence_t* sequence)
+                         local  int i
+ 2207  001EA5B4     58  CameraChainLink* DynamicCam_GetScriptByNum(int32 script)
+ 2218  001EA208     58  CameraSequence_t* DynamicCam_GetSeqByNum(int32 sequence)
+ 2241  002DFCD0    1FC  bool DynamicCam_TrackPercent(CameraChainLink* link, enum PlayerNumber_t ePlayerID, struct CameraScriptSettings_t* settings, float* position, float* lookAt, float* origCamPos)
+                         local  vec4flt object1Location
+                         local  vec4flt object2Location
+                         local  float origHeight
+                         local  CameraScript_t* script
+                         local  bool getPositionSucceeded
+ 2305  002DF6C0    610  bool DynamicCam_TrackOffset(CameraChainLink* link, enum PlayerNumber_t ePlayerID, struct CameraScriptSettings_t* settings, float* position, float* lookAt, float* origCamPos)
+                         local  vec4flt object1Location
+                         local  vec4flt object2Location
+                         local  vec4flt curToNewPosition
+                         local  float ballToPinPercent
+                         local  float origHeight
+                         local  float scaleAmount
+                         local  float percent
+                         local  float sideOffset
+                         local  float refOffset
+                         local  CameraScript_t* script
+                         local  bool getPositionSucceeded
+                         local  vec4flt tempVec
+                         local  float length
+                         local  float dot
+                         local  vec4flt tempVec
+                         inlines  CamScript_ClearFlag, DynamicCam_CheckObjectLocations, DynamicCam_ReferencesBall, DynamicCam_ReferencesBallOrCup, LLMath_Add3, LLMath_AddScale3, LLMath_DotProduct3, LLMath_Scale3, LLMath_Subtract3, vec4flt_Copy, vec4flt_Swap, vec_madd, vec_sld, vec_sub
+ 2415  002DEE5C    864  void DynamicCam_TrackBallVelocityLag(CameraChainLink* link, enum PlayerNumber_t ePlayerID, struct CameraScriptSettings_t* settings, float* position, float timeStep, float* lookAt, float* origCamPos)
+                         local  vec4flt ballLocation
+                         local  vec4flt ballVelocity
+                         local  vec4flt newPosition
+                         local  vec4flt ballToOldPos
+                         local  vec4flt ballToOldPosNorm
+                         local  vec4flt ballToNewPos
+                         local  vec4flt ballToNewPosNorm
+                         local  vec4flt ballToRotPos
+                         local  vec4flt ballToRotPosNorm
+                         local  vec4flt rotAxis
+                         local  Quat rotationQuat
+                         local  float offset
+                         local  float diffLength
+                         local  float translationScaleAmount
+                         local  float rotationScaleAmount
+                         local  float swoopAmount
+                         local  float maxHeight
+                         local  float minHeight
+                         local  float smoothedBallAltitude
+                         local  float oldDistance
+                         local  float newDistance
+                         local  float angleDiff
+                         local  float angleDiffInRad
+                         local  float origHeight
+                         local  float ballSpeedFactor
+                         local  float easeLagAmount
+                         local  CameraScript_t* script
+                         inlines  LLMath_Add3, LLMath_AddScale3, LLMath_CrossProduct3W0, LLMath_DotProduct3, LLMath_Length3, LLMath_Scale3, LLMath_Subtract3, __vec_cross, __vec_mul, vec4flt_Copy3, vec_ld, vec_madd, vec_nmsub, vec_perm, vec_sld, vec_sub
+ 2648  002DEBD4    288  void DynamicCam_TrackBallVelocityTight(CameraChainLink* link, enum PlayerNumber_t ePlayerID, struct CameraScriptSettings_t* settings, float* position, float* lookAt, float* origCamPos)
+                         local  vec4flt ballLocation
+                         local  vec4flt ballVelocity
+                         local  vec4flt newPosition
+                         local  float offset
+                         local  float maxHeight
+                         local  float minHeight
+                         local  float smoothedBallAltitude
+                         local  float origHeight
+                         local  CameraScript_t* script
+                         inlines  LLMath_AddScale3, vec4flt_Copy3, vec_madd
+ 2735  002DEB70     64  void DynamicCam_TrackFixed(CameraChainLink* link, enum PlayerNumber_t ePlayerID, struct CameraScriptSettings_t* settings, float* position, float* lookAt, float* origCamPos)
+                         local  vec4flt objectPosition
+                         inlines  vec4flt_Copy3
+ 2755  0025F4D0     F0  void DynamicCam_Calculate2PointSphere(const float* object1Location, const float* object2Location, float* sphereCenter, const float& sphereRadius, float* lineOfActon)
+                         local  float tempRadius
+                         inlines  LLMath_AddScale3, LLMath_Subtract3, vec_madd, vec_sub
+ 2775  002DDD98    158  float DynamicCam_Get2PointHeight(const struct TwoPointFramingData& TwoPointData, float* lookAt, float* origCamPos)
+                         local  vec4flt tempPosition
+                         inlines  vec4flt_Copy3
+ 2830  002B30CC    1B8  void DynamicCam_CalculatePerspectiveCenter(const struct TwoPointFramingData& TwoPointData, float* camPos)
+                         local  float zDepth
+                         local  float obj1ZDepth
+                         local  float obj2ZDepth
+                         inlines  LLMath_AddScale3, LLMath_DistanceBetween3, __vec_len_sqr3, vec_madd, vec_sld
+ 2857  002878B0    22C  void DynamicCam_DetermineIdeal2PointPositionOnVector(float* vecToCamPos, float* sphereCenter, float sphereRadius, float* object1Location, float fieldOfView, float* idealPosition)
+                         local  vec4flt vecToObject1
+                         local  float tempAngle
+                         local  float cosAngle
+                         local  float tempDist
+                         inlines  LLMath_AddScale3, LLMath_DotProduct3, LLMath_Subtract3, std::sinf, vec_madd, vec_splat, vec_sub
+ 2903  00287ADC     34  void DynamicCam_DetermineIdeal2PointPositionOnVector(const struct TwoPointFramingData& TwoPointData, float* idealPosition)
+ 2918  002B3284     F0  void DynamicCam_DetermineIdeal2PointPerspectivePositionOnVector(const struct TwoPointFramingData& TwoPointData, float* camPos, float* idealPosition)
+                         inlines  LLMath_Subtract3
+ 2942  002DDEF0    33C  void DynamicCam_FindIdeal2PointFramingPosition(const struct TwoPointFramingData& TwoPointData, float* position, float* lookAt, float* origCamPos)
+                         local  vec4flt vecToCamPos
+                         local  float rotationAngle
+                         local  float distFromInt1ToCamPos
+                         local  vec4flt tempPosition
+                         local  float tempDist
+                         local  float side
+                         local  float emphasisAngle
+                         inlines  LLMath_AddScale3, LLMath_DistanceBetween3, LLMath_Subtract3, RotateXY, std::cosf, std::sinf, vec4flt_Copy3, vec_madd, vec_sld, vec_splat, vec_sub
+ 3054  002DE22C    944  void DynamicCam_Track2Point(CameraChainLink* link, enum PlayerNumber_t ePlayerID, struct CameraScriptSettings_t* settings, float* position, float* lookAt, float* origCamPos, float timeStep)
+                         local  CameraScript_t* script
+                         local  struct TwoPointFramingData TwoPointData
+                         local  vec4flt tempVec
+                         local  vec4flt landPos
+                         local  vec4flt landPos
+                         inlines  CamScript_ClearFlag, CamScript_SetFlag, DynamicCam_ReferencesBall, DynamicCam_ReferencesBallOrCup, LLMath_AddScale3, LLMath_DistanceBetween3, LLMath_Scale3, LLMath_Subtract3, RotateXY, __vec_make_from_scalar, __vec_mul, std::cosf, std::sinf, vec4flt_Copy, vec4flt_Copy3, vec_madd, vec_sub
+ 3408  002769CC    220  void DynamicCam_GetBonePos_AddMetersToYardsOffset(struct TCharacter* pCharacter, enum ReferencedBoneID boneID, float* posFinal)
+                         local  vec4flt posRoot
+                         local  vec4flt posBone
+                         inlines  Character_GetBonePos, Character_GetBonePos_FromIndex, LLMath_Add3, LLMath_Scale3, LLMath_Subtract3, __vec_mul, vec_ld
+ 3440  002DD368    A30  void DynamicCam_GetLocation(enum CameraTracking_e tracking, enum PlayerNumber_t ePlayerID, float* position, struct CameraScriptSettings_t* settings, CameraChainLink* link, float* lookAt, float* origCamPos)
+                         local  vec4flt leftFootPos
+                         local  vec4flt rightFootPos
+                         local  vec4flt footCenterPos
+                         local  vec4flt headPos
+                         local  vec4flt waistPos
+                         local  vec4flt chestPos
+                         local  vec4flt chestDir
+                         local  vec4flt headDir
+                         local  vec4flt waistDir
+                         local  vec4flt originPos
+                         local  vec4flt originDir
+                         local  mat44flt* headMat
+                         local  mat44flt* chestMat
+                         local  mat44flt* waistMat
+                         local  mat44flt* originMat
+                         local  CameraScript_t* script
+                         local  enum CameraTracking_e otherTracking
+                         local  struct TCharacter* pCharacter
+                         inlines  Character_GetBoneMatrix, Character_GetBonePos, GamePlayer::GetCharacter, LLMath_Add3, LLMath_Scale3, __vec_mul, vec4flt_Copy3, vec_ld
+ 3771  002CB930    6EC  CameraSequence_t* DynamicCam_ChooseSequence(enum PlayerNumber_t ePlayerID, float shotDist, enum Lie_t startLie, uint32 endLie, enum CameraShotState_e state, bool allowGenericShotTypes)
+                         local  int i
+                         local  int[50] possibleScripts
+                         local  int scriptsFound
+                         local  int randomScript
+                         local  int currentScript
+                         local  int defaultSeq
+                         local  float possiblePercent
+                         local  enum CameraLie_e cameraStartLie
+                         local  enum CameraLie_e cameraEndLie
+                         local  float heightDiff
+                         local  uint32 randomNum
+                         local  bool checkTriggers
+                         local  int32_t j
+ 3948  002CB2E4    64C  CameraSequence_t* DynamicCam_ChoosePreFlightSequence(enum PlayerNumber_t ePlayerID, enum Lie_t startLie, enum CameraShotState_e state)
+                         local  int i
+                         local  int[50] possibleScripts
+                         local  int scriptsFound
+                         local  int randomScript
+                         local  int currentScript
+                         local  float possiblePercent
+                         local  float distToPin
+                         local  float heightDiff
+                         local  int defaultSeq
+                         local  enum CameraLie_e cameraStartLie
+                         local  bool tooClose
+                         local  uint32 randomNum
+                         local  bool possible
+ 4111  001EC49C     2C  int DynamicCam_GetNumCamAnimPairs()
+ 4123  001E9D20     58  const char* DynamicCam_GetCamAnimPairAnimName(int index)
+ 4135  001EBA9C     C8  struct CameraAnimPairs_t* DynamicCam_FindAnimPairForAnim(const char* animName)
+                         local  int32 i
+ 4147  001F0DC4    188  bool DynamicCamSearchForPairedSequence(const char* animName, CameraSequence_t** pSequence, CameraChainLink** pLink)
+                         local  uint32 randomval
+                         local  struct CameraAnimPairs_t* pAnimPair
+ 4220  001F0F60    30C  bool DynamicCam_ChoosePairedSequenceOrCamera(enum PlayerNumber_t ePlayerID, bool checkReaction, CameraSequence_t** pSequence, CameraChainLink** pLink)
+                         local  char* animName
+                         local  char[32] copyAnimName
+                         local  const char* full_animName
+                         local  const char* underscore
+                         local  int i
+                         local  int j
+                         inlines  GameEffects_IsLetterboxOn
+ 4329  001F0B54     50  bool DynamicCam_IsDefualtSeq(CameraSequence_t* seq, enum CameraShotState_e state)
+ 4347  001F142C     50  bool DynamicCam_IsDefualtAnimSeq(CameraSequence_t* seq, enum CameraAnimType_e state)
+ 4364  001F147C     C8  enum CameraLie_e DynamicCam_MaterialToCameraLie(uint32 lieID, enum PlayerNumber_t playerID)
+                         local  enum CameraLie_e[20] sMaterialToCamLies
+                         local  float roughLength
+ 4443  001F0958     20  enum CameraLie_e DynamicCam_BallLieToCameraLie(enum Lie_t lie, enum PlayerNumber_t playerID)
+ 4480  001F0BA4    18C  bool DynamicCam_MatchSeqClub(CameraSequence_t* seq, enum PlayerNumber_t ePlayerID)
+                         local  enum Club_t club
+ 4580  001F0D54     38  bool DynamicCam_MatchHeightDiff(CameraSequence_t* seq, enum PlayerNumber_t ePlayerID, float heightDiff)
+ 4597  001F0978    1B0  bool DynamicCam_MatchSeqShot(CameraSequence_t* seq, enum PlayerNumber_t ePlayerID, bool allowGenericShotTypes)
+                         local  enum ShotType_t type
+ 4736  002490C4    150  bool DynamicCam_MatchPlayerType(CameraSequence_t* seq, enum PlayerNumber_t ePlayerID)
+ 4788  001F9870     4C  bool DynamicCam_MatchCourse(CameraSequence_t* seq)
+ 4803  001F9838     38  bool DynamicCam_MatchPars(CameraSequence_t* seq)
+ 4817  001F0D30     24  bool DynamicCam_MatchLies(uint32 lieFlag, enum CameraLie_e ballLie)
+ 4830  001F0D8C     38  bool DynamicCam_MatchDistToPin(CameraSequence_t* seq, enum PlayerNumber_t ePlayerID, float playerToPinDist)
+ 4849  001F126C    1C0  bool DynamicCam_MatchAnimType(CameraSequence_t* seq, enum CameraAnimType_e type)
+ 4924  001F0B28     2C  bool DynamicCam_MatchStateType(CameraSequence_t* seq, enum CameraShotState_e state)
+ 4944  002CB1D8    10C  bool DynamicCam_ModeType(CameraSequence_t* seq)
+                         local  enum GM_ModeType_t mode
+                         inlines  GM_GetModeType
+ 4988  001F0858     2C  bool DynamicCam_MatchScriptStateType(CameraChainLink* link, enum CameraShotState_e state)
+ 5008  001F1544     A4  bool DynamicCam_MatchPlayer(CameraScript_t* script)
+                         local  bool female
+                         local  uint64 modelID
+ 5049  002B3B74     FC  void DynamicCam_AddOffset(float* position, float* dir, float offset, struct CameraScriptSettings_t* settings, CameraChainLink* link, enum PlayerNumber_t ePlayerID, float origHeight)
+                         local  vec4flt normalizedDir
+                         inlines  vec4flt_Copy3
+ 5080  002B3598    5DC  void DynamicCam_AddHeightOffset(float* position, struct CameraScriptSettings_t* settings, CameraChainLink* link, enum PlayerNumber_t ePlayerID, float origHeight)
+                         local  TGD_TerrainInfo* pTerrainGameData
+                         local  vec4flt leftFootPos
+                         local  vec4flt rightFootPos
+                         local  vec4flt footCenterPos
+                         local  vec4flt waistPos
+                         local  vec4flt headPos
+                         local  vec4flt smoothBallPos
+                         local  vec4flt ballPosition
+                         local  float fSmoothAdjust
+                         local  float easeScale
+                         local  float minHeight
+                         local  int iBallUpdatesThisFrame
+                         local  vec4flt oldToNewBall
+                         local  int i
+                         local  CameraScript_t* script
+                         local  struct TCharacter* pCharacter
+                         inlines  GamePlayer::GetCharacter, LLMath_Add3, LLMath_Scale3, LLMath_Subtract3, __vec_mul, std::sqrt, vec4flt_Zero, vec_ld, vec_splat
+ 5284  00278B30    3F8  void DynamicCam_ApplyMinMaxHeight(float* position, CameraChainLink* link, enum PlayerNumber_t ePlayerID, struct CameraScriptSettings_t* settings, float* origPosition)
+                         local  TGD_TerrainInfo* pTerrainGameData
+                         local  float fActualGroundHeight
+                         local  float minHeight
+                         local  float maxHeight
+                         local  float heightDiff
+                         local  float minTerrainHeight
+                         local  CameraScript_t* script
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  vec4flt tempNormal
+                         inlines  CamScript_DoesScriptTrackGolfer
+ 5457  001F17C8     80  bool DynamicCam_IsValidFlightSequence(CameraSequence_t* seq, enum PlayerNumber_t playerID)
+ 5480  002747D4    334  void DynamicCam_ClampBallVelocity(float* ballVelocity, float* camPos, float* ballPos)
+                         local  vec4flt ballVelocity2D
+                         local  float cosAngle
+                         local  float angleDiffInRad
+                         local  vec4flt rotationAxis
+                         local  Quat rotationQuat
+                         inlines  LLMath_CrossProduct3W0, LLMath_DotProduct3, LLMath_Scale3, LLMath_Subtract3, __vec_mul, vec4flt_Copy3, vec_ld, vec_madd, vec_nmsub, vec_splat
+ 5527  002B3374    224  void DynamicCam_GetSmoothBallLocation(struct CameraScriptSettings_t* settings, CameraScript_t* script, enum PlayerNumber_t ePlayerID, float* position, bool set)
+                         local  bool ballInCup
+                         inlines  LLMath_DistanceBetween3, vec4flt_Copy3
+ 5580  00265E9C     EC  void DynamicCam_CalculateFlippedOffsets(CameraScript_t* pScript, enum PlayerNumber_t ePlayerID, float* sideOffset, float* refOffset)
+ 5632  00277C20     78  float DynamicCam_fAdjustMaxHeightByHole(float maxHeight)
+ 5660    inline-only   static void DynamicCam_CheckObjectLocations(struct CameraScriptSettings_t* settings, CameraScript_t* script, float* object1Location, float* object2Location)
+                         local  vec4flt tempVec
+                         local  vec4flt tempVec
+                         local  float length
+                         local  float dot
+ 5723  001F1848    4AC  void DynamicCam_PrintUnusedCamInfo()
+                         local  int i
+                         local  int j
+                         local  int k
+                         local  bool matchFound
+                         local  int unusedSeqs
+                         local  int unusedCams
+ 5850  00240B74    7E4  void DynamicCam_SaveCameraSettings()
+                         local  const char[30] __FUNCTION__
+                         local  char* gDynamicCamBuffer
+                         local  char* curBuf
+                         local  int i
+                         local  float fov
+                         local  float endFov
+                         local  bool oldState
+                         local  int curBufLen
+                         inlines  TagValuePair, operator+

@@ -1,0 +1,11 @@
+// C:/packages/rwaudiocore/2.08.01/source/decoders/ealayer31/mpegl3base.cpp
+// compiled in: mpegl3base.cpp
+// 4 functions, source order. line | PS3 address | size
+
+ 4480  006D8D58    194  void HuffmanTableSetup(const struct <anon>* this)
+ 4550  006D8EEC     84  void CMpegLayer3Base(const struct <anon>* this)
+                         local  int i
+ 4566  006D8FF4     60  void ~CMpegLayer3Base(const struct <anon>* this)
+ 4574  006D9120     90  int AllocateHybrid(const struct <anon>* this, int numChannels)
+                         local  unsigned int sizeOfPrevBlockX4
+                         inlines  core::MemSet

@@ -1,0 +1,9 @@
+// ../../../../../TIGERCODE/Code/Golf/GameMode/Headers/GameModeDriver_UCAPSkillChallenges.h
+// compiled in: golf_unity.cpp, other_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   43    inline-only   void GameModeDriverUCAPSkillChallenges::SetCurrentEventIndex(const struct GameModeDriverUCAPSkillChallenges* this, int iGame)
+   47    inline-only   int GameModeDriverUCAPSkillChallenges::GetNumEvents(const const struct GameModeDriverUCAPSkillChallenges* this)
+   49  0033E92C      8  bool GameModeDriverUCAPSkillChallenges::GiveExperience(const struct GameModeDriverUCAPSkillChallenges* this)
+   51    inline-only   struct UCAPSkillChallengesEvent_t* GameModeDriverUCAPSkillChallenges::GetUCAPSkillChallengesEventInfoPtr()
+   59  0033E934      8  bool GameModeDriverUCAPSkillChallenges::AIUseDisplayStats(const struct GameModeDriverUCAPSkillChallenges* this)

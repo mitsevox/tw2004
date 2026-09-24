@@ -1,0 +1,219 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/AI/Target.c
+// compiled in: golf2_unity.cpp
+// 34 functions, source order. line | PS3 address | size
+
+  139  0017B298    148  void TARGET_Init()
+                         local  bool registered
+                         local  struct HashString textureID
+                         local  int i
+                         local  struct TextureGroup* pTexGrp
+                         inlines  HashString::HashString
+  205  0014966C     24  void TARGET_Close()
+  216  001E6D54    16C  void TARGET_RenderMarker(enum PlayerNumber_t PlayerID)
+                         local  int8 currentState
+  261  001C0490   1318  void TARGET_RenderBallTarget(enum PlayerNumber_t PlayerID, bool forceArrowTarget, vec4flt* forceTarget)
+                         local  float[4][4] ballVerts
+                         local  float[4][4] shadowVerts
+                         local  int i
+                         local  CameraController_t* currCamera
+                         local  float textX
+                         local  float textX1
+                         local  float textX2
+                         local  float textY
+                         local  float[4] pulseVert
+                         local  float[4] trans1Vert
+                         local  float[4] trans2Vert
+                         local  struct RC_SRenderCtx* spRenderCtx
+                         local  int target_ypos
+                         local  int target_xpos
+                         local  float[4][3] ballVertexData
+                         local  bool bDraw
+                         local  float[4][4] ballUVs
+                         local  vec4flt transballColor
+                         local  vec4flt fullballColor
+                         local  vec4flt pulseColor
+                         local  vec4flt textColor
+                         local  float[4][3] shadowVertData
+                         local  float camDist
+                         local  float targetHeight
+                         local  float targetFeet
+                         local  float targetInches
+                         local  float sinp
+                         local  float cosp
+                         local  vec4flt* camPos
+                         local  vec4flt* camLook
+                         local  vec4flt straightVec
+                         local  vec4flt crossP
+                         local  float targetDistance
+                         local  vec4flt targetPos
+                         local  float powerpercent
+                         local  float targetScale
+                         local  float dotP
+                         local  vec4flt camToLook
+                         local  struct CoreShotInfo_t* shotInfo
+                         local  bool bIsPuttingInTemple
+                         local  int8_t iViewControllerId
+                         local  int32 targetPanelHeight
+                         local  const int32 SAFE_ZONE_DIVISOR
+                         local  int32 minY
+                         local  int32 maxY
+                         local  void* pVoidGameMode
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, GUI_ToggleTargetInfo, LLMath_CrossProduct3W0, LLMath_DistanceBetween3, LLMath_DotProduct3, LLMath_Scale, LLMath_Subtract3, PR_vSetCurrentColor, PR_vSetCurrentTexture, PR_vSetCurrentUsage, RC_spGetRenderCtxViewport, RC_vComputeRenderCtxWorldToPrimitiveCoordinate, RC_vCoordPrimitiveToFrame, Singleton<DifficultySettings>::GetSingleton, __vec_cross, __vec_dot3, std::sqrt, vec4flt_Copy, vec_ld, vec_madd, vec_nmsub, vec_perm, vec_sld, vec_sub
+  794  00132E74    154  void TARGET_SetupTarget(enum PlayerNumber_t PlayerID)
+  831  00158050     5C  void TARGET_ResetMomentums(enum PlayerNumber_t PlayerID)
+                         inlines  GamePlayer::SetDistanceTargetMomentum, GamePlayer::SetRotationTargetMomentum
+  842  00149690      8  bool TARGET_AdjustOffsetForOob(enum PlayerNumber_t playerNum, float* curTargetPos, float* newTranslation)
+  872  001D97E0    170  void TARGET_AdjustShotAfterDistanceChange(enum PlayerNumber_t playerNum)
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  enum Club_t previousClub
+                         inlines  GUI_ClubSelected, GUI_UpdateLieUIData, GUI_UpdateShotUIData, GUI_UpdateWindUIData
+  911  001D9A40    B8C  bool TARGET_UpdateMomentums(enum PlayerNumber_t PlayerID)
+                         local  float rotateAmount
+                         local  CameraController_t* pCameraController
+                         local  vec4flt playerToCam
+                         local  vec4flt vec
+                         local  vec4flt origPos
+                         local  vec4flt playerToAim
+                         local  float playerToAimDist
+                         local  float playerToCamDist
+                         local  float sinp
+                         local  float cosp
+                         local  float minTargetDistance
+                         local  float speedMultiplier
+                         local  float targetMoveAmnt
+                         local  bool updateDistance
+                         local  bool changed
+                         local  bool bIsPuttingInTemple
+                         local  int8_t iViewControllerId
+                         local  float requestedDirection
+                         local  vec4flt offsetFromCur
+                         inlines  AIMgr, CA_fGetCameraFieldOfViewRatio, GUI_UpdateLieUIData, GUI_UpdateShotUIData, GUI_UpdateWindUIData, GamePlayer::GetDistanceTargetMomentum, GamePlayer::GetRotationTargetMomentum, GamePlayer::SetDistanceTargetMomentum, GamePlayer::SetRotationTargetMomentum, LLMath_Add3, LLMath_Length3, LLMath_Subtract3, std::cosf, std::sinf, vec4flt_Copy, vec4flt_Copy3, vec_madd, vec_sld, vec_st
+ 1149  001D9950     F0  void TARGET_MoveTargetInDirection(enum PlayerNumber_t playerNum, float cosX, float sinY)
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  const float targetMoveAmnt
+                         inlines  AIMgr, vec4flt_Copy
+ 1174  001580AC     C4  void Target_RotateLeft(enum PlayerNumber_t PlayerID)
+                         inlines  GamePlayer::GetRotationTargetMomentum, GamePlayer::SetRotationTargetMomentum
+ 1184  00158170     A4  void Target_RotateRight(enum PlayerNumber_t PlayerID)
+                         inlines  GamePlayer::GetRotationTargetMomentum, GamePlayer::SetRotationTargetMomentum
+ 1194  00156110    114  void Target_MoveForward(enum PlayerNumber_t PlayerID)
+                         inlines  GamePlayer::GetDistanceTargetMomentum, GamePlayer::SetDistanceTargetMomentum
+ 1225  00156224     F8  void Target_MoveBack(enum PlayerNumber_t PlayerID)
+                         inlines  GamePlayer::GetDistanceTargetMomentum, GamePlayer::SetDistanceTargetMomentum
+ 1260  00149698    1B0  static bool PlaceBall_IsValidDropLocation(enum PlayerNumber_t PlayerID, float* vec)
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  float fTerrainHeight
+                         local  vec4flt normal
+ 1305  001B3650     EC  void PlaceBall_Set(enum PlayerNumber_t PlayerID, const float* targetPos)
+                         local  float tempf
+                         local  vec4flt playerTargetPos
+                         local  float heightOffset
+                         inlines  GM_GetModeType, GamePlayer::SetBPTargetPositionVertex
+ 1336  00149848     E8  void PlaceBall_ResetMomentums(enum PlayerNumber_t PlayerID)
+                         local  vec4flt playerTargetPos
+                         inlines  GamePlayer::SetDistanceTargetMomentum, GamePlayer::SetRotationTargetMomentum
+ 1357  00149930     A8  bool PlaceBall_CheckInBounds(float* vec)
+ 1382  001464AC     18  struct TNetwork* PlaceBall_GetPlaceBallNetwork()
+ 1387  001B373C    900  bool PlaceBall_UpdateMomentums(enum PlayerNumber_t PlayerID, float tappaScale)
+                         local  vec4flt vec
+                         local  vec4flt startPos
+                         local  vec4flt move
+                         local  float targetMoveAmnt
+                         local  bool changed
+                         local  float rotateAmount
+                         local  float sinp
+                         local  float cosp
+                         local  float angle
+                         local  float frameRateScale
+                         local  uint32 materialID
+                         local  float terrainSpeedFactor
+                         local  struct TGD_MaterialInfo* playerSurface
+                         local  vec4flt playerTargetPos
+                         local  float angleMod
+                         inlines  GM_GetModeType, GamePlayer::GetBPRotation, GamePlayer::GetBPTargetPositionVertex, GamePlayer::SetBPRotation, GamePlayer::SetBPRotationTargetMomentum, GamePlayer::SetBPTargetPositionVertex, GamePlayer::SetBPXDistanceTargetMomentum, GamePlayer::SetBPZDistanceTargetMomentum, std::cosf, std::sinf
+ 1608  0015977C     C4  void PlaceBall_RotateLeft(enum PlayerNumber_t PlayerID)
+                         inlines  GamePlayer::GetBPRotationTargetMomentum, GamePlayer::SetBPRotationTargetMomentum
+ 1619  00159840     A4  void PlaceBall_RotateRight(enum PlayerNumber_t PlayerID)
+                         inlines  GamePlayer::GetBPRotationTargetMomentum, GamePlayer::SetBPRotationTargetMomentum
+ 1630  001563E8    114  void PlaceBall_MoveForward(enum PlayerNumber_t PlayerID)
+                         inlines  GamePlayer::GetBPZDistanceTargetMomentum, GamePlayer::SetBPZDistanceTargetMomentum
+ 1649  001564FC     F8  void PlaceBall_MoveBack(enum PlayerNumber_t PlayerID)
+                         inlines  GamePlayer::GetBPZDistanceTargetMomentum, GamePlayer::SetBPZDistanceTargetMomentum
+ 1670  00157DE0    114  void PlaceBall_MoveLeft(enum PlayerNumber_t PlayerID)
+                         inlines  GamePlayer::GetBPXDistanceTargetMomentum, GamePlayer::SetBPXDistanceTargetMomentum
+ 1689  00157EF4     F8  void PlaceBall_MoveRight(enum PlayerNumber_t PlayerID)
+                         inlines  GamePlayer::GetBPXDistanceTargetMomentum, GamePlayer::SetBPXDistanceTargetMomentum
+ 1722  001E5E08    F4C  void PlaceBall_RenderBallTarget(enum PlayerNumber_t PlayerID)
+                         local  float[4][4] ballVerts
+                         local  float[4][4] shadowVerts
+                         local  int i
+                         local  CameraController_t* currCamera
+                         local  float textX
+                         local  float textY
+                         local  int target_xpos
+                         local  int target_ypos
+                         local  float adjustedTargetHeight
+                         local  float vertFieldOfView
+                         local  float horizFieldOfView
+                         local  float minViewableY
+                         local  float maxViewableY
+                         local  float lXpX
+                         local  float lZpZ
+                         local  float cosFov
+                         local  float a
+                         local  float b
+                         local  float c
+                         local  float a2
+                         local  float x1
+                         local  float x2
+                         local  float sqrtb24ac
+                         local  vec4flt camToLook
+                         local  vec4flt camToTarget
+                         local  struct RC_SRenderCtx* spRenderCtx
+                         local  float[4][3] ballVertexData
+                         local  float[4][4] ballUVs
+                         local  float[4][3] shadowVertData
+                         local  float camDist
+                         local  float sinp
+                         local  float cosp
+                         local  vec4flt* camPos
+                         local  vec4flt* camLook
+                         local  vec4flt straightVec
+                         local  vec4flt crossP
+                         local  float teeDistance
+                         local  float holeDistance
+                         local  float ballDistance
+                         local  vec4flt targetPos
+                         local  vec4flt teePos
+                         local  vec4flt holePos
+                         local  vec4flt ballPos
+                         local  bool ballInBounds
+                         local  bool renderBall
+                         local  bool bRenderBallTargetText
+                         local  bool bRenderTextHideMarker
+                         local  float dotP
+                         local  vec4flt playerTeePos
+                         local  vec4flt vCup
+                         local  float[4][4] oobColors
+                         local  vec4flt* useColor
+                         local  vec4flt markerTopCenter
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetZBufferMode, LLMath_Add3, LLMath_CrossProduct3W0, LLMath_DistanceBetween3, LLMath_DotProduct3, LLMath_Scale, LLMath_Scale3, LLMath_Subtract, LLMath_Subtract3, PR_vSetCurrentColor, PR_vSetCurrentTexture, PR_vSetCurrentUsage, RC_spGetCurrentRenderCtxCamera, RC_spGetRenderCtxViewport, RC_vComputeRenderCtxWorldToPrimitiveCoordinate, RC_vCoordPrimitiveToFrame, __vec_cross, __vec_dot3, __vec_mul, std::cosf, std::sqrt, vec_ld, vec_madd, vec_nmsub, vec_perm, vec_sld, vec_splat, vec_st, vec_sub
+ 2191  0015EC2C    178  void PlaceBall_SetupTarget(enum PlayerNumber_t PlayerID)
+                         local  float angle
+                         local  vec4flt viewVec
+                         local  vec4flt playerBPTargetPos
+                         local  vec4flt vCup
+                         inlines  GamePlayer::SetBPRotation, LLMath_Subtract
+ 2231  00149A54     C0  void PlaceBall_SetTargetSize(enum PlayerNumber_t PlayerID, enum TargetSizeType sizeType)
+ 2253  00149B14    134  void PlaceBall_NetworkLoadCallback(struct TNetwork* netPtr)
+                         local  int i
+                         local  int j
+                         local  TNode* nodePtr
+ 2297  00149C48     1C  void PlaceBall_ResetPBNetwork()
+ 2302  00149C64     28  bool PlaceBall_GetDrawTargetOn(enum PlayerNumber_t PlayerID)
+ 2307  00149C8C     28  void PlaceBall_SetDrawTargetOn(enum PlayerNumber_t PlayerID, bool onoff)
+ 2312  001499D8     7C  float PlaceBall_DistanceFromPin(float* pos)
+                         local  float holeDistance
+                         local  vec4flt vCup
+                         local  vec4flt holePos
+                         inlines  LLMath_Subtract, std::sqrt

@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_OnlineGameModes_Gotw.h
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   16  0011A9A0    160  void UIOnlineGameModes_Gotw::~UIOnlineGameModes_Gotw(const struct UIOnlineGameModes_Gotw* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIOnlineGameModes_Gotw::DstMenuItem_omgw>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+   18  000FF734      C  uint32 UIOnlineGameModes_Gotw::GetSignature(const const struct UIOnlineGameModes_Gotw* this)
+   24  000FF740     44  void UIOnlineGameModes_Gotw::ShowHelpText(const struct UIOnlineGameModes_Gotw* this)
+   26  000FF78C      C  struct IExternArray* UIOnlineGameModes_Gotw::GetExternArray(const struct UIOnlineGameModes_Gotw* this)

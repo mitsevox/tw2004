@@ -1,0 +1,95 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/RenderObjects/model/ps3/twmodelrenderobj.cpp
+// compiled in: rnaunity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   53  004DB778    4F0  void ModelRenderObj(const struct <anon>* this, struct GeomC* geom, struct MaterialListC* materialList, RNAMatrix44& transform)
+                         local  struct MeshC* mesh
+                         local  const struct ElementT* posElem
+                         local  struct StreamPlatC* streamPlat
+                         local  void* vb
+                         local  int32_t stride
+                         local  int32_t numVerts
+                         local  float_t[3] bvmin
+                         local  float_t[3] bvmax
+                         local  RNAVector3 vMax
+                         local  int32_t i
+                         local  const Vector4Intrinsic_32 zero
+                         local  Vector4Intrinsic_32 isZeroMask
+                         local  Vector4Intrinsic_32 recipSqrt
+                         local  Vector4Intrinsic_32 result
+                         local  Vector4Intrinsic_32 secondEstimate
+                         local  Vector4Intrinsic_32 vZero
+                         local  Vector4Intrinsic_32 vOne
+                         local  Vector4Intrinsic_32 vHalf
+                         local  Vector4Intrinsic_32 estimate
+                         local  Vector4Intrinsic_32 vZero
+                         local  Vector4Intrinsic_32 vOne
+                         local  Vector4Intrinsic_32 vHalf
+                         local  float_t* v
+                         inlines  AssertMacroHelper, GetMesh, GetNumVertices, GetPlatform, GetStride, Matrix44, RNADebugBreak, StreamPlatC::GetVertexBuffer, VecFloat, Vector3, operator float, operator=, vpu::Magnitude, vpu::operator-
+  108  004C9AB8     18  void ~ModelRenderObj(const struct <anon>* this)
+  123  004DFBE4    840  void Process(const struct <anon>* this, struct DeviceC* device, double_t timeStamp)
+                         local  const const RNAMatrix44& view
+                         local  RNAMatrix44 viewInverse
+                         local  RNAVector4 cameraPosition
+                         local  const RNAVector3 worldPoint
+                         local  RNAVector3 cameraPosition3
+                         local  const RNAVector3 posVect
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  int[4] zero
+                         local  Vector4Intrinsic_32 _asmNegateYW_mask
+                         local  Vector4Intrinsic_32 _asmGetSignMaskYW_zero
+                         local  unsigned char[16] permuteControl
+                         local  Vector4Intrinsic_32 tmp0
+                         local  Vector4Intrinsic_32 tmp1
+                         local  Vector4Intrinsic_32 tmp2
+                         local  int[4] zero
+                         local  unsigned char[16] permuteControl
+                         local  int[4] zero
+                         local  Vector4Intrinsic_32 secondEstimate
+                         local  Vector4Intrinsic_32 vOne
+                         local  Vector4Intrinsic_32 estimate
+                         local  Vector4Intrinsic_32 vOne
+                         local  Vector4Intrinsic_32 tmp0
+                         local  Vector4Intrinsic_32 tmp1
+                         local  Vector4Intrinsic_32 tmp2
+                         local  int[4] zero
+                         local  Vector4Intrinsic_32 tmp0
+                         local  Vector4Intrinsic_32 tmp1
+                         local  Vector4Intrinsic_32 tmp2
+                         local  Vector4Intrinsic_32 xx_yy_zz_ww
+                         local  Vector4Intrinsic_32 zz_ww
+                         local  Vector4Intrinsic_32 xxpluszz_yyplusww
+                         local  Vector4Intrinsic_32 yyplusww
+                         local  Vector4Intrinsic_32 _asmNegateXZ_mask
+                         local  Vector4Intrinsic_32 _asmGetSignMaskXZ_zero
+                         local  unsigned char[16] permuteControl
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  Vector4Intrinsic_32 secondEstimate
+                         local  Vector4Intrinsic_32 vOne
+                         local  Vector4Intrinsic_32 estimate
+                         local  Vector4Intrinsic_32 vOne
+                         local  unsigned char[16] permuteControl
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  Vector4Intrinsic_32 _asmNegateXZ_mask
+                         local  Vector4Intrinsic_32 _asmNegateYW_mask
+                         local  Vector4Intrinsic_32 temp0
+                         local  Vector4Intrinsic_32 temp1
+                         local  Vector4Intrinsic_32 temp2
+                         local  Vector4Intrinsic_32 temp3
+                         local  int[4] zero
+                         local  unsigned char[16] permuteControl
+                         local  Vector4Intrinsic_32 xx_yy_zz
+                         local  Vector4Intrinsic_32 yy
+                         local  Vector4Intrinsic_32 zz
+                         inlines  AssertMacroHelper, Matrix44, Vector3, Vector3<VectorAxisX, VectorAxisY, VectorAxisZ>, Vector4, operator float, operator*, vec_perm, vec_splat, vpu::Inverse, vpu::Magnitude, vpu::_asmSquareRootDotV3, vpu::operator*, vpu::operator-, vpu::operator/<VectorAxisX, VectorAxisW>, vpu::operator/<VectorAxisY, VectorAxisW>, vpu::operator/<VectorAxisZ, VectorAxisW>
+  152  004E0424    6A0  void Render(const struct <anon>* this, struct DeviceC* device, double_t timeStamp)
+                         local  struct <anon>* renderObjMgr
+                         local  struct <anon> viewFrustum
+                         local  struct <anon> center
+                         local  struct ShaderC* shader
+                         local  struct MaterialC* pMaterial
+                         local  struct TechniqueInfo techInfo
+                         local  char[256] techname
+                         inlines  AssertMacroHelper, DeviceC::Flush, DeviceC::Render<RNA::GeomC>, GetInstance, GetMeshMatIndex, GetShader, GetTechnique, IsSphereInFrustum, Plane, RNADebugBreak, VecFloat, Vector3, Vector4, ViewFrustum, operator float

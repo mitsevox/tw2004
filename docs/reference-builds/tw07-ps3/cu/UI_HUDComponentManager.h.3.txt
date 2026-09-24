@@ -1,0 +1,19 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/Headers/UI_HUDComponentManager.h
+// compiled in: golf_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+  171    inline-only   struct UIHud* UI_HUDComponentManager::getUIHud()
+  172    inline-only   struct UIScoreCardManager* UI_HUDComponentManager::getUIScoreCard()
+  173    inline-only   struct UIEndGame* UI_HUDComponentManager::getUIEndGame()
+  175    inline-only   struct UISpudHud* UI_HUDComponentManager::getUISpudHud()
+  176    inline-only   struct UIHighImpactMessages* UI_HUDComponentManager::getUIHighImpactMessages()
+  177    inline-only   struct UILowImpactMessages* UI_HUDComponentManager::getUILowImpactMessages()
+  179    inline-only   struct UIBattleGolf_ChooseAddRemove* UI_HUDComponentManager::getUIBattleGolf_ChooseAddRemove()
+  180    inline-only   struct UIBattleGolf_ChooseClub* UI_HUDComponentManager::getUIBattleGolf_ChooseClub()
+  181    inline-only   struct UIBloodSome* UI_HUDComponentManager::getUIBloodSome()
+  183    inline-only   struct UIHUDFlashText* UI_HUDComponentManager::getUIHUDFlashText()
+  184    inline-only   struct UITutorial* UI_HUDComponentManager::getUITutorial()
+  185    inline-only   struct UISkillZone* UI_HUDComponentManager::getUISkillZone()
+  189    inline-only   struct UIHudShotInfo* UI_HUDComponentManager::getUIHudShotInfo()
+  191    inline-only   struct UISeveTwentyOne* UI_HUDComponentManager::getUISeveTwentyOne()
+  192    inline-only   struct UIMinigames* UI_HUDComponentManager::getUIMinigames()

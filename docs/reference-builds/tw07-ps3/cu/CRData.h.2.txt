@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/CRData.h
+// compiled in: headgate_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   15  0034A814     E0  void CRData::CRData(const struct CRData* this)
+                         inlines  PatchInfoS::PatchInfoS
+   16  0034A8F8     2C  void CRData::~CRData(const struct CRData* this)
+   31    inline-only   void CRData::SetGolferPos(const struct CRData* this, float* pos)
+   35    inline-only   int CRData::GetGolferPosition(const struct CRData* this, float* v)
+   37    inline-only   int CRData::GetGolferMinMaxPos(const struct CRData* this, float* min, float* max, float* pos)
+   44    inline-only   bool CRData::IsGolferObjstructedByStructure(const struct CRData* this)
+   45    inline-only   float CRData::GetObstructedGolferDist(const struct CRData* this)

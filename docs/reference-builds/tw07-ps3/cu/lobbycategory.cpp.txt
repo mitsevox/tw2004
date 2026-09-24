@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/lobbycategory.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    5  005B9650     34  void LobbyCategory(const struct LobbyCategory* this)
+    9  005B96B8      C  void ~LobbyCategory(const struct LobbyCategory* this)

@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/././garbagecollectorconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   59  005B74FC     3C  void GarbageCollectorConcrete(const struct <anon>* this)
+   62  005B7538      4  void ~GarbageCollectorConcrete(const struct <anon>* this)
+   71    inline-only   void* operator new(size_t size)
+   77    inline-only   void operator delete(void* ptr)

@@ -1,0 +1,9 @@
+// C:/packages/rwaudiocore/2.08.01/include/rw/audio/core/voice.h
+// compiled in: highpassiir2.cpp, sndplayer1.cpp, system.cpp, voice.cpp
+// 5 functions, source order. line | PS3 address | size
+
+  395    inline-only   float GetPriority(const struct Voice* this)
+  442    inline-only   bool IsExpelled(const struct Voice* this)
+  633    inline-only   struct <anon>* GetSystem(const struct Voice* this)
+  712    inline-only   float GetDecayInSamples(const struct Voice* this)
+  718    inline-only   void AdjustDecaySamples(const struct Voice* this, float decay)

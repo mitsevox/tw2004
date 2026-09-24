@@ -1,0 +1,14 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_Filter.cpp
+// compiled in: shader_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   34  0051B77C     6C  void SM_FilterClass::SM_FilterClass(const struct SM_FilterClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base
+   49  00509360    174  void SM_FilterClass::Load(const struct SM_FilterClass* this)
+   67  005094D4     A4  void SM_FilterClass::Activate(const struct SM_FilterClass* this)
+   78  00509578     38  void SM_FilterClass::Deactivate(const struct SM_FilterClass* this)
+   85  00512318     74  void SM_FilterClass::SetFilterSampleBase(const struct SM_FilterClass* this, float b0, float b1)
+   95  0051238C     74  void SM_FilterClass::SetFilterOffset1(const struct SM_FilterClass* this, float v0, float v1)
+  105  00512400     74  void SM_FilterClass::SetFilterOffset2(const struct SM_FilterClass* this, float v0, float v1)
+  114  00512474     74  void SM_FilterClass::SetFilterOffset3(const struct SM_FilterClass* this, float v0, float v1)
+  124  005124E8     64  void SM_FilterClass::SetFilterTexture(const struct SM_FilterClass* this, TextureRef texRef)

@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/istudio_runtime/uiLoadFile.c
+// compiled in: apt_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   16  0002CEE4      4  void UI_RegisterStreamClients()
+   24  0002CB5C      8  bool UI_TestTextureGroupChkRef(int32 id)

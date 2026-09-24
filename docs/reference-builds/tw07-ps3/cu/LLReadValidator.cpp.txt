@@ -1,0 +1,21 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLReadValidator.cpp
+// compiled in: Legacy_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   53  00392474    2F8  int LLReadValidator_ReadCallback(const char* name, unsigned int offset, const char* data, unsigned int size)
+                         local  const char* stored_name
+                         local  unsigned int nameHash
+                         local  struct ChecksumEntry* found
+                         local  unsigned int blockOffset
+                         local  unsigned int checksum
+                         local  int i
+                         local  struct ChecksumEntry* entry
+  135  003C591C    2D0  void LLReadValidator_InitOnce()
+                         local  const char[25] __FUNCTION__
+                         local  int32 f
+                         local  int32 size
+                         local  int32 bytes
+                         local  unsigned int tableCrc
+                         local  int i
+                         local  struct ChecksumEntry* entry
+                         inlines  TagValuePair, operator+

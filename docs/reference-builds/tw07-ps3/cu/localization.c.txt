@@ -1,0 +1,145 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Localization/localization.c
+// compiled in: golf_unity.cpp
+// 65 functions, source order. line | PS3 address | size
+
+   69  0021AF14     74  void Locale_SetLanguage(enum Locale_Language_e language)
+   81  0021AF88     18  enum Locale_Language_e Locale_GetLanguage()
+   91  0021AFA0    108  static int Locale_GetStringKeyCompare(const void* keyToFind, const void* placeToLook)
+                         local  const char* pKey
+                         local  const char* pPlace
+                         local  int nIdLen
+                         local  int nIndex
+                         local  char keyChar
+                         local  char placeChar
+                         local  int nCompareRslt
+  123  0021B0A8     9C  char* Locale_GetString(const char* szStrID)
+                         local  const char* pStr
+                         local  void* pSrchRslt
+                         local  const char* pStringRec
+  159  0021CDAC     E8  void Locale_CopyLocalString(char* buffer, const char* id, int32 n)
+                         local  const char* src
+  168  00278F28    22C  static void Locale_SubstTokenVA(char* str, int n, const char* token, const char* fmt, va_list va)
+                         local  char[512] tail
+                         local  char* start
+                         local  char* end
+                         local  int remainingLength
+                         inlines  std::strstr
+  215  00279524     3C  void Locale_SubstToken(char* string, int n, const char* token, const char* fmt)
+                         local  va_list va
+  260  00279154     A4  const char* Locale_BuffSubstCreate(const char* string, const char* token, const char* fmt)
+                         local  va_list va
+  302  0021B144    304  char* Locale_GetStringIndexed(const char* strIdBase, int Ofs, int32 numLeadingZeros)
+                         local  int nSeqIndex
+                         local  int nMult
+                         local  const char* p
+                         local  char[128] temp
+                         local  char* localizedString
+                         local  int nTemp
+                         local  char[5] buff
+                         local  char* pFirst
+                         local  char* pTemp
+                         local  int i
+  358  0021CE94     1C  char* Locale_GetFrontendName()
+  363  0021CEB0     1C  char* Locale_GetIngameName()
+  368  0021CECC     1C  char* Locale_GetFacilityStreamName()
+  373  0021CEE8     1C  char* Locale_GetFrontendStreamName()
+  378  0021CF04     1C  char* Locale_GetIngameStreamName()
+  383  0021CF20     1C  char* Locale_GetCRACStreamName()
+  388  00200C0C     74  void Locale_SetMoneyString(char* dest, size_t destBufLen, const char* moneystring)
+  396  0021CF3C     44  char Locale_GetMoneySeparator()
+  410  0021CF80     38  char Locale_GetDecimalSeparator()
+  423  0021CFB8     A4  void Locale_LocalizeDecimalSeparator(char* numberWithFraction, size_t destBufLen)
+                         local  const uint32 stringLength
+                         local  const char englishDecimalSeparator
+                         local  uint32 charIndex
+                         local  char separator
+  438  0021D05C    128  void Locale_LocalizeSign(char* numberString, size_t numberStringSize)
+                         local  const uint32 MAX_LOCALIZE_SIGN_STRING_SIZE
+                         local  bool insertSpaceBeforeSign
+                         local  uint32 length
+                         local  uint32 charIndex
+  491  002442D8      8  static void Locale_vLanguageStringCallback(struct TStreamData* spStreamData_p)
+  496  002442D0      8  static void Locale_vStartupUICallback(struct TStreamData* spStreamData_p)
+  502  00243FEC    2E4  void Locale_vStreamCallback(struct TStreamData* spStreamData_p, enum Locale_LanguageFile_e locale_index)
+                         local  const char[23] __FUNCTION__
+                         local  int32 i
+                         local  int32 j
+                         local  uint32 offset
+                         local  struct TStreamData* ptr
+                         inlines  TagValuePair, operator+
+  540  0021D184     C8  void Locale_vSetLanguageStartupUI()
+                         local  struct TStreamData* ptr
+  560  00244340    520  void Locale_vSetLanguageStrings()
+                         local  const char[27] __FUNCTION__
+                         local  int32 i
+                         local  int32* data
+                         local  uintptr_t offset
+                         local  uintptr_t* offset_table
+                         local  uintptr_t hold
+                         local  struct TStreamData** pPtr
+                         inlines  TagValuePair, operator+
+  701  0021D270     A4  void Locale_vRegisterStreamClients()
+  710  0021D314     5C  void Locale_vUnregisterStreamClients()
+  719  0021D370     44  void Locale_vRegisterStreamStartup()
+  725  0021D3B4     2C  void Locale_vUnregisterStreamStartup()
+  788  0021D3E0     20  void ConvertTo4Char(int32 curr_course, char* course_char)
+  796  0021D400     54  int CourseMatches(char* id1, char* id2)
+                         local  int i
+ 1058  0021D454      4  void LocaleCommentary_vRegisterStreamClients()
+ 1065  0021D458      4  void LocaleCommentary_vUnregisterStreamClients()
+ 1073  0021D45C     5C  void LocaleCommentary_Init()
+                         local  int i
+ 1086  0021D4B8     E4  void LocaleCommentary_Close()
+                         local  int i
+ 1124    inline-only   static int LocaleCommentary_TruncToBufSize(const char* txtstr, char* txtbuf, size_t txtBufLen, int pagenum)
+                         local  int nPagesFound
+                         local  const char* pNextStart
+                         local  const char* pCopyStart
+                         local  const char* pCopyEnd
+                         local  bool bLastPage
+                         local  const char kManualPageBreakChar
+                         local  const char* pCurrPage
+                         local  const char* pPageEnd
+                         local  int nPageSize
+                         local  int nLastSpaceLoc
+                         local  bool bHaveGap
+ 1206  0021D59C    100  bool Locale_GetCommentaryHeaderAndIndex(int32 audio_index, int32* pLocType, int32* pIndex)
+                         local  int loc_type
+                         local  struct LOC_COMMENTARY_HDR_t* loc_hdr
+                         local  int i
+ 1239  0021D69C     2C  bool Locale_HasLocalizedCommentaryText(int32 audio_index)
+ 1244  0021D6C8    2F4  char* LocaleCommentary_GetPopupText(int pagenum, int max_page_sz, int* total_pages)
+                         local  int32 audio_index
+                         local  char* txtstr
+                         local  int32 offset
+                         local  int32 loc_type
+                         local  int32 nHeaderIndex
+                         local  struct LOC_COMMENTARY_HDR_t* loc_hdr
+                         local  char* loc_txt
+                         inlines  LocaleCommentary_TruncToBufSize
+ 1597  0021D9BC      4  void LocaleTutorial_vRegisterStreamClients()
+ 1604  0021D9C0      4  void LocaleTutorial_vUnregisterStreamClients()
+ 1611  0021D9C4      8  bool Locale_PopupDelay()
+ 1626  0021D254      4  void Locale_LadderedMode_LoadTCMfromStream(struct TStreamData* pStreamData)
+ 1631  0021D258      4  void Locale_LadderedMode_LoadTCMStrfromStream(struct TStreamData* pStreamData)
+ 1636  0021D25C      4  void Locale_PlayNowMode_LoadPLYfromStream(struct TStreamData* pStreamData)
+ 1641  0021D260      4  void Locale_PlayNowMode_LoadPLYsfromStream(struct TStreamData* pStreamData)
+ 1646  0021D264      4  void Locale_PgaTourMode_LoadPGAcFromStream(struct TStreamData* pStreamData)
+ 1653  00242470      4  void Locale_PgaTourMode_LoadPGAnFromStream(struct TStreamData* pStreamData)
+ 1660  0021D268      4  void Locale_PgaTourMode_LoadPGAeFromStream(struct TStreamData* pStreamData)
+ 1667  002426D0      4  void Locale_PgaTourMode_LoadPGAsFromStream(struct TStreamData* pStreamData)
+ 1674  0021D26C      4  void Locale_PgaTourMode_LoadPGnlFromStream(struct TStreamData* pStreamData)
+ 1681  00242590      4  void Locale_PgaTourMode_LoadPGn2FromStream(struct TStreamData* pStreamData)
+ 1688  00242838      4  void Locale_RealtimeMode_LoadRTEcFromStream(struct TStreamData* pStreamData)
+ 1695  00242ABC      4  void Locale_RealtimeMode_LoadRTEnFromStream(struct TStreamData* pStreamData)
+ 1702  0021D9CC     24  void Locale_Earnings_LoadERNFromStream(struct TStreamData* pStreamData)
+ 1709  0021D9F0     24  void Locale_Earnings_LoadEBSnFromStream(struct TStreamData* pStreamData)
+ 1716  0021DA14     24  void Locale_Earnings_LoadEBHnFromStream(struct TStreamData* pStreamData)
+ 1723  0021DA38     24  void Locale_Earnings_LoadEBGnFromStream(struct TStreamData* pStreamData)
+ 1730  00241DF4      4  void Locale_DriverEra_LoadERADFromStream(struct TStreamData* pStreamData)
+ 1737  00242350      4  void Locale_DriverEra_LoadERAnFromStream(struct TStreamData* pStreamData)
+ 1744  00242C90      4  void Locale_DriverTigerChallenge_LoadTGRCFromStream(struct TStreamData* pStreamData)
+ 1751  00242FF4      4  void Locale_DriverTrainingChallenges_LoadTRAtFromStream(struct TStreamData* pStreamData)
+ 1758  002434B8      4  void Locale_DriverUCAPSkillChallenges_LoadUCAtFromStream(struct TStreamData* pStreamData)
+ 1765  00243180      4  void Locale_DriverFacility_LoadFACTFromStream(struct TStreamData* pStreamData)
+ 1773  0021D24C      8  enum Locale_Language_e Locale_GetOSLanguage()

@@ -1,0 +1,14 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/texblendoverlay.cpp
+// compiled in: other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   18  003D1510     40  void TexBlendOverlay::TexBlendOverlay(const struct TexBlendOverlay* this, const const struct Allocator& allocRef, struct Texture32b* destTexture)
+   25  003D1590     18  void TexBlendOverlay::~TexBlendOverlay(const struct TexBlendOverlay* this)
+   30  003D160C    520  void TexBlendOverlay::BlendNPixels(const struct TexBlendOverlay* this, int32_t mipmap, int32_t numTextures, struct RawTexture** textures, TexBlendParams* params, int32_t numPixels, RawTexture_PixelValue** pixelBuffer, RawTexture_PixelValue* destPixels)
+                         local  int i
+                         local  RawTexture_PixelValue* pix1
+                         local  RawTexture_PixelValue* pix2
+                         local  float alphaPercent
+                         local  float r
+                         local  float g
+                         local  float b

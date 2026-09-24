@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/packages/RNA/dev-2.0-golf/RNA/RNAX/include/RNAX/RNABuilder.inl
+// compiled in: rnaunity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+  237    inline-only   void SetElement3f(const struct <anon>* this, enum ElementNameE eName, uint32_t uIndex, float_t x, float_t y, float_t z)
+                         local  const char[13] __FUNCTION__
+  307    inline-only   void SetPosition3f(const struct <anon>* this, float_t x, float_t y, float_t z)
+  349    inline-only   void SetTexCoord3f(const struct <anon>* this, uint32_t uIndex, float_t x, float_t y, float_t z)

@@ -1,0 +1,9 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNARender/ps3/RNARender/RNAMeshPlat.h
+// compiled in: RNABuilder.cpp, RNAMeshProcessorImmediate.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   37    inline-only   void* MeshPlatC::operator new(size_t size, const char* text, struct ICoreAllocator* allocator, enum AllocFlags allocator_flags, uint32_t alignment)
+   37    inline-only   struct ICoreAllocator* MeshPlatC::GetClassAllocator()
+   47    inline-only   uint32_t MeshPlatC::GetStartIndex(const const struct MeshPlatC* this)
+   48    inline-only   uint32_t MeshPlatC::GetPrimCount(const const struct MeshPlatC* this)
+   50    inline-only   uint32_t MeshPlatC::GetIndicesOffset(const const struct MeshPlatC* this)

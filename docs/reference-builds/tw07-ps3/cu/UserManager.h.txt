@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/User/Headers/UserManager.h
+// compiled in: apt_unity.cpp, golf2_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   97    inline-only   void UserManager::SetUpForOnlineGame(const struct UserManager* this)
+  125    inline-only   enum UserNumber UserManager::CurrentUserSlot(const struct UserManager* this)

@@ -1,0 +1,6 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/systemgetpluginregistry.cpp
+// compiled in: systemgetpluginregistry.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   13  006D6C6C     98  struct PlugInRegistry* GetPlugInRegistry(const struct <anon>* this)
+                         local  const char[18] __FUNCTION__

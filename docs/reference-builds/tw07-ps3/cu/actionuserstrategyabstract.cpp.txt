@@ -1,0 +1,11 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/actionuserstrategyabstract.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   75  005B32B8     34  void ActionUserStrategy(const struct ActionUserStrategy* this)
+   99  005B3320      C  void ~ActionUserStrategy(const struct ActionUserStrategy* this)
+  123  005B3370     54  void ActionUserStrategyAbstract(const struct <anon>* this, uint32_t uPriority, char8_t* strID)
+  149  005B3418      C  void ~ActionUserStrategyAbstract(const struct <anon>* this)
+  171  005B3468     40  bool IsShownForUser(const const struct <anon>* this, const struct User* pUser)
+  194  005B34A8     40  bool IsEnabledForUser(const const struct <anon>* this, const struct User* pUser)
+  217  005B34E8     9C  bool MeetsOnlineRequirements(const struct <anon>* this, const struct User* pUser)

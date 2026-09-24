@@ -1,0 +1,39 @@
+map-10 wave 5 (2026-09-24 09:42-11:00), range 02 0x80021980-0x80066558. Tried lists for the next lane.
+
+TOOLS (scratch, real-unit builds, no perm_setup needed):
+  w5_rt.py (rt(unit, fn, text) -> aligned diff count vs the unit's real .o), w5_real.py <Unit> <fn> [ctx] (diff),
+  w5_var.py <Unit> <fn> <base.c> <variants.py> (V=[(label, old, new) or (label, [(old,new),...])], G greedy, SAVE),
+  w5_climb.py <Unit> <fn> <base.c|-> <first decl> <last decl> (greedy decl climb), w5_show.py <Unit> <fn> <file.c>.
+  quicktrial base.c is unreliable for GoDynamicCam (local aggregate initialisers merge into one .rodata blob) and
+  fn_8004731C: use w5_rt there.
+
+DONE (exact)
+- GoDynamicCam fn_8003B028: fStep/fRise split into `x = a; x *= b;`, fT squared in place (`fT *= fT;`), the
+  acos result in a local (`fAngle = ...; fTurn = fAngle * fTurn;`), fFrames/fY declared late.
+- Swing STATEFUNC_GreenWatchRollUpdate: no pointer locals (pGhost etc.): write gPlayers[nPlayer].ballBefore.x in
+  the loop; CW hoists the addresses itself (TW07 has none of those locals).
+- Swing_UpdateBackswing: `int nKind = ...; if (!(nKind != 1 && nKind != 2 && nKind != 3))` (== chain on a local
+  merges 1||2 into a range compare; on the field it reloads for the index).
+- Ball_SetLie: `switch (r & 1) { case 0: if (...) {...; break;} default: ... }` for the beq/b pair.
+- Swing GOLFERSTATE_Set: no pStack/pTop locals (96.8 -> 97.3), then `s8 nState` (TW07: int8 newState) in the
+  definition and game.h -> 100; full report compared before/after: no other function moved, DOL OK.
+- GoTerrain fn_80031AB4 97.4 -> 99.3 (not exact): sqrt into fT first; pPlanes declared first; iObject block-scoped
+  in each loop. Left: loop 1's iObject<<6 in r25, orig r29.
+
+TRIED, NO GAIN
+- GoDynamicCam fn_8003D414 (fnmsubs operand order, the only diff): any form that puts the sqrt result in a variable
+  (function/block local, fHeight/fLow reuse, inline helper) fixes fnmsubs but rotates f29/f30/f31 (fY and the two
+  hoisted constants); decl order (all 24 of 4 floats, top/end) no help; + forms, neg forms, GC/2.0/2.6/2.7/1.3.2 same.
+- Swing_Launch (p in r27, orig r31): decl order (300 random), const/init p, all-p / no-p, late p, gPlayers+n.
+- Swing_RumbleOff: pointer order/const/decl permutations, p-> forms; TW07 SW_KillVibration has int temp +
+  pCoreShotInfo + pSwingInfo.
+- GoTerrain fn_80032B7C (1.0f arg load scheduled late): (u8) cast, 1.0/1, pointer arith, 0.0f<fFar, fBias init.
+- GoTerrain fn_80032518: orig indexes the inner loops by a scaled counter (lwzx base,nClip*4+0x38); ours walks a
+  pointer. Loop bounds < / <=, types (16 combos), unrolled / goto / flag forms: none.
+- skalib AnimLib_WasLastPlayed (nKind in r10, orig; ours r0): types, !strcmp, *ppSlot reuse, &[0], if-return.
+- gocamscripts fn_8003F2E0: not retried (see w4 notes).
+- Swing_ComputePower: EA's local order (SW_vCalculateShotPower) no gain; a random decl order gave 84.9 -> 85.1
+  only (not kept). Swing_CurveAngle: fRange statement splits/orders, no gain (pure scheduling of the gpSwing load).
+- PlayerNumber_t for the player parameter: worse or equal on Swing_Launch, Swing_RumbleOff, fn_8003D414,
+  AnimLib_WasLastPlayed. GoDynObj fn_8004731C: decl climb and the spin-constant expression forms, no gain.
+- GoTerrain fn_80034CAC: const / static const / file-scope const mask, == 1, >> 0: all fold to clrlwi.

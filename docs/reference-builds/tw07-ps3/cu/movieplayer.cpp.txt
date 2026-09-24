@@ -1,0 +1,88 @@
+// C:/packages/rwmovie/1.04.01/source/movielib/movieplayer/cmn/movieplayer.cpp
+// compiled in: movieplayer.cpp
+// 45 functions, source order. line | PS3 address | size
+
+    0  006F79F0     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   54  006F6FA0     1C  bool movie::DefaultStreamerDataFilterFunc(void* pData, void* filterContext)
+   66  006F6FBC      8  bool movie::MyStreamerNullFilterFunc(void* pData, void* filterContext)
+   81  006F7E58     3C  struct <anon> GetResourceDescriptor()
+                         local  RwUInt32 alignment
+                         local  RwUInt32 size
+                         inlines  ResourceDescriptor
+   89  006F8E00     34  struct <anon>* Initialize(const struct <anon>& resource, struct IResourceAllocator* allocator)
+                         local  struct <anon>* mplayer
+  247  006F6FC4     14  void SetStreamerParseFunc(const struct <anon>* this, const enum ParseReturnValue(*)()& streamerParseFunc)
+  276  006F6FD8     14  void SetStreamerVideoFilterFunc(const struct <anon>* this, const bool(*)()& streamerVideoFilterFunc)
+  305  006F6FEC     14  void SetStreamerAudioFilterFunc(const struct <anon>* this, const bool(*)()& streamerAudioFilterFunc)
+  333  006F7000     18  void SetStreamerSubtitleFilterFunc(const struct <anon>* this, const bool(*)()& streamerSubtitleFilterFunc, void* streamerSubtitleFilterContext)
+  363  006F7018     14  void SetVideoDecoder(const struct <anon>* this, struct IVideoDecoder* videoDecoder)
+  391  006F702C     14  void SetAudioDecoder(const struct <anon>* this, struct IAudioDecoder* audioDecoder)
+  419  006F7040     3C  void SetSubtitleDecoder(const struct <anon>* this, struct ISubtitleDecoder* subtitleDecoder)
+  448  006F707C     14  void SetVideoRenderer(const struct <anon>* this, struct IVideoRenderer* videoRenderer)
+  476  006F7090     3C  void SetAudioRenderer(const struct <anon>* this, struct IAudioRenderer* audioRenderer)
+  505  006F70CC     3C  void SetSubtitleRenderer(const struct <anon>* this, struct ISubtitleRenderer* subtitleRenderer)
+  534  006F7108     3C  void SetVideoRenderableOperations(const struct <anon>* this, struct IVideoRenderableOperations* videoRenderableOperations)
+  563  006F7144     30  void SetDataCallback(const struct <anon>* this, DataHandlingFunc* dataCallbackFunc, void* pContext, bool(*)()* streamerDataFilterFunc)
+  597  006F7174     18  void EnablePreloadVideoFile(const struct <anon>* this)
+  624  006F718C     18  void EnablePreloadAudioFile(const struct <anon>* this)
+  651  006F71A4     18  void EnablePreloadSubtitleFile(const struct <anon>* this)
+  683  006F71BC     D8  enum Status SetVideoFile(const struct <anon>* this, const char* videoFilePath, int64_t offset, int64_t size)
+  733  006F7294     A0  enum Status SetAudioFile(const struct <anon>* this, const char* audioFilePath)
+  778  006F7334     A0  enum Status SetSubtitleFile(const struct <anon>* this, const char* subtitleFilePath)
+  836  006F8E34    B2C  void OpenFiles(const struct <anon>* this, int32_t movieStreamBufferSize, int32_t movieGreedyThreshold)
+                         local  int audioTapNum
+                         local  int nullTapNum
+                         local  struct <anon> fileOp
+                         local  enum OpStatus status
+                         local  struct Handle* fileHandle
+                         local  const int REQUESTS
+                         local  int videoTapNum
+                         local  void* VIDEO_FILTER_CONTEXT
+                         local  int nullTapNum
+                         local  void* DATA_FILTER_CONTEXT
+                         local  int dataTapNum
+                         local  int subtitleTapNum
+                         local  int nullTapNum
+                         local  struct <anon> fileOp
+                         local  enum OpStatus status
+                         local  struct Handle* fileHandle
+                         local  struct <anon> fileOp
+                         local  enum OpStatus status
+                         local  struct Handle* fileHandle
+                         local  void* AUDIO_FILTER_CONTEXT
+                         local  int audioTapNum
+                         inlines  Allocate, ResourceDescriptor, ~ResourceDescriptor
+ 1157  006F73D4     24  int GetNumberAudioTracks(const struct <anon>* this)
+ 1191  006F73F8     34  enum Status SetAudioTrack(const struct <anon>* this, int audioTrackNumber)
+ 1237  006F742C     3C  void SetVolume(const struct <anon>* this, float volume)
+ 1266  006F7468      8  float GetVolume(const struct <anon>* this)
+ 1272  006F7470     3C  void SetVideoPositionX(const struct <anon>* this, float x)
+ 1300  006F74AC     3C  void SetVideoPositionY(const struct <anon>* this, float y)
+ 1328  006F74E8     3C  void SetVideoPositionZ(const struct <anon>* this, float z)
+ 1358  006F7524     3C  void SetVideoScaleX(const struct <anon>* this, float sx)
+ 1386  006F7560     3C  void SetVideoScaleY(const struct <anon>* this, float sy)
+ 1416  006F759C     14  void SetVideoDecodeThreadProcessor(const struct <anon>* this, int videoDecodeThreadProcessor)
+ 1449  006F75B0     14  void SetNumVideoRenderables(const struct <anon>* this, unsigned int numVideoRenderables)
+ 1516  006F7A90    3C8  void PreparePlayer(const struct <anon>* this)
+                         local  enum State state
+                         local  enum State state
+                         local  enum VideoFormat videoFormat
+                         local  unsigned int numVideoBuffersPerFrame
+                         local  struct ChunkInfo* videoHdrChunk
+                         local  const uint32_t hdrId
+                         local  struct ChunkedAviHeader* chunk
+                         local  uint32_t fpsNumerator
+                         local  uint16_t fpsDenominator
+ 1756  006F75C4     1C  bool IsFinished(const struct <anon>* this)
+ 1763  006F75E0     78  bool IsTimeForNextFrame(const struct <anon>* this)
+                         local  float elapsedTime
+ 1793  006F7658    1EC  void Decode(const struct <anon>* this)
+                         local  float elapsedTime
+                         local  struct ChunkInfo* nextChunk
+ 1940  006F7844    10C  void Render(const struct <anon>* this)
+ 2043  006F7950     50  void Pause(const struct <anon>* this)
+ 2074  006F79A0     50  void UnPause(const struct <anon>* this)
+ 2105  006F819C    244  void Shutdown(const struct <anon>* this)
+                         inlines  Free
+ 2183  006F7A70     10  static void _GLOBAL__I__ZN2rw5movie29DefaultStreamerDataFilterFuncEPvS1_()
+ 2184  006F7A80     10  static void _GLOBAL__D__ZN2rw5movie29DefaultStreamerDataFilterFuncEPvS1_()

@@ -1,0 +1,89 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_SkillZoneHorse.cpp
+// compiled in: golf_unity.cpp
+// 35 functions, source order. line | PS3 address | size
+
+   20  002042E0     40  void GameModeSkillZoneHorse::GameModeSkillZoneHorse(const struct GameModeSkillZoneHorse* this)
+   24  0020051C     18  void GameModeSkillZoneHorse::~GameModeSkillZoneHorse(const struct GameModeSkillZoneHorse* this)
+   32  0024E6F8    200  void GameModeSkillZoneHorse::Init(const struct GameModeSkillZoneHorse* this)
+                         inlines  GameModeBase::SetUseShotClock
+   79  002AC154     7C  int32 GameModeSkillZoneHorse::GetEndGameSequence(const struct GameModeSkillZoneHorse* this)
+                         local  int32 sequence
+                         local  void* ptr
+   92  00200598      4  void GameModeSkillZoneHorse::Update(const struct GameModeSkillZoneHorse* this)
+   96  0020059C      4  void GameModeSkillZoneHorse::Shutdown(const struct GameModeSkillZoneHorse* this)
+  100  002005A0     24  bool GameModeSkillZoneHorse::QueryInterface(const struct GameModeSkillZoneHorse* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bRet
+  117  0032AF50    15C  enum PlayerNumber_t GameModeSkillZoneHorse::GetHonors(const struct GameModeSkillZoneHorse* this, enum PlayerNumber_t ignore, bool doNotIgnoreHoledOut)
+                         local  int32 i
+                         local  int32 nextup
+                         local  bool juststarted
+                         inlines  GM_GetCurrentHoleIndex, GM_GetGolferUp
+  151  00238838     C0  void GameModeSkillZoneHorse::EndGolferTurn(const struct GameModeSkillZoneHorse* this, enum PlayerNumber_t PlayerID)
+                         inlines  GamePlayer::GetSkillZoneData
+  166  002C4E44    798  void GameModeSkillZoneHorse::CheckShotAwards(const struct GameModeSkillZoneHorse* this, enum PlayerNumber_t PlayerID)
+                         local  int32 collisionSurfaceID
+                         local  float distance
+                         local  int8 greenIndex
+                         local  enum SZ_BullsEyeColors_t ring
+                         local  float xpos
+                         local  float ypos
+                         local  char[256] tempString
+                         local  char* localizedString
+                         inlines  GamePlayer::GetSkillZoneData, LLMath_Scale, RC_vComputeRenderCtxWorldToPrimitiveCoordinate, vec_ld
+  404  002D0D68    33C  void GameModeSkillZoneHorse::SetupNextGolfer(const struct GameModeSkillZoneHorse* this)
+                         local  int32 i
+                         local  char* localizedString
+                         local  char[256] tempString
+                         local  bool bShownFreeShot
+                         local  char* localizedColorString
+  504  002463BC     88  void GameModeSkillZoneHorse::SwingInit(const struct GameModeSkillZoneHorse* this, enum PlayerNumber_t PlayerID)
+                         local  char* localizedString
+  520  00305DAC     5C  void GameModeSkillZoneHorse::LoadHole(const struct GameModeSkillZoneHorse* this)
+  533  002005D0     3C  void GameModeSkillZoneHorse::RestartHole(const struct GameModeSkillZoneHorse* this)
+  545  00280F88     48  void GameModeSkillZoneHorse::ClearPerHoleData(const struct GameModeSkillZoneHorse* this)
+  559  0020060C      8  bool GameModeSkillZoneHorse::GameFinished(const struct GameModeSkillZoneHorse* this, bool predict)
+  568  00200614     64  bool GameModeSkillZoneHorse::BallOOB(const struct GameModeSkillZoneHorse* this, enum PlayerNumber_t PlayerID)
+  577  002388F8     94  bool GameModeSkillZoneHorse::HoleFinished(const struct GameModeSkillZoneHorse* this, enum PlayerNumber_t PlayerID, bool predict)
+                         local  int32 i
+                         local  int numberPlaying
+  598  002812DC     84  bool GameModeSkillZoneHorse::PickPrevTarget(const struct GameModeSkillZoneHorse* this, enum PlayerNumber_t PlayerID)
+  610  0028119C     84  bool GameModeSkillZoneHorse::PickTarget(const struct GameModeSkillZoneHorse* this, enum PlayerNumber_t PlayerID)
+  622  00200678     20  int8 GameModeSkillZoneHorse::GetCurrentLeaderRing(const struct GameModeSkillZoneHorse* this)
+  633  00200698     38  void GameModeSkillZoneHorse::HitBall(const struct GameModeSkillZoneHorse* this, enum PlayerNumber_t PlayerID)
+  646  00306440     60  void GameModeSkillZoneHorse::ShotClockOut(const struct GameModeSkillZoneHorse* this)
+                         inlines  GM_GetGolferUp
+  658  002D5F38    1D4  void GameModeSkillZoneHorse::EndGame(const struct GameModeSkillZoneHorse* this)
+                         local  int32 i
+                         local  enum PlayerNumber_t winner
+                         local  enum PlayerNumber_t loser
+                         local  struct OnWinData_t onWinData
+                         local  int32 rank
+                         local  int32 highest
+                         local  int i
+  724  002006D0     30  void GameModeSkillZoneHorse::QuitGame(const struct GameModeSkillZoneHorse* this)
+  733  002005C4      C  void GameModeSkillZoneHorse::GetIDScore(const struct GameModeSkillZoneHorse* this, int32 surfaceID, int32* bonusAmount)
+  754  00200700      8  int GameModeSkillZoneHorse::GetLastShotExceeded(const struct GameModeSkillZoneHorse* this)
+  765  00200708     DC  int GameModeSkillZoneHorse::GreenType(const struct GameModeSkillZoneHorse* this, enum PlayerNumber_t PlayerID, int iGreenIndex)
+  780  00246444    1B4  void GameModeSkillZoneHorse::PreShotUpdateUI(const struct GameModeSkillZoneHorse* this, enum PlayerNumber_t PlayerID)
+                         local  char[256] tempString
+                         local  char* localizedColorString
+                         local  char* localizedString
+  825  00248604    17C  void GameModeSkillZoneHorse::UpdateDisplayInfo(const struct GameModeSkillZoneHorse* this, enum PlayerNumber_t PlayerID)
+                         local  char[48] strBuf
+                         local  char[48] tempString
+  862  0021C368     14  const char* GameModeSkillZoneHorse::GetModeName(const struct GameModeSkillZoneHorse* this)
+                         local  char* localizedString
+  873  0021C2A8     C0  void GameModeSkillZoneHorse::GetUIGameFinishedString(const struct GameModeSkillZoneHorse* this, char* strBuf, int32 bufferSize)
+                         local  char* localizedString
+  892  0023898C    318  bool GameModeSkillZoneHorse::GetUIScoreCardField(const struct GameModeSkillZoneHorse* this, int32_t row, int32_t column, char* strBuf, int32 bufferSize)
+                         local  bool bUpdate
+                         local  char[256] tempString
+                         local  int i
+                         local  char[6] tigerString
+  971  002007E4    174  void GameModeSkillZoneHorse::DisplayGameModeInfo(const struct GameModeSkillZoneHorse* this)
+                         local  char[32] sFlagTexture
+                         local  bool bAddFlagActor
+                         local  bool bAddLuxorLight
+                         local  int cupCount
+                         local  int i
+ 1021  00200958     14  const char* GameModeSkillZoneHorse::GetName(const struct GameModeSkillZoneHorse* this)

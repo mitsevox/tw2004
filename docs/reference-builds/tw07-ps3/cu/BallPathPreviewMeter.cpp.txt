@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/BallPathPreviewMeter.cpp
+// compiled in: golf_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   18  002FD72C    120  void BallPathPreviewMeter::Render(const struct BallPathPreviewMeter* this)
+                         local  FO_EAddMode eOldAddMode
+                         inlines  DS_vSetZTestEnable
+   53  002FD3FC    18C  void BallPathPreviewMeter::RenderBackground(const struct BallPathPreviewMeter* this, float x1, float y1, float x2, float y2)
+                         local  float[2][4] xpVertices
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, PR_vFillVerticesWith2DRect, PR_vSetCurrentColor, PR_vSetCurrentUsage, vec_st
+   85  002FD588    1A4  void BallPathPreviewMeter::RenderOutline(const struct BallPathPreviewMeter* this, float x1, float y1, float x2, float y2)
+                         local  float[2][4] xpVertices
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, PR_vFillVerticesWith2DRect, PR_vSetCurrentColor, PR_vSetCurrentUsage, vec_st

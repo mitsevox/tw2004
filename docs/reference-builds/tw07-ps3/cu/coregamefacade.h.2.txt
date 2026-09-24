@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/include/common/osdk/gamefacade/coregamefacade.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   53    inline-only   struct <anon>* GetInstance()
+  119  00622610     18  void ~CoreGameFacade(const struct <anon>* this)

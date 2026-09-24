@@ -1,0 +1,79 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/scenegraph/source/SceneGraph/Runtime/Nodes/SGNodeNURBSSurface.cpp
+// compiled in: SGNodeNURBSSurface.cpp
+// 17 functions, source order. line | PS3 address | size
+
+    0  008C9A28    140  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  SGNodeNURBSSurfaceInfoC::SGNodeNURBSSurfaceInfoC, SGNodeNURBSSurfaceInfoC::~SGNodeNURBSSurfaceInfoC
+    0  008CDBF8      C  void SGNodeNURBSSurfaceInfoC::~SGNodeNURBSSurfaceInfoC(const struct SGNodeNURBSSurfaceInfoC* this)
+                         inlines  ~SGNodeInfoC
+   49  008CDC40     88  struct SGNodeC* SGNodeNURBSSurfaceInfoC::Create(const const struct SGNodeNURBSSurfaceInfoC* this)
+                         inlines  operator new
+   50  008CDA94      8  const char* SGNodeNURBSSurfaceInfoC::GetNodeTypeName(const const struct SGNodeNURBSSurfaceInfoC* this)
+   51    inline-only   NodeType_t SGNodeNURBSSurfaceInfoC::GetNodeTypeEnum(const const struct SGNodeNURBSSurfaceInfoC* this)
+   61  008CA430    220  void Reset(const struct <anon>* this, bool destroyGeom)
+                         local  const char[6] __FUNCTION__
+                         local  uint32_t flags
+                         inlines  Clear, Init, RNADebugBreak
+   87  008CBE70    2C8  void SGNodeNURBSSurfaceC(const struct <anon>* this)
+                         inlines  Init, RNADebugBreak, Vector
+   99  008C9B88    310  void ~SGNodeNURBSSurfaceC(const struct <anon>* this)
+                         inlines  Init, operator delete, ~Vector
+  125  008CC400   1694  struct SGNodeC* Clone(const struct <anon>* this, bool8_t recurse, NodeCloneUserDataCallback userDataCallback, struct SGNodeC* baseClone)
+                         local  const char[6] __FUNCTION__
+                         local  struct <anon>* clone
+                         local  uint32_t arraySize
+                         local  const char* buf
+                         local  int32_t i
+                         local  uint32_t arraySize
+                         local  const char* buf
+                         local  int32_t i
+                         local  uint32_t arraySize
+                         local  const char* buf
+                         local  int32_t i
+                         local  uint32_t arraySize
+                         local  const char* buf
+                         local  int32_t i
+                         inlines  Clear, Construct, Copy, Destroy, GetControlPoints, GetUKnots, GetVKnots, Init, RNADebugBreak, SGNodeC::GetNodeTypeEnum, SetControlPoints, SetGeomPtr, SetUDegree, SetUKnots, SetUSpans, SetVDegree, SetVKnots, SetVSpans, Vector, operator new, ~Vector
+  162  008C99C4      8  const struct SGNodeInfoC* GetNodeInfo(const const struct <anon>* this)
+  168  008C99BC      8  const struct SGNodeInfoC* _GetNodeInfo()
+  173  008CA650    200  bool IsNURBS(const const struct <anon>* this)
+                         local  int32_t cvsInU
+                         local  int32_t cvsInV
+                         local  int32_t u
+                         local  int32_t v
+                         inlines  GetUDegree, GetUSpans, GetVDegree, GetVSpans, RNADebugBreak, Size, operator[]
+  209  008CADB0   10C0  void SerializeIn(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[12] __FUNCTION__
+                         local  int32_t version
+                         local  int32_t cvsInU
+                         local  int32_t cvsInV
+                         local  int32_t numUKnots
+                         local  int32_t numVKnots
+                         local  int32_t u
+                         local  int32_t v
+                         local  int32_t u
+                         local  int32_t v
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  RNAVector4* newData
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  float_t* newData
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  float_t* newData
+                         inlines  Construct, Grow, RNADebugBreak, Resize, Vector, operator[], ~Vector
+  267  008CA850    560  void SerializeOut(const const struct <anon>* this, const struct OutStreamC& out)
+                         local  const char[13] __FUNCTION__
+                         local  int32_t cvsInU
+                         local  int32_t cvsInV
+                         local  int32_t u
+                         local  int32_t v
+                         local  int32_t u
+                         local  int32_t v
+                         inlines  RNADebugBreak, operator[]
+  315  008C99CC     5C  void* Tesselate(const struct <anon>* this)
+                         local  const char[10] __FUNCTION__
+                         inlines  RNADebugBreak
+  330  008C9B78     10  static void _GLOBAL__I__ZN6SceneX19SGNodeNURBSSurfaceC16s_ClassAllocatorE()
+  331  008C9B68     10  static void _GLOBAL__D__ZN6SceneX19SGNodeNURBSSurfaceC16s_ClassAllocatorE()

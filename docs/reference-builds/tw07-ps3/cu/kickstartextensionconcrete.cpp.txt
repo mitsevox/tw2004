@@ -1,0 +1,102 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/kickstart/source/common/kickstartextensionconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 41 functions, source order. line | PS3 address | size
+
+   88  005FB72C     FC  bool OperationProcess(const struct KickStartExtensionConcrete* this, const struct Operation* )
+  169  005E0FD0     60  void OperationCancel(const struct KickStartExtensionConcrete* this, const struct Operation* )
+                         inlines  operator=
+  176  005C9240     60  uint32_t Hash(const struct KickStartExtensionConcrete* this, const char8_t* str)
+                         local  uint32_t uHash
+                         local  const uint8_t* p
+                         local  uint32_t c
+  189  005C9238      8  void SetState(const struct KickStartExtensionConcrete* this, enum BotState eState)
+  199  005C92A0    140  char8_t* GetStateAsString(const struct KickStartExtensionConcrete* this, enum BotState eState)
+                         local  char8_t* strState
+  282  005EA418     54  void UserLocalLoginSuccess(const struct KickStartExtensionConcrete* this)
+                         inlines  operator=
+  288  005EA46C     54  void UserLocalLoginFailure(const struct KickStartExtensionConcrete* this, enum Failure eFailure, uint32_t uLoginSlotIndex)
+                         inlines  operator=
+  298  005EA4C0     54  void UserLocalLoginAlert(const struct KickStartExtensionConcrete* this, const struct Alert* pAlert)
+                         inlines  operator=
+  308  005EA514     54  void UserLocalLoginAborted(const struct KickStartExtensionConcrete* this)
+                         inlines  operator=
+  315  005C93E0      8  void UserLocalTOSNotAccepted(const struct KickStartExtensionConcrete* this)
+  320  005C93E8      8  void UserLocalSharingInfoNotSet(const struct KickStartExtensionConcrete* this)
+  325  005C93F0      8  void UserLocalForeignRegAlert(const struct KickStartExtensionConcrete* this)
+  330  005C93F8      8  void UserLocalProductUpdateAlert(const struct KickStartExtensionConcrete* this, uint32_t )
+  335  005D3524     58  void AcceptTos(const struct KickStartExtensionConcrete* this)
+                         inlines  operator->
+  341  005D357C     60  void SetShareInfo(const struct KickStartExtensionConcrete* this)
+                         inlines  operator->
+  347  005D35DC     58  void AcceptForeignReg(const struct KickStartExtensionConcrete* this)
+                         inlines  operator->
+  353  005D3634     58  void AcceptProductUpdate(const struct KickStartExtensionConcrete* this)
+                         inlines  operator->
+  359  005FAF20     54  void LobbyMatchupGameSuccess(const struct KickStartExtensionConcrete* this, struct GameSession* pSession)
+                         inlines  operator=
+  369  005FAF74     54  void LobbyMatchupGameFailure(const struct KickStartExtensionConcrete* this, enum Failure eFailure)
+                         inlines  operator=
+  379  005FAFC8     54  void LobbyCreateGameSuccess(const struct KickStartExtensionConcrete* this, struct GameSession* pSession)
+                         inlines  operator=
+  389  005FB01C     54  void LobbyCreateGameFailure(const struct KickStartExtensionConcrete* this, enum Failure eFailure)
+                         inlines  operator=
+  399  005FB070     40  void GameSessionStartSuccess(const struct KickStartExtensionConcrete* this)
+                         inlines  operator=
+  405  005FB0B0     54  void GameSessionStartFailure(const struct KickStartExtensionConcrete* this, enum FailureCode eFailureCode)
+                         inlines  operator=
+  416  005C9400      8  void GameSessionStarted(const struct KickStartExtensionConcrete* this, struct GameSession* pSession)
+  424  005FB104     80  void UnsuspendSuccess(const struct KickStartExtensionConcrete* this)
+                         inlines  operator=
+  434  005FB184     64  void UnsuspendFailure(const struct KickStartExtensionConcrete* this)
+                         inlines  operator=
+  443  005EA568    108  void Login(const struct KickStartExtensionConcrete* this)
+                         local  struct LoginSlot* pLoginSlot
+                         inlines  operator=
+  458  005CC098    104  void Idle(const struct KickStartExtensionConcrete* this)
+  471  005FB1E8    2EC  void Match(const struct KickStartExtensionConcrete* this)
+                         local  struct <anon>* pLobby
+                         local  struct <anon> pGameParams
+                         local  struct <anon>* pLocalUser
+                         local  struct CreateGameParams params
+                         inlines  RCPointer, operator=, ~RCPointer
+  529  005CE280     60  void UnlockGameSession(const struct KickStartExtensionConcrete* this)
+                         local  struct <anon>* pFacade
+                         local  GameManagerRefT* pGameManager
+  538  005D12A8    100  void CheckPeerConnection(const struct KickStartExtensionConcrete* this)
+                         local  struct <anon>* pPeerConnectionManager
+                         local  const struct List<OSDK::PeerConnection>* pPeerConnections
+  558  005CBF8C    10C  void NotifyConnected(const struct KickStartExtensionConcrete* this)
+                         local  struct <anon>* pPeerConnectionManager
+                         local  const struct List<OSDK::PeerConnection>* pPeerConnections
+                         local  struct PeerConnection* pPeerConnection
+                         local  struct <anon>* pLocalUser
+                         local  struct GameSession* pGameSession
+                         inlines  GetElementAt
+  570  005FB4D4    180  void StartGame(const struct KickStartExtensionConcrete* this)
+                         local  struct <anon>* pLocalUser
+                         local  struct GameSession* pGameSession
+                         inlines  operator=
+  586  005CBEDC     B0  void Suspend(const struct KickStartExtensionConcrete* this)
+  594  005CBE38     A4  void TransitionToGame(const struct KickStartExtensionConcrete* this)
+                         local  struct GameSessionPersistent* pGameSession
+  602  005C9234      4  void Play(const struct KickStartExtensionConcrete* this)
+  608  005D7324    4A8  void ReportGame(const struct KickStartExtensionConcrete* this, const struct Dictionary* pGameStats)
+                         local  struct GameSessionPersistent* pGameSession
+                         local  struct <anon> pStats
+                         local  int32_t[4] iScore
+                         local  int32_t[4] iTeam
+                         local  const struct List<OSDK::GameUser>* pGameUsers
+                         local  uint32_t uNumPlayers
+                         local  char8_t[32] strTag
+                         local  uint32_t uIndex
+                         local  struct GameUser* pGameUser
+                         inlines  GetElementAt, GetNumberOfElements, RCPointer, ~RCPointer
+  654  005FB6A0     8C  void Unsuspend(const struct KickStartExtensionConcrete* this)
+                         inlines  operator=
+  682  0060F78C     E8  void KickStartExtensionConcrete(const struct KickStartExtensionConcrete* this)
+                         inlines  KickStartExtension, OperationStrategy, RCPointer
+  709  0060FB0C    1D0  void ~KickStartExtensionConcrete(const struct KickStartExtensionConcrete* this)
+                         inlines  operator->, ~KickStartExtension, ~OperationStrategy, ~RCPointer
+  744  005F4BDC    16C  struct KickStartOperation* Begin(const struct KickStartExtensionConcrete* this, struct KickStartCallback* pCallback, const struct Dictionary* pGameParameters, uint32_t uNumPlayers)
+                         local  struct OperationConcrete* pOperation
+                         inlines  GetOperationManagerConcrete, operator new, operator=

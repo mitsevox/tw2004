@@ -1,0 +1,12 @@
+// C:/packages/rwmovie/1.04.01/source/movielib/private/threadfactory.cpp
+// compiled in: threadfactory.cpp
+// 8 functions, source order. line | PS3 address | size
+
+    0  006FAFF8     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   22  006FAF14     40  struct <anon>* CreateThread()
+   27  006FAF54     44  void DestroyThread(struct <anon>* pThread)
+   32  006FAF98      8  size_t GetThreadSize()
+   37  006FAFA0     34  struct <anon>* ConstructThread(void* pMemory)
+   42  006FAFD4     24  void DestructThread(struct <anon>* pThread)
+   48  006FB078     10  static void _GLOBAL__I__ZN2rw13ThreadFactory12CreateThreadEv()
+   49  006FB088     10  static void _GLOBAL__D__ZN2rw13ThreadFactory12CreateThreadEv()

@@ -1,0 +1,32 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptString.cpp
+// compiled in: other_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+    6  003EE5C8     48  unsigned int AptString::Hash(const char* pString)
+                         local  const unsigned char* szKey
+                         local  unsigned int nHash
+                         local  unsigned int c
+  345  0046A104    48C  struct AptValue* AptString::objectMemberLookup(const struct AptString* this, struct AptValue* pContext, const char* szName)
+                         local  AptNativeString sBuf
+                         local  AptNativeStringUCS2 sucs2Buf
+                         inlines  AptInteger::AptInteger, AptInteger::operator new, BasicString, ReAlloc, Size, To<AptNativeStringUCS2>, UseCapacity, ~BasicString
+  407  00453844     C4  void AptString::__dec(struct AptValue* pValue)
+                         local  struct AptString* pString
+                         inlines  AptString::operator delete, AptValue::subtractReference, ReAlloc, checked_delete<AptString>, ~BasicString
+  418  00461390    2B8  void AptString::cpy(const struct AptString* this, const char* from)
+                         local  const char* s
+                         local  char[16] s
+                         inlines  AptString::InvalidateHash, Capacity, Copy, Copy<char*, char*>, DoingSmallStringOptimization, ReAlloc, Swap, operator=, ~BasicString
+  425  00443060    338  void AptString::cat(const struct AptString* this, const char* from)
+                         local  int newSize
+                         local  char* iter
+                         local  int newCapacity
+                         local  int insertPos
+                         local  char* string
+                         inlines  AptString::InvalidateHash, Begin, Capacity, Copy, Copy<char*, char*>, End, Insert<const char*>, Move<char*, char*>, ReAlloc, Reserve, operator+=
+  431  004610A0    2F0  void AptString::printf(const struct AptString* this, const char* szFormat)
+                         local  char[2048] szBuf
+                         local  va_list arg
+                         local  const char* s
+                         local  char[16] s
+                         inlines  AptString::InvalidateHash, Capacity, Copy, Copy<char*, char*>, DoingSmallStringOptimization, ReAlloc, Swap, UseCapacity, operator=, ~BasicString

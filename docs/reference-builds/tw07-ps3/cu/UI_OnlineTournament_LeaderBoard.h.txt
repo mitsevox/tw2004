@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_OnlineTournament_LeaderBoard.h
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   20  001192D0    160  void UIOnlineTournament_LeaderBoard::~UIOnlineTournament_LeaderBoard(const struct UIOnlineTournament_LeaderBoard* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIOnlineTournament_LeaderBoard::DstMenuItem_oltl>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+   22  000FFAD4      C  uint32 UIOnlineTournament_LeaderBoard::GetSignature(const const struct UIOnlineTournament_LeaderBoard* this)
+   27  000FFAE0     44  void UIOnlineTournament_LeaderBoard::ShowHelpText(const struct UIOnlineTournament_LeaderBoard* this)
+   29  000FFB2C      C  struct IExternArray* UIOnlineTournament_LeaderBoard::GetExternArray(const struct UIOnlineTournament_LeaderBoard* this)

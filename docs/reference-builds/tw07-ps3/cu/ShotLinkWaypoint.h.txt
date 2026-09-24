@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/ShotLink/ShotLinkWaypoint.h
+// compiled in: golf_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   24    inline-only   void ShotLinkWaypoint::SetScale(const struct ShotLinkWaypoint* this, const float scale)
+   25    inline-only   void ShotLinkWaypoint::SetColor(const struct ShotLinkWaypoint* this, const float* color)
+   26    inline-only   void ShotLinkWaypoint::SetCoordinate(const struct ShotLinkWaypoint* this, const float* coord)

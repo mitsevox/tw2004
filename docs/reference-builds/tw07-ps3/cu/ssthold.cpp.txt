@@ -1,0 +1,7 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/ssthold.cpp
+// compiled in: ssthold.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   29  006CDE0C     B0  int SNDSTRM_modifyhold(int sndrequesthandle, int holdtime)
+                         local  struct SNDSTREAMREQUEST* pssr
+                         local  int ret

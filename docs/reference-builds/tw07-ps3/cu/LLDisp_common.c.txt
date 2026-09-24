@@ -1,0 +1,29 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Legacy/LL/LLDisp_common.c
+// compiled in: Legacy_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   28  0037F6D4     18  TextureRef Displ_GetFrontBuffer()
+   32  0037F1C4     18  TextureRef Displ_GetBackBuffer()
+   36  0037F6EC     18  TextureRef Displ_GetHiddenBuffer()
+   40  0037F704     18  TextureRef Displ_GetDepthBuffer()
+   48  0037F71C     18  void Displ_SetSwapScreensClearFlags(int32 clearFlags)
+   54  003BE630     60  void Displ_SwapScreens(unsigned int presentInterval)
+  121  003C32D4     98  void Displ_DrawFatalErrorDialog(char* pBuf1, char* pBuf2)
+                         inlines  OnlineManagerOSDK::GetInstance
+  204  003CDB4C     E8  void Displ_DrawFrontBufferToFrameBuffer()
+                         local  float[2][4] pVertex
+                         local  float[2][4] pUVs
+                         local  const float[4] pColor
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetZBufferMode, PR_vSetCurrentColor, PR_vSetCurrentTexture
+  243  0037ED0C     54  TextureRef Displ_GetRenderTarget(uint32 index, int32* textureLayer)
+  256  003BD6C4    134  void Displ_SetRenderTarget(uint32 index, TextureRef ref, int32 textureLayer)
+                         inlines  TX_TextureIsAllocated, TX_TextureIsRenderTarget
+  269  003BA754    138  void Displ_SetViewportFromRenderTarget(int index, float left, float top, float width, float ht)
+                         local  int layer
+                         local  TextureRef ref
+                         local  uint16 vpWidthPixels
+                         local  uint16 vpHeightPixels
+  292  003BD7F8     44  void Displ_ResetRenderTargets()
+                         local  int i
+  301  003BDB48     70  void Displ_SetDefaultRenderTargets()
+  311  0037F9A4     18  bool Displ_UsingMSAA()

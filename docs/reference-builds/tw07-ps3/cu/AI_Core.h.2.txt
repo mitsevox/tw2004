@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/Golf/AI/Headers/AI_Core.h
+// compiled in: golf_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   95    inline-only   const struct CoreShotInfo_t* AICore::GetPhantomShotInfo(const struct AICore* this)
+   96    inline-only   bool AICore::IsPhantomAvailable(const struct AICore* this)
+  235    inline-only   struct AICore& AIMgr()

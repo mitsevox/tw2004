@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNARender/RNAShader.h
+// compiled in: RNADevice.cpp, RNAShader.cpp
+// 3 functions, source order. line | PS3 address | size
+
+  110    inline-only   int32_t ShaderC::GetNumInterfaces(const const struct ShaderC* this)
+  111    inline-only   const struct <anon>* ShaderC::GetInterface(const const struct ShaderC* this, int32_t iInterface)
+  121    inline-only   int32_t ShaderC::GetOverrideTechnique(const struct ShaderC* this)

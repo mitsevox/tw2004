@@ -1,0 +1,18 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_GolfBall.cpp
+// compiled in: shader_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   37  0051A2AC     78  void SM_GolfBallClass::SM_GolfBallClass(const struct SM_GolfBallClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base
+   65  00504838    228  void SM_GolfBallClass::Load(const struct SM_GolfBallClass* this)
+   92  00504A60     F8  void SM_GolfBallClass::Activate(const struct SM_GolfBallClass* this)
+  114  00516AAC     6C  void SM_GolfBallClass::SetMatAmbient(const struct SM_GolfBallClass* this, const float[4]& col)
+                         inlines  vec4flt_Copy
+  124  00516B18     6C  void SM_GolfBallClass::SetSpecExtra(const struct SM_GolfBallClass* this, const float[4]& specExtraParams)
+                         inlines  vec4flt_Copy
+  134  0050F7C0     64  void SM_GolfBallClass::SetBaseTexture(const struct SM_GolfBallClass* this, TextureRef texRef)
+  144  0050F824     64  void SM_GolfBallClass::SetNormalMap(const struct SM_GolfBallClass* this, TextureRef texRef)
+  154  0050F888     64  void SM_GolfBallClass::SetAmbientCubeMap(const struct SM_GolfBallClass* this, TextureRef texRef)
+  164  0050F8EC     64  void SM_GolfBallClass::SetSpecEnvCubeMap(const struct SM_GolfBallClass* this, TextureRef texRef)
+  174  0050F950     64  void SM_GolfBallClass::SetEnvCubeMap(const struct SM_GolfBallClass* this, TextureRef texRef)
+  184  0050F9B4     64  void SM_GolfBallClass::SetHaveAmbientCube(const struct SM_GolfBallClass* this, bool bHaveAmbientCube)

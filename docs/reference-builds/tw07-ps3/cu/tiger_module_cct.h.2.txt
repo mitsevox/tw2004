@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/include/tiger_module_cct.h
+// compiled in: tiger_module_cct.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  100  0033E9C4      8  const char* GetForcedIgcActor(const const struct <anon>* this)

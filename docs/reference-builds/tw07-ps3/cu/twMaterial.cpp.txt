@@ -1,0 +1,59 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/Geom/twMaterial.cpp
+// compiled in: golf_unity.cpp
+// 23 functions, source order. line | PS3 address | size
+
+   38  0022B630     7C  struct twShaderPresetDB* twShaderPresetDB::GetPresetDB(int32 char_index)
+                         local  struct twShaderPresetDB* result
+   46  0022B624      C  void twShaderPresetDB::ResetPresets(const struct twShaderPresetDB* this)
+   57  0022B9F8    184  twShaderConstants* twShaderPresetDB::AddNamedPreset(const struct twShaderPresetDB* this, const char* name, const char* type, bool bCheckForExisting)
+                         local  twShaderConstants* pPreset
+   99  0022B9AC     4C  twShaderConstants* twShaderPresetDB::LookupPreset(const struct twShaderPresetDB* this, const char* name)
+                         local  int i
+  113  0022B910     9C  int twShaderPresetDB::LookupPresetIndex(const struct twShaderPresetDB* this, const char* name)
+                         local  uint32 i
+  128  0027225C    1AC  twShaderConstants* twShaderPresetDB::ResolvePreset(const struct twShaderPresetDB* this, const char* name, struct GameXmlSettings* pXmlSettings)
+                         local  twShaderConstants* pPreset
+                         local  struct GameXmlSettings matSettings
+                         local  int index
+  152    inline-only   static void HWS_Settings_AddVariableV(struct GameXmlSettings* pXmlSettings, float* fValue, float min, float max, enum eGameXml_TuneFlags tuneFlags, const char* name, va_list va)
+                         local  char[100] buf
+  167  00270DC8    11C  static void HWS_Settings_AddVariable(struct GameXmlSettings* pXmlSettings, float* fValue, float min, float max, enum eGameXml_TuneFlags tuneFlags, const char* name)
+                         local  va_list va
+                         inlines  HWS_Settings_AddVariableV
+  176  00270EE4     BC  static void HWS_Settings_AddColorRGBA(struct GameXmlSettings* pXmlSettings, float* data, float min, float max, enum eGameXml_TuneFlags tuneFlags, const char* name)
+  183  0022B6AC    184  void twShaderConstants::Init(const struct twShaderConstants* this)
+  242  0022B890     80  void twShaderConstants::InitEye(const struct twShaderConstants* this)
+  263  0022B830     60  void twShaderConstants::InitHair(const struct twShaderConstants* this)
+  282  0022BB7C     9C  void twShaderConstants::InitBall(const struct twShaderConstants* this, bool bIndoor)
+  305  00271C08     50  void twShaderConstants::ResolveSettings(const struct twShaderConstants* this, struct GameXmlSettings* pXmlSettings, enum eGameXml_TuneFlags tuneFlags)
+  311  00271230    9D8  void twShaderConstants::ResolveSettings_ShaderParams(const struct twShaderConstants* this, struct GameXmlSettings* pXmlSettings, enum eGameXml_TuneFlags tuneFlags)
+  414  00270FA0    284  void twShaderConstants::ResolveSettings_Lighting(const struct twShaderConstants* this, struct GameXmlSettings* pXmlSettings, enum eGameXml_TuneFlags tuneFlags)
+  442  00271224      C  void twShaderConstants::ResolveSettings_LightingAdj(const struct twShaderConstants* this, struct GameXmlSettings* pXmlSettings, enum eGameXml_TuneFlags tuneFlags)
+  451  0022BDA0     28  bool twShaderConstants::NudgeShaderValue(const struct twShaderConstants* this, const char* name, float presetVal)
+  459  0022BDC8     28  bool twShaderConstants::PokeShaderValue(const struct twShaderConstants* this, const char* name, float presetVal)
+  467  0022BC18    188  bool twShaderConstants::ChangeShaderValue(const struct twShaderConstants* this, const char* name, float presetVal, bool bReplace)
+                         local  bool bOK
+                         local  struct tShaderVarNameRec[15] valTable_Eye
+                         local  struct tShaderVarNameRec[27] valTable_Hair
+                         local  struct tShaderVarNameRec[24] valTable_Ball
+                         local  struct tShaderVarNameRec[42] valTable_Default
+                         local  struct tShaderVarNameRec* pTbl
+                         local  struct tShaderVarNameRec* pRec
+                         local  unsigned int nDataOfs
+                         local  float* pVal
+  672  0022BDF0     14  struct twShaderPresetDB* twShaderPresetDB::TunerDB()
+  688  00299C8C    290  struct XMLRPC_Value* XMLRPC_AddNewMaterialPreset(struct XMLRPC_Value* value)
+                         local  const char* name
+                         local  const char* type
+                         local  struct XMLRPC_Value* fault
+                         local  twShaderConstants* pPreset
+                         local  bool bCheckForExisting
+                         local  struct GameXmlSettings matSettings
+  725  00299BF0     9C  struct XMLRPC_Value* XMLRPC_UpdateShaderPreset(struct XMLRPC_Value* params)
+                         local  const char* name
+                         local  const char* type
+                         local  float presetVal
+                         local  struct XMLRPC_Value* fault
+                         local  struct HashString hashedType
+                         local  twShaderConstants* pPreset
+                         inlines  HashString::HashString

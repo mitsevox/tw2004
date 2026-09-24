@@ -1,0 +1,15 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_ThreeHoleStroke.cpp
+// compiled in: golf_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   15  002049D0     44  void GameModeThreeHoleStroke::GameModeThreeHoleStroke(const struct GameModeThreeHoleStroke* this)
+   20  00201058     18  void GameModeThreeHoleStroke::~GameModeThreeHoleStroke(const struct GameModeThreeHoleStroke* this)
+   25  0021011C    1C8  void GameModeThreeHoleStroke::Init(const struct GameModeThreeHoleStroke* this)
+                         local  int i
+                         local  Course_t courseID
+                         local  enum GM_CourseType_t course
+                         local  int hole
+   51  00201204     8C  bool GameModeThreeHoleStroke::GameFinished(const struct GameModeThreeHoleStroke* this, bool predict)
+                         local  int32 i
+                         local  bool bRet
+   70  00201290     14  const char* GameModeThreeHoleStroke::GetName(const struct GameModeThreeHoleStroke* this)

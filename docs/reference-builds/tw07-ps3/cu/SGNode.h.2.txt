@@ -1,0 +1,26 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/SceneGraph/include/SceneGraph/SGNode.h
+// compiled in: SGManager.cpp, SGNode.cpp, SGNodeBoundingVolume.cpp, SGNodeGroup.cpp, SGNodeLattice.cpp, SGNodeRenderable.cpp, SGNodeSwitch.cpp
+// 22 functions, source order. line | PS3 address | size
+
+   92    inline-only   NodeType_t SGNodeC::GetNodeTypeEnum(const const struct SGNodeC* this)
+  102    inline-only   void SetName(const struct SGNodeC* this, const char* pName)
+  103    inline-only   const char* SGNodeC::GetName(const const struct SGNodeC* this)
+  103    inline-only   const char* GetName(const const struct <anon>* this)
+  104    inline-only   void SGNodeC::SetUserFlags(const struct SGNodeC* this, uint32_t uFlags)
+  104    inline-only   void SetUserFlags(const struct SGNodeC* this, uint32_t uFlags)
+  105    inline-only   void ClearUserFlags(const struct SGNodeC* this, uint32_t uFlags)
+  106    inline-only   uint32_t GetUserFlags(const const struct <anon>* this)
+  106    inline-only   uint32_t SGNodeC::GetUserFlags(const const struct SGNodeC* this)
+  108    inline-only   void* GetUserData(const struct SGNodeC* this)
+  132    inline-only   int32_t SGNodeC::GetNumChildren(const const struct SGNodeC* this)
+  132    inline-only   int32_t GetNumChildren(const const struct <anon>* this)
+  133    inline-only   struct SGNodeC* SGNodeC::GetFirstChild(const const struct SGNodeC* this)
+  133    inline-only   struct SGNodeC* GetFirstChild(const const struct <anon>* this)
+  134    inline-only   struct SGNodeC* SGNodeC::GetNextSibling(const const struct SGNodeC* this)
+  134    inline-only   struct SGNodeC* GetNextSibling(const const struct <anon>* this)
+  135    inline-only   struct SGNodeC* GetPrevSibling(const const struct <anon>* this)
+  136    inline-only   struct SGNodeC* SGNodeC::GetParent(const const struct SGNodeC* this)
+  136    inline-only   struct SGNodeC* GetParent(const const struct <anon>* this)
+  142    inline-only   void* SGNodeC::GetVoidInterface(const const struct SGNodeC* this, InterfaceID id)
+  142  008C3FB0      8  void* GetVoidInterface(const const struct <anon>* this, InterfaceID id)
+  184  008AEAAC      C  void ~SGNodeInfoC(const struct SGNodeInfoC* this)

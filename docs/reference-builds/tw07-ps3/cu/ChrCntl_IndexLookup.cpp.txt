@@ -1,0 +1,17 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/src/ChrCntl_IndexLookup.cpp
+// compiled in: ChrCntl_IndexLookup.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   25    inline-only   int ChrCntl_IndexLookup_CompareResourceIDs(uint32_t id1, uint32_t id2)
+   38    inline-only   int ChrCntl_IndexLookup_EntryNumFromID(uint32_t id, struct <anon>* table, int numEntries)
+                         local  int32_t idx
+                         local  int32_t listSize
+                         local  int32_t l
+                         local  int32_t hi
+                         local  int32_t m
+   70  005A0308     C4  int ChrCntl_IndexLookup_IndexFromHashedName(uint32_t hashedBoneName, struct <anon>* table, int numEntries)
+                         local  int entryNum
+                         inlines  ChrCntl_IndexLookup_EntryNumFromID
+   85  005A03CC     44  int ChrCntl_IndexLookup_IndexFromName(const char* name, struct <anon>* table, int numEntries)
+                         inlines  Common::CommonHash
+   90  005A02EC     1C  BoneHashId ChrCntl_IndexLookup_GetHashedName(const struct <anon>* table, BoneIndex boneIdx)

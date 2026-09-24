@@ -1,0 +1,25 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/src/HighLevel/HighLevel_AnimFrame.c
+// compiled in: HighLevel_AnimFrame.c
+// 4 functions, source order. line | PS3 address | size
+
+  317    inline-only   static void _CombineSkeletonFilters(const int32_t& numEvaluatedBones, const int32_t& numExtractedBones, struct Flags8* targetFlags, struct <anon>* targetFilter, const struct Skeleton* skeleton, const struct <anon>* primaryFilter, const struct <anon>* viewInfo)
+                         local  int32_t secondaryFilterCount
+                         local  const struct <anon>*[1] secondaryFilters
+                         local  const struct <anon>* secondaryFilter
+  360  005B26B4    3A4  struct Frame* AnimFrame_ConstructFrame(struct Character* viewInfo, const struct MotionDefinition* motionRef, const struct <anon>* filterRef, const struct Skeleton* skeleton, float frameNum, int flags)
+                         local  struct <anon>* tempAnimFrame
+                         local  struct Frame* animFrameRef
+                         local  const struct <anon>* motion
+                         local  struct <anon>* animationFilter
+                         local  struct <anon>* primaryFilter
+                         local  int32_t numEvaluatedBones
+                         local  int32_t numExtractedBones
+                         local  struct Flags8[200] decompressionFlags
+                         local  bool bCacheHit
+                         local  struct Frame* tempFrameRef
+                         local  struct ICodec* codec
+                         inlines  Flags8::Flags8, GetFilter, Quat_Set, _CombineSkeletonFilters, vec4flt_Set4
+  495  005B2A58     78  struct Frame* AnimFrame_ConstructMotionFrame(struct Character* viewInfo, const struct MotionDefinition* motionRef, struct <anon>* filterRef, float frameNum, int flags)
+                         local  const struct Skeleton* skeleton
+  503  005B25B4    100  struct <anon>* AnimFrame_ConstructBoneTransform(struct <anon>* target, struct Character* viewInfo, const struct MotionDefinition* motionRef, const struct <anon>* filterRef, float frameNum, int flags, int bone)
+                         local  struct ICodec* codec

@@ -1,0 +1,9 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/QuerySearch.h
+// compiled in: Database.cpp, QuerySearch.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   51  0080E810     44  void QuerySearch(const struct <anon>* this)
+   52  0081325C     9C  void QuerySearch(const struct <anon>* this, struct Database* pDb, struct <anon>* pJoins, struct ExprNode* pFilter, enum TDbError* dbError)
+   54  007CAD98     88  void QuerySearch(const struct QuerySearch* this, int tableCount, struct Table* table, struct ExprNode* expr, struct ExprNode* filter)
+   63  0080ED64    100  void ~QuerySearch(const struct <anon>* this)
+                         local  uint32_t tblNum

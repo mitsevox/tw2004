@@ -1,0 +1,20 @@
+// C:/packages/rwmovie/1.04.01/source/movielib/private/snode.cpp
+// compiled in: snode.cpp
+// 8 functions, source order. line | PS3 address | size
+
+    0  007043AC     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   29  0070444C     40  struct <anon> GetResourceDescriptor(RwUInt32 dataSize)
+                         local  RwUInt32 alignment
+                         local  RwUInt32 size
+                         inlines  BaseResourceDescriptor, GetBaseResourceDescriptor, ResourceDescriptor
+   37  0070448C     3C  struct <anon>* Initialize(const struct <anon>& resource)
+                         local  struct <anon>* snode
+                         inlines  SNode
+   91  007041D0      C  void* GetDataPtr(const const struct <anon>* this)
+                         local  uintptr_t ptr
+  118  007041DC     E4  enum Status SetData(const struct <anon>* this, const void* item, const unsigned int dataSize, struct ICloner* cloner)
+                         local  void* dest
+  160  007042C0     EC  enum Status GetData(const const struct <anon>* this, void* item, const unsigned int dataSize, struct ICloner* cloner)
+                         local  const void* source
+  186  0070442C     10  static void _GLOBAL__I__ZN2rw5SNode21GetResourceDescriptorEj()
+  187  0070443C     10  static void _GLOBAL__D__ZN2rw5SNode21GetResourceDescriptorEj()

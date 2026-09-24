@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/gamesetupsendmessagecallback.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   47  005B3CC0      C  void GameSetupSendMessageCallback(const struct <anon>* this)
+   51  005B3CCC      C  void ~GameSetupSendMessageCallback(const struct <anon>* this)

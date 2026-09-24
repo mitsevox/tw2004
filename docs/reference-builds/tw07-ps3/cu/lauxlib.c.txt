@@ -1,0 +1,76 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/lua-5.0.2/src/lib/lauxlib.c
+// compiled in: lauxlib.c
+// 43 functions, source order. line | PS3 address | size
+
+   46  00552898    10C  int luaL_argerror(lua_State* L, int narg, const char* extramsg)
+                         local  lua_Debug ar
+   62  005529A4     88  int luaL_typerror(lua_State* L, int narg, const char* tname)
+                         local  const char* msg
+   69  00552A2C     4C  static void tag_error(lua_State* L, int narg, int tag)
+   74  00552748     C4  void luaL_where(lua_State* L, int level)
+                         local  lua_Debug ar
+   87  0055280C     8C  int luaL_error(lua_State* L, const char* fmt)
+                         local  va_list argp
+  100  00552A78     88  int luaL_findstring(const char* name, const const char** list)
+                         local  int i
+  109  00552B00     EC  int luaL_newmetatable(lua_State* L, const char* tname)
+  126  00552BEC     40  void luaL_getmetatable(lua_State* L, const char* tname)
+  132  00552C2C    10C  void* luaL_checkudata(lua_State* L, int ud, const char* tname)
+                         local  const char* tn
+  148  00552D38     78  void luaL_checkstack(lua_State* L, int space, const char* mes)
+  154  00552DB0     78  void luaL_checktype(lua_State* L, int narg, int t)
+  160  00552E28     78  void luaL_checkany(lua_State* L, int narg)
+  166  00552EA0     90  const char* luaL_checklstring(lua_State* L, int narg, size_t* len)
+                         local  const char* s
+  175  00552F30     B4  const char* luaL_optlstring(lua_State* L, int narg, const char* def, size_t* len)
+  185  00552FE4     B0  lua_Number luaL_checknumber(lua_State* L, int narg)
+                         local  lua_Number d
+  193  00553094     78  lua_Number luaL_optnumber(lua_State* L, int narg, lua_Number def)
+  199  0055310C     E4  int luaL_getmetafield(lua_State* L, int obj, const char* event)
+  215  005531F0     AC  int luaL_callmeta(lua_State* L, int obj, const char* event)
+  226  0055329C    1CC  void luaL_openlib(lua_State* L, const char* libname, const luaL_reg* l, int nup)
+                         local  int i
+  258  00553468     98  static int checkint(lua_State* L, int topop)
+                         local  int n
+  266  00553500     F4  static void getsizes(lua_State* L)
+  282  005535F4    170  void luaL_setn(lua_State* L, int t, int n)
+  301  00553764    17C  int luaL_getn(lua_State* L, int t)
+                         local  int n
+  337  005538E0     78  static int emptybuffer(luaL_Buffer* B)
+                         local  size_t l
+  349  00553958     D4  static void adjuststack(luaL_Buffer* B)
+                         local  lua_State* L
+                         local  int toget
+                         local  size_t toplen
+                         local  size_t l
+  368  00553A2C     44  char* luaL_prepbuffer(luaL_Buffer* B)
+  375  00553A70     C8  void luaL_addlstring(luaL_Buffer* B, const char* s, size_t l)
+  381  00553B38     4C  void luaL_addstring(luaL_Buffer* B, const char* s)
+  386  00553B84     48  void luaL_pushresult(luaL_Buffer* B)
+  393  00553BCC    130  void luaL_addvalue(luaL_Buffer* B)
+                         local  lua_State* L
+                         local  size_t vl
+  410  00553CFC     18  void luaL_buffinit(lua_State* L, luaL_Buffer* B)
+  419  00553D14    150  int luaL_ref(lua_State* L, int t)
+                         local  int ref
+  445  00553E64     C8  void luaL_unref(lua_State* L, int t, int ref)
+  469  00553F2C     8C  static const char* getF(lua_State* L, void* ud, size_t* size)
+                         local  LoadF* lf
+  478  00553FB8     9C  static int errfile(lua_State* L, int fnameindex)
+                         local  const char* filename
+  486  00554054    1F8  int luaL_loadfile(lua_State* L, const char* filename)
+                         local  LoadF lf
+                         local  int status
+                         local  int readstatus
+                         local  int c
+                         local  int fnameindex
+  524  0055424C     24  static const char* getS(lua_State* L, void* ud, size_t* size)
+                         local  LoadS* ls
+  535  00554270     40  int luaL_loadbuffer(lua_State* L, const char* buff, size_t size, const char* name)
+                         local  LoadS ls
+  552    inline-only   static void callalert(lua_State* L, int status)
+  567  005542B0    130  static int aux_do(lua_State* L, int status)
+                         inlines  callalert
+  576  005543E0     34  int lua_dofile(lua_State* L, const char* filename)
+  582  00554414     34  int lua_dobuffer(lua_State* L, const char* buff, size_t size, const char* name)
+  587  00554448     50  int lua_dostring(lua_State* L, const char* str)

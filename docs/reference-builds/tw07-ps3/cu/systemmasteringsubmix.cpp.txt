@@ -1,0 +1,9 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/systemmasteringsubmix.cpp
+// compiled in: systemmasteringsubmix.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   14  006D6D84    104  void SetMasteringSubMix(const struct <anon>* this, struct PlugIn* pPlugIn)
+                         local  struct SubMix* pSubMix
+                         inlines  Assert
+   34  006D6D04     80  struct PlugIn* GetMasteringSubMix(const struct <anon>* this)
+                         inlines  Assert

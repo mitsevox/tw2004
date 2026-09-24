@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_ProShopPopup.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   24  00100498      C  uint32 UIProShopPopup::GetSignature(const const struct UIProShopPopup* this)
+   30  001004A4     24  void UIProShopPopup::RegainFocus(const struct UIProShopPopup* this, uint32 )
+   31  001004C8     24  void UIProShopPopup::LooseFocus(const struct UIProShopPopup* this, uint32 )

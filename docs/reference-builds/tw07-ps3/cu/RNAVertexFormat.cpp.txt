@@ -1,0 +1,50 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/PS3/RNAVertexFormat.cpp
+// compiled in: RNAVertexFormat.cpp
+// 12 functions, source order. line | PS3 address | size
+
+    0  0083FFC4     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+  156  008409B0    1A8  struct <anon>& operator=(const struct VertexFormatC* this, const const struct <anon>& other)
+                         local  const char[10] __FUNCTION__
+                         local  int32_t iElement
+                         local  const struct ElementT* pSrcElement
+                         inlines  Copy, GetElement, GetName, RNADebugBreak, SetName
+  176  0083FFB4     10  void AddRef(const struct VertexFormatC* this)
+  181  00840ED4     E0  void Release(const struct VertexFormatC* this)
+                         local  const char[8] __FUNCTION__
+                         inlines  RNADebugBreak, operator delete
+  244  00840B58    124  const struct ElementT* GetElementByType(const struct VertexFormatC* this, enum ElementNameE elementName)
+                         local  const char[17] __FUNCTION__
+                         local  int32_t element
+                         inlines  GetElement, GetNumElements, RNADebugBreak
+  261  00840064     90  void BeginElements(const struct VertexFormatC* this)
+                         local  const char[14] __FUNCTION__
+                         inlines  RNADebugBreak
+  280  008400F4    43C  void AddElement(const struct VertexFormatC* this, int32_t iStream, enum ElementNameE eName, int32_t iIndex, enum ElementFormatE eFormat, int32_t iOffset, int16_t iFrequency, enum FreqeuncyOperationE iFreqOp)
+                         local  const char[11] __FUNCTION__
+                         local  struct ElementT* pElement
+                         local  uint32_t uElementDataSize
+                         inlines  RNADebugBreak
+  363  00840790     80  void EndElements(const struct VertexFormatC* this)
+                         local  const char[12] __FUNCTION__
+                         inlines  RNADebugBreak
+  370  00840810    1A0  void CreateFormatString(const const struct <anon>* this, char* pStr, int32_t nChars)
+                         local  const char[19] __FUNCTION__
+                         local  char* pStart
+                         local  int32_t iElement
+                         local  const struct ElementT* pElement
+                         local  char cName
+                         inlines  GetElement, RNADebugBreak
+  397  00840530    260  bool8_t AddElementsFromString(const struct VertexFormatC* this, const char* pStrFormat)
+                         local  const char[22] __FUNCTION__
+                         local  char[256] str
+                         local  char* pToken
+                         local  char[32] strElementFormat
+                         local  char cName
+                         local  int32_t iIndex
+                         local  uint32_t iOffset
+                         local  enum ElementNameE eName
+                         local  enum ElementFormatE eFormat
+                         local  int i
+                         inlines  RNADebugBreak
+  480  00840044     10  static void _GLOBAL__I__ZN3RNA13VertexFormatC16s_ClassAllocatorE()
+  481  00840054     10  static void _GLOBAL__D__ZN3RNA13VertexFormatC16s_ClassAllocatorE()

@@ -1,0 +1,5 @@
+// C:/packages/rwaudiocore/2.08.01/include/rw/audio/core/plugins/resample.h
+// compiled in: resample.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   69    inline-only   float* GetHistoryBuffer(const struct <anon>* this)

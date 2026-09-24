@@ -1,0 +1,6 @@
+// C:/packages/rwmovie/1.04.01/include/rwmovie/private/ilist.h
+// compiled in: slist.cpp, snode.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   71  007044C8      C  void ~IListNode(const struct IListNode* this)
+  232  0070403C      C  void ~IList(const struct <anon>* this)

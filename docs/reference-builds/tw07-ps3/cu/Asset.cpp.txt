@@ -1,0 +1,172 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Rna/Asset/Asset.cpp
+// compiled in: rnaunity.cpp
+// 39 functions, source order. line | PS3 address | size
+
+   90  004C6C08     D8  static bool IsRtamPath(const char* pFileName)
+                         local  const char* cur
+  114    inline-only   static bool FileExists(const char* pFileName, uint32_t* type)
+                         local  struct <anon> info
+  157  004C6CE0     94  static void FixExtensionBasedOnRTAMType(uint32_t type, const struct <anon>& path)
+                         local  struct TypeToExt[6] typesLU
+                         local  int i
+  198  004C6D74      8  bool AssetGetFileWriteTime(const char* pFileName, const uint64_t& uTime64)
+  251  004CCD98    4C4  void* AssetLoadFile(const char* pFilePath, const uint32_t& uFileSize)
+                         local  const char[14] __FUNCTION__
+                         local  void* pData
+                         local  HFile hFile
+                         local  int nBytesRead
+                         local  char[256] filename
+                         local  FILE* pFile
+                         local  int32_t nBytesRead
+                         local  const void* pRAMFile
+                         inlines  TagValuePair, operator+
+  378  004C6E9C     44  void AssetFreeFile(void* pData)
+  392  004CC5B8     D0  bool AssetSaveFile(const char* pFilePath, const void* pData, uint32_t uDataSize)
+                         local  HFile hFile
+                         local  int32_t nBytesWritten
+  476  004E74F8    2BC  void AssetC::AssetC(const struct AssetC* this, struct AssetMgrC* pAssetMgr, const char* pFilePath, MemBudgetTypeE budget, enum eMemoryPools memPool)
+                         local  const char* filepath
+                         local  char[256] rtamPath
+                         local  char* cur
+                         inlines  AssetC::GetFilePath, RNADebugBreak, String
+  515  004D1CA8     FC  void AssetC::~AssetC(const struct AssetC* this)
+                         inlines  Clear, WatchObjectC::~WatchObjectC, ~String
+  523  004CCD88     10  bool AssetC::Load(const struct AssetC* this)
+  532  004C6EE0      C  void AssetC::Unload(const struct AssetC* this)
+  539  004C6EEC     7C  bool AssetC::Reload(const struct AssetC* this)
+  614  004C6F68      4  void AssetC::MenuPrint(const struct AssetC* this, const char8_t* pLinePrefixTabString)
+  658  004E8680    474  void AssetMgrC::AssetMgrC(const struct AssetMgrC* this)
+                         inlines  Init, RNADebugBreak, String, Vector
+  668  004D64A0    578  void AssetMgrC::~AssetMgrC(const struct AssetMgrC* this)
+                         local  int i
+                         inlines  Clear, Init, operator[], ~String, ~Vector
+  678  004EAC10    598  void AssetMgrC::AddSearchExtension(const struct AssetMgrC* this, const char* pExt)
+                         local  const char[19] __FUNCTION__
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct <anon>* newData
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct <anon>* newData
+                         local  int32_t i
+                         inlines  Construct, Destroy, Init, PushBack, RNADebugBreak, String, ~String
+  687  004D4428    12C  void AssetMgrC::RemoveAllSearchExtensions(const struct AssetMgrC* this)
+                         inlines  Clear
+  692  004EB1A8    8F8  void AssetMgrC::AddSearchPath(const struct AssetMgrC* this, const char* pSearchPath, enum PathTypeE pathType)
+                         local  const char[14] __FUNCTION__
+                         local  int iPath
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct <anon>* newData
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  enum PathTypeE* newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  enum PathTypeE* newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct <anon>* newData
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Construct, Copy, Destroy, Init, PushBack, RNADebugBreak, String, operator[], ~String
+  719  004D4D8C    5AC  void AssetMgrC::RemoveSearchPath(const struct AssetMgrC* this, const char* pSearchPath)
+                         local  int iPath
+                         inlines  Construct, Destroy, Erase, Init, RNADebugBreak, operator[]
+  735  004D24C4    12C  void AssetMgrC::RemoveAllSearchPaths(const struct AssetMgrC* this)
+                         inlines  Clear
+  742  004EBAA0    690  enum PathTypeE AssetMgrC::SearchForFile(const struct AssetMgrC* this, const char* pFilePath, char* pOutPath, int32_t nOutChars)
+                         local  struct <anon> path
+                         local  struct <anon> origPath
+                         local  int32_t iSearchPath
+                         local  int32_t iSearchExt
+                         local  uint32_t type
+                         inlines  FileExists, RNADebugBreak, String, operator==, operator[], ~String
+  827  004EC610    358  struct <anon> AssetMgrC::XformAssetNameForDeployment(const struct AssetMgrC* this, const char* pAssetName)
+                         local  struct <anon> path
+                         local  bool found
+                         local  int32_t iSearchPath
+                         local  struct <anon> searchPath
+                         inlines  Init, RNADebugBreak, String, operator[]
+  860  004D7514    21C  bool8_t AssetMgrC::DeployAssetsToConsole(const struct AssetMgrC* this, bool forceOverwrite)
+                         local  const char[22] __FUNCTION__
+                         local  int i
+                         local  enum AssetHomeE assetHome
+                         local  const char* pFilePath
+                         local  struct <anon> deployPath
+                         local  int32_t deployStatus
+                         inlines  AssetC::GetAssetHome, AssetC::GetFilePath, RNADebugBreak, operator[], ~String
+  890  004C6F98     1C  enum AssetHomeE AssetMgrC::GetAssetHomeFromPathType(const struct AssetMgrC* this, enum PathTypeE pathType)
+                         local  enum AssetHomeE assetHome
+  910  004EC130    3B4  struct AssetC* AssetMgrC::ResolveAsset(const struct AssetMgrC* this, const char* pProvidedFilePath)
+                         local  const char[13] __FUNCTION__
+                         local  char[256] strFilePath
+                         local  const char* pFilePath
+                         local  enum PathTypeE pathType
+                         local  struct AssetC* pAsset
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AssetC** newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AssetC** newData
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Construct, PushBack, RNADebugBreak
+  977  004D7730    110  bool AssetMgrC::DoesMgrContainsAsset(const struct AssetMgrC* this, const struct AssetC* pAsset)
+                         local  int i
+                         inlines  operator[]
+  994  004D7840    194  struct AssetC* AssetMgrC::FindAsset(const struct AssetMgrC* this, const char* pFilePath)
+                         local  int i
+                         inlines  RNADebugBreak, operator[]
+ 1010  004D79D4     D8  void AssetMgrC::ReloadAll(const struct AssetMgrC* this)
+                         local  int i
+                         inlines  operator[]
+ 1021  004D7AAC     D8  void AssetMgrC::UnloadAll(const struct AssetMgrC* this)
+                         local  int i
+                         inlines  operator[]
+ 1030  004C700C      4  void AssetMgrC::CheckAllForReload(const struct AssetMgrC* this)
+ 1076  004D7B84    250  void AssetMgrC::PrintAll(const struct AssetMgrC* this)
+                         local  int i
+                         local  struct AssetC* pAsset
+                         local  MemBudgetTypeE budget
+                         local  enum eMemoryPools pool
+                         local  const char* szPool
+                         local  const char* szBudget
+                         inlines  AssetC::GetCurrentMemPool, AssetC::GetFilePath, AssetMgrC::GetName, RNADebugBreak, String, operator[], ~String
+ 1095  004D7DD4     FC  void AssetMgrC::SetAllWatches(const struct AssetMgrC* this)
+                         local  int i
+                         local  struct AssetC* pAsset
+                         inlines  operator[]
+ 1110  004CBC90     80  void AssetMgrC::CheckAllWatchesForReload()
+                         local  uintptr_t idWatch
+                         local  bool bSomethingReloaded
+                         local  struct WatchObjectC* pAsset
+ 1130  004D7ED0    218  void AssetMgrC::MenuPrint(const struct AssetMgrC* this, const char8_t* pLinePrefixTabString)
+                         local  int i
+                         local  struct AssetC* pAsset
+                         local  uint32_t uOldColor
+                         local  uint32_t uOldColor
+                         inlines  RNADebugBreak, operator[]
+ 1176  004D80E8    7B8  int32_t AssetMgrC::GarbageCollect(const struct AssetMgrC* this, bool force)
+                         local  int32_t numCollected
+                         local  int i
+                         local  struct AssetC* asset
+                         local  int32_t idx
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Construct, Erase, RNADebugBreak, operator[]
+ 1222  004C6FB4     58  void AssetMgrC::CallReloadNotify()
+ 1231  004C7010     20  void AssetMgrC::SetReloadNotifyCallback(void(*)()* pCallback, void* pUserData)
+ 1237  004C9E14     50  bool SaveFileLocally(const char* pLocalPath, void* pData, uint32_t uFileSize, struct FILETIME* pRemoteCreationTime)
+                         local  const char[16] __FUNCTION__
+                         inlines  RNADebugBreak
+ 1280  004C6F6C     2C  enum DeployStatusE DeployFile(const char* pRemotePath, const char* pLocalPath, bool forceOverwrite)
+                         local  enum DeployStatusE ret

@@ -1,0 +1,237 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameModeDriver_RealTimeEvents.cpp
+// compiled in: golf_unity.cpp
+// 77 functions, source order. line | PS3 address | size
+
+   56  0025667C     64  void GameModeDriverRTE::GameModeDriverRTE(const struct GameModeDriverRTE* this)
+   70  0020B748     18  void GameModeDriverRTE::~GameModeDriverRTE(const struct GameModeDriverRTE* this)
+   75  0020B840     D4  CalendarDate GameModeDriverRTE::UI_GetCalendarInitialDate(const struct GameModeDriverRTE* this)
+                         local  uint32 month
+                         local  uint32 day
+                         local  uint32 year
+                         local  CalendarDate date
+   94  0020B914     60  bool GameModeDriverRTE::UI_CanPlayEventOnDate(const struct GameModeDriverRTE* this, CalendarDate date)
+                         local  uint32 month
+                         local  uint32 day
+                         local  uint32 year
+                         local  CalendarDate todayDate
+  105  0020B974     7C  void GameModeDriverRTE::RegisterStreamClients()
+  133  0020B9F0     4C  void GameModeDriverRTE::UnregisterStreamClients()
+  141  00279AFC     2C  bool GameModeDriverRTE::QueryInterface(const struct GameModeDriverRTE* this, enum GM_DriverType_t typeID, const void*& ptr)
+                         local  bool bRet
+                         inlines  GameModeDriver::QueryInterface
+  158  0020BAE4    114  int32 GameModeDriverRTE::GetNextEvent(const struct GameModeDriverRTE* this)
+                         local  int32 result
+                         local  CalendarDate date
+                         local  uint32 month
+                         local  uint32 day
+                         local  uint32 year
+                         local  int32 yearIndex
+                         local  int32 dayDelta
+                         local  int32 i
+                         local  int32 currDayDelta
+  194  003357B0    244  void GameModeDriverRTE::StartEvent(const struct GameModeDriverRTE* this)
+                         local  const struct EventData_t* pData
+                         local  const int32 c_strLen
+                         local  char[256] opponentName
+  242  0020BBF8      8  bool GameModeDriverRTE::CanPlayEvent(const struct GameModeDriverRTE* this, int32 eventID)
+  247  0020BA3C     A8  const struct CalendarEntry_t* GameModeDriverRTE::GetCalData(const struct GameModeDriverRTE* this, int32 nEventNum)
+  258  0020BC7C     70  const struct EventData_t* GameModeDriverRTE::GetEventData(const struct GameModeDriverRTE* this, int32 nEventNum)
+                         local  int32 nScenarioNum
+  266  0020BCEC     20  const char* GameModeDriverRTE::GetStringTable(const struct GameModeDriverRTE* this, int32 nIndex)
+  271  0020BD0C    130  bool GameModeDriverRTE::GetEventByDate(const struct GameModeDriverRTE* this, CalendarDate date, const int32& rEventID, const int32& rDayNum)
+                         local  uint32 month
+                         local  uint32 day
+                         local  uint32 year
+                         local  int32 yearIndex
+                         local  int32 dayDelta
+                         local  bool found
+                         local  int32 i
+  311  0020BE3C     60  bool GameModeDriverRTE::GetEventByDateMDY(const struct GameModeDriverRTE* this, uint32 month, uint32 day, uint32 year, const int32& rEventID, const int32& rDayNum)
+                         local  CalendarDate date
+  321  0020B7C4     7C  void GameModeDriverRTE::GetCurrentDate(const struct GameModeDriverRTE* this, uint32* pMonth, uint32* pDay, uint32* pYear)
+                         local  int month
+                         local  int day
+                         local  int year
+                         local  int hour
+                         local  int minute
+                         local  int second
+                         local  int millisecond
+  333  0020BE9C     38  const char* GameModeDriverRTE::GetName(const struct GameModeDriverRTE* this, int32 eventID)
+  338  0020BED4     38  const char* GameModeDriverRTE::GetDescription(const struct GameModeDriverRTE* this, int32 eventID)
+  343  0020BF0C     28  const char* GameModeDriverRTE::GetHandicapEntryString(const struct GameModeDriverRTE* this, int32 eventID)
+  348  0020BF34     28  int32 GameModeDriverRTE::GetPurse(const struct GameModeDriverRTE* this, int32 eventID)
+  353  0020BF5C     8C  bool GameModeDriverRTE::IsEventComplete(const struct GameModeDriverRTE* this, int32 userID, int32 eventID)
+                         local  const struct UserInfo& userInfo
+  360  0020BFE8     3C  void GameModeDriverRTE::EndGame(const struct GameModeDriverRTE* this)
+  365  0020C028      4  void GameModeDriverRTE::QuitGame(const struct GameModeDriverRTE* this)
+  370  00336198    350  void GameModeDriverRTE::EndCurrentEvent(const struct GameModeDriverRTE* this)
+                         local  int32 i
+                         local  const struct UserInfo& userInfo
+                         local  int32 nScenarioNum
+                         local  struct CourseMoneyTracking_t courseMoneyTracking
+                         local  const struct EventData_t* pData
+                         local  int32 totalearned
+                         local  int points
+                         inlines  GM_GetPlayerHoleStrokes, GeneralUserData::GetDevPoints, GeneralUserData::SetDevPoints, UserInfo::GetDevPoints, UserInfo::SetDevPoints
+  420  0020C02C     DC  void GameModeDriverRTE::ScenarioMarkerActor(const struct GameModeDriverRTE* this, TBasicParamPtr pData)
+                         local  TScenarioMarkerParam* pParam
+                         local  int32 zerobasedID
+  437  002489E0     7C  bool GameModeDriverRTE::CheckCurrentEventActorPosition(const struct GameModeDriverRTE* this)
+                         local  const struct EventData_t* pData
+  444  00248A5C     A4  bool GameModeDriverRTE::IsSkillsChallenge(const struct GameModeDriverRTE* this)
+                         local  const struct EventData_t* pData
+                         local  enum GM_ModeType_t modeType
+  455  002505A4    63C  void GameModeDriverRTE::PostHoleLoadInit(const struct GameModeDriverRTE* this)
+                         local  const struct EventData_t* pData
+                         local  int32 nScenarioNum
+                         local  vec4flt markerLocation
+                         local  bool bFound
+                         local  uint8_t plrCount
+                         local  int32 i
+                         local  uint8_t plr
+                         inlines  vec4flt_Copy
+  544  002442F0      8  void GameModeDriverRTE::LoadRTEcFromStream(struct TStreamData* pStreamData)
+  550  002426D4    164  void GameModeDriverRTE::Locale_LoadRTEcFromStream(struct TStreamData* pStreamData)
+                         local  const char[26] __FUNCTION__
+                         local  void* dataPtr
+                         local  uint32 size
+                         local  void* pData
+                         inlines  TagValuePair, operator+
+  578  0024283C    164  void GameModeDriverRTE::LoadRTEsFromStream(struct TStreamData* pStreamData)
+                         local  const char[19] __FUNCTION__
+                         local  void* dataPtr
+                         local  uint32 size
+                         local  void* pData
+                         inlines  TagValuePair, operator+
+  605  002442E8      8  void GameModeDriverRTE::LoadRTEnFromStream(struct TStreamData* pStreamData)
+  611  002429A0    11C  void GameModeDriverRTE::Locale_LoadRTEnFromStream(struct TStreamData* pStreamData)
+                         local  const char[26] __FUNCTION__
+                         local  char* pStrTable
+                         local  uint32 datasize
+                         inlines  TagValuePair, operator+
+  624  00335704     AC  void GameModeDriverRTE::SetupEvent(const struct GameModeDriverRTE* this, const struct EventData_t* pData)
+                         inlines  GM_SelectHoleSet
+  638  002CCEC0    754  void GameModeDriverRTE::SetupCourseAndHoleSelection(const struct GameModeDriverRTE* this, const struct EventData_t* pData)
+                         local  int32 nIndex
+                         local  int32 nHole
+                         local  bool grouped
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         inlines  GM_SelectSingleHole
+  772  00335010    6F4  void GameModeDriverRTE::PrepareForTeeOff(const struct GameModeDriverRTE* this, const struct EventData_t* pData)
+                         local  int32 i
+                         local  int32 userID
+                         local  bool midGroup
+                         inlines  GM_GetCurrentHoleIndex, GM_SetPlayerHoleStrokes, GM_SetTargetCup, GamePlayerManager::SetPlayerCount, cGAME_GLOBALS::GetCharacterStyleShirt, cGAME_GLOBALS::SetCharacterStyleShirt, cGAME_GLOBALS::SetTimeOfDaySet
+  933  00334308    D08  void GameModeDriverRTE::SetupInitialRoundScore(const struct GameModeDriverRTE* this, const struct EventData_t* pData)
+                         local  int32 diff
+                         local  int32 holeindex
+                         local  int32 totalpar
+                         local  int32 totalscore
+                         local  uint32 i
+                         local  uint32 j
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_SetPlayerHoleStrokes, GamePlayer::GetGolferScore
+ 1156  0021B6D4     C4  const char* GameModeDriverRTE::GetWinScoreTypeString(const struct GameModeDriverRTE* this, enum GM_PNScoringType_t type)
+                         local  const char*[10] keyList
+                         local  int32 idx
+ 1176  003359F4    748  bool GameModeDriverRTE::ScenarioWon(const struct GameModeDriverRTE* this)
+                         local  bool bRet
+                         local  const struct EventData_t* pData
+                         local  enum GM_PNScoringType_t winScoreType
+                         local  int32 winScore
+                         local  int32 roundScore
+                         local  int32 roundPar
+                         local  int32 numHoles
+                         local  int32 timeTaken
+                         local  int32 modepoints
+                         local  int32 plr2modepoints
+                         local  int32 i
+                         local  bool beatAllPlayers
+                         local  int32 opponentScore
+                         local  int32 strokesAfterHit
+                         local  int32 par
+                         local  bool mostskins
+                         local  int32 j
+                         local  bool beatAllPlayers
+                         local  int32 i
+                         local  int32 opponentScore
+                         local  bool beatAllPlayers
+                         local  int32 i
+                         local  int32 opponentScore
+                         inlines  GM_GetCurrentHoleIndex, GM_GetModeType, GM_GetPlayerHoleStrokes
+ 1506  0020BC00     7C  const struct EventData_t* GameModeDriverRTE::GetScenario(const struct GameModeDriverRTE* this, int32 nIndex)
+ 1516  0020C108     70  enum UIScoreCardDispMode_t GameModeDriverRTE::GetScoreDisplayMode(const struct GameModeDriverRTE* this, bool getAlternate)
+                         local  enum UIScoreCardDispMode_t ret
+                         local  struct GameModeBase* mode
+ 1528  0020C178     38  int32 GameModeDriverRTE::UI_GetEventIconIndexOnCal(const struct GameModeDriverRTE* this, int32 eventID)
+                         local  int32 iconIdx
+                         local  const struct CalendarEntry_t* calEnt
+ 1539  0020C1B0     74  int32 GameModeDriverRTE::UI_GetEventIconIndexInDetails(const struct GameModeDriverRTE* this, CalendarDate date)
+                         local  int32 iconIdx
+                         local  int32 eventID
+                         local  int32 round
+                         local  const struct CalendarEntry_t* calEnt
+ 1558  0021CB14    298  void GameModeDriverRTE::UI_SetEventInfoText(const struct GameModeDriverRTE* this, CalendarDate date)
+                         local  struct UICalendar* calendar
+                         local  char[256] strBuf
+                         local  int32 eventID
+                         local  int32 round
+                         local  const struct EventData_t* pData
+                         local  enum GM_CourseType_t courseIndex
+                         local  enum GM_PNScoringType_t winScoreType
+ 1601  0033613C     5C  int32 GameModeDriverRTE::GetDevPointsPurseForBracket(const struct GameModeDriverRTE* this, enum PlayerNumber_t userID)
+                         local  const struct EventData_t* pData
+ 1611  00248B00     D4  int32 GameModeDriverRTE::GetDevPointAssignment(const struct GameModeDriverRTE* this, enum PlayerNumber_t userID)
+                         local  const struct EventData_t* pData
+ 1642  002A2A68     E4  struct GameModeDriverRTE* RTEDPtr()
+                         local  void* ptr
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+ 1654  002A3450     34  bool GM_Currently_RealtimeMode()
+ 1659  00205ECC      8  GM_RealtimeEventID_t GM_RealtimeMode_GetSelectedEvent(int32* pDayNum)
+ 1664  002A31C0     50  void GM_RealtimeMode_SelectEvent(GM_RealtimeEventID_t eventID, int dayNum)
+ 1669  002A3344     68  bool GM_RealtimeMode_SelectEventToday()
+                         local  uint32 month
+                         local  uint32 day
+                         local  uint32 year
+                         local  int eventID
+                         local  int dayNum
+                         local  bool bRet
+ 1686  002A2F9C     30  const struct CalendarEntry_t* GM_RealtimeMode_GetEventInfo(GM_RealtimeEventID_t eventID)
+ 1691  002A2F44     58  const struct CalendarEntry_t* GM_RealtimeMode_GetEventInfoByDate(CalendarDate date)
+                         local  int32 eventID
+                         local  int32 eventDayNum
+                         local  const struct CalendarEntry_t* pRet
+ 1705  002A2F08     3C  const char* GM_RealtimeMode_GetCurrentName()
+ 1710  002A2ED8     30  char* GM_RealtimeMode_GetName(GM_RealtimeEventID_t eventID)
+ 1715  002A2EA8     30  char* GM_RealtimeMode_GetDescription(GM_RealtimeEventID_t eventID)
+ 1720  002A2E78     30  char* GM_RealtimeMode_GetHandicapEntryString(GM_RealtimeEventID_t eventID)
+ 1725  0020C224      8  int GM_RealtimeMode_GetTextureID(GM_RealtimeEventID_t eventID)
+ 1730  0020C22C      8  bool GM_RealtimeMode_TodaysEventCompleted()
+ 1735  0020C234      8  GM_RealtimeEventID_t GM_RealtimeMode_GetNextIncompleteEvent()
+ 1740  0020C23C     70  int GM_RealtimeMode_GetNEventsWon()
+                         local  int numWon
+                         local  int32 i
+ 1754  002A2E34     44  enum GM_CourseType_t GM_RealtimeMode_GetCurrentCourse()
+ 1759  0020C2AC      8  bool GM_Realtime_DidUserQuit(enum PlayerNumber_t userID)
+ 1764  0020C024      4  void GM_Realtime_SetUserQuit(enum PlayerNumber_t userID, bool userQuit)
+ 1769  0020C2B4      8  bool GM_RealtimeMode_CheckHandicap(enum PlayerNumber_t userID)
+ 1774  0020C2BC      8  int GM_RealtimeMode_GetNumTrophies(int index)
+ 1779  0020C2C4      8  bool GM_RealtimeMode_GetTrophyStatus(int trophyRoomIndex, int enrtyNum, char* dateWon, size_t maxDateWonLen, char* awardName, size_t maxAwardNameLen, int* iconIndex)
+ 1785  0020C2CC      8  CalendarDate GM_RealtimeMode_GetStartDate(GM_RealtimeEventID_t eventID)
+ 1790  0020C2D4      8  int GM_RealtimeMode_GetIconIDByTrophyGroup(int trophyGroupID)
+ 1796  0020C2DC      4  void GM_RealtimeMode_GetNameByTrophyGroup(int trophyGroupID, char* name, size_t awardNameLen)
+ 1801  002A2DEC     48  bool GM_RealtimeMode_IsEventComplete(int userID, GM_RealtimeEventID_t eventID)
+ 1806  0020C2E0      8  int GM_RealtimeMode_GetTrophyID(GM_RealtimeEventID_t eventID)
+ 1811  002A2DBC     30  int GM_RealtimeMode_GetPurse(GM_RealtimeEventID_t eventID)
+ 1816  002A2BA4     64  bool GM_RealtimeMode_GetEventByDateMDY(uint32 month, uint32 day, uint32 year, GM_RealtimeEventID_t* pEventID, int* pDayNum)
+                         local  CalendarDate date
+ 1826  002A2D6C     50  void GM_RealtimeMode_GetCurrentDate(uint32* pMonth, uint32* pDay, uint32* pYear)
+ 1831  002A2B4C     58  bool GM_RealtimeMode_GetEventByDate(CalendarDate date, GM_RealtimeEventID_t* pEventID, int* pDayNum)
+                         local  const int32& pDayNumRef
+                         local  const int32& eventIdRef
+ 1838  0020C2E8     74  void GameModeDriverRTE::GetCurrentScoreString(const struct GameModeDriverRTE* this, char* strBuf, int32 bufferSize)
+                         local  struct GameModeBase* mode

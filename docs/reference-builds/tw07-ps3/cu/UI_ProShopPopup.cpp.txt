@@ -1,0 +1,26 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_ProShopPopup.cpp
+// compiled in: apt_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+    8  000F2EB0     4C  void UIProShopPopup::UIProShopPopup(const struct UIProShopPopup* this)
+   12  000F2F48     B8  void UIProShopPopup::~UIProShopPopup(const struct UIProShopPopup* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   16  00033788     38  void UIProShopPopup::Init(const struct UIProShopPopup* this)
+   22  00033CA8     24  void UIProShopPopup::Close(const struct UIProShopPopup* this)
+   27  00039660     6C  void UIProShopPopup::Show(const struct UIProShopPopup* this)
+   37  00067D40    1B8  void UIProShopPopup::FSCommand(const struct UIProShopPopup* this, const char* szCommand, const char* szParams)
+                         local  uint16* idList
+                         local  FE_CrAP_Asset_Category_e category
+                         local  int32 curSubCategory
+                         local  int32 unfilteredEntryNum
+                         local  int32 curActiveItemIndex
+                         local  int32 assetID
+                         local  bool sale
+                         local  int32 price
+                         local  char[64] strBuf
+                         local  char[16] priceString
+                         inlines  UIGameFace::GetProShopMenuAssetList
+   88  000396CC     D8  void UIProShopPopup::ChangeMenuSel(const struct UIProShopPopup* this, int32 newSel)
+                         local  char[64] strBuf
+  103  000D5444    194  enum eAptHandleInput UIProShopPopup::HandleInput(const struct UIProShopPopup* this, int32 cID)
+  132  000D53BC     88  void UIProShopPopup::ConfirmSelection(const struct UIProShopPopup* this)

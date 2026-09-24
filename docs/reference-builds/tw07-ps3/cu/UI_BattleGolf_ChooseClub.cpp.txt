@@ -1,0 +1,74 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_BattleGolf_ChooseClub.cpp
+// compiled in: apt_unity.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   54  000F51CC     AC  void UIBattleGolf_ChooseClub::UIBattleGolf_ChooseClub(const struct UIBattleGolf_ChooseClub* this)
+                         inlines  TArrayInternal<UIBattleGolf_ChooseClub::BattleGolf_ChooseClub_DstMenuItem,AptStructSwapper>::TArrayInternal, TExternArray<UIBattleGolf_ChooseClub::BattleGolf_ChooseClub_DstMenuItem>::TExternArray
+   67  000EF178     70  void UIBattleGolf_ChooseClub::Init(const struct UIBattleGolf_ChooseClub* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList
+   76  00031AD8     44  void UIBattleGolf_ChooseClub::ShowRemoveClubMenu(const struct UIBattleGolf_ChooseClub* this)
+   82  00031A94     44  void UIBattleGolf_ChooseClub::ShowAddClubMenu(const struct UIBattleGolf_ChooseClub* this)
+   88  00031BA4    240  void UIBattleGolf_ChooseClub::SetupSourceMenuItems(const struct UIBattleGolf_ChooseClub* this)
+                         local  void* ptr
+                         local  struct GameModeBattle* pBattle
+                         local  enum PlayerNumber_t winner
+                         local  int clubMenuIndex
+                         local  int clubIndex
+                         local  enum PlayerNumber_t loser
+                         local  int clubMenuIndex
+                         local  int clubIndex
+  142  000429FC     B8  void UIBattleGolf_ChooseClub::Show(const struct UIBattleGolf_ChooseClub* this)
+                         inlines  UIBattleGolf_ChooseClub::ShowMenu
+  164  0003C80C     A0  void UIBattleGolf_ChooseClub::InitMenuParams(const struct UIBattleGolf_ChooseClub* this)
+  175  00031DF4     88  char* UIBattleGolf_ChooseClub::GetClubName(const struct UIBattleGolf_ChooseClub* this, int32 clubId)
+                         local  char[16] strID
+                         local  char* clubNameStr
+  191  000731D4    1CC  void UIBattleGolf_ChooseClub::GenerateBagOwnerText(const struct UIBattleGolf_ChooseClub* this)
+                         local  void* ptr
+                         local  struct GameModeBattle* pBattle
+                         local  enum PlayerNumber_t bagOwnerPlayerId
+                         local  char* formatString
+                         local  char[32] golferNameBuffer
+  231  00031E7C     F0  void UIBattleGolf_ChooseClub::UpdateItemAndLabel(const struct UIBattleGolf_ChooseClub* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct BattleGolf_ChooseClub_SrcMenuItem* src
+                         local  struct BattleGolf_ChooseClub_DstMenuItem* dest
+  265  00087648    730  enum eAptHandleInput UIBattleGolf_ChooseClub::HandleInput(const struct UIBattleGolf_ChooseClub* this, int32 cID)
+                         local  bool isInputFromCorrectController
+                         local  void* ptr
+                         local  bool bProcessInput
+                         local  struct GameModeBattle* pBattle
+                         local  enum PlayerNumber_t winner
+                         local  int lastUIPlayer
+                         local  bool shouldUpdate
+                         local  int32 newIndex
+                         local  int32 oldIndex
+                         local  int row
+                         local  int column
+                         local  int row
+                         local  int column
+                         local  void* ptr
+                         local  struct GameModeBattle* pBattle
+                         local  enum Club_t club
+                         local  enum PlayerNumber_t loser
+                         local  int32 lastRow
+                         local  int32 newRow
+                         local  int32 lastColumn
+                         local  enum PlayerNumber_t winner
+  550  00042F28     78  void UIBattleGolf_ChooseClub::Hide(const struct UIBattleGolf_ChooseClub* this)
+  560  0003203C     D4  void UIBattleGolf_ChooseClub::OnHide(const struct UIBattleGolf_ChooseClub* this)
+                         local  void* ptr
+                         local  struct GameModeBattle* pBattle
+  579  000AE804     88  void UIBattleGolf_ChooseClub::UpdateMenuItems(const struct UIBattleGolf_ChooseClub* this)
+                         inlines  UIMenuBase::mMenu_StartUpdate_func
+  589  000AEAAC    13C  enum AptThreadReturnValue UIBattleGolf_ChooseClub::UpdateMenuItemsThread(const struct UIBattleGolf_ChooseClub* this)
+                         local  int i
+                         local  int32 old
+                         inlines  UIMenuBase::mMenu_UpdateNextElement_func
+  614  00022630     34  enum TAptSequenceStatus UIBattleGolf_ChooseClub::Show_BattleGolfChooseAddRemoveScreen_Sequence(const struct UIBattleGolf_ChooseClub* this, bool inbFirstTime, void* inData)
+  622  00031F6C     4C  int32 UIBattleGolf_ChooseClub::GetRow(const struct UIBattleGolf_ChooseClub* this, int32 index)
+                         local  int32 max
+                         local  int32 i
+  635  00031FB8     84  int32 UIBattleGolf_ChooseClub::GetColumn(const struct UIBattleGolf_ChooseClub* this, int32 index)
+                         local  int32 row
+                         local  int32 column
+                         local  int32 i

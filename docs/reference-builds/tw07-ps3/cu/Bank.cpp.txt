@@ -1,0 +1,19 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/Bank.cpp
+// compiled in: Bank.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   13  0059846C    174  struct <anon>* FromData(void* data)
+                         local  struct <anon>* bank
+                         local  int* relocs
+                         local  uint8_t* pShared
+                         local  int m
+                         local  struct MotionDefinition* def
+                         local  int32_t idx
+                         local  struct ICodec* codec
+   53  005985E0      C  int32_t GetStateDefinitionCount(const const struct <anon>* this)
+   58  005985EC     38  const char* GetStateDefinitionName(const const struct <anon>* this, StateIndex i)
+   67  00598624     34  const struct StateDefinition* GetStateDefinition(const const struct <anon>* this, StateIndex i)
+   76  00598658      C  int32_t GetMotionDefinitionCount(const const struct <anon>* this)
+   81  00598664     34  const struct MotionDefinition* GetMotionDefinition(const const struct <anon>* this, int32_t i)
+   90  00598698      C  int32_t GetTransitionDefinitionCount(const const struct <anon>* this)
+   95  005986A4     34  const struct TransitionDefinition* GetTransitionDefinition(const const struct <anon>* this, int32_t i)

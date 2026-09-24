@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/llFileCache.c
+// compiled in: Legacy_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+    3  00380270      8  bool FileCache_InitOnce()
+   16  003811BC      4  void FileCache_CloseOnce()
+   21  003811B8      4  void FileCache_Flush()
+   28  003AAD48     10  static void _GLOBAL__I__Z10Quat_SlerpPfS_f()
+   29  003AAD38     10  static void _GLOBAL__D__Z10Quat_SlerpPfS_f()

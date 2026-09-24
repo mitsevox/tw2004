@@ -1,0 +1,9 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/career/source/common/./careerdynamiclayoutconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   54  006252C0     94  struct Operation* LoadUser(const struct <anon>* this, const char8_t* strUserName, struct CareerDynamicLayoutCallback* pCallback)
+   60  00625354     A4  const char8_t* GetValue(const const struct <anon>* this, uint32_t uIndex, int32_t* pX, int32_t* pY)
+   68  006253F8     44  uint32_t GetNumSlots(const const struct <anon>* this)
+   69  0062543C     44  void SetActiveSlot(const struct <anon>* this, uint32_t uSlot)
+   70  00625480     44  uint32_t GetActiveSlot(const const struct <anon>* this)

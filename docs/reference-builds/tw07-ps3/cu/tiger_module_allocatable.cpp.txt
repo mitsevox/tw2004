@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_allocatable.cpp
+// compiled in: tiger_module_allocatable.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    6  00521558     7C  void* operator new(unsigned int size, struct IAllocator* allocator)
+                         local  struct IAllocator** allocatorPtrPtr
+                         inlines  TagValuePair
+   18  00521504     54  void operator delete(void* ptr)
+                         local  struct IAllocator** allocatorPtrPtr
+   25  005215D4     10  struct IAllocator* GetAllocator(const const struct <anon>* this)

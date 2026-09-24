@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/Hi-Rendering/Headers/BallPathPreviewMeter.h
+// compiled in: golf_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   11    inline-only   void BallPathPreviewMeter::SetPercent(const struct BallPathPreviewMeter* this, float pct)
+   12    inline-only   void BallPathPreviewMeter::Show(const struct BallPathPreviewMeter* this, bool visible)

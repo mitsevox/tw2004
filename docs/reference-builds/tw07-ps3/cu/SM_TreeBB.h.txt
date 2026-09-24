@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_TreeBB.h
+// compiled in: shader_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   24  00520DD0     18  void SM_TreeBBClass::~SM_TreeBBClass(const struct SM_TreeBBClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base

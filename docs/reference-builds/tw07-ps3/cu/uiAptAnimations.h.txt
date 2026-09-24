@@ -1,0 +1,44 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/aptInterface/uiAptAnimations.h
+// compiled in: other_unity.cpp
+// 33 functions, source order. line | PS3 address | size
+
+   46    inline-only   int32_t AptStyleTxtGrp::GetTextureId(const const struct AptStyleTxtGrp* this)
+   47    inline-only   int32_t AptStyleTxtGrp::GetSize(const const struct AptStyleTxtGrp* this)
+   49    inline-only   float* AptStyleTxtGrp::GetStripList(const const struct AptStyleTxtGrp* this)
+   50    inline-only   struct LS_VertexBuffer* AptStyleTxtGrp::GetVectexBuffer(const const struct AptStyleTxtGrp* this)
+   91    inline-only   struct AptStyleTxtGrp* AptFillStyles::GetStypeTxtGrp(const const struct AptFillStyles* this)
+   93    inline-only   void AptFillStyles::GoToFirstStyle(const struct AptFillStyles* this)
+   94    inline-only   void AptFillStyles::GoToNextStyle(const struct AptFillStyles* this)
+   95    inline-only   bool AptFillStyles::HasMoreStyles(const const struct AptFillStyles* this)
+  100    inline-only   void AptFillStyles::GetRawDataSize(const struct AptFillStyles* this, const char*& rawData, const int32& size)
+  120    inline-only   void AptRUFile_t::Swap(const struct AptRUFile_t* this, const struct AptRUFile_t& b)
+  122    inline-only   void AptRUFile_t::operator delete [](void* p)
+  122    inline-only   void* AptRUFile_t::operator new [](size_t size)
+  226  00442DF8    134  void AptInfo_t::~AptInfo_t(const struct AptInfo_t* this)
+                         inlines  AptStructSwapper::Free, CustomClassSwapper<AptRUFile_t>::Free, TArrayInternal<AptInt32,AptStructSwapper>::~TArrayInternal, TArrayInternal<AptRUFile_t,CustomClassSwapper<AptRUFile_t> >::~TArrayInternal, ~TAptArrayClass, ~TAptArrayStruct
+  232    inline-only   int32 AptInfo_t::GetIsUsed(const const struct AptInfo_t* this)
+  238    inline-only   char* AptInfo_t::GetAptFileName(const const struct AptInfo_t* this)
+  241    inline-only   void AptInfo_t::SetScreenRegistration(const struct AptInfo_t* this, enum eAptScreenRegistration screenRegistration)
+  242    inline-only   enum eAptScreenRegistration AptInfo_t::GetScreenRegistration(const const struct AptInfo_t* this)
+  243    inline-only   enum eAptSRRes AptInfo_t::GetScreenResolution(const const struct AptInfo_t* this)
+  244    inline-only   void AptInfo_t::SetScreenResolution(const struct AptInfo_t* this, enum eAptSRRes res)
+  246    inline-only   void AptInfo_t::SetSmoothRendering(const struct AptInfo_t* this, enum eAptPrimTexturedSmoothType smooth)
+  247    inline-only   enum eAptPrimTexturedSmoothType AptInfo_t::GetSmoothRendering(const const struct AptInfo_t* this)
+  250    inline-only   TextureRef AptInfo_t::GetTextureRefFromAptTextureId(const const struct AptInfo_t* this, int32 id)
+  251    inline-only   int32 AptInfo_t::AddTextureRef(const struct AptInfo_t* this, TextureRef ref)
+  254    inline-only   void AptInfo_t::ClearTextureRef(const struct AptInfo_t* this, TextureRef ref)
+                         local  int i
+  264    inline-only   void AptInfo_t::SetVersion(const struct AptInfo_t* this, uint32 version)
+  297    inline-only   void AptInfo_t::operator delete(void* p, size_t size)
+  297    inline-only   void* AptInfo_t::operator new(size_t size)
+  314  00442AB0     1C  void AptAnimations::AptAnimations(const struct AptAnimations* this)
+                         inlines  TAptArrayStruct
+  315  00480274    1E0  void AptAnimations::~AptAnimations(const struct AptAnimations* this)
+                         local  int32 i
+                         local  struct AptInfo_t* aptInfo
+                         inlines  AptAnimations::GetAptInfo, AptInfo_t::operator delete, AptStructSwapper::Free, TArrayInternal<AptInt32,AptStructSwapper>::Flush, TArrayInternal<AptInt32,AptStructSwapper>::operator[], ~TAptArrayStruct
+  317    inline-only   struct AptInfo_t& AptAnimations::GetAptInfo(const const struct AptAnimations* this, uint32_t animId)
+                         local  struct AptInfo_t* aptInfo
+  325    inline-only   int32_t AptAnimations::GetNbrAnimations(const struct AptAnimations* this)
+  341    inline-only   void* AptAnimations::operator new(size_t size)
+  341    inline-only   void AptAnimations::operator delete(void* p, size_t size)

@@ -1,0 +1,81 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/vector_intrinsic_operation_inline.h
+// compiled in: RNADevice.cpp, RNAType.cpp, SGNodeBSPCulledRenderable.cpp, SGNodeJoint.cpp, Scrape.cpp
+// 20 functions, source order. line | PS3 address | size
+
+   67    inline-only   Vector4Intrinsic_32 vpu::_asmCreateVector(float x, float y)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 vi_temp
+   74    inline-only   Vector4Intrinsic_32 vpu::_asmCreateVector(float x, float y, float z)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 vi_temp
+   81    inline-only   Vector4Intrinsic_32 vpu::_asmCreateVector(float x, float y, float z, float w)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 vi_temp
+  121    inline-only   Vector4Intrinsic_32 vpu::_asmCreateVectorAxis<VectorAxisX, VectorAxisY, VectorAxisZ>(Vector4Intrinsic_32_InParam x, Vector4Intrinsic_32_InParam y, Vector4Intrinsic_32_InParam z)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 result
+                         local  unsigned char[16] permuteControl
+  146    inline-only   Vector4Intrinsic_32 vpu::_asmGetZero()
+                         local  Vector4Intrinsic_32 ret
+  162    inline-only   Vector4Intrinsic_32 vpu::_asmGetOne()
+                         local  Vector4Intrinsic_32 ret
+  266    inline-only   Vector4Intrinsic_32 vpu::_asmMult(Vector4Intrinsic_32_InParam v0, Vector4Intrinsic_32_InParam v1)
+                         local  Vector4Intrinsic_32 ret
+                         local  int[4] zero
+  283    inline-only   Vector4Intrinsic_32 vpu::_asmNegate(Vector4Intrinsic_32_InParam v0)
+                         local  Vector4Intrinsic_32 ret
+                         local  int[4] zero
+  460    inline-only   Vector4Intrinsic_32 vpu::_asmMultAdd(Vector4Intrinsic_32_InParam v0, Vector4Intrinsic_32_InParam v1, Vector4Intrinsic_32_InParam v2)
+                         local  Vector4Intrinsic_32 ret
+  533    inline-only   bool vpu::_asmIsEqualV4(Vector4Intrinsic_32_InParam v0, Vector4Intrinsic_32_InParam v1)
+                         local  bool ret
+  542    inline-only   bool vpu::_asmIsEqualV3(Vector4Intrinsic_32_InParam v0, Vector4Intrinsic_32_InParam v1)
+                         local  bool ret
+                         local  Vector4Intrinsic_32 v0comp
+                         local  Vector4Intrinsic_32 v1comp
+  551    inline-only   bool vpu::_asmIsEqualV2(Vector4Intrinsic_32_InParam v0, Vector4Intrinsic_32_InParam v1)
+                         local  bool ret
+                         local  Vector4Intrinsic_32 v0comp
+                         local  Vector4Intrinsic_32 v1comp
+  806    inline-only   Vector4Intrinsic_32 vpu::_asmDotV3(Vector4Intrinsic_32_InParam v0, Vector4Intrinsic_32_InParam v1)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 xx_yy_zz
+                         local  Vector4Intrinsic_32 yy
+                         local  Vector4Intrinsic_32 zz
+  961    inline-only   Vector4Intrinsic_32 vpu::_asmSplat<VectorAxisW>(Vector4Intrinsic_32_InParam v)
+                         local  Vector4Intrinsic_32 ret
+  978    inline-only   Vector4Intrinsic_32 vpu::_asmSwizzleStore<VectorAxisX, VectorAxisX>(Vector4Intrinsic_32_InParam dest, Vector4Intrinsic_32_InParam src)
+                         local  Vector4Intrinsic_32 ret
+                         local  unsigned char[16] permuteControl
+  978    inline-only   Vector4Intrinsic_32 vpu::_asmSwizzleStore<VectorAxisY, VectorAxisY>(Vector4Intrinsic_32_InParam dest, Vector4Intrinsic_32_InParam src)
+                         local  Vector4Intrinsic_32 ret
+                         local  unsigned char[16] permuteControl
+  978    inline-only   Vector4Intrinsic_32 vpu::_asmSwizzleStore<VectorAxisZ, VectorAxisZ>(Vector4Intrinsic_32_InParam dest, Vector4Intrinsic_32_InParam src)
+                         local  Vector4Intrinsic_32 ret
+                         local  unsigned char[16] permuteControl
+  978    inline-only   Vector4Intrinsic_32 vpu::_asmSwizzleStore<VectorAxisW, VectorAxisW>(Vector4Intrinsic_32_InParam dest, Vector4Intrinsic_32_InParam src)
+                         local  Vector4Intrinsic_32 ret
+                         local  unsigned char[16] permuteControl
+  978    inline-only   Vector4Intrinsic_32 vpu::_asmSwizzleStore<VectorAxisW, VectorAxisX>(Vector4Intrinsic_32_InParam dest, Vector4Intrinsic_32_InParam src)
+                         local  Vector4Intrinsic_32 ret
+                         local  unsigned char[16] permuteControl
+ 1248    inline-only   void vpu::_asmMatrixFromQuaternion(Vector4Intrinsic_32_InParam q, const Vector4Intrinsic_32& x, const Vector4Intrinsic_32& y, const Vector4Intrinsic_32& z)
+                         local  Vector4Intrinsic_32 vZero
+                         local  Vector4Intrinsic_32 sqrt2s
+                         local  Vector4Intrinsic_32 scaled_q
+                         local  Vector4Intrinsic_32 halves
+                         local  Vector4Intrinsic_32 neg_qq
+                         local  Vector4Intrinsic_32 scaled_q_yzx
+                         local  Vector4Intrinsic_32 xy_yz_zx
+                         local  Vector4Intrinsic_32 scaled_q_zxy
+                         local  Vector4Intrinsic_32 wz_wx_wy
+                         local  Vector4Intrinsic_32 addVec
+                         local  Vector4Intrinsic_32 subVec
+                         local  Vector4Intrinsic_32 neg_yy_zz_xx
+                         local  Vector4Intrinsic_32 diagonalValues
+                         local  Vector4Intrinsic_32 result
+                         local  unsigned char[16] permuteControl
+                         local  Vector4Intrinsic_32 result
+                         local  unsigned char[16] permuteControl
+                         local  Vector4Intrinsic_32 result
+                         local  unsigned char[16] permuteControl

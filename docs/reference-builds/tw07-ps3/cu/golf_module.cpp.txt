@@ -1,0 +1,33 @@
+// ../../../../../TIGERCODE/Code/GolfModule/golf_module.cpp
+// compiled in: golf_unity.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   17  0022ED78     D4  void GolfModule::FailMessage(const struct GolfModule* this, const char* string)
+                         local  va_list args
+   37  0022EE4C     C8  void GolfModule::DebugMessage(const struct GolfModule* this, const char* string)
+                         local  va_list args
+   57  0022EF14      8  struct IAllocator* GolfModule::GetAllocator(const struct GolfModule* this)
+   62  002A07AC     2C  void GolfModule::GolfModule(const struct GolfModule* this, const const void** __vtt_parm, struct IAllocator* allocator)
+   67  0022EF1C     14  float GolfModule::GetElapsedSeconds(const struct GolfModule* this)
+   72  0022EF30     7C  void GolfModule::Sleep(const struct GolfModule* this, unsigned int milliseconds)
+   77  0022EFAC     28  void GolfModule::ProfileBegin(const struct GolfModule* this, const char* label)
+   82  0022EFD4     24  void GolfModule::ProfileEnd(const struct GolfModule* this)
+   87  0022EFF8     4C  void GolfModule::PauseMainLoop(const struct GolfModule* this)
+   92  0022F044     4C  void GolfModule::RunMainLoop(const struct GolfModule* this)
+   97  0022F090     18  void GolfModule::SetSimTimeScale(const struct GolfModule* this, float fTimeScale)
+                         inlines  GolfTimer::SetElapsedTimeScale
+  102  0022F0A8     A4  float GolfModule::GetAspectRatio(const struct GolfModule* this)
+  108  00253194     A4  float GolfModule::GetTerrainHeight(const const struct GolfModule* this, float x, float y, float z)
+                         local  struct GoTemple* pTemple
+                         local  bool bFlag
+                         local  vec4flt p
+                         local  float h
+                         inlines  GoTemple::EnableMaterialFiltering
+  132  002570F8     60  float GolfModule::GetTerrainUp(const const struct GolfModule* this, float x, float y, float z)
+                         local  vec4flt normal
+                         local  struct TGD_MaterialInfo* info
+                         local  vec4flt p
+  150  0024ACB8     38  void GolfModule::ScreenFadeIn(const struct GolfModule* this, float r, float g, float b, float duration)
+  155  0022F14C     38  void GolfModule::ScreenFadeOut(const struct GolfModule* this, float r, float g, float b, float duration)
+  161  0022F184     5C  void GolfModule::DrawTextToScreen(const struct GolfModule* this, char* str, float x, float y, float r, float g, float b, float a, int font)
+                         local  const float kText_Scale

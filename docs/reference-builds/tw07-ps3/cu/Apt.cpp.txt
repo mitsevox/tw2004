@@ -1,0 +1,128 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/Apt.cpp
+// compiled in: other_unity.cpp
+// 40 functions, source order. line | PS3 address | size
+
+   56  003EE6F4      4  void _profileInit()
+   68  003EE6F8     48  static void _passthruToMemFree(void* p, size_t size)
+   74  00479C74    1DC  void AptInitialize()
+                         inlines  AptAnimationPoolData::operator new, AptFileSavedInputState::AptFileSavedInputState, AptLinker::AptLinker, AptLinker::operator new, AptLoader, AptLoader::operator new, AptSavedInputCheckpoints, AptSavedInputCheckpoints::operator new, AptSharedPtr<AptFile>::AptSharedPtr, SingleList, UseCapacity
+  132  003EDAB0     2C  bool IsAptInitialized()
+  138  00479408    4B8  void AptShutdown(enum eAptShutdown shutDownType)
+                         inlines  AptSharedPtr<AptFile>::operator new [], checked_delete<AptAnimationPoolData>, checked_delete<AptLinker>, checked_delete<AptLoader>, checked_delete<AptSavedInputCheckpoints>
+  166  00468694     D4  void AptCompleteAnimationAsyncLoad(AptFilePtr& file, void* pData, void* pConstTable, void* pUserData)
+                         inlines  AptSharedPtr<AptFile>::AptSharedPtr, AptSharedPtr<AptFile>::~AptSharedPtr
+  171  0045FADC    140  struct AptCIH* _AptGetAnimationAtLevel(int nLevel)
+                         local  struct AptCIH* pCur
+                         local  struct AptCIH* pEmpty
+                         inlines  AptCIH::AptCIH, AptCIH::operator new
+  189  00411BD4     A4  void AptGetAnimationSize(int* pnWidth, int* pnHeight)
+                         local  struct AptCharacterAnimationInst* pSprInst
+                         inlines  AptCIH::getAnimationInst, AptCIH::isAnimationInst
+  213  003EE740      8  bool _AptValidate()
+  225  0047BE04    3F8  void AptLoadAnimation(const char* szBaseName, const char* szTarget)
+                         local  AptNativeString sTarget
+                         local  const char* s
+                         local  const char* s
+                         inlines  BasicString, Capacity, Copy, Copy<char*, char*>, ReAlloc, Size, UseCapacity, ~BasicString
+  235  00467EB4    194  AptFilePtr AptPreloadAnimation(const char* szBaseName)
+                         local  const char* s
+                         inlines  BasicString, Capacity, Copy, ReAlloc, ~BasicString
+  240  00413094     28  bool AptIsFileLoaded(AptFilePtr& file)
+  245    inline-only   static void _addScreenGrabToSavedInputs()
+  262    inline-only   static int _tick(unsigned int nDeltaTime)
+                         local  int bAdvancedFrame
+                         local  struct AptCharacterAnimationInst* pAnimInst
+                         local  unsigned int nMillisecondsPerFrame
+                         local  struct AptCharacterAnimationInst* pAnimInst
+  309    inline-only   static void _playbackSavedInputs(unsigned int nDeltaTime)
+  405  0049C430    310  void AptUpdate(unsigned int nDeltaTime)
+                         local  AptFilePtr[64] aLoadedFiles
+                         inlines  AptCIH::isAnimationInst, AptLoader::GetFileVector, AptSharedPtr<AptFile>::AptSharedPtr, AptSharedPtr<AptFile>::~AptSharedPtr, _tick
+  451  00470170     60  void AptRender()
+  513  0047480C    1F8  void AptSetInternalVariable(char* szName, const char* szValue)
+                         local  struct AptString* pStr
+                         local  int i
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptString::AptString, AptString::operator new, AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount, Capacity, UseCapacity
+  534  004746EC    120  void AptSetInternalVariable(char* szName, float szValue)
+                         local  struct AptFloat* pValue
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptFloat::AptFloat, AptFloat::operator new, AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount
+  544  0047411C    120  void AptSetInternalVariable(char* szName, int32 szValue)
+                         local  struct AptInteger* pValue
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptInteger::AptInteger, AptInteger::operator new, AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount
+  554  0046617C    168  bool AptSetColor(char* szName, float r, float g, float b)
+                         local  struct AptValue* pContext
+                         local  AptNativeString sVar
+                         local  struct AptValue* pCurrentContext
+                         inlines  BasicString, ~BasicString
+  580  0046D8BC    12C  void AptGetInternalVariable(char* szName, char* szValue, int bufSize)
+                         local  struct AptValue* pVal
+                         local  const char* pStr
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount
+  592  0046D7C4     F8  void AptGetInternalVariable(char* szName, float* szValue)
+                         local  struct AptValue* pVal
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount
+  602  0046D6CC     F8  void AptGetInternalVariable(char* szName, int* szValue)
+                         local  struct AptValue* pVal
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount
+  612  003EE748     F0  uint32 Apt_WriteInt(int ival, char* pBuf, uint32 bufLen)
+                         local  char[13] revStr
+                         local  char* pCur
+                         local  bool sign
+                         local  uint32 val
+                         local  int n
+                         local  uint32 nextVal
+  641  003EE838    208  uint32 Apt_WriteFloat(float fVal, char* pBuf, uint32 bufLen)
+                         local  char[24] revStr
+                         local  char* pCur
+                         local  const float WRITE_FLOAT_EPSILON
+                         local  bool sign
+                         local  float fraction
+                         local  int n
+                         local  float nextVal
+                         local  uint32 val
+                         local  int precision
+  690  003EEA40     4C  uint32 Apt_WriteStr(const char* pSrc, char* pBuf, uint32 bufLen)
+                         local  char* pCur
+  711  0049C028     18  void AptLoadMoviesNow()
+                         local  struct AptLinker* gpLinker
+  719  0046D4A8     98  bool AptIsMovieClipValid(char* szName)
+                         local  struct AptValue* pVal
+                         local  struct AptCIH* cih
+  736  0046D074     AC  bool AptGetInternalDynamicText(char* szName, const struct AptAllocateStringParameters& asp)
+                         local  struct AptValue* pVal
+                         local  struct AptCIH* cih
+                         local  struct AptCharacterTextInst* pTextInst
+                         inlines  AptCIH::getTextInst
+  768  0049CA94    3A8  void AptCallFunction(char* szName, char* szReturnValue, char* szThisObject, int nNumParams)
+                         local  struct AptString*[32] apStrings
+                         local  struct AptValue* pContext
+                         local  int i
+                         local  va_list varargs
+                         local  struct AptValue* pFuncValue
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  struct AptValue* pVal
+                         local  const char* pStr
+                         local  int i
+                         inlines  AptActionInterpreter::stackPop, AptString::AptString, AptString::operator new, AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount, AptValueStack<AptValue*,384>::push, Capacity
+  815  0046CFAC     C8  bool AptSetInputRoot(const char* szRoot)
+                         local  struct AptValue* pTarget
+                         local  struct AptCIH* pCIH
+                         inlines  AptValue::isCIH
+  842  00460544     5C  int AptDebugGetCurrentFrame(int nLevel)
+                         local  struct AptCIH* pCIH
+  855  00460504     40  int AptDebugGetNumFrames(int nLevel)
+                         local  struct AptCIH* pCIH
+  868  004604A8     5C  int AptDebugIsPlaying(int nLevel)
+                         local  struct AptCIH* pCIH
+                         inlines  AptCIH::isAnimationInst
+  882  003EEA94     24  void AptDebugEnableSavedInputs(int bEnabled)
+  888  003EEAB8     28  void AptDebugPlaySavedInputs(struct AptSavedInputRecord* aSavedInputs, int nSavedInputsFileSize)
+  896  003EEAE0     18  void AptDebugEnableInputGremlins(int bEnabled)
+  926  00415494     30  void AptDeallocateAllStrings()
+  955  003EEAF8     3C  void AptFlushInputQueue()

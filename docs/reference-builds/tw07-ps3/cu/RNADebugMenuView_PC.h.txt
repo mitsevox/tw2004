@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/Golf/Rna/RNADebugMenuView_PC.h
+// compiled in: rnaunity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   20    inline-only   void DebugMenuViewFlapC::SetHeight(const struct DebugMenuViewFlapC* this, int32_t height)

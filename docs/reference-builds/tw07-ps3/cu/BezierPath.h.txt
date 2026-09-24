@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Utils/BezierPath.h
+// compiled in: headgate_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   13  00343E10     5C  void BezierPath::BezierPath(const struct BezierPath* this)
+                         local  int i
+                         local  int j

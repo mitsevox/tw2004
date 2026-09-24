@@ -1,0 +1,35 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLTextureShared.cpp
+// compiled in: Legacy_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   70  00383994     30  size_t TX_FormatHorizontalPixelsPerBlock(TextureFormat format)
+                         inlines  TX_FormatIsDXTCompressed
+   78  003839C4     30  size_t TX_FormatVerticalPixelsPerBlock(TextureFormat format)
+                         inlines  TX_FormatIsDXTCompressed
+   86  0038988C     30  int TX_FormatChannelCount(TextureFormat format)
+   92  00388FC4     90  size_t TX_FormatSize(TextureFormat format, size_t width, size_t height)
+                         local  size_t pixelsPerBlockX
+                         local  size_t pixelsPerBlockY
+                         local  size_t blocksX
+                         local  size_t blocksY
+                         local  size_t bpb
+  106  00388F9C     28  const char* TX_FormatGetString_dbg(TextureFormat format)
+  113  00388EF4     A8  TextureFormat TX_FormatFromString(const char* s)
+                         local  TextureFormat format
+                         local  int i
+  128  0037EE78     B8  int TX_Dxt1HasAlpha(size_t size, void* data)
+                         local  short unsigned int* words
+                         local  size_t i
+                         local  short unsigned int col0
+                         local  short unsigned int col1
+                         local  long unsigned int interp
+                         local  char* c
+                         local  int j
+                         local  unsigned char byte
+  156  00384994    1D0  int TX_ForcePowerOf2(int value, PowerOfTwoResizeMethod method)
+                         local  float p
+                         local  float smaller
+                         local  float bigger
+                         local  float nearest
+                         local  int selected
+                         inlines  std::logf

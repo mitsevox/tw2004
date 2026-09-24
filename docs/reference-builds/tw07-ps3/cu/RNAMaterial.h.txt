@@ -1,0 +1,41 @@
+// ../../../../../TIGERCODE/packages/RNA/dev-2.0-golf/RNA/RNACore/include/RNARender/RNAMaterial.h
+// compiled in: golf_unity.cpp, rnaunity.cpp
+// 19 functions, source order. line | PS3 address | size
+
+   46    inline-only   struct UserData* GetUserData(const const struct <anon>* this)
+   46    inline-only   void SetUserData(const struct MaterialC* this, struct UserData* pData)
+   47    inline-only   void* operator new(size_t size, const char* text, struct ICoreAllocator* allocator, enum AllocFlags allocator_flags, uint32_t alignment)
+   47    inline-only   struct ICoreAllocator* GetClassAllocator()
+   53    inline-only   struct ShaderC* MaterialC::GetShader(const const struct MaterialC* this)
+   53    inline-only   struct ShaderC* GetShader(const const struct <anon>* this)
+   55    inline-only   int32_t MaterialC::GetTechnique(const const struct MaterialC* this)
+   55    inline-only   int32_t GetTechnique(const const struct <anon>* this)
+   56    inline-only   void MaterialC::SetTechnique(const struct MaterialC* this, int32_t iTechnique)
+   56    inline-only   void SetTechnique(const struct MaterialC* this, int32_t iTechnique)
+   94  00501320    1DC  bool8_t SetByName<RNA::TextureC*>(const struct MaterialC* this, const char* pStrName, const const struct TextureC*& value, uint32_t uCount, uint32_t uIndex)
+                         local  struct <anon>* pParm
+                         inlines  RNADebugBreak, Set<RNA::TextureC*>
+   94  005014FC    1A4  bool8_t SetByName<rw::math::vpu::Matrix44>(const struct MaterialC* this, const char* pStrName, const const struct Matrix44& value, uint32_t uCount, uint32_t uIndex)
+                         local  struct <anon>* pParm
+                         inlines  RNADebugBreak, Set<RNAMath::RNAMatrix44>
+   94  005016A0    180  bool8_t SetByName<rw::math::vpu::Vector3>(const struct MaterialC* this, const char* pStrName, const const struct Vector3& value, uint32_t uCount, uint32_t uIndex)
+                         local  struct <anon>* pParm
+                         inlines  RNADebugBreak, Set<RNAMath::RNAVector3>
+   94  00501820    180  bool8_t SetByName<rw::math::vpu::Vector2>(const struct MaterialC* this, const char* pStrName, const const struct Vector2& value, uint32_t uCount, uint32_t uIndex)
+                         local  struct <anon>* pParm
+                         inlines  RNADebugBreak, Set<RNAMath::RNAVector2>
+   94  005019A0    180  bool8_t SetByName<rw::math::vpu::Vector4>(const struct MaterialC* this, const char* pStrName, const const struct Vector4& value, uint32_t uCount, uint32_t uIndex)
+                         local  struct <anon>* pParm
+                         inlines  RNADebugBreak, Set<RNAMath::RNAVector4>
+   94  00501B20    180  bool8_t SetByName<int>(const struct MaterialC* this, const char* pStrName, const const int& value, uint32_t uCount, uint32_t uIndex)
+                         local  struct <anon>* pParm
+                         inlines  RNADebugBreak, Set<std::int32_t>
+   94  00501CA0    180  bool8_t SetByName<std::float_t>(const struct MaterialC* this, const char* pStrName, const const float_t& value, uint32_t uCount, uint32_t uIndex)
+                         local  struct <anon>* pParm
+                         inlines  RNADebugBreak, Set<std::float_t>
+   94  00501E20    17C  bool8_t SetByName<bool>(const struct MaterialC* this, const char* pStrName, const const bool& value, uint32_t uCount, uint32_t uIndex)
+                         local  struct <anon>* pParm
+                         inlines  RNADebugBreak, Set<bool>
+   94  00501F9C    1A0  bool8_t SetByName<rw::math::vpu::Matrix33>(const struct MaterialC* this, const char* pStrName, const const struct Matrix33& value, uint32_t uCount, uint32_t uIndex)
+                         local  struct <anon>* pParm
+                         inlines  RNADebugBreak, Set<rw::math::vpu::Matrix33>

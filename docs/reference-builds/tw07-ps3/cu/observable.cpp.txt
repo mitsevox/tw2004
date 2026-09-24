@@ -1,0 +1,9 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/observable.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  125  005BC730     6C  void AddObserver(const struct <anon>* this, void* pObserver)
+                         local  void** pFound
+                         local  void** pCurr
+  169  005BC79C     54  void RemoveObserver(const struct <anon>* this, void* pObserver)
+                         local  void** pCurr

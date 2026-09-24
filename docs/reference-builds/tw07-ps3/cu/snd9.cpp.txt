@@ -1,0 +1,25 @@
+// C:/packages/rwaudiocore/2.08.01/source/plugins/snd9.cpp
+// compiled in: snd9.cpp
+// 6 functions, source order. line | PS3 address | size
+
+    0  006DA8DC     54  void ~Snd9Service(const struct <anon>* this)
+                         inlines  ~PlugIn
+   69  006DA330      8  struct <anon>* GetPlugInDescRunTime()
+   75  006DA7EC     E8  bool CreateInstance(struct PlugIn* pPlugIn, void* pConstructorParams)
+                         local  struct <anon>* pThis
+                         inlines  Initialize<rw::audio::core::Snd9Service>, SetCallback, SetContext
+  120  006DA338     68  void ReleaseEvent(const struct <anon>* this)
+  133  006DA3A0    224  void UpdateSnd9SampleRate(const struct <anon>* this, float sampleRate)
+                         local  SNDPROFVOICES spv
+                         local  MIXCONFIG mc
+                         local  int i
+                         inlines  Assert, FToI::Round, GetSystem
+  172  006DA5C4    228  void RwacTimerClient(void* pContext, float timeToNextCall)
+                         local  struct <anon>* pThis
+                         local  int i
+                         local  void*[6] pmixbuf
+                         local  float sampleRate
+                         local  int samples
+                         local  int nexttimersample
+                         local  int numSamples
+                         inlines  FToI::Round, GetSampleRate

@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_cct/tiger_cct_internal.h
+// compiled in: tiger_cct_internal.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   71    inline-only   const struct Mesh* GetMesh(const const struct <anon>* this)
+   92  005630EC     20  void VariableId::VariableId(const struct VariableId* this)
+   93  00562244     A8  void VariableId::VariableId(const struct VariableId* this, const char* text, unsigned int index)
+                         local  int ch
+                         local  unsigned int count
+                         local  char* dst

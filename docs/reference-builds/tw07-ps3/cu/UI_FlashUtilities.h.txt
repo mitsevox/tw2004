@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_FlashUtilities.h
+// compiled in: apt_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   23  000FF304      C  uint32 UIFlashUtilities::GetSignature(const const struct UIFlashUtilities* this)
+   26  00103288     14  void UIFlashUtilities::CalculateStringDimensions_func(struct IAptSubscriber* subs)
+   33  000FF310     14  void UIFlashUtilities::IsOnline_AptNotify_func(struct IAptSubscriber* subs)
+   36  00100BC0     14  void UIFlashUtilities::IsCaddieTipAvailable_AptNotify_func(struct IAptSubscriber* subs)
+   39  000FF324      4  void UIFlashUtilities::IsShotCallerAllowed_AptNotify_func(struct IAptSubscriber* subs)

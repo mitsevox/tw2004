@@ -1,0 +1,10 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sstrstat.cpp
+// compiled in: sstrstat.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   70  006CE1B8    2B4  int SNDSTRM_requeststatus(int sndrequesthandle, SNDREQUESTSTATUS* psrs)
+                         local  SNDSTREAMCHANNEL* pssc
+                         local  struct SNDSTREAMREQUEST* pssr
+                         local  int samplerate
+                         local  float framesToMilliseconds
+                         inlines  SNDI_ftoifast

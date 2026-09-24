@@ -1,0 +1,22 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_SpectatorCardDraw.cpp
+// compiled in: shader_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   36  0051A12C     74  void SM_SpectatorCardDrawClass::SM_SpectatorCardDrawClass(const struct SM_SpectatorCardDrawClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base
+   59  005042A8    26C  void SM_SpectatorCardDrawClass::Load(const struct SM_SpectatorCardDrawClass* this)
+   99  00504514    140  void SM_SpectatorCardDrawClass::Activate(const struct SM_SpectatorCardDrawClass* this)
+  118  00504654     38  void SM_SpectatorCardDrawClass::Deactivate(const struct SM_SpectatorCardDrawClass* this)
+  125  0050F1B8     64  void SM_SpectatorCardDrawClass::SetColorTexture(const struct SM_SpectatorCardDrawClass* this, TextureRef colorTexture)
+  135  0050F21C     64  void SM_SpectatorCardDrawClass::SetCardTexture(const struct SM_SpectatorCardDrawClass* this, TextureRef cardTexture)
+  145  0050F280     60  void SM_SpectatorCardDrawClass::SetTintMap(const struct SM_SpectatorCardDrawClass* this, TextureRef tintTexture)
+  153  0050F2E0     D0  void SM_SpectatorCardDrawClass::SetQuad(const struct SM_SpectatorCardDrawClass* this, const float* quad_array, const int count)
+  169  0050F3B0     D0  void SM_SpectatorCardDrawClass::SetUVList(const struct SM_SpectatorCardDrawClass* this, const float* uvlist_array, const int count)
+  186  0050F480     98  void SM_SpectatorCardDrawClass::SetTintColor(const struct SM_SpectatorCardDrawClass* this, const float* tint_array)
+  195  005169D4     6C  void SM_SpectatorCardDrawClass::SetFogColor(const struct SM_SpectatorCardDrawClass* this, float* camPos)
+                         inlines  vec4flt_Copy
+  205  00516A40     6C  void SM_SpectatorCardDrawClass::SetFogCameraPos(const struct SM_SpectatorCardDrawClass* this, float* camPos)
+                         inlines  vec4flt_Copy
+  215  0050F518     60  void SM_SpectatorCardDrawClass::SetFogDensity(const struct SM_SpectatorCardDrawClass* this, float f)
+  225  0050F578     60  void SM_SpectatorCardDrawClass::SetFogStartRadius(const struct SM_SpectatorCardDrawClass* this, float f)
+  235  0050F5D8     60  void SM_SpectatorCardDrawClass::SetFogHeightTop(const struct SM_SpectatorCardDrawClass* this, float f)

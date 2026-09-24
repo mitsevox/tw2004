@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/Animation/Headers/CharacterDefinition.h
+// compiled in: golf2_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   33  00137AE0     38  void CharacterDefinition::CharacterDefinition(const struct CharacterDefinition* this)
+   34  001365C0     5C  void CharacterDefinition::~CharacterDefinition(const struct CharacterDefinition* this)

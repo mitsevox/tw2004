@@ -1,0 +1,20 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNABase/RNAAllocatorString.cpp
+// compiled in: RNAAllocatorString.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   56  0081F2BC     20  void StringAllocatorStandard(const struct <anon>* this, const char* name, bool enable_debug_print)
+   64  0081F0F8     68  void SetAllocator(const struct <anon>* this, struct ICoreAllocator* pAllocator)
+                         local  const char[13] __FUNCTION__
+                         inlines  RNADebugBreak
+   70  0081EF04     94  void ~StringAllocatorStandard(const struct <anon>* this)
+                         inlines  ~IStringAllocator
+   81  0081F160    15C  const char* AllocString(const struct <anon>* this, const char* cstring)
+                         local  const char[12] __FUNCTION__
+                         local  uint32_t size
+                         local  const char* newstring
+                         inlines  RNADebugBreak
+   99  0081EF98     F8  void FreeString(const struct <anon>* this, char* cstring)
+                         local  const char[11] __FUNCTION__
+                         local  uint32_t size
+                         inlines  RNADebugBreak
+  112  0081F090     68  bool IsEqual(const const struct <anon>* this, const char* cstring1, const char* cstring2)

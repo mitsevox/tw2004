@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/include/tiger_module_global.h
+// compiled in: tiger_module_global.cpp, tiger_module_trinity_internal.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   35    inline-only   struct Lua* Global::GetLua(const const struct Global* this)
+   38  0033EA7C      4  void FirstUpdate(const struct <anon>* this)
+   39  0033EA94      8  int GetResourceCount(const struct <anon>* this)
+   40  0033EAB0      4  void ResourceCallback(const struct <anon>* this, void* resource, int resourceId, unsigned int resourceSize)
+   41  0033EAC8      8  int GetResourceId(const struct <anon>* this, int resourceIndex)

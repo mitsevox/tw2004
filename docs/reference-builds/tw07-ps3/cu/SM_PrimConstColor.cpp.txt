@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_PrimConstColor.cpp
+// compiled in: shader_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   33  005067C8     88  void SM_PrimConstColorClass::Load(const struct SM_PrimConstColorClass* this)
+   41  00506850     48  void SM_PrimConstColorClass::Activate(const struct SM_PrimConstColorClass* this)
+   48  005172B0     6C  void SM_PrimConstColorClass::SetColor(const struct SM_PrimConstColorClass* this, const float* src)
+                         inlines  vec4flt_Copy

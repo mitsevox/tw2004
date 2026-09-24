@@ -1,0 +1,61 @@
+map-06 link wave round 2 (2026-09-24 12:53-14:00). Units: Ball, gocamscripts, GoGolfCam, Swing, GoDynObj,
+GoStaticCam, GoTerrainCollision, GoTerrain. Scripts: w7_swap.py (scale-first call swap, calls only; preserves
+line endings), w6_var.py FN variants.py (quicktrial variants).
+
+DONE
+- 8b0f1236 scale-first: fn_8001EF34 / fn_8000AE28 definitions (asm + C port), engine.h prototypes, 149 calls in
+  22 files (w7_swap.py 148 + GoDynObj.c:563 by hand, its argument holds a comment with a comma). DOL OK, nothing
+  down; Ball_FlightStep 98.72 -> 100 (with if/else fDrag), Character_SetupForShot 99.69 -> 99.90.
+- Physics_HandleCollision 98.41 -> 98.74: `fD = sqrt(vSlip[0]*vSlip[0] + vSlip[2]*vSlip[2])` in one expression
+  (124 -> 96 diff insns), `if (pBall->fSpinX || pBall->fSpinY)` (-4; EA loads the field before the 0.0f).
+
+- GolfCamera_ProcessZoomToAimCamera 99.04 -> 99.37 (quicktrial 42 -> 13): the end's fSlow (1 + f4 ... / 10000)
+  is its own local (fFlatDist) and the fn_80038054 value is its own local (fAmount), declared last; decl order
+  bMirror, fSpeed, fDist, fTotal, fBase, f, fSlow, fAimY, fCamY (quicktrial climb). Left: fCamY in f6 (EA) vs f2,
+  the `1 - ratio*2` lerp scheduled after the (fCamY - fAimY) diff, srwi of `bMirror != 0` placement.
+- GoTerrain fn_80031E58 75.67 -> 78.95 (179 -> 151): the opaque test reads lbl_801D3CB0.pObjectSortList[i]
+  directly (pRef assigned only before the draws), the two state writes share `iObject = ...iGlobalObjectIndex`,
+  decl order pModel, uFlags0, i, uFlags2. Left: fn_8003241C argument scheduling (EA materialises
+  lis/addi lbl_801D3CB0 for fDefaultObjectMipmapBias first; ours last).
+
+- GoTerrain fn_80032F88 89.24 -> 99.45 (quicktrial 59 -> 21): EA builds the fn_80014118 flags twice and
+  takes bits 0x10/0x20 apart again (neg/or/srawi x2, extrwi 26/27, neg/and): an inline
+  Ter_FlagBits(u32 uFlags) { fn_80014118((uFlags & 0x10 ? 0x10 : 0) | (uFlags & 0x20 ? 0x20 : 0) | 0x40); }
+  called with `(bShaded ? 0x10 : 0) | 0x40 | (bUseFog ? 0x20 : 0)`: CodeWarrior substitutes the argument
+  expression at each use of the parameter. Plus `bNewShaded = type != 1 && type != 3;` (71 -> 26 with the
+  inline) and the state word read in place in both tests, no uState local (cmpwi, not cmplwi: 26 -> 21).
+  Left: pDraw r29 / iObject r30 swapped (EA pDraw r30); climb, int/u32, block local, for-init: none.
+
+TRIED, NO GAIN
+- GoTerrain fn_80032B7C (1.0f arg load early in EA): inline wrappers for the two deferred adds (alpha as a
+  parameter or not), (f32)1.0: none (4).
+- Physics_HandleCollision (rest is float register allocation, fSpeed f30 / fA f31 in EA): decl climb over 21 lines
+  after the fix (92, none); fGrip in fT/fS/fScale per block, `fGrip = fGrip * m`, `m * fGrip`, *(p+i), (int)
+  index, f64: none (the fmuls operand swap at `fGrip *= gTurfSpeedMul[]` stays). Top spin clamp as one
+  expression: worse (97). `fGrip = f10 * fabs; fGrip *= 0.3f;` 91 (one insn, not kept).
+- GolfCamera_ProcessPlaceBallCamera (16, volatile temps numbered differently in the first pCam[1] lerp and the
+  pSub[1] block: EA fGround f4): new local for the second fGround (3 decl places), commuted lerp, fDiff local
+  (diff or 1-f98), `x = x + ...`, `x = ... + x`: none.
+- GolfCamera_ProcessPlaceBallCamera: permuter 14 min -j2: nothing better than base.
+- GolfCamera_ProcessZoomToAimCamera lerp: one-expression / 2.0f*ratio / separate 1-f / fDiff local / fCamY -=:
+  39-55 (global f29/f31 swap), static inline lerpf (a+(b-a)*t, several call forms) 10 of 13 but fnmsubs fused
+  (not kept); bMirror arg: (u8)(), !!, ?:, (int), s8/int types: none.
+- CameraScript_LagAimMarker: not retried (TW07 params: lagAmount before the two bools; tried by map-10).
+- gocamscripts fn_8003F2E0 case 2: `f = v[3] = cond ? E : 0.0f` 8 -> 5 (EA: ternary result in f2 then frsp to f,
+  i.e. a double-typed join with the else arm reusing the compare's 0.0f register); (f64)E arm, (f64)(?:), `: 0.0`
+  give lfd 0.0 (5-6). The 5 form built: objdiff 98.31 -> 97.78 (drops the else-arm branch), reverted.
+- Physics_HandleCollision web splits (w7_hc6.py: soil fA, first fD, cos-bank fCo, second fLen, soil fT, clamp
+  fT/fSi/fLen, bounce fT as own locals, declared first or last): 92-134, none better.
+- Ter_CheckObjectAndHazardObstruction (41, int regs + spill slots: bObstructed at 0x88 / nX at 0xa0 in EA):
+  every position of bObstructed, nX, bFirst in the decl list: none below 41.
+- SW_vImpact (23, EA p = r31 and the gPlayers offset r30): decl climb, p initialiser in 3 places,
+  gPlayers + nPlayer: none.
+- GoTerrain fn_80033744 (EA materialises lbl_801D3CB0 twice, r28 for the view-fade loop and r30 later): fade
+  loop as a static inline: identical code.
+- GoTerrain fn_80032770 (EA keeps base r30 + offset r31 for the nClip loop, 5 saved regs; ours walks one
+  pointer): p = arr; p += n, arr + n, direct reads, < 3, u32/s32, decl order: none.
+- Physics_HandleCollision: permuter 14 min -j2: best (775 vs 855) copies cos(bank) through a temp; in quicktrial
+  92 -> 93, not kept.
+- SW_KillVibration (EA: pController = copy of p then +0xa08; first call loads 0xa08(p)): p->nController in the
+  first call, gPlayers[] forms, statement orders: 4-19, none better than base 4.
+- GoTerrain fn_80031154 (98.2, int register allocation, EA pLOD path has an extra mr/b): not tried this round.

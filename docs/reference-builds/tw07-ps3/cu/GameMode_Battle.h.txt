@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/GameMode/Headers/GameMode_Battle.h
+// compiled in: golf_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   53  0033EB30      8  bool GameModeBattle::IsCPUPlayerDisabled(const struct GameModeBattle* this)
+   55  0033EB38     14  const char* GameModeBattle::GetModeName(const struct GameModeBattle* this)
+   57  0033EB4C      8  enum eLoadingScreens GameModeBattle::GetFirstLoadingScreen(const struct GameModeBattle* this)
+   58  0033EB54      8  enum eLoadingScreens GameModeBattle::GetLastLoadingScreen(const struct GameModeBattle* this)
+   61  0033EB5C     14  char* GameModeBattle::NumPlyReqStrID(const struct GameModeBattle* this)
+   83  0033EB70      8  bool GameModeBattle::AllowUserShotClockOverride(const struct GameModeBattle* this)

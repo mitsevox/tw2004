@@ -1,0 +1,100 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Rna/RNAFlap.cpp
+// compiled in: rnaunity.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   70  004CCAD0      8  bool8_t FLAP::MainInitFont()
+  113  004CD69C    170  void FLAP::MainInitDebugMenu()
+                         local  struct DebugMenuViewC* pView
+                         local  int i
+                         local  int i
+                         inlines  DebugMenuManagerC::GetActiveView
+  157  004CD80C     70  bool8_t FLAP::ParseDebugMenuInput(uint32_t nVKey)
+                         local  struct DebugMenuManagerC* pMenuMgr
+                         inlines  DebugMenuManagerC::GetActiveView
+  172  004C8B00     E8  bool FLAP::WaitForFlapConnection()
+                         local  bool bContinueAnyway
+                         local  uint32_t oldColor
+  304  004C8BE8     24  int FLAP::show_ifconfig()
+                         local  int[10] id_list
+                         local  int count
+                         local  int i
+  328  004C8C0C    104  void FLAP::MainInitFLAP()
+                         local  int state
+                         local  int ret
+                         local  char[131072] __libnet_memory
+                         local  sys_net_initialize_parameter_t __libnet_param
+                         inlines  sys_timer_usleep
+  444  004EF804    1A4  void FLAP::OnClientConnect(uint32_t ipAddr)
+                         local  struct DeviceC* pDevice
+                         local  struct <anon> vpt
+                         local  int i
+                         local  int i
+                         inlines  DebugMenuManagerC::GetActiveView
+  501  004CD87C     74  void FLAP::OnClientListen()
+                         inlines  DebugMenuManagerC::GetActiveView
+  534  004C8D10      4  void FLAP::SetDragIcon(uint32_t width, uint32_t height, const struct <anon>* pIconData)
+  539  004F402C    598  void FLAP::OnClientEvent(uint32_t uEventFlags)
+                         local  char[256] strCmd
+                         local  uint32_t[32] state
+                         local  int count
+                         local  int i
+                         local  struct <anon>[32] mouse
+                         local  int count
+                         local  int i
+                         local  int32_t idView
+                         local  int count
+                         local  struct <anon>[32] key
+                         local  int i
+                         local  int32_t[4] heights
+                         local  int32_t idActiveView
+                         local  int count
+                         local  int i
+                         local  struct DebugMenuViewC* pActiveView
+                         local  char[256] dropFile
+                         local  int32_t idWindow
+                         local  int32_t posX
+                         local  int32_t posY
+                         local  int32_t idView
+                         local  char[256] dropFile
+                         local  int32_t idWindow
+                         local  int32_t posX
+                         local  int32_t posY
+                         local  struct <anon>[4096] iconData
+                         local  int32_t width
+                         local  int32_t height
+                         local  bool8_t bHandledByMenu
+                         inlines  DebugMenuManagerC::GetActiveView, DebugMenuViewFlapC::SetHeight
+  812  004EF1B4    5B0  static void FLAP::DrawMouseCursor(struct DeviceC* pDevice, int32_t posX, int32_t posY)
+                         local  struct <anon> main_viewport
+                         local  struct <anon> pShader
+                         local  struct <anon> pTexture
+                         local  float_t fPosX
+                         local  float_t fPosY
+                         local  float_t fWidth
+                         local  float_t fHeight
+                         local  float_t fLeft
+                         local  float_t fTop
+                         local  float_t fRight
+                         local  float_t fBottom
+                         local  float_t fXScale
+                         local  float_t fYScale
+                         local  struct <anon> im
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         inlines  AssetMgrC::SetCurrentBudget, AssetMgrC::SetCurrentMemPool, AutoRefCount, DeviceC::Flush, GetX, RNADebugBreak, ScopeParmC::Set<RNA::TextureC*>, SetElement3f, SetPosition3f, SetTexCoord3f, Update, operator RNA::TextureC*
+  895  004C8ABC     44  bool8_t FLAP::IsKeyDown(uint32_t uKeyCode)
+  904  004CCAD8     C8  void FLAP::FLAPPrintf(const char* pFormat)
+                         local  const char[11] __FUNCTION__
+                         local  va_list args
+                         local  char[1024] printBuf
+                         local  unsigned int nSize
+                         inlines  RNADebugBreak
+  924  004C8DCC     C4  void Menu_WaitForConnection(void* pUserData)
+                         local  bool bContinueAnyway
+  986  004F493C     B4  void FLAPDrive_Start()
+                         local  bool initialized
+                         local  bool memLockRestore
+ 1013  004C8E90     2C  void FLAPDrive_End()
+                         local  struct DeviceC* pDevice
+ 1019  004EF764     A0  void FLAP_DrawMouseCursor()
+                         local  bool memLockRestore

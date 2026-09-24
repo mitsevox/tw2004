@@ -1,0 +1,26 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Utils/intersect.h
+// compiled in: headgate_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   20    inline-only   void SphereS::SetRadius(const struct SphereS* this, float rad)
+  235    inline-only   int32 TriWithinBoundingBox(float* v0, float* v1, float* v2, float* boxMin, float* boxMax)
+                         local  float[4] V0
+                         local  float[4] V1
+                         local  float[4] V2
+                         local  float[4] vBMin
+                         local  float[4] vBMax
+                         local  float[4] vMin
+                         local  float[4] vMax
+                         local  int[4] vBMinTest
+                         local  int[4] vBMaxTest
+                         local  int[4] vZero
+                         local  int[4] vTrivOut
+                         local  int compareResult
+  270    inline-only   int32 BoxWithinBoundingBox(float[4] vMin, float[4] vMax, float* boxMin, float* boxMax)
+                         local  float[4] vBMin
+                         local  float[4] vBMax
+                         local  int[4] vBMinTest
+                         local  int[4] vBMaxTest
+                         local  int[4] vZero
+                         local  int[4] vTrivOut
+                         local  int compareResult

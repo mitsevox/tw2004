@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/ps3/LLDisSt_gcm.c
+// compiled in: Legacy_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   33  0037F34C      4  void DS_xAssertDefaultRenderState_Dbg()
+  121  003BDBB8    114  void Displ_SetPersistentNonSonyDefaultState_gcm()
+                         local  int i
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetZBufferMode, DS_vSetZTestEnable, Gcm::cellGcmSetFrontFace, Gcm::cellGcmSetRestartIndex, Gcm::cellGcmSetRestartIndexEnable, Gcm::cellGcmSetVertexDataArray

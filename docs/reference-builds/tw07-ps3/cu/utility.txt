@@ -1,0 +1,8 @@
+// C:/dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/target/ppu/include/utility
+// compiled in: headgate_unity.cpp, rnaunity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    9    inline-only   void std::swap<unsigned char>(const unsigned char& _Left, const unsigned char& _Right)
+                         local  unsigned char _Tmp
+    9    inline-only   void std::swap<TwRenderObj::BaseRenderObj*>(const struct BaseRenderObj*& _Left, const struct BaseRenderObj*& _Right)
+                         local  struct BaseRenderObj* _Tmp

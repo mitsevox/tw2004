@@ -1,0 +1,9 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/systemassert.cpp
+// compiled in: systemassert.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   31  006E4460     FC  void AssertImplementation(struct <anon>* pThis, const char* pExpression, const char* info, const char* pFile, int line)
+                         local  const char* defaultInfo
+                         local  const char* pInfo
+                         local  char[1024] buffer
+                         local  bool breakIntoDebugger

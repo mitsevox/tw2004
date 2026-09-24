@@ -1,0 +1,21 @@
+// C:/packages/rwmovie/1.04.01/source/movielib/movieplayer/cmn/movietimer.cpp
+// compiled in: movietimer.cpp
+// 10 functions, source order. line | PS3 address | size
+
+    0  006F9B0C     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   34  006F9D1C     3C  struct <anon> GetResourceDescriptor()
+                         local  RwUInt32 alignment
+                         local  RwUInt32 size
+                         inlines  ResourceDescriptor
+   42  006F9CE8     34  struct MovieTimer* Initialize(const struct <anon>& resource, struct IResourceAllocator* allocator)
+                         local  struct MovieTimer* movieTimer
+   91  006F9A20      8  void SetAudioRenderer(const struct MovieTimer* this, struct IAudioRenderer* audioRenderer)
+   97  006F9E94     38  void Start(const struct MovieTimer* this)
+                         inlines  Start
+  103  006F9A28     28  void Pause(const struct MovieTimer* this)
+  109  006F9A50     38  void UnPause(const struct MovieTimer* this)
+                         inlines  Start
+  115  006F9A88     84  float GetElapsedTime(const struct MovieTimer* this)
+                         local  float elapsedTime
+  149  006F9B8C     10  static void _GLOBAL__I__ZN2rw5movie10MovieTimer21GetResourceDescriptorEv()
+  150  006F9B9C     10  static void _GLOBAL__D__ZN2rw5movie10MovieTimer21GetResourceDescriptorEv()

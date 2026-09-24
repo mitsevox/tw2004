@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/./productupdatemanagerstrategy.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   57    inline-only   const struct ProductUpdateStage* GetCurrentStage(const const struct <anon>* this)
+   60    inline-only   struct ProductUpdateInfo* GetUpdateInfo(const struct ProductUpdateManagerStrategy* this)
+   63    inline-only   struct ProductUpdateDownloadCallback* GetCallback(const const struct <anon>* this)

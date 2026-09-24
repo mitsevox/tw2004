@@ -1,0 +1,52 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_manager.cpp
+// compiled in: tiger_module_manager.cpp
+// 20 functions, source order. line | PS3 address | size
+
+    0  003426B4     38  void ~Manager(const struct <anon>* this)
+                         inlines  ~Module
+   20  00538208     D8  void Init(const struct <anon>* this)
+                         local  unsigned int i
+   42  005382E0     CC  void FirstUpdate(const struct <anon>* this)
+                         local  struct Container* c
+   55  005384EC    208  void Shutdown(const struct <anon>* this)
+                         local  int i
+                         local  unsigned int i
+   84  005386F4    1A8  void Update(const struct <anon>* this)
+                         local  struct <anon> ___profScope
+                         local  struct Container* c
+                         inlines  Profile, ~Profile
+  106  0053937C     D8  void LevelInit(const struct <anon>* this)
+                         local  struct Container* c
+                         local  struct Module* m
+  125  00539454     94  void LevelShutdown(const struct <anon>* this)
+                         local  struct Container* c
+  134  0053889C     68  void LevelShutdownInitListInReverse(const struct <anon>* this, struct Container* c)
+  148  00538904     1C  int GetStreamFileCount(const const struct <anon>* this)
+  153  00538920     FC  const char* GetStreamFileName(const const struct <anon>* this, int streamFileIndex)
+  163  00538D94    190  void AddModule(const struct <anon>* this, struct Module* module, int initPriority, int postLoadPriority, int updatePriority)
+                         local  struct Container* c
+                         inlines  TagValuePair
+  182  00538F24    458  void InitModules(const struct <anon>* this)
+                         local  struct Container* c
+                         local  struct Module* m
+                         local  int i
+                         local  int totalIndex
+                         local  struct Module* m
+                         local  int fileCount
+                         local  int i
+                         local  const char* name
+                         local  size_t bufferLength
+                         inlines  TagValuePair
+  247  00538A1C    198  void InsertIntoList(const struct <anon>* this, struct Container* c, int listIndex)
+                         local  struct Container* prev
+                         local  struct Container* next
+  277  005383AC    140  void DeleteAndShutdownInitListInReverse(const struct <anon>* this, struct Container* c)
+  299  00538BB4     18  unsigned int GetModuleCount()
+  304  005381F0     18  struct <anon>* GetSingleton()
+  309  00538BCC    1B4  void ManagerResourceCallback(void* resource, int resourceId, unsigned int resourceSize)
+                         local  struct Container* c
+                         local  struct Module* m
+                         local  int i
+  329  00538D80      8  int GetResourceCount(const struct <anon>* this)
+  334  00538D88      8  int GetResourceId(const struct <anon>* this, int )
+  339  00538D90      4  void ResourceCallback(const struct <anon>* this, void* resource, int , unsigned int )

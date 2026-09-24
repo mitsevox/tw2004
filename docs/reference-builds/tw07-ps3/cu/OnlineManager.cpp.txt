@@ -1,0 +1,365 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/online/OnlineManager.cpp
+// compiled in: golf2_unity.cpp
+// 137 functions, source order. line | PS3 address | size
+
+  105  0015E17C     1C  void CancelLogin()
+  110  001953FC     4C  void OnCloseLoginAlert(int32 rslt)
+  116  0019B5BC     4C  void RegularLobbyLogin()
+                         inlines  OnlineManagerOSDK::GetInstance
+  122  0015E2D0     18  void AcceptForeignRegAgreement()
+  127  0017E310     48  void DeclineForeignRegAgreement()
+  133  0019B558     64  void PostLoadProfileStartChallenge()
+                         inlines  OnlineManagerOSDK::GetInstance, UICharacterSel::SetCharSelectOnCloseFunc
+  144  0014E460     28  void PostConfirmStartChallenge()
+                         inlines  OnlineManagerOSDK::GetInstance, OnlineManagerOSDK::SetChallengeAccepted
+  149  001703E0    124  void PostConfirmCancelChallenge()
+                         local  void* pPtr
+                         inlines  OnlineManagerOSDK::SetTrickyPostInvite, UIMainMenu::SetChallengeCancelled
+  177  00163DCC    10C  void PostConfirmCancelPendingChallenge()
+                         local  void* pPtr
+                         inlines  OnlineManagerOSDK::SetTrickyPostInvite
+  202  00192D04     A8  void AcceptPendingChallenge()
+                         inlines  OnlineManagerOSDK::SetTrickyPostInvite
+  224  00162AE4     90  void PostTrickySequenceStartInvite(enum eSavedGameNotifcationCodes notifyCd, enum MCAction action)
+                         inlines  OnlineManagerOSDK::SetTrickyPostInvite
+  237  001903E0     18  void PostSwitchStickInvite(int32 nRslt)
+  242  001903C8     18  void DontSaveSwitchStickSetting()
+  247  001288DC     70  void SaveSwitchStickSetting()
+  253  0016B33C     68  void PostDailyTournament()
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen
+  261  0016D508     20  void ResetConnectEAMsgFlag()
+                         inlines  OnlineManagerOSDK::SetShowingEAConnect
+  271  0019BD28    20C  void OnlineManagerOSDK::OnlineManagerOSDK(const struct OnlineManagerOSDK* this)
+                         local  uint32 i
+                         inlines  RCPointer, SilentSigninObserver
+  320  0019C26C    33C  void OnlineManagerOSDK::~OnlineManagerOSDK(const struct OnlineManagerOSDK* this)
+                         inlines  RemoveObserver, ~RCPointer, ~SilentSigninObserver
+  373  0019C140    12C  const struct OnlineManagerOSDK* OnlineManagerOSDK::CreateInstance()
+                         local  const char[15] __FUNCTION__
+                         local  void* pTemp
+                         inlines  TagValuePair, operator+
+  383  001A06AC    5E0  void OnlineManagerOSDK::Initialize(const struct OnlineManagerOSDK* this)
+                         local  const char[11] __FUNCTION__
+                         local  void* pTemp
+                         local  struct Facade* pFacade
+                         local  void* pLeaderboardTemp
+                         local  void* pTickerTemp
+                         local  void* pWebOfferTemp
+                         local  void* pHTTPTemp
+                         local  uint32_t uIndex
+                         local  int i
+                         local  int i
+                         inlines  AddObserver, TagValuePair, operator+, operator=
+  451  0012830C     70  void OnlineManagerOSDK::RegisterGameMessageCallback(const struct OnlineManagerOSDK* this, enum NetMsgTypeEnum type, void(*)()* callback)
+  458  001A0C8C    73C  void OnlineManagerOSDK::Process(const struct OnlineManagerOSDK* this)
+                         local  TI_STimeValue currentTime
+                         local  float fElapsedTime
+                         local  struct Facade* pFacade
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, TI_fConvertTimeDifToSeconds, operator=, sys_time_get_timebase_frequency
+  638  0014E4D8     B8  void OnlineManagerOSDK::SetDisconnectPopupRequest(const struct OnlineManagerOSDK* this, enum UIDisconnectType critical, int reason)
+  653  0018BC0C    25C  void OnlineManagerOSDK::ProcessDisconnectPopups(const struct OnlineManagerOSDK* this)
+                         inlines  cGAME_GLOBALS::SetGamePaused
+  700  0017DC38     8C  void OnlineManagerOSDK::SetOnlinePath(const struct OnlineManagerOSDK* this, enum OnlinePath path)
+                         inlines  operator->, operator=
+  711  00163FBC     48  struct OnlineMatchParams* OnlineManagerOSDK::GetMatchParams()
+                         local  struct KickStart* pKickStart
+                         inlines  KickStart::GetGameParams, LobbyMatchupOSDK::GetGameParamsRef
+  722  0012837C     74  void OnlineManagerOSDK::SetCurrentConnection(const struct OnlineManagerOSDK* this, uint32_t connIndex)
+  728  00175D60     18  enum PlayerNumber_t OnlineManagerOSDK::GetPlayerFromCurrentConnection(const struct OnlineManagerOSDK* this)
+  733  00175BF0    170  enum PlayerNumber_t OnlineManagerOSDK::GetPlayerFromConnection(const struct OnlineManagerOSDK* this, uint32_t connection)
+                         local  struct PeerConnectionManager* pPeerMgr
+                         local  const struct List<OSDK::PeerConnection>* pPeerConnections
+                         local  struct PeerConnection* pPeerConnection
+                         local  const struct List<OSDK::GameUser>* pGameUsers
+                         local  int count
+                         inlines  List<OSDK::GameUser>::GetElementAt, List<OSDK::PeerConnection>::GetElementAt
+  753  00175E0C    1BC  bool OnlineManagerOSDK::CheckIfPlayerExists(const struct OnlineManagerOSDK* this, enum PlayerNumber_t playernum)
+                         local  uint8_t i
+                         local  struct PeerConnectionManager* pPeerMgr
+                         local  const struct List<OSDK::GameUser>* pGameUsers
+                         local  const struct List<OSDK::PeerConnection>* pPeerConnections
+                         local  struct PeerConnection* pPeerConnection
+                         inlines  List<OSDK::GameUser>::GetElementAt, List<OSDK::PeerConnection>::GetElementAt, List<OSDK::PeerConnection>::GetNumberOfElements
+  775  00175FC8    198  int32_t OnlineManagerOSDK::GetConnectionFromPlayer(const struct OnlineManagerOSDK* this, enum PlayerNumber_t playernum)
+                         local  uint8_t i
+                         local  struct PeerConnectionManager* pPeerMgr
+                         local  const struct List<OSDK::GameUser>* pGameUsers
+                         local  const struct List<OSDK::PeerConnection>* pPeerConnections
+                         local  struct PeerConnection* pPeerConnection
+                         inlines  List<OSDK::GameUser>::GetElementAt, List<OSDK::PeerConnection>::GetElementAt, List<OSDK::PeerConnection>::GetNumberOfElements
+  794  00128958     98  int32_t OnlineManagerOSDK::GetPlayerIDFromName(const struct OnlineManagerOSDK* this, char* name)
+                         local  uint8_t i
+  808  0017C140    458  void OnlineManagerOSDK::ProcessPeerConnections(const struct OnlineManagerOSDK* this)
+                         local  int[3] sCurrentMsgSize
+                         local  char*[3] sCurrentMsgData
+                         local  NetworkMessage_t[3] sCurrentNetMsg
+                         local  uint32_t uIndex
+                         local  NetGamePacketT packet
+                         local  struct PeerConnectionManager* pPeerMgr
+                         local  const struct List<OSDK::PeerConnection>* pPeerConnections
+                         local  const struct List<OSDK::GameUser>* pGameUsers
+                         local  uint32_t uNumConnections
+                         local  uint32_t i
+                         local  struct PeerConnection* pPeerConnection
+                         local  NetGameLinkRefT* pLinkRef
+                         local  uint32 now
+                         local  uint32_t heartbeat_time
+                         local  uint32 crc
+                         inlines  List<OSDK::GameUser>::GetNumberOfElements, List<OSDK::PeerConnection>::GetElementAt, List<OSDK::PeerConnection>::GetNumberOfElements
+  918  00128A68    118  void OnlineManagerOSDK::ProcessIncomingNetworkMessage(const struct OnlineManagerOSDK* this, NetworkMessage_t* netMsg)
+  993  0017C824    22C  int OnlineManagerOSDK::SendDataToAll(const struct OnlineManagerOSDK* this, int pkt_type, enum NetMsgTypeEnum type, void* data, unsigned int len)
+                         local  uint32_t save_conn
+                         local  int err
+                         local  struct PeerConnectionManager* pPeerMgr
+                         local  const struct List<OSDK::GameUser>* pGameUsers
+                         local  uint32 i
+                         inlines  List<OSDK::GameUser>::GetNumberOfElements, OnlineManagerOSDK::GetCurrentConnection
+ 1026  0017C6A8    138  int OnlineManagerOSDK::SendDataToPlayer(const struct OnlineManagerOSDK* this, int pkt_type, enum PlayerNumber_t player, enum NetMsgTypeEnum type, void* data, unsigned int len)
+                         local  uint32_t saveConn
+                         local  int32_t playerConn
+                         local  int32_t err
+                         inlines  OnlineManagerOSDK::GetCurrentConnection
+ 1052  0017C598    110  int OnlineManagerOSDK::ConstructAndSendNetworkMessage(const struct OnlineManagerOSDK* this, int pkt_type, enum NetMsgTypeEnum type, void* data, unsigned int len)
+                         local  int err
+                         local  int i
+                         local  char* ptr
+                         local  NetworkMessage_t netMsg
+ 1079  0017BC14    4B4  int OnlineManagerOSDK::SendNetworkMessage(const struct OnlineManagerOSDK* this, uint32_t connIndex, int type, NetworkMessage_t* netMsg)
+                         local  int err
+                         local  struct PeerConnectionManager* pPeerMgr
+                         local  const struct List<OSDK::PeerConnection>* pPeerConnections
+                         local  uint32_t uNumConnections
+                         local  struct PeerConnection* pPeerConnection
+                         local  NetGameLinkRefT* pLinkRef
+                         local  NetGamePacketT packet
+                         local  int total_size
+                         local  int bytes_remaining
+                         local  TI_STimeValue start_tick
+                         local  bool once
+                         local  TI_STimeValue cur_tick
+                         local  float elapsed
+                         inlines  List<OSDK::PeerConnection>::GetElementAt, OnlineManagerOSDK::GetNextMsgNum, TI_fConvertTimeDifToSeconds
+ 1171  0017C0C8     78  int OnlineManagerOSDK::SendHeartbeat(const struct OnlineManagerOSDK* this, uint32_t connIndex)
+                         local  int err
+                         local  NetworkMessage_t netMsg
+ 1192  001901B4    1D4  void OnlineManagerOSDK::ShowChallengeLoadingScreen(const struct OnlineManagerOSDK* this)
+                         local  struct GameModeDriver* gameDrive
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton, UIMainMenu::SetQuitGame, cGAME_GLOBALS::SetNextGame
+ 1237  0014E488     50  void OnlineManagerOSDK::SetChallengeCancelled(const struct OnlineManagerOSDK* this)
+                         inlines  OnlineManagerOSDK::SetTrickyPostInvite
+ 1245  00190388     40  bool OnlineManagerOSDK::SetReadyForChallenges(const struct OnlineManagerOSDK* this)
+ 1256  0016669C     D8  void OnlineManagerOSDK::StartChallengeAgain(const struct OnlineManagerOSDK* this)
+ 1281  0014B39C     D0  void OnlineManagerOSDK::StartSilentSignin(const struct OnlineManagerOSDK* this)
+                         local  struct SilentSigninExtension* pSilentSignin
+                         inlines  AddObserver
+ 1298  0014B5B0     B4  void OnlineManagerOSDK::ShutdownSilentSign(const struct OnlineManagerOSDK* this)
+                         local  struct SilentSigninExtension* pSilentSignin
+                         inlines  RemoveObserver
+ 1310  001B23E0    7D8  void OnlineManagerOSDK::FrontEndToGame(const struct OnlineManagerOSDK* this, enum GameType gametype)
+                         local  struct OnlineMatchParams* pMatchParams
+                         local  struct OnlineMatchParams* pTempParams
+                         local  struct Facade* pFacade
+                         local  struct PeerConnectionManager* pPeerMgr
+                         local  const struct List<OSDK::GameUser>* pGameUsers
+                         local  const struct List<OSDK::PeerConnection>* pPeerConnections
+                         local  int count
+                         local  uint32 bAutoOnline
+                         local  int err
+                         local  uint32_t i
+                         local  uint32 uIndex
+                         local  int i
+                         local  int count
+                         local  struct PeerConnection* pPeerConnection
+                         local  int err
+                         inlines  AddObserver, List<OSDK::GameUser>::GetElementAt, List<OSDK::GameUser>::GetNumberOfElements, List<OSDK::PeerConnection>::GetElementAt, List<OSDK::PeerConnection>::GetNumberOfElements, OnlineManagerOSDK::SetMyPlayerNumber, UserManager::SetUpForOnlineGame
+ 1497  00197464    608  int OnlineManagerOSDK::SetupGolfGame(const struct OnlineManagerOSDK* this, bool useDailyTournamentExtension, struct OnlineMatchParams* matchParams)
+                         local  struct PeerConnectionManager* pConnMgr
+                         local  int flags
+                         local  struct GameSessionPersistent* pGameSession
+                         local  TourneyParamsT* todaysTournament
+                         inlines  DailyTourn::GetInstance, GM_SelectHoleSet, GM_SetCurrentCourse, Singleton<DifficultySettings>::GetSingleton, cGAME_GLOBALS::SetDemoMode, cGAME_GLOBALS::SetGlobalFlags
+ 1655  001B21A0    240  int OnlineManagerOSDK::StartGolfGame(const struct OnlineManagerOSDK* this, struct OnlineMatchParams* matchParams)
+                         local  uint32 bAutoOnline
+                         inlines  UserManager::SetUpForOnlineGame, cGAME_GLOBALS::SetFacilityBootingToTheFeUi
+ 1761  0018BF24    138  void OnlineManagerOSDK::SyncUpHeartbeats(const struct OnlineManagerOSDK* this)
+                         local  float timeWaited
+                         local  uint8_t i
+ 1794  001289F0     78  void OnlineManagerOSDK::ReceivedHeartbeat(const struct OnlineManagerOSDK* this)
+                         local  uint32_t currConnection
+                         local  uint8_t i
+                         inlines  OnlineManagerOSDK::GetNumConnections
+ 1809  0017CA84    1B8  float OnlineManagerOSDK::WaitForHeartbeats(const struct OnlineManagerOSDK* this)
+                         local  TI_STimeValue startOfLoopTime
+                         local  TI_STimeValue endOfLoopTime
+                         inlines  TI_fConvertTimeDifToSeconds
+ 1822  001B1F48    258  void OnlineManagerOSDK::GameToFrontEnd(const struct OnlineManagerOSDK* this, bool startSignin)
+                         local  struct KickStart* pKickStart
+                         inlines  KickStart::GetInstance, Singleton<DifficultySettings>::GetSingleton
+ 1878  0019AD14    5A8  void OnlineManagerOSDK::DoPostLoginAction(const struct OnlineManagerOSDK* this)
+                         local  bool bMultiplayerPermission
+                         local  struct DailyTourn* pDailyTourn
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, Singleton<DifficultySettings>::GetSingleton
+ 2058  0019B2BC    29C  void OnlineManagerOSDK::DoLobbyLogin(const struct OnlineManagerOSDK* this, int userindex, enum OnlinePath path)
+                         local  struct LoginSlot* pLoginSlot
+                         inlines  operator=
+ 2109  00185524     70  void OnlineManagerOSDK::DoKickstart(const struct OnlineManagerOSDK* this, int numPlayers)
+                         local  struct KickStart* pKickStart
+ 2122  0015E0E4     98  void OnlineManagerOSDK::CancelLoginOperation(const struct OnlineManagerOSDK* this, bool bShowLegalPopup)
+                         inlines  operator->
+ 2131  0015E198     9C  void OnlineManagerOSDK::AcceptTos(const struct OnlineManagerOSDK* this)
+                         inlines  operator->
+ 2139  0015E234     9C  void OnlineManagerOSDK::AcceptForeignReg(const struct OnlineManagerOSDK* this)
+                         inlines  operator->
+ 2147  0015E2E8     9C  void OnlineManagerOSDK::SetShareInfo(const struct OnlineManagerOSDK* this, bool bShareEA, bool bSharePartners)
+                         inlines  operator->
+ 2157  00156F34     60  void OnlineManagerOSDK::UnsuspendSuccess(const struct OnlineManagerOSDK* this)
+ 2165  001290D4     3C  void OnlineManagerOSDK::UnsuspendFailure(const struct OnlineManagerOSDK* this)
+ 2171  0018BA34    1D8  void OnlineManagerOSDK::ShowPopupDisconnect(const struct OnlineManagerOSDK* this, enum UIDisconnectType critical, int reason)
+                         local  vec4flt fadeColor
+                         inlines  OnlineManagerOSDK::SetShowingEAConnect, cGAME_GLOBALS::SetGamePaused
+ 2210  00195778    3F4  void OnlineManagerOSDK::OsdkDisconnected(const struct OnlineManagerOSDK* this, enum DisconnectReason reason)
+                         local  enum UIDisconnectType criticalDisconnectType
+                         inlines  cGAME_GLOBALS::SetGamePaused, operator->
+ 2318  001290D0      4  void OnlineManagerOSDK::CheckForOnlineAchievements(const struct OnlineManagerOSDK* this)
+ 2357  00129110      4  void OnlineManagerOSDK::SetArbitratedStats(const struct OnlineManagerOSDK* this)
+ 2535  001B0EF8   1050  void OnlineManagerOSDK::ReportStats(const struct OnlineManagerOSDK* this)
+                         local  struct GameSessionPersistent* pGameSession
+                         local  struct Dictionary* pGameStats
+                         local  int m_iGameType
+                         local  const struct List<OSDK::GameUser>* pGameUsers
+                         local  uint32_t uNumPlayers
+                         local  uint32_t uOneBallPoints
+                         local  char8_t[32] strTag
+                         local  uint32_t uIndex
+                         local  struct GameUser* pGameUser
+                         local  enum GM_ScoringType_t score_type
+                         local  int i
+                         inlines  GM_GetModeType, GM_GetScoringType, List<OSDK::GameUser>::GetElementAt, List<OSDK::GameUser>::GetNumberOfElements, Singleton<GameModeDriverManager>::GetSingleton
+ 2714  001C7034    514  void OnlineManagerOSDK::PeerDisconnected(const struct OnlineManagerOSDK* this, struct PeerConnection* pConnection)
+                         local  int32_t playerID
+                         local  vec4flt fadeColor
+                         local  struct PeerConnectionManager* pPeerMgr
+                         local  const struct List<OSDK::PeerConnection>* pPeerConnections
+                         inlines  GM_GetGolferUp, List<OSDK::PeerConnection>::GetNumberOfElements, Singleton<GameModeDriverManager>::GetSingleton, cGAME_GLOBALS::SetGamePaused
+ 2795  00158468     F4  void OnlineManagerOSDK::RemovePeerConnectionObservers(const struct OnlineManagerOSDK* this)
+                         local  struct PeerConnectionManager* pPeerMgr
+                         local  const struct List<OSDK::PeerConnection>* pPeerConnections
+                         local  uint32_t uNumConnections
+                         local  uint32_t uIndex
+                         local  struct PeerConnection* pPeerConnection
+                         inlines  List<OSDK::PeerConnection>::GetElementAt, List<OSDK::PeerConnection>::GetNumberOfElements, RemoveObserver
+ 2810  0018BE68     BC  void OnlineManagerOSDK::Disconnect(const struct OnlineManagerOSDK* this)
+                         local  struct PeerConnectionManager* pPeerMgr
+                         inlines  cGAME_GLOBALS::SetGamePaused
+ 2827  00129114     3C  void OnlineManagerOSDK::UserLocalLoginConnectedToNetwork(const struct OnlineManagerOSDK* this)
+ 2832  0015284C     94  void OnlineManagerOSDK::UserLocalLoginSuccess(const struct OnlineManagerOSDK* this)
+ 2844  0017E3BC    134  void OnlineManagerOSDK::UserLocalLoginFailure(const struct OnlineManagerOSDK* this, enum Failure eFailure, uint32_t uLoginSlotIndex)
+                         inlines  operator=
+ 2883  0017B480    218  void OnlineManagerOSDK::UserLocalLoginAlert(const struct OnlineManagerOSDK* this, const struct Alert* pAlert)
+                         inlines  operator=
+ 2903  001528E0     8C  void OnlineManagerOSDK::UserLocalTOSNotAccepted(const struct OnlineManagerOSDK* this)
+ 2913  0015296C     8C  void OnlineManagerOSDK::UserLocalSharingInfoNotSet(const struct OnlineManagerOSDK* this)
+ 2923  0017E4F0    140  void OnlineManagerOSDK::UserLocalLoginAborted(const struct OnlineManagerOSDK* this)
+                         inlines  operator=
+ 2945  001529F8     8C  void OnlineManagerOSDK::UserLocalForeignRegAlert(const struct OnlineManagerOSDK* this)
+ 2955  00129150      4  void OnlineManagerOSDK::UserLocalProductUpdateAlert(const struct OnlineManagerOSDK* this, uint32_t uNumFiles)
+ 2959  00129154      4  void OnlineManagerOSDK::UserLocalProductUpdateProgress(const struct OnlineManagerOSDK* this, uint32_t uProgress, uint32_t uFileNum)
+ 2963  00129158      4  void OnlineManagerOSDK::UserLocalProductUpdateComplete(const struct OnlineManagerOSDK* this)
+ 2967  0012915C     3C  void OnlineManagerOSDK::UserLocalRegistrationInvalid(const struct OnlineManagerOSDK* this)
+ 2972  0019514C     44  void OnlineManagerOSDK::ActionSuccessful(const struct OnlineManagerOSDK* this, struct Action* pAction)
+                         inlines  operator=
+ 2978  00195190     BC  void OnlineManagerOSDK::ActionFailed(const struct OnlineManagerOSDK* this, struct Action* pAction, int32_t iFailureCode)
+                         inlines  operator->, operator=
+ 2990  00152E40    160  void OnlineManagerOSDK::InviteAccepted(const struct OnlineManagerOSDK* this, struct LoginSlot* pSlot, const char8_t* pSessionData, bool bSameConsole)
+ 3151  00129198     68  void OnlineManagerOSDK::SilentSigninSuccess(const struct OnlineManagerOSDK* this, uint32_t uLoginSlotIndex)
+ 3161  00129200     58  void OnlineManagerOSDK::SilentSigninFailure(const struct OnlineManagerOSDK* this)
+ 3170  00127694      8  bool OnlineManagerOSDK::IsConnectedToPeer(const struct OnlineManagerOSDK* this)
+ 3175  00175A4C     4C  void OnlineManagerOSDK::GetLeaderboards(const struct OnlineManagerOSDK* this)
+ 3182  00129274     28  bool OnlineManagerOSDK::IsLeaderboardBusy(const struct OnlineManagerOSDK* this)
+ 3187  00195E04     88  void OnlineManagerOSDK::LoadLeaderboard(const struct OnlineManagerOSDK* this, int32_t leaderboard, int32_t index, int32_t variation)
+ 3195  0015DFEC     9C  char* OnlineManagerOSDK::GetLeaderboardCell(const struct OnlineManagerOSDK* this, int32_t row, int32_t column)
+                         local  char* pCell
+ 3203  0015DE38     74  int32_t OnlineManagerOSDK::GetRowCount(const struct OnlineManagerOSDK* this)
+ 3210  0012929C      C  void OnlineManagerOSDK::ReadyForESPNProcess(const struct OnlineManagerOSDK* this)
+ 3215  0017E254      8  void OnlineManagerOSDK::LoadESPNArticle(const struct OnlineManagerOSDK* this, uint32_t articlenum)
+ 3220  0017E240      8  void OnlineManagerOSDK::GetNextESPNArticles(const struct OnlineManagerOSDK* this)
+ 3225  0017E21C      8  void OnlineManagerOSDK::GetPrevESPNArticles(const struct OnlineManagerOSDK* this)
+ 3230  0017E1F8      8  void OnlineManagerOSDK::ESPNBack(const struct OnlineManagerOSDK* this)
+ 3235  0017E300     10  void OnlineManagerOSDK::RequestTOS(const struct OnlineManagerOSDK* this)
+ 3240  00155AC4      C  void OnlineManagerOSDK::ExecuteWebOfferAlertAction(const struct OnlineManagerOSDK* this, int32_t rslt)
+ 3245  00127A30     80  bool OnlineManagerOSDK::LocalUserHasCreatedContentPermission(const struct OnlineManagerOSDK* this)
+                         local  struct UserLocal* pLocalUser
+ 3254  001292A8     80  bool OnlineManagerOSDK::LocalUserHasCommunicationPermission(const struct OnlineManagerOSDK* this)
+                         local  struct UserLocal* pLocalUser
+ 3263  0012904C     78  bool OnlineManagerOSDK::LocalUserHasMultiplayerPermission(const struct OnlineManagerOSDK* this)
+                         local  struct UserLocal* pLocalUser
+ 3272  00129328     80  bool OnlineManagerOSDK::LocalUserHasProfilePermission(const struct OnlineManagerOSDK* this)
+                         local  struct UserLocal* pLocalUser
+ 3281  001293A8    130  const char8_t* OnlineManagerOSDK::GetLocalUserName(const struct OnlineManagerOSDK* this)
+                         local  struct Facade* pFacade
+                         local  struct GameSessionPersistent* pSession
+ 3300  001294D8     A4  const char8_t* OnlineManagerOSDK::GetUserName(const struct OnlineManagerOSDK* this, uint32_t userindex)
+                         local  struct Facade* pFacade
+                         local  struct LoginSlot* pLoginSlot
+ 3309  0012957C     78  uint8_t OnlineManagerOSDK::GetLocalUserControllerIndex(const struct OnlineManagerOSDK* this)
+                         local  struct LoginSlot* pLoginSlot
+ 3318  001911A8     A0  void OnlineManagerOSDK::MakeHttpRequest(const struct OnlineManagerOSDK* this, enum HttpRequest whichType)
+ 3338  00127680     14  bool OnlineManagerOSDK::IsDisconnectedFromServer(const struct OnlineManagerOSDK* this)
+ 3343  00128F5C     14  bool OnlineManagerOSDK::IsDisconnectedFromPeer(const struct OnlineManagerOSDK* this)
+ 3349  00128F70     50  bool OnlineManagerOSDK::IsDisconnected(const struct OnlineManagerOSDK* this)
+ 3354  001295F4      8  int OnlineManagerOSDK::RichPresence_Type(const struct OnlineManagerOSDK* this, enum PresenceType ptype)
+ 3386  001295FC      8  int OnlineManagerOSDK::RichPresence_GameMode(const struct OnlineManagerOSDK* this, enum GM_ModeType_t mode)
+ 3500  00129604      8  int OnlineManagerOSDK::RichPresence_Course(const struct OnlineManagerOSDK* this, Course_t course)
+ 3552  0012960C     18  int OnlineManagerOSDK::RichPresence_Hole(const struct OnlineManagerOSDK* this, uint32 hole)
+ 3565  00129624     F4  void OnlineManagerOSDK::SetPresence(const struct OnlineManagerOSDK* this, uint8_t userindex, enum PresenceType ptype, enum GM_ModeType_t gamemode, Course_t course, uint32 hole)
+ 3575  0012894C      C  void OnlineManagerOSDK::UpdatePresence(const struct OnlineManagerOSDK* this)
+ 3602  001756AC    204  void OnlineManagerOSDK::ProcessAlert(const struct OnlineManagerOSDK* this)
+                         local  const struct List<OSDK::Action>* pActions
+                         local  int32_t iNumEntries
+                         local  int32_t iMenuCount
+                         local  int32_t iLoop
+                         inlines  List<OSDK::Action>::GetElementAt, operator->
+ 3635  0019524C    1B0  void OnlineManagerOSDK::ExecuteAlertAction(const struct OnlineManagerOSDK* this, int32_t rslt)
+                         local  const struct List<OSDK::Action>* pActions
+                         local  int32_t iNumEntries
+                         local  int32_t iMenuCount
+                         local  struct Action* pSelectedAction
+                         local  int32_t iLoop
+                         inlines  List<OSDK::Action>::GetElementAt, operator->, operator=
+ 3661  00129718      8  uint32_t OnlineManagerOSDK::GetNumAchievementsAwarded(const struct OnlineManagerOSDK* this)
+ 3715  00129720      4  void OnlineManagerOSDK::AwardAchievement(const struct OnlineManagerOSDK* this, uint8_t userindex, int achievementToAward)
+ 3755  00129724    100  void OnlineManagerOSDK::LoadStatBookForUser(const struct OnlineManagerOSDK* this, const char8_t* name, char* view)
+                         local  const char8_t* strView
+                         local  uint32_t numSlots
+                         local  struct <anon>* pCareerExtension
+ 3768  00129824     A8  void OnlineManagerOSDK::CareerStatbookLoadSuccess(const struct OnlineManagerOSDK* this, struct CareerStatbook* pCareerStatbook)
+ 3779  001298CC      4  void OnlineManagerOSDK::UnloadStatBookForUser(const struct OnlineManagerOSDK* this)
+ 3784  001298D0     E4  char8_t* OnlineManagerOSDK::GetStatbookValue(const struct OnlineManagerOSDK* this, int index)
+ 3791  001299B4     48  int32_t OnlineManagerOSDK::GetStatbookNumRows(const struct OnlineManagerOSDK* this)
+ 3796  001299FC     38  void OnlineManagerOSDK::CareerStatbookLoadFailure(const struct OnlineManagerOSDK* this, enum Failure eFailure)
+ 3801  0015855C    3E8  void OnlineManagerOSDK::CheckForVoipUI(const struct OnlineManagerOSDK* this)
+                         local  struct Voip* pVoip
+                         local  struct VoiceUser* pLocalUser
+                         local  const struct List<OSDK::VoiceUser>* pVoiceUsers
+                         local  uint32 i
+                         local  struct VoiceUser* pVoiceUser
+                         local  int32 iPlayerIdx
+                         local  char[64] szPath
+                         local  int32 j
+                         inlines  List<OSDK::VoiceUser>::GetElementAt, List<OSDK::VoiceUser>::GetNumberOfElements
+ 3875  00156F94     44  void OnlineManagerOSDK::SetPlayPodcast(const struct OnlineManagerOSDK* this, bool turnon)
+ 3888  00191E80     18  void OnlineManagerOSDK::SendChatMessage(const struct OnlineManagerOSDK* this, char8_t* msg)
+ 3893  00129A34     1C  const char8_t* OnlineManagerOSDK::GetGameUserNameFromPeerSession(const struct OnlineManagerOSDK* this, uint32_t player)
+ 3898  00128B80     94  void OnlineManagerOSDK::ConfirmChallenge(const struct OnlineManagerOSDK* this)
+                         inlines  AptControllerListener::StopPortLocking
+ 3909  00195448    190  void OnlineManagerOSDK::ShowProfile(const struct OnlineManagerOSDK* this, const char8_t* username)
+                         local  struct Facade* facade
+                         local  struct LoginSlot* loginSlot
+                         inlines  operator=
+ 3928  00129A50      8  bool OnlineManagerOSDK::CheckIsOnlineDisconnect(const struct OnlineManagerOSDK* this)
+ 3933  00129A58      C  void OnlineManagerOSDK::ResetIsDisconnectFromOnline(const struct OnlineManagerOSDK* this)
+ 3937  001955D8     60  void OnlineManagerOSDK::HudShowProfileFailed(const struct OnlineManagerOSDK* this)
+                         inlines  operator=
+ 3943  00195638     60  void OnlineManagerOSDK::HudShowProfileSuccessful(const struct OnlineManagerOSDK* this)
+                         inlines  operator=
+ 3949  00129A64      C  void OnlineManagerOSDK::SetProcessDisconnectForInGame(const struct OnlineManagerOSDK* this)

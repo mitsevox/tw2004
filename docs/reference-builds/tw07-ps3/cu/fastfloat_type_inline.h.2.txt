@@ -1,0 +1,27 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/fastfloat_type_inline.h
+// compiled in: DebugMenu.cpp, RNADevice.cpp, RNADevicePlat.cpp, SGNodeBSPCulledRenderable.cpp, SGNodeBoundingVolume.cpp, SGNodeJoint.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   44    inline-only   float GetFloat(const const struct VecFloatRefIndex* this)
+                         local  union <anon> temp
+  101    inline-only   float operator float(const const struct VecFloatRefIndex* this)
+                         local  union <anon> temp
+  178    inline-only   float GetFloat(const const struct <anon>* this)
+                         local  float ret
+                         local  union <anon> vecUnion
+  194    inline-only   float operator float(const const struct <anon>* this)
+                         local  float ret
+                         local  union <anon> vecUnion
+  246    inline-only   float GetFloat(const const struct <anon>* this)
+                         local  float32_t ret
+                         local  union <anon> vecUnion
+  255    inline-only   void SetFloat(const struct <anon>* this, float f)
+                         local  Vector4Intrinsic_32 vec
+                         local  Vector4Intrinsic_32 vi_temp
+                         local  unsigned char[16] permuteControl
+  277    inline-only   struct <anon>& operator=(const struct <anon>* this, struct <anon>& rhs)
+                         local  unsigned char[16] permuteControl
+  285    inline-only   struct <anon>& operator=(const struct <anon>* this, struct <anon>& rhs)
+                         local  unsigned char[16] permuteControl
+  291    inline-only   struct <anon>& operator=(const struct <anon>* this, struct <anon>& rhs)
+                         local  unsigned char[16] permuteControl

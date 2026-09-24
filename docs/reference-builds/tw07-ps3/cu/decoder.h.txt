@@ -1,0 +1,20 @@
+// C:/packages/rwaudiocore/2.08.01/include/rw/audio/core/decoder.h
+// compiled in: decealayer3.cpp, decoder.cpp, decoderregistry.cpp, sndplayer1.cpp
+// 12 functions, source order. line | PS3 address | size
+
+  191    inline-only   int GetSamplesRemaining(const struct Decoder* this, unsigned char requestHandle)
+                         local  struct RequestDesc* pRequestDesc
+                         local  int samplesRemaining
+  222    inline-only   void Release(const struct Decoder* this)
+  237    inline-only   unsigned int GetInstanceSize(const struct Decoder* this)
+  262  006D2C64      4  void FeedEvent(const struct Decoder* this, unsigned char requestHandle)
+  267    inline-only   struct <anon>* GetSystem(const struct Decoder* this)
+  277    inline-only   unsigned int GetChannels(const struct Decoder* this)
+  333  006D2C68      C  void ~Decoder(const struct Decoder* this)
+  342    inline-only   void SetSystem(const struct Decoder* this, struct <anon>* system)
+  349    inline-only   struct RequestDesc* GetRequestDescArray(const struct Decoder* this)
+  355    inline-only   struct RequestDesc* GetRequestDesc(const struct Decoder* this, unsigned int slot)
+                         local  struct RequestDesc* pRequestDesc
+  364    inline-only   void SetChannels(const struct Decoder* this, unsigned int numChannels)
+  376    inline-only   struct RequestDesc* AdvanceSlot(const struct Decoder* this, unsigned char* pSlot)
+                         local  struct RequestDesc* pRequestDescArray

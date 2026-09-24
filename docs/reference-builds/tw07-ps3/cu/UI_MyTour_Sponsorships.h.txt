@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_MyTour_Sponsorships.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   15  0011BBE0    160  void UIMyTour_Sponsorships::~UIMyTour_Sponsorships(const struct UIMyTour_Sponsorships* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIMyTour_Sponsorships::DstMenuItem_mtss>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+   17  001002A8      C  uint32 UIMyTour_Sponsorships::GetSignature(const const struct UIMyTour_Sponsorships* this)
+   24  001002BC      C  struct IExternArray* UIMyTour_Sponsorships::GetExternArray(const struct UIMyTour_Sponsorships* this)

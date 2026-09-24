@@ -1,0 +1,23 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/include/common/OSDK/Juice/JuiceOsdkApi.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   30  006242C0      C  void ~cOsdkBase(const struct <anon>* this)
+   33    inline-only   struct <anon>* Instance()
+                         local  struct <anon>* activeInsance
+   45  006242F8      4  void Update(const struct <anon>* this)
+   46  006242FC      4  void UpdatePad(const struct <anon>* this, void* )
+   47  00624300      8  bool CheckChannel(const struct <anon>* this, int group, int channel, int level)
+   48  00624308      4  void LogText(const struct <anon>* this, const char* )
+   49  0062430C     1C  void LogPrintf(const struct <anon>* this, const char* format)
+   50  00624328      4  void GameEvent(const struct <anon>* this, const char* category, const char* event, const char* outcomeString, int intValue, float floatResult, const char* stringResult, const char* imageName, const char* coordinates)
+   51  0062432C      4  void AssetHit(const struct <anon>* this, const char* category, const char* name)
+   52  00624330      4  void AssertLog(const struct <anon>* this, int lineNumber, const char* functionName, const char* fileName, const char* condition, const char* message)
+   55  00624334      4  void BeginOnlineSession(const struct <anon>* this, char* onlineServer, int port, char* serverIP, char* playerName, char* userServerData, char* userSessionData)
+   56  00624338      4  void EndOnlineSession(const struct <anon>* this)
+   57  0062433C      4  void BeginOnlineGame(const struct <anon>* this, int game_id, int game_type)
+   58  00624340      4  void EndOnlineGame(const struct <anon>* this)
+   59  00624344      4  void SetOnlineGameStatus(const struct <anon>* this, char* gameStatus)
+   63    inline-only   struct <anon>* GetSetInstance(struct <anon>* newImplimentation)
+                         local  struct <anon> defaultInstance
+                         local  struct <anon>* pInstance

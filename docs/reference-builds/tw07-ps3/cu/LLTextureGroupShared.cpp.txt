@@ -1,0 +1,15 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLTextureGroupShared.cpp
+// compiled in: Legacy_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   55  0037EF30     44  unsigned int TG_CalculateChkRef(const char* name)
+   59  00388BF8    1EC  void TG_StoreOffsets(struct t4TextureGroup* textgenGroup)
+                         local  size_t base
+                         local  int i
+                         local  struct t4Texture* textgenTex
+                         local  int j
+   98  00390884    1DC  void TG_ResolveOffsets(struct t4TextureGroup* textgenGroup)
+                         local  size_t base
+                         local  int i
+                         local  struct t4Texture* textgenTex
+                         local  int j

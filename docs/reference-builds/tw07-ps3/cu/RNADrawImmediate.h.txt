@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNAX/include/RNAX/PS3/RNAX/RNADrawImmediate.h
+// compiled in: RNADrawImmediate.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  143  008A7228    18C  void DrawImmediateC(const struct <anon>* this, struct DeviceC* pDevice)
+  144  008A6D80     E8  void ~DrawImmediateC(const struct <anon>* this)
+                         inlines  ~PS3DrawLineListC, ~PS3DrawLineStripC, ~PS3DrawPointListC, ~PS3DrawQuadListC, ~PS3DrawTriFanC, ~PS3DrawTriListC, ~PS3DrawTriStripC

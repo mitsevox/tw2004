@@ -1,0 +1,19 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/MemPool.inl
+// compiled in: DbManager.cpp, ExprNode.cpp, QueryIndex.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   55  007CE244     94  void MemPool(const struct <anon>* this)
+   95  007CF9D4     24  void ~MemPool(const struct <anon>* this)
+  117  007CE494    364  enum TDbError Init(const struct <anon>* this, unsigned int size, int initCount, int iGrowBy)
+                         local  const char[5] __FUNCTION__
+                         local  struct <anon>* mem
+  174  007CEEC0    1D8  enum TDbError DeInit(const struct <anon>* this)
+                         local  struct <anon>* alist
+                         local  struct <anon>* next
+  212  007ED3DC     A8  enum TDbError Reset(const struct <anon>* this)
+  237  007D96F8    374  enum TDbError Alloc(const struct <anon>* this, struct ExprNode** ppBlock)
+                         local  const char[6] __FUNCTION__
+                         local  struct <anon>* mem
+  314  007D9B0C    11C  void Free(const struct <anon>* this, struct ExprNode* pBlock)
+                         local  const char[5] __FUNCTION__
+                         local  struct <anon>* fm

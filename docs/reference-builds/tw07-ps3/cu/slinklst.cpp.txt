@@ -1,0 +1,10 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/slinklst.cpp
+// compiled in: slinklst.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   11  006DDD70     14  void SNDLINKI_init(SNDLINKLIST* plist)
+   21  006DDD84     4C  void SNDLINKI_push(SNDLINKLIST* plist, SNDLINKNODE* pnode)
+   43  006DDDD0     4C  void SNDLINKI_pushtail(SNDLINKLIST* plist, SNDLINKNODE* pnode)
+   65  006DDE1C     4C  void* SNDLINKI_pop(SNDLINKLIST* plist)
+                         local  SNDLINKNODE* pnode
+   90  006DDE68     70  void SNDLINKI_remove(SNDLINKLIST* plist, SNDLINKNODE* pnode)

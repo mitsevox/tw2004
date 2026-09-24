@@ -1,0 +1,22 @@
+// C:/packages/rwaudiocore/2.08.01/source/plugins/route.cpp
+// compiled in: route.cpp
+// 7 functions, source order. line | PS3 address | size
+
+    0  006D9E1C     2C  void ~Route(const struct <anon>* this)
+                         inlines  ~PlugIn
+  133  006D9AA4      8  struct <anon>* GetPlugInDescRunTime()
+  139  006D9DC8     4C  bool CreateInstance(struct PlugIn* pPlugIn, void* pConstructorParams)
+                         local  struct <anon>* pThis
+                         local  int maxChannelsOut
+                         local  int i
+                         inlines  Initialize<rw::audio::core::Route>
+  155  006D9AE0      4  void ReleaseEvent(const struct <anon>* this)
+  165  006D9AE4     C8  void EventEvent(const struct <anon>* this, int , void* pParameterBuffer)
+                         local  struct <anon>* pSystem
+                         inlines  GetSystem, SetParamHandler<rw::audio::core::Route::ConnectByPointerParams>
+  176  006D9AAC     34  void DisconnectImmediate(const struct <anon>* this)
+  182  006D9BAC    21C  int ConnectByPointerHandler(struct <anon>* pCommand)
+                         local  struct <anon>* pThis
+                         local  struct ConnectByPointerCommand* pConnectByPointerCommand
+                         local  struct SubMix* pSubMix
+                         inlines  Assert, HandlerGetThis<rw::audio::core::Route, rw::audio::core::Route::ConnectByPointerCommand>

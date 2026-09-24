@@ -1,0 +1,22 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_FacilityMap.cpp
+// compiled in: apt_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   49  000F2870     4C  void UIFacilityMap::UIFacilityMap(const struct UIFacilityMap* this)
+   53  00033AD4     80  void UIFacilityMap::Init(const struct UIFacilityMap* this)
+   63  00035100     60  void UIFacilityMap::Show(const struct UIFacilityMap* this)
+   70  00035160    194  void UIFacilityMap::OnShow(const struct UIFacilityMap* this)
+   95  000352F4      8  enum eAptHandleInput UIFacilityMap::HandleInput(const struct UIFacilityMap* this, int32 cID)
+  104  0007A518    31C  enum AptThreadReturnValue UIFacilityMap::MoveTarget(const struct UIFacilityMap* this)
+                         local  TI_STimeValue currentTime
+                         local  float fSecondsElapsed
+                         local  float fDiffX
+                         local  float fDiffY
+                         local  float fMoveX
+                         local  float fMoveY
+                         inlines  TI_fConvertTimeDifToSeconds, sys_time_get_timebase_frequency
+  149  000352FC     A0  void UIFacilityMap::Reveal(const struct UIFacilityMap* this)
+                         local  char[10] szIndex
+  162  0003539C     44  void UIFacilityMap::Cover(const struct UIFacilityMap* this)
+  171  000353E0    1CC  void UIFacilityMap::SetDestination(const struct UIFacilityMap* this, int iAreaIdx)
+                         local  char[10] szIndex

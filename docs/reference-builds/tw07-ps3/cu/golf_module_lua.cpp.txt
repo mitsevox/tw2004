@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/GolfModule/golf_module_lua.cpp
+// compiled in: golf_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    6  002F64C8     94  void GolfModuleLua::GolfModuleLua(const struct GolfModuleLua* this, const const void** __vtt_parm, struct IAllocator* allocator, struct Com* com)
+   11  0022F94C     70  void GolfModuleLua::LevelInit(const struct GolfModuleLua* this)
+   26  0022F9BC     1C  void GolfModuleLua::StartInSleepMode()

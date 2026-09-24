@@ -1,0 +1,23 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/productupdategesystemtinfostrategy.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   81  005D13B4    174  intptr_t GetSystemInfo(void* pContext)
+                         local  int32_t ret
+                         local  sys_memory_container_t memory_container
+                         local  char8_t[10] strProductDir
+                         local  struct MemoryStrategy* pMemoryStrategy
+                         local  struct <anon>* pThis
+                         local  struct <anon>* pThis
+  166  005D3978     D0  void GameDataStatCallback(struct CellGameDataCBResult* result, struct CellGameDataStatGet* get, struct CellGameDataStatSet* set)
+                         local  struct <anon>* pThis
+                         local  struct CellGameDataStatGet* pGameDataStat
+                         inlines  GetGameDataStat
+  209  00621AFC     84  void ProductUpdateGetSystemInfoStrategy(const struct <anon>* this, struct ProductUpdateManagerStrategy* pUpdateStrategy)
+                         inlines  ProductUpdateStage
+  235  00621C04     70  void ~ProductUpdateGetSystemInfoStrategy(const struct <anon>* this)
+                         inlines  ~ProductUpdateStage
+  260  005BD974     D4  enum ProcessResultE Process(const struct <anon>* this)
+                         local  enum ProcessResultE eResult
+                         local  struct <anon> initThread
+                         local  struct <anon> tp

@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/Animation/Headers/FaceBlend.h
+// compiled in: apt_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   62    inline-only   void FaceBlend::SetTexGroup(const struct FaceBlend* this, struct TextureGroup* pTexGroup)

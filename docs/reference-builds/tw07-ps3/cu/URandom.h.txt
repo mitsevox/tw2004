@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/Legacy/Lib/Headers/URandom.h
+// compiled in: golf2_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  140    inline-only   float Misc_RandFuncf(enum eRandomType type)
+                         local  uint32 ri
+                         local  float rf

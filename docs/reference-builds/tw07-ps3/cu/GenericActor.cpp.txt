@@ -1,0 +1,159 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Actors/GenericActor.cpp
+// compiled in: golf2_unity.cpp
+// 46 functions, source order. line | PS3 address | size
+
+   56  00158C10    188  void GenericActor_InitModule()
+                         inlines  Allocator::GetTempAllocator
+   78  0017BA70    1A4  void GenericActor_CloseModule()
+                         inlines  freeActorTemplates
+  101  00136348    13C  static void loadActorGeoCB(TStreamDataPtr pStream)
+                         local  uint32 resID
+                         local  bool bFoundTemplate
+                         local  GenericActorTemplateData* pt
+                         local  uint32 i
+  128  00136484    13C  static void loadActorSkelCB(TStreamDataPtr pStream)
+                         local  uint32 resID
+                         local  bool bFoundTemplate
+                         local  GenericActorTemplateData* pt
+                         local  uint32 i
+  155  0013661C    2AC  static void loadActorTemplateCB(TStreamDataPtr pStream)
+                         local  uint32* pData
+                         local  uint32 neo_version
+                         local  uint32 numTemplates
+                         local  GenericActorTemplateDataParams* pTemplates
+                         local  uint32 i
+                         local  const char* pTexGrpName
+                         inlines  GenericActorTemplateDataS
+  196  00136280     7C  void GenericActor_RegisterStreamClients()
+  206  001362FC     4C  void GenericActor_UnRegisterStreamClients()
+  218  001368C8    1B0  static void loadGeo(GenericActorTemplateData* pt)
+                         local  bool bGeomInited
+                         local  twGeom* pGeom
+                         local  uint32 m
+  258  00136A78     A4  void GenericActor_InitForGame()
+                         local  GenericActorTemplateData* pt
+                         local  uint32 i
+  273  0015FB20    330  void GenericActor_InitActorInstance(struct GenericActor* pActor)
+                         local  GenericActorTemplateData* pTemplate
+                         local  bool bCreateCCTActor
+                         local  const char* bankname
+                         inlines  LLMath_IdentifyMat, findTemplate, vec_st
+  370  00137440     F8  void GenericActor_DeleteActorInstance(struct GenericActor* pDelActor)
+                         local  struct GenericActor* pActor
+                         local  struct GenericActor* pPrevActor
+  407  0015FE50     64  void GenericActor_InitForHole()
+                         local  struct GenericActor* pActor
+  425  0013743C      4  void GenericActor_DeInitForHole()
+  444  00136B1C    118  struct GenericActor* GenericActor_CreateActorInstance(GenericActorParams* pActorParams)
+                         local  struct GenericActor* pNewActor
+                         inlines  allocateActor
+  479  00136C34     B4  struct GenericActor* GenericActor_CreateActorInstance(const char* pszTemplateName, const float[4]& loc)
+                         local  GenericActorParams params
+  501  00136CE8     8C  int32_t GenericActor_Count(const char* pszTemplateName)
+                         local  int32_t count
+                         local  struct GenericActor* pActor
+  520  00136D74      4  void GenericActor_DownloadInstance(TBasicParam* pParams)
+  534  00136D78     9C  bool GenericActor_IsType(int32 nActorID, const char* pszTemplateName)
+                         local  bool bRet
+                         local  struct GenericActor* pActor
+  557  00136E14     2C  void GenericActor_Update()
+                         local  struct GenericActor* pActor
+  573    inline-only   void GenericActor_SetupEnvironmentMaps(bool bFullBright)
+  585  0018B7C8     94  void GenericActor_RenderActors(int viewport, enum GenericActorRenderPass pass)
+                         local  struct GenericActor* pActor
+  613  001BF740     E0  void GenericActor_RenderCollision(int viewport)
+                         local  const bool bRenderMesh
+                         local  const bool bRenderRays
+                         local  const bool bRenderHits
+                         local  struct GenericActor* pActor
+  645  0018B2D4    4F4  void GenericActor_RenderActor(struct GenericActor* pActor)
+                         local  bool bFullBright
+                         local  const struct CharModelMgrCharacterInstance& mgr
+                         local  bool bGeomInited
+                         local  uint32 numBones
+                         local  const short unsigned int* remapping
+                         local  float[50][4][4] skinningMatrices
+                         local  uint32 iBone
+                         local  Quat quat
+                         local  mat44flt skinMat
+                         local  float[4][4]* pBindMats
+                         local  short unsigned int[24] remap2
+                         inlines  DS_vEnableZBufferUpdate, GenericActor_SetupEnvironmentMaps
+  733  00136EA4    410  void GenericActor_RenderActorShadow(struct GenericActor* pActor)
+                         local  const struct CharModelMgrCharacterInstance& mgr
+                         local  bool bGeomInited
+                         local  uint32 numBones
+                         local  const short unsigned int* remapping
+                         local  float[50][4][4] skinningMatrices
+                         local  uint32 iBone
+                         local  Quat quat
+                         local  mat44flt skinMat
+                         local  float[4][4]* pBindMats
+                         local  short unsigned int[24] remap2
+  796  001BF480    2C0  static void renderCollisionMesh(struct GenericActor* pActor)
+                         local  const int TIGER_CCT_MAX_COLLISION_VERTICES
+                         local  const int TIGER_CCT_MAX_COLLISION_JOINTS
+                         local  const float[4] MESH_COLOR
+                         local  struct <anon>[2024] meshVertices
+                         local  struct <anon>[200] boneTransforms
+                         local  const struct <anon>* mesh
+                         local  const JointIdx* boneRemapping
+                         local  mat44flt* rootMtx
+                         local  int jointIdx
+                         local  int triangleIdx
+                         local  const const struct <anon>& triangle
+                         local  float[3][4] triVertices
+                         local  int triVertIdx
+                         local  const int meshVertIdx
+                         local  mat44flt* worldMtx
+                         local  mat44flt objectMtx
+                         local  vec4flt objectQuat
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaFunction, PR_vSetCurrentColor, PR_vSetCurrentUsage, vec4flt_Copy, vec_st
+  867    inline-only   static void renderCollisionHits(struct GenericActor* pActor)
+  875    inline-only   static void renderCollisionRays(struct GenericActor* pActor)
+  887    inline-only   static GenericActorTemplateData* findTemplate(const char* pActorType)
+                         local  GenericActorTemplateData* pt
+                         local  uint32 i
+  903  001372F0     90  static void releaseActor(struct GenericActor* pActor)
+                         local  struct twHashSubstitution* pTexSubst
+                         local  struct twHashSubstitution* pNext
+                         inlines  deallocateActor
+  923  00137380     BC  static void purgeActorList()
+                         local  struct GenericActor* pActor
+                         local  struct GenericActor* pThisActor
+  949    inline-only   static void freeActorTemplates()
+                         local  GenericActorTemplateData* pt
+                         local  uint32 i
+  971    inline-only   static struct GenericActor* allocateActor()
+                         local  struct GenericActor* pNewActor
+  984    inline-only   static void deallocateActor(struct GenericActor* pActor)
+  992    inline-only   static struct twHashSubstitution* allocateTextureSubst(const char* origTexID, const char* newTexID)
+                         local  struct twHashSubstitution* pNewTS
+ 1007  001372B4     3C  static void deallocateTextureSubst(struct twHashSubstitution* pSubst)
+ 1015  00137538      8  void GenericActor_SetTranslucency(struct GenericActor* pActor, float translucency)
+ 1027  00137540     28  void GenericActor_SetVisible(struct GenericActor* pActor, bool bVisible)
+ 1038  00136E40     64  bool GenericActor_GetVisible(struct GenericActor* pActor)
+ 1046  00137568     F4  int32_t GenericActor_GetActorsOfType(const char* pszTemplateName, struct GenericActor** ppActors, int nMaxResults)
+                         local  int32_t count
+                         local  struct GenericActor* pActor
+ 1065  0013765C     8C  struct GenericActor* GenericActor_GetActor(const char* pszCctID)
+                         local  struct GenericActor* pResult
+                         local  struct GenericActor* pActor
+ 1089  001376E8     1C  void GenericActor_SetPosition(struct GenericActor* pActor, const float* pos)
+ 1102  00165B40     D8  void GenericActor_SetRotation(struct GenericActor* pActor, float yaw, float pitch, float roll)
+                         local  mat44flt newModelMatrix
+                         inlines  LLMath_CopyMat44, LLMath_IdentifyMat, vec_ld, vec_st
+ 1118  00137704     70  void GenericActor_SetAnimationState(struct GenericActor* pActor, const char* pAnimName)
+ 1133  00137774    2B8  void GenericActor_AddTextureSubstitution(struct GenericActor* pActor, const char* origTexID, const char* newTexID)
+                         local  struct twHashSubstitution* pTexSubst
+                         local  struct twHashSubstitution* pPrevEntry
+                         local  struct twHashSubstitution* pTS
+                         inlines  allocateTextureSubst
+ 1194  00137A2C     6C  void GenericActor_PlaceFlag()
+                         local  const int NUM_FLAGS
+                         local  struct GenericActor*[1] apActors
+                         local  int nFlags
+ 1208  00137A98     48  struct GenericActor* GenericActor_GetActiveFlag()
+                         local  const int NUM_FLAGS
+                         local  struct GenericActor*[1] apActors
+                         local  int nFlags

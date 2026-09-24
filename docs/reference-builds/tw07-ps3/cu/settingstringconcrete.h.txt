@@ -1,0 +1,16 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/././settingstringconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   50  006229B4     44  const char8_t* GetIdentifier(const const struct <anon>* this)
+                         inlines  GetIdentifier
+   50  006229F8      8  bool IsEnabled(const const struct <anon>* this)
+   50  00622A00      C  void Enable(const struct <anon>* this)
+   50  00622A0C      C  void Disable(const struct <anon>* this)
+   50  00622A20      4  struct Setting* GetSettingInterface(const struct <anon>* this)
+   50  00627048     14  bool IsPersistent(const const struct <anon>* this)
+   53  00622A24      8  enum Type GetType(const const struct <anon>* this)
+   56  00622A2C     44  const char8_t* GetValue(const const struct <anon>* this)
+   58  00622A70      8  uint32_t GetMaxLength(const const struct <anon>* this)
+   59  00622A78      8  uint32_t GetMinLength(const const struct <anon>* this)
+   60  00622A80     44  const char8_t* GetDefault(const const struct <anon>* this)

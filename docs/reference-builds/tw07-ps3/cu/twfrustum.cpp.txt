@@ -1,0 +1,73 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/RenderObjects/twfrustum.cpp
+// compiled in: rnaunity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   58  004E0AC4   24E0  void ExtractFrustumPlanes(const struct <anon>* this, const struct <anon>& viewProjMatrix)
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  long int offset
+                         local  signed char[16] alignConstant
+                         local  Vector4Intrinsic_32 permConstant
+                         local  uint32_t i
+                         local  float_t mag
+                         local  int[4] zero
+                         local  int[4] zero
+                         inlines  A, AssertMacroHelper, B, C, D, VecFloat, operator float, operator(), operator=, vec_perm, vec_splat, vpu::Sqrt, vpu::operator*<VectorAxisX, VectorAxisX>, vpu::operator*<VectorAxisY, VectorAxisY>, vpu::operator*<VectorAxisZ, VectorAxisZ>, vpu::operator+, vpu::operator-, vpu::operator/<VectorAxisW>, vpu::operator/<VectorAxisX>, vpu::operator/<VectorAxisY>, vpu::operator/<VectorAxisZ>

@@ -1,0 +1,18 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_MenuTutorial.h
+// compiled in: apt_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   35  000FF2C0      C  uint32 UIMenuTutorial::GetSignature(const const struct UIMenuTutorial* this)
+   46    inline-only   int32 UIMenuTutorial::GetStartFrom(const struct UIMenuTutorial* this)
+   47    inline-only   int32 UIMenuTutorial::GetShotType(const struct UIMenuTutorial* this)
+   48    inline-only   int32 UIMenuTutorial::GetTutorialType(const struct UIMenuTutorial* this)
+   65  000FF2CC     14  void UIMenuTutorial::NotifyGetTitleText_func(struct IAptSubscriber* subs)
+   69  000FF2E8      C  struct IExternArray* UIMenuTutorial::GetExternArray(const struct UIMenuTutorial* this)
+   70  000FF2FC      8  int32 UIMenuTutorial::GetSizeofArrayStruct(const struct UIMenuTutorial* this)
+   71  001038D8     14  void UIMenuTutorial::UpdateItemAndLabel(const struct UIMenuTutorial* this, struct UIMenuItemBaseDst* dst, struct UIMenuItemBaseSrc* src, int32 index, char* inLabel)
+   72  001038F4     18  void UIMenuTutorial::UpdateItemAndLabelFlash(const struct UIMenuTutorial* this, struct UIMenuItemBaseDst* inMenuItem, int32 index, char* label)
+   80    inline-only   void UIMenuTutorial::SetNumItemsInLevel(const struct UIMenuTutorial* this, int iLevel, int iNumItems)
+   82    inline-only   bool UIMenuTutorial::GetShowTryThisTutorial(const const struct UIMenuTutorial* this)
+   83    inline-only   void UIMenuTutorial::SetShowTryThisTutorial(const struct UIMenuTutorial* this, bool val)
+   85    inline-only   void UIMenuTutorial::SetAlreadyShownFlag(const struct UIMenuTutorial* this, bool bFlag)
+   86    inline-only   bool UIMenuTutorial::IsAlreadyShownCauseUserFlagAintWorking(const struct UIMenuTutorial* this)

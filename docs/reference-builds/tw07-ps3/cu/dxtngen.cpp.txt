@@ -1,0 +1,204 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/dxtngen.cpp
+// compiled in: other_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   51    inline-only   static void gputi(void* dst, unsigned int data, int bytes)
+  189    inline-only   static unsigned int GetNoise(Palette* palette, Colour25* dstColours, int paletteSize)
+                         local  unsigned int noise
+                         local  int r
+                         local  int g
+                         local  int b
+                         local  int i
+                         local  Colour25 colour25_1
+                         local  Colour25 colour25_2
+  226    inline-only   static unsigned int GetVariation(Palette* palette, unsigned char paletteSize)
+                         local  int totalr
+                         local  int totalg
+                         local  int totalb
+                         local  int i
+                         local  Colour25 colour25
+  253    inline-only   static unsigned char GetClosestEncoding3(Colour25 colour1, Colour25 colour2, Colour25 colour3, Colour25 srcColour)
+                         local  int minDiff
+                         local  int diff
+                         local  unsigned char closestEncoding
+  291    inline-only   static unsigned char GetClosestEncoding4(Colour25 colour1, Colour25 colour2, Colour25 colour3, Colour25 colour4, Colour25 srcColour)
+                         local  int minDiff
+                         local  int diff
+                         local  unsigned char closestEncoding
+  406    inline-only   static int DxtEncodeBlock(const DxtEncodeParams* params, const DxtEncodeBlockParams* block)
+                         local  int blockSize
+                         local  unsigned char[16] indices
+                         local  Palette[16] palette
+                         local  unsigned char numColours
+                         local  int hasTransparent
+                         local  Colour25[16] srcColours
+                         local  Colour25[16] dstColours
+                         local  Colour25 bestColour1
+                         local  Colour25 bestColour2
+                         local  unsigned char[16] curEncodings
+                         local  unsigned char[16] bestEncodings
+                         local  unsigned int bestNoise
+                         local  unsigned int dwEncodings
+                         local  unsigned char* outPtr
+                         local  short unsigned int tempIndex
+                         local  int i
+                         local  int j
+                         local  RawTexture_PixelValue temp32
+                         local  Colour25 tempColour
+                         local  int alreadyInPalette
+                         local  int transparent
+                         local  unsigned char k
+                         local  short unsigned int colour1
+                         local  short unsigned int colour2
+                         local  Colour25 tempColour25
+                         local  unsigned int variation
+                         local  unsigned int m
+                         local  unsigned int n
+                         local  Colour25 curColour1
+                         local  Colour25 curColour2
+                         local  Colour25 interpolant1
+                         local  Colour25 interpolant2
+                         local  Colour25 interpolant
+                         local  short unsigned int colour1
+                         local  short unsigned int colour2
+                         local  Colour25 tempColour25
+                         local  short unsigned int tempColour
+                         local  unsigned char closestEncoding
+                         local  Colour25 prevColour
+                         local  Colour25 curSrcColour
+                         local  unsigned int noise
+                         local  unsigned int i
+                         local  unsigned int noise
+                         local  Colour25 tempColour25
+                         local  unsigned int i
+                         local  Colour25 palColour
+                         local  short unsigned int closestEncoding
+                         local  short unsigned int alphaRow
+                         local  int i
+                         local  unsigned char a0
+                         local  unsigned char a1
+                         local  unsigned char a2
+                         local  unsigned char a3
+                         local  bool interp6
+                         local  int minAlpha
+                         local  int maxAlpha
+                         local  int[8] alpha
+                         local  uint64 blockOut
+                         local  int i
+                         local  int j
+                         local  uint8_t alpha
+                         local  int i
+                         local  int j
+                         local  int curAlpha
+                         local  int best
+                         local  int bestDiff
+                         local  int k
+                         local  int diff
+                         local  int i
+                         local  unsigned char encode
+  925  00432338   1AEC  static void DxtEncodeBlockRow(DxtEncodeParams* params, int y)
+                         local  int x
+                         local  DxtEncodeBlockParams block
+                         local  unsigned char* pixelIn
+                         local  int i
+                         local  int j
+                         local  RawTexture_PixelValue temp32
+                         local  Colour25 tempColour
+                         local  int alreadyInPalette
+                         local  int transparent
+                         local  unsigned char k
+                         local  int i
+                         local  unsigned char encode
+                         local  unsigned int variation
+                         local  unsigned int m
+                         local  unsigned int n
+                         local  Colour25 curColour1
+                         local  Colour25 curColour2
+                         local  Colour25 interpolant1
+                         local  Colour25 interpolant2
+                         local  Colour25 interpolant
+                         local  short unsigned int colour1
+                         local  short unsigned int colour2
+                         local  unsigned char closestEncoding
+                         local  Colour25 prevColour
+                         local  Colour25 curSrcColour
+                         local  unsigned int noise
+                         local  unsigned int i
+                         local  unsigned int noise
+                         local  short unsigned int alphaRow
+                         local  int i
+                         local  unsigned char a0
+                         local  unsigned char a1
+                         local  unsigned char a2
+                         local  unsigned char a3
+                         local  unsigned int i
+                         local  Colour25 palColour
+                         local  short unsigned int closestEncoding
+                         local  Colour25 colour25_1
+                         local  Colour25 colour25_2
+                         local  Colour25 colour25_1
+                         local  Colour25 colour25_2
+                         local  Colour25 colour25
+                         local  bool interp6
+                         local  int minAlpha
+                         local  int maxAlpha
+                         local  int[8] alpha
+                         local  uint64 blockOut
+                         local  int i
+                         local  int j
+                         local  int i
+                         local  int j
+                         local  int curAlpha
+                         local  int best
+                         local  int bestDiff
+                         local  int k
+                         local  int diff
+                         local  short unsigned int colour1
+                         local  short unsigned int colour2
+                         local  uint8_t alpha
+                         local  Colour25 colour25
+                         inlines  DxtEncodeBlock, DxtSwap, GetClosestEncoding3, GetClosestEncoding4, GetNoise, GetVariation, gputi
+  949    inline-only   static void DxtEncodeBlocks(DxtEncodeParams* params)
+                         local  int blockInStride
+                         local  int y
+  972  004344D0    24C  static void DxtEncodeBlocksJobManager(unsigned int TAG, void* data, unsigned int dataSize)
+                         local  const unsigned int READ_TAG
+                         local  const unsigned int WRITE_TAG
+                         local  DxtEncodeParams* params
+                         local  int blockInStride
+                         local  unsigned char*[2] localDataIn
+                         local  unsigned char*[2] localDataOut
+                         local  unsigned char[2][32768] staticLocalDataIn
+                         local  unsigned char[2][8192] staticLocalDataOut
+                         local  int curBuf
+                         local  int nextBuf
+                         local  int i
+                         local  int y
+                         local  int i
+ 1068  00414C48     A8  void DxtEncodeInitOnce()
+                         local  struct <anon> mp
+                         inlines  Allocator::GetTempAllocator
+ 1100  00433F0C    570  int DxtEncodeData(void* dataOut, unsigned int dataOutStride, const void* dataIn, unsigned int dataInStride, int width, int height, const TextureDXTnType texelType, bool allowAlpha, float alphaRef, int quality)
+                         local  DxtEncodeParams* params
+                         local  const int MAX_DXTNGEN_JOBS
+                         local  LLJob*[4] job
+                         local  DxtEncodeParams*[4] jobParams
+                         local  int numJobs
+                         local  int nextJob
+                         local  int jobIncrement
+                         local  int use_spu
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+                         inlines  DxtEncodeBlocks
+ 1232  0043447C     54  int DxtCompressBlock(void* dst, const void* src, TextureDXTnType type)
+ 1237  00433E24     E8  int DxtCompressBlock_NoSPU(void* dataOut, void* dataIn, TextureDXTnType texelType)
+                         local  unsigned int dataOutStride
+                         local  unsigned int dataInStride
+                         local  int width
+                         local  int height
+                         local  bool allowAlpha
+                         local  float alphaRef
+                         local  DxtEncodeParams* params

@@ -1,0 +1,38 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_ESPNNewsDetail.cpp
+// compiled in: apt_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   35  000F6994     A8  void UIESPNNewsDetail::UIESPNNewsDetail(const struct UIESPNNewsDetail* this)
+                         inlines  TAptArrayStruct, TArrayInternal<UIESPNNewsDetail::DstMenuItem_esnd,AptStructSwapper>::TArrayInternal, TArrayInternal<char*,AptStructSwapper>::TArrayInternal, TExternArray<UIESPNNewsDetail::DstMenuItem_esnd>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   39  000F0058     A0  void UIESPNNewsDetail::Init(const struct UIESPNNewsDetail* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   57  000D8550     78  void UIESPNNewsDetail::Close(const struct UIESPNNewsDetail* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<char*,AptStructSwapper>::Flush
+   64  000B43B8    3AC  void UIESPNNewsDetail::Show(const struct UIESPNNewsDetail* this)
+                         local  const char[5] __FUNCTION__
+                         local  int i
+                         local  char** szText
+                         inlines  AptStructSwapper::Swap, TArrayInternal<char*,AptStructSwapper>::Push, TagValuePair, UIMenuVertBase::SetNumVisibleVertRows, operator+
+   94  00046C24     48  void UIESPNNewsDetail::OnShow(const struct UIESPNNewsDetail* this)
+  110  000D85C8     C8  void UIESPNNewsDetail::Hide(const struct UIESPNNewsDetail* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<char*,AptStructSwapper>::Flush
+  129  00046C6C      4  void UIESPNNewsDetail::OnHide(const struct UIESPNNewsDetail* this)
+  133  000BD544     A4  void UIESPNNewsDetail::UpdateItemAndLabel(const struct UIESPNNewsDetail* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_esnd* dest
+                         inlines  TArrayInternal<char*,AptStructSwapper>::operator[]
+  145  00085A48     F8  enum eAptHandleInput UIESPNNewsDetail::HandleInput(const struct UIESPNNewsDetail* this, int32 cID)
+  178  000BD5E8    4A0  void UIESPNNewsDetail::UpdateNewsDetail(const struct UIESPNNewsDetail* this, const char* szDetail)
+                         local  const char[17] __FUNCTION__
+                         local  int index
+                         local  char* szLine
+                         local  int iNumCharsPerLine
+                         local  char* szNextLine
+                         local  int i
+                         local  char** szText
+                         inlines  AptStructSwapper::Swap, TArrayInternal<char*,AptStructSwapper>::Push, TArrayInternal<char*,AptStructSwapper>::operator[], TagValuePair, operator+
+  252  0005C0A8    1EC  void UIESPNNewsDetail::AddImage(const struct UIESPNNewsDetail* this, uint32 iTextureWidth, uint32 iTextureHeight, const uint8* pImageSrc)
+                         local  const char[9] __FUNCTION__
+                         local  uint8* pScaleToFitData
+                         local  struct TextureLockInfo lockInfo
+                         local  void* pData
+                         inlines  TagValuePair, operator+

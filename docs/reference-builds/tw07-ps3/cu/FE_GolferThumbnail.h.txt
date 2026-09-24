@@ -1,0 +1,10 @@
+// ../../../../../TIGERCODE/Code/Golf/UI_Core/Frontend/Headers/FE_GolferThumbnail.h
+// compiled in: apt_unity.cpp, other_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   20  00021AC0     40  void FEGolferThumbnail::FEGolferThumbnail(const struct FEGolferThumbnail* this)
+   21  00021B94     68  void FEGolferThumbnail::~FEGolferThumbnail(const struct FEGolferThumbnail* this)
+                         local  int32 i
+   31    inline-only   void FEGolferThumbnail::SetPendingSnapFlag(const struct FEGolferThumbnail* this, bool bSnapIsPending)
+   32    inline-only   bool FEGolferThumbnail::GetPendingSnapFlag(const struct FEGolferThumbnail* this)
+   34    inline-only   TextureRef FEGolferThumbnail::GetTextureRef(const const struct FEGolferThumbnail* this, enum UserNumber whichPlayer)

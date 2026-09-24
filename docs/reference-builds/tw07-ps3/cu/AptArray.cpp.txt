@@ -1,0 +1,35 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptArray.cpp
+// compiled in: other_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   44  003EEF68    138  void AptArray::_reserve(const struct AptArray* this, int nSize)
+                         local  int nCapSize
+                         local  struct AptValue** _aArray
+   71  0045F7CC    134  void AptArray::set(const struct AptArray* this, int nIndex, struct AptValue* pValue)
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount
+   88  003EECC4     50  struct AptValue* AptArray::get(const struct AptArray* this, int nIndex)
+   95  00467DC4     F0  uint32 AptArray::toString(const const struct AptArray* this, char* szBuf, uint32 szBufLen, const char* szSeparator)
+                         local  uint32 bufPos
+                         local  int i
+                         local  char[256] valueBuf
+                         local  const char* pValueStr
+  125  004701D0    850  void AptArray::toString(const const struct AptArray* this, const AptNativeString& sBuf, const char* szSeparator)
+                         local  const char* s
+                         local  int i
+                         local  AptNativeString sVal
+                         local  char[16] s
+                         local  char* currentEnd
+                         local  char* currentEnd
+                         inlines  BasicString, Capacity, Copy, Copy<char*, char*>, DoingSmallStringOptimization, Swap, UseCapacity, operator+=, operator+=<AptStringPolicy>, operator=, ~BasicString
+  145  00424440    140  struct AptValue* AptArray::objectMemberLookup(const struct AptArray* this, struct AptValue* pContext, const char* szName)
+                         local  char* pEnd
+                         local  int nRet
+                         local  int nLen
+                         local  struct AptValue* pRet
+                         inlines  AptInteger::AptInteger, AptInteger::operator new
+  210    inline-only   static int _isIndex(const char* szName)
+                         local  int nNum
+  221  0045F900     E8  int AptArray::objectMemberSet(const struct AptArray* this, struct AptValue* pContext, const char* szName, struct AptValue* pValue)
+                         local  int nNum
+                         inlines  _isIndex, std::atoi

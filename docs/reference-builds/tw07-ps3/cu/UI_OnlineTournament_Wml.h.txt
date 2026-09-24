@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_OnlineTournament_Wml.h
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   21  00118A9C    160  void UIOnlineTournament_Wml::~UIOnlineTournament_Wml(const struct UIOnlineTournament_Wml* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIOnlineTournament_Wml::DstMenuItem_olwm>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+   23  000FFB40      C  uint32 UIOnlineTournament_Wml::GetSignature(const const struct UIOnlineTournament_Wml* this)
+   28  000FFB4C     44  void UIOnlineTournament_Wml::ShowHelpText(const struct UIOnlineTournament_Wml* this)
+   31  000FFB98      C  struct IExternArray* UIOnlineTournament_Wml::GetExternArray(const struct UIOnlineTournament_Wml* this)

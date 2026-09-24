@@ -1,0 +1,17 @@
+// ../../../../../TIGERCODE/Code/AptInterface/AptPackage/_AptString.h
+// compiled in: other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   20    inline-only   void* operator new [](size_t size, void* addr, struct UniqueAptTypeToDisambiguiateOperatorNew )
+   36    inline-only   char* ReAlloc<char>(const char* ptr, int oldNum, int newNum)
+                         local  struct UniqueAptTypeToDisambiguiateOperatorNew uniqueType
+                         local  char* ret
+                         local  int numElem
+                         local  char* dst
+                         local  int i
+   36    inline-only   short unsigned int* ReAlloc<short unsigned int>(const short unsigned int* ptr, int oldNum, int newNum)
+                         local  struct UniqueAptTypeToDisambiguiateOperatorNew uniqueType
+                         local  short unsigned int* ret
+                         local  int numElem
+                         local  short unsigned int* dst
+                         local  int i

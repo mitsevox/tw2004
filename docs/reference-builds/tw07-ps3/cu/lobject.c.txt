@@ -1,0 +1,27 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/lua-5.0.2/src/lobject.c
+// compiled in: lobject.c
+// 8 functions, source order. line | PS3 address | size
+
+   37  0054979C     3C  int luaO_int2fb(unsigned int x)
+                         local  int m
+   47  005497D8     BC  int luaO_log2(unsigned int x)
+                         local  const lu_byte[255] log_8
+   74  00549894     90  int luaO_rawequalObj(const TObject* t1, const TObject* t2)
+   92  00549924     D4  int luaO_str2d(const char* s, lua_Number* result)
+                         local  char* endptr
+                         local  lua_Number res
+  104  005499F8     9C  static void pushstr(lua_State* L, const char* str)
+                         local  TObject* i_o
+  111  00549A94    298  const char* luaO_pushvfstring(lua_State* L, const char* fmt, va_list argp)
+                         local  int n
+                         local  const char* e
+                         local  TObject* i_o
+                         local  TObject* i_o
+                         local  TObject* i_o
+                         local  char[2] buff
+  153  00549D2C     44  const char* luaO_pushfstring(lua_State* L, const char* fmt)
+                         local  const char* msg
+                         local  va_list argp
+  163  00549D70    208  void luaO_chunkid(char* out, const char* source, int bufflen)
+                         local  int len
+                         local  int l

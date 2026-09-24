@@ -1,0 +1,7 @@
+// C:/packages/rwaudiocore/2.08.01/include/rw/audio/core/encoder.h
+// compiled in: encoderregistry.cpp
+// 3 functions, source order. line | PS3 address | size
+
+  211    inline-only   void Encoder::SetSystem(const struct Encoder* this, struct <anon>* system)
+  248    inline-only   void Encoder::SetChannels(const struct Encoder* this, int numChannels)
+  253    inline-only   void Encoder::SetSampleRate(const struct Encoder* this, int sampleRate)

@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/Code/Headgate/SOURCE/Game/Engine/CRManager.h
+// compiled in: rnaunity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   57    inline-only   struct CRShadowMap* CRManager::GetCRShadowMap(const struct CRManager* this)
+   60    inline-only   struct CRCloudShadows* CRManager::GetCRCloudShadows(const struct CRManager* this)
+   85    inline-only   void CRManager::SetSunPosition(const struct CRManager* this, float x, float y, float z)
+   86    inline-only   float[4]& CRManager::GetSunPosition(const struct CRManager* this)

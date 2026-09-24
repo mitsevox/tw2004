@@ -1,0 +1,25 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/Headers/GameMode_HitTheBaskets.h
+// compiled in: golf_unity.cpp
+// 21 functions, source order. line | PS3 address | size
+
+   21  0033F37C      8  enum PlayerNumber_t GameModeHitTheBaskets::GetHonors(const struct GameModeHitTheBaskets* this, enum PlayerNumber_t ignore, bool doNotIgnoreHoledOut)
+   29  0033F384      8  bool GameModeHitTheBaskets::SkipPreShotAnimation(const struct GameModeHitTheBaskets* this)
+   36  0033F38C      8  bool GameModeHitTheBaskets::GoToGreenSelection(const struct GameModeHitTheBaskets* this)
+   38  0033F394      8  bool GameModeHitTheBaskets::IsGreenSelectionEnabled(const const struct GameModeHitTheBaskets* this)
+   39  0033F39C      8  bool GameModeHitTheBaskets::IsCupSelectionEnabled(const const struct GameModeHitTheBaskets* this)
+   40  0033F3A4      8  bool GameModeHitTheBaskets::IsPlaceBallEnabled(const const struct GameModeHitTheBaskets* this)
+   43  0033F3AC      8  bool GameModeHitTheBaskets::UseCupPosForInitialPlaceBallPos(const const struct GameModeHitTheBaskets* this)
+   46  0033F3B4      8  enum UIScoreCardDispMode_t GameModeHitTheBaskets::GetScoreDisplayMode(const struct GameModeHitTheBaskets* this, bool getAlternate)
+   50  0033F3BC      8  bool GameModeHitTheBaskets::PopulateScoreCardUI(const struct GameModeHitTheBaskets* this)
+   58    inline-only   int GameModeHitTheBaskets::GetBasketsToPass(const struct GameModeHitTheBaskets* this)
+   59    inline-only   int GameModeHitTheBaskets::GetBasketsPassed(const struct GameModeHitTheBaskets* this)
+   60    inline-only   int GameModeHitTheBaskets::GetLimit(const struct GameModeHitTheBaskets* this)
+   61    inline-only   int GameModeHitTheBaskets::GetBallsUsed(const struct GameModeHitTheBaskets* this)
+   64  0033F3C4      8  bool GameModeHitTheBaskets::IsShotClockForSinglePlayer(const struct GameModeHitTheBaskets* this)
+   65  0033F3CC      8  bool GameModeHitTheBaskets::IsShotClockPermanent(const struct GameModeHitTheBaskets* this)
+   66  0033F3D4      8  bool GameModeHitTheBaskets::ResetShotClockAfterEachHit(const struct GameModeHitTheBaskets* this)
+   69  0033F3DC      8  bool GameModeHitTheBaskets::IsTimedMode(const struct GameModeHitTheBaskets* this)
+   77  0033F3E4      8  bool GameModeHitTheBaskets::ShowShotHistory(const struct GameModeHitTheBaskets* this)
+   80  0033F3EC      8  bool GameModeHitTheBaskets::ShowShotInfo(const struct GameModeHitTheBaskets* this)
+   83  0033F3F4      8  int8 GameModeHitTheBaskets::GetStateAfterBallLands(const struct GameModeHitTheBaskets* this, enum PlayerNumber_t PlayerID)
+  170    inline-only   bool GameModeHitTheBaskets::UsingTimeLimit(const const struct GameModeHitTheBaskets* this)

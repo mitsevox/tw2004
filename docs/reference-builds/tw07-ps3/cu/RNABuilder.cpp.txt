@@ -1,0 +1,101 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnax/source/RNAX/RNABuilder.cpp
+// compiled in: RNABuilder.cpp
+// 37 functions, source order. line | PS3 address | size
+
+    0  008480C4    1A4  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  GetRow, Matrix44, Quaternion, Set, Vector2, Vector3, Vector4
+    0  00848DDC     2C  void ~StreamTargetC(const struct <anon>* this)
+   91  00846640     50  void StreamTargetC(const struct <anon>* this, struct DeviceC* pDevice)
+   97  008466E0      C  void SetStream(const struct <anon>* this, struct StreamC* pStream, uint32_t uMaxVertices)
+  103  00847AB8    1D0  void Begin(const struct <anon>* this, struct <anon>* pVertexFormat, uint8_t*(*)()* pFlushVertexFunc)
+                         local  const char[6] __FUNCTION__
+                         local  void* pData
+                         inlines  BuilderTargetC::ResetVertexCounter, RNADebugBreak, StreamC::GetPlatform
+  140  00846898     44  void Flush(const struct <anon>* this)
+                         local  const char[6] __FUNCTION__
+                         inlines  RNADebugBreak
+  146  0084790C    1AC  void End(const struct <anon>* this)
+                         local  const char[4] __FUNCTION__
+                         local  void* pData
+                         inlines  RNADebugBreak, StreamC::GetPlatform
+  184  008466EC     F4  bool8_t CreateVertexFormat(const struct <anon>* this, const struct <anon>& vf, int32_t iStream)
+                         local  int32_t eName
+                         local  uint32_t iIndex
+                         local  enum ElementFormatE eFormat
+                         inlines  GetFormat
+  211  008467E0     50  void Reset(const struct <anon>* this)
+  217  00846830     34  void ResetFormat(const struct <anon>* this)
+  321  0084686C      C  void ResetVertexState(const struct <anon>* this)
+  345  00846864      8  void SetAllocator(const struct <anon>* this, struct ICoreAllocator* pAllocator)
+  372  008468DC     BC  void SetPrimTarget(const struct <anon>* this, enum PrimTypeE ePrimType, struct BuilderTargetC* pTarget)
+                         local  const char[14] __FUNCTION__
+                         inlines  RNADebugBreak
+  417  00846878     14  void SetTempBuffer(void* pBuffer, uint32_t uBufferSize)
+  449  00846EC8     D8  void BeginGeom(const struct <anon>* this, uint32_t uMaxMeshes, struct UserData* pUserData, uint32_t uGeomFlags)
+                         inlines  GeomC::GetClassAllocator, GeomC::operator new
+  473  00846D40    188  void BeginGeom(const struct <anon>* this, struct GeomC* pGeom)
+                         local  const char[10] __FUNCTION__
+                         inlines  RNADebugBreak
+  508  00846FA0    130  struct GeomC* EndGeom(const struct <anon>* this)
+                         local  const char[8] __FUNCTION__
+                         local  struct GeomC* pGeom
+                         inlines  RNADebugBreak
+  540  00846998     90  void AddMesh(const struct <anon>* this, struct MeshC* pMesh)
+                         local  const char[8] __FUNCTION__
+                         inlines  RNADebugBreak
+  566  008470D0     F8  void SetMaterial(const struct <anon>* this, int32_t iMaterial)
+                         local  const char[12] __FUNCTION__
+                         inlines  RNADebugBreak
+  602  00847328     E8  void BeginMesh(const struct <anon>* this, enum PrimTypeE ePrimType, uint32_t uMaxStreams, struct UserData* pUserData, uint32_t uMeshFlags)
+                         inlines  MeshPlatC::GetClassAllocator, MeshPlatC::operator new
+  626  008471C8    160  void BeginMesh(const struct <anon>* this, struct MeshC* pMesh)
+                         local  const char[10] __FUNCTION__
+                         inlines  RNADebugBreak
+  664  00847C88    29C  void AddStream(const struct <anon>* this, struct StreamC* pStream, struct <anon>* pStreamFormat, uint32_t uNumVerticesUsed)
+                         local  const char[10] __FUNCTION__
+                         local  int32_t iStream
+                         local  int32_t iStreamElement
+                         local  int32_t nPrims
+                         local  const struct ElementT* pElement
+                         inlines  GetElement, RNADebugBreak
+  725  00847590    37C  void AddIndices(const struct <anon>* this, struct IndicesC* pIndices)
+                         local  const char[11] __FUNCTION__
+                         local  int32_t iNumIndices
+                         local  int32_t iPrimCount
+                         inlines  IndicesC::GetNumIndices, RNADebugBreak
+  794  00847410    180  struct MeshC* EndMesh(const struct <anon>* this)
+                         local  const char[8] __FUNCTION__
+                         local  struct MeshC* pMesh
+                         inlines  RNADebugBreak
+  851  00848510     B4  void BeginStream(const struct <anon>* this)
+                         inlines  StreamPlatC::GetClassAllocator, StreamPlatC::operator new
+  879  00848450     C0  void BeginStream(const struct <anon>* this, uint32_t uNumVertices)
+                         inlines  StreamPlatC::GetClassAllocator, StreamPlatC::operator new
+  909  00848288    1C8  void BeginStream(const struct <anon>* this, struct StreamC* pStream, uint32_t uNumVertices)
+                         local  const char[12] __FUNCTION__
+                         inlines  RNADebugBreak, operator=
+  945  00847F24    150  struct StreamC* EndStream(const struct <anon>* this)
+                         local  const char[10] __FUNCTION__
+                         local  struct StreamC* pStream
+                         local  struct <anon>* pVertexFormat
+                         local  uint32_t uVertexCount
+                         inlines  BuilderTargetC::GetVertexFormat, RNADebugBreak, operator RNA::StreamC*, operator=
+ 1011  0084688C      C  void SetVertexFormat(const struct <anon>* this, struct <anon>* pVertexFormat, uint8_t*(*)()* pFlushVertexFunc)
+ 1040  00846A28     DC  void BeginTarget(const struct <anon>* this, struct BuilderTargetC* pTarget)
+                         local  const char[12] __FUNCTION__
+                         inlines  RNADebugBreak
+ 1076  00846B04     9C  void EndTarget(const struct <anon>* this)
+                         local  const char[10] __FUNCTION__
+                         inlines  RNADebugBreak
+ 1106  00846BA0    10C  void FlushVertex(const struct <anon>* this)
+                         local  const char[12] __FUNCTION__
+                         inlines  RNADebugBreak
+ 1148  00846CAC     94  void FlushPrim(const struct <anon>* this)
+                         local  const char[10] __FUNCTION__
+                         inlines  RNADebugBreak
+ 1184  008485C4    210  void Begin(const struct <anon>* this, enum PrimTypeE ePrimType)
+                         local  const char[6] __FUNCTION__
+                         inlines  RNADebugBreak
+ 1239  00848074     50  void End(const struct <anon>* this)
+ 1253  00848278     10  static void _GLOBAL__I__ZN4RNAX13StreamTargetCC2EPN3RNA7DeviceCE()
+ 1254  00848268     10  static void _GLOBAL__D__ZN4RNAX13StreamTargetCC2EPN3RNA7DeviceCE()

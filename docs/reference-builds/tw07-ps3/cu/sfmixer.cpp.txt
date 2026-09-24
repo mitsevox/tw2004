@@ -1,0 +1,16 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/sfmixer.cpp
+// compiled in: sfmixer.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   45  006F4EA8    174  int SFILTER_mixer(void* pstate, int frames, void* psrcp, void* pdstp, int requester)
+                         local  MIXERSTATE* pms
+                         local  int totalbufsize
+                         local  int retframes1
+                         local  int retframes2
+                         local  float* pdst
+                         local  int i
+                         inlines  SNDMEMI_alloc, SNDMEMI_free
+  117  006F4E28     48  void SFILTER_mixerrestore(void* pstate)
+                         local  MIXERSTATE* pms
+                         inlines  SNDMEMI_free
+  129  006F4E70     38  int SFILTER_createMIX(MIXERSTATE* pms)

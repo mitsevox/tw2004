@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/Headers/texturergb5a3.h
+// compiled in: other_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   42  004A7470      8  void* TextureRGB5A3::PrepareTextureForBlend(const struct TextureRGB5A3* this, enum TXRBlendRule_Mode blendMode, float lerpVal, int32_t texNum)
+   43  004A7478      4  void TextureRGB5A3::RestoreTextureFromBlend(const struct TextureRGB5A3* this, enum TXRBlendRule_Mode blendMode, float lerpVal, void* dataStorage)

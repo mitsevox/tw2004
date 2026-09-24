@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Shared/StringHash/StringHash.h
+// compiled in: other_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  212    inline-only   bool SH_boCheckHashedStringValidity(SH_THashedString* tpHashedString_p)
+  233  004A7534    108  int32 SH_iCompareHashedStrings(SH_THashedString* tpHashedString1_p, SH_THashedString* tpHashedString2_p)

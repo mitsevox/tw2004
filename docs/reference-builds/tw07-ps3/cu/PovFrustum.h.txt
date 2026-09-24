@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Spectator/PovFrustum.h
+// compiled in: golf2_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   89    inline-only   void CPovPlane::Set(const struct CPovPlane* this, const float a, const float b, const float c, const float d)
+   92    inline-only   float CPovPlane::GetDistance(const struct CPovPlane* this)
+   95    inline-only   struct CPovVector3& CPovPlane::GetNormal(const struct CPovPlane* this)
+  101    inline-only   void CPovPlane::Normalize(const struct CPovPlane* this)
+                         local  float len

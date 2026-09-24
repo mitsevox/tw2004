@@ -1,0 +1,51 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/aptInterface/uiRender.cpp
+// compiled in: other_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   55  003F6878     28  uint32_t GetStencilRefValue()
+   63  00481E24    150  void AptSetgScaleMatrix(void* renderingUnit)
+                         local  struct AptRUFile_t* aptRUFile
+                         local  struct AptInfo_t* aptInfo
+                         local  const enum eAptScreenRegistration sc
+                         inlines  AptAnimations::GetAptInfo, AptInfo_t::GetScreenRegistration
+   82    inline-only   void AptColorTransform(float* rgba)
+  108    inline-only   void AptColorTransform(float r, float g, float b, float a, float* rgba)
+  121    inline-only   void AptColorTransform(const uint32_t& color)
+                         local  vec4flt rgba
+  165  004778A8    11C  void AptSetRendererTo2dMode()
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetColorWriteEnable, DS_vSetCullMode, DS_vSetStencilEnable, DS_vSetZTestEnable, PR_vSetCurrentColor, PR_vSetCurrentUsage, ScreenEffects::SetRecoverRenderStatesMode
+  197  0048858C    160  void AptSetRendererTo3dMode()
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetColorWriteEnable, DS_vSetStencilEnable, DS_vSetStencilOp, DS_vSetStencilTest, DS_vSetStencilWriteMask, DS_vSetZBufferMode, DS_vSetZTestEnable, SM_NoteActiveShader, ScreenEffects::SetRecoverRenderStatesMode
+  229  004889E0    108  void AptSetRendererTo3dMode_KeepStencil()
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetColorWriteEnable, DS_vSetZBufferMode, DS_vSetZTestEnable, SM_NoteActiveShader, ScreenEffects::SetRecoverRenderStatesMode
+  256  00477D2C    10C  void AptSetRendererTo2dMode_KeepStencil()
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetColorWriteEnable, DS_vSetCullMode, DS_vSetZTestEnable, PR_vSetCurrentColor, PR_vSetCurrentUsage, ScreenEffects::SetRecoverRenderStatesMode
+  288  00484188    214  void Apt_GetRectFromRenderingUnit(void* renderingUnit, const float& x0, const float& y0, const float& x1, const float& y1)
+                         local  mat44flt PR_gxMatrix2D_Ivert
+                         local  mat44flt kTempMatrix
+                         local  mat44flt kResultMatrix
+                         local  struct AptRUFile_t* aptRUFile
+                         local  const struct AptFillStyles& styles
+                         local  struct AptStyleTxtGrp* fillStyle
+                         local  float* strips
+                         local  const int32_t nbr
+                         local  struct vtxStruct* vertexStrip
+                         local  const float X1
+                         local  const float Y1
+                         local  const float X2
+                         local  const float Y2
+                         local  vec4flt p0
+                         local  vec4flt p1
+                         local  const float x
+                         local  const float y
+                         inlines  AptFillStyles::GetStypeTxtGrp, AptFillStyles::GoToFirstStyle, AptStyleTxtGrp::GetStripList
+  337  004840C4     C4  void APT_UVRenderingUnitCenter(AptAssetRenderingUnit renderingUnit, const float& u, const float& v)
+                         local  mat44flt kResultMatrix
+                         local  vec4flt p1
+  365  00453B80    5B0  void APT_MaskingOperation(enum AptMaskRenderOperation eMaskOperation, int32_t maskingLevel)
+                         local  const uint32_t newMaskValue
+                         local  const uint32_t newMaskValue
+                         inlines  DS_vSetColorWriteEnable, DS_vSetStencilEnable, DS_vSetStencilOp, DS_vSetStencilTest, DS_vSetStencilWriteMask
+  535  003F68A0     7C  void AptCreate2DRect(vec4flt* xpVertices_p, vec4flt* xpUVs_p, float fRectLeft_p, float fRectTop_p, float fRectRight_p, float fRectBottom_p, float fZ)
+  575  00484038     8C  void aptCustomControlRender(char* szType, char* szTarget, AptAssetRenderingUnit renderingUnit, const char* szCustomProperties, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+  582  0047C7BC     60  void aptCustomControlRenderNeeds(char* szType, int32_t* needTarget, int32_t* needCustomProp, int32_t* needMatrix)

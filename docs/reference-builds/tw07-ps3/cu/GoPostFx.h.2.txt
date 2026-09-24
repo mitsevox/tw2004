@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/Hi-Rendering/Headers/GoPostFx.h
+// compiled in: golf_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+  172    inline-only   void PostFx_SetFade(bool on, int32 viewController, vec4flt* color)
+  173    inline-only   void PostFx_SetBlur(bool on, float shake, float blur, int32 viewController)
+  174    inline-only   void PostFx_SetFocus(bool on, float* color, bool blur, float x, float y, int32 viewController)
+  178    inline-only   void PostFx_Reset()
+  180    inline-only   void PostFx_AddTintToFullScreenNow(float* color)
+  182    inline-only   void PostFx_SetScreenDimmingPercentage(int32 viewController, float fPercent)

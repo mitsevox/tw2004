@@ -1,0 +1,32 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/SitDev/SitDevLog.c
+// compiled in: golf2_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   28  00131C58    104  static void SitDev_RetireFirstEntry()
+                         local  int i
+   47  00131D5C     A4  void SitDev_AddToScriptLog(char* string)
+   61  00131E00     70  bool SitDev_ToggleConditionDisplay(int condNum)
+                         local  uint32 bitmask
+                         local  int index
+   79  00131E70     D8  void SitDev_PrintConditionDisplayStatus()
+                         local  int i
+  108  00131F48     1C  char* SitDev_GetOperatorString(uint8 op)
+  113  001547B4    410  char* SitDev_GetConditionValueString(int conditionIndex, uint16 conditionValue)
+                         local  char* retString
+                         local  char[64] buf
+  329  00154BC4    120  void SitDev_PrintStateVector()
+                         local  int i
+                         local  bool bFirst
+                         local  char* str
+  353  0018D51C    21C  void SitDev_DisplayScriptLog()
+                         local  int i
+                         local  vec4flt textColor
+                         local  float textY
+                         local  bool first
+                         local  vec4flt xBackColor
+                         local  float[4][4] xpVertices
+                         inlines  DS_vSetAlphaEnable, PR_vFillVerticesWith2DRect, PR_vSetCurrentColor, PR_vSetCurrentUsage
+  415  00131180     68  void SitDev_PrintEvent(int situation)
+  443  00131F64     94  void SitDevPrintf(char* fmt)
+                         local  va_list arglist
+                         local  char[1025] s

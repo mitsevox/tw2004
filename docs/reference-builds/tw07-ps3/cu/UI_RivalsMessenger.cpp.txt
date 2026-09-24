@@ -1,0 +1,52 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_RivalsMessenger.cpp
+// compiled in: apt_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   41  000F9E00     78  void UIRivalsMessenger::UIRivalsMessenger(const struct UIRivalsMessenger* this)
+                         inlines  BoastChallengeResponseHandler::BoastChallengeResponseHandler
+   52  00033558     58  void UIRivalsMessenger::Init(const struct UIRivalsMessenger* this)
+   63  0006F314     F8  void UIRivalsMessenger::OnShow(const struct UIRivalsMessenger* this)
+  100  00088F78    158  enum eAptHandleInput UIRivalsMessenger::HandleInput(const struct UIRivalsMessenger* this, int32 cID)
+  151  0006F188     D0  void UIRivalsMessenger::RecordMaxChallenges(const struct UIRivalsMessenger* this)
+                         local  struct GameModeDriverEra* curRivalsGameDriver
+                         local  int32 numEvents
+                         local  bool firstEventFound
+                         local  int32 i
+                         inlines  GameModeDriverEra::GetNumEvents
+  179  0006F258     BC  void UIRivalsMessenger::FindNextMessageID(const struct UIRivalsMessenger* this)
+                         local  struct GameModeDriverEra* curRivalsGameDriver
+                         local  int32 numEvents
+                         local  int32 i
+                         inlines  GameModeDriverEra::GetNumEvents
+  197  00049FE8     B0  void UIRivalsMessenger::FindPrevMessageID(const struct UIRivalsMessenger* this)
+                         local  struct GameModeDriverEra* curRivalsGameDriver
+                         local  int32 numEvents
+                         local  int32 i
+                         inlines  GameModeDriverEra::GetNumEvents
+  215  00049E3C     E4  void UIRivalsMessenger::UpdateCurrentEventText(const struct UIRivalsMessenger* this)
+                         local  struct GameModeDriverEra* curRivalsGameDriver
+  237  00088CF0    194  void UIRivalsMessenger::NotifyPlayableEventId(const struct UIRivalsMessenger* this)
+                         local  struct GameModeDriver* gameModeDriver
+                         inlines  UserInfo::SetValid, cGAME_GLOBALS::SetNextGame
+  272  00088E84     54  void UIRivalsMessenger::OnSelectBoastChallenge(const struct UIRivalsMessenger* this, int32 id)
+  281  0007B368    13C  bool UIRivalsMessenger::GetAvailableBoastChallenges(const struct UIRivalsMessenger* this, int32 eventnum)
+                         local  struct GameModeDriverEra* curRivalsGameDriver
+                         local  int numAvailBoasts
+                         local  int32 i
+                         local  struct RivalsMessengerBoastYeah* src
+                         inlines  UIRivalsMenuVert::SetCurrentEventIDLookup
+  309  00049F20     C8  void UIRivalsMessenger::ManageBoastButton(const struct UIRivalsMessenger* this)
+                         local  bool bShowButton
+                         local  uint8[5] tempArray
+                         local  struct GameModeDriverEra* curRivalsGameDriver
+                         local  int numAvailBoasts
+  339  00088ED8     A0  void BoastChallengeResponseHandler::onClose(const struct BoastChallengeResponseHandler* this, void* inData)
+                         local  const int32 index
+  391  000F1194     80  void UIRivalsMenuVert::Init(const struct UIRivalsMenuVert* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init
+  400  0004A098      8  void UIRivalsMenuVert::ShowMenu(const struct UIRivalsMenuVert* this, struct UIResponseHandler* inpHandler, struct UIMenuItemBaseSrc* inMenuItemArray, int32 sizeMenu, int32 sizeofMenu, enum eMenuAllocType alloctype)
+  406  0004FCC4    220  void UIRivalsMenuVert::UpdateItemAndLabel(const struct UIRivalsMenuVert* this, struct UIMenuItemBaseDst* dstItem, struct UIMenuItemBaseSrc* srcItem, int32 index, char* label)
+                         local  struct RivalsMessengerBoastYeah* src
+                         local  struct RivalChChallengeItem1* dst
+                         local  struct GameModeDriverEra* curRivalsGameDriver
+                         local  char[16] moneyAmountString

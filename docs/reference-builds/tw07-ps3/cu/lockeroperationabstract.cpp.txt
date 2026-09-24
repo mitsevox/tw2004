@@ -1,0 +1,21 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/locker/source/common/lockeroperationabstract.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   70  005D9AC8     88  void CallCallback(const struct LockerOperationAbstract* this)
+  100  005D9B50     4C  bool OperationProcess(const struct LockerOperationAbstract* this, const struct Operation* )
+  137  005C9A28     3C  void OperationTimeout(const struct LockerOperationAbstract* this, const struct Operation* pOperation)
+  161  005C9A64     94  void OperationCancel(const struct LockerOperationAbstract* this, const struct Operation* )
+                         inlines  GetInstance
+  191  005C96C0     18  void MarkAsDone(const struct LockerOperationAbstract* this)
+  218  005C96D8     24  void MarkAsFailed(const struct LockerOperationAbstract* this, LockerApiErrorE eLockerError)
+  257  005F63E4    1EC  void LockerOperationCallback(LockerApiRefT* pLockerApi, LockerApiEventE eEvent, LockerApiFileT* pFile, void* )
+                         local  bool bCreateFile
+                         local  struct <anon> pSavedOperation
+                         inlines  RCPointer, operator=, ~RCPointer
+  319  005FDFB0     68  void LockerOperationAbstract(const struct LockerOperationAbstract* this)
+                         inlines  RCPointer
+  349  005FDE4C     7C  void ~LockerOperationAbstract(const struct LockerOperationAbstract* this)
+                         inlines  ~RCPointer
+  379  005C9AF8      4  void WriteData(const struct LockerOperationAbstract* this)
+  404  005C9AFC      4  void ReadData(const struct LockerOperationAbstract* this)

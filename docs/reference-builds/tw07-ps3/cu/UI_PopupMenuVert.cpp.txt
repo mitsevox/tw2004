@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_PopupMenuVert.cpp
+// compiled in: apt_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   31  000F0F2C     78  void UIPopupMenuVert::Init(const struct UIPopupMenuVert* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   41  00042300     74  void UIPopupMenuVert::ShowMenuVertPopup(const struct UIPopupMenuVert* this, struct UIResponseHandler* inpHandler, struct UIMenuItemBaseSrc* inMenuItemArray, int32 nbrElemsInMenu, char* popupMessageId)

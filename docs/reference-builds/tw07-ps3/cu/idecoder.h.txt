@@ -1,0 +1,6 @@
+// ../../../../packages/rwmovie/1.04.01/include/rwmovie/idecoder.h
+// compiled in: golf2_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   33  001E7E70     18  void ~IVideoDecoder(const struct IVideoDecoder* this)
+   79  001E7EC0     18  void ~IAudioDecoder(const struct IAudioDecoder* this)

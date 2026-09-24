@@ -1,0 +1,17 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_GenericTerrain.cpp
+// compiled in: shader_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   34  0051B99C     70  void SM_GenericTerrainClass::SM_GenericTerrainClass(const struct SM_GenericTerrainClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base
+   52  005099C0    1B0  void SM_GenericTerrainClass::Load(const struct SM_GenericTerrainClass* this)
+   71  00509B70     B0  void SM_GenericTerrainClass::Activate(const struct SM_GenericTerrainClass* this)
+   83  00509C20     38  void SM_GenericTerrainClass::Deactivate(const struct SM_GenericTerrainClass* this)
+   89  005127C8     64  void SM_GenericTerrainClass::SetColorTexture(const struct SM_GenericTerrainClass* this, TextureRef texRef)
+  109  00517F8C     6C  void SM_GenericTerrainClass::SetFogColor(const struct SM_GenericTerrainClass* this, float* camPos)
+                         inlines  vec4flt_Copy
+  119  00517FF8     6C  void SM_GenericTerrainClass::SetFogCameraPos(const struct SM_GenericTerrainClass* this, float* camPos)
+                         inlines  vec4flt_Copy
+  129  0051282C     60  void SM_GenericTerrainClass::SetFogDensity(const struct SM_GenericTerrainClass* this, float f)
+  139  0051288C     60  void SM_GenericTerrainClass::SetFogStartRadius(const struct SM_GenericTerrainClass* this, float f)
+  149  005128EC     60  void SM_GenericTerrainClass::SetFogHeightTop(const struct SM_GenericTerrainClass* this, float f)

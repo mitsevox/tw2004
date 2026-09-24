@@ -1,0 +1,32 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/rnaunity.cpp
+// compiled in: rnaunity.cpp
+// 19 functions, source order. line | PS3 address | size
+
+    0    inline-only   struct <anon>& operator=(const struct <anon>* this, const const struct <anon>& )
+    0  004C8D14     5C  static void __tcf_3()
+                         inlines  ~AutoRefCount
+    0  004C8D70     5C  static void __tcf_4()
+                         inlines  ~AutoRefCount
+    0  004CEE64     C0  static void __tcf_5()
+                         inlines  ~Vector
+    0  004D0AFC     5C  static void __tcf_1()
+                         inlines  ~AutoRefCount
+    0  004D0B58     5C  static void __tcf_2()
+                         inlines  ~AutoRefCount
+    0  004D0C34    2E8  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  AllocatorStandard::~AllocatorStandard, GetRow, Matrix44, Quaternion, Set, Vector2, Vector3, Vector4, vpu::_asmCreateVector, ~ShadowedMaterialList
+    0  004DACB4    748  static void __tcf_0()
+                         inlines  RNADebugBreak, ~Tiger07CameraToScopeXformC
+    0  004F7910     38  void ~JobC(const struct JobC* this)
+    0  004F7BB0     38  void TigerScrapeProcess::~TigerScrapeProcess(const struct TigerScrapeProcess* this)
+    0  004FE004     4C  void TextureAssetMgrC::~TextureAssetMgrC(const struct TextureAssetMgrC* this)
+    0  004FE068     4C  void ShaderAssetMgrC::~ShaderAssetMgrC(const struct ShaderAssetMgrC* this)
+    0  004FE0CC     4C  void ScrapeAssetMgrC::~ScrapeAssetMgrC(const struct ScrapeAssetMgrC* this)
+    0  004FE130     4C  void MaterialXMLAssetMgrC::~MaterialXMLAssetMgrC(const struct MaterialXMLAssetMgrC* this)
+    0  004FE194     4C  void CharacterMaterialXMLAssetMgrC::~CharacterMaterialXMLAssetMgrC(const struct CharacterMaterialXMLAssetMgrC* this)
+    0  004FE1F8     4C  void SceneAssetMgrC::~SceneAssetMgrC(const struct SceneAssetMgrC* this)
+    0  004FE25C     4C  void ScopeXMLAssetMgrC::~ScopeXMLAssetMgrC(const struct ScopeXMLAssetMgrC* this)
+    0  004FF7EC    784  void ~Tiger07CameraToScopeXformC(const struct <anon>* this)
+                         inlines  MapInputC::~MapInputC, RNADebugBreak, Release, ~MapOutputC, ~ParmC
+    0  00500A24    478  void ~Tiger08XformMappingC(const struct <anon>* this)
+                         inlines  MapInputC::~MapInputC, RNADebugBreak, Release, ~MapOutputC, ~ParmC

@@ -1,0 +1,10 @@
+// ../../../../../TIGERCODE/Code/Golf/TextureFX/Headers/texcomp.h
+// compiled in: golf2_unity.cpp, other_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   36  00423A78     F8  void TexComp::TexComp(const struct TexComp* this, const const struct Allocator& pAllocator, int32 num_mipmaps)
+                         inlines  HashString::HashString
+   37  00423C68     CC  void TexComp::TexComp(const struct TexComp* this, const const struct Allocator& pAllocator, struct DynTex* pDyntex, struct DynTexGroupT* pDyntexGroup, int32 num_mipmaps)
+                         inlines  HashString::HashString
+   40  003D1FE4     80  void TexComp::~TexComp(const struct TexComp* this)
+   62    inline-only   void TexComp::AllowMissingTextures(const struct TexComp* this, bool allow)

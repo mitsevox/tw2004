@@ -1,0 +1,76 @@
+// ../../../../../TIGERCODE/Code/GolfModule/golf_module_global_interface.cpp
+// compiled in: golf_unity.cpp
+// 30 functions, source order. line | PS3 address | size
+
+   11  0030D800     C4  bool GlobalPlayerUpdate::Update(const struct GlobalPlayerUpdate* this, struct <anon>* context)
+                         inlines  GM_GetGolferUp
+   29  0031E1E8    224  bool GlobalSwingStateUpdate::RealUpdate(const struct GlobalSwingStateUpdate* this, struct <anon>* context)
+                         local  enum GolferState currentState
+                         local  SW_sSwingData* pSwingInfo
+                         inlines  GamePlayer::GetSwingInfo
+   92  002C5D74     40  bool GlobalDistToPinUpdate::RealUpdate(const struct GlobalDistToPinUpdate* this, struct <anon>* context)
+   99  002C5CF8     40  bool GlobalInitialDistToPinUpdate::RealUpdate(const struct GlobalInitialDistToPinUpdate* this, struct <anon>* context)
+  106  002324A8     44  bool GlobalIsLeftHandedUpdate::RealUpdate(const struct GlobalIsLeftHandedUpdate* this, struct <anon>* context)
+  113  0033E10C     E0  bool GlobalStrokesUpdate::RealUpdate(const struct GlobalStrokesUpdate* this, struct <anon>* context)
+                         local  int strokes
+                         inlines  GM_GetCurrentHoleIndex
+  122  002324EC     B0  bool GlobalMatchWinsUpdate::RealUpdate(const struct GlobalMatchWinsUpdate* this, struct <anon>* context)
+                         local  int wins
+  131  0030F638     A8  bool GlobalRoundScoreUpdate::RealUpdate(const struct GlobalRoundScoreUpdate* this, struct <anon>* context)
+                         local  int score
+  142  0023259C     48  bool GlobalLastShotOBUpdate::RealUpdate(const struct GlobalLastShotOBUpdate* this, struct <anon>* context)
+  150  002325E4    22C  bool GlobalLieUpdate::RealUpdate(const struct GlobalLieUpdate* this, struct <anon>* context)
+                         local  enum Lie_t lie
+  218  00256C80    2CC  bool GlobalFutureLieUpdate::RealUpdate(const struct GlobalFutureLieUpdate* this, struct <anon>* context)
+                         local  struct GamePlayer* plr
+                         local  struct PhysicsBall_t* estBall
+                         local  vec4flt normal
+                         local  struct TGD_MaterialInfo* info
+                         inlines  GamePlayer::GetEstimatedBall
+  309  00232810     B4  bool GlobalRoundHoleNumberUpdate::Update(const struct GlobalRoundHoleNumberUpdate* this, struct <anon>* context)
+                         inlines  GM_GetCurrentHoleIndex
+  315  002328C4     B4  bool GlobalRoundHoleCountUpdate::Update(const struct GlobalRoundHoleCountUpdate* this, struct <anon>* context)
+                         inlines  GM_GetNumSelectedHoles
+  321  00232978    150  bool GlobalRoundMatchModeUpdate::Update(const struct GlobalRoundMatchModeUpdate* this, struct <anon>* context)
+                         local  void* ptr
+                         local  struct GameModeBase* pGameMode
+                         local  bool isSMatchMode
+                         local  bool isSkinsMode
+  338  00232AC8     AC  bool GlobalRoundStrokeModeUpdate::Update(const struct GlobalRoundStrokeModeUpdate* this, struct <anon>* context)
+                         local  void* ptr
+                         local  struct GameModeBase* pGameMode
+                         local  bool isStrokeMode
+  354  00232B74     AC  bool GlobalRoundStablefordModeUpdate::Update(const struct GlobalRoundStablefordModeUpdate* this, struct <anon>* context)
+                         local  void* ptr
+                         local  struct GameModeBase* pGameMode
+                         local  bool isStablefordMode
+  370  00232C20     64  bool GlobalRoundCrowdUpdate::Update(const struct GlobalRoundCrowdUpdate* this, struct <anon>* context)
+                         inlines  cGAME_GLOBALS::GetCrowds
+  376  00232C84     B8  bool GlobalRoundPlayerCountUpdate::Update(const struct GlobalRoundPlayerCountUpdate* this, struct <anon>* context)
+  383  00232D3C     DC  bool GlobalHoleParUpdate::Update(const struct GlobalHoleParUpdate* this, struct <anon>* context)
+  395  0030D8C4     B4  bool GlobalHoleGolferUpUpdate::Update(const struct GlobalHoleGolferUpUpdate* this, struct <anon>* context)
+                         inlines  GM_GetGolferUp
+  403  002473EC     C4  bool GlobalHoleDistUpdate::RealUpdate(const struct GlobalHoleDistUpdate* this, struct <anon>* context)
+  410  00232E18    12C  bool GlobalClubUpdate::RealUpdate(const struct GlobalClubUpdate* this, struct <anon>* context)
+                         local  enum Club_t club
+                         local  float swingClub
+  438  00232F44    118  bool GlobalShotUpdate::RealUpdate(const struct GlobalShotUpdate* this, struct <anon>* context)
+                         local  struct CoreShotInfo_t* shotInfo
+                         local  enum ShotType_t shotType
+                         local  enum GolferState currstate
+  479  0023305C     48  bool GlobalShotPowerUpdate::RealUpdate(const struct GlobalShotPowerUpdate* this, struct <anon>* context)
+                         local  struct CoreShotInfo_t* shotInfo
+  487  002330A4     64  bool GlobalBallPosUpdate::RealUpdate(const struct GlobalBallPosUpdate* this, struct <anon>* context)
+                         local  struct CoreShotInfo_t* info
+  496  00233108     64  bool GlobalBallVelUpdate::RealUpdate(const struct GlobalBallVelUpdate* this, struct <anon>* context)
+                         local  struct CoreShotInfo_t* info
+  505  0023316C     64  bool GlobalTargetUpdate::RealUpdate(const struct GlobalTargetUpdate* this, struct <anon>* context)
+                         local  struct CoreShotInfo_t* info
+  514  002517B4     C0  bool GlobalPosUpdate::RealUpdate(const struct GlobalPosUpdate* this, struct <anon>* context)
+                         local  vec4flt originPos
+                         inlines  Character_GetBonePos, Character_GetBonePos_FromIndex, GamePlayer::GetCharacter, vec4flt_Copy
+  524  002331D0    288  bool GlobalBallFxUpdate::RealUpdate(const struct GlobalBallFxUpdate* this, struct <anon>* context)
+                         local  struct TGD_MaterialInfo* info
+                         local  enum CollisionEffect_t uiCollisionEffectID
+  607  00233458     D0  bool GlobalIsWearingHatUpdate::RealUpdate(const struct GlobalIsWearingHatUpdate* this, struct <anon>* context)
+                         inlines  GM_GetGolferUp

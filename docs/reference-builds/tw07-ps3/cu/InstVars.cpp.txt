@@ -1,0 +1,28 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/Internal/InstVars.cpp
+// compiled in: InstVars.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   27  0059C2B4    16C  void Reserve(const struct <anon>* this, uint32_t capacity)
+                         local  float* newArr
+                         local  uint32_t i
+                         local  float* pOld
+                         inlines  Get, GetAllocator, ManagedArray<float>::Reserve
+   32  0059C1D8     DC  void Clear(const struct <anon>* this, bool bFreeData)
+                         inlines  ManagedArray<float>::Clear, ManagedArray<float>::Resize
+   44  0059BE88      8  uint32_t Size(const const struct <anon>* this)
+   49  0059C420    33C  void Copy(const struct <anon>* this, const struct <anon>* copy)
+                         local  uint32_t size
+                         local  int32_t iSize
+                         local  int32_t i
+                         local  uint32_t i
+                         local  float* pOld
+                         inlines  ManagedArray<float>::Add, ManagedArray<float>::Reserve, ManagedArray<float>::Resize, ManagedArray<float>::UpsizePwr2
+   70  0059C75C    300  float& operator[](const struct <anon>* this, uint32_t pos)
+                         local  uint32_t size
+                         local  float* newArr
+                         local  uint32_t i
+                         local  float* pOld
+                         local  uint32_t i
+                         local  float* pOld
+                         inlines  Get, GetAllocator, ManagedArray<float>::Add, ManagedArray<float>::Reserve, ManagedArray<float>::Size, ManagedArray<float>::UpsizePwr2
+   84  0059BE74     14  const float& operator[](const const struct <anon>* this, uint32_t pos)

@@ -1,0 +1,29 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/listarraybase.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   52  005B9284     54  void ListArrayBase(const struct <anon>* this, uint32_t uCapacity, struct MemoryStrategy* pMemoryStrategy, Comparator* pComparator)
+   59  005B932C     48  void ListArrayBase(const struct <anon>* this, const const struct <anon>& otherList)
+   66  005B93BC      C  void ~ListArrayBase(const struct <anon>* this)
+   71  005B940C     24  struct Base* GetElementAt(const const struct <anon>* this, uint32_t uIndex)
+   77  005B9430     8C  void SetElementAt(const struct <anon>* this, uint32_t uIndex, const struct Base* pElement)
+                         local  struct Base* pItem
+   97  005B94BC     48  void InsertElement(const struct <anon>* this, const struct Base* pElement)
+  108  005B9504     58  void InsertElementAt(const struct <anon>* this, uint32_t uIndex, const struct Base* pElement)
+  119  005D9BAC     9C  void RemoveAllInternal(const struct <anon>* this)
+                         local  uint32_t uNumElements
+                         local  uint32_t uIndex
+                         local  struct Base* pItem
+                         inlines  GetNumberOfElements, RemoveAll
+  137  005B955C     4C  void FastRemoveElementAt(const struct <anon>* this, uint32_t uIndex)
+                         local  struct Base* pItem
+  149  005D05C0     C8  uint32_t FindElement(const const struct <anon>* this, const struct Base* pElement)
+                         local  uint32_t size
+                         local  uint32_t uIndex
+                         local  struct Base* pCurObject
+                         inlines  GetNumberOfElements
+  173  005D0688     48  bool ElementExists(const const struct <anon>* this, const struct Base* pElement)
+  178  005D06D0     58  void RemoveElement(const struct <anon>* this, const struct Base* pElement)
+                         local  uint32_t uIndex
+  190  005B95A8     4C  void RemoveElementAt(const struct <anon>* this, uint32_t uIndex)
+                         local  struct Base* pItem

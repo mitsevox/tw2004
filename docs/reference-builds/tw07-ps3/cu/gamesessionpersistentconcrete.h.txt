@@ -1,0 +1,13 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/./gamesessionpersistentconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   53  00623EF4      C  const char8_t* GetName(const const struct <anon>* this)
+   54  00623F00      C  int32_t GetIdentifier(const const struct <anon>* this)
+   55  00623F0C      C  const char8_t* GetSessionID(const const struct <anon>* this)
+   56  00623F18      8  uint32_t GetRandomSeed(const const struct <anon>* this)
+   57  00623F20      C  const struct List<OSDK::GameUser>* GetUsers(const const struct <anon>* this)
+   58  00623F2C      C  const struct Dictionary* GetGameState(const const struct <anon>* this)
+   59  006263D0      8  struct GameUser* GetHost(const const struct <anon>* this)
+   60  006263D8      8  struct GameUser* GetLocalUser(const const struct <anon>* this)
+   61  00623F38      C  bool IsRanked(const const struct <anon>* this)

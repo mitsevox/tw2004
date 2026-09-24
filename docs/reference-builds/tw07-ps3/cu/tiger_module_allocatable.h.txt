@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/packages/tiger_module/include/tiger_module_allocatable.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   15  0033FD98     18  void ~Allocatable(const struct <anon>* this)

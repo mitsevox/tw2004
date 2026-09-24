@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/vector3_operation_inline.h
+// compiled in: RNADevice.cpp, SGNodeBSPCulledRenderable.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   23    inline-only   bool vpu::operator==(struct <anon>& a, struct <anon>& b)
+   28    inline-only   bool vpu::operator!=(struct <anon>& a, struct <anon>& b)
+   33    inline-only   struct <anon> vpu::Mult(struct <anon>& v, struct <anon>& s)
+   93    inline-only   struct <anon> vpu::Dot(struct <anon>& a, struct <anon>& b)
+  166    inline-only   struct <anon> vpu::Negate(struct <anon>& v)
+  425    inline-only   struct <anon> vpu::operator-(struct <anon>& v)

@@ -1,0 +1,238 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/cameras/GoCamAnimDebug.c
+// compiled in: golf_unity.cpp
+// 70 functions, source order. line | PS3 address | size
+
+  566  001E9B24     1C  bool CamAnimDebug_EditingCamera()
+  571  001E9B40     34  bool CamAnimDebug_CheckForObstructions()
+  576  001E9B74     5C  bool CamAnimDebug_CheckOOB()
+  581  001E9BD0     5C  bool CamAnimDebug_PutBackOnFairway()
+  586  001E9C2C     5C  bool CamAnimDebug_CheckFlagCollision()
+  591  001E9C88     5C  bool CamAnimDebug_CheckForOcclusion()
+  596  001E9CE4     3C  bool CamAnimDebug_ForceFixedTime()
+  607  001E9FA4    154  void CamAnimDebug_SetShotInfo(struct CoreShotInfo_t* shotInfo)
+                         inlines  CamAnimDebug_GetClubType
+  625  001E9D78    22C  enum ShotType_t CamAnimDebug_GetShotType(enum ShotType_t shot)
+                         local  int i
+                         local  const char* animName
+  676    inline-only   static enum Club_t CamAnimDebug_GetClubType()
+                         local  int i
+                         local  const char* animName
+  717  001EA0F8     C8  static void CamAnimDebug_InitSequenceHistory()
+                         local  int i
+  747  001EA1C0     48  void* CamAnimDebug_SequenceHistoryCB(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+  775  001EB210    290  void* CamAnimDebug_SequenceHistoryEditCB(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+                         local  CameraSequence_t* sequence
+                         local  char[64] catName
+                         local  int id
+                         local  int32 temp
+  834  001EA2E8    2CC  void CamAnimDebug_AddSequenceToHistory(CameraSequence_t* pSequence)
+                         local  int catId
+                         local  int i
+                         local  char[64] seqName
+  897  001EA794     58  void* CamAnimDebug_CamHistoryCallback(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+  924  001EA874    1F8  void CamAnimDebug_AddCameraToHistory(CameraChainLink* link)
+                         local  int catId
+                         local  int32 cameraIndex
+                         local  char[64] camName
+  964  001EAA6C    268  void* CamAnimDebug_CamCallback(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+                         local  int32 value
+                         local  CameraChainLink* link
+ 1036  002EE87C    240  void* CamAnimDebug_AnimCallback(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+                         local  int32 value
+ 1101  002EEC6C    160  void CamAnimDebug_CameraEditViewEnter(CameraChainLink* link)
+                         local  CameraController_t* pCameraController
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  int i
+                         inlines  vec4flt_Copy3
+ 1139  002EEABC    1B0  void CamAnimDebug_CameraEditViewExit()
+                         local  CameraController_t* pCameraController
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  CameraChainLink* link
+                         local  int i
+                         inlines  vec4flt_Copy3
+ 1182  0023EDA8    2BC  void CamAnimDebug_CamSequenceTypeModified()
+                         local  int i
+                         local  bool found
+ 1261  0023F38C    714  void* CamAnimDebug_CamSequenceEditCallback(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+                         local  int32 value
+                         local  int32 value
+                         local  int32 value
+                         local  CameraChainLink* link
+                         local  CameraSequence_t* sequence
+ 1480  002EC8B8    2F4  void* CamAnimDebug_CamPlaySequenceSeriesCallback(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+                         local  enum PlayerNumber_t playerNum
+                         local  CameraController_t* pCameraController
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         inlines  vec4flt_Copy3
+ 1575  002EE83C     40  void* CamAnimDebug_CamSequencePlayCallback(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+ 1596  001EAE5C     30  int32 CamAnimDebug_GetSeqBeingEdited(int32 userType)
+                         local  int32 index
+ 1624  0023F064    328  void* CamAnimDebug_CamSequenceCallback(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+                         local  char[64] buffer
+                         local  int id
+ 1696  002EE420    1AC  void CamAnimDebug_PlayAnimWithCamera()
+                         local  enum PlayerNumber_t playerNum
+                         local  CameraController_t* pCameraController
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         inlines  vec4flt_Copy3
+ 1748  001EAE8C     E8  StringValuePair* CamAnimDebug_GetFilterList(uint32 filterType)
+                         local  StringValuePair* filter
+ 1825  001EAF74     D0  int32 CamAnimDebug_GetFilterListSize(uint32 filterType)
+                         local  int32 filterSize
+ 1903  001EB0A8     CC  int32 CamAnimDebug_GetFilterListIndex(int32 value, uint32 filterType)
+                         local  StringValuePair* filterList
+                         local  int32 filterListSize
+                         local  int i
+ 1926  001EB548     BC  int32 CamAnimDebug_GetPrevFilterListValue(int32 value, uint32 filterType)
+                         local  StringValuePair* filterList
+                         local  int32 filterListSize
+                         local  int32 index
+ 1962  001EB4A0     A8  int32 CamAnimDebug_GetNextFilterListValue(int32 value, uint32 filterType)
+                         local  StringValuePair* filterList
+                         local  int32 filterListSize
+                         local  int32 index
+ 1997  001EB044     64  int32 CamAnimDebug_SetFilterListValue(int32 value, int32 filterType)
+                         local  int32 listSize
+ 2011  001EB604     C8  int32 CamAnimDebug_GetPrevListValue(int32 value, uint32 filterType)
+                         local  StringValuePair* filterList
+                         local  int32 filterListSize
+                         local  int32 index
+ 2040  001EB6CC     8C  int32 CamAnimDebug_GetNextListValue(int32 value, uint32 filterType)
+                         local  StringValuePair* filterList
+                         local  int32 filterListSize
+                         local  int32 index
+ 2063  001EB174     9C  char* CamAnimDebug_GetFilterListString(int32 value, uint32 filterType)
+                         local  StringValuePair* filterList
+                         local  int32 index
+ 2087  0023E80C    11C  void* CamAnimDebug_CamFilterCallback(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+ 2132  002EC6D0    1E8  void* CamAnimDebug_CrACCamCallback(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+                         local  int32 event
+                         local  CameraController_t* pCameraController
+ 2251  001EB758     34  int CamAnimDebug_CamCompare(const void* var1, const void* var2)
+                         local  const CameraChainLink* cam1
+                         local  const CameraChainLink* cam2
+ 2269  001EB78C     5C  int CamAnimDebug_AnimCompare(const void* var1, const void* var2)
+                         local  const int32 index1
+                         local  const int32 index2
+                         local  const char* animName1
+                         local  const char* animName2
+ 2291  001EB7E8     34  int CamAnimDebug_SequenceCompare(const void* var1, const void* var2)
+                         local  const CameraSequence_t* seq1
+                         local  const CameraSequence_t* seq2
+ 2307  001EB81C    17C  bool CamAnimDebug_FilterCamera(CameraChainLink* camera)
+ 2369  0023DA70    3BC  void CamAnimDebug_BuildCamList()
+                         local  const char[26] __FUNCTION__
+                         local  CameraChainLink* curLink
+                         local  int i
+                         local  int i
+                         inlines  TagValuePair, operator+
+ 2440  001EBA40     5C  bool CamAnimDebug_IsCamInList(CameraChainLink** pLinkList, int32 numInList, CameraChainLink* pLink)
+                         local  int i
+ 2458  0023DE2C    558  void CamAnimDebug_BuildAnimTestCamList()
+                         local  const char[34] __FUNCTION__
+                         local  CameraChainLink* curLink
+                         local  struct CameraAnimPairs_t* pAnimPair
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+                         inlines  TagValuePair, operator+
+ 2546  0023E384    22C  void CamAnimDebug_BuildSeqCamList()
+                         local  const char[29] __FUNCTION__
+                         local  CameraSequence_t* curSequence
+                         local  int i
+                         inlines  TagValuePair, operator+
+ 2588  001EBB64    938  bool CamAnimDebug_FilterAnim(int32 index)
+                         local  int i
+                         local  const char* animName
+                         local  int32 shotType
+                         local  int32 shotState
+                         local  int32 clubType
+                         local  CameraSequence_t* curSequence
+ 2869  0023E5B0    25C  void CamAnimDebug_BuildAnimList()
+                         local  const char[27] __FUNCTION__
+                         local  int i
+                         inlines  TagValuePair, operator+
+ 2925  0023E928    25C  void CamAnimDebug_BuildSeqAnimList()
+                         local  const char[30] __FUNCTION__
+                         local  int i
+                         inlines  TagValuePair, operator+
+ 2978  001EC4C8     C0  bool CamAnimDebug_FilterSequence(CameraSequence_t* sequence)
+ 3000  0023EB84    224  void CamAnimDebug_BuildSeqList()
+                         local  const char[26] __FUNCTION__
+                         local  int i
+                         local  CameraSequence_t* curSeq
+                         inlines  TagValuePair, operator+
+ 3035  001EC5A8    194  void CamAnimDebug_SyncToCamera(CameraChainLink* link)
+                         local  CameraScript_t* script
+ 3080  00261B80    2D0  void CamAnimDebug_SaveToCamera(CameraChainLink* link, int32 userType)
+                         local  CameraScript_t* script
+                         local  CameraController_t* pCameraController
+                         local  CameraController_t* pCameraController
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt vecDiff
+                         inlines  CamScript_SetFlag, LLMath_Add3, LLMath_Subtract
+ 3160  001EC73C    990  static void CamAnimDebug_AddCamTuningVars(int id, CameraChainLink* link)
+                         local  uint8* ptr
+ 3271  002EEDCC    428  static void* CamAnimDebug_CamEditCallback(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+                         local  int id
+                         local  int32 value
+ 3391  001EA60C    188  void CamAnimDebug_CreateAndEnterCameraEditMenu(CameraChainLink* link)
+ 3418  002EE5CC    270  void* CamAnimDebug_CamAnimTestCallback(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+                         local  int32 value
+ 3500  0025BDD8    BC4  void* CamAnimDebug_CreateCameraCategories(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  int id
+                         local  int catId
+ 3613  0023FAA0    248  void CamAnimDebug_Init()
+                         local  const char[18] __FUNCTION__
+                         inlines  TagValuePair, operator+
+ 3675  001ED128     B4  void CamAnimDebug_DeInit()
+ 3698  001ED1DC     30  bool CamAnimDebug_IsCamTestRunning()
+ 3714  002EDB1C    904  void CamAnimDebug_UpdateCamAnimRun()
+                         local  enum PlayerNumber_t PlayerID
+                         local  bool ballInHand
+                         local  DynObj_sTeeMgr* pMgr
+                         local  vec4flt grassLocation
+                         local  CameraController_t* pCameraController
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         local  CameraChainLink* swingCam
+                         local  int32_t physicsTimes
+                         local  int32_t i
+                         inlines  Character_CheckTag, Character_IsTagValid, Character_ResetTag, GamePlayer::GetCharacter, PhysicsBall_t::ClearFlag, PhysicsBall_t::SetFlag, vec4flt_Copy3
+ 3885  002DA5F4    284  static void CamAnimDebug_ResetGolferState()
+                         local  enum PlayerNumber_t playerNum
+                         local  CameraController_t* pCameraController
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+                         inlines  GameEffects_SetDoubleTime, GameEffects_SetHalfTime, SKATime_SetTimeScale, vec4flt_Copy3
+ 3923  002DA878     6C  void CamAnimDebug_UpdateBallFlightRun()
+                         local  enum PlayerNumber_t playerNum
+ 3942  001ED22C    15C  CameraChainLink* CamAnimDebug_GetScriptForState(int32 golferState)
+                         local  int i
+ 4013  001EACF0    16C  CameraSequence_t* CamAnimDebug_GetSequenceForState(int32 golferState)
+                         local  int i
+ 4084  001ED388    164  int32 CamAnimDebug_GetAnimIndexForState(int32 golferState)
+                         local  int i
+ 4155  001ED4EC     40  void CamAnimDebug_SetCurrentCamTestScript(CameraChainLink* script)
+ 4166  001ED52C     74  CameraChainLink* CamAnimDebug_GetCurrentScript()
+ 4183  001ED5A0     60  char* CamAnimDebug_GetInterpTypeStr(enum CameraInterpType_e interpType)
+                         local  int tablesize
+                         local  int i

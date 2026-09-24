@@ -1,0 +1,22 @@
+// ../../../../../TIGERCODE/Code/Golf/RNA/Asset/Common/ScrapeAsset.h
+// compiled in: rnaunity.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   40  004F788C      4  void TigerScrapeProcess::SetCamera(const struct TigerScrapeProcess* this, struct DeviceC* pDevice, int32_t idCamera, int32_t cameraParm, int32_t vptWidth, int32_t vptHeight)
+   42  004F7890      4  void TigerScrapeProcess::RenderObject(const struct TigerScrapeProcess* this, struct DeviceC* pDevice, void* pObject, int32_t parm0, int32_t parm1)
+   43  004F7894      4  void TigerScrapeProcess::RenderScene(const struct TigerScrapeProcess* this, struct DeviceC* pDevice, struct RNASceneC* pScene, int32_t parm0, int32_t parm1)
+   44  004F7898      4  void TigerScrapeProcess::RenderSGNode(const struct TigerScrapeProcess* this, struct DeviceC* pDevice, struct SGNodeC* pNode)
+   46  004F789C      8  struct JobC* TigerScrapeProcess::ResolveJob(const struct TigerScrapeProcess* this, const char* pFileName)
+   49  004F78A4      8  struct RNASceneC* TigerScrapeProcess::ResolveScene(const struct TigerScrapeProcess* this, const char* pFileName)
+   50  004F78AC      4  void TigerScrapeProcess::UnresolveScene(const struct TigerScrapeProcess* this, struct RNASceneC* pScene)
+   52  004F78B0      8  int32_t TigerScrapeProcess::ResolveCamera(const struct TigerScrapeProcess* this, const char* pStrName)
+   54  004F78B8      8  void* TigerScrapeProcess::ResolveObject(const struct TigerScrapeProcess* this, const char* pStrName)
+   55  004F78C0      8  struct SGNodeC* TigerScrapeProcess::ResolveSGNode(const struct TigerScrapeProcess* this, struct RNASceneC* pScene, const char* pStrName)
+   58  004F78C8      8  int32_t TigerScrapeProcess::ResolveCategory(const struct TigerScrapeProcess* this, const char* pStrName)
+   59  004F78D0      8  uint32_t TigerScrapeProcess::ResolveObjectMask(const struct TigerScrapeProcess* this, const char* pStrName)
+   60  004F78D8      4  void TigerScrapeProcess::SetVisibleObjects(const struct TigerScrapeProcess* this, int32_t idCategory, uint32_t includeMask, uint32_t excludeMask)
+   66  004F78DC      8  bool TigerScrapeProcess::ResolveConstant(const struct TigerScrapeProcess* this, const char* pStrName, const float_t& fConst)
+   69  004F78E4      4  void TigerScrapeProcess::CreateMipMaps(const struct TigerScrapeProcess* this, struct DeviceC* pDevice, struct TextureC* pTexture, int32_t parm)
+   70  004F78E8      4  void TigerScrapeProcess::GPUIdle(const struct TigerScrapeProcess* this, struct DeviceC* pDevice)
+   80  004F78EC     10  int32_t ScrapeAssetC::GetRefCount(const struct ScrapeAssetC* this)
+   85    inline-only   struct Process* ScrapeAssetC::GetProcess(const struct ScrapeAssetC* this)

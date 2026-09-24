@@ -1,0 +1,17 @@
+// ../../../../../TIGERCODE/Code/Golf/Talky/Headers/talkyManager.h
+// compiled in: other_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   35  003DA758      C  void TalkyChannel::TalkyChannel(const struct TalkyChannel* this)
+   42    inline-only   int TalkyChannel::GetChannelID(const const struct TalkyChannel* this)
+   43    inline-only   bool TalkyChannel::IsPriming(const const struct TalkyChannel* this)
+   44    inline-only   bool TalkyChannel::IsPrimingDone(const const struct TalkyChannel* this)
+   45    inline-only   bool TalkyChannel::IsPlaying(const const struct TalkyChannel* this)
+   46    inline-only   bool TalkyChannel::IsIdle(const const struct TalkyChannel* this)
+   47    inline-only   float TalkyChannel::GetPrimeStartTime(const const struct TalkyChannel* this)
+   48    inline-only   bool TalkyChannel::IsPrimeAndPlay(const const struct TalkyChannel* this)
+   50    inline-only   void TalkyChannel::SetCharacter(const struct TalkyChannel* this, struct TCharacter* pChar)
+   57    inline-only   void TalkyChannel::ReportPrimingOrPlayingDone(const struct TalkyChannel* this)
+   61    inline-only   void TalkyChannel::SetState(const struct TalkyChannel* this, enum State newState, float curTimeSecs)
+  119    inline-only   int TalkyManager::NumChannels(const const struct TalkyManager* this)
+  176    inline-only   bool TalkyManager::IsValidChannel(const const struct TalkyManager* this, ChannelID channelID)

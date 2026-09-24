@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/istudio_runtime/UI_Loader.cpp
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   31  0002CE80     64  void UI_Loader::InitModule()
+   39  0002CFC8     54  void UI_Loader::CloseModule()
+   47  0002CDA4     18  struct UI_Loader* UI_Loader::GetCurrentLoader()
+   85  0002D05C     80  void UI_Loader::DispatchStreamData(const struct UI_Loader* this, struct TStreamData* xpStreamData_p)

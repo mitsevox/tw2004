@@ -1,0 +1,79 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/usermanagerconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 25 functions, source order. line | PS3 address | size
+
+   64  00624D64      C  void ~ActionInviteSend(const struct <anon>* this)
+   78  00624DA8      C  void ~ActionInviteView(const struct <anon>* this)
+   92  00624DEC      C  void ~ActionMessageSend(const struct <anon>* this)
+  107  00624E30      C  void ~ActionPlatformProfileView(const struct <anon>* this)
+  159  005C1E14     4C  bool DoIsEnabledForUser(const const struct <anon>* this, const struct User* pUser)
+  184  005C1E60     9C  bool DoIsShownForUser(const const struct <anon>* this, const struct User* pUser)
+  210  005C1EFC     4C  bool DoIsEnabledForUser(const const struct <anon>* this, const struct User* pUser)
+  235  005C1F48     4C  bool DoIsShownForUser(const const struct <anon>* this, const struct User* pUser)
+  260  005C1F94      8  bool DoIsShownForUser(const const struct <anon>* this, const struct User* )
+  287  005C1F9C      8  bool DoIsEnabledForUser(const const struct <anon>* this, const struct User* )
+  314  005C1FA4      8  bool DoIsShownForUser(const const struct <anon>* this, const struct User* )
+  341  005C1FAC      8  bool DoIsEnabledForUser(const const struct <anon>* this, const struct User* pUser)
+  370  005DB3F0    1B0  void ProcessComplete(const struct UserManagerConcrete* this)
+                         local  uint32_t uNumUsers
+                         local  uint32_t uIndex
+                         local  struct UserConcrete* pUser
+                         local  uint32_t uCacheAge
+                         local  uint32_t uNumElements
+                         local  struct UserObserver** pList
+                         inlines  FastRemoveElementAt, GetCacheAge, GetElementAt, GetMaxNumberOfObservers, GetNumberOfElements, GetObserverList, SetClean
+  420  005D8718     A8  void TriggerCacheUpdatedEvent(const struct UserManagerConcrete* this, struct User* pUser)
+                         local  uint32_t uNumElements
+                         local  struct UserObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  444  005C1FB4     A8  void TriggerCacheUpdateFailedEvent(const struct UserManagerConcrete* this, struct User* pUser)
+                         local  uint32_t uNumElements
+                         local  struct UserObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  471  00613E44    690  void UserManagerConcrete(const struct UserManagerConcrete* this)
+                         local  struct <anon>* pFacade
+                         local  struct LobbyConcrete* pLobby
+                         local  uint32_t uActualDestIndex
+                         local  struct ActionUserStrategy* pSecondObject
+                         inlines  ActionComparator, ActionInviteSend, ActionInviteView, AddObserver, GetElementAt, GetInstance, GetLobbyConcrete, InsertElement, List, ListSorted, LobbyDispatchObserver, RCPointer, Sort, operator const OSDK::Comparator*, operator->, operator=
+  525  00614B64    16C  void ~UserManagerConcrete(const struct UserManagerConcrete* this)
+                         local  struct <anon>* pFacade
+                         local  struct LobbyConcrete* pLobby
+                         inlines  GetLobbyConcrete, RemoveAll, RemoveObserver, ~List, ~LobbyDispatchObserver, ~RCPointer
+  560  0060D920      8  struct UserConcrete* GetUserConcrete(const struct UserManagerConcrete* this, const char8_t* strName)
+  586  0060D544    224  struct UserConcrete* GetUserConcrete(const struct UserManagerConcrete* this, const char8_t* strName, bool bCreateIfNotExist)
+                         local  struct UserConcrete* pFoundUser
+                         local  uint32_t uNumUsers
+                         local  uint32_t msEldest
+                         local  uint32_t iEldest
+                         local  uint32_t uIndex
+                         local  struct UserConcrete* pUser
+                         inlines  GetCacheAge, GetElementAt, GetNumberOfElements, InsertElement, IsFull, SetElementAt
+  658  0060D768    1B8  void LobbyDispatch(const struct UserManagerConcrete* this, const struct Lobby* , LobbyApiMsgT* pMesg)
+                         local  LobbyApiUserT userInfo
+                         local  const char8_t* strName
+                         local  struct UserConcrete* pUser
+                         local  LobbyApiRefT* pLobbyApi
+                         local  HasherRef* pHashRef
+                         local  DispListT* pDispElem
+                         local  DispListRef* pDispList
+                         local  LobbyApiUserT* pListUser
+                         local  struct UserConcrete* pUser
+                         inlines  GetInstance, GetLobbyApi
+  729  005C205C      8  const struct ListSorted<OSDK::ActionUserStrategy>* GetActions(const struct UserManagerConcrete* this)
+  753  005F2F14    294  void AddAction(const struct UserManagerConcrete* this, struct ActionUserStrategy* pAction)
+                         inlines  ElementExists, InsertElement, Sort, operator->
+  783  005DB5A0    284  void RemoveAction(const struct UserManagerConcrete* this, struct ActionUserStrategy* pAction)
+                         local  uint32_t uActualDestIndex
+                         local  struct ActionUserStrategy* pSecondObject
+                         inlines  GetElementAt, RemoveElement, Sort, operator->
+  807  005D31F4     D0  struct ActionUserStrategy* GetAction(const struct UserManagerConcrete* this, const char8_t* strIdentifier)
+                         local  uint32_t uActions
+                         local  uint32_t uIndex
+                         local  struct ActionUserStrategy* pAction
+                         inlines  GetElementAt, GetNumberOfElements
+  848  005C2064     84  int32_t Compare(const const struct <anon>* this, const struct Base* pObject1, const struct Base* pObject2)
+                         local  const struct <anon>* pAction1
+                         local  const struct <anon>* pAction2
+                         local  uint32_t uPriority1
+                         local  uint32_t uPriority2

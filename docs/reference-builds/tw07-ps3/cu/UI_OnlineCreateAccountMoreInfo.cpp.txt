@@ -1,0 +1,26 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_OnlineCreateAccountMoreInfo.cpp
+// compiled in: apt_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   46  00046D2C     10  void UI_OnlineAccount_MoreInfoStruct::Init(const struct UI_OnlineAccount_MoreInfoStruct* this)
+   57  000F4A24     88  void UIOnlineCreateAccountMoreInfo::UIOnlineCreateAccountMoreInfo(const struct UIOnlineCreateAccountMoreInfo* this)
+                         inlines  TExternArray<UIOnlineCreateAccountMoreInfo::DstMenuItem_ocai>::TExternArray
+   61  000F00F8     80  void UIOnlineCreateAccountMoreInfo::Init(const struct UIOnlineCreateAccountMoreInfo* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, FlashUpdateItem::SetFlashUpdateList
+   70  00046D44      4  void UIOnlineCreateAccountMoreInfo::SetupSourceMenuItems(const struct UIOnlineCreateAccountMoreInfo* this)
+   74  00046D48     6C  void UIOnlineCreateAccountMoreInfo::Show(const struct UIOnlineCreateAccountMoreInfo* this)
+                         inlines  UIOnlineCreateAccountMoreInfo::ShowMenu
+   82  00046DB4     A0  void UIOnlineCreateAccountMoreInfo::InitMenuParams(const struct UIOnlineCreateAccountMoreInfo* this)
+   92  00046E54    1B4  void UIOnlineCreateAccountMoreInfo::UpdateItemAndLabel(const struct UIOnlineCreateAccountMoreInfo* this, struct UIMenuItemBaseDst* DstMenuItem_ocaiToUpdate, struct UIMenuItemBaseSrc* SrcMenuItem_ocaiArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_ocai* dest
+                         local  char* tempBuffer
+  139  0008577C    2CC  enum eAptHandleInput UIOnlineCreateAccountMoreInfo::HandleInput(const struct UIOnlineCreateAccountMoreInfo* this, int32 cID)
+                         local  bool isFlashUpdateNeeded
+                         local  bool isFlashUpdateNeeded
+                         inlines  cGAME_GLOBALS::SetOnlineOptionsFlagsBits
+  257  000AE88C     88  void UIOnlineCreateAccountMoreInfo::UpdateMenuItems(const struct UIOnlineCreateAccountMoreInfo* this)
+                         inlines  UIMenuBase::mMenu_StartUpdate_func
+  267  000AEBE8    13C  enum AptThreadReturnValue UIOnlineCreateAccountMoreInfo::UpdateMenuItemsThread(const struct UIOnlineCreateAccountMoreInfo* this)
+                         local  int i
+                         local  int32 old
+                         inlines  UIMenuBase::mMenu_UpdateNextElement_func

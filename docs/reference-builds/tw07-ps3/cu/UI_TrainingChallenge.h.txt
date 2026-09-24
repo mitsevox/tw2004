@@ -1,0 +1,14 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_TrainingChallenge.h
+// compiled in: apt_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   39  00121F74    1CC  void UITrainingChallenge::~UITrainingChallenge(const struct UITrainingChallenge* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, TExternArray<UITrainingChallenge::DstMenuItem_tran>::~TExternArray, UIMenuCircBase::~UIMenuCircBase, UIMenuCircDefault::~UIMenuCircDefault
+   43  00100874      C  uint32 UITrainingChallenge::GetSignature(const const struct UITrainingChallenge* this)
+   50  00100888      C  struct IExternArray* UITrainingChallenge::GetExternArray(const struct UITrainingChallenge* this)
+   51  0010089C      8  int32 UITrainingChallenge::GetSizeofArrayStruct(const struct UITrainingChallenge* this)
+   57  001008A4     24  void UITrainingChallenge::LooseFocus(const struct UITrainingChallenge* this, uint32 screenId)
+   58  001008C8     24  void UITrainingChallenge::RegainFocus(const struct UITrainingChallenge* this, uint32 screenId)
+   73  001106DC     14  enum TAptSequenceStatus UITrainingChallenge::InitPreviewMenuSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   74  00103238     14  enum TAptSequenceStatus UITrainingChallenge::InitSkillsTableSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   76  001008EC     14  void UITrainingChallenge::NotifySetPlayerLevel_func(struct IAptSubscriber* subs)

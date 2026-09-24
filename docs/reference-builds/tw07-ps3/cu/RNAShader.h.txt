@@ -1,0 +1,12 @@
+// ../../../../../TIGERCODE/packages/RNA/dev-2.0-golf/RNA/RNACore/include/RNARender/RNAShader.h
+// compiled in: golf_unity.cpp, rnaunity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   90    inline-only   struct UserData* GetUserData(const const struct <anon>* this)
+   90    inline-only   void SetUserData(const struct ShaderC* this, struct UserData* pData)
+  120    inline-only   void ShaderC::SetOverrideTechnique(const struct ShaderC* this, int32_t techniqueIndex)
+  120    inline-only   void SetOverrideTechnique(const struct ShaderC* this, int32_t techniqueIndex)
+  122    inline-only   void ShaderC::ClearOverrideTechnique(const struct ShaderC* this)
+  122    inline-only   void ClearOverrideTechnique(const struct ShaderC* this)
+  138  004F7820      4  void OnFlush(const struct ShaderC* this)
+  139  004F7824      4  void FlushGlobals(const struct ShaderC* this)

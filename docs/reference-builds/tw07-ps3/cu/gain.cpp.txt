@@ -1,0 +1,10 @@
+// C:/packages/rwaudiocore/2.08.01/source/plugins/gain.cpp
+// compiled in: gain.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    0  006D9224      C  void ~Gain(const struct <anon>* this)
+                         inlines  ~PlugIn
+   87  006D91B0      8  struct <anon>* GetPlugInDescRunTime()
+   93  006D91B8     24  bool CreateInstance(struct PlugIn* pPlugIn, void* pConstructorParams)
+                         local  struct <anon>* pThis
+                         inlines  Initialize<rw::audio::core::Gain>

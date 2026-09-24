@@ -1,0 +1,18 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/uiAptProcessInterface.c
+// compiled in: apt_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   29  0004FA04    214  void UI_GetMoneyString(int money, char* string, size_t stringBufLen)
+                         local  char[128] buff
+                         local  uint32 strLen
+                         local  uint32 moneyLen
+                         local  int numCommas
+                         local  int commasRemaining
+                         local  int finLen
+                         local  int pos
+                         local  int i
+  101  000518DC     28  void UI_OpenInterface()
+  108  000C1020     60  void UI_vCloseModule()
+  120  0005BDA0      4  void UI_vInitModule()
+  128  00051904     3C  void UI_ExitFade()
+                         inlines  cGAME_GLOBALS::SetEndGame, cGAME_GLOBALS::SetGamePaused

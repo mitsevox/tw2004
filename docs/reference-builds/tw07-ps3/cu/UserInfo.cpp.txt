@@ -1,0 +1,258 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/User/UserInfo.cpp
+// compiled in: other_unity.cpp
+// 138 functions, source order. line | PS3 address | size
+
+   94  003D5998     1C  void UserInfo::OpenOnce()
+  104  003D59B4      4  void UserInfo::CloseOnce()
+  111    inline-only   static uint64_t GetTimeStamp()
+                         local  int32_t Month
+                         local  int32_t Day
+                         local  int32_t Year
+                         local  int32_t Hour
+                         local  int32_t Minute
+                         local  int32_t Second
+                         local  int32_t Millisecond
+                         local  uint64_t utc
+  125  0043B834    894  void UserInfo::ResetUserInfo(const struct UserInfo* this, int32 userNumber)
+                         local  uint32_t i
+                         local  bool tempuser
+                         local  void* save_crap
+                         local  void*[2] save_alterego
+                         local  char[32] userName
+                         local  struct TigerChallengeEvent_t* pTCReadOnlyData
+                         local  struct UCAPSkillChallengesEvent_t* pUcapSCReadOnlyData
+                         local  uint32_t i
+                         local  uint32 worldRanking
+                         local  int i
+                         local  int i
+                         inlines  BitArray_ClearArray, GameModeDriverTigerChallenge::GetTigerChallengeEventInfoPtr, GetTimeStamp, Singleton<GolferStats>::GetSingleton, UCAPSkillChallengesUserData::SetHidden, UCAPSkillChallengesUserData::SetLock, UCAPSkillChallengesUserData::SetWon, UnlockInfo::SetTourCard, UserInfo::GetGolferStyle, UserInfo::SetBling, UserInfo::SetBlingBlingChance, UserInfo::SetControllerTiltSpinnaOption, UserInfo::SetDevPoints, UserInfo::SetDifficultyStreakValue, UserInfo::SetLeftSwingStick, UserInfo::SetNickName, UserInfo::SetRightSliceSwingStick, UserInfo::SetTotalCash, UserInfo::SetTourEarnings, UserInfo::SetVoicePitch, UserInfo::SetVoiceStyle
+  430  00427C0C    240  void UserInfo::ResetGolferData(const struct UserInfo* this)
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  UserInfo::GetDevLevel, UserInfo::GetGolferData, UserInfo::SetDevCapLevelWins, UserInfo::SetDevLevel, UserInfo::SetDevPoints
+  482  003D5D60     78  struct CrAPInfo_t& UserInfo::GetCrAPInfo(const struct UserInfo* this)
+  489  003D5DD8     84  struct CRAPAlterEgo_t& UserInfo::GetAlterEgoInfo(const struct UserInfo* this, int egoindex)
+  497  003D5E5C     78  struct THUMBNAILS_t& UserInfo::GetThumbnails(const struct UserInfo* this)
+  504  003D5ED4     7C  void UserInfo::SetThumbnailLoaded(const struct UserInfo* this, int index, bool val)
+  510  003D5F50     70  bool UserInfo::IsThumbnailLoaded(const struct UserInfo* this, int index)
+  520  0042ED44     48  void UserInfo::InitCrAPInfo(const struct UserInfo* this)
+  531  003D5FC0     A0  void UserInfo::InitAlterEgoInfo(const struct UserInfo* this, uint32_t index)
+                         local  int32 i
+  546  0042E858    2D8  void UserInfo::InitCrAPItemBitArrays(const struct UserInfo* this)
+                         local  int32_t numDBEntries
+                         local  FE_CrAP_Asset_Gender_e savedGender
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         inlines  BitArray_ClearBit, BitArray_SetBit
+  604  0042EC50     F4  void UserInfo::ClearNewProshopItemsBitArray(const struct UserInfo* this)
+                         local  int32 numDBEntries
+                         local  int32 i
+                         inlines  BitArray_ClearBit
+  620  0041EBA4     64  bool UserInfo::IsAssetNewlyAvailable(const struct UserInfo* this, uint32 assetID)
+  628  00402C3C     BC  void UserInfo::ClampStats(const struct UserInfo* this)
+                         local  int8_t statID
+                         inlines  UserInfo::GetGolferData
+  648  0042F140     94  void UserInfo::UnlockGolfer(const struct UserInfo* this, enum Golfer_t golferID)
+  660  0042F87C     74  void UserInfo::UnlockCourse(const struct UserInfo* this, enum GM_CourseType_t courseID)
+  674  0043C730    10C  bool UserInfo::IsGolferAvailable(const struct UserInfo* this, enum Golfer_t golferID)
+                         inlines  Singleton<GolferStats>::GetSingleton
+  715  0041F198     78  bool UserInfo::IsCourseAvailable(const struct UserInfo* this, enum GM_CourseType_t courseID)
+  752  003D6060     70  int32_t UserInfo::GetNumTrophyBallsWon(const struct UserInfo* this)
+                         local  int32_t i
+                         local  int32_t numWon
+  767  003D61A4     A8  int32_t UserInfo::GetRealTimeCompletedBitArray(const struct UserInfo* this, int32_t startIndex)
+                         local  int32_t i
+                         local  int32_t bitArray
+                         local  int32_t entryNum
+  782  00402CF8     AC  void UserInfo::SetUserName(const struct UserInfo* this, char* name)
+  791  003E7648     70  void UserInfo::UpdateGamerTagName(const struct UserInfo* this, int nGamerIndex)
+  799  003E759C     AC  bool UserInfo::GetGamerTag(int nGamerId, char* buffer, size_t buffSz)
+  822  003E74AC     F0  void UserInfo::SetPersonaName(const struct UserInfo* this, char* name)
+  831  0042EB30     E0  void UserInfo::SetUserFlag(const struct UserInfo* this, UserFlag flagType, bool bVal)
+                         inlines  BitArray_ClearBit, BitArray_SetBit
+  846  0041F210     68  void UserInfo::ClearEraCutscenePlayedFlags(const struct UserInfo* this)
+                         inlines  BitArray_ClearArray
+  854  0042EE7C     90  void UserInfo::SetEraCutscenePlayed(const struct UserInfo* this, uint32_t cutsceneIndex)
+                         inlines  BitArray_SetBit
+  862  0041EC08     9C  bool UserInfo::HasEraCutscenePlayed(const const struct UserInfo* this, uint32_t cutsceneIndex)
+  870  003D5C7C     E4  void UserInfo::SetERA(const struct UserInfo* this, enum ERA_Type_e setEra)
+  881  003D624C     7C  enum ERA_Type_e UserInfo::GetERA(const struct UserInfo* this)
+  894  003D62C8     80  enum ERA_Type_e UserInfo::GetERA_MultiCurrentOk(const struct UserInfo* this)
+  903  003D6348     7C  void UserInfo::SetShotTypeTotal(const struct UserInfo* this, uint32_t shotType, int32_t iVal)
+  911  003D5B78     6C  AwardInfoTrophyBalls& UserInfo::GetTrophyBallAwardInfo(const struct UserInfo* this, uint32_t i)
+  919  003D63C4     6C  struct REPLAY_MOMENT_t& UserInfo::GetTrophyBallReplay(const struct UserInfo* this, uint32_t i)
+  927  003D6430     74  const int32_t UserInfo::GetShotTypeTotal(const struct UserInfo* this, uint32_t shotType)
+  935  003D64A4     70  struct CreatedCourse_t& UserInfo::GetCreatedCourseInfo(const struct UserInfo* this, uint32_t i)
+  943  003D6514     D4  AwardInfoPGAEvent& UserInfo::GetPGAEventAwardInfo(const struct UserInfo* this, uint32_t i)
+  965  003D65E8     CC  AwardInfoPGAMajorAwards& UserInfo::GetPGAMajorAwardInfo(const struct UserInfo* this, uint32_t i)
+  975  003D66B4     CC  AwardInfoPGAMoneyList& UserInfo::GetPGAMoneyListAwardInfo(const struct UserInfo* this, uint32_t i)
+ 1009  003D6780     C4  AwardInfoRivalMode& UserInfo::GetRivalModeAwardInfo(const struct UserInfo* this, uint32_t i)
+ 1019  003D6844     C4  AwardInfoRTE& UserInfo::GetRealTimeEventAwardInfo(const struct UserInfo* this, uint32_t i)
+ 1062  003D6908    220  void UserInfo::CopyUserInfo(const struct UserInfo* this, const struct UserInfo& userInfoToCopy)
+                         local  void* save_crap
+                         local  void* save_alterego1
+                         local  void* save_alterego2
+                         local  struct PGATourUserData* save_pga
+                         local  struct RealTimeEventUserData* save_rte
+                         local  struct RivalModeUserData* save_riv
+                         local  struct EraModeUserData* save_era
+                         local  struct TigerChallengeUserData* save_tc
+                         local  struct TrainingChallengeUserData* save_trc
+                         local  struct UCAPSkillChallengesUserData* save_ucapsc
+ 1139  003D6B28      4  void UserInfo::CopyUserInfo(const struct UserInfo* this, struct UserInfo* userInfoToCopy)
+ 1146  003D60D0     D4  bool UserInfo::IsRealTimeEventComplete(const struct UserInfo* this, uint32_t i)
+ 1156  0041ECA4     9C  bool UserInfo::IsCaddieTipGiven(const struct UserInfo* this, CaddieTip i)
+ 1164  0042EF0C     E0  void UserInfo::SetCaddieTipGiven(const struct UserInfo* this, CaddieTip i, bool bVal)
+                         inlines  BitArray_ClearBit, BitArray_SetBit
+ 1179  003D6B2C     84  void UserInfo::IncShotTypeTotal(const struct UserInfo* this, uint32_t shotType, int32_t incVal)
+ 1199  0043C83C    1B0  void UserInfo::CreateDummyUserInfo(const struct UserInfo* this, int golferModelID)
+                         local  char[32] userName
+                         inlines  Singleton<GolferStats>::GetSingleton, UnlockInfo::SetTourCard, UserInfo::GetGolferData, UserInfo::SetLoaded, UserInfo::SetValid
+ 1238  003D6BB0     A4  int32_t UserInfo::GetPar5EagleStat(const struct UserInfo* this, int32_t statType, int32_t courseAndHole)
+ 1259  003D5ACC     AC  void UserInfo::SetPar5EagleStat(const struct UserInfo* this, int32_t statType, int32_t courseAndHole, int32_t iValue)
+ 1280  0041EE80     48  bool UserInfo::IsTourDifficultyUnlocked(const struct UserInfo* this)
+                         local  bool unlocked
+ 1335  003D5C64     18  bool UserInfo::IsOldUserLoaded()
+ 1342  003D6C54     18  void UserInfo::SetOldUserLoaded(bool bVal)
+ 1349  00411AD0    104  uint32_t UserInfo::GetUserMoney(const struct UserInfo* this, bool bForceOnline)
+                         local  struct <anon>* pStatStrategy
+ 1373  003D6C6C      8  uint32_t UserInfo::GetUserMoneyHighWaterMark(const struct UserInfo* this)
+ 1380  003D6C98     48  void UserInfo::AddUserMoney(const struct UserInfo* this, uint32_t amount)
+                         inlines  UserInfo::IncTotalCash
+ 1389  003D6CE0      C  void UserInfo::DeductUserMoney(const struct UserInfo* this, uint32_t amount)
+ 1412  003D5AB4     18  void UserInfo::SetCurrentCash(const struct UserInfo* this, int32_t currentCash)
+ 1423  003D6C74     24  void UserInfo::IncCurrentCash(const struct UserInfo* this, int32_t incVal)
+ 1434  003D5BE4     80  struct EraMode_WorldRankingList& UserInfo::GetERAModeData(const struct UserInfo* this)
+ 1443  003D6CEC     B4  char* UserInfo::GetWorldRankingName(const struct UserInfo* this, int rankPosition)
+ 1459  003D6DA0     E4  int32_t UserInfo::GetWorldRankingStat(const struct UserInfo* this, int rankPosition, enum Era_StatType_e stat)
+                         inlines  UserInfo::GetTotalCash
+ 1476  003D6E84     C0  int UserInfo::GetWorldRankingPosition(const struct UserInfo* this, enum ERA_RankingType_e rankType, int index)
+                         local  int i
+ 1495  003D6F44     D0  int16_t UserInfo::GetAssociatedDevPtType(const struct UserInfo* this, int statType)
+ 1525  0041F278    154  bool UserInfo::AreDevPointsTypeUseful(const struct UserInfo* this, int index)
+ 1571  003D7014     84  static int DevLevelIncreasing(const void* arg1, const void* arg2)
+                         local  int result
+                         local  struct DevLevelAndType a1
+                         local  struct DevLevelAndType a2
+ 1591  0041F3CC    108  void UserInfo::GetSortedDevLevels(const struct UserInfo* this, struct DevLevelAndType* sorted)
+                         local  uint32 i
+                         inlines  UserInfo::GetDevLevel
+ 1608  003D71E4     BC  void UserInfo::RemoveAndDestroyTokensOnAsset(const struct UserInfo* this, int crap_asset_ID)
+                         local  int i
+ 1626  003D7098    14C  void UserInfo::DestroyToken(const struct UserInfo* this, int index)
+ 1638  003D7350    108  int32 UserInfo::AddNewToken(const struct UserInfo* this, int statType, int crap_asset_ID)
+                         local  int32 retVal
+ 1662  003D7458     94  void UserInfo::AssignToken(const struct UserInfo* this, int token_index, int crap_asset_ID)
+ 1669  003D74EC    11C  void UserInfo::GetAssetTokenReport(const struct UserInfo* this, int crap_asset_ID, int* token_report)
+                         local  int i
+ 1686  00402DA4    108  void UserInfo::UpdateAssetBasedModLevels(const struct UserInfo* this)
+                         local  int32 assetID
+                         local  int32 i
+                         local  FE_CrAP_Asset_Slot_e iSlot
+                         local  int[16] token_report
+ 1721  003D7608     7C  bool UserInfo::IsDefaultToken(const struct UserInfo* this, int tokenIdx)
+ 1729  003D72A0     B0  void UserInfo::SetDefaultToken(const struct UserInfo* this, int tokenIdx, bool bVal)
+ 1744  003D7684     D8  enum UserDevPointType UserInfo::ConvertPlayerStatToUserStat(enum STAT_e stat)
+                         local  enum UserDevPointType userDevType
+ 1771  003D775C     88  enum STAT_e UserInfo::ConvertUserStatToPlayerStat(enum UserDevPointType dev)
+                         local  int32 i
+ 1784  0041F604     6C  int32 UserInfo::GetTotalStatDisplayValue(const struct UserInfo* this, enum STAT_e stat)
+ 1792  0041F4D4    130  int32 UserInfo::GetTotalStatDisplayValue(const struct UserInfo* this, enum UserDevPointType devPointType)
+                         local  int32 statValue
+                         local  int32 modLevel
+                         local  int32 totalStat
+                         inlines  GeneralUserData::GetDevLevel, UserInfo::GetDevLevel
+ 1811  00423E00    2F0  void UserInfo::UseAlternatePersona(const struct UserInfo* this, uint32_t index)
+                         local  struct CRAPAlterEgo_t tempBuffer
+                         local  int saveThumbnailIndex
+                         inlines  CRAPAlterEgo_t
+ 1869  003D77E4     2C  bool UserInfo::HasClub(const struct UserInfo* this, int32 club)
+ 1885  003D7810     38  bool UserInfo::AddClub(const struct UserInfo* this, int32 club)
+                         local  bit32 clubMask
+                         local  bool retval
+ 1901  003D7848     38  bool UserInfo::RemoveClub(const struct UserInfo* this, int32 club)
+                         local  bit32 clubMask
+                         local  bool retval
+ 1919  0040D8A0    210  float UserInfo::ComputeDevCapLevelInc(const struct UserInfo* this, float wins)
+                         local  const float maxDevLevel
+                         local  const float initialCapLevel
+                         local  const float nVictoriesToMaxLevel
+                         local  float devCapLevelInc
+ 1935  0040DAFC     A8  uint32_t UserInfo::GetDevCapLevel(const struct UserInfo* this)
+ 1941  0040DAB0     4C  uint32_t UserInfo::GetDevCapLevelThisCourse(const struct UserInfo* this)
+ 1948  0041F670    160  bool UserInfo::HasUnrealizedPotential(const struct UserInfo* this)
+                         local  int i
+                         local  int32 modLevel
+                         inlines  UserInfo::GetDevLevel, UserInfo::GetModLevel
+ 1963  0041F7D0    1AC  void UserInfo::MaxOutDevelopmentLevels(const struct UserInfo* this)
+                         local  const float nVictoriesToMaxLevel
+                         local  int32_t i
+                         inlines  UnlockInfo::SetTourCard, UserInfo::GetDevLevel, UserInfo::SetDevLevel
+ 1982  003D7880     34  void UserInfo::MaxOutModLevels(const struct UserInfo* this)
+                         local  int i
+ 1993  0042EC10     40  void UserInfo::MaxOutCharacterDevelopment(const struct UserInfo* this)
+ 2002  003D78B4     E4  bool UserInfo::IsGolferDevLevelMaxedOut(const struct UserInfo* this)
+                         local  int32_t i
+                         inlines  UserInfo::GetDevLevel
+ 2018  003D7998     CC  bool UserInfo::ResetHoleHistory(const struct UserInfo* this, int32 course, int32 hole, int32 expIndex)
+                         local  int stroke
+ 2033  003D7A64     90  void UserInfo::ResetShotHistories(const struct UserInfo* this)
+                         local  int j
+                         local  int k
+                         local  int index
+ 2048  003D7AF4    10C  void UserInfo::ShiftHoleHistories(const struct UserInfo* this, int32 course, int32 hole)
+                         local  uint32 j
+ 2072  003D7C00     AC  bool UserInfo::SetHoleShotHistory(const struct UserInfo* this, int32 course, int hole, int expIndex, int stroke, const struct sHoleShotHistory& sHoleHistory)
+ 2084  003D7CAC     E8  bool UserInfo::AddHoleShotHistory(const struct UserInfo* this, int32 course, int hole, int stroke, const struct sHoleShotHistory& sHoleHistory)
+                         local  bool retVal
+                         local  int newestHistoryIndex
+ 2104  003D7D94     78  bool UserInfo::AddHoleShotHistory(const struct UserInfo* this, int32 course, int hole, int stroke, float* dest, enum Club_t club, bool holedOut)
+                         local  struct sHoleShotHistory sHoleHistory
+                         inlines  vec3flt_Copy
+ 2122  003D7E0C     A0  bool UserInfo::GetHoleShotHistory(const struct UserInfo* this, int32 course, int hole, int expIndex, int stroke, const struct sHoleShotHistory& strokeHistory)
+ 2133  003D7EAC     68  int UserInfo::GetNumHoleHistories(const struct UserInfo* this, int32 course, int hole)
+                         local  int numHistories
+ 2151  003D7F14     38  void UserInfo::SetNewUCAP(const struct UserInfo* this, int eventIndex)
+ 2162  003D7F4C     4C  void UserInfo::ResetNewUCAP(const struct UserInfo* this)
+ 2181  003D5960      8  void SeasonInfo::SetSeasonInfo(const struct SeasonInfo* this, struct PGATourSeason_t* pData)
+ 2186  003E6AF4    170  void SeasonInfo::Clear(const struct SeasonInfo* this)
+                         local  int32 i
+                         local  uint32 i
+                         local  int32 i
+ 2221  003D81BC     10  int SeasonInfo::GetSeason(const struct SeasonInfo* this)
+ 2226  003D81CC     74  void SeasonInfo::IncrementSeason(const struct SeasonInfo* this)
+ 2236  003D8240     24  bool SeasonInfo::GetEventIDInitialized(const struct SeasonInfo* this)
+ 2242  003D8264     10  int SeasonInfo::GetRealEventID(const struct SeasonInfo* this)
+ 2247  003D8274     2C  int SeasonInfo::GetEventID(const struct SeasonInfo* this)
+ 2256  003D82A0     10  int SeasonInfo::GetRound(const struct SeasonInfo* this)
+ 2261  003D82B0     14  void SeasonInfo::IncrementRound(const struct SeasonInfo* this)
+ 2268  003D82C4     80  void SeasonInfo::SetPlayersFinishRank(const struct SeasonInfo* this, int iYear, int iRank)
+ 2275  003D8344     78  int SeasonInfo::GetPlayersFinishRank(const struct SeasonInfo* this, int iYear)
+ 2283  003D83BC     80  void SeasonInfo::SetOverallWinner(const struct SeasonInfo* this, int iYear, int iPlayerIx)
+ 2290  003D843C     78  int SeasonInfo::GetOverallWinner(const struct SeasonInfo* this, int iYear)
+ 2299  003D84B4     10  int SeasonInfo::GetNumGuests(const struct SeasonInfo* this)
+ 2303  003D84C4     70  uint64 SeasonInfo::GetGuestTimeStamp(const struct SeasonInfo* this, int32 nGuest)
+ 2308  003D8534     10  int16 SeasonInfo::GetBracket(const struct SeasonInfo* this)
+ 2312  003D8544      C  uint16 SeasonInfo::GetWonFedExCup(const struct SeasonInfo* this)
+ 2316  003D8550     70  const char* SeasonInfo::GetGuestName(const struct SeasonInfo* this, int32 nGuest)
+ 2322  003D7FA4      C  void SeasonInfo::SetSeason(const struct SeasonInfo* this, int season)
+ 2326  003D85C0      C  void SeasonInfo::SetEventID(const struct SeasonInfo* this, int id)
+ 2331  003D7FB0      C  void SeasonInfo::SetRound(const struct SeasonInfo* this, int round)
+ 2335  003D7FBC     64  void SeasonInfo::SetNumGuests(const struct SeasonInfo* this, int guest)
+ 2340  003D8020     7C  void SeasonInfo::SetGuestTimeStamp(const struct SeasonInfo* this, int32 nGuest, uint64 stamp)
+ 2345  003D809C      C  void SeasonInfo::SetBracket(const struct SeasonInfo* this, int16 bracket)
+ 2349  003D80A8      C  void SeasonInfo::SetWonFedExCup(const struct SeasonInfo* this, uint16 won)
+ 2354  003E6A24     D0  void SeasonInfo::SetGuestName(const struct SeasonInfo* this, int32 nGuest, const char* pName)
+ 2362  003D80B4     78  struct PGATourSeason_EventData& SeasonInfo::GetEventData(const struct SeasonInfo* this, int32 index)
+ 2368  003D812C     70  GM_Pga_StatCounts& SeasonInfo::GetSimCounts(const struct SeasonInfo* this, int32 index)
+ 2374  003D85CC    31C  void SeasonInfo::ClearSimCounts(const struct SeasonInfo* this, int32 index)
+ 2415  003D819C     10  struct PgaTourSim_Tournament_MC_t& SeasonInfo::GetCurrentTournament(const struct SeasonInfo* this)
+ 2420  003D81AC     10  GM_Pga_UserStats& SeasonInfo::GetUserStats(const struct SeasonInfo* this)
+ 2436  003D88E8      C  uint16 SeasonInfo::GetTourRank(const struct SeasonInfo* this)
+ 2443  003D88F4     10  GM_Pga_FedExPointsInfo& SeasonInfo::GetFedExPointsInfo(const struct SeasonInfo* this)
+ 2449  0040DBA4     A8  float GeneralUserData::IncDevCapLevelWins(const struct GeneralUserData* this, float incAmnt)
+                         local  const float nVictoriesToMaxLevel
+ 2464  003D8DAC     9C  void GeneralUserData::SetDevCapLevelWins(const struct GeneralUserData* this, float wins)
+                         local  const float nVictoriesToMaxLevel

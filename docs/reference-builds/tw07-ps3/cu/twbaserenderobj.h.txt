@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/Code/Golf/RenderObjects/base/twbaserenderobj.h
+// compiled in: rnaunity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   50  004F79E0      4  void Process(const struct BaseRenderObj* this, struct DeviceC* device, double_t timeStamp)
+   52    inline-only   bool IsFlagSet(const struct BaseRenderObj* this, uint32_t flag)
+   53    inline-only   void SetFlag(const struct BaseRenderObj* this, uint32_t flag)
+   56    inline-only   float_t GetDistanceFromCamera(const const struct <anon>* this)

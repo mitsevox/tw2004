@@ -1,0 +1,39 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/RNAMaterial.cpp
+// compiled in: RNAMaterial.cpp
+// 13 functions, source order. line | PS3 address | size
+
+    0  0082A3A8     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   75  0082A860     88  void MaterialC::MaterialC(const struct MaterialC* this, struct DeviceC* pDevice, struct UserData* pUserData, uint32_t uFlags)
+                         inlines  RNARef
+  106  0082AD28    25C  void MaterialC::~MaterialC(const struct MaterialC* this)
+                         local  const char[11] __FUNCTION__
+                         local  struct <anon>* pParm
+                         local  struct TextureC* pTexture
+                         inlines  GetNext, ParmBlockC::Get<RNA::TextureC*>, ParmBlockC::GetFirstParm, RNADebugBreak, ~RNARef
+  155  0082AC2C     FC  void MaterialC::BindShader(const struct MaterialC* this, struct ShaderC* pShader, bool bAddDefaultParms)
+                         local  const struct ParmBlockC* pParmBlock
+                         inlines  SetPtr
+  177  0082A4E8     E4  struct <anon>* MaterialC::AddParm(const struct MaterialC* this, struct ScopeParmC* pScopeParm, int32_t Offset)
+                         local  struct <anon>* pParm
+                         local  const struct ShaderInterfaceC* pIntf
+  200  0082A710     68  struct <anon>* MaterialC::AddParm(const struct MaterialC* this, enum TypeID idType, const char* pStrName, uint32_t uCount, int32_t Offset)
+  206  0082A448     A0  struct <anon>* MaterialC::FindParm(const struct MaterialC* this, enum TypeID idType, const char* pStrName, uint32_t uCount)
+                         local  const char[9] __FUNCTION__
+                         local  struct <anon>* pParm
+                         inlines  RNADebugBreak
+  218  0082A5CC    144  struct <anon>* MaterialC::ResolveParm(const struct MaterialC* this, enum TypeID idType, const char* pStrName, uint32_t uCount)
+                         local  const char[12] __FUNCTION__
+                         local  struct <anon>* pParm
+                         local  struct ScopeParmC* pScopeParm
+                         inlines  RNADebugBreak
+  251  0082A970    2BC  void MaterialC::AddParmsFrom(const struct MaterialC* this, const struct ParmBlockC* pParmBlock, bool bCopyValues)
+                         local  struct <anon>* pParm
+                         local  struct <anon>* pNewParm
+                         local  const union <anon>* pSrcValue
+                         local  union <anon>* pDestValue
+                         inlines  GetNext, ParmBlockC::GetFirstParm, ParmBlockC::ReadValue, ParmBlockC::WriteValue, RNADebugBreak
+  290  0082A348     60  void MaterialC::DeleteAllParms(const struct MaterialC* this)
+  326  0082A778     E8  void MaterialC::Print(const const struct MaterialC* this)
+                         inlines  MaterialC::GetShader
+  332  0082A428     10  static void _GLOBAL__I__ZN3RNA9MaterialC16s_ClassAllocatorE()
+  333  0082A438     10  static void _GLOBAL__D__ZN3RNA9MaterialC16s_ClassAllocatorE()

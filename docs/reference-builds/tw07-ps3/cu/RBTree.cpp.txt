@@ -1,0 +1,101 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/source/common/Index/RBTree.cpp
+// compiled in: RBTree.cpp
+// 29 functions, source order. line | PS3 address | size
+
+    0  0080D24C    10C  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+    0  0080D6BC     38  void ICollection(const struct ICollection* this)
+   61  0080A3F4    120  void RBTree(const struct <anon>* this, int32_t initialAllocations, int32_t numColumn, bool8_t allowDuplicates, enum TDbError* dbError)
+   91  0080A634     B0  void ~RBTree(const struct <anon>* this)
+  107  0080A844     64  enum TDbError Clear(const struct <anon>* this)
+  124  0080A8A8     38  bool8_t AreDuplicatesAllowed(const const struct <anon>* this)
+  140  0080A8E0     38  ColNum GetNumberOfColumns(const const struct <anon>* this)
+  156  0080A918     50  struct <anon>* GetColumn(const struct <anon>* this, int32_t columnIndex)
+  184  00809FC4    218  struct <anon>* InternalGetLeft(const struct <anon>* this, struct <anon>* node)
+                         local  const char[16] __FUNCTION__
+                         local  struct <anon>* prevNode
+                         local  struct <anon>* parentNode
+                         local  struct <anon>* nextNode
+                         local  struct <anon>* nextNode
+  266  0080DD90    2F8  struct <anon>* InternalGetLeft(const struct <anon>* this, struct <anon>* node, int offset)
+                         local  const char[16] __FUNCTION__
+                         local  struct <anon>* prevNode
+                         local  struct <anon>* parentNode
+                         local  struct <anon>* nextNode
+  354  0080A1DC    218  struct <anon>* InternalGetRight(const struct <anon>* this, struct <anon>* node)
+                         local  const char[17] __FUNCTION__
+                         local  struct <anon>* nextNode
+                         local  struct <anon>* parentNode
+                         local  struct <anon>* prevNode
+                         local  struct <anon>* prevNode
+  436  0080E088    2F8  struct <anon>* InternalGetRight(const struct <anon>* this, struct <anon>* node, int offset)
+                         local  const char[17] __FUNCTION__
+                         local  struct <anon>* nextNode
+                         local  struct <anon>* parentNode
+                         local  struct <anon>* prevNode
+  517  0080C12C    45C  enum TDbError Insert(const struct <anon>* this, struct <anon>* newIndexNode, struct <anon>* rootIndexNode)
+                         local  const char[7] __FUNCTION__
+                         local  int32_t direction
+                         local  int32_t parent_direction
+                         local  struct <anon>* newNode
+                         local  struct <anon>* rootNode
+                         local  struct <anon>* pSearch
+                         local  union <anon>* newNodeColData
+  605  0080A968    604  struct <anon>* RemoveNode(const struct <anon>* this, struct <anon>* indexNodeDelete)
+                         local  const char[11] __FUNCTION__
+                         local  int32_t parent_direction
+                         local  struct <anon>* pParent
+                         local  struct <anon>* pAtLeft
+                         local  struct <anon>* pNearLeft
+                         local  struct <anon>** ppSlot
+                         local  struct <anon>* pDelete
+                         local  struct <anon>* pSearch
+  775  0080AF6C    748  struct <anon>* Seek(const struct <anon>* this, const union <anon>* seekData, enum ExprOp seekType)
+                         local  int32_t direction
+                         local  int32_t link_direction
+                         local  struct <anon>* pSearch
+                         local  struct <anon>* pNode
+  882  0080B6B4    32C  struct <anon>* SeekClosest(const struct <anon>* this, const union <anon>* seekData)
+                         local  int32_t direction
+                         local  int32_t link_direction
+                         local  struct <anon>* pSearch
+                         local  struct <anon>* pNode
+  931  0080B9E0     A8  struct <anon>* GetLeft(const struct <anon>* this, struct <anon>* indexNode)
+                         local  struct <anon>* node
+  948  0080BA88     A8  struct <anon>* GetRight(const struct <anon>* this, struct <anon>* indexNode)
+                         local  struct <anon>* node
+  966  0080BB30     C0  struct <anon>* GetLeft(const struct <anon>* this, struct <anon>* indexNode, int offset)
+                         local  struct <anon>* node
+  984  0080BBF0     C0  struct <anon>* GetRight(const struct <anon>* this, struct <anon>* indexNode, int offset)
+                         local  struct <anon>* node
+ 1011  0080BCB0    220  void Rotate(const struct <anon>* this, struct <anon>* insert, bool direction)
+                         local  struct <anon>* pTemp
+                         local  bool8_t OppositeDirection
+ 1074  0080BED0    25C  void InsertFixup(const struct <anon>* this, struct <anon>* node)
+                         local  struct <anon>* pTemp
+                         local  struct <anon>* pParent
+                         local  struct <anon>* pGrandParent
+                         local  bool8_t Direction
+                         local  bool8_t OppositeDirection
+ 1148  0080C588    2F0  void CreateKey(const struct <anon>* this, RowNum rowNum, struct <anon>* node)
+                         local  uint8_t* pData
+                         local  struct <anon>* pColDef
+                         local  union <anon>* pColData
+                         local  ColNum colNum
+ 1218  0080C878    700  int Compare(const struct <anon>* this, const union <anon>* n1Data, const union <anon>* n2Data, ColNum numCols)
+                         local  const char[8] __FUNCTION__
+                         local  const struct <anon>* pCols
+                         local  struct <anon>* pColDef
+                         local  ColNum colNum
+                         local  int16_t rc
+                         local  int16_t ord
+ 1291  0080CF78    1CC  void DebugIdxValidate(const struct <anon>* this)
+                         local  const char[17] __FUNCTION__
+                         local  uint32_t temp
+                         local  struct <anon>* pNode
+                         local  struct <anon>* pColDef
+ 1334  0080D144     80  struct <anon>* AllocateNode(const struct <anon>* this)
+                         local  struct <anon>* indexNode
+ 1352  0080D1C4     88  void DeallocateNode(const struct <anon>* this, struct <anon>* indexNode)
+                         local  struct <anon>* node
+ 1357  0080D358     3C  static void _GLOBAL__I__ZN2EA4T3db6RBTreeC2EiiaPNS0_8TDbErrorE()
+ 1358  0080D394     3C  static void _GLOBAL__D__ZN2EA4T3db6RBTreeC2EiiaPNS0_8TDbErrorE()

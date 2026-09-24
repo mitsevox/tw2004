@@ -1,0 +1,6 @@
+// C:/packages/PlayStation3GCC/096.002/Installed/target/ppu/include/new
+// compiled in: decoderregistry.cpp, pluginregistry.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   97    inline-only   void* operator new(size_t , void* _Where)
+  134    inline-only   void* operator new(size_t , size_t , void* _Where)

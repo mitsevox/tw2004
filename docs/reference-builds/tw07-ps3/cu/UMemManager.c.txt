@@ -1,0 +1,50 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/UMemManager.c
+// compiled in: Legacy_unity.cpp
+// 17 functions, source order. line | PS3 address | size
+
+  189    inline-only   static void MemoryManager_SetupFacilityBudget()
+                         local  int32 spectatorMemLeft
+  234  0037B434    118  char* MemManager_SizeString(char* buf, size_t len, uint32 bytes)
+  246  003A2D50    164  static void MemManger_CheckValidBudget(const char* name, uint32 bytes, MemBudgetTracker_Budget* pBudgetInfo)
+                         local  uint32 memoryBudgeted
+                         local  int i
+                         local  bool bAddBudget
+                         local  char[64] budgeted
+                         local  char[64] have
+                         local  char[64] diff
+                         local  int memdiff
+  280  003CDE50     70  struct <anon> FakeResourceAllocator::DoAllocate(const struct FakeResourceAllocator* this, const const struct <anon>& resourceDescriptor, const char8_t* name)
+                         inlines  Resource
+  284  003CDE34     1C  void FakeResourceAllocator::DoFree(const struct FakeResourceAllocator* this, const const struct <anon>& resource)
+  291  003B2878    2A4  void MemManager_InitAllMemory()
+                         local  CircularBuffer_t* memBudgetBuffer
+                         local  uint32 memNeededToRun
+                         local  uint32 memAvailable
+                         local  sys_memory_info_t info
+                         local  char[64] buf
+                         local  char[64] buf2
+                         inlines  MemoryManager_SetupFacilityBudget, sys_memory_get_user_memory_size
+  421  003B2C00     8C  void MemManager_FreeAllMemory()
+                         local  CircularBuffer_t* memBudgetBuffer
+  447  0037B5A0     90  enum eMemoryPools MemManager_FindMemPool(void* ptr)
+                         local  int i
+  464  003A2CB0     74  CircularBuffer_t* MemManager_GetCircBuffer(MemBudgetTypeE eBudgetType)
+  478  0037B630     6C  MemBudgetTracker_Budget* MemManager_GetBudgetInitInfo(int eGameMode)
+  514  003AA860     20  void GolfAllocator(const struct <anon>* this)
+  518  003AB994    17C  void* Alloc(const struct <anon>* this, size_t size, const const struct <anon>& flags)
+                         local  MemBudgetTypeE eBudgetType
+                         local  TTypeAcces typeMem
+                         local  int32 align
+                         local  enum eMemoryPools pool
+                         local  char* fileName
+                         local  int lineNumber
+                         local  char* function
+                         local  const struct <anon>* p
+                         local  void* ptr
+  598  003A8674     A8  void Free(const struct <anon>* this, void* block, size_t size)
+                         local  enum eMemoryPools memPool
+  628  0037B69C     18  int AddRef(const struct <anon>* this)
+  635  0037B6B4     6C  int Release(const struct <anon>* this)
+  647  003AAD58     60  void CustomGolfAllocator(const struct <anon>* this, MemBudgetTypeE budget, enum eMemoryPools pool)
+  651  003B15B8     54  void* Alloc(const struct <anon>* this, size_t size, const const struct <anon>& flags)
+                         inlines  TagValuePair, operator+

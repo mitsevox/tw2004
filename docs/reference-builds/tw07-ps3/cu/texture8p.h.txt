@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/Code/Golf/TextureFX/Headers/texture8p.h
+// compiled in: other_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   79    inline-only   void Texture8P::GetClutValue(const struct Texture8P* this, int32_t clutEntry, const RawTexture_PixelValue& value)
+                         local  int32_t realEntry
+                         local  int32_t blockNum
+                         local  int32_t pixNum

@@ -40,3 +40,18 @@ hard function boundary.
 PS3 is 64-bit and TW07 is substantially newer. Names, enums, signatures, field purposes, source
 organization, and algorithms are useful evidence; raw byte offsets and class sizes are not directly
 portable to the 32-bit GameCube build.
+
+## Per-source-file lists and the pairing with TW2004
+
+- `cu/<SourceFile>.txt`: every function the DWARF places in that source file, in source order (TW07
+  was built as unity files; functions are regrouped by their declaring file). One function per
+  block: `line  PS3-address  size  [static ]return Name(parameters)`, then its `local` variables
+  in declaration order and the functions it `inlines`. Inline-only functions (no address) are
+  included. `cu/index.tsv` lists the files, their function counts and EA's source paths. Made by
+  `python tools/match/tw07dwarf.py <elf> <out dir>`.
+- `pairs.tsv`: a machine pairing of TW2004 functions (GameCube address, our unit and current name)
+  with TW07 functions (name, file, line), scored on shared strings, float constants, paired callees
+  and callers, size ratio (PS3 code is about 1.8x GameCube) and source-order alignment within a
+  unit. `conf` high/med/low; measured precision against names already proven: high 26/26, med 66/68,
+  low about 85%. A candidate, never a fact. `pairs_blind.tsv` is the same without our names, for
+  blind audit lanes. Snapshot of 2026-09-24; our names change as the audit renames functions.

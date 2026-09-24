@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/RenderObjects/base/twbaserenderobj.cpp
+// compiled in: rnaunity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   51  004CDCDC     24  void BaseRenderObj(const struct BaseRenderObj* this)
+                         inlines  SetFlag
+   68  004C9AA0     18  void ~BaseRenderObj(const struct BaseRenderObj* this)

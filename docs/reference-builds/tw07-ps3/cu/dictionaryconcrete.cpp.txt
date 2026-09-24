@@ -1,0 +1,78 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/dictionaryconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 37 functions, source order. line | PS3 address | size
+
+   80  005EF610     98  void CopyDictionary(const struct DictionaryConcrete* this, const const struct DictionaryConcrete& otherDictionary, struct MemoryStrategy* pMemoryStrategy)
+                         local  int32_t iTagErr
+                         inlines  GetTagField
+  112  005B4848     C8  void AllocateTagField(const struct DictionaryConcrete* this, uint32_t uCapacity, struct MemoryStrategy* pMemoryStrategy)
+  145  005CBD20     10  struct MemoryStrategy* GetMemoryStrategy(const const struct DictionaryConcrete* this)
+                         local  struct MemoryStrategy* pMemoryStrategy
+  174  005CBCB0     70  struct MemoryStrategy* GetMemoryStrategyForState()
+                         local  struct MemoryStrategy* pMemoryStrategy
+                         inlines  GetInstance
+  209  005B4910     68  void DictionaryConcrete(const struct DictionaryConcrete* this, uint32_t uMaximumMemorySize, struct MemoryStrategy* pMemoryStrategy)
+  237  005B49E0     90  void DictionaryConcrete(const struct DictionaryConcrete* this, uint32_t uMaximumMemorySize, const char8_t* strTagField, struct MemoryStrategy* pMemoryStrategy)
+                         local  int32_t iTagErr
+  268  005B4B00     9C  void DictionaryConcrete(const struct DictionaryConcrete* this, const char8_t* strTagField, uint32_t uMaximumMemorySize)
+  307  005EF700     6C  void DictionaryConcrete(const struct DictionaryConcrete* this, const const struct DictionaryConcrete& otherDictionary, struct MemoryStrategy* pMemoryStrategy)
+  335  005B479C     68  void ~DictionaryConcrete(const struct DictionaryConcrete* this)
+  362  005EF6A8     58  struct <anon>& operator=(const struct DictionaryConcrete* this, const const struct DictionaryConcrete& otherDictionary)
+  392  005B4D10     60  int32_t GetString(const const struct DictionaryConcrete* this, const char8_t* key, const char8_t* strDefaultValue, char8_t* pBuffer, uint32_t uBufferSize)
+                         local  const char8_t* pField
+                         local  int32_t iResult
+  418  005B4D70     48  int32_t GetStringSize(const const struct DictionaryConcrete* this, const char8_t* key)
+  441  005B4DB8     40  int32_t GetNumber(const const struct DictionaryConcrete* this, const char8_t* key, int32_t iDefaultValue)
+                         local  const char8_t* pField
+  465  005B4DF8     40  float_t GetFloat(const const struct DictionaryConcrete* this, const char8_t* key, float_t fDefaultValue)
+                         local  const char8_t* pField
+  490  005B4E38     50  uint32_t GetEpoch(const const struct DictionaryConcrete* this, const char8_t* key, uint32_t uDefaultValue)
+                         local  const char8_t* pField
+  521  005B4E88     68  void SetString(const struct DictionaryConcrete* this, const char8_t* key, const char8_t* value)
+                         local  int32_t iTagErr
+  549  005B4EF0     68  void SetNumber(const struct DictionaryConcrete* this, const char8_t* key, int32_t value)
+                         local  int32_t iTagErr
+  578  005B4F58     68  void SetFloat(const struct DictionaryConcrete* this, const char8_t* key, float_t value)
+                         local  int32_t iTagErr
+  606  005B4FC0     28  void RemoveValue(const struct DictionaryConcrete* this, const char8_t* key)
+                         local  int32_t iTagErr
+  634  005B4FE8     10  void RemoveAll(const struct DictionaryConcrete* this)
+  658  005D728C     98  struct Dictionary* CreateDictionary(uint32_t uMaximumMemorySize, struct MemoryStrategy* pMemoryStrategy)
+  686  005D71FC     90  struct Dictionary* CreateDictionary(const char8_t* strTagField, struct MemoryStrategy* pMemoryStrategy)
+  714  005B4FF8     3C  bool KeyExists(const const struct DictionaryConcrete* this, const char8_t* key)
+  740  005EFA5C     84  void Merge(const struct DictionaryConcrete* this, const struct Dictionary* otherDictionary)
+                         local  int32_t iTagErr
+                         inlines  GetTagField
+  769  005B5034     58  void GetNumberArray(const const struct DictionaryConcrete* this, const char8_t* key, int32_t* pArray, uint32_t uElements)
+                         local  const char8_t* pField
+  794  005B508C     48  void SetNumberArray(const struct DictionaryConcrete* this, const char8_t* key, const int32_t* pArray, uint32_t uElements)
+                         local  int32_t iTagErr
+  819  005D8E20    158  struct Dictionary* GetDictionary(const const struct DictionaryConcrete* this, const char8_t* key)
+                         local  const char8_t* pField
+                         local  int32_t iResult
+                         local  uint32_t uSize
+                         local  struct DictionaryConcrete* pDictionary
+                         local  struct <anon> strTagField
+                         local  struct <anon> tempDictionary
+  867  005EFFAC     9C  void SetDictionary(const struct DictionaryConcrete* this, const char8_t* key, const struct Dictionary* dictionary)
+                         local  int32_t iTagErr
+                         inlines  GetTagField
+  895  005B50D4     68  void SetEpoch(const struct DictionaryConcrete* this, const char8_t* key, uint32_t value)
+                         local  int32_t iTagErr
+  922  005B513C     40  int32_t GetFlags(const const struct DictionaryConcrete* this, const char8_t* key, int32_t iDefaultValue)
+                         local  const char8_t* pField
+  948  005B517C     68  void SetFlags(const struct DictionaryConcrete* this, const char8_t* key, int32_t value)
+                         local  int32_t iTagErr
+  977  005B51E4     78  void SetBinary(const struct DictionaryConcrete* this, const char8_t* key, const void* pBuffer, uint32_t uBufferSize)
+                         local  int32_t iTagErr
+ 1006  005B525C     54  uint32_t GetBinary(const const struct DictionaryConcrete* this, const char8_t* key, void* pBuffer, uint32_t uBufferSize)
+                         local  const char8_t* pField
+ 1035  005B52B0    10C  void SetRaw(const struct DictionaryConcrete* this, const char8_t* key, const char8_t* pBuffer, uint32_t uBufferSize)
+                         local  int32_t iTagErr
+                         local  char8_t* pRawStr
+ 1072  005B53BC     50  int32_t GetPackedBuffer(const const struct DictionaryConcrete* this, const char8_t* key, char8_t* pBuffer, uint32_t uBufferSize)
+                         local  int32_t iTagErr
+                         local  const char8_t* pField
+ 1104  005B540C     78  void SetPackedBuffer(const struct DictionaryConcrete* this, const char8_t* key, const char8_t* pBuffer, uint32_t uBufferSize)
+                         local  int32_t iTagErr
+ 1130  005B5484     30  uint32_t GetSize(const const struct DictionaryConcrete* this)

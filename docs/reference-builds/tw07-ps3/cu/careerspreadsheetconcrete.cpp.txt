@@ -1,0 +1,53 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/career/source/common/careerspreadsheetconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 22 functions, source order. line | PS3 address | size
+
+   81  005CB9E4    2CC  void CareerStatbookLoadSuccess(const struct <anon>* this, struct CareerStatbook* pStatbook)
+                         local  uint32_t uNumRows
+                         local  uint32_t uNumSets
+                         local  uint32_t uIndex
+                         local  struct <anon> strFirstItem
+                         local  int32_t iSet
+                         local  const char8_t* strParams
+                         local  int32_t iRowsPerSet
+  177  005C7914     5C  void CareerStatbookLoadFailure(const struct <anon>* this, enum Failure eFailure)
+  205  005C7808    10C  void UpdateNumDisplayRows(const struct <anon>* this)
+                         local  int32_t iUserCol
+                         local  uint32_t uNumRows
+                         local  const char8_t* strUser
+  248  00604944     E4  void CareerSpreadsheetConcrete(const struct <anon>* this, const char8_t* strView, uint32_t uNumSlots)
+  283  006047D4     80  void ~CareerSpreadsheetConcrete(const struct <anon>* this)
+  311  005C7970     B0  struct Operation* LoadUser(const struct <anon>* this, const char8_t* strUserName, uint32_t uSlot, struct CareerSpreadsheetCallback* pCallback)
+  345  005C7A20     4C  int32_t GetMaxNumVisibleRows(const const struct <anon>* this)
+  370  005C7A6C     4C  int32_t GetSpreadsheetVerticalPosition(const const struct <anon>* this)
+  395  005C7AB8     5C  int32_t GetNumberOfStaticColumns(const const struct <anon>* this)
+                         local  int32_t iNumStaticCols
+  422  005C7B14     4C  int32_t GetUserColumn(const const struct <anon>* this)
+  447  005C7B60     68  const char8_t* GetColumnHeader(const const struct <anon>* this, int32_t iColumn)
+  479  005C7BC8     C4  const char8_t* GetCell(const const struct <anon>* this, int32_t iRow, int32_t iColumn, uint32_t uSlot)
+                         local  const char8_t* strValue
+  515  005C7C8C      8  uint32_t GetNumberOfRows(const const struct <anon>* this)
+  540  005C7C94      8  uint32_t GetNumberOfColumns(const const struct <anon>* this)
+  565  005C7C9C    108  struct SpreadSheetColumnFormat GetColumnFormat(const const struct <anon>* this, int32_t iColumn)
+                         local  int32_t iWidth
+                         local  enum Alignment eAlign
+                         local  enum Type eType
+  608  005C7DA4     2C  uint32_t GetNumberOfExtendedItems(const const struct <anon>* this)
+                         local  uint32_t uNumExtendedItems
+  638  005C7DD0    1D4  struct ExtendedItemLayout GetExtendedItemLayout(const const struct <anon>* this, uint32_t uIndex)
+                         local  struct ExtendedItemLayout layout
+                         local  struct ExtendedItemLayout layout
+                         local  const char8_t* strParams
+                         local  char8_t[25] strParam
+                         local  int32_t iErr
+  700  005C7FA4     B8  const char8_t* GetExtendedItemValue(const const struct <anon>* this, uint32_t uIndex, uint32_t uRow, uint32_t uSlot)
+                         local  const char8_t* strValue
+  735  005C805C     90  const char8_t* GetNoDataWarning(const const struct <anon>* this)
+                         local  const char8_t* strMessage
+                         local  struct CareerStatbookConcrete* pStatbook
+                         local  int32_t iRow
+  769  005C80EC      4  void Sort(const struct <anon>* this, int32_t iColumn, bool bDescending)
+  795  005C80F0     84  void NextSet(const struct <anon>* this)
+                         local  uint32_t uCurrentSet
+  836  005C8174     7C  void PrevSet(const struct <anon>* this)
+                         local  uint32_t uCurrentSet

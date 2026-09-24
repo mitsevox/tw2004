@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_trinity_node.h
+// compiled in: tiger_module_trinity_creation_interface.cpp, tiger_module_trinity_node.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   16    inline-only   const char* TrinityNode::GetContextName(const const struct TrinityNode* this)
+   16    inline-only   const char* GetContextName(const const struct <anon>* this)
+   22    inline-only   struct Global* GetGlobal(const const struct <anon>* this)

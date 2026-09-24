@@ -1,0 +1,19 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/UMemPool.c
+// compiled in: Legacy_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   72  003AF768    22C  MemPoolPtr CreateMemPoolFunc(const const struct Allocator& allocRef, int32 numToPreallocate, int32 sizeOfEntry, int32 memoryType, int32 alignment, char* filename, int32 lineNumber)
+                         local  MemPoolPtr pool
+                         local  char* entryPtr
+                         local  char* lastEntryPtr
+                         local  int32 poolBlockSize
+                         local  int32 actualEntrySize
+                         local  struct Allocator tempAlloc
+                         local  int32 headerSize
+                         inlines  TagValuePair, operator+
+  129  003AA2DC     1C  void DeleteMemPool(MemPoolPtr memPool)
+  139  0038EA68     BC  void* AllocPoolMem(MemPoolPtr memPool)
+                         local  char* entry
+  165  0038E8D8     84  void ReturnPoolMem(MemPoolPtr memPool, void* poolEntry)
+  188  0037B720     30  bool MemPool_PtrInPool(MemPoolPtr pMemPool, void* poolEntry)
+                         local  uintptr_t pstart

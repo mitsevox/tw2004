@@ -1,0 +1,38 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/scenegraph/source/SceneGraph/Runtime/Nodes/SGNodeTransform.cpp
+// compiled in: SGNodeTransform.cpp
+// 19 functions, source order. line | PS3 address | size
+
+    0  008BCFBC    140  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  SGNodeTransformInfoC::SGNodeTransformInfoC, SGNodeTransformInfoC::~SGNodeTransformInfoC
+    0  008BD210      C  void SGNodeTransformInfoC::~SGNodeTransformInfoC(const struct SGNodeTransformInfoC* this)
+                         inlines  ~SGNodeInfoC
+   49  008BD248     88  struct SGNodeC* SGNodeTransformInfoC::Create(const const struct SGNodeTransformInfoC* this)
+                         inlines  operator new
+   50  008BD1CC      8  const char* SGNodeTransformInfoC::GetNodeTypeName(const const struct SGNodeTransformInfoC* this)
+   51    inline-only   NodeType_t SGNodeTransformInfoC::GetNodeTypeEnum(const const struct SGNodeTransformInfoC* this)
+   62  008BCB70     B8  void SGNodeTransformC(const struct <anon>* this)
+                         inlines  SetIdentity, operator=
+   70  008BCAAC     C4  void ~SGNodeTransformC(const struct <anon>* this)
+                         inlines  operator delete, ~ITransform
+   96  008BCCE0    2DC  struct SGNodeC* Clone(const struct <anon>* this, bool8_t recurse, NodeCloneUserDataCallback userDataCallback, struct SGNodeC* baseClone)
+                         local  const char[6] __FUNCTION__
+                         local  struct <anon>* clone
+                         inlines  RNADebugBreak, SGNodeC::GetNodeTypeEnum, operator new
+  124  008BC820      8  const struct SGNodeInfoC* GetNodeInfo(const const struct <anon>* this)
+  130  008BC818      8  const struct SGNodeInfoC* _GetNodeInfo()
+  137  008BCA3C     38  void SetLocalToParent(const struct <anon>* this, const const RNAMatrix44& mat)
+                         inlines  operator=
+  142  008BCA74     38  RNAMatrix44 GetLocalToParent(const struct <anon>* this)
+                         inlines  Matrix44
+  147  008BC828     38  void SetCachedLocalToWorld(const struct <anon>* this, const const RNAMatrix44& mat)
+                         inlines  operator=
+  152  008BCA04     38  RNAMatrix44 GetCachedLocalToWorld(const struct <anon>* this)
+                         inlines  Matrix44
+  158  008BC860     44  void* GetVoidInterface(const const struct <anon>* this, InterfaceID id)
+  170  008BC8A4     C4  void SerializeIn(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[12] __FUNCTION__
+                         local  int32_t version
+                         inlines  RNADebugBreak
+  183  008BC968     9C  void SerializeOut(const const struct <anon>* this, const struct OutStreamC& out)
+  196  008BD10C     10  static void _GLOBAL__I__ZN6SceneX16SGNodeTransformC16s_ClassAllocatorE()
+  197  008BD0FC     10  static void _GLOBAL__D__ZN6SceneX16SGNodeTransformC16s_ClassAllocatorE()

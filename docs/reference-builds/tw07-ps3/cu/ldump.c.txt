@@ -1,0 +1,31 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/lua-5.0.2/src/ldump.c
+// compiled in: ldump.c
+// 14 functions, source order. line | PS3 address | size
+
+   28  00547898     4C  static void DumpBlock(const void* b, size_t size, DumpState* D)
+   35  005478E4     30  static void DumpByte(int y, DumpState* D)
+                         local  char x
+   41  00547914     30  static void DumpInt(int x, DumpState* D)
+   46  00547944     30  static void DumpSize(size_t x, DumpState* D)
+   51  00547974     30  static void DumpNumber(lua_Number x, DumpState* D)
+   56  005479A4     90  static void DumpString(TString* s, DumpState* D)
+                         local  size_t size
+   68    inline-only   static void DumpCode(const Proto* f, DumpState* D)
+   74    inline-only   static void DumpLocals(const Proto* f, DumpState* D)
+                         local  int i
+                         local  int n
+   86    inline-only   static void DumpLines(const Proto* f, DumpState* D)
+   92    inline-only   static void DumpUpvalues(const Proto* f, DumpState* D)
+                         local  int i
+                         local  int n
+  101    inline-only   static void DumpConstants(const Proto* f, DumpState* D)
+                         local  int i
+                         local  int n
+                         local  const TObject* o
+  128  00547A34    2E4  static void DumpFunction(const Proto* f, const TString* p, DumpState* D)
+                         local  const TObject* o
+                         inlines  DumpCode, DumpConstants, DumpLines, DumpLocals, DumpUpvalues
+  143    inline-only   static void DumpHeader(DumpState* D)
+  162  00547D18     F8  void luaU_dump(lua_State* L, const Proto* Main, lua_Chunkwriter w, void* data)
+                         local  DumpState D
+                         inlines  DumpHeader

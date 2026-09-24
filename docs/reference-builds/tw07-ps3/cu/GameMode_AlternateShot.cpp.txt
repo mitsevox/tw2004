@@ -1,0 +1,110 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_AlternateShot.cpp
+// compiled in: golf_unity.cpp
+// 32 functions, source order. line | PS3 address | size
+
+   20  00205170     44  void GameModeAlternateShot::GameModeAlternateShot(const struct GameModeAlternateShot* this)
+   25  001FC6F0     18  void GameModeAlternateShot::~GameModeAlternateShot(const struct GameModeAlternateShot* this)
+   30  001FC794    104  void GameModeAlternateShot::Init(const struct GameModeAlternateShot* this)
+   51  001FC898      4  void GameModeAlternateShot::Update(const struct GameModeAlternateShot* this)
+   56  001FC89C      4  void GameModeAlternateShot::Shutdown(const struct GameModeAlternateShot* this)
+   61  001FC8A0     1C  bool GameModeAlternateShot::QueryInterface(const struct GameModeAlternateShot* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bRet
+   75  001FC8BC     38  int32 GameModeAlternateShot::GetEndGameSequence(const struct GameModeAlternateShot* this)
+                         local  int32 sequence
+   84  00305558    140  void GameModeAlternateShot::SetupNextGolfer(const struct GameModeAlternateShot* this)
+                         local  int32 i
+                         inlines  GM_GetGolferUp, PhysicsBall_t::ClearFlag, PhysicsBall_t::SetFlag
+  104  0031EBFC    310  enum PlayerNumber_t GameModeAlternateShot::GetHonors(const struct GameModeAlternateShot* this, enum PlayerNumber_t ignore, bool doNotIgnoreHoledOut)
+                         local  enum PlayerNumber_t player
+                         local  uint32 j
+                         local  int32 currentTeamTeeFirstHonors
+                         local  int32 nextTeamTeeFirstHonors
+                         local  enum PlayerNumber_t[4] currentTeeHonors
+                         local  int32 nTeam
+                         local  int32 nActualPlayer
+                         local  int32 team0Score
+                         local  int32 team1Score
+                         local  enum PlayerNumber_t swap
+                         local  int32 nActualPlayer
+                         inlines  GM_GetCurrentHoleIndex, GetGamePlayerTeam
+  199  0031F5C8    228  enum PlayerNumber_t GameModeAlternateShot::GetHoleWinner(const const struct GameModeAlternateShot* this)
+                         local  enum PlayerNumber_t winner
+                         local  bool bTeam0ExceededShotLimit
+                         local  bool bTeam1ExceededShotLimit
+  225  002C71E0    158  void GameModeAlternateShot::AfterShotButBeforePostReaction(const struct GameModeAlternateShot* this, enum PlayerNumber_t PlayerID)
+                         local  const int32 team
+                         inlines  GetGamePlayerTeam
+  257  0031F228     34  void GameModeAlternateShot::EndGolferTurn(const struct GameModeAlternateShot* this, enum PlayerNumber_t PlayerID)
+                         local  enum PlayerNumber_t teammate
+  265  0031FFDC    3A0  bool GameModeAlternateShot::HoleFinished(const struct GameModeAlternateShot* this, enum PlayerNumber_t PlayerID, bool predict)
+                         local  bool ret
+                         local  int32 holecount
+                         local  int32 i
+                         inlines  GM_GetCurrentHoleIndex
+  321  00279B28    10C  bool GameModeAlternateShot::IsMidRoundSaveAllowedNow(const struct GameModeAlternateShot* this, enum PlayerNumber_t PlayerID)
+                         local  bool bCanSave
+                         local  enum PlayerNumber_t[2] theTeam
+                         local  unsigned int i
+                         local  struct CoreShotInfo_t* pShotInfo
+  352  003306A8    38C  bool GameModeAlternateShot::GameFinished(const struct GameModeAlternateShot* this, bool predict)
+                         local  int32 i
+                         local  int32 j
+                         local  int32 holecount
+                         inlines  GM_GetCurrentHoleIndex, GM_IsPlayoff, GM_SetPlayerHoleStrokes
+  422  0031FCE8    2F4  bool GameModeAlternateShot::GoToPlayoff(const struct GameModeAlternateShot* this, bool predict)
+                         local  int32 i
+                         local  int32 j
+                         inlines  GM_GetCurrentHoleIndex, GM_SetPlayerHoleStrokes
+  493  0031EF0C    1FC  void GameModeAlternateShot::EndHole(const struct GameModeAlternateShot* this)
+                         local  int32 currHole
+                         local  enum PlayerNumber_t winner
+                         local  int playedHoleNum
+                         local  int j
+                         inlines  GM_GetCurrentHoleIndex, GamePlayer::GetGolferScore
+  550  0031FA24    2C4  void GameModeAlternateShot::EndGame(const struct GameModeAlternateShot* this)
+                         local  enum PlayerNumber_t winner
+                         local  enum PlayerNumber_t loser
+                         local  int32 pointsAhead
+                         local  int32 totalearned
+                         local  int32 baseearned
+                         local  int32 userID
+                         local  int32 plr
+                         local  void* driverPointer
+                         local  int32 i
+                         inlines  GM_FullRoundOfGolf, GM_GetNumHolesInRound, GM_IsPlayoff, Singleton<GameModeDriverManager>::GetSingleton
+  641  001FC968     20  void GameModeAlternateShot::SetTeamHonors(int team, enum PlayerNumber_t honors)
+  646  001FC988     2C  enum PlayerNumber_t GameModeAlternateShot::GetTeamHonors(int team)
+  651  001FC774     20  void GameModeAlternateShot::ResetAllTeamHonors(const struct GameModeAlternateShot* this)
+  658  001FC9B4     14  const char* GameModeAlternateShot::GetName(const struct GameModeAlternateShot* this)
+  664  001FC9C8     3C  bool GameModeAlternateShot::OnSameTeam(const struct GameModeAlternateShot* this, enum PlayerNumber_t PlayerID_1, enum PlayerNumber_t PlayerID_2)
+  672  001FCA04     84  bool GameModeAlternateShot::IsTeamOffTee(const const struct GameModeAlternateShot* this, int32 teamNum)
+                         local  bool rval
+                         local  enum PlayerNumber_t plr1
+                         local  enum PlayerNumber_t plr2
+  689  00295C98     B0  bool GameModeAlternateShot::TeamDone(const const struct GameModeAlternateShot* this, int32 teamNum)
+                         local  enum PlayerNumber_t plr1
+                         local  enum PlayerNumber_t plr2
+                         inlines  PLR_HoledOut
+  701  0031F108    120  void GameModeAlternateShot::CopyPlayerShotData(enum PlayerNumber_t dest, enum PlayerNumber_t src)
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_SetPlayerHoleStrokes
+  713  001FC8F4     48  enum PlayerNumber_t GameModeAlternateShot::GetPartner(enum PlayerNumber_t player)
+                         local  enum PlayerNumber_t ret
+  738  00255C54     68  bool GameModeAlternateShot::PlayerHasTeamHonors(const const struct GameModeAlternateShot* this, enum PlayerNumber_t plr)
+                         local  int32 odd
+  747  0031F46C    15C  int32 GameModeAlternateShot::TeamBestPossibleScore(const const struct GameModeAlternateShot* this, int32 teamNum)
+                         local  int32 currHole
+                         local  enum PlayerNumber_t plr1
+                         local  enum PlayerNumber_t plr2
+                         local  int32 minScore
+                         local  int32 teamsCurrentScore
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, PLR_HoledOut
+  770  0031F7F0     C0  int32 GameModeAlternateShot::TeamMatchWins(const const struct GameModeAlternateShot* this, int32 teamNum)
+                         local  int32 currHole
+                         local  enum PlayerNumber_t plr1
+                         local  enum PlayerNumber_t plr2
+                         inlines  GM_GetCurrentHoleIndex
+  782  0031F8B0    174  void GameModeAlternateShot::GetCurrentScoreString(const struct GameModeAlternateShot* this, char* strBuf, int32 bufferSize)
+                         local  int32 player
+                         local  int32 yourWins
+                         local  int32 theirWins
+  806  001FCA88     18  void GameModeAlternateShot::SetCurrentTeam(int32 currentTeam)

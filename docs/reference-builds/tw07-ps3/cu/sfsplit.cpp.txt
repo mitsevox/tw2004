@@ -1,0 +1,13 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/sfsplit.cpp
+// compiled in: sfsplit.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   31  006F5830    1A4  int SFILTER_splitter(void* pstate, int frames, void* psrcp, void* pdstp, int requester)
+                         local  SPLITSTATE* pss
+                         local  int totalbufsize
+                         local  int retframes
+                         inlines  MemCpy, SNDMEMI_alloc, SNDMEMI_free
+   92  006F57A4     48  void SFILTER_splitrestore(void* pstate)
+                         local  SPLITSTATE* pss
+                         inlines  SNDMEMI_free
+  103  006F57EC     44  int SFILTER_createSPLIT(SPLITSTATE* pss)

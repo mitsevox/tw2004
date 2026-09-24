@@ -1,0 +1,18 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/include/common/osdk/list.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   46  006265D4     5C  void ~List(const struct <anon>* this)
+                         inlines  RemoveAllInternal
+   49    inline-only   uint32_t GetNumberOfElements(const const struct List<OSDK::LockerBufferSection>* this)
+   50    inline-only   struct <anon>* GetElementAt(const const struct <anon>* this, uint32_t uIndex)
+   51    inline-only   bool ElementExists(const const struct List<OSDK::VoiceUser>* this, const struct VoiceUser* pElement)
+   55    inline-only   void SetElementAt(const struct List<OSDK::CareerStatbook>* this, uint32_t uIndex, const struct CareerStatbook* pElement)
+   58    inline-only   void InsertElement(const struct <anon>* this, const struct ResourceProtocol* pElement)
+   61    inline-only   void InsertElementAt(const struct List<OSDK::InvitationFilter>* this, uint32_t uIndex, const struct InvitationFilter* pElement)
+   64    inline-only   void RemoveElementAt(const struct <anon>* this, uint32_t uIndex)
+   67    inline-only   void FastRemoveElementAt(const struct List<OSDK::UserConcrete>* this, uint32_t uIndex)
+   73    inline-only   void RemoveElement(const struct <anon>* this, const struct <anon>* pElement)
+   76    inline-only   void RemoveAll(const struct List<OSDK::User>* this)
+   79    inline-only   bool IsFull(const const struct <anon>* this)
+   83    inline-only   void RemoveAllInternal(const struct <anon>* this)

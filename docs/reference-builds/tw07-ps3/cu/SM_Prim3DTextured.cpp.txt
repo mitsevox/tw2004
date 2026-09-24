@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_Prim3DTextured.cpp
+// compiled in: shader_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   43  0051AA7C     40  void SM_Prim3DTexturedClass::SM_Prim3DTexturedClass(const struct SM_Prim3DTexturedClass* this)
+   48  00506518    2B0  void SM_Prim3DTexturedClass::Load(const struct SM_Prim3DTexturedClass* this)

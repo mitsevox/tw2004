@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Version/GoVersion.cpp
+// compiled in: GoVersion.cpp
+// 4 functions, source order. line | PS3 address | size
+
+    0  00343D60     90  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   69  00343D4C     14  char* VE_chpGetBuildVersionString()
+   76  00343DF0     10  static void _GLOBAL__I__Z27VE_chpGetBuildVersionStringv()
+   77  00343E00     10  static void _GLOBAL__D__Z27VE_chpGetBuildVersionStringv()

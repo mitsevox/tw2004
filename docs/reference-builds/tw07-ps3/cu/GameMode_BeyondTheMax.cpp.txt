@@ -1,0 +1,77 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_BeyondTheMax.cpp
+// compiled in: golf_unity.cpp
+// 32 functions, source order. line | PS3 address | size
+
+   12  00258E30     50  void GameModeBeyondTheMax::GameModeBeyondTheMax(const struct GameModeBeyondTheMax* this)
+   18  00203704     18  void GameModeBeyondTheMax::~GameModeBeyondTheMax(const struct GameModeBeyondTheMax* this)
+   27  0031AA84    1D4  void GameModeBeyondTheMax::EndGolferTurn(const struct GameModeBeyondTheMax* this, enum PlayerNumber_t playerID)
+                         local  bool failure
+                         local  struct CoreShotInfo_t* pShotInfo
+                         local  float dist
+                         local  float yardsGained
+                         inlines  LLMath_DistanceBetween3, __vec_len_sqr3, vec4flt_Copy, vec_madd, vec_sld
+   78  00203780     64  void GameModeBeyondTheMax::GetCurrentScoreString(const struct GameModeBeyondTheMax* this, char* strBuf, int32 bufferSize)
+   83  002037E4     DC  void GameModeBeyondTheMax::GetUIGameFinishedString(const struct GameModeBeyondTheMax* this, char* strBuf, int32 bufferSize)
+                         local  const int kMaxStringLength
+                         local  char[32] scoreStr
+  101  002038C0     48  bool GameModeBeyondTheMax::GameFinished(const struct GameModeBeyondTheMax* this, bool predict)
+                         local  bool bRet
+  109  00203908     BC  float GameModeBeyondTheMax::GetDefaultMaxDistance(const struct GameModeBeyondTheMax* this)
+                         local  const enum PlayerNumber_t playerID
+                         local  float fDist
+  123  00203A8C     2C  int32 GameModeBeyondTheMax::GetEndGameSequence(const struct GameModeBeyondTheMax* this)
+                         local  int32 sequence
+  131  00203AB8      C  const char* GameModeBeyondTheMax::GetModeName(const struct GameModeBeyondTheMax* this)
+  138  00203AC4     48  bool GameModeBeyondTheMax::HoleFinished(const struct GameModeBeyondTheMax* this, enum PlayerNumber_t PlayerID, bool predict)
+                         local  bool bRet
+  146  0032DBBC    1D8  void GameModeBeyondTheMax::Init(const struct GameModeBeyondTheMax* this)
+                         local  uint32 playerID
+                         inlines  GM_GetCurrentHoleIndex, GameModeBase::SetUseShotClock
+  183  00258C94    19C  void GameModeBeyondTheMax::InitForTrainingChallenge(const struct GameModeBeyondTheMax* this, const struct TrainingChallengeEvent_t* pEventInfo)
+                         local  float fNumYardsNeededForWin
+                         local  int iShotTimeLimit
+                         local  enum Club_t eMaxClub
+                         local  const float fZero
+                         inlines  cGAME_GLOBALS::SetShotClockOption
+  224  00203BC4     14  bool GameModeBeyondTheMax::IsStartOfTurn(const struct GameModeBeyondTheMax* this)
+  229  00203C28     78  void GameModeBeyondTheMax::ResetClubsAndMaxDistance(const struct GameModeBeyondTheMax* this, enum PlayerNumber_t PlayerID)
+  243  0027D8F0     48  void GameModeBeyondTheMax::PreShotInit(const struct GameModeBeyondTheMax* this, enum PlayerNumber_t PlayerID)
+  256  002ABA24     E0  void GameModeBeyondTheMax::EndGame(const struct GameModeBeyondTheMax* this)
+                         local  struct OnWinData_t onWinData
+                         inlines  OnWinData_t::OnWinData_t
+  273  00203B0C     B8  enum Club_t GameModeBeyondTheMax::GetMaxAvailableClub(const struct GameModeBeyondTheMax* this, enum PlayerNumber_t playerID, enum Club_t eDesiredClub)
+                         local  enum Club_t maxClub
+                         local  int clubIndex
+                         local  struct GamePlayer* pPlayer
+  290  0027D8BC     34  void GameModeBeyondTheMax::OnClubChanged(const struct GameModeBeyondTheMax* this)
+  298  00203D04      4  void GameModeBeyondTheMax::QuitGame(const struct GameModeBeyondTheMax* this)
+  303  00203D08     1C  bool GameModeBeyondTheMax::QueryInterface(const struct GameModeBeyondTheMax* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bRet
+  317  00203CA0     64  void GameModeBeyondTheMax::RestorePlayerClubs(const struct GameModeBeyondTheMax* this)
+                         local  uint32 playerID
+  325  0024A548     60  void GameModeBeyondTheMax::SavePlayerClubs(const struct GameModeBeyondTheMax* this)
+                         local  uint32 playerID
+  331  00203BD8     50  void GameModeBeyondTheMax::SetClubRestrictions(const struct GameModeBeyondTheMax* this)
+                         local  const bit32 availableClubs
+                         local  uint32 playerID
+  340  002D1564     5C  void GameModeBeyondTheMax::SetupNextGolfer(const struct GameModeBeyondTheMax* this)
+                         inlines  PhysicsBall_t::ClearFlag
+  351  0031AA4C     38  void GameModeBeyondTheMax::ShotClockOut(const struct GameModeBeyondTheMax* this)
+  357  0027D6C0    1FC  void GameModeBeyondTheMax::ShowUICurrentStanding(const struct GameModeBeyondTheMax* this, bool bFailure)
+                         local  char[64] mode
+                         local  char[64] curShot
+                         local  char[64] thresholdStr
+                         local  char[64] score
+                         local  int shotDist
+  401  002468E0     6C  void GameModeBeyondTheMax::ShowUIInitialFlash(const struct GameModeBeyondTheMax* this)
+  406  0024694C     78  void GameModeBeyondTheMax::ShowYardsGained(const const struct GameModeBeyondTheMax* this, float fYards)
+                         local  char[64] strBuf
+  413  00203D24      4  void GameModeBeyondTheMax::Shutdown(const struct GameModeBeyondTheMax* this)
+  417  00203D28      4  void GameModeBeyondTheMax::Update(const struct GameModeBeyondTheMax* this)
+  421  002039F8     94  void GameModeBeyondTheMax::UpdateTargetCircle(const struct GameModeBeyondTheMax* this)
+                         local  const float fScale
+                         local  const float fMinWidth
+                         local  const float fMaxWidth
+  440  002039C4     34  float GameModeBeyondTheMax::YardsGained(const struct GameModeBeyondTheMax* this)
+                         local  float fDefaultShotDist
+                         local  float fYardsGained

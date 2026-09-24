@@ -1,0 +1,44 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLPoolAllocator.cpp
+// compiled in: Legacy_unity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   15  003B0434    120  void CorePoolAllocator::CorePoolAllocator(const struct CorePoolAllocator* this, enum eMemoryPools memPoolType, int budgetType, struct CorePoolDescriptor* pdesc, int numPools, const char* name)
+                         local  struct <anon> params
+   48  003AA8A0     58  void CorePoolAllocator::~CorePoolAllocator(const struct CorePoolAllocator* this)
+                         inlines  ~IResourceAllocator
+   56  003B01EC    248  void CorePoolAllocator::InitPools(const struct CorePoolAllocator* this, enum eMemoryPools memPoolType, int budgetType, struct CorePoolDescriptor* pdesc, int numPools)
+                         local  uint32 nTotalUsed
+                         local  struct CorePoolDescriptor* pThisdesc
+                         local  int i
+   97  003AA584     AC  void CorePoolAllocator::FreePools(const struct CorePoolAllocator* this)
+                         local  int i
+  126  0037F27C      8  void CorePoolAllocator::SetLockNonPoolAllocs(const struct CorePoolAllocator* this, bool bLock)
+  134  0037F284     44  void* CorePoolAllocator::Alloc(const struct CorePoolAllocator* this, size_t size, const char* name, unsigned int flags)
+  142  003AC990    5A4  void* CorePoolAllocator::Alloc(const struct CorePoolAllocator* this, size_t size, const char* name, unsigned int flags, unsigned int align, unsigned int alignOffset)
+                         local  const char[6] __FUNCTION__
+                         local  struct <anon> am
+                         local  void* pmem
+                         local  MemPoolPtr ppool
+                         local  struct CorePoolDescriptor* pdesc
+                         local  int i
+                         local  char[64] tmp
+                         inlines  AutoMutex, CorePoolDescriptor::InRange, TagValuePair, operator+, ~AutoMutex
+  273  003A91A4     F8  void CorePoolAllocator::Free(const struct CorePoolAllocator* this, void* block, size_t )
+                         local  struct <anon> am
+                         local  bool bFound
+                         local  int i
+                         inlines  AutoMutex, ~AutoMutex
+  314  003840A8    190  struct <anon> CorePoolAllocator::DoAllocate(const struct CorePoolAllocator* this, const const struct <anon>& resList, const char8_t* name)
+                         local  struct <anon> resource
+                         local  const char[11] __FUNCTION__
+                         local  struct <anon> resource
+                         local  uint32_t index
+                         local  struct <anon> resDesc
+                         inlines  AssertMacroHelper, GetBaseResourceDescriptor, Resource, ~BaseResourceDescriptor
+  330  0037F2C8     84  void CorePoolAllocator::DoFree(const struct CorePoolAllocator* this, const const struct <anon>& res)
+                         local  uint32_t index
+  343  0039064C     9C  int CorePoolAllocator::GetPoolFreeCount(const struct CorePoolAllocator* this, int poolIndex)
+  355  00391D08    138  void CorePoolAllocator::Dump(const struct CorePoolAllocator* this)
+                         local  struct <anon> am
+                         local  int i
+                         inlines  AutoMutex, ~AutoMutex

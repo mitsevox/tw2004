@@ -1,0 +1,64 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/TigerNet/TigerNetLockerInterface.cpp
+// compiled in: golf_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   46  0028403C     20  void TigerNetLockerInterface::~TigerNetLockerInterface(const struct TigerNetLockerInterface* this)
+                         inlines  ~LockerChangeCallback, ~LockerFileOperationCallback
+   62  0022388C     74  struct TigerNetLockerInterface* TigerNetLockerInterface::GetSingleton()
+                         local  struct TigerNetLockerInterface lockerInterface
+                         inlines  TigerNetLockerInterface::TigerNetLockerInterface
+   81  0022382C      4  void TigerNetLockerInterface::Init(const struct TigerNetLockerInterface* this)
+   99  00223850     3C  void TigerNetLockerInterface::InitOnce(const struct TigerNetLockerInterface* this)
+  117  00236FF8    3FC  bool TigerNetLockerInterface::UploadEpisode(const struct TigerNetLockerInterface* this, int32 episodeID, char8_t* fileNameInLocker)
+                         local  struct <anon>* lockerExtension
+                         local  int32 strokeCount
+                         local  int32 totalFileSize
+                         local  int i
+                         local  struct tEpisodeInfo episodeInfo
+                         local  struct tTcDbStrokeDataInfo strokeDataInfo
+                         local  bool dbAccessOk
+                         local  char8_t[64] strFilename
+                         local  struct <anon>* pLocker
+                         local  const char8_t* pFileType
+                         local  struct LockerBuffer* pBuffer
+                         local  void* pData
+                         local  void* fileData
+                         inlines  GetInstance, List<OSDK::LockerBufferSection>::GetElementAt
+  227  0022396C     FC  bool TigerNetLockerInterface::FetchLocker(const struct TigerNetLockerInterface* this)
+                         local  struct <anon>* lockerExtension
+                         local  struct User* user
+  263  00223A68     F4  bool TigerNetLockerInterface::FetchLocker(const struct TigerNetLockerInterface* this, char8_t* userName)
+                         local  struct <anon>* lockerExtension
+                         local  struct UserManager* userManager
+                         local  struct User* user
+  293  00223900     6C  bool TigerNetLockerInterface::CanRunLockerOperation(const struct TigerNetLockerInterface* this)
+  321  0027AB5C    204  bool TigerNetLockerInterface::DownloadEpisode(const struct TigerNetLockerInterface* this, char8_t* fileName)
+                         local  struct <anon>* lockerExtension
+                         local  struct <anon>* pLocker
+                         local  const struct List<OSDK::LockerFile>* pList
+                         local  int32 i
+                         local  int32 elementCount
+                         local  struct LockerFile* pFile
+                         inlines  List<OSDK::LockerFile>::GetElementAt
+  364  0027B3F4    31C  bool TigerNetLockerInterface::CleanLocker(const struct TigerNetLockerInterface* this, char8_t* episode1, char8_t* episode2, char8_t* episode3)
+                         local  struct <anon>* lockerExtension
+                         local  struct <anon>* pLocker
+                         local  const struct List<OSDK::LockerFile>* pList
+                         local  int32 i
+                         local  int32 elementCount
+                         local  struct LockerFile* pFile
+                         inlines  List<OSDK::LockerFile>::GetElementAt
+  416  00260860    280  bool TigerNetLockerInterface::RemoveEpisode(const struct TigerNetLockerInterface* this, char8_t* episodeName)
+                         local  struct <anon>* lockerExtension
+                         local  struct <anon>* pLocker
+                         local  const struct List<OSDK::LockerFile>* pList
+                         local  int32 i
+                         local  int32 elementCount
+                         local  struct LockerFile* pFile
+                         inlines  List<OSDK::LockerFile>::GetElementAt
+  468  0027B3A0     54  void TigerNetLockerInterface::LockerChangeSuccess(const struct TigerNetLockerInterface* this)
+  490  0027B270    130  void TigerNetLockerInterface::LockerChangeFailure(const struct TigerNetLockerInterface* this, enum FailureCode eFailureCode)
+  529  00224AE8     D0  void TigerNetLockerInterface::LockerFileOperationSuccess(const struct TigerNetLockerInterface* this, struct LockerFile* pFile, struct LockerBuffer* pBuffer)
+  574  00223E40     74  void TigerNetLockerInterface::LockerFileOperationProgress(const struct TigerNetLockerInterface* this, uint32_t uPercentDone)
+                         local  char8_t[64] tempStr
+  596  00223EB4    138  void TigerNetLockerInterface::LockerFileOperationFailure(const struct TigerNetLockerInterface* this, struct LockerFile* pFile, enum FailureCode eFailure)

@@ -1,0 +1,62 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/voice.cpp
+// compiled in: voice.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   18  006D7EDC    71C  struct Voice* CreateInstance(int processingStage, int numPlugIns, struct PlugInConfig* pPlugInConfigs, struct PlugIn*** pPlugInPtrs, struct <anon>* pSystem)
+                         local  const char[15] __FUNCTION__
+                         local  unsigned int sizeOfPlugInArray
+                         local  unsigned int memRequired
+                         local  int inputChannelsDebug
+                         local  enum PlugInType previousTypeDebug
+                         local  struct Voice* pThis
+                         local  uintptr_t pMemBlock
+                         local  int inputChannels
+                         local  int i
+                         local  struct PlugInConfig* pPlugInConfig
+                         local  struct <anon>* pPlugInDescRunTime
+                         local  enum PlugInType currentType
+                         local  int i
+                         local  int i
+                         local  struct PlugInConfig* pPlugInConfig
+                         local  struct <anon>* pPlugInLocationDesc
+                         local  struct <anon>* pPlugInDescRunTime
+                         local  void* pTemp
+                         local  char[256] strBuf
+                         inlines  Assert, New2<rw::audio::core::Voice>, OverRide, SetHandler, Voice, core::AlignUp<unsigned int>, core::LinearAlloc<rw::audio::core::PlugInLocationDesc*, std::uintptr_t>, core::LinearAlloc<void*, std::uintptr_t>, core::LinearAllocAddSize
+  265  006D85F8     9C  void Release(const struct Voice* this)
+                         inlines  SetHandler
+  274  006D79F8    1B8  void ReleaseImmediate(const struct Voice* this, bool failedCreation)
+                         local  const char[17] __FUNCTION__
+                         local  int i
+                         inlines  Delete<rw::audio::core::Voice*>, GetSystem, Remove
+  308  006D774C     DC  void SetPriority(const struct Voice* this, float priority)
+                         local  const char[12] __FUNCTION__
+                         local  struct SetPriorityCommand* pCommand
+                         inlines  GetCommandSlot
+  320  006D7828     44  float GetLatencyInSamples(const struct Voice* this)
+                         local  float latency
+                         local  int i
+  333  006D7BDC     68  float GetLatency(const struct Voice* this)
+                         local  const char[11] __FUNCTION__
+  341  006D7C44     64  float GetDecayTime(const struct Voice* this)
+                         local  const char[13] __FUNCTION__
+  353  006D79D0     28  void ExpelImmediate(const struct Voice* this)
+                         inlines  OverRide
+  370  006D772C     20  void ExpelAfterDecay(const struct Voice* this)
+  385  006D7CA8    234  int CreateInstanceHandler(struct <anon>* pCom)
+                         local  struct Voice* pVoice
+                         local  int i
+                         local  int newMaxVoices
+                         local  unsigned int oldSize
+                         local  unsigned int newSize
+                         local  struct <anon>* pNewVoiceListNodes
+                         inlines  Push, core::MemCpy
+  460  006D796C     64  void ExpelHandler(const struct Voice* this)
+                         inlines  Push, SetNext, SetPrev
+  474  006D7BB0     2C  int ReleaseHandler(struct <anon>* pCom)
+                         local  struct Voice* pVoice
+  483  006D7954     18  int SetPriorityHandler(struct <anon>* pCommand)
+                         local  struct Voice* pThis
+                         local  struct SetPriorityCommand* pSetPriorityCommand
+  497  006D786C     E8  bool RemoveActiveVoice(const struct Voice* this)
+                         local  int i

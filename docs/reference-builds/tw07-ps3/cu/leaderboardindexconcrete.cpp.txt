@@ -1,0 +1,11 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/leaderboardindexconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   49  0060A254    1DC  void LeaderboardIndexConcrete(const struct <anon>* this, uint32_t uLobbyRankCategoryIndex, uint32_t uLobbyRankIndexIndex)
+                         local  int32_t iNumberOfLeaderboards
+                         local  int32_t iLeaderboardIndex
+                         inlines  InsertElement, List, RCPointer, operator->, operator=
+   66  005E0AF8     54  const char8_t* GetName(const const struct <anon>* this)
+                         local  LobbyRankT* pLobbyRank
+   73  005B8DA0      8  struct List<OSDK::Leaderboard>* GetLeaderboardList(const struct <anon>* this)

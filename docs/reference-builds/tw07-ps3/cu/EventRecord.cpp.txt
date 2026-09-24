@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/Internal/EventRecord.cpp
+// compiled in: EventRecord.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    9  0059BB00     18  void Clear(const struct <anon>* this)

@@ -1,0 +1,34 @@
+// ../../../../../TIGERCODE/Code/Legacy/LL/Headers/LLConCmd.h
+// compiled in: Legacy_unity.cpp, apt_unity.cpp, other_unity.cpp
+// 27 functions, source order. line | PS3 address | size
+
+  467  0037CA34      4  void CO_SCommandCRAP::CO_SCommandCRAP(const struct CO_SCommandCRAP* this)
+  470    inline-only   bool CO_SCommandCRAP::ShouldSave(const const struct CO_SCommandCRAP* this)
+  471    inline-only   void CO_SCommandCRAP::SetShouldSave(const struct CO_SCommandCRAP* this, bool bSave)
+  473    inline-only   bool CO_SCommandCRAP::HasCommand(const const struct CO_SCommandCRAP* this)
+  474    inline-only   void CO_SCommandCRAP::SetHasCommand(const struct CO_SCommandCRAP* this, bool bHas)
+  476    inline-only   bool CO_SCommandCRAP::ShouldLoad(const const struct CO_SCommandCRAP* this)
+  477    inline-only   void CO_SCommandCRAP::SetShouldLoad(const struct CO_SCommandCRAP* this, bool bLoad)
+  479    inline-only   void CO_SCommandCRAP::ClearFilename(const struct CO_SCommandCRAP* this)
+  480    inline-only   const char* CO_SCommandCRAP::GetFilename(const const struct CO_SCommandCRAP* this)
+  741    inline-only   bool CO_SCommandAPT::GetShowDebug(const struct CO_SCommandAPT* this)
+  742    inline-only   bool CO_SCommandAPT::GetShowStack(const struct CO_SCommandAPT* this)
+  744    inline-only   float CO_SCommandAPT::GetScale(const struct CO_SCommandAPT* this)
+                         local  const float s
+  745    inline-only   float CO_SCommandAPT::GetSafeZoneW(const struct CO_SCommandAPT* this)
+                         local  const float s
+  746    inline-only   float CO_SCommandAPT::GetSafeZoneH(const struct CO_SCommandAPT* this)
+                         local  const float s
+  748    inline-only   int CO_SCommandAPT::GetLoadingScreen(const struct CO_SCommandAPT* this)
+  751    inline-only   float CO_SCommandAPT::GetFontFusionAlphaCorrection(const struct CO_SCommandAPT* this)
+  752    inline-only   float CO_SCommandAPT::GetFontFusionQuality(const struct CO_SCommandAPT* this)
+  753    inline-only   int32 CO_SCommandAPT::GetFontFusionPurge(const struct CO_SCommandAPT* this)
+  754    inline-only   void CO_SCommandAPT::SetFontFusionPurge(const struct CO_SCommandAPT* this, int f)
+  756    inline-only   uint32 CO_SCommandAPT::GetColorO3(const struct CO_SCommandAPT* this)
+  757    inline-only   uint32 CO_SCommandAPT::GetColorO2(const struct CO_SCommandAPT* this)
+  759    inline-only   float CO_SCommandAPT::GetThumbnailBrightness(const struct CO_SCommandAPT* this)
+  760    inline-only   float CO_SCommandAPT::GetThumbnailContrast(const struct CO_SCommandAPT* this)
+  761    inline-only   float CO_SCommandAPT::GetThumbnailIntensity(const struct CO_SCommandAPT* this)
+  762    inline-only   float CO_SCommandAPT::GetThumbnailHighlight(const struct CO_SCommandAPT* this)
+  763    inline-only   float CO_SCommandAPT::GetThumbnailShadow(const struct CO_SCommandAPT* this)
+  764    inline-only   float CO_SCommandAPT::GetThumbnailSaturation(const struct CO_SCommandAPT* this)

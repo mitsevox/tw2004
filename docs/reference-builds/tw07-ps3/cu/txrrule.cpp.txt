@@ -1,0 +1,17 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/txrrule.cpp
+// compiled in: other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   19  00425C5C    184  TextureRef TXRRule::FindTexture(const char* stateName, struct TextureGroup* pTexGroup, TextureRef workspace, struct TXRRule_TEXStateInfo* state, const int32_t& scale)
+                         local  TextureRef texture
+                         local  const char* textureName
+                         local  char[64] lowerBuffer
+                         local  uint32 k
+                         local  char[256] buf
+   70  00409BBC    128  void TXRRule::EnableTinting(char* variableName, struct TXRRule_TEXStateInfo* state, enum TXRTintRule_Mode tintMode, float* pTintParams)
+                         local  int i
+   86  00425FFC    12C  void TXRRule::GetTintInfo(TextureRef texture, struct TextureGroup* pTexGroup, struct TXRRule_TEXStateInfo* state, const int& tintEnabledOut, const enum TXRTintRule_Mode& tintModeOut, float* pTintParamsOut)
+                         local  int32_t scale
+                         local  int i
+                         local  const char* varName
+                         local  TextureRef varTex

@@ -1,0 +1,216 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_Helpers.cpp
+// compiled in: apt_unity.cpp
+// 99 functions, source order. line | PS3 address | size
+
+   24  0003AE3C     18  float UIConvert_YardsToMeters(float yards)
+   25  0003AE54     18  float UIConvert_MetersToYards(float yards)
+   26  0003AE6C     18  float UIConvert_YardsToFeet(float yards)
+   27  0003AE84     18  float UIConvert_FeetToInches(float feet)
+   28  0003AE9C     18  float UIConvert_InchesToYards(float inches)
+   29  0003AEB4     18  float UIConvert_FeetToYards(float feet)
+   30  0003AECC     18  float UIConvert_MetersToCentimeters(float meters)
+   31  0003AEE4     18  float UIConvert_CentimetersToMeters(float centimeters)
+   33  00030EF4     14  char* UIGetTemporaryStringBuffer()
+   38  00030EE0     14  char* UIGetSecondaryTemporaryStringBuffer()
+   43  00030DD8     14  char* UIGetTertiaryTemporaryStringBuffer()
+   48  0006E0B8     EC  float UITruncateDistanceToCorrespondWithString(float yards, int32 placesAfterDecimal)
+                         local  float newTruncatedYards
+                         local  char[16] tempstr
+                         local  char[16] formatStr
+                         inlines  std::atof
+  109  0006D9FC     B0  void UIFormat_DistanceString(float yards, char* distanceStr, int32 distanceStrSize, int32 placesAfterDecimal, int32 formatFlags)
+  121  0003B110    1B0  void UIFormat_MetricDistString(float yards, char* distanceStr, int32 distanceStrSize, int32 placesAfterDecimal, int32 formatFlags)
+                         local  const char* sfx
+                         local  char[8] formatStr
+                         local  float distance
+  161  0003AEFC    214  void UIFormat_StandDistString(float yards, char* distanceStr, int32 distanceStrSize, int32 placesAfterDecimal, int32 formatFlags)
+                         local  const char* sfx
+                         local  char[8] formatStr
+                         local  float distance
+  221  0003B4E8    29C  void UI_parseText(char* szText, uint32 iMaxWidth, uint32 iBufLen)
+                         local  char* pszStart
+                         local  char* pszCurrChar
+                         local  uint32 iCounter
+                         local  bool bEOF
+                         local  bool bHTTP
+                         local  char* pszSavedPos
+  354  0003B784    214  char* UI_tokenizeText(char* szText, uint32 iMaxWidth)
+                         local  char* pszStart
+                         local  char* pszCurrChar
+                         local  uint32 iCounter
+  441  0003B3C8    120  char* UIBackToPrevCharacter(char* bufferIndexPointer, bool bBackOneChar, bool bBackTwoChar)
+                         local  char* nextCharacter
+                         local  unsigned char ch
+                         local  unsigned char prevOne
+                         local  unsigned char prevTwo
+  493  0003B2C0    108  char* UISkipToNextCharacter(char* bufferIndexPointer, const uint32& iCounter)
+                         local  char* nextCharacter
+                         local  unsigned char ch
+  530  0003B998     B8  char* UIFindNextEndOfLine(char* textBuffer)
+                         local  uint32 iCounter
+                         local  char* bufferIndex
+  553  0003BA50     2C  void UIExternIterator::UIExternIterator(const struct UIExternIterator* this)
+  565  0003BAA8     80  void UIExternIterator::SetExternArray(const struct UIExternIterator* this, struct IExternArray* inpExternArray)
+  575  00034C7C     C0  int32 UIExternIterator::GetElemCount(const struct UIExternIterator* this)
+  585  0003BB28     94  void UIExternIterator::SetNbrElems(const struct UIExternIterator* this, int32 inDefaultSize)
+  595  0003BC38     C8  void* UIExternIterator::UpdateElement(const struct UIExternIterator* this, int32 inIndex)
+  616  00035818     94  void* UIExternIterator::GetItem(const struct UIExternIterator* this, int32 inIndex)
+  626  0003BD00     74  void UIExternIterator::Close(const struct UIExternIterator* this)
+  678  0009CEA4     6C  void UIExternMenuIterator::UIExternMenuIterator(const struct UIExternMenuIterator* this)
+  694  0003BD74     2C  void UIExternMenuIterator::Close(const struct UIExternMenuIterator* this)
+  712  000105D0     10  void UIExternMenuIterator::SetFlashUpdateFunctions(const struct UIExternMenuIterator* this, char* inObjectName, char* inUpdateItemName, char* inUpdateAllName)
+  723  0003BDA0      8  void UIExternMenuIterator::SetFlashClearItemFunction(const struct UIExternMenuIterator* this, char* inClearItemName)
+  732  0003BDA8     50  void UIExternMenuIterator::Clear(const struct UIExternMenuIterator* this, int32 inDefaultSize)
+  750  0003C060     9C  void UIExternMenuIterator::ActivateNextItem(const struct UIExternMenuIterator* this, int32 inAmount)
+  756  0003BFC4     9C  void UIExternMenuIterator::ActivatePrevItem(const struct UIExternMenuIterator* this, int32 inAmount)
+  762  0003BE80    144  void UIExternMenuIterator::ActivateItem(const struct UIExternMenuIterator* this, int32 inIndex)
+                         local  int32 oItemCount
+                         local  const int32 oldActiveItemIndex
+  805  0003BDF8     88  void UIExternMenuIterator::UpdateItem(const struct UIExternMenuIterator* this, int32 inIndex)
+  822  0003C0FC     64  void* UIExternMenuIterator::ActiveItem(const struct UIExternMenuIterator* this)
+  841  00031DE4      8  void UIExternMenuIterator::SetLoop(const struct UIExternMenuIterator* this, enum eMenuWheel isLooping)
+  849  0003C160     8C  void UIExternMenuIterator::UpdateNextElement(const struct UIExternMenuIterator* this)
+  898  000B6E10     BC  void UIExternScrollMenuIterator::UIExternScrollMenuIterator(const struct UIExternScrollMenuIterator* this)
+  933  00034094      8  void UIExternScrollMenuIterator::SetColumnCount(const struct UIExternScrollMenuIterator* this, int32 inColumnCount)
+  951  0003C1EC     A0  bool UIExternScrollMenuIterator::GetIsLooping(const struct UIExternScrollMenuIterator* this)
+                         local  bool ret
+  975  0003C4B8     BC  const char* UIExternScrollMenuIterator::GetLabelByIndex(const struct UIExternScrollMenuIterator* this, int32 inIndex)
+  986  0003C574     BC  const char* UIExternScrollMenuIterator::GetOnlineLabelByIndex(const struct UIExternScrollMenuIterator* this, int32 inIndex)
+  998  000381A0     8C  int32 UIExternScrollMenuIterator::GetRowCount(const struct UIExternScrollMenuIterator* this)
+                         local  int32 oItemCount
+                         local  int32 oRowCount
+ 1016  0003C630     14  int32 UIExternScrollMenuIterator::GetActiveRowIndex(const struct UIExternScrollMenuIterator* this)
+ 1025  00038800     64  void UIExternScrollMenuIterator::SetItemScrollPad(const struct UIExternScrollMenuIterator* this, int32 inItemScrollPadTop, int32 inItemScrollPadBottom)
+ 1045  00031DEC      8  void UIExternScrollMenuIterator::DelayActivateItem(const struct UIExternScrollMenuIterator* this, int32 inActivateItemDelay)
+ 1058  0003C658    110  void UIExternScrollMenuIterator::SetMenuParams(const struct UIExternScrollMenuIterator* this, int32 inVisibleRowCount, char* inItemPrefix, char* inScrollAttribute, float inStartPos, float inDeltaPos)
+ 1082  0003C8AC     78  void UIExternScrollMenuIterator::Close(const struct UIExternScrollMenuIterator* this)
+ 1115  0003BBBC     7C  void UIExternScrollMenuIterator::Clear(const struct UIExternScrollMenuIterator* this, int32 inDefaultSize)
+ 1140  00087E28     F4  void UIExternScrollMenuIterator::StartUpdate(const struct UIExternScrollMenuIterator* this)
+                         local  char[256] ret
+                         inlines  UIExternScrollMenuIterator::TurnOnOffScrollBar
+ 1182  0003CD04    340  void UIExternScrollMenuIterator::UpdateNextElement(const struct UIExternScrollMenuIterator* this)
+                         local  int32 oItemCount
+                         local  int32 oRowCount
+                         local  int32 oFirstIndexMod
+                         local  int32 oFirstIndexDiv
+                         local  int32 oLocalRowIndex
+                         local  int32 oItemIndex
+                         local  int32 oLocalRowIndex
+                         local  int32 oItemIndex
+ 1278  00082FFC     90  void UIExternScrollMenuIterator::ActivateNextItem(const struct UIExternScrollMenuIterator* this, int32 inAmount)
+ 1287  00082F6C     90  void UIExternScrollMenuIterator::ActivatePrevItem(const struct UIExternScrollMenuIterator* this, int32 inAmount)
+ 1296  00082434     D0  void UIExternScrollMenuIterator::ActivateNextRow(const struct UIExternScrollMenuIterator* this, int32 inAmount, bool playSound)
+ 1305  00082364     D0  void UIExternScrollMenuIterator::ActivatePrevRow(const struct UIExternScrollMenuIterator* this, int32 inAmount, bool playSound)
+ 1314  000822B0     B4  void UIExternScrollMenuIterator::ActivateNextColumn(const struct UIExternScrollMenuIterator* this, int32 inAmount)
+                         local  int activeRow
+                         local  int activeColumn
+                         local  int newActiveColumn
+ 1326  0008218C    124  void UIExternScrollMenuIterator::ActivatePrevColumn(const struct UIExternScrollMenuIterator* this, int32 inAmount)
+                         local  int activeRow
+                         local  int activeColumn
+                         local  int newActiveColumn
+ 1348  0003CBA8     8C  void UIExternScrollMenuIterator::UpdateActiveItem(const struct UIExternScrollMenuIterator* this)
+ 1355  00080358    358  enum eMenuNoise UIExternScrollMenuIterator::ActivateItem(const struct UIExternScrollMenuIterator* this, int32 inItemIndex)
+                         local  int32 oItemCount
+                         local  int32 oRowIndex
+                         local  int32 oUsableScrollPadTop
+                         local  int32 oUsableScrollPadBottom
+                         local  bool obOverrideDelay
+                         local  int32 deltaTop
+                         local  const int32 oldActiveItemIndex
+                         local  int32 deltaBottom
+                         local  const int32 oSafeIndex
+ 1473  000801D0    188  void UIExternScrollMenuIterator::UpdateScrollBar(const struct UIExternScrollMenuIterator* this)
+                         local  char[8] cur
+                         local  char[8] max
+                         local  char[8] page
+                         local  int32 maxVal
+                         inlines  UIExternScrollMenuIterator::TurnOnOffScrollBar
+ 1520  0003D044      8  bool UIExternScrollMenuIterator::IsArrowReady(const struct UIExternScrollMenuIterator* this)
+ 1532  0003D04C     9C  void UIExternScrollMenuIterator::InvalidateArrows(const struct UIExternScrollMenuIterator* this)
+ 1550  0003D4B4    1D4  void UIExternScrollMenuIterator::ManageShowHideArrows(const struct UIExternScrollMenuIterator* this)
+                         local  bool showTopArrow
+                         local  bool showDownArrow
+                         local  const int32 nbrLines
+ 1584  0003DC44     18  void UIExternScrollMenuIterator::ShowArrows(const struct UIExternScrollMenuIterator* this)
+ 1590  0003D328     18  void UIExternScrollMenuIterator::HideArrows(const struct UIExternScrollMenuIterator* this)
+ 1597  0003D0E8    240  void UIExternScrollMenuIterator::ShowArrows(const struct UIExternScrollMenuIterator* this, bool showTopArrow, bool showDownArrow)
+ 1635  0003C958    250  void UIExternScrollMenuIterator::UpdateItem(const struct UIExternScrollMenuIterator* this, int32 inItemIndex, bool inbForceUpdate)
+                         local  int32 oRowIndex
+                         local  int32 oUpdateRowIndex
+                         local  const int32 oldUpdateColumnIndex
+                         local  const int32 oldUpdateRowIndex
+ 1696  0003C28C     74  int32 UIExternScrollMenuIterator::GetSafeIndex(const struct UIExternScrollMenuIterator* this, int32 inIndex)
+                         local  int32 oSafeIndex
+                         local  const int32 numElements
+ 1718  0003C924     34  void* UIExternScrollMenuIterator::UpdateElement(const struct UIExternScrollMenuIterator* this, int32 inIndex)
+ 1729  0003C320     68  void* UIExternScrollMenuIterator::ActiveItem(const struct UIExternScrollMenuIterator* this)
+ 1742  0003C300     20  int32 UIExternScrollMenuIterator::ActiveItemIndex(const struct UIExternScrollMenuIterator* this)
+ 1759  0003C644     14  void UIExternScrollMenuIterator::SnapToTarget(const struct UIExternScrollMenuIterator* this)
+ 1771  0003D688    590  bool UIExternScrollMenuIterator::ScrollMenu(const struct UIExternScrollMenuIterator* this)
+                         local  char[36] oVarName
+                         local  int32 oFirstUpdateRowIndex
+                         local  int32 oLastUpdateRowIndex
+                         local  int32 oFirstVisibleRowIndex
+                         local  const int32 maxindex
+                         local  int32 oItemRowIndex
+                         local  float oPos
+                         local  int32 oClipRowIndex
+                         local  float oAlpha
+                         local  int32 oClipColumnIndex
+                         local  const int32 realIndex
+                         local  const bool forceUpdate
+ 1948  00038728     D8  void UIExternScrollMenuIterator::UpdateFirstRowIndex(const struct UIExternScrollMenuIterator* this, int32 inRowIndex)
+ 1964  0003DC5C     78  void UIExternScrollMenuIterator::SetItemPos(const struct UIExternScrollMenuIterator* this, int32 inClipIndex, float inPos)
+                         local  char[36] oVarName
+ 1975  0003DCD4     84  void UIExternScrollMenuIterator::SetItemPos(const struct UIExternScrollMenuIterator* this, int32 inClipRowIndex, int32 inClipColumnIndex, float inPos)
+                         local  const int32 index
+                         local  char[36] oVarName
+ 2009  0006FA98     30  void AptAutoRepeater::AptAutoRepeater(const struct AptAutoRepeater* this)
+ 2020  00078678     18  void AptAutoRepeater::~AptAutoRepeater(const struct AptAutoRepeater* this)
+ 2028  0003DD58     68  void AptAutoRepeater::Close(const struct AptAutoRepeater* this)
+ 2045  0003DE00     AC  void AptAutoRepeater::Press(const struct AptAutoRepeater* this, int32 inAmount)
+ 2063  0003DEB8     A0  void AptAutoRepeater::Release(const struct AptAutoRepeater* this)
+ 2079  0003DF58      4  void AptAutoRepeater::Activate(const struct AptAutoRepeater* this, int32 inAmount)
+ 2086  000753D4     A8  enum AptThreadReturnValue AptAutoRepeater::AutoRepeatThread(const struct AptAutoRepeater* this)
+                         local  float fDeltaTime
+ 2103  0003DDC0     40  void AptAutoRepeater::InitializerTimer(const struct AptAutoRepeater* this)
+ 2109  0003DEAC      C  void AptAutoRepeater::ClearTimer(const struct AptAutoRepeater* this)
+ 2117  00075204    1D0  float AptAutoRepeater::TimeElapsed(const struct AptAutoRepeater* this)
+                         local  float fDeltaTime
+                         local  TI_STimeValue currentTime
+                         inlines  TI_fConvertTimeDifToSeconds, sys_time_get_timebase_frequency
+ 2136  0003DF68     8C  void UIResponseHandlerFromFlash::onClose(const struct UIResponseHandlerFromFlash* this, void* inData)
+                         local  const int32 dataInt
+                         local  char[36] integerStr
+ 2148  0003DFF4     50  void UIResponseHandlerFromFlash::onShow(const struct UIResponseHandlerFromFlash* this)
+ 2156  0003E044     50  void UIResponseHandlerFromFlash::onHide(const struct UIResponseHandlerFromFlash* this)
+ 2166  0003E094     48  void UIResponseHandlerFromFlash::SetFullPathAS(const struct UIResponseHandlerFromFlash* this, const char* inStr)
+ 2174  0003DF5C      C  const char* UIResponseHandlerFromFlash::GetFullPathAS(const const struct UIResponseHandlerFromFlash* this)
+ 2185  000B6BF4     BC  void UIExternCircleMenuIterator::~UIExternCircleMenuIterator(const struct UIExternCircleMenuIterator* this)
+                         inlines  MenuLevelStruct::~MenuLevelStruct, UIExternScrollMenuIterator::~UIExternScrollMenuIterator
+ 2192  000970E0     80  void UIExternCircleMenuIterator::Close(const struct UIExternCircleMenuIterator* this)
+                         local  int i
+                         inlines  MenuLevelStruct::Close
+ 2205  0003E0DC    350  void UIExternCircleMenuIterator::SetIsCircleMenu(const struct UIExternCircleMenuIterator* this, int32 currentMenuLevel, enum eCircleMenuType circleMenuType)
+                         local  const struct MenuLevelStruct& currentLevel
+                         local  float* xPosArray
+                         local  float* yPosArray
+                         local  char[36] oVarName
+                         local  int32 clipIndex
+                         local  char[36] oVarName
+                         local  float[2] startPos
+                         local  int32 clipIndex
+                         local  const int32 useIndex
+ 2291  0003E42C    274  void UIExternCircleMenuIterator::SetItemPos(const struct UIExternCircleMenuIterator* this, int32 inClipIndex, float inPos)
+                         local  const struct MenuLevelStruct& currentLevel
+                         local  float* xPosArray
+                         local  float* yPosArray
+                         local  float t
+                         local  int32 index
+                         local  float _x
+                         local  float _y
+                         local  char[36] oVarName
+ 2368  0003E6A0     24  void UIExternCircleMenuIterator::SetItemPos(const struct UIExternCircleMenuIterator* this, int32 inClipRowIndex, int32 inClipColumnIndex, float inPos)
+                         local  const struct MenuLevelStruct& currentLevel
+ 2384  0003E6C4     5C  char* UIFormat_HandicapString(int32_t handicap)

@@ -1,0 +1,266 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnax/source/RNAUtils/IOStream.cpp
+// compiled in: IOStream.cpp
+// 102 functions, source order. line | PS3 address | size
+
+    0  008700DC    150  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  GetRow, Matrix44, Quaternion, Set, Vector2, Vector3, Vector4
+   60  0086D7B8     18  void OutStreamC(const struct <anon>* this)
+   66  0086D804      8  bool GetBigEndianFlag(const const struct <anon>* this)
+   71  0086D80C      8  void SetBigEndianFlag(const struct <anon>* this, bool bFlag)
+   77  0086E7DC     FC  void LogPrintf(const struct <anon>* this, const char* pFormat)
+                         local  const char[10] __FUNCTION__
+                         local  char8_t[512] printBuf
+                         local  va_list args
+                         local  size_t nSize
+                         inlines  RNADebugBreak
+   94  0087057C     40  void OutStreamBinaryFileWriterC(const struct <anon>* this)
+  103  0086EA84     F8  void ~OutStreamBinaryFileWriterC(const struct <anon>* this)
+                         local  const char[28] __FUNCTION__
+                         inlines  RNADebugBreak, ~OutStreamC
+  115  0086E8D8    100  bool Open(const struct <anon>* this, const char* pFilename, const char* pLogFileName)
+                         local  const char[5] __FUNCTION__
+                         inlines  RNADebugBreak
+  133  0086E9D8     AC  bool Close(const struct <anon>* this)
+                         local  const char[6] __FUNCTION__
+                         inlines  RNADebugBreak
+  154  0086D814     1C  bool IsOpen(const struct <anon>* this)
+  162  0086D830     54  void Flush(const struct <anon>* this)
+  171  0086EB7C     D8  void SerializeBytes(const struct <anon>* this, const void* pData, int32_t nBytes)
+                         local  const char[15] __FUNCTION__
+                         local  int8_t* pData8
+                         local  int32_t i
+                         inlines  RNADebugBreak
+  180  0086EC54    130  void SerializeOrderedBytes(const struct <anon>* this, const void* pData, int32_t nBytes)
+                         local  const char[22] __FUNCTION__
+                         local  int8_t* pData8
+                         local  int32_t i
+                         inlines  RNADebugBreak
+  199  0086D884     50  struct OutStreamC& operator<<(const struct <anon>* this, const const int32_t& nVal)
+  205  0086D8D4     50  struct OutStreamC& operator<<(const struct <anon>* this, const const uint32_t& nVal)
+  211  0086D924     50  struct OutStreamC& operator<<(const struct <anon>* this, const const int16_t& nVal)
+  217  0086D974     50  struct OutStreamC& operator<<(const struct <anon>* this, const const uint16_t& nVal)
+  223  0086D9C4     50  struct OutStreamC& operator<<(const struct <anon>* this, const const int8_t& nVal)
+  229  0086DA14     50  struct OutStreamC& operator<<(const struct <anon>* this, const const uint8_t& nVal)
+  243  0086DA64     50  struct OutStreamC& operator<<(const struct <anon>* this, const const float_t& fVal)
+  249  0086DAB4     50  struct OutStreamC& operator<<(const struct <anon>* this, const const double_t& dVal)
+  256  0086DB04     A0  void SerializeString(const struct <anon>* this, const char* pString)
+                         local  int32_t iStrLen
+  265  0086DBA4     3C  void LogPrintString(const struct <anon>* this, const char* pString)
+  274  0086ED84     78  int32_t GetStreamPos(const struct <anon>* this)
+                         local  const char[13] __FUNCTION__
+                         inlines  RNADebugBreak
+  280  0086EDFC     D4  void SetStreamPos(const struct <anon>* this, int32_t iPos)
+                         local  const char[13] __FUNCTION__
+                         local  int ret
+                         inlines  RNADebugBreak
+  290  0086D7D0     1C  void InStreamC(const struct <anon>* this)
+  297  0086DBFC      8  bool GetBigEndianFlag(const const struct <anon>* this)
+  302  0086DC04      8  void SetBigEndianFlag(const struct <anon>* this, bool bFlag)
+  307  008707BC     5C  void InStreamBinaryC(const struct <anon>* this, void* pBuffer, int32_t nBufferSize)
+  314  00870874      C  void ~InStreamBinaryC(const struct <anon>* this)
+                         inlines  ~InStreamC
+  319  0086EED0    140  void SerializeBytes(const struct <anon>* this, void* pData, int32_t nBytes)
+                         local  const char[15] __FUNCTION__
+                         local  int32_t nBytesAvail
+                         inlines  RNADebugBreak
+  345  0086F010    1E8  void SerializeOrderedBytes(const struct <anon>* this, void* pData, int32_t nBytes)
+                         local  const char[22] __FUNCTION__
+                         local  int32_t iByte
+                         local  int32_t nBytesAvail
+                         local  uint8_t* pData8
+                         inlines  RNADebugBreak
+  385  0086DC0C     50  struct InStreamC& operator>>(const struct <anon>* this, const int32_t& nVal)
+  391  0086DC5C     50  struct InStreamC& operator>>(const struct <anon>* this, const uint32_t& nVal)
+  398  0086DCAC     50  struct InStreamC& operator>>(const struct <anon>* this, const int16_t& nVal)
+  404  0086DCFC     50  struct InStreamC& operator>>(const struct <anon>* this, const uint16_t& nVal)
+  410  0086DD4C     50  struct InStreamC& operator>>(const struct <anon>* this, const int8_t& nVal)
+  416  0086DD9C     50  struct InStreamC& operator>>(const struct <anon>* this, const uint8_t& nVal)
+  431  0086DDEC     50  struct InStreamC& operator>>(const struct <anon>* this, const float_t& fVal)
+  437  0086DE3C     50  struct InStreamC& operator>>(const struct <anon>* this, const double_t& dVal)
+  443  0086F1F8    164  int32_t SerializeString(const struct <anon>* this, char* pString, int32_t iBufferSize)
+                         local  const char[16] __FUNCTION__
+                         local  int32_t iStrLen
+                         inlines  RNADebugBreak
+  455  0086F35C     A4  void SetStreamPos(const struct <anon>* this, int32_t iPos)
+                         local  const char[13] __FUNCTION__
+                         inlines  RNADebugBreak
+  471  008709A8     3C  void InStreamBinary_SameEndiannessC(const struct <anon>* this, void* pBuffer, int32_t nBufferSize)
+  478  00870950     40  void ~InStreamBinary_SameEndiannessC(const struct <anon>* this)
+  483  0086F400     8C  void SetBigEndianFlag(const struct <anon>* this, bool bBigEndian)
+                         local  const char[17] __FUNCTION__
+                         inlines  RNADebugBreak
+  490    inline-only   void SerializeOrderedBytesInlined(const struct <anon>* this, void* pData, int32_t nBytes)
+                         local  const char[29] __FUNCTION__
+                         local  int8_t* pData8
+                         local  int16_t* pData16
+                         local  int32_t* pData32
+                         local  int64_t* pData64
+  525  00871504    114  struct InStreamC& operator>>(const struct <anon>* this, const int32_t& nVal)
+                         local  int32_t* pData32
+                         inlines  RNADebugBreak, SerializeOrderedBytesInlined
+  531  00871618    114  struct InStreamC& operator>>(const struct <anon>* this, const uint32_t& nVal)
+                         local  int32_t* pData32
+                         inlines  RNADebugBreak, SerializeOrderedBytesInlined
+  538  0087172C     DC  struct InStreamC& operator>>(const struct <anon>* this, const int16_t& nVal)
+                         local  int16_t* pData16
+                         inlines  RNADebugBreak, SerializeOrderedBytesInlined
+  544  00871808     DC  struct InStreamC& operator>>(const struct <anon>* this, const uint16_t& nVal)
+                         local  int16_t* pData16
+                         inlines  RNADebugBreak, SerializeOrderedBytesInlined
+  550  008718E4     DC  struct InStreamC& operator>>(const struct <anon>* this, const int8_t& nVal)
+                         local  int8_t* pData8
+                         inlines  RNADebugBreak, SerializeOrderedBytesInlined
+  556  008719C0     DC  struct InStreamC& operator>>(const struct <anon>* this, const uint8_t& nVal)
+                         local  int8_t* pData8
+                         inlines  RNADebugBreak, SerializeOrderedBytesInlined
+  571  00871A9C    114  struct InStreamC& operator>>(const struct <anon>* this, const float_t& fVal)
+                         local  int32_t* pData32
+                         inlines  RNADebugBreak, SerializeOrderedBytesInlined
+  577  00871BB0    114  struct InStreamC& operator>>(const struct <anon>* this, const double_t& dVal)
+                         local  int64_t* pData64
+                         inlines  RNADebugBreak, SerializeOrderedBytesInlined
+  585  008708D8     3C  void InStreamBinary_OppositeEndiannessC(const struct <anon>* this, void* pBuffer, int32_t nBufferSize)
+  592  00870880     40  void ~InStreamBinary_OppositeEndiannessC(const struct <anon>* this)
+  597  0086F48C     8C  void SetBigEndianFlag(const struct <anon>* this, bool bBigEndian)
+                         local  const char[17] __FUNCTION__
+                         inlines  RNADebugBreak
+  604    inline-only   void SerializeOrderedBytesInlined(const struct <anon>* this, void* pData, int32_t nBytes)
+                         local  const char[29] __FUNCTION__
+                         local  int8_t* pData8
+  649  00871CC4     EC  struct InStreamC& operator>>(const struct <anon>* this, const int32_t& nVal)
+                         inlines  RNADebugBreak, SerializeOrderedBytesInlined
+  655  00871DB0     EC  struct InStreamC& operator>>(const struct <anon>* this, const uint32_t& nVal)
+                         inlines  RNADebugBreak, SerializeOrderedBytesInlined
+  662  00871E9C     BC  struct InStreamC& operator>>(const struct <anon>* this, const int16_t& nVal)
+                         inlines  RNADebugBreak, SerializeOrderedBytesInlined
+  668  00871F58     BC  struct InStreamC& operator>>(const struct <anon>* this, const uint16_t& nVal)
+                         inlines  RNADebugBreak, SerializeOrderedBytesInlined
+  674  00872014     DC  struct InStreamC& operator>>(const struct <anon>* this, const int8_t& nVal)
+                         inlines  RNADebugBreak, SerializeOrderedBytesInlined
+  680  008720F0     DC  struct InStreamC& operator>>(const struct <anon>* this, const uint8_t& nVal)
+                         inlines  RNADebugBreak, SerializeOrderedBytesInlined
+  695  008721CC     EC  struct InStreamC& operator>>(const struct <anon>* this, const float_t& fVal)
+                         inlines  RNADebugBreak, SerializeOrderedBytesInlined
+  701  008722B8    14C  struct InStreamC& operator>>(const struct <anon>* this, const double_t& dVal)
+                         inlines  RNADebugBreak, SerializeOrderedBytesInlined
+  711  00870A58     40  void InStreamBinaryFileReaderC(const struct <anon>* this)
+  720  0086F63C     B0  void ~InStreamBinaryFileReaderC(const struct <anon>* this)
+                         local  const char[27] __FUNCTION__
+                         inlines  RNADebugBreak, ~InStreamC
+  727  0086F518     98  bool Open(const struct <anon>* this, const char* pFilename)
+                         local  const char[5] __FUNCTION__
+                         inlines  RNADebugBreak
+  735  0086F5B0     8C  bool Close(const struct <anon>* this)
+                         local  const char[6] __FUNCTION__
+                         inlines  RNADebugBreak
+  748  0086F6EC     EC  void SerializeBytes(const struct <anon>* this, void* pData, int32_t nBytes)
+                         local  const char[15] __FUNCTION__
+                         local  int8_t* pData8
+                         local  int32_t i
+                         inlines  RNADebugBreak
+  759  0086F7D8    12C  void SerializeOrderedBytes(const struct <anon>* this, void* pData, int32_t nBytes)
+                         local  const char[22] __FUNCTION__
+                         local  int8_t* pData8
+                         local  int32_t i
+                         inlines  RNADebugBreak
+  778  0086DE8C     50  struct InStreamC& operator>>(const struct <anon>* this, const int32_t& nVal)
+  784  0086DEDC     50  struct InStreamC& operator>>(const struct <anon>* this, const uint32_t& nVal)
+  791  0086DF2C     50  struct InStreamC& operator>>(const struct <anon>* this, const int16_t& nVal)
+  797  0086DF7C     50  struct InStreamC& operator>>(const struct <anon>* this, const uint16_t& nVal)
+  803  0086DFCC     50  struct InStreamC& operator>>(const struct <anon>* this, const int8_t& nVal)
+  809  0086E01C     50  struct InStreamC& operator>>(const struct <anon>* this, const uint8_t& nVal)
+  824  0086E06C     50  struct InStreamC& operator>>(const struct <anon>* this, const float_t& fVal)
+  830  0086E0BC     50  struct InStreamC& operator>>(const struct <anon>* this, const double_t& dVal)
+  836  0086F904    164  int32_t SerializeString(const struct <anon>* this, char* pString, int32_t iBufferSize)
+                         local  const char[16] __FUNCTION__
+                         local  int32_t iStrLen
+                         inlines  RNADebugBreak
+  848  0086FA68     78  int32_t GetStreamPos(const struct <anon>* this)
+                         local  const char[13] __FUNCTION__
+                         inlines  RNADebugBreak
+  854  0086FAE0     D4  void SetStreamPos(const struct <anon>* this, int32_t iPos)
+                         local  const char[13] __FUNCTION__
+                         local  int ret
+                         inlines  RNADebugBreak
+  861  0086FBB4    13C  int32_t GetStreamSize(const struct <anon>* this)
+                         local  const char[14] __FUNCTION__
+                         local  int iPos
+                         local  int ret
+                         local  int iFileSize
+                         inlines  RNADebugBreak
+  874  0086E10C     3C  bool IsEndOfStream(const struct <anon>* this)
+  882  0086E148     1C  bool IsOpen(const struct <anon>* this)
+  895  0086E164     D0  struct OutStreamC& Utils::operator<<(const struct OutStreamC& out, const const struct <anon>& string)
+                         local  int32_t iSize
+  906  0086FCF0    1D8  struct InStreamC& Utils::operator>>(const struct InStreamC& in, const struct <anon>& string)
+                         local  const char[11] __FUNCTION__
+                         local  int32_t iSize
+                         local  char[2048] buffer
+                         inlines  RNADebugBreak, operator=
+  920  0087023C     94  struct OutStreamC& Utils::operator<<(const struct OutStreamC& out, const const RNAVector2& v)
+  927  008702D0     C4  struct OutStreamC& Utils::operator<<(const struct OutStreamC& out, const const RNAVector3& v)
+  935  00870394     F4  struct OutStreamC& Utils::operator<<(const struct OutStreamC& out, const const RNAVector4& v)
+  944  00870488     F4  struct OutStreamC& Utils::operator<<(const struct OutStreamC& out, const const RNAPlane& v)
+  953  0086E234     D4  struct OutStreamC& Utils::operator<<(const struct OutStreamC& out, const const RNAMatrix44& mat)
+                         local  int32_t i
+                         inlines  operator float
+  967  0086E6E8     F4  struct OutStreamC& Utils::operator<<(const struct OutStreamC& out, const const RNAQuaternion& q)
+  976  0086E308     C8  struct InStreamC& Utils::operator>>(const struct InStreamC& in, const RNAVector2& v)
+                         local  float x
+                         local  float y
+                         inlines  Set
+  985  0086E3D0     F0  struct InStreamC& Utils::operator>>(const struct InStreamC& in, const RNAVector3& v)
+                         local  float x
+                         local  float y
+                         local  float z
+                         inlines  Set
+  995  0086FEC8    114  struct InStreamC& Utils::operator>>(const struct InStreamC& in, const RNAVector4& v)
+                         local  float x
+                         local  float y
+                         local  float z
+                         local  float w
+                         inlines  Set
+ 1006  0086E4C0    114  struct InStreamC& Utils::operator>>(const struct InStreamC& in, const RNAPlane& v)
+                         local  float a
+                         local  float b
+                         local  float c
+                         local  float d
+                         inlines  Set
+ 1017  0086FFDC    100  struct InStreamC& Utils::operator>>(const struct InStreamC& in, const RNAMatrix44& mat)
+                         local  int32_t i
+                         local  float_t f
+                         inlines  SetElem
+ 1029  0086E5D4    114  struct InStreamC& Utils::operator>>(const struct InStreamC& in, const RNAQuaternion& q)
+                         local  float x
+                         local  float y
+                         local  float z
+                         local  float w
+                         inlines  Set
+ 1044  00870C08    8FC  void TestIOStream()
+                         local  const char[13] __FUNCTION__
+                         local  struct <anon> out
+                         local  int32_t i32
+                         local  int16_t i16
+                         local  int8_t i8
+                         local  uint32_t u32
+                         local  uint16_t u16
+                         local  uint8_t u8
+                         local  float_t f1
+                         local  float_t f2
+                         local  float_t f3
+                         local  char[26] testString
+                         local  char[5] testString2
+                         local  struct <anon> infile
+                         local  int32_t i32
+                         local  int16_t i16
+                         local  int8_t i8
+                         local  uint32_t u32
+                         local  uint16_t u16
+                         local  uint8_t u8
+                         local  float_t f1
+                         local  float_t f2
+                         local  float_t f3
+                         local  char[35] testString
+                         local  char[34] testString2
+                         inlines  RNADebugBreak
+ 1116  0087022C     10  static void _GLOBAL__I__ZN5Utils10OutStreamCC2Ev()

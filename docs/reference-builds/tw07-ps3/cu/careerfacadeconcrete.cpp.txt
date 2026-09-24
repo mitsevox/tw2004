@@ -1,0 +1,17 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/career/source/common/careerfacadeconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   71  005F68B0     E4  void CareerFacadeConcrete(const struct <anon>* this)
+                         inlines  CareerFacade, GetInstance, RCPointer
+  106  005E6764     DC  void ~CareerFacadeConcrete(const struct <anon>* this)
+                         inlines  GetInstance, operator delete, operator=, ~CareerFacade, ~RCPointer
+  133  005F6A78     58  void CreateFacade()
+                         inlines  operator new
+  161  005D9CE8     50  void DestroyFacade()
+                         inlines  GetInstance
+  188  005C7244      C  struct <anon>* GetInstance()
+  215  005E6840     64  void StateChanging(const struct <anon>* this, enum OsdkState eOldState, enum OsdkState eNewState)
+                         inlines  operator=
+  243  00611EEC     D8  void StateChanged(const struct <anon>* this, enum OsdkState eOldState, enum OsdkState eNewState)
+                         inlines  operator=

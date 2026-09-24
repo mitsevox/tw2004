@@ -1,0 +1,36 @@
+// ../../../../../TIGERCODE/Code/GolfModule/golf_module_ucap.cpp
+// compiled in: golf_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+    5  0023371C     84  static bool CO_ToggleUcap(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+   25  002F6B44    13C  void GolfModuleUCAP::GolfModuleUCAP(const struct GolfModuleUCAP* this, const const void** __vtt_parm, struct IAllocator* allocator, struct Lua* lua, float fps)
+   41  0024597C    1DC  void GolfModuleUCAP::Init(const struct GolfModuleUCAP* this)
+                         local  const char[5] __FUNCTION__
+                         local  int i
+                         local  int j
+                         inlines  TagValuePair, operator+
+   56  002337A0     C0  void GolfModuleUCAP::Shutdown(const struct GolfModuleUCAP* this)
+                         local  int i
+                         local  int j
+   71  00233860    1A8  void GolfModuleUCAP::HandleNewComponents(const struct GolfModuleUCAP* this)
+                         local  int32 nextIndex
+                         local  unsigned int vertCount
+                         local  const struct GeoComponent* base
+                         local  int j
+                         local  unsigned int submeshVertCount
+                         local  const struct GeoComponent* inputComponents
+                         local  struct GeoComponent* pComponents
+                         inlines  UCAP::GetComponentsFromHeader
+   92  00233A08    174  void GolfModuleUCAP::SwapComponentBuffers(const struct GolfModuleUCAP* this)
+                         local  const char* textureGroupName
+                         local  struct TextureGroup* pUcapTextureGroup
+                         local  const int cNameBuffLen
+                         local  char[32] texName
+                         local  int i
+                         local  TextureRef tex
+  117  00230C6C     CC  bool GolfModuleUCAP::IsUcapAvailable(const struct GolfModuleUCAP* this)
+                         local  const struct GolfModuleTrinity& trinity
+                         inlines  GolfModuleTrinity::IsStreamValid
+  124  00233B7C     C4  bool GolfModuleUCAP::IsPlayerUcap(const struct GolfModuleUCAP* this, enum PlayerNumber_t player)
+                         local  struct GolferData_t* pGolferData
+                         inlines  GamePlayer::GetGolferData

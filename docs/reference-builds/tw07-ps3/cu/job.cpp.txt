@@ -1,0 +1,38 @@
+// C:/packages/job_manager/1.11.00/source/common/job.cpp
+// compiled in: job.cpp
+// 21 functions, source order. line | PS3 address | size
+
+   77  007046B8     FC  void Clear(const struct Job* this)
+  122  0070466C     4C  void ClearArrays(const struct Job* this)
+                         local  uint32_t i
+                         local  uint32_t i
+  154  007047B4     B0  void Restore(const struct Job* this)
+  179  00704864     EC  void WaitOn(const const struct <anon>* this)
+                         local  const volatile struct <anon>* jobHeader
+                         inlines  sys_ppu_thread_yield, sys_timer_usleep
+  258  00704950     38  void SleepOn(const const struct <anon>* this)
+  295  00704988     64  void SetName(const struct Job* this, const char* name)
+  318  00704B0C     A0  void SetPriority(const struct Job* this, enum JobPriority priority)
+  334  00704BAC      C  const char* GetName(const const struct <anon>* this)
+  345  00704BB8      C  unsigned int Status(const const struct <anon>* this)
+  355  00704BC4     18  bool IsDone(const const struct <anon>* this)
+  364  00704BDC      8  int GetId(const const struct <anon>* this)
+  374  00704BE4      C  int GetNumDependents(const const struct <anon>* this)
+  384  00704BF0      C  int GetNumDependencies(const const struct <anon>* this)
+  399  00704BFC    15C  void SetData(const struct Job* this, void* data, uint32_t size)
+                         local  uint32_t stack_begin
+                         local  uint32_t stack_end
+                         local  uint64_t* stack_begin_ptr
+                         local  uint64_t* stack_end_ptr
+  446  00704D58      8  void SetKernelSwap(const struct Job* this, enum KernelSwap setting)
+  461  00704D60     68  void SetCodeRecycle(const struct Job* this, enum JobCodeRecycle recycle)
+  543  00704DC8    28C  void SetCode(const struct Job* this, PtrToCode elf, enum JobType type, unsigned int size)
+                         local  struct SPUExecutableInfo info
+                         local  bool ret
+                         inlines  SPUExecutableInfo::SPUExecutableInfo
+  609  0070523C    110  void DependsOn(const struct Job* this, struct Job* job)
+  620  00705054     84  void AddDependent(const struct Job* this, struct Job* job)
+  628  007050D8    164  void AddDependency(const struct Job* this, struct Job* job)
+                         local  unsigned int i
+                         inlines  IncrementNumDependencies
+  648  0070534C    168  void Print(const struct Job* this, const struct JobScheduler& jobScheduler)

@@ -1,0 +1,81 @@
+// ../../../../../TIGERCODE/Code/AptInterface/AptPackage/_Apt.h
+// compiled in: other_unity.cpp
+// 57 functions, source order. line | PS3 address | size
+
+  258    inline-only   void AptIntervalTimer::cleanParams(const struct AptIntervalTimer* this)
+                         local  int i
+                         local  int nP
+  380    inline-only   void AptRenderingContext::operator delete(void* p, size_t size)
+  380    inline-only   void* AptRenderingContext::operator new(size_t size)
+  391  003EFC38     5C  void AptRenderingContext::AptRenderingContext(const struct AptRenderingContext* this)
+  398    inline-only   void AptRenderingContext::popColourTransform(const struct AptRenderingContext* this)
+  411    inline-only   void AptRenderingContext::pushAppendColourTransform(const struct AptRenderingContext* this, struct AptCXForm* pCXForm)
+  429    inline-only   void AptRenderingContext::pushVertexMatrix(const struct AptRenderingContext* this)
+  435    inline-only   void AptRenderingContext::popVertexMatrix(const struct AptRenderingContext* this)
+  442    inline-only   void AptRenderingContext::appendVertexMatrix(const struct AptRenderingContext* this, struct AptMatrix* pMatrix)
+  448    inline-only   void AptRenderingContext::pushAppendVertexMatrix(const struct AptRenderingContext* this, struct AptMatrix* pMatrix)
+  457    inline-only   void AptRenderingContext::multMatrix(struct AptMatrix* pA, struct AptMatrix* pB, struct AptMatrix* pOut)
+                         local  struct AptMatrix tempA
+                         local  struct AptMatrix tempB
+  519    inline-only   void* AptDisplayListState::operator new(size_t size)
+  519    inline-only   void AptDisplayListState::operator delete(void* p, size_t size)
+  551  0045EF3C    12C  void AptDisplayList::AptDisplayList(const struct AptDisplayList* this)
+                         inlines  AptCIH::AptCIH, AptDisplayListState::AptDisplayListState, AptDisplayListState::operator new, AptValue::setIsDefined
+  552  00478FE8     B0  void AptDisplayList::~AptDisplayList(const struct AptDisplayList* this)
+                         inlines  checked_delete<AptDisplayListState>
+  630    inline-only   void AptFrameStack::operator delete(void* p, size_t size)
+  630    inline-only   void* AptFrameStack::operator new(size_t size)
+  640    inline-only   void AptHash::operator delete(void* p, size_t size)
+  640    inline-only   void* AptHash::operator new(size_t size)
+  648    inline-only   void AptArray::operator delete(void* p, size_t size)
+  648    inline-only   void* AptArray::operator new(size_t size)
+  650  00444958     54  void AptArray::AptArray(const struct AptArray* this)
+                         inlines  AptObject::AptObject
+  651  00428160    114  void AptArray::~AptArray(const struct AptArray* this)
+                         local  int i
+                         inlines  ~AptObject
+  652  004A8830     84  void AptArray::__dec(struct AptValue* pValue)
+                         inlines  AptValue::subtractReference, checked_delete<AptArray>
+  714    inline-only   void AptNone::operator delete(void* p, size_t size)
+  714    inline-only   void* AptNone::operator new(size_t size)
+  722  004A77D4      4  void AptNone::__dec(struct AptValue* pValue)
+  727    inline-only   void AptExtern::operator delete(void* p, size_t size)
+  727    inline-only   void* AptExtern::operator new(size_t size)
+  734  004A77D8      4  void AptExtern::__dec(struct AptValue* pValue)
+  740    inline-only   void AptMath::operator delete(void* p, size_t size)
+  740    inline-only   void* AptMath::operator new(size_t size)
+  795  004A77DC      4  void AptMath::__dec(struct AptValue* pValue)
+  857    inline-only   void AptGlobal::operator delete(void* p, size_t size)
+  857    inline-only   void* AptGlobal::operator new(size_t size)
+  863  004A77E0      4  void AptGlobal::__dec(struct AptValue* pValue)
+  971    inline-only   void AptMovieClip::operator delete(void* p, size_t size)
+  971    inline-only   void* AptMovieClip::operator new(size_t size)
+  977  004A8658     8C  void AptMovieClip::__dec(struct AptValue* pValue)
+                         inlines  AptMovieClip::operator delete, AptValue::subtractReference, checked_delete<AptMovieClip>
+ 1163    inline-only   void* AptProceduralSettings::operator new(size_t size)
+ 1163    inline-only   void AptProceduralSettings::operator delete(void* p, size_t size)
+ 1376    inline-only   void AptCharacterShapeInst::operator delete(void* p, size_t size)
+ 1376    inline-only   void* AptCharacterShapeInst::operator new(size_t size)
+ 1522    inline-only   void AptAnimationPoolData::operator delete(void* p, size_t size)
+ 1522    inline-only   void* AptAnimationPoolData::operator new(size_t size)
+ 1579  00479B80     F4  void AptAnimationPoolData::AptAnimationPoolData(const struct AptAnimationPoolData* this)
+                         inlines  AptIntervalTimer, AptValueSet<AptCIH*,512>::AptValueSet, AptValueSet<AptValue*,64>::AptValueSet
+ 1580  00479148    2C0  void AptAnimationPoolData::~AptAnimationPoolData(const struct AptAnimationPoolData* this)
+                         local  int i
+                         local  int i
+                         local  int i
+                         inlines  AptIntervalTimer::~AptIntervalTimer, AptValueSet<AptCIH*,512>::~AptValueSet, AptValueSet<AptValue*,64>::~AptValueSet, AptValueStack<AptValue*,6>::pop, AptValueStack<AptValue*,6>::size
+ 1641    inline-only   struct AptActionPool* AptAnimationPoolData::IncrementDequeLocation(const struct AptAnimationPoolData* this, struct AptActionPool* curr)
+                         local  struct AptActionPool* ret
+ 1653    inline-only   struct AptActionPool* AptAnimationPoolData::DecrementDequeLocation(const struct AptAnimationPoolData* this, struct AptActionPool* curr)
+                         local  struct AptActionPool* ret
+ 1730    inline-only   void AptCharacterSpriteInst::operator delete(void* p, size_t size)
+ 1730    inline-only   void* AptCharacterSpriteInst::operator new(size_t size)
+ 1738    inline-only   void AptCharacterAnimationInst::operator delete(void* p, size_t size)
+ 1738    inline-only   void* AptCharacterAnimationInst::operator new(size_t size)
+ 1740  00479F44    134  void AptCharacterAnimationInst::AptCharacterAnimationInst(const struct AptCharacterAnimationInst* this, AptFilePtr& file)
+                         inlines  AptCharacterInst::AptCharacterInst, AptCharacterSpriteInstBase::AptCharacterSpriteInstBase, AptHash::AptHash, AptHash::operator new, AptSharedPtr<AptFile>::AptSharedPtr, AptSharedPtr<AptFile>::Dispose, AptSharedPtr<AptFile>::operator=
+ 1741  0047A1AC    34C  void AptCharacterAnimationInst::~AptCharacterAnimationInst(const struct AptCharacterAnimationInst* this)
+                         inlines  AptCharacterSpriteInstBase::~AptCharacterSpriteInstBase, AptSharedPtr<AptFile>::~AptSharedPtr
+ 1770    inline-only   void AptCharacterTextInst::operator delete(void* p, size_t size)
+ 1770    inline-only   void* AptCharacterTextInst::operator new(size_t size)

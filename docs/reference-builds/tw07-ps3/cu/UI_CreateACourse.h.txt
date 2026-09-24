@@ -1,0 +1,16 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_CreateACourse.h
+// compiled in: apt_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   18  00120924    160  void UICreateACourse::~UICreateACourse(const struct UICreateACourse* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UICreateACourse::DstMenuItem_crac>::~TExternArray, UIMenuCircBase::~UIMenuCircBase
+   20  001002D0      C  uint32 UICreateACourse::GetSignature(const const struct UICreateACourse* this)
+   25  001002E4      C  struct IExternArray* UICreateACourse::GetExternArray(const struct UICreateACourse* this)
+   33  001002F0     24  void UICreateACourse::RegainFocus(const struct UICreateACourse* this, uint32 )
+   34  00100314     24  void UICreateACourse::LooseFocus(const struct UICreateACourse* this, uint32 )
+   36  00115670     14  void UICreateACourse::NotifyPic_func(struct IAptSubscriber* subs)
+   43    inline-only   struct UserInfo& UICreateACourse::GetCurrentCRACUserInfo(const struct UICreateACourse* this)
+   56  00100338      4  void UICreateACourse::Show(const struct UICreateACourse* this)
+   87  00100344      C  uint32 UICRACLogoSelect::GetSignature(const const struct UICRACLogoSelect* this)
+   89  00100350     24  void UICRACLogoSelect::RegainFocus(const struct UICRACLogoSelect* this, uint32 )
+   90  00100374     24  void UICRACLogoSelect::LooseFocus(const struct UICRACLogoSelect* this, uint32 )

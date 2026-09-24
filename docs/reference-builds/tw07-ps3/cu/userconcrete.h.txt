@@ -1,0 +1,9 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/./userconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   63    inline-only   uint32_t GetReferenceCount(const const struct <anon>* this)
+  127    inline-only   uint32_t GetCacheAge(const const struct <anon>* this)
+  130    inline-only   void SetDirty(const struct UserConcrete* this)
+  131    inline-only   void SetClean(const struct UserConcrete* this)
+  132    inline-only   bool IsDirty(const const struct <anon>* this)

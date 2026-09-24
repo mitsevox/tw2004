@@ -1,0 +1,35 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/fastfloat_operation_inline.h
+// compiled in: RNADevicePlat.cpp, SGNodeBSPCulledRenderable.cpp, SGNodeJoint.cpp
+// 7 functions, source order. line | PS3 address | size
+
+  417    inline-only   bool vpu::operator>(struct <anon>& a, const const float& b)
+  679    inline-only   struct <anon> vpu::operator-(struct <anon>& a)
+                         local  Vector4Intrinsic_32 ret
+                         local  int[4] zero
+  968    inline-only   struct <anon> vpu::operator+<VectorAxisW>(struct <anon>& a, struct <anon>& b)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 bVF
+ 1319    inline-only   struct <anon> vpu::operator*<VectorAxisX>(struct <anon>& a, const const float& b)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 aVF
+                         local  Vector4Intrinsic_32 floatVec
+                         local  Vector4Intrinsic_32 vi_temp
+                         local  int[4] zero
+ 1319    inline-only   struct <anon> vpu::operator*<VectorAxisY>(struct <anon>& a, const const float& b)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 aVF
+                         local  Vector4Intrinsic_32 floatVec
+                         local  Vector4Intrinsic_32 vi_temp
+                         local  int[4] zero
+ 1319    inline-only   struct <anon> vpu::operator*<VectorAxisZ>(struct <anon>& a, const const float& b)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 aVF
+                         local  Vector4Intrinsic_32 floatVec
+                         local  Vector4Intrinsic_32 vi_temp
+                         local  int[4] zero
+ 1319    inline-only   struct <anon> vpu::operator*<VectorAxisW>(struct <anon>& a, const const float& b)
+                         local  Vector4Intrinsic_32 ret
+                         local  Vector4Intrinsic_32 aVF
+                         local  Vector4Intrinsic_32 floatVec
+                         local  Vector4Intrinsic_32 vi_temp
+                         local  int[4] zero

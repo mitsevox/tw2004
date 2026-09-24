@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Shared/Headers/UHashString.h
+// compiled in: apt_unity.cpp, golf_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  179    inline-only   struct HashString& HashString::operator=(const struct HashString* this, const const struct HashString& str)
+  193    inline-only   bool operator==(const const struct HashString& a, const const struct HashString& b)

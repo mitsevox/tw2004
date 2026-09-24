@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/include/common/osdk/listarray.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   52    inline-only   uint32_t GetNumberOfElements(const const struct <anon>* this)
+   76    inline-only   void RemoveAll(const struct ListArray* this)
+   82    inline-only   bool IsFull(const const struct <anon>* this)

@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_OnlineGameSetup.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   56  00125174     B8  void UIOnlineGameSetup::~UIOnlineGameSetup(const struct UIOnlineGameSetup* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   58  000FF80C      C  uint32 UIOnlineGameSetup::GetSignature(const const struct UIOnlineGameSetup* this)
+  114    inline-only   void UIOnlineGameSetup::SetFromAPop(const struct UIOnlineGameSetup* this, bool bFlag)

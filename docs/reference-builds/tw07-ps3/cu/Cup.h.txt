@@ -1,0 +1,15 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/Cup.h
+// compiled in: headgate_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   43  00349778    4F4  void Cup::Cup(const struct Cup* this, int8 nGreenIndex, int8 nCupIndex)
+                         local  struct ObjectData data
+                         local  uint32 size
+                         local  struct LS_VertexBuffer* resultVB
+                         local  struct LS_IndexBuffer* resultIB
+                         local  LS_Index* pOutputIndices
+                         local  uint32 i
+   44  0034A160     B0  void Cup::~Cup(const struct Cup* this)
+                         local  unsigned int i
+   51    inline-only   uint32 Cup::GreenIndex(const const struct Cup* this)
+   52    inline-only   uint32 Cup::CupIndex(const const struct Cup* this)

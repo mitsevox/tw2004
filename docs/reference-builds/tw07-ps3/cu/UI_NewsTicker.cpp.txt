@@ -1,0 +1,58 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_NewsTicker.cpp
+// compiled in: apt_unity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   34  00045550    1AC  void UINewsTicker::UpdateStringColorPosition(const struct UINewsTicker* this, const struct AptExternalContext& contextT, int32 id, int32 update)
+                         local  char[16] tickerNumber
+                         local  struct AptExternalContext tickerContext
+   64  000F971C     54  void UINewsTicker::UINewsTicker(const struct UINewsTicker* this)
+   69  000339F4     BC  void UINewsTicker::Init(const struct UINewsTicker* this)
+   85  000456FC     F4  void UINewsTicker::Show(const struct UINewsTicker* this)
+  107  000457F0    160  void UINewsTicker::OnShow(const struct UINewsTicker* this)
+                         local  int iScreenWidth
+                         local  struct AptExternalContext tickerContextT
+                         local  int i
+  149  00045950     68  void UINewsTicker::OnHide(const struct UINewsTicker* this)
+  156  000459B8      8  enum eAptHandleInput UINewsTicker::HandleInput(const struct UINewsTicker* this, int32 cID)
+  165  000917CC    5C8  bool UINewsTicker::AddString(const struct UINewsTicker* this, const char* szString, int32 iColor)
+                         local  bool bValidUTF8
+                         local  const uint32 lenStr
+                         local  struct AptExternalContext tickerContextT
+                         local  uint32 j
+                         local  uint32 iIdx
+                         local  uint32 iMaxStringLength
+                         local  char[80] szName
+                         local  char[128] szBody
+                         local  char[256] szMessage
+                         local  uint32 iCount
+                         local  int i
+                         local  int iTickerIdx
+                         local  int iScreenWidth
+                         local  int i
+                         inlines  std::isspace
+  313  000459C0    1C8  void UINewsTicker::PopString(const struct UINewsTicker* this)
+                         local  int i
+                         local  int i
+                         local  int i
+  393  00045B88    74C  enum AptThreadReturnValue UINewsTicker::ScrollText(const struct UINewsTicker* this)
+                         local  int iNumTickerFields
+                         local  struct AptExternalContext tickerContextT
+                         local  int32[30] aiStringWidth
+                         local  const float fScrollX
+                         local  int i
+                         local  int i
+                         local  int iThisIdx
+                         local  int iPrevIdx
+                         local  int i
+                         local  int iNumStringLines
+                         local  int iStringHeight
+                         local  int iNewFrontID
+                         local  int i
+                         local  int iThisIdx
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int iNumStringLines
+                         local  int iStringHeight
+  606  000462D4     38  void UINewsTicker::ShowPodCastIcon(const struct UINewsTicker* this)
+  615  0004630C     38  void UINewsTicker::HidePodCastIcon(const struct UINewsTicker* this)

@@ -1,0 +1,259 @@
+// ../../../../../TIGERCODE/Code/GolfModule/golf_module_trinity.cpp
+// compiled in: golf_unity.cpp
+// 69 functions, source order. line | PS3 address | size
+
+   71  002F69E4     B4  void GolfModuleTrinity::GolfModuleTrinity(const struct GolfModuleTrinity* this, const const void** __vtt_parm, struct IAllocator* allocator, struct Global* global, struct CCT* cct, struct Lua* lua)
+   76  0023024C    100  void GolfModuleTrinity::Init(const struct GolfModuleTrinity* this)
+  110  00230588    14C  void GolfModuleTrinity::LevelInit(const struct GolfModuleTrinity* this)
+  147  0027E4FC    1E4  void GolfModuleTrinity::LevelShutdown(const struct GolfModuleTrinity* this)
+                         local  unsigned int currentTag
+  175  002309F4     50  void GolfModuleTrinity::CloseStreamFile(const struct GolfModuleTrinity* this)
+  187  0024E2C4     D0  void GolfModuleTrinity::AbortStreamFile(const struct GolfModuleTrinity* this)
+                         local  unsigned int currentTag
+  207  00230720      8  unsigned int GolfModuleTrinity::GetActiveResourceTag(const struct GolfModuleTrinity* this)
+  212  00230728      C  unsigned int GolfModuleTrinity::GetStreamingResourceTag(const struct GolfModuleTrinity* this)
+  217  0030D424    3DC  void GolfModuleTrinity::Update(const struct GolfModuleTrinity* this)
+                         local  struct GoTemple* pTemple
+                         local  enum PlayerNumber_t golferUp
+                         local  bool bPipDesired
+                         local  bool bPipAlreadyOn
+                         local  enum PlayerCtrl_t playerController
+                         local  bool bIsInFlyBy
+                         local  bool bInterrupted
+                         local  bool bCanInterrupt
+                         inlines  GM_GetGolferUp, GamePlayer::GetController, Trinity::SetIsInterrupted
+  334  002C569C    238  enum PlayerNumber_t GolfModuleTrinity::GetNextPlayer(const const struct GolfModuleTrinity* this, const enum PlayerNumber_t currentPlayer, bool forceCurrent, bool bHasLanded)
+                         local  struct PhysicsBall_t* ball
+                         local  enum PlayerNumber_t nextPlayer
+                         local  float currentToPin
+                         local  struct PhysicsBall_t* nextBall
+                         local  float nextToPin
+                         local  void* ptr
+                         local  struct GameModeOneBall* mode
+                         inlines  GamePlayer::GetEstimatedBall
+  399  00256F4C    1AC  enum Club_t GolfModuleTrinity::GetPlausibleClub(const const struct GolfModuleTrinity* this, enum PlayerNumber_t player, bool bUseEstimatedBall)
+                         local  struct CoreShotInfo_t* coreShot
+                         local  struct PhysicsBall_t* ball
+                         local  vec4flt normal
+                         local  struct TGD_MaterialInfo* info
+                         local  unsigned int lie
+                         inlines  AIMgr, GamePlayer::GetEstimatedBall
+  440  00230734     30  void GolfModuleTrinity::FreeTrinCallback(void* resource, void* userPtr)
+                         local  struct GolfModuleTrinity* trin
+  446  00230764     40  void GolfModuleTrinity::FreeBnkCallback(void* resource, void* userPtr)
+  451  002307A4      4  void GolfModuleTrinity::FreeUcapCallback(void* resource, void* userPtr)
+  545  002306D4     4C  void GolfModuleTrinity::DeleteBucketUcapTextureGroup(const struct GolfModuleTrinity* this, struct BucketDef* bucket)
+                         local  struct TextureGroup* group
+  559  00285960    2B8  int GolfModuleTrinity::GetGolferBucketStartingIndex(const const struct GolfModuleTrinity* this, enum PlayerNumber_t player)
+                         local  struct GolferData_t* pGolferData
+                         local  const struct UserInfo& userInfo
+                         inlines  GamePlayer::GetGolferData
+  641  002307A8     7C  void GolfModuleTrinity::PreOpenStreams()
+                         local  char[256] buf
+                         local  unsigned int i
+  650  0030B928     D4  void GolfModuleTrinity::SetupUcapPlayer(const struct GolfModuleTrinity* this, enum PlayerNumber_t player)
+                         local  unsigned int index
+  669  0030B7B8    170  void GolfModuleTrinity::ReloadStreamForFacility(const struct GolfModuleTrinity* this, enum PlayerNumber_t player)
+                         local  unsigned int index
+                         local  const struct GolfModuleUCAP& ucap
+                         local  struct GolferData_t* pGolferData
+                         inlines  GamePlayer::GetGolferData
+  690  002C5A70     9C  void GolfModuleTrinity::StartNextPlayerStream(const struct GolfModuleTrinity* this, enum PlayerNumber_t player, bool forceCurrent)
+                         local  enum PlayerNumber_t nextPlayer
+                         local  bool bUseEstimatedBall
+                         local  enum Club_t club
+                         local  unsigned int startIndex
+  707  00230824     48  void GolfModuleTrinity::UpdateStreaming(const struct GolfModuleTrinity* this)
+  723  0023086C     7C  void GolfModuleTrinity::CancelStreaming(const struct GolfModuleTrinity* this, int streamHandle)
+                         local  int32 curFile
+                         local  int32 curOffset
+                         local  int32 fileSize
+  736  002308E8    10C  void GolfModuleTrinity::UpdateStreamerUntilCompletion(const struct GolfModuleTrinity* this)
+                         local  int32 curFile
+                         local  int32 curOffset
+                         local  int32 fileSize
+                         local  bool dashboardWasAutoUpdating
+  765  0025DA30    468  void GolfModuleTrinity::StreamBucket(const struct GolfModuleTrinity* this, unsigned int bucketIndex)
+                         local  struct BucketDef* nextBucket
+                         local  unsigned int activeTag
+                         local  unsigned int streamTag
+                         local  struct BucketDef* activeBucket
+                         local  struct BucketDef* oldBucket
+                         local  unsigned int currentTag
+                         local  char[256] streamName
+  865  0025DE98     7C  void GolfModuleTrinity::ResetNextPlayerStream(const struct GolfModuleTrinity* this)
+  879  0030AD10    58C  void GolfModuleTrinity::WaitForPlayerStream(const struct GolfModuleTrinity* this)
+                         local  struct GolferData_t* pGolferData
+                         local  const char* streamName
+                         local  int bucketIndex
+                         local  bool original
+                         local  const struct GolfModuleUCAP& ucap
+                         inlines  GM_GetGolferUp, GamePlayer::GetGolferData
+  991  00230A44    1CC  unsigned int GolfModuleTrinity::GetNextCycledVariation(const struct GolfModuleTrinity* this, unsigned int startIndex)
+ 1024  002990B0    4A8  void GolfModuleTrinity::ComputeBucketInfoAndNextClubForLua(const struct GolfModuleTrinity* this, enum Club_t club, unsigned int startIdx, const float& nextClub, const struct BucketInfo& bucketInfo, bool bForceCurrent)
+                         inlines  std::atoi
+ 1174  002C58D4    19C  void GolfModuleTrinity::VerifyStreamSelectionAndReload(const struct GolfModuleTrinity* this, enum PlayerNumber_t player, bool bForceCurrent)
+                         local  enum PlayerNumber_t nextPlayer
+                         local  enum Club_t club
+                         local  unsigned int startIndex
+                         local  struct BucketInfo bucketInfo
+                         local  float nextClub
+ 1201  00309D04     8C  const float* GolfModuleTrinity::GetRelativeMtx(const const struct GolfModuleTrinity* this)
+                         local  enum PlayerNumber_t playerNumber
+                         local  struct GamePlayer* player
+                         local  const float* mtx
+                         inlines  Character_GetBoneMatrix, Character_GetBoneMatrix_FromIndex, GM_GetGolferUp, GamePlayer::GetCharacter
+ 1210  00309D90     C4  bool GolfModuleTrinity::ShouldApplyCharHeightOffset(const const struct GolfModuleTrinity* this)
+                         local  bool bShouldApply
+                         local  enum PlayerNumber_t playerNum
+                         local  enum Golfer_t golferIdx
+                         local  int32 golferHandle
+                         inlines  GM_GetGolferUp
+ 1242  00309E54    158  float GolfModuleTrinity::GetCharacterHeightOffset(const const struct GolfModuleTrinity* this)
+                         local  float heightOffset
+                         local  enum PlayerNumber_t playerNum
+                         local  struct CrAPInfo_t* pCrAPInfo
+                         local  const struct CrAP_BoneTransform_t* pBoneTransform
+                         local  const float sCharHeightInches
+                         inlines  GM_GetGolferUp
+ 1270  00309FAC     F0  void GolfModuleTrinity::SetGolferStreamInfoForLua(const struct GolfModuleTrinity* this)
+                         local  enum PlayerNumber_t player
+                         local  struct GolferData_t* pGolferData
+                         local  char[64] golferFullName
+                         inlines  GM_GetGolferUp, GamePlayer::GetGolferData
+ 1282  00230C10     5C  const char* GolfModuleTrinity::GetActiveUcapTextureGroupName(const struct GolfModuleTrinity* this)
+ 1287  001F21C8     28  void GolfModuleTrinity::SetTrinityFlag(const struct GolfModuleTrinity* this, enum TrinityFlag_t flag, bool bSet)
+ 1295  0030A09C     BC  void GolfModuleTrinity::StartIGC(const struct GolfModuleTrinity* this)
+                         local  enum PlayerNumber_t currentPlayer
+                         local  bool bIsLeftHanded
+                         inlines  CCT::SetIsTransFromIGC, GM_GetGolferUp, Trinity::SetIsActorLeftHanded
+ 1306  00230D38     60  void GolfModuleTrinity::StopIGC(const struct GolfModuleTrinity* this)
+                         inlines  CCT::SetIsTransFromIGC
+ 1355  0030A870    4A0  static void* Trinity_PlaySequenceCallback(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+                         local  char* pPreString
+                         local  int32 value
+                         local  enum GM_AllowAnimationsTypes_t savePreShotAnimType
+                         local  bool saveShowPostAnimation
+                         inlines  GM_GetGolferUp, std::strstr
+ 1479  0030A39C    4D4  static void* Trinity_PlayAnimationCallback(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+                         local  int32 value
+ 1588  0024AC4C     6C  static void* Trinity_FadeInCallBack(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+ 1603  0030B5D8    1E0  static void* Trinity_LoadBucketCallback(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+                         local  enum PlayerNumber_t player
+                         local  int32 value
+                         inlines  GM_GetGolferUp
+ 1662  0030B504     D4  static void* Trinity_ResetBucketCallback(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+                         local  enum PlayerNumber_t player
+                         inlines  GM_GetGolferUp
+ 1685  0030CA84     CC  static void* Trinity_TestSequencesCallBack(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+ 1718  00230DE8     64  static void* Trinity_TimeScaleCallBack(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+ 1734  00230E4C    340  static void* Trinity_BreakPointCallBack(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+                         local  float seqTime
+ 1813  0023118C    41C  void GolfModuleTrinity::Trinity_InitTuner(const struct GolfModuleTrinity* this)
+                         local  int id
+                         local  int testMenuId
+ 1843  0030A158    244  void GolfModuleTrinity::InGameTune_RebuildSequenceList(bool bResetIndex)
+                         local  struct TrinitySequence* pSequence
+                         local  struct TrinitySequence* pSelectedSequence
+                         local  int counter
+                         local  char* pFirstUnderScore
+                         inlines  GM_GetGolferUp, GetNext, TrinitySequence::GetResourceTag, std::strchr
+ 1889  00231678     A8  void GolfModuleTrinity::InGameTune_RebuildBucketList(bool bResetIndex)
+ 1900  00230D98      8  int GolfModuleTrinity::GetBucketDefCount()
+ 1905  0023166C      C  int GolfModuleTrinity::GetCurrentBucketIndex(const struct GolfModuleTrinity* this)
+ 1910  0030B9FC   1088  void GolfModuleTrinity::TestSequences(const struct GolfModuleTrinity* this)
+                         local  char[64] golferFullName
+                         local  struct GolferData_t* pGolferData
+                         local  enum PlayerNumber_t player
+                         local  int i
+                         local  int j
+                         local  int i
+                         local  int putterStartIndex
+                         local  int j
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int putterStartIndex
+                         local  int j
+                         local  int i
+                         local  int putterStartIndex
+                         local  int j
+                         local  int i
+                         local  int putterStartIndex
+                         local  int j
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int putterStartIndex
+                         local  int j
+                         inlines  GM_GetGolferUp, GolferStats::GetGolferStats, Singleton<GolferStats>::GetSingleton, Trinity::SetIsInTestMode
+ 2179  00264EC8     CC  bool GolfModuleTrinity::TestStartSequence(const struct GolfModuleTrinity* this, const char* sequenceName, unsigned int resourceTag)
+                         local  struct TrinitySequence* pSequence
+                         inlines  GetNext
+ 2202  0030B29C    268  void GolfModuleTrinity::TestStreamBucketAndPlay(const struct GolfModuleTrinity* this, unsigned int bucketIndex)
+                         local  struct <anon> param
+                         local  int lieIdx
+                         local  int dtpIdx
+                         local  int iobIdx
+                         local  int shotIdx
+                         local  int flIdx
+                         local  int fsIdx
+                         local  int lieIdx
+                         local  int dtpIdx
+                         local  int parIdx
+                         local  int hsIdx
+ 2259  00231720    328  void GolfModuleTrinity::TestSetLie(const struct GolfModuleTrinity* this, enum Lie_t lie)
+ 2324  00231A48    160  void GolfModuleTrinity::TestSetDistToPin(const struct GolfModuleTrinity* this, int pathIdx)
+ 2347  00231BA8     F8  void GolfModuleTrinity::TestSetIsOutOfBound(const struct GolfModuleTrinity* this, int pathIdx)
+ 2364  00231CA0    140  void GolfModuleTrinity::TestSetShot(const struct GolfModuleTrinity* this, enum ShotType_t shotType)
+ 2391  00231DE0    388  void GolfModuleTrinity::TestSetFutureLie(const struct GolfModuleTrinity* this, int pathIdx)
+ 2466  0023216C    108  void GolfModuleTrinity::TestSetPar(const struct GolfModuleTrinity* this, int pathIdx)
+ 2485  00232274    134  void GolfModuleTrinity::TestSetHazardShot(const struct GolfModuleTrinity* this, int pathIdx)
+ 2507  00232168      4  void GolfModuleTrinity::TestSetForeStatus(const struct GolfModuleTrinity* this, int pathIdx)
+ 2515  00230DA0     48  void GolfModuleTrinity::SetForcedNextGolferStream(const struct GolfModuleTrinity* this, const char* streamName)
+ 2520  0030CB50    544  void GolfModuleTrinity::DisplayDebugInfo(const struct GolfModuleTrinity* this)
+                         local  vec3flt focusVec
+                         local  vec3flt originVec
+                         local  vec4flt colorRed
+                         local  vec4flt colorBlue
+                         local  vec4flt colorGreen
+                         local  vec4flt lookVec
+                         local  vec4flt posVec
+                         local  vec4flt moveVec
+                         local  int camPosRefPoint
+                         local  const float START_X
+                         local  const float START_Y
+                         local  int bucketCount
+                         local  const char* stateName
+                         local  int i
+                         local  char* bucket
+                         local  char* ucap
+                         local  FO_EColors color
+                         inlines  DS_vSetAlphaBlendingFunction, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, GM_GetGolferUp, LLMath_Add3, LLMath_Scale, LLMath_Subtract3, PR_vSetCurrentColor, PR_vSetCurrentUsage, Trinity::GetCrowdCamPosRefPoint, Trinity::SetDisplayDebugInfo
+ 2621  002323A8     40  void GolfModuleTrinity::PlayAllSequences(const struct GolfModuleTrinity* this)
+ 2628  0030D094    150  void GolfModuleTrinity::StartSequence(const struct GolfModuleTrinity* this, const char* sequenceName, unsigned int resourceTag, bool bIsRelative)
+                         inlines  GM_GetGolferUp
+ 2644  002323E8     C0  bool GolfModuleTrinity::IsActivePutterBucket(const struct GolfModuleTrinity* this)
+ 2650  002315A8     C4  void GolfModuleTrinity::PlayNextPASequence(const struct GolfModuleTrinity* this)
+                         local  unsigned int activeTag
+                         local  struct TrinitySequence* playSequence
+ 2670  0030D2D8    14C  void GolfModuleTrinity::PlayAllGolferBuckets(const struct GolfModuleTrinity* this)
+                         local  enum PlayerNumber_t player
+                         local  struct GolferData_t* pGolferData
+                         inlines  GM_GetGolferUp, GamePlayer::GetGolferData
+ 2708  0030D1E4     F4  void GolfModuleTrinity::PlayNextBucket(const struct GolfModuleTrinity* this)
+                         local  struct BucketDef* def
+                         local  enum PlayerNumber_t player
+                         inlines  GM_GetGolferUp

@@ -1,0 +1,21 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/sfupmpgp.cpp
+// compiled in: sfupmpgp.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   19  006DEF68    33C  int SFILTER_unpackmpegp(void* pstate, int framestoup, void* psrcp, void* pdstp, int requester)
+                         local  UNPACKMPEGPSTATE* pups
+                         local  MPEGPDECODESTATE* pmdcs
+                         local  float* psample
+                         local  float*[2] pdest
+                         local  int maxframes
+                         local  int outbufframe
+                         local  int continuation
+                         local  int totalNeededBufSize
+                         inlines  MemCpy
+  164  006DF2A4     E8  void SFILTER_unpackmpegprestore(void* pstate)
+                         local  UNPACKMPEGPSTATE* pups
+                         inlines  SNDMEMI_free, ~CMpegL3DecF
+  188  006DF38C    20C  void SFILTER_unpackmpegpinit(void* pstate, UNPACKINITPARAMS* pupip)
+                         local  UNPACKMPEGPSTATE* pups
+                         local  MPEGPDECODESTATE* pmdcs
+                         inlines  CMpegL3DecF, SNDMEMI_alloc

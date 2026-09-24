@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/career/source/common/careertrophiesobserver.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    6  005C9048      C  void CareerTrophiesObserver(const struct CareerTrophiesObserver* this)
+   10  005C9060      C  void ~CareerTrophiesObserver(const struct CareerTrophiesObserver* this)

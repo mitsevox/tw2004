@@ -1,0 +1,24 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/HoleLoader/GoHoleLoader.c
+// compiled in: golf_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+  106  0021A0E8     34  void HoleLoader_vInitOnce()
+  122  0021A11C      4  void HoleLoader_vCloseOnce()
+  137  003399EC    300  void HoleLoader_vLoadQueuedHole()
+                         local  int32 iPreviousFreeMem
+                         local  int32 iHoleCount
+                         local  bool dashboardAutoUpdating
+                         local  const struct UILoadingScreen& lScreen
+                         local  bool bNotWaitingOnScoreCard
+                         local  int32 iCurrentFreeMem
+                         inlines  GM_OnFirstSelectedHole, GolfModuleManager::SetIsLevelGlobalData, UILoadingScreen::SetState, cGAME_GLOBALS::IsQuitApplicationRequested
+  274  001F3D38     20  void HoleLoader_QueueNextHole()
+  283  0021A120     20  void HoleLoader_ResetQueueNextHole()
+  292  00339928     C4  void HoleLoader_PreHoleInit()
+                         inlines  ClubHouseMgr
+  331  00338A4C    1F4  void HoleLoader_PostHoleInit()
+                         local  vec4flt fadeColor
+                         inlines  DrawFadeIndicator::GetInstance, Singleton<AIFeatureNetworkMgr>::GetSingleton
+  445  003079FC    154  void HoleLoader_CloseCurrentHole()
+                         inlines  AIMgr, GM_GetGolferUp
+  521  001F03C4     44  void HoleLoader_vToggleMemoryChecks(bool bOn)

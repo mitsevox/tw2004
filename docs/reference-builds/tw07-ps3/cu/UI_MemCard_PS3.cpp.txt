@@ -1,0 +1,56 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/Common/PS3/UI_MemCard_PS3.cpp
+// compiled in: apt_unity.cpp
+// 31 functions, source order. line | PS3 address | size
+
+   22  0003099C      8  int UIMemCard_AlwaysCheck()
+   23  000309A4      4  void UIMemcard_CheckCardState()
+   24  000309A8      4  void UIMemCard_CheckingSetup()
+   25  000309AC      4  void UIMemCard_DeletingSetup()
+   26  000309B0      4  void UIMemCard_DisplayCorrupt()
+   27  000309B4      4  void UIMemCard_FormatCard()
+   28  0002F1D8      8  int UIMemCard_GetPort()
+   29  0002F1E0      8  int UIMemCard_GetSlot()
+   30  000309B8      8  bool UIMemCard_IsSystemUIVisible()
+   31  000309C0      4  void UIMemCard_LoadReplay()
+   32  000309C4      4  void UIMemcard_PromptForSignIn(bool )
+   33  000309C8      4  void UIMemCard_PromptToSaveData()
+   34  0002F820      4  void UIMemCard_RefreshMCName()
+   35  00030998      4  void UIMemCard_SetCardText()
+   36  000309CC      8  bool UIMemCard_SignInUser()
+   37  000309D4      4  void UIMemcard_WarnNoLoginNoSave()
+   38  0002F1D4      4  void UIMemCard_ZeroCards()
+   45  0007F010     F8  void UIMemCard_AutoLoadOptions_Ps3()
+                         local  char* sFileName
+                         local  int iNextEmptyUserSlot
+                         local  int iUserMgrSlot
+                         local  int iReturnVal
+                         local  MC_ArgsLoadT sLoadArgs
+   78  0007F438     98  int UIMemCard_LoadLastUser_Ps3(enum UserNumber userID)
+                         local  int return_value
+                         local  MC_ArgsLoadT loadArgs
+  106  000309DC     34  int UIMemCard_GetInitialLoadUserFileNbr()
+  120  0007B6F8     E0  void UIMemCard_ProcessInitialUser_Ps3()
+                         inlines  UserInfo::SetLoaded, UserInfo::SetValid
+  142  0007B7D8     48  void UIMemCard_SetInitialUserLoadResult(uint32 nRslt)
+  155  00030A10     9C  void UIMemCard_DeleteFilesPrompt()
+  169  0007F2A8    190  void UIMemCard_LoadFile()
+                         local  int iNextEmptyUserSlot
+                         local  int iUserMgrSlot
+                         local  int iReturnVal
+                         inlines  MC_CallActionFnLoad
+  215  00079C68     C4  void UIMemCard_SetUserLoadResult(uint32 nRslt)
+                         local  enum tLoadedUserStatus userStatis
+                         local  const struct UserInfo& userInfo
+                         inlines  UserInfo::SetLoaded, UserInfo::SetValid
+  241  00030AAC      8  bool UIMemcard_CanLoadThisUserFileFromDisk(const char* szUserName)
+  263  0007FEFC    178  void UIMemCard_SaveFile(bool bAutoSave)
+                         local  int iReturnVal
+                         local  MC_ArgsSaveT sSaveArgs
+                         inlines  MC_CallActionFnSave
+  304  00030AB4     E4  void UIMemCard_SavingSetup()
+                         local  char[64] sFileTypeStr
+  327  00030B98     E4  void UIMemCard_LoadSetup()
+                         local  char[64] sFileTypeStr
+  350  00030C7C     A0  void UIMemCard_InitialLoadSetup()
+                         local  char[64] sFileTypeStr
+  363  00030D1C     9C  void UIMemCard_AskReplace()

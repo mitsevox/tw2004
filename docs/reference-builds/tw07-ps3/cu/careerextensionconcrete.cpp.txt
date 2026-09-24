@@ -1,0 +1,56 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/career/source/common/careerextensionconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 26 functions, source order. line | PS3 address | size
+
+   56  006299C8     50  void CareerDownloadViewsStrategy::~CareerDownloadViewsStrategy(const struct CareerDownloadViewsStrategy* this)
+   78  006258AC      C  void ActionViewCareer::~ActionViewCareer(const struct ActionViewCareer* this)
+   92  006258F0      C  void ActionViewCompare::~ActionViewCompare(const struct ActionViewCompare* this)
+  130  0060F1B0     70  void CareerDownloadViewsSetupStrategy(const struct CareerDownloadViewsSetupStrategy* this, LobbyStatbookT* pLobbyStatbook, struct CareerDownloadViewsCallback* pCallback)
+                         inlines  RCPointer
+  157  0060F290     DC  void ~CareerDownloadViewsSetupStrategy(const struct CareerDownloadViewsSetupStrategy* this)
+                         inlines  operator->, ~CareerDownloadViewsCallback, ~LobbySetupStrategy, ~RCPointer
+  189  005FE8B4     FC  struct Operation* LobbySetupStartOperation(const struct CareerDownloadViewsSetupStrategy* this, struct LobbySetupStrategyCallback* pCallback)
+                         local  struct CareerDownloadViewsStrategy* pStrategy
+                         inlines  GetOperationManagerConcrete, operator=
+  225  005FAB30     B0  void CareerDownloadViewsSuccess(const struct CareerDownloadViewsSetupStrategy* this)
+                         inlines  operator=
+  255  005FABE0     C0  void CareerDownloadViewsFailure(const struct CareerDownloadViewsSetupStrategy* this, enum Failure eFailure)
+                         inlines  operator=
+  284  005FE82C     88  void CareerDownloadViewsStrategy::CareerDownloadViewsStrategy(const struct CareerDownloadViewsStrategy* this, LobbyStatbookT* pLobbyStatbook, struct CareerDownloadViewsCallback* pCallback)
+  312  005C7570    104  bool CareerDownloadViewsStrategy::OperationProcess(const struct CareerDownloadViewsStrategy* this, const struct Operation* )
+                         local  bool bContinue
+                         local  int32_t iStatus
+  365  005C7674      4  void CareerDownloadViewsStrategy::OperationCancel(const struct CareerDownloadViewsStrategy* this, const struct Operation* )
+  389  005C7678     58  void CareerDownloadViewsStrategy::OperationTimeout(const struct CareerDownloadViewsStrategy* this, const struct Operation* )
+  417  005E6FB4    1EC  void CareerDownloadViewsSuccess(const struct CareerExtensionConcrete* this)
+                         local  int32_t iNumViews
+                         local  uint32_t uNumStatbooks
+                         local  int32_t iIndex
+                         local  const LobbyStatbookViewInfoT* pViewInfo
+                         local  uint32_t uIndex
+                         inlines  InsertElement, List, operator=
+  463  005E71A0     40  void CareerDownloadViewsFailure(const struct CareerExtensionConcrete* this, enum Failure )
+                         inlines  operator=
+  486  005C76D0      8  bool ActionViewCareer::DoIsShownForUser(const const struct ActionViewCareer* this, const struct User* )
+  509  005C76D8     44  bool ActionViewCareer::DoIsEnabledForUser(const const struct ActionViewCareer* this, const struct User* pUser)
+  532  005C771C      8  bool ActionViewCompare::DoIsShownForUser(const const struct ActionViewCompare* this, const struct User* )
+  555  005C7724     44  bool ActionViewCompare::DoIsEnabledForUser(const const struct ActionViewCompare* this, const struct User* pUser)
+  582  00611834    35C  void CareerExtensionConcrete(const struct CareerExtensionConcrete* this)
+                         local  const struct CareerGameParameters* pCareerParams
+                         local  struct LobbySetupConcrete* pLobbySetup
+                         inlines  ActionViewCareer::ActionViewCareer, ActionViewCompare::ActionViewCompare, CareerDownloadViewsCallback, CareerExtension, GetLobbySetupConcrete, GetUserManagerConcrete, List, RCPointer, operator OSDK::CareerDownloadViewsSetupStrategy*, operator=
+  627  00611FC4    1CC  void ~CareerExtensionConcrete(const struct CareerExtensionConcrete* this)
+                         local  const struct CareerGameParameters* pCareerParams
+                         inlines  GetUserManagerConcrete, RemoveAllInternal, operator=, ~CareerDownloadViewsCallback, ~CareerExtension, ~List, ~RCPointer
+  670  005E5BA8    1C0  struct CareerStatbook* GetStatbook(const struct CareerExtensionConcrete* this, const char8_t* strView, uint32_t uNumSlots)
+                         local  int32_t iInsertIndex
+                         local  struct CareerStatbookConcrete* pStatbook
+                         local  bool bFound
+                         local  uint32_t uNumStatbooks
+                         local  uint32_t uIndex
+                         inlines  GetElementAt, GetNumberOfElements, GetViewName, SetElementAt
+  727  005D57A8     8C  struct CareerDynamicLayout* GetDynamicLayout(const struct CareerExtensionConcrete* this, const char8_t* strView, uint32_t uNumSlots)
+  751  00604A28     8C  struct CareerSpreadsheet* GetSpreadsheet(const struct CareerExtensionConcrete* this, const char8_t* strView, uint32_t uNumSlots)
+  775  005D571C     8C  struct CareerCompare* GetCompare(const struct CareerExtensionConcrete* this, const char8_t* strView, uint32_t uNumSlots)
+  799  005EAEF8     6C  struct CareerTrophies* GetTrophies(const struct CareerExtensionConcrete* this)
+  823  005C7768      C  const struct List<OSDK::CareerView>* GetCareerViews(const struct CareerExtensionConcrete* this)

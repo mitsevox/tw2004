@@ -1,0 +1,24 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/GoBallShadow.c
+// compiled in: golf_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   56  00215AC8    164  void BS_vInit()
+                         local  uint32_t size
+                         local  struct TextureGroup* pTexGrp
+                         local  unsigned int i
+                         local  struct LS_VertexBuffer* result
+                         local  struct vtxStruct* pOutputVerts
+   96  0026DDA8    264  void BS_vUpdate(float* xPos_p, int32 iPlayer_p, float fGroundHeight)
+                         local  float shadowSize
+                         local  vec4flt eyePoint
+                         local  float distAboveGround
+                         local  vec4flt sunDir
+                         local  struct vtxStruct* pOutputVerts
+                         inlines  LLMath_Scale, __vec_mul, cGAME_GLOBALS::GetSunPos, vec_ld, vec_splat
+  164  0030006C    2D0  void BS_vRender(float* xPos_p, int32 iPlayer_p, float fGroundHeight)
+                         local  vec4flt eyePoint
+                         local  float distAboveGround
+                         local  vec4flt sunDir
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetZBufferMode, LLMath_Scale, __vec_mul, cGAME_GLOBALS::GetSunPos, vec_ld, vec_splat
+  232  00215C2C     68  void BS_vClose()
+                         local  unsigned int i

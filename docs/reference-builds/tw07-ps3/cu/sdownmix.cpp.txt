@@ -1,0 +1,9 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sdownmix.cpp
+// compiled in: sdownmix.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   29  006DC6B4     A8  void SetDefaultAzimuths(struct CHANPUB* pVoice)
+                         local  const unsigned char* pAzimuth
+                         local  int i
+                         local  int sourceVoice
+                         local  struct CHANPUB* pSourceVoice

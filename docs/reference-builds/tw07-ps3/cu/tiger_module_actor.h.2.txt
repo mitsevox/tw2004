@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_actor.h
+// compiled in: tiger_module_actor.cpp, tiger_module_cct.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   77    inline-only   unsigned int GetAttr(const const struct <anon>* this)
+  127    inline-only   unsigned int Actor::GetFramesInState(const const struct Actor* this)
+  165    inline-only   struct IK* Actor::GetIK(const struct Actor* this)

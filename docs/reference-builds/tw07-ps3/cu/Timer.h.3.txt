@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNAX/include/RNAUtils/Timer.h
+// compiled in: Timer.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   39  008735F4     80  void TimerC(const struct <anon>* this)
+                         local  const char[7] __FUNCTION__
+                         local  BOOL bResult
+                         inlines  RNADebugBreak

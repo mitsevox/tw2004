@@ -1,0 +1,62 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/earnings/HighScoreRecords.cpp
+// compiled in: other_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   31  0048C87C    390  int HighScoreRecords::GetEndOfShotRecord(const struct HighScoreRecords* this, enum PlayerNumber_t PlayerID, struct PhysicsBall_t* ball, bool setrecord, bool predicted, bool firstPlaceOnly)
+                         local  float x
+                         local  float y
+                         local  float hitDist
+                         local  int par
+                         local  uint32 initialLie
+                         local  enum HSR_RecordSetTypes_t recordset
+                         local  enum PlayerNumber_t userID
+                         local  char[32] userName
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_IsRandomCourse, GM_SetPlayerHoleStrokes, std::sqrt
+  113  003D94BC     CC  void HighScoreRecords::SendEndOfShotRecordUI(const struct HighScoreRecords* this, int userID)
+                         local  int i
+  128  0048D3F0    358  int HighScoreRecords::GetEndOfHoleRecord(const struct HighScoreRecords* this, enum PlayerNumber_t PlayerID, struct PhysicsBall_t* ball, bool setrecord, bool predicted, bool firstPlaceOnly)
+                         local  float x
+                         local  float y
+                         local  float hitDist
+                         local  enum HSR_RecordSetTypes_t recordset
+                         local  enum PlayerNumber_t userID
+                         local  char[32] userName
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_SetPlayerHoleStrokes, std::sqrt
+  204  003D95C0     CC  void HighScoreRecords::SendEndOfHoleRecordUI(const struct HighScoreRecords* this, int userID)
+                         local  int i
+  219  0048DEB8    764  int HighScoreRecords::GetEndOfGameRecord(const struct HighScoreRecords* this, enum PlayerNumber_t PlayerID, bool setrecord, bool predicted, bool firstPlaceOnly)
+                         local  int totalscore
+                         local  int totalbirdies
+                         local  int totaleagles
+                         local  int totalputts
+                         local  int j
+                         local  enum HSR_RecordSetTypes_t recordset
+                         local  enum PlayerNumber_t userID
+                         local  char[32] userName
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_IsRandomCourse, GM_SetPlayerHoleStrokes
+  370  003D968C    12C  void HighScoreRecords::SendEndOfGameRecordUI(const struct HighScoreRecords* this, enum PlayerNumber_t PlayerID)
+                         local  int i
+  387  00430B9C    3F4  enum HSR_RecordSetTypes_t HighScoreRecords::CheckRecord(const struct HighScoreRecords* this, enum HSR_RecordTypes_t recordType, int recordData, bool setrecord, const char* username, enum PlayerNumber_t playerID)
+                         local  enum HSR_RecordSetTypes_t recordSet
+                         local  int i
+                         local  int j
+                         local  const struct GLOBAL_RECORD_t& lastRecord
+                         local  const struct GLOBAL_RECORD_t& lastOverallRecord
+                         local  const struct GLOBAL_RECORD_t& newRecord
+                         local  const struct GLOBAL_RECORD_t& loopRecord0
+                         local  const struct GLOBAL_RECORD_t& loopRecord0
+                         local  const struct GLOBAL_RECORD_t& newRecord
+                         local  const struct GLOBAL_RECORD_t& loopRecord0
+                         local  const struct GLOBAL_RECORD_t& loopRecord1
+                         local  const struct GLOBAL_RECORD_t& loopRecord0
+                         local  const struct GLOBAL_RECORD_t& loopRecord1
+                         inlines  GM_IsCompilationCourse, GM_IsCustomCourse
+  492  003E5654    1AC  bool HighScoreRecords::RecordExist(const struct HighScoreRecords* this, enum HSR_RecordTypes_t recordType, int recordData, char* username, enum GM_CourseType_t courseID)
+                         local  int place
+                         local  struct GLOBAL_RECORD_t currRecord
+                         inlines  GM_IsCustomCourse
+  536  004452D8    318  bool HighScoreRecords::CheckRecordGameSetting(const struct HighScoreRecords* this, enum HSR_RecordTypes_t recordType)
+                         inlines  GM_FullRoundOfGolf, GM_GetModeType, GM_GetScoringType
+  619  003D9864      8  enum HSR_SkillzoneRecord_t HighScoreRecords::GetSkillZoneRecordType(const struct HighScoreRecords* this, enum GM_ModeType_t mode)
+  652  003D97B8     AC  bool HighScoreRecords::IsEqualOrBetter(const struct HighScoreRecords* this, enum HSR_RecordTypes_t recordType, int newRecord, int oldRecord)
+                         local  bool result

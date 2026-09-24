@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/Huffman.h
+// compiled in: Huffman.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   77  00819B50     88  void Huffman(const struct <anon>* this)
+                         local  const char[8] __FUNCTION__
+   81  00819C60     88  void ~Huffman(const struct <anon>* this)
+                         local  const char[9] __FUNCTION__

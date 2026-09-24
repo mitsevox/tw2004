@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/Code/Legacy/Lib/Headers/TCrossPl.h
+// compiled in: mem_tracker.cpp, ui_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+  342  003CE010     10  static void _GLOBAL__I_c__dev_Tiger_DL_Default_TigerCode_Code_Golf_network_mem_tracker.cpp_7C3E8B0F_CA66B526()
+  342  005214E4     10  static void _GLOBAL__I_c__dev_Tiger_DL_Default_TigerCode_Code_ui_unity.cpp_7C3E8B0F_BC0E9D41()
+  343  003CE020     10  static void _GLOBAL__D_c__dev_Tiger_DL_Default_TigerCode_Code_Golf_network_mem_tracker.cpp_7C3E8B0F_CA66B526()
+  343  005214F4     10  static void _GLOBAL__D_c__dev_Tiger_DL_Default_TigerCode_Code_ui_unity.cpp_7C3E8B0F_BC0E9D41()

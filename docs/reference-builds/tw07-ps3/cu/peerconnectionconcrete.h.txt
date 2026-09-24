@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/./peerconnectionconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   63  006243D8      8  struct GameUser* GetGameUser(const const struct <anon>* this)
+   64    inline-only   void SetGameUser(const struct PeerConnectionConcrete* this, struct GameUser* pGameUser)
+   76  006262F0      8  const char8_t* GetChatMessage(const const struct <anon>* this)

@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/Skeleton.cpp
+// compiled in: Skeleton.cpp
+// 5 functions, source order. line | PS3 address | size
+
+    9  0059AC8C     54  BoneHashId GetBoneHashId(const const struct <anon>* this, BoneIndex idx)
+   19  0059ACE0     38  BoneIndex GetBoneIndex(const const struct <anon>* this, const char* name, bool warn)
+   24  0059AD18     38  BoneIndex GetBoneIndex(const const struct <anon>* this, int32_t hashedName, bool warn)
+   29  0059AD50     38  BoneIndex GetBoneParent(const const struct <anon>* this, BoneIndex idx)
+   38  0059AD88     30  float[4][4]& GetInverseBindMatrix(const const struct <anon>* this, BoneIndex idx)

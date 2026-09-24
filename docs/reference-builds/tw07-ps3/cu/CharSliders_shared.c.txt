@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/animation/CharSliders_shared.c
+// compiled in: golf2_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+ 1781  0013C754    2D8  void CharSlider_Free(struct CharSlider_SliderDefinitions_t* pDefs, enum eMemoryPools ePool)
+                         local  int32 i
+                         local  int32 j

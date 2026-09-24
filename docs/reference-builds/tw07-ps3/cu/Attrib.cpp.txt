@@ -1,0 +1,82 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnax/source/RNAUtils/Attrib.cpp
+// compiled in: Attrib.cpp
+// 17 functions, source order. line | PS3 address | size
+
+    0  008E9C88    1A4  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  GetRow, Matrix44, Quaternion, Set, Vector2, Vector3, Vector4
+   74  008E9C70     18  void AttribC::SetDirty(const struct AttribC* this)
+                         inlines  AttribArrayC::SetDirty
+   84  008EA79C   1144  bool AttribC::SerializeValueOut(const const struct AttribC* this, const struct OutStreamC& out, uint32_t uIndex, bool(*)()* pFunc)
+                         local  const char* name
+                         local  const RNAVector2 v
+                         local  const RNAVector3 v
+                         local  const RNAVector4 v
+                         local  const RNAMatrix44 m
+                         inlines  AttribC::GetName, AttribC::GetString, Get<RNAMath::RNAMatrix44>, Get<RNAMath::RNAVector2>, Get<RNAMath::RNAVector3>, Get<RNAMath::RNAVector4>, Get<bool8_t>, Get<std::float_t>, Get<std::int32_t>, Matrix44, RNADebugBreak, Vector2, Vector3, Vector4, operator float, operator()
+  164  008ECB10   137C  bool AttribC::SerializeValueIn(const struct AttribC* this, const struct InStreamC& in, uint32_t uIndex, bool(*)()* pFunc)
+                         local  float_t fVal
+                         local  int32_t iVal
+                         local  RNAVector2 vVal
+                         local  RNAVector4 vVal
+                         local  struct <anon> tempString
+                         local  RNAVector3 vVal
+                         local  bool8_t bVal
+                         local  RNAMatrix44 mat
+                         inlines  AllocValueMem<RNA::String>, AttribC::SetString, CStr, Init, RNADebugBreak, Set<RNAMath::RNAMatrix44>, Set<RNAMath::RNAVector2>, Set<RNAMath::RNAVector3>, Set<RNAMath::RNAVector4>, Set<bool8_t>, Set<std::float_t>, Set<std::int32_t>, String, operator new [], operator=, ~String
+  245  008EE14C    2EC  struct AttribC* AttribC::Clone(const const struct AttribC* this)
+                         local  struct AttribC* pAttrib
+                         local  uint32_t i
+                         inlines  AttribC::GetCount, AttribC::GetName, AttribC::GetType, Init, RNADebugBreak, String, operator new [], operator=
+  288  008ECA58     B8  struct AttribC* AttribArrayC::AddAttrib(const struct AttribArrayC* this, const char* pName, uint32_t idType, uint32_t uCount)
+                         local  struct AttribC* pAttrib
+  303  008EC738    320  struct AttribC* AttribArrayC::AddAttrib(const struct AttribArrayC* this, struct AttribC* pAttrib)
+                         local  const char[10] __FUNCTION__
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AttribC** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AttribC** newData
+                         inlines  Construct, PushBack, RNADebugBreak
+  311  008EB8E0    364  bool8_t AttribArrayC::RemoveAttrib(const struct AttribArrayC* this, struct AttribC* pAttrib)
+                         local  int32_t iAttrib
+                         inlines  Erase, RNADebugBreak, operator[]
+  325  008EBC44    1BC  void AttribArrayC::DeleteAllAttribs(const struct AttribArrayC* this)
+                         local  const char[17] __FUNCTION__
+                         local  int32_t iAttrib
+                         local  struct AttribC* pAttrib
+                         inlines  Clear, RNADebugBreak, operator[]
+  340  008EBF78    188  struct AttribC* AttribArrayC::FindByName(const struct AttribArrayC* this, const char* pName)
+                         local  int32_t iAttrib
+                         inlines  RNADebugBreak, operator[]
+  353  008EC100    174  struct AttribC* AttribArrayC::FindByType(const struct AttribArrayC* this, uint32_t idType)
+                         local  int32_t iAttrib
+                         inlines  RNADebugBreak, operator[]
+  366  008EC274    144  const struct AttribC* AttribArrayC::FindByName(const const struct AttribArrayC* this, const char* pName)
+                         local  int32_t iAttrib
+                         inlines  RNADebugBreak, operator[]
+  382  008EC3B8    144  const struct AttribC* AttribArrayC::FindByType(const const struct AttribArrayC* this, uint32_t idType)
+                         local  int32_t iAttrib
+                         inlines  RNADebugBreak, operator[]
+  397  008EDE8C    2C0  void AttribArrayC::SerializeIn(const struct AttribArrayC* this, const struct InStreamC& in, bool(*)()* pFunc)
+                         local  const char[12] __FUNCTION__
+                         local  int32_t iVersion
+                         local  int32_t iNumAttribs
+                         local  int32_t iAttrib
+                         local  uint32_t idType
+                         local  struct <anon> name
+                         local  uint32_t uCount
+                         local  struct AttribC* pAttrib
+                         local  uint32_t uIndex
+                         inlines  Init, RNADebugBreak, String, ~String
+  444  008EC4FC    23C  void AttribArrayC::SerializeOut(const const struct AttribArrayC* this, const struct OutStreamC& out, bool(*)()* pFunc)
+                         local  const char[13] __FUNCTION__
+                         local  int32_t iAttrib
+                         local  struct AttribC* pAttrib
+                         local  uint32_t uIndex
+                         inlines  AttribArrayC::GetAttrib, RNADebugBreak
+  475  008E9E3C     10  static void _GLOBAL__I__ZN7AttribCC2EPKcjj()
+  476  008E9E2C     10  static void _GLOBAL__D__ZN7AttribCC2EPKcjj()

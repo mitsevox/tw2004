@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/CRTextures.cpp
+// compiled in: headgate_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   11  0034CDB8     DC  void CRTex_BindTextureGroups()
+   22  0034ACC0     24  void CRTex_FreeTextureGroups()
+   33  0034CE94     B0  TextureRef CRTex_FindTextureInHoleOrCourse(uint32 hash)
+                         local  TextureRef ref
+   55  0034CF44     2C  TextureRef CRTex_FindTextureInHoleOrCourse(const char* lowerCaseName)

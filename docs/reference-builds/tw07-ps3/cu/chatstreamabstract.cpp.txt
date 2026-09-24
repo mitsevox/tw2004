@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/chatstreamabstract.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   70  005EC080     74  void ChatStreamAbstract(const struct <anon>* this, const char8_t* strId, enum ChatStreamType eType)
+   98  005DDA60     48  void ~ChatStreamAbstract(const struct <anon>* this)
+  121  005D83A8     DC  void Clear(const struct <anon>* this)
+                         local  uint32_t uNumElements
+                         local  struct ChatStreamObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList

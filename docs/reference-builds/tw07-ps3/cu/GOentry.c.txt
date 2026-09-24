@@ -1,0 +1,75 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/entry/GOentry.c
+// compiled in: golf_unity.cpp
+// 28 functions, source order. line | PS3 address | size
+
+  120  002652E8    248  void GameState::RegisterGameStates(const struct GameState* this)
+  163  00265530     58  void GameState::GameState(const struct GameState* this)
+  170  001F3B10     18  void GameState::~GameState(const struct GameState* this)
+  174  001F3B78     18  void GameState::SetState(const struct GameState* this, enum GAME_MODE_e state)
+                         inlines  cGAME_GLOBALS::SetGameMode
+  179  001F3B90     14  enum GAME_MODE_e GameState::GetState(const const struct GameState* this)
+  184  00264FE4     40  const char* GameState::GetModeName(const const struct GameState* this, enum GAME_MODE_e mode)
+                         local  const char* pRet
+                         inlines  GameState::IsValidState
+  196  00265224     C4  void GameState::RegisterGameState(const struct GameState* this, enum GAME_MODE_e state, const char* stateName, GameStateFuncPtr* gameFunc)
+                         inlines  GameState::IsValidState
+  211  0026518C     98  void MA_vMain(int32 iArgc_p, char** chppArgv_p)
+                         local  struct GameState* pGameState
+  235  001F3BA4     38  void GameState::ClubHouse(struct GameState* pGState)
+  242  00307D1C     78  void GameState::ClubHouseExitHole(struct GameState* pGState)
+  264  00258ED0     74  void GameState::ClubHouseShutdown(struct GameState* pGState)
+                         inlines  cGAME_GLOBALS::GetNextGame, cGAME_GLOBALS::SetNextGame
+  279  001F3BDC     38  void GameState::ClubHouseSetup(struct GameState* pGState)
+  286  0033A150    138  void GameState::ClubHouseLoadHole(struct GameState* pGState)
+                         local  enum GUI_ScoreCardType_t scType
+                         local  const struct UILoadingScreen& loadingScreen
+                         inlines  UILoadingScreen::SetDelayedLoadingBalls
+  346  002A09C4    200  void GameState::StartupInit(struct GameState* pGState)
+                         local  bool firstTime
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton, Singleton<UserManager>::GetSingleton, cGAME_GLOBALS::GetGlobalFlags
+  425  00258F44    128  void GameState::Startup(struct GameState* pGState)
+                         inlines  cGAME_GLOBALS::GetNextGame, cGAME_GLOBALS::GetResetGame, cGAME_GLOBALS::SetNextGame
+  493  001F3C2C      4  void GameState::TestRun(struct GameState* pGState)
+  558  001F3C30     4C  void GameState::FEStreaming(struct GameState* pGState)
+  570  0025906C     FC  void GameState::FERun(struct GameState* pGState)
+                         inlines  cGAME_GLOBALS::GetNextGame, cGAME_GLOBALS::GetResetGame, cGAME_GLOBALS::SetNextGame
+  630  002CE45C    1B0  void GameState::IGSetup(struct GameState* pGState)
+                         inlines  GM_GetModeType, cGAME_GLOBALS::SetGameCount
+  684  00339CEC    464  void GameState::IGLoadHole(struct GameState* pGState)
+                         local  enum GUI_ScoreCardType_t scType
+                         local  bool memLockRestore
+                         local  const struct UILoadingScreen& loadingScreen
+                         local  float completion
+                         local  enum PresenceType ptype
+                         local  int i
+                         local  int i
+                         local  void* ptr
+                         local  struct GameModeBattle* pBattle
+                         inlines  GM_GetModeType, GM_OnFirstSelectedHole, OnlineManagerOSDK::GetInstance, UILoadingScreen::SetDelayedLoadingBalls
+  844  0024ADA4    104  void GameState::IGPlayHole(struct GameState* pGState)
+  887  001F3D58      8  void GameState::IGExitOnline(struct GameState* pGState)
+  896  00307B50    1CC  void GameState::IGExitHole(struct GameState* pGState)
+                         local  int i
+                         local  const struct GameModeDriver* pDriver
+                         local  struct GameModeDriverFacility* pFacilityDriver
+                         inlines  cGAME_GLOBALS::GetResetGame
+  979  002CE60C    6BC  void GameState::IGShutdown(struct GameState* pGState)
+                         local  int hole
+                         local  int32 course
+                         local  enum GM_TeeColorType_t tee
+                         local  Course_t courseID
+                         local  enum GM_CourseType_t course
+                         local  uint32 i
+                         local  enum GM_TeeColorType_t[25] tees
+                         local  int8[25] pins
+                         local  enum GM_CourseType_t[25] courses
+                         local  enum Golfer_t[25] golfers
+                         inlines  GM_GetModeType, GM_SelectHoleSet, GM_SelectSingleHole, GM_SetCurrentCourse, cGAME_GLOBALS::GetGlobalFlags, cGAME_GLOBALS::GetNextGame, cGAME_GLOBALS::GetResetGame, cGAME_GLOBALS::SetNextGame, cGAME_GLOBALS::SetPin
+ 1160  001F4074      8  void GameState::Reset(struct GameState* pGState)
+ 1165  001F407C      4  void GameState::Quit(struct GameState* pGState)
+ 1171  001F4080     64  void GameState::Error(struct GameState* pGState)
+ 1177  00265024    168  bool GameState::Run(const struct GameState* this)
+                         local  enum GAME_MODE_e gState
+                         local  bool bQuitMain
+                         local  GameStateFuncPtr* pFunc
+                         inlines  GameState::IsValidState

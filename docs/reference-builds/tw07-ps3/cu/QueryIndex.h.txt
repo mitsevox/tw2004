@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/QueryIndex.h
+// compiled in: Query.cpp, QueryIndex.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   51  007EB2B4     64  void ~QueryIndex(const struct QueryIndex* this)
+   58  007EB03C    13C  void QueryIndex(const struct QueryIndex* this, int32_t initialAllocations, int32_t numColumns, int32_t numTables, struct <anon>* querySearch, enum TDbError* dbError)
+   73  007E6858     34  struct ICollection* GetCollection(const struct <anon>* this)

@@ -1,0 +1,8 @@
+// C:/packages/rwaudiocore/2.08.01/include/rw/audio/core/plugins/sndplayer1.h
+// compiled in: sndplayer1.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  309    inline-only   struct RequestInternal* GetRequestInternal(const struct <anon>* this, unsigned int index)
+                         local  struct RequestInternal* pArray
+  341    inline-only   bool IsRequestActive(const struct <anon>* this, unsigned char inputState)
+                         local  enum RequestState state

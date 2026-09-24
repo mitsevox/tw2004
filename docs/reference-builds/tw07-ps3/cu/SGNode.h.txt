@@ -1,0 +1,9 @@
+// ../../../../../TIGERCODE/packages/RNA/dev-2.0-golf/RNA/SceneGraph/include/SceneGraph/SGNode.h
+// compiled in: rnaunity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+  103    inline-only   const char* SGNodeC::GetName(const const struct SGNodeC* this)
+  106    inline-only   uint32_t SGNodeC::GetUserFlags(const const struct SGNodeC* this)
+  133    inline-only   struct SGNodeC* SGNodeC::GetFirstChild(const const struct SGNodeC* this)
+  134    inline-only   struct SGNodeC* SGNodeC::GetNextSibling(const const struct SGNodeC* this)
+  147    inline-only   struct <anon>* SGNodeC::GetInterface<SceneX::IVisibility>(const struct SGNodeC* this)

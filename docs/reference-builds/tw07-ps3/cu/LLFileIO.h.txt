@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/Legacy/LL/Headers/LLFileIO.h
+// compiled in: other_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  123    inline-only   bool File_IsValid(int32 file)

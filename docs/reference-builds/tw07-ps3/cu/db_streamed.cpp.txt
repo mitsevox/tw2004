@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Database/db_streamed.cpp
+// compiled in: golf_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   66  00215330    114  enum TDbError Init(char8_t* dbPath)
+   95  00214F3C     8C  void Shutdown()
+  129  00288D24    200  enum TDbError LoadTable(DbRef dbRef, TableRef tableRef)
+                         local  struct ExtIoCallback ioCallback
+                         local  enum TDbError error
+                         inlines  Helper::SQL_LoadTableFromFile, Helper::SQL_SetTablePersistentDataFlag
+  169  002894C4    118  enum TDbError UnloadTable(DbRef dbRef, TableRef tableRef)
+                         local  enum TDbError error
+                         inlines  Destroy, Helper::SQL_DestroyTable

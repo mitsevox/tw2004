@@ -1,0 +1,8 @@
+// C:/packages/rwmovie/1.04.01/source/movielib/moviedecoder/cmn/videorenderablemanager.h
+// compiled in: videorenderablemanager.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   58  006FDD0C    4A0  void VideoRenderableManager(const struct <anon>* this, struct IResourceAllocator* allocator)
+                         inlines  Allocate, BaseResources, Resource, VideoRenderableComparator, ~ResourceDescriptor
+   61  006FE64C    18C  void ~VideoRenderableManager(const struct <anon>* this)
+                         inlines  Free, ~VideoRenderableComparator

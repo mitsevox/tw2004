@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_WorldTour.h
+// compiled in: apt_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   31  00126814     B8  void UIWorldTour::~UIWorldTour(const struct UIWorldTour* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   33  001006AC      C  uint32 UIWorldTour::GetSignature(const const struct UIWorldTour* this)
+   40  001006B8     24  void UIWorldTour::LooseFocus(const struct UIWorldTour* this, uint32 )
+   41  001006DC     24  void UIWorldTour::RegainFocus(const struct UIWorldTour* this, uint32 )
+   43  00100700     44  void UIWorldTour::ShowHelpText(const struct UIWorldTour* this)
+   48    inline-only   void UIWorldTour::SetGameMode(const struct UIWorldTour* this, enum GM_ModeType_t gameMode)

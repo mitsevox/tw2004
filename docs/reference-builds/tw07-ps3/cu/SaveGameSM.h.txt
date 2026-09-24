@@ -1,0 +1,20 @@
+// ../../../../../TIGERCODE/Code/Golf/UI_Core/Common/Headers/SaveGameSM.h
+// compiled in: apt_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   88  000FE2D4     18  void SavedGameTask::~SavedGameTask(const struct SavedGameTask* this)
+   95    inline-only   bool SavedGameTask::IsIdle()
+   97    inline-only   void SavedGameTask::SetCanPause(bool bCanPause)
+  107    inline-only   void SavedGameTask::SetSaveOrLoadOperationCompleted(bool bCompleted)
+  113    inline-only   int SavedGameTask::GetTaskState(const struct SavedGameTask* this)
+  114    inline-only   void SavedGameTask::SetTaskState(const struct SavedGameTask* this, int nState)
+  117    inline-only   enum eMemCardUserResp SavedGameTask::GetResult(const struct SavedGameTask* this)
+  118    inline-only   struct SavedGameTask* SavedGameTask::GetLastSubTask(const struct SavedGameTask* this)
+  119    inline-only   enum eMemCardUserResp SavedGameTask::GetLastSubTaskRslt(const struct SavedGameTask* this)
+  122    inline-only   int SavedGameTask::GetListOffset(const struct SavedGameTask* this)
+  123    inline-only   void SavedGameTask::SetResult(const struct SavedGameTask* this, enum eMemCardUserResp nRslt, int nListOffset)
+  125    inline-only   void SavedGameTask::SetTickHandler(void(*)()* hdlr)
+  134    inline-only   struct SavedGameTask* SavedGameTask::ActiveTask()
+  135    inline-only   enum MCAction SavedGameTask::CurrentContext()
+  136    inline-only   void SavedGameTask::SetCurrentContext(enum MCAction nAction)
+  140    inline-only   bool(*)()* SavedGameTask::GetHandler(const struct SavedGameTask* this)

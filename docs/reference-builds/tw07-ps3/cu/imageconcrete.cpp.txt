@@ -1,0 +1,32 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/imageconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   81  005F21C0     54  void ImageConcrete(const struct <anon>* this, struct MemoryStrategy* pMemoryStrategy)
+                         inlines  RCPointer
+  106  005F2268     6C  void ImageConcrete(const struct <anon>* this, const char8_t* strName, struct MemoryStrategy* pMemoryStrategy)
+                         inlines  RCPointer
+  132  005F2340     FC  void ImageConcrete(const struct <anon>* this, struct Resource* pResource, struct MemoryStrategy* pMemoryStrategy)
+                         local  uint32_t uDataSize
+                         local  void* pData
+                         inlines  RCPointer
+  164  005F26A8     48  void ~ImageConcrete(const struct <anon>* this)
+                         inlines  ~RCPointer
+  190  005B7730     A4  void Initialize(const struct <anon>* this, struct MemoryStrategy* pOverride)
+  227  005B77E4      C  void SetBuffer(const struct <anon>* this, const uint8_t* pBuffer, uint32_t uBufferSize)
+  254  005B77D4     10  void SetName(const struct <anon>* this, const char8_t* strName)
+  280  005B77F0     68  void ReleaseData(const struct <anon>* this)
+  310  005B7858     88  void ReleaseAll(const struct <anon>* this)
+  344  005F2538    170  void CreateImage(struct Resource* pResource, struct <anon>* pRCPointer)
+                         local  struct Image* pImage
+                         local  int32_t iMemGroup
+                         inlines  operator=
+  390  005B78E0    164  bool GetImageFromBuffer(const struct <anon>* this, const uint8_t* pBuffer, uint32_t uBufferSize)
+                         local  size_t rawSize
+                         local  uint8_t* pRawData
+                         local  int32_t iResult
+  459  005B7A44     48  bool GetImageFromBuffer(const struct <anon>* this)
+  483  005B7A8C     B8  bool GetSizeFromBuffer(const struct <anon>* this, const uint8_t* pBuffer, uint32_t uBufferSize)
+                         local  int32_t iResult
+  519  005B7B44     48  bool GetSizeFromBuffer(const struct <anon>* this)
+  543  005B7B8C      8  void SetImageCleanupCallback(const struct <anon>* this, ImageCleanupCallbackT* pCallback)

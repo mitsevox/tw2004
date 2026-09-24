@@ -1,0 +1,21 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/CRManager.h
+// compiled in: headgate_unity.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   43  00351AD8    180  void CRManager::CRManager(const struct CRManager* this)
+   44  0034CAB0     E4  void CRManager::~CRManager(const struct CRManager* this)
+   57    inline-only   struct CRShadowMap* CRManager::GetCRShadowMap(const struct CRManager* this)
+   58    inline-only   struct CRGrass* CRManager::GetCRGrass(const struct CRManager* this)
+   59    inline-only   struct CROcean* CRManager::GetCROcean(const struct CRManager* this)
+   60    inline-only   struct CRCloudShadows* CRManager::GetCRCloudShadows(const struct CRManager* this)
+   67    inline-only   void CRManager::DrawTerrain(const struct CRManager* this, bool b)
+   68    inline-only   void CRManager::DrawVegetation(const struct CRManager* this, bool b)
+   69    inline-only   void CRManager::DrawPan(const struct CRManager* this, bool b)
+   70    inline-only   void CRManager::DrawSkydome(const struct CRManager* this, bool b)
+   72    inline-only   void CRManager::DrawGrass(const struct CRManager* this, bool b)
+   73    inline-only   void CRManager::DrawOcean(const struct CRManager* this, bool b)
+   74    inline-only   void CRManager::DrawShadowmap(const struct CRManager* this, bool b)
+   77    inline-only   bool CRManager::ShouldDrawVegetation(const struct CRManager* this)
+   80    inline-only   bool CRManager::ShouldDrawSkydome(const struct CRManager* this)
+   85    inline-only   void CRManager::SetSunPosition(const struct CRManager* this, float x, float y, float z)
+   86    inline-only   float[4]& CRManager::GetSunPosition(const struct CRManager* this)

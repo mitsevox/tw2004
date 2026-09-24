@@ -1,0 +1,115 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/settingmanagerconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 33 functions, source order. line | PS3 address | size
+
+   63  0062A954     40  void ~QuickMessageOperation(const struct <anon>* this)
+   82  006249FC      C  void ~EmailValidator(const struct <anon>* this)
+   84  00624A40    1A4  bool Validate(const struct <anon>* this, const char8_t* strValue)
+                         local  bool bValid
+                         local  uint32_t INVALID
+                         local  size_t nLen
+                         local  uint32_t uAT
+                         local  uint32_t uDOT
+                         local  uint32_t uIndex
+                         local  const char8_t c
+  166  006291E0      C  void ~SmsValidator(const struct <anon>* this)
+                         inlines  ~EmailValidator
+  173  00624BE4      C  void ~PasswordValidator(const struct <anon>* this)
+  175  00624C28     48  bool Validate(const struct <anon>* this, const char8_t* strValue)
+                         local  bool bValid
+                         local  size_t nLen
+  228  0060C5F0     60  void LobbySetupStorageLoadStrategy(const struct LobbySetupStorageLoadStrategy* this, struct SettingLoadCallback* pCallback)
+                         inlines  RCPointer
+  254  0060C6B0     DC  void ~LobbySetupStorageLoadStrategy(const struct LobbySetupStorageLoadStrategy* this)
+                         inlines  operator->, ~LobbySetupStrategy, ~RCPointer, ~SettingLoadCallback
+  287  005F9DF4     90  struct Operation* LobbySetupStartOperation(const struct LobbySetupStorageLoadStrategy* this, struct LobbySetupStrategyCallback* pCallback)
+                         inlines  GetLobbySettingStorage, operator=
+  318  005F9E84     BC  void SettingLoadResult(const struct LobbySetupStorageLoadStrategy* this, const struct Operation* pOperation, enum ResultE eResult)
+                         inlines  operator=
+  352  0060C94C     60  void LobbySetupQuickMessageStrategy(const struct LobbySetupQuickMessageStrategy* this, struct QuickMessageLoadCallback* pCallback)
+                         inlines  RCPointer
+  378  0060CA0C     DC  void ~LobbySetupQuickMessageStrategy(const struct LobbySetupQuickMessageStrategy* this)
+                         inlines  operator->, ~LobbySetupStrategy, ~QuickMessageLoadCallback, ~RCPointer
+  410  006064B8     AC  struct Operation* LobbySetupStartOperation(const struct LobbySetupQuickMessageStrategy* this, struct LobbySetupStrategyCallback* pCallback)
+                         inlines  operator=
+  442  005F9F40     B8  void QuickMessageLoadComplete(const struct LobbySetupQuickMessageStrategy* this, const char8_t* strResults)
+                         inlines  operator=
+  472  0060644C     6C  void QuickMessageOperation(const struct <anon>* this, const char8_t* strParameters, struct QuickMessageLoadCallback* pCallback)
+  500  005BF290     48  void AriesOperationFailure(const struct <anon>* this, int32_t )
+  522  005BF2D8     9C  bool AriesOperationResult(const struct <anon>* this, LobbyApiMsgT* pMsg)
+                         local  bool bContinue
+  562  005BF374      4  void AriesOperationCancel(const struct <anon>* this)
+  584  005E5A18     54  void SettingLoadResult(const struct SettingManagerConcrete* this, const struct Operation* , enum ResultE )
+                         inlines  operator=
+  614  005E5A6C    13C  void QuickMessageLoadComplete(const struct SettingManagerConcrete* this, const char8_t* strResults)
+                         local  struct <anon> dict
+                         local  char8_t[193] strDefault
+                         local  char8_t[16] strTag
+                         local  uint32_t uIndex
+                         inlines  operator->, operator=
+  654  005BF378    1DC  void SettingEvent(const struct SettingManagerConcrete* this, struct Setting* pSetting, enum EventE eEvent)
+                         local  struct SettingInteger* pSettingGameStats
+  702  00616D30    264  void SettingManagerConcrete(const struct SettingManagerConcrete* this)
+                         inlines  GetLobbySetupConcrete, List, QuickMessageLoadCallback, RCPointer, SettingLoadCallback, operator OSDK::LobbySetupQuickMessageStrategy*, operator OSDK::LobbySetupStorageLoadStrategy*, operator=
+  734  006171F8    110  void ~SettingManagerConcrete(const struct SettingManagerConcrete* this)
+                         inlines  RemoveAllInternal, ~List, ~QuickMessageLoadCallback, ~RCPointer, ~SettingLoadCallback
+  764  005EDC0C    514  void Startup(const struct SettingManagerConcrete* this)
+                         local  int32_t iSpamDefault
+                         inlines  EmailValidator, PasswordValidator, SmsValidator, operator=
+  807  005EE120    2AC  void Shutdown(const struct SettingManagerConcrete* this)
+                         inlines  operator=
+  858  005DC158    124  void AddSetting(const struct SettingManagerConcrete* this, struct Setting* pSetting)
+                         local  uint32_t uListSize
+                         local  bool bDuplicate
+                         local  uint32_t uIndex
+                         local  struct Setting* pElement
+                         inlines  GetElementAt, GetNumberOfElements, InsertElement
+  902  005DC27C     CC  struct Setting* GetSetting(const const struct <anon>* this, const char8_t* strIdentifier)
+                         local  struct Setting* pSetting
+                         local  uint32_t uListSize
+                         local  uint32_t uIndex
+                         local  struct Setting* pElement
+                         inlines  GetElementAt, GetNumberOfElements
+  941  005DC348     E4  void RemoveSetting(const struct SettingManagerConcrete* this, const char8_t* strIdentifier)
+                         local  uint32_t uListSize
+                         local  uint32_t uIndex
+                         local  struct Setting* pElement
+                         inlines  FastRemoveElementAt, GetElementAt, GetNumberOfElements
+  977  005E0E2C    1A4  struct Operation* SaveSettings(const struct SettingManagerConcrete* this, struct <anon>* pCallback)
+                         local  struct <anon>* pStorage
+                         local  uint32_t uSettingCount
+                         local  struct Operation* pSaveOperation
+                         local  uint32_t uIndex
+                         local  struct Setting* pSetting
+                         inlines  GetElementAt, GetLobbySettingStorage, GetNumberOfElements
+ 1033  005DC42C    170  void LoadSettings(const struct SettingManagerConcrete* this)
+                         local  struct <anon>* pStorage
+                         local  uint32_t uSettingCount
+                         local  uint32_t uIndex
+                         local  struct Setting* pSetting
+                         inlines  GetElementAt, GetLobbySettingStorage, GetNumberOfElements
+ 1084  005F0F08    21C  const struct Dictionary* GetSnapshot(const const struct <anon>* this)
+                         local  struct <anon> BuildSnapshot
+                         local  uint32_t uListSize
+                         local  struct DictionaryConcrete* pSnapshot
+                         local  uint32_t uIndex
+                         local  struct Setting* pSetting
+                         local  const char8_t* strIdentifier
+                         inlines  GetElementAt, GetNumberOfElements, GetTagField
+ 1138  005DC59C    1CC  void RestoreSnapshot(const struct SettingManagerConcrete* this, const struct Dictionary* pDictionary, bool bFireEvent)
+                         local  uint32_t uListSize
+                         local  bool bPreviousEventSetting
+                         local  uint32_t uIndex
+                         local  struct Setting* pSetting
+                         local  const char8_t* strIdentifier
+                         local  struct SettingInteger* pInteger
+                         local  char8_t[256] strValue
+                         inlines  GetElementAt, GetNumberOfElements
+ 1203  005D0CB0    1EC  bool CompareSnapshot(const const struct <anon>* this, const struct Dictionary* pDictionary)
+                         local  bool bMatch
+                         local  uint32_t uListSize
+                         local  uint32_t uIndex
+                         local  struct Setting* pSetting
+                         local  const char8_t* strIdentifier
+                         local  char8_t[256] strValue
+                         inlines  GetElementAt, GetNumberOfElements

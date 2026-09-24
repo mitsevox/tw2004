@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/productupdatestagefactory.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   77  00621E14    23C  struct ProductUpdateStage* GetNextStage(struct ProductUpdateManagerStrategy* pUpdateStrategy)
+                         local  const struct ProductUpdateStage* pStage
+                         inlines  GetCurrentStage, operator new

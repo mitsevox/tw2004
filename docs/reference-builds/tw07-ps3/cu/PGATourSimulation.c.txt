@@ -1,0 +1,666 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/PGATourSimulation.c
+// compiled in: golf_unity.cpp
+// 177 functions, source order. line | PS3 address | size
+
+  354  0023B14C     D4  static struct PgaTourSim_Entrant_MC_t* GetEntrantMCPtr(enum PlayerNumber_t userID, int entrantID, int line)
+  369  0021291C     90  static struct PgaTourSim_Entrant_NonMC_t* GetEntrantNonMCPtr(int entrantID)
+  379  0023CA90     A4  void GM_PgaTourSim_StoreEntrantHoleNumbers()
+                         local  int nEntrants
+                         local  int i
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC
+  400  002AA058    18C  void GM_PgaTourSim_ClearAllSeasons(struct SeasonInfo* pSeason)
+                         local  uint32 i
+                         local  struct GameModeDriver* pPGA
+  433  00212AF4     B8  void GM_PgaTourSim_ClearSeason(struct SeasonInfo* pSeason)
+                         local  int32 i
+  464  00212BAC     1C  void GM_PgaTourSim_InvalidateGuestCache()
+  469  00212BC8     18  bool GM_PgaTourSim_GuestsCached()
+  477  00239E38     68  void GM_PgaTourSim_ClearGuestStats(enum PlayerNumber_t userID)
+                         local  struct SeasonInfo* pSeason
+                         local  int32 i
+                         inlines  UserInfo::GetPGATourData
+  495    inline-only   static void GM_PgaTourSim_SimEachEntrantEachHole(enum PlayerNumber_t userID, int round, enum PgaTourSim_SimRound_Flags_t flags)
+                         local  int nEntrants
+                         local  int iEntrant
+                         local  int iHoleNum
+  526  002A289C    1CC  void GM_PgaTourSim_OutputAllEntrants()
+                         local  int entrantID
+                         local  int golferID
+                         local  int numTigers
+                         local  char[32] strBuf1
+                         local  char[32] strBuf2
+                         local  enum PlayerNumber_t userID
+  556  002A65A8    150  int GM_PgaTourSim_GetTigerEntrantID(enum PlayerNumber_t userID)
+                         local  int tigerEntrantID
+                         local  int entrantID
+                         local  int player
+                         local  enum PlayerNumber_t userID
+                         local  char[32] strBuf1
+                         local  char[32] strBuf2
+  599  002A8D04   11FC  void GM_PgaTourSim_SimRound(enum PlayerNumber_t userID, struct PGATourSeason_EventData* pEventInfo, int round, int16 minField, int16 maxField, int cutRank, int lowRoundScore, enum PgaTourSim_SimRound_Flags_t flags, bool skipTournament)
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+                         local  int iEntrant
+                         local  int nEntrants
+                         local  struct GameModeDriver* pPGA
+                         local  int nGuests
+                         local  int score
+                         local  int iMaxNonUserGolfers
+                         local  int eventID
+                         local  int entrantID
+                         local  int iHoleNum
+                         local  int offset
+                         local  bool isUserOrGuest
+                         local  int swap
+                         local  int userRank
+                         local  int nEntrants
+                         local  int nUncutEntrants
+                         local  int lastEntrantID
+                         local  int lastRank
+                         local  int golferID
+                         local  int swap
+                         local  int i
+                         local  int entrantRank
+                         local  int entrantID
+                         inlines  GM_PgaTourSim_DetermineTargetScores, GM_PgaTourSim_SelectEntrants, GM_PgaTourSim_SelectEntrantsForFedExPlayoffs, GM_PgaTourSim_SimEachEntrantEachHole
+  818  002A66F8     D4  void GM_SetTigerCurrentHole(enum PlayerNumber_t userID, int holeNum)
+                         local  int tigerEntrantID
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+  834  002A7BF4     98  int32 GM_PgaTourSim_ComputeAvgScorePar(int currentRound)
+                         local  int userScore
+                         local  int avgScore
+  863  002A7A9C    158  void GM_PgaTourSim_ComputeCurrentRoundLowerLimitForAllAI(int32 aiTargetRelativeTotal, int32 currentRound, enum PgaTourSim_SimRound_Flags_t flags)
+                         local  int iEntrant
+                         local  int nEntrants
+                         local  int bestEntrantID
+  892  0023C50C     A8  int32 GM_PgaTourSim_GetCurrentRoundLowerLimit(int32 aiGolferIdx)
+  900  0023C45C     B0  void GM_PgaTourSim_SetCurrentRoundLowerLimit(int32 aiGolferIdx, int32 lowerLimit)
+  908  002A63BC    1EC  int32 GM_PgaTourSim_PickAIForFirstPlace()
+                         local  int index
+                         local  const int AI_POOL_SIZE
+                         local  int[20] top20
+                         local  int nEntrants
+                         local  int top20Count
+                         local  int entrantID
+                         local  int rankdomPick
+                         local  int i
+  952  0023C904    18C  void GM_PgaTourSim_BoundTargetScoresFromBelow(enum PlayerNumber_t userID)
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC
+                         local  int nEntrants
+                         local  int roundParScore
+                         local  int i
+  977  00212C10    104  int GM_PgaTourSim_ComputeVarianceForAIRamping(int round)
+                         local  int variance
+ 1005  002A8BB0    154  int GM_PgaTourSim_ComputeAILowScoreForRound(enum PlayerNumber_t userID, int tour_num, int round, int firstRoundAIScore, bool skipTournament, enum PgaTourSim_SimRound_Flags_t simFlags)
+                         local  int lowRoundScore
+                         local  int bestAIPrevTotalScorePar
+                         local  int avgScorePar
+                         local  int aiTargetTotalPar
+                         local  int aiGolferIdx
+                         local  int variance
+                         local  struct GameModeDriver* pPGA
+ 1058  002A8AF4     BC  int32 GM_PgaTourSim_GetAnyRoundLowScore(GM_PgaTourEventID_t eventID)
+                         local  struct GameModeDriver* pPGA
+                         local  int tour_num
+ 1088  00239EA0     A8  void GM_PgaTourSim_ResetTournament(enum PlayerNumber_t userID)
+ 1100  002A7160    30C  void GM_PgaTourSim_CutBadGolfers(enum PlayerNumber_t userID, int cutRank)
+                         local  int entrantID
+                         local  int i
+                         local  int cutRow
+                         local  int nEntrants
+                         local  int saveRound
+                         inlines  CalculateCutRow
+ 1146  0023C85C     A8  void GM_PgaTourSim_PassEntrant(enum PlayerNumber_t userID, int entrantID)
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC
+                         local  GM_Pga_StatCounts* pStatCounts
+ 1166  0023C7A8     B4  void GM_PgaTourSim_CutEntrant(enum PlayerNumber_t userID, int entrantID)
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC
+                         local  GM_Pga_StatCounts* pStatCounts
+ 1186  0023B220    168  static void CommitEntrantRoundScore(enum PlayerNumber_t userID, int entrantID)
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+                         local  int iHoleNum
+ 1216  0023B388     C8  void GM_PgaTourSim_CommitRoundScores(enum PlayerNumber_t userID)
+                         local  int iEntrant
+                         local  int nEntrants
+ 1234  0020A83C     54  bool GM_PgaTourSim_DidUserQuit(enum PlayerNumber_t userID)
+ 1243  002093AC     60  void GM_PgaTourSim_SetUserQuit(enum PlayerNumber_t userID, bool userQuit)
+ 1252  00239F48    154  void GM_PgaTourSim_ResetGuests(enum PlayerNumber_t userID)
+ 1267  0023A1FC     94  bool GM_PgaTourSim_ResetEntrantHoleScores(enum PlayerNumber_t userID, int entrantID)
+                         local  bool bRet
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+                         local  int i
+ 1290  0023A290     90  void GM_PgaTourSim_ResetHoleScores(enum PlayerNumber_t userID)
+                         local  int iEntrant
+ 1307  002A85F4    500  void GM_PgaTourSim_SimTournamentWinner(enum PlayerNumber_t userID)
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC
+                         local  int entrantID
+                         local  int winner
+                         local  int countdown
+                         local  bool bUserEntered
+                         local  bool bUserWon
+                         local  bool bUserInPlayoff
+                         local  int nPlayoffEntrants
+                         local  int iEntrant
+                         local  int purse
+                         local  int firstPrize
+                         local  int nEntrants
+                         local  int userRank
+                         local  struct GameModeDriver* pPGA
+ 1418  002A7F38    6BC  void GM_PgaTourSim_CheckEndOfTournamentAward(enum PlayerNumber_t userID, bool bUserEntered, bool bUserWon)
+                         local  GM_PgaTourEventID_t nextEvent
+                         local  int i
+                         local  int golferCount
+                         local  GM_Pga_StatCounts* pStats
+                         local  GM_Pga_UserStats* pUserStats
+                         local  GM_PgaTourEventID_t eventID
+                         local  PGATourMajorAwardType[4] bWonMajorAward
+                         local  int nMajorAwardsWon
+                         local  bool bWonRookieOfTheYear
+                         local  struct GameModeDriver* pPGA
+                         local  int awardIndex
+                         local  enum GUI_MovieIndex_t movieIndex
+ 1674  0023A09C     78  int GM_PgaTourSim_GetNumEntrants(enum PlayerNumber_t userID)
+ 1683  0023A320     70  int GM_PgaTourSim_GetNumGuests(enum PlayerNumber_t userID)
+ 1691  002A6C64    144  int GM_PgaTourSim_GetNumFirstPlaceEntrants(enum PlayerNumber_t userID)
+                         local  int i
+                         local  int entrantID
+                         local  int nRank1
+                         local  int nEntrants
+ 1723  0026612C    1E0  void GM_PgaTourSim_GetStatValString(enum GM_Pga_StatTypes_t statType, float val, char* valstr, size_t valStrBufLen)
+                         local  char[8] fmtstr
+ 1757  0024DDAC    358  void GM_PgaTourSim_ChangeGuests(char** cutList, int32 numToCut, int32 numGuests, int32 round)
+                         local  int guestIndex
+                         local  int cutIndex
+                         local  int userIndex
+                         local  int nOldGuests
+                         local  const struct SeasonInfo& tourData
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrants
+                         local  const char* guestName
+                         local  int playerId
+                         local  const char* guestName
+                         inlines  UserInfo::GetPGATourData
+ 1804  00208A68     34  int GM_PgaTourSim_GetGuestUserNum(int guestIndex)
+ 1853    inline-only   static void GM_PgaTourSim_SelectEntrants(struct PgaTourSim_Entrant_MC_t* pEntrants, int16* pNEntrants, int16 minField, int16 maxField, int iMaxNonUserGolfers, bool userEntered)
+                         local  int iGolfer
+                         local  int iSwap
+                         local  int userCount
+                         local  int nSwapped
+                         local  int[178] tmpEntrants
+                         local  int nGuests
+                         local  int swap
+ 1962    inline-only   static void GM_PgaTourSim_SelectEntrantsForFedExPlayoffs(struct PgaTourSim_Entrant_MC_t* pEntrants, int16* pNEntrants, int16 minField, int16 maxField, int iMaxNonUserGolfers, bool userEntered)
+                         local  int iGolfer
+                         local  int userCount
+                         local  int nSelected
+                         local  int eventID
+                         local  int[178] tmpEntrants
+                         local  int nGuests
+                         local  int i
+                         local  int golferID
+                         local  int rank
+                         local  int fedExPoints
+                         local  int golferID
+ 2075  0023A828    108  void GM_PgaTourSim_ResetTournament_KeepSameEntrants(enum PlayerNumber_t userID)
+                         local  const struct PgaTourSim_Tournament_MC_t& currTournament
+                         local  int i
+ 2102  00212D60     14  static int IntCompareIncreasing(const void* arg1, const void* arg2)
+ 2115  002A9F00    158  static int HistoricalScoreRankCompareIncreasing(const void* arg1, const void* arg2)
+                         local  int entrantID0
+                         local  int entrantID1
+                         local  float n0
+                         local  float n1
+                         local  enum PlayerNumber_t userID
+                         local  int golferID
+                         local  struct GameModeDriver* pPGA
+ 2196    inline-only   static void GM_PgaTourSim_DetermineTargetScores(enum PlayerNumber_t userID, int lowRoundScore)
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC
+                         local  int nEntrants
+                         local  int entrantID
+                         local  int roundParScore
+                         local  int lowAbsoluteScore
+                         local  float mean
+                         local  int i
+                         local  int iSwap
+                         local  int[178] rowEntrantTargetOrderMap
+                         local  int[178] targetScores
+                         local  int32 lowestScoreForRound
+                         local  int offset
+                         local  bool isUserOrGuest
+                         local  int swap
+                         local  int score
+                         local  int diff
+                         local  int entrantID
+ 2365  002A2240    178  const char* GM_PgaTourSim_GetNameFromGolferID(enum PlayerNumber_t userID, int golferID)
+                         local  struct GameModeDriverPGATour* pPGA
+                         inlines  UserInfo::GetUserName
+ 2405  00206124     44  void GM_PgaTourSim_SetUserFedExRank(uint32_t rank)
+ 2425  00206168     44  void GM_PgaTourSim_SetUserSimmedRoundScoreAdjustment(uint32_t nStrokes)
+ 2443  00266E04     CC  int GM_PgaTourSim_GetStatRankFromGolferID(enum PlayerNumber_t userID, int golferID, enum GM_Pga_StatTypes_t stat)
+ 2459  00266D6C     98  float GM_PgaTourSim_GetStatValueFromGolferID(enum PlayerNumber_t userID, int golferID, enum GM_Pga_StatTypes_t stat)
+ 2469  00266CD8     94  int GM_PgaTourSim_GetGolferIDFromStatRow(enum PlayerNumber_t userID, enum GM_Pga_StatTypes_t stat, int row)
+ 2480  00266B74    164  bool GM_PgaTourSim_IsLeaderForStat(enum PlayerNumber_t userID, int golferID, enum GM_Pga_StatTypes_t stat)
+                         local  float val
+                         local  int i
+                         local  int n
+ 2525  00212D74     20  enum GM_Pga_StatView GM_PgaTourSim_GetStatView(enum GM_Pga_StatTypes_t stat)
+ 2533  0023AA78     84  int GM_PgaTourSim_GetNEventsFromGolferID(enum PlayerNumber_t userID, int golferID)
+ 2542  0023AB60     84  int GM_PgaTourSim_GetNRoundsFromGolferID(enum PlayerNumber_t userID, int golferID)
+ 2551  0023BE8C     C4  bool GM_PgaTourSim_IsEntrantUserOrGuest(enum PlayerNumber_t userID, int entrantID)
+ 2561  0023B8DC     98  bool GM_PgaTourSim_IsEntrantUser(enum PlayerNumber_t userID, int entrantID)
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC
+ 2579  0023B7D0    10C  bool GM_PgaTourSim_IsEntrantGuest(enum PlayerNumber_t userID, int entrantID)
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC
+ 2602  002A67CC     88  int GM_PgaTourSim_GetScoreRankFromEntrantID(enum PlayerNumber_t userID, int entrantID)
+ 2612  0023B738     98  int GM_PgaTourSim_GetGolferIDFromEntrantID(enum PlayerNumber_t userID, int entrantID)
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC
+ 2628  0023C0D8     C0  static int GetLastHoleToScore(enum PlayerNumber_t userID, int entrantID, bool includeCurrHole)
+                         local  int lastHole
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+ 2662  0023C198    2C4  int GM_PgaTourSim_GetTotalScoreFromEntrantID(enum PlayerNumber_t userID, int entrantID, bool includeCurrHole)
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+                         local  int result
+                         local  int lastHole
+                         local  int i
+ 2721  002A531C    3E4  int GM_PgaTourSim_GetRelativeScoreFromEntrantID(enum PlayerNumber_t userID, int entrantID, bool includeCurrHole)
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+                         local  int result
+                         local  int i
+                         local  int nRounds
+                         local  int lastHole
+                         local  int holeVal
+                         local  int par
+                         local  enum GM_CourseType_t[4] courses
+                         local  enum GM_CourseType_t current_course
+                         local  const struct GM_PgaTour_EventSlot_t* pEventInfo
+                         local  GM_PgaTourEventID_t eventID
+                         local  struct GameModeDriver* pPGA
+                         local  unsigned int iRound
+                         local  int nHole
+                         local  int nCourse
+ 2812  002A798C    110  int GM_PgaTourSim_GetBestOpponentRelativeScore(enum PlayerNumber_t userID, bool includeCurrHole)
+                         local  int result
+                         local  int iEntrant
+                         local  int nEntrants
+ 2836  0023B610    128  int GM_PgaTourSim_GetRoundScoreFromEntrantID(enum PlayerNumber_t userID, int entrantID, int round)
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+                         local  int result
+                         local  int iHoleNum
+ 2874  0023B59C     74  bool GM_PgaTourSim_GetWasCutFromEntrantID(enum PlayerNumber_t userID, int entrantID)
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC
+ 2892  002A615C     A8  int GM_PgaTourSim_GetEntrantIDFromScoreRow(enum PlayerNumber_t userID, int row)
+ 2904  002A59D4     54  void GM_PgaTourSim_CalcScoreRankings(enum PlayerNumber_t userID)
+ 2915  002A6B64    100  bool GM_PgaTourSim_IsEntrantTied(enum PlayerNumber_t userID, int entrantID)
+                         local  int iEntrant
+                         local  int rank
+                         local  int nEntrants
+ 2940  0023BF50    188  void GM_PgaTourSim_SetUserEntrantHoleStrokes(enum PlayerNumber_t playerID, int strokes)
+                         local  enum GM_Pga_EntrantId_e entrantID
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+                         local  enum PlayerNumber_t userID
+ 2974  00212A7C     78  int GM_PgaTourSim_GetEntrantHoleStrokes(enum PlayerNumber_t userID, int entrantID, int holeNum)
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+ 2988  002AB87C     E0  void GM_PgaTourSim_AdvancePlayer(enum PlayerNumber_t userID, int entrantID, int holeNum)
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+ 3009  002AB7AC     D0  void GM_PgaTourSim_AdvancePlayerAndGuests(enum PlayerNumber_t userID, int holeNum)
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+                         local  int entrantID
+ 3036  002AB634    178  void GM_PgaTourSim_AdvanceField(enum PlayerNumber_t userID)
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC
+                         local  int iEntrant
+                         local  int entrantID
+                         local  int userHole
+                         local  int nEntrants
+ 3080  00212A1C     60  int GM_PgaTourSim_GetCurrentHoleFromEntrantID(enum PlayerNumber_t userID, int entrantID)
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+ 3094  0023B528     74  int GM_PgaTourSim_GetLeaderboardWinningsFromEntrantID(enum PlayerNumber_t userID, int entrantID)
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC
+ 3112    inline-only   static int CalculateCutRow(enum PlayerNumber_t userID, int cutRank)
+                         local  int result
+                         local  int i
+                         local  int nEntrants
+                         local  int entrantID
+ 3155    inline-only   static int FindFirstCutEntrantIndex(enum PlayerNumber_t userID)
+                         local  int result
+                         local  int i
+                         local  int nEntrants
+                         local  int entrantID
+ 3187  002A413C    458  static void GM_PgaTourSim_SimEntrantScoresOnHole(enum PlayerNumber_t userID, int round, int entrantID, int holeNum)
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+                         local  int statsGolferIndex
+                         local  float expectedRoundScore
+                         local  float targetRoundScore
+                         local  float targetExpectedRatio
+                         local  float adjustedPar3Performance
+                         local  float adjustedPar4Performance
+                         local  float adjustedPar5Performance
+                         local  float fStrokes
+                         local  int strokes
+                         local  int par
+                         local  struct GameModeDriver* pPGA
+                         local  bool isUserOrGuest
+ 3268  00212D94     50  static int TotalEntrantHoleScores(int entrantID)
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+                         local  int i
+                         local  int result
+ 3300  002A0594    218  void GM_PgaTourSim_ImproveEntrantScore(int entrantID, int targetDiff, int holeNum, int lastHoleDisplayed)
+                         local  int currentDiff
+                         local  int currentHole
+                         local  bool adjusted
+                         local  float adjustmentProb
+                         inlines  Misc_RandFuncf
+ 3349  00212C08      8  bool GM_MonitoringTigerDisplayScore()
+ 3361  00212DE4     20  void GM_PgaTourSim_SetLastTigerHoleScoreDisplayed(int tigerHoleDisplayed)
+ 3373  002A7678    314  void GM_PgaTourSim_RubberBandTiger(enum PlayerNumber_t userID)
+                         local  int round
+                         local  int tigerEntrantID
+                         local  int tigerRank
+                         local  int tigerCurrentHole
+                         local  int tigerRelativeScore
+                         local  int i
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC
+                         local  int playerRelativeScore
+                         local  int tigerLead
+                         local  int tigerHoleLead
+                         local  int[18] topBrackets
+                         local  int entrantID
+                         local  int rankedPlayerRelativeScore
+                         local  int tigerLead
+                         local  int realisticLead
+                         local  int nextPlayerID
+                         local  int npRelativeScore
+                         local  int i
+ 3486  002A23B8    1A0  void GM_PgaTourSim_MakeTigerGuest(enum PlayerNumber_t userID, int tigerEntrantID)
+                         local  int userCount
+                         local  int numGuests
+                         local  struct PgaTourSim_Entrant_MC_t* pTigerEntrant_MC
+                         local  struct PgaTourSim_Entrant_MC_t* pFirstNonGuestEntrant_MC
+                         local  struct PgaTourSim_Entrant_MC_t tmpEntrant
+                         local  const struct SeasonInfo& tourData
+ 3527  002A1E78    3C8  static void GM_PgaTourSim_SimAdjustEntrantScores(enum PlayerNumber_t userID, int entrantID, int round)
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+                         local  GM_Pga_StatCounts* pStatCounts
+                         local  int totalStrokes
+                         local  const int MAX_STROKES_PER_ROUND
+                         local  float fQuarterTarget
+                         local  float fTotalStrokes
+                         local  int holeNum
+                         local  bool adjusted
+                         local  int holeNum
+                         local  bool adjusted
+                         inlines  Misc_RandFuncf
+ 3682    inline-only   static void GM_PgaTourSim_SimEntrantStatsOnHole(enum PlayerNumber_t userID, int round, int entrantID, int holeNum)
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+                         local  int statsGolferIndex
+                         local  GM_Pga_StatCounts* pStatCounts
+                         local  int par
+                         local  int strokes
+                         local  float driveDist
+                         local  uint16 driveDistInt
+                         local  uint16 gir
+                         local  int putts
+                         local  struct GameModeDriver* pPGA
+                         local  uint16 fairway
+                         local  uint16 bunkerSave
+ 3919  002A49F8    924  void GM_PgaTourSim_SimStats(enum PlayerNumber_t userID)
+                         local  int iEntrant
+                         local  int iHole
+                         local  int nEntrants
+                         local  bool isUserOrGuest
+                         local  uint16 fairway
+                         local  uint16 bunkerSave
+                         inlines  GM_PgaTourSim_SimEntrantStatsOnHole, Misc_RandFuncf
+ 3947  002A69FC    168  void GM_PgaTourSim_InitPlayoff(enum PlayerNumber_t userID)
+                         local  int iEntrant
+                         local  int nEntrants
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+                         local  int i
+ 3980  0023A114     E8  int GM_PgaTourSim_GetNumPlayoffEntrants(enum PlayerNumber_t userID)
+                         local  int iEntrant
+                         local  int nEntrants
+                         local  int result
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+ 4006  0023A448     AC  int GM_PgaTourSim_NumGuestsInPlayoff(enum PlayerNumber_t userID)
+                         local  int result
+                         local  int iEntrant
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+ 4029  002129AC     70  bool GM_PgaTourSim_EntrantIsInPlayoff(enum PlayerNumber_t userID, int entrantID)
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+ 4043  0023A390     B8  bool GM_PgaTourSim_GuestIsInPlayoff(enum PlayerNumber_t userID)
+                         local  int entrantID
+                         local  int nGuests
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+ 4069  0023BB18    374  void GM_PgaTourSim_UpdatePlayoffs(enum PlayerNumber_t userID, int holeNum)
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+                         local  struct PgaTourSim_Entrant_NonMC_t* pUserEntrant_NonMC
+                         local  int iEntrant
+                         local  int nEntrants
+                         local  int i
+                         local  int guestScore
+                         local  int score
+ 4163  0023B974    1A4  int GM_PgaTourSim_GetBestOpponentPlayoffHoleScore(enum PlayerNumber_t userID, int holeNum)
+                         local  struct PgaTourSim_Entrant_NonMC_t* pEntrant_NonMC
+                         local  int iEntrant
+                         local  int nEntrants
+                         local  int result
+                         local  int holeScore
+ 4533  002A4958     A0  int GM_PgaTourSim_GetFedExPoints(GM_PgaTourEventID_t eventID, int rank)
+                         local  struct GameModeDriver* pPGA
+ 4541  002A48C8     90  int GM_PgaTourSim_GetFedExInitialPlayoffPoints(int rank)
+                         local  struct GameModeDriver* pPGA
+ 4552  0023ABE4     8C  int GM_PgaTourSim_GetFedExPointsFromGolferID(enum PlayerNumber_t userID, int golferID)
+                         local  int fedExPoints
+ 4561  0023AC70     94  void GM_PgaTourSim_SetFedExPointsForGolferID(enum PlayerNumber_t userID, int golferID, int points)
+ 4568  002A6854    1A8  void GM_PgaTourSim_UpdateFedExPointsForAllEntrants(enum PlayerNumber_t userID)
+                         local  int nEntrants
+                         local  int i
+                         local  int golferID
+                         local  int eventID
+                         local  int rank
+                         local  int curFedExPoints
+                         local  int newFedExPoints
+ 4605  0023AD80     84  bool GM_PgaTourSim_HasCareerGrandSlam()
+                         local  uint32 i
+                         local  bool hasCareerGrandSlam
+ 4625  0023AE04     D0  void GM_PgaTourSim_SetCareerMajorWin(GM_PgaTourEventID_t eventID)
+                         local  uint32 majorIndex
+ 4718  0023AED4     B8  bool GM_PgaTourSim_UserPlayedEvent(enum PlayerNumber_t userID, uint32 eventID)
+ 4729  0023AF8C     A8  int GM_PgaTourSim_GetUserRankForEvent(enum PlayerNumber_t userID, uint32 eventID)
+ 4740  0023B034    118  bool GM_PgaTourSim_Satisfies_SeasonAll4Majors_Criteria(enum PlayerNumber_t userID, int maxRank)
+                         local  int i
+                         local  bool satisfied
+                         local  int[4] eventIDs
+                         local  const int nMajorEvents
+                         local  int eventID
+ 4770  0026630C    868  static void CalcAllStatsIfDirty(enum PlayerNumber_t userID)
+                         inlines  CalcAllStats
+ 4781  002A5700    2D4  static void CalcScoreRankings(enum PlayerNumber_t userID)
+                         local  int i
+                         local  int entrantID
+                         local  int lastRank
+                         local  int lastScore
+                         local  int score
+                         local  bool lastCut
+                         local  int nEntrants
+                         local  bool isUserOrGuest
+ 4852    inline-only   static void CalcScoreRankingsForCutEntrants(enum PlayerNumber_t userID)
+                         local  int i
+                         local  int entrantID
+                         local  int lastRank
+                         local  int lastScore
+                         local  int score
+                         local  bool lastCut
+                         local  int nEntrants
+                         local  int firstCutEntrantIndex
+                         local  bool isUserOrGuest
+ 4923  002A5C3C    344  static void CalcScoreRankingsIfDirty(enum PlayerNumber_t userID)
+                         local  bool isUserOrGuest
+                         local  int entrantID
+                         inlines  CalcScoreRankingsForCutEntrants
+ 4940  0023A51C    22C  static void CalcRankingsForStat(enum PlayerNumber_t userID, enum GM_Pga_StatTypes_t statType)
+                         local  int i
+                         local  int golferID
+                         local  int lastRank
+                         local  char[16] lastvalstr
+                         local  int nSeasonPlayers
+ 4986    inline-only   static void CalcSimplePlayerStats(enum PlayerNumber_t userID, int golferID)
+                         local  int32 i
+                         local  CalcStat fn
+ 5002    inline-only   static void CalcAllSimpleStats(enum PlayerNumber_t userID)
+                         local  int i
+ 5014    inline-only   static void CalcAllSimpleRankings(enum PlayerNumber_t userID)
+                         local  int32 i
+ 5026    inline-only   static void CalcComplex1PlayerStats(int golferID)
+ 5042    inline-only   static void CalcAllComplex1Stats()
+                         local  int i
+ 5052    inline-only   static void CalcAllComplex1Rankings(enum PlayerNumber_t userID)
+                         local  int32 i
+ 5064    inline-only   static void CalcComplex2PlayerStats(int golferID)
+ 5074    inline-only   static void CalcAllComplex2Stats()
+                         local  int i
+ 5084    inline-only   static void CalcAllComplex2Rankings(enum PlayerNumber_t userID)
+                         local  int32 i
+ 5096    inline-only   static void CalcSpecialPlayerStats(int golferID)
+ 5118    inline-only   static void CalcAllSpecialStats()
+                         local  int i
+ 5128    inline-only   static void CalcAllSpecialRankings(enum PlayerNumber_t userID)
+                         local  int32 i
+ 5140    inline-only   static void CalcAllStats(enum PlayerNumber_t userID)
+ 5157    inline-only   bool SafeDivide(uint32 top, uint32 bottom, float* pVal)
+                         local  bool result
+ 5175    inline-only   bool SafeDividePct(uint32 top, uint32 bottom, float* pVal)
+                         local  bool result
+ 5193  0026BC58     F0  static bool CalcDrivingDistance(GM_Pga_StatCounts* pStatCounts, float* pVal)
+                         inlines  SafeDivide
+ 5200  00272F50    100  static bool CalcAccuracy(GM_Pga_StatCounts* pStatCounts, float* pVal)
+                         inlines  SafeDividePct
+ 5207  00273050    100  static bool CalcGIR(GM_Pga_StatCounts* pStatCounts, float* pVal)
+                         inlines  SafeDividePct
+ 5214  0026BD48     F0  static bool CalcPuttsPerRound(GM_Pga_StatCounts* pStatCounts, float* pVal)
+                         inlines  SafeDivide
+ 5221  0026BE38     F0  static bool CalcPuttingAvg(GM_Pga_StatCounts* pStatCounts, float* pVal)
+                         inlines  SafeDivide
+ 5228  00273150    100  static bool CalcSandSave(GM_Pga_StatCounts* pStatCounts, float* pVal)
+                         inlines  SafeDividePct
+ 5235  00273250    10C  static bool CalcScrambling(GM_Pga_StatCounts* pStatCounts, float* pVal)
+                         inlines  SafeDividePct
+ 5242  0027335C    114  static bool CalcBounceBack(GM_Pga_StatCounts* pStatCounts, float* pVal)
+                         local  bool retVal
+                         inlines  SafeDividePct
+ 5254  0026BF28     F0  static bool CalcHolesPerEagle(GM_Pga_StatCounts* pStatCounts, float* pVal)
+                         inlines  SafeDivide
+ 5261  0026C018     F0  static bool CalcBirdieAvg(GM_Pga_StatCounts* pStatCounts, float* pVal)
+                         inlines  SafeDivide
+ 5268  00273470    100  static bool CalcPar3BirdieAvg(GM_Pga_StatCounts* pStatCounts, float* pVal)
+                         inlines  SafeDividePct
+ 5275  00273570    100  static bool CalcPar4BirdieAvg(GM_Pga_StatCounts* pStatCounts, float* pVal)
+                         inlines  SafeDividePct
+ 5282  00273670    100  static bool CalcPar5BirdieAvg(GM_Pga_StatCounts* pStatCounts, float* pVal)
+                         inlines  SafeDividePct
+ 5289  00273770    100  static bool CalcBirdieConversion(GM_Pga_StatCounts* pStatCounts, float* pVal)
+                         inlines  SafeDividePct
+ 5296  0026C108     F0  static bool CalcScoringAvg(GM_Pga_StatCounts* pStatCounts, float* pVal)
+                         inlines  SafeDivide
+ 5303  00212E24    108  static bool CalcParBreakers(GM_Pga_StatCounts* pStatCounts, float* pVal)
+                         inlines  SafeDividePct
+ 5310  0026C1F8     F0  static bool CalcPar3ScoringAvg(GM_Pga_StatCounts* pStatCounts, float* pVal)
+                         inlines  SafeDivide
+ 5317  0026C2E8     F0  static bool CalcPar4ScoringAvg(GM_Pga_StatCounts* pStatCounts, float* pVal)
+                         inlines  SafeDivide
+ 5324  00212F2C     F0  static bool CalcPar5ScoringAvg(GM_Pga_StatCounts* pStatCounts, float* pVal)
+                         inlines  SafeDivide
+ 5332  0021301C     58  static bool CalcLongestDrive(GM_Pga_StatCounts* pStatCounts, float* pVal)
+ 5338  00213074     58  static bool CalcLongestPutt(GM_Pga_StatCounts* pStatCounts, float* pVal)
+ 5344  002130CC     58  static bool CalcTotalEagles(GM_Pga_StatCounts* pStatCounts, float* pVal)
+ 5350  00213124     58  static bool CalcTotalBirdies(GM_Pga_StatCounts* pStatCounts, float* pVal)
+ 5356  0021317C     58  static bool CalcConsecutiveCuts(GM_Pga_StatCounts* pStatCounts, float* pVal)
+ 5362  002131D4     58  static bool CalcSeasonWinnings(GM_Pga_StatCounts* pStatCounts, float* pVal)
+ 5368  0021322C     58  static bool CalcCareerWinnings(GM_Pga_StatCounts* pStatCounts, float* pVal)
+ 5374  00213284     58  static bool CalcRounds(GM_Pga_StatCounts* pStatCounts, float* pVal)
+ 5380  002132DC     58  static bool CalcPlayerOfYearPoints(GM_Pga_StatCounts* pStatCounts, float* pVal)
+ 5386    inline-only   static void CalcAllAroundScore(int golferID, float* pVal)
+ 5399    inline-only   static void CalcTotalDriving(int golferID, float* pVal)
+ 5406    inline-only   static void CalcBallStriking(int golferID, float* pVal)
+ 5423    inline-only   static void CalcFedExPoints(int golferID, float* pVal)
+ 5429  002A4594    334  static void SplitWinnings(enum PlayerNumber_t userID, int cash, int splitStart, int splitNWays)
+                         local  int i
+                         local  int splitCash
+                         local  struct GameModeDriver* pPGA
+                         local  int entrantID
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC
+                         local  bool isUser
+ 5463  002A5F80    1DC  void GM_PgaTourSim_DistributeWinnings(enum PlayerNumber_t userID, int purse, int firstPrize)
+                         local  int i
+                         local  int lastRank
+                         local  int cash
+                         local  int splitStart
+                         local  int splitNWays
+                         local  int nEntrants
+                         local  int entrantID
+ 5513  002A2558    1DC  static int StatRankIncreasing(const void* arg1, const void* arg2)
+                         local  int golferID0
+                         local  int golferID1
+                         local  float statVal0
+                         local  float statVal1
+                         local  int result
+                         local  enum GM_Pga_StatTypes_t statType
+                         local  enum PlayerNumber_t userID
+ 5571  002A2734    168  static int StatRankDecreasing(const void* arg1, const void* arg2)
+                         local  int golferID0
+                         local  int golferID1
+                         local  float statVal0
+                         local  float statVal1
+                         local  int result
+                         local  enum GM_Pga_StatTypes_t statType
+                         local  enum PlayerNumber_t userID
+ 5613  002A5A28    214  static int TournamentRankIncreasing(const void* arg1, const void* arg2)
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC0
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC1
+                         local  int entrantID0
+                         local  int entrantID1
+                         local  int relScore0
+                         local  int relScore1
+                         local  int result
+                         local  enum PlayerNumber_t userID
+                         local  bool isUserOrGuest
+ 5674  002A746C    20C  static int TournamentRankIncreasingForCutEntrants(const void* arg1, const void* arg2)
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC0
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC1
+                         local  int entrantID0
+                         local  int entrantID1
+                         local  int relScore0
+                         local  int relScore1
+                         local  int result
+                         local  enum PlayerNumber_t userID
+                         local  bool isUserOrGuest
+ 5721  00212D14     4C  static void PlayPGAAwardVideo(int movieIndex, int numRandom)
+ 5755  00212E04     20  void GM_PgaTourSim_SetStatsDirty(bool val)
+ 5760  00212BE0     20  void GM_PgaTourSim_SetScoresDirty(bool val)
+ 5765  0020AEFC     24  int GM_PgaTourSim_GetUserPlayoffScore()
+ 5770  00213334     24  int GM_PgaTourSim_GetSavedBestOpponentPlayoffScore()
+ 5775  002436B0    120  void PGATourSimulation_OpenONCE()
+                         local  const char[27] __FUNCTION__
+                         inlines  TagValuePair, operator+
+ 5789  00213358     40  void PGATourSimulation_CloseONCE()
+ 5798  0020B0CC    310  void GM_PgaTourSim_AddStatCounts(const GM_Pga_StatCounts* pSrc1StatCounts, const GM_Pga_StatCounts* pSrc2StatCounts, GM_Pga_StatCounts* pDstStatCounts)
+ 5842  0023A4F4     28  static int GM_GetNumberSeasonPlayers(enum PlayerNumber_t userID)
+                         local  int iNumSeasonPlayers
+ 5855  00212C00      8  int GM_GetMaxNonUserGolfers()
+ 5864  0023B450     D8  void GM_PgaTourSim_SetTargetScore(enum PlayerNumber_t userID, int32 entrantID, int16 targetScore)
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC
+ 5880  002A6204    1B8  void GM_PgaTourSim_AdjustUserScoreForSimmedRound(enum PlayerNumber_t userID)
+                         local  int32 currentRound
+                         local  int32 leadScore
+                         local  int32 delta
+                         local  int16 targetScore
+                         local  int32 place
+                         local  const int32 minDelta
+                         local  int32 maxDelta
+                         local  int iEntrant
+                         local  int iHoleNum

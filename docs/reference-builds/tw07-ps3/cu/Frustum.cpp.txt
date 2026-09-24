@@ -1,0 +1,227 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/Frustum.cpp
+// compiled in: golf_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   14  002CAC94    104  void SSphere::createFromAABB(const struct SSphere* this, const float* minPoint, const float* maxPoint)
+                         inlines  LLMath_Add3, LLMath_Length3, LLMath_Scale, LLMath_Subtract, __vec_len_sqr3, __vec_mul, vec_ld, vec_madd
+   25  00275E14    1B4  void SPlane::createPlane(const struct SPlane* this, vec4flt* pVertices, int32 idx0, int32 idx1, int32 idx2)
+                         local  vec4flt v0
+                         local  vec4flt v1
+                         local  vec4flt v2
+                         local  vec4flt edge0
+                         local  vec4flt edge1
+                         local  vec4flt normal
+                         local  float dist
+                         inlines  LLMath_CrossProduct3W0, LLMath_DotProduct3, LLMath_Subtract, SPlane::set, vec4flt_Copy, vec_madd, vec_nmsub, vec_perm, vec_sld, vec_st, vec_sub
+   54  002CAD98    16C  void SPlane::normalize(const struct SPlane* this)
+                         local  float length
+                         inlines  LLMath_Length3, LLMath_Scale, __vec_mul, vec_madd, vec_sld
+   66  00275FC8     D8  void SFrustum::makePlanes(const struct SFrustum* this, vec4flt* worldVerts)
+   81  00226130    134  void SFrustum::buildNPVertData(const struct SFrustum* this)
+                         local  int32 i
+                         local  uint32 planePIndex
+                         local  uint32 planeNIndex
+                         local  uint32 NX
+                         local  uint32 NY
+                         local  uint32 NZ
+                         local  uint32 NW
+  146  0027631C     6C  void SFrustum::createFromRenderCtx(const struct SFrustum* this, const struct RC_SRenderCtx* pRenderCtx)
+                         local  mat44flt inverseViewMatrix
+  158  002760A0    27C  void SFrustum::createFromView(const struct SFrustum* this, float[4]* inverseViewMatrix, const struct RC_SRenderCtx* pRenderCtx, bool reverseWindingOrder)
+                         local  const float tanHalfFOV
+                         local  const float aspectRatio
+                         local  const float nearZ
+                         local  const float farZ
+                         local  float[9][4] localVerts
+                         local  float[9][4] worldVerts
+                         local  float halfWidth
+                         local  float halfHeight
+                         local  int32 i
+                         local  float ooW
+                         inlines  LLMath_MaxVec4, LLMath_MinVec4, LLMath_Scale, __vec_mul, vec4flt_Copy, vec_ld, vec_splat
+  216  002CAF04    2D4  void SFrustum::createFromProjectionMatrix(const struct SFrustum* this, float[4]* matrix, float left, float right, float bottom, float top, float front, float back)
+                         inlines  SPlane::set
+  275  00276388    150  enum ClipTest SFrustum::clipSphereToFrustum(const const struct SFrustum* this, const struct SSphere* pSphere, struct SSphere* pNewSphere)
+                         local  int32 numTrivIn
+                         local  int32 i
+                         local  float sphRadius
+                         local  float dist
+                         local  float delta
+                         local  float scale
+                         inlines  LLMath_AddScale3, LLMath_DotProduct3, __vec_dot3, __vec_make_from_scalar, vec_madd, vec_sld
+  598  0024C2D4    1E0  enum ClipTest SFrustum::cullSphere(const const struct SFrustum* this, const struct SSphere* pSphere)
+                         local  uint32[4] s_constants
+                         local  uint32[4] s_permAXYZBW
+                         local  float[4] vTmpSphere
+                         local  float[4] vConstants
+                         local  float[4] vPermAXYZBW
+                         local  float[4] vPosRadius
+                         local  float[4] vNegateALL
+                         local  float[4] vOne
+                         local  float[4] vNegRadius
+                         local  float[4] vSphere
+                         local  float[4] vPlane0
+                         local  float[4] vPlane1
+                         local  float[4] vPlane2
+                         local  float[4] vPlane3
+                         local  float[4] vPlane4
+                         local  float[4] vPlane5
+                         local  float[4] vDist0
+                         local  float[4] vDist1
+                         local  float[4] vDist2
+                         local  float[4] vDist3
+                         local  float[4] vDist4
+                         local  float[4] vDist5
+                         local  uint32 resultTrivOut
+                         local  uint32 resultTrivIn
+                         local  uint32 result
+                         inlines  vec_add, vec_all_gt, vec_msum4, vec_perm, vec_sld, vec_vspltw, vec_xor
+  655  00256900    2A0  void SFrustum::cullAABBStrips(const const struct SFrustum* this, const struct SStrip* pStrips, const int32 numStrips, void* pBitField)
+                         local  float[4] vZero
+                         local  float[4]* vPlanes
+                         local  short int[8]* pvStrips
+                         local  unsigned char[16] vPermN0
+                         local  unsigned char[16] vPermN1
+                         local  unsigned char[16] vPermN2
+                         local  unsigned char[16] vPermN3
+                         local  unsigned char[16] vPermN4
+                         local  unsigned char[16] vPermN5
+                         local  float[4] plane0
+                         local  float[4] plane1
+                         local  float[4] plane2
+                         local  float[4] plane3
+                         local  float[4] plane4
+                         local  float[4] plane5
+                         local  int32 i
+                         local  short int[8] tmpMinMax
+                         local  int[4] tmpMin
+                         local  int[4] tmpMax
+                         local  float[4] vMin
+                         local  float[4] vMax
+                         local  float[4] nVtx0
+                         local  float[4] nVtx1
+                         local  float[4] nVtx2
+                         local  float[4] nVtx3
+                         local  float[4] nVtx4
+                         local  float[4] nVtx5
+                         local  float[4] np0Dot
+                         local  float[4] np1Dot
+                         local  float[4] np2Dot
+                         local  float[4] np3Dot
+                         local  float[4] np4Dot
+                         local  float[4] np5Dot
+                         local  uint32 resultTrivOut
+                         local  uint32 testBit
+                         local  int32 wordOffset
+                         local  int32 bitOffset
+                         local  uint32 currWord
+                         inlines  vec_add, vec_all_gt, vec_msum4, vec_perm, vec_sld, vec_unpackh, vec_unpackl, vec_vcfsx
+  739  00255FD8    37C  enum ClipTest SFrustum::cullAABB(const const struct SFrustum* this, const float* minPoint, const float* maxPoint)
+                         local  uint32[4] s_XOR
+                         local  float[4] vMin
+                         local  float[4] vMax
+                         local  unsigned char[16] vXOR
+                         local  float[4] vZero
+                         local  float[4]* vPlanes
+                         local  unsigned char[16] vPermN0
+                         local  unsigned char[16] vPermN1
+                         local  unsigned char[16] vPermN2
+                         local  unsigned char[16] vPermN3
+                         local  unsigned char[16] vPermN4
+                         local  unsigned char[16] vPermN5
+                         local  float[4] plane0
+                         local  float[4] plane1
+                         local  float[4] plane2
+                         local  float[4] plane3
+                         local  float[4] plane4
+                         local  float[4] plane5
+                         local  float[4] nVtx0
+                         local  float[4] nVtx1
+                         local  float[4] nVtx2
+                         local  float[4] nVtx3
+                         local  float[4] nVtx4
+                         local  float[4] nVtx5
+                         local  float[4] np0Dot
+                         local  float[4] np1Dot
+                         local  float[4] np2Dot
+                         local  float[4] np3Dot
+                         local  float[4] np4Dot
+                         local  float[4] np5Dot
+                         local  unsigned char[16] vPermP0
+                         local  unsigned char[16] vPermP1
+                         local  unsigned char[16] vPermP2
+                         local  unsigned char[16] vPermP3
+                         local  unsigned char[16] vPermP4
+                         local  unsigned char[16] vPermP5
+                         local  float[4] pVtx0
+                         local  float[4] pVtx1
+                         local  float[4] pVtx2
+                         local  float[4] pVtx3
+                         local  float[4] pVtx4
+                         local  float[4] pVtx5
+                         local  uint32 resultTrivOut
+                         local  float[4] pp0Dot
+                         local  float[4] pp1Dot
+                         local  float[4] pp2Dot
+                         local  float[4] pp3Dot
+                         local  float[4] pp4Dot
+                         local  float[4] pp5Dot
+                         local  int32 resultTrivIn
+                         inlines  vec_add, vec_all_gt, vec_msum4, vec_perm, vec_sld, vec_xor
+  944  0024C4B4    3A8  void SFrustum::multiCullSpheres(const struct SFrustum* pFrustums, int32 numFrustums, const struct SSphere* pSpheres, uint8* pFlags, int32 numSpheres)
+                         local  struct SPlane* planes
+                         local  unsigned char* flags
+                         local  int i
+                         local  int j
+                         local  int32 s
+                         local  unsigned char flag
+                         local  int32 f
+                         local  uint32[4] s_constants
+                         local  uint32[4] s_permAXYZBW
+                         local  float[4] vTmpSphere
+                         local  float[4] vConstants
+                         local  float[4] vPermAXYZBW
+                         local  float[4] vPosRadius
+                         local  float[4] vOne
+                         local  float[4] vSphere
+                         local  float[4] vPlane0
+                         local  float[4] vPlane1
+                         local  float[4] vPlane2
+                         local  float[4] vPlane3
+                         local  float[4] vPlane4
+                         local  float[4] vPlane5
+                         local  float[4] vDist0
+                         local  float[4] vDist1
+                         local  float[4] vDist2
+                         local  float[4] vDist3
+                         local  float[4] vDist4
+                         local  float[4] vDist5
+                         local  uint32 resultTrivOut
+                         inlines  vec_add, vec_all_gt, vec_msum4, vec_perm, vec_sld, vec_vspltw
+ 1089  0028703C    500  enum ClipTest SFrustum::clipAABBToFrustum(const const struct SFrustum* this, const float* minPoint, const float* maxPoint, float* newMinPoint, float* newMaxPoint)
+                         local  float[8][4] boxCorners
+                         local  int32 planeMask
+                         local  const uint8[16][2] scEdges
+                         local  int32 p
+                         local  const const struct SPlane& plane
+                         local  const const struct SBoxIndex& boxIdx
+                         local  float[4]* pNVertex
+                         local  float[4]* pPVertex
+                         local  float nDistToPlane
+                         local  float pDistToPlane
+                         local  int32 edge
+                         local  const int32 v0
+                         local  const int32 v1
+                         local  float[2][4] lineVerts
+                         local  vec4flt lineDir
+                         local  float lineLength
+                         local  bool bClipped
+                         local  int32 p
+                         local  const const struct SPlane& plane
+                         local  const int32 localPlaneMask
+                         local  float distToPlane
+                         local  float distToPlane2
+                         local  float nDotD
+                         local  float intersect
+                         local  vec4flt* pInterpPoint
+                         inlines  LLMath_AddScale3, LLMath_DotProduct, LLMath_DotProduct3, LLMath_MaxVec4, LLMath_MinVec4, LLMath_Subtract, LLMath_Subtract3, SFrustum::makeAABB, __vec_dot4, vec4flt_Copy, vec_add, vec_madd, vec_max, vec_perm, vec_sld, vec_splat, vec_st

@@ -1,0 +1,49 @@
+// ../../../../../TIGERCODE/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/plane_type_inline.h
+// compiled in: rnaunity.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   61    inline-only   Vector4Intrinsic_32& GetVector(const struct <anon>* this)
+   67    inline-only   const Vector4Intrinsic_32& GetVector(const const struct Plane* this)
+   73    inline-only   void Set(const struct <anon>* this, float _a, float _b, float _c, float _d)
+                         local  Vector4Intrinsic_32 vi_temp
+   79    inline-only   void Set(const struct <anon>* this, struct <anon>& _a, struct <anon>& _b, struct <anon>& _c, struct <anon>& _d)
+                         local  Vector4Intrinsic_32 temp0
+                         local  Vector4Intrinsic_32 temp1
+   85    inline-only   void Set(const struct <anon>* this, struct <anon>& _a, struct <anon>& _b, struct <anon>& _c, struct <anon>& _d)
+                         local  Vector4Intrinsic_32 vi_temp
+  233    inline-only   void A(const struct <anon>* this, struct <anon>& a)
+                         local  unsigned char[16] permuteControl
+  239    inline-only   void A(const struct <anon>* this, struct <anon>& a)
+                         local  Vector4Intrinsic_32 permuteControl
+                         local  int[4] asmSwizzleStore_I_V_a
+                         local  int[4] asmSwizzleStore_I_V_b
+                         local  signed char[16] asmSwizzleStore_I_V_c
+                         local  int[4] tempResult
+  256    inline-only   void B(const struct <anon>* this, struct <anon>& b)
+                         local  unsigned char[16] permuteControl
+  262    inline-only   void B(const struct <anon>* this, struct <anon>& b)
+                         local  Vector4Intrinsic_32 permuteControl
+                         local  int[4] asmSwizzleStore_I_V_a
+                         local  int[4] asmSwizzleStore_I_V_b
+                         local  signed char[16] asmSwizzleStore_I_V_c
+                         local  int[4] tempResult
+  279    inline-only   void C(const struct <anon>* this, struct <anon>& c)
+                         local  unsigned char[16] permuteControl
+  285    inline-only   void C(const struct <anon>* this, struct <anon>& c)
+                         local  Vector4Intrinsic_32 permuteControl
+                         local  int[4] asmSwizzleStore_I_V_a
+                         local  int[4] asmSwizzleStore_I_V_b
+                         local  signed char[16] asmSwizzleStore_I_V_c
+                         local  int[4] tempResult
+  302    inline-only   void D(const struct <anon>* this, struct <anon>& d)
+                         local  unsigned char[16] permuteControl
+  308    inline-only   void D(const struct <anon>* this, struct <anon>& d)
+                         local  Vector4Intrinsic_32 permuteControl
+                         local  int[4] asmSwizzleStore_I_V_a
+                         local  int[4] asmSwizzleStore_I_V_b
+                         local  signed char[16] asmSwizzleStore_I_V_c
+                         local  int[4] tempResult
+  333    inline-only   VecFloatRefX A(const struct <anon>* this)
+  343    inline-only   VecFloatRefY B(const struct <anon>* this)
+  353    inline-only   VecFloatRefZ C(const struct <anon>* this)
+  363    inline-only   VecFloatRefW D(const struct <anon>* this)

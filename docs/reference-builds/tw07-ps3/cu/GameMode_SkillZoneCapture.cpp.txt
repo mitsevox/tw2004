@@ -1,0 +1,131 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_SkillZoneCapture.cpp
+// compiled in: golf_unity.cpp
+// 40 functions, source order. line | PS3 address | size
+
+   29  00204360     40  void GameModeSkillZoneCapture::GameModeSkillZoneCapture(const struct GameModeSkillZoneCapture* this)
+   33  001FFDFC     18  void GameModeSkillZoneCapture::~GameModeSkillZoneCapture(const struct GameModeSkillZoneCapture* this)
+   41  0024E4F8    200  void GameModeSkillZoneCapture::Init(const struct GameModeSkillZoneCapture* this)
+                         inlines  GameModeBase::SetUseShotClock
+   87  002AC1D0     7C  int32 GameModeSkillZoneCapture::GetEndGameSequence(const struct GameModeSkillZoneCapture* this)
+                         local  int32 sequence
+                         local  void* ptr
+  100  001FFE78      4  void GameModeSkillZoneCapture::Update(const struct GameModeSkillZoneCapture* this)
+  104  001FFE7C      4  void GameModeSkillZoneCapture::Shutdown(const struct GameModeSkillZoneCapture* this)
+  108  001FFE80     24  bool GameModeSkillZoneCapture::QueryInterface(const struct GameModeSkillZoneCapture* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bRet
+  124  001FFEA4      4  void GameModeSkillZoneCapture::StartGamePreData(const struct GameModeSkillZoneCapture* this)
+  132  0032A764    1DC  enum PlayerNumber_t GameModeSkillZoneCapture::GetHonors(const struct GameModeSkillZoneCapture* this, enum PlayerNumber_t ignore, bool doNotIgnoreHoledOut)
+                         local  int32 i
+                         local  int32 currentGolfer
+                         local  bool juststarted
+                         inlines  GM_GetCurrentHoleIndex, GM_GetGolferUp
+  199  00248564     A0  void GameModeSkillZoneCapture::EndGolferTurn(const struct GameModeSkillZoneCapture* this, enum PlayerNumber_t PlayerID)
+                         inlines  GamePlayer::GetSkillZoneData
+  214  0032A940    610  void GameModeSkillZoneCapture::CheckShotAwards(const struct GameModeSkillZoneCapture* this, enum PlayerNumber_t PlayerID)
+                         local  int32 collisionSurfaceID
+                         local  float distance
+                         local  int greenIndex
+                         local  enum SZ_BullsEyeColors_t ring
+                         local  char[256] tempString
+                         local  int stolenLockedState
+                         local  char* pSpecialMessage
+                         local  char* localizedString
+                         local  char[256] moneyString
+                         inlines  GM_GetCurrentHoleIndex, GamePlayer::GetSkillZoneData
+  429  001FFF9C    170  int GameModeSkillZoneCapture::GetTargetList(const struct GameModeSkillZoneCapture* this, bool* bTargets, int size, enum PlayerNumber_t playerID)
+                         local  int retVal
+                         local  int j
+  471  0029F7A4    7D0  void GameModeSkillZoneCapture::AI_SelectCup(const struct GameModeSkillZoneCapture* this, enum PlayerNumber_t playerID)
+                         local  bool[40] bStealableTargets
+                         local  int numStealableTargets
+                         local  int cupID
+                         local  float fChooseNewTargetProb
+                         local  enum PlayerNumber_t otherPlayerID
+                         local  int ourTotalTargets
+                         local  int theirTotalTargets
+                         local  int j
+                         local  float ourBias
+                         local  const float MAXMINUS1
+                         local  float fSelectIndex
+                         local  int numRolls
+                         local  int selectIndex
+                         local  int curSelected
+                         local  int i
+                         local  int j
+                         local  bool[40] bFreeTargets
+                         local  int numFreeTargets
+                         local  float fSelectIndex
+                         local  int numRolls
+                         local  int selectIndex
+                         local  int curSelected
+                         local  int i
+                         local  int j
+                         inlines  Misc_RandFuncf
+  598  002D10A4    14C  void GameModeSkillZoneCapture::SetupNextGolfer(const struct GameModeSkillZoneCapture* this)
+                         local  int32 i
+  636  00305E08     5C  void GameModeSkillZoneCapture::LoadHole(const struct GameModeSkillZoneCapture* this)
+  649  00200240     3C  void GameModeSkillZoneCapture::RestartHole(const struct GameModeSkillZoneCapture* this)
+  661  00280FD0     58  void GameModeSkillZoneCapture::ClearPerHoleData(const struct GameModeSkillZoneCapture* this)
+                         local  int j
+  679  0020027C      8  bool GameModeSkillZoneCapture::GameFinished(const struct GameModeSkillZoneCapture* this, bool predict)
+  688  00200284     64  bool GameModeSkillZoneCapture::BallOOB(const struct GameModeSkillZoneCapture* this, enum PlayerNumber_t PlayerID)
+  697  002002E8     84  bool GameModeSkillZoneCapture::HoleFinished(const struct GameModeSkillZoneCapture* this, enum PlayerNumber_t PlayerID, bool predict)
+                         local  int32 i
+  715  0020010C    118  int GameModeSkillZoneCapture::GetTotalTargetsHit(const struct GameModeSkillZoneCapture* this, enum PlayerNumber_t PlayerID)
+                         local  int count
+                         local  int i
+  747  0020036C     18  enum PlayerNumber_t GameModeSkillZoneCapture::GetRingOwnerFromIndex(const struct GameModeSkillZoneCapture* this, int greenIndex)
+  758  00200224     1C  int GameModeSkillZoneCapture::GetCapturedRingFromIndex(const struct GameModeSkillZoneCapture* this, int greenIndex)
+  766  001FFF50     4C  int GameModeSkillZoneCapture::GetMadeMoneyFromIndex(const struct GameModeSkillZoneCapture* this, int greenIndex)
+  779  0029E978     F8  void GameModeSkillZoneCapture::ComputePlayerScore(const struct GameModeSkillZoneCapture* this)
+                         local  int32 i
+                         local  int32 bonusAmount
+                         local  int j
+                         inlines  GamePlayer::GetSkillZoneData
+  803  00200384      C  int GameModeSkillZoneCapture::GetShotEarned(const struct GameModeSkillZoneCapture* this, enum PlayerNumber_t PlayerID)
+  811  00200390     24  void GameModeSkillZoneCapture::HitBall(const struct GameModeSkillZoneCapture* this, enum PlayerNumber_t PlayerID)
+  823  003060D8     60  void GameModeSkillZoneCapture::ShotClockOut(const struct GameModeSkillZoneCapture* this)
+                         inlines  GM_GetGolferUp
+  835  002D610C    318  void GameModeSkillZoneCapture::EndGame(const struct GameModeSkillZoneCapture* this)
+                         local  int32 i
+                         local  int commentID
+                         local  int32 winner
+                         local  int32 loser
+                         local  int32 rank
+                         local  int32 highest
+                         local  struct OnWinData_t onWinData
+                         local  int j
+                         inlines  OnWinData_t::OnWinData_t
+  917  002003B4     30  void GameModeSkillZoneCapture::QuitGame(const struct GameModeSkillZoneCapture* this)
+  925  002003E4     E8  int GameModeSkillZoneCapture::GreenType(const struct GameModeSkillZoneCapture* this, enum PlayerNumber_t PlayerID, int iGreenIndex)
+  947  00306138    308  void GameModeSkillZoneCapture::DisplayGameModeInfo(const struct GameModeSkillZoneCapture* this)
+                         local  enum PlayerNumber_t playerCurrentlyUpID
+                         local  char[32] sFlagTexture
+                         local  char[32] sLuxorTexture
+                         local  bool bAddFlagActor
+                         local  bool bAddLuxorLight
+                         local  int cupCount
+                         local  int i
+                         inlines  GM_GetGolferUp
+ 1048  00248560      4  void GameModeSkillZoneCapture::PreShotUpdateUI(const struct GameModeSkillZoneCapture* this, enum PlayerNumber_t PlayerID)
+ 1056  00248340    220  void GameModeSkillZoneCapture::UpdateDisplayInfo(const struct GameModeSkillZoneCapture* this, enum PlayerNumber_t PlayerID)
+                         local  char[256] tempString
+                         local  char* localizedString
+                         local  char[32] playerOrTeamString1
+                         local  char[32] playerOrTeamString2
+                         local  enum PlayerNumber_t p1
+                         local  enum PlayerNumber_t p2
+ 1099  002004CC     3C  bool GameModeSkillZoneCapture::IsTeamGame(const struct GameModeSkillZoneCapture* this)
+ 1107  001FFEA8     A8  int GameModeSkillZoneCapture::GetTeam(const struct GameModeSkillZoneCapture* this, enum PlayerNumber_t player)
+ 1124  0021C698     14  const char* GameModeSkillZoneCapture::GetModeName(const struct GameModeSkillZoneCapture* this)
+                         local  char* localizedString
+ 1135  0021C5DC     BC  void GameModeSkillZoneCapture::GetUIGameFinishedString(const struct GameModeSkillZoneCapture* this, char* strBuf, int32 bufferSize)
+                         local  char* localizedString
+ 1154  0021C37C    260  bool GameModeSkillZoneCapture::GetUIScoreCardField(const struct GameModeSkillZoneCapture* this, int32_t row, int32_t column, char* strBuf, int32 bufferSize)
+                         local  bool bUpdate
+                         local  char* localizedString
+                         local  char[32] playerOrTeamString1
+                         local  char[32] playerOrTeamString2
+                         local  enum PlayerNumber_t p1
+                         local  enum PlayerNumber_t p2
+ 1217  00200508     14  const char* GameModeSkillZoneCapture::GetName(const struct GameModeSkillZoneCapture* this)

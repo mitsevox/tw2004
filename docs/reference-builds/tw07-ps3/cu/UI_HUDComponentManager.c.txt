@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_HUDComponentManager.c
+// compiled in: apt_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   55  000EF1E8     DC  void UI_HUDComponentManager::Init()
+   87  000A2E48     F8  void UI_HUDComponentManager::Close()

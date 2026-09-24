@@ -1,0 +1,6 @@
+// ../../../Allocator/1.07.00/include/Allocator/IAllocator.h
+// compiled in: tiger_module_allocator.cpp, tiger_module_lua.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   46    inline-only   const struct <anon>& operator+(const const struct <anon>* this, const const struct <anon>& rhs)
+  184  0033E23C     18  void ~IAllocator(const struct IAllocator* this)

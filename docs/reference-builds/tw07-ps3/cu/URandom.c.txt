@@ -1,0 +1,31 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/URandom.c
+// compiled in: Legacy_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   90  0038AE84    124  uint32 Misc_RandFunc(enum eRandomType type)
+                         local  int32 j
+                         local  int32 k
+                         local  uint32* table
+  161  0037B86C     60  int32 Misc_PMRand()
+                         local  uint32 tmp
+  191  0038AD58     C4  void Misc_SetSeedFunc(enum eRandomType type, int32 seed)
+                         local  int32 i
+  254    inline-only   int32 Misc_CreateRandomSeed_Internal()
+                         local  int32 returnValue
+  291  00384958     3C  int32 Misc_CreateRandomSeed()
+                         inlines  Misc_CreateRandomSeed_Internal
+  311  0038AE1C     68  void Misc_InitModule(int32 seed)
+                         local  int32 i
+  330  0037B8CC     1C  void Misc_CloseModule()
+  342  0038B118    18C  float Misc_RandFuncg(enum eRandomType type)
+                         local  float x1
+                         local  float x2
+                         local  float y1
+                         local  float y2
+                         local  float s
+                         local  float c
+                         local  float z
+                         local  float result
+                         inlines  Misc_RandFuncf, std::cosf, std::logf, std::sinf, std::sqrt
+  381  0038ACF8     60  int32 Misc_GetCurrentRandomIndex(enum eRandomType type)
+  392  0038AC80     78  uint32 Misc_GetCurrentRandomTableEntry(enum eRandomType type)

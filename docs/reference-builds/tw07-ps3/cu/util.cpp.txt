@@ -1,0 +1,25 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptFF/core/util.cpp
+// compiled in: other_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   73  003F6860      4  void util_SortShortArray(int16_t* a, int32_t n)
+  102  003F1F24     84  F16Dot16 util_FixMul(F16Dot16 mA, F16Dot16 mB)
+                         local  uint16_t mA_Hi
+                         local  uint16_t mA_Lo
+                         local  uint16_t mB_Hi
+                         local  uint16_t mB_Lo
+                         local  uint32_t d1
+                         local  uint32_t d2
+                         local  uint32_t d3
+                         local  F16Dot16 result
+                         local  int sign
+  156  003F6864      8  F16Dot16 util_FixMul26Dot6(F16Dot16 mA, F16Dot16 mB)
+  245  003F686C      8  int32_t util_ShortFracMul(int32_t mA, int16_t mB)
+  304  003F1A38     98  F16Dot16 util_FixDiv(F16Dot16 mA, F16Dot16 mB)
+                         local  int sign
+                         local  uint32_t high16
+                         local  uint32_t low16
+                         local  F16Dot16 Q
+  426  003F5D98      8  F16Dot16 util_FixSin(F16Dot16 in)
+  544  003F27D8      8  F16Dot16 util_EuclidianDistance(F16Dot16 A, F16Dot16 B)
+  605  003F6874      4  void util_ComputeIntersection(int16_t line1_pt1_x, int16_t line1_pt1_y, int16_t line1_pt2_x, int16_t line1_pt2_y, int16_t line2_pt1_x, int16_t line2_pt1_y, int16_t line2_pt2_x, int16_t line2_pt2_y, int16_t* x, int16_t* y)

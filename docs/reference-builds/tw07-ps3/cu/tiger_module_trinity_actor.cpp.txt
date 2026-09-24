@@ -1,0 +1,39 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_trinity_actor.cpp
+// compiled in: tiger_module_trinity_actor.cpp
+// 31 functions, source order. line | PS3 address | size
+
+    0  00540D30     18  void ~ListNode(const struct <anon>* this)
+                         inlines  ~Allocatable
+    0  005868A4     40  void ~TrinityActor(const struct <anon>* this)
+                         inlines  TrinityActor::~TrinityActor, ~ListNode
+    8  00586594    114  void TrinityActor(const struct <anon>* this, struct CCT* cct)
+                         inlines  Interpolator, TrinityActor::TrinityActor, TrinityTransformBase
+   16  00586048      4  void ActivateHeadTracking(const struct <anon>* this)
+   20  0058604C      4  void ActorEvent(const struct <anon>* this, int32_t iEventId, int32_t iDatasize, const char* strData)
+   24  00586050      8  const uint32_t GetActorId(const const struct <anon>* this)
+   29  00586058      4  void GetActorPos(const struct <anon>* this, const vec4flt& vPos)
+   33  0058605C      4  void SetActorPos(const struct <anon>* this, const vec4flt& vPos)
+   37  00586060      4  void GetActorMat(const struct <anon>* this, const mat44flt& mat)
+   41  00586064      4  void SetActorMat(const struct <anon>* this, float_t[4]* mat)
+   45  00586068     14  float_t GetActorScale(const struct <anon>* this)
+   50  0058607C      4  void SetActorScale(const struct <anon>* this, float_t fActorScale)
+   54  00586080     14  float_t GetAnimSpeed(const struct <anon>* this)
+   59  00586094      4  void SetAnimSpeed(const struct <anon>* this, float_t fAnimSpeed)
+   63  00586098      8  bool8_t IsAnimDone(const struct <anon>* this)
+   68  005860A0      4  void AttachToActor(const struct <anon>* this, uint32_t iActorGuid, char* pChildBoneName, char* pParentBoneName)
+   72  005860A4      8  bool8_t CastRayWorldTerrain(const struct <anon>* this, const float_t[4]& pos0, const float_t[4]& pos1, const vec4flt& contact, const vec4flt& contact_normal)
+   77  005860AC      4  void DeactivateHeadTracking(const struct <anon>* this)
+   81  005860B0      4  void DetachFromActor(const struct <anon>* this)
+   85  005860B4    190  void Dispossess(const struct <anon>* this)
+  112  00586244      4  void SetHeadTrackingLookAtPos(const struct <anon>* this, const vec4flt& vPos)
+  116  00586248      4  void Hide(const struct <anon>* this)
+  120  0058624C      4  void InitActor(const struct <anon>* this)
+  124  00586250    108  bool8_t InitActor(const struct <anon>* this, uint32_t guid, const char* pActorName, struct Sequence* pSequence, float_t actorScale, bool8_t bRestoreActorState, bool8_t bSpawnedActorPersist, const vec3flt& initSpawnPos)
+  134  00586358      4  void ReInitActor(const struct <anon>* this)
+  143  0058635C    218  void PlayAnim(const struct <anon>* this, char* pAnimName, bool8_t bUseCustomTransition, int32_t startFrame, int32_t blendDuration, int32_t sourceBehavior, int32_t destBehavior)
+                         local  const char* currentState
+  169  00586574      8  bool8_t IsPossessed(const struct <anon>* this)
+  174  0058657C      8  bool8_t RegisterJawMod(const struct <anon>* this, void* pTrans)
+  179  00586584      4  void Show(const struct <anon>* this)
+  183  00586588      4  void TickActor(const struct <anon>* this, float_t fDeltaSec, bool8_t fTransDone, bool8_t bIsStart)
+  187  0058658C      8  bool8_t UnregisterJawMod(const struct <anon>* this, void* pTrans)

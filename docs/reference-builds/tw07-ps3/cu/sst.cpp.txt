@@ -1,0 +1,102 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sst.cpp
+// compiled in: sst.cpp
+// 21 functions, source order. line | PS3 address | size
+
+   73  006CD34C     88  void Snd9::StreamRemoveFaders(SNDSTREAMCHANNEL* pSndStrmChannel)
+                         local  int i
+                         local  StreamSourceChannelState* pSourceChannelState
+                         inlines  CListDStack::Remove, RemoveVariableTimerClient
+  100  006CD250     FC  enum ParseReturnValue sndStreamChunkParser(void* pData, uint32_t datasize, int , void* , bool(*)()* filterfunc, void* filtercontext, uint32_t* blocksize)
+                         local  struct <anon>* chunk
+                         local  unsigned int size
+                         inlines  PutU<unsigned int, std::uint32_t>
+  138  006CBC04    3A0  void SNDSTRMI_startstream(SNDSTREAMCHANNEL* pssc)
+                         local  unsigned int i
+                         local  int j
+                         local  int voice
+                         local  int sourceVoice
+                         local  struct CHANPUB* pSourceVoice
+                         local  enum Channel sourceChannel
+                         local  StreamSourceChannelState* pSourceChannelState
+                         local  const unsigned char* pAzimuthSpacings
+                         local  int sourceVoice
+                         local  struct CHANPUB* pSourceVoice
+                         local  enum Channel sourceChannel
+                         local  StreamSourceChannelState* pSourceChannelState
+                         inlines  FastVol, SNDI_ftoifast
+  224  006CBFA4     C0  int SNDSTRMI_calcdatarate(SNDSAMPLEFORMAT* pssf)
+                         local  int avgdatarate
+                         local  int ratio
+  288  006CD4F4     80  int SNDSTRMI_destroyall()
+                         local  int i
+  299  006CC064     3C  SNDSTREAMCHANNEL* SNDSTRMI_getstreamptr(int sndstreamhandle)
+  308  006CC0A0     98  void SNDSTRMI_removerequest(int sndrequesthandle)
+                         local  SNDSTREAMCHANNEL* pssc
+                         local  struct SNDSTREAMREQUEST* pssr
+  345  006CC138     44  void SNDSTRMI_releasecallback(void* pSamples, void* )
+                         local  struct <anon>* pChunkReleaseInfo
+                         local  SNDSTREAMCHANNEL* pSndStreamChannel
+  374  006CC17C     FC  void SNDSTRMI_framescallback(int pktchan, int numframes, void* pclientdata)
+                         local  SNDSTREAMCHANNEL* pssc
+                         local  struct SNDSTREAMREQUEST* pssr
+                         local  int residual
+                         local  int timeout
+  445  006CC278    308  int SNDSTRMI_parseheader(int chan, struct ChunkInfo* pchunk)
+                         local  SNDSTREAMCHANNEL* pssc
+                         local  struct SNDSTREAMREQUEST* pssr
+                         local  SNDSAMPLEDESC ssd
+                         local  SNDUSERDATACBINFO udinfo
+                         local  int userdatachunks
+                         local  int i
+  548  006CD574    1EC  void SNDSTRMI_parsedata(SNDSTREAMCHANNEL* pssc, struct ChunkInfo* pChunkInfo)
+                         local  SNDPACKET packet
+                         local  struct SNDSTREAMREQUEST* pSndStreamRequest
+                         local  int i
+                         local  char* pSampleData
+                         local  unsigned int* pint
+                         local  int* intTemp
+                         local  int* intTemp1
+                         local  int temp
+                         local  struct <anon>* pChunkReleaseInfo
+                         inlines  PutB<int, int>
+  673  006CD760     98  int SNDSTRMI_parsechunk(int chan, struct ChunkInfo* pchunk)
+                         local  SNDSTREAMCHANNEL* pssc
+  702  006CC580    140  int SNDSTRMI_isheld(SNDSTREAMCHANNEL* pssc)
+                         local  struct SNDSTREAMREQUEST* pssr
+                         local  unsigned int bufferedtime
+                         local  unsigned int gettable
+  776  006CD7F8    198  void SNDSTRMI_service()
+                         local  struct ChunkInfo* pchunk
+                         local  SNDSTREAMCHANNEL* pssc
+                         local  int chan
+                         local  int ret
+                         local  int space
+  858  006CC6C0     4C  int SNDSTRMI_numcreated()
+                         local  int i
+                         local  int numcreated
+  873  006CCBE4    65C  int SNDSTRMI_create(SNDPLAYOPTS* pspo, int maxrequests, int maxchunks, void* pmem, int memsize, struct <anon>* pRwCoreStream, int fromtap, int readBlockSize)
+                         local  SNDSTREAMCHANNEL* pssc
+                         local  struct SNDSTREAMREQUEST* prequest
+                         local  void* ppacketmem
+                         local  int sndstreamhandle
+                         local  int i
+                         local  int overhead
+                         local  void* pMemForFx
+                         local  float floatVol
+                         local  StreamSourceChannelState* pSourceChannelState
+                         local  void* pmemAfterAlign
+ 1100  006CC70C    208  int SNDSTRMI_queue(int sndstreamhandle, int holdtime, char* param1, int param2, int queuetype)
+                         local  SNDSTREAMCHANNEL* pssc
+                         local  struct SNDSTREAMREQUEST* pssr
+                         local  int sndrequesthandle
+ 1246  006CD240     10  int SNDSTRM_create(SNDPLAYOPTS* pspo, int maxrequests, int maxchunks, void* pmem, int memsize, int readBlockSize)
+                         local  int ret
+ 1276  006CD3D4    120  int SNDSTRM_destroy(int sndstreamhandle)
+                         local  SNDSTREAMCHANNEL* pssc
+ 1378  006CC914     98  int SNDSTRM_queuefile(int sndstreamhandle, int holdtime, char* filename, int offset)
+                         local  int ret
+ 1412  006CC9AC    238  int SNDSTRM_purge(int sndStrmHandle)
+                         local  SNDSTREAMCHANNEL* pssc
+                         local  struct SNDSTREAMREQUEST* pssr
+                         local  int i
+                         inlines  SNDMEMI_free

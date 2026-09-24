@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/code/ParticleSystem/include/particle_manager.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   44    inline-only   struct ParticleEmitter* ParticleManager::GetEmitterList(const struct ParticleManager* this)

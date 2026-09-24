@@ -1,0 +1,35 @@
+// C:/dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/target/ppu/include/xutility
+// compiled in: golf_unity.cpp, rnaunity.cpp
+// 19 functions, source order. line | PS3 address | size
+
+  394    inline-only   struct <anon> std::_Iter_cat<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> > >(const const struct <anon>& )
+                         local  struct <anon> _Cat
+                         local  struct <anon> _Cat
+  403    inline-only   struct <anon> std::_Ptr_cat<Course*, Course*>(const struct Course*& , const struct Course*& )
+                         local  struct <anon> _Cat
+                         local  struct <anon> _Cat
+  403    inline-only   struct <anon> std::_Ptr_cat<MeshSortStruct*, MeshSortStruct*>(const struct MeshSortStruct*& , const struct MeshSortStruct*& )
+                         local  struct <anon> _Cat
+                         local  struct <anon> _Cat
+  403    inline-only   struct <anon> std::_Ptr_cat<std::_Vector_iterator<MeshSortStruct, std::allocator<MeshSortStruct> >, MeshSortStruct*>(const struct <anon>& , const struct MeshSortStruct*& )
+                         local  struct <anon> _Cat
+                         local  struct <anon> _Cat
+  411    inline-only   struct <anon> std::_Ptr_cat<TwRenderObj::BaseRenderObj>(struct BaseRenderObj** , struct BaseRenderObj** )
+                         local  struct <anon> _Cat
+                         local  struct <anon> _Cat
+  769    inline-only   BaseRenderObjPtr* std::_Val_type<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> > >(struct <anon> )
+  830    inline-only   ptrdiff_t* std::_Dist_type<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> > >(struct <anon> )
+ 1491    inline-only   BaseRenderObjPtr* std::_Copy_opt<TwRenderObj::BaseRenderObj**, TwRenderObj::BaseRenderObj**>(BaseRenderObjPtr* _First, BaseRenderObjPtr* _Last, BaseRenderObjPtr* _Dest, struct <anon> )
+                         local  ptrdiff_t _Off
+ 1507    inline-only   BaseRenderObjPtr* std::copy<TwRenderObj::BaseRenderObj**, TwRenderObj::BaseRenderObj**>(BaseRenderObjPtr* _First, BaseRenderObjPtr* _Last, BaseRenderObjPtr* _Dest)
+ 1516    inline-only   struct Course* std::_Copy_backward_opt<Course*, Course*>(struct Course* _First, struct Course* _Last, struct Course* _Dest, struct <anon> )
+ 1516    inline-only   struct MeshSortStruct* std::_Copy_backward_opt<MeshSortStruct*, MeshSortStruct*>(struct MeshSortStruct* _First, struct MeshSortStruct* _Last, struct MeshSortStruct* _Dest, struct <anon> )
+ 1527    inline-only   BaseRenderObjPtr* std::_Copy_backward_opt<TwRenderObj::BaseRenderObj**, TwRenderObj::BaseRenderObj**>(BaseRenderObjPtr* _First, BaseRenderObjPtr* _Last, BaseRenderObjPtr* _Dest, struct <anon> )
+                         local  ptrdiff_t _Off
+ 1543    inline-only   struct Course* std::copy_backward<Course*, Course*>(struct Course* _First, struct Course* _Last, struct Course* _Dest)
+ 1543    inline-only   struct MeshSortStruct* std::copy_backward<MeshSortStruct*, MeshSortStruct*>(struct MeshSortStruct* _First, struct MeshSortStruct* _Last, struct MeshSortStruct* _Dest)
+ 1543    inline-only   BaseRenderObjPtr* std::copy_backward<TwRenderObj::BaseRenderObj**, TwRenderObj::BaseRenderObj**>(BaseRenderObjPtr* _First, BaseRenderObjPtr* _Last, BaseRenderObjPtr* _Dest)
+ 1646    inline-only   void std::fill<Course*, Course>(struct Course* _First, struct Course* _Last, const const struct Course& _Val)
+ 1646    inline-only   void std::fill<MeshSortStruct*, MeshSortStruct>(struct MeshSortStruct* _First, struct MeshSortStruct* _Last, const const struct MeshSortStruct& _Val)
+ 1646    inline-only   void std::fill<TwRenderObj::BaseRenderObj**, TwRenderObj::BaseRenderObj*>(BaseRenderObjPtr* _First, BaseRenderObjPtr* _Last, const const BaseRenderObjPtr& _Val)
+ 1675    inline-only   void std::fill_n<TwRenderObj::BaseRenderObj**, unsigned int, TwRenderObj::BaseRenderObj*>(BaseRenderObjPtr* _First, unsigned int _Count, const const struct BaseRenderObj*& _Val)

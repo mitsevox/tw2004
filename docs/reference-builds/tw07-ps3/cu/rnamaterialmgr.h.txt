@@ -1,0 +1,11 @@
+// ../../../../../TIGERCODE/Code/Golf/rnamaterialmgr/rnamaterialmgr.h
+// compiled in: rnaunity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   72    inline-only   void Add(const struct <anon>* this, const const struct <anon>& pMat)
+   77    inline-only   uint32_t GetNumMaterials(const struct <anon>* this)
+   78    inline-only   struct <anon>* GetMaterial(const struct <anon>* this, uint32_t index)
+   79    inline-only   void ClearMaterials(const struct <anon>* this)
+  101    inline-only   struct <anon>* GetInstance()
+  122  004C5A8C      4  void RNAMaterialMgr(const struct <anon>* this)
+  123  004C5A94      4  void ~RNAMaterialMgr(const struct <anon>* this)

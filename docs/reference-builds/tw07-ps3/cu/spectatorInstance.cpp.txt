@@ -1,0 +1,66 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Spectator/spectatorInstance.cpp
+// compiled in: golf2_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   25  001633C4    1CC  void CSpectatorInstance::Init(const struct CSpectatorInstance* this, struct CSpectatorCloneGroup* cloneGroup, uint8 textureVarient, uint8 colorVarient)
+                         local  bool isMarshall
+                         local  const SPECTATOR_MODEL modelType
+                         inlines  CPovVector3::operator=
+   84  001C223C    2F4  void CSpectatorInstance::SetPositionAndAngle(const struct CSpectatorInstance* this, const const struct CPovVector3& position, const const struct CPovVector3& target, bool smoothTurning, bool setbackup)
+                         local  struct CPovVector3 VectorToTarget
+                         local  float tempCos
+                         local  float tempSin
+                         local  float tempAngle
+                         inlines  CPovVector3::GetX, CPovVector3::Normalize, CPovVector3::operator!=, CPovVector3::operator-, CPovVector3::operator=, std::atan2, std::cosf, std::sinf
+  159  001C3F9C    1A8  void CSpectatorInstance::ModifyPositionAndAngle(const struct CSpectatorInstance* this, const const struct CPovVector3& position, const const struct CPovVector3& target)
+                         local  struct CPovVector3 VectorToTarget
+                         inlines  CPovVector3::Normalize, CPovVector3::operator!=, CPovVector3::operator-, CPovVector3::operator=, std::atan2
+  194  0018985C     B4  void CSpectatorInstance::RestorePositionAndAngle(const struct CSpectatorInstance* this)
+                         inlines  CPovVector3::operator=, std::cos, std::sin
+  210  0016F9B4     A0  void CSpectatorInstance::SetIsUsed(const struct CSpectatorInstance* this, uint8 val)
+                         inlines  CSpectatorCloneGroup::IncNumUsedInstances
+  235  00189A94     90  void CSpectatorInstance::SetPipViewAngle(const struct CSpectatorInstance* this, float angle)
+                         inlines  std::cos, std::sin
+  247  00172800    1E4  void CSpectatorInstance::SetupRenderTfm(const struct CSpectatorInstance* this, const const struct CPovVector3& scale, bool prerender)
+                         local  struct CPovMatrix4x4 worldMatrix
+                         local  float cosAngle
+                         local  float sinAngle
+                         local  int32[4] vars
+                         inlines  CPovMatrix4x4::operator=, CPovMatrix4x4::operator[], CPovVector4::operator=, CPovVector4::operator[]
+  299  0015363C     FC  void CSpectatorInstance::SetStopPosition(const struct CSpectatorInstance* this, const const struct CPovVector3& stopPos)
+                         inlines  CPovVector3::GetY, CPovVector3::Set
+  306  00161E88    258  void CSpectatorInstance::SetOverridePose(const struct CSpectatorInstance* this, struct CSpectatorPose* pPose, bool simple)
+                         local  struct CSpectatorCloneGroup* pCloneGroup
+                         local  bool not_used
+                         local  CSpectatorInstanceList* pMovers
+                         local  struct CSpectatorInstance* pEnd
+                         local  struct CSpectatorInstance* pMover
+                         local  CSpectatorInstanceList* pMovers
+                         local  struct CSpectatorInstance* pEnd
+                         local  struct CSpectatorInstance* pMover
+                         local  CSpectatorInstanceList* pMovers
+                         local  struct CSpectatorInstance* pEnd
+                         local  struct CSpectatorInstance* pMover
+                         inlines  CPovLink<CSpectatorInstance>::GetNext, CPovLinkedList<CSpectatorInstance>::End, CPovLinkedList<CSpectatorInstance>::First, CSpectatorCloneGroup::SetOverridePose, CSpectatorInstance::GetCloneGroup
+  466  00163590    188  bool CSpectatorInstance::SetOverrideBlend(const struct CSpectatorInstance* this, bool blend_in, uint8 blend_frames)
+  513  0014152C     1C  void CSpectatorInstance::LinkOverrideBlend(const struct CSpectatorInstance* this, struct CSpectatorInstance* inst)
+  520  001540FC     50  void CSpectatorInstance::TerminateBlendPose(const struct CSpectatorInstance* this)
+  535  001622CC    69C  void CSpectatorInstance::UpdateOverrideBlend(const struct CSpectatorInstance* this)
+                         local  int nBones
+                         local  float lerp
+                         local  float[2][15][4] blend
+                         local  float[15][3] trans
+                         local  mat44flt mat
+                         local  mat44flt* modelToWorld
+                         local  mat44flt* bindmat
+                         local  mat44flt MBone2Model
+                         local  mat44flt MBone2ModelBind
+                         local  const short unsigned int[16] remapping
+                         local  int i
+                         local  int x
+                         local  int y
+                         local  int i
+                         local  int x
+                         local  int y
+                         local  const float scale
+                         inlines  CSpectatorPose::GetBoneToWorldMats

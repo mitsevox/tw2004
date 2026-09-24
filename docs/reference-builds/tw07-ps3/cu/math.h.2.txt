@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/target/ppu/include/math.h
+// compiled in: ExprNode.cpp, RNABuilderTarget.cpp
+// 4 functions, source order. line | PS3 address | size
+
+  251    inline-only   int std::fpclassify(float _Left)
+  283    inline-only   bool std::isfinite<float>(float _Left)
+  779    inline-only   float std::fabs(float _Left)
+  856  007D9610     54  float std::sqrt(float _Left)

@@ -1,0 +1,527 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameModeDriver_PGATour.cpp
+// compiled in: golf_unity.cpp
+// 173 functions, source order. line | PS3 address | size
+
+   98  00256744     40  void GameModeDriverPGATour::GameModeDriverPGATour(const struct GameModeDriverPGATour* this)
+  106  00208850     18  void GameModeDriverPGATour::~GameModeDriverPGATour(const struct GameModeDriverPGATour* this)
+  111  002088CC     1C  bool GameModeDriverPGATour::QueryInterface(const struct GameModeDriverPGATour* this, enum GM_DriverType_t typeID, const void*& ptr)
+                         local  bool bRet
+  125  00238CA4     F0  float GameModeDriverPGATour::GetGameModeDriverCompletionPercentage(const const struct GameModeDriverPGATour* this, const struct UserInfo& userInfo)
+                         local  float fRet
+                         local  int nNumEvents
+                         local  int nNumEventsFinishedInTop10
+                         local  const GM_Pga_UserStats* pUserStats
+                         local  const float dPercent
+                         local  int i
+  151  002088E8     44  int32 GameModeDriverPGATour::GetEndGameSequence(const struct GameModeDriverPGATour* this)
+                         local  int32 sequence
+  162  0020892C      C  void GameModeDriverPGATour::Reset(const struct GameModeDriverPGATour* this)
+  167  00208A60      8  bool GameModeDriverPGATour::AreGuestsCached(const struct GameModeDriverPGATour* this)
+  172  0023A748     E0  void GameModeDriverPGATour::SetUpCachedGuests(const struct GameModeDriverPGATour* this)
+                         local  int nGuests
+                         local  int guestIndex
+                         local  enum UserNumber userNumber
+  183  00239380     B4  CalendarDate GameModeDriverPGATour::UI_GetCalendarInitialDate(const struct GameModeDriverPGATour* this)
+                         local  const struct SeasonInfo& tourData
+                         local  GM_PgaTourEventID_t eventID
+                         inlines  UserInfo::GetPGATourData
+  196  00279668    494  void GameModeDriverPGATour::UI_SetEventInfoText(const struct GameModeDriverPGATour* this, CalendarDate date)
+                         local  struct UICalendar* calendar
+                         local  GM_PgaTourEventID_t eventID
+                         local  char[80] strBuf
+                         local  int32 round
+                         local  CalendarDate startDate
+                         local  CalendarDate endDate
+                         local  enum GM_CourseType_t courseHash
+                         local  enum GM_CourseType_t courseIndex
+                         local  char*[12] aszCourseLocations
+  264  0026749C    164  bool GameModeDriverPGATour::UI_CanPlayEventOnDate(const struct GameModeDriverPGATour* this, CalendarDate date)
+                         local  GM_PgaTourEventID_t eventID
+                         local  int32 round
+                         local  struct SeasonInfo* pTourData
+                         local  CalendarDate firstDayCurTour
+                         local  uint32 year
+                         local  uint32 curYear
+                         inlines  UserInfo::GetPGATourData
+  303  00208DF8    304  void GameModeDriverPGATour::RegisterStreamClients()
+                         local  char* pStrTable
+                         local  uint32 datasize
+  367  002090FC     DC  void GameModeDriverPGATour::UnregisterStreamClients()
+  393  00242354    11C  void GameModeDriverPGATour::Locale_PgaTourMode_LoadPGAnFromStream(struct TStreamData* pStreamData)
+                         local  const char[38] __FUNCTION__
+                         local  char* pStrTable
+                         local  uint32 datasize
+                         inlines  TagValuePair, operator+
+  409  00242474    11C  void GameModeDriverPGATour::Locale_PgaTourMode_LoadPGn2FromStream(struct TStreamData* pStreamData)
+                         local  const char[38] __FUNCTION__
+                         local  char* pStrTable
+                         local  uint32 datasize
+                         inlines  TagValuePair, operator+
+  425  002091D8     40  void GameModeDriverPGATour::Locale_PgaTourMode_LoadPGAcFromStream(struct TStreamData* pStreamData)
+  431  00209218     40  void GameModeDriverPGATour::Locale_PgaTourMode_LoadPGAeFromStream(struct TStreamData* pStreamData)
+  437  00242594    13C  void GameModeDriverPGATour::Locale_PgaTourMode_LoadPGAsFromStream(struct TStreamData* pStreamData)
+                         local  const char[38] __FUNCTION__
+                         local  char* pStrTable
+                         local  uint32 datasize
+                         inlines  TagValuePair, operator+
+  452  00209258     40  void GameModeDriverPGATour::Locale_PgaTourMode_LoadPGnlFromStream(struct TStreamData* pStreamData)
+  457  002D0874    224  void GameModeDriverPGATour::StartEvent(const struct GameModeDriverPGATour* this)
+                         local  int32 eventID
+                         local  int32 round
+                         local  bool validEvent
+  522  0024B030     30  bool GameModeDriverPGATour::HasUserStartedThisPartOfTheGame(const struct GameModeDriverPGATour* this)
+  610  002D021C    658  void GameModeDriverPGATour::PrepareForTeeOff(const struct GameModeDriverPGATour* this)
+                         local  struct GamePlayer* pPlayer
+                         local  enum PlayerNumber_t userID
+                         local  int32 selectedEvent
+                         local  GM_Pga_StatCounts* pStatCounts
+                         local  GM_Pga_StatCounts* pStatCountsGuest1
+                         local  GM_Pga_StatCounts* pStatCountsGuest2
+                         local  GM_Pga_StatCounts* pStatCountsGuest3
+                         local  int32 tour_num
+                         local  int aiLowScoreForRound
+                         local  const struct UserInfo& userInfo
+                         local  int32 i
+                         local  enum PgaTourSim_SimRound_Flags_t simRoundFlags
+                         local  bool skipTournament
+                         local  int nGuests
+                         inlines  GM_SelectHoleSet, GM_SelectSingleHole
+  759  002F92CC     98  void GameModeDriverPGATour::PostHoleLoadInit(const struct GameModeDriverPGATour* this)
+                         local  enum PlayerNumber_t userID
+                         local  int32 i
+                         inlines  GM_IsPlayoff
+  778  00332E1C    14C  bool GameModeDriverPGATour::GameFinished(const struct GameModeDriverPGATour* this, bool bPredict)
+                         local  int32 i
+                         inlines  GM_GetCurrentHoleIndex, GM_GetCurrentRound, GM_GetNumberRoundsToPlay, GM_IsPlayoff
+  809  002FAD44    1FC  bool GameModeDriverPGATour::GoToPlayoff(const struct GameModeDriverPGATour* this, bool bPredict)
+                         local  bool playoff
+                         local  int32 numPlayers
+                         local  int32 i
+                         local  int32 j
+                         inlines  GM_SelectHoleSet, GM_SelectSingleHole, GM_SetPlayerHoleStrokes
+  854  0023A930    148  void GameModeDriverPGATour::QuitGame(const struct GameModeDriverPGATour* this)
+                         local  enum PlayerNumber_t userID
+                         local  const struct UserInfo& userInfo
+                         inlines  UserInfo::GetPGATourData
+  891  002FAF40    1C8  void GameModeDriverPGATour::StartGamePreData(const struct GameModeDriverPGATour* this)
+                         local  const struct UserInfo& userInfo
+                         local  int32 selectedEvent
+                         local  int32 i
+                         local  int i
+                         local  int playerID
+                         inlines  GM_SetPlayerHoleStrokes
+  925  00334244     C4  void GameModeDriverPGATour::EndHole(const struct GameModeDriverPGATour* this)
+                         local  enum PlayerNumber_t userID
+                         local  int32 hole
+                         local  int32 entrantID
+                         inlines  GM_GetCurrentHoleIndex, GM_IsPlayoff
+  943  0033398C    2FC  void GameModeDriverPGATour::EndGame(const struct GameModeDriverPGATour* this)
+                         local  enum PlayerNumber_t userID
+                         local  int32 entrantID
+                         local  int32 userScore
+                         local  int32 selectedEvent
+                         local  int32 tour_num
+                         local  struct PGATourSeason_EventData* pEventData
+                         local  GM_Pga_UserStats* pUserStats
+                         inlines  GameModeDriverPGATour::SetJustFinishedPGATourRound
+ 1021  00238D94     D8  enum GM_CourseType_t GameModeDriverPGATour::GetCurrentCourse(const struct GameModeDriverPGATour* this)
+                         local  enum PlayerNumber_t userID
+                         local  int32 selectedEvent
+                         local  const struct GM_PgaTour_EventSlot_t* eventInfo
+                         local  int32 currentSeason
+                         local  int32 currentRound
+                         local  enum GM_CourseType_t course
+ 1048  00209760     AC  enum GM_CourseType_t GameModeDriverPGATour::GetCourseByEventSeasonRound(const struct GameModeDriverPGATour* this, const struct GM_PgaTour_EventSlot_t* selectedEvent, int32 currentSeason, int32 currentRound)
+                         local  int tournament
+                         local  enum GM_CourseType_t course
+ 1059  002094EC    274  Course_t GameModeDriverPGATour::GetCourseByTourneySeasonRound(const struct GameModeDriverPGATour* this, int32 tour_num, int32 currentSeason, int32 currentRound)
+                         local  int32 courseListID
+                         local  int count
+                         local  int period
+                         local  int index
+                         local  struct YearCourse_t* yearCourse
+                         local  Course_t course
+ 1099  0020629C    120  const char* GameModeDriverPGATour::GetNameByEventSeason(const struct GameModeDriverPGATour* this, int32 eventID, int32 season)
+                         local  int32 nameChangeListID
+                         local  int period
+                         local  char* strings
+                         local  int index
+ 1142  00208CB8     60  bool GameModeDriverPGATour::GetEventByDateMDY(const struct GameModeDriverPGATour* this, uint32 month, uint32 day, uint32 year, GM_PgaTourEventID_t* pEventID, int32* pRound)
+                         local  CalendarDate date
+ 1152  00208B54    164  bool GameModeDriverPGATour::GetEventByDate(const struct GameModeDriverPGATour* this, CalendarDate date, GM_PgaTourEventID_t* pEventID, int32* pRound)
+                         local  uint32 month
+                         local  uint32 day
+                         local  uint32 year
+                         local  int32 yearIndex
+                         local  uint32 i
+                         local  int dayDelta
+                         local  bool found
+ 1194  002391C4     54  GM_PgaTourEventID_t GameModeDriverPGATour::GetNextEvent(const struct GameModeDriverPGATour* this)
+                         local  enum PlayerNumber_t userID
+ 1203  00239158     6C  GM_PgaTourEventID_t GameModeDriverPGATour::GetFinalEventOfSeason(const struct GameModeDriverPGATour* this)
+                         local  GM_PgaTourEventID_t eventID
+                         local  GM_PgaTourEventID_t nextEventID
+ 1218  0020980C     40  const struct GM_PgaTour_EventSlot_t* GameModeDriverPGATour::GetEventInfo(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID)
+                         local  const struct GM_PgaTour_EventSlot_t* pResult
+ 1231  0020984C     F0  int GameModeDriverPGATour::GetRounds(const struct GameModeDriverPGATour* this, int eventID)
+ 1247  0020993C     74  const struct GM_PgaTour_EventSlot_t* GameModeDriverPGATour::GetEventInfoByDate(const struct GameModeDriverPGATour* this, CalendarDate date)
+                         local  GM_PgaTourEventID_t eventID
+                         local  int32 eventDayNum
+ 1262  00208A9C     B8  CalendarDate GameModeDriverPGATour::GetStartDate(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID, int32 season)
+                         local  const struct GM_PgaTour_EventSlot_t* eventInfo
+ 1276  002099B0     C8  CalendarDate GameModeDriverPGATour::GetEndDate(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID, int32 season)
+                         local  const struct GM_PgaTour_EventSlot_t* eventInfo
+                         local  CalendarDate date
+ 1292  00238E6C     60  const char* GameModeDriverPGATour::GetName(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID)
+                         local  int32 season
+ 1303  00209A78     44  int32 GameModeDriverPGATour::GetTextureID(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID)
+                         local  const struct GM_PgaTour_EventSlot_t* eventInfo
+ 1310  00209ABC     64  const char* GameModeDriverPGATour::GetInitialChampName(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID)
+ 1316  00209B20     2C  int32 GameModeDriverPGATour::GetInitialChampScore(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID)
+ 1321  00238ECC    124  int32 GameModeDriverPGATour::GetCourses(const struct GameModeDriverPGATour* this, const struct GM_PgaTour_EventSlot_t* eventInfo, enum GM_CourseType_t* courses)
+                         local  int32 i
+                         local  int32 iRetVal
+                         local  int32 season
+                         local  struct Tournament_events_t* event
+                         local  int nRounds
+ 1372  00266F84    2F8  bool GameModeDriverPGATour::CriteriaSatisfied(const struct GameModeDriverPGATour* this, enum ePGA_EntryCriteria entryCriteria, int32 entryValue, int32 eventID)
+                         local  bool satisfied
+                         local  int32 userRank
+                         local  int32 wins
+                         local  int qualifyingEventID
+ 1520  0026727C    220  bool GameModeDriverPGATour::CheckCriteria(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID)
+                         local  bool satisfied
+                         local  bool satisfied1
+                         local  bool satisfied2
+                         local  int32 criteriaID
+                         local  enum ePGA_EntryCriteria entryCriteria1
+                         local  int32 entryValue1
+                         local  enum ePGA_LogicalOperator logicalOperator
+                         local  enum ePGA_EntryCriteria entryCriteria2
+                         local  int32 entryValue2
+ 1572  00208D18     E0  const char* GameModeDriverPGATour::GetEntryString(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID)
+                         local  int32 criteriaID
+ 1579  00209BF0     78  int32 GameModeDriverPGATour::GetFirstPrizeForBracket(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID, int32 bracket)
+                         local  const struct GM_PgaTour_EventSlot_t* pEventInfo
+                         local  int32 firstPrize
+                         local  float firstPrizeForBracket
+ 1588  00209D0C     F4  int32 GameModeDriverPGATour::GetPurseForBracket(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID, int32 bracket)
+                         local  const struct GM_PgaTour_EventSlot_t* pEventInfo
+                         local  int32 purse
+                         local  float purseForBracket
+                         local  bool bTourDifficulty
+ 1608  00209B4C     A4  float GameModeDriverPGATour::ComputeFirstPrizeForBracket(const struct GameModeDriverPGATour* this, int32 firstPrize, int32 bracket)
+                         local  float increment
+ 1616  00209C68     A4  float GameModeDriverPGATour::ComputePurseForBracket(const struct GameModeDriverPGATour* this, int32 purse, int32 bracket)
+                         local  float increment
+ 1624  00209EA4     78  int32 GameModeDriverPGATour::GetDevPointsFirstPrizeForBracket(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID, int32 bracket)
+                         local  const struct GM_PgaTour_EventSlot_t* pEventInfo
+                         local  int32 devPoints
+                         local  float devPointsForBracket
+ 1636  002A6ED4    28C  int32 GameModeDriverPGATour::GetDevPointsPurseForBracket(const struct GameModeDriverPGATour* this, enum PlayerNumber_t userID)
+                         local  GM_PgaTourEventID_t eventID
+                         local  int32 bracket
+                         local  int rank
+                         local  int32 devPointFirstPrize
+                         local  bool bTourDifficulty
+                         local  float multiplier
+                         local  float devPointsPurseForBracket
+                         local  int i
+ 1679  00209E00     A4  float GameModeDriverPGATour::ComputeDevPointsFirstPrizeForBracket(const struct GameModeDriverPGATour* this, int32 firstPrize, int32 bracket)
+                         local  float increment
+ 1687  00209F1C     2C  int32 GameModeDriverPGATour::GetPgaTourTournament(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID)
+ 1692  002094BC     2C  int32 GameModeDriverPGATour::GetScenario(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID)
+ 1697  00209438     2C  int32 GameModeDriverPGATour::GetMinField(const struct GameModeDriverPGATour* this, int32 tour_num)
+ 1702  00209464     2C  int32 GameModeDriverPGATour::GetMaxField(const struct GameModeDriverPGATour* this, int32 tour_num)
+ 1707  00238FF0     70  Course_t GameModeDriverPGATour::GetTournamentCourse(const struct GameModeDriverPGATour* this, int32 tour_num, int32 round)
+                         local  int32 season
+ 1718  00209F48     3C  int32 GameModeDriverPGATour::GetTee(const struct GameModeDriverPGATour* this, int32 tour_num, int32 round)
+ 1729  00209F84     3C  int32 GameModeDriverPGATour::GetPinPosition(const struct GameModeDriverPGATour* this, int32 tour_num, int32 round)
+ 1734  00209FC0     A8  int32 GameModeDriverPGATour::GetGreenSpeed(const struct GameModeDriverPGATour* this, int32 tour_num, int32 round)
+ 1742  0020A068     A8  int32 GameModeDriverPGATour::GetGreenHardness(const struct GameModeDriverPGATour* this, int32 tour_num, int32 round)
+ 1751  0020A110     A8  int32 GameModeDriverPGATour::GetFairwaySpeed(const struct GameModeDriverPGATour* this, int32 tour_num, int32 round)
+ 1760  0020A1B8     A8  int32 GameModeDriverPGATour::GetRoughLength(const struct GameModeDriverPGATour* this, int32 tour_num, int32 round)
+ 1769  0020A260     A8  int32 GameModeDriverPGATour::GetWindSpeed(const struct GameModeDriverPGATour* this, int32 tour_num, int32 round)
+ 1778  0020A308     AC  bool GameModeDriverPGATour::GetTournamentStructure(const struct GameModeDriverPGATour* this, int32 tour_num, int32 round)
+ 1787  0020A3B4     A8  int32 GameModeDriverPGATour::GetCrowdSize(const struct GameModeDriverPGATour* this, int32 tour_num, int32 round)
+ 1795  0020A45C      8  int32 GameModeDriverPGATour::GetTimeOfDay(const struct GameModeDriverPGATour* this, int32 tour_num, int32 round)
+ 1804  0020A464     3C  bool GameModeDriverPGATour::IsAMajor(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID)
+ 1809  0020A4A0     2C  int32 GameModeDriverPGATour::GetLegendCoinAward(const struct GameModeDriverPGATour* this, int32 rank)
+ 1814  00239060     F8  GM_PgaTourEventID_t GameModeDriverPGATour::GetEventOnOrAfter(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID)
+                         local  enum PlayerNumber_t userID
+                         local  const struct GM_PgaTour_EventSlot_t* pEventInfo
+                         local  GM_PgaTourEventID_t result
+                         local  bool done
+ 1849  00209490     2C  int32 GameModeDriverPGATour::GetCutRank(const struct GameModeDriverPGATour* this, int32 tour_num)
+ 1855  0020940C     2C  int32 GameModeDriverPGATour::GetFirstRoundAIScore(const struct GameModeDriverPGATour* this, int32 tour_num)
+ 1860  0020A4CC     2C  int32 GameModeDriverPGATour::GetAnyRoundLowScore(const struct GameModeDriverPGATour* this, int32 tour_num)
+ 1884  0023AAFC     64  bool GameModeDriverPGATour::StartingFresh(const struct GameModeDriverPGATour* this)
+                         local  bool freshStart
+                         local  enum PlayerNumber_t userID
+                         local  int season
+                         local  int eventsPlayed
+ 1898  00285028     30  bool GameModeDriverPGATour::AtBeginningOfSeason(const struct GameModeDriverPGATour* this)
+ 2022  0020A4F8    1F0  int GameModeDriverPGATour::GetFedExPoints(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID, unsigned int rank)
+                         local  enum ePGA_FedExPointType type
+                         local  int points
+ 2059  0020A6E8     78  int GameModeDriverPGATour::GetFedExInitialPlayoffPoints(const struct GameModeDriverPGATour* this, int rank)
+                         local  int points
+ 2070  0023AD04     7C  void GameModeDriverPGATour::InitFedExPoints(const struct GameModeDriverPGATour* this)
+                         local  enum PlayerNumber_t userID
+                         local  uint32 i
+ 2155  0020A760     74  bool GameModeDriverPGATour::IsFedExPlayoff(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID)
+ 2161  0020A7D4     5C  bool GameModeDriverPGATour::IsFirstFedExPlayoff(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID)
+ 2189  00266ED0     B4  bool GameModeDriverPGATour::QualifiedForFedEx(const struct GameModeDriverPGATour* this, enum PlayerNumber_t userID)
+ 2198  00264054     5C  static void PGADriver_ShowCalendar()
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen
+ 2205  002CFBD8     64  static void PGADriver_ShowCalendar_AdvanceSeason()
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen
+ 2213  00285058    150  void GameModeDriverPGATour::CheckFedExQualify(const struct GameModeDriverPGATour* this, enum PlayerNumber_t userID)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen
+ 2239  0020A830      C  const struct PgaTour_WinInfo* GameModeDriverPGATour::GetWinInfo(const struct GameModeDriverPGATour* this)
+ 2245  002CFD84    200  void GameModeDriverPGATour::CheckAdvanceTournament(const struct GameModeDriverPGATour* this, enum PlayerNumber_t userID, bool simmedRound)
+                         local  int selectedEvent
+                         local  int iRoundsToPlay
+                         local  int iCurrentRound
+                         local  int entrantID
+ 2304  002A6E84     50  void GameModeDriverPGATour::AwardMoney(const struct GameModeDriverPGATour* this, enum PlayerNumber_t userID, int32 cash)
+                         local  int32 entrantID
+ 2313  002CF6F4    184  void GameModeDriverPGATour::SimCurrentTournament(const struct GameModeDriverPGATour* this, enum PlayerNumber_t userID, bool simUser)
+                         local  const struct GM_PgaTour_EventSlot_t* pEventInfo
+                         local  int32 nRounds
+ 2335  002CF160    30C  void GameModeDriverPGATour::SimCurrentRound(const struct GameModeDriverPGATour* this, enum PlayerNumber_t userID, bool simUser)
+                         local  const struct GM_PgaTour_EventSlot_t* pEventInfo
+                         local  int32 selectedEvent
+                         local  int32 tour_num
+                         local  int aiLowScoreForRound
+                         local  enum PgaTourSim_SimRound_Flags_t simRoundFlags
+                         local  enum GM_CourseType_t courseID
+                         local  bool skipTournament
+                         inlines  GM_SetCurrentCourse
+ 2393  00239218     6C  GM_PgaTourEventID_t GameModeDriverPGATour::GetSelectedEvent(const struct GameModeDriverPGATour* this, int32* pRound)
+ 2399  002CFC3C    148  void GameModeDriverPGATour::SelectEvent(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID)
+                         local  enum PlayerNumber_t userID
+                         local  bool simUser
+                         local  GM_PgaTourEventID_t dummy
+                         local  int32 round
+ 2426  002CF878    1A4  void GameModeDriverPGATour::SkipToEvent(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID, bool simUser, bool bSimThisEvent)
+                         local  enum PlayerNumber_t userID
+                         local  int entrantID
+ 2466  002CF46C     C8  void GameModeDriverPGATour::SkipToRound(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID, int32 round, bool simUser)
+                         local  enum PlayerNumber_t userID
+ 2478  002CF534    1C0  void GameModeDriverPGATour::SimulateRound(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID, int32 round)
+                         local  enum PlayerNumber_t userID
+ 2504  002CFA1C    1BC  void GameModeDriverPGATour::AdvanceSeason(const struct GameModeDriverPGATour* this)
+                         local  enum PlayerNumber_t userID
+                         local  GM_PgaTourEventID_t finalEventID
+ 2568  00239284     3C  int32 GameModeDriverPGATour::GetCurrentSeason(const struct GameModeDriverPGATour* this)
+ 2573  0020A890     44  int32 GameModeDriverPGATour::GetCurrentSeasonYear(const struct GameModeDriverPGATour* this)
+ 2578  0020A8D4     48  bool GameModeDriverPGATour::OnLastSeason(const struct GameModeDriverPGATour* this)
+ 2584  002392C0     3C  GM_PgaTourEventID_t GameModeDriverPGATour::GetCurrentEventID(const struct GameModeDriverPGATour* this)
+ 2589  002392FC     84  bool GameModeDriverPGATour::IsFinishedCurrentSeason(const struct GameModeDriverPGATour* this)
+                         local  GM_PgaTourEventID_t curEvtID
+                         local  uint16 numEventsPlayed
+ 2607  00239434     F8  void GameModeDriverPGATour::GetPurseString(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID, char* purse, size_t purseBufLen)
+                         local  struct PGATourSeason_EventData* pEvent
+                         local  enum PlayerNumber_t userID
+                         local  int32 bracket
+ 2625  002A6DA8     DC  void GameModeDriverPGATour::GetCurrentEventLeader(const struct GameModeDriverPGATour* this, char* leaderName, size_t bufLen)
+                         local  enum PlayerNumber_t userID
+                         local  int32 nFirstPlace
+                         local  int32 entrantID
+                         local  int32 golferID
+ 2646  002A7EE8     50  int32 GameModeDriverPGATour::GetCurrentLeaderScore(const struct GameModeDriverPGATour* this)
+                         local  enum PlayerNumber_t userID
+                         local  int32 entrantID
+                         local  int32 result
+                         local  bool isUserOrGuest
+ 2659  0023952C     F8  void GameModeDriverPGATour::GetWinnerEarningsString(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID, char* earnings, size_t earningsBufLen)
+                         local  struct PGATourSeason_EventData* pEvent
+                         local  enum PlayerNumber_t userID
+                         local  int32 bracket
+ 2677  002A7EA8     40  int32 GameModeDriverPGATour::GetUserScore(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID)
+ 2682  00239624    188  void GameModeDriverPGATour::GetUserFinishString(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID, char* finish, size_t finishBufLen)
+ 2701  002397AC     8C  void GameModeDriverPGATour::GetChamp(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID, char* champ, size_t champBufLen)
+ 2706  00239838     54  int32 GameModeDriverPGATour::GetChampScore(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t eventID)
+ 2711  002F9364    2CC  int32 GameModeDriverPGATour::DisplayEndOfHoleMessage(const struct GameModeDriverPGATour* this, char* message, size_t msgBufLen)
+                         local  enum PlayerNumber_t userID
+                         local  int32 numPlayoffEntrants
+                         local  char[128] userAndGuestNames
+                         local  int32 userInPlayoff
+                         local  int32 numGuestsInPlayoff
+                         local  int32 numNonCPUInPlayoff
+                         local  int32 numCPUInPlayoff
+                         local  int32 selectedEvent
+                         local  int32 tour_num
+                         local  int32 cutRank
+                         inlines  GM_IsPlayoff
+ 2787  0023988C     3C  int32 GameModeDriverPGATour::GetUsersCurrentEventID(const struct GameModeDriverPGATour* this, enum PlayerNumber_t userID)
+ 2792  002398C8     78  int32 GameModeDriverPGATour::GetCurrentTourNum(const struct GameModeDriverPGATour* this)
+                         local  int32 selectedEvent
+                         local  int32 tour_num
+ 2801  0020A91C     70  uint64 GameModeDriverPGATour::GetOptionTimeStamp(const struct GameModeDriverPGATour* this, int32 nIndex)
+ 2807  0020A98C     7C  void GameModeDriverPGATour::SetOptionTimeStamp(const struct GameModeDriverPGATour* this, int32 nIndex, uint64 nValue)
+ 2813  0020AA08     70  uint64 GameModeDriverPGATour::GetGuestTimeStamp(const struct GameModeDriverPGATour* this, int32 nIndex)
+ 2819  0020AA78     7C  void GameModeDriverPGATour::SetGuestTimeStamp(const struct GameModeDriverPGATour* this, int32 nIndex, uint64 nValue)
+ 2829  00244320      8  void GameModeDriverPGATour::LoadPGAcFromStream(struct TStreamData* pStreamData)
+ 2837  0020AAF4     40  void GameModeDriverPGATour::LoadPGAtFromStream(struct TStreamData* pStreamData)
+ 2855  00244318      8  void GameModeDriverPGATour::LoadPGAnFromStream(struct TStreamData* pStreamData)
+ 2860  0020AB34     40  void GameModeDriverPGATour::LoadPGALegendCoins(struct TStreamData* pStreamData)
+ 2868  00244310      8  void GameModeDriverPGATour::LoadPGAeFromStream(struct TStreamData* pStreamData)
+ 2876  00244308      8  void GameModeDriverPGATour::LoadPGAsFromStream(struct TStreamData* pStreamData)
+ 2884  0020AB74     40  void GameModeDriverPGATour::LoadPGAyFromStream(struct TStreamData* pStreamData)
+ 2892  0020ABB4     40  void GameModeDriverPGATour::LoadPGArFromStream(struct TStreamData* pStreamData)
+ 2900  00244300      8  void GameModeDriverPGATour::LoadPGnlFromStream(struct TStreamData* pStreamData)
+ 2908  002442F8      8  void GameModeDriverPGATour::LoadPGn2FromStream(struct TStreamData* pStreamData)
+ 2927  0020ABF4     40  void GameModeDriverPGATour::LoadPGfpFromStream(struct TStreamData* pStreamData)
+ 2936  0020AC34     40  void GameModeDriverPGATour::LoadPGSTfromStream(struct TStreamData* pStreamData)
+ 2943  00332F68    13C  bool GameModeDriverPGATour::IsPuttForLead(const struct GameModeDriverPGATour* this, enum PlayerNumber_t playerID)
+                         local  bool result
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_IsPlayoff
+ 2962  0032E778    180  bool GameModeDriverPGATour::IsPuttForWin(const struct GameModeDriverPGATour* this, enum PlayerNumber_t playerID)
+                         local  bool result
+                         local  int nRounds
+                         inlines  GM_GetNumHolesRemainingInRound, GM_IsPlayoff
+ 2990  003330A4     F8  int32 GameModeDriverPGATour::GetCurrentLead(const struct GameModeDriverPGATour* this, enum PlayerNumber_t playerID)
+                         local  int32 result
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_IsPlayoff
+ 3006  0033319C    100  int32 GameModeDriverPGATour::GetPotentialLead(const struct GameModeDriverPGATour* this, enum PlayerNumber_t playerID)
+                         local  int32 result
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_IsPlayoff
+ 3025  0020AC74     24  void GameModeDriverPGATour::SaveGamePlayOptions(const struct GameModeDriverPGATour* this)
+ 3030  0020AC98     BC  float GameModeDriverPGATour::ConvertCrowdSizeToDensity(const struct GameModeDriverPGATour* this, int32 crowdSize)
+                         local  float density
+ 3039  0020AD54     DC  void GameModeDriverPGATour::SetGamePlayOptions(const struct GameModeDriverPGATour* this, int32 tournament, int32 currentRound)
+                         local  int32 crowdSize
+                         local  float crowdDensity
+ 3063  002094E8      4  void GameModeDriverPGATour::RestoreGamePlayOptions(const struct GameModeDriverPGATour* this)
+ 3070  002CFF84    298  void GameModeDriverPGATour::SetTournament(const struct GameModeDriverPGATour* this, int32 tournament)
+                         local  int32 tournamentIndex
+                         local  int32 currentRound
+                         local  int32 currentSeason
+                         local  enum PlayerNumber_t userID
+                         local  int32 i
+                         local  int32 h
+                         inlines  GM_GetCurrentRound, GM_SetCurrentCourse, GM_SetTargetCup, cGAME_GLOBALS::SetTimeOfDaySet
+ 3125  00239940    14C  void GameModeDriverPGATour::PlayEndOfGameMovies(const struct GameModeDriverPGATour* this)
+                         local  enum PlayerNumber_t userID
+                         local  const struct GM_PgaTour_EventSlot_t* pEventInfo
+                         local  int32 entrantID
+                         local  int32 i
+                         local  int32 numMajors
+ 3184  0033329C    6F0  void GameModeDriverPGATour::EndTournament(const struct GameModeDriverPGATour* this, enum PlayerNumber_t userID)
+                         local  int32 winnings
+                         local  int32 entrantID
+                         local  int32 currBracket
+                         local  const struct GM_PgaTour_EventSlot_t* pEventInfo
+                         local  bool userWon
+                         local  uint16 winningScore
+                         local  int32 nRank
+                         local  int32 nLegendCoins
+                         local  struct CourseMoneyTracking_t courseMoneyTracking
+                         local  int32 strokesWonBy
+                         local  int32 winningDevPoints
+                         local  int32 curDevPoints
+                         local  enum PlayerNumber_t playerID
+                         local  GM_Pga_UserStats* pUserStats
+                         local  int secondPlace_entrantID
+                         local  uint16 secondPlaceScore
+                         local  int currentHoleIndex
+                         local  int secondPlaceScore
+                         local  int eventID
+                         local  int32 winningCash
+                         inlines  GM_GetCurrentHoleIndex, GM_IsPlayoff, GamePlayer::GetGolferBonus, UserInfo::GetDevPoints, UserInfo::IncDevCapLevelWins, UserInfo::SetDevPoints
+ 3329  002A7C8C    21C  void GameModeDriverPGATour::AdvanceEvent(const struct GameModeDriverPGATour* this, enum PlayerNumber_t userID)
+                         local  struct PgaTourSim_Tournament_MC_t* pTourney
+                         local  struct PGATourSeason_EventData* pEvent
+                         local  int32 iWinnerEntry
+                         local  int32 golferID
+ 3409  0023C5B4    1F4  void GameModeDriverPGATour::CommitUserOrGuestRoundStatCounts(const struct GameModeDriverPGATour* this, enum PlayerNumber_t userID, int32 entrantID)
+                         local  GM_Pga_StatCounts* pSrcStatCounts
+                         local  GM_Pga_StatCounts* pDstStatCounts
+ 3441  00239A8C     74  uint16 GameModeDriverPGATour::GetCurrentBracket(const struct GameModeDriverPGATour* this, enum PlayerNumber_t userID)
+ 3447  00239B00     80  void GameModeDriverPGATour::SetCurrentBracket(const struct GameModeDriverPGATour* this, enum PlayerNumber_t userID, uint16 bracket)
+ 3453  0020AF20    1AC  uint16 GameModeDriverPGATour::ComputeBracket(const struct GameModeDriverPGATour* this, enum PlayerNumber_t userID, int32 strokesWonBy)
+                         local  uint16 bracket
+ 3490  00334200     44  void GM_PgaTour_UpdateUserOrGuestStats(enum PlayerNumber_t userID, int32 entrantID)
+                         local  struct GameModeDriverPGATour* pPGA
+ 3496  00333C88    578  void GameModeDriverPGATour::UpdateUserOrGuestStats(const struct GameModeDriverPGATour* this, enum PlayerNumber_t userID, int32 entrantID)
+                         local  GM_Pga_StatCounts* pStatCounts
+                         local  struct GamePlayer* pPlayer
+                         local  int32 hole
+                         local  int32 par
+                         local  int32 strokes
+                         local  int32 putts
+                         local  int32 roundScore
+                         local  int32 puttDistance
+                         local  bool gotBirdie
+                         local  int prevHole
+                         inlines  GM_GetCurrentHoleIndex, GamePlayer::GetGolferBonus, GamePlayer::GetGolferScore
+ 3706  0020B3DC    180  void GameModeDriverPGATour::GetTimeOfDayFromRank(const struct GameModeDriverPGATour* this, int8* hour, int8* minute, int32 rank)
+ 3731  0020AE30     58  enum SEASON_e GameModeDriverPGATour::GetSeasonFromMonth(const struct GameModeDriverPGATour* this, uint32 month)
+                         local  enum SEASON_e season
+ 3762  0020AE88     74  int32 GameModeDriverPGATour::GetNumEventsWon(const const struct GameModeDriverPGATour* this, const struct UserInfo& userInfo)
+                         local  int32 numWon
+                         local  uint32 i
+ 3777  0024D8F0    2EC  void GameModeDriverPGATour::GetUserAndGuestNameList(const struct GameModeDriverPGATour* this, char* names, size_t namesBufLen, bool cut)
+                         local  char[128] namesString
+                         local  char* stringPtr
+                         local  int32 stringBufLen
+                         local  const struct UserInfo& userInfo
+                         local  int32 stringLen
+                         local  int32 i
+                         local  int32 stringLen
+                         local  int32 stringLen
+                         local  int32 i
+                         local  int32 stringLen
+                         inlines  UserInfo::GetUserName
+ 3835  0024DBDC    1D0  void GameModeDriverPGATour::GetUserAndGuestNamesInPlayoff(const struct GameModeDriverPGATour* this, char* names, size_t namesBufLen)
+                         local  char[128] namesString
+                         local  char* stringPtr
+                         local  int stringBufLen
+                         local  const struct UserInfo& userInfo
+                         local  int stringLen
+                         local  int i
+                         local  int stringLen
+                         inlines  UserInfo::GetUserName
+ 3867  00239B80    1D8  void GameModeDriverPGATour::SetupGuestAndAIPlayers(const struct GameModeDriverPGATour* this)
+                         local  const struct UserInfo& userInfo
+                         local  int32 round
+                         local  enum GM_ModeType_t mode
+                         local  int32 i
+                         local  int32 nRequiredAIs
+                         local  int32 index
+                         local  int32 i
+                         local  int32 rnd
+ 3906  00209298     B4  enum GM_ModeType_t GameModeDriverPGATour::GetGameModeForEvent(const struct GameModeDriverPGATour* this, GM_PgaTourEventID_t event)
+                         local  int32 nTournament
+ 3914  0032E6B4     C4  void GameModeDriverPGATour::GetCurrentScoreString(const struct GameModeDriverPGATour* this, char* strBuf, int32 bufferSize)
+                         local  int32 curScore
+                         local  const char* prefix
+ 3935  0020B55C     40  static struct GameModeDriverPGATour* PGAPtr()
+                         local  void* ptr
+ 3958  002A1AC8     D0  struct GameModeDriverPGATour* PGADriver()
+                         local  void* ptr
+                         local  struct GameModeDriverPGATour* pPGADriver
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+ 3972  0020B59C     50  bool GameModeDriverPGATour::IsSpudHudUsed(const struct GameModeDriverPGATour* this)
+ 3977  002851A8     E8  uint32 GameModeDriverPGATour::GetPostGameContext(const struct GameModeDriverPGATour* this, uint32 prevContext)
+                         local  uint32 contextFlag
+ 4032  002AB5E8     4C  bool GM_Currently_PgaTourMode()
+ 4065  002AB5A0     48  GM_PgaTourEventID_t GM_PgaTourMode_GetNextEvent()
+ 4070  002AB308     58  int32 GM_PgaTourMode_GetRounds(GM_PgaTourEventID_t eventID)
+ 4124  002AB29C     6C  GM_PgaTourEventID_t GM_PgaTour_GetCurrentEventID()
+                         local  GM_PgaTourEventID_t nRet
+                         local  void* ptr
+                         local  struct GameModeDriverPGATour* pgaDriver
+ 4340  0020B5EC      4  void GM_PgaTourMode_RegisterStreamClients()
+ 4345  0020B5F0      4  void GM_PgaTourMode_UnRegisterStreamClients()
+ 4442  0020B5F4     18  void GM_SetPgaTourMode_inFE(bool pgaTourMode)
+ 4447  0020B60C     18  bool GM_Currently_PgaTourMode_inFE()
+ 4582  0020B624     74  const struct GM_PgaTour_EventSlot_t* GM_PgaTourMode_GetEventInfoByDate(CalendarDate date)
+                         local  const struct GM_PgaTour_EventSlot_t* ret
+ 4640  002AB254     48  const GM_Pga_StatCounts* GM_PgaTour_GetUserRoundStatCounts()
+ 4646  002AB1B4     A0  void PGATour_InitFE()
+                         local  enum GM_DriverType_t saveDriverType
+                         local  struct GameModeDriverPGATour* driver
+                         inlines  GameModeDriverPGATour::SetJustFinishedPGATourRound

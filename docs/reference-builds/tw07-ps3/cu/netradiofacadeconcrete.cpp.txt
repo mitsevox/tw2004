@@ -1,0 +1,17 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/netradio/source/common/netradiofacadeconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   69  005F59E4     A0  void NetRadioFacadeConcrete(const struct <anon>* this)
+                         inlines  GetInstance, NetRadioFacade, RCPointer
+  100  005E51F0     B0  void ~NetRadioFacadeConcrete(const struct <anon>* this)
+                         inlines  GetInstance, operator delete, ~NetRadioFacade, ~RCPointer
+  126  005F5B24     58  void CreateFacade()
+                         inlines  operator new
+  154  005D81D8     50  void DestroyFacade()
+                         inlines  GetInstance
+  181  005C9F6C      C  struct <anon>* GetInstance()
+  208  005FC0C4     6C  void StateChanging(const struct <anon>* this, enum OsdkState eOldState, enum OsdkState eNewState)
+                         inlines  operator=
+  237  006102EC     D0  void StateChanged(const struct <anon>* this, enum OsdkState eOldState, enum OsdkState eNewState)
+                         inlines  operator new, operator=

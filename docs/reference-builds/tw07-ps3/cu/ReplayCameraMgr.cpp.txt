@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Replay/ReplayCameraMgr.cpp
+// compiled in: golf2_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   58  00151B68     24  void ReplayCameraMgr::SetBallFinalPos(const struct ReplayCameraMgr* this, float* pos)
+                         inlines  vec4flt_Copy3
+   75  00151B8C     24  void ReplayCameraMgr::GetBallFinalPos(const struct ReplayCameraMgr* this, float* pos)
+                         inlines  vec4flt_Copy3
+   93  0012D51C     7C  void ReplayCameraMgr::CreateInstance()
+  112  0012D598     54  void ReplayCameraMgr::DestroyInstance()
+  133  00153004    128  void ReplayCameraMgr::CheckForCamSwitchRequest(const struct ReplayCameraMgr* this, enum PlayerNumber_t playerNum)
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  int button

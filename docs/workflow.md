@@ -81,7 +81,7 @@ units). m2c turns it into a first draft.
 
 ```
 python tools/match/jtfix.py build/GW4E69/asm/<Unit>.s build/GW4E69/asm/<data file>.s <scratch>/u.s
-python C:/dev/tools/m2c/m2c.py -t ppc-mwcc-c --pointer-style left --globals used <scratch>/u.s > <scratch>/u_m2c.c
+python <tools>/m2c/m2c.py -t ppc-mwcc-c --pointer-style left --globals used <scratch>/u.s > <scratch>/u_m2c.c
 python tools/match/getfn.py <scratch>/u_m2c.c fn_A fn_B    # print single functions, no temp decls
 ```
 

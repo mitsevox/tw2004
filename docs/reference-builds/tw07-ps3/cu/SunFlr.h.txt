@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/Code/Golf/SunFlare/SunFlr.h
+// compiled in: golf_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+  538    inline-only   void SF_vSetSunRotation(float[4]* xSunRotationMatrix_p)
+  564    inline-only   void SF_vSetSunColor(float* xSunColor_p)
+  596    inline-only   void SF_vEnableSunFlare(bool boEnable_p)
+  620    inline-only   void SF_vSetFlareType(DS_EFlareType eFlareType_p)

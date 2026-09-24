@@ -1,0 +1,8 @@
+// C:/packages/rwaudiocore/2.08.01/source/decoders/ealayer31/ealayer3core.cpp
+// compiled in: ealayer3core.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   20  006D8988     F8  void EALayer3Core(const struct <anon>* this, int numChannels)
+                         local  int result
+                         inlines  Assert
+   36  006D88EC     2C  void ~EALayer3Core(const struct <anon>* this)

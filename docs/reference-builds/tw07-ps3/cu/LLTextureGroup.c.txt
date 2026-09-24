@@ -1,0 +1,104 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLTextureGroup.c
+// compiled in: Legacy_unity.cpp
+// 35 functions, source order. line | PS3 address | size
+
+   66    inline-only   static int TG_GetTextureGroupIndex(struct TextureGroup* texGrp)
+                         local  uintptr_t index
+   80    inline-only   static MemBudgetTypeE TG_GetBudget(uint32 budgetChkRef)
+                         local  MemBudgetTypeE ret
+                         local  int32 i
+   97  003ADACC    1C8  struct TextureGroup* TG_DownloadTextureGroup(uint32 groupChkRef, void* data, int dataSize, void* freePtr, enum TextureGroupLifetime lifetime)
+                         local  struct t4TextureGroup* t4Grp
+                         local  MemBudgetTypeE forceBudget
+                         local  MemBudgetTypeE budget
+                         local  struct TextureGroup* texGrp
+                         inlines  TG_GetBudget
+  148  003ADC94     20  static void TG_HeaderLoadCallback(TStreamDataPtr pStreamClass)
+  152  003B9F8C    134  static int TG_GetTextureIndex(TextureRef ref, struct TextureGroup** TexGrp)
+                         local  const TextureInfo* info
+                         local  struct TextureGroup* texGrp
+  167    inline-only   static int TG_AllocTexture(TextureRef ref)
+                         local  struct TextureGroup* texGrp
+                         local  int index
+                         local  struct t4Texture* tex
+                         local  const char* formatString
+                         local  TextureFormat format
+                         local  TextureOptions options
+                         local  const char* modeString
+                         local  const char* filterString
+                         local  const char* edgeString
+  273  003C12FC    758  void TG_DownloadTexture(TextureRef ref, void* data, int dataSize)
+                         local  struct TextureGroup* texGrp
+                         local  int index
+                         local  int textureSize
+                         local  bool DirectVRAMUpload
+                         local  int bytesLoaded
+                         inlines  TG_AllocTexture
+  301  003C1A54    120  static void TG_DataLoadCallback(TStreamDataPtr pStreamClass)
+                         local  struct TextureGroup* TexGrp
+                         local  TextureRef ref
+  319  003BA49C     30  struct TextureGroup* TG_GetTextureGroup(TextureRef ref)
+                         local  struct TextureGroup* texGrp
+  325  0037EF74     E8  void TG_InitOnce()
+                         local  int32 i
+  345  00392E08     5C  void TG_InitModule()
+  350  003C2878     FC  void TG_FreeTextureGroups(enum TextureGroupLifetime minLifetime, enum TextureGroupLifetime maxLifetime)
+                         local  int i
+  366  003C2980     44  void TG_CloseModule()
+  373  003C2974      C  void TG_CloseOnce()
+  377  003A5168    1E8  void TG_ChangeTextureGroupLifetime(struct TextureGroup* texGrp, enum TextureGroupLifetime lifetime)
+                         inlines  TG_GetTextureGroupIndex
+  392  003AD5C4    508  struct TextureGroup* TG_AllocTextureGroup(uint32 groupChkRef, int numTextures, MemBudgetTypeE budget, enum TextureGroupLifetime lifetime)
+                         local  const char[21] __FUNCTION__
+                         local  struct TextureGroup* texGrp
+                         local  int i
+                         local  int i
+                         inlines  TG_GetTextureGroupIndex, TagValuePair, operator+
+  443  003A937C    1B4  void TG_UnloadTextureGroupHeader(struct TextureGroup* texGrp)
+                         inlines  TG_GetTextureGroupIndex
+  454  003C2284    22C  void TG_UnloadTextures(struct TextureGroup* texGrp, bool keepReserved)
+                         local  int i
+                         inlines  TG_GetTextureGroupIndex
+  467  003C24B0    3C8  void TG_FreeTextureGroup(struct TextureGroup* texGrp)
+                         local  int i
+                         inlines  TG_GetTextureGroupIndex
+  512  00388DE4     E8  struct TextureGroup* TG_FindTextureGroup(uint32 GroupChkRef)
+                         local  struct TextureGroup* found
+                         local  int i
+  535  00388ECC     28  struct TextureGroup* TG_FindTextureGroupByName(const char* name)
+  539  003BA4CC     E0  void TG_UnmanageTexture(TextureRef ref)
+                         local  struct TextureGroup* TexGrp
+                         local  int textureGroupEntry
+                         local  struct TextureGroupEntry* entry
+                         local  TextureInfo* info
+  556    inline-only   static TextureRef TG_GetTextureForEntry(struct TextureGroup* TexGrp, int index)
+                         local  struct TextureGroupEntry* entry
+                         local  TextureInfo* info
+  578  003BB0A4    530  TextureRef TG_FindTexture(struct TextureGroup* TexGrp, uint32 TextureChkRef)
+                         local  int found
+                         local  int i
+                         local  TextureInfo* info
+                         inlines  TG_GetTextureForEntry, TG_GetTextureGroupIndex
+  611  003BB888     38  TextureRef TG_FindTextureByName(struct TextureGroup* TexGrp, const char* name)
+  615  003BB5D4    124  TextureRef TG_FindGlobalTexture(uint32 TextureChkRef)
+                         local  TextureRef found
+                         local  int i
+                         local  struct TextureGroup* TexGrp
+                         local  TextureRef ref
+  640  003BB6F8     28  TextureRef TG_FindGlobalTextureByName(const char* name)
+  644  003BA0C0    138  static struct t4TextureParam* TG_FindUserParam(TextureRef ref, uint32 paramChkRef)
+                         local  struct TextureGroup* texGrp
+                         local  int index
+                         local  struct t4Texture* texture
+                         local  int i
+  662  003BA3BC     98  const char* TG_GetUserString(TextureRef ref, uint32 paramChkRef, const char* defaultValue)
+                         local  struct t4TextureParam* param
+  671  003BA454     48  const char* TG_GetUserStringByName(TextureRef ref, const char* name, const char* defaultValue)
+  675  003BA2DC     98  int TG_GetUserInteger(TextureRef ref, uint32 paramChkRef, int defaultValue)
+                         local  struct t4TextureParam* param
+  684  003BA374     48  int TG_GetUserIntegerByName(TextureRef ref, const char* name, int defaultValue)
+  688  003BA1F8     9C  float TG_GetUserFloat(TextureRef ref, uint32 paramChkRef, float defaultValue)
+                         local  struct t4TextureParam* param
+  697  003BA294     48  float TG_GetUserFloatByName(TextureRef ref, const char* name, float defaultValue)
+  702  00390A60     6C  void tx_not_implemented(const char* file, int line, const char* func)
+                         local  int skip_messages

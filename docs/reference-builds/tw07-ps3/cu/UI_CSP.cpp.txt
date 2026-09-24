@@ -1,0 +1,64 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_CSP.cpp
+// compiled in: apt_unity.cpp
+// 29 functions, source order. line | PS3 address | size
+
+  108  000F5E20    1B0  void UICSP::UICSP(const struct UICSP* this)
+  136  000668E0      4  void UICSP::CreateNewGolfer()
+  144  000CD790    14C  void UICSP::GoToNewUCAPEvent(int32 selection)
+                         local  void* driverPtr
+                         local  int UCAPevent
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+  163  000CDBA8     D0  void UICSP::GoToPgaTour()
+                         local  void* driverPtr
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, Singleton<GameModeDriverManager>::GetSingleton
+  181  000BBC54     14  void UICSP::GoToProShop()
+  189  000CDC78     E8  void UICSP::RetryTigerChallenge()
+                         local  void* driverPtr
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+  206  000CDD60     E8  void UICSP::RetryUCAPEvent()
+                         local  void* driverPtr
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+  224  000CDE48     E4  void UICSP::RetryTrainingEvent()
+                         local  void* driverPtr
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+  242  000CDF2C     B4  void UICSP::GoToTigerChallenge()
+                         local  void* driverPtr
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+  257  0006D1BC     A4  void UICSP::TrainGolfer()
+                         local  struct DevLevelAndType[9] sorted
+                         local  int i
+  277  000B1044     D8  void UICSP::GoToTutorials()
+                         inlines  UIMenuTutorial::SetNumItemsInLevel
+  302  000B111C     FC  void UICSP::ContinueTutorials()
+                         inlines  UIMenuTutorial::SetNumItemsInLevel
+  332  0005F534     4C  void UICSP::SkipTutorials()
+  341  000B573C    148  void UICSP::Show(const struct UICSP* this)
+                         inlines  UICSPScreen::ResetContext
+  373  000348C4    164  void UICSP::ShowHelpText(const struct UICSP* this)
+  404  0004247C    21C  void UICSP::ShowCSPFormPopUp(const struct UICSP* this, char* infoTitleId, char* menuOpt0Id, char* menuDescrpt0Id, UICSPfuncPointer* onCloseFunc0, char* menuOpt1Id, char* menuDescrpt1Id, UICSPfuncPointer* onCloseFunc1, char* menuOpt2Id, char* menuDescrpt2Id, UICSPfuncPointer* onCloseFunc2, char* menuOpt3Id, char* menuDescrpt3Id, UICSPfuncPointer* onCloseFunc3, char* menuOpt4Id, char* menuDescrpt4Id, UICSPfuncPointer* onCloseFunc4, int32 defaultOption)
+                         local  int32 numElements
+  453  0009F8A0     A4  void UICSP::OnShow(const struct UICSP* this)
+                         inlines  UIMenuBase::OnShow
+  463  000664F0     30  void UICSP::Hide(const struct UICSP* this)
+                         inlines  AptControllerListener::StopPortLocking
+  479  00042760     BC  void UICSP::ShowCSPFormPopUp(const struct UICSP* this, char* titleId, UICSPresponseFuncPtr* onCloseFunc, char* menuOpt0Id, char* menuDescrpt0Id, char* menuOpt1Id, char* menuDescrpt1Id, char* menuOpt2Id, char* menuDescrpt2Id, char* menuOpt3Id, char* menuDescrpt3Id, char* menuOpt4Id, char* menuDescrpt4Id, int32 defaultOption)
+  497  00042698     C8  void UICSP::ShowCSPFormPopUpWithAllowBack(const struct UICSP* this, char* infoTitleId, char* menuOpt0Id, char* menuDescrpt0Id, UICSPfuncPointer* onCloseFunc0, char* menuOpt1Id, char* menuDescrpt1Id, UICSPfuncPointer* onCloseFunc1, char* menuOpt2Id, char* menuDescrpt2Id, UICSPfuncPointer* onCloseFunc2, char* menuOpt3Id, char* menuDescrpt3Id, UICSPfuncPointer* onCloseFunc3, char* menuOpt4Id, char* menuDescrpt4Id, UICSPfuncPointer* onCloseFunc4, int32 defaultOption, UICSPfuncPointer* onBackFunc)
+  513  000CD8DC    2CC  void UICSP::onClose(const struct UICSP* this, void* inData)
+                         local  int32 destination
+  588  00027D74     60  void UICSP::SetUpGameModeCSPState(const struct UICSP* this)
+  596  000B1218    150  void UICSP::SetUpGameFaceCSPState(const struct UICSP* this, bool bNewGFplayer)
+  627  000B5530    20C  void UICSP::SetUpTextArray(const struct UICSP* this)
+                         local  uint32 tempContext
+                         local  int32 i
+                         local  int32 j
+                         inlines  UserInfo::GetNumNewUCAP
+  694  00034668     1C  void UICSP::RegisterCSPDestination(const struct UICSP* this, enum eCSPDest dest, UICSPfuncPointer* func, bool allowBack)
+  707  000F5D44     DC  void UICSPScreen::UICSPScreen(const struct UICSPScreen* this)
+                         inlines  TArrayInternal<UICSPScreen::DstMenuItem_cspp,AptStructSwapper>::TArrayInternal, TExternArray<UICSPScreen::DstMenuItem_cspp>::TExternArray, UIMenuVertBase::UIMenuVertBase
+  722  000EF4E0     78  void UICSPScreen::Init(const struct UICSPScreen* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+  733  00034A28    17C  void UICSPScreen::UpdateItemAndLabel(const struct UICSPScreen* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  char* menuStr
+                         local  struct DstMenuItem_cspp* dest
+  765  000867BC    13C  enum eAptHandleInput UICSPScreen::HandleInput(const struct UICSPScreen* this, int32 cID)
+                         local  int32 selection

@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_LeafShadow.cpp
+// compiled in: shader_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   35  0051B4F4     64  void SM_LeafShadowClass::SM_LeafShadowClass(const struct SM_LeafShadowClass* this)
+                         local  int i
+                         inlines  SM_Shader_Base::SM_Shader_Base, vec4flt_Zero
+   47  00508CE0     C8  void SM_LeafShadowClass::Load(const struct SM_LeafShadowClass* this)
+   58  00508DA8     60  void SM_LeafShadowClass::Activate(const struct SM_LeafShadowClass* this)
+   67  00508E08     38  void SM_LeafShadowClass::Deactivate(const struct SM_LeafShadowClass* this)
+   75  00511F48     98  void SM_LeafShadowClass::SetLeafQuads(const struct SM_LeafShadowClass* this, const float* pLeafQuads)
+   85  00511FE0     64  void SM_LeafShadowClass::SetColorLeafTexture(const struct SM_LeafShadowClass* this, TextureRef texRef)

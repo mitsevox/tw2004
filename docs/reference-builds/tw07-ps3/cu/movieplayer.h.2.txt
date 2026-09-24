@@ -1,0 +1,8 @@
+// C:/packages/rwmovie/1.04.01/include/rwmovie/movieplayer.h
+// compiled in: movieplayer.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   85  006F83E0    510  void MoviePlayer(const struct <anon>* this, struct IResourceAllocator* allocator)
+                         inlines  Allocate, BaseResources, Resource, ~ResourceDescriptor
+   91  006F7E94    184  void ~MoviePlayer(const struct <anon>* this)
+                         inlines  Free

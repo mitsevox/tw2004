@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/kickstart/source/common/kickstartoperationconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   70  005F4B0C     68  void KickStartOperationConcrete(const struct <anon>* this, struct OperationConcrete* pOperation)
+                         inlines  RCPointer
+   95  005F4D48     44  void ~KickStartOperationConcrete(const struct <anon>* this)
+                         inlines  ~RCPointer
+  115  005FB654     4C  void StartGame(const struct <anon>* this)
+  136  005D77CC     54  void ReportGame(const struct <anon>* this, const struct Dictionary* pGameStats)

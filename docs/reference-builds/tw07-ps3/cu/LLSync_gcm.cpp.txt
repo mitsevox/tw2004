@@ -1,0 +1,26 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/ps3/LLSync_gcm.cpp
+// compiled in: Legacy_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   32  0037ED60     18  DL_GpuFenceValue DL_GetNextFenceValue()
+   41  0037F218     20  DL_GpuFenceValue DL_GetCurrentFenceValue()
+   52  00387540     C4  DL_GpuFenceValue DL_InsertFence()
+                         local  const DL_GpuFenceValue insertedFence
+                         inlines  Gcm::cellGcmSetWriteBackEndLabel
+   82  00380100     A0  bool DL_IsFencePending(DL_GpuFenceValue fenceValue)
+                         local  const DL_GpuFenceValue value
+                         local  int delta
+                         inlines  Gcm::cellGcmFlush
+  108  00387748    10C  void DL_BlockCPUOnFence(DL_GpuFenceValue fenceValue)
+                         local  bool timerStarted
+                         local  clock_t start
+                         local  clock_t now
+                         local  const clock_t delay
+  153  00387604    144  void DL_BlockGPUOnFence(DL_GpuFenceValue fenceValue)
+                         local  int delta
+                         local  int delta
+                         inlines  Gcm::cellGcmSetWaitLabel
+  198  003800D0     30  volatile DL_GpuFenceValue* DL_GetFenceAddress(DL_GpuFenceValue fenceValue)
+  218  00380094     30  void DL_FlushCPUCache(void* address, unsigned int size)
+                         local  unsigned int flushAddress
+                         local  unsigned int lastAddress

@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/Golf/RenderObjects/instanced/twinstancedrenderobj.h
+// compiled in: rnaunity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   52  004F79E4      4  void Process(const struct <anon>* this, struct DeviceC* device, double_t timeStamp)

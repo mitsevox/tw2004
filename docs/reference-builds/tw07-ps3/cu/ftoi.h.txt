@@ -1,0 +1,7 @@
+// C:/packages/rwaudiocore/2.08.01/source/extern/ftoi.h
+// compiled in: smixhip.cpp, ssysinit.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   78    inline-only   static int FToI::Round(float val)
+                         local  int result
+  313    inline-only   static int FToI::Fast(float val)

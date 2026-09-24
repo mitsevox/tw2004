@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/GoActorCollision.c
+// compiled in: golf_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   25  002159CC     54  int Actor_GetMaterialIDFromHit(const struct <anon>* pHit)
+                         local  int matID
+   38  002D2760     E0  void Actor_OnCollision(const struct <anon>* pHit)
+                         local  enum PlayerNumber_t playerID
+                         local  struct CoreShotInfo_t* pShotInfo
+                         local  vec4flt collisionLocation
+                         inlines  vec4flt_Copy

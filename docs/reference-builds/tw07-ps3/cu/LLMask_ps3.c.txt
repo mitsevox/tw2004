@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/ps3/LLMask_ps3.c
+// compiled in: Legacy_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   41  0037F9E0      4  void MS_vInitModule()
+   46  0037F9E4      4  void MS_vCloseModule()
+   57  0037F9E8      4  void MS_vAddPrepareMaskToDisplayState(bool bClearMask, float fZoneX1, float fZoneY1, float fZoneX2, float fZoneY2)
+   66  0037F9EC     1C  void MS_vAddEnableMaskToDisplayState(enum MS_EMaskUsage eUsage)
+   74  0037FA08     1C  void MS_vAddDisableMaskToDisplayState()
+   83  0037FA24     18  bool MS_bIsMaskOn()

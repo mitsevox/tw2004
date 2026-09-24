@@ -1,0 +1,17 @@
+// ../../../../../TIGERCODE/Code/Golf/TextureFX/Headers/rawtexture.h
+// compiled in: other_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   70    inline-only   struct HashString RawTexture::GetTextureName(const const struct RawTexture* this)
+   71    inline-only   int32_t RawTexture::GetHeight(const struct RawTexture* this, int32_t mipmap)
+   72    inline-only   int32_t RawTexture::GetWidth(const struct RawTexture* this, int32_t mipmap)
+   73    inline-only   int32_t RawTexture::GetNumMipmaps(const struct RawTexture* this)
+   74    inline-only   void* RawTexture::GetRawTextureData(const struct RawTexture* this)
+   75    inline-only   void RawTexture::SetReadyForFastBlend(const struct RawTexture* this, bool ready)
+   76    inline-only   bool RawTexture::IsReadyForFastBlend(const struct RawTexture* this)
+   77    inline-only   void RawTexture::SuspendTinting(const struct RawTexture* this)
+   78    inline-only   void RawTexture::ResumeTinting(const struct RawTexture* this)
+   79    inline-only   bool RawTexture::IsTintEnabled(const struct RawTexture* this)
+   80    inline-only   float* RawTexture::GetTintParams(const struct RawTexture* this)
+   81    inline-only   struct RawTexture* RawTexture::GetTintMask(const struct RawTexture* this)
+   82    inline-only   struct Tinter* RawTexture::GetTinter(const struct RawTexture* this)

@@ -1,0 +1,48 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/frontend/FE_Stats.c
+// compiled in: apt_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+  154  000A17AC    16C  static void PrintStatsWithUnits(const char* value, enum StatsUnits_t units, char* dest, size_t destBufLen)
+                         local  int moneyValue
+                         local  char[128] money
+                         inlines  std::atoi
+  189  00024714     18  void UIStatsRankings_SetActiveStat(int32 statId)
+  194  0002472C     1C  int32 UIStatsRankings_GetActiveStat()
+  199  00024748     20  enum StatsUnits_t UIStatsRankings_GetStatUnits(enum GM_Pga_StatTypes_t stat)
+  204  00024768     20  enum StatsUnits_t UIStatsRankings_GetRivalStatUnits(enum Era_StatType_e stat)
+  209  00024788      8  int32 UIStatsRankings_GetNumRows()
+  216  000A2338    1A8  void UIStatsRankings_GetRow(int32 row, const char** name, char* valuestr, int32 valueStrBufLen, char* rankstr, int32 rankstrBufLen)
+                         local  char[17] tempStr
+                         local  enum GM_Pga_StatTypes_t mappedStat
+                         local  enum StatsUnits_t units
+                         local  enum PlayerNumber_t userID
+                         local  int golferID
+                         local  float value
+  264  00024790      8  int32 UIStatsRankings_GetIndStatsNumRows()
+  270  000A1EE0    294  void UIStatsRankings_GetIndStatsRow(int32 row, char* rankstr, int32 rankstrBufLen, const char** name, char* roundsEvents, int32 roundEventsBufLen, char* valuestr, int32 valueStrBufLen)
+                         local  enum GM_Pga_StatTypes_t mappedStat
+                         local  int golferID
+                         local  enum PlayerNumber_t userID
+                         local  char[17] tempStr
+                         local  float value
+                         local  enum StatsUnits_t units
+  333  00024798     64  void UIStatsRankings_SetActiveGolferByRow(int32 row)
+                         local  enum PlayerNumber_t userID
+                         local  enum GM_Pga_StatTypes_t mappedStat
+                         local  int golferID
+  340  000247FC     18  void UIStatsRankings_SetActiveGolfer(int32 golferID)
+  344  00024814     1C  int32 UIStatsRankings_GetActiveGolfer()
+  348  00024830     D8  int32 UIStatsRankings_GetActiveGolferRow()
+                         local  int numRows
+                         local  int row
+                         local  enum PlayerNumber_t userID
+                         local  enum GM_Pga_StatTypes_t mappedStat
+                         local  int golferID
+  367  00024908     C8  int32 UIStatsRankings_GetUserGolferRow()
+                         local  int numRows
+                         local  int row
+                         local  enum PlayerNumber_t userID
+                         local  enum GM_Pga_StatTypes_t mappedStat
+                         local  int golferID
+  386  000249D0     40  const char* UIStatsRankings_GetActiveGolferName()
+                         local  enum PlayerNumber_t userID

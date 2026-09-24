@@ -1,0 +1,14 @@
+// ../../../../../TIGERCODE/Code/Legacy/LL/Headers/LLTex.h
+// compiled in: Legacy_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+  376    inline-only   int16 TX_STextureGroupHeader::NumBlocksToAllocate(const const struct TX_STextureGroupHeader* this)
+  377    inline-only   void TX_STextureGroupHeader::SetNumBlocksToAllocate(const struct TX_STextureGroupHeader* this, int16 nBlocks)
+  379    inline-only   int16 TX_STextureGroupHeader::NumTexturesInFile(const const struct TX_STextureGroupHeader* this)
+  380    inline-only   void TX_STextureGroupHeader::SetNumTexturesInFile(const struct TX_STextureGroupHeader* this, int16 nTextures)
+  381    inline-only   void TX_STextureGroupHeader::IncrNumTexturesInFile(const struct TX_STextureGroupHeader* this, int16 nTexturesToAdd)
+  769    inline-only   struct TX_STextureGroupTexture* TX_spGetTextureGroupTextureFromIndex(struct TX_STextureGroup* spTextureGroup_p, uint32 uiTextureIndex_p)
+  905    inline-only   int32 TX_iGetNumberOfTexturesInTextureGroup(struct TX_STextureGroup* spTextureGroup_p)
+  918    inline-only   struct HashString TX_uiGetTextureIDFromTextureIndex(struct TX_STextureGroup* spTextureGroup_p, uint32 uiTextureIndex_p)
+  963    inline-only   int32 TX_GetNumberOfMipMaps(const struct TX_STextureGroupTexture* spTextureGroupTexture_p)
+  992    inline-only   uint32 TX_GetTotalTextureSize(const struct TX_STextureGroupTexture* spTextureGroupTexture_p)

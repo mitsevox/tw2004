@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Temple/GoTempleVideoPlayer.cpp
+// compiled in: golf_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   97  00236850    104  bool GoTempleVideoPlayer::LoadVideoSeqFromFile(const struct GoTempleVideoPlayer* this, char* pFileName)
+                         local  bool bOldMemLockState
+  147  00236954     40  bool GoTempleVideoPlayer::BeginPlay(const struct GoTempleVideoPlayer* this, enum GoTempleVideoPlayerOptionsE ePlayOption)
+  184  00304C20    214  void GoTempleVideoPlayer::ResolveNextFrameToTexture(const struct GoTempleVideoPlayer* this, TextureRef texRef)
+                         local  bool bOldMemLockState
+                         inlines  DS_vSetAlphaTestMode, DS_vSetZBufferMode
+  258  00236994     4C  void GoTempleVideoPlayer::EndPlay(const struct GoTempleVideoPlayer* this)

@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/GameMode/Headers/GameEffects.h
+// compiled in: apt_unity.cpp, golf2_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+  129    inline-only   void GameEffects_SetPostGBCrowdLevel(uint8 crowdLevel)
+  135    inline-only   void GameEffects_SetPostGBCommentary(uint16 fileID)
+  144    inline-only   void GameEffects_SetPostGBNegativeCommentary(uint16 fileID)
+  158    inline-only   void GameEffects_SetDoubleTime(bool on, enum PlayerNumber_t ePlayerID)
+  188    inline-only   void GameEffects_SetHalfTime(bool on, enum PlayerNumber_t ePlayerID)
+  216    inline-only   bool GameEffects_IsGameBreakerOn()
+  221    inline-only   bool GameEffects_IsLetterboxOn()
+  233    inline-only   bool GameEffects_IsScriptedMomentOn()

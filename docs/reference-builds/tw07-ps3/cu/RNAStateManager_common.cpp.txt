@@ -1,0 +1,132 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/RNAStateManager_common.cpp
+// compiled in: RNAStateManager_common.cpp
+// 47 functions, source order. line | PS3 address | size
+
+    0  0082F9A0     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   51  00831D58     AC  void DeviceC::SetDepthBufferEnable(const struct DeviceC* this, bool bEnable)
+                         inlines  DeviceC::SetRenderState, RNADebugBreak
+   57  00830038     CC  bool DeviceC::GetDepthBufferEnable(const struct DeviceC* this)
+                         inlines  DeviceC::EasyGetRenderState<bool>, RNADebugBreak
+   63  00831E04     AC  void DeviceC::SetDepthWriteEnable(const struct DeviceC* this, bool bEnable)
+                         inlines  DeviceC::SetRenderState, RNADebugBreak
+   68  0082FF6C     CC  bool DeviceC::GetDepthWriteEnable(const struct DeviceC* this)
+                         inlines  DeviceC::EasyGetRenderState<bool>, RNADebugBreak
+   73  00830DD4     AC  void DeviceC::SetDepthCompareFunc(const struct DeviceC* this, enum RSCompareFuncE eFunc)
+                         inlines  DeviceC::SetRenderState, RNADebugBreak
+   78  0083082C     A4  enum RSCompareFuncE DeviceC::GetDepthCompareFunc(const struct DeviceC* this)
+                         inlines  DeviceC::EasyGetRenderState<RNA::RSCompareFuncE>, RNADebugBreak
+   83  00830414    168  void DeviceC::SetDepthBias(const struct DeviceC* this, float fBias, float fSlopeScaleBias)
+                         local  const char[13] __FUNCTION__
+                         inlines  DeviceC::SetRenderState, RNADebugBreak
+   90  00830308    10C  void DeviceC::GetDepthBias(const struct DeviceC* this, const float& fBias, const float& fSlopeScaleBias)
+                         inlines  DeviceC::GetRenderState, RNADebugBreak
+   97  00831EB0     AC  void DeviceC::SetStencilEnable(const struct DeviceC* this, bool bEnable)
+                         inlines  DeviceC::SetRenderState, RNADebugBreak
+  102  0082FEA0     CC  bool DeviceC::GetStencilEnable(const struct DeviceC* this)
+                         inlines  DeviceC::EasyGetRenderState<bool>, RNADebugBreak
+  108  008317A8    16C  void DeviceC::SetStencilOps(const struct DeviceC* this, enum RSStencilOpE eStencilFailOp, enum RSStencilOpE eStencilPassZFailOp, enum RSStencilOpE eStencilPassZPassOp)
+                         inlines  DeviceC::SetRenderState, RNADebugBreak
+  115  00831A80    16C  void DeviceC::GetStencilOps(const struct DeviceC* this, const enum RSStencilOpE& eStencilFailOp, const enum RSStencilOpE& eStencilPassZFailOp, const enum RSStencilOpE& eStencilPassZPassOp)
+                         inlines  DeviceC::GetRenderState, RNADebugBreak
+  123  00830E80    114  void DeviceC::SetStencilCompareFunc(const struct DeviceC* this, enum RSCompareFuncE eFunc, int32_t iRef)
+                         inlines  DeviceC::SetRenderState, RNADebugBreak
+  129  008308D0    114  void DeviceC::GetStencilCompareFunc(const struct DeviceC* this, const enum RSCompareFuncE& eFunc, const int32_t& iRef)
+                         inlines  DeviceC::GetRenderState, RNADebugBreak
+  136  00830CB8    11C  void DeviceC::SetStencilMasks(const struct DeviceC* this, uint32_t uTestMask, uint32_t uWriteMask)
+                         inlines  DeviceC::SetRenderState, RNADebugBreak
+  142  00830A88    11C  void DeviceC::GetStencilMasks(const struct DeviceC* this, const uint32_t& uTestMask, const uint32_t& uWriteMask)
+                         inlines  DeviceC::GetRenderState, RNADebugBreak
+  150  00831F5C     AC  void DeviceC::SetStencilCCWEnable(const struct DeviceC* this, bool bEnable)
+                         inlines  DeviceC::SetRenderState, RNADebugBreak
+  155  0082FDD4     CC  bool DeviceC::GetStencilCCWEnable(const struct DeviceC* this)
+                         inlines  DeviceC::EasyGetRenderState<bool>, RNADebugBreak
+  161  00831914    16C  void DeviceC::SetStencilCCWOps(const struct DeviceC* this, enum RSStencilOpE eStencilFailOp, enum RSStencilOpE eStencilPassZFailOp, enum RSStencilOpE eStencilPassZPassOp)
+                         inlines  DeviceC::SetRenderState, RNADebugBreak
+  168  00831BEC    16C  void DeviceC::GetStencilCCWOps(const struct DeviceC* this, const enum RSStencilOpE& eStencilFailOp, const enum RSStencilOpE& eStencilPassZFailOp, const enum RSStencilOpE& eStencilPassZPassOp)
+                         inlines  DeviceC::GetRenderState, RNADebugBreak
+  176  00830F94     AC  void DeviceC::SetStencilCCWCompareFunc(const struct DeviceC* this, enum RSCompareFuncE eFunc)
+                         inlines  DeviceC::SetRenderState, RNADebugBreak
+  181  008309E4     A4  enum RSCompareFuncE DeviceC::GetStencilCCWCompareFunc(const struct DeviceC* this)
+                         inlines  DeviceC::EasyGetRenderState<RNA::RSCompareFuncE>, RNADebugBreak
+  187  00832008     E4  void DeviceC::SetBlendEnable(const struct DeviceC* this, bool bEnable)
+                         local  const char[15] __FUNCTION__
+                         inlines  DeviceC::SetRenderState, RNADebugBreak
+  193  0082FD08     CC  bool DeviceC::GetBlendEnable(const struct DeviceC* this)
+                         inlines  DeviceC::EasyGetRenderState<bool>, RNADebugBreak
+  199  00831498    1A4  void DeviceC::SetBlendMode(const struct DeviceC* this, enum RSBlendModeE eSrc, enum RSBlendOpE eOp, enum RSBlendModeE eDst)
+                         local  const char[13] __FUNCTION__
+                         inlines  DeviceC::SetRenderState, RNADebugBreak
+  207  008311C0    16C  void DeviceC::GetBlendMode(const struct DeviceC* this, const enum RSBlendModeE& eSrc, const enum RSBlendOpE& eOp, const enum RSBlendModeE& eDst)
+                         inlines  DeviceC::GetRenderState, RNADebugBreak
+  215  008320EC     AC  void DeviceC::SetAlphaChannelBlendEnable(const struct DeviceC* this, bool bEnable)
+                         inlines  DeviceC::SetRenderState, RNADebugBreak
+  220  0082FC3C     CC  bool DeviceC::GetAlphaChannelBlendEnable(const struct DeviceC* this)
+                         inlines  DeviceC::EasyGetRenderState<bool>, RNADebugBreak
+  226  0083163C    16C  void DeviceC::SetAlphaChannelBlendMode(const struct DeviceC* this, enum RSBlendModeE eSrc, enum RSBlendOpE eOp, enum RSBlendModeE eDst)
+                         inlines  DeviceC::SetRenderState, RNADebugBreak
+  233  0083132C    16C  void DeviceC::GetAlphaChannelBlendMode(const struct DeviceC* this, const enum RSBlendModeE& eSrc, const enum RSBlendOpE& eOp, const enum RSBlendModeE& eDst)
+                         inlines  DeviceC::GetRenderState, RNADebugBreak
+  241  00832198     E4  void DeviceC::SetAlphaTestEnable(const struct DeviceC* this, bool bEnable)
+                         local  const char[19] __FUNCTION__
+                         inlines  DeviceC::SetRenderState, RNADebugBreak
+  247  00830104     CC  bool DeviceC::GetAlphaTestEnable(const struct DeviceC* this)
+                         inlines  DeviceC::EasyGetRenderState<bool>, RNADebugBreak
+  252  00831040    180  void DeviceC::SetAlphaTestMode(const struct DeviceC* this, enum RSCompareFuncE eFunc, uint32_t uRefVal)
+                         local  const char[17] __FUNCTION__
+                         inlines  DeviceC::SetRenderState, RNADebugBreak
+  260  00830BA4    114  void DeviceC::GetAlphaTestMode(const struct DeviceC* this, const enum RSCompareFuncE& eFunc, const uint32_t& uRefVal)
+                         inlines  DeviceC::GetRenderState, RNADebugBreak
+  267  0082FB90     AC  void DeviceC::SetCullMode(const struct DeviceC* this, enum RSCullModeE eMode)
+                         inlines  DeviceC::SetRenderState, RNADebugBreak
+  272  0082FAEC     A4  enum RSCullModeE DeviceC::GetCullMode(const struct DeviceC* this)
+                         inlines  DeviceC::EasyGetRenderState<RNA::RSCullModeE>, RNADebugBreak
+  278  0083057C    180  void DeviceC::SetColorWriteMask(const struct DeviceC* this, int32_t iRenderTarget, bool bRed, bool bGreen, bool bBlue, bool bAlpha)
+                         local  const char[18] __FUNCTION__
+                         inlines  DeviceC::SetRenderState, RNADebugBreak
+  291  008306FC    130  void DeviceC::GetColorWriteMask(const struct DeviceC* this, int32_t iRenderTarget, const bool& bRed, const bool& bGreen, const bool& bBlue, const bool& bAlpha)
+                         local  const char[18] __FUNCTION__
+                         local  int32_t val
+                         inlines  DeviceC::GetRenderState, RNADebugBreak
+  311  0082F810     74  void DeviceC::SetRenderState(const struct DeviceC* this, const const struct <anon>& block)
+                         local  uint32_t i
+  319  0082F884     74  void DeviceC::GetRenderState(const struct DeviceC* this, const struct <anon>& block)
+                         local  uint32_t i
+  328  008301D0    138  void DeviceC::SetRenderState(const struct DeviceC* this, const const struct <anon>& list)
+                         local  int32_t i
+                         inlines  RNADebugBreak, operator[]
+  336  0083227C    9C8  void DeviceC::SetAndGetRenderState(const struct DeviceC* this, const const struct <anon>& newStateList, const struct <anon>& oldStateList)
+                         local  int32_t idx
+                         local  int32_t i
+                         local  int32_t i
+                         local  int32_t iOldValue
+                         local  enum RSStateE eEnum
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct StateValuePair* newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct StateValuePair* newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct StateValuePair* newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct StateValuePair* newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct StateValuePair* newData
+                         inlines  AddStateValuePair<int>, ClearAndReserveSize, Construct, Grow, RNADebugBreak, Reserve, Size, operator[]
+  354  0082FA40     AC  void DeviceC::PushRenderState(const struct DeviceC* this)
+                         local  const char[16] __FUNCTION__
+                         inlines  RNADebugBreak
+  364  0082F8F8     A8  void DeviceC::PopRenderState(const struct DeviceC* this)
+                         local  const char[15] __FUNCTION__
+                         inlines  RNADebugBreak
+  373  0082FA20     10  static void _GLOBAL__I__ZN3RNA7DeviceC20SetDepthBufferEnableEb()
+  374  0082FA30     10  static void _GLOBAL__D__ZN3RNA7DeviceC20SetDepthBufferEnableEb()

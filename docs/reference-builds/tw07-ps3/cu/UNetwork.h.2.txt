@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/specif/Headers/UNetwork.h
+// compiled in: Legacy_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  155    inline-only   int16 Network_GetNextNode(const struct TNetwork* network, int16 node, int16 prevNode)
+                         local  int16 nextNode
+  173    inline-only   float isLeft(const float* P0, const float* P1, const float* P2)

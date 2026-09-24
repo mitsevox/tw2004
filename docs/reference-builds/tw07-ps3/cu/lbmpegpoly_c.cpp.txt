@@ -1,0 +1,18 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/extern/coda/cmn/lbmpegpoly_c.cpp
+// compiled in: lbmpegpoly_c.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  334  006ECC64    EFC  static void Snd::dct64(float* out0, float* out1, float* samples)
+                         local  float[2][32] bufs
+  615  006EDB60    404  void CMpegBase::PolySynth(const struct CMpegBase* this, int channel, float* pSamples, float* pBand)
+                         local  float* b0
+                         local  float[288]* buf
+                         local  int bo1
+                         local  int bob1
+                         local  int bob2
+                         local  int count
+                         local  int j
+                         local  const float* window
+                         local  float sum
+                         local  float sum
+                         local  float sum

@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_EASportsTrax.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   15  0011C560    160  void UIEASportsTrax::~UIEASportsTrax(const struct UIEASportsTrax* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIEASportsTrax::DstMenuItem_trax>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+   17  00100470      C  uint32 UIEASportsTrax::GetSignature(const const struct UIEASportsTrax* this)
+   24  00100484      C  struct IExternArray* UIEASportsTrax::GetExternArray(const struct UIEASportsTrax* this)

@@ -1,0 +1,69 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/scenegraph/source/SceneGraph/SGNode.cpp
+// compiled in: SGNode.cpp
+// 27 functions, source order. line | PS3 address | size
+
+    0  008C1B14     F0  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   56  008C1CB4    1D0  static void _ValidateChildrenLinkage(struct SGNodeC* pParent)
+                         local  const char[25] __FUNCTION__
+                         local  int32_t nReportedChildren
+                         local  int32_t nFoundChildren
+                         local  struct SGNodeC* pPrevNode
+                         local  struct SGNodeC* pNode
+                         inlines  GetFirstChild, GetNextSibling, GetNumChildren, RNADebugBreak
+   83  008C2E4C    23C  void SGNodeC(const struct SGNodeC* this)
+                         inlines  AutoRefCount, RNADebugBreak, RefCountTemplate, String, operator=
+   97  008C35F0    2DC  void ~SGNodeC(const struct SGNodeC* this)
+                         local  const char[9] __FUNCTION__
+                         local  struct SGNodeC* pNode
+                         inlines  GetFirstChild, RNADebugBreak, ~AutoRefCount, ~RefCountTemplate, ~String
+  145  008C28FC    290  struct SGNodeC* Clone(const struct SGNodeC* this, bool8_t recurse, NodeCloneUserDataCallback userDataCallback, struct SGNodeC* clone)
+                         local  const char[6] __FUNCTION__
+                         local  int32_t iAttrib
+                         local  struct SGNodeC* child
+                         inlines  ClearUserFlags, GetFirstChild, GetName, GetNextSibling, RNADebugBreak, SetName, SetUserFlags, operator=
+  186  008C16C0     5C  const char* GetNodeTypeName(const const struct <anon>* this)
+  191  008C1C24     90  void SetUserData(const struct SGNodeC* this, void* data)
+                         local  const char[12] __FUNCTION__
+                         inlines  RNADebugBreak
+  203  008C1E84     A0  void SetDynamicFlag(const struct SGNodeC* this, bool8_t bDynamic)
+                         inlines  RNADebugBreak, SafeAssign
+  208  008C1698      C  bool8_t GetDynamicFlag(const struct SGNodeC* this)
+  218  008C16A4     1C  int32_t GetNumAttribs(const const struct <anon>* this)
+                         inlines  AttribArrayC::GetNumAttribs
+  223  008C1F24     F8  struct AttribC* GetNthAttrib(const struct SGNodeC* this, int32_t iAttrib)
+                         local  const char[13] __FUNCTION__
+                         inlines  AttribArrayC::GetAttrib, RNADebugBreak
+  229  008C201C     F8  const struct AttribC* GetNthAttrib(const const struct <anon>* this, int32_t iAttrib)
+                         local  const char[13] __FUNCTION__
+                         inlines  AttribArrayC::GetAttrib, RNADebugBreak
+  235  008C171C     3C  struct AttribC* FindAttribByName(const struct SGNodeC* this, const char* pName)
+  240  008C1758     3C  const struct AttribC* FindAttribByName(const const struct <anon>* this, const char* pName)
+  245  008C1794     CC  struct AttribC* AddAttrib(const struct SGNodeC* this, const char* pName, uint32_t eType)
+  254  008C1860     AC  struct AttribC* AddAttrib(const struct SGNodeC* this, struct AttribC* pAttr)
+  264  008C2114     7C  void CopyAttributes(const struct SGNodeC* this, const struct <anon>* pSourceNode)
+                         local  int32_t iAttrib
+  286  008C2190    2C8  void AttachChildFirst(const struct SGNodeC* this, struct SGNodeC* pChild)
+                         local  const char[17] __FUNCTION__
+                         inlines  RNADebugBreak, operator=
+  307  008C26FC    200  void AttachChildLast(const struct SGNodeC* this, struct SGNodeC* pChild)
+                         local  const char[16] __FUNCTION__
+                         local  struct SGNodeC* pLastChild
+                         inlines  GetFirstChild, RNADebugBreak, operator SceneX::SGNodeC*, operator=
+  337  008C2B8C    2C0  void InsertNextSibling(const struct SGNodeC* this, struct SGNodeC* pNewSibling)
+                         local  const char[18] __FUNCTION__
+                         inlines  RNADebugBreak, operator=
+  365  008C2458    2A4  void InsertPrevSibling(const struct SGNodeC* this, struct SGNodeC* pNewSibling)
+                         local  const char[18] __FUNCTION__
+                         inlines  RNADebugBreak, operator=
+  392  008C32C4    32C  void DetachChild(const struct SGNodeC* this, struct SGNodeC* pChild)
+                         local  const char[12] __FUNCTION__
+                         inlines  AddRef, RNADebugBreak, Release, operator=
+  428  008C3E94    11C  void DetachFromParent(const struct SGNodeC* this)
+                         local  const char[17] __FUNCTION__
+                         inlines  AddRef, RNADebugBreak, Release
+  444  008C190C    114  void SerializeIn(const struct SGNodeC* this, const struct InStreamC& in)
+                         local  int32_t version
+                         local  bool8_t m_bObsoleteVisibilityFlag
+  462  008C1A20     F4  void SerializeOut(const const struct <anon>* this, const struct OutStreamC& out)
+  470  008C1C04     10  static void _GLOBAL__I__ZN6SceneX7SGNodeCC2Ev()
+  471  008C1C14     10  static void _GLOBAL__D__ZN6SceneX7SGNodeCC2Ev()

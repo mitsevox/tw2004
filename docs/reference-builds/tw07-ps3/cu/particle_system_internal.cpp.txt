@@ -1,0 +1,773 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/ParticleSystem/source/particle_system_internal.cpp
+// compiled in: particle_unity.cpp
+// 42 functions, source order. line | PS3 address | size
+
+   24  004AD5B4     14  unsigned int ParticleSystemInternal::SizeNeededForInit(const struct ParticleSystemFile* desc)
+   37  004B02E0     80  void ParticleSystemInternal::Init(struct ParticleSystemInternal* system, const struct ParticleSystemFile* desc, struct IParticleSpawn* spawnInterface)
+   53  004AD6B4    1BC  int IsConstantColor(const struct ParticleSystemFile* f)
+                         local  float v
+                         inlines  ParticleSystemFile::GetStartColorWMin, ParticleSystemFile::GetStartColorXMin, ParticleSystemFile::GetStartColorYMin, ParticleSystemFile::GetStartColorZMin
+  172  004AD870     D8  int IsConstantTexture(const struct ParticleSystemFile* f)
+  231  004AD5C8     EC  int IsConstantSize(const struct ParticleSystemFile* f)
+                         local  float v
+                         inlines  ParticleSystemFile::GetStartHeightMin, ParticleSystemFile::GetStartWidthMin
+  300  004B00F8    1E8  void ParticleSystemInternal::ResetSimulation(const struct ParticleSystemInternal* this)
+  354  004ACA60     C4  float ParticleSystemInternal::GetRandomTimeToNextEruption(const struct ParticleSystemInternal* this)
+                         local  float minEPS
+                         local  float maxEPS
+                         local  float eps
+                         inlines  ParticleSystemFile::GetEruptionsPerSecondMin
+  371  004B09D8     A0  int ParticleSystemInternal::Update(const struct ParticleSystemInternal* this, float deltaTime, const float* viewDir, void* emitter, int doEruptions)
+                         local  int anyAlive
+  391  004AD948    218  void ParticleSystemInternal::UpdateSpawn(const struct ParticleSystemInternal* this, float deltaTime, void* emitter)
+                         local  const char* spawnName
+                         local  unsigned int count
+                         local  struct Particle* particle
+                         local  float lifeTime
+                         local  float lifeUsed
+                         local  float spawnTime
+                         local  float lifeTime
+                         local  float lifeUsed
+                         local  float deltaRatio
+                         local  float usedRatio
+                         local  float[3] zero
+                         local  float spawnTime
+                         local  float deltaRatio
+                         local  float usedRatio
+                         local  float[4] gravity
+  467  004ACF4C    3A8  void ParticleSystemInternal::Sort(const struct ParticleSystemInternal* this, const float* viewDir)
+                         local  struct _FVEC dirVec
+                         local  unsigned int count
+                         local  struct Particle* particle0
+                         local  struct _FVEC pos0
+                         local  float dot0
+                         local  struct Particle* particle1
+                         local  struct _FVEC pos1
+                         local  float dot1
+                         local  struct _FVEC vel0
+                         local  struct _FVEC vel1
+                         local  struct _FVEC other0
+                         local  struct _FVEC other1
+                         local  struct _FVEC grav0
+                         local  struct _FVEC grav1
+  512  004ACB80    370  void ParticleSystemInternal::UpdateMotion(const struct ParticleSystemInternal* this, float deltaTime)
+                         local  unsigned int count
+                         local  struct Particle* particle
+                         local  struct _FVEC wind
+                         local  float drag
+                         local  float lifeUsed
+                         local  unsigned int seed
+                         local  struct _FVEC position
+                         local  struct _FVEC velocity
+                         local  struct _FVEC windDiff
+                         local  struct _FVEC windForce
+                         local  struct _FVEC moveVec
+                         local  struct _FVEC totalForce
+                         local  struct _FVEC accelVec
+                         inlines  ParticleSystemFile::GetDrag
+  555  004ACEF0     5C  int ParticleSystemInternal::UpdateLifeUsed(const struct ParticleSystemInternal* this, float deltaTime)
+                         local  unsigned int count
+                         local  struct Particle* particle
+                         local  int anyAlive
+                         local  float lifeUsed
+  579  004C53F8    100  unsigned int ParticleSystemInternal::SetParticleOutput(const struct ParticleSystemInternal* this, struct ParticleOutput* output, const float* camera)
+                         local  unsigned int constantMask
+  617  004ACB24     5C  void ParticleSystemInternal::ResetEruptions(const struct ParticleSystemInternal* this)
+                         local  unsigned int i
+  627  004B08E0     F8  void ParticleSystemInternal::UpdateEruptions(const struct ParticleSystemInternal* this, float deltaTime)
+                         local  struct ParticleEruption* eruption
+                         local  unsigned int eruptionCount
+                         local  float timeToNextEruption
+  656  004AFED0    11C  void ParticleSystemInternal::UpdateSingleEruption(const struct ParticleSystemInternal* this, struct ParticleEruption* eruption, float deltaTime)
+                         local  unsigned int burstsRemaining
+                         local  float timeToNextBurst
+                         inlines  ParticleSystemFile::GetTimeBetweenBurstsMin
+  675  004AFFEC    10C  void ParticleSystemInternal::DoEruption(const struct ParticleSystemInternal* this)
+                         local  struct ParticleEruption* eruption
+                         local  struct ParticleEruption* nextEruption
+                         local  struct ParticleEruption* firstEruption
+                         inlines  ParticleSystemFile::GetBurstsPerEruptionMin
+  693  004AFE20     B0  void ParticleSystemInternal::DoBurst(const struct ParticleSystemInternal* this)
+                         local  unsigned int burstCount
+                         local  unsigned int maxCount
+                         local  unsigned int activeCount
+                         inlines  ParticleSystemFile::GetParticleCount
+  727  004AEBF8    39C  void ParticleSystemInternal::PositionCylinderBurst(const struct ParticleSystemInternal* this, unsigned int burstCount)
+                         local  unsigned int maxCount
+                         local  struct Particle* next
+                         local  struct Particle* begin
+                         local  struct Particle* end
+                         local  float scaleX
+                         local  float scaleY
+                         local  float scaleZ
+                         local  float a
+                         local  float x
+                         local  float y
+                         local  float z
+                         local  float r
+                         local  float a
+                         inlines  std::cosf, std::sinf
+  779  004ADB6C    3F4  void ParticleSystemInternal::PositionBoxBurst(const struct ParticleSystemInternal* this, unsigned int burstCount)
+                         local  unsigned int maxCount
+                         local  struct Particle* next
+                         local  struct Particle* begin
+                         local  struct Particle* end
+                         local  float scaleX
+                         local  float scaleY
+                         local  float scaleZ
+                         local  unsigned int seed
+                         local  float a
+                         local  float b
+                         local  unsigned int face
+                         local  float x
+                         local  float y
+                         local  float z
+  851  004AEF94    420  void ParticleSystemInternal::PositionEllipsoidBurst(const struct ParticleSystemInternal* this, unsigned int burstCount)
+                         local  unsigned int maxCount
+                         local  struct Particle* next
+                         local  struct Particle* begin
+                         local  struct Particle* end
+                         local  float scaleX
+                         local  float scaleY
+                         local  float scaleZ
+                         local  unsigned int seed
+                         local  float theta
+                         local  float phi
+                         local  float cosTheta
+                         local  float sinTheta
+                         local  float cosPhi
+                         local  float sinPhi
+                         local  float x
+                         local  float y
+                         local  float z
+                         local  float theta
+                         local  float phi
+                         local  float cosTheta
+                         local  float sinTheta
+                         local  float cosPhi
+                         local  float sinPhi
+                         local  float r
+                         local  float sinPhiR
+                         local  float x
+                         local  float y
+                         local  float z
+                         inlines  std::cosf, std::sinf
+  918  004AF3B4    A6C  struct Particle* ParticleSystemInternal::FinishBurst(const struct ParticleSystemInternal* this, unsigned int burstCount)
+                         local  unsigned int maxCount
+                         local  struct Particle* particleBegin
+                         local  struct Particle* particleEnd
+                         local  struct Particle* particle
+                         local  int fromCenter
+                         local  unsigned int seed
+                         local  struct _FVEC center
+                         local  struct _FVEC gravityNoiseMin
+                         local  struct _FVEC gravityNoiseMax
+                         local  struct _FVEC originalGravity
+                         local  struct _FVEC position
+                         local  struct _FVEC yaxis
+                         local  float yy
+                         local  float yx
+                         local  struct _FVEC xaxis
+                         local  struct _FVEC zaxis
+                         local  struct _FVEC v
+                         local  struct _FVEC acc
+                         local  struct _FVEC product
+                         inlines  FRANGE_FVEC
+ 1018  004AD2F4    120  unsigned int ParticleSystemInternal::GetRandomBurstCount(const struct ParticleSystemInternal* this)
+                         local  float burstMin
+                         local  float burstMax
+ 1025  004AACC4      C  int ParticleSystemInternal::IsConstantRotation(const const struct ParticleSystemInternal* this)
+ 1032  004B0FE0   2480  unsigned int ParticleSystemInternal::Output_DYNAM_ROT_DYNAM_TEX_DYNAM_SIZE_DYNAM_COLOR(const struct ParticleSystemInternal* this, struct ParticleOutput* output)
+                         local  struct _FVEC rotSpeedMin
+                         local  struct _FVEC rotSpeedMax
+                         local  struct _FVEC initialRotMin
+                         local  struct _FVEC initialRotMax
+                         local  float texFPS
+                         local  unsigned int texFrameCount
+                         local  float texStartMin
+                         local  float texStartMax
+                         local  struct _FVEC uvwMin
+                         local  struct _FVEC uvwMax
+                         local  struct _FVEC uvwStepMin
+                         local  struct _FVEC uvwStepMax
+                         local  struct _FVEC uvwSize
+                         local  struct _FVEC redMin
+                         local  struct _FVEC greenMin
+                         local  struct _FVEC blueMin
+                         local  struct _FVEC alphaMin
+                         local  struct _FVEC redMax
+                         local  struct _FVEC greenMax
+                         local  struct _FVEC blueMax
+                         local  struct _FVEC alphaMax
+                         local  struct _FVEC widthMin
+                         local  struct _FVEC widthMax
+                         local  struct _FVEC heightMin
+                         local  struct _FVEC heightMax
+                         local  float absMinWidth
+                         local  float absMinHeight
+                         local  float absMaxWidth
+                         local  float absMaxHeight
+                         local  struct _FVEC[3] quadMtx
+                         local  struct _FVEC[3] quadMtxT
+                         local  unsigned int outputCount
+                         local  struct Particle* particle
+                         local  unsigned int activeCount
+                         local  unsigned int seed
+                         local  float lifetime
+                         local  float L
+                         local  struct _FVEC pos
+                         local  float t
+                         local  struct _FVEC tvec
+                         local  struct _FVEC qt
+                         local  float value
+                         local  struct _FVEC rotSpeed
+                         local  struct _FVEC initialRot
+                         local  struct _FVEC rotVec
+                         local  struct _FVEC euler
+                         local  struct _FVEC quat
+                         local  float texStart
+                         local  float texTime
+                         local  unsigned int texFrame
+                         local  float fTexFrame
+                         local  struct _FVEC uvw0
+                         local  struct _FVEC uvw1
+                         inlines  FRANGE_FVEC, ParticleSystemFile::GetTextureFPS, ParticleSystemFile::GetTextureFrameCount
+ 1033  004B3460   1988  unsigned int ParticleSystemInternal::Output_DYNAM_ROT_DYNAM_TEX_DYNAM_SIZE_CONST_COLOR(const struct ParticleSystemInternal* this, struct ParticleOutput* output)
+                         local  struct _FVEC rotSpeedMin
+                         local  struct _FVEC rotSpeedMax
+                         local  struct _FVEC initialRotMin
+                         local  struct _FVEC initialRotMax
+                         local  float texFPS
+                         local  unsigned int texFrameCount
+                         local  float texStartMin
+                         local  float texStartMax
+                         local  struct _FVEC uvwMin
+                         local  struct _FVEC uvwMax
+                         local  struct _FVEC uvwStepMin
+                         local  struct _FVEC uvwStepMax
+                         local  struct _FVEC uvwSize
+                         local  struct _FVEC constColor
+                         local  struct _FVEC widthMin
+                         local  struct _FVEC widthMax
+                         local  struct _FVEC heightMin
+                         local  struct _FVEC heightMax
+                         local  float absMinWidth
+                         local  float absMinHeight
+                         local  float absMaxWidth
+                         local  float absMaxHeight
+                         local  struct _FVEC[3] quadMtx
+                         local  struct _FVEC[3] quadMtxT
+                         local  unsigned int outputCount
+                         local  struct Particle* particle
+                         local  unsigned int activeCount
+                         local  unsigned int seed
+                         local  float lifetime
+                         local  float L
+                         local  struct _FVEC pos
+                         local  float t
+                         local  struct _FVEC tvec
+                         local  struct _FVEC qt
+                         local  float value
+                         local  struct _FVEC rotSpeed
+                         local  struct _FVEC initialRot
+                         local  struct _FVEC rotVec
+                         local  struct _FVEC euler
+                         local  struct _FVEC quat
+                         local  float texStart
+                         local  float texTime
+                         local  unsigned int texFrame
+                         local  float fTexFrame
+                         local  struct _FVEC uvw0
+                         local  struct _FVEC uvw1
+                         inlines  FRANGE_FVEC, ParticleSystemFile::GetTextureFPS, ParticleSystemFile::GetTextureFrameCount
+ 1034  004B4DE8   1D48  unsigned int ParticleSystemInternal::Output_DYNAM_ROT_DYNAM_TEX_CONST_SIZE_DYNAM_COLOR(const struct ParticleSystemInternal* this, struct ParticleOutput* output)
+                         local  struct _FVEC rotSpeedMin
+                         local  struct _FVEC rotSpeedMax
+                         local  struct _FVEC initialRotMin
+                         local  struct _FVEC initialRotMax
+                         local  float texFPS
+                         local  unsigned int texFrameCount
+                         local  float texStartMin
+                         local  float texStartMax
+                         local  struct _FVEC uvwMin
+                         local  struct _FVEC uvwMax
+                         local  struct _FVEC uvwStepMin
+                         local  struct _FVEC uvwStepMax
+                         local  struct _FVEC uvwSize
+                         local  struct _FVEC redMin
+                         local  struct _FVEC greenMin
+                         local  struct _FVEC blueMin
+                         local  struct _FVEC alphaMin
+                         local  struct _FVEC redMax
+                         local  struct _FVEC greenMax
+                         local  struct _FVEC blueMax
+                         local  struct _FVEC alphaMax
+                         local  const float constWidth
+                         local  const float constHeight
+                         local  struct _FVEC[3] quadMtx
+                         local  struct _FVEC[3] quadMtxT
+                         local  unsigned int outputCount
+                         local  struct Particle* particle
+                         local  unsigned int activeCount
+                         local  unsigned int seed
+                         local  float lifetime
+                         local  float L
+                         local  struct _FVEC pos
+                         local  float t
+                         local  struct _FVEC tvec
+                         local  struct _FVEC qt
+                         local  float value
+                         local  struct _FVEC rotSpeed
+                         local  struct _FVEC initialRot
+                         local  struct _FVEC rotVec
+                         local  struct _FVEC euler
+                         local  struct _FVEC quat
+                         local  float texStart
+                         local  float texTime
+                         local  unsigned int texFrame
+                         local  float fTexFrame
+                         local  struct _FVEC uvw0
+                         local  struct _FVEC uvw1
+                         inlines  FRANGE_FVEC, ParticleSystemFile::GetStartHeightMin, ParticleSystemFile::GetStartWidthMin, ParticleSystemFile::GetTextureFPS, ParticleSystemFile::GetTextureFrameCount
+ 1035  004B6B30   1024  unsigned int ParticleSystemInternal::Output_DYNAM_ROT_DYNAM_TEX_CONST_SIZE_CONST_COLOR(const struct ParticleSystemInternal* this, struct ParticleOutput* output)
+                         local  struct _FVEC rotSpeedMin
+                         local  struct _FVEC rotSpeedMax
+                         local  struct _FVEC initialRotMin
+                         local  struct _FVEC initialRotMax
+                         local  float texFPS
+                         local  unsigned int texFrameCount
+                         local  float texStartMin
+                         local  float texStartMax
+                         local  struct _FVEC uvwMin
+                         local  struct _FVEC uvwMax
+                         local  struct _FVEC uvwStepMin
+                         local  struct _FVEC uvwStepMax
+                         local  struct _FVEC uvwSize
+                         local  struct _FVEC constColor
+                         local  const float constWidth
+                         local  const float constHeight
+                         local  unsigned int outputCount
+                         local  struct Particle* particle
+                         local  unsigned int activeCount
+                         local  unsigned int seed
+                         local  float lifetime
+                         local  float L
+                         local  struct _FVEC pos
+                         local  struct _FVEC rotSpeed
+                         local  struct _FVEC initialRot
+                         local  struct _FVEC rotVec
+                         local  struct _FVEC euler
+                         local  struct _FVEC quat
+                         local  float texStart
+                         local  float texTime
+                         local  unsigned int texFrame
+                         local  float fTexFrame
+                         local  struct _FVEC uvw0
+                         local  struct _FVEC uvw1
+                         inlines  FRANGE_FVEC, ParticleSystemFile::GetStartHeightMin, ParticleSystemFile::GetStartWidthMin, ParticleSystemFile::GetTextureFPS, ParticleSystemFile::GetTextureFrameCount
+ 1037  004B7B54   1DA8  unsigned int ParticleSystemInternal::Output_DYNAM_ROT_CONST_TEX_DYNAM_SIZE_DYNAM_COLOR(const struct ParticleSystemInternal* this, struct ParticleOutput* output)
+                         local  struct _FVEC rotSpeedMin
+                         local  struct _FVEC rotSpeedMax
+                         local  struct _FVEC initialRotMin
+                         local  struct _FVEC initialRotMax
+                         local  unsigned int constTexFrame
+                         local  struct _FVEC constUVW0
+                         local  struct _FVEC constUVW1
+                         local  struct _FVEC redMin
+                         local  struct _FVEC greenMin
+                         local  struct _FVEC blueMin
+                         local  struct _FVEC alphaMin
+                         local  struct _FVEC redMax
+                         local  struct _FVEC greenMax
+                         local  struct _FVEC blueMax
+                         local  struct _FVEC alphaMax
+                         local  struct _FVEC widthMin
+                         local  struct _FVEC widthMax
+                         local  struct _FVEC heightMin
+                         local  struct _FVEC heightMax
+                         local  float absMinWidth
+                         local  float absMinHeight
+                         local  float absMaxWidth
+                         local  float absMaxHeight
+                         local  struct _FVEC[3] quadMtx
+                         local  struct _FVEC[3] quadMtxT
+                         local  unsigned int outputCount
+                         local  struct Particle* particle
+                         local  unsigned int activeCount
+                         local  unsigned int seed
+                         local  float lifetime
+                         local  float L
+                         local  struct _FVEC pos
+                         local  float t
+                         local  struct _FVEC tvec
+                         local  struct _FVEC qt
+                         local  float value
+                         local  struct _FVEC rotSpeed
+                         local  struct _FVEC initialRot
+                         local  struct _FVEC rotVec
+                         local  struct _FVEC euler
+                         local  struct _FVEC quat
+                         inlines  FRANGE_FVEC
+ 1038  004B98FC   12B0  unsigned int ParticleSystemInternal::Output_DYNAM_ROT_CONST_TEX_DYNAM_SIZE_CONST_COLOR(const struct ParticleSystemInternal* this, struct ParticleOutput* output)
+                         local  struct _FVEC rotSpeedMin
+                         local  struct _FVEC rotSpeedMax
+                         local  struct _FVEC initialRotMin
+                         local  struct _FVEC initialRotMax
+                         local  unsigned int constTexFrame
+                         local  struct _FVEC constUVW0
+                         local  struct _FVEC constUVW1
+                         local  struct _FVEC constColor
+                         local  struct _FVEC widthMin
+                         local  struct _FVEC widthMax
+                         local  struct _FVEC heightMin
+                         local  struct _FVEC heightMax
+                         local  float absMinWidth
+                         local  float absMinHeight
+                         local  float absMaxWidth
+                         local  float absMaxHeight
+                         local  struct _FVEC[3] quadMtx
+                         local  struct _FVEC[3] quadMtxT
+                         local  unsigned int outputCount
+                         local  struct Particle* particle
+                         local  unsigned int activeCount
+                         local  unsigned int seed
+                         local  float lifetime
+                         local  float L
+                         local  struct _FVEC pos
+                         local  float t
+                         local  struct _FVEC tvec
+                         local  struct _FVEC qt
+                         local  float value
+                         local  struct _FVEC rotSpeed
+                         local  struct _FVEC initialRot
+                         local  struct _FVEC rotVec
+                         local  struct _FVEC euler
+                         local  struct _FVEC quat
+                         inlines  FRANGE_FVEC
+ 1039  004BABAC   1670  unsigned int ParticleSystemInternal::Output_DYNAM_ROT_CONST_TEX_CONST_SIZE_DYNAM_COLOR(const struct ParticleSystemInternal* this, struct ParticleOutput* output)
+                         local  struct _FVEC rotSpeedMin
+                         local  struct _FVEC rotSpeedMax
+                         local  struct _FVEC initialRotMin
+                         local  struct _FVEC initialRotMax
+                         local  unsigned int constTexFrame
+                         local  struct _FVEC constUVW0
+                         local  struct _FVEC constUVW1
+                         local  struct _FVEC redMin
+                         local  struct _FVEC greenMin
+                         local  struct _FVEC blueMin
+                         local  struct _FVEC alphaMin
+                         local  struct _FVEC redMax
+                         local  struct _FVEC greenMax
+                         local  struct _FVEC blueMax
+                         local  struct _FVEC alphaMax
+                         local  const float constWidth
+                         local  const float constHeight
+                         local  struct _FVEC[3] quadMtx
+                         local  struct _FVEC[3] quadMtxT
+                         local  unsigned int outputCount
+                         local  struct Particle* particle
+                         local  unsigned int activeCount
+                         local  unsigned int seed
+                         local  float lifetime
+                         local  float L
+                         local  struct _FVEC pos
+                         local  float t
+                         local  struct _FVEC tvec
+                         local  struct _FVEC qt
+                         local  float value
+                         local  struct _FVEC rotSpeed
+                         local  struct _FVEC initialRot
+                         local  struct _FVEC rotVec
+                         local  struct _FVEC euler
+                         local  struct _FVEC quat
+                         inlines  FRANGE_FVEC, ParticleSystemFile::GetStartHeightMin, ParticleSystemFile::GetStartWidthMin
+ 1040  004BC21C    970  unsigned int ParticleSystemInternal::Output_DYNAM_ROT_CONST_TEX_CONST_SIZE_CONST_COLOR(const struct ParticleSystemInternal* this, struct ParticleOutput* output)
+                         local  struct _FVEC rotSpeedMin
+                         local  struct _FVEC rotSpeedMax
+                         local  struct _FVEC initialRotMin
+                         local  struct _FVEC initialRotMax
+                         local  unsigned int constTexFrame
+                         local  struct _FVEC constUVW0
+                         local  struct _FVEC constUVW1
+                         local  struct _FVEC constColor
+                         local  const float constWidth
+                         local  const float constHeight
+                         local  unsigned int outputCount
+                         local  struct Particle* particle
+                         local  unsigned int activeCount
+                         local  unsigned int seed
+                         local  float lifetime
+                         local  float L
+                         local  struct _FVEC pos
+                         local  struct _FVEC rotSpeed
+                         local  struct _FVEC initialRot
+                         local  struct _FVEC rotVec
+                         local  struct _FVEC euler
+                         local  struct _FVEC quat
+                         inlines  FRANGE_FVEC, ParticleSystemFile::GetStartHeightMin, ParticleSystemFile::GetStartWidthMin
+ 1042  004BCB8C   1E8C  unsigned int ParticleSystemInternal::Output_CONST_ROT_DYNAM_TEX_DYNAM_SIZE_DYNAM_COLOR(const struct ParticleSystemInternal* this, struct ParticleOutput* output)
+                         local  struct _FVEC constOrientation
+                         local  float texFPS
+                         local  unsigned int texFrameCount
+                         local  float texStartMin
+                         local  float texStartMax
+                         local  struct _FVEC uvwMin
+                         local  struct _FVEC uvwMax
+                         local  struct _FVEC uvwStepMin
+                         local  struct _FVEC uvwStepMax
+                         local  struct _FVEC uvwSize
+                         local  struct _FVEC redMin
+                         local  struct _FVEC greenMin
+                         local  struct _FVEC blueMin
+                         local  struct _FVEC alphaMin
+                         local  struct _FVEC redMax
+                         local  struct _FVEC greenMax
+                         local  struct _FVEC blueMax
+                         local  struct _FVEC alphaMax
+                         local  struct _FVEC widthMin
+                         local  struct _FVEC widthMax
+                         local  struct _FVEC heightMin
+                         local  struct _FVEC heightMax
+                         local  float absMinWidth
+                         local  float absMinHeight
+                         local  float absMaxWidth
+                         local  float absMaxHeight
+                         local  struct _FVEC[3] quadMtx
+                         local  struct _FVEC[3] quadMtxT
+                         local  unsigned int outputCount
+                         local  struct Particle* particle
+                         local  unsigned int activeCount
+                         local  unsigned int seed
+                         local  float lifetime
+                         local  float L
+                         local  struct _FVEC pos
+                         local  float t
+                         local  struct _FVEC tvec
+                         local  struct _FVEC qt
+                         local  float value
+                         local  float texStart
+                         local  float texTime
+                         local  unsigned int texFrame
+                         local  float fTexFrame
+                         local  struct _FVEC uvw0
+                         local  struct _FVEC uvw1
+                         inlines  FRANGE_FVEC, ParticleSystemFile::GetTextureFPS, ParticleSystemFile::GetTextureFrameCount
+ 1043  004BEA18   1384  unsigned int ParticleSystemInternal::Output_CONST_ROT_DYNAM_TEX_DYNAM_SIZE_CONST_COLOR(const struct ParticleSystemInternal* this, struct ParticleOutput* output)
+                         local  struct _FVEC constOrientation
+                         local  float texFPS
+                         local  unsigned int texFrameCount
+                         local  float texStartMin
+                         local  float texStartMax
+                         local  struct _FVEC uvwMin
+                         local  struct _FVEC uvwMax
+                         local  struct _FVEC uvwStepMin
+                         local  struct _FVEC uvwStepMax
+                         local  struct _FVEC uvwSize
+                         local  struct _FVEC constColor
+                         local  struct _FVEC widthMin
+                         local  struct _FVEC widthMax
+                         local  struct _FVEC heightMin
+                         local  struct _FVEC heightMax
+                         local  float absMinWidth
+                         local  float absMinHeight
+                         local  float absMaxWidth
+                         local  float absMaxHeight
+                         local  struct _FVEC[3] quadMtx
+                         local  struct _FVEC[3] quadMtxT
+                         local  unsigned int outputCount
+                         local  struct Particle* particle
+                         local  unsigned int activeCount
+                         local  unsigned int seed
+                         local  float lifetime
+                         local  float L
+                         local  struct _FVEC pos
+                         local  float t
+                         local  struct _FVEC tvec
+                         local  struct _FVEC qt
+                         local  float value
+                         local  float texStart
+                         local  float texTime
+                         local  unsigned int texFrame
+                         local  float fTexFrame
+                         local  struct _FVEC uvw0
+                         local  struct _FVEC uvw1
+                         inlines  FRANGE_FVEC, ParticleSystemFile::GetTextureFPS, ParticleSystemFile::GetTextureFrameCount
+ 1044  004BFD9C   174C  unsigned int ParticleSystemInternal::Output_CONST_ROT_DYNAM_TEX_CONST_SIZE_DYNAM_COLOR(const struct ParticleSystemInternal* this, struct ParticleOutput* output)
+                         local  struct _FVEC constOrientation
+                         local  float texFPS
+                         local  unsigned int texFrameCount
+                         local  float texStartMin
+                         local  float texStartMax
+                         local  struct _FVEC uvwMin
+                         local  struct _FVEC uvwMax
+                         local  struct _FVEC uvwStepMin
+                         local  struct _FVEC uvwStepMax
+                         local  struct _FVEC uvwSize
+                         local  struct _FVEC redMin
+                         local  struct _FVEC greenMin
+                         local  struct _FVEC blueMin
+                         local  struct _FVEC alphaMin
+                         local  struct _FVEC redMax
+                         local  struct _FVEC greenMax
+                         local  struct _FVEC blueMax
+                         local  struct _FVEC alphaMax
+                         local  const float constWidth
+                         local  const float constHeight
+                         local  struct _FVEC[3] quadMtx
+                         local  struct _FVEC[3] quadMtxT
+                         local  unsigned int outputCount
+                         local  struct Particle* particle
+                         local  unsigned int activeCount
+                         local  unsigned int seed
+                         local  float lifetime
+                         local  float L
+                         local  struct _FVEC pos
+                         local  float t
+                         local  struct _FVEC tvec
+                         local  struct _FVEC qt
+                         local  float value
+                         local  float texStart
+                         local  float texTime
+                         local  unsigned int texFrame
+                         local  float fTexFrame
+                         local  struct _FVEC uvw0
+                         local  struct _FVEC uvw1
+                         inlines  FRANGE_FVEC, ParticleSystemFile::GetStartHeightMin, ParticleSystemFile::GetStartWidthMin, ParticleSystemFile::GetTextureFPS, ParticleSystemFile::GetTextureFrameCount
+ 1045  004C14E8    A30  unsigned int ParticleSystemInternal::Output_CONST_ROT_DYNAM_TEX_CONST_SIZE_CONST_COLOR(const struct ParticleSystemInternal* this, struct ParticleOutput* output)
+                         local  struct _FVEC constOrientation
+                         local  float texFPS
+                         local  unsigned int texFrameCount
+                         local  float texStartMin
+                         local  float texStartMax
+                         local  struct _FVEC uvwMin
+                         local  struct _FVEC uvwMax
+                         local  struct _FVEC uvwStepMin
+                         local  struct _FVEC uvwStepMax
+                         local  struct _FVEC uvwSize
+                         local  struct _FVEC constColor
+                         local  const float constWidth
+                         local  const float constHeight
+                         local  unsigned int outputCount
+                         local  struct Particle* particle
+                         local  unsigned int activeCount
+                         local  unsigned int seed
+                         local  float lifetime
+                         local  float L
+                         local  struct _FVEC pos
+                         local  float texStart
+                         local  float texTime
+                         local  unsigned int texFrame
+                         local  float fTexFrame
+                         local  struct _FVEC uvw0
+                         local  struct _FVEC uvw1
+                         inlines  FRANGE_FVEC, ParticleSystemFile::GetStartHeightMin, ParticleSystemFile::GetStartWidthMin, ParticleSystemFile::GetTextureFPS, ParticleSystemFile::GetTextureFrameCount
+ 1047  004C1F18   17AC  unsigned int ParticleSystemInternal::Output_CONST_ROT_CONST_TEX_DYNAM_SIZE_DYNAM_COLOR(const struct ParticleSystemInternal* this, struct ParticleOutput* output)
+                         local  struct _FVEC constOrientation
+                         local  unsigned int constTexFrame
+                         local  struct _FVEC constUVW0
+                         local  struct _FVEC constUVW1
+                         local  struct _FVEC redMin
+                         local  struct _FVEC greenMin
+                         local  struct _FVEC blueMin
+                         local  struct _FVEC alphaMin
+                         local  struct _FVEC redMax
+                         local  struct _FVEC greenMax
+                         local  struct _FVEC blueMax
+                         local  struct _FVEC alphaMax
+                         local  struct _FVEC widthMin
+                         local  struct _FVEC widthMax
+                         local  struct _FVEC heightMin
+                         local  struct _FVEC heightMax
+                         local  float absMinWidth
+                         local  float absMinHeight
+                         local  float absMaxWidth
+                         local  float absMaxHeight
+                         local  struct _FVEC[3] quadMtx
+                         local  struct _FVEC[3] quadMtxT
+                         local  unsigned int outputCount
+                         local  struct Particle* particle
+                         local  unsigned int activeCount
+                         local  unsigned int seed
+                         local  float lifetime
+                         local  float L
+                         local  struct _FVEC pos
+                         local  float t
+                         local  struct _FVEC tvec
+                         local  struct _FVEC qt
+                         local  float value
+                         inlines  FRANGE_FVEC
+ 1048  004C36C4    CC0  unsigned int ParticleSystemInternal::Output_CONST_ROT_CONST_TEX_DYNAM_SIZE_CONST_COLOR(const struct ParticleSystemInternal* this, struct ParticleOutput* output)
+                         local  struct _FVEC constOrientation
+                         local  unsigned int constTexFrame
+                         local  struct _FVEC constUVW0
+                         local  struct _FVEC constUVW1
+                         local  struct _FVEC constColor
+                         local  struct _FVEC widthMin
+                         local  struct _FVEC widthMax
+                         local  struct _FVEC heightMin
+                         local  struct _FVEC heightMax
+                         local  float absMinWidth
+                         local  float absMinHeight
+                         local  float absMaxWidth
+                         local  float absMaxHeight
+                         local  struct _FVEC[3] quadMtx
+                         local  struct _FVEC[3] quadMtxT
+                         local  unsigned int outputCount
+                         local  struct Particle* particle
+                         local  unsigned int activeCount
+                         local  unsigned int seed
+                         local  float lifetime
+                         local  float L
+                         local  struct _FVEC pos
+                         local  float t
+                         local  struct _FVEC tvec
+                         local  struct _FVEC qt
+                         local  float value
+                         inlines  FRANGE_FVEC
+ 1049  004C4384   1074  unsigned int ParticleSystemInternal::Output_CONST_ROT_CONST_TEX_CONST_SIZE_DYNAM_COLOR(const struct ParticleSystemInternal* this, struct ParticleOutput* output)
+                         local  struct _FVEC constOrientation
+                         local  unsigned int constTexFrame
+                         local  struct _FVEC constUVW0
+                         local  struct _FVEC constUVW1
+                         local  struct _FVEC redMin
+                         local  struct _FVEC greenMin
+                         local  struct _FVEC blueMin
+                         local  struct _FVEC alphaMin
+                         local  struct _FVEC redMax
+                         local  struct _FVEC greenMax
+                         local  struct _FVEC blueMax
+                         local  struct _FVEC alphaMax
+                         local  const float constWidth
+                         local  const float constHeight
+                         local  struct _FVEC[3] quadMtx
+                         local  struct _FVEC[3] quadMtxT
+                         local  unsigned int outputCount
+                         local  struct Particle* particle
+                         local  unsigned int activeCount
+                         local  unsigned int seed
+                         local  float lifetime
+                         local  float L
+                         local  struct _FVEC pos
+                         local  float t
+                         local  struct _FVEC tvec
+                         local  struct _FVEC qt
+                         local  float value
+                         inlines  FRANGE_FVEC, ParticleSystemFile::GetStartHeightMin, ParticleSystemFile::GetStartWidthMin
+ 1050  004AE56C    340  unsigned int ParticleSystemInternal::Output_CONST_ROT_CONST_TEX_CONST_SIZE_CONST_COLOR(const struct ParticleSystemInternal* this, struct ParticleOutput* output)
+                         local  struct _FVEC constOrientation
+                         local  unsigned int constTexFrame
+                         local  struct _FVEC constUVW0
+                         local  struct _FVEC constUVW1
+                         local  struct _FVEC constColor
+                         local  const float constWidth
+                         local  const float constHeight
+                         local  unsigned int outputCount
+                         local  struct Particle* particle
+                         local  unsigned int activeCount
+                         local  unsigned int seed
+                         local  float lifetime
+                         local  float L
+                         local  struct _FVEC pos
+                         inlines  ParticleSystemFile::GetStartHeightMin, ParticleSystemFile::GetStartWidthMin
+ 1051  004AD4A4     10  static void _GLOBAL__I__ZN15ParticleEmitternwEj()
+ 1052  004AD4B4     10  static void _GLOBAL__D__ZN15ParticleEmitternwEj()

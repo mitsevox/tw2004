@@ -1,0 +1,12 @@
+// ../../../../../TIGERCODE/Code/Golf/TextureFX/Headers/txrblendrule.h
+// compiled in: other_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   47    inline-only   const char* TXRBlendRule::GetBlendName(const const struct TXRBlendRule* this)
+   49    inline-only   const char* TXRBlendRule::GetVarGroup(const const struct TXRBlendRule* this)
+   51    inline-only   const char* TXRBlendRule::GetVarSelection(const const struct TXRBlendRule* this)
+   53    inline-only   enum TXRBlendRule_Mode TXRBlendRule::GetBlendMode(const const struct TXRBlendRule* this)
+   55    inline-only   int32_t TXRBlendRule::GetNumParams(const const struct TXRBlendRule* this)
+   57    inline-only   bool TXRBlendRule::GetMirrored(const const struct TXRBlendRule* this)
+   59    inline-only   const struct TXRBlendRuleParams* TXRBlendRule::GetParam(const const struct TXRBlendRule* this, int32_t index)
+   61    inline-only   void TXRBlendRule::GetDestRect(const const struct TXRBlendRule* this, const float& u0, const float& v0, const float& u1, const float& v1)

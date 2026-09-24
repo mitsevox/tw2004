@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_trinity_camera.h
+// compiled in: tiger_module_trinity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   26    inline-only   float TrinityCamera::GetFov(const const struct TrinityCamera* this)
+   27    inline-only   const float* TrinityCamera::GetMtx(const const struct TrinityCamera* this)

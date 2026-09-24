@@ -1,0 +1,248 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Spectator/PovMatrix.cpp
+// compiled in: golf2_unity.cpp
+// 65 functions, source order. line | PS3 address | size
+
+   84  00153AA0    2E0  void CPovQuaternion::Set(const struct CPovQuaternion* this, const const struct CPovMatrix4x3& src)
+                         local  float tr
+                         local  float s
+                         local  float[4] q
+                         local  int i
+                         local  int j
+                         local  int k
+                         local  int[3] nxt
+                         inlines  CPovMatrix4x3::operator[], CPovVector3::operator[], CPovVector4::operator=
+  153  00153D80    2E0  void CPovQuaternion::Set(const struct CPovQuaternion* this, const const struct CPovMatrix4x4& src)
+                         local  float tr
+                         local  float s
+                         local  float[4] q
+                         local  int i
+                         local  int j
+                         local  int k
+                         local  int[3] nxt
+                         inlines  CPovMatrix4x4::operator[], CPovVector4::operator=, CPovVector4::operator[]
+  204  001A3980     E4  struct CPovQuaternion CPovQuaternion::operator+(const const struct CPovQuaternion* this, const const struct CPovQuaternion& src)
+                         local  struct CPovVector3 t1
+                         local  struct CPovVector3 t2
+                         local  struct CPovVector3 t3
+                         local  float w1
+                         local  float w2
+                         local  struct CPovVector4 result
+                         inlines  CPovQuaternion::CPovQuaternion, CPovVector3::operator+, CPovVector4::GetW, CPovVector4::Normalize, CPovVector4::operator*
+  226  0017617C     88  struct CPovQuaternion CPovQuaternion::operator*(const const struct CPovQuaternion* this, const const struct CPovQuaternion& src)
+                         local  float w1
+                         local  float w2
+                         local  struct CPovVector4 v
+                         local  struct CPovVector4 result
+                         local  struct CPovVector3 test
+                         inlines  CPovQuaternion::CPovQuaternion, CPovVector3::CPovVector3, CPovVector4::GetW
+  247  0018D048    1C0  struct CPovQuaternion CPovQuaternion::Slerp(const const struct CPovQuaternion* this, const const struct CPovQuaternion& to, float time)
+                         local  struct CPovVector4 to1
+                         local  float omega
+                         local  float cosom
+                         local  float sinom
+                         local  float scale0
+                         local  float scale1
+                         local  struct CPovVector4 result
+                         inlines  CPovQuaternion::CPovQuaternion, CPovVector4::Dot, CPovVector4::Normalized, CPovVector4::operator+, std::sin
+  301  0016B42C     AC  struct CPovQuaternion CPovQuaternion::Lerp(const const struct CPovQuaternion* this, const const struct CPovQuaternion& to, float time)
+                         local  struct CPovVector4 to1
+                         local  float cosom
+                         local  float scale0
+                         local  float scale1
+                         local  struct CPovVector4 result
+                         inlines  CPovQuaternion::CPovQuaternion, CPovVector4::Normalized, CPovVector4::operator+
+  339  00143F1C      4  void CPovQuaternion::Print(const const struct CPovQuaternion* this)
+  344  00143F20      4  void CPovQuaternion::Print(const const struct CPovQuaternion* this, const char* name)
+  351  001C5C60     48  void CPovMatrix4x3::SetRotate(const struct CPovMatrix4x3* this, float angle, const const struct CPovVector3& axis)
+                         inlines  std::cos
+  358  001C5AA4    1BC  void CPovMatrix4x3::SetAxisAndCos(const struct CPovMatrix4x3* this, float c, const const struct CPovVector3& axis)
+                         local  float s
+                         local  float t
+                         local  struct CPovVector3 temp
+                         inlines  CPovVector3::Normalize, CPovVector3::operator=
+  395  0018A39C    16C  void CPovMatrix4x3::SetRotateXYZ(const struct CPovMatrix4x3* this, float x, float y, float z)
+                         local  float cr
+                         local  float sr
+                         local  float cp
+                         local  float sp
+                         local  float cy
+                         local  float sy
+                         inlines  CPovVector3::SetIdentity, CPovVector3::operator=, std::cos, std::sin
+  416  0018ABFC    1DC  void CPovMatrix4x3::SetRotateXZY(const struct CPovMatrix4x3* this, float x, float y, float z)
+                         inlines  CPovMatrix4x3::RotateY, CPovMatrix4x3::RotateZ, CPovMatrix4x3::SetRotateX, CPovMatrix4x3::SetRotateZ, CPovVector3::Set, CPovVector3::SetIdentity, CPovVector3::SetZero, std::sin
+  427  0018A508    174  void CPovMatrix4x3::SetRotateRYPT(const struct CPovMatrix4x3* this, const const struct CPovVector3& _trans, float roll, float pitch, float yaw)
+                         local  float cr
+                         local  float sr
+                         local  float cp
+                         local  float sp
+                         local  float cy
+                         local  float sy
+                         local  float cpsr
+                         local  float sycr
+                         inlines  CPovVector3::operator=, std::cos, std::sin
+  453  001C5D70    11C  void CPovMatrix4x3::SetDir(const struct CPovMatrix4x3* this, const const struct CPovVector3& _forward)
+                         inlines  CPovVector3::Cross, CPovVector3::Normalize, CPovVector3::operator=
+  468  0018A67C    26C  void CPovMatrix4x3::SetCamera(const struct CPovMatrix4x3* this, const const struct CPovVector3& pos, const const struct CPovVector3& angle)
+                         inlines  CPovMatrix4x3::RotateY, CPovMatrix4x3::RotateZ, CPovMatrix4x3::SetRotateX, CPovMatrix4x3::SetRotateZ, CPovMatrix4x3::operator*, CPovVector3::Set, CPovVector3::SetZero, CPovVector3::operator-, CPovVector3::operator=, std::sin
+  479  001C6044     14  void CPovMatrix4x3::SetLookAtLH(const struct CPovMatrix4x3* this, const const struct CPovVector3& pos, const const struct CPovVector3& target)
+  484  001C5E8C    1B8  void CPovMatrix4x3::SetLookAtLH(const struct CPovMatrix4x3* this, const const struct CPovVector3& pos, const const struct CPovVector3& target, const const struct CPovVector3& _up)
+                         local  struct CPovVector3 vright
+                         local  struct CPovVector3 vup
+                         local  struct CPovVector3 vforward
+                         inlines  CPovVector3::Cross, CPovVector3::Dot, CPovVector3::Normalize, CPovVector3::operator+, CPovVector3::operator-, CPovVector3::operator[]
+  527  001C6214     14  void CPovMatrix4x3::SetLookAtRH(const struct CPovMatrix4x3* this, const const struct CPovVector3& pos, const const struct CPovVector3& target)
+  532  001C6058    1BC  void CPovMatrix4x3::SetLookAtRH(const struct CPovMatrix4x3* this, const const struct CPovVector3& pos, const const struct CPovVector3& target, const const struct CPovVector3& _up)
+                         local  struct CPovVector3 vright
+                         local  struct CPovVector3 vup
+                         local  struct CPovVector3 vforward
+                         inlines  CPovVector3::Cross, CPovVector3::Dot, CPovVector3::Normalize, CPovVector3::operator+, CPovVector3::operator-, CPovVector3::operator[]
+  575  00174108    4F8  struct CPovMatrix4x3 CPovMatrix4x3::AffineInverse(const const struct CPovMatrix4x3* this)
+                         local  float det_1
+                         local  float pos
+                         local  float neg
+                         local  float temp
+                         local  float x
+                         local  float y
+                         local  float z
+                         local  struct CPovMatrix4x3 result
+                         local  const const struct CPovMatrix4x3& in
+                         inlines  CPovMatrix4x3::CPovMatrix4x3, CPovMatrix4x3::operator[], CPovVector3::operator=, CPovVector3::operator[]
+  652  001C6228    144  struct CPovMatrix4x3 CPovMatrix4x3::Unitized(const const struct CPovMatrix4x3* this)
+                         local  struct CPovMatrix4x3& result
+                         local  struct CPovVector3 col0
+                         local  struct CPovVector3 col1
+                         local  struct CPovVector3 col2
+                         local  struct CPovMatrix4x3 result
+                         inlines  CPovVector3::GetW, CPovVector3::GetX, CPovVector3::GetY, CPovVector3::GetZ, CPovVector3::Normalize, CPovVector3::Set, CPovVector3::operator=
+  674  001C5CA8     C8  void CPovMatrix4x3::Rotate(const struct CPovMatrix4x3* this, float angle, const const struct CPovVector3& axis)
+                         local  struct CPovMatrix4x3 temp
+                         inlines  CPovMatrix4x3::operator=
+  685  00186084    170  struct CPovMatrix4x3 CPovMatrix4x3::operator*(const const struct CPovMatrix4x3* this, const const struct CPovMatrix3x3& src)
+                         inlines  CPovMatrix4x3::CPovMatrix4x3, CPovMatrix4x3::operator*, CPovVector3::operator=
+  707  00176704    1CC  struct CPovMatrix4x3 CPovMatrix4x3::operator*(const const struct CPovMatrix4x3* this, const const struct CPovMatrix4x3& src)
+                         local  struct CPovMatrix4x3& result
+                         local  struct CPovMatrix4x3 result
+                         inlines  CPovMatrix4x3::RotateVector, CPovMatrix4x3::operator*, CPovVector3::operator=
+  725  0017CC3C    1F0  struct CPovMatrix4x3 CPovMatrix4x3::operator*(const const struct CPovMatrix4x3* this, const const struct CPovMatrix4x4& src)
+                         local  struct CPovMatrix4x3& result
+                         local  struct CPovMatrix4x3 result
+                         inlines  CPovMatrix4x3::RotateVector, CPovMatrix4x3::operator*, CPovVector3::operator=
+  745  001768D0     B4  struct CPovMatrix4x3& CPovMatrix4x3::operator*=(const struct CPovMatrix4x3* this, const const struct CPovMatrix4x3& src)
+                         inlines  CPovMatrix4x3::operator=, CPovVector3::operator=
+  754  00143F24      4  void CPovMatrix4x3::Print(const const struct CPovMatrix4x3* this)
+  762  00143F28      4  void CPovMatrix4x3::Print(const const struct CPovMatrix4x3* this, const char* name)
+  770  001C636C    174  void CPovMatrix4x3::RotateAroundUp(const struct CPovMatrix4x3* this, float angle)
+                         inlines  CPovVector3::Cross, CPovVector3::Normalize, CPovVector3::operator*, CPovVector3::operator+, CPovVector3::operator=, std::cos, std::sin
+  783  001C64E0    17C  void CPovMatrix4x3::RotateAroundRight(const struct CPovMatrix4x3* this, float angle)
+                         inlines  CPovVector3::Cross, CPovVector3::Normalize, CPovVector3::operator*, CPovVector3::operator+, CPovVector3::operator=, std::cos, std::sin
+  796  001C665C    174  void CPovMatrix4x3::RotateAroundForward(const struct CPovMatrix4x3* this, float angle)
+                         inlines  CPovVector3::Cross, CPovVector3::Normalize, CPovVector3::operator*, CPovVector3::operator+, CPovVector3::operator=, std::cos, std::sin
+  809  001C699C     48  void CPovMatrix4x4::SetRotate(const struct CPovMatrix4x4* this, float angle, const const struct CPovVector3& axis)
+                         inlines  std::cos
+  816  001C67D0    1CC  void CPovMatrix4x4::SetAxisAndCos(const struct CPovMatrix4x4* this, float c, const const struct CPovVector3& axis)
+                         local  float s
+                         local  float t
+                         local  struct CPovVector3 temp
+                         inlines  CPovVector3::Normalize, CPovVector4::operator=
+  853  00143F2C      4  void CPovMatrix4x4::SetOrtho(const struct CPovMatrix4x4* this, float left, float right, float bottom, float top, float nearp, float farp)
+  895  00143F30      4  void CPovMatrix4x4::SetProjection(const struct CPovMatrix4x4* this, const struct CPovMatrix4x4& inverse, float _left, float _right, float _bottom, float _top, float znear, float zfar, float aspectx, float aspecty)
+  921  0014B710     B0  void CPovMatrix4x4::SetPerspectiveLH(const struct CPovMatrix4x4* this, float width, float height, float nearZ, float farZ)
+                         inlines  CPovVector4::operator[]
+  937  0014B7C0     AC  void CPovMatrix4x4::SetPerspectiveRH(const struct CPovMatrix4x4* this, float width, float height, float nearZ, float farZ)
+                         inlines  CPovVector4::operator[]
+  953  0014B86C     A0  void CPovMatrix4x4::SetScreenOrtho(const struct CPovMatrix4x4* this, float width, float height)
+                         inlines  CPovVector4::operator[]
+  968  0014B90C     A8  void CPovMatrix4x4::SetOrthoLH(const struct CPovMatrix4x4* this, float width, float height, float nearZ, float farZ)
+                         inlines  CPovVector4::operator[]
+  983  0014B9B4     C0  void CPovMatrix4x4::SetOrthoLH(const struct CPovMatrix4x4* this, float left, float right, float top, float bottom, float nearZ, float farZ)
+                         local  float width
+                         local  float height
+                         inlines  CPovVector4::operator[]
+ 1005  0014BA74     A8  void CPovMatrix4x4::SetOrthoRH(const struct CPovMatrix4x4* this, float width, float height, float nearZ, float farZ)
+                         inlines  CPovVector4::operator[]
+ 1020  0014BB1C     C8  void CPovMatrix4x4::SetOrthoRH(const struct CPovMatrix4x4* this, float left, float right, float top, float bottom, float nearZ, float farZ)
+                         local  float width
+                         local  float height
+                         inlines  CPovVector4::operator[]
+ 1040  0018A8E8    17C  void CPovMatrix4x4::SetRotateXYZ(const struct CPovMatrix4x4* this, float x, float y, float z)
+                         local  float cr
+                         local  float sr
+                         local  float cp
+                         local  float sp
+                         local  float cy
+                         local  float sy
+                         inlines  CPovVector4::SetIdentity, CPovVector4::operator=, std::cos, std::sin
+ 1061  0019DE3C    200  void CPovMatrix4x4::SetRotateXZY(const struct CPovMatrix4x4* this, float x, float y, float z)
+                         inlines  CPovMatrix4x4::RotateY, CPovMatrix4x4::RotateZ, CPovMatrix4x4::SetRotateX, CPovMatrix4x4::SetRotateZ, CPovVector4::Set, CPovVector4::SetIdentity, CPovVector4::SetZero, std::sin
+ 1072  0018AA64    198  void CPovMatrix4x4::SetRotateRYPT(const struct CPovMatrix4x4* this, const const struct CPovVector3& _trans, float roll, float pitch, float yaw)
+                         local  float cr
+                         local  float sr
+                         local  float cp
+                         local  float sp
+                         local  float cy
+                         local  float sy
+                         local  float cpsr
+                         local  float sycr
+                         inlines  CPovVector4::SetW, CPovVector4::operator=, std::cos, std::sin
+ 1099  001A3A64    154  void CPovMatrix4x4::SetDir(const struct CPovMatrix4x4* this, const const struct CPovVector3& _forward)
+                         inlines  CPovVector4::Cross, CPovVector4::Normalize, CPovVector4::SetIdentity, CPovVector4::SetW, CPovVector4::operator=
+ 1118  0019DBA8    294  void CPovMatrix4x4::SetCamera(const struct CPovMatrix4x4* this, const const struct CPovVector3& pos, const const struct CPovVector3& angle)
+                         inlines  CPovMatrix4x4::RotateY, CPovMatrix4x4::RotateZ, CPovMatrix4x4::SetRotateX, CPovMatrix4x4::SetRotateZ, CPovMatrix4x4::operator*, CPovVector3::operator-, CPovVector4::Set, CPovVector4::SetZero, CPovVector4::operator=, std::sin
+ 1129  001A3E04     50  void CPovMatrix4x4::SetLookAt(const struct CPovMatrix4x4* this, const const struct CPovVector3& pos, const const struct CPovVector3& target)
+                         inlines  CPovVector3::CPovVector3
+ 1134  001A3BB8    24C  void CPovMatrix4x4::SetLookAt(const struct CPovMatrix4x4* this, const const struct CPovVector3& pos, const const struct CPovVector3& target, const const struct CPovVector3& _up)
+                         inlines  CPovMatrix4x4::RotateVector, CPovVector3::operator-, CPovVector4::CPovVector4, CPovVector4::Cross, CPovVector4::MultX, CPovVector4::Normalize, CPovVector4::SetW, CPovVector4::operator=
+ 1161  001C6CA8     20  void CPovMatrix4x4::SetLookAtLH(const struct CPovMatrix4x4* this, const const struct CPovVector3& pos, const const struct CPovVector3& target)
+ 1166  001C6ACC    1DC  void CPovMatrix4x4::SetLookAtLH(const struct CPovMatrix4x4* this, const const struct CPovVector3& pos, const const struct CPovVector3& target, const const struct CPovVector3& _up)
+                         local  struct CPovVector3 vright
+                         local  struct CPovVector3 vup
+                         local  struct CPovVector3 vforward
+                         inlines  CPovVector3::Cross, CPovVector3::Dot, CPovVector3::Normalize, CPovVector3::operator+, CPovVector3::operator-, CPovVector4::operator[]
+ 1238  001A40A0     50  void CPovMatrix4x4::SetLookAtRH(const struct CPovMatrix4x4* this, const const struct CPovVector3& pos, const const struct CPovVector3& target)
+                         inlines  CPovVector3::CPovVector3
+ 1244  001A3E54    24C  void CPovMatrix4x4::SetLookAtRH(const struct CPovMatrix4x4* this, const const struct CPovVector3& pos, const const struct CPovVector3& target, const const struct CPovVector3& _up)
+                         inlines  CPovMatrix4x4::RotateVector, CPovVector3::Cross, CPovVector3::operator-, CPovVector4::Cross, CPovVector4::MultX, CPovVector4::Normalize, CPovVector4::SetW, CPovVector4::operator=
+ 1284  00172DA4    E64  struct CPovMatrix4x4 CPovMatrix4x4::AffineInverse(const const struct CPovMatrix4x4* this)
+                         local  struct CPovMatrix4x4 result
+                         local  float[4][8] wtmp
+                         local  float m0
+                         local  float m1
+                         local  float m2
+                         local  float m3
+                         local  float s
+                         local  float* r0
+                         local  float* r1
+                         local  float* r2
+                         local  float* r3
+                         inlines  CPovMatrix4x4::CPovMatrix4x4, CPovMatrix4x4::operator[], CPovVector4::operator=, CPovVector4::operator[]
+ 1523  001C6CC8    14C  struct CPovMatrix4x4 CPovMatrix4x4::Unitized(const const struct CPovMatrix4x4* this)
+                         local  struct CPovMatrix4x4& result
+                         local  struct CPovVector3 col0
+                         local  struct CPovVector3 col1
+                         local  struct CPovVector3 col2
+                         local  struct CPovMatrix4x4 result
+                         inlines  CPovVector3::Normalize, CPovVector4::GetW, CPovVector4::GetX, CPovVector4::GetY, CPovVector4::GetZ, CPovVector4::Set, CPovVector4::operator=
+ 1545  001C69E4     E8  void CPovMatrix4x4::Rotate(const struct CPovMatrix4x4* this, float angle, const const struct CPovVector3& axis)
+                         local  struct CPovMatrix4x4 temp
+                         inlines  CPovMatrix4x4::operator=
+ 1556  0019D358    1E4  struct CPovMatrix4x4 CPovMatrix4x4::operator*(const const struct CPovMatrix4x4* this, const const struct CPovMatrix3x3& src)
+                         inlines  CPovMatrix4x4::CPovMatrix4x4, CPovMatrix4x4::operator*, CPovVector4::CPovVector4, CPovVector4::operator=
+ 1561  0019D53C    2E4  struct CPovMatrix4x4 CPovMatrix4x4::operator*(const const struct CPovMatrix4x4* this, const const struct CPovMatrix4x3& src)
+                         local  struct CPovMatrix4x4& result
+                         local  struct CPovMatrix4x4 matrix
+                         local  struct CPovMatrix4x4 result
+                         inlines  CPovMatrix4x4::operator*, CPovMatrix4x4::operator=, CPovVector4::operator=
+ 1587  0019D820    2B4  struct CPovMatrix4x4 CPovMatrix4x4::operator*(const const struct CPovMatrix4x4* this, const const struct CPovMatrix4x4& src)
+                         local  struct CPovMatrix4x4& result
+                         local  struct CPovMatrix4x4 result
+                         inlines  CPovMatrix4x4::operator*, CPovVector4::operator=
+ 1608  0019DAD4     D4  struct CPovMatrix4x4& CPovMatrix4x4::operator*=(const struct CPovMatrix4x4* this, const const struct CPovMatrix4x4& src)
+                         inlines  CPovMatrix4x4::operator=, CPovVector4::operator=
+ 1617  00143F34      4  void CPovMatrix4x4::Print(const const struct CPovMatrix4x4* this)
+ 1625  00143F38      4  void CPovMatrix4x4::Print(const const struct CPovMatrix4x4* this, const char* name)
+ 1633  001A40F0    1AC  void CPovMatrix4x4::RotateAroundUp(const struct CPovMatrix4x4* this, float angle)
+                         inlines  CPovVector4::Cross, CPovVector4::Normalize, CPovVector4::operator*, CPovVector4::operator+, CPovVector4::operator=, std::cos, std::sin
+ 1646  001A429C    1B4  void CPovMatrix4x4::RotateAroundRight(const struct CPovMatrix4x4* this, float angle)
+                         inlines  CPovVector4::Cross, CPovVector4::Normalize, CPovVector4::operator*, CPovVector4::operator+, CPovVector4::operator=, std::cos, std::sin
+ 1659  001A4450    1AC  void CPovMatrix4x4::RotateAroundForward(const struct CPovMatrix4x4* this, float angle)
+                         inlines  CPovVector4::Cross, CPovVector4::Normalize, CPovVector4::operator*, CPovVector4::operator+, CPovVector4::operator=, std::cos, std::sin

@@ -1,0 +1,248 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameModeBase.cpp
+// compiled in: golf_unity.cpp
+// 171 functions, source order. line | PS3 address | size
+
+   38  00204178     18  void GameModeBase::GameModeBase(const struct GameModeBase* this)
+   43  00203D2C     80  void GameModeBase::SetGameData(const struct GameModeBase* this, struct IGameData* pData)
+   49  00203F28    250  void GameModeBase::ResetVars(const struct GameModeBase* this)
+                         local  int i
+                         local  enum PlayerNumber_t player
+                         inlines  GameModeBase::SetUseShotClock
+  114  001FC5C8     18  void GameModeBase::~GameModeBase(const struct GameModeBase* this)
+  119  002053D0      C  void GameModeBase::ModeTipShown(const struct GameModeBase* this)
+  124  002053DC      8  bool GameModeBase::IsModeTipShown(const struct GameModeBase* this)
+  130  002053E4      C  void GameModeBase::InitCaddyTips(const struct GameModeBase* this)
+  135  001F9E74     10  bool GameModeBase::QueryInterface(const struct GameModeBase* this, enum GM_ModeType_t typeID, const void*& ptr)
+  143  00203DAC      8  void GameModeBase::SetCustomUserID(const struct GameModeBase* this, enum PlayerNumber_t nID)
+  148  001E97D8      8  enum PlayerNumber_t GameModeBase::GetCustomUserID(const struct GameModeBase* this)
+  153  001FB90C     7C  void GameModeBase::SetFlybyButtonCounter(const struct GameModeBase* this, enum PlayerNumber_t ePlayer, int32 nCount)
+  159  002053F0     74  int32 GameModeBase::GetFlybyButtonCounter(const struct GameModeBase* this, enum PlayerNumber_t ePlayer)
+  165  001FB988     7C  void GameModeBase::SetAltCameraCounter(const struct GameModeBase* this, enum PlayerNumber_t ePlayer, int32 nCount)
+  171  00205464     74  int32 GameModeBase::GetAltCameraCounter(const struct GameModeBase* this, enum PlayerNumber_t ePlayer)
+  177  00203DB4     60  void GameModeBase::SetQuitter(const struct GameModeBase* this, enum PlayerNumber_t ePlayer)
+  183  001F9F5C      8  enum PlayerNumber_t GameModeBase::GetQuitter(const struct GameModeBase* this)
+  188  00203E14      8  void GameModeBase::SetWager(const struct GameModeBase* this, uint32 nAmount)
+  193  001FB014      8  uint32_t GameModeBase::GetWager(const struct GameModeBase* this)
+  198  00203E1C     78  void GameModeBase::SetPlayerWagered(const struct GameModeBase* this, enum PlayerNumber_t ePlayer, bool bVal)
+  204  001FB01C     6C  bool GameModeBase::PlayerWagered(const struct GameModeBase* this, enum PlayerNumber_t ePlayer)
+  210  00203E94     74  void GameModeBase::SetMatchHandicaps(const struct GameModeBase* this, enum PlayerNumber_t ePlayer, int8 val)
+  216  002054D8     6C  int8 GameModeBase::GetMatchHandicaps(const struct GameModeBase* this, enum PlayerNumber_t ePlayer)
+  222  001FA238      8  void GameModeBase::SetShowGameModeYardage(const struct GameModeBase* this, bool bVal)
+  227  001FBD70      8  bool GameModeBase::GetShowGameModeYardage(const const struct GameModeBase* this)
+  232  001FF89C      8  void GameModeBase::SetBallHitToggleUI(const struct GameModeBase* this, bool bVal)
+  237  001FBBB8      8  bool GameModeBase::GetBallHitToggleUI(const const struct GameModeBase* this)
+  242  001F9D34      8  void GameModeBase::SetCheckShotOverlimit(const struct GameModeBase* this, bool bVal)
+  247  001FBC88      8  bool GameModeBase::GetCheckShotOverlimit(const const struct GameModeBase* this)
+  252  001FF8A4      8  void GameModeBase::SetDefaultScorecard(const struct GameModeBase* this, bool bVal)
+  257  001E9800      8  bool GameModeBase::DefaultScorecard(const const struct GameModeBase* this)
+  262  001F9D1C      8  void GameModeBase::SetDisplayScorecard(const struct GameModeBase* this, bool bVal)
+  267  001E9808      8  bool GameModeBase::DisplayScorecard(const const struct GameModeBase* this)
+  272  001F9CEC      8  void GameModeBase::SetAIPreshotSetup(const struct GameModeBase* this, bool bVal)
+  277  00205544      8  bool GameModeBase::GetAIPreshotSetup(const const struct GameModeBase* this)
+  282  00203F08      8  void GameModeBase::SetCharacterPreshotReset(const struct GameModeBase* this, bool bVal)
+  287  0020554C      8  bool GameModeBase::GetCharacterPreshotReset(const const struct GameModeBase* this)
+  292  001F9CD4      8  void GameModeBase::SetAllowTapIns(const struct GameModeBase* this, bool bVal)
+  297  0021115C     3C  bool GameModeBase::AllowTapIns(const const struct GameModeBase* this)
+  309  001FE40C      8  void GameModeBase::SetAllowHoleRestart(const struct GameModeBase* this, bool bVal)
+  314  001FBF54      8  bool GameModeBase::AllowHoleRestart(const const struct GameModeBase* this)
+  319  001FDD34      8  void GameModeBase::SetAllowAIConcede(const struct GameModeBase* this, bool bVal)
+  324  001FBAA4      8  bool GameModeBase::AllowAIConcede(const const struct GameModeBase* this)
+  329  001FE038      8  void GameModeBase::SetRecordShotStats(const struct GameModeBase* this, bool bVal)
+  334  001FAFD8      8  bool GameModeBase::GetRecordShotStats(const const struct GameModeBase* this)
+  339  001FD9B0      8  void GameModeBase::SetRecordHoleStats(const struct GameModeBase* this, bool bVal)
+  344  00205554      8  bool GameModeBase::GetRecordHoleStats(const const struct GameModeBase* this)
+  349  001FD9B8      8  void GameModeBase::SetRecordGameStats(const struct GameModeBase* this, bool bVal)
+  354  001FAFE0      8  bool GameModeBase::GetRecordGameStats(const const struct GameModeBase* this)
+  360  001FD9C0      8  void GameModeBase::SetDoFlyBy(const struct GameModeBase* this, bool bVal)
+  365  00211100     5C  bool GameModeBase::DoFlyBy(const const struct GameModeBase* this)
+  371  001FD9C8      8  void GameModeBase::SetDoMidholeFlyBy(const struct GameModeBase* this, bool bVal)
+  376  001FC2A4      8  bool GameModeBase::DoMidholeFlyBy(const const struct GameModeBase* this)
+  381  001FA230      8  void GameModeBase::SetAllowCaddieTips(const struct GameModeBase* this, bool bVal)
+  386  0020555C      8  bool GameModeBase::AllowCaddieTips(const const struct GameModeBase* this)
+  391  00203F10      8  void GameModeBase::SetHideUIOnSwing(const struct GameModeBase* this, bool bVal)
+  396  00205564      8  bool GameModeBase::HideUIOnSwing(const const struct GameModeBase* this)
+  401  001FF8DC      8  void GameModeBase::SetAllow3ShotCam(const struct GameModeBase* this, bool bVal)
+  406  0020556C      8  bool GameModeBase::Allow3ShotCam(const const struct GameModeBase* this)
+  411  00201464      8  void GameModeBase::SetAllowShotReset(const struct GameModeBase* this, bool bVal)
+  416  00205574      8  bool GameModeBase::AllowShotReset(const const struct GameModeBase* this)
+  421  001F9CCC      8  void GameModeBase::SetAllowGameBreakers(const struct GameModeBase* this, bool bVal)
+  426  001FB524      8  bool GameModeBase::AllowGameBreakers(const const struct GameModeBase* this)
+  431  001FF8AC      8  void GameModeBase::SetAllowSpeedSlowButtons(const struct GameModeBase* this, bool bVal)
+  436  0020557C      8  bool GameModeBase::AllowSpeedSlowButtons(const const struct GameModeBase* this)
+  441  001FA228      8  void GameModeBase::SetAllowReplays(const struct GameModeBase* this, bool bVal)
+  446  001FBD80      8  bool GameModeBase::AllowReplays(const const struct GameModeBase* this)
+  451  001FF8B4      8  void GameModeBase::SetAllowEnvironmentSounds(const struct GameModeBase* this, bool bVal)
+  456  00205584      8  bool GameModeBase::AllowEnvironmentSounds(const const struct GameModeBase* this)
+  461  001FF8BC      8  void GameModeBase::SetAllowCameraCollision(const struct GameModeBase* this, bool bVal)
+  466  001ED950      8  bool GameModeBase::AllowCameraCollision(const const struct GameModeBase* this)
+  471  001F9DEC      8  void GameModeBase::SetAllowSpecialSwings(const struct GameModeBase* this, bool bVal)
+  476  001F2814      8  bool GameModeBase::AllowSpecialSwings(const const struct GameModeBase* this)
+  481  001FF8C4      8  void GameModeBase::SetRemoveAllWind(const struct GameModeBase* this, bool bVal)
+  486  0020558C      8  bool GameModeBase::RemoveAllWind(const const struct GameModeBase* this)
+  491  001FF8CC      8  void GameModeBase::SetAllowObstructionBumping(const struct GameModeBase* this, bool bVal)
+  496  001FBD78      8  bool GameModeBase::AllowObstructionBumping(const const struct GameModeBase* this)
+  501  001FF8D4      8  void GameModeBase::SetTargetCycling(const struct GameModeBase* this, bool bVal)
+  506  001E9B14      8  bool GameModeBase::GetTargetCycling(const const struct GameModeBase* this)
+  511  001FBB50      8  void GameModeBase::SetGameReachedLastHole(const struct GameModeBase* this, bool bVal)
+  516  00205594      8  bool GameModeBase::GameReachedLastHole(const const struct GameModeBase* this)
+  521  00203F18      8  void GameModeBase::SetUserLevelledUp(const struct GameModeBase* this, bool bVal)
+  526  0020559C      8  bool GameModeBase::GetUserLevelledUp(const const struct GameModeBase* this)
+  531  001F9D14      8  void GameModeBase::SetRestoreBallPosition(const struct GameModeBase* this, bool bVal)
+  536  002055A4      8  bool GameModeBase::GetRestoreBallPosition(const const struct GameModeBase* this)
+  546  002055AC      4  void GameModeBase::LoadHole(const struct GameModeBase* this)
+  554  0030ECD8    190  void GameModeBase::EndHole(const struct GameModeBase* this)
+                         local  int32 i
+                         local  int32_t val
+                         local  uint32 x
+                         inlines  GM_GetPlayerHoleStrokes
+  582  00252D98    10C  void GameModeBase::UpdateScoreCard(const struct GameModeBase* this)
+                         local  int32 i
+  595  002055B0      4  void GameModeBase::InitTeeOff(const struct GameModeBase* this)
+  600  00200E50      8  bool GameModeBase::BallInHole(const struct GameModeBase* this, enum PlayerNumber_t player)
+  605  001FFCC0      8  bool GameModeBase::InitialFlyByDone(const struct GameModeBase* this, enum PlayerNumber_t player)
+  610  002055B4      8  bool GameModeBase::PuttIsForWin(const struct GameModeBase* this)
+  615  002055BC      8  bool GameModeBase::PuttIsForLead(const struct GameModeBase* this)
+  620  0032EFA4      8  int32 GameModeBase::GetCurrentLead(const struct GameModeBase* this, enum PlayerNumber_t playerID)
+  625  002055C4      8  enum PlayerNumber_t GameModeBase::GetHoleWinner(const const struct GameModeBase* this)
+  630  002055CC      8  enum PlayerNumber_t GameModeBase::GetSpecificHoleWinner(const const struct GameModeBase* this, int32 hole)
+  635  0032ED58      8  int32 GameModeBase::GetPotentialLead(const struct GameModeBase* this, enum PlayerNumber_t playerID)
+  640  002D0CAC     B8  void GameModeBase::SetupNextGolfer(const struct GameModeBase* this)
+                         local  int32 i
+  658  002055D4      8  enum PlayerNumber_t GameModeBase::GetHonors(const struct GameModeBase* this, enum PlayerNumber_t ignore, bool doNotIgnoreHoledOut)
+  663  002055DC      8  bool GameModeBase::HoleFinished(const struct GameModeBase* this, enum PlayerNumber_t PlayerID, bool predict)
+  668  002055E4      8  bool GameModeBase::GameFinished(const struct GameModeBase* this, bool bPredict)
+  673  002055EC      8  bool GameModeBase::GoToPlayoff(const struct GameModeBase* this, bool bPredict)
+  678  002055F4      4  void GameModeBase::StartGamePreData(const struct GameModeBase* this)
+  683  002055F8      4  void GameModeBase::StartGamePostData(const struct GameModeBase* this)
+  688  001FD5F8      4  void GameModeBase::EndGame(const struct GameModeBase* this)
+  695  002055FC      4  void GameModeBase::QuitGame(const struct GameModeBase* this)
+  700  00205600      8  bool GameModeBase::IsPuttForLead(const struct GameModeBase* this, enum PlayerNumber_t player)
+  705  0032F59C     28  bool GameModeBase::IsPuttForWin(const struct GameModeBase* this, enum PlayerNumber_t player)
+  710  00205608      8  enum GM_HoleResult_t GameModeBase::GetPotentialHoleResult(const struct GameModeBase* this, enum PlayerNumber_t player)
+  715  00205610      4  void GameModeBase::PreShotInit(const struct GameModeBase* this, enum PlayerNumber_t player)
+  719  00205614      4  void GameModeBase::PreShotUpdate(const struct GameModeBase* this, enum PlayerNumber_t PlayerID)
+  723  00205618      4  void GameModeBase::EndTurnEndHoleNotGame(const struct GameModeBase* this, enum PlayerNumber_t PlayerID)
+  728  0020561C      4  void GameModeBase::ScorecardClosed(const struct GameModeBase* this)
+  733  00205620      8  bool GameModeBase::ShotOverLimit(const struct GameModeBase* this, enum PlayerNumber_t player)
+  738  00205628      4  void GameModeBase::RestartHole(const struct GameModeBase* this)
+  743  0020562C      4  void GameModeBase::ResetShot(const struct GameModeBase* this, enum PlayerNumber_t player)
+  748  00205630      8  bool GameModeBase::RenderBallTarget(const struct GameModeBase* this, enum PlayerNumber_t player)
+  753  00205638      8  bool GameModeBase::CheckControllerPulled(const struct GameModeBase* this)
+  758  00205640      8  bool GameModeBase::OKToShoot(const struct GameModeBase* this, enum PlayerNumber_t player)
+  763  00205648      4  void GameModeBase::BallCollision(const struct GameModeBase* this, enum PlayerNumber_t player)
+  768  0020564C      8  int32 GameModeBase::TriggerSplash(const struct GameModeBase* this, enum PlayerNumber_t player)
+  773  00205654      4  void GameModeBase::CheckShotAwards(const struct GameModeBase* this, enum PlayerNumber_t player)
+  778  00205658      4  void GameModeBase::EndGolferTurn(const struct GameModeBase* this, enum PlayerNumber_t player)
+  783  001FF954      8  bool GameModeBase::BallOOB(const struct GameModeBase* this, enum PlayerNumber_t player)
+  788  0020565C      4  void GameModeBase::Mulligan(const struct GameModeBase* this, enum PlayerNumber_t player)
+  793  00205660      8  bool GameModeBase::PickTarget(const struct GameModeBase* this, enum PlayerNumber_t player)
+  798  00205668      4  void GameModeBase::SetTimer(const struct GameModeBase* this, enum PlayerNumber_t player, int32 nTimer)
+  803  0020566C      4  void GameModeBase::HitBall(const struct GameModeBase* this, enum PlayerNumber_t player)
+  808  00205670      8  bool GameModeBase::PickPrevTarget(const struct GameModeBase* this, enum PlayerNumber_t player)
+  813  00205678      4  void GameModeBase::CollisionActor(const struct GameModeBase* this, enum PlayerNumber_t PlayerID, int32 actorID)
+  818  0020567C      8  int32 GameModeBase::GreenType(const struct GameModeBase* this, enum PlayerNumber_t player, int32 GreenIndex)
+  823  0027DC44      8  void GameModeBase::ShowYardage(const struct GameModeBase* this, enum PlayerNumber_t PlayerID)
+  828  00205684      8  int GameModeBase::GetEndGameLoadingScreen(const struct GameModeBase* this)
+  833  0020568C      4  void GameModeBase::SwingInit(const struct GameModeBase* this, enum PlayerNumber_t PlayerID)
+  843  001FD5E4     14  int32 GameModeBase::GetNumPlayers(const const struct GameModeBase* this)
+  848  001E9A30     6C  int32 GameModeBase::NumHolesInRound(const const struct GameModeBase* this)
+                         local  int32 iNumSelected
+                         local  int32 i
+  863  001E999C     94  int32 GameModeBase::NumHolesRemainingInRound(const const struct GameModeBase* this)
+                         local  int32 iNumSelected
+                         local  int i
+  878  00200B18     D4  bool GameModeBase::FullRoundOfGolf(const const struct GameModeBase* this)
+                         local  bool retVal
+                         local  int32 i
+  901  001FBAC4     8C  bool GameModeBase::CurrentlyOnLastHole(const const struct GameModeBase* this)
+                         local  bool wasLastHole
+                         local  int32 j
+  917  00249D44    244  void GameModeBase::PickPlayOffHole(const struct GameModeBase* this)
+                         local  int32 prevHole
+                         local  int32 newHole
+                         local  int32 i
+                         local  int32[18] holeNums
+                         local  int32 numSelected
+  973  0020FE28    194  void GameModeBase::SelectHoleSet(const struct GameModeBase* this, enum GM_HoleSelectType_t selection)
+                         local  int32 i
+ 1041  0020FCF4     F8  void GameModeBase::InitCurrentHoleToFirstSelected(const struct GameModeBase* this)
+                         local  int32 i
+ 1057  0020FDEC     3C  void GameModeBase::SelectSingleHole(const struct GameModeBase* this, int32 singlehole)
+ 1063  0020FC80     74  void GameModeBase::SetCurrentHole(const struct GameModeBase* this, int32 currHole)
+ 1071  00205774      8  bool GameModeBase::UsePerfectShot(const struct GameModeBase* this)
+ 1078  0024B294    9B8  void GameModeBase::SetRandom18Course(const struct GameModeBase* this)
+                         local  int i
+                         local  int j
+                         local  int k
+                         local  int numCourses
+                         local  enum GM_CourseType_t randCourse
+                         local  int32 randHole
+                         local  uint32 randCourseIndex
+                         local  uint32[4] slot
+                         local  int8[18] tempHoles
+                         local  int8 tempHoleCtr
+                         local  enum GM_CourseType_t[15] availCourses
+                         local  bool[15] courseChosen
+                         local  int userID
+                         local  const struct UserInfo& userInfo
+                         local  enum GM_CourseType_t nCourse
+                         local  int32 nHole
+                         local  uint32 tempSlot
+                         local  enum GM_CourseType_t nCourse
+                         local  int32 nHole
+                         local  enum GM_CourseType_t nCourse
+                         local  int32 nHole
+                         local  enum GM_CourseType_t nCourse
+                         local  int32 nHole
+                         local  enum GM_CourseType_t nCourse
+                         local  int32 nHole
+                         local  enum GM_CourseType_t course
+                         local  int32 hole
+ 1373  001E9910     8C  int32 GameModeBase::GetNextSelectedHole(const struct GameModeBase* this)
+                         local  int32 oldhole
+                         local  int32 retVal
+                         local  int32 i
+ 1395  001F98BC     B8  const char* GameModeBase::GetCourseName(const struct GameModeBase* this)
+                         local  enum GM_CourseType_t course
+                         local  Course_t currCourse
+ 1425  001E987C     94  bool GameModeBase::OnFirstSelectedHole(const struct GameModeBase* this)
+                         local  bool ret
+                         local  uint32 i
+ 1443  0020577C     44  int32 GameModeBase::CurrentHoleFlagIndex(const struct GameModeBase* this)
+ 1449  0026B224    50C  void GameModeBase::UpdateAnalogueControlllers(const struct GameModeBase* this, enum PlayerNumber_t PlayerID)
+                         local  int32 iPadID
+                         local  struct Controller_StickInfo* stickInfo
+                         local  const float kStickLow
+                         local  const float kStickHigh
+                         local  const float kStickRange
+                         local  const float kRotationSpeedMultiplier
+                         inlines  GamePlayer::SetBPRotationTargetMomentum, GamePlayer::SetBPXDistanceTargetMomentum, GamePlayer::SetBPZDistanceTargetMomentum
+ 1500  002057C0      4  void GameModeBase::FinishHole(const struct GameModeBase* this)
+ 1505  0032DD94    2CC  void GameModeBase::SetupForNextPlayoffHole(const struct GameModeBase* this)
+                         local  int32 i
+                         local  int32 j
+                         local  int32 prevHole
+                         inlines  GM_GetCurrentHoleIndex, GM_SetPlayerHoleStrokes
+ 1550  002057C4      4  void GameModeBase::AwardWinnings(const struct GameModeBase* this)
+ 1555  001F9D2C      8  void GameModeBase::SetPreShotAnimationsMode(const struct GameModeBase* this, enum GM_AllowAnimationsTypes_t mode)
+ 1560  001F9D24      8  void GameModeBase::SetPostShotAnimationsMode(const struct GameModeBase* this, enum GM_AllowAnimationsTypes_t mode)
+ 1565  001FBDA0      8  enum GM_AllowAnimationsTypes_t GameModeBase::GetPreShotAnimationsMode(const struct GameModeBase* this)
+ 1570  001FC1A8      8  enum GM_AllowAnimationsTypes_t GameModeBase::GetPostShotAnimationMode(const struct GameModeBase* this)
+ 1575  002057C8      4  void GameModeBase::DisplayGameModeInfo(const struct GameModeBase* this)
+ 1579  002057CC      4  void GameModeBase::HandleEvent(const struct GameModeBase* this, enum PlayerNumber_t PlayerID, enum EVENTID_e eventID)
+ 1583  002057D0      8  bool GameModeBase::IsTimedMode(const struct GameModeBase* this)
+ 1588  002057D8      8  bool GameModeBase::IsStartOfTurn(const struct GameModeBase* this)
+ 1593  002057E0      8  bool GameModeBase::SkipPreShotAnimation(const struct GameModeBase* this)
+ 1598  00203F20      8  void GameModeBase::SetDoNotGoToPlaceBall(const struct GameModeBase* this, bool bVal)
+ 1604  002057E8     14  bool GameModeBase::DoNotGoToPlaceBall(const struct GameModeBase* this)
+                         local  bool retVal
+ 1618  002057FC      4  void GameModeBase::AfterShotButBeforePostReaction(const struct GameModeBase* this, enum PlayerNumber_t PlayerID)
+ 1622  00205800      4  void GameModeBase::PreShotUpdateUI(const struct GameModeBase* this, enum PlayerNumber_t PlayerID)
+ 1626  00205804      4  void GameModeBase::ShotClockOut(const struct GameModeBase* this)
+ 1630  00205810     A0  char* GameModeBase::NumPlyReqStrID(const struct GameModeBase* this)
+                         local  int32 minGolfers
+ 1650  0024977C     30  int8 GameModeBase::GetStateAfterBallLands(const struct GameModeBase* this, enum PlayerNumber_t PlayerID)
+                         local  int8 nextState
+ 1662  002058B0     74  bool GameModeBase::ShowShotHistory(const struct GameModeBase* this, enum PlayerNumber_t PlayerID)
+                         local  bool retVal
+ 1677  00205924      8  bool GameModeBase::GiveOOBPenalty(const struct GameModeBase* this)

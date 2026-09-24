@@ -1,0 +1,8 @@
+// ../ears_rt_cct/dev/api/ears_rt_cct/Internal/InstVars.h
+// compiled in: InstVars.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   44  0059BFAC     88  void InstVars(const struct <anon>* this)
+                         inlines  ManagedArray<float>::ManagedArray, TagValuePair
+   48  0059BE90    11C  void InstVars(const struct <anon>* this, uint32_t capacity)
+                         inlines  Get, GetAllocator, ManagedArray<float>::ManagedArray, TVPContainer, TagValuePair

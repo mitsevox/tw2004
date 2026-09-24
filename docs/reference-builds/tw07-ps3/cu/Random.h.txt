@@ -1,0 +1,9 @@
+// ../ears_common/dev/include/ears_common/Random.h
+// compiled in: ChrCntl_AnimTree.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   46    inline-only   float RandFloat()
+                         local  uint32_t RandTablePos
+                         local  uint32_t RandTableMask
+                         local  float[] Rand01Table
+                         local  int idx

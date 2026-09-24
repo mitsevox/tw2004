@@ -1,0 +1,247 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_cct/tiger_cct_internal.cpp
+// compiled in: tiger_cct_internal.cpp
+// 103 functions, source order. line | PS3 address | size
+
+    0  00540D30     18  void ~ListNode(const struct <anon>* this)
+                         inlines  ~Allocatable
+    0  00566758     38  void ~CollisionMeshNode(const struct CollisionMeshNode* this)
+                         inlines  ~NamedListNode
+   58  00565E70    170  void CollisionMeshNode(const struct CollisionMeshNode* this, void* meshFile)
+                         inlines  NamedListNode
+   67  005655E4     5C  bool IsNameEqual(const const struct <anon>* this, const char* name)
+                         local  int lhs
+                         local  int rhs
+                         inlines  Common::CommonHash
+   75  00562518     6C  int Init(const struct <anon>* this, struct IAllocator* allocator, struct Allocator* levelAllocator)
+  114  00565A84    3EC  int InitVariables(const struct <anon>* this, const char* aiVariablesText)
+                         local  unsigned int tableCount
+                         local  unsigned int vi
+                         local  unsigned int vi
+                         inlines  TagValuePair
+  183  00564AD0    190  void Shutdown(const struct <anon>* this)
+  215  005622F8    124  int AdvanceActorAnim(const struct <anon>* this, float deltaSeconds)
+                         local  bool resetEventHandler
+                         local  int advanceResult
+  274  0056241C     3C  int SetActorState(const struct <anon>* this, const char* stateName)
+  284  00562458     3C  int SetActorFaceState(const struct <anon>* this, const char* stateName)
+  295  00562154     E8  int CountVariables(const struct <anon>* this, const char* aiVariablesText)
+                         local  int ch
+                         local  const char* colon
+  334  00565640    444  int ParseVariables(const struct <anon>* this, const char* aiVariablesText)
+                         local  struct VariableInfo* info
+                         local  unsigned int varCount
+                         local  const char* text
+                         local  const char* colonPtr
+                         local  const char* endLine
+                         local  const char* commaPtr
+                         local  const char* namePtr
+                         local  unsigned int nameLength
+                         local  int whiteSpaceEnded
+                         local  int endOfWord
+                         local  const char* defaultPtr
+                         local  int ch
+                         local  const char* defaultEqualsPtr
+                         local  const char* defaultValuePtr
+                         local  unsigned int i
+                         local  const char* minPtr
+                         local  const char* minEqualsPtr
+                         local  const char* minValuePtr
+                         local  unsigned int i
+                         local  const char* maxPtr
+                         local  const char* maxEqualsPtr
+                         local  const char* maxValuePtr
+                         local  unsigned int i
+                         inlines  std::atof
+  548  00562494     30  void LevelZero(const struct <anon>* this)
+  558  005624C4     54  void Zero(const struct <anon>* this)
+  584  00562584     48  float EvaluateVariable(struct Character* , int varIndex)
+  589  005626EC    10C  int SetGameVariable(const struct <anon>* this, const char* variableName, float value)
+                         local  struct VariableInfo* info
+                         local  float maxValue
+                         local  float minValue
+  624  005627F8     80  int SetGameVariable(const struct <anon>* this, const char* variableName, bool value)
+                         local  struct VariableInfo* info
+  648  00562878     3C  int SetActorBoneRemapping(const struct <anon>* this, unsigned int boneI, unsigned int boneHashedName)
+  660  005628B4     54  float GetActorFrameCount(const const struct <anon>* this)
+  670  00562908     3C  int GetActorBoneIndexFromName(const struct <anon>* this, const char* boneName)
+  681  00562944     AC  int AddBank(const struct <anon>* this, void* bnkFile, unsigned int resourceTag)
+                         local  struct Bank* bank
+  704  005649C0     B8  int RemoveBank(const struct <anon>* this, struct Bank* bank)
+                         local  struct Actor* actor
+                         inlines  GetNext
+  730  00564A78     58  int RemoveBank(const struct <anon>* this, const char* name)
+                         local  struct Bank* bank
+  742  00564C60     CC  void RemoveBankByFile(const struct <anon>* this, void* bankFile)
+                         local  struct Bank* bank
+                         inlines  GetNext
+  759  00565494    150  void PrintBanks(const struct <anon>* this, struct Module* module)
+                         local  struct Bank* bank
+                         local  const char* stateName
+                         inlines  GetNext
+  788  00564DB0    1F0  void UnregisterActorBank(const struct <anon>* this, const char* bankName, unsigned int resourceTag)
+                         local  char[32] fullBankName
+                         local  struct Bank* bank
+  805  00562AF8     94  int AddRig(const struct <anon>* this, void* binary, unsigned int binarySize)
+                         local  struct Rig* rig
+  819  00566150     80  int AddCollisionMesh(const struct <anon>* this, void* binary)
+                         local  struct CollisionMeshNode* mesh
+  847  00562B8C    21C  void* AddActor(const struct <anon>* this, const char* actorName, const char* rigName, const char* collisionMeshName, const char* igcName, const char* luaInit, const char* luaUpdate, const char* luaShutdown, const struct LuaParam* luaParams, unsigned int luaParamCount, unsigned int contextIndex, unsigned int faceBoneCount, int blendShapeCount, struct Lua* lua, bool hasIK)
+                         local  struct Rig* rig
+                         local  const struct Mesh* collisionMesh
+                         local  struct Actor* actor
+                         local  const struct <anon>* collisionMeshNode
+                         inlines  GetMesh
+  894  00562DA8     3C  int SetActorFaceBone(const struct <anon>* this, unsigned int faceBoneI, const char* boneName)
+  905  00562DE4     E4  int RemoveActor(const struct <anon>* this, struct Actor* actor, struct Lua* lua)
+  931  00562A74     84  int RemoveRig(const struct <anon>* this, struct Rig* rig)
+  942  005629F0     84  int RemoveCollisionMesh(const struct <anon>* this, struct CollisionMeshNode* mesh)
+  953  00562EC8     6C  int RemoveActor(const struct <anon>* this, const char* name, struct Lua* lua)
+                         local  struct Actor* actor
+  964  005652E8     3C  struct Actor* FindActorByContext(const struct <anon>* this, unsigned int contextIndex)
+                         local  struct Actor* actor
+                         inlines  GetNext
+  982  0056223C      8  struct IAllocator* GetAllocator(const struct <anon>* this)
+  987  005643C8     9C  bool IsBankLoaded(const struct <anon>* this, const char* bankName)
+                         local  struct Bank* bank
+                         inlines  GetNext
+ 1003  00564464    1D4  struct Bank* FindBank(const struct <anon>* this, const char* bankName, unsigned int resourceTag)
+                         local  struct Bank* bank
+                         local  struct Bank* found
+                         local  unsigned int foundCount
+                         inlines  GetNext
+ 1032  00564FA0    214  int RegisterActorBank(const struct <anon>* this, const char* bankName, unsigned int resourceTag)
+                         local  char[32] fullBankName
+                         local  struct Bank* bank
+ 1068  005651B4    134  int RegisterActorFaceBank(const struct <anon>* this, const char* bankName, unsigned int resourceTag)
+                         local  char[32] fullBankName
+                         local  struct Bank* bank
+ 1094  005653B0     20  void SetCurrentActorFromPtr(const struct <anon>* this, void* ptr)
+ 1101  00562F34     28  void* GetActorPtrFromName(const const struct <anon>* this, const char* actorName)
+ 1106  005653D0     C4  int SetCurrentActor(const struct <anon>* this, const char* actorName)
+                         local  struct Actor* actor
+ 1121  00565324     8C  int SetCurrentActor(const struct <anon>* this, unsigned int contextIndex)
+                         local  struct Actor* actor
+ 1142  00562F5C     2C  int SetEventHandler(const struct <anon>* this, void(*)()* eventHandlerFunction, void* blindPtr)
+ 1150  00562F88      C  void SetCachedGameFloat(const struct <anon>* this, float value)
+ 1155  00562F94      C  float GetCachedGameFloat(const struct <anon>* this)
+ 1160  00562FA0      C  float GetCachedGameFloatMin(const struct <anon>* this)
+ 1165  00562FAC      C  float GetCachedGameFloatMax(const struct <anon>* this)
+ 1172  00562FB8     5C  int CacheGameFloat(const struct <anon>* this, const char* variableName)
+ 1187  005625CC    120  struct VariableInfo* FindVariable(const struct <anon>* this, const char* variableName, const struct VariableId* ids, unsigned int count)
+                         local  struct VariableId id
+                         local  unsigned int a0
+                         local  unsigned int a1
+                         local  unsigned int a2
+                         local  unsigned int a3
+                         local  const int neg
+                         local  const int pos
+                         local  int low
+                         local  int high
+                         local  int mid
+                         local  unsigned int b0
+                         local  unsigned int b1
+                         local  unsigned int b2
+                         local  unsigned int b3
+                         local  int compare
+ 1241  00563014     6C  int VariableId::Compare(const void* a, const void* b)
+                         local  const struct VariableId* ia
+                         local  const struct VariableId* ib
+                         local  unsigned int a0
+                         local  unsigned int a1
+                         local  unsigned int a2
+                         local  unsigned int a3
+                         local  unsigned int b0
+                         local  unsigned int b1
+                         local  unsigned int b2
+                         local  unsigned int b3
+ 1271  00563080     64  int VariableId::operator<(const const struct VariableId* this, const const struct VariableId& id)
+                         local  unsigned int a0
+                         local  unsigned int a1
+                         local  unsigned int a2
+                         local  unsigned int a3
+                         local  unsigned int b0
+                         local  unsigned int b1
+                         local  unsigned int b2
+                         local  unsigned int b3
+ 1298  005630E4      8  int VariableId::operator==(const const struct VariableId* this, const const struct VariableId& id)
+ 1331  0056312C      C  const char* VariableId::operator const char*(const const struct VariableId* this)
+ 1357  005631E0     74  int GetGameVariableMin(const struct <anon>* this, float* resultPtr, const char* variableName)
+                         local  struct VariableInfo* info
+ 1368  00563254     74  int GetGameVariableMax(const struct <anon>* this, float* resultPtr, const char* variableName)
+                         local  struct VariableInfo* info
+ 1381  005632C8     74  int GetGameVariable(const struct <anon>* this, float* resultPtr, const char* variableName)
+                         local  struct VariableInfo* info
+ 1393  0056333C     3C  unsigned int GetActorBoneCount(const const struct <anon>* this)
+ 1405  00563378     A0  int GetActorBoneParent(const const struct <anon>* this, unsigned int* parentIndexPtr, unsigned int boneI)
+                         local  int parent
+ 1432  00563418     3C  const float* GetActorInvBindMats(const const struct <anon>* this)
+ 1442  00563454     3C  const float* GetActorBlendShapeWeights(const const struct <anon>* this)
+ 1452  00563490     3C  int GetActorBlendShapeCount(const const struct <anon>* this)
+ 1462  005634CC     3C  const struct Mesh* GetActorCollisionMesh(const const struct <anon>* this)
+ 1472  00563508     3C  const unsigned char* GetActorCollisionBoneRemapping(const const struct <anon>* this)
+ 1482  00563544     28  void GetActorBoneTransform(const const struct <anon>* this, float* matrix, float* quat, unsigned int boneI)
+ 1487  0056356C     28  void GetActorParentBoneMatrix(const const struct <anon>* this, float* matrix, unsigned int boneI)
+ 1507  00563594     4C  int AddActorTarget(const struct <anon>* this, unsigned int solutionIndex, unsigned int boneI, float quatX, float quatY, float quatZ, float quatW, float transX, float transY, float transZ, unsigned int boneToReparent, unsigned int newParent)
+ 1530  005635E0     3C  int ComputeActorSolution(const struct <anon>* this, unsigned int iterationCount, unsigned int solutionIndex)
+ 1540  0056361C     3C  int ResetActorSolution(const struct <anon>* this, unsigned int solutionIndex)
+ 1555  00563658     3C  int SetActorBoneIsTerminal(const struct <anon>* this, unsigned int boneI, int isTerminal)
+ 1565  00563694     3C  int SetActorBoneIsNoIK(const struct <anon>* this, unsigned int boneI, int isNoIK)
+ 1577  005636D0     18  const short unsigned int* GetActorBoneRemapping(const struct <anon>* this)
+                         inlines  Actor::GetBoneRemapping
+ 1587  005636E8     3C  const char* GetActorState(const struct <anon>* this)
+ 1597  00563724     54  int IsActorStateEnded(const struct <anon>* this)
+ 1614  00563778     28  int GetActorIsMirror(const struct <anon>* this)
+ 1624  005637A0     3C  int SetActorIsMirror(const struct <anon>* this, bool isMirror, struct CCTInterface* cctInterface, unsigned int defaultMask)
+ 1636  005637DC     EC  void SetActorBoneConstraint(const struct <anon>* this, unsigned int boneI, float twistMin, float twistMax, float swingMaxX, float swingMaxY)
+ 1643  005638C8     EC  void SetActorBoneConstraintAxes(const struct <anon>* this, unsigned int boneI, float axesQuatX, float axesQuatY, float axesQuatZ, float axesQuatW)
+ 1651  005639B4     3C  int SetActorBoneMirrorMask(const struct <anon>* this, unsigned int boneI, unsigned int mask)
+ 1661  005639F0      8  void EnableIK(const struct <anon>* this, int enable)
+ 1666  005622EC      C  int IsEnabledIK(const const struct <anon>* this)
+ 1671  005639F8     3C  int SetWeightForIK(const struct <anon>* this, unsigned int solutionIndex, float weight)
+ 1681  00563A34     54  float GetWeightForIK(const const struct <anon>* this, unsigned int solutionIndex)
+ 1691  00563A88     3C  int TransitionActorState(const struct <anon>* this, const char* stateName, float frames, int holdFirst)
+ 1703  005661D0    1E4  bool CheckActorCollisions(const struct <anon>* this, struct HitPool* collisionHitPool, const struct Ray* collisionRays, int collisionTestCount)
+                         local  bool bRet
+                         local  struct <anon> ___profScope
+                         local  struct Actor* actor
+                         inlines  GetNext, Profile, ~Profile
+ 1735  005663B4    3A4  void Update(const struct <anon>* this, float deltaSeconds, struct Lua* lua, struct HitPool* collisionHitPool, const struct Ray* collisionRays, int collisionTestCount)
+                         local  struct <anon> ___profScope
+                         local  struct Actor* oldCurrent
+                         local  struct <anon> ___profScope
+                         local  struct Actor* actor
+                         local  struct <anon> ___profScope
+                         local  struct Actor* actor
+                         local  bool useIK
+                         local  struct Actor* actor
+                         inlines  Actor::IncrementFramesInState, GetNext, Profile, ~Profile
+ 1835  00564638     80  struct Actor* FindActorForIGC(const const struct <anon>* this, const char* igcName)
+                         local  struct Actor* actor
+                         inlines  GetNext
+ 1856  00563AC4     C4  bool IsActorScripted(const const struct <anon>* this)
+ 1863  00563B88     D4  void SetActorIsScripted(const struct <anon>* this, bool isScripted)
+ 1870  005646B8     B8  void SetCurrentActorForIgc(const struct <anon>* this, const char* igcName)
+                         local  struct Actor* actor
+ 1877  00563C5C     D4  void SetActorIsImmuneToIgc(const struct <anon>* this, bool isImmune)
+ 1884  00563D30     D4  void SetActorRootMtx(const struct <anon>* this, const float* rootMtx)
+ 1890  00563E04     BC  const float* GetActorRootMtx(const const struct <anon>* this)
+ 1896  00563EC0     D4  void SetActorIsSleeping(const struct <anon>* this, bool isSleeping)
+ 1903  00563F94     D4  void SetActorIsCollidable(const struct <anon>* this, bool isCollidable)
+ 1910  00564068     D4  void CallActorInit(const struct <anon>* this, struct Lua* lua)
+ 1916  0056413C     AC  struct Actor* GetCurrentActor(const struct <anon>* this)
+ 1922  005641E8     B0  struct Rig* GetRigByName(const struct <anon>* this, const char* rigName)
+                         local  struct Rig* rig
+ 1930  00564D2C     84  int DoesBankExistWithSameName(const const struct <anon>* this, void* bnkFile)
+                         local  const uint32_t* newName
+                         local  struct Bank* bank
+                         local  const uint32_t* testName
+                         inlines  GetNext
+ 1949  00564770     38  int DoesBankExistWithSamePtr(const const struct <anon>* this, void* bnkFile)
+                         local  struct Bank* bank
+                         inlines  GetNext
+ 1966  005647A8    218  void LevelInit(const struct <anon>* this)
+                         local  struct Bank* bank
+                         inlines  GetNext
+ 2007  00564298    130  void LevelShutdown(const struct <anon>* this)
+                         local  struct Bank* bank
+                         inlines  GetNext

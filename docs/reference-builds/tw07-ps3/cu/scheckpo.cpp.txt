@@ -1,0 +1,5 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/scheckpo.cpp
+// compiled in: scheckpo.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    7  006DBEC4    23C  void SNDI_checkplayopts(SNDPLAYOPTS* pspo)

@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/InGameTune/LuaTuningFileManager.cpp
+// compiled in: golf2_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    4  0014CE64    25C  bool LuaTuningFileManager::Load(const char* file_name)
+                         local  const char[5] __FUNCTION__
+                         local  bool result
+                         local  int32 fin
+                         local  int file_length
+                         local  bool memLockRestore
+                         local  char* file_data
+                         local  int file_data_size
+                         inlines  TagValuePair, operator+

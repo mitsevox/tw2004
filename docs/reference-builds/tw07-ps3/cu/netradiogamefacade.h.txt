@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/packages/osdk/2.06.04/extensions/netradio/include/common/osdk/netradio/gamefacade/netradiogamefacade.h
+// compiled in: golf2_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   61  001E763C     24  void ~NetRadioGameFacade(const struct <anon>* this)

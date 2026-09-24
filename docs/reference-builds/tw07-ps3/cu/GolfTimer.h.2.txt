@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/Lo-Math/Headers/GolfTimer.h
+// compiled in: golf2_unity.cpp, golf_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   44    inline-only   float GolfTimer::GetElapsedTimeScale()
+   45    inline-only   void GolfTimer::SetElapsedTimeScale(float timescale)

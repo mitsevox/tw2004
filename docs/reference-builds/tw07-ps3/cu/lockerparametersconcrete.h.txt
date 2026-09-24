@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/Golf/Online/OSDK/lockerparametersconcrete.h
+// compiled in: golf2_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   40  001E7A20      8  bool LockerParametersConcrete::AddToActionPop(const const struct LockerParametersConcrete* this)
+   45  001E7A28     38  void LockerParametersConcrete::~LockerParametersConcrete(const struct LockerParametersConcrete* this)
+                         inlines  ~LockerParameters

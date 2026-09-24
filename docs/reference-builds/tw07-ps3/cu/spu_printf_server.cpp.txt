@@ -1,0 +1,25 @@
+// C:/packages/job_manager/1.11.00/source/ps3/ppu/spu_printf_server.cpp
+// compiled in: spu_printf_server.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   63  0070A58C    178  int spu_printf_server_initialize(struct JobScheduler* jobScheduler)
+                         local  int ret
+                         inlines  GetPrintfQueueHandle, sys_event_port_connect_local, sys_event_port_create, sys_event_queue_create
+  111  0070A3B4    16C  int spu_printf_server_finalize(struct JobScheduler* jobScheduler)
+                         local  int ret
+                         local  uint64_t exit_status
+                         inlines  sys_event_port_destroy, sys_event_port_disconnect, sys_event_port_send, sys_event_queue_destroy, sys_ppu_thread_join
+  153  0070A520     6C  int spu_printf_server_register(sys_spu_thread_t spu, struct JobScheduler* jobScheduler)
+                         local  int ret
+                         inlines  sys_spu_thread_connect_event
+  168  0070A1A0     68  int spu_printf_server_unregister(sys_spu_thread_t spu, struct JobScheduler* jobScheduler)
+                         local  int ret
+                         inlines  sys_spu_thread_disconnect_event
+  183  0070A208    1AC  void spu_printf_server_entry(uint64_t arg)
+                         local  struct JobScheduler* jobScheduler
+                         local  int ret
+                         local  sys_event_t event
+                         local  sys_spu_thread_t spu
+                         local  char[1024] printBuf
+                         local  int sret
+                         inlines  sys_event_queue_receive, sys_spu_thread_write_spu_mb

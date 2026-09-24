@@ -1,0 +1,119 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_ProShopMenu.cpp
+// compiled in: apt_unity.cpp
+// 45 functions, source order. line | PS3 address | size
+
+   59  000F4C5C     B8  void UIProShopMenu::UIProShopMenu(const struct UIProShopMenu* this)
+                         inlines  AptStaticCharBuffer<34u>::AptStaticCharBuffer, TExternArray<PSMenuItem>::TExternArray
+   67  000F17E4    170  void UIProShopMenu::~UIProShopMenu(const struct UIProShopMenu* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStaticCharBuffer<34u>::~AptStaticCharBuffer, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<PSMenuItem>::~TExternArray, UIMenuCircBase::~UIMenuCircBase
+   71  000EF79C     B0  void UIProShopMenu::Init(const struct UIProShopMenu* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList
+   90  000592E8     B0  enum TAptSequenceStatus UIProShopMenu::CheckNoResults(const struct UIProShopMenu* this, bool inbFirstTime, void* inData)
+  101  00042394     84  void UIProShopMenu::AddRefShow(const struct UIProShopMenu* this, uint32 numItems, struct IProShopMenuBehavior* behavior, int32 instanceData)
+  123  00042374     20  void UIProShopMenu::AddRefShow(const struct UIProShopMenu* this)
+  133  00035F00     3C  void UIProShopMenu::AddRefHide(const struct UIProShopMenu* this)
+  143  0003796C     38  void UIProShopMenu::WantAlpha0(const struct UIProShopMenu* this)
+  153  000379A4     38  void UIProShopMenu::WantAlpha100(const struct UIProShopMenu* this)
+  163  0003C768     A4  void UIProShopMenu::InitMenuParams(const struct UIProShopMenu* this)
+  174  00038184      4  void UIProShopMenu::onClose(const struct UIProShopMenu* this, void* inData)
+  178  00038188      C  void UIProShopMenu::UpdateItemAndLabel(const struct UIProShopMenu* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct PSMenuItem* dst
+  186  00038194      C  struct IExternArray* UIProShopMenu::GetExternArray(const struct UIProShopMenu* this)
+  191  000BA2E4    278  enum eAptHandleInput UIProShopMenu::HandleInput(const struct UIProShopMenu* this, int32 cID)
+                         local  bool bProcessInput
+                         inlines  UIExternScrollMenuIterator::ForceUpdateScrollThread
+  299  0003C474     44  void UIProShopMenu::SetScrollBarEnabled(const struct UIProShopMenu* this, int32 enable)
+  305  0003C388     EC  void UIProShopMenu::UpdateScrollBar(const struct UIProShopMenu* this)
+                         local  int32 max
+  321  00024DF4     68  void UIProShopMenu::NotifyGo(const struct UIProShopMenu* this)
+  332  0003822C     68  void UIProShopMenu::NotifyClipUpdate(const struct UIProShopMenu* this)
+  341  00038294     FC  void UIProShopMenu::SetMenuItemIcon(const struct UIProShopMenu* this, const char* itemClipPath, const char* iconName)
+                         local  char[256] aptBuf
+                         local  struct IAptSubscriber* aptGameSub
+  360  00038390    1E0  void UIProShopMenu::SetMenuItemSponsorIcon(const struct UIProShopMenu* this, const char* itemClipPath, const char* iconName)
+                         local  char[128] aptBuf
+                         local  struct IAptSubscriber* aptGameSub
+  386  00038570    174  void UIProShopMenu::SetSponsorIcon(const struct UIProShopMenu* this, const char* iconName)
+                         local  char[128] aptBuf
+                         local  char[2] suf
+                         local  int32 clip
+                         local  struct IAptSubscriber* aptGameSub
+  415  000386E4     44  void UIProShopMenu::SetTitleText(const struct UIProShopMenu* this, const char* text)
+                         local  char* textc
+  423  000362D4     44  void UIProShopMenu::SetSubTitleText(const struct UIProShopMenu* this, const char* text)
+                         local  char* textb
+  431  00050A70     BC  void UIProShopMenu::SetCurCashText(const struct UIProShopMenu* this, int32 nDollars)
+                         local  char[32] finalStrBuf
+                         local  char[32] strBuf
+                         local  char[16] tempBuffer
+  445  00086BD8     A4  void UIProShopMenu::SetMenuItemCount(const struct UIProShopMenu* this, int32 count)
+  458  00038904     34  void UIProShopMenu::SetItemNameText(const struct UIProShopMenu* this, const char* text)
+  465  000509F8     78  void UIProShopMenu::SetItemPriceText(const struct UIProShopMenu* this, int32 price)
+                         local  char[32] strBuf
+                         local  char[16] tempBuffer
+  476  00038938     34  void UIProShopMenu::SetItemPriceText(const struct UIProShopMenu* this, const char* text)
+  483  0003896C     34  void UIProShopMenu::SetItemUnlockText(const struct UIProShopMenu* this, const char* text)
+  490  000389A0    24C  void UIProShopMenu::SetMenuItemStatIndicators(const struct UIProShopMenu* this, const char* itemClipPath, bool locked, bool sale, bool owned, bool free, bool equipped)
+                         local  char[64] aptBuf
+  545  00038BEC    230  void UIProShopMenu::SetMenuItemTokenIndicators(const struct UIProShopMenu* this, const char* itemClipPath, int8 tokenType1, int8 tokenType2, int8 tokenType3, int8 tokenType4)
+                         local  char[64] aptBuf
+                         local  char[2] strBuf
+                         local  int32 i
+                         local  int8[4] toks
+                         local  struct IAptSubscriber* aptGameSub
+  587  00038E1C     30  void UIProShopMenu::SetTokenIndicators(const struct UIProShopMenu* this, int8 tokenType1, int8 tokenType2, int8 tokenType3, int8 tokenType4)
+  593  000B9878    3CC  void UIProShopMenu::RefreshTokensDistribution(const struct UIProShopMenu* this)
+                         local  int32 i
+                         local  int32 j
+                         local  int8[11] distributed
+                         local  int8[11] available
+                         local  const struct UserInfo& userInfo
+                         local  int32 count
+                         local  struct FE_CrAP_Asset_t* asset
+                         local  int32 slot
+                         local  char[64] aptBuf
+                         local  int32 type
+                         local  int8[4] dist
+                         local  struct IAptSubscriber* aptGameSub
+                         inlines  Singleton<UserManager>::GetSingleton, UserInfo::GetGamePlayUserData
+  665  00038E4C     34  void UIProShopMenu::SetTokenBoxItemNameText(const struct UIProShopMenu* this, const char* text)
+  672  00038E80     34  void UIProShopMenu::SetItemSponsorText(const struct UIProShopMenu* this, const char* text)
+  679  00038EB4     34  void UIProShopMenu::SetTokenBoxItemSponsorText(const struct UIProShopMenu* this, const char* text)
+  686  000B9D38    1BC  void UIProShopMenu::ShowTokenPopup(const struct UIProShopMenu* this)
+                         local  const struct UserInfo& userInfo
+                         local  int32 count
+                         local  int32 i
+                         local  int32 foundCount
+                         local  int32 nextTokenType
+                         inlines  Singleton<UserManager>::GetSingleton, UserInfo::GetGamePlayUserData
+  721  00038EE8    180  void UIProShopMenu::UpdateTokenPopupMenuItem(const struct UIProShopMenu* this, int32 index, int32 type)
+                         local  char[64] aptBuf
+                         local  struct IAptSubscriber* aptGameSub
+                         local  struct IAptSubscriber* aptGameSub
+  759  00039068     44  void UIProShopMenu::HideTokenPopup(const struct UIProShopMenu* this)
+  764  00039140     54  void UIProShopMenu::TokenPopupSelectItem(const struct UIProShopMenu* this, int32 index)
+  771  000390AC     94  void UIProShopMenu::SetTokenItemHighlight(const struct UIProShopMenu* this, int32 itemIndex, int32 state)
+                         local  char[32] aptBuf
+  783  000B9FE4    300  void UIProShopMenu::TokenPopupChangeToken(const struct UIProShopMenu* this, int32 direction)
+                         local  int32 i
+                         local  const struct UserInfo& userInfo
+                         local  int32 count
+                         local  int32 nextTokenType
+                         local  int32 curTokenType
+                         local  int32 nextTokenIndex
+                         local  bool nextGood
+                         inlines  Singleton<UserManager>::GetSingleton, UserInfo::GetGamePlayUserData
+  891  00050440    5B8  void UIProShopMenu::SetMenuItemBoxInfo(const struct UIProShopMenu* this, const char* itemClipPath, const char* name, int32 price, int32 salePrice, const char* brand, const char* color, const char* unlock, int32 availability, bool owned)
+                         local  char[64] tmpBuf
+                         local  char[64] aptBuf
+                         local  char[32] strBuf
+                         local  char[16] tempBuffer
+  992  00039194    4CC  void UIProShopMenu::SetMenuItemBoxModInfo(const struct UIProShopMenu* this, const char* itemClipPath, int32 level, int32 mod1type, int32 mod1value, int32 mod2type, int32 mod2value)
+                         local  char[64] tmpBuf
+                         local  char[64] aptBuf
+                         local  char[32] strBuf
+                         local  char[32] labelBuf
+ 1086  0003CC34     D0  void UIProShopMenu::UpdateAllVisibleItems(const struct UIProShopMenu* this)
+                         local  int32 startIdx
+                         local  int32 endIdx
+                         local  int32 i

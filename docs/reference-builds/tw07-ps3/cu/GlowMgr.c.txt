@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/SunFlare/GlowMgr.c
+// compiled in: golf_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   27  00291224     88  void GLW_vInitModule(int iNumberOfViewports)
+                         local  bool dashboardAutoUpdating
+                         inlines  ColGlow_SetCurrentList
+   44  00236584     28  void GLW_vCloseModule()
+   55  0025FC64     20  void GLW_vUpdateGlows(int iViewportID)
+                         inlines  ColGlow_ResetCurrentList
+   68  00304B80     A0  void GLW_vRenderGlows(int iViewportID)
+                         inlines  LLMath_IdentifyMat, RC_spGetCurrentRenderCtx, RC_vSetRenderCtxTransformationMatrix, vec_st

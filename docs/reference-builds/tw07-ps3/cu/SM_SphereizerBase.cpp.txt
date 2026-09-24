@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_SphereizerBase.cpp
+// compiled in: shader_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   11  00519BC4    190  void SM_SphereizerBase::Sphereize(const struct SM_SphereizerBase* this, float l, float t, float r, float b, float coef)
+                         local  const LS_ShaderHandle& vsHandlePtr
+                         inlines  SM_NoteActiveShader
+   42  0050D8CC     9C  void SM_SphereizerBase::StopSphereize(const struct SM_SphereizerBase* this)
+                         local  const LS_ShaderHandle& vsHandlePtr
+                         inlines  SM_NoteActiveShader
+   57  00506C24    158  void SM_SphereizerBase::Load(const struct SM_SphereizerBase* this, const void* compiledprogram, struct LS_VertexAttribute* vertexDescArray, uint32 vertexDescSize)
+   75  00506E44     E8  void SM_SphereizerBase::Activate(const struct SM_SphereizerBase* this)

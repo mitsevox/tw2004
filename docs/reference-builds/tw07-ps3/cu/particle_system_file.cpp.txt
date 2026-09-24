@@ -1,0 +1,43 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/ParticleSystem/source/particle_system_file.cpp
+// compiled in: particle_unity.cpp
+// 31 functions, source order. line | PS3 address | size
+
+  108  004AAD74    184  void ParticleSystemFile::SetDefaults(const struct ParticleSystemFile* this)
+                         local  unsigned int memberCount
+                         local  struct MemberInfo* info
+                         inlines  ParticleSystemFile::SetEndian
+  143  004AAEF8     88  char* ReverseMembersToBuffer(char* buffer, const struct ParticleSystemFile* file, const struct MemberInfo* info, unsigned int memberCount)
+                         local  unsigned int size
+                         local  const char* ptr
+  161  004AAF80     88  const char* ReverseMembersFromBuffer(const char* buffer, struct ParticleSystemFile* file, const struct MemberInfo* info, unsigned int memberCount)
+                         local  unsigned int size
+                         local  char* ptr
+  180  004AB008    230  void ParticleSystemFile::WriteToBuffer(const const struct ParticleSystemFile* this, char* buffer, int reverseBytes)
+  205  004AB238    22C  void ParticleSystemFile::ReadFromBuffer(const struct ParticleSystemFile* this, const char* buffer, int reverseBytes)
+  230  004ADB60      C  int ParticleSystemFile::IsConstrainedToEdge(const const struct ParticleSystemFile* this)
+  236  004AAD30     2C  void ParticleSystemFile::SetIsConstrainedToEdge(const struct ParticleSystemFile* this, int isConstrainedToEdge)
+                         inlines  ParticleSystemFile::SetAttribute
+  249  004AB464     14  int ParticleSystemFile::IsBox(const const struct ParticleSystemFile* this)
+  254  004AB478     18  int ParticleSystemFile::IsCylinder(const const struct ParticleSystemFile* this)
+  259  004AB490     18  int ParticleSystemFile::IsEllipsoid(const const struct ParticleSystemFile* this)
+  264  004AB4A8     14  void ParticleSystemFile::SetIsEllipsoid(const struct ParticleSystemFile* this)
+  270  004AB4BC     14  void ParticleSystemFile::SetIsCylinder(const struct ParticleSystemFile* this)
+  276  004AAD20     10  void ParticleSystemFile::SetIsBox(const struct ParticleSystemFile* this)
+  282  004AB4D0     10  int ParticleSystemFile::IsYAxisFromCenter(const const struct ParticleSystemFile* this)
+  287  004AB4E0      C  int ParticleSystemFile::IsYAxisSameAsEmitter(const const struct ParticleSystemFile* this)
+  296  004AB4EC     14  void ParticleSystemFile::SetIsYAxisFromCenter(const struct ParticleSystemFile* this)
+  302  004AAD5C     18  void ParticleSystemFile::SetIsYAxisSameAsEmitter(const struct ParticleSystemFile* this)
+  309  004AACA4     10  int ParticleSystemFile::IsOrientToCamera(const const struct ParticleSystemFile* this)
+  313  004AB500      C  int ParticleSystemFile::IsOrientToWorld(const const struct ParticleSystemFile* this)
+  320  004AAD0C     14  void ParticleSystemFile::SetIsOrientToCamera(const struct ParticleSystemFile* this)
+  325  004AB50C     18  void ParticleSystemFile::SetIsOrientToWorld(const struct ParticleSystemFile* this)
+  335  004AB524      C  int ParticleSystemFile::IsSpawnOneTime(const const struct ParticleSystemFile* this)
+  339  004AB530     10  int ParticleSystemFile::IsSpawnPerParticle(const const struct ParticleSystemFile* this)
+  344  004AB540     18  void ParticleSystemFile::SetIsSpawnOneTime(const struct ParticleSystemFile* this)
+  350  004AB558     14  void ParticleSystemFile::SetIsSpawnPerParticle(const struct ParticleSystemFile* this)
+  360  004AAC90      C  const char* ParticleSystemFile::GetTextureName(const const struct ParticleSystemFile* this)
+  366  004AB56C     44  void ParticleSystemFile::SetTextureName(const struct ParticleSystemFile* this, const char* name)
+  372  004AAC78      C  const char* ParticleSystemFile::GetFileName(const const struct ParticleSystemFile* this)
+  378  004AB5B0     44  void ParticleSystemFile::SetFileName(const struct ParticleSystemFile* this, const char* name)
+  384  004AB5F4      C  const char* ParticleSystemFile::GetSpawnName(const const struct ParticleSystemFile* this)
+  390  004AB600     44  void ParticleSystemFile::SetSpawnName(const struct ParticleSystemFile* this, const char* name)

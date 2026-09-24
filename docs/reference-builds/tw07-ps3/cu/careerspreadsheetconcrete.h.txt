@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/career/source/common/./careerspreadsheetconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   54  00625558     94  struct Operation* LoadUser(const struct <anon>* this, const char8_t* strUserName, struct CareerSpreadsheetCallback* pCallback)
+   71  006255EC     94  const char8_t* GetCell(const const struct <anon>* this, int32_t iRow, int32_t iColumn)
+   77  00625680     94  const char8_t* GetExtendedItemValue(const const struct <anon>* this, uint32_t uIndex, uint32_t uRow)
+   90  00625714     44  uint32_t GetNumSlots(const const struct <anon>* this)
+   91  00625758     44  void SetActiveSlot(const struct <anon>* this, uint32_t uSlot)
+   92  0062579C     44  uint32_t GetActiveSlot(const const struct <anon>* this)

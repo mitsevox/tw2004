@@ -1,0 +1,61 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/Calendar.c
+// compiled in: golf_unity.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   31  001F7858     58  bool IsLeapYear(uint32 year)
+                         local  bool result
+   66  001F78B0     2C  static uint32 DaysInYear(uint32 year)
+   71  001F7B14     3C  uint32 CalDate_GetDay(CalendarDate date)
+                         local  uint32 dummy
+                         local  uint32 day
+   78  001F7AD8     3C  uint32 CalDate_GetMonth(CalendarDate date)
+                         local  uint32 dummy
+                         local  uint32 month
+   85  001F7A9C     3C  uint32 CalDate_GetYear(CalendarDate date)
+                         local  uint32 dummy
+                         local  uint32 year
+   92  001F7C64    188  void CalDate_SetMDYHMS(uint64* pDate, uint32 month, uint32 day, uint32 year, uint32 hour, uint32 minute, uint32 seconds)
+                         local  CalendarDate Date
+                         local  uint64 utc
+  109  001F7B50    114  void CalDate_SetMDY(CalendarDate* pDate, uint32 month, uint32 day, uint32 year)
+                         local  uint32 currMonth
+                         local  uint32 currYear
+                         local  uint32 dayCount
+  144  001F7960    13C  void CalDate_GetMDY(const CalendarDate* pDate, uint32* pMonth, uint32* pDay, uint32* pYear)
+                         local  uint32 currMonth
+                         local  uint32 currDay
+                         local  uint32 currYear
+                         local  uint32 dayNum
+                         local  uint32 daysInMonth
+                         local  uint32 daysInYear
+  189  001F7DEC     10  void CalDate_AddDays(CalendarDate* pDate, int32 days)
+  194  001F7DFC    110  void CalDate_AddMonths(CalendarDate* pDate, int32 months)
+                         local  uint32 month
+                         local  uint32 day
+                         local  uint32 year
+                         local  int32 tempMonth
+                         local  uint32 daysInMonth
+  228  001F7F0C     8C  void CalDate_AddYears(CalendarDate* pDate, int32 years)
+                         local  uint32 month
+                         local  uint32 day
+                         local  uint32 year
+                         local  uint32 daysInMonth
+  249  001F7F98     3C  enum CalendarDayOfWeek CalDate_GetDayOfWeek(CalendarDate* pDate)
+  254  001F78DC     84  uint32 DaysInMonth(uint32 month, uint32 year)
+  275  001F7FD4     2C  void CalDate_GetPrevMonth(enum CalendarMonth curMonth, uint32 curYear, enum CalendarMonth* prevMonth, uint32* prevYear)
+  294  001F8000     2C  void CalDate_GetNextMonth(enum CalendarMonth curMonth, uint32 curYear, enum CalendarMonth* nextMonth, uint32* nextYear)
+  314  00279560    108  void CalDate_ToString(CalendarDate date, char* s, size_t sBufLen)
+                         local  uint32 month
+                         local  uint32 day
+                         local  uint32 year
+                         local  char[32] tmpBuf
+  337  001F802C     74  void CalDate_ToStringMD(CalendarDate date, char* s, size_t sBufLen)
+                         local  uint32 month
+                         local  uint32 day
+                         local  uint32 year
+  353  001F80A0     5C  CalendarDate CalDate_GetToday()
+                         local  CalendarDate curDay
+                         local  int month
+                         local  int day
+                         local  int year
+                         local  int dummy

@@ -1,0 +1,12 @@
+// ../../../../../TIGERCODE/Code/Golf/UI_Core/AptRuntime/Headers/UI_CourseSelect.h
+// compiled in: apt_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   63  000FE924      C  uint32 UICourseSelect::GetSignature(const const struct UICourseSelect* this)
+   65  000FE938      C  struct IExternArray* UICourseSelect::GetExternArray(const struct UICourseSelect* this)
+   69  000FE94C     3C  void UICourseSelect::UpdateItemAndLabel(const struct UICourseSelect* this, struct UIMenuItemBaseDst* dstItem, struct UIMenuItemBaseSrc* srcItem, int32 index, char* label)
+  118  000FE990      8  int32 UIHoleSelect::GetSizeofArrayStruct(const struct UIHoleSelect* this)
+  122  000FE9A0      C  uint32 UIHoleSelect::GetSignature(const const struct UIHoleSelect* this)
+  130  000FE9AC     3C  void UIHoleSelect::Show(const struct UIHoleSelect* this)
+  131  000FE9E8     40  void UIHoleSelect::OnShow(const struct UIHoleSelect* this)
+  133  000FEA28      4  void UIHoleSelect::ShowHelpText(const struct UIHoleSelect* this)

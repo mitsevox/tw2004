@@ -1,0 +1,17 @@
+// ../../../../../TIGERCODE/Code/Golf/GameMode/Headers/GameModeDriver_PGATour.h
+// compiled in: golf_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+  127  0033ECB8     14  enum UIScoreCardDispMode_t GameModeDriverPGATour::GetScoreDisplayMode(const struct GameModeDriverPGATour* this, bool getAlternate)
+  133  0033ECCC      8  enum eLoadingScreens GameModeDriverPGATour::GetFirstLoadingScreen(const struct GameModeDriverPGATour* this)
+  134  0033ECD4      8  enum eLoadingScreens GameModeDriverPGATour::GetLastLoadingScreen(const struct GameModeDriverPGATour* this)
+  294  0033ECDC      C  const void* GameModeDriverPGATour::GetUserRoundStatCounts(const struct GameModeDriverPGATour* this)
+  296  0033ECE8     30  const float GameModeDriverPGATour::GetHistoricStatsData(const struct GameModeDriverPGATour* this, int golferID, int32 statIndex)
+  297  0033ED18     20  const char* GameModeDriverPGATour::GetHistoricStatsGolferName(const struct GameModeDriverPGATour* this, int golferID)
+  303  0033ED38      8  bool GameModeDriverPGATour::IsSpudLeaderBoardShownCommonly(const struct GameModeDriverPGATour* this)
+  314  0033ED40      8  bool GameModeDriverPGATour::GiveExperience(const struct GameModeDriverPGATour* this)
+  316  0033ED48      8  bool GameModeDriverPGATour::IsCurrentlyPgaSeasonMode(const struct GameModeDriverPGATour* this)
+  321    inline-only   bool GameModeDriverPGATour::IsUsingSkippingToLastHoleCheat(const struct GameModeDriverPGATour* this)
+  330    inline-only   void GameModeDriverPGATour::SetJustFinishedPGATourRound(const struct GameModeDriverPGATour* this, bool finished)
+  331    inline-only   bool GameModeDriverPGATour::JustFinishedPGATourRound(const struct GameModeDriverPGATour* this)
+  418    inline-only   int32 GM_PgaTourMode_GetNEvents()

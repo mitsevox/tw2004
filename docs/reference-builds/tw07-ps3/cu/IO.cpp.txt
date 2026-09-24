@@ -1,0 +1,90 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/source/common/IO.cpp
+// compiled in: IO.cpp
+// 16 functions, source order. line | PS3 address | size
+
+    0  007DEFCC    10C  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   52  007D9CF4     E8  void InitCRCTable()
+                         local  uint16_t i
+                         local  uint16_t j
+                         local  uint32_t c
+   79  007D9EC8    2D0  enum TDbError WriteBuffer(struct <anon>* pFile, void* pBuffer, const uint32_t bufSize)
+                         local  const char[12] __FUNCTION__
+                         local  enum TDbError dbResult
+                         local  uint32_t bytesWritten
+  118  007DA198    2D0  enum TDbError ReadBuffer(struct <anon>* pFile, void* pBuffer, const uint32_t bufSize)
+                         local  const char[11] __FUNCTION__
+                         local  enum TDbError dbResult
+                         local  uint32_t bytesRead
+  166  007DA468    47C  uint32_t SaveDatabaseSize(struct Database* pDb, struct <anon>* pOffsetLst)
+                         local  const char[17] __FUNCTION__
+                         local  uint32_t uDbSize
+                         local  uint32_t uTblCnt
+                         local  uint32_t uTblOff
+                         local  struct Table* pTable
+                         local  struct TableIndex* pIndex
+  265  007DCDB8    C40  enum TDbError ReadTableAppend(struct Table* pTable, struct <anon>* savedTbl, TableRef tableRef, struct <anon>* pFile)
+                         local  const char[16] __FUNCTION__
+                         local  enum TDbError dbResult
+                         local  RowNum uFreeRows
+                         local  RowNum uNewRows
+                         local  RowNum uTotalRowsToRead
+                         local  struct <anon>[254] tempColDefs
+                         local  bool8_t bBulkRead
+                         local  struct TableIndex* pIndex
+  483  007DA8E4    61C  enum TDbError ReadTableRow(struct Table* pTable, struct <anon>* pFile, bool8_t bDummyRead)
+                         local  const char[13] __FUNCTION__
+                         local  enum TDbError dbResult
+                         local  void* pData
+                         local  struct TableIndex* pIndex
+                         local  RowNum rowNum
+                         local  bool8_t wasDeleted
+                         local  uint8_t[8192] dumbBuffer
+  612  007DBD58   1060  enum TDbError ReadTableNew(struct Database* pDb, struct <anon>* savedTbl, TableRef tableRef, struct <anon>* pFile)
+                         local  const char[13] __FUNCTION__
+                         local  struct Table* pTable
+                         local  uint32_t uTrigCount
+                         local  enum TDbError dbResult
+                         local  char8_t[8] strPad
+                         local  struct TableIndex* temp
+  802  007DB59C    7BC  enum TDbError ReadIndex(struct Table* pTable, struct <anon>* pFile, bool8_t bFakeRead)
+                         local  const char[10] __FUNCTION__
+                         local  struct TableIndex* pIndex
+                         local  struct <anon> savedIndex
+                         local  struct <anon> savedCol
+                         local  enum TDbError dbResult
+                         local  RowNum rowNum
+                         local  ColNum colNum
+                         local  struct <anon> savedFilter
+                         local  struct ICollection* collection
+                         local  struct <anon>* indexColSort
+  938  007DAF00    69C  enum TDbError ReadExprNode(struct ExprNode* pNode, struct <anon>* pFile, bool8_t bFakeRead)
+                         local  const char[13] __FUNCTION__
+                         local  enum TDbError dbResult
+ 1012  007DD9F8    530  enum TDbError WriteExprNode(struct Table* pTable, struct ExprNode* pNode, struct <anon>* pFile)
+                         local  const char[14] __FUNCTION__
+                         local  ColNum colNum
+                         local  enum TDbError dbResult
+                         local  struct <anon> exprNode
+ 1082  007DDF28    700  enum TDbError WriteTable(struct Table* pTable, struct <anon>* pFile)
+                         local  const char[11] __FUNCTION__
+                         local  struct TableIndex* pIndex
+                         local  enum TDbError dbResult
+                         local  bool8_t bWriteRows
+                         local  struct <anon> savedTbl
+                         local  uint32_t bytesWritten
+                         local  char8_t[8] strPad
+ 1254  007DE628    9A4  enum TDbError SaveDatabase(struct Database* pDb, struct IOCallback* pCallbacks)
+                         local  const char[13] __FUNCTION__
+                         local  enum TDbError dbResult
+                         local  struct Table* pTable
+                         local  struct <anon>* tblOffLst
+                         local  uint32_t tblCount
+                         local  uint32_t bytesWritten
+                         local  uint32_t firstTblOff
+                         local  struct <anon> fileHdr
+                         local  struct <anon> savedDb
+                         local  struct <anon> hFile
+ 1468  007D9DDC     EC  uint32_t CalculateCRC32(uint8_t* buf, uint32_t len, uint32_t previousCrc)
+                         local  const uint8_t* p
+ 1483  007DF0D8     3C  static void _GLOBAL__I__ZN2EA4T3db2IO12mCrc32_tableE()
+ 1484  007DF114     3C  static void _GLOBAL__D__ZN2EA4T3db2IO12mCrc32_tableE()

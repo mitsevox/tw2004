@@ -1,0 +1,66 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_OnlineLobbyRoom.cpp
+// compiled in: apt_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   72  000F7184     98  void UIOnlineLobbyRoom::UIOnlineLobbyRoom(const struct UIOnlineLobbyRoom* this)
+                         inlines  TArrayInternal<UIOnlineLobbyRoom::PlayerMenuItem,AptStructSwapper>::TArrayInternal, TExternArray<UIOnlineLobbyRoom::PlayerMenuItem>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   79  000F0560     90  void UIOnlineLobbyRoom::Init(const struct UIOnlineLobbyRoom* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   93  000673F4     EC  void UIOnlineLobbyRoom::Show(const struct UIOnlineLobbyRoom* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen
+  123  000674E0     78  void UIOnlineLobbyRoom::OnShow(const struct UIOnlineLobbyRoom* this)
+  132  00047D18     84  void UIOnlineLobbyRoom::Hide(const struct UIOnlineLobbyRoom* this)
+  153  000C3C98     3C  void UIOnlineLobbyRoom::UpdateDetailedInfo(const struct UIOnlineLobbyRoom* this)
+  160  00068E14    244  void UIOnlineLobbyRoom::UpdateItemAndLabel(const struct UIOnlineLobbyRoom* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct User* pUser
+                         local  struct PlayerMenuItem* dest
+                         local  bool bIsValidName
+                         local  bool bIsValidLabel
+  249  000C3938    360  enum eAptHandleInput UIOnlineLobbyRoom::HandleInput(const struct UIOnlineLobbyRoom* this, int32 cID)
+                         local  struct User* pUser
+                         local  int iNumGames
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, OnlineManagerOSDK::GetLobby
+  380  000C341C    2CC  void UIOnlineLobbyRoom::RefreshLobbyUsersList(const struct UIOnlineLobbyRoom* this, int32 numUsers, int32 activeUserIndex)
+                         local  int32 savefirstRowIndex
+                         local  int32 savemLastUpdateRowIndex
+                         local  float saveTargerMenuPos
+                         local  float saveMenuPos
+                         local  float saveMenuVel
+                         local  int32 saveAnimFrames
+                         local  int32 i
+                         local  struct LobbyOSDK* pLobby
+                         local  struct User* pUser
+                         local  struct LobbyOSDK* pLobby
+                         local  struct User* pUser
+                         inlines  UIExternScrollMenuIterator::GetActiveItemIndex
+  446  000C308C    390  bool UIOnlineLobbyRoom::UpdatePlayerInfo(const struct UIOnlineLobbyRoom* this, int index)
+                         local  bool bRet
+                         local  struct User* pUser
+                         local  struct <anon>* pStatStrategy
+                         local  char* golferLastName
+                         local  bool bValid
+                         inlines  OnlineManagerOSDK::GetLobby
+  561  00047D9C     C4  bool UIOnlineLobbyRoom::IsValidString(const struct UIOnlineLobbyRoom* this, const char* pszName)
+                         local  bool bValid
+                         local  int iCount
+                         local  const char* pPtr
+  608  00067558     74  void UIOnlineLobbyRoom::LooseFocus(const struct UIOnlineLobbyRoom* this, uint32 gointTo_Signature)
+  616  000675CC     74  void UIOnlineLobbyRoom::RegainFocus(const struct UIOnlineLobbyRoom* this, uint32 comeFrom_Signature)
+  625  000C3814    124  void UIOnlineLobbyRoom::SelectPreviousInUserList(const struct UIOnlineLobbyRoom* this)
+                         local  struct LobbyOSDK* pLobby
+                         local  int numInList
+                         local  int iUserPos
+                         local  struct User* pUser
+                         inlines  OnlineManagerOSDK::GetLobby
+  646  000C36E8    12C  void UIOnlineLobbyRoom::SelectNextInUserList(const struct UIOnlineLobbyRoom* this)
+                         local  struct LobbyOSDK* pLobby
+                         local  int numInList
+                         local  int iUserPos
+                         local  struct User* pUser
+                         inlines  OnlineManagerOSDK::GetLobby
+  668  00069058    100  int UIOnlineLobbyRoom::GetLocationInUserList(const struct UIOnlineLobbyRoom* this, char* nameToFind)
+                         local  struct LobbyOSDK* pLobby
+                         local  int numInList
+                         local  int posInList
+                         local  struct User* pUser
+                         inlines  OnlineManagerOSDK::GetLobby

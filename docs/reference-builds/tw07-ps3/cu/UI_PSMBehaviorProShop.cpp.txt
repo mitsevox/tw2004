@@ -1,0 +1,78 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_PSMBehaviorProShop.cpp
+// compiled in: apt_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+    8  0006B160    340  void PSMBehavior_ProShop::OnInit(const struct PSMBehavior_ProShop* this, int32 instanceData)
+                         local  char[32] strBuf
+                         local  FE_CrAP_Asset_Category_e category
+                         local  int32 subCatIndex
+                         local  FE_CrAP_Asset_Slot_e itemSlot
+  114  0008EF50    63C  void PSMBehavior_ProShop::UpdateMovieClip(const struct PSMBehavior_ProShop* this, int32 curMenuItemIndex, const char* mDestMenuItemClipName, int32 instanceData)
+                         local  uint16* idList
+                         local  FE_CrAP_Asset_Category_e category
+                         local  int32 subCategory
+                         local  int32 unfilteredEntryNum
+                         local  bool locked
+                         local  bool sale
+                         local  bool owned
+                         local  bool free
+                         local  bool equip
+                         local  int32 price
+                         local  int32 salePrice
+                         local  char[32] sponsorName
+                         local  SponsorType s
+                         local  int32 availability
+                         local  char[64] unlockMsg
+                         local  char[48] strBuf
+                         local  char[64] colorBuf
+                         local  uint32 color
+                         local  SponsorType sp
+                         local  const char* sIcon
+                         local  int32 boxIndex
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  int32 msgIdx
+                         local  char* iconName
+                         local  char* posi
+                         local  char[256] iconBuf
+                         inlines  UIGameFace::GetProShopMenuAssetList, std::strstr
+  277  000AAC90    2B0  void PSMBehavior_ProShop::OnMoveSelection(const struct PSMBehavior_ProShop* this, int32 index, int32 instanceData)
+                         local  char[64] strBuf
+                         local  int32 numItems
+                         local  uint16* idList
+                         local  int32 id
+                         local  struct FE_CrAP_Asset_t* asset
+                         local  FE_CrAP_Asset_Category_e cat
+                         local  int32 subCat
+                         local  int32 item
+                         local  FE_CrAP_Asset_Slot_e itemSlot
+                         local  SponsorType sp
+                         local  const char* sIcon
+                         local  int32 price
+                         local  int32 lastIndex
+                         local  int32 dir
+                         inlines  UIGameFace::GetProShopMenuAssetList, UIGameFace::GetProShopMenuAssetListCount
+  373  0004F998     6C  bool PSMBehavior_ProShop::DoesScreenAllowSubCatChange(const struct PSMBehavior_ProShop* this, int32 screen)
+  400  000D4E40    57C  bool PSMBehavior_ProShop::OnInput(const struct PSMBehavior_ProShop* this, const int32& button, int32 curActiveItemIndex, int32 instanceData)
+                         local  char[32] strBuf
+                         local  uint16* idList
+                         local  FE_CrAP_Asset_Category_e category
+                         local  int32 curSubCategory
+                         local  FE_CrAP_Asset_Slot_e itemSlot
+                         local  int32 unfilteredEntryNum
+                         local  int32 numSubCats
+                         local  char[16] strBuf
+                         local  int32 addAmount
+                         local  int32 minSubCatIdx
+                         local  int32 maxSubCatIdx
+                         local  uint32 numOptions
+                         local  int32 numItems
+                         local  int32 msgIdx
+                         inlines  UIGameFace::GetProShopMenuAssetList, UIGameFace::SetCurrentProShopSubCat
+  619  0008FAF8    2E0  void PSMBehavior_ProShop::SetupHelpText(const struct PSMBehavior_ProShop* this, int32 id, int32 isEquipping)
+                         local  FE_CrAP_Asset_Category_e cat
+                         local  int32 subCat
+                         local  int32 item
+                         local  int32 seb
+                         local  int32 cib
+                         local  int32 sqb
+                         local  char[8] arg

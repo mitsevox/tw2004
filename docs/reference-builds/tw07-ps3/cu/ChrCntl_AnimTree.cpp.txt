@@ -1,0 +1,287 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/src/ChrCntl_AnimTree.cpp
+// compiled in: ChrCntl_AnimTree.cpp
+// 63 functions, source order. line | PS3 address | size
+
+   45    inline-only   static int32_t Round_float_to_int32(float_t _a)
+   59  005AB774     E4  float ChrCntl_AnimTree_WrapFrameNum(float frameNum, float numFrames)
+                         local  int numLoops
+   75  005AB858     6C  static int _IsFirstFrameOfAnim(float frameNum, float prevFrameNum, float numFrames, int flags)
+                         local  int isFirstFrame
+                         local  bool lastAnimEnded
+                         local  bool prevFrameWrapped
+  106  005AB8C4      C  static int _GetNumDataFrames(struct MotionDefinition* motionRef)
+  115    inline-only   static const struct SkeletonFilterRef* _GetSkeletonFilterRef(struct Character* animView, struct MotionDefinition* motionRef)
+  181  005AFAD4    1B8  static struct Frame* _AnimTree_MotionFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  struct Frame* animFrame
+                         local  struct MotionDefinition* motionRef
+                         local  const struct SkeletonFilterRef* filterRef
+                         local  struct <anon> frameBuilder
+                         local  int numDataFrames
+                         local  float numAnimFrames
+                         local  float scaleFactor
+                         inlines  _GetSkeletonFilterRef
+  234  005AB8D0    2C0  static struct Frame* _AnimTree_TransitionFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  struct Frame* frameRef
+                         local  struct <anon>* prevNode
+                         local  struct <anon>* nextNode
+                         local  struct <anon>* transitionInfo
+                         local  float frameNumDelta
+                         local  float frameNumAfter
+                         local  float interp
+                         local  float frameNumA
+                         local  float frameNumB
+                         local  struct Frame* frameA
+                         local  struct Frame* frameB
+  298  005ABB90    164  static struct Frame* _AnimTree_SequenceFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  float numFrames
+                         local  float thisChildFrames
+                         local  int numChildren
+                         local  int i
+  321  005AF854    280  static int _SelectRandomChild(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, int flags)
+                         local  int i
+                         local  int selectedChild
+                         local  float sumOfWeights
+                         local  float randValue
+                         local  struct <anon>* selectRandInfo
+                         local  struct <anon>* selectInfo
+                         local  int lastSelected
+                         inlines  RandFloat
+  385  005ABCF4    40C  static struct Frame* _AnimTree_SelectFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, ChrCntl_SelectChildFn selectChildFn, int selectEveryFrameFlag, float frameRateScale, float duration)
+                         local  struct <anon>* selectNodeInfo
+                         local  int changeAnim
+                         local  bool bDoSelectBlend
+                         local  struct Frame* frameRef
+                         local  int newSelectedChild
+                         local  float newNumFrames
+                         local  float ratioAB
+                         local  struct Frame* frameA
+  463  005AC100     3C  static struct Frame* _AnimTree_RandomSelectFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  const struct <anon>* randomInfo
+  469  005AC13C    138  static struct Frame* _AnimTree_ReverseFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  struct Frame* frameRef
+  483  005AC274     54  static float _AnimTree_PreserveRelativeFrameNum(struct Character* viewInfo, const struct <anon>* node, float numOldFrames, float numNewFrames, float oldFrameNum, float frameRateScale, int flags)
+                         local  float framePercent
+                         local  float frameDelta
+                         local  float newFrameNum
+  505  005AC2C8    884  static struct Frame* _AnimTree_BlendChildren(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float interp, float frameRateScale, int flagInterpChildLengths)
+                         local  struct Frame* frameRef
+                         local  struct Frame* frameA
+                         local  struct Frame* frameB
+                         local  struct <anon>* childA
+                         local  struct <anon>* childB
+                         local  float framePercent
+                         local  float framePercent
+                         local  float framePercent
+                         local  float framePercent
+                         local  float reqNumFrames
+                         local  float scaleFactorA
+                         local  float scaleFactorB
+                         local  float framePercent
+                         local  float framePercent
+  677  005ACBF8     BC  static struct Frame* _AnimTree_VariableBlendFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  struct Frame* frameRef
+                         local  struct <anon>* varInfo
+  689  005ACB4C     34  static struct Frame* _AnimTree_BlendFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  struct Frame* frameRef
+                         local  float interp
+  699  005ACCB4     BC  static int _SelectVariableChild(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, int flags)
+                         local  int numChildren
+                         local  int i
+                         local  struct <anon>* childVarSelectRangeInfo
+                         local  struct <anon>* varRangeInfo
+                         local  float varValue
+  726  005ACD70     40  static struct Frame* _AnimTree_VariableSelectFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  struct <anon>* varRangeInfo
+  733  005ACDB0     50  static struct Frame* _AnimTree_FrameRateFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  struct Frame* frameRef
+                         local  struct <anon>* child
+                         local  float scaleFactor
+                         local  struct <anon>* frameRateInfo
+  749  005ACE00     50  static struct Frame* _AnimTree_FrameRateIntFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  struct Frame* frameRef
+                         local  struct <anon>* child
+                         local  float scaleFactor
+                         local  struct <anon>* frameRateInfo
+  765  005ACE50     64  static struct Frame* _AnimTree_FrameRangeFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  struct <anon>* rangeInfo
+                         local  struct <anon>* child
+  786  005ACEB4     98  static struct Frame* _AnimTree_ScaleGMTransFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  struct <anon>* scaleInfo
+                         local  struct Frame* frameRef
+                         local  struct <anon>* child
+  808  005ACF4C    130  static struct Frame* _AnimTree_EventCheckFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  struct Frame* frameRef
+                         local  struct <anon>* child
+                         local  struct <anon>* grandChild
+                         local  struct <anon>* greatGrandChild
+                         local  struct MotionDefinition* motionRef
+  846  005AD07C      8  static struct Frame* _AnimTree_StitchFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+  851  005AD084    2BC  static struct Frame* _AnimTree_AddFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  struct Frame* frameRef
+                         local  struct Frame* frameA
+                         local  struct Frame* frameB
+                         local  struct Frame* frameC
+                         local  struct <anon>* childA
+                         local  struct <anon>* childB
+                         local  struct <anon>* childC
+                         local  float frameNumDelta
+                         local  float frameNumA
+                         local  float frameNumB
+                         local  float frameNumC
+  896  005AD340    2BC  static struct Frame* _AnimTree_SubtractFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  struct Frame* frameRef
+                         local  struct Frame* frameA
+                         local  struct Frame* frameB
+                         local  struct Frame* frameC
+                         local  struct <anon>* childA
+                         local  struct <anon>* childB
+                         local  struct <anon>* childC
+                         local  float frameNumDelta
+                         local  float frameNumA
+                         local  float frameNumB
+                         local  float frameNumC
+  941  005AD5FC     90  static struct Frame* _AnimTree_ScaleFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  struct <anon>* scaleInfo
+                         local  struct Frame* frameRef
+                         local  struct <anon>* childA
+                         local  float scaleFactor
+  958  005AD68C    12C  static struct Frame* _AnimTree_VariableScaleFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  struct <anon>* variableScaleInfo
+                         local  struct Frame* frameRef
+                         local  struct <anon>* childA
+                         local  float varValue
+                         local  float scaleFactor
+  985  005AD7B8    140  static struct Frame* _AnimTree_OverlayFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  struct Frame* frameRef
+                         local  struct Frame* frameA
+                         local  struct Frame* frameB
+                         local  struct <anon>* childA
+                         local  struct <anon>* childB
+                         local  float frameNumB
+ 1007  005AD8F8    2B0  static struct Frame* _AnimTree_RepeatFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  struct Frame* frameRef
+                         local  struct <anon>* repeatInfo
+                         local  float numFramesPerCycle
+                         local  float prevNumRepeats
+                         local  float originalNumFrames
+                         local  float newNumFrames
+                         inlines  RandFloat
+ 1046  005ADCBC    2B0  static struct Frame* _AnimTree_VariableFrameRateFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  struct Frame* frameRef
+                         local  struct <anon>* child
+                         local  struct <anon>* varFrameRateInfo
+                         local  float reqNumFrames
+                         local  int childFrameRateLoopFlag
+ 1085  005AE05C    140  static struct Frame* _AnimTree_VariableSelectFrameFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  struct Frame* frameRef
+                         local  struct <anon>* varInfo
+                         local  struct <anon>* child
+                         local  float numChildFrames
+                         local  float frameSelected
+                         local  float prevFrameSelected
+ 1116  005AE214     B4  static struct Frame* _AnimTree_VariableBlendPoseFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  struct Frame* frameRef
+                         local  struct <anon>* varInfo
+ 1128  005AE2C8      8  static struct Frame* _AnimTree_RagdollFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+ 1142  005AE2D0     70  static struct Frame* _AnimTree_AdjustPoseFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  struct Frame* frameRef
+                         local  struct <anon>* adjustPoseInfo
+ 1162  005AE340     68  struct Frame* AnimTree_Evaluate(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+ 1177  005AF570    2E4  struct Frame* AnimTree_EvaluateSlerped(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, struct <anon>* currFrameSlerp, float prevFrameNum, int flags, float frameRateScale)
+                         local  float factor
+                         local  struct Frame* leftFrame
+                         local  struct Frame* rightFrame
+                         inlines  GetSlerpFactor
+ 1286  005AE3A8     14  static float _AnimTree_numFramesRagdollFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+ 1302  005AE3BC     40  static float _AnimTree_numFramesPrimaryFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+                         local  struct MotionDefinition* motionRef
+                         local  struct <anon>* primInfo
+                         local  struct <anon>* rangeInfo
+ 1315  005AE3FC     B8  static float _AnimTree_numFramesMotionFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+                         local  struct MotionDefinition* motionRef
+                         local  float numFrames
+ 1330  005AE4B4     A8  static float _AnimTree_numFramesTransitionFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+                         local  float numFrames
+ 1342  005AE55C    124  static float _AnimTree_numFramesSumChildrenFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+                         local  float numFrames
+                         local  int numChildren
+                         local  int i
+ 1356  005AE680    170  static float _AnimTree_numFramesSelectFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+                         local  struct <anon>* selectNodeInfo
+                         local  float numFrames
+                         local  int numChildren
+                         local  int i
+ 1372  005AE7F0     64  static float _AnimTree_numFramesFirstChildFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+                         local  float numFrames
+ 1381  005AE854    12C  static float _AnimTree_numFramesMaxChildFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+                         local  float numFrames
+                         local  float childFrames
+                         local  int numChildren
+                         local  int i
+ 1419  005AE980    184  static float _AnimTree_numFramesFrameRateFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+                         local  struct <anon>* child
+                         local  float numFrames
+                         local  float scaleFactor
+                         local  struct <anon>* frameRateInfo
+                         local  int childFrameRateLoopFlag
+                         inlines  Round_float_to_int32
+ 1450  005AEB04    13C  static float _AnimTree_numFramesVariableFrameRateFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+                         local  struct <anon>* child
+                         local  float numFrames
+                         local  float scaleFactor
+                         local  struct <anon>* frameRateInfo
+                         local  int childFrameRateLoopFlag
+ 1480  005AEC40    138  static float _AnimTree_numFramesFrameRangeFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+                         local  struct <anon>* child
+                         local  float numFrames
+                         local  struct <anon>* rangeInfo
+ 1502  005AED78    148  static float __AnimTree_numFramesBlendChildren(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float interp, int flagInterpChildLengths)
+                         local  float numFrames
+                         local  float childANumFrames
+                         local  float childBNumFrames
+ 1545  005AEEC0     68  static float _AnimTree_numFramesVariableBlendFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+                         local  struct <anon>* varInfo
+                         local  float numFrames
+ 1555  005AEF28     10  static float _AnimTree_numFramesBlendFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+                         local  float numFrames
+                         local  float interp
+ 1565  005AEF38     14  static float _AnimTree_numFramesStitchFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+ 1570  005AEF4C     70  static float _AnimTree_numFramesRepeatFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+                         local  struct <anon>* repeatInfo
+                         local  float numFrames
+                         local  float numChildFrames
+ 1580  005AEFBC     CC  static float _AnimTree_numFramesOverlayFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+                         local  float numFrames
+ 1591  005AF088     68  static float _AnimTree_numFramesVariableBlendPoseFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+                         local  struct <anon>* varInfo
+                         local  float numFrames
+ 1601  005AF0F0     30  static float _AnimTree_numFramesVariableSelectFrameFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+ 1611  005AF120     E4  float ChrCntl_AnimTree_EvalNumFrames(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+                         local  float numFrames
+ 1627  005AF204    24C  static struct Frame* _AnimTree_PrimaryFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+                         local  struct <anon>* primaryInfo
+                         local  struct <anon>* rangeInfo
+                         local  struct <anon>* frameRateInfo
+                         local  struct MotionDefinition* motionRef
+                         local  const struct SkeletonFilterRef* filterRef
+                         local  struct Frame* animFrame
+                         local  float scaleFactor
+                         local  struct <anon> frameBuilder
+                         local  float numAnimFrames
+                         local  int numDataFrames
+                         inlines  _GetSkeletonFilterRef
+ 1710  005ACB80     78  static void _AnimTree_variablesBlendFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+                         local  struct <anon>* varInfo
+                         local  float varValue
+ 1720  005AE19C     78  static void _AnimTree_variablesBlendPoseFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+                         local  struct <anon>* varInfo
+                         local  float varValue
+ 1727  005ADBA8    114  static void _AnimTree_variablesFrameRateFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+                         local  struct <anon>* varFrameRateInfo
+                         local  float var
+ 1743  005ADF6C     F0  static void _AnimTree_variablesSelectFrameFn(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+                         local  struct <anon>* varInfo
+                         local  float varValue
+ 1788  005AF450    120  void ChrCntl_AnimTree_EvalVariables(struct Character* viewInfo, const struct <anon>* node, struct InstVars* vars)
+                         local  uint8_t animFn
+                         local  int i

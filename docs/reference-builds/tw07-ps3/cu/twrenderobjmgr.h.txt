@@ -1,0 +1,10 @@
+// ../../../../../TIGERCODE/Code/Golf/RenderObjects/twrenderobjmgr.h
+// compiled in: rnaunity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   75    inline-only   struct <anon>& GetViewFrustum(const struct <anon>* this)
+   92    inline-only   struct <anon>* GetInstance()
+   99  004D4950    128  void RenderObjMgr(const struct <anon>* this, int32_t numBins)
+                         inlines  RenderBin, ViewFrustum, vector
+  100  004D103C     E0  void ~RenderObjMgr(const struct <anon>* this)
+                         inlines  ~RenderBin

@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_trinity_sequence.h
+// compiled in: tiger_module_trinity_internal.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   16    inline-only   struct <anon>* TrinitySequence::GetMaster(const const struct TrinitySequence* this)
+   17    inline-only   struct Sequence* TrinitySequence::GetSequence(const const struct TrinitySequence* this)
+   18    inline-only   unsigned int TrinitySequence::GetResourceTag(const const struct TrinitySequence* this)

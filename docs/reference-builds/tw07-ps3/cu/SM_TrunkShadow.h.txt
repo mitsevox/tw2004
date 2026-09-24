@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_TrunkShadow.h
+// compiled in: shader_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   24  00520B50     18  void SM_TrunkShadowClass::~SM_TrunkShadowClass(const struct SM_TrunkShadowClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base

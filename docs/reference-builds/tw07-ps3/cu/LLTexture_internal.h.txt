@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/Headers/LLTexture_internal.h
+// compiled in: Legacy_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   68    inline-only   struct TextureFormatNative TX_GetNativeFormat(TextureFormat format, TextureOptions options)
+                         local  struct TextureFormatNative nativeFormat
+                         local  struct TextureFormatNative nativeFormat
+   89    inline-only   uint32 TX_GetNativeCubemapLayer(uint32 layer)
+   97    inline-only   uint32 TX_GetMemoryType(TextureOptions options)
+  105    inline-only   struct TextureInfoNative* TX_GetNativeTextureInfo(TextureRef ref)

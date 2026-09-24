@@ -1,0 +1,75 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNAX/include/RNAUtils/Attrib.h
+// compiled in: Attrib.cpp, SGNode.cpp
+// 42 functions, source order. line | PS3 address | size
+
+  107  008EA038    16C  void AttribC::AttribC(const struct AttribC* this, const char* pStrName, uint32_t idType, uint32_t uArrayCount)
+                         inlines  RNADebugBreak, String
+  108  008E9E4C    1EC  void AttribC::~AttribC(const struct AttribC* this)
+                         local  const char[9] __FUNCTION__
+                         inlines  AttribC::FreeValueMem, RNADebugBreak, operator delete [], ~String
+  110    inline-only   uint32_t AttribC::GetType(const const struct AttribC* this)
+  111    inline-only   uint32_t AttribC::GetCount(const const struct AttribC* this)
+  112    inline-only   const char* AttribC::GetName(const const struct AttribC* this)
+  123    inline-only   void Set<RNAMath::RNAMatrix44>(const struct AttribC* this, const const RNAMatrix44& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  const char[7] __FUNCTION__
+  123    inline-only   void Set<RNAMath::RNAVector4>(const struct AttribC* this, const const RNAVector4& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  const char[7] __FUNCTION__
+  123    inline-only   void Set<RNAMath::RNAVector3>(const struct AttribC* this, const const RNAVector3& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  const char[7] __FUNCTION__
+  123    inline-only   void Set<RNAMath::RNAVector2>(const struct AttribC* this, const const RNAVector2& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  const char[7] __FUNCTION__
+  123    inline-only   void Set<bool8_t>(const struct AttribC* this, const const bool8_t& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  const char[7] __FUNCTION__
+  123    inline-only   void Set<std::float_t>(const struct AttribC* this, const const float_t& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  const char[7] __FUNCTION__
+  123    inline-only   void Set<std::int32_t>(const struct AttribC* this, const const int32_t& value, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+                         local  const char[7] __FUNCTION__
+  148    inline-only   const int32_t& Get<std::int32_t>(const const struct AttribC* this, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+  148    inline-only   const float_t& Get<std::float_t>(const const struct AttribC* this, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+  148    inline-only   const bool8_t& Get<bool8_t>(const const struct AttribC* this, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+  148    inline-only   const RNAVector3& Get<RNAMath::RNAVector3>(const const struct AttribC* this, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+  148    inline-only   const RNAVector4& Get<RNAMath::RNAVector4>(const const struct AttribC* this, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+  148    inline-only   const RNAVector2& Get<RNAMath::RNAVector2>(const const struct AttribC* this, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+  148    inline-only   const RNAMatrix44& Get<RNAMath::RNAMatrix44>(const const struct AttribC* this, uint32_t uIndex)
+                         local  const char[4] __FUNCTION__
+  162    inline-only   void AttribC::SetString(const struct AttribC* this, const char* pStrName, uint32_t uIndex)
+                         local  const char[10] __FUNCTION__
+                         local  const char[7] __FUNCTION__
+  177    inline-only   const char* AttribC::GetString(const const struct AttribC* this, uint32_t uIndex)
+                         local  const char[10] __FUNCTION__
+  198    inline-only   void AllocValueMem<RNA::String>(const const struct AttribC* this)
+  198    inline-only   void AllocValueMem<RNAMath::RNAMatrix44>(const const struct AttribC* this)
+  198    inline-only   void AllocValueMem<RNAMath::RNAVector4>(const const struct AttribC* this)
+  198    inline-only   void AllocValueMem<RNAMath::RNAVector3>(const const struct AttribC* this)
+  198    inline-only   void AllocValueMem<RNAMath::RNAVector2>(const const struct AttribC* this)
+  198    inline-only   void AllocValueMem<bool8_t>(const const struct AttribC* this)
+  198    inline-only   void AllocValueMem<std::float_t>(const const struct AttribC* this)
+  198    inline-only   void AllocValueMem<std::int32_t>(const const struct AttribC* this)
+  223    inline-only   void AttribC::FreeValueMem(const struct AttribC* this)
+  264  008EA1A4    150  void AttribArrayC::AttribArrayC(const struct AttribArrayC* this)
+                         inlines  RNADebugBreak, Vector
+  265  008EBE00     BC  void AttribArrayC::~AttribArrayC(const struct AttribArrayC* this)
+                         inlines  ~Vector
+  275    inline-only   int32_t AttribArrayC::GetNumAttribs(const const struct AttribArrayC* this)
+  276    inline-only   struct AttribC* AttribArrayC::GetAttrib(const const struct AttribArrayC* this, int32_t iAttrib)
+  280    inline-only   void AttribArrayC::SetDirty(const struct AttribArrayC* this)
+  302    inline-only   uint32_t GetTypeID<std::int32_t>()
+  303    inline-only   uint32_t GetTypeID<std::float_t>()
+  304    inline-only   uint32_t GetTypeID<bool8_t>()
+  307    inline-only   uint32_t GetTypeID<RNAMath::RNAVector2>()
+  308    inline-only   uint32_t GetTypeID<RNAMath::RNAVector3>()
+  309    inline-only   uint32_t GetTypeID<RNAMath::RNAVector4>()
+  310    inline-only   uint32_t GetTypeID<RNAMath::RNAMatrix44>()

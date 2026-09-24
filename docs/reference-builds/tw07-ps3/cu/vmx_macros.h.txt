@@ -1,0 +1,9 @@
+// ../../../../../TIGERCODE/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/vmx_macros.h
+// compiled in: rnaunity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   38    inline-only   static unsigned char[16] detail::CastToVectorUnsignedChar(float[4] vec)
+   43    inline-only   static signed char[16] detail::CastToVectorSignedChar(float[4] vec)
+   48    inline-only   static int[4] detail::CastToVectorSignedInt(float[4] vec)
+   53    inline-only   static float[4] detail::CastToVectorFloat(int[4] vec)
+   58    inline-only   static float[4] detail::CastToVectorFloat(signed char[16] vec)

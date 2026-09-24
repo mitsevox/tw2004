@@ -1,0 +1,6 @@
+// ../../../../rw45/platform/include/native/ps3-ppu-gcc/rw/core/resource/baseresource.h
+// compiled in: tiger_module_com.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  111    inline-only   uint32_t GetSize(const const struct <anon>* this)
+  132    inline-only   uint32_t GetAlignment(const const struct <anon>* this)

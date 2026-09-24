@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/ps3/./hudconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   68  00623D28      4  void ShowMarketplaceList(const struct HudConcrete* this, struct LoginSlot* pSlot)
+   71  00623D2C      4  void ShowMarketplaceItem(const struct HudConcrete* this, struct LoginSlot* , uint32_t )
+   74  00623D30      4  void ShowGameInvite(const struct HudConcrete* this, struct LoginSlot* pSlot)

@@ -1,0 +1,78 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_SkillZoneTargetToTarget.cpp
+// compiled in: golf_unity.cpp
+// 36 functions, source order. line | PS3 address | size
+
+   27  00204460     40  void GameModeSkillZoneTargetToTarget::GameModeSkillZoneTargetToTarget(const struct GameModeSkillZoneTargetToTarget* this)
+   31  001FFA50     18  void GameModeSkillZoneTargetToTarget::~GameModeSkillZoneTargetToTarget(const struct GameModeSkillZoneTargetToTarget* this)
+   39  002602A8    220  void GameModeSkillZoneTargetToTarget::Init(const struct GameModeSkillZoneTargetToTarget* this)
+                         inlines  GameModeSkillZoneBase::SetScoreRequiredForSuccess
+   90  002AC310     7C  int32 GameModeSkillZoneTargetToTarget::GetEndGameSequence(const struct GameModeSkillZoneTargetToTarget* this)
+                         local  int32 sequence
+                         local  void* ptr
+  105  002461D0     8C  void GameModeSkillZoneTargetToTarget::InitForTrainingChallenge(const struct GameModeSkillZoneTargetToTarget* this, const struct TrainingChallengeEvent_t* pEventInfo)
+                         inlines  GameModeSkillZoneBase::SetScoreRequiredForSuccess
+  115  001FFACC      4  void GameModeSkillZoneTargetToTarget::Update(const struct GameModeSkillZoneTargetToTarget* this)
+  119  001FFAD0      4  void GameModeSkillZoneTargetToTarget::Shutdown(const struct GameModeSkillZoneTargetToTarget* this)
+  123  001FFAD4     24  bool GameModeSkillZoneTargetToTarget::QueryInterface(const struct GameModeSkillZoneTargetToTarget* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bRet
+  140  00328CE0    15C  enum PlayerNumber_t GameModeSkillZoneTargetToTarget::GetHonors(const struct GameModeSkillZoneTargetToTarget* this, enum PlayerNumber_t ignore, bool doNotIgnoreHoledOut)
+                         local  int32 i
+                         local  int32 nextup
+                         local  bool juststarted
+                         inlines  GM_GetCurrentHoleIndex, GM_GetGolferUp
+  174  002A0F6C     D8  void GameModeSkillZoneTargetToTarget::EndGolferTurn(const struct GameModeSkillZoneTargetToTarget* this, enum PlayerNumber_t PlayerID)
+                         inlines  GamePlayer::GetSkillZoneData
+  191  00328E3C    8F8  void GameModeSkillZoneTargetToTarget::CheckShotAwards(const struct GameModeSkillZoneTargetToTarget* this, enum PlayerNumber_t PlayerID)
+                         local  int32 collisionSurfaceID
+                         local  float distance
+                         local  int8 greenIndex
+                         local  enum SZ_BullsEyeColors_t ring
+                         local  int commentID
+                         local  int UIMessageSent
+                         local  char[256] tempString
+                         local  char[256] ballString
+                         local  char[256] moneyString
+                         local  char* localizedString
+                         inlines  GM_GetCurrentHoleIndex, GamePlayer::GetSkillZoneData
+  516  002D12D8    118  void GameModeSkillZoneTargetToTarget::SetupNextGolfer(const struct GameModeSkillZoneTargetToTarget* this)
+                         local  int32 i
+  541  00305EB4     5C  void GameModeSkillZoneTargetToTarget::LoadHole(const struct GameModeSkillZoneTargetToTarget* this)
+  552  001FFAF8     3C  void GameModeSkillZoneTargetToTarget::RestartHole(const struct GameModeSkillZoneTargetToTarget* this)
+  564  00281028     AC  void GameModeSkillZoneTargetToTarget::ClearPerHoleData(const struct GameModeSkillZoneTargetToTarget* this)
+                         local  int32 i
+  581  001FFB34      8  bool GameModeSkillZoneTargetToTarget::GameFinished(const struct GameModeSkillZoneTargetToTarget* this, bool predict)
+  590  001FFB3C     64  bool GameModeSkillZoneTargetToTarget::BallOOB(const struct GameModeSkillZoneTargetToTarget* this, enum PlayerNumber_t PlayerID)
+  599  0024CD9C     DC  bool GameModeSkillZoneTargetToTarget::HoleFinished(const struct GameModeSkillZoneTargetToTarget* this, enum PlayerNumber_t PlayerID, bool predict)
+                         local  bool rval
+                         inlines  GameModeSkillZoneBase::GetScoreRequiredForSuccess
+  624  0023D6D0    244  void GameModeSkillZoneTargetToTarget::GetIDScore(const struct GameModeSkillZoneTargetToTarget* this, int32 surfaceID, int32* bonusMoney, int* bonusBalls)
+  703  00280D48     58  bool GameModeSkillZoneTargetToTarget::PickPrevTarget(const struct GameModeSkillZoneTargetToTarget* this, enum PlayerNumber_t PlayerID)
+  712  00280CF0     58  bool GameModeSkillZoneTargetToTarget::PickTarget(const struct GameModeSkillZoneTargetToTarget* this, enum PlayerNumber_t PlayerID)
+  721  001FFBA0      C  int GameModeSkillZoneTargetToTarget::GetShotEarned(const struct GameModeSkillZoneTargetToTarget* this, enum PlayerNumber_t PlayerID)
+  729  002385B8     B4  int GameModeSkillZoneTargetToTarget::GreenType(const struct GameModeSkillZoneTargetToTarget* this, enum PlayerNumber_t PlayerID, int iGreenIndex)
+  744  001FFBAC      C  int GameModeSkillZoneTargetToTarget::GetExtraBallsEarned(const struct GameModeSkillZoneTargetToTarget* this, enum PlayerNumber_t PlayerID)
+  752  002AC24C     C4  void GameModeSkillZoneTargetToTarget::EndGame(const struct GameModeSkillZoneTargetToTarget* this)
+                         local  struct OnWinData_t onWinData
+                         inlines  OnWinData_t::OnWinData_t
+  778  001FFBB8     30  void GameModeSkillZoneTargetToTarget::QuitGame(const struct GameModeSkillZoneTargetToTarget* this)
+  787  001FFBE8      8  int32 GameModeSkillZoneTargetToTarget::GetHitAllTargetsBonus(const struct GameModeSkillZoneTargetToTarget* this)
+  807  002A0F68      4  void GameModeSkillZoneTargetToTarget::PreShotUpdateUI(const struct GameModeSkillZoneTargetToTarget* this, enum PlayerNumber_t PlayerID)
+  816  002A0F00     68  void GameModeSkillZoneTargetToTarget::UpdateDisplayInfo(const struct GameModeSkillZoneTargetToTarget* this, enum PlayerNumber_t PlayerID)
+  830  00248158    1E8  void GameModeSkillZoneTargetToTarget::UpdateDisplayInfoNormal(const struct GameModeSkillZoneTargetToTarget* this, enum PlayerNumber_t PlayerID)
+                         local  char[256] tempString
+                         local  char[256] moneyString
+                         local  char* localizedString
+  863  0024CE78    1BC  void GameModeSkillZoneTargetToTarget::UpdateDisplayInfoTrainingChallenge(const struct GameModeSkillZoneTargetToTarget* this, enum PlayerNumber_t PlayerID)
+                         local  char[256] tempString
+                         local  char[256] moneyString
+                         local  char* localizedString
+  894  0021C6AC     14  const char* GameModeSkillZoneTargetToTarget::GetModeName(const struct GameModeSkillZoneTargetToTarget* this)
+                         local  char* localizedString
+  905  0024D034    120  void GameModeSkillZoneTargetToTarget::GetUIGameFinishedString(const struct GameModeSkillZoneTargetToTarget* this, char* strBuf, int32 bufferSize)
+                         local  char* localizedString
+  950  002A1314    24C  bool GameModeSkillZoneTargetToTarget::GetUIScoreCardField(const struct GameModeSkillZoneTargetToTarget* this, int32_t row, int32_t column, char* strBuf, int32 bufferSize)
+                         local  bool bUpdate
+                         local  char* localizedString
+                         local  char[256] moneyString
+ 1026  001FFBF0     14  const char* GameModeSkillZoneTargetToTarget::GetName(const struct GameModeSkillZoneTargetToTarget* this)
+ 1035  002A0EDC     24  bool GameModeSkillZoneTargetToTarget::ShowTrainingChallengeBallsRemaining(const struct GameModeSkillZoneTargetToTarget* this)

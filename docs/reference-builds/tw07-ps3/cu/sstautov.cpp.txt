@@ -1,0 +1,21 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sstautov.cpp
+// compiled in: sstautov.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   11  006CDBD4    178  void Snd9::StreamFader(void* pClientData)
+                         local  StreamSourceChannelState* pSourceChannelState
+                         local  SNDSTREAMCHANNEL* pSndStreamChannel
+                         local  int offsetToStart
+                         local  int voice
+                         local  struct CHANPUB* pVoice
+                         local  int channelIndex
+                         local  int sourceVoice
+                         local  struct CHANPUB* pSourceVoice
+                         inlines  FastVol, RemoveVariableTimerClient
+  139  006CD990    244  int SNDSTRM_autovol(int sndStrmHandle, int time, int targetVol)
+                         local  SNDSTREAMCHANNEL* pssc
+                         local  float floatTargetVol
+                         local  int i
+                         local  int result
+                         local  StreamSourceChannelState* pSourceChannelState
+                         inlines  AddVariableTimerClient, CListDStack::Push, RemoveVariableTimerClient

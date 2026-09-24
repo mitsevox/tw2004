@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/Golf/online/osdk/dailytourn.h
+// compiled in: golf2_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   37    inline-only   struct DailyTourn* DailyTourn::GetInstance()
+   49  0012A390     18  void DailyTourn::DailyTourn(const struct DailyTourn* this)
+   50  0012A434     1C  void DailyTourn::~DailyTourn(const struct DailyTourn* this)

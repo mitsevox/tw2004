@@ -1,0 +1,115 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_trinity_math.cpp
+// compiled in: tiger_module_trinity_math.cpp
+// 33 functions, source order. line | PS3 address | size
+
+    9  0053CD68     38  void TrinityMath(const struct <anon>* this)
+                         inlines  TrinityMath
+   14  0053CA40     4C  void ~TrinityMath(const struct <anon>* this)
+                         inlines  ~Allocatable, ~TrinityMath
+   20  0053CE30     B4  void Vec4flt_Set4(const struct <anon>* this, float_t x, float_t y, float_t z, float_t w, float_t* dest)
+                         inlines  TIGER_MATH::VecSet, TIGER_MATH::VecStore, TIGER_MATH::__vmx_stvx
+   25  0053CEE4     84  void Vec4flt_Zero4(const struct <anon>* this, float_t* v)
+                         inlines  TIGER_MATH::VecStore, TIGER_MATH::VecZero, TIGER_MATH::__vmx_stvx
+   30  0053E914     D8  void Vec4flt_Copy3(const struct <anon>* this, const float_t* src, float_t* dest)
+                         inlines  TIGER_MATH::VecLoad
+   35  0053E9EC     9C  void Vec4flt_Copy4(const struct <anon>* this, const float_t* src, float_t* dest)
+                         inlines  TIGER_MATH::VecLoad, TIGER_MATH::VecStore, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx
+   40  0053EA88    260  void Vec4flt_Mat44fltMultiply33(const struct <anon>* this, const float_t* v, float_t[4]* m, float_t* dest)
+                         local  struct <anon> m0
+                         local  struct <anon> m1
+                         local  struct <anon> m2
+                         local  struct <anon> vv
+                         local  struct <anon> d
+                         inlines  TIGER_MATH::VecApplyMatrix, TIGER_MATH::VecLoad, TIGER_MATH::__vmx_lvx
+   51  0053ECE8    318  void Vec4flt_Mat44fltMultiply44(const struct <anon>* this, const float_t* v, float_t[4]* m, float_t* dest)
+                         local  struct <anon> m0
+                         local  struct <anon> m1
+                         local  struct <anon> m2
+                         local  struct <anon> m3
+                         local  struct <anon> vv
+                         local  struct <anon> d
+                         inlines  TIGER_MATH::VecApplyMatrix, TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecStore, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx, TIGER_MATH::operator+
+   63  0053F000     D0  void Vec4flt_Subtract3(const struct <anon>* this, const float_t* a, const float_t* b, float_t* dest)
+                         local  struct <anon> u
+                         local  struct <anon> v
+                         inlines  TIGER_MATH::VecLoad, TIGER_MATH::__vmx_lvx, TIGER_MATH::operator-
+   71  0053CA8C     70  void Vec4flt_Subtract4(const struct <anon>* this, const float_t* a, const float_t* b, float_t* dest)
+   76  0053F0D0     C4  void Vec4flt_Normalize3(const struct <anon>* this, const float_t* src, float_t* dest)
+                         local  struct <anon> v
+                         local  struct <anon> dot3
+                         local  struct <anon> rcp3
+                         local  struct <anon> unit
+                         inlines  TIGER_MATH::VecDot3, TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecRsqrt, TIGER_MATH::VecStore, TIGER_MATH::__vmx_stvx, Vec, vec_madd, vec_sld
+   85  0053F194     C4  void Vec4flt_Normalize4(const struct <anon>* this, const float_t* src, float_t* dest)
+                         local  struct <anon> v
+                         inlines  TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecRsqrt, TIGER_MATH::VecStore, TIGER_MATH::VecUnit, TIGER_MATH::__vmx_stvx, Vec, vec_madd, vec_sld
+   92  0053F258    194  void Vec4flt_Crossproduct3(const struct <anon>* this, const float_t* a, const float_t* b, float_t* dest)
+                         local  struct <anon> u
+                         local  struct <anon> v
+                         inlines  TIGER_MATH::VecCross, TIGER_MATH::VecLoad, TIGER_MATH::VecStore, TIGER_MATH::VecX, TIGER_MATH::VecY, TIGER_MATH::VecZ, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx
+   99  0053F3EC     D4  float_t Vec4flt_Dotproduct3(const struct <anon>* this, const float_t* a, const float_t* b)
+                         local  struct <anon> u
+                         local  struct <anon> v
+                         inlines  TIGER_MATH::VecDot3, TIGER_MATH::VecLoad, TIGER_MATH::__vmx_lvx, vec_madd, vec_sld
+  106  0053CAFC     10  void Vec3flt_Set3(const struct <anon>* this, float_t x, float_t y, float_t z, float* dest)
+  113  0053CB0C     70  void Vec3flt_Copy3(const struct <anon>* this, const float* src, float* dest)
+  118  0053CB7C     70  void Mat44flt_Invert44(const struct <anon>* this, float_t[4]* m, float_t[4]* invm)
+  123  0053CBEC     70  void Mat44flt_Invert33(const struct <anon>* this, float_t[4]* m, float_t[4]* invm)
+  128  0053D38C    2AC  void Mat44flt_SetIdentity44(const struct <anon>* this, float_t[4]* m)
+                         inlines  TIGER_MATH::MtxIdentity, TIGER_MATH::MtxSet, TIGER_MATH::MtxStore, TIGER_MATH::VecSet, TIGER_MATH::VecStore, TIGER_MATH::__vmx_stvx, Vec, operator[]
+  133  0053CF68    22C  void Mat44flt_SetIdentity34(const struct <anon>* this, float_t[4]* m)
+                         local  struct <anon> i
+                         inlines  TIGER_MATH::MtxIdentity, TIGER_MATH::MtxSet, TIGER_MATH::VecStore, TIGER_MATH::__vmx_stvx, Vec, operator[]
+  141  0053E40C    508  void Mat44flt_InvertNormalize44(const struct <anon>* this, float_t[4]* m, float_t[4]* invnm)
+                         local  struct <anon> mm
+                         local  struct <anon> transpose
+                         local  struct <anon> translate
+                         inlines  TIGER_MATH::MtxLoad, TIGER_MATH::MtxStore, TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecMulByY, TIGER_MATH::VecMulByZ, TIGER_MATH::VecStore, TIGER_MATH::__vmx_stvx, TIGER_MATH::operator*, TIGER_MATH::operator+, TIGER_MATH::operator-, operator[]
+  157  0053D86C    BA0  void Mat44flt_Multiply44(const struct <anon>* this, float_t[4]* a, float_t[4]* b, float_t[4]* dest)
+                         local  struct <anon> ma
+                         local  struct <anon> mb
+                         local  struct <anon> m
+                         inlines  TIGER_MATH::MtxLoad, TIGER_MATH::MtxSet, TIGER_MATH::MtxStore, TIGER_MATH::VecFromOneX, TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecMulByY, TIGER_MATH::VecMulByZ, TIGER_MATH::VecStore, TIGER_MATH::__vmx_stvx, TIGER_MATH::operator*, TIGER_MATH::operator+, Vec, operator[]
+  167  0053F4C0    4C8  void Mat44flt_Multiply33(const struct <anon>* this, float_t[4]* a, float_t[4]* b, float_t[4]* dest)
+                         local  struct <anon> a0
+                         local  struct <anon> a1
+                         local  struct <anon> a2
+                         local  struct <anon> b0
+                         local  struct <anon> b1
+                         local  struct <anon> b2
+                         inlines  TIGER_MATH::VecApplyMatrix, TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecMulByY, TIGER_MATH::VecMulByZ, TIGER_MATH::__vmx_lvx, TIGER_MATH::operator+, Vec, vec_madd
+  189  0053D194    1F8  void Mat44flt_EulerAngles34(const struct <anon>* this, float_t y, float_t p, float_t r, float_t[4]* dest)
+                         local  struct <anon> euler
+                         local  struct <anon> quat
+                         local  struct <anon> mtx
+                         inlines  TIGER_MATH::QuatToMtx, TIGER_MATH::VecSet, TIGER_MATH::VecStore, TIGER_MATH::__vmx_stvx, operator[]
+  199  0053D638    234  void Mat44flt_ExtractEulerAngles33(const struct <anon>* this, float_t[4]* m, float_t* y, float_t* p, float_t* r)
+                         local  struct <anon> mtx
+                         local  struct <anon> euler
+                         inlines  TIGER_MATH::MtxLoad
+  210  0053F988    16C  void Mat44flt_Copy34(const struct <anon>* this, float_t[4]* src, float_t[4]* dest)
+                         inlines  TIGER_MATH::VecLoad, TIGER_MATH::VecStore, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx
+  217  0053FAF4    254  void Quat_ToMatrix44(const struct <anon>* this, const float_t* q, float_t[4]* m)
+                         local  struct <anon> quat
+                         local  struct <anon> mtx
+                         inlines  TIGER_MATH::MtxStore, TIGER_MATH::QuatToMtx, TIGER_MATH::VecLoad, TIGER_MATH::VecStore, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx, operator[]
+  224  0053FD48    1D8  void Quat_ToMatrix34(const struct <anon>* this, const float_t* q, float_t[4]* m)
+                         local  struct <anon> quat
+                         local  struct <anon> mtx
+                         inlines  TIGER_MATH::QuatToMtx, TIGER_MATH::VecLoad, TIGER_MATH::VecStore, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx, operator[]
+  233  0053FF20    238  void Quat_FromMatrix44(const struct <anon>* this, float_t[4]* m, float_t* q)
+                         local  struct <anon> quat
+                         inlines  TIGER_MATH::MtxLoad, TIGER_MATH::VecStore, TIGER_MATH::__vmx_stvx
+  239  00540158    244  void Quat_Slerp(const struct <anon>* this, float_t f, const float_t* q1, const float_t* q2, float_t* dest)
+                         local  struct <anon> quat1
+                         local  struct <anon> quat2
+                         local  struct <anon> dot4
+                         local  struct <anon> vf
+                         local  struct <anon> result
+                         inlines  TIGER_MATH::VecDot, TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecOne, TIGER_MATH::VecSetAll, TIGER_MATH::VecStore, TIGER_MATH::VecUnit, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx, TIGER_MATH::operator+, TIGER_MATH::operator-, Vec, operator float __vector__, vec_madd, vec_sld
+  260  0053CC5C     C4  void Quat_ExtractEulerAngles(const struct <anon>* this, const float_t* q, float_t* y, float_t* p, float_t* r)
+                         local  struct <anon> quat
+                         local  struct <anon> euler
+                         inlines  TIGER_MATH::VecLoad, TIGER_MATH::__vmx_lvx
+  270  0053CD20     24  float_t Trig_Tan(const struct <anon>* this, float_t f)
+  275  0053CD44     24  float_t Trig_Atan(const struct <anon>* this, float_t f)

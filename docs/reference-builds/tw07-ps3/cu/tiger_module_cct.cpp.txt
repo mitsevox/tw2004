@@ -1,0 +1,385 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_cct.cpp
+// compiled in: tiger_module_cct.cpp
+// 192 functions, source order. line | PS3 address | size
+
+    0  003427A4     38  void ~CCT(const struct <anon>* this)
+                         inlines  ~Module
+   24  005243A8     10  static void StaticLuaRegisterBank(const struct <anon>* param, void* object)
+   25  005244A4     10  static void StaticLuaRegisterFaceBank(const struct <anon>* param, void* object)
+   26  00524C20     10  static void StaticLuaSetFaceBone(const struct <anon>* param, void* object)
+   27  00523880     10  static void StaticLuaSetState(const struct <anon>* param, void* object)
+   28  00524550     10  static void StaticLuaSetFaceState(const struct <anon>* param, void* object)
+   29  00524B88     10  static void StaticLuaTransitionState(const struct <anon>* param, void* object)
+   30  00524AD8     10  static void StaticLuaTransitionStateHoldFirst(const struct <anon>* param, void* object)
+   31  005226B0     10  static void StaticLuaSetVariable(const struct <anon>* param, void* object)
+   32  00527D5C     10  static void StaticLuaMultBoneAtVarVal(const struct <anon>* param, void* object)
+   33  00527C40     10  static void StaticLuaMultByCachedBone(const struct <anon>* param, void* object)
+   34  00527A60     10  static void StaticLuaMultInvBoneAtVarVal(const struct <anon>* param, void* object)
+   35  00524A00     10  static void StaticLuaAddTargetForIK(const struct <anon>* param, void* object)
+   36  00523810     10  static void StaticLuaSetWeightForIK(const struct <anon>* param, void* object)
+   37  00526FBC     10  static void StaticLuaSetIdentity(const struct <anon>* param, void* object)
+   38  00522D0C     10  static void StaticLuaResetIK(const struct <anon>* param, void* object)
+   39  005230E0     10  static void StaticLuaSetBoneIsTerminalIK(const struct <anon>* param, void* object)
+   40  00522FA0     10  static void StaticLuaSetBoneIsNoIK(const struct <anon>* param, void* object)
+   41  00522C38     10  static void StaticLuaComputeSolutionForIK(const struct <anon>* param, void* object)
+   42  00523B74     10  static void StaticLuaEnableIK(const struct <anon>* param, void* object)
+   43  00523BE4     10  static void StaticLuaEnableBlendedIK(const struct <anon>* param, void* object)
+   44  00526F48     10  static void StaticLuaMovePos(const struct <anon>* param, void* object)
+   45  00528AAC     10  static void StaticLuaAlignFootToGround(const struct <anon>* param, void* object)
+   46  00525A34     10  static void StaticLuaRemapBones(const struct <anon>* param, void* object)
+   47  00523950     10  static void StaticLuaSetActorBoneConstraintAxes(const struct <anon>* param, void* object)
+   48  00523A20     10  static void StaticLuaSetActorBoneConstraint(const struct <anon>* param, void* object)
+   49  00524E34     10  static void StaticLuaResetLocalTransSources(const struct <anon>* param, void* object)
+   50  00524E88     10  static void StaticLuaSetLocalTransSource(const struct <anon>* param, void* object)
+   53  005223C4     10  static float StaticLuaGetTerrainHeight(const struct <anon>* param, void* object)
+   54  00522438     10  static float StaticLuaGetTerrainUp(const struct <anon>* param, void* object)
+   55  00522450     10  static float StaticLuaGetWorldX(const struct <anon>* param, void* object)
+   56  00522468     10  static float StaticLuaGetWorldY(const struct <anon>* param, void* object)
+   57  00522480     10  static float StaticLuaGetWorldZ(const struct <anon>* param, void* object)
+   58  00522498     10  static float StaticLuaGetObjectX(const struct <anon>* param, void* object)
+   59  005224B0     10  static float StaticLuaGetObjectY(const struct <anon>* param, void* object)
+   60  005224C8     10  static float StaticLuaGetObjectZ(const struct <anon>* param, void* object)
+   63  0052325C     10  static const char* StaticLuaGetState(const struct <anon>* param, void* object)
+   65  005232C0     10  static int StaticLuaIsStateEnded(const struct <anon>* param, void* object)
+   66  0052541C     10  static float StaticLuaGetFramesInState(const struct <anon>* param, void* object)
+   68  00522804     10  static float StaticLuaGetVariable(const struct <anon>* param, void* object)
+   69  0052429C     10  static float StaticLuaGetVariableForEvent(const struct <anon>* param, void* object)
+   70  00522530     10  static float StaticLuaGetElapsedSeconds(const struct <anon>* param, void* object)
+   71  005257A8     10  static float StaticLuaGetVariableWithClosestBonePosition(const struct <anon>* param, void* object)
+   72  00524620     10  static float StaticLuaGetFrameCount(const struct <anon>* param, void* object)
+   75  005263D4     70  void CCT(const struct <anon>* this, struct CCTInterface* cctInterface, struct Lua* lua, struct Allocator* levelAllocator)
+   83  005260FC    130  void Zero(const struct <anon>* this)
+                         inlines  TIGER_MATH::VecStore, TIGER_MATH::VecZero, TIGER_MATH::__vmx_stvx
+   96  005262C8    10C  void Init(const struct <anon>* this)
+                         inlines  TagValuePair
+  105  00522540      4  void FirstUpdate(const struct <anon>* this)
+  109  0052622C     9C  void Shutdown(const struct <anon>* this)
+  117  005264C4    1C4  void Update(const struct <anon>* this)
+                         local  struct <anon> ___profScope
+                         inlines  Profile, ~Profile
+  129  00522544     3C  bool CheckActorCollisions(const struct <anon>* this, struct HitPool* collisionHitPool, const struct Ray* collisionRays, int collisionTestCount)
+  138  00522580      8  int GetResourceCount(const struct <anon>* this)
+  143  00525250    114  void ResourceCallback(const struct <anon>* this, void* resource, int id, unsigned int resourceSize)
+  167  00525364     3C  int GetResourceId(const struct <anon>* this, int index)
+  190  005226C0     98  int SetGameVariable(const struct <anon>* this, const char* variableName, float value)
+  202  00522814     3C  int GetGameVariable(const struct <anon>* this, float* resultPtr, const char* variableName)
+  215  00522850     2C  int RemoveActor(const struct <anon>* this, const char* name)
+  220  0052287C     28  void RemoveBankByFile(const struct <anon>* this, void* bankFile)
+  225  005228A4     28  int RemoveBank(const struct <anon>* this, const char* name)
+  230  005228CC     28  void SetCurrentActorFromPtr(const struct <anon>* this, void* ptr)
+  235  00527DC0     54  int SetCurrentActor(const struct <anon>* this, const char* actorName)
+                         local  int result
+  246  00527E14     98  void SetCurrentActorForIgc(const struct <anon>* this, const char* igcName)
+                         local  const char* forcedActor
+  262  00527D6C     54  int SetCurrentActor(const struct <anon>* this, unsigned int contextIndex)
+                         local  int result
+  274  005228F4     9C  int SetActorState(const struct <anon>* this, const char* stateName)
+  289  00522990     28  int SetEventHandler(const struct <anon>* this, void(*)()* eventHandler, void* blindPtr)
+  294  005229B8     28  unsigned int GetActorBoneCount(const struct <anon>* this)
+  299  005229E0     28  int GetActorBoneParent(const struct <anon>* this, unsigned int* parentIndexPtr, unsigned int boneI)
+  304  00522A08     28  const float* GetActorInvBindMats(const struct <anon>* this)
+  309  00522A30     28  const float* GetActorBlendShapeWeights(const const struct <anon>* this)
+  314  00522A58     28  int GetActorBlendShapeCount(const const struct <anon>* this)
+  319  00522A80     28  const struct Mesh* GetActorCollisionMesh(const const struct <anon>* this)
+  324  00522AA8     28  const unsigned char* GetActorCollisionBoneRemapping(const const struct <anon>* this)
+  329  00522AD0     28  int InitVariables(const struct <anon>* this, const char* variablesText)
+  334  00522AF8     28  void GetActorBoneTransform(const struct <anon>* this, float* matrix, float* quat, unsigned int boneI)
+  339  00522B20     60  void GetActorBoneWorldPosition(const struct <anon>* this, float* position, unsigned int boneI, const float* localTranslateScale)
+  346  00522B80     28  void GetActorParentBoneMatrix(const struct <anon>* this, float* matrix, unsigned int boneI)
+  353  00522C48     28  int ComputeActorSolution(const struct <anon>* this, unsigned int iterationCount, unsigned int solutionIndex)
+  358  00522D1C     28  int ResetActorSolution(const struct <anon>* this, unsigned int solutionIndex)
+  364  00522D44     28  int SetActorBoneIsTerminal(const struct <anon>* this, unsigned int boneI, int isBoneTerminal)
+  369  00522D6C     28  int SetActorBoneIsNoIK(const struct <anon>* this, unsigned int boneI, int isBoneTerminal)
+  375  00522D94     28  int GetGameVariableMin(const struct <anon>* this, float* resultPtr, const char* variableName)
+  379  00522DBC     28  int GetGameVariableMax(const struct <anon>* this, float* resultPtr, const char* variableName)
+  384  00522DE4     28  int SetActorBoneRemapping(const struct <anon>* this, unsigned int boneI, unsigned int boneHashedName)
+  389  00522E0C     3C  const short unsigned int* GetActorBoneRemapping(const struct <anon>* this)
+  401  00522E48     28  int CacheGameFloat(const struct <anon>* this, const char* variableName)
+  406  005230F0     28  int GetActorBoneIndexFromName(const struct <anon>* this, const char* boneName)
+  411  00523118     28  void SetCachedGameFloat(const struct <anon>* this, float value)
+  416  00523140     28  float GetCachedGameFloat(const struct <anon>* this)
+  421  00523168     28  float GetCachedGameFloatMin(const struct <anon>* this)
+  426  00523190     28  float GetCachedGameFloatMax(const struct <anon>* this)
+  431  0052326C     28  const char* GetActorState(const struct <anon>* this)
+  436  00523294     28  int IsActorStateEnded(const struct <anon>* this)
+  441  005232D0     28  void SetWeightForIK(const struct <anon>* this, unsigned int solutionIndex, float weight)
+  446  005232F8     28  float GetWeightForIK(const const struct <anon>* this, unsigned int solutionIndex)
+  451  005233E0    148  int SetActorIsMirror(const struct <anon>* this, bool isMirror, unsigned int defaultMask)
+                         local  const unsigned int specialMaskCount
+                         local  unsigned int specialI
+                         local  const char* boneName
+                         local  unsigned int mask
+  472  00523320     28  int GetActorIsMirror(const struct <anon>* this)
+  477  00523348     2C  int SetActorBoneMirrorMask(const struct <anon>* this, unsigned int boneI, int isMirrorLocalZ)
+  484  00523528     5C  float GetActorAnimTime(const struct <anon>* this)
+                         local  float time
+                         local  struct Actor* pActor
+  495  00523584     58  void SetActorAnimTime(const struct <anon>* this, float time, bool doPause)
+                         local  struct Actor* pActor
+  506  00523374     6C  int SetActorBoneMirrorMask(const struct <anon>* this, const char* boneName, int isMirrorLocalZ)
+                         local  int boneIndex
+  516  005235DC     E8  void SetActorBoneConstraint(const struct <anon>* this, const char* boneName, float twistMin, float twistMax, float swingMaxX, float swingMaxY)
+                         local  int boneIndex
+  524  005236C4     E8  void SetActorBoneConstraintAxes(const struct <anon>* this, const char* boneName, float axesQuatX, float axesQuatY, float axesQuatZ, float axesQuatW)
+                         local  int boneIndex
+  532  00523960     C0  void LuaSetActorBoneConstraint(const struct <anon>* this, const struct <anon>* param)
+                         local  int boneIndex
+                         local  float twistMin
+                         local  float twistMax
+                         local  float swingMaxX
+                         local  float swingMaxY
+  548  00523890     C0  void LuaSetActorBoneConstraintAxes(const struct <anon>* this, const struct <anon>* param)
+                         local  int boneIndex
+                         local  float axesQuatX
+                         local  float axesQuatY
+                         local  float axesQuatZ
+                         local  float axesQuatW
+  566  00523A30    114  int GetActorBoneTransformAtVariableValue(const struct <anon>* this, float* matrix, float* quat, unsigned int boneI, const char* varName, float varValue)
+                         local  float oldValue
+  605  00523B84     28  void EnableIK(const struct <anon>* this, int enable)
+  610  00523BAC     38  void LuaEnableBlendedIK(const struct <anon>* this, const struct <anon>* param)
+  616  00523BF4     28  int IsEnabledIK(const const struct <anon>* this)
+  621  00523C1C     84  void ResourceCallbackCCM(const struct <anon>* this, void* resource, unsigned int resourceSize)
+  626  00523CA0     84  void ResourceCallbackRCB(const struct <anon>* this, void* resource, unsigned int resourceSize)
+  631  00523D24     E0  void ResourceCallbackBNK(const struct <anon>* this, void* resource, unsigned int resourceSize)
+  636  00523E04    124  void ResourceCallbackVAR(const struct <anon>* this, void* resource, unsigned int resourceSize)
+                         local  char* tempData
+  649  00523F28     58  void TrapEventHandlerFunc(const char* eventName, const struct EventParam* params, unsigned int paramCount, void* blindPtr)
+                         local  struct <anon>* cct
+  662  00523F80     4C  void EventHandlerFunc(const char* eventName, const struct EventParam* params, unsigned int paramCount, void* blindPtr)
+                         local  struct <anon>* cct
+  673  00523FCC    210  int FindVariableValueWhenEventOccurs(const struct <anon>* this, float* valuePtr, const char* variableName, const char* eventName, unsigned int steps)
+                         local  float minValue
+                         local  float maxValue
+                         local  float currentValue
+                         local  int returnValue
+                         local  const float halfValue
+  750  005242AC     2C  bool IsBankLoaded(const struct <anon>* this, const char* bankName)
+  755  005242D8     28  void UnregisterActorBank(const struct <anon>* this, const char* bankName, unsigned int resourceTag)
+  762  00524300     98  void RegisterActorBank(const struct <anon>* this, const char* bankName, unsigned int resourceTag)
+  778  005243B8     DC  void RegisterActorFaceBank(const struct <anon>* this, const char* bankName, unsigned int resourceTag)
+  794  00524398     10  void LuaRegisterBank(const struct <anon>* this, const struct <anon>* param)
+  800  00524494     10  void LuaRegisterFaceBank(const struct <anon>* this, const struct <anon>* param)
+  810  00523820     60  void LuaSetState(const struct <anon>* this, const struct <anon>* param)
+  818  005244B4     9C  void LuaSetFaceState(const struct <anon>* this, const struct <anon>* param)
+  826  00524560     98  void SetActorFaceState(const struct <anon>* this, const char* stateName)
+  839  00522588    128  void LuaSetVariable(const struct <anon>* this, const struct <anon>* param)
+                         local  const char* variableName
+                         local  float value
+  856  005231B8     A4  const char* LuaGetState(const struct <anon>* this, const struct <anon>* )
+                         local  const char* state
+  869  005245F8     28  float LuaGetFrameCount(const struct <anon>* this, const struct <anon>* )
+  874  00522758     AC  float LuaGetVariable(const struct <anon>* this, const struct <anon>* param)
+                         local  float value
+                         local  int success
+  888  00524630    13C  int GetBoneAtVarVal(const struct <anon>* this, float* boneMatrix, float* boneQuat, const struct <anon>* param)
+                         local  const char* boneName
+                         local  const char* varName
+                         local  float varValue
+                         local  int boneIndex
+  912  00526FCC    65C  void MultQuatPos(const struct <anon>* this, const float* quatPtr, const float* posPtr)
+                         local  struct <anon> oldQuat
+                         local  struct <anon> oldPos
+                         local  struct <anon> newQuat
+                         local  struct <anon> newPos
+                         local  float[4] fnewPos
+                         local  float[4] fnewQuat
+                         inlines  TIGER_MATH::Dot, TIGER_MATH::QuatCompose, TIGER_MATH::QuatToMtx, TIGER_MATH::VecAdd, TIGER_MATH::VecCross, TIGER_MATH::VecDot, TIGER_MATH::VecFromOneW, TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecMulByY, TIGER_MATH::VecMulByZ, TIGER_MATH::VecRsqrt, TIGER_MATH::VecSet, TIGER_MATH::VecStore, TIGER_MATH::VecSub, TIGER_MATH::VecX, TIGER_MATH::VecY, TIGER_MATH::VecZ, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx, TIGER_MATH::operator*, TIGER_MATH::operator+, Vec, operator float __vector__, vec_madd, vec_sld
+  930  00527C50    10C  void LuaMultBoneAtVarVal(const struct <anon>* this, const struct <anon>* param)
+                         local  struct <anon> ___profScope
+                         local  float[16] boneMatrix
+                         local  float[4] boneQuat
+                         inlines  Profile, ~Profile
+  942  00527A70    1D0  void LuaMultByCachedBone(const struct <anon>* this, const struct <anon>* param)
+                         local  struct <anon> ___profScope
+                         local  float[16] boneMatrix
+                         local  float[4] boneQuat
+                         local  struct Actor* actor
+                         local  const char* boneName
+                         local  int boneIndex
+                         inlines  Profile, ~Profile
+  964  00527628    438  void LuaMultInvBoneAtVarVal(const struct <anon>* this, const struct <anon>* param)
+                         local  struct <anon> ___profScope
+                         local  float[16] boneMatrix
+                         local  float[4] boneQuat
+                         local  struct <anon> quat
+                         local  struct <anon> pos
+                         local  struct <anon> invQuat
+                         local  struct <anon> invPos
+                         inlines  Profile, TIGER_MATH::QuatConj, TIGER_MATH::QuatToMtx, TIGER_MATH::VecFromOneX, TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecMulByY, TIGER_MATH::VecMulByZ, TIGER_MATH::VecSet, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_sub, TIGER_MATH::operator*, TIGER_MATH::operator+, TIGER_MATH::operator-, Vec, ~Profile
+  982  00524778      C  const float* GetPos(const const struct <anon>* this)
+  987  0052476C      C  const float* GetQuat(const const struct <anon>* this)
+  992  00526A84    450  void UpdateWorldPos(const struct <anon>* this)
+                         local  const float[4] scale
+                         inlines  TIGER_MATH::MtxLoad, TIGER_MATH::VecFromOneZ, TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecMulByX, TIGER_MATH::VecMulByY, TIGER_MATH::VecStore, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx, TIGER_MATH::operator*, TIGER_MATH::operator+, Vec, vec_madd
+  999  00526ED4     10  void SetPos(const struct <anon>* this, float x, float y, float z)
+ 1008  00524784     14  void SetQuat(const struct <anon>* this, float x, float y, float z, float w)
+ 1018  00524798    268  void LuaAddTargetForIK(const struct <anon>* this, const struct <anon>* param)
+                         local  unsigned int solutionIndex
+                         local  const char* targetBoneName
+                         local  const char* reparentedBoneName
+                         local  const char* newParentBoneName
+                         local  int targetBoneIndex
+                         local  const float* quat
+                         local  const float* pos
+                         local  int reparentedBoneIndex
+                         local  int newParentBoneIndex
+ 1077  005237AC     64  void LuaSetWeightForIK(const struct <anon>* this, const struct <anon>* param)
+ 1085  005241DC     C0  float LuaGetVariableForEvent(const struct <anon>* this, const struct <anon>* param)
+                         local  float value
+                         local  const char* varName
+                         local  const char* eventName
+ 1099  00526F58     64  void LuaSetIdentity(const struct <anon>* this, const struct <anon>* )
+ 1105  00522C70     9C  void LuaResetIK(const struct <anon>* this, const struct <anon>* param)
+                         local  unsigned int solutionIndex
+ 1116  00522FB0    130  void LuaSetBoneIsTerminalIK(const struct <anon>* this, const struct <anon>* param)
+                         local  const char* boneName
+                         local  int boneIndex
+ 1134  00522E70    130  void LuaSetBoneIsNoIK(const struct <anon>* this, const struct <anon>* param)
+                         local  const char* boneName
+                         local  int boneIndex
+ 1154  00522BA8     90  void LuaComputeSolutionForIK(const struct <anon>* this, const struct <anon>* param)
+ 1163  00523B44     30  void LuaEnableIK(const struct <anon>* this, const struct <anon>* param)
+ 1169  00526EE4     64  void LuaMovePos(const struct <anon>* this, const struct <anon>* param)
+                         local  const float* pos
+ 1177  00527EAC    C00  void LuaAlignFootToGround(const struct <anon>* this, const struct <anon>* param)
+                         local  struct Actor* actor
+                         local  const char* footName
+                         local  const char* toeName
+                         local  int leftHanded
+                         local  int footI
+                         local  int toeI
+                         local  struct <anon> footMtx
+                         local  struct <anon> footQuat
+                         local  struct <anon> toeMtx
+                         local  struct <anon> toeQuat
+                         local  struct <anon> footPos
+                         local  struct <anon> toePos
+                         local  const float[4] scale
+                         local  struct <anon> scaleVec
+                         local  struct <anon> root
+                         local  struct <anon> footPosForHeight
+                         local  struct <anon> toePosForHeight
+                         local  const float footHeight
+                         local  const float toeHeight
+                         local  const float toeMove
+                         local  const float len
+                         local  const float sine
+                         local  const float angle
+                         local  const float half
+                         local  const float halfCos
+                         local  float halfSin
+                         local  struct <anon> newFootQuat
+                         inlines  Mtx, TIGER_MATH::Dot, TIGER_MATH::Len, TIGER_MATH::MtxLoad, TIGER_MATH::QuatCompose, TIGER_MATH::VecAdd, TIGER_MATH::VecDot, TIGER_MATH::VecFromOneW, TIGER_MATH::VecFromOneX, TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecMulByX, TIGER_MATH::VecMulByY, TIGER_MATH::VecMulByZ, TIGER_MATH::VecRsqrt, TIGER_MATH::VecSet, TIGER_MATH::VecStore, TIGER_MATH::VecSub, TIGER_MATH::VecX, TIGER_MATH::VecY, TIGER_MATH::VecZ, TIGER_MATH::__vmx_lvx, TIGER_MATH::operator*, TIGER_MATH::operator+, TIGER_MATH::operator-, Vec, operator float __vector__, operator[], std::cosf, std::sinf, vec_madd, vec_sld
+ 1237  005224D8     58  float LuaGetElapsedSeconds(const struct <anon>* this, const struct <anon>* )
+ 1242  005256DC     CC  float LuaGetVariableWithClosestBonePosition(const struct <anon>* this, const struct <anon>* param)
+                         local  float resultValue
+                         local  const char* varName
+                         local  const char* boneName
+                         local  int findResult
+ 1273  0052542C    2B0  int FindNextVariableValueWithNearestBonePosition(const struct <anon>* this, float* resultValuePtr, const char* variableName, const char* boneName, const float compareValue, const float minResultValue, const float maxResultValue, const float resultStepSize)
+                         local  struct Actor* actor
+                         local  float savedCurrentValue
+                         local  int boneIndex
+                         local  struct <anon> compareMtx
+                         local  float[4] quat
+                         local  float closestDist2
+                         local  float closestValue
+                         local  float value
+                         local  struct <anon> boneMtx
+                         local  float[4] quat
+                         local  struct <anon> diff
+                         local  float dist2
+                         inlines  Mtx, TIGER_MATH::Dot, TIGER_MATH::VecX, TIGER_MATH::operator-, vec_madd, vec_sld
+ 1354  00524A10     28  int TransitionActorState(const struct <anon>* this, const char* stateName, float frames, int holdFirst)
+ 1360  00524AE8     A0  void LuaTransitionState(const struct <anon>* this, const struct <anon>* param)
+                         local  float fBlendFrame
+ 1379  00524A38     A0  void LuaTransitionStateHoldFirst(const struct <anon>* this, const struct <anon>* param)
+                         local  float fBlendFrame
+ 1399  005232BC      4  int LuaIsStateEnded(const struct <anon>* this, const struct <anon>* )
+                         local  int result
+ 1406  005253A0     7C  float LuaGetFramesInState(const struct <anon>* this, const struct <anon>* )
+ 1412  00524B98     88  void LuaSetFaceBone(const struct <anon>* this, const struct <anon>* param)
+                         local  int boneI
+                         local  const char* boneName
+ 1422  005257B8    27C  void LuaRemapBones(const struct <anon>* this, const struct <anon>* param)
+                         local  int isLeftHanded
+                         local  const char* copySrcA
+                         local  const char* copySrcB
+                         local  const char* copySrcC
+                         local  const char* copyDestA
+                         local  const char* copyDestB
+                         local  const char* copyDestC
+                         local  const unsigned int copyHashedSrcA
+                         local  const unsigned int copyHashedSrcB
+                         local  const unsigned int copyHashedSrcC
+                         local  const unsigned int copyHashedDestA
+                         local  const unsigned int copyHashedDestB
+                         local  const unsigned int copyHashedDestC
+                         local  const unsigned int boneCount
+                         local  unsigned int boneI
+                         local  unsigned int boneHashedName
+                         inlines  Common::CommonHash
+ 1497  00524C30     28  void* GetActorPtrFromName(const const struct <anon>* this, const char* actorName)
+ 1517  00524C58     90  void* AddActor(const struct <anon>* this, const char* actorName, const char* rigName, const char* collisionMeshName, const char* igcName, const char* luaInit, const char* luaUpdate, const char* luaShutdown, const struct <anon>* luaParams, unsigned int luaParamCount, unsigned int contextIndex, unsigned int faceBoneCount, int blendShapeCount, bool hasIK)
+ 1537  00524CE8     28  void SetActorIsScripted(const struct <anon>* this, bool isScripted)
+ 1542  00524D10     2C  bool IsActorScripted(const const struct <anon>* this)
+ 1547  00524D3C     28  void SetActorIsImmuneToIgc(const struct <anon>* this, bool isImmuneToIgc)
+ 1552  00524D64     28  const float* GetActorRootMtx(const const struct <anon>* this)
+ 1557  00524D8C     28  void SetActorRootMtx(const struct <anon>* this, const float* rootMtx)
+ 1562  00524DB4     28  void SetActorIsSleeping(const struct <anon>* this, bool isSleeping)
+ 1567  00524DDC     28  void SetActorIsCollidable(const struct <anon>* this, bool isCollidable)
+ 1574  00528ABC    58C  void GetActorBoneWorldPosQuat(const struct <anon>* this, float* pos4, float* quat4, const char* boneName, const float* localTranslateScale)
+                         local  int boneI
+                         local  const struct Actor* actor
+                         local  struct <anon> objectQuat
+                         local  struct <anon> rootMtx
+                         local  struct <anon> rootQuat
+                         local  struct <anon> finalQuat
+                         inlines  TIGER_MATH::Dot, TIGER_MATH::MtxLoad, TIGER_MATH::QuatCompose, TIGER_MATH::VecAdd, TIGER_MATH::VecCross, TIGER_MATH::VecDot, TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecRsqrt, TIGER_MATH::VecSet, TIGER_MATH::VecStore, TIGER_MATH::VecSub, TIGER_MATH::VecX, TIGER_MATH::VecY, TIGER_MATH::VecZ, TIGER_MATH::__vmx_lvx, Vec, vec_madd, vec_sld
+ 1592  00522360     64  float LuaGetTerrainHeight(const struct <anon>* this, const struct <anon>* )
+ 1597  005223D4     64  float LuaGetTerrainUp(const struct <anon>* this, const struct <anon>* )
+ 1602  00522448      8  float LuaGetWorldX(const struct <anon>* this, const struct <anon>* )
+ 1607  00522460      8  float LuaGetWorldY(const struct <anon>* this, const struct <anon>* )
+ 1612  00522478      8  float LuaGetWorldZ(const struct <anon>* this, const struct <anon>* )
+ 1616  00522490      8  float LuaGetObjectX(const struct <anon>* this, const struct <anon>* )
+ 1621  005224A8      8  float LuaGetObjectY(const struct <anon>* this, const struct <anon>* )
+ 1626  005224C0      8  float LuaGetObjectZ(const struct <anon>* this, const struct <anon>* )
+ 1632  00524E04     30  void LuaResetLocalTransSources(const struct <anon>* this, const struct <anon>* )
+ 1637  00524E44     44  void LuaSetLocalTransSource(const struct <anon>* this, const struct <anon>* param)
+ 1642  00524E98     6C  bool IsActorSolidlyInState(const const struct <anon>* this)
+                         local  struct Actor* actor
+ 1648  00524F04     44  void PrintBanks(const struct <anon>* this)
+ 1653  00524F48    148  void SetCurrentActorTransformMod(const struct <anon>* this, unsigned int boneI, const float* quat, const float* trans, const float* scale, int useHierarchicalScaling)
+                         local  struct Actor* pActor
+                         local  struct IK* pIK
+                         inlines  Actor::GetIK
+ 1662  00525090     40  void SetActorIsBindPose(const struct <anon>* this, bool isBind)
+ 1667  005250D0     50  void SetActorBoneIsBindPose(const struct <anon>* this, const char* boneName, bool isBind)
+ 1672  00525120     50  void GetActorBoneBindTransform(const const struct <anon>* this, float* matrix, unsigned int boneI)
+ 1677  00525170     50  void GetActorBoneInvBindTransform(const const struct <anon>* this, float* matrix, unsigned int boneI)
+ 1682  005251C0     40  void SetActorIsSimple(const struct <anon>* this, bool isSimple)
+ 1689  00526688    3FC  void GetActorBoneWorldTargetPos(const struct <anon>* this, float* pos, const char* boneName)
+                         local  struct <anon> targetPos
+                         local  struct <anon> rootMtx
+                         inlines  TIGER_MATH::MtxLoad, TIGER_MATH::VecFromOneZ, TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecMulByX, TIGER_MATH::VecMulByY, TIGER_MATH::VecStore, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx, TIGER_MATH::operator*, TIGER_MATH::operator+, Vec
+ 1698  00525200     28  int DoesBankExistWithSameName(const const struct <anon>* this, void* bnkFile)
+ 1703  00525228     28  int DoesBankExistWithSamePtr(const const struct <anon>* this, void* bnkFile)
+ 1708  00525A6C    690  void LevelInit(const struct <anon>* this)
+                         local  enum LuaType bType
+                         local  enum LuaType iType
+                         local  enum LuaType sType
+                         local  enum LuaType[2] iiType
+                         local  enum LuaType[2] isType
+                         local  enum LuaType[2] sfType
+                         local  enum LuaType[2] sbType
+                         local  enum LuaType[2] ifType
+                         local  enum LuaType[2] ssType
+                         local  enum LuaType[3] ssfType
+                         local  enum LuaType[3] ssbType
+                         local  enum LuaType[3] fffType
+                         local  enum LuaType[4] isssType
+                         local  enum LuaType[5] sffff
+                         local  enum LuaType[6] ssffff
+                         local  enum LuaType[7] bssssss
+ 1793  00525A44     28  void LevelShutdown(const struct <anon>* this)

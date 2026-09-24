@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/earnings/Headers/EarningsManager.h
+// compiled in: other_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   41    inline-only   int EarningsManager::GetNumTrophies(const struct EarningsManager* this)
+   49    inline-only   void EarningsManager::SetAwardGivenFlag(const struct EarningsManager* this, bool flag)
+   50    inline-only   bool EarningsManager::GetAwardGivenFlag(const struct EarningsManager* this)
+   54    inline-only   bool EarningsManager::TestGameMode(const struct EarningsManager* this, const uint32* gameModeValid, enum GM_ModeType_t gameMode)
+   59    inline-only   bool EarningsManager::TestBit(const struct EarningsManager* this, bit32 num, unsigned int bit)
+   64    inline-only   bool EarningsManager::GM_Earnings_IsTrackingTigerTrophy(const struct EarningsManager* this, enum TrophyBall_t trophy)

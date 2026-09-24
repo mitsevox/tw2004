@@ -1,0 +1,7 @@
+// ../ears_rt_math/dev/include/ears_rt_math/mathquat.h
+// compiled in: MathQuat.c
+// 3 functions, source order. line | PS3 address | size
+
+   99    inline-only   static void Quat_Identify(float* Q)
+  113    inline-only   static void Quat_Zero4(float* Q)
+  144    inline-only   static float Quat_GetNorm(const float* Q0)

@@ -1,0 +1,18 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/career/source/common/careerdynamiclayoutconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   72  005C6CAC     60  void CareerStatbookLoadSuccess(const struct <anon>* this, struct CareerStatbook* pStatbook)
+  101  005C6D0C     5C  void CareerStatbookLoadFailure(const struct <anon>* this, enum Failure eFailure)
+  131  005C7250     C4  void CareerDynamicLayoutConcrete(const struct <anon>* this, const char8_t* strView, uint32_t uNumSlots)
+  159  005C6D68     78  void ~CareerDynamicLayoutConcrete(const struct <anon>* this)
+  186  005C6ED8     A0  struct Operation* LoadUser(const struct <anon>* this, const char8_t* strUserName, uint32_t uSlot, struct CareerDynamicLayoutCallback* pCallback)
+  218  005C6F78     44  uint32_t GetNumberOfItems(const const struct <anon>* this)
+  243  005C6FBC    13C  const char8_t* GetLabel(const const struct <anon>* this, uint32_t uIndex, int32_t* pX, int32_t* pY)
+                         local  const char8_t* strParams
+                         local  char8_t[25] strParam
+                         local  int32_t iErr
+  291  005C70F8    14C  const char8_t* GetValue(const const struct <anon>* this, uint32_t uIndex, uint32_t uSlot, int32_t* pX, int32_t* pY)
+                         local  const char8_t* strParams
+                         local  char8_t[25] strParam
+                         local  int32_t iErr

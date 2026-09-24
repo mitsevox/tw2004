@@ -1,0 +1,105 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/UHeap.c
+// compiled in: Legacy_unity.cpp
+// 35 functions, source order. line | PS3 address | size
+
+   26  0037AE98      4  void HE_vInitOnce()
+   35  0037AE9C      4  void HE_vCloseOnce()
+   44  0037AEA0      4  void HE_vInitModule()
+   53  0037AEA4      4  void HE_vCloseModule()
+   73  003A3CDC    148  HE_SHeap* HE_spCreateHeapFromBuffer(uint32 uiHeapSize_p, uintptr_t uiHeapStartOffset_p, uint32 uiMaxNumberOfBlocks_p, void* vpBuffer_p)
+                         local  uint32 ui
+                         local  HE_SHeapBlock* spBlock
+                         local  HE_SHeap* spHeap
+  160  003B180C    144  HE_SHeap* HE_spCreateHeap(const const struct Allocator& allocRef, uint32 uiHeapSize_p, uintptr_t uiHeapStartOffset_p, uint32 uiMaxNumberOfBlocks_p)
+                         local  const char[16] __FUNCTION__
+                         local  void* vpBuffer
+                         local  HE_SHeap* spHeap
+                         local  struct Allocator tempAlloc
+                         inlines  TagValuePair, operator+
+  192  003AAE54     30  void HE_vDeleteHeap(HE_SHeap* spHeap_p)
+  213  003A4740    298  uintptr_t HE_uiAlloc(HE_SHeap* spHeap_p, uint32 uiSize_p, uint32 uiAlign_p)
+                         local  HE_SHeapBlock* spCurBlock
+                         local  HE_SHeapBlock* spBestFitBlock
+                         local  HE_SHeapBlock* spBlockToInsert
+                         local  uint32 uiOffsetCorrectionForAlignment
+  403  003A43A8    398  uintptr_t HE_uiAlloc2(HE_SHeap* spHeap_p, uint32 uiSize_p, uint32 uiAlign_p, TTypeAcces memtype)
+                         local  HE_SHeapBlock* spCurBlock
+                         local  HE_SHeapBlock* spBestFitBlock
+                         local  HE_SHeapBlock* spBlockToInsert
+                         local  HE_SHeapBlock* spEndBlock
+                         local  uint32 uiOffsetCorrectionForAlignment
+  620  0037AF78     48  uint32 HE_uiGetHeapAvailableMemory(HE_SHeap* spHeap_p, uint32* uipBiggestBlockSize_p)
+  643  003A3E24    18C  void HE_vFree(HE_SHeap* spHeap_p, uintptr_t uiOffset_p)
+                         local  HE_SHeapBlock* spCurBlock
+                         local  uint32 uiCorrectedOffset
+  715  0037AFF8     98  bool HE_bIsValidBlock(HE_SHeap* spHeap_p, uint32 uiOffset_p)
+                         local  HE_SHeapBlock* spCurBlock
+                         local  uint32 uiCorrectedOffset
+  770  0037AF34     44  uint32 HE_uiGetBiggestHeapBlockSize(HE_SHeap* spHeap_p)
+                         local  HE_SHeapBlock* spCurBlock
+                         local  HE_SHeapBlock* spBiggestBlock
+  818  0037B090      8  void HE_vAddHeapBlockToUnusedBlockList(HE_SHeap* spHeap_p, HE_SHeapBlock* spBlockToAdd_p)
+  834  003A3C30     AC  HE_SHeapBlock* HE_spGetUnusedHeapBlock(HE_SHeap* spHeap_p)
+                         local  HE_SHeapBlock* spBlock
+  873  0037B098     C0  HE_SHeapBlock* HE_spMergeHeapBlocks(HE_SHeap* spHeap_p, HE_SHeapBlock* spFirstListBlock_p, HE_SHeapBlock* spBlockToMerge_p)
+                         local  HE_SHeapBlock* spLowerBlock
+                         local  HE_SHeapBlock* spUpperBlock
+                         local  int32 i
+  934  0037AEA8     2C  void HE_vListInsertAfer(HE_SHeapBlock* spMainBlock_p, HE_SHeapBlock* spBlockToInsert_p)
+  950  0037B158     2C  void HE_vListInsertBefore(HE_SHeapBlock* spMainBlock_p, HE_SHeapBlock* spBlockToInsert_p)
+ 1000  0037AED4     60  HE_SHeapBlock* HE_spListRemove(HE_SHeapBlock* spFirstListBlock_p, HE_SHeapBlock* spBlockToRemove_p)
+ 1039  0037B184     B0  HE_SHeapBlock* HE_spListInsertSorted(HE_SHeapBlock* spFirstListBlock_p, HE_SHeapBlock* spBlockToInsert_p)
+                         local  HE_SHeapBlock* spCurBlock
+ 1096  003A3B18    118  uint32 HE_uiGetHeapBlockSize(HE_SHeap* spHeap_p, uint32 uiOffset_p)
+                         local  HE_SHeapBlock* spCurBlock
+                         local  uint32 uiCorrectedOffset
+ 1148  003A3A2C     EC  uint32 HE_uiGetHeapBlockSizeFromWithin(HE_SHeap* spHeap_p, uint32 uiOffset_p)
+                         local  HE_SHeapBlock* spCurBlock
+                         local  uint32 uiCorrectedOffset
+ 1199  0037AFC0     38  bool HE_boIsOffsetInHeapRange(HE_SHeap* spHeap_p, uint32 uiOffset_p)
+ 1215  00394884     98  void HE_vHeapDump(HE_SHeap* spHeap_p)
+                         local  HE_SHeapBlock* spCurBlock
+                         local  int total
+ 1315  003B16FC    110  BetterHeap* BH_CreateHeap(uint32 heapSize, void* buffer, uint32 maxNumberOfBlocks)
+                         local  const char[14] __FUNCTION__
+                         local  uint8* byteBuffer
+                         local  BetterHeap* heap
+                         inlines  TagValuePair, operator+
+ 1329  003AAE38     1C  void BH_DeleteHeap(BetterHeap* heap)
+ 1334  0038CFA0    154  static void _BH_Validate(BetterHeap* heap, BetterHeapNode* node)
+ 1365  0038D290     48  void BH_ResetHeap(BetterHeap* heap)
+                         local  BetterHeapNode* node
+ 1390  0038D2D8    194  BetterHeapNode* _BH_FindBestNode(BetterHeap* heap, uint32 size, uint32 align)
+                         local  BetterHeapNode* node
+                         local  BetterHeapNode* bestFit
+                         local  uint32 bestSize
+                         local  uint32 alignAdjust
+                         local  uint32 alignMask
+                         local  uint8* base
+                         local  uint8* end
+                         local  uint8* alignedBase
+                         local  uint8* endOfRequest
+                         local  uint32 avail
+ 1449    inline-only   static void _BH_SplitNode(BetterHeapNode* node, uint32 size)
+                         local  BetterHeapNode* split
+ 1485  003A3754    2D8  void* BH_Alloc(BetterHeap* heap, uint32 size, uint32 align)
+                         local  BetterHeapNode* node
+                         local  BetterHeapNode* newNode
+                         local  uint8* base
+                         local  uint32 alignAdjust
+                         local  uint32 alignMask
+                         local  uint8* target
+                         local  uint32 offset
+                         inlines  _BH_SplitNode
+ 1575  0037B234     30  bool BH_IsOffsetInHeapRange(BetterHeap* heap, void* ptr)
+ 1586  0038D0F4    19C  void BH_Free(BetterHeap* heap, void* ptr)
+                         local  BetterHeapNode* node
+                         local  BetterHeapNode* next
+                         local  BetterHeapNode* prev
+ 1681  0037B264     7C  uint32 BH_GetHeapAvailableMemory(BetterHeap* heap, uint32* biggest)
+                         local  uint32 available
+                         local  uint32 bigSize
+                         local  BetterHeapNode* node
+ 1716  0037B2E0     38  uint32 BH_GetHeapUsedBlocks(BetterHeap* heap)
+                         local  uint32 count
+                         local  BetterHeapNode* node

@@ -1,0 +1,40 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/GoRenderUtils.c
+// compiled in: golf_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   70    inline-only   static void GoRenderUtils_PostInitShaderTextures()
+  117    inline-only   static void GoRenderUtils_ReleaseSpecialShaderTextures()
+  132  0027E22C    2D0  void GoRenderUtils_InitModule(uint32 numConcurrentCharacters, uint32 numTexGrpsPerCharacter, uint32 bytesPerTexGrp)
+                         local  uint32 i
+                         local  uint32 page
+                         inlines  CharTexController::CharTexController
+  183  00227F98    214  void GoRenderUtils_CloseModule()
+                         local  uint32 i
+                         local  uint32 page
+                         inlines  GoRenderUtils_ReleaseSpecialShaderTextures, ~CharTexController
+  231  00227E08     24  static int compareUnsigned(const void* arg1, const void* arg2)
+  239  00307D94    488  struct CharTexController* GoRenderUtils_GrabTextureContextForCharacter(struct TCharacter* pCharacter)
+                         local  struct CharTexController* pControllerToReturn
+                         local  struct TCharacter* pGolferUpCharacter
+                         local  uint32 i
+                         local  uint32[2] tagList
+                         local  uint32[2] tagListSorted
+                         local  uint32 i
+                         local  uint32 j
+                         local  uint32 i
+                         inlines  GM_GetGolferUp, GamePlayer::GetCharacter
+  370  00227E2C    16C  void GoRenderUtils_ReleaseTextureContextForCharacter(struct TCharacter* pCharacter)
+                         local  uint32 i
+  409  002281AC     18  uint32 GoRenderUtils_GetNumTextureContexts()
+  419  00226F70     78  struct CharTexController* GoRenderUtils_GetMostRecentRTController()
+                         local  struct CharTexController* pControllerToReturn
+                         local  uint32 i
+  437  0029C288     84  void GoRenderUtils_DisplayCharacterMaps()
+                         local  struct CharTexController* pTexController
+                         local  vec4flt dstRect
+  466  002281C4    124  void GoRenderUtils_vInitForHole()
+                         inlines  GoRenderUtils_PostInitShaderTextures
+  477  002282E8      4  void GoRenderUtils_RegisterStreamClients()
+  482  002282EC      4  void GoRenderUtils_UnregisterStreamClients()
+  487  0021A140      4  void GoRenderUtils_vCloseForHole()
+  497  002282F0     28  void GoRenderUtils_RegisterWithTuner()

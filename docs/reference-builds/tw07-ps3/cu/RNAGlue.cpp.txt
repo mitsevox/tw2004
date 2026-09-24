@@ -1,0 +1,387 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Rna/RNAGlue.cpp
+// compiled in: rnaunity.cpp
+// 65 functions, source order. line | PS3 address | size
+
+  114  004C5A9C     18  struct DeviceC* GetRNADevice()
+  123  004C7A9C     58  bool RNAAssertHandler(const char8_t* pExpression, const char8_t* pMessage, const char8_t* pFileName, const char8_t* pFunctionName, int32_t iLineNumber)
+  150  004C9C80     60  struct ICoreAllocator* RNA::SetGlobalAllocator(struct ICoreAllocator* allocator)
+                         local  const char[19] __FUNCTION__
+                         local  struct ICoreAllocator* oldAllocator
+                         inlines  RNADebugBreak
+  161  004C5A64     14  struct ICoreAllocator* RNA::GetGlobalAllocator()
+  166  004C67E8     4C  struct IStringAllocator* RNA::GetStringAllocator()
+  185  004C7A18     84  void RNAPrintf(const char* pFormat)
+                         local  va_list args
+                         local  char[1024] printBuf
+  198  004C7EE4     9C  void RNAWarningPrintf(const char* pFormat)
+                         local  va_list args
+                         local  char[1024] printBuf
+  213  004C7E48     9C  void RNAErrorPrintf(const char* pFormat)
+                         local  va_list args
+                         local  char[1024] printBuf
+  261  004F79E8     14  const char* GetName(const const struct <anon>* this)
+  266  004F79FC      4  void OnBind(const struct <anon>* this)
+  270  004F7A00      4  void OnUnbind(const struct <anon>* this)
+  274  004FEB14    ADC  void OnExecute(const struct <anon>* this, ScopeMaskT ScopeMask)
+                         local  RNAMatrix44 mat
+                         local  Vector4Intrinsic_32 tmp0
+                         local  Vector4Intrinsic_32 tmp1
+                         local  Vector4Intrinsic_32 tmp2
+                         local  Vector4Intrinsic_32 _asmNegateYW_mask
+                         local  Vector4Intrinsic_32 _asmGetSignMaskYW_zero
+                         local  unsigned char[16] permuteControl
+                         local  unsigned char[16] permuteControl
+                         local  Vector4Intrinsic_32 tmp0
+                         local  Vector4Intrinsic_32 tmp1
+                         local  Vector4Intrinsic_32 tmp2
+                         local  Vector4Intrinsic_32 _asmNegateXZ_mask
+                         local  Vector4Intrinsic_32 _asmGetSignMaskXZ_zero
+                         local  unsigned char[16] permuteControl
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  Vector4Intrinsic_32 secondEstimate
+                         local  Vector4Intrinsic_32 vOne
+                         local  Vector4Intrinsic_32 estimate
+                         local  Vector4Intrinsic_32 vOne
+                         local  Vector4Intrinsic_32 tmp0
+                         local  Vector4Intrinsic_32 tmp1
+                         local  Vector4Intrinsic_32 tmp2
+                         local  Vector4Intrinsic_32 tmp0
+                         local  Vector4Intrinsic_32 tmp1
+                         local  Vector4Intrinsic_32 tmp2
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  unsigned char[16] permuteControl
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  Vector4Intrinsic_32 xx_yy_zz_ww
+                         local  Vector4Intrinsic_32 zz_ww
+                         local  Vector4Intrinsic_32 xxpluszz_yyplusww
+                         local  Vector4Intrinsic_32 yyplusww
+                         local  Vector4Intrinsic_32 _asmNegateXZ_mask
+                         local  Vector4Intrinsic_32 _asmNegateYW_mask
+                         local  Vector4Intrinsic_32 temp0
+                         local  Vector4Intrinsic_32 temp1
+                         local  Vector4Intrinsic_32 temp2
+                         local  Vector4Intrinsic_32 temp3
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  int[4] zero
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  int[4] zero
+                         local  Vector4Intrinsic_32 tmp0
+                         local  Vector4Intrinsic_32 tmp1
+                         local  Vector4Intrinsic_32 tmp2
+                         local  Vector4Intrinsic_32 _asmNegateYW_mask
+                         local  Vector4Intrinsic_32 _asmGetSignMaskYW_zero
+                         local  unsigned char[16] permuteControl
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  Vector4Intrinsic_32 secondEstimate
+                         local  Vector4Intrinsic_32 vOne
+                         local  Vector4Intrinsic_32 estimate
+                         local  Vector4Intrinsic_32 vOne
+                         local  unsigned char[16] permuteControl
+                         local  Vector4Intrinsic_32 tmp0
+                         local  Vector4Intrinsic_32 tmp1
+                         local  Vector4Intrinsic_32 tmp2
+                         local  Vector4Intrinsic_32 _asmNegateXZ_mask
+                         local  Vector4Intrinsic_32 _asmGetSignMaskXZ_zero
+                         local  unsigned char[16] permuteControl
+                         local  Vector4Intrinsic_32 tmp0
+                         local  Vector4Intrinsic_32 tmp1
+                         local  Vector4Intrinsic_32 tmp2
+                         local  unsigned char[16] permuteControl
+                         local  Vector4Intrinsic_32 tmp0
+                         local  Vector4Intrinsic_32 tmp1
+                         local  Vector4Intrinsic_32 tmp2
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  Vector4Intrinsic_32 xx_yy_zz_ww
+                         local  Vector4Intrinsic_32 zz_ww
+                         local  Vector4Intrinsic_32 xxpluszz_yyplusww
+                         local  Vector4Intrinsic_32 yyplusww
+                         local  Vector4Intrinsic_32 _asmNegateXZ_mask
+                         local  Vector4Intrinsic_32 temp0
+                         local  Vector4Intrinsic_32 temp1
+                         local  Vector4Intrinsic_32 temp2
+                         local  Vector4Intrinsic_32 temp3
+                         local  Vector4Intrinsic_32 _asmNegateYW_mask
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  int[4] zero
+                         local  Vector4Intrinsic_32 reciprocal
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         inlines  MapInputC::GetRef<RNAMath::RNAMatrix44>, Matrix44, RNADebugBreak, ScopeParmC::Set<rw::math::vpu::Matrix44>, Set<rw::math::vpu::Matrix44>, Update, operator=, vec_perm, vec_splat, vpu::Inverse, vpu::Mult, vpu::Transpose, vpu::operator*
+  320  00500700    324  void Tiger07CameraToScopeXformC(const struct <anon>* this, struct DeviceC* pDevice)
+  340  004F7A04     14  const char* GetName(const const struct <anon>* this)
+  345  004F7A18      4  void OnBind(const struct <anon>* this)
+  349  004F7A1C      4  void OnUnbind(const struct <anon>* this)
+  353  004FE2C0    854  void OnExecute(const struct <anon>* this, ScopeMaskT ScopeMask)
+                         inlines  MapInputC::GetRef<RNAMath::RNAMatrix44>, Matrix44, RNADebugBreak, ScopeParmC::Set<rw::math::vpu::Matrix44>, Set<rw::math::vpu::Matrix44>, Update, operator=
+  368  004DB3FC    37C  void RNA_RunPOST()
+                         local  const char[12] __FUNCTION__
+                         local  struct <anon> xFormCamera
+                         local  ScopeMaskT blankScopeMask
+                         local  struct ScopeParmC* pUseScrape
+                         local  bool useScrape
+                         inlines  AddRef, DeviceC::Flush, RNADebugBreak, Release, ScopeParmC::Get<bool>
+  416  004C6834     3C  void RNA_ResetBuilderDefaults()
+  421  004F4B70   1004  void RNA_InitOnce()
+                         local  const char[13] __FUNCTION__
+                         local  struct <anon> pErrorShader
+                         local  struct DeviceC* pDevice
+                         local  const struct ScopeC& scope
+                         local  struct MaterialListC* pMaterialList
+                         local  struct DebugMenuManagerC* pDebugMenuMgr
+                         local  struct <anon>* pSGManager
+                         local  struct <anon> envShader
+                         local  struct <anon> uiShader
+                         local  int i
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         inlines  AssetMgrC::SetCurrentBudget, AssetMgrC::SetCurrentMemPool, AssetMgrC::SetPath, AutoRefCount, DeviceC::GetScope, DeviceC::SetErrorShader, Init, RNADebugBreak, ScopeParmC::Set<bool>, TagValuePair, Tiger08XformMappingC, Update, UserData::UserData, operator+, ~AutoRefCount
+  711  004F3D64    2C8  void RNA_ProcessConsoleCommand(const char* szCommand)
+                         local  char[1024] tmpArray
+  767    inline-only   static struct GeomC* RNADemoInitGeomPtr(struct SGNodeRenderableC* pNode, struct GolfSceneC* pScene)
+                         local  const char[19] __FUNCTION__
+  782  004C6870     24  int geomSorter(const void* a, const void* b)
+                         local  struct geomSortStruct* renderableA
+                         local  struct geomSortStruct* renderableB
+  791  004DC560    4A0  void SortGeometry(struct DeviceC* pDevice, const struct GolfSceneTraversalC& trav, struct GolfSceneC* pScene)
+                         local  struct geomSortStruct[10000] aRenderables
+                         local  int32_t numRenderables
+                         local  const const RNAMatrix44& view
+                         local  RNAVector4 forwardVec
+                         local  RNAVector4 cameraPosition
+                         local  RNAMatrix44 viewTranspose
+                         local  int32_t i
+                         local  struct SGNodeRenderableC* pRenderable
+                         local  const RNAVector4 worldPoint
+                         local  const float_t projectionAlongViewDirection
+                         local  int32_t i
+                         inlines  AssertMacroHelper, GolfSceneTraversalC::GetNthQueuedRenderable, GolfSceneTraversalC::GetNumQueuedRenderables, GolfSceneTraversalC::SetNthQueuedRenderable, Matrix44, RNADebugBreak, Size, VecFloat, Vector4, operator float, operator[], vec_splat, vpu::Dot, vpu::Transpose, vpu::operator*, vpu::operator-
+  829  004D3FB4    474  void RenderGeometry(struct DeviceC* pDevice, const struct GolfSceneTraversalC& trav, struct GolfSceneC* pScene)
+                         local  const char[15] __FUNCTION__
+                         local  const int MAX_BONEVECTORS
+                         local  int32_t iStartElement
+                         local  int32_t iEndElement
+                         local  const struct ScopeC& scope
+                         local  struct ScopeParmC* startParm
+                         local  struct ScopeParmC* endParm
+                         local  int32_t numRenderables
+                         local  int32_t i
+                         local  struct SGNodeRenderableC* pRenderable
+                         local  RNAMatrix44 newMat
+                         local  struct GeomC* pGeom
+                         inlines  DeviceC::Render<RNA::GeomC>, GolfSceneTraversalC::GetNthQueuedRenderable, GolfSceneTraversalC::GetNumQueuedRenderables, RNADebugBreak, RNADemoInitGeomPtr, SGNodeRenderableC::SetGeomPtr, ScopeParmC::Get<std::int32_t>, operator=
+  978  004DF9AC    110  void TraverseGraph(struct DeviceC* pDevice, const struct GolfSceneTraversalC& trav, struct SGNodeC* pRootNode, bool frustumCullHack)
+                         local  struct Frustum frustum
+  987  004F2E40    9A0  void DrawScene(struct DeviceC* pDevice, struct GolfSceneC* pScene, bool frustumCullHack)
+                         local  struct GolfSceneTraversalC trav
+                         local  RNAMatrix44 world
+                         local  bool sortGeoms
+                         local  struct ScopeParmC* sortParm
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         local  const struct <anon>& GeomList
+                         local  int i
+                         local  struct <anon> envShader
+                         local  int32_t iTech
+                         inlines  AutoRefCount, ClearOverrideTechnique, DeviceC::Render<RNA::GeomC>, GetGeom, RNADebugBreak, RNASceneC::GetGeomList, ScopeParmC::Get<bool>, ScopeParmC::Set<int>, ScopeParmC::Set<std::float_t>, SetOverrideTechnique, Update, operator=, ~AutoRefCount
+ 1064  004D9EF4    288  void RenderBinRender(struct DeviceC* pDevice, enum RenderBinType renderBin)
+                         local  const char[16] __FUNCTION__
+                         local  bool bWireFrameMode
+                         local  struct <anon>* renderObjMgr
+                         inlines  DeviceC::Flush, DeviceC::GetScope, RNADebugBreak, ScopeParmC::Get<bool>
+ 1101  004F37E0    2A0  void RNA_RenderProofOfConceptRSF(struct DeviceC* pDevice, struct GolfSceneC* pScene, bool frustumCullHack)
+                         local  const char[28] __FUNCTION__
+                         local  bool bWireFrameMode
+                         inlines  DeviceC::Flush, DeviceC::GetScope, RNADebugBreak, ScopeParmC::Get<bool>
+ 1149  004F3A80    2E4  void RNA_RenderTerrainRSF()
+                         local  RNAMatrix44 viewProj
+                         local  struct <anon>* renderObjMgr
+                         local  bool bRenderVeg
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  bool renderOverdrawMode
+                         inlines  GetInstance, Matrix44, RNADebugBreak, ScopeParmC::Get<bool>, Vector4, vec_splat, vpu::Mult, vpu::operator*
+ 1210  004E64AC     98  void PopulateRenderObjMgr(struct DeviceC* device)
+                         inlines  SceneAssetC::GetScene
+ 1235  004C6894     1C  bool MeshCompareFunc(const const struct MeshSortStruct& a, const const struct MeshSortStruct& b)
+ 1240  004E5984    B28  void AddSceneToRenderObjMgr(struct DeviceC* device, struct GolfSceneC* scene, enum RenderBinType renderBin)
+                         local  struct GolfSceneTraversalC trav
+                         local  struct <anon> meshSortVec
+                         local  struct <anon>* renderObjMgr
+                         local  struct MaterialListC* materialList
+                         local  uint32_t start
+                         local  uint32_t end
+                         local  int32_t numRenderables
+                         local  int32_t i
+                         local  struct SGNodeRenderableC* pRenderable
+                         local  struct GeomC* geom
+                         local  struct MeshC* pMesh
+                         local  struct StreamPlatC* pStreamPlat
+                         local  void* vbptr
+                         local  struct MeshSortStruct ms
+                         local  const struct <anon>& geomList
+                         local  struct MeshSortStruct* _Ptr
+                         local  size_t _Size
+                         local  int i
+                         local  uint32_t numInstances
+                         local  struct <anon>* renderObj
+                         local  uint32_t i
+                         local  const struct MeshSortStruct& ms
+                         local  RNAMatrix44 worldTrans
+                         local  struct GeomC* geom
+                         local  struct SGNodeRenderableC* renderable
+                         local  uint32_t i
+                         local  const struct MeshSortStruct& ms
+                         local  struct <anon>* renderObj
+                         local  RNAMatrix44 worldTrans
+                         local  struct GeomC* geom
+                         local  struct SGNodeRenderableC* renderable
+                         local  struct GeomC* geom
+                         local  struct MeshC* pMesh
+                         local  struct StreamPlatC* pStreamPlat
+                         local  void* vbptr
+                         local  struct MeshSortStruct ms
+                         local  struct MeshSortStruct* _Ptr
+                         local  size_t _Size
+                         inlines  GetGeom, GetInstance, GetMesh, GolfSceneTraversalC::GetNthQueuedRenderable, GolfSceneTraversalC::GetNumQueuedRenderables, Matrix44, RNADebugBreak, RNASceneC::GetGeomList, RNASceneC::GetMaterialList, SGNodeRenderableC::GetGeomPtr, StreamPlatC::GetVertexBuffer, _Destroy, _Ucopy<std::_Vector_iterator<MeshSortStruct, std::allocator<MeshSortStruct> > >, _Ufill, allocate, begin, capacity, deallocate, end, insert, operator=, operator[], push_back, reserve, size, vector, ~vector
+ 1414  004C68BC     84  void DumpShadowGen()
+                         local  volatile bool flip
+                         local  const float[4]& sunPos
+                         inlines  CRManager::GetSunPosition, CRManager::SetSunPosition
+ 1428  004EA4A4    2F8  void RNA_StartFrame()
+                         local  struct CRShadowMap* pShadowMap
+                         local  TextureRef shadowMapTex
+                         local  TextureRef HRshadowMapTex
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         inlines  CRManager::GetCRShadowMap, CRShadowMap::GetHRShadowMapTexture, CRShadowMap::GetShadowMapTexture, DeviceC::BindMapping, RNADebugBreak, ScopeParmC::Set<RNA::TextureC*>, Update
+ 1459  004F2B70    2D0  void RNA_EndFrame()
+                         local  struct ScopeParmC* pGlobalTime
+                         local  struct <anon> timer
+                         local  struct <anon> uiShader
+                         inlines  AutoRefCount, DeviceC::Flush, DeviceC::UnbindMapping, RNADebugBreak, ScopeParmC::Set<std::float_t>
+ 1502  004EEF0C     88  void RNA_LoadAssetsForHole()
+                         inlines  AssetMgrC::SetCurrentBudget, AssetMgrC::SetCurrentMemPool
+ 1530  004F49F0    180  void RNA_ExitHole()
+                         local  struct <anon>* renderObjMgr
+                         inlines  GetInstance
+ 1595  004D47C4    18C  void SetTigerDefaultRenderstate()
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaBlendingFunction, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetColorWriteEnable, DS_vSetCullMode, DS_vSetStencilEnable, DS_vSetStencilOp, DS_vSetStencilTest, DS_vSetStencilWriteMask, DS_vSetZBufferMode, DS_vSetZTestEnable
+ 1633  004ED1D8    AD4  void RNA_LoadMaterialListFromXML()
+                         local  const char[28] __FUNCTION__
+                         local  bool overrideSearchPath
+                         local  char[1024] filePath
+                         local  char[1024] courseAbbr
+                         local  char[1024] courseName
+                         local  uint32_t holeNumber
+                         local  char[1024] scannedCourseName
+                         local  char[1024] scannedCoursePath
+                         local  char[1024] scannedCourseAbbr
+                         local  const char* courseListPath
+                         local  HFile hFile
+                         local  const struct ScopeC& hScope
+                         local  uint32_t uFileSize
+                         local  char* pData
+                         local  uint32_t nBytesRead
+                         local  int32_t nBytesLeft
+                         local  char* pCurrent
+                         local  char[1024] terrainPath
+                         local  char[1024] vegetationPath
+                         local  char[1024] terrainFilename
+                         local  char[1024] vegetationFilename
+                         local  char[1024] consoleRSFPath
+                         local  char[1024] fullPath
+                         local  char[1024] lightingXMLPath
+                         local  char* pDataNext
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         inlines  AssetMgrC::SetCurrentBudget, AssetMgrC::SetCurrentMemPool, DeviceC::GetScope, RNADebugBreak, ScopeParmC::Set<bool>, TagValuePair, Update, operator+, std::strchr
+ 1784  004EE158     50  void RNA_LoadCharacterMaterialListFromXML()
+                         inlines  AssetMgrC::SetCurrentBudget, AssetMgrC::SetCurrentMemPool
+ 1791  004F6D88     40  struct MaterialC* RNA_FindCharacterMaterial(const char* baseMatName, const char* variationMatName)
+ 1796  004C69EC     3C  void RNA_ReleaseCharacterMaterial(struct MaterialC* mat)
+ 1801  004EE130     28  void RNA_GarbageCollectCharacterMaterials()
+ 1806  004EE108     28  void RNA_FreeCharacterMaterialDefinitions()
+ 1812  004CEF24     F0  RNAMatrix44 RNAGLUE_ConvertMat44(float[4]* inMatrix)
+                         local  struct <anon>& outMatrix
+                         local  RNAMatrix44 outMatrix
+                         inlines  Set
+ 1822  004CF014     B0  RNAMatrix44 RNAGLUE_Convert2Vec4ToMat(float[4]* pRows)
+                         local  struct <anon>& outMatrix
+                         local  RNAMatrix44 outMatrix
+                         inlines  Set
+ 1835  004D0520     14  void ConvertVMXToVec2(float* float2, const const struct Vector2& vec)
+ 1840  004D0534     1C  void ConvertVMXToVec3(float* float3, const const struct Vector3& vec)
+ 1846  004D0550     24  void ConvertVMXToVec4(float* float4, const const struct Vector4& vec)
+ 1853  004D0574     5C  void ConvertVMXToMat33(float* mat33, const const RNAMatrix33& mat)
+                         inlines  X
+ 1865  004D05D0     9C  void ConvertVMXToMat44(float* mat44, const const RNAMatrix44& mat)
+                         inlines  X
+ 1888  004CE3FC     54  RNAVector3 RNAGLUE_ConvertVector3(const float[3]& vec3)
+                         local  struct <anon>& outVector3
+                         local  RNAVector3 outVector3
+                         inlines  Vector3
+ 1894  004CE7D0     50  RNAVector4 RNAGLUE_ConvertVector4(const float[4]& vec)
+                         local  struct <anon>& outVector4
+                         local  RNAVector4 outVector4
+                         inlines  Vector4
+ 1900  004CE820     48  RNAVector4 RNAGLUE_ConvertVector3ToVector4(const float[3]& vec)
+                         local  struct <anon>& outVector4
+                         local  RNAVector4 outVector4
+                         inlines  Vector4
+ 1906  004E8D58    264  struct TextureC* RNAGLUE_ConvertTex2D(TextureRef texRef)
+                         local  int32_t texIndex
+                         local  struct TextureInfoNative* tigerTextureInfo
+                         local  bool Initialized
+                         local  char[256] txName
+                         local  struct UserData* txUserData
+                         inlines  AssetMgrC::SetCurrentBudget, AssetMgrC::SetCurrentMemPool, SetUserData, UserData::SetRNAid
+ 1965  004C6940     AC  void RNAGlue_ClearTextureCache()
+                         local  int i
+ 1997  004C6A28     38  void TraceFunction(const char* text, void* context)
+ 2002  004C9CE0     50  bool MallocFailed(struct GeneralAllocator* allocator, size_t mallocRequestedSize, size_t allocatorRequestedSize, void* context)
+                         local  const char[13] __FUNCTION__
+                         inlines  RNADebugBreak
+ 2009  004C9D30     5C  void AssertFailed(const char* condition, void* context)
+                         local  const char[13] __FUNCTION__
+                         inlines  RNADebugBreak
+ 2017    inline-only   static void InitHeap(const struct GeneralAllocatorDebug& allocator, void* buf, size_t size)
+ 2039  004CE450    238  void AllocateHeapsForRNA(void* ioPtr, uint32_t ioBytes)
+                         inlines  GeneralAllocatorDebug::SetDefaultDebugDataFlag, InitHeap
+ 2045  004C6A60     C0  void* RNA::RSXAlloc(uint32_t size, uint32_t alignment, bool bLocal, const char* pAllocType, const char* pAllocName)
+                         local  const char[9] __FUNCTION__
+ 2057  004C6B20     E8  void RNA::RSXFree(void* ptr)
+                         local  const char[8] __FUNCTION__
+ 2072  004C9D8C     88  uint32_t RNA::RSXGetOffset(void* ptr)
+                         local  const char[13] __FUNCTION__
+                         local  uint32_t offset
+                         local  int ret
+                         inlines  RNADebugBreak

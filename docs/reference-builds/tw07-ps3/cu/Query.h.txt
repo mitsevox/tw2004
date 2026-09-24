@@ -1,0 +1,19 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/Query.h
+// compiled in: Database.cpp, Query.cpp, Table.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   84  007E68C4     DC  void SetTableIndexObject(const struct Query* this, struct TableIndex* tableIndex)
+                         local  const char[20] __FUNCTION__
+   90  007E69A0     C4  void SetQueryIndexObject(const struct Query* this, struct <anon>* queryIndex)
+                         local  const char[20] __FUNCTION__
+   96  007E6A64     C4  void SetTableObject(const struct Query* this, struct Table* table)
+                         local  const char[15] __FUNCTION__
+  102  007CDFB4     D8  struct TableIndex* GetTableIndexObject(const struct Query* this)
+                         local  const char[20] __FUNCTION__
+  108  007CE08C     C0  struct <anon>* GetQueryIndexObject(const struct Query* this)
+                         local  const char[20] __FUNCTION__
+  114  007CE14C     C0  struct Table* GetTableObject(const struct Query* this)
+                         local  const char[15] __FUNCTION__
+  158  00800BC0     F0  int GetTableInQueryIndex(const struct Query* this, const struct <anon>* pTable)
+                         local  uint32_t tblNum
+  175  007CAE20     38  struct Query* GetNext(const struct Query* this)

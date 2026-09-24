@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNARender/RNAStateManager.h
+// compiled in: RNAStateManager_common.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  310    inline-only   void ClearAndReserveSize(const struct <anon>* this, int32_t iReserve)
+  317    inline-only   void AddStateValuePair<int>(const struct <anon>* this, enum RSStateE eState, int value)
+                         local  struct StateValuePair temp

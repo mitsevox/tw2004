@@ -1,0 +1,42 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/frontend/FE_Manager.c
+// compiled in: apt_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   57  000239C4     2C  void FE_vOpenONCE()
+   80  000239F0     88  void FE_CharBios_FreeStreamMemory()
+  103  00023A78     44  void FE_CharBios_RegisterStreamClients()
+  114  00023ABC     2C  void FE_CharBios_UnRegisterStreamClients()
+  123  0005B740    2E8  static void FE_CharBios_LoadBIOfromStream(struct TStreamData* pStreamData)
+                         local  const char[30] __FUNCTION__
+                         local  char* sig
+                         local  int32 bioChunkSize
+                         inlines  TagValuePair, operator+
+  188  000B950C     C0  void FE_vInitModule()
+                         inlines  Singleton<UserManager>::GetSingleton
+  211  000C0CFC     A8  void FE_vCloseModule()
+                         inlines  Singleton<UserManager>::GetSingleton
+  232  0005BA28    108  void FE_InitManager()
+                         local  const char[15] __FUNCTION__
+                         inlines  TagValuePair, operator+
+  246  000C0C9C     60  void FE_CloseManager()
+  264  000BF788    3E8  void FE_TransferUserStatsToGolferStats()
+                         local  int i
+                         local  int j
+                         local  GolferStat_t[11] saveBaseStats
+                         local  GolferStat_t[11] saveCrapStats
+                         local  const struct UserInfo& userInfo
+                         inlines  Singleton<GolferStats>::GetSingleton
+  304  00023BA8     D4  void FE_TransferGolferStatsToGamePlayer()
+                         local  int i
+                         local  enum Golfer_t golfer
+  319  0001EBE0     30  int FE_DateToInt(int month, int day, int year)
+                         local  int date
+  333  00023C7C     74  void FE_IntToDate(int date, int* month, int* day, int* year)
+  350  00023CF0     74  bool FE_bIsLicensedGolfer(enum Golfer_t golferNum)
+  385  000C0DA4    278  void FE_vExitUI()
+                         local  enum PlayerNumber_t[4] userNumbersBeingStomped
+                         local  int i
+                         local  const struct UserInfo& userInfo
+                         local  bit32 clubselection
+                         local  bit32 clubselection
+                         inlines  Singleton<GolferStats>::GetSingleton, UserInfo::SetValid, cGAME_GLOBALS::SetDemoMode

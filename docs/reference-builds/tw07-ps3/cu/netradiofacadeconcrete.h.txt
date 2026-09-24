@@ -1,0 +1,9 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/netradio/source/common/./netradiofacadeconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   46    inline-only   struct <anon>* GetInstance()
+   47  006265B4      8  struct NetRadioExtension* GetNetRadioExtension(const const struct <anon>* this)
+   48  00625E50      8  struct NetRadioExtensionConcrete* GetNetRadioExtensionConcrete(const const struct <anon>* this)
+   50    inline-only   uint32_t GetLastDownloadTime(const const struct <anon>* this)
+   51    inline-only   void SetLastDownloadTime(const struct <anon>* this, uint32_t uLastDownloadTime)

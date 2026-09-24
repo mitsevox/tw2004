@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/career/source/common/./careerstatbookconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   55  00625134     94  struct Operation* LoadUser(const struct CareerStatbookConcrete* this, const char8_t* strUserName, struct CareerStatbookCallback* pCallback)
+   65  006251C8     84  const char8_t* GetRowData(const const struct <anon>* this, uint32_t uRow)
+   77    inline-only   LobbyStatbookT* GetLobbyStatbookApi(const const struct <anon>* this)
+   78    inline-only   const char8_t* GetViewName(const const struct <anon>* this)
+   84  0062524C      8  uint32_t GetNumSlots(const const struct <anon>* this)
+   86  00625254      8  uint32_t GetActiveSlot(const const struct <anon>* this)

@@ -1,0 +1,198 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_MainMenu.cpp
+// compiled in: apt_unity.cpp
+// 109 functions, source order. line | PS3 address | size
+
+  144  000B78C8     3C  void ShowTitleScreen()
+                         inlines  UI_ComponentManager::ShowScreen
+  151  000942D4     78  void SetPlayNowOptions()
+  168  0009434C     4C  void StartPlayNow()
+  184  000B8A78     B0  void StartDefaultPlayNow(enum PlayerNumber_t PlayerNbr, int32 iGolfer)
+  212  000415AC     4C  bool IsStandAloneMiniGame(enum GM_ModeType_t gamemode)
+                         local  bool bIsStandAlone
+  243  000C0BE8     84  void StartStandAloneMiniGame(enum GM_ModeType_t gamemode)
+                         local  struct GameModeDriverFacility* pFacilityDriver
+  253  000C0C94      8  void StartMiniGameSeve()
+  260  000C0C8C      8  void StartMiniGameTwentyOne()
+  265  000C0C84      8  void StartPureShort()
+  269  0006D274     3C  void StartPureDriving()
+                         inlines  UIWorldTour::SetGameMode
+  274  0006D2B0     3C  void StartHorse()
+                         inlines  UIWorldTour::SetGameMode
+  281  0006D2EC     3C  void StartCaptureTheFlag()
+                         inlines  UIWorldTour::SetGameMode
+  288  0006D328     3C  void StartTargetToTarget()
+                         inlines  UIWorldTour::SetGameMode
+  293  0006D364     3C  void StartTarget()
+                         inlines  UIWorldTour::SetGameMode
+  298  000C0C7C      8  void StartPuttingChallenge()
+  302  00069158     3C  void StartClosestToPin()
+                         inlines  UIWorldTour::SetGameMode
+  309  000C0C74      8  void StartChippingChallenge()
+  313  000C0C6C      8  void StartLongDriveChallenge()
+  323  0007B5F0     48  void StartTigerChallenge()
+  328  0006D260     14  void StartTrainingChallenges()
+  333  000415F8     14  void StartSkillChallenges()
+  337  00062EB4     64  void StartRealtimeMode()
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen
+  344  00062F18     64  void ShowCalendar()
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen
+  352  00062F7C     78  void ShowCalendar_CheckFedExQualify()
+  360  0007A834     48  void ShowPgaTourStats()
+  365  00088310     48  void ShowSponsorships()
+  370  0004160C     48  void ShowPgaTourLeaderboard()
+  375  0007E9CC     14  void ShowTrophyScreen()
+  379  00041654     14  void ShowUserRecords()
+  383  00041668     14  void ShowUserResume()
+  391  0004167C     14  void ShowAllTimeRecords()
+  395  00041690     14  void _ShowWorldTour()
+  400  0007788C     14  void MainMenuShowSwitchSticksCB()
+  407  000E8658     14  void NotifyTutorialAgainCB()
+  414  000C4AC0     A4  void PostLoadProfileGotoGameFace()
+  438  000AD8F4     44  void StartSaveGameSequenceMemCardCB(int32 )
+                         inlines  UserInfo::SetValid
+  443  000AD8AC     48  void ResetCurrentUserCheckForSaveAgainCB()
+  448  000969A8     FC  void StartCreateNewUserFromGame()
+                         inlines  UserManager::CurrentUserSlot
+  468  000B3C18     A8  void ResetDifficultyLevelStreakValueCB()
+                         inlines  DifficultySettings::ResetStreakValue, Singleton<DifficultySettings>::GetSingleton, UserInfo::SetDifficultyStreakValue
+  474  000B3CC0     E8  void DecreaseDifficultyLevelCB()
+                         inlines  DifficultySettings::ResetStreakValue, Singleton<DifficultySettings>::GetSingleton, UserInfo::SetDifficultyStreakValue
+  484  000B3DA8     E8  void IncreaseDifficultyLevelCB()
+                         inlines  DifficultySettings::ResetStreakValue, Singleton<DifficultySettings>::GetSingleton, UserInfo::SetDifficultyStreakValue
+  499  000AD938     84  void SaveProfile()
+                         inlines  UserInfo::SetLoginIndex
+  505  000B1BE4     84  void MM_TurnOffAutoSaveCB()
+                         inlines  AptControllerListener::StopPortLocking
+  515  000B1C68     84  void MM_TurnOnAutoSaveCB()
+                         inlines  AptControllerListener::StopPortLocking
+  525  0005F308     6C  void DoTheAutoSave()
+  536  0005F580     1C  void ClearMainMenuSequenceVar()
+  541  0005F59C      4  void ClearMainMenuSequenceVar(int32 )
+  819  000F41C0     AC  void UIMainMenu::UIMainMenu(const struct UIMainMenu* this)
+  855  000334E8     70  void UIMainMenu::Init(const struct UIMainMenu* this)
+  878  000B3FC4     38  void UIMainMenu::Show(const struct UIMainMenu* this)
+  887  000416A4    2B0  void UIMainMenu::BuildCustomOpenScreenSequence(const struct UIMainMenu* this)
+  975  000B3F64     60  void UIMainMenu::SetUpMainMenuEntryStates(const struct UIMainMenu* this)
+                         inlines  cGAME_GLOBALS::SetDemoMode
+  996  000B3E90     D4  void UIMainMenu::ResetMainMenuEntryStates(const struct UIMainMenu* this)
+                         inlines  Singleton<DifficultySettings>::GetSingleton, UserManager::CurrentUserSlot
+ 1022  00041954     C4  void UIMainMenu::LoadBg(const struct UIMainMenu* this, int32 bg)
+                         local  char[16] integerStr
+ 1045  00034884     40  void UIMainMenu::StartMenus(const struct UIMainMenu* this)
+ 1055  000AD6A4    1C8  void UIMainMenu::CheckToSeeIfGameSaveNeeded(const struct UIMainMenu* this)
+                         local  int32 usersController
+                         local  char* saveStrbuffer
+                         inlines  AptControllerListener::StopPortLocking
+ 1098  00041A40     64  void UIMainMenu::ExitFacilityGoToGameface(const struct UIMainMenu* this)
+ 1108  00040730     64  void UIMainMenu::ExitFacilityGoToProShop(const struct UIMainMenu* this)
+ 1118  0004066C     C4  void UIMainMenu::ExitFacilityCreateNewUser(const struct UIMainMenu* this, enum MMCreateNewUserType userType)
+ 1133  00041AA4     68  void UIMainMenu::ExitFacilityGoToScreen(const struct UIMainMenu* this, uint32 screenSig)
+ 1144  00041C14     84  void UIMainMenu::ExitFacilityGoToForSaveFlowToCreateNewUser(const struct UIMainMenu* this)
+ 1156  00041C98     7C  void UIMainMenu::ExitFacilityGoToNormalFlow(const struct UIMainMenu* this)
+ 1165  000C7310     18  void PlayNowAgain()
+ 1173  000C712C     CC  void UIMainMenu::PlayNow06(const struct UIMainMenu* this)
+                         local  int32 iGolfer
+                         local  int32 numEmptySlots
+                         inlines  UserInfo::SetValid
+ 1205  000C6F90    19C  void UIMainMenu::PlayNow06Implimentation(const struct UIMainMenu* this, bool foundprofile)
+                         local  enum GM_ModeType_t gameMode
+                         inlines  UserInfo::SetValid
+ 1272  00031B1C     88  void UIMainMenu::HideAllScreensAndNotifyExit(const struct UIMainMenu* this)
+ 1307  0009B9FC    190  enum TAptSequenceStatus UIMainMenu::HideAllScreensSequence(const struct UIMainMenu* this, bool inbFirstTime, void* inData)
+                         local  bool bDoneWithHiding
+                         local  int32 i
+                         local  struct AptScreenSubscriber* screen
+                         local  struct IAptControllerListener* controllerListener
+                         local  struct AptScreenSubscriber* screen
+                         inlines  AptScreenSubscriber::IsSequenceComplete
+ 1351  000B1E78     24  enum TAptSequenceStatus UIMainMenu::NotifyExitSequence(const struct UIMainMenu* this, bool inbFirstTime, void* inData)
+ 1360  00041A18     28  enum TAptSequenceStatus UIMainMenu::LoadRandomBG(const struct UIMainMenu* this, bool inbFirstTime, void* inData)
+ 1370  000AD86C     40  enum TAptSequenceStatus UIMainMenu::CheckForSaveAndNewPlayer(const struct UIMainMenu* this, bool inbFirstTime, void* inData)
+ 1391  0005C994     8C  enum TAptSequenceStatus UIMainMenu::ShowOnlineResultsReceivedPopup(const struct UIMainMenu* this, bool inbFirstTime, void* inData)
+                         inlines  OnlineManagerOSDK::SetDisconnectedFromFacility
+ 1416  00041D14     A8  enum TAptSequenceStatus UIMainMenu::FacilityFlyby(const struct UIMainMenu* this, bool inbFirstTime, void* inData)
+ 1434  0007E958     74  enum TAptSequenceStatus UIMainMenu::ShowWidgetSequence(const struct UIMainMenu* this, bool inbFirstTime, void* inData)
+ 1452  000673C0     34  enum TAptSequenceStatus UIMainMenu::CheckForTheDelayedDisconnectPopup(const struct UIMainMenu* this, bool inbFirstTime, void* inData)
+ 1470  0009BB8C     D0  enum TAptSequenceStatus UIMainMenu::WaitAndShowGamefaceSequence(const struct UIMainMenu* this, bool inbFirstTime, void* inData)
+                         inlines  AptScreenSubscriber::IsSequenceComplete, UIMenuCircDefault::SetFirstActiveIndex
+ 1491  000BBBA0     B4  enum TAptSequenceStatus UIMainMenu::WaitAndShowProShopSequence(const struct UIMainMenu* this, bool inbFirstTime, void* inData)
+                         inlines  AptScreenSubscriber::IsSequenceComplete, UIMenuCircDefault::SetFirstActiveIndex
+ 1513  0009BC5C     D8  enum TAptSequenceStatus UIMainMenu::WaitAndShowNewUserSequence(const struct UIMainMenu* this, bool inbFirstTime, void* inData)
+                         inlines  AptScreenSubscriber::IsSequenceComplete, UIMenuCircDefault::SetFirstActiveIndex
+ 1539  0009BD34     E0  enum TAptSequenceStatus UIMainMenu::WaitAndShowSavedScreenSequence(const struct UIMainMenu* this, bool inbFirstTime, void* inData)
+                         inlines  AptScreenSubscriber::IsSequenceComplete, UIMenuCircDefault::SetFirstActiveIndex, UI_ComponentManager::ShowScreen
+ 1561  0009BE14    144  enum TAptSequenceStatus UIMainMenu::ExitFacilityGoTo2dFrontEndSequence(const struct UIMainMenu* this, bool inbFirstTime, void* inData)
+                         inlines  AptScreenSubscriber::IsSequenceComplete, UI_ComponentManager::HideScreen, cGAME_GLOBALS::SetNextGame
+ 1590  00024A24     10  enum TAptSequenceStatus UIMainMenu::LastMainMenuSequence(const struct UIMainMenu* this, bool inbFirstTime, void* inData)
+ 1598  000C09FC    1EC  static void _onCloseTryItAfterShowMe(int32 iIndex)
+                         local  void* ptr
+                         local  struct GameModeDriverFacility* pFacility
+                         local  struct GameModeDriver* gameModeDriver
+                         local  int iStartFrom
+                         local  int iShotType
+                         local  bool bLoadNeeded
+                         inlines  UIMenuTutorial::GetShotType, UIMenuTutorial::GetStartFrom, UIMenuTutorial::SetShowTryThisTutorial, UIWidget::SetForceReLoadOfFacility
+ 1672  000669FC    140  enum TAptSequenceStatus UIMainMenu::OpenInitialScreenSequence(const struct UIMainMenu* this, bool inbFirstTime, void* inData)
+ 1726  00062338     B0  enum TAptSequenceStatus UIMainMenu::HackyFixBackgroundInStartupSequence(const struct UIMainMenu* this, bool inbFirstTime, void* inData)
+                         local  enum TAptSequenceStatus retVal
+ 1753  000AD600     A4  enum TAptSequenceStatus UIMainMenu::SavedGamePreflight(const struct UIMainMenu* this, bool inbFirstTime, void* inData)
+                         local  enum TAptSequenceStatus retVal
+ 1798  0002FC1C     98  enum TAptSequenceStatus UIMainMenu::SavedGameSponsorship(const struct UIMainMenu* this, bool inbFirstTime, void* inData)
+                         local  enum TAptSequenceStatus nStatus
+ 1861  000897C8     54  enum TAptSequenceStatus UIMainMenu::ExitStartupState(const struct UIMainMenu* this, bool inbFirstTime, void* inData)
+ 1876  00024A1C      8  enum TAptSequenceStatus UIMainMenu::SetupAcceptedChallenge(const struct UIMainMenu* this, bool inbFirstTime, void* inData)
+ 1913  0005F374    104  enum TAptSequenceStatus UIMainMenu::SetupDifficultyChallenge(const struct UIMainMenu* this, bool inbFirstTime, void* inData)
+                         local  enum TAptSequenceStatus retVal
+ 2011  000739F8    100  void UIMainMenu::NotifyFrontEnd(const struct UIMainMenu* this)
+                         local  bool firstTime
+ 2043  000B7904    118  void UIMainMenu::NotifyStartup(const struct UIMainMenu* this)
+ 2089  000C71F8    118  void UIMainMenu::NotifyPlayNow(const struct UIMainMenu* this)
+                         inlines  cGAME_GLOBALS::SetNextGame
+ 2130  000C6D40    250  void UIMainMenu::NotifyGameMode(const struct UIMainMenu* this)
+                         local  enum GM_ModeType_t modeType
+ 2216  000BB8C4    29C  void UIMainMenu::NotifyPGATour(const struct UIMainMenu* this)
+                         inlines  OnlineManagerOSDK::GetInstance, UIPgaTourStats_Category::SetShowFedExRankFlag
+ 2281  000BB734    190  void UIMainMenu::NotifyMyTOUR(const struct UIMainMenu* this)
+                         inlines  OnlineManagerOSDK::GetInstance
+ 2336  000EC6EC    36C  void UIMainMenu::NotifyOptions(const struct UIMainMenu* this)
+                         inlines  OnlineManagerOSDK::GetInstance
+ 2446  00024A34      4  void UIMainMenu::NotifyThreads(const struct UIMainMenu* this)
+ 2466  0005F78C     10  void UIMainMenu::NotifyPlayMovie(const struct UIMainMenu* this)
+ 2480  0005F5A0    1EC  void UIMainMenu::ActuallyPlayMovie()
+                         local  char[128] buff
+                         local  int32 mMovieOptions
+                         local  bool bWideScreen
+ 2543  000B1CEC    18C  void UIMainMenu::NotifyExit(const struct UIMainMenu* this)
+                         local  int32 i
+ 2590  000BB468    2CC  void UIMainMenu::NotifyGameFace(const struct UIMainMenu* this)
+                         local  const int32 kProShopLevel
+                         local  const int32 kAnimationsLevel
+                         local  const int32 kFirstMenuLevelSelect
+                         local  bool foundProfile
+                         local  int32 i
+                         inlines  cGAME_GLOBALS::SetFacilityBootingToTheFeUi
+ 2716  00024A38     3C  void UIMainMenu::NotifyNotImplimented(const struct UIMainMenu* this)
+ 2724  00071AC8     84  void UIMainMenu::NotifyDemoMode(const struct UIMainMenu* this)
+                         inlines  cGAME_GLOBALS::SetDemoMode
+ 2744  000BB434     34  void UIMainMenu::NotifyTigerChallenge(const struct UIMainMenu* this)
+ 2761  000BB414     20  void UIMainMenu::NotifyTrainingChallenges(const struct UIMainMenu* this)
+ 2808  000BB3A0     74  void UIMainMenu::NotifySkillChallenges(const struct UIMainMenu* this)
+                         local  const struct GameModeDriver* pDriver
+ 2825  000E80B8    5A0  void UIMainMenu::NotifyTutorial(const struct UIMainMenu* this)
+                         local  int[22] aiRemap
+                         local  char[20] szPopupDesc
+                         local  uint32 iDescIdx
+                         local  int iRemap
+                         local  bool bHasAProfile
+                         local  int32 i
+                         local  void* ptr
+                         local  struct GameModeDriverFacility* pFacility
+                         local  struct GameModeDriver* gameModeDriver
+                         local  int iTutorial1
+                         local  int iTutorial2
+                         local  bool bLoadNeeded
+                         inlines  Singleton<DifficultySettings>::GetSingleton, UIMenuTutorial::SetNumItemsInLevel, UIMenuTutorial::SetShowTryThisTutorial, UIPopupDef::SetShowNoTipsPrompt, UIWidget::SetForceReLoadOfFacility
+ 3040  0002E6A0     3C  void UIMainMenu::NotifyMenusTutorial(const struct UIMainMenu* this)
+ 3052  00024A74     24  void UIMainMenu::NotifyGetVeryFirstTimeBool(const struct UIMainMenu* this)
+ 3060  000271EC     AC  void UIMainMenu::NotifyOneBallVideo(const struct UIMainMenu* this)
+                         local  char[128] buff

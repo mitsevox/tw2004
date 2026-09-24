@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Utils/util.cpp
+// compiled in: headgate_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   25  0034513C     28  void seedrn(int seed)
+   32  00345164      4  void randomize()
+   41  00345168     4C  int random(int max)
+   53  003451B4     98  float rn()

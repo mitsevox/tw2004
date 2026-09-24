@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/streaming/StreamManagerBase.cpp
+// compiled in: golf2_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   12  00135078     18  void StreamManagerBase::~StreamManagerBase(const struct StreamManagerBase* this)
+   18  001355A8     40  void StreamManagerBase::StreamFiles(const struct StreamManagerBase* this)
+   38  00135518      4  void StreamManagerBase::RegisterStreamClients(const struct StreamManagerBase* this)
+   44  0013551C      4  void StreamManagerBase::UnregisterStreamClients(const struct StreamManagerBase* this)
+   50  00134EA0     D4  void StreamManagerBase::AddStreamFileName(const struct StreamManagerBase* this, const char* fileName, StreamBeginCallback callbackBegin, StreamEndCallback callbackEnd)
+   67  00135418      C  void StreamManagerBase::ClearStreamFileNames(const struct StreamManagerBase* this)
+   74  00135520     3C  int32 StreamManagerBase::OpenStreamFiles(const struct StreamManagerBase* this)
+   83  0013557C     2C  void StreamManagerBase::CloseStreamFiles(const struct StreamManagerBase* this)
+   91  00135608      4  void StreamManagerBase::SetupFileStream(const struct StreamManagerBase* this)

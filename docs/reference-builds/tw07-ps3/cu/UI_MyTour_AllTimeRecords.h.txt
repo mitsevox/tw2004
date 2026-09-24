@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_MyTour_AllTimeRecords.h
+// compiled in: apt_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   20  00124BE0    110  void UIMyTour_AllTimeRecords::~UIMyTour_AllTimeRecords(const struct UIMyTour_AllTimeRecords* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStaticCharBuffer<256u>::~AptStaticCharBuffer, ~Records
+   22  001003D0      C  uint32 UIMyTour_AllTimeRecords::GetSignature(const const struct UIMyTour_AllTimeRecords* this)
+   27  001003DC     44  void UIMyTour_AllTimeRecords::ShowHelpText(const struct UIMyTour_AllTimeRecords* this)
+   30  00100420     24  void UIMyTour_AllTimeRecords::LooseFocus(const struct UIMyTour_AllTimeRecords* this, uint32 )
+   31  00100444     24  void UIMyTour_AllTimeRecords::RegainFocus(const struct UIMyTour_AllTimeRecords* this, uint32 )

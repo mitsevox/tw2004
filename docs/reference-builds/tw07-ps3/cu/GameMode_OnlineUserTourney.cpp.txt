@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_OnlineUserTourney.cpp
+// compiled in: golf_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   10  00204D30     44  void GameModeOnlineUserTourney::GameModeOnlineUserTourney(const struct GameModeOnlineUserTourney* this)
+   15  001FE300     18  void GameModeOnlineUserTourney::~GameModeOnlineUserTourney(const struct GameModeOnlineUserTourney* this)
+   19  0021071C     F8  void GameModeOnlineUserTourney::Init(const struct GameModeOnlineUserTourney* this)
+   37  00327A20    170  void GameModeOnlineUserTourney::SetupNextGolfer(const struct GameModeOnlineUserTourney* this)
+                         local  int i
+                         inlines  GM_GetCurrentHoleIndex, GM_SetPlayerHoledOut, Singleton<GamePlayerManager>::GetSingleton
+   50  001FE37C     14  const char* GameModeOnlineUserTourney::GetName(const struct GameModeOnlineUserTourney* this)

@@ -1,0 +1,75 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Rna/Flap/FLAPNetConn.cpp
+// compiled in: rnaunity.cpp
+// 31 functions, source order. line | PS3 address | size
+
+   62  004C7100     3C  static void FLAP::FixupSocket(SOCKET socket)
+                         local  int val
+  126  004C7504     5C  void Shutdown(const struct <anon>* this)
+                         local  int ret
+  139  004C71E4     80  void AllocSendBuffer(const struct <anon>* this, uint32_t uSize)
+  152  004C7194     50  void FreeSendBuffer(const struct <anon>* this)
+  164  004C713C     58  void FlushSendBuffer(const struct <anon>* this)
+  180  004C7638     D0  int SendBuffered(const struct <anon>* this, const void* pData, int32_t numBytes)
+                         local  int32_t sendBufferAvailable
+  207  004C709C     64  void SetBlocking(const struct <anon>* this, bool bBlock)
+                         local  int optval
+  219  004C809C     94  bool Connect(const struct <anon>* this, uint32_t uIPAddr, int port)
+                         local  SOCKADDR_IN addr
+                         local  int addrLen
+  240  004C8130     68  bool Bind(const struct <anon>* this, int port)
+                         local  SOCKADDR_IN addr
+  259  004C8198     40  bool Listen(const struct <anon>* this, int maxQueue)
+  273  004C81D8     7C  struct <anon>* Accept(const struct <anon>* this)
+                         local  SOCKADDR_IN addr
+                         local  FLAPAddrLenT addrLen
+                         local  SOCKET socket
+  291  004CA1FC     44  void Recv(const struct <anon>* this, const uint32_t& val)
+                         local  uint32_t netval
+  298  004CA18C     70  void Recv(const struct <anon>* this, const uint64_t& val)
+                         local  uint32_t netvallo
+                         local  uint32_t netvalhi
+  314  004CA0F8     44  void Recv(const struct <anon>* this, const int32_t& val)
+                         local  uint32_t netval
+  321  004CA0B4     44  void Recv(const struct <anon>* this, const int16_t& val)
+                         local  int16_t netval
+  330  004CA070     44  void Recv(const struct <anon>* this, const uint8_t& val)
+                         local  uint8_t netval
+  338  004CA13C     50  void RecvStr(const struct <anon>* this, char* pStr, int32_t iBufferSize)
+                         local  int32_t len
+  357  004C9F2C    144  bool RecvData(const struct <anon>* this, void* pBuffer, int32_t numBytes)
+                         local  int numToRecv
+                         local  int numRecv
+                         local  struct pollfd pfd
+                         local  int retVal
+  409  004C8254     6C  int32_t RecvPacket(const struct <anon>* this, void* pBuffer, int32_t numBytes, const uint32_t& uIPAddr, const int& port)
+                         local  SOCKADDR_IN addr
+                         local  FLAPAddrLenT addrLen
+                         local  int numBytesRecv
+  423  004C82C0     54  void Send(const struct <anon>* this, const const uint64_t& val)
+                         local  uint32_t netvalhi
+                         local  uint32_t netvallo
+  432  004C7DA4     30  void Send(const struct <anon>* this, const const uint32_t& val)
+                         local  uint32_t netval
+  439  004C77B8     30  void Send(const struct <anon>* this, const const int32_t& val)
+                         local  int32_t netval
+  446  004C8314     30  void Send(const struct <anon>* this, const const int16_t& val)
+                         local  int16_t netval
+  453  004C77B0      8  void Send(const struct <anon>* this, const const uint8_t& val)
+  460  004C77E8     68  void SendStr(const struct <anon>* this, const char* pStr)
+                         local  int32_t len
+  472  004C7708     A8  bool SendData(const struct <anon>* this, const void* pBuffer, int32_t numBytes)
+                         local  int numSent
+  495  004C8344     6C  bool SendPacket(const struct <anon>* this, void* pBuffer, int32_t numBytes, const uint32_t& uIPAddr, const int& port)
+                         local  SOCKADDR_IN addr
+                         local  int addrLen
+                         local  int numBytesSent
+  511  004C83B0     74  bool GetLocalAddr(const struct <anon>* this, const uint32_t& uIPAddr, const int& port)
+                         local  SOCKADDR_IN addr
+                         local  FLAPAddrLenT addrLen
+  525  004C8424     74  bool GetRemoteAddr(const struct <anon>* this, const uint32_t& uIPAddr, const int& port)
+                         local  SOCKADDR_IN addr
+                         local  FLAPAddrLenT addrLen
+  539  004C84F4     54  const char* PrintRemoteAddr(const struct <anon>* this, char* pStr)
+                         local  uint32_t uIPAddr
+                         local  int port
+  549  004C8498     5C  const char* PrintAddr(char* pStr, uint32_t uIPAddr, int port)

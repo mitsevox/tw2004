@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Replay/Headers/ReplayCameraMgr.h
+// compiled in: golf2_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+    7  0012D4FC      C  void ReplayCameraMgr::ReplayCameraMgr(const struct ReplayCameraMgr* this)
+    8  0012D514      4  void ReplayCameraMgr::~ReplayCameraMgr(const struct ReplayCameraMgr* this)
+   12    inline-only   enum CameraMode_t ReplayCameraMgr::GetCurrentReplayCamMode(const struct ReplayCameraMgr* this)
+   14    inline-only   struct ReplayCameraMgr* ReplayCameraMgr::GetInstance()

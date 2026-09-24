@@ -1,0 +1,37 @@
+// ../../../../../TIGERCODE/Code/InGameTune/Headers/LuaTuningFileManager.h
+// compiled in: golf2_unity.cpp, golf_unity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   13    inline-only   bool LuaTuningFileManager::GetParamValue<bool>(const const struct LuaParam& param)
+                         local  bool result
+   35    inline-only   float LuaTuningFileManager::GetParamValue<float>(const const struct LuaParam& param)
+                         local  float result
+   57    inline-only   void LuaTuningFileManager::SetParamValue(const struct <anon>& result, int value)
+   63    inline-only   void LuaTuningFileManager::SetParamValue(const struct <anon>& result, unsigned int value)
+   69    inline-only   void LuaTuningFileManager::SetParamValue(const struct <anon>& result, float value)
+   81    inline-only   bool LuaTuningFileManager::Call<bool>(const char* function_name)
+                         local  struct <anon> out
+                         local  unsigned int out_count
+   81    inline-only   float LuaTuningFileManager::Call<float>(const char* function_name)
+                         local  struct <anon> out
+                         local  unsigned int out_count
+   90    inline-only   float LuaTuningFileManager::Call<float, float>(const char* function_name, const const float& param0)
+                         local  struct <anon> in
+                         local  struct <anon> out
+                         local  unsigned int out_count
+  102    inline-only   float LuaTuningFileManager::Call<float, uint32, float>(const char* function_name, const const uint32& param0, const const float& param1)
+                         local  struct <anon>[2] in
+                         local  struct <anon> out
+                         local  unsigned int out_count
+  115    inline-only   float LuaTuningFileManager::Call<float, PlayerNumber_t, float, float>(const char* function_name, const const enum PlayerNumber_t& param0, const const float& param1, const const float& param2)
+                         local  struct <anon>[3] in
+                         local  struct <anon> out
+                         local  unsigned int out_count
+  115    inline-only   float LuaTuningFileManager::Call<float, int, float, float>(const char* function_name, const const int& param0, const const float& param1, const const float& param2)
+                         local  struct <anon>[3] in
+                         local  struct <anon> out
+                         local  unsigned int out_count
+  129    inline-only   float LuaTuningFileManager::Call<float, float, SW_eSwingInputStyle_t, float, float>(const char* function_name, const const float& param0, const const enum SW_eSwingInputStyle_t& param1, const const float& param2, const const float& param3)
+                         local  struct <anon>[4] in
+                         local  struct <anon> out
+                         local  unsigned int out_count

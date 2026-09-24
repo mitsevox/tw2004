@@ -1,0 +1,11 @@
+// ../../../../../TIGERCODE/Code/Headgate/SOURCE/Game/Engine/CRShadowmap.h
+// compiled in: rnaunity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   28    inline-only   TextureRef CRShadowMap::GetShadowMapTexture(const struct CRShadowMap* this)
+   37    inline-only   TextureRef CRShadowMap::GetHRShadowMapTexture(const struct CRShadowMap* this)
+   45    inline-only   float CRShadowMap::GetHRShadowFadeDist(const struct CRShadowMap* this)
+   46    inline-only   float CRShadowMap::GetHRCamOffset(const struct CRShadowMap* this)
+   47    inline-only   float[4][4]& CRShadowMap::GetShadowMatrix(const struct CRShadowMap* this)
+   48    inline-only   float[4][4]& CRShadowMap::GetHRShadowMatrix(const struct CRShadowMap* this)
+   49    inline-only   float[4][4]& CRShadowMap::GetGolferShadowMatrix(const struct CRShadowMap* this)

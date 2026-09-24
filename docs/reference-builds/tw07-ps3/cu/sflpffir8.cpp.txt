@@ -1,0 +1,12 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/sflpffir8.cpp
+// compiled in: sflpffir8.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   10  006F4CA8     AC  int SFILTER_lpfFIR8(void* pstate, int outputframes, void* psrcp, void* pdstp, int requester)
+                         local  LPFSTATE* pls
+                         local  int temp
+   40  006F4D54     58  int SFILTER_createLPFFIR8(LPFSTATE* pls)
+   55  006F4DAC     7C  void SFILTER_modifyLPFFIR8(LPFSTATE* pls, FIXED24P8* pparams)
+                         local  int cutofffreq
+                         local  int samplerate
+                         local  float leakage

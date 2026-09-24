@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/UI_EndGame.h
+// compiled in: apt_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   22  00034D3C     18  void UIEndGame::UIEndGame(const struct UIEndGame* this)

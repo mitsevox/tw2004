@@ -1,0 +1,18 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/CRShadowmap.h
+// compiled in: headgate_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   13  00351958     C0  void CRShadowMap::CRShadowMap(const struct CRShadowMap* this)
+                         inlines  LLMath_IdentifyMat, vec_st
+   14  0034CA34     7C  void CRShadowMap::~CRShadowMap(const struct CRShadowMap* this)
+   28    inline-only   TextureRef CRShadowMap::GetShadowMapTexture(const struct CRShadowMap* this)
+   37    inline-only   TextureRef CRShadowMap::GetHRShadowMapTexture(const struct CRShadowMap* this)
+   39    inline-only   void CRShadowMap::GetMinShadowCoords(const struct CRShadowMap* this, float* minShadowCoords)
+   40    inline-only   void CRShadowMap::GetMaxShadowCoords(const struct CRShadowMap* this, float* maxShadowCoords)
+   41    inline-only   void CRShadowMap::GetHighResMinShadowCoords(const struct CRShadowMap* this, float* minShadowCoords)
+   42    inline-only   void CRShadowMap::GetHighResMaxShadowCoords(const struct CRShadowMap* this, float* maxShadowCoords)
+   45    inline-only   float CRShadowMap::GetHRShadowFadeDist(const struct CRShadowMap* this)
+   46    inline-only   float CRShadowMap::GetHRCamOffset(const struct CRShadowMap* this)
+   47    inline-only   float[4][4]& CRShadowMap::GetShadowMatrix(const struct CRShadowMap* this)
+   48    inline-only   float[4][4]& CRShadowMap::GetHRShadowMatrix(const struct CRShadowMap* this)
+   49    inline-only   float[4][4]& CRShadowMap::GetGolferShadowMatrix(const struct CRShadowMap* this)

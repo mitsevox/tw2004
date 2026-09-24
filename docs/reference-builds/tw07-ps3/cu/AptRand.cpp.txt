@@ -1,0 +1,18 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptRand.cpp
+// compiled in: other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   29    inline-only   static unsigned int _randReloadMersenneTwister()
+                         local  unsigned int* p0
+                         local  unsigned int* p2
+                         local  unsigned int* pM
+                         local  unsigned int s0
+                         local  unsigned int s1
+                         local  int j
+   57  003EF9B8    280  unsigned int AptRand()
+                         local  unsigned int y
+                         inlines  _randReloadMersenneTwister
+   72  003EF964     54  void AptSeedRand(unsigned int nSeed)
+                         local  unsigned int x
+                         local  unsigned int* s
+                         local  int j

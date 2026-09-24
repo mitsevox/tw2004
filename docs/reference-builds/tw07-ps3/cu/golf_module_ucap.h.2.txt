@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/GolfModule/golf_module_ucap.h
+// compiled in: shader_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   38    inline-only   TextureRef* GolfModuleUCAP::GetActiveTextures(const struct GolfModuleUCAP* this)

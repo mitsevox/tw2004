@@ -1,0 +1,82 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/GoTerrain_HeadGate.c
+// compiled in: golf_unity.cpp
+// 38 functions, source order. line | PS3 address | size
+
+  135  002175DC      4  void Ter_vPrintMemoryStatus()
+  142  002175E0     64  void Ter_vInitModule()
+                         local  bool bFirstTime
+  160  00217644     24  void Ter_vCloseModule()
+  169  00217F14     2C  void Ter_DeInitForHole()
+  183  00217668      4  void Ter_LoadTERFromFile(char* pFilepath)
+  190  00217EC8     28  void Ter_PostLoadHGSTerrain()
+  395  0021766C    1DC  void Ter_InitOceanEmitters()
+                         local  float[256][4] positions
+                         local  struct ParticleEmitter* em
+                         local  const struct ParticleSystem* sys
+                         local  const char* name
+                         local  const float* trans
+                         inlines  ParticleManager::GetEmitterList
+  430  00217848      4  void Ter_LaunchOceanEmitters()
+  449  0027EF7C     88  void Ter_PreRender(int32 iViewControlID, bool bFirstCall)
+                         local  struct Timing_AutoMarker terrainPreRenderMarker
+                         inlines  Timing_AutoMarker::Timing_AutoMarker, Timing_AutoMarker::~Timing_AutoMarker
+  461  002FDA04    320  void Ter_RenderHole(int32 iViewControlID, bool bRenderingPip)
+                         local  int first
+                         local  CameraController_t* pCameraController
+                         local  vec4flt vPos
+                         local  vec4flt vLookAt
+                         local  int32 iTerViewerRenderFlags
+                         local  vec4flt ptGolferLoc
+                         local  struct TCharacter* pCharacter
+                         local  char[100] buf
+                         local  const float[4] pColor
+                         inlines  Character_GetBonePos, Character_GetBonePos_FromIndex, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, GM_GetCourseName, GamePlayer::GetCharacter, LLMath_Add3, PR_vSetCurrentColor, PR_vSetCurrentUsage, vec3flt_Copy, vec4flt_Copy
+  574  00275910    104  void* LI_RippleTunerCallback(void* ptr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  vec4flt vPos
+                         local  vec4flt vLookAt
+                         local  CameraController_t* pCameraController
+                         local  vec4flt collisionPoint
+                         local  vec4flt surfaceNormal
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  TGD_ObjectInstanceInfo* pSurfaceObject
+                         local  int terrainID
+                         inlines  LLMath_Add3, vec3flt_Copy
+  608  0021784C    1B8  void Ter_Update()
+                         local  struct Timing_AutoMarker terrainUpdateMarker
+                         local  float dt
+                         local  int id
+                         local  int catId
+                         local  float fDummy
+                         inlines  Timing_AutoMarker::Timing_AutoMarker, Timing_AutoMarker::~Timing_AutoMarker
+  654  00217A04     54  void Ter_AddPostDrawTerrainToDisplayList(bool bRenderingPip)
+                         local  uint32 iTerViewerRenderFlags
+  669  00217A58      4  void Ter_AddNearbyObjectsToDisplayList()
+  682  00217A5C     D0  void Ter_InitiateRipple(float x, float z, enum HGS_RippleType rippleType)
+                         local  float power
+                         local  float size
+                         local  float duration
+                         local  float frequency
+                         local  unsigned int priority
+  724  00213630     40  void Ter_StartCrowdCheerAnimation(float fIntensity, float fDuration)
+  733  00213670     40  void Ter_StartCrowdLamentAnimation(float fIntensity, float fDuration)
+  743  001F493C     44  void Ter_StopCrowdCheerAndLamentAnimation()
+  752  00217B2C     48  void Ter_StartCrowdAnticipation()
+  761  00217B74     18  bool Ter_bIsCrowdCheering()
+  766  00217B8C     18  bool Ter_bIsCrowdLamenting()
+  771  00217BA4     18  bool Ter_bIsCrowdAnticipating()
+  777  001FBDA8     18  float Ter_fCurrentCrowdCheerLength()
+  781  001FBDC0     18  float Ter_fCurrentCrowdCheerIntensity()
+  786  001F42D8     4C  void Ter_MarshalRaiseSign()
+  796  001F43B4     4C  void Ter_MarshalLowerSign()
+  806  00217BBC     18  bool Ter_bIsMarshalSignUp()
+  815  00217BD4      8  int Ter_GetTerrainWidthLevel(enum Ter_EWidthType eType)
+  816  00217BDC      4  void Ter_SetTerrainUndulationLevel(enum Ter_EUndulationType eType, float level)
+  817  00217BE0      4  void Ter_SaveTerrainUndulationLevels()
+  818  00217BE4     14  float Ter_GetCurrentTerrainUndulationLevel(enum Ter_EUndulationType eType)
+  819  00217BF8     14  float Ter_GetLastTerrainUndulationLevel(enum Ter_EUndulationType eType)
+  820  00217C0C      4  void Ter_SetTreeMovementAmplitude(float amplitude)
+  821  00217C10      4  void Ter_SetCloudSpeed(float fSpeed)
+  822  00217C14      4  void Ter_SetTerrainWidthLevel(enum Ter_EWidthType eType, int level)
+  823  00217C18      4  void Ter_UpdateMorphedBoundingData()
+  824  00217C1C      4  void Ter_SetPatchFadeFogColor(enum Ter_EWidthType eType)
+  827  001F4D84      4  void Ter_UpdateObjectRenderStateForCollision(uint16 uiPatchNum, uint16 uiObjectListNum)

@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/packages/osdk/2.06.04/core/include/common/osdk/gamefacade/debugstrategy.h
+// compiled in: golf2_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   65  001E7500     18  void ~DebugStrategy(const struct DebugStrategy* this)

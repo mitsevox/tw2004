@@ -1,0 +1,44 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Actors/tiger_particle_mgr.cpp
+// compiled in: golf_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   23  0022D970    160  void* ITigerParticleSpawn::Create(const struct ITigerParticleSpawn* this, const char* name, void* emitter, const float* position, const float* velocity, const float* gravity)
+                         local  struct TigerParticleEmitter* childEmitter
+   51  0022DAD0     6C  void TigerParticleManager::PlatformInit(const struct TigerParticleManager* this)
+   64  0022DB3C     74  void TigerParticleManager::PlatformShutdown(const struct TigerParticleManager* this)
+   80  0022DBB0     78  void TigerParticleManager::CallbackPSF(TStreamDataPtr pStream)
+                         local  int addResult
+   90  0022DC28     6C  void TigerParticleManager::CallbackTXFX(TStreamDataPtr pStream)
+  105  00245440    160  void* TigerParticleManager::Alloc(unsigned int size, unsigned int align)
+                         local  const char[6] __FUNCTION__
+                         local  bool oldLockStatus
+                         local  void* ptr
+                         inlines  TagValuePair, operator+
+  117  0022DC94     A0  void TigerParticleManager::Free(void* ptr)
+                         local  bool oldLockStatus
+  130  0022DD34     78  const char* TigerParticleManager::SpecialChar(const char* text)
+                         local  const char* special
+  154  0022DDAC    154  void TigerParticleManager::TextureNameOnly(char* result, const char* pathName, int buffLength)
+                         local  const char* special
+                         local  int length
+                         local  const char* period
+                         local  int i
+                         inlines  std::tolower
+  186  0025345C    31C  void TigerParticleManager::HandleTigerComData(const struct TigerParticleManager* this, const char* command, const void* data, unsigned int size)
+                         local  unsigned int fileParticleCount
+                         local  const char* name
+                         local  unsigned int emittersTweaked
+                         local  struct ParticleEmitter* emitter
+                         local  void* residentPSF
+                         local  int psfExistsAlready
+                         local  struct CA_SCamera* camera
+                         local  unsigned int i
+                         local  char* filePtr
+                         local  const char* existingName
+                         local  const char* emitterSysName
+                         inlines  RC_spGetRenderCtxCamera
+  297  0022DF00     18  struct TX_STextureGroup* TigerParticleManager::GetTextureGroup()
+  302  0022DF18     14  float* TigerParticleManager::GetLuaParticlePos(const struct TigerParticleManager* this)
+  307  0022DF2C     34  void TigerParticleManager::SetLuaParticlePos(const struct TigerParticleManager* this, float* pos)
+  315  0022DF60     14  float* TigerParticleManager::GetLuaParticleRot(const struct TigerParticleManager* this)
+  320  0022DF74     34  void TigerParticleManager::SetLuaParticleRot(const struct TigerParticleManager* this, float* rot)

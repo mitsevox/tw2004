@@ -1,0 +1,163 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/UMemBudgetTracker.cpp
+// compiled in: Legacy_unity.cpp
+// 37 functions, source order. line | PS3 address | size
+
+  224  0038630C     DC  void MemBudgetTracker_GetHoleName(char* sBudget_holename)
+                         local  const char* course
+                         local  int holenum
+                         inlines  GM_GetCourseName
+  314  003B160C     F0  void MemBudgetTracker::InitOnce()
+                         local  const char[9] __FUNCTION__
+                         inlines  TagValuePair, operator+
+  324  003AAE18     20  void MemBudgetTracker::CloseOnce()
+  357  0038F6C8     9C  void MemBudgetTracker::InitBudgets(const struct MemBudgetTracker* this, MemBudgetTracker_Budget* pInitInfo)
+  370  003A3314    380  uint32 MemBudgetTracker::TrackAllocation(const struct MemBudgetTracker* this, void* ptr, int32 memSize, MemBudgetTypeE eType, uint32 typeMem, char* filename, int32 lineNumber)
+                         local  int32 filenameNdx
+                         local  uint8 eBudgetSubType
+                         local  MemBudgetTracker_AllocInfo* allocItem
+                         local  uint32 index
+                         local  int i
+  467  0038EEEC     DC  void MemBudgetTracker::RemoveAllocation(const struct MemBudgetTracker* this, uint32 index)
+                         local  MemBudgetTracker_AllocInfo* pAllocInfo
+                         local  MemBudgetTypeE eType
+                         local  uint8 eBudgetSubType
+  486  0037ABE4     60  void MemBudgetTracker::CheckUnfreedAllocations(const struct MemBudgetTracker* this)
+                         local  bool bFoundUnfreed
+                         local  int i
+  519  003C9A54     A0  void MemBudgetTracker::CheckUnfreedFastAllocations(const struct MemBudgetTracker* this)
+                         local  bool bFoundUnfreed
+                         local  int i
+  548  0038EE3C     B0  void MemBudgetTracker::ClearAllocations(const struct MemBudgetTracker* this)
+  561  003A2EB4    208  void MemBudgetTracker::VerifyBudget(const struct MemBudgetTracker* this, MemBudgetTypeE eType)
+                         local  char[16] circBufferName
+  611  003A30BC     B4  bool MemBudgetTracker::EnableBudgetTracking(const struct MemBudgetTracker* this, bool bEnableBudgetTracking, MemBudgetTypeE eBudget)
+                         local  bool result
+                         local  int maxTypes
+                         local  int i
+                         local  int maxTypes
+                         local  int i
+  647  0039EA48    638  void MemBudgetTracker::DumpMemByFile(const struct MemBudgetTracker* this)
+                         local  int32 filenameNdx
+                         local  int32[4] MemUsed
+                         local  int32 TotalMemUsed
+                         local  int32 i
+                         local  uint8* usedPtr
+                         local  int32 usedSize
+                         local  int32 totalUnused
+                         local  int32 moduleUnused
+                         local  int32 unusedCount
+                         local  char[128] sStr
+                         local  MemBudgetTracker_AllocInfo* pInfo
+                         local  char* pName
+                         local  bool bFoundData
+                         local  MemBudgetTracker_AllocInfo* pInfo
+                         inlines  std::strrchr
+  815  0039E2FC    74C  void MemBudgetTracker::DumpMemByBudget(const struct MemBudgetTracker* this, bool bDetails, bool bSaveReport)
+                         local  int32 TotalMemUsed
+                         local  int32 TotalMemBudgeted
+                         local  int32 i
+                         local  uint8* usedPtr
+                         local  int32 usedSize
+                         local  int32 totalUnused
+                         local  int32 moduleUnused
+                         local  int32 unusedCount
+                         local  int32 iBudget
+                         local  int32 unusedAtEndBlock
+                         local  int32 unusedThisBlock
+                         local  int32 biggestUnusedBlock
+                         local  char** pSubType
+                         local  int32 numBudgetTypes
+                         local  MemBudgetTracker_AllocInfo* pInfo
+                         local  char* pName
+                         local  char[128] sStr
+                         inlines  std::strrchr
+  990  003C8DE8    7C8  void MemBudgetTracker::DumpBudgetSummary(const struct MemBudgetTracker* this, bool bDetails, bool bSaveReport, int32 memPool)
+                         local  int32 TotalMemUsed
+                         local  int32 TotalMemBudgeted
+                         local  int32 i
+                         local  uint8* usedPtr
+                         local  int32 usedSize
+                         local  int32 totalUnused
+                         local  int32 moduleUnused
+                         local  int32 unusedCount
+                         local  int32 iBudget
+                         local  int32 unusedAtEndBlock
+                         local  int32 unusedThisBlock
+                         local  int32 biggestUnusedBlock
+                         local  char** pSubType
+                         local  int32 numBudgetTypes
+                         local  MemBudgetTracker_AllocInfo* pInfo
+                         local  char* pName
+                         local  char[128] sStr
+                         inlines  std::strrchr
+ 1174  0039E15C    18C  void MemBudgetTracker::SendMemInfoToConsole(const struct MemBudgetTracker* this)
+                         local  int32 TotalMemUsed
+                         local  int32 TotalMemBudgeted
+                         local  int32 iBudget
+                         local  char[256] str
+                         local  int32 numBudgetTypes
+ 1206  0037AD14     C0  void MemBudgetTracker_PrintX(char* errorString, int32 v1, int32 v2, int32 v3, int32 v4, int32 v5)
+                         local  uint32 l
+                         local  int bufLen
+ 1220  0038C0E8     78  const MemBudgetTracker_AllocInfo* MemBudgetTracker::GetAllocationInfo(const struct MemBudgetTracker* this, int index)
+ 1226  0038C080     68  const char* MemBudgetTracker::GetFilename(const struct MemBudgetTracker* this, int16 filenameIndex)
+ 1232  0038C010     70  MemBudgetFailureLevelE MemBudgetTracker::GetBudgetFailureLevel(const struct MemBudgetTracker* this, MemBudgetTypeE eBudget)
+ 1238  0038BF28     74  int32 MemBudgetTracker::GetBudget(const struct MemBudgetTracker* this, MemBudgetTypeE eBudget)
+ 1244  0038BEB8     70  int32 MemBudgetTracker::GetMemUsed(const struct MemBudgetTracker* this, MemBudgetTypeE eBudget)
+ 1250  0038BE10     A8  int32 MemBudgetTracker::GetSubMemUsed(const struct MemBudgetTracker* this, MemBudgetTypeE eBudget, uint8 eSubBudget)
+ 1257  0038BDA0     70  int32 MemBudgetTracker::GetWaterMark(const struct MemBudgetTracker* this, MemBudgetTypeE eBudget)
+                         local  int32 returnValue
+ 1268  0037B35C     BC  void MemBudgetTracker_PrintReport()
+                         local  char* s
+                         local  uint32 l
+ 1282  0037E120    118  void MemBudgetTracker_SaveReport(char* filename, bool makeUniqueFilename)
+                         local  char* s
+                         local  char[256] name
+ 1330  003C8BAC    10C  void MemBudgetTracker_AppendReport(char* filename, bool makeUniqueFilename)
+                         local  char* s
+                         local  char[256] name
+ 1379  0037AC98     20  void MemBudgetTracker_StartNewReportSession()
+ 1396  003C9878    1A8  void MemBudgetTracker_PrintReportOfAllCircBuffers(bool bShowDetails)
+                         local  struct MemBudgetTracker*[3] pMemTrackers
+                         local  CircularBuffer_t* debugBuffer
+                         local  char[128] sStr
+                         local  int i
+ 1460  003A6368    270  void MemBudgetTracker_RenderOverBudgetItems()
+                         local  float x
+                         local  float y
+                         local  float ydelta
+                         local  int i
+                         local  int j
+                         local  struct MemBudgetTracker* pTracker
+                         local  int32 overBytes
+                         local  char[64] overBy
+                         local  char[64] buf
+                         local  int32 courseGrassMem
+                         local  char[64] courseGrassMemStr
+ 1544  0037B54C     3C  void MemBudgetTracker_SwitchMemoryHudBool()
+ 1553  0037B588     18  void MemBudgetTracker_SetMemoryHudBool(enum MemBudget_HudType hudType)
+ 1559  003A5F6C    3FC  void MemBudgetTracker_RenderMemoryHudWhole()
+                         local  float ydelta
+                         local  float xdelta
+                         local  char[255] buf
+                         local  int32_t counter
+                         local  int j
+                         local  float x
+                         local  float xStart
+                         local  float y
+                         local  int i
+                         local  struct MemBudgetTracker* pTracker
+                         local  int32 remaining
+ 1681  003863E8    104  void MemBudget_Tracker_UpdateWaterMarks(int32 loc, int32 currentHigh, int32 memPool)
+                         inlines  GM_GetCourseName
+ 1687  003864EC    104  void MemBudget_Tracker_UpdateHighMemUsed(int32 loc, int32 currentHigh, int32 memPool)
+                         inlines  GM_GetCourseName
+ 1693  003C8CB8    130  void MemBudgetTracker::PrintWaterMarks(const struct MemBudgetTracker* this, int32 memPool)
+                         local  char[128] sStr
+                         local  int32 numBudgetTypes
+                         local  int iBudget
+ 1710  003A65D8     54  void MemBudgetTracker_RenderMemoryHud()
+ 1736  003C95B0    2C8  void MemBudget_Tracker_PrintFinalSummary()
+                         local  struct MemBudgetTracker*[3] pMemTrackers
+                         local  int i
+                         inlines  GM_GetCourseName

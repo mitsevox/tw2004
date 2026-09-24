@@ -1,0 +1,62 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/texturedxt1i4.cpp
+// compiled in: other_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   19  0041FCAC     EC  void TextureDXT1I4::TextureDXT1I4(const struct TextureDXT1I4* this, const const struct Allocator& allocRef, const const struct HashString& textureName, int32_t width, int32_t height, int32_t mipmaps, void* dxt1TextureData, void* I4TextureData)
+   26  003D32C8     70  void TextureDXT1I4::~TextureDXT1I4(const struct TextureDXT1I4* this)
+   33  00406D74    1B4  void TextureDXT1I4::GetPixelValue(const struct TextureDXT1I4* this, int32_t x, int32_t y, const RawTexture_PixelValue& value, int32_t mipmap)
+                         local  int32_t pixelIndex
+   49  00406F28    168  void TextureDXT1I4::GetNPixels(const struct TextureDXT1I4* this, int32_t startX, int32_t startY, RawTexture_PixelValue* pixels, int32_t mipmap, int32_t numPixels)
+                         local  int32_t pixelIndex
+                         local  int i
+   66  00407090    12C  void TextureDXT1I4::GetNPixels(const struct TextureDXT1I4* this, int32_t pixelIndex, RawTexture_PixelValue* pixels, int32_t numPixels)
+                         local  int i
+   83  00405228    230  void TextureDXT1I4::UnswizzleAlphaData(const struct TextureDXT1I4* this)
+                         local  int totalSize
+                         local  uint8* oldData
+                         local  uint8* pDestImage
+                         local  uint8* pSrcImage
+                         local  int i
+                         local  int i
+                         local  int iHeight
+                         local  int iWidth
+                         local  int iBitsPerPixel
+                         local  int iX
+                         local  int iY
+                         local  int iTileHeight
+                         local  int iTileWidth
+                         local  int iTX
+                         local  int iTY
+                         local  uint8* ptrSrc
+                         local  int iByteSize
+                         inlines  RawTexture::GetHeight, RawTexture::GetNumMipmaps, RawTexture::GetWidth
+  146  003D3428     EC  uint8_t TextureDXT1I4::GetAlpha(const struct TextureDXT1I4* this, int32_t pixelIndex, int32_t mipmap)
+                         local  uint8_t* textureData
+                         local  float alphaPercent
+                         local  uint8_t alpha
+  168  003D3514      8  void* TextureDXT1I4::PrepareTextureForBlend(const struct TextureDXT1I4* this, enum TXRBlendRule_Mode blendMode, float lerpVal, int texNum)
+  173  003D351C      4  void TextureDXT1I4::RestoreTextureFromBlend(const struct TextureDXT1I4* this, enum TXRBlendRule_Mode blendMode, float lerpVal, void* dataStorage)
+  180  003D3520     44  void TextureDXT1I4::TintTexture(const struct TextureDXT1I4* this, struct Tinter* tinter, float* tintParams, struct RawTexture* tintMask)
+  186  0040230C     B8  int32_t TextureDXT1I4::CalculatePixelIndex(const struct TextureDXT1I4* this, int32_t x, int32_t y, int32_t mipmap)
+                         local  int32_t index
+  197  00405458     EC  void* TextureDXT1I4::GetRawTextureData(const struct TextureDXT1I4* this, int32_t mipmap)
+                         local  int32_t width
+                         local  int32_t height
+                         local  uint8_t* data
+                         local  int32_t i
+                         inlines  RawTexture::GetHeight, RawTexture::GetWidth
+  220  00403C58    334  void TextureDXT1I4::CreateI4MapFrom32Bit(const struct TextureDXT1I4* this, struct Texture32b* workspace)
+                         local  uint8* i4ptr
+                         local  RawTexture_PixelValue* srcPixel
+                         local  int32_t mip
+                         local  int width
+                         local  int height
+                         local  int uiSrcY
+                         local  int uiSrcX
+                         local  int uiY
+                         local  int uiX
+                         local  uint32_t ui32A1
+                         local  uint32_t ui32A2
+                         local  float fA1
+                         local  float fA2
+                         inlines  RawTexture::GetHeight, RawTexture::GetWidth

@@ -1,0 +1,44 @@
+map-01 wave 3 (2026-09-24 from 05:38), range 0x80066558-0x80091460. Tried lists for the next lane.
+
+DONE
+- animblender fn_8007260C exact: `if (pB != NULL) { pFirst = pA; if (pA->nType == 0 && pB->nType == 0) {...} }`
+  (pFirst set before the type tests puts the `mr r5,r3` where EA has it).
+- FE_MessageTable fn_8008311C exact: s32 for every local except nChallenge (int), and the opponent's
+  record in a local `pOther = fn_80077A80(...)` before `pRecord->nModelID == pOther->nModelID`.
+
+- GameUICommands fn_80087460 exact, unit LINKED: `PlayerNumber_t nPlayer = PLR_1_e;` (decomp-notes enum
+  rule) + GetEntrantMCPtr's body as a static inline (Tour_EntrantMC) for the add order. Link needed:
+  table slots 162-164 fixed (fn_80089D04, fn_80089D28, fn_800834A8; objdiff masks the relocations),
+  GameUICommands_StrippedFn for 1.0f first in .sdata2, .sbss defined in reverse order.
+- FE_MessageTable fn_80080054 exact: `int nCourseArg = pArgs[0].i;` for the tests and the last call,
+  and the saved round's course read into nCourse before the call.
+- target fn_80069CDC: a greedy decl climb (w3_climb.py) only reaches 99.64 (not kept).
+
+TRIED, NO GAIN
+- ShaderObjectsData fn_80074628 (99.94, eLayout r27 vs r31): eLayout at every decl position, types
+  int/u32/s32/u8; nPos at every position; block-scoped case locals (98.8); eLayout replaced by another
+  local (nPos/nTex/...) all lower.
+- fe_movies fn_80091BDC (99.67, f0/f1 swapped for 0.25 dead store / 0.5): chained =, copies from [0],
+  fGrey local, fAlpha local, 0.5f*0.5f, inline SetRGBA/SetGrey/SetA helpers.
+- GameUICommands fn_80087460 (61.7): EA keeps `li r31,0` across the call and multiplies it (a profile
+  index 0 not folded). Tried int/s32 local = 0, local passed to fn_801197CC too, for/do loops of one
+  (for keeps the li but folds the mul: 81.2), volatile (68), inline ProfileX()/ProfileP(), static const,
+  GC/2.0 (same). An inline copy of GetEntrantMCPtr (`&gpSaveData[n].tour.field.aEntrant[e]`) gets the
+  add order right (69.8) but still folds the 0.
+- uiLoadFile fn_8008EFC0 / fn_8008EFFC (97.7 / 99.3; offset vs value register swapped in the
+  `p[i] += base` fixup): +=, no ppName, operand orders, int/s32 i, uBase local, pName local,
+  *(uptr*)& form, pEntry pointer local, uOffset local, GC/2.0 (same).
+- animblender fn_800736D8 (99.1): every decl order, inline ClearPoseBit helper (both/one loop, 89-98),
+  const param. fn_80072980 (99.46, fDir/fLen f2/f4 swapped): fDir/fLen at every decl position, no fLen
+  local, operand orders, const params (97.0).
+- uiProcessInterface fn_8008F488 (96.25): &apTables[0], (u32) casts, UIFileTables.nCount u32 (header).
+  fn_8008FE88 (99.61, uHash/szName pair regs): uHash/szName at every decl position, no szName, block
+  scoped uHash/nBank.
+- FE_MessageTable fn_8007E204 (99.09): operand orders, 1U, casts, nClub/uBit/nBit locals.
+  fn_80080054 (91.8): if/else chain, SavedRound* local. fn_8007F8A0 (86.1; copy source adds base+index
+  before the 0x438 offset): &aReplay[k], (gpSaveData + i)->, inline accessor, SaveProfile* local.
+- OBFData fn_8006F650 (96.4): float decl orders x fmadds operand order. fn_8006FDD4 (84.6; pList/i
+  registers swapped): int/u32 i, while loop, pChunk local, pL copy, operand order, GC/2.0.
+  const OBFChunkList* gives the right registers (88.2) but hoists the count load.
+- target fn_80067B80 (93.8, unrolled 5-marker init addressing): s32/u32/long i, element pointer,
+  pointer walk, <= 4, counting down, != 5. PlaceBall_UpdateMomentums (99.8): fTicks folded/split.

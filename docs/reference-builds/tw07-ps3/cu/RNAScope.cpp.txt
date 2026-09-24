@@ -1,0 +1,99 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNAScope/RNAScope.cpp
+// compiled in: RNAScope.cpp
+// 28 functions, source order. line | PS3 address | size
+
+    0  008225F8     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+  101  00824578    1D8  void ScopeParmC(const struct ScopeParmC* this, int32_t ID, struct <anon>* pScopeBlock, enum TypeID idType, const char* pStrName, uint32_t uCount)
+                         inlines  RNADebugBreak, RefCountTemplate, String
+  144  00823CAC    1DC  void ~ScopeParmC(const struct ScopeParmC* this)
+                         inlines  RNADebugBreak, operator delete, ~ParmC, ~RefCountTemplate, ~String
+  175  008224E8     64  void CopyExternalValue(const struct ScopeParmC* this)
+  265  00823E88    120  void DeleteAllParms(const struct <anon>* this)
+                         local  struct ScopeParmC* pScopeParm
+                         local  int refCount
+                         inlines  RNADebugBreak, Release
+  283  00822840    13C  void DeleteUnusedParms(const struct <anon>* this)
+                         local  const char[18] __FUNCTION__
+                         local  struct ScopeParmC* pLastScopeParm
+                         local  struct ScopeParmC* pScopeParm
+                         local  struct <anon>* pParm
+                         local  struct ScopeParmC* pUnusedScopeParm
+                         inlines  GetFirstParm, GetNext, RNADebugBreak
+  336  0082254C     3C  struct ScopeParmC* FindParm(const struct <anon>* this, enum TypeID idType, const char* pParmName, uint32_t uCount)
+                         local  struct <anon>* pParm
+  371  00824928    164  struct ScopeParmC* AddParm(const struct <anon>* this, int32_t ID, enum TypeID idType, const char* pParmName, uint32_t uCount)
+                         local  const char[8] __FUNCTION__
+                         local  struct ScopeParmC* pScopeParm
+                         inlines  AddRef, RNADebugBreak, operator new
+  424  008238F0    180  void AutoResize(const struct <anon>* this)
+                         local  struct ScopeParmC* pParm
+                         local  union <anon>* pValue
+                         inlines  GetFirstParm, GetNext, ParmBlockC::WriteValue, RNADebugBreak
+  529  00822B24     D0  struct ScopeParmC* FindParm(const struct ScopeC* this, const char* pBlockName, enum TypeID idType, const char* pParmName, uint32_t uCount)
+                         local  const char[9] __FUNCTION__
+                         local  struct <anon>* pScopeBlock
+                         local  struct <anon>* pParm
+                         inlines  GetScopeParm, RNADebugBreak
+  571  00824B98     CC  struct ScopeParmC* AddParm(const struct ScopeC* this, const char* pBlockName, enum TypeID idType, const char* pParmName, uint32_t uCount)
+                         local  const char[8] __FUNCTION__
+                         local  struct <anon>* pScopeBlock
+                         inlines  RNADebugBreak
+  608  00824A8C    10C  struct ScopeParmC* ResolveParm(const struct ScopeC* this, const char* pBlockName, enum TypeID idType, const char* pParmName, uint32_t uCount)
+                         local  const char[12] __FUNCTION__
+                         local  struct <anon>* pScopeBlock
+                         local  struct ScopeParmC* pScopeParm
+                         inlines  RNADebugBreak
+  648  00822D70    13C  struct <anon>* AddBlock(const struct ScopeC* this, const char* pBlockName)
+                         local  const char[9] __FUNCTION__
+                         local  struct <anon>* pScopeBlock
+                         inlines  RNADebugBreak, operator new
+  685  00822A7C     A8  struct <anon>* FindBlockByName(const const struct <anon>* this, const char* pBlockName)
+                         local  int32_t iBlock
+                         local  struct <anon>* pScopeBlock
+                         inlines  GetBlock
+  721  00823A70    23C  void SetParmBlock(const struct ScopeC* this, struct ParmBlockC* pParmBlock)
+                         local  const char[13] __FUNCTION__
+                         local  const struct <anon>* pParmList
+                         local  struct ScopeParmC* pBoundParm
+                         local  struct <anon>* pParm
+                         local  struct ScopeParmC* pDstParm
+                         local  const union <anon>* pTemp
+                         inlines  GetBoundScopeParm, GetFirstParm, GetNext, GetScopeParm, ParmBlockC::GetParmList, ParmBlockC::ReadValue, RNADebugBreak, SetParmBlock
+  775  00823764    18C  void ResolveExternalValues(const struct ScopeC* this)
+                         local  int32_t iBlock
+                         local  struct <anon>* pScopeBlock
+                         local  bool bNull
+                         local  struct ScopeParmC* pParm
+                         inlines  GetBlock, GetFirstParm, GetNext, Set<RNA::TextureC*>
+  826  0082365C     88  void UnbindAllMappings(const struct ScopeC* this)
+                         inlines  IsListEmpty
+  842  008231A8    154  void LinkMapping(const struct ScopeC* this, enum MappingListE eMappingList, struct MappingC* pMapping)
+                         local  const char[12] __FUNCTION__
+                         inlines  LinkToTail, RNADebugBreak, SetNext, SetPrev
+  850  00822704    13C  void UnlinkMapping(const struct ScopeC* this, enum MappingListE eMappingList, struct MappingC* pMapping)
+                         local  const char[14] __FUNCTION__
+                         inlines  RNADebugBreak, SetNext, SetPrev, Unlink
+  858  00822698     6C  struct MappingC* UnlinkMappingHead(const struct ScopeC* this, enum MappingListE eMappingList)
+                         local  struct MappingC* pMapping
+                         inlines  UnlinkHead
+  890  008236E4     80  void BindMapping(const struct ScopeC* this, struct MappingC* pMapping)
+  935  008235B8     A4  void UnbindMapping(const struct ScopeC* this, struct MappingC* pMapping)
+  985  00823548     70  void UpdateMapping(const struct ScopeC* this, struct MappingC* pMapping)
+ 1029  008232FC    24C  void FlushMappings(const struct ScopeC* this)
+                         local  const char[14] __FUNCTION__
+                         local  struct MappingC* pMapping
+                         local  struct MappingC* pMapping
+                         local  struct MappingC* pMapping
+                         inlines  GetFirstMapping, IsListEmpty, RNADebugBreak
+ 1091  0082297C     90  void DeleteUnusedParms(const struct ScopeC* this)
+                         local  int32_t iBlock
+                         local  struct <anon>* pBlock
+ 1104  00822EAC    2FC  void Print(const const struct <anon>* this)
+                         local  int32_t iBlock
+                         local  struct <anon>* pBlock
+                         local  struct ScopeParmC* pParm
+                         local  int32_t i
+                         local  uint32_t j
+                         inlines  GetBlock, GetElementPtr, GetFirstParm, GetInput, GetNext, GetTypeID, RNADebugBreak
+ 1154  00822678     10  static void _GLOBAL__I__ZN3RNA10ScopeParmC16s_ClassAllocatorE()
+ 1155  00822688     10  static void _GLOBAL__D__ZN3RNA10ScopeParmC16s_ClassAllocatorE()

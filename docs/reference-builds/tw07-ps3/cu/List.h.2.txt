@@ -1,0 +1,16 @@
+// ../ears_common/dev/include/ears_common/List.h
+// compiled in: ChrCntl_Character.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   34    inline-only   const struct TransitionDefinition*& GetItem(const struct ListNode<const EA::CCT::Internal::TransitionDefinition*>* this)
+   36    inline-only   const struct ListNode<const EA::CCT::Internal::TransitionDefinition*>* GetNext(const const struct ListNode<const EA::CCT::Internal::TransitionDefinition*>* this)
+   68    inline-only   struct <anon>& operator++(const struct <anon>* this)
+   70    inline-only   bool operator!=(const struct <anon>* this, const const struct <anon>& iter)
+   85    inline-only   const struct TransitionDefinition*& operator*(const struct <anon>* this)
+  110    inline-only   int List<const EA::CCT::Internal::TransitionDefinition*>::Size(const const struct List<const EA::CCT::Internal::TransitionDefinition*>* this)
+  113    inline-only   struct Iterator List<const EA::CCT::Internal::TransitionDefinition*>::Begin(const struct List<const EA::CCT::Internal::TransitionDefinition*>* this)
+  116    inline-only   struct ConstIterator List<const EA::CCT::Internal::TransitionDefinition*>::End(const const struct List<const EA::CCT::Internal::TransitionDefinition*>* this)
+  217    inline-only   struct Iterator List<const EA::CCT::Internal::TransitionDefinition*>::Erase(const struct List<const EA::CCT::Internal::TransitionDefinition*>* this, const struct Iterator& iter)
+                         local  struct ListNode<const EA::CCT::Internal::TransitionDefinition*>* pNode
+  357    inline-only   void List<const EA::CCT::Internal::TransitionDefinition*>::Append(const struct List<const EA::CCT::Internal::TransitionDefinition*>* this, const const const struct TransitionDefinition*& item)
+                         local  struct ListNode<const EA::CCT::Internal::TransitionDefinition*>* pNewNode

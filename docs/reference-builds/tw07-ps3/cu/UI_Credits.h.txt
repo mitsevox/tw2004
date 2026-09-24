@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_Credits.h
+// compiled in: apt_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   21  0011CC24    160  void UICredits::~UICredits(const struct UICredits* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UICredits::DstMenuItem_cred>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+   23  001000B4      C  uint32 UICredits::GetSignature(const const struct UICredits* this)
+   28  001000C0     44  void UICredits::ShowHelpText(const struct UICredits* this)
+   31  00100104      4  void UICredits::RegainFocus(const struct UICredits* this, uint32 )
+   32  00100108      4  void UICredits::LooseFocus(const struct UICredits* this, uint32 )
+   34  00100114      C  struct IExternArray* UICredits::GetExternArray(const struct UICredits* this)
+   40  00100B9C     14  void UICredits::NotifyChangePage_func(struct IAptSubscriber* subs)
+   41  0010353C     14  enum AptThreadReturnValue UICredits::TimerUpdateThread_func(struct IAptSubscriberBase* subs)

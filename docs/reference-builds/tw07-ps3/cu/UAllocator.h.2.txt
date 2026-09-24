@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/Headers/UAllocator.h
+// compiled in: Legacy_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   24  0037A3B0     14  void Allocator::Allocator(const struct Allocator* this, MemBudgetTypeE budget, enum eMemoryPools pool, TTypeAcces type, int32 align)
+   25  0037A3D8     24  void Allocator::Allocator(const struct Allocator* this, const const struct Allocator& alloc)
+   26  0037A420      C  void Allocator::Allocator(const struct Allocator* this)
+   36    inline-only   MemBudgetTypeE Allocator::GetBudgetType(const struct Allocator* this)
+   45    inline-only   enum eMemoryPools Allocator::GetMemPool(const struct Allocator* this)
+   57    inline-only   void Allocator::SetCurrentAllocator(const const struct Allocator& allocRef)
+   59    inline-only   void Allocator::InvalidateCurrentAllocator()
+   65    inline-only   const struct Allocator& Allocator::GetTempAllocator(MemBudgetTypeE eBudget, enum eMemoryPools pool, TTypeAcces type, int32 align)

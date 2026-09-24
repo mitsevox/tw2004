@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/Headers/UI_WeatherInfo.h
+// compiled in: apt_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   21  00101098      C  uint32 UIWeatherInfo::GetSignature(const const struct UIWeatherInfo* this)

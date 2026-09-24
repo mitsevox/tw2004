@@ -1,0 +1,8 @@
+// C:/packages/rwmovie/1.04.01/source/movielib/movieplayer/cmn/movietimer.h
+// compiled in: movietimer.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   54  006F9BAC    13C  void MovieTimer(const struct MovieTimer* this, struct IResourceAllocator* allocator)
+                         inlines  Allocate, BaseResources, Resource, ResourceDescriptor, ~ResourceDescriptor
+   55  006F9960     C0  void ~MovieTimer(const struct MovieTimer* this)
+                         inlines  Free

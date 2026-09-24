@@ -1,0 +1,144 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/clutgenopaqfuplus.cpp
+// compiled in: other_unity.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   57  0043B688    1AC  void ClutGenOpaqFuPlus::GenerateClut(const struct ClutGenOpaqFuPlus* this, const struct Texture32b& srcTexture, const struct Texture8P& destTexture, bool oneBitAlpha)
+                         local  const char[13] __FUNCTION__
+                         local  TI_STimeValue sEndTime
+                         local  TI_STimeValue sStartTime
+                         local  float executionTime
+                         inlines  TI_fConvertTimeDifToSeconds, TagValuePair, operator+
+   88  00413B94    1AC  void ClutGenOpaqFuPlus::GenerateClut(const struct ClutGenOpaqFuPlus* this, const struct Texture32b& srcTexture, const struct Texture4P& destTexture, bool oneBitAlpha)
+                         local  const char[13] __FUNCTION__
+                         local  TI_STimeValue sEndTime
+                         local  TI_STimeValue sStartTime
+                         local  float executionTime
+                         inlines  TI_fConvertTimeDifToSeconds, TagValuePair, operator+
+  192    inline-only   static void Hist3d(struct WU_ClutGenOpaqFuPlus* wu, int* vwt, int* vmr, int* vmg, int* vmb, float* m2)
+                         local  int i
+                         local  int y
+                         local  int[256] table
+                         local  int memsize
+                         local  const RawTexture_PixelValue* pixel
+                         local  int x
+                         local  int r
+                         local  int g
+                         local  int b
+                         local  int inr
+                         local  int ing
+                         local  int inb
+                         local  int ind
+  246    inline-only   static void M3d_clutGenOpaqFuPlus(int* vwt, int* vmr, int* vmg, int* vmb, float* m2)
+                         local  unsigned int ind1
+                         local  unsigned int ind2
+                         local  unsigned char i
+                         local  unsigned char r
+                         local  unsigned char g
+                         local  unsigned char b
+                         local  int line
+                         local  int line_r
+                         local  int line_g
+                         local  int line_b
+                         local  int[33] area
+                         local  int[33] area_r
+                         local  int[33] area_g
+                         local  int[33] area_b
+                         local  float line2
+                         local  float[33] area2
+  288  003CF440    114  static int Vol(struct WUBOX_ClutGenOpaqFuPlus* cube, int[33][33][33]* mmt)
+                         local  int sum
+  310  003CF554    218  static int Bottom(struct WUBOX_ClutGenOpaqFuPlus* cube, unsigned char dir, int[33][33][33]* mmt)
+  338  003CF76C    228  static int Top(struct WUBOX_ClutGenOpaqFuPlus* cube, unsigned char dir, int pos, int[33][33][33]* mmt)
+  366  003CF994    2B4  static float Var(struct WU_ClutGenOpaqFuPlus* wu, struct WUBOX_ClutGenOpaqFuPlus* cube)
+                         local  float dr
+                         local  float dg
+                         local  float db
+                         local  float xx
+  394  003CFC48    400  static float Maximize(struct WU_ClutGenOpaqFuPlus* wu, struct WUBOX_ClutGenOpaqFuPlus* cube, unsigned char dir, int first, int last, int* cut, int whole_r, int whole_g, int whole_b, int whole_w)
+                         local  int half_r
+                         local  int half_g
+                         local  int half_b
+                         local  int half_w
+                         local  int base_r
+                         local  int base_g
+                         local  int base_b
+                         local  int base_w
+                         local  int i
+                         local  float temp
+                         local  float max
+  441    inline-only   static int Cut(struct WU_ClutGenOpaqFuPlus* wu, struct WUBOX_ClutGenOpaqFuPlus* set1, struct WUBOX_ClutGenOpaqFuPlus* set2)
+                         local  unsigned char dir
+                         local  int cutr
+                         local  int cutg
+                         local  int cutb
+                         local  float maxr
+                         local  float maxg
+                         local  float maxb
+                         local  int whole_r
+                         local  int whole_g
+                         local  int whole_b
+                         local  int whole_w
+  498    inline-only   static void Mark(struct WUBOX_ClutGenOpaqFuPlus* cube, int label, unsigned char* table)
+                         local  int r
+                         local  int g
+                         local  int b
+                         local  int tableEntry
+  511  00400A18    378  static struct WU_ClutGenOpaqFuPlus* AllocWuData_ClutGenOpaqFuPlus(const const struct Allocator& allocRef)
+                         local  const char[30] __FUNCTION__
+                         local  struct Allocator tempAllocator
+                         local  int memsize
+                         local  struct WU_ClutGenOpaqFuPlus* wu
+                         inlines  TagValuePair, operator+
+  549  003FFED4    B44  static void GenerateTable(const const struct Allocator& allocRef, struct WU_ClutGenOpaqFuPlus* wu, RawTexture_PixelValue* colourTable, int numcolours, int* returncolours, unsigned char* inverseTable)
+                         local  const char[14] __FUNCTION__
+                         local  int i
+                         local  int k
+                         local  int next
+                         local  int weight
+                         local  struct WUBOX_ClutGenOpaqFuPlus* cube
+                         local  float* vv
+                         local  float temp
+                         local  int realcolours
+                         local  struct Allocator tempAllocator
+                         inlines  Cut, M3d_clutGenOpaqFuPlus, Mark, TagValuePair, operator+
+  654  0043B18C    4FC  void ClutGenOpaqFuPlus::GenerateClutOpaqueFUPlus(const struct ClutGenOpaqFuPlus* this, const struct Texture32b& srcTexture, const struct Texture8P& destTexture, bool oneBitAlpha)
+                         local  const char[25] __FUNCTION__
+                         local  struct WU_ClutGenOpaqFuPlus* wu
+                         local  RawTexture_PixelValue* colourTable
+                         local  int32 iClutEntry
+                         local  RawTexture_PixelValue val
+                         inlines  Hist3d, TagValuePair, operator+
+  709  00403378    1C8  void ClutGenOpaqFuPlus::RemapTexture(const struct ClutGenOpaqFuPlus* this, const struct Texture32b& srcTexture, const struct Texture8P& destTexture, bool oneBitAlpha)
+                         local  RawTexture_PixelValue* srcPixels
+                         local  uint8* destPixels
+                         local  int mipmap
+                         local  int width
+                         local  int height
+                         local  int h
+                         local  int w
+                         local  int r
+                         local  int g
+                         local  int b
+                         local  int tableEntry
+                         inlines  RawTexture::GetHeight, RawTexture::GetWidth
+  747  00401978    528  void ClutGenOpaqFuPlus::GenerateClutOpaqueFUPlus(const struct ClutGenOpaqFuPlus* this, const struct Texture32b& srcTexture, const struct Texture4P& destTexture, bool oneBitAlpha)
+                         local  const char[25] __FUNCTION__
+                         local  struct WU_ClutGenOpaqFuPlus* wu
+                         local  RawTexture_PixelValue* colourTable
+                         local  int32 iClutEntry
+                         local  RawTexture_PixelValue val
+                         inlines  Hist3d, TagValuePair, operator+
+  800  00403540    228  void ClutGenOpaqFuPlus::RemapTexture(const struct ClutGenOpaqFuPlus* this, const struct Texture32b& srcTexture, const struct Texture4P& destTexture, bool oneBitAlpha)
+                         local  RawTexture_PixelValue* srcPixels
+                         local  uint8* destPixels
+                         local  int mipmap
+                         local  int width
+                         local  int height
+                         local  int h
+                         local  int w
+                         local  int r
+                         local  int g
+                         local  int b
+                         local  int tableEntry
+                         local  uint8 pixel
+                         inlines  RawTexture::GetHeight, RawTexture::GetWidth

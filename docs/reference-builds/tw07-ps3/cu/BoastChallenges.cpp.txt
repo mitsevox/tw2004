@@ -1,0 +1,88 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/GameMode/BoastChallenges.cpp
+// compiled in: golf_unity.cpp
+// 36 functions, source order. line | PS3 address | size
+
+   96  001F5530     78  struct BoastChallenge& BoastChallengeMgr()
+                         inlines  Singleton<BoastChallenge>::GetSingleton
+  103  001F56E0      4  void BoastChallenge::InitModule(const struct BoastChallenge* this)
+  110  001F56E4      8  enum BoastChallengeTypes_e BoastChallenge::GetChallenge(const struct BoastChallenge* this)
+  118  001F562C     B4  void BoastChallenge::ResetChallenge(const struct BoastChallenge* this)
+                         local  int i
+                         local  int bitflag
+  151  001F5720    184  void BoastChallenge::SetChallenge(const struct BoastChallenge* this, enum BoastChallengeTypes_e type, bool8_t inEraMode, uint8_t plrbitmask)
+                         local  int i
+  245  001F58E8    108  void BoastChallenge::SetProChallenge(const struct BoastChallenge* this, enum eProChallenge_t eChallengeType, bool8_t inEraMode, uint8_t plrbitmask)
+                         local  enum BoastChallengeTypes_e eBoastType
+  276  001F58AC     3C  void BoastChallenge::SetProChallengeUnavailableClubs(const struct BoastChallenge* this, enum eProChallenge_t eChallengeType)
+                         local  int32_t iClubOffMask
+  316  001F56EC     34  bool BoastChallenge::ChallengeAffectsAI(const struct BoastChallenge* this, enum BoastChallengeTypes_e type)
+  337  0027BCE8    28C  void BoastChallenge::SetupChallengeParams(const struct BoastChallenge* this)
+                         local  int i
+                         local  int j
+                         local  int userID
+                         local  const struct UserInfo& userInfo
+                         local  int32 totalAvailClubs
+                         local  struct GameModeBase* mode
+                         local  int32 clubOffMask
+                         inlines  UserInfo::GetDevPoints
+  408  002D7010    27C  void BoastChallenge::EndChallenge(const struct BoastChallenge* this, enum PlayerNumber_t playerID, char** msg1, char** msg2, char** msg3, char** msg4, char** msg5)
+                         local  char* sLocaleStr
+                         local  int i
+                         local  int nummsg
+                         local  char[255] resultStr
+  474  00249F88    17C  void BoastChallenge::LostChallenge(const struct BoastChallenge* this, enum PlayerNumber_t playerID, char** msg1, char** msg2, char** msg3, char** msg4, char** msg5)
+                         local  int i
+                         local  char* sLocaleStr
+                         local  int userID
+                         local  const struct UserInfo& userInfo
+                         inlines  UserInfo::SetNumEquipmentTokens
+  513  002D6E04    20C  void BoastChallenge::WonChallenge(const struct BoastChallenge* this, enum PlayerNumber_t playerID, char** msg1, char** msg2, char** msg3, char** msg4, char** msg5)
+                         local  int i
+                         local  int eventID
+                         local  int boastrewndx
+                         local  char* sLocaleStr
+                         local  struct GameModeDriver* gameModeDriver
+                         local  const struct Era_MainData_t* pMainData
+  572  002D6970    494  void BoastChallenge::Reward(const struct BoastChallenge* this, enum PlayerNumber_t playerID, enum BoastRewardTypes_e rewtype, int16 rewval)
+                         local  char[255] tmpstr
+                         local  int userID
+                         local  const struct UserInfo& userInfo
+                         local  int i
+                         local  int points
+                         local  int scaledpoints
+                         local  int delta
+                         local  int scale
+                         local  enum STAT_e statndx
+                         local  char* sLocaleStr
+                         local  struct CourseMoneyTracking_t courseMoneyTracking
+                         inlines  GamePlayer::GetGolferBonus, UserInfo::GetDevPoints, UserInfo::SetDevPoints
+  680  001F5A04     B4  void BoastChallenge::AddTextToRewBuf(const struct BoastChallenge* this, char* str, bool bTerminate)
+                         local  int len
+  697  001F5BD8     1C  void BoastChallenge::SetAvailableClubs(const struct BoastChallenge* this, int32 clubAvailable)
+  711  001F58A4      8  void BoastChallenge::SetUnAvailableClubMask(const struct BoastChallenge* this, int32 clubUnAvailable)
+  718  001F5BF4     14  void BoastChallenge::SetAvailableShotTypes(const struct BoastChallenge* this, int32 bitflag)
+  728  001F5C08     10  void BoastChallenge::SetBoastFinished(const struct BoastChallenge* this, enum PlayerNumber_t playerID, bool bFinished)
+  735  001F5C18     3C  void BoastChallenge::SetBoastWon(const struct BoastChallenge* this, enum PlayerNumber_t playerID, bool bWon)
+  753  001F5C54     14  void BoastChallenge::SetShotHandicap(const struct BoastChallenge* this, int32 handicap)
+  763  001F5C68     1C  void BoastChallenge::SetShotLimit(const struct BoastChallenge* this, int32 shotlimit)
+  776  001F5C84     1C  void BoastChallenge::SetStrokeWins(const struct BoastChallenge* this, int32 strokes)
+  786  001F5CA0     10  bool BoastChallenge::IsBoastFinished(const struct BoastChallenge* this, enum PlayerNumber_t playerID)
+  793  001F5CB0     30  bool BoastChallenge::IsBoastWon(const struct BoastChallenge* this, enum PlayerNumber_t playerID)
+  804  001F5CE0      8  bool BoastChallenge::IsBoastInEraMode(const struct BoastChallenge* this)
+  809  0026BBD0     88  bool BoastChallenge::IsLostChallenge(const struct BoastChallenge* this, enum PlayerNumber_t playerID)
+  817  001F481C     30  bool BoastChallenge::IsChallenge(const struct BoastChallenge* this, enum PlayerNumber_t playerID, enum BoastChallengeTypes_e type)
+  830  001F4F68     C8  bool BoastChallenge::IsClubAvailableForShotType(const struct BoastChallenge* this, enum PlayerNumber_t playerID, enum ShotType_t shotType)
+                         local  int j
+                         local  struct CoreShotInfo_t* shotInfo
+  852  001F5CE8     5C  bool BoastChallenge::IsOptionDisabled(const struct BoastChallenge* this, enum PlayerNumber_t playerID, enum OptionFlags flag)
+  880  001F4F20     48  bool BoastChallenge::IsShotTypeAvailable(const struct BoastChallenge* this, enum PlayerNumber_t playerID, enum ShotType_t type)
+                         local  int32 bitflag
+  898  001F5D44     1C  int BoastChallenge::GetNumTreesHit(const struct BoastChallenge* this, enum PlayerNumber_t playerID)
+  905  001F5D60      8  float BoastChallenge::GetReducedStatScale(const struct BoastChallenge* this)
+  912  001F5D68      C  int BoastChallenge::GetShotLimit(const struct BoastChallenge* this)
+  920  001F5D74      C  int32 BoastChallenge::GetStrokeWins(const struct BoastChallenge* this)
+  927  001F59F0      C  int32 BoastChallenge::GetUnavailableClubMask(const struct BoastChallenge* this)
+  934  003175AC    1C0  void BoastChallenge::HitTree(const struct BoastChallenge* this, enum PlayerNumber_t playerID)
+                         local  enum GM_ScoringType_t scoreType
+                         local  int32 score
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_SetPlayerHoleStrokes

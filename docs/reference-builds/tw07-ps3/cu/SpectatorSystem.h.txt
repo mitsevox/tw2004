@@ -1,0 +1,15 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Spectator/SpectatorSystem.h
+// compiled in: golf2_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+  145    inline-only   struct CPovVector3& CSpectatorSystem::GetViewPos(const struct CSpectatorSystem* this, bool bPip)
+  146    inline-only   struct CPovMatrix4x4& CSpectatorSystem::GetViewMatrix(const struct CSpectatorSystem* this, bool bPip)
+  147    inline-only   struct CPovMatrix4x4& CSpectatorSystem::GetViewProjMatrix(const struct CSpectatorSystem* this, bool bPip)
+  148    inline-only   struct CPovFrustum& CSpectatorSystem::GetViewFrustum(const struct CSpectatorSystem* this, bool bPip)
+  168    inline-only   CSpectatorCloneGroupList& CSpectatorSystem::GetCloneGroupList(const struct CSpectatorSystem* this)
+  170    inline-only   int32 CSpectatorSystem::GetRenderBufferNum(const struct CSpectatorSystem* this)
+  171    inline-only   int32 CSpectatorSystem::GetUpdateBufferNum(const struct CSpectatorSystem* this)
+  173    inline-only   float CSpectatorSystem::GetDeltaTime(const struct CSpectatorSystem* this)
+  205    inline-only   bool CSpectatorSystem::IsPipCurrent(const const struct CSpectatorSystem* this)
+  206    inline-only   struct CSpectatorPoseOverride* CSpectatorSystem::GetPoseOverride(const struct CSpectatorSystem* this)
+  207    inline-only   struct CSpectatorCollision* CSpectatorSystem::GetCollision(const struct CSpectatorSystem* this)

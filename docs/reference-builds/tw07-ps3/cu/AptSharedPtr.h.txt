@@ -1,0 +1,17 @@
+// ../../../../../TIGERCODE/Code/AptInterface/AptPackage/AptSharedPtr.h
+// compiled in: other_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   45    inline-only   void* AptSharedPtr<AptFile>::operator new [](size_t size)
+   45    inline-only   void AptSharedPtr<AptFile>::operator delete [](void* p)
+   67    inline-only   struct AptSharedPtr<AptFile>& AptSharedPtr<AptFile>::operator=(const struct AptSharedPtr<AptFile>* this, const const struct AptSharedPtr<AptFile>& r)
+   87    inline-only   struct AptFile* AptSharedPtr<AptFile>::operator->(const const struct AptSharedPtr<AptFile>* this)
+   87    inline-only   struct AptLinkerThingy* AptSharedPtr<AptLinkerThingy>::operator->(const const struct AptSharedPtr<AptLinkerThingy>* this)
+   88    inline-only   struct AptFile* AptSharedPtr<AptFile>::Get(const const struct AptSharedPtr<AptFile>* this)
+   90    inline-only   bool AptSharedPtr<AptFile>::operator bool(const const struct AptSharedPtr<AptFile>* this)
+   91    inline-only   bool AptSharedPtr<AptFile>::operator!(const const struct AptSharedPtr<AptFile>* this)
+  100    inline-only   void AptSharedPtr<AptFile>::Dispose(const struct AptSharedPtr<AptFile>* this)
+  100    inline-only   void AptSharedPtr<AptLinkerThingy>::Dispose(const struct AptSharedPtr<AptLinkerThingy>* this)
+  116    inline-only   bool operator==<AptFile, AptFile>(const const struct AptSharedPtr<AptFile>& a, const const struct AptSharedPtr<AptFile>& b)
+  119    inline-only   bool operator==<AptFile>(const const struct AptSharedPtr<AptFile>& a, const int b)
+  125    inline-only   bool operator!=<AptFile>(const const struct AptSharedPtr<AptFile>& a, const int b)

@@ -1,0 +1,31 @@
+// C:/packages/rwaudiocore/2.08.01/source/plugins/submix.cpp
+// compiled in: submix.cpp
+// 10 functions, source order. line | PS3 address | size
+
+    0  006DA980     28  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  ListDStack
+    0  006DADB4     2C  void ~SubMix(const struct SubMix* this)
+                         inlines  ~PlugIn
+   91  006DA978      8  struct <anon>* GetPlugInDescRunTime()
+   97  006DA9B8     28  struct SubMix* EnumerateSubMix()
+                         local  struct SubMix* pSubMix
+  112  006DAC0C    1A0  bool CreateInstance(struct PlugIn* pPlugIn, void* pConstructorParams)
+                         local  struct SubMix* pThis
+                         local  unsigned int SUBMIXBUFFERSIZE
+                         local  int maxChannelsOut
+                         local  struct ConstructorParams* pSubMixConstructorParams
+                         local  int i
+                         inlines  Assert, GetSystem, Initialize<rw::audio::core::SubMix>, SetHandler, core::MemSet
+  209  006DAAF4     44  int CreateInstanceHandler(struct <anon>* pCom)
+                         local  struct SubMix* pThis
+                         inlines  Push, SetPrev
+  223  006DAB38     D4  void ReleaseEvent(const struct SubMix* this)
+                         local  struct <anon>* ptempnode
+                         local  struct <anon>* ptempnode
+                         inlines  GetHead, GetNext, GetPrev, Remove, SetNext, SetPrev
+  298  006DAAB0     44  void Connect(const struct <anon>* this, struct Voice* pVoice, struct SubMix* pSubMix)
+                         inlines  Push, SetNext, SetPrev
+  313  006DA9E0     D0  void Disconnect(const struct <anon>* this, float* pDeClickValue)
+                         local  int i
+                         inlines  Remove
+  342  006DA9A8     10  static void _GLOBAL__I__ZN2rw5audio4core6SubMix7sSpuElfE()

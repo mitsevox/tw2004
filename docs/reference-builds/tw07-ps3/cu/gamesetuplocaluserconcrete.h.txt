@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/././././gamesetuplocaluserconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   68  006231E0     4C  void ~GameSetupLocalUserConcrete(const struct GameSetupLocalUserConcrete* this)
+                         inlines  ~RCPointer
+   70    inline-only   enum Presence GetNewPresenceState(const const struct <anon>* this)
+   72    inline-only   bool WishesToGoToReadyState(const const struct <anon>* this)
+   74    inline-only   bool ShouldPeersRTPStateBeReset(const const struct <anon>* this)
+   76    inline-only   void ResetShouldPeersRTPStateBeReset(const struct GameSetupLocalUserConcrete* this)

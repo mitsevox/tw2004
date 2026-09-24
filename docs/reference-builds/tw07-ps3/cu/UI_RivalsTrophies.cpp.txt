@@ -1,0 +1,24 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_RivalsTrophies.cpp
+// compiled in: apt_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   55  000F8BCC     F0  void UITrophyList::UITrophyList(const struct UITrophyList* this)
+                         inlines  TArrayInternal<UITrophyList::UITrophyItem,AptStructSwapper>::TArrayInternal, TExternArray<UITrophyList::UITrophyItem>::TExternArray, UIMenuVertBase::UIMenuVertBase
+  107  000F1214     70  void UITrophyList::Init(const struct UITrophyList* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init
+  117  0004A0A0    10C  void UITrophyList::Show(const struct UITrophyList* this)
+  150  0005D598     9C  void UITrophyList::InitMenuParams(const struct UITrophyList* this)
+                         inlines  UIMenuVertBase::SetNumVisibleVertRows
+  165  0004A1AC     68  bool UITrophyList::HasWonPar5Trophy(const struct UITrophyList* this, int index)
+                         local  bool retVal
+                         local  Course_t course
+  187  0005DB48    42C  void UITrophyList::UpdateItemAndLabel(const struct UITrophyList* this, struct UIMenuItemBaseDst* dstItem, struct UIMenuItemBaseSrc* srcItem, int32 index, char* inLabel)
+                         local  struct UITrophyItem* itemToUpdate
+                         local  int iCareerMoneySkip
+                         local  enum TrophyBall_t tigerId
+                         local  uint32_t remap
+  474  000806B0     E0  void UITrophyList::RefreshUITrophyMenu(const struct UITrophyList* this)
+  500  0004A214    178  void UITrophyList::DisplayTrophyIcon(const struct UITrophyList* this)
+                         local  uint32 index
+  779  0004A38C     E8  void UITrophyList::RefreshHeader(const struct UITrophyList* this)
+  812  0008308C    290  enum eAptHandleInput UITrophyList::HandleInput(const struct UITrophyList* this, int32 cID)

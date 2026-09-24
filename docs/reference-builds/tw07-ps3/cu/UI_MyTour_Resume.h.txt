@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_MyTour_Resume.h
+// compiled in: apt_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   26  001001D8     44  void UIMyTour_Resume::ShowHelpText(const struct UIMyTour_Resume* this)
+   27  0010021C     24  void UIMyTour_Resume::LooseFocus(const struct UIMyTour_Resume* this, uint32 )
+   28  00100240     24  void UIMyTour_Resume::RegainFocus(const struct UIMyTour_Resume* this, uint32 )
+   31  0010026C      C  uint32 UIMyTour_Resume::GetSignature(const const struct UIMyTour_Resume* this)
+   63  0011572C     1C  enum AptThreadReturnValue UIMyTour_Resume::UpdateResumeThread_func(struct IAptSubscriberBase* subs)

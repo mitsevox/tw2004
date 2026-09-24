@@ -1,0 +1,6 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sattrdef.cpp
+// compiled in: sattrdef.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   23  006DBE30     94  int SND_attrsetdef(SNDSAMPLEATTR* pssa)
+                         local  int i

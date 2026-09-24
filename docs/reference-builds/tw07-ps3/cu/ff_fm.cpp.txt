@@ -1,0 +1,124 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptFF/core/fontmanager/ff_fm.cpp
+// compiled in: other_unity.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   75  00418DE8    4D4  void FF_FM_RenderGlyph(struct FF_FM_Class* pFM, uint16_t fontCode, struct T2K** pScaler, int32_t charCode, int8_t xFracPenDelta, int8_t yFracPenDelta, uint8_t greyScaleLevel, uint16_t cmd, int* pErrCode)
+                         local  int errCode
+                         local  uint32_t hashIndex
+                         local  int8_t done
+                         local  int8_t defaultChar
+                         local  uint16_t scalerIndex
+                         local  uint16_t gIndex
+                         local  int32_t numGlyphs
+                         local  int32_t totGlyphs
+                         local  int32_t oldTotGlyphs
+                         local  int32_t aCode
+  211  0041BA38    514  struct T2K* FF_FM_SelectFont(struct FF_FM_Class* pFM, uint16_t fontCode, int* errCode)
+                         local  uint32_t hashIndex
+                         local  int err
+                         local  uint16_t logFontIndex
+                         local  uint16_t physFontIndex
+                         local  struct InputStream* in1
+                         local  struct InputStream* in2
+                         local  int16_t fontType
+                         local  int16_t nScalersNeeded
+                         local  uint16_t firstCharCode
+                         local  uint16_t lastCharCode
+                         local  struct T2K_TRANS_MATRIX trans
+                         local  struct T2K_AlgStyleDescriptor* stylePtr
+                         local  uint16_t streamIndex
+                         local  uint16_t subIndex
+                         local  size_t subScalerSize
+                         local  size_t subFontSize
+                         local  size_t subMemSize
+                         local  int scalerIndex
+  360  003F5998     5C  void FF_FM_DeleteFont(struct FF_FM_Class* pFM, uint16_t fontCode, int* errCode)
+                         local  uint32_t hashIndex
+  420  003F01C4    188  uint16_t FF_FM_CreateFont(struct FF_FM_Class* pFM, uint16_t index, int8_t* flushCache, struct T2K_TRANS_MATRIX* trans, struct T2K_AlgStyleDescriptor* styling, int* errCode)
+                         local  uint32_t hashIndex
+                         local  int err
+                         local  uint16_t newFontCode
+                         local  int8_t done
+  495  0041AFDC    940  void FF_FM_AddTypefaceStream(struct FF_FM_Class* p, struct InputStream* InputStreamA, struct InputStream* InputStreamB, int* pErrCode)
+                         local  int errCode
+                         local  size_t size
+                         local  int8_t* src
+                         local  int8_t* dst
+                         local  uint16_t* src16
+                         local  uint16_t* dst16
+                         local  const int dstLength
+                         local  unsigned int ii
+                         local  int8_t found
+                         local  uint32_t ii
+                         local  uint32_t jj
+                         local  uint32_t fragIndex
+                         local  uint32_t nFragments
+                         local  int8_t* s1
+                         local  int8_t* s2
+                         local  uint16_t* s1_16
+                         local  uint16_t* s2_16
+                         local  int8_t bit8Comp
+                         local  int8_t bit16Comp
+                         local  int8_t bit8to16Comp
+                         local  int8_t bit16to8Comp
+                         local  uint16_t[64] TmpFontName16
+                         local  int kk
+                         inlines  AddPhysicalFont, AddToLogicalFontList, AddToPhysicalAndLogicalFontLists
+  554  003F0888    100  struct FF_FM_Class* FF_FM_New(int* pErrCode)
+                         local  struct FF_FM_Class* p
+                         local  int ii
+  601  003F58A8     F0  void FF_FM_Delete(struct FF_FM_Class* pFM, int* errCode)
+                         inlines  RemoveLogFontsFM, RemovePhysFontsFM, RemoveStreamsFM
+  622  003F01B0      4  static void ff_fm_EmergencyShutDown(struct FF_FM_Class* pFM)
+  649  003F0988      4  void FF_FM_EnumTypefaces(struct FF_FM_Class* pFM, int16_t(*)()* enumTypefaceCallBack)
+  678    inline-only   static void RemoveStreamsFM(struct FF_FM_Class* p)
+  688    inline-only   static void RemovePhysFontsFM(struct FF_FM_Class* p)
+  698    inline-only   static void RemoveLogFontsFM(struct FF_FM_Class* p)
+                         local  int ii
+  717    inline-only   static int AddToPhysicalAndLogicalFontLists(struct FF_FM_Class* pFM, uint32_t streamIndex)
+                         local  int errCode
+  734    inline-only   static int AddPhysicalFont(struct FF_FM_Class* pFM, struct T2K* scaler, uint32_t streamIndex, uint32_t subIndex)
+                         local  int errCode
+                         local  size_t size
+                         local  int8_t* src
+                         local  int8_t* dst
+                         local  uint16_t* src16
+                         local  uint16_t* dst16
+                         local  const int dstLength
+                         local  unsigned int ii
+  818  003F098C      8  static int str16cmp(uint16_t* s1_16, uint16_t* s2_16)
+  842    inline-only   static int AddToLogicalFontList(struct FF_FM_Class* pFM, uint32_t physicalFontIndex)
+                         local  int errCode
+                         local  size_t listSize
+                         local  size_t fragmentListSize
+                         local  uint32_t foundIndex
+                         local  int8_t found
+                         local  uint32_t ii
+                         local  uint32_t jj
+                         local  uint32_t fragIndex
+                         local  uint32_t nFragments
+                         local  int8_t* s1
+                         local  int8_t* s2
+                         local  uint16_t* s1_16
+                         local  uint16_t* s2_16
+                         local  int8_t bit8Comp
+                         local  int8_t bit16Comp
+                         local  int8_t bit8to16Comp
+                         local  int8_t bit16to8Comp
+                         local  uint16_t[64] TmpFontName16
+                         local  int kk
+  993    inline-only   static int AddToPhysicalFontList(struct FF_FM_Class* pFM, uint32_t streamIndex)
+                         local  int errCode
+                         local  int ii
+                         local  int subIndex
+                         local  int nSubFonts
+                         local  int16_t fontType
+                         local  struct InputStream* in
+                         local  struct InputStream* in2
+                         local  struct sfntClass* font
+                         local  struct T2K* localScaler
+                         local  struct tsiMemObject* mem
+                         local  int8_t done
+ 1067  003F5734    174  static void DoKillScalers(struct FF_FM_Class* pFM, int* errCode)
+                         local  uint32_t hashIndex
+                         local  int32_t scalerIndex

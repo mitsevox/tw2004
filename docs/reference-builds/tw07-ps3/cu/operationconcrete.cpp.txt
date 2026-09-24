@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/operationconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   70  005BC868     5C  void OperationConcrete(const struct OperationConcrete* this, uint32_t uExpiration, struct OperationStrategy* pStrategy)
+   97  005BC920      C  void ~OperationConcrete(const struct OperationConcrete* this)
+  119  005E2BA0     94  void Cancel(const struct OperationConcrete* this)
+  152  005BC970      4  void OperationTimeout(const struct OperationStrategy* this, const struct Operation* pOperation)

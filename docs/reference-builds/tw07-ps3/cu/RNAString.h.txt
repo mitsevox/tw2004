@@ -1,0 +1,11 @@
+// ../../../../../TIGERCODE/packages/RNA/dev-2.0-golf/RNA/RNACore/include/RNABase/RNAString.h
+// compiled in: rnaunity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   76    inline-only   void Clear(const struct <anon>* this)
+   87    inline-only   struct <anon>& operator=(const struct <anon>* this, const const struct <anon>& s)
+   96    inline-only   struct <anon>& operator=(const struct <anon>* this, const char* cstring)
+  102    inline-only   bool operator==(const const struct <anon>* this, const const struct <anon>& s)
+  121    inline-only   const char* CStr(const const struct <anon>* this)
+  137    inline-only   void Init(const struct <anon>* this)
+  141    inline-only   void Copy(const struct <anon>* this, const char* cstring)

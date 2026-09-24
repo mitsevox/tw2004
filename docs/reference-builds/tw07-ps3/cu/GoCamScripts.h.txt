@@ -1,0 +1,11 @@
+// ../../../../../TIGERCODE/Code/Golf/Cameras/Headers/GoCamScripts.h
+// compiled in: golf2_unity.cpp, golf_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+  234    inline-only   bool CamScript_DoesScriptTrackBall(CameraScript_t* script)
+  247    inline-only   bool CamScript_DoesScriptTrackGolfer(CameraScript_t* script)
+  262    inline-only   void CamScript_SetCurrentCrACEvent(enum StaticCam_EventType_e event, struct CameraScriptSettings_t* settings)
+  282    inline-only   void CamScript_SetFlag(const uint32& flagField, uint32 flag)
+  292    inline-only   void CamScript_ClearFlag(const uint32& flagField, uint32 flag)
+  297    inline-only   bool CamScript_IsFlagSet(uint32 flagField, uint32 flag)
+  307    inline-only   bool CamScript_ShowGolfer(uint8 showGolfer)

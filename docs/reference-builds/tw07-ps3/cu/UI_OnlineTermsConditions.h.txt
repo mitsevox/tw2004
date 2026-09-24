@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_OnlineTermsConditions.h
+// compiled in: apt_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   19  00119848    198  void UIOnlineTermsConditions::~UIOnlineTermsConditions(const struct UIOnlineTermsConditions* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TArrayInternal<char*,AptStructSwapper>::~TArrayInternal, TExternArray<UIOnlineTermsConditions::DstMenuItem_oltc>::~TExternArray, UIMenuVertBase::~UIMenuVertBase, ~TAptArrayStruct
+   21  000FFC84      C  uint32 UIOnlineTermsConditions::GetSignature(const const struct UIOnlineTermsConditions* this)
+   31  000FFC90      4  void UIOnlineTermsConditions::Show(const struct UIOnlineTermsConditions* this)
+   32  000FFC94     44  void UIOnlineTermsConditions::ShowHelpText(const struct UIOnlineTermsConditions* this)
+   38  000FFCE0      C  struct IExternArray* UIOnlineTermsConditions::GetExternArray(const struct UIOnlineTermsConditions* this)

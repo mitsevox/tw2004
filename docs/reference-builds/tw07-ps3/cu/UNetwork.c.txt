@@ -1,0 +1,153 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/specif/UNetwork.c
+// compiled in: Legacy_unity.cpp
+// 26 functions, source order. line | PS3 address | size
+
+   66  0038DE18     80  struct TNetwork* Network_GetNetAtIndex(uint32 i)
+   72  00380674     6C  int32 Network_FindValidConnectingPoint(const struct TNetwork* pNetwork, int32 currentNode)
+                         local  const TNode* pNode
+                         local  int32 i
+   89  0038DCDC    13C  float Network_GetConnectionInfo(const struct TNetwork* pNetwork, int32 node1, int32 node2)
+                         local  vec4flt tempVec
+                         local  float relativeYaw
+                         local  const TNode* pNode1
+                         local  const TNode* pNode2
+                         inlines  LLMath_Subtract3
+  109  003845FC     A0  float Network_FindNearestDistance(const struct TNetwork* pNetwork, const float* thePos)
+                         local  float distance
+                         local  float bestDistance
+                         local  const TNode* pNode
+                         local  int i
+                         inlines  std::sqrt
+  129  003806E0     1C  static void Network_FreeDownloadData(TStreamDataPtr pStreamClass)
+  137  003A9D3C    324  static void Network_DownloadDataPNB(TStreamDataPtr pStreamClass)
+                         local  uint32* pCurData
+                         local  uint32 streamVer
+                         local  uint32 netIndexTableOffset
+                         local  uint32 netTotalNetInStream
+                         local  uint32* netIndexTable
+                         local  uint32 net
+                         local  int32 regIndex
+                         local  struct TNetwork* pCurNetwork
+                         local  int32 i
+                         local  int32 i
+  233  003806FC      8  bool NetworkCallbackTrue(struct TNetwork* pNetwork)
+  238  00380704      8  bool NetworkCallbackFalse(struct TNetwork* pNetwork)
+  243  0038070C      4  void NetworkCallbackNoLoad(struct TNetwork* pNetwork)
+  247  00380710      4  void NetworkCallbackPostNetworkLoadDoNothing()
+  251  0038DAC4    218  bool Network_RegisterLoadNetworkCallback(int32 netType, LoadNetworkCallbackPtr callbackPtr, ShouldLoadNetworkCallbackPtr shouldLoadCallback, PostNetworkLoadCallbackPtr postNetworkLoadCallback)
+                         local  int i
+  301  0038D9C4     4C  void Network_CloseModule()
+  308  00392D40     54  void Network_InitModule()
+  337  003B47F4    2A0  int wn_PnPoly(const float* P, const struct TNetwork* network, int n)
+                         local  int i
+                         local  int wn
+                         local  int node
+                         local  int prevNode
+                         local  int nextNode
+                         local  vec3flt V0
+                         local  vec3flt V1
+                         inlines  Singleton<AIFeatureNetworkMgr>::GetSingleton, vec3flt_Copy
+  412  00380714     EC  bool Network_InfiniteLineIntersection(const float* start1, const float* end1, const float* start2, const float* end2, float* pT1, float* pT2, float* intersect)
+                         local  float n1
+                         local  float n2
+                         local  float x1
+                         local  float x2
+                         local  float x3
+                         local  float x4
+                         local  float z1
+                         local  float z2
+                         local  float z3
+                         local  float z4
+                         local  float denom
+                         local  float numer
+  481  00380800     7C  bool Network_LineIntersection(const float* start1, const float* end1, const float* start2, const float* end2, float* intersect)
+                         local  float n1
+                         local  float n2
+  507  0038087C     64  bool Network_InfLineLineSegIntersection(const float* start1, const float* end1, const float* start2, const float* end2, float* intersect)
+                         local  float n2
+  529  003808E0     70  bool Network_RayIntersection(const float* start1, const float* end1, const float* start2, const float* end2, float* intersect)
+                         local  float n1
+                         local  float n2
+  555  00382B84    1BC  uint32 Network_InfLineNetworkIntersection(const float* start, const float* end, const struct TNetwork* network, float* intersect, const uint32 arraySize)
+                         local  int i
+                         local  int node
+                         local  int prevNode
+                         local  int nextNode
+                         local  vec3flt V0
+                         local  vec3flt V1
+                         local  uint32 numIntersectFound
+                         inlines  Network_GetNextNode, vec3flt_Copy
+  608  0038469C    24C  bool Network_LineNetworkIntersection(const float* start, const float* end, const struct TNetwork* network, int n, float* intersect, int* edgeStart)
+                         local  int i
+                         local  int node
+                         local  int prevNode
+                         local  int nextNode
+                         local  vec3flt V0
+                         local  vec3flt V1
+                         local  vec3flt intersection
+                         local  float minDist
+                         local  float dist
+                         local  bool found
+                         inlines  Network_GetNextNode, std::sqrt, vec3flt_Copy
+  679  00382D40    17C  bool Network_RayNetworkDoesIntersect(const float* start, const float* end, const struct TNetwork* network, int n)
+                         local  int i
+                         local  int node
+                         local  int prevNode
+                         local  int nextNode
+                         local  vec3flt V0
+                         local  vec3flt V1
+                         inlines  Network_GetNextNode, vec3flt_Copy
+  724  00381F8C    244  bool Network_RayNetworkFirstIntersection(const float* start, const float* end, const struct TNetwork* network, int n, float* intersect, int* edgeStart)
+                         local  int i
+                         local  int node
+                         local  int prevNode
+                         local  int nextNode
+                         local  vec3flt V0
+                         local  vec3flt V1
+                         local  float minDist
+                         local  float dist
+                         local  bool found
+                         local  vec3flt intersection
+                         inlines  Network_GetNextNode, std::sqrt, vec3flt_Copy
+  781    inline-only   static void PointToLineSegment(float* p, float* ls0, float* ls1, float* intersect)
+                         local  vec4flt a
+                         local  vec4flt b
+                         local  vec4flt x
+                         local  float dot
+                         local  float len_b_sq
+                         local  float len_x_over_len_b
+  837  003838BC     D8  int16 Network_GetNearestNode(const float* point, const struct TNetwork* network)
+                         local  int16 nearestNode
+                         local  float minDist
+                         local  float dist
+                         local  int16 node
+                         local  int16 node
+                         inlines  LLMath_SquareDistanceBetween3, __vec_len_sqr3, vec_madd, vec_sld
+  861  00383A2C    330  float Network_PointToNetworkSqr(const float* p, const struct TNetwork* network, int n, float* intersect)
+                         local  vec4flt p0
+                         local  vec4flt vN0
+                         local  vec4flt vN1
+                         local  vec4flt currIntersect
+                         local  vec4flt minIntersect
+                         local  const TNode* pN0
+                         local  const TNode* pN1
+                         local  int iNode0
+                         local  int iNode1
+                         local  float currDistSqr
+                         local  float minDistSqr
+                         local  bool firstLoop
+                         inlines  LLMath_Add, LLMath_DotProduct3, LLMath_Scale, LLMath_SquareDistanceBetween3, LLMath_Subtract, PointToLineSegment, __vec_dot3, __vec_len_sqr3, vec4flt_Copy, vec4flt_Zero3, vec_add, vec_madd, vec_sld
+  911  003B7970    214  void Network_DrawNetwork(const struct TNetwork* network)
+                         local  const int kVertBufferSize
+                         local  float[384][4] s_convertedVertBuffer
+                         local  vec4flt color
+                         local  int vertBufferIdx
+                         local  int16 numNodes
+                         local  int16 i
+                         local  const TNode* node
+                         local  int j
+                         local  int16 connectingIdx
+                         local  const TNode* connectingNode
+                         local  float* a
+                         local  float* b
+                         inlines  DS_vSetZTestEnable, PR_vSetCurrentColor, PR_vSetCurrentUsage

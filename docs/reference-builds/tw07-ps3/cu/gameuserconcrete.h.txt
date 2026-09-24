@@ -1,0 +1,19 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/./gameuserconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   58  00623E60      8  const struct Dictionary* GetState(const const struct <anon>* this)
+   67  00623E68      C  int32_t GetIdentity(const const struct <anon>* this)
+   70  00623E74      C  const char8_t* GetName(const const struct <anon>* this)
+   73  00623E80      8  uint32_t GetExternalAddress(const const struct <anon>* this)
+   76  00623E88      8  uint32_t GetInternalAddress(const const struct <anon>* this)
+   79  00623E90      C  const char8_t* GetMachineAddress(const const struct <anon>* this)
+   82  00623E9C      C  int32_t GetPartition(const const struct <anon>* this)
+   85  00623EA8      8  uint32_t GetFlags(const const struct <anon>* this)
+   88  00623EB0      C  const char8_t* GetParams(const const struct <anon>* this)
+   94  00623EBC      8  void SetGameState(const struct <anon>* this, int32_t iState)
+   97  00623EC4      C  int32_t GetGameState(const const struct <anon>* this)
+  100  00623ED0      C  int32_t GetGameId(const const struct <anon>* this)
+  103  00623EDC      8  void SetGameId(const struct <anon>* this, int32_t iGameId)
+  106  00623EE4      8  void* GetGameData(const const struct <anon>* this)
+  109  00623EEC      8  void SetGameData(const struct <anon>* this, void* pGameData)

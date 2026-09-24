@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/locker/source/common/./././lockerextensionconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   88    inline-only   LockerApiRefT* GetLockerApi(const const struct <anon>* this)
+   94    inline-only   uint32_t FindFileType(const const struct <anon>* this, const char8_t* strFileType)

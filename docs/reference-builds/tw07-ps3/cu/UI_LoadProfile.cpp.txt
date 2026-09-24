@@ -1,0 +1,99 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_LoadProfile.cpp
+// compiled in: apt_unity.cpp
+// 47 functions, source order. line | PS3 address | size
+
+   73  00063E9C    19C  void CreateDummyUser()
+                         local  char[32] username
+                         local  time_t rawtime
+                         local  struct <anon>* LocalSysTime
+                         local  int dummyModelID
+                         local  uint32 pad
+                         local  const int32 femaleDummyCharPadMask
+                         inlines  UserInfo::SetValid
+  122  000F4B34     94  void UILoadProfile::UILoadProfile(const struct UILoadProfile* this)
+                         inlines  TArrayInternal<UILoadProfile::UIProfileMenuItem,AptStructSwapper>::TArrayInternal, TExternArray<UILoadProfile::UIProfileMenuItem>::TExternArray
+  135  000B1368     BC  void FinishNewTigerUserFirstSaveCB(int32 nRslt)
+                         inlines  UserInfo::SetValid
+  158  000405CC     48  static void FinishDeleteFilesCB(int32 nRslt)
+  174  000AD9BC     68  void SaveProfile()
+  179  000ADA60     3C  void Prof_TurnOffAutoSaveCB()
+  185  000ADA24     3C  void Prof_TurnOnAutoSaveCB()
+  191  000B3A68      8  void Prof_CancelAutoSaveCB()
+  196  0005F2AC     5C  void AskForAutoSave()
+  201  000B3BD4     44  void Prof_OnSelectDifficulty(int32 index)
+  215  000B3964    104  void Prof_SelectDifficulty(int32 rslt)
+  234  00061174     54  void ShowKeyboardForTigerUser()
+  243  000B97A0     D8  void SaveTigerGFUser()
+                         local  char[256] kbText
+                         inlines  UserInfo::SetLoaded
+  272  00040614     2C  void UnloadTigerGFUser()
+  278  000B1B88     5C  void UILoadProfile_DeleteUserAndStartNewGFCB()
+  288  0005FF34    114  void UILoadProfile_DeleteThisUserCB(int32 rslt)
+                         local  char* buffer
+  315  00060840     F0  void UIloadProfile_StartNewGFCBFromTigerWarningPopup()
+                         local  char[32] tmpPersonaName
+  332  000C4B64     BC  void PostLoadProfileGotoProShop()
+  363  000EF84C     94  void UILoadProfile::Init(const struct UILoadProfile* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList, UIMenuCircBase::SetNbrItemsVisibleInMenu
+  379  000971B8      4  void UILoadProfile::Close(const struct UILoadProfile* this)
+  392  000BB1B0    1F0  void UILoadProfile::ShowLoadProfile(const struct UILoadProfile* this, ProfileOnCloseFuncPtr* inOnCloseFunc, enum PlayerNumber_t playerNumber, bool inResetUserStatus)
+                         local  int32 activeController
+                         local  enum UserNumber defaultUserSlot
+  453  000BAC80    104  void UILoadProfile::ShowManageLoadProfile(const struct UILoadProfile* this, bool inResetUserStatus, ProfileOnCloseFuncPtr* inOnCloseFunc)
+                         local  int32 numOptions
+  486  00060048    10C  void UILoadProfile::UpdateProfileAndGTagStrings(const struct UILoadProfile* this)
+                         local  enum UserNumber defaultUserSlot
+  525  00066864     7C  void UILoadProfile::ShowNewProfilePopup()
+  537  000668E4     9C  void UILoadProfile::ShowTigerInitPopup()
+  549  00040650     1C  void UILoadProfile::TigerInitPopopOnBack()
+  557  00066980     7C  void UILoadProfile::ShowTigerResetPopup()
+  567  000665C8     1C  void UILoadProfile::Hide(const struct UILoadProfile* this)
+                         inlines  AptControllerListener::StopPortLocking
+  586  000BA55C    160  void UILoadProfile::UpdateItemAndLabel(const struct UILoadProfile* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct UIProfileMenuItemConst* src
+                         local  struct UIProfileMenuItem* dest
+                         local  const struct UserInfo& userInfo
+                         inlines  Singleton<UserManager>::GetSingleton
+  621  0006CF34     EC  void UILoadProfile::StartNewGFUserCB()
+                         inlines  UserInfo::SetLoginIndex
+  647  0006D020     E4  void UILoadProfile::StartTigerGFUserCB()
+                         inlines  UserInfo::SetLoginIndex, UserInfo::SetValid
+  671  000BBB60     40  void UILoadProfile::GoToProshopFromCSP(const struct UILoadProfile* this)
+  684  00064E58    230  void DeleteAUser(char* strID, char* finalWarnStrID)
+                         local  int32 numPlayersToErase
+  731  000B19B8    1D0  void UILoadProfile::SelectProfileItemInMenu(const struct UILoadProfile* this, enum eProfileItem id)
+                         local  bool userManagerFull
+                         local  int32 i
+  778  000B18D8     E0  void UILoadProfile::SelectCurrentConfigAndHide(const struct UILoadProfile* this)
+  802  00040570     5C  bool UILoadProfile::DoOnCloseFunc(const struct UILoadProfile* this)
+                         local  bool retVal
+  818  00060828     18  static void UILoadProfile_SetMemCardLoadRslt(int32 nRslt)
+  850  00040794     60  void UILoadProfile::SetMemCardLoadRslt(const struct UILoadProfile* this, int32 nRslt)
+  869  000BAA54    22C  void UILoadProfile::RegainFocus(const struct UILoadProfile* this, uint32 comeFrom_Signature)
+                         local  struct UIProfileMenuItem* pActiveItem
+                         local  const struct UserInfo& userInfo
+                         local  const struct UserInfo& newUserInfo
+                         inlines  Singleton<UserManager>::GetSingleton
+  935  000B1704    1D4  void UILoadProfile::UpdateUserPicture(const struct UILoadProfile* this)
+                         local  struct UIProfileMenuItem* pActiveItem
+                         local  bool bOkDisplay
+                         local  char* label
+                         local  int32 mnuIdx
+                         inlines  ThumbNailManager::GetTexFactory
+  990  000BA7D8    27C  enum eAptHandleInput UILoadProfile::HandleInput(const struct UILoadProfile* this, int32 cID)
+                         local  struct UIProfileMenuItem* pActiveItem
+                         local  const struct UserInfo& userInfo
+                         inlines  Singleton<UserManager>::GetSingleton
+ 1061  000407F4     5C  bool UILoadProfile::UpdateHelpTextAndCheckForKeyboard(const struct UILoadProfile* this)
+                         local  struct UIProfileMenuItem* pActiveItem
+                         local  bool canRenameEgo
+ 1087  00040850     C8  void UILoadProfile::ShowHelpText(const struct UILoadProfile* this)
+ 1120  000BA6BC    11C  enum UserNumber UILoadProfile::NextVisibleUserIndex(const struct UILoadProfile* this)
+                         local  int retVal
+                         inlines  Singleton<UserManager>::GetSingleton
+ 1137  00065088     E8  void UILoadProfile::UpdateUIIndexMap(const struct UILoadProfile* this)
+                         local  int32 i
+                         local  const struct UserInfo& user
+                         local  int32 i
+ 1164  000820C8     C0  void UILoadProfile::ForceRefreshOnScreenInfo(const struct UILoadProfile* this)
+ 1181  00082188      4  void UILoadProfile::CheckGamerTagStates(const struct UILoadProfile* this)

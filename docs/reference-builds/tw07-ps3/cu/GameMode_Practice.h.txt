@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/Headers/GameMode_Practice.h
+// compiled in: golf_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   43  0033EFD0      8  bool GameModePractice::IsCPUPlayerDisabled(const struct GameModePractice* this)
+   45  0033EFD8      8  bool GameModePractice::AllowsMidRoundSave(const struct GameModePractice* this)

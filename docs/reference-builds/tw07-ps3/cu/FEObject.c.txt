@@ -1,0 +1,36 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/istudio_runtime/FEObject.c
+// compiled in: apt_unity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   83  0002C180     60  void FEObj_RegisterStreamClients()
+   93  0002C1E0     3C  void FEObj_UnRegisterStreamClients()
+  100  0009B6F0    1C0  static void FEObj_LoadBallTexfromStream(TStreamDataPtr pStream)
+                         local  char* defaultballtexname
+                         local  struct HashString defaultBallTexID
+                         local  struct HashString textureIDnrm
+                         inlines  Allocator::GetTempAllocator, HashString::HashString
+  123  0002C21C     3C  void FETEO_LoadDatfromStream(TStreamDataPtr pStream)
+  174  0002C258     48  void FEObj_InitModule()
+  213  0002C2A0     E8  void FEObj_CloseModule()
+  251  0002C388      4  void FEObj_InvalidateBallTexGroup_PS2()
+  267  0002C38C     28  void FEObj_InitForRender()
+  286  0002C3B4      4  void FEObj_DeInitForRender()
+  292  000704B0    204  static void FEObj_RotateAndRenderBallPart(TObject* pObj, float[4]* rotMat, float[4]* scaleMat, float* objLoc)
+                         local  mat44flt tempMatRot
+                         local  mat44flt tempMatScale
+                         local  mat44flt tempMatComposed
+                         inlines  LLMath_CopyMat44, Object_UpdateO2WComposed33, vec4flt_Copy, vec_ld, vec_st
+  327  000DCD1C    450  void FEObj_ObjectRender()
+                         local  vec4flt objLoc
+                         local  mat44flt scaleMat
+                         local  mat44flt* rotMat
+                         local  vec3flt color
+                         local  TObject* pBallObject
+                         local  vec3flt color
+                         local  mat44flt rot180
+                         local  mat44flt newRot
+                         inlines  Character_GetBoneMatrix, Character_GetBonePos, Character_GetBonePos_FromIndex, DS_vEnableZBufferUpdate, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, FEEraModeBall::GetBallObject, LLMath_IdentifyMat, RC_vSetCurrentRenderCtxTransformationMatrix, vec4flt_Copy, vec_st
+  422  0002ADB4    11C  void FEObj_UploadBallLogoTexture(const char* texName)
+                         local  int ballTexNum
+                         local  struct HashString ballTexID
+                         inlines  HashString::HashString

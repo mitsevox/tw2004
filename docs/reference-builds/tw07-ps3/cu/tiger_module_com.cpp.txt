@@ -1,0 +1,75 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_com.cpp
+// compiled in: tiger_module_com.cpp
+// 31 functions, source order. line | PS3 address | size
+
+    0  003425C4     38  void ~Com(const struct Com* this)
+                         inlines  ~Module
+    0  0052BDA4     90  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+  119  0052B00C     10  const char* GetMyIP(const struct Com* this)
+  124  0052B01C     14  unsigned int GetMyPort(const struct Com* this)
+  132  0052DB44    100  void Com(const struct Com* this, const const void** __vtt_parm, struct ComInterface* iface, short unsigned int port)
+  142  0052B030     E4  enum TigerComErrorNum Connect(const struct Com* this, const char* ipAddress, short unsigned int port)
+                         local  RwInt32 lastError
+  186  0052BE54    290  enum TigerComErrorNum InitMySocket(const struct Com* this)
+                         local  bool allowReuse
+                         local  RwUInt32 noBlock
+                         local  int bindTries
+                         inlines  Resource
+  270  0052C0E4    138  enum TigerComErrorNum InternalDisconnect(const struct Com* this, bool reinit)
+                         local  enum TigerComErrorNum error
+  305  0052C8C4    10C  enum TigerComErrorNum Disconnect(const struct Com* this, bool reinit)
+                         local  enum TigerComErrorNum disconnectMessageResult
+  325  0052B33C    2E0  enum TigerComErrorNum QueueTransferData(const struct Com* this, const void* data, unsigned int size, const char* dataTypeId, unsigned int chainIndex, unsigned int chainCount)
+                         local  unsigned int slot
+                         local  struct <anon>* header
+                         local  const char* dataPtr
+                         local  unsigned int count
+                         local  unsigned int index
+                         local  unsigned int smallSize
+                         local  enum TigerComErrorNum error
+  390  0052B61C     B8  enum TigerComErrorNum QueueTransferMessage(const struct Com* this, const char* text, enum TigerComMessageNum messageType)
+                         local  unsigned int slot
+  409  0052C5B0    314  void Update(const struct Com* this)
+                         local  struct <anon> ___profScope
+                         local  RwUInt32 receivedBytes
+                         local  enum TigerComErrorNum receiveBytesResult
+                         inlines  Profile, Resource, ~Profile
+  482  0052BBA4    1C0  void UpdateQueues(const struct <anon>* this, struct Com* com)
+                         local  enum TigerComErrorNum transferResult
+                         local  enum TigerComErrorNum transferResult
+  514  0052B6D4     54  void Zero(const struct <anon>* this)
+  544  0052B998    20C  enum TigerComErrorNum TransferMessage(const struct Com* this, const char* text, enum TigerComMessageNum messageType)
+                         local  struct <anon>* messagePacket
+                         local  enum TigerComErrorNum error
+  577  0052B7D8    1C0  enum TigerComErrorNum TransferData(const struct Com* this, const void* data, unsigned int size, const struct <anon>* header)
+                         local  struct <anon>* sendPacket
+                         local  enum TigerComErrorNum sendError
+  619  0052B728     B0  enum TigerComErrorNum SendFromBuffer(const struct Com* this, unsigned int size)
+                         local  struct <anon>* sendPacket
+                         local  RwInt32 sendResult
+  656  0052B144    1F8  const char* GetErrorText(const struct Com* this, enum TigerComErrorNum errorNum)
+                         local  const char* text
+  694  0052BD64     10  int IsConnectionInitiated(const struct Com* this)
+  699  0052B114     30  int IsConnectionCompleted(const struct Com* this)
+  705  0052C21C    394  enum TigerComErrorNum ProcessReceivedBytes(const struct Com* this, unsigned int receivedBytes)
+                         local  enum TigerComErrorNum returnValue
+                         local  const struct <anon>* packet
+                         local  unsigned int setAsideOffset
+                         local  unsigned int actualBytes
+                         local  unsigned int setAsideSize
+                         local  char* setAsidePtr
+                         local  const struct <anon>* messagePacket
+  788  0052BD74      C  unsigned int GetNumberOfTransfersInQueue(const struct Com* this)
+  793  0052BD80      C  unsigned int GetNumberOfMessagesInQueue(const struct Com* this)
+  799  0052D00C    B38  void Init(const struct Com* this)
+                         local  struct <anon> descriptor
+                         local  unsigned int i
+                         inlines  GetAlignment, GetSize, TagValuePair, ~ResourceDescriptor
+  907  0052BD8C      4  void FirstUpdate(const struct Com* this)
+  911  0052C9D0    63C  void Shutdown(const struct Com* this)
+                         local  unsigned int i
+  985  0052BD90      8  int GetResourceCount(const struct Com* this)
+  990  0052BD98      8  int GetResourceId(const struct Com* this, int )
+  995  0052BDA0      4  void ResourceCallback(const struct Com* this, void* , int , unsigned int )
+  998  0052BE34     10  static void _GLOBAL__I__ZN11TigerModule3Com15m_instanceCountE()
+  999  0052BE44     10  static void _GLOBAL__D__ZN11TigerModule3Com15m_instanceCountE()

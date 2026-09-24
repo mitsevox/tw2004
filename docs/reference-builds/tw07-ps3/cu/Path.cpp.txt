@@ -1,0 +1,42 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnax/source/RNAUtils/Path.cpp
+// compiled in: Path.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   73  00872C84     B8  void GetPath(const struct <anon>* this, char* pPath, int bufferSize)
+                         local  const char[8] __FUNCTION__
+                         local  int numBytes
+                         inlines  RNADebugBreak
+   91  00872924      C  const char* GetDrive(const const struct <anon>* this)
+   96  00872930      C  const char* GetDir(const const struct <anon>* this)
+  101  0087293C      C  const char* GetName(const const struct <anon>* this)
+  106  00872948      C  const char* GetExt(const const struct <anon>* this)
+  112  00872954     48  bool HasExt(const struct <anon>* this, const char* pExt)
+  117  00872D3C     38  const char* GetPath(const struct <anon>* this)
+  125  0087299C     74  static void CopySubStr(char* pDest, int nDestSize, const char* pSrc, int iStartChar, int iEndChar)
+                         local  int nChars
+  142  00872A10    26C  void SetPath(const struct <anon>* this, const char* pPath)
+                         local  int iDrivePos
+                         local  int iDirPos
+                         local  int iFilePos
+                         local  int iExtPos
+                         local  int iPos
+  225  00872D74     B0  void SetDrive(const struct <anon>* this, const char* pDrive)
+                         local  const char[9] __FUNCTION__
+                         inlines  RNADebugBreak
+  231  00872E24     D8  void SetDir(const struct <anon>* this, const char* pDir)
+                         local  const char[7] __FUNCTION__
+                         local  int dirLen
+                         local  char lastChar
+                         inlines  RNADebugBreak
+  250  00872EFC     B0  void SetName(const struct <anon>* this, const char* pName)
+                         local  const char[8] __FUNCTION__
+                         inlines  RNADebugBreak
+  255  00872FAC     B0  void SetExt(const struct <anon>* this, const char* pExt)
+                         local  const char[7] __FUNCTION__
+                         inlines  RNADebugBreak
+  264  008730B8    194  void Utils::PathTest()
+                         local  const char[9] __FUNCTION__
+                         local  struct <anon> path
+                         local  const char*[6] testPaths
+                         local  int i
+                         inlines  RNADebugBreak

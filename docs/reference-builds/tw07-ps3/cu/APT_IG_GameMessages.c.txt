@@ -1,0 +1,371 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/InGame/APT_IG_GameMessages.c
+// compiled in: apt_unity.cpp
+// 154 functions, source order. line | PS3 address | size
+
+   97  00071B4C    118  char* GM_vGetPointerToPlayerName(int32 playerID)
+  113  00071C64     60  void GM_vGetPlayerName(int32 param1, char* param2, int32 param2bufSize)
+                         local  char* playerName
+  123  00073520    168  void GM_vGetPlayerShortName(int32 param1, char* param2, int32 param2bufSize)
+                         local  const struct UserInfo& userInfo
+  162  0005F848     EC  void GM_vGetPlayerFirstName(int32 param1, char* param2, int32 param2bufSize)
+  191  000B8C10     94  int32 GM_vGetCourseIndex()
+                         local  int32 autoRetVal
+                         inlines  GM_IsCompilationCourse, GM_IsCustomCourse, GM_IsRandomCourse
+  216  000D8FA0     98  int32 GM_vGetCurrentHoleIndex()
+                         local  int32 autoRetVal
+                         inlines  GM_GetCurrentHoleIndex
+  235  000E41DC     38  int32 GM_vGetCurrentGolferIndex()
+                         local  int32 autoRetVal
+                         inlines  GM_GetGolferUp
+  244  00089978    10C  void GM_InGameShowLoadingScreen()
+  267  00089A84     B0  void GM_vEndOfGameExit()
+                         inlines  UIMainMenu::SetQuitGame
+  298  000C8438    250  void GM_vExitGame()
+                         local  struct GameModeDriver* gameDrive
+                         local  struct GoTemple* pTemple
+                         local  const struct GolfModuleCCT& cct
+                         local  unsigned int i
+                         inlines  OnlineManagerOSDK::GetInstance, OnlineManagerOSDK::WaitingForChallenge, Singleton<GameModeDriverManager>::GetSingleton, UIMainMenu::SetQuitGame
+  384  00027DD4     28  int32 GM_vGetNumberGolfersPlaying()
+  393  00027DFC     30  int32 GM_vGetPlayerClubIndex(int32 param1)
+  402  00027E2C     30  int32 GM_vGetPlayerShotTypeIndex(int32 param1)
+  411  00027E5C     3C  int32 GM_vGetPlayerStanceIndex(int32 param1)
+  421  00027E98     28  float GM_vGetPlayerTargetDistance(int32 param1)
+  430  00027EC0     44  float GM_vGetClubDistance(int32 param1, int32 param2, int32 param3)
+                         local  float autoRetVal
+  447  00027F04     6C  int32 GM_vGetPlayerCurrentLie(int32 param1)
+                         local  int32 autoRetVal
+                         local  int32 surfaceID
+  473  00027F70     30  int32 GM_vGetPlayerCurrentLieAngle(int32 param1)
+  482  00027FA0     98  float GM_vGetPlayerWindDirection(int32 param1)
+                         local  vec4flt windDir
+                         local  float plrAngle
+                         local  float windAngle
+                         local  float diff
+  507  00028038     38  int32 GM_vGetPlayerWindSpeed()
+  516  00028070     44  int32 GM_vGetScoringMethod()
+                         local  int32 autoRetVal
+                         inlines  GM_GetScoringType
+  534  000280B4     24  int32 GM_vGetElapsedTimeSeconds()
+  543  000630E0     4C  int32 GM_vGetNumberMatchWins(int32 param1, int32 param2)
+  552  000EA138     70  void GM_vRestartCurHole()
+                         inlines  GM_GetGolferUp, cGAME_GLOBALS::SetReplayActive
+  567  0006D54C     70  int32 GM_vGetGolferUserMoney(int32 param1)
+                         local  int32 autoRetVal
+                         local  enum PlayerNumber_t userID
+                         local  const struct UserInfo& userInfo
+  588  0006F938    160  int32 GM_vIsPostShotCameraDone(int32 param1)
+                         local  int32 autoRetVal
+                         local  bool postShotCamDone
+                         local  bool camTrackingPlayer
+                         local  bool animPaused
+                         local  bool isNotReactionAnimation
+                         local  bool animAlmostDone
+                         inlines  Character_GetAnimationTimeLeft, Character_IsAnimationPaused, GamePlayer::GetCharacter
+  627  000280D8     84  int32 GM_vScorecardGetPar(int32 param1)
+                         local  int32 autoRetVal
+  647  0002815C     48  int32 GM_vHoleSelected(int32 param1)
+  656  0006312C     30  int32 GM_vGetMatchWins(int32 param1)
+  665  0006315C     30  int32 GM_vGetSkinWins(int32 param1)
+  674  000D9538     30  int32 GM_vGetGameModeType()
+                         inlines  GM_GetModeType
+  684  000281A4     28  float GM_vGetLiePercentage(int32 param1)
+  693  000281CC     24  int32 GM_vGetHoleRating(int32 param1)
+  702  0006E3E0     D8  int32 GM_vGetTeeYardage(int32 param1, int32 param2)
+                         local  int32 autoRetVal
+                         local  const float dist
+  728  000281F0     38  int32 GM_vGetPlayerTee(int32 param1)
+  737  00028228     6C  int32 GM_vGetCurrentSkinAmount()
+                         local  int32 autoRetVal
+                         local  void* ptr
+                         local  struct GameModeSkins* pSkin
+  755  00028294     6C  int32 GM_vGetCurrentSkinNum()
+                         local  int32 autoRetVal
+                         local  void* ptr
+                         local  struct GameModeSkins* pSkin
+  775  00028300    178  float GM_vGetLieModifier(int32 param1)
+                         local  float autoRetVal
+                         local  float impactV_Modifier
+                         local  float recoveryMod
+  809  00028478     2C  float GM_vGetLieReadOffset(int32 param1)
+  818  000D9568    128  int32 GM_vGetRelativeScore(int32 param1)
+                         local  int32 autoRetVal
+                         local  enum PlayerNumber_t userID
+                         local  int entrantID
+                         inlines  GM_GetModeType
+  860  0006318C    120  int32 GM_vGetRoundScore(int32 param1, int32 param2)
+                         local  int32 autoRetVal
+                         local  enum PlayerNumber_t userID
+                         local  enum GM_Pga_EntrantId_e entrantID
+  885  000284A4     BC  void GM_vLeaderboard_LastName(int32 param1, char* param2, int32 param2bufSize)
+                         local  int entrantID
+                         local  int golferID
+                         local  enum PlayerNumber_t userID
+  906  00028560     78  int32 GM_vLeaderboard_Position(int32 param1)
+                         local  int32 autoRetVal
+                         local  int entrantID
+                         local  enum PlayerNumber_t userID
+  926  000285D8     7C  int32 GM_vLeaderboard_Tied(int32 param1)
+                         local  int32 autoRetVal
+                         local  int entrantID
+                         local  enum PlayerNumber_t userID
+  946  00028654     94  int32 GM_vLeaderboard_Score(int32 param1)
+                         local  int32 autoRetVal
+                         local  int entrantID
+                         local  enum PlayerNumber_t userID
+                         local  bool isUserOrGuest
+  967  000286E8     A4  int32 GM_vLeaderboard_Hole(int32 param1)
+                         local  int32 autoRetVal
+                         local  int entrantID
+                         local  enum PlayerNumber_t userID
+                         inlines  GM_IsPlayoff
+  994  0002878C     88  int32 GM_vLeaderboard_RoundScore(int32 param1, int32 param2)
+                         local  int32 autoRetVal
+                         local  int entrantID
+                         local  enum PlayerNumber_t userID
+ 1014  00028814     9C  int32 GM_vLeaderboard_PlayerPosition(int32 param1)
+                         local  int32 autoRetVal
+                         local  int entrantID
+                         local  enum PlayerNumber_t userID
+ 1036  000288B0     A0  int32 GM_vLeaderboard_PlayerTied(int32 param1)
+                         local  int32 autoRetVal
+                         local  int entrantID
+                         local  enum PlayerNumber_t userID
+ 1058  00028950     44  int32 GM_vLeaderboard_Entries()
+                         local  int32 autoRetVal
+                         local  enum PlayerNumber_t userID
+ 1081  00028994      8  int32 GM_vGetSpeedGolfHoleScore(int32 param1, int32 param2, int* param3)
+ 1094  0006D5BC     78  void GM_vGetGolfersUserName(int32 param1, char* param2, int32 param2bufSize)
+                         local  enum PlayerNumber_t userID
+                         local  const struct UserInfo& userInfo
+ 1114  000C4CFC     B8  char* GM_vGetGolferName(enum PlayerNumber_t playerNumber, enum Golfer_t golfer)
+                         local  char* retVal
+                         inlines  Singleton<GolferStats>::GetSingleton
+ 1128  000C4ECC     4C  char* GM_vIGGetGolfersName(enum PlayerNumber_t playerNumber)
+ 1133  000C4DB4     34  char* GM_vFEGetGolfersName(enum PlayerNumber_t playerNumber)
+ 1142  0002899C     2C  int32 GM_vIsGolferCPU(int32 param1)
+                         local  int32 autoRetVal
+ 1158  000289C8     28  void GM_vGetPuttHelp(int32 param1, float* param2, float* param3, float* param4, float* param5)
+ 1170  0005D634     A0  int32 GM_vLeaderboard_Winnings(int32 param1)
+                         local  int32 autoRetVal
+                         local  int entrantID
+                         local  enum PlayerNumber_t userID
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC
+ 1192  0005D6D4     C0  int32 GM_vLeaderboard_PlayerWinnings(int32 param1)
+                         local  int32 autoRetVal
+                         local  int entrantID
+                         local  enum PlayerNumber_t userID
+                         local  struct PgaTourSim_Entrant_MC_t* pEntrant_MC
+ 1214  000289F0     6C  void GM_vReturnTimer(int32 param1, int32 param2)
+ 1222  00077090     20  int32 GM_vQuickScorecard()
+ 1249  00028A5C     34  int32 GM_vGetNumHolesSelected()
+                         inlines  GM_GetNumHolesInRound
+ 1258  000770B0     20  int32 GM_vGetDemoMode()
+ 1267  00028A90     28  int32 IG_vIsGolferConceding()
+ 1276  000EA1A8     54  void GM_vConcede_Hole()
+                         inlines  GM_GetGolferUp, cGAME_GLOBALS::SetReplayActive
+ 1289  000EA1FC     64  void GM_vDisableCaddieTips()
+                         local  const struct UserInfo& userInfo
+                         inlines  GM_GetGolferUp
+ 1302  000AC5D0     AC  int32 GM_vIG_MCMemforReplay(int32 param1, int32 param2)
+                         local  int32 autoRetVal
+                         local  MC_ArgsMemoryRequiredT args
+                         inlines  MC_CallActionFnMemoryRequired, MC_SetCurrentFileType
+ 1330  00028AC4      4  void GM_vIG_MCConnect()
+ 1339  00028AC8      4  void GM_vIG_MCDisconnect()
+ 1348  00028AE4     24  int32 GM_vIG_Multitap(int32 param1)
+ 1361  00028B60     E8  int32 GM_vIG_MCExists(int32 param1, int32 param2)
+                         local  int32 autoRetVal
+                         local  struct GolfMemCard_t FEMCard
+ 1377  00028C48     E8  int32 GM_vIG_MCFormatted(int32 param1, int32 param2)
+                         local  int32 autoRetVal
+                         local  struct GolfMemCard_t FEMCard
+ 1393  00028D30     E8  int32 GM_vIG_MCfreeMem(int32 param1, int32 param2)
+                         local  int32 autoRetVal
+                         local  struct GolfMemCard_t FEMCard
+ 1409  00028E18      4  void GM_vIG_MCGetNumReplays()
+ 1419  00028E1C      4  void GM_vIG_MCfunction(int32 param1)
+ 1430  000523D8     CC  int32 GM_vIG_MCFormat(int32 param1, int32 param2)
+                         local  int32 autoRetVal
+ 1448  000EA260     88  int32 GM_vIG_SaveReplay(int32 param1, int32 param2, int32 param3)
+                         local  int32 autoRetVal
+                         local  MC_ArgsSaveT sArgs
+                         inlines  GM_GetGolferUp
+ 1486  000EA2E8     A4  int32 GM_vIG_ReplaceReplay(int32 param1, int32 param2, int32 param3)
+                         local  int32 autoRetVal
+                         inlines  GM_GetGolferUp
+ 1508  00028E30     84  int32 GM_vCurrentReplayValid()
+                         local  int32 autoRetVal
+ 1526  00028EB4     34  int32 GM_vGetNumHolesRemaining()
+                         local  int32 autoRetVal
+                         inlines  GM_GetNumHolesRemainingInRound
+ 1539  00028EE8     34  int32 GM_vGetPlayerUIZoomedIn(int32 param1)
+                         local  int32 autoRetVal
+ 1554  00028F1C     4C  void GM_vPracticeNextHole()
+ 1563  00065A6C     9C  int32 GM_vGetPlayerShotSetup(int32 param1)
+                         local  int32 autoRetVal
+                         local  int currentState
+ 1587  00065B08     78  int32 GM_vGetPlayerBackSwing(int32 param1)
+                         local  int32 autoRetVal
+ 1602  00028F68     58  int UI_FindOnlineControllerSlot()
+                         local  int controllerNum
+ 1626  00028FC0     30  int32 GM_vGetGolferController(int32 param1)
+                         local  int32 autoRetVal
+ 1656  00028FF0      4  void GM_vTimerOut()
+ 1671  00028FF4     34  int32 GM_vGetPlayerUIElevator(int32 param1)
+                         local  int32 autoRetVal
+ 1685  00029028      8  int32 GM_vGetSpeedGolfWinner(int* param1)
+ 1698  00029030     38  int32 GM_vFullRound()
+                         local  int32 autoRetVal
+                         inlines  GM_FullRoundOfGolf
+ 1709  00029068     B8  int32 GM_vGM_NextHoleDetails(int* param1, int* param2)
+                         local  int32 autoRetVal
+                         local  int holeIndex
+                         local  int par
+                         local  int yardage
+                         inlines  GM_GetNextSelectedHole
+ 1738  00029120     B4  void GM_vGetRecordName(int32 param1, int32 param2, int32 param3, char* param4, int32 param4bufSize)
+ 1768  0006E678    174  int32 GM_vGetRecordScore(int32 param1, int32 param2, int32 param3)
+                         local  int32 autoRetVal
+                         local  int recordType
+ 1810  0007B820    7A8  int32 GM_vGetWrapupData(int32 param1, int32 param2)
+                         local  int32 autoRetVal
+                         local  enum PlayerNumber_t userID
+                         local  int tourCard
+                         local  const struct UserInfo& userInfo
+                         inlines  EarningsInfo::GetSpecialShots, GM_GetFlagPositionIndex
+ 2014  000291D4    240  int32 GM_vGetWrapupAwardData(int32 playerIndex, int32 itemIndex, int32 wrapupQueryType)
+                         local  int32 autoRetVal
+ 2087  000EA38C     64  float GM_vGetYardsToPin(int32 param1)
+                         local  float autoRetVal
+                         local  int golfer
+                         inlines  GM_GetGolferUp
+ 2104  00029414     28  float GM_vGetDeltaHeightToPin(int32 param1)
+                         local  float autoRetVal
+ 2122  0002943C     2C  int32 GM_vGetRandInt()
+                         local  int32 autoRetVal
+ 2135  000D9690    330  void GM_vGetCourseHoleName(int32 param1, char* param2, int32 param2bufSize)
+                         local  Course_t course
+                         local  int courseIndex
+                         local  enum GM_CourseType_t course
+                         local  int32 hole
+                         local  enum GM_CourseType_t course
+                         local  int32 hole
+                         inlines  GM_GetCurrentCompilationCourse, GM_GetModeType, GM_IsCompilationCourse, GM_IsCustomCourse, GM_IsRandomCourse
+ 2179  000EABF4    170  int32 GM_vAllowConcede()
+                         local  int32 autoRetVal
+                         inlines  GM_GetGolferUp, GM_GetModeType
+ 2218  00029468      4  void GM_vIG_GetGameName(char* param1, int32 param1bufSize)
+ 2227  0002946C     28  int32 GM_vIsOnlineEvent()
+                         local  int32 autoRetVal
+ 2251  00029494     28  void GM_vSetUITimeFactor(float param1)
+ 2266  000294BC     38  int32 GM_vGetPlayoff()
+                         local  int32 autoRetVal
+ 2282  000632AC     2C  int32 GM_vGetPlayerCut(int32 param1)
+                         local  int32 autoRetVal
+ 2297  000294F4     2C  void GM_vRewardDisplayStarting()
+ 2308  000EAD64     4C  void GM_vIG_OnlineSendChat(char* param1, int32 param1bufSize)
+                         inlines  GM_GetGolferUp
+ 2317  00029520     28  int32 GM_vOnlineMode()
+                         local  int32 autoRetVal
+ 2337  00029548      8  int32 IG_vOnlineTourney()
+ 2359  00029550      4  void GM_vOnlineQuitAccept()
+ 2371  00029554      4  void GM_vGetQuickMessage(int32 param1, char* param2, int32 param2bufSize)
+ 2383  00029558     30  int32 GM_vGetNumberClubs(int32 param1)
+                         local  int32 autoRetVal
+ 2394  00029588     44  int32 GM_vGetClubAvailable(int32 param1, int32 param2)
+                         local  int32 autoRetVal
+ 2408  000295CC     C8  void GM_vAddRemoveClub(int32 param1, int32 param2, int32 param3)
+                         local  void* ptr
+                         local  struct GameModeBattle* pBattle
+ 2430  00029694     60  void IG_vAcceptOnlineInput(int32 param1, int32 param2)
+ 2444  000296F4     7C  int32 IG_vBattle_GetNumClubsStart(int32 param1)
+                         local  int32 autoRetVal
+                         local  void* ptr
+                         local  struct GameModeBattle* pBattle
+ 2462  00029770     B0  int32 IG_vBattle_GetClubAddable(int32 param1, int32 param2)
+                         local  int32 autoRetVal
+                         local  void* ptr
+                         local  struct GameModeBattle* pBattle
+ 2483  00029820      8  int32 IG_v_PGATourWin()
+ 2502  0005F934    310  void IG_v_PGATour_GetCheckInfo(char* param1, int32 param1bufSize, char* param2, int32 param2bufSize, char* param3, int32 param3bufSize, char* param4, int32 param4bufSize, char* param5, int32 param5bufSize)
+                         local  const struct PgaTour_WinInfo* wininfo
+                         local  int ordinalNumber
+                         local  char[64] tempstr
+                         local  const struct UserInfo& userInfo
+                         inlines  UserInfo::GetPGATourData
+ 2562  00029828     84  void IG_vPgaTour_GetCurrEventName(char* param1, int32 param1bufSize)
+                         local  GM_PgaTourEventID_t eventID
+ 2574  000298AC    1D0  void IG_vPlayShotScoreAnimSound(int32 param1, int32 param2)
+ 2693  000940D8     EC  void IG_vPlayIngGameCommentaryRewardSound(int32 param1, int32 param2)
+                         inlines  Gaud_StartPgaRecordComment, Gaud_StartScenariosComment, Gaud_StartStatisticsLeadersComment, Gaud_StartTrackingTigerComment
+ 2739  00029A7C     24  int32 IG_vRewardCommentaryIsPlaying()
+                         local  int32 autoRetVal
+ 2751  00029AA0     98  float IG_vGetStringSize(char* param1, int32 param1bufSize)
+                         local  float autoRetVal
+ 2768  00029B38     54  int32 IG_vGetLocalUserIndex()
+                         local  int32 autoRetVal
+ 2799  00029B8C      8  int32 IG_vShow_Putting_Tip()
+ 2818  00029B94     DC  int32 IG_vShotClockAction(int32 param1, int32 param2)
+                         local  int32 autoRetVal
+ 2847  00029C70     7C  int32 IG_vNumRemovableClubsLeft(int32 param1)
+                         local  int32 autoRetVal
+                         local  void* ptr
+                         local  struct GameModeBattle* pBattle
+ 2866  00029CEC     48  int32 IG_vIsGameBreakerOn()
+                         local  int32 autoRetVal
+                         inlines  GameEffects_IsLetterboxOn
+ 2878  00029D34     6C  void IG_vOnline_CheckPause(int* param1, int* param2)
+ 2899  00029DA0     40  int32 IG_vBattleGolf_ShowClubUI()
+ 2924  00029DE0     3C  void IG_vBattleGolf_FinishedStealingClub()
+ 2942  00029E1C     70  int32 IG_vBattleGolf_GetHoleWinner()
+                         local  int32 autoRetVal
+                         local  void* ptr
+                         local  struct GameModeBattle* pBattle
+ 2961  00069764     2C  int32 IG_IsGamePaused()
+ 2980  00029E8C     4C  int32 IG_vPGATour_EndofHole_message(char* param1, int32 param1bufSize)
+                         local  int32 autoRetVal
+ 2993  00029ED8     30  void IG_vKeypopEnabled(int32 param1)
+ 3008  00029F08     28  int32 IG_vGetRealTimeMode()
+                         local  int32 autoRetVal
+ 3030  000BEAA4    11C  int32 IG_vGetCurrentPlayerNumberStrokes(int32 param1, int32 param2)
+                         local  int32 autoRetVal
+                         inlines  GM_GetPlayerHoleStrokes
+ 3051  00029F30     90  int32 IG_vGetDisqualifiedGolfer()
+                         local  int32 autoRetVal
+                         local  int i
+ 3070  00029FC0     40  int32 IG_vLeaderboard_WasCut(int32 param1)
+                         local  int32 autoRetVal
+                         local  int entrantID
+                         local  enum PlayerNumber_t PlayerID
+ 3087  0002A000     78  int32 IG_vLeaderboard_PlayerWasCut(int32 param1)
+                         local  int32 autoRetVal
+                         local  int entrantID
+ 3101  0002A078     28  int32 IG_vIsStreamingNextHole()
+                         local  int32 autoRetVal
+ 3113  0002A0A0     24  void IG_vProceedToNextHole()
+ 3121  0002A0C4     2C  int32 IG_vGetDesignSecretAwarded()
+ 3136  0002A0F0      4  void IG_vGetAwardedDesignSecret(char* param1, int32 param1bufSize)
+ 3155  0002A0F4     38  void IG_vExitLocalizedPopup()
+                         local  CameraController_t* pCameraController
+ 3167  0002A12C     BC  int32 IG_vGetPopupPage_Text(int32 param1, char* param2, int32 param2bufSize)
+                         local  int32 autoRetVal
+                         local  char* txtstr
+                         local  int total_pages
+ 3195  0002A1E8    284  int32 IG_vGetCurrentHoleSpeed(int32 param1)
+                         local  int32 autoRetVal
+                         local  uint8 asset
+                         local  float value
+ 3271  0002A46C     2C  void IG_vGetCurrentHoleTime(int* param1, int* param2)
+ 3279  0002A498      8  int32 IG_vGetCurrentHoleTemp()
+ 3286  0007DA20     1C  int32 IG_vGetCurrentHoleSeason()
+ 3295  000EADB0     DC  void IG_vSetQuitter()
+                         local  void* driverPointer
+                         inlines  GM_GetGolferUp, Singleton<GameModeDriverManager>::GetSingleton
+ 3305  0002A4A0     B0  int IG_vGetNumPlayersWhoAreUsers()
+                         local  int numUsers
+                         local  int numPlayers
+                         local  int playerIndex
+ 3320  0002A550     94  int32 GM_GetNumLocalHumanPlayers()
+                         local  int32 numLocalHumanPlayers
+                         local  int playerIndex

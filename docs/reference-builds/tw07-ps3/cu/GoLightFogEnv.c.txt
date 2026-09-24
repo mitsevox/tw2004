@@ -1,0 +1,32 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/GoLightFogEnv.c
+// compiled in: golf_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   32  00294818    180  void LF_vInitModule()
+                         local  int32 iLightFogEnvironment
+                         local  LF_SLightFogEnvironment* spLightFogEnvironment
+                         local  struct GameXmlSettings xmlSettings
+                         inlines  LF_vApplyLightingEnvironment, LF_vInitLightFogEnvironment, LF_vSetCurrentLightFogEnvironment
+   72  002157EC     10  void LF_vCloseModule()
+                         local  int32 iLightFogEnvironment
+                         local  LF_SLightFogEnvironment* spLightFogEnvironment
+  103  0025E3E8    688  void LF_vSetLightingEnvironment(TGD_LightingData* xpLightingData_p)
+                         local  struct LI_SLightingEnvironment* spLightingEnvironment
+                         local  struct LI_SLight* spLight
+                         local  TGD_LightDesc* xpLightDesc
+                         local  int32 iESBColorModifier
+                         local  int32 i
+                         local  bool bAddOne
+                         inlines  LLMath_Scale, __vec_mul, vec4flt_Copy, vec_ld, vec_st
+  451  002751F0     CC  void LF_vSetDynamicLightModifiers()
+                         local  struct LI_SLightingEnvironment* spLightingEnvironment
+                         local  struct LI_SLight* spLight
+                         local  float fAngle
+                         inlines  LF_fComputeAngleBetweenLightAndCamera, LLMath_DotProduct3, RC_spGetCurrentRenderCtxCamera
+  482  00255B3C     C0  void LF_vSetLightModifiers(struct LI_SLightingEnvironment* pSrcLightEnv)
+                         local  struct LI_SLightingEnvironment* pDstLightEnv
+                         local  struct LI_SLight* pDstLight
+                         local  struct LI_SLight* pSrcLight
+                         local  LI_SDirectionalLight* pDstDir
+                         local  LI_SDirectionalLight* pSrcDir
+                         inlines  vec4flt_Copy3

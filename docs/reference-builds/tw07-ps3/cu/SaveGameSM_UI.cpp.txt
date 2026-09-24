@@ -1,0 +1,41 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/Common/SaveGameSM_UI.cpp
+// compiled in: apt_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   46  000783F4    144  bool SaveGameSM_ShowUI_SimplePopup(struct SavedGameTask* pTask)
+                         local  bool bActive
+                         inlines  MemCardMgr::ClearDeviceStateChangeFlags, MemCardMgr::DeviceStateChanged, SavedGameTask::SetResult, SavedGameTask::SetTaskState
+   89  00078330     C4  bool SaveGameSM_ShowUI_TimedPopup(struct SavedGameTask* pTask)
+                         local  bool bActive
+                         inlines  SavedGameTask::SetResult, SavedGameTask::SetTaskState
+  124  00078564     74  bool SaveGameSM_ShowUI_MemcardWarningBoxON(struct SavedGameTask* pTask)
+                         local  bool bActive
+                         inlines  SavedGameTask::SetTaskState
+  155  00078604     74  bool SaveGameSM_ShowUI_MemcardWarningBoxOFF(struct SavedGameTask* pTask)
+                         local  bool bActive
+                         inlines  SavedGameTask::SetTaskState
+  186  00078308     28  bool SaveGameSM_ShowUI_SimplePicMCPopup(struct SavedGameTask* pTask)
+  195  000782E0     28  bool SaveGameSM_ShowUI_SimplePicMCPopupNoArrows(struct SavedGameTask* pTask)
+  204  00078184    15C  static bool SGTaskHelper_ShowUI_SimplePicMCPopup(struct SavedGameTask* pTask, bool bShowArrows)
+                         local  bool bActive
+                         inlines  MemCardMgr::ClearDeviceStateChangeFlags, MemCardMgr::DeviceStateChanged, SavedGameTask::SetResult, SavedGameTask::SetTaskState
+  247  0009F394    12C  bool SaveGameSM_ShowUI_SaveLocationsList(struct SavedGameTask* pTask)
+                         local  bool bActive
+                         inlines  SavedGameTask::GetListOffset, SavedGameTask::GetResult, SavedGameTask::SetResult, SavedGameTask::SetTaskState
+  285  0009F688     28  bool SaveGameSM_ShowUI_ReplaysList(struct SavedGameTask* pTask)
+  294  0009F660     28  bool SaveGameSM_ShowUI_ReplayListNoArrows(struct SavedGameTask* pTask)
+  303  0009F4C0    1A0  static bool SGTaskHelper_ShowUI_ReplayList(struct SavedGameTask* pTask, bool bShowArrows)
+                         local  bool bActive
+                         inlines  MemCardMgr::ClearDeviceStateChangeFlags, MemCardMgr::DeviceStateChanged, SavedGameTask::GetListOffset, SavedGameTask::GetResult, SavedGameTask::SetResult, SavedGameTask::SetTaskState
+  349  0009F878     28  bool SaveGameSM_ShowUI_UserList(struct SavedGameTask* pTask)
+  358  0009F850     28  bool SaveGameSM_ShowUI_UserListNoArrows(struct SavedGameTask* pTask)
+  367  0009F6B0    1A0  static bool SGTaskHelper_ShowUI_UserList(struct SavedGameTask* pTask, bool bShowArrows)
+                         local  bool bActive
+                         inlines  MemCardMgr::ClearDeviceStateChangeFlags, MemCardMgr::DeviceStateChanged, SavedGameTask::GetListOffset, SavedGameTask::GetResult, SavedGameTask::SetResult, SavedGameTask::SetTaskState
+  415  00077FFC    188  bool SaveGameSM_ShowUI_GamerList(struct SavedGameTask* pTask)
+                         local  bool bActive
+                         inlines  MemCardMgr::ClearDeviceStateChangeFlags, MemCardMgr::DeviceStateChanged, SavedGameTask::GetListOffset, SavedGameTask::GetResult, SavedGameTask::SetResult, SavedGameTask::SetTaskState
+  519  00062704     F4  static void HidePopupOnPulledMemCard(enum eMemCardUIType uiType)
+                         local  struct UIMemCardPopup* pPopup
+                         local  struct UIMemCardBrowsePopup* pPopup
+                         local  struct UIMemCardMenuPopup* pPopup

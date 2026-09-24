@@ -1,0 +1,22 @@
+// C:/packages/job_manager/1.11.00/source/ps3/ppu/job_thread.cpp
+// compiled in: job_thread.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   29  00708D80     64  void Initialize(const struct <anon>* this, struct JobThreadIdentification* spuData, unsigned int type)
+   40  00708DE4      4  void Sleep(const struct <anon>* this)
+   43  00709160    11C  void ExecJob(const struct <anon>* this)
+                         local  PPUPtrToCode func
+   65  00708DE8    378  void JobDone(const struct <anon>* this)
+                         local  bool notifyPPUs
+                         local  struct <anon> state
+                         local  int i
+                         local  struct <anon>* jhp
+                         local  unsigned int i
+                         local  int ret
+                         inlines  ClearAllFreeJobs, DecrementNumDependencies, GetDependent, GetNumDependencies, IncrementFreeSPUJobs, IsReadyValidPPUJob, IsReadyValidSPUJob, SpuState, sys_event_port_send
+  139  0070927C    2A0  void GetJob(const struct <anon>* this)
+                         local  sys_event_t event
+                         local  int numEvents
+                         local  int h
+                         local  struct <anon>* jhp
+                         inlines  Die, IsReadyValidPPUJob, sys_event_queue_receive, sys_event_queue_tryreceive

@@ -1,0 +1,73 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnax/source/RNAX/RNABuilderTarget.cpp
+// compiled in: RNABuilderTarget.cpp
+// 21 functions, source order. line | PS3 address | size
+
+    0  00849404    1A4  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  GetRow, Matrix44, Quaternion, Set, Vector2, Vector3, Vector4
+   61    inline-only   bool _finite(float_t fValue)
+   85    inline-only   void GetRange<std::int16_t>(const float_t& min, const float_t& max)
+   88    inline-only   void GetRange<std::uint8_t>(const float_t& min, const float_t& max)
+   94  00849FB0    11C  void Quantize<std::int16_t>(float_t fValue, const int16_t& OutputValue, bool bDenormalize)
+                         local  const char[9] __FUNCTION__
+                         local  float_t fMin
+                         local  float_t fMax
+                         inlines  RNADebugBreak, _finite, std::fabs, vpu::Clamp
+   94  0084A31C    11C  void Quantize<std::uint8_t>(float_t fValue, const uint8_t& OutputValue, bool bDenormalize)
+                         local  const char[9] __FUNCTION__
+                         local  float_t fMin
+                         local  float_t fMax
+                         inlines  RNADebugBreak, _finite, std::fabs, vpu::Clamp
+  125  0084A0CC    128  void Quantize<std::int32_t>(float_t fValue, const int32_t& OutputValue, float_t fMin, float_t fMax, bool bDenormalize)
+                         local  const char[9] __FUNCTION__
+                         inlines  RNADebugBreak, _finite, std::fabs, vpu::Clamp, vpu::Min<float>
+  125  0084A1F4    128  void Quantize<std::uint32_t>(float_t fValue, const uint32_t& OutputValue, float_t fMin, float_t fMax, bool bDenormalize)
+                         local  const char[9] __FUNCTION__
+                         inlines  RNADebugBreak, _finite, std::fabs, vpu::Clamp, vpu::Min<float>
+  171  008495C8    9E8  uint8_t* DefaultFlushVertex(uint8_t* pOutPtr, const struct <anon>* pVertexFormat, struct <anon>* pVertexState)
+                         local  const char[19] __FUNCTION__
+                         local  int i
+                         local  const struct ElementT* pElement
+                         local  enum ElementFormatE eInputFormat
+                         local  union <anon>* pIn
+                         local  union <anon>* pOut
+                         local  uint32_t X_MASK
+                         local  uint32_t Y_MASK
+                         local  uint32_t Z_MASK
+                         local  uint32_t x
+                         local  uint32_t y
+                         local  uint32_t z
+                         local  int32_t X_MASK
+                         local  int32_t Y_MASK
+                         local  int32_t Z_MASK
+                         local  int32_t x
+                         local  int32_t y
+                         local  int32_t z
+                         local  int32_t X_MASK
+                         local  int32_t Y_MASK
+                         local  int32_t Z_MASK
+                         local  int32_t x
+                         local  int32_t y
+                         local  int32_t z
+                         inlines  GetElement, GetFormat, RNADebugBreak
+  525  00848E4C     34  void BuilderTargetC(const struct BuilderTargetC* this)
+  552  00848FBC     68  void ~BuilderTargetC(const struct BuilderTargetC* this)
+                         local  const char[16] __FUNCTION__
+                         inlines  RNADebugBreak
+  579  00848EB4     14  void SetBuffer(const struct BuilderTargetC* this, void* pBufferStart, uint32_t uBytes)
+  587  00848EC8      8  void SetPrimitiveSize(const struct BuilderTargetC* this, int32_t iSize)
+  616  00849160     BC  void Begin(const struct BuilderTargetC* this, struct <anon>* pVertexFormat, uint8_t*(*)()* pFlushVertexFunc)
+                         local  const char[6] __FUNCTION__
+                         inlines  RNADebugBreak
+  654  00848ED0     10  void End(const struct BuilderTargetC* this)
+  685  0084911C     44  void Flush(const struct BuilderTargetC* this)
+                         local  const char[6] __FUNCTION__
+                         inlines  RNADebugBreak
+  714  00848EE0     3C  void FlushPrim(const struct BuilderTargetC* this)
+  742  0084921C    1E8  void FlushVertex(const struct BuilderTargetC* this, struct <anon>* pVertexState)
+                         local  const char[12] __FUNCTION__
+                         local  uint32_t uVertexSize
+                         inlines  AddVertexCount, RNADebugBreak
+  792  00848F1C     A0  void ConsumeVertices(const struct BuilderTargetC* this, int32_t nVertices)
+                         local  int32_t nBytes
+  812  008495B8     10  static void _GLOBAL__I__ZN4RNAX14BuilderTargetC18DefaultFlushVertexEPhPKN3RNA13VertexFormatCEPNS_12VertexStateCE()
+  813  008495A8     10  static void _GLOBAL__D__ZN4RNAX14BuilderTargetC18DefaultFlushVertexEPhPKN3RNA13VertexFormatCEPNS_12VertexStateCE()

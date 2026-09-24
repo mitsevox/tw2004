@@ -1,0 +1,39 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_trinity/trinity/Runtime/src/Interpolator.cpp
+// compiled in: Interpolator.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   24  00588490     38  void Reset(const struct <anon>* this)
+   43  005884C8     38  void SetKeys(const struct <anon>* this, uint16_t numKeys, const struct Key1d* pKeys)
+   62  00588500     34  void SetKeys(const struct <anon>* this, uint16_t numKeys, const struct Key3d* pKeys)
+   81  00588534     38  void SetKeys(const struct <anon>* this, uint16_t numKeys, const struct Key4d* pKeys)
+  100  0058856C     38  void SetKeys(const struct <anon>* this, uint16_t numKeys, const struct Coeff* pKeys)
+  118  005885A4    2FC  void Tick(const struct <anon>* this, float_t fDeltaSec)
+  186  005888A0    480  bool8_t GetFloatValue(const const struct <anon>* this, const float_t& value)
+                         local  const struct Key1d* pPastKey
+                         local  const struct Key1d* pFutureKey
+                         local  float_t fSlerpValue
+                         local  const struct Key4d* pPastKey
+                         local  float_t t
+                         local  const struct Coeff* pPastKey
+                         local  const struct Coeff* pFutureKey
+                         local  float_t t
+                         local  float_t t2
+                         local  float_t t3
+                         local  float_t y2
+                         local  float_t y3
+                         local  float_t h1
+                         local  float_t h2
+                         local  float_t h3
+                         local  float_t h4
+  305  00588D20    298  bool8_t GetVector3Value(const const struct <anon>* this, const vec3flt& value)
+                         local  const struct Key3d* pPastKey
+                         local  const struct Key3d* pFutureKey
+                         local  float_t fSlerpValue
+  356  00588FB8    3E8  bool8_t GetVector4Value(const const struct <anon>* this, const vec4flt& value)
+                         local  vec4flt normValue
+                         local  const struct Key4d* pPastKey
+                         local  const struct Key4d* pFutureKey
+                         local  float_t fSlerpValue
+                         local  quat qPast
+                         local  quat qFuture
+                         local  quat q

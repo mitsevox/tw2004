@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_AttributeWrapHelp.h
+// compiled in: apt_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   18  00122AFC     B8  void UIAttributeWrapHelp::~UIAttributeWrapHelp(const struct UIAttributeWrapHelp* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   20  00100930      C  uint32 UIAttributeWrapHelp::GetSignature(const const struct UIAttributeWrapHelp* this)
+   26  0010093C     24  void UIAttributeWrapHelp::LooseFocus(const struct UIAttributeWrapHelp* this, uint32 )
+   27  00100960     24  void UIAttributeWrapHelp::RegainFocus(const struct UIAttributeWrapHelp* this, uint32 )
+   34  00100984     14  void UIAttributeWrapHelp::NotifyGetDescriptionText_func(struct IAptSubscriber* subs)

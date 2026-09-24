@@ -1,0 +1,13 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/kickstart/source/common/kickstartfacadeconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   68  0060F95C     AC  void KickStartFacadeConcrete(const struct <anon>* this)
+                         inlines  KickStartFacade, RCPointer, operator new, operator=
+   98  005E4FA8     80  void ~KickStartFacadeConcrete(const struct <anon>* this)
+                         inlines  operator delete, operator=, ~KickStartFacade, ~RCPointer
+  124  0060FA08     58  void CreateFacade()
+                         inlines  operator new
+  152  005D9C48     50  void DestroyFacade()
+                         inlines  GetInstance
+  179  005C9408      C  struct <anon>* GetInstance()

@@ -1,0 +1,12 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sndi_root1x.cpp
+// compiled in: sndi_root1x.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    6  006F6448     70  float SNDI_rootof1plusx(float input)
+                         local  float p1
+                         local  float p2
+                         local  float p3
+                         local  float p4
+                         local  float p5
+                         local  float p6
+                         local  float p7

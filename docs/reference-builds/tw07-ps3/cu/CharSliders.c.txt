@@ -1,0 +1,109 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/animation/CharSliders.c
+// compiled in: golf2_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+  273  00196744    AFC  struct CharSlider_SliderDefinitions_t* CharSlider_CreateDefinitionsFromMem(char** pData, TTypeAcces memType, enum eMemoryPools ePool)
+                         local  struct CharSlider_SliderDefinitions_t* pSliderDefs
+                         local  char* pDest
+                         local  int32 idxGroups
+                         local  int32 idxEffects
+                         local  int32 idxPairs
+                         local  int32 idxBoneRanges
+                         local  int32 idxBoneScaleDef
+                         local  int32 idxMorphRanges
+                         local  int32 idxMorphScaleDef
+                         local  int32 iNumSliders
+                         local  int32 iNumTargets
+                         inlines  BYTESWAP_SWAPDATASTRUCTURE
+  427  0013BB5C     88  int32 CharSlider_GetSliderIndex(struct CharSlider_SliderDefinitions_t* pSliderDefs, int32 index)
+                         local  int32 i
+  448  0013BBE4     8C  void CharSlider_ResetGameSettings(struct CharSlider_SliderDefinitions_t* pSliderDefs)
+                         local  int32 i
+  466  0013BC70    114  void CharSlider_SetInitialVirtualValues(struct CharSlider_SliderDefinitions_t* pSliderDefs, int32 numSliders, CrAP_Slider_t* sliderValues)
+                         local  int32 i
+                         local  int32 slider
+  481  0013BD84     7C  void CharSlider_ClampVirtualValues(struct CharSlider_SliderDefinitions_t* pSliderDefs)
+                         local  int32 i
+                         local  struct CharSlider_GameSettings_t* pGameSetting
+  503  0013BE00    188  void CharSlider_NormalizePairs(struct CharSlider_SliderDefinitions_t* pSliderDefs)
+                         local  int32 normalizer
+                         local  int32 pairNum
+                         local  int32 normalizee
+                         local  struct CharSlider_SliderGroup_t* pNormalizerGroup
+                         local  struct CharSlider_GameSettings_t* pNormalizerSettings
+                         local  struct CharSlider_GameSettings_t* pNormalizeeSettings
+                         local  struct CharSlider_PairedTo_t* pPairInfo
+                         local  float vectorLength
+  572  0013BF88    2D4  void CharSlider_PropogateEffects(struct CharSlider_SliderDefinitions_t* pSliderDefs)
+                         local  int32 effector
+                         local  int32 effectNum
+                         local  int32 effectee
+                         local  struct CharSlider_SliderGroup_t* pEffectorGroup
+                         local  struct CharSlider_GameSettings_t* pEffectorSettings
+                         local  struct CharSlider_GameSettings_t* pEffecteeSettings
+                         local  struct CharSlider_RangeEffect_t* pEffector
+                         local  bool inRange
+                         local  float percent
+                         local  float range
+                         local  float oldVirtual
+  682  0013C25C     94  float CharSlider_CalculateActualModAmount(float start, float end, float setting, float minScale, float maxScale, float clampLow, float clampHigh)
+                         local  float range
+                         local  float percent
+                         local  float finalValue
+  711  0013F84C    224  void CharSlider_SetAnimModifiers(struct CharSlider_SliderDefinitions_t* pSliderDefs, struct TSkeleton* pSkeleton, struct TSkin* pSkin)
+                         local  int32 i
+                         local  int32 boneRange
+                         local  int32 boneDef
+                         local  struct CharSlider_SliderGroup_t* pGroup
+                         local  struct CharSlider_GameSettings_t* pSettings
+                         local  struct CharSlider_BoneRange_t* pRange
+                         local  struct CharSlider_BoneDef_t* pDef
+                         local  float distance
+                         local  float angle
+  764  00187598    438  void CharSlider_SetBoneModifiers(struct CharSlider_SliderDefinitions_t* pSliderDefs, struct CrAP_TransformModInfo_t* pTransformInfo, struct TSkeleton* pSkeleton, struct TSkin* pSkin)
+                         local  int32 i
+                         local  int32 boneRange
+                         local  int32 boneDef
+                         local  struct CharSlider_SliderGroup_t* pGroup
+                         local  struct CharSlider_GameSettings_t* pSettings
+                         local  struct CharSlider_BoneRange_t* pRange
+                         local  struct CharSlider_BoneDef_t* pDef
+                         local  int32 boneID
+                         local  struct HashString allBones
+                         local  int32 boneIDStart
+                         local  int32 boneIDStop
+                         local  const const struct HashString& boneNameID
+                         local  float scale
+                         local  float rotate
+                         local  const float GOLF_YARDS_TO_INCHES
+                         local  float translate
+                         inlines  HashString::HashString, operator==
+  884  0013C394     9C  void CharSlider_SetMorphTargetsFromPresets_NEWCHARPIPELINE(int golfer, struct TSkin* pSkin)
+                         local  float morph_val
+                         local  int iTarget
+  903  00183B74    330  void CharSlider_SetMorphTargets_NEWCHARPIPELINE(struct CharSlider_SliderDefinitions_t* pSliderDefs, struct TCharacter* pCharacter, struct TSkin* pSkin, int32 gender)
+                         local  int32 i
+                         local  int32 morphRange
+                         local  int32 morphDef
+                         local  struct CharSlider_SliderGroup_t* pGroup
+                         local  struct CharSlider_GameSettings_t* pSettings
+                         local  struct CharSlider_MorphScaleRange_t* pRange
+                         local  struct CharSlider_MorphScaleDef_t* pDef
+                         local  int32 iTarget
+                         local  float scale
+                         local  const int32* pMorphTarget2NewBlendShapeMap
+                         local  int newBlendShapeCount
+                         local  bool[67] bUpdatedChannels
+                         local  int32 remappedTarget
+                         inlines  operator==
+ 1031  001879D0    18C  void CharSlider_UpdateCharacterBasedOnSliderValues(struct TCharacter* pCharacter, int32 gender, int32 numSliders, CrAP_Slider_t* sliderValues)
+                         local  struct TSkin* pSkin
+                         local  struct TSkeleton* pSkeleton
+                         local  struct CharSlider_SliderDefinitions_t* pSliderDefs
+                         local  struct CrAP_TransformModInfo_t* pTransformModInfo
+ 1087  0013C430    324  void CharSlider_OutputMorphTargetInfo(struct TCharacter* pChar)
+                         local  struct TSkin* pSkin
+                         local  SkinMorphStateT* pMorphState
+                         local  int i
+                         local  float fWeight
+                         local  const char* pLabel

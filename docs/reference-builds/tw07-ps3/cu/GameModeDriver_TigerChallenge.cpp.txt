@@ -1,0 +1,81 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameModeDriver_TigerChallenge.cpp
+// compiled in: golf_unity.cpp
+// 27 functions, source order. line | PS3 address | size
+
+   27  002A3484     B8  struct GameModeDriverTigerChallenge* TigerModeDriverPtr()
+                         local  void* ptr
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+   40  002565C4     5C  void GameModeDriverTigerChallenge::GameModeDriverTigerChallenge(const struct GameModeDriverTigerChallenge* this)
+   54  0020C35C     18  void GameModeDriverTigerChallenge::~GameModeDriverTigerChallenge(const struct GameModeDriverTigerChallenge* this)
+   61  0020C3D8     44  void GameModeDriverTigerChallenge::RegisterStreamClients()
+   78  0020C41C     2C  void GameModeDriverTigerChallenge::UnregisterStreamClients()
+   89  00242C94      4  void GameModeDriverTigerChallenge::LoadTGRCfromStream_Localize(struct TStreamData* pStreamData)
+  100  00242AC0    1D0  void GameModeDriverTigerChallenge::Locale_DriverTigerChallenge_LoadTGRCFromStream(struct TStreamData* pStreamData)
+                         local  const char[47] __FUNCTION__
+                         local  void* dataPtr
+                         local  uint32 size
+                         local  void* pData
+                         inlines  TagValuePair, operator+
+  126  0020C448     1C  bool GameModeDriverTigerChallenge::QueryInterface(const struct GameModeDriverTigerChallenge* this, enum GM_DriverType_t typeID, const void*& ptr)
+                         local  bool bRet
+  165  0020C464     7C  struct TigerChallengeEvent_t* GameModeDriverTigerChallenge::GetEventPtr(const struct GameModeDriverTigerChallenge* this, int iEventIndex)
+  174  0020C4E0    170  struct TigerChallengeEvent_t* GameModeDriverTigerChallenge::GetEventPtr(const struct GameModeDriverTigerChallenge* this, int iRegionIndex, int iEventIndexWithinRegion)
+                         local  int iEventIndex
+  195  0024B060     50  bool TigerChallengeEvent_t::IsLocked(const const struct TigerChallengeEvent_t* this)
+                         local  int i
+                         local  const struct UserInfo& userInfo
+  201  0024B0B0     54  bool TigerChallengeEvent_t::IsHidden(const const struct TigerChallengeEvent_t* this)
+                         local  int i
+                         local  const struct UserInfo& userInfo
+  207  0024B104     58  bool TigerChallengeEvent_t::IsWon(const const struct TigerChallengeEvent_t* this)
+                         local  int i
+                         local  const struct UserInfo& userInfo
+  216  0020C650     AC  void GameModeDriverTigerChallenge::SelectEvent(const struct GameModeDriverTigerChallenge* this, int eventID)
+                         inlines  GameModeDriverTigerChallenge::SetCurrentEventIndex
+  225  003368A8    244  void GameModeDriverTigerChallenge::StartEvent(const struct GameModeDriverTigerChallenge* this)
+                         local  const struct TigerChallengeEvent_t* pEventInfo
+                         inlines  GM_SelectHoleSet, Singleton<GameManager>::GetSingleton
+  251  0020C6FC     44  int32 GameModeDriverTigerChallenge::GetEndGameSequence(const struct GameModeDriverTigerChallenge* this)
+                         local  int32 sequence
+  262  0024B15C     30  bool GameModeDriverTigerChallenge::HasUserStartedThisPartOfTheGame(const struct GameModeDriverTigerChallenge* this)
+  271  002CCCA4    21C  void GameModeDriverTigerChallenge::SetupCourseAndHoleSelection(const struct GameModeDriverTigerChallenge* this, const struct TigerChallengeEvent_t* pEventInfo)
+                         local  enum GM_CourseType_t iCourseIndex
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+  314  003365E8    2C0  void GameModeDriverTigerChallenge::PrepareForTeeOff(const struct GameModeDriverTigerChallenge* this, const struct TigerChallengeEvent_t* pEventData)
+                         local  int32 i
+                         local  int newflags
+                         inlines  GM_GetCurrentHoleIndex, GM_SetPlayerHoleStrokes, GM_SetTargetCup, GamePlayerManager::SetPlayerCount, cGAME_GLOBALS::SetCharacterStyleShirt, cGAME_GLOBALS::SetGlobalFlags
+  390  003364E8    100  void GameModeDriverTigerChallenge::SetupInitialRoundScore(const struct GameModeDriverTigerChallenge* this)
+                         local  uint32 i
+                         inlines  GM_GetCurrentHoleIndex, GM_SelectHoleSet, GM_SelectSingleHole, GM_SetPlayerHoleStrokes
+  415  0020C740     60  bool GameModeDriverTigerChallenge::GameFinished(const struct GameModeDriverTigerChallenge* this, bool bPredict)
+  421  0020C7A0      4  void GameModeDriverTigerChallenge::AwardAchievements(const struct GameModeDriverTigerChallenge* this, const struct OnWinData_t& onWinData)
+  459  0020C7A4     AC  void GameModeDriverTigerChallenge::CheatForceWin(const struct GameModeDriverTigerChallenge* this, int iEventIndex)
+                         local  struct OnWinData_t winData
+                         inlines  OnWinData_t::OnWinData_t
+  489  002D5540    470  void GameModeDriverTigerChallenge::OnWinOfCurrentGame(const struct GameModeDriverTigerChallenge* this, const struct OnWinData_t& onWinData)
+                         local  int iNextEventIndex
+                         local  bool bOKToUnlock
+                         local  int16 attrType
+                         local  int i
+                         local  int j
+                         local  int iValueToAdd
+                         local  int32 cashReward
+                         local  enum Golfer_t opponent
+                         inlines  GameModeDriver::SetWasLastEventWonByTheUser, GameModeDriverTigerChallenge::GetNumEvents, GamePlayer::GetGolferBonus, GeneralUserData::IncDevPoints, UserInfo::IncDevCapLevelWins, UserInfo::IncDevPoints
+  582  00264D14     D8  int32 GameModeDriverTigerChallenge::GetNumEventsWon(const const struct GameModeDriverTigerChallenge* this, const struct UserInfo& userInfo)
+                         local  int32 nNumWon
+                         local  int nNumEvents
+                         local  const struct TigerChallengeEvent_t* pEventInfo
+                         local  int i
+                         inlines  GameModeDriverTigerChallenge::GetNumEvents
+  600  00264DEC     DC  float GameModeDriverTigerChallenge::GetGameModeDriverCompletionPercentage(const const struct GameModeDriverTigerChallenge* this, const struct UserInfo& userInfo)
+                         local  float fRet
+                         local  int32 nNumEvents
+                         local  int32 nNumEventsWon
+                         local  const float dPercent
+                         inlines  GameModeDriverTigerChallenge::GetNumEvents
+  617  00285290    124  uint32 GameModeDriverTigerChallenge::GetPostGameContext(const struct GameModeDriverTigerChallenge* this, uint32 prevContext)
+                         local  uint32 contextFlag

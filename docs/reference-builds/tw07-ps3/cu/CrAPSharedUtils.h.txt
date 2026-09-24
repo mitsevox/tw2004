@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Shared/Headers/CrAPSharedUtils.h
+// compiled in: other_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  317  003E8B2C     18  void CrapPresetReaderWriterDebug::CrapPresetReaderWriterDebug(const struct CrapPresetReaderWriterDebug* this)

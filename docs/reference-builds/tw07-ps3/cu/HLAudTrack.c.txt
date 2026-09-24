@@ -1,0 +1,100 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/audio/engine/hl/HLAudTrack.c
+// compiled in: other_unity.cpp
+// 26 functions, source order. line | PS3 address | size
+
+   52    inline-only   static void TrkRender3D(TEmitInst* pemit, TPerf* pperf, audfrac attn)
+                         local  TVoice** ppv
+                         local  TVoice** ppvend
+                         local  audfrac pitch
+                         local  uint16 lowPassFreq
+                         local  TVocMod vocmod
+                         local  uint16 minLowPassFreq
+                         local  int32 sForceLowpassFreq
+                         local  TVoice* pv
+                         local  audfrac velAttn
+  104    inline-only   static void TrkRenderStereo(TEmitInst* pemit, TPerf* pperf, audfrac attn)
+                         local  TTrack* ptrk
+                         local  TVoice** ppv
+                         local  TVoice** ppvend
+                         local  int8 chan
+                         local  TVocMod vocmod
+                         local  TVoice* pv
+                         local  int16 basevol
+  136  003E3C20     6C  static void InsertSortWorldPerf(TPerf* pperf)
+                         local  TListDbl* pperflist
+                         local  TPerf* pperfdest
+  161  003E49C0     E8  bool Trk_InitModule()
+                         local  bool ok
+                         local  uint8 iPerf
+  196  003E4E14     6C  void Trk_ExitModule()
+  214  0044F960     74  void Trk_FreeAllPerfs()
+                         local  int32 listID
+                         local  TListDbl* pperflist
+                         local  TPerf* pperf
+  238  003E0A6C      8  bool Trk_InitSession(uint8 sessID, uint8 subsessID)
+  255  0044FB10      4  void Trk_ExitSession()
+  271  004513E8    1EC  void Trk_Cycle()
+                         local  int32 listID
+                         local  TListDbl* pperflist
+                         local  TPerf* pperf
+                         local  TTrack* ptrk
+  335  0044E630    308  TPerf* Trk_AllocPerf(TEmitInst* pemit, TTrack* ptrk, audfrac distAttn, uint8 trkID)
+                         local  TPool* ppool
+                         local  EPerfList destlistID
+                         local  TListDbl* pdestlist
+                         local  TPerf* pperf
+                         local  TListDbl* psrcelist
+                         local  TPerf* pperfsucker
+  453  0044DC54    1BC  TPerf* Trk_FreePerf(TPerf* pperf)
+                         local  TListDbl* pperflist
+                         local  TPool* ppool
+                         local  TEmitInst* pemit
+                         local  TTrack* ptrk
+  514  0044ED7C    3F4  void Trk_UpdatePerf(TEmitInst* pemit, TPerf* pperf, TTrack* ptrk, uint8 trkID, bool manualstart, bool manualstop, audfrac distAttn)
+                         local  bool playing
+                         local  bool manual
+                         local  bool retrig
+                         local  bool shouldupdate
+                         local  bool shouldplay3D
+                         local  bool shouldstart
+                         local  bool shouldstop
+                         local  bool carryOver
+                         local  uint8 carryVar
+                         local  uint8 carryRange
+                         local  float carryAttn
+  612  0044E4B4     98  void Trk_Start(TPerf* pperf)
+  630  0044DB48    10C  void Trk_Stop(TPerf* pperf)
+  662  0044D518    184  void Trk_StopAllVoices(TPerf* pperf, ETrkStopMode mode)
+                         local  TTrack* ptrk
+                         local  TVoice** ppv
+                         local  TVoice** ppvend
+                         local  bool alldone
+                         local  TVoice* pv
+                         local  TVoice* pv
+  715  0044E3E8     CC  bool Trk_Tick(TPerf* pperf)
+  730  003E1AD8     D8  void Trk_Step(TPerf* pperf, uint8 step, bool debounce)
+  744  003DF86C    138  void Trk_SelectVariation(TPerf* pperf, uint8 var)
+                         inlines  Seq_SelectVariation
+  757  003E3364     B4  void Trk_SetVariationRange(TPerf* pperf, uint8 rangeID)
+  770  003E1BB0     84  void Trk_SetTempo(TPerf* pperf, audfrac tempo)
+  783  00450FC8    420  void Trk_Render(TPerf* pperf)
+                         local  TTrack* ptrk
+                         local  TEmitInst* pemit
+                         local  audfrac attn
+                         inlines  Mas_GetSubmix, Mas_IsChanMuted, TrkRender3D, TrkRenderStereo, audfrac_Mul
+  804  003E1F54    15C  void Trk_Check(TTrack* ptrk, bool bResolve)
+  837  0044CE9C    374  void Trk_VoiceEndCB(void* p, EVocEndReason reason)
+                         local  TVoice* pv
+                         local  TPerf* pperf
+                         local  uint8 vocID
+                         local  TPerfStm* pstm
+  904  003E2938    1BC  void Trk_DebugPrint(const float& x, const float& y, PRINTFFN PrintfFn, const TPerf& performance)
+                         local  const float LINE
+                         local  int index
+                         local  char*[7] szStates
+                         local  float xindent
+                         local  int i
+                         local  const TVoice& voice
+ 1012  003E2E08      4  void Trk_DebugPrint(const float& x, const float& y, PRINTFFN PrintfFn, const TTrack& track)
+ 1071  003E2E0C     60  void Trk_DebugPrint(const float& x, const float& y, PRINTFFN PrintfFn)
+                         local  const float LINE

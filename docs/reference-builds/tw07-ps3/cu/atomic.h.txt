@@ -1,0 +1,9 @@
+// ../../../../../TIGERCODE/RW45/platform/include/native/ps3-ppu-gcc/rw/core/thread/atomic.h
+// compiled in: Legacy_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   44    inline-only   int32_t GetValueRaw(const const struct <anon>* this)
+  158    inline-only   int32_t SetValue(const struct <anon>* this, int32_t n)
+                         local  int32_t nOriginalValue
+  188    inline-only   bool SetValueConditional(const struct <anon>* this, int32_t n, int32_t condition)
+                         local  int32_t nOriginalValue

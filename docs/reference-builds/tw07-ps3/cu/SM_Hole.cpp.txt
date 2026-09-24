@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_Hole.cpp
+// compiled in: shader_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   34  0051B6B4     38  void SM_HoleClass::SM_HoleClass(const struct SM_HoleClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base, vec4flt_Zero
+   41  00509148     88  void SM_HoleClass::Load(const struct SM_HoleClass* this)
+   50  005091D0     48  void SM_HoleClass::Activate(const struct SM_HoleClass* this)
+   57  00509218     24  void SM_HoleClass::Deactivate(const struct SM_HoleClass* this)
+   63  00517E80     6C  void SM_HoleClass::SetTFactor(const struct SM_HoleClass* this, const float[4]& TFactor)
+                         inlines  vec4flt_Copy

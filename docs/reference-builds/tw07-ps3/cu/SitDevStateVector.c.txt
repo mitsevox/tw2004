@@ -1,0 +1,46 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/SitDev/SitDevStateVector.c
+// compiled in: golf2_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   70    inline-only   bool SitDev_CompareConditions(Situation* s, int condIndex, uint16* pStateValues, int condNum)
+  116    inline-only   bool SitDev_MatchConditionRange(Situation* s, int condIndex, uint16* pStateValues, int condNum)
+                         local  int i
+                         local  bool hasCondition2
+                         local  int cond2Index
+                         local  bool needToOR
+  197  001D8164   15C0  bool SitDev_ConditionsMatch(Situation* s, uint16* pStateValues, enum PlayerNumber_t playerID)
+                         local  int i
+                         local  int conditionIndex
+                         local  int conditionNumber
+                         local  bool checkedPredictionMadeCondition
+                         local  bool match
+                         local  bool needToOR
+                         inlines  SitDev_CompareConditions, SitDev_MatchConditionRange, _SetStateVecAndCondition
+  388  001D9724     30  void SitDev_SetupClubCondition(enum Club_t club_id)
+                         local  uint16* pStateValues
+                         local  uint32* pConditions
+                         inlines  _SetStateVecAndCondition
+  455  001E0F68   14D4  void SitDev_SetupStateVector(enum PlayerNumber_t playerID, uint8 situation)
+                         local  int i
+                         local  float f
+                         local  void* ptr
+                         local  int32 value
+                         local  uint16* pStateValues
+                         local  uint32* pConditions
+                         local  struct GamePlayer* plr
+                         local  struct PhysicsBall_t* ball
+                         local  struct PhysicsBall_t* estBall
+                         local  int32 ballSurfaceID
+                         local  int32 estBallSurfaceID
+                         local  uint16 currentRound
+                         local  uint16 holeIndex
+                         local  uint16 gameMode
+                         local  struct GameModeBattle* pBattle
+                         inlines  GM_GetCurrentEventLead, GM_GetCurrentFlagPositionIndex, GM_GetCurrentHoleIndex, GM_GetCurrentRound, GM_GetModeType, GM_GetNumHolesInRound, GM_GetPotentialEventLead, GM_IsPlayoff, GM_IsPuttForWin, GM_OnFirstSelectedHole, GamePlayer::GetCoreShotInfo, GamePlayer::GetEstimatedBall, GamePlayer::GetGolferBonus, GamePlayer::GetGolferScore, _SetStateVecAndCondition
+  843  00132B44    144  void modifyFinalLie(int32* lie, int32 ballSurfaceID, float* ballLocation, struct GamePlayer* plr)
+                         local  bool bLieIsWater
+                         local  bool bLieIsPenalized
+  876  00132B30     14  void modifyInitialLie(int32* lie, int32 ballSurfaceID)
+  883  00132A14    11C  bool SitDev_GameModeMatches(Situation* s, uint32 gameModeBits)
+  901  001328B4    160  bool SitDev_Match_PlayerID(int16 currentPlayerID, uint8 op, uint16 playerID)
+                         local  int16 modifiedCurrentPlayerID

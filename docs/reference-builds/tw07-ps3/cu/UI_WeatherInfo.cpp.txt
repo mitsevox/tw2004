@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_WeatherInfo.cpp
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    8  000FAD70     4C  void UIWeatherInfo::UIWeatherInfo(const struct UIWeatherInfo* this)
+   12  0004F254     24  void UIWeatherInfo::Init(const struct UIWeatherInfo* this)
+   18  0004F278     24  void UIWeatherInfo::Close(const struct UIWeatherInfo* this)

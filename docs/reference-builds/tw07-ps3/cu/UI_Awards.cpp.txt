@@ -1,0 +1,44 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_Awards.cpp
+// compiled in: apt_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   43  000F572C     A4  void UIAwards::UIAwards(const struct UIAwards* this)
+                         inlines  TArrayInternal<UIAwards::DstMenuItem_awar,AptStructSwapper>::TArrayInternal, TExternArray<UIAwards::DstMenuItem_awar>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   53  000EEFE0     8C  void UIAwards::Init(const struct UIAwards* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   66  0007CA2C    150  void UIAwards::Show(const struct UIAwards* this)
+                         local  int32 money
+                         local  char[16] baseMoneyString
+                         local  char* moneyGrandTotalAmount
+   94  00030DEC     E8  int32 UIAwards::GetNumberOfAwards(const struct UIAwards* this, int32 playerIndex)
+                         local  int32 numItems
+  111  0007C934     F8  void UIAwards::OnShow(const struct UIAwards* this)
+                         local  int32 money
+                         local  char[16] baseMoneyString
+                         local  char* moneyGrandTotalAmount
+  127  00031028    524  void UIAwards::UpdateItemAndLabel(const struct UIAwards* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_awar* dest
+                         local  struct DstMenuItem_awar* dst
+                         local  char* strBuf0
+                         local  char* strBuf1
+                         local  const int32 numCategories
+                         local  int32[7] categories
+                         local  int32 category
+                         local  int32 categoriesIndex
+                         local  int32 categoryIndex
+                         local  int32 numCategoryItems
+                         local  int32 trophyId
+                         local  int32 tourCardId
+                         local  int32 numLegendCoins
+                         local  int32 equipmentTokenType
+                         local  char* baseString
+                         local  char* typeString
+                         local  int32 unlockedCourseId
+                         local  char* courseName
+                         local  char* baseUnlockString
+                         local  int32 unlockedGolferId
+                         local  int32 recordId
+  291  000388BC     48  void UIAwards::InitMenuParams(const struct UIAwards* this)
+  300  000CEC18    1F0  enum eAptHandleInput UIAwards::HandleInput(const struct UIAwards* this, int32 cID)
+  345  0007C344    12C  void UIAwards::ShowHelpText(const struct UIAwards* this)
+  362  00030F08    120  char* UIAwards::GetEquipmentTokenString(const struct UIAwards* this, enum STAT_e equipmentTokenType)

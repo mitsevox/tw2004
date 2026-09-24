@@ -1,0 +1,53 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/plugin.cpp
+// compiled in: plugin.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   15  006D2CCC    488  struct PlugIn* CreateInstance(void* pPlugInMem, struct Voice* pVoice, struct <anon>* pPlugInDescRunTime, struct PlugInConfig* pPlugInConfig, int inputChannels)
+                         local  struct PlugIn* pThis
+                         local  struct PlugInRegistry* pPlugInRegistry
+                         local  int numConstructorParameters
+                         local  char* pParameterBufferTemp
+                         local  int i
+                         local  struct <anon>* pParamHandle
+                         local  enum ParameterType paramType
+                         local  float param
+                         local  float param
+                         local  double param
+                         local  Guid param
+                         inlines  Assert, GetSystem
+  171  006D3154    31C  void SetAttribute(const struct PlugIn* this, int attribute, float value)
+                         local  const char[13] __FUNCTION__
+                         local  struct SetAttributeCommand* pCommand
+                         local  struct <anon>* pSystem
+                         local  struct PlugInRegistry* pPlugInRegistry
+                         local  struct <anon>* pParamHandle
+                         inlines  Assert, GetCommandSlot, GetSystem
+  222  006D2CA0     2C  int SetAttributeHandler(struct <anon>* pCommand)
+                         local  struct PlugIn* pThis
+                         local  struct SetAttributeCommand* pSetAttributeCommand
+  239  006D3470    1D4  void GetAttribute(const struct PlugIn* this, int attribute, float* pValue)
+                         local  const char[13] __FUNCTION__
+                         local  struct <anon>* pSystem
+                         local  struct PlugInRegistry* pPlugInRegistry
+                         local  struct <anon>* pParamHandle
+                         inlines  Assert, GetSystem
+  296  006D3644    19C  void GetAttribute(const struct PlugIn* this, int attribute, double* pValue)
+                         local  const char[13] __FUNCTION__
+                         local  struct <anon>* pSystem
+                         local  struct PlugInRegistry* pPlugInRegistry
+                         local  struct <anon>* pParamHandle
+                         inlines  Assert, GetSystem
+  340  006D37E0    554  void Event(const struct PlugIn* this, int event, void* pParameterBuffer)
+                         local  struct <anon>* pSystem
+                         local  struct PlugInRegistry* pPlugInRegistry
+                         local  int numParameters
+                         local  int numOutputParams
+                         local  char* pParameterBufferTemp
+                         local  int i
+                         local  struct <anon>* pParamHandle
+                         local  enum ParameterType paramType
+                         local  float param
+                         local  float param
+                         local  double param
+                         local  Guid param
+                         inlines  Assert, GetSystem

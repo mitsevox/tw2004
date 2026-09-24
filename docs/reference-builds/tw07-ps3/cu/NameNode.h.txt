@@ -1,0 +1,6 @@
+// ../ears_rt_cct/dev/api_src/Internal/NameNode.h
+// compiled in: ChrCntl_Character.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   82    inline-only   const char* GetNodeName(const const struct <anon>* this)
+   96    inline-only   uint16_t GetUsageCount(const const struct <anon>* this)

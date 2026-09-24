@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/UI_LowImpactMessages.h
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   17  00124210     B8  void UILowImpactMessages::~UILowImpactMessages(const struct UILowImpactMessages* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   19  000FE7C0      C  uint32 UILowImpactMessages::GetSignature(const const struct UILowImpactMessages* this)
+   38    inline-only   bool UILowImpactMessages::AreAnyMessagesVisible(const struct UILowImpactMessages* this)
+  106  00103494     1C  enum AptThreadReturnValue UILowImpactMessages::CheckForNewMessagesThread_func(struct IAptSubscriberBase* subs)

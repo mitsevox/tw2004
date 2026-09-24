@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_CharFace.cpp
+// compiled in: shader_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   23  0051D1B8     4C  void SM_CharFaceClass::SM_CharFaceClass(const struct SM_CharFaceClass* this)
+   30  0050E7C8     6C  void SM_CharFaceClass::Load(const struct SM_CharFaceClass* this)
+   39  0051E5F0     74  void SM_CharFaceClass::LoadParams(const struct SM_CharFaceClass* this)
+   48  0051EB50     40  void SM_CharFaceClass::Activate(const struct SM_CharFaceClass* this)
+   55  0050E834     34  void SM_CharFaceClass::Deactivate(const struct SM_CharFaceClass* this)
+   62  005168E8     64  void SM_CharFaceClass::SetBlendNormalMap(const struct SM_CharFaceClass* this, TextureRef texRef)

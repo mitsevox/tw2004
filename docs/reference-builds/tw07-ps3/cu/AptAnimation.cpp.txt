@@ -1,0 +1,81 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptAnimation.cpp
+// compiled in: other_unity.cpp
+// 19 functions, source order. line | PS3 address | size
+
+   13  00468048    504  void AptCharacterAnimation::_fixup(const struct AptCharacterAnimation* this, void* pAptData, struct AptConstFile* pConstFile, void* pUserData)
+                         local  int i
+                         local  unsigned char* pBase
+                         local  const char* s
+                         inlines  AptSharedPtr<AptFile>::operator=, AptSharedPtr<AptFile>::~AptSharedPtr, BasicString, Capacity, Copy, ReAlloc, ~BasicString
+  143  0046854C     60  void AptCharacterAnimation::resolve(const struct AptCharacterAnimation* this, void* pAptData, struct AptConstFile* pConstFile, void* pUserData)
+                         local  unsigned char* pBase
+  156  003EEE58     6C  int AptCharacterAnimation::_unmapCharacter(const struct AptCharacterAnimation* this, struct AptCharacter* pCharacter)
+                         local  int i
+  166  003EEEC4     64  bool AptCharacterAnimation::_isImport(const struct AptCharacterAnimation* this, int nID)
+                         local  int i
+  175  0046292C    534  void AptCharacterAnimation::unresolve(const struct AptCharacterAnimation* this, void* pAptData)
+                         local  int i
+                         local  unsigned char* pBase
+                         local  int j
+                         inlines  AptSharedPtr<AptFile>::AptSharedPtr, AptSharedPtr<AptFile>::operator=, AptSharedPtr<AptFile>::~AptSharedPtr
+  361  004063A8    270  void AptCharacterAnimation::link(const struct AptCharacterAnimation* this, struct AptCharacter* pParentAnim, void* pUserData)
+                         local  int i
+                         local  int j
+                         local  struct AptCharacter* pRet
+                         inlines  AptFile::FindExport, AptSharedPtr<AptFile>::operator->
+  509  0049C040    3F0  void AptAnimationPoolData::tickIntervalTimers(const struct AptAnimationPoolData* this, int nMilliseconds)
+                         local  int i
+                         local  int nCount
+                         local  struct AptScriptFunction* pFuncDef
+                         local  struct AptAction_DefineFunction* pFunc
+                         local  int j
+                         inlines  AptActionInterpreter::stackPop, AptActionInterpreter::stackPush, AptCIH::isLevelInst, AptValue::__inc, AptValue::isLookup, AptValueStack<AptValue*,384>::push, AptValueStack<AptValue*,6>::at, AptValueStack<AptValue*,6>::size
+  557  004996B8     FC  void AptAnimationPoolData::_tickNewInsts(const struct AptAnimationPoolData* this)
+                         local  int i
+                         local  struct AptCharacterSpriteInst* pSprInst
+                         inlines  AptCIH::isSpriteInst
+  585  0049A968    280  void AptAnimationPoolData::runActions(const struct AptAnimationPoolData* this)
+                         local  struct AptActionPool* pCur
+                         local  struct AptActionPool* pOrigEnd
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptAnimationPoolData::IncrementDequeLocation, AptCIH::isLevelInst, AptValue::getVtblIndex, AptValue::setRefCount, AptValueStack<AptValue*,32>::pop, AptValueStack<AptValue*,32>::push, AptValueStack<AptValue*,384>::pop
+  673  0040F5D0    1BC  void AptAnimationPoolData::removeTimerFunctions(const struct AptAnimationPoolData* this, struct AptCIH* pAnimCIH)
+                         local  int nCount
+                         local  int i
+                         inlines  AptIntervalTimer::cleanParams, AptValueStack<AptValue*,6>::pop
+  695  0040C6D8    100  void AptAnimationPoolData::clearActions(const struct AptAnimationPoolData* this)
+                         local  struct AptActionPool* pCur
+                         inlines  AptAnimationPoolData::IncrementDequeLocation
+  729  0045F2BC     BC  void AptAnimationPoolData::addActionBack(const struct AptAnimationPoolData* this, struct AptActionBlock* pActionBlock, struct AptCIH* pCIH, AptInput input)
+                         local  struct AptActionPool* next
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptAnimationPoolData::IncrementDequeLocation, AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount
+  771  0045F494     B8  void AptAnimationPoolData::addActionFront(const struct AptAnimationPoolData* this, struct AptActionBlock* pActionBlock, struct AptCIH* pCIH, AptInput input)
+                         local  struct AptActionPool* next
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptAnimationPoolData::DecrementDequeLocation, AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount
+  810  0045F54C    148  void AptAnimationPoolData::addFunctionBack(const struct AptAnimationPoolData* this, struct AptCIH* pContext, struct AptValue* pFuncDef, int nParams, AptInput input)
+                         local  struct AptActionPool* next
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptAnimationPoolData::IncrementDequeLocation, AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount
+  853  0045F694    138  void AptAnimationPoolData::addFunctionFront(const struct AptAnimationPoolData* this, struct AptCIH* pContext, struct AptValue* pFuncDef, int nParams, AptInput input)
+                         local  struct AptActionPool* next
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptAnimationPoolData::DecrementDequeLocation, AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount
+  893  0040C7D8    1B4  void AptAnimationPoolData::removeActionFor(const struct AptAnimationPoolData* this, struct AptCIH* pCIH)
+                         local  struct AptActionPool* pCur
+                         inlines  AptAnimationPoolData::DecrementDequeLocation, AptAnimationPoolData::IncrementDequeLocation
+  978  003EEA8C      8  void AptAnimationPoolData::setInputMask(const struct AptAnimationPoolData* this, struct AptCIH* pMask)
+  984  003EEF28     40  bool AptAnimationPoolData::isInputMasked(const struct AptAnimationPoolData* this, struct AptCIH* pObj)
+                         local  struct AptCIH* pTemp
+ 1007  00499BC8    1D8  void AptCharacterAnimation::doImportedInitActions(const struct AptCharacterAnimation* this, struct AptCIH* pInst)
+                         local  struct AptCharacterSpriteInstBase* pSpriteInst
+                         local  int j
+                         local  struct AptCharacter* pTmpChat
+                         local  int k
+                         local  int nID
+                         local  int l
+                         local  struct AptControl* pInitTagControl
+                         inlines  AptCIH::getSpriteInstBase, AptCIH::isAnimationInst, AptFile::GetMainCharacter

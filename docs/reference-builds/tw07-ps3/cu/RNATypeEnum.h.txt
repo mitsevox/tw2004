@@ -1,0 +1,15 @@
+// ../../../../../TIGERCODE/packages/RNA/dev-2.0-golf/RNA/RNACore/include/RNAScope/RNATypeEnum.h
+// compiled in: golf_unity.cpp, headgate_unity.cpp, rnaunity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   71    inline-only   enum TypeID RNA::TypeGetID<std::int32_t>()
+   72    inline-only   enum TypeID RNA::TypeGetID<std::uint32_t>()
+   73    inline-only   enum TypeID RNA::TypeGetID<std::float_t>()
+   77    inline-only   enum TypeID RNA::TypeGetID<bool>()
+   80    inline-only   enum TypeID RNA::TypeGetID<bool8_t>()
+   81    inline-only   enum TypeID RNA::TypeGetID<RNA::TextureC*>()
+   84    inline-only   enum TypeID RNA::TypeGetID<RNAMath::RNAVector2>()
+   85    inline-only   enum TypeID RNA::TypeGetID<RNAMath::RNAVector3>()
+   86    inline-only   enum TypeID RNA::TypeGetID<RNAMath::RNAVector4>()
+   87    inline-only   enum TypeID RNA::TypeGetID<RNAMath::RNAMatrix33>()
+   88    inline-only   enum TypeID RNA::TypeGetID<RNAMath::RNAMatrix44>()

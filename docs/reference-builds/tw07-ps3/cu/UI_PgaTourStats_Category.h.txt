@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_PgaTourStats_Category.h
+// compiled in: apt_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   18  000FF0DC      C  uint32 UIPgaTourStats_Category::GetSignature(const const struct UIPgaTourStats_Category* this)
+   19  000FF0E8     44  void UIPgaTourStats_Category::ShowHelpText(const struct UIPgaTourStats_Category* this)
+   30  000FF134      C  struct IExternArray* UIPgaTourStats_Category::GetExternArray(const struct UIPgaTourStats_Category* this)
+   96    inline-only   void UIPgaTourStats_Category::SetSimFromCalendarFlag(const struct UIPgaTourStats_Category* this, bool bFlag)
+   97    inline-only   void UIPgaTourStats_Category::SetShowFedExRankFlag(const struct UIPgaTourStats_Category* this, bool bFlag)
+   99    inline-only   bool UIPgaTourStats_Category::GetShowFedExRankFlag(const struct UIPgaTourStats_Category* this)
+  115  00103BEC     14  enum TAptSequenceStatus UIPgaTourStats_Category::WaitTillDataFillBeforeGoingToPlayerIndex_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)

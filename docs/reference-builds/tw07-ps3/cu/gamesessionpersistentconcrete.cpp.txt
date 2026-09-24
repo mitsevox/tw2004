@@ -1,0 +1,43 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/gamesessionpersistentconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   95  005E1C24     24  void LobbyApiDispatchCallback(LobbyApiRefT* , LobbyApiMsgT* pMsg, void* pUserData)
+                         local  struct <anon>* pGameSession
+  130  005E1AC4    160  void HandleChatDispatch(const struct <anon>* this, LobbyApiMsgT* pMsg)
+                         local  struct MemoryStrategy* pPersistentMemory
+                         local  struct <anon> dictMesg
+                         local  struct <anon> strUser
+                         local  uint32_t uFlags
+                         local  struct <anon> strMessage
+                         local  struct PeerConnection* pPeerConnection
+  177  005F0048    2B8  void ReportStats(const struct <anon>* this, struct Dictionary* pGameStats)
+                         local  struct <anon> StandardStats
+                         local  int32_t iResult
+                         inlines  GetLobbyApi, GetTagField, Instance, cOsdkBase
+  224  006207A4    420  void GameSessionPersistentConcrete(const struct <anon>* this, const struct GameSessionConcrete* pGameSessionToCopyFrom, const LobbyApiPlayT* pLobbyApiPlay)
+                         local  struct MemoryStrategy* pPersistentMemory
+                         local  struct <anon>* pFacade
+                         local  struct User* pHostUser
+                         local  struct <anon>* pLocalUser
+                         local  const struct List<OSDK::GameUser>* pGameUsers
+                         local  uint32_t uNumUsers
+                         local  uint32_t uIndex
+                         local  struct <anon>* pCurrentGameUser
+                         local  const char8_t* strUserName
+                         local  struct GameUser* pNewGameUser
+                         inlines  GetNumberOfElements, InsertElement, List, RCPointer, operator=
+  294  00621398     C4  void ~GameSessionPersistentConcrete(const struct <anon>* this)
+                         inlines  ~List, ~RCPointer
+  323  005D261C     48  void SetPresence(const struct <anon>* this, const char8_t* strPresence)
+                         local  HLBApiRefT* pHLBud
+  356  005D2664     40  void SendTickerScore(const struct <anon>* this, const char8_t* strHomeUser, int32_t iHomeScore, const char8_t* strAwayUser, int32_t iAwayScore, const char8_t* strStatus, const char8_t* strPresence)
+                         local  HLBApiRefT* pHLBud
+                         local  int32_t iResult
+  386  005FDC5C     68  struct Operation* PingServer(const struct <anon>* this, uint32_t uTimeout, struct PingCallback* pCallback)
+                         local  struct Operation* pReturn
+  415  005F0300     F4  void SendChatMessage(const struct <anon>* this, const char8_t* strMessage, const struct <anon>* pUser)
+                         local  struct <anon> dict
+                         local  uint32_t uFlags
+                         local  int32_t iResult
+                         inlines  GetLobbyApi, GetTagField

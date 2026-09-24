@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNAX/include/RNAX/RNAGeomList.h
+// compiled in: RNAGeomList.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   42    inline-only   void GeomListC::operator delete(void* address)
+   42    inline-only   struct ICoreAllocator* GeomListC::GetClassAllocator()
+   48    inline-only   int32_t GeomListC::GetNumGeoms(const const struct GeomListC* this)
+   49    inline-only   struct GeomC* GeomListC::GetGeom(const const struct GeomListC* this, int32_t iGeom)

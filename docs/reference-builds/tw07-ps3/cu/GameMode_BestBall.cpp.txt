@@ -1,0 +1,87 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_BestBall.cpp
+// compiled in: golf_unity.cpp
+// 23 functions, source order. line | PS3 address | size
+
+   20  00205060     44  void GameModeBestBall::GameModeBestBall(const struct GameModeBestBall* this)
+   25  001FD42C     18  void GameModeBestBall::~GameModeBestBall(const struct GameModeBestBall* this)
+   30  001FD4A8     DC  void GameModeBestBall::Init(const struct GameModeBestBall* this)
+   47  001FD584      4  void GameModeBestBall::Update(const struct GameModeBestBall* this)
+   52  001FD588      4  void GameModeBestBall::Shutdown(const struct GameModeBestBall* this)
+   57  001FD58C     1C  bool GameModeBestBall::QueryInterface(const struct GameModeBestBall* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bret
+   71  001FD5A8     38  int32 GameModeBestBall::GetEndGameSequence(const struct GameModeBestBall* this)
+                         local  int32 sequence
+   80  002D14E4      4  void GameModeBestBall::SetupNextGolfer(const struct GameModeBestBall* this)
+   85  00320D54    6C0  enum PlayerNumber_t GameModeBestBall::GetHonors(const struct GameModeBestBall* this, enum PlayerNumber_t ignore, bool doNotIgnoreHoledOut)
+                         local  enum PlayerNumber_t furthest
+                         local  int32 i
+                         local  float x
+                         local  float y
+                         local  float dist
+                         local  float farthestDist
+                         local  uint32 j
+                         local  TGD_TerrainInfo* pTerrainGameData
+                         local  int32 currentTeamTeeFirstHonors
+                         local  int32 nextTeamTeeFirstHonors
+                         local  enum PlayerNumber_t[4] currentTeeHonors
+                         local  int32 team0Score
+                         local  int32 team1Score
+                         local  enum PlayerNumber_t swap
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, PLR_HoledOut, std::sqrt
+  227  00320614    1D8  enum PlayerNumber_t GameModeBestBall::GetHoleWinner(const const struct GameModeBestBall* this)
+                         local  int32_t minStrokes
+                         local  enum PlayerNumber_t winner
+                         local  bool tied
+                         local  int plr
+                         local  int32_t curStrokes
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes
+  275  001FD5E0      4  void GameModeBestBall::EndGolferTurn(const struct GameModeBestBall* this, enum PlayerNumber_t PlayerID)
+  280  00320CEC     68  bool GameModeBestBall::HoleFinished(const struct GameModeBestBall* this, enum PlayerNumber_t PlayerID, bool predict)
+  285  003207EC     88  bool GameModeBestBall::GameFinished(const struct GameModeBestBall* this, bool predict)
+                         local  bool bRet
+                         local  int32 i
+                         inlines  GM_GetCurrentHoleIndex
+  302  00320874    240  void GameModeBestBall::EndHole(const struct GameModeBestBall* this)
+                         local  int32 currHole
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_SetPlayerHoleStrokes, PLR_HoledOut
+  356  00320AB4     C4  void GameModeBestBall::UpdateScoreCard(const struct GameModeBestBall* this)
+                         local  int32 i
+                         inlines  GM_GetCurrentHoleIndex
+  369  00310108    428  void GameModeBestBall::EndGame(const struct GameModeBestBall* this)
+                         local  int32 i
+                         local  enum PlayerNumber_t plr1
+                         local  enum PlayerNumber_t plr3
+                         local  int32 rank1
+                         local  int32 rank2
+                         local  int32 strokesAhead
+                         local  int32 playerscore
+                         local  int32 cpuscore
+                         local  int32 totalearned
+                         local  int32 baseearned
+                         local  int32 userID
+                         local  enum PlayerNumber_t loseteam
+                         local  int32 player
+                         inlines  EarningsInfo::GetStrokeEarnings, GM_FullRoundOfGolf, GM_GetNumHolesInRound, GM_IsPlayoff, Singleton<EarningsInfo>::GetSingleton
+  476  001FD5FC     14  const char* GameModeBestBall::GetName(const struct GameModeBestBall* this)
+  482  001FD654     38  bool GameModeBestBall::OnSameTeam(const struct GameModeBestBall* this, enum PlayerNumber_t PlayerID_1, enum PlayerNumber_t PlayerID_2)
+  490  00320B78    174  bool GameModeBestBall::TeamDone(const struct GameModeBestBall* this, int teamNum)
+                         local  int32 currHole
+                         local  enum PlayerNumber_t plr1
+                         local  enum PlayerNumber_t plr2
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, PLR_HoledOut
+  505  001FD610     44  enum PlayerNumber_t GameModeBestBall::GetPartner(const struct GameModeBestBall* this, enum PlayerNumber_t plr)
+                         local  enum PlayerNumber_t ret
+  530  00321558     C4  void GameModeBestBall::GetCurrentScoreString(const struct GameModeBestBall* this, char* strBuf, int32 bufferSize)
+                         local  int32 curScore
+                         local  const char* prefix
+  550  0030E030    144  int32 GM_BestBallMode_GetTeamHoleScore(enum PlayerNumber_t PlayerID, int32 holeNum)
+                         local  void* ptr
+                         local  enum PlayerNumber_t player
+                         local  struct GameModeBestBall* pBB
+                         inlines  GM_GetPlayerHoleStrokes
+  565  00321414    144  int32 GM_BestBallMode_GetTeamRelativeScore(enum PlayerNumber_t PlayerID, bool bIncludeCurrentHole)
+                         local  int32 totalpar
+                         local  int32 totalscore
+                         local  int32 hole
+                         local  int32 i
+                         inlines  GM_GetCurrentHoleIndex

@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/AptInterface/AptPackage/_AptActions.h
+// compiled in: other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+  234    inline-only   void AptActionInterpreter::stackPush(const struct AptActionInterpreter* this, struct AptValue* pValue)
+  251    inline-only   void AptActionInterpreter::stackPop(const struct AptActionInterpreter* this)
+  256    inline-only   struct AptValue* AptActionInterpreter::stackAt(const struct AptActionInterpreter* this, int nPos)

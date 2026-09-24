@@ -1,0 +1,22 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Memory_Card/sjisascii.c
+// compiled in: apt_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   66  00052A94     D8  char Sjis2Ascii(unsigned char* character)
+                         local  unsigned char byte1
+                         local  unsigned char byte2
+                         local  char output
+                         local  int i
+  143  00052B6C     3C  int IsSjis(unsigned char* title)
+  156  00052BA8     18  long int IsAscii(char* c)
+  165  00052BC0     EC  short unsigned int Ascii2Sjis(unsigned char ascii_code)
+                         local  short unsigned int sjis_code
+                         local  unsigned char stmp
+                         local  unsigned char stmp2
+  207  00052CAC     F8  void AsciiString2Sjis(unsigned char* input, short unsigned int* output)
+                         local  int i
+                         local  int len
+                         local  short unsigned int sjis
+                         local  unsigned char temp1
+                         local  unsigned char temp2
+  228  00052DA4     14  short int SwapShort(short unsigned int input)

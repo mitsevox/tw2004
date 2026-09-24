@@ -1,0 +1,9 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/srandom.cpp
+// compiled in: srandom.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   31  006DE97C     40  void SNDI_randomseed(unsigned int seed)
+                         local  int i
+   42  006DE9BC    120  unsigned int iSNDrandom()
+                         local  unsigned int ax
+                         local  unsigned int c

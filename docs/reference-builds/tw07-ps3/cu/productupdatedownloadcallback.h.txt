@@ -1,0 +1,5 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/./././productupdatedownloadcallback.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   66  00623188      C  void ~ProductUpdateDownloadCallback(const struct ProductUpdateDownloadCallback* this)

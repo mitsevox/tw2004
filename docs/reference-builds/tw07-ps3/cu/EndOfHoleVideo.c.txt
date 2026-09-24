@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/EndOfHoleVideo.c
+// compiled in: golf_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   56  001FB388    120  bool EV_vManageEndOfHoleVideos()
+                         local  enum GUI_MovieIndex_t nextMovie
+                         local  char[64] rawMoviePath
+                         local  char[64] moviePath
+                         local  const bool dashboardAutoUpdating
+   89  001FB2DC     AC  void EV_vBuildRawMoviePathFromIndex(enum GUI_MovieIndex_t nextMovie, char* moviePath, size_t movePathBufLen)
+                         local  char* movieName

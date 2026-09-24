@@ -1,0 +1,40 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_Rivals.cpp
+// compiled in: apt_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   62  000F4764     90  void UIRivals::UIRivals(const struct UIRivals* this)
+                         inlines  TExternArray<UIPRivalsItem>::TExternArray
+   72  000F0FA4     68  void UIRivals::Init(const struct UIRivals* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList
+   84  0006D8B4     A8  void UIRivals::InitMenuParams(const struct UIRivals* this)
+                         inlines  UIMenuCircBase::SetNbrItemsVisibleInMenu
+   98  000497C0     24  void UIRivals::Show(const struct UIRivals* this)
+  103  000497E4     34  void CheckForSpecialPopupsCB(int32 rslt)
+                         local  struct GameModeDriverEra* curRivalsGameDriver
+  112  00049818      4  void UIRivals::OnShow(const struct UIRivals* this)
+  144  0006ED28    1B8  void UIRivals::UpdateItemAndLabel(const struct UIRivals* this, struct UIMenuItemBaseDst* dstItem, struct UIMenuItemBaseSrc* srcItem, int32 index, char* inLabel)
+                         local  const struct UserInfo& userInfo
+                         local  struct UIRivalsItemConstant* menuItemIn
+                         local  struct UIPRivalsItem* itemToUpdate
+  199  000C89DC    1F8  enum eAptHandleInput UIRivals::HandleInput(const struct UIRivals* this, int32 cID)
+                         inlines  ClubHouseMgr
+  252  0004981C     24  void UIRivals::RegainFocus(const struct UIRivals* this, uint32 comeFrom_Signature)
+  268  00095B38     70  static void DoneWithRivalsSaveQuery(int32 nRslt)
+                         inlines  ClubHouseMgr
+  283  000C8688    354  void UIRivals::SelectRivalsItem(const struct UIRivals* this)
+                         local  struct UIPRivalsItem* activeItem
+                         local  enum eRivals id
+                         inlines  ClubHouseMgr
+  345  0006EC7C     AC  bool UIRivals::NeedBlinkyThing(const struct UIRivals* this, enum eRivals id)
+                         local  struct GameModeDriverEra* curRivalsGameDriver
+                         local  int32 numEvents
+                         local  int32 i
+                         inlines  GameModeDriverEra::GetNumEvents
+  366  00095BA8     E4  enum AptThreadReturnValue UIRivals::InitialGoToMessenger(const struct UIRivals* this)
+                         inlines  ClubHouseMgr
+  384  00095C8C    174  enum AptThreadReturnValue UIRivals::ExitImmediately(const struct UIRivals* this)
+                         inlines  ClubHouseMgr
+  405  0006B690    1A0  void UIRivals::NotifyRivalsMode(const struct UIRivals* this)
+                         local  bool doFEExit
+                         inlines  cGAME_GLOBALS::SetDemoMode, cGAME_GLOBALS::SetNextGame
+  464  00049840      8  bool UIRivals::IsStoringMidRoundSave(const struct UIRivals* this)

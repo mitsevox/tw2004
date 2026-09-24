@@ -1,0 +1,65 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/audio/engine/hl/HLAudVoice.c
+// compiled in: other_unity.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   69    inline-only   bool VoicePowerCompare(TVocVolumes* pVolsA, TVocVolumes* pVolsB)
+  130  003E37E8    138  static void ResetModule()
+                         local  uint16 core
+                         local  TVoCore* pcore
+                         local  TVoCore* pcorend
+                         local  TListDbl* plist
+                         local  TListDbl* plistend
+                         local  TVoice* pv
+                         local  TVoice* pvend
+                         local  uint16 chan
+  164  003E3920     24  bool Voc_InitModule()
+  178  003E3944      4  void Voc_ExitModule()
+  188  003E0A74      8  bool Voc_InitSession()
+  194  003E18E4     D8  void Voc_ExitSession()
+                         local  TVoCore* pcore
+                         local  TVoice* pv
+                         local  TVoice* pnext
+  226    inline-only   static void Voc_Dump()
+                         local  int vocState
+                         local  TVoice* pv
+                         local  TListDbl* plist
+                         local  int count
+  271  0044BA94    584  TVoice* Voc_Alloc(TVocAlloc* pvocalloc)
+                         local  TVoCore* pcore
+                         local  TVoice* pv
+                         local  bool steal
+                         local  TListDbl* plist
+                         local  TListDbl* plistEnd
+                         local  TVoice* pvSuck
+                         local  TVocVolumes suckVols
+                         inlines  GM_GetCourseName, Voc_Dump, VoicePowerCompare
+  385  00414CF0     84  void Voc_Start(TVoice* pv, TVocMod* pmod, uaudfrac initRateFactor, uint8 velocity)
+                         local  Chandle chd
+                         local  TTone* ptone
+  405  003E36C4     20  void Voc_StartStream(TVoice* pv)
+  416  00450D38    290  void Voc_Render(TVoice* pv, TVocMod* pmod)
+                         local  Chandle chd
+                         local  uint32 pitch
+                         local  bool dopitch
+                         local  bool bFilter
+                         local  bool reverbon
+                         local  long unsigned int flags
+                         local  bool bLoop
+  498  003E3948     C0  void Voc_Pause(TVoice* pv, bool on)
+  515  0044B8E4     F4  void Voc_Stop(TVoice* pv)
+                         local  TVoCore* pcore
+  545  0044B9D8     BC  void Voc_Delete(TVoice* pv)
+  568  0040F300    15C  void Voc_Cycle()
+                         local  TVoCore* pcore
+                         local  TVoCore* pend
+                         local  TVoice* pv
+                         local  TVoice* pnext
+  638  003E0F68    164  void Voc_PauseAll(bool on, bool spinupDelay)
+                         local  TVoCore* pcore
+                         local  TVoCore* pend
+                         local  TVoice* pv
+                         local  TVoice* pvend
+  689  003E28D8     60  void Voc_DebugPrint(const float& x, const float& y, PRINTFFN PrintfFn, const TVoice& voice)
+                         local  const float LINE
+  703  003E3C8C     60  void Voc_DebugPrint(const float& x, const float& y, PRINTFFN PrintfFn)
+                         local  const float LINE

@@ -1,0 +1,21 @@
+// ../../../../../TIGERCODE/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/matrix44_type_inline.h
+// compiled in: apt_unity.cpp, golf_unity.cpp, rnaunity.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   22    inline-only   struct <anon>& operator=(const struct <anon>* this, const const struct Matrix44& m)
+   31    inline-only   struct <anon>& GetRow(const struct <anon>* this, int i)
+   48    inline-only   void Set(const struct <anon>* this, float m0, float m1, float m2, float m3, float m4, float m5, float m6, float m7, float m8, float m9, float m10, float m11, float m12, float m13, float m14, float m15)
+   82    inline-only   struct <anon> GetElem(const struct <anon>* this, int row, int column)
+   92    inline-only   struct <anon> GetElem(const struct <anon>* this, int i)
+  102    inline-only   struct <anon> operator()(const struct <anon>* this, int row, int column)
+  130    inline-only   struct <anon>& GetW(const struct <anon>* this)
+  136    inline-only   const struct Vector4& GetX(const const struct Matrix44* this)
+  142    inline-only   const struct Vector4& GetY(const const struct Matrix44* this)
+  148    inline-only   const struct Vector4& GetZ(const const struct Matrix44* this)
+  154    inline-only   const struct Vector4& GetW(const const struct Matrix44* this)
+  184    inline-only   const struct Vector4& XAxis(const const struct Matrix44* this)
+  190    inline-only   const struct Vector4& YAxis(const const struct Matrix44* this)
+  196    inline-only   const struct Vector4& ZAxis(const const struct Matrix44* this)
+  226    inline-only   struct <anon>& Pos(const struct <anon>* this)
+  250    inline-only   const struct Vector4& Pos(const const struct Matrix44* this)
+  256    inline-only   void SetElem(const struct <anon>* this, int row, int col, struct <anon>& f)

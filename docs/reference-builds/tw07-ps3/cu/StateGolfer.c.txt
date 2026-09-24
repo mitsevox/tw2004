@@ -1,0 +1,20 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/State_Engine/StateGolfer.c
+// compiled in: golf2_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+  134  001341C8     60  char* GOLFERSTATE_GetCurrentStateString(enum PlayerNumber_t PlayerID)
+  152  00134228     3C  void GOLFERSTATE_OpenONCE()
+                         local  int32 PlayerID
+  176  00134264    13C  void GOLFERSTATE_Update()
+                         local  int32 PlayerID
+                         local  bool bSkipUpdate
+  248  001343A0    150  void GOLFERSTATE_CloseONCE()
+                         local  int32 PlayerID
+  294  001344F0    168  void GOLFERSTATE_Kill(enum PlayerNumber_t PlayerID)
+  346  00164EC8    1AC  void GOLFERSTATE_Push(int8 newState, enum PlayerNumber_t PlayerID)
+  409  00165238    184  void GOLFERSTATE_Pop(enum PlayerNumber_t PlayerID)
+  463  0016565C    238  void GOLFERSTATE_Set(int8 newState, enum PlayerNumber_t PlayerID)
+  556  00134658    20C  void GOLFERSTATE_Switch(int8 newState, enum PlayerNumber_t PlayerID)
+  648  00133728     50  enum GolferState GOLFERSTATE_GetCurrentState(enum PlayerNumber_t PlayerID)
+                         local  enum GolferState curState
+  662  0013306C     54  int8 GOLFERSTATE_GetPreviousState(enum PlayerNumber_t PlayerID)

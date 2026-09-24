@@ -1,0 +1,323 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/online/LobbyMatch.c
+// compiled in: golf2_unity.cpp
+// 129 functions, source order. line | PS3 address | size
+
+ 2503  0017CE2C     70  void OnlineMatchParams::Initialize(const struct OnlineMatchParams* this)
+                         inlines  operator=
+ 2512  0017CE9C     68  void OnlineMatchParams::Destroy(const struct OnlineMatchParams* this)
+                         inlines  operator->, operator=
+ 2519  00162D4C    148  void OnlineMatchParams::ReadMatchInfo(const struct OnlineMatchParams* this, struct GameSession* pSession)
+                         inlines  operator->, operator=
+ 2532  001630E8    1C0  void OnlineMatchParams::ReadLobbyInviteInfo(const struct OnlineMatchParams* this, const struct InvitationIncoming* pInvitation)
+                         inlines  operator->
+ 2545  00163ED8     E4  void OnlineMatchParams::SetDefaultMatchParams(const struct OnlineMatchParams* this)
+                         local  struct KickStart* pKickStart
+                         inlines  KickStart::GetInstance, operator->
+ 2562  0014E5DC     68  void OnlineMatchParams::ResetMatchParams(const struct OnlineMatchParams* this)
+                         inlines  operator->
+ 2571  001276A4      8  int OnlineMatchParams::ValidateMatchParams(const struct OnlineMatchParams* this)
+ 2663  001276AC      C  int OnlineMatchParams::GetNumPlayers(const struct OnlineMatchParams* this)
+ 2669  0014E644     60  enum GM_CourseType_t OnlineMatchParams::GetCourse(const struct OnlineMatchParams* this)
+                         inlines  operator->
+ 2675  0014E6A4     5C  int OnlineMatchParams::GetShotClock(const struct OnlineMatchParams* this)
+                         inlines  operator->
+ 2681  0014E700    118  enum GM_ModeType_t OnlineMatchParams::GetGamemode(const struct OnlineMatchParams* this)
+                         local  int32_t flags
+                         inlines  operator->
+ 2738  001276B8    28C  void OnlineMatchParams::GetGameModeString(const struct OnlineMatchParams* this, enum GM_ModeType_t mode, char* text, int bufferLength)
+ 2789  0014E8B4     B0  enum GM_HoleSelectType_t OnlineMatchParams::GetNumHoles(const struct OnlineMatchParams* this)
+                         local  int32_t flags
+                         inlines  operator->
+ 2816  0014E964     7C  enum GM_TeeColorType_t OnlineMatchParams::GetTees(const struct OnlineMatchParams* this)
+                         local  int32_t flags
+                         inlines  operator->
+ 2831  0014E9E0     84  int OnlineMatchParams::GetPins(const struct OnlineMatchParams* this)
+                         local  int32_t flags
+                         inlines  operator->
+ 2850  0014EA64     7C  enum GREEN_SPEEDS_e OnlineMatchParams::GetGreens(const struct OnlineMatchParams* this)
+                         local  int32_t flags
+                         inlines  operator->
+ 2865  0014EAE0     7C  enum ROUGH_LENGTHS_e OnlineMatchParams::GetRough(const struct OnlineMatchParams* this)
+                         local  int32_t flags
+                         inlines  operator->
+ 2880  0014EB5C     74  enum FAIRWAY_SPEEDS_e OnlineMatchParams::GetFairway(const struct OnlineMatchParams* this)
+                         local  int32_t flags
+                         inlines  operator->
+ 2896  00127944      8  bool OnlineMatchParams::GetRanked(const struct OnlineMatchParams* this)
+ 2902  0014EBD0     D4  enum WEATHER_e OnlineMatchParams::GetWeather(const struct OnlineMatchParams* this)
+                         local  int32_t flags
+                         inlines  operator->
+ 2938  0014ECA4     B4  enum WIND_e OnlineMatchParams::GetWind(const struct OnlineMatchParams* this)
+                         local  int32_t flags
+                         inlines  operator->
+ 2962  0014ED58     5C  int32_t OnlineMatchParams::GetWager(const struct OnlineMatchParams* this)
+                         inlines  operator->
+ 2967  0014EDB4     44  void OnlineMatchParams::SetGSNumber(const struct OnlineMatchParams* this, char* gsString, int value)
+                         inlines  operator->
+ 2973  0014EDF8     98  enum GM_DiffTournType_t OnlineMatchParams::GetDifficulty(const struct OnlineMatchParams* this)
+                         local  int32_t flags
+                         inlines  operator->
+ 2985  0014EE90     60  bool OnlineMatchParams::bIsHeadsetRequired(const struct OnlineMatchParams* this)
+                         local  int32_t flags
+                         inlines  operator->
+ 2992  0014EEF0     60  bool OnlineMatchParams::bIsMatchHandicapped(const struct OnlineMatchParams* this)
+                         local  int32_t flags
+                         inlines  operator->
+ 2999  0012794C      8  bool OnlineMatchParams::bIsMatchPrivate(const struct OnlineMatchParams* this)
+ 3005  0014EF50     60  bool OnlineMatchParams::bIsHostContentBlocked(const struct OnlineMatchParams* this)
+                         local  int32_t flags
+                         inlines  operator->
+ 3011  0014EFB0     60  bool OnlineMatchParams::bIsHostUsingCrap(const struct OnlineMatchParams* this)
+                         local  int32_t flags
+                         inlines  operator->
+ 3018  0014F010     78  void OnlineMatchParams::SetNumPlayers(const struct OnlineMatchParams* this, int numPlayers)
+                         inlines  operator->
+ 3025  0014F088    100  void OnlineMatchParams::SetCourse(const struct OnlineMatchParams* this, enum GM_CourseType_t course)
+                         inlines  operator->
+ 3037  0014F188     5C  void OnlineMatchParams::SetShotClock(const struct OnlineMatchParams* this, int seconds)
+                         inlines  operator->
+ 3043  0014F1E4    1AC  void OnlineMatchParams::SetGameMode(const struct OnlineMatchParams* this, enum GM_ModeType_t mode)
+                         local  int32_t flags
+                         inlines  operator->
+ 3099  0014F390    180  void OnlineMatchParams::SetNumHoles(const struct OnlineMatchParams* this, enum GM_HoleSelectType_t hole)
+                         local  int32_t flags
+                         inlines  operator->
+ 3131  0014F510     F4  void OnlineMatchParams::SetTees(const struct OnlineMatchParams* this, enum GM_TeeColorType_t tee)
+                         local  int32_t flags
+                         inlines  operator->
+ 3156  0014F604    120  void OnlineMatchParams::SetPins(const struct OnlineMatchParams* this, int pin)
+                         local  int32_t flags
+                         inlines  operator->
+ 3184  0014F724     F4  void OnlineMatchParams::SetGreens(const struct OnlineMatchParams* this, enum GREEN_SPEEDS_e green)
+                         local  int32_t flags
+                         inlines  operator->
+ 3209  0014F818     F4  void OnlineMatchParams::SetRough(const struct OnlineMatchParams* this, enum ROUGH_LENGTHS_e rough)
+                         local  int32_t flags
+                         inlines  operator->
+ 3234  0014F90C     F4  void OnlineMatchParams::SetFairway(const struct OnlineMatchParams* this, enum FAIRWAY_SPEEDS_e fairway)
+                         local  int32_t flags
+                         inlines  operator->
+ 3259  0014FA00     78  void OnlineMatchParams::SetRanked(const struct OnlineMatchParams* this, bool matchIsRanked)
+                         inlines  operator->
+ 3266  0014FA78    160  void OnlineMatchParams::SetWeather(const struct OnlineMatchParams* this, enum WEATHER_e weather)
+                         local  int32_t flags
+                         inlines  operator->
+ 3303  0014FBD8    110  void OnlineMatchParams::SetWind(const struct OnlineMatchParams* this, enum WIND_e wind)
+                         local  int32_t flags
+                         inlines  operator->
+ 3331  0014FCE8    108  void OnlineMatchParams::SetWager(const struct OnlineMatchParams* this, int32_t wager)
+                         inlines  operator->
+ 3342  0014FDF0     A0  void OnlineMatchParams::SetRankRange(const struct OnlineMatchParams* this, int32_t rank, int32_t rank_range)
+                         inlines  operator->
+ 3347  0014FE90    124  void OnlineMatchParams::SetDifficulty(const struct OnlineMatchParams* this, enum GM_DiffTournType_t diff)
+                         local  int32_t flags
+                         inlines  operator->
+ 3371  0014FFB4     C0  void OnlineMatchParams::SetHeadsetRequired(const struct OnlineMatchParams* this, bool bHeadsetReqd)
+                         local  int32_t flags
+                         inlines  operator->
+ 3384  00150074     C0  void OnlineMatchParams::SetHandicapped(const struct OnlineMatchParams* this, bool matchIsHandicapped)
+                         local  int32_t flags
+                         inlines  operator->
+ 3397  00150134     78  void OnlineMatchParams::SetPrivate(const struct OnlineMatchParams* this, bool isMatchPrivate)
+                         inlines  operator->
+ 3403  001501AC     C0  void OnlineMatchParams::SetHostContentBlocked(const struct OnlineMatchParams* this, bool isContentBlocked)
+                         local  int32_t flags
+                         inlines  operator->
+ 3415  0015026C     C0  void OnlineMatchParams::SetHostUsingCrap(const struct OnlineMatchParams* this, bool isHostUsingCrap)
+                         local  int32_t flags
+                         inlines  operator->
+ 3427  0015032C     5C  void OnlineMatchParams::SetCourseFlags(const struct OnlineMatchParams* this, int courseflags)
+                         inlines  operator->
+ 3432  00127954     5C  void OnlineMatchParams::SetMatchFlags(const struct OnlineMatchParams* this, int matchflags)
+                         inlines  operator->
+ 3439  00166774     34  void LobbyMatch_GotoOnlineGameSetup()
+ 3444  00191F58     48  void LobbyMatch_AfterNoGamesFound()
+ 3450  00193608     74  void LobbyMatch_RedoQuickMatch()
+ 3459  0015CCBC     58  void LobbyMatch_RedoCustomSearch()
+ 3467  0017E358     64  void LobbyMatch_ShowLobbyNow()
+ 3475  00158000     50  void GameSetupAlertAck()
+ 3486  0019A874    250  void LobbyMatchupOSDK::LobbyMatchupOSDK(const struct LobbyMatchupOSDK* this)
+                         inlines  RCPointer
+ 3502  0019B608    25C  void LobbyMatchupOSDK::~LobbyMatchupOSDK(const struct LobbyMatchupOSDK* this)
+                         inlines  ~RCPointer
+ 3508  00181D34    31C  void LobbyMatchupOSDK::Initialize(const struct LobbyMatchupOSDK* this)
+                         local  struct Facade* pFacade
+                         local  struct ChatStream* pChatStream
+                         inlines  AddObserver, List
+ 3543  001279B0     80  bool LobbyMatchupOSDK::IsOsdkConnected(const struct LobbyMatchupOSDK* this)
+                         local  struct Facade* pFacade
+ 3549  00191FA0    51C  void LobbyMatchupOSDK::Destroy(const struct LobbyMatchupOSDK* this)
+                         local  bool bConnected
+                         local  struct Facade* pFacade
+                         local  struct ChatStream* pChatStream
+                         local  struct Lobby* pLobby
+                         inlines  RemoveAll, RemoveObserver, operator->, operator=
+ 3631  001924BC    418  void LobbyMatchupOSDK::CreateMatch(const struct LobbyMatchupOSDK* this)
+                         local  const char[12] __FUNCTION__
+                         local  struct Facade* pFacade
+                         local  struct Lobby* pLobby
+                         local  char[64] gamename
+                         local  enum Golfer_t golfer
+                         local  uint32_t uPrivateSlots
+                         inlines  operator->, operator=
+ 3713  001928D4    228  void LobbyMatchupOSDK::CreateDailyTournGame(const struct LobbyMatchupOSDK* this)
+                         local  const char[21] __FUNCTION__
+                         local  struct Facade* pFacade
+                         local  struct Lobby* pLobby
+                         local  char[64] gamename
+                         inlines  operator->, operator=
+ 3757  00165A3C     10  int LobbyMatchupOSDK::GetNumAvailableMatches(const struct LobbyMatchupOSDK* this)
+ 3763  00175A98     64  struct GameSession* LobbyMatchupOSDK::GetMatchAtIndex(const struct LobbyMatchupOSDK* this, uint8_t index)
+                         inlines  GetElementAt
+ 3770  00175AFC     E8  struct GameSession* LobbyMatchupOSDK::GetMatchByName(const struct LobbyMatchupOSDK* this, char* gamename)
+                         local  struct GameSession* pSession
+                         local  uint32_t numGames
+                         local  uint32_t i
+                         local  struct GameSession* pTemp
+                         inlines  GetElementAt, GetNumberOfElements
+ 3787  00175BE4      C  struct GameSession* LobbyMatchupOSDK::GetCurAdvertMatch(const struct LobbyMatchupOSDK* this)
+ 3793  00127AB0     68  bool LobbyMatchupOSDK::IsAMatchHost(const struct LobbyMatchupOSDK* this)
+ 3799  0017B3E0     A0  void LobbyMatchupOSDK::SetSearchContext(const struct LobbyMatchupOSDK* this, enum SearchContext context)
+                         inlines  RemoveAll
+ 3819  00127B18     48  void LobbyMatchupOSDK::SetCurAdvertName(const struct LobbyMatchupOSDK* this, char* gamename)
+ 3825  00192C28      C  int32_t LobbyMatchupOSDK::JoinCurrentAdvert(const struct LobbyMatchupOSDK* this)
+ 3831  00192AFC    12C  int32_t LobbyMatchupOSDK::JoinGameSession(const struct LobbyMatchupOSDK* this, char* gamename)
+                         local  const char[16] __FUNCTION__
+                         local  struct GameSession* pGame
+                         inlines  operator->, operator=
+ 3851  00192C34     D0  void LobbyMatchupOSDK::LeaveGameSession(const struct LobbyMatchupOSDK* this)
+                         local  struct UserLocal* pLocalUser
+                         local  struct GameSession* pGameSession
+                         inlines  operator=
+ 3861  00192F08    168  void LobbyMatchupOSDK::StartGameSession(const struct LobbyMatchupOSDK* this)
+                         local  struct UserLocal* pLocalUser
+                         local  struct GameSession* pGameSession
+                         inlines  operator=
+ 3874  00193070    198  void LobbyMatchupOSDK::SendWaitingRoomChatMessage(const struct LobbyMatchupOSDK* this, const char8_t* msg)
+                         local  struct GameSetup* pGameSetup
+                         local  struct GameSetupLocalUser* pGameSetupLocalUser
+                         local  char8_t[256] outMsg
+                         local  struct ChatStream* pChatStream
+                         inlines  operator=
+ 3899  00193208     64  void LobbyMatchupOSDK::ChatStreamSendSuccess(const struct LobbyMatchupOSDK* this)
+                         inlines  operator=
+ 3905  0019326C     64  void LobbyMatchupOSDK::ChatStreamSendFailure(const struct LobbyMatchupOSDK* this, enum Failure eFailure)
+                         inlines  operator=
+ 3911  001932D0     64  void LobbyMatchupOSDK::InvitationSendSuccess(const struct LobbyMatchupOSDK* this, const struct User* pRecipient)
+                         inlines  operator=
+ 3917  00193334     74  void LobbyMatchupOSDK::InvitationSendFailure(const struct LobbyMatchupOSDK* this, const struct User* pRecipient, enum Failure eFailure)
+                         inlines  operator=
+ 3923  0015B48C     4C  void LobbyMatchupOSDK::InvitationIncomingEvent(const struct LobbyMatchupOSDK* this, struct InvitationIncoming* pInvitation, enum InvitationAction eAction)
+                         inlines  LobbyOSDK::SetRoomDirty
+ 3929  00127B60     3C  void LobbyMatchupOSDK::InvitationOutgoingEvent(const struct LobbyMatchupOSDK* this, struct InvitationOutgoing* pInvitation, enum InvitationAction eAction)
+ 3935  00127B9C     74  void LobbyMatchupOSDK::InvitationAcceptSuccess(const struct LobbyMatchupOSDK* this, const struct User* pSender, int32_t iIdentifier)
+ 3941  00127C10     74  void LobbyMatchupOSDK::InvitationAcceptFailure(const struct LobbyMatchupOSDK* this, const struct User* pSender, enum Failure eFailure)
+ 3947  001933A8    260  void LobbyMatchupOSDK::QuickMatch(const struct LobbyMatchupOSDK* this, bool bRanked)
+                         local  struct Lobby* pLobby
+                         inlines  OnlineMatchParams::GetMatchParams, operator=
+ 3998  00193904    1E0  void LobbyMatchupOSDK::CustomMatch(const struct LobbyMatchupOSDK* this, bool bRanked, struct OnlineMatchParams* pParams)
+                         local  struct Lobby* pLobby
+                         inlines  operator=
+ 4036  0015CD14     84  void LobbyMatchupOSDK::Challenge(const struct LobbyMatchupOSDK* this, char* sBuddyName)
+ 4047  00170298    148  bool LobbyMatchupOSDK::ViewReceivedLobbyChallenge(const struct LobbyMatchupOSDK* this, const char* sBuddyName)
+                         local  bool bValid
+                         local  struct User* pUser
+                         local  struct InvitationIncoming* pInvitation
+                         local  struct OnlineMatchParams* pParams
+                         inlines  UIOnlineGameAdvertisement::SetFromLobbyChallenge
+ 4078  00152A84    114  void LobbyMatchupOSDK::AcceptLobbyChallenge(const struct LobbyMatchupOSDK* this)
+                         local  bool bValid
+                         local  struct User* pUser
+                         local  struct InvitationIncoming* pInvitation
+ 4098  00127C84     D4  void LobbyMatchupOSDK::DeclineLobbyChallenge(const struct LobbyMatchupOSDK* this)
+                         local  struct User* pUser
+                         local  struct InvitationIncoming* pInvitation
+ 4112  00193AE4    370  void LobbyMatchupOSDK::JoinAcceptedChallenge(const struct LobbyMatchupOSDK* this)
+                         local  const char[22] __FUNCTION__
+                         local  struct Facade* pFacade
+                         local  struct Lobby* pLobby
+                         local  struct UserLocal* pLocalUser
+                         local  struct GameSession* pGameSession
+                         local  const char* sessionid
+                         local  int32_t iIdentifier
+                         inlines  OnlineManagerOSDK::GetAcceptedSessionId, operator->, operator=, std::atoi
+ 4168  00162F64    184  bool LobbyMatchupOSDK::CheckOkayToJoinChallenge(const struct LobbyMatchupOSDK* this, struct GameSession* pSession)
+                         local  struct OnlineMatchParams* pParams
+                         inlines  LobbyMatchupOSDK::GetSearchParamsRef
+ 4207  00127D58    370  void LobbyMatchupOSDK::ConstructGameName(const char* hostname, enum GM_ModeType_t gamemode, char* strOut)
+                         local  char[32] modeStr
+ 4291  0014E818     9C  void LobbyMatchupOSDK::ConstructGameName(const struct LobbyMatchupOSDK* this, char* strOut)
+ 4298  001280C8     3C  void LobbyMatchupOSDK::LobbyMatchupGameSent(const struct LobbyMatchupOSDK* this)
+ 4304  00193E54    1F4  void LobbyMatchupOSDK::LobbyMatchupGameSuccess(const struct LobbyMatchupOSDK* this, struct GameSession* pGame)
+                         local  char[64] gameName
+                         local  uint8_t numUsers
+                         inlines  operator=
+ 4344  00194048    138  void LobbyMatchupOSDK::LobbyMatchupGameFailure(const struct LobbyMatchupOSDK* this, enum Failure eFailure)
+                         inlines  operator=
+ 4370  00194180    2FC  void LobbyMatchupOSDK::LobbySearchGamesSuccess(const struct LobbyMatchupOSDK* this, const LobbyGameList* pGames)
+                         local  uint32_t numMatches
+                         local  uint32_t i
+                         local  struct GameSession* pSession
+                         local  struct GameSession* pSession
+                         inlines  GetElementAt, GetNumberOfElements, InsertElement, RemoveAll, operator=
+ 4434  0019447C    11C  void LobbyMatchupOSDK::LobbySearchGamesFailure(const struct LobbyMatchupOSDK* this, enum Failure eFailure)
+                         inlines  OnlineManagerOSDK::GetOnlinePath, operator=
+ 4453  00194598    1D0  void LobbyMatchupOSDK::LobbyCreateGameSuccess(const struct LobbyMatchupOSDK* this, struct GameSession* pGame)
+                         local  char[64] gameName
+                         local  uint8_t numUsers
+                         inlines  operator=
+ 4488  00194768    180  void LobbyMatchupOSDK::LobbyCreateGameFailure(const struct LobbyMatchupOSDK* this, enum Failure eFailure)
+                         inlines  operator=
+ 4521  00128104     44  void LobbyMatchupOSDK::LobbyCancelMatchupSuccess(const struct LobbyMatchupOSDK* this)
+ 4528  00128148     3C  void LobbyMatchupOSDK::LobbyCancelMatchupFailed(const struct LobbyMatchupOSDK* this, enum Failure eFailure)
+ 4534  00128184     3C  void LobbyMatchupOSDK::LobbyCancelMatchupGoInGame(const struct LobbyMatchupOSDK* this)
+ 4540  001948E8    1DC  void LobbyMatchupOSDK::GameSessionJoinSuccess(const struct LobbyMatchupOSDK* this)
+                         local  struct GameSession* pGame
+                         local  char[64] gameName
+                         local  uint8_t numUsers
+                         inlines  operator=
+ 4570  00194AC4    21C  void LobbyMatchupOSDK::GameSessionJoinFailure(const struct LobbyMatchupOSDK* this, enum FailureCode eFailureCode)
+                         inlines  operator=
+ 4604  001281C0     64  void LobbyMatchupOSDK::GameSessionAdded(const struct LobbyMatchupOSDK* this, struct GameSession* pSession)
+ 4610  00192DAC    15C  void LobbyMatchupOSDK::GameSessionChanged(const struct LobbyMatchupOSDK* this, struct GameSession* pSession)
+ 4628  00191784     E4  void LobbyMatchupOSDK::GameSessionDeleted(const struct LobbyMatchupOSDK* this, struct GameSession* pSession)
+ 4640  00162E94     D0  void LobbyMatchupOSDK::GameSessionJoined(const struct LobbyMatchupOSDK* this, struct GameSession* pSession)
+ 4648  001517F0     C8  void LobbyMatchupOSDK::GameSessionLeft(const struct LobbyMatchupOSDK* this, struct GameSession* pSession, enum GameSessionLeftReason eReason)
+ 4658  00128224     64  void LobbyMatchupOSDK::GameSessionStarted(const struct LobbyMatchupOSDK* this, struct GameSession* pSession)
+ 4665  001B2C3C    6FC  void LobbyMatchupOSDK::ProcessComplete(const struct LobbyMatchupOSDK* this)
+                         local  const char[16] __FUNCTION__
+                         local  struct OnlineManagerOSDK* pOnlineMgr
+                         local  struct GameSession* pGame
+                         local  struct Lobby* pLobby
+                         local  int i
+                         local  char[8] tempbuf
+                         local  struct PeerConnectionManager* pPeerMgr
+                         local  struct GameSession* pGame
+                         local  struct User* pUser
+                         inlines  OnlineManagerOSDK::GetInstance, OnlineManagerOSDK::GetOnlinePath, operator->, operator=
+ 4813  001583D4     94  void LobbyMatchupOSDK::GameSetupPeerListChanged(const struct LobbyMatchupOSDK* this, struct GameSetup* pGameSetup)
+                         local  uint32_t numUsers
+ 4823  00128288      4  void LobbyMatchupOSDK::GameSetupPeerConnected(const struct LobbyMatchupOSDK* this, struct GameSetup* pGameSetup, struct GameSetupUser* pGameSetupUser)
+ 4828  0012828C     3C  void LobbyMatchupOSDK::GameSetupAllPeersConnected(const struct LobbyMatchupOSDK* this, struct GameSetup* pGameSetup)
+ 4834  0015631C     CC  void LobbyMatchupOSDK::GameSetupGoToGame(const struct LobbyMatchupOSDK* this, struct GameSetup* pGameSetup)
+ 4856  00152B98    2A8  void LobbyMatchupOSDK::GameSetupAlertOccurred(const struct LobbyMatchupOSDK* this, struct GameSetup* pGameSetup, struct Alert* pAlert)
+ 4878  001282C8     3C  void LobbyMatchupOSDK::GameSetupLeaveGame(const struct LobbyMatchupOSDK* this, struct GameSetup* pGameSetup)
+ 4883  00128304      4  void LobbyMatchupOSDK::GameSetupMessageReceived(const struct LobbyMatchupOSDK* this, struct GameSetup* pGameSetup, struct GameSetupUser* pGameSetupUser, int32_t iKind, void* pMessage, uint32_t uSize)
+ 4888  00159524     E4  void LobbyMatchupOSDK::ChatStreamMessageReceived(const struct LobbyMatchupOSDK* this, const char8_t* strID, struct Message* pMessage)
+                         local  const char8_t* pSender
+                         local  const char8_t* pText
+ 4901  00128308      4  void LobbyMatchupOSDK::ChatStreamCleared(const struct LobbyMatchupOSDK* this, const char8_t* strID)
+ 4905  00194CE0     B0  void LobbyMatchupOSDK::GameSessionStartSuccess(const struct LobbyMatchupOSDK* this)
+                         inlines  operator=
+ 4915  00194D90     74  void LobbyMatchupOSDK::GameSessionStartFailure(const struct LobbyMatchupOSDK* this, enum FailureCode eFailureCode)
+                         inlines  UIOnlineWaitingRoom::SetExitedWaitingRoom, operator=
+ 4922  00194E04    1B8  void LobbyMatchupOSDK::GameSessionLeaveSuccess(const struct LobbyMatchupOSDK* this)
+                         local  struct Facade* pFacade
+                         local  struct Lobby* pLobby
+                         inlines  operator=
+ 4947  00194FBC     C0  void LobbyMatchupOSDK::GameSessionLeaveFailure(const struct LobbyMatchupOSDK* this, enum FailureCode eFailureCode)
+                         inlines  operator=
+ 4963  0019507C     68  void LobbyMatchupOSDK::UserInviteSendSuccess(const struct LobbyMatchupOSDK* this, struct User* pUser)
+                         inlines  operator=
+ 4971  001950E4     68  void LobbyMatchupOSDK::UserInviteSendFailure(const struct LobbyMatchupOSDK* this, struct User* pUser)
+                         inlines  operator=

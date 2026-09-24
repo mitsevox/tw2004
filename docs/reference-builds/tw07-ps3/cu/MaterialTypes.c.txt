@@ -1,0 +1,35 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Physics/MaterialTypes.c
+// compiled in: golf2_unity.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   36  0014C8F4    19C  void MaterialTypes::RegisterStreamClients()
+                         local  const char[22] __FUNCTION__
+                         local  int32 filesize
+                         local  char* buffer
+                         inlines  TagValuePair, operator+
+   62  0012AE58     2C  void MaterialTypes::UnregisterStreamClients()
+   68  0014C70C    1E8  static void LoadCourseMaterialsfromStream(struct TStreamData* pStreamData)
+                         local  const char[30] __FUNCTION__
+                         local  int32 tableSize
+                         inlines  TagValuePair, operator+
+  113  0012AE84     40  void MaterialTypes::DeInit()
+  120  0012DFC0    3EC  void MaterialTypes::AddTuningVars(int32 catId, int32 matID)
+                         local  struct TGD_MaterialInfo* material
+  153  001694E8    200  void* MaterialTypes::EditCallback(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  void* ret
+                         local  int32 value
+                         local  char[32] buffer
+                         local  int id
+                         local  char[32] buffer
+  226  0012E7E8     60  void MaterialTypes::RegisterTuningValues()
+                         local  int catId
+  302  0012AEC4     2C  struct TGD_MaterialInfo* MaterialTypes::getMaterial(int index)
+  309  0012AF30     40  int32 MaterialTypes::getMaterialID(const struct TGD_MaterialInfo* material)
+  317  0012AF70     18  struct TGD_MaterialInfo* MaterialTypes::getMaterialList()
+  322  0012AF88     40  bool MaterialTypes::isMaterialValid(int index)
+  331  0012AFC8     1C  int MaterialTypes::getNumMaterials()
+  336  0012AFE4     30  float MaterialTypes::getImpactV(int index)
+  343  0012B014     30  float MaterialTypes::getImpactV_Modifier(int index)
+  350  0012B044     30  float MaterialTypes::getRestitution(int index)
+  357  0012B074     30  uint32 MaterialTypes::getLieID(int index)
+  364  0012B0A4     30  uint32 MaterialTypes::getFlags(int index)

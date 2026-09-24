@@ -1,0 +1,49 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/ssys.cpp
+// compiled in: ssys.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   28    inline-only   enum Result Snd9::SndErrToResult(int oldError)
+                         local  enum Result newError
+   61    inline-only   enum Result Snd9::SafeGetOpts(SNDSYSOPTS* pSndSysOpts)
+                         local  int result
+   69    inline-only   enum Result Snd9::SafeSetOpts(SNDSYSOPTS* pSndSysOpts)
+                         local  int result
+   77  006CEB98     8C  enum Result SetMaxBanks(int banks)
+                         local  SNDSYSOPTS sso
+                         inlines  Snd9::SafeGetOpts, Snd9::SafeSetOpts
+   94  006CEC24     40  enum Result GetMaxBanks(int* pbanks)
+                         local  SNDSYSOPTS sso
+                         inlines  Snd9::SafeGetOpts
+  105  006CEC64     8C  enum Result SetMaxStreams(int maxstreams)
+                         local  SNDSYSOPTS sso
+                         inlines  Snd9::SafeGetOpts, Snd9::SafeSetOpts
+  122  006CECF0     8C  enum Result SetStealEqualPriorityVoices(bool stealequalpriority)
+                         local  SNDSYSOPTS sso
+                         inlines  Snd9::SafeGetOpts, Snd9::SafeSetOpts
+  139  006CED7C     8C  enum Result SetRandomSeed(unsigned int seed)
+                         local  SNDSYSOPTS sso
+                         inlines  Snd9::SafeGetOpts, Snd9::SafeSetOpts
+  156  006CEE08     48  enum Result CapVoices(int* pVoices)
+                         local  SNDSYSOPTS sso
+                         inlines  Snd9::SafeGetOpts
+  168  006CEE50     8C  enum Result SetVoices(int voices)
+                         local  SNDSYSOPTS sso
+                         inlines  Snd9::SafeGetOpts, Snd9::SafeSetOpts
+  185  006CEEDC     40  enum Result GetVoices(int* pVoices)
+                         local  SNDSYSOPTS sso
+                         inlines  Snd9::SafeGetOpts
+  196  006CEF1C     6C  enum Result SetResampleQuality(float quality)
+                         local  SNDSYSOPTS sso
+                         inlines  Snd9::SafeGetOpts, Snd9::SafeSetOpts
+  208  006CEF88     58  enum Result GetResampleQuality(float* pQuality)
+                         local  SNDSYSOPTS sso
+                         inlines  Snd9::SafeGetOpts
+  219  006CEAB8      8  enum Result SetSse(bool useSse)
+  237  006CEFE0    350  enum Result Init(struct PlugIn* pSubMix)
+                         inlines  Snd9::SafeSetOpts
+  352  006CEAC0     18  bool IsInited()
+  358  006CEAD8     58  enum Result Restore()
+                         local  struct <anon>* pSndSystem
+  372  006CEB30     68  enum Result SetFunctionProfiler(void(*)()* enter, void(*)()* leave)
+                         local  SNDSYSOPTS sso
+                         inlines  Snd9::SafeGetOpts, Snd9::SafeSetOpts

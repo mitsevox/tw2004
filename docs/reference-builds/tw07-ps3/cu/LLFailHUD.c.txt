@@ -1,0 +1,27 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLFailHUD.c
+// compiled in: Legacy_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   89  003AE8C4    1BC  void FH_vInitModule()
+                         local  const char[15] __FUNCTION__
+                         local  FH_SFailHUDItem* spElement
+                         local  int32 iElement
+                         inlines  TagValuePair, operator+
+  105  003A9A98     60  void FH_vCloseModule()
+  117  003951D8    3B4  void FH_vNotifyFailureFunc(const char* chpText_p)
+                         local  FH_SFailHUDItem* spFailHUDItem
+                         local  int32 iItem
+                         local  va_list va
+                         local  char[43] msg
+                         local  FH_SFailHUDItem* spEarliestFailHUDItem
+                         local  FH_SFailHUDItem* spElement
+  243  0037D764    250  void FH_vUpdate()
+                         local  FH_SFailHUDItem* spNextFailHUDItem
+                         local  FH_SFailHUDItem* spFailHUDItem
+                         local  int32 iItem
+  304  003B9C24    268  void FH_vRender()
+                         local  FH_SFailHUDItem* spFailHUDItem
+                         local  int32 iItem
+                         local  int32 iNumberOfLinesToDisplay
+                         local  FO_EAddMode eOldAddMode
+                         inlines  DS_vSetZTestEnable

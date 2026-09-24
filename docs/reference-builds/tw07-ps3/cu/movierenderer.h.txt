@@ -1,0 +1,6 @@
+// C:/packages/rwmovie/1.04.01/include/rwmovie/supplemental/movierenderer.h
+// compiled in: movierenderer.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   20  006FA3A4     60  void MovieRenderer(const struct MovieRenderer* this, struct IResourceAllocator* allocator)
+   21  006FA498      4  void ~MovieRenderer(const struct MovieRenderer* this)

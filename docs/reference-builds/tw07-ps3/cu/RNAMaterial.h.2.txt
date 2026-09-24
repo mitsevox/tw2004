@@ -1,0 +1,31 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNARender/RNAMaterial.h
+// compiled in: RNADevice.cpp, RNAMaterial.cpp, RNAScene.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   47    inline-only   void MaterialC::operator delete(void* address)
+   47    inline-only   struct ICoreAllocator* MaterialC::GetClassAllocator()
+   47    inline-only   void* MaterialC::operator new(size_t size, const char* text, struct ICoreAllocator* allocator, enum AllocFlags allocator_flags, uint32_t alignment)
+   53    inline-only   struct ShaderC* MaterialC::GetShader(const const struct MaterialC* this)
+   55    inline-only   int32_t MaterialC::GetTechnique(const const struct MaterialC* this)
+   56    inline-only   void MaterialC::SetTechnique(const struct MaterialC* this, int32_t iTechnique)
+   94    inline-only   bool8_t MaterialC::SetByName<RNA::TextureC*>(const struct MaterialC* this, const char* pStrName, const const struct TextureC*& value, uint32_t uCount, uint32_t uIndex)
+                         local  struct <anon>* pParm
+                         inlines  ParmBlockC::Set<RNA::TextureC*>, RNADebugBreak
+   94    inline-only   bool8_t MaterialC::SetByName<RNAMath::RNAVector2>(const struct MaterialC* this, const char* pStrName, const const RNAVector2& value, uint32_t uCount, uint32_t uIndex)
+                         local  struct <anon>* pParm
+                         inlines  ParmBlockC::Set<RNAMath::RNAVector2>, RNADebugBreak
+   94    inline-only   bool8_t MaterialC::SetByName<RNAMath::RNAVector3>(const struct MaterialC* this, const char* pStrName, const const RNAVector3& value, uint32_t uCount, uint32_t uIndex)
+                         local  struct <anon>* pParm
+                         inlines  ParmBlockC::Set<RNAMath::RNAVector3>, RNADebugBreak
+   94    inline-only   bool8_t MaterialC::SetByName<RNAMath::RNAVector4>(const struct MaterialC* this, const char* pStrName, const const RNAVector4& value, uint32_t uCount, uint32_t uIndex)
+                         local  struct <anon>* pParm
+                         inlines  ParmBlockC::Set<RNAMath::RNAVector4>, RNADebugBreak
+   94    inline-only   bool8_t MaterialC::SetByName<std::float_t>(const struct MaterialC* this, const char* pStrName, const const float_t& value, uint32_t uCount, uint32_t uIndex)
+                         local  struct <anon>* pParm
+                         inlines  ParmBlockC::Set<std::float_t>, RNADebugBreak
+   94    inline-only   bool8_t MaterialC::SetByName<std::int32_t>(const struct MaterialC* this, const char* pStrName, const const int32_t& value, uint32_t uCount, uint32_t uIndex)
+                         local  struct <anon>* pParm
+                         inlines  ParmBlockC::Set<std::int32_t>, RNADebugBreak
+   94  00868958    180  bool8_t MaterialC::SetByName<bool8_t>(const struct MaterialC* this, const char* pStrName, const const bool8_t& value, uint32_t uCount, uint32_t uIndex)
+                         local  struct <anon>* pParm
+                         inlines  ParmBlockC::Set<bool8_t>, RNADebugBreak

@@ -1,0 +1,20 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/texblendsoftlight.cpp
+// compiled in: other_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   20  003D1B2C     40  void TexBlendSoftLight::TexBlendSoftLight(const struct TexBlendSoftLight* this, const const struct Allocator& refAlloc, struct Texture32b* destTexture)
+   27  003D1BAC     18  void TexBlendSoftLight::~TexBlendSoftLight(const struct TexBlendSoftLight* this)
+   35  003D1C28    32C  void TexBlendSoftLight::BlendNPixels(const struct TexBlendSoftLight* this, int32_t mipmap, int32_t numTextures, struct RawTexture** textures, TexBlendParams* params, int32_t numPixels, RawTexture_PixelValue** pixelBuffer, RawTexture_PixelValue* destPixels)
+                         local  bool fastBlend
+                         local  int i
+                         local  RawTexture_PixelValue* pix1
+                         local  RawTexture_PixelValue* pix2
+                         local  int i
+                         local  RawTexture_PixelValue* pix1
+                         local  RawTexture_PixelValue* pix2
+                         local  RawTexture_PixelValue newPixel
+                         local  int32_t maskPercent
+  114  003D1F54     48  void* TexBlendSoftLight::PrepareTextureForBlend(const struct TexBlendSoftLight* this, struct RawTexture* texture, float lerpVal, int32_t texNum)
+  119  003D1F9C     48  void TexBlendSoftLight::RestoreTextureFromBlend(const struct TexBlendSoftLight* this, struct RawTexture* texture, float lerpVal, void* dataStorage)
+  124  003D08F4     DC  int32_t TexBlendSoftLight::CalculateSoftlightValue(int32_t val, float percent)
+                         local  float maskPercent

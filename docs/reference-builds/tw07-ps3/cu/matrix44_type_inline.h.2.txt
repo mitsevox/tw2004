@@ -1,0 +1,23 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/matrix44_type_inline.h
+// compiled in: Attrib.cpp, DebugMenu.cpp, IOStream.cpp, RNADebugMenus.cpp, RNADevice.cpp, RNAType.cpp, Scrape.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   22    inline-only   struct <anon>& operator=(const struct <anon>* this, const const struct Matrix44& m)
+   31    inline-only   struct <anon>& GetRow(const struct <anon>* this, int i)
+   37    inline-only   const struct Vector4& GetRow(const const struct Matrix44* this, int i)
+   48    inline-only   void Set(const struct <anon>* this, float m0, float m1, float m2, float m3, float m4, float m5, float m6, float m7, float m8, float m9, float m10, float m11, float m12, float m13, float m14, float m15)
+   56    inline-only   void Set(const struct <anon>* this, struct <anon>& row0, struct <anon>& row1, struct <anon>& row2, struct <anon>& row3)
+   72    inline-only   void SetIdentity(const struct <anon>* this)
+                         local  Vector4Intrinsic_32 iVec
+                         local  Vector4Intrinsic_32 jVec
+                         local  Vector4Intrinsic_32 kVec
+                         local  Vector4Intrinsic_32 lVec
+   82    inline-only   struct <anon> GetElem(const struct <anon>* this, int row, int column)
+   87    inline-only   const struct VecFloatRefIndex GetElem(const const struct Matrix44* this, int row, int column)
+   92    inline-only   struct <anon> GetElem(const struct <anon>* this, int i)
+   97    inline-only   const struct VecFloatRefIndex GetElem(const const struct Matrix44* this, int i)
+  102    inline-only   struct <anon> operator()(const struct <anon>* this, int row, int column)
+  107    inline-only   const struct VecFloatRefIndex operator()(const const struct Matrix44* this, int row, int column)
+  202    inline-only   const struct Vector4& WAxis(const const struct Matrix44* this)
+  256    inline-only   void SetElem(const struct <anon>* this, int row, int col, struct <anon>& f)
+  272    inline-only   void SetElem(const struct <anon>* this, int i, struct <anon>& f)

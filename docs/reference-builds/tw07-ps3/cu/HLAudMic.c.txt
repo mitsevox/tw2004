@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/audio/engine/hl/HLAudMic.c
+// compiled in: other_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   31  003E4AA8     5C  bool Mic_InitModule()
+                         local  bool ok
+   54  003E4E80     18  void Mic_ExitModule()
+   60  003E07A4     78  bool Mic_InitSession(uint8 sessID, uint8 subsessID, uint8 nMics)
+   80  003E081C      4  void Mic_ExitSession()
+   88  003E0820     68  void Mic_Set3DInfo(uint8 micID, audfrac* pos, audfrac[4]* mat)
+   97  003E0888     F0  void Mic_SetControllerInt(uint8 micID, uint8 ctrlID, int32 val)
+  112  003E0978     68  void Mic_SetRvbPreset(uint8 micID, uint8 presetID)

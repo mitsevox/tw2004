@@ -1,0 +1,21 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/source/common/ExprCursor.cpp
+// compiled in: ExprCursor.cpp
+// 9 functions, source order. line | PS3 address | size
+
+    0  007D014C    10C  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   91  007CFCCC    110  void Init(const struct <anon>* this)
+                         local  const char[5] __FUNCTION__
+  112  007CFDDC     3C  void SetQuery(const struct <anon>* this, struct Query* query)
+  128  007CFE18     50  bool IsValid(const const struct <anon>* this)
+  155  007CFE68    24C  enum TDbError Destroy(const struct <anon>* this)
+                         local  const char[8] __FUNCTION__
+                         local  struct <anon> lock
+                         local  struct <anon> lock
+                         local  struct <anon>* pParseInfo
+                         local  struct <anon>* pTopParseInfo
+                         local  uint32_t idxParseInfo
+                         local  enum TDbError dbResult
+  226  007D00B4     40  void Seek(const struct <anon>* this, unsigned int offset)
+  248  007D00F4     58  void Adjust(const struct <anon>* this, int adjustValue)
+  252  007D0258     3C  static void _GLOBAL__I__ZN2EA4T3db10ExprCursorC2Ev()
+  253  007D0294     3C  static void _GLOBAL__D__ZN2EA4T3db10ExprCursorC2Ev()

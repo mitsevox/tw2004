@@ -1,0 +1,13 @@
+// ../../../../../TIGERCODE/Code/Golf/Spectator/spectatorPose.h
+// compiled in: golf2_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+  109    inline-only   TSpectatorModel* CSpectatorPose::GetModel(const struct CSpectatorPose* this)
+  116    inline-only   bool CSpectatorPose::AnimationStarted(const struct CSpectatorPose* this)
+  118    inline-only   bool CSpectatorPose::GetActive(const struct CSpectatorPose* this)
+  119    inline-only   void CSpectatorPose::SetDelayedStart(const struct CSpectatorPose* this, float fDelayedStart)
+  121    inline-only   mat44flt* CSpectatorPose::GetBoneToWorldMats(const struct CSpectatorPose* this)
+  122    inline-only   void CSpectatorPose::SetBlendInOutPose(const struct CSpectatorPose* this, struct CSpectatorPose* BlendInOutPose)
+  127    inline-only   void CSpectatorPose::SetLoop(const struct CSpectatorPose* this, bool flag)
+  128    inline-only   bool CSpectatorPose::GetLoop(const struct CSpectatorPose* this)
+  130    inline-only   char* CSpectatorPose::GetActorName(const struct CSpectatorPose* this)

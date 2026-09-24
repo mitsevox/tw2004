@@ -1,0 +1,21 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_MenuVert.cpp
+// compiled in: apt_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   33  000EFDF8     94  void UIMenuVert::Init(const struct UIMenuVert* this)
+                         inlines  AptScreenSubscriber::SetCanShowOptionsScreen, FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   46  00044A20      8  void UIMenuVert::ShowMenu(const struct UIMenuVert* this, struct UIResponseHandler* inpHandler, struct UIMenuItemBaseSrc* inMenuItemArray, int32 sizeMenu, int32 sizeofMenu, enum eMenuAllocType alloctype)
+   54  00044A28     90  void UIMenuVert::UpdateItemAndLabel(const struct UIMenuVert* this, struct UIMenuItemBaseDst* dst, struct UIMenuItemBaseSrc* src, int32 index, char* inLabel)
+                         local  struct UiMenuItemDefaultDst* menuItem
+                         local  char* strOut
+   73  00044AB8     60  void UIMenuVertBase::BuildCustomCloseScreenSequence(const struct UIMenuVertBase* this)
+   82  00044B18     84  void UIMenuVertBase::BuildCustomOpenScreenSequence(const struct UIMenuVertBase* this)
+   89  000105E0     40  enum TAptSequenceStatus UIMenuVertBase::InitMenuSequence(const struct UIMenuVertBase* this, bool inbFirstTime, void* inData)
+   98  00081DC8    1DC  enum TAptSequenceStatus UIMenuVertBase::ShowBasicMenuSequence(const struct UIMenuVertBase* this, bool inbFirstTime, void* inData)
+                         local  float m0ypos
+                         local  float m1ypos
+  134  00010620     44  enum TAptSequenceStatus UIMenuVertBase::HideBasicMenuSequence(const struct UIMenuVertBase* this, bool inbFirstTime, void* inData)
+  143  00044B9C    13C  void UIMenuVertBase::ShowHelpText(const struct UIMenuVertBase* this)
+  169  00085F64    240  enum eAptHandleInput UIMenuVertBase::HandleInput(const struct UIMenuVertBase* this, int32 cID)
+                         local  char* myTempString
+                         local  char* newIdStr

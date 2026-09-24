@@ -1,0 +1,36 @@
+// C:/packages/rwaudiocore/2.08.01/source/plugins/send.cpp
+// compiled in: send.cpp
+// 8 functions, source order. line | PS3 address | size
+
+    0  006DA2F8     2C  void ~Send(const struct <anon>* this)
+                         inlines  ~PlugIn
+  131  006D9E54      8  struct <anon>* GetPlugInDescRunTime()
+  137  006DA0F8     64  bool CreateInstance(struct PlugIn* pPlugIn, void* pConstructorParams)
+                         local  struct <anon>* pThis
+                         local  int maxChannelsOut
+                         local  int i
+                         inlines  Initialize<rw::audio::core::Send>
+  160  006DA07C      4  void ReleaseEvent(const struct <anon>* this)
+  166  006DA15C    194  void EventEvent(const struct <anon>* this, int event, void* pParameterBuffer)
+                         local  struct <anon>* pSystem
+                         local  struct ConnectByNameParams* pParams
+                         local  int stringLength
+                         local  int commandLength
+                         local  struct <anon>* pCommand
+                         local  int* pInt
+                         inlines  Assert, GetCommandSlot, GetSystem, SetParamHandler<rw::audio::core::Send::ConnectByPointerParams>, core::AlignUp<int>
+  217  006D9F94     E8  void DisconnectImmediate(const struct <anon>* this)
+                         local  float[6] tempDeclickOffsets
+                         local  float*[6] pSrcPointers
+                         local  float*[6] pDstPointers
+                         local  unsigned int i
+  249  006DA080     78  int ConnectByPointerHandler(struct <anon>* pCommand)
+                         local  struct <anon>* pThis
+                         local  struct ConnectByPointerCommand* pConnectByPointerCommand
+                         inlines  HandlerGetThis<rw::audio::core::Send, rw::audio::core::Send::ConnectByPointerCommand>
+  269  006D9E5C    138  int ConnectByNameHandler(struct <anon>* pCommand)
+                         local  struct <anon>* pThis
+                         local  int* pSizeOfCommand
+                         local  const char* pName
+                         local  struct SubMix* pSubMix
+                         inlines  Assert, SubMix::EnumerateSubMixReset

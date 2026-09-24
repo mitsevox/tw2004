@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/State_Engine/statemain.c
+// compiled in: golf2_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   53  001349AC     38  char* STATEMAIN_GetCurrentStateString()
+   71  001349E4     28  void STATEMAIN_OpenONCE()
+   80  00134A0C     7C  void STATEMAIN_Update()
+   92  00134A88     98  void STATEMAIN_CloseONCE()
+  107  00134B20    148  void STATEMAIN_Set(int8 newState)
+  136  00134C68    150  void STATEMAIN_Switch(int8 newState)
+  165  00134DB8     1C  int8 STATEMAIN_GetCurrentState()

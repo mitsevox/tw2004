@@ -1,0 +1,110 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/TerrainGrass.h
+// compiled in: headgate_unity.cpp
+// 23 functions, source order. line | PS3 address | size
+
+   52  0035D960   1270  void VBResource::VBResource(const struct VBResource* this, struct TerrainGrass* pGrassEffect)
+                         local  const char[11] __FUNCTION__
+                         local  const int maxBladeTypes
+                         local  struct GrassVertexNormal*[128] bladeTypes
+                         local  float xf
+                         local  float zf
+                         local  float windMult
+                         local  int windIndex
+                         local  int numClusters
+                         local  float* clustersx
+                         local  float* clustersz
+                         local  int* clusterCount
+                         local  int cluster
+                         local  int baseGreen
+                         local  int topGreen
+                         local  const int kLODColorKludge
+                         local  float bladeOffset
+                         local  int lod
+                         local  uint32 size
+                         local  struct LS_VertexBuffer* result
+                         local  int i
+                         local  struct BezierPath paths
+                         local  float top
+                         local  float mid
+                         local  float height
+                         local  float width
+                         local  float topYDisplace
+                         local  struct APosition p1
+                         local  struct APosition p2
+                         local  struct APosition p3
+                         local  struct APosition p4
+                         local  int numSegments
+                         local  float tstep
+                         local  float t
+                         local  struct APosition last
+                         local  float rotation
+                         local  int j
+                         local  struct APosition next
+                         local  struct APosition vect
+                         local  struct APosition vert
+                         local  int rnd
+                         local  int color
+                         local  int rnd
+                         local  int color
+                         local  int lod
+                         local  struct vtxStruct* pOutputVerts
+                         local  float clusterFactor
+                         local  int clusterMin
+                         local  int clusterMax
+                         local  unsigned int i
+                         local  int maxClusterCount
+                         local  int total
+                         local  int rndCol
+                         local  float theta
+                         local  float cs
+                         local  float sn
+                         local  int t
+                         local  int k
+                         local  int vertIndexMax
+                         local  int tempIndexMax
+                         local  int tempIndex
+                         local  struct GrassVertexNormal* pTempVert
+                         local  float xwindMult
+                         inlines  APosition::Set, TagValuePair, operator+, std::cos, std::sin
+   53  00347C1C      4  void VBResource::VBResource(const struct VBResource* this)
+   54  00347C24     B8  void VBResource::~VBResource(const struct VBResource* this)
+                         local  int lod
+   57    inline-only   bool VBResource::Succeeded(const struct VBResource* this)
+   85  00348114    158  void THGridResource::THGridResource(const struct THGridResource* this, unsigned int gridwidth, float spacing)
+                         local  int dim
+                         local  int i
+                         inlines  TerrainHeightInfoLite::TerrainHeightInfoLite
+   86  0034826C     64  void THGridResource::~THGridResource(const struct THGridResource* this)
+  134  00346028    1AC  void TerrainGrass::TerrainGrass(const struct TerrainGrass* this, int grassIndex)
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+  135  00348B78     74  void TerrainGrass::~TerrainGrass(const struct TerrainGrass* this)
+                         local  int i
+  157    inline-only   void TerrainGrass::SetClippingTextureDataPtr(const struct TerrainGrass* this, const void* pData)
+  165    inline-only   float TerrainGrass::GetBladeHeight(const const struct TerrainGrass* this)
+  167    inline-only   void TerrainGrass::GetYRange(const struct TerrainGrass* this, const float& minY, const float& maxY)
+  168    inline-only   void TerrainGrass::SetYRange(const struct TerrainGrass* this, const float& minY, const float& maxY)
+  169    inline-only   void TerrainGrass::GetGridMin(const const struct TerrainGrass* this, const vec4flt& minCoord)
+  170    inline-only   void TerrainGrass::GetGridMax(const const struct TerrainGrass* this, const vec4flt& maxCoord)
+  171    inline-only   void TerrainGrass::SetGridMin(const struct TerrainGrass* this, const vec4flt& minCoord)
+  172    inline-only   void TerrainGrass::SetGridMax(const struct TerrainGrass* this, const vec4flt& maxCoord)
+  173    inline-only   bool TerrainGrass::GridChanged(const const struct TerrainGrass* this)
+  174    inline-only   uint32_t TerrainGrass::GetGrassIndex(const const struct TerrainGrass* this)
+  175    inline-only   uint32_t TerrainGrass::GetDrawCount(const const struct TerrainGrass* this)
+  176    inline-only   bool TerrainGrass::GetDrawEnabled(const const struct TerrainGrass* this)
+  178    inline-only   void TerrainGrass::SetClippingTexture(const struct TerrainGrass* this, TextureRef ref)
+  315  0034D954    3EC  void CRGrass::CRGrass(const struct CRGrass* this)
+                         local  const char[8] __FUNCTION__
+                         local  int32 tfile
+                         local  uint32_t i
+                         local  uint32_t i
+                         local  int i
+                         local  int i
+                         local  int ci
+                         local  int lod
+                         local  int b
+                         inlines  TagValuePair, operator+
+  316  00348F38     94  void CRGrass::~CRGrass(const struct CRGrass* this)
+                         local  int i

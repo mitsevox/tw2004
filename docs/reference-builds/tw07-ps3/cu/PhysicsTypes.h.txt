@@ -1,0 +1,11 @@
+// ../../../../../TIGERCODE/Code/Golf/Physics/Headers/PhysicsTypes.h
+// compiled in: golf2_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+  185    inline-only   bool PhysicsBall_t::TestFlag(const const struct PhysicsBall_t* this, uint32 flag)
+  186    inline-only   void PhysicsBall_t::SetFlag(const struct PhysicsBall_t* this, uint32 flag)
+  187    inline-only   void PhysicsBall_t::ClearFlag(const struct PhysicsBall_t* this, uint32 flag)
+  188    inline-only   void PhysicsBall_t::SetFlagState(const struct PhysicsBall_t* this, uint32 flag, bool state)
+  193    inline-only   void PhysicsBall_t::ClearAllFlags(const struct PhysicsBall_t* this)
+  195    inline-only   uint32 PhysicsBall_t::GetFlags(const const struct PhysicsBall_t* this)
+  196    inline-only   void PhysicsBall_t::SetFlags(const struct PhysicsBall_t* this, uint32 f)

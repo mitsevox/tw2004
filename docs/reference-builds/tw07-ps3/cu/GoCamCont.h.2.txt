@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Cameras/Headers/GoCamCont.h
+// compiled in: other_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  379    inline-only   vec4flt* CameraController_GetCameraOrigin(CameraController_t* pCameraController)
+  384    inline-only   vec4flt* CameraController_GetCameraLookPoint(CameraController_t* pCameraController)

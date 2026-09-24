@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/packages/tiger_module/include/tiger_module_com.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   25  0033FD48     18  void ~ComInterface(const struct ComInterface* this)

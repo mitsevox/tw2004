@@ -1,0 +1,34 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Shared/StringHash/StringHash.c
+// compiled in: other_unity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   79    inline-only   bool SH_boIsModuleInitialized()
+   91    inline-only   void SH_vSetModuleInitializationState(bool boModuleInitialized_p)
+  102    inline-only   uint64 SH_uiEndianRevert64(uint64 uiData_p)
+  135  003E8468      4  void TestFunct()
+  141  004154C4    18C  void SH_vInitModule()
+                         local  int32 i
+                         inlines  SH_vSetModuleInitializationState
+  207  003E846C     1C  void SH_vCloseModule()
+                         inlines  SH_vSetModuleInitializationState
+  219  00425990    128  void SH_vEndianRevertHashedString(SH_THashedString* tpHashedString_p)
+  242  0041D710    280  bool SH_boComputeHashedStringFromString(SH_THashedString* tpHashedString_p, const char* chpString_p)
+                         local  int word
+                         local  uint64* cs
+                         local  uint32 uiStringLen
+                         local  int charCnt
+                         inlines  SH_boCheckHashedStringValidity
+  319  003E8488    174  bool SH_boComputeStringFromHashedString(SH_THashedString* tpHashedString_p, char* chpString_p)
+                         local  int word
+                         local  int charIdx
+                         local  uint64 val
+                         local  uint64 digit
+                         local  uint64* cs
+                         local  uint64 placeMult
+  384  003E85FC     60  void SH_vSortHashedStringList(void* vpHashedStringList_p, int32 iNumberOfEntriesInHashedStringList_p, int32 iSizeOfEntry_p, TSH_CompareHashedStringCallback* pCompareCallback)
+  410  003E865C    124  static int32 SH_iBinarySearchHashedStringInList(void* vpHashedStringList_p, int32 iIndexOfFirstStringInList_p, int32 iNumberOfEntriesInHashedStringList_p, int32 iSizeOfEntry_p, SH_THashedString* tpHashedStringToFind_p, TSH_CompareHashedStringCallback* pCompareCallback)
+                         local  int32 iHalfEntries
+                         local  int32 iMiddleEntry
+                         local  int32 iCompareResult
+                         local  void* vpMiddleEntry
+  489  003E8780     20  int32 SH_iFindHashedStringInList(void* vpHashedStringList_p, int32 iNumberOfEntriesInHashedStringList_p, int32 iSizeOfEntry_p, SH_THashedString* tpHashedStringToFind_p, TSH_CompareHashedStringCallback* pCallback)

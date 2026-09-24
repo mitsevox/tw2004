@@ -1,0 +1,37 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/Common/SaveGameSM.cpp
+// compiled in: apt_unity.cpp
+// 25 functions, source order. line | PS3 address | size
+
+   35  00030370     68  void SavedGameTask::SavedGameTask(const struct SavedGameTask* this, bool(*)()* hdlr)
+                         local  unsigned int i
+   60  000706B4     98  void SavedGameTask::StartTopLevelTask(struct SavedGameTask* pChildTask, enum MCAction nContext)
+   73  000305A8     88  void SavedGameTask::GoIdleOnTaskEnd(const struct SavedGameTask* this)
+   92  0003045C     C0  void SavedGameTask::StartSubTask(const struct SavedGameTask* this, struct SavedGameTask* pChildTask, int nNextStateOnCompletion)
+  112  00030630     3C  bool SavedGameTask::DelegateTo(const struct SavedGameTask* this, struct SavedGameTask* pDelegate)
+  122  0002E8D0      4  void SavedGameTask::Init()
+  131  00088140    178  void SavedGameTask::Update()
+  221  0003066C     3C  enum eSavedGameNotifcationCodes SavedGameTask::GetNotifyCode(int32 nRsltCode)
+                         local  enum eSavedGameNotifcationCodes notifyCd
+  243  000306A8     20  void SavedGameTask::SendNotifyCBWhenIdle(int32 nRsltToSend)
+  254  000306C8     1C  int32 SavedGameTask::GetLastNotificationValue()
+  266  00030440     1C  void SavedGameTask::ClearLastNotificationValue()
+  275  000306E4     8C  void SavedGameTask::Pause()
+  289  00030770     34  void SavedGameTask::Resume()
+  302  000880F8     48  void SavedGameTask::OnMachineStartWork()
+                         inlines  UIMenuToggle::SetInMemCardAction
+  315  00058AD4     44  void SavedGameTask::OnMachineEndWork()
+                         inlines  UIMenuToggle::SetInMemCardAction
+  328  000625EC     30  void SavedGameTask::NotifySaveGameUiObjectActive(bool bIsActive)
+  345  000307A4     B0  void SavedGameTask::SetAptInputEnabled(bool bIsActive)
+  376  00060560     4C  void SavedGameTask::PushLastSubTaskRslt(const struct SavedGameTask* this, enum eMemCardUserResp nRslt)
+                         inlines  SavedGameTask::SetResult
+  389  00030854     98  void SavedGameTask::RegisterNotifyCallback(tSaveGameSMNotifyCB cb)
+                         local  unsigned int i
+  407  000308EC     5C  void SavedGameTask::UnRegisterNotifyCallback(tSaveGameSMNotifyCB cb)
+                         local  unsigned int i
+  423  0006AB24     74  void SavedGameTask::NotifyCompletion(int32 nRsltCode)
+  436  0003051C     8C  void SavedGameTask::NotifyInterestedParties(enum eSavedGameNotifcationCodes notifyCd, enum MCAction action)
+                         local  unsigned int i
+  452  00030948      8  bool SaveGameSM_IdleTask(struct SavedGameTask* pTask)
+  462  00030950      8  bool SaveGameSM_PauseTask(struct SavedGameTask* pTask)
+  472  00030958     40  bool SaveGameSM_ResultHolder(struct SavedGameTask* pTask)

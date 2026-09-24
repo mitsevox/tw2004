@@ -1,0 +1,180 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnax/source/RNAUtils/DebugMenu.cpp
+// compiled in: DebugMenu.cpp
+// 73 functions, source order. line | PS3 address | size
+
+    0  0086AAC0    174  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  GetRow, Matrix44, Quaternion, Set, Vector2, Vector3, Vector4
+  101  0086A7DC    284  void Menu_TestAdjustment(void* pUserData)
+  155  0086B690    174  void DebugMenuManagerC::DebugMenuManagerC(const struct DebugMenuManagerC* this)
+                         local  const char[18] __FUNCTION__
+                         inlines  Init, RNADebugBreak, Vector
+  162  0086B4F0     D0  void DebugMenuManagerC::~DebugMenuManagerC(const struct DebugMenuManagerC* this)
+                         inlines  ~Vector
+  168  00869D74     68  struct DebugMenuManagerC* DebugMenuManagerC::getInstance()
+                         local  const char[12] __FUNCTION__
+                         inlines  RNADebugBreak
+  174  00869DDC     C8  bool DebugMenuManagerC::Init(const struct DebugMenuManagerC* this)
+                         local  const char[5] __FUNCTION__
+                         inlines  RNADebugBreak
+  187  0086C8D4    48C  void DebugMenuManagerC::AddMenu(const struct DebugMenuManagerC* this, pDebugMenuFunc_t pFunc, void* pUserData, const char* pName)
+                         local  const char[8] __FUNCTION__
+                         local  struct DebugMenuContextC* pContext
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct DebugMenuContextC** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct DebugMenuContextC** newData
+                         inlines  Construct, DebugMenuContextC::DebugMenuContextC, PushBack, RNADebugBreak, operator=
+  202  0086BA60    3A0  void DebugMenuManagerC::RemoveMenu(const struct DebugMenuManagerC* this, pDebugMenuFunc_t pFunc)
+                         local  int32_t i
+                         local  int32_t idx
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Construct, Erase, RNADebugBreak, operator[]
+  213  0086BE00    160  void DebugMenuManagerC::SetMenuUserData(const struct DebugMenuManagerC* this, pDebugMenuFunc_t pFunc, void* pUserData)
+                         local  int32_t i
+                         inlines  RNADebugBreak, operator[]
+  223  0086C638    11C  void DebugMenuManagerC::RemoveAllMenus(const struct DebugMenuManagerC* this)
+                         local  int i
+                         local  struct DebugMenuViewC* pView
+                         inlines  Clear
+  241  0086BF60    228  struct DebugMenuContextC* DebugMenuManagerC::GetNextMenu(const struct DebugMenuManagerC* this, struct DebugMenuContextC* pMenu)
+                         local  int32_t i
+                         inlines  RNADebugBreak, operator[]
+  280  0086C1F0    1C8  struct DebugMenuContextC* DebugMenuManagerC::GetPreviousMenu(const struct DebugMenuManagerC* this, struct DebugMenuContextC* pMenu)
+                         local  int32_t i
+                         inlines  RNADebugBreak, Size, operator[]
+  315  0086C420    178  struct DebugMenuContextC* DebugMenuManagerC::FindContext(const struct DebugMenuManagerC* this, pDebugMenuFunc_t pFunc)
+                         local  int32_t i
+                         inlines  RNADebugBreak, operator[]
+  329  0086C754    10C  struct DebugMenuContextC* DebugMenuManagerC::GetMenuByNum(const struct DebugMenuManagerC* this, int32_t iMenuNum)
+                         local  const char[13] __FUNCTION__
+                         inlines  RNADebugBreak, operator[]
+  335  0086AA60     60  const char8_t* DebugMenuManagerC::GetContextName(struct DebugMenuContextC* pContext)
+                         local  const char[15] __FUNCTION__
+                         inlines  RNADebugBreak
+  345  00869EA4     A4  struct DebugMenuViewC* DebugMenuManagerC::GetView(const struct DebugMenuManagerC* this, int32_t iView)
+                         local  const char[8] __FUNCTION__
+                         inlines  RNADebugBreak
+  351  00869F8C     B4  void DebugMenuManagerC::SetView(const struct DebugMenuManagerC* this, int32_t iView, struct DebugMenuViewC* pView)
+                         local  const char[8] __FUNCTION__
+                         inlines  RNADebugBreak
+  357  00869F48     44  void DebugMenuManagerC::SetActiveView(const struct DebugMenuManagerC* this, int32_t iView, bool bMakeVisible)
+  362  00868CA0     A4  void DebugMenuManagerC::SetActiveView(const struct DebugMenuManagerC* this, struct DebugMenuViewC* pView, bool bMakeVisible)
+  376  0086A418     5C  void DebugMenuManagerC::UpdateViews(const struct DebugMenuManagerC* this)
+                         local  int i
+                         local  struct DebugMenuViewC* pView
+  396  00868D44     58  void DebugMenuViewC::DebugMenuViewC(const struct DebugMenuViewC* this, struct DebugMenuManagerC* pMenuMgr, int32_t iViewInstance)
+  409  00868DF4      C  void DebugMenuViewC::~DebugMenuViewC(const struct DebugMenuViewC* this)
+  414  0086C188     68  void DebugMenuViewC::ShowNextMenu(const struct DebugMenuViewC* this)
+  425  0086C3B8     68  void DebugMenuViewC::ShowPreviousMenu(const struct DebugMenuViewC* this)
+  436  0086C598     A0  void DebugMenuViewC::ShowMenu(const struct DebugMenuViewC* this, pDebugMenuFunc_t pFunc)
+                         local  const char[9] __FUNCTION__
+                         local  struct DebugMenuContextC* pNewContext
+                         inlines  RNADebugBreak
+  451  0086C860     74  void DebugMenuViewC::ShowMenuByIndex(const struct DebugMenuViewC* this, int32_t iMenuNum)
+                         local  const char[16] __FUNCTION__
+                         local  struct DebugMenuContextC* pNewMenu
+                         inlines  RNADebugBreak
+  458  00868E38     10  void DebugMenuViewC::SetInputFlags(const struct DebugMenuViewC* this, enum MenuInputFlagsE eFlags)
+  463  00868E48     3C  void DebugMenuViewC::DropFile(const struct DebugMenuViewC* this, const char* pFileName)
+  469  00868E84     18  void DebugMenuViewC::MouseClick(const struct DebugMenuViewC* this, int32_t posx, int32_t posy)
+  476  00868E9C     18  void DebugMenuViewC::MouseDoubleClick(const struct DebugMenuViewC* this, int32_t posx, int32_t posy)
+  484  00868EB4     64  void DebugMenuViewC::MouseHit(const struct DebugMenuViewC* this)
+  503  0086A2D4    144  void DebugMenuViewC::UpdateMenu(const struct DebugMenuViewC* this)
+  536  0086A040    168  void DebugMenuViewC::BeginMenu(const struct DebugMenuViewC* this)
+                         local  const char[10] __FUNCTION__
+                         inlines  RNADebugBreak
+  573  0086A1A8    12C  void DebugMenuViewC::EndMenu(const struct DebugMenuViewC* this)
+                         local  const char[8] __FUNCTION__
+                         inlines  RNADebugBreak
+  602  00868F8C     20  MenuColorT DebugMenuViewC::SetColor(const struct DebugMenuViewC* this, enum MenuColorE eColor, MenuColorT Color)
+                         local  MenuColorT prevColor
+  609  00868FD4     20  MenuColorT DebugMenuViewC::SetDefaultColor(const struct DebugMenuViewC* this, enum MenuColorE eColor, MenuColorT Color)
+                         local  MenuColorT prevColor
+  618  00868FF4      8  void DebugMenuViewC::SetVisible(const struct DebugMenuViewC* this, bool bVisible)
+  623  00868FFC     74  void DebugMenuViewC::UseHighlightColors(const struct DebugMenuViewC* this)
+  629  00868F18     74  void DebugMenuViewC::UseNormalColors(const struct DebugMenuViewC* this)
+  642  00869070     10  void MenuEchoThisMenuToDebugOutput(bool bEcho)
+  648  0086A474    368  void MenuPrintf(const char8_t* fmt)
+                         local  const char[11] __FUNCTION__
+                         local  char8_t[2050] printBuf
+                         local  va_list args
+                         local  int nSize
+                         local  int32_t nPos
+                         local  int32_t nStrLen
+                         local  bool bNewline
+                         local  int i
+                         local  bool bHighlight
+                         local  char8_t origChar
+                         inlines  RNADebugBreak
+  743  00869080     BC  static void _adjustable()
+                         local  const char[12] __FUNCTION__
+                         inlines  RNADebugBreak
+  764    inline-only   static bool adjustSigned<int>(const int& val, int32_t min, int32_t max, int32_t step)
+  764    inline-only   static bool adjustSigned<short int>(const short int& val, int32_t min, int32_t max, int32_t step)
+  764  00869588    180  static bool adjustSigned<signed char>(const signed char& val, int32_t min, int32_t max, int32_t step)
+  798    inline-only   static bool adjustUnsigned<unsigned int>(const unsigned int& val, uint32_t min, uint32_t max, uint32_t step)
+  798    inline-only   static bool adjustUnsigned<short unsigned int>(const short unsigned int& val, uint32_t min, uint32_t max, uint32_t step)
+  798    inline-only   static bool adjustUnsigned<unsigned char>(const unsigned char& val, uint32_t min, uint32_t max, uint32_t step)
+  832    inline-only   static bool adjustFloat(const float_t& val, float_t min, float_t max, float_t step)
+  864  00869288    180  bool MenuAdjust(const int32_t& nVal, int32_t nMin, int32_t nMax, int32_t nStep)
+                         inlines  adjustSigned<int>
+  869  00869408    180  bool MenuAdjust(const int16_t& nVal, int32_t nMin, int32_t nMax, int32_t nStep)
+                         inlines  adjustSigned<short int>
+  874  00869760     24  bool MenuAdjust(const int8_t& nVal, int32_t nMin, int32_t nMax, int32_t nStep)
+  879  00869784    168  bool MenuAdjust(const uint32_t& nVal, uint32_t nMin, uint32_t nMax, uint32_t nStep)
+                         inlines  adjustUnsigned<unsigned int>
+  884  008698EC    168  bool MenuAdjust(const uint16_t& nVal, uint32_t nMin, uint32_t nMax, uint32_t nStep)
+                         inlines  adjustUnsigned<short unsigned int>
+  889  00869A54    168  bool MenuAdjust(const uint8_t& nVal, uint32_t nMin, uint32_t nMax, uint32_t nStep)
+                         inlines  adjustUnsigned<unsigned char>
+  894  0086913C    14C  bool MenuAdjust(const float_t& fVal, float_t fMin, float_t fMax, float_t fStep)
+                         inlines  adjustFloat
+  900  0086AE68     94  bool MenuAdjust(VecFloatRefX& vecFloatRef, float_t fMin, float_t fMax, float_t fStep)
+                         local  float fVal
+                         local  bool bChanged
+                         inlines  SetFloat, operator float
+  908  0086AEFC     94  bool MenuAdjust(VecFloatRefY& vecFloatRef, float_t fMin, float_t fMax, float_t fStep)
+                         local  float fVal
+                         local  bool bChanged
+                         inlines  SetFloat, operator float
+  916  0086B0A4     94  bool MenuAdjust(VecFloatRefZ& vecFloatRef, float_t fMin, float_t fMax, float_t fStep)
+                         local  float fVal
+                         local  bool bChanged
+                         inlines  SetFloat, operator float
+  924  0086B29C     94  bool MenuAdjust(VecFloatRefW& vecFloatRef, float_t fMin, float_t fMax, float_t fStep)
+                         local  float fVal
+                         local  bool bChanged
+                         inlines  SetFloat, operator float
+  933  00869BBC     C8  bool MenuAdjustFileName(char* pFileName, int32_t nChars)
+  955  00869708     58  bool MenuAdjust(const bool& nBool)
+                         local  bool bResult
+                         local  int8_t nBoolAsVal
+  964  00869C84     30  bool MenuAdjust(const signed char& sChar)
+  969  00869CB4     68  bool MenuIsLineSelected()
+  984  00869D1C     40  bool MenuIsLineHighlighted()
+  995  00869D5C     18  void MenuGotoThisLine()
+ 1000  00868FAC     28  MenuColorT MenuSetColor(enum MenuColorE eColor, MenuColorT Color)
+ 1011  0086B330    1C0  bool MenuPrintVector(const RNAVector4& Vector, bool bAdjustable, float_t fMin, float_t fMax, float_t fStep)
+                         local  bool bChanged
+                         inlines  W, X, Y, Z
+ 1031  0086B138    164  bool MenuPrintVector(const RNAVector3& Vector, bool bAdjustable, float_t fMin, float_t fMax, float_t fStep)
+                         local  bool bChanged
+                         inlines  X, Y, Z
+ 1048  0086AF90    114  bool MenuPrintVector(const RNAVector2& Vector, bool bAdjustable, float_t fMin, float_t fMax, float_t fStep)
+                         local  bool bChanged
+                         inlines  X, Y
+ 1062  0086AC54    214  bool MenuPrintMatrix(const RNAMatrix44& Matrix, bool bAdjustable, float_t fMin, float_t fMax, float_t fStep, int32_t iIndentAmount)
+                         local  bool bChanged
+                         local  int32_t iRow
+                         local  int32_t iCol
+                         local  float_t val
+                         local  int32_t iIndent
+                         inlines  SetElem, operator float
+ 1094  0086AC44     10  static void _GLOBAL__I__ZN17DebugMenuManagerC12s_pSingletonE()
+ 1095  0086AC34     10  static void _GLOBAL__D__ZN17DebugMenuManagerC12s_pSingletonE()

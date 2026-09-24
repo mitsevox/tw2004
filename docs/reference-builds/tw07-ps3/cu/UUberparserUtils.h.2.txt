@@ -1,0 +1,14 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/Headers/UUberparserUtils.h
+// compiled in: Legacy_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   29  003AEF44    1D8  void OrderedSubset::OrderedSubset(const struct OrderedSubset* this, void* uberparserTable, int numTableRows, int rowSize, Predicate_t filterFunc)
+                         local  const char[14] __FUNCTION__
+                         local  int i
+                         local  void* element
+                         inlines  OrderedSubset::add, TagValuePair, operator+
+   30  003A9BD8     1C  void OrderedSubset::~OrderedSubset(const struct OrderedSubset* this)
+   37    inline-only   void OrderedSubset::setPrintFunc(const struct OrderedSubset* this, PrintFunc_t printFunc)
+   38    inline-only   void OrderedSubset::add(const struct OrderedSubset* this, void* element)
+   57    inline-only   void* OrderedSubset::operator[](const const struct OrderedSubset* this, int index)
+   58    inline-only   int OrderedSubset::getNumElements(const struct OrderedSubset* this)

@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/UI_Tutorial.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   25  00126310     B8  void UITutorial::~UITutorial(const struct UITutorial* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   27  000FE7D4      C  uint32 UITutorial::GetSignature(const const struct UITutorial* this)
+   78  00103138     14  enum AptThreadReturnValue UITutorial::UpdateControllerIcon_func(struct IAptSubscriberBase* subs)

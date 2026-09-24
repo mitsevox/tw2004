@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_OnlineStats_Category.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   17  000FFC18      C  uint32 UIOnlineStats_Category::GetSignature(const const struct UIOnlineStats_Category* this)
+   26  000FFC24     44  void UIOnlineStats_Category::ShowHelpText(const struct UIOnlineStats_Category* this)
+   30  000FFC70      C  struct IExternArray* UIOnlineStats_Category::GetExternArray(const struct UIOnlineStats_Category* this)

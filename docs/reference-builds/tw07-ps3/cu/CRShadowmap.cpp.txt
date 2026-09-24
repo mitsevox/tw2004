@@ -1,0 +1,150 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/CRShadowmap.cpp
+// compiled in: headgate_unity.cpp
+// 21 functions, source order. line | PS3 address | size
+
+   97  00364C74    348  void CRShadowMap::LoadHole(const struct CRShadowMap* this)
+                         local  const TextureFormat format
+                         local  const TextureFormat HRformat
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         inlines  RNADebugBreak, ScopeParmC::Set<RNA::TextureC*>
+  125  0034C90C    128  void CRShadowMap::UnloadHole(const struct CRShadowMap* this)
+                         local  bool dashboardWasAutoUpdating
+  150  0034AF2C      C  void CRShadowMap::SetShearForLightDirection(const struct CRShadowMap* this, float sx, float sz)
+  160  00375C78    BAC  void CRShadowMap::Update(const struct CRShadowMap* this)
+                         local  bool bTunerGen
+                         local  const float[4]& curSun
+                         local  vec4flt camPos
+                         local  vec4flt camDir
+                         local  vec4flt camOffset
+                         local  struct TerrainHeightInfo info
+                         local  unsigned int propsFlags
+                         local  const float[4]& sunVct
+                         local  float groundY
+                         local  float boundsDisplacementX
+                         local  float boundsDisplacementZ
+                         local  float groundDisplacementX
+                         local  float groundDisplacementZ
+                         local  float step
+                         local  bool dashboardAutoUpdating
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         local  float lastCallX
+                         local  float lastCallZ
+                         local  float lastCallY
+                         local  unsigned int lastAttributeMask
+                         local  enum FlagOp lastOp
+                         local  unsigned int lastPropsMask
+                         local  struct TerrainHeightInfo lastInfo
+                         local  float lastCallX
+                         local  float lastCallZ
+                         local  float lastCallY
+                         local  unsigned int lastAttributeMask
+                         local  enum FlagOp lastOp
+                         local  unsigned int lastPropsMask
+                         local  struct TerrainHeightInfo lastInfo
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         inlines  CRManager::GetSunPosition, LLMath_Add, LLMath_Length3, RNADebugBreak, ScopeParmC::Set<RNAMath::RNAMatrix44>, ScopeParmC::Set<rw::math::vpu::Vector4>, TerrainHeightInfo::TerrainHeightInfo, Update, Vector4, __vec_len_sqr3, operator=, vec4flt_Copy, vec_madd, vec_sld, vec_st
+  322  0037545C    81C  void CRShadowMap::GenerateStaticShadowMap(const struct CRShadowMap* this)
+                         local  TI_STimeValue start
+                         local  CircularBuffer_t* circBuffer1
+                         local  int pass
+                         local  vec4flt treeMax
+                         local  vec4flt treeMin
+                         local  vec4flt terMax
+                         local  vec4flt terMin
+                         local  float hw
+                         local  float hh
+                         local  float step
+                         local  vec3flt sunVct
+                         local  mat44flt viewMat
+                         local  mat44flt viewWithShearMat
+                         inlines  DS_vSetColorWriteEnable, LLMath_MaxVec4, LLMath_MinVec4, TI_fConvertTimeDifToSeconds, TI_uiReadCP0Count
+  493  0034C84C     C0  void CRShadowMap::FinishStaticShadowMap(const struct CRShadowMap* this)
+  514    inline-only   static struct TCharacter* ChooseCharacterForEnhancedShadow()
+                         local  struct GamePlayer* player
+  530    inline-only   static struct GenericActor* ChooseFlagForEnhancedShadow()
+                         local  struct GenericActor* pFlag
+                         local  struct GenericActor* pFlagCandidate
+                         local  const struct CharModelMgrCharacterInstance& flagModel
+                         local  bool bGeomInited
+                         local  vec4flt minBB
+                         local  vec4flt maxBB
+                         local  struct SFrustum frustum
+                         local  enum ClipTest clipTest
+  581    inline-only   static void ChooseLocationForEnhancedShadow(struct TCharacter* pCharacter, struct GenericActor* pFlag, float* loc)
+  617  00376A04     FC  static void RenderCharacterShadows(struct TCharacter* pSpecialChar, bool bExclude, const float* outColor)
+                         local  bool doCharShadowsOnTerrain
+                         inlines  DS_vSetAlphaTestMode
+  640  00376824    1E0  static void RenderFlagShadows(struct GenericActor* pSpecialFlag, bool bExclude, const float* outColor)
+                         local  bool doFlagShadowsOnTerrain
+                         local  const int32 cMaxFlagsToRender
+                         local  struct GenericActor*[8] pFlagActors
+                         local  int32 numFlags
+                         local  int32 flag
+                         local  struct GenericActor* pFlag
+                         inlines  DS_vSetAlphaTestMode
+  748  0034CD58     60  static void RenderSpectatorShadows()
+                         local  bool gSpectatorsEnabled
+                         local  bool doSpectatorShadowsOnTerrain
+  784  00375248    13C  void CRShadowMap::BeginShadowRender(const struct CRShadowMap* this, TextureRef shadowMap)
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetCullMode, DS_vSetZBufferMode, DS_vSetZTestEnable
+  812  00375384     D8  void CRShadowMap::EndShadowRender(const struct CRShadowMap* this)
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetColorWriteEnable, DS_vSetCullMode, DS_vSetZBufferMode
+  837  00351E44    1CC  void CRShadowMap::CalcOrthoTerrainTransforms(const struct CRShadowMap* this, float* min, float* max)
+                         local  vec4flt sunVct
+                         local  mat44flt viewMat
+                         local  mat44flt viewWithShearMat
+                         local  float hw
+                         local  float hh
+                         inlines  vec4flt_Copy, vec_st
+  870  0036CD58    4C4  void CRShadowMap::CalcOrthoGolferTransforms(const struct CRShadowMap* this)
+                         local  vec4flt camPos
+                         local  vec4flt sunDir
+                         local  const float oneOverSunY
+                         local  struct TerrainHeightInfo info
+                         local  float objShadowDist
+                         local  vec4flt objMin
+                         local  vec4flt objMax
+                         local  float groundDisplacementX
+                         local  float groundDisplacementZ
+                         local  float step
+                         local  mat44flt viewMat
+                         local  mat44flt viewWithShearMat
+                         local  float hw
+                         local  float hh
+                         local  float scaleU
+                         local  float scaleV
+                         local  struct DeviceC* pDevice
+                         local  struct ScopeParmC* pScopeParm
+                         inlines  RNADebugBreak, ScopeParmC::Set<RNAMath::RNAMatrix44>, TerrainHeightInfo::TerrainHeightInfo, vec4flt_Copy, vec_ld, vec_st
+  981  00352010     A0  void CRShadowMap::CalcTerrainFrustum(const struct CRShadowMap* this, struct SFrustum* pFrustum)
+  991  00376D64    39C  void CRShadowMap::GenerateDynamicShadowMap(const struct CRShadowMap* this)
+                         local  vec4flt min
+                         local  vec4flt max
+                         local  mat44flt shadowMat
+                         local  OL_EBoundingVolumeResult clipTest
+                         local  bool bUseFastFilter
+                         inlines  Character_GetPosition, ChooseCharacterForEnhancedShadow, ChooseFlagForEnhancedShadow, ChooseLocationForEnhancedShadow, LLMath_CopyMat44, vec4flt_Copy, vec_ld, vec_st
+ 1076  00376BC8    19C  void CRShadowMap::RenderTerrainContributions(const struct CRShadowMap* this, float[4]* shadowMat)
+                         local  vec4flt outColor
+                         local  bool bExclude
+                         inlines  DS_vSetColorWriteEnable
+ 1155  00376B00     C8  void CRShadowMap::RenderGolferContributionsOverlay(const struct CRShadowMap* this, float[4]* shadowMat)
+                         local  bool bExclude
+                         local  vec4flt outColor
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetColorWriteEnable, DS_vSetZTestEnable
+ 1204  00355674    320  void CRShadowMap::CalculateShadowMatrix(const struct CRShadowMap* this, float[4]* mat, float minShadX, float minShadY, float maxShadZ, float shadScaleU, float shadScaleV, int shadMapW, int shadMapH)
+                         local  vec4flt light
+                         local  mat44flt translate
+                         local  mat44flt deform
+                         local  float fOffsetX
+                         local  float fOffsetY
+                         local  mat44flt xztouv
+                         local  mat44flt temp
+                         inlines  LLMath_Scale, __vec_mul, vec4flt_Copy, vec_ld

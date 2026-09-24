@@ -1,0 +1,28 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Database/db_gamemode.cpp
+// compiled in: golf_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   67  00215108    114  enum TDbError Init(char8_t* dbPath)
+                         local  enum TDbError error
+   99  00214E24     8C  void Shutdown()
+  131  00215444     A4  enum TDbError Create()
+                         local  enum TDbError error
+                         local  struct Database* db
+  160  002156A0     BC  enum TDbError Destroy()
+                         local  enum TDbError error
+                         local  struct Database* db
+  195  0029C504    1C4  enum TDbError LoadNew()
+                         local  struct Database* db
+                         local  struct ExtIoCallback ioCallback
+                         local  enum TDbError error
+                         inlines  Load
+  240  0029C9A8    1B0  enum TDbError LoadPersistent(char8_t* dbPath)
+                         local  struct Database* db
+                         local  struct ExtIoCallback ioCallback
+                         local  enum TDbError error
+                         inlines  Load
+  285  002912AC    150  enum TDbError SavePersistent(char8_t* dbPath)
+                         local  struct ExtIoCallback ioCallback
+                         local  struct Database* db
+                         local  enum TDbError error
+                         inlines  InternalIsLocked, Save, T3dbLock, ~T3dbLock

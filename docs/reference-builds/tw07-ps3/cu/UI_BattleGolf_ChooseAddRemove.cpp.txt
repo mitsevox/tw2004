@@ -1,0 +1,34 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_BattleGolf_ChooseAddRemove.cpp
+// compiled in: apt_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   36  000F5AC4     AC  void UIBattleGolf_ChooseAddRemove::UIBattleGolf_ChooseAddRemove(const struct UIBattleGolf_ChooseAddRemove* this)
+                         inlines  TArrayInternal<UIBattleGolf_ChooseAddRemove::UIBattleGolfDstMenuItem,AptStructSwapper>::TArrayInternal, TExternArray<UIBattleGolf_ChooseAddRemove::UIBattleGolfDstMenuItem>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   44  000EF100     78  void UIBattleGolf_ChooseAddRemove::Init(const struct UIBattleGolf_ChooseAddRemove* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   54  000733A0    180  void UIBattleGolf_ChooseAddRemove::GenerateWinnerText(const struct UIBattleGolf_ChooseAddRemove* this)
+                         local  void* ptr
+                         local  struct GameModeBattle* pBattle
+                         local  enum PlayerNumber_t winner
+                         local  char[32] golferNameBuffer
+   82  00087D78     B0  void UIBattleGolf_ChooseAddRemove::InitMenuParams(const struct UIBattleGolf_ChooseAddRemove* this)
+  105  00042AB4    2B0  void UIBattleGolf_ChooseAddRemove::Show(const struct UIBattleGolf_ChooseAddRemove* this)
+                         local  void* ptr
+                         local  int32 numElements
+                         local  struct GameModeBattle* pBattle
+                         local  enum PlayerNumber_t winner
+                         local  enum PlayerNumber_t loser
+                         local  int numAddableClubs
+                         local  int numRemovableClubs
+                         local  bool isWinnerMissingClubs
+                         local  bool doesLoserHaveClubs
+  172  00031930    164  void UIBattleGolf_ChooseAddRemove::UpdateItemAndLabel(const struct UIBattleGolf_ChooseAddRemove* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct UIBattleGolfDstMenuItem* dest
+  216  000800E8     94  enum TAptSequenceStatus UIBattleGolf_ChooseAddRemove::Show_BattleGolfChooseClubScreen_Sequence(const struct UIBattleGolf_ChooseAddRemove* this, bool inbFirstTime, void* inData)
+  235  000868F8    2E0  enum eAptHandleInput UIBattleGolf_ChooseAddRemove::HandleInput(const struct UIBattleGolf_ChooseAddRemove* this, int32 cID)
+                         local  bool isInputFromCorrectController
+                         local  void* ptr
+                         local  bool bProcessInput
+                         local  struct GameModeBattle* pBattle
+                         local  enum PlayerNumber_t winner
+                         local  int lastUIPlayer

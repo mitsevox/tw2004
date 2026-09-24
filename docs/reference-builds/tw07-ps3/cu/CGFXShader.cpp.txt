@@ -1,0 +1,258 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnax/source/RNAX/PS3/CGFXShader.cpp
+// compiled in: CGFXShader.cpp
+// 49 functions, source order. line | PS3 address | size
+
+    0  0089D3F0    1A4  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  GetRow, Matrix44, Quaternion, Set, Vector2, Vector3, Vector4
+    0  008A3F44    118  void ~CGFXInterfaceC(const struct <anon>* this)
+                         inlines  ParmBlockC::operator delete, ~String
+    0  008A5A28    9A4  void RNAFXConstant(const struct <anon>* this, const const struct <anon>& )
+                         inlines  Construct, Init, RNADebugBreak, String, Vector
+  141  0089C760    134  bool RNAX::cgUtilDeleteParameter(CGprogram program, uint32_t parmIndex)
+                         local  uint32_t numParms
+                         local  CGparameter lastparm
+                         local  CGparameter parm
+                         local  CGparameter nextparm
+  174  0089C894     80  bool RNAX::cgUtilDeleteParameterRange(CGprogram program, uint32_t startIndex, uint32_t parmCount)
+  186  0089C914    138  void RNAX::cgUtilDeleteUnreferencedParameters(CGprogram program)
+                         local  uint32_t parmIndex
+                         local  CGparameter parm
+                         local  const char* parmName
+                         local  const char* bracket
+  216  0089CA4C     F4  uint32_t RNAX::cgUtilScanArray(CGprogram program, uint32_t startIndex, const char* arrayName, uint32_t arrayNameLen)
+                         local  uint32_t arraySize
+                         local  CGparameter parm
+                         local  const char* parmName
+  239  0089CB40    120  bool RNAX::cgUtilAreParameterRegistersContiguous(CGprogram program, uint32_t startIndex, uint32_t parmCount, const int32_t& baseReg)
+                         local  int32_t i
+                         local  CGparameter parm
+                         local  int32_t reg
+  271  0089CC60    138  void RNAX::cgUtilDeleteChildParameters(CGprogram program)
+                         local  uint32_t parmIndex
+                         local  CGparameter parm
+                         local  const char* parmName
+                         local  const char* bracket
+                         local  uint32_t childCount
+  304  0089CD98    18C  void RNAX::cgUtilCombineArrayElements(CGprogram program)
+                         local  uint32_t parmIndex
+                         local  CGparameter parm
+                         local  const char* parmName
+                         local  const char* bracket
+                         local  uint32_t arrayCount
+                         local  int32_t baseReg
+  347  0089CF24    14C  void RNAX::cgUtilDumpProgram(CGprogram program)
+                         local  CGparameter parm
+  387  0089D070     94  bool RNAX::cgUtilIsArrayParameter(CGprogram cgProgram, CGparameter parm)
+  403  0089D5B4    174  uint32_t RNAX::cgUtilGetArraySize(CGprogram program, char* szParamName)
+                         local  char[255] szParamNameSansElements
+                         local  uint32_t uArraySize
+                         local  uint32_t parmIndex
+                         local  CGparameter parm
+                         local  char* szElement
+                         inlines  fpu::Max<unsigned int>, std::strchr
+  441  0089D744    158  void CGFXInterfaceC(const struct <anon>* this, const char* pStrName, struct <anon>* pShader)
+                         inlines  RNADebugBreak, String
+  449  0089D104      8  bool8_t GetAnnotation(const const struct <anon>* this, const struct <anon>* pParm, const char* pAnnotName, const float_t& fValue)
+  454  0089D10C      8  bool8_t GetAnnotation(const const struct <anon>* this, const struct <anon>* pParm, const char* pAnnotName, const int32_t& iValue)
+  459  0089D114      8  bool8_t GetAnnotation(const const struct <anon>* this, const struct <anon>* pParm, const char* pAnnotName, const const char*& pValue)
+  464  0089D3AC      8  const char* GetName(const const struct <anon>* this)
+  470  008A2D64    29C  void CGFXShaderC(const struct <anon>* this, struct DeviceC* pDevice, const struct <anon>* pSemanticInfo, struct UserData* pUserData)
+                         inlines  Init, RNADebugBreak, Vector
+  490  008A329C    434  void ~CGFXShaderC(const struct <anon>* this)
+                         inlines  Init, ~CGFXInterfaceC, ~String, ~Vector
+  499  0089D140     1C  bool IsEffectLoaded(const const struct <anon>* this)
+  504  0089D2B8     F4  const struct <anon>* FindSemanticInfo(const struct <anon>* this, const char* pSemanticName)
+                         local  const char[17] __FUNCTION__
+                         local  int32_t i
+                         inlines  RNADebugBreak
+  518  0089D15C     10  const char* RNAX::SafeStringName(const char* pString)
+  524  0089D16C     68  static void RNAX::MakeLowercase(char* str)
+                         local  int i
+                         inlines  std::tolower
+  535  0089FFC8   1E20  void AddParmsFromProgram(const struct <anon>* this, struct <anon>* pCGFXProgram, struct RNAFX* pEffect, struct RNAFXProgram* pProgram)
+                         local  const char[20] __FUNCTION__
+                         local  char[255] szLastParamName
+                         local  char[255] szCurrParamNameSansElement
+                         local  CGprogram cgProgram
+                         local  bool bVertexProgram
+                         local  CGparameter parm
+                         local  char* szElementString
+                         local  const char* pScopeName
+                         local  char[256] strSemanticName
+                         local  bool bAlreadyAdded
+                         local  enum TypeID idType
+                         local  enum CGtype parmType
+                         local  struct <anon>* pFxConst
+                         local  struct <anon>* pFxSampler
+                         local  struct <anon>* aliasNameAnnot
+                         local  struct <anon>* aliasSemanticAnnot
+                         local  bool bUnmanaged
+                         local  int32_t iNumElements
+                         local  const char* pScopeBlock
+                         local  const struct <anon>* pSemanticInfo
+                         local  struct ScopeParmC* pScopeParm
+                         local  bool bIsNewParm
+                         local  struct ShaderInterfaceC* pInterface
+                         local  struct <anon>* pParm
+                         local  struct <anon> shaderParm
+                         local  struct TextureC* pTexture
+                         local  struct <anon>* pAnnot
+                         local  enum ElementNameE name
+                         local  uint32_t index
+                         local  enum CGresource resource
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct <anon>* newData
+                         local  float[16] aDefaultFloats
+                         local  const RNAFXStrings& valueStrings
+                         local  int32_t nValues
+                         local  int32_t i
+                         local  int32_t iVal
+                         local  int scanned
+                         local  int32_t iVal
+                         local  RNAVector2 v
+                         local  RNAVector4 v
+                         local  RNAVector3 v
+                         local  RNAMatrix44 m
+                         local  int i
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Construct, ParmBlockC::Set<RNA::TextureC*>, ParmBlockC::Set<RNAMath::RNAMatrix44>, ParmBlockC::Set<RNAMath::RNAVector2>, ParmBlockC::Set<RNAMath::RNAVector3>, ParmBlockC::Set<RNAMath::RNAVector4>, ParmBlockC::Set<bool>, ParmBlockC::Set<float>, ParmBlockC::Set<std::int32_t>, ParmBlockC::WriteValue, PushBack, RNADebugBreak, ScopeParmC::Set, SetElem, Size, Vector2, Vector3, Vector4, operator[], std::strchr
+ 1008  0089D11C     24  void InvalidateTechnique(const struct <anon>* this)
+ 1019  0089D89C    180  bool SetTechniqueAndPass(const struct <anon>* this, int32_t idTechnique, int32_t idPass)
+                         local  struct <anon>* pTechnique
+                         inlines  GetNumPasses, GetPass, RNADebugBreak, RNAFX::GetTechnique
+ 1057  008A1DE8    F7C  void LoadEffect(const struct <anon>* this, struct RNAFX* pEffect)
+                         local  const char[11] __FUNCTION__
+                         local  struct <anon>* pMatrixOrder
+                         local  const RNAFXStrings& values
+                         local  const char* pStr
+                         local  int iProgram
+                         local  int iBool
+                         local  int32_t iConstant
+                         local  struct <anon> constant
+                         local  char[256] scopeBlockName
+                         local  struct ScopeParmC* pScopeParm
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct ScopeParmC** newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct ScopeParmC** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct ScopeParmC** newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct ScopeParmC** newData
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  AddRef, CGFXProgramC, CStr, Clear, Construct, DeviceC::GetScope, PushBack, RNADebugBreak, RNAFX::GetNumPermutedBools, RNAFX::GetNumPrograms, RNAFX::GetPermutedBool, RNAFX::GetProgram, Reserve, Resize, operator[], ~CGFXProgramC
+ 1132  0089FAC0    508  void UnloadEffect(const struct <anon>* this)
+                         local  int32_t iIntf
+                         local  struct ShaderInterfaceC* pInterface
+                         local  struct <anon>* pParm
+                         inlines  Clear, GetNext, ParmBlockC::GetFirstParm, ParmBlockC::Set<RNA::TextureC*>, RNADebugBreak, Release, ShaderC::GetInterface
+ 1173  0089D728     1C  int32_t GetNumTechniques(const struct <anon>* this)
+                         inlines  RNAFX::GetNumTechniques
+ 1178  0089DAC0    174  bool8_t GetTechniqueInfo(const struct <anon>* this, int32_t iTechnique, const struct TechniqueInfo& info)
+                         inlines  RNADebugBreak, RNAFX::GetTechnique
+ 1192  0089DC34     F4  void SetParmsDirtyFlags(const struct <anon>* this, const struct <anon>& aParms, bool bValue)
+                         local  int i
+                         local  struct <anon>* pShaderParm
+                         local  struct ScopeParmC* pScopeParm
+                         inlines  ScopeParmC::SetDirty, operator[]
+ 1205  0089DE80    C88  void SetVertexParms(const struct <anon>* this, struct <anon>* pProgram, const struct <anon>& aParms, bool bDirtyCheck, bool bDirtyClear)
+                         local  const char[15] __FUNCTION__
+                         local  int i
+                         local  struct <anon>* pShaderParm
+                         local  struct ScopeParmC* pScopeParm
+                         local  CGparameter cgParm
+                         local  struct DevicePlatC* pDevicePlat
+                         local  uint32_t uElementCount
+                         local  int32_t nArraySize
+                         local  const float* aValues
+                         local  int32_t nArraySize
+                         local  const int32_t* aValues
+                         local  float[] fArray
+                         local  uint32_t iCount
+                         local  int32_t nArraySize
+                         local  const bool* aValues
+                         local  float[] fArray
+                         local  uint32_t iCount
+                         local  const RNAVector2* pVect2
+                         local  const RNAVector4* pVect4
+                         local  const RNAVector3* pVect3
+                         local  const RNAMatrix44* pMatrix
+                         local  struct TextureC* pTexture
+                         local  int32_t texUnit
+                         local  const CellGcmTexture* pGCMTexture
+                         local  struct <anon>* pSamplerData
+                         local  const RNAMatrix44* pMatrix
+                         local  RNAMatrix44 transposedMatrix
+                         local  const float fValue
+                         local  const float fValue
+                         local  const float fValue
+                         inlines  Gcm::cellGcmSetVertexProgramParameter, Gcm::cellGcmSetVertexProgramParameterBlock, Gcm::cellGcmSetVertexTexture, Gcm::cellGcmSetVertexTextureAddress, Gcm::cellGcmSetVertexTextureControl, Gcm::cellGcmSetVertexTextureFilter, Matrix44, RNADebugBreak, ScopeParmC::Get<RNA::TextureC*>, ScopeParmC::Get<bool>, ScopeParmC::Get<std::float_t>, ScopeParmC::Get<std::int32_t>, ScopeParmC::GetPtr<RNAMath::RNAMatrix44>, ScopeParmC::GetPtr<RNAMath::RNAVector2>, ScopeParmC::GetPtr<RNAMath::RNAVector3>, ScopeParmC::GetPtr<RNAMath::RNAVector4>, ScopeParmC::GetPtr<bool>, ScopeParmC::GetPtr<float>, ScopeParmC::GetPtr<std::int32_t>, ScopeParmC::SetDirty, TexturePlatC::GetGcmTexture, operator[], vpu::Transpose
+ 1401  0089EB08    A00  void SetFragmentParms(const struct <anon>* this, struct <anon>* pProgram, const struct <anon>& aParms, bool bDirtyCheck, bool bDirtyClear)
+                         local  const char[17] __FUNCTION__
+                         local  CGprogram fragmentProgram
+                         local  uint32_t fragmentOffset
+                         local  bool bFragmentUpdated
+                         local  int i
+                         local  struct <anon>* pShaderParm
+                         local  struct ScopeParmC* pScopeParm
+                         local  CGparameter cgParm
+                         local  const float fValue
+                         local  struct TextureC* pTexture
+                         local  int32_t texUnit
+                         local  const CellGcmTexture* pGCMTexture
+                         local  struct <anon>* pSamplerData
+                         local  enum SurfaceFormatE eFormat
+                         local  const RNAMatrix44* pMatrix
+                         local  const float* pMatFloat
+                         local  RNAMatrix44 transposedMatrix
+                         local  int iParm
+                         local  const RNAVector3* pVect3
+                         local  const float* pData
+                         local  int iParm
+                         local  const RNAVector2* pVect2
+                         local  const float* pData
+                         local  int iParm
+                         local  const float fValue
+                         local  const float fValue
+                         local  const RNAVector4* pVect4
+                         local  const float* pData
+                         local  int iParm
+                         inlines  Gcm::cellGcmSetFragmentProgramParameter, Gcm::cellGcmSetTextureAddress, Gcm::cellGcmSetTextureBorderColor, Gcm::cellGcmSetTextureControl, Gcm::cellGcmSetTextureFilter, Gcm::cellGcmSetUpdateFragmentProgramParameter, Matrix44, RNADebugBreak, ScopeParmC::Get<RNA::TextureC*>, ScopeParmC::Get<bool>, ScopeParmC::Get<std::float_t>, ScopeParmC::Get<std::int32_t>, ScopeParmC::GetPtr<RNAMath::RNAMatrix44>, ScopeParmC::GetPtr<RNAMath::RNAVector2>, ScopeParmC::GetPtr<RNAMath::RNAVector3>, ScopeParmC::GetPtr<RNAMath::RNAVector4>, ScopeParmC::SetDirty, TextureC::GetFormat, TexturePlatC::GetGcmTexture, operator=, operator[], vpu::Transpose
+ 1640  0089F624    49C  void OnFlush(const struct <anon>* this)
+                         local  const char[8] __FUNCTION__
+                         local  int32_t idVertexProgram
+                         local  int32_t idPixelProgram
+                         local  struct <anon>* pVertexProgram
+                         local  struct <anon>* pPixelProgram
+                         local  uint32_t permute
+                         local  int iBool
+                         inlines  Gcm::cellGcmSetFragmentProgram, Gcm::cellGcmSetVertexProgram, GetPixelProgramID, GetPixelProgramPermutations, GetVertexProgramID, GetVertexProgramPermutations, RNADebugBreak, ScopeParmC::Get<bool8_t>, Size, operator[]
+ 1723  0089F508    11C  void FlushGlobals(const struct <anon>* this)
+                         local  int iProgram
+                         local  struct <anon>* pProgram
+                         inlines  RNADebugBreak, operator[]
+ 1750  0089D3B4     3C  void SetRenderState(const struct <anon>* this)
+ 1762  0089D1D4     30  void RestoreRenderState(const struct <anon>* this)
+ 1771  0089DA38     88  void OnBind(const struct <anon>* this, int32_t iTechnique, int32_t iPass)
+ 1796  0089D204      4  void OnUnbind(const struct <anon>* this)
+ 1802  0089D208      C  int32_t GetNumPasses(const struct <anon>* this)
+ 1808  0089DA1C     1C  void SetPass(const struct <anon>* this, int32_t iPass)
+ 1818  0089D214      8  ScopeMaskT GetInputMask(const struct <anon>* this)
+ 1824  0089D21C      8  bool8_t GetAnnotation(const const struct <anon>* this, const char* pAnnotName, const float_t& fValue)
+ 1830  0089D224      8  bool8_t GetAnnotation(const const struct <anon>* this, const char* pAnnotName, const int32_t& iValue)
+ 1836  0089D22C      8  bool8_t GetAnnotation(const const struct <anon>* this, const char* pAnnotName, const const char*& pValue)
+ 1842  0089D234     84  void SetDefaultTexture(struct TextureC* pTexture)
+                         local  struct TextureC* pOldTexture
+ 1857  0089D5A4     10  static void _GLOBAL__I__ZN4RNAX21cgUtilDeleteParameterEP10_CGprogramj()
+ 1858  0089D594     10  static void _GLOBAL__D__ZN4RNAX21cgUtilDeleteParameterEP10_CGprogramj()

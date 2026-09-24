@@ -1,0 +1,20 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Shared/XceedZip_ZLib64/infcodes.c
+// compiled in: other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   60  003F7B10     D8  inflate_codes_statef* inflate_codes_new(uInt bl, uInt bd, inflate_huft* tl, inflate_huft* td, z_streamp z)
+                         local  inflate_codes_statef* c
+   78  003F9714    B30  int inflate_codes(inflate_blocks_statef* s, z_streamp z, int r)
+                         local  uInt maxlen
+                         local  uInt j
+                         local  inflate_huft* t
+                         local  uInt e
+                         local  uLong b
+                         local  uInt k
+                         local  Bytef* p
+                         local  uInt n
+                         local  Bytef* q
+                         local  uInt m
+                         local  Bytef* f
+                         local  inflate_codes_statef* c
+  244  003F7528     78  void inflate_codes_free(inflate_codes_statef* c, z_streamp z)

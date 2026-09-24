@@ -1,0 +1,182 @@
+// ../../../../../TIGERCODE/Code/GolfModule/golf_module_interface.cpp
+// compiled in: golf_unity.cpp
+// 65 functions, source order. line | PS3 address | size
+
+  129  00245890     EC  void GolfModuleInterface::Init()
+  205  0022E408     34  void GolfModuleInterface::Update()
+  210  00303470     14  void GolfModuleInterface::DebugRender()
+  215  002336D8     44  void GolfModuleInterface::Shutdown()
+  222  002F8328    ADC  void GolfModuleInterface::LevelInit()
+                         local  enum LuaType iType
+                         local  enum LuaType sType
+                         local  enum LuaType[2] ffType
+                         local  enum LuaType[3] fffType
+                         local  enum LuaType[2] siType
+                         inlines  GlobalHoleGolferUpUpdate::GlobalHoleGolferUpUpdate, GlobalHoleParUpdate::GlobalHoleParUpdate, GlobalRoundCrowdUpdate::GlobalRoundCrowdUpdate, GlobalRoundHoleCountUpdate::GlobalRoundHoleCountUpdate, GlobalRoundHoleNumberUpdate::GlobalRoundHoleNumberUpdate, GlobalRoundMatchModeUpdate::GlobalRoundMatchModeUpdate, GlobalRoundPlayerCountUpdate::GlobalRoundPlayerCountUpdate, GlobalRoundStablefordModeUpdate::GlobalRoundStablefordModeUpdate, GlobalRoundStrokeModeUpdate::GlobalRoundStrokeModeUpdate
+  336  00230450     A8  void GolfModuleInterface::LevelShutdown(bool frontEndShutdown)
+                         inlines  Allocator::SetLock
+  367  001ED920     14  struct GolfModuleTrinity& GolfModuleInterface::GetTrinity()
+  372  001F1E48     14  struct GolfModuleLua& GolfModuleInterface::GetMainLua()
+  377  0022E43C     14  struct GolfModuleAptDebug& GolfModuleInterface::GetAptDebug()
+  382  001F0F4C     14  struct GolfModuleCCT& GolfModuleInterface::GetCCT()
+  387  00229950     14  struct GolfModuleUCAP& GolfModuleInterface::GetUCAP()
+  394  001F21F8     14  struct GolfModuleGlobal& GolfModuleInterface::GetGlobal()
+  400  0022E450     64  int GolfModuleInterface::LuaIsFrontend(const struct LuaParam* , void* )
+                         local  enum GAME_MODE_e mode
+  413  003088D8     B8  int GolfModuleInterface::LuaIsAnimationActive(const struct LuaParam* param, void* )
+                         local  enum GAME_MODE_e mode
+                         local  const char* playerName
+                         local  unsigned int scriptPlayer
+                         local  unsigned int activePlayer
+                         inlines  GM_GetGolferUp
+  449  00308990    38C  const char* GolfModuleInterface::LuaGetBallFx(const struct LuaParam* , void* )
+                         local  char[64] LuaGetBallFxBuffer
+                         local  char* str
+                         local  int bufferSize
+                         local  enum PlayerNumber_t Player
+                         local  struct TGD_MaterialInfo* info
+                         local  enum CollisionEffect_t uiCollisionEffectID
+                         inlines  GM_GetGolferUp
+  546  00281B88     70  const char* GolfModuleInterface::LuaGetFrontendAnim(const struct LuaParam* , void* )
+                         local  const char* animName
+                         inlines  FEAnimManager::GetCurAnimName
+  559  00308D1C     A8  void GolfModuleInterface::LuaChangeToPlayerContext(const struct LuaParam* , void* )
+                         local  unsigned int activePlayer
+                         local  const char* playerString
+                         inlines  GM_GetGolferUp
+  568  0022E5A8     14  float GolfModuleInterface::LuaGetTimeElapsed(const struct LuaParam* , void* )
+  573  0023DA04     34  float GolfModuleInterface::LuaGetAnimTimeScale(const struct LuaParam* param, void* )
+                         local  const char* playerName
+                         local  unsigned int scriptPlayer
+                         local  struct TCharacter* pCharacter
+                         local  float scale
+  585  0022E5BC     40  void GolfModuleInterface::LuaPrintStr(const struct LuaParam* param, void* )
+                         local  const char* str
+  604  0022E5FC     44  float GolfModuleInterface::LuaGetSwingSpeed(const struct LuaParam* param, void* )
+                         local  int LUA_shotTypeNumber
+                         local  enum ShotType_t shotType
+  612  0022E640     24  float GolfModuleInterface::LuaGetExplosiveDownSwingTimeScale(const struct LuaParam* , void* )
+  617  0022E664     28  int GolfModuleInterface::LuaIsBackSwingDist_GT_SlowdownDist(const struct LuaParam* , void* )
+  622  00253940     44  int GolfModuleInterface::LuaIsReplayAnimAtStart(const struct LuaParam* param, void* )
+                         local  const char* playerName
+                         local  unsigned int scriptPlayer
+                         local  CameraController_t* pCameraController
+  631  0022E68C     2C  int GolfModuleInterface::LuaGetStickXatTopFidget(const struct LuaParam* param, void* )
+                         local  const char* playerName
+                         local  unsigned int playerID
+  639  0023DA38     38  float GolfModuleInterface::LuaGetLastSKAStateID(const struct LuaParam* param, void* )
+                         local  const char* playerName
+                         local  unsigned int playerID
+  647  00308300     A0  static void LuaChangeToCurrentPlayerContext(const struct LuaParam* , void* )
+                         local  char*[4] names
+                         inlines  GM_GetGolferUp
+  662  0022E6B8     2C  static void LuaPlaySound(const struct LuaParam* param, void* )
+                         local  const char* soundName
+                         local  int trackID
+  669  00273A08      C  static void LuaSetPipCamPosition(const struct LuaParam* param, void* )
+                         local  float fXPos
+                         local  float fYPos
+  677  00273A68      C  static void LuaSetPipCamSize(const struct LuaParam* param, void* )
+                         local  float fWidth
+                         local  float fHeight
+  685  00273D8C     80  static void LuaBeginPipCamZap(const struct LuaParam* param, void* )
+                         local  bool bIsOpenZap
+  693  003082B4     4C  static int LuaIsBallSimulating(const struct LuaParam* , void* )
+                         inlines  GM_GetGolferUp
+  698  0022E6E4     50  const char* GolfModuleInterface::PlayerContextName(char* buffer, const unsigned int playerI, const char* context)
+  704  002F79E0    948  void GolfModuleInterface::InitPlayerGlobals()
+                         local  unsigned int playerI
+                         local  char[128] buffer
+                         inlines  GlobalBallFxUpdate::GlobalBallFxUpdate, GlobalBallPosUpdate::GlobalBallPosUpdate, GlobalBallVelUpdate::GlobalBallVelUpdate, GlobalClubUpdate::GlobalClubUpdate, GlobalDistToPinUpdate::GlobalDistToPinUpdate, GlobalFutureLieUpdate::GlobalFutureLieUpdate, GlobalHoleDistUpdate::GlobalHoleDistUpdate, GlobalInitialDistToPinUpdate::GlobalInitialDistToPinUpdate, GlobalIsLeftHandedUpdate::GlobalIsLeftHandedUpdate, GlobalIsWearingHatUpdate::GlobalIsWearingHatUpdate, GlobalLastShotOBUpdate::GlobalLastShotOBUpdate, GlobalLieUpdate::GlobalLieUpdate, GlobalMatchWinsUpdate::GlobalMatchWinsUpdate, GlobalPlayerUpdate::GlobalPlayerUpdate, GlobalPosUpdate::GlobalPosUpdate, GlobalRoundScoreUpdate::GlobalRoundScoreUpdate, GlobalShotPowerUpdate::GlobalShotPowerUpdate, GlobalShotUpdate::GlobalShotUpdate, GlobalStrokesUpdate::GlobalStrokesUpdate, GlobalSwingStateUpdate::GlobalSwingStateUpdate, GlobalTargetUpdate::GlobalTargetUpdate
+  756  0022E734     90  static void LuaDoParticles(const struct LuaParam* param, void* )
+                         local  float* rot
+                         local  float* pos
+  763  0022E7C4     90  static void LuaDoParticlesOnDivot(const struct LuaParam* param, void* )
+                         local  float* rot
+                         local  float* pos
+  770  0022E854      4  static void LuaDoTee(const struct LuaParam* , void* )
+  773  0022E858      4  static void LuaDoDivot(const struct LuaParam* , void* )
+  776  0022E85C     3C  static void LuaStopParticles(const struct LuaParam* param, void* )
+  780  0022E898     5C  static void LuaSetParticlePosToBall(const struct LuaParam* , void* )
+                         local  unsigned int m_playerNumber
+                         local  struct CoreShotInfo_t* info
+  786  0022E8F4     A4  static void LuaSetParticleRotToTarget(const struct LuaParam* , void* )
+                         local  unsigned int m_playerNumber
+                         local  struct CoreShotInfo_t* info
+                         local  float vx
+                         local  float vz
+                         local  float[4] rot
+                         inlines  std::atan2
+  797  0022E998      4  static void LuaMoveParticlePos(const struct LuaParam* , void* )
+  801  002679FC     24  static int LuaAreWeInFacilityIdleState(const struct LuaParam* , void* )
+  807  00308784     44  static int LuaIsLeftHanded(const struct LuaParam* , void* )
+                         inlines  GM_GetGolferUp
+  812  003087C8     48  static int LuaIsAIPlayer(const struct LuaParam* , void* )
+                         inlines  GM_GetGolferUp
+  817  00247A94     2C  static int LuaIsInFacility(const struct LuaParam* , void* )
+  822  00251DA4     FC  static void LuaPlayTalky(const struct LuaParam* param, void* )
+                         local  const char* streamName
+                         local  uint32 streamGuid
+                         local  uint8 playListId
+                         local  uint16 waveId
+                         local  bool bTalkyFound
+                         inlines  Ses_HasStreamingAudio
+  841  002EC6C8      8  static void LuaSetPipCamMode(const struct LuaParam* param, void* )
+                         local  enum CameraMode_t camMode
+  847  003083A0     60  static void LuaSetMainCamMode(const struct LuaParam* param, void* )
+                         local  enum CameraMode_t camMode
+                         inlines  GM_GetGolferUp
+  854  00308400    1C0  static const char* LuaGetRandomPositivePurchasableAnim(const struct LuaParam* , void* )
+                         local  int numOfReactions
+                         local  int randomIndex
+                         local  struct CustomAnimationName_t reaction
+                         inlines  GM_GetGolferUp
+  872  003085C0    1C4  static const char* LuaGetRandomNegativePurchasableAnim(const struct LuaParam* , void* )
+                         local  int numOfReactions
+                         local  int randomIndex
+                         local  struct CustomAnimationName_t reaction
+                         inlines  GM_GetGolferUp
+  890  00308860     34  static int LuaGetGolferHonors(const struct LuaParam* , void* )
+                         inlines  GM_GetGolferUp
+  895  0022E99C     50  static int LuaGetHonoredPlayer(const struct LuaParam* , void* )
+  900  002C5D38      8  static float LuaGetPlayerBeginingDistToPin(const struct LuaParam* param, void* )
+                         local  enum PlayerNumber_t playerID
+                         local  float beginingDistToPin
+  908  002C5DB4    120  static float LuaGetPlayerEndingDistToPin(const struct LuaParam* param, void* )
+                         local  enum PlayerNumber_t playerID
+                         local  float endDistToPin
+                         local  int gameMode
+  928  00308810     50  static int LuaGetCurrentPlayerStat(const struct LuaParam* param, void* )
+                         local  enum STAT_e stat
+                         inlines  GM_GetGolferUp
+  934  0022E9EC     60  static int LuaGetPlayerRoundStrokes(const struct LuaParam* param, void* )
+                         local  enum PlayerNumber_t playerID
+  940  0022EA4C     88  static int LuaGetGameDifficulty(const struct LuaParam* , void* )
+                         inlines  Singleton<DifficultySettings>::GetSingleton
+  945  0022EAD4     24  static int LuaGetGameMode(const struct LuaParam* , void* )
+                         local  int gameMode
+  951  0022EAF8     4C  static int LuaGetContestsCurrentRound(const struct LuaParam* , void* )
+  956  0027FAB0     88  static float LuaGetContestsBestDistToPin(const struct LuaParam* , void* )
+                         local  float player1Best
+                         local  float player2Best
+  963  0022EB44     2C  static int LuaRandom(const struct LuaParam* param, void* )
+  968  0022EB70    208  static int LuaCycledRandom(const struct LuaParam* param, void* )
+                         local  int prehitSeed
+                         local  int inflightSeed
+                         local  int reactionSeed
+  996  0033DE50    2BC  static int LuaHasWonTheHole(const struct LuaParam* , void* )
+                         local  void* ptr
+                         local  int bHasWon
+                         local  struct GameModeBase* pGameMode
+                         local  enum Lie_t lie
+                         local  bool isMatchMode
+                         local  bool isSkinsMode
+                         local  bool isStablefordMode
+                         local  unsigned int holeIndex
+                         local  int curPlayerStrokes
+                         local  enum PlayerNumber_t nextPlayer
+                         local  int i
+                         local  int nextPlayerStokes
+                         inlines  GM_GetCurrentHoleIndex, GM_GetGolferUp, GM_GetPlayerHoleStrokes
+ 1039  00308894     44  static int LuaHasExceededShotLimit(const struct LuaParam* , void* )
+                         inlines  GM_GetGolferUp

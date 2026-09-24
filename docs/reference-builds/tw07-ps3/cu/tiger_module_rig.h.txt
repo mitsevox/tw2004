@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_rig.h
+// compiled in: tiger_module_actor.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   19    inline-only   void* Rig::GetBinary(const const struct Rig* this)
+   20    inline-only   unsigned int Rig::GetBinarySize(const const struct Rig* this)

@@ -1,0 +1,15 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNABase/RNAList.h
+// compiled in: RNAScope.cpp
+// 9 functions, source order. line | PS3 address | size
+
+  111    inline-only   struct MappingC* GetNext(const const struct <anon>* this)
+  112    inline-only   struct MappingC* GetPrev(const const struct <anon>* this)
+  113    inline-only   void SetNext(const struct <anon>* this, struct MappingC* pNode)
+  114    inline-only   void SetPrev(const struct <anon>* this, struct MappingC* pNode)
+  130    inline-only   bool IsEmpty(const const struct <anon>* this)
+  131    inline-only   struct MappingC* GetHead(const const struct <anon>* this)
+  133    inline-only   void LinkToTail(const struct <anon>* this, struct MappingC* pObject)
+                         local  const char[11] __FUNCTION__
+  174    inline-only   struct MappingC* UnlinkHead(const struct <anon>* this)
+                         local  struct MappingC* pObject
+  197    inline-only   void Unlink(const struct <anon>* this, struct MappingC* pObject)

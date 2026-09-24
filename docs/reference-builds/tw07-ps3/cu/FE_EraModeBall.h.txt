@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/frontend/Headers/FE_EraModeBall.h
+// compiled in: apt_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   89    inline-only   TObject* FEEraModeBall::GetBallObject(const struct FEEraModeBall* this)

@@ -1,0 +1,49 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/animation/char_State.c
+// compiled in: golf2_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   87  00132DBC     3C  void CharacterState_SetSKAState(struct TCharacter* pCharacter, enum CharacterAnimStateE animState)
+  101  00132DF8     70  enum CharacterAnimStateE CharacterState_GetCurrentSKAState(struct TCharacter* pCharacter)
+  108  0013CE5C     70  enum CharacterAnimStateE CharacterState_GetTargetSKAState(struct TCharacter* pCharacter)
+  115  00132D88     24  void CharacterState_ResetSKAState(struct TCharacter* pCharacter)
+  133    inline-only   static float SKABlend_CalculateBlendInfo(struct TCharacter* pCharacter, TSwingProfile* pSwingProfile, float swingTime, float localT0, float localT1, float gT0, float dt, struct TSKABlendInfo* pBlendInfo)
+  229  00188C2C    454  void CharacterState_AddSKABlendData(struct TCharacter* pCharacter, bool reset, enum eIGSkaStates skaStateID, float t0, float localT0, float localT1, float dt, enum CharacterAnimStateE transitionStateID, float transitionTime)
+                         local  struct TSKATime* pTime
+                         local  struct TSkeletonAnimation* pSKA0
+                         local  struct TSKABlender* pBlender
+                         local  struct TSKABlendInfo blendInfo
+                         local  struct TSKAChannel* pChannel
+                         inlines  SKABlend_CalculateBlendInfo, TSKABlender::IsBlenderFull, TSKAChannel::TSKAChannel
+  340    inline-only   int8 GET_AMBIENT_FIDGET_COUNT()
+  344    inline-only   int8 GET_IDLE_FIDGET_COUNT()
+  348  001845B0     68  enum eIGSkaStates CharacterState_ResetFidgetState(struct TCharacter* pCharacter)
+                         inlines  GET_AMBIENT_FIDGET_COUNT
+  355    inline-only   static enum eIGSkaStates CharacterState_UpdateFidgetState(struct TCharacter* pCharacter)
+                         local  enum eIGSkaStates state
+  421  0013CF24     C4  int32 CharacterState_UpdateGameEmotionState(struct TCharacter* pCharacter)
+                         local  enum eSkaEmotionState[10] iEmotion
+                         local  int32 type
+  445  00189080     A0  void CharacterState_SetTapInState(struct TCharacter* pCharacter)
+                         local  int score
+  481  001A7550    908  void CharacterState_UpdateSKAState(struct TCharacter* pCharacter)
+                         local  bool bEnableIK
+                         local  bool bTrasitionIK
+                         local  bool boChangeWorked
+                         local  float ikTransitionTime
+                         local  enum eIGSkaStates stateID
+                         local  bool reset
+                         local  int32 oldShotType
+                         local  enum eIGSkaStates stateID
+                         local  bool reset
+                         local  float putterBlendTime
+                         local  int32 type
+                         local  int i
+                         local  float dt
+                         local  bool reset
+                         local  bool reset
+                         local  float dt
+                         local  bool reset
+                         local  enum eIGSkaStates state
+                         local  enum CharacterAnimStateE transitionStateID
+                         inlines  CharacterState_UpdateFidgetState, GET_AMBIENT_FIDGET_COUNT, GET_IDLE_FIDGET_COUNT
+  975  0013D09C     54  float CharacterState_GetLastSKAStateID(struct TCharacter* pCharacter)

@@ -1,0 +1,96 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_Battle.cpp
+// compiled in: golf_unity.cpp
+// 34 functions, source order. line | PS3 address | size
+
+   18  002050E8     44  void GameModeBattle::GameModeBattle(const struct GameModeBattle* this)
+   23  001FCAB8     18  void GameModeBattle::~GameModeBattle(const struct GameModeBattle* this)
+   28  001FCC10     A0  void GameModeBattle::Init(const struct GameModeBattle* this)
+                         local  int32 i
+                         inlines  cGAME_GLOBALS::SetAIUseRegulationClubs
+   48  001FCD2C      4  void GameModeBattle::Shutdown(const struct GameModeBattle* this)
+   53  001FCD30     1C  bool GameModeBattle::QueryInterface(const struct GameModeBattle* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bret
+   67  001FCD4C     38  int32 GameModeBattle::GetEndGameSequence(const struct GameModeBattle* this)
+                         local  int32 sequence
+   76  0032037C    298  void GameModeBattle::EndHole(const struct GameModeBattle* this)
+                         local  int32 i
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GamePlayer::GetGolferScore, PLR_HoledOut
+  128  002D65F0    30C  void GameModeBattle::EndGame(const struct GameModeBattle* this)
+                         local  enum PlayerNumber_t winner
+                         local  enum PlayerNumber_t loser
+                         local  int32 pointsAhead
+                         local  int32 totalearned
+                         local  int32 baseearned
+                         local  int32 userID
+                         local  void* driverPointer
+                         local  uint8_t winnerID
+                         local  uint8_t loserID
+                         inlines  GM_FullRoundOfGolf, Singleton<GameModeDriverManager>::GetSingleton
+  206  00252A60    10C  bool GameModeBattle::GameFinished(const struct GameModeBattle* this, bool predict)
+  233  001FCE6C      4  void GameModeBattle::StartGamePostData(const struct GameModeBattle* this)
+  238  001F3C7C      8  bool GameModeBattle::IsClubStealingFinished(const struct GameModeBattle* this)
+  244  001FCD90     14  const char* GameModeBattle::GetName(const struct GameModeBattle* this)
+  253  001FCDA4     30  bool GameModeBattle::AddClub(const struct GameModeBattle* this, enum PlayerNumber_t plrID, enum Club_t club)
+  258  001FCDD4     98  void GameModeBattle::SaveClubSetup(const struct GameModeBattle* this)
+                         local  int32 i
+  267  001FCCB0     7C  void GameModeBattle::RestoreClubSetup(const struct GameModeBattle* this)
+                         local  int32 i
+  275  001FCE70     1C  int32 GameModeBattle::GetNumberStartingClubs(const struct GameModeBattle* this, enum PlayerNumber_t plrID)
+  280  001FCE8C     AC  bool GameModeBattle::CanAddClub(const struct GameModeBattle* this, enum PlayerNumber_t plrID, enum Club_t club)
+                         local  bit32 clubMask
+                         local  bool retval
+  295  001FCF38     30  bool GameModeBattle::HasClub(const struct GameModeBattle* this, enum PlayerNumber_t plrID, enum Club_t club)
+  300  001FCF68     18  enum Club_t GameModeBattle::GetClubLostOnLastHole(const struct GameModeBattle* this, enum PlayerNumber_t plrID)
+  307  001FD058     D0  bool GameModeBattle::RemoveClub(const struct GameModeBattle* this, enum PlayerNumber_t plrID, enum Club_t club)
+                         local  bool retval
+  327  001FD128      8  bool GameModeBattle::ShowEndOfHole_ClubAddRemove_UI(const struct GameModeBattle* this)
+  332  001FD130      8  enum PlayerNumber_t GameModeBattle::GetHoleWinner(const struct GameModeBattle* this)
+  337  001FCD84      C  void GameModeBattle::EndClubStealing(const struct GameModeBattle* this)
+  342  001FCF80     24  bool GameModeBattle::ClubIsRequired(const struct GameModeBattle* this, enum Club_t club)
+  355  001FD138     80  int32 GameModeBattle::NumAddableClubsLeft(const struct GameModeBattle* this, enum PlayerNumber_t plrID)
+                         local  int32 clubCount
+                         local  int32 i
+  370  001FCFA4     B4  int32 GameModeBattle::NumRemovableClubsLeft(const struct GameModeBattle* this, enum PlayerNumber_t plrID)
+                         local  int32 clubCount
+                         local  int32 i
+  386  001FD1B8     48  bool GameModeBattle::GetWinner(const struct GameModeBattle* this, enum PlayerNumber_t* pPlrID)
+                         local  bool retval
+  399  001FD200     88  bool GameModeBattle::GetLoser(const struct GameModeBattle* this, enum PlayerNumber_t* pPlrID)
+                         local  bool retval
+                         local  enum PlayerNumber_t tempID
+  422  00237960    168  void GameModeBattle::GetCurrentScoreString(const struct GameModeBattle* this, char* strBuf, int32 bufferSize)
+                         local  int32 player
+                         local  int32 yourWins
+                         local  int32 theirWins
+  449  002861B4    314  void GameModeBattle::AIAddOrRemoveClub(const struct GameModeBattle* this, enum PlayerNumber_t aiPlayerNumber)
+                         local  enum Club_t club
+                         local  enum tAIDecision aiDecision
+                         local  enum PlayerNumber_t winner
+                         local  enum PlayerNumber_t loser
+                         local  char[16] clubNameBuffer
+                         local  char[32] golferNameBuffer
+                         local  char* clubTitleText
+                         local  char[16] clubNameBuffer
+                         local  char[32] golferNameBuffer
+                         local  char* clubTitleText
+  542  0021C75C     84  char* GameModeBattle::GetClubName(const struct GameModeBattle* this, enum Club_t clubId)
+                         local  char[16] strID
+                         local  char* clubNameStr
+  561  001FD288    164  enum tAIDecision GameModeBattle::AIMakeAddRemoveDecision(const struct GameModeBattle* this)
+                         local  enum PlayerNumber_t winner
+                         local  enum PlayerNumber_t loser
+                         local  int clubDifference
+                         local  int diffIndex
+                         local  int compProb
+  612  00285C18    59C  enum Club_t GameModeBattle::AIPickClubToModify(const struct GameModeBattle* this, enum PlayerNumber_t PlayerID, struct <anon> m_mainClubSelectorFn)
+                         local  int clubIndex
+                         local  enum Club_t par3Club
+                         local  float closest
+                         local  float check
+                         local  int teeDistance
+                         local  int i
+                         inlines  GM_GetNextSelectedHole
+  751  001FD3EC     40  bool GameModeBattle::IsNextHolePar3()
+                         local  bool retVal
+                         local  int holeIndex
+                         inlines  GM_GetNextSelectedHole

@@ -1,0 +1,16 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/locker/source/common/./lockerbufferconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   44  00625A20      C  const char8_t* GetType(const const struct <anon>* this)
+   47  00625A2C      C  const char8_t* GetDisplayName(const const struct <anon>* this)
+   50  00625A38      C  const char8_t* GetRealName(const const struct <anon>* this)
+   53  00625A44      8  uint32_t GetBufferSize(const const struct <anon>* this)
+   56  00625A4C      C  const struct List<OSDK::LockerBufferSection>* GetSections(const const struct <anon>* this)
+   62    inline-only   void* GetRawData(const struct LockerBufferConcrete* this)
+   65    inline-only   uint32_t GetRawDataSize(const const struct <anon>* this)
+   68    inline-only   void SetRawDataPointer(const struct LockerBufferConcrete* this, void* pDataBuffer)
+   91  00625A58      C  const char8_t* GetName(const const struct <anon>* this)
+   94  00625A64      8  uint32_t GetDataSize(const const struct <anon>* this)
+   97  00625A6C      8  void* GetDataPointer(const struct <anon>* this)
+  100  00625A74      8  void SetDataPointer(const struct <anon>* this, void* pData)

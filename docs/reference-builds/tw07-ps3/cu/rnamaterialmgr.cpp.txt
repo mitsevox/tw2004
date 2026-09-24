@@ -1,0 +1,130 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/rnamaterialmgr/rnamaterialmgr.cpp
+// compiled in: rnaunity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   71  004FAD9C     18  void RNAMaterialXMLCallBack::~RNAMaterialXMLCallBack(const struct RNAMaterialXMLCallBack* this)
+                         inlines  GameXMLCallback::~GameXMLCallback
+  129  004D066C    180  unsigned int GetHashFromString(const char* pStr)
+                         local  unsigned int baseNameLength
+                         local  unsigned int myCrc
+                         local  const char* pExt
+                         local  char* name
+                         local  unsigned int i
+                         inlines  std::tolower
+  177  004D5398    C14  void RNAMaterialXMLCallBack::StartElement(const struct RNAMaterialXMLCallBack* this, const char8_t* name, uint32_t nameLen, const struct <anon>* attributes, uint32_t attributeCount)
+                         local  struct <anon> mat
+                         local  bool8_t hasValue
+                         local  struct <anon> param
+                         local  char8_t[32] typeStr
+                         local  bool8_t hasValue
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct <anon>* newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct <anon>* newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  float32_t f
+                         local  struct <anon> vec
+                         local  struct <anon> vec
+                         local  struct <anon> vec
+                         local  struct <anon> mat
+                         local  struct <anon> mat
+                         inlines  Add, Construct, GetMaterial, GetNumMaterials, PushBack, RNADebugBreak, RNAMaterialDef, ~RNAMaterialDef
+  331  004C5A88      4  void RNAMaterialXMLCallBack::EndElement(const struct RNAMaterialXMLCallBack* this, const char8_t* name, uint32_t nameLen)
+  336  004D3B00    1BC  struct <anon>* FindMaterial(const struct <anon>* this, const char* name)
+                         local  struct <anon>* mat
+                         local  int32_t i
+                         local  int32_t c
+                         local  const char* matName
+                         inlines  RNADebugBreak, Size, operator[]
+  381  004F5B74    D60  void MaterialSetup(const struct <anon>* this, struct MaterialC* pMaterial, struct <anon>* pDef)
+                         local  const char[14] __FUNCTION__
+                         local  struct TextureC* pTexture
+                         local  struct <anon> v2
+                         local  struct <anon> v3
+                         local  struct <anon> v4
+                         local  struct <anon> m33
+                         local  struct <anon> m44
+                         local  struct ShaderC* pShader
+                         local  const struct ShaderInterfaceC* pInterface
+                         local  struct DeviceC* pDevice
+                         local  const struct ScopeC& Scope
+                         local  int32_t techniqueNum
+                         local  uint32_t i
+                         local  struct <anon>* pParm
+                         local  char* pStrSemantic
+                         local  uint32_t semanticLen
+                         local  bool8_t isMatParm
+                         local  bool8_t useParm
+                         local  uint32_t i
+                         local  struct ScopeParmC* pScopeParm
+                         inlines  DeviceC::GetScope, GetRow, RNADebugBreak, ScopeParmC::Set<RNA::TextureC*>, ScopeParmC::Set<bool>, ScopeParmC::Set<int>, ScopeParmC::Set<rw::math::vpu::Matrix33>, ScopeParmC::Set<rw::math::vpu::Matrix44>, ScopeParmC::Set<rw::math::vpu::Vector2>, ScopeParmC::Set<rw::math::vpu::Vector3>, ScopeParmC::Set<rw::math::vpu::Vector4>, ScopeParmC::Set<std::float_t>, Set, SetTechnique, operator[], std::tolower
+  541  004D5FAC    4F4  void MaterialMerge(const struct <anon>* this, const struct <anon>* base, struct <anon>* variation)
+                         local  uint32_t varParmCount
+                         local  uint32_t i
+                         local  uint32_t c
+                         local  const struct <anon>* baseParm
+                         local  uint32_t j
+                         local  struct <anon>* varParm
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct <anon>* newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct <anon>* newData
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Construct, PushBack, RNADebugBreak, Size, operator[]
+  595  004D0140     4C  void MaterialClear(const struct <anon>* this, struct MaterialC* pMaterial, struct <anon>* pDef)
+                         local  struct <anon>* pParm
+                         local  struct TextureC* pTexture
+                         inlines  GetFirstParm
+  621  004F6DC8    6C4  void ParseMaterialXml(const struct <anon>* this, void* materialXmlBuffer, struct MaterialListC* pMaterialList)
+                         local  struct <anon> list
+                         local  struct RNAMaterialXMLCallBack callback
+                         local  struct <anon> xmlparser
+                         local  struct DeviceC* pDevice
+                         local  struct TerMesh* pMesh
+                         local  struct TerMesh* pMeshEndPoint
+                         local  uint32_t i
+                         local  struct <anon>* mat
+                         local  struct UserData* pUserData
+                         local  struct MaterialC* pMaterial
+                         local  struct TerStrip* pStrip
+                         local  struct TerStrip* pStripEndPoint
+                         local  struct TerDefaultMaterial* pMat
+                         local  uint32_t i
+                         local  unsigned int rnaMaterialHash
+                         local  unsigned int endianSwappedMatHash
+                         inlines  GameXMLCallback::GameXMLCallback, GetMaterial, GetNumMaterials, Init, RNADebugBreak, RNAMaterialDefList, RNAMaterialXMLCallBack::RNAMaterialXMLCallBack, RNAMaterialXMLCallBack::~RNAMaterialXMLCallBack, UserData::UserData, UserData::operator new, operator new, ~RNAMaterialDefList
+  693  004D4554     BC  void ParseCharacterMaterialXml(const struct <anon>* this, void* materialXmlBuffer, struct <anon>* pMaterialDefList)
+                         local  struct RNAMaterialXMLCallBack callback
+                         local  struct <anon> xmlparser
+                         inlines  GameXMLCallback::GameXMLCallback, RNAMaterialXMLCallBack::RNAMaterialXMLCallBack, RNAMaterialXMLCallBack::~RNAMaterialXMLCallBack
+  715  004C5AB4     80  void UnbindFromGeometry(const struct <anon>* this)
+                         local  struct TerMesh* pMesh
+                         local  struct TerMesh* pMeshEndPoint
+                         local  struct TerStrip* pStrip
+                         local  struct TerStrip* pStripEndPoint
+  746  004C5B34    264  void UnbindFromCharGeometry(const struct <anon>* this)
+                         local  struct GenericActor* pActor
+                         local  struct CharModelMgrCharacterInstance* pCharModel
+                         local  uint32 i
+                         local  struct CharGeom* charGeom
+                         local  uint32_t iMesh
+                         local  struct CharMesh* charMesh
+                         local  twMaterial* twMat
+                         local  int32_t i
+                         local  struct TCharacter* pCharacter
+                         local  struct CharModelMgrCharacterInstance* pCharModel
+                         local  uint32 j
+                         local  struct CharGeom* charGeom
+                         local  uint32_t iMesh
+                         local  struct CharMesh* charMesh
+                         local  twMaterial* twMat
+  810  004C5D98     94  void CreateInstance()
+  830  004C5E2C     78  void DestroyInstance()

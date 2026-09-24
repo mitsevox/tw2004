@@ -1,0 +1,61 @@
+// ../../../PPMalloc/1.08.00/include/PPMalloc/EAGeneralAllocator.h
+// compiled in: EAGeneralAllocator.cpp
+// 50 functions, source order. line | PS3 address | size
+
+  411  00561C9C    25C  void GeneralAllocator(const struct GeneralAllocator* this, void* pInitialCore, size_t nInitialCoreSize, bool bShouldFreeInitialCore, bool bShouldTrimInitialCore, size_t(*)()* pInitialCoreFreeFunction, void* pInitialCoreFreeFunctionContext)
+  416  00561C94      4  void ~GeneralAllocator(const struct GeneralAllocator* this)
+ 1056  0055C238     8C  void Snapshot::Snapshot(const struct Snapshot* this, size_t nSizeOfThis, int nBlockTypeFlags)
+ 1420    inline-only   bool GetIsMinAligned(void* pAddress)
+ 1427    inline-only   bool GetIsAligned(void* pAddress, size_t nAlignment)
+ 1435    inline-only   size_t AlignUp(size_t nValue, size_t nAlignment)
+ 1443    inline-only   char* AlignUp(void* pValue, size_t nAlignment)
+ 1460    inline-only   void* GetPostHeaderPtrFromChunkPtr(const struct Chunk* pChunk)
+ 1466    inline-only   void* GetDataPtrFromChunkPtr(const struct Chunk* pChunk)
+ 1473    inline-only   struct Chunk* GetChunkPtrFromDataPtr(const void* pData)
+ 1480    inline-only   uint32_t GetChunkSizeFromDataSize(uint32_t nDataSize)
+                         local  const uint32_t sum
+ 1537    inline-only   unsigned int GetFastBinIndexFromChunkSize(uint32_t nChunkSize)
+ 1544    inline-only   int GetPrevChunkIsInUse(const struct Chunk* pChunk)
+ 1551    inline-only   struct Chunk* GetMMapChunkFromMMapListChunk(const struct Chunk* pChunk)
+ 1561    inline-only   int GetChunkIsMMapped(const struct Chunk* pChunk)
+ 1568    inline-only   int GetChunkIsInternal(const struct Chunk* pChunk)
+ 1575    inline-only   void SetChunkIsInternal(struct Chunk* pChunk)
+ 1589    inline-only   int GetChunkIsFastBin(const struct Chunk* pChunk)
+ 1610    inline-only   uint32_t GetChunkSize(const struct Chunk* pChunk)
+ 1640    inline-only   struct Chunk* GetNextChunk(const struct Chunk* pChunk)
+ 1647    inline-only   struct Chunk* GetPrevChunk(const struct Chunk* pChunk)
+ 1661    inline-only   struct Chunk* GetChunkAtOffset(const struct Chunk* pChunk, int nOffset)
+ 1668    inline-only   int GetChunkIsInUse(const struct Chunk* pChunk)
+                         local  const const struct Chunk* pNextChunk
+ 1676    inline-only   void SetChunkIsInUse(struct Chunk* pChunk)
+ 1689    inline-only   int GetChunkInUseOffset(const struct Chunk* pChunk, int nOffset)
+ 1696    inline-only   void SetChunkInUseOffset(struct Chunk* pChunk, int nOffset)
+ 1703    inline-only   void ClearChunkInUseOffset(struct Chunk* pChunk, int nOffset)
+ 1710    inline-only   void SetChunkSize(struct Chunk* pChunk, uint32_t nSize)
+ 1717    inline-only   void SetChunkSizePreserveFlags(struct Chunk* pChunk, uint32_t nSize)
+ 1733    inline-only   void SetNextChunkPrevSize(struct Chunk* pChunk, uint32_t nSize)
+ 1740    inline-only   void LinkChunk(struct Chunk* pChunk, struct Chunk* pPrev, struct Chunk* pNext)
+ 1750    inline-only   void UnlinkChunk(const struct Chunk* pChunk)
+ 1769    inline-only   struct Chunk* GetLastChunkInBin(const struct Chunk* pBin)
+ 1775    inline-only   struct Chunk* GetNextBin(struct Chunk* pBin)
+ 1782    inline-only   struct Chunk* GetBin(const const struct <anon>* this, int nIndex)
+ 1791    inline-only   bool SizeIsWithinSmallBinRange(uint32_t nSize)
+ 1798    inline-only   int GetSmallBinIndexFromChunkSize(uint32_t nSize)
+ 1805    inline-only   int GetBinIndexFromChunkSize(uint32_t nSize)
+ 1815    inline-only   struct Chunk* GetUnsortedBin(const const struct <anon>* this)
+ 1822    inline-only   struct Chunk* GetInitialTopChunk(const const struct <anon>* this)
+ 1836    inline-only   struct Chunk* GetFenceChunk(const struct CoreBlock* pCoreBlock)
+ 1843    inline-only   int GetBinBitmapWordFromBinIndex(int nBinIndex)
+ 1849    inline-only   int GetBinBitmapBitFromBinIndex(int nBinIndex)
+ 1856    inline-only   void MarkBinBitmapBit(const struct GeneralAllocator* this, int nBinIndex)
+                         local  const int nWord
+                         local  const int nBit
+ 1874    inline-only   int GetBinBitmapBit(const const struct <anon>* this, int nBinIndex)
+                         local  const int nWord
+                         local  const int nBit
+ 1883    inline-only   int GetFastBinChunksExist(const const struct <anon>* this)
+ 1889    inline-only   void SetFastBinChunksExist(const struct GeneralAllocator* this, bool bExist)
+ 1899    inline-only   bool GetCoreIsContiguous(const const struct <anon>* this)
+ 1907    inline-only   unsigned int GetMaxFastBinChunkSize(const const struct <anon>* this)
+ 1914    inline-only   void SetMaxFastBinDataSize(const struct GeneralAllocator* this, uint32_t nSize)
+                         local  const unsigned int nExistingFlags

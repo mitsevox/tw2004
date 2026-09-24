@@ -1,0 +1,115 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLRealFileIO.cpp
+// compiled in: Legacy_unity.cpp
+// 32 functions, source order. line | PS3 address | size
+
+   57  003929A8     90  void LLFileIO_Printf(const char* txt)
+                         local  va_list va
+                         local  char[255] buf
+  170  0037DE78     54  void File_InitFileHandleTable()
+                         local  int i
+  186  0037DECC    1E0  static bool File_FormatFilename(enum FileIODevice device, char8_t* strFilenameDest, const char8_t* strFilenameSrc, uint32_t destBufLen, bool bAppendDrive)
+                         local  bool8_t retVal
+                         local  bool8_t bIsAbsolutePath
+                         local  char8_t[128] strSrcClean
+                         local  const char8_t* afterColon
+                         local  const char8_t* strRootPath
+                         local  char* s
+  265  003B0A2C    2FC  int32 File_InitOnce()
+                         local  struct <anon> mp
+                         local  struct CorePoolDescriptor[4] desc
+                         local  struct Channel* DemoDebugOutputChannel
+                         local  struct ConsoleDevice* DemoDebugOutputDevice
+                         local  struct <anon> FileSysOpts
+                         inlines  ConsoleDevice::ConsoleDevice, SetReadFileFailCallback
+  342  003AA718     90  void File_CloseOnce()
+  360  003C3384     70  void File_Update()
+  374  003C35F4    504  static int32 File_Open_Private(enum FileIODevice device, const char* filename, bool bUseHardDriveCache, enum FILEIO_FOPEN_FLAGS flags)
+                         local  char8_t[128] formattedFilename
+                         local  TI_STimeValue start
+                         local  unsigned int openFlags
+                         local  uint32_t handle
+                         local  float elapsed
+                         local  const bool8_t existsval
+                         local  const int32_t sizeval
+                         local  struct <anon> am
+                         local  uint32_t sHighWaterMark
+                         local  struct <anon> am
+                         inlines  AutoMutex, TI_fConvertTimeDifToSeconds, TI_uiReadCP0Count, ~AutoMutex
+  500  003C4544    3C4  int32 File_Close(int32 fileID)
+                         local  TI_STimeValue start
+                         local  enum OpStatus retCode
+                         local  bool8_t closeStatus
+                         local  float elapsed
+                         local  struct <anon> am
+                         local  struct <anon> am
+                         inlines  AutoMutex, TI_fConvertTimeDifToSeconds, TI_uiReadCP0Count, ~AutoMutex
+  552  003C3C68    144  int32 File_GetLength(int32 fileID)
+                         local  struct <anon> am
+                         local  uint64_t ofs
+                         inlines  AutoMutex, ~AutoMutex
+  572  003C33F4    1FC  static int32 File_Read_Private(int32 fileID, char* destAdr, uint32 bytesToRead, uint32 offsetFromStart)
+                         local  int32_t numBytesRead
+                         local  struct <anon> am
+                         inlines  AutoMutex, ~AutoMutex
+  603  003C5BEC    260  static void* File_ReadFileToHeap_Private(const char* filename, int32* fileLength, int32 align, bool debugHeap)
+                         local  const char[28] __FUNCTION__
+                         local  int32 fileID
+                         local  int32_t fileLen
+                         local  void* memLoc
+                         local  int32_t numBytesRead
+                         inlines  TagValuePair, operator+
+  651  0039276C    23C  void File_AsyncCallback(struct <anon>* op)
+                         local  struct <anon> am
+                         local  bool8_t showWarning
+                         local  int handle
+                         local  struct AsyncOperationPair* prevPairPtr
+                         local  struct AsyncOperationPair* pairPtr
+                         local  int32_t numbytes
+                         local  enum OpStatus retCode
+                         inlines  AutoMutex, ~AutoMutex
+  745  00390FBC    238  int32 File_ReadAsync(int32 fileID, char* destAdr, uint32 bytesToRead, uint32 offsetFromStart, CallbackPtr callbackFuncPtr)
+                         local  struct <anon> am
+                         local  void* newPtr
+                         local  void* newPtr
+                         inlines  AsyncOperationPair::AsyncOperationPair, AutoMutex, ~AutoMutex
+  791  003911F4      4  int32 File_ReadAsyncEx(int32 fileID, char* destAdr, uint32 bytesToRead, uint32 offsetFromStart, CallbackPtrEx callbackFuncPtr, uint8 priority, uint32 user, uint8 uid, uint8 legacy)
+  807  00390E64     E8  bool File_PCFileExists(const char* filename)
+                         local  bool8_t existsval
+                         local  char8_t[128] formattedFilename
+  826  0037E0AC     74  int32 File_WritePCFile(const char* filename, void* dataPtr, int32 dataSize)
+                         local  char8_t[128] formattedFilename
+                         local  bool8_t success
+  839  003C9B08     60  int32 File_ReadPCFileIntoBuffer(const char* filename, void* buffer)
+                         local  int32 handle
+                         local  int32_t size
+                         local  int32_t numBytesRead
+  853  003C8B3C     70  int32 File_AppendPCFile(const char* filename, void* dataPtr, int32 dataSize)
+                         local  int32 handle
+                         local  int32_t numBytesWritten
+  863  003C885C      4  int32 File_ClosePCFileForWrite(int32 fileID)
+  868  003C4208    174  int32 File_WriteToOpenedPCFile(int32 fileID, void* dataPtr, int32 dataSize)
+                         local  int32_t numBytesWritten
+                         local  struct <anon> am
+                         local  int32_t size
+                         inlines  AutoMutex, ~AutoMutex
+  891  0037E238      8  int32 File_GetFilesInDirectory(const char* dirName, char** fileNames, int32 maxFiles, int32 maxFileNameSize)
+  901  003C85A4      4  void* File_ReadFileToHeap(const char* filename, int32* fileLength, int32 align, bool debugHeap)
+  905  003C5E4C      4  void* File_ReadPCFileToHeap(const char* filename, int32* fileLength, int32 align, bool debugHeap)
+  910  003C3C54     14  int32 File_OpenPCFile(const char* filename)
+  915  003C3C40     14  int32 File_OpenPCFileForWrite(const char* filename)
+  922  003C3C1C     24  int32 File_Open(const char* filename, bool bUseHardDriveCache, bool sequential)
+  928    inline-only   static int32 File_CheckForPreOpenFile_Name(const char* fileName)
+                         local  struct <anon> am
+                         local  uint32_t handle
+  941  003C3AF8    124  void File_PreOpen(const char* fileName)
+                         local  char8_t[128] formattedFilename
+                         inlines  File_CheckForPreOpenFile_Name, ~AutoMutex
+  957  003C35F0      4  int32 File_Read(int32 fileID, char* destAdr, uint32 bytesToRead, uint32 offsetFromStart)
+  988  003C9B6C     84  static bool DamagedDiscCallback()
+                         local  bool bIsMainThread
+                         local  struct <anon> am
+                         inlines  AutoMutex, ~AutoMutex
+ 1027  003C336C     18  void DisplayDamagedDiscMessage()
+                         local  const char* msg1
+                         local  const char* msg2
+ 1065  0037E240      8  bool File_PreCacheFile(const char* filename)

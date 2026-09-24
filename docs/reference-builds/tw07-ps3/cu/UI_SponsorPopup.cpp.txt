@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_SponsorPopup.cpp
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   26  000FA958     6C  void UISponsorPopup::UISponsorPopup(const struct UISponsorPopup* this)
+                         inlines  AptStaticCharBuffer<32u>::AptStaticCharBuffer
+   34  00033934     58  void UISponsorPopup::Init(const struct UISponsorPopup* this)
+   41  0007E070    13C  void UISponsorPopup::ShowPgaSponsorPopup(const struct UISponsorPopup* this, int sponsor, int startCash, int bonusCash, bool isTW05Save, bool wereInASequence)
+                         local  char* strBuf
+                         local  char[16] tempBuffer
+                         local  char* strBufB
+                         local  char[16] tempBufferB
+   79  0005F79C     AC  enum eAptHandleInput UISponsorPopup::HandleInput(const struct UISponsorPopup* this, int32 cID)

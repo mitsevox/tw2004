@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_SpectatorMesh.cpp
+// compiled in: shader_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   47  0051A0DC     28  void SM_SpectatorMeshClass::SM_SpectatorMeshClass(const struct SM_SpectatorMeshClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base
+   53  005040B8    174  void SM_SpectatorMeshClass::Load(const struct SM_SpectatorMeshClass* this)
+   83  0050422C     44  void SM_SpectatorMeshClass::Activate(const struct SM_SpectatorMeshClass* this)
+   90  00504270     38  void SM_SpectatorMeshClass::Deactivate(const struct SM_SpectatorMeshClass* this)
+   97  0050F030     64  void SM_SpectatorMeshClass::SetColorTexture(const struct SM_SpectatorMeshClass* this, TextureRef colorTexture)
+  107  0050F094     60  void SM_SpectatorMeshClass::SetVarIndices(const struct SM_SpectatorMeshClass* this, const float* var_indices)
+  116  0050F0F4     64  void SM_SpectatorMeshClass::SetTintColor(const struct SM_SpectatorMeshClass* this, const float* tint_array)
+  124  0050F158     60  void SM_SpectatorMeshClass::SetWorldLightDirection(const struct SM_SpectatorMeshClass* this, const float* light_dir)

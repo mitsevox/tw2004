@@ -1,0 +1,7 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/slib.cpp
+// compiled in: slib.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    8  006DDC34    13C  void iSNDcalcvol(int voice)
+                         local  struct CHANPUB* pv
+                         inlines  SNDI_ftoifast

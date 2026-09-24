@@ -1,0 +1,5 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNAX/include/RNAX/ps3/RNAX/CGFXShader.h
+// compiled in: RNADevicePlat.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  116    inline-only   int8_t CGFXShaderC::GetChannelMapping(const struct CGFXShaderC* this, enum ElementNameE eName, uint32_t index)

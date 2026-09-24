@@ -1,0 +1,24 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_CharBio.cpp
+// compiled in: apt_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   67  000F2680     9C  void UICharBio::UICharBio(const struct UICharBio* this)
+                         inlines  AptStaticCharBuffer<32u>::AptStaticCharBuffer
+   91  000331B4     58  void UICharBio::Init(const struct UICharBio* this)
+  101  0009310C    438  void UICharBio::Show(const struct UICharBio* this, enum Golfer_t golfer)
+                         local  int16_t index
+                         local  const float h
+                         local  const float h2
+                         local  const int32 h3
+                         local  int32 i
+                         local  char[32] tgaName
+  175  0006E368     78  void UICharBio::OnShow(const struct UICharBio* this)
+  188  0003320C     3C  void UICharBio::Hide(const struct UICharBio* this)
+  197  00033248     78  void UICharBio::ShowHelpText(const struct UICharBio* this)
+  208  000605DC    24C  enum eAptHandleInput UICharBio::HandleInput(const struct UICharBio* this, int32 cID)
+                         local  char[128] buff
+                         local  enum Golfer_t nextGolfer
+  271  000332C0     70  bool UICharBio::LookUpCharBioMovieName(const struct UICharBio* this)
+                         local  bool retVal
+                         local  int32 i
+  292  00024ADC     78  enum TAptSequenceStatus UICharBio::CallOpenFunctionSeq(const struct UICharBio* this, bool inbFirstTime, void* inData)

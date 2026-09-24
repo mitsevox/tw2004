@@ -1,0 +1,19 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/ariesoperationabstract.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   67  006056B8     64  void AriesOperationAbstract(const struct <anon>* this)
+                         inlines  RCPointer
+   93  00605780     58  void ~AriesOperationAbstract(const struct <anon>* this)
+                         inlines  ~RCPointer
+  118  005F7534    124  void AriesOperationSend(const struct <anon>* this, int32_t iAriesKind, const char8_t* strParameters, struct MemoryStrategy* pMemStrategy)
+                         inlines  GetOperationManagerConcrete, operator=
+  145  005B376C      C  void AriesOperationDiscontinue(const struct <anon>* this)
+  169  005F7658     9C  void AriesOperationSetFailure(const struct <anon>* this, int32_t iFailure)
+                         inlines  GetOperationManagerConcrete, operator=
+  199  005B3A20     94  bool OperationProcess(const struct <anon>* this, const struct Operation* pOperation)
+                         local  bool bContinue
+  259  005CE428     BC  void OperationCancel(const struct <anon>* this, const struct Operation* pOperation)
+  299  005B3778     70  void AriesCallback(LobbyApiRefT* , LobbyApiMsgT* pMsg, void* pUserData)
+                         local  struct <anon>* pInstance
+  338  005CDF50      8  struct Operation* GetOperation(const struct <anon>* this)

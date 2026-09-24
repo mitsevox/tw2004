@@ -1,0 +1,146 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/source/common/ExprNode.cpp
+// compiled in: ExprNode.cpp
+// 101 functions, source order. line | PS3 address | size
+
+    0  007D948C    10C  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   65  007D0328     68  static void T3db::_TDbOpNone(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+   72  007D0390     D4  static void T3db::_TDbOpRelatLT_STRING(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+   78  007D0464     CC  static void T3db::_TDbOpRelatLE_STRING(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+   84  007D0530     CC  static void T3db::_TDbOpRelatEQ_STRING(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+   90  007D05FC     CC  static void T3db::_TDbOpRelatGT_STRING(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+   96  007D06C8     D4  static void T3db::_TDbOpRelatGE_STRING(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  102  007D079C     CC  static void T3db::_TDbOpRelatNE_STRING(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  108  007D0868     D8  static void T3db::_TDbOpLogicAND_STRING(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  115  007D0940     D8  static void T3db::_TDbOpLogicOR_STRING(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  122  007D0A18    11C  static void T3db::_TDbOpLogicXOR_STRING(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  129  007D0B34     A0  static void T3db::_TDbOpLogicNOT_STRING(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  135  007D0BD4     D0  static void T3db::_TDbOpRelatLT_BINARY(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  141  007D0CA4     C8  static void T3db::_TDbOpRelatLE_BINARY(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  147  007D0D6C     C8  static void T3db::_TDbOpRelatEQ_BINARY(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  153  007D0E34     C8  static void T3db::_TDbOpRelatGT_BINARY(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  159  007D0EFC     D0  static void T3db::_TDbOpRelatGE_BINARY(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  165  007D0FCC     C8  static void T3db::_TDbOpRelatNE_BINARY(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  173  007D1094     90  static void T3db::_TDbOpRelatLT_INT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  179  007D1124     90  static void T3db::_TDbOpRelatLE_INT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  185  007D11B4     90  static void T3db::_TDbOpRelatEQ_INT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  191  007D1244     90  static void T3db::_TDbOpRelatGT_INT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  197  007D12D4     90  static void T3db::_TDbOpRelatGE_INT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  203  007D1364     90  static void T3db::_TDbOpRelatNE_INT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  209  007D13F4     C8  static void T3db::_TDbOpRelatIR_INT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  216  007D14BC     C8  static void T3db::_TDbOpRelatNR_INT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  223  007D1584     98  static void T3db::_TDbOpLogicAND_INT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  229  007D161C     98  static void T3db::_TDbOpLogicOR_INT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  235  007D16B4     DC  static void T3db::_TDbOpLogicXOR_INT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  242  007D1790     74  static void T3db::_TDbOpLogicNOT_INT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  248  007D1804     78  static void T3db::_TDbOpSMathADD_INT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  254  007D187C     78  static void T3db::_TDbOpSMathSUB_INT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  260  007D18F4     78  static void T3db::_TDbOpSMathMUL_INT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  266  007D196C     A4  static void T3db::_TDbOpSMathDIV_INT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  272  007D1A10     98  static void T3db::_TDbOpSMathPCT_INT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  278  007D1AA8     A8  static void T3db::_TDbOpSMathMINOF_INT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  284  007D1B50     A8  static void T3db::_TDbOpSMathMAXOF_INT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  290  007D1BF8    170  static void T3db::_TDbOpFMathFDIV_INT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  296  007D1D68     90  static void T3db::_TDbOpRelatLT_UINT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  302  007D1DF8     90  static void T3db::_TDbOpRelatLE_UINT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  308  007D1E88     90  static void T3db::_TDbOpRelatGT_UINT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  314  007D1F18     90  static void T3db::_TDbOpRelatGE_UINT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  320  007D1FA8     C0  static void T3db::_TDbOpRelatIR_UINT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  327  007D2068     C0  static void T3db::_TDbOpRelatNR_UINT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  334  007D2128     78  static void T3db::_TDbOpSMathADD_UINT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  340  007D21A0     78  static void T3db::_TDbOpSMathSUB_UINT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  346  007D2218     78  static void T3db::_TDbOpSMathMUL_UINT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  352  007D2290     A4  static void T3db::_TDbOpSMathDIV_UINT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  358  007D2334     90  static void T3db::_TDbOpSMathPCT_UINT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  364  007D23C4     A8  static void T3db::_TDbOpSMathMINOF_UINT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  370  007D246C     A8  static void T3db::_TDbOpSMathMAXOF_UINT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  376  007D2514     78  static void T3db::_TDbOpBMathAND_UINT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  382  007D258C     78  static void T3db::_TDbOpBMathOR_UINT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  388  007D2604     78  static void T3db::_TDbOpBMathXOR_UINT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  394  007D267C     68  static void T3db::_TDbOpBMathNOT_UINT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  400  007D26E4    170  static void T3db::_TDbOpFMathFDIV_UINT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  406  007D2854     8C  static void T3db::_TDbOpRelatLT_FLOAT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  412  007D28E0     90  static void T3db::_TDbOpRelatLE_FLOAT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  418  007D2970     8C  static void T3db::_TDbOpRelatGT_FLOAT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  424  007D29FC     90  static void T3db::_TDbOpRelatGE_FLOAT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  430  007D2A8C    1C8  static void T3db::_TDbOpRelatIR_FLOAT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  439  007D2C54    194  static void T3db::_TDbOpRelatNR_FLOAT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  448  007D2DE8     6C  static void T3db::_TDbOpSMathADD_FLOAT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  454  007D2E54     6C  static void T3db::_TDbOpSMathSUB_FLOAT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  460  007D2EC0     6C  static void T3db::_TDbOpSMathMUL_FLOAT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  466  007D2F2C     9C  static void T3db::_TDbOpSMathDIV_FLOAT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  472  007D2FC8     74  static void T3db::_TDbOpSMathPCT_FLOAT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  478  007D303C     9C  static void T3db::_TDbOpSMathMINOF_FLOAT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  484  007D30D8     9C  static void T3db::_TDbOpSMathMAXOF_FLOAT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  490  007D3174     74  static void T3db::_TDbOpFMathROUND_FLOAT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  496  007D31E8     7C  static void T3db::_TDbOpFMathSQRT_FLOAT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  502  007D3264     B4  static void T3db::_TDbOpFMathMKPCT_FLOAT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  510  007D3318    188  static void T3db::_TDbOpFMathMKPCT_INT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  517  007D34A0    188  static void T3db::_TDbOpFMathMKPCT_UINT(const const struct <anon>* left, const const struct <anon>* right, const struct <anon>* result)
+  646  007D3680    15C  void FillTableColRefOpExpr(const struct ExprNode* this, enum ExprOp op, TableRef leftTblRef, ColRef leftColRef, enum ColType rightType, struct ExprNode* rightExpr)
+                         local  const char[22] __FUNCTION__
+  673  007D37DC    15C  void FillExprOpTableColRef(const struct ExprNode* this, enum ExprOp op, enum ColType leftType, struct ExprNode* leftExpr, TableRef rightTblRef, ColRef rightColRef)
+                         local  const char[22] __FUNCTION__
+  700  007D3938    1EC  void FillExprOpData(const struct ExprNode* this, enum ExprOp op, enum ColType leftType, struct ExprNode* leftExpr, enum ColType rightType, union <anon> rightData)
+                         local  const char[15] __FUNCTION__
+  727  007D3B24    1E4  void FillExprOpUint32(const struct ExprNode* this, enum ExprOp op, enum ColType leftType, struct ExprNode* leftExpr, enum ColType rightType, uint32_t rightData)
+                         local  const char[17] __FUNCTION__
+  755  007D3D08    1EC  void FillDataOpExpr(const struct ExprNode* this, enum ExprOp op, enum ColType leftType, union <anon> leftData, enum ColType rightType, struct ExprNode* rightExpr)
+                         local  const char[15] __FUNCTION__
+  782  007D3EF4    1E4  void FillUint32OpExpr(const struct ExprNode* this, enum ExprOp op, enum ColType leftType, uint32_t leftData, enum ColType rightType, struct ExprNode* rightExpr)
+                         local  const char[17] __FUNCTION__
+  810  007D40D8    15C  void FillTableColRefOpData(const struct ExprNode* this, enum ExprOp op, TableRef leftTblRef, ColRef leftColRef, enum ColType rightType, union <anon> rightData)
+                         local  const char[22] __FUNCTION__
+  836  007D4234    154  void FillTableColRefOpUint32(const struct ExprNode* this, enum ExprOp op, TableRef leftTblRef, ColRef leftColRef, enum ColType rightType, uint32_t rightData)
+                         local  const char[24] __FUNCTION__
+  863  007D4388    15C  void FillDataOpTableColRef(const struct ExprNode* this, enum ExprOp op, enum ColType leftType, union <anon> leftData, TableRef rightTblRef, ColRef rightColRef)
+                         local  const char[22] __FUNCTION__
+  912  007D737C   2110  enum TDbError Prepare(const struct ExprNode* this, struct ExprNode** ppExpr, struct Table** ppTables, uint32_t tblCount, bool bReadFromDisk)
+                         local  const char[8] __FUNCTION__
+                         local  struct ExprNode* pTempNode
+                         local  uint32_t count
+                         local  enum TDbError dbResult
+                         local  ColNum colNum
+                         local  bool8_t bLeftTrue
+                         local  bool8_t bRightTrue
+                         local  enum ColType leftType
+                         local  enum ColType rightType
+ 1300  007D70E8    294  void Free(const struct ExprNode* this)
+ 1357  007D44E4    E54  void Test(const struct ExprNode* this, struct <anon>* pResult, struct Table** ppTables, RowNum* rowNums)
+                         local  const char[5] __FUNCTION__
+                         local  _TDbExprOpFunc opFunc
+                         local  const struct <anon>* pTable
+                         local  uint8_t* pData
+                         local  struct <anon> left
+                         local  struct <anon> right
+                         local  ColNum colNum
+ 1551  007D5338    6D4  enum TDbError Copy(const struct ExprNode* this, struct ExprNode** ppNewExpr)
+                         local  const char[5] __FUNCTION__
+                         local  enum TDbError dbResult
+ 1650  007D5A0C    198  bool FindTableCol(const struct ExprNode* this, TableColRef tableColRef)
+ 1704  007D5BA4    2A8  bool CompareIndexCol(const struct ExprNode* this, ColNum colIdx, const struct <anon>** ppWhichExpr)
+                         local  const char[16] __FUNCTION__
+ 1781  007D5E4C    3EC  int CompareIndexExpr(const struct ExprNode* this, struct ExprNode* pIExpr)
+                         local  const char[17] __FUNCTION__
+                         local  bool8_t bLeftMatch
+                         local  bool8_t bOpMatch
+                         local  int32_t bestPartialRet
+ 1894  007D6238    414  ColNum FindJoinColumn(const struct ExprNode* this, uint32_t joinNum, uint32_t* pJoinTblIdx, struct ExprNode** ppJoinExpr)
+                         local  const char[15] __FUNCTION__
+                         local  struct <anon> tempVal
+                         local  ColNum retCol
+                         local  enum ExprOp[6] swapArray
+ 1970  007D664C    2AC  void DebugValidateExprs(const struct ExprNode* this, uint32_t tblNum)
+                         local  const char[19] __FUNCTION__
+ 2027  007D68F8    1EC  void FillExpressions(const struct ExprNode* this, enum ExprOp op, enum ColType leftType, struct ExprNode* leftExpr, enum ColType rightType, struct ExprNode* rightExpr)
+                         local  const char[16] __FUNCTION__
+ 2052  007D6AE4     BC  void FillTableColRefs(const struct ExprNode* this, enum ExprOp op, TableRef leftTblRef, ColRef leftColRef, TableRef rightTblRef, ColRef rightColRef)
+ 2071  007D6BA0     68  void FillNoOpTableColRef(const struct ExprNode* this, TableColRef tableColRef)
+ 2095  007D6C08    1EC  void FillDatas(const struct ExprNode* this, enum ExprOp op, enum ColType leftType, union <anon> leftData, enum ColType rightType, union <anon> rightData)
+                         local  const char[10] __FUNCTION__
+ 2119  007D6DF4     A8  void FillCompare(const struct ExprNode* this, TableRef tableRef, ColRef colRef, enum ExprOp exprOp, union <anon> data, enum ColType eDataType)
+ 2139  007D6E9C    128  void FillNoOpExpr(const struct ExprNode* this, enum ColType exprType, struct ExprNode* expr)
+                         local  const char[13] __FUNCTION__
+ 2161  007D6FC4    124  void FillNoOpData(const struct ExprNode* this, enum ColType dataType, union <anon> data)
+                         local  const char[13] __FUNCTION__
+ 2170  007D9598     3C  static void _GLOBAL__I__ZN2EA4T3db8ExprNodeC2Ev()
+ 2171  007D95D4     3C  static void _GLOBAL__D__ZN2EA4T3db8ExprNodeC2Ev()

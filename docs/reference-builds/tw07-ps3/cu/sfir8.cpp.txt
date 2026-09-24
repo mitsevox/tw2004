@@ -1,0 +1,9 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/sfir8.cpp
+// compiled in: sfir8.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   41  006F49C8     28  void SNDI_fir8init(SNDFIRSTATE* psfs)
+   58  006F49F0     F4  void SNDI_fir8(SNDFIRSTATE* pfir, int frames, void* psrcp, void* pdstp)
+                         local  float* psrc
+                         local  float* pdst
+                         local  int i

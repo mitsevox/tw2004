@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptVersion.cpp
+// compiled in: other_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    6  003EFD08     14  const char* AptDebugVersionString()

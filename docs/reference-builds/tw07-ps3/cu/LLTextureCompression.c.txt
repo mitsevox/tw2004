@@ -1,0 +1,106 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLTextureCompression.c
+// compiled in: Legacy_unity.cpp
+// 22 functions, source order. line | PS3 address | size
+
+   22    inline-only   static bool TX_UnlockMemoryAllocations(enum eMemoryPools pool)
+                         local  CircularBuffer_t* pBuffer
+   33    inline-only   static void TX_RestoreMemoryAllocations(enum eMemoryPools pool, bool memAllocLocked)
+                         local  CircularBuffer_t* pBuffer
+   41    inline-only   static void* TX_WorkBufferAlloc(size_t size)
+                         local  const char[19] __FUNCTION__
+                         local  bool restore
+                         local  void* ptr
+                         local  CircularBuffer_t* pBuffer
+                         local  CircularBuffer_t* pBuffer
+   50    inline-only   static void TX_WorkBufferFree(void* ptr)
+                         local  bool restore
+   61  0037F05C      4  void TX_Tile(void* dst, void* src, uint16 blocksX, uint16 blocksY, uint32 rowStride, uint16 blockSize)
+   76  0037F060      4  void TX_Untile(void* dst, void* src, uint16 blocksX, uint16 blocksY, uint32 rowStride, uint16 blockSize)
+   91  003906E8    19C  void TX_Compress(void* dst, uint32 dstRowStride, TextureFormat dstFormat, void* src, uint32 srcRowStride, TextureFormat srcFormat, uint16 width, uint16 height)
+                         local  TI_STimeValue start
+                         local  TextureDXTnType outputFormat
+                         local  bool allowAlpha
+                         local  const float alphaRef
+                         local  int errors
+                         inlines  TI_uiReadCP0Count, TX_FormatHasAlpha
+  151  003B3554     44  int TX_Resample(void* dst, uint16 dstWidth, uint16 dstHeight, uint32 dstRowStride, TextureFormat dstFormat, void* src, uint16 srcWidth, uint16 srcHeight, uint32 srcRowStride, TextureFormat srcFormat, TextureResampleMode mode)
+  183  0037ED78    100  void TX_Memcpy(void* dst, uint32 dstRowStride, const void* src, uint32 srcRowStride, uint32 blocksY, uint32 rowSize)
+                         local  uint8* tsrc
+                         local  uint8* tdst
+                         local  uint32 i
+  203    inline-only   static int TX_ConvertTexture(TextureRef dst, TextureRef src, TextureResampleMode mode)
+                         local  TI_STimeValue start
+                         local  int srcLayers
+                         local  int dstLayers
+                         local  bool needPreviousBufFree
+                         local  void* previousSource
+                         local  size_t previousStride
+                         local  int i
+                         local  struct TextureLockInfo srcInfo
+                         local  struct TextureLockInfo dstInfo
+                         local  bool needCurrentBufFree
+                         local  void* currentSource
+                         local  size_t currentStride
+                         local  bool restoreStandard
+                         local  bool restorePerm
+                         local  int srcLayer
+                         local  bool needCopy
+                         local  void* nextSource
+                         local  size_t nextStride
+                         local  void* nextSource
+                         local  void* nextSource
+                         local  void* nextSource
+  413  003BAFC4     28  int TX_CopyTextureSlow(TextureRef dst, TextureRef src, TextureResampleMode mode)
+                         local  struct TextureAsyncOp* asyncOp
+  450  003BF624   10E8  static intptr_t TextureWorkerThread(void* )
+                         local  sys_ppu_thread_t threadId
+                         local  struct TextureAsyncOp* asyncOp
+                         local  int i
+                         local  struct TextureLockInfo srcInfo
+                         local  struct TextureLockInfo dstInfo
+                         local  bool needCurrentBufFree
+                         local  void* currentSource
+                         local  size_t currentStride
+                         local  bool restoreStandard
+                         local  bool restorePerm
+                         local  int srcLayer
+                         local  bool needCopy
+                         local  size_t nextStride
+                         local  void* nextSource
+                         local  void* nextSource
+                         local  void* nextSource
+                         local  void* nextSource
+                         inlines  TI_uiReadCP0Count, TX_ConvertTexture, TX_FormatIsDXTCompressed, TX_RestoreMemoryAllocations, TX_UnlockMemoryAllocations, TX_WorkBufferAlloc, TX_WorkBufferFree, TagValuePair, operator+, sys_ppu_thread_set_priority
+  506  003B08B0    17C  void TX_InitCompressionThreads()
+                         local  struct <anon> tp
+                         local  int i
+                         local  int i
+  536  003AA630     E8  void TX_ShutdownCompressionThreads()
+                         local  int i
+                         local  int i
+  555    inline-only   static struct TextureAsyncOp* TX_AllocAsyncOp()
+                         local  struct TextureAsyncOp* asyncOp
+                         local  int i
+  580    inline-only   static void TX_FreeAsyncOp(struct TextureAsyncOp* asyncOp)
+  591  003BA9F8    3CC  struct TextureAsyncOp* TX_CopyTextureAsync(TextureRef dst, TextureRef src, TextureResampleMode mode)
+                         local  struct TextureInfoNative* dstInfo
+                         local  struct TextureInfoNative* srcInfo
+                         local  struct TextureAsyncOp* asyncOp
+                         local  int i
+                         local  int i
+                         inlines  Gcm::cellGcmFlush, TI_uiReadCP0Count, TX_AllocAsyncOp, TX_GetNativeTextureInfo
+  665  00388B70     88  int TX_AsyncOpRunning(struct TextureAsyncOp* asyncOp)
+  677  003BADC4    200  int TX_AsyncOpFinish(struct TextureAsyncOp* asyncOp)
+                         local  struct TextureInfoNative* dstInfo
+                         local  struct TextureInfoNative* srcInfo
+                         local  int ret
+                         inlines  TX_FreeAsyncOp, TX_GetNativeTextureInfo
+  699  00391E40    434  void TX_DumpCompressionStats()
+                         inlines  sys_time_get_timebase_frequency
+  711  003C2034     CC  static void RunCompressionTest(const TextureRef& dst, TextureRef src, TextureFormat format, uint16 width, uint16 height, uint16 layers, TextureResampleMode mode, const char* name)
+  721  003C2100    184  void TestCompression(TextureRef src)
+                         local  int run
+                         local  TextureRef[6] dst
+                         local  TextureFormat format
+                         local  uint16 width
+                         local  uint16 height

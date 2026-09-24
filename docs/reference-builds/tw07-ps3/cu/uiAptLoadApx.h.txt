@@ -1,0 +1,17 @@
+// ../../../../../TIGERCODE/Code/AptInterface/uiAptLoadApx.h
+// compiled in: other_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   39  003ECD64     24  void LoadAPX::LoadAPX(const struct LoadAPX* this, struct TStreamData* theRes)
+   63    inline-only   int32_t LoadAPX::GetIndex(const const struct LoadAPX* this)
+   69    inline-only   struct AptInfo_t& LoadAPX::GetAptInfo(const struct LoadAPX* this)
+   92    inline-only   void LoadAPX::Seek(const struct LoadAPX* this, int32 nBytes)
+   98    inline-only   void LoadAPX::SkipUint32(const struct LoadAPX* this)
+  106    inline-only   uint32_t LoadAPX::GetNextUint32(const struct LoadAPX* this)
+                         local  uint32_t tag
+  124    inline-only   uint32_t LoadAPX::GetNextTag(const struct LoadAPX* this)
+  132    inline-only   int32_t LoadAPX::GetNextInt32(const struct LoadAPX* this)
+                         local  uint32_t v
+  141    inline-only   unsigned char* LoadAPX::GetCurrentStreamPtr(const const struct LoadAPX* this)
+  152    inline-only   void LoadAPX::GoToNextBlock(const struct LoadAPX* this, int32_t index)
+                         local  const int size

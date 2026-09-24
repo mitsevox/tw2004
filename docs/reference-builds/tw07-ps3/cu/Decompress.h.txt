@@ -1,0 +1,21 @@
+// ../../../../../TIGERCODE/Code/Golf/Animation/Headers/Decompress.h
+// compiled in: golf2_unity.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   35    inline-only   int sizeofConstant(int nf)
+   36    inline-only   int sizeofLinear(int nf)
+   37    inline-only   int sizeofQuadratic(int nf)
+   38    inline-only   int sizeofCubic(int nf)
+   39    inline-only   int sizeofRaw(int nf)
+   40    inline-only   int sizeofGroup(int nf)
+   41    inline-only   int sizeofQuantizeByte(int nf)
+   42    inline-only   int sizeofQuantizeByte2(int nf)
+   43    inline-only   int sizeofQuantizeByte3(int nf)
+   44    inline-only   int sizeofQuantizeByte4(int nf)
+   45    inline-only   int sizeofQuantizeByte5(int nf)
+   46    inline-only   int sizeofQuantizeByte6(int nf)
+   47    inline-only   int sizeofQuantizeByte7(int nf)
+   48    inline-only   int sizeofQuantizeByte8(int nf)
+   49    inline-only   int sizeofQuantizeShort(int nf)
+   50    inline-only   int sizeofQuantizeShort2(int nf)
+   51    inline-only   int sizeofZero(int nf)

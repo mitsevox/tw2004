@@ -1,0 +1,27 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/src/ChrCntl_GameMovement.cpp
+// compiled in: ChrCntl_GameMovement.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   31  005B2368    24C  struct <anon>* ChrCntl_GameMovement_Extract(struct <anon>* trg, struct <anon>* src, const struct <anon>* init, int32_t flags)
+                         local  struct Flags32 bitFlags
+                         local  struct <anon> ignoredOffsets
+                         local  bool bInitRot
+                         local  Quat unrotation
+                         local  struct <anon> remainingSource
+                         inlines  Flags32::Flags32, Quat_Copy, _ExtractCurrentTranslation, _IgnoreInitialTranslation, vec4flt_Copy4, vec4flt_Subtract3
+   97  005B1FB4    114  struct <anon>* ChrCntl_GameMovement_Apply(struct <anon>* trg, const struct <anon>* curr, const struct <anon>* prev, const struct <anon>* first, bool started)
+                         local  struct <anon> target
+                         local  Quat unrotation
+                         inlines  Quat_Copy
+  177  005B20C8    100  static void _IgnoreInitialRotation(float* ignoredRotation, const float* initialRotation, const struct Flags32* flags)
+                         local  vec3flt ignoredAngles
+                         local  vec3flt initialAngles
+                         inlines  Flags32::Test
+  208  005B21C8    1A0  static void _ExtractCurrentRotation(float* targetRotation, float* sourceRotation, const struct Flags32* flags)
+                         local  uint32_t allAxisMask
+                         local  uint32_t mask
+                         local  vec3flt targetAngles
+                         local  vec3flt sourceAngles
+                         inlines  Quat_Copy, Quat_Identify
+  262    inline-only   static void _IgnoreInitialTranslation(float* ignoredTranslation, const float* initialTranslation, const struct Flags32* flags)
+  280    inline-only   static void _ExtractCurrentTranslation(float* targetTranslation, float* sourceTranslation, const struct Flags32* flags)

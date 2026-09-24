@@ -1,0 +1,22 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Spectator/PovFrustum.cpp
+// compiled in: golf2_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   58  001C17A8    334  void CPovFrustum::Set(const struct CPovFrustum* this, const const struct CPovMatrix4x4& matrix)
+                         local  float a
+                         local  float b
+                         local  float c
+                         local  float d
+                         local  float m03
+                         local  float m13
+                         local  float m23
+                         local  float m33
+                         inlines  CPovPlane::Normalize, CPovPlane::Set, CPovVector4::operator[]
+  131  0015FA98     88  uint32 CPovFrustum::Contains(const struct CPovFrustum* this, const const struct CPovVector3& center, const float radius)
+                         local  int32 i
+                         local  float distance
+                         inlines  CPovVector3::Dot
+  166  00151BB0     88  uint32 CPovFrustum::ContainsAll(const struct CPovFrustum* this, const const struct CPovVector3& center, const float radius)
+                         local  int32 i
+                         local  float distance
+                         inlines  CPovVector3::Dot

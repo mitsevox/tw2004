@@ -1,0 +1,27 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Performance/PerfGraph.c
+// compiled in: other_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+  187  003FBF58    408  void PG_vInit()
+                         local  const char[9] __FUNCTION__
+                         local  int i
+                         inlines  TagValuePair, WG_vSetCanvasPosition, operator+
+  237  003D5580      4  void PG_vDeInit()
+  242  003D5510     70  void PG_vReset()
+  248  003D54BC     54  void PG_vSetGraphType(PG_EGraphType eGraphType)
+  258  0040FA10    310  void PG_vUpdate()
+                         local  int i
+                         local  float fDiffMaxMinGraph
+                         local  float fDiffMaxMinScreen
+                         local  TimingTimes times
+                         inlines  vec4flt_Copy
+  366  00488110    344  void PG_vRender()
+                         local  vec4flt xColorBlue
+                         local  vec4flt xColorGreen
+                         local  vec4flt xColorWhite
+                         local  float[4][4] xFrameDropLines
+                         local  float fFrameDropCPU
+                         local  float fFrameDropDMA
+                         local  char[256] str
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetZBufferMode, PR_vSetCurrentColor, WG_vSetCanvasBackgroundColor, WG_vSetCanvasDefaultBackgroundColor, vec_st
+  528  003D5584     1C  void PG_vActivate(bool bActivate)

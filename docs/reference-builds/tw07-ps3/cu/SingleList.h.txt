@@ -1,0 +1,26 @@
+// ../../../../../TIGERCODE/Code/AptInterface/AptPackage/CommonSense/SingleList/SingleList.h
+// compiled in: other_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   32    inline-only   void* operator new(size_t s)
+   33    inline-only   void operator delete(void* p)
+   54    inline-only   struct Iterator& operator++(const struct <anon>* this)
+   59    inline-only   struct <anon> operator++(const struct <anon>* this, int )
+                         local  struct Iterator& tmp
+                         local  struct <anon> tmp
+   65    inline-only   struct AptFile*& operator*(const const struct <anon>* this)
+   68    inline-only   bool operator==(const const struct <anon>* this, const const struct <anon>& x)
+   73    inline-only   bool operator!=(const const struct <anon>* this, const const struct <anon>& x)
+  154    inline-only   void Clear(const struct <anon>* this)
+  156    inline-only   void PushFront(const struct <anon>* this, const const struct AptFile*& x)
+                         local  struct Node* tmp
+  163    inline-only   void PopFront(const struct <anon>* this)
+                         local  struct Node* newhead
+  173    inline-only   bool Empty(const struct <anon>* this)
+  175    inline-only   struct Iterator Begin(const struct <anon>* this)
+  176    inline-only   struct Iterator End(const struct <anon>* this)
+  180    inline-only   void EraseAfter(const struct <anon>* this, const struct Iterator& x)
+                         local  struct Node* tmp
+  188    inline-only   void Erase(const struct <anon>* this, const struct Iterator& x)
+                         local  struct Node* tmp
+                         local  struct Node* kill

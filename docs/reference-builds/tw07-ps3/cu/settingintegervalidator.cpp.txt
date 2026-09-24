@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/settingintegervalidator.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    6  005BF0E0     34  void SettingIntegerValidator(const struct SettingIntegerValidator* this)
+   10  005BF148      C  void ~SettingIntegerValidator(const struct SettingIntegerValidator* this)

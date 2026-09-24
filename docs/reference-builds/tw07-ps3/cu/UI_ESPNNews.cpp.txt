@@ -1,0 +1,70 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_ESPNNews.cpp
+// compiled in: apt_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   32  000F6854     A0  void UIESPNNews::UIESPNNews(const struct UIESPNNews* this)
+                         inlines  TAptArrayStruct, TArrayInternal<char*,AptStructSwapper>::TArrayInternal, TExternArray<UIESPNNews::DstMenuItem_esns>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   36  000EFF7C     DC  void UIESPNNews::Init(const struct UIESPNNews* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   54  000D8334     78  void UIESPNNews::Close(const struct UIESPNNews* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<char*,AptStructSwapper>::Flush
+   61  00046344     4C  void UIESPNNews::Show(const struct UIESPNNews* this)
+  100  000D83AC     C4  void UIESPNNews::Hide(const struct UIESPNNews* this)
+                         local  int i
+                         inlines  AptStructSwapper::Free, TArrayInternal<char*,AptStructSwapper>::Flush
+  115  000BD47C     C8  void UIESPNNews::UpdateItemAndLabel(const struct UIESPNNews* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_esns* dest
+                         inlines  TArrayInternal<char*,AptStructSwapper>::operator[]
+  132  00085B40    1B0  enum eAptHandleInput UIESPNNews::HandleInput(const struct UIESPNNews* this, int32 cID)
+  190  000B3FFC    32C  void UIESPNNews::AddNewsItem(const struct UIESPNNews* this, const char* pszNews, uint32_t iNewsIndex)
+                         local  char** pszNewLine
+                         local  uint32 i
+                         inlines  AptStructSwapper::Swap, TArrayInternal<char*,AptStructSwapper>::Push
+  220  000D8470     E0  void UIESPNNews::ResetItems(const struct UIESPNNews* this)
+                         local  int i
+                         inlines  AptStructSwapper::Free, TArrayInternal<char*,AptStructSwapper>::Flush
+  237  0005BDA4    304  void UIESPNNews::AddImage(const struct UIESPNNews* this, uint32 iTextureWidth, uint32 iTextureHeight, const uint8* pImageSrc)
+                         local  const char[9] __FUNCTION__
+                         local  uint8* pScaleToFitData
+                         inlines  TagValuePair, operator+
+  310  00046BA0     80  void UIESPNNews::LockAndLoadTextureData(const struct UIESPNNews* this, uint32 iTextureWidth, uint32 iTextureHeight, uint8* pImageSrc, int iTextureID)
+                         local  struct TextureLockInfo lockInfo
+                         local  void* pData
+  330  000A0A6C    320  void UIESPNNews::CustomRenderImage(void* pRenderingUnit, const char* szTarget)
+                         local  const char* pszStart
+                         local  uint32 iMenuItem
+                         local  bool bIsMenuItem
+                         local  TextureRef texture
+                         local  float x0
+                         local  float x1
+                         local  float y0
+                         local  float y1
+                         local  float UVcoordRight
+                         local  float UVcoordBottom
+                         local  float[4][4] xpVertices
+                         local  float[4][4] xpUVs
+                         local  vec4flt color
+                         local  char[5] szIndex
+                         local  int iArrayIdx
+                         local  int iFirstRow
+                         local  int iTopItem
+                         local  int iCurrItem
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetColorWriteEnable, PR_vSetCurrentColor, PR_vSetCurrentTexture, PR_vSetCurrentUsage, UIESPNNews::GetFirstRow, UIESPNNews::GetTexture, UIESPNNewsDetail::GetTexture, std::atoi, vec_st
+  446  00046C20      4  void UIESPNNews::CompressImage(const struct UIESPNNews* this, uint8* pDestImage, uint8* pSourceImage, int32 iWidth, int32 iHeight)
+  473  00046390    810  void UIESPNNews::FitImage(uint8* pDestImage, const uint8* pSourceImage, uint32 iOrigWidth, uint32 iOrigHeight, uint32 iNewWidth, uint32 iNewHeight)
+                         local  uint32 iNewImageIdx
+                         local  uint32 iLargestOrigDimension
+                         local  uint32 iLargestNewDimension
+                         local  float fScale
+                         local  uint32 iWidthPad
+                         local  uint32 iHeightPad
+                         local  uint32 i
+                         local  uint32 j
+                         local  uint32 iWidthToGo
+                         local  uint32 iHeightToGo
+                         local  uint32 iSampleY
+                         local  uint32 iSampleX
+                         local  uint32 iSamplePix
+                         local  uint32 k
+                         local  uint32 k
+  629  000B4328     90  void UIESPNNews::RefreshNewsItem(const struct UIESPNNews* this, char* pszNewsItem, uint32 iTextureWidth, uint32 iTextureHeight, const uint8* pImageSrc, uint32_t iNewsIndex)

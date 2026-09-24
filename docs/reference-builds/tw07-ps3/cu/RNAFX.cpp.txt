@@ -1,0 +1,194 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnax/source/RNAX/RNAFX.cpp
+// compiled in: RNAFX.cpp
+// 98 functions, source order. line | PS3 address | size
+
+    0  0084AF88     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+    0  00855FF8    3F4  void RNAFXPass(const struct <anon>* this)
+                         inlines  Init, RNADebugBreak, RenderStateList, Vector
+  111  0084B598      8  const char* GetName(const const struct <anon>* this)
+  124  0084BDC8     24  void SetName(const struct <anon>* this, const char* name)
+  136  0084B5A0      8  const char* GetType(const const struct <anon>* this)
+  149  0084BD9C     2C  void SetType(const struct <anon>* this, const char* type)
+  162  0084B5A8      8  const char* GetValue(const const struct <anon>* this)
+  175  0084BD70     2C  void SetValue(const struct <anon>* this, const char* value)
+  183  0084B5B0     C8  void SerializeOut(const struct <anon>* this, const struct OutStreamC& out)
+  194  0084B028     DC  void SerializeIn(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[12] __FUNCTION__
+                         local  uint32_t tag
+                         inlines  RNADebugBreak
+  236  0084B678      8  const char* GetName(const const struct <anon>* this)
+  249  0084BD4C     24  void SetName(const struct <anon>* this, const char* name)
+  261  0084B680      8  const char* GetUsage(const const struct <anon>* this)
+  273  0084BD20     2C  void SetUsage(const struct <anon>* this, const char* usage)
+  286  0084B688      8  const char* GetType(const const struct <anon>* this)
+  298  0084BCF4     2C  void SetType(const struct <anon>* this, const char* type)
+  310  0084AEB8      8  uint32_t GetVectorLength(const const struct <anon>* this)
+  321  0084AEC0      8  void SetVectorLength(const struct <anon>* this, uint32_t vectorLength)
+  343  0084AEC8      8  uint32_t GetVectorLengthOfBaseType(const const struct <anon>* this)
+  364  0084AED0      8  void SetVectorLengthOfBaseType(const struct <anon>* this, uint32_t vectorLengthOfBaseType)
+  377  0084B690      8  const char* GetOrigType(const const struct <anon>* this)
+  389  0084BCC8     2C  void SetOrigType(const struct <anon>* this, const char* type)
+  401  0084AED8      C  const RNAFXStrings& GetValues(const const struct <anon>* this)
+  413  0084AEE4      C  RNAFXStrings& GetValues(const struct <anon>* this)
+  426  0084B698      8  const char* GetSemantics(const const struct <anon>* this)
+  440  0084BC9C     2C  void SetSemantics(const struct <anon>* this, const char* semantics)
+  454  0084AEF0      C  const RNAFXAnnotations& GetAnnotations(const const struct <anon>* this)
+  467  0084AEFC      C  RNAFXAnnotations& GetAnnotations(const struct <anon>* this)
+  481  008519FC    14C  struct <anon>* FindAnnotation(const const struct <anon>* this, const char* name)
+                         local  int32_t iter
+                         inlines  RNADebugBreak, operator[]
+  500  00851B48    188  struct <anon>* FindAnnotation(const struct <anon>* this, const char* name)
+                         local  int32_t iter
+                         inlines  RNADebugBreak, operator[]
+  519  0084C320     BC  void AddAnnotation(const struct <anon>* this, const const struct <anon>& annotation)
+                         inlines  Construct, PushBack
+  530  00852488    274  void SerializeOut(const struct <anon>* this, const struct OutStreamC& out)
+                         local  int i
+                         inlines  operator[]
+  563  00852CAC    184  void SerializeIn(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[12] __FUNCTION__
+                         local  uint32_t tag
+                         inlines  RNADebugBreak
+  610  0084B6A0      8  const char* GetName(const const struct <anon>* this)
+  622  0084BC78     24  void SetName(const struct <anon>* this, const char* name)
+  635  0084AF08      C  const RNAFXConstants& GetMemberVariables(const const struct <anon>* this)
+  647  0084AF14      C  RNAFXConstants& GetMemberVariables(const struct <anon>* this)
+  655  008526FC     80  void SerializeOut(const struct <anon>* this, const struct OutStreamC& out)
+  663  00852E30    100  void SerializeIn(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[12] __FUNCTION__
+                         local  uint32_t tag
+                         inlines  RNADebugBreak
+  716  0084B6A8      8  const char* GetName(const const struct <anon>* this)
+  729  0084BC54     24  void SetName(const struct <anon>* this, const char* name)
+  742  0084B6B0      8  const char* GetValue(const const struct <anon>* this)
+  755  0084BC28     2C  void SetValue(const struct <anon>* this, const char* value)
+  763  0084B6B8     A4  void SerializeOut(const struct <anon>* this, const struct OutStreamC& out)
+  772  0084B104    100  void SerializeIn(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[12] __FUNCTION__
+                         local  uint32_t tag
+                         inlines  RNADebugBreak
+  808  0084B75C      8  const char* GetName(const const struct <anon>* this)
+  820  0084BC04     24  void SetName(const struct <anon>* this, const char* name)
+  833  0084B764      8  const char* GetType(const const struct <anon>* this)
+  845  0084BBD8     2C  void SetType(const struct <anon>* this, const char* type)
+  858  0084B76C      8  const char* GetUsage(const const struct <anon>* this)
+  870  0084BBAC     2C  void SetUsage(const struct <anon>* this, const char* usage)
+  883  0084B774      8  const char* GetSemantics(const const struct <anon>* this)
+  895  0084BB80     2C  void SetSemantics(const struct <anon>* this, const char* semantics)
+  908  0084AF20      C  const RNAFXStates& GetStates(const const struct <anon>* this)
+  920  0084AF2C      C  RNAFXStates& GetStates(const struct <anon>* this)
+  932  0085148C    140  struct <anon>* FindState(const const struct <anon>* this, const char* name)
+                         local  int32_t iter
+                         inlines  RNADebugBreak, operator[]
+  949  008515CC    180  struct <anon>* FindState(const struct <anon>* this, const char* name)
+                         local  int32_t iter
+                         inlines  RNADebugBreak, operator[]
+  966  0084D544     9C  void AddState(const struct <anon>* this, const const struct <anon>& state)
+                         inlines  Construct, PushBack
+  979  0084AF38      C  const RNAFXAnnotations& GetAnnotations(const const struct <anon>* this)
+  991  0084AF44      C  RNAFXAnnotations& GetAnnotations(const struct <anon>* this)
+ 1004  00851CD0    14C  struct <anon>* FindAnnotation(const const struct <anon>* this, const char* name)
+                         local  int32_t iter
+                         inlines  RNADebugBreak, operator[]
+ 1022  00851E1C    188  struct <anon>* FindAnnotation(const struct <anon>* this, const char* name)
+                         local  int32_t iter
+                         inlines  RNADebugBreak, operator[]
+ 1039  0084C264     BC  void AddAnnotation(const struct <anon>* this, const const struct <anon>& annotation)
+                         inlines  Construct, PushBack
+ 1047  00852384    104  void SerializeOut(const struct <anon>* this, const struct OutStreamC& out)
+ 1061  00852B94    118  void SerializeIn(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[12] __FUNCTION__
+                         local  uint32_t tag
+                         inlines  RNADebugBreak
+ 1099  0084B8C0    294  struct <anon>& operator=(const struct <anon>* this, const const struct <anon>& other)
+                         local  const char[10] __FUNCTION__
+                         inlines  Clear, Copy, RNADebugBreak, operator=
+ 1135  0084B204     CC  void SetProgramData(const struct <anon>* this, void* programData, uint32_t programSize)
+                         local  const char[15] __FUNCTION__
+                         inlines  RNADebugBreak
+ 1148  0084B2D0     FC  void Load(const struct <anon>* this)
+                         local  const char[5] __FUNCTION__
+                         inlines  RNADebugBreak
+ 1175  0084AF50      4  void Unload(const struct <anon>* this)
+ 1187  008522DC     A8  void SerializeOut(const struct <anon>* this, const struct OutStreamC& out)
+ 1197  00851FA4    338  void SerializeOut(const struct <anon>* this, const struct OutStreamC& out)
+                         local  int iPerm
+                         local  int iPerm
+                         inlines  operator[]
+ 1225  0084B77C    13C  void SerializeOut(const struct <anon>* this, const struct OutStreamC& out)
+ 1240  00852AB8     DC  void SerializeIn(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[12] __FUNCTION__
+                         local  uint32_t tag
+                         inlines  RNADebugBreak
+ 1249  00852950    168  void SerializeIn(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[12] __FUNCTION__
+                         local  uint32_t tag
+                         inlines  RNADebugBreak
+ 1266  0084B3CC    1CC  void SerializeIn(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[12] __FUNCTION__
+                         local  uint32_t tag
+                         local  uint32_t type
+                         inlines  RNADebugBreak
+ 1317  0084F62C    4D4  void RNAFX(const struct <anon>* this)
+                         inlines  Init, RNADebugBreak, RefCountTemplate, Vector
+ 1337  0084DF00    A68  void ~RNAFX(const struct <anon>* this)
+                         inlines  Destroy, Init, RNADebugBreak, ~RefCountTemplate, ~String, ~Vector
+ 1351  0084AF54      8  uint32_t GetVersion(const const struct <anon>* this)
+ 1363  0084AF5C      8  void SetVersion(const struct <anon>* this, uint32_t version)
+ 1376  0084B8B8      8  const char* GetName(const const struct <anon>* this)
+ 1388  0084BB54     2C  void SetName(const struct <anon>* this, const char* name)
+ 1401  0084AF64      C  RNAFXConstants& GetConstants(const struct <anon>* this)
+ 1413  0084EFA0    14C  struct <anon>* FindConstant(const const struct <anon>* this, const char* name)
+                         local  int32_t iter
+                         inlines  RNADebugBreak, operator[]
+ 1425  0084F0EC     E4  int32_t FindConstantIndex(const const struct <anon>* this, const char* name)
+                         local  int iConstant
+                         inlines  operator[]
+ 1444  0084F1D0    188  struct <anon>* FindConstant(const struct <anon>* this, const char* name)
+                         local  int32_t iter
+                         inlines  RNADebugBreak, operator[]
+ 1462  0084E968     84  void AddConstant(const struct <anon>* this, const const struct <anon>& constant)
+                         inlines  PushBack
+ 1475  0084AF70      C  RNAFXStructs& GetStructs(const struct <anon>* this)
+ 1487  0084ED1C    284  void AddStruct(const struct <anon>* this, const const struct <anon>& structDecl)
+                         inlines  Construct, PushBack, RNADebugBreak
+ 1500  0084AF7C      C  RNAFXSamplers& GetSamplers(const struct <anon>* this)
+ 1512  0084F358    14C  struct <anon>* FindSampler(const const struct <anon>* this, const char* name)
+                         local  int32_t iter
+                         inlines  RNADebugBreak, operator[]
+ 1530  0084F4A4    188  struct <anon>* FindSampler(const struct <anon>* this, const char* name)
+                         local  int32_t iter
+                         inlines  RNADebugBreak, operator[]
+ 1548  0084E9EC    330  void AddSampler(const struct <anon>* this, const const struct <anon>& sampler)
+                         inlines  Construct, PushBack, RNADebugBreak
+ 1555  0085277C    1D4  void SerializeOut(const struct <anon>* this, const struct OutStreamC& out)
+ 1578  00852F30    1A8  void SerializeIn(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[12] __FUNCTION__
+                         local  uint32_t tag
+                         inlines  InStreamC::SetVersion, RNADebugBreak
+ 1606  008530D8    798  bool LoadPrograms(const struct <anon>* this, bool bVerbose)
+                         local  bool bError
+                         local  int32_t iTech
+                         local  const struct <anon>& technique
+                         local  int32_t iPass
+                         local  const struct <anon>& pass
+                         local  int32_t iState
+                         local  enum RSStateE eState
+                         local  enum RSStateTypeE eStateType
+                         local  int32_t iStateValue
+                         local  struct <anon> state
+                         local  int32_t i
+                         local  const struct <anon>& sampler
+                         local  int32_t j
+                         local  const const struct <anon>& annotation
+                         local  int32_t j
+                         local  const const struct <anon>& samplerstate
+                         local  int32_t i
+                         local  const struct <anon>& prog
+                         inlines  AddStateValuePair<int>, Construct, GetPass, GetProgram, GetStates, GetTechnique, PushBack, RNADebugBreak, RNAFXState, operator[]
+ 1704  0084BDEC     B8  void UnloadPrograms(const struct <anon>* this)
+                         local  int32_t i
+                         local  const struct <anon>& prog
+                         inlines  GetProgram
+ 1718  0084B008     10  static void _GLOBAL__I__ZN4RNAX15RNAFXAnnotationC2Ev()
+ 1719  0084B018     10  static void _GLOBAL__D__ZN4RNAX15RNAFXAnnotationC2Ev()

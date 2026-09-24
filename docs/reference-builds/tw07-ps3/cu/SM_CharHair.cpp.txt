@@ -1,0 +1,35 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_CharHair.cpp
+// compiled in: shader_unity.cpp
+// 20 functions, source order. line | PS3 address | size
+
+   39  0051D63C    110  void SM_CharHairClass::SM_CharHairClass(const struct SM_CharHairClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base, vec4flt_Zero
+   85  0050E708     6C  void SM_CharHairClass::Load(const struct SM_CharHairClass* this)
+   95  0051F990     D0  void SM_CharHairClass::ResetPSMode(const struct SM_CharHairClass* this)
+                         inlines  GM_IsFrontEnd
+  102  0051FA60    44C  void SM_CharHairClass::LoadParams(const struct SM_CharHairClass* this)
+                         inlines  GM_IsFrontEnd
+  146  0051FEAC    274  void SM_CharHairClass::Activate(const struct SM_CharHairClass* this)
+                         local  int32 i
+                         inlines  GM_IsFrontEnd
+  185  0050E774     54  void SM_CharHairClass::Deactivate(const struct SM_CharHairClass* this)
+  199  0051990C     6C  void SM_CharHairClass::SetTexTransform0(const struct SM_CharHairClass* this, const float[4]& transForm)
+                         inlines  vec4flt_Copy
+  209  00519978     6C  void SM_CharHairClass::SetAmbientParams(const struct SM_CharHairClass* this, const float[4]& ambientParams)
+                         inlines  vec4flt_Copy
+  219  005199E4     6C  void SM_CharHairClass::SetWrapLightAmount(const struct SM_CharHairClass* this, const float[4]& col)
+                         inlines  vec4flt_Copy
+  229  0051634C     6C  void SM_CharHairClass::SetSpecExtra(const struct SM_CharHairClass* this, const float[4]& specExtraParams)
+                         inlines  vec4flt_Copy
+  239  005163B8     6C  void SM_CharHairClass::SetShadowParams(const struct SM_CharHairClass* this, float shadowMapBias, float shadowMapGain)
+  250  00516424    1A4  void SM_CharHairClass::SetTintingParams(const struct SM_CharHairClass* this, int32 tintMode, float* pTintValues)
+                         local  int32 i
+                         inlines  GM_IsFrontEnd
+  275  005165C8     64  void SM_CharHairClass::SetBaseTexture(const struct SM_CharHairClass* this, TextureRef texRef)
+  285  0051662C     64  void SM_CharHairClass::SetNormalMap(const struct SM_CharHairClass* this, TextureRef texRef)
+  295  00516690     64  void SM_CharHairClass::SetPackedMap(const struct SM_CharHairClass* this, TextureRef texRef)
+  305  005166F4     64  void SM_CharHairClass::SetShadowMap(const struct SM_CharHairClass* this, TextureRef texRef)
+  315  00516758     64  void SM_CharHairClass::SetAmbientCubeMap(const struct SM_CharHairClass* this, TextureRef texRef)
+  325  005167BC     64  void SM_CharHairClass::SetSpecEnvCubeMap(const struct SM_CharHairClass* this, TextureRef texRef)
+  335  00516820     64  void SM_CharHairClass::SetEnvCubeMap(const struct SM_CharHairClass* this, TextureRef texRef)
+  345  00516884     64  void SM_CharHairClass::SetFilmLookLUTMap(const struct SM_CharHairClass* this, TextureRef texRef)

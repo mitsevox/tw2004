@@ -1,0 +1,20 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/Transform.cpp
+// compiled in: Transform.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   11  0059B44C     40  void Clear(const struct <anon>* this)
+                         inlines  Quat_Identify, vec4flt_ZeroW1
+   17  0059B494     24  void Copy(const struct <anon>* this, const struct <anon>* other)
+                         inlines  Quat_Copy, vec4flt_Copy4, vec_st
+   23  0059B13C     80  void Add(const struct <anon>* this, const struct <anon>* other)
+                         inlines  vec4flt_Add3
+   30  0059B2D4     A8  void Subtract(const struct <anon>* this, const struct <anon>* other)
+                         local  Quat temp_quat
+                         inlines  vec4flt_Subtract3
+   40  0059B37C     D0  void Slerp(const struct <anon>* this, const struct <anon>* other, float ratioThisThat)
+                         inlines  __vec_make_from_scalar, vec4flt_Interpolate3, vec_madd
+   47  0059B1BC     F0  void Scale(const struct <anon>* this, float factor)
+                         local  Quat identityQuat
+                         local  bool initIdentity
+                         inlines  Quat_Identify, __vec_mul, vec4flt_Scale3, vec_ld
+   62  0059B2AC     28  void ScaleTranslation(const struct <anon>* this, float sx, float sy, float sz)

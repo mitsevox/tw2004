@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_LogoEditor.h
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   24  000FEA60      C  uint32 UILogoEditor::GetSignature(const const struct UILogoEditor* this)
+   30  001115EC     1C  enum AptThreadReturnValue UILogoEditor::ControlThread_func(struct IAptSubscriberBase* subs)
+   35    inline-only   bool UILogoEditor::LogoHasBeenModified(const struct UILogoEditor* this)
+   37    inline-only   void UILogoEditor::SetControlsEnabled(const struct UILogoEditor* this, bool bEnabled)

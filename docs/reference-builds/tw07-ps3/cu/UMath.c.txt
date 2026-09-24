@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/UMath.c
+// compiled in: Legacy_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   27  0037B330      4  void MF_vInitOnce()
+   35  0037B334      4  void MF_vCloseOnce()
+   43  0037B338      4  void MF_vInitModule()
+   51  0037B33C      4  void MF_vCloseModule()

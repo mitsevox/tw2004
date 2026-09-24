@@ -1,0 +1,26 @@
+// C:/dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/target/ppu/include/xmemory
+// compiled in: golf_unity.cpp, rnaunity.cpp
+// 19 functions, source order. line | PS3 address | size
+
+   26    inline-only   char* std::_Allocate<char>(size_t _Count, char* )
+   26    inline-only   struct Course* std::_Allocate<Course>(size_t _Count, struct Course* )
+   26    inline-only   BaseRenderObjPtr* std::_Allocate<TwRenderObj::BaseRenderObj*>(size_t _Count, BaseRenderObjPtr* )
+   26    inline-only   struct MeshSortStruct* std::_Allocate<MeshSortStruct>(size_t _Count, struct MeshSortStruct* )
+   34    inline-only   void std::_Construct<Course, Course>(struct Course* _Ptr, const const struct Course& _Val)
+                         local  void* _Vptr
+   34    inline-only   void std::_Construct<MeshSortStruct, MeshSortStruct>(struct MeshSortStruct* _Ptr, const const struct MeshSortStruct& _Val)
+                         local  void* _Vptr
+   51    inline-only   void std::_Destroy<Course>(struct Course* _Ptr)
+   51    inline-only   void std::_Destroy<MeshSortStruct>(struct MeshSortStruct* _Ptr)
+  136    inline-only   void deallocate(const struct <anon>* this, struct Course* _Ptr, size_t )
+  141    inline-only   char* allocate(const struct <anon>* this, size_t _Count)
+  151    inline-only   void construct(const struct <anon>* this, struct Course* _Ptr, const const struct Course& _Val)
+  156    inline-only   void destroy(const struct <anon>* this, struct Course* _Ptr)
+  161    inline-only   size_t max_size(const const struct <anon>* this)
+                         local  size_t _Count
+  221    inline-only   void std::_Destroy_range<Course, std::allocator<Course> >(struct Course* _First, struct Course* _Last, const struct <anon>& _Al)
+  221    inline-only   void std::_Destroy_range<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >(BaseRenderObjPtr* _First, BaseRenderObjPtr* _Last, const struct <anon>& _Al)
+  221    inline-only   void std::_Destroy_range<MeshSortStruct, std::allocator<MeshSortStruct> >(struct MeshSortStruct* _First, struct MeshSortStruct* _Last, const struct <anon>& _Al)
+  229    inline-only   void std::_Destroy_range<Course, std::allocator<Course> >(struct Course* _First, struct Course* _Last, const struct <anon>& _Al, struct <anon> )
+  229    inline-only   void std::_Destroy_range<MeshSortStruct, std::allocator<MeshSortStruct> >(struct MeshSortStruct* _First, struct MeshSortStruct* _Last, const struct <anon>& _Al, struct <anon> )
+  238    inline-only   void std::_Destroy_range<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >(BaseRenderObjPtr* , BaseRenderObjPtr* , const struct <anon>& , struct <anon> )

@@ -1,0 +1,136 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_math/dev/source/tiger_quat.cpp
+// compiled in: tiger_quat.cpp
+// 17 functions, source order. line | PS3 address | size
+
+    8  008E4594    1A0  struct <anon> TIGER_MATH::QuatLerp(const const struct <anon>& quatA, const const struct <anon>& quatB, const const struct <anon>& weightA, const const struct <anon>& weightB)
+                         local  struct <anon> dot
+                         local  struct <anon> mulResult
+                         local  struct <anon> len2
+                         inlines  TIGER_MATH::VecDot, TIGER_MATH::VecMul, TIGER_MATH::VecRsqrt, TIGER_MATH::VecSet, TIGER_MATH::__vmx_cmpge, TIGER_MATH::operator+, TIGER_MATH::operator-, Vec, vec_madd, vec_sld
+   33  008E6018     FC  struct <anon> TIGER_MATH::QuatToEulerXYZ(const const struct <anon>& quat)
+                         inlines  TIGER_MATH::QuatToMtx, TIGER_MATH::VecSet
+   38  008E6114     FC  struct <anon> TIGER_MATH::QuatToEulerZYX(const const struct <anon>& quat)
+                         inlines  TIGER_MATH::QuatToMtx, TIGER_MATH::VecSet
+   44  008E6210     FC  struct <anon> TIGER_MATH::QuatToEulerXZY(const const struct <anon>& quat)
+                         inlines  TIGER_MATH::QuatToMtx, TIGER_MATH::VecSet
+   50  008E630C     FC  struct <anon> TIGER_MATH::QuatToEulerYXZ(const const struct <anon>& quat)
+                         inlines  TIGER_MATH::QuatToMtx, TIGER_MATH::VecSet
+   55  008E6408     FC  struct <anon> TIGER_MATH::QuatToEulerYZX(const const struct <anon>& quat)
+                         inlines  TIGER_MATH::QuatToMtx, TIGER_MATH::VecSet
+   60  008E6504     FC  struct <anon> TIGER_MATH::QuatToEulerZXY(const const struct <anon>& quat)
+                         inlines  TIGER_MATH::QuatToMtx, TIGER_MATH::VecSet
+   66  008E6600    108  struct <anon> TIGER_MATH::QuatToEuler(const const struct <anon>& quat, enum TigerEulerOrder order)
+                         inlines  TIGER_MATH::QuatToMtx, TIGER_MATH::VecSet
+   72  008E42D4     A4  float TIGER_MATH::QuatToEulerZ_fromZYX(const const struct <anon>& quat)
+                         local  struct <anon> euler
+                         local  float qx
+                         local  float qy
+                         local  float qz
+                         local  float qw
+                         local  float test
+                         local  float sqx
+                         local  float sqz
+                         inlines  TIGER_MATH::VecW, TIGER_MATH::VecX, TIGER_MATH::VecY, TIGER_MATH::VecZ
+   92  008E4734    338  struct <anon> TIGER_MATH::EulerToQuat(const const struct <anon>& euler, enum TigerEulerOrder order)
+                         local  struct <anon> halfEuler
+                         local  float halfX
+                         local  float halfY
+                         local  float halfZ
+                         local  float shx
+                         local  float shy
+                         local  float shz
+                         local  float chx
+                         local  float chy
+                         local  float chz
+                         local  const float[6][4] signA
+                         local  const float[6][4] signB
+                         local  struct <anon> quatA
+                         local  struct <anon> quatB
+                         inlines  TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecSet, TIGER_MATH::VecSetAll, TIGER_MATH::__vmx_lvx, TIGER_MATH::operator*, TIGER_MATH::operator+, Vec, std::cosf, std::sinf
+  138  008E4A6C    248  struct <anon> TIGER_MATH::AngleAxisToQuat(const const struct <anon>& angleAxis)
+                         local  float angle
+                         local  struct <anon> axis
+                         local  float halfAngle
+                         local  float sine
+                         local  struct <anon> result
+                         inlines  TIGER_MATH::Len, TIGER_MATH::VecMul, TIGER_MATH::VecSet, TIGER_MATH::VecSqrt, TIGER_MATH::VecX, TIGER_MATH::operator*, TIGER_MATH::operator/, Vec, operator float __vector__, std::cosf, std::sinf, vec_madd, vec_sld
+  157  008E516C    1BC  struct <anon> TIGER_MATH::QuatToAngleAxis(const const struct <anon>& quat)
+                         local  float cosine
+                         local  struct <anon> result
+                         local  float sine
+                         local  float halfAngle
+                         local  float angle
+                         inlines  TIGER_MATH::Len, TIGER_MATH::VecMul, TIGER_MATH::VecSet, TIGER_MATH::VecSqrt, TIGER_MATH::VecSub, TIGER_MATH::VecW, TIGER_MATH::VecX, TIGER_MATH::operator*=, Vec, vec_madd, vec_sld
+  178  008E4378    21C  struct <anon> TIGER_MATH::QuatTransToMtx(const const struct <anon>& quat, const const struct <anon>& trans)
+                         local  float qx
+                         local  float qy
+                         local  float qz
+                         local  float qw
+                         local  float sqw
+                         local  float sqx
+                         local  float sqy
+                         local  float sqz
+                         local  float m00
+                         local  float m11
+                         local  float m22
+                         local  float tmp1
+                         local  float tmp2
+                         local  float m10
+                         local  float m01
+                         local  float m20
+                         local  float m02
+                         local  float m21
+                         local  float m12
+                         inlines  TIGER_MATH::MtxSet, TIGER_MATH::VecSet, TIGER_MATH::VecW, TIGER_MATH::VecX, TIGER_MATH::VecY, TIGER_MATH::VecZ, Vec
+  221  008E5328    690  void TIGER_MATH::QuatToTwistSwing(const float& twist, const float& swingA, const float& swingB, const const struct <anon>& quat, const const struct <anon>& axesRot)
+                         local  struct <anon> rotatedQuat
+                         local  float qw
+                         local  float qx
+                         local  float qy
+                         local  float qz
+                         local  float halfTwist
+                         local  float cosTwist
+                         local  float sinTwist
+                         local  float sinAB_x
+                         local  float sinAB_y
+                         local  float cosAB_sqr
+                         local  float cosAB
+                         local  struct <anon> swingRot
+                         inlines  TIGER_MATH::Dot, TIGER_MATH::QuatCompose, TIGER_MATH::QuatConj, TIGER_MATH::VecAdd, TIGER_MATH::VecDot, TIGER_MATH::VecFromOneW, TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecRsqrt, TIGER_MATH::VecSet, TIGER_MATH::VecSub, TIGER_MATH::VecX, TIGER_MATH::VecY, TIGER_MATH::VecZ, Vec, std::cosf, std::fabs, std::sinf, vec_madd, vec_sld, vec_splat
+  288  008E59B8    660  struct <anon> TIGER_MATH::QuatRotationBetweenTwoVectors(const const struct <anon>& a, const const struct <anon>& b)
+                         local  struct <anon> result
+                         local  float sine
+                         local  float cosine
+                         local  float sineHalf
+                         local  float cosineHalf
+                         local  struct <anon> absV
+                         local  float x
+                         local  float y
+                         local  float z
+                         inlines  TIGER_MATH::Dot, TIGER_MATH::Len, TIGER_MATH::VecCross, TIGER_MATH::VecMul, TIGER_MATH::VecRsqrt, TIGER_MATH::VecSet, TIGER_MATH::VecSqrt, TIGER_MATH::VecUnit, TIGER_MATH::VecX, TIGER_MATH::VecY, TIGER_MATH::VecZ, TIGER_MATH::operator*=, Vec, operator float __vector__, vec_madd, vec_sld
+  339  008E4CB4    4B8  struct <anon> TIGER_MATH::TwistSwingToQuat(float twist, float swingA, float swingB, const const struct <anon>& axesRot)
+                         local  struct <anon> constraintAxes
+                         local  struct <anon> twistQuat
+                         local  struct <anon> swingQuat
+                         inlines  TIGER_MATH::Dot, TIGER_MATH::QuatCompose, TIGER_MATH::QuatToMtx, TIGER_MATH::VecAdd, TIGER_MATH::VecDot, TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecRsqrt, TIGER_MATH::VecSet, TIGER_MATH::VecSetAll, TIGER_MATH::VecSub, TIGER_MATH::VecX, TIGER_MATH::VecY, TIGER_MATH::VecZ, TIGER_MATH::operator*, TIGER_MATH::operator+, Vec, vec_madd, vec_sld
+  348  008E3FEC    2E8  struct <anon> TIGER_MATH::MtxToQuat(const const struct <anon>& mtx)
+                         local  struct <anon> quat
+                         local  struct <anon> quat
+                         local  const float m00
+                         local  const float m01
+                         local  const float m02
+                         local  const float m10
+                         local  const float m11
+                         local  const float m12
+                         local  const float m20
+                         local  const float m21
+                         local  const float m22
+                         local  const float w2
+                         local  const float x2
+                         local  const float y2
+                         local  const float x
+                         local  const float rcpTwoX
+                         local  const float w
+                         local  const float rcpFourW
+                         local  const float y
+                         inlines  TIGER_MATH::VecX, TIGER_MATH::VecY, TIGER_MATH::VecZ, Vec, operator[]

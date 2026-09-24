@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/cameras/GoCamTuningVars.c
+// compiled in: golf_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   26  00259168   2C70  void CreateGlobalCameraTuningVariables()
+                         local  int id
+                         local  int catid
+                         local  uint32 tempSpecCameraDisabled
+                         local  int camId
+  381  0023FCE8    A30  void CameraTuning_Init()
+                         local  const char[18] __FUNCTION__
+                         inlines  TagValuePair, operator+
+  687  001EE78C     50  void CameraTuning_Close()

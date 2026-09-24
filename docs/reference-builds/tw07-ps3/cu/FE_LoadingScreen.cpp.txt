@@ -1,0 +1,51 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/frontend/FE_LoadingScreen.cpp
+// compiled in: apt_unity.cpp
+// 26 functions, source order. line | PS3 address | size
+
+   49  00074314    1C8  void MaybeUpdateProgressBar()
+                         local  TI_STimeValue time
+                         local  TI_STimeValue gLastDraw
+                         local  struct UILoadingScreen* lScreen
+                         inlines  TI_fConvertTimeDifToSeconds, TI_uiReadCP0Count
+   75  0002267C     1C  void UILoadingScreen::InitLoadingScreenSection()
+   80  00022698     1C  void UILoadingScreen::CloseLoadingScreenSection()
+   85  0007D304     D4  struct UILoadingScreen& UILoadingScreen::OpenHandle(enum GUI_ScoreCardType_t type, bool m_bShowLoadingBalls)
+                         local  struct UILoadingScreen* pScreen
+                         inlines  UILoadingScoreScreen::SetLeaderBoard, UILoadingScreen::SetDelayedLoadingBalls
+  116  000226B4     78  struct UILoadingScreen& UILoadingScreen::GetHandle()
+  122  00022664     18  struct UILoadingScreen* UILoadingScreen::GetHandlePtr()
+  127  0002272C     2C  bool UILoadingScreen::HasHandle()
+  132  00022758     98  void UILoadingScreen::CloseHandle()
+  145  000227F0     28  void UILoadingScreen::UILoadingScreen(const struct UILoadingScreen* this)
+  149  00022840     18  void UILoadingScreen::~UILoadingScreen(const struct UILoadingScreen* this)
+  153  0007D3D8     14  void UILoadingScreen::Init(const struct UILoadingScreen* this)
+                         inlines  UILoadingScreen::SetDone, UILoadingScreen::SetState
+  159  000739B8     40  void UILoadingScreen::Close(const struct UILoadingScreen* this)
+  173  000228A4     40  void UILoadingBallsScreen::UILoadingBallsScreen(const struct UILoadingBallsScreen* this)
+  177  00022974     18  void UILoadingBallsScreen::~UILoadingBallsScreen(const struct UILoadingBallsScreen* this)
+  181  0007D3EC     38  void UILoadingBallsScreen::Init(const struct UILoadingBallsScreen* this)
+  191  000DD38C     F4  void UILoadingBallsScreen::RenderProgressBar(const struct UILoadingBallsScreen* this, float completion)
+                         local  enum State curState
+  234  0007E678    224  void UILoadingBallsScreen::StartTime(const struct UILoadingBallsScreen* this)
+                         local  TI_STimeValue startTime
+                         inlines  sys_time_get_timebase_frequency
+  246  0009D1C4    238  void UILoadingBallsScreen::WaitToEndLoading(const struct UILoadingBallsScreen* this)
+                         local  TI_STimeValue startTime
+                         local  TI_STimeValue endTime2
+                         local  struct Displ_DashboardAutoOff turnDashBoardUpdatingOff
+                         local  TI_STimeValue time
+                         inlines  Displ_DashboardAutoOff::Displ_DashboardAutoOff, Displ_DashboardAutoOff::~Displ_DashboardAutoOff, sys_time_get_timebase_frequency
+  276  00022858     4C  void UILoadingScoreScreen::UILoadingScoreScreen(const struct UILoadingScoreScreen* this)
+  280  00022A3C     18  void UILoadingScoreScreen::~UILoadingScoreScreen(const struct UILoadingScoreScreen* this)
+  284  0007E5E0     98  void UILoadingScoreScreen::Init(const struct UILoadingScoreScreen* this)
+                         inlines  UILoadingScreen::ReportFirstRun, UILoadingScreen::SetDone, UIScoreCardManager::SetProgressBarIsON, UIScoreCardManager::SetProgressBarValue
+  316  00022ABC      4  void UILoadingScoreScreen_DrawProgressBar()
+  321  00022AB8      4  void UILoadingScoreScreen::DrawProgressBar(const struct UILoadingScoreScreen* this)
+  328  000EB214    24C  void UILoadingScoreScreen::RenderProgressBar(const struct UILoadingScoreScreen* this, float completion)
+                         local  struct Displ_DashboardAutoOff turnDashBoardUpdatingOff
+                         local  float completionToUse
+                         local  enum UI_LoadScreen_state state
+                         inlines  Displ_DashboardAutoOff::Displ_DashboardAutoOff, Displ_DashboardAutoOff::~Displ_DashboardAutoOff, ModulateProgressCompletion::GetRightCompletion, ModulateProgressCompletion::SetCompletion1, UIScoreCardManager::SetProgressBarIsOFF, UIScoreCardManager::SetProgressBarValue
+  394  000986CC     44  void UILoadingScoreScreen::InitRenderFrameContext(const struct UILoadingScoreScreen* this)
+                         inlines  DS_vEnableZBufferUpdate
+  405  00022AC0      4  void UILoadingScoreScreen::SwapBuffers(const struct UILoadingScoreScreen* this)

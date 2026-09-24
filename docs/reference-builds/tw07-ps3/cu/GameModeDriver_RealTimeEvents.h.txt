@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/Headers/GameModeDriver_RealTimeEvents.h
+// compiled in: golf_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  121  0033F4DC      8  bool GameModeDriverRTE::AIUseDisplayStats(const struct GameModeDriverRTE* this)
+  123  0033F4E4      8  bool GameModeDriverRTE::GiveExperience(const struct GameModeDriverRTE* this)

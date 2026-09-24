@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/Headgate/SOURCE/Game/Engine/CRData.h
+// compiled in: rnaunity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   44    inline-only   bool CRData::IsGolferObjstructedByStructure(const struct CRData* this)

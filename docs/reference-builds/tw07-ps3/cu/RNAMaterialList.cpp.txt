@@ -1,0 +1,52 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/RNAMaterialList.cpp
+// compiled in: RNAMaterialList.cpp
+// 10 functions, source order. line | PS3 address | size
+
+    0  0082B590     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   76  0082C0F0    518  void MaterialListC::SetMaterial(const struct MaterialListC* this, int32_t iMaterial, struct MaterialC* pMaterial)
+                         local  const char[12] __FUNCTION__
+                         local  int32_t idx
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::MaterialC>* newData
+                         local  int32_t i
+                         inlines  Construct, Destroy, Grow, RNADebugBreak, Resize, operator=, operator[], ~AutoRefCount
+  107  0082C608    448  int32_t MaterialListC::AddMaterial(const struct MaterialListC* this, struct MaterialC* pMaterial)
+                         local  const char[12] __FUNCTION__
+                         local  int32_t iMaterial
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::MaterialC>* newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::MaterialC>* newData
+                         inlines  AutoRefCount, Construct, Destroy, PushBack, RNADebugBreak, Size, ~AutoRefCount
+  133  0082B630     FC  int32_t MaterialListC::FindMaterialIndexByName(const const struct MaterialListC* this, const char* pName)
+                         local  int32_t iMat
+                         local  struct MaterialC* pMaterial
+                         inlines  MaterialListC::GetMaterial, MaterialListC::GetNumMaterials
+  168  0082B72C     A0  struct MaterialC* MaterialListC::FindMaterialByName(const const struct MaterialListC* this, const char* pName)
+                         local  int32_t iMaterial
+                         inlines  MaterialListC::GetMaterial, RNADebugBreak, operator RNA::MaterialC*, operator[]
+  197  0082BC90    460  void MaterialListC::MaterialListC(const struct MaterialListC* this, int32_t nMaterials, uint32_t flags)
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::MaterialC>* newData
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNA::MaterialC>* newData
+                         local  int32_t i
+                         inlines  Construct, Destroy, Object::SetAllocated, RNADebugBreak, Reserve, Vector
+  227  0082B7CC    180  void MaterialListC::~MaterialListC(const struct MaterialListC* this)
+                         local  const char[15] __FUNCTION__
+                         inlines  RNADebugBreak, ~Vector
+  237  0082B480    110  void MaterialListC::ReleaseAll(const struct MaterialListC* this)
+                         inlines  Clear
+  242  0082B610     10  static void _GLOBAL__I__ZN3RNA13MaterialListC16s_ClassAllocatorE()
+  243  0082B620     10  static void _GLOBAL__D__ZN3RNA13MaterialListC16s_ClassAllocatorE()

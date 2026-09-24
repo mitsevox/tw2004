@@ -1,0 +1,9 @@
+// ../../../../../TIGERCODE/Code/Golf/UI_Core/FrontEnd/Headers/FE_ProShopPreviews.h
+// compiled in: apt_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   11  00092FE8     B4  void ProShopAssetPreviewManager::ProShopAssetPreviewManager(const struct ProShopAssetPreviewManager* this)
+                         local  int32 i
+                         inlines  PreviewBox
+   12  0001E460     70  void ProShopAssetPreviewManager::~ProShopAssetPreviewManager(const struct ProShopAssetPreviewManager* this)
+                         inlines  ~PreviewBox

@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_OnlineUserFeedback.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   22  00117FAC    160  void UIOnlineUserFeedback::~UIOnlineUserFeedback(const struct UIOnlineUserFeedback* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIOnlineUserFeedback::DstMenuItem_oluf>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+   24  000FFE4C      C  uint32 UIOnlineUserFeedback::GetSignature(const const struct UIOnlineUserFeedback* this)
+   31  000FFE60      C  struct IExternArray* UIOnlineUserFeedback::GetExternArray(const struct UIOnlineUserFeedback* this)

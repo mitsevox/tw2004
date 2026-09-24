@@ -1,0 +1,7 @@
+// C:/dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/target/ppu/include/new
+// compiled in: Legacy_unity.cpp, PositionsFrameCache.cpp, golf2_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   97    inline-only   void* operator new(size_t , void* _Where)
+  109    inline-only   void* operator new [](size_t , void* _Where)
+  134    inline-only   void* operator new(size_t , size_t , void* _Where)

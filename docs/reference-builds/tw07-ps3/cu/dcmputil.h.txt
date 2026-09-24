@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/animation/Headers/dcmputil.h
+// compiled in: golf2_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   12    inline-only   float dcmpGet3Float(const unsigned char* ptr)
+                         local  unsigned int buf
+                         local  float* a
+   28    inline-only   short unsigned int dcmpGetShort(const unsigned char* ptr)
+                         local  short unsigned int buf
+   42    inline-only   float dcmpGetFloat(const unsigned char* ptr)
+                         local  unsigned int buf
+                         local  float* a

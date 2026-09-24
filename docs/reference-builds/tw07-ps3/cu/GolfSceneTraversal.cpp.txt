@@ -1,0 +1,84 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Rna/Scene/GolfSceneTraversal.cpp
+// compiled in: rnaunity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   51  004E4768    5F4  void GolfSceneTraversalC::GolfSceneTraversalC(const struct GolfSceneTraversalC* this, void(*)()* pDefaultFunc)
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct SGNodeRenderableC** newData
+                         inlines  Init, RNADebugBreak, Reserve, Set, SetHandler<SceneX::SGNodeBoundingVolumeC*, GolfSceneTraversalC*>, SetHandler<SceneX::SGNodeCullableRenderableC*, GolfSceneTraversalC*>, SetHandler<SceneX::SGNodeJointC*, GolfSceneTraversalC*>, SetHandler<SceneX::SGNodeLODTransformC*, GolfSceneTraversalC*>, SetHandler<SceneX::SGNodeRenderableC*, GolfSceneTraversalC*>, SetHandler<SceneX::SGNodeSwitchC*, GolfSceneTraversalC*>, SetHandler<SceneX::SGNodeTransformC*, GolfSceneTraversalC*>, Vector
+   69  004CD97C     10  void GolfSceneTraversalC::SetWorldSpaceRefCoordForLODCalculation(const struct GolfSceneTraversalC* this, const const RNAVector3& v3)
+                         inlines  operator=
+   74  004CDF58    194  void GolfSceneTraversalC::~GolfSceneTraversalC(const struct GolfSceneTraversalC* this)
+                         inlines  Init, ~Vector
+   78  004E5350    634  void GolfSceneTraversalC::Traverse(const struct GolfSceneTraversalC* this, struct SGNodeC* pNode, struct Frustum* pFrustum, const const RNAMatrix44& Matrix)
+                         local  int32_t idx
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct SGNodeRenderableC** newData
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct SGNodeBoundingVolumeC** newData
+                         inlines  Construct, Grow, RNADebugBreak, Resize, operator=
+  105  004CEA44     C0  void GolfSceneTraversalC::Handler_TraverseVisibleChildren(struct SGNodeC* pNode, struct GolfSceneTraversalC* pTraversal)
+                         local  struct <anon>* pVisibilityInterface
+                         inlines  SGNodeC::GetFirstChild, SGNodeC::GetInterface<SceneX::IVisibility>, SGNodeC::GetNextSibling
+  121  004D3D7C    238  void GolfSceneTraversalC::Handler_TransformNodes(struct SGNodeTransformC* pNode, struct GolfSceneTraversalC* pTraversal)
+                         local  RNAMatrix44 prevLocalToWorld
+                         local  struct SGNodeTransformC* pPrevTransformNode
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         inlines  Matrix44, operator=, vec_splat, vpu::Mult, vpu::operator*
+  147  004DC158    408  void GolfSceneTraversalC::Handler_LODTransformNodes(struct SGNodeLODTransformC* pNode, struct GolfSceneTraversalC* pTraversal)
+                         local  RNAMatrix44 prevLocalToWorld
+                         local  struct SGNodeTransformC* pPrevTransformNode
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  RNAVector3 worldCoord
+                         local  float_t fDist
+                         local  struct SGNodeC* pChosenChild
+                         local  Vector4Intrinsic_32 xx_yy_zz
+                         local  Vector4Intrinsic_32 yy
+                         local  Vector4Intrinsic_32 zz
+                         inlines  AssertMacroHelper, GetFloat, Matrix44, SGNodeC::GetFirstChild, VecFloat, Vector3, operator=, vec_splat, vpu::Magnitude, vpu::Mult, vpu::operator*, vpu::operator-
+  192  004CEB98    238  void GolfSceneTraversalC::Handler_JointNodes(struct SGNodeJointC* pNode, struct GolfSceneTraversalC* pTraversal)
+                         local  RNAMatrix44 prevLocalToWorld
+                         local  struct SGNodeTransformC* pPrevTransformNode
+                         local  int[4] zero
+                         local  int[4] zero
+                         local  int[4] zero
+                         inlines  Matrix44, operator=, vec_splat, vpu::Mult, vpu::operator*
+  216  004CD8F0     8C  void GolfSceneTraversalC::Handler_SwitchNodes(struct SGNodeSwitchC* pNode, struct GolfSceneTraversalC* pTraversal)
+                         local  struct SGNodeC* pActiveChild
+  231  004E4238    530  void GolfSceneTraversalC::Handler_AddRenderable(struct SGNodeRenderableC* pNode, struct GolfSceneTraversalC* pTraversal)
+                         local  float_t sphereRadius
+                         local  const RNAPlane* pPlanes
+                         local  const const RNAVector4& worldPoint
+                         local  int32_t iPlane
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct SGNodeRenderableC** newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct SGNodeRenderableC** newData
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  AssertMacroHelper, Construct, PushBack, RNADebugBreak, Vector4, vpu::Dot, vpu::_asmDot, vpu::operator<
+  267  004E6544    340  void GolfSceneTraversalC::Handler_AddBVHCulledRenderable(struct SGNodeCullableRenderableC* pNode, struct GolfSceneTraversalC* pTraversal)
+                         local  const struct <anon>* bvhNode
+                         local  const struct <anon>* culler
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct SGNodeRenderableC** newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct SGNodeRenderableC** newData
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Construct, PushBack, RNADebugBreak, SGNodeCullableRenderableC::GetCuller
+  291  004CEB04     94  void GolfSceneTraversalC::Handler_BoundingVolume(struct SGNodeBoundingVolumeC* pNode, struct GolfSceneTraversalC* pTraversal)

@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_trinity_vfx.cpp
+// compiled in: tiger_module_trinity_vfx.cpp
+// 7 functions, source order. line | PS3 address | size
+
+    0  00540D30     18  void ~ListNode(const struct <anon>* this)
+                         inlines  ~Allocatable
+    0  00582324     40  void ~TrinityVfx(const struct <anon>* this)
+                         inlines  TrinityVfx::~TrinityVfx, ~ListNode
+    5  005822DC      4  void Stop(const struct <anon>* this)
+    8  005822E0      4  void Kill(const struct <anon>* this)
+   12  005822E4      4  void UpdateMatrix(const struct <anon>* this, float_t[4]* mat)
+   16  005822E8      8  bool8_t CreateVfx(const struct <anon>* this, char* fxName)
+   21  005822F0      4  void AttachToActor(const struct <anon>* this, struct TrinityActor* pActor, char* pBoneName, float[3]* pOffset)

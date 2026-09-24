@@ -1,0 +1,60 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/CRData.cpp
+// compiled in: headgate_unity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   18  0034A70C     18  struct CRData* GetCRDataPtr()
+   49  0034A8F4      4  void CRData::Release(const struct CRData* this)
+   56  0034A728     EC  void CRData::SetupFiltering(const struct CRData* this)
+                         local  int dataSize
+                         local  struct LS_VertexBuffer* resultVB
+                         local  struct vtxStruct* pVertsLS
+   94  0034A950    29C  void CRData::AlphaTextureEdges(const struct CRData* this, unsigned int numPixelsFromEdge, TextureRef texRef)
+                         local  float fAlpha
+                         local  float fPixelEdgePct
+                         local  struct TextureLockInfo lockInfo
+                         local  unsigned int pixelsFromEdge
+                         local  uint8 uiAlphaColor
+                         local  uint8* pData
+                         local  unsigned int edgeX
+                         local  unsigned int edgeY
+                         local  unsigned int widthCenter
+                         local  unsigned int heightCenter
+                         local  unsigned int y
+                         local  unsigned int x
+  184  0036F6B4    538  void CRData::FilterTexture(const struct CRData* this, unsigned int width, unsigned int height, unsigned int numPasses, TextureRef texRef, bool bUseFastFilter)
+                         local  const TextureInfo* info
+                         local  TextureOptions originalOptions
+                         local  int xpoffset1
+                         local  int xpoffset2
+                         local  int ypoffset1
+                         local  int ypoffset2
+                         local  unsigned int x1
+                         local  unsigned int y1
+                         local  unsigned int x2
+                         local  unsigned int y2
+                         local  float xoffset
+                         local  float yoffset
+                         local  unsigned int i
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetZTestEnable
+  272  0035318C     98  void CRData::LoadHole(const struct CRData* this)
+  291  0034ABF0      4  void CRData::UnloadHole(const struct CRData* this)
+  299  0034ABEC      4  void CRData::CreatePatchTables(const struct CRData* this)
+  312  00353140     4C  void PatchInfoS::Init(const struct PatchInfoS* this)
+                         inlines  CTerrainMesh::GetWorldMax, CTerrainMesh::GetWorldMin
+  319  0034ABF8     58  static bool CompareVec4Flt(float* lhs, float* rhs)
+  327  003648AC    284  bool CRData::Update(const struct CRData* this, bool bForceReflagging, const bool& bCamXZChanged, const bool& bCamYChanged)
+                         local  vec4flt from
+                         local  vec4flt direction
+                         local  float fov
+                         local  struct GamePlayer* player
+                         local  vec4flt temp
+                         local  vec4flt vGolferMove
+                         inlines  Character_GetPosition, GM_GetGolferUp, GamePlayer::GetCharacter, LLMath_LengthSquared3, LLMath_Subtract, vec4flt_Copy, vec_ld, vec_madd, vec_sld, vec_sub
+  385  003645F0    2BC  void CRData::ComputeStructursBlockingView(const struct CRData* this, const float* camPos, const float* camDir)
+                         local  vec4flt golferMin
+                         local  vec4flt golferMax
+                         local  vec4flt golferPos
+                         local  vec4flt direction
+                         local  float dist
+                         local  vec4flt temp
+                         inlines  CRData::GetGolferMinMaxPos, LLMath_Add, LLMath_DotProduct3, LLMath_Length3, LLMath_Scale, LLMath_Subtract, __vec_len_sqr3, __vec_make_from_scalar, vec4flt_Copy3, vec_add, vec_ld, vec_madd

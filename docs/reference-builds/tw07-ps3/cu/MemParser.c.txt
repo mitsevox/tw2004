@@ -1,0 +1,17 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/animation/MemParser.c
+// compiled in: golf2_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   79  0013F2A0     18  void MemParse_SetByteSize(int32 numBytes)
+   87  0013F2B8     70  bool MemParse_IsWhiteSpace(char ch)
+  102  0013F328    25C  char* MemParse_GetNextString(char** pStream)
+                         local  char ch
+                         local  int32 cnt
+                         local  int32 insideComment
+                         local  char* pStr
+  170  0013F584     B0  void MemParse_GotoNextLine(char** pStream)
+  198  0013F634     30  int32 MemParse_GetNextInt(char** pStream)
+                         local  char* pStr
+  207  0013F664     CC  int32 MemParse_GetNextCMD(char** pStream, char** cmdName, int32 numCmds)
+                         local  int32 i
+                         local  char* pStr

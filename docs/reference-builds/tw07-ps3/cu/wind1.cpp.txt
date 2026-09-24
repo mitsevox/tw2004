@@ -1,0 +1,46 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/wind1.cpp
+// compiled in: headgate_unity.cpp
+// 18 functions, source order. line | PS3 address | size
+
+  114  00346FB4     40  float RandRangeF(float highVal, float lowVal)
+                         local  float randomValue
+  266  003477C4    2E8  void Wind1::SetSliderValue(const struct Wind1* this, float val)
+                         local  int partitions
+                         local  float step
+                         local  int smallIndex
+                         local  int largeIndex
+                         local  float pcnt
+  310  00356208    784  bool Wind1::NextFrame(const struct Wind1* this, float pctIntervalCompleted)
+                         local  WIND1_INFO* wiPtr
+                         local  float extraTime
+                         local  float pitchChangeC1
+                         local  float pitchChangeC2
+                         local  float pitchChange
+                         local  float yawChangeC1
+                         local  float yawChangeC2
+                         local  float yawChange
+                         local  float speedChange
+                         local  bool gusting
+                         local  float frameSec
+                         local  mat44flt orientationMatrix
+                         inlines  LLMath_Scale, LLMath_mat44fltMultiply33, __vec_mul, vec_ld, vec_madd, vec_splat
+  629  00347AAC      8  bool Wind1::Move(const struct Wind1* this, const const struct APosition& pos)
+  639  00347AB4      C  void Wind1::Draw(const struct Wind1* this)
+  650  00347AC0      8  bool Wind1::Done(const struct Wind1* this)
+  661  00347AC8     24  void Wind1::Toggle(const struct Wind1* this)
+  676  00347AEC      8  void Wind1::SetType(const struct Wind1* this, int wType)
+  689  00351098     14  void Wind1::GetTrueWindVector(const struct Wind1* this, float* alternateStorageLocation)
+                         inlines  vec4flt_Copy
+  700  003510AC     14  void Wind1::GetNormalizedWindVector(const struct Wind1* this, float* alternateStorageLocation)
+                         inlines  vec4flt_Copy
+  712  00347AF4     14  void Wind1::GetTrueWindVectorXZ(const struct Wind1* this, float* xComponent, float* zComponent)
+  726  00347B08     14  void Wind1::GetNormalizedWindVectorXZ(const struct Wind1* this, float* xComponent, float* zComponent)
+  740  003510C0     24  void Wind1::GetWindVectors(const struct Wind1* this, float* trueVctPtr, float* normVctPtr)
+                         inlines  vec4flt_Copy, vec_st
+  754  00347B1C     18  float Wind1::GetWindSpeed(const struct Wind1* this, float* alternateStorageLocation)
+  770  00347B34     30  float Wind1::GetWindSpeedMPH(const struct Wind1* this, float* alternateStorageLocation)
+                         local  float speedInMPH
+  789  00347B64     18  float Wind1::GetWindDir(const struct Wind1* this, float* alternateStorageLocation)
+  806  00346FF4     30  float MPHToIPS(float valMPH)
+                         local  float valIPS
+  824  00347B7C     18  float MinutesToSeconds(float valMinutes)

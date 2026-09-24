@@ -1,0 +1,124 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf_unity.cpp
+// compiled in: golf_unity.cpp
+// 64 functions, source order. line | PS3 address | size
+
+    0  00222478      4  static void __tcf_1()
+    0  00224E24      4  static void __tcf_4()
+    0  002258C8      4  static void __tcf_5()
+    0  0026CD84      4  static void __tcf_0()
+    0  0028407C     14  static void __tcf_2()
+    0  00287828     88  static void __tcf_6()
+                         inlines  CourseWalk::~CourseWalk
+    0  00298564     AC  static void __tcf_3()
+                         inlines  TigerNetLobbyInterface::~TigerNetLobbyInterface
+    0  002F6E90    B30  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  Allocator::Allocator, Allocator::~Allocator, AllocatorProfile::~AllocatorProfile, BoastChallenge::BoastChallenge, BoastChallenge::~BoastChallenge, ClubHouseManager::ClubHouseManager, ClubHouseManager::~ClubHouseManager, GameModeDriverManager::~GameModeDriverManager, GetRow, GolfAllocatorProfile::GolfAllocatorProfile, GolfAllocatorProfile::~GolfAllocatorProfile, GolfModule::~GolfModule, GolfModuleAptDebug::~GolfModuleAptDebug, GolfModuleCCT::~GolfModuleCCT, GolfModuleCCTInterface::GolfModuleCCTInterface, GolfModuleCCTInterface::~GolfModuleCCTInterface, GolfModuleGlobal::GolfModuleGlobal, GolfModuleGlobal::~GolfModuleGlobal, GolfModuleLua::~GolfModuleLua, GolfModuleManager::~GolfModuleManager, GolfModuleTrinity::~GolfModuleTrinity, GolfModuleUCAP::~GolfModuleUCAP, ITigerParticleSpawn::ITigerParticleSpawn, LightData::LightData, Matrix44, Module, Quaternion, Set, ShadowMapGenerator::ShadowMapGenerator, Vector2, Vector3, Vector4, cGAME_GLOBALS, ~IAllocator, ~Module
+    0  0033FDE8     18  void GlobalPlayerUpdate::~GlobalPlayerUpdate(const struct GlobalPlayerUpdate* this)
+                         inlines  ~GlobalUpdate
+    0  003401E0     68  void GameModeDriverManager::~GameModeDriverManager(const struct GameModeDriverManager* this)
+                         inlines  Singleton<GameModeDriverManager>::~Singleton
+    0  00340248     38  void GolfModuleComInterface::~GolfModuleComInterface(const struct GolfModuleComInterface* this)
+                         inlines  ~ComInterface
+    0  00340280     18  void GameModeBloodGreenSome::~GameModeBloodGreenSome(const struct GameModeBloodGreenSome* this)
+    0  00340D44     18  void GolfModuleCCTInterface::~GolfModuleCCTInterface(const struct GolfModuleCCTInterface* this)
+                         inlines  ~CCTInterface
+    0  00340D94     18  void GolfAllocatorProfile::~GolfAllocatorProfile(const struct GolfAllocatorProfile* this)
+                         inlines  AllocatorProfile::~AllocatorProfile
+    0  00340DF4     18  void ~GlobalUpdate(const struct GlobalUpdate* this)
+                         inlines  ~Allocatable
+    0  00340F2C     68  void ClubHouseManager::~ClubHouseManager(const struct ClubHouseManager* this)
+                         inlines  Singleton<ClubHouseManager>::~Singleton
+    0  00341014     68  void BoastChallenge::~BoastChallenge(const struct BoastChallenge* this)
+                         inlines  Singleton<BoastChallenge>::~Singleton
+    0  00342598     18  void Com::~Com(const struct Com* this)
+                         inlines  ~Module
+    0  00342610     18  void GolfModule::~GolfModule(const struct GolfModule* this)
+                         inlines  ~Module
+    0  00342688     18  void Manager::~Manager(const struct Manager* this)
+                         inlines  ~Module
+    0  00342700     18  void Lua::~Lua(const struct Lua* this)
+                         inlines  ~Module
+    0  00342778     18  void CCT::~CCT(const struct CCT* this)
+                         inlines  ~Module
+    0  003427F0     18  void Trinity::~Trinity(const struct Trinity* this)
+                         inlines  ~Module
+    0  00342868     18  void UCAP::~UCAP(const struct UCAP* this)
+                         inlines  ~Module
+    0  00342908     18  void Global::~Global(const struct Global* this)
+                         inlines  ~Module
+    0  003429C4     18  void GlobalRoundHoleNumberUpdate::~GlobalRoundHoleNumberUpdate(const struct GlobalRoundHoleNumberUpdate* this)
+                         inlines  ~GlobalUpdate
+    0  00342A14     18  void GlobalRoundHoleCountUpdate::~GlobalRoundHoleCountUpdate(const struct GlobalRoundHoleCountUpdate* this)
+                         inlines  ~GlobalUpdate
+    0  00342A64     18  void GlobalRoundMatchModeUpdate::~GlobalRoundMatchModeUpdate(const struct GlobalRoundMatchModeUpdate* this)
+                         inlines  ~GlobalUpdate
+    0  00342AB4     18  void GlobalRoundStrokeModeUpdate::~GlobalRoundStrokeModeUpdate(const struct GlobalRoundStrokeModeUpdate* this)
+                         inlines  ~GlobalUpdate
+    0  00342B04     18  void GlobalRoundStablefordModeUpdate::~GlobalRoundStablefordModeUpdate(const struct GlobalRoundStablefordModeUpdate* this)
+                         inlines  ~GlobalUpdate
+    0  00342B54     18  void GlobalRoundCrowdUpdate::~GlobalRoundCrowdUpdate(const struct GlobalRoundCrowdUpdate* this)
+                         inlines  ~GlobalUpdate
+    0  00342BA4     18  void GlobalRoundPlayerCountUpdate::~GlobalRoundPlayerCountUpdate(const struct GlobalRoundPlayerCountUpdate* this)
+                         inlines  ~GlobalUpdate
+    0  00342BF4     18  void GlobalHoleParUpdate::~GlobalHoleParUpdate(const struct GlobalHoleParUpdate* this)
+                         inlines  ~GlobalUpdate
+    0  00342C44     18  void GlobalHoleGolferUpUpdate::~GlobalHoleGolferUpUpdate(const struct GlobalHoleGolferUpUpdate* this)
+                         inlines  ~GlobalUpdate
+    0  00342CB0     7C  void GolfModuleCom::~GolfModuleCom(const struct GolfModuleCom* this)
+                         inlines  Com::~Com, GolfModule::~GolfModule, ~Module
+    0  00342E00     7C  void GolfModuleManager::~GolfModuleManager(const struct GolfModuleManager* this)
+                         inlines  GolfModule::~GolfModule, Manager::~Manager, ~Module
+    0  00342F50     7C  void GolfModuleLua::~GolfModuleLua(const struct GolfModuleLua* this)
+                         inlines  GolfModule::~GolfModule, Lua::~Lua, ~Module
+    0  003430A0     7C  void GolfModuleCCT::~GolfModuleCCT(const struct GolfModuleCCT* this)
+                         inlines  CCT::~CCT, GolfModule::~GolfModule, ~Module
+    0  003431F0     7C  void GolfModuleTrinity::~GolfModuleTrinity(const struct GolfModuleTrinity* this)
+                         inlines  GolfModule::~GolfModule, Trinity::~Trinity, ~Module
+    0  00343340     7C  void GolfModuleUCAP::~GolfModuleUCAP(const struct GolfModuleUCAP* this)
+                         inlines  GolfModule::~GolfModule, UCAP::~UCAP, ~Module
+    0  00343488     48  void GolfModuleAptDebug::~GolfModuleAptDebug(const struct GolfModuleAptDebug* this)
+                         inlines  GolfModule::~GolfModule, ~Module
+    0  00343568     7C  void GolfModuleGlobal::~GolfModuleGlobal(const struct GolfModuleGlobal* this)
+                         inlines  Global::~Global, GolfModule::~GolfModule, ~Module
+    0  0034369C     18  void GlobalSwingStateUpdate::~GlobalSwingStateUpdate(const struct GlobalSwingStateUpdate* this)
+                         inlines  GlobalPlayerUpdate::~GlobalPlayerUpdate
+    0  003436EC     18  void GlobalDistToPinUpdate::~GlobalDistToPinUpdate(const struct GlobalDistToPinUpdate* this)
+                         inlines  GlobalPlayerUpdate::~GlobalPlayerUpdate
+    0  0034373C     18  void GlobalInitialDistToPinUpdate::~GlobalInitialDistToPinUpdate(const struct GlobalInitialDistToPinUpdate* this)
+                         inlines  GlobalPlayerUpdate::~GlobalPlayerUpdate
+    0  0034378C     18  void GlobalIsLeftHandedUpdate::~GlobalIsLeftHandedUpdate(const struct GlobalIsLeftHandedUpdate* this)
+                         inlines  GlobalPlayerUpdate::~GlobalPlayerUpdate
+    0  003437DC     18  void GlobalStrokesUpdate::~GlobalStrokesUpdate(const struct GlobalStrokesUpdate* this)
+                         inlines  GlobalPlayerUpdate::~GlobalPlayerUpdate
+    0  0034382C     18  void GlobalMatchWinsUpdate::~GlobalMatchWinsUpdate(const struct GlobalMatchWinsUpdate* this)
+                         inlines  GlobalPlayerUpdate::~GlobalPlayerUpdate
+    0  0034387C     18  void GlobalRoundScoreUpdate::~GlobalRoundScoreUpdate(const struct GlobalRoundScoreUpdate* this)
+                         inlines  GlobalPlayerUpdate::~GlobalPlayerUpdate
+    0  003438CC     18  void GlobalLastShotOBUpdate::~GlobalLastShotOBUpdate(const struct GlobalLastShotOBUpdate* this)
+                         inlines  GlobalPlayerUpdate::~GlobalPlayerUpdate
+    0  0034391C     18  void GlobalLieUpdate::~GlobalLieUpdate(const struct GlobalLieUpdate* this)
+                         inlines  GlobalPlayerUpdate::~GlobalPlayerUpdate
+    0  0034396C     18  void GlobalFutureLieUpdate::~GlobalFutureLieUpdate(const struct GlobalFutureLieUpdate* this)
+                         inlines  GlobalPlayerUpdate::~GlobalPlayerUpdate
+    0  003439BC     18  void GlobalHoleDistUpdate::~GlobalHoleDistUpdate(const struct GlobalHoleDistUpdate* this)
+                         inlines  GlobalPlayerUpdate::~GlobalPlayerUpdate
+    0  00343A0C     18  void GlobalClubUpdate::~GlobalClubUpdate(const struct GlobalClubUpdate* this)
+                         inlines  GlobalPlayerUpdate::~GlobalPlayerUpdate
+    0  00343A5C     18  void GlobalShotUpdate::~GlobalShotUpdate(const struct GlobalShotUpdate* this)
+                         inlines  GlobalPlayerUpdate::~GlobalPlayerUpdate
+    0  00343AAC     18  void GlobalShotPowerUpdate::~GlobalShotPowerUpdate(const struct GlobalShotPowerUpdate* this)
+                         inlines  GlobalPlayerUpdate::~GlobalPlayerUpdate
+    0  00343AFC     18  void GlobalBallPosUpdate::~GlobalBallPosUpdate(const struct GlobalBallPosUpdate* this)
+                         inlines  GlobalPlayerUpdate::~GlobalPlayerUpdate
+    0  00343B4C     18  void GlobalBallVelUpdate::~GlobalBallVelUpdate(const struct GlobalBallVelUpdate* this)
+                         inlines  GlobalPlayerUpdate::~GlobalPlayerUpdate
+    0  00343B9C     18  void GlobalTargetUpdate::~GlobalTargetUpdate(const struct GlobalTargetUpdate* this)
+                         inlines  GlobalPlayerUpdate::~GlobalPlayerUpdate
+    0  00343BEC     18  void GlobalPosUpdate::~GlobalPosUpdate(const struct GlobalPosUpdate* this)
+                         inlines  GlobalPlayerUpdate::~GlobalPlayerUpdate
+    0  00343C3C     18  void GlobalBallFxUpdate::~GlobalBallFxUpdate(const struct GlobalBallFxUpdate* this)
+                         inlines  GlobalPlayerUpdate::~GlobalPlayerUpdate
+    0  00343C8C     18  void GlobalIsWearingHatUpdate::~GlobalIsWearingHatUpdate(const struct GlobalIsWearingHatUpdate* this)
+                         inlines  GlobalPlayerUpdate::~GlobalPlayerUpdate
+  338  002F79D0     10  static void _GLOBAL__I_gCamAnimDebugManager()
+  339  002F79C0     10  static void _GLOBAL__D_gCamAnimDebugManager()

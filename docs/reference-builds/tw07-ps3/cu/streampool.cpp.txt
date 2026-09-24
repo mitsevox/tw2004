@@ -1,0 +1,55 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/streampool.cpp
+// compiled in: streampool.cpp
+// 9 functions, source order. line | PS3 address | size
+
+    0  006D4B10     28  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  ListDStack
+   38  006D5120     EC  void RwacTimerClient(void* pContext, float timeToNextCall)
+                         local  struct <anon>* pThis
+                         local  int deleteStreamPool
+                         local  int i
+                         local  struct StreamDesc* pStreamDesc
+                         local  int i
+                         local  struct StreamDesc* pStreamDesc
+                         inlines  Delete<rw::audio::core::StreamPool*>
+   72  006D4D4C    3D4  struct <anon>* CreateInstance(Guid guid, int numStreams, int bufferBytes, int maxRequests, struct <anon>* pSystem, struct IResourceAllocator* pAllocator, int readBlockSize)
+                         local  const char[15] __FUNCTION__
+                         local  unsigned int sizeOfStreamDesc
+                         local  unsigned int sizeOfStreamBuffers
+                         local  unsigned int memRequired
+                         local  struct <anon>* pThis
+                         local  uintptr_t pMemBlock
+                         local  char* pStreamBufferMem
+                         local  int i
+                         inlines  Assert, New2<rw::audio::core::StreamPool>, Push, SetNext, SetPrev, StreamPool, core::LinearAlloc<char*, std::uintptr_t>, core::LinearAlloc<rw::audio::core::StreamPool::StreamDesc*, std::uintptr_t>, core::LinearAllocAddSize
+  172  006D4B48     C0  struct <anon>* GetInstance(Guid guid)
+                         local  const char[12] __FUNCTION__
+                         local  struct <anon>* pNext
+                         local  struct <anon>* pStreamPool
+                         inlines  GetHead, GetNext
+  200  006D520C    2AC  void* AcquireStream(const struct <anon>* this, float priority, void(*)()* pStreamLostCallback, void* pStreamLostContext)
+                         local  const char[14] __FUNCTION__
+                         local  double timeStamp
+                         local  float lowestPriority
+                         local  struct StreamDesc* pStreamDescCandidate
+                         local  int i
+                         local  struct StreamDesc* pStreamDesc
+                         local  int i
+                         local  struct StreamDesc* pStreamDesc
+                         local  int i
+                         local  struct StreamDesc* pStreamDesc
+                         inlines  AllocateStream, Assert
+  295  006D49B8     8C  void ReleaseStream(const struct <anon>* this, void* streamHandle)
+                         local  const char[14] __FUNCTION__
+                         local  struct StreamDesc* pStreamDesc
+  321  006D4A44     CC  void Release(const struct <anon>* this)
+                         local  const char[8] __FUNCTION__
+                         inlines  SetHandler
+  344  006D4C08    144  int ReleaseHandler(struct <anon>* pCommand)
+                         local  struct <anon>* pThis
+                         local  struct <anon>* ptempnode
+                         local  struct <anon>* ptempnode
+                         local  int i
+                         local  struct StreamDesc* pStreamDesc
+                         inlines  GetNext, GetPrev, Remove, SetCallback, SetContext, SetNext, SetPrev
+  378  006D4B38     10  static void _GLOBAL__I__ZN2rw5audio4core10StreamPool13sInstanceListE()

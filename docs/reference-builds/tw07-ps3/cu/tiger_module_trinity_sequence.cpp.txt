@@ -1,0 +1,14 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_trinity_sequence.cpp
+// compiled in: tiger_module_trinity_sequence.cpp
+// 7 functions, source order. line | PS3 address | size
+
+    0  00540D30     18  void ~ListNode(const struct <anon>* this)
+                         inlines  ~Allocatable
+   12  00540B70     C8  void TrinitySequence(const struct <anon>* this, struct <anon>* master, unsigned int resourceTag)
+                         inlines  NamedListNode
+   22  00540A90     38  void ~TrinitySequence(const struct <anon>* this)
+                         inlines  ~NamedListNode
+   26  00540AC8      8  void SetSequence(const struct <anon>* this, struct Sequence* sequence)
+   31  00540AD0     48  bool IsNameEqual(const const struct <anon>* this, const char* name)
+   36  00540B18     34  void FreeResource(const struct <anon>* this)
+   44  00540B4C     24  const char* GetSequenceName(const struct <anon>* this)

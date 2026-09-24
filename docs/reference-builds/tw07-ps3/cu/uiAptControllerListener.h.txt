@@ -1,0 +1,15 @@
+// ../../../../../TIGERCODE/Code/AptInterface/uiAptControllerListener.h
+// compiled in: apt_unity.cpp, other_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+  104    inline-only   void AptControllerListener::StopPortLocking()
+  105    inline-only   int32 AptControllerListener::GetPortLockController()
+  112  000FDBE0      C  void AptControllerListener::EnableInput(const struct AptControllerListener* this)
+  113  000FDBEC      C  void AptControllerListener::DisableInput(const struct AptControllerListener* this)
+  114  000FDBF8      8  bool AptControllerListener::IsInputDisabled(const const struct AptControllerListener* this)
+  117  000FDC00      4  void AptControllerListener::HandleSticks(const struct AptControllerListener* this, struct Controller_PositionInfo* leftStick, struct Controller_PositionInfo* rightStick)
+  118  000FDC04      4  void AptControllerListener::RegainFocus(const struct AptControllerListener* this, uint32 comeFrom_Signature)
+  119  004A747C      4  void AptControllerListener::RegainFocusScreenSubscriber(const struct AptControllerListener* this, uint32 comeFrom_Signature)
+  120  000FDC08      4  void AptControllerListener::LooseFocus(const struct AptControllerListener* this, uint32 gointTo_Signature)
+  121  000FDC0C      8  enum ePriority AptControllerListener::GetControllerStackPriority(const struct AptControllerListener* this)
+  133    inline-only   bool AptControllerListener::CheckPortLock(int32 ctr)

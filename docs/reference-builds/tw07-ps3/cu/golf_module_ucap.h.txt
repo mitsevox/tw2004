@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/golfmodule/golf_module_ucap.h
+// compiled in: golf_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   21    inline-only   struct GeoComponent* GolfModuleUCAP::GetActiveComponentBuffer(const struct GolfModuleUCAP* this, unsigned int index)
+   28    inline-only   void GolfModuleUCAP::GetComponentBuffersForSubMesh(const struct GolfModuleUCAP* this, struct GeoComponent** ppUCAPComponents_0, struct GeoComponent** ppUCAPComponents_1, unsigned int index)

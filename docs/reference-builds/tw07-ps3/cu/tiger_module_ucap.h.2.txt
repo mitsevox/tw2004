@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/include/tiger_module_ucap.h
+// compiled in: tiger_module_ucap.cpp
+// 6 functions, source order. line | PS3 address | size
+
+  116  0033E40C      4  void HandleNewComponents(const struct <anon>* this)
+  117  0033E410      4  void SwapComponentBuffers(const struct <anon>* this)
+  125    inline-only   const struct TexFrame* GetTexFramesFromHeader(const struct Header* h)
+  130    inline-only   const struct GeoFrame* GetGeoFramesFromHeader(const struct Header* h)
+  140    inline-only   unsigned int GetFrameCountFromHeader(const struct Header* h)
+  155    inline-only   int GetActiveIndex(const const struct <anon>* this)

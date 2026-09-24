@@ -1,0 +1,94 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNAX/include/RNAUtils/RNAVectorSerialization.h
+// compiled in: RNAFX.cpp
+// 20 functions, source order. line | PS3 address | size
+
+   41  00854B20     F0  struct OutStreamC& RNA::operator<< <RNA::String, std::int32_t>(const struct OutStreamC& out, const const struct <anon>& array)
+                         local  int32_t i
+                         inlines  operator[]
+   41  00854D04    100  struct OutStreamC& RNA::operator<< <std::int32_t, std::int32_t>(const struct OutStreamC& out, const const struct <anon>& array)
+                         local  int32_t i
+                         inlines  RNADebugBreak, operator[]
+   53  00854E04    1AC  struct InStreamC& RNA::operator>><std::int32_t, std::int32_t>(const struct InStreamC& in, const struct <anon>& array)
+                         local  int32_t iSize
+                         local  int32_t idx
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Construct, RNADebugBreak, Resize, operator[]
+   53  008554AC    2B8  struct InStreamC& RNA::operator>><RNA::String, std::int32_t>(const struct InStreamC& in, const struct <anon>& array)
+                         local  int32_t iSize
+                         local  int32_t idx
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Construct, Destroy, Resize, operator[], ~String
+   98  00854C10     F4  void RNA::SerializeOutVector<RNAX::RNAFXProgram, std::int32_t>(const struct OutStreamC& out, const const struct <anon>& array)
+                         local  int32_t i
+                         inlines  operator[]
+   98  00859584     E8  void RNA::SerializeOutVector<RNAX::RNAFXState, std::int32_t>(const struct OutStreamC& out, const const struct <anon>& array)
+                         local  int32_t i
+                         inlines  operator[]
+   98  008598A8     F4  void RNA::SerializeOutVector<RNAX::RNAFXAnnotation, std::int32_t>(const struct OutStreamC& out, const const struct <anon>& array)
+                         local  int32_t i
+                         inlines  operator[]
+   98  0085999C     F4  void RNA::SerializeOutVector<RNAX::RNAFXPass, std::int32_t>(const struct OutStreamC& out, const const struct <anon>& array)
+                         local  int32_t i
+                         inlines  operator[]
+   98  00859A90     F4  void RNA::SerializeOutVector<RNAX::RNAFXTechnique, std::int32_t>(const struct OutStreamC& out, const const struct <anon>& array)
+                         local  int32_t i
+                         inlines  operator[]
+   98  00859B84     F4  void RNA::SerializeOutVector<RNAX::RNAFXSampler, std::int32_t>(const struct OutStreamC& out, const const struct <anon>& array)
+                         local  int32_t i
+                         inlines  operator[]
+   98  00859C78     F4  void RNA::SerializeOutVector<RNAX::RNAFXConstant, std::int32_t>(const struct OutStreamC& out, const const struct <anon>& array)
+                         local  int32_t i
+                         inlines  operator[]
+   98  00859D6C     F4  void RNA::SerializeOutVector<RNAX::RNAFXStruct, std::int32_t>(const struct OutStreamC& out, const const struct <anon>& array)
+                         local  int32_t i
+                         inlines  operator[]
+  109  00855DBC    23C  void RNA::SerializeInVector<RNAX::RNAFXProgram, std::int32_t>(const struct InStreamC& in, const struct <anon>& array)
+                         local  int32_t iSize
+                         local  int32_t idx
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Construct, Destroy, Resize, operator[]
+  109  0085966C    23C  void RNA::SerializeInVector<RNAX::RNAFXState, std::int32_t>(const struct InStreamC& in, const struct <anon>& array)
+                         local  int32_t iSize
+                         local  int32_t idx
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Construct, Destroy, Resize, operator[]
+  109  00859E60    280  void RNA::SerializeInVector<RNAX::RNAFXAnnotation, std::int32_t>(const struct InStreamC& in, const struct <anon>& array)
+                         local  int32_t iSize
+                         local  int32_t idx
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Construct, Destroy, Resize, operator[]
+  109  0085A0E0    8EC  void RNA::SerializeInVector<RNAX::RNAFXPass, std::int32_t>(const struct InStreamC& in, const struct <anon>& array)
+                         local  int32_t iSize
+                         local  int32_t idx
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Destroy, Resize, operator[], ~RNAFXPass
+  109  0085A9CC    F2C  void RNA::SerializeInVector<RNAX::RNAFXTechnique, std::int32_t>(const struct InStreamC& in, const struct <anon>& array)
+                         local  int32_t iSize
+                         local  int32_t idx
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Construct, Destroy, Init, RNADebugBreak, RNAFXTechnique, Resize, Vector, operator[], ~RNAFXTechnique
+  109  0085B8F8    4DC  void RNA::SerializeInVector<RNAX::RNAFXSampler, std::int32_t>(const struct InStreamC& in, const struct <anon>& array)
+                         local  int32_t iSize
+                         local  int32_t idx
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Construct, Destroy, RNADebugBreak, Resize, operator[]
+  109  0085BDD4    23C  void RNA::SerializeInVector<RNAX::RNAFXConstant, std::int32_t>(const struct InStreamC& in, const struct <anon>& array)
+                         local  int32_t iSize
+                         local  int32_t idx
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Destroy, Resize, operator[]
+  109  0085C010    448  void RNA::SerializeInVector<RNAX::RNAFXStruct, std::int32_t>(const struct InStreamC& in, const struct <anon>& array)
+                         local  int32_t iSize
+                         local  int32_t idx
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Construct, Destroy, RNADebugBreak, Resize, operator[]

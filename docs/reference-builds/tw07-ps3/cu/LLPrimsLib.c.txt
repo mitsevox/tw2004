@@ -1,0 +1,79 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLPrimsLib.c
+// compiled in: Legacy_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   18  003B9320    450  void PR_vAddWireSphereToDisplayList(float* center, float radius, int resolution)
+                         local  float step
+                         local  float theta
+                         local  float phi
+                         local  float sinTheta
+                         local  float cosTheta
+                         local  float sinPhi
+                         local  float cosPhi
+                         local  int vertCount
+                         inlines  std::cosf, std::sinf
+  132  003B91E8    138  void PR_vAddDebugAxis()
+                         local  float[2][4] kAxisLine
+                         local  vec4flt kAxisColor
+                         inlines  PR_vSetCurrentColor, vec_st
+  180  003B8F54    294  void PR_vAddWireAABoxToDisplayList(float* min, float* max, float* color)
+                         local  vec4flt a
+                         local  vec4flt b
+                         local  vec4flt c
+                         local  vec4flt d
+                         local  vec4flt p
+                         local  vec4flt q
+                         local  vec4flt r
+                         local  vec4flt s
+                         local  float[8][4] temp
+                         inlines  PR_vSetCurrentColor, vec4flt_Copy, vec_st
+  241  003B879C    244  void PR_vAddWireBoxToDisplayList(float* a, float* b, float* c, float* d, float* p, float* q, float* r, float* s, float* color)
+                         local  float[8][4] temp
+                         inlines  PR_vSetCurrentColor, vec4flt_Copy, vec_ld, vec_st
+  289  003B89E0    574  void PR_vAddWireOrientedBoxToDisplayList(float* center, float yaw, float pitch, float roll, float width, float height, float depth, float* color)
+                         local  vec4flt a
+                         local  vec4flt b
+                         local  vec4flt c
+                         local  vec4flt d
+                         local  vec4flt p
+                         local  vec4flt q
+                         local  vec4flt r
+                         local  vec4flt s
+                         local  float halfWidth
+                         local  float halfHeight
+                         local  float halfDepth
+                         local  mat44flt rotMatrix
+                         inlines  LLMath_Add3, LLMath_IdentifyMat, LLMath_mat44fltMultiply33, __vec_mul, vec_ld, vec_madd, vec_splat, vec_st
+  330  003B84DC    2C0  void PR_vAddWireCylinderToDisplayList(float* center, float radius, float height, int32 resolution)
+                         local  float[2][4] vertical
+                         local  float[9][4] upperVtx
+                         local  float[9][4] lowerVtx
+                         local  int32 i
+                         local  float x
+                         local  float z
+                         local  float upperY
+                         local  float lowerY
+                         local  float s
+                         local  float a
+                         inlines  std::cosf, std::sinf
+  379  003B7E6C    670  void PR_vAddWireOrientedCylinderToDisplayList(float[4]* transform, float radius, float height, int32 resolution)
+                         local  float[2][4] vertical
+                         local  float[9][4] upperVtx
+                         local  float[9][4] lowerVtx
+                         local  mat44flt rotMatrix
+                         local  vec4flt center
+                         local  int32 i
+                         local  float x
+                         local  float z
+                         local  float halfHeight
+                         local  float upperY
+                         local  float lowerY
+                         local  float s
+                         local  float a
+                         inlines  LLMath_Add3, LLMath_CopyMat44, LLMath_IdentifyMat, LLMath_mat44fltMultiply33, __vec_mul, std::cosf, std::sinf, vec_ld, vec_madd, vec_splat, vec_st
+  450  003B7B84    2E8  void PR_vAddDebugAxis(float[4]* transform, float length)
+                         local  float[2][4] kAxisLine
+                         local  vec4flt kAxisColor
+                         local  vec4flt axisVec
+                         local  vec4flt center
+                         inlines  LLMath_Add3, LLMath_Scale, PR_vSetCurrentColor, __vec_mul, vec_ld, vec_splat, vec_st

@@ -1,0 +1,25 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/GoRenderCtx.c
+// compiled in: golf_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   37  0026E1C0     20  void RC_vInitModule()
+                         inlines  RC_vSetCurrentRenderCtx
+   47  00215998      4  void RC_vCloseModule()
+   52  002BB51C    18C  struct RC_SRenderCtx* RC_spCreateRenderCtx(struct CA_SCamera* spCamera_p, FB_SFrameBuffer* spFrameBuffer_p, VM_SViewport* spViewport_p)
+                         local  const char[21] __FUNCTION__
+                         local  struct RC_SRenderCtx* spRenderCtx
+                         inlines  RC_vSetRenderCtxCamera, RC_vSetRenderCtxFrameBuffer, RC_vSetRenderCtxTransformationMatrix, RC_vSetRenderCtxViewport, TagValuePair, operator+, vec_st
+   72  0021592C     3C  void RC_vReleaseRenderCtx(struct RC_SRenderCtx* spRenderCtx_p)
+   87  002BAEF8    1CC  void RC_vUpdateRenderCtxScreenMatricesAndInfo(struct RC_SRenderCtx* spRenderCtx_p, float* pAspectRatio)
+                         local  const struct CA_SCamera* spCamera
+                         local  const VM_SViewport* spViewport
+                         local  const FB_SFrameBuffer* spFrameBuffer
+                         local  const float aspectRatio
+                         local  vec4flt xTmpSrcPoint
+                         local  vec4flt xTmpNormPoint
+                         local  float fNormalizedViewToScreenFactorX
+                         local  float fNormalizedViewToScreenFactorY
+                         inlines  LLMath_CopyMat44, vec_ld, vec_st
+  191  002BB104    150  void RC_vUpdateRenderCtxTransformationMatrices(struct RC_SRenderCtx* spRenderCtx_p)
+                         local  mat44flt xInvTransMatrix
+                         inlines  LLMath_CopyMat44, vec_ld, vec_st

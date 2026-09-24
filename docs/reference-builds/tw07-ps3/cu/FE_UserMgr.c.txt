@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/frontend/FE_UserMgr.c
+// compiled in: apt_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   21  000C1080     94  struct GolferData_t* FE_spGetGolfer(enum Golfer_t golferNum)
+                         local  const struct UserInfo& userInfo
+                         inlines  GolferStats::GetGolferStats, Singleton<GolferStats>::GetSingleton, UserInfo::GetGolferData
+   41  000136CC      8  enum PlayerNumber_t FE_GetCurrUserID()

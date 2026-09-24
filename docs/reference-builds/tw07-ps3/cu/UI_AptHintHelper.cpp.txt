@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/Common/UI_AptHintHelper.cpp
+// compiled in: apt_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    7  0002E6DC     CC  void SendHintToAptScreen(const char* sig, unsigned int hint, void* p1, void* p2, void* p3, void* p4, void* p5)
+                         local  struct IAptSubscriber* aptSub
+                         local  struct AptScreenSubscriber* screen

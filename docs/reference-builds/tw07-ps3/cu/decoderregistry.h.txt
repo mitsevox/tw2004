@@ -1,0 +1,5 @@
+// C:/packages/rwaudiocore/2.08.01/include/rw/audio/core/decoderregistry.h
+// compiled in: decoderregistry.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  372    inline-only   struct <anon>* GetDecoderDescFromNode(const struct DecoderRegistry* this, struct <anon>* pNode)

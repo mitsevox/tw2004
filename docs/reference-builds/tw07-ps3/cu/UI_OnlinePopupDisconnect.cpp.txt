@@ -1,0 +1,25 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_OnlinePopupDisconnect.cpp
+// compiled in: apt_unity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   31  000F987C     58  void UIOnlinePopupDisconnect::UIOnlinePopupDisconnect(const struct UIOnlinePopupDisconnect* this)
+   42  00033634     6C  void UIOnlinePopupDisconnect::Init(const struct UIOnlinePopupDisconnect* this)
+   57  00070BD8    3A4  void UIOnlinePopupDisconnect::Show(const struct UIOnlinePopupDisconnect* this, enum UIDisconnectType criticalType, uint32 disconnectCode)
+                         inlines  OnlineManagerOSDK::GetInstance, OnlineManagerOSDK::SetShowingEAConnect
+  156  000481E4     2C  void UIOnlinePopupDisconnect::Hide(const struct UIOnlinePopupDisconnect* this)
+  171  00070BAC     2C  enum TAptSequenceStatus UIOnlinePopupDisconnect::WaitForSaveGameAndGameface(const struct UIOnlinePopupDisconnect* this, bool inbFirstTime, void* inData)
+  186  00070B44     68  bool UIOnlinePopupDisconnect::NeedToWait(const struct UIOnlinePopupDisconnect* this)
+  198  00076018    1BC  enum TAptSequenceStatus UIOnlinePopupDisconnect::WaitForTimeAndHide(const struct UIOnlinePopupDisconnect* this, bool inbFirstTime, void* inData)
+                         local  TI_STimeValue currentTime
+                         local  float fSecondsElapsed
+                         inlines  TI_fConvertTimeDifToSeconds, sys_time_get_timebase_frequency
+  217  00048210      4  void UIOnlinePopupDisconnect::OnHide(const struct UIOnlinePopupDisconnect* this)
+  224  00070A38    10C  void UIOnlinePopupDisconnect::OnShow(const struct UIOnlinePopupDisconnect* this)
+                         inlines  AptControllerListener::StopPortLocking
+  272  00048214     50  void UIOnlinePopupDisconnect::ShowHelpText(const struct UIOnlinePopupDisconnect* this)
+  284  00057AF4    2A4  void UIOnlinePopupDisconnect::HideAllScreens(const struct UIOnlinePopupDisconnect* this, bool Unused1, bool Unused2, bool Unused3, bool bCheckForOnline)
+                         local  struct IAptControllerListener* controllerListener
+                         local  struct AptScreenSubscriber* screen
+                         local  bool bShouldHide
+  366  000A8168    150  enum eAptHandleInput UIOnlinePopupDisconnect::HandleInput(const struct UIOnlinePopupDisconnect* this, int32 cID)
+                         inlines  OnlineManagerOSDK::GetInstance, OnlineManagerOSDK::SetTrickyPostInvite, OnlineManagerOSDK::WaitingForChallenge, UIMainMenu::SetQuitGame, cGAME_GLOBALS::SetNextGame

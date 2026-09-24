@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/Golf/TextureFX/Headers/txrsliderrule.h
+// compiled in: other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   49    inline-only   const char* TXRSliderRule::GetSliderName(const const struct TXRSliderRule* this)
+   53    inline-only   float TXRSliderRule::GetSliderValue(const struct TXRSliderRule* this)
+   55    inline-only   int32_t TXRSliderRule::GetNumPositions(const struct TXRSliderRule* this)

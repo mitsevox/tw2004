@@ -1,0 +1,577 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/animation/char.c
+// compiled in: golf2_unity.cpp
+// 120 functions, source order. line | PS3 address | size
+
+  180    inline-only   float Character_ComputeMaxVisableDistance(struct TCharacter* pCharacter)
+  184    inline-only   float Character_ComputeMaxVisableShadowDistance(struct TCharacter* pCharacter)
+  190    inline-only   mat44flt* Character_GetBoneMatrixSwapIfLefty(struct TCharacter* pCharacter, enum ReferencedBoneID boneID)
+  195    inline-only   void Character_GetBonePosSwapIfLefty(struct TCharacter* pCharacter, enum ReferencedBoneID boneID, float* pos)
+  200  001398C8     98  static void Character_DeInitSkeletons()
+  295  00139960     44  static void Character_ResetSKATags(struct TCharacter* pCharacter)
+                         local  int32 i
+  307  001399A4    108  void Character_InitSKATags(struct TCharacter* pCharacter, const struct TSkeletonAnimation* pSKA, float T0)
+                         local  int i
+                         local  uint32 id
+  327  00176204    1F4  void Character_InitBoneState(struct TCharacter* pCharacter, struct TSkeletonState* pState)
+                         local  struct TSkin* pSkin
+                         local  int i
+                         inlines  BitArray_ClearArray, BitArray_FillArray, Quat_Copy, vec_st
+  367    inline-only   float Character_GetTerrainHeightAndNormal(struct TCharacter* pCharacter, float* testPoint, vec4flt** pNormal)
+                         local  float supportingHeight
+                         local  float coveringHeight
+                         local  vec4flt supportingNormal
+                         local  vec4flt coveringNormal
+                         local  struct TGD_MaterialInfo* supportingSurface
+                         local  struct TGD_MaterialInfo* coveringSurface
+                         local  vec4flt tmpPoint
+                         local  TGD_TerrainInfo* pTID
+                         local  struct GoTemple* pTemple
+                         local  bool bIsMatFilterEnabled
+  464  00199280    354  void Character_UpdateFeetTerrainInfo(struct TCharacter* pCharacter, int32 updateNormals)
+                         local  int32 i
+                         local  int32 iCnt
+                         local  int32 iStep
+                         local  vec4flt* pNormal
+                         local  float alt
+                         inlines  Character_GetTerrainHeightAndNormal, GoTemple::EnableMaterialFiltering, vec4flt_Copy
+  511  00173C08    3D0  void Character_UpdateTestPoints(struct TCharacter* pCharacter)
+                         local  mat44flt* pMat_LToe
+                         local  mat44flt* pMat_RToe
+                         local  mat44flt* pMat_LFoot
+                         local  mat44flt* pMat_RFoot
+                         local  float rht
+                         local  float lht
+                         inlines  Character_GetBoneMatrixSwapIfLefty, Character_GetBoneMatrix_FromIndex, LLMath_AddScale, __vec_make_from_scalar, vec_madd, vec_splat
+  558    inline-only   void Character_AnimateBallInStanceMovement(struct TCharacter* pCharacter, float dt)
+                         local  const float fTotalTime
+                         local  float fTotalAnimDistance
+                         local  float fRateOfTravel
+                         local  float fStep
+  593  0015723C     B4  bool TCharacter::ShouldRenderClubs(const const struct TCharacter* this)
+                         local  enum PlayerNumber_t PlayerID
+                         local  int clubBoneID
+                         inlines  SKEL_GetBoneIDIndex
+  616    inline-only   static void sPlaceTeeInHand(enum PlayerNumber_t PlayerID)
+                         local  DynObj_sTeeMgr* pMgr
+                         local  vec3flt dummyLoc
+  633  001CAA8C    788  void Character_UpdateBallAnimation(struct TCharacter* pCharacter)
+                         local  vec4flt throwDirection
+                         local  float throwVelocity
+                         local  int32 PlayerID
+                         local  vec3flt dummyLoc
+                         inlines  Character_CheckTag, Character_GetTagTime, Character_IsTagValid, Character_ResetTag, GamePlayer::GetCharacter, GamePlayer::GetEstimatedBall, LLMath_Length3, LLMath_Subtract3, PhysicsBall_t::ClearFlag, PhysicsBall_t::SetFlag, sPlaceTeeInHand, vec4flt_Copy3, vec_madd, vec_sld, vec_sub
+  722  00139B3C    438  void Character_UpdateBlendShapeChannels(struct TCharacter* pCharacter)
+                         local  const struct TSkeleton* pSkeleton
+                         local  const struct CharModelMgrCharacterInstance* pInstance
+                         local  const char* pActorName
+                         local  const int32 numChannels
+                         local  const float* pWeights
+                         local  vec4flt textureTransform
+                         local  uint32 iGeom
+                         local  struct CharGeom* pCharGeom
+                         local  twGeom* pGeom
+                         local  uint32 iMesh
+                         local  struct CharMesh* pCharMesh
+                         local  twMesh* pMesh
+                         local  struct CharMaterial* pCharMaterial
+                         local  twMaterial* pMaterial
+                         local  const int32[8][2] animNormalChannelMap
+                         local  const struct SBlendCtrl& blendCtrl
+                         local  int32 iNormal
+                         local  const int32 iChannel
+                         local  const float fWeight
+                         local  struct TSkin* pBodySkin
+                         local  int32 iChannel
+                         local  float fWeight
+  864    inline-only   static void Character_ApplyMergedBoneScaleLengthModifiersFromSKA(struct TSkeleton* pSkeleton, struct TSkeletonState* pSKASkelState, struct TSkeletonState* pTalkySkelState)
+                         local  BitArray_t[7] mergedChange
+                         local  int iBone
+  890  00139718     A0  float Character_PredictNextFrameSKATime(struct TCharacter* pCharacter, float dt)
+                         local  struct TSKATime tmpSkaTime
+  900  001CB214    95C  void Character_UpdateAnimation(struct TCharacter* pCharacter, float dt, int32 forceUpdate)
+                         local  struct TSkeleton* pSkeleton
+                         local  int32 bSetupForShot
+                         local  BitArray_t[7] boneMaskAll
+                         local  bool bDoRightLegIk
+                         local  bool bDoLeftLegIk
+                         local  bool bLimitedCharUpdate
+                         local  bool bApplyBoneScaleLenModsFromSKABlender
+                         local  struct TSkeletonState* pSKASkelState
+                         local  int playerId
+                         inlines  BitArray_ClearBit, BitArray_FillArray, Character_AnimateBallInStanceMovement, Character_ApplyMergedBoneScaleLengthModifiersFromSKA, Character_CalculateClipPoints, LLMath_Add3, LLMath_Length3, LLMath_Scale3, LLMath_Subtract3, __vec_mul, vec4flt_Copy3, vec_ld, vec_sub
+ 1138  001572F0     34  void Character_SetSkeleton(struct TCharacter* pCharacter, struct TSkeleton* pSkeleton)
+ 1151  0017DC14     24  void Character_SetSkin(struct TCharacter* pCharacter, struct TSkin* pSkin)
+ 1168    inline-only   static void Character_SetTestPointsFeet(struct TCharacter* pCharacter)
+                         local  mat44flt* pMat_LToe
+                         local  mat44flt* pMat_RToe
+                         local  mat44flt* pMat_LFoot
+                         local  mat44flt* pMat_RFoot
+                         local  mat44flt pMat_LToeInv
+                         local  mat44flt pMat_RToeInv
+                         local  mat44flt pMat_LFootInv
+                         local  mat44flt pMat_RFootInv
+                         local  vec4flt boneToHeel
+                         local  vec4flt boneToToe
+                         local  vec4flt bonePos_LToe
+                         local  vec4flt bonePos_RToe
+                         local  vec4flt bonePos_LFoot
+                         local  vec4flt bonePos_RFoot
+ 1223  0017DB44     D0  void Character_SetPreferedPos(struct TCharacter* pCharacter)
+ 1241  001A721C    334  void Character_PlaceFeetOnGround(struct TCharacter* pCharacter)
+                         local  TGD_TerrainInfo* pTID
+                         local  float maxDepth
+                         local  float yOffset
+                         local  int32 i
+                         local  float dHeight
+                         local  float terrainNormalLength
+                         local  float h
+                         local  float supportingHeight
+                         local  float coveringHeight
+                         local  vec4flt supportingNormal
+                         local  vec4flt coveringNormal
+                         local  struct TGD_MaterialInfo* supportingSurface
+                         local  struct TGD_MaterialInfo* coveringSurface
+                         local  vec4flt*[5] pPos
+                         inlines  LLMath_Add3, LLMath_Length3, vec3flt_Scale, vec_madd, vec_sld
+ 1356  001A817C     F8  void Character_SetPosition(struct TCharacter* pCharacter, const float* pos, bool xformSkeleton)
+                         local  BitArray_t[7] boneMaskAll
+                         inlines  BitArray_FillArray, vec4flt_Copy
+ 1384  0018FA4C    168  void Character_SetOrientation(struct TCharacter* pCharacter, float yaw)
+                         local  struct TSkeleton* pSkeleton
+                         inlines  GM_IsFrontEnd, Quat_Copy, Quat_CopyToVector31, vec_ld, vec_st
+ 1409  001AA23C    218  void Character_SetOrientationVec(struct TCharacter* pCharacter, float* dir, float extraYaw)
+                         local  mat44flt mat
+                         local  float y
+                         local  float p
+                         local  float r
+                         local  float len
+                         inlines  LLMath_CrossProduct3W0, LLMath_Length3, LLMath_Scale3, __vec_cross, __vec_make_from_scalar, __vec_mul, vec_ld, vec_madd, vec_nmsub, vec_perm, vec_sld, vec_splat
+ 1435  0014D2A4     E4  void* TCharacter::operator new(size_t size)
+                         local  const char[13] __FUNCTION__
+                         local  void* ptr
+                         inlines  TagValuePair, operator+
+ 1446  0013A060     3C  void TCharacter::operator delete(void* ptr)
+ 1451  0018D738     58  struct TCharacter* Character_Create()
+                         local  struct TCharacter* pCharacter
+                         inlines  TCharacter
+ 1463  00184618    284  void TCharacter::Init(const struct TCharacter* this)
+                         local  int i
+                         inlines  Quat_Clear, vec4flt_Zero
+ 1584  0013A0A8      4  void Character_SwapFlagTexture()
+ 1628  0013D484      4  void Character_PreHoleInit()
+ 1636  001CC524     50  void Character_AlignCharacterForShotImpact(struct TCharacter* pCharacter)
+ 1648  00160494    324  void Character_SetClubRenderFlags()
+                         local  int j
+                         local  const int numGeoms
+                         local  int geomI
+                         local  struct CharGeom* charGeom
+                         local  twGeom* geom
+                         local  twHash geomHash
+                         local  const int numCullGroups
+                         local  bool isClub
+                         local  int cullI
+                         local  twCullGroup* cullGroup
+                         local  twHash cullHash
+ 1712  001607B8    138  void Character_PostInit()
+                         local  int32 ii
+                         local  int32 jj
+                         inlines  GamePlayer::GetCharacter
+ 1744  0014BBE4     70  void Character_PostHoleInit()
+                         local  int i
+                         local  struct TCharacter* pCharacter
+                         inlines  GamePlayer::GetCharacter
+ 1757  0017ECE4    154  void Character_SetupUCAP()
+                         local  enum PlayerNumber_t player
+                         local  const struct GolfModuleUCAP& ucap
+                         local  struct GolferData_t* pGolferData
+                         inlines  GamePlayer::GetGolferData
+ 1776  0013A0AC     C8  static void Character_LoadCrMAFromStream(struct TStreamData* streamPtr)
+ 1797  0013A174     38  static void Character_LoadShaderDefsFromStream(struct TStreamData* streamPtr)
+ 1806  0013A1AC     38  static void Character_LoadTintDefsFromStream(struct TStreamData* streamPtr)
+ 1817  0013A1E4     90  void Character_AssignMaterialPresetDB(struct TCharacter* pCharacter, int32 char_index)
+ 1825  0013A274    358  void Character_BindMaterialPresets(struct TCharacter* pCharacter)
+                         local  struct GameXmlSettings matPresetSettings
+                         local  struct GameXmlIter it
+ 1847  0013A5CC     A0  void Character_BindAllMaterialPresets()
+                         local  int32 i
+                         local  struct TCharacter* pCharacter
+ 1857  0018E7F8    420  void Character_InitLightingEnvironment(struct TCharacter* pCharacter, enum tInitType initType, int32 char_index)
+                         local  const char[34] __FUNCTION__
+                         local  enum Golfer_t golferIndex
+                         local  struct GolferData_t* golferData
+                         local  const char* courseName
+                         local  struct GameXmlSettings charXmlSettings
+                         inlines  GM_GetCourseName, Singleton<GolferStats>::GetSingleton, TagValuePair, operator+
+ 1912    inline-only   static void Character_CalculateClipPoints(struct TCharacter* pCharacter)
+                         local  int i
+                         local  vec4flt center
+                         local  vec4flt radius
+ 1956  001AADB8    56C  void Character_ClipTest(struct TCharacter* pCharacter, int32 PlayerID)
+                         local  float fDist
+                         local  float fDistInViewSpace
+                         local  OL_SSphere sSphereInCamSpace
+                         local  vec4flt xSpherePosInCamSpace
+                         local  mat44flt* pMat
+                         local  vec4flt tmpV
+                         local  float fDot
+                         local  float gGolferCastShadowDim
+                         inlines  Character_GetBoneMatrix, LLMath_DotProduct3, LLMath_Length3, LLMath_Subtract, OL_eTestBoundingSphere, RC_fGetRenderCtxFarZClip, RC_fGetRenderCtxHalfFieldOfViewCosY, RC_fGetRenderCtxHalfFieldOfViewSinY, RC_fGetRenderCtxNearZClip, RC_spGetCurrentRenderCtx, RC_vSetCurrentRenderCtxTransformationMatrix, vec4flt_Copy3, vec_madd, vec_sld
+ 2076  00132FC8     40  void Character_SetNewBallInStance(struct TCharacter* pCharacter, float stance, bool bAnimated)
+ 2094  00176AB4    1E8  void Character_PreRenderAllMainThread()
+                         local  struct Timing_AutoMarker charPreRenderMarker
+                         local  int i
+                         local  const struct TCharacter* pCharacter
+                         local  int32 iPlayer2Clip
+                         local  bool bPreRender
+                         local  struct RC_SRenderCtx* pRenderCtx
+                         local  bool bShowPip
+                         inlines  RC_spGetCurrentRenderCtx, Timing_AutoMarker::Timing_AutoMarker, Timing_AutoMarker::~Timing_AutoMarker
+ 2177  00184A34     28  void Character_PreRenderAll()
+ 2183  0018489C    198  void Character_PreRenderAllSlaveThread()
+                         local  struct Timing_AutoMarker charPreRenderMarker
+                         local  int i
+                         local  const struct TCharacter* pCharacter
+                         local  int32 iPlayer2Clip
+                         local  bool bPreRender
+                         inlines  CharModelMgr::SetCurrentCharacterInUse, Timing_AutoMarker::Timing_AutoMarker, Timing_AutoMarker::~Timing_AutoMarker
+ 2248  001E5058    14C  void Character_RenderAll(uint32 flags)
+                         local  int32 i
+                         local  int32 iPlayer2Clip
+                         local  int char_index
+                         inlines  GM_GetModeType
+ 2327  001E4E6C    1EC  void Character_RenderAllSpecified(uint32 flags, struct TCharacter* pSpecialChar, bool bExclude)
+                         local  int32 i
+                         local  int32 iPlayer2Clip
+                         local  int char_index
+                         inlines  CharModelMgr::SetCurrentCharacterInUse, GM_GetModeType
+ 2407  001CC404    120  void Character_UpdateAll(float dt)
+                         local  struct Timing_AutoMarker charUpdateMarker
+                         local  int32 i
+                         inlines  CharModelMgr::SetCurrentCharacterInUse, Timing_AutoMarker::Timing_AutoMarker, Timing_AutoMarker::~Timing_AutoMarker
+ 2439  001AB3D0    154  void Character_ClipTestAll()
+                         local  int32 i
+                         inlines  CharModelMgr::SetCurrentCharacterInUse, LLMath_IdentifyMat, RC_spGetCurrentRenderCtx, RC_vSetRenderCtxTransformationMatrix, vec_st
+ 2456  0013A85C     30  float Character_GetMaxPlaytime(struct TCharacter* pCharacter)
+ 2468  0018D790    118  void Character_Free(struct TCharacter* pCharacter)
+                         local  enum eMemoryPools pool
+                         inlines  ~TCharacter
+ 2511  0013A88C     14  bool Character_IsHumanGender(enum GenderT gender)
+ 2517  0013A8A0     50  struct TCharacter* Character_Add(struct TCharacter* pCharacter)
+ 2538  00175604     A8  void Character_InitIG()
+ 2573  0018EC18    180  void Character_PreStreamInit(enum tInitType initType)
+                         local  int playerID
+                         local  struct TCharacter* pCharacter
+                         local  int32 golferHandle
+                         local  const struct UserInfo& userInfo
+                         local  const struct CrAPInfo_t& crapInfo
+                         local  enum Golfer_t golferIndex
+                         local  struct GolferData_t* golferData
+                         local  struct TCharacter* pCharacter
+                         inlines  Singleton<GolferStats>::GetSingleton
+ 2607  001A9710    B2C  void Character_PostStreamInit(enum tInitType initType)
+                         local  const char[25] __FUNCTION__
+                         local  struct TCharacter*[4] pCharList
+                         local  int32 numChars
+                         local  int32 i
+                         local  int playerID
+                         local  struct TCharacter* pCharacter
+                         local  TIKInit* pIKInit
+                         local  bool bIsHuman
+                         local  int32 handed
+                         local  enum Golfer_t golferIndex
+                         local  struct GolferData_t* golferData
+                         local  struct TSkeleton* pSkeleton
+                         local  SkinMorphStateT* pMorphState
+                         local  vec4flt golferPos
+                         local  const struct CrAP_TransformModInfo_t& transformInfo
+                         inlines  BitArray_ClearArray, Character_LoadCrAPSettings, Character_SetTestPointsFeet, GolferStats::GetGolferStats, Singleton<GolferStats>::GetSingleton, TagValuePair, operator+
+ 2753  0016F8A4    110  void Character_CloseIG()
+                         local  bool dashboardAutoUpdating
+                         local  int i
+                         local  struct TCharacter* pCharacter
+ 2808  0013A92C      4  void Character_ExitHole()
+ 2813  0013E0FC     60  void Character_InitFE()
+ 2832  0013E270     7C  void Character_CloseFE()
+                         local  bool dashboardAutoUpdating
+ 2867  00169940    148  void Legacy_Character_InitModule()
+                         local  struct Allocator tempAllocator
+                         local  int32 i
+ 2898  0018D8A8     E8  void Legacy_Character_CloseModule()
+                         local  int32 i
+ 2927  0018ED98     B4  struct HashString Character_GetPreset(int32 golfer_TID)
+                         inlines  HashString::HashString, Singleton<GolferStats>::GetSingleton
+ 2936  00157324    190  void Character_SelectClub(struct TCharacter* pCharacter, int32 club)
+                         local  int32 aBoneID_clubhead
+                         local  int32 aBoneID_clubbreak
+                         local  int32 player
+ 2969  0013AA94      8  void Character_SelectShotType(struct TCharacter* pCharacter, int32 shotType)
+ 2995  001DC77C     F4  void Character_InitNewClubAndShotType(int32 PlayerID)
+                         local  struct GamePlayer* Plr_p
+                         local  struct TCharacter* pCharacter
+                         local  int32 prevShotType
+                         local  int32 prevClubType
+                         inlines  GamePlayer::GetCharacter, GamePlayer::GetCoreShotInfo
+ 3023  0013AA9C     74  void Character_SelectGameShotType(struct TCharacter* pCharacter, enum ShotType_t shot)
+ 3084  001D9754     8C  void Character_SelectGameClub(struct TCharacter* pCharacter, enum Club_t clubType)
+ 3097  0013AB10      8  void Character_SetEmotion(struct TCharacter* pCharacter, enum eSkaEmotionState Emotion)
+ 3123  0014BC54     98  void Character_AlignShotWithTarget(int32 PlayerID, bool resetPos, bool initIK, struct TCharacter* pCharacter)
+                         inlines  GamePlayer::GetCharacter
+ 3143  001AA454    3E4  static void Character_SetShotPosition(struct TCharacter* pCharacter)
+                         local  int32 tempPlayerID
+                         local  enum PlayerNumber_t PlayerID
+                         local  vec4flt dir
+                         local  vec4flt vForward
+                         local  vec4flt vWorldUp
+                         local  vec4flt vSideways
+                         local  vec4flt playerLocation
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  vec4flt lookAtPos
+                         local  struct GoTemple* pTemple
+                         local  enum TempleStateE eTempleState
+                         local  float _lenSquared
+                         local  vec4flt normal
+                         local  struct TGD_MaterialInfo* info
+                         local  float back
+                         local  float[4]* vStartPosition
+                         local  float[4]* vTargetPosition
+                         inlines  GoTemple::GetCurrentState, GoTempleEnv::GetCharLookAtOnScreen, GoTempleEnv::GetCharacterPos, GoTempleEnv::GetCharacterPosInBunker, LLMath_CrossProduct3W0, LLMath_LengthSquared3, LLMath_Scale, LLMath_Subtract, __vec_cross, __vec_mul, vec4flt_Copy, vec4flt_Copy3, vec_ld, vec_madd, vec_nmsub, vec_perm, vec_sld
+ 3262  001AA838    580  static void Character_SetupForShot(struct TCharacter* pCharacter)
+                         local  int32 resetPos
+                         local  int32 initIK
+                         local  struct TSkeleton* pSkeleton
+                         local  const char* actorName
+                         local  TIKSkeleton* pIKSkeleton
+                         local  float y
+                         local  float dy
+                         local  vec4flt dX
+                         local  vec4flt dZ
+                         local  vec4flt targetPos
+                         local  int32 iWaistID
+                         local  int32 iClubID
+                         local  vec4flt ballLocation
+                         local  mat44flt rootMtx
+                         inlines  LLMath_Add, LLMath_CopyMat44, LLMath_Scale, Quat_Copy, Quat_CopyToVector31, SKEL_GetBoneIDIndex, __vec_make_from_scalar, __vec_mul, vec4flt_Copy, vec_add, vec_ld, vec_splat, vec_st
+ 3394  0013AB18    1EC  struct GameXmlSettings Character_XmlLightSettings(const char* courseName, const char* charName)
+                         local  struct GameXmlSettings charLightingSettings
+                         local  struct GameXmlSettings charLightingSettings
+                         local  struct GameXmlCategory* charLightingNode
+                         local  struct GameXmlCategory* charNode
+                         local  struct GameXmlCategory* courseNode
+                         local  struct GameXmlCategory* courseModifier
+                         local  struct GameXmlCategory* charTable
+                         local  const char* courseCondition
+                         local  const char* charBrightness
+ 3429  0013AD04     7C  struct TCharacter* SkeletalObject_FindObject(uint32 iObjectID)
+                         local  int32 i
+ 3445  001AB324     AC  void SkeletalObject_ClipTestAll()
+                         local  int32 i
+ 3460  0013AD80     78  void Character_AskForGolferTextureBind(struct TCharacter* pCharacter)
+ 3467    inline-only   static void Character_BindMaterialsToModel(struct TCharacter* pCharacter)
+ 3486  0013ADF8     6C  void Character_Sleep(struct TCharacter* pCharacter)
+                         inlines  Character_ReleaseBlenders
+ 3495  0013A09C      C  void Character_SetSKATransitionState(struct TCharacter* pCharacter, enum CharacterAnimStateE stateID, float time)
+ 3501    inline-only   static void Character_ReleaseBlenders(struct TCharacter* pCharacter)
+ 3510  0013AE64     1C  bool Character_AreBlendersInitialized(struct TCharacter* pCharacter)
+ 3515  0017F230     70  void Character_ResetBlenders(struct TCharacter* pCharacter)
+ 3527  0017F2A0    114  void Character_PrepareForRendering(enum PlayerNumber_t whichPlayer)
+                         local  struct TCharacter* pCharacter
+                         inlines  Character_BindMaterialsToModel, GamePlayer::GetCharacter
+ 3570  0014BCEC     B8  void Character_SetGolfGloveState(enum PlayerNumber_t PlayerID)
+                         local  struct TCharacter* pCharacter
+                         local  int32 chrInstIdx
+ 3590  00173FD8    130  void Character_GetBallOnFingerPosition(struct TCharacter* pCharacter, float* pos)
+                         local  vec4flt yAxis
+                         local  mat44flt* pMat
+                         inlines  Character_GetBoneMatrixSwapIfLefty, LLMath_AddScale3, SKEL_GetBoneIDSwapIfLefty, vec4flt_Copy, vec4flt_Copy3
+ 3606  00164754    204  void Character_GetTeeInHandPositionAndRot(struct TCharacter* pCharacter, float* pos, float* rot)
+                         local  int32 iPlayerID
+                         local  mat44flt* pMat
+                         local  vec4flt vBallSize
+                         inlines  Character_GetBoneMatrixSwapIfLefty, Character_GetBoneMatrix_FromIndex, LLMath_Add3, LLMath_Scale3, vec4flt_Copy, vec_st
+ 3645  0015B764     7C  void Character_GetEndOfAnimationPosition(struct TCharacter* pCharacter, float* pos)
+                         inlines  Character_GetBonePos, SKEL_GetBoneIDIndex, vec4flt_Copy
+ 3656  0013AEC8    19C  void Character_FreeTXRInfo(struct TCharacter* pCharacter)
+                         local  struct FaceBlend* faceBlender
+ 3693  0013B064     F0  bool TCharacter::GetTXRSliderValue(const const struct TCharacter* this, const char* sliderName, const float& val)
+                         local  bool bFound
+                         local  int i
+                         local  float curVal
+ 3714  00186BDC    530  void Character_SaveTXRSettings(struct TCharacter* pCharacter, struct CrAPInfo_t* pCrapInfo)
+                         local  int32 sliderCount
+                         local  int32 texCount
+                         local  int32 i
+                         local  struct TXRFile* pTXR
+                         local  int32 j
+                         local  int32 j
+                         local  int32 j
+                         local  const char* sliderName
+                         local  uint8 sliderValue
+                         local  bool bFound
+                         local  int32 k
+                         local  const char* sliderName
+                         local  struct HashString hsSliderName
+                         local  float sliderValue
+                         local  bool bFound
+                         local  int32 k
+                         local  const char* sliderName
+                         local  struct HashString hsSliderName
+                         local  float sliderValue
+                         local  bool bFound
+                         local  int32 k
+                         inlines  HashString::HashString, HashString::operator=, operator==
+ 3826  0018710C    48C  void Character_LoadTXRSettings(struct TCharacter* pCharacter, struct CrAPInfo_t* pCrapInfo)
+                         local  bool setDefaults
+                         local  const char* txrfilename
+                         local  int faceIndex
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  struct FaceBlend* faceBlender
+                         inlines  TXUFile::GetTXRFileName
+ 3910    inline-only   static void Character_LoadCrAPSettings(struct TCharacter* pCharacter, struct CrAPInfo_t* pCrapInfo)
+                         local  bool left
+ 3933  0013B154     4C  struct TCharacter* Character_GetFlagCharacter()
+                         local  int i
+ 3956  00187B5C     C4  void* Character_ApplyIngameTuneAnimTraits(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  BitArray_t[7] setAllArray
+                         local  struct TCharacter* pCharacter
+                         inlines  BitArray_FillArray
+ 3978  0013A670    1EC  void Character_UpdateIngameTuneAnimTraits(int32 charNdx)
+                         local  int32 catId
+                         local  int32 id
+ 3995  00135B1C     7C  void Character_RegisterStreamClientsForLoadOnce()
+ 4007  0014D388     F4  void Character_InitOnce()
+                         local  const char[19] __FUNCTION__
+                         inlines  TagValuePair, operator+
+ 4032  0013B1A0     5C  void Character_CloseOnce()
+ 4090  00184214    158  bool Character_FindCloserStructureIntersect(float* ballPosition, float* unitDirection, const vec4flt& bestRayIntersect, const float& maxDistance)
+                         local  bool bRetVal
+                         local  vec4flt rayIntersect
+                         local  struct TerrainHeightInfo tInfo
+                         local  vec4flt diffVec
+                         local  float collDistance
+                         inlines  LLMath_Subtract3, TerrainHeightInfo::TerrainHeightInfo, std::sqrt, vec4flt_Copy, vec_sub
+ 4149  001A8274   149C  void Character_MoveAwayFromIntersectables(struct TCharacter* pCharacter)
+                         local  enum PlayerNumber_t PlayerID
+                         local  vec4flt vWorldUp
+                         local  vec4flt targetDir
+                         local  vec4flt vForward
+                         local  vec4flt vSideways
+                         local  vec4flt tempDir
+                         local  vec4flt playerPosition
+                         local  vec4flt ballPosition
+                         local  vec4flt directionToMove
+                         local  bool collides
+                         local  bool treeCollides
+                         local  bool bunkerWallCollides
+                         local  struct TerrainHeightInfo tInfo
+                         local  vec4flt bestRayIntersect
+                         local  vec4flt rayIntersect
+                         local  vec4flt collVec
+                         local  float collDistance
+                         local  float closestCollDistance
+                         local  int moveCount
+                         local  const int MAX_TIMES_TO_MOVE
+                         local  vec4flt savePlayerPosition
+                         local  vec4flt saveBallPosition
+                         local  float _lenSquared
+                         local  const int collision_nDir
+                         local  float[8][4] collision_directions
+                         local  float bunkerDistanceCheck
+                         local  float treeX
+                         local  float treeY
+                         local  float treeZ
+                         local  bool struct_collision
+                         local  vec4flt diffVec
+                         local  vec4flt newBallPosition
+                         local  float distMoved
+                         local  int i
+                         local  int i
+                         local  float height
+                         local  vec4flt awayPos
+                         local  struct TGD_MaterialInfo* pMaterialInfo
+                         local  int matSurf
+                         local  vec4flt tempDirectionToMove
+                         local  int i
+                         local  vec4flt tempDirectionToMove
+                         local  const struct AIFeatureNetwork* pBunkerNetwork
+                         local  vec4flt endDirPosition
+                         local  int i
+                         local  int i
+                         local  float height
+                         local  vec4flt awayPos
+                         local  struct TGD_MaterialInfo* pMaterialInfo
+                         local  int matSurf
+                         local  int j
+                         local  struct PhysicsBall_t* pBall
+                         local  vec4flt safe_ball_pos
+                         local  vec4flt safe_ball_vec
+                         local  vec4flt oldBallPosition
+                         local  int i
+                         local  const struct AIFeatureNetwork* pBunkerNetwork
+                         local  vec4flt endDirPosition
+                         local  int i
+                         inlines  AINetworkMgr, Character_GetPosition, GamePlayer::SetCloseToStructureOrTree, LLMath_Add3, LLMath_AddScale3, LLMath_CrossProduct3W0, LLMath_LengthSquared3, LLMath_Scale, LLMath_Subtract, LLMath_Subtract3, TerrainHeightInfo::TerrainHeightInfo, __vec_make_from_scalar, __vec_mul, std::sqrt, vec3flt_Add, vec3flt_Scale, vec4flt_Copy, vec4flt_Copy3, vec_ld, vec_madd, vec_nmsub, vec_perm, vec_sld, vec_splat, vec_sub
+ 4550  0013B1FC    104  static void TWChar_Skeleton_StreamCallback(struct TStreamData* spStreamData_p)
+                         local  twSkel* pSkeleton
+ 4573  0013B300     64  static void TWChar_Mesh_StreamCallback(struct TStreamData* spStreamData_p)
+ 4582  0013B364      4  static void TWChar_Definition_StreamCallback(struct TStreamData* spStreamData_p)
+ 4588  0013B368      4  static void TWChar_BoneDefinition_StreamCallback(struct TStreamData* spStreamData_p)
+ 4594  00174774    79C  static void TWChar_Tex_Rules_StreamCallback(struct TStreamData* spStreamData_p)
+                         local  struct TCharacter*[4] pCharList
+                         local  int32 numChars
+                         local  int32 TXRGender
+                         local  bool bForFrontEnd
+                         local  int32 i
+                         local  struct TCharacter* pCharacter
+                         local  int32 c
+                         local  struct TCharacter* pCharacter
+                         local  char* pData
+                         local  int numTXU
+                         local  int numTXR
+                         local  struct Allocator currentAlloc
+                         local  int i
+                         local  const char* txrName
+                         local  int32 txrIndex
+                         local  int i
+                         inlines  Allocator::GetTempAllocator, Allocator::InvalidateCurrentAllocator, Allocator::SetCurrentAllocator
+ 4708  00197240    224  static void TWChar_Slider_StreamCallback(struct TStreamData* spStreamData_p)
+                         local  char* pData
+                         local  int32 SLDgender
+                         local  struct TCharacter*[4] pCharList
+                         local  int32 numChars
+                         local  bool bForFrontEnd
+                         local  char* pStartData
+                         local  int32 i
+                         local  struct TCharacter* pCharacter
+                         local  int32 c
+ 4766  00135CA4     F8  void RegisterTWCharStreamClients()
+ 4780  00135798     F8  void RegisterTWCharStreamClientsFE()
+ 4798  0017CFB8    718  void TWChar_PostInit()
+                         local  int32 charHandle
+                         local  uint64 startTime
+                         local  uint32 i
+                         local  const struct UserInfo& userInfo
+                         local  const struct CrAPInfo_t& crapInfo
+                         local  int32 charDefSize
+                         local  uint8* pCharDef
+                         local  const struct CharacterDefinition& charDef
+                         local  const struct CharDefBlendShape* blendShapeList
+                         local  const int32 blendShapeCount
+                         local  struct <anon>[4] eyeShapeList
+                         local  int32 iBlendShape
+                         local  uint32 iEyeShape
+                         inlines  CharModelMgrCharacterInstance::SetMyPlayerIndex, TI_fConvertTimeDifToSeconds, TI_uiReadCP0Count, cGAME_GLOBALS::GetCharacterStyleShirt
+ 4915  0013B36C    394  void TWChar_BuildCrAPInfoFromCharDef(int32 playerIndex, const struct CrAPInfo_t& crapInfo, const struct CharacterDefinition& charDef)
+                         local  int32 i
+                         local  int32 assetCount
+                         local  int32 blendCount
+                         local  struct CharDefTextureBlend* pBlends
+                         local  int32 slot
+                         local  const char* assetName
+                         local  int32 assetID
+                         local  struct FE_CrAP_Asset_t* pAsset
+ 4974  0013A910     18  bool IsCrAPGolfer(int32 golferHandle)
+ 4990  0013A014     34  const twSkel* Character_GetTWSkeleton(const struct TCharacter* pCharacter)
+ 4995  0013B700     18  void Character_DisableRendering(bool disableCharacterRender)
+ 5000  0013B718     18  bool Character_IsDisableRendering()

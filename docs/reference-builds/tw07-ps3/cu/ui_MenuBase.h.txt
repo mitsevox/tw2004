@@ -1,0 +1,25 @@
+// ../../../../../TIGERCODE/Code/Golf/UI_Core/AptRuntime/Headers/ui_MenuBase.h
+// compiled in: apt_unity.cpp
+// 21 functions, source order. line | PS3 address | size
+
+   82  000FDEB4      8  int32 IMenuArrayUpdate::GetSizeofArrayStruct(const struct IMenuArrayUpdate* this)
+   85  000FDEBC     3C  void IMenuArrayUpdate::UpdateItemAndLabel(const struct IMenuArrayUpdate* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+   91  000FDEF8     3C  void IMenuArrayUpdate::UpdateItemAndLabelFlash(const struct IMenuArrayUpdate* this, struct UIMenuItemBaseDst* menuItemToUpdate, int32 index, char* inLabel)
+  135  000FDF34     3C  void UIMenuBase::Show(const struct UIMenuBase* this)
+  144    inline-only   void UIMenuBase::mMenu_UpdateNextElement_func(struct IAptSubscriber* subs)
+  144    inline-only   void UIMenuBase::mMenu_StartUpdate_func(struct IAptSubscriber* subs)
+  147  00100CB4     1C  enum AptThreadReturnValue UIMenuBase::MenuControlThread_func(struct IAptSubscriberBase* subs)
+  148  00100AFC     18  enum TAptSequenceStatus UIMenuBase::AddMenuControlThreadSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+  149  000FF8EC     18  enum TAptSequenceStatus UIMenuBase::RemoveMenuControlThreadSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+  152    inline-only   void UIMenuBase::OnShow(const struct UIMenuBase* this)
+  153  000FDFBC     4C  void UIMenuBase::OnHide(const struct UIMenuBase* this)
+  185    inline-only   void UIMenuBase::SetMaxRefCount(const struct UIMenuBase* this, int32 max)
+  187    inline-only   bool UIMenuBase::CanWeShow(const struct UIMenuBase* this)
+  226  001013CC      C  struct IExternArray* DefaultMenuArrayUpdate<UIMenuCircBase>::GetExternArray(const struct DefaultMenuArrayUpdate<UIMenuCircBase>* this)
+  226  001013E0      C  struct IExternArray* DefaultMenuArrayUpdate<UIMenuVertBase>::GetExternArray(const struct DefaultMenuArrayUpdate<UIMenuVertBase>* this)
+  227  001013F4      8  int32 DefaultMenuArrayUpdate<UIMenuVertBase>::GetSizeofArrayStruct(const struct DefaultMenuArrayUpdate<UIMenuVertBase>* this)
+  227  00101440      8  int32 DefaultMenuArrayUpdate<UIMenuCircBase>::GetSizeofArrayStruct(const struct DefaultMenuArrayUpdate<UIMenuCircBase>* this)
+  228    inline-only   void DefaultMenuArrayUpdate<UIMenuCircBase>::UpdateItemAndLabel(const struct DefaultMenuArrayUpdate<UIMenuCircBase>* this, struct UIMenuItemBaseDst* dst, struct UIMenuItemBaseSrc* src, int32 index, char* inLabel)
+  228  00101404     14  void DefaultMenuArrayUpdate<UIMenuVertBase>::UpdateItemAndLabel(const struct DefaultMenuArrayUpdate<UIMenuVertBase>* this, struct UIMenuItemBaseDst* dst, struct UIMenuItemBaseSrc* src, int32 index, char* inLabel)
+  229    inline-only   void DefaultMenuArrayUpdate<UIMenuCircBase>::UpdateItemAndLabelFlash(const struct DefaultMenuArrayUpdate<UIMenuCircBase>* this, struct UIMenuItemBaseDst* inMenuItem, int32 index, char* label)
+  229  00101420     18  void DefaultMenuArrayUpdate<UIMenuVertBase>::UpdateItemAndLabelFlash(const struct DefaultMenuArrayUpdate<UIMenuVertBase>* this, struct UIMenuItemBaseDst* inMenuItem, int32 index, char* label)

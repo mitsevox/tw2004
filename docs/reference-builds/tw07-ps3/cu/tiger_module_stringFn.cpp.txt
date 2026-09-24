@@ -1,0 +1,22 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_stringFn.cpp
+// compiled in: tiger_module_stringFn.cpp
+// 5 functions, source order. line | PS3 address | size
+
+    7  005395C4     74  int SC_PRINTF(const char* format)
+                         local  va_list argptr
+                         local  char[256] temp
+   19  00539638     AC  int VSN_PRINTF(char* buffer, size_t count, const char* format, va_list argptr)
+                         local  char[256] temp
+                         local  size_t len
+   36  005396E4     DC  int SN_PRINTF(char* buffer, size_t count, const char* format)
+                         local  va_list argptr
+                         local  char[256] temp
+                         local  size_t len
+   58  0053982C     CC  int STRICMP(const char* s1, const char* s2)
+                         local  int index
+                         local  const char p
+                         local  const char q
+                         inlines  std::tolower
+   77  005397C0     6C  char* STRLWR(char* str)
+                         local  char* str2
+                         inlines  std::tolower

@@ -1,0 +1,24 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_Practice.cpp
+// compiled in: golf_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   14  00204CA8     44  void GameModePractice::GameModePractice(const struct GameModePractice* this)
+   19  001FE390     18  void GameModePractice::~GameModePractice(const struct GameModePractice* this)
+   24  001FE414    12C  void GameModePractice::Init(const struct GameModePractice* this)
+   50  001FE540      4  void GameModePractice::Update(const struct GameModePractice* this)
+   55  001FE544      4  void GameModePractice::Shutdown(const struct GameModePractice* this)
+   60  002520A4     D0  void GameModePractice::LoadHole(const struct GameModePractice* this)
+                         local  int32 PlayerID
+                         local  enum PlayerNumber_t plr
+   80  0029612C     84  bool GameModePractice::HoleFinished(const struct GameModePractice* this, enum PlayerNumber_t PlayerID, bool predict)
+                         local  int32 i
+                         inlines  PLR_HoledOut
+   98  00327B90     88  bool GameModePractice::GameFinished(const struct GameModePractice* this, bool bPredict)
+                         local  int32 i
+                         inlines  GM_GetCurrentHoleIndex
+  112  00253C24      4  void GameModePractice::SetupNextGolfer(const struct GameModePractice* this)
+  117  00253BF8     2C  void GameModePractice::RestartHole(const struct GameModePractice* this)
+  123  002D309C     64  void GameModePractice::EndTurnEndHoleNotGame(const struct GameModePractice* this, enum PlayerNumber_t PlayerID)
+  138  0033AE24     14  void GameModePractice::FinishHole(const struct GameModePractice* this)
+  147  00253B94     64  void GameModePractice::InitCamera(const struct GameModePractice* this)
+                         local  vec4flt fadeColor

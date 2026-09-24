@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/usersendinvitecallback.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    5  005C2144      C  void UserSendInviteCallback(const struct <anon>* this)
+    9  005C215C      C  void ~UserSendInviteCallback(const struct <anon>* this)

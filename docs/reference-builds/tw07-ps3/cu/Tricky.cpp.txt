@@ -1,0 +1,21 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/codec/Tricky/src/Tricky.cpp
+// compiled in: Tricky.cpp
+// 7 functions, source order. line | PS3 address | size
+
+    0  0059E400     64  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  Tricky, ~Tricky
+   19  0059E008     88  bool Register()
+                         local  bool ret
+   27  0059E090      4  void InitializeData(const struct <anon>* this, char8_t* block_data, char8_t* shared_data)
+   35  0059E24C    1B4  void ExpandFrame(const struct <anon>* this, struct <anon>* target, struct Character* viewInfo, const struct <anon>* motion, struct Flags8* flags, float frameNum, int numEvaluatedBones, int numBlendShapes)
+                         local  const uint8_t* trickyData
+                         local  int32_t dataIdx
+                         local  int32_t boneIdx
+                         local  int32_t dataIdx
+                         local  int32_t boneIdx
+   84  0059E094    1B8  void ExpandBone(const struct <anon>* this, struct <anon>* target, struct Character* viewInfo, const struct <anon>* motion, struct <anon>* filter, float frameNum, int skeletonBoneIdx)
+                         local  const uint8_t* trickyData
+                         local  int32_t boneIdx
+                         local  int32_t boneIdx
+  122  0059E474     10  static void _GLOBAL__I__ZN2EA3CCT5Codec6TrickyE()
+  123  0059E464     10  static void _GLOBAL__D__ZN2EA3CCT5Codec6TrickyE()

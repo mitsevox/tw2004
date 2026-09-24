@@ -1,0 +1,48 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/Cup.cpp
+// compiled in: headgate_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+  119    inline-only   static float Cup_GetTerrainHeight(float x, float z)
+                         local  float h
+                         local  float supportingHeight
+                         local  float coveringHeight
+                         local  vec4flt supportingNormal
+                         local  vec4flt coveringNormal
+                         local  struct TGD_MaterialInfo* supportingSurface
+                         local  struct TGD_MaterialInfo* coveringSurface
+                         local  vec4flt pPos
+  165  00361160    858  float Cup::Move(const struct Cup* this, const float* pos)
+                         local  float fTerrainHeightAtPin
+                         local  struct ObjectData data
+                         local  struct vtxStruct* pVertsLS
+                         local  struct vtxStruct* pHoleVertsLS
+                         local  float bottomHeight
+                         local  vec4flt cupCenter
+                         local  uint32 i
+                         local  float pcnt
+                         local  float theta
+                         local  float cs
+                         local  float sn
+                         local  int bottom
+                         inlines  Cup_GetTerrainHeight, std::cos, std::sin, vec4flt_Copy, vec_ld
+  312  0036F244    2C8  void Cup::Draw(const struct Cup* this)
+                         local  bool gotCollision
+                         local  int terrainID
+                         local  vec4flt collisionPoint
+                         local  vec4flt surfaceNormal
+                         local  struct TGD_MaterialInfo* pSurfaceInfo
+                         local  TGD_ObjectInstanceInfo* pSurfaceObject
+                         local  vec4flt vCameraPos
+                         local  vec4flt vDistance
+                         local  float fDistance
+                         local  float maxDistance
+                         local  int i
+                         local  struct ObjectData* data
+                         local  int numIndices
+                         inlines  DS_vSetCullMode, Gcm::cellGcmSetCullFaceEnable, LLMath_Length3, LLMath_Subtract3, vec4flt_Copy
+  394  0036F058    1EC  void Cup::DrawHole(const struct Cup* this)
+                         local  vec4flt myVec
+                         local  struct ObjectData* data
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetColorWriteEnable, DS_vSetStencilEnable, DS_vSetStencilOp, DS_vSetStencilTest
+  431  0034D068     6C  void Cup::LoadHole(const struct Cup* this)
+  443  0034D5CC     38  void Cup::UnLoadHole(const struct Cup* this)

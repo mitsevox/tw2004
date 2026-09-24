@@ -1,0 +1,81 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/src/ChrCntl_Transition.cpp
+// compiled in: ChrCntl_Transition.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   96  005A0410    114  void ChrCntl_Transition_SetPreviousAnim(struct Character* viewInfo, const struct <anon>* transitionInfo, float frame, float startFrame)
+                         local  struct <anon>* prevInfo
+  119  005A0524     64  static struct <anon>* _ChrCntl_Transition_GetPrev(struct Character* viewInfo, int index)
+                         local  struct <anon>* prevInfo
+  143  005A0588     EC  float ChrCntl_TransitionStartFrame(struct Character* viewInfo, const struct TransitionDefinition* stateTransition, float numToFrames)
+                         local  float startFrame
+  194  005A0860     78  static void _ChrCntl_Transition_ChangeState(struct Character* viewInfo, const struct AnimNode* toStateTree, struct InstVars* toStateVars, int toStateId)
+  213  005A08D8    27C  static void _ChrCntl_Transition_ExecuteTransition(struct Character* viewInfo, const struct TransitionDefinition* stateTransition, bool override, float startFrameOverride)
+                         local  const struct AnimNode* toStateTree
+                         local  struct <anon> toStateVars
+                         local  float numToFrames
+                         local  struct <anon>* foo
+                         local  float startFrame
+                         inlines  GetAllocator, float_Min, ~InstVars, ~TVPContainer
+  266  005A0B54    100  static uint32_t _ConsiderTransitionsCB(const struct TransitionDefinition* transition, void* data)
+                         local  struct ConsiderTransitionsParams* params
+  309  005A0C54     F0  static uint32_t _GetTransitionToCB(const struct TransitionDefinition* transition, void* data)
+                         local  struct GetTransitionToParams* params
+  351  005A16DC    218  void ChrCntl_Transition_ChangeStateWithoutTransition(struct Character* viewInfo, int toStateId, bool override, float startFrame)
+                         local  struct <anon>* prevInfo
+                         local  const struct AnimNode* toStateTree
+                         local  struct <anon> toStateVars
+                         inlines  GetAllocator, ~InstVars, ~TVPContainer
+  390  005A0D44     B0  int ChrCntl_Transition_ConsiderTransitions(struct Character* viewInfo, int eventIndex)
+                         local  float wrappedFrameNum
+                         local  struct ConsiderTransitionsParams params
+                         local  int transitionIndex
+                         inlines  ConsiderTransitionsParams::ConsiderTransitionsParams
+  418  005A1668     74  const struct TransitionDefinition* ChrCntl_Transition_GetTransitionTo(struct Character* viewInfo, int toAnimState)
+                         local  struct GetTransitionToParams params
+                         local  int transitionIndex
+                         inlines  GetTransitionToParams::GetTransitionToParams
+  448  005A0DF4    130  bool ChrCntl_Transition_TransitionToState(struct Character* viewInfo, int toAnimState, bool override, float startFrame)
+                         local  float wrappedFrameNum
+                         local  const struct TransitionDefinition* pFoundTransition
+                         local  struct GetTransitionToParams params
+                         local  int transitionIndex
+                         local  struct <anon> st
+                         inlines  GetTransitionToParams::GetTransitionToParams
+  498  005A0F24     9C  void ChrCntl_Transition_TransitionToStateDynamic(struct Character* viewInfo, int toAnimState, float startFrame, const struct <anon>* info)
+                         local  struct <anon> stateTransition
+  536  005A0FC0     C8  float ChrCntl_Transition_PrevNodeFrameNum(const struct <anon>* transitionInfo, float timeOfTransition, float prevNumFrames, float frameNum)
+                         local  float frameNumA
+                         local  float nextEndFrame
+  569  005A1088     9C  float ChrCntl_Transition_numFramesTransitionDo(struct Character* viewInfo, const struct AnimNode* destination, struct InstVars* instVars, const struct <anon>* transitionInfo)
+                         local  float dest_numFrames
+                         local  float numFrames
+  599  005A1124    374  static struct Frame* _TransitionFromPrev(struct Character* viewInfo, const struct AnimNode* animTree, struct InstVars* instVars, float frameNum, float prevFrameNum, float numFrames, int flags, int prevStateId)
+                         local  struct Frame* frameRef
+                         local  struct <anon>* prevStateInfo
+                         local  struct <anon>* transitionInfo
+                         local  float frameNumDelta
+                         local  float frameNumDelta
+                         local  float frameNumAfter
+                         local  float frameNumAfter
+                         local  float interp
+                         local  float frameNumA
+                         local  float frameNumB
+                         local  struct Frame* frameRefA
+                         local  struct Frame* frameRefB
+                         local  float numFrames
+                         local  float numOldFrames
+                         local  float fractionalIncrease
+                         inlines  vec3flt_Set
+  723  005A1498    144  struct Frame* ChrCntl_Transition_EvaluateCurrentTransition(struct Character* viewInfo, const struct AnimNode* animTree, struct InstVars* instVars, float frameNum, float prevFrameNum, int flags, int prevStateId)
+                         local  struct Frame* frameRef
+                         local  float prevNumFrames
+  744  005A0674    1EC  float ChrCntl_Transition_EvaluateCurrentNumFrames(struct Character* viewInfo, const struct AnimNode* animTree, struct InstVars* instVars)
+                         local  struct <anon>* prevStateInfo
+                         local  float numFrames
+                         local  float numOldFrames
+                         local  float numRepeats
+                         local  float lengthDelta
+                         local  float fractionalIncrease
+  794  005A15DC     8C  int ChrCntl_Transition_CurrentlyTransitioning(const struct <anon>* viewInfo, int prevStateId)
+                         local  struct <anon>* prevStateInfo
+                         local  struct <anon>* transitionInfo

@@ -1,0 +1,59 @@
+orphan data: 745700 B (728.2 KB) in 176 blocks; total_data 1078863
+BLOCK classes:
+  A:    9 blocks    13628 B (  13.3 KB) =  1.26% of data bar
+  B:   60 blocks   101324 B (  98.9 KB) =  9.39% of data bar
+  C:   95 blocks   615740 B ( 601.3 KB) = 57.07% of data bar
+  S:    5 blocks    14804 B (  14.5 KB) =  1.37% of data bar
+  U:    7 blocks      204 B (   0.2 KB) =  0.02% of data bar
+BYTES by resolved owner status:
+  linked-unit        382627 B ( 373.7 KB) = 35.47% of data bar
+  unlinked-unit      286403 B ( 279.7 KB) = 26.55% of data bar
+  ambiguous           44413 B (  43.4 KB) =  4.12% of data bar
+  sdk-dataonly        14760 B (  14.4 KB) =  1.37% of data bar
+  out-of-order        10585 B (  10.3 KB) =  0.98% of data bar
+  unplaced             4128 B (   4.0 KB) =  0.38% of data bar
+  unref                2720 B (   2.7 KB) =  0.25% of data bar
+  linked-sdk             40 B (   0.0 KB) =  0.00% of data bar
+  attachable now, bss-like (define only)         367839 B ( 359.2 KB) = 34.10% of data bar
+  attachable now, initialised (needs values)      14828 B (  14.5 KB) =  1.37% of data bar
+Attachable now (owner already linked), by owner:
+  PGATourSimulation                          181760 B
+  SkinMorph                                   66120 B
+  MC_Gc                                       57296 B
+  CourseData                                  22768 B
+  hlaudemitter                                13528 B
+  GameMode5                                   11704 B
+  Code8009AA28                                10320 B
+  Replay                                       3888 B
+  hlaudvoice                                   3256 B
+  GameMode4                                    1752 B
+  GoShaderObject_PrelitUVAnimation_Gc          1416 B
+  GoGrass                                      1312 B
+  fe_stats                                      896 B
+  GameUICommands                                856 B
+  GameMode8                                     807 B
+  Skeleton                                      528 B
+  EASBStorage                                   488 B
+  GoPostFx                                      408 B
+  UKernel                                       408 B
+  GameMode14                                    372 B
+  GoLighting                                    344 B
+  uiobject                                      248 B
+  GoRenderCtx_Gc                                248 B
+  GoRenderSurface                               232 B
+  emotion                                       184 B
+  Code800BA940                                  176 B
+  GameMode12                                    168 B
+  fe_movies                                     136 B
+  GoAnimalActors                                120 B
+  PasswordManager                                96 B
+  Code8006F154                                   88 B
+  EASportsBio                                    88 B
+  GameMode11                                     88 B
+  GameRound                                      80 B
+  LLVideo                                        56 B
+  UFstPart                                       48 B
+  hlaudtrack                                     40 B
+  GameModeBattle                                 40 B
+  LLPict_Gc                                      32 B
+  GameMode15                                     32 B

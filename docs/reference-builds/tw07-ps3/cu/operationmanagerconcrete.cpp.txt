@@ -1,0 +1,26 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/operationmanagerconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   74  005E2B2C     70  void RemoveOperation(const struct OperationManagerConcrete* this, struct OperationConcrete* pOperation)
+                         local  uint32_t uIndex
+                         inlines  operator=
+  113  005F4690     58  void OperationManagerConcrete(const struct OperationManagerConcrete* this)
+                         inlines  RCPointer
+  136  005F4740     E0  void ~OperationManagerConcrete(const struct OperationManagerConcrete* this)
+                         local  uint32_t uIndex
+                         inlines  operator->, ~RCPointer
+  164  005E2B9C      4  void AbortOperation(const struct OperationManagerConcrete* this, struct Operation* pOperation)
+                         local  struct OperationConcrete* pConcrete
+  188  005D3F78    100  struct OperationConcrete* AddOperation(const struct OperationManagerConcrete* this, uint32_t uTimeout, struct OperationStrategy* pStrategy, struct MemoryStrategy* pMemStrat)
+                         local  uint32_t uExpiration
+                         local  struct OperationConcrete* pOperation
+                         local  uint32_t uIndex
+                         inlines  operator=
+  255  005F49E8    124  void ProcessOperations(const struct OperationManagerConcrete* this)
+                         local  uint32_t uIndex
+                         local  struct OperationConcrete* pOperation
+                         local  struct <anon> pRCOperation
+                         local  bool bContinue
+                         local  int32_t iDifference
+                         inlines  GetExpiration, GetStrategy, RCPointer, operator OSDK::OperationConcrete*, ~RCPointer

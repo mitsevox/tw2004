@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/packages/RNA/dev-2.0-golf/RNA/RNAX/include/RNAX/RNAGeomList.h
+// compiled in: rnaunity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   48    inline-only   int32_t GetNumGeoms(const const struct <anon>* this)
+   49    inline-only   struct GeomC* GetGeom(const const struct <anon>* this, int32_t iGeom)

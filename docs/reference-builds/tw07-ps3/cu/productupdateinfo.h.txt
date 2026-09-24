@@ -1,0 +1,22 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/././productupdateinfo.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   69    inline-only   const char8_t* GetURL(const const struct <anon>* this)
+   70    inline-only   const uint32_t GetDownloadChecksum(const const struct <anon>* this)
+   71    inline-only   const char8_t* GetPatchFileName(const const struct <anon>* this)
+   72    inline-only   const char8_t* GetUnpackedFileName(const const struct <anon>* this)
+   73    inline-only   const char8_t* GetTargetFileName(const const struct <anon>* this)
+   75    inline-only   const enum FileTypeE GetFileType(const const struct <anon>* this)
+   77    inline-only   void SetURL(const struct <anon>* this, const char8_t* pNewString)
+   78    inline-only   void SetDownloadChecksum(const struct <anon>* this, uint32_t uNewValue)
+   79    inline-only   void SetPatchFileName(const struct <anon>* this, const char8_t* pNewString)
+   80    inline-only   void SetUnpackedFileName(const struct <anon>* this, const char8_t* pNewString)
+   81    inline-only   void SetTargetFileName(const struct <anon>* this, const char8_t* pNewString)
+   83    inline-only   void SetFileType(const struct <anon>* this, enum FileTypeE eType)
+  126    inline-only   uint32_t GetNumberOfFiles(const const struct <anon>* this)
+  127    inline-only   uint32_t GetNumberOfDowloadRetries(const const struct <anon>* this)
+  128    inline-only   const struct List<OSDK::ProductUpdateInfoFile>* GetFileList(const const struct <anon>* this)
+  130    inline-only   const char8_t* GetGameDataPath(const const struct <anon>* this)
+  131    inline-only   const char8_t* GetContentInfoPath(const const struct <anon>* this)
+  133    inline-only   struct CellGameDataStatGet* GetGameDataStat(const struct ProductUpdateInfo* this)

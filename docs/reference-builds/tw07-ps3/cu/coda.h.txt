@@ -1,0 +1,8 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/extern/coda/include/coda.h
+// compiled in: eaxadecf.cpp, lbmpeg_layer3.cpp, mtdecf.cpp
+// 3 functions, source order. line | PS3 address | size
+
+  271  006E8EC4     20  void CEAXABLKDecf(const struct <anon>* this)
+  813  006F3A28     2C  void CMTBLKDecf(const struct <anon>* this)
+ 1106    inline-only   unsigned int CMpegBase::GetBits(const struct CMpegBase* this, int n)
+                         local  const unsigned int bits

@@ -1,0 +1,15 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/UByteSwap.c
+// compiled in: Legacy_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   20  0037A598    5E0  void BYTESWAP_SWAPDATA(char** pSrc, char* pDest, int32 nBytes, int32 elmSize)
+                         local  int32 noSwap
+                         local  int32 cnt
+                         local  char c0
+                         local  char c1
+                         local  char c2
+                         local  char c3
+                         local  char c4
+                         local  char c5
+                         local  char c6
+                         local  char c7

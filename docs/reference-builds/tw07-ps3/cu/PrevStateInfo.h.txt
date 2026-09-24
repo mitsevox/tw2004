@@ -1,0 +1,5 @@
+// ../ears_rt_cct/dev/api/ears_rt_cct/Internal/PrevStateInfo.h
+// compiled in: PrevStateInfo.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   35  0059D9D4     3C  void PrevStateInfo(const struct <anon>* this)

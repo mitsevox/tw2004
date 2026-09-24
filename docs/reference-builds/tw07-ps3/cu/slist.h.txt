@@ -1,0 +1,24 @@
+// C:/packages/rwmovie/1.04.01/include/rwmovie/private/slist.h
+// compiled in: slist.cpp, snode.cpp
+// 19 functions, source order. line | PS3 address | size
+
+   45  00704500     34  void ~SNode(const struct <anon>* this)
+                         inlines  ~IListNode
+   69  00704534      8  struct IListNode* GetNext(const const struct <anon>* this)
+   75  0070453C      8  void SetNext(const struct <anon>* this, struct IListNode* node)
+   80  00704544     24  struct <anon> GetMemoryResource(const struct <anon>* this)
+  124  00704074      8  void SetAllocator(const struct <anon>* this, struct IResourceAllocator* allocator)
+  130  0070407C      8  struct IResourceAllocator* GetAllocator(const const struct <anon>* this)
+  136  00704084      8  void SetElementSize(const struct <anon>* this, unsigned int dataSize)
+  142  0070408C      8  unsigned int GetElementSize(const const struct <anon>* this)
+  148  00704094      8  void SetElementAlignment(const struct <anon>* this, unsigned int dataAlign)
+  154  0070409C      8  unsigned int GetElementAlignment(const const struct <anon>* this)
+  161  007040A4      4  void SetAllocHint(const struct <anon>* this, unsigned int )
+  166  007040A8      8  unsigned int GetAllocHint(const const struct <anon>* this)
+  173  007040B0      4  void LockMemory(const struct <anon>* this, unsigned int maxNodes)
+  179  007040B4      4  void UnlockMemory(const struct <anon>* this)
+  185  007040B8      8  void SetDebugChannel(const struct <anon>* this, struct <anon>* channel)
+  191  007040C0      8  struct <anon>* GetDebugChannel(const const struct <anon>* this)
+  200  007040C8      8  struct IListNode* GetHead(const const struct <anon>* this)
+  206  007040D0      8  struct IListNode* GetTail(const const struct <anon>* this)
+  228  007040D8      8  unsigned int GetLength(const const struct <anon>* this)

@@ -1,0 +1,17 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/garbagecollectorconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   75  005CA494     70  void CreateInstance()
+                         inlines  operator new
+  100  005B38E4      C  struct <anon>* GetInstance()
+  130  005CA504     74  void DestroyInstance()
+                         inlines  operator delete
+  205  005D5420     40  struct Base* AddIfUnowned(const struct <anon>* this, struct Base* pObject)
+                         inlines  SetOwnedByGarbageCollector
+  242  005B38F0     A4  void Remove(const struct <anon>* this, const struct Base* pObject)
+                         local  uint32_t uIndex
+                         inlines  ClearOwnedByGarbageCollector
+  290  005B6188     B4  void Collect(const struct <anon>* this)
+                         local  uint32_t m_uIndex
+                         local  struct Base* pCurObject

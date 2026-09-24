@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/SitDev/Headers/Shared/SitDevAction.h
+// compiled in: golf2_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   40    inline-only   uint8 Engine_Action::getType(const struct Engine_Action* this)
+   43    inline-only   uint8 Engine_Action::getHasAudioIDs(const struct Engine_Action* this)

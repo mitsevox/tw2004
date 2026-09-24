@@ -1,0 +1,40 @@
+// ../ears_common/dev/include/ears_common/HashTable.h
+// compiled in: ChrCntl_Character.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   48    inline-only   uint32_t Equal(const const uint32_t& a, const const uint32_t& b)
+   98    inline-only   uint32_t Hash(uint32_t hash)
+  170    inline-only   void Clear(const struct <anon>* this)
+                         local  struct EntryBlock* pBlock
+                         local  uint32_t i
+                         local  struct Entry* pEntry
+                         local  struct Entry* pNext
+                         local  struct EntryBlock* pNext
+  209    inline-only   enum AddResult Add(const struct <anon>* this, const const uint32_t& key, const const struct <anon>& obj)
+                         local  enum AddResult retVal
+  244    inline-only   enum RemoveResult Remove(const struct <anon>* this, const const uint32_t& key)
+                         local  enum RemoveResult retVal
+                         local  uint32_t binIdx
+                         local  struct Entry* pEntry
+                         local  struct Entry* pPrevEntry
+  275    inline-only   struct <anon>* Lookup(const const struct <anon>* this, const const uint32_t& key)
+                         local  struct Entry* entry
+  306    inline-only   uint32_t Size(const const struct <anon>* this)
+  432    inline-only   struct Entry* CreateEntry(const struct <anon>* this, const const uint32_t& key, const const struct <anon>& obj, uint32_t bin)
+                         local  struct Entry* pEntry
+  450    inline-only   struct Entry* FindEntry(const const struct <anon>* this, const const uint32_t& key)
+                         local  uint32_t bin
+                         local  struct Entry* entry
+  459    inline-only   struct Entry* NewEntry(const struct <anon>* this)
+                         local  struct Entry* pEntry
+                         local  struct EntryBlock* pBlock
+                         local  uint32_t i
+  484    inline-only   void FreeEntry(const struct <anon>* this, struct Entry* pEntry)
+  491    inline-only   void Grow(const struct <anon>* this)
+                         local  uint32_t newSize
+                         local  struct Entry** newBins
+                         local  struct Entry* entry
+                         local  struct Entry* nextEntry
+                         local  uint32_t newBin
+                         local  uint32_t i
+  521    inline-only   uint32_t GetBin(const const struct <anon>* this, const const uint32_t& key)

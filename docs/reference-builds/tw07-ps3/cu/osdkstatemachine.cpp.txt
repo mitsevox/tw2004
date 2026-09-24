@@ -1,0 +1,79 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/osdkstatemachine.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 25 functions, source order. line | PS3 address | size
+
+  110  005E3284     AC  void OsdkStateMachine(const struct OsdkStateMachine* this)
+                         inlines  Observable
+  142  006197E8     50  void ~OsdkStateMachine(const struct OsdkStateMachine* this)
+                         inlines  operator delete, ~Observable
+  168  00618EA0    948  void SetOsdkState(const struct OsdkStateMachine* this, enum OsdkState eNewState)
+                         local  enum OsdkState eOldState
+                         local  uint32_t uNumElements
+                         local  struct OsdkStateChangeObserver** pList
+                         local  uint32_t uNumElements
+                         local  struct OsdkStateChangeObserver** pList
+                         local  const char* pszName
+                         local  char8_t[64] strServerName
+                         local  int port
+                         local  char* persona
+                         local  char* serviceID
+                         inlines  GetMaxNumberOfObservers, GetObserverList, Instance, cOsdkBase, operator new
+  330  005E8AC8     54  void ModulesDisconnected(const struct <anon>* this)
+                         inlines  RCPointer
+  355  0060B980    388  void StartupModules(const struct <anon>* this)
+                         local  const struct CoreGameParameters* pCoreParameters
+                         local  struct MemoryStrategy* pMemory
+                         local  uint32_t uLoop
+                         inlines  InsertElement, List, operator new, operator->, operator=
+  422  005E3D2C    168  void ~ModulesDisconnected(const struct <anon>* this)
+                         inlines  operator delete, operator=, ~RCPointer
+  452  005E86F8     4C  void ModulesConnectedToIsp(const struct <anon>* this)
+                         inlines  RCPointer
+  476  005E82C0    220  void StartupModules(const struct <anon>* this)
+                         inlines  MarketplaceConcrete, operator new, operator=
+  516  005CC6F8    110  void CreateLobbyApi(const struct <anon>* this)
+                         local  const struct CoreGameParameters* pCoreParameters
+                         local  const char8_t* pPlatform
+                         local  int32_t iErr
+                         local  char8_t[256] strKey
+  588  005BCA04      4  void LobbyApiPrintCallback(void* , const char8_t* )
+  611  005E3E94    144  void ~ModulesConnectedToIsp(const struct <anon>* this)
+                         inlines  operator delete, operator=, ~RCPointer
+  646  005E321C     34  void ModulesConnectedToLobby(const struct <anon>* this)
+  670  005BC9B8     4C  void StartupModules(const struct <anon>* this)
+  697  005E3FD8     84  void ~ModulesConnectedToLobby(const struct <anon>* this)
+                         inlines  GetInstance
+  722  005E31B4     34  void ModulesSuspended(const struct <anon>* this)
+  746  005CECDC     FC  void StartupModules(const struct <anon>* this)
+                         local  const struct CoreGameParameters* pCoreParameters
+                         local  LobbyApiRefT* pLobbyApi
+                         local  const char8_t* strPartition
+                         local  const char8_t* strRelease
+                         local  int32_t iRefMemGroup
+                         local  const char8_t* pTitleId
+  788  005E416C     4C  void ~ModulesSuspended(const struct <anon>* this)
+  815  005E8A08     60  void ModulesUnsuspending(const struct <anon>* this)
+                         inlines  RCPointer
+  839  006188DC    5C4  void StartupModules(const struct <anon>* this)
+                         local  uint32_t uMaximumExtensions
+                         local  struct <anon>* pFacade
+                         local  const struct DictionaryConcrete* pServerConfig
+                         local  char8_t[64] strLoginKey
+                         local  uint32_t uLast
+                         inlines  AddObserver, GetInstance, GetServerConfiguration, operator=
+  903  005EE3CC    27C  void ~ModulesUnsuspending(const struct <anon>* this)
+                         inlines  GetInstance, RemoveObserver, operator=, ~RCPointer
+  951  005E7ED4     4C  void ModulesFrontEnd(const struct <anon>* this)
+                         inlines  RCPointer
+  975  00617828    30C  void StartupModules(const struct <anon>* this)
+                         local  struct <anon>* pFacade
+                         local  LobbyApiRefT* pLobbyApi
+                         local  HLBApiRefT* pBuddyApi
+                         local  ConnApiRefT* pConnApi
+                         inlines  GetBuddyApi, GetInstance, GetLobbyApi, GetLocalUserConcrete, operator=
+ 1021  005BCA44    150  void ~ModulesFrontEnd(const struct <anon>* this)
+                         inlines  operator=, ~RCPointer
+ 1058  005CAE44     B0  void* DirtyMemAlloc(int32_t iSize, int32_t iMemModule, int32_t iMemGroup)
+                         local  struct MemoryStrategy* pMemory
+ 1123  005CAEF4     A8  void DirtyMemFree(void* pMem, int32_t iMemModule, int32_t iMemGroup)
+                         local  struct MemoryStrategy* pMemory

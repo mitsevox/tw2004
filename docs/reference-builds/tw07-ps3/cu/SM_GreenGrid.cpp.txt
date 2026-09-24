@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_GreenGrid.cpp
+// compiled in: shader_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   36  0051B724     2C  void SM_GreenGridClass::SM_GreenGridClass(const struct SM_GreenGridClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base
+   44  0050923C     C8  void SM_GreenGridClass::Load(const struct SM_GreenGridClass* this)
+   56  00509304     5C  void SM_GreenGridClass::Activate(const struct SM_GreenGridClass* this)
+   64  0051223C     78  void SM_GreenGridClass::SetAnimation(const struct SM_GreenGridClass* this, const float speedU, const float speedV, const float time)
+   75  005122B4     64  void SM_GreenGridClass::SetColorTexture(const struct SM_GreenGridClass* this, TextureRef textureref)

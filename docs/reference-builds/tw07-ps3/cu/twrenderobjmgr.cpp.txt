@@ -1,0 +1,29 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/RenderObjects/twrenderobjmgr.cpp
+// compiled in: rnaunity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+  123  004D4C48    144  void AddRenderObj(const struct <anon>* this, struct BaseRenderObj* renderObj, enum RenderBinType renderbin)
+                         inlines  insert, push_back
+  144  004D018C     F4  void RemoveRenderObj(const struct <anon>* this, struct BaseRenderObj* renderObj, enum RenderBinType renderbin)
+                         local  struct <anon> itr
+                         inlines  begin, end, erase, operator++
+  173  004D0280    12C  void ProcessObjects(const struct <anon>* this, struct DeviceC* device, double_t timeStamp)
+                         local  int32_t iBin
+                         local  uint32_t iObj
+                         local  struct BaseRenderObj* renderObj
+                         inlines  size
+  190  004CE990     20  bool TwRenderObj::DistCompareFunc(const const BaseRenderObjPtr& a, const const BaseRenderObjPtr& b)
+  206  004D5338     60  void SortFrontToBack(const struct <anon>* this, enum RenderBinType renderbin)
+                         inlines  begin, end, std::sort<std::_Vector_iterator<TwRenderObj::BaseRenderObj*, std::allocator<TwRenderObj::BaseRenderObj*> >, bool (*)(TwRenderObj::BaseRenderObj* const&, TwRenderObj::BaseRenderObj* const&)>
+  221  004D03AC    174  void ClearBins(const struct <anon>* this)
+                         local  int32_t iBin
+                         local  uint32_t iObj
+                         local  struct BaseRenderObj* renderObj
+                         inlines  clear, deallocate, size
+  250  004CE688    148  void RenderObjects(const struct <anon>* this, struct DeviceC* device, enum RenderBinType renderbin, double_t timeStamp)
+                         local  uint32_t iObj
+                         local  struct BaseRenderObj* renderObj
+                         inlines  IsFlagSet, size
+  277  004E2FC4      C  void UpdateViewFrustum(const struct <anon>* this, RNAMatrix44& viewProjMatrix)
+  293  004D4A78     A8  void CreateInstance()
+  314  004D11FC     8C  void DestroyInstance()

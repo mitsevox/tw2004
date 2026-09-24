@@ -1,0 +1,295 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameModeDriver_Era.cpp
+// compiled in: golf_unity.cpp
+// 87 functions, source order. line | PS3 address | size
+
+  119  002567C4     84  void GameModeDriverEra::GameModeDriverEra(const struct GameModeDriverEra* this)
+  145  0020729C     18  void GameModeDriverEra::~GameModeDriverEra(const struct GameModeDriverEra* this)
+  153  00205EEC      8  void GameModeDriverEra::SetEraMode(const struct GameModeDriverEra* this, enum ERA_EventModeType_e modeType)
+  161  00205EE4      8  enum ERA_EventModeType_e GameModeDriverEra::GetEraMode(const struct GameModeDriverEra* this)
+  169  00207318     B4  void GameModeDriverEra::RegisterStreamClients()
+  198  002073CC     6C  void GameModeDriverEra::UnregisterStreamClients()
+  210  00207438     1C  bool GameModeDriverEra::QueryInterface(const struct GameModeDriverEra* this, enum GM_DriverType_t typeID, const void*& ptr)
+                         local  bool bRet
+  225  00207454     70  enum UIScoreCardDispMode_t GameModeDriverEra::GetScoreDisplayMode(const struct GameModeDriverEra* this, bool getAlternate)
+                         local  enum UIScoreCardDispMode_t ret
+                         local  struct GameModeBase* mode
+  239  001F5AB8     74  const struct Era_MainData_t* GameModeDriverEra::GetEvent(const struct GameModeDriverEra* this, int32 nIndex)
+  249  00207540    13C  const struct EventData_t* GameModeDriverEra::GetEventsLastScenario(const struct GameModeDriverEra* this, int32 eventIndex)
+                         local  const struct Era_MainData_t* pMainData
+                         local  const struct EventData_t* pData
+                         local  const struct EventData_t* pDataLast
+                         local  int32 i
+  266  002074C4     7C  const struct EventData_t* GameModeDriverEra::GetScenario(const struct GameModeDriverEra* this, int32 nIndex)
+  279  0020767C     7C  const struct Rival_Tournament_events_t* GameModeDriverEra::GetTournament(const struct GameModeDriverEra* this, int32 nIndex)
+  292  002076F8     74  struct Era_HistoricalStats_t* GameModeDriverEra::GetHistoricStat(int32 nIndex)
+  305  0020776C      8  void GameModeDriverEra::SelectEvent(const struct GameModeDriverEra* this, int32 eventID)
+  313  00207774     1C  int32 GameModeDriverEra::GetNumHistoricStats()
+  321  00207790     64  bool GameModeDriverEra::GetDefaultUnlockedEvent(int32 eventID)
+  342  002077F4    340  int32 GameModeDriverEra::HolesInEvent(int32 nEventNum)
+                         local  int32 numHoles
+                         local  const struct Era_MainData_t* pMainData
+                         local  int32 nIndex
+                         local  const struct EventData_t* pData
+                         local  uint32 nLocalIndex
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         local  int32 nLocalIndex
+                         local  const struct Rival_Tournament_events_t* pData
+  451  00207B34     C0  int GameModeDriverEra::CountTotalHolesInEra(const struct GameModeDriverEra* this, enum ERA_Type_e eraToCount)
+                         local  int totalholes
+                         local  int32 i
+                         local  const struct Era_MainData_t* pMainData
+  470  00207C30     EC  int GameModeDriverEra::CountEraChallengesWon(const struct GameModeDriverEra* this, enum ERA_Type_e targetEra)
+                         local  int totalchallengewins
+                         local  int32 i
+                         local  const struct Era_MainData_t* pMainData
+  491  00207D50    128  bool GameModeDriverEra::AllEraBoardChallengesWon(const struct GameModeDriverEra* this, enum ERA_Type_e targetEra)
+                         local  bool allchallengeswon
+                         local  int32 i
+                         local  const struct Era_MainData_t* pMainData
+  516  00331CFC    4AC  void GameModeDriverEra::StartEvent(const struct GameModeDriverEra* this)
+                         local  const struct Era_MainData_t* pMainData
+                         local  int32 shotTypeBitFlag
+                         local  const struct Rival_Tournament_events_t* pData
+                         local  int32 clubAvailable
+                         local  const struct EventData_t* pData
+                         inlines  GM_SelectHoleSet, GameModeDriverEra::ClearCutsceneTriggeredForEvent, GamePlayerManager::SetPlayerCount, Singleton<GameManager>::GetSingleton
+  642  002CD614    74C  void GameModeDriverEra::SetupCourseAndHoleSelection(const struct GameModeDriverEra* this, const struct EventData_t* pData, int startScenarioIndex)
+                         local  int32 nIndex
+                         local  int32 nHole
+                         local  bool grouped
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         inlines  GM_SelectSingleHole
+  769  003315C8    734  void GameModeDriverEra::PrepareForTeeOff(const struct GameModeDriverEra* this, const struct EventData_t* pData)
+                         local  int32 i
+                         local  int32 userID
+                         local  enum BoastChallengeTypes_e boastType
+                         local  bool midGroup
+                         inlines  GM_GetCurrentHoleIndex, GM_SetPlayerHoleStrokes, GM_SetTargetCup, GamePlayerManager::SetPlayerCount, cGAME_GLOBALS::GetCharacterStyleShirt, cGAME_GLOBALS::SetCharacterStyleShirt, cGAME_GLOBALS::SetTimeOfDaySet
+  937  00207E78     DC  void GameModeDriverEra::ScenarioMarkerActor(const struct GameModeDriverEra* this, TBasicParamPtr pData)
+                         local  TScenarioMarkerParam* pParam
+                         local  int32 zerobasedID
+  954  002CF028    138  void GameModeDriverEra::PrepareForTournamentTeeOff(const struct GameModeDriverEra* this, const struct Rival_Tournament_events_t* pData)
+                         local  struct GamePlayer* pPlayer
+                         local  enum PlayerNumber_t userID
+                         local  GM_Pga_StatCounts* pStatCounts
+                         local  int32 tour_num
+                         local  enum BoastChallengeTypes_e boastType
+                         local  uint32_t curRound
+                         inlines  GM_SelectHoleSet
+ 1001  002CEE20    208  void GameModeDriverEra::SetTournament(const struct GameModeDriverEra* this, const struct Rival_Tournament_events_t* pData)
+                         local  enum PlayerNumber_t userID
+                         local  int32 h
+                         inlines  GM_GetCurrentRound, GM_SetCurrentCourse, GM_SetTargetCup, cGAME_GLOBALS::SetSeasonOptionSet
+ 1072  00330A68    B60  void GameModeDriverEra::SetupInitialRoundScore(const struct GameModeDriverEra* this, const struct EventData_t* pData)
+                         local  int32 diff
+                         local  int32 holeindex
+                         local  int32 totalpar
+                         local  int32 totalscore
+                         local  uint32 i
+                         local  uint32 j
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_SetPlayerHoleStrokes, GamePlayer::GetGolferScore
+ 1262  00207F90     9C  bool GameModeDriverEra::CanPlayEvent(const struct GameModeDriverEra* this, int32 eventID)
+                         local  const struct Era_MainData_t* pMainData
+ 1278  00248780     C0  void GameModeDriverEra::EndGame(const struct GameModeDriverEra* this)
+                         local  const struct Era_MainData_t* pMainData
+ 1297  002AB95C     C8  void GameModeDriverEra::QuitGame(const struct GameModeDriverEra* this)
+ 1319  0020802C     14  int GameModeDriverEra::NumActualPlayingGolfers(const const struct GameModeDriverEra* this)
+ 1324  00332A00    21C  void GameModeDriverEra::EndCurrentEvent(const struct GameModeDriverEra* this)
+                         local  int32 i
+                         inlines  GM_GetModeType, GM_GetPlayerHoleStrokes
+ 1364  00332904     7C  bool GameModeDriverEra::CheckEventWon(const struct GameModeDriverEra* this)
+                         local  const struct Era_MainData_t* pMainData
+ 1379  003321A8    75C  bool GameModeDriverEra::ScenarioWon(const struct GameModeDriverEra* this)
+                         local  bool bRet
+                         local  const struct EventData_t* pData
+                         local  enum GM_PNScoringType_t winScoreType
+                         local  int32 winScore
+                         local  int32 roundScore
+                         local  int32 roundPar
+                         local  int32 numHoles
+                         local  int32 timeTaken
+                         local  int32 modepoints
+                         local  int32 plr2modepoints
+                         local  int32 i
+                         local  int32 strokesAfterHit
+                         local  int32 par
+                         local  bool beatAllPlayers
+                         local  int32 i
+                         local  int32 opponentScore
+                         local  bool mostskins
+                         local  int32 j
+                         local  bool beatAllPlayers
+                         local  int32 i
+                         local  int32 opponentScore
+                         local  bool beatAllPlayers
+                         local  int32 opponentScore
+                         inlines  GM_GetCurrentHoleIndex, GM_GetModeType, GM_GetPlayerHoleStrokes
+ 1718  00248840     78  bool GameModeDriverEra::CheckCurrentEventActorPosition(const struct GameModeDriverEra* this)
+                         local  const struct Era_MainData_t* pMainData
+                         local  const struct EventData_t* pData
+ 1732  002488B8     90  bool GameModeDriverEra::IsCurrentEventScoreFake(const struct GameModeDriverEra* this)
+                         local  const struct Era_MainData_t* pMainData
+                         local  const struct EventData_t* pData
+ 1759  0024FFA0    604  void GameModeDriverEra::PostHoleLoadInit(const struct GameModeDriverEra* this)
+                         local  const struct Era_MainData_t* pMainData
+                         local  const struct EventData_t* pData
+                         local  int32 nScenarioNum
+                         local  vec4flt markerLocation
+                         local  bool bFound
+                         local  uint8_t plrCount
+                         local  int32 i
+                         local  uint8_t plr
+                         inlines  PhysicsBall_t::SetFlag, vec4flt_Copy
+ 1861  00249038     8C  void GameModeDriverEra::PostHoleBallLocationAdjustment(const struct GameModeDriverEra* this)
+                         local  uint8_t plrCount
+                         local  uint8_t plr
+ 1872  00207BF4     3C  bool GameModeDriverEra::IsChallengeEvent(const struct GameModeDriverEra* this, int32 eventID)
+                         local  const struct Era_MainData_t* pMainData
+ 1886  00207D1C     34  bool GameModeDriverEra::IsChallengeBoardEvent(const struct GameModeDriverEra* this, int32 eventID)
+                         local  const struct Era_MainData_t* pMainData
+ 1904  00208040     50  bool GameModeDriverEra::IsConditionalEvent(const struct GameModeDriverEra* this, int32 eventID)
+                         local  const struct Era_MainData_t* pMainData
+ 1918  00207F54     3C  bool GameModeDriverEra::IsStoryMessage(const struct GameModeDriverEra* this, int32 eventID)
+                         local  const struct Era_MainData_t* pMainData
+ 1932  0024BC4C     D8  bool GameModeDriverEra::CanPlayChallengeEvent(const struct GameModeDriverEra* this, int32 eventID)
+                         local  const struct Era_MainData_t* pMainData
+ 1948  00332980     80  int32 GameModeDriverEra::GetDevPointsPurseForBracket(const struct GameModeDriverEra* this, enum PlayerNumber_t userID)
+                         local  const struct Era_MainData_t* pMainData
+                         local  const struct EventData_t* pData
+ 1964  00248948     98  int32 GameModeDriverEra::GetDevPointAssignment(const struct GameModeDriverEra* this, enum PlayerNumber_t userID)
+                         local  const struct Era_MainData_t* pMainData
+                         local  const struct EventData_t* pData
+ 1995  002D59B0    4CC  void GameModeDriverEra::SelectedEventWon(const struct GameModeDriverEra* this)
+                         local  bool unlockEvent
+                         local  const struct Era_MainData_t* pMainData
+                         local  int32 i
+                         local  int32 i
+                         local  int32 i
+                         local  const struct Era_MainData_t* pMainData
+                         local  const struct EventData_t* pData
+                         local  int index
+                         local  int points
+                         inlines  GeneralUserData::GetDevPoints, UserInfo::GetDevPoints, UserInfo::SetDevPoints
+ 2159  0027A854    138  void GameModeDriverEra::CheckAllEraConditions(const struct GameModeDriverEra* this)
+                         local  int32 i
+                         local  const struct Era_MainData_t* pMainData
+ 2183  0027A2FC    558  bool GameModeDriverEra::CheckConditionalUnlocks(const struct GameModeDriverEra* this, int conditional, enum ERA_Type_e targetEra)
+                         local  bool winCondition
+                         local  int wincount
+                         local  int wincount
+                         local  int wincount
+                         local  int wincount
+ 2356  0025FE1C     C4  bool GameModeDriverEra::CheckEraAdvancement(const struct GameModeDriverEra* this)
+                         local  const struct Era_MainData_t* pMainData
+                         local  const enum ERA_Type_e newEra
+                         inlines  cGAME_GLOBALS::SetDemoMode, cGAME_GLOBALS::SetNextGame
+ 2382  00332C1C     6C  bool GameModeDriverEra::IsFirstHoleInEvent(const const struct GameModeDriverEra* this)
+                         inlines  GM_GetCurrentHoleIndex, GM_GetNumSelectedHoles
+ 2388  00332C88     C8  bool GameModeDriverEra::IsBeforePlayersFirstPutt(const const struct GameModeDriverEra* this, enum PlayerNumber_t PlayerID)
+                         local  bool bIsOnGreen
+                         local  bool bIsPlayersFirstPutt
+                         inlines  GM_GetCurrentHoleIndex
+ 2400  0020809C     8C  bool GameModeDriverEra::IsPlayingTiger(const const struct GameModeDriverEra* this)
+ 2405  00332D50     CC  bool GameModeDriverEra::OpponentBeatsPlayer(const const struct GameModeDriverEra* this)
+                         local  bool bOpponentWins
+                         local  int nStrokesPlayer
+                         local  int nStrokesOpponent
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes
+ 2419  00208128      8  bool GameModeDriverEra::HasPlayedCutsceneBefore(const const struct GameModeDriverEra* this, int cutsceneNum)
+ 2428  002D5E7C     BC  void GameModeDriverEra::HandleEvent(const struct GameModeDriverEra* this, enum PlayerNumber_t PlayerID, enum EVENTID_e eventID)
+                         inlines  PhysicsBall_t::ClearFlag
+ 2486  00208130      8  bool GameModeDriverEra::CheckCharNodeFlag(const struct GameModeDriverEra* this, uint16 flags)
+ 2494  0027A98C    1D0  bool GameModeDriverEra::CheckForSkipClubHouseEvents(const struct GameModeDriverEra* this)
+                         local  int32 i
+                         local  const struct Era_MainData_t* pMainData
+ 2526  00244330      8  void GameModeDriverEra::LoadERADfromStream(struct TStreamData* pStreamData)
+ 2532  00241C98    15C  void GameModeDriverEra::Locale_DriverEra_LoadERADFromStream(struct TStreamData* pStreamData)
+                         local  const char[36] __FUNCTION__
+                         local  void* dataPtr
+                         local  uint32 size
+                         local  void* pData
+                         inlines  TagValuePair, operator+
+ 2556  00241DF8    164  void GameModeDriverEra::LoadERAMfromStream(struct TStreamData* pStreamData)
+                         local  const char[19] __FUNCTION__
+                         local  void* dataPtr
+                         local  uint32 size
+                         local  void* pData
+                         inlines  TagValuePair, operator+
+ 2581  00241F5C    164  void GameModeDriverEra::LoadERSkfromStream(struct TStreamData* pStreamData)
+                         local  const char[19] __FUNCTION__
+                         local  void* dataPtr
+                         local  uint32 size
+                         local  void* pData
+                         inlines  TagValuePair, operator+
+ 2606  002420C0    158  void GameModeDriverEra::LoadERASfromStream(struct TStreamData* pStreamData)
+                         local  const char[19] __FUNCTION__
+                         local  void* dataPtr
+                         local  uint32 size
+                         local  void* pData
+                         inlines  TagValuePair, operator+
+ 2632  00244328      8  void GameModeDriverEra::LoadERAnFromStream(struct TStreamData* pStreamData)
+ 2640  00242218    138  void GameModeDriverEra::Locale_DriverEra_LoadERAnFromStream(struct TStreamData* pStreamData)
+                         local  const char[36] __FUNCTION__
+                         local  char* pStrTable
+                         local  uint32 datasize
+                         inlines  TagValuePair, operator+
+ 2660  00208138     20  char* GameModeDriverEra::GetStringTable(const struct GameModeDriverEra* this, int32 nIndex)
+ 2665  00208158     38  char* GameModeDriverEra::GetEventName(const struct GameModeDriverEra* this, int32 eventID)
+ 2673  00208190      4  void GM_EraMode_GenerateNewWorldRanking(struct EraMode_WorldRankingList* pEraData, int userRanking)
+ 2692  00208194     28  void GM_EraMode_ClearWorldRanking(struct EraMode_WorldRankingList* pEraData)
+                         local  int i
+ 2704  00208580     70  void GM_EraMode_AddPhantomGolfersToWorldRanking(struct EraMode_WorldRankingList* pEraData)
+                         local  int i
+                         local  struct Era_HistoricalStats_t* historicStat
+ 2716  0029CCA0     EC  void GM_EraMode_AddGolfersToWorldRanking(struct EraMode_WorldRankingList* pEraData)
+                         local  int i
+                         inlines  Singleton<GolferStats>::GetSingleton
+ 2732  002081BC    3C4  void GM_EraMode_AddWorldRanking(struct EraMode_WorldRankingList* pEraData, enum ERA_RankingType_e rankingType, int rankingGolferID, int rank)
+                         local  int i
+                         local  bool placed
+                         local  char[256] msg
+ 2819  00205FC4    160  void GM_EraMode_ResolveWinBumpLoser(struct EraMode_WorldRankingList* pEraData, int winnerRank, int loserRank)
+                         local  enum ERA_RankingType_e tempRankingType
+                         local  int tempRankingGolferID
+                         local  int diffRank
+                         local  int moveLoserUp
+                         local  int i
+ 2881  0029CD8C    178  char* GM_EraMode_GetWorldRankingName(struct EraMode_WorldRankingList* pEraData, int rankPosition)
+                         local  struct Era_HistoricalStats_t* historicStat
+                         inlines  Singleton<GolferStats>::GetSingleton
+ 2918  0029CF04    144  uint32 GM_EraMode_GetWorldRankingStat(struct EraMode_WorldRankingList* pEraData, int rankPosition, enum Era_StatType_e stat)
+                         local  struct Era_HistoricalStats_t* historicStat
+                         inlines  Singleton<GolferStats>::GetSingleton
+ 2961  002085F0     C8  void GM_EraMode_FillWorldRankingGaps(struct EraMode_WorldRankingList* pEraData)
+                         local  int i
+                         local  int j
+ 2979  002086B8     4C  int32 GM_EraMode_CountTotalWorldRankingRungs(struct EraMode_WorldRankingList* pEraData)
+                         local  int i
+ 2989  00208704     24  bool GM_EraMode_IsCurrentEra(enum ERA_Type_e eraType)
+ 2997  00208728     74  int GameModeDriverEra::GetAvailableBoasts(const struct GameModeDriverEra* this, int32 eventID, uint8* boasts)
+                         local  const struct Era_MainData_t* pMainData
+                         local  int i
+                         local  int numBoasts
+ 3017  00208090      4  void GameModeDriverEra::UI_WonRivalEvent(const struct GameModeDriverEra* this, int eventNum, int32 moneyWon)
+ 3026  00208094      4  void GameModeDriverEra::UI_WorldRankingAdvance(const struct GameModeDriverEra* this, int newPosition)
+ 3035  00208098      4  void GameModeDriverEra::UI_UnlockedRivalEvent(const struct GameModeDriverEra* this, int eventNum)
+ 3043  0024BD24    134  void GameModeDriverEra::UI_DisplayStoryMessages(const struct GameModeDriverEra* this)
+                         local  int32 i
+                         local  const struct Era_MainData_t* pMainData
+ 3073  0026B8DC    14C  void GameModeDriverEra::UI_PossiblyDisplaySpecialTigerPopup(const struct GameModeDriverEra* this)
+                         local  int32 i
+                         local  int iEventIndex
+                         local  const struct Era_MainData_t* pMainData
+                         inlines  UIRivals::SetShowSpecialTigerPopup, UIRivalsMessenger::SetEventIDToFindAndDisplayFirst
+ 3107  001FDB40     68  int GM_EraMode_GetTrophyEvent(enum ERATrophyBall_t eraTrophyIndex)
+ 3113  0020879C     40  int GM_EraMode_GetPlaqueEvent(enum ERAPlaque_t eraPlaqueIndex)
+ 3123  001FDBA8     68  int GM_EraMode_GetTigerChallengeEvent(enum ERATigerChallenge_t eraChallengeIndex)
+ 3129  002087DC     74  void GameModeDriverEra::GetCurrentScoreString(const struct GameModeDriverEra* this, char* strBuf, int32 bufferSize)
+                         local  struct GameModeBase* mode

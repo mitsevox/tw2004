@@ -1,0 +1,9 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/./chatstreamgamesetupconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   63  006232A0      4  void GameSessionAdded(const struct <anon>* this, struct GameSession* )
+   64  006232AC      4  void GameSessionChanged(const struct <anon>* this, struct GameSession* )
+   65  006232B8      4  void GameSessionDeleted(const struct <anon>* this, struct GameSession* )
+   66  006232C4      4  void GameSessionLeft(const struct <anon>* this, struct GameSession* , enum GameSessionLeftReason )
+   67  006232D0      4  void GameSessionStarted(const struct <anon>* this, struct GameSession* )

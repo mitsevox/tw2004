@@ -1,0 +1,24 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/listarray.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   73  005B874C     A8  void ListArray(const struct ListArray* this, uint32_t uSizeOfElement, uint32_t uCapacity, struct MemoryStrategy* pMemoryStrategy)
+  104  005B8E50     B8  void ListArray(const struct ListArray* this, const const struct <anon>& otherList)
+  133  005B87F4     60  void ~ListArray(const struct ListArray* this)
+  158  005B8734     18  void* GetElementAt(const const struct <anon>* this, uint32_t uIndex)
+  188  005B9088     40  void SetElementAt(const struct ListArray* this, uint32_t uIndex, const void* pElement)
+  217  005B8854     58  void InsertElement(const struct ListArray* this, const void* pElement)
+  243  005D0508     B8  void RemoveElement(const struct ListArray* this, const void* pElement)
+                         local  uint32_t size
+                         local  uint32_t uIndex
+                         local  void* pCurElement
+                         inlines  GetNumberOfElements
+  284  005B9148     C4  void InsertElementAt(const struct ListArray* this, uint32_t uIndex, const void* pElement)
+                         local  uint32_t i
+                         local  char8_t* pDest
+  324  005B90C8     80  void RemoveElementAt(const struct ListArray* this, uint32_t uIndex)
+                         local  char8_t* pDest
+  355  005CA660     E8  struct <anon>& operator=(const struct ListArray* this, const const struct <anon>& otherList)
+  389  005B920C     78  void FastRemoveElementAt(const struct ListArray* this, uint32_t uIndex)
+                         local  char8_t* pDest
+                         local  char8_t* pSrc

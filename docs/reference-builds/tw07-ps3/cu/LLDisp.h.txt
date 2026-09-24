@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Legacy/LL/Headers/LLDisp.h
+// compiled in: Legacy_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  247    inline-only   unsigned int Displ_RoundUpForAlignment(unsigned int value, unsigned int alignment)
+                         local  const int multiple

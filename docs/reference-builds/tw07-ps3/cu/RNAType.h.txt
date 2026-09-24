@@ -1,0 +1,17 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNAScope/RNAType.h
+// compiled in: RNADebugMenus.cpp, RNAParm.cpp, RNAParmList.cpp, RNAScope.cpp, RNAType.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   53    inline-only   void operator delete(void* address)
+   53    inline-only   struct ICoreAllocator* GetClassAllocator()
+   53    inline-only   void* operator new(size_t size, const char* text, struct ICoreAllocator* allocator, enum AllocFlags allocator_flags, uint32_t alignment)
+   73    inline-only   const char* GetName(const const struct <anon>* this)
+   75    inline-only   uint32_t GetSize(const const struct <anon>* this)
+   76    inline-only   uint32_t GetAlignment(const const struct <anon>* this)
+   94    inline-only   const char* GetNameByTypeID(const const struct <anon>* this, enum TypeID idType)
+   99  00825304    138  void TypeMgrC(const struct TypeMgrC* this)
+                         inlines  RNADebugBreak, Vector
+  100  008255F4    1E8  void ~TypeMgrC(const struct TypeMgrC* this)
+                         local  int32_t i
+                         local  struct <anon>* pTypeInfo
+                         inlines  RNADebugBreak, operator delete, operator[], ~TypeInfoC, ~Vector

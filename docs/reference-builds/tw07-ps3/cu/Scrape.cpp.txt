@@ -1,0 +1,299 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnax/source/scrape/Scrape.cpp
+// compiled in: Scrape.cpp
+// 29 functions, source order. line | PS3 address | size
+
+    0  00874030    1A4  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  GetRow, Matrix44, Quaternion, Set, Vector2, Vector3, Vector4
+   65  00873D70    2C0  void SCRAPE::ScrapeSurfaceCapture(struct DeviceC* pDevice, const char* filename, struct SurfaceC* surface)
+                         local  const char[21] __FUNCTION__
+                         local  int width
+                         local  int height
+                         local  int buffersize
+                         local  unsigned char* buffer
+                         local  FILE* f
+                         local  void* bufferStart
+                         local  uint32_t uPitch
+                         local  int nEndBuffer
+                         local  int i
+                         local  int nP
+                         local  int j
+                         local  uint32_t argb
+                         local  uint32_t colorTmp
+                         inlines  RNADebugBreak, SurfaceC::GetHeight, SurfaceC::GetWidth
+  128  0087FD90    268  int32_t FindShaderByName(const const struct <anon>* this, const char* pStrName)
+                         local  int32_t i
+                         inlines  RNADebugBreak, String, operator==, operator[], ~String
+  138  0087FFF8    268  int32_t FindSurfaceByName(const const struct <anon>* this, const char* pStrName)
+                         local  int32_t i
+                         inlines  RNADebugBreak, String, operator==, operator[], ~String
+  148  00880260    270  int32_t FindTextureByName(const const struct <anon>* this, const char* pStrName)
+                         local  int32_t i
+                         inlines  RNADebugBreak, String, operator==, operator[], ~String
+  158  008804D0    268  int32_t FindSceneByName(const const struct <anon>* this, const char* pStrName)
+                         local  int32_t i
+                         inlines  RNADebugBreak, String, operator==, operator[], ~String
+  168  00880738    268  int32_t FindLabelByName(const const struct <anon>* this, const char* pStrName)
+                         local  int32_t i
+                         inlines  RNADebugBreak, String, operator==, operator[], ~String
+  178  008809A0    268  int32_t FindCameraByName(const const struct <anon>* this, const char* pStrName)
+                         local  int32_t i
+                         inlines  RNADebugBreak, String, operator==, operator[], ~String
+  188  00880C08    268  int32_t FindMatrixByName(const const struct <anon>* this, const char* pStrName)
+                         local  int32_t i
+                         inlines  RNADebugBreak, String, operator==, operator[], ~String
+  199  00880E70    268  int32_t FindProcessByName(const const struct <anon>* this, const char* pStrName)
+                         local  int32_t i
+                         inlines  RNADebugBreak, String, operator==, operator[], ~String
+  210  00874800     CC  void SetMatrix(const struct <anon>* this, int32_t idMatrix, const const RNAMatrix44& matrix)
+                         inlines  RNADebugBreak, operator=, operator[]
+  218  00874ADC    BCC  void Process(const struct <anon>* this)
+                         inlines  Init, RNADebugBreak, RefCountTemplate, Vector
+  229  0087A128    AA8  void ~Process(const struct <anon>* this)
+                         inlines  Init, RNADebugBreak, ~RefCountTemplate, ~Vector
+  234  00873AC0     40  bool TickFrameCount(const struct <anon>* this)
+  256  00873B00      C  void ResetFrameCount(const struct <anon>* this)
+  262  0087A060     C8  void Unload(const struct <anon>* this)
+                         local  const char[7] __FUNCTION__
+                         inlines  RNADebugBreak
+  277  008786D8   1988  void DeleteAllVars(const struct <anon>* this)
+                         local  const char[14] __FUNCTION__
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+                         local  int i
+                         inlines  Clear, Command::operator delete, Init, RNADebugBreak, Variable::operator delete, operator[], ~CameraVar, ~EventVar, ~LabelVar, ~MatrixVar, ~ParmVar, ~ProcVar, ~RenderBinVar, ~RenderObjectVar, ~SceneVar, ~ShaderVar, ~SurfaceVar
+  386  008741F4    470  void AllocateTexture(const struct <anon>* this, struct DeviceC* pDevice, struct TextureVar* pTextureVar)
+                         local  const char[16] __FUNCTION__
+                         inlines  RNADebugBreak, SetTexture, String, TexturePlatC::operator new, operator==, ~String
+  444  00873BAC    1C4  void AllocateSurface(const struct <anon>* this, struct DeviceC* pDevice, struct SurfaceVar* pSurfaceVar)
+                         local  const char[16] __FUNCTION__
+                         local  struct SurfacePlatC* pSurface
+                         inlines  RNADebugBreak, SurfacePlatC::operator new
+  500  00876458   1510  void AllocateResources(const struct <anon>* this, struct DeviceC* pDevice, bool bAllocateStatics)
+                         local  const char[18] __FUNCTION__
+                         local  int i
+                         local  struct SceneVar* pSceneVar
+                         local  int i
+                         local  struct ShaderVar* pShaderVar
+                         local  int i
+                         local  struct ParmVar* pParmVar
+                         local  int i
+                         local  struct TextureVar* pTextureVar
+                         local  int i
+                         local  struct SurfaceVar* pSurfaceVar
+                         local  int i
+                         local  struct CameraVar* pCameraVar
+                         local  int i
+                         local  struct MatrixVar* pMatrixVar
+                         local  int i
+                         local  struct RenderBinVar* pRenderBinVar
+                         local  int i
+                         local  struct RenderObjectVar* pRenderObjectVar
+                         local  int i
+                         local  struct ProcVar* pProcVar
+                         local  uint32_t nLastIndex
+                         local  struct <anon> aJobs
+                         local  int i
+                         local  struct Command* pCmd
+                         local  bool bStopChain
+                         local  struct JobInstanceC* pTemp
+                         local  struct Command* pPrevCmd
+                         local  struct JobInstanceC* pChain
+                         local  struct Command* pPrevCmd
+                         local  struct JobInstanceC* pChain
+                         local  int32_t k
+                         local  int32_t k
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNAX::JobInstanceC>* newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct AutoRefCount<RNAX::JobInstanceC>* newData
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  AddRef, AutoRefCount, Clear, Construct, Destroy, Init, JobC::GetPlatform, PushBack, RNADebugBreak, Vector, operator=, operator[], ~AutoRefCount, ~Vector
+  684  00876274    1E4  void AllocateStaticResources(const struct <anon>* this, struct DeviceC* pDevice)
+                         local  const char[24] __FUNCTION__
+                         local  int i
+                         local  struct TextureVar* pTextureVar
+                         local  int i
+                         local  struct SurfaceVar* pSurfaceVar
+                         inlines  RNADebugBreak, operator[]
+  711  008748CC    210  static void SCRAPE::RemoveTextureFromScope(struct ScopeC* pScope, struct TextureC* pTexture)
+                         local  int32_t iBlock
+                         local  struct <anon>* pScopeBlock
+                         local  struct ScopeParmC* pParm
+                         inlines  GetFirstParm, RNADebugBreak, ScopeParmC::Get<RNA::TextureC*>, ScopeParmC::GetNext, ScopeParmC::Set<RNA::TextureC*>
+  741  00877968    2C0  void FreeStaticResources(const struct <anon>* this, struct DeviceC* pDevice)
+                         local  const char[20] __FUNCTION__
+                         local  int i
+                         local  struct SurfaceVar* pSurfaceVar
+                         local  int i
+                         local  struct TextureVar* pTextureVar
+                         inlines  RNADebugBreak, SetTexture, operator[]
+  780  00877C28    AB0  void FreeResources(const struct <anon>* this, struct DeviceC* pDevice, bool bFreeStatics)
+                         local  const char[14] __FUNCTION__
+                         local  int i
+                         local  struct SceneVar* pSceneVar
+                         local  int i
+                         local  struct ShaderVar* pShaderVar
+                         local  int i
+                         local  uint32_t nIndex
+                         local  struct Command* pTemp
+                         local  struct JobInstanceC* pChain
+                         local  int i
+                         local  struct ProcVar* pProcVar
+                         local  int i
+                         local  uint32_t nIndex
+                         local  struct Command* pCmd
+                         local  struct JobInstanceC* pItem
+                         local  struct JobInstanceC* pChain
+                         local  int i
+                         local  struct SurfaceVar* pSurfaceVar
+                         local  int i
+                         local  struct TextureVar* pTextureVar
+                         local  int i
+                         local  struct CameraVar* pCameraVar
+                         local  int i
+                         local  struct RenderBinVar* pRenderBinVar
+                         local  int i
+                         local  struct RenderObjectVar* pRenderObjectVar
+                         inlines  RNADebugBreak, Release, SetTexture, operator[]
+ 1029  00873B0C      8  bool8_t ValidateSurfaces(const struct <anon>* this, struct DeviceC* pDevice, int32_t iCmd, const char8_t* pCommandString)
+ 1037  0087C138   3C58  void Execute(const struct <anon>* this, struct DeviceC* pDevice, int32_t entryLabelID)
+                         local  const char[8] __FUNCTION__
+                         local  struct <anon> im
+                         local  struct <anon> oldViewport
+                         local  struct <anon> persistantVpt
+                         local  struct <anon> oldScissor
+                         local  RNAMatrix44 unit
+                         local  RNAVector4 ClearColor
+                         local  float_t fClearZ
+                         local  uint32_t uClearStencil
+                         local  struct SurfaceC* pOldDepthStencil
+                         local  int32_t entryCmdIndex
+                         local  struct ShaderC* pShader
+                         local  int i
+                         local  struct SurfaceVar* pSurfaceVar
+                         local  struct SurfaceC* pSurface
+                         local  int i
+                         local  struct TextureVar* pTextureVar
+                         local  struct SurfaceC* pSurface
+                         local  int32_t iCmd
+                         local  struct Command* pCmd
+                         local  struct SurfaceC* pSurface
+                         local  struct TextureC* pTexture
+                         local  char[256] szHostfilename
+                         local  bool bPrint
+                         local  struct TextureC* pTexture1
+                         local  struct TextureC* pTexture2
+                         local  struct SurfaceC* pSurface1
+                         local  struct SurfaceC* pSurface2
+                         local  uint8_t transferMode
+                         local  int i
+                         local  struct SurfaceVar* pSurfaceVar
+                         local  struct TextureC* pTexture
+                         local  struct RenderBinVar* pRenderBinVar
+                         local  struct SceneVar* pSceneVar
+                         local  struct <anon> vpt
+                         local  float_t fHalfU
+                         local  float_t fHalfV
+                         local  float_t fPixelOffset
+                         local  enum RSCullModeE ePreviousCullMode
+                         local  struct MaterialListC* pMaterialList
+                         local  struct SceneVar* pSceneVar
+                         local  struct MatrixVar* pMatrixVar
+                         local  struct ScopeParmC* pScopeParm
+                         local  struct ScopeParmC* pScopeParm
+                         local  struct TextureC* pTexture
+                         local  enum RenderTargetE eRenderTarget
+                         local  int32_t idSurface
+                         local  int32_t idTexture
+                         local  struct TextureVar* pTextureVar
+                         local  struct TextureC* pTexture
+                         local  struct <anon> vpt
+                         local  struct <anon> scissor
+                         local  struct CameraVar* pCameraVar
+                         local  struct RenderObjectVar* pRenderObjectVar
+                         local  struct TextureC* pTexture
+                         local  struct ShaderVar* pShaderVar
+                         local  uint32_t uPitch
+                         local  void* pData
+                         local  int i
+                         local  struct JobInstanceC* pChain
+                         local  uint32_t nIndex
+                         local  struct Command* pTemp
+                         local  struct SurfaceVar* pSurfaceVar
+                         local  struct SurfaceC* pSurface
+                         local  struct <anon> scissor
+                         local  struct SurfaceVar* pSurfaceVar
+                         local  struct SurfaceC* pSurface
+                         local  struct <anon> scissor
+                         local  struct SurfaceVar* pSurfaceVar
+                         local  struct SurfaceC* pSurface
+                         local  bool8_t bJump
+                         local  struct ScopeParmC* pScopeParm
+                         local  bool8_t bJump
+                         local  struct ScopeParmC* pScopeParm
+                         local  struct LabelVar* pLabelVar
+                         local  struct JobInstanceC* pChain
+                         local  struct JobInstanceC* pItem
+                         local  struct TextureVar* pTextureVar
+                         local  struct TextureC* pTexture
+                         local  struct TextureVar* pTextureVar
+                         local  struct TextureC* pTexture
+                         local  struct SurfaceVar* pSurfaceVar
+                         local  struct SurfaceC* pSurface
+                         local  struct <anon> vpt
+                         local  struct <anon> scissor
+                         local  RNAVector4 v4
+                         local  RNAVector2 v2
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct LabelVar** newData
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  int32_t* newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct LabelVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  int32_t* newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  RNAVector3 v3
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct LabelVar** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  int32_t* newData
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Back, Construct, DeviceC::Flush, Gcm::cellGcmSetTransferImage, Gcm::cellGcmSetTransferLocation, LabelVar, PopBack, PushBack, RNADebugBreak, RNASceneC::GetMaterialList, ScopeParmC::Get<bool8_t>, ScopeParmC::Set<RNA::TextureC*>, ScopeParmC::Set<RNAMath::RNAVector2>, ScopeParmC::Set<RNAMath::RNAVector3>, ScopeParmC::Set<RNAMath::RNAVector4>, ScopeParmC::Set<std::float_t>, SetColor4f, SetElement3f, SetElement4f, SetIdentity, SetNormal3f, SetPosition3f, SetTexCoord3f, SetTexture, Size, Update, Variable::operator delete, Variable::operator new, Vector2, Vector3, Vector4, operator float, operator=, operator[], ~LabelVar
+ 2121  00874664    19C  struct TextureC* ScopeBoundTextureVar::GetTexture(const struct ScopeBoundTextureVar* this)
+                         local  const char[11] __FUNCTION__
+                         local  struct TextureC* tmpTexture
+                         inlines  RNADebugBreak, ScopeParmC::Get<RNA::TextureC*>
+ 2151  008741E4     10  static void _GLOBAL__I__ZN6SCRAPE20ScrapeSurfaceCaptureEPN3RNA7DeviceCEPKcPNS0_8SurfaceCE()
+ 2152  008741D4     10  static void _GLOBAL__D__ZN6SCRAPE20ScrapeSurfaceCaptureEPN3RNA7DeviceCEPKcPNS0_8SurfaceCE()

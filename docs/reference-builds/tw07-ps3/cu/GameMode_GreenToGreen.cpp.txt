@@ -1,0 +1,80 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_GreenToGreen.cpp
+// compiled in: golf_unity.cpp
+// 37 functions, source order. line | PS3 address | size
+
+   57  002052B0     68  void GameModeGreenToGreen::GameModeGreenToGreen(const struct GameModeGreenToGreen* this)
+   68  001FC674     4C  void GameModeGreenToGreen::~GameModeGreenToGreen(const struct GameModeGreenToGreen* this)
+   76  00246058    178  void GameModeGreenToGreen::Init(const struct GameModeGreenToGreen* this)
+  121  001F9D3C     48  const char* GameModeGreenToGreen::GetModeSpecificTipString(const struct GameModeGreenToGreen* this)
+  139  0021CA14     14  const char* GameModeGreenToGreen::GetModeName(const struct GameModeGreenToGreen* this)
+                         local  char* localizedString
+  149  0021C8E8    12C  void GameModeGreenToGreen::GetUIGameFinishedString(const struct GameModeGreenToGreen* this, char* strBuf, int32 bufferSize)
+                         local  char* localizedString
+  178  00253238    144  bool GameModeGreenToGreen::GetUIScoreCardField(const struct GameModeGreenToGreen* this, int32_t row, int32_t column, char* strBuf, int32 bufferSize)
+                         local  bool bUpdate
+                         local  char* localizedString
+                         inlines  GameModeGreenToGreen::GetShotsToPass
+  216  003050C4    1A4  void GameModeGreenToGreen::InitForTrainingChallenge(const struct GameModeGreenToGreen* this, const struct TrainingChallengeEvent_t* pEvent)
+                         local  int[6] opposingTees
+                         local  vec4flt opposingTeeLoc
+                         inlines  GM_GetGolferUp, GameModeBase::SetUseShotClock, GameModeGreenToGreen::SetBallLimit, GameModeGreenToGreen::SetShotsToPass, GameModeGreenToGreen::SetStartingBallLimit, cGAME_GLOBALS::SetShotClockOption, vec4flt_Copy
+  259  001F9DF4     44  void GameModeGreenToGreen::RegisterStreamClients()
+  268  001F9E38     2C  void GameModeGreenToGreen::UnregisterStreamClients()
+  276  00241978    1A0  void GameModeGreenToGreen::Locale_GreenToGreen_LoadGTOGFromStream(struct TStreamData* pStreamData)
+                         local  const char[39] __FUNCTION__
+                         local  void* dataPtr
+                         local  uint32 size
+                         local  void* pData
+                         inlines  TagValuePair, operator+
+  301  001F9E64     10  void GameModeGreenToGreen::LoadHole(const struct GameModeGreenToGreen* this)
+  311  001F9E84     50  bool GameModeGreenToGreen::QueryInterface(const struct GameModeGreenToGreen* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bRet
+  328  001F9D84     68  void GameModeGreenToGreen::SetSelectedChallenge(const struct GameModeGreenToGreen* this, int challengeIx)
+  335  002D14E8     7C  void GameModeGreenToGreen::SetupNextGolfer(const struct GameModeGreenToGreen* this)
+                         local  struct GreenToGreenInfo_t* pChallengeInfo
+  349  002CAA04    290  void GameModeGreenToGreen::PreShotInit(const struct GameModeGreenToGreen* this, enum PlayerNumber_t PlayerID)
+                         local  struct GreenToGreenInfo_t* pChallengeInfo
+                         local  vec4flt vStartPos
+                         local  bool result
+                         local  const struct GameModeDriver* ptr
+                         local  const struct GameModeDriverFacility* pFacility
+                         inlines  vec4flt_Copy, vec_st
+  412  001F9F40      8  enum PlayerNumber_t GameModeGreenToGreen::GetHonors(const struct GameModeGreenToGreen* this, enum PlayerNumber_t ignore, bool doNotIgnoreHoledOut)
+  420  00264F94     50  void GameModeGreenToGreen::EndGolferTurn(const struct GameModeGreenToGreen* this, enum PlayerNumber_t PlayerID)
+                         inlines  GameModeGreenToGreen::GetBallLimit, GameModeGreenToGreen::SetBallLimit
+  442  0025337C     BC  bool GameModeGreenToGreen::HoleFinished(const struct GameModeGreenToGreen* this, enum PlayerNumber_t PlayerID, bool predict)
+  463  001F9F48      8  bool GameModeGreenToGreen::GameFinished(const struct GameModeGreenToGreen* this, bool predict)
+  468  001F9F50      4  void GameModeGreenToGreen::EndHole(const struct GameModeGreenToGreen* this)
+  475  001F9F54      8  bool GameModeGreenToGreen::GoToPlayoff(const struct GameModeGreenToGreen* this, bool predict)
+  484  002AD470     F8  void GameModeGreenToGreen::EndGame(const struct GameModeGreenToGreen* this)
+                         local  struct OnWinData_t onWinData
+                         local  enum PlayerNumber_t holeWinner
+                         inlines  OnWinData_t::OnWinData_t
+  519  002640B0    238  void GameModeGreenToGreen::CheckShotAwards(const struct GameModeGreenToGreen* this, enum PlayerNumber_t PlayerID)
+                         local  char* localizedString
+                         local  char[256] tempString
+                         local  char* localizedString
+                         local  char[64] tempString
+  578  00262F38      8  enum PlayerNumber_t GameModeGreenToGreen::CheckForHoleWinner(const struct GameModeGreenToGreen* this)
+  588  001F9F64      8  enum PlayerNumber_t GameModeGreenToGreen::CheckForGameWinner(const struct GameModeGreenToGreen* this)
+  598  002610EC    148  void GameModeGreenToGreen::UpdateDisplayInfo(const struct GameModeGreenToGreen* this, enum PlayerNumber_t PlayerID)
+                         local  char[256] tempString
+                         local  char* localizedString
+                         local  char* localizedStringCups
+  628  0026123C     14  bool GameModeGreenToGreen::ShowTrainingChallengeBallsRemaining(const struct GameModeGreenToGreen* this)
+  641  00261234      8  void GameModeGreenToGreen::PreShotUpdateUI(const struct GameModeGreenToGreen* this, enum PlayerNumber_t PlayerID)
+  649  001F9F6C     14  bool GameModeGreenToGreen::IsStartOfTurn(const struct GameModeGreenToGreen* this)
+  657  001F9F80     5C  void GameModeGreenToGreen::ShotClockOut(const struct GameModeGreenToGreen* this)
+  668  002CA8F4    110  void GameModeGreenToGreen::SetCup_AlignGolfer(const struct GameModeGreenToGreen* this, enum PlayerNumber_t PlayerID, int8 cupID)
+                         inlines  AIMgr, GUI_UpdateShotUIData
+  687  0024EBE8     D8  void GameModeGreenToGreen::SetCup(const struct GameModeGreenToGreen* this, enum PlayerNumber_t PlayerID, int8 cupID)
+                         local  struct TCharacter* pFlagModel
+                         local  struct GreenToGreenInfo_t* pChallengeInfo
+                         local  const float[4]& vCupPos
+                         inlines  vec4flt_Copy
+  710  001F9FDC     1C  enum PlayerNumber_t GameModeGreenToGreen::GetHoleWinner(const const struct GameModeGreenToGreen* this)
+  723  001F9FF8    1A4  void GameModeGreenToGreen::CreateLuxorLight(const struct GameModeGreenToGreen* this)
+                         local  GenericActorParams params
+                         local  const float[4]& flagloc
+  757  001FA19C     58  void GameModeGreenToGreen::DestroyLuxorLight(const struct GameModeGreenToGreen* this)
+  769  001FA1F4     34  void GameModeGreenToGreen::QuitGame(const struct GameModeGreenToGreen* this)

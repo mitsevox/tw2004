@@ -1,0 +1,21 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/slinklist.h
+// compiled in: sfxrevc.cpp, sgp.cpp, snd9.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   17    inline-only   void CListNode::SetNext(const struct CListNode* this, struct CListNode* pnode)
+   18    inline-only   struct CListNode* CListNode::GetNext(const struct CListNode* this)
+   41    inline-only   void CListDNode::SetNext(const struct CListDNode* this, struct CListDNode* pnode)
+   42    inline-only   void CListDNode::SetPrev(const struct CListDNode* this, struct CListDNode* pnode)
+   43    inline-only   struct CListDNode* CListDNode::GetNext(const struct CListDNode* this)
+   44    inline-only   struct CListDNode* CListDNode::GetPrev(const struct CListDNode* this)
+   57    inline-only   void CListStack::Reset(const struct CListStack* this)
+   59    inline-only   bool CListStack::IsEmpty(const struct CListStack* this)
+   61    inline-only   struct CListNode* CListStack::GetHead(const struct CListStack* this)
+   63    inline-only   void CListStack::Push(const struct CListStack* this, struct CListNode* pnode)
+   75    inline-only   struct CListNode* CListStack::Pop(const struct CListStack* this)
+                         local  struct CListNode* pnode
+  106    inline-only   struct CListDNode* CListDStack::GetHead(const struct CListDStack* this)
+  108    inline-only   void CListDStack::Push(const struct CListDStack* this, struct CListDNode* pnode)
+  144    inline-only   void CListDStack::Remove(const struct CListDStack* this, struct CListDNode* pnode)
+                         local  struct CListDNode* ptempnode
+                         local  struct CListDNode* ptempnode

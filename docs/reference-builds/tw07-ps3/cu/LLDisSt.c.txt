@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLDisSt.c
+// compiled in: Legacy_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   22  003CDA20    12C  void DS_vInitModule()
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetCullMode, DS_vSetStencilEnable, DS_vSetStencilOp, DS_vSetStencilTest, DS_vSetZBufferMode, DS_vSetZTestEnable
+   51  0037F354     1C  void DS_vCloseModule()

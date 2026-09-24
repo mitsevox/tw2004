@@ -1,0 +1,78 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_TigerChallenge.cpp
+// compiled in: apt_unity.cpp
+// 25 functions, source order. line | PS3 address | size
+
+  127  0004DAA0     9C  struct GlobeSizeScale_t* LookUpGlobeSizeScale(Course_t sig)
+                         local  int32 i
+  139  0004DB3C     14  void ShowTigerAgain()
+  158  000F8ED4     E8  void UITigerChallenge::UITigerChallenge(const struct UITigerChallenge* this)
+                         inlines  TArrayInternal<UITigerChallenge::DstMenuItem_tigr,AptStructSwapper>::TArrayInternal, TExternArray<UITigerChallenge::DstMenuItem_tigr>::TExternArray, UIMenuVertBase::UIMenuVertBase
+  180  000F12FC     88  void UITigerChallenge::Init(const struct UITigerChallenge* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+  194  00063C74    138  void UITigerChallenge::Show(const struct UITigerChallenge* this)
+                         local  struct TigerChallengeEvent_t* pTigBossEvent
+  232  0004DC0C     44  void UITigerChallenge::OnShow(const struct UITigerChallenge* this)
+  237  0006670C     C4  void UITigerChallenge::Hide(const struct UITigerChallenge* this)
+                         inlines  AptControllerListener::StopPortLocking
+  253  0004DC50     34  void UITigerChallenge::OnHide(const struct UITigerChallenge* this)
+  258  0004DC84     80  void UITigerChallenge::ShowHelpText(const struct UITigerChallenge* this)
+  266  00091490     58  void UITigerChallenge::InitMenuParams(const struct UITigerChallenge* this)
+  273  0004DD04     A4  void UITigerChallenge::BuildCustomOpenScreenSequence(const struct UITigerChallenge* this)
+  282  0004DB50     BC  void UITigerChallenge::StreamIcons(const struct UITigerChallenge* this)
+                         local  char[64] iconName
+                         local  int32 i
+                         local  int32 j
+  296  00069F4C    114  enum TAptSequenceStatus UITigerChallenge::StartListenForSkipBackThreadSeq(const struct UITigerChallenge* this, bool inbFirstTime, void* inData)
+  312  00024F60     48  enum TAptSequenceStatus UITigerChallenge::RemoveListenForSkipBackThreadSeq(const struct UITigerChallenge* this, bool inbFirstTime, void* inData)
+  318  00041B0C    108  enum AptThreadReturnValue UITigerChallenge::ListenForSkipBackThread(const struct UITigerChallenge* this)
+  338  0004DE20    2BC  enum TAptSequenceStatus UITigerChallenge::InitAnimVars(const struct UITigerChallenge* this, bool inbFirstTime, void* inData)
+                         local  int32 i
+                         local  char[8] mcIndex
+                         local  char[256] mcName
+  380  0004E11C    1F0  void UITigerChallenge::NotifyUpdateGlobeAnimVars(const struct UITigerChallenge* this)
+                         local  char[256] globeName
+  415  0004DDA8     78  void UITigerChallenge::GetValueFromFlash(const struct UITigerChallenge* this, char* valueName, const float& fValue)
+                         local  char[256] returnValue
+  422  000C8100    29C  void UITigerChallenge::UpdateItemAndLabel(const struct UITigerChallenge* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_tigr* dest
+                         local  struct TigerChallengeEvent_t* pTigEvent
+                         local  char* szTempBuffer
+                         inlines  Singleton<GolferStats>::GetSingleton
+  471  0008874C    5A4  enum eAptHandleInput UITigerChallenge::HandleInput(const struct UITigerChallenge* this, int32 cID)
+                         local  int32 nextRowIndex
+                         local  int32 prevRowIndex
+                         local  int32 prevIndex
+                         local  int32 nextIndex
+  649  0004E0DC     40  void UITigerChallenge::UpdateGlobe(const struct UITigerChallenge* this)
+  655  0005CA90    128  void UITigerChallenge::SelectEvent(const struct UITigerChallenge* this, int32 eventId)
+                         local  struct TigerChallengeEvent_t* pTigEvent
+  673  0004E30C     74  void UITigerChallenge::UnSelectEvent(const struct UITigerChallenge* this)
+  683  000886A0     AC  void UITigerChallenge::StartEvent(const struct UITigerChallenge* this, int32 eventId)
+                         inlines  AptControllerListener::StopPortLocking
+  695  00076620    990  enum AptThreadReturnValue UITigerChallenge::UpdateTigerFlash(const struct UITigerChallenge* this)
+                         local  float mTargetSelectedRowX
+                         local  float mTargetSelectedRowY
+                         local  int32 i
+                         local  float xdist1
+                         local  float xdist2
+                         local  float xdist3
+                         local  float ydist1
+                         local  float ydist2
+                         local  float ydist3
+                         local  float scaleDif1
+                         local  float scaleDif2
+                         local  float scaleDif3
+                         local  struct GlobeSizeScale_t* targetSizeScale
+                         local  float targetSpherize
+                         local  float globeSpeed
+                         local  float targetFrontAlpha
+                         local  float targetBackAlpha
+                         local  float dx
+                         local  float dy
+                         local  float dScale
+                         local  float dSphere
+                         local  TI_STimeValue currentTime
+                         local  float timeDiff
+                         local  char* rotateToPos
+                         local  enum GM_CourseType_t course
+                         inlines  TI_fConvertTimeDifToSeconds

@@ -1,0 +1,43 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_ScoreCardManager.cpp
+// compiled in: apt_unity.cpp
+// 25 functions, source order. line | PS3 address | size
+
+   41  000F9EF0    138  void UIScoreCardManager::UIScoreCardManager(const struct UIScoreCardManager* this)
+                         inlines  UIScoreCardSeve::UIScoreCardSeve
+   63  000FA160    164  void UIScoreCardManager::~UIScoreCardManager(const struct UIScoreCardManager* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::~IAptSubscriber, UIScoreCardSeve::~UIScoreCardSeve
+   70  0003FE48     58  void UIScoreCardManager::Init(const struct UIScoreCardManager* this)
+   77  0004B8A4     4C  void UIScoreCardManager::InitForPlayoff(const struct UIScoreCardManager* this)
+   86  00040134     24  void UIScoreCardManager::Close(const struct UIScoreCardManager* this)
+   95  00066F90    284  void UIScoreCardManager::Show(const struct UIScoreCardManager* this, bool bAllowManualClose)
+                         local  struct GameModeDriver* driver
+                         local  vec4flt fadeColor
+  179  0004B8F0     5C  void UIScoreCardManager::BuildCustomOpenScreenSequence(const struct UIScoreCardManager* this)
+  191  0004B94C     9C  void UIScoreCardManager::OnShow(const struct UIScoreCardManager* this)
+                         local  vec4flt fadeColor
+  209  0009C19C     A8  enum TAptSequenceStatus UIScoreCardManager::WaitForHUDHide(const struct UIScoreCardManager* this, bool inbFirstTime, void* inData)
+                         inlines  AptScreenSubscriber::IsSequenceComplete
+  229  00062464     D8  void UIScoreCardManager::Hide(const struct UIScoreCardManager* this)
+  252  0004B9E8     F0  void UIScoreCardManager::OnHide(const struct UIScoreCardManager* this)
+  280  000DC7D8    34C  enum eAptHandleInput UIScoreCardManager::HandleInput(const struct UIScoreCardManager* this, int32 cID)
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+  406  000DC488    270  void UIScoreCardManager::ShowHelpText(const struct UIScoreCardManager* this)
+                         local  char* altModeStr
+                         inlines  GM_GetModeType, ModulateProgressCompletion::SetCompletion1
+  465  000698DC    144  bool UIScoreCardManager::RequestClose(const struct UIScoreCardManager* this)
+                         local  bool retval
+                         local  bool allCPU
+                         local  int32 i
+  513  0004BBCC      4  void UIScoreCardManager::UpdateScoreCard(const struct UIScoreCardManager* this, enum PlayerNumber_t playerNumber, int32 holeIndex, int32 strokes, int32 modePoints)
+  524  0004A4D0     20  void UIScoreCardManager::UpdateFlashData(const struct UIScoreCardManager* this)
+  538  0004BD00     40  void UIScoreCardManager::SetCurrentMode(const struct UIScoreCardManager* this, enum UIScoreCardDispMode_t* cardMode)
+  549  0004BD40     BC  void UIScoreCardManager::AltModeSelect(const struct UIScoreCardManager* this)
+                         local  int32 bFlipped
+  575  0004BAD8     2C  enum UIScoreCardDispMode_t* UIScoreCardManager::GetOtherMode(const struct UIScoreCardManager* this)
+  585  0004BB04     C8  char* UIScoreCardManager::GetDispModeName(const struct UIScoreCardManager* this, enum UIScoreCardDispMode_t mode)
+  609  0004BBD0    130  struct UIScoreCardBase* UIScoreCardManager::GetCardByMode(const struct UIScoreCardManager* this, enum UIScoreCardDispMode_t cardMode)
+  647  000DC6F8     E0  void UIScoreCardManager::EndgameIsShowingContinue(const struct UIScoreCardManager* this)
+                         inlines  GM_GetModeType
+  671  0004BDFC      4  void UIScoreCardManager::PrintScoreCard(const struct UIScoreCardManager* this)
+  680  0004BE00     24  void UIScoreCardManager::LooseFocus(const struct UIScoreCardManager* this, uint32 )
+  688  0004BE24     54  void UIScoreCardManager::RegainFocus(const struct UIScoreCardManager* this, uint32 )

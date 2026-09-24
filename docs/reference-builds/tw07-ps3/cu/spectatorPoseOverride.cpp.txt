@@ -1,0 +1,33 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Spectator/spectatorPoseOverride.cpp
+// compiled in: golf2_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   56  00155F68    190  struct CSpectatorPose* CSpectatorPoseOverride::GetNewOverride(const struct CSpectatorPoseOverride* this, TSpectatorModel* model, struct CSpectatorPose* blendInOutPose, bool bRandomStart, float fDelayedStart, bool use_cct)
+                         local  int i
+                         local  int max_count
+                         inlines  CSpectatorPose::SetBlendInOutPose, CSpectatorPose::SetDelayedStart
+  125  00162968    10C  void CSpectatorPoseOverride::ClearOverrides(const struct CSpectatorPoseOverride* this, bool requests_only)
+                         local  const CSpectatorCloneGroupList& CloneGroupList
+                         local  struct CSpectatorCloneGroup* pCloneGroup
+                         local  struct CSpectatorCloneGroup* pCloneGroupListEnd
+                         local  int i
+                         local  CSpectatorInstanceList* pMovers
+                         local  struct CSpectatorInstance* pEnd
+                         local  struct CSpectatorInstance* pMover
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLink<CSpectatorInstance>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::End, CPovLinkedList<CSpectatorCloneGroup>::First, CPovLinkedList<CSpectatorInstance>::End, CPovLinkedList<CSpectatorInstance>::First, CSpectatorCloneGroup::SetOverridePose
+  164  0016BD74     88  void CSpectatorPoseOverride::Update(const struct CSpectatorPoseOverride* this, float dt)
+                         local  int i
+  177  00153738     FC  void Spectator_AddOverrideRequest(struct CSpectatorInstance* pInstance, char* anim, float fDelayedStart)
+                         local  int i
+  206  00163718    484  void CSpectatorPoseOverride::UpdateCCT(const struct CSpectatorPoseOverride* this)
+                         local  int i
+                         local  struct CSpectatorPose* pPose
+                         local  struct CSpectatorInstance* pInstance
+                         local  struct CSpectatorCloneGroup* pCloneGroup
+                         local  void* actorPtr
+                         local  const char* state
+                         local  int actor_state_ended
+                         local  CSpectatorInstanceList* pMovers
+                         local  struct CSpectatorInstance* pEnd
+                         local  struct CSpectatorInstance* pMover
+                         inlines  CPovLink<CSpectatorInstance>::GetNext, CPovLinkedList<CSpectatorInstance>::End, CPovLinkedList<CSpectatorInstance>::First, CSpectatorCloneGroup::SetOverridePose, CSpectatorInstance::GetCloneGroup, CSpectatorPose::SetLoop

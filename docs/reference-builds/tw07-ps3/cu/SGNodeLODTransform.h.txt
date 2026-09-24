@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/SceneGraph/include/SceneGraph/Runtime/Nodes/SGNodeLODTransform.h
+// compiled in: SGNodeLODTransform.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   46    inline-only   void* operator new(size_t size, const char* text, struct ICoreAllocator* allocator, enum AllocFlags allocator_flags, uint32_t alignment)
+   46    inline-only   struct ICoreAllocator* GetClassAllocator()
+   46    inline-only   void operator delete(void* address)
+   66    inline-only   int32_t GetNumLODThresholds(const struct <anon>* this)
+   67    inline-only   float_t GetNthLODThreshold(const struct <anon>* this, int32_t i)
+   70    inline-only   void AddLODThreshold(const struct <anon>* this, float_t fVal)

@@ -1,0 +1,584 @@
+// ../../../../../TIGERCODE/Code/Golf/UI_Core/AptRuntime/Headers/UI_Helpers.h
+// compiled in: apt_unity.cpp
+// 353 functions, source order. line | PS3 address | size
+
+  135  00111778     94  void TExternArray<UIAwards::DstMenuItem_awar>::~TExternArray(const struct TExternArray<UIAwards::DstMenuItem_awar>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIAwards::DstMenuItem_awar>::operator delete, ~TAptArrayStruct
+  135  00111888     94  void TExternArray<UIMoney::DstMenuItem_euro>::~TExternArray(const struct TExternArray<UIMoney::DstMenuItem_euro>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIMoney::DstMenuItem_euro>::operator delete, ~TAptArrayStruct
+  135  00111998     94  void TExternArray<UIOnlineTournament_LeaderBoard::DstMenuItem_oltl>::~TExternArray(const struct TExternArray<UIOnlineTournament_LeaderBoard::DstMenuItem_oltl>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIOnlineTournament_LeaderBoard::DstMenuItem_oltl>::operator delete, ~TAptArrayStruct
+  135  00111AA8     94  void TExternArray<UIOnlineWaitingRoom::PlayerMenuItem>::~TExternArray(const struct TExternArray<UIOnlineWaitingRoom::PlayerMenuItem>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIOnlineWaitingRoom::PlayerMenuItem>::operator delete, ~TAptArrayStruct
+  135  00111BB8     94  void TExternArray<UIOnlineTermsConditions::DstMenuItem_oltc>::~TExternArray(const struct TExternArray<UIOnlineTermsConditions::DstMenuItem_oltc>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIOnlineTermsConditions::DstMenuItem_oltc>::operator delete, ~TAptArrayStruct
+  135  00111CC8     94  void TExternArray<UIOnlineTournament_Gotw::DstMenuItem_olgw>::~TExternArray(const struct TExternArray<UIOnlineTournament_Gotw::DstMenuItem_olgw>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIOnlineTournament_Gotw::DstMenuItem_olgw>::operator delete, ~TAptArrayStruct
+  135  00111DD8     94  void TExternArray<UIOnlineMyQuickMessages::DstMenuItem_olqm>::~TExternArray(const struct TExternArray<UIOnlineMyQuickMessages::DstMenuItem_olqm>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIOnlineMyQuickMessages::DstMenuItem_olqm>::operator delete, ~TAptArrayStruct
+  135  00111EE8     94  void TExternArray<UIOnlineNews::DstMenuItem_olns>::~TExternArray(const struct TExternArray<UIOnlineNews::DstMenuItem_olns>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIOnlineNews::DstMenuItem_olns>::operator delete, ~TAptArrayStruct
+  135  00111FF8     94  void TExternArray<UIOnlineLobbyRoom::PlayerMenuItem>::~TExternArray(const struct TExternArray<UIOnlineLobbyRoom::PlayerMenuItem>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIOnlineLobbyRoom::PlayerMenuItem>::operator delete, ~TAptArrayStruct
+  135  00112108     94  void TExternArray<UIOnlineLobbyRoomMatches::MatchesMenuItem>::~TExternArray(const struct TExternArray<UIOnlineLobbyRoomMatches::MatchesMenuItem>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIOnlineLobbyRoomMatches::MatchesMenuItem>::operator delete, ~TAptArrayStruct
+  135  00112218     94  void TExternArray<UIOnlineTournament_TourWins::DstMenuItem_oltw>::~TExternArray(const struct TExternArray<UIOnlineTournament_TourWins::DstMenuItem_oltw>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIOnlineTournament_TourWins::DstMenuItem_oltw>::operator delete, ~TAptArrayStruct
+  135  00112328     94  void TExternArray<UIOnlineTournament_Wml::DstMenuItem_olwm>::~TExternArray(const struct TExternArray<UIOnlineTournament_Wml::DstMenuItem_olwm>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIOnlineTournament_Wml::DstMenuItem_olwm>::operator delete, ~TAptArrayStruct
+  135  00112438     94  void TExternArray<UIPgaTourLeaderboard::DstMenuItem_ptlb>::~TExternArray(const struct TExternArray<UIPgaTourLeaderboard::DstMenuItem_ptlb>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIPgaTourLeaderboard::DstMenuItem_ptlb>::operator delete, ~TAptArrayStruct
+  135  00112548     94  void TExternArray<UIOnlineStats_Player::OnlineFlashItem>::~TExternArray(const struct TExternArray<UIOnlineStats_Player::OnlineFlashItem>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIOnlineStats_Player::OnlineFlashItem>::operator delete, ~TAptArrayStruct
+  135  00112658     94  void TExternArray<UICSPScreen::DstMenuItem_cspp>::~TExternArray(const struct TExternArray<UICSPScreen::DstMenuItem_cspp>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UICSPScreen::DstMenuItem_cspp>::operator delete, ~TAptArrayStruct
+  135  00112768     94  void TExternArray<UIEASportsTrax::DstMenuItem_trax>::~TExternArray(const struct TExternArray<UIEASportsTrax::DstMenuItem_trax>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIEASportsTrax::DstMenuItem_trax>::operator delete, ~TAptArrayStruct
+  135  00112878     94  void TExternArray<UIOnlineUserFeedback::DstMenuItem_oluf>::~TExternArray(const struct TExternArray<UIOnlineUserFeedback::DstMenuItem_oluf>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIOnlineUserFeedback::DstMenuItem_oluf>::operator delete, ~TAptArrayStruct
+  135  00112988     94  void TExternArray<GFMenuItem>::~TExternArray(const struct TExternArray<GFMenuItem>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<GFMenuItem>::operator delete, ~TAptArrayStruct
+  135  00112A98     94  void TExternArray<RivalChRankItem2>::~TExternArray(const struct TExternArray<RivalChRankItem2>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<RivalChRankItem2>::operator delete, ~TAptArrayStruct
+  135  00112BA8     94  void TExternArray<RivalChStatsItem3>::~TExternArray(const struct TExternArray<RivalChStatsItem3>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<RivalChStatsItem3>::operator delete, ~TAptArrayStruct
+  135  00112CB8     94  void TExternArray<RivalChChallengeItem1>::~TExternArray(const struct TExternArray<RivalChChallengeItem1>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<RivalChChallengeItem1>::operator delete, ~TAptArrayStruct
+  135  00112DC8     94  void TExternArray<UIPgaTourStats_Player::PgaFlashItem>::~TExternArray(const struct TExternArray<UIPgaTourStats_Player::PgaFlashItem>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIPgaTourStats_Player::PgaFlashItem>::operator delete, ~TAptArrayStruct
+  135  00112ED8     94  void TExternArray<UIPRivalsItem>::~TExternArray(const struct TExternArray<UIPRivalsItem>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIPRivalsItem>::operator delete, ~TAptArrayStruct
+  135  00112FE8     94  void TExternArray<UIOnlineChatBox::DstMenuItem_olcb>::~TExternArray(const struct TExternArray<UIOnlineChatBox::DstMenuItem_olcb>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIOnlineChatBox::DstMenuItem_olcb>::operator delete, ~TAptArrayStruct
+  135  001130F8     94  void TExternArray<UIPgaTournament_TourWins::DstMenuItem_pgtw>::~TExternArray(const struct TExternArray<UIPgaTournament_TourWins::DstMenuItem_pgtw>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIPgaTournament_TourWins::DstMenuItem_pgtw>::operator delete, ~TAptArrayStruct
+  135  00113208     94  void TExternArray<UIRivalsChallenge::RChallengeMenuItem>::~TExternArray(const struct TExternArray<UIRivalsChallenge::RChallengeMenuItem>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIRivalsChallenge::RChallengeMenuItem>::operator delete, ~TAptArrayStruct
+  135  00113318     94  void TExternArray<UIRivalsChallengeToggle::RChallengeToggleMenuItem>::~TExternArray(const struct TExternArray<UIRivalsChallengeToggle::RChallengeToggleMenuItem>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIRivalsChallengeToggle::RChallengeToggleMenuItem>::operator delete, ~TAptArrayStruct
+  135  00113428     94  void TExternArray<UICreateACourse::DstMenuItem_crac>::~TExternArray(const struct TExternArray<UICreateACourse::DstMenuItem_crac>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UICreateACourse::DstMenuItem_crac>::operator delete, ~TAptArrayStruct
+  135  00113538     94  void TExternArray<UIMyTour_SponsorshipItems::DstMenuItem_mtsi>::~TExternArray(const struct TExternArray<UIMyTour_SponsorshipItems::DstMenuItem_mtsi>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIMyTour_SponsorshipItems::DstMenuItem_mtsi>::operator delete, ~TAptArrayStruct
+  135  00113648     94  void TExternArray<UIOnlineStats_Category::OnlineFlashItem>::~TExternArray(const struct TExternArray<UIOnlineStats_Category::OnlineFlashItem>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIOnlineStats_Category::OnlineFlashItem>::operator delete, ~TAptArrayStruct
+  135  00113758     94  void TExternArray<UIPgaTourStats_Category::PgaFlashItem>::~TExternArray(const struct TExternArray<UIPgaTourStats_Category::PgaFlashItem>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIPgaTourStats_Category::PgaFlashItem>::operator delete, ~TAptArrayStruct
+  135  00113868     94  void TExternArray<UIMyTour_Sponsorships::DstMenuItem_mtss>::~TExternArray(const struct TExternArray<UIMyTour_Sponsorships::DstMenuItem_mtss>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIMyTour_Sponsorships::DstMenuItem_mtss>::operator delete, ~TAptArrayStruct
+  135  00113978     94  void TExternArray<UIESPNNews::DstMenuItem_esns>::~TExternArray(const struct TExternArray<UIESPNNews::DstMenuItem_esns>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIESPNNews::DstMenuItem_esns>::operator delete, ~TAptArrayStruct
+  135  00113A88     94  void TExternArray<UICredits::DstMenuItem_cred>::~TExternArray(const struct TExternArray<UICredits::DstMenuItem_cred>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UICredits::DstMenuItem_cred>::operator delete, ~TAptArrayStruct
+  135  00113B98     94  void TExternArray<UILoadProfile::UIProfileMenuItem>::~TExternArray(const struct TExternArray<UILoadProfile::UIProfileMenuItem>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UILoadProfile::UIProfileMenuItem>::operator delete, ~TAptArrayStruct
+  135  00113CA8     94  void TExternArray<UIESPNNewsDetail::DstMenuItem_esnd>::~TExternArray(const struct TExternArray<UIESPNNewsDetail::DstMenuItem_esnd>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIESPNNewsDetail::DstMenuItem_esnd>::operator delete, ~TAptArrayStruct
+  135  00113DB8     94  void TExternArray<UIOnlineCreateAccountMoreInfo::DstMenuItem_ocai>::~TExternArray(const struct TExternArray<UIOnlineCreateAccountMoreInfo::DstMenuItem_ocai>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIOnlineCreateAccountMoreInfo::DstMenuItem_ocai>::operator delete, ~TAptArrayStruct
+  135  00113EC8     94  void TExternArray<UIMenuToggleItem>::~TExternArray(const struct TExternArray<UIMenuToggleItem>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIMenuToggleItem>::operator delete, ~TAptArrayStruct
+  135  00113FD8     94  void TExternArray<UIMenuItemDefaultDst_Tutorial>::~TExternArray(const struct TExternArray<UIMenuItemDefaultDst_Tutorial>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIMenuItemDefaultDst_Tutorial>::operator delete, ~TAptArrayStruct
+  135  001140E8     94  void TExternArray<UIOnlineFAQ::DstMenuItem_olfq>::~TExternArray(const struct TExternArray<UIOnlineFAQ::DstMenuItem_olfq>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIOnlineFAQ::DstMenuItem_olfq>::operator delete, ~TAptArrayStruct
+  135  001141F8     94  void TExternArray<UIOnlineGameAdvertisement::DstMenuItem>::~TExternArray(const struct TExternArray<UIOnlineGameAdvertisement::DstMenuItem>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIOnlineGameAdvertisement::DstMenuItem>::operator delete, ~TAptArrayStruct
+  135  00114308     94  void TExternArray<UIOnlineLegalAgreement::DstMenuItem_olla>::~TExternArray(const struct TExternArray<UIOnlineLegalAgreement::DstMenuItem_olla>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIOnlineLegalAgreement::DstMenuItem_olla>::operator delete, ~TAptArrayStruct
+  135  00114418     94  void TExternArray<UIOnlineEAMessenger::DstMenuItem_omsg>::~TExternArray(const struct TExternArray<UIOnlineEAMessenger::DstMenuItem_omsg>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIOnlineEAMessenger::DstMenuItem_omsg>::operator delete, ~TAptArrayStruct
+  135  00114528     94  void TExternArray<UISkillChallenge::DstMenuItem_skil>::~TExternArray(const struct TExternArray<UISkillChallenge::DstMenuItem_skil>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UISkillChallenge::DstMenuItem_skil>::operator delete, ~TAptArrayStruct
+  135  00114638     94  void TExternArray<UIOnlineGameModes_Gotw::DstMenuItem_omgw>::~TExternArray(const struct TExternArray<UIOnlineGameModes_Gotw::DstMenuItem_omgw>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIOnlineGameModes_Gotw::DstMenuItem_omgw>::operator delete, ~TAptArrayStruct
+  135  00114748     94  void TExternArray<UIOnlineGameModes_LeaderBoards::DstMenuItem_olgl>::~TExternArray(const struct TExternArray<UIOnlineGameModes_LeaderBoards::DstMenuItem_olgl>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIOnlineGameModes_LeaderBoards::DstMenuItem_olgl>::operator delete, ~TAptArrayStruct
+  135  00114858     94  void TExternArray<UITrainingChallenge::DstMenuItem_tran>::~TExternArray(const struct TExternArray<UITrainingChallenge::DstMenuItem_tran>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UITrainingChallenge::DstMenuItem_tran>::operator delete, ~TAptArrayStruct
+  135  00114968     94  void TExternArray<UiMenuItemDefaultDst>::~TExternArray(const struct TExternArray<UiMenuItemDefaultDst>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UiMenuItemDefaultDst>::operator delete, ~TAptArrayStruct
+  135  00114A78     94  void TExternArray<UITigerChallenge::DstMenuItem_tigr>::~TExternArray(const struct TExternArray<UITigerChallenge::DstMenuItem_tigr>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UITigerChallenge::DstMenuItem_tigr>::operator delete, ~TAptArrayStruct
+  135  00114B88     94  void TExternArray<UIBattleGolf_ChooseAddRemove::UIBattleGolfDstMenuItem>::~TExternArray(const struct TExternArray<UIBattleGolf_ChooseAddRemove::UIBattleGolfDstMenuItem>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIBattleGolf_ChooseAddRemove::UIBattleGolfDstMenuItem>::operator delete, ~TAptArrayStruct
+  135  00114C98     94  void TExternArray<UIBattleGolf_ChooseClub::BattleGolf_ChooseClub_DstMenuItem>::~TExternArray(const struct TExternArray<UIBattleGolf_ChooseClub::BattleGolf_ChooseClub_DstMenuItem>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIBattleGolf_ChooseClub::BattleGolf_ChooseClub_DstMenuItem>::operator delete, ~TAptArrayStruct
+  135  00114DA8     94  void TExternArray<UIMenuItemBaseDst>::~TExternArray(const struct TExternArray<UIMenuItemBaseDst>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIMenuItemBaseDst>::operator delete, ~TAptArrayStruct
+  135  00114EB8     94  void TExternArray<PSMenuItem>::~TExternArray(const struct TExternArray<PSMenuItem>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<PSMenuItem>::operator delete, ~TAptArrayStruct
+  135  00114FC8     94  void TExternArray<UITrophyList::UITrophyItem>::~TExternArray(const struct TExternArray<UITrophyList::UITrophyItem>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UITrophyList::UITrophyItem>::operator delete, ~TAptArrayStruct
+  135  001150D8     94  void TExternArray<UIXBoxLiveSettings::DstMenuItem_xbls>::~TExternArray(const struct TExternArray<UIXBoxLiveSettings::DstMenuItem_xbls>* this)
+                         inlines  AptStructSwapper::Free, TAptArrayStruct<UIXBoxLiveSettings::DstMenuItem_xbls>::operator delete, ~TAptArrayStruct
+  135  00115838     AC  void TExternArray<UICourseItem>::~TExternArray(const struct TExternArray<UICourseItem>* this)
+                         inlines  AptStaticCharBuffer<16u>::~AptStaticCharBuffer, AptStructSwapper::Free, TAptArrayStruct<UICourseItem>::operator delete, ~TAptArrayStruct, ~UICourseItem
+  137  0010CA84     68  void TExternArray<GFMenuItem>::vFlush(const struct TExternArray<GFMenuItem>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<GFMenuItem,AptStructSwapper>::Flush
+  137  0010CAEC     68  void TExternArray<PSMenuItem>::vFlush(const struct TExternArray<PSMenuItem>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<PSMenuItem,AptStructSwapper>::Flush
+  137  0010CB54     68  void TExternArray<UIAwards::DstMenuItem_awar>::vFlush(const struct TExternArray<UIAwards::DstMenuItem_awar>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIAwards::DstMenuItem_awar,AptStructSwapper>::Flush
+  137  0010CBBC     68  void TExternArray<UIMoney::DstMenuItem_euro>::vFlush(const struct TExternArray<UIMoney::DstMenuItem_euro>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIMoney::DstMenuItem_euro,AptStructSwapper>::Flush
+  137  0010CC24     68  void TExternArray<UIBattleGolf_ChooseAddRemove::UIBattleGolfDstMenuItem>::vFlush(const struct TExternArray<UIBattleGolf_ChooseAddRemove::UIBattleGolfDstMenuItem>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIBattleGolf_ChooseAddRemove::UIBattleGolfDstMenuItem,AptStructSwapper>::Flush
+  137  0010CC8C     68  void TExternArray<UIBattleGolf_ChooseClub::BattleGolf_ChooseClub_DstMenuItem>::vFlush(const struct TExternArray<UIBattleGolf_ChooseClub::BattleGolf_ChooseClub_DstMenuItem>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIBattleGolf_ChooseClub::BattleGolf_ChooseClub_DstMenuItem,AptStructSwapper>::Flush
+  137  0010CCF4     68  void TExternArray<UICourseItem>::vFlush(const struct TExternArray<UICourseItem>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UICourseItem,AptStructSwapper>::Flush
+  137  0010CD5C     68  void TExternArray<UICreateACourse::DstMenuItem_crac>::vFlush(const struct TExternArray<UICreateACourse::DstMenuItem_crac>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UICreateACourse::DstMenuItem_crac,AptStructSwapper>::Flush
+  137  0010CDC4     68  void TExternArray<UICredits::DstMenuItem_cred>::vFlush(const struct TExternArray<UICredits::DstMenuItem_cred>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UICredits::DstMenuItem_cred,AptStructSwapper>::Flush
+  137  0010CE2C     68  void TExternArray<UICSPScreen::DstMenuItem_cspp>::vFlush(const struct TExternArray<UICSPScreen::DstMenuItem_cspp>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UICSPScreen::DstMenuItem_cspp,AptStructSwapper>::Flush
+  137  0010CE94     68  void TExternArray<UIEASportsTrax::DstMenuItem_trax>::vFlush(const struct TExternArray<UIEASportsTrax::DstMenuItem_trax>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIEASportsTrax::DstMenuItem_trax,AptStructSwapper>::Flush
+  137  0010CEFC     68  void TExternArray<UILoadProfile::UIProfileMenuItem>::vFlush(const struct TExternArray<UILoadProfile::UIProfileMenuItem>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UILoadProfile::UIProfileMenuItem,AptStructSwapper>::Flush
+  137  0010CF64     68  void TExternArray<UIMenuToggleItem>::vFlush(const struct TExternArray<UIMenuToggleItem>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIMenuToggleItem,AptStructSwapper>::Flush
+  137  0010CFCC     68  void TExternArray<UIMenuItemDefaultDst_Tutorial>::vFlush(const struct TExternArray<UIMenuItemDefaultDst_Tutorial>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIMenuItemDefaultDst_Tutorial,AptStructSwapper>::Flush
+  137  0010D034     68  void TExternArray<UIMyTour_SponsorshipItems::DstMenuItem_mtsi>::vFlush(const struct TExternArray<UIMyTour_SponsorshipItems::DstMenuItem_mtsi>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIMyTour_SponsorshipItems::DstMenuItem_mtsi,AptStructSwapper>::Flush
+  137  0010D09C     68  void TExternArray<UIMyTour_Sponsorships::DstMenuItem_mtss>::vFlush(const struct TExternArray<UIMyTour_Sponsorships::DstMenuItem_mtss>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIMyTour_Sponsorships::DstMenuItem_mtss,AptStructSwapper>::Flush
+  137  0010D104     68  void TExternArray<UIESPNNews::DstMenuItem_esns>::vFlush(const struct TExternArray<UIESPNNews::DstMenuItem_esns>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIESPNNews::DstMenuItem_esns,AptStructSwapper>::Flush
+  137  0010D16C     68  void TExternArray<UIESPNNewsDetail::DstMenuItem_esnd>::vFlush(const struct TExternArray<UIESPNNewsDetail::DstMenuItem_esnd>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIESPNNewsDetail::DstMenuItem_esnd,AptStructSwapper>::Flush
+  137  0010D1D4     68  void TExternArray<UIOnlineCreateAccountMoreInfo::DstMenuItem_ocai>::vFlush(const struct TExternArray<UIOnlineCreateAccountMoreInfo::DstMenuItem_ocai>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIOnlineCreateAccountMoreInfo::DstMenuItem_ocai,AptStructSwapper>::Flush
+  137  0010D23C     68  void TExternArray<UIOnlineLegalAgreement::DstMenuItem_olla>::vFlush(const struct TExternArray<UIOnlineLegalAgreement::DstMenuItem_olla>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIOnlineLegalAgreement::DstMenuItem_olla,AptStructSwapper>::Flush
+  137  0010D2A4     68  void TExternArray<UIOnlineEAMessenger::DstMenuItem_omsg>::vFlush(const struct TExternArray<UIOnlineEAMessenger::DstMenuItem_omsg>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIOnlineEAMessenger::DstMenuItem_omsg,AptStructSwapper>::Flush
+  137  0010D30C     68  void TExternArray<UIOnlineFAQ::DstMenuItem_olfq>::vFlush(const struct TExternArray<UIOnlineFAQ::DstMenuItem_olfq>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIOnlineFAQ::DstMenuItem_olfq,AptStructSwapper>::Flush
+  137  0010D374     68  void TExternArray<UIOnlineGameAdvertisement::DstMenuItem>::vFlush(const struct TExternArray<UIOnlineGameAdvertisement::DstMenuItem>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIOnlineGameAdvertisement::DstMenuItem,AptStructSwapper>::Flush
+  137  0010D3DC     68  void TExternArray<UIOnlineGameModes_Gotw::DstMenuItem_omgw>::vFlush(const struct TExternArray<UIOnlineGameModes_Gotw::DstMenuItem_omgw>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIOnlineGameModes_Gotw::DstMenuItem_omgw,AptStructSwapper>::Flush
+  137  0010D444     68  void TExternArray<UIOnlineGameModes_LeaderBoards::DstMenuItem_olgl>::vFlush(const struct TExternArray<UIOnlineGameModes_LeaderBoards::DstMenuItem_olgl>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIOnlineGameModes_LeaderBoards::DstMenuItem_olgl,AptStructSwapper>::Flush
+  137  0010D4AC     68  void TExternArray<UIOnlineLobbyRoom::PlayerMenuItem>::vFlush(const struct TExternArray<UIOnlineLobbyRoom::PlayerMenuItem>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIOnlineLobbyRoom::PlayerMenuItem,AptStructSwapper>::Flush
+  137  0010D514     68  void TExternArray<UIOnlineLobbyRoomMatches::MatchesMenuItem>::vFlush(const struct TExternArray<UIOnlineLobbyRoomMatches::MatchesMenuItem>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIOnlineLobbyRoomMatches::MatchesMenuItem,AptStructSwapper>::Flush
+  137  0010D57C     68  void TExternArray<UIOnlineMyQuickMessages::DstMenuItem_olqm>::vFlush(const struct TExternArray<UIOnlineMyQuickMessages::DstMenuItem_olqm>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIOnlineMyQuickMessages::DstMenuItem_olqm,AptStructSwapper>::Flush
+  137  0010D5E4     68  void TExternArray<UIOnlineNews::DstMenuItem_olns>::vFlush(const struct TExternArray<UIOnlineNews::DstMenuItem_olns>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIOnlineNews::DstMenuItem_olns,AptStructSwapper>::Flush
+  137  0010D6AC     68  void TExternArray<UIOnlineTermsConditions::DstMenuItem_oltc>::vFlush(const struct TExternArray<UIOnlineTermsConditions::DstMenuItem_oltc>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIOnlineTermsConditions::DstMenuItem_oltc,AptStructSwapper>::Flush
+  137  0010D714     68  void TExternArray<UIOnlineTournament_Gotw::DstMenuItem_olgw>::vFlush(const struct TExternArray<UIOnlineTournament_Gotw::DstMenuItem_olgw>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIOnlineTournament_Gotw::DstMenuItem_olgw,AptStructSwapper>::Flush
+  137  0010D77C     68  void TExternArray<UIOnlineTournament_LeaderBoard::DstMenuItem_oltl>::vFlush(const struct TExternArray<UIOnlineTournament_LeaderBoard::DstMenuItem_oltl>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIOnlineTournament_LeaderBoard::DstMenuItem_oltl,AptStructSwapper>::Flush
+  137  0010D7E4     68  void TExternArray<UIOnlineWaitingRoom::PlayerMenuItem>::vFlush(const struct TExternArray<UIOnlineWaitingRoom::PlayerMenuItem>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIOnlineWaitingRoom::PlayerMenuItem,AptStructSwapper>::Flush
+  137  0010D84C     68  void TExternArray<UIOnlineTournament_TourWins::DstMenuItem_oltw>::vFlush(const struct TExternArray<UIOnlineTournament_TourWins::DstMenuItem_oltw>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIOnlineTournament_TourWins::DstMenuItem_oltw,AptStructSwapper>::Flush
+  137  0010D8B4     68  void TExternArray<UIOnlineTournament_Wml::DstMenuItem_olwm>::vFlush(const struct TExternArray<UIOnlineTournament_Wml::DstMenuItem_olwm>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIOnlineTournament_Wml::DstMenuItem_olwm,AptStructSwapper>::Flush
+  137  0010D91C     68  void TExternArray<UIOnlineStats_Player::OnlineFlashItem>::vFlush(const struct TExternArray<UIOnlineStats_Player::OnlineFlashItem>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIOnlineStats_Player::OnlineFlashItem,AptStructSwapper>::Flush
+  137  0010D984     68  void TExternArray<UIOnlineStats_Category::OnlineFlashItem>::vFlush(const struct TExternArray<UIOnlineStats_Category::OnlineFlashItem>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIOnlineStats_Category::OnlineFlashItem,AptStructSwapper>::Flush
+  137  0010D9EC     68  void TExternArray<UIOnlineChatBox::DstMenuItem_olcb>::vFlush(const struct TExternArray<UIOnlineChatBox::DstMenuItem_olcb>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIOnlineChatBox::DstMenuItem_olcb,AptStructSwapper>::Flush
+  137  0010DA54     68  void TExternArray<UIOnlineUserFeedback::DstMenuItem_oluf>::vFlush(const struct TExternArray<UIOnlineUserFeedback::DstMenuItem_oluf>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIOnlineUserFeedback::DstMenuItem_oluf,AptStructSwapper>::Flush
+  137  0010DABC     68  void TExternArray<UIPgaTourLeaderboard::DstMenuItem_ptlb>::vFlush(const struct TExternArray<UIPgaTourLeaderboard::DstMenuItem_ptlb>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIPgaTourLeaderboard::DstMenuItem_ptlb,AptStructSwapper>::Flush
+  137  0010DB24     68  void TExternArray<UIPgaTourStats_Category::PgaFlashItem>::vFlush(const struct TExternArray<UIPgaTourStats_Category::PgaFlashItem>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIPgaTourStats_Category::PgaFlashItem,AptStructSwapper>::Flush
+  137  0010DB8C     68  void TExternArray<UIPgaTourStats_Player::PgaFlashItem>::vFlush(const struct TExternArray<UIPgaTourStats_Player::PgaFlashItem>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIPgaTourStats_Player::PgaFlashItem,AptStructSwapper>::Flush
+  137  0010DBF4     68  void TExternArray<UIPgaTournament_TourWins::DstMenuItem_pgtw>::vFlush(const struct TExternArray<UIPgaTournament_TourWins::DstMenuItem_pgtw>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIPgaTournament_TourWins::DstMenuItem_pgtw,AptStructSwapper>::Flush
+  137  0010DC5C     68  void TExternArray<UIPRivalsItem>::vFlush(const struct TExternArray<UIPRivalsItem>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIPRivalsItem,AptStructSwapper>::Flush
+  137  0010DCC4     68  void TExternArray<UIRivalsChallenge::RChallengeMenuItem>::vFlush(const struct TExternArray<UIRivalsChallenge::RChallengeMenuItem>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIRivalsChallenge::RChallengeMenuItem,AptStructSwapper>::Flush
+  137  0010DD2C     68  void TExternArray<UIRivalsChallengeToggle::RChallengeToggleMenuItem>::vFlush(const struct TExternArray<UIRivalsChallengeToggle::RChallengeToggleMenuItem>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIRivalsChallengeToggle::RChallengeToggleMenuItem,AptStructSwapper>::Flush
+  137  0010DD94     68  void TExternArray<UITrophyList::UITrophyItem>::vFlush(const struct TExternArray<UITrophyList::UITrophyItem>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UITrophyList::UITrophyItem,AptStructSwapper>::Flush
+  137  0010DDFC     68  void TExternArray<UISkillChallenge::DstMenuItem_skil>::vFlush(const struct TExternArray<UISkillChallenge::DstMenuItem_skil>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UISkillChallenge::DstMenuItem_skil,AptStructSwapper>::Flush
+  137  0010DE64     68  void TExternArray<UITigerChallenge::DstMenuItem_tigr>::vFlush(const struct TExternArray<UITigerChallenge::DstMenuItem_tigr>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UITigerChallenge::DstMenuItem_tigr,AptStructSwapper>::Flush
+  137  0010DECC     68  void TExternArray<UITrainingChallenge::DstMenuItem_tran>::vFlush(const struct TExternArray<UITrainingChallenge::DstMenuItem_tran>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UITrainingChallenge::DstMenuItem_tran,AptStructSwapper>::Flush
+  137  0010DF34     68  void TExternArray<UIMenuItemBaseDst>::vFlush(const struct TExternArray<UIMenuItemBaseDst>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIMenuItemBaseDst,AptStructSwapper>::Flush
+  137  0010DF9C     68  void TExternArray<UIXBoxLiveSettings::DstMenuItem_xbls>::vFlush(const struct TExternArray<UIXBoxLiveSettings::DstMenuItem_xbls>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UIXBoxLiveSettings::DstMenuItem_xbls,AptStructSwapper>::Flush
+  137  0010E004     68  void TExternArray<RivalChStatsItem3>::vFlush(const struct TExternArray<RivalChStatsItem3>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<RivalChStatsItem3,AptStructSwapper>::Flush
+  137  0010E06C     68  void TExternArray<RivalChRankItem2>::vFlush(const struct TExternArray<RivalChRankItem2>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<RivalChRankItem2,AptStructSwapper>::Flush
+  137  0010E0D4     68  void TExternArray<RivalChChallengeItem1>::vFlush(const struct TExternArray<RivalChChallengeItem1>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<RivalChChallengeItem1,AptStructSwapper>::Flush
+  137  0010E13C     68  void TExternArray<UiMenuItemDefaultDst>::vFlush(const struct TExternArray<UiMenuItemDefaultDst>* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<UiMenuItemDefaultDst,AptStructSwapper>::Flush
+  139    inline-only   int32 TExternArray<UIMenuToggleItem>::vGetElemCount(const struct TExternArray<UIMenuToggleItem>* this)
+  139  00103918      C  int32 TExternArray<UIPRivalsItem>::vGetElemCount(const struct TExternArray<UIPRivalsItem>* this)
+  139  00103924      C  int32 TExternArray<UICourseItem>::vGetElemCount(const struct TExternArray<UICourseItem>* this)
+  139  00103930      C  int32 TExternArray<UIRivalsChallengeToggle::RChallengeToggleMenuItem>::vGetElemCount(const struct TExternArray<UIRivalsChallengeToggle::RChallengeToggleMenuItem>* this)
+  139  0010393C      C  int32 TExternArray<UIRivalsChallenge::RChallengeMenuItem>::vGetElemCount(const struct TExternArray<UIRivalsChallenge::RChallengeMenuItem>* this)
+  139  00103948      C  int32 TExternArray<UIPgaTournament_TourWins::DstMenuItem_pgtw>::vGetElemCount(const struct TExternArray<UIPgaTournament_TourWins::DstMenuItem_pgtw>* this)
+  139  00103954      C  int32 TExternArray<UIPgaTourLeaderboard::DstMenuItem_ptlb>::vGetElemCount(const struct TExternArray<UIPgaTourLeaderboard::DstMenuItem_ptlb>* this)
+  139  00103960      C  int32 TExternArray<UIPgaTourStats_Category::PgaFlashItem>::vGetElemCount(const struct TExternArray<UIPgaTourStats_Category::PgaFlashItem>* this)
+  139  0010396C      C  int32 TExternArray<UIPgaTourStats_Player::PgaFlashItem>::vGetElemCount(const struct TExternArray<UIPgaTourStats_Player::PgaFlashItem>* this)
+  139  00103978      C  int32 TExternArray<UILoadProfile::UIProfileMenuItem>::vGetElemCount(const struct TExternArray<UILoadProfile::UIProfileMenuItem>* this)
+  139  00103984      C  int32 TExternArray<UITrophyList::UITrophyItem>::vGetElemCount(const struct TExternArray<UITrophyList::UITrophyItem>* this)
+  139  00103990      C  int32 TExternArray<UIOnlineLobbyRoomMatches::MatchesMenuItem>::vGetElemCount(const struct TExternArray<UIOnlineLobbyRoomMatches::MatchesMenuItem>* this)
+  139  0010399C      C  int32 TExternArray<UIOnlineLobbyRoom::PlayerMenuItem>::vGetElemCount(const struct TExternArray<UIOnlineLobbyRoom::PlayerMenuItem>* this)
+  139  001039A8      C  int32 TExternArray<UIOnlineGameModes_LeaderBoards::DstMenuItem_olgl>::vGetElemCount(const struct TExternArray<UIOnlineGameModes_LeaderBoards::DstMenuItem_olgl>* this)
+  139  001039B4      C  int32 TExternArray<UIOnlineGameModes_Gotw::DstMenuItem_omgw>::vGetElemCount(const struct TExternArray<UIOnlineGameModes_Gotw::DstMenuItem_omgw>* this)
+  139  001039C0      C  int32 TExternArray<UIOnlineGameAdvertisement::DstMenuItem>::vGetElemCount(const struct TExternArray<UIOnlineGameAdvertisement::DstMenuItem>* this)
+  139  001039CC      C  int32 TExternArray<UIOnlineChatBox::DstMenuItem_olcb>::vGetElemCount(const struct TExternArray<UIOnlineChatBox::DstMenuItem_olcb>* this)
+  139  001039D8      C  int32 TExternArray<UIOnlineLegalAgreement::DstMenuItem_olla>::vGetElemCount(const struct TExternArray<UIOnlineLegalAgreement::DstMenuItem_olla>* this)
+  139  001039E4      C  int32 TExternArray<UIOnlineCreateAccountMoreInfo::DstMenuItem_ocai>::vGetElemCount(const struct TExternArray<UIOnlineCreateAccountMoreInfo::DstMenuItem_ocai>* this)
+  139  001039F0      C  int32 TExternArray<UIMenuItemBaseDst>::vGetElemCount(const struct TExternArray<UIMenuItemBaseDst>* this)
+  139  001039FC      C  int32 TExternArray<UIMenuItemDefaultDst_Tutorial>::vGetElemCount(const struct TExternArray<UIMenuItemDefaultDst_Tutorial>* this)
+  139  00103A08      C  int32 TExternArray<RivalChChallengeItem1>::vGetElemCount(const struct TExternArray<RivalChChallengeItem1>* this)
+  139  00103A14      C  int32 TExternArray<UIAwards::DstMenuItem_awar>::vGetElemCount(const struct TExternArray<UIAwards::DstMenuItem_awar>* this)
+  139  00103A20      C  int32 TExternArray<UIMoney::DstMenuItem_euro>::vGetElemCount(const struct TExternArray<UIMoney::DstMenuItem_euro>* this)
+  139  00103A2C      C  int32 TExternArray<UIBattleGolf_ChooseClub::BattleGolf_ChooseClub_DstMenuItem>::vGetElemCount(const struct TExternArray<UIBattleGolf_ChooseClub::BattleGolf_ChooseClub_DstMenuItem>* this)
+  139  00103A38      C  int32 TExternArray<UIBattleGolf_ChooseAddRemove::UIBattleGolfDstMenuItem>::vGetElemCount(const struct TExternArray<UIBattleGolf_ChooseAddRemove::UIBattleGolfDstMenuItem>* this)
+  139  00103A44      C  int32 TExternArray<UiMenuItemDefaultDst>::vGetElemCount(const struct TExternArray<UiMenuItemDefaultDst>* this)
+  139  00103A50      C  int32 TExternArray<RivalChStatsItem3>::vGetElemCount(const struct TExternArray<RivalChStatsItem3>* this)
+  139  00103A5C      C  int32 TExternArray<RivalChRankItem2>::vGetElemCount(const struct TExternArray<RivalChRankItem2>* this)
+  139  00103A68      C  int32 TExternArray<UITrainingChallenge::DstMenuItem_tran>::vGetElemCount(const struct TExternArray<UITrainingChallenge::DstMenuItem_tran>* this)
+  139  00103A74      C  int32 TExternArray<UISkillChallenge::DstMenuItem_skil>::vGetElemCount(const struct TExternArray<UISkillChallenge::DstMenuItem_skil>* this)
+  139  00103A80      C  int32 TExternArray<UITigerChallenge::DstMenuItem_tigr>::vGetElemCount(const struct TExternArray<UITigerChallenge::DstMenuItem_tigr>* this)
+  139  00103A8C      C  int32 TExternArray<UIXBoxLiveSettings::DstMenuItem_xbls>::vGetElemCount(const struct TExternArray<UIXBoxLiveSettings::DstMenuItem_xbls>* this)
+  139  00103A98      C  int32 TExternArray<UIESPNNewsDetail::DstMenuItem_esnd>::vGetElemCount(const struct TExternArray<UIESPNNewsDetail::DstMenuItem_esnd>* this)
+  139  00103AA4      C  int32 TExternArray<UIESPNNews::DstMenuItem_esns>::vGetElemCount(const struct TExternArray<UIESPNNews::DstMenuItem_esns>* this)
+  139  00103AB0      C  int32 TExternArray<UICSPScreen::DstMenuItem_cspp>::vGetElemCount(const struct TExternArray<UICSPScreen::DstMenuItem_cspp>* this)
+  139  00103ABC      C  int32 TExternArray<UIEASportsTrax::DstMenuItem_trax>::vGetElemCount(const struct TExternArray<UIEASportsTrax::DstMenuItem_trax>* this)
+  139  00103AC8      C  int32 TExternArray<UICreateACourse::DstMenuItem_crac>::vGetElemCount(const struct TExternArray<UICreateACourse::DstMenuItem_crac>* this)
+  139  00103AD4      C  int32 TExternArray<UIMyTour_Sponsorships::DstMenuItem_mtss>::vGetElemCount(const struct TExternArray<UIMyTour_Sponsorships::DstMenuItem_mtss>* this)
+  139  00103AE0      C  int32 TExternArray<UIMyTour_SponsorshipItems::DstMenuItem_mtsi>::vGetElemCount(const struct TExternArray<UIMyTour_SponsorshipItems::DstMenuItem_mtsi>* this)
+  139  00103AEC      C  int32 TExternArray<UICredits::DstMenuItem_cred>::vGetElemCount(const struct TExternArray<UICredits::DstMenuItem_cred>* this)
+  139  00103AF8      C  int32 TExternArray<PSMenuItem>::vGetElemCount(const struct TExternArray<PSMenuItem>* this)
+  139  00103B04      C  int32 TExternArray<GFMenuItem>::vGetElemCount(const struct TExternArray<GFMenuItem>* this)
+  139  00103B10      C  int32 TExternArray<UIOnlineUserFeedback::DstMenuItem_oluf>::vGetElemCount(const struct TExternArray<UIOnlineUserFeedback::DstMenuItem_oluf>* this)
+  139  00103B1C      C  int32 TExternArray<UIOnlineMyQuickMessages::DstMenuItem_olqm>::vGetElemCount(const struct TExternArray<UIOnlineMyQuickMessages::DstMenuItem_olqm>* this)
+  139  00103B28      C  int32 TExternArray<UIOnlineFAQ::DstMenuItem_olfq>::vGetElemCount(const struct TExternArray<UIOnlineFAQ::DstMenuItem_olfq>* this)
+  139  00103B34      C  int32 TExternArray<UIOnlineNews::DstMenuItem_olns>::vGetElemCount(const struct TExternArray<UIOnlineNews::DstMenuItem_olns>* this)
+  139  00103B40      C  int32 TExternArray<UIOnlineTermsConditions::DstMenuItem_oltc>::vGetElemCount(const struct TExternArray<UIOnlineTermsConditions::DstMenuItem_oltc>* this)
+  139  00103B4C      C  int32 TExternArray<UIOnlineStats_Category::OnlineFlashItem>::vGetElemCount(const struct TExternArray<UIOnlineStats_Category::OnlineFlashItem>* this)
+  139  00103B58      C  int32 TExternArray<UIOnlineStats_Player::OnlineFlashItem>::vGetElemCount(const struct TExternArray<UIOnlineStats_Player::OnlineFlashItem>* this)
+  139  00103B64      C  int32 TExternArray<UIOnlineTournament_Wml::DstMenuItem_olwm>::vGetElemCount(const struct TExternArray<UIOnlineTournament_Wml::DstMenuItem_olwm>* this)
+  139  00103B70      C  int32 TExternArray<UIOnlineTournament_LeaderBoard::DstMenuItem_oltl>::vGetElemCount(const struct TExternArray<UIOnlineTournament_LeaderBoard::DstMenuItem_oltl>* this)
+  139  00103B7C      C  int32 TExternArray<UIOnlineTournament_Gotw::DstMenuItem_olgw>::vGetElemCount(const struct TExternArray<UIOnlineTournament_Gotw::DstMenuItem_olgw>* this)
+  139  00103B88      C  int32 TExternArray<UIOnlineTournament_TourWins::DstMenuItem_oltw>::vGetElemCount(const struct TExternArray<UIOnlineTournament_TourWins::DstMenuItem_oltw>* this)
+  139  00103B94      C  int32 TExternArray<UIOnlineEAMessenger::DstMenuItem_omsg>::vGetElemCount(const struct TExternArray<UIOnlineEAMessenger::DstMenuItem_omsg>* this)
+  139  00103BA0      C  int32 TExternArray<UIOnlineWaitingRoom::PlayerMenuItem>::vGetElemCount(const struct TExternArray<UIOnlineWaitingRoom::PlayerMenuItem>* this)
+  141  001042D8    338  void TExternArray<RivalChChallengeItem1>::vSetNbrElems(const struct TExternArray<RivalChChallengeItem1>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<RivalChChallengeItem1,AptStructSwapper>::SetNbrElems
+  141  00104610    240  void TExternArray<RivalChRankItem2>::vSetNbrElems(const struct TExternArray<RivalChRankItem2>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<RivalChRankItem2,AptStructSwapper>::SetNbrElems
+  141  00104850    280  void TExternArray<RivalChStatsItem3>::vSetNbrElems(const struct TExternArray<RivalChStatsItem3>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<RivalChStatsItem3,AptStructSwapper>::SetNbrElems
+  141  00104AD0    214  void TExternArray<UIXBoxLiveSettings::DstMenuItem_xbls>::vSetNbrElems(const struct TExternArray<UIXBoxLiveSettings::DstMenuItem_xbls>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIXBoxLiveSettings::DstMenuItem_xbls,AptStructSwapper>::SetNbrElems
+  141  00104CE4    1F4  void TExternArray<UIMenuItemBaseDst>::vSetNbrElems(const struct TExternArray<UIMenuItemBaseDst>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIMenuItemBaseDst,AptStructSwapper>::SetNbrElems
+  141  00104ED8    2C0  void TExternArray<UITrainingChallenge::DstMenuItem_tran>::vSetNbrElems(const struct TExternArray<UITrainingChallenge::DstMenuItem_tran>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UITrainingChallenge::DstMenuItem_tran,AptStructSwapper>::SetNbrElems
+  141  00105198    360  void TExternArray<UITigerChallenge::DstMenuItem_tigr>::vSetNbrElems(const struct TExternArray<UITigerChallenge::DstMenuItem_tigr>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UITigerChallenge::DstMenuItem_tigr,AptStructSwapper>::SetNbrElems
+  141  001054F8    214  void TExternArray<UISkillChallenge::DstMenuItem_skil>::vSetNbrElems(const struct TExternArray<UISkillChallenge::DstMenuItem_skil>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UISkillChallenge::DstMenuItem_skil,AptStructSwapper>::SetNbrElems
+  141  0010570C    2A0  void TExternArray<UITrophyList::UITrophyItem>::vSetNbrElems(const struct TExternArray<UITrophyList::UITrophyItem>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UITrophyList::UITrophyItem,AptStructSwapper>::SetNbrElems
+  141  001059AC    280  void TExternArray<UIRivalsChallengeToggle::RChallengeToggleMenuItem>::vSetNbrElems(const struct TExternArray<UIRivalsChallengeToggle::RChallengeToggleMenuItem>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIRivalsChallengeToggle::RChallengeToggleMenuItem,AptStructSwapper>::SetNbrElems
+  141  00105C2C    2A0  void TExternArray<UIRivalsChallenge::RChallengeMenuItem>::vSetNbrElems(const struct TExternArray<UIRivalsChallenge::RChallengeMenuItem>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIRivalsChallenge::RChallengeMenuItem,AptStructSwapper>::SetNbrElems
+  141  00105ECC    280  void TExternArray<UIPRivalsItem>::vSetNbrElems(const struct TExternArray<UIPRivalsItem>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIPRivalsItem,AptStructSwapper>::SetNbrElems
+  141  0010614C    280  void TExternArray<UIPgaTournament_TourWins::DstMenuItem_pgtw>::vSetNbrElems(const struct TExternArray<UIPgaTournament_TourWins::DstMenuItem_pgtw>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIPgaTournament_TourWins::DstMenuItem_pgtw,AptStructSwapper>::SetNbrElems
+  141  001063CC    360  void TExternArray<UIPgaTourStats_Player::PgaFlashItem>::vSetNbrElems(const struct TExternArray<UIPgaTourStats_Player::PgaFlashItem>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIPgaTourStats_Player::PgaFlashItem,AptStructSwapper>::SetNbrElems
+  141  0010672C    378  void TExternArray<UIPgaTourStats_Category::PgaFlashItem>::vSetNbrElems(const struct TExternArray<UIPgaTourStats_Category::PgaFlashItem>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIPgaTourStats_Category::PgaFlashItem,AptStructSwapper>::SetNbrElems
+  141  00106AA4    300  void TExternArray<UIPgaTourLeaderboard::DstMenuItem_ptlb>::vSetNbrElems(const struct TExternArray<UIPgaTourLeaderboard::DstMenuItem_ptlb>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIPgaTourLeaderboard::DstMenuItem_ptlb,AptStructSwapper>::SetNbrElems
+  141  00106DA4    214  void TExternArray<UIOnlineUserFeedback::DstMenuItem_oluf>::vSetNbrElems(const struct TExternArray<UIOnlineUserFeedback::DstMenuItem_oluf>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIOnlineUserFeedback::DstMenuItem_oluf,AptStructSwapper>::SetNbrElems
+  141  00106FB8    254  void TExternArray<UIOnlineChatBox::DstMenuItem_olcb>::vSetNbrElems(const struct TExternArray<UIOnlineChatBox::DstMenuItem_olcb>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIOnlineChatBox::DstMenuItem_olcb,AptStructSwapper>::SetNbrElems
+  141  0010720C    360  void TExternArray<UIOnlineStats_Category::OnlineFlashItem>::vSetNbrElems(const struct TExternArray<UIOnlineStats_Category::OnlineFlashItem>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIOnlineStats_Category::OnlineFlashItem,AptStructSwapper>::SetNbrElems
+  141  0010756C    2A0  void TExternArray<UIOnlineStats_Player::OnlineFlashItem>::vSetNbrElems(const struct TExternArray<UIOnlineStats_Player::OnlineFlashItem>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIOnlineStats_Player::OnlineFlashItem,AptStructSwapper>::SetNbrElems
+  141  0010780C    280  void TExternArray<UIOnlineTournament_Wml::DstMenuItem_olwm>::vSetNbrElems(const struct TExternArray<UIOnlineTournament_Wml::DstMenuItem_olwm>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIOnlineTournament_Wml::DstMenuItem_olwm,AptStructSwapper>::SetNbrElems
+  141  00107A8C    280  void TExternArray<UIOnlineTournament_TourWins::DstMenuItem_oltw>::vSetNbrElems(const struct TExternArray<UIOnlineTournament_TourWins::DstMenuItem_oltw>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIOnlineTournament_TourWins::DstMenuItem_oltw,AptStructSwapper>::SetNbrElems
+  141  00107D0C    378  void TExternArray<UIOnlineWaitingRoom::PlayerMenuItem>::vSetNbrElems(const struct TExternArray<UIOnlineWaitingRoom::PlayerMenuItem>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIOnlineWaitingRoom::PlayerMenuItem,AptStructSwapper>::SetNbrElems
+  141  00108084    254  void TExternArray<UIOnlineTournament_LeaderBoard::DstMenuItem_oltl>::vSetNbrElems(const struct TExternArray<UIOnlineTournament_LeaderBoard::DstMenuItem_oltl>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIOnlineTournament_LeaderBoard::DstMenuItem_oltl,AptStructSwapper>::SetNbrElems
+  141  001082D8    240  void TExternArray<UIOnlineTournament_Gotw::DstMenuItem_olgw>::vSetNbrElems(const struct TExternArray<UIOnlineTournament_Gotw::DstMenuItem_olgw>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIOnlineTournament_Gotw::DstMenuItem_olgw,AptStructSwapper>::SetNbrElems
+  141  00108518    214  void TExternArray<UIOnlineTermsConditions::DstMenuItem_oltc>::vSetNbrElems(const struct TExternArray<UIOnlineTermsConditions::DstMenuItem_oltc>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIOnlineTermsConditions::DstMenuItem_oltc,AptStructSwapper>::SetNbrElems
+  141  0010872C    214  void TExternArray<UIOnlineNews::DstMenuItem_olns>::vSetNbrElems(const struct TExternArray<UIOnlineNews::DstMenuItem_olns>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIOnlineNews::DstMenuItem_olns,AptStructSwapper>::SetNbrElems
+  141  00108940    240  void TExternArray<UIOnlineMyQuickMessages::DstMenuItem_olqm>::vSetNbrElems(const struct TExternArray<UIOnlineMyQuickMessages::DstMenuItem_olqm>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIOnlineMyQuickMessages::DstMenuItem_olqm,AptStructSwapper>::SetNbrElems
+  141  00108B80    240  void TExternArray<UIOnlineLobbyRoomMatches::MatchesMenuItem>::vSetNbrElems(const struct TExternArray<UIOnlineLobbyRoomMatches::MatchesMenuItem>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIOnlineLobbyRoomMatches::MatchesMenuItem,AptStructSwapper>::SetNbrElems
+  141  00108DC0    2A0  void TExternArray<UIOnlineLobbyRoom::PlayerMenuItem>::vSetNbrElems(const struct TExternArray<UIOnlineLobbyRoom::PlayerMenuItem>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIOnlineLobbyRoom::PlayerMenuItem,AptStructSwapper>::SetNbrElems
+  141  00109060    2D4  void TExternArray<UIOnlineGameModes_LeaderBoards::DstMenuItem_olgl>::vSetNbrElems(const struct TExternArray<UIOnlineGameModes_LeaderBoards::DstMenuItem_olgl>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIOnlineGameModes_LeaderBoards::DstMenuItem_olgl,AptStructSwapper>::SetNbrElems
+  141  00109334    240  void TExternArray<UIOnlineGameModes_Gotw::DstMenuItem_omgw>::vSetNbrElems(const struct TExternArray<UIOnlineGameModes_Gotw::DstMenuItem_omgw>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIOnlineGameModes_Gotw::DstMenuItem_omgw,AptStructSwapper>::SetNbrElems
+  141  00109574    214  void TExternArray<UIOnlineGameAdvertisement::DstMenuItem>::vSetNbrElems(const struct TExternArray<UIOnlineGameAdvertisement::DstMenuItem>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIOnlineGameAdvertisement::DstMenuItem,AptStructSwapper>::SetNbrElems
+  141  00109788    214  void TExternArray<UIOnlineFAQ::DstMenuItem_olfq>::vSetNbrElems(const struct TExternArray<UIOnlineFAQ::DstMenuItem_olfq>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIOnlineFAQ::DstMenuItem_olfq,AptStructSwapper>::SetNbrElems
+  141  0010999C    280  void TExternArray<UIOnlineEAMessenger::DstMenuItem_omsg>::vSetNbrElems(const struct TExternArray<UIOnlineEAMessenger::DstMenuItem_omsg>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIOnlineEAMessenger::DstMenuItem_omsg,AptStructSwapper>::SetNbrElems
+  141  00109C1C    214  void TExternArray<UIOnlineLegalAgreement::DstMenuItem_olla>::vSetNbrElems(const struct TExternArray<UIOnlineLegalAgreement::DstMenuItem_olla>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIOnlineLegalAgreement::DstMenuItem_olla,AptStructSwapper>::SetNbrElems
+  141  00109E30    214  void TExternArray<UIOnlineCreateAccountMoreInfo::DstMenuItem_ocai>::vSetNbrElems(const struct TExternArray<UIOnlineCreateAccountMoreInfo::DstMenuItem_ocai>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIOnlineCreateAccountMoreInfo::DstMenuItem_ocai,AptStructSwapper>::SetNbrElems
+  141  0010A044    214  void TExternArray<UIESPNNewsDetail::DstMenuItem_esnd>::vSetNbrElems(const struct TExternArray<UIESPNNewsDetail::DstMenuItem_esnd>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIESPNNewsDetail::DstMenuItem_esnd,AptStructSwapper>::SetNbrElems
+  141  0010A258    214  void TExternArray<UIESPNNews::DstMenuItem_esns>::vSetNbrElems(const struct TExternArray<UIESPNNews::DstMenuItem_esns>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIESPNNews::DstMenuItem_esns,AptStructSwapper>::SetNbrElems
+  141  0010A46C    240  void TExternArray<UIMyTour_Sponsorships::DstMenuItem_mtss>::vSetNbrElems(const struct TExternArray<UIMyTour_Sponsorships::DstMenuItem_mtss>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIMyTour_Sponsorships::DstMenuItem_mtss,AptStructSwapper>::SetNbrElems
+  141  0010A6AC    254  void TExternArray<UIMyTour_SponsorshipItems::DstMenuItem_mtsi>::vSetNbrElems(const struct TExternArray<UIMyTour_SponsorshipItems::DstMenuItem_mtsi>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIMyTour_SponsorshipItems::DstMenuItem_mtsi,AptStructSwapper>::SetNbrElems
+  141  0010A900    2D4  void TExternArray<UIMenuItemDefaultDst_Tutorial>::vSetNbrElems(const struct TExternArray<UIMenuItemDefaultDst_Tutorial>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIMenuItemDefaultDst_Tutorial,AptStructSwapper>::SetNbrElems
+  141  0010ABD4    378  void TExternArray<UIMenuToggleItem>::vSetNbrElems(const struct TExternArray<UIMenuToggleItem>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIMenuToggleItem,AptStructSwapper>::SetNbrElems
+  141  0010AF4C    240  void TExternArray<UILoadProfile::UIProfileMenuItem>::vSetNbrElems(const struct TExternArray<UILoadProfile::UIProfileMenuItem>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UILoadProfile::UIProfileMenuItem,AptStructSwapper>::SetNbrElems
+  141  0010B18C    280  void TExternArray<UIEASportsTrax::DstMenuItem_trax>::vSetNbrElems(const struct TExternArray<UIEASportsTrax::DstMenuItem_trax>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIEASportsTrax::DstMenuItem_trax,AptStructSwapper>::SetNbrElems
+  141  0010B40C    254  void TExternArray<UICSPScreen::DstMenuItem_cspp>::vSetNbrElems(const struct TExternArray<UICSPScreen::DstMenuItem_cspp>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UICSPScreen::DstMenuItem_cspp,AptStructSwapper>::SetNbrElems
+  141  0010B660    240  void TExternArray<UICredits::DstMenuItem_cred>::vSetNbrElems(const struct TExternArray<UICredits::DstMenuItem_cred>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UICredits::DstMenuItem_cred,AptStructSwapper>::SetNbrElems
+  141  0010B8A0    280  void TExternArray<UICreateACourse::DstMenuItem_crac>::vSetNbrElems(const struct TExternArray<UICreateACourse::DstMenuItem_crac>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UICreateACourse::DstMenuItem_crac,AptStructSwapper>::SetNbrElems
+  141  0010BB20    20C  void TExternArray<UICourseItem>::vSetNbrElems(const struct TExternArray<UICourseItem>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UICourseItem,AptStructSwapper>::SetNbrElems
+  141  0010BD2C    240  void TExternArray<UIBattleGolf_ChooseClub::BattleGolf_ChooseClub_DstMenuItem>::vSetNbrElems(const struct TExternArray<UIBattleGolf_ChooseClub::BattleGolf_ChooseClub_DstMenuItem>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIBattleGolf_ChooseClub::BattleGolf_ChooseClub_DstMenuItem,AptStructSwapper>::SetNbrElems
+  141  0010BF6C    214  void TExternArray<UIBattleGolf_ChooseAddRemove::UIBattleGolfDstMenuItem>::vSetNbrElems(const struct TExternArray<UIBattleGolf_ChooseAddRemove::UIBattleGolfDstMenuItem>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIBattleGolf_ChooseAddRemove::UIBattleGolfDstMenuItem,AptStructSwapper>::SetNbrElems
+  141  0010C180    254  void TExternArray<UIMoney::DstMenuItem_euro>::vSetNbrElems(const struct TExternArray<UIMoney::DstMenuItem_euro>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIMoney::DstMenuItem_euro,AptStructSwapper>::SetNbrElems
+  141  0010C3D4    254  void TExternArray<UIAwards::DstMenuItem_awar>::vSetNbrElems(const struct TExternArray<UIAwards::DstMenuItem_awar>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UIAwards::DstMenuItem_awar,AptStructSwapper>::SetNbrElems
+  141  0010C63C    1F4  void TExternArray<PSMenuItem>::vSetNbrElems(const struct TExternArray<PSMenuItem>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<PSMenuItem,AptStructSwapper>::SetNbrElems
+  141  0010C830    254  void TExternArray<GFMenuItem>::vSetNbrElems(const struct TExternArray<GFMenuItem>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<GFMenuItem,AptStructSwapper>::SetNbrElems
+  141  0010E1A4    280  void TExternArray<UiMenuItemDefaultDst>::vSetNbrElems(const struct TExternArray<UiMenuItemDefaultDst>* this, int32 inDefaultSize)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<UiMenuItemDefaultDst,AptStructSwapper>::SetNbrElems
+  143  0010E4D4     80  void* TExternArray<UIMenuItemBaseDst>::UpdateElementAndLabel(const struct TExternArray<UIMenuItemBaseDst>* this, int32 inIndex, char* inLabel)
+  143  0010E554     C4  void* TExternArray<UIXBoxLiveSettings::DstMenuItem_xbls>::UpdateElementAndLabel(const struct TExternArray<UIXBoxLiveSettings::DstMenuItem_xbls>* this, int32 inIndex, char* inLabel)
+  143  0010E618    138  void* TExternArray<UICSPScreen::DstMenuItem_cspp>::UpdateElementAndLabel(const struct TExternArray<UICSPScreen::DstMenuItem_cspp>* this, int32 inIndex, char* inLabel)
+                         inlines  TArrayInternal<UICSPScreen::DstMenuItem_cspp,AptStructSwapper>::operator[]
+  143  0010E750     E4  void* TExternArray<UIEASportsTrax::DstMenuItem_trax>::UpdateElementAndLabel(const struct TExternArray<UIEASportsTrax::DstMenuItem_trax>* this, int32 inIndex, char* inLabel)
+  143  0010E834     C4  void* TExternArray<UIESPNNewsDetail::DstMenuItem_esnd>::UpdateElementAndLabel(const struct TExternArray<UIESPNNewsDetail::DstMenuItem_esnd>* this, int32 inIndex, char* inLabel)
+  143  0010E8F8     E4  void* TExternArray<UICreateACourse::DstMenuItem_crac>::UpdateElementAndLabel(const struct TExternArray<UICreateACourse::DstMenuItem_crac>* this, int32 inIndex, char* inLabel)
+  143  0010E9DC     D4  void* TExternArray<UIMyTour_Sponsorships::DstMenuItem_mtss>::UpdateElementAndLabel(const struct TExternArray<UIMyTour_Sponsorships::DstMenuItem_mtss>* this, int32 inIndex, char* inLabel)
+  143  0010EAB0    11C  void* TExternArray<UITigerChallenge::DstMenuItem_tigr>::UpdateElementAndLabel(const struct TExternArray<UITigerChallenge::DstMenuItem_tigr>* this, int32 inIndex, char* inLabel)
+  143  0010EBCC     D4  void* TExternArray<UIAwards::DstMenuItem_awar>::UpdateElementAndLabel(const struct TExternArray<UIAwards::DstMenuItem_awar>* this, int32 inIndex, char* inLabel)
+  143  0010ECA0     E4  void* TExternArray<UiMenuItemDefaultDst>::UpdateElementAndLabel(const struct TExternArray<UiMenuItemDefaultDst>* this, int32 inIndex, char* inLabel)
+  143  0010ED84     E4  void* TExternArray<UIRivalsChallengeToggle::RChallengeToggleMenuItem>::UpdateElementAndLabel(const struct TExternArray<UIRivalsChallengeToggle::RChallengeToggleMenuItem>* this, int32 inIndex, char* inLabel)
+  143  0010EE68     EC  void* TExternArray<UIRivalsChallenge::RChallengeMenuItem>::UpdateElementAndLabel(const struct TExternArray<UIRivalsChallenge::RChallengeMenuItem>* this, int32 inIndex, char* inLabel)
+  143  0010EF54    11C  void* TExternArray<UIPgaTourStats_Category::PgaFlashItem>::UpdateElementAndLabel(const struct TExternArray<UIPgaTourStats_Category::PgaFlashItem>* this, int32 inIndex, char* inLabel)
+  143  0010F070    11C  void* TExternArray<UIPgaTourStats_Player::PgaFlashItem>::UpdateElementAndLabel(const struct TExternArray<UIPgaTourStats_Player::PgaFlashItem>* this, int32 inIndex, char* inLabel)
+  143  0010F18C     C4  void* TExternArray<UIESPNNews::DstMenuItem_esns>::UpdateElementAndLabel(const struct TExternArray<UIESPNNews::DstMenuItem_esns>* this, int32 inIndex, char* inLabel)
+  143  0010F250     D4  void* TExternArray<UIOnlineLobbyRoomMatches::MatchesMenuItem>::UpdateElementAndLabel(const struct TExternArray<UIOnlineLobbyRoomMatches::MatchesMenuItem>* this, int32 inIndex, char* inLabel)
+  143  0010F324    11C  void* TExternArray<UIOnlineWaitingRoom::PlayerMenuItem>::UpdateElementAndLabel(const struct TExternArray<UIOnlineWaitingRoom::PlayerMenuItem>* this, int32 inIndex, char* inLabel)
+  143  0010F440     E4  void* TExternArray<RivalChStatsItem3>::UpdateElementAndLabel(const struct TExternArray<RivalChStatsItem3>* this, int32 inIndex, char* inLabel)
+  143  0010F524     D4  void* TExternArray<RivalChRankItem2>::UpdateElementAndLabel(const struct TExternArray<RivalChRankItem2>* this, int32 inIndex, char* inLabel)
+  143  0010F5F8     F4  void* TExternArray<UITrainingChallenge::DstMenuItem_tran>::UpdateElementAndLabel(const struct TExternArray<UITrainingChallenge::DstMenuItem_tran>* this, int32 inIndex, char* inLabel)
+  143  0010F6EC     C4  void* TExternArray<UISkillChallenge::DstMenuItem_skil>::UpdateElementAndLabel(const struct TExternArray<UISkillChallenge::DstMenuItem_skil>* this, int32 inIndex, char* inLabel)
+  143  0010F7B0     D4  void* TExternArray<UIMoney::DstMenuItem_euro>::UpdateElementAndLabel(const struct TExternArray<UIMoney::DstMenuItem_euro>* this, int32 inIndex, char* inLabel)
+  143  0010F884     D4  void* TExternArray<UILoadProfile::UIProfileMenuItem>::UpdateElementAndLabel(const struct TExternArray<UILoadProfile::UIProfileMenuItem>* this, int32 inIndex, char* inLabel)
+  143  0010F958    104  void* TExternArray<UIPgaTourLeaderboard::DstMenuItem_ptlb>::UpdateElementAndLabel(const struct TExternArray<UIPgaTourLeaderboard::DstMenuItem_ptlb>* this, int32 inIndex, char* inLabel)
+  143  0010FA5C     D4  void* TExternArray<UIBattleGolf_ChooseClub::BattleGolf_ChooseClub_DstMenuItem>::UpdateElementAndLabel(const struct TExternArray<UIBattleGolf_ChooseClub::BattleGolf_ChooseClub_DstMenuItem>* this, int32 inIndex, char* inLabel)
+  143  0010FB30     C4  void* TExternArray<UIBattleGolf_ChooseAddRemove::UIBattleGolfDstMenuItem>::UpdateElementAndLabel(const struct TExternArray<UIBattleGolf_ChooseAddRemove::UIBattleGolfDstMenuItem>* this, int32 inIndex, char* inLabel)
+  143  0010FBF4     D4  void* TExternArray<UIMyTour_SponsorshipItems::DstMenuItem_mtsi>::UpdateElementAndLabel(const struct TExternArray<UIMyTour_SponsorshipItems::DstMenuItem_mtsi>* this, int32 inIndex, char* inLabel)
+  143  0010FCC8     D4  void* TExternArray<UICredits::DstMenuItem_cred>::UpdateElementAndLabel(const struct TExternArray<UICredits::DstMenuItem_cred>* this, int32 inIndex, char* inLabel)
+  143  0010FD9C     C4  void* TExternArray<UIOnlineFAQ::DstMenuItem_olfq>::UpdateElementAndLabel(const struct TExternArray<UIOnlineFAQ::DstMenuItem_olfq>* this, int32 inIndex, char* inLabel)
+  143  0010FE60     C4  void* TExternArray<UIOnlineNews::DstMenuItem_olns>::UpdateElementAndLabel(const struct TExternArray<UIOnlineNews::DstMenuItem_olns>* this, int32 inIndex, char* inLabel)
+  143  0010FF24     80  void* TExternArray<PSMenuItem>::UpdateElementAndLabel(const struct TExternArray<PSMenuItem>* this, int32 inIndex, char* inLabel)
+  143  0010FFA4     D4  void* TExternArray<GFMenuItem>::UpdateElementAndLabel(const struct TExternArray<GFMenuItem>* this, int32 inIndex, char* inLabel)
+  143  00110078     C4  void* TExternArray<UIOnlineUserFeedback::DstMenuItem_oluf>::UpdateElementAndLabel(const struct TExternArray<UIOnlineUserFeedback::DstMenuItem_oluf>* this, int32 inIndex, char* inLabel)
+  143  0011013C     D4  void* TExternArray<UIOnlineMyQuickMessages::DstMenuItem_olqm>::UpdateElementAndLabel(const struct TExternArray<UIOnlineMyQuickMessages::DstMenuItem_olqm>* this, int32 inIndex, char* inLabel)
+  143  00110210     E4  void* TExternArray<UIPRivalsItem>::UpdateElementAndLabel(const struct TExternArray<UIPRivalsItem>* this, int32 inIndex, char* inLabel)
+  143  001102F4    218  void* TExternArray<UICourseItem>::UpdateElementAndLabel(const struct TExternArray<UICourseItem>* this, int32 inIndex, char* inLabel)
+                         inlines  TArrayInternal<UICourseItem,AptStructSwapper>::operator[], operator=
+  143  0011050C     E4  void* TExternArray<UIPgaTournament_TourWins::DstMenuItem_pgtw>::UpdateElementAndLabel(const struct TExternArray<UIPgaTournament_TourWins::DstMenuItem_pgtw>* this, int32 inIndex, char* inLabel)
+  143  001105F0     EC  void* TExternArray<UITrophyList::UITrophyItem>::UpdateElementAndLabel(const struct TExternArray<UITrophyList::UITrophyItem>* this, int32 inIndex, char* inLabel)
+  143  001106F0     EC  void* TExternArray<UIOnlineStats_Player::OnlineFlashItem>::UpdateElementAndLabel(const struct TExternArray<UIOnlineStats_Player::OnlineFlashItem>* this, int32 inIndex, char* inLabel)
+  143  001107DC     E4  void* TExternArray<UIOnlineTournament_Wml::DstMenuItem_olwm>::UpdateElementAndLabel(const struct TExternArray<UIOnlineTournament_Wml::DstMenuItem_olwm>* this, int32 inIndex, char* inLabel)
+  143  001108C0     D4  void* TExternArray<UIOnlineTournament_LeaderBoard::DstMenuItem_oltl>::UpdateElementAndLabel(const struct TExternArray<UIOnlineTournament_LeaderBoard::DstMenuItem_oltl>* this, int32 inIndex, char* inLabel)
+  143  00110994     D4  void* TExternArray<UIOnlineTournament_Gotw::DstMenuItem_olgw>::UpdateElementAndLabel(const struct TExternArray<UIOnlineTournament_Gotw::DstMenuItem_olgw>* this, int32 inIndex, char* inLabel)
+  143  00110A68     C4  void* TExternArray<UIOnlineTermsConditions::DstMenuItem_oltc>::UpdateElementAndLabel(const struct TExternArray<UIOnlineTermsConditions::DstMenuItem_oltc>* this, int32 inIndex, char* inLabel)
+  143  00110B2C    11C  void* TExternArray<UIOnlineStats_Category::OnlineFlashItem>::UpdateElementAndLabel(const struct TExternArray<UIOnlineStats_Category::OnlineFlashItem>* this, int32 inIndex, char* inLabel)
+  143  00110C48     E4  void* TExternArray<UIOnlineTournament_TourWins::DstMenuItem_oltw>::UpdateElementAndLabel(const struct TExternArray<UIOnlineTournament_TourWins::DstMenuItem_oltw>* this, int32 inIndex, char* inLabel)
+  143  00110D2C     E4  void* TExternArray<UIOnlineEAMessenger::DstMenuItem_omsg>::UpdateElementAndLabel(const struct TExternArray<UIOnlineEAMessenger::DstMenuItem_omsg>* this, int32 inIndex, char* inLabel)
+  143  00110E10     C4  void* TExternArray<UIOnlineGameAdvertisement::DstMenuItem>::UpdateElementAndLabel(const struct TExternArray<UIOnlineGameAdvertisement::DstMenuItem>* this, int32 inIndex, char* inLabel)
+  143  00110ED4     D4  void* TExternArray<UIOnlineGameModes_Gotw::DstMenuItem_omgw>::UpdateElementAndLabel(const struct TExternArray<UIOnlineGameModes_Gotw::DstMenuItem_omgw>* this, int32 inIndex, char* inLabel)
+  143  00110FA8     D4  void* TExternArray<UIOnlineChatBox::DstMenuItem_olcb>::UpdateElementAndLabel(const struct TExternArray<UIOnlineChatBox::DstMenuItem_olcb>* this, int32 inIndex, char* inLabel)
+  143  0011107C     C4  void* TExternArray<UIOnlineLegalAgreement::DstMenuItem_olla>::UpdateElementAndLabel(const struct TExternArray<UIOnlineLegalAgreement::DstMenuItem_olla>* this, int32 inIndex, char* inLabel)
+  143  00111140     EC  void* TExternArray<UIOnlineLobbyRoom::PlayerMenuItem>::UpdateElementAndLabel(const struct TExternArray<UIOnlineLobbyRoom::PlayerMenuItem>* this, int32 inIndex, char* inLabel)
+  143  0011122C     F4  void* TExternArray<UIOnlineGameModes_LeaderBoards::DstMenuItem_olgl>::UpdateElementAndLabel(const struct TExternArray<UIOnlineGameModes_LeaderBoards::DstMenuItem_olgl>* this, int32 inIndex, char* inLabel)
+  143  00111320     C4  void* TExternArray<UIOnlineCreateAccountMoreInfo::DstMenuItem_ocai>::UpdateElementAndLabel(const struct TExternArray<UIOnlineCreateAccountMoreInfo::DstMenuItem_ocai>* this, int32 inIndex, char* inLabel)
+  143  001113E4     F4  void* TExternArray<UIMenuItemDefaultDst_Tutorial>::UpdateElementAndLabel(const struct TExternArray<UIMenuItemDefaultDst_Tutorial>* this, int32 inIndex, char* inLabel)
+  143  001114D8    10C  void* TExternArray<RivalChChallengeItem1>::UpdateElementAndLabel(const struct TExternArray<RivalChChallengeItem1>* this, int32 inIndex, char* inLabel)
+  143  00115A5C    11C  void* TExternArray<UIMenuToggleItem>::UpdateElementAndLabel(const struct TExternArray<UIMenuToggleItem>* this, int32 inIndex, char* inLabel)
+  163    inline-only   void* TExternArray<UIMenuToggleItem>::GetItem(const struct TExternArray<UIMenuToggleItem>* this, int32 inIndex)
+  163  00101448     84  void* TExternArray<UITrainingChallenge::DstMenuItem_tran>::GetItem(const struct TExternArray<UITrainingChallenge::DstMenuItem_tran>* this, int32 inIndex)
+                         inlines  TArrayInternal<UITrainingChallenge::DstMenuItem_tran,AptStructSwapper>::operator[]
+  163  001014CC     7C  void* TExternArray<UISkillChallenge::DstMenuItem_skil>::GetItem(const struct TExternArray<UISkillChallenge::DstMenuItem_skil>* this, int32 inIndex)
+                         inlines  TArrayInternal<UISkillChallenge::DstMenuItem_skil,AptStructSwapper>::operator[]
+  163  00101548     84  void* TExternArray<UITigerChallenge::DstMenuItem_tigr>::GetItem(const struct TExternArray<UITigerChallenge::DstMenuItem_tigr>* this, int32 inIndex)
+                         inlines  TArrayInternal<UITigerChallenge::DstMenuItem_tigr,AptStructSwapper>::operator[]
+  163  001015CC     7C  void* TExternArray<UIXBoxLiveSettings::DstMenuItem_xbls>::GetItem(const struct TExternArray<UIXBoxLiveSettings::DstMenuItem_xbls>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIXBoxLiveSettings::DstMenuItem_xbls,AptStructSwapper>::operator[]
+  163  00101648     7C  void* TExternArray<UIESPNNewsDetail::DstMenuItem_esnd>::GetItem(const struct TExternArray<UIESPNNewsDetail::DstMenuItem_esnd>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIESPNNewsDetail::DstMenuItem_esnd,AptStructSwapper>::operator[]
+  163  001016C4     7C  void* TExternArray<UIESPNNews::DstMenuItem_esns>::GetItem(const struct TExternArray<UIESPNNews::DstMenuItem_esns>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIESPNNews::DstMenuItem_esns,AptStructSwapper>::operator[]
+  163  00101740     7C  void* TExternArray<UICSPScreen::DstMenuItem_cspp>::GetItem(const struct TExternArray<UICSPScreen::DstMenuItem_cspp>* this, int32 inIndex)
+                         inlines  TArrayInternal<UICSPScreen::DstMenuItem_cspp,AptStructSwapper>::operator[]
+  163  001017D0     84  void* TExternArray<UIEASportsTrax::DstMenuItem_trax>::GetItem(const struct TExternArray<UIEASportsTrax::DstMenuItem_trax>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIEASportsTrax::DstMenuItem_trax,AptStructSwapper>::operator[]
+  163  00101854     84  void* TExternArray<UICreateACourse::DstMenuItem_crac>::GetItem(const struct TExternArray<UICreateACourse::DstMenuItem_crac>* this, int32 inIndex)
+                         inlines  TArrayInternal<UICreateACourse::DstMenuItem_crac,AptStructSwapper>::operator[]
+  163  001018D8     84  void* TExternArray<UIMyTour_Sponsorships::DstMenuItem_mtss>::GetItem(const struct TExternArray<UIMyTour_Sponsorships::DstMenuItem_mtss>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIMyTour_Sponsorships::DstMenuItem_mtss,AptStructSwapper>::operator[]
+  163  0010195C     7C  void* TExternArray<UIMyTour_SponsorshipItems::DstMenuItem_mtsi>::GetItem(const struct TExternArray<UIMyTour_SponsorshipItems::DstMenuItem_mtsi>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIMyTour_SponsorshipItems::DstMenuItem_mtsi,AptStructSwapper>::operator[]
+  163  001019D8     84  void* TExternArray<UICredits::DstMenuItem_cred>::GetItem(const struct TExternArray<UICredits::DstMenuItem_cred>* this, int32 inIndex)
+                         inlines  TArrayInternal<UICredits::DstMenuItem_cred,AptStructSwapper>::operator[]
+  163  00101A5C     7C  void* TExternArray<PSMenuItem>::GetItem(const struct TExternArray<PSMenuItem>* this, int32 inIndex)
+                         inlines  TArrayInternal<PSMenuItem,AptStructSwapper>::operator[]
+  163  00101AEC     7C  void* TExternArray<GFMenuItem>::GetItem(const struct TExternArray<GFMenuItem>* this, int32 inIndex)
+                         inlines  TArrayInternal<GFMenuItem,AptStructSwapper>::operator[]
+  163  00101B68     7C  void* TExternArray<UIOnlineUserFeedback::DstMenuItem_oluf>::GetItem(const struct TExternArray<UIOnlineUserFeedback::DstMenuItem_oluf>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIOnlineUserFeedback::DstMenuItem_oluf,AptStructSwapper>::operator[]
+  163  00101BE4     84  void* TExternArray<UIOnlineMyQuickMessages::DstMenuItem_olqm>::GetItem(const struct TExternArray<UIOnlineMyQuickMessages::DstMenuItem_olqm>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIOnlineMyQuickMessages::DstMenuItem_olqm,AptStructSwapper>::operator[]
+  163  00101C68     7C  void* TExternArray<UIOnlineFAQ::DstMenuItem_olfq>::GetItem(const struct TExternArray<UIOnlineFAQ::DstMenuItem_olfq>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIOnlineFAQ::DstMenuItem_olfq,AptStructSwapper>::operator[]
+  163  00101CE4     7C  void* TExternArray<UIOnlineNews::DstMenuItem_olns>::GetItem(const struct TExternArray<UIOnlineNews::DstMenuItem_olns>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIOnlineNews::DstMenuItem_olns,AptStructSwapper>::operator[]
+  163  00101D60     7C  void* TExternArray<UIOnlineTermsConditions::DstMenuItem_oltc>::GetItem(const struct TExternArray<UIOnlineTermsConditions::DstMenuItem_oltc>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIOnlineTermsConditions::DstMenuItem_oltc,AptStructSwapper>::operator[]
+  163  00101DDC     84  void* TExternArray<UIOnlineStats_Category::OnlineFlashItem>::GetItem(const struct TExternArray<UIOnlineStats_Category::OnlineFlashItem>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIOnlineStats_Category::OnlineFlashItem,AptStructSwapper>::operator[]
+  163  00101E60     84  void* TExternArray<UIOnlineStats_Player::OnlineFlashItem>::GetItem(const struct TExternArray<UIOnlineStats_Player::OnlineFlashItem>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIOnlineStats_Player::OnlineFlashItem,AptStructSwapper>::operator[]
+  163  00101EE4     84  void* TExternArray<UIOnlineTournament_Wml::DstMenuItem_olwm>::GetItem(const struct TExternArray<UIOnlineTournament_Wml::DstMenuItem_olwm>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIOnlineTournament_Wml::DstMenuItem_olwm,AptStructSwapper>::operator[]
+  163  00101F68     7C  void* TExternArray<UIOnlineTournament_LeaderBoard::DstMenuItem_oltl>::GetItem(const struct TExternArray<UIOnlineTournament_LeaderBoard::DstMenuItem_oltl>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIOnlineTournament_LeaderBoard::DstMenuItem_oltl,AptStructSwapper>::operator[]
+  163  00101FE4     84  void* TExternArray<UIOnlineTournament_Gotw::DstMenuItem_olgw>::GetItem(const struct TExternArray<UIOnlineTournament_Gotw::DstMenuItem_olgw>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIOnlineTournament_Gotw::DstMenuItem_olgw,AptStructSwapper>::operator[]
+  163  00102068     84  void* TExternArray<UIOnlineTournament_TourWins::DstMenuItem_oltw>::GetItem(const struct TExternArray<UIOnlineTournament_TourWins::DstMenuItem_oltw>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIOnlineTournament_TourWins::DstMenuItem_oltw,AptStructSwapper>::operator[]
+  163  001020EC     84  void* TExternArray<UIOnlineEAMessenger::DstMenuItem_omsg>::GetItem(const struct TExternArray<UIOnlineEAMessenger::DstMenuItem_omsg>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIOnlineEAMessenger::DstMenuItem_omsg,AptStructSwapper>::operator[]
+  163  00102170     7C  void* TExternArray<UIOnlineWaitingRoom::PlayerMenuItem>::GetItem(const struct TExternArray<UIOnlineWaitingRoom::PlayerMenuItem>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIOnlineWaitingRoom::PlayerMenuItem,AptStructSwapper>::operator[]
+  163  001021EC     84  void* TExternArray<UIOnlineLobbyRoomMatches::MatchesMenuItem>::GetItem(const struct TExternArray<UIOnlineLobbyRoomMatches::MatchesMenuItem>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIOnlineLobbyRoomMatches::MatchesMenuItem,AptStructSwapper>::operator[]
+  163  00102270     84  void* TExternArray<UIOnlineLobbyRoom::PlayerMenuItem>::GetItem(const struct TExternArray<UIOnlineLobbyRoom::PlayerMenuItem>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIOnlineLobbyRoom::PlayerMenuItem,AptStructSwapper>::operator[]
+  163  001022F4     7C  void* TExternArray<UIOnlineGameModes_LeaderBoards::DstMenuItem_olgl>::GetItem(const struct TExternArray<UIOnlineGameModes_LeaderBoards::DstMenuItem_olgl>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIOnlineGameModes_LeaderBoards::DstMenuItem_olgl,AptStructSwapper>::operator[]
+  163  00102370     84  void* TExternArray<UIOnlineGameModes_Gotw::DstMenuItem_omgw>::GetItem(const struct TExternArray<UIOnlineGameModes_Gotw::DstMenuItem_omgw>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIOnlineGameModes_Gotw::DstMenuItem_omgw,AptStructSwapper>::operator[]
+  163  001023F4     7C  void* TExternArray<UIOnlineGameAdvertisement::DstMenuItem>::GetItem(const struct TExternArray<UIOnlineGameAdvertisement::DstMenuItem>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIOnlineGameAdvertisement::DstMenuItem,AptStructSwapper>::operator[]
+  163  00102470     7C  void* TExternArray<UIOnlineChatBox::DstMenuItem_olcb>::GetItem(const struct TExternArray<UIOnlineChatBox::DstMenuItem_olcb>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIOnlineChatBox::DstMenuItem_olcb,AptStructSwapper>::operator[]
+  163  001024EC     7C  void* TExternArray<UIOnlineLegalAgreement::DstMenuItem_olla>::GetItem(const struct TExternArray<UIOnlineLegalAgreement::DstMenuItem_olla>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIOnlineLegalAgreement::DstMenuItem_olla,AptStructSwapper>::operator[]
+  163  00102568     7C  void* TExternArray<UIOnlineCreateAccountMoreInfo::DstMenuItem_ocai>::GetItem(const struct TExternArray<UIOnlineCreateAccountMoreInfo::DstMenuItem_ocai>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIOnlineCreateAccountMoreInfo::DstMenuItem_ocai,AptStructSwapper>::operator[]
+  163  001025E4     7C  void* TExternArray<UIMenuItemBaseDst>::GetItem(const struct TExternArray<UIMenuItemBaseDst>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIMenuItemBaseDst,AptStructSwapper>::operator[]
+  163  00102660     7C  void* TExternArray<UIMenuItemDefaultDst_Tutorial>::GetItem(const struct TExternArray<UIMenuItemDefaultDst_Tutorial>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIMenuItemDefaultDst_Tutorial,AptStructSwapper>::operator[]
+  163  001026DC     84  void* TExternArray<UIPgaTournament_TourWins::DstMenuItem_pgtw>::GetItem(const struct TExternArray<UIPgaTournament_TourWins::DstMenuItem_pgtw>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIPgaTournament_TourWins::DstMenuItem_pgtw,AptStructSwapper>::operator[]
+  163  00102760     84  void* TExternArray<UIPgaTourLeaderboard::DstMenuItem_ptlb>::GetItem(const struct TExternArray<UIPgaTourLeaderboard::DstMenuItem_ptlb>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIPgaTourLeaderboard::DstMenuItem_ptlb,AptStructSwapper>::operator[]
+  163  001027E4     7C  void* TExternArray<UIPgaTourStats_Category::PgaFlashItem>::GetItem(const struct TExternArray<UIPgaTourStats_Category::PgaFlashItem>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIPgaTourStats_Category::PgaFlashItem,AptStructSwapper>::operator[]
+  163  00102860     84  void* TExternArray<UIPgaTourStats_Player::PgaFlashItem>::GetItem(const struct TExternArray<UIPgaTourStats_Player::PgaFlashItem>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIPgaTourStats_Player::PgaFlashItem,AptStructSwapper>::operator[]
+  163  001028E4     84  void* TExternArray<UILoadProfile::UIProfileMenuItem>::GetItem(const struct TExternArray<UILoadProfile::UIProfileMenuItem>* this, int32 inIndex)
+                         inlines  TArrayInternal<UILoadProfile::UIProfileMenuItem,AptStructSwapper>::operator[]
+  163  00102968     84  void* TExternArray<UITrophyList::UITrophyItem>::GetItem(const struct TExternArray<UITrophyList::UITrophyItem>* this, int32 inIndex)
+                         inlines  TArrayInternal<UITrophyList::UITrophyItem,AptStructSwapper>::operator[]
+  163  001029EC     84  void* TExternArray<UIRivalsChallengeToggle::RChallengeToggleMenuItem>::GetItem(const struct TExternArray<UIRivalsChallengeToggle::RChallengeToggleMenuItem>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIRivalsChallengeToggle::RChallengeToggleMenuItem,AptStructSwapper>::operator[]
+  163  00102A70     84  void* TExternArray<UIRivalsChallenge::RChallengeMenuItem>::GetItem(const struct TExternArray<UIRivalsChallenge::RChallengeMenuItem>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIRivalsChallenge::RChallengeMenuItem,AptStructSwapper>::operator[]
+  163  00102AF4     84  void* TExternArray<UIPRivalsItem>::GetItem(const struct TExternArray<UIPRivalsItem>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIPRivalsItem,AptStructSwapper>::operator[]
+  163  00102B84     84  void* TExternArray<UICourseItem>::GetItem(const struct TExternArray<UICourseItem>* this, int32 inIndex)
+                         inlines  TArrayInternal<UICourseItem,AptStructSwapper>::operator[]
+  163  00102C08     7C  void* TExternArray<UIAwards::DstMenuItem_awar>::GetItem(const struct TExternArray<UIAwards::DstMenuItem_awar>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIAwards::DstMenuItem_awar,AptStructSwapper>::operator[]
+  163  00102C84     7C  void* TExternArray<UIMoney::DstMenuItem_euro>::GetItem(const struct TExternArray<UIMoney::DstMenuItem_euro>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIMoney::DstMenuItem_euro,AptStructSwapper>::operator[]
+  163  00102D00     84  void* TExternArray<UIBattleGolf_ChooseClub::BattleGolf_ChooseClub_DstMenuItem>::GetItem(const struct TExternArray<UIBattleGolf_ChooseClub::BattleGolf_ChooseClub_DstMenuItem>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIBattleGolf_ChooseClub::BattleGolf_ChooseClub_DstMenuItem,AptStructSwapper>::operator[]
+  163  00102D84     7C  void* TExternArray<UIBattleGolf_ChooseAddRemove::UIBattleGolfDstMenuItem>::GetItem(const struct TExternArray<UIBattleGolf_ChooseAddRemove::UIBattleGolfDstMenuItem>* this, int32 inIndex)
+                         inlines  TArrayInternal<UIBattleGolf_ChooseAddRemove::UIBattleGolfDstMenuItem,AptStructSwapper>::operator[]
+  163  00102E00     84  void* TExternArray<UiMenuItemDefaultDst>::GetItem(const struct TExternArray<UiMenuItemDefaultDst>* this, int32 inIndex)
+                         inlines  TArrayInternal<UiMenuItemDefaultDst,AptStructSwapper>::operator[]
+  163  00102F6C     84  void* TExternArray<RivalChStatsItem3>::GetItem(const struct TExternArray<RivalChStatsItem3>* this, int32 inIndex)
+                         inlines  TArrayInternal<RivalChStatsItem3,AptStructSwapper>::operator[]
+  163  00102FF0     84  void* TExternArray<RivalChRankItem2>::GetItem(const struct TExternArray<RivalChRankItem2>* this, int32 inIndex)
+                         inlines  TArrayInternal<RivalChRankItem2,AptStructSwapper>::operator[]
+  163  00103074     7C  void* TExternArray<RivalChChallengeItem1>::GetItem(const struct TExternArray<RivalChChallengeItem1>* this, int32 inIndex)
+                         inlines  TArrayInternal<RivalChChallengeItem1,AptStructSwapper>::operator[]
+  176  000FDDEC     18  void UIExternIterator::~UIExternIterator(const struct UIExternIterator* this)
+  179    inline-only   struct IExternArray* UIExternIterator::GetExternArray(const const struct UIExternIterator* this)
+  222  001116E4     18  void UIExternMenuIterator::~UIExternMenuIterator(const struct UIExternMenuIterator* this)
+                         inlines  UIExternIterator::~UIExternIterator
+  242  000FDE3C      8  bool UIExternMenuIterator::GetIsLooping(const struct UIExternMenuIterator* this)
+  243  000FDE44     14  const char* UIExternMenuIterator::GetLabelByIndex(const struct UIExternMenuIterator* this, int32 inIndex)
+  244  000FDE58     14  void UIExternMenuIterator::StartUpdate(const struct UIExternMenuIterator* this)
+  337    inline-only   int32 UIExternScrollMenuIterator::GetActiveItemIndex(const struct UIExternScrollMenuIterator* this)
+  356    inline-only   void UIExternScrollMenuIterator::TurnOnOffScrollBar(const struct UIExternScrollMenuIterator* this, bool bIsOn)
+  359    inline-only   int32 UIExternScrollMenuIterator::GetFirstRowIndex(const const struct UIExternScrollMenuIterator* this)
+  360    inline-only   void UIExternScrollMenuIterator::ForceUpdateScrollThread(const struct UIExternScrollMenuIterator* this)
+  434    inline-only   void MenuLevelStruct::Close(const struct MenuLevelStruct* this)
+  449    inline-only   int32 UIExternCircleMenuIterator::GetCurrentLevel(const struct UIExternCircleMenuIterator* this)
+  462    inline-only   void FlashUpdateItem::SetFlashUpdateList(struct FlashUpdateItem* list, int32 nbr)
+                         local  int i
+  489  00103550      4  enum AptThreadReturnValue AptAutoRepeater::AutoRepeatThread_func(struct IAptSubscriberBase* subs)
+  525  000FDEA4      4  void UIResponseHandler::onShow(const struct UIResponseHandler* this)
+  526  000FDEA8      4  void UIResponseHandler::onHide(const struct UIResponseHandler* this)
+  527  000FDEAC      8  uint32 UIResponseHandler::getUIResponseHandlerOptions(const struct UIResponseHandler* this)

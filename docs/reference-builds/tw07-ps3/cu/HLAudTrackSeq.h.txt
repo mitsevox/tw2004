@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/audio/engine/hl/Headers/HLAudTrackSeq.h
+// compiled in: other_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   89    inline-only   void Seq_SelectVariation(TPerfSeq* pperf, uint8 var)
+                         local  TTrack* ptrk

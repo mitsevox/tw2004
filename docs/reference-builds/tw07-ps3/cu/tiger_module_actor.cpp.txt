@@ -1,0 +1,250 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_actor.cpp
+// compiled in: tiger_module_actor.cpp
+// 75 functions, source order. line | PS3 address | size
+
+   43  0057921C     50  void AdvanceForSearch(const struct Actor* this)
+   51  0057CF64    35C  void AdvanceForPositionSearch(const struct Actor* this)
+                         local  struct <anon> ___profScope
+                         local  struct Frame* frame
+                         local  struct <anon> ___profScope
+                         local  struct <anon> ___profScope
+                         local  struct <anon> ___profScope
+                         local  struct <anon> ___profScope
+                         inlines  Profile, ~Profile
+   89  0057D2C0    C8C  int Advance(const struct Actor* this, float seconds, bool doIK, bool advanceBlend, bool saveCache)
+                         local  struct <anon> ___profScope
+                         local  struct Frame* frame
+                         local  struct <anon> ___profScope
+                         local  struct <anon> ___profScope
+                         local  struct <anon> ___profScope
+                         local  float prevWeight
+                         local  struct <anon> ___profScope
+                         local  const struct Skeleton* skel
+                         local  struct Frame* frame
+                         local  unsigned int faceBoneI
+                         local  struct <anon> ___profScope
+                         local  struct <anon> ___profScope
+                         local  unsigned int boneI
+                         local  float[4] rotation
+                         local  float[4] translation
+                         local  struct <anon> ___profScope
+                         local  unsigned int solutionIndex
+                         local  struct <anon> ___profScope
+                         local  unsigned int rightToe
+                         local  unsigned int rightFoot
+                         local  unsigned int rightFootHalfway
+                         local  unsigned int rightKnee
+                         local  unsigned int rightKneeHalfway
+                         local  unsigned int rightLegTwist
+                         local  unsigned int rightLeg
+                         local  unsigned int leftToe
+                         local  unsigned int leftFoot
+                         local  unsigned int leftFootHalfway
+                         local  unsigned int leftKnee
+                         local  unsigned int leftKneeHalfway
+                         local  unsigned int leftLegTwist
+                         local  unsigned int leftLeg
+                         local  struct <anon> ___profScope
+                         local  struct <anon> ___profScope
+                         local  struct <anon> ___profScope
+                         local  unsigned int handleI
+                         local  unsigned int breakI
+                         local  unsigned int headI
+                         local  const char* stateName
+                         local  char[64] lowerName
+                         local  float extraOffset
+                         inlines  Profile, TIGER_MATH::VecLoad, TIGER_MATH::VecStore, TIGER_MATH::__vmx_lvx, std::strstr, ~Profile
+  293  0057E06C    348  void AdvanceSimple(const struct Actor* this, float seconds)
+                         local  struct <anon> ___profScope
+                         local  struct Frame* frame
+                         local  struct <anon> ___profScope
+                         local  struct <anon> ___profScope
+                         local  struct <anon> ___profScope
+                         local  struct <anon> ___profScope
+                         inlines  Profile, ~Profile
+  325  005792B8     28  const float* GetBoneObjectQuat(const const struct <anon>* this, unsigned int boneI)
+  330  0057C148    39C  void GetBoneWorldPosition(const const struct <anon>* this, float* result, unsigned int boneI, const float* localPosScale)
+                         local  const float* objectPosPtr
+                         local  const float* rootMtxPtr
+                         local  struct <anon> m0
+                         local  struct <anon> m1
+                         local  struct <anon> m2
+                         local  struct <anon> rootPos
+                         local  struct <anon> localPos
+                         inlines  TIGER_MATH::VecApplyMatrix_W1, TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecMulByZ, TIGER_MATH::VecStore, TIGER_MATH::__vmx_lvx, TIGER_MATH::__vmx_stvx, TIGER_MATH::operator+, vec_madd
+  353  0057C4E4    40C  void DoClubIK(const struct Actor* this, unsigned int handleI, unsigned int breakI, unsigned int headI, float offset)
+                         local  const float[4] fMetersToYards
+                         local  struct <anon> metersToYards
+                         local  struct <anon> headPos
+                         local  const float* rootMtxPtr
+                         local  struct <anon> m0
+                         local  struct <anon> m1
+                         local  struct <anon> m2
+                         local  struct <anon> rootPos
+                         local  float headHeight
+                         local  float headPenetration
+                         inlines  TIGER_MATH::VecApplyMatrix_W1, TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::__vmx_lvx, TIGER_MATH::operator+
+  385  0057C8F0    674  void DoFootIK(const struct Actor* this, unsigned int toeI, unsigned int footI, unsigned int footHalfI, unsigned int kneeI, unsigned int kneeHalfI, unsigned int legTwistI, unsigned int legI)
+                         local  const float[4] fMetersToYards
+                         local  struct <anon> metersToYards
+                         local  struct <anon> footPos
+                         local  struct <anon> toePos
+                         local  const float* rootMtxPtr
+                         local  struct <anon> m0
+                         local  struct <anon> m1
+                         local  struct <anon> m2
+                         local  struct <anon> rootPos
+                         local  float footHeight
+                         local  float toeHeight
+                         local  float footPenetration
+                         local  float toePenetration
+                         local  unsigned int rootI
+                         inlines  TIGER_MATH::VecApplyMatrix_W1, TIGER_MATH::VecLoad, TIGER_MATH::VecMul, TIGER_MATH::VecMulByY, TIGER_MATH::VecMulByZ, TIGER_MATH::__vmx_lvx, TIGER_MATH::operator+, Vec, vec_madd
+  428  0057E3B4   115C  void TestCollision(const struct Actor* this, struct HitPool* hitPool, const struct Ray* rays, int count, struct <anon>* vertices, struct <anon>* transforms)
+                         local  struct <anon> ___profScope
+                         local  struct <anon> ___profScope
+                         local  const struct <anon> rootMtx
+                         local  int jointIdx
+                         local  struct <anon> ___profScope
+                         local  struct <anon> ___profScope
+                         local  const const struct <anon>& actorPosition
+                         local  float* target
+                         local  float[4] quat
+                         local  struct <anon> objectMtx
+                         local  struct <anon> worldMtx
+                         inlines  Profile, TIGER_MATH::MtxLoad, TIGER_MATH::MtxMul, TIGER_MATH::MtxSet, TIGER_MATH::MtxStore, TIGER_MATH::VecFromOneX, TIGER_MATH::VecMul, TIGER_MATH::VecMulByW, TIGER_MATH::VecMulByY, TIGER_MATH::VecMulByZ, TIGER_MATH::operator*, TIGER_MATH::operator+, Vec, operator[], ~Profile
+  480  00579308     48  void Zero(const struct Actor* this)
+  501  0057AA60    154  void InitCharacter(const struct Actor* this, struct Character** character, const struct <anon>* definition, int blendShapeCount)
+                         inlines  TagValuePair
+  525  00579378     AC  int SetFaceBone(const struct Actor* this, unsigned int faceBoneI, const char* boneName)
+                         local  int boneIndex
+  540  0057AE38    524  void Actor(const struct Actor* this, const char* name, const char* rigName, const char* igcName, const char* luaInitFunction, const char* luaUpdateFunction, const char* luaShutdownFunction, const struct LuaParam* luaParams, unsigned int luaParamCount, const struct Rig* rig, const struct Mesh* collisionMesh, unsigned int contextIndex, unsigned int faceBoneCount, int blendShapeCount, bool hasIK)
+                         local  unsigned int i
+                         local  unsigned int i
+                         inlines  Rig::GetBinarySize, TagValuePair
+  643  0057ABB4    108  int InitRemapping(const struct Actor* this)
+                         local  const struct Skeleton* skel
+                         local  unsigned int boneCount
+                         local  unsigned int i
+                         inlines  TagValuePair
+  662  00579450     70  int ShutdownRemapping(const struct Actor* this)
+  673  005794C0     A4  int RemapBone(const struct Actor* this, unsigned int boneI, unsigned int boneHashedName)
+                         local  int remappedIndex
+  697  00579564    160  int InitIK(const struct Actor* this)
+                         local  const struct Skeleton* skel
+                         local  unsigned int boneCount
+                         local  const float* invBindMats
+                         local  unsigned int boneI
+                         local  int parentI
+  748  0057B880    3DC  void ShutdownCharacter(const struct Actor* this, struct Character* character)
+                         local  enum Result result
+                         local  const const struct <anon>* pAssert
+                         local  const char* exprString
+                         local  const char* fileString
+                         local  struct <anon> assertInfo
+                         local  enum Result result
+                         local  const const struct <anon>* pAssert
+                         local  const char* exprString
+                         local  const char* fileString
+                         local  struct <anon> assertInfo
+                         inlines  AssertInfo, EARS::GetAssert, ~Character
+  756  0057ACBC    17C  void InitCollision(const struct Actor* this, const struct Mesh* mesh)
+                         local  const int jointCount
+                         local  int jointIdx
+                         local  const char* jointName
+                         inlines  GetJointCount, TagValuePair
+  780  005796F0     78  void ShutdownCollision(const struct Actor* this)
+  792  0057BC5C    1AC  void ~Actor(const struct Actor* this)
+  819  00579768     28  int SetBoneMirrorMask(const struct Actor* this, unsigned int boneI, unsigned int mask)
+  825  00579790    2C0  int SetIsMirror(const struct Actor* this, bool isMirror, struct CCTInterface* cctInterface, unsigned int defaultMask)
+                         local  const struct Skeleton* skel
+                         local  const int boneCount
+                         local  int bi
+                         local  const unsigned int swapCount
+                         local  unsigned int swapI
+                         local  const char* nameA
+                         local  const char* nameB
+                         local  int cctIndexA
+                         local  int cctIndexB
+  898  00579350     28  int GetBoneIndex(const const struct <anon>* this, const char* boneName)
+  904  00579C00    150  int SetState(const struct Actor* this, const char* stateName)
+                         local  int result
+                         local  const char* testState
+  922  00579B80     80  void DetachBank(const struct Actor* this, struct Bank* bank)
+                         local  const char* stateBefore
+                         local  const char* stateAfter
+  936  00579A50     2C  int AttachBank(const struct Actor* this, struct Bank* bank)
+  941  00579A7C    104  const char* GetState(const const struct <anon>* this)
+                         local  const char* invalid
+                         local  const char* stateName
+                         local  const char* ptr
+                         local  unsigned int count
+  983  00579D50     B8  int SetFaceState(const struct Actor* this, const char* stateName)
+                         local  int setResult
+  996  00579E08     28  void DetachFaceBank(const struct Actor* this, struct Bank* bank)
+ 1001  00579E30     2C  int AttachFaceBank(const struct Actor* this, struct Bank* bank)
+ 1010  00579E5C     2C  int IsStateFinished(const const struct <anon>* this)
+ 1024  00579E94    1EC  int TransitionState(const struct Actor* this, const char* stateName, float frames, int holdFirst)
+                         local  struct <anon> info
+                         local  int setResult
+                         local  int setResult
+ 1066  0057A080     3C  unsigned int GetBoneCount(const const struct <anon>* this)
+                         local  const struct Skeleton* skel
+ 1077  0057A0BC     7C  int GetBoneParent(const const struct <anon>* this, unsigned int boneI)
+                         local  const struct Skeleton* skel
+ 1093  0057A138     5C  const float* GetInvBindMats(const const struct <anon>* this)
+                         local  const struct Skeleton* skel
+ 1109  0057A194      8  const struct Mesh* GetCollisionMesh(const const struct <anon>* this)
+ 1114  0057A19C      8  const unsigned char* GetCollisionBoneRemapping(const const struct <anon>* this)
+ 1119  0057A1A4     28  void GetBoneTransform(const const struct <anon>* this, float* matrix, float* quat, unsigned int boneI)
+ 1124  0057F510     FC  void GetCachedBoneTransform(const const struct <anon>* this, float* matrix, float* quat, unsigned int boneI)
+                         local  struct <anon> ___profScope
+                         inlines  Profile, ~Profile
+ 1131  0057A1CC     28  void GetBoneBindTransform(const const struct <anon>* this, float* matrix, unsigned int boneI)
+ 1137  0057A1F4     28  void GetBoneInvBindTransform(const const struct <anon>* this, float* matrix, unsigned int boneI)
+ 1142  0057A21C    118  void GetParentBoneMatrix(const const struct <anon>* this, float* matrix, unsigned int boneI)
+                         local  unsigned int parentBoneI
+                         local  float[4] quat
+                         local  float[16] identity
+ 1163  0057A334     40  const float* GetBlendShapeWeights(const const struct <anon>* this)
+                         local  const struct <anon>* frame
+ 1175  0057A374     10  int GetBlendShapeCount(const const struct <anon>* this)
+ 1180  00579284     34  int SetWeightForIK(const struct Actor* this, unsigned int solutionIndex, float weight)
+ 1198  0057A384     38  float GetWeightForIK(const const struct <anon>* this, unsigned int solutionIndex)
+ 1222  0057A3BC     38  int AddTarget(const struct Actor* this, unsigned int solutionIndex, unsigned int boneI, float quatX, float quatY, float quatZ, float quatW, float transX, float transY, float transZ, unsigned int boneToReparent, unsigned int newParent)
+ 1246  0057DF4C    120  int ComputeSolution(const struct Actor* this, unsigned int iterationCount, unsigned int solutionIndex)
+                         local  struct <anon> ___profScope
+                         inlines  Profile, ~Profile
+ 1262  0057A3F4     28  void ResetSolution(const struct Actor* this, unsigned int solutionIndex)
+ 1270  0057A41C     28  int SetBoneIsTerminal(const struct Actor* this, unsigned int boneI, int isTerminal)
+ 1275  0057A444     28  int SetBoneIsNoIK(const struct Actor* this, unsigned int boneI, int isNoIK)
+ 1280  0057A46C     30  float GetFrameCount(const const struct <anon>* this)
+ 1292  00579424     2C  void SetIsScripted(const struct Actor* this, bool isScripted)
+ 1304  00579278      C  bool IsScripted(const const struct <anon>* this)
+ 1309  0057A49C     2C  void SetIsImmuneToIgc(const struct Actor* this, bool isImmune)
+ 1321  0057A4C8      C  bool IsImmuneToIgc(const const struct <anon>* this)
+ 1326  0057A4D4     2C  void SetIsSleeping(const struct Actor* this, bool isSleeping)
+ 1340  0057A500     2C  float GetBodyTime(const struct Actor* this)
+ 1345  0057A52C     98  void SetBodyTime(const struct Actor* this, float time, bool doPause)
+ 1360  0057A5C4      C  bool IsSleeping(const const struct <anon>* this)
+ 1365  005796C4     2C  void SetIsCollidable(const struct Actor* this, bool isCollidable)
+ 1377  0057A5D0      C  bool IsCollidable(const const struct <anon>* this)
+ 1382  0057A5DC     28  void SetRootMtx(const struct Actor* this, const float* rootMtx)
+ 1387  005792E0     28  const float* GetRootMtx(const const struct <anon>* this)
+ 1392  0057A604     28  void SetBoneConstraint(const struct Actor* this, unsigned int boneI, float twistMin, float twistMax, float swingMaxX, float swingMaxY)
+ 1397  0057A62C     28  void SetBoneConstraintAxes(const struct Actor* this, unsigned int boneI, float axesQuatX, float axesQuatY, float axesQuatZ, float axesQuatW)
+ 1402  0057A654     28  void ResetLocalTransSources(const struct Actor* this)
+ 1407  0057A67C    158  void SetLocalTransSource(const struct Actor* this, const char* dstBoneName, const char* srcBoneName)
+                         local  const int dstI
+                         local  const int srcI
+ 1418  00579E88      C  bool IsInBadState(const const struct <anon>* this)
+ 1424  0057A7D4     D0  const float* GetBoneTargetPos(const const struct <anon>* this, const char* boneName)
+                         local  int boneIndex
+ 1433  0057A8A4     E8  void SetBoneIsBindPose(const struct Actor* this, const char* boneName, bool isBind)
+                         local  int boneIndex
+ 1441  0057A98C     A8  void SetIsBindPose(const struct Actor* this, bool isBind)
+                         local  const struct Skeleton* skel
+                         local  const unsigned int boneCount
+                         local  unsigned int i
+ 1452  0057AA34     2C  void SetIsSimple(const struct Actor* this, bool isSimple)
+ 1464  0057926C      C  bool IsSimple(const const struct <anon>* this)

@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/usermanager.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    5  005E54C0     50  void UserManager(const struct <anon>* this)
+                         inlines  Observable
+   10  005C1DCC     48  void ~UserManager(const struct <anon>* this)
+                         inlines  ~Observable

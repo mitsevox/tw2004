@@ -1,0 +1,22 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/tinter.cpp
+// compiled in: other_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   16  003CE5E4     18  void Tinter::Tinter(const struct Tinter* this)
+   21  003CE5FC     18  void Tinter::~Tinter(const struct Tinter* this)
+   26  003D26D8    338  void Tinter::TintNPixels(const struct Tinter* this, int32_t x, int32_t y, int32_t numPixels, RawTexture_PixelValue* pixels, float* tintParams, struct RawTexture* tintMask, int32_t mipmap)
+                         local  bool resumeTint
+                         local  int i
+                         local  vec4flt inputColor
+                         local  vec4flt outputColor
+                         local  float alphaVal
+                         local  RawTexture_PixelValue maskVal
+                         inlines  RawTexture::ResumeTinting, RawTexture::SuspendTinting
+   75  004023C4     A0  void Tinter::TintNPixels(const struct Tinter* this, int32_t pixelIndex, int32_t numPixels, RawTexture_PixelValue* pixels, float* tintParams, struct RawTexture* tintMask)
+                         local  int32_t pixel
+                         local  int32_t mipmap
+                         local  int32_t lastPixel
+                         local  int32_t pixelNum
+                         local  int32_t y
+                         local  int32_t x
+                         inlines  RawTexture::GetHeight, RawTexture::GetWidth

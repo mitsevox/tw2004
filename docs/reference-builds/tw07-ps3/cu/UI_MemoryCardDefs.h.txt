@@ -1,0 +1,13 @@
+// ../../../../../TIGERCODE/Code/Golf/UI_Core/Common/Headers/UI_MemoryCardDefs.h
+// compiled in: apt_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+  325  0002FF70      8  void MemCardMgrActionParam::MemCardMgrActionParam(const struct MemCardMgrActionParam* this)
+  326  0002FF98     40  void MemCardMgrActionParam::MemCardMgrActionParam(const struct MemCardMgrActionParam* this, enum PlayerNumber_t playerNbr, bool bAllowCancel)
+  327  00030024      4  void MemCardMgrActionParam::MemCardMgrActionParam(const struct MemCardMgrActionParam* this, int32 controllerID)
+  328  00030040      4  void MemCardMgrActionParam::MemCardMgrActionParam(const struct MemCardMgrActionParam* this, enum GM_DriverType_t driverType, enum GM_ModeType_t modeType, bool bOKToLoadLicensed)
+  374    inline-only   void MemCardMgr_UIRequest::ClearRefreshScreen(const struct MemCardMgr_UIRequest* this)
+  375    inline-only   enum eMemCardUIType MemCardMgr_UIRequest::GetUIType(const struct MemCardMgr_UIRequest* this)
+  378    inline-only   void MemCardMgr_UIRequest::SetOptionCount(const struct MemCardMgr_UIRequest* this, int nCount)
+  433    inline-only   bool MemCardMgr::DeviceStateChanged(const struct MemCardMgr* this)
+  434    inline-only   void MemCardMgr::ClearDeviceStateChangeFlags(const struct MemCardMgr* this)

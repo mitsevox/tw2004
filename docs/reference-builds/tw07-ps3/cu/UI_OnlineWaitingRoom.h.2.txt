@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_OnlineWaitingRoom.h
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   24  00119014    160  void UIOnlineWaitingRoom::~UIOnlineWaitingRoom(const struct UIOnlineWaitingRoom* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIOnlineWaitingRoom::PlayerMenuItem>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+   26  000FF8B8      C  uint32 UIOnlineWaitingRoom::GetSignature(const const struct UIOnlineWaitingRoom* this)
+   34  000FF8CC      C  struct IExternArray* UIOnlineWaitingRoom::GetExternArray(const struct UIOnlineWaitingRoom* this)
+   95  000FF8D8     14  enum AptThreadReturnValue UIOnlineWaitingRoom::UpdateHelpInfo_func(struct IAptSubscriberBase* subs)

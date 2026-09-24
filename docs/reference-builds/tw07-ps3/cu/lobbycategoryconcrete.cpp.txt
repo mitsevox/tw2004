@@ -1,0 +1,34 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/lobbycategoryconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   74  005F1E6C     E4  void LobbyCategoryConcrete(const struct <anon>* this, int32_t iIdentifier)
+                         local  int32_t iErr
+                         inlines  RCPointer, operator=
+  107  005F20EC     44  void ~LobbyCategoryConcrete(const struct <anon>* this)
+                         inlines  ~RCPointer
+  128  005B9708      C  int32_t GetIdentifier(const const struct <anon>* this)
+  150  005B9714      C  const char8_t* GetRoomPrefix(const const struct <anon>* this)
+  172  005B9720      C  const char8_t* GetName(const const struct <anon>* this)
+  194  005B972C      C  const char8_t* GetDescription(const const struct <anon>* this)
+  216  005D1528     9C  uint32_t GetPopulation(const const struct <anon>* this)
+                         local  uint32_t uPopulation
+                         local  LobbyRoomlistT* pRoomListApi
+                         local  int32_t iIndex
+                         local  LobbyApiRoomT* pRoom
+                         inlines  GetRoomListApi
+  258  005DE750    200  const struct <anon>* GetRoomList(const const struct <anon>* this)
+                         local  uint32_t uRoomCount
+                         local  LobbyRoomlistT* pRoomListApi
+                         local  RCLobbyRoomList* pList
+                         local  int32_t iIndex
+                         local  LobbyApiRoomT* pRoom
+                         local  uint32_t uIndex
+                         local  LobbyApiRoomT* pRoom
+                         local  struct <anon>* pLobbyRoom
+                         inlines  GetRoomListApi, InsertElement, List
+  317  005D4AA8      8  const struct Dictionary* GetConfiguration(const const struct <anon>* this)
+  343  005CD460    1C4  void GetImageUrl(const const struct <anon>* this, uint32_t uResIndex, char8_t* strBuffer, uint32_t uBufferSize)
+                         local  const struct Dictionary* pDictionary
+                         local  uint32_t uLength
+                         local  uint32_t uIndex

@@ -1,0 +1,35 @@
+// C:/packages/rwmovie/1.04.01/source/movielib/movierenderer/cmn/movierenderer.cpp
+// compiled in: movierenderer.cpp
+// 25 functions, source order. line | PS3 address | size
+
+    0  006FAE38     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   43  006FAED8     3C  struct <anon> GetResourceDescriptor()
+                         local  RwUInt32 alignment
+                         local  RwUInt32 size
+                         inlines  ResourceDescriptor
+   51  006FA404     34  struct MovieRenderer* Initialize(const struct <anon>& resource, struct IResourceAllocator* allocator)
+                         local  struct MovieRenderer* movieRenderer
+  101  006FA4A0     14  void SetVideoRenderer(const struct MovieRenderer* this, struct IVideoRenderer* videoRenderer)
+  126  006FA4B4     14  void SetAudioRenderer(const struct MovieRenderer* this, struct IAudioRenderer* audioRenderer)
+  153  006FA4C8     14  void SetSubtitleRenderer(const struct MovieRenderer* this, struct ISubtitleRenderer* subtitleRenderer)
+  182  006FA4DC     18  void SetAudioDecodeCallback(const struct MovieRenderer* this, AudioDecodeFunc* audioDecodeCallbackFcn, struct IAudioDecoder* pContext)
+  214  006FA4F4     18  void SetReleaseVideoRenderableCallback(const struct MovieRenderer* this, ReleaseVideoRenderableFunc* releaseVideoRenderableCallbackFcn, struct MovieDecoder* pContext)
+  242  006FA50C     18  void AudioFinishedFcn(void* pContext)
+                         local  struct MovieRenderer* that
+  280  006FA524    2B4  void PrepareRenderer(const struct MovieRenderer* this, unsigned int width, unsigned int height)
+  371  006FA7D8     1C  float GetVideoAudioDelay(const struct MovieRenderer* this)
+  403  006FA7F4     84  void SetVolume(const struct MovieRenderer* this, float volume)
+  440  006FA878     80  void Begin(const struct MovieRenderer* this)
+  475  006FA8F8     70  void Pause(const struct MovieRenderer* this)
+  512  006FA968     80  void UnPause(const struct MovieRenderer* this)
+  549  006FA9E8     80  void SetVideoPositionX(const struct MovieRenderer* this, float x)
+  578  006FAA68     80  void SetVideoPositionY(const struct MovieRenderer* this, float y)
+  607  006FAAE8     80  void SetVideoPositionZ(const struct MovieRenderer* this, float z)
+  636  006FAB68     80  void SetVideoScaleX(const struct MovieRenderer* this, float sx)
+  665  006FABE8     80  void SetVideoScaleY(const struct MovieRenderer* this, float sy)
+  700  006FAC68     CC  void Render(const struct MovieRenderer* this, struct <anon>* videoRenderable, struct <anon>* subtitleRenderable)
+  741  006FAD34     58  float GetAudioRenderingPosition(const struct MovieRenderer* this)
+                         local  float returnValue
+  775  006FAD8C     AC  void Shutdown(const struct MovieRenderer* this)
+  831  006FAEB8     10  static void _GLOBAL__I__ZN2rw5movie13MovieRenderer21GetResourceDescriptorEv()
+  832  006FAEC8     10  static void _GLOBAL__D__ZN2rw5movie13MovieRenderer21GetResourceDescriptorEv()

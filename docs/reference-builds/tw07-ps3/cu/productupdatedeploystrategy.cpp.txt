@@ -1,0 +1,31 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/productupdatedeploystrategy.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   74  005BD550    178  bool CreateDirectory(const struct <anon>* this, const char8_t* pRoot, const char8_t* pPath)
+                         local  char8_t[256] strPathCopy
+                         local  const char8_t* pToken
+                         local  uint32_t uTokenLength
+                         local  const char8_t* pSeparatorTokens
+                         local  bool bSuccess
+                         local  char8_t[256] strPartialPath
+                         local  CellFsErrno error
+  151  005BD6C8     6C  bool DeleteFile(const struct <anon>* this, const char8_t* pFileName)
+                         local  bool bSuccess
+  187  005BD734     B8  bool MoveFile(const struct <anon>* this, const char8_t* pSource, const char8_t* pTarget)
+                         local  bool bSuccess
+  236  006217CC     4C  void ProductUpdateDeployStrategy(const struct <anon>* this, struct ProductUpdateManagerStrategy* pUpdateStrategy)
+                         inlines  ProductUpdateStage
+  257  00621864      C  void ~ProductUpdateDeployStrategy(const struct <anon>* this)
+                         inlines  ~ProductUpdateStage
+  281  005DAA84    194  enum ProcessResultE Process(const struct <anon>* this)
+                         local  bool bSuccess
+                         local  struct ProductUpdateInfo* pProductUpdateInfo
+                         local  const struct List<OSDK::ProductUpdateInfoFile>* pFileList
+                         local  uint32_t uNumUpdates
+                         local  uint32_t uUpdateNum
+                         local  struct <anon>* pFileInfo
+                         local  char8_t[256] strPath
+                         local  const char8_t* pRoot
+                         local  char8_t[256] strTargetFile
+                         inlines  GetElementAt, GetFileList, GetNumberOfElements, GetUpdateInfo

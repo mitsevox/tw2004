@@ -1,0 +1,10 @@
+// ../../../../../TIGERCODE/Code/Golf/AI/Headers/AI_Brain.h
+// compiled in: golf2_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   92  00143F3C    10C  void AIBrain::AIBrain(const struct AIBrain* this)
+   93  00144154     44  void AIBrain::~AIBrain(const struct AIBrain* this)
+  111    inline-only   void AIBrain::SetLimitAttempts(const struct AIBrain* this, bool shouldLimit)
+  115    inline-only   bool AIBrain::InUse(const struct AIBrain* this)
+  148    inline-only   void AIBrain::SetInUse(const struct AIBrain* this, bool inUse)
+  149    inline-only   void AIBrain::SetState(const struct AIBrain* this, enum AIState state)

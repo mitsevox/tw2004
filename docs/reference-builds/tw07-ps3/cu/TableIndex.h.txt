@@ -1,0 +1,11 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/TableIndex.h
+// compiled in: IO.cpp, Table.cpp, TableIndex.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   72  00800D98    13C  void TableIndex(const struct TableIndex* this, int32_t initialAllocations, int32_t numColumns, struct Table* table, bool8_t isTemp, IndexRef indexRef, bool8_t allowDuplicates, enum TDbError* dbError)
+  113  007DF150     38  struct TableIndex* GetNext(const const struct <anon>* this)
+  120  00800CB0     38  IndexRef InternalGetRef(const const struct <anon>* this)
+  126  007DF188     3C  void SetNext(const struct TableIndex* this, struct TableIndex* nextIndex)
+  132  00800CE8     38  struct Table* GetTable(const const struct <anon>* this)
+  143  007DF1C4     34  struct ICollection* GetCollection(const struct TableIndex* this)
+  164  008010B8     4C  void ~TableIndex(const struct TableIndex* this)

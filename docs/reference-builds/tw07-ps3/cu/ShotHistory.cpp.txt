@@ -1,0 +1,43 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/AI/ShotHistory.cpp
+// compiled in: golf2_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   26  00196514     80  void ShotHistory::ShotHistory(const struct ShotHistory* this)
+                         inlines  Singleton<ShotHistory>::Singleton
+   34  001330C0     10  void ShotHistory::Reset(const struct ShotHistory* this)
+   41  00149CB4    2D0  void ShotHistory::SetDemoInfo(const struct ShotHistory* this)
+                         local  int demoCourse
+                         local  int demoHole
+                         local  int i
+                         local  int demoHoleHistoryIndex
+                         local  struct sHoleShotHistory demoShot
+  119  00149F84      4  void ShotHistory::Init(const struct ShotHistory* this)
+  133  00149F88      8  bool ShotHistory::ShotHistorySelected(const struct ShotHistory* this, enum PlayerNumber_t PlayerID)
+  138  00149F90     84  bool ShotHistory::GetHoleShotHistory(const struct ShotHistory* this, enum PlayerNumber_t PlayerID, int32 course, int hole, int expIndex, int stroke, const struct sHoleShotHistory& strokeHistory)
+  143  0014A014     20  bool ShotHistory::IsValidStroke(const struct ShotHistory* this, struct sHoleShotHistory* sHoleHistory)
+  149  0014A034     F0  void ShotHistory::GetHistoryDestination(const struct ShotHistory* this, enum PlayerNumber_t PlayerID, int32 course, int hole, int expIndex, const vec4flt& retDest)
+                         local  int strokeIndex
+                         local  struct sHoleShotHistory strokeHistory
+                         inlines  vec3flt_Copy
+  166  0014A124     FC  int ShotHistory::GetNumStrokes(const struct ShotHistory* this, enum PlayerNumber_t PlayerID, int32 course, int hole, int expIndex)
+                         local  int strokeIndex
+                         local  struct sHoleShotHistory strokeHistory
+  182  0014A220    10C  bool ShotHistory::HoledOut(const struct ShotHistory* this, enum PlayerNumber_t PlayerID, int32 course, int hole, int expIndex)
+                         local  bool bRetVal
+                         local  struct sHoleShotHistory strokeHistory
+                         local  int strokeIndex
+  201  0014A32C    108  bool ShotHistory::AddCompletedShotToHistory(const struct ShotHistory* this, enum PlayerNumber_t PlayerID)
+                         local  int course
+                         local  int hole
+                         local  int stroke
+                         local  struct sHoleShotHistory strokeHistory
+                         inlines  GM_GetPlayerHoleStrokes, vec4flt_Copy3
+  217  0014A434     78  int ShotHistory::GetNumCurrentHoleHistories(const struct ShotHistory* this)
+                         local  int course
+                         local  int hole
+                         local  enum PlayerNumber_t PlayerID
+  226  0014A55C     84  void ShotHistory::NextCurrentHistoryIndex(const struct ShotHistory* this)
+  241  0014A4AC     B0  void ShotHistory::PreviousCurrentHistoryIndex(const struct ShotHistory* this)
+  257  0014A5E0      C  int ShotHistory::GetCurrentHistoryIndex(const struct ShotHistory* this)
+  265  0014A5EC    124  void ShotHistory::UpdateUI(const struct ShotHistory* this)
+                         local  char* tempStr

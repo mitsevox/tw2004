@@ -1,0 +1,92 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_FourBall.cpp
+// compiled in: golf_unity.cpp
+// 24 functions, source order. line | PS3 address | size
+
+   17  00204F50     44  void GameModeFourBall::GameModeFourBall(const struct GameModeFourBall* this)
+   22  001FDCB8     18  void GameModeFourBall::~GameModeFourBall(const struct GameModeFourBall* this)
+   27  001FDD3C     E8  void GameModeFourBall::Init(const struct GameModeFourBall* this)
+   44  001FDE24      4  void GameModeFourBall::Update(const struct GameModeFourBall* this)
+   49  001FDE28      4  void GameModeFourBall::Shutdown(const struct GameModeFourBall* this)
+   55  001FDE2C     38  int32 GameModeFourBall::GetEndGameSequence(const struct GameModeFourBall* this)
+                         local  int32 sequence
+   64  00322CE8    5C8  enum PlayerNumber_t GameModeFourBall::GetHonors(const struct GameModeFourBall* this, enum PlayerNumber_t ignore, bool doNotIgnoreHoledOut)
+                         local  enum PlayerNumber_t furthest
+                         local  int32 i
+                         local  float x
+                         local  float y
+                         local  float dist
+                         local  float farthestDist
+                         local  uint32 j
+                         local  TGD_TerrainInfo* pTerrainGameData
+                         local  int32 currentTeamTeeFirstHonors
+                         local  int32 nextTeamTeeFirstHonors
+                         local  enum PlayerNumber_t[4] currentTeeHonors
+                         local  enum PlayerNumber_t swap
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, PLR_HoledOut, std::sqrt
+  202  00322AB4    14C  enum PlayerNumber_t GameModeFourBall::GetHoleWinner(const const struct GameModeFourBall* this)
+                         local  enum PlayerNumber_t winner
+  237  001FDE74      4  void GameModeFourBall::EndGolferTurn(const struct GameModeFourBall* this, enum PlayerNumber_t PlayerID)
+  242  00323A00    2A8  bool GameModeFourBall::HoleFinished(const struct GameModeFourBall* this, enum PlayerNumber_t PlayerID, bool predict)
+                         local  int i
+                         local  int holecount
+                         inlines  GM_GetCurrentHoleIndex
+  297  0033031C    38C  bool GameModeFourBall::GameFinished(const struct GameModeFourBall* this, bool predict)
+                         local  int i
+                         local  int j
+                         local  int holecount
+                         inlines  GM_GetCurrentHoleIndex, GM_IsPlayoff, GM_SetPlayerHoleStrokes
+  366  0032370C    2F4  bool GameModeFourBall::GoToPlayoff(const struct GameModeFourBall* this, bool predict)
+                         local  int32 i
+                         local  int32 j
+                         inlines  GM_GetCurrentHoleIndex, GM_SetPlayerHoleStrokes
+  434  00322350    170  void GameModeFourBall::EndHole(const struct GameModeFourBall* this)
+                         local  int32 currHole
+                         local  enum PlayerNumber_t winTeam
+                         inlines  GM_GetCurrentHoleIndex, GamePlayer::GetGolferScore
+  475  003229C8     EC  void GameModeFourBall::UpdateScoreCard(const struct GameModeFourBall* this)
+                         local  int32 currHole
+                         local  int32 i
+                         inlines  GM_GetCurrentHoleIndex
+  489  00323478    294  void GameModeFourBall::EndGame(const struct GameModeFourBall* this)
+                         local  enum PlayerNumber_t winner
+                         local  enum PlayerNumber_t loser
+                         local  int32 plr
+                         local  int32 pointsAhead
+                         local  int32 totalearned
+                         local  int32 baseearned
+                         local  int32 userID
+                         local  int32 i
+                         local  void* driverPointer
+                         inlines  GM_FullRoundOfGolf, Singleton<GameModeDriverManager>::GetSingleton
+  566  001FDE78     5C  bool GameModeFourBall::OnSameTeam(const struct GameModeFourBall* this, enum PlayerNumber_t PlayerID_1, enum PlayerNumber_t PlayerID_2)
+  574  001FDE64     10  int32 GameModeFourBall::GetPlayerTeam(const const struct GameModeFourBall* this, enum PlayerNumber_t plr)
+  579  003224C0    1FC  bool GameModeFourBall::TeamDone(const const struct GameModeFourBall* this, int teamNum)
+                         local  int32 currHole
+                         local  bool bTeamShotLimitExceeded
+                         local  enum PlayerNumber_t plr1
+                         local  enum PlayerNumber_t plr2
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, PLR_HoledOut
+  604  003226BC     BC  bool GameModeFourBall::TeamConceded(const const struct GameModeFourBall* this, int teamNum)
+                         local  int32 currHole
+                         local  enum PlayerNumber_t plr1
+                         local  enum PlayerNumber_t plr2
+                         inlines  GM_GetCurrentHoleIndex, PLR_HoledOut
+  618  00322778    250  int32 GameModeFourBall::TeamBestPossibleScore(const const struct GameModeFourBall* this, int teamNum)
+                         local  int32 currHole
+                         local  enum PlayerNumber_t plr1
+                         local  enum PlayerNumber_t plr2
+                         local  int32 minScore
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, PLR_HoledOut
+  648  00322C00     E8  bool GameModeFourBall::CanPlayerHelp(const const struct GameModeFourBall* this, enum PlayerNumber_t plr)
+                         local  int32 playerTeam
+                         local  int32 opposingTeam
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes
+  680  003232B0     54  int32 GameModeFourBall::TeamMatchWins(const const struct GameModeFourBall* this, int teamNum)
+                         local  int32 currHole
+                         local  enum PlayerNumber_t plr1
+                         inlines  GM_GetCurrentHoleIndex
+  691  00323304    174  void GameModeFourBall::GetCurrentScoreString(const struct GameModeFourBall* this, char* strBuf, int32 bufferSize)
+                         local  int32 player
+                         local  int32 yourWins
+                         local  int32 theirWins
+  716  001FDED4     14  const char* GameModeFourBall::GetName(const struct GameModeFourBall* this)

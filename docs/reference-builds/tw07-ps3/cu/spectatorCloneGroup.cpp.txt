@@ -1,0 +1,244 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Spectator/spectatorCloneGroup.cpp
+// compiled in: golf2_unity.cpp
+// 43 functions, source order. line | PS3 address | size
+
+  109  001406FC      4  void CSpectatorCloneGroup::AddEffects(struct DXEffectManager* effectManager)
+  114  001434F4      4  void CSpectatorCloneGroup::SetSamplers()
+  118  001434F8      4  void CSpectatorCloneGroup::SetNormalMapSamplers()
+  124  00143614     FC  void CSpectatorCloneGroup::Startup()
+                         local  uint32 shadowVBSize
+  155  0014379C     A8  void CSpectatorCloneGroup::Shutdown()
+  282  00140700      4  void CSpectatorCloneGroup::InitTintColors()
+  287  00143844    17C  void CSpectatorCloneGroup::SetupTinting(const int32* vars)
+                         local  vec4flt var_indices
+  308  001BFA64    1B4  void CSpectatorCloneGroup::Render(const CSpectatorCloneGroupList& cloneGroupList)
+                         local  struct CSpectatorCloneGroup* it
+                         local  struct CSpectatorCloneGroup* itEnd
+                         local  struct CSpectatorCloneGroup* it
+                         local  struct CSpectatorCloneGroup* itEnd
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::First, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetCullMode, Gcm::cellGcmSetCullFace
+  362  0016D590    11C  void CSpectatorCloneGroup::BeginMeshRender()
+                         local  vec4flt gSunColor
+                         local  vec4flt gAmbientColor
+                         local  vec3flt gSunVect
+                         local  vec4flt light
+  400  00172BA8    1FC  void CSpectatorCloneGroup::RenderMeshes(const struct CSpectatorCloneGroup* this)
+                         local  bool base_set
+                         local  uint32 i
+                         local  struct CSpectatorPose* pOverridePose
+                         local  bool bUseOverride
+                         inlines  CSpectatorInstance::GetOverridePose
+  498  00169B44    148  void CSpectatorCloneGroup::RenderCards(const struct CSpectatorCloneGroup* this)
+                         local  TSpectatorModel* m
+                         inlines  CSpectatorModel::GetModel, CSpectatorTexture::GetTexture
+  530  0016F034    314  void CSpectatorCloneGroup::BeginCardRender()
+                         local  bool bPipIsCurrent
+                         local  const const struct CPovMatrix4x4& viewMatrix
+                         local  struct CPovVector4 right
+                         local  struct CPovVector4 up
+                         local  struct CPovVector4[4] quad
+                         local  struct CPovVector4[4] uvList
+                         local  uint32 count
+                         local  vec4flt gSunColor
+                         local  vec4flt gAmbientColor
+                         local  vec4flt eyePoint
+                         local  int i
+                         local  int j
+                         inlines  CPovVector4::operator*, CPovVector4::operator=, CSpectatorSystem::GetViewMatrix
+  614  001E5BB0    200  void CSpectatorCloneGroup::PreRenderShadows(const CSpectatorCloneGroupList& cloneGroupList)
+                         local  int32 renderBufferNum
+                         local  vec4flt* vert
+                         local  int numInstances
+                         local  struct CSpectatorCloneGroup* it
+                         local  struct CSpectatorCloneGroup* itEnd
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::First, DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetZBufferMode, DS_vSetZTestEnable
+  668  00163B9C    230  void CSpectatorCloneGroup::AddShadows(const struct CSpectatorCloneGroup* this, vec4flt* positionAndScaleVB, const int& counter)
+                         local  float w
+                         local  float[4][4] quad
+                         local  float kMaxShadowDistance
+                         local  vec4flt* positionAndScale
+                         local  uint32 i
+                         local  struct CSpectatorInstance* instance
+                         local  const const struct CPovVector3& pos
+                         local  int j
+                         inlines  CSpectatorInstance::GetPosition
+  717  001C55C0    260  void CSpectatorCloneGroup::PreRender(const CSpectatorCloneGroupList& cloneGroupList)
+                         local  bool bIsPip
+                         local  struct CSpectatorCloneGroup* it
+                         local  struct CSpectatorCloneGroup* itEnd
+                         local  VM_SViewport* pViewport
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::First, CPovMatrix4x4::operator=, CSpectatorSystem::IsPipCurrent, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, RC_spGetRenderCtxViewport
+  782  001602A4    1F0  void CSpectatorCloneGroup::Init(const struct CSpectatorCloneGroup* this, struct CSpectatorModel* model, CLONE_GROUP_TYPE type, uint32 maxInstances)
+                         local  int32 size
+                         inlines  CPovLink<CSpectatorInstance>::SetNext, CPovLink<CSpectatorInstance>::SetPrev, CPovLinkedList<CSpectatorInstance>::Init, CPovVector3::operator=
+  838  00157FEC     14  void CSpectatorCloneGroup::SetModel(const struct CSpectatorCloneGroup* this, struct CSpectatorModel* model)
+  846  0014113C     94  void CSpectatorCloneGroup::FreeResources(const struct CSpectatorCloneGroup* this)
+  878  0014B664     AC  void CSpectatorCloneGroup::AddInstance(const struct CSpectatorCloneGroup* this, struct CSpectatorInstance* instance)
+                         inlines  CPovLink<CSpectatorInstance>::Link, CPovLinkedList<CSpectatorInstance>::Append
+  893  0016FF58     28  void CSpectatorCloneGroup::RemoveInstance(const struct CSpectatorCloneGroup* this, struct CSpectatorInstance* instance)
+                         inlines  CPovLink<CSpectatorInstance>::Unlink
+  902  00143B44     18  void Spectator_SetBigHeads(bool flag)
+  907  00143B5C     20  void Spectator_ToggleBigHeads()
+  914  0018C05C    448  void Spectator_CalcHeadTrack(struct CSpectatorInstance* instance, const float& tracking_angle, const mat44flt& matrix, int focus_type)
+                         local  mat44flt vert_mat
+                         local  mat44flt horiz_mat
+                         local  float c
+                         local  float s
+                         local  struct CPovVector3 pos
+                         local  vec4flt ball_pos
+                         local  vec4flt tracking
+                         local  float vertAngle
+                         local  float tempAngle
+                         inlines  CPovVector3::CPovVector3, CSpectatorInstance::GetPosition, LLMath_IdentifyMat, std::atan2, std::cosf, std::sinf, vec_st
+ 1003  0018C4A4    35C  void CSpectatorCloneGroup::UpdateHeadTracking(const struct CSpectatorCloneGroup* this)
+                         local  struct CSpectatorInstance* instance
+                         local  mat44flt matrix
+                         local  float base_angle
+                         local  int focus_type
+                         local  unsigned int i
+                         local  const float scale
+                         local  float diff
+                         inlines  CSpectatorCloneGroup::GetNumSortedInstances, CSpectatorInstance::GetAngle
+ 1086  0018C800     9C  void CSpectatorCloneGroup::Update(const struct CSpectatorCloneGroup* this, float dt, bool renderAsMeshes)
+ 1106  0016FA54     78  void CSpectatorCloneGroup::Flush(const struct CSpectatorCloneGroup* this)
+                         inlines  CPovLink<CSpectatorInstance>::GetNext, CPovLink<CSpectatorInstance>::Unlink, CPovLinkedList<CSpectatorInstance>::First
+ 1121  0015F7CC    2CC  void CSpectatorCloneGroup::UpdateVertexBuffer(const struct CSpectatorCloneGroup* this)
+                         local  uint32 i
+                         local  CARD_SPRITE_VERTEX* vert
+                         local  struct CSpectatorInstance* instance
+                         local  CARD_SPRITE_VERTEX[360] vert_copy
+                         local  CARD_SPRITE_VERTEX* vert_c
+                         local  const const struct CPovVector3& pos
+                         local  uint32 color
+                         inlines  CSpectatorInstance::GetPosition
+ 1185  001729E4    1C4  void CSpectatorCloneGroup::CreateCards(const struct CSpectatorCloneGroup* this)
+                         local  uint32 i
+                         local  struct CSpectatorInstance* instance
+                         local  const const RENDER_ANGLE_INFO& angleInfo
+ 1234  001C5068    558  void CSpectatorCloneGroup::BeginCreateCards()
+                         local  mat44flt viewMatrix
+                         local  struct CPovVector3 right
+                         local  struct CPovVector3 forward
+                         local  vec4flt cameraPos
+                         local  vec4flt targetPos
+                         local  vec4flt up
+                         local  struct CA_SCamera* camera
+                         local  vec4flt tmp
+                         local  vec4flt xaxis
+                         local  vec4flt yaxis
+                         local  vec4flt zaxis
+                         local  mat44flt camMatrix
+                         local  mat44flt cam_viewMatrix
+                         local  int i
+                         local  int i
+                         local  int j
+                         inlines  CPovMatrix4x4::operator[], CPovVector3::Cross, CPovVector3::Normalize, CPovVector3::operator=, CPovVector4::operator[], LLMath_CrossProduct3W0, LLMath_DotProduct, RC_spGetCurrentRenderCtxCamera, __vec_cross, vec_add, vec_madd, vec_nmsub, vec_perm, vec_sld
+ 1378  00172600    200  void CSpectatorCloneGroup::SetupLighting(const const struct CPovMatrix4x4& worldMatrix)
+                         local  struct CPovMatrix4x4 modWorldMatrix
+                         local  struct CPovMatrix4x4 worldViewProjMatrix
+                         local  mat44flt mat
+                         local  vec4flt unit_light
+                         local  int i
+                         local  int j
+                         inlines  CPovMatrix4x4::CPovMatrix4x4, CPovMatrix4x4::operator[], CPovVector4::operator=
+ 1473  001406EC      8  const char* CSpectatorCloneGroup::GetAnimName(const const struct CSpectatorCloneGroup* this, uint8 index)
+ 1479  001406E4      8  uint8 CSpectatorCloneGroup::NumAnims(const const struct CSpectatorCloneGroup* this)
+ 1486  00143304      4  void CSpectatorCloneGroup::SetAnimIndex(const struct CSpectatorCloneGroup* this, uint8 index, bool randomStart)
+ 1510  00189E60    53C  void CSpectatorCloneGroup::SortInstances(const struct CSpectatorCloneGroup* this)
+                         local  float cutoff_distance
+                         local  float shadow_cutoff_distance
+                         local  unsigned int top_index
+                         local  unsigned int bottom_index
+                         local  unsigned int shadow_index
+                         local  unsigned int to_sort
+                         local  struct CSpectatorInstance*[360] shadow_instances
+                         local  struct CPovVector3 center
+                         local  struct CPovVector3 delta
+                         local  float distance
+                         local  bool bForceMeshInPip
+                         local  const struct CPovFrustum& viewFrustum
+                         local  const const struct CPovMatrix4x4& worldToViewportTfm
+                         local  const struct CPovVector4 wColumn
+                         local  struct CSpectatorInstance* instance
+                         local  struct CSpectatorInstance* end
+                         local  const const struct CPovMatrix4x4& worldToViewportTfm2
+                         local  const struct CPovVector4 wColumn2
+                         local  const float nearPlane
+                         local  const float farPlane
+                         local  const struct CPovVector3& viewPos
+                         local  const float plane0_dist
+                         local  const float plane1_dist
+                         local  const struct CPovVector3& plane0_norm
+                         local  const struct CPovVector3& plane1_norm
+                         local  const float plane2_dist
+                         local  const float plane3_dist
+                         local  const struct CPovVector3& plane2_norm
+                         local  const struct CPovVector3& plane3_norm
+                         local  float value
+                         local  bool bIsVisible
+                         local  unsigned int i
+                         local  const struct CPovFrustum& viewFrustum2
+                         local  float distFromPipCamera
+                         local  bool bPipIsCloser
+                         local  float angle
+                         local  float gPipCameraAngleOffsetFromMainCamera
+                         inlines  CPovLink<CSpectatorInstance>::GetNext, CPovLinkedList<CSpectatorInstance>::First, CPovMatrix4x4::operator[], CPovPlane::GetDistance, CPovVector3::operator=, CPovVector3::operator[], CPovVector4::CPovVector4, CPovVector4::operator[], CSpectatorInstance::GetAngle, CSpectatorInstance::GetDistance, CSpectatorInstance::GetPosition, CSpectatorInstance::SetDistance, CSpectatorInstance::SetIsVisible, CSpectatorInstance::SetPipViewOnly
+ 1700  00189B24    2C0  void CSpectatorCloneGroup::ReChooseAngles(const struct CSpectatorCloneGroup* this)
+                         local  struct CPovVector3 center
+                         local  struct CPovVector3 delta
+                         local  float distance
+                         local  bool bBasedOnPipView
+                         local  const struct CPovFrustum& viewFrustum
+                         local  const const struct CPovMatrix4x4& worldToViewportTfm
+                         local  const struct CPovVector4 wColumn
+                         local  struct CSpectatorInstance* instance
+                         local  struct CSpectatorInstance* end
+                         local  const float nearPlane
+                         local  const float farPlane
+                         local  bool bIsVisible
+                         local  const struct CPovFrustum& viewFrustum2
+                         local  float angle
+                         local  float gPipCameraAngleOffsetFromMainCamera
+                         inlines  CPovLink<CSpectatorInstance>::GetNext, CPovLinkedList<CSpectatorInstance>::First, CPovVector3::operator=, CPovVector4::CPovVector4, CPovVector4::operator[], CSpectatorInstance::GetAngle, CSpectatorInstance::GetPosition, CSpectatorInstance::SetDistance, CSpectatorInstance::SetIsVisible, CSpectatorInstance::SetPipViewOnly, CSpectatorSystem::GetViewFrustum
+ 1793  0016E094    324  void CSpectatorCloneGroup::ChooseAngles(const struct CSpectatorCloneGroup* this)
+                         local  float MIN_CARD_DISTANCE
+                         local  float MAX_ANGLE_ERROR
+                         local  const float minCardDistance
+                         local  uint32 i
+                         local  struct CSpectatorInstance* instance
+                         local  float distance
+                         local  float angle
+                         local  bool bUseOverride
+                         local  bool keepAsMesh
+                         local  RENDER_ANGLE_INFO* renderAngle
+                         local  float smallestError
+                         local  uint32 smallestErrorIndex
+                         local  struct CSpectatorPose* pose
+                         local  uint32 j
+                         local  bool isAtlasFull
+                         local  float error
+                         inlines  CSpectatorCloneGroup::GetPose, CSpectatorInstance::GetAngle, CSpectatorInstance::GetAngle_pip, CSpectatorInstance::GetDistance, CSpectatorInstance::GetOverridePose, CSpectatorInstance::SetCardIndexX, CSpectatorInstance::SetCardIndexY, CSpectatorInstance::SetIsMesh
+ 1939  00165894     B4  void CSpectatorCloneGroup::BeginUpdate()
+                         local  struct CA_SCamera* camera
+                         local  float fovInRadians
+                         local  float kMinAngle
+                         inlines  CA_fGetCameraFieldOfView
+ 1969  00143300      4  void CSpectatorCloneGroup::EndUpdate()
+ 1975  00143B7C     A0  void CSpectatorCloneGroup::IncCardIndex(const struct CSpectatorCloneGroup* this)
+ 1990  00143C1C     2C  bool CSpectatorCloneGroup::AnimEnd(const struct CSpectatorCloneGroup* this)
+ 2000  00143C48     20  void CSpectatorCloneGroup::ToggleNormalMap(const struct CSpectatorCloneGroup* this)
+ 2007  00140740     18  bool CSpectatorCloneGroup::GetUseNormalMap(const struct CSpectatorCloneGroup* this)
+ 2016  0015AB30    95C  void CSpectatorCloneGroup::UpdateCCT(const struct CSpectatorCloneGroup* this)
+                         local  const char* state
+                         local  int actor_state_ended
+                         local  char* idle_name
+                         local  float transition
+                         local  float max_distance
+                         local  uint32 i
+                         local  struct CSpectatorInstance* instance
+                         local  float delay_time
+                         local  int model_type
+                         local  bool justset
+                         local  float max_distance
+                         local  uint32 i
+                         local  struct CSpectatorInstance* instance

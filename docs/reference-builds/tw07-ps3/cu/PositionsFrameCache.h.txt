@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/Internal/PositionsFrameCache.h
+// compiled in: PositionsFrameCache.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  108  0059CA5C     38  void AnimFrameListEntry::AnimFrameListEntry(const struct AnimFrameListEntry* this)
+                         inlines  AnimFrameKey::AnimFrameKey

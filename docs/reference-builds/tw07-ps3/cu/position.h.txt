@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Utils/position.h
+// compiled in: headgate_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   13  00344104     20  void APosition::APosition(const struct APosition* this)
+   14  00344CC0     20  void APosition::APosition(const struct APosition* this, coord _x, coord _z)
+   15  00344CA0     10  void APosition::APosition(const struct APosition* this, coord _x, coord _y, coord _z)
+   16  00344DCC      4  void APosition::APosition(const struct APosition* this, int _x, int _y, int _z)
+   17  00344DD4      C  void APosition::APosition(const struct APosition* this, int _x, int _z)
+   18  00344E08      4  void APosition::APosition(const struct APosition* this, const struct APosition* p)
+   19  00344E2C      4  void APosition::APosition(const struct APosition* this, const const struct APosition& p)
+   58    inline-only   void APosition::Set(const struct APosition* this, float X, float Y, float Z)

@@ -1,0 +1,19 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_VirtualKeyboard.h
+// compiled in: apt_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+   30    inline-only   enum State UIVirtualKeyboard::GetState(const struct UIVirtualKeyboard* this)
+   48    inline-only   void UIVirtualKeyboard::TurnOffBackSound(const struct UIVirtualKeyboard* this)
+   50  000FF330      C  uint32 UIVirtualKeyboard::GetSignature(const const struct UIVirtualKeyboard* this)
+   55  000FF33C     44  void UIVirtualKeyboard::ShowHelpText(const struct UIVirtualKeyboard* this)
+   60  000FF380     24  void UIVirtualKeyboard::LooseFocus(const struct UIVirtualKeyboard* this)
+   61  000FF3A4     24  void UIVirtualKeyboard::RegainFocus(const struct UIVirtualKeyboard* this)
+   63  000FF3D0      C  struct IExternArray* UIVirtualKeyboard::GetExternArray(const struct UIVirtualKeyboard* this)
+   64  000FF3E4      8  int32 UIVirtualKeyboard::GetSizeofArrayStruct(const struct UIVirtualKeyboard* this)
+   66  000FF3F4     3C  void UIVirtualKeyboard::UpdateItemAndLabelFlash(const struct UIVirtualKeyboard* this, struct UIMenuItemBaseDst* menuItemToUpdate, int32 index, char* inLabel)
+   72  000FF430      4  void UIVirtualKeyboard::SetItemPos(const struct UIVirtualKeyboard* this, int32 inClipIndex, float inPos)
+   73  000FF434      4  void UIVirtualKeyboard::SetItemPos(const struct UIVirtualKeyboard* this, int32 inClipRowIndex, int32 inClipColumnIndex, float inPos)
+   81    inline-only   void UIVirtualKeyboard::SetInPasswordFlag(const struct UIVirtualKeyboard* this, bool bFlag)
+   84  000FF438     3C  void UIVirtualKeyboard::Show(const struct UIVirtualKeyboard* this)
+  122  001153FC     1C  void UIVirtualKeyboard::UpdateMenuItems_func(struct IAptSubscriber* subs)
+  123  00115488     1C  enum AptThreadReturnValue UIVirtualKeyboard::UpdateMenuItemsThread_func(struct IAptSubscriberBase* subs)

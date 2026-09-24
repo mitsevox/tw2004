@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/include/tiger_module_allocator.h
+// compiled in: tiger_module_allocator.cpp, tiger_module_global.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   21    inline-only   void Allocator::SetLock(const struct Allocator* this, bool lock)
+   45  0052225C     18  void ~AllocatorProfile(const struct <anon>* this)

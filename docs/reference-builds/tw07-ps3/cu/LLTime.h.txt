@@ -1,0 +1,9 @@
+// ../../../../../TIGERCODE/Code/Legacy/LL/Headers/LLTime.h
+// compiled in: Legacy_unity.cpp, apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+  141    inline-only   uint64 TI_uiReadCP0Count_Internal()
+                         local  uint64 curTime
+  182    inline-only   uint64 TI_uiReadCP0Count()
+ 1297    inline-only   float TI_fConvertTimeDifToSeconds(TI_STimeValue sTimeValue1_p, TI_STimeValue sTimeValue2_p)
+ 1607    inline-only   float TI_fConvertFullTimeDifToSeconds(TI_STimeValue sTimeValue1_p, TI_STimeValue sTimeValue2_p)

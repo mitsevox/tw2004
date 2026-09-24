@@ -1,0 +1,15 @@
+// ../../../../../TIGERCODE/Code/AptInterface/AptPackage/_AptSet.h
+// compiled in: other_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   33    inline-only   void AptValueSet<AptValue*,64>::clear(const struct AptValueSet<AptValue*,64>* this)
+   33    inline-only   void AptValueSet<AptCIH*,512>::clear(const struct AptValueSet<AptCIH*,512>* this)
+   35    inline-only   int AptValueSet<AptValue*,64>::capacity(const struct AptValueSet<AptValue*,64>* this)
+   37    inline-only   void AptValueSet<AptCIH*,512>::add(const struct AptValueSet<AptCIH*,512>* this, struct AptCIH* element)
+                         local  int i
+   57    inline-only   int AptValueSet<AptCIH*,512>::remove(const struct AptValueSet<AptCIH*,512>* this, struct AptCIH* element)
+                         local  int i
+   57    inline-only   int AptValueSet<AptValue*,64>::remove(const struct AptValueSet<AptValue*,64>* this, struct AptValue* element)
+                         local  int i
+   76    inline-only   bool AptValueSet<AptCIH*,512>::has(const struct AptValueSet<AptCIH*,512>* this, struct AptCIH* element)
+                         local  int i

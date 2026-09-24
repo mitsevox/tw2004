@@ -1,0 +1,6 @@
+// C:/packages/rwaudiocore/2.08.01/include/rw/audio/core/decoders/decxas1.h
+// compiled in: decxas1.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   37  006E457C     10  unsigned int Xas1Dec::GetSize(unsigned int numChannels, unsigned int* pAlignment)
+   51    inline-only   void Xas1Dec::Reset(const struct Xas1Dec* this)

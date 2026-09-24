@@ -1,0 +1,5 @@
+// ../ears_rt_cct/dev/api/ears_rt_cct/Transform.h
+// compiled in: Transform.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   40  0059B48C      4  void Transform(const struct <anon>* this)

@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/SceneGraph/include/SceneGraph/Runtime/Nodes/SGNodeRenderable.h
+// compiled in: SGNodeRenderable.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   41    inline-only   void operator delete(void* address)
+   41    inline-only   struct ICoreAllocator* GetClassAllocator()
+   41    inline-only   void* operator new(size_t size, const char* text, struct ICoreAllocator* allocator, enum AllocFlags allocator_flags, uint32_t alignment)
+   47    inline-only   struct ChannelInfluences& ChannelInfluences::operator=(const struct ChannelInfluences* this, const const struct ChannelInfluences& )
+   95    inline-only   void SetGeomPtr(const struct <anon>* this, void* pGeom)
+   96    inline-only   void* GetGeomPtr(const struct <anon>* this)

@@ -1,0 +1,87 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/MathQuat.c
+// compiled in: Legacy_unity.cpp
+// 22 functions, source order. line | PS3 address | size
+
+   16  00384EC0    1F4  void Quat_Slerp(float* Q1, float* Q2, float fFactor_p)
+                         local  const float tlC_SLERP_DELTA
+                         local  Quat cTempQuat
+                         local  float tlOmega
+                         local  float tlCosOmega
+                         local  float tlSinOmega
+                         local  float tlScale0
+                         local  float tlScale1
+                         inlines  Quat_CalcCosine, std::sinf, vec_madd, vec_sld
+   85  0038435C    2A0  void Quat_BuildFromMatrix(float[4]* M, float* Q)
+                         local  float tlMatrixDiagSum
+                         local  float tlScale
+                         local  int32 iIndex0
+                         local  int32 iIndex1
+                         local  int32 iIndex2
+                         local  const int32[3] iNextIndex
+                         local  Quat tlTempQuat
+                         inlines  std::sqrt
+  173  003850B4    4F4  void Quat_EulerAngles(float fYaw_p, float fPitch_p, float fRoll_p, float* Q)
+                         local  float tlSinYaw
+                         local  float tlCosYaw
+                         local  float tlSinPitch
+                         local  float tlCosPitch
+                         local  float tlSinRoll
+                         local  float tlCosRoll
+                         local  float tlCosPitchTimeCosYaw
+                         local  float tlSinPitchTimeSinYaw
+                         local  float tlSinPitchTimeCosYaw
+                         local  float tlCosPitchTimeSinYaw
+                         inlines  Quat_IdentifyForMul, std::cosf, std::sinf
+  401  00379E78     24  float Quat_GetNorm(float* Q)
+  413  00379E9C     80  void Quat_Invert(float* src, float* dest)
+                         local  float tlOneOverNorm
+                         local  float tlNegOneOverNorm
+  430  00379F1C     30  void Quat_Conjugate(float* src, float* dest)
+  443  00379F4C     44  void Quat_Add(float* Q1, float* Q2, float* Q)
+  462  00379F90    104  void Quat_Multiply(float* Q1, float* Q2, float* Q)
+  492  0037A094     88  void Quat_RotateVector(float* Q, float* src, float* dest)
+                         local  Quat cTempVectorQuat
+                         local  Quat cConjugateOfVectorQuatSrc
+  508  0037A11C     C8  void Quat_QuatToMatrix(float* Q, float[4]* M)
+                         local  float wx
+                         local  float wy
+                         local  float wz
+                         local  float xx
+                         local  float yy
+                         local  float yz
+                         local  float xy
+                         local  float xz
+                         local  float zz
+                         local  float x2
+                         local  float y2
+                         local  float z2
+  535  003855A8    174  void Quat_BuildFromVector(float* v, float* Q)
+                         local  float angle
+                         local  float scale
+                         inlines  LLMath_Length3, Quat_IdentifyForMul, std::cosf, std::sqrt, vec_madd, vec_sld
+  558  0038571C    124  void Quat_BuildFromVectorAndScale(float* v, float* Q, float scale)
+                         inlines  Quat_IdentifyForMul, std::cosf, std::sqrt
+  579  0037A1E4     5C  void Quat_TripleProduct(float* Q0, float* Q1, float* Q2, float* dest)
+                         local  Quat tmp
+  588  00385840     74  void Legacy_Quat_BuildFromYaw(float fYaw_p, float* Q)
+                         inlines  Quat_Clear, std::cosf, std::sinf
+  602  003858B4     74  void Legacy_Quat_BuildFromPitch(float fPitch_p, float* Q)
+                         inlines  Quat_Clear, std::cosf, std::sinf
+  616  00385928     74  void Legacy_Quat_BuildFromRoll(float fRoll_p, float* Q)
+                         inlines  Quat_Clear, std::cosf, std::sinf
+  628  00384238    124  void Quat_ExtractEulerAngles(float* Q, float* fYaw_p, float* fPitch_p, float* fRoll_p)
+                         local  float tan_yaw
+                         local  float sin_pitch
+                         local  float tan_roll
+  645  0038599C    154  void Quat_EulerAnglesRPY(float fRoll_p, float fPitch_p, float fYaw_p, float* Q)
+                         local  float tlSinYaw
+                         local  float tlCosYaw
+                         local  float tlSinPitch
+                         local  float tlCosPitch
+                         local  float tlSinRoll
+                         local  float tlCosRoll
+                         inlines  std::cosf, std::sinf
+  697  0037A240     8C  void QT_Multiply(float* Q0, float* T0, float* Q1, float* T1, float* dstQ, float* dstT)
+  705  0037A2CC     64  void QT_MultiplyT(float* Q, float* T, float* srcT, float* dstT)
+  712  0037A330     78  void QT_Invert(float* srcQ, float* srcT, float* dstQ, float* dstT)
+  721  0037A3A8      8  uint16_t QuaternionUnitTests()

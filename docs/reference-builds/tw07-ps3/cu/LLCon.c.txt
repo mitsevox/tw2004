@@ -1,0 +1,130 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLCon.c
+// compiled in: Legacy_unity.cpp
+// 59 functions, source order. line | PS3 address | size
+
+   78  003B98BC    1A0  void CO_vAddBackgroundToDisplayList(float fRectLeft_p, float fRectTop_p, float fRectRight_p, float fRectBottom_p)
+                         local  vec4flt xpColors
+                         local  float[2][4] xpVertices
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, PR_vFillVerticesWith2DRect, PR_vSetCurrentColor, PR_vSetCurrentUsage
+  138  003B9A5C    1C8  void CO_vAddFrameToDisplayList(float fRectLeft_p, float fRectTop_p, float fRectRight_p, float fRectBottom_p, bool boErrorDisplay_p)
+                         local  vec4flt xpColors
+                         local  float[2][4] xpVertices
+                         inlines  DS_vSetAlphaEnable, PR_vFillVerticesWith2DRect, PR_vSetCurrentColor
+  261  003CB410     C8  static void CO_vSetConsoleContext()
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetZBufferMode, DS_vSetZTestEnable
+  287  003CB388     88  static void CO_vRestoreConsoleContext()
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaTestMode, DS_vSetZBufferMode, DS_vSetZTestEnable
+  306  0037C124     24  static void CO_vSetErrorDisplay()
+  318  0037C148     EC  static void CO_vSetNumberOfLinesToDisplay(int32 iNumberOfLinesToDisplay_p)
+  351  0037C234     28  bool CO_boIsConsoleHidden()
+  372  0037C25C     20  void CO_vResetConsoleDisplayCounter()
+  384  0037C27C     1C  static void CO_vSetConsoleShowAlways(bool boShowAlways_p)
+  399    inline-only   static CO_SConsoleVariable* CO_spFindVariable(char* chpString_p)
+                         local  int32 i
+  425    inline-only   static void CO_vSetVariableValue(CO_SConsoleVariable* spConsoleVariable_p, char* chpValueString_p)
+  460  0039D284     FC  static void CO_vDisplayVariable(CO_SConsoleVariable* spConsoleVariable_p)
+                         local  char[128] chpString
+  506    inline-only   static void CO_vDisplayAllVariables()
+                         local  int32 i
+  529    inline-only   static void CO_vDisplayAllCommands()
+                         local  int32 i
+                         local  char[128] chpString
+  561  0039D6F8    104  static bool CO_boSHOWCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+  638  0039D380    23C  static bool CO_boSETCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  CO_SConsoleVariable* spConsoleVariable
+                         inlines  CO_spFindVariable, CO_vDisplayAllVariables, CO_vSetVariableValue, std::atof, std::atoi
+  709  0039D5BC    13C  static bool CO_boLINESCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  int32 iNumberOfLinesToDisplay
+                         local  char[128] chpString
+                         local  char[128] chpString
+                         inlines  std::atoi
+  783  0039D180    104  static bool CO_boHELPCommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         inlines  CO_vDisplayAllCommands
+  799    inline-only   static void CO_vRegisterSystemButtons()
+  875    inline-only   static void CO_vRegisterSystemCommands()
+  896  0037C298     20  void CO_vForceConsoleToHide()
+  908    inline-only   static bool CO_boManageConsoleDisplay()
+  955  0037C2B8     68  static int32 OL_iFindFirstNonBlankCharInString(char* chpString_p, int32 iStringLen_p)
+                         local  int32 i
+  983  0037C320     74  static int32 OL_iFindLastNonBlankCharInString(char* chpString_p, int32 iStringLen_p)
+                         local  int32 i
+ 1009  0037C394     34  static void CO_vClearPromptLine()
+ 1033  0039D7FC    288  bool CO_boExecuteCommandString(char* chpCommandLine)
+                         local  int32 iCommand
+                         local  int32 iFirstChar
+                         local  int32 iLastChar
+                         local  char*[10] chppParamStrings
+                         local  int32 iNumberOfParams
+                         local  int32 iCommandLineLen
+ 1155    inline-only   static bool CO_boManageCommandCalls()
+                         local  char[129] chpCommandLine
+ 1174  0037C3C8     C8  static void OL_vSetPromptLineAccordinglyToHistory()
+                         local  char* chpHistoryString
+ 1201    inline-only   static void OL_vMoveUpCurrentLineInHistory()
+ 1230    inline-only   static void OL_vMoveDownCurrentLineInHistory()
+ 1259  0037C490     24  static void CO_vResetCurrentLineInHistory()
+ 1285    inline-only   static bool CO_boIsErrorDisplayOn()
+ 1298    inline-only   static void CO_vManageErrorDisplay()
+ 1316    inline-only   static void CO_vAddHistoryScrollBarToHistory(float fRectPosX_p, float fRectTop_p, float fRectBottom_p)
+                         local  vec4flt xpColors
+                         local  float[2][4] xpVertices
+                         local  float fScrollBarPos
+                         local  float fScrollBarPosStart
+                         local  float fScrollBarPosEnd
+                         local  float fScrollBarSize
+ 1422    inline-only   static void CO_vAddConsoleFrameToDisplayList()
+ 1453  0037C4B4    168  static void CO_vSendStringIntoHistory(char* chString_p, CO_EMessageType eMessageType_p)
+                         local  int32 i
+                         local  uint32 uiStringLen
+ 1508    inline-only   static void CO_vCleanPromptline()
+                         local  int32 iFirstNonBlankChar
+                         local  char[128] buffer
+ 1551    inline-only   static void CO_vSendPromptLineIntoHistory()
+                         local  int32 iFirstNonBlankChar
+ 1586  0039DA84    508  static void CO_vManagePromptLineChar(char chChar_p)
+                         inlines  CO_boManageCommandCalls, CO_vCleanPromptline, CO_vManageAutoCompletion, CO_vSendPromptLineIntoHistory, OL_vMoveDownCurrentLineInHistory, OL_vMoveUpCurrentLineInHistory
+ 1771  0039E010     90  static void CO_vManagePromptLineString(char* chpString_p)
+                         local  uint32 ui
+                         local  uint32 uiStringLen
+ 1792    inline-only   static void CO_vManageAutoCompletion()
+                         local  int32 iFirstNonBlankChar
+                         local  int32 i
+ 1853    inline-only   static void CO_vManageCarret()
+ 1873    inline-only   static void CO_vAddConsoleStringsToDisplayList()
+                         local  CO_SConsoleHistLine* spConsoleHistLine
+                         local  FO_EAddMode eOldAddMode
+                         local  float fPosY
+                         local  int32 i
+ 1998    inline-only   static bool CO_boManageButton(CO_EButtonType eButtonType_p, uint32 uiButtonValue_p)
+                         local  int32 i
+ 2029    inline-only   static void CO_vManagePaddle()
+ 2078  0039E0A0     BC  void CO_vProcessKeystroke(char chKey)
+                         inlines  CO_boManageButton
+ 2119    inline-only   static void CO_vManageInput()
+ 2131    inline-only   static void CO_vManageCommands()
+                         local  int32 i
+ 2166  003A03E8    14C  void CO_vInitOnce()
+                         local  int32 i
+                         inlines  CO_vRegisterSystemCommands
+ 2249  0037C654      4  void CO_vCloseOnce()
+ 2270  0037C658     44  void CO_vManage()
+                         inlines  CO_vManageCarret
+ 2297  003CBDA4    4E8  void CO_vAddAllToDisplayList()
+                         inlines  CO_boManageConsoleDisplay, CO_vAddConsoleFrameToDisplayList, CO_vAddConsoleStringsToDisplayList, CO_vManageCommands, CO_vManageErrorDisplay
+ 2343  003A0138    1E4  void CO_vRegisterButton(CO_EButtonType eButtonType_p, uint32 uiButtonValue_p, char* chpString_p)
+                         local  CO_SConsoleButton* spConsoleButton
+                         local  int32 i
+ 2419  0039F438    1B4  void CO_vRegisterCommand(char* chpString_p, CO_FCommandCall* fpCommandCall_p, CO_FCommandManage* fpCommandManage_p, void* vpUserData_p)
+                         local  CO_SConsoleCommand* spConsoleCommand
+                         local  int32 i
+ 2486  0039658C     EC  void CO_vSendStringToConsole(char* chpString_p, CO_EUserMessageType eUserMessageType_p)
+ 2547  003CB4D8    100  void CO_vAddStringAndFrameToDisplayList(float fRectLeft_p, float fRectTop_p, char* chpString_p, bool boDisplayBorder_p)
+                         local  float fStringSize
+                         local  FO_EAddMode eOldAddMode
+ 2645  0039624C    218  void CO_vRegisterVariable(CO_EVariableType eVariableType_p, char* chpString_p, void* vpVariableAddress_p)
+                         local  CO_SConsoleVariable* spConsoleVariable
+                         local  int32 i
+ 2713  0037C634     20  void CO_vSelectInputDevices(uint32 uiActiveInputDevices_p)
+ 2768  0039DF8C     84  struct XMLRPC_Value* XMLRPC_ConsoleWriteCallback(struct XMLRPC_Value* value)
+                         local  const char* keys
+                         local  struct XMLRPC_Value* fault

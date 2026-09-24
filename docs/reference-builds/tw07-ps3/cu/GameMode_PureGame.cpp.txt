@@ -1,0 +1,72 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_PureGame.cpp
+// compiled in: golf_unity.cpp
+// 36 functions, source order. line | PS3 address | size
+
+   21  00204808     50  void GameModePureGame::GameModePureGame(const struct GameModePureGame* this)
+   27  0020210C     18  void GameModePureGame::~GameModePureGame(const struct GameModePureGame* this)
+   34  0024F7C0    1FC  void GameModePureGame::Init(const struct GameModePureGame* this)
+                         inlines  GameModeBase::SetUseShotClock
+   83  003064A0    1EC  void GameModePureGame::Update(const struct GameModePureGame* this)
+                         local  char[64] szTargetText
+                         local  bool bValidTarget
+                         local  vec4flt vCurMarkerPos
+                         local  float fDistToPin
+                         local  enum GolferState curGolferState
+                         inlines  GM_GetGolferUp
+  127  00202188      4  void GameModePureGame::Shutdown(const struct GameModePureGame* this)
+  131  0020218C     48  const char* GameModePureGame::GetModeSpecificTipString(const struct GameModePureGame* this)
+  149  002463B8      4  void GameModePureGame::PreShotUpdateUI(const struct GameModePureGame* this, enum PlayerNumber_t PlayerID)
+  155  002021D4     20  bool GameModePureGame::QueryInterface(const struct GameModePureGame* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bRet
+  170  002021F4     2C  int32 GameModePureGame::GetEndGameSequence(const struct GameModePureGame* this)
+                         local  int32 sequence
+  178  0024625C     6C  void GameModePureGame::SetPureGameMode(const struct GameModePureGame* this, enum PG_ModeType_t mode)
+  187  00202220      8  enum PG_ModeType_t GameModePureGame::GetCurrentPGMode(const struct GameModePureGame* this)
+  196  002462C8     F0  void GameModePureGame::UpdateDisplayInfo(const struct GameModePureGame* this, enum PlayerNumber_t PlayerID)
+                         local  char[256] tempString
+                         local  char* localizedString
+  214  00202228     28  void GameModePureGame::StartGamePreData(const struct GameModePureGame* this)
+  221  0032FDF4     C4  void GameModePureGame::GetCurrentScoreString(const struct GameModePureGame* this, char* strBuf, int32 bufferSize)
+                         local  int32 curScore
+                         local  const char* prefix
+  240  002C6AEC    280  void GameModePureGame::EndGolferTurn(const struct GameModePureGame* this, enum PlayerNumber_t PlayerID)
+                         local  float distanceToPin
+                         local  float distanceTravelled
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         inlines  vec4flt_Copy, vec_st
+  320  00281360    184  void GameModePureGame::RestoreAim(const struct GameModePureGame* this, enum PlayerNumber_t PlayerID)
+                         inlines  AIMgr, vec4flt_Copy, vec_st
+  344  002C69DC    110  void GameModePureGame::ShowYardage(const struct GameModePureGame* this, enum PlayerNumber_t PlayerID)
+                         local  float distanceToPin
+                         local  float distanceTravelled
+                         local  char[256] tempString
+  372  00202250     A8  bool GameModePureGame::IsOnFoulLie(const struct GameModePureGame* this, enum PlayerNumber_t PlayerID)
+                         local  enum Lie_t lie
+  397  002022F8      8  bool GameModePureGame::SkipPreShotAnimation(const struct GameModePureGame* this)
+  402  00202300     5C  bool GameModePureGame::SkipFlashTextShotNumber(const struct GameModePureGame* this)
+  421  0024F6D4     EC  bool GameModePureGame::PickPrevTarget(const struct GameModePureGame* this, enum PlayerNumber_t PlayerID)
+                         local  int greenCount
+                         local  int greenIndex
+  447  0024F618     BC  bool GameModePureGame::PickTarget(const struct GameModePureGame* this, enum PlayerNumber_t PlayerID)
+                         local  int greenCount
+                         local  int greenIndex
+  471  0024F500    118  void GameModePureGame::SetTargetToGreen(const struct GameModePureGame* this, enum PlayerNumber_t PlayerID, int iGreenIndex)
+                         local  struct CoreShotInfo_t* playerShotInfo
+                         local  vec4flt greenMarker
+                         local  int iCupIndex
+                         local  const float[4]& cupLocation
+                         inlines  vec4flt_Copy
+  502  0020235C     24  bool GameModePureGame::GoToGreenSelection(const struct GameModePureGame* this)
+  513  00202380     14  bool GameModePureGame::IsGreenSelectionEnabled(const const struct GameModePureGame* this)
+  518  00202394     14  bool GameModePureGame::IsCupSelectionEnabled(const const struct GameModePureGame* this)
+  523  002023A8     14  bool GameModePureGame::IsPlaceBallEnabled(const const struct GameModePureGame* this)
+  528  002023BC     14  bool GameModePureGame::UseCupPosForInitialPlaceBallPos(const const struct GameModePureGame* this)
+  533  002023D0      8  bool GameModePureGame::IsManualGreenSelectionEnabled(const const struct GameModePureGame* this)
+  538  002023D8      8  bool GameModePureGame::IsManualPlaceBallEnabled(const const struct GameModePureGame* this)
+  543  002023E0     14  bool GameModePureGame::IsMenuGreenSelectionEnabled(const const struct GameModePureGame* this)
+  548  002023F4     14  bool GameModePureGame::IsMenuPlaceBallEnabled(const const struct GameModePureGame* this)
+  553  00202408     34  bool GameModePureGame::RenderBallTarget(const struct GameModePureGame* this, enum PlayerNumber_t PlayerID)
+  558  0020243C     10  bool GameModePureGame::RenderBallTargetText(const struct GameModePureGame* this, enum PlayerNumber_t PlayerID, bool* bHideMarker)
+  564  0030668C     50  bool GameModePureGame::AllowMiniHUDGhosting(const struct GameModePureGame* this)
+                         inlines  GM_GetGolferUp
+  570  0020244C     14  const char* GameModePureGame::GetName(const struct GameModePureGame* this)

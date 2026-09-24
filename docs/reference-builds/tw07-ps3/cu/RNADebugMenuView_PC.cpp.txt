@@ -1,0 +1,22 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Rna/RNADebugMenuView_PC.cpp
+// compiled in: rnaunity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+  133  004C8548     54  void DebugMenuViewFlapC::DebugMenuViewFlapC(const struct DebugMenuViewFlapC* this, struct DebugMenuManagerC* pMenuMgr, int32_t idDebugMenu)
+  140  004C85F0     38  void DebugMenuViewFlapC::~DebugMenuViewFlapC(const struct DebugMenuViewFlapC* this)
+  143  004C876C     5C  void DebugMenuViewFlapC::SetTitle(const struct DebugMenuViewFlapC* this, const char* pMenuName)
+  152  004C87C8     20  int32_t DebugMenuViewFlapC::BeginPrinting(const struct DebugMenuViewFlapC* this)
+  162  004C86B0     34  void DebugMenuViewFlapC::WriteChar(const struct DebugMenuViewFlapC* this, char c)
+  177  004C86E4     88  void DebugMenuViewFlapC::WriteString(const struct DebugMenuViewFlapC* this, const char* pString)
+  188  004C87E8    128  void DebugMenuViewFlapC::PrintLine(const struct DebugMenuViewFlapC* this, const char* pString, int nLength)
+  234  004CABF4     BC  void DebugMenuViewFlapC::EndPrinting(const struct DebugMenuViewFlapC* this)
+  261  004C8910      C  void DebugMenuViewFlapC::BringToFront(const struct DebugMenuViewFlapC* this)
+  266  004C891C     94  TextColorT DebugMenuViewFlapC::SetTextColor(const struct DebugMenuViewFlapC* this, TextColorT Color)
+                         local  TextColorT prevColor
+                         local  char[256] str
+  289  004C89B0     94  TextColorT DebugMenuViewFlapC::SetBGColor(const struct DebugMenuViewFlapC* this, TextColorT Color)
+                         local  TextColorT prevColor
+                         local  char[256] str
+  312  004C8A44     78  void DebugMenuViewFlapC::SetVisible(const struct DebugMenuViewFlapC* this, bool8_t bVisible)
+  325  004CAD70    440  bool8_t DebugMenuViewFlapC::ProcessKey(const struct DebugMenuViewFlapC* this, uint32_t uKeyCode)
+                         local  char[256] buffer

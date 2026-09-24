@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/Internal/TransitionDefinitionList.h
+// compiled in: TransitionDefinitionList.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   33  005AB664     88  void TransitionDefinitionList(const struct <anon>* this)
+                         inlines  List<const EA::CCT::Internal::TransitionDefinition*>::List, TagValuePair

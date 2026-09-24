@@ -1,0 +1,23 @@
+// ../../../../../TIGERCODE/Code/AptInterface/AptPackage/_AptStack.h
+// compiled in: other_unity.cpp
+// 19 functions, source order. line | PS3 address | size
+
+   21    inline-only   int AptValueStack<AptValue*,6>::size(const struct AptValueStack<AptValue*,6>* this)
+   21    inline-only   int AptValueStack<AptFrameStack*,32>::size(const struct AptValueStack<AptFrameStack*,32>* this)
+   21    inline-only   int AptValueStack<AptValue*,384>::size(const struct AptValueStack<AptValue*,384>* this)
+   21    inline-only   int AptValueStack<AptValue*,32>::size(const struct AptValueStack<AptValue*,32>* this)
+   26    inline-only   void AptValueStack<AptValue*,6>::push(const struct AptValueStack<AptValue*,6>* this, struct AptValue* element)
+   26    inline-only   void AptValueStack<AptValue*,384>::push(const struct AptValueStack<AptValue*,384>* this, struct AptValue* element)
+   26    inline-only   void AptValueStack<AptValue*,32>::push(const struct AptValueStack<AptValue*,32>* this, struct AptValue* element)
+   26    inline-only   void AptValueStack<AptFrameStack*,32>::push(const struct AptValueStack<AptFrameStack*,32>* this, struct AptFrameStack* element)
+   33    inline-only   void AptValueStack<AptValue*,6>::pop(const struct AptValueStack<AptValue*,6>* this)
+   33    inline-only   void AptValueStack<AptValue*,384>::pop(const struct AptValueStack<AptValue*,384>* this)
+   33    inline-only   void AptValueStack<AptValue*,32>::pop(const struct AptValueStack<AptValue*,32>* this)
+   33    inline-only   void AptValueStack<AptFrameStack*,32>::pop(const struct AptValueStack<AptFrameStack*,32>* this)
+   40    inline-only   struct AptValue* AptValueStack<AptValue*,32>::top(const struct AptValueStack<AptValue*,32>* this)
+   40    inline-only   struct AptFrameStack* AptValueStack<AptFrameStack*,32>::top(const struct AptValueStack<AptFrameStack*,32>* this)
+   40    inline-only   struct AptValue* AptValueStack<AptValue*,384>::top(const struct AptValueStack<AptValue*,384>* this)
+   45    inline-only   struct AptValue* AptValueStack<AptValue*,384>::at(const struct AptValueStack<AptValue*,384>* this, int nPos)
+   45    inline-only   struct AptValue* AptValueStack<AptValue*,32>::at(const struct AptValueStack<AptValue*,32>* this, int nPos)
+   45    inline-only   struct AptFrameStack* AptValueStack<AptFrameStack*,32>::at(const struct AptValueStack<AptFrameStack*,32>* this, int nPos)
+   45    inline-only   struct AptValue* AptValueStack<AptValue*,6>::at(const struct AptValueStack<AptValue*,6>* this, int nPos)

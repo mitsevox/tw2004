@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/Code/Golf/Lo-Rendering/Geom/twGeom.h
+// compiled in: golf_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+  421    inline-only   twSkinVert* twMesh::GetSkinVerts(const struct twMesh* this)
+  432    inline-only   twSkinVert* twMesh::GetSkinVerts(const const struct twMesh* this)
+  464    inline-only   uint32 twGeom_RoundUpSize(uint32 size, uint32 align)
+  469    inline-only   uint8* twGeom_RoundUpPtr(uint8* pData, uint32 align)

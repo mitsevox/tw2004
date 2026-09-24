@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_CharTerrainShadow.cpp
+// compiled in: shader_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   37  0050E868     B0  void SM_CharTerrainShadowClass::Load(const struct SM_CharTerrainShadowClass* this)
+   54  0050E918     5C  void SM_CharTerrainShadowClass::Activate(const struct SM_CharTerrainShadowClass* this)
+   64  0051694C     88  void SM_CharTerrainShadowClass::SetOutputColor(const struct SM_CharTerrainShadowClass* this, const float* col)
+   75  0050E974     60  void SM_CharTerrainShadowClass::SetGroundClipHeight(const struct SM_CharTerrainShadowClass* this, float f)

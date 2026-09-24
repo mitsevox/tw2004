@@ -1,0 +1,17 @@
+// ../../../../../TIGERCODE/Code/AptInterface/AptPackage/AptObjects.h
+// compiled in: other_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   20    inline-only   unsigned int ObjectIndex::hash(const char* str, unsigned int len)
+                         local  int hval
+   43  003EF554    1C8  struct Objects* ObjectIndex::in_word_set(const char* str, unsigned int len)
+                         local  struct Objects[36] wordlist
+                         local  signed char[38] lookup
+                         local  int key
+                         local  int index
+                         local  int offset
+                         local  struct Objects* wordptr
+                         local  struct Objects* wordendptr
+                         local  const char* s
+                         local  const char* s
+                         inlines  ObjectIndex::hash

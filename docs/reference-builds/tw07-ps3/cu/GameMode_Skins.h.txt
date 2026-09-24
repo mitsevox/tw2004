@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/Headers/GameMode_Skins.h
+// compiled in: golf_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   31  0033EB78     18  enum UIScoreCardDispMode_t GameModeSkins::GetScoreDisplayMode(const struct GameModeSkins* this, bool getAlternate)
+   47  0033EB90      8  bool GameModeSkins::TrackingShotHistory(const struct GameModeSkins* this, enum PlayerNumber_t PlayerID)
+   53  0033EB98      8  bool GameModeSkins::IsSpudHudUsed(const struct GameModeSkins* this)
+   54  0033EBA0      8  bool GameModeSkins::AllowConcedeOption(const struct GameModeSkins* this)
+   55  0033EBA8     14  char* GameModeSkins::NumPlyReqStrID(const struct GameModeSkins* this)
+   56  0033EBBC      8  bool GameModeSkins::AllowUserShotClockOverride(const struct GameModeSkins* this)

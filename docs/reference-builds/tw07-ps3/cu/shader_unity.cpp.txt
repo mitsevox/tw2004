@@ -1,0 +1,52 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/shader_unity.cpp
+// compiled in: shader_unity.cpp
+// 24 functions, source order. line | PS3 address | size
+
+    0  0051D85C    7EC  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  SM_AptFontFusionClass::SM_AptFontFusionClass, SM_AptFontFusionClass::~SM_AptFontFusionClass, SM_AptPrimNonTexturedClass::SM_AptPrimNonTexturedClass, SM_AptPrimNonTexturedClass::~SM_AptPrimNonTexturedClass, SM_AptPrimNonTexturedInColorClass::SM_AptPrimNonTexturedInColorClass, SM_AptPrimNonTexturedInColorClass::~SM_AptPrimNonTexturedInColorClass, SM_AptPrimTexturedBaseClass::SM_AptPrimTexturedBaseClass, SM_AptPrimTexturedBaseClass::~SM_AptPrimTexturedBaseClass, SM_AptPrimTexturedClass::SM_AptPrimTexturedClass, SM_AptPrimTexturedClass::~SM_AptPrimTexturedClass, SM_AptPrimTexturedInColorClass::SM_AptPrimTexturedInColorClass, SM_AptPrimTexturedInColorClass::~SM_AptPrimTexturedInColorClass, SM_AptShaderManagerBase::SM_AptShaderManagerBase, SM_AptShaderManagerBase::~SM_AptShaderManagerBase, SM_BlendNormalsClass::~SM_BlendNormalsClass, SM_BlendTexturesClass::SM_BlendTexturesClass, SM_BlendTexturesClass::~SM_BlendTexturesClass, SM_CastTerrainShadowClass::SM_CastTerrainShadowClass, SM_CastTerrainShadowClass::~SM_CastTerrainShadowClass, SM_CharEyeClass::~SM_CharEyeClass, SM_CharFaceClass::~SM_CharFaceClass, SM_CharGenericClass::~SM_CharGenericClass, SM_CharGenericLogoClass::~SM_CharGenericLogoClass, SM_CharHairClass::~SM_CharHairClass, SM_CharTerrainShadowClass::SM_CharTerrainShadowClass, SM_CharTerrainShadowClass::~SM_CharTerrainShadowClass, SM_CupClass::~SM_CupClass, SM_FastGrassClass::~SM_FastGrassClass, SM_FilterClass::~SM_FilterClass, SM_FilterFastClass::~SM_FilterFastClass, SM_GenericTerrainClass::~SM_GenericTerrainClass, SM_GolfBallClass::~SM_GolfBallClass, SM_GrassClass::~SM_GrassClass, SM_GreenGridClass::~SM_GreenGridClass, SM_HoleClass::~SM_HoleClass, SM_LeafShadowClass::~SM_LeafShadowClass, SM_NonRotatingLeafClass::~SM_NonRotatingLeafClass, SM_NonRotatingLeafShadowClass::~SM_NonRotatingLeafShadowClass, SM_ParticleEffectClass::~SM_ParticleEffectClass, SM_PrelitUVAnimationClass::~SM_PrelitUVAnimationClass, SM_Prim3DTexturedClass::~SM_Prim3DTexturedClass, SM_PrimConstColorClass::SM_PrimConstColorClass, SM_PrimConstColorClass::~SM_PrimConstColorClass, SM_PrimNonTexturedClass::SM_PrimNonTexturedClass, SM_PrimNonTexturedClass::~SM_PrimNonTexturedClass, SM_PrimTexturedClass::~SM_PrimTexturedClass, SM_PropGenericClass::~SM_PropGenericClass, SM_QuadEffectClass::SM_QuadEffectClass, SM_QuadEffectClass::~SM_QuadEffectClass, SM_RotatingLeafClass::~SM_RotatingLeafClass, SM_Shader_Base::SM_Shader_Base, SM_Shader_Base::~SM_Shader_Base, SM_ShadowMapClass::~SM_ShadowMapClass, SM_SimpleTextureClass::SM_SimpleTextureClass, SM_SimpleTextureClass::~SM_SimpleTextureClass, SM_SpectatorCardDrawClass::~SM_SpectatorCardDrawClass, SM_SpectatorCardMakerClass::~SM_SpectatorCardMakerClass, SM_SpectatorCardShadowClass::~SM_SpectatorCardShadowClass, SM_SpectatorMeshClass::~SM_SpectatorMeshClass, SM_SpectatorMeshNormalClass::~SM_SpectatorMeshNormalClass, SM_TerrainClass::~SM_TerrainClass, SM_TerrainClippingClass::~SM_TerrainClippingClass, SM_TerrainLoClass::~SM_TerrainLoClass, SM_TerrainReflectionClass::~SM_TerrainReflectionClass, SM_TerrainShadowClass::~SM_TerrainShadowClass, SM_TreeBBClass::~SM_TreeBBClass, SM_TreeSimpleClass::~SM_TreeSimpleClass, SM_TrunkClass::~SM_TrunkClass, SM_TrunkShadowClass::~SM_TrunkShadowClass, SM_UcapClass::~SM_UcapClass, SM_WaterOceanBaseClass::~SM_WaterOceanBaseClass, SM_WaterOceanHiResClass::~SM_WaterOceanHiResClass, SM_WaterOceanLoResClass::~SM_WaterOceanLoResClass, SM_WaterPondClass::~SM_WaterPondClass
+    0  00520140     38  void SM_AptFontFusionClass::~SM_AptFontFusionClass(const struct SM_AptFontFusionClass* this)
+                         inlines  SM_AptShaderManagerBase::~SM_AptShaderManagerBase
+    0  00520190     44  void SM_AptPrimNonTexturedInColorClass::~SM_AptPrimNonTexturedInColorClass(const struct SM_AptPrimNonTexturedInColorClass* this)
+                         inlines  SM_AptShaderManagerBase::~SM_AptShaderManagerBase
+    0  005201F8     38  void SM_AptPrimNonTexturedClass::~SM_AptPrimNonTexturedClass(const struct SM_AptPrimNonTexturedClass* this)
+                         inlines  SM_AptShaderManagerBase::~SM_AptShaderManagerBase
+    0  00520248     38  void SM_AptPrimTexturedBaseClass::~SM_AptPrimTexturedBaseClass(const struct SM_AptPrimTexturedBaseClass* this)
+                         inlines  SM_AptShaderManagerBase::~SM_AptShaderManagerBase
+    0  00520298     18  void SM_AptPrimTexturedClass::~SM_AptPrimTexturedClass(const struct SM_AptPrimTexturedClass* this)
+                         inlines  SM_AptPrimTexturedBaseClass::~SM_AptPrimTexturedBaseClass
+    0  005202E8     24  void SM_AptPrimTexturedInColorClass::~SM_AptPrimTexturedInColorClass(const struct SM_AptPrimTexturedInColorClass* this)
+                         inlines  SM_AptPrimTexturedBaseClass::~SM_AptPrimTexturedBaseClass
+    0  00520470     18  void SM_Prim3DTexturedClass::~SM_Prim3DTexturedClass(const struct SM_Prim3DTexturedClass* this)
+                         inlines  SM_PrimTexturedClass::~SM_PrimTexturedClass
+    0  00520488     18  void SM_SpectatorMeshNormalClass::~SM_SpectatorMeshNormalClass(const struct SM_SpectatorMeshNormalClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base
+    0  005204D8     18  void SM_SpectatorMeshClass::~SM_SpectatorMeshClass(const struct SM_SpectatorMeshClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base
+    0  00520528     18  void SM_SpectatorCardDrawClass::~SM_SpectatorCardDrawClass(const struct SM_SpectatorCardDrawClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base
+    0  00520578     18  void SM_SpectatorCardMakerClass::~SM_SpectatorCardMakerClass(const struct SM_SpectatorCardMakerClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base
+    0  005205C8     18  void SM_SpectatorCardShadowClass::~SM_SpectatorCardShadowClass(const struct SM_SpectatorCardShadowClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base
+    0  00520618     18  void SM_SimpleTextureClass::~SM_SimpleTextureClass(const struct SM_SimpleTextureClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base
+    0  005206B8     18  void SM_CastTerrainShadowClass::~SM_CastTerrainShadowClass(const struct SM_CastTerrainShadowClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base
+    0  00520848     18  void SM_PrimTexturedClass::~SM_PrimTexturedClass(const struct SM_PrimTexturedClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base
+    0  005208D0     18  void SM_PrimConstColorClass::~SM_PrimConstColorClass(const struct SM_PrimConstColorClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base
+    0  00520920     18  void SM_PrimNonTexturedClass::~SM_PrimNonTexturedClass(const struct SM_PrimNonTexturedClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base
+    0  00520970     18  void SM_AptShaderManagerBase::~SM_AptShaderManagerBase(const struct SM_AptShaderManagerBase* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base
+    0  00521088     18  void SM_BlendTexturesClass::~SM_BlendTexturesClass(const struct SM_BlendTexturesClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base
+    0  005210D8     18  void SM_BlendNormalsClass::~SM_BlendNormalsClass(const struct SM_BlendNormalsClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base
+    0  00521128     18  void SM_QuadEffectClass::~SM_QuadEffectClass(const struct SM_QuadEffectClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base
+    0  00521178     18  void SM_ParticleEffectClass::~SM_ParticleEffectClass(const struct SM_ParticleEffectClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base
+    0  00521308     18  void SM_CharTerrainShadowClass::~SM_CharTerrainShadowClass(const struct SM_CharTerrainShadowClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base

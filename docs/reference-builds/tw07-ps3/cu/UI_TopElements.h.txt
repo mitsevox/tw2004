@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_TopElements.h
+// compiled in: apt_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   39  00126BE8     CC  void UITopElements::~UITopElements(const struct UITopElements* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::operator delete, IAptSubscriber::~IAptSubscriber
+   41  0010091C      C  uint32 UITopElements::GetSignature(const const struct UITopElements* this)
+   45  00100B6C     14  void UITopElements::ShouldShowOptionsButton_func(struct IAptSubscriber* subs)
+   47  0010324C     14  void UITopElements::ShouldShowSignInButton_func(struct IAptSubscriber* subs)
+   49  001031B0     14  void UITopElements::ShouldShowGFLightingButton_func(struct IAptSubscriber* subs)
+   50  001031C4     14  void UITopElements::ShouldShowGfRotateButton_func(struct IAptSubscriber* subs)
+   51  001031D8     14  void UITopElements::ShouldShowGFZoomAndRotateButton_func(struct IAptSubscriber* subs)

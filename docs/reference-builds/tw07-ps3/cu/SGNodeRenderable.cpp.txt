@@ -1,0 +1,145 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/scenegraph/source/SceneGraph/Runtime/Nodes/SGNodeRenderable.cpp
+// compiled in: SGNodeRenderable.cpp
+// 50 functions, source order. line | PS3 address | size
+
+    0  008B4A8C    140  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  SGNodeRenderableInfoC::SGNodeRenderableInfoC, SGNodeRenderableInfoC::~SGNodeRenderableInfoC
+    0  008BB590      C  void SGNodeRenderableInfoC::~SGNodeRenderableInfoC(const struct SGNodeRenderableInfoC* this)
+                         inlines  ~SGNodeInfoC
+   49  008BB5D8     88  struct SGNodeC* SGNodeRenderableInfoC::Create(const const struct SGNodeRenderableInfoC* this)
+                         inlines  operator new
+   50  008BAAB4      8  const char* SGNodeRenderableInfoC::GetNodeTypeName(const const struct SGNodeRenderableInfoC* this)
+   51    inline-only   NodeType_t SGNodeRenderableInfoC::GetNodeTypeEnum(const const struct SGNodeRenderableInfoC* this)
+   62  008B7474    344  void SGNodeRenderableC(const struct <anon>* this)
+                         inlines  Init, RNADebugBreak, SGNodeC::SetUserFlags, String, Vector
+   83  008B5748    3EC  void ~SGNodeRenderableC(const struct <anon>* this)
+                         inlines  Destroy, Init, operator delete, ~String, ~Vector
+  109  008B9880    344  struct SGNodeC* Clone(const struct <anon>* this, bool8_t recurse, NodeCloneUserDataCallback userDataCallback, struct SGNodeC* baseClone)
+                         local  const char[6] __FUNCTION__
+                         local  struct <anon>* clone
+                         local  int32_t iChannelInfluences
+                         local  int32_t iBlendShape
+                         inlines  RNADebugBreak, SGNodeC::GetNodeTypeEnum, SetGeomPtr, operator new
+  155  008B4520      8  const struct SGNodeInfoC* GetNodeInfo(const const struct <anon>* this)
+  161  008B44E8      8  const struct SGNodeInfoC* _GetNodeInfo()
+  166  008B44F8      8  void SetMostRecentTransformNode(const struct <anon>* this, struct SGNodeTransformC* pNode)
+  171  008B44F0      8  struct SGNodeTransformC* GetMostRecentTransformNode(const struct <anon>* this)
+  178  008B4528      C  int32_t GetNumChannelInfluences(const const struct <anon>* this)
+  183  008B4BEC     BC  struct ChannelInfluences* GetChannelInfluences(const const struct <anon>* this, int32_t index)
+                         inlines  RNADebugBreak, operator[]
+  188  008B4CA8     7C  int32_t GetFirstChannelInfluencesOfType(const struct <anon>* this, enum InfluenceType eType)
+                         local  int32_t iInfluences
+  201  008B9BC4    4F8  struct ChannelInfluences* AddChannelInfluences(const struct <anon>* this, enum InfluenceType eType)
+                         inlines  PushBack, RNADebugBreak
+  208  008B8F68    918  struct ChannelInfluences* AddChannelInfluences(const struct <anon>* this, const struct ChannelInfluences* influencesToCopy)
+                         inlines  ChannelInfluences::ChannelInfluences, Construct, PushBack, RNADebugBreak, Vector
+  215  008B7D10    728  void ResetChannelInfluences(const struct <anon>* this, int32_t index, enum InfluenceType eType)
+                         local  uint32_t arraySize
+                         local  const char* buf
+                         local  int32_t i
+                         local  uint32_t arraySize
+                         local  const char* buf
+                         local  int32_t i
+                         inlines  ChannelInfluences::operator=, Clear, Construct, Copy, Destroy, Init, RNADebugBreak, operator[]
+  220  008B8438    B30  struct ChannelInfluences* ReplaceChannelInfluences(const struct <anon>* this, int32_t index, const struct ChannelInfluences* influencesToCopy)
+                         local  uint32_t arraySize
+                         local  const char* buf
+                         local  int32_t i
+                         local  uint32_t arraySize
+                         local  const char* buf
+                         local  int32_t i
+                         local  uint32_t arraySize
+                         local  const char* buf
+                         local  int32_t i
+                         inlines  ChannelInfluences::ChannelInfluences, ChannelInfluences::operator=, Clear, Construct, Copy, Destroy, Init, RNADebugBreak, Vector, operator[]
+  230  008B5420    194  void ChannelInfluences::ChannelInfluences(const struct ChannelInfluences* this, enum InfluenceType eType)
+                         inlines  Init, RNADebugBreak, Vector
+  237  008B4E9C    1E4  void ChannelInfluences::~ChannelInfluences(const struct ChannelInfluences* this)
+                         inlines  Init, ~Vector
+  241  008B4534      8  enum InfluenceType ChannelInfluences::GetInfluenceType(const const struct ChannelInfluences* this)
+  246  008B6FF0    230  void ChannelInfluences::AddInfluenceName(const struct ChannelInfluences* this, const char* pName)
+                         local  const char[17] __FUNCTION__
+                         inlines  PushBack, RNADebugBreak, String, ~String
+  252  008B45C4     80  int32_t ChannelInfluences::GetNumInfluenceNames(const const struct ChannelInfluences* this)
+                         local  const char[21] __FUNCTION__
+                         inlines  RNADebugBreak
+  258  008B6544     F0  const char* ChannelInfluences::GetNthInfluenceName(const const struct ChannelInfluences* this, int32_t nIndex)
+                         local  const char[20] __FUNCTION__
+                         inlines  RNADebugBreak, operator[]
+  264  008B6634    16C  void ChannelInfluences::SetNthInfluenceName(const struct ChannelInfluences* this, int32_t nIndex, const char* pName)
+                         local  const char[20] __FUNCTION__
+                         inlines  RNADebugBreak, operator=, operator[]
+  270  008B7AFC    214  void ChannelInfluences::ClearInfluenceNames(const struct ChannelInfluences* this)
+                         local  const char[20] __FUNCTION__
+                         inlines  Construct, RNADebugBreak, Resize, String
+  276  008B465C     B4  void ChannelInfluences::AddInfluencePtr(const struct ChannelInfluences* this, struct SGNodeC* pNode)
+                         local  const char[16] __FUNCTION__
+                         inlines  Construct, PushBack, RNADebugBreak
+  282  008B453C     80  int32_t ChannelInfluences::GetNumInfluencePtrs(const const struct ChannelInfluences* this)
+                         local  const char[20] __FUNCTION__
+                         inlines  RNADebugBreak
+  288  008B48E8     F0  struct SGNodeC* ChannelInfluences::GetNthInfluencePtr(const const struct ChannelInfluences* this, int32_t nIndex)
+                         local  const char[19] __FUNCTION__
+                         inlines  RNADebugBreak, operator[]
+  298  008B4644     18  bool8_t HasBlendShapes(const struct <anon>* this)
+  303  008B6284    2C0  void ClearBlendShapes(const struct <anon>* this)
+                         inlines  Clear, Init
+  314  008B7220    254  void AddBlendNameAndWeight(const struct <anon>* this, const char* pName, float_t fWeight)
+                         inlines  Construct, PushBack, RNADebugBreak, String, ~String
+  320  008B4710     88  int32_t GetNumBlendShapes(const const struct <anon>* this)
+                         local  const char[18] __FUNCTION__
+                         inlines  RNADebugBreak
+  326  008B4D24     B4  float_t GetNthBlendWeight(const struct <anon>* this, int32_t nIndex)
+                         inlines  RNADebugBreak, operator[]
+  331  008B4DD8     C4  void SetNthBlendWeight(const struct <anon>* this, int32_t nIndex, float_t fWeight)
+                         inlines  RNADebugBreak, operator[]
+  336  008B4798     78  void AddBlendGeomPtr(const struct <anon>* this, void* pGeom)
+                         inlines  Construct, PushBack
+  341  008B67A0     B4  const char* GetNthBlendGeomName(const struct <anon>* this, int32_t nIndex)
+                         inlines  RNADebugBreak, operator[]
+  346  008B6854    130  void SetNthBlendGeomName(const struct <anon>* this, int32_t nIndex, const char* pName)
+                         inlines  RNADebugBreak, operator=, operator[]
+  351  008B49D8     B4  void* GetNthBlendGeomPtr(const struct <anon>* this, int32_t nIndex)
+                         inlines  RNADebugBreak, operator[]
+  356  008B4810     D8  void SetBaseBlendGeomName(const struct <anon>* this, const char* pName)
+                         inlines  operator=
+  361  008B45BC      8  const char* GetBaseBlendGeomName(const struct <anon>* this)
+  366  008B4508      8  void SetBaseBlendGeomPtr(const struct <anon>* this, void* pGeom)
+  371  008B4500      8  void* GetBaseBlendGeomPtr(const struct <anon>* this)
+  376  008B4518      8  void SetBlendEnvelope(const struct <anon>* this, float_t fBlend)
+  381  008B4510      8  float_t GetBlendEnvelope(const struct <anon>* this)
+  389  008BA0BC    9F8  void SerializeIn(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[12] __FUNCTION__
+                         local  int32_t version
+                         local  int32_t iNum
+                         local  int32_t i
+                         local  int32_t i
+                         local  float_t temp
+                         local  int32_t iNumJointNames
+                         local  int32_t iNumDeformerNames
+                         local  struct ChannelInfluences* pDeformerInfluences
+                         local  int32_t i
+                         local  int32_t iNumChannels
+                         local  int32_t totalInfluences
+                         local  int32_t iChannel
+                         local  struct ChannelInfluences* pJointInfluences
+                         local  int32_t i
+                         local  struct <anon> temp
+                         local  struct <anon> temp
+                         local  int32_t eType
+                         local  int32_t iNumInfluences
+                         local  struct ChannelInfluences* pInfluences
+                         local  int32_t iInfluence
+                         local  struct <anon> temp
+                         local  struct <anon> temp
+                         inlines  Clear, Construct, Destroy, Init, PushBack, RNADebugBreak, Reserve, SGNodeC::SetUserFlags, String, ~String
+  542  008B6984    66C  void SerializeOut(const const struct <anon>* this, const struct OutStreamC& out)
+                         local  const char[13] __FUNCTION__
+                         local  int32_t iChannel
+                         local  struct ChannelInfluences* pInfluences
+                         local  int32_t i
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  RNADebugBreak, String, operator[], ~String
+  613  008B4BDC     10  static void _GLOBAL__I__ZN6SceneX17SGNodeRenderableC16s_ClassAllocatorE()
+  614  008B4BCC     10  static void _GLOBAL__D__ZN6SceneX17SGNodeRenderableC16s_ClassAllocatorE()

@@ -1,0 +1,63 @@
+// ../../../../../TIGERCODE/Code/AptInterface/uiAptDrawText_ff.h
+// compiled in: other_unity.cpp
+// 48 functions, source order. line | PS3 address | size
+
+  111  0042D3E8     34  void AptAuxFontList::AptAuxFontList(const struct AptAuxFontList* this)
+                         local  int32 nbr
+                         local  int i
+                         inlines  AptAuxFontList::AddFont_FontBitmap, TAptArrayStruct
+  114    inline-only   void AptAuxFontList::AddFont_FontFusion(const struct AptAuxFontList* this, char* fontName, int32 id)
+  115    inline-only   void AptAuxFontList::AddFont_FontBitmap(const struct AptAuxFontList* this, char* fontName, int32 id)
+  117    inline-only   int AptAuxFontList::GetNbrFonts(const const struct AptAuxFontList* this)
+  164    inline-only   void AptTextData::SetFontId(const struct AptTextData* this, uint32 fontid, enum eFontType fontType)
+  165    inline-only   enum eFontType AptTextData::GetFontType(const const struct AptTextData* this)
+  166    inline-only   uint32 AptTextData::GetFontId(const const struct AptTextData* this)
+  168    inline-only   float AptTextData::GetBlurRadius(const const struct AptTextData* this)
+                         local  float blurRadius
+  177    inline-only   bool AptTextData::HasBlur(const const struct AptTextData* this)
+  182    inline-only   float AptTextData::GetLeadingCoef(const const struct AptTextData* this)
+                         local  float leading
+  212    inline-only   bool AptTextData::operator==(const const struct AptTextData* this, const struct AptTextData& a)
+  266    inline-only   void* AptShareTextData::operator new(size_t size)
+  266    inline-only   void AptShareTextData::operator delete(void* p, size_t size)
+  270  004A8770     58  void AptShareTextData::~AptShareTextData(const struct AptShareTextData* this)
+                         inlines  HoldString::~HoldString
+  276    inline-only   bool AptShareTextData::operator==(const const struct AptShareTextData* this, const struct AptShareTextData& a)
+  290  0042417C     68  void AptTextCacheElem::~AptTextCacheElem(const struct AptTextCacheElem* this)
+                         inlines  TRefPtr<AptShareTextData>::~TRefPtr
+  303    inline-only   int32 AptTextCacheElem::Left(const const struct AptTextCacheElem* this)
+  304    inline-only   int32 AptTextCacheElem::Top(const const struct AptTextCacheElem* this)
+  305    inline-only   int32 AptTextCacheElem::Right(const const struct AptTextCacheElem* this)
+  306    inline-only   int32 AptTextCacheElem::Bottom(const const struct AptTextCacheElem* this)
+  307    inline-only   int32 AptTextCacheElem::Width(const const struct AptTextCacheElem* this)
+  308    inline-only   int32 AptTextCacheElem::Height(const const struct AptTextCacheElem* this)
+  310    inline-only   float AptTextCacheElem::GetU0(const const struct AptTextCacheElem* this)
+  311    inline-only   float AptTextCacheElem::GetV0(const const struct AptTextCacheElem* this)
+  313    inline-only   float AptTextCacheElem::GetU1(const const struct AptTextCacheElem* this)
+  314    inline-only   float AptTextCacheElem::GetV1(const const struct AptTextCacheElem* this)
+  316    inline-only   bool AptTextCacheElem::Intersect(const const struct AptTextCacheElem* this, int32 x, int32 y, int32 w, int32 h, uint32 bitszone)
+  332    inline-only   struct AptTextData& AptTextCacheElem::GetTextData(const const struct AptTextCacheElem* this)
+  333    inline-only   char* AptTextCacheElem::GetString(const const struct AptTextCacheElem* this)
+  336    inline-only   bool AptTextCacheElem::operator==(const const struct AptTextCacheElem* this, const struct AptTextCacheElem& a)
+  367  0042A3B4     FC  void AptTextCacheManager::AptTextCacheManager(const struct AptTextCacheManager* this)
+                         inlines  DrawTextRender, TChainList<AptTextCacheElem>::TChainList
+  373    inline-only   struct DrawTextRender* AptTextCacheManager::GetTextRenderer(const struct AptTextCacheManager* this)
+  376    inline-only   void AptTextCacheManager::ReleaseTextAsset(const struct AptTextCacheManager* this, struct AptTextCacheElem* cacheElem)
+  421  00427E4C    120  void AptTextAsset::AptTextAsset(const struct AptTextAsset* this)
+                         inlines  AptShareTextData::operator new, TRefObj<AptShareTextData>::TRefObj, TRefPtr<AptShareTextData>::TRefPtr, TRefPtr<AptShareTextData>::operator=
+  425    inline-only   struct AptTextData& AptTextAsset::GetTextData(const const struct AptTextAsset* this)
+  426    inline-only   char* AptTextAsset::GetString(const const struct AptTextAsset* this)
+  427    inline-only   void AptTextAsset::SetString(const struct AptTextAsset* this, char* str)
+  445    inline-only   void AptTextAsset::operator delete(void* p, size_t size)
+  445    inline-only   void AptTextAsset::operator delete [](void* p)
+  445    inline-only   void* AptTextAsset::operator new [](size_t size)
+  445    inline-only   void* AptTextAsset::operator new(size_t size)
+  460  004379AC     84  void AptFontFusion::AptFontFusion(const struct AptFontFusion* this)
+                         inlines  CFontFusion::operator new, TChainList<AptTextAsset>::TChainList
+  461  00429FD4    340  void AptFontFusion::~AptFontFusion(const struct AptFontFusion* this)
+                         inlines  AptAuxFontList::~AptAuxFontList, CFontFusion::operator delete, Next, TChainList<AptTextAsset>::~TChainList, ~AptTextCacheManager
+  465    inline-only   struct CFontFusion& AptFontFusion::GetCFontFusion(const struct AptFontFusion* this)
+  466    inline-only   struct AptTextCacheManager& AptFontFusion::GetTextCacheManager(const struct AptFontFusion* this)
+  469    inline-only   int32 AptFontFusion::GetFontIdByName(const struct AptFontFusion* this, const char* name, const enum eFontType& outfontType)
+  508    inline-only   void* AptFontFusion::operator new(size_t size)
+  508    inline-only   void AptFontFusion::operator delete(void* p, size_t size)

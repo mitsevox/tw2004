@@ -1,0 +1,29 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/online/NetGame.c
+// compiled in: golf2_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+  160  0016D528     1C  void NetGame_InitializeControl_Opponent()
+                         inlines  OnlineManagerOSDK::ResetGameState
+  169  0014E3D0     1C  void NetGame_InitializeControl_Mine()
+                         inlines  OnlineManagerOSDK::ResetGameState
+  177  0014E3EC     1C  bool NetGame_IsItMyTurn()
+  185  0014E408     20  void NetGame_RegisterMessageCallback(enum NetMsgTypeEnum type, void(*)()* callback)
+  190  0014E428     1C  void NetGame_SetCurrentConnection(int connection_index)
+  195  00165A20     1C  int NetGame_GetCurrentConnection()
+  200  0017CA50     34  int NetGame_AllSendData(int pkt_type, enum NetMsgTypeEnum type, void* data, unsigned int len)
+  205  0017C7E0     44  int NetGame_SendDataToPlayer(int pkt_type, enum PlayerNumber_t player, enum NetMsgTypeEnum type, void* data, unsigned int len)
+  210  001696E8     1C  int32 NetGame_GetNumOpenConnections()
+  215  00176160     1C  int32 NetGame_GetCurrentConnectFromPlayer(enum PlayerNumber_t PlayerID)
+  220  00175D78     48  int32 NetGame_GetPlayerFromCurrentConnection()
+                         local  int32 retval
+  228  00175DC0     4C  int32 NetGame_GetPlayerFromThisConnection(int conn)
+                         local  int32 retval
+  236  00169704     1C  int NetGame_GetNumRealOpenConnections()
+  245  001C6E14    220  int NetGame_StoreLocalControllerInput()
+                         local  unsigned int padData
+                         local  struct Controller_StickInfo* stickData
+                         local  int err
+                         local  struct Controller_StickInfo nullStickData
+                         local  enum PlayerNumber_t myPlayerNum
+                         inlines  GM_GetGolferUp, OnlineManagerOSDK::GetMyPlayerNumber, cGAME_GLOBALS::GetGamePaused
+  328  001283F0     14  ControllerPadAndStickInfo_t* NetGame_GetLocalControllerInput()

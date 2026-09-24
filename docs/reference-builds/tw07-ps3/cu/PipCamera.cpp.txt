@@ -1,0 +1,51 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/cameras/PipCamera.cpp
+// compiled in: golf_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   63  001EDCFC     28  void PipCam_InitModule()
+   72  0030781C    1E0  void PipCam_Update(float deltaT)
+                         local  bool bFirstFrame
+                         local  float oldElapsedT
+                         local  VM_SViewport* pvp
+                         inlines  VM_vSetViewportRect
+  126  00307810      C  void PipCam_SetVisible(bool bShow)
+  134  002739B4     54  void PipCam_SetPosition(float x, float y)
+                         local  struct RC_SRenderCtx* pRenderCtx
+                         local  VM_SViewport* pViewport
+                         inlines  VM_vSetViewportRect
+  144  00273A14     54  void PipCam_SetSize(float width, float height)
+                         local  struct RC_SRenderCtx* pRenderCtx
+                         local  VM_SViewport* pViewport
+                         inlines  VM_vSetViewportRect
+  154  00273A74    1D8  void PipCam_BeginSlideEffect(bool bOpen, float duration, enum ePipEffectDir dir)
+                         local  float left
+                         local  float top
+                         local  float width
+                         local  float height
+                         local  VM_SViewport* pvp
+                         local  float startTop
+                         local  float startLeft
+                         inlines  VM_vSetViewportRect
+  218  00273C4C    140  void PipCam_BeginZapEffect(bool bOpen, float duration)
+                         local  vec4flt openPos
+                         local  vec4flt closePos
+                         local  VM_SViewport* pvp
+                         inlines  VM_vSetViewportRect
+  265  001EDD24     2C  bool PipCam_IsTransitioning()
+  277  002EC5D0     F8  void PipCam_SetOverrideMode(enum CameraMode_t camMode)
+                         local  CameraController_t* mainController
+  295  00273E0C     84  void PipCam_SetOverrideModeAndCopy(enum CameraMode_t camMode)
+  307  001EDD50     30  bool PipCam_IsUsingOverrideMode()
+  315  00273E90     5C  void PipCam_ResetPositionAndSizeToDefault()
+                         local  struct RC_SRenderCtx* pRenderCtx
+                         local  VM_SViewport* pViewport
+                         inlines  VM_vSetViewportRect
+  327  003076F4    11C  static void* PipCamTune_UpdateForcePip(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  int bOn
+                         local  int pipEffectCounter
+                         local  int slideCounter
+  368  0026AFAC     24  static void* PipCamTune_UpdateEnablePip(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         inlines  cGAME_GLOBALS::SetPipEnabled
+  387  001EDD80      8  static void* PipCamTun_RenderTreesCB(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+  430  001EDD88    178  void PipCam_InitTuner()
+                         local  int catid

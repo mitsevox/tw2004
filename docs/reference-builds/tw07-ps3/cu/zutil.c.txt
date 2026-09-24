@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Shared/XceedZip_ZLib64/zutil.c
+// compiled in: other_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   27  003F96CC     14  const char* zlibVersion()
+   39  003F96E0     34  void z_error(char* m)
+   49  003FB9E0     24  const char* zError(int err)
+  204  003FBA04      8  voidpf zcalloc(voidpf opaque, unsigned int items, unsigned int size)
+  209  003FBA0C      4  void zcfree(voidpf opaque, voidpf ptr)

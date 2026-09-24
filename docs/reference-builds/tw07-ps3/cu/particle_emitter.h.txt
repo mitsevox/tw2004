@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/code/ParticleSystem/include/particle_emitter.h
+// compiled in: golf_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   61  0033EAE4      4  void ParticleEmitter::PlatformUpdate(const struct ParticleEmitter* this)
+   62  0033EAE8      4  void ParticleEmitter::PlatformPostTweak(const struct ParticleEmitter* this)

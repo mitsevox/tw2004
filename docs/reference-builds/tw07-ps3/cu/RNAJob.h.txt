@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/packages/RNA/dev-2.0-golf/RNA/RNAX/include/RNAX/RNAJob.h
+// compiled in: rnaunity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   91    inline-only   struct UserData* GetUserData(const const struct <anon>* this)
+   91    inline-only   void SetUserData(const struct JobC* this, struct UserData* pData)

@@ -1,0 +1,419 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/aptInterface/uiAptStreamSupport.cpp
+// compiled in: other_unity.cpp
+// 90 functions, source order. line | PS3 address | size
+
+  112  003FEEEC     E0  void* AllocateTextureMemory(int32 size)
+                         local  const char[22] __FUNCTION__
+                         inlines  TagValuePair, operator+
+  121  003ED128     3C  void FreeTextureMemory(void* buf)
+  132  003ED164     60  static bool Is720pName(char* name)
+  141    inline-only   static bool Is720pNameLen(char* name, int len)
+  154  003ED1C4     E8  void FreeStreamAPX(struct TStreamData* pStreamData)
+                         local  void* ptrToFree
+  193  003ED2AC     2C  void AptStreamTableOfContent::Init(const struct AptStreamTableOfContent* this)
+  205  003ED2D8     64  void AptStreamTableOfContent::SetTableOfContent(const struct AptStreamTableOfContent* this, char* buffer, int32 bufersize)
+  220  003ED69C     B8  int32 AptStreamTableOfContent::GetOffset(const struct AptStreamTableOfContent* this, char* apxName)
+                         local  struct AptStreamTableOfContent localTableContent
+                         local  int32 offset
+                         local  char* newName
+  254  003ED754     AC  int32 AptStreamTableOfContent::GetNextOffset(const struct AptStreamTableOfContent* this)
+                         local  struct AptStreamTableOfContent localTableContent
+                         local  char* name
+  279  003ED800     70  void AptStreamTableOfContent::SetOffset(const struct AptStreamTableOfContent* this, uint32 offsetToUse)
+  309  003ED344    358  char* AptStreamTableOfContent::GetNextAPXNameInStream(const struct AptStreamTableOfContent* this, bool returnOnNewOffset)
+                         local  int32 pos
+                         local  uint16 tag
+  390  0042A314     A0  bool AptStreamSupport::IsStreaming(const struct AptStreamSupport* this)
+                         inlines  Next, TChainList<AptStreamAction>::GetElemCount
+  403  003ED870      C  bool AptStreamSupport::XSectionCanCancelLoading(const struct AptStreamSupport* this, char* name)
+  431  003ED87C     18  void AptLoadNotifier::Initialize(const struct AptLoadNotifier* this)
+  441  003ED89C     40  void AptLoadNotifier::CopyFrom(const struct AptLoadNotifier* this, struct AptLoadNotifier* src)
+  455  003ED8DC     30  struct AptLoadNotifier* AptLoadNotifier::Construct(struct IAptSubscriber* instanceName, LoadNotifierFunc* notifier)
+  473  003ED90C     F4  struct AptLoadNotifier* AptLoadNotifier::Construct(char* thisObject, char* flashFunctionName)
+  499  004A02BC     DC  void AptLoadNotifier::Call(const struct AptLoadNotifier* this, char* instanceName, char* swfName)
+                         local  char* szThisObject
+  554  0049EEB8      C  void AptStreamSupport::FreeAllResources(const struct AptStreamSupport* this)
+  564  004A36EC    370  void AptStreamSupport::Update(const struct AptStreamSupport* this)
+                         local  bool needContinue
+                         local  struct AptStreamAction* streamAction
+                         local  enum AptThreadReturnValue ret
+                         inlines  Next, TChainList<AptStreamAction>::GetCurrent, TChainList<AptStreamAction>::GetElemCount, TChainList<AptStreamAction>::RemoveCurrent
+  638  00444A00    12C  void AptStreamSupport::CleanUp(const struct AptStreamSupport* this)
+                         local  int i
+                         local  const struct LoadMovieNames& item
+                         inlines  TArrayInternal<LoadMovieNames,AptStructSwapper>::GetElemCount, TArrayInternal<LoadMovieNames,AptStructSwapper>::RemoveElem, TArrayInternal<LoadMovieNames,AptStructSwapper>::operator[]
+  654  0043F688    404  enum AptThreadReturnValue AptStreamSupport::AddToPreloadListNow(const struct AptStreamSupport* this, struct AptStreamAction* streamAction)
+                         local  struct PreLoadItem* preload
+                         local  int32 i
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<PreLoadItem,AptStructSwapper>::Push, TArrayInternal<PreLoadItem,AptStructSwapper>::operator[]
+  690  0045275C    250  void AptStreamSupport::ReleaseSwfName(const struct AptStreamSupport* this, char* swfName, struct AptLoadNotifier* notifier)
+                         local  const struct AptStreamAction& action
+                         local  struct T2* beforPrev
+                         inlines  GetElem, Prev, SetNext, SetPrev, T2, TChainList<AptStreamAction>::AddElem, TChainList<AptStreamAction>::AddElemBC
+  705  004A364C     A0  enum AptThreadReturnValue AptStreamSupport::ReleaseSwfNameAction(const struct AptStreamSupport* this, struct AptStreamAction* streamAction)
+  734  004A2148    4C8  void AptStreamSupport::AddToSlot(const struct AptStreamSupport* this, eAptSlot zoneSlot, char* swfName)
+                         local  const int32 useAnim
+                         local  const struct AptStreamAction& action
+                         local  int i
+                         local  char[32] temp
+                         local  int i
+                         local  const int32 position
+                         local  const struct AptInfo_t& aptInfo
+                         local  struct T2* beforPrev
+                         inlines  AptAnimations::GetAptInfo, GetElem, Prev, SetNext, SetPrev, T2, TChainList<AptStreamAction>::AddElem, TChainList<AptStreamAction>::AddElemBC
+  810  004529AC    23C  void AptStreamSupport::StreamSlot(const struct AptStreamSupport* this, eAptSlot zoneSlot, struct AptLoadNotifier* notifier)
+                         local  const struct AptStreamAction& action
+                         local  struct T2* beforPrev
+                         inlines  GetElem, Prev, SetNext, SetPrev, T2, TChainList<AptStreamAction>::AddElem, TChainList<AptStreamAction>::AddElemBC
+  828  004A35F8     54  void AptStreamSupport::ReleaseAllSlots(const struct AptStreamSupport* this)
+                         local  eAptSlot i
+  842  003EDA0C     18  void AptStreamSupport::StopAllCurrentStreaming_OnlyUseInLoadingScreens(const struct AptStreamSupport* this)
+  858  0049F8E8    39C  void AptStreamSupport::CancelStreamingUpdateStates(const struct AptStreamSupport* this)
+                         local  int32 i
+                         local  const struct PreLoadItem& item
+                         local  char[32] swfName
+                         local  const int32 useAnim
+                         local  const struct AptInfo_t& aptInfo
+                         inlines  AptAnimations::GetAptInfo, AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<PreLoadItem,AptStructSwapper>::operator[], TArrayInternal<PreloadOffsets,AptStructSwapper>::SetNbrElems
+  899  004A2F08    2F8  void AptStreamSupport::ReleaseSlot(const struct AptStreamSupport* this, eAptSlot zoneSlot, struct AptLoadNotifier* notifier)
+                         local  const bool cancelLoading
+                         local  const struct AptStreamAction& action
+                         local  struct T2* beforPrev
+                         inlines  GetElem, Prev, SetNext, SetPrev, T2, TChainList<AptStreamAction>::AddElem, TChainList<AptStreamAction>::AddElemBC
+  938  0049EAA8    190  bool AptStreamSupport::IsReadyToRelease(const struct AptStreamSupport* this, eAptSlot zoneSlot, enum ePreload state, bool removeFromList)
+                         local  bool ready
+                         local  int i
+                         local  const struct PreLoadItem& item
+                         inlines  PreLoadItem::MarkPreloadItemAvailable, TArrayInternal<PreLoadItem,AptStructSwapper>::operator[]
+  997  00481498    1E8  enum eMovieAvailableNow AptStreamSupport::IsMovieAvailableNow(const struct AptStreamSupport* this, char* swfName, char* instanceName, bool forLoadVersusUnload)
+                         local  enum eMovieAvailableNow isMovieAvailableNow
+                         local  const int32 useAnim
+                         local  const struct AptInfo_t& aptInfo
+                         inlines  AptAnimations::GetAptInfo
+ 1043  00481170    328  bool AptStreamSupport::CheckSwfNobodyWantToReleaseIt(const struct AptStreamSupport* this, char* swfName)
+                         local  const int32 index
+                         local  eAptSlot slot
+                         local  struct AptStreamAction* current
+                         local  struct AptStreamAction* action
+                         local  bool ok
+                         local  bool ok
+                         local  const int32 useAnim
+                         local  const struct AptInfo_t& aptInfo
+                         inlines  AptAnimations::GetAptInfo, GetElem, Next, TArrayInternal<PreLoadItem,AptStructSwapper>::operator[], TChainList<AptStreamAction>::GetCurrent, TChainList<AptStreamAction>::GotoFirst, TChainList<AptStreamAction>::GotoNext, TChainList<AptStreamAction>::SetCurrent_
+ 1114  003EDA00      C  void AptStreamAction::SetNotifier(const struct AptStreamAction* this, struct AptLoadNotifier* notifier)
+ 1127  004A1B68    378  bool AptStreamSupport::LiveUpdate(const struct AptStreamSupport* this, char* swfName)
+                         local  bool ret
+                         local  int32_t useAnim
+                         local  bool ok
+                         local  const struct AptInfo_t& aptInfo
+                         local  char* name
+                         local  char[256] filename
+                         local  int z
+                         local  int i
+                         local  CircularBuffer_t* circBuffer1
+                         local  CircularBuffer_t* circBuffer2
+                         local  struct TStreamData* streamData
+                         inlines  AptAnimations::GetAptInfo
+ 1231  004A2610    5C0  void AptStreamSupport::LoadMovie(const struct AptStreamSupport* this, char* instanceNameIn, char* swfNameIn, struct AptLoadNotifier* notifier)
+                         local  char* instanceName
+                         local  char* swfName
+                         local  enum eMovieAvailableNow available
+                         local  const struct AptStreamAction& action
+                         local  struct T2* beforPrev
+                         local  int32 index
+                         local  const struct LoadMovieNames& dst
+                         local  struct AptStreamAction action
+                         inlines  AptStreamAction, AptStructSwapper::AllocArray2, AptStructSwapper::Swap, GetElem, Prev, SetNext, SetPrev, T2, TArrayInternal<LoadMovieNames,AptStructSwapper>::GetElemCount, TArrayInternal<LoadMovieNames,AptStructSwapper>::Push, TChainList<AptStreamAction>::AddElem, TChainList<AptStreamAction>::AddElemBC
+ 1299  0049FFD0    2EC  void AptStreamSupport::UnloadMovie(const struct AptStreamSupport* this, char* instanceName, char* swfName)
+                         local  const struct AptStreamAction& action
+                         local  struct T2* beforPrev
+                         inlines  GetElem, Prev, SetNext, SetPrev, T2, TChainList<AptStreamAction>::AddElem, TChainList<AptStreamAction>::AddElemBC
+ 1326  004A1ACC     9C  enum AptThreadReturnValue AptStreamSupport::StartPreLoadNow(const struct AptStreamSupport* this, struct AptStreamAction* streamAction)
+                         local  struct AptStreamAction* action
+                         local  enum AptThreadReturnValue retVal
+ 1361  004A10C4    A08  bool AptStreamSupport::StartPreLoadInternal(const struct AptStreamSupport* this, eAptSlot zoneSlot)
+                         local  int32 assocChkRef
+                         local  bool lastInStreamIs720p
+                         local  CircularBuffer_t* circBuffer1
+                         local  CircularBuffer_t* circBuffer2
+                         local  char* name
+                         local  const int32 len
+                         local  bool found
+                         local  int32 i
+                         local  const struct PreLoadItem& item
+                         local  struct AptInfo_t* aptInfo
+                         local  const int32 startOffset
+                         local  struct TStreamData* streamInRam
+                         local  struct PreloadOffsets* sorted
+                         inlines  AptStreamSupport::GetTableOfContentObj, AptStructSwapper::AllocArray2, AptStructSwapper::Swap, Is720pNameLen, PreLoadItem::MarkPreloadItemAvailable, TArrayInternal<PreLoadItem,AptStructSwapper>::GetElemCount, TArrayInternal<PreLoadItem,AptStructSwapper>::operator[], TArrayInternal<PreloadOffsets,AptStructSwapper>::GetElemCount, TArrayInternal<PreloadOffsets,AptStructSwapper>::Push, TArrayInternal<PreloadOffsets,AptStructSwapper>::SetNbrElems, TI_fConvertTimeDifToSeconds
+ 1509  00431D68    22C  bool AptStreamSupport::OpenStream(const struct AptStreamSupport* this)
+                         inlines  TArrayInternal<PreloadOffsets,AptStructSwapper>::GetElemCount, TI_fConvertTimeDifToSeconds
+ 1540  00431B68    200  bool AptStreamSupport::NextBlock(const struct AptStreamSupport* this)
+                         local  int32 i
+                         local  bool found
+                         inlines  TArrayInternal<PreloadOffsets,AptStructSwapper>::operator[]
+ 1571  00413D40    250  bool AptStreamSupport::CloseStream(const struct AptStreamSupport* this)
+                         inlines  TArrayInternal<PreloadOffsets,AptStructSwapper>::GetElemCount, TI_fConvertTimeDifToSeconds
+ 1604  004A2BD0    338  enum AptThreadReturnValue AptStreamSupport::StreamProgress(const struct AptStreamSupport* this, struct AptStreamAction* streamAction)
+                         local  enum AptThreadReturnValue retVal
+                         inlines  TI_fConvertTimeDifToSeconds
+ 1659  00431F94    32C  bool AptStreamSupport::AcceptRessourceFromAssocRef(const struct AptStreamSupport* this, int32 assocRef)
+                         local  int32 foundIndex
+                         local  int32 index
+                         local  int32 j
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<PreloadOffsets,AptStructSwapper>::CheckNeedAlloc, TArrayInternal<PreloadOffsets,AptStructSwapper>::SetNbrElems, TArrayInternal<PreloadOffsets,AptStructSwapper>::operator[]
+ 1704  0049FC84    17C  void AptStreamSupport::ReleaseSubInstance(const struct AptStreamSupport* this, char* instanceName)
+                         local  const int32 length
+                         local  int32 i
+                         local  char* inst2
+                         local  const int32 length2
+                         inlines  TArrayInternal<LoadMovieNames,AptStructSwapper>::operator[]
+ 1733  0049D9D8    290  bool AptStreamSupport::FreeResource(const struct AptStreamSupport* this, char* swfName)
+                         local  bool ret
+                         local  int32 startIndex
+                         local  const struct LoadMovieNames& loaded
+                         local  int32 i
+                         local  int32 preloadIndex
+                         inlines  AptStructSwapper::Swap, PreLoadItem::MarkPreloadItemAvailable, TArrayInternal<LoadMovieNames,AptStructSwapper>::RemoveElem, TArrayInternal<LoadMovieNames,AptStructSwapper>::operator[], TArrayInternal<PreLoadItem,AptStructSwapper>::operator[]
+ 1788  004A0B08    1D4  void AptStreamSupport::GotNewAPXFromStream(const struct AptStreamSupport* this, char* swfName)
+                         local  int32 preloadIndex
+                         local  int32 startIndex
+                         local  char* instanceName
+                         inlines  TArrayInternal<LoadMovieNames,AptStructSwapper>::operator[], TArrayInternal<PreLoadItem,AptStructSwapper>::operator[]
+ 1837  0049FE00    1D0  void AptStreamSupport::ReleaseInstanceUsedIn(const struct AptStreamSupport* this, int32 index)
+                         local  char* instanceName
+                         local  int32 startIndex
+                         local  int32 iToRemove
+                         inlines  TArrayInternal<LoadMovieNames,AptStructSwapper>::operator[]
+ 1880  004A04C8    398  void AptStreamSupport::LoadMovieInternal(const struct AptStreamSupport* this, int32 index)
+                         local  char* instanceName
+                         local  char* swfName
+                         local  struct AptLoadNotifier* notifier
+                         local  const int32_t useAnim
+                         local  struct AptStreamAction* action
+                         local  bool donotload
+                         local  const struct AptInfo_t& aptInfo
+                         local  char[64] url
+                         inlines  AptAnimations::GetAptInfo, TArrayInternal<LoadMovieNames,AptStructSwapper>::operator[]
+ 1965  00430F90    348  void AptStreamSupport::DebugPrintActionsList(const struct AptStreamSupport* this)
+                         local  struct AptStreamAction* actionSaved
+                         local  struct AptStreamAction* streamAction
+                         local  struct AptStreamAction* elem
+                         inlines  GetElem, Next, TChainList<AptStreamAction>::AdvanceCurrent, TChainList<AptStreamAction>::FindElem, TChainList<AptStreamAction>::GetCurrent, TChainList<AptStreamAction>::SetCurrent_
+ 2018  0043FA8C   17B8  bool AptStreamSupport::CancelLoading(const struct AptStreamSupport* this, eAptSlot zoneSlot)
+                         local  bool canCancel
+                         local  struct AptStreamAction* actionSaved
+                         local  struct AptStreamAction* streamActionTop
+                         local  struct AptStreamAction* streamAction1
+                         local  struct AptStreamAction* streamAction
+                         local  struct AptStreamAction* firstActionSlot
+                         local  struct TAptArrayStruct<PreLoadItem> loadList
+                         local  bool canContinue
+                         local  bool preloadFound
+                         local  eAptSlot slotToAdd
+                         local  bool usePreloadList
+                         local  eAptSlot slotToAdd
+                         local  int i
+                         local  bool gotoNext
+                         local  eAptSlot slotToAdd
+                         local  char* swfNameToLoad
+                         local  int i
+                         local  bool isinPreloadList
+                         local  int i
+                         inlines  AptStructSwapper::Free, AptStructSwapper::Swap, Next, PreLoadItem::MarkPreloadItemAvailable, TAptArrayStruct, TArrayInternal<PreLoadItem,AptStructSwapper>::GetElemCount, TArrayInternal<PreLoadItem,AptStructSwapper>::Push, TArrayInternal<PreLoadItem,AptStructSwapper>::operator[], TChainList<AptStreamAction>::AddElemBC, TChainList<AptStreamAction>::AdvanceCurrent, TChainList<AptStreamAction>::GetCurrent, TChainList<AptStreamAction>::GotoLast, TChainList<AptStreamAction>::RemoveCurrent, TChainList<AptStreamAction>::RewindCurrent, TChainList<AptStreamAction>::SetCurrent_, ~TAptArrayStruct
+ 2277  004A0398    130  enum AptThreadReturnValue AptStreamSupport::ReleaseXSectionSlot(const struct AptStreamSupport* this, struct AptStreamAction* streamAction)
+                         local  eAptSlot zoneSlot
+                         local  enum AptThreadReturnValue ret
+ 2337  004A0860    2A8  enum AptThreadReturnValue AptStreamSupport::LoadMovie(const struct AptStreamSupport* this, struct AptStreamAction* streamAction)
+                         local  const struct LoadMovieNames& dst
+                         local  char* instanceName
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<LoadMovieNames,AptStructSwapper>::Push
+ 2422  0046D540    18C  void AptStreamSupport::CleanListNames(const struct AptStreamSupport* this)
+                         local  const int32 count
+                         local  int i
+                         local  const struct LoadMovieNames& list
+                         local  bool isOk
+                         inlines  TArrayInternal<LoadMovieNames,AptStructSwapper>::RemoveElem, TArrayInternal<LoadMovieNames,AptStructSwapper>::operator[]
+ 2448  0049D96C     6C  enum AptThreadReturnValue AptStreamSupport::UnloadMovie(const struct AptStreamSupport* this, struct AptStreamAction* streamAction)
+                         local  const int32 index
+ 2464  0049E88C     1C  void AptStreamSupport::ReleaseSwfNameNow(const struct AptStreamSupport* this, char* name, bool forceRelease)
+ 2485  0049E9A4    104  void AptStreamSupport::ReleaseXSectionInternal(const struct AptStreamSupport* this, eAptSlot zoneSlot)
+                         local  int32 i
+                         local  const struct PreLoadItem& item
+                         inlines  TArrayInternal<PreLoadItem,AptStructSwapper>::operator[]
+ 2523  0049D7D8    194  void AptStreamSupport::UnloadMovieInternal(const struct AptStreamSupport* this, int32 index)
+                         local  char* instanceName
+                         local  char* swfName
+                         inlines  TArrayInternal<LoadMovieNames,AptStructSwapper>::operator[]
+ 2548  0049D61C    1BC  void AptStreamSupport::UnloadMovieInternal(const struct AptStreamSupport* this, char* instanceName, char* swfName)
+                         local  const int32_t useAnim
+                         local  const struct AptInfo_t& aptInfo
+                         inlines  AptAnimations::GetAptInfo
+ 2600  0049E8A8     94  void AptStreamSupport::ForceReleaseIfInDefaultSlot(const struct AptStreamSupport* this, struct AptInfo_t* aptInfo)
+                         local  char* swfName
+                         local  const int32 index
+                         inlines  AptInfo_t::GetAptFileName
+ 2619  00431500    19C  struct AptStreamAction* AptStreamSupport::FindInActionListNoCurrent(const struct AptStreamSupport* this, enum eAptStreamAction action, char* swfName, char* instanceName, eAptSlot zoneSlot)
+                         local  struct AptStreamAction* currentSaved
+                         local  struct AptStreamAction* actionRet
+                         inlines  GetElem, TChainList<AptStreamAction>::AdvanceCurrent, TChainList<AptStreamAction>::GetCurrent, TChainList<AptStreamAction>::SetCurrent_
+ 2636  004312D8    228  struct AptStreamAction* AptStreamSupport::FindInActionList(const struct AptStreamSupport* this, enum eAptStreamAction action, char* swfName, char* instanceName, eAptSlot zoneSlot, struct AptStreamAction* startWith)
+                         local  struct AptStreamAction* currentSaved
+                         local  bool ok
+                         local  struct AptStreamAction* streamAction
+                         inlines  TChainList<AptStreamAction>::AdvanceCurrent, TChainList<AptStreamAction>::GetCurrent, TChainList<AptStreamAction>::SetCurrent_
+ 2679  00444B2C    1D0  int32 AptStreamSupport::FindInListNames(const struct AptStreamSupport* this, char* instanceName, char* swfName, int32 startIndex)
+                         local  int32 i
+                         local  bool ok
+                         local  char* swfInList
+                         inlines  TArrayInternal<LoadMovieNames,AptStructSwapper>::operator[]
+ 2704  0049E3E0     1C  void AptStreamSupport::FindMemoryForStream(const struct AptStreamSupport* this, struct TStreamData* pStreamData)
+ 2718  00441244    1B8  int32 AptStreamSupport::FindInPreloadList(const struct AptStreamSupport* this, eAptSlot zoneSlot, char* swfName, int32 startIndex)
+                         local  int32 i
+                         local  bool ok
+                         inlines  TArrayInternal<PreLoadItem,AptStructSwapper>::operator[]
+ 2742  003EDA24     34  bool StreamDataHasData(struct TStreamData* theRes)
+                         local  char* stream
+                         local  const int32 streamLength
+ 2758  00481680    180  int32_t AptCheckSpawnedId(struct TStreamData* theRes)
+                         local  struct LoadAPX apxLoader
+                         local  char* fileName
+                         local  int32_t index
+                         inlines  AptAnimations::GetAptInfo
+ 2784  00481800    1D8  struct AptInfo_t* ReserveAptSpot(const char* szBaseNameIn)
+                         local  const char* szBaseName
+                         local  int32_t aptinfoIndex
+                         local  const struct AptInfo_t& aptInfo
+                         inlines  AptAnimations::GetAptInfo
+ 2830  004A1EE0    268  void AptStartLoadAnimation(const char* szBaseName, AptFilePtr& pAsyncLoadContext)
+                         local  int tryAgain
+                         local  const int32_t useAnim
+                         local  const struct AptInfo_t& aptInfo
+                         inlines  AptAnimations::GetAptInfo, AptSharedPtr<AptFile>::AptSharedPtr, AptSharedPtr<AptFile>::~AptSharedPtr
+ 2902  003EDA58      8  char* AptLoadVariables(const char* szCommand)
+ 2939  004819D8    248  bool LoadAPXFromBinary(struct TStreamData* theRes, const int32_t& index_p, bool findIndex)
+                         local  bool retVal
+                         local  struct LoadAPX apxLoader
+                         local  struct AptAnimations* aptAnimations
+                         local  int32_t index
+                         local  const int32_t aptLevel
+                         local  const struct AptInfo_t& aptInfo
+                         local  char[16] levelStr
+                         inlines  AptAnimations::GetAptInfo, TArrayInternal<AptInt32,AptStructSwapper>::operator[]
+ 3003  004484C8     5C  char* GetAPXNameFromStream(struct TStreamData* pStreamData)
+                         local  struct LoadAPX apxLoader
+ 3021  00481C20    204  bool LoadStreamAPX(struct TStreamData* theRes)
+                         local  bool retVal
+                         local  int32_t index
+                         local  const struct AptInfo_t& aptInfo
+                         local  const int32 used
+                         inlines  AptAnimations::GetAptInfo, AptInfo_t::GetIsUsed
+ 3085    inline-only   static void FixupName720p(char* name)
+ 3100  0049E3FC    420  struct TStreamData* CopyStreamData(struct TStreamData* pStreamData)
+                         local  const char[15] __FUNCTION__
+                         local  bool hasTexture
+                         local  int32 textureIsTextGen4
+                         local  int32 prevIndex
+                         local  int32 textureSize
+                         local  void* texture
+                         local  bool freeOldData
+                         local  bool allocPhysical
+                         local  bool addEndBlock
+                         local  int32 len
+                         local  int32 copyDataSize
+                         local  int32 streamDataSize
+                         local  char* dataBuffer
+                         local  struct TStreamData* nextPtr
+                         local  struct TStreamData* streamData
+                         local  struct LoadAPX apxLoader
+                         local  int i
+                         local  const int32 alignMem
+                         local  int i
+                         inlines  AptStreamSupport::FindMemoryNow, TagValuePair, operator+
+ 3223    inline-only   static bool LanguageFixupAndKeep(const struct TStreamData*& pStreamData)
+                         local  char* name
+                         local  bool keep
+                         local  int i
+                         local  char[4] lang
+                         local  char* posi
+ 3268    inline-only   static bool DemoFixupAndKeep(const struct TStreamData*& pStreamData)
+                         local  char* name
+                         local  bool keep
+                         local  char* lang
+                         local  char* posi
+ 3304  004A0CDC    3E8  void AptParseResource(struct TStreamData* pStreamData)
+                         local  const bool okLanguage
+                         local  const bool okDemo
+                         local  char* name
+                         local  const bool ok
+                         local  int i
+                         local  char[4] lang
+                         local  char* posi
+                         local  int32 index
+                         local  const struct AptInfo_t& aptInfo
+                         local  char* nameAPX
+                         local  const int32 index
+                         local  const struct AptInfo_t& aptInfo
+                         local  struct TStreamData* oldStreamData
+                         inlines  AptAnimations::GetAptInfo, AptStreamSupport::AddStreamToReleaseLater, DemoFixupAndKeep, FixupName720p, LanguageFixupAndKeep, std::strstr
+ 3432  004322C0     78  bool AptCheckResource(Drive3DChunkHdrPtr pHeader)
+                         local  const bool accept
+ 3468  0049DC68    20C  bool AptFreeResource(struct TStreamData* pStreamData)
+                         local  char* nameTemp
+                         local  char[32] name
+                         local  struct AptAnimations* aptAnimations
+                         local  bool ret
+                         local  int32_t index
+                         local  const struct AptInfo_t& aptInfo
+                         local  const bool didFree
+                         inlines  AptAnimations::GetAptInfo
+ 3534  004386A0    340  void StreamMemoryReleaseManager::AddStreamToReleaseLater(const struct StreamMemoryReleaseManager* this, struct TStreamData* stream, bool streaming)
+                         local  const int32 index
+                         local  const struct AptStreamInRam& streamInRam
+                         local  struct AptStreamInRam* streamInRam
+                         inlines  AptStructSwapper::Swap, TArrayInternal<AptStreamInRam,AptStructSwapper>::Push, TArrayInternal<AptStreamInRam,AptStructSwapper>::operator[]
+ 3571  0049EC38    280  void StreamMemoryReleaseManager::FreeAllResources(const struct StreamMemoryReleaseManager* this)
+                         local  int i
+                         local  const struct AptStreamInRam& streamInRam
+                         local  struct TStreamData* pStreamData
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<AptStreamInRam,AptStructSwapper>::SetNbrElems, TArrayInternal<AptStreamInRam,AptStructSwapper>::operator[]
+ 3592  0049E81C     70  void StreamMemoryReleaseManager::ReleaseStreamName(const struct StreamMemoryReleaseManager* this, char* nameIn)
+                         local  const int32 index
+ 3609  0049DF40    1D0  void StreamMemoryReleaseManager::ReleaseStreamByIndex(const struct StreamMemoryReleaseManager* this, int32 index)
+                         local  const struct AptStreamInRam& streamInRam
+                         local  struct TStreamData* pStreamData
+                         inlines  AptStructSwapper::Swap, TArrayInternal<AptStreamInRam,AptStructSwapper>::RemoveElem, TArrayInternal<AptStreamInRam,AptStructSwapper>::operator[]
+ 3643  00448524     E4  int32 StreamMemoryReleaseManager::FindStreamInList(const struct StreamMemoryReleaseManager* this, char* nameIn)
+                         local  int i
+                         local  const struct AptStreamInRam& streamInRam
+                         local  struct TStreamData* pStreamData
+                         local  char* name
+                         inlines  TArrayInternal<AptStreamInRam,AptStructSwapper>::operator[]
+ 3669  004385E4     BC  int32 StreamMemoryReleaseManager::FindStreamInList(const struct StreamMemoryReleaseManager* this, struct TStreamData* pStreamDataIn)
+                         local  int i
+                         local  const struct AptStreamInRam& streamInRam
+                         local  struct TStreamData* pStreamData
+                         inlines  TArrayInternal<AptStreamInRam,AptStructSwapper>::operator[]
+ 3693  0049DE74     CC  void StreamMemoryReleaseManager::MarkStreamNameAsReleasable(const struct StreamMemoryReleaseManager* this, char* nameIn)
+                         local  const int32 index
+                         local  const struct AptStreamInRam& streamInRam
+                         local  struct TStreamData* pStreamData
+                         inlines  TArrayInternal<AptStreamInRam,AptStructSwapper>::operator[]
+ 3722  00448608     88  struct TStreamData* StreamMemoryReleaseManager::FindStreamByName(const struct StreamMemoryReleaseManager* this, char* nameIn)
+                         local  const int32 index
+                         local  const struct AptStreamInRam& streamInRam
+                         inlines  TArrayInternal<AptStreamInRam,AptStructSwapper>::operator[]
+ 3738  0049E110    11C  void StreamMemoryReleaseManager::ReleaseAllReleasables(const struct StreamMemoryReleaseManager* this, struct TStreamData* pStreamDataIn)
+                         local  int i
+                         local  const struct AptStreamInRam& streamInRam
+                         local  struct TStreamData* pStreamData
+                         inlines  TArrayInternal<AptStreamInRam,AptStructSwapper>::operator[]
+ 3755  0049E22C    1B4  bool StreamMemoryReleaseManager::FindMemoryToStream(const struct StreamMemoryReleaseManager* this, struct TStreamData* pStreamDataIn)
+                         local  const int32 bytes
+                         local  bool ok
+                         local  int32 bestIndex
+                         local  int32 minGeneration
+                         local  int i
+                         local  const struct AptStreamInRam& streamInRam
+                         local  struct TStreamData* pStreamData
+                         inlines  TArrayInternal<AptStreamInRam,AptStructSwapper>::operator[]

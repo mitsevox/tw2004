@@ -1,0 +1,89 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptFF/core/truetype.cpp
+// compiled in: other_unity.cpp
+// 40 functions, source order. line | PS3 address | size
+
+   65  003F27E0    10C  void setT2KScaleFactors(int32_t pixelsPerEm, int32_t UPEM, struct T2KScaleInfo* si)
+                         local  int32_t nScale
+                         local  int16_t dShift
+                         local  int32_t dScale
+                         local  int32_t dScaleDiv2
+  176    inline-only   static uint16_t Compute_cmapClass_Index0(struct cmapClass* t, uint16_t charCode)
+  231    inline-only   static uint16_t Compute_cmapClass_Index2(struct cmapClass* t, uint16_t charCode)
+  325    inline-only   static uint16_t Compute_cmapClass_Index4(struct cmapClass* t, uint16_t charCode)
+                         local  uint16_t segCountX2
+                         local  uint16_t offset
+                         local  uint16_t idDelta
+                         local  uint16_t index
+                         local  uint16_t uTmp
+                         local  uint8_t* charP
+                         local  uint16_t n0
+                         local  uint16_t n1
+                         local  uint16_t n2
+  391    inline-only   static uint16_t Compute_cmapClass_Index6(struct cmapClass* t, uint16_t charCode)
+  435    inline-only   static uint16_t Compute_cmapClass_GlyphIndex(struct cmapClass* t, uint16_t charCode)
+                         local  uint16_t gIndex
+  578    inline-only   static void Delete_cmapClass(struct cmapClass* t)
+                         local  int i
+ 1029    inline-only   static void Delete_sfnt_DirectoryEntry(struct sfnt_DirectoryEntry* t)
+ 1044  003F2138      8  struct sfnt_OffsetTable* New_sfnt_OffsetTable(struct tsiMemObject* mem, struct InputStream* in)
+ 1229  003F5208     78  void Delete_sfnt_OffsetTable(struct sfnt_OffsetTable* t)
+                         local  int i
+ 1324  003F5534     14  static void Delete_hheaClass(struct hheaClass* t)
+ 1334  003F1C08     90  struct hmtxClass* New_hmtxEmptyClass(struct tsiMemObject* mem, int32_t numGlyphs, int32_t numberOfHMetrics)
+                         local  struct hmtxClass* t
+ 1420  003F5548     64  void Delete_hmtxClass(struct hmtxClass* t)
+ 1475    inline-only   static void Delete_ttcfClass(struct ttcfClass* t)
+ 1578    inline-only   static void Delete_headClass(struct headClass* t)
+ 1721    inline-only   static void Delete_maxpClass(struct maxpClass* t)
+ 1736  003F55AC      8  struct locaClass* New_locaClass(struct tsiMemObject* mem, struct InputStream* in, int16_t indexToLocFormat, int32_t length)
+ 1820    inline-only   static void Delete_locaClass(struct locaClass* t)
+ 1992    inline-only   static struct GlyphClass* New_GlyphClass(struct tsiMemObject* mem, struct InputStream* in, int8_t readHints, int16_t lsb, uint16_t aw, int16_t tsb, uint16_t ah)
+ 2435  003F2790     48  uint16_t GetUPEM(struct sfntClass* t)
+                         local  uint16_t upem
+ 2476  003F2140      8  struct sfnt_DirectoryEntry* GetTableDirEntry_sfntClass(struct sfntClass* t, int32_t tag)
+ 2494  003F5AF8      8  struct InputStream* GetStreamForTable(struct sfntClass* t, int32_t tag)
+ 2538  003F5B00      8  static int CacheKeyTables_sfntClass(struct sfntClass* t, struct InputStream* in, int32_t logicalFontNumber)
+ 2876  003F2A64      4  void GetTTNameProperty(struct sfntClass* font, uint16_t languageID, uint16_t nameID, uint8_t** p8, uint16_t** p16)
+ 2956  003F28EC     48  int32_t GetNumGlyphs_sfntClass(struct sfntClass* t)
+                         local  int32_t n
+ 3002  004178F0    2C0  struct GlyphClass* GetGlyphByIndex(struct sfntClass* t, int32_t index, int8_t readHints, uint16_t* aWidth, uint16_t* aHeight)
+                         local  struct GlyphClass* glyph
+                         local  struct sfnt_DirectoryEntry* dirEntry
+                         local  struct InputStream* stream
+                         local  uint32_t offset1
+                         local  uint32_t offset2
+                         local  uint32_t length
+                         local  uint16_t aw
+                         local  uint16_t ah
+                         local  int16_t lsb
+                         local  int16_t tsb
+ 3278  003F5B08      4  void ff_LoadCMAP(struct sfntClass* t)
+ 3299  003F5D44      8  uint16_t SfntClassPSNameTocharCode(struct sfntClass* t, int8_t* PSName)
+ 3323  003F5B0C    238  uint16_t GetSfntClassGlyphIndex(struct sfntClass* t, uint16_t charCode)
+                         local  uint16_t n0
+                         local  uint16_t n1
+                         local  uint16_t n2
+                         inlines  Compute_cmapClass_GlyphIndex
+ 3391  003F2A48      8  int IsFigure(struct sfntClass* t, uint16_t gIndex)
+ 3444    inline-only   static void SetStyling(struct sfntClass* t, struct T2K_AlgStyleDescriptor* styling)
+                         local  int i
+ 3476  003F5D4C      8  static uint16_t Get_hmtx_AW(void* param1, uint16_t gIndex)
+ 3489  003F5D54      8  static uint16_t Get_Cached_AW(void* param1, uint16_t gIndex)
+ 3553  0041AD20    2BC  struct sfntClass* FF_New_sfntClass(struct tsiMemObject* mem, int16_t fontType, int32_t fontNum, struct InputStream* in1, struct InputStream* in2, struct T2K_AlgStyleDescriptor* styling, int* errCode)
+                         local  struct sfntClass* t
+                         inlines  SetStyling
+ 4455  003F5D5C     3C  int GetMaxPoints(struct sfntClass* t)
+                         local  int result
+ 4490  003F5DA0    274  void GetFontWideOutlineMetrics(struct sfntClass* font, struct T2K_FontWideMetrics* hori, struct T2K_FontWideMetrics* vert)
+                         local  int i
+                         local  F16Dot16 angle
+ 4633  003F6738      4  void Purge_cmapMemory(struct sfntClass* t)
+ 4644  003F55B4    180  void FF_Delete_sfntClass(struct sfntClass* t, int* errCode)
+                         inlines  Delete_cmapClass, Delete_headClass, Delete_locaClass, Delete_maxpClass, Delete_ttcfClass
+ 4713  003F673C    120  void ff_KernShellSort(struct kernPair0Struct* pairs, int num_pair)
+                         local  int i
+                         local  int j
+                         local  int incr
+                         local  uint32_t tempindex
+                         local  int16_t tempvalue
+ 5052  003F685C      4  void T2K_SfntListChars(void* userArg, struct sfntClass* t, void* ctxPtr, int(*)()* ListCharsFn, int* errCode)

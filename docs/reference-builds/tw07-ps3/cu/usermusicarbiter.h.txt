@@ -1,0 +1,5 @@
+// C:/packages/rwaudiocore/2.08.01/include/rw/audio/core/plugins/usermusicarbiter.h
+// compiled in: usermusicarbiter.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   42  006DAE08      8  unsigned int GetSize(struct PlugInConfig* )

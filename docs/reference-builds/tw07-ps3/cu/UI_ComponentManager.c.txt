@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_ComponentManager.c
+// compiled in: apt_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  150  000F1480    364  void UI_ComponentManager::Init()
+                         inlines  UICSP::Init, UIGameFaceShutdown::Init, UIOnlineMainMenu::Init, UIWidgetBG::Init
+  281  000D8BA8    3F8  void UI_ComponentManager::Close()
+                         inlines  UICSP::Close, UIGameFaceShutdown::Close, UIOnlineEAMessenger::Close, UIOnlineMainMenu::Close

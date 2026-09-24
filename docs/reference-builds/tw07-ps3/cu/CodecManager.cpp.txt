@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/Internal/CodecManager.cpp
+// compiled in: CodecManager.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   21  0059B574     20  int32_t MakeFourCC(char c1, char c2, char c3, char c4)
+   26  0059B594     98  int32_t GetCodecIndex(int32_t fourcc)
+                         local  int i
+   39  0059B62C     20  struct ICodec* GetICodec(int32_t index)
+   48  0059B64C     50  bool RegisterCodec(int32_t fourcc, struct ICodec* codec)
+   60  0059B69C     1C  void FreeMemory()

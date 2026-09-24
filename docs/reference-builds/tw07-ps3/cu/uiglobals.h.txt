@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/Golf/ui_core/uiinterface/headers/uiglobals.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   91    inline-only   void UIGameOptions::SetCrowds(const struct UIGameOptions* this, bool bCrowd)

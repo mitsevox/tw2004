@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Legacy/LL/Headers/LLTexture.h
+// compiled in: Legacy_unity.cpp, apt_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  171    inline-only   int TX_TextureIsAllocated(TextureRef ref)
+  175    inline-only   int TX_TextureIsRenderTarget(TextureRef ref)

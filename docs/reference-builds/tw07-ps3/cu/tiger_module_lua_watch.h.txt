@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/include/tiger_module_lua_watch.h
+// compiled in: tiger_module_lua_watch.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   25  005376BC     F8  void LuaWatch(const struct <anon>* this)
+   26  00537930     F0  void LuaWatch(const struct <anon>* this, const char* watch)
+                         local  const char* comma
+                         local  int nameLen
+   27  00537B10    1AC  void LuaWatch(const struct <anon>* this, const char* name, const char* value)

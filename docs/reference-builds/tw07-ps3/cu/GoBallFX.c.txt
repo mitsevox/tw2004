@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/GoBallFX.c
+// compiled in: golf_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   47  00215A20     A4  void BFX_vInit()
+                         local  struct TextureGroup* pTexGrp
+   57  002FB594    1F8  void BFX_vRender(float* ballLoc, enum PlayerNumber_t id, float fGroundHeight)
+                         local  float[2][4] pos
+                         local  const float[2][4] uv
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, PR_vSetCurrentColor, PR_vSetCurrentTexture, PR_vSetCurrentUsage, PR_vSetDefaultCurrentColor
+  110  00215AC4      4  void BFX_vClose()

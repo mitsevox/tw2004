@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/include/ears_rt_cct/Tricky/Tricky_CompressFormula.h
+// compiled in: TrickyDecoder.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   90    inline-only   enum tChanType tCTHeader::GetType(const const struct tCTHeader* this)
+   95    inline-only   int tCTHeader::GetNum(const const struct tCTHeader* this)

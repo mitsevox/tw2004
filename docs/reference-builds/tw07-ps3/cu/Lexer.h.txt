@@ -1,0 +1,9 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/Lexer.h
+// compiled in: Compiler.cpp, Lexer.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   40  007BD8EC     24  void Lexer(const struct <anon>* this)
+   41  007BD934     24  void ~Lexer(const struct <anon>* this)
+   50  007BD544     48  void SkipToken(const struct <anon>* this)
+   56  007BD58C     30  struct <anon>* GetFirstToken(const struct <anon>* this)
+   62  007BD5BC     34  struct <anon>* LookAtNextToken(const struct <anon>* this)

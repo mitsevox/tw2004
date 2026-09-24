@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_LoadProfile.h
+// compiled in: apt_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   37  00120668    160  void UILoadProfile::~UILoadProfile(const struct UILoadProfile* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UILoadProfile::UIProfileMenuItem>::~TExternArray, UIMenuCircBase::~UIMenuCircBase
+   40  000FEDAC      C  uint32 UILoadProfile::GetSignature(const const struct UILoadProfile* this)
+   50  000FEDC0      C  struct IExternArray* UILoadProfile::GetExternArray(const struct UILoadProfile* this)
+   51  000FEDD4      8  int32 UILoadProfile::GetSizeofArrayStruct(const struct UILoadProfile* this)
+   56  000FEDDC     24  void UILoadProfile::LooseFocus(const struct UILoadProfile* this, uint32 )
+   57  001154F0      4  void UILoadProfile::OnShow(const struct UILoadProfile* this)
+  121  000FEE00     3C  void UILoadProfile::Show(const struct UILoadProfile* this)

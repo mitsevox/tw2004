@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/quaternion_type_inline.h
+// compiled in: IOStream.cpp
+// 5 functions, source order. line | PS3 address | size
+
+  297    inline-only   void Set(const struct <anon>* this, float _x, float _y, float _z, float _w)
+                         local  Vector4Intrinsic_32 vi_temp
+  320    inline-only   const VecFloatRefX X(const const struct Quaternion* this)
+  330    inline-only   const VecFloatRefY Y(const const struct Quaternion* this)
+  340    inline-only   const VecFloatRefZ Z(const const struct Quaternion* this)
+  350    inline-only   const VecFloatRefW W(const const struct Quaternion* this)

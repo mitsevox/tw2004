@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNARender/ps3/RNARender/RNACircularBuffer.h
+// compiled in: RNACircularBuffer.cpp, RNADrawImmediate.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   40  008413D4      C  void CircularBufferC(const struct <anon>* this)
+   41  008418E0     10  void ~CircularBufferC(const struct <anon>* this)
+   52    inline-only   enum MemoryLocationE GetLocation(const struct <anon>* this)

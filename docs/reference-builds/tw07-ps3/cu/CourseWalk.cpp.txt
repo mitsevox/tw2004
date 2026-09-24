@@ -1,0 +1,36 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/CourseWalk/CourseWalk.cpp
+// compiled in: golf_unity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   28  0029DC04     84  struct CourseWalk* CourseWalk::GetSingleton()
+                         local  struct CourseWalk coreInstance
+                         inlines  CourseWalk::CourseWalk, vector
+   33  001FB80C      8  bool CourseWalk::IsCourseWalk(const struct CourseWalk* this)
+   42  002CCADC    1C8  bool CourseWalk::GoToNextHole(const struct CourseWalk* this)
+                         local  struct Course* mCour
+                         local  char* name
+                         local  int32 j
+                         inlines  GM_SetCurrentCourseID, GM_SetPlayerHoleStrokes, GamePlayerManager::SetPlayerCount, cGAME_GLOBALS::DisableLoopingDebug
+   98  00225EE4      C  void CourseWalk::setIsCourseWalk(const struct CourseWalk* this)
+  102  00225F20     B8  void CourseWalk::ParseCourseWalkXML(const struct CourseWalk* this)
+                         local  void* courseXMLBuffer
+                         local  struct <anon> xmlparser
+  115  0029DD98    358  void CourseWalk::StartElement(const struct CourseWalk* this, const char8_t* name, uint32_t nameLen, const struct <anon>* attributes, uint32_t attributeCount)
+                         local  struct Course cour
+                         local  bool8_t hasValue
+                         inlines  insert, push_back
+  141  0026795C     5C  struct Course* CourseWalk::GetCourse(const struct CourseWalk* this, uint32_t nIdx)
+                         inlines  operator[], size
+  149  00225EF0      4  void CourseWalk::EndElement(const struct CourseWalk* this, const char8_t* name, uint32_t nameLen)
+  153  00225EF4     2C  void* CourseWalk::LoadXML(const struct CourseWalk* this, char8_t* path)
+                         local  uint32_t uFileSize
+                         local  void* pXMLData
+  161  0029DC88    110  void CourseWalk::InitializeCourseWalk(const struct CourseWalk* this)
+                         local  struct Course* mCour
+                         local  char8_t* mName
+                         local  uint32_t mHole
+                         inlines  size
+  177  00225FD8     3C  void CourseWalk::DumpMemInfo(const struct CourseWalk* this)
+  182  00226014    11C  void CourseWalk::PrintSummary(const struct CourseWalk* this)
+                         local  struct MemBudgetTracker*[3] pMemTrackers
+                         local  int i

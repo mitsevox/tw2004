@@ -1,0 +1,36 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Shared/UHashString.cpp
+// compiled in: other_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   34    inline-only   void HSMemCpy(void* s1, const void* s2, size_t n)
+   39    inline-only   void HSMemSet(void* s1, int val, size_t n)
+  183    inline-only   static char ToLowerCase(char _ch)
+  190  0041E3C8     DC  void HashString::Set(const struct HashString* this, const char* str, int length)
+                         local  int minLength
+                         local  unsigned int i
+                         inlines  HSMemCpy
+  226  0041013C     84  bool HashString::IsEquals(const const struct HashString* this, const const struct HashString& str)
+                         local  bool isEqual
+                         local  int i
+                         inlines  ToLowerCase
+  246  0041E4A4     84  void HashString::Set(const struct HashString* this, const const struct HashString& str)
+                         inlines  HSMemCpy
+  251  003E81A0     48  void HashString::Clear(const struct HashString* this)
+                         inlines  HSMemSet
+  256  003CE030     30  bool HashString::IsEmpty(const const struct HashString* this)
+                         local  bool bResult
+                         local  int i
+  271  004102BC     C4  int HashString::Compare(const const struct HashString* this, const const struct HashString& val)
+                         local  int result
+                         local  int i
+                         inlines  ToLowerCase
+  301  003E81E8     34  int HashString::Length(const const struct HashString* this)
+                         local  int count
+  313  003E821C     BC  void HashString::ToString(const const struct HashString* this, char* destStr, int bufLen)
+                         local  int sLen
+                         inlines  HSMemCpy
+  336  003E82D8     A4  bool HashString::IsValid(const char* str, enum StatusType* pStatus)
+                         local  bool bRet
+  356  003E837C     EC  bool HashString::IsEquals(const const struct HashString* this, const char* str, bool bCaseInsensitive)
+                         local  bool bRet
+                         local  char[17] tmpBuf

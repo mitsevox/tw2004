@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/UAllocator.c
+// compiled in: Legacy_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   42  003B1FF4     E8  void* Allocator::alloc(const struct Allocator* this, int32 size, TTypeAcces type, int32 alignment)
+                         local  int32 alignVal
+                         local  TTypeAcces typeVal
+                         local  MemBudgetTypeE budgetVal
+                         local  void* ptr
+                         inlines  TagValuePair, operator+
+   78  003AAF60     18  void Allocator::free(const struct Allocator* this, void* ptr)

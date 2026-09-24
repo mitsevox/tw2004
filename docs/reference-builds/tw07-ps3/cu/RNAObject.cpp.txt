@@ -1,0 +1,12 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNABase/RNAObject.cpp
+// compiled in: RNAObject.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   50  0081F42C     1C  void Object(const struct <anon>* this, void* pUserData, uint32_t uFlags)
+   60  0081F518     68  void ~Object(const struct <anon>* this)
+                         local  const char[8] __FUNCTION__
+                         inlines  RNADebugBreak
+   68  0081F464     10  void AddRef(const const struct <anon>* this)
+   75  0081F474     A4  void Release(const struct <anon>* this)
+                         local  const char[8] __FUNCTION__
+                         inlines  RNADebugBreak

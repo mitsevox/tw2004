@@ -1,0 +1,26 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/resourceprotocolhttp.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   67  006262F8      8  const char8_t* GetPath(const const struct <anon>* this)
+  126  005D1E0C     98  void ResourceHttp(const struct <anon>* this, const char8_t* strPath, struct MemoryStrategy* pMemoryStrategy)
+  158  005D1CBC     A8  void ResourceHttp(const struct <anon>* this, const char8_t* strPath, void* pBuffer, uint32_t uLength)
+  189  005D1C18     A4  void Initialize(const struct <anon>* this)
+                         local  int32_t iError
+  236  005C02E8     C8  void ~ResourceHttp(const struct <anon>* this)
+  266  005BE54C    314  enum State Process(const struct <anon>* this, uint32_t* pSize, uint32_t* pCompleted)
+                         local  int32_t iError
+                         local  uint32_t uDataRemaining
+                         local  int32_t iHeadResult
+                         local  int32_t iBodyResult
+                         local  int32_t iDownloaded
+  449  005BE860     18  void* GetData(const const struct <anon>* this, const char8_t* strURL, uint32_t* pSize)
+  482  005BE4D4     34  void ResourceProtocolHttp(const struct <anon>* this)
+  503  005BE8AC      C  void ~ResourceProtocolHttp(const struct <anon>* this)
+  524  005BE8FC     64  bool HandlesProtocol(const const struct <anon>* this, const char8_t* strProtocol)
+  551  005E6394     9C  void CreateResource(const struct <anon>* this, const char8_t* strPath, void* pBuffer, uint32_t uLength, struct <anon>* pRCPointer)
+                         inlines  operator=
+  577  005E6430     8C  void CreateResource(const struct <anon>* this, const char8_t* strPath, struct MemoryStrategy* pMemoryStrategy, struct <anon>* pRCPointer)
+                         inlines  operator=
+  601  005BE960     10  enum State ProcessResource(const struct <anon>* this, struct Resource* pResource, uint32_t* pSize, uint32_t* pCompleted)
+                         local  struct <anon>* pHttp

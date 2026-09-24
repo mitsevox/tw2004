@@ -1,0 +1,57 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/aptInterface/uiAptDebugInfo.cpp
+// compiled in: other_unity.cpp
+// 26 functions, source order. line | PS3 address | size
+
+   30  003E9C18     20  void AutoResetMax::SetValue(const struct AutoResetMax* this, int32 value)
+   40  003E9C38     30  void AutoResetMax::CallMeEndOfFrame(const struct AutoResetMax* this)
+   52  003E9C68     34  bool AutoResetMax::NewValueIsHOT(const const struct AutoResetMax* this)
+   69  00408BE8    25C  void AptDebugDrawText(char* string, float y, bool colorIsHot)
+   84  00408E44    5C0  void AptDebugInfo::DisplayInfo(const struct AptDebugInfo* this)
+                         local  char[256] string
+                         local  float y
+  195  0046DA48    27C  void AptDebugInfo::DisplayStack(const struct AptDebugInfo* this)
+                         local  char[256] string
+                         local  float y
+                         local  struct IAptControllerListener* listener
+                         local  struct IAptControllerListener* active
+                         local  int index
+                         local  struct AptScreenSubscriber* screen
+                         local  enum ePriority priority
+                         local  char* priorityString
+  245  003E9C9C    124  void AptDebugInfo::EndOfFrame(const struct AptDebugInfo* this)
+  274  003EA200      4  void AptDebugInfo::SetNbrNewInstance(const struct AptDebugInfo* this, int nbrNewInstances)
+  283  004239F0     88  void AptDebugInfo::IncrementNestedMask(const struct AptDebugInfo* this, int maskLevel)
+                         inlines  AutoResetMax::operator++
+  293  004239D4     1C  void AptDebugInfo::IncrementO2(const struct AptDebugInfo* this)
+                         inlines  AutoResetMax::operator++
+  302  004239B8     1C  void AptDebugInfo::IncrementFade(const struct AptDebugInfo* this)
+                         inlines  AutoResetMax::operator++
+  311  0042399C     1C  void AptDebugInfo::IncrementO3(const struct AptDebugInfo* this)
+                         inlines  AutoResetMax::operator++
+  319  00423914     88  void AptDebugInfo::IncrementBlur(const struct AptDebugInfo* this, bool trueBlur)
+                         inlines  AutoResetMax::operator++
+  330  004238F8     1C  void AptDebugInfo::IncrementStencil(const struct AptDebugInfo* this)
+                         inlines  AutoResetMax::operator++
+  338  00423880     78  void AptDebugInfo::IncrementShape(const struct AptDebugInfo* this, int nbrElemInShape)
+                         inlines  AutoResetMax::operator++
+  348  00423864     1C  void AptDebugInfo::IncrementTextElem(const struct AptDebugInfo* this)
+                         inlines  AutoResetMax::operator++
+  356  00423848     1C  void AptDebugInfo::IncrementTextDrawPrimitiveUP(const struct AptDebugInfo* this)
+                         inlines  AutoResetMax::operator++
+  364  0042382C     1C  void AptDebugInfo::IncrementFontFusionRasterize(const struct AptDebugInfo* this)
+                         inlines  AutoResetMax::operator++
+  372  00423810     1C  void AptDebugInfo::IncrementGradient(const struct AptDebugInfo* this)
+                         inlines  AutoResetMax::operator++
+  380  004237F4     1C  void AptDebugInfo::IncrementFastGradient(const struct AptDebugInfo* this)
+                         inlines  AutoResetMax::operator++
+  390  004237D8     1C  void AptDebugInfo::IncrementBGColorTween(const struct AptDebugInfo* this)
+                         inlines  AutoResetMax::operator++
+  399  004237BC     1C  void AptDebugInfo::IncrementAA(const struct AptDebugInfo* this)
+                         inlines  AutoResetMax::operator++
+  407  004237A0     1C  void AptDebugInfo::IncrementAnimatedTexture(const struct AptDebugInfo* this)
+                         inlines  AutoResetMax::operator++
+  415  00423784     1C  void AptDebugInfo::IncrementFastAlphaMask(const struct AptDebugInfo* this)
+                         inlines  AutoResetMax::operator++
+  423  003EA204     1C  void AptDebugInfo::IncrementTrueAlphaMask(const struct AptDebugInfo* this)
+                         inlines  AutoResetMax::operator++
+  431  003EA220     28  void AptDebugInfo::SetLiveUpdateFile(const struct AptDebugInfo* this, char* fileName)

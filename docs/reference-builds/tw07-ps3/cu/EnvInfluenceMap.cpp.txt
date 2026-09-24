@@ -1,0 +1,54 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/IngameTools/EnvInfluenceMap/EnvInfluenceMap.cpp
+// compiled in: golf_unity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   53  002C9188    194  void CEnvInfluenceMap::SetupCameraForBox(const struct CEnvInfluenceMap* this, float* vTargetTopLeft, float* vTargetBottomRight)
+                         local  CameraController_t* pCameraController
+                         local  float* xCamPos
+                         local  float* xLookPos
+                         local  float fCenterX
+                         local  float fCenterZ
+                         local  float fWidth
+                         local  float fHeight
+                         local  float fCameraHeightAboveGround
+                         local  float fSqureSideLength
+                         local  float fFovTriangleOpisite
+                         local  float fFOV
+                         local  float fTheata
+                         local  float fScaleFOV
+                         inlines  CA_vSetCameraFieldOfView, RC_spGetRenderCtxCamera
+  130  002C931C    1AC  void CEnvInfluenceMap::UpdateCamera(const struct CEnvInfluenceMap* this)
+                         local  vec4flt vTopLeft
+                         local  vec4flt vBottomRight
+                         local  float fCenterX
+                         local  float fCenterZ
+                         local  float fWidth
+                         local  float fHeight
+                         local  float fResizedWidth
+                         local  float fResizedHeight
+                         local  float fCellWidth
+                         local  float fCellHeight
+                         local  int y
+                         local  int x
+  179  002EB250    184  void CEnvInfluenceMap::StateFuncInit(const struct CEnvInfluenceMap* this)
+                         local  vec4flt vInput1
+                         local  vec4flt vInput2
+  242  00235DB8    100  void CEnvInfluenceMap::StateFuncUpdate(const struct CEnvInfluenceMap* this)
+                         local  int iCurrentSnapShot
+  288  002EB190     C0  void CEnvInfluenceMap::StateFuncExit(const struct CEnvInfluenceMap* this)
+  346  00235EC8      4  void CEnvInfluenceMap::RenderDebugInfo(const struct CEnvInfluenceMap* this)
+  390  00303484    280  void CEnvInfluenceMap::RenderBox(const struct CEnvInfluenceMap* this, float* vTargetTopLeft, float* vTargetBottomRight)
+                         local  float fCenterX
+                         local  float fCenterZ
+                         local  float fWidth
+                         local  float fHeight
+                         local  float fWorldHeight
+                         local  vec4flt xpcolors
+                         local  float[8][4] curVert
+                         local  float* pVert
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetZBufferMode, Gcm::cellGcmSetBlendFunc, PR_vSetCurrentColor, PR_vSetCurrentUsage
+  473  00235ECC     D0  void CEnvInfluenceMap::GetCurrentSnapshotName(const struct CEnvInfluenceMap* this, char* sName, int bufSize)
+  490  00235F9C      8  bool CEnvInfluenceMap::IsCurrentlyRunning(const struct CEnvInfluenceMap* this)
+  498  00235EB8      8  bool CEnvInfluenceMap::StitchTempImages(const struct CEnvInfluenceMap* this)
+  607  00235EC0      8  bool CEnvInfluenceMap::WriteExtraData(const struct CEnvInfluenceMap* this)
+  644  00235FA4     2C  void CEnvInfluenceMap::GetBoundingAreaInput(const struct CEnvInfluenceMap* this, float* vInput1, float* vInput2)

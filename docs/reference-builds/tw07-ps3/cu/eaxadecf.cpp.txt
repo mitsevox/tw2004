@@ -1,0 +1,30 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/extern/coda/cmn/eaxadecf.cpp
+// compiled in: eaxadecf.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   50  006E8F64    100  void Snd::process_raw_block(MXAPACKETF* pxap)
+                         local  unsigned int i
+                         local  short int temp
+                         inlines  PutUB<short int, short int>
+  364  006E9064    1C0  void Snd::decodexac(MXAPACKETF* xap)
+                         local  int shift
+                         local  float f0
+                         local  float f1
+                         local  int s0
+                         local  int s1
+                         local  int i
+                         local  unsigned char* ptmpSrc
+  429  006E8E48     40  void* operator new(size_t size)
+  440  006E8E88     3C  void operator delete(void* ptr)
+  462  006E8F04     38  int Feed(const struct <anon>* this, void* pSampleData, int sampleDataSize, int numSamples)
+  483  006E9224    254  int Decode(const struct <anon>* this, float** pDstBuf, int numSamples)
+                         local  int retVal
+                         local  int framesleft
+                         local  int i
+                         local  int tmpframecnt
+                         local  int maxsamples
+                         local  float* ptmpDst
+  582  006E8F3C     14  XAFSTATE GetState(const struct <anon>* this)
+                         local  struct <anon> xtmp
+                         local  XAFSTATE xtmp
+  591  006E8F50     14  void SetState(const struct <anon>* this, XAFSTATE* pxas)

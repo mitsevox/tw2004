@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/txufile.cpp
+// compiled in: other_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   45  003FBCD0    288  char* TXUFile::ReadFromStream(const struct TXUFile* this, char* stream)
+                         local  const char[15] __FUNCTION__
+                         local  int streamSize
+                         local  int i
+                         local  int j
+                         inlines  TagValuePair, operator+

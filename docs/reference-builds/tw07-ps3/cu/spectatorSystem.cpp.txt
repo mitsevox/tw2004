@@ -1,0 +1,180 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Spectator/spectatorSystem.cpp
+// compiled in: golf2_unity.cpp
+// 49 functions, source order. line | PS3 address | size
+
+   93  00140420     18  void CSpectatorSystem::ColdBoot(const struct CSpectatorSystem* this)
+  105  0016F83C      4  void CSpectatorSystem::Exit(const struct CSpectatorSystem* this)
+  112  00175040    538  void CSpectatorSystem::Startup(const struct CSpectatorSystem* this, uint32 maxSpectators, uint32 maxModels)
+                         local  const uint32 maxCloneGroups
+                         local  uint32 count
+                         inlines  CPovLink<CSpectatorCloneGroup>::SetNext, CPovLink<CSpectatorCloneGroup>::SetPrev, CPovLinkedList<CSpectatorCloneGroup>::Init, CPovMatrix4x4::operator=, CPovVector3::operator=, CPovVector4::operator=
+  165  0016F5FC    240  void CSpectatorSystem::Shutdown(const struct CSpectatorSystem* this)
+                         local  uint32 i
+                         local  const struct CharModelMgrCharacterInstance& instance
+  231  0016F560     9C  void CSpectatorSystem::Reset(const struct CSpectatorSystem* this)
+                         local  struct CSpectatorCloneGroup* cloneGroup
+                         local  struct CSpectatorCloneGroup* end
+                         local  struct CSpectatorCloneGroup* next
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLink<CSpectatorCloneGroup>::Unlink, CPovLinkedList<CSpectatorCloneGroup>::First, CPovLinkedList<CSpectatorCloneGroup>::Init, CSpectatorCloneGroup::~CSpectatorCloneGroup
+  256  00140B84     38  struct CSpectatorModel* CSpectatorSystem::AddModel(const struct CSpectatorSystem* this, TSpectatorModel* model)
+                         local  struct CSpectatorModel* outModel
+                         inlines  CSpectatorModel::SetModel
+  276  001432C8     2C  struct CSpectatorModel* CSpectatorSystem::GetModel(const struct CSpectatorSystem* this, uint32 id)
+  300  0016B7C4    2F4  void SetCloneGroupScale(struct CSpectatorCloneGroup* cloneGroup)
+                         local  float scaleX
+                         local  float scaleY
+                         local  float scaleZ
+                         local  bool doUniformScale
+                         local  const SPECTATOR_MODEL modelType
+                         local  bool isFemale
+                         local  bool isChild
+                         inlines  CSpectatorCloneGroup::SetScale
+  367  001404FC      4  void CSpectatorSystem::Init(const struct CSpectatorSystem* this)
+  372  0016FB40      4  void CSpectatorSystem::ResetInstanceUsage(const struct CSpectatorSystem* this)
+  377  001432F4      8  bool CSpectatorSystem::DynClonePoolCreated(const struct CSpectatorSystem* this)
+  382  0017B93C    134  void CSpectatorSystem::CreateDynClonePool(const struct CSpectatorSystem* this, uint32 modelID)
+                         local  unsigned int i
+                         local  struct CSpectatorModel* pModel
+                         inlines  CSpectatorCloneGroup::CSpectatorCloneGroup, CSpectatorCloneGroup::SetIsDynamic, CSpectatorPose::CSpectatorPose
+  398  00176C9C    16C  void CSpectatorSystem::CreateCloseGroupInstances(const struct CSpectatorSystem* this, uint32 modelID, int nInstances, CLONE_GROUP_TYPE type)
+                         local  struct CSpectatorCloneGroup* cloneGroup
+                         local  struct CSpectatorModel* pModel
+                         local  int instance
+                         local  int numCloneGroupMembers
+                         local  const float UNIFORM_STANDS_SCALE
+                         inlines  CPovLink<CSpectatorCloneGroup>::Link, CPovLinkedList<CSpectatorCloneGroup>::Append, CSpectatorCloneGroup::CSpectatorCloneGroup, CSpectatorCloneGroup::SetScale, CSpectatorPose::CSpectatorPose
+  425  00170178     D0  void CSpectatorSystem::DeInitForHole(const struct CSpectatorSystem* this)
+                         local  uint32 count
+                         local  struct CSpectatorCloneGroup* cloneGroup
+                         inlines  CSpectatorInstance::GetCloneGroup
+  448  0016FACC     74  void CSpectatorSystem::Flush(const struct CSpectatorSystem* this)
+                         local  struct CSpectatorCloneGroup* pSpectatorCloneGroup
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::First
+  463  0016FF20     38  void CSpectatorSystem::SetIsUsed(const struct CSpectatorSystem* this, struct CSpectatorInstance* instance, uint8 val)
+  479  001432FC      4  void CSpectatorSystem::Dump(const struct CSpectatorSystem* this)
+  488  00155DF8    170  struct CSpectatorInstance* CSpectatorSystem::GetRandomInstance(const struct CSpectatorSystem* this)
+                         local  int32 index
+                         local  unsigned int numTries
+  515  0016FBAC    374  struct CSpectatorInstance* CSpectatorSystem::GetTypeInstance(const struct CSpectatorSystem* this, CLONE_GROUP_TYPE type)
+                         local  int32 done
+                         local  int32 index
+                         local  unsigned int numTries
+                         local  uint32 leastInstances
+                         local  struct CSpectatorCloneGroup* cloneGroup
+                         local  struct CSpectatorCloneGroup* bestCloneGroup
+                         local  int offset
+                         local  struct CSpectatorCloneGroup* firstCloneGroup
+                         local  int i
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::First, CSpectatorCloneGroup::GetNumUsedInstances
+  588  001C3254     9C  struct CSpectatorInstance* CSpectatorSystem::GetInstance(const struct CSpectatorSystem* this, CLONE_GROUP_TYPE Type, const const struct CPovVector3& Position, const const struct CPovVector3& Target, uint32 Light)
+                         local  struct CSpectatorInstance* pInstance
+                         local  bool doFullColor
+                         inlines  CSpectatorInstance::SetColor
+  607  001C2ED0    384  struct CSpectatorInstance* CSpectatorSystem::GetInstanceBySpline(const struct CSpectatorSystem* this, CLONE_GROUP_TYPE type, int spline_id, const const struct CPovVector3& Position, const const struct CPovVector3& Target, uint32 Light)
+                         local  struct CSpectatorInstance* pInstance
+                         local  int32 done
+                         local  int32 index
+                         local  unsigned int numTries
+                         local  uint32 leastInstances
+                         local  struct CSpectatorCloneGroup* cloneGroup
+                         local  struct CSpectatorCloneGroup* bestCloneGroup
+                         local  bool doFullColor
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::First, CSpectatorCloneGroup::GetNumUsedInstances, CSpectatorInstance::SetColor
+  673  001C264C     98  void CSpectatorSystem::Update(const struct CSpectatorSystem* this, float dt)
+  719  0016BDFC     14  void CSpectatorSystem::UpdatePoseOverride(const struct CSpectatorSystem* this, float dt)
+  766  001ACEBC     28  bool CSpectatorSystem::CheckForCollision(const struct CSpectatorSystem* this, float* fPoint0, float* fPoint1, bool bIsEstimating, float* pCollisionPoint, float* pSurfaceNormal)
+  775  00156B58     28  bool CSpectatorSystem::AreSpectatorsInZone(const struct CSpectatorSystem* this, float x, float z)
+  787  001C1E7C    3C0  int CSpectatorSystem::UpdateThread(char* lpParm)
+                         local  struct CPovVector3 c_viewPos
+                         local  struct CPovMatrix4x4 viewMatrix
+                         local  struct CPovMatrix4x4 viewProjMatrix
+                         local  struct CA_SCamera* camera
+                         local  struct RC_SRenderCtx* context
+                         local  bool bRenderingPip
+                         local  bool re_sort
+                         local  vec3flt viewPos
+                         local  vec3flt viewDir
+                         local  float viewFOV
+                         local  vec3flt sViewPos
+                         local  vec3flt sViewDir
+                         local  float sViewFOV
+                         local  struct CSpectatorCloneGroup* cloneGroup
+                         local  struct CSpectatorCloneGroup* end
+                         local  int i
+                         inlines  CA_fGetCameraFieldOfView, CPovLink<CSpectatorCloneGroup>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::End, CPovLinkedList<CSpectatorCloneGroup>::First, RC_spGetCurrentRenderCtx, RC_spGetCurrentRenderCtxCamera
+  947  00189DE4     7C  void SpectatorVisibilityUpdate()
+                         local  struct CSpectatorCloneGroup* cloneGroup
+                         local  struct CSpectatorCloneGroup* end
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::End, CPovLinkedList<CSpectatorCloneGroup>::First
+  967  0017004C    12C  struct CSpectatorCloneGroup* CSpectatorSystem::RemoveFromGroup(const struct CSpectatorSystem* this, struct CSpectatorInstance* instance)
+                         local  struct CSpectatorCloneGroup* newGroup
+                         local  struct CSpectatorCloneGroup* oldGroup
+                         inlines  CPovLink<CSpectatorCloneGroup>::Link, CPovLinkedList<CSpectatorCloneGroup>::Append, CPovVector3::operator=, CSpectatorCloneGroup::IncNumUsedInstances, CSpectatorCloneGroup::SetScale, CSpectatorInstance::GetCloneGroup, CSpectatorInstance::SetCloneGroup
+ 1013  0016FF80     CC  struct CSpectatorCloneGroup* CSpectatorSystem::RestoreGroup(const struct CSpectatorSystem* this, struct CSpectatorInstance* instance)
+                         local  struct CSpectatorCloneGroup* newGroup
+                         local  struct CSpectatorCloneGroup* oldGroup
+                         inlines  CPovLink<CSpectatorCloneGroup>::Unlink, CSpectatorInstance::GetCloneGroup, CSpectatorInstance::GetOriginalCloneGroup, CSpectatorInstance::SetCloneGroup
+ 1047  001BFC18    1CC  void CSpectatorSystem::Render(const struct CSpectatorSystem* this, bool forceMeshRender)
+                         local  struct CSpectatorCloneGroup* cloneGroup
+                         local  struct CSpectatorCloneGroup* end
+                         local  const CSpectatorInstanceList& instance_list
+                         local  struct CSpectatorInstance* pInstance
+                         local  struct CSpectatorInstance* pInstanceListEnd
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLink<CSpectatorInstance>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::End, CPovLinkedList<CSpectatorCloneGroup>::First, CPovLinkedList<CSpectatorInstance>::First
+ 1141  001C5820    1F4  void CSpectatorSystem::PreRender(const struct CSpectatorSystem* this, bool forceMeshRender)
+                         local  struct CPovVector3 viewPos
+                         local  struct CPovMatrix4x4 viewMatrix
+                         local  struct CPovMatrix4x4 viewProjMatrix
+                         local  struct CA_SCamera* camera
+                         local  struct RC_SRenderCtx* context
+                         local  bool bRenderingPip
+                         inlines  RC_spGetCurrentRenderCtx, RC_spGetCurrentRenderCtxCamera
+ 1209  001C1ADC    3A0  void CSpectatorSystem::SetView(const struct CSpectatorSystem* this, const const struct CPovVector3& viewPos, const const struct CPovMatrix4x4& viewMatrix, const const struct CPovMatrix4x4& viewProjMatrix, float fov, bool bPip)
+                         inlines  CPovMatrix4x4::operator=, CPovVector3::operator=, CPovVector4::operator=
+ 1232  0016E3B8     30  static int CloneGroupQsortFunc(const void* arg1, const void* arg2)
+                         local  struct CSpectatorCloneGroup* p1
+                         local  struct CSpectatorCloneGroup* p2
+ 1249  001533B8     88  void CSpectatorSystem::SortCloneGroups(const struct CSpectatorSystem* this)
+                         local  uint32 count
+                         local  struct CSpectatorCloneGroup* cloneGroup
+                         local  struct CSpectatorCloneGroup* end
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::End, CPovLinkedList<CSpectatorCloneGroup>::First
+ 1273  001560F8     18  struct CSpectatorPose* CSpectatorSystem::GetNewOverride(const struct CSpectatorSystem* this, TSpectatorModel* model, struct CSpectatorPose* blendInOutPose, bool bRandomStart, float fDelayedStart, bool use_cct)
+ 1280  00156A20     7C  void CSpectatorSystem::PlacementWasUpdated(const struct CSpectatorSystem* this)
+ 1299  0016E7D0     20  void CSpectatorSystem::AimAtSpectatorUpdate(const struct CSpectatorSystem* this, enum PlayerNumber_t PlayerID, float dt)
+ 1309  001AC1BC     20  void CSpectatorSystem::BallFlightUpdate(const struct CSpectatorSystem* this, enum PlayerNumber_t PlayerID, float dt)
+ 1317  001622C8      4  void CSpectatorSystem::MakeSpectatorIdle(const struct CSpectatorSystem* this, struct CSpectatorInstance* pInstance)
+ 1325  001622B0     14  void CSpectatorSystem::MakeSpectatorWalk(const struct CSpectatorSystem* this, struct CSpectatorInstance* pInstance)
+ 1335  00162A74     14  void CSpectatorSystem::ClearOverrides(const struct CSpectatorSystem* this, bool requests_only)
+ 1345  001AD3DC     34  void CSpectatorSystem::BallBounce(const struct CSpectatorSystem* this, enum PlayerNumber_t PlayerID, enum EVENTID_e eventID, float* position_p, enum EVENTVALUE_e value)
+ 1356  0015D958    160  void CSpectatorSystem::SaveWalkerPosRot(const struct CSpectatorSystem* this, vec4flt* positions, vec4flt* rotations, uint32 numValues)
+                         local  uint32 spectators
+                         local  uint32 i
+ 1394  001C26E4    1A0  void CSpectatorSystem::RestoreWalkerPosRot(const struct CSpectatorSystem* this, vec4flt* positions, vec4flt* rotations, uint32 numValues)
+                         local  uint32 spectators
+                         local  struct CPovVector3 vPos
+                         local  struct CPovVector3 vTarget
+                         local  uint32 i
+                         inlines  CPovVector3::SetX, CPovVector3::SetY, CPovVector3::SetZ
+ 1434  00140704     28  uint32 CSpectatorSystem::GetSpectatorHitStage(const struct CSpectatorSystem* this)
+                         inlines  CSpectatorBehavior::GetSpectatorHitStage
+ 1450  00153440     38  uint32 CSpectatorSystem::GetNumInstances(const struct CSpectatorSystem* this)
+                         local  uint32 count
+                         local  struct CSpectatorCloneGroup* cloneGroup
+                         local  struct CSpectatorCloneGroup* end
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::First
+ 1465  0015348C     38  uint32 CSpectatorSystem::GetNumMeshRenders(const struct CSpectatorSystem* this)
+                         local  uint32 count
+                         local  struct CSpectatorCloneGroup* cloneGroup
+                         local  struct CSpectatorCloneGroup* end
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::First
+ 1480  0016D544     38  uint32 CSpectatorSystem::GetNumCardRenders(const struct CSpectatorSystem* this)
+                         local  uint32 count
+                         local  struct CSpectatorCloneGroup* cloneGroup
+                         local  struct CSpectatorCloneGroup* end
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::First
+ 1495  001534D8     34  uint32 CSpectatorSystem::GetNumCloneGroups(const struct CSpectatorSystem* this)
+                         local  uint32 count
+                         local  struct CSpectatorCloneGroup* cloneGroup
+                         local  struct CSpectatorCloneGroup* end
+                         inlines  CPovLink<CSpectatorCloneGroup>::GetNext, CPovLinkedList<CSpectatorCloneGroup>::First

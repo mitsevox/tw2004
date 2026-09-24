@@ -1,0 +1,86 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_OnlineEAMessenger.cpp
+// compiled in: apt_unity.cpp
+// 60 functions, source order. line | PS3 address | size
+
+  104  00024DAC      8  enum AptThreadReturnValue UIOnlineEAMessenger::CheckConnection(const struct UIOnlineEAMessenger* this)
+  139  000F6C5C     B4  void UIOnlineEAMessenger::UIOnlineEAMessenger(const struct UIOnlineEAMessenger* this)
+                         inlines  TArrayInternal<UIOnlineEAMessenger::DstMenuItem_omsg,AptStructSwapper>::TArrayInternal, TExternArray<UIOnlineEAMessenger::DstMenuItem_omsg>::TExternArray, UIMenuVertBase::UIMenuVertBase
+  154  000F0210    13C  void UIOnlineEAMessenger::Init(const struct UIOnlineEAMessenger* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+  189  00047104     8C  void UIOnlineEAMessenger::Show(const struct UIOnlineEAMessenger* this)
+  209  00057A80     74  void UIOnlineEAMessenger::Hide(const struct UIOnlineEAMessenger* this)
+  224  000471C4      4  void UIOnlineEAMessenger::SetBuddyIcons(const struct UIOnlineEAMessenger* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, int index)
+  283  000471C8     60  void UIOnlineEAMessenger::UpdateItemAndLabel(const struct UIOnlineEAMessenger* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_omsg* dest
+  306  00061FF4     94  void FindUserKeyBoardCB()
+                         local  char[32] userToFind
+  317  00062088      4  void MessageKeyBoardCB()
+  325  00060C08     88  void UIOnlineEAMessenger::FindUser(const struct UIOnlineEAMessenger* this)
+                         local  char[32] userToFind
+  345  00047228      4  void UIOnlineEAMessenger::SendMessage(const struct UIOnlineEAMessenger* this)
+  364  00062120    144  static void _OptionsHandlerOnClose(int32 activeIndex)
+  415  00084F44    5B8  enum eAptHandleInput UIOnlineEAMessenger::HandleInput(const struct UIOnlineEAMessenger* this, int32 cID)
+                         local  bool bBuddyListNotEmpty
+                         local  bool bInProShop
+                         local  struct IAptControllerListener* pControllerListener
+                         local  struct AptScreenSubscriber* pScreenSubscriber
+                         local  int32 iSize
+  619  000472B8      8  void UIOnlineEAMessenger::SetDisableMessenger(const struct UIOnlineEAMessenger* this, bool flag)
+  628  000472C0     5C  void UIOnlineEAMessenger::SetSelectedBuddyName(const struct UIOnlineEAMessenger* this, char* buddyName)
+  643  0004731C      C  char* UIOnlineEAMessenger::GetSelectedBuddyName(const struct UIOnlineEAMessenger* this)
+  651  00047328      C  int UIOnlineEAMessenger::GetSelectedBuddyFlags(const struct UIOnlineEAMessenger* this)
+  659  0006208C     1C  void UIOnlineEAMessenger::SetToCallsFromLobby(const struct UIOnlineEAMessenger* this)
+  664  00047334      8  void UIOnlineEAMessenger::SetMenuFromLobby(const struct UIOnlineEAMessenger* this, bool flag)
+  672  0004733C     F8  void UIOnlineEAMessenger::RegainFocus(const struct UIOnlineEAMessenger* this, uint32 comingFrom_Signature)
+                         local  struct IAptControllerListener* oldListener
+                         local  struct IAptControllerListener* newListener
+  687  00047434     F4  void UIOnlineEAMessenger::LooseFocus(const struct UIOnlineEAMessenger* this, uint32 )
+                         local  struct IAptControllerListener* oldListener
+                         local  struct IAptControllerListener* newListener
+  702  00047660    114  void UIOnlineEAMessenger::HandleAlertIcons(const struct UIOnlineEAMessenger* this, bool challengeWaiting, bool friendReqWaiting, bool messageWaiting)
+  743  00047528    138  void UIOnlineEAMessenger::ShowAlertIcon(const struct UIOnlineEAMessenger* this, enum eMessgIcon icon, enum eMessgIconState iconState)
+                         local  char* tempStr
+  770  00047774     9C  char* UIOnlineEAMessenger::LookUpAlertIcon(const struct UIOnlineEAMessenger* this, enum eMessgIcon inIcon)
+                         local  int32 i
+  789  00047068     9C  void UIOnlineEAMessenger::PreLoadIcons(const struct UIOnlineEAMessenger* this)
+                         local  int32 i
+  801  00047190     34  void UIOnlineEAMessenger::UnLoadIcons(const struct UIOnlineEAMessenger* this)
+  808  0004728C     24  void UIOnlineEAMessenger::ShowNextMessengerCategory(const struct UIOnlineEAMessenger* this)
+  820  00047268     24  void UIOnlineEAMessenger::ShowPrevMessengerCategory(const struct UIOnlineEAMessenger* this)
+  833  00047064      4  void UIOnlineEAMessenger::RefreshCategoryName(const struct UIOnlineEAMessenger* this)
+  870  00081C68     90  void UIOnlineEAMessenger::RefreshBuddyListNames(const struct UIOnlineEAMessenger* this, int32 numUsers, int32 activeUserIndex)
+  883  00047810      4  void UIOnlineEAMessenger::SendChallengeFriend(const struct UIOnlineEAMessenger* this)
+  912  0005EBC8     BC  void UIOnlineEAMessenger::RemoveFriendMenu(const struct UIOnlineEAMessenger* this)
+                         local  char* msg
+  924  00047814      C  void UIOnlineEAMessenger::RemoveFriend(const struct UIOnlineEAMessenger* this)
+  943  00047820      4  void UIOnlineEAMessenger::CancelFriendRequest(const struct UIOnlineEAMessenger* this)
+  957  00047824      4  void UIOnlineEAMessenger::BlockUserMenu(const struct UIOnlineEAMessenger* this, char* user)
+  979  00047828      C  void UIOnlineEAMessenger::BlockUser(const struct UIOnlineEAMessenger* this)
+  989  0005EC84     E0  void UIOnlineEAMessenger::BlockUserConfirm(const struct UIOnlineEAMessenger* this)
+                         local  char* msg
+ 1008  0005ED64     A8  void UIOnlineEAMessenger::ConfirmPopup(const struct UIOnlineEAMessenger* this, char* msg)
+ 1024  00047834      C  void UIOnlineEAMessenger::SendFriendRequest(const struct UIOnlineEAMessenger* this)
+ 1041  00047840      C  void UIOnlineEAMessenger::AcceptFriendRequest(const struct UIOnlineEAMessenger* this)
+ 1056  0004784C      C  void UIOnlineEAMessenger::DeclineFriendRequest(const struct UIOnlineEAMessenger* this)
+ 1070  00047858      C  void UIOnlineEAMessenger::SendVoiceInvite(const struct UIOnlineEAMessenger* this)
+ 1083  0005F478     BC  void UIOnlineEAMessenger::ViewResume(const struct UIOnlineEAMessenger* this)
+ 1103  000620CC     1C  static void _StopResumeFind()
+ 1112  00047864      8  void UIOnlineEAMessenger::SetViewingResume(const struct UIOnlineEAMessenger* this, bool flag)
+ 1133  0004786C     50  void UIOnlineEAMessenger::SendFeedback(const struct UIOnlineEAMessenger* this)
+ 1143  000478BC      8  void UIOnlineEAMessenger::SetSendingFeedback(const struct UIOnlineEAMessenger* this, bool flag)
+ 1151  000702E0     8C  void UIOnlineEAMessenger::MessageHandler(const struct UIOnlineEAMessenger* this)
+ 1186  0005EE0C     C4  void UIOnlineEAMessenger::AnswerFriendRequest(const struct UIOnlineEAMessenger* this)
+ 1200  000478C4      4  void UIOnlineEAMessenger::HandleFriendOptions(const struct UIOnlineEAMessenger* this)
+ 1227  000478C8      C  void UIOnlineEAMessenger::HandleChallengeOptions(const struct UIOnlineEAMessenger* this)
+ 1254  000478D4      8  void UIOnlineEAMessenger::SetLaunchedGameSetup(const struct UIOnlineEAMessenger* this, bool flag)
+ 1262  000478DC     34  char* UIOnlineEAMessenger::HandleBlockMenuStrings(const struct UIOnlineEAMessenger* this)
+                         local  char* menuStr
+ 1281  00047910     34  char* UIOnlineEAMessenger::HandleMesgMenuStrings(const struct UIOnlineEAMessenger* this)
+                         local  char* menuStr
+ 1301  00047944      8  char* UIOnlineEAMessenger::HandleFriendMenuStrings(const struct UIOnlineEAMessenger* this)
+ 1336  0004794C     34  char* UIOnlineEAMessenger::HandleChallengeMenuStrings(const struct UIOnlineEAMessenger* this)
+                         local  char* menuStr
+ 1358  0004722C     3C  void UIOnlineEAMessenger::ChooseMenuAndOptions(const struct UIOnlineEAMessenger* this)
+ 1563  000620E8     38  static void _SetupAnswerFriendReqMenu(int index)
+ 1684  000620A8     24  static void _SetupRemoveFriendMenu(int index)
+ 1723  000695AC     68  static void _ContinueToResume()

@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/online/osdk/lockerparametersconcrete.cpp
+// compiled in: golf2_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   75  0012AD80      8  const uint32_t LockerParametersConcrete::GetNumberOfFileTypes(const const struct LockerParametersConcrete* this)
+   98  0012AD88     48  const char8_t* LockerParametersConcrete::GetFileType(const const struct LockerParametersConcrete* this, uint32_t uIndex)
+  133  0012ADD0     48  const char8_t* LockerParametersConcrete::GetLocalizedFileType(const const struct LockerParametersConcrete* this, uint32_t uIndex)

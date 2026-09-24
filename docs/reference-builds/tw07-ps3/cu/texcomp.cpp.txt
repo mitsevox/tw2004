@@ -1,0 +1,48 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/texcomp.cpp
+// compiled in: other_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   60  003D20E4    114  void TexComp::SetupDynTex(const struct TexComp* this, int32 max_entries, int32 tex_budget)
+   84  003D21F8     2C  void TexComp::ResetDynTex(const struct TexComp* this)
+   89  003D2224    10C  void TexComp::LoadTexturesFromMemory(const struct TexComp* this, uint8* pData)
+                         local  int i
+  112  003E76B8     7C  void TexComp::SetTextureLoadInfo(const struct TexComp* this, struct TX_STextureGroup* tex_group, uint32 streamTable, const char* streamName)
+  122  003D2330     FC  void TexComp::ClearAllTextures(const struct TexComp* this)
+                         local  int i
+                         local  uint32 uiTexIndex
+  142  004299B4    188  void TexComp::LoadList(const struct TexComp* this, int32 num_textures, struct HashString* load_list)
+                         local  int32 i
+                         local  int32 j
+                         inlines  HashString::operator=, operator==
+  166  003D242C     A4  static int sTexComp_LeastRecentUsed(const void* arg1, const void* arg2)
+                         local  float addr1
+                         local  float addr2
+  182  00401070    420  void TexComp::BeginLoad(const struct TexComp* this)
+                         local  const char[10] __FUNCTION__
+                         local  int i
+                         local  uint32 space_needed
+                         local  uint32 uiTexIndex
+                         local  int32 mem_used
+                         local  int32 space_to_free
+                         local  struct DynTextureT* tmp_list
+                         local  char[17] chpTextureIDString
+                         local  char[256] buf
+                         inlines  TagValuePair, operator+
+  283  003D24D0     84  void TexComp::TextureLoadRequest(const struct TexComp* this, struct TCharacter* pCharacter, LLDynTex_fnLoadCallbackT pBeginCallbackFunc, LLDynTex_fnLoadCallbackT pEndCallbackFunc)
+                         local  struct DynTexLoadRequestT* pRequest
+  302  003D2554     28  void TexComp::WaitForLoadCompletion(const struct TexComp* this)
+  307  003D257C     2C  bool TexComp::ProgressAsyncLoading(const struct TexComp* this)
+  312  003D25A8     28  void TexComp::CancelLoadRequests(const struct TexComp* this)
+  317  00424634    1A0  uint8* TexComp::GetTextureData(const struct TexComp* this, const const struct HashString& texID, int32 mipmap, int32_t layer)
+                         local  int32 i
+                         local  int32 iAddrOffset
+                         local  struct TX_STextureGroupTexture* pTexture
+                         local  int32_t foundLayer
+                         inlines  DynTexGroupT::TouchTextureByIndex, operator==
+  347  004247D4     A8  bool TexComp::IsTextureCurrentlyLoaded(const struct TexComp* this, const const struct HashString& texID)
+                         local  int i
+                         inlines  operator==
+  361  004101C0     FC  struct TX_STextureGroupTexture* TexComp::GetTextureInfo(const struct TexComp* this, const const struct HashString& texID)
+                         local  int32 i
+                         inlines  operator==
+  376  003D25D0     8C  void TexComp::CreateRawTextureList(const struct TexComp* this, int32_t numTextures, struct RawTexture** textures)

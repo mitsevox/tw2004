@@ -1,0 +1,37 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/statsmanagerconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   55  00629B18     50  void ~LeaderboardDownloadCategoriesStrategy(const struct <anon>* this)
+  108  0060CCA8     70  void LeaderboardDownloadCategoriesSetupStrategy(const struct LeaderboardDownloadCategoriesSetupStrategy* this, LobbyRankT* pLobbyRank, struct LeaderboardDownloadCategoriesCallback* pCallback)
+                         inlines  RCPointer
+  135  0060CD88     DC  void ~LeaderboardDownloadCategoriesSetupStrategy(const struct LeaderboardDownloadCategoriesSetupStrategy* this)
+                         inlines  operator->, ~LeaderboardDownloadCategoriesCallback, ~LobbySetupStrategy, ~RCPointer
+  167  005FEF4C     FC  struct Operation* LobbySetupStartOperation(const struct LeaderboardDownloadCategoriesSetupStrategy* this, struct LobbySetupStrategyCallback* pCallback)
+                         local  struct <anon>* pStrategy
+                         inlines  GetOperationManagerConcrete, operator=
+  203  005F9FF8     B0  void LeaderboardDownloadCategoriesSuccess(const struct LeaderboardDownloadCategoriesSetupStrategy* this)
+                         inlines  operator=
+  233  005FA0A8     C0  void LeaderboardDownloadCategoriesFailure(const struct LeaderboardDownloadCategoriesSetupStrategy* this, enum Failure eFailure)
+                         inlines  operator=
+  262  005FEE80     CC  void LeaderboardDownloadCategoriesStrategy(const struct <anon>* this, LobbyRankT* pLobbyRank, struct LeaderboardDownloadCategoriesCallback* pCallback)
+                         local  const char8_t* strCategoriesView
+                         local  int32_t iStatus
+  298  005BFA64     38  bool OperationProcess(const struct <anon>* this, const struct Operation* )
+                         local  bool bContinue
+  329  005BFA9C      4  void OperationCancel(const struct <anon>* this, const struct Operation* )
+  353  005BFAA0     58  void OperationTimeout(const struct <anon>* this, const struct Operation* )
+  381  005BFAF8     AC  void DownloadCategoryListCallback(LobbyRankT* , LobbyApiMsgT* pMsg, void* pUserData)
+                         local  struct <anon>* pStrategy
+  421  0060A5F8     F0  void LeaderboardDownloadCategoriesSuccess(const struct StatsManagerConcrete* this)
+                         local  int32_t iNumberOfCategories
+                         local  int32_t iCategoryIndex
+                         inlines  InsertElement, operator=
+  454  005E6558     40  void LeaderboardDownloadCategoriesFailure(const struct StatsManagerConcrete* this, enum Failure )
+                         inlines  operator=
+  481  0061563C    164  void StatsManagerConcrete(const struct StatsManagerConcrete* this)
+                         local  struct LobbySetupConcrete* pLobbySetup
+                         inlines  GetLobbySetupConcrete, LeaderboardDownloadCategoriesCallback, List, RCPointer, operator OSDK::LeaderboardDownloadCategoriesSetupStrategy*, operator=
+  515  00615904     A0  void ~StatsManagerConcrete(const struct StatsManagerConcrete* this)
+                         inlines  RemoveAllInternal, ~LeaderboardDownloadCategoriesCallback, ~List, ~RCPointer
+  540  005BFBA4      C  const struct List<OSDK::LeaderboardCategory>* GetLeaderboardCategories(const struct StatsManagerConcrete* this)

@@ -1,0 +1,20 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptContext.cpp
+// compiled in: other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   75  0041103C     C8  struct AptNativeHash* AptValue::getNativeHash(const struct AptValue* this)
+                         inlines  AptCIH::isLevelInst, AptValue::getVtblIndex, AptValue::isCIH, AptValue::isNativeHash
+   98  0045FC1C    268  struct AptValue* AptValue::findChild(const struct AptValue* this, const char* szName, struct AptValue* pWith)
+                         local  struct AptValue* pCur
+                         local  struct Objects* pObjects
+                         local  struct AptNativeHash* pNativeHash
+                         local  struct AptValue* pRet
+                         local  struct AptValue* pRet
+                         local  struct AptValue* pValue
+                         local  struct AptValue* pThis
+                         local  struct AptNativeHash* pNativeHash
+                         local  int nLevel
+                         local  struct AptNativeHash* pNativeHash
+                         local  struct AptCIH* pRootCIH
+                         inlines  AptValue::c_cih, AptValue::isCIH, AptValueStack<AptValue*,32>::top, std::atoi
+  302  003EEE0C      8  int AptValue::isMCInParentChain(const struct AptValue* this)

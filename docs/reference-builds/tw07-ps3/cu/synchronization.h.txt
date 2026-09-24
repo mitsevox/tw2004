@@ -1,0 +1,44 @@
+// C:/dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/target/ppu/include/sys/synchronization.h
+// compiled in: EAGeneralAllocator.cpp
+// 4 functions, source order. line | PS3 address | size
+
+  245    inline-only   static int sys_mutex_create(sys_mutex_t* mutex_id, sys_mutex_attribute_t* attr)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n
+  255    inline-only   static int sys_mutex_destroy(sys_mutex_t mutex_id)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n
+  265    inline-only   static int sys_mutex_lock(sys_mutex_t mutex_id, usecond_t timeout)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n
+  285    inline-only   static int sys_mutex_unlock(sys_mutex_t mutex_id)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n

@@ -1,0 +1,23 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/chatstreamlobbymsgconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   84  005EC168     A0  void ChatStreamLobbyMsgConcrete(const struct <anon>* this, const char8_t* strID)
+                         local  struct <anon>* pFacade
+                         local  struct <anon>* pLobby
+                         inlines  AddObserver
+  115  005DDB28     A8  void ~ChatStreamLobbyMsgConcrete(const struct <anon>* this)
+                         local  struct <anon>* pFacade
+                         local  struct <anon>* pLobby
+                         inlines  RemoveObserver
+  147  005B3E14     EC  void LobbyRoomMessageReceived(const struct <anon>* this, struct LobbyRoom* , struct <anon>* pMessage)
+                         local  uint32_t uNumElements
+                         local  struct ChatStreamObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  174  005B3F00      4  void LobbyRoomPopulationChanged(const struct <anon>* this, struct LobbyRoom* )
+  199  005CD7F4     AC  struct Operation* SendMessage(const struct <anon>* this, const char8_t* strMessage, struct <anon>* pCallback)
+                         local  struct <anon>* pLocalUser
+                         local  struct LobbyRoom* pLobbyRoom
+  234  005B3F04      4  void ReadMessage(const struct <anon>* this)
+  258  005B3F08     58  void LobbyRoomSendMessageSuccess(const struct <anon>* this)
+  285  005B3F60     5C  void LobbyRoomSendMessageFailure(const struct <anon>* this)

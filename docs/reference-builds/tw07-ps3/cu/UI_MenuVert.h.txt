@@ -1,0 +1,16 @@
+// ../../../../../TIGERCODE/Code/Golf/UI_Core/AptRuntime/Headers/UI_MenuVert.h
+// compiled in: apt_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   22    inline-only   void UIMenuVertBase::Init(const struct UIMenuVertBase* this)
+   25  00103C00     18  enum TAptSequenceStatus UIMenuVertBase::ShowBasicMenuSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   26  000FE06C     18  enum TAptSequenceStatus UIMenuVertBase::HideBasicMenuSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   27  000FE008     18  enum TAptSequenceStatus UIMenuVertBase::InitMenuSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   34    inline-only   void UIMenuVertBase::RegainFocus(const struct UIMenuVertBase* this, uint32 )
+   35  000FE044     24  void UIMenuVertBase::LooseFocus(const struct UIMenuVertBase* this, uint32 )
+   37    inline-only   void UIMenuVertBase::SetDefaultMenuOption(const struct UIMenuVertBase* this, int32 iDefaultMenuOption)
+   44    inline-only   void UIMenuVertBase::SetNumVisibleVertRows(const struct UIMenuVertBase* this, int32 numRows)
+   45    inline-only   void UIMenuVertBase::InitMenuParams(const struct UIMenuVertBase* this)
+   68  0011169C     48  void UIMenuVert::RegainFocus(const struct UIMenuVert* this, uint32 )
+                         inlines  UIMenuVertBase::RegainFocus
+   74  000FE08C      C  uint32 UIMenuVert::GetSignature(const const struct UIMenuVert* this)

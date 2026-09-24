@@ -1,0 +1,18 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sserver.cpp
+// compiled in: sserver.cpp
+// 6 functions, source order. line | PS3 address | size
+
+    0  006CBBCC     28  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  CListDStack::CListDStack
+   28  006CB814     60  void SNDSYSI_variabletimerservice()
+                         local  VariableTimerClient* pClient
+                         local  struct CListDNode* pNode
+                         inlines  CListDNode::GetNext, CListDStack::GetHead
+   48  006CB874    300  void SNDSYSI_100hzserver()
+                         local  int i
+                         local  struct CHANPUB* pv
+                         local  struct ENVELOPE* penvelope
+                         local  int volchanged
+  334  006CBB74     2C  void SNDSYS_entercritical()
+  354  006CBBA0     2C  void SNDSYS_leavecritical()
+  358  006CBBF4     10  static void _GLOBAL__I__ZN4Snd918gVariableTimerListE()

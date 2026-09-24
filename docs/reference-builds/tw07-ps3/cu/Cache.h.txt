@@ -1,0 +1,12 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/Cache.h
+// compiled in: Database.cpp, Query.cpp, QueryHelper.cpp, QuerySearch.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   43  007E6B60     A0  struct <anon>* Create()
+                         local  struct <anon>* pCache
+   52  007CAA7C     88  void Destroy(const struct <anon>* this)
+   71  007E6C00     88  void SetExpression(const struct <anon>* this, struct ExprNode* exprNode)
+   78  007E6C88     3C  void SetRow(const struct <anon>* this, RowNum rownum)
+  102  008193C8     38  void IncrementHit()
+  106  007EAFA0     38  void IncrementMiss()
+  110  007E6B28     38  void IncrementCreate()

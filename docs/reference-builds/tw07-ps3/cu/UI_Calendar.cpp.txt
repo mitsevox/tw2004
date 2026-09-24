@@ -1,0 +1,236 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_Calendar.cpp
+// compiled in: apt_unity.cpp
+// 52 functions, source order. line | PS3 address | size
+
+   50  000C8C1C     F4  void LaunchGrudgeMatch()
+                         local  float rank2PointAvg
+                         local  float rank3PointAvg
+                         local  const struct GameModeDriverManager& GMDMgr
+                         local  struct GameModeDriverPGAGrudgeMatch* grudgeDriver
+                         local  struct GameModeDriver* driver
+                         inlines  GameModeDriverPGAGrudgeMatch::SetRank2PointsAvg, GameModeDriverPGAGrudgeMatch::SetRank3PointsAvg, Singleton<GameModeDriverManager>::GetSingleton
+   84  000C8D10     1C  void UICalendar_AcceptTigerWoodsChallenge()
+                         inlines  UICalendar::SetInfoUp
+   90  000322D8      8  bool IsTigerWoodsChallengingTheUser()
+  104  000322E0     80  void UICalendar::ShowHelpText(const struct UICalendar* this)
+  111  000F2284     60  void UICalendar::UICalendar(const struct UICalendar* this)
+  120  000F2344     B8  void UICalendar::~UICalendar(const struct UICalendar* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+  124  000CA0B8     10  void UICalendar::GetSelectedEvent(const struct UICalendar* this, int32* eventID, int32* round)
+  129  000CBE34     50  void UICalendar::SeasonAdvance()
+                         local  struct UICalendar* pCal
+  136  000CA240     70  bool UICalendar::PGATourQuittingEvent(const struct UICalendar* this)
+                         local  int32 eventID
+                         local  int32 round
+                         local  const struct SeasonInfo& tourData
+                         inlines  UserInfo::GetPGATourData
+  147  000CC114     F4  bool UICalendar::PGATourSkippingValidEvent(const struct UICalendar* this)
+                         local  CalendarDate day
+                         local  const struct SeasonInfo& tourData
+                         inlines  UserInfo::GetPGATourData
+  162  00089934     44  void UICalendar::LaunchCachedSetup()
+  168  000CC208    1A0  void UICalendar::PGATourLaunchDay(const struct UICalendar* this)
+                         local  int32 eventID
+                         local  int32 round
+  211  000CC00C    108  int32 UICalendar::GetFirstEventInMonth(const struct UICalendar* this, int32 iMonthDifference)
+                         local  uint32 iMonth
+                         local  CalendarDate prevMonthDate
+                         local  int i
+                         local  CalendarDate date
+  234  000CC3A8    CDC  enum eAptHandleInput UICalendar::HandleInput(const struct UICalendar* this, int32 cID)
+                         local  int navAmount
+                         local  char[4] szInfoSelection
+                         local  char[4] szRounds
+                         local  char[10] szGameMode
+                         local  int32 newYear
+                         local  int currentSeason
+                         local  int currentYear
+                         local  char[4] szDate
+                         local  uint32 iSelectedDate
+                         local  char[60] szStrBuf
+                         local  int32 iEventID
+                         local  int32 iRound
+                         local  enum GM_CourseType_t course
+                         local  struct IAptSubscriber* aptGameSub
+                         local  CalendarDate todaysDate
+                         local  void* voidMode
+                         local  CalendarDate todaysDate
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+  623  000CBB1C    318  void UICalendar::MoveDate(const struct UICalendar* this, int32 navAmount)
+                         local  uint32 oldMonth
+                         local  CalendarDate tmpNewDate
+                         local  CalendarDate tmpDate
+                         local  int32 newYear
+                         local  uint32 newMonth
+  687  000CA070     48  bool UICalendar::SelectedDayHasEvent(const struct UICalendar* this)
+                         local  int32 eventID
+                         local  int32 round
+  694  0008981C    104  void UICalendar::LaunchIntoGame(const struct UICalendar* this)
+  722  00032474     74  void UICalendar::Init(const struct UICalendar* this)
+  737  000324E8     24  void UICalendar::Close(const struct UICalendar* this)
+  742  000C93D0    554  void UICalendar::Show(const struct UICalendar* this)
+                         local  struct GameModeDriverPGATour* pgaDriver
+                         local  const struct GameModeDriverManager& GMDMgr
+                         local  GM_PgaTourEventID_t eventID
+                         local  bool _sUnlockCalendarInit
+                         local  void* tmpPtr
+                         local  char[80] aptBuf
+                         local  int32 i
+                         local  struct IAptSubscriber* aptGameSub
+                         local  int32 numCourses
+                         inlines  Singleton<GameManager>::GetSingleton, Singleton<GameModeDriverManager>::GetSingleton
+  889  000663E0    110  void UICalendar::Hide(const struct UICalendar* this)
+                         local  struct IAptSubscriber* aptGameSub
+                         inlines  AptControllerListener::StopPortLocking
+  927  00069ECC     80  void UICalendar::OnShow(const struct UICalendar* this)
+  941  000C8D2C    1B8  int32 UICalendar::GetPurseAmount(const struct UICalendar* this, int32 eventID)
+                         local  int32 ret
+                         local  TourneyParamsT* myTourney
+                         local  void* voidMode
+                         local  struct GameModeDriverPGATour* driver
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+  987  000C8EE4    16C  uint32 UICalendar::GetEventByDate(const struct UICalendar* this, CalendarDate date, int32* eventID, int32* round)
+                         local  uint32 ret
+                         local  void* voidMode
+                         local  struct GameModeDriverPGATour* driver
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+ 1042  000CA2B0    140  const char* UICalendar::GetEventName(const struct UICalendar* this, int32 eventID)
+                         local  const char* pRet
+                         local  TourneyParamsT* myTourney
+                         local  void* voidMode
+                         local  struct GameModeDriverPGATour* driver
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+ 1092  000CA3F0    128  const char* UICalendar::GetEventEntryString(const struct UICalendar* this, int32 eventID)
+                         local  void* voidMode
+                         local  struct GameModeDriverPGATour* driver
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+ 1124  000CA518    2AC  enum GM_CourseType_t UICalendar::GetEventCourse(const struct UICalendar* this, int32 eventID, int32 round)
+                         local  TourneyParamsT* myTourney
+                         local  void* voidMode
+                         local  struct GameModeDriverPGATour* driver
+                         local  const struct GM_PgaTour_EventSlot_t* eventInfo
+                         local  int currentSeason
+                         local  int32 i
+                         local  const struct GM_PgaTour_EventSlot_t* teventInfo
+                         local  enum GM_CourseType_t course
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton, Singleton<UserManager>::GetSingleton
+ 1183  000676CC     90  CalendarDate UICalendar::GetInitialDate(const struct UICalendar* this)
+                         local  CalendarDate date
+ 1200  000CBE84    188  CalendarDate UICalendar::GetEventStartDate(const struct UICalendar* this, int32 eventID, uint32 season)
+                         local  void* voidMode
+                         local  struct GameModeDriverPGATour* driver
+                         local  CalendarDate date
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+ 1239  000CD084    13C  CalendarDate UICalendar::GetEventEndDate(const struct UICalendar* this, int32 eventID, uint32 season)
+                         local  void* voidMode
+                         local  struct GameModeDriverPGATour* driver
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+ 1272  00032570     F0  void UICalendar::NotifyRefresh(const struct UICalendar* this)
+ 1284  000323A4     D0  void UICalendar::ChangeDisplayMonthYear(const struct UICalendar* this, uint32 month, uint32 year)
+                         local  char[32] strBuf
+ 1297  000CB654    2E4  void UICalendar::OnDateChange(const struct UICalendar* this)
+                         local  char[64] strBuf
+                         local  int32 eventID
+                         local  int32 round
+                         local  enum GM_CourseType_t course
+                         local  struct IAptSubscriber* aptGameSub
+ 1363  00032660     BC  void UICalendar::InitialSetup(const struct UICalendar* this)
+                         local  char[32] strBuf
+                         local  char[80] aptBuf
+                         local  int32 day
+ 1376  000C9924     90  bool UICalendar::IsDateGhost(const struct UICalendar* this, CalendarDate cmpDate)
+ 1405  000CB62C     28  void UICalendar::RefreshAllDates(const struct UICalendar* this, uint32 month, uint32 year)
+ 1427  000C9C00    470  void UICalendar::RefreshAllDates_Realtime(const struct UICalendar* this, uint32 month, uint32 year)
+                         local  char[80] aptBuf
+                         local  int32 eventID
+                         local  int32 round
+                         local  int32 iconIndex
+                         local  CalendarDate tmpDate
+                         local  CalendarDate firstOfMonth
+                         local  CalendarDate lastOfMonth
+                         local  int32 week
+                         local  int32 day
+                         local  struct IAptSubscriber* aptGameSub
+                         local  struct IAptSubscriber* aptGameSub
+ 1521  000CAED0    75C  void UICalendar::RefreshAllDates_PGATour(const struct UICalendar* this, uint32 month, uint32 year)
+                         local  char[80] aptBuf
+                         local  int32 eventID
+                         local  int32 round
+                         local  int32 iconIndex
+                         local  bool endOfSeason
+                         local  CalendarDate tmpDate
+                         local  CalendarDate firstOfMonth
+                         local  CalendarDate lastOfMonth
+                         local  struct GameModeDriverPGATour* pDriver
+                         local  const struct UserInfo& userInfo
+                         local  CalendarDate firstDayCurTournament
+                         local  CalendarDate curDayCurTournament
+                         local  CalendarDate lastDayCurTournament
+                         local  int32 week
+                         local  int32 day
+                         local  enum GM_CourseType_t course
+                         local  struct IAptSubscriber* aptGameSub
+                         local  struct IAptSubscriber* aptGameSub
+                         inlines  UserInfo::GetPGATourData
+ 1707  000CA7C4    70C  void UICalendar::RefreshAllDates_Online(const struct UICalendar* this, uint32 month, uint32 year)
+                         local  char[80] aptBuf
+                         local  int32 eventID
+                         local  int32 round
+                         local  int32 iconIndex
+                         local  CalendarDate tmpDate
+                         local  CalendarDate firstOfMonth
+                         local  CalendarDate lastOfMonth
+                         local  bool bIsValidDay
+                         local  int32 week
+                         local  int32 day
+                         local  enum GM_CourseType_t course
+                         local  TourneyParamsT* myTourney
+                         local  struct IAptSubscriber* aptGameSub
+                         local  struct IAptSubscriber* aptGameSub
+                         local  enum GM_CourseType_t course
+                         local  struct IAptSubscriber* aptGameSub
+                         local  struct IAptSubscriber* aptGameSub
+ 1893  0003271C     AC  void UICalendar::SetEventInfoPopupText(const struct UICalendar* this, int32 lineNum, const char* header, const char* text)
+ 1911  000327C8     78  void UICalendar::SetEventInfoPopupText(const struct UICalendar* this, int32 lineNum, const char* header, int32 number)
+ 1925  000C9114    2BC  void UICalendar::RefreshEventInfo(const struct UICalendar* this)
+                         local  int32 i
+                         local  int32 iconIndex
+                         local  char[80] aptBuf
+                         local  struct IAptSubscriber* aptGameSub
+                         local  TourneyParamsT* myTourney
+                         local  char* moneyBuf
+ 2000  000C99B4    24C  void UICalendar::SetHighlight(const struct UICalendar* this, char* aptCalendarRoot, CalendarDate date, bool isOn)
+                         local  char[80] aptBuf
+                         local  int selX
+                         local  CalendarDate tmpDate
+                         local  int selY
+                         local  int32 eventID
+                         local  int32 round
+ 2032  0006775C    18C  enum TAptSequenceStatus UICalendar::WaitForOnlineTournamentDate(const struct UICalendar* this, bool inbFirstTime, void* inData)
+                         local  CalendarDate tmpDate
+ 2069  000CB9C0    15C  enum TAptSequenceStatus UICalendar::WaitForOnlineTournamentLoadSequence(const struct UICalendar* this, bool inbFirstTime, void* inData)
+                         local  TourneyParamsT* tourney
+                         local  CalendarDate tmpDate
+ 2104  000CD1C0    458  enum TAptSequenceStatus UICalendar::WaitForRefresh(const struct UICalendar* this, bool bInFirstTime, void* pInData)
+                         local  float fSecElapsed
+                         local  void* pData
+                         local  struct GameModeDriverPGATour* pDriver
+                         local  struct LoginSlot* pLoginSlot
+                         local  GM_PgaTourEventID_t eventID
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton, TI_fConvertTimeDifToSeconds
+ 2168  000CB938     88  enum AptThreadReturnValue UICalendar::WaitForOnlineTournamentLoadThread(const struct UICalendar* this)
+ 2181  00074E30    180  enum AptThreadReturnValue UICalendar::WaitForAnyDisconnect(const struct UICalendar* this)
+                         local  float fSecondsElapsed
+                         inlines  TI_fConvertTimeDifToSeconds
+ 2214  000C9050     C4  bool UICalendar::CheckValidDate(const struct UICalendar* this, CalendarDate date)
+                         local  struct SeasonInfo* pTourData
+                         local  int32 round
+                         local  int32 eventID
+                         inlines  UserInfo::GetPGATourData
+ 2228  000CD618    178  void UICalendar::SimAnyway()
+                         local  void* voidMode
+                         local  struct GameModeDriverPGATour* driver
+                         inlines  GameModeDriverPGATour::SetJustFinishedPGATourRound, Singleton<GameModeDriverManager>::GetSingleton, UIHighImpactMessages::AddStall, UIPgaTourLeaderboard::SetSimFromCalendarFlag
+ 2263  00032840      8  bool UICalendar::QualifyLastEvent(const struct UICalendar* this)
+ 2269  0005CBB8      C  void UICalendar::SetOnlineFlag(const struct UICalendar* this, bool bFlag)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen

@@ -1,0 +1,7 @@
+// C:/packages/rwmovie/1.04.01/source/movielib/movieplayer/cmn/audiorenderable.cpp
+// compiled in: audiorenderable.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    0  006F6F00     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   37  006F6F80     10  static void _GLOBAL__I__ZN2rw5movie15AudioRenderableC2Ev()
+   38  006F6F90     10  static void _GLOBAL__D__ZN2rw5movie15AudioRenderableC2Ev()

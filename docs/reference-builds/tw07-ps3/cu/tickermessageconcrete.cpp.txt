@@ -1,0 +1,12 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/tickermessageconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   70  00614FB0     C8  void TickerMessageConcrete(const struct <anon>* this, const TickerFilterT* pFilter, uint32_t uPriority, uint32_t uDisplayTime, uint32_t uSound)
+                         inlines  List
+   99  006154D8     74  void ~TickerMessageConcrete(const struct <anon>* this)
+                         inlines  ~List
+  122  005C10D8      C  const TickerMessageSectionList* GetSectionList(const struct <anon>* this)
+  147  005D65E0     A4  void AddSection(const struct <anon>* this, const struct Color* pColor, const char8_t* strText)
+                         local  struct <anon>* pSec
+                         inlines  InsertElement

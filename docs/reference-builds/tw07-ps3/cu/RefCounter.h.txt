@@ -1,0 +1,14 @@
+// ../../../../../TigerCode/packages/COM/4.05.01-rw-modified/include/COM/RefCounter.h
+// compiled in: rnaunity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   44    inline-only   void Destroy(const struct <anon>* this, struct <anon>* object)
+  102    inline-only   ref_count_t inc(const struct <anon>* this)
+  104    inline-only   ref_count_t dec(const struct <anon>* this)
+  167  004F7CA4      4  void Finalise(const struct <anon>* this)
+  173  004F7C38     18  void ~RefCounter(const struct <anon>* this)
+  193  004F7C88     1C  ref_count_t AddRef(const struct <anon>* this)
+                         inlines  inc
+  198  004F7CA8     98  ref_count_t Release(const struct <anon>* this)
+                         local  ref_count_t rc
+                         inlines  Destroy, dec

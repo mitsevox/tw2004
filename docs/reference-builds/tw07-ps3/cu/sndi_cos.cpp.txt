@@ -1,0 +1,11 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sndi_cos.cpp
+// compiled in: sndi_cos.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    6  006DDED8     6C  float SNDI_cos(float input)
+                         local  float x2
+                         local  float x4
+                         local  float x6
+                         local  float x8
+                         local  float x10
+                         local  float x12

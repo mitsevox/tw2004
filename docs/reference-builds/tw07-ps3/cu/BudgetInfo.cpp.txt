@@ -1,0 +1,83 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Performance/BudgetInfo.cpp
+// compiled in: other_unity.cpp
+// 17 functions, source order. line | PS3 address | size
+
+  121  003D5314     3C  void BUDGET_InitModule()
+  129  003D5350      4  void BUDGET_CloseModule()
+  135  003D5354     BC  static float BUDGET_GetRowYVal(int posn)
+  142  003D5410     14  static float BUDGET_GetTextXVal()
+  150  0040F9D0     40  static void BUDGET_RecordWorstInfo()
+                         inlines  vec4flt_Copy, vec_ld, vec_st
+  159    inline-only   static void BUDGET_GetCameraTestOriginAndTarget()
+                         local  int8 nGreenIndex
+                         local  int8 nCupIndex
+                         local  int nTeeIndex
+                         local  vec4flt target
+                         local  float x
+                         local  float z
+                         local  const float[4]& vCupLoc
+                         local  float fHeight
+                         local  const float[4]& vCupLoc
+                         local  float fHeight
+  214  00429648    208  static void BUDGET_InitCameraTest()
+                         local  const float[4]& vCupLoc
+                         local  float fHeight
+                         inlines  BUDGET_GetCameraTestOriginAndTarget
+  223  00410004     D0  static void BUDGET_SetCameraPosition(float* origin, float* target)
+                         local  CameraController_t* cameraController
+                         local  vec4flt* cameraOrigin
+                         local  vec4flt* cameraLookPoint
+                         inlines  CA_vSetCameraFieldOfView, RC_spGetRenderCtxCamera, vec4flt_Copy
+  253    inline-only   static void BUDGET_CameraTest()
+                         local  float sin
+                         local  float cos
+                         local  float tempX
+                         local  float tempZ
+                         local  char[64] str
+                         local  char[100] filename
+                         local  char[256] buf
+                         local  const int numFramesToThrowOut
+                         local  float worstFps
+                         local  float bestFps
+                         local  int numFramesBelow30Fps
+                         local  int count
+                         local  float avgFps
+                         local  int x
+                         local  int y
+                         local  float temp
+                         local  int x
+  358  003D5424     98  static void BUDGET_SetFontColor(bool val)
+                         local  vec4flt color
+  375    inline-only   static void BUDGET_UpdateTimingInfo()
+                         local  TimingTimes course
+                         local  TimingTimes spectator
+  448    inline-only   static bool BUDGET_IsHoleWithinBudget()
+  462    inline-only   static void BUDGET_RenderTimingInfo()
+                         local  char[64] str
+                         local  bool withinBudget
+  507    inline-only   static void BUDGET_RenderMemoryInfo()
+  519    inline-only   static void BUDGET_UpdateMemoryInfo()
+                         local  int32 budget
+                         local  int32 memUsed
+  532  00487468    CA8  void BUDGET_Render()
+                         local  WG_SCanvas canvas
+                         local  bool isValid
+                         local  const char* build
+                         local  const char* structures
+                         local  bool bAreTournamentStructuresVisible
+                         local  char[255] buf
+                         local  char[100] filename
+                         local  char[256] buf
+                         local  const int numFramesToThrowOut
+                         local  float worstFps
+                         local  float bestFps
+                         local  int numFramesBelow30Fps
+                         local  int count
+                         local  float avgFps
+                         local  int x
+                         local  int y
+                         local  float temp
+                         local  int x
+                         inlines  BUDGET_CameraTest, BUDGET_RenderTimingInfo, BUDGET_UpdateTimingInfo, DS_vEnableZBufferUpdate, DS_vSetAlphaTestMode, DS_vSetZBufferMode, GM_GetCourseName, WG_vSetCanvasPosition, std::cosf, std::sinf, vec4flt_Copy, vec_st
+  620  00429850    164  void BUDGET_ReverseState()
+                         inlines  BUDGET_UpdateMemoryInfo

@@ -1,0 +1,434 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptActionInterpreter.cpp
+// compiled in: other_unity.cpp
+// 36 functions, source order. line | PS3 address | size
+
+  198  003EEB34      8  bool _isNaN(struct AptValue* pValue)
+  276  004619FC    7B4  void AptActionInterpreter::_parseStream(unsigned char* aActionStream, unsigned char* pBase, struct AptConstFile* aConstantFile, int* pnCurrentConstantIndex)
+                         local  int bUnresolve
+                         local  unsigned char* pInstruction
+                         local  unsigned char cAction
+                         local  struct AptAction_With* pData
+                         local  struct AptAction_Push* pData
+                         local  int i
+                         local  int i
+                         local  int nConstTableIndex
+                         local  enum AptVirtualFunctionTable_Indices eType
+                         local  struct AptValue* pAtom
+                         local  unsigned char* pBase
+                         local  int i
+                         local  struct AptAction_DefineFunction* pData
+                         local  int i
+                         local  struct AptAction_GetUrl* pData
+                         inlines  AptBoolean::AptBoolean, AptBoolean::operator new, AptFloat::AptFloat, AptFloat::operator new, AptInteger::AptInteger, AptInteger::operator new, AptLookup::AptLookup, AptLookup::operator new, AptRegister::AptRegister, AptRegister::operator new, AptString::AptString, AptString::operator new, AptValue::__inc, Capacity
+  457  004625A0      C  void AptActionInterpreter::unresolveStream(unsigned char* aActionStream, unsigned char* pBase, int* pnCurrentConstantIndex)
+  462  004621B0      4  void AptActionInterpreter::resolveStream(unsigned char* aActionStream, unsigned char* pBase, struct AptConstFile* aConstantFile, int* pnCurrentConstantIndex)
+  475  00473D70    3AC  void AptActionInterpreter::loadVariables(const struct AptActionInterpreter* this, struct AptValue* pContext, struct AptValue* pWith, const char* szURL)
+                         local  char* szVariables
+                         local  const char* szCur
+                         local  AptNativeString sKey
+                         local  AptNativeString sValue
+                         local  struct AptString* pVariable
+                         inlines  AptString::AptString, AptString::operator new, BasicString, Capacity, Copy<char*, char*>, ReAlloc, Size, UseCapacity, ~BasicString
+  512  00465F20    178  struct AptValue* AptActionInterpreter::getObject(struct AptValue* pCurrentContext, struct AptValue* pWith, const char* szPathName)
+                         local  AptNativeString sVar
+                         local  struct AptValue* pContext
+                         local  struct AptValue* pValue
+                         inlines  AptValue::isCIH, AptValue::isNativeHash, BasicString, ~BasicString
+  536  004655E0    550  void AptActionInterpreter::getContext(struct AptValue* pCurrentContext, struct AptValue* pWith, const char* szVarName, struct AptValue** ppContext, const AptNativeString& sName)
+                         local  char[512] szBuf
+                         local  char* noCpyNameWhenPossible
+                         local  char[16] s
+                         inlines  Copy<char*, char*>, ReAlloc, operator=
+  548  00460248    260  void AptActionInterpreter::getContext(struct AptValue* pCurrentContext, struct AptValue* pWith, const char* szVarName, struct AptValue** ppContext, char* szName, char** noCpyNameWhenPossible)
+                         local  const char* pCurChar
+                         local  struct AptValue* pContext
+                         local  struct AptValue* pNewContext
+                         local  char[256] szNextDir
+                         local  char* pNextDir
+  632  0045F278     44  static void _updateObjectMethods(struct AptValue* pContext, const char* szVar, int bRemove)
+                         local  struct AptCharacterSpriteInstBase* pSpriteInstBase
+                         inlines  AptCIH::isSpriteInstBase, AptValue::isCIH
+  648  00472B94    440  void AptActionInterpreter::setVariable(const struct AptActionInterpreter* this, struct AptValue* pContext, const AptNativeString& sVar, struct AptValue* pValue, int bGlobal, int bLookInFunctionScope)
+                         local  int bHandled
+                         local  struct AptValue* pRet
+                         local  struct AptNativeHash* pNativeHash
+                         local  struct AptNativeHash* pNativeHash
+                         local  AptNativeString sBuf
+                         inlines  AptCIH::isShapeInst, AptValue::isArray, AptValue::isCIH, AptValue::isExtern, AptValueStack<AptFrameStack*,32>::size, BasicString, ConstRawPtr, ~BasicString
+  779  00473C58    118  void AptActionInterpreter::setVariable(const struct AptActionInterpreter* this, struct AptValue* pCurrentContext, struct AptValue* pWith, const char* szVarName, struct AptValue* pValue, int bGlobal, int bLookInFunctionScope)
+                         local  struct AptValue* pContext
+                         local  AptNativeString sVar
+                         inlines  BasicString, ~BasicString
+  799  0045FE84    3C4  struct AptValue* AptActionInterpreter::cbCallMethod_setInterval(struct AptValue* pContext, int nParams)
+                         local  struct AptValue* pCBValue
+                         local  struct AptValue* pIntervalValue
+                         local  int i
+                         local  int nParamStart
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  int j
+                         inlines  AptActionInterpreter::stackAt, AptCIH::isSpriteInst, AptInteger::AptInteger, AptInteger::operator new, AptValue::__inc, AptValue::getVtblIndex, AptValue::isObject, AptValue::isScriptFunction, AptValue::setRefCount, AptValueStack<AptValue*,6>::push
+  863  00426AE8    1A0  struct AptValue* AptActionInterpreter::cbCallMethod_clearInterval(struct AptValue* pContext, int nParams)
+                         local  struct AptValue* pIndex
+                         local  int nIndex
+                         inlines  AptIntervalTimer::cleanParams, AptValueStack<AptValue*,6>::pop
+  883  004393C8    188  struct AptValue* AptActionInterpreter::cbCallMethod_hitTest(struct AptCIH* pCIH, int nParams)
+                         local  struct AptValue* pRet
+                         local  float fX
+                         local  float fY
+                         local  int bRectHitTest
+                         local  struct AptRect rect
+                         inlines  AptInteger::AptInteger, AptInteger::operator new
+  923  0042424C     E0  struct AptValue* AptActionInterpreter::cbCallMethod_isNaN(struct AptValue* pContext, int nParams)
+                         local  struct AptValue* pValue
+                         inlines  AptBoolean::AptBoolean, AptBoolean::operator new
+  940  00470ECC    484  struct AptValue* AptActionInterpreter::cbCallMethod_unescape(struct AptValue* pContext, int nParams)
+                         local  struct AptString* pRetValue
+                         local  struct AptValue* pValue
+                         local  int i
+                         local  AptNativeString szBuf
+                         local  char[16] s
+                         inlines  AptActionInterpreter::stackAt, AptString::AptString, AptString::InvalidateHash, AptString::Set, AptString::operator new, AptValue::isString, BasicString, Capacity, Copy<char*, char*>, ReAlloc, Size, Swap, UseCapacity, ~BasicString
+  962  00470A20    4AC  struct AptValue* AptActionInterpreter::cbCallMethod_escape(struct AptValue* pContext, int nParams)
+                         local  struct AptString* pRetValue
+                         local  struct AptValue* pValue
+                         local  int i
+                         local  AptNativeString szBuf
+                         local  char* string
+                         local  char* currentEnd
+                         inlines  AptActionInterpreter::stackAt, AptString::Append, AptString::AptString, AptString::operator new, AptValue::isString, BasicString, Begin, Capacity, Copy, Copy<char*, char*>, ReAlloc, UseCapacity, ~BasicString
+ 1045  00466DD0    3D4  static uint32 _getNameString(const struct AptCIH* pContext, char* sBuf, uint32 bufLen, enum NameStringType eNameStringType)
+                         local  char szSep
+                         local  uint32 bufPos
+                         local  struct AptCIH* pParent
+                         local  const char* pMyName
+                         local  int nInstanceNumber
+                         local  char* pNewName
+                         local  const char* s
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptString::AptString, AptString::operator new, AptValue::__inc, AptValue::getVtblIndex, AptValue::setRefCount, Capacity, Copy, ReAlloc
+ 1120  004676F4      8  void AptActionInterpreter::getName(const struct AptCIH* pCIH, char* szBuf, uint32 bufLen)
+ 1131  0046744C    2A8  void AptActionInterpreter::getName(const struct AptCIH* pCIH, const AptNativeString& sBuf)
+                         local  char[256] strBuf
+                         local  const char* s
+                         local  char[16] s
+                         inlines  Capacity, Copy, Copy<char*, char*>, DoingSmallStringOptimization, ReAlloc, Swap, UseCapacity, operator=, ~BasicString
+ 1144  004671A4    2A8  void AptActionInterpreter::getName2(const struct AptCIH* pCIH, const AptNativeString& sBuf)
+                         local  char[256] strBuf
+                         local  const char* s
+                         local  char[16] s
+                         inlines  Capacity, Copy, Copy<char*, char*>, DoingSmallStringOptimization, ReAlloc, Swap, UseCapacity, operator=, ~BasicString
+ 1158  004998E0    22C  void AptActionInterpreter::_doCloneSprite(const struct AptActionInterpreter* this, struct AptCIH* pCurrentCIH, struct AptValue* pWith, struct AptValue* pSource, struct AptValue* pTarget, int nDepthInt, struct AptValue* pInitObject)
+                         local  struct AptValue* pSourceContext
+                         local  AptNativeString sBuf
+                         local  struct AptCIH* pSourceCIH
+                         local  struct AptCIH* pNewText
+                         local  struct AptCIH* pPrev
+                         inlines  AptCIH::isSpriteInstBase, AptValue::isCIH, BasicString, ConstRawPtr, UseCapacity, ~BasicString
+ 1203  0046BDF8    414  struct AptValue* AptActionInterpreter::getVariable(const struct AptActionInterpreter* this, struct AptValue* pScopeContext, struct AptValue* pContext, struct AptValue* pWith, const AptNativeString& sVar, const char* szVarName, int bGlobal, int bLookInFunctionScope)
+                         local  struct AptValue* pRet
+                         local  struct AptValue* pObjectSpecific
+                         inlines  AptCIH::isSpriteInst, AptValue::isArray, AptValue::isCIH, AptValue::isMath, AptValue::isNativeFunction, AptValue::isString, AptValueStack<AptFrameStack*,32>::size
+ 1367  0046CE6C    140  struct AptValue* AptActionInterpreter::getVariable(const struct AptActionInterpreter* this, struct AptValue* pCurrentContext, struct AptValue* pWith, const char* szVarName, int bGlobal, int bLookInFunctionScope)
+                         local  struct AptValue* pContext
+                         local  AptNativeString sVar
+                         inlines  BasicString, UseCapacity, ~BasicString
+ 1387  00466098     E4  void AptActionInterpreter::valueToObject(struct AptValue* pCurrentContext, struct AptValue* pWith, struct AptValue* pVal, struct AptValue** ppInst)
+                         inlines  AptValue::isCIH, AptValue::isNativeHash, AptValue::isString
+ 1406  00499DDC    998  void AptActionInterpreter::callFunction(const struct AptActionInterpreter* this, struct AptValue* pContext, struct AptValue* pFuncDef, int nStackParams)
+                         local  int i
+                         local  int i
+                         local  struct AptConstantPool origConstantPool
+                         local  struct AptScriptFunction* pSF
+                         local  struct AptAction_DefineFunction* pFunc
+                         local  int nMin
+                         local  struct AptValue* pParam
+                         local  struct AptValue* pRet
+                         local  int i
+                         local  int i
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptActionInterpreter::stackAt, AptActionInterpreter::stackPop, AptActionInterpreter::stackPush, AptCIH::isLevelInst, AptFrameStack::AptFrameStack, AptFrameStack::operator new, AptScriptFunction::getFunction, AptValue::__inc, AptValue::getVtblIndex, AptValue::isLookup, AptValue::isNativeFunction, AptValue::isRegister, AptValue::isScriptFunction, AptValue::setRefCount, AptValueStack<AptFrameStack*,32>::pop, AptValueStack<AptFrameStack*,32>::push, AptValueStack<AptValue*,32>::pop, AptValueStack<AptValue*,32>::push, AptValueStack<AptValue*,384>::push
+ 1473  0049C740    354  struct AptObject* AptActionInterpreter::_createObject(const struct AptActionInterpreter* this, struct AptValue* pCurrentContext, struct AptValue* pCurWith, const char* szObject, int nParams)
+                         local  struct AptObject* pObject
+                         local  struct AptValue* pConstructor
+                         local  int i
+                         local  struct AptArray* pArray
+                         local  int i
+                         inlines  AptActionInterpreter::stackPop, AptArray::operator new, AptMovieClip::AptMovieClip, AptMovieClip::operator new, AptObject::AptObject, AptObject::operator new, AptValue::__inc, AptValue::isNativeFunction, AptValue::isScriptFunction, AptValueStack<AptValue*,384>::pop
+ 1588  003FBC20     B0  void AptActionInterpreter::clearRegisters(const struct AptActionInterpreter* this)
+                         local  int i
+ 1598  0048EBE8    4A4  void AptActionInterpreter::_doEnumerate(const struct AptActionInterpreter* this, struct AptValue* pCurrentContext, struct AptValue* pCurWith)
+                         local  struct AptValue* pObject
+                         local  struct AptNativeHash* pNativeHash
+                         local  struct AptHashItem* pItem
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptActionInterpreter::stackAt, AptActionInterpreter::stackPop, AptActionInterpreter::stackPush, AptValue::__inc, AptValue::getVtblIndex, AptValue::isString, AptValue::setRefCount, AptValueStack<AptValue*,384>::push
+ 1643  00471350    900  static struct AptString* _concatAsStrings(struct AptValue* pA, struct AptValue* pB)
+                         local  struct AptString* pBA
+                         local  AptNativeString sBuf
+                         local  int i
+                         local  AptNativeString sTemp
+                         local  int newCapacity
+                         local  int insertPos
+                         local  char* string
+                         local  char* currentEnd
+                         local  char* string
+                         local  char* currentEnd
+                         inlines  AptString::Append, AptString::AptString, AptString::GetNative, AptString::InvalidateHash, AptString::SetFrom, AptString::operator new, AptValue::isString, BasicString, Begin, Capacity, Copy, Copy<char*, char*>, ReAlloc, Reserve, Size, UseCapacity, operator+=<AptStringPolicy>, ~BasicString
+ 1672  0048F08C   8B00  unsigned char* AptActionInterpreter::runStream(const struct AptActionInterpreter* this, unsigned char* aActionStream, struct AptCIH* pCurrentContext, int nMaxStreamBytes)
+                         local  unsigned char* pInstruction
+                         local  int bEncounteredReturn
+                         local  struct AptValue* pCurWith
+                         local  unsigned char* pRemoveWithAt
+                         local  char[256] tempStringBuf
+                         local  struct AptValue* pSuper
+                         local  unsigned char cAction
+                         local  struct AptValue* pName
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  struct AptValue* pNumber
+                         local  struct AptValue* pNew
+                         local  struct AptValue* pValue
+                         local  struct AptValue* pName
+                         local  struct AptValue* pObject
+                         local  const char* pValueStr
+                         local  struct AptValue* pName
+                         local  struct AptValue* pObject
+                         local  const char* pNameStr
+                         local  struct AptValue* pValue
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  struct AptValue* pValue
+                         local  struct AptValue* pA
+                         local  struct AptValue* pB
+                         local  int nResult
+                         local  struct AptValue* pA
+                         local  struct AptValue* pB
+                         local  int nResult
+                         local  struct AptBoolean* pResult
+                         local  struct AptValue* pA
+                         local  struct AptValue* pB
+                         local  float fFloat1
+                         local  float fFloat2
+                         local  struct AptValue* pNumElements
+                         local  int nNumElements
+                         local  int i
+                         local  struct AptObject* pObject
+                         local  struct AptValue* pNumElements
+                         local  int nNumElements
+                         local  struct AptArray* pArray
+                         local  int i
+                         local  struct AptValue* pObjectName
+                         local  struct AptValue* pParams
+                         local  int nParams
+                         local  struct AptObject* pObject
+                         local  const char* pObjectNameStr
+                         local  struct AptValue* pValue
+                         local  struct AptValue* pOldValue
+                         local  struct AptValue* pA
+                         local  struct AptValue* pB
+                         local  struct AptValue* pResult
+                         local  float fFloat1
+                         local  struct AptValue* pA
+                         local  struct AptValue* pB
+                         local  float fFloat1
+                         local  float fFloat2
+                         local  struct AptValue* pValue
+                         local  float fValue
+                         local  struct AptValue* pA
+                         local  struct AptValue* pB
+                         local  struct AptBoolean* pResult
+                         local  struct AptValue* pA
+                         local  struct AptValue* pB
+                         local  struct AptValue* pResult
+                         local  float fFloat1
+                         local  struct AptValue* pA
+                         local  struct AptValue* pB
+                         local  struct AptFloat* pBA
+                         local  struct AptValue* pValue
+                         local  struct AptValue* pIndex
+                         local  struct AptValue* pTarget
+                         local  struct AptValue* pObject
+                         local  int nInt
+                         local  struct AptValue* pName
+                         local  struct AptValue* pParams
+                         local  struct AptValue* pFunctionValue
+                         local  int nParams
+                         local  AptNativeString sVar
+                         local  struct AptValue* pContext
+                         local  struct AptValue* pValue
+                         local  struct AptValue* pVariable
+                         local  struct AptValue* pValue
+                         local  const char* pValueStr
+                         local  struct AptAction_Push* pData
+                         local  int i
+                         local  struct AptAction_Push* pData
+                         local  struct AptAction_StoreRegister* pData
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  struct AptAction_GetUrl* pData
+                         local  struct AptValue* pValue
+                         local  struct AptValue* pName
+                         local  const char* pNameStr
+                         local  struct AptValue* pA
+                         local  struct AptValue* pB
+                         local  int nResult
+                         local  struct AptBoolean* pResult
+                         local  struct AptValue* pA
+                         local  struct AptValue* pB
+                         local  int nResult
+                         local  struct AptValue* pFunction
+                         local  struct AptValue* pObject
+                         local  struct AptValue* pParams
+                         local  int nParams
+                         local  const char* pFunctionStr
+                         local  int i
+                         local  struct AptValue* pNumber
+                         local  struct AptValue* pNew
+                         local  struct AptAction_BranchAddress* pData
+                         local  struct AptValue* pCondition
+                         local  int nInt
+                         local  struct AptAction_DefineFunction* pData
+                         local  struct AptFrameStack* pFS
+                         local  struct AptScriptFunction* pFuncDef
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  struct AptValue* pA
+                         local  struct AptValue* pB
+                         local  AptNativeString sAString
+                         local  AptNativeString sBString
+                         local  struct AptAction_BranchAddress* pData
+                         local  struct AptValue* pIndex
+                         local  struct AptValue* pTarget
+                         local  struct AptValue* pObject
+                         local  int nInt
+                         local  struct AptValue* pPropValue
+                         local  struct AptValue* pA
+                         local  struct AptValue* pB
+                         local  struct AptString* pBA
+                         local  struct AptValue* pValue
+                         local  int nInt
+                         local  const char* pNameStr
+                         local  struct AptValue* pValue
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  struct AptValue* pFunctionValue
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  struct AptArray* pArray
+                         local  struct AptString* pBA
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  struct AptValue* pValue
+                         local  struct AptValue* pName
+                         local  const char* pNameStr
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  int nInt1
+                         local  int nInt2
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  int nA
+                         local  float fB
+                         local  struct AptArray* pArray
+                         local  struct AptValue* pValue
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  void* outVariable
+                         local  enum AptExternVariable outVariableType
+                         local  bool retVal
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  bool fStrAIsFloat
+                         local  bool fStrBIsFloat
+                         local  float fA
+                         local  float fB
+                         local  const char* pStrA
+                         local  char[256] strB
+                         local  const char* pStrB
+                         local  int nB
+                         local  float fA
+                         local  float fB
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  struct AptScriptFunction* pFunc
+                         local  struct AptCIH* pTempCIH
+                         local  int nA
+                         local  float fB
+                         local  char* szBuf
+                         local  struct AptString* pString
+                         local  int i
+                         local  int nB
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  int nB
+                         local  float fA
+                         local  int nA
+                         local  int nB
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         local  enum AptVirtualFunctionTable_Indices idx
+                         inlines  AptActionInterpreter::stackAt, AptActionInterpreter::stackPop, AptActionInterpreter::stackPush, AptArray::operator new, AptBoolean::AptBoolean, AptBoolean::operator new, AptCIH::isLevelInst, AptFloat::AptFloat, AptFloat::operator new, AptInteger::AptInteger, AptInteger::operator new, AptScriptFunction::operator new, AptString::AptString, AptString::operator new, AptValue::AptValue, AptValue::__inc, AptValue::c_string, AptValue::getVtblIndex, AptValue::isArray, AptValue::isBoolean, AptValue::isCIH, AptValue::isExtern, AptValue::isFloat, AptValue::isInteger, AptValue::isNativeHash, AptValue::isRegister, AptValue::isString, AptValue::setRefCount, AptValueStack<AptFrameStack*,32>::size, AptValueStack<AptFrameStack*,32>::top, AptValueStack<AptValue*,32>::pop, AptValueStack<AptValue*,32>::push, AptValueStack<AptValue*,384>::push, AptValueStack<AptValue*,384>::top, BasicString, Capacity, ReAlloc, UseCapacity, ~BasicString
+ 3544  003EEE14     44  char _escape2Char(const char a, const char b)
+                         local  char[3] sBuf
+                         local  long unsigned int x
+                         inlines  std::strtoul
+ 3558  00452BE8    C5C  void _unEscape(const AptNativeString& sEsc)
+                         local  AptNativeString sUnescapedCopy
+                         local  char* i
+                         local  int newSize
+                         local  char* iter
+                         local  int newCapacity
+                         local  int insertPos
+                         local  char* string
+                         local  char[16] s
+                         local  int newSize
+                         local  char* iter
+                         local  int newCapacity
+                         local  int insertPos
+                         local  int newCapacity
+                         local  int insertPos
+                         local  char* currentEnd
+                         local  char* string
+                         local  char* currentEnd
+                         local  char* string
+                         local  char* currentEnd
+                         inlines  BasicString, Begin, Capacity, Copy, Copy<char*, char*>, DoingSmallStringOptimization, End, Move<char*, char*>, ReAlloc, Reserve, operator+=, operator=, ~BasicString
+ 3584  004649D0    C10  const char* AptActionInterpreter::urlDecode(const struct AptActionInterpreter* this, const char* szURL, const AptNativeString& sKey, const AptNativeString& sValue)
+                         local  const char* szCur
+                         local  const char* szEquals
+                         local  const char* s
+                         local  char[16] s
+                         local  char[16] s
+                         local  char[16] s
+                         local  int size
+                         inlines  BasicString<const char*>, Capacity, Copy, Copy<char*, char*>, DoingSmallStringOptimization, ReAlloc, Size, Swap, UseCapacity, operator=, ~BasicString
+ 3614  003EED14     70  bool AptActionInterpreter::isFSCommand(const struct AptActionInterpreter* this, const char* szCommand)
+ 3623  003EED84     88  int AptActionInterpreter::doFSCommand(const struct AptActionInterpreter* this, const char* szCommand, const char* szParams)

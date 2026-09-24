@@ -1,0 +1,16 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_GFLoading.cpp
+// compiled in: apt_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+    8  000F2BDC     4C  void UIGFLoading::UIGFLoading(const struct UIGFLoading* this)
+   12  000F2C74     B8  void UIGFLoading::~UIGFLoading(const struct UIGFLoading* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   16  000336F0     38  void UIGFLoading::Init(const struct UIGFLoading* this)
+   25  00033D38     24  void UIGFLoading::Close(const struct UIGFLoading* this)
+   30  0007D2A8     5C  void UIGFLoading::Show(const struct UIGFLoading* this)
+                         inlines  AptGameSubscriber::SetEnable3DDrawing
+   42  00038088     7C  void UIGFLoading::Hide(const struct UIGFLoading* this)
+   52  00038104     70  void UIGFLoading::BuildCustomCloseScreenSequence(const struct UIGFLoading* this)
+   60  000251B8     30  enum TAptSequenceStatus UIGFLoading::Enable3DDrawingSequence(const struct UIGFLoading* this, bool inbFirstTime, void* inData)
+                         inlines  AptGameSubscriber::SetEnable3DDrawing
+   67  00038174      8  enum eAptHandleInput UIGFLoading::HandleInput(const struct UIGFLoading* this, int32 cID)

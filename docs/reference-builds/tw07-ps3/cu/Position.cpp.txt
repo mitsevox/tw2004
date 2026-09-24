@@ -1,0 +1,54 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Utils/Position.cpp
+// compiled in: headgate_unity.cpp
+// 27 functions, source order. line | PS3 address | size
+
+   59  003508B0     68  bool APosition::Equal(const const struct APosition* this, float eX, float eY, float eZ)
+   66  0035094C     30  bool APosition::operator==(const const struct APosition* this, const const struct APosition& p)
+   71  00350918     34  bool APosition::operator!=(const const struct APosition* this, const const struct APosition& p)
+   75  00344E34     34  const struct APosition& APosition::operator+=(const struct APosition* this, const const struct APosition& p)
+   82  00344E68     28  const struct APosition& APosition::operator+=(const struct APosition* this, coord value)
+   89  00344E90     34  const struct APosition& APosition::operator-=(const struct APosition* this, const const struct APosition& p)
+   96  00344EC4     28  const struct APosition& APosition::operator-=(const struct APosition* this, coord value)
+  103  00344EEC     34  const struct APosition& APosition::operator*=(const struct APosition* this, const const struct APosition& p)
+  110  00344F20     28  const struct APosition& APosition::operator*=(const struct APosition* this, coord value)
+  117  00344F48     34  const struct APosition& APosition::operator/=(const struct APosition* this, const const struct APosition& p)
+  124  00344F7C     28  const struct APosition& APosition::operator/=(const struct APosition* this, coord value)
+  131  00344FA4     78  struct APosition APosition::operator+(const struct APosition* this, const const struct APosition& that)
+                         local  struct APosition& pos
+                         local  struct APosition pos
+  140  0034501C     78  struct APosition APosition::operator-(const struct APosition* this, const const struct APosition& that)
+                         local  struct APosition& pos
+                         local  struct APosition pos
+  149  00345094     78  struct APosition APosition::operator*(const struct APosition* this, const const coord& val)
+                         local  struct APosition& pos
+                         local  struct APosition pos
+  158  0034510C     10  void APosition::UpdatePosition(const struct APosition* this, coord _x, coord _y, coord _z)
+  164  0034511C     20  void APosition::UpdatePosition(const struct APosition* this, coord _x, coord _z)
+  170  00344D00     CC  void APosition::UpdatePosition(const struct APosition* this, int _x, int _y, int _z)
+  176  00344DEC     1C  void APosition::UpdatePosition(const struct APosition* this, const struct APosition* p)
+  182  00344E10     1C  void APosition::UpdatePosition(const struct APosition* this, const const struct APosition& p)
+  189  0035B974     20  float APosition::Magnitude(const const struct APosition* this)
+                         inlines  std::sqrt
+  193  0035B994     64  void APosition::Normalize(const struct APosition* this)
+                         local  const float m
+  200  0035BFB4     7C  void APosition::Rotate(const struct APosition* this, float theta)
+                         local  const float costheta
+                         local  const float sintheta
+                         local  const float newx
+                         inlines  std::cos, std::sin
+  209  0035AB84     30  float APosition::Rotate(const const struct APosition* this)
+                         inlines  std::atan2
+  214  0035C030     A8  void APosition::Pitch(const struct APosition* this, float beta)
+                         local  const float rotationAngle
+                         local  const float cosbeta
+                         local  const float sinbeta
+                         local  const float newz
+                         inlines  std::cos, std::sin
+  229  0035B9F8     3C  float APosition::Pitch(const const struct APosition* this)
+                         inlines  std::atan2, std::sqrt
+  234  0035ABB4     2C  float APosition::Angle180(const const struct APosition* this, const struct APosition* p)
+                         inlines  std::atan2
+  239  0035ABE0     38  float APosition::Angle180(const const struct APosition* this, float pX, float pZ)
+                         local  const float dX
+                         local  const float dZ
+                         inlines  std::atan2

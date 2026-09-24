@@ -1,0 +1,37 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/Definition.cpp
+// compiled in: Definition.cpp
+// 24 functions, source order. line | PS3 address | size
+
+   37  0059A6AC     48  struct <anon>* FromData(void* data)
+                         local  struct <anon>* pDef
+   49  0059A6F4     8C  bool Init(const struct <anon>* this)
+   55  0059A780     34  bool AttachBank(const struct <anon>* this, struct <anon>* bank)
+   61  0059A7B4     34  bool DetachBank(const struct <anon>* this, struct <anon>* bank)
+   67  0059A7E8     54  void Deinit(const struct <anon>* this)
+   76  0059A83C      C  int32_t GetSkeletonCount(const const struct <anon>* this)
+   82  0059A848     38  const struct Skeleton* GetSkeleton(const const struct <anon>* this, int32_t index)
+   94  0059A880     1C  int32_t GetLocatorCount(const const struct <anon>* this, ModelIndex modelIdx)
+   99  0059A920     4C  LocatorIndex GetLocatorIndex(const const struct <anon>* this, ModelIndex modelIdx, const char* name)
+                         inlines  Common::CommonHash
+  104  0059A89C     84  LocatorIndex GetLocatorIndex(const const struct <anon>* this, ModelIndex modelIdx, uint32_t hashedName)
+                         local  struct LocatorHeader* pHeader
+                         local  struct <anon>* pLocator
+                         local  bool found
+                         local  int i
+  134  0059A96C     8C  const struct Locator* GetLocator(const const struct <anon>* this, ModelIndex modelIdx, LocatorIndex id)
+  143  0059A9F8     4C  StateID GetStateID(const const struct <anon>* this, const char* name)
+                         local  int32_t out
+  152  0059AA44     28  bool IsValidStateID(const const struct <anon>* this, StateID id)
+  158  0059AA6C     24  const char* GetStateName(const const struct <anon>* this, StateID id)
+  163  0059AA90     24  const struct AnimNode* GetStateNode(const const struct <anon>* this, StateID id)
+  169  0059AAB4     2C  void AddStateDefinition(const struct <anon>* this, const struct StateDefinition* stateDefinition)
+  175  0059AAE0     2C  void RemoveStateDefinition(const struct <anon>* this, const struct StateDefinition* stateDefinition)
+  182  0059AB0C     30  void AddMotionDefinition(const struct <anon>* this, const struct MotionDefinition* motionDefinition)
+  188  0059AB3C     2C  void RemoveMotionDefinition(const struct <anon>* this, const struct MotionDefinition* motionDefinition)
+  195  0059AB68     24  void AddTransitionDefinition(const struct <anon>* this, const struct TransitionDefinition* transitionDefinition)
+  201  0059ABB0     18  void RemoveTransitionDefinition(const struct <anon>* this, const struct TransitionDefinition* transitionDefinition)
+  207  0059AB8C     24  int EnumerateTransitions(const struct <anon>* this, TransitionEnumerationCallback callback, void* arg)
+  212  0059ABC8     30  const struct SkeletonFilterRef* GetSkeletonFilterByIndex(const const struct <anon>* this, int32_t index)
+  221  0059ABF8     94  const struct SkeletonFilterRef* GetSkeletonFilterById(const const struct <anon>* this, int32_t id)
+                         local  int i
+                         inlines  FastMap<int,int>::Find

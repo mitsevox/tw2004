@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/RNA/RNATigerAllocator.h
+// compiled in: rnaunity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   44  004FA64C     18  void ~RNATigerAllocator(const struct <anon>* this)
+                         inlines  ~ICoreAllocator

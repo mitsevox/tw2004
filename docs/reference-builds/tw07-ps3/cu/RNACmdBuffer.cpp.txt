@@ -1,0 +1,112 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/PS3/RNACmdBuffer.cpp
+// compiled in: RNACmdBuffer.cpp
+// 29 functions, source order. line | PS3 address | size
+
+    0  008420EC     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   63  00841DE8     C4  static uint64_t CalculateXorChecksum(const void* buffer, const size_t bufferSizeInButes)
+                         local  const uint64_t* pBuf64
+                         local  uint64_t XorChecksum
+                         local  size_t i
+                         local  size_t i
+   92  00842558    1A0  void CmdBufferC(const struct CmdBufferC* this)
+                         inlines  AutoRefCount, Init, RNADebugBreak, RefCountTemplate, Vector
+  107  00842C8C    1AC  void ~CmdBufferC(const struct CmdBufferC* this)
+                         inlines  RNADebugBreak, ~AutoRefCount, ~RefCountTemplate, ~Vector
+  112  00843AB0    41C  bool Create(const struct CmdBufferC* this, struct DeviceC* pDevice, uint32_t sizeInBytes, uint32_t numberBlocks)
+                         local  const char[7] __FUNCTION__
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct CmdBufferDataT* newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct CmdBufferDataT* newData
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  Construct, RNADebugBreak, Reserve
+  128  00842A20    26C  void Destroy(const struct CmdBufferC* this)
+                         local  const char[8] __FUNCTION__
+                         local  int32_t i
+                         inlines  Clear, RNADebugBreak, operator=
+  162  00842338    220  void Reset(const struct CmdBufferC* this)
+                         local  const char[6] __FUNCTION__
+                         inlines  Clear, Init, RNADebugBreak, operator=
+  182  0084219C    19C  void SetWriteBuffer(const struct CmdBufferC* this, struct CmdBufferC* pDestCmd, bool bOptimize)
+                         local  const char[15] __FUNCTION__
+                         inlines  RNADebugBreak, operator=
+  191  008446F0     FC  void* BeginRecroding(const struct CmdBufferC* this, uint32_t uFlags, const uint32_t& sizeInBytes)
+                         local  const char[15] __FUNCTION__
+                         inlines  RNADebugBreak
+  204  008445E4    10C  void* NextBlock(const struct CmdBufferC* this, uint32_t sizeUsedInBytes, const uint32_t& sizeInBytes)
+                         inlines  Clear
+  217  0084452C     B8  void EndRecroding(const struct CmdBufferC* this, uint32_t sizeUsedInBytes)
+  238  008447EC    300  void OptimizeToCmdBuffer(const struct CmdBufferC* this, struct CmdBufferC* pDestCmd)
+                         local  const char[20] __FUNCTION__
+                         local  uint32_t size
+                         local  uint32_t optisize
+                         local  void* pDest
+                         local  void* pSrc
+                         local  int32_t i
+                         inlines  RNADebugBreak
+  272  008437DC    18C  void OptimizeCmdBuffer(const struct CmdBufferC* this)
+                         local  const char[18] __FUNCTION__
+                         local  uint32_t size
+                         local  uint32_t optisize
+                         local  void* pSrc
+                         local  void* pDest
+                         local  int32_t i
+                         inlines  RNADebugBreak
+  298  0084218C     10  uint32_t GetNumBlocks(const struct CmdBufferC* this)
+  303  00842898     98  uint32_t GetBlockOffset(const const struct <anon>* this, uint32_t uBlockNum)
+                         inlines  RNADebugBreak, operator[]
+  310  00841EAC     5C  bool IsFencePending(const struct CmdBufferC* this)
+  315  00841F08     14  void SetLastFenceId(const struct CmdBufferC* this, uint32_t uFenceId)
+  321  00842930     F0  bool IsCorrupted(const const struct <anon>* this, uint32_t uBlockNum)
+                         local  struct CmdBufferDataT data
+                         local  uint64_t csum
+                         inlines  RNADebugBreak, operator[]
+  338  00843ECC    490  void* BeginBlock(const struct CmdBufferC* this, uint32_t uFlags, const uint32_t& sizeInBytes)
+                         local  const char[11] __FUNCTION__
+                         local  struct CmdBufferDataT data
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct CmdBufferDataT* newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct CmdBufferDataT* newData
+                         inlines  Back, Construct, PushBack, RNADebugBreak
+  363  008431A0    260  void EndBlock(const struct CmdBufferC* this, uint32_t sizeUsedInBytes)
+                         local  const char[9] __FUNCTION__
+                         local  struct CmdBufferDataT data
+                         local  void* pWritePos
+                         inlines  Back, RNADebugBreak, operator[]
+  386  00843400    148  void* LockBlock(const struct CmdBufferC* this, uint32_t uBlockNum, uint32_t uFlags, const uint32_t& sizeInBytes)
+                         local  const char[10] __FUNCTION__
+                         local  struct CmdBufferDataT data
+                         inlines  RNADebugBreak, operator[]
+  398  00843548    1FC  void UnlockBlock(const struct CmdBufferC* this, uint32_t uBlockNum, uint32_t sizeUsedInBytes)
+                         local  const char[12] __FUNCTION__
+                         local  struct CmdBufferDataT data
+                         inlines  RNADebugBreak, operator[]
+  414  00843744     98  uint32_t GetOffset(const const struct <anon>* this, uint32_t uBlockNum)
+                         inlines  RNADebugBreak, operator[]
+  421  00843968     98  uint32_t GetBufferBytesUsed(const const struct <anon>* this, uint32_t uBlockNum)
+                         inlines  RNADebugBreak, operator[]
+  428  00843A00     B0  const void* GetBufferBase(const const struct <anon>* this, uint32_t uBlockNum)
+                         inlines  RNADebugBreak, operator[]
+  435  0084435C    1D0  void OptimizeBlockToDestCmdBuffer(const struct CmdBufferC* this)
+                         local  const char[29] __FUNCTION__
+                         local  uint32_t size
+                         local  uint32_t optisize
+                         local  void* pDest
+                         local  void* pSrc
+                         inlines  RNADebugBreak
+  458  00841F1C    1D0  uint32_t OptimizeBlock(void* pDest, const void* pSrc, uint32_t sizeUsedInBytes, bool bOpti)
+                         local  uint32_t tmpSize
+                         local  uint32_t sizeInWords
+                         local  uint32_t outListSize
+  490  0084216C     10  static void _GLOBAL__I__ZN3RNA10CmdBufferCC2Ev()
+  491  0084217C     10  static void _GLOBAL__D__ZN3RNA10CmdBufferCC2Ev()

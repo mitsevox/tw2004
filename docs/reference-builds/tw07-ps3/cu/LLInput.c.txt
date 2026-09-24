@@ -1,0 +1,21 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLInput.c
+// compiled in: Legacy_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+  386  00389CB8     54  void Input_vSelectControlSet(int8 set)
+  398  00389BEC     CC  uint32 Input_uiMap(uint32 Button, bool held)
+                         local  uint32 return_value
+  423  003903F0     A8  bool Input_AnyPadPressed(uint32 whichbutton)
+                         local  bool return_value
+                         local  int i
+  445  00390498     E0  bool Input_PlayerPadPressed(uint32 whichbutton, int whichPlayerControl)
+                         local  bool return_value
+  467  00390320     D0  bool Input_AnyValidPadPressed(uint32 whichbutton, uint32 valid_mask)
+                         local  int i
+                         local  uint32 mask
+                         local  bool return_value
+  492  0038FAF0     40  void Input_vStopAllVibration()
+                         local  int i
+  510  0038FF38     D8  bool Input_AnyStickMoved()
+                         local  int32 i
+                         local  struct Controller_StickInfo* stickInfo

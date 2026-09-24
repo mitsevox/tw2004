@@ -1,0 +1,12 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/plane_type_inline.h
+// compiled in: IOStream.cpp, SGNodeBSPCulledRenderable.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   73    inline-only   void Set(const struct <anon>* this, float _a, float _b, float _c, float _d)
+                         local  Vector4Intrinsic_32 vi_temp
+  338    inline-only   const VecFloatRefX A(const const struct Plane* this)
+  348    inline-only   const VecFloatRefY B(const const struct Plane* this)
+  358    inline-only   const VecFloatRefZ C(const const struct Plane* this)
+  368    inline-only   const VecFloatRefW D(const const struct Plane* this)
+  433    inline-only   const struct Vector3& GetNormal(const const struct Plane* this)
+  450    inline-only   const VecFloatRefW SignedDistance(const const struct Plane* this)

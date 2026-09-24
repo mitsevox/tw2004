@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_Cup.h
+// compiled in: shader_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   24  00520C40     18  void SM_CupClass::~SM_CupClass(const struct SM_CupClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base

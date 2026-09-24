@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Spectator/spectatorCollision.h
+// compiled in: golf2_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   34    inline-only   void CSpectatorCollisionBucket::ClearInstances(const struct CSpectatorCollisionBucket* this)
+   39    inline-only   void CSpectatorCollisionBucket::AddInstance(const struct CSpectatorCollisionBucket* this, struct CSpectatorInstance* spectatorInstance)
+   76  0014321C      C  void CSpectatorCollision::CSpectatorCollision(const struct CSpectatorCollision* this)
+   77  00143228      4  void CSpectatorCollision::~CSpectatorCollision(const struct CSpectatorCollision* this)

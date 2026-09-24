@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/UI_SecondAnalogStick.h
+// compiled in: apt_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   20  000FE490     18  void UISecondAnalogStick::~UISecondAnalogStick(const struct UISecondAnalogStick* this)
+   25    inline-only   void UISecondAnalogStick::Close(const struct UISecondAnalogStick* this)

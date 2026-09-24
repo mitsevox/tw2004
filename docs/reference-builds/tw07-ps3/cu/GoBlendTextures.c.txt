@@ -1,0 +1,88 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/GoBlendTextures.c
+// compiled in: golf_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   55  002273DC     5C  void GoBlendTextures_InitModule()
+   62  00227438     5C  void GoBlendTextures_CloseModule()
+   68  002FE0DC     78  void GoBlendTextures_SetCommonStates()
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetZTestEnable
+   75  002FE29C     78  void GoBlendTextures_RestoreDefaultStates()
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetZTestEnable
+   82  002FE208     94  void GoBlendTextures_StartBlending(uint32 scratchWidth, uint32 scratchHeight, TextureFormat texFormat, void* pScratchDstBuffer, TextureRef workspace)
+                         local  const SGPUBlenderState* pState
+   97  002FE3C4     B4  void GoBlendTextures_FinishBlending()
+                         local  const SGPUBlenderState* pState
+  125  00261E50    2E4  void GoBlendTextures_DrawQuad(TextureRef renderTarget, float l, float t, float r, float b, float u0, float v0, float u1, float v1, float unext0, float vnext0, float unext1, float vnext1, int32 mipLevel)
+                         local  const TextureInfo* info
+                         local  const float width
+                         local  const float height
+                         local  vec4flt coord1
+                         local  vec4flt coord2
+                         local  struct vtxStruct[4] vertices
+                         local  int i
+                         inlines  vtxStruct::Set
+  162  00227494     18  void GoBlendTextures_DebugTgaSwizzle(bool swizzle)
+  198    inline-only   uint8 ClTGAHeader::getIdLength(const struct ClTGAHeader* this)
+  222  002274AC     4C  void ClTGAHeader::init32Bit(const struct ClTGAHeader* this, uint16 width, uint16 height)
+  242  002274F8    458  bool save32BitTGAEndianConvert(const char* pDstFilename, int32 width, int32 height, const uint32* pColours)
+                         local  FILE* fpout
+                         local  struct ClTGAHeader header
+                         local  uint16* pImageInfo
+                         local  const int32 size
+                         local  int i
+                         local  char* pU16
+                         local  int32 i
+                         local  char* pCol
+                         local  char tmpA
+                         local  char tmpR
+                         local  char tmpG
+                         local  char tmpB
+                         local  int32 i
+                         local  char* pCol
+                         local  char tmpA
+                         local  char tmpR
+                         local  char tmpG
+                         local  char tmpB
+                         inlines  ClTGAHeader::ClTGAHeader
+  385  00227950      4  void GoBlendTextures_DebugClearRT(uint32 col)
+  439  00262520    A18  void GoBlendTextures_BlendTextures(const enum GoBlendTextures_BlendOp blendOp, const TexBlendRect* pDestRect, const int32 numBlends, TextureRef* pBlendTextures, int32 mipLevel, const TexBlendParams* pBlendParams, bool mirrored, int32 bTintEnable, enum TXRTintRule_Mode tintMode, float* pTintParams)
+                         local  const SGPUBlenderState* pState
+                         local  const TextureInfo* targetTexInfo
+                         local  uint32 targetWidth
+                         local  uint32 targetHeight
+                         local  uint32 uiRight
+                         local  enum eBlendTexturesTypes useBlendTextureType
+                         local  int32 numActiveBlends
+                         local  bool tintNow
+                         local  float* tintParams
+                         local  float[8] constants
+                         local  TextureRef* textureRefArray
+                         local  int32 blend
+                         local  float t
+                         local  float l
+                         local  float r
+                         local  float b
+                         local  float b0u0
+                         local  float b0v0
+                         local  float b0u1
+                         local  float b0v1
+                         local  float b1u0
+                         local  float b1v0
+                         local  float b1u1
+                         local  float b1v1
+                         local  TextureRef renderTarget
+                         local  float cons
+                         local  const TextureInfo* info
+  707  002FE154     B4  void GoBlendTextures_StartTinting(void* pScratchDstBuffer, uint32 scratchSize)
+                         local  const SGPUBlenderState* pState
+  721  002FE314     B0  void GoBlendTextures_FinishTinting()
+                         local  const SGPUBlenderState* pState
+  738  00262134    3EC  TextureRef GoBlendTextures_TintTexture(enum GoBlendTextures_TintOp tintOp, TextureRef trSrcTexture, int32 mipLevel, float* pTintParams, TextureRef trMaskTexture, TextureRef destTextureRef, bool bUseMaskMode)
+                         local  uint32 width
+                         local  uint32 height
+                         local  enum eBlendTexturesTypes useBlendTextureType
+                         local  TextureRef[2] textureRefArray
+                         local  float[9] tintParams
+                         local  int32 tint
+                         local  int32 numTintTextures
+                         local  TextureRef renderTarget

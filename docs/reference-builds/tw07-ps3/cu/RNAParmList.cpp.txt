@@ -1,0 +1,50 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNAScope/RNAParmList.cpp
+// compiled in: RNAParmList.cpp
+// 16 functions, source order. line | PS3 address | size
+
+    0  00821994     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+  137  00822074    1A8  void DeleteAllParms(const struct ParmListC* this)
+                         local  const char[15] __FUNCTION__
+                         local  struct <anon>* pParm
+                         inlines  RNADebugBreak, operator delete, ~ParmC
+  181  00821BEC    1B4  struct <anon>* LinkParm(const struct ParmListC* this, struct <anon>* pParm, int32_t Offset)
+                         local  const char[9] __FUNCTION__
+                         local  struct <anon>* pTypeInfo
+                         local  struct <anon>* pScopeBlock
+                         local  uint32_t uAlign
+                         inlines  GetAlignment, GetOffset, RNADebugBreak, SetNext
+  257  00821A34     38  struct <anon>* RemoveHead(const struct ParmListC* this)
+                         local  struct <anon>* pParm
+                         inlines  SetNext
+  278  00821A6C    144  void UnlinkParm(const struct ParmListC* this, struct <anon>* pParm, struct <anon>* pLastParm)
+                         local  const char[11] __FUNCTION__
+                         inlines  RNADebugBreak, SetNext
+  326  00821F1C     6C  struct <anon>* FindParm(const const struct <anon>* this, const char* pStrName)
+                         local  struct <anon>* pParm
+                         local  struct ScopeParmC* pScopeParm
+                         inlines  GetFirstParm, GetNext
+  363  00821F88     A4  struct <anon>* FindParm(const const struct <anon>* this, enum TypeID idType, const char* pStrName, uint32_t uCount)
+                         local  struct <anon>* pParm
+                         local  struct ScopeParmC* pScopeParm
+                         inlines  GetFirstParm, GetNext, GetScopeParm
+  401  00821BB0     3C  struct <anon>* FindParm(const const struct <anon>* this, struct ScopeParmC* pScopeParm)
+                         local  struct <anon>* pParm
+                         inlines  GetFirstParm, GetNext
+  433  00821DA0    120  struct <anon>* AddParm(const struct ParmListC* this, struct ScopeParmC* pScopeParm, int32_t Offset)
+                         local  const char[8] __FUNCTION__
+                         local  struct <anon>* pParm
+                         inlines  RNADebugBreak, operator new
+  477  00821EC0     5C  struct <anon>* AddParm(const struct ParmListC* this, const struct ScopeC& scope, const char* pScopeBlockName, enum TypeID idType, const char* pStrName, uint32_t uCount, int32_t Offset)
+  503  008223AC    13C  void BindToScopeParm(const struct ParmListC* this, struct ScopeParmC* pScopeParm)
+                         local  const char[16] __FUNCTION__
+                         inlines  AddRef, RNADebugBreak, Release, SetPtr
+  532  0082184C     10  void AddRef(const const struct <anon>* this)
+  557  0082185C     A4  void Release(const const struct <anon>* this)
+                         local  const char[8] __FUNCTION__
+                         inlines  RNADebugBreak
+  587  00821900     94  void Print(const const struct <anon>* this)
+                         local  int i
+                         local  struct <anon>* pParm
+                         inlines  GetFirstParm, GetNext
+  598  00821A14     10  static void _GLOBAL__I__ZN3RNA9ParmListC16s_ClassAllocatorE()
+  599  00821A24     10  static void _GLOBAL__D__ZN3RNA9ParmListC16s_ClassAllocatorE()

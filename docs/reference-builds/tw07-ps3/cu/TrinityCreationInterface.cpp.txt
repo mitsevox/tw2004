@@ -1,0 +1,33 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_trinity/trinity/Runtime/src/TrinityCreationInterface.cpp
+// compiled in: TrinityCreationInterface.cpp
+// 20 functions, source order. line | PS3 address | size
+
+   33  0059023C     20  void TrinityCreationInterface(const struct <anon>* this)
+   50  0059027C    3B0  void Initialize(const struct <anon>* this, uint32_t maxActor, uint32_t maxCamera, uint32_t maxVfx)
+                         local  int32_t i
+  113  0059062C    2DC  void Reinitialize(const struct <anon>* this)
+                         local  int32_t i
+  169  00590B8C     18  void ~TrinityCreationInterface(const struct <anon>* this)
+  185  00590908    284  void Shutdown(const struct <anon>* this)
+                         local  int32_t i
+  236  00590C08     B0  int32_t GetNewActorIndex(const struct <anon>* this)
+                         local  int32_t returnValue
+  271  00590CB8     D4  void FreeThisActorIndex(const struct <anon>* this, int32_t actorIndex)
+  292  00590D8C     94  struct TrinityActor* GetActorByIndex(const struct <anon>* this, int32_t actorIndex)
+  314  00590E20     38  int32_t GetNewCameraIndex(const struct <anon>* this)
+                         local  int32_t returnValue
+  346  00590E58     D4  void FreeThisCameraIndex(const struct <anon>* this, int32_t cameraIndex)
+  367  00590F2C     94  struct TrinityCamera* GetCameraByIndex(const struct <anon>* this, int32_t cameraIndex)
+  389  00590FC0     38  int32_t GetNewVfxIndex(const struct <anon>* this)
+                         local  int32_t returnValue
+  421  00590FF8     D4  void FreeThisVfxIndex(const struct <anon>* this, int32_t vfxIndex)
+  442  005910CC     94  struct TrinityVfx* GetVfxByIndex(const struct <anon>* this, int32_t vfxIndex)
+  461  00591160     C4  struct TrinityActor* CreateTrinityActor(const struct <anon>* this)
+                         local  struct TrinityActor* pActor
+  478  00591224     C4  struct TrinityCamera* CreateTrinityCamera(const struct <anon>* this)
+                         local  struct TrinityCamera* pCamera
+  496  005912E8     C4  struct TrinityVfx* CreateTrinityVfx(const struct <anon>* this)
+                         local  struct TrinityVfx* pVfx
+  509  005913AC     5C  void DeleteTrinityActor(const struct <anon>* this, struct TrinityActor* pActor)
+  524  00591408     5C  void DeleteTrinityCamera(const struct <anon>* this, struct TrinityCamera* pCamera)
+  539  00591464     5C  void DeleteTrinityVfx(const struct <anon>* this, struct TrinityVfx* pTrinityVfx)

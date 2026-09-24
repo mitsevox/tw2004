@@ -1,0 +1,21 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_lua/tiger_lua_pack.cpp
+// compiled in: tiger_lua_pack.cpp
+// 5 functions, source order. line | PS3 address | size
+
+    7  00542CD8    150  void TigerLuaPack::Init(const struct TigerLuaPack* this)
+                         local  struct Program* program
+                         local  unsigned int count
+   29  00542E28     D4  const struct Program* TigerLuaPack::FindProgram(const struct TigerLuaPack* this, const char* programName)
+                         local  const struct Program* directory
+                         local  int base
+                         local  int end
+                         local  int middle
+                         local  const struct Program* program
+                         local  int compare
+   59  00542C9C     3C  unsigned int TigerLuaPack::Reverse4(const struct TigerLuaPack* this, unsigned int number)
+                         local  unsigned int result
+                         local  const unsigned char* src
+                         local  unsigned char* dst
+   73  00542EFC      8  unsigned int TigerLuaPack::GetProgramCount(const const struct TigerLuaPack* this)
+   78  00542F04     A8  const struct Program* TigerLuaPack::GetProgram(const const struct TigerLuaPack* this, unsigned int index)
+                         local  const struct Program* directory

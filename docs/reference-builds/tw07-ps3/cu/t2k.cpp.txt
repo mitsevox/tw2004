@@ -1,0 +1,132 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptFF/core/t2k.cpp
+// compiled in: other_unity.cpp
+// 29 functions, source order. line | PS3 address | size
+
+   62    inline-only   static struct dropoutAdaptationClass* New_dropoutAdaptationClass(struct tsiMemObject* mem, int32_t numGlyphs)
+                         local  struct dropoutAdaptationClass* t
+   76    inline-only   static void setDropoutSize(struct dropoutAdaptationClass* t, int32_t xPPEm, int32_t yPPEm)
+                         local  uint8_t* p
+                         local  int i
+                         local  int length
+   95    inline-only   static void Delete_dropoutAdaptationClass(struct dropoutAdaptationClass* t)
+  429  003F2278    140  struct T2K* NewT2K(struct tsiMemObject* mem, struct sfntClass* font, int* errCode)
+                         local  struct T2K* t
+                         local  int i
+  505    inline-only   static void T2KDoGriddingSetUp(struct T2K* t)
+  606  003F23B8    1FC  static void scalePoints(int16_t* ooz, F26Dot6* z, int32_t n, struct T2KScaleInfo* si)
+                         local  int i
+                         local  F26Dot6 tmp32
+                         local  int16_t nScale
+                         local  int32_t dScaleDiv2
+                         local  int16_t dShift
+                         local  int32_t dScale
+                         local  F16Dot16 fixedScale
+  659  003F25B4     9C  static void T2K_NewTransformationInternal(struct T2K* t, int doSetUpNow, int32_t xPixelsPerEm, int32_t yPixelsPerEm, struct T2K_TRANS_MATRIX* trans)
+                         inlines  T2KDoGriddingSetUp
+  679  003F2650     9C  void T2K_TransformXFunits(struct T2K* t, int16_t xValueInFUnits, F16Dot16* x, F16Dot16* y)
+                         local  F16Dot16 x16Dot16
+                         local  F16Dot16 y16Dot16
+                         local  F16Dot16 tmpX
+  697  003F26EC     A4  void T2K_TransformYFunits(struct T2K* t, int16_t yValueInFUnits, F16Dot16* x, F16Dot16* y)
+                         local  F16Dot16 x16Dot16
+                         local  F16Dot16 y16Dot16
+                         local  F16Dot16 tmpY
+  720    inline-only   static void ConcatFontMatrix(struct sfntClass* t, struct T2K_TRANS_MATRIX* trans)
+  755  003F6014    724  void T2K_NewTransformation(struct T2K* t, int doSetUpNow, int32_t xRes, int32_t yRes, struct T2K_TRANS_MATRIX* trans, int enableSbits, int* errCode)
+                         local  F16Dot16 xPointSize
+                         local  F16Dot16 yPointSize
+                         local  F16Dot16 xResRatio
+                         local  F16Dot16 yResRatio
+                         local  int32_t xPixelsPerEm
+                         local  int32_t yPixelsPerEm
+                         local  uint16_t UPEM
+                         local  int32_t minPixelsPerEm
+                         local  struct T2K_FontWideMetrics hori
+                         local  struct T2K_FontWideMetrics vert
+                         local  int usedOutlines
+                         local  F16Dot16 tmpX
+                         local  F16Dot16 tmpY
+                         local  F16Dot16 tmpX
+                         local  F16Dot16 tmpY
+                         inlines  New_dropoutAdaptationClass, setDropoutSize
+  945  003F2934      8  static F26Dot6 scaleValue(struct T2K* t, F26Dot6 value, int32_t ppem)
+  960  003F293C    10C  static void T2K_PurgeMemoryInternal(struct T2K* t, int level)
+  987  003F01AC      4  void T2K_PurgeMemory(struct T2K* t, int level, int* errCode)
+ 1008  00417BB0   1134  static void T2K_RenderGlyphInternal(struct T2K* t, int32_t aCode, int depth, int8_t xFracPenDelta, int8_t yFracPenDelta, uint8_t greyScaleLevel, uint16_t cmd)
+                         local  F26Dot6* xPtr
+                         local  F26Dot6* yPtr
+                         local  int pointCount
+                         local  int32_t i
+                         local  int32_t n
+                         local  struct GlyphClass* glyph
+                         local  int isFigure
+                         local  uint16_t aw
+                         local  uint16_t ah
+                         local  uint16_t UPEM
+                         local  int doNativeHints
+                         local  int doAutoHints
+                         local  int16_t agCmd
+                         local  int smart_droput
+                         local  int include_stubs
+                         local  int isTTfont
+                         local  int isT1font
+                         local  int isPFRfont
+                         local  int isStrokeFont
+                         local  F16Dot16 t00
+                         local  F16Dot16 t01
+                         local  F16Dot16 t10
+                         local  F16Dot16 t11
+                         local  F26Dot6 tmpX
+                         local  F26Dot6 tmpY
+                         local  int32_t maxSize
+                         local  struct tsiScanConv* sc
+                         local  int8_t xWeightIsOne
+                         local  int xMicroPosition
+                         local  F26Dot6 error
+                         local  F26Dot6 x1Old
+                         local  F26Dot6 x1New
+                         local  F26Dot6 x2Old
+                         local  F26Dot6 x2New
+                         local  F26Dot6 wOld
+                         local  F26Dot6 wNew
+                         local  F26Dot6 xShift
+                         local  struct GlyphClass* base
+                         local  uint16_t comp_cmd
+                         local  uint16_t flags
+                         local  uint16_t oredFlags
+                         local  struct T2K_TRANS_MATRIX save
+                         local  struct T2K_TRANS_MATRIX newbie
+                         local  int32_t save_XPPEM
+                         local  int32_t save_YPPEM
+                         local  int32_t newT
+                         local  int16_t* componentData
+                         local  uint8_t* hintFragment
+                         local  int32_t hintLength
+                         local  int32_t gIndex
+                         local  int32_t arg1
+                         local  int32_t arg2
+                         local  F26Dot6 tmpX
+                         local  F26Dot6 tmpY
+                         local  F16Dot16 xMul
+                         local  F16Dot16 yMul
+                         local  int8_t xDropOutControl
+                         local  int8_t yDropOutControl
+                         local  uint16_t gIndex
+                         local  int32_t extraColumn
+ 1795  003F0AAC      8  int32_t T2K_GetNumAxes(struct T2K* t)
+ 1826  003F2A50      8  F16Dot16 T2K_GetAxisGranularity(struct T2K* t, int32_t n)
+ 1848  003F2A58      8  F16Dot16 T2K_GetCoordinate(struct T2K* t, int32_t n)
+ 1875  003F0AB4      4  void T2K_SetCoordinate(struct T2K* t, int32_t n, F16Dot16 value)
+ 2040  003F2A60      4  void T2K_GaspifyTheCmds(struct T2K* t, uint8_t* greyScaleLevelPtr, uint16_t* cmdInPtr)
+ 2068  00418CE4    104  void T2K_RenderGlyph(struct T2K* t, int32_t aCode, int8_t xFracPenDelta, int8_t yFracPenDelta, uint8_t greyScaleLevel, uint16_t cmdIn, int* errCode)
+                         local  volatile uint16_t cmd
+ 2176  003F2A68     9C  void T2K_SetNameString(struct T2K* t, uint16_t languageID, uint16_t nameID, int* errCode)
+                         local  struct sfntClass* font
+ 2235  003F2C08     A8  void DeleteT2K(struct T2K* t, int* errCode)
+                         inlines  Delete_dropoutAdaptationClass
+ 2267  003F2CB0      8  uint16_t T2K_GetGlyphIndex(struct T2K* t, uint16_t charCode, int* errCode)
+ 2807  003F2CB8      4  void T2K_ListChars(void* userArg, struct T2K* scaler, int(*)()* ListCharsFn, int* errCode)
+ 2817  003F2CBC      8  int FF_PSNameToCharCode(struct T2K* t, int8_t* PSName, int* errCode)
+ 2876  003F2CC4      8  uint8_t* FF_GetTTTablePointer(struct T2K* t, int32_t tag, uint8_t** ppTbl, size_t* bufSize, int* errCode)
+ 2946  003F2CCC      4  void FF_ForceCMAPChange(struct T2K* t, int* errCode)
+ 3006  003F2CD0      8  int FF_GlyphExists(struct T2K* t, int32_t code, uint16_t cmd, int* errCode)

@@ -1,0 +1,72 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/src/Tricky/TrickyDecoder.cpp
+// compiled in: TrickyDecoder.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   64    inline-only   static float _get3Float(const uint8_t* ptr)
+                         local  uint32_t foo
+   77    inline-only   static uint16_t _getShort(const uint8_t* ptr)
+   87    inline-only   static float _getFloat(const uint8_t* ptr)
+                         local  uint32_t foo
+  101  005A8930    1B4  const uint8_t* TrickySkipChannel(const uint8_t* chanHeaderPtr)
+                         local  const struct tCTHeader* pHeader
+                         local  int count
+                         local  int i
+                         inlines  tCTHeader::GetNum, tCTHeader::GetType
+  158  005A8BC4    8BC  float TrickyDecode(const uint8_t** chanHeaderPtr, float frameNum)
+                         local  float value
+                         local  const uint8_t* pData
+                         local  const struct tCTHeader* pHeader
+                         local  uint16_t index
+                         local  const uint8_t* actualHeader
+                         local  float f0
+                         local  float f1
+                         local  float f0
+                         local  float f1
+                         local  float f2
+                         local  float f0
+                         local  float f1
+                         local  float f2
+                         local  float f3
+                         local  int index
+                         local  float pVal
+                         local  float slop
+                         local  int numSubCurves
+                         local  int GroupIndex
+                         local  const struct tCTHeader* pSubCurveHeader
+                         local  float subNumFrames
+                         local  float MinValue
+                         local  float Slope
+                         local  const uint8_t* pChar
+                         local  int index
+                         local  float pVal
+                         local  float slop
+                         local  float nVal
+                         local  float valueNext
+                         local  float MinValue
+                         local  float Slope
+                         local  const uint16_t* pShort
+                         local  int index
+                         local  float pVal
+                         local  float slop
+                         local  float nVal
+                         local  float valueNext
+                         local  uint8_t index
+                         local  const uint8_t* actualHeader
+                         local  float nVal
+                         inlines  _get3Float, _getFloat, tCTHeader::GetNum, tCTHeader::GetType
+  422  005A9A7C    1A4  void TrickyDecodeFrame(struct <anon>* target, const uint8_t* chanHeaderPtr, float frameNum, int numBones, int numBlendShapes)
+                         local  int i
+                         local  int i
+  447  005A99CC     B0  void TrickyDecodeBlendShapes(struct <anon>* target, const uint8_t** chanHeaderPtr, float frameNum, int numBlendShapes)
+                         local  int i
+  458  005A9894    138  void TrickyDecodeBone(struct <anon>* target, const uint8_t* chanHeaderPtr, float frameNum, int boneIdx)
+                         local  int i
+  489  005A9714    180  void TrickyDecodeFrameWithoutScale(struct <anon>* target, const uint8_t* chanHeaderPtr, float frameNum, int numBones, int numBlendShapes)
+                         local  int i
+                         local  int i
+  513  005A95F4    120  void TrickyDecodeBoneWithoutScale(struct <anon>* target, const uint8_t* chanHeaderPtr, float frameNum, int boneIdx)
+                         local  int i
+  539  005A952C     C8  void TrickyDecodeNextBone(struct <anon>* target, const uint8_t** chanCurrPtr, float frameNum)
+  558  005A9480     AC  void TrickyDecodeNextBoneWithoutScale(struct <anon>* target, const uint8_t** chanCurrPtr, float frameNum)
+  572  005A8B48     7C  void TrickySkipNextBone(const uint8_t** chanCurrPtr, float frameNum)
+  589  005A8AE4     64  void TrickySkipNextBoneWithoutScale(const uint8_t** chanCurrPtr, float frameNum)

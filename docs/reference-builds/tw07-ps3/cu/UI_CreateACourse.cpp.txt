@@ -1,0 +1,66 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_CreateACourse.cpp
+// compiled in: apt_unity.cpp
+// 20 functions, source order. line | PS3 address | size
+
+   47  000F4F04     94  void UICreateACourse::UICreateACourse(const struct UICreateACourse* this)
+                         inlines  ChooseSlotHandler::ChooseSlotHandler, TExternArray<UICreateACourse::DstMenuItem_crac>::TExternArray
+   54  000EF3EC     7C  void UICreateACourse::Init(const struct UICreateACourse* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList
+   68  00097E4C    140  void UICreateACourse::Show(const struct UICreateACourse* this, enum PlayerNumber_t playerNumber)
+                         local  const struct UserInfo& userInfo
+                         inlines  UICreateACourse::GetCurrentCRACUserInfo
+   94  00034188      4  void UICreateACourse::OnShow(const struct UICreateACourse* this)
+  110  0006D7DC     60  void UICreateACourse::InitMenuParams(const struct UICreateACourse* this)
+  119  00097F8C    130  void UICreateACourse::UpdateItemAndLabel(const struct UICreateACourse* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_crac* dest
+                         local  const struct UserInfo& userInfo
+                         local  enum GM_CourseType_t theCourse
+                         local  int32 theHole
+                         local  int32 parForTheHole
+                         inlines  UICreateACourse::GetCurrentCRACUserInfo
+  145  000980BC     9C  void UICreateACourse::SelectCourse(const struct UICreateACourse* this, enum GM_CourseType_t courseNum)
+                         local  const struct UserInfo& userInfo
+                         local  int32 index
+                         inlines  UICreateACourse::GetCurrentCRACUserInfo
+  155  000984A4     A8  void UICreateACourse::SelectHole(const struct UICreateACourse* this, int32 hole)
+                         local  const struct UserInfo& userInfo
+                         local  int32 index
+                         inlines  UICreateACourse::GetCurrentCRACUserInfo
+  168  00098158     18  void WeJustCameBackFromtheCourseSelectScreen(int32 courseNum)
+  173  000B6F88     A8  void CRACSaveGameCB(int32 nRslt)
+                         inlines  UI_ComponentManager::HideScreen
+  188  000B7634     14  void BadNameReShowKeyboard()
+  192  00098170    16C  void UICreateACourseBackFromKeyBoardCB()
+                         local  char[20] kbText
+                         local  bool bIsAllSpaces
+                         local  int32 i
+                         local  const struct UserInfo& userInfo
+                         local  int32 courseSlot
+                         inlines  UICreateACourse::GetCurrentCRACUserInfo
+  235  000B777C     3C  void UICreateACourseCancelFromKeyBoardCB()
+                         inlines  UI_ComponentManager::ShowScreen
+  244  000B7030    4A4  enum eAptHandleInput UICreateACourse::HandleInput(const struct UICreateACourse* this, int32 cID)
+                         local  enum GM_CourseType_t courseNum
+                         local  const struct UserInfo& userInfo
+                         local  int32 index
+                         inlines  UICreateACourse::GetCurrentCRACUserInfo, UI_ComponentManager::HideScreen
+  363  000982DC    1C8  void UICreateACourse::RefreshCourseStatus(const struct UICreateACourse* this)
+                         local  const struct UserInfo& userInfo
+                         local  int32 i
+                         local  enum GM_CourseType_t theCourse
+                         local  int32 theHole
+                         inlines  UICreateACourse::GetCurrentCRACUserInfo
+  403  000985FC     D0  void UICreateACourse::ResetCourse(const struct UICreateACourse* this)
+                         local  const struct UserInfo& userInfo
+                         local  int32 i
+                         inlines  UICreateACourse::GetCurrentCRACUserInfo
+  421  000B7630      4  void UICreateACourse::NotifyPic(const struct UICreateACourse* this)
+  431  0003418C     80  void UICreateACourse::ShowHelpText(const struct UICreateACourse* this)
+  442  000B74D4    15C  void UICreateACourse::ImplimentPic(const struct UICreateACourse* this)
+                         local  const struct UserInfo& userInfo
+                         local  char* temp
+                         local  const int32 MAX_CREATED_COURSE_NAME_LENGTH
+                         inlines  UICreateACourse::GetCurrentCRACUserInfo, UI_ComponentManager::HideScreen
+  479  000B77B8    110  void ChooseSlotHandler::onClose(const struct ChooseSlotHandler* this, void* inData)
+                         local  int32 index
+                         inlines  UI_ComponentManager::ShowScreen

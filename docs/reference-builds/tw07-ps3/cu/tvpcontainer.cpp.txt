@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_common/dev/src/tvpcontainer.cpp
+// compiled in: tvpcontainer.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    0  008DFC2C     44  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  TagValuePair
+   26  008DFC70     10  static void _GLOBAL__I__ZN4EARS6Common12TVPContainer9s_nullTVPE()

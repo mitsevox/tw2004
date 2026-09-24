@@ -1,0 +1,57 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Rna/ScopeBlockManager.cpp
+// compiled in: rnaunity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   77  004F7B78     38  void RNAScopeBlockXMLCallBack::~RNAScopeBlockXMLCallBack(const struct RNAScopeBlockXMLCallBack* this)
+                         inlines  GameXMLCallback::~GameXMLCallback
+  119  004DA17C    B38  void RNAScopeBlockXMLCallBack::StartElement(const struct RNAScopeBlockXMLCallBack* this, const char8_t* name, uint32_t nameLen, const struct <anon>* attributes, uint32_t attributeCount)
+                         local  const int TEMP_STRING_LENGTH
+                         local  char[256] tempString
+                         local  struct ScopeBlockLoaderC* pLoader
+                         local  bool8_t hasValue
+                         local  struct <anon>* block
+                         local  int i
+                         local  const int32_t MAXLEN_PARAM_NAME
+                         local  const int32_t MAXLEN_TYPE_STR
+                         local  char8_t[32] typeStr
+                         local  char8_t[64] paramName
+                         local  int32_t arrayIndex
+                         local  int32_t arraySize
+                         local  bool8_t hasValue
+                         local  enum TypeID paramType
+                         local  struct ScopeParmC* pScopeParam
+                         local  bool8_t success
+                         local  float_t paramValue
+                         local  int32_t paramValue
+                         local  bool8_t valToSet
+                         local  int32_t paramValue
+                         local  uint32_t paramValue
+                         local  struct <anon> paramValue
+                         local  struct <anon> paramValue
+                         local  struct <anon> paramValue
+                         local  struct <anon> paramValue
+                         local  struct <anon> paramValue
+                         inlines  RNADebugBreak, ScopeBlockLoaderC::GetInstance, ScopeParmC::Set<bool8_t>, ScopeParmC::Set<int>, ScopeParmC::Set<rw::math::vpu::Matrix33>, ScopeParmC::Set<rw::math::vpu::Matrix44>, ScopeParmC::Set<rw::math::vpu::Vector2>, ScopeParmC::Set<rw::math::vpu::Vector3>, ScopeParmC::Set<rw::math::vpu::Vector4>, ScopeParmC::Set<std::float_t>, ScopeParmC::Set<std::uint32_t>, operator=, std::tolower
+  259  004D3CBC     C0  void RNAScopeBlockXMLCallBack::EndElement(const struct RNAScopeBlockXMLCallBack* this, const char8_t* name, uint32_t nameLen)
+                         local  const int TEMP_STRING_LENGTH
+                         local  struct ScopeBlockLoaderC* pLoader
+                         inlines  ScopeBlockLoaderC::GetInstance
+  292  004EC968    1C8  void ScopeXMLAssetMgrC::ScopeXMLAssetMgrC(const struct ScopeXMLAssetMgrC* this)
+                         inlines  Clear, Copy, RNADebugBreak, String, operator=, ~String
+  299  004ECCF8     9C  struct ScopeXMLAssetMgrC* ScopeXMLAssetMgrC::GetInstance()
+  308  004C9080     6C  void ScopeXMLAssetMgrC::DestroyInstance()
+  315  004E8320     64  struct ScopeXMLAssetC* ScopeXMLAssetMgrC::CreateNew(const struct ScopeXMLAssetMgrC* this, const char* pFilePath)
+  325  004E82E0     40  void ScopeXMLAssetC::ScopeXMLAssetC(const struct ScopeXMLAssetC* this, struct AssetMgrC* pAssetMgr, const char* pFilePath, MemBudgetTypeE budget, enum eMemoryPools memPool)
+  330  004D20F0     B0  void ScopeXMLAssetC::~ScopeXMLAssetC(const struct ScopeXMLAssetC* this)
+                         local  int32_t refsRemaining
+  341  004D4610    1B4  bool ScopeXMLAssetC::Load(const struct ScopeXMLAssetC* this)
+                         local  uint32_t uFileSize
+                         local  void* pXMLData
+                         local  struct DeviceC* pDevice
+                         local  struct RNAScopeBlockXMLCallBack callback
+                         local  struct <anon> xmlparser
+                         inlines  RNAScopeBlockXMLCallBack::RNAScopeBlockXMLCallBack, RNAScopeBlockXMLCallBack::~RNAScopeBlockXMLCallBack, ScopeBlockLoaderC::GetInstance
+  384  004C90EC      8  bool ScopeXMLAssetC::IsLoaded(const const struct ScopeXMLAssetC* this)
+  390  004C90F4     4C  void ScopeXMLAssetC::Unload(const struct ScopeXMLAssetC* this)
+  402  004C9140      4  void ScopeXMLAssetC::Print(const struct ScopeXMLAssetC* this)
+  409  004C9144      4  void ScopeXMLAssetC::MenuPrint(const struct ScopeXMLAssetC* this, const char8_t* pLinePrefixTabString)

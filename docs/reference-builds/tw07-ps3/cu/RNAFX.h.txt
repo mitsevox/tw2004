@@ -1,0 +1,47 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNAX/include/RNAX/RNAFX.h
+// compiled in: CGFXShader.cpp, RNAFX.cpp
+// 35 functions, source order. line | PS3 address | size
+
+   62  0084BEA4     50  void RNAFXAnnotation(const struct <anon>* this)
+   63  0084BF44     70  void RNAFXAnnotation(const struct <anon>* this, const char* name, const char* type, const char* value)
+   64  0084C024    120  void ~RNAFXAnnotation(const struct <anon>* this)
+                         inlines  ~String
+  113  0084C3DC    268  void RNAFXConstant(const struct <anon>* this)
+                         inlines  Init, RNADebugBreak, Vector
+  114  0084C8AC    364  void ~RNAFXConstant(const struct <anon>* this)
+                         inlines  Destroy, Init, ~String, ~Vector
+  190  0084CF74     48  void RNAFXStruct(const struct <anon>* this)
+  191  0084D004    13C  void ~RNAFXStruct(const struct <anon>* this)
+                         inlines  Destroy, ~String, ~Vector
+  236  0084D27C     40  void RNAFXState(const struct <anon>* this)
+  237  0084D2FC     50  void RNAFXState(const struct <anon>* this, const char* name, const char* value)
+  238  0084D39C     D4  void ~RNAFXState(const struct <anon>* this)
+                         inlines  Clear, ~String
+  276    inline-only   const char* GetName(const const struct <anon>* this)
+  280    inline-only   RNAFXStates& GetStates(const struct <anon>* this)
+  283    inline-only   int32_t GetVertexProgramID(const const struct <anon>* this)
+  286    inline-only   int32_t GetPixelProgramID(const const struct <anon>* this)
+  294    inline-only   const struct <anon>& GetVertexProgramPermutations(const struct <anon>* this)
+  295    inline-only   const struct <anon>& GetPixelProgramPermutations(const struct <anon>* this)
+  318    inline-only   const char* GetName(const const struct <anon>* this)
+  323    inline-only   int32_t GetNumPasses(const const struct <anon>* this)
+  324    inline-only   struct <anon>& GetPass(const struct <anon>* this, uint32_t pass)
+  341  0084DB80     64  void RNAFXProgram(const struct <anon>* this)
+  342  0084DCF0    108  void ~RNAFXProgram(const struct <anon>* this)
+                         inlines  ~String
+  345  0084DC48     54  void RNAFXProgram(const struct <anon>* this, const const struct <anon>& other)
+  361    inline-only   enum ProgramType GetProgramType(const const struct <anon>* this)
+  409  0085174C    158  void RNAFXSampler(const struct <anon>* this)
+                         inlines  Init, PS3SamplerDataC, RNADebugBreak, Vector
+  410  0084D5E0    2D0  void ~RNAFXSampler(const struct <anon>* this)
+                         inlines  Destroy, Init, ~String, ~Vector
+  509    inline-only   int32_t GetNumTechniques(const const struct <anon>* this)
+  509    inline-only   int32_t RNAFX::GetNumTechniques(const const struct RNAFX* this)
+  510    inline-only   struct <anon>& GetTechnique(const struct <anon>* this, uint32_t idTechnique)
+  510    inline-only   struct <anon>& RNAFX::GetTechnique(const struct RNAFX* this, uint32_t idTechnique)
+  513    inline-only   int32_t GetNumPrograms(const const struct <anon>* this)
+  513    inline-only   int32_t RNAFX::GetNumPrograms(const const struct RNAFX* this)
+  514    inline-only   struct <anon>& GetProgram(const struct <anon>* this, uint32_t idProgram)
+  514    inline-only   struct <anon>& RNAFX::GetProgram(const struct RNAFX* this, uint32_t idProgram)
+  520    inline-only   int32_t RNAFX::GetNumPermutedBools(const const struct RNAFX* this)
+  521    inline-only   int32_t RNAFX::GetPermutedBool(const const struct RNAFX* this, int32_t iBool)

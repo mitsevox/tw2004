@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/Legacy/LL/Headers/lldyntex.h
+// compiled in: Legacy_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   85    inline-only   void DynTexGroupT::TouchTextureByIndex(const struct DynTexGroupT* this, uint32 iTexture)
+  134  0038E7B0     94  void DynTex::DynTex(const struct DynTex* this, const const struct Allocator& allocRef)
+  137  0037D574      4  void DynTex::~DynTex(const struct DynTex* this)

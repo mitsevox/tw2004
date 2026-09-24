@@ -1,0 +1,11 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/./././virtualdriveurl.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   75    inline-only   void AbortStream(const struct <anon>* this, uint32_t uAbort)
+   87    inline-only   bool IsActive(const struct <anon>* this)
+   90    inline-only   uint32_t GetTotalLength(const struct <anon>* this)
+   91    inline-only   uint32_t GetTotalConsumed(const struct <anon>* this)
+   92    inline-only   uint32_t GetTotalRead(const struct <anon>* this)
+   95    inline-only   const uint8_t* GetBufferHead(const struct <anon>* this)
+   96    inline-only   uint32_t GetValidBufferLength(const struct <anon>* this)

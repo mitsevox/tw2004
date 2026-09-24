@@ -1,0 +1,22 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_OnlineTournament_TourWins.cpp
+// compiled in: apt_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   38  000F7B54     94  void UIOnlineTournament_TourWins::UIOnlineTournament_TourWins(const struct UIOnlineTournament_TourWins* this)
+                         inlines  TArrayInternal<UIOnlineTournament_TourWins::DstMenuItem_oltw,AptStructSwapper>::TArrayInternal, TExternArray<UIOnlineTournament_TourWins::DstMenuItem_oltw>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   43  000F09B4     84  void UIOnlineTournament_TourWins::Init(const struct UIOnlineTournament_TourWins* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   54  00054EAC     94  void UIOnlineTournament_TourWins::Show(const struct UIOnlineTournament_TourWins* this)
+                         local  int32 numElements
+   68  00054F40    10C  void UIOnlineTournament_TourWins::UpdateItemAndLabel(const struct UIOnlineTournament_TourWins* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_oltw* dest
+  102  00083CA8    10C  enum eAptHandleInput UIOnlineTournament_TourWins::HandleInput(const struct UIOnlineTournament_TourWins* this, int32 cID)
+  139  000A13C8    214  void UIOnlineTournament_TourWins::RefreshRankList(const struct UIOnlineTournament_TourWins* this, int numRows)
+                         local  int iNumRows
+                         local  CalendarDate date
+                         local  char* myStr
+                         local  uint32_t month
+                         local  uint32_t day
+                         local  uint32_t year
+                         local  int i
+                         inlines  std::atoi

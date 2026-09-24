@@ -1,0 +1,21 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNAX/include/RNAX/PS3/RNAX/RNAJobPlat.h
+// compiled in: RNAJobPlat.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   54  008AB070      C  void EnableGpuBlocking(const struct <anon>* this)
+   59  008AB07C      C  void SetDebugNextExecution(const struct <anon>* this)
+   73  008AB088      4  void ResolveScopeData(const struct <anon>* this)
+  117    inline-only   void operator delete(void* address)
+  117    inline-only   struct ICoreAllocator* GetClassAllocator()
+  117    inline-only   void* operator new(size_t size, const char* text, struct ICoreAllocator* allocator, enum AllocFlags allocator_flags, uint32_t alignment)
+  154    inline-only   void operator delete(void* address)
+  154    inline-only   struct ICoreAllocator* GetClassAllocator()
+  154    inline-only   void* operator new(size_t size, const char* text, struct ICoreAllocator* allocator, enum AllocFlags allocator_flags, uint32_t alignment)
+  181    inline-only   void operator delete(void* address)
+  181    inline-only   struct ICoreAllocator* GetClassAllocator()
+  181    inline-only   void* operator new(size_t size, const char* text, struct ICoreAllocator* allocator, enum AllocFlags allocator_flags, uint32_t alignment)
+  206    inline-only   void operator delete(void* address)
+  206    inline-only   struct ICoreAllocator* GetClassAllocator()
+  240  008AB08C      8  const char* GetName(const const struct <anon>* this)
+  244    inline-only   struct <anon> GetJobTypeHandle(const struct <anon>* this)
+  247    inline-only   bool GetScopeBlockAndParms(const struct <anon>* this, const struct <anon>** pScopeBlock, struct <anon>** pParmList)

@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/Headgate/SOURCE/Utils/clock.h
+// compiled in: headgate_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   13  00346FA4      4  void SetGlobalFrameElapsedTime(float fElapsedTime)
+   18  00346FA8      4  void SetGlobalTickCountSpeed(float speed)
+   22  00346FAC      8  unsigned int GetGlobalFrameTickCount()

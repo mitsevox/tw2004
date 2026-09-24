@@ -1,0 +1,16 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/online/osdk/kickstart.cpp
+// compiled in: golf2_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   30  0018528C     F8  void KickStart::KickStart(const struct KickStart* this, uint32_t numPlayers)
+                         inlines  RCPointer, operator=
+   38  001632A8     B8  void KickStart::KickStartConnectedToPeer(const struct KickStart* this, struct PeerConnection* pPeerConnection, struct GameSession* pGameSession)
+                         inlines  operator->
+   44  001B2BB8     84  void KickStart::KickStartGameStarted(const struct KickStart* this, struct GameSessionPersistent* pGameSession)
+   53  0012A354     3C  void KickStart::KickStartGameComplete(const struct KickStart* this)
+   58  0018547C     A8  void KickStart::CreateInstance(uint32_t numPlayers)
+   64  0017CF04     70  void KickStart::DestroyInstance()
+   73  00163360     64  void KickStart::EndGame(const struct KickStart* this)
+                         inlines  operator->
+   79  0014B1AC     BC  void KickStart::~KickStart(const struct KickStart* this)
+                         inlines  operator->, ~KickStartCallback, ~RCPointer

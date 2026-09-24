@@ -1,0 +1,6 @@
+// ../../../../packages/rwmovie/1.04.01/include/rwmovie/irenderer.h
+// compiled in: golf2_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   44  001E7DD0     18  void ~IVideoRenderer(const struct IVideoRenderer* this)
+  152  001E7E20     18  void ~IAudioRenderer(const struct IAudioRenderer* this)

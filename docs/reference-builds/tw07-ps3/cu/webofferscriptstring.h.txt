@@ -1,0 +1,9 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/././webofferscriptstring.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   36  005C3660     30  void WebOfferScriptString(const struct <anon>* this, const char8_t* pConstDefaultString)
+   37  005C3578     18  void WebOfferScriptString(const struct <anon>* this)
+   38  005CB6DC     68  void ~WebOfferScriptString(const struct <anon>* this)
+   41    inline-only   const char8_t* GetString(const const struct <anon>* this)
+   55    inline-only   void SetConstDefault(const struct <anon>* this, const char8_t* pConstDefaultString)

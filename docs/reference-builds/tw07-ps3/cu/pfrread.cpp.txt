@@ -1,0 +1,216 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptFF/core/pfrread.cpp
+// compiled in: other_unity.cpp
+// 34 functions, source order. line | PS3 address | size
+
+  276    inline-only   uint8_t ReadNibble(nibble_t* pNibble)
+  292    inline-only   uint8_t Read2Nibbles(nibble_t* pNibble)
+                         local  uint8_t byte
+  398  003F1670     18  void InitGpsExecContext(gpsExecContext_t* pGpsExecContext)
+  411    inline-only   static void ReadOruTable(struct PFRClass* t, uint8_t format, uint8_t** ppBuff, gpsExecContext_t* pGpsExecContext)
+                         local  uint8_t* pBuff
+                         local  int16_t nXorus
+                         local  int16_t nYorus
+                         local  int16_t nXorusRead
+                         local  int16_t nYorusRead
+                         local  uint8_t oruFormat
+                         local  int16_t prevValue
+                         local  int ii
+                         local  int jj
+                         local  uint8_t extraLongFormat
+                         local  int16_t formatPhase
+                         local  int16_t nibblePhase
+                         local  int16_t delta
+                         local  int16_t* pOruTable
+                         local  uint8_t variableFormat
+  655    inline-only   static void ReadGlyphElement(struct PFRClass* t, uint8_t** ppBuff, charElement_t* pGlyphElement, int32_t* pGpsOffset)
+                         local  uint8_t* pBuff
+                         local  uint8_t format
+                         local  int16_t ii
+                         local  gpsExecContext_t gpsExecContext
+                         local  int16_t pos
+                         local  int16_t xPos
+                         local  int16_t yPos
+                         local  int16_t scale
+                         local  int16_t xScale
+                         local  int16_t yScale
+                         local  uint16_t gpsSize
+                         local  int32_t gpsOffset
+                         local  uint32_t tmpuint32
+  829  003F1688      4  void ReadGpsArgs(uint8_t** ppByte, uint8_t format, gpsExecContext_t* pGpsExecContext, int16_t* pX, int16_t* pY)
+  889    inline-only   static void ReadGpsSegment(gpsExecContext_t* pGpsExecContext, nibble_t* pNibble, int16_t* pType, int16_t* values)
+                         local  uint8_t opcode
+                         local  uint16_t argFormat
+                         local  uint16_t format1
+                         local  uint16_t format2
+                         local  uint16_t format3
+                         local  int16_t nTabs
+ 1059  0040C98C     A8  static int16_t Read3Nibbles(nibble_t* pNibble)
+                         local  int16_t word
+                         inlines  ReadNibble
+ 1077  003F168C    1F0  static int16_t GetControlledCoord(gpsExecContext_t* pGpsExecContext, int16_t dimension, int16_t n)
+                         local  int16_t* pOruTable
+                         local  int16_t nOrus
+                         local  int16_t z0
+                         local  int16_t z
+                         local  int ii
+ 1151  0040CA34    30C  static void ReadGpsPoint(gpsExecContext_t* pGpsExecContext, nibble_t* pNibble, uint16_t argFormat, int16_t* values)
+                         local  int16_t delta
+                         inlines  ReadNibble
+ 1235  003F18CC      8  int16_t ReadByte(uint8_t* pBuff)
+ 1246  003F18D4     1C  int16_t ReadWord(uint8_t* pBuff)
+ 1258  003F18F0     2C  int32_t ReadLongSigned(uint8_t* pBuff)
+ 1270  003F191C     28  int32_t ReadLongUnsigned(uint8_t* pBuff)
+ 1282  003F1944     44  static void SkipExtraItems(uint8_t** ppByte)
+                         local  uint8_t* pByte
+                         local  int16_t nExtraItems
+                         local  int16_t ii
+                         local  int16_t extraItemSize
+ 1304    inline-only   static void SkipExtraStreamItems(struct InputStream* in)
+ 1709  003F187C     50  static int8_t Read2NibblesSigned(nibble_t* pNibble)
+                         local  uint8_t byte
+ 2082  00419944   13DC  struct PFRClass* tsi_NewPFRClass(struct tsiMemObject* mem, struct InputStream* in, int32_t fontNum)
+                         local  struct PFRClass* t
+                         local  uint8_t[10] versSizeBuff
+                         local  uint8_t isPFR
+                         local  uint8_t[43] pfrHeader
+                         local  int32_t physFontMaxSize
+                         local  int32_t fontDirOffset
+                         local  uint8_t[5] tmpBuff
+                         local  uint16_t nLogicalFonts
+                         local  uint32_t logicalFontOffset
+                         local  int16_t boldThickness
+                         local  uint8_t format
+                         local  uint8_t* pByte
+                         local  int32_t physicalFontSize
+                         local  int32_t physicalFontOffset
+                         local  uint8_t* pPhysicalFont
+                         local  int16_t standardSetWidth
+                         local  uint8_t* pExtraItems
+                         local  int16_t nBlueValues
+                         local  uint16_t nCharacters
+                         local  int ii
+                         local  int jj
+                         local  uint8_t* ptempByte
+                         local  F16Dot16 xSize
+                         local  F16Dot16 ySize
+                         local  F16Dot16 aSize
+                         local  F16Dot16 tempx
+                         local  F16Dot16 tempy
+                         local  int nExtraItems
+                         local  int16_t extraItemSize
+                         local  int16_t extraItemType
+                         local  uint8_t format
+                         local  int16_t ii
+                         local  uint8_t charFormat
+                         local  size_t len
+                         inlines  BuildPFRCMAP, BuildPFRMetricsEtc, SetupTCB
+ 2679  003F1B00    108  void tsi_DeletePFRClass(struct PFRClass* t)
+                         local  int ii
+ 2693    inline-only   static void BuildPFRCMAP(struct PFRClass* t, uint8_t** pPhysicalFont, uint8_t format, int16_t standardSetWidth)
+                         local  int ii
+                         local  uint8_t* pByte
+                         local  uint16_t defaultCharCode
+                         local  int16_t defaultSetWidth
+                         local  int32_t defaultGpsOffset
+                         local  uint8_t charFormat
+ 2852    inline-only   static void BuildPFRMetricsEtc(struct PFRClass* t)
+                         local  uint16_t gIndex
+                         local  struct GlyphClass* glyph
+                         local  int16_t ascent
+                         local  int16_t descent
+                         local  int16_t lineGap
+                         local  int16_t maxSW
+                         local  uint16_t aw
+                         local  uint16_t ah
+                         local  int err
+ 2932    inline-only   static int16_t GetGlyphYMax(struct GlyphClass* glyph)
+ 2950    inline-only   static int16_t GetGlyphYMin(struct GlyphClass* glyph)
+ 2969  003F1E7C     A8  uint16_t tsi_PFRGetGlyphIndex(struct PFRClass* t, uint16_t charCode)
+                         local  uint16_t gIndex
+                         local  uint8_t found
+                         inlines  BSearchCTbl
+ 2979  0041740C    4E4  struct GlyphClass* tsi_PFRGetGlyphByIndex(struct PFRClass* t, uint16_t index, uint16_t* aWidth, uint16_t* aHeight, FFT1HintClass* ffhint)
+                         local  int byteCount
+                         local  uint8_t* p
+                         local  struct GlyphClass* glyph
+                         local  uint32_t offset
+                         local  int16_t upper
+                         local  uint16_t ah
+                         local  int32_t xMid
+                         local  int16_t tsb
+                         local  int16_t ymax
+                         local  int16_t* ooy
+                         local  int i
+                         local  int limit
+                         inlines  FlipContourDirection
+ 3084  004159AC   1A60  static void PFRBuildChar(struct PFRClass* t, uint8_t* p, int32_t gpsOffset, uint16_t gpsSize, F16Dot16 xScale, F16Dot16 yScale, F16Dot16 xPos, F16Dot16 yPos, FFT1HintClass* ffhint)
+                         local  uint8_t* pSubChar
+                         local  uint8_t format
+                         local  uint8_t index
+                         local  uint8_t* pGps
+                         local  uint8_t* pByte
+                         local  int16_t nElements
+                         local  int ii
+                         local  int jj
+                         local  int16_t x1
+                         local  int16_t y1
+                         local  int16_t x2
+                         local  int16_t y2
+                         local  int16_t x3
+                         local  int16_t y3
+                         local  F16Dot16 fx1
+                         local  F16Dot16 fy1
+                         local  F16Dot16 fx2
+                         local  F16Dot16 fy2
+                         local  F16Dot16 fx3
+                         local  F16Dot16 fy3
+                         local  gpsExecContext_t gpsExecContext
+                         local  charElement_t glyphElement
+                         local  uint32_t offset
+                         local  int byteCount
+                         local  struct GlyphClass* glyph
+                         local  struct tcb_t tcbSave
+                         local  uint8_t* pLastByte
+                         local  nibble_t nibble
+                         local  int16_t type
+                         local  int16_t[6] values
+                         inlines  Read2Nibbles, ReadGlyphElement, ReadGpsSegment, ReadNibble, ReadOruTable, SetupTrans
+ 3595  003F207C     B0  uint8_t* GetPFRNameProperty(struct PFRClass* t, uint16_t languageID, uint16_t nameID)
+                         local  uint8_t* result
+                         local  uint8_t* p
+                         local  uint32_t length
+ 3627  003F1C98    1E4  static int GetAuxDataMetrics(struct PFRClass* t, uint8_t* pAuxData, uint32_t nAuxBytes, uint16_t requestedBlockID, int16_t* ascent, int16_t* descent, int16_t* lineGap, int16_t* maxAW, uint32_t* isFixedPitch)
+                         local  int errCode
+                         local  blockHead_t* pAux
+                         local  uint16_t len
+                         local  uint16_t blockID
+                         local  uint8_t match
+                         local  auxTypeAtt_t* pWinAtt
+                         local  int8_t pitchAndFamily
+                         local  auxPfmTypeAtt_t* pPfmAtt
+ 3746    inline-only   static void FlipContourDirection(struct GlyphClass* glyph)
+                         local  int16_t ctr
+                         local  int16_t j
+                         local  int16_t* oox
+                         local  int16_t* ooy
+                         local  uint8_t* onCurve
+                         local  int16_t flips
+                         local  int16_t start
+                         local  int16_t end
+                         local  int16_t tempX
+                         local  int16_t tempY
+                         local  uint8_t pointType
+                         local  int16_t indexA
+                         local  int16_t indexB
+ 3788    inline-only   static uint8_t BSearchCTbl(struct PFRClass* t, uint16_t* indexPtr, uint16_t theValue)
+                         local  int32_t left
+                         local  int32_t right
+                         local  int32_t middle
+                         local  int16_t result
+                         local  int32_t nElements
+ 3837    inline-only   static void SetupTCB(struct PFRClass* t)
+ 3866    inline-only   static void SetupTrans(struct PFRClass* t, F16Dot16 xScale, F16Dot16 yScale, F16Dot16 xPosition, F16Dot16 yPosition)
+ 3887  003F1FA8     D4  static void TransformPoint(struct PFRClass* t, F16Dot16 x, F16Dot16 y, F16Dot16* pXt, F16Dot16* pYt)
+                         local  F16Dot16 xt
+                         local  F16Dot16 yt
+ 4637  003F212C      4  void tsi_PFRListChars(void* userArg, struct PFRClass* t, void* ctxPtr, int(*)()* ListCharsFn)

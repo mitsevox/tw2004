@@ -1,0 +1,22 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/ui_menuCirc.h
+// compiled in: apt_unity.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   30  000FE324      4  void UIMenuCircBase::ShowHelpText(const struct UIMenuCircBase* this)
+   33  000FE328     18  enum TAptSequenceStatus UIMenuCircBase::ShowCircMenuSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   34  00100DDC     18  enum TAptSequenceStatus UIMenuCircBase::InitMenuSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   35  00100DC4     18  enum TAptSequenceStatus UIMenuCircBase::InitMenuSequenceBack_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   36  000FE340     18  enum TAptSequenceStatus UIMenuCircBase::HideCircMenuSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   37  00103C18     18  enum TAptSequenceStatus UIMenuCircBase::StoreMenuPosSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   45  000FE358     5C  void UIMenuCircBase::RegainFocus(const struct UIMenuCircBase* this, uint32 )
+   50  000FE3B4     24  void UIMenuCircBase::LooseFocus(const struct UIMenuCircBase* this, uint32 )
+   53    inline-only   int32 UIMenuCircBase::GetNbrItemsVisibleInMenu(const const struct UIMenuCircBase* this)
+   54    inline-only   void UIMenuCircBase::SetNbrItemsVisibleInMenu(const struct UIMenuCircBase* this, int32 n)
+   59  000FE3D8      4  void UIMenuCircBase::MenuFinishInitializations(const struct UIMenuCircBase* this)
+   67    inline-only   int32 UIMenuCircBase::GetMenuOpenLevels(const struct UIMenuCircBase* this)
+  103    inline-only   bool UIMenuCircDefault::IsGhosted(const struct UIMenuCircDefault* this)
+  105    inline-only   void UIMenuCircDefault::SetFirstActiveIndex(const struct UIMenuCircDefault* this, int32 menu, int32 index)
+  112    inline-only   bool UIMenuCircDefault::SelectNeedToWait(const const struct UIMenuCircDefault* this)
+  113    inline-only   bool UIMenuCircDefault::UpNeedToWait(const const struct UIMenuCircDefault* this)
+  114    inline-only   bool UIMenuCircDefault::DownNeedToWait(const const struct UIMenuCircDefault* this)
+  143  000FE3E4      C  uint32 UIMenuCirc::GetSignature(const const struct UIMenuCirc* this)

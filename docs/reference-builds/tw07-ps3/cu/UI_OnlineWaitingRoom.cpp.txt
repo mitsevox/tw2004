@@ -1,0 +1,56 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_OnlineWaitingRoom.cpp
+// compiled in: apt_unity.cpp
+// 19 functions, source order. line | PS3 address | size
+
+   62  000F7A24     98  void UIOnlineWaitingRoom::UIOnlineWaitingRoom(const struct UIOnlineWaitingRoom* this)
+                         inlines  TArrayInternal<UIOnlineWaitingRoom::PlayerMenuItem,AptStructSwapper>::TArrayInternal, TExternArray<UIOnlineWaitingRoom::PlayerMenuItem>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   69  000F0920     94  void UIOnlineWaitingRoom::Init(const struct UIOnlineWaitingRoom* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   81  000770FC     78  void UIOnlineWaitingRoom::OnShow(const struct UIOnlineWaitingRoom* this)
+   94  000482C4      4  void UIOnlineWaitingRoom::OnHide(const struct UIOnlineWaitingRoom* this)
+  117  000777C8     C4  void UIOnlineWaitingRoom::Show(const struct UIOnlineWaitingRoom* this)
+                         local  int32 numPlayers
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen
+  151  000482C8     54  void UIOnlineWaitingRoom::Hide(const struct UIOnlineWaitingRoom* this)
+  164  00090F8C    504  void UIOnlineWaitingRoom::UpdateItemAndLabel(const struct UIOnlineWaitingRoom* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  int32 matchRanked
+                         local  struct PlayerMenuItem* dest
+                         local  struct GameSession* pGame
+                         local  uint8_t numUsers
+                         local  struct User* pUser
+                         local  char* szGameName
+                         local  struct <anon>* pStatStrategy
+                         inlines  List<OSDK::GameUser>::GetElementAt
+  252  00069614    150  void UIOnlineWaitingRoom::ShowHelpText(const struct UIOnlineWaitingRoom* this)
+  289  00062C3C     54  void _UIOnlineWaitingRoom_LeaveCB()
+  298  00083DB4    33C  enum eAptHandleInput UIOnlineWaitingRoom::HandleInput(const struct UIOnlineWaitingRoom* this, int32 cID)
+                         local  struct PlayerMenuItem* activeItem
+                         local  struct GameSession* pGame
+                         local  struct GameUser* pUser
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, List<OSDK::GameUser>::GetElementAt
+  398  00070880    1B8  void UIOnlineWaitingRoom::ExitWaitingRoom(const struct UIOnlineWaitingRoom* this)
+  449  00080EB0     F0  void UIOnlineWaitingRoom::RefreshWaitingUsersList(const struct UIOnlineWaitingRoom* this, int32 numUsers, int32 activeUserIndex)
+                         local  int32 saveActiveItemIndex
+                         local  int32 numUsersInMatch
+  469  00054D5C    150  bool UIOnlineWaitingRoom::ReadyToLaunchGame(const struct UIOnlineWaitingRoom* this)
+                         local  struct Facade* pFacade
+                         local  struct PeerConnectionManager* pConnMgr
+                         local  struct UserLocal* pLocalUser
+                         local  struct GameSession* pGame
+  494  00064A6C    3EC  void UIOnlineWaitingRoom::Refresh(const struct UIOnlineWaitingRoom* this, char* gameName)
+                         local  int32 matchRanked
+                         local  struct OnlineMatchParams* pParams
+                         local  enum GM_ModeType_t mode
+                         local  int courseNdx
+                         local  char* szCourseIDName
+                         local  int32 numHoles
+                         local  int32 matchDifficulty
+                         local  int32 matchWager
+                         inlines  LobbyMatchupOSDK::GetGameParamsRef
+  607  00063664     68  void UIOnlineWaitingRoom::ShowKeyboard(const struct UIOnlineWaitingRoom* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen
+  614  00060AB4     3C  static void _SendChatStringCB()
+                         local  char* szTextStringBuffer
+  620  00067640     8C  void UIOnlineWaitingRoom::LooseFocus(const struct UIOnlineWaitingRoom* this, uint32 gointTo_Signature)
+  629  000636CC     8C  void UIOnlineWaitingRoom::RegainFocus(const struct UIOnlineWaitingRoom* this, uint32 comeFrom_Signature)
+  639  00024C70     40  enum AptThreadReturnValue UIOnlineWaitingRoom::UpdateHelpInfo(const struct UIOnlineWaitingRoom* this)

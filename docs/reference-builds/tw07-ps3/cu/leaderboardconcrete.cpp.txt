@@ -1,0 +1,60 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/leaderboardconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   56  00629C68     6C  void ~LeaderboardDownloadSpreadSheetStrategy(const struct <anon>* this)
+                         inlines  ~RCPointer
+   83  00624508      C  void ~LeaderboardOperation(const struct <anon>* this)
+   86  00629344     44  void Cancel(const struct <anon>* this)
+  132  00600D00    118  void LeaderboardDownloadSpreadSheetStrategy(const struct <anon>* this, struct LeaderboardCallback* pCallback, uint32_t uLobbyRankCategoryIndex, uint32_t uLobbyRankIndexIndex, uint32_t uLobbyRankVariationIndex)
+                         local  LobbyRankT* pLobbyRank
+                         local  const char8_t* strBuddyList
+                         local  int32_t iReturnCode
+                         inlines  GetLobbyRank, RCPointer
+  176  005B8C64     90  bool OperationProcess(const struct <anon>* this, const struct Operation* )
+                         local  bool bContinue
+  213  005E0D7C     54  void OperationCancel(const struct <anon>* this, const struct Operation* )
+                         local  LobbyRankT* pLobbyRank
+                         inlines  GetLobbyRank
+  244  005E0CEC     90  void OperationTimeout(const struct <anon>* this, const struct Operation* )
+                         local  LobbyRankT* pLobbyRank
+                         inlines  GetLobbyRank
+  279  006106AC    42C  void DownloadSpreadSheetCallback(LobbyRankT* , LobbyApiMsgT* pServerMessage, void* pUserData)
+                         local  struct <anon>* pStrategy
+                         local  LobbyRankT* pLobbyRank
+                         local  char8_t[32] strCell
+                         local  int32_t iNumberOfColumns
+                         local  struct List<OSDK::StringConcrete>* pLocalUserData
+                         local  int32_t iReturnCode
+                         local  uint32_t uNumberOfFriends
+                         local  const char8_t*[100] aBuddies
+                         local  uint32_t uUserType
+                         local  int32_t iIndex
+                         local  const char8_t* pResult
+                         local  struct MessengerConcrete* pMessenger
+                         local  const struct List<OSDK::User>* pUsers
+                         local  uint32_t uIndex
+                         inlines  GetElementAt, GetLobbyRank, GetMessengerConcrete, GetNumberOfElements, InsertElementAt, List, operator OSDK::List<OSDK::StringConcrete>*, operator=
+  391  005F82F8     84  void LeaderboardDownloadSpreadSheetSuccess(const struct <anon>* this, struct Leaderboard* , struct <anon>* pSpreadSheet)
+                         inlines  operator=
+  398  005F837C     84  void LeaderboardDownloadSpreadSheetFailure(const struct <anon>* this, struct Leaderboard* , enum Failure eFailure)
+                         inlines  operator=
+  407  0060A14C     84  void LeaderboardConcrete(const struct <anon>* this, uint32_t uLobbyRankCategoryIndex, uint32_t uLobbyRankIndexIndex, uint32_t uLobbyRankVariationIndex)
+                         inlines  RCPointer
+  416  0060AA8C     58  void ~LeaderboardConcrete(const struct <anon>* this)
+                         inlines  ~RCPointer
+  439  005E0C90     5C  const char8_t* GetName(const const struct <anon>* this)
+                         local  LobbyRankT* pLobbyRank
+  465  005E0C28     68  bool IsFriendLeaderboard(const const struct <anon>* this)
+                         local  LobbyRankT* pLobbyRank
+  492  005E0B4C     DC  void GetCountry(const const struct <anon>* this, char8_t* strCountry, uint32_t uMax)
+                         local  int32_t iReturnCode
+                         local  int tempCountry
+                         local  LobbyRankT* pLobbyRank
+  533  00600E18    29C  struct Operation* DownloadSpreadSheet(const struct <anon>* this, struct LeaderboardCallback* pCallback)
+                         local  int32_t iReturnCode
+                         local  const char8_t* pLeaderboardCatName
+                         local  struct OperationStrategy* pStrategy
+                         inlines  GetElementAt, GetOperationManagerConcrete, LeaderboardOperation, operator=
+  588  005F8400     84  void CancelDownloadOperation(const struct <anon>* this)
+                         inlines  operator->, operator=

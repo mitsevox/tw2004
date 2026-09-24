@@ -1,0 +1,10 @@
+// ../../../../../TIGERCODE/packages/RNA/dev-2.0-golf/RNA/RNACore/include/RNARender/RNAGeom.h
+// compiled in: rnaunity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   43    inline-only   struct UserData* GetUserData(const const struct <anon>* this)
+   43    inline-only   void SetUserData(const struct GeomC* this, struct UserData* pData)
+   71    inline-only   struct MeshC* GetMesh(const const struct <anon>* this, int32_t iMesh)
+                         local  const char[8] __FUNCTION__
+   77    inline-only   MatIndexT GetMeshMatIndex(const const struct <anon>* this, int32_t iMesh)
+                         local  const char[16] __FUNCTION__

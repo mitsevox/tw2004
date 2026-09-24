@@ -1,0 +1,8 @@
+// C:/RW45/platform/include/native/ps3-ppu-gcc/rw/core/timer/detail/host_inlines.h
+// compiled in: movietimer.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   10    inline-only   uint64_t GetCPUCycle()
+                         local  uint64_t time
+   23    inline-only   uint64_t GetStopwatchCycle()
+                         local  uint64_t time

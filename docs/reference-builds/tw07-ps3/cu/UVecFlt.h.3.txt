@@ -1,0 +1,7 @@
+// ../ears_rt_math/dev/include/ears_rt_math/UVecFlt.h
+// compiled in: SKA_Base.c, skadecomp.cpp
+// 3 functions, source order. line | PS3 address | size
+
+  180    inline-only   static void vec3flt_Copy(const float* src, float* dest)
+  404    inline-only   static void vec4flt_ZeroW1(float* dest)
+  794    inline-only   static void vec4flt_Copy4(const float* src, float* dest)

@@ -1,0 +1,20 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_trinity_manager.cpp
+// compiled in: tiger_module_trinity_manager.cpp
+// 11 functions, source order. line | PS3 address | size
+
+    0  0053C974     68  void ~TrinityManager(const struct <anon>* this)
+                         inlines  ~Allocatable
+   10  0053C528     BC  bool8_t StartIGC(const struct <anon>* this)
+   17  0053C5E4     F4  void StopIGC(const struct <anon>* this)
+   23  0053C6D8      8  bool8_t Interrupt(const struct <anon>* this, int32_t indexIGC, bool8_t bForceInterrupt)
+   28  0053C6E0      4  void EnableActors(const struct <anon>* this)
+   32  0053C6E4      4  void DisableActors(const struct <anon>* this)
+   36  0053C6E8      4  void ReportSequenceStartUp(const struct <anon>* this, struct Sequence* pSequence)
+   41  0053C790     DC  void StartSequence(const struct <anon>* this, struct TrinitySequence* sequence)
+                         local  struct Sequence* seq
+   49  0053C86C     64  void TrinityManager(const struct <anon>* this)
+                         inlines  Allocatable
+   54  0053C6EC     2C  void Process(const struct <anon>* this, float_t timeStep)
+   59  0053C718     78  void StopSequence(const struct <anon>* this, struct TrinitySequence* sequence)
+                         local  struct Sequence* seq
+                         inlines  TrinitySequence::GetSequence

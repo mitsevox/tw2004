@@ -1,0 +1,24 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/txrtexrule.cpp
+// compiled in: other_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   45  00405F78    430  void TXRTexRule::ReadFromBuffer(const struct TXRTexRule* this, char** buffer)
+                         local  const char[15] __FUNCTION__
+                         local  int i
+                         inlines  TagValuePair, operator+
+  102  00409CE4    11C  const char* TXRTexRule_GetTextureNameAndScaleFromCurrentState(const char* variableName, struct TXRRule_TEXStateInfo* state, const int32_t& scale)
+                         local  int i
+                         inlines  TXRTexRule::GetActiveTextureName
+  121  003D3DA8     F4  bool TXRTexRule_IsActive(struct TXRRule_TEXStateInfo* state, const char* groupName, const char* selectionName)
+                         local  int i
+  134  003D4194     B8  bool TXRTexRule::SetState(const struct TXRTexRule* this, const char* texName)
+                         local  int i
+  150  003D4148     4C  bool TXRTexRule::SetStateByIndex(const struct TXRTexRule* this, int32_t index)
+  161  0042115C     F4  void TXRTexRule::ChangeTexNameByPattern(const struct TXRTexRule* this, const char* oldName, const char* newName)
+                         local  char* instance
+                         local  unsigned int i
+                         inlines  std::strstr
+  179  003D4BB4     5C  void TXRTexRule::SetTint(const struct TXRTexRule* this, int bEnabled, enum TXRTintRule_Mode tintMode, float* pTintParams)
+  186  003D4C10     70  void TXRTexRule::GetTint(const struct TXRTexRule* this, const int& bEnabledOut, const enum TXRTintRule_Mode& tintModeOut, float* pTintParamsOut)
+  196  003D45BC    11C  void TXRTexRule::Randomize(const struct TXRTexRule* this, int32_t minRand, int32_t maxRand)
+                         local  int randNum

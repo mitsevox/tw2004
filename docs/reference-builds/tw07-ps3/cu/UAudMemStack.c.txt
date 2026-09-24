@@ -1,0 +1,20 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/audio/engine/utils/UAudMemStack.c
+// compiled in: other_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   26  003FCDD4    154  void AudMemStack_Init(AudMemStack* pAudMemStack, uint32 startAddr, uint32 nBytes, uint32 maxAllocs, MemStackBlock* memBlocksA, uint32 alignPow2)
+                         local  const char[17] __FUNCTION__
+                         inlines  TagValuePair, operator+
+   56  003E4F28     4C  void AudMemStack_Term(AudMemStack* pAudMemStack)
+   69  003E50A8     A8  uint32 AudMemStack_Alloc(AudMemStack* pAudMemStack, uint32 nBytes, uint8 type)
+   79  003E5288     A8  void AudMemStack_Free(AudMemStack* pAudMemStack, uint32 addr, uint8 type)
+   89  003E4778    114  uint32 AudMemStack_AllocTop(AudMemStack* pAudMemStack, uint32 nBytes)
+                         local  MemStackBlock* pmbl
+  127  003E4BB4    10C  void AudMemStack_FreeTop(AudMemStack* pAudMemStack, uint32 addr)
+                         local  MemStackBlock* pmbl
+                         local  uint32 i
+  161  003E4F74    134  uint32 AudMemStack_AllocBtm(AudMemStack* pAudMemStack, uint32 nBytes)
+                         local  MemStackBlock* pmbl
+  199  003E5150    138  void AudMemStack_FreeBtm(AudMemStack* pAudMemStack, uint32 addr)
+                         local  MemStackBlock* pmbl
+                         local  uint32 i

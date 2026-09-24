@@ -1,0 +1,32 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/lua-5.0.2/src/lib/ltablib.c
+// compiled in: ltablib.c
+// 12 functions, source order. line | PS3 address | size
+
+   21  0055AD78    11C  static int luaB_foreachi(lua_State* L)
+                         local  int i
+                         local  int n
+   38  0055AE94     FC  static int luaB_foreach(lua_State* L)
+   56  0055AF90     6C  static int luaB_getn(lua_State* L)
+   62  0055AFFC     6C  static int luaB_setn(lua_State* L)
+   69  0055B068    150  static int luaB_tinsert(lua_State* L)
+                         local  int v
+                         local  int n
+                         local  int pos
+   91  0055B1B8    14C  static int luaB_tremove(lua_State* L)
+                         local  int n
+                         local  int pos
+  107  0055B304    1BC  static int str_concat(lua_State* L)
+                         local  luaL_Buffer b
+                         local  size_t lsep
+                         local  const char* sep
+                         local  int i
+                         local  int n
+  137  0055B4C0     58  static void set2(lua_State* L, int i, int j)
+  142  0055B518    100  static int sort_comp(lua_State* L, int a, int b)
+                         local  int res
+  157  0055B618    380  static void auxsort(lua_State* L, int l, int u)
+                         local  int i
+                         local  int j
+  220  0055B998     C4  static int luaB_sort(lua_State* L)
+                         local  int n
+  246  0055BA5C     40  int luaopen_table(lua_State* L)

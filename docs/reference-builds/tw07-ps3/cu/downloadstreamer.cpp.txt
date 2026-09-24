@@ -1,0 +1,28 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/downloadstreamer.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   73  005D8228     B0  void FileOpenCallback(struct <anon>* pAsyncOp)
+                         local  struct <anon>* pThis
+  108  005D82D8     B8  void FileWriteCallback(struct <anon>* pAsyncOp)
+                         local  struct <anon>* pThis
+  154  005B5510     C8  void FileCloseCallback(struct <anon>* pAsyncOp)
+                         local  struct <anon>* pThis
+  193  005B55D8    250  void ProcessComplete(const struct <anon>* this)
+                         local  const uint32_t uOpenFlags
+  301  005B5828    20C  int32_t ProtoStreamCallback(ProtoStreamRefT* pProtoStream, ProtoStreamStatusE eStatus, const uint8_t* pBuffer, int32_t iBufSize, void* pUserData)
+                         local  struct <anon>* pThis
+                         local  int32_t iAmountConsumed
+  372  005B5A34    110  enum DownloadStateE GetState(const struct <anon>* this)
+                         local  enum DownloadStateE eState
+  424  005B5B44     E0  uint32_t GetProgress(const struct <anon>* this)
+                         local  uint32_t uProgress
+  462  005B5C24    174  void Clear(const struct <anon>* this)
+                         local  const uint32_t uMaxWait
+                         local  uint32_t uLoop
+                         local  ThreadTime thisThreadWaitTime
+  537  005DB824     F8  void DownloadStreamer(const struct <anon>* this, struct MemoryStrategy* pMemoryStrategy, uint32_t uProtoStreamBufferSize, uint32_t uTempBufferSize)
+                         inlines  AddObserver
+  570  005DBC4C     A4  void ~DownloadStreamer(const struct <anon>* this)
+                         inlines  RemoveObserver
+  598  005B5D98     E4  void Fetch(const struct <anon>* this, const char8_t* pSourceURL, const char8_t* pDestinationFilename)

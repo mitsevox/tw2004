@@ -1,0 +1,11 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNARender/ps3/RNARender/RNADevicePlat.h
+// compiled in: CGFXShader.cpp, RNADevicePlat.cpp, RNAJobPlat.cpp, RNAStateManager.cpp
+// 7 functions, source order. line | PS3 address | size
+
+  102    inline-only   CellGcmSurface& DevicePlatC::GetGCMSurface(const struct DevicePlatC* this)
+  110    inline-only   struct <anon>& DevicePlatC::GetPreservedShaderRenderStateList(const struct DevicePlatC* this)
+  119    inline-only   struct SurfaceC* DevicePlatC::GetAuxillarySurface(const struct DevicePlatC* this)
+  148    inline-only   struct Manager* DevicePlatC::GetRenderSpuManager(const struct DevicePlatC* this)
+  158    inline-only   uint32_t* DevicePlatC::GetRSXBaseAddress(const struct DevicePlatC* this)
+  184    inline-only   void SetRenderTargetChanged(const struct <anon>* this)
+  184    inline-only   void DevicePlatC::SetRenderTargetChanged(const struct DevicePlatC* this)

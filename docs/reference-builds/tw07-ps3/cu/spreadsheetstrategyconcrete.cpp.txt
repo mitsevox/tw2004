@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/online/osdk/spreadsheetstrategyconcrete.cpp
+// compiled in: golf2_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   63  00185E54     18  void SpreadSheetStrategyConcrete::SpreadSheetStrategyConcrete(const struct SpreadSheetStrategyConcrete* this)
+   87  00129E50     38  void SpreadSheetStrategyConcrete::~SpreadSheetStrategyConcrete(const struct SpreadSheetStrategyConcrete* this)
+                         inlines  ~SpreadSheetStrategy
+  109  00129E88     14  const StringComparator* SpreadSheetStrategyConcrete::GetComparator(const struct SpreadSheetStrategyConcrete* this, const struct SpreadSheetColumnFormat* pFormat)

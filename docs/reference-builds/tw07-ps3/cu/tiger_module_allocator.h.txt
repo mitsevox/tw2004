@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/packages/tiger_module/include/tiger_module_allocator.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   21    inline-only   void Allocator::SetLock(const struct Allocator* this, bool lock)

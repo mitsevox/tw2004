@@ -1,0 +1,32 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/dailytourn/source/common/dailytournextensionconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   59  005C9F78    120  static void _TodaysTourneyInfoCallback(LobbyApiRefT* pLobbyRef, LobbyApiMsgT* pMsg, void* pData)
+                         local  TourneyMonthInfoT* monthInfo
+                         local  TourneyMonthT* curMonth
+                         local  int i
+   81  005CA098     44  static void _TodaysDateCallback(LobbyApiRefT* pLobbyRef, LobbyApiMsgT* pMsg, void* pData)
+                         local  uint16_t* caldate
+   96  005CA0DC      4  void StartGame(const struct DailyTournExtensionConcrete* this)
+  100  005CA0E0      4  void ReportGame(const struct DailyTournExtensionConcrete* this)
+  107  005CFEF0    100  void PopulateTodaysDateFromServer(const struct DailyTournExtensionConcrete* this)
+                         local  char[256] buf
+                         local  LobbyApiRefT* pLobbyApi
+                         local  struct <anon>* myLocalUser
+                         local  const char8_t* strPersona
+                         inlines  GetLobbyApi
+  128  005CE2E0    148  void PopulateCalendar(const struct DailyTournExtensionConcrete* this, int firstDate)
+                         local  char[256] buf
+                         local  LobbyApiRefT* pLobbyApi
+                         local  struct <anon>* myLocalUser
+                         local  const char8_t* strPersona
+                         inlines  GetLobbyApi
+  150  005CA0E4      C  TourneyMonthT* GetMonthlyTournaments(const struct DailyTournExtensionConcrete* this)
+  155  005CA0F0      8  uint16_t GetMaxDateTournament(const struct DailyTournExtensionConcrete* this)
+  160  005CA0F8      8  uint16_t GetMinDateTournament(const struct DailyTournExtensionConcrete* this)
+  165  005CA100      8  uint16_t GetFirstCachedDate(const struct DailyTournExtensionConcrete* this)
+  170  005F5F44     60  void DailyTournExtensionConcrete(const struct DailyTournExtensionConcrete* this)
+                         inlines  DailyTournExtension
+  178  005E52A0     38  void ~DailyTournExtensionConcrete(const struct DailyTournExtensionConcrete* this)
+                         inlines  operator delete, ~DailyTournExtension

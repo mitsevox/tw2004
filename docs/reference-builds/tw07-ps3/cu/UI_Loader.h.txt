@@ -1,0 +1,10 @@
+// ../../../../../TIGERCODE/Code/Golf/UI_Core/iStudio_Runtime/Headers/UI_Loader.h
+// compiled in: apt_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   32  0002CF88     40  void UI_Loader::~UI_Loader(const struct UI_Loader* this)
+                         local  uint32_t apxChunkType
+                         local  uint32_t fontFusionChunkType
+   38  0002CE1C     64  void UI_Loader::UI_Loader(const struct UI_Loader* this)
+                         local  uint32_t apxChunkType
+                         local  uint32_t fontFusionChunkType

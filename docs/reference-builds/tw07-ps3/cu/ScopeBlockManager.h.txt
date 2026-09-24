@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/Code/Golf/RNA/ScopeBlockManager.h
+// compiled in: rnaunity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+    9  004C5A78     10  void ScopeBlockLoaderC::ScopeBlockLoaderC(const struct ScopeBlockLoaderC* this)
+   10  004C9078      4  void ScopeBlockLoaderC::~ScopeBlockLoaderC(const struct ScopeBlockLoaderC* this)
+   12    inline-only   struct ScopeBlockLoaderC* ScopeBlockLoaderC::GetInstance()
+   30    inline-only   int32_t ScopeXMLAssetC::GetRefCount(const struct ScopeXMLAssetC* this)

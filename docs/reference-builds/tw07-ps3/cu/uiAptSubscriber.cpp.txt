@@ -1,0 +1,307 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/aptInterface/uiAptSubscriber.cpp
+// compiled in: other_unity.cpp
+// 119 functions, source order. line | PS3 address | size
+
+   79  00421608     B8  char* GetRidOfOnline_FromExtern(char* strIn)
+                         local  char* ol
+                         local  char* tempString
+                         inlines  std::strstr
+  120  003EDADC     18  char* GetLabelFromGetRidOfOnline_FromExtern()
+  125  004218F0     E8  bool FindOLInText(char* strIn, char** strOut)
+                         local  char* ol
+                         local  char* tempString
+                         inlines  std::strstr
+  147  003EA1C4     3C  const char* SignatureConverter::SignatureToString(uint32 signature)
+                         local  char[5] sStringSignature
+  162  003EDAF4     40  uint32 SignatureConverter::StringToSignature(const char* name)
+  172  0046D9E8     60  const char* SignatureConverter::SignatureToSwfNameDebug(uint32 signature)
+                         local  char[64] screenVariable
+  195  003EDB34     24  struct AptThread& AptThread::Get(const struct AptThread* this)
+  200  0043D100    398  void AptThreadManager::UpdateThread(const struct AptThreadManager* this)
+                         local  bool hasNext
+                         local  int loopCount
+                         local  struct AptThread* currentThread
+                         local  struct AptThread currentThreadVal
+                         local  const enum AptThreadReturnValue threadRetVal
+                         local  const bool stillOnSame
+                         inlines  AptThread::operator==, GetElem, Next, TChainList<AptThread>::GetCurrent, TChainList<AptThread>::GetNext, TChainList<AptThread>::GotoFirst, TChainList<AptThread>::GotoNext, TChainList<AptThread>::RemoveCurrent
+  265  0043D70C    254  void AptThreadManager::AddThread(const struct AptThreadManager* this, struct IAptSubscriberBase* instance, AptThreadFunc* notifier, bool persistent)
+                         local  struct AptThread* elem
+                         inlines  TChainList<AptThread>::AddElemBC
+  282  0043D498    274  void AptThreadManager::RemoveThread(const struct AptThreadManager* this, struct IAptSubscriberBase* instance, AptThreadFunc* notifier, bool persistent)
+                         local  struct AptThread newThread
+                         inlines  AptThread::operator==, GetElem, Next, TChainList<AptThread>::RemoveElem, TChainList<AptThread>::RemoveElemSafe
+  390  0047C754     68  struct AptSubscriberManager* AptSubscriberManager::GetManager()
+  399  004A419C     50  void AptSubscriberManager::Update(const struct AptSubscriberManager* this)
+  415  0047C6DC     78  void AptSubscriberManager::InitManager()
+                         inlines  AptSubscriberManager::operator new
+  426  0047DC5C     60  void AptSubscriberManager::CloseManager()
+                         inlines  AptSubscriberManager::operator delete
+  632    inline-only   uint32 GetScreenMagicHash(uint32 signature)
+                         local  const uint32 str0
+                         local  const uint32 str1
+                         local  const uint32 str2
+                         local  const uint32 str3
+                         local  const uint32 magicHashedKey
+  661    inline-only   uint32 GetScreenMagicHash(const char* signature)
+                         local  const uint32 magicHashedKey
+  694  004417A0    88C  void AptSubscriberManager::AddAptSubscriber(const struct AptSubscriberManager* this, struct IAptSubscriber* aptSubscriber)
+                         local  uint32 nbrElems
+                         local  uint32 index
+                         local  int i
+                         local  const uint32 index2
+                         local  struct IAptSubscriber* subscriberToRelocate
+                         local  uint32 i
+                         local  uint32 i
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, GetScreenMagicHash, TArrayInternal<IAptSubscriber*,AptStructSwapper>::Push, TArrayInternal<IAptSubscriber*,AptStructSwapper>::SetNbrElems, TArrayInternal<IAptSubscriber*,AptStructSwapper>::operator[]
+  757  0044202C    118  void AptSubscriberManager::RemoveAptSubscriber(const struct AptSubscriberManager* this, struct IAptSubscriber* aptSubscriber)
+                         local  const int nbr
+                         local  int i
+                         inlines  TArrayInternal<IAptSubscriber*,AptStructSwapper>::GetElemCount, TArrayInternal<IAptSubscriber*,AptStructSwapper>::operator[]
+  786  004427C4     C4  void AptSubscriberManager::FSCommand(const struct AptSubscriberManager* this, const char* szCommand, const char* szParams)
+                         local  struct IAptSubscriber* subsriber
+  806  004426E4     E0  void AptSubscriberManager::CustomRender(const struct AptSubscriberManager* this, const char* szType, const char* szTarget, void* renderingUnit, const char* szCustomProperties, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  struct IAptSubscriber* subsriber
+  818  00442624     C0  void AptSubscriberManager::CustomRenderNeeds(const struct AptSubscriberManager* this, char* szType, int32* needTarget, int32* needCustomProp, int32* needMatrix)
+                         local  struct IAptSubscriber* subsriber
+  882  00442528     FC  void AptSubscriberManager::SetExternVariable(const struct AptSubscriberManager* this, const char* variableName, const char* value)
+                         local  struct IAptSubscriber* subsriber
+  907  004423BC    16C  bool AptSubscriberManager::GetExternVariable(const struct AptSubscriberManager* this, const char* variableName, const enum AptExternVariable& outVariableType, const void*& outVariable)
+                         local  struct IAptSubscriber* subsriber
+                         local  bool bVariableFound
+  981  003EDB58     B0  bool AptSubscriberManager::IsValidUTF8(const char* pString)
+                         local  bool bValidUTF8
+                         local  const unsigned char* pStr
+                         local  int32 len
+                         local  unsigned char ch
+ 1051  00442144    278  struct IAptSubscriber* AptSubscriberManager::GetAptSubscriber(const struct AptSubscriberManager* this, const char* signature)
+                         local  const uint32 nbr
+                         local  const uint32 index
+                         local  const uint32 signature_32bits
+                         local  uint32 i
+                         local  struct IAptSubscriber* subscriber
+                         local  struct IAptSubscriber* subscriber
+                         inlines  GetScreenMagicHash, TArrayInternal<IAptSubscriber*,AptStructSwapper>::operator[]
+ 1090  00442888    228  struct IAptSubscriber* AptSubscriberManager::GetAptSubscriber(const struct AptSubscriberManager* this, const uint32 signature)
+                         local  const uint32 nbr
+                         local  const uint32 index
+                         local  struct IAptSubscriber* subscriber
+                         local  uint32 i
+                         local  struct IAptSubscriber* subscriber
+                         inlines  GetScreenMagicHash, TArrayInternal<IAptSubscriber*,AptStructSwapper>::operator[]
+ 1126  0042D450    30C  bool AptSubscriberVariable::AddVariable(const struct AptSubscriberVariable* this, const char* variableName, void* value, int32 type, AptNotify* notifierSet, AptNotify* notifierGet, bool notifyOnChangeOnly)
+                         local  const struct ValueType& vt
+                         inlines  AptStructSwapper::Swap, TArrayInternal<ValueType,AptStructSwapper>::Push
+ 1150  0047E8D8     50  void AptSubscriberVariable::AddThread(const struct AptSubscriberVariable* this, struct IAptSubscriber* instance, AptThreadFunc* notifier, bool persistent)
+ 1160  0047E888     50  void AptSubscriberVariable::RemoveThread(const struct AptSubscriberVariable* this, struct IAptSubscriber* instance, AptThreadFunc* notifier, bool persistent)
+ 1170  0042D874     38  bool AptSubscriberVariable::AddVariable(const struct AptSubscriberVariable* this, const char* variableName, int32* value, AptNotify* notifierSet, AptNotify* notifierGet, bool notifyOnChangeOnly)
+ 1182  0042D83C     38  bool AptSubscriberVariable::AddVariable(const struct AptSubscriberVariable* this, const char* variableName, uint32* value, AptNotify* notifierSet, AptNotify* notifierGet, bool notifyOnChangeOnly)
+ 1194  0042D804     38  bool AptSubscriberVariable::AddVariable(const struct AptSubscriberVariable* this, const char* variableName, char** value, AptNotify* notifierSet, AptNotify* notifierGet, bool notifyOnChangeOnly)
+ 1206  0042D7CC     38  bool AptSubscriberVariable::AddVariable(const struct AptSubscriberVariable* this, const char* variableName, char* value, AptNotify* notifierSet, AptNotify* notifierGet, bool notifyOnChangeOnly)
+ 1220  0042D794     38  bool AptSubscriberVariable::AddVariable(const struct AptSubscriberVariable* this, const char* variableName, bool* value, AptNotify* notifierSet, AptNotify* notifierGet, bool notifyOnChangeOnly)
+ 1232  0042D75C     38  bool AptSubscriberVariable::AddVariable(const struct AptSubscriberVariable* this, const char* variableName, float* value, AptNotify* notifierSet, AptNotify* notifierGet, bool notifyOnChangeOnly)
+ 1245  003EDC08    3B0  void AptSubscriberVariable::SetExternVariable(const struct AptSubscriberVariable* this, const char* variableName, const char* value)
+                         local  struct ValueType* vt
+                         local  int needNotify
+                         local  int32* vtVal
+                         local  int32 val
+                         local  uint32* vtVal
+                         local  uint32 val
+                         local  bool* vtVal
+                         local  int val
+                         local  float* vtVal
+                         local  float val
+                         local  struct IAptStaticCharBufBase* p
+ 1326  003EDFB8    1E4  bool AptSubscriberVariable::GetExternVariable(const struct AptSubscriberVariable* this, const char* variableName, const enum AptExternVariable& outVariableType, const void*& outVariable)
+                         local  struct ValueType* vt
+                         local  bool ok
+ 1386  0041EA54    150  bool AptSubscriberVariable::RemoveVariable(const struct AptSubscriberVariable* this, const char* variableName)
+                         local  const int32 index
+                         local  const bool ok
+                         inlines  AptStructSwapper::Swap, TArrayInternal<ValueType,AptStructSwapper>::RemoveElem
+ 1402  004279B4     94  struct ValueType* AptSubscriberVariable::FindVariable(const struct AptSubscriberVariable* this, const char* variableName)
+                         local  const int32 index
+                         inlines  TArrayInternal<ValueType,AptStructSwapper>::operator[]
+ 1415  003EE19C     E4  int32 AptSubscriberVariable::FindVariableIndex(const struct AptSubscriberVariable* this, const char* variableName)
+                         local  const int nbr
+                         local  int i
+                         local  const struct ValueType& elem
+                         inlines  TArrayInternal<ValueType,AptStructSwapper>::GetElemCount, TArrayInternal<ValueType,AptStructSwapper>::operator[]
+ 1434  0047E364     30  void AptSubscriberVariable::Init(const struct AptSubscriberVariable* this)
+ 1444  0047D114     74  void AptSubscriberVariable::Close(const struct AptSubscriberVariable* this)
+                         inlines  AptStructSwapper::Free, AptSubscriberVariable::RemoveAllVariables
+ 1457  0049D608     14  void AptSubscriberVariable::CallFlashFunction(const struct AptSubscriberVariable* this, char* name)
+ 1467  003EE280    10C  void AptSubscriberVariableGrp::AddVariableList(const struct AptSubscriberVariableGrp* this, struct ValueType* vtList, int32 nbr)
+                         local  int i
+                         local  const struct ValueType& valueType
+                         local  struct IAptStaticCharBufBase* p
+ 1495  00427A48     C4  struct ValueType* AptSubscriberVariableGrp::FindVariable(const struct AptSubscriberVariableGrp* this, const char* variableName)
+                         local  int i
+ 1542  0047CF30     60  void AptSequence::Close(const struct AptSequence* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<AptSequenceItem,AptStructSwapper>::Flush
+ 1553  0047C900    268  void AptSequence::ClearSequence(const struct AptSequence* this)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<AptSequenceItem,AptStructSwapper>::SetNbrElems
+ 1568  0042D194    254  void AptSequence::StopSequence(const struct AptSequence* this)
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<AptSequenceItem,AptStructSwapper>::SetNbrElems
+ 1582  003EE38C     10  void AptSequence::AnimationComplete_AddRef(const struct AptSequence* this)
+ 1590  0042F8F0    2C8  void AptSequence::AddSequenceFunc(const struct AptSequence* this, struct IAptSubscriberBase* inInstance, AptSequenceFunc* inSequenceFunc, void* inData)
+                         local  int32 oIndex
+                         local  const struct AptSequenceItem& oItem
+                         inlines  AptStructSwapper::AllocArray2, AptStructSwapper::Swap, TArrayInternal<AptSequenceItem,AptStructSwapper>::GetElemCount, TArrayInternal<AptSequenceItem,AptStructSwapper>::SetNbrElems, TArrayInternal<AptSequenceItem,AptStructSwapper>::operator[]
+ 1607  0042FBB8    170  void AptSequence::RemoveSequenceFunc(const struct AptSequence* this, struct IAptSubscriberBase* inInstance, AptSequenceFunc* inSequenceFunc)
+                         local  int i
+                         local  const struct AptSequenceItem& oItem
+                         inlines  TArrayInternal<AptSequenceItem,AptStructSwapper>::RemoveElem, TArrayInternal<AptSequenceItem,AptStructSwapper>::operator[]
+ 1626  004117D0     1C  bool AptSequence::IsSequenceComplete(const struct AptSequence* this)
+ 1638  0042FDFC    130  int32 AptSequence::Run(const struct AptSequence* this)
+                         local  enum TAptSequenceStatus oResult
+                         local  const struct AptSequenceItem& oItem
+                         inlines  TArrayInternal<AptSequenceItem,AptStructSwapper>::operator[]
+ 1674  0047CF14     1C  void AptSequence::AddTrace(const struct AptSequence* this, char* inTrace)
+ 1684  0047CEF8     1C  void AptSequence::AddStall(const struct AptSequence* this, int32 inStallCount)
+ 1695  0047CC14     1C  void AptSequence::AddWaitForAnim(const struct AptSequence* this)
+ 1705  0047CBF8     1C  void AptSequence::AddWaitForAnimTimeOut(const struct AptSequence* this, int32 nbrFrames)
+ 1717  0047CB68     90  void AptSequence::AddToSequence(const struct AptSequence* this, struct IAptSubscriberBase* inInstance, AptSequenceFunc* inSequenceFunc, void* inData)
+ 1733  0047C88C     74  enum AptThreadReturnValue AptSequence::RunSequenceThread(const struct AptSequence* this)
+ 1747  003D55A0      8  enum TAptSequenceStatus AptSequence::TraceSequence(const struct AptSequence* this, bool inbFirstTime, void* inData)
+ 1757  003D55A8     60  enum TAptSequenceStatus AptSequence::StallSequence(const struct AptSequence* this, bool inbFirstTime, void* inData)
+ 1777  0042FF2C    27C  enum TAptSequenceStatus AptSequence::WaitForAnimSequence(const struct AptSequence* this, bool inbFirstTime, void* inData)
+                         local  const int32 index
+                         local  const struct AptSequenceItem& oItem
+                         local  struct IAptSubscriber* opScreen
+                         local  const int32 index
+                         local  const struct AptSequenceItem& oItem
+                         local  struct IAptSubscriber* opScreen
+                         local  char[512] stingFailHud
+                         local  int32 gDebugSequence
+                         inlines  TArrayInternal<AptSequenceItem,AptStructSwapper>::operator[]
+ 1837  003EDA60     50  char* GetLanguageExtension(int32 languageId)
+ 1883  0047C354     5C  void AptGameSubscriber::AptGameSubscriber(const struct AptGameSubscriber* this)
+ 1901  004216C0    230  bool AptGameSubscriber::GetExternVariable(const struct AptGameSubscriber* this, const char* variableName, const enum AptExternVariable& outVariableType, const void*& outVariable)
+ 1976  003EE3A8     D8  eAptSlot GetZoneIdFromName(char* name)
+                         local  const int kNbrZones
+                         local  int i
+ 1993  003EE480     4C  static void FindComma(char* comma, const char*& thisObject)
+ 2007  0047460C     E0  void AptGameSubscriber::ShowHideAllButFocus(const struct AptGameSubscriber* this, int32 show)
+                         local  char[256] string
+                         local  struct IAptControllerListener* listener
+                         local  struct AptScreenSubscriber* screen
+                         local  const char* signature
+                         local  const int32 alpha
+ 2040  004A3200    3F8  void AptGameSubscriber::FSCommand(const struct AptGameSubscriber* this, const char* szCommand, const char* szParams)
+                         local  char[256] animationName
+                         local  char[128] instanceName
+                         local  char* functionName
+                         local  char* thisObject
+                         local  char* comma
+                         local  float toWait
+                         local  unsigned int index
+                         local  unsigned int len
+ 2123  00488AE8    27C  void AptGameSubscriber::CustomRender(const struct AptGameSubscriber* this, const char* szType, const char* szTarget, void* renderingUnit, const char* szCustomProperties, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  float x0
+                         local  float y0
+                         local  float x1
+                         local  float y1
+                         local  int32 index
+                         local  const struct X0Y0X1Y1& rect
+                         inlines  ThumbNailManager::GetTexFactory
+ 2219  0049D348    2C0  void AptGameSubscriber::WaitAndCallAS(const struct AptGameSubscriber* this, float waitTime, char* waitAndCallAS)
+                         local  TI_STimeValue startTime
+                         inlines  sys_time_get_timebase_frequency
+ 2243  0049D2D8     70  enum TAptSequenceStatus AptGameSubscriber::WaitSequence(const struct AptGameSubscriber* this, bool inbFirstTime, void* inData)
+                         local  TI_STimeValue startTime
+ 2323  00451CD0     EC  void AptSoundSubscriber::FSCommand(const struct AptSoundSubscriber* this, const char* szCommand, const char* szParams)
+                         local  const char* idString
+                         local  int32 soundId
+                         local  const char* idString
+                         local  int32 soundId
+ 2360  00460F68     9C  void AptDebugSubscriber::AptDebugSubscriber(const struct AptDebugSubscriber* this)
+                         inlines  AptSubscriberVariable::AptSubscriberVariable, TArrayInternal<ValueType,AptStructSwapper>::TArrayInternal
+ 2370  003D5914     38  void AptDebugSubscriber::notifyStartTimer(const struct AptDebugSubscriber* this)
+ 2382  00413F90    194  void AptDebugSubscriber::timerRequest(const struct AptDebugSubscriber* this)
+                         local  TI_STimeValue oTime
+                         inlines  TI_fConvertTimeDifToSeconds
+ 2396  0047E394     9C  void AptScreenSubscriber::Init(const struct AptScreenSubscriber* this)
+                         inlines  AptScreenSubscriber::SetSignature
+ 2413  003EE39C      C  void AptScreenSubscriber::NotifyAnimationComplete(const struct AptScreenSubscriber* this)
+ 2424  0047D188     70  void AptScreenSubscriber::Close(const struct AptScreenSubscriber* this)
+                         inlines  AptSubscriberVariableGrp::Close
+ 2440  0047CD94    164  void AptScreenSubscriber::Show(const struct AptScreenSubscriber* this)
+ 2471  003D590C      8  enum TAptSequenceStatus AptScreenSubscriber::WaitForExternalEventsToFinish(const struct AptScreenSubscriber* this, bool inbFirstTime, void* inData)
+ 2497  0049D218     C0  void AptScreenSubscriber::ShowHelpText(const struct AptScreenSubscriber* this)
+                         local  char[10] mc
+                         local  char[256] returnValue
+ 2512  0047CC30    164  void AptScreenSubscriber::Hide(const struct AptScreenSubscriber* this)
+ 2541  004744DC     A8  void AptScreenSubscriber::FixVisibility(const struct AptScreenSubscriber* this)
+                         local  char[14] path
+                         local  int retVal
+ 2559  00474584     88  void AptScreenSubscriber::GhostScreen(const struct AptScreenSubscriber* this)
+                         local  char[14] path
+ 2574  00474460     7C  void AptScreenSubscriber::UnGhostScreen(const struct AptScreenSubscriber* this)
+                         local  char[14] path
+ 2586  004743C8     98  void AptScreenSubscriber::GhostScreenAlpha(const struct AptScreenSubscriber* this, bool forceToDoIt)
+                         local  char[14] path
+ 2599  0047434C     7C  void AptScreenSubscriber::UnGhostScreenAlpha(const struct AptScreenSubscriber* this)
+                         local  char[14] path
+ 2609  0049D120     F8  void AptScreenSubscriber::RegainFocusScreenSubscriber(const struct AptScreenSubscriber* this, uint32 comeFrom_Signature)
+                         local  char[10] mc
+ 2627  0047D36C     70  enum TAptSequenceStatus AptScreenSubscriber::UnregisterScreenSequence(const struct AptScreenSubscriber* this, bool inbFirstTime, void* inData)
+ 2638  003E9FE4    10C  enum TAptSequenceStatus AptScreenSubscriber::SubmitRegainFocusSequence(const struct AptScreenSubscriber* this, bool inbFirstTime, void* inData)
+                         local  struct IAptControllerListener* newListener
+ 2662  003E9EB4    130  enum TAptSequenceStatus AptScreenSubscriber::SubmitLooseFocusSequence(const struct AptScreenSubscriber* this, bool inbFirstTime, void* inData)
+                         local  struct IAptControllerListener* newListener
+ 2682  003D5608     40  enum TAptSequenceStatus AptScreenSubscriber::ControllerListenSequence(const struct AptScreenSubscriber* this, bool inbFirstTime, void* inData)
+ 2691  003D5648     40  enum TAptSequenceStatus AptScreenSubscriber::ControllerReleaseSequence(const struct AptScreenSubscriber* this, bool inbFirstTime, void* inData)
+ 2700  003D5688     40  enum TAptSequenceStatus AptScreenSubscriber::EnableInputSequence(const struct AptScreenSubscriber* this, bool inbFirstTime, void* inData)
+ 2709  003D56C8     40  enum TAptSequenceStatus AptScreenSubscriber::DisableInputSequence(const struct AptScreenSubscriber* this, bool inbFirstTime, void* inData)
+ 2720  003D586C     40  enum TAptSequenceStatus AptScreenSubscriber::ShowHelpTextSequence(const struct AptScreenSubscriber* this, bool inbFirstTime, void* inData)
+ 2730  003D58AC     1C  enum TAptSequenceStatus AptScreenSubscriber::StartHiddenToVisibleSequence(const struct AptScreenSubscriber* this, bool inbFirstTime, void* inData)
+ 2740  003D58C8     44  enum TAptSequenceStatus AptScreenSubscriber::StartVisibleToHiddenSequence(const struct AptScreenSubscriber* this, bool inbFirstTime, void* inData)
+ 2752  003D5708     BC  enum TAptSequenceStatus AptScreenSubscriber::OnShowSequence(const struct AptScreenSubscriber* this, bool inbFirstTime, void* inData)
+ 2767  003D57C4     A8  enum TAptSequenceStatus AptScreenSubscriber::OnHideSequence(const struct AptScreenSubscriber* this, bool inbFirstTime, void* inData)
+ 2784  0049D0FC     24  enum TAptSequenceStatus AptScreenSubscriber::OpenScreenSequence(const struct AptScreenSubscriber* this, bool inbFirstTime, void* inData)
+ 2793  0049D094     68  void AptScreenSubscriber::OpenScreen(const struct AptScreenSubscriber* this)
+ 2805  0049D070     24  enum TAptSequenceStatus AptScreenSubscriber::CloseScreenSequence(const struct AptScreenSubscriber* this, bool inbFirstTime, void* inData)
+ 2814  0049D008     68  void AptScreenSubscriber::CloseScreen(const struct AptScreenSubscriber* this)
+ 2822  0049CF8C     7C  enum TAptSequenceStatus AptScreenSubscriber::OnCloseScreenSequence(const struct AptScreenSubscriber* this, bool inbFirstTime, void* inData)
+ 2834  003EE4CC     BC  void AptScreenSubscriber::FSCommand(const struct AptScreenSubscriber* this, const char* szCommand, const char* szParams)
+ 2843  0049CE3C    150  enum eAptHandleInput AptScreenSubscriber::HandleInput(const struct AptScreenSubscriber* this, int32 cID)
+                         local  char[10] mc
+                         local  char* keyStr
+                         local  enum eAptHandleInput ret
+                         local  int i
+                         local  char[256] returnValue
+ 2875  0042FD28     90  void AptScreenSubscriber::ReloadScreen(const struct AptScreenSubscriber* this)
+ 2888  00474A04    190  void AptScreenSubscriber::SetFlashString(const struct AptScreenSubscriber* this, char* szName, const char* szValue)
+                         local  char[192] tmpBuf
+                         local  char[192] outBuf
+                         local  uint8[4] sig
+                         local  va_list arglist
+                         local  char* argPart
+                         inlines  std::strstr
+ 2926  0047423C    110  void AptScreenSubscriber::SetFlashInt(const struct AptScreenSubscriber* this, char* szName, int32 szValue)
+                         local  char[128] tmpBuf
+                         local  char[128] outBuf
+                         local  uint8[4] sig
+                         local  va_list arglist
+ 2953  0047D3DC    1D8  void UIScreenManager::~UIScreenManager(const struct UIScreenManager* this)
+                         local  int i
+                         local  struct AptScreenSubscriber* screen
+                         inlines  AptInt32::GetPtr, AptStructSwapper::Free, AptSubscriberVariable::~AptSubscriberVariable, IAptSubscriber::operator delete, IAptSubscriber::~IAptSubscriber, TArrayInternal<AptInt32,AptStructSwapper>::Flush, TArrayInternal<AptInt32,AptStructSwapper>::operator[], TArrayInternal<AptInt32,AptStructSwapper>::~TArrayInternal, ~TAptArrayStruct
+ 2971  0047E804     84  void UIScreenManager::FSCommand(const struct UIScreenManager* this, const char* szCommand, const char* szParams)
+ 2984  0047E430    300  void UIScreenManager::RegisterScreen(const struct UIScreenManager* this, uint32 signature)
+                         local  struct AptScreenSubscriber* screen
+                         inlines  AptInt32::SetPtr, AptScreenSubscriber::AptScreenSubscriber, AptScreenSubscriber::SetSignature, AptStructSwapper::Swap, AptSubscriberVariableGrp::AptSubscriberVariableGrp, IAptSubscriber::operator new, TAptArrayStruct, TArrayInternal<AptInt32,AptStructSwapper>::Push, TArrayInternal<ValueType,AptStructSwapper>::TArrayInternal
+ 3012  0047D1F8    174  void UIScreenManager::UnregisterScreen(const struct UIScreenManager* this, uint32 signature)
+                         local  int i
+                         local  struct AptScreenSubscriber* screen
+                         inlines  TArrayInternal<AptInt32,AptStructSwapper>::RemoveElem, TArrayInternal<AptInt32,AptStructSwapper>::operator[]
+ 3034  0047E730     D4  void UIScreenManager::ShowScreen(const struct UIScreenManager* this, uint32 signature)
+                         local  struct AptScreenSubscriber* screen
+ 3048  0047C81C     70  void UIScreenManager::HideScreen(const struct UIScreenManager* this, uint32 signature)
+                         local  struct AptScreenSubscriber* screen
+ 3060  003EE588     40  bool UIScreenManager::IsSubScreen(const struct UIScreenManager* this, uint32 signature)
+                         local  bool retVal
+ 3082  0042FDB8     44  void Apt_CO_Console_ReloadCurrentScreen()
+                         local  struct IAptControllerListener* currentListener
+                         local  struct AptScreenSubscriber* aptScreenSubscriber

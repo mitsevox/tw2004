@@ -1,0 +1,14 @@
+// ../../../../../TIGERCODE/Code/Golf/Hi-Rendering/Headers/GoFrameBuf.h
+// compiled in: apt_unity.cpp, golf_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+  196    inline-only   float VM_fGetFrameBufferHeightOverWidth(FB_SFrameBuffer* spFrameBuffer_p)
+  257    inline-only   float FB_fGetFrameBufferOffsetX(FB_SFrameBuffer* spFrameBuffer_p)
+  269    inline-only   float FB_fGetFrameBufferOffsetY(FB_SFrameBuffer* spFrameBuffer_p)
+  281    inline-only   float FB_fGetFrameBufferWidth(FB_SFrameBuffer* spFrameBuffer_p)
+  293    inline-only   float FB_fGetFrameBufferHeight(FB_SFrameBuffer* spFrameBuffer_p)
+  317    inline-only   float FB_fGetFrameBufferHeightRatio(FB_SFrameBuffer* spFrameBuffer_p)
+  329    inline-only   float FB_fGetFrameBufferOneOverWidthRatio(FB_SFrameBuffer* spFrameBuffer_p)
+  341    inline-only   float FB_fGetFrameBufferOneOverHeightRatio(FB_SFrameBuffer* spFrameBuffer_p)
+  359    inline-only   void FB_vSetFrameBuffer(FB_SFrameBuffer* spFrameBuffer_p, float fOffsetX_p, float fOffsetY_p, float fWidth_p, float fHeight_p, float fWidthRatio_p, float fHeightRatio_p)
+  390    inline-only   void FB_vSetDefaultFrameBuffer(FB_SFrameBuffer* spFrameBuffer_p)

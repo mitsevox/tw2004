@@ -1,0 +1,8 @@
+// C:/dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/target/ppu/include/stdlib.h
+// compiled in: Legacy_unity.cpp, apt_unity.cpp, other_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+  170    inline-only   double std::atof(const char* _Str)
+  175    inline-only   int std::atoi(const char* _Str)
+  180    inline-only   long int std::atol(const char* _Str)
+  199    inline-only   long unsigned int std::strtoul(const char* _Str, char** _Endptr, int _Base)

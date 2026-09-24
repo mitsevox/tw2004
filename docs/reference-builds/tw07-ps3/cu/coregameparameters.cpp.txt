@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/gamefacade/coregameparameters.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   54  005C59F4     48  void CoreGameParameters(const struct <anon>* this)
+   72  005B2C00     58  void ~CoreGameParameters(const struct <anon>* this)
+   91  005B2BA8      4  void Validate(const const struct CoreGameParameters* this)
+  113  005B2BAC      4  void Print(const const struct CoreGameParameters* this)

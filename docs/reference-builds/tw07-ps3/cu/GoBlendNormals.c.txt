@@ -1,0 +1,58 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/GoBlendNormals.c
+// compiled in: golf_unity.cpp
+// 26 functions, source order. line | PS3 address | size
+
+   26  00226950     90  void GoBlendNormals_InitModule(struct CharTexController* pControllerArray, uint32 numControllers)
+                         local  uint32 i
+   39  00226A50     88  void GoBlendNormals_CloseModule(struct CharTexController* pControllerArray, uint32 numControllers)
+                         local  uint32 i
+   48  0030821C     98  void GoBlendNormals_UpdateBlendedNormalMaps(struct TCharacter* pCharacter)
+   66  0022678C     5C  void S2dRenderTarget::Create(const struct S2dRenderTarget* this, uint32 width, uint32 height, TextureFormat format)
+   71  002267E8     48  void S2dRenderTarget::Release(const struct S2dRenderTarget* this)
+   78  00226830     2C  uint32 S2dRenderTarget::GetWidth(const struct S2dRenderTarget* this)
+   82  0022685C     2C  uint32 S2dRenderTarget::GetHeight(const struct S2dRenderTarget* this)
+   89  00226888     68  void SBlendCtrl::init(const struct SBlendCtrl* this)
+                         local  int i
+   99  002269EC     64  void SBlendCtrl::term(const struct SBlendCtrl* this)
+                         local  int32 chan
+  115  002268F0     60  void SBlendCtrl::create(const struct SBlendCtrl* this, uint32 rtWidth, uint32 rtHeight)
+  126  00226AD8     EC  void SBlendCtrl::update(const struct SBlendCtrl* this)
+                         local  int32 chan
+  154  002FE0A0      4  void SBlendCtrl::blendNormals(const struct SBlendCtrl* this)
+  159  002FDD24    37C  void SBlendCtrl::blendNormalsPartialTextures(const struct SBlendCtrl* this)
+                         local  TextureRef[8] textures
+                         local  float[8] values
+                         local  float[8] minUs
+                         local  float[8] minVs
+                         local  float[8] maxUs
+                         local  float[8] maxVs
+                         local  int32 blend
+                         local  struct SChannel* pChannel
+                         local  float uScale
+                         local  float vScale
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaTestMode, DS_vSetZTestEnable, Gcm::cellGcmSetAlphaTestEnable, SBlendCtrl::getNumActiveChannels
+  235  00265978    27C  void SBlendCtrl::DrawQuadNormals(const struct SBlendCtrl* this, TextureRef ref, float l, float t, float r, float b, int numUVs, float* minUs, float* minVs, float* maxUs, float* maxVs)
+                         local  vec4flt coord1
+                         local  vec4flt coord2
+                         local  struct vtxStruct[4] vertices
+                         inlines  vtxStruct::Set
+  266  00226C40     B0  void SBlendCtrl::setChannel(const struct SBlendCtrl* this, int32 channelNum, float contribution)
+  288  00226CF0     7C  float SBlendCtrl::getChannel(const const struct SBlendCtrl* this, int32 channelNum)
+  299  00226E04     7C  void SBlendCtrl::setChannelTexture(const struct SBlendCtrl* this, int32 channelNum, TextureRef txt, const struct UV_EndMinMax& uvEndMinMax)
+  310  00226BC4     7C  struct SChannel* SBlendCtrl::getActiveChannel(const struct SBlendCtrl* this, int32 index)
+  321  00226D6C     98  void SChannel::setChannelTexture(const struct SChannel* this, TextureRef txt, const struct UV_EndMinMax& uvEndMinMax)
+  335  002269E0      C  void SChannel::release(const struct SChannel* this)
+  344  00226E80     80  void GoBlendNormals_SetFaceChannel(struct CharTexController* pTexController, enum eFaceNormBlenderChannels index, float value)
+  356  00226F00     70  float GoBlendNormals_GetFaceChannel(struct CharTexController* pTexController, enum eFaceNormBlenderChannels index)
+  410  002FE0A4     38  void GoRenderUtils_BlendNormals(struct CharTexController* pTexController)
+                         local  struct SBlendCtrl* pBlendCtrl
+  468  0029BDE0     88  void GoBlendNormals_Debug_DrawBlendNormals(struct CharTexController* pTexController)
+                         local  bool doDrawBlendNormals
+                         local  vec4flt rect
+  498    inline-only   static void TuneAddFaceBlender(int ownerID, const char* name, const struct SBlendCtrl& blender)
+                         local  int parentID
+  525  00226FE8    3F4  void TuneNormalBlending()
+                         local  int characterId
+                         local  int parentID
+                         local  struct CharTexController* pTexController
+                         inlines  TuneAddFaceBlender

@@ -1,0 +1,14 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/UI_HUD.h
+// compiled in: apt_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   68  000FE40C      C  uint32 UIHud::GetSignature(const const struct UIHud* this)
+   73  000FE420      8  uint32 UIHud::getUIResponseHandlerOptions(const struct UIHud* this)
+   88  00103480     14  void UIHud::ExternSet_func(struct IAptSubscriber* subs)
+   92  001162A4     14  enum AptThreadReturnValue UIHud::GolferLieCycleThread_func(struct IAptSubscriberBase* subs)
+   93  0010340C     14  enum AptThreadReturnValue UIHud::PostShotManager_AptThread_func(struct IAptSubscriberBase* subs)
+   94  000FE428     14  enum AptThreadReturnValue UIHud::TransitionToZoomTargetPanelHeight_AptThread_func(struct IAptSubscriberBase* subs)
+   96  000FE43C     14  void UIHud::GetOnline_func(struct IAptSubscriber* subs)
+   97  001162D4     14  enum AptThreadReturnValue UIHud::WaitForOpportunityAndAskToQuit_func(struct IAptSubscriberBase* subs)
+  103  00104288     14  enum AptThreadReturnValue UIHud::PostShowHide_AptThread_func(struct IAptSubscriberBase* subs)
+  119  000FE450     14  enum TAptSequenceStatus UIHud::FixVisibilitySequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)

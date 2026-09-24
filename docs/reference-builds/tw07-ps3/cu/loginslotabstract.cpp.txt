@@ -1,0 +1,19 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/loginslotabstract.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   75  005EC2F4     5C  void LoginSlotAbstract(const struct <anon>* this, uint32_t uSlotIndex)
+  101  005E3B70      C  void ~LoginSlotAbstract(const struct <anon>* this)
+  123  0061A804    13C  struct LoginOperation* Login(const struct <anon>* this, struct <anon>* pCallback, enum OsdkState eFinalState)
+                         local  struct OperationStrategy* pLoginStrategy
+                         local  struct OperationConcrete* pLoginOperation
+                         inlines  GetOperationManagerConcrete, SetFinalState, operator new
+  153  005CE844    138  enum LoginState GetLoginState(const const struct <anon>* this)
+                         local  struct <anon>* pFacade
+                         local  enum OsdkState eOsdkState
+                         local  enum LoginState eState
+                         local  const char8_t* strName
+  225  005CC8F4     74  const char8_t* GetLocale(const const struct <anon>* this)
+                         local  const char8_t* pLocale
+                         local  const struct CoreGameParameters* pCoreParameters
+  262  005BBB44     10  void SetLocale(const struct <anon>* this, const char8_t* pLocale)

@@ -1,0 +1,73 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_MenuCirc.cpp
+// compiled in: apt_unity.cpp
+// 37 functions, source order. line | PS3 address | size
+
+   47  000EFA14     80  void UIMenuCirc::Init(const struct UIMenuCirc* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList
+   60  0009D098    12C  void UIMenuCirc::UpdateItemAndLabelFlash(const struct UIMenuCirc* this, struct UIMenuItemBaseDst* inMenuItem, int32 index, char* label)
+                         local  struct UiMenuItemDefaultDst* menuItem
+                         local  char* strOut
+   88  000BAF3C    274  enum eAptHandleInput UIMenuCirc::HandleInput(const struct UIMenuCirc* this, int32 cID)
+                         local  enum eAptHandleInput retVal
+                         inlines  OnlineManagerOSDK::GetInstance
+  181  00057720    154  void UIMenuCirc::ShowHelpText(const struct UIMenuCirc* this)
+  202  00079418     5C  void UIMenuCircDefault::Init(const struct UIMenuCircDefault* this)
+                         inlines  AptScreenSubscriber::SetCanShowOptionsScreen, UIMenuBase::SetMaxRefCount
+  221  000223E8     68  enum AptThreadReturnValue UIMenuCircDefault::WaitToAllowSelectThread(const struct UIMenuCircDefault* this)
+                         local  bool stop
+  243  00043928      4  void UIMenuCircDefault::WaitToAllowSelect(const struct UIMenuCircDefault* this, bool up)
+  258  00082CDC    290  enum eAptHandleInput UIMenuCircDefault::HandleInput(const struct UIMenuCircDefault* this, int32 cID)
+                         local  enum eAptHandleInput retVal
+                         local  int32 index
+                         local  char[32] integerStr
+                         local  char[256] myTempString
+                         local  char* newIdStr
+  381  000F43EC     68  void UIMenuCircBase::UIMenuCircBase(const struct UIMenuCircBase* this)
+  393  00041F78     34  void UIMenuCircBase::Init(const struct UIMenuCircBase* this)
+  406  0004392C     E4  void UIMenuCircBase::BuildCustomCloseScreenSequence(const struct UIMenuCircBase* this)
+  427  00043A10     D8  void UIMenuCircBase::BuildCustomOpenScreenSequence(const struct UIMenuCircBase* this)
+  442  00043AE8     CC  void UIMenuCircBase::ShowCircMenu(const struct UIMenuCircBase* this)
+                         local  char[10] showMenuStr
+  454  00022368     40  enum TAptSequenceStatus UIMenuCircBase::ShowCircMenuSequence(const struct UIMenuCircBase* this, bool inbFirstTime, void* inData)
+  464  00043148     98  enum TAptSequenceStatus UIMenuCircBase::InitMenuSequence(const struct UIMenuCircBase* this, bool inbFirstTime, void* inData)
+  488  0006D6F8     98  void UIMenuCircBase::InitMenuParams(const struct UIMenuCircBase* this)
+  503  000430F4     54  enum TAptSequenceStatus UIMenuCircBase::InitMenuSequenceBack(const struct UIMenuCircBase* this, bool inbFirstTime, void* inData)
+  516  00081FA4    124  enum TAptSequenceStatus UIMenuCircBase::StoreMenuPosSequence(const struct UIMenuCircBase* this, bool inbFirstTime, void* inData)
+                         local  const int32 menuLevel
+  543  00043BB4     E4  void UIMenuCircBase::HideCircMenu(const struct UIMenuCircBase* this)
+                         local  char[10] hideMenuStr
+                         local  int32 i
+  567  000223A8     40  enum TAptSequenceStatus UIMenuCircBase::HideCircMenuSequence(const struct UIMenuCircBase* this, bool inbFirstTime, void* inData)
+  577  00082504    108  enum eAptHandleInput UIMenuCircBase::HandleInput(const struct UIMenuCircBase* this, int32 cID)
+  612  00043C98     2C  void UIMenuCircBase::ResetSavePositions(const struct UIMenuCircBase* this)
+                         local  int i
+  624  000637E8    1CC  void UIMenuCircDefault::RegainFocus(const struct UIMenuCircDefault* this, uint32 screenId)
+  660  000623E8     7C  void UIMenuCircDefault::LooseFocus(const struct UIMenuCircDefault* this, uint32 screenId)
+  671  00057874    10C  void UIMenuCircDefault::ShowHelpText(const struct UIMenuCircDefault* this)
+  693  0006D790     4C  void UIMenuCircDefault::InitMenuParams(const struct UIMenuCircDefault* this)
+  718  00043DE0    118  void UIMenuCircDefault::ShowHideInactiveItemsInMenu(const struct UIMenuCircDefault* this, bool show)
+                         local  char[64] clip
+                         local  int level
+                         local  const int32 activeMC
+                         local  int mN
+  744  00043EF8     98  void UIMenuCircDefault::QuickHide(const struct UIMenuCircDefault* this)
+  756  00043D64     38  void UIMenuCircDefault::GhostScreen(const struct UIMenuCircDefault* this)
+  769  00043CC4     5C  void UIMenuCircDefault::UnGhostScreen(const struct UIMenuCircDefault* this)
+  780  0009CF7C     8C  void UIMenuCircDefault::UpdateItemAndLabel(const struct UIMenuCircDefault* this, struct UIMenuItemBaseDst* dst, struct UIMenuItemBaseSrc* src, int32 index, char* inLabel)
+                         inlines  DefaultMenuArrayUpdate<UIMenuCircBase>::UpdateItemAndLabel
+  794  0009D008     90  void UIMenuCircDefault::UpdateItemAndLabelFlash(const struct UIMenuCircDefault* this, struct UIMenuItemBaseDst* inMenuItem, int32 index, char* label)
+                         inlines  DefaultMenuArrayUpdate<UIMenuCircBase>::UpdateItemAndLabelFlash
+  808  00043F90    11C  void UIMenuCircDefault::MenuFinishInitializations(const struct UIMenuCircDefault* this)
+                         local  char[64] clip
+                         local  int32 max
+                         local  int mN
+                         local  int32 outW
+                         local  int32 outH
+                         local  int32 outNbrLines
+  836  000440AC     70  void UIMenuCircDefault::BuildCustomOpenScreenSequence(const struct UIMenuCircDefault* this)
+  846  0004411C     58  void UIMenuCircDefault::BuildCustomCloseScreenSequence(const struct UIMenuCircDefault* this)
+  855  00044174     88  void UIMenuCircDefault::ShowCircMenu(const struct UIMenuCircDefault* this)
+                         local  char[16] param
+  867  000441FC     B4  void UIMenuCircDefault::HideCircMenu(const struct UIMenuCircDefault* this)
+                         local  char[16] param
+                         local  int32 i

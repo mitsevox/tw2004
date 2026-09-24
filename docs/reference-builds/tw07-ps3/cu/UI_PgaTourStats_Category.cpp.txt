@@ -1,0 +1,47 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_PgaTourStats_Category.cpp
+// compiled in: apt_unity.cpp
+// 18 functions, source order. line | PS3 address | size
+
+  173  000F848C     E4  void UIPgaTourStats_Category::UIPgaTourStats_Category(const struct UIPgaTourStats_Category* this)
+                         inlines  PgaFlashItem::PgaFlashItem, TArrayInternal<UIPgaTourStats_Category::PgaFlashItem,AptStructSwapper>::TArrayInternal, TExternArray<UIPgaTourStats_Category::PgaFlashItem>::TExternArray, UIMenuVertBase::SetNumVisibleVertRows, UIMenuVertBase::UIMenuVertBase
+  188  000F0DBC     88  void UIPgaTourStats_Category::Init(const struct UIPgaTourStats_Category* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init
+  200  000971B0      4  void UIPgaTourStats_Category::Close(const struct UIPgaTourStats_Category* this)
+  205  0004915C     A4  void UIPgaTourStats_Category::UpdateHeaderStrings(const struct UIPgaTourStats_Category* this)
+                         local  int32 activeCategory
+                         local  enum Column2HeaderType headerType
+  219  000A22E0     58  void UIPgaTourStats_Category::UpdatePlayerStrings(const struct UIPgaTourStats_Category* this)
+                         local  int32 userRow
+  234    inline-only   static bool _CanShowFedExScreen()
+                         local  int32 iRound
+                         local  GM_PgaTourEventID_t iEventID
+                         local  void* pDataPtr
+                         local  CalendarDate date
+                         local  struct GameModeDriverPGATour* driver
+  255  0007A87C     50  static void _BackToStatsPlayerOrMenu()
+                         inlines  UIPgaTourStats_Category::SetShowFedExRankFlag
+  265  000CF57C    254  void UIPgaTourStats_Category::Show(const struct UIPgaTourStats_Category* this)
+                         inlines  UIMenuVertBase::SetNumVisibleVertRows, _CanShowFedExScreen
+  312  00049200     54  void UIPgaTourStats_Category::OnHide(const struct UIPgaTourStats_Category* this)
+  319  00049254     8C  void UIPgaTourStats_Category::OnShow(const struct UIPgaTourStats_Category* this)
+  331  000492E0     84  void UIPgaTourStats_Category::RefreshMenu(const struct UIPgaTourStats_Category* this)
+  338  000862C8    150  void UIPgaTourStats_Category::CategoryRankingHandleInput(const struct UIPgaTourStats_Category* this, int32 cID)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen
+  369  00086418     24  enum eAptHandleInput UIPgaTourStats_Category::HandleInput(const struct UIPgaTourStats_Category* this, int32 cID)
+  375  00049364     40  void UIPgaTourStats_Category::ChangeCategoryMenuItems(const struct UIPgaTourStats_Category* this)
+  380  000A2174    160  void UIPgaTourStats_Category::CategoryRankingUpdateItem(const struct UIPgaTourStats_Category* this, struct PgaFlashItem* dest, int32 index, char* label)
+                         local  char[4] tmpRank1StringBuffer
+                         local  const char* tmpColumn1
+                         local  char[4] tmpRank2StringBuffer
+                         local  char[4] tmpValueStringBuffer
+                         inlines  std::atoi
+  456  000A22D4      C  void UIPgaTourStats_Category::UpdateItemAndLabel(const struct UIPgaTourStats_Category* this, struct UIMenuItemBaseDst* destItem, struct UIMenuItemBaseSrc* srcItem, int32 index, char* label)
+                         local  struct PgaFlashItem* dest
+  467  00080950    218  enum TAptSequenceStatus UIPgaTourStats_Category::WaitTillDataFillBeforeGoingToPlayerIndex(const struct UIPgaTourStats_Category* this, bool inbFirstTime, void* inData)
+                         local  TI_STimeValue currentTime
+                         local  float fSecElapsed
+                         inlines  TI_fConvertTimeDifToSeconds, sys_time_get_timebase_frequency
+  504  000761D4    1DC  enum TAptSequenceStatus UIPgaTourStats_Category::WaitTillDataBeforeSwitchMenu(const struct UIPgaTourStats_Category* this, bool inbFirstTime, void* inData)
+                         local  TI_STimeValue currentTime
+                         local  float fSecElapsed
+                         inlines  TI_fConvertTimeDifToSeconds, sys_time_get_timebase_frequency

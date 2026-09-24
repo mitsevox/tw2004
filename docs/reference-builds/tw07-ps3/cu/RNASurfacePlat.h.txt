@@ -1,0 +1,9 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNARender/ps3/RNARender/RNASurfacePlat.h
+// compiled in: RNADevicePlat.cpp, RNAStateManager.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   38    inline-only   void* SurfacePlatC::operator new(size_t size, const char* text, struct ICoreAllocator* allocator, enum AllocFlags allocator_flags, uint32_t alignment)
+   38    inline-only   struct ICoreAllocator* SurfacePlatC::GetClassAllocator()
+   54    inline-only   uint32_t SurfacePlatC::GetPitch(const const struct SurfacePlatC* this)
+   55    inline-only   uint32_t SurfacePlatC::GetOffset(const const struct SurfacePlatC* this)
+   56    inline-only   enum MemoryLocationE SurfacePlatC::GetLocation(const const struct SurfacePlatC* this)

@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/Lo-Rendering/Geom/twChar_Morph.h
+// compiled in: golf_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   45    inline-only   void twCharMorphMgr::SetBaseMesh(const struct twCharMorphMgr* this, const twMesh* pBaseMesh)
+   50    inline-only   void twCharMorphMgr::AddMorph(const struct twCharMorphMgr* this, twMorphMesh* pMorph, float blendAmt)

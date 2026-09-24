@@ -1,0 +1,18 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNARender/ps3/RNARender/RNAVertexFormat.h
+// compiled in: RNABuilder.cpp, RNADevice.cpp, RNADevicePlat.cpp, RNAVertexFormat.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   48    inline-only   void* operator new(size_t size, const char* text, struct ICoreAllocator* allocator, enum AllocFlags allocator_flags, uint32_t alignment)
+   48    inline-only   struct ICoreAllocator* GetClassAllocator()
+   48    inline-only   void operator delete(void* address)
+   64  00840D5C     98  void VertexFormatC(const struct VertexFormatC* this)
+                         inlines  Init, RNADebugBreak, String
+   65  00840C7C     E0  void ~VertexFormatC(const struct VertexFormatC* this)
+                         local  const char[15] __FUNCTION__
+                         inlines  RNADebugBreak, ~String
+   68    inline-only   void SetName(const struct VertexFormatC* this, const char* pStrName)
+   69    inline-only   const char* GetName(const const struct <anon>* this)
+   79    inline-only   int32_t GetNumElements(const const struct <anon>* this)
+   80    inline-only   const struct ElementT* GetElement(const const struct <anon>* this, int32_t iElement)
+   82    inline-only   uint32_t GetVertexSize(const const struct <anon>* this, uint32_t iStream)
+   83    inline-only   VertexElementMaskT GetElementMask(const const struct <anon>* this)

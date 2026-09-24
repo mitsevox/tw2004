@@ -1,0 +1,54 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_EndGame.cpp
+// compiled in: apt_unity.cpp
+// 24 functions, source order. line | PS3 address | size
+
+   44  000CE094     34  void UIEndGame::Init(const struct UIEndGame* this)
+   52  000CDFE0     B4  void UIEndGame::RefreshEndgameSequence(const struct UIEndGame* this)
+                         local  struct GameModeDriver* pGMDriver
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+   63  00034D6C      4  void UIEndGame::Close(const struct UIEndGame* this)
+   67  000CE0C8    220  void UIEndGame::Show(const struct UIEndGame* this)
+                         local  int32 lastScreen
+                         local  int32 i
+                         inlines  _CanShowPGAAward
+  122  000CE47C    174  void UIEndGame::ShowScreen(const struct UIEndGame* this, enum UIEndGameScreenMasks_t screen)
+                         local  int32 mLastPlayer
+                         local  int32 mLastPlayer
+  176  000CE2E8     80  void UIEndGame::CurrentScreenClosed(const struct UIEndGame* this)
+                         local  int32 mLastPlayer
+  190  000CE6E0    190  void UIEndGame::GoBack(const struct UIEndGame* this)
+                         local  int32 lastScreen
+                         local  int32 i
+                         local  char[512] mybuff
+  243  00034EFC      8  void UIEndGame::SetCurrentScreen(const struct UIEndGame* this, enum UIEndGameScreenMasks_t newScreen)
+  248  00034F80     14  int32 UIEndGame::AddToSequence(int32 baseSequence, enum UIEndGameScreenMasks_t newScreen)
+  253  00034E24      C  bool UIEndGame::InSequence(int32 sequence, enum UIEndGameScreenMasks_t screen)
+  259  0007C08C     84  bool UIEndGame::IsScreenNeeded(const struct UIEndGame* this, enum UIEndGameScreenMasks_t screen, int32 playerIndex)
+  278  0007C470     C0  bool UIEndGame::IsScreenNeededForAnyPlayer(const struct UIEndGame* this, enum UIEndGameScreenMasks_t screen)
+                         local  int32 playerID
+                         local  int32 i
+  290  00034F94    16C  bool UIEndGame::IsAttributeScreenNeeded(const struct UIEndGame* this, int32 playerIndex)
+                         local  int32 mOldPercentage
+                         local  int32 mNewPercentage
+                         local  int32 i
+  318  0007C110     E8  bool UIEndGame::IsFirstPlayer(const struct UIEndGame* this, enum UIEndGameScreenMasks_t screen, int32 playerIndex)
+                         local  int32 playerID
+                         local  int32 i
+  330  0007C530     DC  bool UIEndGame::IsFirstScreen(const struct UIEndGame* this, enum UIEndGameScreenMasks_t screen, int32 playerIndex)
+                         local  enum UIEndGameScreenMasks_t currentScreen
+                         local  int32 i
+  353  0007C018     74  bool UIEndGame::IsMoneyFlipNeeded(const struct UIEndGame* this, int32 playerIndex)
+  364  000CE628     B8  void UIEndGame::ShowAwardScreen(const struct UIEndGame* this)
+  378  000CE5F0     38  void UIEndGame::ShowMoneyScreen(const struct UIEndGame* this)
+  385  00034E30     CC  bool UIEndGame::IsAwardScreenNeeded(const struct UIEndGame* this, int32 playerIndex)
+                         local  bool awards
+                         local  bool pgatourawards
+  399  0007BFC8     50  bool UIEndGame::IsMoneyScreenNeeded(const struct UIEndGame* this, int32 playerIndex)
+                         local  int32 money
+  407  00034D70     B4  int32 UIEndGame::GetNextPlayerWhoIsALocalUser(const struct UIEndGame* this, int32 currentPlayerIndex)
+                         local  int32 nextPlayerIndex
+  422  00034F04     7C  int32 UIEndGame::GetLastPlayerWhoIsALocalUser(const struct UIEndGame* this, int32 currentPlayerIndex)
+                         local  int32 lastPlayerIndex
+  434  00030ED4      C  int32 UIEndGame::GetCurrentPlayerIndex(const struct UIEndGame* this)
+  444    inline-only   static bool _CanShowPGAAward()
+                         local  void* pDataPtr

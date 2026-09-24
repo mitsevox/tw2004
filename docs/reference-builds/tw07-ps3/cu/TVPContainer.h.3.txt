@@ -1,0 +1,11 @@
+// ../ears_common/dev/include/ears_common/TVPContainer.h
+// compiled in: ChrCntl_Character.cpp, MotionDefinitionMap.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   39    inline-only   struct <anon>* CopyTVP(const const struct <anon>& tvp, struct IAllocator* pAllocator)
+                         local  struct <anon>* pRet
+                         local  int cnt
+                         local  const struct <anon>* p
+                         local  struct <anon>* p2
+  101    inline-only   const struct <anon>& Get(const const struct <anon>* this)
+  135    inline-only   struct IAllocator& GetAllocator(const const struct <anon>* this)

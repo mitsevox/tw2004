@@ -1,0 +1,5 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/sinitut.cpp
+// compiled in: sinitut.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   10  006E0E8C     50  void MIXI_initunpackmt()

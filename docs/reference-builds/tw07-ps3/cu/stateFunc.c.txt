@@ -1,0 +1,399 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/State_Engine/stateFunc.c
+// compiled in: golf2_unity.cpp
+// 110 functions, source order. line | PS3 address | size
+
+  509  0017E9F0    198  void UpdateUcapIdle(enum PlayerNumber_t PlayerID)
+                         local  const struct GolfModuleUCAP& ucap
+                         local  struct GolferData_t* pGolferData
+                         inlines  GamePlayer::GetGolferData
+  541  001DBE34    948  void STATEFUNC_PreShotInit(enum PlayerNumber_t PlayerID)
+                         local  int once
+                         local  struct TCharacter* pCharacter
+                         local  bool bIsPuttingInTemple
+                         local  int8_t iViewControllerId
+                         local  int i
+                         local  bool no_preshot_anim
+                         local  vec4flt fadeColor
+                         inlines  AIMgr, GM_GetCurrentHoleIndex, GamePlayer::GetCharacter, GamePlayer::SetDistanceToPin, GamePlayer::SetTimer, cGAME_GLOBALS::SetAllPlayersOnGreen, cGAME_GLOBALS::SetReplayActive
+  847  001CDEE8    824  void STATEFUNC_PreShotUpdate(enum PlayerNumber_t PlayerID)
+                         local  int i
+                         local  int physicsTimes
+                         local  vec4flt fadeColor
+                         local  bool ballInHand
+                         local  bool bIsPuttingInTemple
+                         local  int8_t iViewControllerId
+                         local  CameraController_t* pCameraController
+                         local  struct TCharacter* pCharacter
+                         inlines  AIMgr, Character_CheckTag, Character_IsTagValid, Character_ResetTag, GamePlayer::GetCharacter, PhysicsBall_t::ClearFlag, PhysicsBall_t::SetFlag
+ 1040  0017EB88    15C  void STATEFUNC_PreShotExit(enum PlayerNumber_t PlayerID)
+                         local  vec4flt fadeColor
+                         local  bool bIsPuttingInTemple
+                         local  int8_t iViewControllerId
+                         local  CameraController_t* pCameraController
+ 1067  00132E68      4  void STATEFUNC_TrinityCutSceneNISInit(enum PlayerNumber_t PlayerID)
+ 1068  00132E6C      4  void STATEFUNC_TrinityCutSceneNISUpdate(enum PlayerNumber_t PlayerID)
+ 1069  0016D6AC     AC  void STATEFUNC_TrinityCutSceneNISExit(enum PlayerNumber_t PlayerID)
+                         inlines  cGAME_GLOBALS::SetPostTrinityState
+ 1097  001DE300    348  void STATEFUNC_ShotSetupInit(enum PlayerNumber_t PlayerID)
+                         local  bool bIsPuttingInTemple
+                         local  int8_t iViewControllerId
+                         local  bool bIsAIPlayer
+                         local  struct TCharacter* pCharacter
+                         inlines  GUI_UpdateShotUIData, GamePlayer::GetCharacter, GamePlayer::SetDistanceToPin, GamePlayer::SetTCSInitialized
+ 1229  001DDF28    3D8  void STATEFUNC_ShotSetupUpdate(enum PlayerNumber_t playerID)
+                         local  bool done
+                         local  float aiMaxShotSetupTime
+                         local  float aiMinShotSetupTime
+                         local  bool bIsPuttingInTemple
+                         local  int8_t iViewControllerId
+                         local  CameraController_t* pCameraController
+                         local  struct CoreShotInfo_t* shotInfo
+                         local  enum Club_t clubBefore
+                         local  enum Club_t clubAfter
+                         local  enum Club_t clubBefore
+                         local  enum Club_t clubAfter
+                         inlines  AIMgr, GamePlayer::GetTimer, GamePlayer::SetTimer
+ 1338  00155108    114  void STATEFUNC_ShotSetupExit(enum PlayerNumber_t PlayerID)
+ 1364  001E08C8    6A0  void STATEFUNC_SwingInit(enum PlayerNumber_t PlayerID)
+                         local  bool bIsPuttingInTemple
+                         local  int8_t iViewControllerId
+                         local  CameraController_t* pCameraController
+                         local  int32 iPlr
+                         local  bool bIsPuttingInTemple
+                         local  int8_t iViewControllerId
+                         inlines  AICore::IsPhantomAvailable, AIMgr, GM_GetModeType, GUI_UpdateLieUIData, GUI_UpdateShotUIData, GamePlayer::GetCharacter, GamePlayer::SetDelayTime, GamePlayer::SetReplayFlags, GamePlayer::SetTCSInitialized, GamePlayer::SetTapInCheat, GamePlayer::SetUsedMulligan
+ 1550  001DFB20    DA8  void STATEFUNC_SwingUpdate(enum PlayerNumber_t PlayerID)
+                         local  const struct AIshot_t& curShot
+                         local  enum Club_t prevClub
+                         local  CameraController_t* pCameraController
+                         local  bool ballHit
+                         local  void* gameModePtr
+                         local  enum PlayerNumber_t testID
+                         local  uint32 nControllerNum
+                         local  uint32 curInput
+                         local  bool holeOutPassed
+                         local  SW_sSwingData* pSwingInfo
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  float fb1
+                         local  float fb2
+                         local  float rl1
+                         local  float rl2
+                         local  vec4flt dist2cup
+                         local  float dist2D
+                         local  bool readingGreen
+                         local  bool unavailable
+                         inlines  AIMgr, GM_GetGolferUp, GamePlayer::GetController, GamePlayer::GetDelayTime, GamePlayer::GetSwingInfo, GamePlayer::SetDelayTime, GolfTimer::SetElapsedTimeScale, LLMath_Length3, LLMath_Subtract, cGAME_GLOBALS::SetGamePaused, vec_madd, vec_sld
+ 1948  0015F064     B8  void STATEFUNC_SwingExit(enum PlayerNumber_t PlayerID)
+                         inlines  GamePlayer::SetTCSInitialized, GolfTimer::SetElapsedTimeScale
+ 1985  001DEE88    4A4  void STATEFUNC_ResetGreen(enum PlayerNumber_t PlayerID)
+                         local  struct TCharacter* pCharacter
+                         local  int32_t i
+                         inlines  AIMgr, GUI_ClubSelected, GUI_UpdateLieUIData, GUI_UpdateShotUIData, GamePlayer::GetCharacter, cGAME_GLOBALS::SetAllPlayersOnGreen, vec4flt_Copy, vec_st
+ 2088  0018ADD8    4FC  void STATEFUNC_ReplaySwingInit(enum PlayerNumber_t PlayerID)
+                         local  CameraController_t* pCameraController
+                         local  vec4flt fadeColor
+                         local  struct CoreShotInfo_t* pCoreShot
+                         local  float predictedNextFrameSkaTime
+                         inlines  Character_GetTagTime, GUI_ShowReplayLogo, GamePlayer::GetCharacter, vec4flt_Copy
+ 2252  001DDC24    304  void STATEFUNC_ReplaySwingUpdate(enum PlayerNumber_t PlayerID)
+                         local  CameraController_t* pCameraController
+                         local  struct TCharacter* pCharacter
+                         local  float predictedNextFrameSkaTime
+                         local  const struct TSKATime& skaTime
+                         local  float dt
+                         local  bool superSwing
+                         local  enum eIGSkaStates stateID
+                         local  float localT0
+                         inlines  Character_IsTagValid, GamePlayer::GetCharacter
+ 2366  0019D210    148  void STATEFUNC_ReplaySwingExit(enum PlayerNumber_t PlayerID)
+                         local  CameraController_t* pCameraController
+                         inlines  GameEffects_SetHalfTime, SKATime_SetTimeScale
+ 2400  001904E4    1C8  void STATEFUNC_ZoomInit(enum PlayerNumber_t PlayerID)
+                         local  bool bIsPuttingInTemple
+                         local  int8_t iViewController
+                         local  CameraController_t* cameraControl
+                         local  enum CameraMode_t zoomCameraMode
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+ 2467  001DF32C    7F4  void STATEFUNC_ZoomUpdate(enum PlayerNumber_t PlayerID)
+                         local  uint32 nControllerNum
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  int32 leftRight
+                         local  int32 forwardBack
+                         inlines  AIMgr, GM_GetGolferUp, GamePlayer::GetController, Singleton<GameModeDriverManager>::GetSingleton, Singleton<ShotHistory>::GetSingleton, cGAME_GLOBALS::SetGamePaused
+ 2632  00155AD0    19C  void STATEFUNC_ZoomExit(enum PlayerNumber_t PlayerID)
+                         local  bool bIsPuttingInTemple
+                         local  int8_t iViewController
+                         local  enum CameraMode_t switchToMode
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         inlines  Singleton<ShotHistory>::GetSingleton
+ 2686  001330D0     C0  void STATEFUNC_ElevatorInit(enum PlayerNumber_t PlayerID)
+ 2711  001DA9A4    30C  void STATEFUNC_ElevatorUpdate(enum PlayerNumber_t PlayerID)
+                         inlines  AIMgr
+ 2776  00133190     A8  void STATEFUNC_ElevatorExit(enum PlayerNumber_t PlayerID)
+ 2803  00133238     58  void STATEFUNC_GreenInit(enum PlayerNumber_t PlayerID)
+ 2818  0016559C     C0  void STATEFUNC_GreenUpdate(enum PlayerNumber_t PlayerID)
+ 2836  00133290     A8  void STATEFUNC_GreenExit(enum PlayerNumber_t PlayerID)
+ 2862  001DDA0C    218  void STATEFUNC_GreenWatchRollInit(enum PlayerNumber_t PlayerID)
+                         local  struct PhysicsBall_t ball
+                         local  enum PlayerCtrl_t controller
+                         local  vec4flt fadeColor
+                         local  struct CoreShotInfo_t coreShotInfo
+                         inlines  AIMgr, GamePlayer::GetEstimatedBall, PhysicsBall_t::SetFlag
+ 2922  001CD310    260  void STATEFUNC_GreenWatchRollUpdate(enum PlayerNumber_t PlayerID)
+                         local  int physicsTimes
+                         local  vec4flt fadeColor
+                         local  TGD_TerrainInfo* pTerrainData
+                         local  vec4flt camOrigin
+                         local  int greenrollpause
+                         local  bool fadeout
+                         local  float startFadeDist
+                         inlines  AIMgr
+ 3078  001B7720    1A4  void STATEFUNC_GreenWatchRollExit(enum PlayerNumber_t PlayerID)
+                         local  vec4flt fadeColor
+                         inlines  GamePlayer::GetEstimatedBall, PhysicsBall_t::SetFlag
+ 3127  001334E4     48  void STATEFUNC_GreenReversePuttInit(enum PlayerNumber_t PlayerID)
+ 3142  001654F4     A8  void STATEFUNC_GreenReversePuttUpdate(enum PlayerNumber_t PlayerID)
+ 3169  0013352C     A8  void STATEFUNC_GreenReversePuttExit(enum PlayerNumber_t PlayerID)
+ 3197  001335D4     58  void STATEFUNC_GreenMorphInit(enum PlayerNumber_t PlayerID)
+ 3211  001DBAC4    370  void STATEFUNC_GreenMorphUpdate(enum PlayerNumber_t PlayerID)
+                         inlines  AIMgr, GUI_UpdateShotUIData
+ 3272  0013362C     FC  void STATEFUNC_GreenMorphExit(enum PlayerNumber_t PlayerID)
+ 3309  001AEFF4    364  void STATEFUNC_SimulateInit(enum PlayerNumber_t PlayerID)
+                         local  CameraController_t* pCameraController
+                         local  bool bIsPuttingInTemple
+                         local  enum CameraMode_t newMode
+                         inlines  CameraController_SetDelayCounter, CameraController_vResetDelayCounter, DrawFadeIndicator::GetInstance, GamePlayer::GetEstimatedBall, GamePlayer::SetTapInFound, PhysicsBall_t::SetFlag, ReplayCameraMgr::GetCurrentReplayCamMode
+ 3442  001D4F50    EDC  void STATEFUNC_SimulateUpdate(enum PlayerNumber_t PlayerID)
+                         local  bool doubleTime
+                         local  bool halfTime
+                         local  bool bIsPuttingInTemple
+                         local  CameraController_t* pCameraController
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  float puttbling_distance
+                         local  bool waitedLongEnough
+                         local  bool quitReplayEarly
+                         local  uint32 nControllerNum
+                         local  struct PhysicsBall_t* ball
+                         local  unsigned int updateTicks
+                         local  int8 nextGolferState
+                         local  vec4flt color
+                         local  enum GolferState currstate
+                         inlines  CameraController_SetDelayCounter, GM_GetGolferUp, GameEffects_SetDoubleTime, GameEffects_SetHalfTime, GamePlayer::GetController, ReplayCameraMgr::GetInstance, cGAME_GLOBALS::SetGamePaused
+ 3969  0016B3A4     88  void STATEFUNC_WaitForEpicTextUpdate(enum PlayerNumber_t PlayerID)
+ 3986  00155C6C    18C  void STATEFUNC_SimulateExit(enum PlayerNumber_t PlayerID)
+                         local  bool bIsPuttingInTemple
+                         local  CameraController_t* pCameraController
+                         inlines  CameraController_SetDelayCounter, GUI_ShowReplayLogo, GameEffects_SetDoubleTime, GameEffects_SetHalfTime
+ 4027  001E2B54    18C  static void onPlayedReactionAnimation(enum PlayerNumber_t PlayerID)
+                         local  struct <anon> luaParam
+                         local  struct <anon> retVal
+                         local  unsigned int count
+                         local  int animEmotionState
+                         local  const char*[7] emotionNames
+                         local  int retValInt
+ 4073  00133780     A4  void STATEFUNC_FadeToInTheHoleInit(enum PlayerNumber_t PlayerID)
+                         local  vec4flt fadeColor
+                         local  CameraController_t* pCameraController
+ 4083  001E2FF8    240  void STATEFUNC_FadeToInTheHoleUpdate(enum PlayerNumber_t PlayerID)
+                         local  CameraController_t* pCameraController
+                         local  vec4flt fadeColor
+                         local  const char* anim_name
+                         inlines  ScreenEffects::CurrFadeType
+ 4139  00133824     1C  void STATEFUNC_InTheHoleInit(enum PlayerNumber_t PlayerID)
+ 4147  00162B74    1D8  void STATEFUNC_InTheHoleUpdate(enum PlayerNumber_t PlayerID)
+                         local  CameraController_t* pCameraController
+                         inlines  GamePlayer::SetReplayFlags, SKATime_SetTimeScale
+ 4211  00133840     D8  void STATEFUNC_ConcededInit(enum PlayerNumber_t PlayerID)
+                         local  vec4flt fadeColor
+                         local  CameraController_t* pCameraController
+ 4236  00133918     24  void STATEFUNC_ConcededUpdate(enum PlayerNumber_t PlayerID)
+ 4244  0013393C      4  void STATEFUNC_ConcededExit(enum PlayerNumber_t PlayerID)
+ 4249  00133940     7C  void STATEFUNC_FadeToEpicTextInit(enum PlayerNumber_t PlayerID)
+                         local  vec4flt fadeColor
+                         local  CameraController_t* pCameraController
+ 4257  001348E8     C4  void STATEFUNC_FadeToEpicTextUpdate(enum PlayerNumber_t PlayerID)
+                         local  CameraController_t* pCameraController
+                         local  enum CameraFadeType_e fadeType
+                         local  vec4flt fadeColor
+ 4275  001339BC      4  void STATEFUNC_EpicTextInit(enum PlayerNumber_t PlayerID)
+ 4280  001339C0      4  void STATEFUNC_EpicTextUpdate(enum PlayerNumber_t PlayerID)
+ 4292  001339C4     A4  void STATEFUNC_FadeToShowYardageInit(enum PlayerNumber_t PlayerID)
+                         local  vec4flt fadeColor
+                         local  CameraController_t* pCameraController
+ 4302  001E2CE0    318  void STATEFUNC_FadeToShowYardageUpdate(enum PlayerNumber_t PlayerID)
+                         local  CameraController_t* pCameraController
+                         local  bool playingreaction
+                         local  vec4flt fadeColor
+                         inlines  AIMgr, GamePlayer::SetTapInCheat, GamePlayer::SetTapInFound, ScreenEffects::CurrFadeType
+ 4362  00133AAC      4  void STATEFUNC_FadeToShowYardageExit(enum PlayerNumber_t PlayerID)
+ 4376  00133AB0     34  void STATEFUNC_ShowYardageInit(enum PlayerNumber_t PlayerID)
+ 4384  001C2C10    2C0  void _statefunc_handleInputWhileWaiting(enum PlayerNumber_t PlayerID, bool bAllowReplayAndMulligan)
+                         inlines  GUI_HidePostShotUI
+ 4478  001CD8A4    644  void STATEFUNC_ShowYardageUpdate(enum PlayerNumber_t PlayerID)
+                         local  CameraController_t* pCameraController
+                         local  bool dontChangeAnims
+                         local  const struct GolfModuleTrinity& trinity
+                         local  vec4flt fadeColor
+                         local  vec4flt fadeColor
+                         local  char[128] buffer
+                         local  char[128] buffer
+                         local  void* pGameModePtr
+                         local  enum PlayerNumber_t partnerPlayer
+                         inlines  AIMgr, GamePlayer::GetCharacter, GamePlayer::SetTapInFound
+ 4830  001D660C    1B4  void STATEFUNC_ShowYardageExit(enum PlayerNumber_t PlayerID)
+                         local  const struct GolfModuleTrinity& trinity
+                         inlines  vec4flt_Copy, vec_st
+ 4869  0015B5DC    188  void STATEFUNC_FadeToTapInInit(enum PlayerNumber_t PlayerID)
+                         local  vec4flt fadeColor
+                         local  vec4flt location
+                         inlines  vec4flt_Copy, vec4flt_Copy3
+ 4908  001CD5BC    2E8  void STATEFUNC_FadeToTapInUpdate(enum PlayerNumber_t PlayerID)
+                         local  CameraController_t* pCameraController
+                         local  vec4flt location
+                         local  bool allOnGreen
+                         inlines  AIMgr, GamePlayer::SetTapInCheat, GamePlayer::SetTapInFound, cGAME_GLOBALS::SetAllPlayersOnGreen, vec4flt_Copy3
+ 4981  00133AE4      4  void STATEFUNC_FadeToTapInExit(enum PlayerNumber_t PlayerID)
+ 4989  001DED4C    13C  void STATEFUNC_TapInInit(enum PlayerNumber_t PlayerID)
+                         inlines  GamePlayer::GetCharacter, GamePlayer::SetDistanceToPin, GamePlayer::SetReplayFlags, cGAME_GLOBALS::SetAllPlayersOnGreen
+ 5026  001DD814    1F8  void STATEFUNC_TapInUpdate(enum PlayerNumber_t PlayerID)
+                         local  vec4flt fadeColor
+                         local  CameraController_t* pCameraController
+                         inlines  PhysicsBall_t::SetFlag
+ 5084  00133AE8      4  void STATEFUNC_TapInExit(enum PlayerNumber_t PlayerID)
+ 5092  00165EB8    178  void TriggerPostHoleCameraChain(enum PlayerNumber_t playerID)
+                         local  struct GameModeBase* pGameMode
+                         local  bool bHoleComplete
+                         local  int32 playerIdx
+                         local  CameraChainLink* pLink
+                         local  CameraController_t* pCameraController
+                         local  vec4flt* pCameraOrigin
+                         local  vec4flt* pCameraLookPoint
+ 5145  0016614C    168  void STATEFUNC_FadeToRemoveBallInit(enum PlayerNumber_t PlayerID)
+                         local  CameraController_t* pCameraController
+                         local  vec4flt fadeColor
+ 5195  00133AEC     24  void STATEFUNC_FadeToRemoveBallUpdate(enum PlayerNumber_t PlayerID)
+ 5206  00133B10      4  void STATEFUNC_FadeToRemoveBallExit(enum PlayerNumber_t PlayerID)
+ 5214  001AF3E4    1F4  void STATEFUNC_RemoveBallInit(enum PlayerNumber_t PlayerID)
+                         local  const float* pCupLocation
+                         local  struct <anon> param
+                         inlines  vec4flt_Copy3
+ 5260  00166030    11C  void STATEFUNC_RemoveBallUpdate(enum PlayerNumber_t PlayerID)
+                         local  CameraController_t* pCameraController
+                         local  vec4flt fadeColor
+                         local  struct CoreShotInfo_t* coreShotInfo
+                         local  struct PhysicsBall_t* ball
+ 5299  00152438     F0  void STATEFUNC_RemoveBallExit(enum PlayerNumber_t PlayerID)
+                         local  CameraController_t* pCameraController
+                         local  vec4flt fadeColor
+ 5321  001AF358     8C  void STATEFUNC_WaitInit(enum PlayerNumber_t PlayerID)
+                         local  CameraController_t* pCameraController
+ 5344  00133B14      4  void STATEFUNC_WaitUpdate(enum PlayerNumber_t PlayerID)
+ 5352  001DB6D8    3EC  void STATEFUNC_InitialFlyByInit(enum PlayerNumber_t PlayerID)
+                         local  const char* courseAbbrev
+                         local  char[32] sequenceName
+                         local  vec4flt fadeColor
+                         local  int32 holeIndex
+                         inlines  AIMgr, GM_GetCurrentHoleIndex, Singleton<GameModeDriverManager>::GetSingleton, cGAME_GLOBALS::SetAllPlayersOnGreen
+ 5463  0016ACF0    210  void STATEFUNC_InitialFlyByUpdate(enum PlayerNumber_t PlayerID)
+                         local  bool skipIt
+                         local  CameraController_t* pCameraController
+ 5539  00152528     E0  void STATEFUNC_InitialFlyByExit(enum PlayerNumber_t PlayerID)
+ 5570  001A1CF0    290  void STATEFUNC_MidHoleFlyByInit(enum PlayerNumber_t PlayerID)
+                         local  CameraController_t* cam
+                         local  const char* courseAbbrev
+                         local  char[32] sequenceName
+                         local  int32 holeIndex
+                         inlines  GM_GetCurrentHoleIndex
+ 5632  001653BC    138  void STATEFUNC_MidHoleFlyByUpdate(enum PlayerNumber_t PlayerID)
+                         local  bool skipIt
+                         local  enum PlayerNumber_t playerID
+ 5741  00133BA0     A0  void STATEFUNC_MidHoleFlyByExit(enum PlayerNumber_t PlayerID)
+                         local  CameraController_t* cam
+ 5773  00133C40     C0  void STATEFUNC_CameraDebugInit(enum PlayerNumber_t PlayerID)
+ 5801  00183748    240  void STATEFUNC_CameraDebugUpdate(enum PlayerNumber_t PlayerID)
+                         local  CameraController_t* pCameraController
+                         local  vec4flt pCameraOrigin
+                         local  vec4flt pCameraLookPoint
+                         local  int8 prevState
+                         inlines  AINetworkMgr, vec4flt_Copy, vec_st
+ 5882  00133D00     4C  void STATEFUNC_CameraDebugExit(enum PlayerNumber_t PlayerID)
+ 5899  001DB1E0    4F8  void STATEFUNC_PlaceBallInit(enum PlayerNumber_t PlayerID)
+                         local  int i
+                         local  TGD_TerrainInfo* pTID
+                         local  float h
+                         local  vec4flt pos
+                         local  float fSupportingGroundHeight
+                         local  float fCoveringGroundHeight
+                         local  vec4flt cupLocation
+                         local  vec4flt teeLocation
+                         local  vec4flt dir
+                         local  int playerIx
+                         inlines  AIMgr, GM_GetModeType, GamePlayer::SetTimer, LLMath_AddScale3, LLMath_Subtract3, cGAME_GLOBALS::SetAllPlayersOnGreen, cGAME_GLOBALS::SetInPlaceBall, cGAME_GLOBALS::SetReplayActive, vec4flt_Copy, vec4flt_Copy3, vec_sub
+ 6039  001B403C    4CC  void STATEFUNC_PlaceBallUpdate(enum PlayerNumber_t PlayerID)
+                         local  CameraController_t* pCameraController
+                         local  vec4flt playerBPTargetPosn
+ 6162  00133D4C     A4  void STATEFUNC_PlaceBallExit(enum PlayerNumber_t PlayerID)
+                         inlines  cGAME_GLOBALS::SetInPlaceBall
+ 6178  001570D8     E4  void STATEFUNC_GreenSelectInit(enum PlayerNumber_t PlayerID)
+                         local  float distanceToGreen
+                         local  char* playerName
+ 6206  001662B4    394  void STATEFUNC_GreenSelectUpdate(enum PlayerNumber_t PlayerID)
+                         local  CameraController_t* pCameraController
+                         local  int greenCount
+                         local  int greenIdx
+                         local  vec3flt greenSelectParams
+                         local  int greenCount
+                         local  int greenIdx
+                         local  vec3flt greenSelectParams
+ 6319  00133DF0     74  void STATEFUNC_GreenSelectExit(enum PlayerNumber_t PlayerID)
+ 6335  001B4508    1A0  void STATEFUNC_CupSelectInit(enum PlayerNumber_t PlayerID)
+                         local  const float[4]& cupLocation
+                         local  char* playerName
+                         inlines  cGAME_GLOBALS::SetInCupSelection
+ 6376  001906AC    4A0  void STATEFUNC_CupSelectUpdate(enum PlayerNumber_t PlayerID)
+                         local  vec3flt cupSelectParams
+                         local  vec3flt cupSelectParams
+                         local  CameraController_t* pCameraController
+                         local  const struct GameModeDriver* driverPtr
+                         local  vec3flt greenCupSelectParams
+                         local  const struct GameModeDriverFacility* pFacilityDriver
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+ 6474  00133E64     6C  void STATEFUNC_CupSelectExit(enum PlayerNumber_t PlayerID)
+                         inlines  cGAME_GLOBALS::SetInCupSelection
+ 6485  0015521C     8C  void STATEFUNC_EllipseOrbitInit(enum PlayerNumber_t PlayerID)
+ 6504  001DA5CC    3D8  void STATEFUNC_EllipseOrbitUpdate(enum PlayerNumber_t PlayerID)
+                         local  uint32 nControllerNum
+                         inlines  AIMgr, GM_GetGolferUp, GamePlayer::GetController, cGAME_GLOBALS::SetGamePaused
+ 6608  001552A8     E0  void STATEFUNC_EllipseOrbitExit(enum PlayerNumber_t PlayerID)
+ 6992  00133ED0     54  void STATEFUNC_InactivityInit(enum PlayerNumber_t PlayerID)
+ 7008  00133F24     1C  bool _stickMoved(uint8 stickval)
+ 7015  001CD1EC    124  void STATEFUNC_InactivityUpdate(enum PlayerNumber_t PlayerID)
+                         local  struct Controller_StickInfo* stickInfo
+                         inlines  AIMgr
+ 7045  00133F40     A8  void STATEFUNC_InactivityExit(enum PlayerNumber_t PlayerID)
+ 7070  00133FE8     D8  void STATEFUNC_EndBoastChallengeInit(enum PlayerNumber_t PlayerID)
+                         local  vec4flt fadeColor
+                         local  CameraController_t* pCameraController
+ 7095  001340C0     24  void STATEFUNC_EndBoastChallengeUpdate(enum PlayerNumber_t PlayerID)
+ 7103  001340E4      4  void STATEFUNC_EndBoastChallengeExit(enum PlayerNumber_t PlayerID)
+ 7185  001340E8     34  void STATEFUNC_EnvInfluenceToolInit(enum PlayerNumber_t PlayerID)
+ 7190  0013411C     34  void STATEFUNC_EnvInfluenceToolUpdate(enum PlayerNumber_t PlayerID)
+ 7195  00134150     34  void STATEFUNC_EnvInfluenceToolExit(enum PlayerNumber_t PlayerID)
+ 7203  00134184     18  bool STATEFUNC_InFlyBy()
+ 7213  001DE648    704  void STATEFUNC_FacilityInit(enum PlayerNumber_t PlayerID)
+                         local  struct TCharacter* pCharacter
+                         local  int i
+                         local  int32 holeIndex
+                         local  const char* courseAbbrev
+                         local  char[32] sequenceName
+                         local  vec4flt fadeColor
+                         local  int iPlr
+                         inlines  AIMgr, GM_GetCurrentHoleIndex, GM_GetModeType, GUI_UpdateShotUIData, GamePlayer::GetCharacter, GamePlayer::SetDistanceToPin, GamePlayer::SetTCSInitialized, cGAME_GLOBALS::SetAllPlayersOnGreen, cGAME_GLOBALS::SetPlayFacilityFlyby, cGAME_GLOBALS::SetReplayActive
+ 7418  00165074    1C4  void STATEFUNC_FacilityIdleUpdate(enum PlayerNumber_t PlayerID)
+                         local  vec4flt fadeColor
+                         inlines  OnlineManagerOSDK::GetInstance
+ 7459  0013419C     2C  void STATEFUNC_FacilityIdleExit(enum PlayerNumber_t PlayerID)
+                         inlines  CCT::SetIsTransFromIGC
+ 7468  00134864     84  void STATEFUNC_HaltUpdate(enum PlayerNumber_t PlayerID)
+                         local  enum GolferState nextState
+ 7478  0019EA14     68  void STATEFUNC_PositionPlayerAtLastManuallyPickedPos()

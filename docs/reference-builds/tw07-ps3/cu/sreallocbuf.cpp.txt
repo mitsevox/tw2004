@@ -1,0 +1,9 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sreallocbuf.cpp
+// compiled in: sreallocbuf.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   13  006DEADC     F0  void ReallocBuf(void** buffer, int* curSize, int newMinSize, int sizeofDataType)
+                         local  int orgSize
+                         local  void* pbuffer
+                         local  void* pNewBuf
+                         inlines  MemCpy, SNDMEMI_alloc, SNDMEMI_free

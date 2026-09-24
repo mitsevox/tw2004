@@ -1,0 +1,541 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/audio/GameAudio.c
+// compiled in: other_unity.cpp
+// 233 functions, source order. line | PS3 address | size
+
+  513  00449D6C     A0  void Gaud_GetClubPosition(const vec4flt& pos)
+                         local  struct GamePlayer* plr
+                         inlines  Character_GetBonePos, GM_GetGolferUp, GamePlayer::GetCharacter, vec4flt_Copy
+  520  003DA9A8     50  void Gaud_GetHolePosition(const vec4flt& pos)
+                         local  const float[4]& p
+  529  003DA9F8     A8  void Gaud_GetCameraPosition(const vec4flt& pos)
+                         local  struct CA_SCamera* pcam
+                         local  bool aligned
+  549  003DAAA0    140  void Gaud_GetCameraPositionOrientationUp(const vec4flt& vecPos, const vec4flt& vecOr, const vec4flt& vecUp)
+                         local  struct CA_SCamera* pcam
+                         local  bool aligned
+  594  003DABE0      4  void Gaud_GetBallPosition(const vec4flt& pos)
+  599  00449E0C     5C  void Gaud_GetTeePosition(const vec4flt& pos)
+                         local  struct GamePlayer* plr
+                         inlines  GM_GetGolferUp
+  625  003DABE4     50  void MusicTrackState::MusicTrackState(const struct MusicTrackState* this)
+  654  003DAC84     A8  void MusicTrackState::set(const struct MusicTrackState* this, enum MusicState_t state)
+                         local  char*[5] stateNames
+  684  003DAD2C     68  int MusicTrackState::getCurrentPlaylist(const struct MusicTrackState* this)
+                         local  int playlist
+  707  003DAD94    178  int MusicTrackState::getPotentialTracksToPlay(const struct MusicTrackState* this, int* trackList)
+                         local  int numPotentialTracks
+                         local  bool bFirstTimeThru
+                         local  int i
+                         local  int[4] firstTimeTracks
+                         local  int thisFirstTrackIndex
+  745  003DAFBC    17C  int MusicTrackState::getNextTrackUserSelected(const struct MusicTrackState* this)
+                         local  int[18] potentialTracks
+                         local  int numPotentialTracks
+                         local  int i
+                         local  int trackIndex
+  782  003DB138    150  int MusicTrackState::getCurrentTrack(const struct MusicTrackState* this)
+                         local  int track
+                         local  bool bVeryFirstTimeThru
+                         local  bool bSecondTimeThru
+  845  003DAF0C     B0  int MusicTrackState::getNumTracksSelected(const struct MusicTrackState* this)
+                         local  int numTracksSelected
+                         local  int song
+  866    inline-only   static void FirstFrameInit()
+                         local  bool bEnableStreaming
+                         local  int32 nplayers
+                         local  PlayerSound* psound
+                         local  uint8 windlevel
+                         local  int32 i
+                         local  vec4flt pos
+  945  003DB2A0     48  static void HeartBeatLoopCallback(uint8 instID, uint8 trkID, EAudTrkCBReason reason)
+  956  003DB2E8     9C  void Gaud_DuckCrowdAttn(float fTargetAttn)
+  977    inline-only   static void UpdateCommentVolDucking()
+ 1024    inline-only   static void StartCriticalMomentDucking()
+ 1031  0040CEE4    3C0  static void UpdateCriticalMomentDucking()
+                         local  float sfxattn
+                         local  float commentatten
+                         local  float talkyattn
+                         local  float musicattn
+                         local  float attn
+                         local  uint8 chan
+                         local  float attn
+                         local  Course_t courseID
+                         local  float attn
+                         local  float attn
+ 1103  0040D2A4     28  static void StopCriticalMomentDucking()
+ 1122  003DB384     4C  void Gaud_AmbianceCompressorStartClamp()
+ 1134  00457340     80  void Gaud_AmbianceCompressorEndClamp()
+ 1150  0045724C     F4  void Gaud_MusicVolumeResetAmbianceCompressorClamp()
+ 1191  003DB3D0     54  void Gaud_AmbianceCompressor(float value)
+ 1209    inline-only   static void UpdateAmbianceAutoGainControl()
+                         local  float fAmbianceAutoGainCurrentTime
+                         local  float slope
+                         local  float fTimeDelta
+                         local  float fRiseDeltaSinceLastFrame
+ 1328    inline-only   static void InitCrowdBuildup(uint8 varRangeID)
+                         local  bool bCanPlayNickname
+ 1370  00457CDC     8C  static void ExitCrowdBuildup()
+ 1390    inline-only   static void UpdateCrowdBuildup()
+                         local  int32 level
+ 1420  0041D31C     D8  int Gaud_GetCurrentEaTraxList(int gameMode)
+                         local  int eatraxlist
+                         local  enum GM_DriverType_t curDriver
+ 1470  003DB424     30  void Gaud_InvalidateEmitter(uint8 id)
+ 1491  0045A1B4    340  void SetStreamingContext()
+                         local  enum GM_ModeType_t gameMode
+                         local  float newmusicattn
+                         local  enum EStmContext newcontext
+                         local  bool music
+                         local  bool dostreaming
+                         local  uint8 eatraxlist
+                         local  bool infrontend
+                         local  vec4flt pos
+                         inlines  GM_GetModeType
+ 1580  004589D0     C4  static void StartBackgroundMusic()
+                         local  int playlist
+                         local  int track
+                         inlines  GM_GetModeType
+ 1607    inline-only   static void StartAmbientStreamer()
+                         local  enum GM_CourseType_t courseIndex
+                         local  uint8 holeID
+                         local  Course_t courseID
+                         local  uint8 rangeID
+                         local  bool bDisableModernSounds
+                         local  bool bIsKnownCourse
+ 1681    inline-only   static void StopAmbientStreamer(bool controlOnly)
+ 1699    inline-only   static uint8 GetAmbientStreamRange(Course_t courseID, uint8 holeID)
+                         local  uint32 mapSize
+                         local  uint8 holeNum
+                         local  uint8 ret
+                         local  uint32 iMap
+ 1723    inline-only   static void UpdateStreaming()
+                         local  uint8 eaTraxlist
+ 1827    inline-only   static void saveClubAudioTypes()
+ 1900  003DB4B4     44  bool Gaud_IsOneShotEmitter(TEmitInst* pemit)
+ 1915  003DB4F8     44  bool Gaud_IsAmbianceEmitter(TEmitInst* pemit)
+ 1930  003DB53C     44  bool Gaud_IsCrowdEmitter(TEmitInst* pemit)
+ 1945  003DB580     44  bool Gaud_IsNicknameEmitter(TEmitInst* pemit)
+ 1960  003DB5C4     44  bool Gaud_IsCommentary(TEmitInst* pemit)
+ 1980  0040D2CC    2B4  bool Gaud_ReInit()
+                         local  int32 i
+                         local  int i
+ 2062  0040D580     34  bool Gaud_InitOnce()
+ 2071  003E4F24      4  void Gaud_ExitOnce()
+ 2099  00458F74    6E8  void Gaud_Cycle()
+                         local  bool onlyonce
+                         local  uint32 lastFrameCounterServiced
+                         local  bool isplaying
+                         local  float slope
+                         local  float fTimeDelta
+                         local  float fRiseDeltaSinceLastFrame
+                         inlines  UpdateAmbianceAutoGainControl, UpdateCommentVolDucking, cGAME_GLOBALS::GetCumulativeFrames
+ 2277  0045DF34    894  void Gaud_Monitor()
+                         local  int32 level
+                         local  bool bCameraReady
+                         local  enum GM_CourseType_t courseIndex
+                         local  uint8 holeID
+                         local  Course_t courseID
+                         local  uint8 rangeID
+                         local  bool bDisableModernSounds
+                         local  bool bIsKnownCourse
+                         local  int32 nplayers
+                         local  PlayerSound* psound
+                         local  uint8 windlevel
+                         local  int32 i
+                         local  vec4flt pos
+                         local  struct CA_SCamera* pcam
+                         local  uint8 eaTraxlist
+                         inlines  FirstFrameInit, GM_GetGolferUp, GM_GetModeType, GetAmbientStreamRange, InitCrowdBuildup, StartAmbientStreamer, UpdateCrowdBuildup, UpdateStreaming
+ 2309  003DB608     1C  void Gaud_ForceJustOutOfPause()
+ 2325    inline-only   static bool isEmitterActive(uint32 tmplID, uint8 emitterFlags)
+                         local  bool emitterActive
+ 2332  0045A03C    178  void Gaud_ActorDownloadCallback(TBasicParamPtr pActorData, bool soundActorPure)
+                         local  TSndEmitterParam* psep
+                         local  uint32 tmplID
+                         local  uint8 flags
+                         local  int16 alias
+                         local  EAudPosType postype
+                         local  uint8 instID
+                         local  vec4flt pos
+ 2397  003DB624    1B4  static void resetDefaults()
+ 2443  0040CD40    1A4  void Gaud_InitFE()
+ 2467  00459A50     5C  void Gaud_ExitFE()
+ 2486  00459E48    1F4  void Gaud_InitFacility()
+                         local  vec4flt pos
+ 2517  004599E0     70  void Gaud_ExitFacility()
+ 2542  003DBFF4      4  void Gaud_PreHoleLoad()
+ 2548  00459AAC     98  void Gaud_PrepareForExit()
+ 2697  003DBFF8    128  void Gaud_SetLoadedNicknameBank(int resType, int bankIndex)
+                         local  bool bfound
+                         local  int ii
+ 2731  0042BAB4     F8  int Gaud_GetBankIndexPlayerId(int playerid)
+                         local  enum UserNickName nickname
+                         local  enum Golfer_t golfer
+                         local  int ii
+                         local  int ii
+                         inlines  UserInfo::GetNickName
+ 2778  00436360     A0  void Gaud_UnloadNicknameBanks()
+                         local  int i
+ 2798  0042B754    360  void Gaud_LoadNicknameBanks()
+                         local  bool bDisableRuntimeAudio
+                         local  int nicknameindex
+                         local  int i
+                         local  int playerID
+                         local  int streamchunk1
+                         local  int streamchunk2
+                         local  int streamchunk3
+                         local  int streamchunk4
+                         local  enum UserNickName nickname
+                         local  int ii
+                         local  enum Golfer_t golfer
+                         local  int ii
+                         inlines  UserInfo::GetNickName
+ 2891  0045A850    310  void Gaud_InitHole()
+                         local  enum GM_ModeType_t gameMode
+                         local  vec4flt pos
+                         local  int cumHoles
+                         inlines  GM_GetCurrentHoleIndex, GM_GetModeType
+ 2963  0045965C    384  static void WaitForAllStreams()
+                         local  uint64 uiStartTimeValue
+                         local  double sndSysTimeStart
+                         local  uint64 uiInProcessTimeValue
+                         local  double fElapsedTimeInSecs
+                         local  double diff
+                         inlines  Ses_HasStreamingAudio, TI_uiReadCP0Count, sys_time_get_timebase_frequency
+ 3045  0045DD84    1B0  void Gaud_ExitHole()
+                         local  int32 i
+                         local  int32 nplayers
+ 3126  00406734     30  void Gaud_EndHole()
+ 3133  004502EC     44  void Gaud_KillFlagSound()
+ 3140  00457E8C     60  static void Gaud_ResetCrowdInterxn()
+ 3148  00457EEC     58  void Gaud_BeginTurn(uint8 PlayerID)
+ 3158  0045DC18    16C  void Gaud_InitSwing(uint8 playerID)
+                         local  int32 viewID
+                         local  PlayerSound* ps
+                         local  struct GamePlayer* plr
+                         local  uint8 emid
+                         local  vec4flt pos
+                         inlines  Character_GetBonePos, Character_GetBonePos_FromIndex, GamePlayer::GetCharacter, vec4flt_Copy
+ 3201  0045E9BC    38C  void Gaud_UpdtSwing(uint8 playerID)
+                         local  int32 viewID
+                         local  PlayerSound* ps
+                         local  struct GamePlayer* plr
+                         local  uint8 emid
+                         local  float clubheadvel
+                         local  float pitch
+                         local  float attn
+                         local  vec4flt pos
+                         local  vec4flt lastpos
+                         inlines  Character_GetBonePos, Character_GetBonePos_FromIndex, GamePlayer::GetCharacter, GamePlayer::GetSwingInfo, LLMath_DistanceBetween3, vec4flt_Copy
+ 3295    inline-only   static uint8 getSwingVarRange(enum PlayerNumber_t playerID)
+                         local  enum Club_t clubType
+                         local  enum GaudClubType_t audioClubType
+ 3395    inline-only   static uint8 getSwingVariation(uint8 playerID)
+                         local  uint8 variationIndex
+                         local  enum Lie_t lie
+                         local  bool buried
+                         local  bool sandShot
+                         local  float shotPower
+                         local  bool hardShot
+                         local  bool wetShot
+ 3491  0045D4AC    6C4  void Gaud_SwingBallHit(uint8 playerID, bool supressSampledSound)
+                         local  struct GamePlayer* plr
+                         local  PlayerSound* ps
+                         local  uint8 emidswing
+                         local  CameraController_t* pcam
+                         local  enum CameraSpecialSwings_t swtype
+                         local  struct CoreShotInfo_t* pCoreShotInfo
+                         local  bool playcrowdonhit
+                         local  float shotPower
+                         local  bool bPlayingSpecialStream
+                         local  int bigHitStreamIndex
+                         local  bool isplaying
+                         local  int crowdRxn
+                         local  int swingVarRange
+                         local  int swingVar
+                         local  char*[3] rxnText
+                         local  float duration
+                         inlines  GameEffects_IsScriptedMomentOn, Gaud_StartBigHitStream, cGAME_GLOBALS::GetSfxGroundCondition, getSwingVarRange, getSwingVariation
+ 3617  0045B790     70  void testClubHitSound(int varRange, int variation)
+                         local  PlayerSound* ps
+                         local  uint8 emidswing
+ 3652  0045BAAC     24  void Gaud_SwingReverse(uint8 playerID)
+                         local  uint8 emid
+ 3666  0045D0AC    400  void Gaud_BallBounce(uint8 playerID)
+                         local  struct GamePlayer* plr
+                         local  PlayerSound* ps
+                         local  struct TGD_MaterialInfo* psurf
+                         local  TI_STimeValue thistime
+                         local  float elapsedTime
+                         local  bool bIsWater
+                         local  bool bPlayBounceSnd
+                         local  float diffvel
+                         local  float attn
+                         local  uint8 emid
+                         local  bool bIsBranchSound
+                         local  uint8 trackID
+                         inlines  GamePlayer::GetCoreShotInfo, TI_fConvertTimeDifToSeconds, sys_time_get_timebase_frequency
+ 3748  0045C2CC     78  void Gaud_BallStopped(uint8 playerID)
+ 3762  0045D020     8C  void Gaud_BallInCup(uint8 playerID)
+                         local  struct GamePlayer* plr
+                         local  uint8 emid
+                         local  uint8 step
+                         local  int which
+ 3784  0045CFAC     74  void Gaud_BallHitPole(uint8 playerID)
+                         local  struct GamePlayer* plr
+                         local  uint8 emid
+ 3800  0045CF38     74  void Gaud_BallHitMetalTarget(uint8 playerID)
+                         local  struct GamePlayer* plr
+                         local  uint8 emid
+ 3817  0045B6AC     E4  void Gaud_CameraShake(uint8 playerID, bool filter)
+                         local  uint8 emidL
+                         local  uint8 emidR
+                         local  uint32 startTime
+ 3843  0045B62C     80  void Gaud_TextFall()
+                         local  uint8 emidL
+                         local  uint8 emidR
+ 3859  003DC2C8      4  void Gaud_PlayTextDitty(enum TextDittyType type)
+ 3864  003DC2CC      4  void Gaud_StartShotClock()
+ 3871  003DC2D0      4  void Gaud_StopShotClock()
+ 3879  003DC2D4      4  void Gaud_TimeTicking()
+ 3887  003DC2D8      4  void Gaud_TimeTickingStop()
+ 3895  00451C04     18  void Gaud_MoneyAward()
+ 3901  00451BEC     18  void Gaud_BullsEye()
+ 3906  00451BD4     18  void Gaud_BullsEyeBONUS()
+ 3911  00451BBC     18  void Gaud_BonusBall()
+ 3917  00451BA4     18  void Gaud_ScoreInRing()
+ 3923  00451B8C     18  void Gaud_ScoreInRingStolen()
+ 3929  00451B74     18  void Gaud_ScoreInRingStolenBullsEye()
+ 3934  00451B5C     18  void Gaud_ScoreInRingBONUS()
+ 3940  00451B44     18  void Gaud_EndBuzzer()
+ 3946  00451B2C     18  void Gaud_BallHitTarget()
+ 3952  00451B14     18  void Gaud_TargetClosedOut()
+ 3958  00451AFC     18  void Gaud_LetterGained()
+ 3965  004521D8     18  void Gaud_DefaultSelectSound()
+ 3971  004521C0     18  void Guad_SwitchGreen()
+ 3977  004521A8     18  void Gaud_SwitchCup()
+ 3983  00451AE4     18  void Gaud_DefaultErrorSound()
+ 3989  00451ACC     18  void Gaud_GameFailSound()
+ 3995  00451AB4     18  void Gaud_Steal_TargetSound()
+ 4001  00451A9C     18  void Gaud_GameSuccessSound()
+ 4007  00451A84     18  void Gaud_EpicTextChime()
+ 4013  003DC2DC      4  void Gaud_Tappa(uint8 playerID)
+ 4021  003DC2E0      4  void Gaud_Spina(uint8 playerID)
+ 4028  00457E58     34  void Gaud_PlayTappaFeedback(uint8 playerID)
+                         local  int32 viewID
+                         local  PlayerSound* ps
+                         local  uint8 emid
+ 4047    inline-only   static void Gaud_MuteAll()
+ 4070    inline-only   static void Gaud_UnmuteAll()
+ 4095  0045CCF0    248  void Gaud_InitGameBreaker(uint8 playerID, bool predicted)
+                         local  PlayerSound* ps
+                         inlines  Gaud_MuteAll, StartCriticalMomentDucking
+ 4133  0045CAC8    228  void Gaud_ExitGameBreaker(uint8 playerID)
+                         local  PlayerSound* ps
+                         inlines  Gaud_UnmuteAll
+ 4174  0045CABC      C  void Gaud_GamebreakerSuccess()
+ 4180  00457E08     50  void Gaud_InitCamZoom(uint8 playerID)
+                         local  PlayerSound* ps
+ 4190  00457DB8     50  void Gaud_ExitCamZoom(uint8 playerID)
+                         local  PlayerSound* ps
+ 4203  0045B330    2FC  void Gaud_InitSpecialShot(uint8 playerID)
+                         local  PlayerSound* ps
+                         local  CameraController_t* pcam
+                         local  enum CameraSpecialSwings_t swtype
+                         local  bool swooshnow
+                         local  uint8 range
+ 4308  0045B24C     E4  void Gaud_UpdtSpecialShot(uint8 playerID, uint8 frameID)
+                         local  PlayerSound* ps
+                         local  CameraController_t* pcam
+                         local  enum CameraSpecialSwings_t swtype
+ 4338  0045DB70     A8  void Gaud_ExitSpecialShot(uint8 playerID)
+                         local  PlayerSound* ps
+ 4355  003DC2E4      4  void Gaud_StartHappyGilmoreSound(uint8 playerID)
+ 4359  003DC298     30  void Gaud_ExitHeartBeat(uint8 playerID)
+                         local  CameraController_t* pcam
+                         local  enum CameraSpecialSwings_t swtype
+ 4379  0045B1D0     7C  void Gaud_InitSlowMo(uint8 playerID, uint8 varID)
+                         local  PlayerSound* ps
+ 4391  00457D68     50  void Gaud_ExitSlowMo(uint8 playerID)
+                         local  PlayerSound* ps
+ 4401  0045C7C4    2F8  void Gaud_InitCrowdReactionSound(int32 varRangeID, ECrowdReacSit sit)
+                         local  uint8 range
+                         local  bool bCanPlayNickname
+ 4485  0045C0D8     8C  void Gaud_ExitCrowdReactionSound()
+ 4510  0045C49C    18C  void Gaud_FireQuickCheer()
+                         local  int32 varRangeID
+                         local  bool bCanPlayNickname
+ 4559  0045C344    158  void Gaud_InitTopOfArcBuildup()
+                         local  bool bCanPlayNickname
+                         inlines  GM_GetGolferUp
+ 4603  0045C01C     BC  void Gaud_ExitTopOfArcBuildup()
+ 4626  0045BF0C    110  void Gaud_CrowdMutter_Begin()
+                         local  bool bCanPlayNickname
+ 4657  0045BDF8    114  void Gaud_CrowdMutter_End()
+                         local  bool bCanPlayNickname
+ 4692  003DC2E8     38  bool Gaud_IsCrowdScattering()
+ 4698  004586B4    100  static bool Gaud_PlayCrowdHitComment()
+                         local  bool bPlayed
+                         local  uint16 commentID
+                         local  bool bCalcNewTone
+                         local  int[2] prevRandTones
+ 4735  0045BD28     D0  void Gaud_CrowdInterxn_Scatter()
+ 4754  0045C1AC    120  void Gaud_CrowdInterxn_Impact()
+ 4779  0045C164     48  void Gaud_ExitShotSimulation()
+ 4793  0045B10C     80  void Gaud_InitWindSound(int level)
+ 4805  00457764     6C  void Gaud_ExitWindSound()
+ 4818  004579E4     80  static void Gaud_InitSurroundBirds()
+                         local  bool bEnableSurroundBirds
+ 4846  0045B09C     70  void Gaud_InitTreeSound(int level)
+ 4857  00457708     5C  void Gaud_ExitTreeSound()
+ 4867  0045AFC0     DC  void Gaud_InitRainSound(float intensity)
+                         local  uint8 level
+ 4887  00457C40     9C  void Gaud_ExitRainSound()
+ 4907  00459B44     40  void Gaud_OnScoreCard(bool on)
+ 4926  003E114C     8C  void Gaud_Pause(bool on)
+ 4950  00451C1C     B4  void Gaud_PlayUISound(int32 sndID, float fVol)
+                         local  uint16 vol
+                         inlines  Mas_GetSubmix
+ 4967  00412590      C  void Gaud_StopUISound(int32 sndID)
+ 4976  004519D0     B4  void Gaud_PlayMiniGameSound(int32 sndID, float fVol)
+                         local  uint16 vol
+                         inlines  Mas_GetSubmix
+ 4992  00412584      C  void Gaud_StopMiniGameSound(int32 sndID)
+ 5003  00459CB4    15C  bool Gaud_PlayEmitter(uint32 guid, uint8 track)
+                         local  bool bResult
+                         local  int i
+                         local  const const TEmitInst& emitter
+                         local  struct CoreShotInfo_t* p
+ 5041  00459E10     38  bool Gaud_PlayEmitter(const char* name, uint8 track)
+ 5056  0045BA18     94  void Gaud_LongDriveUi_Play(int32 script, int32 track, int32 range, int32 loop, int32 pan)
+ 5079  00457688     80  void Gaud_LongDriveUi_Stop(int32 script, int32 track, int32 range)
+ 5101  00457108     24  int Gaud_RewardCommentaryIsPlaying()
+ 5119  003DB288     18  void Gaud_EnableStreaming(bool bEnable)
+ 5125  00458890    140  void Gaud_StartMusic(uint8 playlist, int32 trackID)
+                         inlines  Ses_HasStreamingAudio
+ 5152  00457B08     74  void Gaud_StopMusic()
+ 5167  0045712C     3C  bool Gaud_GetMusicStatus()
+ 5179  0045A818     38  void Gaud_StartMusicInFrontEndOptions(int songIndex)
+ 5188  003DC320      4  void Gaud_PlayEraMusic()
+ 5193  0045A814      4  void Gaud_StartFEMusic(bool firstTime)
+ 5200  003DC324     24  void Gaud_InitFlyBy()
+ 5208  00457A64     A4  void Gaud_ExitFlyBy()
+ 5229  003DC348      4  void Gaud_InitGameFace()
+ 5237  004587B4     DC  void Gaud_StartOneShotStream(uint8 playlist, uint16 commentID, TCommentPlayMode mode)
+                         local  bool sbEnableStreams
+ 5268  00458508    1AC  void Gaud_StartComment(uint8 playlist, uint16 commentID, TCommentPlayMode mode)
+                         local  bool sbEnableStreams
+                         local  char*[3] modeText
+ 5311  00457990     54  void Gaud_StopComment()
+ 5326  00457970     20  void Gaud_StopOneShot()
+ 5334  00457070     98  bool Gaud_CanTriggerTalky()
+                         local  bool bCanTriggerTalky
+ 5362  0040F160     58  void Gaud_StopTalky(bool bIncludeSecondChannel)
+ 5371  003DC388     24  bool Gaud_HasPrimedTalky(int streamType)
+ 5377  0040FD20     B8  bool Gaud_PrimeTalky(uint16 playlistID, uint16 waveID, int streamType, AudStmStatusCallbackPtr pCallback, int callbackUserData)
+                         local  bool bSuccess
+                         local  uint32 ramoffset
+                         local  uint32 offset
+                         inlines  Ses_HasStreamingAudio
+ 5392  00409E7C     8C  bool Gaud_PlayPrimedTalky(int streamType, float timeMult)
+                         local  bool bSuccess
+                         local  uint16 vol
+ 5420  0040FDD8     A8  bool Gaud_PrimeAudioStream(uint8 playlistID, uint16 waveID, int type, AudStmStatusCallbackPtr pCallback, int callbackUserData)
+                         local  bool bSuccess
+                         local  uint32 ramoffset
+                         local  uint32 offset
+                         inlines  Ses_HasStreamingAudio
+ 5435  003DDB18     34  bool Gaud_PlayPrimedAudioStream(int type, bool bLoop, uint16 vol)
+                         local  bool bSuccess
+ 5445  003DC274     24  bool Gaud_IsStreamPlaying(int type)
+ 5451  003DD564      4  void Gaud_SetStreamTimeMult(int type, float timeMult)
+ 5457  00456FD4     3C  bool Gaud_GetCommentStatus()
+                         local  bool bBusy
+ 5469  00456F4C     3C  static bool Gaud_GetOneShotStatus()
+ 5480  00457010     60  void Gaud_FlushCommentaryQueue()
+ 5490  00456F88     4C  bool Gaud_GetAmbientStmStatus()
+ 5503  003DC60C     18  bool Gaud_GetTrinityStatus()
+ 5509  004571B0     9C  bool Gaud_GetStreamingStatus()
+ 5523  003DC624     E4  static void TrinityAudioCallback(int strmHandle, enum eAudStrmCallbackReason reason, int userData)
+ 5538  0040ED14    270  bool Gaud_PlayTrinityAudio(const char* sequence_name)
+                         local  uint32 offset_ram
+                         local  uint32 offset_strm
+                         local  float fVol
+                         local  int len
+                         local  char[64] tmpbuf
+ 5574  00457B7C     C4  void Gaud_StopAllStreams()
+                         inlines  StopAmbientStreamer
+ 5586  004127B8     10  void Gaud_ReleaseAllRambased()
+ 5620  0045C628    19C  void Gaud_StartTrophyBallComment(int32 tballID)
+                         local  uint8[23] audioID
+ 5668  003E0494    17C  void Gaud_SetSfxLevel(float attn)
+                         local  uint8 chan
+ 5700  003E0380    114  void Gaud_SetCommentLevel(float attn)
+                         local  Course_t courseID
+ 5720  003E0354     2C  void Gaud_SetTalkyLevel(float attn)
+ 5729  0045A614      4  void Gaud_SetMusicLevel(float attn)
+ 5773    inline-only   static void printSubmixLevels()
+                         local  int i
+ 5785  0045A618    1FC  void Gaud_ChangeSubmixLevel(int submixChan, float attn)
+                         inlines  cGAME_GLOBALS::SetCommentaryVolumeOption, cGAME_GLOBALS::SetMusicVolumeOption, cGAME_GLOBALS::SetSfxVolumeOption, cGAME_GLOBALS::SetTalkyVolumeOption, printSubmixLevels
+ 5820  0040FE80    178  void Gaud_PreviewTalky(bool bMale, int voiceStyle, float pitch)
+                         local  uint16 streamID
+                         local  uint32 ramoffset
+                         local  uint32 offset
+                         local  float timeMult
+                         inlines  Ses_HasStreamingAudio
+ 5849  0045025C     90  void Gaud_InitInGameVideo()
+ 5902  003E030C     48  void* MixUI(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 5908  003E02D0     3C  void* MixSPECIAL_EFFECTS(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 5914  003E0294     3C  void* MixPLAYER(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 5920  003E0258     3C  void* MixBALL(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 5926  003E021C     3C  void* MixSWING(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 5932  003E01D4     48  void* MixCROWDS(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 5938  003E018C     48  void* MixTEXTDITTIES(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 5944  003E0144     48  void* MixDIN(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 5950  003E00FC     48  void* MixMINIGAME(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 5956  003E00B4     48  void* MixUI_SPECIAL(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 5962  003E006C     48  void* MixTALKY_STM(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 5968  003E0024     48  void* MixSFX_STM(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 5974  003DFFDC     48  void* MixAMBIENT(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 5980  003DFF94     48  void* MixCOMMENT(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 5986  003DFF4C     48  void* MixMUSIC(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 5993  003DFF04     48  void* MixWIND(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 5999  003DFEBC     48  void* MixBIRDS(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 6005  003DFE74     48  void* MixWATER(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 6011  003DFE2C     48  void* MixANIMALS(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 6017  003DFDE4     48  void* MixINSECTS(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 6023  003DFD9C     48  void* MixWATERFALL(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 6029  003DFD54     48  void* MixTREES(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 6035  003DFD0C     48  void* MixTRANSPORTATION(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 6041  003DFCC4     48  void* MixAMBIENTMUSIC(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 6047  003DFC7C     48  void* MixOBJECTS(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 6053  003DFC34     48  void* MixSKILLZ_UI(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 6059  003DFBEC     48  void* MixMOVIE(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 6067  003DDBC8     24  void* Tune_MirrorStreams(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 6073  003DC708      8  void* Tune_MirrorRam(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+ 6081  003DB7D8    81C  void Gaud_InitTuners()
+                         local  int id
+                         local  int catid
+                         local  float gfMasterVolume
+                         local  float sPanRadius
+                         local  float gRearStereoAttn_Streams
+                         local  float gRearStereoAttn_Ram
+                         local  int32 sForcePan
+                         local  int32 sForceLowpassFreq
+ 6169  0045A4F4     28  void Gaud_RestartMusic()
+ 6177  0045A5A8     6C  void Gaud_PlayCreditsMusic()
+ 6189  0045A51C     8C  void Gaud_StopCreditsMusic()
+ 6201  00457168     48  void Gaud_StopTrinityAudio()
+ 6210  00488454    138  void Gaud_Printf(float x, float y, char* fmt)
+                         local  va_list args
+                         local  char[2048] buffer
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetCullMode, DS_vSetZBufferMode
+ 6251  004768C8    13C  void AudioDebug_DrawWireframeSphere(const vec4flt& center, float radius, const float[4]& color)
+                         inlines  DS_vSetAlphaBlendingFunction, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, PR_vSetCurrentColor, PR_vSetCurrentUsage, PR_vSetDefaultCurrentColor
+ 6275  003DC710    140  void Gaud_DebugRender()
+                         local  FO_EAddMode eOldAddMode
+                         local  float x
+                         local  float y
+                         local  int i
+                         local  DEBUGPRINTFN pFn

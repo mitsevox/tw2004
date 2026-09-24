@@ -1,0 +1,37 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_OnlineAPopHelper.cpp
+// compiled in: apt_unity.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   28  000778FC     14  static struct UIOnlineAPopHelper* getOnlineAPopHelper()
+   33  0005E8B8     14  static struct UIMemCardBrowsePopup* getMemCardBrowsePopup()
+   51  0005EB74     54  static void _ASelectedYourSelfCB(int32 index)
+   63  00077910    170  static void _APopLobbyChallengeOptionsCB(int index)
+   93  00077B68    120  static void _APopLobbyOptionsCB(int index)
+  136  00077A80     E8  static void _APopWaitingRoomOptionsCB(int index)
+  210  000DCC04     8C  void UIOnlineAPopHelper::UIOnlineAPopHelper(const struct UIOnlineAPopHelper* this)
+                         inlines  AptSubscriberVariableGrp::AptSubscriberVariableGrp, TArrayInternal<ValueType,AptStructSwapper>::TArrayInternal
+  222  00033610     24  void UIOnlineAPopHelper::Init(const struct UIOnlineAPopHelper* this)
+  230  00033D5C     50  void UIOnlineAPopHelper::Close(const struct UIOnlineAPopHelper* this)
+                         inlines  AptSubscriberVariableGrp::Close
+  240  0005EB04     70  void UIOnlineAPopHelper::ShowAPopOptionsHelper(const struct UIOnlineAPopHelper* this, char* szUserName, enum eApopContext context)
+  251  0006A904     48  void UIOnlineAPopHelper::ChallengeGamer(const struct UIOnlineAPopHelper* this)
+                         inlines  UIOnlineGameSetup::SetFromAPop
+  265  0005E624    194  void UIOnlineAPopHelper::SendMessage(const struct UIOnlineAPopHelper* this)
+                         local  struct OnlineManagerOSDK* pOnlineMgr
+                         local  struct Facade* pFacade
+                         local  struct LoginSlot* pLoginSlot
+  296  00069420     F8  void UIOnlineAPopHelper::ViewResume(const struct UIOnlineAPopHelper* this)
+  325  0005E7B8    100  void UIOnlineAPopHelper::ViewGamerCard(const struct UIOnlineAPopHelper* this)
+  347  00046C78     B4  void UIOnlineAPopHelper::SubmitPlrReview(const struct UIOnlineAPopHelper* this)
+                         local  struct Facade* pFacade
+                         local  struct LoginSlot* pLoginSlot
+  356  0005CE78     8C  void UIOnlineAPopHelper::ViewReceivedLobbyChallenge(const struct UIOnlineAPopHelper* this)
+                         local  struct LobbyMatchupOSDK* pLobbyMatch
+                         inlines  OnlineManagerOSDK::GetLobbyMatchup
+  370  0005E8CC    238  void UIOnlineAPopHelper::ShowAPop(const struct UIOnlineAPopHelper* this, enum eApopContext context)
+                         local  int32 iSize
+                         local  char* stringId
+                         local  MemCardResponseFuncPtr* popupOnCloseCB
+                         local  bool bShowPopup
+                         local  struct Facade* pFacade
+  489  00069518     94  enum AptThreadReturnValue UIOnlineAPopHelper::WaitForResumeThread(const struct UIOnlineAPopHelper* this)

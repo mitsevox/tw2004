@@ -1,0 +1,46 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_TrainingChallenge.cpp
+// compiled in: apt_unity.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   63  0004E380     14  void ShowTrainAgain()
+   69  000F551C    108  void UITrainingChallenge::UITrainingChallenge(const struct UITrainingChallenge* this)
+                         inlines  TArrayInternal<UITrainingChallenge::DstMenuItem_tran,AptStructSwapper>::TArrayInternal, TExternArray<UITrainingChallenge::DstMenuItem_tran>::TExternArray, UIMenuCircDefault::UIMenuCircDefault
+   77  000F1384     80  void UITrainingChallenge::Init(const struct UITrainingChallenge* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList, UIMenuBase::SetMaxRefCount
+   90  00063BB4     C0  void UITrainingChallenge::Show(const struct UITrainingChallenge* this)
+  108  0004E394     68  void UITrainingChallenge::OnShow(const struct UITrainingChallenge* this)
+  118  000667D0     94  void UITrainingChallenge::Hide(const struct UITrainingChallenge* this)
+                         inlines  AptControllerListener::StopPortLocking
+  137  0004E3FC     AC  void UITrainingChallenge::ShowCSPSkills(const struct UITrainingChallenge* this)
+  152  000587E4     80  void UITrainingChallenge::ShowHelpText(const struct UITrainingChallenge* this)
+  164  00034684     A4  void UITrainingChallenge::RegisterCSPSkills(const struct UITrainingChallenge* this, int index, enum UserDevPointType type)
+                         local  int stringIndex
+                         local  int i
+  190  0004E4A8     A8  void UITrainingChallenge::BuildCustomOpenScreenSequence(const struct UITrainingChallenge* this)
+  201  00097C48    204  enum TAptSequenceStatus UITrainingChallenge::InitPreviewMenuSequence(const struct UITrainingChallenge* this, bool inbFirstTime, void* inData)
+                         local  int32 i
+                         local  enum UserDevPointType devPt
+                         local  int iNumMenuItems
+                         local  int32 j
+                         local  int32 iSelectedEventIndex
+                         local  char* nameEvent
+                         inlines  GameModeDriverTrainingChallenges::SetPrimaryAttribute
+  234  00060154    16C  enum TAptSequenceStatus UITrainingChallenge::InitSkillsTableSequence(const struct UITrainingChallenge* this, bool inbFirstTime, void* inData)
+                         local  const struct UserInfo& userInfo
+  259  0004E550    11C  void UITrainingChallenge::UpdateItemAndLabel(const struct UITrainingChallenge* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_tran* dest
+                         local  int32 iSelectedEventIndex
+                         local  struct UITrainingChallengeConst* srcA
+  282  0004E66C     48  void UITrainingChallenge::UpdateItemAndLabelFlash(const struct UITrainingChallenge* this, struct UIMenuItemBaseDst* inMenuItem, int32 index, char* label)
+  287  000C0544    2A4  enum eAptHandleInput UITrainingChallenge::HandleInput(const struct UITrainingChallenge* this, int32 cID)
+                         local  int32 eventIndex
+                         local  int32 randEvent
+                         inlines  GameModeDriverTrainingChallenges::SetPrimaryAttribute
+  354  000C0458     EC  void UITrainingChallenge::StartEvent(const struct UITrainingChallenge* this, int32 menuIndex)
+                         inlines  AptControllerListener::StopPortLocking
+  365  0004E6B4     BC  int32 UITrainingChallenge::GetRandomTrainingEvent(const struct UITrainingChallenge* this, int32 menuIndex)
+                         local  int32 randEvent
+                         local  int32 numTotalEvents
+                         local  enum UserDevPointType devPt
+                         inlines  GameModeDriverTrainingChallenges::SetPrimaryAttribute
+  380  00024FA8    124  void UITrainingChallenge::NotifySetPlayerLevel(const struct UITrainingChallenge* this)

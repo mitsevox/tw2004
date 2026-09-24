@@ -1,0 +1,93 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_Match.cpp
+// compiled in: golf_unity.cpp
+// 23 functions, source order. line | PS3 address | size
+
+   20  00204EC8     44  void GameModeMatch::GameModeMatch(const struct GameModeMatch* this)
+   25  001FCAA0     18  void GameModeMatch::~GameModeMatch(const struct GameModeMatch* this)
+   30  001FCB34     DC  void GameModeMatch::Init(const struct GameModeMatch* this)
+   47  001FDF4C      4  void GameModeMatch::Update(const struct GameModeMatch* this)
+   52  001FDF50      4  void GameModeMatch::Shutdown(const struct GameModeMatch* this)
+   57  001FDF54     1C  bool GameModeMatch::QueryInterface(const struct GameModeMatch* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bRet
+   71  001FDF70     38  int32 GameModeMatch::GetEndGameSequence(const struct GameModeMatch* this)
+                         local  int32 sequence
+   80  002AC898    318  enum PlayerNumber_t GameModeMatch::GetHonors(const struct GameModeMatch* this, enum PlayerNumber_t ignore, bool doNotIgnoreHoledOut)
+                         local  enum PlayerNumber_t retVal
+                         local  enum PlayerNumber_t teePlayer
+                         local  enum PlayerNumber_t furthest
+                         local  int32 i
+                         local  float x
+                         local  float y
+                         local  float dist
+                         local  float farthestDist
+                         local  TGD_TerrainInfo* pTerrainGameData
+                         local  bool found
+                         inlines  std::sqrt
+  191  002AC71C    17C  enum PlayerNumber_t GameModeMatch::GetTeeHonors(const struct GameModeMatch* this, enum PlayerNumber_t ignore)
+                         local  int32 i
+                         local  int j
+                         local  enum PlayerNumber_t retVal
+  246  00323CA8    274  enum PlayerNumber_t GameModeMatch::GetHoleWinner(const const struct GameModeMatch* this)
+                         local  uint32_t curHole
+                         local  enum PlayerNumber_t winner
+                         local  bool plr1HoledOut
+                         local  bool plr2HoledOut
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GamePlayer::HoledOut
+  274  002AC6D4     48  int GameModeMatch::NumMatchPlayers(const const struct GameModeMatch* this)
+                         local  int nMatchPlayers
+  280  0030E174    4F8  bool GameModeMatch::HoleFinished(const struct GameModeMatch* this, enum PlayerNumber_t PlayerID, bool predict)
+                         local  int i
+                         local  int holecount
+                         inlines  GM_GetPlayerHoleStrokes, GM_SetPlayerHoleStrokes
+  344  002F97F0     50  void GameModeMatch::ScorecardClosed(const struct GameModeMatch* this)
+  352  002A18A0     F0  bool GameModeMatch::TrackingReactiveDifficulty(const struct GameModeMatch* this)
+                         local  bool bRetVal
+                         local  void* driverPointer
+                         local  struct GameModeDriver* pGMDriver
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+  364  0025281C    244  bool GameModeMatch::GameFinished(const struct GameModeMatch* this, bool predict)
+                         local  int i
+                         local  int holecount
+                         local  bool retval
+  436  002F9630    1C0  void GameModeMatch::ClearScores(const struct GameModeMatch* this)
+                         local  int32 i
+                         local  int32 j
+                         inlines  GM_SetPlayerHoleStrokes
+  461  00252B6C    1A0  bool GameModeMatch::GoToPlayoff(const struct GameModeMatch* this, bool predict)
+                         local  int32 j
+                         local  uint32 nIndex
+  514  0030EE68    1C0  void GameModeMatch::EndHole(const struct GameModeMatch* this)
+                         local  enum PlayerNumber_t winner
+                         inlines  GamePlayer::GetGolferScore
+  553  00237AC8     A4  void GameModeMatch::GetWinnerAndLoser(const struct GameModeMatch* this, enum PlayerNumber_t* winner, enum PlayerNumber_t* loser)
+  567  002D4D84    4EC  void GameModeMatch::EndGame(const struct GameModeMatch* this)
+                         local  bool bAward
+                         local  void* driverPointer
+                         local  enum PlayerNumber_t winner
+                         local  enum PlayerNumber_t loser
+                         local  struct OnWinData_t onWinData
+                         local  enum PlayerNumber_t winner
+                         local  enum PlayerNumber_t loser
+                         local  uint8_t winnerID
+                         local  uint8_t loserID
+                         local  enum PlayerNumber_t winner
+                         local  enum PlayerNumber_t loser
+                         local  enum PlayerNumber_t winner
+                         local  enum PlayerNumber_t loser
+                         local  int32 winnerNumWins
+                         local  int32 loserNumWins
+                         inlines  GolferStats::GetGolferStats, OnWinData_t::OnWinData_t, Singleton<DifficultySettings>::GetSingleton, Singleton<GameModeDriverManager>::GetSingleton, Singleton<GolferStats>::GetSingleton
+  654  002D6424    1CC  void GameModeMatch::AwardWinnings(const struct GameModeMatch* this)
+                         local  enum PlayerNumber_t winner
+                         local  enum PlayerNumber_t loser
+                         local  int32 pointsAhead
+                         local  int32 totalearned
+                         local  int32 baseearned
+                         local  int32 userID
+                         local  void* driverPointer
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+  693  00237B6C    168  void GameModeMatch::GetCurrentScoreString(const struct GameModeMatch* this, char* strBuf, int32 bufferSize)
+                         local  int32 player
+                         local  int32 yourWins
+                         local  int32 theirWins
+  719  001FDFA8     14  const char* GameModeMatch::GetName(const struct GameModeMatch* this)

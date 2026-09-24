@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/UI_BloodSome.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   20  00122E34     C0  void UIBloodSome::~UIBloodSome(const struct UIBloodSome* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStaticCharBuffer<64u>::~AptStaticCharBuffer, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   22  000FE648      C  uint32 UIBloodSome::GetSignature(const const struct UIBloodSome* this)
+   42  000FE654      4  void UIBloodSome::Show(const struct UIBloodSome* this)

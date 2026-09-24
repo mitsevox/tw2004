@@ -1,0 +1,6 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/systemgetprofiler.cpp
+// compiled in: systemgetprofiler.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   13  006F6374     9C  struct Profiler* GetProfiler(const struct <anon>* this)
+                         local  const char[12] __FUNCTION__

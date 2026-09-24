@@ -1,0 +1,16 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/ps3/LLJobScheduler_ps3.c
+// compiled in: Legacy_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   16  003AFA70    124  void LLJobScheduler_InitOnce()
+                         local  int spuInit
+                         local  struct <anon> mp
+                         inlines  Allocator::GetTempAllocator, SetDebugOutputFilter, sys_spu_initialize
+   35  0038EDB8     84  LLJob* LLJobScheduler_AllocJob(const char* name)
+                         local  LLJob* job
+   42  0038E99C     CC  void LLJobScheduler_FreeJob(LLJob* job)
+   49  0037FCBC     38  void LLJobScheduler_StartJobTree(LLJob* job)
+   53  00391B10    1F8  void LLJobScheduler_WaitUntilDone(LLJob* job)
+                         local  TI_STimeValue start
+                         inlines  TI_fConvertFullTimeDifToSeconds
+   74  0037FCF4     38  void LLJobScheduler_CloseOnce()

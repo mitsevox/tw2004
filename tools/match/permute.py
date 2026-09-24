@@ -6,7 +6,12 @@ best outputs found. Read the diff in the best output and apply the idea by hand.
 import glob, os, pathlib, subprocess, sys, time
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]   # the checkout this script lives in
-PERMUTER = 'C:/dev/tools/decomp-permuter/permuter.py'
+# decomp-permuter checkout: TW_PERMUTER, else tools/decomp-permuter beside the main checkout
+# (a worktree sits one level deeper, in <parent>/tw2004-agents/<lane>)
+PERMUTER = os.environ.get('TW_PERMUTER') or next(
+    (str(p) for p in (ROOT.parent / 'tools/decomp-permuter/permuter.py',
+                      ROOT.parent.parent / 'tools/decomp-permuter/permuter.py') if p.exists()),
+    str(ROOT.parent / 'tools/decomp-permuter/permuter.py'))
 args = sys.argv[1:]
 minutes, jobs = 20, 4
 if '--minutes' in args:

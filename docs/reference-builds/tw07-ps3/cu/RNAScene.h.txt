@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/packages/RNA/dev-2.0-golf/RNA/RNAX/include/RNAX/RNAScene.h
+// compiled in: golf_unity.cpp, rnaunity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   47    inline-only   struct MaterialListC& RNASceneC::GetMaterialList(const struct RNASceneC* this)
+   48    inline-only   struct <anon>& RNASceneC::GetGeomList(const struct RNASceneC* this)
+   72    inline-only   bool8_t RNASceneC::IsLoaded(const const struct RNASceneC* this)
+   79  004F78FC      4  void RNASceneC::HeartBeat(const struct RNASceneC* this)

@@ -1,0 +1,20 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/./webofferconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   64  00623C28      C  struct <anon>* GetAlert(const struct <anon>* this)
+   65  00623C34      C  struct <anon>* GetArticles(const struct <anon>* this)
+   66  00623C40      C  struct <anon>* GetHTTP(const struct <anon>* this)
+   67  00623C4C      C  struct <anon>* GetCredit(const struct <anon>* this)
+   68  00623C58      C  struct <anon>* GetPromo(const struct <anon>* this)
+   69  00623C64      C  struct <anon>* GetNews(const struct <anon>* this)
+   70  00623C70      C  struct <anon>* GetStory(const struct <anon>* this)
+   71  00623C7C      C  struct <anon>* GetMedia(const struct <anon>* this)
+   72  00623C88      C  struct <anon>* GetMenu(const struct <anon>* this)
+   73  00623C94      C  struct <anon>* GetForm(const struct <anon>* this)
+   86  00623CA0      4  void WebOfferAbandon(const struct <anon>* this)
+   96  0062658C      8  struct WebOfferMediaResource* MediaGetList(const struct <anon>* this)
+  129  00629530     7C  void WebOfferTransferSuccess(const struct <anon>* this)
+                         inlines  operator=
+  143  00623CAC     7C  void WebOfferTransferFailure(const struct <anon>* this)
+                         inlines  operator=

@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/online/osdk/lockerstrategyconcrete.cpp
+// compiled in: golf2_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   60  0012AE18      8  int32_t LockerStrategyConcrete::GetFileTypePlatforms(const struct LockerStrategyConcrete* this, const char8_t* strFileType)
+   85  00185F14     18  void LockerStrategyConcrete::LockerStrategyConcrete(const struct LockerStrategyConcrete* this)
+  109  0012AE20     38  void LockerStrategyConcrete::~LockerStrategyConcrete(const struct LockerStrategyConcrete* this)
+                         inlines  ~LockerStrategy

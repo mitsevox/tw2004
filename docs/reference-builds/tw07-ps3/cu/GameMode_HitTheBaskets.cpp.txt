@@ -1,0 +1,85 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_HitTheBaskets.cpp
+// compiled in: golf_unity.cpp
+// 37 functions, source order. line | PS3 address | size
+
+    8  002ABE44     50  void GameModeHitTheBaskets::GameModeHitTheBaskets(const struct GameModeHitTheBaskets* this)
+   14  00203064     18  void GameModeHitTheBaskets::~GameModeHitTheBaskets(const struct GameModeHitTheBaskets* this)
+   29  00246790     E4  bool GameModeHitTheBaskets::CheckForUniqueBasketCollision(const struct GameModeHitTheBaskets* this, const char* cctActorID)
+                         local  bool bCollision
+                         local  struct GenericActor*[16] apActors
+                         local  int numBasketsToCheck
+                         local  int i
+   55  0031ACD4    1B8  void GameModeHitTheBaskets::EndGolferTurn(const struct GameModeHitTheBaskets* this, enum PlayerNumber_t playerID)
+                         local  bool failure
+                         local  struct CoreShotInfo_t* pShotInfo
+                         inlines  vec4flt_Copy
+   99  002030FC     90  const char* GameModeHitTheBaskets::GetModeSpecificTipString(const struct GameModeHitTheBaskets* this)
+  140  002030E0     1C  const char* GameModeHitTheBaskets::GetBasketTemplateName(const const struct GameModeHitTheBaskets* this, enum HTB_BasketSize_t eSize)
+  145  0020318C     50  void GameModeHitTheBaskets::GetCurrentScoreString(const struct GameModeHitTheBaskets* this, char* strBuf, int32 bufferSize)
+  150  002581E4     3C  enum PlayerNumber_t GameModeHitTheBaskets::GetHoleWinner(const const struct GameModeHitTheBaskets* this)
+                         local  enum PlayerNumber_t winner
+  171  002031DC     A0  bool GameModeHitTheBaskets::GetUIScoreCardField(const struct GameModeHitTheBaskets* this, int32_t row, int32_t column, char* strBuf, int32 bufferSize)
+                         local  bool bUpdate
+  196  0020327C     DC  void GameModeHitTheBaskets::GetUIGameFinishedString(const struct GameModeHitTheBaskets* this, char* strBuf, int32 bufferSize)
+                         local  const int kMaxStringLength
+                         local  char[32] scoreStr
+  214  00203358     48  bool GameModeHitTheBaskets::GameFinished(const struct GameModeHitTheBaskets* this, bool predict)
+                         local  bool bRet
+  222  002033A0     2C  int GameModeHitTheBaskets::GetTotalNumBaskets(const const struct GameModeHitTheBaskets* this)
+  228  002033CC     2C  int32 GameModeHitTheBaskets::GetEndGameSequence(const struct GameModeHitTheBaskets* this)
+                         local  int32 sequence
+  236  002033F8      C  const char* GameModeHitTheBaskets::GetModeName(const struct GameModeHitTheBaskets* this)
+  243  00203404     48  bool GameModeHitTheBaskets::HoleFinished(const struct GameModeHitTheBaskets* this, enum PlayerNumber_t PlayerID, bool predict)
+                         local  bool bRet
+  251  0032D984    238  void GameModeHitTheBaskets::Init(const struct GameModeHitTheBaskets* this)
+                         local  vec4flt vTemp
+                         local  uint32 playerID
+                         inlines  GM_GetCurrentHoleIndex
+  298  002ABBD8    26C  void GameModeHitTheBaskets::InitForTrainingChallenge(const struct GameModeHitTheBaskets* this, const struct TrainingChallengeEvent_t* pEventInfo)
+                         local  int iLimit
+                         local  int iBasketsToHitForWin
+                         local  enum HTB_BasketSize_t eBasketSize
+                         local  int nBasketCount
+                         local  void* ptr
+                         local  int i
+                         local  struct GameModeDriverTrainingChallenges* pDriver
+                         inlines  GameModeBase::SetUseShotClock, cGAME_GLOBALS::SetShotClockOption
+  374  002034DC     F4  bool GameModeHitTheBaskets::IsBasketHit(const const struct GameModeHitTheBaskets* this, int32 nBasketID)
+                         local  bool bRet
+                         local  int i
+  391  002035D0     44  bool GameModeHitTheBaskets::IsValidBasket(const const struct GameModeHitTheBaskets* this, int32 nActorID)
+                         local  bool bRet
+  398  00203614     14  bool GameModeHitTheBaskets::IsStartOfTurn(const struct GameModeHitTheBaskets* this)
+  403  0026D3C8     48  void GameModeHitTheBaskets::PreShotInit(const struct GameModeHitTheBaskets* this, enum PlayerNumber_t PlayerID)
+  416  002ABB04     D4  void GameModeHitTheBaskets::EndGame(const struct GameModeHitTheBaskets* this)
+                         local  struct OnWinData_t onWinData
+                         inlines  OnWinData_t::OnWinData_t
+  437  002750AC    144  void GameModeHitTheBaskets::OnActorCollision(const struct GameModeHitTheBaskets* this, const struct <anon>* pHit)
+                         local  vec4flt pos
+                         local  int i
+                         local  vec4flt upVector
+                         local  vec4flt unitNormal
+                         local  float fDot
+                         inlines  LLMath_DotProduct3, operator const float*, vec_madd, vec_sld
+  474  0026D3C0      8  void GameModeHitTheBaskets::OnClubChanged(const struct GameModeHitTheBaskets* this)
+  479  002036DC      4  void GameModeHitTheBaskets::QuitGame(const struct GameModeHitTheBaskets* this)
+  484  002036E0     1C  bool GameModeHitTheBaskets::QueryInterface(const struct GameModeHitTheBaskets* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bRet
+  498  00203678     64  void GameModeHitTheBaskets::RestorePlayerClubs(const struct GameModeHitTheBaskets* this)
+                         local  uint32 playerID
+  506  0024A4E8     60  void GameModeHitTheBaskets::SavePlayerClubs(const struct GameModeHitTheBaskets* this)
+                         local  uint32 playerID
+  512  00246688    108  void GameModeHitTheBaskets::SetBasketHit(const struct GameModeHitTheBaskets* this, int32 nBasketID)
+  528  00203628     50  void GameModeHitTheBaskets::SetClubRestrictions(const struct GameModeHitTheBaskets* this)
+                         local  const bit32 availableClubs
+                         local  uint32 playerID
+  537  002D15C0     5C  void GameModeHitTheBaskets::SetupNextGolfer(const struct GameModeHitTheBaskets* this)
+                         inlines  PhysicsBall_t::ClearFlag
+  548  0031AC58     7C  void GameModeHitTheBaskets::ShotClockOut(const struct GameModeHitTheBaskets* this)
+  564  0026CFFC    3C4  void GameModeHitTheBaskets::ShowUICurrentStanding(const struct GameModeHitTheBaskets* this, bool bFailure)
+                         local  char[256] tempString
+  614  00246874     6C  void GameModeHitTheBaskets::ShowUIInitialFlash(const struct GameModeHitTheBaskets* this)
+  620  002036FC      4  void GameModeHitTheBaskets::Shutdown(const struct GameModeHitTheBaskets* this)
+  624  00203700      4  void GameModeHitTheBaskets::Update(const struct GameModeHitTheBaskets* this)
+  629  0024F9BC     50  void GameModeHitTheBaskets::UpdateTargetCircle(const struct GameModeHitTheBaskets* this, const float[4]& vCenter, float fRadius)
+                         inlines  vec4flt_Copy

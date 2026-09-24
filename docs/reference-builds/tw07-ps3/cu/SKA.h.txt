@@ -1,0 +1,6 @@
+// ../ears_rt_cct/dev/codec/SKA/api/ears_rt_cct/codec/SKA.h
+// compiled in: SKA.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   28  0059DFB8     18  void ~SKA(const struct <anon>* this)
+                         inlines  ~ICodec

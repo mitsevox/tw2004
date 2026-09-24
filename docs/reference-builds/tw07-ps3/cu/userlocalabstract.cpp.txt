@@ -1,0 +1,29 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/userlocalabstract.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 15 functions, source order. line | PS3 address | size
+
+  107  005CB5DC     4C  void UserLocalAbstract(const struct <anon>* this)
+  132  005C1B3C     40  void ~UserLocalAbstract(const struct <anon>* this)
+  155  005C1C04      C  void SetLoginKey(const struct <anon>* this, const char8_t* strLKEY)
+  179  005C1C10     44  const char8_t* GetLoginKey(const const struct <anon>* this)
+  202  005C1C54     88  bool IsSameUser(const const struct <anon>* this, struct User* pUser)
+  225  005C1CDC     54  bool IsSameUser(const const struct <anon>* this, const char8_t* strName)
+  249  005C1D30      4  void SetPresence(const struct <anon>* this, const char8_t* )
+  273  005E1754     70  struct GameSession* GetGameSession(const const struct <anon>* this)
+                         local  struct GameSession* pGameSession
+                         local  struct GameSessionManagerConcrete* pGameManager
+                         inlines  IsGameSessionManagerConcreteAvailable
+  305  005E0570     34  struct LobbyRoom* GetLobbyRoom(const const struct <anon>* this)
+  329  005E17C4     20  void AddObserver(const struct <anon>* this, struct GameSessionObserver* pObserver)
+                         inlines  AddObserver
+  353  005CE20C     20  void RemoveObserver(const struct <anon>* this, struct GameSessionObserver* pObserver)
+                         inlines  RemoveObserver
+  377  005C1D34     3C  struct User* GetAsUser(const const struct <anon>* this)
+  401  0060DF80     60  struct UserConcrete* GetAsUserConcrete(const const struct <anon>* this)
+                         inlines  GetUserManagerConcrete
+  426  005D9508     28  struct LoginSlot* GetLoginSlot(const const struct <anon>* this)
+  448  005CF69C    1D8  void GetRoomEntryCriteria(const const struct <anon>* this, LobbyApiRoomCriteriaT* pCrit)
+                         local  const LobbyApiUserT* pUserInfo
+                         local  uint32_t uLevel
+                         local  char8_t[3] strCountry
+                         inlines  GetDashBoardUtil

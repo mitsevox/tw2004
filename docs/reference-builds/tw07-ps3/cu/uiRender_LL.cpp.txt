@@ -1,0 +1,61 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/aptInterface/uiRender_LL.cpp
+// compiled in: other_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   84  00485EC0    354  void AptDrawRenderingUnit(AptAssetRenderingUnit renderingUnit, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  struct AptCXForm saveTransform
+                         local  bool isaveIsIdentity
+                         local  const struct AptCXForm& colorTransform
+                         local  float scale4X
+                         local  const float Xsaved
+                         local  const float Ysaved
+                         inlines  DS_vSetAlphaBlendingFunction, DS_vSetColorWriteEnable, DS_vSetStencilEnable
+  163  0048239C    354  void AptDrawRenderingUnit_DrawSlowly(AptAssetRenderingUnit renderingUnit, enum AptMaskRenderOperation eMaskOperation, int nMaskDepth)
+                         local  struct AptCXForm saveTransform
+                         local  bool isaveIsIdentity
+                         local  const struct AptCXForm& colorTransform
+                         local  float scale4X
+                         local  const float Xsaved
+                         local  const float Ysaved
+                         inlines  DS_vSetAlphaBlendingFunction, DS_vSetColorWriteEnable, DS_vSetStencilEnable
+  241  00482CE4    198  void AptDrawRenderingUnitColor(AptAssetRenderingUnit renderingUnit, enum AptMaskRenderOperation eMaskOperation, int32_t nMaskDepth, vec4flt* pColors)
+                         inlines  DS_vSetAlphaBlendingFunction, DS_vSetColorWriteEnable, DS_vSetStencilEnable
+  271  00482B2C    1B8  void AptDrawRenderingUnitCompactFormat_Color(AptAssetRenderingUnit renderingUnit, enum AptMaskRenderOperation eMaskOperation, int32_t nMaskDepth, vec4flt* pColors)
+                         local  mat44flt kResultMatrix
+                         local  struct AptRUFile_t* aptRUFile
+                         local  const struct AptFillStyles& styles
+                         local  struct AptStyleTxtGrp* fillStyle
+                         local  float* strips
+                         local  const int32_t nbr
+                         local  int i
+                         local  int ii
+                         inlines  AptFillStyles::GetStypeTxtGrp, AptFillStyles::GoToFirstStyle, AptStyleTxtGrp::GetStripList, DS_vSetAlphaEnable
+  319  00485AB0    410  void AptDrawRenderingUnitCompactFormat(AptAssetRenderingUnit renderingUnit, enum AptMaskRenderOperation eMaskOperation, int32_t nMaskDepth)
+                         local  mat44flt kResultMatrix
+                         local  struct AptRUFile_t* aptRUFile
+                         local  const struct AptInfo_t& aptInfo
+                         local  const struct AptFillStyles& styles
+                         local  struct AptStyleTxtGrp* fillStyle
+                         local  float* strips
+                         local  const int32_t nbr
+                         local  const bool doTexture
+                         local  TextureRef textureRef
+                         local  vec4flt rgba
+                         local  const int isAlphaMasking
+                         local  const bool bDisableAlpha
+                         inlines  AptAnimations::GetAptInfo, AptColorTransform, AptFillStyles::GetStypeTxtGrp, AptFillStyles::GoToFirstStyle, AptFillStyles::GoToNextStyle, AptFillStyles::HasMoreStyles, AptInfo_t::GetTextureRefFromAptTextureId, DS_vSetAlphaEnable, LLMath_Add, LLMath_ClampVec, LLMath_MultiplyVec, vec_ld, vec_max, vec_min
+  380  00481F74    428  void AptDrawRenderingUnitCompactFormat_DrawSlowly(AptAssetRenderingUnit renderingUnit, enum AptMaskRenderOperation eMaskOperation, int32_t nMaskDepth)
+                         local  mat44flt kResultMatrix
+                         local  struct AptRUFile_t* aptRUFile
+                         local  const struct AptInfo_t& aptInfo
+                         local  const struct AptFillStyles& styles
+                         local  struct AptStyleTxtGrp* fillStyle
+                         local  float* strips
+                         local  const int32_t nbr
+                         local  struct vtxStruct* primVertex
+                         local  const bool doTexture
+                         local  TextureRef textureRef
+                         local  vec4flt rgba
+                         local  const int isAlphaMasking
+                         local  const bool bDisableAlpha
+                         inlines  AptAnimations::GetAptInfo, AptColorTransform, AptFillStyles::GetStypeTxtGrp, AptFillStyles::GoToFirstStyle, AptFillStyles::GoToNextStyle, AptFillStyles::HasMoreStyles, AptInfo_t::GetTextureRefFromAptTextureId, AptStyleTxtGrp::GetStripList, DS_vSetAlphaEnable, LLMath_Add, LLMath_ClampVec, LLMath_MultiplyVec, vec_ld, vec_max, vec_min

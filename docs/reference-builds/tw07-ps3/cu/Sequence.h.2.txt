@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_trinity/trinity/Runtime/src/Sequence.h
+// compiled in: Trinity.cpp, TrinityActor.cpp
+// 5 functions, source order. line | PS3 address | size
+
+  131    inline-only   bool8_t IsRunning(const const struct <anon>* this)
+  139    inline-only   bool8_t IsInstanceRelative(const const struct <anon>* this)
+  157    inline-only   bool8_t IsStart(const const struct <anon>* this)
+  165    inline-only   float_t[4][4]& GetRelativeMatrix(const const struct <anon>* this)
+  189    inline-only   struct <anon>* GetSeqBin(const const struct <anon>* this)

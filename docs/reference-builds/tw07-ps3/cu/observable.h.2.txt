@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/include/common/osdk/observable.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   71  005BC418     84  void ObservableBase(const struct <anon>* this, uint32_t uMaximumNumberOfObservers, struct MemoryStrategy* pMemoryStrategy)
+   72  005BC520     48  void ~ObservableBase(const struct <anon>* this)
+   84    inline-only   void AddObserver(const struct <anon>* this, struct OsdkStateChangeObserver* pObserver)
+   90    inline-only   void RemoveObserver(const struct <anon>* this, struct GameSessionObserver* pObserver)
+   97    inline-only   struct VoiceDisconnectObserver** GetObserverList(const const struct <anon>* this)
+  103    inline-only   uint32_t GetMaxNumberOfObservers(const const struct <anon>* this)

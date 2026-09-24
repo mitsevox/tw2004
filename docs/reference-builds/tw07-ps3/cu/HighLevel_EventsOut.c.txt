@@ -1,0 +1,14 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/src/HighLevel/HighLevel_EventsOut.c
+// compiled in: HighLevel_EventsOut.c
+// 3 functions, source order. line | PS3 address | size
+
+   29    inline-only   static void _LogEvent(struct Character* viewInfo, const struct <anon>* eventInfo)
+                         local  int32_t exclusionTimeIdx
+                         local  float excludeTime
+                         local  int8_t historyIdx
+                         local  const struct <anon>& eventRecord
+   60    inline-only   static bool _ExcludeEvent(const struct <anon>* viewInfo, const struct <anon>* eventInfo)
+                         local  bool bExclude
+                         local  int8_t historyIdx
+   77  005B0994    10C  void ChrCntl_EventsOut_ProcessEvent(struct Character* viewInfo, const struct <anon>* eventInfo)
+                         inlines  _ExcludeEvent, _LogEvent

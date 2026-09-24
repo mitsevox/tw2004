@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Online/OnlineManager.h
+// compiled in: golf_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   71    inline-only   const struct OnlineManagerOSDK* OnlineManagerOSDK::GetInstance()
+   89    inline-only   const struct LobbyOSDK* OnlineManagerOSDK::GetLobby()
+  167    inline-only   bool OnlineManagerOSDK::HasOnlineGameStartedSetup(const struct OnlineManagerOSDK* this)
+  168    inline-only   uint32_t OnlineManagerOSDK::GetCurrentConnection(const struct OnlineManagerOSDK* this)
+  180    inline-only   enum PlayerNumber_t OnlineManagerOSDK::GetMyPlayerNumber(const struct OnlineManagerOSDK* this)
+  208    inline-only   bool OnlineManagerOSDK::WaitingForChallenge(const struct OnlineManagerOSDK* this)

@@ -1,0 +1,92 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/source/common/TableIndex.cpp
+// compiled in: TableIndex.cpp
+// 19 functions, source order. line | PS3 address | size
+
+    0  00804F7C    10C  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   89  00801010     A8  void* operator new(size_t datasize, void* p)
+  141  00801150    3E8  enum TDbError RowAdd(const struct TableIndex* this, RowNum rowNum)
+                         local  const char[7] __FUNCTION__
+                         local  struct <anon>* node
+                         local  enum TDbError dbResult
+                         local  struct ICollection* collection
+                         local  struct <anon> res
+  203  00801538    510  enum TDbError RowDelete(const struct TableIndex* this, RowNum rowNum)
+                         local  const char[10] __FUNCTION__
+                         local  struct <anon>* pNode
+                         local  struct <anon>* pSeekNode
+                         local  struct ICollection* collection
+                         local  bool bFound
+  268  00801A48    3C0  struct <anon>* RowFindNode(const struct TableIndex* this, RowNum rowNum)
+                         local  const char[12] __FUNCTION__
+                         local  struct <anon>* pNode
+                         local  struct <anon>* pSeekNode
+                         local  struct ICollection* collection
+  324  00802020    A84  enum TDbError RowUpdated(const struct TableIndex* this, struct <anon>* node, RowNum rowNum)
+                         local  const char[11] __FUNCTION__
+                         local  struct <anon>* pNewNode
+                         local  struct <anon>* removedNode
+                         local  enum TDbError dbResult
+                         local  struct ICollection* collection
+                         local  struct <anon> res
+  437  00802AA4     94  enum TDbError Clear(const struct TableIndex* this)
+  460  00803128    3C0  struct TableIndex* Create(int32_t initialAllocations, uint32_t numColumns, struct Table* table, bool8_t isTemp, IndexRef indexRef, bool8_t allowDuplicates, enum TDbError* dbError)
+                         local  struct TableIndex* index
+  529  00802B38    5F0  enum TDbError Destroy(const struct TableIndex* this)
+                         local  const char[8] __FUNCTION__
+                         local  struct <anon> lock
+                         local  struct Table* pTable
+                         local  struct TableIndex* pPrevIndex
+                         local  struct Query* pQuery
+                         local  bool8_t bFound
+                         local  uint32_t numCols
+  628  008034E8    2E8  enum TDbError WriteIndex(const struct TableIndex* this, struct <anon>* pFile)
+                         local  struct <anon> savedIndex
+                         local  struct <anon> savedCol
+                         local  enum TDbError dbResult
+                         local  ColNum colNum
+                         local  ColNum numCols
+                         local  struct ICollection* collection
+                         local  struct <anon>* indexColSort
+  696  008037D0    620  uint32_t GetScore(const struct TableIndex* this, struct ExprNode* pExpr, struct <anon>* pColSort, const struct <anon>** ppSeekExpr)
+                         local  const char[9] __FUNCTION__
+                         local  uint32_t score
+                         local  int32_t exprComp
+                         local  ColNum colNum
+                         local  struct ICollection* collection
+                         local  struct <anon>* indexColSort
+  877  00803DF0    2E4  uint32_t GetScoreIndexComplex(const struct TableIndex* this, struct QuerySearch* pQData, int joinNum, ColNum joinColIdx, struct ExprNode* pJoinExpr)
+                         local  uint32_t score
+                         local  int32_t exprComp
+  939  00801E08    218  void DeleteFixEx(const struct TableIndex* this, struct <anon>* oldNode, struct <anon>* newNode)
+                         local  struct Query* pQry
+                         local  struct ICollection* collection
+  997  008040D4     D8  void GetDupState(const struct TableIndex* this, bool* unique)
+                         local  struct <anon> lock
+ 1034  008041AC    350  enum TDbError EnumerateColumns(const struct TableIndex* this, struct <anon>* colSortList, uint32_t* maxItems)
+                         local  const char[17] __FUNCTION__
+                         local  uint32_t realMax
+                         local  uint32_t idxCol
+                         local  struct <anon>* pIdxColSort
+                         local  struct ICollection* collection
+ 1081  008044FC    368  void RawExport(const struct TableIndex* this, void** ppBuffer, int* pRealCount)
+                         local  uint8_t* pBuffer
+                         local  struct <anon> savedIdx
+                         local  struct <anon> savedCol
+                         local  ColNum colNum
+                         local  ColNum numCols
+                         local  struct ICollection* collection
+                         local  struct <anon>* indexColSort
+ 1138  00804864    718  enum TDbError RawImport(struct Table* pTable, void** ppBuffer)
+                         local  const char[10] __FUNCTION__
+                         local  uint8_t* pBuffer
+                         local  struct TableIndex* pIndex
+                         local  struct <anon> savedIdx
+                         local  struct <anon> savedCol
+                         local  enum TDbError dbResult
+                         local  RowNum rowNum
+                         local  ColNum colNum
+                         local  struct <anon> savedFilter
+                         local  struct ICollection* collection
+                         local  struct <anon>* indexColSort
+ 1239  00805088     3C  static void _GLOBAL__I__ZN2EA4T3db10TableIndexC2EiiPNS0_5TableEajaPNS0_8TDbErrorE()
+ 1240  008050C4     3C  static void _GLOBAL__D__ZN2EA4T3db10TableIndexC2EiiPNS0_5TableEajaPNS0_8TDbErrorE()

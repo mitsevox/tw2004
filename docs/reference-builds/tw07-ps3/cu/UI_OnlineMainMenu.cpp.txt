@@ -1,0 +1,28 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_OnlineMainMenu.cpp
+// compiled in: apt_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+  672  00054114     68  void PostLoadProfileGotoLobby()
+                         inlines  OnlineManagerOSDK::GetInstance
+  680  0005417C     68  void PostLoadProfileQuickRanked()
+                         inlines  OnlineManagerOSDK::GetInstance
+  686  000541E4     68  void PostLoadProfileQuickUnranked()
+                         inlines  OnlineManagerOSDK::GetInstance
+  692  0005424C     68  void PostLoadProfileCustomRanked()
+                         inlines  OnlineManagerOSDK::GetInstance
+  698  000542B4     68  void PostLoadProfileCustomUnranked()
+                         inlines  OnlineManagerOSDK::GetInstance
+  704  0005431C     68  void PostLoadProfileCreateRanked()
+                         inlines  OnlineManagerOSDK::GetInstance
+  710  00054384     68  void PostLoadProfileCreateUnranked()
+                         inlines  OnlineManagerOSDK::GetInstance
+  718  000543EC     E8  void UIOnlineMainMenu::NotifyPlayOnline(const struct UIOnlineMainMenu* this)
+  739  000544D4     50  static void _GoToOnlineGameModes()
+  745  000C6C58     E8  void UIOnlineMainMenu::NotifyOnlineGameModes(const struct UIOnlineMainMenu* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen
+  776  00054524     68  void UIOnlineMainMenu::NotifyESPN(const struct UIOnlineMainMenu* this)
+                         inlines  OnlineManagerOSDK::GetInstance
+  787  000C6B7C     DC  void UIOnlineMainMenu::NotifyOnlineRankedMatch(const struct UIOnlineMainMenu* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen
+  814  000C6AA0     DC  void UIOnlineMainMenu::NotifyOnlineUnrankedMatch(const struct UIOnlineMainMenu* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen

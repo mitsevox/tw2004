@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/UI_Core/FrontEnd/Headers/FE_twCharResMan.h
+// compiled in: apt_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  204  0001A100      4  void TWCharResMan::TWCharResMan(const struct TWCharResMan* this)
+  205  0001A108      4  void TWCharResMan::~TWCharResMan(const struct TWCharResMan* this)

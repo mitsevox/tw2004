@@ -1,0 +1,8 @@
+// ../../../../../TIGERCODE/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/fastfloat.h
+// compiled in: rnaunity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+  389    inline-only   struct <anon>& operator=(const struct <anon>* this, struct <anon>& rhs)
+                         local  unsigned char[16] permuteControl
+  394    inline-only   float operator float(const const struct <anon>* this)
+  403    inline-only   struct <anon>& operator=(const struct <anon>* this, float f)

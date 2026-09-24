@@ -1,0 +1,30 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_OnlineFAQ.cpp
+// compiled in: apt_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   42  000F6DC4     B0  void UIOnlineFAQ::UIOnlineFAQ(const struct UIOnlineFAQ* this)
+                         inlines  TAptArrayStruct, TArrayInternal<char*,AptStructSwapper>::TArrayInternal, TExternArray<UIOnlineFAQ::DstMenuItem_olfq>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   46  000F034C     84  void UIOnlineFAQ::Init(const struct UIOnlineFAQ* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   57  00047980     14  void UIOnlineFAQ::OnShow(const struct UIOnlineFAQ* this)
+   66  000B49B0    2F8  void UIOnlineFAQ::Show(const struct UIOnlineFAQ* this, char* FAQ)
+                         local  const char[5] __FUNCTION__
+                         local  int32 numElements
+                         local  int i
+                         local  char** szNewLine
+                         inlines  AptStructSwapper::Swap, TArrayInternal<char*,AptStructSwapper>::Push, TagValuePair, operator+
+   86  000D87C0     B4  void UIOnlineFAQ::Hide(const struct UIOnlineFAQ* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<char*,AptStructSwapper>::Flush
+  102  000BE278    1B0  void UIOnlineFAQ::UpdateItemAndLabel(const struct UIOnlineFAQ* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_olfq* dest
+                         inlines  TArrayInternal<char*,AptStructSwapper>::operator[]
+  125  00084DE8    15C  enum eAptHandleInput UIOnlineFAQ::HandleInput(const struct UIOnlineFAQ* this, int32 cID)
+                         local  int32 activeIndex
+  167  000BE428    228  void UIOnlineFAQ::UpdateFAQ(const struct UIOnlineFAQ* this, const char* FAQ, int faqSize)
+                         local  int index
+                         local  char* szLine
+                         local  char* szNextLine
+                         inlines  TArrayInternal<char*,AptStructSwapper>::operator[]
+  220  000BE650     18  void UIOnlineFAQ::RefreshFAQ(const struct UIOnlineFAQ* this, const char* FAQ, int faqSize)
+  236  000D8874     B4  void UIOnlineFAQ::Close(const struct UIOnlineFAQ* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<char*,AptStructSwapper>::Flush

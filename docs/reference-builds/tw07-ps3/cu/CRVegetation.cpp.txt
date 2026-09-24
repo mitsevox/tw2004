@@ -1,0 +1,428 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/CRVegetation.cpp
+// compiled in: headgate_unity.cpp
+// 52 functions, source order. line | PS3 address | size
+
+  205    inline-only   bool InstGroupIsBush(struct InstGroup* pInstGroup)
+  212    inline-only   bool InstIsValid(struct InstHeader* pInstHeader)
+  297    inline-only   void LODDistanceParams::Init(const struct LODDistanceParams* this, float min, float max)
+  312  0034ADF0     64  void TreeInit()
+                         local  struct TreeBoundingVolume bSphere
+                         local  struct SSphere sSphere
+  332  0034AFA4     40  static bool TreeLoaded()
+  337    inline-only   static unsigned int TreeGetVertexSize(enum TreeShaderType shaderType)
+                         local  unsigned int vertexSize
+  367  00370D64     DC  static void TreeRestoreRenderStates()
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaBlendingFunction, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetCullMode, DS_vSetZBufferMode, DS_vSetZTestEnable
+  382    inline-only   static void TreeDisableFog()
+  390  00352B3C    5EC  static void TreeSetDefaultConstants()
+                         local  vec4flt TFactor
+                         local  vec4flt sunDir
+                         local  struct CRShadowMap* pShadowMap
+                         local  vec4flt windDir
+                         local  vec4flt eyePoint
+                         local  const float[4][4]& shadowMat
+                         local  const float[4][4]& hrShadowMat
+                         local  const float[4][4]& golferShadowMat
+                         local  float[2][4] myMShadow
+                         local  float[4][4] myMShadowHR
+                         local  float[4][4] myGolferShadow
+                         local  float fadeDist
+                         local  float HRShadowDist
+                         local  vec4flt camPos
+                         local  float shadCamYOffset
+                         inlines  CRManager::GetCRShadowMap, CRShadowMap::GetHRShadowFadeDist, CRShadowMap::GetShadowMapTexture, vec4flt_Copy
+  506    inline-only   static void TreeSetLeafRotationsCards(int turn)
+                         local  float[4][4] origquad
+                         local  unsigned int i
+                         local  unsigned int j
+                         local  unsigned int k
+                         local  int offset
+  562  0034AFE4     8C  static enum eTreeRenderCardSize TreeChooseRenderCard(struct TreeBoundingVolume* pBoundingVolume)
+                         local  bool isSmall
+                         local  bool isSquare
+                         local  float xSpan
+                         local  float ySpan
+                         local  float zSpan
+                         local  float length
+                         local  float zRatio
+                         local  float xRatio
+                         local  float wRatio
+  592    inline-only   static bool TreeTgaWrite(const char* meshName, TextureRef srcTexture, enum eTreeRenderCardSize cardSize)
+                         local  uint32 height
+                         local  uint32 width
+                         local  TextureOptions options
+                         local  TextureRef dstTexture
+                         local  const char* courseHoleName
+                         local  char[256] filename
+                         local  bool wroteFile
+  615  0034B070     D4  void TreeChangeAllTextureOptions(TextureOptions options, unsigned int flags)
+                         local  unsigned int mat
+                         local  struct TreeMaterial* pMaterial
+  627  0034B144    284  void TreeCardRenderForTexture(unsigned int mesh)
+                         local  unsigned int shaderType
+                         local  struct TreeShaderGroup* pShaderGroup
+                         local  struct TreeMesh* pMesh
+                         local  struct SM_Shader_Base* pShader
+                         local  unsigned int strip
+                         local  struct TreeStrip* pStrip
+  677  0034B3C8     88  bool TreeIsGroupEmtpy(unsigned int mesh)
+                         local  struct InstGroup* pInstGroup
+                         local  unsigned int shaderType
+                         local  struct TreeMesh* pMesh
+  697  00371284    C84  static void TreeRenderCards()
+                         local  uint64 startTime
+                         local  bool oldState
+                         local  TextureRef[6] renderTargets
+                         local  struct TextureAsyncOp*[6] asyncOp
+                         local  vec4flt unitVec
+                         local  int currentTarget
+                         local  int i
+                         local  unsigned int group
+                         local  int i
+                         local  struct TreeBillboard* pBillboard
+                         local  struct TreeBoundingVolume* pBoundingVolume
+                         local  mat44flt model
+                         local  mat44flt viewMatrix
+                         local  unsigned int view
+                         local  struct InstGroup* pInstGroup
+                         local  enum eTreeRenderCardSize cardSize
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetCullMode, DS_vSetZBufferMode, DS_vSetZTestEnable, LLMath_IdentifyMat, TI_uiReadCP0Count, TreeDisableFog, TreeSetLeafRotationsCards, TreeTgaWrite, sys_time_get_timebase_frequency, vec_st
+  912  0034E424    794  static void TreeInitializeCards()
+                         local  const char[20] __FUNCTION__
+                         local  unsigned int billboardSize
+                         local  unsigned int numComponents
+                         local  struct TextureGroup* pHoleTexGrp
+                         local  struct TextureGroup* pCourseTexGrp
+                         local  unsigned int group
+                         local  struct InstGroup* pInstGroup
+                         local  struct TreeBillboard* pBillboard
+                         local  struct TreeBoundingVolume* pBoundingVolume
+                         local  unsigned int numVerts
+                         local  unsigned int vertBuffSize
+                         local  float* min
+                         local  float* max
+                         local  float[8][4] vertex
+                         local  float[8][2] uvs
+                         local  float* pVertMem
+                         local  unsigned int vertIdx
+                         local  struct InstPlacement* pInstPlacement
+                         local  struct InstPlacement* pInstPlacementEnd
+                         local  unsigned int i
+                         local  char[128] buffer
+                         local  vec4flt transVec
+                         local  int i
+                         local  enum eTreeRenderCardSize cardSize
+                         local  TextureOptions options
+                         local  uint16 layers
+                         inlines  TagValuePair, operator+
+ 1057    inline-only   static void TreeSetupBoundingVolumes()
+                         local  struct TreeBoundingVolume* pBoundingVolume
+                         local  struct InstGroup* pInstGroup
+                         local  struct InstGroup* pInstGroupEnd
+                         local  struct InstPlacement* pInstPlacement
+                         local  struct InstPlacement* pInstPlacementEnd
+                         local  struct InstVisibility* pInstVisibility
+                         local  struct SSphere* pSphere
+                         local  float scale
+                         local  vec4flt center
+                         local  float extent
+                         local  float originCylinderRadius
+ 1106    inline-only   static void TreeCreateCards()
+                         local  bool bIsDashboardAutoUpdating
+ 1119    inline-only   static void TreeMarkLODZone()
+                         local  int total
+                         local  int oob
+                         local  struct InstVisibility* pInstVisibility
+                         local  struct InstVisibility* pInstVisibilityEnd
+                         local  struct SSphere* pSphere
+ 1142  0034B450     C0  int TreeHashLocation(float x, float z)
+                         local  int cellX
+                         local  int cellZ
+                         local  int hash
+ 1166  00359074    41C  void TreePutTreeInstancesIntoBuckets(bool bCountOnly)
+                         local  vec4flt point
+                         local  int iMemoryUsed
+                         local  int x
+                         local  int x
+                         local  int z
+                         local  float distSq
+                         local  float centerX
+                         local  float centerZ
+                         local  struct InstPlacement* pInstPlacement
+                         local  struct InstPlacement* pInstPlacementEnd
+                         local  vec4flt diff
+                         local  float testDistSq
+                         local  int hash
+                         local  struct TreeNearBucket* bucket
+                         inlines  LLMath_LengthSquared3, LLMath_Subtract, vec_madd, vec_sld
+ 1255  003722B4    588  void TreePostLoad()
+                         local  TI_STimeValue start
+                         inlines  TI_fConvertTimeDifToSeconds, TI_uiReadCP0Count, TreeCreateCards, TreeMarkLODZone, TreeSetupBoundingVolumes
+ 1278  00353DB0    6E4  static unsigned char* TreeLoadInst(unsigned char* stream)
+                         local  const char[13] __FUNCTION__
+                         local  struct InstHeader* pInstHeader
+                         local  struct InstFileHeader* pInstFileHeader
+                         local  unsigned int groupsSize
+                         local  unsigned int placementSize
+                         local  unsigned int spheresSize
+                         local  unsigned int instRenderFlagsSize
+                         local  unsigned int visibilitySize
+                         local  struct InstPlacement* pCurrentPlacement
+                         local  struct InstVisibility* pCurrentVisibility
+                         local  struct SSphere* pCurrentSphere
+                         local  TreeRenderFlags* pCurrentRenderFlags
+                         local  unsigned int g
+                         local  struct InstGroup* pGroup
+                         local  struct InstFileGroup* pFileGroup
+                         local  unsigned int p
+                         local  struct InstPlacement* pPlacement
+                         local  struct InstVisibility* pVisibility
+                         local  struct InstFilePlacement* pFilePlacement
+                         inlines  LLMath_CopyMat44, TagValuePair, operator+, vec_st
+ 1377    inline-only   static void InstHeaderFree(struct InstHeader* pInstHeader)
+ 1389    inline-only   static unsigned int TreeVertBuffer(unsigned char* stream, struct LS_VertexBuffer** ppVertexBuffer, unsigned int numVerts, unsigned int vertexSize)
+                         local  unsigned int size
+                         local  unsigned int vertexBufferSize
+                         local  void* pVertexMem
+ 1411    inline-only   static unsigned int TreeLoadStrip(unsigned char* stream, struct TreeStrip* pTreeStrip, unsigned int vertexSize)
+                         local  unsigned int size
+                         local  struct TreeFileStrip* pFileStrip
+ 1428    inline-only   static unsigned int TreeLoadIndices(unsigned char* stream, struct TreeStrip* pTreeStrip)
+                         local  unsigned int size
+                         local  unsigned int indexBufferSize
+                         local  void* pIndexMem
+ 1457  00354494    D1C  void TreeLoadTerDataFromMemory(unsigned char* streamData)
+                         local  const char[26] __FUNCTION__
+                         local  struct TreeFileHeader* pTreeHeader
+                         local  unsigned int numQuadRotations
+                         local  unsigned int size
+                         local  char* pCurrentString
+                         local  struct TreeMaterial* pCurrentMaterial
+                         local  struct TreeStrip* pCurrentStrip
+                         local  struct TreeMesh* pCurrentMesh
+                         local  struct TreeShaderGroup* pCurrentShaderGroup
+                         local  unsigned int boundingSphereSize
+                         local  char[5] magicFileString
+                         local  char[5] magicString
+                         local  unsigned int meshNum
+                         local  unsigned int materialNum
+                         local  struct TreeFileMaterial* pFileMaterial
+                         local  unsigned int shaderGroupNum
+                         local  unsigned int* pShaderType
+                         local  unsigned int vertexSize
+                         local  unsigned int meshNum
+                         local  struct TreeFileMesh* pFileMesh
+                         local  struct InstGroup* pInstGroup
+                         local  unsigned int numStrips
+                         local  unsigned int stripNum
+                         local  unsigned int* pMeshNameSize
+                         local  unsigned int vertexBufferSize
+                         local  void* pVertexMem
+                         local  unsigned int indexBufferSize
+                         local  void* pIndexMem
+                         inlines  TagValuePair, TreeGetVertexSize, TreeLoadIndices, TreeLoadStrip, operator+
+ 1656    inline-only   static void UnloadTreeModel()
+                         local  unsigned int stripIdx
+                         local  struct TreeStrip* pStrip
+                         local  unsigned int billboardIdx
+                         local  struct TreeBillboard* pBillboard
+                         local  unsigned int i
+ 1695  0034B654    3A8  void UnloadTreeData()
+                         local  int x
+                         local  struct TreeStrip* pStrip
+                         local  unsigned int billboardIdx
+                         local  struct TreeBillboard* pBillboard
+                         local  unsigned int i
+                         inlines  InstHeaderFree, UnloadTreeModel
+ 1712    inline-only   static void TreeSetMaterialConstants(struct TreeMaterial* pMaterial)
+ 1724    inline-only   static void TreeSetInstanceConstants(struct InstPlacement* pInstPlacement, struct SSphere* pSphere, struct InstVisibility* pInstVisibility, float alpha)
+                         local  float* center
+                         local  vec4flt tfactor
+ 1751  0035AC18    5F4  static void TreeSetLeafRotations(TreeRenderFlags renderFlags)
+                         local  vec4flt dir
+                         local  float yaw
+                         local  float drop
+                         local  float pitch
+                         local  float forcePitch
+                         local  mat44flt m
+                         local  mat44flt rx
+                         local  mat44flt rz
+                         local  mat44flt rc
+                         local  mat44flt c
+                         local  float[4][4] origquad
+                         local  float theta
+                         local  const float windSpeedAffect
+                         local  float forceTheta
+                         local  bool bForceZero
+                         local  unsigned int i
+                         local  unsigned int j
+                         local  float rockingAngle
+                         local  float leafRockingTheta
+                         local  float angleMult
+                         local  float sign
+                         local  const float kPowerExp
+                         local  float leafRotation
+                         local  int k
+                         local  vec4flt v
+                         local  int quadway
+                         local  int offset
+                         inlines  LLMath_IdentifyMat, std::atan2, std::cosf, vec4flt_Copy, vec_st
+ 1859  0037016C    288  static void TreeRenderBoundingVolumes()
+                         local  vec4flt _sph_color
+                         local  vec4flt _trans_color
+                         local  int32 numInst
+                         local  struct TreeBoundingVolume* pBoundingVolume
+                         local  struct InstGroup* pInstGroup
+                         local  struct InstGroup* pInstGroupEnd
+                         local  struct InstVisibility* pInstVisibility
+                         local  struct SSphere* pSphere
+                         local  struct InstPlacement* pInstPlacement
+                         local  struct InstPlacement* pInstPlacementEnd
+                         local  float* center
+                         inlines  DS_vSetAlphaBlendingFunction, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, PR_vSetCurrentColor, PR_vSetCurrentUsage, RC_vSetCurrentRenderCtxTransformationMatrix, RC_vSetRenderCtxTransformationMatrix, vec_st
+ 1910  003608C8    4F4  static bool TreeConsole(int32 numParams, char** paramStrings, void* userData)
+                         local  bool help
+                         local  char[128] buffer
+                         inlines  std::atoi
+ 2007    inline-only   static unsigned int TreeAddQuad(LS_Index* pIndex, unsigned int numIndices, LS_Index vertStart)
+ 2020  0036FBEC    578  void TreeRenderBillboards(TreeRenderFlags renderFlags)
+                         local  vec4flt tfactor
+                         local  unsigned int group
+                         local  struct TreeBillboard* pBillboard
+                         local  struct InstGroup* pInstGroup
+                         local  LS_Index* pIndex
+                         local  unsigned int numIndices
+                         local  unsigned int placement
+                         local  struct InstPlacement* pInstPlacement
+                         local  struct InstVisibility* pInstVisibility
+                         local  float alpha
+                         inlines  DS_vSetAlphaTestMode, DS_vSetCullMode, TreeAddQuad
+ 2105    inline-only   static void TreeDrawInstances(struct InstGroup* pInstGroup, struct TreeStrip* pStrip, enum TreeShaderType shaderType, TreeRenderFlags renderFlags, float fAlpha)
+                         local  unsigned int placement
+                         local  struct InstPlacement* pInstPlacement
+                         local  struct InstVisibility* pInstVisibility
+                         local  struct SSphere* pSphere
+                         local  float alpha
+ 2146    inline-only   static bool TreeLineTest(struct InstVisibility* pInstVisibility, struct SSphere* pSphere, float* target2dPos, float* targetCamRay, float* targetCamCross, float treeBlockRadiusScaleSqr)
+                         local  vec4flt golferToInst
+                         local  float cylinderRadiusSqr
+                         local  float distToLine
+ 2182    inline-only   static TreeRenderFlags TreeSetLOD(const float* cameraPos, struct InstVisibility* pInstVisibility, struct SSphere* pSphere, const struct LODDistanceParams* pLODParams, bool bCameraAlpha, float* target2dPos, float* targetCamRay, float* targetCamCross, float treeBlockRadiusScaleSqr)
+                         local  float lodBeginBlend
+                         local  float lodMidBlend
+                         local  float lodEndBlend
+                         local  vec4flt camDist
+                         local  float distSqr
+                         local  TreeRenderFlags flags
+                         local  float alpha
+                         local  float dist
+ 2280    inline-only   static bool TreeShouldDrawShadow(struct InstVisibility* pInstVisibility, float* minShadow, float* maxShadow)
+                         local  float instMinX
+                         local  float instMaxX
+                         local  float instMinZ
+                         local  float instMaxZ
+ 2298  0036309C    B4C  static void TreeUpdateInstRuntimeFlags(struct RC_SRenderCtx* spRenderCtx, struct RC_SRenderCtx* spPipRenderCtx, struct CRShadowMap* pShadowMap, bool bShadows, float* minShadow, float* maxShadow, struct SFrustum* pReflectionFrustum)
+                         local  struct SFrustum[4] frustums
+                         local  int numFrustums
+                         local  struct InstGroup* pInstGroup
+                         local  struct InstGroup* pInstGroupEnd
+                         local  struct LODDistanceParams[2] lodParams
+                         local  vec4flt target2dPos
+                         local  vec4flt camera2dPos
+                         local  vec4flt targetCamRay
+                         local  vec4flt targetCamCross
+                         local  bool bCameraAlpha
+                         local  enum GolferState golferState
+                         local  float targetCamLengthSqr
+                         local  float treeBlockRadiusScaleSqr
+                         local  float bushBlockRadiusScaleSqr
+                         local  bool sInitTreeConsole
+                         local  unsigned int num3dOpaque
+                         local  unsigned int num2dOpaque
+                         local  unsigned int num3dAlpha
+                         local  unsigned int num2dAlpha
+                         local  unsigned int numShadow
+                         local  unsigned int numReflection
+                         local  unsigned int numPip
+                         local  struct SSphere golferSphere
+                         local  enum ClipTest clipTest
+                         local  float blockRadScaleSqr
+                         local  struct InstVisibility* pInstVisibility
+                         local  unsigned int placement
+                         local  char[64] buff
+                         local  char[64] buff2
+                         local  char[64] buff3
+                         local  struct SSphere* pSphere
+                         local  float alpha
+                         local  float dist
+                         inlines  CRData::GetGolferPosition, GM_GetGolferUp, LLMath_DotProduct, LLMath_LengthSquared, LLMath_Subtract, LODDistanceParams::Init, TreeLineTest, TreeSetLOD, TreeShouldDrawShadow, vec4flt_Copy, vec_madd, vec_sld, vec_st, vec_sub
+ 2491    inline-only   static void TreeRender3dMeshes(struct TreeShaderGroup* pShaderGroup, enum TreeShaderType shaderType, struct SM_Shader_Base* pShader, TreeRenderFlags renderFlags, float fAlpha)
+                         local  struct TreeMaterial* pMaterial
+                         local  unsigned int group
+                         local  struct InstGroup* pInstGroup
+                         local  struct TreeMesh* pMesh
+                         local  vec4flt amplitudes
+                         local  vec4flt frequencies
+                         local  struct TreeStrip* pStrip
+                         local  struct TreeStrip* pStripEnd
+                         local  int meshIdx
+                         local  bool bDoubleSided
+ 2562  003703F4    970  static void TreeRender(TreeRenderFlags renderFlags, float fAlpha)
+                         local  struct TreeShaderGroup* pShaderGroup
+                         local  struct TreeShaderGroup* pShaderGroupEnd
+                         local  struct SM_Shader_Base* pShader
+                         local  enum TreeShaderType shaderType
+                         local  vec4flt tfactor
+                         inlines  DS_vSetAlphaTestMode, DS_vSetColorWriteEnable, Gcm::cellGcmSetCullFace, Gcm::cellGcmSetCullFaceEnable, LLMath_Scale, TreeRender3dMeshes
+ 2614  003710B4    1D0  void TreeDraw()
+                         local  bool useVegetation
+                         local  bool useRSF
+                         local  struct RC_SRenderCtx* pCtx
+                         local  const bool bRenderingPip
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetZBufferMode, RNADebugBreak, ScopeParmC::Get<bool>
+ 2666  00370F20    194  void TreeDrawAlpha()
+                         local  bool useVegetation
+                         local  bool useRSF
+                         inlines  DS_vSetAlphaBlendingFunction, DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetZBufferMode, Gcm::cellGcmSetAlphaTestEnable, RNADebugBreak, ScopeParmC::Get<bool>
+ 2693  00370E40     E0  void TreeDrawShadow(bool bDrawAll, float fAlpha)
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaTestMode, DS_vSetZBufferMode
+ 2706    inline-only   static void TreeValidate()
+                         local  struct TreeShaderGroup* pShaderGroup
+                         local  struct TreeShaderGroup* pShaderGroupEnd
+                         local  struct TreeMesh* pMesh
+                         local  struct InstGroup* pInstGroup
+                         local  struct InstGroup* pInstGroupEnd
+ 2742  00371F08    3AC  void TreeUpdate(struct CROcean* pOcean)
+                         local  bool sIsValidated
+                         local  struct RC_SRenderCtx* spPipRenderCtx
+                         local  bool bShowPip
+                         local  vec4flt minShadow
+                         local  vec4flt maxShadow
+                         local  struct CRShadowMap* pShadowMap
+                         local  bool bShadows
+                         local  struct SFrustum* pReflectionFrustum
+                         local  struct SFrustum reflectionFrustum
+                         local  mat44flt inverseViewMatrix
+                         local  struct TreeMesh* pMesh
+                         local  struct InstGroup* pInstGroup
+                         local  struct InstGroup* pInstGroupEnd
+                         inlines  CRManager::GetCRShadowMap, CRShadowMap::GetHighResMaxShadowCoords, CRShadowMap::GetHighResMinShadowCoords, TreeValidate, vec4flt_Zero, vec_st
+ 2812  00358A48    18C  bool TreeIsNear(float x, float y, float z, float maxDistance, float* location)
+                         local  int hash
+                         local  struct TreeNearBucket* bucket
+                         local  vec4flt point
+                         local  float distSq
+                         local  int tree
+                         local  struct InstPlacement* pInstPlacement
+                         local  vec4flt diff
+                         local  float testDistSq
+                         inlines  LLMath_LengthSquared3, LLMath_Subtract, __vec_len_sqr3
+ 2854  0034B510    144  void TreeGetMinMax(float* minX, float* minY, float* minZ, float* maxX, float* maxY, float* maxZ)
+                         local  float Xmin
+                         local  float Xmax
+                         local  float Ymin
+                         local  float Ymax
+                         local  float Zmin
+                         local  float Zmax
+                         local  struct SSphere* pSphere
+                         local  struct SSphere* pSphereEnd

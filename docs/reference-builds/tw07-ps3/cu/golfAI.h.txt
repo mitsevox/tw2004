@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/AI/Headers/golfAI.h
+// compiled in: golf2_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  237    inline-only   bool GolfAI_IsRoughLie(enum Lie_t lie)
+  241    inline-only   bool GolfAI_IsSandyLie(enum Lie_t lie)

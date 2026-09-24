@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Shared/XceedZip_ZLib64/adler32.c
+// compiled in: other_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   21  003F7124    220  uLong adler32(uLong adler, const Bytef* buf, uInt len)
+                         local  long unsigned int s1
+                         local  long unsigned int s2
+                         local  int k

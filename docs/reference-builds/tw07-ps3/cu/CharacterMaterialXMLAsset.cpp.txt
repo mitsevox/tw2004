@@ -1,0 +1,56 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Rna/Asset/Common/CharacterMaterialXMLAsset.cpp
+// compiled in: rnaunity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   63  004E7E74    178  void CharacterMaterialXMLAssetC::CharacterMaterialXMLAssetC(const struct CharacterMaterialXMLAssetC* this, struct AssetMgrC* pAssetMgr, const char* pFilePath, MemBudgetTypeE budget, enum eMemoryPools memPool)
+                         inlines  Init, RNADebugBreak, RNAMaterialDefList, Vector
+   69  004D3520    1F0  void CharacterMaterialXMLAssetC::~CharacterMaterialXMLAssetC(const struct CharacterMaterialXMLAssetC* this)
+                         local  int32_t refsRemaining
+                         inlines  ~RNAMaterialDefList
+   85  004E40D0    168  bool CharacterMaterialXMLAssetC::Load(const struct CharacterMaterialXMLAssetC* this)
+                         local  uint32_t uFileSize
+                         local  void* pXMLData
+                         local  struct DeviceC* pDevice
+                         inlines  operator new
+  132  004C91D8     1C  bool CharacterMaterialXMLAssetC::IsLoaded(const const struct CharacterMaterialXMLAssetC* this)
+  138  004D3224    2FC  void CharacterMaterialXMLAssetC::Unload(const struct CharacterMaterialXMLAssetC* this)
+                         local  uint32_t i
+                         local  uint32_t c
+                         inlines  ClearMaterials, GetMaterial, GetNumMaterials
+  162  004C91F4     40  bool CharacterMaterialXMLAssetC::Reload(const struct CharacterMaterialXMLAssetC* this)
+  173  004C9234      4  void CharacterMaterialXMLAssetC::Print(const struct CharacterMaterialXMLAssetC* this)
+  180  004C9238      4  void CharacterMaterialXMLAssetC::MenuPrint(const struct CharacterMaterialXMLAssetC* this, const char8_t* pLinePrefixTabString)
+  189  004EDCAC    1C8  void CharacterMaterialXMLAssetMgrC::CharacterMaterialXMLAssetMgrC(const struct CharacterMaterialXMLAssetMgrC* this)
+                         inlines  Clear, Copy, RNADebugBreak, String, operator=, ~String
+  196  004EE03C     9C  struct CharacterMaterialXMLAssetMgrC* CharacterMaterialXMLAssetMgrC::GetInstance()
+  205  004C923C     6C  void CharacterMaterialXMLAssetMgrC::DestroyInstance()
+  213  004E7FEC     64  struct CharacterMaterialXMLAssetC* CharacterMaterialXMLAssetMgrC::CreateNew(const struct CharacterMaterialXMLAssetMgrC* this, const char* pFilePath)
+  220  004EE0D8     30  struct CharacterMaterialXMLAssetC* CharacterMaterialXMLAssetMgrC::ResolveMaterialList(const struct CharacterMaterialXMLAssetMgrC* this, const char* pFilePath)
+                         local  struct CharacterMaterialXMLAssetC* pCharacterMaterialXMLAsset
+  229  004F68D4    4B4  struct MaterialC* CharacterMaterialXMLAssetMgrC::ResolveMaterial(const struct CharacterMaterialXMLAssetMgrC* this, const char* baseMatName, const char* variationMatName)
+                         local  struct MaterialC* mat
+                         local  struct CharacterMaterialXMLAssetC* baseList
+                         local  struct CharacterMaterialXMLAssetC* variationList
+                         local  struct <anon>* baseDef
+                         local  struct <anon>* variationDef
+                         local  int32 i
+                         local  int32 c
+                         local  int32 i
+                         local  int32 c
+                         local  struct DeviceC* pDevice
+                         local  struct UserData* pUserData
+                         inlines  AssetMgrC::SetCurrentBudget, AssetMgrC::SetCurrentMemPool, RNADebugBreak, Size, UserData::UserData, UserData::operator new, operator new, operator[]
+  307  004D88A0    1A0  void CharacterMaterialXMLAssetMgrC::GarbageCollectMaterials(const struct CharacterMaterialXMLAssetMgrC* this)
+                         local  int32 i
+                         local  int32 c
+                         local  struct CharacterMaterialXMLAssetC* list
+                         local  uint32_t numMaterials
+                         local  uint32_t j
+                         local  struct <anon>* def
+                         local  struct MaterialC* mat
+                         inlines  GetMaterial, GetNumMaterials, RNADebugBreak, Size, operator[]
+  330  004D8A40    228  void CharacterMaterialXMLAssetMgrC::FreeMaterialDefinitions(const struct CharacterMaterialXMLAssetMgrC* this)
+                         local  int32 i
+                         local  int32 c
+                         local  struct CharacterMaterialXMLAssetC* list
+                         inlines  ClearMaterials, Init, RNADebugBreak, Size, operator[]

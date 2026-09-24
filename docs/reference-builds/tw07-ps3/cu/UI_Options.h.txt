@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_Options.h
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   19  000FFE6C     18  void UIOptions::~UIOptions(const struct UIOptions* this)
+   22    inline-only   void UIOptions::Init(const struct UIOptions* this)
+   23    inline-only   void UIOptions::Close(const struct UIOptions* this)
+   66  000FFEBC      8  uint32 OptionsResponseHandler::getUIResponseHandlerOptions(const struct OptionsResponseHandler* this)

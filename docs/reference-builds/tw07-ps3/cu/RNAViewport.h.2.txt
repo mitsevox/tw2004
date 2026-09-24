@@ -1,0 +1,12 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNARender/RNAViewport.h
+// compiled in: RNAStateManager.cpp, RNAViewport.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   42  00834408     18  void ScissorC(const struct <anon>* this)
+   63    inline-only   int32_t GetX(const const struct <anon>* this)
+   64    inline-only   int32_t GetY(const const struct <anon>* this)
+   65    inline-only   int32_t GetWidth(const const struct <anon>* this)
+   66    inline-only   int32_t GetHeight(const const struct <anon>* this)
+   67    inline-only   float_t GetMinZ(const const struct <anon>* this)
+   68    inline-only   float_t GetMaxZ(const const struct <anon>* this)
+   71  0083444C     28  void ViewportC(const struct <anon>* this)

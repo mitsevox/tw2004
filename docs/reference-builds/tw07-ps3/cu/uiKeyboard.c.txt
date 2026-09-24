@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/istudio_runtime/uiKeyboard.c
+// compiled in: apt_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   46  0002CAC4     4C  void UK_vInitOnce()
+   59  0002CB10      4  void UK_vCloseOnce()
+   71  0002CB14     24  bool UK_bPassThroughFunctionKeys(bool bPassThrough)
+                         local  bool bOldValue
+   89    inline-only   static void UK_vManageKeyboardBuffer()
+                         local  char chKey
+  160  00061F24     D0  void UK_vManage()
+                         inlines  UK_vManageKeyboardBuffer
+  189  0002CB38     24  bool KB_bIsAKeyboardConnected()

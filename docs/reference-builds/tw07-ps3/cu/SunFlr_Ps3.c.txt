@@ -1,0 +1,27 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/SunFlare/Ps3/SunFlr_Ps3.c
+// compiled in: golf_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   57  00236060     B8  void SF_vPlatformInit()
+                         local  int32 iRect
+                         local  int32 iPixels
+                         inlines  Gcm::cellGcmSetClearReport
+   76  0023614C     1C  void SF_vPlatformClose()
+   81  00236118     34  void SF_vPlatformVPInit(int32 iViewport_p, SF_SSunFlareViewportInfo* pViewportInfo)
+   86  00236168     34  void SF_vPlatformVPClose(int32 iViewport_p, SF_SSunFlareViewportInfo* pViewportInfo)
+                         local  int32 iFrame
+  101  00236280      4  void SF_vStoreZBufferZone(int32 iViewport_p)
+  107  002362E0     D8  float SF_fComputeZBufferCoverage(int32 iViewport_p, SF_SSunFlareViewportInfo* spSunFlareViewportInfo)
+                         local  int32 iFrame
+  129  002961B0    2C8  void SF_DoOcclusionQuery()
+                         local  float sizeMult
+                         local  int x
+                         inlines  DS_vSetColorWriteEnable, DS_vSetZTestEnable, Gcm::cellGcmSetReport, Gcm::cellGcmSetZpassPixelCountEnable
+  240  002365CC    10C  void SF_GetQueryResults()
+                         local  bool ready
+                         local  int startVisiblePixels
+                         local  int endVisiblePixels
+                         local  int startPixels
+                         local  int endPixels
+  265  002366D8    140  float SF_GetPercentVisiblePixels()
+                         local  float percentage

@@ -1,0 +1,27 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/salloc.cpp
+// compiled in: salloc.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   33  006DAF00     5C  int SNDVOICEI_isreserved(int voice, int voicesallocated)
+                         local  int i
+   48  006DAF5C    620  int SNDVOICEI_alloc(int voicesneeded, int priority, int* phandle, int minvoicerange, int maxvoicerange)
+                         local  int i
+                         local  int rc
+                         local  int lowestpriority
+                         local  int lowestvoice
+                         local  unsigned int timestamp
+                         local  int voice
+                         local  int lasthandle
+                         local  struct CHANPUB* pv
+                         local  int temphandle
+                         local  int voicesallocated
+                         local  int sorted
+  259  006DB57C    204  void SNDVOICEI_free(int voice)
+                         local  struct CHANPUB* pv
+                         local  int numtimbres
+                         local  int patchkey
+                         local  int i
+                         local  int mastervoice
+  360  006DB780     68  int SNDVOICEI_get(int handle)
+                         local  int voice
+                         local  struct CHANPUB* pv

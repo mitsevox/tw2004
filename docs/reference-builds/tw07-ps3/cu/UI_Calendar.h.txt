@@ -1,0 +1,15 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_Calendar.h
+// compiled in: apt_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   50  000FF000      C  uint32 UICalendar::GetSignature(const const struct UICalendar* this)
+   53  000FF00C     38  void UICalendar::RegainFocus(const struct UICalendar* this, uint32 )
+   54  000FF044     24  void UICalendar::LooseFocus(const struct UICalendar* this, uint32 )
+   56  00100B58     14  void UICalendar::NotifyRefresh_func(struct IAptSubscriber* subs)
+   60    inline-only   void UICalendar::SetInfoUp(const struct UICalendar* this, bool val)
+   67  001033C0     14  enum TAptSequenceStatus UICalendar::WaitForOnlineTournamentDate_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   68  0011597C     14  enum TAptSequenceStatus UICalendar::WaitForOnlineTournamentLoadSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   69  00115990     14  enum TAptSequenceStatus UICalendar::WaitForRefresh_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+  147    inline-only   int32 UICalendar::GetSelectedRound(const struct UICalendar* this)
+  148    inline-only   int32 UICalendar::GetSelectedEvent(const struct UICalendar* this)
+  149    inline-only   CalendarDate UICalendar::GetSelectedDate(const struct UICalendar* this)

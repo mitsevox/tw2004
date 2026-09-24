@@ -1,0 +1,15 @@
+// ../../../../../TIGERCODE/Code/Golf/RNA/Scene/GolfSceneTraversal.h
+// compiled in: rnaunity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   44    inline-only   void SetHandler<SceneX::SGNodeTransformC*, GolfSceneTraversalC*>(const struct GolfSceneTraversalC* this, NodeType_t eNodeType, void(*)()* pFunc)
+   44    inline-only   void SetHandler<SceneX::SGNodeLODTransformC*, GolfSceneTraversalC*>(const struct GolfSceneTraversalC* this, NodeType_t eNodeType, void(*)()* pFunc)
+   44    inline-only   void SetHandler<SceneX::SGNodeSwitchC*, GolfSceneTraversalC*>(const struct GolfSceneTraversalC* this, NodeType_t eNodeType, void(*)()* pFunc)
+   44    inline-only   void SetHandler<SceneX::SGNodeRenderableC*, GolfSceneTraversalC*>(const struct GolfSceneTraversalC* this, NodeType_t eNodeType, void(*)()* pFunc)
+   44    inline-only   void SetHandler<SceneX::SGNodeCullableRenderableC*, GolfSceneTraversalC*>(const struct GolfSceneTraversalC* this, NodeType_t eNodeType, void(*)()* pFunc)
+   44    inline-only   void SetHandler<SceneX::SGNodeBoundingVolumeC*, GolfSceneTraversalC*>(const struct GolfSceneTraversalC* this, NodeType_t eNodeType, void(*)()* pFunc)
+   44    inline-only   void SetHandler<SceneX::SGNodeJointC*, GolfSceneTraversalC*>(const struct GolfSceneTraversalC* this, NodeType_t eNodeType, void(*)()* pFunc)
+   61    inline-only   int32_t GolfSceneTraversalC::GetNumQueuedRenderables(const struct GolfSceneTraversalC* this)
+   62    inline-only   struct SGNodeRenderableC* GolfSceneTraversalC::GetNthQueuedRenderable(const struct GolfSceneTraversalC* this, int32_t n)
+   63    inline-only   void GolfSceneTraversalC::SetNthQueuedRenderable(const struct GolfSceneTraversalC* this, int32_t n, struct SGNodeRenderableC* r)
+   69    inline-only   bool8_t GolfSceneTraversalC::GetIgnoresVisibility(const struct GolfSceneTraversalC* this)

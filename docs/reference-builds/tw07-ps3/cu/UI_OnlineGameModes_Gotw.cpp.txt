@@ -1,0 +1,14 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_OnlineGameModes_Gotw.cpp
+// compiled in: apt_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   32  000F6F24     9C  void UIOnlineGameModes_Gotw::UIOnlineGameModes_Gotw(const struct UIOnlineGameModes_Gotw* this)
+                         inlines  TArrayInternal<UIOnlineGameModes_Gotw::DstMenuItem_omgw,AptStructSwapper>::TArrayInternal, TExternArray<UIOnlineGameModes_Gotw::DstMenuItem_omgw>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   37  000F0458     84  void UIOnlineGameModes_Gotw::Init(const struct UIOnlineGameModes_Gotw* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   48  00081444     14  void UIOnlineGameModes_Gotw::OnShow(const struct UIOnlineGameModes_Gotw* this)
+   57  00047B8C     48  void UIOnlineGameModes_Gotw::Show(const struct UIOnlineGameModes_Gotw* this)
+                         local  int32 numElements
+   65  00047BD4      4  void UIOnlineGameModes_Gotw::UpdateItemAndLabel(const struct UIOnlineGameModes_Gotw* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+   70  00084D34     B4  enum eAptHandleInput UIOnlineGameModes_Gotw::HandleInput(const struct UIOnlineGameModes_Gotw* this, int32 cID)
+  102  000813A8     9C  void UIOnlineGameModes_Gotw::RefreshRankList(const struct UIOnlineGameModes_Gotw* this, int numRows)

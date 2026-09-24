@@ -1,0 +1,26 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/pluginregistry.cpp
+// compiled in: pluginregistry.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   13  006D3E20     A4  struct PlugInRegistry* CreateInstance(struct <anon>* pSystem)
+                         local  const char[15] __FUNCTION__
+                         local  struct PlugInRegistry* pThis
+                         inlines  New2<rw::audio::core::PlugInRegistry>
+   42  006D3EC4     68  void Release(const struct PlugInRegistry* this)
+                         local  const char[8] __FUNCTION__
+                         inlines  Delete<rw::audio::core::PlugInRegistry*>
+   53  006D3F2C     C4  struct <anon>* GetPlugInHandle(const struct PlugInRegistry* this, Guid guid)
+                         local  const char[16] __FUNCTION__
+                         local  struct <anon>* pNext
+                         local  struct <anon>* pPlugInDescRunTime
+                         inlines  GetHead, GetNext, GetPlugInDescRunTimeFromNode
+   77  006D3FF0    1E8  struct <anon>* RegisterPlugInRunTime(const struct PlugInRegistry* this, struct <anon>* pPlugInDescRunTime)
+                         local  const char[22] __FUNCTION__
+                         local  struct <anon>* pNext
+                         local  struct RegisterPlugInRunTimeCommand* pCommand
+                         local  struct <anon>* pNode
+                         inlines  Assert, GetCommandSlot, GetHead, GetNext, GetPlugInDescRunTimeFromNode, Push
+  134  006D3D34     EC  int RegisterPlugInRunTimeHandler(struct <anon>* pCommand)
+                         local  struct PlugInRegistry* pThis
+                         local  struct RegisterPlugInRunTimeCommand* pRegisterPlugInRunTimeCommand
+                         inlines  Assert, HandlerGetThis<rw::audio::core::PlugInRegistry, rw::audio::core::PlugInRegistry::RegisterPlugInRunTimeCommand>

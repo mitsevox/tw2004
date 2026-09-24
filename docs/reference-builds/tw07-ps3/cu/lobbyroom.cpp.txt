@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/lobbyroom.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    5  005BABDC     34  void LobbyRoom(const struct LobbyRoom* this)
+    9  005BAC44      C  void ~LobbyRoom(const struct LobbyRoom* this)

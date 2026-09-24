@@ -1,0 +1,95 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/weboffertypesconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 71 functions, source order. line | PS3 address | size
+
+   58  005C43C0     58  void WebOfferButtonConcrete(const struct <anon>* this, const WebOfferButtonT* pButton)
+   65  005C4470      C  void ~WebOfferButtonConcrete(const struct <anon>* this)
+   69  005C44C0     28  enum WebOfferButtonTypeE GetType(const struct <anon>* this)
+   81  005C44E8     58  void WebOfferFixedImageConcrete(const struct <anon>* this, const WebOfferFixedImageT* pFixedImage)
+   90  005C4598      C  void ~WebOfferFixedImageConcrete(const struct <anon>* this)
+   97  005C45E8     B0  void WebOfferArticleConcrete(const struct <anon>* this, const char8_t* pArticle, const char8_t* pImage, const char8_t* pType, const char8_t* pDesc)
+  107  005C4748      C  void ~WebOfferArticleConcrete(const struct <anon>* this)
+  113  005C38B0     4C  void WebOfferHTTPConcrete(const struct <anon>* this)
+  121  005C38A4      C  void ~WebOfferHTTPConcrete(const struct <anon>* this)
+  125  005C4828     30  void Fill(const struct <anon>* this, WebOfferT* pWebOffer)
+  130  005D6040     74  struct WebOfferButton* GetButton(const struct <anon>* this, uint32_t uButtonNum)
+  138  005C39C0     4C  void WebOfferAlertConcrete(const struct <anon>* this)
+  146  005C39B4      C  void ~WebOfferAlertConcrete(const struct <anon>* this)
+  150  005C48E8     30  void Fill(const struct <anon>* this, WebOfferT* pWebOffer)
+  164  005D5FB4     8C  struct WebOfferButton* GetButton(const struct <anon>* this, uint32_t uButtonNum)
+  172  005C3AD0     54  void WebOfferCreditConcrete(const struct <anon>* this)
+  192  005C3AC4      C  void ~WebOfferCreditConcrete(const struct <anon>* this)
+  196  005C49E4     3C  void Fill(const struct <anon>* this, WebOfferT* pWebOffer)
+  202  005D5F28     8C  struct WebOfferButton* GetButton(const struct <anon>* this, uint32_t uButtonNum)
+  224  005D5EA0     88  struct WebOfferFixedImage* GetFixedImage(const struct <anon>* this, uint32_t uFixedImageNum)
+  234  005C4A54     54  const char8_t* GetWebOfferListEntry(const struct <anon>* this, WebOfferT* pWebOffer, uint32_t uIndex, const char8_t* pList)
+  244  005B5F0C     98  int32_t CopyToStringBuffer(const struct <anon>* this, char8_t* pDest, const char* pSource, uint32_t uDestSize)
+                         local  int32_t iReturn
+  262  005C3BE8     4C  void WebOfferPromoConcrete(const struct <anon>* this)
+  272  005C3BDC      C  void ~WebOfferPromoConcrete(const struct <anon>* this)
+  276  005C4B38     30  void Fill(const struct <anon>* this, WebOfferT* pWebOffer)
+  281  005D5E14     8C  struct WebOfferButton* GetButton(const struct <anon>* this, uint32_t uButtonNum)
+  303  005D5D8C     88  struct WebOfferFixedImage* GetFixedImage(const struct <anon>* this, uint32_t uFixedImageNum)
+  315  005C3CF8     6C  void WebOfferNewsConcrete(const struct <anon>* this)
+  324  005C3CEC      C  void ~WebOfferNewsConcrete(const struct <anon>* this)
+  330  005F2788    154  void Fill(const struct <anon>* this, WebOfferT* pWebOffer)
+                         local  const char8_t* pNewsPtr
+                         inlines  GetWordPtrIndex
+  381  005D5D00     8C  struct WebOfferButton* GetButton(const struct <anon>* this, uint32_t uButtonNum)
+  403  005D5C78     88  struct WebOfferFixedImage* GetFixedImage(const struct <anon>* this, uint32_t uFixedImageNum)
+  416  005F2914    2E0  const char8_t* GetWord(const struct <anon>* this, uint32_t uIndex, const uint32_t& uLength)
+                         local  uint32_t uCurrentIndex
+                         local  const char8_t* pCurrentWord
+                         local  const char8_t* pEndOfWord
+                         local  uint32_t uStartingIndex
+                         local  volatile uint32_t uOOPS
+                         inlines  GetWordPtrIndex, IsNewWordCharacter
+  518  005F2BF4    320  char8_t* GetWord(const struct <anon>* this, uint32_t uIndex, char8_t* pDest, uint32_t uDestSize)
+                         local  uint32_t uCurrentIndex
+                         local  const char8_t* pCurrentWord
+                         local  const char8_t* pEndOfWord
+                         local  uint32_t uLength
+                         local  uint32_t uStartingIndex
+                         inlines  GetWordPtrIndex, IsNewWordCharacter
+  601  005C3E28     4C  void WebOfferMenuConcrete(const struct <anon>* this)
+  608  005C3E1C      C  void ~WebOfferMenuConcrete(const struct <anon>* this)
+  612  005C4CDC     30  void Fill(const struct <anon>* this, WebOfferT* pWebOffer)
+  617  005D5BEC     8C  struct WebOfferButton* GetButton(const struct <anon>* this, uint32_t uButtonNum)
+  626  005C3FF0     54  void WebOfferArticlesConcrete(const struct <anon>* this)
+  635  005C3FE4      C  void ~WebOfferArticlesConcrete(const struct <anon>* this)
+  639  005C4DD8     78  void Fill(const struct <anon>* this, WebOfferT* pWebOffer)
+                         local  uint32_t uLoop
+  659  005D5B60     8C  struct WebOfferButton* GetButton(const struct <anon>* this, uint32_t uButtonNum)
+  681  005D5AD8     88  struct WebOfferFixedImage* GetFixedImage(const struct <anon>* this, uint32_t uFixedImageNum)
+  691  005D5A24     B4  struct WebOfferArticle* GetArticle(const struct <anon>* this, uint32_t uArticleNum)
+                         local  struct WebOfferArticle* pArticle
+  706  005C4108     4C  void WebOfferStoryConcrete(const struct <anon>* this)
+  713  005C40FC      C  void ~WebOfferStoryConcrete(const struct <anon>* this)
+  717  005C4F14     30  void Fill(const struct <anon>* this, WebOfferT* pWebOffer)
+  724  005C4218     4C  void WebOfferMediaConcrete(const struct <anon>* this)
+  731  005C420C      C  void ~WebOfferMediaConcrete(const struct <anon>* this)
+  735  005C4FD4     30  void Fill(const struct <anon>* this, WebOfferT* pWebOffer)
+  759  005C4328     54  void WebOfferFormConcrete(const struct <anon>* this)
+  786  005C431C      C  void ~WebOfferFormConcrete(const struct <anon>* this)
+  805  005C50D0    114  void Fill(const struct <anon>* this, WebOfferT* pWebOffer)
+                         local  uint32_t uLoop
+                         local  uint32_t uListCount
+  864  005C5218     1C  int32_t GetFieldMaxWidth(const struct <anon>* this, int32_t iIndex)
+  887  005C5234     1C  int32_t GetFieldType(const struct <anon>* this, int32_t iIndex)
+  910  005C5250     14  const char8_t* GetFieldName(const struct <anon>* this, int32_t iIndex)
+  932  005C5264     14  const char8_t* GetFieldUserValue(const struct <anon>* this, int32_t iIndex)
+  954  005D5998     8C  struct WebOfferButton* GetButton(const struct <anon>* this, uint32_t uButtonNum)
+  976  005D5910     88  struct WebOfferFixedImage* GetFixedImage(const struct <anon>* this, uint32_t uFixedImageNum)
+ 1004  005C52CC     A8  const char8_t* GetFieldListItem(const struct <anon>* this, int32_t iField, uint32_t uSelection)
+ 1037  005C5374     3C  const char8_t* GetFieldListSelection(const struct <anon>* this, int32_t iField)
+ 1059  005C53B0     3C  const char8_t* GetFieldString(const struct <anon>* this, int32_t iField)
+ 1082  005C53EC     3C  const char8_t* GetFieldStaticString(const struct <anon>* this, int32_t iField)
+ 1105  005C5428     3C  const char8_t* GetFieldRegistration(const struct <anon>* this, int32_t iField)
+ 1129  005C5464     3C  const char8_t* GetFieldNumeric(const struct <anon>* this, int32_t iField)
+ 1153  005C54A0     3C  const char8_t* GetFieldFloat(const struct <anon>* this, int32_t iField)
+ 1175  005C54DC      8  void SetNumValidFields(const struct <anon>* this, int32_t iCount)
+ 1198  005C557C     18  int32_t SetFieldUserValue(const struct <anon>* this, int32_t iIndex, const char8_t* pValue)
+ 1221  005C5594     18  void SetFieldStyle(const struct <anon>* this, int32_t iIndex, int32_t iStyle)
+ 1247  005C54E4     98  int32_t CopyToStringBuffer(const struct <anon>* this, char8_t* pDest, const char* pSource, uint32_t uDestSize)
+                         local  int32_t iReturn
+ 1263  005C5278     54  const char8_t* GetWebOfferListEntry(const struct <anon>* this, WebOfferT* pWebOffer, uint32_t uIndex, const char8_t* pList)

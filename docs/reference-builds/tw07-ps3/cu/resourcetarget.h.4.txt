@@ -1,0 +1,5 @@
+// C:/RW45/platform/include/native/ps3-ppu-gcc/rw/core/resource/resourcetarget.h
+// compiled in: system.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  270    inline-only   MemoryResource& GetMemoryResource(const struct <anon>* this)

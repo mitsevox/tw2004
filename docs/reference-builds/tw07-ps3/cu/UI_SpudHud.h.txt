@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/UI_SpudHud.h
+// compiled in: apt_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   22  00125FE8     B8  void UISpudHud::~UISpudHud(const struct UISpudHud* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   24  000FE4E8      C  uint32 UISpudHud::GetSignature(const const struct UISpudHud* this)
+   40    inline-only   bool UISpudHud::IsSpudHudActive(const const struct UISpudHud* this)
+   85  00116268     14  enum AptThreadReturnValue UISpudHud::VisibilityTimerThread_func(struct IAptSubscriberBase* subs)
+   86  0010103C     14  enum AptThreadReturnValue UISpudHud::GameBreakerAndShotNumberTimeOut_Thread_func(struct IAptSubscriberBase* subs)

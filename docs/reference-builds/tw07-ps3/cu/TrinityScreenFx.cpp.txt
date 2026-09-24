@@ -1,0 +1,24 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_trinity/trinity/Runtime/src/TrinityScreenFx.cpp
+// compiled in: TrinityScreenFx.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   27  00591A88     A4  void Initialize(const struct TrinityScreenFx* this)
+   53  00591B2C      4  void Shutdown(const struct TrinityScreenFx* this)
+   59  00591B30     58  void InitScreenEffects(const struct TrinityScreenFx* this, struct <anon>* pSequence)
+   72  00591B88    4EC  void Tick(const struct TrinityScreenFx* this, float_t fDeltaSec)
+                         local  vec3flt vColor3
+                         local  float_t fDistance
+                         local  struct TrinityCamera* pCamera
+                         local  float_t fIntensity
+                         local  vec3flt vColor3
+                         local  float_t fIntensity
+                         local  vec3flt vColor3
+                         local  float_t fIntensity
+                         inlines  TrinityCamera::SetFocusDistance
+  186  00592074     AC  void SetBlurIntensityKeys(const struct TrinityScreenFx* this, int32_t numKeys, const struct Key1d* pKeys)
+  200  00592120     AC  void SetBlurColorKeys(const struct TrinityScreenFx* this, int32_t numKeys, const struct Key3d* pKeys)
+  214  005921CC     AC  void SetBloomIntensityKeys(const struct TrinityScreenFx* this, int32_t numKeys, const struct Key1d* pKeys)
+  228  00592278     AC  void SetBloomColorKeys(const struct TrinityScreenFx* this, int32_t numKeys, const struct Key3d* pKeys)
+  242  00592324     AC  void SetDepthIntensityKeys(const struct TrinityScreenFx* this, int32_t numKeys, const struct Key1d* pKeys)
+  256  005923D0     AC  void SetDepthDistanceKeys(const struct TrinityScreenFx* this, int32_t numKeys, const struct Key1d* pKeys)
+  270  0059247C     AC  void SetDepthColorKeys(const struct TrinityScreenFx* this, int32_t numKeys, const struct Key3d* pKeys)

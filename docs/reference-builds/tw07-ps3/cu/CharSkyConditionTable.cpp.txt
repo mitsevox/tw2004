@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/animation/CharSkyConditionTable.cpp
+// compiled in: golf2_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   22  00135AD8     44  void CharSkyConditionTable::RegisterStreamClients()
+   29  0013BAC0     5C  int CharSkyConditionTable::numSkyConditions()
+   35  0013BB1C     40  bool CharSkyConditionTable::IsConditionValid(int conditionNum)
+   44  0014D47C    16C  static void LoadCharSkyConditionTablefromStream(struct TStreamData* pStreamData)
+                         local  const char[36] __FUNCTION__
+                         local  int32 tableSize
+                         inlines  TagValuePair, operator+

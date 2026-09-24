@@ -1,0 +1,12 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/actionabstract.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   74  005FC49C     54  void ActionAbstract(const struct <anon>* this, const char8_t* strId)
+  100  005FC544     14  void ~ActionAbstract(const struct <anon>* this)
+                         inlines  ~OperationStrategy
+  122  005E12D8     8C  struct Operation* Execute(const struct <anon>* this, struct <anon>* pCallback)
+                         inlines  GetOperationManagerConcrete
+  149  005B3B00     68  bool OperationProcess(const struct <anon>* this, const struct Operation* )
+  179  005B3AB4     4C  void OperationTimeout(const struct <anon>* this, const struct Operation* pOperation)
+  204  005B3250      C  void OperationCancel(const struct <anon>* this, const struct Operation* )

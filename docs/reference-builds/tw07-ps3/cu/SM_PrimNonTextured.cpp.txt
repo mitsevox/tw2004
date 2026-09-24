@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_PrimNonTextured.cpp
+// compiled in: shader_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   44  00506898     78  void SM_PrimNonTexturedClass::Load(const struct SM_PrimNonTexturedClass* this)
+   52  00510A6C     80  void SM_PrimNonTexturedClass::EnableFloatColor(const struct SM_PrimNonTexturedClass* this, bool enable)

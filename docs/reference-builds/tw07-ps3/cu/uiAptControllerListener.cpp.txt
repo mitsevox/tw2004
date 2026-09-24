@@ -1,0 +1,58 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/aptInterface/uiAptControllerListener.cpp
+// compiled in: other_unity.cpp
+// 21 functions, source order. line | PS3 address | size
+
+  151  003EA79C     20  float AptControllerListener::GetafTotalTimeHeldDown(int32 indexOfButton)
+  159  003EA7BC     20  void AptControllerListener::SetafTotalTimeHeldDown(int32 indexOfButton, float time)
+  167  003E9E38     7C  struct IAptControllerListener* AptControllerListener::AptGetCurrentListener()
+  182  003EA0F0     D4  struct IAptControllerListener* AptControllerListener::AptGetNextListener(struct IAptControllerListener* listener)
+                         local  int32 index
+  212  00451DBC    3EC  bool AptControllerListener::AptUpdateSingleController(uint32 controlPadInput, int controller, float fSecondsElapsed)
+                         local  struct uiMapButton* mb
+                         local  int i
+                         local  bool bEventGenerated
+                         local  struct IAptControllerListener* listener
+                         local  enum eAptHandleInput result
+                         local  struct Controller_StickInfo* info
+                         local  bool bY1
+                         local  bool bY2
+                         local  bool bX1
+                         local  bool bX2
+  339  004521F0    56C  void AptControllerListener::AptUpdateController()
+                         local  float fSecondsElapsed
+                         local  TI_STimeValue currentTime
+                         local  enum PlayerCtrl_t ctrl
+                         local  int ctr
+                         local  uint32 controlPadInput
+                         local  struct IAptControllerListener* listener
+                         local  struct AptScreenSubscriber* screen
+                         local  unsigned int signature
+                         local  bool bDoPauseMenuCheck
+                         local  bool skip
+                         local  int i
+                         local  enum PlayerNumber_t golferUp
+                         local  enum PlayerNumber_t golferUp
+                         inlines  AptControllerListener::CheckPortLock, GM_GetGolferUp, GamePlayer::GetController, TI_fConvertTimeDifToSeconds, sys_time_get_timebase_frequency
+  484  003EA7F4     1C  void AptControllerListener::OpenListeners()
+  494  003EA810     20  void AptControllerListener::DisableAllInputs()
+  502  003EA830     6C  void AptControllerListener::EnableAllInputs()
+  512  003EA89C     30  void AptControllerListener::CloseListeners()
+                         local  int i
+  523  003EA8CC     68  void AptControllerListener::RefreshStack(const struct AptControllerListener* this)
+  533  003EA934     E0  void AptControllerListener::PushOnStack(const struct AptControllerListener* this)
+  548  003EAA14     AC  void AptControllerListener::RemoveFromStack(const struct AptControllerListener* this)
+  559  003EAAC0    208  bool AptControllerListener::SortDownOnce(const struct AptControllerListener* this)
+                         local  int32 prevIndex
+                         local  int32 currIndex
+                         local  struct AptControllerListener* previous
+  595  003EACC8    120  void AptControllerListener::CondenseStack(const struct AptControllerListener* this)
+                         local  int condenseAmount
+                         local  int currentIndex
+                         local  int nextIndex
+                         local  struct AptControllerListener* next
+  628  003EADE8     78  void AptControllerListener::ControllerListen(const struct AptControllerListener* this)
+  649  003EAE60     58  void AptControllerListener::ControllerRelease(const struct AptControllerListener* this)
+  663  003EAEB8     1C  int32 AptControllerListener::GetActiveController()
+  672  003EA7DC     18  void AptControllerListener::SetActiveController(int32 activeController)
+  681  003EAED4     20  void AptControllerListener::StartPortLocking(int32 ctl)
+  688  003EAEF4     28  void AptControllerListener::SetDebugControl(void* object, void(*)()* record, uint32(*)()* drive)

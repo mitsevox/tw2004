@@ -1,0 +1,203 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/lua-5.0.2/src/lapi.c
+// compiled in: lapi.c
+// 70 functions, source order. line | PS3 address | size
+
+   48  00542FAC     7C  static TObject* negindex(lua_State* L, int idx)
+                         local  TObject* func
+   68  00543028     24  static TObject* luaA_index(lua_State* L, int idx)
+                         local  TObject* o
+   81  0054304C     34  static TObject* luaA_indexAcceptable(lua_State* L, int idx)
+                         local  TObject* o
+   93  00543080     6C  void luaA_pushobject(lua_State* L, const TObject* o)
+                         local  const TObject* o2
+                         local  TObject* o1
+   99  005430EC     B8  int lua_checkstack(lua_State* L, int size)
+                         local  int res
+  115  005431A4     78  void lua_xmove(lua_State* from, lua_State* to, int n)
+                         local  int i
+                         local  const TObject* o2
+                         local  TObject* o1
+  128  0054321C     10  lua_CFunction lua_atpanic(lua_State* L, lua_CFunction panicf)
+                         local  lua_CFunction old
+  138  0054322C     6C  lua_State* lua_newthread(lua_State* L)
+                         local  lua_State* L1
+                         local  TObject* i_o
+  157  00543298     18  int lua_gettop(lua_State* L)
+  162  005432B0     6C  void lua_settop(lua_State* L, int idx)
+  178  0054331C     74  void lua_remove(lua_State* L, int idx)
+                         local  StkId p
+                         local  const TObject* o2
+                         local  TObject* o1
+  188  00543390     84  void lua_insert(lua_State* L, int idx)
+                         local  StkId p
+                         local  StkId q
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  const TObject* o2
+                         local  TObject* o1
+  199  00543414     5C  void lua_replace(lua_State* L, int idx)
+                         local  const TObject* o2
+                         local  TObject* o1
+  208  00543470     4C  void lua_pushvalue(lua_State* L, int idx)
+                         local  const TObject* o2
+                         local  TObject* o1
+  222  005434BC     38  int lua_type(lua_State* L, int idx)
+                         local  StkId o
+  228  005434F4     34  const char* lua_typename(lua_State* L, int t)
+  234  00543528     64  int lua_iscfunction(lua_State* L, int idx)
+                         local  StkId o
+  240  0054358C     64  int lua_isnumber(lua_State* L, int idx)
+                         local  TObject n
+                         local  const TObject* o
+  247  005435F0     34  int lua_isstring(lua_State* L, int idx)
+                         local  int t
+  253  00543624     60  int lua_isuserdata(lua_State* L, int idx)
+                         local  const TObject* o
+  259  00543684     7C  int lua_rawequal(lua_State* L, int index1, int index2)
+                         local  StkId o1
+                         local  StkId o2
+  267  00543700     B4  int lua_equal(lua_State* L, int index1, int index2)
+                         local  StkId o1
+                         local  StkId o2
+                         local  int i
+  280  005437B4     80  int lua_lessthan(lua_State* L, int index1, int index2)
+                         local  StkId o1
+                         local  StkId o2
+                         local  int i
+  294  00543834     78  lua_Number lua_tonumber(lua_State* L, int idx)
+                         local  TObject n
+                         local  const TObject* o
+  304  005438AC     5C  int lua_toboolean(lua_State* L, int idx)
+                         local  const TObject* o
+  310  00543908     CC  const char* lua_tostring(lua_State* L, int idx)
+                         local  StkId o
+                         local  const char* s
+  327  005439D4     88  size_t lua_strlen(lua_State* L, int idx)
+                         local  StkId o
+                         local  size_t l
+  343  00543A5C     54  lua_CFunction lua_tocfunction(lua_State* L, int idx)
+                         local  StkId o
+  349  00543AB0     5C  void* lua_touserdata(lua_State* L, int idx)
+                         local  StkId o
+  360  00543B0C     54  lua_State* lua_tothread(lua_State* L, int idx)
+                         local  StkId o
+  366  00543B60     C8  const void* lua_topointer(lua_State* L, int idx)
+                         local  StkId o
+  389  00543C28     1C  void lua_pushnil(lua_State* L)
+  397  00543C44     20  void lua_pushnumber(lua_State* L, lua_Number n)
+                         local  TObject* i_o
+  405  00543C64     94  void lua_pushlstring(lua_State* L, const char* s, size_t len)
+                         local  TObject* i_o
+  414  00543CF8     6C  void lua_pushstring(lua_State* L, const char* s)
+  423  00543D64     70  const char* lua_pushvfstring(lua_State* L, const char* fmt, va_list argp)
+                         local  const char* ret
+  433  00543DD4     84  const char* lua_pushfstring(lua_State* L, const char* fmt)
+                         local  const char* ret
+                         local  va_list argp
+  446  00543E58     FC  void lua_pushcclosure(lua_State* L, lua_CFunction fn, int n)
+                         local  Closure* cl
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  TObject* i_o
+  462  00543F54     30  void lua_pushboolean(lua_State* L, int b)
+                         local  TObject* i_o
+  470  00543F84     20  void lua_pushlightuserdata(lua_State* L, void* p)
+                         local  TObject* i_o
+  484  00543FA4     68  void lua_gettable(lua_State* L, int idx)
+                         local  StkId t
+                         local  const TObject* o2
+                         local  TObject* o1
+  493  0054400C     60  void lua_rawget(lua_State* L, int idx)
+                         local  StkId t
+                         local  const TObject* o2
+                         local  TObject* o1
+  503  0054406C     68  void lua_rawgeti(lua_State* L, int idx, int n)
+                         local  StkId o
+                         local  const TObject* o2
+                         local  TObject* o1
+  514  005440D4     7C  void lua_newtable(lua_State* L)
+                         local  TObject* i_o
+  523  00544150     A0  int lua_getmetatable(lua_State* L, int objindex)
+                         local  const TObject* obj
+                         local  Table* mt
+                         local  int res
+                         local  TObject* i_o
+  551  005441F0     AC  void lua_getfenv(lua_State* L, int idx)
+                         local  StkId o
+                         local  const TObject* o2
+                         local  TObject* o1
+  566  0054429C     5C  void lua_settable(lua_State* L, int idx)
+                         local  StkId t
+  577  005442F8     7C  void lua_rawset(lua_State* L, int idx)
+                         local  StkId t
+                         local  const TObject* o2
+                         local  TObject* o1
+  589  00544374     7C  void lua_rawseti(lua_State* L, int idx, int n)
+                         local  StkId o
+                         local  const TObject* o2
+                         local  TObject* o1
+  601  005443F0     DC  int lua_setmetatable(lua_State* L, int objindex)
+                         local  TObject* obj
+                         local  TObject* mt
+                         local  int res
+  629  005444CC     8C  int lua_setfenv(lua_State* L, int idx)
+                         local  StkId o
+                         local  int res
+  650  00544558     38  void lua_call(lua_State* L, int nargs, int nresults)
+                         local  StkId func
+  670  00544590     30  static void f_call(lua_State* L, void* ud)
+                         local  struct CallS* c
+  677  005445C0     A8  int lua_pcall(lua_State* L, int nargs, int nresults, int errfunc)
+                         local  struct CallS c
+                         local  int status
+                         local  ptrdiff_t func
+  700  00544668     F0  static void f_Ccall(lua_State* L, void* ud)
+                         local  struct CCallS* c
+                         local  Closure* cl
+                         local  TObject* i_o
+                         local  TObject* i_o
+  713  00544758     54  int lua_cpcall(lua_State* L, lua_CFunction func, void* ud)
+                         local  struct CCallS c
+                         local  int status
+  726  005447AC     88  int lua_load(lua_State* L, lua_Chunkreader reader, void* data, const char* chunkname)
+                         local  ZIO z
+                         local  int status
+                         local  int c
+  740  00544834     84  int lua_dump(lua_State* L, lua_Chunkwriter writer, void* data)
+                         local  int status
+                         local  TObject* o
+  766  005448B8     10  int lua_getgcthreshold(lua_State* L)
+                         local  int threshold
+  774  005448C8     10  int lua_getgccount(lua_State* L)
+                         local  int count
+  782  005448D8     68  void lua_setgcthreshold(lua_State* L, int newthreshold)
+  798  00544940     14  const char* lua_version()
+  803  00544954     28  int lua_error(lua_State* L)
+  812  0054497C     7C  int lua_next(lua_State* L, int idx)
+                         local  StkId t
+                         local  int more
+  829  005449F8     E8  void lua_concat(lua_State* L, int n)
+                         local  TObject* i_o
+  846  00544AE0     84  void* lua_newuserdata(lua_State* L, size_t size)
+                         local  Udata* u
+                         local  TObject* i_o
+  858  00544B64     E0  int lua_pushupvalues(lua_State* L)
+                         local  Closure* func
+                         local  int n
+                         local  int i
+                         local  const TObject* o2
+                         local  TObject* o1
+  876  00544C44    108  static const char* aux_upvalue(lua_State* L, int funcindex, int n, TObject** val)
+                         local  Closure* f
+                         local  StkId fi
+                         local  Proto* p
+  895  00544D4C     5C  const char* lua_getupvalue(lua_State* L, int funcindex, int n)
+                         local  const char* name
+                         local  TObject* val
+                         local  const TObject* o2
+                         local  TObject* o1
+  909  00544DA8     5C  const char* lua_setupvalue(lua_State* L, int funcindex, int n)
+                         local  const char* name
+                         local  TObject* val
+                         local  const TObject* o2
+                         local  TObject* o1

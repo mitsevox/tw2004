@@ -1,0 +1,15 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/PS3/RNAMeshPlat.cpp
+// compiled in: RNAMeshPlat.cpp
+// 9 functions, source order. line | PS3 address | size
+
+    0  008E9488     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   51  008E9190     4C  void MeshPlatC(const struct <anon>* this, enum PrimTypeE ePrimType, int32_t iMaxStreams, struct UserData* pUserData, uint32_t uFlags)
+   61  008E9228     64  void MeshPlatC(const struct <anon>* this, const struct <anon>* pSrcMeshPlat, struct UserData* pUserData)
+   72  008E92F0     B4  void ~MeshPlatC(const struct <anon>* this)
+                         inlines  operator delete
+   76  008E93A4     14  void SetPrimRange(const struct <anon>* this, uint32_t StartIndex, uint32_t PrimCount)
+   83  008E93B8     10  void SetPrimRange(const struct <anon>* this, int32_t BaseVertexIndex, uint32_t StartIndex, uint32_t PrimCount)
+   90  008E93C8     C0  void MeshC::SetIndices(const struct MeshC* this, struct IndicesC* pIndices)
+                         inlines  SetIndicesOffset, SetPtr
+  101  008E9508     10  static void _GLOBAL__I__ZN3RNA9MeshPlatC16s_ClassAllocatorE()
+  102  008E9518     10  static void _GLOBAL__D__ZN3RNA9MeshPlatC16s_ClassAllocatorE()

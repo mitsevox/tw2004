@@ -1,0 +1,75 @@
+// C:/packages/job_manager/1.11.00/source/ps3/ppu/job_scheduler_platform.cpp
+// compiled in: job_scheduler_platform.cpp
+// 17 functions, source order. line | PS3 address | size
+
+  127  007071C4     24  void Jobs::DefaultOutputFunction(const char* format, va_list args)
+  342  0070873C    188  void Jobs::ThreadMain(uint64_t parameter)
+                         local  struct JobThreadIdentification* kernelData
+                         local  struct <anon>* kernelThread
+                         local  struct JobScheduler* jobScheduler
+  373  00707400    7A0  void Initialize(const struct JobScheduler* this, unsigned int numSPUs, unsigned int numPPUs, struct <anon>* threadAttribs, struct <anon>* ppuTraceThreadAttribs)
+                         local  int ret
+                         local  int priority
+                         local  sys_spu_thread_group_attribute_t groupAttr
+                         local  char[16] threadName
+                         local  sys_spu_thread_attribute_t threadAttr
+                         local  int32_t entryPoint
+                         local  sys_spu_thread_argument_t threadArg
+                         local  unsigned int i
+                         local  sys_lwmutex_attribute_t lwmutex_attr
+                         local  sys_event_queue_attribute_t queue_attr
+                         local  int ret
+                         inlines  sys_event_port_connect_local, sys_event_port_create, sys_event_queue_create, sys_spu_thread_connect_event, sys_spu_thread_group_create, sys_spu_thread_initialize
+  759  007071E8    218  void _InitPPUThreads(const struct JobSchedulerInternal* this, struct <anon>* threadAttribs)
+                         local  sys_ppu_thread_t curThreadId
+                         local  int basePriority
+                         local  int newPriority
+                         local  size_t stackSize
+                         local  void* parameter
+                         local  int ret
+                         local  char[16] threadName
+                         local  uint32_t i
+                         inlines  sys_ppu_thread_get_priority
+  819  00707BA0    128  void Start(const struct JobScheduler* this)
+                         local  int ret
+                         inlines  sys_spu_thread_group_start
+  841  00707DC4     24  void _SignalShutdown(const struct JobSchedulerInternal* this, bool finishPending)
+                         inlines  cellAtomicStore32
+ 1011  00707DE8      4  void PauseWork(const struct JobScheduler* this)
+ 1025  00707DEC    620  void Destroy(const struct JobScheduler* this, bool finishPending)
+                         local  int ret
+                         local  int cause
+                         local  int status
+                         local  uint64_t exit_status
+                         local  unsigned int i
+                         local  uint32_t i
+                         local  uint32_t i
+                         local  unsigned int i
+                         local  uint32_t i
+                         inlines  sys_event_port_destroy, sys_event_port_disconnect, sys_event_port_send, sys_event_queue_destroy, sys_ppu_thread_join, sys_spu_thread_disconnect_event, sys_spu_thread_group_destroy, sys_spu_thread_group_join
+ 1190  007088C4    2AC  void _NotifyProcessors(const struct JobSchedulerInternal* this, const struct <anon>& state)
+                         local  unsigned int minSpu
+                         local  unsigned int maxSpu
+                         local  unsigned int i
+                         inlines  DecrementFreeSPUJobs, GetNextSPUToNotify, sys_spu_thread_write_snr
+ 1227  00707CC8     FC  void _NotifyAllProcessors(const struct JobSchedulerInternal* this)
+                         local  unsigned int i
+                         inlines  sys_spu_thread_write_snr
+ 1257  00708B70    1F0  void _MarkOffSPUWeAreGoingToNotify(const struct JobSchedulerInternal* this)
+                         local  unsigned int maxSpu
+                         local  unsigned int i
+                         inlines  DecrementFreeSPUJobs, GetNextSPUToNotify, MarkSPURunning
+ 1290  0070840C     AC  uint32_t _GetJobListIndex(const struct JobSchedulerInternal* this, struct Job* jp)
+                         local  volatile struct <anon>* jhp
+                         local  uint32_t offset
+ 1307  007084B8     D0  void _GetLock(const struct JobSchedulerInternal* this)
+                         local  int spins
+                         local  int startTime
+                         local  int curTime
+                         inlines  sys_ppu_thread_yield, sys_timer_usleep
+ 1337  00708588     2C  void _ReleaseLock(const struct JobSchedulerInternal* this)
+ 1344  007085B4     84  void _GetPPULock(const struct JobSchedulerInternal* this)
+                         local  int ret
+ 1355  00708638     80  void _ReleasePPULock(const struct JobSchedulerInternal* this)
+                         local  int ret
+ 1366  007086B8     84  ThreadIdType GetThreadId(const struct JobScheduler* this, const unsigned int spuIndex)

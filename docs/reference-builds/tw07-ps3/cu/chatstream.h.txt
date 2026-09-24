@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/include/common/osdk/chatstream.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   59  00622D10     3C  struct Operation* SendRawMessage(const struct ChatStream* this, const char8_t* strMessage, struct <anon>* pCallback)
+   65  00622D4C     3C  struct Operation* SendPrivateMessage(const struct ChatStream* this, const char8_t* strMessage, struct <anon>* pCallback)

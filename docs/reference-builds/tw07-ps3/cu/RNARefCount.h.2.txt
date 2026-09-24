@@ -1,0 +1,24 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNABase/RNARefCount.h
+// compiled in: RNABuilder.cpp, RNACmdBuffer.cpp, RNADevice.cpp, RNAMapping.cpp, RNAMaterialList.cpp, RNAParm.cpp, RNAScene.cpp, RNAScope.cpp, SGNode.cpp, SGNodeSwitch.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   83    inline-only   const struct <anon>& operator=(const struct <anon>* this, const const struct <anon>& rhs)
+   90    inline-only   const struct AutoRefCount<RNA::MaterialC>& operator=(const struct AutoRefCount<RNA::MaterialC>* this, struct MaterialC* pObject)
+                         local  const struct MaterialC* pTemp
+  107    inline-only   struct CmdBufferC* operator->(const const struct <anon>* this)
+  110    inline-only   struct MaterialC* operator RNA::MaterialC*(const const struct AutoRefCount<RNA::MaterialC>* this)
+  110    inline-only   struct CmdBufferC* operator RNA::CmdBufferC*(const const struct <anon>* this)
+  110    inline-only   struct StreamC* operator RNA::StreamC*(const const struct <anon>* this)
+  110    inline-only   struct MeshC* operator RNA::MeshC*(const const struct AutoRefCount<RNA::MeshC>* this)
+  110    inline-only   struct VertexFormatC* operator RNA::VertexFormatC*(const const struct AutoRefCount<RNA::VertexFormatC>* this)
+  110    inline-only   struct IndicesC* operator RNA::IndicesC*(const const struct AutoRefCount<RNA::IndicesC>* this)
+  110    inline-only   struct ShaderC* operator RNA::ShaderC*(const const struct AutoRefCount<RNA::ShaderC>* this)
+  110    inline-only   struct TextureC* operator RNA::TextureC*(const const struct AutoRefCount<RNA::TextureC>* this)
+  110    inline-only   struct SGNodeC* operator SceneX::SGNodeC*(const const struct <anon>* this)
+  152  00824DE0     68  void ~RefCountTemplate(const struct <anon>* this)
+                         local  const char[18] __FUNCTION__
+                         inlines  RNADebugBreak
+  165    inline-only   int AddRef(const struct <anon>* this)
+  174    inline-only   int Release(const struct <anon>* this)
+                         local  const char[8] __FUNCTION__
+  185    inline-only   int GetRefCount(const struct <anon>* this)

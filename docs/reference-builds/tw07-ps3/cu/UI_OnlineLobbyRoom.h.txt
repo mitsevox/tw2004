@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_OnlineLobbyRoom.h
+// compiled in: apt_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   19  0011A428    160  void UIOnlineLobbyRoom::~UIOnlineLobbyRoom(const struct UIOnlineLobbyRoom* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIOnlineLobbyRoom::PlayerMenuItem>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+   21  000FF820      C  uint32 UIOnlineLobbyRoom::GetSignature(const const struct UIOnlineLobbyRoom* this)
+   31  000FF82C      4  void UIOnlineLobbyRoom::ShowHelpText(const struct UIOnlineLobbyRoom* this)
+   33  000FF838      C  struct IExternArray* UIOnlineLobbyRoom::GetExternArray(const struct UIOnlineLobbyRoom* this)
+   60  00115794     1C  void UIOnlineLobbyRoom::UpdateDetailedInfo_func(struct IAptSubscriber* subs)

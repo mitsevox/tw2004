@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/audio/AudStrToGuid.cpp
+// compiled in: other_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   23    inline-only   static char mytolower(char c)
+   33  003DA934     74  uint32 AudStrToGuid(const char* key)
+                         local  uint32 hash
+                         inlines  mytolower

@@ -1,0 +1,21 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/earnings/UnlockInfo.cpp
+// compiled in: other_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   35  0041F008     84  bool UnlockInfo::IsGolferUnlocked(const struct UnlockInfo* this, uint32_t i)
+   49  0041F100     98  bool UnlockInfo::IsCourseUnlocked(const struct UnlockInfo* this, int i)
+   57  0041EDD4     AC  bool UnlockInfo::IsEraEventUnlocked(const struct UnlockInfo* this, uint32_t i)
+   70  0042EFEC    104  void UnlockInfo::SetGolferStatus(const struct UnlockInfo* this, uint32_t i, enum UNLOCK_STATUS status)
+                         inlines  BitArray_ClearBit, BitArray_SetBit
+   85  0042F1D4     FC  void UnlockInfo::SetCourseStatus(const struct UnlockInfo* this, uint32_t i, enum UNLOCK_STATUS status)
+                         local  uint32_t index
+                         inlines  BitArray_ClearBit, BitArray_SetBit
+  101  003D59B8     FC  void UnlockInfo::SetEraEventStatus(const struct UnlockInfo* this, uint32_t i, enum UNLOCK_STATUS status)
+                         local  uint32_t index
+                         inlines  BitArray_ClearBit, BitArray_SetBit
+  117  0042F2D0     50  void UnlockInfo::UnlockAllCourses(const struct UnlockInfo* this)
+                         local  uint32_t i
+  128  0042F0F0     50  void UnlockInfo::UnlockAllGolfers(const struct UnlockInfo* this)
+                         local  uint32_t i
+  139  003D98CC     50  void UnlockInfo::UnlockAllEraEvents(const struct UnlockInfo* this)
+                         local  uint32_t i

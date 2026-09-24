@@ -1,0 +1,91 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/IGameData.cpp
+// compiled in: golf_unity.cpp
+// 69 functions, source order. line | PS3 address | size
+
+   19  0020F9A0     D4  void IGameData::ResetAll(const struct IGameData* this)
+                         local  int i
+   64  001F9CFC      8  void IGameData::SetScoreType(const struct IGameData* this, const enum GM_ScoringType_t eType)
+   69  001E96D8      8  enum GM_ScoringType_t IGameData::GetScoreType(const const struct IGameData* this)
+   74  001F9D04      8  void IGameData::SetMulliganType(const struct IGameData* this, const enum GM_MulliganType_t eType)
+   79  001E97E0      8  enum GM_MulliganType_t IGameData::GetMulliganType(const const struct IGameData* this)
+   84  001F9CDC      8  void IGameData::SetMaxGolfers(const struct IGameData* this, const uint32 nNum)
+   89  0020FA7C      8  uint32 IGameData::GetMaxGolfers(const const struct IGameData* this)
+   94  001F9CE4      8  void IGameData::SetMinGolfers(const struct IGameData* this, const uint32 nNum)
+   99  00205808      8  uint32 IGameData::GetMinGolfers(const const struct IGameData* this)
+  104  002CC7F4    1F8  void IGameData::SetCurrentCourse(const struct IGameData* this, const enum GM_CourseType_t Course)
+                         local  enum GM_CourseType_t nCourse
+                         local  int32 nHole
+                         local  int i
+                         inlines  GM_GetModeType
+  156  001E9694      8  const enum GM_CourseType_t IGameData::GetCurrentCourse(const const struct IGameData* this)
+  166  0020FB3C      8  void IGameData::SetCurrentHole(const struct IGameData* this, uint32 nHole)
+  172  001F2D80      8  const uint32 IGameData::GetCurrentHole(const struct IGameData* this)
+  177  0020FB44    13C  void IGameData::SetCurrentHoleIndex(const struct IGameData* this, const uint32 nIndex)
+                         local  bool sRegisterSetCurretHole
+  205  001E9600      8  const uint32 IGameData::GetCurrentHoleIndex(const const struct IGameData* this)
+  210  001F51C8      8  const uint32 IGameData::GetPreviousHoleIndex(const const struct IGameData* this)
+  215  00201124     D8  void IGameData::SetCustomCourseSelection(const struct IGameData* this, const uint32 nHoleNum, const enum GM_CourseType_t Course, const int32 nHoleFromCourse)
+  223  001F6400     9C  void IGameData::GetCustomCourseSelection(const struct IGameData* this, const uint32 nHoleNum, const enum GM_CourseType_t& Course, const int32& nHole)
+  232  0021091C     A8  const uint32 IGameData::GetHoleIndex(const const struct IGameData* this, int holeNum)
+                         local  int bRet
+                         local  int i
+  246  001E969C     3C  int IGameData::NumHolesSelected(const const struct IGameData* this)
+                         local  int nHoles
+                         local  const int nEntries
+                         local  int i
+  258  002109C4     7C  void IGameData::SetCustomHoleSelection(const struct IGameData* this, const uint32 nIndex, const int32 nHoleSelection)
+  264  00210A40     70  const uint32 IGameData::GetCustomHoleSelection(const struct IGameData* this, const uint32 nIndex)
+  270  001E9A9C     78  void IGameData::SetHoleAsSelected(const struct IGameData* this, const uint32 nIndex, bool bSelected)
+  276  001E9810     6C  const bool IGameData::IsHoleSelected(const const struct IGameData* this, const uint32 nIndex)
+  282  002063BC     78  void IGameData::SetHoleHandicap(const struct IGameData* this, const uint32 nIndex, uint8 handicap)
+  288  001F6624     6C  const uint8 IGameData::GetHoleHandicap(const struct IGameData* this, const uint32 nIndex)
+  294  00205690     78  void IGameData::SetPlayoffHoleSelectable(const struct IGameData* this, const uint32 nIndex, bool bSelectable)
+  300  00205708     6C  const bool IGameData::IsPlayoffHoleSelectable(const struct IGameData* this, const uint32 nIndex)
+  306  001F9D0C      8  void IGameData::SetPlayoffMode(const struct IGameData* this, bool bMode)
+  311  001E9734      8  bool IGameData::IsPlayoffMode(const const struct IGameData* this)
+  316  001FC960      8  void IGameData::SetPlayOffWasForFullRound(const struct IGameData* this, bool bVal)
+  321  00200B10      8  bool IGameData::PlayOffWasForFullRound(const const struct IGameData* this)
+  326  001FC93C      8  void IGameData::SetPlayOffHoleCount(const struct IGameData* this, uint32 nVal)
+  331  001F51C0      8  uint32 IGameData::GetPlayOffHoleCount(const struct IGameData* this)
+  336  001F9CF4      8  void IGameData::SetCurrentRound(const struct IGameData* this, uint32 nVal)
+  341  001E9724      8  uint32 IGameData::GetCurrentRound(const struct IGameData* this)
+  346  001E972C      8  void IGameData::SetNumRoundsToPlay(const struct IGameData* this, uint32 nVal)
+  351  001E9B1C      8  uint32 IGameData::GetNumRoundsToPlay(const struct IGameData* this)
+  356  001E9744     8C  void IGameData::SetTargetCup(const struct IGameData* this, const uint32 nHole, const int8 nGreenIndex, const int8 nCupIndex)
+  363  001E9608     6C  const struct GreenCupTuple& IGameData::GetTargetCup(const struct IGameData* this, const uint32 nHole)
+  369  001E96E0     34  const struct GreenCupTuple& IGameData::GetTargetCup(const struct IGameData* this)
+  373  001FBEC8      8  void IGameData::SetHoleStartTime(const struct IGameData* this, uint32 nTime)
+  378  00206760      8  uint32 IGameData::GetHoleStartTime(const struct IGameData* this)
+  383  001F4660     58  void IGameData::GetCupLocation(const struct IGameData* this, const vec4flt& vCup)
+  395  001FB8C8      8  void IGameData::SetNoHoleAdvance(const struct IGameData* this, bool bVal)
+  400  001E97E8      8  bool IGameData::NoHoleAdvance(const struct IGameData* this)
+  405  001E97F0      8  void IGameData::SetNeedToBuildPlayoffHoleList(const struct IGameData* this, bool bVal)
+  410  001E97F8      8  bool IGameData::NeedToBuildPlayoffHoleList(const struct IGameData* this)
+  415  002011FC      8  void IGameData::SetCustomCourse(const struct IGameData* this, bool bVal)
+  420  001E971C      8  bool IGameData::IsCustomCourse(const struct IGameData* this)
+  425  0020FA84      8  void IGameData::SetRandomCourse(const struct IGameData* this, bool bVal)
+  430  001E9714      8  bool IGameData::IsRandomCourse(const struct IGameData* this)
+  435  0020FA8C      8  void IGameData::SetCompilationCourse(const struct IGameData* this, bool bVal)
+  440  001E968C      8  bool IGameData::IsCompilationCourse(const struct IGameData* this)
+  445  00210AB0      8  void IGameData::SetCustomIndex(const struct IGameData* this, uint32 nIndex)
+  450  00210AB8      8  uint32 IGameData::GetCustomIndex(const struct IGameData* this)
+  455  00210AC0     F4  void IGameData::PrepareCustomHoleSelection(const struct IGameData* this)
+                         local  const struct UserInfo& userInfo
+                         local  int32 i
+                         local  int32 hole
+                         local  enum GM_CourseType_t course
+                         inlines  GM_GetCustomUserID
+  468  0020FA94     A0  void IGameData::SetupCompilationCourseHoleSelection(const struct IGameData* this, enum GM_CourseType_t course)
+                         local  int32 i
+  476  0020FB34      8  void IGameData::SetCurrentCourseID(const struct IGameData* this, enum GM_CourseType_t nID)
+  482  00210BE8      8  void IGameData::SetCurrentCourseMoreDirectly(const struct IGameData* this, enum GM_CourseType_t nID)
+  487  00210BF0      8  enum GM_CourseType_t IGameData::CurrentCourseID(const const struct IGameData* this)
+  492  002D0C60     4C  void IGameData::SetCurrentGolfer(const struct IGameData* this, enum PlayerNumber_t ePlayer)
+  501  001FB8D0     3C  void IGameData::SetCurrentGolferOnline(const struct IGameData* this, enum PlayerNumber_t ePlayer)
+  506  001E97D0      8  enum PlayerNumber_t IGameData::GetCurrentGolfer(const const struct IGameData* this)
+  512  002010D4     50  void IGameData::ResetHoleSelection(const struct IGameData* this)
+                         local  int32 i
+  520  001FC76C      8  void IGameData::SetTeamPlay(const struct IGameData* this, bool teamPlay)
+  525  00210BF8      8  bool IGameData::GetTeamPlay(const struct IGameData* this)
+  531  00210C00      8  void IGameData::SetDebugGolfCompletionPercentage(const struct IGameData* this, float_t perc)
+  535  001FC3F0      8  float_t IGameData::GetDebugGolfCompletionPercentage(const struct IGameData* this)

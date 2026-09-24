@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/loginslot.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   70  005E3410     4C  void LoginSlot(const struct LoginSlot* this)
+                         inlines  Observable
+   95  005E3AA8     40  void ~LoginSlot(const struct LoginSlot* this)
+                         inlines  ~Observable

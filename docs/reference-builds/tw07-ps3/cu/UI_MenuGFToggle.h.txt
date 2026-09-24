@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_MenuGFToggle.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   36  00100908      C  uint32 UIMenuGFToggle::GetSignature(const const struct UIMenuGFToggle* this)
+   44  0010E424     14  enum AptThreadReturnValue UIMenuGFToggle::CheckThumbSticksThread_func(struct IAptSubscriberBase* subs)
+   48    inline-only   void UIMenuGFToggle::SetTopMessageStr(const struct UIMenuGFToggle* this, char* str)

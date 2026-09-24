@@ -1,0 +1,35 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/SitDev/SitDevFile.c
+// compiled in: golf2_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+  216  0014D0F4    1B0  void SitDev_LoadScripts(TStreamDataPtr pStream)
+                         local  const char[19] __FUNCTION__
+                         inlines  TagValuePair, operator+
+  252  00131698     44  static void BindHeader(SitDevHeader* pHeader)
+  280  001316DC     48  static void BindActionResponses(SitDevHeader* pHeader)
+                         local  uint32 i
+                         local  Action* a
+  297    inline-only   static void PrintLocalLoadWarning(int nBytes, SitDevHeader* pHeader)
+  319  00131288     4C  const char* SitDev_GetSituationTitle(int fileIndex, int sitIndex)
+                         local  struct String2DArrayHeader* hdr
+  330  00131724     34  static const char* getString(StringArrayHeader* hdr, int index)
+  340  00131758     20  const char* SitDev_GetScriptName(int index)
+  347  00131778     20  const char* SitDev_GetWavName(int index)
+  362  00131920    338  void SitDev_LoadPCData()
+                         local  char[128] fullPath
+                         local  int32 fileLength
+                         inlines  PrintLocalLoadWarning, SitDev_LoadDebugData, bindString2dOffsets
+  393    inline-only   static void SitDev_LoadDebugData()
+  405  00131798    188  static void maybeLoadStringArray(char* filename, StringArrayHeader** bufferToFree)
+                         local  int32 fileLength
+                         local  char[128] fullPath
+                         inlines  bindStringOffsets
+  429    inline-only   static void maybeLoadString2DArray(char* filename, struct String2DArrayHeader** bufferToFree)
+                         local  int32 fileLength
+                         local  char[128] fullPath
+  457    inline-only   static void bindStringOffsets(StringArrayHeader* hdr)
+                         local  int i
+                         local  int i
+  472    inline-only   static void bindString2dOffsets(struct String2DArrayHeader* hdr)
+                         local  int i
+                         local  int i

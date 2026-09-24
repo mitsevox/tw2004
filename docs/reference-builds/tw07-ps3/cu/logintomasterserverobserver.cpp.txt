@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/logintomasterserverobserver.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    6  005BBD8C     34  void LoginToMasterServerObserver(const struct LoginToMasterServerObserver* this)
+   10  005BBD80      C  void ~LoginToMasterServerObserver(const struct LoginToMasterServerObserver* this)

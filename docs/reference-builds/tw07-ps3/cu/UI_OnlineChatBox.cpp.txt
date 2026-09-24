@@ -1,0 +1,29 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_OnlineChatBox.cpp
+// compiled in: apt_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   30  000F8114     94  void UIOnlineChatBox::UIOnlineChatBox(const struct UIOnlineChatBox* this)
+                         inlines  TArrayInternal<UIOnlineChatBox::DstMenuItem_olcb,AptStructSwapper>::TArrayInternal, TExternArray<UIOnlineChatBox::DstMenuItem_olcb>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   34  000F0BE8     C0  void UIOnlineChatBox::Init(const struct UIOnlineChatBox* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   50  0007B23C     B8  void UIOnlineChatBox::Show(const struct UIOnlineChatBox* this)
+   77  00057D98     68  void UIOnlineChatBox::Hide(const struct UIOnlineChatBox* this)
+   97  000488AC      4  void UIOnlineChatBox::OnShow(const struct UIOnlineChatBox* this)
+  100  000488B0     E8  void UIOnlineChatBox::UpdateItemAndLabel(const struct UIOnlineChatBox* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_olcb* dest
+                         local  int iStringHeight
+                         local  int iNumStringLines
+                         local  char[40] szChatName
+  118  00048998     40  enum eAptHandleInput UIOnlineChatBox::HandleInput(const struct UIOnlineChatBox* this, int32 cID)
+  124  00080B68     CC  void UIOnlineChatBox::RefreshScreen(const struct UIOnlineChatBox* this)
+                         local  struct OnlineManagerOSDK* pOnlineMgr
+                         inlines  OnlineManagerOSDK::GetInstance
+  138  00057E00     2C  int32 UIOnlineChatBox::GetMaxStringLength(const struct UIOnlineChatBox* this)
+  158  000489D8     BC  void UIOnlineChatBox::SetStringArrayPosition(const struct UIOnlineChatBox* this, int iPos, char* textPtr)
+  169  00048A94    100  void UIOnlineChatBox::SetChatNamePosition(const struct UIOnlineChatBox* this, int iPos, const char* szChatName)
+  213  00048B94      8  bool UIOnlineChatBox::IsUserInWaitingRoom(const struct UIOnlineChatBox* this, const char* pszChatBuffer)
+  241  00048B9C      8  bool UIOnlineChatBox::IsUserInLobbyRoom(const struct UIOnlineChatBox* this, const char* pszChatBuffer)
+  275  00047CDC     3C  void UIOnlineChatBox::ResetChatAndName(const struct UIOnlineChatBox* this)
+                         local  int32 stringIndex
+  285  00048BA4     24  void UIOnlineChatBox::LooseFocus(const struct UIOnlineChatBox* this, uint32 )
+  290  00048BC8     24  void UIOnlineChatBox::RegainFocus(const struct UIOnlineChatBox* this, uint32 )

@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/FrontEnd/Headers/FE_LoadingScreen.h
+// compiled in: golf2_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   39    inline-only   void UILoadingScreen::SetDone(const struct UILoadingScreen* this, bool bState)
+   42    inline-only   void UILoadingScreen::SetState(const struct UILoadingScreen* this, enum State newState)
+   43    inline-only   enum State UILoadingScreen::GetState(const const struct UILoadingScreen* this)

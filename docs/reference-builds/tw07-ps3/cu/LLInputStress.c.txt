@@ -1,0 +1,28 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLInputStress.c
+// compiled in: Legacy_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+  132  0038AFA8    170  static void Stress_RandomButton(uint32 pad, uint32 buttonID)
+                         local  uint32 randVal
+                         local  uint32 bOn
+  174  0038B2A4    128  static float Stress_RandomStick(float deadzone, float maxzone)
+                         local  float range
+                         local  float value
+                         inlines  Misc_RandFuncf
+  187  00396678    688  void Stress_PatchControllerInput()
+                         local  int skip_pad_bounce
+                         local  int32 i
+                         local  float hammer
+                         local  uint32 pad
+                         local  struct Controller_StickInfo* stick
+                         local  char[255] buf
+                         inlines  Misc_RandFuncf
+  298  0037E3E4     2C  bool Stress_IsRunning()
+  303  00396464    128  void Stress_InitModule()
+                         local  int once
+                         inlines  Misc_RandFuncf
+  343  003834C4    268  void Stress_Update()
+                         local  TI_STimeValue last_tick
+                         local  TI_STimeValue cur_tick
+                         local  float elapsed
+                         inlines  TI_fConvertTimeDifToSeconds, sys_time_get_timebase_frequency

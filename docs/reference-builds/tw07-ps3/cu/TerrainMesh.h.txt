@@ -1,0 +1,24 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/TerrainMesh.h
+// compiled in: headgate_unity.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   23    inline-only   bool IS_BAD_ELEVATION(float v)
+   47    inline-only   struct THInfoVertex& THInfoVertex::operator=(const struct THInfoVertex* this, const const struct THTableVertex& src)
+  189    inline-only   int32 CBucket::GetSize(const struct CBucket* this)
+  190    inline-only   uint32 CBucket::operator[](const struct CBucket* this, int i)
+  235  00346598      4  void CCupGeo::CCupGeo(const struct CCupGeo* this)
+  236  003463DC      4  void CCupGeo::~CCupGeo(const struct CCupGeo* this)
+  244    inline-only   bool CCupGeo::IsActive(const const struct CCupGeo* this)
+  245    inline-only   void CCupGeo::Activate(const struct CCupGeo* this, bool bActive)
+  328    inline-only   void CTerrainMesh::GetWorldMin(const const struct CTerrainMesh* this, float* min)
+  329    inline-only   void CTerrainMesh::GetWorldMax(const const struct CTerrainMesh* this, float* max)
+  341    inline-only   struct tagPolyObject* CTerrainMesh::GetCollisionTree(const struct CTerrainMesh* this, int id)
+  353    inline-only   float CTerrainMesh::ColumnToWorldX(const const struct CTerrainMesh* this, int col)
+  354    inline-only   float CTerrainMesh::RowToWorldZ(const const struct CTerrainMesh* this, int row)
+  355    inline-only   int CTerrainMesh::Column(const const struct CTerrainMesh* this, float x)
+  356    inline-only   int CTerrainMesh::Row(const const struct CTerrainMesh* this, float z)
+  357    inline-only   int CTerrainMesh::TableValue(const const struct CTerrainMesh* this, float x, float z)
+                         local  const int row
+                         local  const int col
+  419    inline-only   bool TerrainHeightFromTable(float x, float z, unsigned int attributeMask, enum FlagOp op, unsigned int propsMask, const struct TerrainHeightInfo& info, bool bForceHighest, float MaxElev)
+  427    inline-only   bool CTerrainMesh::IsValidAttributes(const struct CTerrainMesh* this, unsigned int attribs, enum FlagOp op, unsigned int props)

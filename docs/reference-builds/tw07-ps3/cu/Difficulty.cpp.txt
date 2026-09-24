@@ -1,0 +1,23 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/AI/Difficulty.cpp
+// compiled in: golf2_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   18  00196614     98  void DifficultySettings::DifficultySettings(const struct DifficultySettings* this)
+                         inlines  Singleton<DifficultySettings>::Singleton
+   26  0016EF50     1C  int DifficultySettings::GetDifficultyLevel(const struct DifficultySettings* this)
+   32  0016BAB8     64  void DifficultySettings::SetDifficultyLevel(const struct DifficultySettings* this, DIFFICULTY_LEVEL_e diff)
+                         inlines  cGAME_GLOBALS::SetDifficultyLevel
+   42  0016EFD0     64  bool DifficultySettings::IncDifficultyLevel(const struct DifficultySettings* this)
+                         local  int curDiffLevel
+   54  0016EF6C     64  bool DifficultySettings::DecDifficultyLevel(const struct DifficultySettings* this)
+                         local  int curDiffLevel
+   70  00177050     E0  int DifficultySettings::StreakDrivenPrompt(const struct DifficultySettings* this)
+                         local  int iRetVal
+                         local  int streakVal
+                         inlines  AICore::GetStreakTrigger, AIMgr
+   87  00133B18     88  void DifficultySettings::SaveDifficultySettingsForOnline(const struct DifficultySettings* this)
+   96  00128FC0     8C  void DifficultySettings::RestoreDifficultySettingsForOnline(const struct DifficultySettings* this)
+                         inlines  cGAME_GLOBALS::SetDifficultyLevel
+  110  00185F74    110  void DifficultySettings::UpdateStreakValue(const struct DifficultySettings* this, int streakInput)
+                         local  int currentStreakValue
+                         inlines  DifficultySettings::DecStreakValue, DifficultySettings::IncStreakValue, DifficultySettings::ResetStreakValue

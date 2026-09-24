@@ -1,0 +1,12 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/Inline.h
+// compiled in: Compiler.cpp, Database.cpp, QueryHelper.cpp, Table.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   45  007CAE58     A0  bool IsLocked(const struct <anon>* this)
+                         local  struct <anon> lock
+   59    inline-only   struct Table* FindTable(const struct Database* this, TableRef tblRef)
+                         local  const char[10] __FUNCTION__
+                         local  struct <anon> lock
+  104  007B2298     74  static struct <anon>* T3db::ColLiteralFill(struct <anon>* pLiteral, const TableRef tableRef, const ColRef colRef, const union <anon> data)
+  120  007E7A50     60  static struct <anon>* T3db::ColLiteralFillTerminator(struct <anon>* pLiteral)
+  140  007F1D04     88  static struct <anon>* T3db::ColDefFill(struct <anon>* pColDef, ColRef colRef, enum ColType eType, uint32_t size)

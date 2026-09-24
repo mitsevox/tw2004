@@ -1,0 +1,17 @@
+// ../../../../../TIGERCODE/Code/AptInterface/AptPackage/_AptVector.h
+// compiled in: other_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   76    inline-only   float StringAsVectorPolicy::GrowthFactor()
+   82    inline-only   struct AptFileSavedInputState* ReAlloc<AptFileSavedInputState>(const struct AptFileSavedInputState* ptr, int oldNum, int newNum)
+                         local  struct AptFileSavedInputState* ret
+                         local  int numElem
+                         local  struct AptFileSavedInputState* dst
+   82    inline-only   AptFilePtr* ReAlloc<AptFilePtr>(const AptFilePtr* ptr, int oldNum, int newNum)
+                         local  AptFilePtr* ret
+                         local  int numElem
+                         local  AptFilePtr* dst
+  123    inline-only   struct AptFileSavedInputState* Copy<AptFileSavedInputState*, AptFileSavedInputState*>(struct AptFileSavedInputState* srcBegin, struct AptFileSavedInputState* srcEnd, struct AptFileSavedInputState* dstBegin)
+  123    inline-only   AptFilePtr* Copy<AptFilePtr*, AptFilePtr*>(AptFilePtr* srcBegin, AptFilePtr* srcEnd, AptFilePtr* dstBegin)
+  123    inline-only   AptFilePtr* Copy<const AptFilePtr*, AptFilePtr*>(const AptFilePtr* srcBegin, const AptFilePtr* srcEnd, AptFilePtr* dstBegin)
+  123    inline-only   struct AptFileSavedInputState* Copy<const AptFileSavedInputState*, AptFileSavedInputState*>(const struct AptFileSavedInputState* srcBegin, const struct AptFileSavedInputState* srcEnd, struct AptFileSavedInputState* dstBegin)

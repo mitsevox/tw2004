@@ -1,0 +1,643 @@
+address	unit	our_name	tw07_name	tw07_file	line	score	conf	evidence
+800060E0	LLFileIO_Gc	fn_800060E0	loadActorTemplateCB	GenericActor.cpp	155	8	low	calls:2 strcmp,strcpy; size x1.1
+800083A4	GoEntry	fn_800083A4	BlockOnAllJobsComplete	managerplat.cpp	1642	4	low	calls:1 printf; size x1.0
+800097CC	StaticMemory	fn_800097CC	CO_TnTestHelp	TigerNetTestHarness.cpp	320	4	low	calls:1 printf; size x1.1
+8000B130	urandom	Rand_Next	Misc_RandFunc	URandom.c	90	12	med	callers:14 CharacterState_UpdateSKAState,ComicCam_I; size x2.9
+8000B194	urandom	fn_8000B194	Misc_PMRand	URandom.c	161	3	low	size x1.5; gap 1/1
+8000B1D4	urandom	fn_8000B1D4	Misc_SetSeedFunc	URandom.c	191	12	med	callers:4 GameModeReplay_SetupNextGolfer,REPLAY_Pl; size x1.8
+8000B428	urandom	Rand_Float	Misc_RandFuncg	URandom.c	342	5	low	calls:1 Misc_RandFunc; callers:1 GM_PgaTourSim_SimAdjustEntrantScores; size x5.8
+8000D4F0	UStream	UStream_ParseChunks	Stream_ParseBufs	UStream.c	1222	4	low	calls:1 Mem_cpy; size x3.1
+8000E148	UStream	UStream_Open	Stream_OpenStreamFiles	UStream.c	2514	4	low	calls:1 Mem_cpy; size x1.7
+8000E254	UStream	UStream_OpenFileByName	Stream_OpenStreamFile	UStream.c	2625	4	low	calls:1 memset; size x1.7
+8000E2B0	UStream	UStream_RegisterHandler	Stream_RegisterLoadChunkCallback	UStream.c	2660	6	low	callers:2 GameModeDriverPGATour_RegisterStreamClie; size x3.7
+8000E358	UStream	UStream_UnregisterHandler	Stream_UnregisterLoadChunkCallback	UStream.c	2714	6	low	callers:2 GameModeDriverPGATour_UnregisterStreamCl; size x1.7
+8000E790	UStream	fn_8000E790	Stream_StreamLoadFixedSize	UStream.c	2920	7	low	calls:1 Mem_cpy; callers:1 GameModeDriverPGATour_LoadPGAtFromStream; size x1.5
+8000E81C	UStream	fn_8000E81C	Stream_StreamLoadVariableSize	UStream.c	2956	4	low	callers:2 GameModeDriverPGATour_Locale_PgaTourMode; size x5.6
+8000FBB0	LLTex	TX_spParseTextureGroupFromStream	TX_spParseTextureGroupFromStream	LLTex.c	306	5	low	file:lltex.c; calls:1 Mem_cpy; size x0.8; same name
+800128F8	UFont	UFont_DrawString	FO_vAddStringToDisplayList	UFont.c	649	4	low	calls:1 Mem_cpy; size x1.5
+8001497C	streammanagerhole	StreamManagerHole_StreamFiles	Emi_SetTrackVarRangeTmpl	HLAudEmitter.c	585	4	low	calls:1 sprintf; size x1.3
+80014A64	streammanagerhole	fn_80014A64	Emi_SetTrackStep	HLAudEmitter.c	619	4	low	calls:1 sprintf; size x1.0
+80014BB4	streammanagerhole	fn_80014BB4	Emi_SetTrackAttenuation	HLAudEmitter.c	652	4	low	calls:1 sprintf; size x1.4
+80014C9C	streammanagerhole	fn_80014C9C	Emi_SetTrackPitchFactor	HLAudEmitter.c	687	4	low	calls:1 sprintf; size x1.2
+80014DFC	streammanagerhole	fn_80014DFC	Emi_SetTrackPitchRamp	HLAudEmitter.c	723	4	low	calls:1 sprintf; size x3.2
+8001529C	streammanagerhole	fn_8001529C	core::VerifyLockedHelper	system.cpp	1709	4	low	calls:1 strcpy; size x1.2
+80015334	streammanagerhole	fn_80015334	core::VerifyUnlockedHelper	system.cpp	1722	4	low	calls:1 strcpy; size x1.2
+800153CC	streammanagerhole	fn_800153CC	GenericActor_CreateActorInstance	GenericActor.cpp	479	4	low	calls:1 strcpy; size x1.3
+80017320	char_tex_manager	sGetUserTextureIdx	AptStreamSupport::ReleaseSubInstance	uiAptStreamSupport.cpp	1704	8	low	calls:2 strlen,strncmp; size x3.2
+800178C8	char	Character_UpdateFeetTerrainInfo	Character_UpdateFeetTerrainInfo	char.c	464	15	med	flt:1; calls:1 Character_GetTerrainHeightAndNormal; callers:3 Character_SetPosition,Character_SetupFor; size x2.3; same name
+80017BB8	char	Character_UpdateTestPoints	Character_UpdateTestPoints	char.c	511	9	low	callers:3 Character_SetPosition,Character_SetupFor; size x1.8; same name
+80017EF4	char	Character_UpdateAnimation	Character_UpdateAnimation	char.c	900	24	med	calls:8 CharacterState_UpdateSKAState,Character_PlaceFeetOnGround,Ch; size x1.7; same name
+80018710	char	fn_80018710	Character_SetPreferedPos	char.c	1223	4	low	calls:1 SKEL_UpdateState; size x1.1
+800187CC	char	Character_PlaceFeetOnGround	Character_PlaceFeetOnGround	char.c	1241	18	med	flt:1; calls:1 Ter_GetEnclosingGroundData; callers:4 CharacterState_UpdateSKAState,Character_; size x1.8; same name
+80019234	char	Character_SetPosition	Character_SetPosition	char.c	1356	19	med	calls:4 Character_PlaceFeetOnGround,Character_UpdateFeetTerrainInfo,; callers:1 STATEFUNC_RemoveBallInit; size x1.6; same name
+8001966C	char	fn_8001966C	Character_UpdateAll	char.c	2407	4	low	calls:1 Character_UpdateAnimation; size x1.6
+8001B208	char	fn_8001B208	Character_PostStreamInit	char.c	2607	4	low	flt:1; file:char.c; size x3.2
+8001C724	char	fn_8001C724	Character_SelectGameShotType	char.c	3023	9	low	callers:3 GameModeReplay_SetupNextGolfer,STATEFUNC; size x1.4
+8001C774	char	fn_8001C774	Character_SelectGameClub	char.c	3084	9	low	callers:3 GameModeReplay_SetupNextGolfer,STATEFUNC; size x1.0
+8001C7FC	char	fn_8001C7FC	Character_SetEmotion	char.c	3097	6	low	callers:1 CharacterState_SetTapInState; size x1.0; gap 1/1
+8001C804	char	fn_8001C804	Character_AlignShotWithTarget	char.c	3123	12	med	callers:8 GM_CheckForShotChanges,STATEFUNC_GreenMo; size x1.7
+8001C860	char	fn_8001C860	Character_SetupForShot	char.c	3262	23	high	calls:5 Character_PlaceFeetOnGround,Character_UpdateFeetTerrainInfo,; callers:1 Character_UpdateAnimation; size x1.2
+8001D4A4	char	fn_8001D4A4	Emi_DebugPrint	HLAudEmitter.c	823	4	low	calls:1 sprintf; size x1.4
+8001D8DC	char	fn_8001D8DC	Character_PrepareForRendering	char.c	3527	6	low	callers:2 STATEFUNC_InitialFlyByInit,STATEFUNC_Pre; size x2.2
+8001F79C	mtalib	fn_8001F79C	GM_PgaTourSim_ComputeVarianceForAIRamping	PGATourSimulation.c	977	4	low	calls:1 Misc_RandFunc; size x2.5
+8001F804	mtalib	fn_8001F804	GM_PgaTourSim_RubberBandTiger	PGATourSimulation.c	3373	4	low	calls:1 memcpy; size x1.4
+80021ADC	skalib	AnimLib_FindByName	FindState	RNAFX.cpp	932	4	low	calls:1 strcmp; size x2.1
+80022828	skalib	Skalib_SetBudgets	FE_CrAP_UpdateSaleInfo	FE_CrAPUtils.c	99	4	low	calls:1 Misc_RandFunc; size x1.7
+80022EC8	skalib	AnimLib_KeepRandomCb	FE_CrAP_RandomizeHair	FE_CrAPUtils.c	953	4	low	calls:1 Misc_RandFunc; size x1.0
+80023F7C	skalib	AnimLib_PlanBank	GenericActor_RenderActor	GenericActor.cpp	645	6	low	calls:2 Mem_cpy,strcmp; size x0.5
+800254C8	skalib	AnimLib_ReloadSlot	GenericActor_RenderActorShadow	GenericActor.cpp	733	4	low	calls:1 Mem_cpy; size x2.8
+80025808	skalib	AnimLib_WasLastPlayed	FindState	RNAFX.cpp	949	4	low	calls:1 strcmp; size x2.2
+800263C8	skalib	AnimLib_OnLoaded	FE_CrAP_LoadVitalsSettingsfromStream	FE_CrAPUtils.c	1896	4	low	calls:1 Mem_cpy; size x3.3
+80026844	skalib	fn_80026844	FE_CrAP_RemoveCustomAnimation	FE_CrAPUtils.c	2594	4	low	calls:1 strcmp; size x1.6
+800279C0	Skeleton	fn_800279C0	SKEL_UpdateState	skeleton_shared.c	749	7	low	calls:1 SKEL_TransformBones; callers:1 Character_UpdateAnimation; size x1.3
+80028314	Skeleton	fn_80028314	SKEL_CreateIKSkeleton	skeleton_shared.c	851	8	low	flt:2; calls:1 SKEL_SetIKSolutionWeight; size x3.9
+80028564	Skeleton	fn_80028564	SKEL_LoadFromMem	skeleton_shared.c	1034	8	low	calls:2 SKEL_TransformBones,memset; size x2.3
+8002B030	Golfer	AI_RehearseShot	AIBrain::Think	AI_Brain.cpp	379	7	low	calls:2 Mem_cpy,Physics_ShotImpact; size x0.8
+8002B59C	Golfer	AI_ApplyError	Physics_InitModule	Physics.c	5667	8	low	flt:4; size x2.7
+8002D074	Golfer	AI_MaxDistance	CSpectatorBehavior::AddTunerControls	spectatorBehavior.cpp	994	4	low	flt:2; size x1.5
+8002E310	Golfer	Player_SetGolfer	GolfCamera_InitTigerVisionCam	GoGolfCam.c	6170	8	low	flt:2; calls:1 Mem_cpy; size x1.1
+8002E760	Golfer	Player_IsCPU	GolfCamera_IsMatrixCamActive	GoGolfCam.c	13129	6	low	callers:2 GolfCamera_ProcessBallFlightCamera,STATE; size x2.0
+8002EE1C	Golfer	Session_Init	FE_CrAP_RandomizeBrow	FE_CrAPUtils.c	1048	4	low	calls:1 Misc_RandFunc; size x1.3
+800364AC	Skin	fn_800364AC	UIGameFace::AppendCurrentClothingToAssetList	UI_GameFace.cpp	3451	4	low	calls:1 memset; size x1.3
+800377FC	Skin	fn_800377FC	UIGameFace::ControlLogo	UI_GameFace.cpp	4215	8	low	calls:2 memcpy,memset; size x1.6
+80039FF8	GoDynamicCam	fn_80039FF8	DynamicCam_Init	GoDynamicCam.c	1530	8	low	file:godynamiccam.c; callers:2 GO_vInitFE,GO_vInitIG; size x1.3
+8003A074	GoDynamicCam	fn_8003A074	DynamicCam_DeInit	GoDynamicCam.c	1550	3	low	size x2.1; gap 1/1
+8003A148	GoDynamicCam	fn_8003A148	DynamicCam_ProcessScript	GoDynamicCam.c	1615	8	low	callers:3 CamScript_RunFEScript,CamScript_RunScrip; size x0.7
+8003A7C8	GoDynamicCam	fn_8003A7C8	DynamicCam_ChooseScript	GoDynamicCam.c	1814	16	med	calls:1 Misc_RandFunc; callers:9 ComicCam_CheckForCameraSwitch,ComicCam_S; size x1.9
+8003A8C4	GoDynamicCam	fn_8003A8C4	DynamicCam_ChooseScriptByName	GoDynamicCam.c	1874	6	low	callers:1 GolfCamera_SwitchCrAPCamera; size x1.5; gap 1/1
+8003A950	GoDynamicCam	fn_8003A950	DynamicCam_ChooseScriptInSequence	GoDynamicCam.c	1903	16	med	calls:1 Misc_RandFunc; callers:8 GolfCamera_ChooseReactionCam,GolfCamera_; size x1.5
+8003AC50	GoDynamicCam	fn_8003AC50	DynamicCam_TrackPercent	GoDynamicCam.c	2241	8	low	calls:2 DynamicCam_GetLocation,GameEffects_BallUpdatesThisFrame; size x1.2
+8003ADF8	GoDynamicCam	fn_8003ADF8	DynamicCam_TrackOffset	GoDynamicCam.c	2305	8	low	calls:2 DynamicCam_GetLocation,GameEffects_BallUpdatesThisFrame; size x2.8
+8003B028	GoDynamicCam	fn_8003B028	DynamicCam_TrackBallVelocityLag	GoDynamicCam.c	2415	8	low	calls:2 DynamicCam_GetLocation,powf; size x1.7
+8003B534	GoDynamicCam	fn_8003B534	DynamicCam_TrackBallVelocityTight	GoDynamicCam.c	2648	4	low	calls:1 DynamicCam_GetLocation; size x1.6
+8003B6D0	GoDynamicCam	fn_8003B6D0	DynamicCam_TrackFixed	GoDynamicCam.c	2735	4	low	calls:1 DynamicCam_GetLocation; size x1.1
+8003B728	GoDynamicCam	DynamicCam_GetLocation	DynamicCam_GetLocation	GoDynamicCam.c	3440	11	med	calls:2 CamScript_PutBackOnFairway,DynamicCam_GetLocation; callers:1 DynamicCam_GetLocation; size x1.5; same name
+8003BDBC	GoDynamicCam	fn_8003BDBC	DynamicCam_ChooseSequence	GoDynamicCam.c	3771	10	med	calls:1 Misc_RandFunc; callers:2 GolfCamera_ChooseReactionCam,GolfCamera_; size x1.3
+8003C2E0	GoDynamicCam	DynamicCam_ChoosePreFlightSequence	DynamicCam_ChoosePreFlightSequence	GoDynamicCam.c	3948	17	med	calls:2 Misc_RandFunc,Ter_CheckObjectAndHazardObstruction; callers:3 GolfCamera_InitPreShotCamera,GolfCamera_; size x1.2; same name
+8003C800	GoDynamicCam	fn_8003C800	FE_CrAP_RandomizeFacialHair	FE_CrAPUtils.c	1114	4	low	calls:1 Misc_RandFunc; size x2.3
+8003C9D0	GoDynamicCam	fn_8003C9D0	DynamicCam_ChoosePairedSequenceOrCamera	GoDynamicCam.c	4220	9	low	callers:3 GolfCamera_ChooseReactionCam,GolfCamera_; size x2.6
+8003D414	GoDynamicCam	fn_8003D414	DynamicCam_AddHeightOffset	GoDynamicCam.c	5080	4	low	calls:1 GameEffects_BallUpdatesThisFrame; size x1.7
+8003D9AC	GoDynamicCam	fn_8003D9AC	DynamicCam_GetSmoothBallLocation	GoDynamicCam.c	5527	11	med	flt:1; callers:3 CamScript_GetLookAtPoint,CamScript_RunSc; size x1.9
+8003DCE8	gocamscripts	fn_8003DCE8	CamScript_RunScript	GoCamScripts.c	360	36	high	calls:9 CamScript_CheckOutOfBounds,CamScript_GetLookAtPoint,CamScrip; callers:7 CameraScript_GoToNewScript,CameraScript_; size x1.2
+8003E624	gocamscripts	fn_8003E624	CamScript_RunFEScript	GoCamScripts.c	788	15	med	calls:3 CamScript_GetLookAtPoint,CamScript_SplineCameras,GameEffects; callers:1 GolfCamera_SwitchCrAPCamera; size x1.4
+8003EA50	gocamscripts	fn_8003EA50	CamScript_RunFlybyCamera	GoCamScripts.c	953	15	med	calls:3 CamScript_GetLookAtPoint,CamScript_SplineCameras,CameraScrip; callers:1 GolfCamera_ProcessPostShotCamera; size x1.2
+8003EE68	gocamscripts	fn_8003EE68	CamScript_SmoothTerrainHeight	GoCamScripts.c	1230	9	low	flt:1; calls:1 GOLFERSTATE_GetCurrentState; callers:1 CamScript_RunScript; size x1.3
+8003F064	gocamscripts	fn_8003F064	CamScript_AccelerateTime	GoCamScripts.c	1388	6	low	callers:2 CamScript_RunFlybyCamera,CamScript_RunSc; size x0.9
+8003F2E0	gocamscripts	fn_8003F2E0	CamScript_Fade	GoCamScripts.c	1795	7	low	callers:3 CamScript_RunFlybyCamera,CamScript_RunSc; size x0.5
+8003F518	gocamscripts	fn_8003F518	CamScript_LerpPercentOfFlightCameras	GoCamScripts.c	2073	4	low	callers:2 CamScript_RunFEScript,CamScript_RunScrip; size x0.5
+8003FD54	gocamscripts	fn_8003FD54	CamScript_LerpFixedTargetCameras	GoCamScripts.c	2145	10	med	calls:1 CamScript_GetLookAtPoint; callers:2 CamScript_RunFEScript,CamScript_RunScrip; size x1.5
+8004017C	gocamscripts	fn_8004017C	CamScript_LerpSwingToBallFlightCameras	GoCamScripts.c	2222	10	med	calls:1 CamScript_GetLookAtPoint; callers:2 CamScript_RunFEScript,CamScript_RunScrip; size x1.3
+8004048C	gocamscripts	CamScript_SplineCameras	CamScript_SplineCameras	GoCamScripts.c	2371	17	med	calls:2 CamScript_GetLookAtPoint,GameEffects_FieldOfViewChange; callers:3 CamScript_RunFEScript,CamScript_RunFlyby; size x2.1; same name
+800407D4	gocamscripts	fn_800407D4	CamScript_ArcCameras	GoCamScripts.c	2490	5	low	callers:2 CamScript_RunFEScript,CamScript_RunScrip; size x0.6
+80040A58	gocamscripts	fn_80040A58	CamScript_CircleCameras	GoCamScripts.c	2517	10	low	calls:1 GameEffects_FieldOfViewChange; callers:2 CamScript_RunFEScript,CamScript_RunScrip; size x0.9
+80040CF0	gocamscripts	fn_80040CF0	CamScript_PickArcDirection	GoCamScripts.c	2581	10	med	flt:1; calls:2 CamScript_GetLookAtPoint,Ter_PointInOOBNetwork; size x2.0
+80040EF0	gocamscripts	CamScript_GetLookAtPoint	CamScript_GetLookAtPoint	GoCamScripts.c	2674	24	high	calls:3 CameraScript_LagAimMarker,GOLFERSTATE_GetCurrentState,GameEf; callers:6 CamScript_PutBackOnFairway,CamScript_Run; size x1.8; same name
+800418B0	gocamscripts	fn_800418B0	CameraScript_CalculateShoulderShake	GoCamScripts.c	3141	5	low	flt:1; callers:1 CamScript_GetLookAtPoint; size x2.9
+80041A24	gocamscripts	CameraScript_LagAimMarker	CameraScript_LagAimMarker	GoCamScripts.c	3249	9	low	callers:3 CamScript_GetLookAtPoint,GolfCamera_Proc; size x1.9; same name
+80041EA8	gocamscripts	fn_80041EA8	CameraScript_LagBallFlight	GoCamScripts.c	3412	11	med	calls:2 GameEffects_BallUpdatesThisFrame,powf; callers:1 CamScript_GetLookAtPoint; size x2.0
+800422C4	gocamscripts	fn_800422C4	CameraScript_LagTargetPoint	GoCamScripts.c	3587	7	low	calls:1 GameEffects_BallUpdatesThisFrame; callers:1 CamScript_GetLookAtPoint; size x1.6
+8004255C	gocamscripts	fn_8004255C	CameraScript_OffsetLookVector	GoCamScripts.c	3700	6	low	callers:2 CamScript_GetLookAtPoint,CameraScript_La; size x1.8
+80042604	gocamscripts	CameraScript_RecordCurrentCam	CameraScript_RecordCurrentCam	GoCamScripts.c	3750	26	high	str:1 'ON THE FLY CAM'; calls:1 GameEffects_FieldOfViewChange; callers:8 CamScript_PutBackOnFairway,CameraScript_; size x1.2; same name
+800427E8	gocamscripts	CameraScript_UpdateLandingEstimate	CameraScript_UpdateLandingEstimate	GoCamScripts.c	3821	11	med	calls:2 Ter_CheckForGroundCollision,powf; callers:1 CameraScript_GoToNewScript; size x1.9; same name
+80042B6C	gocamscripts	CameraScript_GoToNewScript	CameraScript_GoToNewScript	GoCamScripts.c	4000	23	high	calls:5 CamScript_RunScript,CameraScript_UpdateLandingEstimate,GOLFE; callers:1 CamScript_RunFlybyCamera; size x1.8; same name
+80042EDC	gocamscripts	CameraScript_InterpToNewScript	CameraScript_InterpToNewScript	GoCamScripts.c	4211	28	high	calls:4 CameraScript_IsDefaultSwingCam,CameraScript_RecordCurrentCam; callers:20 CamScript_PutBackOnFairway,CamScript_Upd; size x1.5; same name
+80043388	gocamscripts	fn_80043388	CameraScript_SnapToScript	GoCamScripts.c	4464	12	med	callers:4 CamScript_GetLookAtPoint,CamScript_RunFl; size x0.9
+80043420	gocamscripts	fn_80043420	CameraScript_GetBallHeightWithMaxHeight	GoCamScripts.c	4498	5	low	callers:1 CamScript_GetLookAtPoint; size x0.7; gap 1/2
+8004349C	gocamscripts	fn_8004349C	CameraScript_KeepPointInView	GoCamScripts.c	4527	6	low	callers:1 CamScript_GetLookAtPoint; size x1.7; gap 2/2
+800437F8	gocamscripts	CameraScript_IsDefaultSwingCam	CameraScript_IsDefaultSwingCam	GoCamScripts.c	4677	6	low	callers:2 CameraScript_InterpToNewScript,GolfCamer; size x1.5; same name
+80043920	gocamscripts	fn_80043920	CameraScript_DontUpdateCameraDuringSlowMo	GoCamScripts.c	4723	7	low	calls:1 GameEffects_BallUpdatesThisFrame; callers:1 CamScript_RunScript; size x1.1
+800439E4	gocamscripts	fn_800439E4	CamScript_CheckObstructedCamera	GoCamScripts.c	4767	7	low	calls:1 Ter_CheckObjectAndHazardObstruction; callers:1 CamScript_RunScript; size x2.0
+80043AFC	gocamscripts	CamScript_CheckOutOfBounds	CamScript_CheckOutOfBounds	GoCamScripts.c	4819	7	low	calls:1 CamScript_PutBackOnFairway; callers:1 CamScript_RunScript; size x1.6; same name
+80043C74	gocamscripts	fn_80043C74	CamScript_GetCameraOnFairwayPos	GoCamScripts.c	4910	6	low	callers:2 CamScript_PutBackOnFairway,DynamicCam_Ge; size x2.0
+800441E4	gocamscripts	fn_800441E4	CamScript_CheckFlagCollision	GoCamScripts.c	5156	6	low	callers:1 CamScript_RunScript; size x2.0; gap 1/1
+800442E8	gocamscripts	CamScript_PutBackOnFairway	CamScript_PutBackOnFairway	GoCamScripts.c	5205	25	high	calls:4 CamScript_GetLookAtPoint,CameraScript_InterpToNewScript,Came; callers:3 CamScript_CheckOutOfBounds,CamScript_Run; size x1.4; same name
+800444BC	gocamscripts	CamScript_UpdateFairwayCam	CamScript_UpdateFairwayCam	GoCamScripts.c	5280	11	med	calls:2 CamScript_GetLookAtPoint,CameraScript_InterpToNewScript; callers:1 CamScript_RunScript; size x1.5; same name
+800447DC	gocamscripts	Terrain_HeightAt	CamScript_GuessBestPlayableHeight	GoCamScripts.c	5472	6	low	callers:2 CamScript_UpdateFairwayCam,CameraScript_; size x1.2
+80044BD4	gocamscripts	CamScript_KeepAboveGround	CamScript_KeepAboveGround	GoCamScripts.c	5757	13	med	calls:1 Ter_CheckForGroundCollision; callers:3 CamScript_RunScript,GolfCamera_ProcessGr; size x2.2; same name
+80045038	gocamscripts	CameraScript_WillGolferBeOccludedInThisView	CameraScript_WillGolferBeOccludedInThisView	GoCamScripts.c	6126	28	high	calls:4 CamScript_RunScript,CameraScript_InterpToNewScript,Mem_cpy,T; callers:5 ComicCam_CheckForCameraSwitch,ComicCam_S; size x1.4; same name
+80045558	gocamscripts	fn_80045558	STATEFUNC_InitialFlyByUpdate	stateFunc.c	5463	4	low	calls:1 EVENT_Trigger; size x2.9
+80046288	GoDynObj	fn_80046288	DynObj_InitForHole	GoDynObj.c	457	8	low	flt:5; size x1.6
+800468B4	GoDynObj	fn_800468B4	DynObj_bAltShotDrawBall	GoDynObj.c	578	4	low	calls:1 GOLFERSTATE_GetCurrentState; size x1.2
+80046928	GoDynObj	fn_80046928	DynObj_RenderBalls	GoDynObj.c	713	4	low	calls:1 GOLFERSTATE_GetCurrentState; size x1.4
+80046B8C	GoDynObj	fn_80046B8C	DynObj_DrawBallMarkers	GoDynObj.c	778	4	low	calls:1 GOLFERSTATE_GetCurrentState; size x1.6
+80047EF0	GoDynObj	fn_80047EF0	DynObj_TeeAdd	GoDynObj.c	1682	9	low	callers:3 CamAnimDebug_UpdateCamAnimRun,STATEFUNC_; size x1.3
+8004B5A8	GoTerrainCollision	Ter_PointInFreeDropNetwork	Ter_PointInFreeDropNetwork	GoTerrainCollision.c	601	9	low	callers:3 GM_CheckForBallOOB,PlaceBall_IsValidDrop; size x1.3; same name
+8004B664	GoTerrainCollision	Ter_PointInOOBNetwork	Ter_PointInOOBNetwork	GoTerrainCollision.c	655	12	med	callers:4 GM_ReplaceOOBBall,GM_ShowPostShotAnimati; size x1.5; same name
+8004C134	GoTerrainCollision	Ter_SearchForDropLocation	Ter_FindDropLocation	GoTerrainCollision.c	875	10	med	calls:1 Ter_CheckForDropLocation; callers:2 GM_BumpBallForObstructions,GM_ReplaceOOB; size x2.2
+8004C590	GoTerrainCollision	Ter_CheckForDropLocation	Ter_CheckForDropLocation	GoTerrainCollision.c	1297	19	med	calls:4 Ter_CheckObjectAndHazardObstruction,Ter_GetSupportingGroundD; callers:1 Physics_Simulate; size x1.1; same name
+8004C798	GoTerrainCollision	Ter_IsValidDropSurface	Ter_IsValidDropSurface	GoTerrainCollision.c	1362	6	low	callers:2 Physics_Simulate,PlaceBall_IsValidDropLo; size x1.8; same name
+8004D5C0	GoTerrainCollision	fn_8004D5C0	Ter_GetHighestGroundHeight	GoTerrainCollision_Headgate.c	649	5	low	callers:2 Physics_DropBall,Physics_InitBall; size x0.8
+8004D620	GoTerrainCollision	fn_8004D620	Ter_GetSupportingGroundHeight	GoTerrainCollision_Headgate.c	700	5	low	callers:3 GolfCamera_ProcessPostShotCamera,Physics; size x0.2
+8004D838	GoTerrainCollision	Ter_GetSupportingWorldMaterial	Ter_GetSupportingWorldMaterial	GoTerrainCollision_Headgate.c	777	7	low	callers:3 Physics_DropBall,Physics_StopBall,PlaceB; size x0.6; same name
+8004D890	GoTerrainCollision	Ter_GetSupportingGroundData	Ter_GetSupportingGroundData	GoTerrainCollision_Headgate.c	789	9	low	callers:3 Physics_GetShotData,PlaceBall_IsValidDro; size x1.0; same name
+8004D9A8	GoTerrainCollision	Ter_GetEnclosingGroundHeight	Ter_GetEnclosingGroundHeight	GoTerrainCollision_Headgate.c	821	9	low	callers:5 GM_MovePlayerToBall,GolfCamera_InitZoomT; size x0.4; same name
+8004D9E0	GoTerrainCollision	Ter_GetEnclosingGroundData	Ter_GetEnclosingGroundData	GoTerrainCollision_Headgate.c	835	14	med	flt:1; callers:4 Character_PlaceFeetOnGround,GM_ShowPostS; size x1.8; same name
+80050C2C	Ball	Ball_Holed	Physics_ForceBallInHole	Physics.c	863	5	low	flt:1; callers:1 Physics_CheckTerrainCollisions; size x1.0
+80050CAC	Ball	Physics_OutOfBounds	Physics_OutOfBounds	Physics.c	875	13	med	calls:1 EVENT_Trigger; callers:3 Physics_CheckTerrainCollisions,Physics_F; size x1.4; same name
+80050F88	Ball	fn_80050F88	Physics_EstimateShotPower	Physics.c	1180	4	low	calls:1 Ter_GetSupportingGroundData; size x1.8
+800510EC	Ball	fn_800510EC	Physics_GetLiePowerPercentage	Physics.c	1233	5	low	callers:2 CameraScript_UpdateLandingEstimate,GolfC; size x4.6
+800512BC	Ball	Physics_GetShotData	Physics_GetShotData	Physics.c	1312	11	med	flt:2; calls:1 Ter_GetSupportingGroundData; callers:1 Physics_ShotImpact; size x1.6; same name
+80051A18	Ball	fn_80051A18	Physics_ThrowBall	Physics.c	1521	5	low	flt:1; size x1.9; gap 1/1
+80051AF4	Ball	Ball_Launch	Physics_ShotImpact	Physics.c	1568	14	med	calls:2 EVENT_Trigger,Physics_GetShotData; callers:2 BreakLine_Reset,SW_vImpact; size x3.6
+80052088	Ball	Physics_GetSurfaceInfo	Physics_GetSurfaceInfo	Physics.c	1933	10	med	flt:1; calls:2 Physics_OutOfBounds,Ter_GetEnclosingGroundData; size x1.9; same name
+80052598	Ball	Physics_HandleCollision	Physics_HandleCollision	Physics.c	2166	9	low	flt:1; calls:1 atan2f; callers:1 Physics_CheckTerrainCollisions; size x3.0; same name
+80053240	Ball	fn_80053240	Physics_CheckPreConditionsForCollision	Physics.c	2863	7	low	flt:2; calls:1 Physics_OutOfBounds; callers:1 Physics_FixBallHeight; size x0.3
+80053594	Ball	Ball_SetLie	Physics_SetLie	Physics.c	3084	14	med	calls:2 EVENT_Trigger,Misc_RandFunc; callers:2 Physics_DropBall,Physics_StopBall; size x1.2
+8005418C	Ball	Physics_FixBallHeight	Physics_FixBallHeight	Physics.c	3573	20	med	flt:3; calls:2 Physics_OutOfBounds,Ter_GetEnclosingGroundHeight; callers:2 Physics_QuickSimulate,Physics_StopBall; size x3.7; same name
+80054340	Ball	Ball_Stop	Physics_StopBall	Physics.c	3657	22	high	calls:4 EVENT_Trigger,Physics_FixBallHeight,Physics_SetLie,Ter_GetSu; callers:2 Physics_CheckTerrainCollisions,Physics_Q; size x1.7
+80054450	Ball	Ball_Collide	Physics_CheckTerrainCollisions	Physics.c	3742	23	high	calls:5 EVENT_Trigger,Physics_HandleCollision,Physics_OutOfBounds,Ph; callers:1 Physics_QuickSimulate; size x3.7
+80054A10	Ball	Ball_DistanceToPin	Physics_GetDistanceToCup	Physics.c	4009	6	low	callers:1 Physics_QuickSimulate; size x1.6; gap 1/1
+80054A6C	Ball	fn_80054A6C	Physics_InitShotData	Physics.c	4015	6	low	callers:2 STATEFUNC_PreShotInit,STATEFUNC_ShotSetu; size x2.1
+80054D28	Ball	Ball_GroundContact	GolfCamera_ProcessSpecialMomentsCamera	GoGolfCam.c	9693	5	low	flt:1; calls:1 atan2f; size x0.8
+800554A8	Ball	Ball_Tick	Physics_QuickSimulate	Physics.c	4549	14	med	flt:2; calls:3 Physics_CheckTerrainCollisions,Physics_FixBallHeight,Physics; callers:1 Physics_Simulate; size x15.7
+8005567C	Ball	Physics_Simulate	Physics_Simulate	Physics.c	4677	23	high	flt:1; calls:3 Physics_QuickSimulate,Ter_CheckForDropLocation,Ter_IsValidDr; callers:3 CamAnimDebug_UpdateCamAnimRun,GM_Simulat; size x1.9; same name
+800557B4	Ball	Ball_SimSeconds	Physics_TimedSimulation	Physics.c	4811	6	low	flt:1; calls:1 Physics_QuickSimulate; size x1.6
+8005587C	Ball	Physics_DropBall	Physics_DropBall	Physics.c	4920	28	high	flt:5; calls:2 Physics_SetLie,Ter_GetSupportingWorldMaterial; callers:6 CamAnimDebug_UpdateCamAnimRun,GM_BumpBal; size x2.0; same name
+800559BC	Ball	fn_800559BC	Physics_SetBallPosition	Physics.c	5056	5	low	flt:1; callers:1 CamAnimDebug_UpdateCamAnimRun; size x1.4
+80055AA8	Ball	fn_80055AA8	Physics_InitBall	Physics.c	5085	12	med	callers:4 CamAnimDebug_UpdateCamAnimRun,GM_BumpBal; size x2.0
+80055FC8	Ball	Wind_Generate	CSpectatorBehavior::BallBounce	spectatorBehavior.cpp	683	4	low	calls:1 Misc_RandFunc; size x2.2
+800564D8	PasswordManager	PasswordManager_TestPassword	TU_LoadTunerXML_StartCallback	InGameTune.c	2087	4	low	calls:1 strcmp; size x1.0
+80057DA4	PasswordManager	fn_80057DA4	FE_CrAP_GetAssetEquippedTokensForCurrentUser	FE_CrAPDB.c	5354	4	low	calls:1 memset; size x1.3
+80057F18	fe_craputils	FE_CrAP_InitCrAPInfo	FE_CrAP_InitCrAPInfo	FE_CrAPUtils.c	2282	10	med	str:1 'NoLogoName'; size x1.6; same name
+80058560	fe_craputils	fn_80058560	RNAX::cgUtilGetArraySize	CGFXShader.cpp	403	4	low	calls:1 strcpy; size x1.9
+800587A8	fe_craputils	fn_800587A8	FindSampler	RNAFX.cpp	1512	4	low	calls:1 strcmp; size x1.1
+800589F8	Swing	Swing_Init	SW_vInitModule	Swing.c	1416	10	med	flt:14; calls:1 SW_vUIInit; callers:1 GO_vInitIG; size x15.3
+80058FA4	Swing	fn_80058FA4	SW_vInitSwing	Swing.c	2314	6	low	callers:2 STATEFUNC_ShotSetupInit,STATEFUNC_SwingI; size x1.6
+80059050	Swing	Swing_Begin	SW_vStateInitBackSwing	Swing.c	2383	4	low	calls:1 CharacterState_UpdateSKAState; size x1.8
+800591A0	Swing	Swing_WaitForBackswing	SW_ProcessStateIdleSwingAnalogStick	Swing.c	2443	4	low	calls:1 EVENT_Trigger; size x1.2
+8005934C	Swing	Swing_UpdateBackswing	SW_ProcessStateBackSwingAnalogStick	Swing.c	2661	9	low	flt:1; calls:2 CharacterState_UpdateSKAState,EVENT_Trigger; size x0.8
+80059A40	Swing	Swing_HoldAtTop	SW_vStateInitBackSwingFigit	Swing.c	3073	6	low	flt:1; calls:1 Character_UpdateAnimation; size x1.3
+80059ACC	Swing	Swing_UpdateAtTop	SW_vStateBackSwingFigit	Swing.c	3105	6	low	flt:1; calls:1 EVENT_Trigger; size x1.2
+80059CE0	Swing	Swing_UpdateDownswing	SW_vStateDownSwing	Swing.c	3220	8	low	calls:2 EVENT_Trigger,SW_vImpact; size x3.4
+80059EB4	Swing	Swing_RumbleOff	SW_KillVibration	Swing.c	3417	6	low	callers:1 STATEFUNC_SimulateExit; size x1.1; gap 1/1
+80059F44	Swing	Swing_RumbleTick	SW_UpdateVibration	Swing.c	3445	9	low	callers:3 STATEFUNC_ShowYardageUpdate,STATEFUNC_Si; size x1.3
+8005A080	Swing	Swing_LoadTuning	SW_vUIInit	Swing.c	3690	20	med	str:2 'clubback'; size x1.8
+8005A0E0	Swing	Swing_ClearFrameFlag	SW_vUIBlurReset	Swing.c	3710	6	low	callers:2 STATEFUNC_ReplaySwingInit,STATEFUNC_Repl; size x2.7
+8005AD20	Swing	fn_8005AD20	SW_vUIAdjustClub	Swing.c	4381	6	low	flt:3; size x0.9
+8005AEE0	Swing	Swing_Launch	SW_vImpact	Swing.c	4543	21	high	calls:3 Mem_cpy,Physics_ShotImpact,REPLAY_Play; callers:3 STATEFUNC_GreenWatchRollInit,STATEFUNC_R; size x3.9
+8005B154	Swing	Swing_UpdatePower	SW_vSetSwingStrength	Swing.c	4883	3	low	size x2.3; gap 1/1
+8005B250	Swing	Swing_ComputePower	SW_vCalculateShotPower	Swing.c	4964	7	low	flt:2; callers:1 SW_vImpact; size x1.0
+8005B64C	Swing	fn_8005B64C	SW_vGetShotPower	Swing.c	5190	6	low	callers:2 CameraScript_UpdateLandingEstimate,GolfC; size x1.7
+8005BE10	Swing	Swing_BoostInput	SW_vCheckForSwingBoost	Swing.c	5873	4	low	calls:1 EVENT_Trigger; size x1.4
+8005BFC0	Swing	Swing_ResetBoostAndSpin	SW_vClearBoosts	Swing.c	6110	6	low	callers:2 STATEFUNC_PlaceBallInit,STATEFUNC_PreSho; size x1.3
+8005D188	Swing	GOLFERSTATE_Switch	GM_CanStartReplay	GameMode.c	1363	6	low	callers:2 GM_DoPostShotInHoleUI,STATEFUNC_Simulate; size x0.9
+8005D44C	Swing	STATEFUNC_PreShotInit	STATEFUNC_PreShotInit	stateFunc.c	541	24	med	calls:9 BreakLine_Reset,CameraController_SetCameraMode,CharacterStat; size x2.8; same name
+8005D7A0	Swing	STATEFUNC_PreShotUpdate	CamAnimDebug_UpdateCamAnimRun	GoCamAnimDebug.c	3714	20	med	calls:5 Character_GetBallOnFingerPosition,GameEffects_BallUpdatesThi; size x1.4
+8005DE20	Swing	STATEFUNC_PreShotExit	STATEFUNC_PreShotExit	stateFunc.c	1040	4	low	calls:1 Mem_cpy; size x2.0; same name
+8005DED0	Swing	STATEFUNC_ShotSetupInit	STATEFUNC_ShotSetupInit	stateFunc.c	1097	20	med	calls:5 CameraController_SetCameraMode,CharacterState_UpdateSKAState; size x1.7; same name
+8005E284	Swing	STATEFUNC_ShotSetupExit	STATEFUNC_ShotSetupExit	stateFunc.c	1338	3	low	size x2.5; same name; gap 2/2
+8005E2F4	Swing	STATEFUNC_SwingInit	STATEFUNC_SwingInit	stateFunc.c	1364	20	med	calls:5 CameraController_SetCameraMode,Character_AlignShotWithTarget; size x1.6; same name
+8005E6F8	Swing	STATEFUNC_SwingUpdate	STATEFUNC_SwingUpdate	stateFunc.c	1550	20	med	calls:5 EVENT_Trigger,GM_BallHit,GM_CheckForShotChanges,GOLFERSTATE_; size x3.2; same name
+8005EB60	Swing	STATEFUNC_ReplaySwingInit	STATEFUNC_ReplaySwingInit	stateFunc.c	2088	24	med	calls:7 CameraController_SetCameraMode,CharacterState_AddSKABlendDat; size x1.8; same name
+8005EE38	Swing	STATEFUNC_ReplaySwingUpdate	STATEFUNC_ReplaySwingUpdate	stateFunc.c	2252	20	med	calls:5 CharacterState_AddSKABlendData,EVENT_Trigger,GOLFERSTATE_Swi; size x1.3; same name
+8005F088	Swing	STATEFUNC_ReplaySwingExit	STATEFUNC_ReplaySwingExit	stateFunc.c	2366	8	low	calls:2 EVENT_Trigger,GameEffects_SetSuperSlowMo; size x2.4; same name
+8005F110	Swing	STATEFUNC_ZoomInit	STATEFUNC_ZoomInit	stateFunc.c	2400	4	low	calls:1 CameraController_SetCameraMode; size x2.9; same name
+8005F1B0	Swing	STATEFUNC_ZoomUpdate	STATEFUNC_ZoomUpdate	stateFunc.c	2467	8	low	calls:2 EVENT_Trigger,GOLFERSTATE_Pop; size x3.5; same name
+8005F3F4	Swing	STATEFUNC_ZoomExit	STATEFUNC_ZoomExit	stateFunc.c	2632	12	med	calls:3 CameraController_SetCameraMode,EVENT_Trigger,GOLFERSTATE_Get; size x2.1; same name
+8005F4B4	Swing	STATEFUNC_ElevatorInit	STATEFUNC_ElevatorInit	stateFunc.c	2686	4	low	calls:1 CameraController_SetCameraMode; size x1.0; same name
+8005F56C	Swing	STATEFUNC_ElevatorUpdate	STATEFUNC_ElevatorUpdate	stateFunc.c	2711	8	low	calls:2 EVENT_Trigger,GOLFERSTATE_Pop; size x1.7; same name
+8005F730	Swing	STATEFUNC_ElevatorExit	STATEFUNC_ElevatorExit	stateFunc.c	2776	8	low	calls:2 CameraController_SetCameraMode,GOLFERSTATE_GetPreviousState; size x1.0; same name
+8005F7D8	Swing	STATEFUNC_GreenInit	STATEFUNC_GreenInit	stateFunc.c	2803	6	low	calls:1 CameraController_SetCameraMode; size x0.8; same name; gap 1/2
+8005F840	Swing	STATEFUNC_GreenUpdate	STATEFUNC_GreenUpdate	stateFunc.c	2818	3	low	size x1.3; same name; gap 2/2
+8005F8D0	Swing	STATEFUNC_GreenExit	STATEFUNC_GreenExit	stateFunc.c	2836	8	low	calls:2 CameraController_SetCameraMode,GOLFERSTATE_GetPreviousState; size x1.0; same name
+8005F978	Swing	STATEFUNC_GreenWatchRollInit	STATEFUNC_GreenWatchRollInit	stateFunc.c	2862	12	med	calls:3 CameraController_SetCameraMode,Mem_cpy,SW_vImpact; size x2.0; same name
+8005FA84	Swing	STATEFUNC_GreenWatchRollUpdate	STATEFUNC_GreenWatchRollUpdate	stateFunc.c	2922	12	med	calls:3 GOLFERSTATE_Pop,GameEffects_BallUpdatesThisFrame,Physics_Sim; size x1.0; same name
+8005FCC8	Swing	STATEFUNC_GreenWatchRollExit	STATEFUNC_GreenWatchRollExit	stateFunc.c	3078	12	med	calls:3 CameraController_SetCameraMode,GOLFERSTATE_GetPreviousState,; size x1.9; same name
+8005FE04	Swing	STATEFUNC_GreenReversePuttUpdate	GameModeBloodGreenSome::ZoomUpdate	GameMode_BloodGreenSome.cpp	776	4	low	calls:1 GOLFERSTATE_Pop; size x3.0
+8005FF30	Swing	STATEFUNC_KneeCamInit	GameModeBloodGreenSome::ZoomExit	GameMode_BloodGreenSome.cpp	823	4	low	calls:1 CameraController_SetCameraMode; size x1.3
+8006014C	Swing	STATEFUNC_KneeCamExit	STATEFUNC_GreenReversePuttExit	stateFunc.c	3169	8	low	calls:2 CameraController_SetCameraMode,GOLFERSTATE_GetPreviousState; size x1.1
+800601E8	Swing	STATEFUNC_GreenMorphInit	STATEFUNC_GreenMorphInit	stateFunc.c	3197	6	low	calls:1 CameraController_SetCameraMode; size x0.8; same name; gap 1/1
+80060250	Swing	STATEFUNC_GreenMorphUpdate	STATEFUNC_GreenMorphUpdate	stateFunc.c	3211	12	med	calls:3 BreakLine_Reset,Character_AlignShotWithTarget,GM_CheckForSho; size x1.6; same name
+80060474	Swing	STATEFUNC_GreenMorphExit	STATEFUNC_GreenMorphExit	stateFunc.c	3272	8	low	calls:2 CameraController_SetCameraMode,GOLFERSTATE_GetPreviousState; size x1.1; same name
+8006055C	Swing	STATEFUNC_SimulateInit	STATEFUNC_SimulateInit	stateFunc.c	3309	8	low	calls:2 CameraController_SetCameraMode,Mem_cpy; size x2.9; same name
+80060688	Swing	STATEFUNC_SimulateUpdate	STATEFUNC_SimulateUpdate	stateFunc.c	3442	24	med	calls:6 GM_PlayerTakeMulligan,GM_PlayerTookShot,GM_SimulateBallMovem; size x3.8; same name
+80060B18	Swing	STATEFUNC_InTheHoleInit	STATEFUNC_FadeToInTheHoleUpdate	stateFunc.c	4083	8	low	calls:2 Emotion_UpdatePlayerEmotion,Mem_cpy; size x3.3
+80060BC4	Swing	STATEFUNC_InTheHoleUpdate	STATEFUNC_InTheHoleUpdate	stateFunc.c	4147	7	low	calls:2 GM_DoPostShotInHoleUI,GolfCamera_CutToGolferDoneAnimatingCam; size x0.8; same name
+80060E18	Swing	STATEFUNC_ConcededInit	STATEFUNC_ConcededInit	stateFunc.c	4211	4	low	calls:1 CameraController_SetCameraMode; size x1.1; same name
+80060EDC	Swing	STATEFUNC_ConcededUpdate	STATEFUNC_ConcededUpdate	stateFunc.c	4236	4	low	calls:1 GM_DoPostShotInHoleUI; size x1.1; same name
+80060F00	Swing	STATEFUNC_ShowYardageInit	STATEFUNC_FadeToShowYardageUpdate	stateFunc.c	4302	6	low	calls:2 Emotion_UpdatePlayerEmotion,Mem_cpy; size x6.0
+80061408	Swing	STATEFUNC_ShowYardageExit	STATEFUNC_ShowYardageExit	stateFunc.c	4830	6	low	calls:1 GM_BumpBallForObstructions; size x5.5; same name; gap 1/2
+80061458	Swing	STATEFUNC_FadeToTapInInit	STATEFUNC_FadeToTapInInit	stateFunc.c	4869	3	low	size x1.6; same name; gap 2/2
+80061548	Swing	STATEFUNC_FadeToTapInUpdate	STATEFUNC_FadeToTapInUpdate	stateFunc.c	4908	8	low	calls:2 GM_EndOfGolferTurn,GOLFERSTATE_Switch; size x2.1; same name
+800616AC	Swing	STATEFUNC_FadeToTapInExit	STATEFUNC_FadeToTapInExit	stateFunc.c	4981	3	low	size x1.0; same name; gap 1/1
+800616B0	Swing	STATEFUNC_TapInInit	STATEFUNC_TapInInit	stateFunc.c	4989	8	low	calls:2 Character_AlignShotWithTarget,GM_MovePlayerToBall; size x1.3; same name
+800617A8	Swing	STATEFUNC_TapInUpdate	STATEFUNC_TapInUpdate	stateFunc.c	5026	12	med	calls:3 CameraController_SetCameraMode,GOLFERSTATE_Switch,SW_vImpact; size x1.2; same name
+80061A54	Swing	STATEFUNC_RemoveBallInit	STATEFUNC_RemoveBallInit	stateFunc.c	5214	16	med	calls:4 Character_SetPosition,Emotion_UpdatePlayerEmotion,Mem_cpy,Ph; size x2.1; same name
+80061B44	Swing	STATEFUNC_RemoveBallUpdate	STATEFUNC_RemoveBallUpdate	stateFunc.c	5260	4	low	calls:2 CameraController_SetCameraMode,GM_DoPostShotInHoleUI; size x0.3; same name
+80061EFC	Swing	STATEFUNC_RemoveBallExit	STATEFUNC_RemoveBallExit	stateFunc.c	5299	4	low	calls:1 Mem_cpy; size x1.3; same name
+80061FB0	Swing	STATEFUNC_WaitInit	STATEFUNC_WaitInit	stateFunc.c	5321	4	low	calls:1 CameraController_SetCameraMode; size x1.2; same name
+8006205C	Swing	STATEFUNC_InitialFlyByInit	STATEFUNC_InitialFlyByInit	stateFunc.c	5352	26	high	flt:1; calls:6 CameraController_SetCameraMode,Character_AlignShotWithTarget; size x2.0; same name
+80062364	Swing	STATEFUNC_InitialFlyByExit	STATEFUNC_InitialFlyByExit	stateFunc.c	5539	3	low	size x1.2; same name; gap 1/1
+80062424	Swing	STATEFUNC_MidHoleFlyByInit	STATEFUNC_MidHoleFlyByInit	stateFunc.c	5570	8	low	calls:2 EVENT_Trigger,GolfCamera_SetCameraMatrixMode; size x2.7; same name
+80062514	Swing	STATEFUNC_MidHoleFlyByUpdate	STATEFUNC_MidHoleFlyByUpdate	stateFunc.c	5632	4	low	calls:1 GOLFERSTATE_Pop; size x1.1; same name
+80062624	Swing	STATEFUNC_MidHoleFlyByExit	STATEFUNC_CameraDebugUpdate	stateFunc.c	5801	4	low	calls:1 CameraController_SetCameraMode; size x2.9
+800626EC	Swing	STATEFUNC_PlaceBallInit	STATEFUNC_PlaceBallInit	stateFunc.c	5899	26	high	flt:1; calls:6 CameraController_SetCameraMode,Character_AlignShotWithTarget; size x2.4; same name
+80062900	Swing	STATEFUNC_PlaceBallUpdate	STATEFUNC_PlaceBallUpdate	stateFunc.c	6039	16	med	calls:4 EVENT_Trigger,GOLFERSTATE_Switch,Physics_DropBall,PlaceBall_; size x2.1; same name
+80062F38	GoCamCont	CameraController_Idle	CameraController_Idle	GoCamCont.c	206	24	med	calls:9 GolfCamera_ProcessBallFlightCamera,GolfCamera_ProcessGreenZo; size x3.3; same name
+800632E4	GoCamCont	View_SetCamera	CameraController_SetCameraMode	GoCamCont.c	670	36	high	calls:14 GolfCamera_InitBallFlightCamera,GolfCamera_InitElevatorCamer; callers:26 GM_EndOfGolferTurn_GameFinished,GO_vInit; size x2.6
+80063920	GoCamCont	fn_80063920	CameraController_CameraCollision	GoCamCont.c	1219	8	low	calls:2 CamScript_PutBackOnFairway,GOLFERSTATE_GetCurrentState; size x1.4
+80063B98	GoCamCont	fn_80063B98	CameraController_FadeIn	GoCamCont.c	1298	10	med	callers:8 GolfCamera_InitHeartBeatCamera,GolfCamer; size x0.5
+80063BF4	GoCamCont	fn_80063BF4	CameraController_FadeOut	GoCamCont.c	1314	10	med	callers:4 GolfCamera_ProcessHeartBeatCamera,STATEF; size x0.5
+80063C90	GoCamCont	fn_80063C90	CameraController_IsFadeOutDone	GoCamCont.c	1347	6	low	callers:2 GM_DoPostShotInHoleUI,STATEFUNC_GreenWat; size x2.1
+80063CBC	GoCamCont	fn_80063CBC	CameraController_IsFadeOn	GoCamCont.c	1362	2	low	size x0.7; gap 1/1
+8006421C	GoCamCont	CameraController_Shake	CameraController_ShakeCamera	GoCamCont.c	1648	5	low	flt:1; callers:1 CameraController_Idle; size x2.1
+800642D0	GoCamCont	fn_800642D0_ReapplyCurrentShot	CameraController_FreezeCurrentCamera	GoCamCont.c	1689	6	low	flt:1; calls:1 CameraScript_InterpToNewScript; size x1.7
+80064A0C	GoStaticCam	fn_80064A0C	GameModeSkillZoneTarget::CheckShotAwards	GameMode_SkillZoneTarget.cpp	293	8	low	calls:2 sprintf,strcpy; size x2.1
+80064E2C	GoStaticCam	fn_80064E2C	StaticCam_Init	GoStaticCam.c	344	5	low	file:gostaticcam.c; callers:1 GO_vInitIG; size x3.4
+80064E74	GoStaticCam	fn_80064E74	StaticCam_DeInit	GoStaticCam.c	363	3	low	size x1.8; gap 1/2
+80064EA4	GoStaticCam	fn_80064EA4	StaticCam_Reset	GoStaticCam.c	380	2	low	size x0.6; gap 2/2
+80064F54	GoStaticCam	fn_80064F54	StaticCam_ProcessScript	GoStaticCam.c	400	8	low	callers:3 CamScript_RunFEScript,CamScript_RunFlyby; size x4.4
+80064F7C	GoStaticCam	fn_80064F7C	StaticCam_ChooseScript	GoStaticCam.c	429	16	med	calls:1 Misc_RandFunc; callers:4 GolfCamera_CutToGolferDoneAnimatingCam,G; size x2.8
+8006509C	GoStaticCam	fn_8006509C	StaticCam_GetFlyByCam	GoStaticCam.c	738	6	low	callers:2 GolfCamera_InitPostShotCamera,GolfCamera; size x1.4
+80067074	event	EVENT_Trigger	EVENT_Trigger	event.c	1211	10	low	callers:31 CharacterState_AddSKABlendData,Character; size x6.7; same name
+80067B80	target	fn_80067B80	TARGET_Init	Target.c	139	31	high	str:2 'shadow'; flt:6; callers:1 GO_vInitIG; size x1.0
+80067DAC	target	fn_80067DAC	TARGET_RenderBallTarget	Target.c	261	3	low	size x1.6; gap 1/1
+800689D4	target	fn_800689D4	TARGET_SetupTarget	Target.c	794	10	med	flt:2; callers:2 GM_CheckForShotChanges,STATEFUNC_ShotSet; size x1.6
+80068AA8	target	fn_80068AA8	TARGET_ResetMomentums	Target.c	831	9	low	callers:3 STATEFUNC_PreShotInit,STATEFUNC_ShotSetu; size x2.9
+80068AC8	target	fn_80068AC8	TARGET_UpdateMomentums	Target.c	911	10	med	calls:1 Character_AlignShotWithTarget; callers:2 GM_CheckForShotChanges,STATEFUNC_ZoomUpd; size x1.9
+80069218	target	fn_80069218	PlaceBall_IsValidDropLocation	Target.c	1260	23	high	calls:5 Ter_CheckObjectAndHazardObstruction,Ter_GetSupportingGroundD; callers:1 PlaceBall_UpdateMomentums; size x1.5
+80069330	target	fn_80069330	PlaceBall_Set	Target.c	1305	10	med	flt:2; callers:2 PlaceBall_UpdateMomentums,STATEFUNC_Plac; size x2.0
+800693A4	target	fn_800693A4	PlaceBall_ResetMomentums	Target.c	1336	7	low	calls:1 PlaceBall_IsValidDropLocation; callers:1 STATEFUNC_PlaceBallInit; size x1.8
+80069428	target	fn_80069428	PlaceBall_CheckInBounds	Target.c	1357	11	med	calls:2 Ter_PointInOOBNetwork,Ter_iNumOOBNetworksLoaded; callers:1 PlaceBall_UpdateMomentums; size x1.5
+80069498	target	fn_80069498	PlaceBall_GetPlaceBallNetwork	Target.c	1382	6	low	callers:1 CamScript_CheckOutOfBounds; size x3.0; gap 1/1
+800694A0	target	PlaceBall_UpdateMomentums	PlaceBall_UpdateMomentums	Target.c	1387	11	med	calls:2 PlaceBall_IsValidDropLocation,Ter_GetSupportingWorldMaterial; callers:1 STATEFUNC_PlaceBallUpdate; size x1.5; same name
+80069CDC	target	fn_80069CDC	PlaceBall_RenderBallTarget	Target.c	1722	4	low	calls:1 Ter_PointInOOBNetwork; size x1.5
+8006A6C4	target	fn_8006A6C4	PlaceBall_SetupTarget	Target.c	2191	15	med	flt:6; calls:1 atan2f; callers:1 STATEFUNC_PlaceBallInit; size x1.6
+8006AA9C	emotion	fn_8006AA9C	Emotion_GetPredictedEmotionAnimationType	Emotion.c	107	9	low	callers:3 GM_ChooseRemoveBallState,GM_ShowPostShot; size x2.0
+8006AAB4	emotion	fn_8006AAB4	Emotion_SetAnimationType	Emotion.c	121	6	low	callers:1 GM_ChooseRemoveBallState; size x1.2; gap 1/2
+8006ACE0	emotion	fn_8006ACE0	Emotion_SetPredictedAnimationType	Emotion.c	176	3	low	size x2.0; gap 2/2
+8006ACF8	emotion	fn_8006ACF8	Emotion_PostBallEvent	Emotion.c	187	6	low	callers:2 STATEFUNC_SimulateInit,STATEFUNC_SwingIn; size x1.3
+8006AD68	emotion	Emotion_UpdatePlayerEmotion	Emotion_UpdatePlayerEmotion	Emotion.c	238	20	high	calls:2 EVENT_Trigger,GOLFERSTATE_GetCurrentState; callers:5 GM_CheckForShotChanges,STATEFUNC_PlaceBa; size x2.1; same name
+8006B2C4	emotion	fn_8006B2C4	Emotion_PostShotUpdate	Emotion.c	483	6	low	callers:2 GM_SimulateBallMovement,STATEFUNC_Simula; size x0.9
+8006B57C	emotion	fn_8006B57C	Emotion_BallHitUpdate	Emotion.c	1225	6	low	flt:3; size x1.5
+8006BED4	Replay	fn_8006BED4	REPLAY_InitModule	Replay.c	96	4	low	file:replay.c; callers:1 GO_vInitIG; size x4.5
+8006BF20	Replay	fn_8006BF20	REPLAY_CloseModule	Replay.c	118	3	low	size x1.8; gap 1/2
+8006BF4C	Replay	fn_8006BF4C	REPLAY_Init	Replay.c	127	3	low	size x1.4; gap 2/2
+8006BF60	Replay	fn_8006BF60	REPLAY_Save	Replay.c	137	9	low	calls:1 Mem_cpy; callers:2 GameModeReplay_SetupNextGolfer,SW_vImpac; size x0.7
+8006C300	Replay	fn_8006C300	REPLAY_Play	Replay.c	338	13	med	calls:1 Mem_cpy; callers:3 GM_DoPostShotInHoleUI,STATEFUNC_Simulate; size x1.9
+8006C4A0	Replay	fn_8006C4A0	REPLAY_Stop	Replay.c	422	6	low	callers:2 GM_PlayerTakeMulligan,STATEFUNC_Simulate; size x1.2
+8006C4C0	Replay	fn_8006C4C0	REPLAY_Restore	Replay.c	434	7	low	calls:1 Mem_cpy; callers:1 GM_PlayerTakeMulligan; size x1.7
+8006C720	gomainloop	fn_8006C720	GO_vOpenONCE	GoMainLoop.c	396	4	low	calls:1 GOLFERSTATE_OpenONCE; size x3.2
+8006C770	gomainloop	fn_8006C770	GO_vCloseONCE	GoMainLoop.c	521	2	low	size x4.5; gap 1/1
+8006C7A8	gomainloop	fn_8006C7A8	GO_vInitModules	GoMainLoop.c	571	6	low	callers:2 GO_vInitFE,GO_vInitIG; size x3.4
+8006C9EC	gomainloop	fn_8006C9EC	GO_vInitFE	GoMainLoop.c	1266	16	med	calls:4 CA_spCreateCamera,CameraController_SetCameraMode,CameraTunin; size x2.1
+8006CBDC	gomainloop	GO_vInitIG	GO_vInitIG	GoMainLoop.c	1663	23	med	calls:6 BFX_vInit,CA_spCreateCamera,CameraTuning_Init,GR_vInit,TARGE; size x4.9; same name
+8006CDC4	gomainloop	fn_8006CDC4	GO_vCloseIG	GoMainLoop.c	2122	3	low	size x2.5; gap 1/1
+8006CEFC	gomainloop	fn_8006CEFC	GO_vInitStartup	GoMainLoop.c	2337	8	low	calls:2 CA_spCreateCamera,CameraController_SetCameraMode; size x2.3
+8006D1C0	gomainloop	fn_8006D1C0	SetDPadAnalogEmulationFlag	GoMainLoop.c	4053	4	low	calls:1 GOLFERSTATE_GetCurrentState; size x2.2
+8006D8E8	gomainloop	fn_8006D8E8	GO_vRunMainLoop	GoMainLoop.c	4650	7	low	calls:2 EVENT_Trigger,GM_Update; size x4.1
+8006E1C8	GoFrameBuf	fn_8006E1C8	FB_spCreateFrameBuffer	GoFrameBuf.c	125	7	low	file:goframebuf.c; callers:2 GO_vInitFE,GO_vInitIG; size x5.2
+80072ACC	animblender	fn_80072ACC	AptActionInterpreter::cbCallMethod_escape	AptActionInterpreter.cpp	962	4	low	calls:1 memcpy; size x2.4
+8007326C	animblender	fn_8007326C	SKATime_UnPause	AnimBlender.c	681	6	low	callers:2 STATEFUNC_PreShotInit,STATEFUNC_SwingIni; size x1.0
+800732B8	animblender	fn_800732B8	SKATime_SetTime	AnimBlender.c	694	6	low	flt:3; size x1.7
+800754C0	LLVideo	fn_800754C0	TExternArray<UICourseItem>::vSetNbrElems	UI_Helpers.h	141	4	low	calls:1 memcpy; size x1.7
+800763BC	GoCamera	CA_vUpdateInternalFieldOfViewData	CA_vUpdateInternalFieldOfViewData	GoCamera.c	107	4	low	flt:2; size x1.2; same name
+80076400	GoCamera	CA_spCreateCamera	CA_spCreateCamera	GoCamera.c	118	9	low	file:gocamera.c; callers:3 GO_vInitFE,GO_vInitIG,UI_Obj_InitModule; size x6.1; same name
+80076ACC	GoViewport	fn_80076ACC	VM_spCreateViewport	GoViewport.c	125	8	low	file:goviewport.c; callers:2 GO_vInitFE,GO_vInitIG; size x3.7
+800775BC	FE_Manager	fn_800775BC_LoadCreatedFromSave	FE_CharBios_LoadBIOfromStream	FE_Manager.c	123	4	low	calls:1 Mem_cpy; size x1.6
+80077808	FE_Manager	fn_80077808	FE_TransferUserStatsToGolferStats	FE_Manager.c	264	4	low	calls:1 Mem_cpy; size x2.8
+800779BC	FE_Manager	fn_800779BC	GolfCamera_SwitchToSlowHitCam	GoGolfCam.c	13036	4	low	calls:1 Mem_cpy; size x2.9
+80078008	FE_Manager	fn_80078008	FE_CrAP_IsItemLocked	FE_CrAPUtils.c	264	4	low	calls:1 GM_GetGameProgress; size x1.4
+80078A2C	FE_Manager	fn_80078A2C	FE_CrAP_RandomizeCategoryWithUndesirableTest	FE_CrAPUtils.c	777	8	low	calls:2 FE_CrAP_IsAssetUndesirable,Misc_RandFunc; size x1.3
+80078B84	FE_Manager	fn_80078B84	FE_CrAP_IsCrazyHairColor	FE_CrAPUtils.c	823	10	med	str:1 'White'; size x1.2
+80078C94	FE_Manager	FE_CrAP_IsCrazyHat	FE_CrAP_IsCrazyHat	FE_CrAPUtils.c	841	24	high	str:2 'Hats'; calls:1 strstr; size x1.4; same name
+80078D24	FE_Manager	fn_80078D24	FE_CrAP_IsCrazyFaceHairColor	FE_CrAPUtils.c	853	10	med	str:1 'White'; size x1.2
+80079664	FE_Manager	fn_80079664	FE_CrAP_RandomizeAll	FE_CrAPUtils.c	1281	8	low	calls:2 FE_CrAP_TurnOnPart,Misc_RandFunc; size x1.2
+8007975C	FE_Manager	fn_8007975C	CSpectatorBehavior::DuckFromBall	spectatorBehavior.cpp	168	4	low	calls:1 Misc_RandFunc; size x1.6
+800797E0	FE_Manager	fn_800797E0	CSpectatorBehavior::Walk	spectatorBehavior.cpp	236	4	low	calls:1 Misc_RandFunc; size x1.1
+80079974	FE_Manager	fn_80079974	FE_CrAP_SetDefaultsByAge	FE_CrAPUtils.c	1481	4	low	calls:1 FE_CrAP_TurnOnPart; size x1.9
+8007BE28	FE_MessageTable	GetGolferName	CreateJobTypeFromBin	managerplat.cpp	367	7	low	calls:2 strcmp,strlen; size x4.0
+8007D160	FE_MessageTable	fn_8007D160	SetDrive	Path.cpp	225	4	low	calls:1 strcpy; size x2.6
+8007D1A4	FE_MessageTable	fn_8007D1A4	SetDir	Path.cpp	231	8	low	calls:2 strcpy,strlen; size x1.2
+8007FF8C	FE_MessageTable	fn_8007FF8C	Alloc	system.cpp	1651	4	low	calls:1 sprintf; size x2.0
+800838C4	FE_MessageTable	fn_800838C4	GenericActor_GetActor	GenericActor.cpp	1065	4	low	calls:1 strcmp; size x2.2
+80083A4C	FE_MessageTable	fn_80083A4C	DumpCurrentJobs	managerplat.cpp	2886	4	low	calls:1 strcpy; size x3.3
+80084D6C	FE_MessageTable	fn_80084D6C	SetName	Path.cpp	250	8	low	calls:2 strcpy,strlen; size x1.3
+80084DF4	FE_MessageTable	fn_80084DF4	SetExt	Path.cpp	255	8	low	calls:2 strcpy,strlen; size x1.3
+8008A468	GameUICommands	fn_8008A468	core::VerifyCommandsExecutingHelper	system.cpp	1735	4	low	calls:1 strcpy; size x2.5
+8008E468	FEgolferanim	fn_8008E468	LuaWatch	tiger_module_lua_watch.h	26	5	low	calls:2 strcpy,strncpy; size x0.4
+8008E724	FEgolferanim	fn_8008E724	QueueTransferData	tiger_module_com.cpp	325	4	low	calls:1 strncpy; size x3.0
+8008E960	FEgolferanim	fn_8008E960	QueueTransferMessage	tiger_module_com.cpp	390	4	low	calls:1 strncpy; size x2.6
+8008EEB8	uiLoadFile	fn_8008EEB8	StreamManagerHole::StreamFiles	StreamManagerHole.cpp	85	10	low	str:1 'frontend'; size x3.8
+800907AC	uiProcessInterface	fn_800907AC	LuaParseValue	tiger_module_lua.cpp	949	8	low	calls:2 sprintf,strlen; size x2.2
+80091EE8	fe_movies	fn_80091EE8	GM_PgaTourSim_AdjustUserScoreForSimmedRound	PGATourSimulation.c	5880	4	low	calls:1 Misc_RandFunc; size x2.0
+80093A80	goballfx	BFX_vInit	BFX_vInit	GoBallFX.c	47	13	med	str:1 'marker'; callers:1 GO_vInitIG; size x2.0; same name
+80093AE0	goballfx	fn_80093AE0	BFX_vRender	GoBallFX.c	57	6	low	flt:3; size x0.9
+80095B4C	CharAnim	CharacterState_AddSKABlendData	CharacterState_AddSKABlendData	char_State.c	229	20	med	flt:2; calls:1 EVENT_Trigger; callers:4 CharacterState_SetTapInState,CharacterSt; size x1.0; same name
+80096338	CharAnim	fn_80096338	FE_CrAP_RandomizeCrAPCategoryInOneSubcategory	FE_CrAPUtils.c	1333	4	low	calls:1 Misc_RandFunc; size x2.0
+800965DC	CharAnim	CharAnim_StartTapIn	CharacterState_SetTapInState	char_State.c	445	14	med	flt:2; calls:1 CharacterState_AddSKABlendData; callers:2 CharacterState_UpdateSKAState,STATEFUNC_; size x0.9
+80096690	CharAnim	CharacterState_UpdateSKAState	CharacterState_UpdateSKAState	char_State.c	481	33	high	calls:7 CharacterState_AddSKABlendData,CharacterState_SetTapInState,; callers:3 Character_UpdateAnimation,STATEFUNC_PreS; size x1.1; same name
+800977F8	GoCamTuningVars	fn_800977F8	CameraTuning_Init	GoCamTuningVars.c	381	16	med	flt:38; file:gocamtuningvars.c; callers:2 GO_vInitFE,GO_vInitIG; size x1.5
+8009B630	GoGreenGrid	GR_vInit	GR_vInit	GoGreenGrid.c	190	5	low	file:gogreengrid.c; callers:1 GO_vInitIG; size x3.6; same name
+8009BE08	GoGreenGrid	fn_8009BE08	GR_vInitForHole	GoGreenGrid.c	383	4	low	calls:1 Ter_GetSupportingGroundData; size x2.7
+8009C0BC	GoGreenGrid	fn_8009C0BC	GR_BuildGridRenderData	GoGreenGrid.c	1108	6	low	flt:1; calls:1 GOLFERSTATE_GetCurrentState; size x1.8
+8009C914	GoGreenGrid	fn_8009C914	GR_UpdateGreenGrid	GoGreenGrid.c	1219	4	low	calls:1 GOLFERSTATE_GetCurrentState; size x2.4
+8009E544	MC_Gc	fn_8009E544	SetProgramData	RNAFX.cpp	1135	4	low	calls:1 memcpy; size x1.1
+8009E758	MC_Gc	fn_8009E758	GM_PgaTourSim_ChangeGuests	PGATourSimulation.c	1757	4	low	calls:1 strcmp; size x1.9
+8009F0F0	MC_Gc	fn_8009F0F0	AddBreakpoint	tiger_module_lua.cpp	734	4	low	calls:1 memcpy; size x2.6
+8009F3D4	MC_Gc	fn_8009F3D4	Load	RNAFX.cpp	1148	4	low	calls:1 memcpy; size x1.4
+8009F514	MC_Gc	fn_8009F514	FindConstant	RNAFX.cpp	1413	4	low	calls:1 strcmp; size x1.6
+8009F5E4	MC_Gc	fn_8009F5E4	FindConstantIndex	RNAFX.cpp	1425	4	low	calls:1 strcmp; size x1.2
+8009FCFC	MC	fn_8009FCFC	MC_LoadOptionsFromFirstCardFound	MC.c	482	4	low	calls:1 Mem_cpy; size x1.4
+800A0230	MC	fn_800A0230	MC_LoadOptions	MC.c	619	4	low	calls:1 Mem_cpy; size x1.6
+800A0C6C	MC	fn_800A0C6C	MC_SaveOptions	MC.c	719	4	low	calls:1 Mem_cpy; size x2.0
+800A0E6C	MC	fn_800A0E6C	MC_LoadUser	MC.c	1273	4	low	calls:1 Mem_cpy; size x1.5
+800A1164	MC	fn_800A1164	MC_SaveUser	MC.c	1470	4	low	calls:1 Mem_cpy; size x2.4
+800A13E8	MC	fn_800A13E8	MC_LoadLastUser	MC.c	1728	4	low	calls:1 Mem_cpy; size x2.4
+800A1590	MC	fn_800A1590	MC_GetUser	MC.c	1988	4	low	calls:1 Mem_cpy; size x1.5
+800A1758	MC	fn_800A1758	MC_GetNumOptions	MC.c	2088	3	low	size x1.2; gap 1/1
+800A178C	MC	fn_800A178C	MC_RefreshMCUserInfo	MC.c	2110	4	low	calls:1 Mem_cpy; size x2.2
+800A1D4C	MC	fn_800A1D4C	MC_LoadEAGameListfromStream	MC.c	2720	3	low	size x3.0; gap 1/1
+800A1F6C	MC	fn_800A1F6C	sfReplaceInString	SafeString.cpp	81	8	low	calls:2 strlen,strncmp; size x1.9
+800A29B4	PsMgr	fn_800A29B4	XMLRPC_Unescape	xmlrpc.c	330	12	med	calls:3 sscanf,strchr,strlen; size x1.9
+800A4E34	GameAudio	fn_800A4E34	Gaud_InitFE	GameAudio.c	2443	5	low	flt:1; callers:1 GO_vInitFE; size x1.0
+800A573C	GameAudio	fn_800A573C	Gaud_UpdtSwing	GameAudio.c	3201	6	low	callers:2 STATEFUNC_ReplaySwingUpdate,STATEFUNC_Sw; size x1.6
+800A5980	GameAudio	fn_800A5980	Gaud_SwingBallHit	GameAudio.c	3491	9	low	callers:3 STATEFUNC_ReplaySwingUpdate,STATEFUNC_Sw; size x2.2
+800A5EC0	GameAudio	fn_800A5EC0	Gaud_PlayCrowdHitComment	GameAudio.c	4698	4	low	calls:1 Misc_RandFunc; size x1.6
+800A9D7C	hlaudtrack	fn_800A9D7C	Trk_FreePerf	HLAudTrack.c	453	4	low	calls:1 Stm_Exit; size x1.7
+800A9E7C	hlaudtrack	fn_800A9E7C	Trk_UpdatePerf	HLAudTrack.c	514	3	low	size x1.7; gap 1/4
+800AA0D8	hlaudtrack	fn_800AA0D8	Trk_Start	HLAudTrack.c	612	3	low	size x2.4; gap 2/4
+800AA118	hlaudtrack	fn_800AA118	Trk_Stop	HLAudTrack.c	630	3	low	size x1.7; gap 3/4
+800AA1B8	hlaudtrack	fn_800AA1B8	Trk_StopAllVoices	HLAudTrack.c	662	6	low	callers:1 Stm_SetStream; size x1.6; gap 4/4
+800AA2A4	hlaudtrack	fn_800AA2A4	Trk_Tick	HLAudTrack.c	715	4	low	calls:1 Stm_Tick; size x2.8
+800AB3A4	hlaudtrackstm	fn_800AB3A4	CheckQueue	HLAudTrackStm.c	66	11	med	calls:2 Stm_SetPlayList,Stm_SetStream; callers:1 Stm_Tick; size x2.7
+800AB428	hlaudtrackstm	fn_800AB428	StartStreamVoices	HLAudTrackStm.c	108	6	low	callers:2 Stm_Start,Stm_Tick; size x1.0
+800AE1F8	uiobject	UI_Obj_InitModule	UI_Obj_InitModule	uiObject.c	116	35	high	str:2 'ring'; flt:5; calls:1 CA_spCreateCamera; callers:1 GO_vInitIG; size x2.2; same name
+800AE3F8	uiobject	fn_800AE3F8	UI_Obj_RenderBoostUI	uiObject.c	364	10	med	flt:3; calls:1 GameEffects_GetLetterboxHeight; size x1.3
+800B34F0	GoComicCam	fn_800B34F0	ComicCam_InitComicCam	GoComicCam.c	87	5	low	file:gocomiccam.c; callers:1 GO_vInitIG; size x3.9
+800B352C	GoComicCam	fn_800B352C	ComicCam_CloseComicCam	GoComicCam.c	97	3	low	size x1.8; gap 1/1
+800B3550	GoComicCam	fn_800B3550	ComicCam_StartComicCam	GoComicCam.c	102	16	med	calls:4 CameraScript_InterpToNewScript,CameraScript_WillGolferBeOccl; size x1.0
+800B3F9C	GoComicCam	fn_800B3F9C	ComicCam_Init3ScreenMode	GoComicCam.c	510	11	med	flt:9; callers:1 ComicCam_StartComicCam; size x1.1
+800B4108	GoComicCam	fn_800B4108	ComicCam_Init9ScreenRapidMode	GoComicCam.c	557	15	med	flt:4; calls:1 Misc_RandFunc; callers:1 ComicCam_StartComicCam; size x1.0
+800B4818	GoComicCam	fn_800B4818	ComicCam_IsComicCamOver	GoComicCam.c	677	3	low	size x1.6; gap 1/2
+800B4908	GoComicCam	fn_800B4908	ComicCam_IsScreenFrozen	GoComicCam.c	723	3	low	size x2.3; gap 2/2
+800B4E28	GoShaderObject_Rain_Gc	SD_vShaderObject_Rain_Dynamic_Init	Create	RNATexturePlat.cpp	139	4	low	calls:1 memset; size x1.6
+800BB0E8	SitDevFile	fn_800BB0E8	GM_InitForHole_SitDev	GameMode.c	458	4	low	calls:1 EVENT_Trigger; size x1.6
+800BB7AC	SitDevFile	fn_800BB7AC	GM_PgaTourSim_OutputAllEntrants	PGATourSimulation.c	526	4	low	calls:1 strcmp; size x1.8
+800BCF84	SitDevFile	fn_800BCF84	Physics_CalcClubImpact	Physics.c	5926	4	low	calls:1 Misc_RandFunc; size x1.5
+800BDA30	GoGolfCam	fn_800BDA30	GolfCamera_InitShotSetupCamera	GoGolfCam.c	692	15	med	calls:3 CameraScript_InterpToNewScript,DynamicCam_ChoosePreFlightSeq; callers:1 CameraController_SetCameraMode; size x1.3
+800BDBA4	GoGolfCam	fn_800BDBA4	GolfCamera_ProcessShotSetupCamera	GoGolfCam.c	779	6	low	callers:1 CameraController_Idle; size x1.1; gap 1/1
+800BDC20	GoGolfCam	GolfCamera_InitZoomToAimCamera	GolfCamera_InitZoomToAimCamera	GoGolfCam.c	795	17	med	flt:1; calls:3 EVENT_Trigger,GOLFERSTATE_GetCurrentState,Ter_GetEnclosingGr; callers:1 CameraController_SetCameraMode; size x1.6; same name
+800BDE54	GoGolfCam	GolfCamera_ProcessZoomToAimCamera	GolfCamera_ProcessZoomToAimCamera	GoGolfCam.c	906	19	med	calls:4 CamScript_KeepAboveGround,CameraScript_LagAimMarker,EVENT_Tr; callers:1 CameraController_Idle; size x1.5; same name
+800BE504	GoGolfCam	GolfCamera_InitGreenZoomToAimCamera	GolfCamera_InitGreenZoomToAimCamera	GoGolfCam.c	1556	19	med	flt:2; calls:3 EVENT_Trigger,GOLFERSTATE_GetCurrentState,Ter_GetEnclosingGr; callers:1 CameraController_SetCameraMode; size x1.4; same name
+800BE828	GoGolfCam	GolfCamera_ProcessGreenZoomToAimCamera	GolfCamera_ProcessGreenZoomToAimCamera	GoGolfCam.c	1703	15	med	calls:3 CamScript_KeepAboveGround,CameraScript_LagAimMarker,EVENT_Tr; callers:1 CameraController_Idle; size x1.5; same name
+800BEEB0	GoGolfCam	GolfCamera_InitSteepSlopeCamera	GolfCamera_InitSteepSlopeCamera	GoGolfCam.c	1952	21	high	str:1 'STEEPSLOPE CAM'; calls:2 CameraScript_RecordCurrentCam,GolfCamera_ComputeSteepSlopeCa; callers:1 CameraController_SetCameraMode; size x1.1; same name
+800BEF28	GoGolfCam	GolfCamera_ProcessSteepSlopeCamera	GolfCamera_ProcessSteepSlopeCamera	GoGolfCam.c	1980	7	low	calls:1 GolfCamera_ComputeSteepSlopeCamVectors; callers:1 CameraController_Idle; size x1.0; same name
+800BEFAC	GoGolfCam	GolfCamera_InitElevatorCamera	GolfCamera_InitElevatorCamera	GoGolfCam.c	2001	23	high	str:1 'ELEVATOR CAM'; flt:1; calls:2 CameraScript_InterpToNewScript,CameraScript_RecordCurrentCam; callers:1 CameraController_SetCameraMode; size x1.2; same name
+800BF184	GoGolfCam	fn_800BF184	GolfCamera_ProcessPlaceBallCamera	GoGolfCam.c	2466	11	med	calls:2 CamScript_KeepAboveGround,Ter_CheckForGroundCollision; callers:1 CameraController_Idle; size x2.4
+800BF5E4	GoGolfCam	fn_800BF5E4	CameraDebug_InitOrbitGolferCamera	GoDebugCam.c	985	6	low	callers:1 CameraController_SetCameraMode; size x2.5; gap 1/1
+800BF658	GoGolfCam	fn_800BF658	CameraDebug_ProcessOrbitGolferCamera	GoDebugCam.c	1024	6	low	flt:2; callers:1 CameraController_Idle; size x0.8
+800BFC80	GoGolfCam	fn_800BFC80	GolfCamera_InitGreenRollCamera	GoGolfCam.c	3514	4	low	flt:1; callers:1 CameraController_SetCameraMode; size x4.0
+800BFE00	GoGolfCam	fn_800BFE00	GolfCamera_ProcessGreenRollCamera	GoGolfCam.c	3721	7	low	calls:1 CamScript_KeepAboveGround; callers:1 CameraController_Idle; size x2.9
+800C0624	GoGolfCam	fn_800C0624	CamAnimDebug_CameraEditViewEnter	GoCamAnimDebug.c	1101	6	low	flt:1; calls:1 CameraScript_InterpToNewScript; size x2.1
+800C06C8	GoGolfCam	fn_800C06C8	CameraDebug_InitStaticDebugCamera	GoDebugCam.c	1157	4	low	calls:1 CamScript_RunScript; size x1.4
+800C0914	GoGolfCam	fn_800C0914	GolfCamera_ProcessFlyByCamera	GoGolfCam.c	5714	7	low	calls:1 CamScript_RunFlybyCamera; callers:1 CameraController_Idle; size x1.5
+800C0A30	GoGolfCam	GolfCamera_InitPreShotCamera	GolfCamera_InitPreShotCamera	GoGolfCam.c	5978	23	high	calls:5 CameraScript_InterpToNewScript,DynamicCam_ChoosePreFlightSeq; callers:1 CameraController_SetCameraMode; size x1.7; same name
+800C0C0C	GoGolfCam	fn_800C0C0C	GolfCamera_ProcessPreShotCamera	GoGolfCam.c	6107	15	med	calls:3 CamScript_RunScript,CameraScript_InterpToNewScript,DynamicCa; callers:1 CameraController_Idle; size x1.1
+800C0D70	GoGolfCam	GolfCamera_InitSwingCamera	GolfCamera_InitSwingCamera	GoGolfCam.c	6282	19	med	calls:4 CameraScript_InterpToNewScript,CameraScript_WillGolferBeOccl; callers:1 CameraController_SetCameraMode; size x1.2; same name
+800C1338	GoGolfCam	fn_800C1338	GolfCamera_ProcessSwingCamera	GoGolfCam.c	6993	7	low	calls:1 CamScript_RunScript; callers:1 CameraController_Idle; size x2.7
+800C1530	GoGolfCam	fn_800C1530	GolfCamera_ProcessReplaySwingCamera	GoGolfCam.c	7331	7	low	calls:1 CamScript_RunScript; callers:1 CameraController_Idle; size x3.0
+800C1670	GoGolfCam	fn_800C1670	GolfCamera_Init3ScreenCamera	GoGolfCam.c	7529	4	low	calls:1 ComicCam_StartComicCam; size x1.2
+800C16C4	GoGolfCam	fn_800C16C4	CamAnimDebug_CrACCamCallback	GoCamAnimDebug.c	2132	4	low	calls:1 CameraController_SetCameraMode; size x2.4
+800C1824	GoGolfCam	GolfCamera_InitHeartBeatCamera	GolfCamera_InitHeartBeatCamera	GoGolfCam.c	7605	21	high	flt:1; calls:4 CameraScript_InterpToNewScript,CameraScript_WillGolferBeOccl; callers:1 CameraController_SetCameraMode; size x1.1; same name
+800C1A08	GoGolfCam	GolfCamera_ProcessHeartBeatCamera	GolfCamera_ProcessHeartBeatCamera	GoGolfCam.c	7668	19	med	calls:4 CamScript_RunScript,CameraScript_InterpToNewScript,CameraScr; callers:1 CameraController_Idle; size x1.1; same name
+800C1C50	GoGolfCam	GolfCamera_InitShutterCamera	GolfCamera_InitShutterCamera	GoGolfCam.c	7771	13	med	flt:1; calls:2 CameraScript_InterpToNewScript,DynamicCam_ChooseScript; callers:1 CameraController_SetCameraMode; size x1.0; same name
+800C1D3C	GoGolfCam	fn_800C1D3C	GolfCamera_ProcessShutterCamera	GoGolfCam.c	7805	16	med	flt:1; calls:3 CamScript_RunScript,CameraScript_InterpToNewScript,DynamicCa; callers:1 CameraController_Idle; size x0.8
+800C2514	GoGolfCam	GolfCamera_ProcessBallFlightCamera	GolfCamera_ProcessBallFlightCamera	GoGolfCam.c	8166	23	high	calls:5 CamScript_RunScript,CameraScript_InterpToNewScript,CameraScr; callers:1 CameraController_Idle; size x1.5; same name
+800C2C80	GoGolfCam	GolfCamera_InitPostShotCamera	GolfCamera_InitPostShotCamera	GoGolfCam.c	8750	26	high	calls:5 CameraScript_InterpToNewScript,DynamicCam_ChooseScriptInSequ; callers:2 CameraController_SetCameraMode,GolfCamer; size x1.1; same name
+800C2ED8	GoGolfCam	GolfCamera_ProcessPostShotCamera	GolfCamera_ProcessPostShotCamera	GoGolfCam.c	8880	33	high	flt:3; calls:6 CamScript_RunFlybyCamera,CamScript_RunScript,CameraScript_Re; callers:1 CameraController_Idle; size x1.5; same name
+800C324C	GoGolfCam	GolfCamera_InitInHoleCamera	GolfCamera_InitInHoleCamera	GoGolfCam.c	9024	14	med	calls:2 GOLFERSTATE_GetCurrentState,GolfCamera_ChooseReactionCam; callers:2 CameraController_SetCameraMode,GolfCamer; size x1.2; same name
+800C336C	GoGolfCam	GolfCamera_ProcessInHoleCamera	GolfCamera_ProcessInHoleCamera	GoGolfCam.c	9096	5	low	calls:1 GolfCamera_InitInHoleCamera; callers:1 CameraController_Idle; size x0.6; same name
+800C3478	GoGolfCam	fn_800C3478	GolfCamera_InitScoreCardCamera	GoGolfCam.c	9129	6	low	callers:1 CameraController_SetCameraMode; size x1.0; gap 1/2
+800C34F8	GoGolfCam	fn_800C34F8	GolfCamera_ProcessScoreCardCamera	GoGolfCam.c	9143	6	low	callers:1 CameraController_Idle; size x2.0; gap 2/2
+800C353C	GoGolfCam	GolfCamera_InitTutorialWaitCamera	GolfCamera_InitTutorialWaitCamera	GoGolfCam.c	9159	16	med	str:1 'TUTORIAL WAIT'; flt:2; callers:1 CameraController_SetCameraMode; size x0.8; same name
+800C37FC	GoGolfCam	fn_800C37FC	GolfCamera_ProcessTutorialWaitCamera	GoGolfCam.c	9239	7	low	calls:1 CamScript_RunScript; callers:1 CameraController_Idle; size x1.2
+800C38BC	GoGolfCam	fn_800C38BC	GolfCamera_InitFECamera	GoGolfCam.c	9812	15	med	flt:2; calls:2 CameraScript_InterpToNewScript,DynamicCam_ChooseScript; callers:1 CameraController_SetCameraMode; size x1.2
+800C39A8	GoGolfCam	fn_800C39A8	GolfCamera_ProcessFECamera	GoGolfCam.c	9848	14	med	calls:3 CamScript_RunFEScript,CameraScript_InterpToNewScript,Dynamic; callers:1 CameraController_Idle; size x0.8
+800C3C40	GoGolfCam	GolfCamera_SwitchCrAPCamera	GolfCamera_SwitchCrAPCamera	GoGolfCam.c	9909	18	med	flt:1; calls:4 CamScript_RunFEScript,CameraScript_InterpToNewScript,CameraS; size x1.9; same name
+800C44A8	GoGolfCam	fn_800C44A8	GolfCamera_Choose3ScreenCam	GoGolfCam.c	10723	7	low	callers:4 GolfCamera_InitBallFlightCamera,STATEFUN; size x0.2
+800C44CC	GoGolfCam	fn_800C44CC	GolfCamera_ChooseHeartBeatCam	GoGolfCam.c	10738	6	low	callers:2 STATEFUNC_ReplaySwingInit,STATEFUNC_Swin; size x1.0
+800C44E0	GoGolfCam	fn_800C44E0	GolfCamera_ChooseShutterCam	GoGolfCam.c	10752	6	low	callers:2 STATEFUNC_ReplaySwingInit,STATEFUNC_Swin; size x1.0
+800C4604	GoGolfCam	fn_800C4604	GolfCamera_SteepSlopeCamCheckCollision	GoGolfCam.c	10831	4	low	calls:1 Ter_CheckForGroundCollision; size x1.7
+800C4650	GoGolfCam	fn_800C4650	GolfCamera_NeedSteepSlopeCam	GoGolfCam.c	10853	6	low	callers:1 STATEFUNC_ElevatorInit; size x1.1; gap 1/1
+800C4724	GoGolfCam	GolfCamera_ComputeSteepSlopeCamVectors	GolfCamera_ComputeSteepSlopeCamVectors	GoGolfCam.c	10910	12	med	flt:1; calls:1 Ter_CheckForGroundCollision; callers:2 GolfCamera_InitSteepSlopeCamera,GolfCame; size x1.8; same name
+800C4AB0	GoGolfCam	fn_800C4AB0	GolfCamera_ClampLookAngle	GoGolfCam.c	11086	5	low	flt:1; callers:1 GolfCamera_ComputeSteepSlopeCamVectors; size x1.6
+800C4DF8	GoGolfCam	fn_800C4DF8	GolfCamera_GetAlternateSwingCamera	GoGolfCam.c	11205	6	low	calls:1 DynamicCam_ChooseScript; callers:1 GolfCamera_InitSwingCamera; size x0.8
+800C4E80	GoGolfCam	fn_800C4E80	GolfCamera_vSwitchToNextAlternateSwingCamera	GoGolfCam.c	11267	7	low	calls:1 CameraScript_InterpToNewScript; callers:1 GM_CheckForShotChanges; size x1.4
+800C54FC	GoGolfCam	fn_800C54FC	CamAnimDebug_ResetGolferState	GoCamAnimDebug.c	3885	8	low	calls:2 EVENT_Trigger,Mem_cpy; size x1.5
+800C5D64	GoGolfCam	fn_800C5D64	ComicCam_CheckForCameraSwitch	GoComicCam.c	730	12	med	calls:3 CameraScript_InterpToNewScript,CameraScript_WillGolferBeOccl; size x1.8
+800C6110	GoGolfCam	fn_800C6110	GolfCamera_ChooseReactionCam	GoGolfCam.c	12208	16	med	flt:1; calls:2 CameraScript_InterpToNewScript,DynamicCam_ChooseScriptInSequ; callers:2 GolfCamera_InitInHoleCamera,GolfCamera_I; size x1.7
+800C6358	GoGolfCam	GolfCamera_CutToGolferDoneAnimatingCam	GolfCamera_CutToGolferDoneAnimatingCam	GoGolfCam.c	12318	28	high	flt:1; calls:5 CameraScript_InterpToNewScript,CameraScript_RecordCurrentCam; callers:2 GolfCamera_ProcessPostShotCamera,STATEFU; size x1.2; same name
+800C6618	GoGolfCam	fn_800C6618	GolfCamera_ChooseSpecialSwing	GoGolfCam.c	12489	6	low	calls:1 CameraScript_IsDefaultSwingCam; callers:1 STATEFUNC_SwingUpdate; size x0.8
+800C6B7C	GoGolfCam	fn_800C6B7C	GolfCamera_ReplaySwingSpeed	GoGolfCam.c	12828	6	low	callers:2 STATEFUNC_ReplaySwingInit,STATEFUNC_Repl; size x2.8
+800C6D64	GoGolfCam	fn_800C6D64	GolfCamera_IsSuperZoomCamActive	GoGolfCam.c	13135	6	low	callers:2 GolfCamera_ProcessBallFlightCamera,STATE; size x1.4
+800C6D80	GoGolfCam	fn_800C6D80	GolfCamera_IsSlowMoSwingCamActive	GoGolfCam.c	13141	3	low	size x1.4; gap 1/1
+800C6D9C	GoGolfCam	fn_800C6D9C	GolfCamera_IsFreezeTimeActive	GoGolfCam.c	13147	6	low	callers:2 CamScript_CheckOutOfBounds,STATEFUNC_Sim; size x1.1
+800C6F14	GoGolfCam	fn_800C6F14	GolfCamera_IsThereAPostPreShotCamera	GoGolfCam.c	13217	4	low	calls:1 DynamicCam_ChooseScriptInSequence; size x1.1
+800C7140	GoGolfCam	fn_800C7140	GolfCamera_SetCameraMatrixMode	GoGolfCam.c	13425	12	med	callers:4 CameraScript_GoToNewScript,CameraScript_; size x2.3
+800C714C	GoGolfCam	fn_800C714C	GolfCamera_IsScriptMatrixModeOn	GoGolfCam.c	13430	6	low	callers:2 CamScript_RunScript,GameEffects_BallUpda; size x2.3
+800C7158	GoGolfCam	fn_800C7158	GolfCamera_SetPostShowPostShotAnimations	GoGolfCam.c	13435	3	low	size x1.0; gap 1/1
+800C7160	GoGolfCam	fn_800C7160	GolfCamera_ShowPostShotAnimations	GoGolfCam.c	13440	6	low	callers:2 GolfCamera_InitInHoleCamera,GolfCamera_I; size x1.0
+800C808C	GoBreakLine	fn_800C808C	BreakLine::InitModule	GoBreakLine.c	326	5	low	file:gobreakline.c; callers:1 GO_vInitIG; size x2.2
+800C844C	GoBreakLine	BreakLine_Step	BreakLine::Render	GoBreakLine.c	705	4	low	calls:1 EVENT_Trigger; size x2.0
+800C8C70	GoBreakLine	BreakLine_Start	BreakLine::Reset	GoBreakLine.c	875	21	high	flt:2; calls:2 Mem_cpy,Physics_ShotImpact; callers:3 GM_CheckForShotChanges,STATEFUNC_GreenMo; size x0.9
+800CD404	SkinPart	fn_800CD404	ProShopAssetPreviewManager::SetupDefaultCamera	FE_ProShopPreviews.cpp	754	4	low	calls:1 memset; size x3.0
+800CEF04	SkinPart	fn_800CEF04	ProShopAssetPreviewManager::SetupBallsCamera	FE_ProShopPreviews.cpp	830	4	low	calls:1 memset; size x1.9
+800CFE74	HoleScore	fn_800CFE74	GameModeDriverPGATour::IsPuttForWin	GameModeDriver_PGATour.cpp	2962	4	low	calls:1 GM_PgaTourSim_GetBestOpponentRelativeScore; size x1.0
+800D1DAC	SwingTips	fn_800D1DAC	AIBrain::ScrewItUp	AI_Brain.cpp	595	4	low	calls:1 Misc_RandFunc; size x1.3
+800D2678	Calendar	fn_800D2678	CalDate_SetMDY	Calendar.c	109	6	low	callers:2 GameModeDriverRTE_GetNextEvent,TibExtCur; size x1.8
+800D2714	Calendar	fn_800D2714	CalDate_GetMDY	Calendar.c	144	6	low	callers:2 GameModeDriverPGATour_GetEventByDate,Gam; size x1.7
+800D3244	Earnings	fn_800D3244	_getNameString	AptActionInterpreter.cpp	1045	4	low	calls:1 memcpy; size x2.8
+800D3478	Earnings	fn_800D3478	GM_Earnings_TournamentPayout	Earnings.c	178	4	low	flt:2; size x2.2
+800D3548	Earnings	fn_800D3548	GM_Earnings_AwardMoney	Earnings.c	212	12	med	callers:4 GameModeAlternateShot_EndGame,GameModeBa; size x1.1
+800D37BC	Earnings	fn_800D37BC	GM_Earnings_GetStrokeWinningsTeam	Earnings.c	427	6	low	callers:2 GameModeAlternateShot_EndGame,GameModeFo; size x1.7
+800D750C	Earnings	fn_800D750C	GM_Earnings_AwardTrophyBall	Earnings.c	1293	4	low	calls:1 Mem_cpy; size x1.4
+800D85DC	Earnings	fn_800D85DC	CharModelMgrCharacterInstance::FindGeomByName	twChar.cpp	1947	4	low	calls:1 strcmp; size x1.1
+800D8FE4	Earnings	fn_800D8FE4	GM_RecordIndividualShotStats	Earnings.c	1532	7	low	calls:1 Ter_GetSupportingWorldMaterial; callers:1 GM_PlayerTookShot; size x1.5
+800DA6D0	GameHoleContests	fn_800DA6D0	GenericActor_InitActorInstance	GenericActor.cpp	273	6	low	calls:2 sprintf,strcmp; size x0.5
+800DAE84	GameEffects	GameEffects_ResetGameEffectSettings	GameEffects_ResetGameEffectSettings	GameEffects.c	121	16	med	calls:1 EVENT_Trigger; callers:8 GM_InitForHole,GM_RestartHole,STATEFUNC_; size x1.2; same name
+800DAF74	GameEffects	fn_800DAF74	GameEffects_ResetGameEffectTimeSettings	GameEffects.c	157	6	low	callers:2 GameEffects_ResetGameEffectSettings,STAT; size x1.3
+800DB1C4	GameEffects	GameEffects_BallUpdatesThisFrame	GameEffects_BallUpdatesThisFrame	GameEffects.c	173	16	med	calls:1 GOLFERSTATE_GetCurrentState; callers:7 CamAnimDebug_UpdateCamAnimRun,CamScript_; size x1.2; same name
+800DB30C	GameEffects	fn_800DB30C	GameEffects_ScriptedGameBreakerBallHitTrigger	GameEffects.c	286	4	low	calls:1 EVENT_Trigger; size x1.1
+800DBA50	GameEffects	fn_800DBA50	GameEffects_InFlightGameBreakerTrigger	GameEffects.c	450	8	low	calls:2 DynamicCam_ChooseScriptInSequence,EVENT_Trigger; size x1.5
+800DBDA8	GameEffects	fn_800DBDA8	GameEffects_EndGameBreaker	GameEffects.c	813	9	low	flt:1; calls:1 EVENT_Trigger; callers:1 STATEFUNC_SimulateUpdate; size x1.1
+800DBF34	GameEffects	fn_800DBF34	GameEffects_RenderGameBreakerEffects	GameEffects.c	880	3	low	size x1.9; gap 1/1
+800DBFAC	GameEffects	fn_800DBFAC	GameEffects_RenderPredictedGB	GameEffects.c	921	4	low	flt:2; size x1.6
+800DC18C	GameEffects	fn_800DC18C	GameEffects_RenderScriptedGB	GameEffects.c	1144	4	low	flt:2; size x1.2
+800DC290	GameEffects	fn_800DC290	GameEffects_DrawLetterBoxes	GameEffects.c	1203	5	low	flt:1; size x1.9; gap 1/1
+800DC3A4	GameEffects	fn_800DC3A4	GameEffects_FieldOfViewChange	GameEffects.c	1246	16	med	flt:2; callers:5 CamScript_PutBackOnFairway,CamScript_Run; size x1.1
+800DC45C	GameEffects	fn_800DC45C	GameEffects_DepthOfFieldChange	GameEffects.c	1311	3	low	size x2.5; gap 1/2
+800DC464	GameEffects	fn_800DC464	GameEffects_SimulateBall	GameEffects.c	1359	6	low	callers:1 CameraScript_UpdateLandingEstimate; size x1.4; gap 2/2
+800DC498	GameEffects	fn_800DC498	GameEffects_SpinWindowDone	GameEffects.c	1373	4	low	calls:1 Mem_cpy; size x1.8
+800DC524	GameEffects	GameEffects_SetSuperSlowMo	GameEffects_SetSuperSlowMo	GameEffects.c	1457	16	med	calls:1 EVENT_Trigger; callers:4 GolfCamera_InitHeartBeatCamera,STATEFUNC; size x1.0; same name
+800DC9D4	GameEffects	fn_800DC9D4	GameEffects_Pause	GameEffects.c	1682	6	low	callers:2 STATEFUNC_MidHoleFlyByExit,STATEFUNC_Mid; size x0.9
+800DCA94	GameEffects	GameEffects_GetLetterboxHeight	GameEffects_GetLetterboxHeight	GameEffects.c	1721	4	low	flt:2; size x1.2; same name
+800DCE5C	GameManager	GM_EndOfGolferTurn	GM_EndOfGolferTurn	GameMode.c	577	29	high	calls:5 EVENT_Trigger,GM_CheckForAIConcede,GM_EndOfGolferTurn_HoleFi; callers:3 GM_DoPostShotInHoleUI,STATEFUNC_FadeToTa; size x2.4; same name
+800DCF98	GameManager	GM_EndOfGolferTurn_HoleFinished	GM_EndOfGolferTurn_HoleFinished	GameMode.c	660	15	med	calls:3 EVENT_Trigger,GM_EndOfGolferTurn_GameFinished,GM_HoleFinishe; callers:1 GM_EndOfGolferTurn; size x3.6; same name
+800DD080	GameManager	GM_EndOfGolferTurn_GameFinished	GM_EndOfGolferTurn_GameFinished	GameMode.c	757	15	med	calls:3 CameraController_SetCameraMode,EVENT_Trigger,GOLFERSTATE_Set; callers:1 GM_EndOfGolferTurn_HoleFinished; size x2.5; same name
+800DD1E0	GameManager	GM_HoleFinished_GameNotFinished	GM_HoleFinished_GameNotFinished	GameMode.c	895	7	low	calls:1 GOLFERSTATE_Set; callers:1 GM_EndOfGolferTurn_HoleFinished; size x2.1; same name
+800DD2A8	GameManager	GM_CheckForAIConcede	GM_CheckForAIConcede	GameMode.c	951	6	low	callers:1 GM_EndOfGolferTurn; size x2.7; same name; gap 1/3
+800DD3A4	GameManager	GM_BallHit	GM_BallHit	GameMode.c	998	6	low	callers:1 STATEFUNC_SwingUpdate; size x1.3; same name; gap 2/3
+800DD40C	GameManager	GM_PlayerAddStroke	GM_PlayerAddStroke	GameMode.c	1037	6	low	callers:1 GM_PlayerTookShot; size x2.3; same name; gap 3/3
+800DD904	GameManager	GM_BumpBallForObstructions	GM_BumpBallForObstructions	GameMode.c	1319	15	med	calls:3 Physics_DropBall,Physics_InitBall,Ter_CheckObjectAndHazardOb; callers:1 STATEFUNC_ShowYardageExit; size x1.6; same name
+800DDA14	GameManager	GM_PlayerTookShot	GM_PlayerTookShot	GameMode.c	1390	15	med	calls:3 GM_CheckBallForUIHints,GM_CheckForBallOOB,GM_PlayerAddStroke; callers:1 STATEFUNC_SimulateUpdate; size x1.7; same name
+800DDDC8	GameManager	GM_PlayerTakeMulligan	GM_PlayerTakeMulligan	GameMode.c	1651	14	med	calls:2 GOLFERSTATE_GetCurrentState,GOLFERSTATE_Switch; callers:2 GM_DoPostShotInHoleUI,STATEFUNC_Simulate; size x1.9; same name
+800DDFB4	GameManager	fn_800DDFB4	GM_DoPreshotAnimation	GameMode.c	1832	11	med	calls:2 Misc_RandFunc,Ter_CheckObjectAndHazardObstruction; callers:1 STATEFUNC_PreShotInit; size x0.9
+800DE180	GameManager	GM_ShowPostShotAnimation	GM_ShowPostShotAnimation	GameMode.c	1892	11	med	calls:3 Misc_RandFunc,Ter_GetEnclosingGroundData,Ter_PointInOOBNetwo; size x0.8; same name
+800DE7D8	GameManager	GM_ShowPostShotCrowdFlyby	GM_ShowPostShotCrowdFlyby	GameMode.c	2128	6	low	callers:2 GolfCamera_InitPostShotCamera,GolfCamera; size x1.4; same name
+800DE828	GameManager	GM_FlyByMode_Init	GM_FlyByMode_Init	GameMode.c	2144	4	low	calls:1 GOLFERSTATE_Push; size x1.3; same name
+800DE930	GameManager	GM_RestartHole	GM_RestartHole	GameMode.c	2250	4	low	calls:1 GameEffects_ResetGameEffectSettings; size x1.5; same name
+800DEA44	GameManager	GM_ReplaceOOBBall	GM_ReplaceOOBBall	GameMode.c	2310	15	med	calls:3 Physics_DropBall,Physics_InitBall,Ter_PointInOOBNetwork; callers:1 STATEFUNC_ShowYardageUpdate; size x1.9; same name
+800DEB5C	GameManager	fn_800DEB5C	GM_ReplaceLateralHazardBall	GameMode.c	2346	8	low	calls:2 Physics_DropBall,Physics_InitBall; size x1.6
+800DEC34	GameManager	GM_GolferConcede_Hole	GM_GolferConcede_Hole	GameMode.c	2388	7	low	calls:1 GOLFERSTATE_Switch; callers:1 GM_EndOfGolferTurn; size x2.3; same name
+800DED60	GameManager	GM_MovePlayerToBall	GM_MovePlayerToBall	GameMode.c	2458	15	med	flt:1; calls:1 Ter_GetEnclosingGroundHeight; callers:3 STATEFUNC_InitialFlyByInit,STATEFUNC_Pre; size x1.6; same name
+800DEE4C	GameManager	GM_CheckForShotChanges	GM_CheckForShotChanges	GameMode.c	2856	30	high	calls:8 BreakLine_Reset,Character_AlignShotWithTarget,EVENT_Trigger,; callers:2 STATEFUNC_GreenMorphUpdate,STATEFUNC_Swi; size x2.0; same name
+800DF280	GameManager	GM_DoPostShotInHoleUI	GM_DoPostShotInHoleUI	GameMode.c	3025	25	high	calls:4 GM_EndOfGolferTurn,GM_PlayerTakeMulligan,GOLFERSTATE_Switch,; callers:3 STATEFUNC_ConcededUpdate,STATEFUNC_InThe; size x1.6; same name
+800DF824	GameManager	GM_SimulateBallMovement	GM_SimulateBallMovement	GameMode.c	3272	27	high	flt:4; calls:4 EVENT_Trigger,GameEffects_BallUpdatesThisFrame,Misc_RandFunc; callers:1 STATEFUNC_SimulateUpdate; size x2.2; same name
+800E0334	GameManager	GM_vGetAllTimeRecordsHeld	GM_vGetAllTimeRecordsHeld	GameMode.c	3664	5	low	calls:1 strcmp; callers:1 GM_GetBonusProgress; size x0.5; same name
+800E0564	GameManager	GM_GetGameProgress	GM_GetGameProgress	GameMode.c	3692	2	low	size x0.7; same name; gap 1/1
+800E0854	GameManager	GM_GetBonusProgress	GM_GetBonusProgress	GameMode.c	3747	4	low	flt:1; calls:1 GM_vGetAllTimeRecordsHeld; size x0.6; same name
+800E0A90	GameManager	fn_800E0A90	GameManager::GetGameMode	GameManager.cpp	459	6	low	callers:2 GM_EndOfGolferTurn,GM_EndOfGolferTurn_Ho; size x1.0
+800E1904	GameRound	fn_800E1904	GM_PgaTourSim_GetBestOpponentRelativeScore	PGATourSimulation.c	2812	12	med	callers:4 GameModeDriverPGATour_GetCurrentLead,Gam; size x1.7
+800E2BA4	GameRound	fn_800E2BA4	CSpectatorBehavior::AimAtSpectatorUpdate	spectatorBehavior.cpp	326	4	low	calls:1 Misc_RandFunc; size x1.9
+800E3B28	GameUI	fn_800E3B28	GUI_Init	GameUI.c	177	6	low	callers:2 GM_InitForHole,GM_RestartHole; size x2.5
+800E3D38	GameUI	fn_800E3D38	GUI_ToggleUI	GameUI.c	298	5	low	callers:18 GM_BallHit,GM_CheckForShotChanges,GM_Gol; size x0.1
+800E415C	GameUI	fn_800E415C	GUI_IsPauseMenuOpen	GameUI.c	436	6	low	callers:2 GM_Update,GOLFERSTATE_Update; size x3.0
+800E4164	GameUI	fn_800E4164	GUI_StartPostShotUI	GameUI.c	445	9	low	callers:3 GM_CheckBallForUIHints,GM_CheckForBallOO; size x1.0
+800E41C8	GameUI	fn_800E41C8	GUI_FlagPostShotRequest	GameUI.c	455	6	low	callers:1 GM_GolferConcede_Hole; size x2.3; gap 1/2
+800E41D4	GameUI	fn_800E41D4	GUI_AdvancePostShotUI	GameUI.c	464	3	low	size x2.7; gap 2/2
+800E4204	GameUI	fn_800E4204	GUI_HideAllHelpTips	GameUI.c	475	9	low	callers:3 GM_EndOfGolferTurn,GM_PlayerTakeMulligan; size x3.1
+800E4254	GameUI	fn_800E4254	GUI_IsPostShotUIAnimating	GameUI.c	508	6	low	callers:2 GM_DoPostShotInHoleUI,STATEFUNC_ShowYard; size x1.1
+800E4364	GameUI	fn_800E4364	GUI_QueUIMessageMessage	GameUI.c	647	9	low	callers:3 GameModeAlternateShot_EndGame,GameModeBa; size x3.8
+800E45C0	GameUI	fn_800E45C0	GUI_GolfersTiedUIMessage	GameUI.c	850	12	med	callers:7 GameModeAlternateShot_GameFinished,GameM; size x2.3
+800E46B4	GameUI	fn_800E46B4	GUI_CheckMessageQue	GameUI.c	1196	6	low	callers:3 GM_DoPostShotInHoleUI,GM_Update,STATEFUN; size x0.4
+800E6C10	GameModeAlternateShot	fn_800E6C10	GameModeAlternateShot::SetupNextGolfer	GameMode_AlternateShot.cpp	84	4	low	calls:1 GOLFERSTATE_Set; size x2.6
+800E7038	GameModeAlternateShot	GameModeAlternateShot_HoleFinished	GameModeAlternateShot::HoleFinished	GameMode_AlternateShot.cpp	265	8	low	calls:2 GameModeAlternateShot_TeamBestPossibleScore,GameModeAlternat; size x1.8; same name
+800E723C	GameModeAlternateShot	GameModeAlternateShot_GameFinished	GameModeAlternateShot::GameFinished	GameMode_AlternateShot.cpp	352	8	low	calls:2 GUI_GolfersTiedUIMessage,GameModeAlternateShot_TeamMatchWins; size x1.6; same name
+800E7474	GameModeAlternateShot	GameModeAlternateShot_GoToPlayoff	GameModeAlternateShot::GoToPlayoff	GameMode_AlternateShot.cpp	422	8	low	calls:2 GUI_GolfersTiedUIMessage,GameModeAlternateShot_TeamMatchWins; size x1.1; same name
+800E7740	GameModeAlternateShot	GameModeAlternateShot_EndHole	GameModeAlternateShot::EndHole	GameMode_AlternateShot.cpp	493	3	low	size x2.2; same name; gap 1/1
+800E7828	GameModeAlternateShot	GameModeAlternateShot_EndGame	GameModeAlternateShot::EndGame	GameMode_AlternateShot.cpp	550	8	low	calls:2 GM_Earnings_AwardMoney,GameModeAlternateShot_TeamMatchWins; size x2.1; same name
+800E7CBC	GameModeBattle	GameModeBattle_EndGame	GameModeBattle::EndGame	GameMode_Battle.cpp	128	8	low	calls:2 GM_Earnings_AwardMoney,GameModeBattle_NumRemovableClubsLeft; size x1.8; same name
+800E7E64	GameModeBattle	GameModeBattle_ClubIsRequired	GameModeBattle::ClubIsRequired	GameMode_Battle.cpp	342	6	low	callers:2 GameModeBattle_NumRemovableClubsLeft,Gam; size x1.0; same name
+800E7E88	GameModeBattle	GameModeBattle_NumRemovableClubsLeft	GameModeBattle::NumRemovableClubsLeft	GameMode_Battle.cpp	370	10	med	calls:1 GameModeBattle_ClubIsRequired; callers:2 GameModeBattle_EndGame,GameModeBattle_Ga; size x1.5; same name
+800E9178	GameModeFourBall	GameModeFourBall_GetHonors	GameModeFourBall::GetHonors	GameMode_FourBall.cpp	64	8	low	calls:2 GameModeFourBall_GetPlayerTeam,GameModeFourBall_TeamDone; size x1.9; same name
+800E948C	GameModeFourBall	GameModeFourBall_HoleFinished	GameModeFourBall::HoleFinished	GameMode_FourBall.cpp	242	16	med	calls:4 GameModeFourBall_TeamBestPossibleScore,GameModeFourBall_Team; size x1.2; same name
+800E96B8	GameModeFourBall	GameModeFourBall_GameFinished	GameModeFourBall::GameFinished	GameMode_FourBall.cpp	297	8	low	calls:2 GUI_GolfersTiedUIMessage,GameModeFourBall_TeamMatchWins; size x1.6; same name
+800E98F0	GameModeFourBall	GameModeFourBall_GoToPlayoff	GameModeFourBall::GoToPlayoff	GameMode_FourBall.cpp	366	8	low	calls:2 GUI_GolfersTiedUIMessage,GameModeFourBall_TeamMatchWins; size x1.1; same name
+800E9BBC	GameModeFourBall	GameModeFourBall_EndHole	GameModeFourBall::CanPlayerHelp	GameMode_FourBall.cpp	648	7	low	calls:2 GameModeFourBall_TeamBestPossibleScore,GameModeFourBall_Team; size x0.7
+800E9CF4	GameModeFourBall	GameModeFourBall_EndGame	GameModeFourBall::GetCurrentScoreString	GameMode_FourBall.cpp	691	4	low	calls:1 GameModeFourBall_TeamMatchWins; size x1.1
+800EA548	GameModeMatch	GameModeMatch_GameFinished	GameModeMatch::GameFinished	GameMode_Match.cpp	364	7	low	calls:1 GUI_GolfersTiedUIMessage; callers:1 GameModeBattle_GameFinished; size x1.1; same name
+800EAB44	GameModeMatch	GameModeMatch_EndGame	GameModeMatch::AwardWinnings	GameMode_Match.cpp	654	4	low	calls:1 GM_Earnings_AwardMoney; size x1.5
+800EC170	GameMode5	fn_800EC170	FE_CrAP_GetRandomSliderValue	FE_CrAPUtils.c	883	4	low	calls:1 Misc_RandFunc; size x2.1
+800EDFC0	GameModeDriverPGATour	GameModeDriverPGATour_Locale_PgaTourMode_LoadPGAnFromStream	GameModeDriverPGATour::Locale_PgaTourMode_LoadPGAnFromStream	GameModeDriver_PGATour.cpp	393	4	low	calls:1 Mem_cpy; size x2.6; same name
+800EE5B4	GameModeDriverPGATour	GameModeDriverPGATour_IsPuttForLead	GameModeDriverPGATour::IsPuttForLead	GameModeDriver_PGATour.cpp	2943	8	low	calls:2 GM_PgaTourSim_GetBestOpponentPlayoffHoleScore,GM_PgaTourSim_; size x1.3; same name
+800EE778	GameModeDriverPGATour	GameModeDriverPGATour_GetCurrentLead	GameModeDriverPGATour::GetCurrentLead	GameModeDriver_PGATour.cpp	2990	8	low	calls:2 GM_PgaTourSim_GetBestOpponentPlayoffHoleScore,GM_PgaTourSim_; size x1.6; same name
+800EE810	GameModeDriverPGATour	GameModeDriverPGATour_GetPotentialLead	GameModeDriverPGATour::GetPotentialLead	GameModeDriver_PGATour.cpp	3006	8	low	calls:2 GM_PgaTourSim_GetBestOpponentPlayoffHoleScore,GM_PgaTourSim_; size x1.6; same name
+800EFAD0	GameModeDriverPGATour	fn_800EFAD0	GameModeDriverPGATour::AdvanceEvent	GameModeDriver_PGATour.cpp	3329	4	low	calls:1 GameModeDriverPGATour_GetEventOnOrAfter; size x2.9
+800F009C	GameModeDriverPGATour	fn_800F009C	Free	system.cpp	1679	3	low	size x1.4; gap 1/3
+800F00F8	GameModeDriverPGATour	GameModeDriverPGATour_GetWinnerEarningsString	SetJobScheduler	system.cpp	1688	3	low	size x1.0; gap 2/3
+800F018C	GameModeDriverPGATour	fn_800F018C	SetAssertHandler	system.cpp	1697	3	low	size x1.4; gap 3/3
+800F0E3C	GameModeDriverRTE	fn_800F0E3C	GameModeDriverRTE::UI_GetCalendarInitialDate	GameModeDriver_RealTimeEvents.cpp	75	4	low	calls:1 GameModeDriverRTE_GetCurrentDate; size x2.1
+800F0EB4	GameModeDriverRTE	fn_800F0EB4	GameModeDriverRTE::GetEventData	GameModeDriver_RealTimeEvents.cpp	258	4	low	calls:1 GameModeDriverRTE_GetCalData; size x1.8
+800F0FBC	GameModeDriverRTE	fn_800F0FBC	GameModeDriverRTE::UI_GetEventIconIndexInDetails	GameModeDriver_RealTimeEvents.cpp	1539	4	low	calls:1 GameModeDriverRTE_GetCalData; size x1.5
+800F1008	GameModeDriverRTE	fn_800F1008	GM_RealtimeMode_GetEventInfoByDate	GameModeDriver_RealTimeEvents.cpp	1691	4	low	calls:1 GameModeDriverRTE_GetCalData; size x2.4
+800F15AC	GameModeReplay	GameModeReplay_SetupNextGolfer	GameModeReplay::SetupNextGolfer	GameMode_Replay.cpp	83	16	med	calls:4 GOLFERSTATE_Switch,Mem_cpy,Physics_DropBall,Physics_InitBall; size x1.6; same name
+800F81FC	GameMode2	fn_800F81FC	GameModeSkins::SetupNextGolfer	GameMode_Skins.cpp	84	4	low	calls:1 GOLFERSTATE_Set; size x2.0
+800F9100	GameMode2	GameModeSkins_EndGame	GameModeSkins::EndGame	GameMode_Skins.cpp	583	4	low	calls:1 GM_Earnings_AwardMoney; size x1.7; same name
+800FCCF0	GameMode8	fn_800FCCF0	STATEFUNC_ShowYardageUpdate	stateFunc.c	4478	4	low	calls:1 GOLFERSTATE_Switch; size x1.3
+800FD8D0	GameMode8	fn_800FD8D0	GameModeSkillZoneTarget::UpdateDisplayInfoNormal	GameMode_SkillZoneTarget.cpp	125	8	low	calls:2 sprintf,strcpy; size x1.9
+800FE3FC	GameModeStableford	GameModeStableford_GetHonors	GameModeStableford::GetHonors	GameMode_Stableford.cpp	193	4	low	calls:1 GameModeStableford_PlayerDoneHole; size x1.4; same name
+800FE7EC	GameModeStableford	GameModeStableford_HoleFinished	GameModeStableford::HoleFinished	GameMode_Stableford.cpp	353	4	low	calls:1 GameModeStableford_PlayerDoneHole; size x1.2; same name
+800FF7DC	GameModeStroke	GameModeStroke_SetupNextGolfer	GameModeStroke::SetupNextGolfer	GameMode_Stroke.cpp	87	4	low	calls:1 GOLFERSTATE_Set; size x1.4; same name
+800FFDB8	GameModeStroke	GameModeStroke_EndGame	GameModeStroke::AwardWinnings	GameMode_Stroke.cpp	468	4	low	calls:1 GM_Earnings_AwardMoney; size x1.6
+801037F8	FE_CrAPDB	fn_801037F8	FE_CrAP_InitModule	FE_CrAPDB.c	639	5	low	file:fe_crapdb.c; callers:1 GO_vInitFE; size x2.8
+80104398	FE_CrAPDB	FE_CrAP_TurnOnAsset	TWCharResMan::CalcWorstCaseBuffers	FE_twCharResMan.cpp	4051	4	low	calls:1 strcmp; size x1.0
+80104F68	FE_CrAPDB	fn_80104F68	FE_CrAP_GetTriggerAnims	FE_CrAPDB.c	909	6	low	callers:2 FE_CrAP_TurnOnAsset,FE_CrAP_TurnOnPart; size x1.4
+8010645C	FE_CrAPDB	fn_8010645C	FE_CrAP_GetColorNameFromID	FE_CrAPDB.c	3546	10	med	str:1 'NONE'; size x3.1
+801070F4	FE_CrAPDB	fn_801070F4	GenericActor_AddTextureSubstitution	GenericActor.cpp	1133	4	low	calls:1 strcpy; size x2.1
+80109514	FE_CrAPMessages	fn_80109514	GM_vCRAPCreatingLogo	FE_CrAPMessages.c	641	4	low	calls:1 memset; size x1.4
+8010ADA4	LLDynTex	fn_8010ADA4	AptActionInterpreter::getContext	AptActionInterpreter.cpp	536	4	low	calls:1 memcpy; size x1.8
+8010B0C0	LLDynTex	fn_8010B0C0	CharModelMgrCharacterInstance::Init	twChar.cpp	1482	4	low	calls:1 memset; size x1.0
+8010B1D4	LLDynTex	fn_8010B1D4	AptActionInterpreter::getName	AptActionInterpreter.cpp	1131	4	low	calls:1 memcpy; size x3.2
+8010B2A8	LLDynTex	fn_8010B2A8	CharModelMgrCharacterInstance::UncullMesh	twChar.cpp	2105	4	low	calls:1 memcpy; size x1.6
+8010E890	FE_PGATourMessages	fn_8010E890	GameModeSkillZoneTarget::UpdateDisplayInfoTrainingChallenge	GameMode_SkillZoneTarget.cpp	173	8	low	calls:2 sprintf,strcpy; size x1.5
+8010FAF4	FE_LogoDesign	fn_8010FAF4	FE_LogoDesign_SetCurUserLogoData	FE_LogoDesign.c	380	4	low	calls:1 Mem_cpy; size x1.8
+8010FF9C	DiscCheck	fn_8010FF9C	ExecuteLine	tiger_module_lua.cpp	296	4	low	calls:1 strlen; size x1.1
+801102AC	DiscCheck	fn_801102AC	CharTintDefDB::LoadFromStream	twChar.cpp	256	4	low	calls:1 memcpy; size x1.7
+801104AC	hwsBurn	fn_801104AC	Create	RNATexturePlat.cpp	210	4	low	calls:1 memset; size x1.1
+801111E8	hwsBurn	fn_801111E8	Create	RNATexturePlat.cpp	335	4	low	calls:1 memcpy; size x1.8
+80112B34	hwsOverride_Gc	fn_80112B34	Destroy	RNATexturePlat.cpp	416	4	low	calls:1 memset; size x1.3
+80117600	PGATourSimulation	GetEntrantMCPtr	GetEntrantMCPtr	PGATourSimulation.c	354	8	low	callers:3 GM_PgaTourSim_AdvanceField,GM_PgaTourSim; size x5.3; same name
+80117628	PGATourSimulation	GetEntrantNonMCPtr	GetEntrantNonMCPtr	PGATourSimulation.c	369	10	low	callers:4 GM_PgaTourSim_AdvanceField,GM_PgaTourSim; size x7.2; same name
+801178C8	PGATourSimulation	fn_801178C8	GM_PgaTourSim_SimRound	PGATourSimulation.c	599	9	low	calls:3 GM_PgaTourSim_SimAdjustEntrantScores,GetEntrantNonMCPtr,Misc; size x8.2
+80117BF4	PGATourSimulation	fn_80117BF4	GM_PgaTourSim_PassEntrant	PGATourSimulation.c	1146	4	low	calls:1 GetEntrantMCPtr; size x1.8
+80117C50	PGATourSimulation	fn_80117C50	GM_PgaTourSim_CutEntrant	PGATourSimulation.c	1166	4	low	calls:1 GetEntrantMCPtr; size x1.7
+80117CB8	PGATourSimulation	fn_80117CB8	CommitEntrantRoundScore	PGATourSimulation.c	1186	8	low	calls:2 GetEntrantMCPtr,GetEntrantNonMCPtr; size x1.8
+80117E98	PGATourSimulation	fn_80117E98	GM_PgaTourSim_SimTournamentWinner	PGATourSimulation.c	1307	12	med	calls:3 CalcScoreRankingsIfDirty,GetEntrantMCPtr,Misc_RandFunc; size x2.3
+801180C4	PGATourSimulation	fn_801180C4	GM_PgaTourSim_CheckEndOfTournamentAward	PGATourSimulation.c	1418	4	low	calls:1 Misc_RandFunc; size x1.2
+80118664	PGATourSimulation	fn_80118664	GM_PgaTourSim_GetNumEntrants	PGATourSimulation.c	1674	9	low	callers:3 GM_PgaTourSim_AdvanceField,GM_PgaTourSim; size x3.8
+80118710	PGATourSimulation	GM_PgaTourSim_GetStatValString	GM_PgaTourSim_GetStatValString	PGATourSimulation.c	1723	6	low	callers:2 UIStatsRankings_GetIndStatsRow,UIStatsRa; size x2.1; same name
+80118E68	PGATourSimulation	GM_PgaTourSim_GetStatRankFromGolferID	GM_PgaTourSim_GetStatRankFromGolferID	PGATourSimulation.c	2443	10	med	calls:1 CalcAllStatsIfDirty; callers:2 UIStatsRankings_GetIndStatsRow,UIStatsRa; size x2.4; same name
+80118EBC	PGATourSimulation	GM_PgaTourSim_GetStatValueFromGolferID	GM_PgaTourSim_GetStatValueFromGolferID	PGATourSimulation.c	2459	10	med	calls:1 CalcAllStatsIfDirty; callers:2 UIStatsRankings_GetIndStatsRow,UIStatsRa; size x1.8; same name
+80118F10	PGATourSimulation	GM_PgaTourSim_GetGolferIDFromStatRow	GM_PgaTourSim_GetGolferIDFromStatRow	PGATourSimulation.c	2469	7	low	calls:1 CalcAllStatsIfDirty; callers:1 UIStatsRankings_GetIndStatsRow; size x1.9; same name
+80118F60	PGATourSimulation	fn_80118F60	GM_PgaTourSim_IsLeaderForStat	PGATourSimulation.c	2480	4	low	calls:1 CalcAllStatsIfDirty; size x1.8
+8011908C	PGATourSimulation	fn_8011908C	GM_PgaTourSim_IsEntrantUser	PGATourSimulation.c	2561	7	low	calls:1 GetEntrantMCPtr; callers:1 GM_PgaTourSim_SimTournamentWinner; size x2.0
+801190D8	PGATourSimulation	fn_801190D8	GM_PgaTourSim_GetScoreRankFromEntrantID	PGATourSimulation.c	2602	4	low	calls:1 CalcScoreRankingsIfDirty; size x2.1
+80119118	PGATourSimulation	fn_80119118	GM_PgaTourSim_GetGolferIDFromEntrantID	PGATourSimulation.c	2612	6	low	calls:1 GetEntrantMCPtr; callers:1 GameModeDriverPGATour_GetCurrentEventLea; size x4.2
+8011913C	PGATourSimulation	fn_8011913C	GetLastHoleToScore	PGATourSimulation.c	2628	4	low	calls:1 GetEntrantNonMCPtr; size x1.3
+801191D0	PGATourSimulation	fn_801191D0	GM_PgaTourSim_GetTotalScoreFromEntrantID	PGATourSimulation.c	2662	8	low	calls:2 GetEntrantMCPtr,GetEntrantNonMCPtr; size x1.7
+8011937C	PGATourSimulation	fn_8011937C	GM_PgaTourSim_GetRelativeScoreFromEntrantID	PGATourSimulation.c	2721	7	low	calls:1 GetEntrantNonMCPtr; callers:1 GM_PgaTourSim_GetBestOpponentRelativeSco; size x1.9
+80119638	PGATourSimulation	fn_80119638	GM_PgaTourSim_GetRoundScoreFromEntrantID	PGATourSimulation.c	2836	7	low	calls:2 GetEntrantMCPtr,GetEntrantNonMCPtr; size x0.8
+801197A4	PGATourSimulation	fn_801197A4	GM_PgaTourSim_GetWasCutFromEntrantID	PGATourSimulation.c	2874	4	low	calls:1 GetEntrantMCPtr; size x2.9
+801197CC	PGATourSimulation	fn_801197CC	GM_PgaTourSim_GetEntrantIDFromScoreRow	PGATourSimulation.c	2892	7	low	calls:1 CalcScoreRankingsIfDirty; callers:1 GameModeDriverPGATour_GetCurrentEventLea; size x2.8
+8011989C	PGATourSimulation	fn_8011989C	GM_PgaTourSim_SetUserEntrantHoleStrokes	PGATourSimulation.c	2940	6	low	calls:1 GetEntrantNonMCPtr; callers:1 GM_CheckForBallOOB; size x4.3
+801198F8	PGATourSimulation	fn_801198F8	GM_PgaTourSim_GetEntrantHoleStrokes	PGATourSimulation.c	2974	4	low	calls:1 GetEntrantNonMCPtr; size x2.0
+80119934	PGATourSimulation	fn_80119934	GM_PgaTourSim_AdvanceField	PGATourSimulation.c	3036	12	med	calls:3 GetEntrantMCPtr,GetEntrantNonMCPtr,Misc_RandFunc; size x1.8
+80119A04	PGATourSimulation	fn_80119A04	GM_PgaTourSim_GetCurrentHoleFromEntrantID	PGATourSimulation.c	3080	4	low	calls:1 GetEntrantNonMCPtr; size x2.4
+80119A2C	PGATourSimulation	fn_80119A2C	GM_PgaTourSim_GetLeaderboardWinningsFromEntrantID	PGATourSimulation.c	3094	4	low	calls:1 GetEntrantMCPtr; size x3.2
+80119B54	PGATourSimulation	fn_80119B54	GM_PgaTourSim_SimEntrantScoresOnHole	PGATourSimulation.c	3187	8	low	calls:2 GetEntrantMCPtr,GetEntrantNonMCPtr; size x2.0
+80119D78	PGATourSimulation	TotalEntrantHoleScores	TotalEntrantHoleScores	PGATourSimulation.c	3268	5	low	calls:1 GetEntrantNonMCPtr; callers:1 GM_PgaTourSim_SimAdjustEntrantScores; size x0.5; same name
+80119E28	PGATourSimulation	fn_80119E28	GM_PgaTourSim_SimAdjustEntrantScores	PGATourSimulation.c	3527	22	high	flt:3; calls:4 GetEntrantMCPtr,GetEntrantNonMCPtr,Misc_RandFunc,TotalEntran; size x1.6
+8011A074	PGATourSimulation	fn_8011A074	GM_PgaTourSim_SimStats	PGATourSimulation.c	3919	8	low	calls:2 GetEntrantMCPtr,GetEntrantNonMCPtr; size x1.9
+8011A5F8	PGATourSimulation	fn_8011A5F8	GM_PgaTourSim_InitPlayoff	PGATourSimulation.c	3947	7	low	calls:1 GetEntrantNonMCPtr; callers:1 GameModeDriverPGATour_GameFinished; size x2.6
+8011A684	PGATourSimulation	fn_8011A684	GM_PgaTourSim_GetNumPlayoffEntrants	PGATourSimulation.c	3980	10	med	calls:1 GetEntrantNonMCPtr; callers:2 GM_PgaTourSim_SimTournamentWinner,GameMo; size x2.1
+8011A6F4	PGATourSimulation	fn_8011A6F4	GM_PgaTourSim_EntrantIsInPlayoff	PGATourSimulation.c	4029	10	med	calls:1 GetEntrantNonMCPtr; callers:2 GM_PgaTourSim_SimTournamentWinner,GameMo; size x2.5
+8011A720	PGATourSimulation	fn_8011A720	GM_PgaTourSim_UpdatePlayoffs	PGATourSimulation.c	4069	6	low	calls:1 GetEntrantNonMCPtr; callers:1 GameModeDriverPGATour_GameFinished; size x5.3
+8011A7C8	PGATourSimulation	fn_8011A7C8	GM_PgaTourSim_GetBestOpponentPlayoffHoleScore	PGATourSimulation.c	4163	13	med	calls:1 GetEntrantNonMCPtr; callers:3 GameModeDriverPGATour_GetCurrentLead,Gam; size x2.8
+8011A85C	PGATourSimulation	CalcAllStatsIfDirty	CalcAllStatsIfDirty	PGATourSimulation.c	4770	5	low	calls:1 CalcAllStats; callers:3 GM_PgaTourSim_GetGolferIDFromStatRow,GM_; size x41.4; same name
+8011A890	PGATourSimulation	fn_8011A890	CalcScoreRankings	PGATourSimulation.c	4781	7	low	calls:1 qsort; callers:1 CalcScoreRankingsIfDirty; size x1.3
+8011AAC0	PGATourSimulation	fn_8011AAC0	CalcScoreRankingsIfDirty	PGATourSimulation.c	4923	4	low	calls:1 qsort; size x2.7
+8011B978	PGATourSimulation	fn_8011B978	SplitWinnings	PGATourSimulation.c	5429	4	low	calls:1 GetEntrantMCPtr; size x2.4
+8011BAD4	PGATourSimulation	fn_8011BAD4	GM_PgaTourSim_DistributeWinnings	PGATourSimulation.c	5463	7	low	calls:1 CalcScoreRankingsIfDirty; callers:1 GM_PgaTourSim_SimTournamentWinner; size x1.8
+8011BDF8	PGATourSimulation	fn_8011BDF8	TournamentRankIncreasing	PGATourSimulation.c	5613	8	low	calls:2 GetEntrantMCPtr,strcmp; size x1.4
+8011BF74	PGATourSimulation	fn_8011BF74	TournamentRankIncreasingForCutEntrants	PGATourSimulation.c	5674	8	low	calls:2 GetEntrantMCPtr,strcmp; size x2.3
+8011CF64	fe_stats	fn_8011CF64	UIStatsRankings_GetRow	FE_Stats.c	216	16	med	calls:4 GM_PgaTourSim_GetStatRankFromGolferID,GM_PgaTourSim_GetStatV; size x1.7
+8011D0A8	fe_stats	fn_8011D0A8	UIStatsRankings_GetIndStatsRow	FE_Stats.c	270	24	med	calls:6 GM_PgaTourSim_GetGolferIDFromStatRow,GM_PgaTourSim_GetStatRa; size x1.5
+8011E0AC	llrtclock	RTClock_GetDateTimeString	RTClock_GetDateTimeString	LLRTClock.c	18	10	med	str:1 '%d/%d/%d %d:%02d %s'; size x1.4; same name
+80121488	GameMode4Menu	fn_80121488	TWCharResMan::FindInResTexList	FE_twCharResMan.cpp	1891	8	low	calls:2 strcmp,strlen; size x1.9
+8012168C	GameMode4Menu	fn_8012168C	TWCharResMan::FreeTextureCache	FE_twCharResMan.cpp	2598	4	low	calls:1 memset; size x2.9
+80122FD8	gbacable	fn_80122FD8	newNumMicroMeshesForMesh	twChar.cpp	2235	4	low	calls:1 memcmp; size x1.4
+8012645C	GameMode22	fn_8012645C	GameModeSkillZoneTarget::EndGolferTurn	GameMode_SkillZoneTarget.cpp	276	4	low	calls:1 Physics_InitBall; size x2.3
+80127614	SkinBurn	fn_80127614	UIGameFace::CacheExistingLogo	UI_GameFace.cpp	4178	4	low	calls:1 memcpy; size x1.2
+80129E88	EASBStorage	fn_80129E88	TWCharResMan_InitModule	FE_twCharResMan.cpp	129	4	low	calls:1 memset; size x1.2
+8012B27C	EASBStorage	fn_8012B27C	TWCharResMan::FreeMeshResource	FE_twCharResMan.cpp	1300	4	low	calls:1 memset; size x1.3
+8012B4C0	EASBStorage	fn_8012B4C0	TWCharResMan::FreeCharacters	FE_twCharResMan.cpp	2629	4	low	calls:1 memset; size x1.8
+8012BA58	EASBStorage	fn_8012BA58	ProShopAssetPreviewManager::SetupGlovesCamera	FE_ProShopPreviews.cpp	891	4	low	calls:1 memset; size x2.8
+8012BBD8	EASBStorage	fn_8012BBD8	ProShopAssetPreviewManager::SetupClubHeadsCamera	FE_ProShopPreviews.cpp	967	4	low	calls:1 memset; size x3.0
+8012BD0C	EASBStorage	fn_8012BD0C	ProShopAssetPreviewManager::SetupShaftsCamera	FE_ProShopPreviews.cpp	1035	4	low	calls:1 memset; size x2.6
+8012C03C	EASBStorage	fn_8012C03C	GFLogoFlowProceed	UI_GameFace.cpp	4152	8	low	calls:2 memcpy,memset; size x1.2
+80168FC8	UISApi	fn_80168FC8	TWCharResMan::BurnCharacters	FE_twCharResMan.cpp	2713	4	low	calls:1 memmove; size x1.7
+80169590	UISApi	fn_80169590	TWCharResMan::CacheAllMeshes	FE_twCharResMan.cpp	3832	4	low	calls:1 memset; size x1.5
+8016B6BC	UISScreen	fn_8016B6BC	AptStreamSupport::UnloadMovie	uiAptStreamSupport.cpp	1299	3	low	size x2.3; gap 1/2
+8016B808	UISScreen	fn_8016B808	AptStreamSupport::StartPreLoadNow	uiAptStreamSupport.cpp	1326	3	low	size x2.6; gap 2/2
+8016B844	UISScreen	fn_8016B844	CharModelMgrCharacterInstance::BindTexturesToMesh	twChar.cpp	3398	4	low	calls:1 strlen; size x1.5
+8016FE1C	Common/SharedFileIO/SharedFileIO	SFIOCreateStart	Run	tiger_module_lua.cpp	324	4	low	calls:1 strlen; size x1.2
+80170300	Common/SharedFileIO/SharedFileIO	SFIOEnd	l_realloc	tiger_module_lua.cpp	698	4	low	calls:1 memcpy; size x1.9
+8017060C	Common/SharedFileIO/SharedFileIO	SFIOWrite	AptActionInterpreter::getName2	AptActionInterpreter.cpp	1144	4	low	calls:1 memcpy; size x2.8
+801715B8	NGC/SharedFileIO/llSharedFileIO	fn_801715B8	TWCharResMan::UpdateBlends	FE_twCharResMan.cpp	786	4	low	calls:2 memset,strlen; size x11.0
+80171744	NGC/SharedFileIO/llSharedFileIO	fn_80171744	TWCharResMan::PostLoadProcess	FE_twCharResMan.cpp	1471	10	low	calls:3 memcpy,memset,strlen; size x6.7
+80171ADC	NGC/SharedFileIO/llSharedFileIO	fn_80171ADC	CharModelMgrCharacterInstance::CullMesh	twChar.cpp	2082	6	low	calls:2 memcpy,strlen; size x0.5
+80171CB8	NGC/SharedFileIO/llSharedFileIO	fn_80171CB8	TWCharResMan::MakeWorstCaseCharacter	FE_twCharResMan.cpp	4109	10	low	calls:3 memcpy,memset,strlen; size x6.9
+80173448	Common/TagFile/TagFile	TagFile_GetHeader	ImportRawFormat	Table.cpp	2226	8	low	str:1 'NULL != pBuffer'; size x6.2
+80173530	Common/TagFile/TagFile	TagFile_SetHeader	LevelInit	tiger_module_lua.cpp	142	4	low	calls:1 memcpy; size x2.0
+80173E34	Common/TagFile/TagFile	TagFile_MapChecksum	UIGameFace::NotifyTattooUpdate	UI_GameFace.cpp	1943	8	low	calls:2 memcpy,memset; size x1.4

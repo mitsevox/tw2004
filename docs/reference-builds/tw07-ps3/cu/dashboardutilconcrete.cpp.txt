@@ -1,0 +1,16 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/ps3/dashboardutilconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   75  005BCA08     3C  void DashBoardUtilConcrete(const struct <anon>* this)
+  100  005C5660      C  void ~DashBoardUtilConcrete(const struct <anon>* this)
+  123  005C56B0      8  float32_t GetLocalUserRep(const struct <anon>* this)
+  146  005BBE10      8  bool IsUserGuest(uint32_t uUserIndex)
+  169  005C0F0C      8  enum MembershipLevel GetMembershipLevel(uint32_t uUserIndex)
+  193  005C56B8     B4  enum HardwareRegion GetHardwareRegion()
+                         local  enum HardwareRegion ThisUserRegion
+                         local  int32_t iRegion
+                         local  int32_t iResult
+  257  0060D928     DC  struct Operation* RequestUserRep(const struct <anon>* this, const char8_t* szName, struct UserGetReputationCallback* pCallback)
+                         local  struct <anon>* pFacadeConcrete
+                         local  struct UserConcrete* pUserConcrete

@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/weboffer.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    7  005E2EDC     34  void WebOffer(const struct <anon>* this)
+   11  0060ECD8     68  struct <anon>* CreateInstance()
+                         inlines  operator new
+   16  005E4B88      C  void ~WebOffer(const struct <anon>* this)

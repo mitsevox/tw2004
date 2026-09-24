@@ -1,0 +1,21 @@
+audit-rec-AD: GoPostFx (25: per-view screen effects) + hlaudemitter (25: the 256-slot sound instance pool) + GameMode15 (24: the letters target game) = 74 functions, all three units Matching.
+- Names: 0 kept, 0 renamed, 0 T3, 1 demoted, 73 unnamed (the lanes' agreed guesses are in the ledger notes). namecheck: 1 row, 0 errors, 0 flags.
+- Demoted: PostFx_CopyScreenToBuffer -> fn_80037DD8. The TW06 name (strong, but anchored only on the bare "GoPostFx.c" string) says "copy", and nothing is copied: it allocates the buffer lbl_80281D80 and clears the effects at mode start. The copy is fn_800392D0 (GXCopyTex, from LLDisp_Gc). Guess for later: PostFx_Init.
+- Comments: 39 ok, 26 none, 9 fixed (12 edits: GoPostFx.c 3, engine.h 1, hwsRender_Gc.c 1, hlaudemitter.c 2, GameMode15.c 5), 0 stripped. Fake-match, port, EA bug and (our name)/(EA's name) tags untouched.
+- Worst: fn_800F4B14 said "1 for the leader's target". The code does the reverse: 0 for the leader's target, 1 for every other target (the GoDynObj marker model). The demoted TW06 name had also misled engine.h into saying ScreenCopy is "filled by" fn_80037DD8.
+- Also fixed: fn_800F48C4 "End the round now (from the pause menu)" (it is a UI command that forfeits the shot, same fix as rec-AA's mode 14 twin); fn_800F4584 "Hole start" (it runs for every golfer); lbl_8028237C/7D; hlaudemitter's block comment (fn_800ADA08 takes a sound number, not an entry) and its header ("check the instance exists": only id 0xFF is checked); GoPostFx's stale "not decompiled" status note.
+- Checked by simulation (renames, then comments, in memory): each old text occurs exactly once, no new line is over 100 columns, and no touched file uses __LINE__.
+- Unclear rules: (1) the TW06 name here is contradicted only on its verb. I used D (lane 2 contradicts it) rather than a T3 guess. (2) A wrong location tag on the prototype in another unit's .c (hwsRender_Gc.c "// gomainloop.c") was fixed on the function's row. (3) GameMode15's global comments go on fn_800F39F4's row (nearest function).
+
+Findings (no code changes):
+1. fn_800F48C4 hard-codes 2 players (confirmed). With a leader, the letter goes to player 1 when the leader is 0, else to player 0. It does not go to the current golfer (lbl_80282278). The rest of the mode handles up to gNumPlayersSetUp players (fn_800F3C7C, fn_800F4784). So with 3+ players, the wrong player can get the letter (e.g. leader 2, golfer 1: player 0 gets it).
+2. fn_800F4950 calls EASBio_SetCurrentGameWon(1) unconditionally (confirmed). Every finished mode-15 game is recorded as won, whoever is left. Mode 14's fn_800F3860 calls it only in the winner's branch.
+3. The guard in fn_800382E0 is dead (confirmed). fn_8003944C (unsorted/sweep_8003944C.c, 8 bytes starting exactly at GoPostFx's .text end) always returns 0, so the three effect passes always run. fn_8003944C probably belongs to GoPostFx (maybe a stripped debug switch).
+4. fn_800AD280 calls fn_800A7C30(u8 nEntry, s16 nSound) through a 7-argument cast (confirmed; it already has a `port:` note). Left for the type pass.
+5. Latent bug (from reading the code; not tested in Dolphin): init hands out id 255, but 0xFF means "none". When the 256th instance is taken, fn_800AD280 returns 0xFF, which callers read as a failure. fn_800AD450 and fn_800AD0C4 can never free it, so it stays active and fn_800AD1C8 flushes it every frame. This only happens with 256 live instances.
+6. fn_800AD450 has no in-use check (L2, confirmed): freeing an id twice corrupts the active and free lists. Callers reset their stored id to 0xFF.
+7. GoPostFx oddities (L2, confirmed in the source):
+   - fn_80038054's sound is always for player 0, whatever the view.
+   - fn_800389C0 copies the whole screen once per enabled blur view.
+   - fn_80038A90's fMaxDist uses the 0..1 screen corners while the centre is in view space, so it is exact only for full-screen views.
+   - TYPE: lbl_801D4F80 is set up as 256x128 format 4, but fn_8002A164 fills that buffer at 256x224 format 0x27.

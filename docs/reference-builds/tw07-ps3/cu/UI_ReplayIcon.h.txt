@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_ReplayIcon.h
+// compiled in: apt_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   17  001009A0      C  uint32 UIReplayIcon::GetSignature(const const struct UIReplayIcon* this)
+   19  001009AC     1C  enum AptThreadReturnValue UIReplayIcon::ReplayShowOrHideWaitThread_func(struct IAptSubscriberBase* subs)

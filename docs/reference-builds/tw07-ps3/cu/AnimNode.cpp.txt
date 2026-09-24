@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/Internal/AnimNode.cpp
+// compiled in: AnimNode.cpp
+// 5 functions, source order. line | PS3 address | size
+
+    9  005AAF3C     30  struct Frame* TreeEvaluate(const const struct <anon>* this, struct Character* character, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float frameRateScale)
+   14  005AAF6C     30  struct Frame* RateAdjustedTreeEvaluate(const const struct <anon>* this, struct Character* character, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float scaleFactor, float frameRateScale)
+   19  005AAF9C     30  struct Frame* RateAdjustedTreeEvaluateInt(const const struct <anon>* this, struct Character* character, struct InstVars* vars, float frameNum, float prevFrameNum, int flags, float scaleFactor, float frameRateScale)
+   25  005AAFCC     30  float TreeEvaluateNumFrames(const const struct <anon>* this, struct Character* character, struct InstVars* vars)
+   30  005AAFFC     30  void TreeEvaluateVariables(const const struct <anon>* this, struct Character* character, struct InstVars* vars)

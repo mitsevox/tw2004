@@ -1,0 +1,7 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/spatkey.cpp
+// compiled in: spatkey.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    6  006CA0CC     B4  int iSNDpatchkey(int chan, int* psetchan)
+                         local  struct CHANPUB* pchan
+                         local  int patchkey

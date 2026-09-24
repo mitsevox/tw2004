@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_SpinnaOption.h
+// compiled in: apt_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   17  00125CB0     B8  void UISpinnaOption::~UISpinnaOption(const struct UISpinnaOption* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   27  001009E4      C  uint32 UISpinnaOption::GetSignature(const const struct UISpinnaOption* this)
+   32  001009F0     24  void UISpinnaOption::RegainFocus(const struct UISpinnaOption* this, uint32 )
+   33  00100A14     24  void UISpinnaOption::LooseFocus(const struct UISpinnaOption* this, uint32 )
+   40  00100A38     3C  void UISpinnaOption::Show(const struct UISpinnaOption* this)

@@ -1,0 +1,14 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_CSP.h
+// compiled in: apt_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   55  00100618      C  uint32 UICSPScreen::GetSignature(const const struct UICSPScreen* this)
+   58  0010062C      C  struct IExternArray* UICSPScreen::GetExternArray(const struct UICSPScreen* this)
+   71  00100638     20  enum ePriority UICSPScreen::GetControllerStackPriority(const struct UICSPScreen* this)
+   73  00100658     24  void UICSPScreen::RegainFocus(const struct UICSPScreen* this, uint32 )
+   74  0010067C     24  void UICSPScreen::LooseFocus(const struct UICSPScreen* this, uint32 )
+   77    inline-only   void UICSPScreen::ResetContext(const struct UICSPScreen* this)
+  105  001006A0      4  void UICSPScreen::Show(const struct UICSPScreen* this)
+  117    inline-only   void UICSP::Init(const struct UICSP* this)
+  118    inline-only   void UICSP::Close(const struct UICSP* this)
+  154    inline-only   bool UICSP::NeedToShowCSP(const struct UICSP* this)

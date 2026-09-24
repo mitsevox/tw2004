@@ -1,0 +1,124 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameModeDriver_Facility.cpp
+// compiled in: golf_unity.cpp
+// 41 functions, source order. line | PS3 address | size
+
+   31  00256450     74  void GameModeDriverFacility::GameModeDriverFacility(const struct GameModeDriverFacility* this)
+                         inlines  GameModeDriverFacility::SetFirstTimeFlag, GameModeDriverFacility::SetForce2p
+   51  0020D0FC     18  void GameModeDriverFacility::~GameModeDriverFacility(const struct GameModeDriverFacility* this)
+   58  0020D178     44  void GameModeDriverFacility::RegisterStreamClients()
+   69  0020D1BC     2C  void GameModeDriverFacility::UnregisterStreamClients()
+   76  002442E0      8  void GameModeDriverFacility::LoadFACTfromStream_Localize(struct TStreamData* pStreamData)
+   87  00242FF8    188  void GameModeDriverFacility::Locale_DriverFacility_LoadFACTFromStream(struct TStreamData* pStreamData)
+                         local  const char[41] __FUNCTION__
+                         local  void* dataPtr
+                         local  uint32 size
+                         local  void* pData
+                         inlines  TagValuePair, operator+
+  112  0020D1E8     1C  bool GameModeDriverFacility::QueryInterface(const struct GameModeDriverFacility* this, enum GM_DriverType_t typeID, const void*& ptr)
+                         local  bool bRet
+  131  0020D204    174  void GameModeDriverFacility::ScenarioMarkerActor(const struct GameModeDriverFacility* this, TBasicParamPtr pData)
+                         local  TScenarioMarkerParam* pParam
+                         local  int16 scenarioID
+                         local  int32 markerID
+                         local  const struct EraScenarioMarker_t& pMarker
+  155  001F9ED4     6C  bool GameModeDriverFacility::GetScenarioMarkerPosition(const const struct GameModeDriverFacility* this, int32 scenarioID, int32 markerID, const vec4flt& out)
+  172  0020D378    108  void GameModeDriverFacility::BullseyeMarkerActor(const struct GameModeDriverFacility* this, TBasicParamPtr pData)
+                         local  TSkillZoneTargetParam* pParam
+                         local  int32 id
+  198  00202108      4  void GameModeDriverFacility::DisplayGameModeInfo(const struct GameModeDriverFacility* this)
+  202  0026CF78     84  char* GameModeDriverFacility::GetFacilityModeString(const struct GameModeDriverFacility* this)
+                         local  int facilityEventIndex
+  232  0020D480     AC  void GameModeDriverFacility::SelectEvent(const struct GameModeDriverFacility* this, int eventID)
+                         inlines  GameModeDriverFacility::SetFacilityMiniGameIndex
+  240  00291784    128  bool GameModeDriverFacility::IsReloadedNeededForFacilityGame(const struct GameModeDriverFacility* this)
+                         local  enum Golfer_t loadedPlayer1
+                         local  enum Golfer_t loadedPlayer2
+                         local  enum Golfer_t selectedPlayer1
+                         local  enum Golfer_t selectedPlayer2
+                         local  int selectedPlayer1Shirt
+                         local  int selectedPlayer2Shirt
+                         local  bool bNeedReloadBecauseOfChangedProfile
+                         inlines  cGAME_GLOBALS::GetCharacterStyleShirt
+  266  003377AC    274  void GameModeDriverFacility::StartEvent(const struct GameModeDriverFacility* this)
+                         local  enum Golfer_t loadedPlayer1
+                         local  enum Golfer_t loadedPlayer2
+                         local  enum Golfer_t selectedPlayer1
+                         local  enum Golfer_t selectedPlayer2
+                         local  int selectedPlayer1Shirt
+                         local  int selectedPlayer2Shirt
+                         local  bool bNeedReloadBecauseOfChangedProfile
+                         local  enum Golfer_t secondCharacter
+                         inlines  GameModeDriverFacility::SetForce2p, UIWidget::SetForceReLoadOfFacility, cGAME_GLOBALS::GetCharacterStyleShirt
+  329  00337760     4C  void GameModeDriverFacility::PostHoleLoadInit(const struct GameModeDriverFacility* this)
+  359  003375C4    19C  void GameModeDriverFacility::ActuallyStartEvent(const struct GameModeDriverFacility* this)
+                         inlines  GameModeDriverFacility::SetForce2p
+  409  002644A0     D4  int GameModeDriverFacility::DetermineMiniGameIndexFromGameMode(const struct GameModeDriverFacility* this)
+                         local  enum GM_ModeType_t gamemode
+                         local  int i
+                         local  struct FacilityMiniGameInfo_t* pGameInfo
+                         inlines  GameModeDriverFacility::FacilityGetGameMode
+  434  00264574     5C  void GameModeDriverFacility::FacilitySetGameMode(const struct GameModeDriverFacility* this, enum GM_ModeType_t gamemode)
+  448  0024E104    1C0  bool GameModeDriverFacility::SetTigerAsPlayer1(const struct GameModeDriverFacility* this)
+                         local  bool bLoadNeeded
+                         local  int32 numEmptySlots
+                         local  enum Golfer_t player1Golfer
+                         local  enum Golfer_t golferOpponent
+  502  002D3EC0    130  bool GameModeDriverFacility::ShowTutorial(const struct GameModeDriverFacility* this, int32 iTutID, int32 iTutSubID)
+                         local  bool bLoadNeeded
+                         local  bool bNeedReloadBecauseOfChangedProfile
+                         inlines  GameModeDriverFacility::SetForce2p
+  535  002D3D74    14C  void GameModeDriverFacility::ActuallyShowTutorial(const struct GameModeDriverFacility* this)
+                         local  void* ptr
+                         inlines  GameModeDriverFacility::SetForce2p
+  568  002D3BB0    1C4  bool GameModeDriverFacility::StartTutorial(const struct GameModeDriverFacility* this, int32 iTutID, int32 iTutSubID)
+                         local  bool bLoadNeeded
+                         local  bool bNeedReloadBecauseOfChangedProfile
+                         local  int32 plr1Controller
+                         inlines  GameModeDriverFacility::SetForce2p, GamePlayer::SetController
+  614  002D3A64    14C  void GameModeDriverFacility::ActuallyStartTutorial(const struct GameModeDriverFacility* this)
+                         local  void* ptr
+                         inlines  GameModeDriverFacility::SetForce2p
+  648  0020D534     60  bool GameModeDriverFacility::GameFinished(const struct GameModeDriverFacility* this, bool bPredict)
+  658  002854C4    194  uint32 GameModeDriverFacility::GetPostGameContext(const struct GameModeDriverFacility* this, uint32 prevContext)
+                         local  uint32 contextFlag
+                         local  void* ptr
+  704  0020D594     A8  bool GameModeDriverFacility::IsValidDropSurface(const struct GameModeDriverFacility* this, uint32 lieID)
+                         local  bool valid
+                         local  int facilityEventIndex
+                         local  struct FacilityMiniGameInfo_t* miniGameInfo
+  761  003373EC    1D8  void GameModeDriverFacility::PrepareForTeeOff(const struct GameModeDriverFacility* this)
+                         local  struct FacilityMiniGameInfo_t* miniGameInfo
+                         local  int i
+                         local  int i
+                         inlines  GM_GetModeType, GamePlayer::SetController, GamePlayerManager::SetPlayerCount, cGAME_GLOBALS::SetSeasonOption, cGAME_GLOBALS::SetWindOption
+  817  002D3A3C     28  void GameModeDriverFacility::ReStartEvent(const struct GameModeDriverFacility* this)
+  828  00337330     BC  void GameModeDriverFacility::SetupInitialRoundScore(const struct GameModeDriverFacility* this)
+                         local  uint32 i
+                         local  uint32 j
+                         inlines  GM_GetCurrentHoleIndex, GM_SetPlayerHoleStrokes
+  843  0020D63C     40  void GameModeDriverFacility::PreHoleLoadInit(const struct GameModeDriverFacility* this)
+  853  0026A3F8    194  void GameModeDriverFacility::MoveToTee(const struct GameModeDriverFacility* this, enum PlayerNumber_t playerID, enum GM_TeeFacilityIndex_t tee)
+                         local  vec4flt playerTeePosn
+                         inlines  cGAME_GLOBALS::SetPin, vec4flt_Copy, vec_ld
+  881  0020D67C     78  bool GameModeDriverFacility::GetAllCupsOnGreenActive(const const struct GameModeDriverFacility* this)
+  898  002D5444     FC  void GameModeDriverFacility::OnWinOfCurrentGame(const struct GameModeDriverFacility* this, const struct OnWinData_t& onWinData)
+                         local  enum PlayerNumber_t winner
+                         local  enum PlayerNumber_t loser
+                         local  int loserRanking
+                         local  int32 moneyWon
+                         inlines  GameModeDriver::SetWasLastEventWonByTheUser
+  928  0020D6F4     2C  int32 GameModeDriverFacility::GetEndGameSequence(const struct GameModeDriverFacility* this)
+                         local  int32 sequence
+  939  0020D720     4C  void GameModeDriverFacility::EndHole(const struct GameModeDriverFacility* this)
+  956  0020D76C      C  void GameModeDriverFacility::LeaveDriverAndExitHole(const struct GameModeDriverFacility* this)
+  965  0026B730    1AC  bool GameModeDriverFacility::SetupForTestEquipment(const struct GameModeDriverFacility* this, int8_t iEquipmentType)
+                         local  bool bNeedReloadBecauseOfChangedProfile
+                         local  int32 plr1Controller
+                         inlines  GameModeDriverFacility::SetForce2p, GamePlayer::SetController, UserInfo::SetLoginIndex
+ 1003  002D39EC     50  void GameModeDriverFacility::TestDriver(const struct GameModeDriverFacility* this)
+                         local  bool bIsCharReloadNeeded
+ 1012  002D399C     50  void GameModeDriverFacility::TestPutter(const struct GameModeDriverFacility* this)
+                         local  bool bIsCharReloadNeeded
+ 1022  002D3864    138  void GameModeDriverFacility::ActuallyTestEquipment(const struct GameModeDriverFacility* this)
+                         local  void* ptr
+                         inlines  GameModeDriverFacility::SetForce2p

@@ -1,0 +1,27 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/Table.h
+// compiled in: Database.cpp, IO.cpp, Query.cpp, Table.cpp
+// 14 functions, source order. line | PS3 address | size
+
+  154  007CAB04    100  TableRef GetRef(const struct Table* this)
+                         local  const char[7] __FUNCTION__
+                         local  struct <anon> lock
+  270  007F1D8C     24  void Table(const struct Table* this)
+  272  007F1DD4     24  void ~Table(const struct Table* this)
+  276  007DF1F8     38  TableRef InternalGetRef(const struct Table* this)
+  346  007CAC04     38  struct Table* GetNext(const struct Table* this)
+  351  007DF230     3C  void SetNext(const struct Table* this, struct Table* table)
+  365  007CAC3C     60  bool IsFlagSet(const const struct <anon>* this, int flag)
+  371  007DF26C     54  bool InternalIsPersistent(const const struct <anon>* this)
+  390  007CAC9C     FC  bool GetRowDeleted(const struct Table* this, RowNum rowNum)
+                         local  uint8_t* pData
+  417  007DF2C0    174  void SetRowDeleted(const struct Table* this, RowNum rowNum, bool newState)
+                         local  uint8_t* pData
+  444  007DF434     7C  RowNum GetRowNextDeleted(const struct Table* this, RowNum rowNum)
+                         local  uint8_t* pData
+  465  007DF4B0     80  void SetRowNextDeleted(const struct Table* this, RowNum rowNum, RowNum nextDeleted)
+                         local  uint8_t* pData
+  482  007E6CC4    250  enum TDbError GetPrevRow(const struct Table* this, RowNum* pIdxRow)
+                         local  const char[11] __FUNCTION__
+  516  007E6F14    1A8  enum TDbError GetNextRow(const struct Table* this, RowNum* pIdxRow)
+                         local  const char[11] __FUNCTION__
+                         local  RowNum maxRow

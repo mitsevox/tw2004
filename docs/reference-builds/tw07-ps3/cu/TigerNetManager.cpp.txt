@@ -1,0 +1,53 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/TigerNet/TigerNetManager.cpp
+// compiled in: golf_unity.cpp
+// 23 functions, source order. line | PS3 address | size
+
+   20  00223B5C     74  struct TigerNetManager* TigerNetManager::GetSingleton()
+                         local  struct TigerNetManager tigerNetManager
+                         inlines  TigerNetManager::TigerNetManager
+   26  00223834     10  void TigerNetManager::InitOnce(const struct TigerNetManager* this)
+                         local  int i
+   39  00223844      C  void TigerNetManager::Init(const struct TigerNetManager* this)
+   48  00224E28     80  bool TigerNetManager::AddListener(const struct TigerNetManager* this, struct TigerNetManagerListener* listener)
+   68  0027BC28     94  void TigerNetManager::RequestLeaderboard(const struct TigerNetManager* this, struct LeaderBoardOptions* options)
+                         local  bool operationResult
+   94  00224EA8      4  void TigerNetManager::StartCleanupAndMaintenance(const struct TigerNetManager* this)
+  102  00224EAC    110  void TigerNetManager::StartEpisodeUpload(const struct TigerNetManager* this, int32 episodeID, struct TigerNetLobbyUploadParams* episodeUploadParams)
+                         local  struct tEpisodeInfo episodeInfo
+                         local  bool operationStarted
+  148  0027AFC8     E0  void TigerNetManager::StartPlayingEpisode(const struct TigerNetManager* this, int32 episodeID, const char8_t* owner)
+                         local  bool operationResult
+  190  002250A8     30  bool TigerNetManager::QueueTigerClipGameMode(const struct TigerNetManager* this)
+  204  00224FBC     EC  void TigerNetManager::EndGameAndSendReport(const struct TigerNetManager* this, bool success, int32 score, int32 style)
+                         local  struct TigerNetEpisodeGameReport gameReport
+                         local  int32 i
+  224  0027AF6C     5C  void TigerNetManager::OnCanDownloadFinished(const struct TigerNetManager* this, bool success, int32 lobbyResult)
+                         local  int i
+                         local  bool operationStarted
+  258  002242AC     5C  void TigerNetManager::OnCanUploadEpisodeFinished(const struct TigerNetManager* this, int32 lobbyResult)
+                         local  bool canUpload
+                         local  bool operationStarted
+  279  0023746C     A8  void TigerNetManager::OnLobbyUploadEpisodeFinished(const struct TigerNetManager* this, int32 lobbyResult, int32 episodeID)
+                         local  bool okToUpload
+                         local  bool operationStarted
+  307  00225298    10C  void TigerNetManager::OnLockerDownloadThumbnailFinished(const struct TigerNetManager* this, bool success, char8_t* thumbnailData, int32 thumbnailSize)
+                         local  int i
+  330  0027ADD0    19C  void TigerNetManager::OnLockerFetchFinished(const struct TigerNetManager* this, bool success)
+                         local  bool operationStarted
+                         local  int32 i
+  390  00225410     E8  void TigerNetManager::OnLeaderboardRequestFinished(const struct TigerNetManager* this, bool success, struct SpreadSheetLeaderboard* pSpreadSheet)
+                         local  int i
+  409  00223C94    1AC  void TigerNetManager::OnLockerDownloadProgress(const struct TigerNetManager* this, int32 progress)
+                         local  int32 i
+  440  002249B8    130  void TigerNetManager::OnLockerDownloadEpisodeFinished(const struct TigerNetManager* this, bool success, int32 localEpisodeID)
+                         local  int32 i
+                         local  bool operationStarted
+  483  002250D8     E8  void TigerNetManager::OnLobbyGameSessionStarted(const struct TigerNetManager* this, bool success)
+                         local  bool operationStarted
+                         local  int32 i
+  518  00223BD0     C4  void TigerNetManager::OnEpisodeUploadFinished(const struct TigerNetManager* this, bool success)
+                         local  int32 i
+  528  002253A4     6C  void TigerNetManager::StartDownloadingThumbnails(const struct TigerNetManager* this)
+                         local  bool operationResult
+  551  0022569C      4  void TigerNetManager::ContinueDownloadingThumbnails(const struct TigerNetManager* this)
+  555  00225290      8  bool TigerNetManager::ThumbnailsPending(const struct TigerNetManager* this)

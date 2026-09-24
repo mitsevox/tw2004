@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/UI_Money.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   26  0011D19C    160  void UIMoney::~UIMoney(const struct UIMoney* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIMoney::DstMenuItem_euro>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+   28  000FE7FC      C  uint32 UIMoney::GetSignature(const const struct UIMoney* this)
+   35  000FE810      C  struct IExternArray* UIMoney::GetExternArray(const struct UIMoney* this)

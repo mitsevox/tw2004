@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_NewsTicker.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   24  00124FE0     B8  void UINewsTicker::~UINewsTicker(const struct UINewsTicker* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   26  001005F0      C  uint32 UINewsTicker::GetSignature(const const struct UINewsTicker* this)
+   36  00100F38     14  enum AptThreadReturnValue UINewsTicker::ScrollText_func(struct IAptSubscriberBase* subs)

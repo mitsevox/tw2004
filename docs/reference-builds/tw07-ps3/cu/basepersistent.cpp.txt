@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/basepersistent.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   49  005B321C     34  void BasePersistent(const struct <anon>* this)
+   54  005E2E00      C  void ~BasePersistent(const struct <anon>* this)

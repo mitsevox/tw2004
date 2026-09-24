@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/./Headers/LLPoolAllocator.h
+// compiled in: Legacy_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   35    inline-only   bool CorePoolDescriptor::InRange(const struct CorePoolDescriptor* this, int size)

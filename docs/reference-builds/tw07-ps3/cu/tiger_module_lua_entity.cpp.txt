@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_lua_entity.cpp
+// compiled in: tiger_module_lua_entity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   14  0057FB64    304  void LuaEntity(const struct <anon>* this, const char* name, const char* luaInitFunction, const char* luaUpdateFunction, const char* luaShutdownFunction, const struct <anon>* luaParams, unsigned int luaParamCount)
+                         local  const unsigned int paramSize
+                         inlines  TagValuePair
+   63  0057FE68     84  void ~LuaEntity(const struct <anon>* this)
+   71  00580000     64  void CallUpdate(const struct <anon>* this, struct Lua* lua)
+   83  00580064     54  void CallShutdown(const struct <anon>* this, struct Lua* lua)
+   91  005800B8     54  void CallInit(const struct <anon>* this, struct Lua* lua)

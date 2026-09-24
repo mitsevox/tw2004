@@ -1,0 +1,113 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/UTiming.c
+// compiled in: Legacy_unity.cpp
+// 33 functions, source order. line | PS3 address | size
+
+  201  003812BC     64  void Timing_StartCounterFrame()
+                         inlines  Gcm::cellGcmSetClearReport, Gcm::cellGcmSetZpassPixelCountEnable
+  210  00381320     C8  int Timing_StartCounterQuery(TMarker* pMarker)
+                         local  int index
+                         inlines  Gcm::cellGcmFlush, Gcm::cellGcmSetReport, Gcm::cellGcmSetTimeStamp
+  225  0037BB04     68  void Timing_ReadCounterQuery(int reportIndex, volatile uint64* time, volatile uint32* pixels)
+  233  0037BB6C     34  static void Timing_BeginGPUStats(void* pData)
+                         local  int index
+                         local  volatile TMarker* pMarker
+  243  0037BBA0     90  static void Timing_EndGPUStats(void* pData)
+                         local  int index
+                         local  volatile TMarker* pMarker
+                         local  uint64 endTime
+                         local  uint32 endPixels
+  259  0038A6F0     A4  int32 Timing_GetThreadIndex()
+  268  0038AA94     FC  int32 Timing_SetupThreadIndex()
+                         local  int32 i
+  287  0038A4DC     E0  TMarker* Timing_GetMarker(Timing_EMarker marker)
+  296  0038A47C     60  TMarkerFrame* Timing_GetMarkerFrame(uint32 frameNumber)
+  304  0038A418     64  TMarkerFrame* Timing_GetPeakFrame(int32 peakNumber)
+  312  003A26B4    1B8  void Timing_InitModule()
+                         local  vec4flt xCanvasColor
+                         local  int once
+                         local  int32 i
+                         inlines  WG_vSetCanvasBackgroundColor, WG_vSetCanvasPosition, sys_time_get_timebase_frequency
+  354  0037BC30      4  void Timing_CloseModule()
+  360  003A2454    260  void Timing_ResetCapture()
+                         local  int32 i
+  393  0038A5BC    134  static void Timing_GetMarkerFrameTimes(Timing_EMarker marker, TimingTimes* times, int32 threadIndex, TMarkerFrame* pFrame)
+                         local  TMarker* pMarker
+                         local  int32 i
+  423  0038A8F8    19C  void Timing_GetTimes(Timing_EMarker marker, TimingTimes* times, uint32 framesAgo, int32 averageFrames)
+                         local  int32 threadIndex
+                         local  uint32 curFrame
+                         local  int32 i
+                         local  int32 i
+                         local  TMarkerFrame* pFrame
+  451  0038A794    164  void Timing_GetPeakTimes(Timing_EMarker marker, TimingTimes* times, int32 peakIndex, int32 averagePeaks)
+                         local  int32 threadIndex
+                         local  int32 i
+                         local  TMarkerFrame* pFrame
+                         local  int32 i
+  483  0037BC34     54  static void Timing_BeginGPUFrame(void* pData)
+                         local  int32 i
+  500  003A2260    1F4  void Timing_BeginFrame(const char* threadName)
+                         local  int32 threadIndex
+                         local  int32 i
+                         local  TMarkerFrame* pFrame
+  554  0037BC88    138  static void Timing_EndGPUFrame(void* pData)
+                         local  TMarkerFrame* pFrame
+                         local  int32 i
+                         local  int64 j
+                         local  int32 k
+                         local  TMarker* parent
+  594    inline-only   static void Timing_CheckForPeaks(uint32 checkFrame)
+                         local  TMarkerFrame* pFrame
+                         local  float rootCPU
+                         local  float rootGPU
+                         local  float rootWorst
+                         local  int32 i
+                         local  TMarkerFrame* pPeakFrame
+                         local  float peakCPU
+                         local  float peakGPU
+                         local  float peakWorst
+  621  003A06F8    388  void Timing_EndFrame()
+                         local  int32 threadIndex
+                         local  TMarkerFrame* pFrame
+                         local  int32 i
+                         inlines  Timing_CheckForPeaks
+  687  003A2004    25C  void Timing_BeginMarker(Timing_EMarker marker)
+                         local  TMarker* pMarker
+                         local  int32 threadIndex
+                         local  TMarkerStack* pStack
+                         local  int index
+                         inlines  TI_uiReadCP0Count
+  749  003A0A80    198  void Timing_AddVertices(int numVertices)
+                         local  TMarkerStack* pStack
+                         local  int32 i
+                         local  Timing_EMarker marker
+                         local  TMarker* pMarker
+  795  003A0534    1C4  void Timing_EndMarker(Timing_EMarker marker)
+                         local  int32 threadIndex
+                         local  TMarker* pMarker
+                         local  TMarkerStack* pStack
+                         local  int index
+                         inlines  TI_uiReadCP0Count
+  844  00395BFC     8C  void Timing_Activate(enum TimingActivateMode activate)
+  867  0037BDE8     18  void Timing_Display(int32 display)
+  874  0037BE00     18  void Timing_Focus(Timing_EMarker marker)
+  891  003A569C    8D0  static bool Timing_RenderTimingHierarchy(int32 depth, const int32& row, Timing_EMarker parent)
+                         local  char[100] buf
+                         local  TimingTimes times
+                         local  char[11] depthStr
+                         local  int32 i
+                         local  int32 depthLeft
+                         local  int32 marker
+                         local  TMarker* pMarker
+  996  003CD430    5F0  void Timing_RenderTimingInfo()
+                         local  struct Timing_AutoMarker timerRenderMarker
+                         local  int32 row
+                         local  char[100] title
+                         inlines  Timing_AutoMarker::Timing_AutoMarker, Timing_AutoMarker::~Timing_AutoMarker
+ 1056  003A286C    364  static bool CO_boTIMECommandCall(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+                         local  int32 i
+                         local  size_t len
+                         inlines  std::atoi
+ 1128  0037BEEC     94  void Timing_SetMarker(const char* markerName)
+ 1142  0037BE18     94  void Timing_BeginEvent(const char* eventName)
+ 1157  0037BEAC     40  void Timing_EndEvent()

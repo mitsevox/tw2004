@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Legacy/Lib/Headers/UMemBudgetTracker.h
+// compiled in: Legacy_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  160  003A3170     60  void MemBudgetTracker::MemBudgetTracker(const struct MemBudgetTracker* this, MemBudgetTracker_InitInfo* pInitInfo)
+  161  0037AB78      4  void MemBudgetTracker::~MemBudgetTracker(const struct MemBudgetTracker* this)

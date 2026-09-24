@@ -1,0 +1,72 @@
+// ../../../Shared/XceedZip_ZLib64/deflate.c
+// compiled in: golf_unity.cpp
+// 18 functions, source order. line | PS3 address | size
+
+  183  00220C30     1C  int deflateInit_(z_streamp strm, int level, const char* version, int stream_size)
+  191  002208AC    384  int deflateInit2_(z_streamp strm, int level, int method, int windowBits, int memLevel, int strategy, const char* version, int stream_size)
+                         local  deflate_state* s
+                         local  int noheader
+                         local  const char* my_version
+                         local  ushf* overlay
+  315  0021F484    190  int deflateSetDictionary(z_streamp strm, const Bytef* dictionary, uInt dictLength)
+                         local  deflate_state* s
+                         local  uInt length
+                         local  uInt n
+                         local  IPos hash_head
+  353  0022070C    1A0  int deflateReset(z_streamp strm)
+                         local  deflate_state* s
+                         inlines  lm_init
+  383  00222344    134  int deflateParams(z_streamp strm, int level, int strategy)
+                         local  deflate_state* s
+                         local  compress_func func
+                         local  int err
+  420  0021F614     3C  static void putShortMSB(deflate_state* s, uInt b)
+  432  0021F650     D8  static void flush_pending(z_streamp strm)
+                         local  unsigned int len
+  451  00221F6C    3D8  int deflate(z_streamp strm, int flush)
+                         local  int old_flush
+                         local  deflate_state* s
+                         local  enum block_state bstate
+                         local  uInt header
+                         local  uInt level_flags
+  587  0021F2CC    1B8  int deflateEnd(z_streamp strm)
+                         local  int status
+  616  0021F728    2C0  int deflateCopy(z_streamp dest, z_streamp source)
+                         local  deflate_state* ds
+                         local  deflate_state* ss
+                         local  ushf* overlay
+  684    inline-only   static int read_buf(z_streamp strm, Bytef* buf, unsigned int size)
+                         local  unsigned int len
+  706    inline-only   static void lm_init(deflate_state* s)
+  746  0021F9E8    494  static uInt longest_match(deflate_state* s, IPos cur_match)
+                         local  unsigned int chain_length
+                         local  Bytef* scan
+                         local  Bytef* match
+                         local  int len
+                         local  int best_len
+                         local  int nice_match
+                         local  IPos limit
+                         local  Posf* prev
+                         local  uInt wmask
+                         local  Bytef* strend
+                         local  Byte scan_end1
+                         local  Byte scan_end
+  943  0021FE7C    16C  static void check_match(deflate_state* s, IPos start, IPos match, int length)
+  974  0021FFE8    300  static void fill_window(deflate_state* s)
+                         local  unsigned int n
+                         local  unsigned int m
+                         local  Posf* p
+                         local  unsigned int more
+                         local  uInt wsize
+                         local  uInt move
+                         inlines  read_buf
+ 1099  0026FB2C    2E0  static enum block_state deflate_stored(deflate_state* s, int flush)
+                         local  ulg max_block_size
+                         local  ulg max_start
+ 1155  0026F69C    490  static enum block_state deflate_fast(deflate_state* s, int flush)
+                         local  IPos hash_head
+                         local  int bflush
+ 1249  0026F070    62C  static enum block_state deflate_slow(deflate_state* s, int flush)
+                         local  IPos hash_head
+                         local  int bflush
+                         local  uInt max_insert

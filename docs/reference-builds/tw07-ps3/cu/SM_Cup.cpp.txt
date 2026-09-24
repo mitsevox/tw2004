@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_Cup.cpp
+// compiled in: shader_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   35  0051B614     50  void SM_CupClass::SM_CupClass(const struct SM_CupClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base
+   50  00508F44    148  void SM_CupClass::Load(const struct SM_CupClass* this)
+   66  0050908C     84  void SM_CupClass::Activate(const struct SM_CupClass* this)
+   76  00509110     38  void SM_CupClass::Deactivate(const struct SM_CupClass* this)
+   83  005120A8     70  void SM_CupClass::SetLightDir(const struct SM_CupClass* this, float lx, float ly, float lz)
+   92  00512118     60  void SM_CupClass::SetDiffuseFactor(const struct SM_CupClass* this, float diffuseFactor)
+  101  00512178     60  void SM_CupClass::SetAmbientFactor(const struct SM_CupClass* this, float ambientFactor)
+  112  005121D8     64  void SM_CupClass::SetColorTexture(const struct SM_CupClass* this, TextureRef texRef)

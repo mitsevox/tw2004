@@ -1,0 +1,168 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/source/common/Query/QuerySearch.cpp
+// compiled in: QuerySearch.cpp
+// 24 functions, source order. line | PS3 address | size
+
+    0  00819244    10C  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   75  0080E898    4CC  enum TDbError PrepComplex(const struct <anon>* this)
+                         local  const char[12] __FUNCTION__
+                         local  struct TableIndex* pIndex
+                         local  struct ExprNode* pJoinExpr
+                         local  uint32_t tblCount
+                         local  uint32_t tempScore
+                         local  uint32_t bestScore
+                         local  uint32_t parentTbl
+                         local  enum TDbError dbResult
+                         local  ColNum colIdx
+  181  00812A44    818  enum TDbError InitializeMembers(const struct <anon>* this, struct Database* pDb, struct <anon>* pJoins, struct ExprNode* pFilter)
+                         local  const char[18] __FUNCTION__
+                         local  struct ExprNode* pExpr
+                         local  uint32_t tblCount
+                         local  enum TDbError dbResult
+  314  00815098    794  enum TDbError PrepSimple(const struct <anon>* this, struct <anon>* pColSort, bool bCreateTemp)
+                         local  const char[11] __FUNCTION__
+                         local  struct TableIndex* pIndex
+                         local  struct TableIndex* pBestIndex
+                         local  struct <anon>* pTSort
+                         local  struct ExprNode* pBestExpr
+                         local  struct ExprNode* pSeekExpr
+                         local  uint32_t tempScore
+                         local  uint32_t bestScore
+                         local  enum TDbError dbResult
+                         local  RowNum rowNum
+                         local  bool8_t bFound
+  476  008105AC   2498  enum TDbError PrepComplexFilter(const struct <anon>* this, struct ExprNode* pOrigTree, struct ExprNode** ppExpr, bool bUnderAnd)
+                         local  const char[18] __FUNCTION__
+                         local  uint32_t count
+                         local  enum TDbError dbResult
+                         local  ColNum colNum
+                         local  bool8_t bAtAnd
+                         local  struct ExprNode* pTempExpr
+                         local  bool8_t bLeftTrue
+                         local  bool8_t bRightTrue
+                         local  enum ColType leftType
+                         local  enum ColType rightType
+  922  0080EF64    494  void FillToColLits(const struct <anon>* this, struct <anon>* pColLits)
+                         local  const char[14] __FUNCTION__
+                         local  struct <anon>* pLit
+                         local  uint8_t* pRowData
+                         local  uint32_t tblNum
+  992  0080F3F8    E84  bool8_t FillFromColLits(const struct <anon>* this, struct <anon>* pColLits, struct <anon>* pColsChanged)
+                         local  const char[16] __FUNCTION__
+                         local  struct <anon>* pLit
+                         local  uint8_t* pRowData
+                         local  struct TableIndex* pIndex
+                         local  struct <anon>*[30] pINodes
+                         local  uint32_t INodeCount
+                         local  union <anon> tData
+                         local  uint32_t tblNum
+                         local  uint32_t trigCount
+                         local  uint32_t changeCount
+                         local  uint32_t litNum
+                         local  uint8_t[10] trigStatus
+                         local  bool8_t tblChanged
+                         local  enum TDbError dbError
+ 1137  0081027C    330  enum TDbError PrepColLits(const struct <anon>* this, struct <anon>* pColLits)
+                         local  const char[12] __FUNCTION__
+                         local  struct <anon>* pLit
+                         local  uint32_t tblNum
+                         local  uint32_t count
+                         local  bool8_t bFound
+ 1199  00818BA8    69C  enum TDbError DeleteRow(const struct <anon>* this, bool isCached, struct <anon>* pDbRet)
+                         local  const char[10] __FUNCTION__
+                         local  struct <anon> dbRet
+                         local  struct TableIndex* pIndex
+                         local  enum TDbError dbResult
+                         local  struct <anon> filterRes
+                         local  bool useCacheData
+ 1352  00813F94    A1C  enum TDbError SyncStart(const struct <anon>* this, uint32_t tblNum)
+                         local  const char[10] __FUNCTION__
+                         local  enum TDbError dbResult
+                         local  struct <anon> testResult
+                         local  union <anon> seekData
+ 1505  008149B0    6E8  enum TDbError SyncSkip(const struct <anon>* this, uint32_t tblNum)
+                         local  const char[9] __FUNCTION__
+                         local  enum TDbError dbResult
+                         local  struct <anon> testResult
+ 1616  008172D0    654  enum TDbError _TDbQryCallback(const struct <anon>* this, uint32_t callbackName, struct <anon>* pCallbackParams, uint16_t userParm, struct <anon>* pRet)
+                         local  const char[16] __FUNCTION__
+                         local  QueryCallback callbackFunc
+                         local  uint32_t counter
+                         local  ColNum[255] colIdxs
+                         local  struct <anon> filterRes
+                         local  bool8_t bModFlag
+                         local  bool8_t bIdxsWillChange
+                         local  enum TDbError dbResult
+                         local  struct <anon> changeBits
+ 1764  00816864    A6C  enum TDbError RowCopy(const struct <anon>* this, struct <anon>* pSrcLits, struct Table* destTable, struct <anon>* pRet)
+                         local  const char[8] __FUNCTION__
+                         local  uint32_t counter
+                         local  ColNum[255] colIdxs
+                         local  struct <anon> filterRes
+                         local  enum TDbError dbResult
+                         local  struct TableIndex* pIndex
+                         local  bool8_t wasDeleted
+                         local  RowNum destRow
+ 1928  00815DD8    A8C  enum TDbError RowCopyTrig(const struct <anon>* this, struct <anon>* pSrcLits, struct Table* destTable, struct <anon>* pRet)
+                         local  const char[12] __FUNCTION__
+                         local  uint32_t counter
+                         local  ColNum[255] colIdxs
+                         local  struct <anon> filterRes
+                         local  enum TDbError dbResult
+                         local  struct TableIndex* pIndex
+                         local  bool8_t wasDeleted
+                         local  RowNum destRow
+ 2095  00818340    868  enum TDbError SetRow(const struct <anon>* this, struct <anon>* pColLitLst, bool bSingleRow, bool isCached, struct <anon>* pDbRet)
+                         local  const char[7] __FUNCTION__
+                         local  struct <anon> dbRet
+                         local  enum TDbError dbResult
+                         local  struct <anon> changeBits
+                         local  struct <anon> filterRes
+                         local  RowNum cachedRowNum
+                         local  bool useCacheData
+                         local  struct ExprNode* pWhichExpr
+                         local  bool isColfound
+                         local  struct <anon>* pLit
+                         local  uint32_t tblcount
+ 2254  0081582C    5AC  enum TDbError UpdateRows(const struct <anon>* this, TableColRef* pTblColRefList, struct ExprNode** pUpdateList, struct <anon>* pDbRet)
+                         local  const char[11] __FUNCTION__
+                         local  struct <anon> dbRet
+                         local  uint32_t counter
+                         local  uint32_t numColumns
+                         local  struct <anon> filterRes
+                         local  enum TDbError dbResult
+                         local  struct <anon>[33] colLits
+                         local  struct <anon> changeBits
+ 2340  00813734    37C  enum TDbError UpdateQIdxsFromLits(const struct <anon>* this, struct <anon>* pColLits, struct <anon>* changeBits)
+                         local  const char[20] __FUNCTION__
+                         local  struct Query* pQuery
+                         local  enum TDbError dbResult
+                         local  uint32_t litNum
+                         local  uint32_t tblNum
+ 2394  00813AB0    4E4  void ResolveSeekExpr(const struct <anon>* this, const uint32_t joinNum, union <anon>* data)
+                         local  const char[16] __FUNCTION__
+                         local  uint32_t srcTblNum
+                         local  struct Table* pTable
+                         local  uint8_t* pData
+                         local  ColNum colNum
+                         local  struct <anon> exprVal
+ 2465  00817924    920  struct QueryIndex* CreateQIdx(const struct <anon>* this, struct <anon>* pColSort, enum TDbError* dbError)
+                         local  const char[11] __FUNCTION__
+                         local  struct Database* pDb
+                         local  uint32_t colCount
+                         local  uint32_t tblNum
+                         local  struct QueryIndex* ppNewQIdx
+                         local  struct <anon>[2] tempSort
+                         local  int32_t tableCount
+                         local  struct ICollection* collection
+                         local  uint32_t numCol
+                         local  struct <anon>* indexColSort
+ 2582  00813394    20C  enum TDbError SetInUse(const struct <anon>* this)
+                         local  const char[9] __FUNCTION__
+                         local  uint32_t tblCnt
+ 2616  008135A0    194  void ClearInUse(const struct <anon>* this)
+                         local  const char[11] __FUNCTION__
+                         local  uint32_t tblCnt
+ 2637  00818244     FC  bool GetCachedData(const struct <anon>* this)
+                         local  struct <anon>* pCache
+ 2661  00819350     3C  static void _GLOBAL__I__ZN2EA4T3db11QuerySearchC2Ev()
+ 2662  0081938C     3C  static void _GLOBAL__D__ZN2EA4T3db11QuerySearchC2Ev()

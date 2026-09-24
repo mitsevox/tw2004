@@ -1,0 +1,150 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/rsxgpu/dev/source/rsxgpu/RSXGPU.cpp
+// compiled in: RSXGPU.cpp
+// 94 functions, source order. line | PS3 address | size
+
+   54  008D4FC8     30  void RSXGPU::BeginBuffer(const struct RSXGPU* this, uint32_t* buffer, uint32_t sizeInBytes)
+   64  008D4FF8     4C  uint32_t* RSXGPU::EndBuffer(const struct RSXGPU* this)
+                         local  uint32_t* ptr
+   88  008D5044     4C  void RSXGPU::BeginFifo(const struct RSXGPU* this, uint32_t reserveSizeInWords)
+                         local  uint32_t* ptr
+   98  008D5090     28  void RSXGPU::EndFifo(const struct RSXGPU* this)
+                         local  uint32_t* endPtr
+  108  008D50B8     70  void RSXGPU::ReserveFifo(const struct RSXGPU* this, uint32_t reserveSizeInWords)
+  126  008D5128     18  void RSXGPU::SetCommand(const struct RSXGPU* this, uint32_t command)
+  137  008D5140     28  void RSXGPU::SetRegister(const struct RSXGPU* this, enum RSXRegister reg, uint32_t value)
+  147  008D5168     30  void RSXGPU::SetRegister2(const struct RSXGPU* this, enum RSXRegister reg, uint32_t value0, uint32_t value1)
+  158  008D5198     38  void RSXGPU::SetRegister3(const struct RSXGPU* this, enum RSXRegister reg, uint32_t value0, uint32_t value1, uint32_t value2)
+  169  008D51D0     40  void RSXGPU::SetRegisterPair(const struct RSXGPU* this, enum RSXRegister reg0, uint32_t value0, enum RSXRegister reg1, uint32_t value1)
+  184  008D5210      C  void RSXGPU::PrimBegin(const struct RSXGPU* this, const uint8_t mode)
+  189  008D521C     B8  void RSXGPU::DrawArrays(const struct RSXGPU* this, uint32_t first, uint32_t count)
+                         local  uint32_t nextCount
+  211  008D52D4      8  void RSXGPU::PrimEnd(const struct RSXGPU* this)
+  219  008D52DC      C  void RSXGPU::SetReferenceCommand(const struct RSXGPU* this, const uint32_t ref)
+  224  008D52E8      C  void RSXGPU::SetJumpCommand(const struct RSXGPU* this, const uint32_t offset)
+  229  008D52F4      C  void RSXGPU::SetCallCommand(const struct RSXGPU* this, const uint32_t offset)
+  234  008D5300      8  void RSXGPU::SetReturnCommand(const struct RSXGPU* this)
+  239  008D5308      8  void RSXGPU::SetNopCommand(const struct RSXGPU* this)
+  244  008D5310     40  void RSXGPU::SetNopCommand(const struct RSXGPU* this, const uint32_t count)
+                         local  uint32_t loop
+  260  008D5350     14  void RSXGPU::SetWaitLabel(const struct RSXGPU* this, const uint8_t index, const uint32_t value)
+  268  008D5364     14  void RSXGPU::SetWriteCommandLabel(const struct RSXGPU* this, const uint8_t index, const uint32_t value)
+  276  008D5378     30  void RSXGPU::SetWriteBackEndLabel(const struct RSXGPU* this, const uint8_t index, const uint32_t value)
+                         local  uint32_t tmp1
+                         local  uint32_t tmp2
+                         local  uint32_t tmp3
+                         local  uint32_t mangledValue
+  299  008D53A8     14  void RSXGPU::SetWriteTextureLabel(const struct RSXGPU* this, const uint8_t index, const uint32_t value)
+  307  008D53BC     18  void RSXGPU::SetTimeStamp(const struct RSXGPU* this, const uint8_t index)
+  326  008D53D4      C  void RSXGPU::SetInvalidateZcull(const struct RSXGPU* this)
+  334  008D53E0     10  void RSXGPU::SetAlphaFunc(const struct RSXGPU* this, const uint32_t af, const uint32_t ref)
+  340  008D53F0     14  void RSXGPU::SetBlendColor(const struct RSXGPU* this, const uint32_t color, const uint32_t color2)
+  348  008D5404     14  void RSXGPU::SetBlendEquation(const struct RSXGPU* this, const uint16_t color, const uint16_t alpha)
+  353  008D5418     20  void RSXGPU::SetBlendFunc(const struct RSXGPU* this, const uint16_t sfcolor, const uint16_t dfcolor, const uint16_t sfalpha, const uint16_t dfalpha)
+  358  008D5438     14  void RSXGPU::SetClearSurface(const struct RSXGPU* this, const uint32_t mask)
+  367  008D544C      C  void RSXGPU::SetClearColor(const struct RSXGPU* this, const uint32_t color)
+  372  008D5458      C  void RSXGPU::SetClearDepthStencil(const struct RSXGPU* this, const uint32_t value)
+  377  008D5464      C  void RSXGPU::SetColorMask(const struct RSXGPU* this, const uint32_t mask)
+  382  008D5470      C  void RSXGPU::SetColorMaskMrt(const struct RSXGPU* this, const uint32_t mask)
+  387  008D547C      C  void RSXGPU::SetCullFace(const struct RSXGPU* this, const uint32_t cfm)
+  392  008D5488     34  void RSXGPU::SetDepthBounds(const struct RSXGPU* this, const float zmin, const float zmax)
+  397  008D54BC      C  void RSXGPU::SetDepthFunc(const struct RSXGPU* this, const uint32_t zf)
+  402  008D54C8      C  void RSXGPU::SetDepthMask(const struct RSXGPU* this, const uint32_t enable)
+  407  008D54D4      C  void RSXGPU::SetFrontFace(const struct RSXGPU* this, const uint32_t dir)
+  412  008D54E0      C  void RSXGPU::SetLineWidth(const struct RSXGPU* this, const uint32_t width)
+  417  008D54EC      C  void RSXGPU::SetLogicOp(const struct RSXGPU* this, const uint32_t op)
+  422  008D54F8     2C  void RSXGPU::SetPointSize(const struct RSXGPU* this, const float size)
+  427  008D5524     34  void RSXGPU::SetPolygonOffset(const struct RSXGPU* this, const float factor, const float units)
+  432  008D5558     20  void RSXGPU::SetScissor(const struct RSXGPU* this, const uint16_t x, const uint16_t y, const uint16_t w, const uint16_t h)
+  437  008D5578      C  void RSXGPU::SetShadeMode(const struct RSXGPU* this, const uint32_t sm)
+  442  008D5584     14  void RSXGPU::SetStencilFunc(const struct RSXGPU* this, const uint32_t func, const int32_t ref, const uint32_t mask)
+  447  008D5598     14  void RSXGPU::SetBackStencilFunc(const struct RSXGPU* this, const uint32_t func, const int32_t ref, const uint32_t mask)
+  452  008D55AC      C  void RSXGPU::SetStencilMask(const struct RSXGPU* this, const uint32_t sm)
+  457  008D55B8      C  void RSXGPU::SetBackStencilMask(const struct RSXGPU* this, const uint32_t sm)
+  462  008D55C4     18  void RSXGPU::SetStencilOp(const struct RSXGPU* this, const uint32_t fail, const uint32_t depthFail, const uint32_t depthPass)
+  467  008D55DC     18  void RSXGPU::SetBackStencilOp(const struct RSXGPU* this, const uint32_t fail, const uint32_t depthFail, const uint32_t depthPass)
+  472  008D55F4    1AC  void RSXGPU::SetViewport(const struct RSXGPU* this, const uint16_t x, const uint16_t y, const uint16_t w, const uint16_t h, const float min, const float max, const float* scale, const float* offset)
+  507  008D57A0      C  void RSXGPU::SetAlphaTestEnable(const struct RSXGPU* this, const uint32_t enable)
+  512  008D57AC      C  void RSXGPU::SetBlendEnable(const struct RSXGPU* this, const uint32_t enable)
+  517  008D57B8     20  void RSXGPU::SetBlendEnableMrt(const struct RSXGPU* this, const uint32_t mrt1, const uint32_t mrt2, const uint32_t mrt3)
+  522  008D57D8      C  void RSXGPU::SetLogicOpEnable(const struct RSXGPU* this, const uint32_t enable)
+  527  008D57E4      C  void RSXGPU::SetCullFaceEnable(const struct RSXGPU* this, const uint32_t enable)
+  532  008D57F0      C  void RSXGPU::SetDepthBoundsTestEnable(const struct RSXGPU* this, const uint32_t enable)
+  537  008D57FC      C  void RSXGPU::SetDepthTestEnable(const struct RSXGPU* this, const uint32_t enable)
+  542  008D5808      C  void RSXGPU::SetDitherEnable(const struct RSXGPU* this, const uint32_t enable)
+  547  008D5814      C  void RSXGPU::SetStencilTestEnable(const struct RSXGPU* this, const uint32_t enable)
+  552  008D5820      C  void RSXGPU::SetTwoSidedStencilTestEnable(const struct RSXGPU* this, const uint32_t enable)
+  557  008D582C      C  void RSXGPU::SetPolygonOffsetFillEnable(const struct RSXGPU* this, const uint32_t enable)
+  562  008D5838      C  void RSXGPU::SetRestartIndexEnable(const struct RSXGPU* this, const uint32_t enable)
+  567  008D5844     10  void RSXGPU::SetPointSpriteEnable(const struct RSXGPU* this, const uint32_t enable)
+  575  008D5854      C  void RSXGPU::SetInvalidateTextureCache(const struct RSXGPU* this, const uint32_t value)
+  580  008D5860      C  void RSXGPU::SetTextureBorderColor(const struct RSXGPU* this, const uint8_t index, const uint32_t color)
+  585  008D586C     20  void RSXGPU::SetTextureFilter(const struct RSXGPU* this, const uint8_t index, const uint16_t bias, const uint8_t min, const uint8_t mag)
+                         local  uint32_t value
+  591  008D588C     30  void RSXGPU::SetTextureAddress(const struct RSXGPU* this, const uint8_t index, const uint8_t wraps, const uint8_t wrapt, const uint8_t wrapr, const uint8_t unsignedRemap, const uint8_t zfunc)
+                         local  uint32_t value
+  597  008D58BC     2C  void RSXGPU::SetTextureControl(const struct RSXGPU* this, const uint8_t index, const uint32_t enable, const uint16_t minlod, const uint16_t maxlod, const uint8_t maxaniso)
+                         local  uint32_t value
+  603  008D58E8    1C0  void RSXGPU::SetTexture(const struct RSXGPU* this, const uint8_t index, const CellGcmTexture* texture)
+                         local  uint32_t texBase
+  654  008D5AA8     F0  void RSXGPU::SetTextureFast(const struct RSXGPU* this, const uint8_t index, const CellGcmTexture* texture)
+                         local  uint32_t texBase
+  675  008D5B98     9C  void RSXGPU::ConvertTexture(struct RSXTexture* dest, const CellGcmTexture* src)
+  688  008D5C34     B8  void RSXGPU::SetTexture(const struct RSXGPU* this, const uint8_t index, const struct RSXTexture* texture)
+                         local  uint32_t texBase
+                         local  uint32_t offset
+                         local  uint32_t format
+                         local  uint32_t address
+                         local  uint32_t control0
+                         local  uint32_t control1
+                         local  uint32_t filter
+                         local  uint32_t imageRect
+                         local  uint32_t control3
+  724  008D5CEC     58  void RSXGPU::SetDrawArrays(const struct RSXGPU* this, const uint8_t mode, uint32_t first, uint32_t count)
+  731  008D5D44     F0  void RSXGPU::SetDrawIndexArray(const struct RSXGPU* this, const uint8_t mode, uint32_t count, const uint8_t type, const uint8_t location, const uint32_t indicies)
+                         local  uint32_t first
+                         local  int numDraws
+                         local  uint32_t nextCount
+  790  008D5E34     64  void RSXGPU::SetInvalidateVertexCache(const struct RSXGPU* this)
+  805  008D5E98      C  void RSXGPU::SetRestartIndex(const struct RSXGPU* this, const uint32_t index)
+  810  008D5EA4     54  void RSXGPU::SetVertexData4f(const struct RSXGPU* this, const uint8_t index, const float* v)
+  822  008D5EF8     34  void RSXGPU::SetVertexDataArray(const struct RSXGPU* this, const uint8_t index, const uint16_t frequency, const uint8_t stride, const uint8_t size, const uint8_t type, const uint8_t location, const uint32_t offset)
+  832  008D5F2C      C  void RSXGPU::SetFrequencyDividerOperation(const struct RSXGPU* this, const uint16_t operation)
+  840  008D6044    110  void RSXGPU::SetFragmentProgramParameter(const struct RSXGPU* this, const CGprogram prog, const CGparameter param, const float* value, const uint32_t offset)
+                         local  uint32_t[4] valueRotated
+                         local  uint32_t x
+                         local  uint32_t y
+                         local  uint32_t z
+                         local  uint32_t w
+                         local  uint32_t* patchList
+                         local  uint32_t patchCount
+  887  008D6154     10  void RSXGPU::SetUpdateFragmentProgramParameter(const struct RSXGPU* this, const uint32_t offset)
+  896  008D5F38    10C  void RSXGPU::InlineTransfer(const struct RSXGPU* this, const uint32_t dstOffset, const void* srcAdr, const uint32_t sizeInWords)
+                         local  uint32_t countPadded
+                         local  uint32_t* src
+                         local  uint32_t i
+  931  008D6164    234  void RSXGPU::InlineTransferMainMemory(const struct RSXGPU* this, const uint32_t dstOffset, const void* srcAdr, const uint32_t sizeInWords)
+                         local  uint32_t countPadded
+                         local  uint32_t* src
+                         local  uint32_t i
+  982  008D6398     68  void RSXGPU::SetVertexConstant1x4f(const struct RSXGPU* this, uint32_t reg, const float* value)
+                         local  const uint32_t* v
+  998  008D6400     F8  void RSXGPU::SetVertexConstant4x4f(const struct RSXGPU* this, uint32_t reg, const float* value)
+                         local  const uint32_t* v
+ 1026  008D64F8     94  void RSXGPU::SetVertexProgramParameter(const struct RSXGPU* this, const CGparameter param, const float* value)
+ 1053  008D658C    1B4  void RSXGPU::SetVertexProgram(const struct RSXGPU* this, const CGprogram program, const void* ucode)
+                         local  const struct _CGvertexprograminfo* progInfo
+                         local  int32_t qwordCount
+                         local  const uint32_t* ucode32
+                         local  CGparameter parm
+                         local  const float* values
+ 1116  008D6740    120  void RSXGPU::SetFragmentProgram(const struct RSXGPU* this, const CGprogram program, const uint32_t offset)
+                         local  const struct _CGfragmentprograminfo* progInfo
+                         local  uint32_t texcoordMask
+                         local  uint32_t texcoordValue
+                         local  uint32_t i
+                         local  uint32_t registerCount
+ 1174  008D6860     48  void RSXGPU::CopyData(const struct RSXGPU* this, const uint32_t* srcBuffer, uint32_t wordCount)
+ 1190  008D68A8     40  void RSXGPU::Align(const struct RSXGPU* this, uint32_t alignment)
+ 1208  008D68E8     D8  void RSXGPU::SetPM(const struct RSXGPU* this, uint32_t mode)
+ 1244  008D69E8    10C  void RSXFriendlyBusyWait::Yield(const struct RSXFriendlyBusyWait* this)
+                         inlines  sys_timer_usleep

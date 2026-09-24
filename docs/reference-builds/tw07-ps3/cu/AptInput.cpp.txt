@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptInput.cpp
+// compiled in: other_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+  557  003EF80C      8  bool AptAnimationPoolData::_pointHits(const struct AptAnimationPoolData* this, struct AptCIH* pSprInst, AptInput input)
+  754  003EF814      4  void AptAnimationPoolData::_processListenerEvents(const struct AptAnimationPoolData* this, enum AptInputType eType, enum AptInputState eState, AptInput input)
+  823  003EF818      4  void AptAnimationPoolData::_addListenerToQueue(const struct AptAnimationPoolData* this, struct AptValue* pValue, int nEventFlags, AptInput input)
+ 1042  003EF81C      4  void AptAnimationPoolData::_processInput(const struct AptAnimationPoolData* this, AptInput input)
+ 1106  003EF820     30  void AptAnimationPoolData::processInputs(const struct AptAnimationPoolData* this)
+                         local  int i

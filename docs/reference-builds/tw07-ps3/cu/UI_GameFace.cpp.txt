@@ -1,0 +1,592 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_GameFace.cpp
+// compiled in: apt_unity.cpp
+// 237 functions, source order. line | PS3 address | size
+
+  177  000A6298     80  void* GFAssetTunerCB(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+  190  000C7F4C    1B4  void* GFCharTunerCB(void* pMgr, TU_eCallbackReason reason, void* data, void* userType)
+                         local  int32 charIndex
+                         local  int32 outfitIndex
+                         local  struct GolferData_t* pStats
+                         local  int32 charHandle
+                         local  int32 charDefSize
+                         local  uint8* pCharDef
+                         local  struct CharacterDefinition charDef
+                         local  int32 bHasHead
+                         inlines  GolferStats::GetGolferStats, Singleton<GolferStats>::GetSingleton
+  225    inline-only   struct UIGameFace* GetGF()
+  230    inline-only   struct UIProShopMenu* GetPSM()
+  240    inline-only   struct UIAttributeWrapUp* GetAttributes()
+  249    inline-only   struct UIAttributeWrapHelp* GetAttributesHelp()
+  255    inline-only   struct UIMenuGFToggle* GetGFToggle()
+  265  000C4CE8     14  void GFGoIntoAppWalkthrough()
+  278  000C4CD8     10  void UIGameFace::EnterAppWalkthrough(const struct UIGameFace* this)
+  284  0007DC54    174  void MakeCrAPIconNameString(char* strBuf, int32 bufSize, uint16 id)
+  308  000C4CC4     14  void GFSkipAppearance()
+  313  000C4CB4     10  void UIGameFace::SkipAppWalkthrough(const struct UIGameFace* this)
+  321  000355E0     30  void GF_SetSortOwned(int32 value)
+  327  00035610     30  void GF_SetSortStatus(int32 value)
+  333  0003569C     60  void GF_SetSortMod(int32 value)
+  342  000356FC     90  void GF_SetSortBrand(int32 value)
+  355  0003578C     28  void GF_SetSortColor(int32 value)
+  363  000357B4     28  void GF_SetSortLevel(int32 value)
+  369  000357DC     3C  void GF_SetSortCat(int32 value)
+  376  00095ACC     6C  void GF_SetSortSubCat(int32 value)
+                         local  int32 catOption
+                         local  FE_CrAP_Asset_Category_e cat
+  386  000358AC     3C  void GF_SetFilterEra(int32 value, int32 category)
+  396  00095A08     C4  void GetBrandText(int32 menuItemIndex, int32 itemOptionIndex)
+  409  0009597C     8C  void GetSortText(int32 menuItemIndex, int32 itemOptionIndex)
+  421  000958C0     BC  void ChangePSSCategory(int32 menuItemIndex, int32 itemOptionIndex)
+                         local  int32 numSubCat
+                         inlines  UIGameFace::SetCurProSearchCat
+  436  00095844     7C  void GetCategoryText(int32 menuItemIndex, int32 itemOptionIndex)
+  444  0009579C     A8  void GetSubCategoryText(int32 menuItemIndex, int32 itemOptionIndex)
+                         local  char[32] strBuf
+                         inlines  UIGameFace::GetCurProSearchCat
+  465  00095724     78  void GetGenderText(int32 menuItemIndex, int32 itemOptionIndex)
+  473  0009568C     98  void GetHandText(int32 menuItemIndex, int32 itemOptionIndex)
+  485  000F4DCC     9C  void UIGameFace::UIGameFace(const struct UIGameFace* this)
+                         inlines  TExternArray<GFMenuItem>::TExternArray
+  495  000F1C0C    160  void UIGameFace::~UIGameFace(const struct UIGameFace* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<GFMenuItem>::~TExternArray, UIMenuCircBase::~UIMenuCircBase
+  499  000EF5D0    1CC  void UIGameFace::Init(const struct UIGameFace* this)
+                         local  const char[5] __FUNCTION__
+                         local  int32 i
+                         inlines  AptScreenSubscriber::SetCanShowOptionsScreen, FlashUpdateItem::SetFlashUpdateList, TagValuePair, UIMenuCircBase::SetNbrItemsVisibleInMenu, operator+
+  531  000971BC     B8  void UIGameFace::Close(const struct UIGameFace* this)
+  542  0003596C      8  bool UIGameFace::GetInOnlineProShop(const struct UIGameFace* this)
+  547  000D5F50    BBC  void UIGameFace::Show(const struct UIGameFace* this, enum eGFMode mode)
+                         local  int32 i
+                         local  int32 nOwnerIndex
+                         local  bool bAddedAssetsToTuner
+                         local  int32 numAppearenceItems
+                         local  char[64] tunerBuf
+                         local  int catId
+                         local  int32 cat
+                         local  int32 assetCount
+                         local  int32 firstID
+                         local  int32 i
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  const char* assetName
+                         local  char* pUnder
+                         local  int catCatId
+                         local  int32 i
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  const char* assetName
+                         local  int32 chr
+                         local  struct GolferData_t* pStats
+                         local  int32 shirt
+                         local  int32 i
+                         local  int32 i
+                         local  int32 smallIdx
+                         local  uint16 tmpID
+                         local  int32 j
+                         inlines  GolferStats::GetGolferStats, Singleton<GolferStats>::GetSingleton, UserInfo::SetLoginIndex, std::strstr
+  957  00035B08     64  void UIGameFace::OnShow(const struct UIGameFace* this)
+  965  0007936C     AC  void UIGameFace::InitMenuParams(const struct UIGameFace* this)
+                         inlines  UIExternScrollMenuIterator::TurnOnOffScrollBar
+  979  00035B6C    170  char* UIGameFace::GetMenuItemDesc(const struct UIGameFace* this, int32 index)
+                         local  const char*[12] keyList
+                         local  const char*[4] keyList
+                         local  const char*[3] keyList
+                         local  const char*[18] keyList
+ 1058  00035CDC    110  char* UIGameFace::GetMenuItemIcon(const struct UIGameFace* this, int32 index)
+                         local  const char*[20] keyList
+                         local  const char*[2] keyList
+                         local  const char*[15] keyList
+                         local  const char*[13] keyList
+                         local  const char*[3] keyList
+                         local  const char*[4] keyList
+ 1178  00035DEC     D4  void UIGameFace::UpdateItemAndLabel(const struct UIGameFace* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct GFMenuItem* dest
+ 1201  000D5F38     18  void RedoNameChar()
+ 1206  000B95CC    1D4  bool UIGameFace::CheckValidUserName(const struct UIGameFace* this, MemCardActionFuncPtr* onFailFunc)
+                         local  char[256] kbText
+                         local  bool bIsAllSpaces
+                         local  int32 i
+                         local  const char* msg
+                         inlines  Singleton<UserManager>::GetSingleton
+ 1252  0009552C     B0  void UIGameFace::DoGhostForGFPopups(const struct UIGameFace* this)
+ 1276  00095474     B8  void UIGameFace::DoUnGhostForGFPopups(const struct UIGameFace* this)
+ 1299  000955DC     B0  void UIGameFace::LooseFocus(const struct UIGameFace* this, uint32 comeFrom_Signature)
+ 1310  000D5C48    2F0  void UIGameFace::RegainFocus(const struct UIGameFace* this, uint32 comeFrom_Signature)
+                         local  bool bGotDataBack
+                         local  bool bDataIsValid
+                         local  char[256] kbText
+                         local  enum State keyboardState
+                         local  int32 selectedSlot
+ 1420  000D2814     80  void UIGameFace::GoFlow(const struct UIGameFace* this, enum eGFFlow_t toScreen)
+                         local  enum eGFFlow_t oldScreen
+                         inlines  FE_sCharRenderMgr::SetUpdateBallTexture
+ 1445  000D278C     88  void UIGameFace::FlowLeaveScreen(const struct UIGameFace* this, enum eGFFlow_t fromScreen, enum eGFFlow_t toScreen)
+ 1475  000D267C     48  void UIGameFace::LeaveScreens_Tattoos(const struct UIGameFace* this, enum eGFFlow_t fromScreen, enum eGFFlow_t toScreen)
+ 1489  00065CFC     54  void UIGameFace::LeaveScreens_Animations(const struct UIGameFace* this, enum eGFFlow_t fromScreen, enum eGFFlow_t toScreen)
+ 1499  0006D104     64  void UIGameFace::LeaveScreens_Skills(const struct UIGameFace* this, enum eGFFlow_t fromScreen, enum eGFFlow_t toScreen)
+ 1527  000D23FC    280  void UIGameFace::LeaveScreens_Appearance(const struct UIGameFace* this, enum eGFFlow_t fromScreen, enum eGFFlow_t toScreen)
+ 1601  00065D50     68  void UIGameFace::LeaveScreens_ProShop(const struct UIGameFace* this, enum eGFFlow_t fromScreen, enum eGFFlow_t toScreen)
+ 1612  000D233C     C0  void UIGameFace::LeaveScreens_ProSearch(const struct UIGameFace* this, enum eGFFlow_t fromScreen, enum eGFFlow_t toScreen)
+ 1628  00035974    138  void UIGameFace::SetRingState(const struct UIGameFace* this, enum GFRingState newState)
+ 1669  000B1424    14C  void ShutDownGameFace()
+                         inlines  OnlineManagerOSDK::SetWaitingForGameFace, UserInfo::SetValid
+ 1712  000D5904     90  void FinishGameFaceSaveCB(int32 rslt)
+ 1743  000B5A98     38  void FinishDownloadableContentCheckCB(int32 rslt)
+                         inlines  UIGameFace::NeedToAskSave
+ 1756  000B5884     E0  void SaveGFUser()
+                         inlines  UserInfo::SetLoaded
+ 1784  000B5B0C     3C  void TurnOffAutoSaveCB()
+ 1790  000B5AD0     3C  void TurnOnAutoSaveCB()
+ 1795  000B5A84     14  void OnBackAutoSaveCB()
+ 1800  0005F250     5C  void AskAutoSave()
+ 1805  000D58AC     58  void OnSelectDifficulty(int32 index)
+ 1823  000B5964    120  void UIGameFace::AskSaveOnExit(const struct UIGameFace* this)
+ 1838  000D5994     24  void UIGameFace::DoFinalCheckForSave(const struct UIGameFace* this)
+                         inlines  UIGameFace::NeedToAskSave
+ 1861  00024DB4     40  enum AptThreadReturnValue UIGameFace::ShutdownThread(const struct UIGameFace* this)
+ 1867  000D59B8    270  void UIGameFace::FlowEnterScreen(const struct UIGameFace* this, enum eGFFlow_t toScreen, enum eGFFlow_t fromScreen)
+                         local  bool bInNewNewNonTigerUserMode
+ 1943  00095304    170  void UIGameFace::NotifyTattooUpdate(const struct UIGameFace* this)
+                         local  int32 slot
+                         local  int32 shape
+                         local  int32 templateOption
+ 1971  000B54BC     74  void UIGameFace::NotifyGetUseNewGfMenu(const struct UIGameFace* this)
+ 1986  000B53E8     D4  bool UIGameFace::GetNewItemsInProShop(const struct UIGameFace* this)
+ 2003  00035F60     88  void UIGameFace::UpdateLogoPreview(const struct UIGameFace* this, int32 slot, int32 shape, int32 templateOption)
+ 2009  00035F3C     24  void UIGameFace::DoUnGhost(const struct UIGameFace* this)
+ 2014  00095074    290  void UIGameFace::EnterScreens_Tattoos(const struct UIGameFace* this, enum eGFFlow_t toScreen, enum eGFFlow_t fromScreen)
+                         local  char* dName
+                         local  int32 logoNum
+ 2088  0008D66C    1B4  void UIGameFace::EnterScreens_Animations(const struct UIGameFace* this, enum eGFFlow_t toScreen, enum eGFFlow_t fromScreen)
+                         local  int32 destScreen
+                         local  uint32 numOptions
+                         local  uint32 numOptions
+                         local  uint32 numOptions
+ 2152  000D57A8    104  void UIGameFace::CanceledSave(const struct UIGameFace* this)
+ 2185  0006D168     3C  void UIGameFace::EnterScreens_Skills(const struct UIGameFace* this, enum eGFFlow_t toScreen, enum eGFFlow_t fromScreen)
+ 2192  000A9560    934  void UIGameFace::EnterScreens_Appearance(const struct UIGameFace* this, enum eGFFlow_t toScreen, enum eGFFlow_t fromScreen)
+                         local  const char* helpTextKey
+                         inlines  UIMenuGFToggle::SetTopMessageStr
+ 2466  00036160     88  bool UIGameFace::IsFlowChangeOk(const struct UIGameFace* this)
+                         local  bool isReady
+ 2484  0008D360    1A8  int32 UIGameFace::SetupListCacheForCatAndSubCat(const struct UIGameFace* this, FE_CrAP_Asset_Category_e cat, int32 subCat)
+                         local  uint16* idList
+                         local  bool saveApplyFilterState
+                         local  int32 numOptions
+                         local  int32 i
+                         local  int32 unfilteredEntryNum
+                         local  int32 id
+                         inlines  UIGameFace::GetProShopMenuAssetList, UIGameFace::SetProShopMenuAssetListCount
+ 2527  0008D1BC    1A4  int32 UIGameFace::SetupListCacheForHair(const struct UIGameFace* this)
+                         local  uint16* idList
+                         local  bool saveApplyFilterState
+                         local  int32 numHairSubs
+                         local  int32 acc
+                         local  int32 sub
+                         local  int32 numOptions
+                         local  int32 i
+                         local  int32 unfilteredEntryNum
+                         local  int32 id
+                         inlines  UIGameFace::GetProShopMenuAssetList, UIGameFace::SetProShopMenuAssetListCount
+ 2575  0008CF8C    230  int32 UIGameFace::SetupListCacheForAllClubs(const struct UIGameFace* this)
+                         local  uint16* idList
+                         local  bool saveApplyFilterState
+                         local  int32 numEquipmentSubs
+                         local  int32 acc
+                         local  int32 sub
+                         local  int32 numOptions
+                         local  int32 i
+                         local  int32 iron7Count
+                         local  int32 unfilteredEntryNum
+                         local  int32 id
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         inlines  UIGameFace::GetProShopMenuAssetList, UIGameFace::SetProShopMenuAssetListCount
+ 2640  000360D4     88  void UIGameFace::InvalidateAllProShopIconStreaming(const struct UIGameFace* this)
+                         local  int32 i
+                         local  eAptSlot slot
+ 2655  0003615C      4  void UIGameFace::DoProShopIconsStreamingPerMenuPos(const struct UIGameFace* this, int32 currentMenuItemSelected)
+ 2659  000361E8     88  bool UIGameFace::IsCatSubcatUnequipable(const struct UIGameFace* this, FE_CrAP_Asset_Category_e category, int32 subCategory)
+ 2673  000D55D8    1D0  void UIGameFace::PurchaseCompleteCallback(int32 assetID)
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  const char* animName
+                         local  const char* cameraName
+                         local  bool bIsIdleAnim
+                         local  FE_CrAP_Asset_Category_e category
+                         local  int32 subcategory
+                         local  int32 entryNum
+ 2704  00036270      C  bool UIGameFace::PostLoadAnimOK(const struct UIGameFace* this)
+ 2709  000D4770     90  void UIGameFace::CheckPostLoadActions(const struct UIGameFace* this)
+ 2723  000D4800    640  void UIGameFace::DoPurchaseCurrentProShopItem(const struct UIGameFace* this)
+                         local  uint16* idList
+                         local  bool bDoPurchase
+                         local  FE_CrAP_Asset_Category_e category
+                         local  int32 curSubCategory
+                         local  int32 unfilteredEntryNum
+                         local  int32 curActiveItemIndex
+                         local  int32 assetID
+                         local  bool onSale
+                         local  uint32 price
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  struct FE_CrAP_Asset_t* asset
+                         inlines  UIGameFace::GetProShopMenuAssetList
+ 2911  00065DB8     AC  void UIGameFace::UpdateNumAnimEquippedUI(const struct UIGameFace* this, int32 type)
+                         local  int32 numOn
+                         local  char[64] strBuf
+ 2930  000B94F8     14  void GFSellAccepted()
+ 2935  0008C28C    1B0  int32 UIGameFace::GetNumberOfRealAssetsInProShop(const struct UIGameFace* this, bool onlyCountAvailableAssets)
+                         local  struct catSubPair[19] screens
+                         local  const int32 numScreens
+                         local  int32 assetCount
+                         local  int32 i
+                         local  int32 numAssetsThisScreen
+ 2990  000B90EC    40C  void UIGameFace::DoSellCurrentProShopItem(const struct UIGameFace* this)
+                         local  uint16* idList
+                         local  FE_CrAP_Asset_Category_e category
+                         local  int32 curSubCategory
+                         local  int32 unfilteredEntryNum
+                         local  int32 curActiveItemIndex
+                         local  int32 assetID
+                         local  int32[2] bonus
+                         local  int8[4] tokenTypePerSlot
+                         local  int32 i
+                         local  int32 j
+                         local  char* msg
+                         inlines  BitArray_ClearBit, UIGameFace::GetProShopMenuAssetList
+ 3080  000363F4    158  bool UIGameFace::ShouldItemBeEquipped(const struct UIGameFace* this, int32 assetID)
+                         local  bool bEquipped
+                         local  FE_CrAP_Asset_Category_e category
+                         local  int32 subCategory
+                         local  int32 unfilteredEntryNum
+                         local  struct FE_CrAP_Asset_t* pAsset
+ 3117  000A5EAC    2A4  void UIGameFace::DoPreviewCurrentProShopItem(const struct UIGameFace* this)
+                         local  uint16* idList
+                         local  FE_CrAP_Asset_Category_e category
+                         local  int32 curSubCategory
+                         local  int32 unfilteredEntryNum
+                         local  int32 curActiveItemIndex
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  struct FE_CrAP_Asset_t* pAsset
+                         local  bool bEquipped
+                         inlines  UIGameFace::GetProShopMenuAssetList
+ 3197  0006B830    1CC  int32 UIGameFace::SetupListCacheForFeaturedItems(const struct UIGameFace* this)
+                         local  uint16* idList
+                         local  bool saveApplyFilterState
+                         local  FE_CrAP_Asset_Gender_e gender
+                         local  int32 numOptions
+                         local  int32 saleID
+                         local  int32 item
+                         local  int32 id
+                         local  const struct FE_CrAP_Asset_t* asset
+                         inlines  UIGameFace::GetProShopMenuAssetList, UIGameFace::SetProShopMenuAssetListCount
+ 3246  0008CE48    144  int32 UIGameFace::SetupListCacheForNewUserItems(const struct UIGameFace* this, FE_CrAP_Asset_Category_e cat, int32 subCat)
+                         local  uint16* idList
+                         local  int32 numOptions
+                         local  int32 i
+                         local  int32 unfilteredEntryNum
+                         local  int32 id
+                         inlines  UIGameFace::GetProShopMenuAssetList, UIGameFace::SetProShopMenuAssetListCount
+ 3272  0008CC8C    1BC  int32 UIGameFace::SetupListCacheForSkills(const struct UIGameFace* this, FE_CrAP_Asset_Category_e cat, int32 subCat)
+                         local  uint16* idList
+                         local  int32 numOptions
+                         local  int32 startIdx
+                         local  int32 set
+                         local  int32 i
+                         local  int32 unfilteredEntryNum
+                         local  int32 id
+                         inlines  UIGameFace::GetProShopMenuAssetList, UIGameFace::SetProShopMenuAssetListCount
+ 3330  0008D508    164  int32 UIGameFace::SetupListCacheForNewProshopItems(const struct UIGameFace* this)
+                         local  int32 numTotalOptions
+                         local  int32 numNewOptions
+                         local  uint16* idList
+                         local  int32 i
+                         local  uint32 assetId
+                         inlines  UIGameFace::GetProShopMenuAssetList, UIGameFace::SetProShopMenuAssetListCount
+ 3363  000A9328    238  void UIGameFace::EnterScreens_ProShop(const struct UIGameFace* this, enum eGFFlow_t toScreen, enum eGFFlow_t fromScreen)
+                         local  uint32 numOptions
+                         local  FE_CrAP_Asset_Category_e category
+                         local  int32 subCategory
+                         local  FE_CrAP_Asset_Slot_e itemSlot
+                         local  int32 instanceData
+                         local  int32 extraAssetCount
+                         local  int16 id
+                         local  int32 extraAssetCount
+ 3451  000367C4    1F8  int32 UIGameFace::AppendCurrentClothingToAssetList(const struct UIGameFace* this)
+                         local  int32[59] slotsOn
+                         local  int32 mExtraAssets
+                         local  const struct CrAPInfo_t& crapInfo
+                         local  int32 i
+                         local  int32 i
+                         local  int32 alreadyInList
+                         local  int32 assetID
+                         local  int32 j
+                         local  struct FE_CrAP_Asset_t* pAsset
+ 3491  000A9194    194  void UIGameFace::EnterScreens_ProSearch(const struct UIGameFace* this, enum eGFFlow_t toScreen, enum eGFFlow_t fromScreen)
+                         local  uint32 numOptions
+                         local  int32 extraAssetCount
+                         inlines  UIMenuGFToggle::SetTopMessageStr
+ 3522  000D4718     58  enum AptThreadReturnValue UIGameFace::WaitStreamingLaunchFlow(const struct UIGameFace* this)
+ 3545  00094F64    110  enum AptThreadReturnValue UIGameFace::SkinUpdateThread(const struct UIGameFace* this)
+                         local  char[64] aptBuf
+                         local  int32 option
+                         local  int32 i
+                         local  int32 toneIndex
+ 3569  0002AEF8      8  bool UIGameFace::ShouldAllowModelRotate(const struct UIGameFace* this)
+ 3574  0002AEF0      8  bool UIGameFace::ShouldAllowModelZoom(const struct UIGameFace* this)
+ 3579  0006A94C    128  enum AptThreadReturnValue UIGameFace::FrontLoadCharacterWaitThread(const struct UIGameFace* this)
+ 3619  000369BC     7C  void UIGameFace::CopyAssetList(const struct UIGameFace* this, uint16* pDestList, const int32& destListCurSize, int32 destListMaxSize, uint16* pSrcList, int32 srcListSize)
+                         local  int32 itemsToCopy
+ 3632  000A90C0     D4  void UIGameFace::DoCacheForRandomizeScreen(const struct UIGameFace* this)
+                         local  const int32 kListSize
+                         local  uint16[128] assetList
+                         local  int32 assetCount
+ 3650  000AB088    268  void UIGameFace::RequestInitialLoadCaching(const struct UIGameFace* this)
+                         local  const int32 kListSize
+                         local  uint16[128] assetList
+                         local  int32 assetCount
+ 3707  0006AA74     B0  enum AptThreadReturnValue UIGameFace::FrontLoadEquippedClubsWaitThread(const struct UIGameFace* this)
+                         local  bool bLoadingScreenShown
+ 3738  000D4514    204  enum AptThreadReturnValue UIGameFace::FirstAppearThread(const struct UIGameFace* this)
+                         local  const struct UserInfo& userInfo
+ 3821  00036B68     28  enum AptThreadReturnValue UIGameFace::StreamerUpdateThread(const struct UIGameFace* this)
+ 3908  000ABE68     64  void UIGameFace::Update(const struct UIGameFace* this)
+ 3989  00036A38    130  void UIGameFace::UpdateHourGlassIcon(const struct UIGameFace* this, bool bForceOn)
+                         local  int32 forceCounter
+                         local  bool bShowLoadingIcon
+ 4019  000A82B8    134  void UIGameFace::Hide(const struct UIGameFace* this)
+                         inlines  AptControllerListener::StopPortLocking
+ 4057  00036B90      4  void UIGameFace::OnHide(const struct UIGameFace* this)
+ 4064  000D4150    214  enum eAptHandleInput UIGameFace::HandleInput(const struct UIGameFace* this, int32 cID)
+                         inlines  AptScreenSubscriber::IsSequenceComplete
+ 4111  00065F28     C0  void UIGameFace::NewControlState(const struct UIGameFace* this, enum GFControlState newState)
+                         local  int32 i
+ 4127  000AAF8C     FC  enum eAptHandleInput UIGameFace::ControlDuringPreview(const struct UIGameFace* this, int32 cID)
+ 4152  000D4364    1B0  void GFLogoFlowProceed()
+                         local  int32 selectedSlot
+                         local  int32 templateOption
+                         local  int32 shape
+ 4178  00035FE8     AC  void UIGameFace::CacheExistingLogo(const struct UIGameFace* this, int32 option)
+ 4192  000D2778     14  void GFLogoKeepChanges()
+ 4197  000D2730     48  void GFLogoDitchChanges()
+ 4205  000D26C4     6C  void UIGameFace::ExitLogoCreateScreen(const struct UIGameFace* this)
+ 4215  000D3CF0    460  enum eAptHandleInput UIGameFace::ControlLogo(const struct UIGameFace* this, int32 cID)
+                         local  int32 selectedSlot
+                         local  int32 templateOption
+                         local  int32 curType
+                         local  int32 newType
+                         local  char* temp
+                         local  int32 shape
+                         inlines  UILogoEditor::SetControlsEnabled
+ 4333  00036B94     34  bool UIGameFace::DoesProShopScreenAllowZoom(const struct UIGameFace* this, enum eGFFlow_t targetScreen)
+ 4350  00036BC8     68  void UIGameFace::SetAllowZoomBasedOnCameraState(const struct UIGameFace* this, enum FE_eCrAPCameraState camState)
+ 4368  000D38A8    448  enum eAptHandleInput UIGameFace::ControlCircMenu(const struct UIGameFace* this, int32 cID)
+                         local  int32 i
+                         local  struct UIProShopMenuStopMultipleInit noMoreMultipleShow
+                         local  enum eGFFlow_t targetScreen
+                         local  int32 i
+                         local  int32 i
+                         local  enum eGFFlow_t destScreen
+ 4513  000D36FC    1AC  enum AptThreadReturnValue UIGameFace::ShutdownWithPictureThread(const struct UIGameFace* this)
+                         local  int32 countDown
+                         inlines  FEGolferThumbnail::SetPendingSnapFlag, ThumbNailManager::GetTexFactory
+ 4563  0009E03C     14  void GFEquipCustomSwing()
+ 4568  000A6150    148  enum eAptHandleInput UIGameFace::ControlAnimations(const struct UIGameFace* this, int32 cID)
+                         local  enum eGFFlow_t mCurScreen
+ 4617  0006035C     14  void GFGoBackToBasics()
+ 4623  00036CE8     40  void GFRefreshHelpText()
+ 4629  00036C94     54  void UIGameFace::WaitAndQuit(const struct UIGameFace* this)
+ 4636  00036C30     5C  void UIGameFace::WaitAndFlow(const struct UIGameFace* this, enum eGFFlow_t toScreen)
+ 4644  000D5C34     14  void GFCancelSkipAppearance()
+ 4649  000D5C28      C  void UIGameFace::CancelSkipAppearance(const struct UIGameFace* this)
+ 4654  000AAF40     4C  void UIGameFace::PostMsgResetHelpText()
+ 4659  000D2F94    550  enum eAptHandleInput UIGameFace::ControlAppearanceScreen(const struct UIGameFace* this, int32 cID)
+                         local  enum eGFFlow_t nextScreen
+                         local  enum eGFFlow_t nextScreen
+ 4889  000AC52C     A4  enum AptThreadReturnValue UIGameFace::ExitAppearanceScreenThread(const struct UIGameFace* this)
+ 4908  000A7BB4    100  enum AptThreadReturnValue UIGameFace::WaitForStreamBeforeExitAppearanceScreenThread(const struct UIGameFace* this)
+ 4937  0006608C     24  void GFReturnToClothes()
+ 4945  000D2D88    20C  enum AptThreadReturnValue UIGameFace::AfterNewClothingSectionThread(const struct UIGameFace* this)
+                         local  int32 countDown
+                         inlines  FEGolferThumbnail::SetPendingSnapFlag, ThumbNailManager::GetTexFactory
+ 5009  00094D6C    1F8  void UIGameFace::SetSliderHelpText(const struct UIGameFace* this)
+                         local  enum eGFFlow_t mCurScreen
+                         local  struct UIMenuToggleItem* currItem
+ 5046  00094C14    158  void UIGameFace::PressedSliderMinMax(const struct UIGameFace* this)
+                         local  struct UIMenuToggleItem* currItem
+                         local  int32 current
+ 5083  000C49CC     F4  void UIGameFace::BeginModelLoad(const struct UIGameFace* this)
+                         local  const struct UserInfo& userInfo
+ 5110  000C4C20     94  void UIGameFace::ConfirmBasicsScreen(const struct UIGameFace* this)
+ 5138  000D2C7C    10C  enum eAptHandleInput UIGameFace::ControlSearchScreen(const struct UIGameFace* this, int32 cID)
+ 5180  0006AD80     90  void UIGameFace::ForceCharacterToThumbnailReadyState(const struct UIGameFace* this)
+                         local  const char* animName
+ 5196  00036D8C      8  bool UIGameFace::IsFullCamera(const struct UIGameFace* this)
+ 5214  00065FE8     A4  enum AptThreadReturnValue UIGameFace::AfterLogoThumbnailThread(const struct UIGameFace* this)
+                         local  int32 countDown
+ 5273  000D2A54    228  enum AptThreadReturnValue UIGameFace::AfterSearchThumbnailThread(const struct UIGameFace* this)
+                         local  int32 countDown
+                         inlines  FEGolferThumbnail::SetPendingSnapFlag, ThumbNailManager::GetTexFactory, UIGameFace::SetCurProSearchCat
+ 5328  000D34E4    218  enum eAptHandleInput UIGameFace::ControlProShopScreen(const struct UIGameFace* this, int32 cID)
+                         local  enum eGFFlow_t cur
+                         local  enum eGFFlow_t cur
+ 5429  000A7A60    154  enum AptThreadReturnValue UIGameFace::WaitForStreamBeforeExitProShopScreenThread(const struct UIGameFace* this)
+ 5468  000D29F8     5C  enum AptThreadReturnValue UIGameFace::WaitForStreamBeforeExitProSortScreenThread(const struct UIGameFace* this)
+ 5483  000A797C     E4  enum AptThreadReturnValue UIGameFace::WaitForStreamBeforeExitProSearchScreenThread(const struct UIGameFace* this)
+ 5515  000D2900     F8  enum eAptHandleInput UIGameFace::ControlSkills(const struct UIGameFace* this, int32 cID)
+ 5628  00036D94    220  void UIGameFace::AddMenuItemNonCrAP(const struct UIGameFace* this, const char* stringId, int32 numOptions, int32 toggleType, GetOptionFuncPtr* getOptionFunc, SetOptionFuncPtr* setOptionFunc, GetOptionTextFuncPtr* getTextFunc, ChangeOptionCallbackFuncPtr* changeCallbackFunc, enum eGFToggleType screenToggleType)
+ 5651  00036FB4      C  void UIGameFace::ResetMenuBuilder(const struct UIGameFace* this)
+ 5656  0003775C    10C  void UIGameFace::BuildMenu_ProShopSort(const struct UIGameFace* this)
+                         local  int32 numBrands
+ 5673  00060370    190  void UIGameFace::BuildMenu_ProShopSearch(const struct UIGameFace* this)
+                         local  int32 numCat
+                         local  int32 numSub
+                         local  int32 numBrands
+                         inlines  UIGameFace::SetCurProSearchCat
+ 5699  000374EC    270  void UIGameFace::BuildMenu_Basics(const struct UIGameFace* this)
+                         local  int32 numHeightOptions
+ 5727  00037868     98  int32 UIGameFace::GetToggleTypeForFeature(const struct UIGameFace* this, enum GFAppFeatureKey featureKey)
+                         local  int32 type
+                         local  int32 i
+                         local  int32 tableSize
+ 5750  0008DF34    154  void UIGameFace::AddGFFeatureMenuItem(const struct UIGameFace* this, const char* menuItemLabel, enum GFAppFeatureKey featureKey, enum eGFToggleType screenToggleType, int8 gender)
+                         local  int32 curGender
+                         local  int32 numOptions
+                         local  int32 toggleType
+ 5764  0008EA90    174  void UIGameFace::BuildMenu_HairSkin(const struct UIGameFace* this)
+ 5794  0008E940    150  void UIGameFace::BuildMenu_Eyes(const struct UIGameFace* this)
+ 5831  0008E85C     E4  void UIGameFace::BuildMenu_Brow(const struct UIGameFace* this)
+ 5848  0008E748    114  void UIGameFace::BuildMenu_FaceHead(const struct UIGameFace* this)
+ 5871  0008E58C    1BC  void UIGameFace::BuildMenu_Mouth(const struct UIGameFace* this)
+ 5906  0008E490     FC  void UIGameFace::BuildMenu_Nose(const struct UIGameFace* this)
+ 5930  0008E424     6C  void UIGameFace::BuildMenu_CheekEar(const struct UIGameFace* this)
+ 5942  0008E250    1D4  void UIGameFace::BuildMenu_ChinJaw(const struct UIGameFace* this)
+ 5974  0007DFB0     C0  void UIGameFace::BuildMenu_Voice(const struct UIGameFace* this)
+                         local  const struct UserInfo& userInfo
+ 5989  0008E13C    114  void UIGameFace::BuildMenu_UpperBody(const struct UIGameFace* this)
+ 6019  0008E088     B4  void UIGameFace::BuildMenu_LowerBody(const struct UIGameFace* this)
+ 6035  000373A4    148  void UIGameFace::BuildMenu_Randomize(const struct UIGameFace* this)
+ 6048  000372A8     FC  void UIGameFace::BuildMenu_LogoSelect(const struct UIGameFace* this)
+ 6065  000370F8    1B0  void UIGameFace::BuildMenu_LogoPlaceClothes(const struct UIGameFace* this)
+                         local  int32 i
+ 6085  00036FC0    138  void UIGameFace::BuildMenu_LogoPlaceBody(const struct UIGameFace* this)
+                         local  int32 i
+ 6102  00037900     6C  uint32 UIGameFace::GetAgeGroupIndex()
+                         local  uint8[4] ageGroupUpperLimits
+                         local  uint32 age
+                         local  uint32 ageGroupIndex
+ 6117  000D0288    384  void UIGameFace::DoRandomize(const struct UIGameFace* this)
+                         local  int32 i
+                         local  int32 numTgItems
+                         local  struct UIMenuToggleItem* curItem
+                         local  float newVal
+                         local  struct UIMenuToggleItem* curItem
+                         local  float newVal
+                         inlines  TExternArray<UIMenuToggleItem>::GetItem, TExternArray<UIMenuToggleItem>::vGetElemCount
+ 6184  000A7460    258  void UIGameFace::DoRandMenuRandomize(const struct UIGameFace* this, int32 index)
+                         local  const struct UserInfo& ui
+                         local  enum FE_CRAP_Randomize_Age age
+                         local  enum CrAP_Slider_e slider
+                         local  enum CrAP_Slider_e slider
+ 6256  0003654C    278  void UIGameFace::ProShopScreenToCategory(const struct UIGameFace* this, enum eGFFlow_t screen, FE_CrAP_Asset_Category_e* outCategory, int32* outSubCat, FE_CrAP_Asset_Slot_e* outSlot)
+                         local  FE_CrAP_Asset_Category_e cat
+                         local  int32 subCat
+                         local  FE_CrAP_Asset_Slot_e slot
+ 6392  000A7880     FC  enum AptThreadReturnValue UIGameFace::WaitForStreamBeforeEnterProSortScreenThread(const struct UIGameFace* this)
+                         inlines  UIMenuGFToggle::SetTopMessageStr
+ 6416  000AC4B4     78  void UIGameFace::DoProShopSort(const struct UIGameFace* this)
+ 6429  00065E64     C4  void UIGameFace::ManageProShopActiveState(const struct UIGameFace* this)
+ 6446  0003D340    174  void UIGameFace::ManageToggleActiveState(const struct UIGameFace* this)
+ 6478  000379DC      8  void UIGameFace::SetStartFlowScreen(const struct UIGameFace* this, enum eGFFlow_t startScreen)
+ 6483  00035AAC     5C  void UIGameFace::ResetSearchFilter(const struct UIGameFace* this)
+ 6504  00036D28     64  const char* UIGameFace::GetThumbnailAnimName(const struct UIGameFace* this)
+ 6516  00056B80     10  void UIGameFace::NotifyToggleAnimDone(const struct UIGameFace* this)
+ 6533  000379E4     44  void UIGameFace::ForceSkinColorUpdate(const struct UIGameFace* this)
+ 6542  0009E270     B0  void GF_SetAge(int32 value)
+                         local  const struct UserInfo& userInfo
+ 6555  00037A28      C  void GF_SetHeight(int32 value)
+ 6560  00094BB4     60  void GetAgeText(int32 menuItemIndex, int32 itemOptionIndex)
+                         local  char[8] strBuf
+ 6567  00094AD0     E4  void GetLogoSlotText(int32 menuItemIndex, int32 itemOptionIndex)
+                         local  char[32] strBuf
+ 6584  00037A34      4  void SetLogoSlot(int32 value)
+ 6589  00094A68     68  void GetLogoShapeText(int32 menuItemIndex, int32 itemOptionIndex)
+                         local  char[32] strBuf
+ 6598  00094990     D8  void GetLogoTemplateText(int32 menuItemIndex, int32 itemOptionIndex)
+                         local  char[32] strBuf
+                         local  int32 shape
+ 6615  0009494C     44  void GetLogoPlaceClothesText(int32 menuItemIndex, int32 itemOptionIndex)
+ 6627  0009DFE4     58  void ChangeLogoPlaceClothes(int32 menuItemIndex, int32 itemOptionIndex)
+ 6641  00094908     44  void GetLogoPlaceBodyText(int32 menuItemIndex, int32 itemOptionIndex)
+ 6653  0009DF84     60  void ChangeLogoPlaceBody(int32 menuItemIndex, int32 itemOptionIndex)
+ 6669  000947F4    114  void GetHeightText(int32 menuItemIndex, int32 itemOptionIndex)
+                         local  char[8] strBuf
+                         local  uint32 inches
+ 6690  000947AC     48  void GetNNameText(int32 menuItemIndex, int32 itemOptionIndex)
+ 6695  00037A38     5C  void GF_SetNName(int32 inParam)
+                         inlines  UserInfo::SetNickName
+ 6701  000990FC     34  void GF_ChangeVoice(int32 menuItemIndex, int32 itemOptionIndex)
+                         local  const struct UserInfo& userInfo
+                         inlines  UserInfo::SetVoiceStyle
+ 6710  00099028     D4  void GF_ChangeVoicePitch(int32 menuItemIndex, int32 itemOptionIndex)
+                         local  const struct UserInfo& userInfo
+                         local  float timeMult
+                         inlines  UserInfo::SetVoicePitch
+ 6726  00098EE8    140  void GF_PreviewVoice()
+                         local  struct TCharacter* pCharacter
+                         local  bool bMale
+                         local  const char* pAnimName
+                         local  int previewIndex
+                         inlines  Singleton<TalkyManager>::GetSingleton
+ 6739  00094714     98  void GF_GetVoiceStyleText(int32 menuItemIndex, int32 itemOptionIndex)
+                         local  const char* styleName
+                         inlines  Singleton<TalkyManager>::GetSingleton
+ 6746  00037A94     54  void ChangedGender(int32 menuItemIndex, int32 itemOptionIndex)
+                         local  uint8 newGender
+                         local  const struct UserInfo& userInfo
+ 6754  00037AE8     4C  void ChangedHandedness(int32 menuItemIndex, int32 itemOptionIndex)
+                         local  uint8 newHandedness
+                         local  const struct UserInfo& userInfo
+ 6761  000945D8    13C  void GetMenuGFFeatureText(int32 menuItemIndex, int32 itemOptionIndex)
+                         local  char[128] strBuf
+                         local  enum GFAppFeatureKey featureKey
+                         local  int32 i
+                         local  int32 tableSize
+ 6787  000945C0     18  void GetRandText(int32 menuItemIndex, int32 itemOptionIndex)
+ 6792  00037BD0     F8  void ChangeRandomize(int32 menuItemIndex, int32 itemOptionIndex)
+ 6822  000D2894     6C  enum AptThreadReturnValue UIGameFace::WaitForStreamBeforeFlowThread(const struct UIGameFace* this)
+ 6836  0003627C     58  void UIGameFace::HoldControlForStreamer(const struct UIGameFace* this)
+ 6843  000A3008     48  enum AptThreadReturnValue UIGameFace::HoldControlForStreamerThread(const struct UIGameFace* this)
+ 6854  000B0204     94  enum AptThreadReturnValue UIGameFace::DelayedFeatureChangeThread(const struct UIGameFace* this)
+ 6870  000B0178     8C  void UIGameFace::FlushPendingFeatureChange(const struct UIGameFace* this)
+ 6884  00037CC8     AC  void UIGameFace::SetPendingFeatureChange(const struct UIGameFace* this, enum GFAppFeatureKey featureKey, int32 itemOptionIndex)
+ 6899  000B00DC     9C  void OnGFFeatureChange(int32 menuItemUniqueId, int32 itemOptionIndex)
+                         local  int32 menuItemIndex
+                         local  enum GFAppFeatureKey featureKey
+                         local  struct UIMenuToggleItem* item
+ 6919  00037E0C     5C  void UIGameFace::ChangedCrAPToggle(const struct UIGameFace* this, int32 index)
+ 6930  00094534     8C  void ChangeLogoShape(int32 menuItemIndex, int32 itemOptionIndex)
+                         local  int32 slot
+                         local  int32 templateOption
+ 6938  000944B8     7C  void ChangeLogoTemplate(int32 menuItemIndex, int32 itemOptionIndex)
+                         local  int32 slot
+                         local  int32 shape
+ 6945  00094398    120  void ChangeLogoSlot(int32 menuItemIndex, int32 itemOptionIndex)
+                         local  int32 shape
+ 6966  00037E68    1F4  void SetSkinColor(int32 value)
+                         local  int32[10] colorMap
+                         local  struct HashString* pSliderNames
+                         local  float* pSliderValues
+                         local  int32 sliderIndex
+ 6989  00060500     1C  void RefreshSkinColors(int32 menuItemIndex, int32 itemOptionIndex)
+ 6996  000358E8     84  char* UIGameFace::GetCatName(int32 index)
+                         local  char*[30] catNames
+ 7039  00056B90     94  void UIGameFaceShutdown::ForceShutDownGameFace(const struct UIGameFaceShutdown* this, tSaveGameSMNotifyCB cb)
+ 7057  0007B2F4     14  void UIGameFaceShutdown::UIGameFaceShutDownCB()
+ 7064  000627F8     A4  void UIGameFaceShutdown::StartSequences(const struct UIGameFaceShutdown* this)
+ 7076  0007E42C    1B4  enum TAptSequenceStatus UIGameFaceShutdown::WaitForStreaming(const struct UIGameFaceShutdown* this, bool inbFirstTime, void* inData)
+                         local  bool bNeedToAskBePolite
+                         inlines  UIGameFace::NeedToAskSave, UIGameFaceShutdown::SetCancelShutdownCallBack
+ 7127  000B1570    194  enum TAptSequenceStatus UIGameFaceShutdown::ShutDownGameFaceSeq(const struct UIGameFaceShutdown* this, bool inbFirstTime, void* inData)
+ 7161  0009B8B0    14C  enum TAptSequenceStatus UIGameFaceShutdown::WaitForClose(const struct UIGameFaceShutdown* this, bool inbFirstTime, void* inData)
+                         inlines  AptScreenSubscriber::IsSequenceComplete
+ 7194  0006289C     74  enum TAptSequenceStatus UIGameFaceShutdown::DoCallBack(const struct UIGameFaceShutdown* this, bool inbFirstTime, void* inData)
+ 7208  0007B308     60  void UIGameFaceShutdown::UIGameFaceCancelShutDownCB()
+                         local  MemCardActionFuncPtr* pfnCancelShutdownCB
+                         inlines  UIGameFaceShutdown::GetCancelShutdownCallBack, UIGameFaceShutdown::SetCancelShutdownCallBack

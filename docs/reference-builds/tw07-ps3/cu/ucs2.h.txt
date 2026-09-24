@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/AptInterface/AptPackage/ea/string/ucs2.h
+// compiled in: other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   29    inline-only   void FromUcs4<short unsigned int*>(const short unsigned int*& iter, int ucs4)
+   35    inline-only   bool SizeIsLength()
+   38    inline-only   int NumCharactersFor(int )

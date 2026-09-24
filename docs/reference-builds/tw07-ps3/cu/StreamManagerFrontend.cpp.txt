@@ -1,0 +1,20 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/streaming/StreamManagerFrontend.cpp
+// compiled in: golf2_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   32  00135890     8C  void StreamManagerFrontend::RegisterStreamClients(const struct StreamManagerFrontend* this)
+   86  0013591C     64  void StreamManagerFrontend::UnregisterStreamClients(const struct StreamManagerFrontend* this)
+  129  00135980     90  void StreamManagerFE_RenderProgressBar(float completion)
+                         local  struct UILoadingScreen* lScreen
+  142  0016D33C    1CC  void StreamManagerFrontend::StreamFiles(const struct StreamManagerFrontend* this)
+                         local  int32 curFile
+                         local  int32 curOffset
+                         local  int32 fileSize
+                         local  float completion
+                         local  bool bStillStreaming
+                         local  bool dashboardAutoUpdating
+                         local  const struct UILoadingScreen& loadScr
+                         inlines  UILoadingScreen::SetState
+  205  00135A10     34  void StreamManagerFrontend::BeginStreamCallback(void* pData)
+  225  00135A44      4  void StreamManagerFrontend::EndStreamCallback(void* pData)
+  235  00135A48     4C  void StreamManagerFrontend::SetupFileStream(const struct StreamManagerFrontend* this)

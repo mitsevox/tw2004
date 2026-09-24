@@ -1,0 +1,29 @@
+// C:/packages/rwaudiocore/2.08.01/source/plugins/pan2d1.cpp
+// compiled in: pan2d1.cpp
+// 11 functions, source order. line | PS3 address | size
+
+    0  006D9614     48  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+    0  006D9A6C      C  void ~Pan2D1(const struct <anon>* this)
+                         inlines  ~PlugIn
+   39  006D9764     58  void Speaker::Set(const struct Speaker* this, float angle)
+                         inlines  std::cosf, std::sinf
+  202  006D9530      8  struct <anon>* GetPlugInDescRunTime()
+  208  006D966C     7C  void SetDefaultFrontSpeakerAngle(float frontAngle)
+                         inlines  Assert
+  218  006D96E8     7C  void SetDefaultRearSpeakerAngle(float rearAngle)
+                         inlines  Assert
+  226  006D9538     88  void SetDefaultNormalizationMode(enum NormalizationMode normMode)
+                         inlines  Assert
+  235  006D98E0    184  bool CreateInstance(struct PlugIn* pPlugIn, void* pConstructorParams)
+                         local  struct <anon>* pThis
+                         local  enum NormalizationMode normMode
+                         inlines  GetInputChannels, GetOutputChannels, Initialize<rw::audio::core::Pan2D1>
+  289  006D95C0     54  void ComputeTransform(const struct <anon>* this, float[2]* xform, const struct Speaker& startSpeaker, const struct Speaker& endSpeaker)
+                         local  float v1x
+                         local  float v1y
+                         local  float v2x
+                         local  float v2y
+                         local  float scale
+  305  006D97BC    124  void SpeakerConfig(const struct <anon>* this)
+                         inlines  std::cosf
+  333  006D965C     10  static void _GLOBAL__I__ZN2rw5audio4core6Pan2D17sSpuElfE()

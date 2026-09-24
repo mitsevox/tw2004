@@ -1,0 +1,102 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptFF/ffapt.cpp
+// compiled in: other_unity.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   55  004219D8    21C  void gammaTableInit(float gammaCorrection)
+                         local  int32_t gammaType
+                         local  const float invGamma
+                         local  uint8_t i
+                         local  float i01
+                         local  float i01
+                         inlines  std::pow
+  142  003F0A2C      4  void CFontFusion::flushCache(const struct CFontFusion* this)
+  156  0041B91C    11C  int CFontFusion::addFont(const struct CFontFusion* this, void* data, int sizeFont)
+                         local  const uint16_t fontIndex
+                         local  struct fontData* pFont
+                         local  int nError
+                         local  struct T2K_TRANS_MATRIX transform
+                         local  int8_t bFlushCache
+                         local  struct T2K_AlgStyleDescriptor* styling
+  211  003F59F4     FC  void CFontFusion::purge(const struct CFontFusion* this)
+                         local  int nError
+                         local  int i
+                         local  struct fontData* pFont
+  253  003F0AA0      8  unsigned int wstrlen(uint16_t* p)
+  265  003F0AA8      4  void CFontFusion::setStrokeFontScale(const struct CFontFusion* this, int nFont, float fScale)
+  279  0041BF4C    184  void CFontFusion::getName(const struct CFontFusion* this, int nFont, short unsigned int* szFontName, int nLanguageID)
+                         local  int nError
+                         local  short unsigned int* pSrc
+                         local  unsigned char* pSrc
+  327  0041C0D0    F98  int CFontFusion::renderString(const struct CFontFusion* this, int nFont, uint16_t* wszString, int nPointSize, const int& nTexWidth, const int& nTexHeight, unsigned char* pData, int bWrap, int nBoxWidth, enum Alignment eAlignment, int nLineOffset, float leadingCoef, float fontScale)
+                         local  const int nX
+                         local  const int nY
+                         local  const int nBorderSize
+                         local  const unsigned int MAX_STRING
+                         local  int nError
+                         local  int renderedCharacters
+                         local  struct T2K_TRANS_MATRIX trans
+                         local  float HACK_FF_ScaleX
+                         local  float HACK_FF_ScaleY
+                         local  int nLines
+                         local  uint16_t* pSourceLine
+                         local  const int xBorderSize
+                         local  int xYBase
+                         local  int nTextWidth
+                         local  const int renderingMaxX
+                         local  const int wrapMapX
+                         local  const int yNextLine
+                         local  int maxSizeX
+                         local  int maxSizeY
+                         local  bool newLine
+                         local  bool continueLine
+                         local  int xXBase
+                         local  uint16_t[512] wszLine1
+                         local  uint16_t* wszLine
+                         local  uint16_t* pLine
+                         local  unsigned int nLen
+                         local  int nnTextWidth
+                         local  F16Dot16 xAlignmentOffset
+                         local  int bRenderedACharacter
+                         local  int nNewWidth
+                         local  uint16_t* p
+                         local  uint16_t nIndex
+                         local  float HACK_FF_ScaleX
+                         local  float HACK_FF_ScaleY
+                         local  uint16_t* fontName
+                         local  bool sameFont
+                         local  int fontId
+                         local  uint16_t* pOrigLinePos
+                         local  int nOrigLen
+                         local  uint16_t* pOrigSourceLinePos
+                         local  int nWithNextWordWidth
+                         local  int x
+                         local  int y
+                         local  const int32_t maxX
+                         local  int32_t maxY
+                         local  bool needRender
+                         local  unsigned char* src
+                         local  const int32_t incRowSrc
+                         local  const int32_t incRowDst
+                         local  unsigned char* dst
+                         local  int32_t nX
+                         local  short unsigned int[64] fontNameUnicode
+                         local  int i
+                         local  float HACK_FF_ScaleX
+                         local  float HACK_FF_ScaleY
+  874  003EC0A4     38  enum eFFIcon CFontFusion::GetIconCoordinates(const struct CFontFusion* this, const int& x, const int& y)
+  884  0041979C    1A8  int CFontFusion::MeasureTextX(const struct CFontFusion* this, uint16_t* wszLine, int nFont)
+                         local  int nError
+                         local  int xXBase
+                         local  int maxX
+                         local  uint16_t* p
+                         local  uint16_t nIndex
+                         local  int x
+  910  003EC084     20  void CFontFusion::SetConversationLength(const struct CFontFusion* this, int length)
+  925  003F0994     98  void FFMemNoFrag::Init(struct FF_FM_Class* pManager)
+  937  003F0A30     70  void FFMemNoFrag::Close()
+  944  003F0AB8     64  void* FFMemNoFrag::AllocScanConverter()
+  951  003F0B1C     C0  void FFMemNoFrag::FreeScanConverter(void* scan)
+  958  003F0BDC     90  void* FFMemNoFrag::AllocT2K()
+                         local  uint32_t i
+  972  003F0C6C     7C  void FFMemNoFrag::FreeT2K(void* t2k)
+                         local  uint32_t i

@@ -1,0 +1,47 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/source/common/QueryIndex.cpp
+// compiled in: QueryIndex.cpp
+// 10 functions, source order. line | PS3 address | size
+
+    0  007ECC6C    10C  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   70  007EB004     38  void* operator new(size_t datasize, void* p)
+  121  007EB90C    1B8  struct QueryIndex* Create(int32_t initialAllocations, int32_t numColumns, int32_t numTables, struct <anon>* querySearch, enum TDbError* dbError)
+                         local  struct QueryIndex* index
+  157  007EB794    178  enum TDbError Destroy(const struct QueryIndex* this)
+                         local  int32_t numColumns
+  192  007EB37C    418  bool IsColumnUsed(const struct QueryIndex* this, struct Table* table, ColNum colIdx)
+                         local  const char[13] __FUNCTION__
+                         local  uint32_t tblNum
+                         local  uint32_t count
+                         local  bool8_t bIsUsed
+                         local  struct ICollection* collection
+                         local  uint32_t maxCount
+                         local  struct <anon>* indexColSort
+  276  007EC174    6E8  enum TDbError Rebuild(const struct QueryIndex* this, struct <anon>** ppCurrent)
+                         local  const char[8] __FUNCTION__
+                         local  enum TDbError dbErr
+                         local  struct <anon>* pNode
+                         local  union <anon>[10] oldKey
+                         local  struct <anon> filterRes
+  361  007EBAC4    6B0  struct <anon>* CreateQIdxKey(const struct QueryIndex* this)
+                         local  const char[14] __FUNCTION__
+                         local  uint8_t* pData
+                         local  struct <anon>* pColDef
+                         local  union <anon>* pColData
+                         local  ColNum colNum
+                         local  uint32_t tblNum
+                         local  RowNum* rowNums
+                         local  enum TDbError dbResult
+                         local  struct <anon>* node
+                         local  struct ICollection* collection
+                         local  int maxCount
+                         local  struct <anon>* indexColSort
+  450  007EC85C    410  bool8_t CheckUsage(const struct QueryIndex* this, struct Table* pTable, ColNum colIdx)
+                         local  const char[11] __FUNCTION__
+                         local  uint32_t tblNum
+                         local  uint32_t count
+                         local  bool8_t bIsUsed
+                         local  struct ICollection* collection
+                         local  uint32_t numCol
+                         local  struct <anon>* indexColSort
+  522  007ECD78     3C  static void _GLOBAL__I__ZN2EA4T3db10QueryIndex12sEmptyStringE()
+  523  007ECDB4     3C  static void _GLOBAL__D__ZN2EA4T3db10QueryIndex12sEmptyStringE()

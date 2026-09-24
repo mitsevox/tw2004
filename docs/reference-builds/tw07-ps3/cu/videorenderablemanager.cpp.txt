@@ -1,0 +1,105 @@
+// C:/packages/rwmovie/1.04.01/source/movielib/moviedecoder/cmn/videorenderablemanager.cpp
+// compiled in: videorenderablemanager.cpp
+// 26 functions, source order. line | PS3 address | size
+
+    0  006FD024     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+    0  006FE99C     2C  void ~VideoRenderableComparator(const struct <anon>* this)
+                         inlines  ~IComparator
+   33  006FD0C4     2C  enum Relation Compare(const struct <anon>* this, const void* lhs, const void* rhs)
+                         local  struct <anon>* left
+                         local  struct <anon>* right
+                         inlines  GetFrameNumber
+   95  006FD0F0     94  void AddEmptyRenderable(const struct <anon>* this, struct <anon>* renderable)
+                         local  struct <anon> aMutex
+                         local  void* p
+                         inlines  AutoMutex, ~AutoMutex
+  109  006FD184     98  struct <anon>* RetrieveEmptyRenderable(const struct <anon>* this)
+                         local  struct <anon> aMutex
+                         local  struct IListNode* node
+                         local  uintptr_t* pData
+                         inlines  AutoMutex, ~AutoMutex
+  126  006FD21C     D0  struct <anon>* RemoveEmptyRenderable(const struct <anon>* this)
+                         local  struct <anon> aMutex
+                         local  struct IListNode* node
+                         local  struct <anon>* pRend
+                         local  enum Status res
+                         inlines  AutoMutex, ~AutoMutex
+  143  006FD2EC     84  unsigned int GetNumberEmptyRenderables(const struct <anon>* this)
+                         local  struct <anon> aMutex
+                         inlines  AutoMutex, ~AutoMutex
+  151  006FD370     94  void AddFilledRenderable(const struct <anon>* this, struct <anon>* renderable)
+                         local  struct <anon> aMutex
+                         local  void* p
+                         inlines  AutoMutex, ~AutoMutex
+  159  006FD404     9C  void AddFilledSortedRenderable(const struct <anon>* this, struct <anon>* renderable)
+                         local  struct <anon> aMutex
+                         local  void* p
+                         inlines  AutoMutex, ~AutoMutex
+  169  006FD4A0     98  struct <anon>* RetrieveFilledRenderable(const struct <anon>* this)
+                         local  struct <anon> aMutex
+                         local  struct IListNode* node
+                         local  uintptr_t* pData
+                         inlines  AutoMutex, ~AutoMutex
+  188  006FD538     E8  struct <anon>* RetrieveQueuedFilledRenderable(const struct <anon>* this, const unsigned int nodeNum)
+                         local  struct <anon> aMutex
+                         local  struct IListNode* node
+                         local  uintptr_t* pData
+                         inlines  AutoMutex, ~AutoMutex
+  207  006FD620     D0  struct <anon>* RemoveFilledRenderable(const struct <anon>* this)
+                         local  struct <anon> aMutex
+                         local  struct IListNode* node
+                         local  struct <anon>* pRend
+                         local  enum Status res
+                         inlines  AutoMutex, ~AutoMutex
+  224  006FD6F0     84  unsigned int GetNumberFilledRenderables(const struct <anon>* this)
+                         local  struct <anon> aMutex
+                         inlines  AutoMutex, ~AutoMutex
+  232  006FD774     94  void AddSentToRendererRenderable(const struct <anon>* this, struct <anon>* renderable)
+                         local  struct <anon> aMutex
+                         local  void* p
+                         inlines  AutoMutex, ~AutoMutex
+  241  006FD808     98  struct <anon>* RetrieveSentToRendererRenderable(const struct <anon>* this)
+                         local  struct <anon> aMutex
+                         local  struct IListNode* node
+                         local  uintptr_t* pData
+                         inlines  AutoMutex, ~AutoMutex
+  258  006FCE60     A0  struct <anon>* RetrieveLastSentToRendererRenderable(const struct <anon>* this)
+                         local  struct IListNode* node
+                         local  uintptr_t* pData
+  275  006FD8A0     D0  struct <anon>* RemoveSentToRendererRenderable(const struct <anon>* this)
+                         local  struct <anon> aMutex
+                         local  struct IListNode* node
+                         local  struct <anon>* pRend
+                         local  enum Status res
+                         inlines  AutoMutex, ~AutoMutex
+  292  006FD970     84  unsigned int GetNumberSentToRendererRenderables(const struct <anon>* this)
+                         local  struct <anon> aMutex
+                         inlines  AutoMutex, ~AutoMutex
+  304  006FD9F4     94  void AddSentToDecoderRenderable(const struct <anon>* this, struct <anon>* renderable)
+                         local  struct <anon> aMutex
+                         local  void* p
+                         inlines  AutoMutex, ~AutoMutex
+  314  006FDA88    130  struct <anon>* RetrieveSentToDecoderRenderable(const struct <anon>* this, const unsigned int nodeNum)
+                         local  struct <anon> aMutex
+                         local  struct IListNode* node
+                         local  uintptr_t* pData
+                         local  struct IListNode* node
+                         local  uintptr_t* pData
+                         inlines  AutoMutex, ~AutoMutex
+  357  006FCF00     A0  struct <anon>* RetrieveLastSentToDecoderRenderable(const struct <anon>* this)
+                         local  struct IListNode* node
+                         local  uintptr_t* pData
+  373  006FDBB8    154  struct <anon>* RemoveSentToDecoderRenderable(const struct <anon>* this, const unsigned int nodeNum)
+                         local  struct <anon> aMutex
+                         local  struct <anon>* pRend
+                         local  struct IListNode* node
+                         local  enum Status res
+                         local  struct IListNode* node
+                         local  enum Status res
+                         inlines  AutoMutex, ~AutoMutex
+  421  006FCFA0     84  unsigned int GetNumberSentToDecoderRenderables(const struct <anon>* this)
+                         local  struct <anon> aMutex
+                         inlines  AutoMutex, ~AutoMutex
+  432  006FCDE4     7C  struct IListNode* RetrieveNode(struct SList* list)
+  448  006FD0A4     10  static void _GLOBAL__I__ZN2rw5movie25VideoRenderableComparator7CompareEPKvS3_()
+  449  006FD0B4     10  static void _GLOBAL__D__ZN2rw5movie25VideoRenderableComparator7CompareEPKvS3_()

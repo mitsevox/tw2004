@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/RNA/RNATigerAllocator.cpp
+// compiled in: rnaunity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   48  004D0BB4     2C  void RNATigerAllocator(const struct <anon>* this, const char* name, int enable_debug_print)
+   56  004C9C04     44  void* Alloc(const struct <anon>* this, size_t size, const char* name, unsigned int flags)
+   61  004CD5C4     D8  void* Alloc(const struct <anon>* this, size_t size, const char* name, unsigned int flags, unsigned int align, unsigned int alignOffset)
+                         local  const char[6] __FUNCTION__
+                         inlines  TagValuePair, operator+
+   66  004C9C48     38  void Free(const struct <anon>* this, void* block, size_t size)
+   70  004D0F2C     10  static void _GLOBAL__I__ZN22RNAMaterialXMLCallBack26mXMLTagElement_RNAMaterialE()
+   71  004D0F1C     10  static void _GLOBAL__D__ZN22RNAMaterialXMLCallBack26mXMLTagElement_RNAMaterialE()

@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/Internal/ConditionNode.cpp
+// compiled in: ConditionNode.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    6  005AB02C     24  float TreeEvaluate(const const struct <anon>* this, struct Character* character)

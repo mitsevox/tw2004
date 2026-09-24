@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_MenuToggle.h
+// compiled in: apt_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+  116  000FF21C     24  void UIMenuToggle::LooseFocus(const struct UIMenuToggle* this, uint32 )
+  117  000FF240     24  void UIMenuToggle::RegainFocus(const struct UIMenuToggle* this, uint32 )
+  129  000FF26C      C  uint32 UIMenuToggle::GetSignature(const const struct UIMenuToggle* this)
+  130  000FF280      C  struct IExternArray* UIMenuToggle::GetExternArray(const struct UIMenuToggle* this)
+  133  000FF294      8  int32 UIMenuToggle::GetSizeofArrayStruct(const struct UIMenuToggle* this)
+  146  000FF29C     1C  void UIMenuToggle::NotifySetText_func(struct IAptSubscriber* subs)
+  154    inline-only   void UIMenuToggle::SetInMemCardAction(const struct UIMenuToggle* this, bool inAction)

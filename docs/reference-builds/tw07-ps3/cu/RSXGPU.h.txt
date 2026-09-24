@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/rsxgpu/dev/include/rsxgpu/RSXGPU.h
+// compiled in: RSXGPU.cpp
+// 4 functions, source order. line | PS3 address | size
+
+ 2647  008D4F68     18  void RSXGPU::RSXGPU(const struct RSXGPU* this)
+ 2648  008D4F98     18  void RSXGPU::~RSXGPU(const struct RSXGPU* this)
+ 2826  008D69C0     14  void RSXFriendlyBusyWait::RSXFriendlyBusyWait(const struct RSXFriendlyBusyWait* this, bool readingHardwareRegsiter)
+ 2843    inline-only   uint32_t RSXGPU::GetSpaceAvailable(const struct RSXGPU* this)

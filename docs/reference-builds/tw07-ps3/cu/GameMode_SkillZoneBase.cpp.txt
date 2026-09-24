@@ -1,0 +1,122 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_SkillZoneBase.cpp
+// compiled in: golf_unity.cpp
+// 48 functions, source order. line | PS3 address | size
+
+   67  00204228     5C  void GameModeSkillZoneBase::GameModeSkillZoneBase(const struct GameModeSkillZoneBase* this)
+   75  001FECE8     18  void GameModeSkillZoneBase::~GameModeSkillZoneBase(const struct GameModeSkillZoneBase* this)
+   83  001FED64     44  void GameModeSkillZoneBase::RegisterStreamClients()
+   92  001FEDA8     2C  void GameModeSkillZoneBase::UnregisterStreamClients()
+   99  00241B18    180  void GameModeSkillZoneBase::Locale_SkillsZone_LoadSKLZFromStream(struct TStreamData* pStreamData)
+                         local  const char[37] __FUNCTION__
+                         local  void* dataPtr
+                         local  uint32 size
+                         local  void* pData
+                         inlines  TagValuePair, operator+
+  122  001FEDD4     2C  int32 GameModeSkillZoneBase::GetEndGameSequence(const struct GameModeSkillZoneBase* this)
+                         local  int32 sequence
+  132  001FEE00     D0  int GameModeSkillZoneBase::GetLocationMoney(const struct GameModeSkillZoneBase* this, enum SkillZoneLocationScore_e location)
+                         local  int i
+  147  001FEED0     D0  int GameModeSkillZoneBase::GetLocationBonusBalls(const struct GameModeSkillZoneBase* this, enum SkillZoneLocationScore_e location)
+                         local  int i
+  164  001FEFA0     1C  int GameModeSkillZoneBase::GetCupCount(const struct GameModeSkillZoneBase* this)
+  172  0024EFB4     A0  void GameModeSkillZoneBase::GetCupPosition(const struct GameModeSkillZoneBase* this, int iGreenIndex, float* xPosition)
+                         inlines  vec4flt_Copy
+  184  001FEFBC     C4  void GameModeSkillZoneBase::AddCup(float x, float y, float z)
+  199  00305B5C    250  void GameModeSkillZoneBase::SortCupsByDistanceFromTee(const struct GameModeSkillZoneBase* this)
+                         local  int i
+                         local  int j
+                         local  vec4flt xTemp
+                         local  vec4flt xTeePos
+                         local  enum PlayerNumber_t playerID
+                         inlines  GM_GetGolferUp, LLMath_DistanceBetween3, __vec_len_sqr3, vec4flt_Copy, vec_st, vec_sub
+  236  001FF080     B8  enum Club_t GameModeSkillZoneBase::GetMaxAvailableClub(const struct GameModeSkillZoneBase* this, enum PlayerNumber_t PlayerID, enum Club_t eDesiredClub)
+                         local  enum Club_t maxClub
+                         local  int clubIndex
+                         local  struct GamePlayer* pPlayer
+  256  001FF138     80  float GameModeSkillZoneBase::GetDefaultMaxDistance(const struct GameModeSkillZoneBase* this, enum PlayerNumber_t PlayerID)
+                         local  enum Club_t highestClub
+  270  00280A14    2DC  void GameModeSkillZoneBase::SetCup(const struct GameModeSkillZoneBase* this, enum PlayerNumber_t PlayerID, int8 cupID)
+                         local  struct TCharacter* pFlagModel
+                         local  vec4flt vTargetPos
+                         local  float fMaxDist
+                         local  vec4flt vTargetVec
+                         local  float fTargetDist
+                         inlines  AIMgr, LLMath_Add3, LLMath_Scale3, LLMath_Subtract3, __vec_mul, std::sqrt, vec4flt_Copy
+  323  002CA7B8    13C  void GameModeSkillZoneBase::SetCup_AlignGolfer(const struct GameModeSkillZoneBase* this, enum PlayerNumber_t PlayerID, int8 cupID)
+                         inlines  AIMgr, GUI_UpdateShotUIData
+  344  00281220     BC  bool GameModeSkillZoneBase::PickPrevTarget(const struct GameModeSkillZoneBase* this, enum PlayerNumber_t PlayerID)
+  356  00281140     5C  bool GameModeSkillZoneBase::PickTarget(const struct GameModeSkillZoneBase* this, enum PlayerNumber_t PlayerID)
+  365  002B5B94    1F8  int8 GameModeSkillZoneBase::GetGreenIndexHit(const struct GameModeSkillZoneBase* this, enum PlayerNumber_t PlayerID)
+                         local  int8 i
+                         local  int8 bestCup
+                         local  float cupDist
+                         local  float bestDist
+                         inlines  LLMath_DistanceBetween3, vec_madd, vec_sld, vec_sub
+  388  002B5D8C    1F8  int GameModeSkillZoneBase::GetGreenTargetted(const struct GameModeSkillZoneBase* this, enum PlayerNumber_t PlayerID)
+                         local  int i
+                         local  int bestCup
+                         local  float cupDist
+                         local  float bestDist
+                         inlines  LLMath_DistanceBetween3, vec_madd, vec_sld, vec_sub
+  411  001FF1B8      4  void GameModeSkillZoneBase::TimerOut(const struct GameModeSkillZoneBase* this)
+  423  001FF1BC      4  void GameModeSkillZoneBase::ShotClockOut(const struct GameModeSkillZoneBase* this)
+  431  001FF1C0     94  enum SZ_BullsEyeColors_t GameModeSkillZoneBase::GetBullsEyeColor(const struct GameModeSkillZoneBase* this, int32 surfaceID)
+  454  00280DA0    1E8  void GameModeSkillZoneBase::ClearPerHoleData(const struct GameModeSkillZoneBase* this)
+                         local  int32 i
+                         local  int j
+  491  002380CC     F0  void GameModeSkillZoneBase::ClearPerShotData(const struct GameModeSkillZoneBase* this)
+                         local  int32 i
+                         local  int j
+  510  002381BC     84  int GameModeSkillZoneBase::CountGreensHit(const struct GameModeSkillZoneBase* this, enum PlayerNumber_t PlayerID)
+                         local  int i
+                         local  int greens
+  527  00238240    1C0  void GameModeSkillZoneBase::SetupBonusBall(const struct GameModeSkillZoneBase* this, enum PlayerNumber_t PlayerID)
+                         local  int bonusball
+                         local  int commentID
+                         local  bool bUseBonusBall
+                         local  int i
+  591  00238400     38  bool GameModeSkillZoneBase::FirstShot(const struct GameModeSkillZoneBase* this, enum PlayerNumber_t PlayerID)
+  601  001FF270      8  int GameModeSkillZoneBase::GetShotEarned(const struct GameModeSkillZoneBase* this, enum PlayerNumber_t PlayerID)
+  609  00238438     70  void GameModeSkillZoneBase::AI_SelectCup(const struct GameModeSkillZoneBase* this, enum PlayerNumber_t playerID)
+  618  001FF278      8  int GameModeSkillZoneBase::GetTimeEarned(const struct GameModeSkillZoneBase* this, enum PlayerNumber_t PlayerID)
+  626  001FF280      8  int GameModeSkillZoneBase::GetDriveMultiplier(const struct GameModeSkillZoneBase* this, enum PlayerNumber_t PlayerID)
+  634  001FF288      8  int GameModeSkillZoneBase::GetExtraBallsEarned(const struct GameModeSkillZoneBase* this, enum PlayerNumber_t PlayerID)
+  642  001FF290      8  int32 GameModeSkillZoneBase::GetHitAllTargetsBonus(const struct GameModeSkillZoneBase* this)
+  650  001FF298      4  void GameModeSkillZoneBase::StartComment(const struct GameModeSkillZoneBase* this, enum SkillZoneComment_ID_e commentID)
+  662  001FF29C     18  void GameModeSkillZoneBase::SetBallsToStartWith(const struct GameModeSkillZoneBase* this, int iNum)
+  669  001FF254     1C  int GameModeSkillZoneBase::GetBallsToStartWith(const struct GameModeSkillZoneBase* this)
+  678  001FF2B4    1C8  void GameModeSkillZoneBase::GenerateBonusBallShots(const struct GameModeSkillZoneBase* this)
+                         local  int i
+                         local  int j
+                         local  bool bNewPick
+  735  00267600    35C  void GameModeSkillZoneBase::DisplayGameModeInfo(const struct GameModeSkillZoneBase* this)
+                         local  void* voidMode
+                         local  struct GameModeBase* mode
+                         local  enum PlayerNumber_t playerID
+                         local  char[32] sFlagTexture
+                         local  bool bAddFlagActor
+                         local  bool bAddLuxorLight
+                         local  int cupCount
+                         local  int i
+  830  0024F424     DC  void GameModeSkillZoneBase::PlayBullseyeParticleEffect(const struct GameModeSkillZoneBase* this, enum PlayerNumber_t PlayerID, enum SkillZoneParticleEffect_e effectID)
+                         local  int currTarget
+                         local  vec4flt vTarget
+  854  0024F258    1CC  void GameModeSkillZoneBase::CreateFlags(const struct GameModeSkillZoneBase* this)
+                         local  GenericActorParams params
+                         local  vec4flt flagloc
+                         local  int i
+  890  001FF47C    104  void GameModeSkillZoneBase::DestroyFlags(const struct GameModeSkillZoneBase* this)
+                         local  int i
+  906  0024F054    204  void GameModeSkillZoneBase::CreateLuxorLights(const struct GameModeSkillZoneBase* this)
+                         local  GenericActorParams params
+                         local  vec4flt flagloc
+                         local  int i
+  945  001FF580    104  void GameModeSkillZoneBase::DestroyLuxorLights(const struct GameModeSkillZoneBase* this)
+                         local  int i
+  960  001FF684     80  enum PlayerNumber_t GameModeSkillZoneBase::GetOpposingPlayerID(const struct GameModeSkillZoneBase* this, enum PlayerNumber_t playerID)
+                         local  enum PlayerNumber_t retPlayer
+  984  001FF704     7C  void GameModeSkillZoneBase::SkillZoneGenerateMoneyString(const struct GameModeSkillZoneBase* this, int iAmount, char* finalString, int len)
+                         local  int invertAmount
+  997  001FF780     1C  void GameModeSkillZoneBase::ResetTargetCount()
+ 1004  001FF79C     84  bool GameModeSkillZoneBase::IsAnyPlayerAI(const struct GameModeSkillZoneBase* this)
+                         local  int j

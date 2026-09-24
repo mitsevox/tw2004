@@ -1,0 +1,12 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/suppf.cpp
+// compiled in: suppf.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    8  006E2268    1B0  int SFILTER_unpackpf(void* pstate, int framestoup, void* psrcp, void* pdstp, int requester)
+                         local  UNPACKPFSTATE* pups
+                         local  int maxframes
+                         local  int totalframes
+                         local  int continuation
+                         local  float* pdst
+   79  006E2418     84  void SFILTER_unpackpfinit(void* pstate, UNPACKINITPARAMS* pupip)
+                         local  UNPACKPFSTATE* pups

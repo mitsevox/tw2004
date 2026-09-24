@@ -1,0 +1,28 @@
+// C:/packages/rwaudiocore/2.08.01/include/rw/audio/core/plugin.h
+// compiled in: dac.cpp, gain.cpp, gainfader.cpp, highpassiir2.cpp, lowpassiir2.cpp, matrixpanner.cpp, pan2d1.cpp, plugin.cpp, rechannel.cpp, resample.cpp, route.cpp, send.cpp, snd9.cpp, sndplayer1.cpp, submix.cpp, usermusicarbiter.cpp
+// 24 functions, source order. line | PS3 address | size
+
+ 1776    inline-only   void Initialize<rw::audio::core::Gain>(struct <anon>* pThis, uintptr_t attributeOffset)
+ 1776    inline-only   void Initialize<rw::audio::core::GainFader>(struct <anon>* pThis, uintptr_t attributeOffset)
+ 1776    inline-only   void Initialize<rw::audio::core::MatrixPanner>(struct <anon>* pThis, uintptr_t attributeOffset)
+ 1776    inline-only   void Initialize<rw::audio::core::Pan2D1>(struct <anon>* pThis, uintptr_t attributeOffset)
+ 1776    inline-only   void Initialize<rw::audio::core::Route>(struct <anon>* pThis, uintptr_t attributeOffset)
+ 1776    inline-only   void Initialize<rw::audio::core::Send>(struct <anon>* pThis, uintptr_t attributeOffset)
+ 1776    inline-only   void Initialize<rw::audio::core::Snd9Service>(struct <anon>* pThis, uintptr_t attributeOffset)
+ 1776    inline-only   void Initialize<rw::audio::core::SubMix>(struct SubMix* pThis, uintptr_t attributeOffset)
+ 1776    inline-only   void Initialize<rw::audio::core::UserMusicArbiter>(struct <anon>* pThis, uintptr_t attributeOffset)
+ 1776    inline-only   void Initialize<rw::audio::core::Dac>(struct <anon>* pThis, uintptr_t attributeOffset)
+ 1776    inline-only   void Initialize<rw::audio::core::HighPassIir2>(struct <anon>* pThis, uintptr_t attributeOffset)
+ 1776    inline-only   void Initialize<rw::audio::core::LowPassIir2>(struct <anon>* pThis, uintptr_t attributeOffset)
+ 1776    inline-only   void Initialize<rw::audio::core::Rechannel>(struct <anon>* pThis, uintptr_t attributeOffset)
+ 1776    inline-only   void Initialize<rw::audio::core::Resample>(struct <anon>* pThis, uintptr_t attributeOffset)
+ 1776    inline-only   void Initialize<rw::audio::core::SndPlayer1>(struct <anon>* pThis, uintptr_t attributeOffset)
+ 1832    inline-only   void ExpelAfterDecay(const struct PlugIn* this)
+ 1948    inline-only   void SetDecay(const struct PlugIn* this, float decay)
+ 1967    inline-only   struct Voice* GetVoice(const struct PlugIn* this)
+ 1993    inline-only   struct <anon>* GetSystem(const struct PlugIn* this)
+ 2017    inline-only   int GetInputChannels(const struct PlugIn* this)
+ 2038    inline-only   int GetOutputChannels(const struct PlugIn* this)
+ 2075  006D91DC      4  void ReleaseEvent(const struct PlugIn* this)
+ 2097  006D91E0      4  void EventEvent(const struct PlugIn* this, int event, void* pParameterBuffer)
+ 2152  006D91E4      C  void ~PlugIn(const struct PlugIn* this)

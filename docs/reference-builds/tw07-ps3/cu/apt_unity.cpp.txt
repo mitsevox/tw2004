@@ -1,0 +1,99 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/apt_unity.cpp
+// compiled in: apt_unity.cpp
+// 48 functions, source order. line | PS3 address | size
+
+    0    inline-only   struct UICourseItem& operator=(const struct UICourseItem* this, const const struct UICourseItem& )
+    0  0009F944     1C  static void __tcf_0()
+                         inlines  UICommentaryPopup::~UICommentaryPopup
+    0  000FAF90   2C30  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  AptStructSwapper::Free, GetRow, IProShopMenuBehavior::~IProShopMenuBehavior, LoadingScreenInternal::LoadingScreenInternal, Matrix44, NumPGAPlrsOptResponseHandler::NumPGAPlrsOptResponseHandler, PSMBehavior_ProShop::PSMBehavior_ProShop, PSMBehavior_ProShop::~PSMBehavior_ProShop, Quaternion, Set, TExternArray<UiMenuItemDefaultDst>::TExternArray, UIAttributeWrapHelp::~UIAttributeWrapHelp, UIAttributeWrapUp::~UIAttributeWrapUp, UIAwards::~UIAwards, UIBattleGolf_ChooseAddRemove::~UIBattleGolf_ChooseAddRemove, UIBattleGolf_ChooseClub::~UIBattleGolf_ChooseClub, UIBloodSome::~UIBloodSome, UICRACLogoSelect::UICRACLogoSelect, UICRACLogoSelect::~UICRACLogoSelect, UICSP::~UICSP, UICharBio::~UICharBio, UICharacterSel::~UICharacterSel, UIChiron::UIChiron, UIChiron::~UIChiron, UIControllerPull::~UIControllerPull, UICourseSelect::~UICourseSelect, UICreateACourse::~UICreateACourse, UICredits::~UICredits, UIEASportsTrax::~UIEASportsTrax, UIESPNNews::~UIESPNNews, UIESPNNewsDetail::~UIESPNNewsDetail, UIFacilityMap::~UIFacilityMap, UIFlashUtilities::~UIFlashUtilities, UIGameFaceShutdown::UIGameFaceShutdown, UIGameFaceShutdown::~UIGameFaceShutdown, UIGameOptions::UIGameOptions, UIGameOptions::~UIGameOptions, UIHUDFlashText::~UIHUDFlashText, UIHighImpactMessages::~UIHighImpactMessages, UIHoleSelect::UIHoleSelect, UIHoleSelect::~UIHoleSelect, UIHudShotInfo::~UIHudShotInfo, UIIngameMessageBG::~UIIngameMessageBG, UILoadProfile::~UILoadProfile, UILoadProfileWidget::~UILoadProfileWidget, UILowImpactMessages::~UILowImpactMessages, UIMainMenu::~UIMainMenu, UIMemCardAction::UIMemCardAction, UIMemCardAction::~UIMemCardAction, UIMemCardBrowsePopup::UIMemCardBrowsePopup, UIMemCardBrowsePopup::~UIMemCardBrowsePopup, UIMemCardConfirmPopup::UIMemCardConfirmPopup, UIMemCardConfirmPopup::~UIMemCardConfirmPopup, UIMemCardMenuPopup::UIMemCardMenuPopup, UIMemCardMenuPopup::~UIMemCardMenuPopup, UIMemCardPopup::UIMemCardPopup, UIMemCardPopup::~UIMemCardPopup, UIMenuCirc::UIMenuCirc, UIMenuCirc::~UIMenuCirc, UIMenuGFToggle::~UIMenuGFToggle, UIMenuToggle::~UIMenuToggle, UIMenuTutorial::~UIMenuTutorial, UIMenuVert::UIMenuVert, UIMenuVert::~UIMenuVert, UIMinigames::~UIMinigames, UIMoney::~UIMoney, UIMyTour_AllTimeRecords::~UIMyTour_AllTimeRecords, UIMyTour_SponsorshipItems::~UIMyTour_SponsorshipItems, UIMyTour_Sponsorships::~UIMyTour_Sponsorships, UINewsTicker::~UINewsTicker, UIOnlineAPopHelper::~UIOnlineAPopHelper, UIOnlineChatBox::~UIOnlineChatBox, UIOnlineCreateAccountMoreInfo::~UIOnlineCreateAccountMoreInfo, UIOnlineEAMessenger::~UIOnlineEAMessenger, UIOnlineFAQ::~UIOnlineFAQ, UIOnlineGameAdvertisement::~UIOnlineGameAdvertisement, UIOnlineGameModes_Gotw::~UIOnlineGameModes_Gotw, UIOnlineGameModes_LeaderBoards::~UIOnlineGameModes_LeaderBoards, UIOnlineGameSetup::~UIOnlineGameSetup, UIOnlineLegalAgreement::~UIOnlineLegalAgreement, UIOnlineLobbyRoom::~UIOnlineLobbyRoom, UIOnlineLobbyRoomMatches::~UIOnlineLobbyRoomMatches, UIOnlineMainMenu::UIOnlineMainMenu, UIOnlineMainMenu::~UIOnlineMainMenu, UIOnlineMyQuickMessages::~UIOnlineMyQuickMessages, UIOnlineNews::~UIOnlineNews, UIOnlinePopupDisconnect::~UIOnlinePopupDisconnect, UIOnlineStats_Category::~UIOnlineStats_Category, UIOnlineStats_Player::~UIOnlineStats_Player, UIOnlineTermsConditions::~UIOnlineTermsConditions, UIOnlineTournament_Gotw::~UIOnlineTournament_Gotw, UIOnlineTournament_LeaderBoard::~UIOnlineTournament_LeaderBoard, UIOnlineTournament_TourWins::~UIOnlineTournament_TourWins, UIOnlineTournament_Wml::~UIOnlineTournament_Wml, UIOnlineUserFeedback::~UIOnlineUserFeedback, UIOnlineWaitingRoom::~UIOnlineWaitingRoom, UIOptions::UIOptions, UIOptions::~UIOptions, UIPGATourAwards::~UIPGATourAwards, UIPgaTourLeaderboard::~UIPgaTourLeaderboard, UIPgaTourStats_Category::~UIPgaTourStats_Category, UIPgaTourStats_Player::~UIPgaTourStats_Player, UIPgaTournament_TourWins::~UIPgaTournament_TourWins, UIPopupDef::~UIPopupDef, UIPopupMenuVert::UIPopupMenuVert, UIPopupMenuVert::~UIPopupMenuVert, UIReplayIcon::UIReplayIcon, UIReplayIcon::~UIReplayIcon, UIResponseHandler::UIResponseHandler, UIRivals::~UIRivals, UIRivalsChBoard::UIRivalsChBoard, UIRivalsChBoard::~UIRivalsChBoard, UIRivalsChallenge::~UIRivalsChallenge, UIRivalsChallengeToggle::~UIRivalsChallengeToggle, UIRivalsMenuVert::UIRivalsMenuVert, UIRivalsMenuVert::~UIRivalsMenuVert, UIRivalsMessenger::~UIRivalsMessenger, UISecondAnalogStick::~UISecondAnalogStick, UISeveTwentyOne::~UISeveTwentyOne, UISkillChallenge::~UISkillChallenge, UISkillZone::~UISkillZone, UISpinnaOption::~UISpinnaOption, UISponsorPopup::~UISponsorPopup, UISpudHud::~UISpudHud, UISwitchSticks::UISwitchSticks, UISwitchSticks::~UISwitchSticks, UITigerChallenge::~UITigerChallenge, UITopElements::~UITopElements, UITrainingChallenge::~UITrainingChallenge, UITrophyList::~UITrophyList, UITutorial::~UITutorial, UIVirtualKeyboard::~UIVirtualKeyboard, UIWidget::~UIWidget, UIWidgetBG::UIWidgetBG, UIWidgetBG::~UIWidgetBG, UIWorldTour::~UIWorldTour, UIXBoxLiveSettings::~UIXBoxLiveSettings, UI_LoadScreen_mgr, Vector2, Vector3, Vector4, tFileSaveState_Data::tFileSaveState_Data, tFileSaveState_Icon0::tFileSaveState_Icon0, tFileSaveState_NULL::tFileSaveState_NULL, tFileSaveState_Start::tFileSaveState_Start
+    0  000FDE6C     38  void UIExternScrollMenuIterator::~UIExternScrollMenuIterator(const struct UIExternScrollMenuIterator* this)
+                         inlines  UIExternMenuIterator::~UIExternMenuIterator
+    0  001032EC     90  void AptSubscriberVariableGrp::~AptSubscriberVariableGrp(const struct AptSubscriberVariableGrp* this)
+                         inlines  AptStructSwapper::Free, AptSubscriberVariable::~AptSubscriberVariable, IAptSubscriber::~IAptSubscriber
+    0  001035CC     4C  void UIScoreCardSeve::~UIScoreCardSeve(const struct UIScoreCardSeve* this)
+                         inlines  IAptSubscriberBase::operator delete
+    0  0011555C     68  void UIGameOptions::~UIGameOptions(const struct UIGameOptions* this)
+                         inlines  Singleton<UIGameOptions>::~Singleton
+    0  00115B8C     A8  void UIFlashUtilities::~UIFlashUtilities(const struct UIFlashUtilities* this)
+                         inlines  AptStaticCharBuffer<64u>::~AptStaticCharBuffer, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::operator delete, IAptSubscriber::~IAptSubscriber
+    0  00115CD0     A8  void UIOnlineMainMenu::~UIOnlineMainMenu(const struct UIOnlineMainMenu* this)
+                         inlines  AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+    0  00115D78     B4  void UIOnlineAPopHelper::~UIOnlineAPopHelper(const struct UIOnlineAPopHelper* this)
+                         inlines  AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::operator delete, IAptSubscriber::~IAptSubscriber
+    0  00115ED4     A8  void UIGameFaceShutdown::~UIGameFaceShutdown(const struct UIGameFaceShutdown* this)
+                         inlines  AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+    0  001161B0     B8  void AptScreenSubscriber::~AptScreenSubscriber(const struct AptScreenSubscriber* this)
+                         inlines  AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+    0  00116308    160  void DefaultMenuArrayUpdate<UIMenuVertBase>::~DefaultMenuArrayUpdate(const struct DefaultMenuArrayUpdate<UIMenuVertBase>* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UiMenuItemDefaultDst>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+    0  00116C88    160  void UITrophyList::~UITrophyList(const struct UITrophyList* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UITrophyList::UITrophyItem>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+    0  00117778    160  void UIPgaTourStats_Player::~UIPgaTourStats_Player(const struct UIPgaTourStats_Player* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIPgaTourStats_Player::PgaFlashItem>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+    0  00117A34    160  void UIPgaTourStats_Category::~UIPgaTourStats_Category(const struct UIPgaTourStats_Category* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIPgaTourStats_Category::PgaFlashItem>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+    0  00118524    160  void UIOnlineStats_Category::~UIOnlineStats_Category(const struct UIOnlineStats_Category* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIOnlineStats_Category::OnlineFlashItem>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+    0  001187E0    160  void UIOnlineStats_Player::~UIOnlineStats_Player(const struct UIOnlineStats_Player* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIOnlineStats_Player::OnlineFlashItem>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+    0  0011C158    160  void UIMenuToggle::~UIMenuToggle(const struct UIMenuToggle* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIMenuToggleItem>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+    0  0011C81C    160  void UICSPScreen::~UICSPScreen(const struct UICSPScreen* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UICSPScreen::DstMenuItem_cspp>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+    0  0011D860    154  void UIMenuGFToggle::~UIMenuGFToggle(const struct UIMenuGFToggle* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, TExternArray<UIMenuToggleItem>::~TExternArray, UIMenuToggle::~UIMenuToggle, UIMenuVertBase::~UIMenuVertBase
+    0  0011DEC8    168  void UICSP::~UICSP(const struct UICSP* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, TExternArray<UICSPScreen::DstMenuItem_cspp>::~TExternArray, UICSPScreen::~UICSPScreen, UIMenuVertBase::~UIMenuVertBase
+    0  0011E78C    154  void UIMenuVert::~UIMenuVert(const struct UIMenuVert* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, DefaultMenuArrayUpdate<UIMenuVertBase>::~DefaultMenuArrayUpdate, TExternArray<UiMenuItemDefaultDst>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+    0  0011EA58    154  void UIPopupMenuVert::~UIPopupMenuVert(const struct UIPopupMenuVert* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, DefaultMenuArrayUpdate<UIMenuVertBase>::~DefaultMenuArrayUpdate, TExternArray<UiMenuItemDefaultDst>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+    0  0011ED24    1BC  void UIRivalsMenuVert::~UIRivalsMenuVert(const struct UIRivalsMenuVert* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, DefaultMenuArrayUpdate<UIMenuVertBase>::~DefaultMenuArrayUpdate, TExternArray<RivalChChallengeItem1>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+    0  0011F0B8    160  void DefaultMenuArrayUpdate<UIMenuCircBase>::~DefaultMenuArrayUpdate(const struct DefaultMenuArrayUpdate<UIMenuCircBase>* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UiMenuItemDefaultDst>::~TExternArray, UIMenuCircBase::~UIMenuCircBase
+    0  0011F77C    168  void UIVirtualKeyboard::~UIVirtualKeyboard(const struct UIVirtualKeyboard* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStaticCharBuffer<256u>::~AptStaticCharBuffer, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIMenuItemBaseDst>::~TExternArray, UIMenuCircBase::~UIMenuCircBase
+    0  0011FA48    1F8  void UIRivalsChBoard::~UIRivalsChBoard(const struct UIRivalsChBoard* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<RivalChChallengeItem1>::~TExternArray, TExternArray<RivalChRankItem2>::~TExternArray, TExternArray<RivalChStatsItem3>::~TExternArray, UIMenuCircBase::~UIMenuCircBase
+    0  0011FE34    160  void UIRivals::~UIRivals(const struct UIRivals* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIPRivalsItem>::~TExternArray, UIMenuCircBase::~UIMenuCircBase
+    0  00120BE0    178  void UICourseSelect::~UICourseSelect(const struct UICourseSelect* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStaticCharBuffer<64u>::~AptStaticCharBuffer, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UICourseItem>::~TExternArray, UIMenuCircBase::~UIMenuCircBase, ~UICourseItem
+    0  001211B0    168  void UIHoleSelect::~UIHoleSelect(const struct UIHoleSelect* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, DefaultMenuArrayUpdate<UIMenuCircBase>::~DefaultMenuArrayUpdate, TExternArray<UiMenuItemDefaultDst>::~TExternArray, UIMenuCircBase::~UIMenuCircBase
+    0  0012149C    154  void UIMenuCircDefault::~UIMenuCircDefault(const struct UIMenuCircDefault* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, DefaultMenuArrayUpdate<UIMenuCircBase>::~DefaultMenuArrayUpdate, TExternArray<UiMenuItemDefaultDst>::~TExternArray, UIMenuCircBase::~UIMenuCircBase
+    0  001218BC    174  void UIMenuCirc::~UIMenuCirc(const struct UIMenuCirc* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, TExternArray<UiMenuItemDefaultDst>::~TExternArray, UIMenuCircBase::~UIMenuCircBase, UIMenuCircDefault::~UIMenuCircDefault
+    0  00121BC0    1CC  void UIMenuTutorial::~UIMenuTutorial(const struct UIMenuTutorial* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, TExternArray<UIMenuItemDefaultDst_Tutorial>::~TExternArray, UIMenuCircBase::~UIMenuCircBase, UIMenuCircDefault::~UIMenuCircDefault
+    0  00122320     E4  void UIMenuVertBase::~UIMenuVertBase(const struct UIMenuVertBase* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::~IAptSubscriber, UIMenuBase::~UIMenuBase
+    0  00122404     E4  void UIMenuCircBase::~UIMenuCircBase(const struct UIMenuCircBase* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::~IAptSubscriber, UIMenuBase::~UIMenuBase
+    0  00122968     B8  void UIWeatherInfo::~UIWeatherInfo(const struct UIWeatherInfo* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+    0  001238D4    11C  void UIHud::~UIHud(const struct UIHud* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStaticCharBuffer<128u>::~AptStaticCharBuffer, AptStaticCharBuffer<64u>::~AptStaticCharBuffer, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber, ~TAptArrayStruct
+    0  001246CC     B8  void UIMemCardAction::~UIMemCardAction(const struct UIMemCardAction* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+    0  00124860     B8  void UIMainMenu::~UIMainMenu(const struct UIMainMenu* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+    0  001249F4     E4  void UIMenuBase::~UIMenuBase(const struct UIMenuBase* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::~IAptSubscriber
+    0  0012549C     C0  void UIPopupDef::~UIPopupDef(const struct UIPopupDef* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStaticCharBuffer<1024u>::~AptStaticCharBuffer, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+    0  00125640     B8  void UIRivalsMessenger::~UIRivalsMessenger(const struct UIRivalsMessenger* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+    0  0012617C     B8  void UISwitchSticks::~UISwitchSticks(const struct UISwitchSticks* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+    0  001269A8     B8  void UICRACLogoSelect::~UICRACLogoSelect(const struct UICRACLogoSelect* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+    0  00126B28     B8  void UIWidgetBG::~UIWidgetBG(const struct UIWidgetBG* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+    0  00126D7C     B8  void UIReplayIcon::~UIReplayIcon(const struct UIReplayIcon* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+    0  00127184     94  void DefaultMenuArrayUpdate<UIMenuVertBase>::DefaultMenuArrayUpdate(const struct DefaultMenuArrayUpdate<UIMenuVertBase>* this)
+                         inlines  TArrayInternal<UiMenuItemDefaultDst,AptStructSwapper>::TArrayInternal, TExternArray<UiMenuItemDefaultDst>::TExternArray, UIMenuVertBase::UIMenuVertBase

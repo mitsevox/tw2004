@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_ShadowMap.cpp
+// compiled in: shader_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   36  0051A39C     28  void SM_ShadowMapClass::SM_ShadowMapClass(const struct SM_ShadowMapClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base
+   42  00504D18     50  void SM_ShadowMapClass::Load(const struct SM_ShadowMapClass* this)
+   48  00504CA8     70  void SM_ShadowMapClass::LoadParams(const struct SM_ShadowMapClass* this)
+   55  00504D68     44  void SM_ShadowMapClass::Activate(const struct SM_ShadowMapClass* this)
+   61  00504DAC     38  void SM_ShadowMapClass::Deactivate(const struct SM_ShadowMapClass* this)
+   68  0050FA18     64  void SM_ShadowMapClass::SetBaseTexture(const struct SM_ShadowMapClass* this, TextureRef baseTexture)

@@ -1,0 +1,51 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/SitDev/SitDevTrigger.c
+// compiled in: golf2_unity.cpp
+// 17 functions, source order. line | PS3 address | size
+
+   74  001E32C0    BB0  void SitDev_InvokeMultipleActions(Situation* s, int iFileIndex, enum PlayerNumber_t PlayerID, uint8 situation, uint8* announcerBits)
+                         local  int i
+                         local  Action* a
+                         local  bool playedComment
+                         inlines  GM_GetModeType, GM_IsCompilationCourse, GM_IsRandomCourse, GameEffects_SetPostGBNegativeCommentary, SitDev_InvokeAction, SitDev_InvokeCommentaryBank, SitDev_IsVaguePrediction, SitDev_SuppressAction, _SetStateVecAndCondition
+  149    inline-only   static bool SitDev_IsVaguePrediction(uint8 situation, uint16* pStateValues)
+  160  00132C88     10  bool SitDev_IsPredictionWithoutCorrection(uint16* pStateValues)
+  184    inline-only   static bool SitDev_InvokeCommentaryBank(Action* a, uint8 situation, uint8* announcerBits, int iFileIndex, int32 delayed_audioID, Situation* s)
+                         local  uint16 audioID
+                         local  bool check_for_delay
+                         local  int numUnused
+                         local  TCommentPlayMode mode
+                         local  bool audioBeforePredictionStillRunning
+  333    inline-only   static bool SitDev_InvokeAction(Action* a, enum PlayerNumber_t PlayerID, uint8 situation, int iFileIndex)
+                         local  int i
+                         local  int j
+                         local  int start
+                         local  int actionResponseIndex
+                         local  int[16] numMatchingResponses
+                         local  int[16][100] responseIDs
+                         local  bool triggeredResponse
+                         local  Response* r
+  457    inline-only   static bool SitDev_SuppressAction(Action* a, int iFileIndex, enum PlayerNumber_t PlayerID, uint8 situation)
+  535  001D19C8    218  void SitDev_TriggerTalkyResponse(Response* r, enum PlayerNumber_t PlayerID, bool bApplyVoiceStyle)
+                         local  bool bTriggerTalky
+                         local  uint16 animIndex
+                         local  uint16 talkyIndex
+                         local  struct TCharacter* pCharacter
+                         local  char* pAnimName
+                         local  ChannelID id
+                         inlines  GM_GetGolferUp, GamePlayer::GetCharacter, Singleton<TalkyManager>::GetSingleton
+  597  001D1BE0    464  static void SitDev_TriggerResponse(Response* r, enum PlayerNumber_t PlayerID, uint8 situation, int iFileIndex)
+                         local  uint16 commentID
+                         local  TCommentPlayMode mode
+                         local  int eaTraxList
+                         inlines  GM_GetModeType, GameEffects_SetPostGBCommentary, GameEffects_SetPostGBCrowdLevel, Gaud_StartAnnouncerIntroComment, Gaud_StartDanceAnimStream, Gaud_StartRegularComment
+  743  00131FF8     D0  void SitDev_ClearGroupFlags()
+                         local  uint32 i
+  756    inline-only   static bool SitDev_DelayForLocalizedPopup(Action* a, int iFileIndex, uint8 situation, uint8* announcerBits, uint16* pAudioID, Situation* s)
+  837  00132CC8      4  void SitDev_PlayDelayedFlyBy()
+  865  00132CCC     4C  void SitDev_InitDelayedFlyBy()
+                         local  int i
+  880  00132D18      8  int32 SitDev_GetDelayedFlyByID()
+  893  00132D20     1C  void SitDev_ResetDelayedFlyBy()
+  900  00132D3C     1C  int SitDev_GetNumDelayedFlyBys()
+  906  00132D58     18  bool SitDev_GetFlybySkippedOnInitFlag()
+  912  00132D70     18  void SitDev_SetFlybySkippedOnInitFlag(bool flag)

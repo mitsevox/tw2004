@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptExternalContext.h
+// compiled in: other_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   26  00465D10    108  void AptExternalContext::AptExternalContext(const struct AptExternalContext* this, const char* szName)
+                         local  AptNativeString sLeafNode
+                         inlines  BasicString, ReAlloc, UseCapacity, ~BasicString
+   27  00465B30     F0  void AptExternalContext::AptExternalContext(const struct AptExternalContext* this, struct AptExternalContext* pParentContext, const char* szName)
+                         local  AptNativeString sLeafNode
+                         inlines  BasicString, ReAlloc, UseCapacity, ~BasicString

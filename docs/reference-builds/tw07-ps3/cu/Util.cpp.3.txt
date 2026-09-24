@@ -1,0 +1,110 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/source/common/Util.cpp
+// compiled in: Util.cpp
+// 28 functions, source order. line | PS3 address | size
+
+    0  0080995C    10C  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   59  00805590     74  uint32_t GetFileVersion()
+                         local  struct <anon> lock
+                         local  uint32_t fileVersion
+   79  00805604     6C  char* GetCompileDate()
+                         local  struct <anon> lock
+   98  00805670     90  char* GetVersionInfo()
+                         local  struct <anon> lock
+                         local  char8_t[10] version
+  126  00805700    49C  int DebugDeath(enum TDbError dbError)
+                         local  const char[11] __FUNCTION__
+                         local  struct <anon> lock
+                         local  char8_t* err
+  300  00808DC8     E0  void PrintExpression(struct ExprNode* pExpr, uint32_t* pNumNodes)
+                         local  struct <anon> lock
+  320  00809490    4CC  void PrintJoin(struct <anon>* pJoinLst)
+                         local  struct <anon> lock
+                         local  char8_t[5] ref
+                         local  TableRef tblRef
+                         local  uint32_t iDepth
+  409  00805B9C    1E0  int CountDbRefs(const DbRef* pDbRefLst)
+                         local  const char[12] __FUNCTION__
+                         local  struct <anon> lock
+                         local  int entryCnt
+  448  00805D7C    1E4  int CountTableRefs(const TableRef* pTableRefLst)
+                         local  const char[15] __FUNCTION__
+                         local  struct <anon> lock
+                         local  uint8_t entryCnt
+  489  00805F60    1DC  int CountTableColRefs(const TableColRef* pTableColRefLst)
+                         local  const char[18] __FUNCTION__
+                         local  struct <anon> lock
+                         local  int entryCnt
+  529  0080613C    1E0  int CountColRefs(const ColRef* pColRefLst)
+                         local  const char[13] __FUNCTION__
+                         local  struct <anon> lock
+                         local  int entryCnt
+  571  0080631C    1E0  int CountColDefs(const struct <anon>* pColDefLst)
+                         local  const char[13] __FUNCTION__
+                         local  struct <anon> lock
+                         local  int entryCnt
+  613  008064FC    1E0  int CountColLiterals(const struct <anon>* pColLiteralLst)
+                         local  const char[17] __FUNCTION__
+                         local  struct <anon> lock
+                         local  int entryCnt
+  655  008066DC    1E0  int CountColSorts(const struct <anon>* pColSortLst)
+                         local  const char[14] __FUNCTION__
+                         local  struct <anon> lock
+                         local  int entryCnt
+  696  008068BC    1E4  int CountJoins(const struct <anon>* pJoinList)
+                         local  const char[11] __FUNCTION__
+                         local  struct <anon> lock
+                         local  uint32_t numItems
+  734  00806AA0    1E0  int CountIndexRefs(const IndexRef* pIndexRefLst)
+                         local  const char[15] __FUNCTION__
+                         local  struct <anon> lock
+                         local  int entryCnt
+  792  00806C80    2CC  void FillColRefsForDefs(const struct <anon>* pColDefLst, ColRef* pColRefLst)
+                         local  const char[19] __FUNCTION__
+                         local  struct <anon> lock
+                         local  uint16_t idxDef
+  836  00806F4C    2FC  void FillTableColRefsForTableColLits(const struct <anon>* pColLitLst, TableColRef* pTableColLst)
+                         local  const char[32] __FUNCTION__
+                         local  struct <anon> lock
+                         local  ColNum idxLit
+  882  00807248    2F0  void FillTableColRefsForDefs(const TableRef tableRef, const struct <anon>* pColDefLst, TableColRef* pTblColRefLst)
+                         local  const char[24] __FUNCTION__
+                         local  struct <anon> lock
+                         local  uint16_t idxDef
+  931  00807538    2F0  void FillTableColRefsForRefs(const TableRef tableRef, const ColRef* pColRefLst, TableColRef* pTblColRefLst)
+                         local  const char[24] __FUNCTION__
+                         local  struct <anon> lock
+                         local  uint16_t idxRef
+ 1004  00807828    400  enum TDbError EnumCommonDefs(const struct <anon>* pColDefLst1, const struct <anon>* pColDefLst2, struct <anon>* pCommonDefLst, ColNum* maxItems)
+                         local  const char[15] __FUNCTION__
+                         local  struct <anon> lock
+                         local  ColNum iNumCommon
+                         local  const struct <anon>* pColDefLst2Origin
+ 1088  00807C28    1B0  void FillTableRefsForTableColRefs(const TableColRef* pTableColRefLst, TableRef* pTableRefLst)
+                         local  struct <anon> lock
+                         local  uint32_t tableCount
+                         local  bool8_t bFound
+ 1156  00807DD8    72C  enum TDbError FillColLitsForRefs(const DbRef dbRef, const TableRef tableRef, const ColRef* pColRefLst, struct <anon>* rpColLiteralLst)
+                         local  const char[19] __FUNCTION__
+                         local  struct <anon> lock
+                         local  ColNum iMaxItems
+                         local  struct <anon>[255] defs
+                         local  enum TDbError err
+                         local  uint64_t[4] wanted
+                         local  uint32_t numWanted
+                         local  uint32_t i
+                         local  uint32_t j
+                         local  char8_t* pStr
+                         local  uint8_t colCount
+                         local  struct Table* table
+ 1314  00808EA8    5E8  void PrintExpressionValue(struct <anon>* val, uint32_t* pNumNodes)
+                         local  const char[21] __FUNCTION__
+                         local  char8_t[5] ref
+                         local  char8_t[5] ref2
+                         local  TableRef tblRef
+                         local  ColRef colRef
+ 1403  00808A08    3C0  void _PrintExpression(struct ExprNode* pExpr, uint32_t* pNumNodes)
+                         local  const char[17] __FUNCTION__
+ 1463  00808504    504  char8_t* OperatorToString(enum ExprOp op)
+                         local  const char[17] __FUNCTION__
+ 1551  00809A68     3C  static void _GLOBAL__I__ZN2EA4T3db4Util14GetFileVersionEv()
+ 1552  00809AA4     3C  static void _GLOBAL__D__ZN2EA4T3db4Util14GetFileVersionEv()

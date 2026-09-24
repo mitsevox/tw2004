@@ -1,0 +1,17 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/Headers/GameMode_TimedChallenges.h
+// compiled in: golf_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   68  0033ED9C      8  bool GameModeTimedChallenges::GiveOOBPenalty(const struct GameModeTimedChallenges* this)
+   69  0033EDA4      8  bool GameModeTimedChallenges::SkipHoleOutUIDisplay(const struct GameModeTimedChallenges* this)
+   70  0033EDAC      8  bool GameModeTimedChallenges::SkipFlashTextShotNumber(const struct GameModeTimedChallenges* this)
+   74  0033EDB4     14  enum UIScoreCardDispMode_t GameModeTimedChallenges::GetScoreDisplayMode(const struct GameModeTimedChallenges* this, bool getAlternate)
+   76  0033EDC8      8  bool GameModeTimedChallenges::PopulateScoreCardUI(const struct GameModeTimedChallenges* this)
+   80  0033EDD0      8  bool GameModeTimedChallenges::SkipFlashTextScore(const struct GameModeTimedChallenges* this)
+   90  0033EDD8      8  bool GameModeTimedChallenges::IsShotClockForSinglePlayer(const struct GameModeTimedChallenges* this)
+   92  0033EDE0      8  bool GameModeTimedChallenges::ResetShotClockAfterEachHit(const struct GameModeTimedChallenges* this)
+   98    inline-only   void GameModeTimedChallenges::SetTargetPointsToPass(const struct GameModeTimedChallenges* this, int iPoints)
+   99    inline-only   int GameModeTimedChallenges::GetTargetPointsToPass(const struct GameModeTimedChallenges* this)
+  100    inline-only   int GameModeTimedChallenges::GetTimedChallengeType(const struct GameModeTimedChallenges* this)
+  105  0033EDE8      8  bool GameModeTimedChallenges::GetCrowdsEnabled(const const struct GameModeTimedChallenges* this)
+  113  0033EDF0      8  bool GameModeTimedChallenges::IsShotClockPermanent(const struct GameModeTimedChallenges* this)

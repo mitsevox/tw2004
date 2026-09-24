@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Spectator/PovVector.cpp
+// compiled in: golf2_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   68  00143F0C      4  void CPovVector3::Print(const const struct CPovVector3* this)
+   75  00143F10      4  void CPovVector3::Print(const const struct CPovVector3* this, const char* name)
+   84  00143F14      4  void CPovVector4::Print(const const struct CPovVector4* this)
+   92  00143F18      4  void CPovVector4::Print(const const struct CPovVector4* this, const char* name)

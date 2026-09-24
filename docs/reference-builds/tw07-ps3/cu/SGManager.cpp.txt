@@ -1,0 +1,99 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/scenegraph/source/SceneGraph/SGManager.cpp
+// compiled in: SGManager.cpp
+// 33 functions, source order. line | PS3 address | size
+
+    0  008BE9E8     F0  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   69  008BF2A0     80  struct <anon>* GetInstance()
+   79  008BEE9C     58  void DestroyInstance()
+   88  008BFFA4    3EC  NodeType_t RegisterSGNode(const struct <anon>* this, const struct SGNodeInfoC* pConstNodeInfo)
+                         local  const char[15] __FUNCTION__
+                         local  struct SGNodeInfoC* pNodeInfo
+                         local  int32_t i
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct SGNodeInfoC** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct SGNodeInfoC** newData
+                         inlines  Construct, PushBack, RNADebugBreak, operator[]
+  111  008BEAF8     80  void CompleteRegistration(const struct <anon>* this)
+                         local  const char[21] __FUNCTION__
+                         inlines  RNADebugBreak
+  119  008BE92C      C  bool8_t IsRegistrationComplete(const struct <anon>* this)
+  125  008BE920      C  int32_t GetNumRegisteredNodes(const struct <anon>* this)
+  130  008BF750    220  struct SGNodeC* CreateNodeByTypeName(const struct <anon>* this, const char* pName)
+                         local  const char[21] __FUNCTION__
+                         local  int32_t i
+                         local  struct SGNodeC* ret
+                         inlines  RNADebugBreak, operator[]
+  148  008BFAF8    1EC  NodeType_t GetTypeEnumFromTypeName(const struct <anon>* this, const char* pName)
+                         local  const char[24] __FUNCTION__
+                         local  int32_t i
+                         inlines  RNADebugBreak, operator[]
+  167  008BF428    1D4  void SerializeTreeOut(const struct <anon>* this, const struct OutStreamC& out, struct SGNodeC* pNode)
+                         local  struct <anon> nodeTypeName
+                         inlines  Copy, RNADebugBreak, SGNodeC::GetFirstChild, SGNodeC::GetNextSibling, String, operator=, ~String
+  185  008BF970    188  struct SGNodeC* SerializeTreeIn(const struct <anon>* this, const struct InStreamC& in, struct SGNodeC* pAttachTo)
+                         local  struct <anon> nodeTypeName
+                         local  struct SGNodeC* pNewNode
+                         local  int32_t nNumChildren
+                         local  int32_t i
+                         inlines  RNADebugBreak, String, ~String
+  217  008BEEF4     90  struct SGNodeC* FindNamedNode(struct SGNodeC* pNode, const char* pName)
+                         local  struct SGNodeC* pFound
+                         inlines  SGNodeC::GetFirstChild, SGNodeC::GetNextSibling
+  236  008BEC08     80  struct SGNodeC* FindNode(struct SGNodeC* pNode, struct SGNodeC* pNodeToFind)
+                         local  struct SGNodeC* pFound
+                         inlines  SGNodeC::GetFirstChild, SGNodeC::GetNextSibling
+  257  008BEC88     84  struct SGNodeC* FindTypedNode(struct SGNodeC* pNode, NodeType_t eType)
+                         local  struct SGNodeC* pFound
+                         inlines  SGNodeC::GetFirstChild, SGNodeC::GetNextSibling
+  276  008BEF84     C4  struct SGNodeC* FindTypedNamedNode(struct SGNodeC* pNode, NodeType_t eType, const char* pName)
+                         local  struct SGNodeC* pFound
+                         inlines  SGNodeC::GetFirstChild, SGNodeC::GetNextSibling
+  295  008C0CC4    31C  int32_t FindNamedNodes(struct SGNodeC* pNode, const char* pName, const struct Vector<SceneX::SGNodeC*,std::int32_t,1u>& aNodes, bool8_t bIncludeRoot, bool8_t bCaseSensitive)
+                         inlines  PushBack, SGNodeC::GetFirstChild, SGNodeC::GetNextSibling
+  309  008C09B4    310  int32_t GetAllNodes(struct SGNodeC* pNode, const struct Vector<SceneX::SGNodeC*,std::int32_t,1u>& aNodes)
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct SGNodeC** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct SGNodeC** newData
+                         inlines  Construct, PushBack, RNADebugBreak, SGNodeC::GetFirstChild, SGNodeC::GetNextSibling
+  324  008C06B8    2FC  int32_t FindTypedNodes(struct SGNodeC* pNode, NodeType_t eType, const struct Vector<SceneX::SGNodeC*,std::int32_t,1u>& aNodes, bool8_t bIncludeRoot)
+                         inlines  PushBack, SGNodeC::GetFirstChild, SGNodeC::GetNextSibling
+  340  008C0390    328  int32_t FindTypedNamedNodes(struct SGNodeC* pNode, NodeType_t eType, const char* pName, const struct Vector<SceneX::SGNodeC*,std::int32_t,1u>& aNodes, bool8_t bIncludeRoot)
+                         inlines  PushBack, SGNodeC::GetFirstChild, SGNodeC::GetNextSibling
+  356  008C0FE0    304  int32_t FindNodesWithAttribute(struct SGNodeC* pNode, const char* pAttributeName, const struct Vector<SceneX::SGNodeC*,std::int32_t,1u>& aNodes, bool8_t bIncludeRoot)
+                         inlines  PushBack, SGNodeC::GetFirstChild, SGNodeC::GetNextSibling
+  375  008BF048     78  struct SGNodeC* FindNamedChild(struct SGNodeC* pNode, const char* pName, bool8_t bCaseSensitive)
+                         inlines  SGNodeC::GetFirstChild, SGNodeC::GetNextSibling
+  390  008BF0C0     8C  int32_t FindNamedChildIndex(struct SGNodeC* pNode, const char* pName, bool8_t bCaseSensitive)
+                         local  int32_t index
+                         inlines  SGNodeC::GetFirstChild, SGNodeC::GetNextSibling
+  408  008BED0C     3C  struct SGNodeC* FindTypedChild(struct SGNodeC* pNode, NodeType_t eType)
+                         inlines  SGNodeC::GetFirstChild, SGNodeC::GetNextSibling
+  425  008BED48     4C  int32_t FindTypedChildIndex(struct SGNodeC* pNode, NodeType_t eType)
+                         local  int32_t index
+                         inlines  SGNodeC::GetFirstChild, SGNodeC::GetNextSibling
+  444  008BEB78     90  struct SGNodeC* FindTypedNamedChild(struct SGNodeC* pNode, NodeType_t eType, const char* pName, bool8_t bCaseSensitive)
+                         inlines  SGNodeC::GetFirstChild, SGNodeC::GetNextSibling
+  461  008BFCE4    118  void InsertParent(struct SGNodeC* pNewParent, struct SGNodeC* pChildNode)
+                         local  struct SGNodeC* pOldParent
+                         inlines  AddRef, RNADebugBreak, Release, SGNodeC::GetParent
+  482  008BFDFC    128  void ReparentChildren(struct SGNodeC* pOldParent, struct SGNodeC* pNewParent)
+                         local  struct <anon> pChild
+                         inlines  RNADebugBreak, SGNodeC::GetFirstChild, operator=
+  493  008BFF6C     38  void ReparentChildrenAndDetach(struct SGNodeC* pOldParent, struct SGNodeC* pNewParent)
+  500  008BFF24     48  void InsertBetweenParentAndChildren(struct SGNodeC* pParent, struct SGNodeC* pNewNode)
+  509  008BE938     58  struct OutStreamC& SceneX::operator<<(const struct OutStreamC& outStream, struct SGNodeC* pNode)
+  515  008BE990     58  struct InStreamC& SceneX::operator>>(const struct InStreamC& inStream, struct SGNodeC* pNode)
+  520  008BEAD8     10  static void _GLOBAL__I__ZN6SceneX10SGManagerC20s_pSGManagerInstanceE()
+  521  008BEAE8     10  static void _GLOBAL__D__ZN6SceneX10SGManagerC20s_pSGManagerInstanceE()

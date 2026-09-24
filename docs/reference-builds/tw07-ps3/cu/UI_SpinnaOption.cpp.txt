@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_SpinnaOption.cpp
+// compiled in: apt_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   20  0004D624     58  void _UISpinnaOptionSaveCB(int32 inRst)
+   29  000FA8B0     54  void UISpinnaOption::UISpinnaOption(const struct UISpinnaOption* this)
+   34  00033BE0     24  void UISpinnaOption::Init(const struct UISpinnaOption* this)
+   41  000EC614     D8  void UISpinnaOption::Show(const struct UISpinnaOption* this, enum SpinnaOptionMode mode)
+                         inlines  GM_GetGolferUp
+   52  0007A438     E0  void UISpinnaOption::OnShow(const struct UISpinnaOption* this)
+   69  0004D67C     44  void UISpinnaOption::ShowHelpText(const struct UISpinnaOption* this)
+   74  000AD0E0    2C4  enum eAptHandleInput UISpinnaOption::HandleInput(const struct UISpinnaOption* this, int32 cID)
+                         inlines  GamePlayer::SetControllerTiltSpinnaOption, UserInfo::SetControllerTiltSpinnaOption, UserInfo::SetLoginIndex

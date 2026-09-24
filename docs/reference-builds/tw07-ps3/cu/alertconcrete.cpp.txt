@@ -1,0 +1,12 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/alertconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 6 functions, source order. line | PS3 address | size
+
+    6  005E7C6C     CC  void AlertConcrete(const struct <anon>* this, const char8_t* pHeader, const char8_t* pBody, const char8_t* pFooter, struct List<OSDK::Action>* pButtonList, struct MemoryStrategy* pMemory)
+                         inlines  RCPointer, operator=
+   15  005C0520     70  void ~AlertConcrete(const struct <anon>* this)
+                         inlines  ~RCPointer
+   19  005B3740      C  const struct <anon>* GetHeader(const const struct <anon>* this)
+   24  005B374C      C  const struct <anon>* GetBody(const const struct <anon>* this)
+   29  005B3758      C  const struct <anon>* GetFooter(const const struct <anon>* this)
+   34  005B3764      8  const struct List<OSDK::Action>* GetActionList(const const struct <anon>* this)

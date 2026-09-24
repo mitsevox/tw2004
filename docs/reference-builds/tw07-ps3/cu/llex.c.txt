@@ -1,0 +1,36 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/lua-5.0.2/src/llex.c
+// compiled in: llex.c
+// 14 functions, source order. line | PS3 address | size
+
+   40  00584060     A0  void luaX_init(lua_State* L)
+                         local  int i
+                         local  TString* ts
+   54  005842E8     78  void luaX_checklimit(LexState* ls, int val, int limit, const char* msg)
+   62  00584100     B4  void luaX_errorline(LexState* ls, const char* s, const char* token, int line)
+                         local  lua_State* L
+                         local  char[80] buff
+   71  005841B4      C  static void luaX_error(LexState* ls, const char* s, const char* token)
+   76  00584230     B8  void luaX_syntaxerror(LexState* ls, const char* msg)
+                         local  const char* lasttoken
+   94  005841C0     70  const char* luaX_token2str(LexState* ls, int token)
+  104  00584360     70  static void luaX_lexerror(LexState* ls, const char* s, int token)
+  112  005843D0     DC  static void inclinenumber(LexState* LS)
+  119  005844AC     EC  void luaX_setinput(lua_State* L, LexState* LS, ZIO* z, TString* source)
+  161    inline-only   static size_t readname(LexState* LS)
+                         local  size_t l
+  174  00584598    718  static void read_numeral(LexState* LS, int comma, SemInfo* seminfo)
+                         local  size_t l
+  211  00584CB0    4C0  static void read_long_string(LexState* LS, SemInfo* seminfo)
+                         local  int cont
+                         local  size_t l
+  258    inline-only   static void read_string(LexState* LS, int del, SemInfo* seminfo)
+                         local  size_t l
+                         local  int c
+                         local  int i
+  314  00585170    ED8  int luaX_lex(LexState* LS, SemInfo* seminfo)
+                         local  int c
+                         local  int i
+                         local  int c
+                         local  size_t l
+                         local  TString* ts
+                         inlines  read_string, readname

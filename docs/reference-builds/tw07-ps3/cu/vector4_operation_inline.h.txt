@@ -1,0 +1,16 @@
+// ../../../../../TIGERCODE/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/vector4_operation_inline.h
+// compiled in: golf_unity.cpp, rnaunity.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   40    inline-only   bool vpu::operator==(struct <anon>& a, struct <anon>& b)
+   45    inline-only   bool vpu::operator!=(struct <anon>& a, struct <anon>& b)
+   72    inline-only   struct <anon> vpu::Dot(struct <anon>& a, struct <anon>& b)
+   78    inline-only   struct <anon> vpu::Mult(struct <anon>& v, struct <anon>& s)
+  118    inline-only   struct <anon> vpu::Add(struct <anon>& a, struct <anon>& b)
+  123    inline-only   struct <anon> vpu::Subtract(struct <anon>& a, struct <anon>& b)
+  143    inline-only   struct <anon> vpu::Magnitude(struct <anon>& v)
+  238    inline-only   struct <anon> vpu::MagnitudeRecipXYZ(struct <anon>& v)
+  259    inline-only   struct <anon>& vpu::operator*=(const struct <anon>& v, struct <anon>& a)
+  466    inline-only   struct <anon> vpu::operator-(struct <anon>& a, struct <anon>& b)
+  471    inline-only   struct <anon> vpu::operator+(struct <anon>& a, struct <anon>& b)
+  487    inline-only   void vpu::Mult(struct <anon>& v, struct <anon>& s, const struct <anon>& result)

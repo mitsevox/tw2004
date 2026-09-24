@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Streaming/Headers/StreamManager.h
+// compiled in: apt_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  135    inline-only   void StreamManagerFEChar::SetModelIDAndTextureID(int32_t modelID, int32_t textureID)

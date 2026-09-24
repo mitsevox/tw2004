@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/silentsignin/source/common/./silentsigninextensionconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   82  00625E04      4  void UserLocalLoginConnectedToNetwork(const struct SilentSigninExtensionConcrete* this)
+   91  00625E10      4  void UserLocalProductUpdateProgress(const struct SilentSigninExtensionConcrete* this, uint32_t , uint32_t )
+   92  00625E1C      4  void UserLocalProductUpdateComplete(const struct SilentSigninExtensionConcrete* this)

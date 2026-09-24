@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNARender/ps3/RNARender/RNAPrimType.h
+// compiled in: RNAMeshProcessorImmediate.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   82    inline-only   int32_t RNA::GetGCMPrimEnum(enum PrimTypeE primType)
+                         local  const char[15] __FUNCTION__

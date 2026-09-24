@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_AptShaderManagerBase.cpp
+// compiled in: shader_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    3  00519AE4     88  void SM_AptShaderManagerBase::Activate(const struct SM_AptShaderManagerBase* this)
+                         inlines  SM_NoteActiveShader

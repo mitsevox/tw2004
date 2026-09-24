@@ -1,0 +1,97 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Rna/RuntimeTools/MaterialListController.cpp
+// compiled in: rnaunity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   64  004D2EB8     9C  struct <anon>* GetInstance()
+   73  004E404C     84  void RegisterMaterialList(const struct <anon>* this, struct MaterialListC* pMaterialList, const char* listName)
+                         local  struct <anon> shadowedList
+                         inlines  ~ShadowedMaterialList
+   83  004D2B94    198  void RegisterMaterialList(const struct <anon>* this, struct <anon>* pShadowedMaterialList)
+                         local  int i
+                         inlines  operator=
+  103  004D277C    100  bool UnregisterMaterialList(const struct <anon>* this, int32_t i)
+                         inlines  operator=
+  109  004D2B14     80  bool UnregisterMaterialList(const struct <anon>* this, struct MaterialListC* pMaterialList)
+                         local  int i
+  127  004D287C     58  void UnregisterAll(const struct <anon>* this)
+                         local  int i
+  141  004D25F0    18C  void MaterialListController(const struct <anon>* this)
+                         local  int i
+                         inlines  operator=
+  152  004D28D4     C8  void ~MaterialListController(const struct <anon>* this)
+                         inlines  ~ShadowedMaterialList
+  157  004F2B3C     28  void RNAGolf::RNADebugMenu_RNAMaterialEditor(void* pUserData)
+  163  004EFA60   30DC  void MenuPrint(const struct <anon>* this)
+                         local  MenuColorT oldColor
+                         local  struct MaterialListC* pMatList
+                         local  struct MaterialListC* pShadowMatList
+                         local  struct <anon> aLineExpanded
+                         local  int i
+                         local  const char* activeText
+                         local  int32_t idx
+                         local  int32_t i
+                         local  int32_t iMaterial
+                         local  struct MaterialC* pMat
+                         local  struct MaterialC* pShadowMat
+                         local  bool bLineSelected
+                         local  char[512] shaderFileName
+                         local  struct ShaderC* pShader
+                         local  struct <anon> shaderPath
+                         local  const struct ShaderInterfaceC* pIntf
+                         local  struct <anon>* pParm
+                         local  struct <anon>* pShadowParm
+                         local  int32_t iTech
+                         local  struct TechniqueInfo techinfo
+                         local  bool bAdjustable
+                         local  float_t fMin
+                         local  float_t fMax
+                         local  float_t fStep
+                         local  int32_t iMin
+                         local  int32_t iMax
+                         local  int32_t iStep
+                         local  RNAVector2 v2
+                         local  RNAVector2 v2s
+                         local  RNAVector3 v3
+                         local  RNAVector3 v3s
+                         local  RNAVector4 v4
+                         local  RNAVector4 v4s
+                         local  RNAMatrix44 m44
+                         local  RNAMatrix44 m44s
+                         local  float_t fVal
+                         local  float_t fValS
+                         local  int32_t iVal
+                         local  int32_t iValS
+                         local  bool bVal
+                         local  bool bValS
+                         local  struct TextureC* texVal
+                         local  struct TextureC* texValS
+                         local  bool bModified
+                         local  float_t value
+                         local  int32_t value
+                         local  bool value
+                         local  int len
+                         local  char[256] FileName
+                         local  struct <anon> texPath
+                         local  const char* fileName
+                         local  struct <anon> texPath
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  bool* newData
+                         inlines  Construct, Get<RNA::TextureC*>, Get<RNAMath::RNAMatrix44>, Get<RNAMath::RNAVector2>, Get<RNAMath::RNAVector3>, Get<RNAMath::RNAVector4>, Get<bool>, Get<std::float_t>, Get<std::int32_t>, GetFirstParm, GetMaterial, GetNext, GetNumMaterials, GetShader, Grow, MaterialList, Matrix44, RNADebugBreak, Resize, Set<RNA::TextureC*>, Set<RNAMath::RNAMatrix44>, Set<RNAMath::RNAVector2>, Set<RNAMath::RNAVector3>, Set<RNAMath::RNAVector4>, Set<bool>, Set<std::float_t>, Set<std::int32_t>, SetTechnique, ShadowList, Vector, Vector2, Vector3, operator RNA::MaterialC*, operator=, operator[], std::strstr, vpu::operator!=
+  586  004E3F08    144  bool RegenerateShadowList(const struct <anon>* this)
+                         local  const struct MaterialListC* pTemp
+                         local  const struct MaterialListC* pTemp
+                         inlines  operator=
+  602  004E2FD0    DA0  struct MaterialC* RNAGolf::CloneMaterial(struct MaterialC* pOriginalMaterial)
+                         local  struct MaterialC* pClone
+                         local  struct <anon>* pParm
+                         local  const char* name
+                         local  uint32_t eleCount
+                         local  uint32_t index
+                         inlines  Get<RNA::TextureC*>, Get<RNAMath::RNAMatrix44>, Get<RNAMath::RNAVector2>, Get<RNAMath::RNAVector3>, Get<RNAMath::RNAVector4>, Get<bool>, Get<rw::math::vpu::Matrix33>, Get<std::float_t>, Get<std::int32_t>, GetFirstParm, GetNext, RNADebugBreak, SetTechnique, operator new
+  643  004E3D70    198  struct MaterialListC* RNAGolf::CloneMaterialList(struct MaterialListC* pOriginalMatList)
+                         local  struct MaterialListC* pClone
+                         local  int32_t numMaterials
+                         local  int32_t i
+                         local  struct MaterialC* pMaterialClone
+                         inlines  GetMaterial, GetNumMaterials, operator new

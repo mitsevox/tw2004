@@ -1,0 +1,13 @@
+// ../../../../../TIGERCODE/Code/Golf/TextureFX/Headers/TXUFile.h
+// compiled in: golf2_unity.cpp, other_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   30  003D51C0     4C  void TXUFile::TXUFile(const struct TXUFile* this)
+   33  003D520C     3C  void TXUFile::TXUFile(const struct TXUFile* this, const const struct Allocator& allocatorRef)
+   37  003D5284     48  void TXUFile::~TXUFile(const struct TXUFile* this)
+   40    inline-only   int TXUFile::GetNumPairs(const struct TXUFile* this)
+   44    inline-only   char* TXUFile::GetTextureName(const struct TXUFile* this, int entryNum)
+   56    inline-only   void TXUFile::SetTextureName(const struct TXUFile* this, const char* txrName, const char* newName)
+                         local  int32 i
+   67    inline-only   void TXUFile::SetTextureName(const struct TXUFile* this, int entryNum, const char* newName)
+   77    inline-only   char* TXUFile::GetTXRFileName(const struct TXUFile* this, int entryNum)

@@ -1,0 +1,5 @@
+// ../../../ears_rt_cct/dev/api/ears_rt_cct/interfaces/ieventhandler.h
+// compiled in: tiger_cct_internal_event_handler.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   30  00566900     18  void ~IEventHandler(const struct <anon>* this)

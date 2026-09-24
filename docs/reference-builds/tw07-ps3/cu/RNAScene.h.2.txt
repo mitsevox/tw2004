@@ -1,0 +1,13 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNAX/include/RNAX/RNAScene.h
+// compiled in: RNAScene.cpp, Scrape.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   47    inline-only   struct MaterialListC& RNASceneC::GetMaterialList(const struct RNASceneC* this)
+   51    inline-only   struct VertexFormatC* GetVertexFormat(const const struct <anon>* this, int32_t id)
+   55    inline-only   struct MeshC* GetMesh(const const struct <anon>* this, int32_t id)
+   58    inline-only   struct StreamC* GetStream(const const struct <anon>* this, int32_t id)
+   61    inline-only   struct IndicesC* GetIndices(const const struct <anon>* this, int32_t id)
+   64    inline-only   struct TextureC* GetTexture(const const struct <anon>* this, int32_t id)
+   67    inline-only   struct ShaderC* GetShader(const const struct <anon>* this, int32_t id)
+   72    inline-only   bool8_t IsLoaded(const const struct <anon>* this)
+   79  004F78FC      4  void HeartBeat(const struct <anon>* this)

@@ -1,0 +1,46 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/PS3/RNATexturePlat.cpp
+// compiled in: RNATexturePlat.cpp
+// 15 functions, source order. line | PS3 address | size
+
+    0  0083EEA8     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   66  0083EF48    118  uint32_t RNA::ConvertTextureFormat(enum SurfaceFormatE eFormat)
+                         local  const char[21] __FUNCTION__
+                         inlines  RNADebugBreak
+   94  0083EC98     60  void TexturePlatC(const struct <anon>* this, struct UserData* pUserData, uint32_t uFlags)
+  103  0083EDEC     BC  void ~TexturePlatC(const struct <anon>* this)
+                         inlines  operator delete
+  111  0083ED58     34  void SetGcmTexture(const struct <anon>* this, const const CellGcmTexture& texture)
+  139  0083FDA0    194  bool Create(const struct <anon>* this, struct DeviceC* pDevice, struct SurfaceC* pSurface, uint32_t overrideWidth, uint32_t overrideHeight, enum SurfaceFormatE overrideFormat)
+                         local  const char[7] __FUNCTION__
+                         local  CellGcmTexture texture
+                         local  enum SurfaceFormatE eFormat
+                         inlines  RNADebugBreak, SurfaceC::GetFormat
+  210  0083F430    460  bool Create(const struct <anon>* this, struct DeviceC* pDevice, enum TextureTypeE eType, int32_t iWidth, int32_t iHeight, int32_t iDepth, enum SurfaceFormatE eFormat, int32_t iNumLayers, int32_t iNumMipmapLevels, SurfaceFlagsT uSurfaceFlags)
+                         local  const char[7] __FUNCTION__
+                         local  CellGcmTexture texture
+                         local  uint32_t alignment
+                         inlines  RNADebugBreak
+  335  0083F890    21C  bool Create(const struct <anon>* this, CellGcmTexture* gcmTexture)
+                         local  const char[7] __FUNCTION__
+                         inlines  RNADebugBreak
+  416  0083ED8C     60  void Destroy(const struct <anon>* this)
+  428  0083FAAC     48  bool CastFormat(const struct <anon>* this, enum SurfaceFormatE eFormat)
+                         local  const char[11] __FUNCTION__
+                         inlines  RNADebugBreak
+  463  0083FAF4    1AC  struct SurfaceC* AcquireSurface(const struct <anon>* this, struct DeviceC* pDevice, int32_t iLayer, int32_t iMipmapLevel)
+                         local  const char[15] __FUNCTION__
+                         local  struct SurfacePlatC* pSurface
+                         inlines  RNADebugBreak, SurfacePlatC::operator new
+  509  0083FCA0    100  void ReleaseSurface(const struct <anon>* this, struct DeviceC* pDevice, struct SurfaceC* pSurface)
+                         local  const char[15] __FUNCTION__
+                         inlines  RNADebugBreak
+  542  0083F060    3D0  static uint32_t RNA::GetTextureDataSize(enum SurfaceFormatE eFormat, int32_t iWidth, int32_t iHeight, int32_t iDepth, int32_t iNumMips, bool bCubeMap)
+                         local  const char[19] __FUNCTION__
+                         local  uint32_t uNumBytes
+                         local  int32_t iCurrWidth
+                         local  int32_t iCurrHeight
+                         local  int32_t iCurrDepth
+                         local  int32_t i
+                         inlines  RNADebugBreak
+  597  0083EF28     10  static void _GLOBAL__I__ZN3RNA12TexturePlatC16s_ClassAllocatorE()
+  598  0083EF38     10  static void _GLOBAL__D__ZN3RNA12TexturePlatC16s_ClassAllocatorE()

@@ -1,0 +1,55 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/UByteStream.c
+// compiled in: Legacy_unity.cpp
+// 33 functions, source order. line | PS3 address | size
+
+   25  0037A438     18  static void _StreamReset(struct ByteStreamT* pStream)
+   30    inline-only   static int32 _CloseReadStream(struct ByteStreamT* pStream)
+                         local  int32 iSize
+   37    inline-only   static int32 _CloseWriteStream(struct ByteStreamT* pStream)
+                         local  int32 iSize
+   44    inline-only   static int32 _CloseVirtualWriteStream(struct ByteStreamT* pStream)
+                         local  int32 iSize
+   51    inline-only   static void* _GetCurrentData(struct ByteStreamT* pStream)
+   56  003B3F58     AC  int32 BS_CloseStream(struct ByteStreamT* pStream)
+                         inlines  _CloseVirtualWriteStream
+   76  0037A450     58  void BS_OpenWriteStream(struct ByteStreamT* pStream, void* pData, int32 iMaxSize)
+   85  0037A4A8     58  void BS_OpenReadStream(struct ByteStreamT* pStream, void* pData, int32 iDataSize)
+   94  0037A500     44  void BS_OpenVirtualWriteStream(struct ByteStreamT* pStream)
+  103  0037A544      C  bool BS_IsStreamVirtual(struct ByteStreamT* pStream)
+  115  0037A550      C  ByteStreamPosT BS_GetPos(struct ByteStreamT* pStream)
+  120  003B3D34     7C  void BS_Seek(struct ByteStreamT* pStream, ByteStreamPosT iPos)
+  133  0037A55C     3C  void BS_SeekRelative(struct ByteStreamT* pStream, int32 skip)
+                         local  int32 iPos
+  145  003B3928     C8  void BS_WriteByte(struct ByteStreamT* pStream, uint8 b)
+  160  003B3598     98  uint8 BS_ReadByte(struct ByteStreamT* pStream)
+  170  003B3AE0     5C  void BS_Write32(struct ByteStreamT* pStream, uint32 i)
+  178  003B377C     70  uint32 BS_Read32(struct ByteStreamT* pStream)
+                         local  uint32 i
+  190  003B3B68      8  void BS_WriteS32(struct ByteStreamT* pStream, int32 i)
+  195  003B3818      4  int32 BS_ReadS32(struct ByteStreamT* pStream)
+  200  003B3A94     44  void BS_Write16(struct ByteStreamT* pStream, uint16 i)
+  206  003B3710     48  uint16 BS_Read16(struct ByteStreamT* pStream)
+                         local  uint16 i
+  216  003B3AD8      8  void BS_WriteS16(struct ByteStreamT* pStream, int16 i)
+  221  003B3758     24  int16 BS_ReadS16(struct ByteStreamT* pStream)
+  226  003B3A90      4  void BS_Write8(struct ByteStreamT* pStream, uint8 i)
+  231  003B36EC     24  uint8 BS_Read8(struct ByteStreamT* pStream)
+  236  003B3A88      8  void BS_WriteS8(struct ByteStreamT* pStream, int8 i)
+  241  003B36C8     24  int8 BS_ReadS8(struct ByteStreamT* pStream)
+  246  003B3B40     28  void BS_WriteFloat(struct ByteStreamT* pStream, float f)
+                         local  uint32* pi
+  256  003B37F0     28  float BS_ReadFloat(struct ByteStreamT* pStream)
+                         local  uint32 i
+                         local  float* pF
+  267  003B3C74     C0  void BS_WriteString(struct ByteStreamT* pStream, char* s)
+                         local  int32 i
+                         local  int32 l
+  288  003B38D0     58  char* BS_ReadString(struct ByteStreamT* pStream)
+                         local  int32 l
+                         local  char* pStr
+  304  003B39F0     98  void BS_WriteBinary(struct ByteStreamT* pStream, void* p, int32 iSize)
+                         local  uint8* data
+                         local  int32 i
+  315  003B3630     98  void BS_ReadBinary(struct ByteStreamT* pStream, void* p, int32 iSize)
+                         local  uint8* data
+                         local  int32 i

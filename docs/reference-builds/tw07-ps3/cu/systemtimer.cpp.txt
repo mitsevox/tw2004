@@ -1,0 +1,14 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/systemtimer.cpp
+// compiled in: systemtimer.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   13  006D70E8     94  void AddTimer(const struct <anon>* this, struct ITask* pITask)
+                         local  const char[9] __FUNCTION__
+                         inlines  Push
+   21  006D6FF0     F8  void RemoveTimer(const struct <anon>* this, struct ITask* pITask)
+                         local  const char[12] __FUNCTION__
+                         inlines  Assert, Remove
+   32  006D6F00     80  void AddTimerClient(const struct <anon>* this, struct <anon>* pClient, enum TimerStage stage)
+                         local  const char[15] __FUNCTION__
+   39  006D6F80     70  void RemoveTimerClient(const struct <anon>* this, struct <anon>* pClient)
+                         local  const char[18] __FUNCTION__

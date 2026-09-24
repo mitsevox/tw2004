@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/./ActionUserStrategyAbstract.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   55  006231C8      8  const char8_t* GetIdentifier(const struct <anon>* this)
+   58  006231D0      8  uint32_t GetPriority(const const struct <anon>* this)
+   62  006231D8      8  bool DoIsEnabledForUser(const const struct <anon>* this, const struct User* )

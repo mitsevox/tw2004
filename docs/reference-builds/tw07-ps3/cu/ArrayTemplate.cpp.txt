@@ -1,0 +1,14 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/aptInterface/ArrayTemplate.cpp
+// compiled in: other_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   32  003E9834    18C  static void AptArray_UpdateArrayAllocation(int32 index, void* array, int32 size)
+   63  003E99C0     8C  void AptArray_CheckAllocation(void* array, int32 size)
+                         local  int i
+   75  003E9A4C    140  void AptArray_TrackAllocation(void* array, int32 size)
+                         local  int32 first0
+                         local  int i
+                         local  bool notifyOnce
+  111  003E9B8C     8C  void AptArray_CloseModule()
+                         local  int i
+                         local  int32* z

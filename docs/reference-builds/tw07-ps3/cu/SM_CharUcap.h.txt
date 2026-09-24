@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_CharUcap.h
+// compiled in: shader_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   19  00520350     18  void SM_UcapClass::~SM_UcapClass(const struct SM_UcapClass* this)
+                         inlines  SM_CharGenericClass::~SM_CharGenericClass

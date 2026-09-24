@@ -1,0 +1,6 @@
+// C:/packages/PlayStation3GCC/096.002/Installed/target/ppu/include/cell/atomic.h
+// compiled in: job_scheduler_platform.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  199    inline-only   static uint32_t cellAtomicStore32(uint32_t* ea, uint32_t value)
+                         local  uint32_t old

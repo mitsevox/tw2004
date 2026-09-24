@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/career/source/common/./careerfacadeconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   47    inline-only   struct <anon>* GetInstance()
+   48  0062659C      8  struct CareerExtension* GetCareerExtension(const const struct <anon>* this)
+   49  0062551C      8  struct CareerExtensionConcrete* GetCareerExtensionConcrete(const const struct <anon>* this)
+   50  00625524      C  const struct CareerGameParameters* GetCareerGameParameters(const const struct <anon>* this)

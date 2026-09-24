@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/hi-rendering/GoSafeZone.c
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   58  002FFEE8    184  void SZ_vDrawSafeZone()
+                         local  float[2][4] xpVertices
+                         local  vec4flt xColor
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetZBufferMode, PR_vFillVerticesWith2DRect, PR_vSetCurrentColor, PR_vSetCurrentUsage

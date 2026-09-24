@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/Online/Lobby.h
+// compiled in: golf2_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  703    inline-only   void LobbyOSDK::SetChatDirty(const struct LobbyOSDK* this)
+  704    inline-only   void LobbyOSDK::SetRoomDirty(const struct LobbyOSDK* this)

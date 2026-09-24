@@ -1,0 +1,17 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_SkillChallenge.cpp
+// compiled in: apt_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   29  000F8DAC     94  void UISkillChallenge::UISkillChallenge(const struct UISkillChallenge* this)
+                         inlines  TArrayInternal<UISkillChallenge::DstMenuItem_skil,AptStructSwapper>::TArrayInternal, TExternArray<UISkillChallenge::DstMenuItem_skil>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   33  000F1284     78  void UISkillChallenge::Init(const struct UISkillChallenge* this)
+                         inlines  FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   43  0004BFC0     9C  void UISkillChallenge::Show(const struct UISkillChallenge* this)
+                         local  const struct GameModeDriver* pPtr
+                         local  int32 numElements
+                         inlines  GameModeDriver::GetNumEvents
+   66  0004C05C     50  void UISkillChallenge::UpdateItemAndLabel(const struct UISkillChallenge* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_skil* dest
+   75  000C0908     F4  enum eAptHandleInput UISkillChallenge::HandleInput(const struct UISkillChallenge* this, int32 cID)
+  102  000C07E8    120  void UISkillChallenge::StartEvent(const struct UISkillChallenge* this, int32 eventIndex)
+                         local  struct UCAPSkillChallengesEvent_t* pEvent

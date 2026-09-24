@@ -1,0 +1,27 @@
+// ../../../../../TIGERCODE/Code/Golf/Lo-Rendering/Geom/twchar.h
+// compiled in: golf2_unity.cpp, golf_unity.cpp
+// 22 functions, source order. line | PS3 address | size
+
+   56  002285FC     14  void CharShaderDefDB::CharShaderDefDB(const struct CharShaderDefDB* this)
+   57  002286C0      4  void CharShaderDefDB::~CharShaderDefDB(const struct CharShaderDefDB* this)
+   82  00228610     10  void CharTintDefDB::CharTintDefDB(const struct CharTintDefDB* this)
+   83  00228760      4  void CharTintDefDB::~CharTintDefDB(const struct CharTintDefDB* this)
+  105  002288F8      4  void CharMaterial::CharMaterial(const struct CharMaterial* this)
+  106  00228904      4  void CharMaterial::~CharMaterial(const struct CharMaterial* this)
+  156  00228D80     38  void CharMesh::CharMesh(const struct CharMesh* this)
+  157  00228F40      4  void CharMesh::~CharMesh(const struct CharMesh* this)
+  166    inline-only   bool CharMesh::IsActive(const const struct CharMesh* this)
+  168    inline-only   bool CharMesh::HasUcap(const const struct CharMesh* this)
+  192  0022932C      4  void CharGeom::CharGeom(const struct CharGeom* this)
+  193  0022926C      4  void CharGeom::~CharGeom(const struct CharGeom* this)
+  257  002297D0     3C  void CharModelMgrCharacterInstance::CharModelMgrCharacterInstance(const struct CharModelMgrCharacterInstance* this)
+  295    inline-only   void CharModelMgrCharacterInstance::SetMyPlayerIndex(const struct CharModelMgrCharacterInstance* this, uint8_t index)
+  299    inline-only   void* CharModelMgrCharacterInstance::GetDMAListPtr(const struct CharModelMgrCharacterInstance* this)
+  301    inline-only   void CharModelMgrCharacterInstance::SetOverrideDMAListPtr(const struct CharModelMgrCharacterInstance* this, void* pList)
+  322  0027E0E4     68  void CharModelMgr::CharModelMgr(const struct CharModelMgr* this)
+  323  00229578     78  void CharModelMgr::~CharModelMgr(const struct CharModelMgr* this)
+                         inlines  ~CharModelMgrCharacterInstance
+  379    inline-only   uint32 CharModelMgr::GetMaxCharacterInUse(const struct CharModelMgr* this)
+  384    inline-only   uint32 CharModelMgr::IncrementMaxCharacterInUse(const struct CharModelMgr* this)
+  391    inline-only   uint32 CharModelMgr::GetCurrentCharacterInUse(const struct CharModelMgr* this)
+  396    inline-only   uint32 CharModelMgr::SetCurrentCharacterInUse(const struct CharModelMgr* this, uint32 newCurrent)

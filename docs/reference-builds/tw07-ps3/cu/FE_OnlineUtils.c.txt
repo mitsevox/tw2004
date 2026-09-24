@@ -1,0 +1,28 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/frontend/FE_OnlineUtils.c
+// compiled in: apt_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   60  0002449C    144  void FE_OnlineLegal_GetRowString(int row, char* rowStr)
+                         local  char* stringPtr
+                         local  char* nextStr
+                         local  int i
+   87  000245E0     74  int FE_OnlineLegal_GetTotalRows()
+                         local  int row_count
+                         local  char* stringPtr
+                         local  char* nextStr
+                         local  char[64] dummy
+  107  00024318    184  char* FE_OnlineLegal_GetRow(char* start, char* rowStr)
+                         local  char* end
+                         local  int src
+                         local  int dst
+                         local  int space
+  159  00023B4C     5C  void FE_OnlineLegal_FreeStreamMemory()
+  170  00024654      C  static int32 FE_GetLegalChunkID()
+  182  00024660     8C  void FE_OnlineLegal_RegisterStreamClients()
+                         local  int32 chunkID
+                         local  int32 filesize
+  204  000246EC     28  void FE_OnlineLegal_UnRegisterStreamClients()
+                         local  int32 chunkID
+  218  0005BB30    170  void FE_OnlineLegal_LoadAgreementfromStream(struct TStreamData* pStreamData)
+                         local  const char[39] __FUNCTION__
+                         inlines  TagValuePair, operator+

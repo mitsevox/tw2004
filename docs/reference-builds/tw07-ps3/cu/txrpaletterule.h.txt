@@ -1,0 +1,7 @@
+// ../../../../../TIGERCODE/Code/Golf/TextureFX/Headers/txrpaletterule.h
+// compiled in: other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   37    inline-only   const char* TXRPaletteRule::GetName(const struct TXRPaletteRule* this)
+   39    inline-only   int32 TXRPaletteRule::GetState(const struct TXRPaletteRule* this)
+   40    inline-only   void TXRPaletteRule::SetMaskMode(const struct TXRPaletteRule* this, int32 maskMode)

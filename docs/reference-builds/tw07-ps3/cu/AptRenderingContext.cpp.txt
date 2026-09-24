@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptRenderingContext.cpp
+// compiled in: other_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   27  003EF2A8    12C  void AptRenderingContext::expandBoundingRect(const struct AptRenderingContext* this, struct AptRect* pBoundingRect, struct AptRect* pNewRect)
+                         local  float[4] x
+                         local  float[4] y
+                         local  float[4] xfX
+                         local  float[4] xfY
+                         local  int i

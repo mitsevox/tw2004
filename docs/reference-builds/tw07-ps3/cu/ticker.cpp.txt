@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/ticker.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    5  005DE224     5C  void Ticker(const struct <anon>* this, uint32_t uMaximumObservers)
+                         inlines  Observable
+   10  005C0DD8     48  void ~Ticker(const struct <anon>* this)
+                         inlines  ~Observable

@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Golf/RNA/Asset/PS3/TextureAsset.h
+// compiled in: rnaunity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   39    inline-only   struct TextureC* TextureAssetC::GetTexture(const struct TextureAssetC* this)
+   45  004F787C     10  int32_t TextureAssetC::GetRefCount(const struct TextureAssetC* this)

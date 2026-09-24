@@ -1,0 +1,181 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/gamesetupconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 47 functions, source order. line | PS3 address | size
+
+   66  00627374     E0  void PerformAction(const struct <anon>* this)
+                         local  uint32_t uNumElements
+                         local  struct GameSetupObserver** pList
+                         inlines  GetInstance, GetMaxNumberOfObservers, GetObserverList
+   75  00629744     40  void ~ActionAlertExit(const struct <anon>* this)
+   81  00627294     E0  void PerformAction(const struct <anon>* this)
+                         local  uint32_t uNumElements
+                         local  struct GameSetupObserver** pList
+                         inlines  GetInstance, GetMaxNumberOfObservers, GetObserverList
+   90  006297A8     40  void ~ActionAlertLeave(const struct <anon>* this)
+  107  005FD254    130  void GameSessionChanged(const struct GameSetupConcrete* this, struct GameSession* pSession)
+                         local  uint32_t uNumElements
+                         local  struct GameSetupObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  133  005F3A10    124  void PeerConnectGameSuccess(const struct GameSetupConcrete* this, struct PeerConnection* pPeerConnection)
+                         local  struct GameUser* pGameUser
+                         local  struct <anon>* pGameSetupUser
+                         local  uint32_t uNumElements
+                         local  struct GameSetupObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  140  005FD55C     84  void PeerConnectGameFailed(const struct GameSetupConcrete* this)
+                         local  struct <anon>* pFacade
+                         local  bool bHeadToHead
+  172  005FCBAC    298  void FireLeaveGameAlert(const struct GameSetupConcrete* this, const char8_t* strMessage, enum DisconnectReasonE eReason)
+                         local  struct <anon>* pFacade
+                         local  struct GameSession* pGame
+                         local  struct List<OSDK::Action>* pButtonList
+                         local  struct Alert* pAlert
+                         local  uint32_t uNumElements
+                         local  struct GameSetupObserver** pList
+                         inlines  ActionAlertLeave, GetInstance, GetMaxNumberOfObservers, GetObserverList, InsertElement, List, operator=
+  193  005F76F4     40  void GameSessionLeaveFailure(const struct GameSetupConcrete* this, enum FailureCode )
+                         inlines  operator=
+  198  005F7734     40  void GameSessionLeaveSuccess(const struct GameSetupConcrete* this)
+                         inlines  operator=
+  223  005FD384    1D8  void PeerConnectGameDisconnected(const struct GameSetupConcrete* this, struct PeerConnection* pPeerConnection, enum DisconnectReasonE eReason)
+                         local  bool bHeadToHead
+                         local  struct GameSession* pGameSession
+                         inlines  operator=
+  249  005EB324    1E0  void PeerConnectAllPeersConnected(const struct GameSetupConcrete* this)
+                         local  uint32_t uNumElements
+                         local  struct GameSetupObserver** pList
+                         local  uint32_t uNumElements
+                         local  struct GameSetupObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  275  005D20F8    1C0  void PeerConnectConnectionStarted(const struct GameSetupConcrete* this)
+                         local  uint32_t uNumElements
+                         local  struct GameSetupObserver** pList
+                         local  uint32_t uNumElements
+                         local  struct GameSetupObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  297  005F385C    1B4  void StreamMessageReceived(const struct GameSetupConcrete* this, struct <anon>* pConnection, uint32_t uIdent, int32_t iKind, void* pMessage, uint32_t uSize)
+                         local  struct GameUser* pGameUser
+                         local  struct <anon>* pGameSetupUser
+                         local  uint32_t uNumElements
+                         local  struct GameSetupObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  307  005E250C    168  void GameSessionStarted(const struct GameSetupConcrete* this, struct GameSession* pSession)
+                         local  uint32_t uNumElements
+                         local  struct GameSetupObserver** pList
+                         inlines  GetInvitationManagerConcrete, GetMaxNumberOfObservers, GetObserverList
+  318  005B6D5C     40  void GameSessionDeleted(const struct GameSetupConcrete* this, struct GameSession* pGameSession)
+  323  005FC898    314  void GameSessionLeft(const struct GameSetupConcrete* this, struct GameSession* , enum GameSessionLeftReason eReason)
+                         local  bool bFireGameSetupExitEvent
+                         local  struct List<OSDK::Action>* pButtonList
+                         local  const char8_t* strMessage
+                         local  bool bHeadToHead
+                         local  struct Alert* pAlert
+                         local  uint32_t uNumElements
+                         local  struct GameSetupObserver** pList
+                         local  uint32_t uNumElements
+                         local  struct GameSetupObserver** pList
+                         inlines  ActionAlertExit, GetMaxNumberOfObservers, GetObserverList, InsertElement, List
+  390  005ED608    178  void GameSessionJoined(const struct GameSetupConcrete* this, struct GameSession* pSession)
+                         inlines  operator=
+  403  005F7CA4     A8  struct Operation* SetGameSettings(const struct GameSetupConcrete* this, const struct Dictionary* pGameSettings, struct GameSessionStateCallback* pCallback)
+  427  005F7978    268  struct Operation* SendUserSettingsToPeers(const struct GameSetupConcrete* this, struct <anon>* pCallback)
+                         local  struct <anon>* pGameSetupUser
+                         local  struct <anon> dictUserState
+                         local  bool bHeadToHead
+                         local  enum RTPState eRTPState
+                         inlines  ResetShouldPeersRTPStateBeReset, operator->
+  512  005F7774    204  void InstructPeersToResetRTPState(const struct GameSetupConcrete* this)
+                         local  struct <anon>* pLocalUser
+                         local  const struct List<OSDK::GameSetupUser>* pList
+                         local  uint32_t uNumGameSetupUsers
+                         local  struct User* pCurrentPeer
+                         local  uint32_t uIndex
+                         inlines  GetElementAt, GetNumberOfElements, operator->, operator=
+  538  005D22B8    228  void LobbyDispatch(const struct GameSetupConcrete* this, const struct Lobby* , LobbyApiMsgT* pMesg)
+                         local  struct <anon> Message
+                         local  char8_t[1028] strText
+                         local  struct <anon> Message2
+                         local  uint32_t uNumElements
+                         local  struct GameSetupObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  596  005FCE44    198  void InHeadToHeadCheckIfHostShouldLeave(const struct GameSetupConcrete* this)
+                         local  bool bHeadToHead
+                         local  uint32_t uMaxPlayers
+                         local  const struct List<OSDK::GameSetupUser>* pList
+                         local  struct GameSession* pGameSession
+  628  005CFFF0    190  void OnTheHostUpdateCanStartGameState(const struct GameSetupConcrete* this)
+                         local  bool bStartGame
+                         local  const struct List<OSDK::GameSetupUser>* pList
+                         local  uint32_t uNumGameSetupUsers
+                         local  uint32_t uIndex
+                         local  uint32_t uNumElements
+                         local  struct GameSetupObserver** pList
+                         inlines  GetElementAt, GetMaxNumberOfObservers, GetNumberOfElements, GetObserverList
+  659  005F7D64     A4  void MessagePrivateSendSuccess(const struct GameSetupConcrete* this)
+                         inlines  operator=
+  675  005F7E08     A4  void MessagePrivateSendFailure(const struct GameSetupConcrete* this, enum Failure )
+                         inlines  operator=
+  690  005E1C48     8C  void TestAndFireAllPeersAreConnectedEvent(const struct GameSetupConcrete* this)
+                         local  struct PeerConnectionManagerConcrete* pPeerConnectionManager
+                         inlines  GetPeerConnectionManagerConcrete
+  699  005EB174    1B0  void UpdatePeerConnectionObserverList(const struct GameSetupConcrete* this)
+                         local  struct PeerConnectionManagerConcrete* pPeerConnectionManager
+                         local  const struct List<OSDK::PeerConnection>* pPeerConnections
+                         local  uint32_t uNumConnections
+                         local  uint32_t uIndex
+                         local  struct PeerConnection* pPeerConnection
+                         local  struct <anon>* pStreamedConnection
+                         inlines  AddObserver, GetElementAt, GetInstance, GetNumberOfElements, GetPeerConnectionManagerConcrete, InsertElement
+  720  005E2D04     FC  void ClearPeerConnectionObserverList(const struct GameSetupConcrete* this)
+                         local  uint32_t uNumConnections
+                         local  uint32_t uIndex
+                         local  struct <anon>* pStreamedConnection
+                         inlines  GetElementAt, GetNumberOfElements, RemoveAll, RemoveObserver
+  737  00610AD8    154  void GameSetupConcrete(const struct GameSetupConcrete* this)
+                         inlines  List, LobbyDispatchObserver, PeerConnectionStreamedObserver, RCPointer
+  749  00610D80    144  void ~GameSetupConcrete(const struct GameSetupConcrete* this)
+                         inlines  ~List, ~LobbyDispatchObserver, ~PeerConnectionStreamedObserver, ~RCPointer
+  759  005B6DCC      8  bool CanStartGame(const const struct <anon>* this)
+  764  005CD760     94  struct Operation* StartGame(const struct GameSetupConcrete* this, struct GameSessionStartCallback* pCallback)
+  769  005F3614    248  const struct List<OSDK::GameSetupUser>* GetGameSetupUserList(const const struct <anon>* this)
+                         local  const struct <anon>* pGameSession
+                         local  struct <anon>* pGameSetupUserList
+                         local  const struct List<OSDK::GameUser>* pGameUsers
+                         local  uint32_t uNumGameUsers
+                         local  uint32_t uIndex
+                         inlines  GetElementAt, GetNumberOfElements, InsertElement, List
+  789  005CD6CC     94  struct Operation* LeaveGame(const struct GameSetupConcrete* this, struct GameSessionLeaveCallback* pCallback)
+  794  005B6DD4     70  struct Operation* KickPeer(const struct GameSetupConcrete* this, struct <anon>* pGameSetupUser, struct <anon>* pCallback)
+  799  005B6E44      8  bool IsLocalUserHost(const const struct <anon>* this)
+  824  005FCFDC    278  bool Startup(const struct GameSetupConcrete* this)
+                         local  struct <anon>* pFacade
+                         local  struct PeerConnectionManagerConcrete* pPeerConnectionManager
+                         local  const char8_t* strMessage
+                         local  bool bHeadToHead
+                         inlines  AddObserver, GetInstance, operator=
+  902  005F7EAC    1F4  void Shutdown(const struct GameSetupConcrete* this)
+                         local  struct <anon>* pFacade
+                         inlines  GetInstance, RemoveObserver, operator->, operator=
+  942  005D7190     6C  struct <anon>* GetGameSetupHostUser(const const struct <anon>* this)
+  947  005B6E4C      8  struct <anon>* GetGameSetupLocalUser(const const struct <anon>* this)
+  952  00607044     58  struct Operation* SendChatMessage(const struct GameSetupConcrete* this, const char8_t* pChatMessage, struct <anon>* pCallback, bool bFilter)
+                         local  struct Operation* pOperation
+                         local  struct <anon>* pFacadeConcrete
+                         local  struct LobbyConcrete* pLobbyConrete
+                         inlines  GetLobbyConcrete
+  976  00606FCC     60  struct Operation* SendPrivateMessage(const struct GameSetupConcrete* this, const char8_t* pChatMessage, struct <anon>* pCallback, bool bFilter)
+                         local  struct Operation* pOperation
+                         local  struct <anon>* pFacadeConcrete
+                         local  struct LobbyConcrete* pLobbyConrete
+                         inlines  GetLobbyConcrete
+ 1000  005D0180     F0  void SendMessage(const struct GameSetupConcrete* this, int32_t iKind, const void* pMessage, uint32_t uSize)
+                         local  uint32_t uNumConnections
+                         local  uint32_t uIndex
+                         local  struct <anon>* pStreamedConnection
+                         inlines  GetElementAt, GetNumberOfElements
+ 1029  005F80A0     40  void GameSessionStateSuccess(const struct GameSetupConcrete* this)
+                         inlines  operator=
+ 1054  005F80E0     40  void GameSessionStateFailure(const struct GameSetupConcrete* this, enum FailureCode )
+                         inlines  operator=
+ 1079  005E1CD4     58  bool AreAllPeersConnected(const const struct <anon>* this)
+                         inlines  GetPeerConnectionManagerConcrete

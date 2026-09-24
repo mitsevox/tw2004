@@ -1,0 +1,41 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/audio/engine/utils/UAudContainers.c
+// compiled in: other_unity.cpp
+// 23 functions, source order. line | PS3 address | size
+
+   33  003E4114      8  bool UCont_InitModule()
+   43  003E411C      4  void UCont_ExitModule()
+   56  003E1674     18  void UList_Reset(TListDbl* plist, uint16 nslots)
+   69  003E3A08    100  void UList_PushHead(TListDbl* plist, TListDblLink* plink)
+   89  003E152C    100  void UList_PushTail(TListDbl* plist, TListDblLink* plink)
+  109  003E4120     E8  TListDblLink* UList_PopHead(TListDbl* plist)
+                         local  TListDblLink* plink
+  134  003E4208     E8  TListDblLink* UList_PopTail(TListDbl* plist)
+                         local  TListDblLink* plink
+  160  003E3B08    118  void UList_InsertAt(TListDbl* plist, TListDblLink* plink, TListDblLink* pdestlink)
+                         local  TListDblLink* pprev
+  185  003E176C    15C  void UList_DeleteAt(TListDbl* plist, TListDblLink* plink)
+  222  003E42F0     1C  void UStack_Reset(TStack* ps, void* buff, uint16 nslots, uint32 itemSize)
+  236  003E430C     E8  uint8* UStack_Push(TStack* ps, uint16 nitems)
+  250  003E43F4     E4  uint8* UStack_Pop(TStack* ps, uint16 nitems)
+                         local  uint8* pret
+  267  003E44D8     14  void UStack_Flush(TStack* ps)
+  278  003E44EC     2C  void UQueue_Reset(TQueue* pq, void* buff, uint16 nslots, uint32 itemSize)
+  290  003E4518     C0  uint8* UQueue_Push(TQueue* pq)
+                         local  uint8* pret
+  314  003E45D8     B8  uint8* UQueue_Pop(TQueue* pq)
+                         local  uint8* pret
+  347  003E4690     18  void UQueue_Flush(TQueue* pq)
+  366  003E4D2C     E8  bool UBuff_Create(TBuffer* pb, uint32 buffSize, uint16 nitems, bit8 flags)
+                         local  uint32 tablesize
+                         local  uint32 totalsize
+                         local  void* buff
+  394  003E4CD8     54  void UBuff_Destroy(TBuffer* pb)
+  419  003E162C     48  void UPool_Init(TPool* pPool, void* pBuffer, uint32 nEntries, uint32 entrySizeBytes)
+                         local  uint32 iEntry
+                         local  char* pEntry
+                         local  TListSglLink* pNode
+                         local  TListSglLink* pNext
+  445  003E173C     30  TListSglLink* UPool_Alloc(TPool* pPool)
+                         local  TListSglLink* pNode
+  460  003E18C8     1C  void UPool_Free(TPool* pPool, TListSglLink* pNode)
+  473  003E4110      4  static void UAudContainers_ResetModule()

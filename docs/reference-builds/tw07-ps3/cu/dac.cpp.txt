@@ -1,0 +1,82 @@
+// C:/packages/rwaudiocore/2.08.01/source/plugins/dac.cpp
+// compiled in: dac.cpp
+// 17 functions, source order. line | PS3 address | size
+
+    0  006E48EC     78  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  CpuLoadBalancer
+    0  006E5A5C     2C  void ~Dac(const struct <anon>* this)
+                         inlines  ~PlugIn
+  428  006E458C    10C  void RampOutput(const struct <anon>* this, float* pData, int numSamples, bool rampUp)
+                         local  float* pEnd
+                         local  float increment
+                         local  float rep
+                         local  int i
+                         local  int i
+  466  006E4698      8  struct <anon>* GetPlugInDescRunTime()
+  472  006E5044    6A4  bool CreateInstance(struct PlugIn* pPlugIn, void* pConstructorParams)
+                         local  struct <anon>* pThis
+                         local  int err
+                         local  unsigned char[3] prioritizedChannelCounts
+                         local  unsigned int availableChannels
+                         local  CellAudioOutConfiguration audioOutConfig
+                         local  struct CellAudioPortParam cellAudioPortParam
+                         local  struct CellAudioPortConfig cellAudioPortConfig
+                         local  sys_event_queue_attribute_t sysEventQueueAttribute
+                         local  sys_ppu_thread_t sysPpuThread
+                         local  struct JobScheduler* pJobScheduler
+                         local  unsigned int numSPUs
+                         local  int i
+                         local  unsigned int i
+                         local  unsigned int i
+                         local  sys_spu_thread_t spuThreadId
+                         inlines  Assert, GetJobScheduler, GetSPUThreadCount, GetSystem, Initialize<rw::audio::core::Dac>, SetSampleRate, SetTimerPeriod, core::MemSet, sys_event_queue_create, sys_spu_thread_connect_event
+ 1106  006E4A60    150  void ReleaseEvent(const struct <anon>* this)
+                         local  struct JobScheduler* pJobScheduler
+                         local  unsigned int numSPUs
+                         local  ThreadId threadId
+                         local  unsigned int i
+                         local  sys_spu_thread_t spuThreadId
+                         inlines  GetJobScheduler, GetSPUThreadCount, sys_event_queue_destroy, sys_spu_thread_disconnect_event
+ 1241  006E56E8    36C  void EventEvent(const struct <anon>* this, int event, void* pParameterBuffer)
+                         local  const char[11] __FUNCTION__
+                         local  struct <anon>* pSystem
+                         local  struct EnumerateModeParams* pEnumerateModeParams
+                         local  int i
+                         local  struct SetModeParams* pSetModeParams
+                         local  struct SetSampleRateParams* pSetSampleRateParams
+                         inlines  Assert, GetSystem, SetHandler, SetParamHandler<rw::audio::core::Dac::SetModeParams>, SetParamHandler<rw::audio::core::Dac::SetSampleRateParams>
+ 1302  006E46E0    1C8  int SetModeHandler(struct <anon>* pCommand)
+                         local  struct <anon>* pThis
+                         local  struct SetModeCommand* pSetModeCommand
+                         local  enum Mode[4] preferredModeOrder
+                         local  int preferredModeIndex
+                         local  bool modeSupported
+                         local  int i
+                         local  int i
+                         inlines  HandlerGetThis<rw::audio::core::Dac, rw::audio::core::Dac::SetModeCommand>
+ 1388  006E4984     DC  int SetSampleRateHandler(struct <anon>* pCommand)
+                         local  struct <anon>* pThis
+                         local  struct SetSampleRateCommand* pSetSampleRateCommand
+                         local  bool rateSet
+                         local  int i
+                         inlines  GetSystem, HandlerGetThis<rw::audio::core::Dac, rw::audio::core::Dac::SetSampleRateCommand>, SetSampleRate, SetTimerPeriod
+ 1447  006E4BB0     50  int StartHandler(struct <anon>* pCommand)
+                         local  struct <anon>* pThis
+                         inlines  ResumeOverheadCounting
+ 1465  006E48A8     44  int StopHandler(struct <anon>* pCommand)
+                         local  struct <anon>* pThis
+ 1481  006E46BC     24  void StartImmediate(const struct <anon>* this)
+ 1536  006E46A0     1C  void StopImmediate(const struct <anon>* this)
+ 1575  006E4C00    1D4  enum BufferStatus Mix(const struct <anon>* this)
+                         local  enum BufferStatus bufferStatus
+                         local  struct JobScheduler* pJobScheduler
+                         inlines  AdvanceTime, Assert, GetJobScheduler, GetSystem, ResumeOverheadCounting
+ 2932  006E4DD4    270  void Ps3Thread(uint64_t pContext)
+                         local  struct <anon>* pThis
+                         local  struct <anon>* pSystem
+                         local  sys_event_t eventLibAudio
+                         local  sys_event_t eventSpuMixDone
+                         local  unsigned int writeBlock
+                         inlines  GetSystem, PauseOverheadCounting, ResumeOverheadCounting, SetMixerCpuCycles, core::MemCpy, sys_event_queue_drain, sys_event_queue_receive, sys_ppu_thread_yield, sys_timer_usleep
+ 3102  006E4964     10  static void _GLOBAL__I__ZN2rw5audio4core19gMixerExecuteParamsE()
+ 3103  006E4974     10  static void _GLOBAL__D__ZN2rw5audio4core19gMixerExecuteParamsE()

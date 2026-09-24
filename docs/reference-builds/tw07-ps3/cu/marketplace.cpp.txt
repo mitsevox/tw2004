@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/marketplace.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    7  005E3330     34  void Marketplace(const struct <anon>* this)
+   11  005E3CDC      C  void ~Marketplace(const struct <anon>* this)

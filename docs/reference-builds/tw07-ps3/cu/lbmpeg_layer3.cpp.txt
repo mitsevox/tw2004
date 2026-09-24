@@ -1,0 +1,74 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/extern/coda/cmn/lbmpeg_layer3.cpp
+// compiled in: lbmpeg_layer3.cpp
+// 16 functions, source order. line | PS3 address | size
+
+    0  006ECBF4     44  void ~CMpegLayer3(const struct <anon>* this)
+   21  006E9478     14  void reset(const struct <anon>* this)
+   29  006E948C     1C  unsigned int hsstell(const const struct <anon>* this)
+   36  006E94A8     C0  unsigned int hgetbits(const struct <anon>* this, unsigned int N)
+                         local  unsigned int val
+   66  006E9568     58  unsigned int hget1bit(const struct <anon>* this)
+                         local  const int bit
+   83  006E95C0     20  void hputbuf(const struct <anon>* this, int val)
+   90  006E95E0     50  void rewindNbits(const struct <anon>* this, int N)
+   99  006E9630     40  void rewindNbytes(const struct <anon>* this, int N)
+  114  006EAA5C   1ADC  bool GetSideInfo(const struct <anon>* this)
+                         local  int ch
+                         local  int gr
+                         local  GranuleInfo* pGranuleInfo
+                         local  GranuleInfo* pGranuleInfo
+                         inlines  CMpegBase::GetBits
+  270  006E9670    728  void GetScaleFactors(const struct <anon>* this, unsigned int ch, unsigned int gr)
+                         local  int sfb
+                         local  int window
+                         local  GranuleInfo* pGranuleInfo
+                         local  int scale_comp
+                         local  int length0
+                         local  int length1
+                         local  Layer3ScaleFactors* pScaleFactors
+  417  006E9D98    3EC  void GetLsfScaleData(const struct <anon>* this, int ch, int gr, unsigned char* scaleFacBuf)
+                         local  unsigned int[4] new_slen
+                         local  unsigned int scalefac_comp
+                         local  unsigned int int_scalefac_comp
+                         local  unsigned int mode_ext
+                         local  int m
+                         local  int blocktypenumber
+                         local  int blocknumber
+                         local  GranuleInfo* pGranuleInfo
+                         local  unsigned int x
+                         local  unsigned int i
+                         local  unsigned int j
+  531  006EA184    230  void GetLsfScaleFactors(const struct <anon>* this, int ch, int gr)
+                         local  unsigned int m
+                         local  unsigned int sfb
+                         local  unsigned int window
+                         local  GranuleInfo* pGranuleInfo
+                         local  Layer3ScaleFactors* pScaleFactors
+                         local  unsigned char[54] scaleFacBuf
+  600  006EA3B4    5E4  void DecodeHuffman(const struct <anon>* this, int ch, int gr, float* output, int part2_start)
+                         local  int i
+                         local  int tableSelect
+                         local  int linearBits
+                         local  const short int* pEntry
+                         local  const HuffEntry* pEntry
+  820  006EC538    648  int Decode_Layer3(const struct <anon>* this, float* pOutputSamples)
+                         local  TempMemory tempMemory
+                         local  TempMemory* pTempMemory
+                         local  Layer3Temp layer3Temp
+                         local  unsigned int nSlots
+                         local  unsigned int flush_main
+                         local  unsigned int gr
+                         local  unsigned int ch
+                         local  int main_data_end
+                         local  int bytes_to_discard
+                         local  int i
+                         local  float*[2] pOutSamples
+                         local  void*[3] p2304Bytes
+                         local  GranuleInfo* pGranuleInfo
+                         local  void* pTemp
+                         local  float[18][32]* pFrac
+                         local  int part2_start
+                         inlines  CMpegBase::GetBits
+ 1010  006EA998     C4  int OpenLayer(const struct <anon>* this)
+ 1036  006ECB80     74  int Decode(const struct <anon>* this, float* outsamp)
+                         local  int ret

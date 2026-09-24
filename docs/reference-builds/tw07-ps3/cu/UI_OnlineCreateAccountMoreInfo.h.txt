@@ -1,0 +1,18 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_OnlineCreateAccountMoreInfo.h
+// compiled in: apt_unity.cpp
+// 13 functions, source order. line | PS3 address | size
+
+   14  00046D3C      4  void UI_OnlineAccount_MoreInfoStruct::UI_OnlineAccount_MoreInfoStruct(const struct UI_OnlineAccount_MoreInfoStruct* this)
+   31  001203AC    160  void UIOnlineCreateAccountMoreInfo::~UIOnlineCreateAccountMoreInfo(const struct UIOnlineCreateAccountMoreInfo* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIOnlineCreateAccountMoreInfo::DstMenuItem_ocai>::~TExternArray, UIMenuCircBase::~UIMenuCircBase
+   33  000FF494      C  uint32 UIOnlineCreateAccountMoreInfo::GetSignature(const const struct UIOnlineCreateAccountMoreInfo* this)
+   38  000FF4A0     44  void UIOnlineCreateAccountMoreInfo::ShowHelpText(const struct UIOnlineCreateAccountMoreInfo* this)
+   40  000FF4E4     24  void UIOnlineCreateAccountMoreInfo::RegainFocus(const struct UIOnlineCreateAccountMoreInfo* this, uint32 previouslyFocusedScreenId)
+   41  000FF508     24  void UIOnlineCreateAccountMoreInfo::LooseFocus(const struct UIOnlineCreateAccountMoreInfo* this, uint32 )
+   43  000FF534      C  struct IExternArray* UIOnlineCreateAccountMoreInfo::GetExternArray(const struct UIOnlineCreateAccountMoreInfo* this)
+   46  000FF548     3C  void UIOnlineCreateAccountMoreInfo::UpdateItemAndLabelFlash(const struct UIOnlineCreateAccountMoreInfo* this, struct UIMenuItemBaseDst* menuItemToUpdate, int32 index, char* inLabel)
+   50  000FF584      4  void UIOnlineCreateAccountMoreInfo::SetItemPos(const struct UIOnlineCreateAccountMoreInfo* this, int32 inClipIndex, float inPos)
+   51  000FF588      4  void UIOnlineCreateAccountMoreInfo::SetItemPos(const struct UIOnlineCreateAccountMoreInfo* this, int32 inClipRowIndex, int32 inClipColumnIndex, float inPos)
+   69    inline-only   void UIOnlineCreateAccountMoreInfo::ShowMenu(const struct UIOnlineCreateAccountMoreInfo* this, struct UIResponseHandler* inpHandler, struct UIMenuItemBaseSrc* inMenuItemArray, int32 sizeMenu, int32 sizeofMenu, enum eMenuAllocType alloctype)
+   91  001153C4     1C  void UIOnlineCreateAccountMoreInfo::UpdateMenuItems_func(struct IAptSubscriber* subs)
+   92  00115450     1C  enum AptThreadReturnValue UIOnlineCreateAccountMoreInfo::UpdateMenuItemsThread_func(struct IAptSubscriberBase* subs)

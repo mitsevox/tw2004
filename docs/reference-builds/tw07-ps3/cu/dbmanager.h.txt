@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/packages/t3db/2.21.03-RW-EAC/include/common/t3db/dbmanager.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  168    inline-only   void SetDefaultInitParms(struct <anon>* initParms)

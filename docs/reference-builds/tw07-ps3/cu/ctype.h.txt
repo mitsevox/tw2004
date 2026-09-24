@@ -1,0 +1,15 @@
+// C:/dev/Tiger/DL_Default/TigerCode/packages/PlayStation3GCC/110.006/installed/target/ppu/include/ctype.h
+// compiled in: apt_unity.cpp, golf2_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   65    inline-only   int std::isalpha(int _Ch)
+   75    inline-only   int std::isdigit(int _Ch)
+   80    inline-only   int std::isgraph(int _Ch)
+   85    inline-only   int std::islower(int _Ch)
+  100    inline-only   int std::_Isspace(int _Ch)
+  105    inline-only   int std::isspace(int _Ch)
+  110    inline-only   int std::isupper(int _Ch)
+  127    inline-only   int std::tolower(int _Ch)
+                         local  int __x
+  133    inline-only   int std::toupper(int _Ch)
+                         local  int __x

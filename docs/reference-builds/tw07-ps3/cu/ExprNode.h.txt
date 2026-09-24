@@ -1,0 +1,8 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/ExprNode.h
+// compiled in: ExprNode.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   79  007D02D0     34  void ExprNode(const struct ExprNode* this)
+   80  007D0304     24  void ~ExprNode(const struct ExprNode* this)
+  132  007D9A6C     A0  void SafeTest(struct ExprNode* origExpr, struct <anon>* pResult, struct Table** ppTables, RowNum* rowNums)
+  156  007D9C28     CC  enum TDbError SafePrepare(struct ExprNode* origExpr, struct ExprNode** ppExpr, struct Table** ppTables, uint32_t tblCount, bool bReadFromDisk)

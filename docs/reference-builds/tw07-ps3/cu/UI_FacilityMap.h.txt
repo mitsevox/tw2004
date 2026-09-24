@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_FacilityMap.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   34  001234A4     B8  void UIFacilityMap::~UIFacilityMap(const struct UIFacilityMap* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   36  00100604      C  uint32 UIFacilityMap::GetSignature(const const struct UIFacilityMap* this)
+   49  001038B4     14  enum AptThreadReturnValue UIFacilityMap::MoveTarget_func(struct IAptSubscriberBase* subs)

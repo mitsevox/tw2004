@@ -1,0 +1,10 @@
+// ../../../../../TIGERCODE/packages/rwaudiocore/2.08.01/include/rw/audio/core/private/bitgetter.h
+// compiled in: other_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   34    inline-only   void SetBitBuffer(const struct <anon>* this, void* pBuffer)
+   46    inline-only   unsigned int GetBits(const struct <anon>* this, unsigned int numBits)
+                         local  unsigned int val
+                         local  unsigned int index
+                         local  unsigned int bitpos
+                         local  unsigned int nbits

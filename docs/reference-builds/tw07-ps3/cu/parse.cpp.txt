@@ -1,0 +1,68 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/Filecom/parse.cpp
+// compiled in: golf_unity.cpp
+// 29 functions, source order. line | PS3 address | size
+
+   18  00213A3C     2C  void ParseStart(const char* name, int line)
+   25  00213A68     70  void ParseError(const char* form)
+                         local  char[4096] sbuf
+                         local  int off
+                         local  va_list al
+   50  00213AD8      4  static const char* consume_pp(const char* str)
+  106  00213ADC     38  static int IsDelimeterChar(char c, const char* delimChars)
+  119  0027C2BC    10C  const char* Skip_Whitespace(const char* str)
+                         inlines  std::isspace
+  147  0027C640    23C  static const char* Get_TokenHead_Sub(const char* str, int sameLineOnly)
+                         inlines  std::isspace
+  199  0027CCC8      8  const char* Get_TokenHead(const char* str)
+  204  0027C3C8    25C  static const char* Get_TokenTail_Sub(const char* str, int sameLineOnly, const char* delimChars, bool* pNeedToDeQuote)
+                         local  const char* tok
+                         local  int bQuotedString
+  261  0027C624     1C  const char* Get_TokenTail(const char* str)
+  266  0027C87C     D4  static int Get_Token_Sub(char* token, const char** pstr, int sameLineOnly, const char* delimChars)
+                         local  const char* head
+                         local  const char* tail
+                         local  bool bDequote
+                         local  int tokenLen
+  299  0027C9C0     18  int Get_Token(char* token, const char** pstr)
+  304  0027C994     2C  int Get_DelimToken(char* token, const char** pstr, const char* delimChars)
+  309  0027C97C     18  int Get_LineToken(char* token, const char** pstr)
+  314  0027C950     2C  int Get_DelimLineToken(char* token, const char** pstr, const char* delimChars)
+  319  00213B14     54  void Skip_To_EOL(const char** pstr)
+                         local  const char* tok
+  331  00213B68     8C  void Back_To_BOL(const char** pStr, const char* pBegin)
+                         local  const char* tok
+  345  00213BF4     EC  void StripQuotes(char* token)
+                         local  int i
+  366  0027CCD0    1C4  void StripWhitespace(char* token)
+                         local  int rangeMin
+                         local  int rangeMax
+                         local  int i
+                         local  int nChars
+                         inlines  std::isspace
+  385  00213CE0     70  void StripLastSlash(char* pszPath)
+                         local  int iStrLen
+  395  0027CBD8     F0  int Get_ParenthesizedItem(char* token, const char** srcText)
+                         local  const char* origSrcText
+                         local  char[1024] tempTok
+  420  0027CB30     A8  int Find_Token(const char* token, const char** pstr)
+                         local  char[256] tempToken
+                         local  const char* pStrOrig
+  437  0027CA68     C8  int Find_TokenStart(const char* token, const char** pstr)
+                         local  char[256] tempToken
+                         local  const char* pStrOrig
+  454  0027CA40     28  int Skip_Token(const char** pstr)
+                         local  char[256] tempToken
+  460  0026FE78     F0  char* stristr(const char* cs, const char* ct)
+                         local  const char* t
+                         local  const char* s
+                         inlines  std::tolower
+  484  0026FF68     6C  void DowncaseString(char* buf)
+                         local  char c
+  494  0026FE0C     6C  void UpcaseString(char* buf)
+                         local  char c
+  504  00213D50     50  void ReplaceChar(char* str, char orig, char rep)
+  514  00213DA0     44  int CountChars(const char* cs, char c)
+                         local  int n
+  525  0027C9D8     68  int Token_Is_Avail(const char* pStr)
+                         local  char[1024] token
+                         local  int osline

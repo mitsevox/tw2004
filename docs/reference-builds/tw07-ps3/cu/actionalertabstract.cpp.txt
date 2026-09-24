@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/actionalertabstract.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    6  005FC820     3C  void ActionAlertAbstract(const struct <anon>* this, const char8_t* pIdentifier)
+   12  005FC7B8     40  void ~ActionAlertAbstract(const struct <anon>* this)
+   16  005B3B68     64  bool OperationProcess(const struct <anon>* this, const struct Operation* pOperation)

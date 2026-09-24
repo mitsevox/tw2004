@@ -1,0 +1,42 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/src/HighLevel/HighLevel_Extensions.c
+// compiled in: HighLevel_Extensions.c
+// 17 functions, source order. line | PS3 address | size
+
+   50  005A2010     58  bool ChrCntl_Extensions_AnimEnd(struct Character* pAnimViewInfo, float advTime)
+                         local  bool animEnd
+   63    inline-only   static bool _TransitionToStateById(struct Character* viewInfo, int stateId, bool blend, bool override, float startFrame)
+                         local  bool transitioned
+                         local  const struct <anon>* node
+   90  005A2068    124  bool ChrCntl_Extensions_TransitionToStateById(struct Character* viewInfo, int stateId, bool blend, bool ignoreGameMovementBlend)
+                         local  const struct <anon>* node
+                         inlines  _TransitionToStateById
+  109  005A218C     74  bool ChrCntl_Extensions_TransitionToStateByIdDynamic(struct Character* viewInfo, int stateId, float startFrame, const struct <anon>* info)
+                         local  bool transitioned
+  132  005A2200     90  static bool _SetToStateById(struct Character* viewInfo, int stateId, bool override, float startFrame)
+                         local  bool changedState
+  151  005A2290     48  bool ChrCntl_Extensions_SetToStateById(struct Character* viewInfo, StateID stateId)
+  163  005A22D8     B4  static bool _SetToNamedState(struct Character* viewInfo, char* toAnimStateName, bool override, float startFrame)
+                         local  bool changedState
+                         local  int stateId
+  189  005A238C     38  bool ChrCntl_Extensions_SetToStateByName(struct Character* viewInfo, char* toAnimStateName)
+  195  005A23C4     28  bool ChrCntl_Extensions_SetToStateByNameFrameOverride(struct Character* viewInfo, char* toAnimStateName, float startFrame)
+  226  005A23EC     7C  void BuildMatrices(struct Character* viewInfo, struct Frame* frameRef)
+  243  005A26C8    238  struct Frame* CalcFrame(struct Character* viewInfo)
+                         local  struct Frame* frameRef
+                         local  struct <anon> myGM
+                         local  struct Character* curViewInfo
+                         local  struct Frame* secFrameRef
+                         local  float ratioAB
+                         local  const struct <anon>* aNode
+                         local  const struct <anon>* aNodeChild
+                         inlines  GetFilter
+  333    inline-only   static void Check_SecondaryAnim_ResetOnAnimEnd(struct Character* viewInfo)
+  346  005A2468    200  bool AdvanceFrame(struct Character* viewInfo, float deltaTime)
+                         local  bool holdingLastFrame
+                         local  struct Character* currViewInfo
+                         inlines  Check_SecondaryAnim_ResetOnAnimEnd
+  491  005A2668     2C  void ChrCntl_Extensions_SetUseInternalTransitionLogic(struct Character* viewInfo, bool value)
+  570  005A2694     20  void ChrCntl_Extensions_SetUniformScale(struct Character* viewInfo, float scale)
+  576  005A2900     D8  void ChrCntl_Extensions_NormalizeBoneMatrix(struct Character* viewInfo, float[4]* srcMat, float[4]* destMat)
+                         inlines  __vec_make_from_scalar, __vec_mul, vec4flt_Copy4, vec4flt_Scale4, vec_ld, vec_splat
+  609  005A26B4     14  const char* ChrCntl_Extensions_GetModelName(const struct <anon>* viewInfo)

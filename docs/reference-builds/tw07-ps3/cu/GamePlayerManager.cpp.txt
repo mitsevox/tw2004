@@ -1,0 +1,109 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/GamePlayer/GamePlayerManager.cpp
+// compiled in: other_unity.cpp
+// 38 functions, source order. line | PS3 address | size
+
+   29  004755A4    194  void GamePlayerManager::GamePlayerManager(const struct GamePlayerManager* this)
+                         inlines  GamePlayer, Singleton<GamePlayerManager>::Singleton
+   39  003DA1C4     44  void GamePlayerManager::RegisterStreamClients()
+   47  003DA208     2C  void GamePlayerManager::UnRegisterStreamClients()
+   55  003FC708    1BC  void GamePlayerManager::LoadGSTAFromStream(struct TStreamData* pStreamData)
+                         local  const char[19] __FUNCTION__
+                         local  void* dataPtr
+                         local  uint32 size
+                         local  void* pData
+                         inlines  TagValuePair, operator+
+   75  003DA234     58  void GamePlayerManager::ClampAllPlayerStats(const struct GamePlayerManager* this)
+                         local  int8 plrID
+   88  0043CE68    298  void GamePlayerManager::CreateAll(const struct GamePlayerManager* this)
+                         local  unsigned char i
+                         local  bool leftSwingStick
+                         local  bool rightSliceSwingStick
+                         local  enum ViewPlacement_t viewPlacement
+                         local  bool bLeftSwingStick
+                         local  bool bRigntSliceSwingStick
+                         local  bool bControllerTiltSpinnaOption
+                         local  uint32 golferclubs
+                         local  int golferID
+                         inlines  Singleton<GolferStats>::GetSingleton
+  127  003DA28C     80  void GamePlayerManager::DeleteAll(const struct GamePlayerManager* this)
+                         local  int32 PlayerID
+  144  00411638     98  uint8_t GamePlayerManager::GetHumanPlayerCount(const const struct GamePlayerManager* this)
+                         local  uint8_t numHumanPlayers
+                         local  uint8_t plrCount
+                         local  uint8_t plr
+  159  004116D0     98  uint8_t GamePlayerManager::GetLocalHumanPlayerCount(const const struct GamePlayerManager* this)
+                         local  uint8_t numLocalHumanPlayers
+                         local  uint8_t plrCount
+                         local  uint8_t plr
+  177  0042C884     CC  enum Golfer_t GamePlayerManager::GetPlayerFromPool(enum PlayerNumber_t playerID, enum PlayerNumber_t eCurrentlyLoadedPlayer, enum Golfer_t desiredPlayer)
+                         local  enum Golfer_t retGolfer
+                         local  struct GamePlayer* pUserPlayer
+  200  0042C5AC    140  uint8 GamePlayerManager::GetValidUnlockedGolfersForStatus(int16 eStatus, enum Golfer_t* validGolfers)
+                         local  uint8 count
+                         local  int i
+  221  0042C6EC    198  enum Golfer_t GamePlayerManager::GetRandomGolferFromPool(int16 eStatus, enum Golfer_t desiredPlayer)
+                         local  enum Golfer_t retGolfer
+                         local  enum Golfer_t[6] aValidGolfers
+                         local  uint8 validCount
+                         local  int i
+                         local  int golferIndex
+  260  0042C4E4     C8  bool GamePlayerManager::IsValidOpponent(enum PlayerNumber_t playerID, enum PlayerNumber_t opponentID)
+                         local  bool bRet
+                         local  enum Golfer_t opponentGolferID
+                         local  enum TourCard playerStatus
+                         local  int i
+                         inlines  UnlockInfo::GetTourCard
+  284  0040B82C     E0  bool GamePlayerManager::IsAITeam(const const struct GamePlayerManager* this, enum PlayerNumber_t teamID)
+                         local  enum PlayerNumber_t plr
+                         local  int i
+  321  0040B90C     54  bool GamePlayerManager::IsHumanTeam(const const struct GamePlayerManager* this, enum PlayerNumber_t teamID)
+                         local  enum PlayerNumber_t plr
+                         local  int i
+  343  00411768     68  uint8 GamePlayerManager::GetNumPlayersAwake(const const struct GamePlayerManager* this)
+                         local  uint8 nPlayerAwake
+                         local  int nPlayers
+                         local  int i
+  358  003DA30C     C4  void GamePlayerManager::LimitClubs(const struct GamePlayerManager* this, bool limit)
+                         inlines  GamePlayer::SetClubAvailable
+  374  00404AD8     68  bool PLR_IsAIPlayer(enum PlayerNumber_t PlayerID)
+  380  00404AA8     30  bool PLR_IsShotLinkPlayer(enum PlayerNumber_t PlayerID)
+  385  00404B40     50  bool PLR_IsAIOrShotLinkPlayer(enum PlayerNumber_t PlayerID)
+  390  00404A78     30  bool PLR_IsOnlinePlayer(enum PlayerNumber_t PlayerID)
+  395  00404A44     34  bool PLR_IsLocalHumanPlayer(enum PlayerNumber_t PlayerID)
+  400  00404A10     34  bool PLR_IsHumanPlayer(enum PlayerNumber_t PlayerID)
+  406  00429400     C8  bool PLR_IsAITeam(enum PlayerNumber_t teamID)
+                         local  enum PlayerNumber_t plr
+                         local  int32 i
+                         inlines  Singleton<GamePlayerManager>::GetSingleton
+  432  004294C8     C8  bool PLR_IsHumanTeam(enum PlayerNumber_t teamID)
+                         local  enum PlayerNumber_t plr
+                         local  int32 i
+                         inlines  Singleton<GamePlayerManager>::GetSingleton
+  457  003DA3D0     60  bool PLR_AreTeammates(enum PlayerNumber_t team1ID, enum PlayerNumber_t team2ID)
+  468  00429590     B8  bool PLR_FinishedHole(enum PlayerNumber_t PlayerID)
+                         inlines  Singleton<GamePlayerManager>::GetSingleton
+  479  0040478C     78  bool PLR_AddClub(enum PlayerNumber_t PlayerID, enum Club_t club)
+                         local  bit32 clubMask
+                         local  bool retval
+                         inlines  GamePlayer::GetCoreShotInfo
+  496  00404804     78  bool PLR_RemoveClub(enum PlayerNumber_t PlayerID, enum Club_t club)
+                         local  bit32 clubMask
+                         local  bool retval
+                         inlines  GamePlayer::GetCoreShotInfo
+  513  0040487C     50  bool PLR_HasClub(enum PlayerNumber_t PlayerID, enum Club_t club)
+                         local  bit32 clubMask
+                         local  bool retval
+  528  004048CC     84  int32 PLR_CountClubs(enum PlayerNumber_t PlayerID)
+                         local  bit32 clubMask
+                         local  int i
+                         local  int clubcount
+  545  003CE14C     78  struct GamePlayerManager& GamePlayerMgr()
+                         inlines  Singleton<GamePlayerManager>::GetSingleton
+  550  003CE1C4     30  struct GamePlayer* GetGamePlayer(enum PlayerNumber_t PlayerID)
+  555  00404950     3C  struct CoreShotInfo_t* GetGamePlayerCoreShotInfo(enum PlayerNumber_t PlayerID)
+  560  0040498C     84  enum PlayerNumber_t GetGamePlayerFromCoreShotInfo(struct CoreShotInfo_t* coreShotInfo)
+                         local  int i
+  575  003DA430     28  uint8 GetGamePlayerCount()
+  580  0040B960     68  enum PlayerNumber_t GamePlayerManager::GetLowestHumanPlayerNumber(const const struct GamePlayerManager* this)
+                         local  int32_t plr
+  594  003CE0A8     88  struct GamePlayer* GamePlayerManager::GetPlayer(const struct GamePlayerManager* this, enum PlayerNumber_t PlayerID)

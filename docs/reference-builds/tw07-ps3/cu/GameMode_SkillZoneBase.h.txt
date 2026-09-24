@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/Headers/GameMode_SkillZoneBase.h
+// compiled in: golf_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+  180  0033EFE0      8  bool GameModeSkillZoneBase::TrackingShotHistory(const struct GameModeSkillZoneBase* this, enum PlayerNumber_t PlayerID)
+  183  0033EFE8      8  bool GameModeSkillZoneBase::ShowShotInfo(const struct GameModeSkillZoneBase* this)
+  189  0033EFF0      8  bool GameModeSkillZoneBase::GoToPlayoff(const struct GameModeSkillZoneBase* this, bool bPredict)
+  192  0033EFF8      8  bool GameModeSkillZoneBase::IsSpudHudUsed(const struct GameModeSkillZoneBase* this)
+  205  0033F000      8  int8 GameModeSkillZoneBase::GetStateAfterBallLands(const struct GameModeSkillZoneBase* this, enum PlayerNumber_t PlayerID)
+  208  0033F008      8  bool GameModeSkillZoneBase::GiveOOBPenalty(const struct GameModeSkillZoneBase* this)
+  229    inline-only   void GameModeSkillZoneBase::SetScoreRequiredForSuccess(const struct GameModeSkillZoneBase* this, int iScore)
+  230    inline-only   int GameModeSkillZoneBase::GetScoreRequiredForSuccess(const struct GameModeSkillZoneBase* this)
+  238    inline-only   bool GameModeSkillZoneBase::GetFlagsCreated(const struct GameModeSkillZoneBase* this)

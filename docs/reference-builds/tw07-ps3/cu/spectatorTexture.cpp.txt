@@ -1,0 +1,28 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Spectator/spectatorTexture.cpp
+// compiled in: golf2_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   67  001434FC    114  void CSpectatorTexture::Startup(uint32 width, uint32 height, uint32 numTilesX, uint32 numTilesY)
+   82  00143714     88  void CSpectatorTexture::Shutdown()
+   90  00143CC4     BC  void CSpectatorTexture::Begin()
+  104  00143C68     5C  void CSpectatorTexture::End()
+  116  001439C0    174  uint32 CSpectatorTexture::GetUVList(struct CPovVector4* uvList)
+                         local  float sizeX
+                         local  float sizeY
+  160  00143B34     10  void CSpectatorTexture::Reset(const struct CSpectatorTexture* this)
+  168  00143D88      8  bool CSpectatorTexture::BeginRender(const struct CSpectatorTexture* this, uint32 clearColor, uint32 indexX, uint32 indexY)
+  175  00143D90      4  void CSpectatorTexture::EndRender(const struct CSpectatorTexture* this)
+  179  00140778    394  void CSpectatorTexture::SetupTintTexture(vec4flt* table, int num_entries)
+                         local  int index
+                         local  int table_index
+                         local  int height
+                         local  vec4flt* data
+                         local  struct TextureLockInfo info
+                         local  int y
+                         local  int j
+                         local  int i
+                         local  int y
+                         local  int j
+                         local  int i
+                         local  int i
+                         local  int i

@@ -1,0 +1,8 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sstovrhd.cpp
+// compiled in: sstovrhd.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   23  006CDFCC     60  int SNDSTRM_overheadtap(int maxrequests, int maxchunks)
+                         local  int overhead
+   58  006CE02C     28  int SNDSTRM_overhead(int maxrequests, int maxchunks)
+                         local  int overhead

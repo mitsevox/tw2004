@@ -1,0 +1,128 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_CharacterSel_Xenon.cpp
+// compiled in: apt_unity.cpp
+// 46 functions, source order. line | PS3 address | size
+
+   72  000C7534     14  void CharSel_CharSelLoadProfileCB()
+   80  000F2580     80  void UICharacterSel::UICharacterSel(const struct UICharacterSel* this)
+                         local  int32 i
+   93  0005CBC4     8C  void UICharacterSel::Init(const struct UICharacterSel* this)
+                         local  int32 i
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen
+  110  000C7328     8C  void UICharacterSel::Show(const struct UICharacterSel* this)
+                         local  int32 i
+                         inlines  AptScreenSubscriber::SetCanShowOptionsScreen
+  130  00032848     5C  void UICharacterSel::Hide(const struct UICharacterSel* this)
+  139  000C7548     CC  void UICharacterSel::OnShow(const struct UICharacterSel* this)
+                         local  int32 i
+  155  000C671C    1E0  void UICharacterSel::ShowOutOfFlow(const struct UICharacterSel* this, int32 numPlayersAlreadySet, UICharSelectOnCloseFunc* onCloseFunc, char* titleText)
+                         local  int32 i
+                         local  int32 i
+                         inlines  AptScreenSubscriber::SetCanShowOptionsScreen
+  199  000B0E24    220  void UICharacterSel::LookForPresetGolfers(const struct UICharacterSel* this)
+                         local  enum UserNumber userNumber
+                         inlines  ThumbNailManager::GetTexFactory
+  240  0006E7EC    1D8  void UICharacterSel::ResetCharSelectScreen(const struct UICharacterSel* this, int32 iNumPlayersAlreadySet)
+                         local  struct GameModeDriver* curGameDriver
+  295  00032FE4     54  void UICharacterSel::SetNumAvailableCharacters(const struct UICharacterSel* this)
+  311  000328A4     F0  void UICharacterSel::SetUpFlashForIcons(const struct UICharacterSel* this)
+                         local  int32 i
+  328  000C73B4     A0  void UICharacterSel::FixNumGolfersAndGolferPicsForNewSuperTiger(const struct UICharacterSel* this)
+                         local  int32 oldNumNonCrap
+                         local  int32 i
+  366  00032BF8    1EC  void UICharacterSel::ShowHelpText(const struct UICharacterSel* this)
+  406  000C7614    938  enum eAptHandleInput UICharacterSel::HandleInput(const struct UICharacterSel* this, int32 cID)
+                         local  enum eContlr activeController
+                         local  enum eCharSelPanel panel
+                         local  int32 i
+                         local  int32 maxIndex
+                         local  int32 dir
+                         local  enum Golfer_t golferId
+                         local  char* tempStr
+                         local  enum Golfer_t golferId
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, GolferStats::GetGolferStats, Singleton<GolferStats>::GetSingleton, UserInfo::SetValid
+  684  000C7454     E0  void UICharacterSel::CharSelLoadProfileCB(const struct UICharacterSel* this)
+                         local  enum eCharSelPanel panel
+  704  000C57C8    22C  void UICharacterSel::UpdatePanel(const struct UICharacterSel* this, enum eCharSelPanel panel)
+                         local  int32 i
+  740  00032DE4     48  void StringToUpperCase(char* pStr)
+  755  000C51BC    60C  void UICharacterSel::RefreshStats(const struct UICharacterSel* this, enum eCharSelPanel panel)
+                         local  int32 index
+                         local  enum Golfer_t golferId
+                         local  const struct UserInfo& userInfo
+                         inlines  GolferStats::DisplayStat, GolferStats::GetGolferStats, Singleton<GolferStats>::GetSingleton
+  819  00063DAC     F0  void UICharacterSel::ResetPanel(const struct UICharacterSel* this, enum eCharSelPanel panel)
+                         inlines  UICharacterSel::ResetCPUDefault, UserInfo::SetValid
+  839  00063758     90  void UICharacterSel::ResetVariables(const struct UICharacterSel* this)
+                         local  int32 i
+                         local  int32 i
+  863  000C6514    208  bool UICharacterSel::AssignControllerToPanel(const struct UICharacterSel* this, enum eContlr controller, bool bPlaySound)
+                         local  enum eCharSelPanel panel
+                         local  int32 i
+                         local  int32 i
+  903  000C63B8    15C  void UICharacterSel::RemoveControllerFromPanel(const struct UICharacterSel* this, enum eContlr controller, enum eCharSelPanel panel)
+                         local  int32 i
+  925  000C6244    174  void UICharacterSel::ToggleControllerBetweenPanels(const struct UICharacterSel* this, enum eContlr controller, enum eCharSelPanel startPanel, enum eCharToggleDir dir)
+                         local  enum eCharSelPanel panel
+                         local  int32 panelLRNum
+  963  00032994     40  void UICharacterSel::CountNumPanels(const struct UICharacterSel* this)
+                         local  int32 i
+  978  00032E2C     FC  void UICharacterSel::ResetLRNumber(const struct UICharacterSel* this, enum eCharSelPanel panel)
+                         local  int32 numberToReplace
+                         local  int32 i
+  991  000C5018    1A4  int32 UICharacterSel::GetAnAvailableShirt(const struct UICharacterSel* this, enum eCharSelPanel panel, int32 shirt)
+                         local  enum Golfer_t golferId
+                         local  int32 i
+                         local  enum Golfer_t theOtherPanelsGolfer
+ 1033  00024A98     44  enum eCharSelPanel UICharacterSel::LookUpByLRNumber(const struct UICharacterSel* this, int32 num)
+                         local  int32 i
+ 1047  000C6060    1E4  enum AptThreadReturnValue UICharacterSel::PollForPulledController(const struct UICharacterSel* this)
+                         local  struct AptScreenSubscriber* screen
+                         local  bool controllerOut
+                         local  int32 panel
+                         local  int32 i
+                         local  int32 controller
+ 1083  00032F28     2C  bool UICharacterSel::IsGolferDisabledInFrontEnd(const struct UICharacterSel* this, enum Golfer_t golferID)
+ 1091  00032F54     90  int32 UICharacterSel::GetNumGolfersInFrontEnd(const struct UICharacterSel* this)
+                         local  int32 retVal
+                         local  int32 i
+ 1108  000329D4     B4  int32 UICharacterSel::LookUpGolferUINumber(const struct UICharacterSel* this, enum Golfer_t golferID)
+                         local  int32 i
+ 1124  00032B18     3C  bool UICharacterSel::IsNumPlayersSatisfied(const struct UICharacterSel* this)
+ 1133  00032B54     A4  bool UICharacterSel::ArePanelsReady(const struct UICharacterSel* this)
+                         local  int32 i
+ 1147  000741FC    118  bool UICharacterSel::IsCpuAvailable(const struct UICharacterSel* this, int32 panelLRNum)
+                         local  bool retVal
+                         local  struct GameModeDriver* curGameDriver
+ 1195  000C4F18    100  bool UICharacterSel::GetCharacterUnlockedStatus(const struct UICharacterSel* this, enum Golfer_t golferId)
+                         local  int i
+                         local  const struct UserInfo& userInfo
+                         inlines  Singleton<GolferStats>::GetSingleton
+ 1234  00033038     60  void UICharacterSel::SaveCharacterLockConditions(const struct UICharacterSel* this, enum Golfer_t golferIndex, int32 costToUnlock)
+                         local  int32 i
+ 1250  00033098     5C  int32 UICharacterSel::GetCharacterLockCondition(const struct UICharacterSel* this, enum Golfer_t golferIndex)
+                         local  int32 i
+ 1272  000C59F4    24C  void UICharacterSel::ReOrderPanelsToMatchLRNums(const struct UICharacterSel* this)
+                         local  int32 i
+                         local  enum eCharSelPanel panelInLROrder
+                         local  struct CharPanelItem tempBuffer
+ 1308  000330F4     84  void UICharacterSel::ReOrderControllerMapToMatchLRNums(const struct UICharacterSel* this, enum eCharSelPanel oldPanelInOrder, enum eCharSelPanel newPanelInOrder)
+                         local  int32 saveOldContrPanel
+                         local  int32 saveNewContrPanel
+                         local  int32 contr
+ 1331  00077280     40  void ConfirmRivalChallenge()
+ 1336  0006A60C     40  void CancelRivalChallenge()
+ 1345  0005F1E0     70  void UICharacterSel::ShowRivalsChallengeIfNecessary(const struct UICharacterSel* this, bool forceShow)
+ 1356  00033178     3C  void UICharacterSel::OnConfirmRivalsChallenge(const struct UICharacterSel* this, bool bChoice)
+ 1366  000773D0     14  void CharSelConfirmWipeCB()
+ 1374  000C5C40    420  void UICharacterSel::SetCharacterSettingsAndContinue(const struct UICharacterSel* this)
+                         local  int32 numloadedGolfers
+                         local  enum PlayerNumber_t[4] userNumbersBeingStomped
+                         local  int32 numUsersBeingStomped
+                         local  int32 i
+                         local  int32 playerNumber
+                         local  int32 panel
+                         local  char* buffer
+                         inlines  cGAME_GLOBALS::SetCharacterStyleShirt
+ 1466  000772C0    110  void UICharacterSel::ContinueToNextScreen(const struct UICharacterSel* this)
+                         local  void* voidMode
+                         local  struct GameModeBase* mode

@@ -1,0 +1,5 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/coreallocator/1.02.03/include/coreallocator/icoreallocator_interface.h
+// compiled in: RNAAllocatorStandard.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   66    inline-only   void ~ICoreAllocator(const struct <anon>* this)

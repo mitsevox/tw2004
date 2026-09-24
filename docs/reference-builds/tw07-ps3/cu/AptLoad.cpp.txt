@@ -1,0 +1,84 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/AptInterface/AptPackage/AptLoad.cpp
+// compiled in: other_unity.cpp
+// 19 functions, source order. line | PS3 address | size
+
+   26  00430AE8     B4  AptFilePtr AptLoader::findFile(const struct AptLoader* this, const const AptNativeString& sFilename)
+                         local  struct <anon> i
+                         inlines  AptSharedPtr<AptFile>::AptSharedPtr, Begin, operator++
+   40  0042432C    114  void AptLoader::Invalidate(const struct AptLoader* this, struct AptFile* pFile)
+                         local  struct <anon> i
+                         local  struct <anon> next
+                         inlines  Begin, EraseAfter, PopFront, operator++
+   61  00464960     70  void AptLoader::notify(const struct AptLoader* this, AptFilePtr& f)
+                         inlines  AptSharedPtr<AptFile>::AptSharedPtr, AptSharedPtr<AptFile>::~AptSharedPtr
+   67  0046340C     A8  AptFilePtr AptLoader::IsLoaded(const struct AptLoader* this, const const AptNativeString& sFilename)
+                         local  AptFilePtr f
+                         inlines  AptSharedPtr<AptFile>::AptSharedPtr, AptSharedPtr<AptFile>::operator bool, AptSharedPtr<AptFile>::~AptSharedPtr
+   75  00463174    298  AptFilePtr AptLoader::Load(const struct AptLoader* this, const const AptNativeString& sFilename)
+                         local  AptFilePtr f
+                         local  struct AptFile* pFile
+                         local  AptFilePtr ret
+                         inlines  AptFile::AptFile, AptFile::operator new, AptSharedPtr<AptFile>::AptSharedPtr, AptSharedPtr<AptFile>::~AptSharedPtr, Capacity, Copy<char*, char*>, Node, PushFront, ReAlloc, UseCapacity, operator!=<AptFile>
+   93  00468768    278  bool AptLoader::AllImportsAvailable(const struct AptLoader* this, AptFilePtr& f)
+                         local  bool bReady
+                         local  int j
+                         local  const char* s
+                         inlines  AptSharedPtr<AptFile>::operator!, AptSharedPtr<AptFile>::~AptSharedPtr, BasicString, Capacity, Copy, ReAlloc, UseCapacity, ~BasicString
+  110  004689E0    244  void AptLoader::Update(const struct AptLoader* this)
+                         local  bool bMovedToResolved
+                         local  struct <anon> i
+                         local  AptFilePtr f
+                         local  enum State state
+                         inlines  AptFile::GetState, AptFile::setState, AptSharedPtr<AptFile>::AptSharedPtr, AptSharedPtr<AptFile>::~AptSharedPtr, Begin, ConstRawPtr, operator++
+  156  004685AC     E8  void AptLoader::CompleteLoad(const struct AptLoader* this, AptFilePtr& f, void* pData, void* pConstTable, void* pUserData)
+                         local  unsigned char* pBase
+                         local  struct AptConstFile* pConstFile
+                         inlines  AptFile::setDataPointers, AptFile::setState, AptSharedPtr<AptFile>::operator->
+  181  0049ABE8   1440  void AptLinker::Update(const struct AptLinker* this)
+                         local  int nOrigLength
+                         local  AptFilePtr* i
+                         local  AptFilePtr f
+                         local  struct <anon> j
+                         local  struct AptSharedPtr<AptLinkerThingy> thingy
+                         local  struct AptCharacterAnimationInst* pCAI
+                         local  struct AptCIH* pTarget
+                         local  FilePtrVector tmp
+                         inlines  AptCharacterAnimationInst::operator new, AptFileSavedInputState::AptFileSavedInputState, AptFileSavedInputState::GetState, AptLinkerThingy::GetFile, AptLinkerThingy::GetTarget, AptLinkerThingy::SetAttachedToMovie, AptSavedInputCheckpoints::AllLinked, AptSavedInputCheckpoints::CanLinkPendingFiles, AptSharedPtr<AptFile>::AptSharedPtr, AptSharedPtr<AptFile>::operator new [], AptSharedPtr<AptFile>::~AptSharedPtr, AptSharedPtr<AptLinkerThingy>::AptSharedPtr, AptSharedPtr<AptLinkerThingy>::~AptSharedPtr, AptValue::setIsDefined, AptValue::setVtblIndex, BasicString, Begin, Capacity, Copy<AptFilePtr*, AptFilePtr*>, Copy<AptFileSavedInputState*, AptFileSavedInputState*>, Size, Swap, UseCapacity, operator++, ~AptFileSavedInputState, ~BasicString
+  240  004634B4    420  void AptLinker::Notify(const struct AptLinker* this, AptFilePtr& f)
+                         local  AptFilePtr* i
+                         local  int newCapacity
+                         local  int insertPos
+                         local  AptFilePtr* currentEnd
+                         inlines  AptSharedPtr<AptFile>::AptSharedPtr, AptSharedPtr<AptFile>::operator=, AptSharedPtr<AptFile>::~AptSharedPtr, Begin, Copy<const AptFilePtr*, AptFilePtr*>, PushBack, operator==<AptFile, AptFile>
+  250  0047B2B8    4F4  void AptLinker::Load(const struct AptLinker* this, const const AptNativeString& sFilename, AptNativeString& sTarget)
+                         local  struct AptValue* pTarget
+                         local  AptFilePtr f
+                         local  struct AptCIH* pCIH
+                         local  struct <anon> thingy
+                         local  struct <anon> i
+                         local  struct <anon> j
+                         inlines  AptLinker::findThingy, AptLinkerThingy::AptLinkerThingy, AptLinkerThingy::operator new, AptSharedPtr<AptFile>::AptSharedPtr, AptSharedPtr<AptFile>::operator=, AptSharedPtr<AptFile>::~AptSharedPtr, AptSharedPtr<AptLinkerThingy>::AptSharedPtr, AptSharedPtr<AptLinkerThingy>::~AptSharedPtr, AptValue::isCIH, AptValue::setIsDefined, AptValue::setVtblIndex, BasicString, Begin, Capacity, Erase, PopFront, PushFront, operator++, ~BasicString
+  326  00463000    174  void AptLinker::CancelLoad(const struct AptLinker* this, struct AptCIH* pCIH)
+                         local  struct <anon> i
+                         inlines  AptLinker::findThingy, Erase, PopFront, operator++
+  337  00415994     18  int AptSharedPtrIncRef(struct AptFile* p)
+                         inlines  AptSharedPtrRefCount::IncRef
+  338  0041D3F4     18  int AptSharedPtrDecRef(struct AptFile* p)
+                         inlines  AptSharedPtrRefCount::DecRef
+  339  00462E60    104  void AptSharedPtrDelete(struct AptFile* p)
+                         inlines  AptFile::operator delete, AptFile::~AptFile, checked_delete<AptFile>, ~BasicString
+  341  003EF850     18  int AptSharedPtrIncRef(struct AptLinkerThingy* p)
+                         inlines  AptSharedPtrRefCount::IncRef
+  342  003EF868     18  int AptSharedPtrDecRef(struct AptLinkerThingy* p)
+                         inlines  AptSharedPtrRefCount::DecRef
+  343  00462F64     9C  void AptSharedPtrDelete(struct AptLinkerThingy* p)
+                         inlines  AptLinkerThingy::operator delete, AptSharedPtr<AptFile>::~AptSharedPtr, checked_delete<AptLinkerThingy>, ~AptLinkerThingy
+  346  004638D4   108C  void GlobalNotificationFunction(AptFilePtr& f)
+                         local  int newSize
+                         local  struct AptFileSavedInputState* iter
+                         local  int newCapacity
+                         local  int insertPos
+                         local  char[16] s
+                         local  struct AptFileSavedInputState* currentEnd
+                         local  char[16] s
+                         inlines  AptFile::GetName, AptFileSavedInputState::AptFileSavedInputState, AptFileSavedInputState::SetState, AptSavedInputCheckpoints::FileLoaded, AptSharedPtr<AptFile>::AptSharedPtr, AptSharedPtr<AptFile>::~AptSharedPtr, Begin, Capacity, Copy<char*, char*>, Copy<const AptFileSavedInputState*, AptFileSavedInputState*>, DoingSmallStringOptimization, End, Insert<const AptFileSavedInputState*>, Move<AptFileSavedInputState*, AptFileSavedInputState*>, PushBack, ReAlloc, Size, Swap, UseCapacity, operator=, ~AptFileSavedInputState, ~BasicString

@@ -1,0 +1,44 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/Internal/FrameBuilder.cpp
+// compiled in: FrameBuilder.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   57  005B16F8    260  struct Frame* ConstructFullAnimationFrame(const struct <anon>* this, float currFrameNum, float prevFrameNum, float animFrameCount, int32_t dataFrameCount, float animScaleFactor, int32_t flags)
+                         local  struct <anon> currFrameSlerp
+                         local  struct <anon> currGMSlerp
+                         local  struct <anon> prevGMSlerp
+                         local  struct Params stats
+                         local  bool bStarted
+                         local  struct Frame* currFrameRef
+  110  005B1A34     E8  struct Frame* ConstructGameMovementFrame(const struct <anon>* this, float currFrameNum, float prevFrameNum, float animFrameCount, int32_t dataFrameCount, float animScaleFactor, int32_t flags)
+                         local  struct <anon> gameMovement
+                         local  struct Frame* currFrameRef
+  134  005B14D8    220  struct <anon>* ConstructGameMovement(const struct <anon>* this, struct <anon>* target, float currFrameNum, float prevFrameNum, float animFrameCount, int32_t dataFrameCount, float animScaleFactor, int32_t flags)
+                         local  struct <anon> currFrameSlerp
+                         local  struct <anon> currGMSlerp
+                         local  struct <anon> prevGMSlerp
+                         local  struct Params stats
+                         local  bool bStarted
+  176  005B1958     DC  struct Frame* _AllocateSingleFrame(const struct <anon>* this)
+                         local  struct Frame* frameRef
+                         inlines  GetFilter
+  202  005B0FA8    144  struct Frame* _DecompressSingleFrame(const struct <anon>* this, int32_t frameNum, int32_t flags)
+                         local  struct Frame* frameRef
+                         inlines  GetFilter
+  229  005B0D08     C4  struct <anon>* _DecompressSingleGM(const struct <anon>* this, struct <anon>* trg, int32_t frameNum, int32_t flags)
+  243  005B10EC     B8  struct Frame* _ConstructSingleFrame(const struct <anon>* this, const struct <anon>* init, int32_t frameNum, int32_t flags)
+                         local  struct Frame* frameRef
+  268  005B0E64     BC  struct <anon>* _ConstructSingleGM(const struct <anon>* this, struct <anon>* trg, const struct <anon>* init, int32_t frameNum, int32_t flags)
+                         local  struct <anon> tmp
+  282  005B0DCC     98  struct <anon>* _ConstructSingleGM(const struct <anon>* this, struct <anon>* trg, const struct <anon>* init, const struct <anon>* src)
+                         local  struct <anon> tmp
+  293  005B11A4    144  struct Frame* _ConstructSlerpedFrame(const struct <anon>* this, const struct <anon>* init, const struct FrameSlerp* slerp, int32_t flags)
+                         local  struct Frame* leftFrame
+                         local  struct Frame* rightFrame
+                         inlines  GetLeftFrameNum, GetRightFrameNum, GetSlerpFactor
+  338  005B12E8    1F0  struct <anon>* _ConstructSlerpedGM(const struct <anon>* this, struct <anon>* trg, const struct <anon>* init, const struct FrameSlerp* slerp, int32_t flags)
+                         local  struct <anon> leftGM
+                         local  struct <anon> rightGM
+                         local  bool haveLeft
+                         local  bool haveRight
+                         inlines  GetLeftFrameNum, GetRightFrameNum, GetSlerpFactor
+  384  005B0F20     88  struct <anon>* _ApplyUniformScale(const struct <anon>* this, struct <anon>* trg)

@@ -1,0 +1,12 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNAX/include/RNAUtils/IOStream.h
+// compiled in: IOStream.cpp, RNAChunkReader.cpp, RNAFX.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   54  00872404      C  void ~OutStreamC(const struct <anon>* this)
+   77  0087243C      4  void LogPrintString(const struct <anon>* this, const char* pString)
+  139  00872440      C  void ~InStreamC(const struct <anon>* this)
+  166    inline-only   int32_t InStreamC::GetVersion(const struct InStreamC* this)
+  167    inline-only   void InStreamC::SetVersion(const struct InStreamC* this, int32_t version)
+  203  00872478      C  int32_t GetStreamPos(const struct <anon>* this)
+  205  00872484     1C  bool IsEndOfStream(const struct <anon>* this)
+  207  008724A0     1C  bool IsOpen(const struct <anon>* this)

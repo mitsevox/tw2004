@@ -1,0 +1,15 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLFileIO.c
+// compiled in: Legacy_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   13  0037D6FC     1C  void File_WriteTabReset()
+   18  0037D718     20  void File_WriteTabPush()
+   23  0037D738     2C  void File_WriteTabPop()
+   29  003C437C    164  int32 File_WriteLnToOpenedPCFile(int32 fid, const char* fmtStr)
+                         local  char[1024] outstr
+                         local  va_list varg
+                         local  const char[3] WINCARRIAGERETURN
+                         local  int i
+   56  003C44E0     64  int32 File_WriteLnToOpenedPCFile(int32 fid)
+                         local  int oldTab
+                         local  int32 nBytes

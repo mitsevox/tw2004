@@ -1,0 +1,17 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/online/osdk/dailytourn.cpp
+// compiled in: golf2_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   39  0012A3A8     8C  void DailyTourn::CreateInstance()
+   45  0012A450     7C  void DailyTourn::DestroyInstance()
+   52  0012A4CC     A8  void DailyTourn::PopulateCalendar(const struct DailyTourn* this, int firstDate)
+   58  00128C14     98  void DailyTourn::PopulateDateFromServer(const struct DailyTourn* this)
+   64  0012A574     9C  uint16_t DailyTourn::GetOnlineDate(const struct DailyTourn* this)
+   70  0012A610     B4  void DailyTourn::StartGame(const struct DailyTourn* this)
+   77  0012A6C4     98  void DailyTourn::EndGame(const struct DailyTourn* this)
+   85  0012A850    148  TourneyParamsT* DailyTourn::GetDailyTournamentIndex(const struct DailyTourn* this, int index)
+                         local  TourneyMonthT* curMonth
+                         local  CalendarDate tmpDate
+                         local  int dateToReturn
+  109  0012A75C     F4  uint16_t DailyTourn::GetMaxTourneyDate(const struct DailyTourn* this)
+  116  0012A998     F4  uint16_t DailyTourn::GetMinTourneyDate(const struct DailyTourn* this)

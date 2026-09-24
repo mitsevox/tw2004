@@ -1,0 +1,14 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_FlashUtilities.cpp
+// compiled in: apt_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   26  00063008     C0  void UIFlashUtilities::CalculateStringDimensions(const struct UIFlashUtilities* this)
+                         inlines  AptStaticCharBuffer<64u>::operator char*
+   48  00024C6C      4  void UIFlashUtilities::IsShotCallerAllowed_AptNotify(const struct UIFlashUtilities* this)
+   53  00024C60      C  void UIFlashUtilities::IsOnline_AptNotify(const struct UIFlashUtilities* this)
+   62  000355AC     34  void UIFlashUtilities::IsCaddieTipAvailable_AptNotify(const struct UIFlashUtilities* this)
+   67  000DCB24     70  void UIFlashUtilities::UIFlashUtilities(const struct UIFlashUtilities* this)
+                         inlines  AptStaticCharBuffer<64u>::AptStaticCharBuffer, AptSubscriberVariableGrp::AptSubscriberVariableGrp, TArrayInternal<ValueType,AptStructSwapper>::TArrayInternal
+   73  000336A0     50  void UIFlashUtilities::Init(const struct UIFlashUtilities* this)
+   79  00097C18     30  void UIFlashUtilities::Close(const struct UIFlashUtilities* this)
+                         inlines  AptSubscriberVariableGrp::Close

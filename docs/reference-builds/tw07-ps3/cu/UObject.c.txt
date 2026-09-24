@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/lib/UObject.c
+// compiled in: Legacy_unity.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   26  00382998     F0  void Object_Init(TObject* pObject, uint32 Flags)
+                         inlines  LLMath_IdentifyMat, vec_st
+   36  003AA2C0     1C  void Object_Destroy(TObject* xpObject_p)

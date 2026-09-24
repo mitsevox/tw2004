@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/scenegraph/source/SceneGraph/Runtime/RegisterRuntimeNodes.cpp
+// compiled in: RegisterRuntimeNodes.cpp
+// 4 functions, source order. line | PS3 address | size
+
+    0  008BD474     F0  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   49  008BD2E0    194  void SceneX::RegisterRuntimeNodes(struct <anon>* pSGManager)
+                         local  const char[21] __FUNCTION__
+                         inlines  RNADebugBreak
+   68  008BD564     10  static void _GLOBAL__I__ZN6SceneX20RegisterRuntimeNodesEPNS_10SGManagerCE()
+   69  008BD574     10  static void _GLOBAL__D__ZN6SceneX20RegisterRuntimeNodesEPNS_10SGManagerCE()

@@ -1,0 +1,9 @@
+// ../ears_common/dev/include/ears_common/bitflags.h
+// compiled in: ChrCntl_FrameUtil.cpp, ChrCntl_GameMovement.cpp, SKA.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   18    inline-only   uint32_t Flags32::GetAllFlags(const const struct Flags32* this)
+   31    inline-only   bool Flags32::Test(const const struct Flags32* this, uint32_t flag)
+   87    inline-only   void Flags8::Set(const struct Flags8* this, uint8_t flag)
+   91    inline-only   void Flags8::Clear(const struct Flags8* this, uint8_t flag)
+   97    inline-only   bool Flags8::Test(const const struct Flags8* this, uint8_t flag)

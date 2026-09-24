@@ -1,0 +1,89 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameModeDriver_UCAPSkillChallenges.cpp
+// compiled in: golf_unity.cpp
+// 29 functions, source order. line | PS3 address | size
+
+   28  002A35F4     B8  struct GameModeDriverUCAPSkillChallenges* UCAPSCGameModeDriverPtr()
+                         local  void* ptr
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+   42  00256388     64  void GameModeDriverUCAPSkillChallenges::GameModeDriverUCAPSkillChallenges(const struct GameModeDriverUCAPSkillChallenges* this)
+   58  0020D778     18  void GameModeDriverUCAPSkillChallenges::~GameModeDriverUCAPSkillChallenges(const struct GameModeDriverUCAPSkillChallenges* this)
+   65  0020D7F4     60  void GameModeDriverUCAPSkillChallenges::RegisterStreamClients()
+   78  0020D854     3C  void GameModeDriverUCAPSkillChallenges::UnregisterStreamClients()
+   87  00243184    1B4  void GameModeDriverUCAPSkillChallenges::LoadUCAPFromStream(struct TStreamData* pStreamData)
+                         local  const char[19] __FUNCTION__
+                         local  void* dataPtr
+                         local  uint32 size
+                         local  void* pData
+                         inlines  TagValuePair, operator+
+  114  00243338    180  void GameModeDriverUCAPSkillChallenges::Locale_DriverUCAPSkillChallenges_LoadUCAtFromStream(struct TStreamData* pStreamData)
+                         local  const char[52] __FUNCTION__
+                         local  char* pStrTable
+                         local  uint32 datasize
+                         inlines  TagValuePair, operator+
+  133  0020D890     1C  bool GameModeDriverUCAPSkillChallenges::QueryInterface(const struct GameModeDriverUCAPSkillChallenges* this, enum GM_DriverType_t typeID, const void*& ptr)
+                         local  bool bRet
+  172  0020D8AC     74  struct UCAPSkillChallengesEvent_t* GameModeDriverUCAPSkillChallenges::GetEventPtr(const struct GameModeDriverUCAPSkillChallenges* this, int iEventIndex)
+  178  0020D920     88  const char* GameModeDriverUCAPSkillChallenges::GetEventText(int iEventID)
+  206  002ACDA0     B8  bool UCAPSkillChallengesEvent_t::IsLocked(const const struct UCAPSkillChallengesEvent_t* this)
+                         local  const struct UserInfo& userInfo
+                         local  bool bLocked
+                         local  float gameProgress
+  233  0024B18C     5C  bool UCAPSkillChallengesEvent_t::IsHidden(const const struct UCAPSkillChallengesEvent_t* this)
+                         local  int i
+                         local  const struct UserInfo& userInfo
+  240  002655E0     5C  bool UCAPSkillChallengesEvent_t::IsWon(const const struct UCAPSkillChallengesEvent_t* this)
+                         local  int i
+                         local  const struct UserInfo& userInfo
+  248  0020D9A8     40  bool GameModeDriverUCAPSkillChallenges::IsGreenSelectionEnabled(const const struct GameModeDriverUCAPSkillChallenges* this)
+                         local  bool bIsGreenSelectionEnabled
+  268  0020D9E8     AC  void GameModeDriverUCAPSkillChallenges::SelectEvent(const struct GameModeDriverUCAPSkillChallenges* this, int eventID)
+                         inlines  GameModeDriverUCAPSkillChallenges::SetCurrentEventIndex
+  277  00337C9C    16C  void GameModeDriverUCAPSkillChallenges::SetupForEvent(const struct GameModeDriverUCAPSkillChallenges* this, const struct UCAPSkillChallengesEvent_t* pEventInfo)
+                         inlines  Singleton<GameManager>::GetSingleton
+  303  00337E08     E8  void GameModeDriverUCAPSkillChallenges::StartEvent(const struct GameModeDriverUCAPSkillChallenges* this)
+                         local  const struct UCAPSkillChallengesEvent_t* pEventInfo
+  318  0020DA94      8  int GameModeDriverUCAPSkillChallenges::GetNewlyUnlockedEvents(const struct GameModeDriverUCAPSkillChallenges* this, int* anEventIndices, int nMaxEventsUnlocked)
+  345  00268D3C     B8  void GameModeDriverUCAPSkillChallenges::ResetNewlyUnlockedEvents(const struct GameModeDriverUCAPSkillChallenges* this)
+                         local  int i
+                         local  struct UCAPSkillChallengesEvent_t* pEvent
+                         inlines  UCAPSkillChallengesEvent_t::SetNewlyUnlocked
+  357  0026581C     8C  int GameModeDriverUCAPSkillChallenges::GetNumEventsWon(const const struct GameModeDriverUCAPSkillChallenges* this, const struct UserInfo& userInfo)
+                         local  int count
+                         local  int nNumEvents
+                         local  int i
+                         inlines  GameModeDriverUCAPSkillChallenges::GetNumEvents
+  375  00337A20    27C  void GameModeDriverUCAPSkillChallenges::PrepareForTeeOff(const struct GameModeDriverUCAPSkillChallenges* this, const struct UCAPSkillChallengesEvent_t* pEventData)
+                         local  int8 cupIndex
+                         local  int8 greenIndex
+                         local  int newflags
+                         inlines  GM_GetCurrentHoleIndex, GM_SetPlayerHoleStrokes, GM_SetTargetCup, GamePlayer::SetController, GamePlayerManager::SetPlayerCount, cGAME_GLOBALS::SetGlobalFlags, cGAME_GLOBALS::SetGolfer, cGAME_GLOBALS::SetGreen, cGAME_GLOBALS::SetPin
+  434  0026563C    16C  void GameModeDriverUCAPSkillChallenges::RewardUserOnWin(const struct GameModeDriverUCAPSkillChallenges* this)
+                         local  const int16 validReward
+                         local  int16 attrType
+                         local  int i
+                         local  int iValueToAdd
+                         inlines  GamePlayer::GetGolferBonus, GeneralUserData::IncDevPoints, UserInfo::IncDevPoints
+  461  0020DA9C     60  bool GameModeDriverUCAPSkillChallenges::GameFinished(const struct GameModeDriverUCAPSkillChallenges* this, bool bPredict)
+  467  00268DF4    114  void GameModeDriverUCAPSkillChallenges::OnGameCompletionChanged(const struct GameModeDriverUCAPSkillChallenges* this, float fCompletionPercentage)
+                         local  int nCompletionPercentage
+                         local  int i
+                         local  struct UCAPSkillChallengesEvent_t* pEvent
+                         local  bool bUnlocked
+                         inlines  UCAPSkillChallengesEvent_t::SetNewlyUnlocked
+  495  00257B64     D4  void GameModeDriverUCAPSkillChallenges::OnPlayerStatusChanged(const struct GameModeDriverUCAPSkillChallenges* this, uint32_t eStatus)
+                         local  int i
+                         local  struct UCAPSkillChallengesEvent_t* pEvent
+                         local  bool bUnlocked
+                         inlines  UCAPSkillChallengesEvent_t::SetNewlyUnlocked
+  519  002657A8     74  void GameModeDriverUCAPSkillChallenges::OnWinOfCurrentGame(const struct GameModeDriverUCAPSkillChallenges* this, const struct OnWinData_t& onWinData)
+                         local  enum PlayerNumber_t playerID
+                         inlines  GameModeDriver::SetWasLastEventWonByTheUser, UCAPSkillChallengesUserData::SetWon
+  544  002658A8     D0  float GameModeDriverUCAPSkillChallenges::GetGameModeDriverCompletionPercentage(const const struct GameModeDriverUCAPSkillChallenges* this, const struct UserInfo& userInfo)
+                         local  float fRet
+                         local  int32 nNumEventsWon
+                         local  const float dPercent
+                         inlines  GameModeDriverUCAPSkillChallenges::GetNumEvents
+  563  0020DAFC     BC  bool GameModeDriverUCAPSkillChallenges::IsValidDropSurface(const struct GameModeDriverUCAPSkillChallenges* this, uint32 lieID)
+                         local  bool valid
+  594  00285658    1B4  uint32 GameModeDriverUCAPSkillChallenges::GetPostGameContext(const struct GameModeDriverUCAPSkillChallenges* this, uint32 prevContext)
+                         local  uint32 contextFlag

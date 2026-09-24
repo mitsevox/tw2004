@@ -1,0 +1,58 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Headgate/SOURCE/Game/Engine/Collisions.cpp
+// compiled in: headgate_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   48  00345918    434  bool DoesLineIntersectPoly(float* p1, float* p2, float* p3, float BallX, float BallY, float BallZ, float LastBallX, float LastBallY, float LastBallZ, unsigned int renderFlags, float* outT, float* outIntersect)
+                         local  unsigned int doubleSided
+                         local  float V1x
+                         local  float V1y
+                         local  float V1z
+                         local  float V2x
+                         local  float V2y
+                         local  float V2z
+                         local  float Nx
+                         local  float Ny
+                         local  float Nz
+                         local  float mag
+                         local  float ooMag
+                         local  float D
+                         local  float BVx
+                         local  float BVy
+                         local  float BVz
+                         local  float ooBVmag
+                         local  float NdotBV
+                         local  float t
+                         local  float ix
+                         local  float iy
+                         local  float iz
+                         local  float vp1u
+                         local  float vp1v
+                         local  float vp2u
+                         local  float vp2v
+                         local  float vp3u
+                         local  float vp3v
+                         local  float vu
+                         local  float vv
+                         local  float Pointu
+                         local  float Pointv
+                         local  float p1u
+                         local  float p1v
+                         local  float p2u
+                         local  float p2v
+                         local  float p3u
+                         local  float p3v
+                         local  float aNx
+                         local  float aNy
+                         local  float aNz
+                         local  int positive
+                         local  const float precisionFudge
+  220  0035C0D8    1A8  void CreateWorldMatrix(const struct tagSurfaceStructure* struc, float[4]* mat)
+                         local  float scale
+                         local  float cosine
+                         local  float sine
+                         inlines  std::cos, std::sin
+  241  00355FA4    264  void TransformPointToTreeSpace(struct tagSurfaceStructure* struc, const float& x, const float& y, const float& z)
+                         local  float invScale
+                         local  vec4flt v
+                         local  mat44flt m
+                         inlines  LLMath_Scale, LLMath_mat44fltMultiply33, __vec_make_from_scalar, vec_ld, vec_splat

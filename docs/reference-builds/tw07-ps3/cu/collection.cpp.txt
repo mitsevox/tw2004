@@ -1,0 +1,55 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/collection.cpp
+// compiled in: collection.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   22  006E319C    160  bool AddItem(const struct <anon>* this, struct ItemHandle* pHandle)
+                         local  bool isFailure
+                         local  struct <anon>* pLinkNode
+                         local  struct ItemNode* pNode
+                         inlines  Assert, Pop, Push
+   52  006E2F34     34  void RemoveItem(const struct <anon>* this, struct ItemHandle* pHandle)
+                         local  struct ItemNode* pNode
+   59  006E2D20     E0  struct ItemNode* RemoveItemDeferred(const struct <anon>* this, struct ItemHandle* pHandle)
+                         local  struct ItemNode* pNode
+                         inlines  Assert
+   73  006E2E00    134  void RemoveNode(const struct <anon>* this, struct ItemNode* pNode)
+                         inlines  Assert, Push, Remove
+   85  006E3004    198  bool AddCapacity(const struct <anon>* this, int capacity)
+                         local  bool isError
+                         local  int newBlockSize
+                         local  unsigned int bufferSize
+                         local  struct NodeBlockHeader* pHeader
+                         local  struct ItemNode* pNodes
+                         local  int i
+                         inlines  Assert, NodeBlockHeader::GetNodeArray, Push, PushTail, SetNext, SetPrev
+  115  006E32FC    260  bool Defragment(const struct <anon>* this)
+                         local  bool hasReclaimed
+                         local  struct NodeBlockHeader* pOldestBlock
+                         local  int excessCapacity
+                         local  struct ItemNode* pNodes
+                         local  int i
+                         local  struct <anon>* ptempnode
+                         local  int i
+                         local  struct ItemHandle* pHandle
+                         local  struct <anon>* ptempnode
+                         local  struct <anon>* ptempnode
+                         inlines  GetHead, GetNext, GetPrev, NodeBlockHeader::GetNodeArray, Pop, Remove, SetNext, SetPrev
+  163  006E2BA4     A0  bool Contains(const struct <anon>* this, struct ItemHandle* pHandle)
+                         local  bool isContained
+                         inlines  Assert
+  180  006E2B40     64  bool Contains(const struct <anon>* this, struct ItemNode* pNode)
+                         local  bool isContained
+                         local  struct NodeBlockHeader* pBlock
+                         local  struct ItemNode* pNodeArray
+                         local  struct <anon>* pListNode
+                         inlines  GetHead, GetNext, NodeBlockHeader::GetNodeArray
+  201  006E2B38      8  struct ItemNode* GetNodes(const struct <anon>* this)
+                         inlines  GetHead
+  207  006E2F68     9C  void Clear(const struct <anon>* this)
+                         local  struct <anon>* pLinkNode
+                         local  struct ItemNode* pNode
+                         inlines  IsEmpty
+  228  006E2C44     DC  void Release(const struct <anon>* this)
+                         local  struct <anon>* pNode
+                         local  struct NodeBlockHeader* pBlock
+                         inlines  GetHead, Pop, Reset

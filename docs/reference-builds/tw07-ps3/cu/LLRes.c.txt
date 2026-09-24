@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLRes.c
+// compiled in: Legacy_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   40  003CC28C    228  void RE_vClearCurrentFrameBuffer(bool boFade_p)
+                         local  float[2][4] xpVertices
+                         local  vec4flt xBackColor
+                         local  int32 i
+                         local  int32 iNumberOfLoop
+                         inlines  DS_vSetAlphaEnable, DS_vSetAlphaFunction, DS_vSetAlphaTestMode, DS_vSetZBufferMode, PR_vFillVerticesWith2DRect, PR_vSetCurrentColor, PR_vSetCurrentUsage, vec_st

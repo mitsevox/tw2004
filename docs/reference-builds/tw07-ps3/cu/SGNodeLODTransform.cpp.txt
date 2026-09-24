@@ -1,0 +1,48 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/scenegraph/source/SceneGraph/Runtime/Nodes/SGNodeLODTransform.cpp
+// compiled in: SGNodeLODTransform.cpp
+// 14 functions, source order. line | PS3 address | size
+
+    0  008B2F1C    140  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  SGNodeLODTransformInfoC::SGNodeLODTransformInfoC, SGNodeLODTransformInfoC::~SGNodeLODTransformInfoC
+    0  008B44A0      C  void SGNodeLODTransformInfoC::~SGNodeLODTransformInfoC(const struct SGNodeLODTransformInfoC* this)
+                         inlines  ~SGNodeInfoC
+   49  008B4408     88  struct SGNodeC* SGNodeLODTransformInfoC::Create(const const struct SGNodeLODTransformInfoC* this)
+                         inlines  operator new
+   50  008B40E8      8  const char* SGNodeLODTransformInfoC::GetNodeTypeName(const const struct SGNodeLODTransformInfoC* this)
+   51    inline-only   NodeType_t SGNodeLODTransformInfoC::GetNodeTypeEnum(const const struct SGNodeLODTransformInfoC* this)
+   62  008B2C1C    194  void SGNodeLODTransformC(const struct <anon>* this)
+                         inlines  Init, RNADebugBreak, Vector
+   67  008B2DB0    16C  void ~SGNodeLODTransformC(const struct <anon>* this)
+                         inlines  operator delete, ~Vector
+   93  008B35E8    5D0  struct SGNodeC* Clone(const struct <anon>* this, bool8_t recurse, NodeCloneUserDataCallback userDataCallback, struct SGNodeC* baseClone)
+                         local  const char[6] __FUNCTION__
+                         local  struct <anon>* clone
+                         local  int32_t iLODThreshold
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  float_t* newData
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  float_t* newData
+                         local  int32_t i
+                         local  int32_t i
+                         inlines  AddLODThreshold, Construct, GetNthLODThreshold, GetNumLODThresholds, RNADebugBreak, SGNodeC::GetNodeTypeEnum, operator new
+  124  008B2C14      8  const struct SGNodeInfoC* GetNodeInfo(const const struct <anon>* this)
+  130  008B2C0C      8  const struct SGNodeInfoC* _GetNodeInfo()
+  140  008B3BB8    488  void SerializeIn(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[12] __FUNCTION__
+                         local  int32_t version
+                         local  int32_t numThresholds
+                         local  int32_t idx
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  float_t* newData
+                         inlines  Construct, Grow, RNADebugBreak, Resize, operator[]
+  160  008B3254    200  void SerializeOut(const const struct <anon>* this, const struct OutStreamC& out)
+                         local  int32_t i
+                         inlines  RNADebugBreak, operator[]
+  179  008B306C     10  static void _GLOBAL__I__ZN6SceneX19SGNodeLODTransformC16s_ClassAllocatorE()
+  180  008B305C     10  static void _GLOBAL__D__ZN6SceneX19SGNodeLODTransformC16s_ClassAllocatorE()

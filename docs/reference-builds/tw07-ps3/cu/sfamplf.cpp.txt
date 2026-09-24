@@ -1,0 +1,12 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/sfamplf.cpp
+// compiled in: sfamplf.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   29  006F3E44     D8  int SFILTER_amplf(void* pstate, int frames, void* psrcp, void* pdstp, int requester)
+                         local  AMPLFSTATE* pas
+                         local  int temp
+                         local  float* psrc
+                         local  float* pdst
+                         local  int i
+   74  006F3F1C     34  int SFILTER_createAMPLF(AMPLFSTATE* pas)
+   89  006F3F50     28  void SFILTER_modifyAMPLF(AMPLFSTATE* pas, FIXED24P8* pparams)

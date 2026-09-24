@@ -1,0 +1,36 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/PS3/RNACircularBuffer.cpp
+// compiled in: RNACircularBuffer.cpp
+// 11 functions, source order. line | PS3 address | size
+
+    0  008413EC     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   66  008417C0     40  bool IsEmpty(const struct <anon>* this)
+   73  00841800     38  void WaitUntilEmpty(const struct <anon>* this)
+   83  0084148C    114  void Initialize(const struct <anon>* this, struct DeviceC* pDevice, int32_t iBufferSize, int32_t iAlignment, int32_t iGCMLabel, enum MemoryLocationE eLocation)
+                         local  const char[11] __FUNCTION__
+                         inlines  RNADebugBreak
+  105  00841838     A8  void Destroy(const struct <anon>* this)
+                         local  const char[8] __FUNCTION__
+                         inlines  RNADebugBreak
+  118  00841790     30  int32_t GetAvailableSpace(const struct <anon>* this)
+                         local  int32_t iSize1
+                         local  int32_t iOffset1
+                         local  int32_t iSize2
+                         local  int32_t iOffset2
+  126  008415A0    1F0  int32_t GetAvailableSpaces(const struct <anon>* this, const int32_t& iSize1, const int32_t& iOffset1, const int32_t& iSize2, const int32_t& iOffset2)
+                         local  const char[19] __FUNCTION__
+                         inlines  RNADebugBreak
+  182  00841AB8    330  void* BeginWrite(const struct <anon>* this, int32_t iRequestedSize, const int32_t& offset, int32_t iAlignment)
+                         local  const char[11] __FUNCTION__
+                         local  int32_t iSize1
+                         local  int32_t iOffset1
+                         local  int32_t iSize2
+                         local  int32_t iOffset2
+                         local  void* pNewAddress
+                         local  void* pAlignedAddress
+                         inlines  RNADebugBreak
+  239  00841900    1B8  void EndWrite(const struct <anon>* this, void* pNext)
+                         local  const char[9] __FUNCTION__
+                         local  int32_t iBytesUsed
+                         inlines  Gcm::cellGcmSetWriteBackEndLabel, RNADebugBreak
+  260  0084146C     10  static void _GLOBAL__I__ZN3RNA15CircularBufferCC2Ev()
+  261  0084147C     10  static void _GLOBAL__D__ZN3RNA15CircularBufferCC2Ev()

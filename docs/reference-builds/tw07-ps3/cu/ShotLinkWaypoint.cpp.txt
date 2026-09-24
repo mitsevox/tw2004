@@ -1,0 +1,15 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/ShotLink/ShotLinkWaypoint.cpp
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    5  0027FD28    31C  void ShotLinkWaypoint::SendGeometryToRenderer(const struct ShotLinkWaypoint* this, const float* camToLook)
+                         local  float dotP
+                         local  float[4][4] shotlinkWaypointVerts
+                         local  float[4][4] shotlinkUVs
+                         local  vec4flt yaxis
+                         local  vec4flt xaxis
+                         local  vec4flt widthOffset
+                         local  vec4flt heightOffset
+                         local  vec4flt newYAxis
+                         local  int i
+                         inlines  LLMath_CrossProduct3W0, LLMath_DotProduct3, LLMath_Scale, LLMath_Subtract, PR_vSetCurrentColor, PR_vSetDefaultCurrentColor, __vec_cross, __vec_make_from_scalar, __vec_mul, vec_ld, vec_madd, vec_nmsub, vec_perm, vec_sld, vec_splat

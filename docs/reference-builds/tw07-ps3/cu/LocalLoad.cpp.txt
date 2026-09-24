@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Misc/LocalLoad.cpp
+// compiled in: golf2_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   33  0012732C     94  void getLocalPathName(char* pathname, size_t bufLen, const char* filename)

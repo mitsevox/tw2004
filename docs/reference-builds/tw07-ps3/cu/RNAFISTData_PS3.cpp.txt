@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Rna/Asset/Fist/RNAFISTData_PS3.cpp
+// compiled in: rnaunity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+13853  004C6D7C    120  const void* FISTGetFile(const char* pFileName, unsigned int* pFileSize)
+                         local  int i

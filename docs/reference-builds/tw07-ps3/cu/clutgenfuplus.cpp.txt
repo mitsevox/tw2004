@@ -1,0 +1,175 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/clutgenfuplus.cpp
+// compiled in: other_unity.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   53  0043E100    15C  void ClutGenFuPlus::GenerateClut(const struct ClutGenFuPlus* this, const struct Texture32b& srcTexture, const struct Texture8P& destTexture)
+                         local  const char[13] __FUNCTION__
+                         inlines  TagValuePair, operator+
+   71  00427858    15C  void ClutGenFuPlus::GenerateClut(const struct ClutGenFuPlus* this, const struct Texture32b& srcTexture, const struct Texture4P& destTexture)
+                         local  const char[13] __FUNCTION__
+                         inlines  TagValuePair, operator+
+  174    inline-only   static void Hist3d(struct WU* wu, int minAlpha, int maxAlpha, int* vwt, int* vmr, int* vmg, int* vmb, float* m2)
+                         local  int i
+                         local  int y
+                         local  int m
+                         local  int[256] table
+                         local  int memsize
+                         local  const char* basePixel
+                         local  const RawTexture_PixelValue* argb
+                         local  int x
+                         local  int a
+                         local  int r
+                         local  int g
+                         local  int b
+                         local  int inr
+                         local  int ing
+                         local  int inb
+                         local  int ind
+  260    inline-only   static void M3d(int* vwt, int* vmr, int* vmg, int* vmb, float* m2)
+                         local  unsigned int ind1
+                         local  unsigned int ind2
+                         local  unsigned char i
+                         local  unsigned char r
+                         local  unsigned char g
+                         local  unsigned char b
+                         local  int line
+                         local  int line_r
+                         local  int line_g
+                         local  int line_b
+                         local  int[17] area
+                         local  int[17] area_r
+                         local  int[17] area_g
+                         local  int[17] area_b
+                         local  float line2
+                         local  float[17] area2
+  302  003CE780    114  static int Vol(struct WUBOX* cube, int[17][33][17]* mmt)
+                         local  int sum
+  324  003CE894    204  static int Bottom(struct WUBOX* cube, unsigned char dir, int[17][33][17]* mmt)
+  352  003CEA98    1CC  static int Top(struct WUBOX* cube, unsigned char dir, int pos, int[17][33][17]* mmt)
+  380  003CEC64    2B4  static float Var(struct WU* wu, struct WUBOX* cube)
+                         local  float dr
+                         local  float dg
+                         local  float db
+                         local  float xx
+  408  003CEF18    400  static float Maximize(struct WU* wu, struct WUBOX* cube, unsigned char dir, int first, int last, int* cut, int whole_r, int whole_g, int whole_b, int whole_w)
+                         local  int half_r
+                         local  int half_g
+                         local  int half_b
+                         local  int half_w
+                         local  int base_r
+                         local  int base_g
+                         local  int base_b
+                         local  int base_w
+                         local  int i
+                         local  float temp
+                         local  float max
+  455    inline-only   static int Cut(struct WU* wu, struct WUBOX* set1, struct WUBOX* set2)
+                         local  unsigned char dir
+                         local  int cutr
+                         local  int cutg
+                         local  int cutb
+                         local  float maxr
+                         local  float maxg
+                         local  float maxb
+                         local  int whole_r
+                         local  int whole_g
+                         local  int whole_b
+                         local  int whole_w
+  512    inline-only   static void Mark(int alpha, struct WUBOX* cube, int label, unsigned char* table)
+                         local  int r
+                         local  int g
+                         local  int b
+                         local  int tableEntry
+  525  003FFB54    380  static struct WU* AllocWuData(const const struct Allocator& allocRef)
+                         local  const char[12] __FUNCTION__
+                         local  struct Allocator tempAllocator
+                         local  int memsize
+                         local  struct WU* wu
+                         inlines  TagValuePair, operator+
+  562  00426C88    560  static void GetAlphaRangeCount(const struct WU* wu, int* numEntriesForAlpha)
+                         local  int y
+                         local  int[8] alphaRangeCount
+                         local  const char* basePixel
+                         local  int entriesLeft
+                         local  int coloursPicked
+                         local  float[8] alphaRamp
+                         local  int i
+                         local  int j
+                         local  int m
+                         local  const RawTexture_PixelValue* argb
+                         local  int x
+                         local  unsigned int a
+                         local  int i
+                         local  int numToTry
+                         local  int j
+                         local  float randPercent
+                         local  int numEntries
+                         local  int maxRange
+                         local  int maxNumEntriesForAlpha
+                         inlines  Misc_RandFuncf, std::sqrt
+  723  003FEFCC    B88  static void GenerateTable(const const struct Allocator& allocRef, struct WU* wu, RawTexture_PixelValue* colourTable, int tableOffset, int alphaValueIndex, int numcolours, int* returncolours, unsigned char* inverseTable)
+                         local  const char[14] __FUNCTION__
+                         local  int i
+                         local  int k
+                         local  int next
+                         local  int weight
+                         local  struct WUBOX* cube
+                         local  float* vv
+                         local  float temp
+                         local  int realcolours
+                         local  struct Allocator tempAlloc
+                         inlines  Cut, M3d, Mark, TagValuePair, operator+
+  827  0043DA90    670  void ClutGenFuPlus::GenerateClutFUPlus(const struct ClutGenFuPlus* this, const struct Texture32b& srcTexture, const struct Texture8P& destTexture, int num_clut_entries)
+                         local  const char[19] __FUNCTION__
+                         local  int i
+                         local  struct WU* wu
+                         local  int[8] numEntriesForAlpha
+                         local  RawTexture_PixelValue* colourTable
+                         local  int curTableOffset
+                         local  int returnColours
+                         local  int extraColours
+                         local  int32 iClutEntry
+                         local  RawTexture_PixelValue val
+                         inlines  Hist3d, TagValuePair, operator+
+  885  00402EAC    1EC  void ClutGenFuPlus::RemapTexture(const struct ClutGenFuPlus* this, const struct Texture32b& srcTexture, const struct Texture8P& destTexture)
+                         local  RawTexture_PixelValue* srcPixels
+                         local  uint8* destPixels
+                         local  int mipmap
+                         local  int width
+                         local  int height
+                         local  int h
+                         local  int w
+                         local  int alphaBucket
+                         local  int a
+                         local  int r
+                         local  int g
+                         local  int b
+                         inlines  RawTexture::GetHeight, RawTexture::GetWidth
+  925  004271E8    670  void ClutGenFuPlus::GenerateClutFUPlus(const struct ClutGenFuPlus* this, const struct Texture32b& srcTexture, const struct Texture4P& destTexture, int num_clut_entries)
+                         local  const char[19] __FUNCTION__
+                         local  int i
+                         local  struct WU* wu
+                         local  int[8] numEntriesForAlpha
+                         local  RawTexture_PixelValue* colourTable
+                         local  int curTableOffset
+                         local  int returnColours
+                         local  int extraColours
+                         local  int32 iClutEntry
+                         local  RawTexture_PixelValue val
+                         inlines  Hist3d, TagValuePair, operator+
+  983  00403098    2E0  void ClutGenFuPlus::RemapTexture(const struct ClutGenFuPlus* this, const struct Texture32b& srcTexture, const struct Texture4P& destTexture)
+                         local  RawTexture_PixelValue* srcPixels
+                         local  uint8* destPixels
+                         local  int mipmap
+                         local  int width
+                         local  int height
+                         local  int h
+                         local  int w
+                         local  int alphaBucket
+                         local  int a
+                         local  int r
+                         local  int g
+                         local  int b
+                         local  int tableEntry
+                         local  uint8 pixel
+                         inlines  RawTexture::GetHeight, RawTexture::GetWidth

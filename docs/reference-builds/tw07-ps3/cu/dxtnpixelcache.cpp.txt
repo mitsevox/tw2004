@@ -1,0 +1,21 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/dxtnpixelcache.cpp
+// compiled in: other_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   45  003D0048     48  void DXTnPixelCache::ResetCache(const struct DXTnPixelCache* this)
+                         local  int i
+   55  003D00F8     C4  bool DXTnPixelCache::GetPixelValue(const struct DXTnPixelCache* this, int32_t x, int32_t y, int32_t mipmap, const RawTexture_PixelValue& pixel, bool isTinted)
+                         local  int width
+                         local  int blockNum
+                         local  int entryNum
+                         local  int pixelNum
+   76  003D01BC    14C  bool DXTnPixelCache::GetPixelRow(const struct DXTnPixelCache* this, int32_t x, int32_t y, int32_t mipmap, RawTexture_PixelValue* pixels, bool isTinted)
+                         local  int width
+                         local  int blockNum
+                         local  int entryNum
+                         local  int pixelRow
+   98  003D0308     C4  void DXTnPixelCache::AddPixelBlock(const struct DXTnPixelCache* this, int32_t x, int32_t y, int32_t mipmap, RawTexture_PixelValue* pixels, bool isTinted)
+                         local  int width
+                         local  int blockNum
+                         local  int entryNum
+                         local  int i

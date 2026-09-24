@@ -1,0 +1,16 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/math/vpu/detail/vector3_type_inline.h
+// compiled in: DebugMenu.cpp, IOStream.cpp, RNADevice.cpp, SGNodeJoint.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   23    inline-only   void Set(const struct <anon>* this, float x, float y, float z)
+                         local  Vector4Intrinsic_32 vi_temp
+   39    inline-only   void Set(const struct <anon>* this, struct <anon>& x, struct <anon>& y, struct <anon>& z)
+                         local  Vector4Intrinsic_32 vi_temp
+  172    inline-only   void SetZero(const struct <anon>* this)
+  261    inline-only   struct <anon>& operator=(const struct <anon>* this, struct <anon>& v)
+  314    inline-only   VecFloatRefX X(const struct <anon>* this)
+  320    inline-only   const VecFloatRefX X(const const struct Vector3* this)
+  326    inline-only   VecFloatRefY Y(const struct <anon>* this)
+  332    inline-only   const VecFloatRefY Y(const const struct Vector3* this)
+  338    inline-only   VecFloatRefZ Z(const struct <anon>* this)
+  344    inline-only   const VecFloatRefZ Z(const const struct Vector3* this)

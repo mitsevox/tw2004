@@ -1,0 +1,54 @@
+// ../ears_rt_math/dev/include/ears_rt_math/ps3/llmathps3.h
+// compiled in: Character.cpp, MathQuat.c, Transform.cpp
+// 24 functions, source order. line | PS3 address | size
+
+   76    inline-only   static float[4] __vec_dot3(float[4] lhs, float[4] rhs)
+                         local  float[4] result
+   84    inline-only   static float[4] __vec_dot4(float[4] lhs, float[4] rhs)
+                         local  float[4] result
+   92    inline-only   static float[4] __vec_cross(float[4] lhs, float[4] rhs)
+                         local  float[4] tmp0
+                         local  float[4] tmp1
+                         local  float[4] tmp2
+                         local  float[4] tmp3
+                         local  float[4] result
+  104    inline-only   static float[4] __vec_len_sqr3(float[4] src)
+                         local  float[4] lshift
+                         local  float[4] result
+  126    inline-only   static float[4] __vec_mul(float[4] lhs, float[4] rhs)
+  131    inline-only   static float[4] __vec_make_from_scalar(float src)
+                         local  union <anon> tmp
+  254    inline-only   static void LLMath_CopyVec(const float* src, float* dest)
+  266    inline-only   static void LLMath_CopyVec3(const float* src, float* dest)
+                         local  uint32_t savedW
+  339    inline-only   static void LLMath_Scale3(float Amul, const float* A, float* dest)
+                         local  uint32_t savedW
+                         local  float[4] tmp
+  357    inline-only   static void LLMath_Scale(float Amul, const float* A, float* dest)
+                         local  float[4] tmp
+  446    inline-only   static void LLMath_Add(const float* src1, const float* src2, float* dest)
+  461    inline-only   static void LLMath_Add3(const float* src1, const float* src2, float* dest)
+                         local  uint32_t savedW
+  479    inline-only   static void LLMath_Negate(const float* src, float* dest)
+  493    inline-only   static void LLMath_Negate3(const float* src, float* dest)
+                         local  uint32_t savedW
+  556    inline-only   static void LLMath_Subtract3(const float* src1, const float* src2, float* dest)
+                         local  uint32_t savedW
+  573    inline-only   static void LLMath_AddScale(const float* A, const float* B, float Bmul, float* dest)
+  587    inline-only   static void LLMath_AddScale3(const float* A, const float* B, float Bmul, float* dest)
+                         local  uint32_t savedW
+  621    inline-only   static void LLMath_Interpolate3(const float* A, const float* B, float s, float* dest)
+                         local  uint32_t savedW
+  642    inline-only   static void LLMath_CrossProduct3(const float* A, const float* B, float* dest)
+                         local  float[4] a
+                         local  float[4] b
+                         local  const uint32_t savedW
+  750    inline-only   static void LLMath_MultiplyVec(const float* A, const float* B, float* dest)
+  977    inline-only   static float LLMath_Length3(const float* A)
+                         local  union <anon> len
+ 1006    inline-only   static float LLMath_LengthSquared3(const float* A)
+                         local  union <anon> dot
+ 1056    inline-only   static float LLMath_DotProduct(const float* A, const float* B)
+                         local  union <anon> dot
+ 1071    inline-only   static float LLMath_DotProduct3(const float* A, const float* B)
+                         local  union <anon> dot

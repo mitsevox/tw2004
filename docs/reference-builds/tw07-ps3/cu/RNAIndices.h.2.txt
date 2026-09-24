@@ -1,0 +1,11 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNARender/ps3/RNARender/RNAIndices.h
+// compiled in: RNABuilder.cpp, RNAIndices.cpp, RNAMeshProcessorImmediate.cpp, RNAScene.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   51    inline-only   void IndicesC::operator delete(void* address)
+   51    inline-only   struct ICoreAllocator* IndicesC::GetClassAllocator()
+   51    inline-only   void* IndicesC::operator new(size_t size, const char* text, struct ICoreAllocator* allocator, enum AllocFlags allocator_flags, uint32_t alignment)
+   58    inline-only   void* IndicesC::GetIndexBuffer(const const struct IndicesC* this)
+   59    inline-only   enum IndexFormatE IndicesC::GetIndexFormat(const const struct IndicesC* this)
+   60    inline-only   int32_t IndicesC::GetNumIndices(const const struct IndicesC* this)
+   70    inline-only   uint32_t IndicesC::GetLocation(const struct IndicesC* this)

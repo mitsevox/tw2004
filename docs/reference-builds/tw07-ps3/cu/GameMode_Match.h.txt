@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/GameMode/Headers/GameMode_Match.h
+// compiled in: golf_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   30  0033EAEC     10  enum UIScoreCardDispMode_t GameModeMatch::GetScoreDisplayMode(const struct GameModeMatch* this, bool getAlternate)
+   42  0033EAFC      8  bool GameModeMatch::TrackingShotHistory(const struct GameModeMatch* this, enum PlayerNumber_t PlayerID)
+   51  0033EB04      8  bool GameModeMatch::IsSpudHudUsed(const struct GameModeMatch* this)
+   52  0033EB0C     14  char* GameModeMatch::NumPlyReqStrID(const struct GameModeMatch* this)
+   53  0033EB20      8  bool GameModeMatch::AllowUserShotClockOverride(const struct GameModeMatch* this)
+   55  0033EB28      8  bool GameModeMatch::AllowConcedeOption(const struct GameModeMatch* this)

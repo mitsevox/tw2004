@@ -1,0 +1,26 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_FastGrass.cpp
+// compiled in: shader_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   45  0051A7CC     EC  void SM_FastGrassClass::SM_FastGrassClass(const struct SM_FastGrassClass* this)
+                         inlines  SM_Shader_Base::SM_Shader_Base, vec4flt_Zero, vec_st
+   79  005058F0    3CC  void SM_FastGrassClass::Load(const struct SM_FastGrassClass* this)
+  116  00505CBC    184  void SM_FastGrassClass::Activate(const struct SM_FastGrassClass* this)
+  137  00505E40     40  void SM_FastGrassClass::Deactivate(const struct SM_FastGrassClass* this)
+  146  00510254     64  void SM_FastGrassClass::SetGrassBladeTexture(const struct SM_FastGrassClass* this, TextureRef textureRef)
+  156  005102B8     64  void SM_FastGrassClass::SetHRShadowTexture(const struct SM_FastGrassClass* this, TextureRef textureRef)
+  166  0051031C     64  void SM_FastGrassClass::SetShadowTexture(const struct SM_FastGrassClass* this, TextureRef textureRef)
+  176  00516FBC     6C  void SM_FastGrassClass::SetGrassPatchCoords(const struct SM_FastGrassClass* this, const vec4flt& patch)
+                         inlines  vec4flt_Copy
+  187  00510380     60  void SM_FastGrassClass::SetGrassAlphaFadeDistMult(const struct SM_FastGrassClass* this, float alphaFadeDistMult)
+  197  00517028     B4  void SM_FastGrassClass::SetShadowMatrix(const struct SM_FastGrassClass* this, float[4]* pRows)
+                         inlines  vec4flt_Copy, vec_st
+  210  005170DC     B4  void SM_FastGrassClass::SetHRShadowMatrix(const struct SM_FastGrassClass* this, float[4]* pRows)
+                         inlines  vec4flt_Copy, vec_st
+  223  005103E0     70  void SM_FastGrassClass::SetHRCamPos(const struct SM_FastGrassClass* this, float x, float y, float z)
+  233  00510450     70  void SM_FastGrassClass::SetHRShadowDispUnscaled(const struct SM_FastGrassClass* this, float x, float y, float z)
+  243  005104C0     60  void SM_FastGrassClass::SetHRShadowFadeDist(const struct SM_FastGrassClass* this, float dist)
+  253  00517190     B4  void SM_FastGrassClass::SetGolferShadowMatrix(const struct SM_FastGrassClass* this, float[4]* pRows)
+                         inlines  vec4flt_Copy, vec_st
+  266  00517244     6C  void SM_FastGrassClass::SetShadowsColor(const struct SM_FastGrassClass* this, const vec4flt& color)
+                         inlines  vec4flt_Copy

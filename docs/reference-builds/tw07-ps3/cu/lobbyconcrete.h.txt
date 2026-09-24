@@ -1,0 +1,17 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/./lobbyconcrete.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 9 functions, source order. line | PS3 address | size
+
+  101  00622B6C      C  void ~LobbyDispatchElement(const struct LobbyDispatchElement* this)
+  104    inline-only   bool operator==(const const struct <anon>* this, const const struct <anon>& Other)
+  116  0062A494     38  void ~LobbyDispatchElementComparator(const struct <anon>* this)
+                         inlines  ~TemplateComparator
+  118  00622BB0     50  int32_t Compare(const const struct <anon>* this, const struct Base* o1, const struct Base* o2)
+                         local  const struct <anon>* object1
+                         local  const struct <anon>* object2
+                         inlines  operator==
+  148  00622C00      C  void ~LobbyCategoryDownloadCallback(const struct LobbyCategoryDownloadCallback* this)
+  180  00622C38      C  void ~LobbyMenusInternalCallback(const struct LobbyMenusInternalCallback* this)
+  309    inline-only   struct <anon>* GetFilterParameters(const struct LobbyConcrete* this)
+  316    inline-only   struct MemoryPool* GetRoomPool(const struct LobbyConcrete* this)
+  318    inline-only   void SetCreatedRoomIdentifier(const struct LobbyConcrete* this, int32_t iIdentifier)

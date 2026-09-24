@@ -1,0 +1,13 @@
+// ../../../../../TIGERCODE/Code/Golf/RNA/RuntimeTools/MaterialListController.h
+// compiled in: rnaunity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   44  004D0F64     6C  void ShadowedMaterialList(const struct <anon>* this, struct MaterialListC* pActive, struct MaterialListC* pShadow, const char* listName)
+                         inlines  AutoRefCount
+   45  004D0F3C     14  void ShadowedMaterialList(const struct <anon>* this, struct MaterialListC* pActive, const char* listName)
+                         inlines  AutoRefCount
+   46  004D0C0C     14  void ShadowedMaterialList(const struct <anon>* this)
+                         inlines  AutoRefCount
+   52    inline-only   struct MaterialListC* MaterialList(const const struct <anon>* this)
+   53    inline-only   struct MaterialListC* ShadowList(const const struct <anon>* this)
+   54    inline-only   const char* GetName(const const struct <anon>* this)

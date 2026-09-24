@@ -1,0 +1,14 @@
+// ../../../../../TIGERCODE/Code/GolfModule/golf_module_apt_debug.cpp
+// compiled in: golf_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+    4  002F6DA8     80  void GolfModuleAptDebug::GolfModuleAptDebug(const struct GolfModuleAptDebug* this, const const void** __vtt_parm)
+   16  00233C40     24  void GolfModuleAptDebug::Update(const struct GolfModuleAptDebug* this)
+   26  00233C64      8  unsigned int GolfModuleAptDebug::Drive(const struct GolfModuleAptDebug* this, unsigned int signatureCheck)
+   72  00233C6C      4  void GolfModuleAptDebug::Record(const struct GolfModuleAptDebug* this, unsigned int input, unsigned int signature)
+  101  00233C70      8  unsigned int GolfModuleAptDebug::DriveFunction(void* object, unsigned int signatureCheck)
+  110  00233C78      4  void GolfModuleAptDebug::RecordFunction(void* object, unsigned int input, unsigned int signature)
+  118  00233C7C      C  void GolfModuleAptDebug::ResetRecord(const struct GolfModuleAptDebug* this)
+  123  00233C88      8  bool GolfModuleAptDebug::SetDriveEntry(const struct GolfModuleAptDebug* this, const char* text, unsigned int index)
+  204  00233C90      4  void GolfModuleAptDebug::StartDrive(const struct GolfModuleAptDebug* this, unsigned int count)
+  223  00233C94     14  const char* GolfModuleAptDebug::GetRecordText(const struct GolfModuleAptDebug* this, unsigned int recordIndex)

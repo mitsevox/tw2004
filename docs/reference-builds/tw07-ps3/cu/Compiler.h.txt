@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/Compiler.h
+// compiled in: Compiler.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   75  007B23F0     5C  void Compiler(const struct <anon>* this)
+   76  007B24A8    248  void ~Compiler(const struct <anon>* this)

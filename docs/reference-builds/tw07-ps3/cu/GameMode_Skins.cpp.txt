@@ -1,0 +1,87 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_Skins.cpp
+// compiled in: golf_unity.cpp
+// 23 functions, source order. line | PS3 address | size
+
+   16  00204AE0     44  void GameModeSkins::GameModeSkins(const struct GameModeSkins* this)
+   21  0020096C     18  void GameModeSkins::~GameModeSkins(const struct GameModeSkins* this)
+   26  002009E8     CC  void GameModeSkins::Init(const struct GameModeSkins* this)
+                         local  int32_t i
+   51  00200AB4      4  void GameModeSkins::Update(const struct GameModeSkins* this)
+   56  00200AB8      4  void GameModeSkins::Shutdown(const struct GameModeSkins* this)
+   62  00200ABC     38  int32 GameModeSkins::GetEndGameSequence(const struct GameModeSkins* this)
+                         local  int32 sequence
+   71  00200AF4     1C  bool GameModeSkins::QueryInterface(const struct GameModeSkins* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bret
+   84  002D17CC     F4  void GameModeSkins::SetupNextGolfer(const struct GameModeSkins* this)
+                         local  enum PlayerNumber_t player
+                         local  int32 i
+                         local  int32 i
+  116  0032B0AC    690  enum PlayerNumber_t GameModeSkins::GetHonors(const struct GameModeSkins* this, enum PlayerNumber_t ignore, bool doNotIgnoreHoledOut)
+                         local  int32 i
+                         local  enum PlayerNumber_t furthest
+                         local  enum PlayerNumber_t retVal
+                         local  float x
+                         local  float y
+                         local  float dist
+                         local  float farthestDist
+                         local  int32 j
+                         local  int32 bestScoreInHole
+                         local  TGD_TerrainInfo* pTerrainGameData
+                         local  bool holedOut
+                         local  bool holedOut
+                         local  bool holedOut
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, PLR_HoledOut, std::sqrt
+  268  0032B73C    224  enum PlayerNumber_t GameModeSkins::GetHoleWinner(const const struct GameModeSkins* this)
+                         local  int32 hole
+                         local  enum PlayerNumber_t winner
+                         local  enum PlayerNumber_t bestscore
+                         local  enum PlayerNumber_t secondbest
+                         local  int32_t i
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, PLR_HoledOut
+  313  00237DD0     A8  enum PlayerNumber_t GameModeSkins::GetSpecificHoleWinner(const const struct GameModeSkins* this, int32 hole)
+                         local  enum PlayerNumber_t winner
+                         local  int32_t i
+  328  0032B960    430  bool GameModeSkins::HoleFinished(const struct GameModeSkins* this, enum PlayerNumber_t PlayerID, bool predict)
+                         local  enum PlayerNumber_t bestscore
+                         local  enum PlayerNumber_t secondbest
+                         local  int32 i
+                         local  bool retVal
+                         local  int32 bestScorersStrokes
+                         local  int32 secondScorersStrokes
+                         local  int32 numStrokes
+                         local  int32 numStrokes
+                         local  int32 numStrokes
+                         local  int32 numStrokes
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_IsPlayoff, PLR_HoledOut
+  433  0032E2BC    1A0  bool GameModeSkins::GameFinished(const struct GameModeSkins* this, bool predict)
+                         local  uint32 i
+                         local  uint32 holecount
+                         inlines  GM_GetCurrentHoleIndex, GM_IsPlayoff
+  483  0032E060    25C  bool GameModeSkins::GoToPlayoff(const struct GameModeSkins* this, bool predict)
+                         local  int32 i
+                         local  uint32 j
+                         inlines  GM_GetCurrentHoleIndex
+  550  0032BEA0    220  void GameModeSkins::EndHole(const struct GameModeSkins* this)
+                         local  enum PlayerNumber_t winner
+                         inlines  GM_GetCurrentHoleIndex, GM_IsPlayoff, GamePlayer::GetGolferScore
+  577  00200BEC     10  void GameModeSkins::StartGamePreData(const struct GameModeSkins* this)
+  583  002F9018    248  void GameModeSkins::EndGame(const struct GameModeSkins* this)
+                         local  int32 i
+                         local  int32 userID
+                         local  int32[4] places
+                         local  int32 maxScore
+                         local  int32 ceilingScore
+                         local  int place
+                         local  int plr
+                         inlines  GM_GetNumHolesInRound, GM_IsPlayoff
+  658  0032BD90    110  int32 GameModeSkins::CurrentHoleValue(const struct GameModeSkins* this)
+                         local  int32 i
+                         inlines  GM_GetCurrentHoleIndex, GM_IsPlayoff
+  683  002F9260     6C  int32 GameModeSkins::CurrentHoleNumberSkins(const struct GameModeSkins* this)
+                         inlines  GM_IsPlayoff
+  692  00200BFC      8  void GameModeSkins::SetSkinCarryOver(const struct GameModeSkins* this, int32 carryover)
+  697  00200C04      8  void GameModeSkins::SetNumSkinsCarryOver(const struct GameModeSkins* this, int32 numcarryover)
+  702  00237E78     80  void GameModeSkins::GetCurrentScoreString(const struct GameModeSkins* this, char* strBuf, int32 bufferSize)
+                         local  int32 curMoney
+                         local  char[32] tempBuffer
+  712  00200C80     14  const char* GameModeSkins::GetName(const struct GameModeSkins* this)

@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/screentinter.cpp
+// compiled in: other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   14  003D0600     40  void ScreenTinter::ScreenTinter(const struct ScreenTinter* this)
+   19  003D077C     18  void ScreenTinter::~ScreenTinter(const struct ScreenTinter* this)
+   24  004223C4    464  void ScreenTinter::Tint(const struct ScreenTinter* this, int32_t numPixels, vec4flt* input, vec4flt* output, float* tintParams, float* scale)
+                         local  vec4flt zeroVec
+                         local  vec4flt oneVec
+                         local  int i
+                         local  int i
+                         inlines  LLMath_ClampVec, Tinter::ScaleTint

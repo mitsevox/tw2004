@@ -1,0 +1,19 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Physics/Wind.c
+// compiled in: golf2_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+  126  0012D2C8      4  void Wind_vInitModule()
+  131  0012D2CC      4  void Wind_vCloseModule()
+  153  00164E40     88  float Wind_GetPhysicsWindVelocity(float* windVector)
+                         local  vec4flt vec
+                         inlines  LLMath_Scale, __vec_make_from_scalar, __vec_mul, vec4flt_Copy, vec_ld, vec_splat
+  167  0012D2D0     18  enum WIND_t Wind_GetPhysicsDirection()
+  174  0012D2E8     18  float Wind_GetPhysicsSpeed()
+  181  0012D300     AC  void Wind_SetPhysicsWind(float velocity, enum WIND_t direction)
+  201  0012D3AC     18  void Wind_SetPhysicsWindSpeed(float velocity)
+  209  00154514    2A0  void Wind_InitForHole()
+                         local  float speed
+                         local  enum WIND_t direction
+                         local  enum WIND_e windCategory
+  276  0015B590     30  void Wind_GetDirection(float* dir)
+                         inlines  vec4flt_Copy, vec_st

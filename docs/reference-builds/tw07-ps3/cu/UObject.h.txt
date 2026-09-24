@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/Legacy/Lib/Headers/UObject.h
+// compiled in: apt_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   42    inline-only   void Object_UpdateO2WComposed33(TObject* pObject)

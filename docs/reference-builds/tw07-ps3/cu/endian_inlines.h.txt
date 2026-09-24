@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/RW45/platform/include/native/ps3-ppu-gcc/rw/core/endian/detail/endian_inlines.h
+// compiled in: golf2_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    9    inline-only   uint32_t endian::ConvertLittle(const uint32_t x)

@@ -1,0 +1,10 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_InTheBag.h
+// compiled in: apt_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   23  000FFF74     44  void UIInTheBag::ShowHelpText(const struct UIInTheBag* this)
+   29  000FFFB8     24  void UIInTheBag::LooseFocus(const struct UIInTheBag* this, uint32 gointTo_Signature)
+   30  000FFFDC     24  void UIInTheBag::RegainFocus(const struct UIInTheBag* this, uint32 comeFrom_Signature)
+   32  00100008      C  uint32 UIInTheBag::GetSignature(const const struct UIInTheBag* this)
+   38  001042A4     14  void UIInTheBag::NotifyGo_func(struct IAptSubscriber* subs)
+   42    inline-only   bool UIInTheBag::NeedToAskSave(const struct UIInTheBag* this)

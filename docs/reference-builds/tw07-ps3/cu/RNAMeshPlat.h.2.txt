@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/RNACore/Include/RNARender/PS3/RNARender/RNAMeshPlat.h
+// compiled in: RNAMeshPlat.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   37    inline-only   void operator delete(void* address)
+   37    inline-only   struct ICoreAllocator* GetClassAllocator()
+   51    inline-only   void SetIndicesOffset(const struct <anon>* this, uint32_t indicesOffset)

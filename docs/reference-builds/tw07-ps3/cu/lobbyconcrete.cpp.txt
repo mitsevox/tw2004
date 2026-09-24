@@ -1,0 +1,514 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/lobbyconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 171 functions, source order. line | PS3 address | size
+
+   97  00624554     D0  int32_t Compare(const const struct <anon>* this, const struct Base* o1, const struct Base* o2)
+                         local  const struct <anon>* object1
+                         local  const struct <anon>* object2
+                         local  int32_t catId1
+                         local  int32_t catId2
+  162  0062462C     10  void OperationCancel(const struct <anon>* this, const struct Operation* )
+  184  0062A9B8     40  void ~LoadMenusOperation(const struct <anon>* this)
+  450  00624644      4  void GameSessionAdded(const struct <anon>* this, struct GameSession* )
+  451  00624650      4  void GameSessionChanged(const struct <anon>* this, struct GameSession* )
+  452  0062465C      4  void GameSessionDeleted(const struct <anon>* this, struct GameSession* )
+  454  00624668      4  void GameSessionLeft(const struct <anon>* this, struct GameSession* , enum GameSessionLeftReason )
+  455  00624674      4  void GameSessionStarted(const struct <anon>* this, struct GameSession* )
+  576  005B9794     E8  int FilterRoomList(void* filtref, int , void* recptr)
+                         local  struct <anon>* pParams
+                         local  LobbyApiRoomT* pRoom
+                         local  const uint32_t uPrefixLength
+  607  005B987C     4C  static int OSDK::_SortForward(void* sortref, int sortcon, void* recptr1, void* recptr2)
+                         local  struct <anon>* pSorter
+                         local  LobbyApiUserT* pUserA
+                         local  LobbyApiUserT* pUserB
+  617  005B98C8     50  static int32_t OSDK::_SortByNameHelper(bool bDescending, LobbyApiUserT* pUserA, LobbyApiUserT* pUserB)
+  628  00624678      8  const char8_t* GetSortingLabel(const struct <anon>* this)
+  629  00624680     10  int32_t SortUsers(const struct <anon>* this, bool bDescending, LobbyApiUserT* pUserA, LobbyApiUserT* pUserB)
+  636  00624690      C  void ~LobbyRoomSortName(const struct <anon>* this)
+  650  006246D4      8  const char8_t* GetSortingLabel(const struct <anon>* this)
+  651  006260EC    170  int32_t SortUsers(const struct <anon>* this, bool bDescending, LobbyApiUserT* pUserA, LobbyApiUserT* pUserB)
+                         local  int32_t pingValueA
+                         local  int32_t pingValueB
+                         local  struct <anon>* pLocalUser
+                         local  int32_t iSort
+  678  006246DC      C  void ~LobbyRoomSortPing(const struct <anon>* this)
+  692  00624720      8  const char8_t* GetSortingLabel(const struct <anon>* this)
+  693  00624728     84  int32_t SortUsers(const struct <anon>* this, bool bDescending, LobbyApiUserT* pUserA, LobbyApiUserT* pUserB)
+                         local  int32_t iLvlA
+                         local  int32_t iLvlB
+                         local  int32_t iSort
+  703  006247AC      C  void ~LobbyRoomSortLevel(const struct <anon>* this)
+  717  006247F0      8  const char8_t* GetSortingLabel(const struct <anon>* this)
+  718  006270FC    158  int32_t SortUsers(const struct <anon>* this, bool bDescending, LobbyApiUserT* pUserA, LobbyApiUserT* pUserB)
+                         local  struct UserManagerConcrete* pUserManager
+                         local  int32_t iInviteA
+                         local  int32_t iInviteB
+                         local  int32_t iSort
+                         inlines  GetUserManagerConcrete
+  729  006247F8      C  void ~LobbyRoomSortInvite(const struct <anon>* this)
+  834  006084DC    120  struct Operation* SendCustomAriesCommand(const struct LobbyConcrete* this, int32_t iCommandCode, struct Dictionary* pParameters, struct <anon>* pCallback)
+                         local  struct Operation* pOperation
+                         local  struct <anon>* pStrategy
+                         inlines  GetLobbyApi
+  874  00608440     9C  void LobbyCustomAriesCommandOperation(const struct <anon>* this, int32_t iCode, struct Dictionary* pParameters, struct <anon>* pCallback)
+  904  006083D8     40  void ~LobbyCustomAriesCommandOperation(const struct <anon>* this)
+  929  005B99E8     4C  void AriesOperationFailure(const struct <anon>* this, int32_t )
+  952  005EF76C    104  bool AriesOperationResult(const struct <anon>* this, LobbyApiMsgT* pMsg)
+                         local  struct <anon> dicResults
+                         local  struct DictionaryConcrete* pCopyOfResults
+  989  005B9A34      4  void AriesOperationCancel(const struct <anon>* this)
+ 1012  00600AA0     B4  void LobbyCategoryDownloadOperation(const struct <anon>* this, struct LobbyCategoryDownloadCallback* pCallback)
+                         local  int32_t iError
+ 1051  006009C0     50  void ~LobbyCategoryDownloadOperation(const struct <anon>* this)
+ 1073  005B9A38     7C  bool OperationProcess(const struct <anon>* this, const struct Operation* )
+                         local  bool bContinue
+ 1115  005B9AB4     68  void HandleRoomListDownload(const struct <anon>* this, LobbyApiMsgT* pMsg)
+                         local  bool bSuccess
+ 1144  005B9B1C     20  void RoomListDownloadCallback(LobbyApiRefT* , LobbyApiMsgT* pMsg, void* pUserData)
+                         local  struct <anon>* pDownload
+ 1178  006002E0    140  void LobbyCreateRoomOperation(const struct <anon>* this, const char8_t* strParameters, struct <anon>* pCallback, struct LobbyConcrete* pLobbyConcrete)
+                         local  struct <anon>* pLocalUser
+                         local  int32_t iError
+                         inlines  GetInstance
+ 1223  00600200     50  void ~LobbyCreateRoomOperation(const struct <anon>* this)
+ 1246  005B9B3C     7C  bool OperationProcess(const struct <anon>* this, const struct Operation* )
+                         local  bool bContinue
+ 1288  005D15C4     48  void OperationCancel(const struct <anon>* this, const struct Operation* )
+ 1311  005DE950    37C  void HandleCreateRoom(const struct <anon>* this, LobbyApiMsgT* pMsg)
+                         local  int32_t iIdentifier
+                         local  struct <anon>* pRoom
+                         inlines  SetCreatedRoomIdentifier
+ 1384  005DECCC      8  void CreateRoomCallback(LobbyApiRefT* pRef, LobbyApiMsgT* pMsg, void* pUserData)
+                         local  struct <anon>* pCreateRoom
+ 1410  005FF8D4    12C  void JoinLobbyRoomOperation(const struct <anon>* this, const char8_t* strParameters, struct <anon>* pCallback)
+                         local  struct <anon>* pLocalUser
+                         local  int32_t iError
+                         inlines  GetInstance
+ 1453  005FF7F4     50  void ~JoinLobbyRoomOperation(const struct <anon>* this)
+ 1478  005B9BB8     7C  bool OperationProcess(const struct <anon>* this, const struct Operation* )
+                         local  bool bContinue
+ 1520  005D160C     48  void OperationCancel(const struct <anon>* this, const struct Operation* )
+ 1543  005DECD4    404  void HandleJoinRoom(const struct <anon>* this, LobbyApiMsgT* pMsg)
+                         local  int32_t iIdentifier
+                         local  struct <anon>* pRoom
+ 1639  005DF0D8      8  void JoinRoomCallback(LobbyApiRefT* pRef, LobbyApiMsgT* pMsg, void* pUserData)
+                         local  struct <anon>* pJoinRoom
+ 1664  00608260     6C  void LeaveLobbyRoomOperation(const struct <anon>* this, const char8_t* strParameters, struct <anon>* pCallback)
+ 1690  006081F8     40  void ~LeaveLobbyRoomOperation(const struct <anon>* this)
+ 1715  005B9C34     48  void AriesOperationFailure(const struct <anon>* this, int32_t )
+ 1740  005CD0DC    194  bool AriesOperationResult(const struct <anon>* this, LobbyApiMsgT* pMsg)
+ 1795  005B9C7C     48  void AriesOperationCancel(const struct <anon>* this)
+ 1819  00602560    118  void LobbyCreateGameOperation(const struct <anon>* this, const char8_t* strParameters, struct <anon>* pCallback)
+                         local  struct <anon>* pLocalUser
+                         local  GameManagerRefT* pGameManager
+                         inlines  GetInstance
+ 1856  006021A4     40  void ~LobbyCreateGameOperation(const struct <anon>* this)
+ 1881  005B9CC4     90  void GameManagerOperationFailedToSend(const struct <anon>* this)
+ 1912  005CCF38    1A4  bool GameManagerOperationResult(const struct <anon>* this, LobbyApiMsgT* pMsg)
+                         local  bool bKeepWaiting
+ 1976  0061F990     E8  bool OperationProcess(const struct <anon>* this, const struct Operation* pOperation)
+                         local  GameManagerRefT* pGameManager
+                         local  int32_t iStatus
+                         local  LobbyApiMsgT* pMsg
+                         local  struct GameSessionManagerConcrete* pGameSessionManager
+                         local  struct GameSession* pGameSession
+ 2026  005B9D54      C  void GameManagerOperationCancel(const struct <anon>* this)
+ 2050  00607E68     6C  void LobbyGetGameOperation(const struct <anon>* this, const char8_t* strParameters, struct <anon>* pCallback)
+ 2076  00607E00     40  void ~LobbyGetGameOperation(const struct <anon>* this)
+ 2081  005B9D60     48  void AriesOperationFailure(const struct <anon>* this, int32_t )
+ 2105  0061F750    240  bool AriesOperationResult(const struct <anon>* this, LobbyApiMsgT* pMsg)
+                         local  struct GameSessionManagerConcrete* pGameSessionManager
+                         local  struct GameSession* pGameSession
+                         local  struct List<OSDK::GameSession>* pList
+                         local  struct List<OSDK::GameSession>* pList
+                         inlines  InsertElement, List
+ 2163  005B9DA8     48  void AriesOperationCancel(const struct <anon>* this)
+ 2188  00607558    168  void LobbySearchGamesOperation(const struct <anon>* this, const char8_t* strParameters, struct <anon>* pCallback)
+                         local  struct <anon> dicParameters
+                         local  struct <anon>* pLocalUser
+                         inlines  GetInstance, RCPointer
+ 2231  0060743C     64  void ~LobbySearchGamesOperation(const struct <anon>* this)
+                         inlines  ~LobbyDispatchObserver, ~RCPointer
+ 2253  005B9DF0     8C  void AriesOperationFailure(const struct <anon>* this, int32_t iFailure)
+ 2284  00604DFC    354  bool AriesOperationResult(const struct <anon>* this, LobbyApiMsgT* pMsg)
+                         local  bool bContinue
+                         local  const char8_t* pData
+                         local  struct List<OSDK::GameSession>* m_pNoGamesFound
+                         local  struct LobbyConcrete* pLobby
+                         local  char8_t[16] strEvent
+                         inlines  GetLobbyConcrete, List, operator=
+ 2360  005F3234     A0  void AriesOperationCancel(const struct <anon>* this)
+ 2391  0061F658     F8  void LobbyDispatch(const struct <anon>* this, const struct Lobby* , LobbyApiMsgT* pMesg)
+                         local  struct GameSessionManagerConcrete* pGameSessionManager
+                         local  struct GameSession* pGameSession
+                         local  struct LobbyConcrete* pLobbyConcrete
+                         inlines  InsertElement
+ 2432  006022C4     D0  void LobbyCancelMatchupGameOperation(const struct <anon>* this, struct LobbyCancelMatchupGameCallback* pCallback)
+                         local  struct <anon> strTagField
+                         local  GameManagerRefT* pGameManager
+                         inlines  GetGameManagerApi, GetTagField
+ 2463  0060213C     40  void ~LobbyCancelMatchupGameOperation(const struct <anon>* this)
+ 2485  005D1858    1BC  bool GameManagerOperationResult(const struct <anon>* this, LobbyApiMsgT* pMsg)
+                         local  bool bContinue
+                         local  struct <anon>* pFacadeConcrete
+                         local  struct GameSession* pGameSession
+                         local  GameManagerRefT* pGameManager
+                         local  int32_t iStatus
+                         inlines  GetInstance
+ 2553  005B9E7C     50  void GameManagerOperationFailedToSend(const struct <anon>* this)
+ 2581  005B9ECC      C  void GameManagerOperationCancel(const struct <anon>* this)
+ 2604  005D1A14     C0  bool OperationProcess(const struct <anon>* this, const struct Operation* pOperation)
+                         local  GameManagerRefT* pGameManager
+                         local  int32_t iStatus
+ 2646  0060AB9C    150  void LobbyMatchupGameOperation(const struct <anon>* this, const char8_t* strParameters, struct <anon>* pCallback)
+                         local  struct <anon>* pLocalUser
+                         local  GameManagerRefT* pGameManager
+                         inlines  RCPointer
+ 2686  0060B0EC     CC  void ~LobbyMatchupGameOperation(const struct <anon>* this)
+                         inlines  operator->, operator=, ~RCPointer
+ 2717  005F8484    198  bool OperationProcess(const struct <anon>* this, const struct Operation* pOperation)
+                         local  struct GameSessionManagerConcrete* pGameSessionManager
+                         local  struct GameSession* pGameSession
+                         local  struct <anon>* pFacade
+                         inlines  GetInstance, RemoveObserver, operator=
+ 2764  005F861C     90  void LobbyCancelMatchupSuccess(const struct <anon>* this)
+                         inlines  operator=
+ 2796  005F86AC     DC  void LobbyCancelMatchupFailed(const struct <anon>* this, enum Failure eFailure)
+                         inlines  operator=
+ 2829  005CD3C8     98  void LobbyCancelMatchupGoInGame(const struct <anon>* this)
+                         local  struct <anon>* pFacade
+                         local  struct GameSession* pGame
+ 2859  005F8788     E4  void GameSessionJoined(const struct <anon>* this, struct GameSession* pSession)
+                         local  struct <anon>* pFacade
+                         inlines  RemoveObserver, operator=
+ 2910  005E1D2C    284  bool GameManagerOperationResult(const struct <anon>* this, LobbyApiMsgT* pMsg)
+                         local  struct <anon>* pFacade
+                         local  bool bContinue
+                         local  struct <anon> dict
+                         local  uint32_t uMaxPlayers
+                         local  int32_t iTotalSlots
+                         local  int32_t iPrivateSlots
+                         local  struct PeerConnectionManagerConcrete* pPeerMgr
+                         local  struct GameSessionManagerConcrete* pGameSessionManager
+                         local  struct GameSession* pGameSession
+                         local  int32_t iIdentifier
+                         inlines  AddObserver, GetGameSessionManagerConcrete
+ 3005  005B9ED8     80  void GameManagerOperationFailedToSend(const struct <anon>* this)
+ 3040  005F886C    11C  void GameManagerOperationCancel(const struct <anon>* this)
+                         local  struct <anon>* pFacade
+                         inlines  RemoveObserver, operator->, operator=
+ 3080  005FF51C     FC  void LobbyFindUserOperation(const struct <anon>* this, const char8_t* strName, struct LobbyGetUserCallback* pCallback)
+                         local  int32_t iError
+ 3109  005FF370     94  void ~LobbyFindUserOperation(const struct <anon>* this)
+ 3117  005CA748     EC  void HandleLobbyFindUser(const struct <anon>* this, LobbyApiUserT* pUser)
+ 3144  005CA834      8  void LobbyFindUserApiCallback(void* pCalldata, const char8_t* , LobbyApiUserT* pUser)
+                         local  struct <anon>* pFind
+ 3153  005B9F58    120  bool OperationProcess(const struct <anon>* this, const struct Operation* )
+                         local  bool bContinue
+ 3186  005CE0E0     B8  void OperationCancel(const struct <anon>* this, const struct Operation* )
+ 3221  00607188     6C  void LobbyGetOnlineStateOperation(const struct <anon>* this, const char8_t* strParameters, struct LobbyGetOnlineStateCallback* pCallback)
+ 3247  00607120     40  void ~LobbyGetOnlineStateOperation(const struct <anon>* this)
+ 3252  005BA078     48  void AriesOperationFailure(const struct <anon>* this, int32_t )
+ 3277  005BA0C0     E8  bool AriesOperationResult(const struct <anon>* this, LobbyApiMsgT* pMsg)
+ 3319  005BA1A8     48  void AriesOperationCancel(const struct <anon>* this)
+ 3344  00606CB8     6C  void LobbySendPrivateMessageOperation(const struct <anon>* this, const char8_t* strParameters, struct MessagePrivateSendCallback* pCallback)
+ 3370  00606C50     40  void ~LobbySendPrivateMessageOperation(const struct <anon>* this)
+ 3375  005BA1F0     48  void AriesOperationFailure(const struct <anon>* this, int32_t )
+ 3400  005BA238     94  bool AriesOperationResult(const struct <anon>* this, LobbyApiMsgT* pMsg)
+ 3440  005BA2CC     48  void AriesOperationCancel(const struct <anon>* this)
+ 3463  005DF6B8    59C  void HandleDispatch(const struct LobbyConcrete* this, LobbyApiMsgT* pMsg)
+                         local  uint32_t uListSize
+                         local  uint32_t uIndex
+                         local  int32_t iRoomIdentifier
+                         local  struct <anon>* pRoom
+                         local  int32_t iCategoryIdentifier
+                         local  struct LobbyDispatchElement* pElement
+                         local  struct <anon> dictMesg
+                         local  struct <anon>* pJoinedRoom
+                         local  struct <anon>* pMessage
+                         local  uint32_t uNumElements
+                         local  struct LobbyRoomObserver** pList
+                         local  uint32_t uPopulation
+                         local  uint32_t uInGamePopulation
+                         local  uint32_t uNumElements
+                         local  struct LobbyObserver** pList
+                         local  uint32_t uNumElements
+                         local  struct LobbyRoomObserver** pList
+                         inlines  GetElementAt, GetMaxNumberOfObservers, GetNumberOfElements, GetObserverList
+ 3614  005CD270    148  void HandleUserListUpdate(const struct LobbyConcrete* this)
+                         local  struct <anon>* pFacade
+                         local  struct <anon>* pUser
+                         local  struct LobbyRoom* pRoom
+                         local  uint32_t uNumElements
+                         local  struct LobbyRoomObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+ 3651  005CD3B8     10  void LobbyApiUserListCallback(LobbyApiRefT* , LobbyApiMsgT* , void* pUserData)
+                         local  struct LobbyConcrete* pLobby
+ 3681  005DFC54     10  void LobbyApiDispatchCallback(LobbyApiRefT* , LobbyApiMsgT* pMsg, void* pUserData)
+                         local  struct LobbyConcrete* pLobby
+ 3710  005DF2A0    418  void ProcessComplete(const struct LobbyConcrete* this)
+                         local  uint32_t uNetConnElapsedTick
+                         local  uint32_t uIndex
+                         local  struct <anon>* pMsg
+                         local  char8_t* strAt
+                         local  int32_t iRoomIdentifier
+                         local  int32_t iPopulation
+                         local  struct <anon>* pRoom
+                         local  int32_t iCategoryIdentifier
+                         local  uint32_t uNumElements
+                         local  struct LobbyCategoryObserver** pList
+                         local  int32_t iRoomIdentifier
+                         local  int32_t iCategoryIdentifier
+                         local  const char8_t* pName
+                         local  char8_t[36] strName
+                         local  LobbyRoomlistT* pRoomListApi
+                         local  uint32_t uNumElements
+                         local  struct LobbyCategoryObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+ 3844  005BA314     10  void AddKeepAliveRequest(const struct LobbyConcrete* this)
+ 3869  005BA324     28  void RemoveKeepAliveRequest(const struct LobbyConcrete* this)
+ 3903  00600B54     F8  struct Operation* LobbySetupStartOperation(const struct LobbyConcrete* this, struct LobbySetupStrategyCallback* pCallback)
+                         local  struct <anon>* pDownload
+                         inlines  GetOperationManagerConcrete, operator=
+ 3936  005F8988     90  void LobbyCategoryDownloadComplete(const struct LobbyConcrete* this, bool bSuccess)
+                         inlines  operator=
+ 3972  005BA34C     FC  void LobbyDispatch(const struct LobbyConcrete* this, const struct Lobby* , LobbyApiMsgT* pMesg)
+                         local  char8_t[17] strName
+                         local  char8_t[1028] strText
+                         local  char8_t[1028] strMessage
+ 4033  005CEA8C     84  LobbyRoomlistT* CreateRoomlistApi()
+                         local  LobbyRoomlistT* pApi
+                         local  LobbyApiRefT* pLobbyApi
+ 4063  005CEB10     64  void DestroyRoomlistApi(LobbyRoomlistT* pRef)
+                         local  LobbyApiRefT* pLobbyApi
+ 4091  00612530    6F8  void LobbyConcrete(const struct LobbyConcrete* this)
+                         local  LobbyApiRefT* pLobbyApi
+                         local  struct MemoryStrategy* pMemoryStrategy
+                         local  const char8_t* strConfig
+                         local  const LobbyApiUserT* pUserInfo
+                         local  uint32_t uLocality
+                         local  const struct DictionaryConcrete* pServerConfig
+                         local  char8_t[8] strLoc
+                         inlines  AddObserver, GetLobbyApi, GetServerConfiguration, List, LobbyCategoryDownloadCallback, LobbyDispatchElementComparator, LobbyDispatchObserver, LobbyMenusInternalCallback, LobbyRoomSortInvite, LobbyRoomSortLevel, LobbyRoomSortName, LobbyRoomSortPing, LobbySetupStrategy, RCPointer, operator=
+ 4192  00613320    3B4  void ~LobbyConcrete(const struct LobbyConcrete* this)
+                         local  LobbyApiRefT* pLobbyApi
+                         local  struct MemoryStrategy* pMemoryStrategy
+                         inlines  GetLobbyApi, RemoveAllInternal, RemoveObserver, operator->, operator=, ~List, ~LobbyCategoryDownloadCallback, ~LobbyDispatchElementComparator, ~LobbyDispatchObserver, ~LobbyMenusInternalCallback, ~LobbySetupStrategy, ~RCPointer
+ 4259  005ED780     E8  void AddDispatchObserver(const struct LobbyConcrete* this, struct LobbyDispatchObserver* pObserver, int32_t iMessageType)
+                         local  struct LobbyDispatchElement* pElement
+                         inlines  ElementExists, InsertElement, LobbyDispatchElement
+ 4296  005F31A8     8C  void RemoveDispatchObserver(const struct LobbyConcrete* this, struct LobbyDispatchObserver* pObserver, int32_t iMessageType)
+                         local  struct <anon> Element
+                         inlines  LobbyDispatchElement, RemoveElement, ~LobbyDispatchElement
+ 4327  005FC130    308  struct List<OSDK::User>* GetUserList(const struct LobbyConcrete* this, const char8_t* strRoomName)
+                         local  const char8_t* strLocalRoom
+                         local  int32_t iListSize
+                         local  bool bLocalUserInList
+                         local  const struct <anon>* pLocalUser
+                         local  RCUserList* pList
+                         local  int32_t iIndex
+                         local  int32_t iIndex
+                         local  LobbyApiUserT* pUser
+                         local  LobbyApiUserT* pUser
+                         local  struct <anon>* pSorter
+                         inlines  GetInstance, GetUserManagerConcrete, InsertElement, List
+ 4395  0060E440    21C  struct List<OSDK::UserConcrete>* GetUserConcreteList(const struct LobbyConcrete* this, const char8_t* strRoomName)
+                         local  struct List<OSDK::UserConcrete>* pList
+                         local  const char8_t* strLocalRoom
+                         local  int32_t iListSize
+                         local  int32_t iIndex
+                         local  LobbyApiUserT* pUser
+                         inlines  InsertElement, List
+ 4445  005D1654     98  LobbyApiRoomT* GetApiRoomByIdentifier(const const struct <anon>* this, int32_t iIdentifier)
+                         local  LobbyApiRoomT* pRoom
+                         local  DispListT* pItem
+                         local  DispListRef* pList
+ 4480  005D16EC     44  bool GetApiRoomByName(const const struct <anon>* this, const char8_t* strName, LobbyApiRoomT* pRoom)
+                         local  int32_t iCategory
+ 4506  005D6E80    148  struct <anon>* GetJoinedRoom(const struct LobbyConcrete* this)
+                         local  struct <anon>* pLobbyRoom
+                         local  const char8_t* strLocalRoom
+                         local  LobbyApiRoomT ApiRoom
+ 4563  005FFBDC    4D0  struct Operation* JoinRoom(const struct LobbyConcrete* this, const struct LobbyRoom* pRoom, const char8_t* strPassword, struct <anon>* pCallback)
+                         local  LobbyApiRoomT* pApiRoom
+                         local  char8_t[64] strTagField
+                         local  int32_t iIdErr
+                         local  struct <anon>* pJoinRoom
+                         local  struct <anon>* pLocalUser
+                         local  const char8_t* pszName
+                         local  const struct <anon>* pUser
+                         local  LobbyApiRoomCriteriaT userCrit
+                         local  LobbyApiRoomCriteriaT roomCrit
+                         local  int32_t failIndex
+                         local  int32_t iIndex
+                         local  int32_t iPassErr
+                         local  struct User* pUser
+                         local  bool isFriend
+                         local  const char8_t* pEvent
+                         local  enum Failure eFailure
+                         inlines  GetOperationManagerConcrete, GetUserManagerConcrete
+ 4691  005FFA00    1DC  struct Operation* RejoinRoom(const struct LobbyConcrete* this, struct <anon>* pCallback)
+                         local  struct <anon>* pFacade
+                         local  char8_t[33] strLobbyRoomName
+                         local  char8_t[17] strLobbyRoomPassword
+                         local  char8_t[32] strTagField
+                         local  int32_t iIdErr
+                         local  struct <anon>* pJoinRoom
+                         local  int32_t iPassErr
+                         inlines  GetInstance, GetOperationManagerConcrete
+ 4754  006082CC     88  struct Operation* LeaveRoom(const struct LobbyConcrete* this, struct <anon>* pCallback)
+                         inlines  SetCreatedRoomIdentifier
+ 4781  005FF618     E0  struct Operation* GetUser(const struct LobbyConcrete* this, const char8_t* strName, struct LobbyGetUserCallback* pCallback)
+                         local  struct <anon>* pFind
+                         inlines  GetOperationManagerConcrete
+ 4807  006071F4     E8  struct Operation* GetOnlineState(const struct LobbyConcrete* this, const char8_t* strName, struct LobbyGetOnlineStateCallback* pCallback)
+                         local  struct <anon> params
+                         inlines  GetTagField
+ 4832  005CEB74     44  uint32_t GetPopulation(const const struct <anon>* this)
+ 4856  005CEBB8     44  uint32_t GetInGamePopulation(const const struct <anon>* this)
+                         local  const void* pTemp
+                         local  const LobbyApiServerStatT* pStats
+ 4880  005D4AB0      8  const struct Dictionary* GetConfiguration(const const struct <anon>* this)
+ 4902  006042A4    1D0  const LobbyCategoryList* GetCategories(const const struct <anon>* this)
+                         local  LobbyRoomlistT* pRoomListApi
+                         local  int32_t iCategoryCount
+                         local  RCLobbyCategoryList* pCategoryList
+                         local  int32_t iIndex
+                         local  struct <anon>* pLobbyCategory
+                         local  const struct <anon>* pRoomList
+                         inlines  InsertElement, List, LobbyCategoryComparator
+ 4955  005F2034     B8  struct LobbyCategory* GetCategoryByIdentifier(const struct LobbyConcrete* this, int32_t iIdentifier)
+                         local  struct LobbyCategory* pLobbyCategory
+                         local  LobbyRoomlistT* pRoomListApi
+                         local  int32_t iCategoryCount
+ 4989  005D6DF0     90  struct LobbyRoom* GetRoomByIdentifier(const struct LobbyConcrete* this, int32_t iIdentifier)
+                         local  struct <anon>* pLobbyRoom
+                         local  LobbyApiRoomT* pApiRoom
+ 5019  005D6D50     A0  struct LobbyRoom* GetRoomByName(const struct LobbyConcrete* this, const char8_t* strName)
+                         local  struct <anon>* pLobbyRoom
+                         local  LobbyApiRoomT ApiRoom
+ 5059  00600788     F8  struct Operation* CreateRoom(const struct LobbyConcrete* this, const char8_t* strName, const char8_t* strPassword, uint32_t uCapacity, const char8_t* strDescription, int32_t iRequiredLevelRange, int32_t iRequiredDnf, bool bFriendsOnly, const struct Dictionary* pConfiguration, struct <anon>* pCallback)
+                         local  const char8_t* pLobbyPrefix
+ 5097  00600420    368  struct Operation* CreateRoom(const struct LobbyConcrete* this, const char8_t* strPrefix, const char8_t* strName, const char8_t* strPassword, uint32_t uCapacity, const char8_t* strDescription, int32_t iRequiredLevelRange, int32_t iRequiredDnf, bool bFriendsOnly, bool bJoinIfFail, const struct Dictionary* pConfiguration, struct <anon>* pCallback)
+                         local  struct <anon> CreateRoomState
+                         local  char8_t[36] strRealName
+                         local  const char8_t* pRoomName
+                         local  const struct TelemetryRoomKeysT[7] PossibleKeys
+                         local  const uint32_t uPossibleKeySize
+                         local  struct <anon>* pCreateRoom
+                         inlines  GetOperationManagerConcrete, GetTagField
+ 5192  005CCCC0    278  void TelemetryRecordParameters(const struct LobbyConcrete* this, const struct DictionaryConcrete* pConfig, uint32_t uModuleID, uint32_t uGroupID, const struct TelemetryRoomKeysT* pPossibleKeys, uint32_t uPossibleKeysSize)
+                         local  char8_t[16] strEvent
+                         local  const struct TelemetryRoomKeysT* pEntry
+                         local  uint32_t uLoop
+                         local  char8_t[16] pTempKeyValue
+                         local  bool bIsPasswordKey
+                         local  bool bIsFieldEmpty
+ 5239  006080A4     E8  struct Operation* GetGameByIdentifier(const struct LobbyConcrete* this, int32_t iIdentifier, struct <anon>* pCallback)
+                         local  struct <anon> TagField
+                         inlines  GetTagField
+ 5249  00607FBC     E8  struct Operation* GetGameByName(const struct LobbyConcrete* this, const char8_t* strName, struct <anon>* pCallback)
+                         local  struct <anon> TagField
+                         inlines  GetTagField
+ 5259  00607ED4     E8  struct Operation* GetGameBySession(const struct LobbyConcrete* this, const char8_t* strSession, struct <anon>* pCallback)
+                         local  struct <anon> TagField
+                         inlines  GetTagField
+ 5299  005BA460    158  struct Operation* CreateGame(const struct LobbyConcrete* this, int32_t iGameMode, const char8_t* strName, const char8_t* strPassword, bool bRanked, bool bChallenge, bool bKeepHistory, const struct LobbyRoom* pParentRoom, uint32_t uMinimumUsers, uint32_t uMaximumUsers, uint32_t uPrivateSlots, uint32_t uFlags, uint32_t uMaximumDnf, uint32_t uLevelRange, const struct Dictionary* pCreateGameParameters, struct <anon>* pCallback)
+                         local  struct CreateGameParams params
+ 5341  00602678    344  struct Operation* CreateGame(const struct LobbyConcrete* this, const struct CreateGameParams* pParams, struct <anon>* pCallback)
+                         local  struct <anon> GameSessionTagField
+                         local  int32_t iMaxPublic
+                         local  int32_t iMaxPrivate
+                         local  struct PeerConnectionManagerConcrete* pPeerMgr
+                         local  uint32_t uGroupID
+                         local  struct OperationStrategy* pOp
+                         local  char8_t[16] strEvent
+                         local  bool bAllGSParametersZero
+                         local  uint32_t uIndex
+                         local  char8_t[8] strField
+                         local  int32_t iParameterValue
+                         inlines  GetOperationManagerConcrete, GetTagField
+ 5454  005BA5B8     A8  struct Operation* SearchGames(const struct LobbyConcrete* this, bool bAsyncUpdates, int32_t iGameMode, const char8_t* strName, enum RankCriteria eRanked, uint32_t uMinimumUsers, uint32_t uMaximumUsers, uint32_t uFlags, uint32_t uFlagMask, const struct LobbyRoom* pParentRoom, uint32_t uMaximumDnf, uint32_t uLevelRange, const struct Dictionary* pSearchParameters, struct <anon>* pCallback)
+ 5491  006077D4    4C4  struct Operation* SearchGames(const struct LobbyConcrete* this, bool bAsyncUpdates, int32_t iGameMode, const char8_t* strName, enum RankCriteria eRanked, uint32_t uIndex, uint32_t uCount, uint32_t uMinimumUsers, uint32_t uMaximumUsers, uint32_t uFlags, uint32_t uFlagMask, const struct LobbyRoom* pParentRoom, uint32_t uMaximumDnf, uint32_t uLevelRange, const struct Dictionary* pSearchParameters, struct <anon>* pCallback)
+                         local  struct <anon> tagField
+                         local  uint32_t uMyLevel
+                         local  struct <anon> EncodedSearch
+                         local  bool bAllGSValuesZero
+                         local  uint32_t uIndex
+                         local  char8_t[8] strField
+                         local  int32_t iParameterValue
+                         local  char8_t[16] strMatchParameters
+                         inlines  ConvertToString
+ 5639  006076C0    114  void CancelSearchAsyncUpdates(const struct LobbyConcrete* this)
+                         local  struct <anon> tagField
+                         inlines  ConvertToString, operator=
+ 5670  005F8A18     40  void LobbySearchGamesSuccess(const struct LobbyConcrete* this, const LobbyGameList* )
+                         inlines  operator=
+ 5696  005F8A58     84  void LobbySearchGamesFailure(const struct LobbyConcrete* this, enum Failure eFailure)
+                         inlines  operator=
+ 5736  0060AE3C    2B0  struct Operation* MatchupGame(const struct LobbyConcrete* this, int32_t iGameMode, const char8_t* strMatchMode, enum RankCriteria eRanked, uint32_t uMinimumUsers, uint32_t uMaximumUsers, uint32_t uFlags, uint32_t uFlagMask, uint32_t uMaximumDnf, uint32_t uLevelRange, const struct Dictionary* pMatchupGameParameters, const struct Dictionary* pCreateGameParameters, struct <anon>* pCallback)
+                         local  struct <anon> tagField
+                         local  struct OperationManagerConcrete* pOperationMgr
+                         inlines  ConvertToString, GetOperationManagerConcrete
+ 5834  00602394     FC  struct Operation* CancelMatchupGame(const struct LobbyConcrete* this, struct LobbyCancelMatchupGameCallback* pCallback)
+                         local  struct OperationManagerConcrete* pOperationMgr
+                         inlines  GetOperationManagerConcrete
+ 5862  005FDBF4     68  struct Operation* Ping(const struct LobbyConcrete* this, uint32_t uTimeout, struct PingCallback* pCallback)
+                         local  struct Operation* pReturn
+ 5889  005D4A00     54  void GetBillboardURL(const const struct <anon>* this, char8_t* strBuffer, uint32_t uBufferSize)
+                         inlines  operator->
+ 5913  005D4A54     54  void GetBillboardText(const const struct <anon>* this, char8_t* strBuffer, uint32_t uBufferSize)
+                         inlines  operator->
+ 5939  00606D24    118  struct Operation* SendPrivateMessage(const struct LobbyConcrete* this, const char8_t* strName, bool bUserSet, uint32_t uFlags, const char8_t* strMessage, struct MessagePrivateSendCallback* pCallback)
+                         local  int32_t iErr
+                         local  char8_t[1028] strTagField
+ 5986  005D535C     48  bool AddSortCriteria(const struct LobbyConcrete* this, struct <anon>* pSorter)
+                         inlines  InsertElement
+ 6015  005BA800     54  const char8_t* GetSortCriteriaString(const struct LobbyConcrete* this)
+                         local  struct <anon>* pSorter
+                         inlines  GetElementAt
+ 6041  005D53A4     7C  void CycleSortCriteria(const struct LobbyConcrete* this, int32_t iDirection)
+ 6085  00606808     6C  void LoadMenusOperation(const struct <anon>* this, const char8_t* strParameters, struct LobbyMenusInternalCallback* pCallback)
+ 6092  005BA854     48  void AriesOperationFailure(const struct <anon>* this, int32_t )
+ 6116  005BA89C     94  bool AriesOperationResult(const struct <anon>* this, LobbyApiMsgT* pMsg)
+ 6163  005BA930     48  void AriesOperationCancel(const struct <anon>* this)
+ 6188  005F8ADC    14C  void LoadMenusSuccess(const struct LobbyConcrete* this, const char8_t* strData)
+                         local  struct DictionaryConcrete* pMerge
+                         inlines  operator->, operator=
+ 6217  00606B3C     A8  void LoadMenusFailure(const struct LobbyConcrete* this, enum Failure eFail)
+                         inlines  operator=
+ 6265  00606874    2C8  void GetWebConfig(const struct LobbyConcrete* this, enum Request eReq)
+                         local  char8_t[8] strLocale
+                         local  char8_t[32] strName
+                         local  struct User* pUser
+                         local  struct User* pUser
+                         inlines  operator=
+ 6322  005D1730    128  void SetRoomListFilter(const struct LobbyConcrete* this)
+                         local  struct User* pUser
+ 6350  005F0898     E0  void SetUserFlag(const struct LobbyConcrete* this, uint32_t uFlag)
+                         local  LobbyApiRefT* pLobbyApi
+                         local  const LobbyApiUserT* pUserInfo
+                         local  uint32_t uFlags
+                         local  struct <anon> dict
+                         inlines  GetLobbyApi, GetTagField
+ 6385  005F0978    100  void ClearUserFlag(const struct LobbyConcrete* this, uint32_t uFlag)
+                         local  LobbyApiRefT* pLobbyApi
+                         local  const LobbyApiUserT* pUserInfo
+                         local  uint32_t uFlags
+                         local  struct <anon> dict
+                         inlines  GetLobbyApi, GetTagField
+ 6422  005BA978     3C  void LocalizeData(const struct LobbyConcrete* this, uint32_t uType, const char8_t* strSource, char8_t* strBuffer, uint32_t uBufferSize)
+                         local  int32_t iResult
+ 6451  005CDBD4    108  int32_t LobbyLocalizeHandler(int32_t iType, char8_t* pBuffer, int32_t iBufLen, const char8_t* pSource, void* pUserData)
+                         local  int32_t iResult
+                         local  int32_t iValue
+                         inlines  GetInstance
+ 6497  005CEBFC     44  void SetServerTransactionTimeout(const struct LobbyConcrete* this, uint32_t uTimeout)
+                         local  LobbyApiRefT* pLobbyApi
+ 6526  005CEC40     44  void RestoreServerTransactionTimeout(const struct LobbyConcrete* this)
+                         local  LobbyApiRefT* pLobbyApi
+ 6554  005BA660    19C  void SetRankCriteria(const struct LobbyConcrete* this, struct DictionaryConcrete* pTagField, enum RankCriteria eRanked)
+                         local  int32_t iSysFlags
+                         local  int32_t iSysMask
+ 6601  005BA7FC      4  void SetPlatformSearchCriteria(const struct LobbyConcrete* this, struct DictionaryConcrete* pTagField, int32_t iGameMode, enum RankCriteria eRanked)

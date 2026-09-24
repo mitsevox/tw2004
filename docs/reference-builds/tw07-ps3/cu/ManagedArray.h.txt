@@ -1,0 +1,20 @@
+// ../ears_common/dev/include/ears_common/ManagedArray.h
+// compiled in: InstVars.cpp
+// 8 functions, source order. line | PS3 address | size
+
+  159    inline-only   void ManagedArray<float>::Clear(const struct ManagedArray<float>* this)
+                         local  int32_t i
+  183    inline-only   void ManagedArray<float>::UpsizePwr2(const struct ManagedArray<float>* this)
+                         local  uint32_t newMaxElem
+  195    inline-only   void ManagedArray<float>::Reserve(const struct ManagedArray<float>* this, uint32_t capacity)
+                         local  float* newArr
+                         local  uint32_t i
+                         local  float* pOld
+  227    inline-only   void ManagedArray<float>::Resize(const struct ManagedArray<float>* this, uint32_t size)
+                         local  uint32_t i
+                         local  int32_t iSize
+                         local  int32_t i
+  252    inline-only   uint32_t ManagedArray<float>::Size(const const struct ManagedArray<float>* this)
+  319    inline-only   void ManagedArray<float>::Add(const struct ManagedArray<float>* this, const const float& obj)
+  498    inline-only   const float& ManagedArray<float>::operator[](const const struct ManagedArray<float>* this, uint32_t idx)
+  505    inline-only   float& ManagedArray<float>::operator[](const struct ManagedArray<float>* this, uint32_t idx)

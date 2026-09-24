@@ -1,0 +1,83 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/frontend/FE_GameFace_Appearance.cpp
+// compiled in: apt_unity.cpp
+// 11 functions, source order. line | PS3 address | size
+
+  153  00021390     18  void FEGameFaceAppearance::FEGameFaceAppearance(const struct FEGameFaceAppearance* this)
+  157  000213C0     18  void FEGameFaceAppearance::~FEGameFaceAppearance(const struct FEGameFaceAppearance* this)
+  161  00021428     BC  void FEGameFaceAppearance::SetupSubcategoryIndicies(const struct FEGameFaceAppearance* this)
+                         local  int32 tableSize
+                         local  int32 i
+                         local  const char* subStr
+  178  000214E4     C0  struct GFAppFeatureDef* FEGameFaceAppearance::GetFeatureDefFromKey(const struct FEGameFaceAppearance* this, enum GFAppFeatureKey featureKey)
+                         local  int32 i
+                         local  int32 tableSize
+                         local  struct GFAppFeatureDef* retVal
+  195  000215A4     58  bool FEGameFaceAppearance::FeatureUsesSlider(const struct FEGameFaceAppearance* this, enum GFAppFeatureKey featureKey)
+                         local  struct GFAppFeatureDef* feature
+  216  000215FC     40  bool FEGameFaceAppearance::IsBlenderFeature(const struct FEGameFaceAppearance* this, enum GFAppFeatureKey featureKey)
+                         local  struct GFAppFeatureDef* feature
+  234  0002163C     54  bool FEGameFaceAppearance::IsGeoLoadFeature(const struct FEGameFaceAppearance* this, enum GFAppFeatureKey featureKey)
+                         local  struct GFAppFeatureDef* feature
+  255  0008C43C    164  int32 FEGameFaceAppearance::GetNumOptionsForFeature(const struct FEGameFaceAppearance* this, enum GFAppFeatureKey featureKey)
+                         local  int32 numOptions
+                         local  struct GFAppFeatureDef* feature
+                         local  FE_CrAP_Asset_Category_e category
+                         local  int32 subcat
+                         local  bool bMustBuy
+  320  0008DAD8    45C  int32 FEGameFaceAppearance::GetFeatureCurrentValue(const struct FEGameFaceAppearance* this, enum GFAppFeatureKey featureKey)
+                         local  int32 curGameVal
+                         local  struct GFAppFeatureDef* feature
+                         local  enum GFAppFeatureSpecialType specialType
+                         local  FE_CrAP_Asset_Category_e category
+                         local  int32 subcat
+                         local  bool bMustBuy
+                         local  int32 index
+                         local  struct FE_CrAP_Asset_t* asset
+                         local  struct FE_CrAP_Asset_t* tmpAsset
+                         local  int32 i
+                         local  int32 count
+                         local  int32 slider
+                         local  const struct UserInfo& userInfo
+                         local  struct CrAPInfo_t* userCrapInfo
+                         local  uint8 val
+                         local  float pct
+                         local  struct FaceBlend* faceBlender
+                         local  float curVal
+                         local  float pct
+                         local  uint8 val
+                         local  uint8 val1
+                         local  uint8 val2
+                         local  int32 unfilteredEntryNum
+  466  0008D820    2B8  void FEGameFaceAppearance::GetFeatureCurValText(const struct FEGameFaceAppearance* this, enum GFAppFeatureKey featureKey, char* strBuf, int32 bufSize, int32 itemOptionIndex)
+                         local  struct GFAppFeatureDef* feature
+                         local  FE_CrAP_Asset_Category_e category
+                         local  int32 subcat
+                         local  bool bMustBuy
+                         local  struct FE_CrAP_Asset_t* asset
+                         local  struct FE_CrAP_Asset_p ast
+                         local  char[32] tmpBuf
+                         local  enum GFAppFeatureSpecialType specialType
+                         local  int32 unfilteredEntryNum
+                         inlines  FE_CrAP_Asset_p::FE_CrAP_Asset_p
+  557  000AF8D8    804  void FEGameFaceAppearance::SetFeatureCurrentValue(const struct FEGameFaceAppearance* this, enum GFAppFeatureKey featureKey, int32 value)
+                         local  struct GFAppFeatureDef* feature
+                         local  int32 itemOptionIndex
+                         local  FE_CrAP_Asset_Category_e category
+                         local  int32 subcat
+                         local  bool bMustBuy
+                         local  int32 assetID
+                         local  enum CrAP_Slider_e slider
+                         local  struct FaceBlend* faceBlender
+                         local  int8 val
+                         local  int8 val
+                         local  enum GFAppFeatureSpecialType specialType
+                         local  float val1
+                         local  float val2
+                         local  enum GFAppRawDataType dataType
+                         local  uint8* pData
+                         local  const int32 iDataSize
+                         local  const int32 iDataSize
+                         local  int8 oldHandedness
+                         local  int32 whichToggle
+                         local  float val
+                         local  int32 unfilteredEntryNum

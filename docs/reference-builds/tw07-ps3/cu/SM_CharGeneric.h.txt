@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/Lo-Rendering/ShaderWrappers/SM_CharGeneric.h
+// compiled in: shader_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   21  00521218     18  void SM_CharGenericClass::~SM_CharGenericClass(const struct SM_CharGenericClass* this)
+                         inlines  SM_Shader_Base::~SM_Shader_Base

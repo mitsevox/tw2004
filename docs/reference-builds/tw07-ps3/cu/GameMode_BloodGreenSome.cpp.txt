@@ -1,0 +1,96 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_BloodGreenSome.cpp
+// compiled in: golf_unity.cpp
+// 31 functions, source order. line | PS3 address | size
+
+   24  001FD68C     C0  void GameModeBloodGreenSome::Init(const struct GameModeBloodGreenSome* this)
+   45  001FD74C     30  void GameModeBloodGreenSome::Shutdown(const struct GameModeBloodGreenSome* this)
+   58  001FD77C     64  bool GameModeBloodGreenSome::QueryInterface(const struct GameModeBloodGreenSome* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bRet
+   72  001FD7E0     20  void GameModeBloodGreenSome::LoadHole(const struct GameModeBloodGreenSome* this)
+   79  001FD800      4  void GameModeBloodGreenSome::EndGame(const struct GameModeBloodGreenSome* this)
+  132  001FD804     38  int32 GameModeBloodGreenSome::GetEndGameSequence(const struct GameModeBloodGreenSome* this)
+                         local  int32 sequence
+  143  001FD83C     44  enum eLoadingScreens GameModeBloodGreenSome::GetFirstLoadingScreen(const struct GameModeBloodGreenSome* this)
+  157  0021C718     44  const char* GameModeBloodGreenSome::GetModeName(const struct GameModeBloodGreenSome* this)
+  170  0021C6D4     44  char* GameModeBloodGreenSome::NumPlyReqStrID(const struct GameModeBloodGreenSome* this)
+  185  001FD880     44  enum eLoadingScreens GameModeBloodGreenSome::GetLastLoadingScreen(const struct GameModeBloodGreenSome* this)
+  198  00305698    288  void GameModeBloodGreenSome::SetupNextGolfer(const struct GameModeBloodGreenSome* this)
+                         local  enum PlayerNumber_t playerChooseBall
+                         local  int32 i
+                         inlines  PhysicsBall_t::ClearFlag, PhysicsBall_t::SetFlag
+  244  0032161C    3F8  enum PlayerNumber_t GameModeBloodGreenSome::GetHonors(const struct GameModeBloodGreenSome* this, enum PlayerNumber_t ignore, bool doNotIgnoreHoledOut)
+                         local  enum PlayerNumber_t honoredPlayer
+                         local  int32 currentTeamTeeFirstHonors
+                         local  int32 nextTeamTeeFirstHonors
+                         local  enum PlayerNumber_t[4] currentTeeHonors
+                         local  uint8 j
+                         local  int32 team0Score
+                         local  int32 team1Score
+                         local  enum PlayerNumber_t firstBallPlayer
+                         local  enum PlayerNumber_t secondBallPlayer
+                         inlines  GM_GetCurrentHoleIndex
+  344  00321BC8     C0  enum PlayerNumber_t GameModeBloodGreenSome::GetHoleWinner(const const struct GameModeBloodGreenSome* this)
+  358  001FD8C4     18  void GameModeBloodGreenSome::SetBloodGreenSomeMode(const struct GameModeBloodGreenSome* this, enum BGS_ModeType_t mode)
+  363  001FD8DC     18  enum BGS_ModeType_t GameModeBloodGreenSome::GetCurrentBloodGreenSomeMode(const const struct GameModeBloodGreenSome* this)
+  368  0031F25C    210  void GameModeBloodGreenSome::EndGolferTurn(const struct GameModeBloodGreenSome* this, enum PlayerNumber_t PlayerID)
+                         local  enum PlayerNumber_t ePlayerToSet
+                         local  enum PlayerNumber_t ePlayerToSet
+                         inlines  GetGamePlayerTeam, PLR_HoledOut
+  413  002C7338    170  void GameModeBloodGreenSome::AfterShotButBeforePostReaction(const struct GameModeBloodGreenSome* this, enum PlayerNumber_t PlayerID)
+  431  001FD8F4     40  bool GameModeBloodGreenSome::RenderBallTarget(const struct GameModeBloodGreenSome* this, enum PlayerNumber_t PlayerID)
+  436  0024BE58     20  bool GameModeBloodGreenSome::RenderBallTargetText(const struct GameModeBloodGreenSome* this, enum PlayerNumber_t PlayerID, bool* bHideMarker)
+  445  002EB580    290  void GameModeBloodGreenSome::BallSelectInit(enum PlayerNumber_t PlayerID)
+                         local  vec4flt fadeColor
+                         local  CameraController_t* pCameraController
+                         inlines  AIMgr, GamePlayer::GetCharacter, GamePlayer::SetDistanceToPin, cGAME_GLOBALS::SetReplayActive
+  496  002D1B5C    8F8  void GameModeBloodGreenSome::BallSelectUpdate(enum PlayerNumber_t PlayerID)
+                         local  bool sDelayStateChange
+                         local  enum PlayerNumber_t playerSelectingID
+                         local  enum PlayerNumber_t teammateSelectingID
+                         local  enum PlayerNumber_t teamMateID
+                         local  uint32 pID
+                         local  enum PlayerNumber_t firstUpID
+                         local  enum PlayerNumber_t teamMateUpNext
+                         local  int currentTeam
+                         local  enum PlayerNumber_t selectedID
+                         local  enum PlayerNumber_t firstUpID
+                         local  enum PlayerNumber_t teamMateUpNext
+                         local  int currentTeam
+                         local  enum PlayerNumber_t eFirstUpID
+                         local  uint32 pID
+                         inlines  GetGamePlayerTeam, PhysicsBall_t::ClearFlag, PhysicsBall_t::SetFlag
+  731  002EB504     7C  void GameModeBloodGreenSome::BallSelectExit(enum PlayerNumber_t PlayerID)
+  751  002EB454     B0  void GameModeBloodGreenSome::ZoomInit(enum PlayerNumber_t PlayerID)
+                         local  enum PlayerNumber_t otherPlayer
+                         local  char[32] szTargetText
+  776  00257EEC    190  void GameModeBloodGreenSome::ZoomUpdate(enum PlayerNumber_t PlayerID)
+                         local  enum PlayerNumber_t playerSelectingID
+                         local  enum PlayerNumber_t teammateSelectingID
+  823  002EB3D4     80  void GameModeBloodGreenSome::ZoomExit(enum PlayerNumber_t PlayerID)
+  837  001F1F98     18  void GameModeBloodGreenSome::NotifyOtherBallInView(bool bInView)
+  851  002807F0    224  enum PlayerNumber_t GameModeBloodGreenSome::SelectAIPlayer(enum PlayerNumber_t playerID1, enum PlayerNumber_t playerID2, bool best)
+                         local  float lieScore1
+                         local  float lieScore2
+                         local  vec4flt vecToTarget
+                         local  float distance1
+                         local  float distance2
+                         local  const float* cupLocation
+                         local  float normalizedScore2
+                         inlines  AIMgr, LLMath_Subtract3, std::sqrt
+  891  0024A104     84  bool GameModeBloodGreenSome::IsTeamOffTee(const const struct GameModeBloodGreenSome* this, int32 teamNum)
+                         local  bool rval
+                         local  enum PlayerNumber_t plr1
+                         local  enum PlayerNumber_t plr2
+  908  00321A14    1B4  bool GameModeBloodGreenSome::TeamHoledInOne(const const struct GameModeBloodGreenSome* this, int32 teamNum)
+                         local  int32 currHole
+                         local  enum PlayerNumber_t plr1
+                         local  enum PlayerNumber_t plr2
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, PLR_HoledOut
+  928  00321C88    418  bool GameModeBloodGreenSome::HoleFinished(const struct GameModeBloodGreenSome* this, enum PlayerNumber_t PlayerID, bool predict)
+                         local  int32 holecount
+                         local  int32 i
+                         inlines  GM_GetCurrentHoleIndex, PLR_HoledOut
+  986  00295D48     E4  bool GameModeBloodGreenSome::TeamDone(const const struct GameModeBloodGreenSome* this, int32 teamNum)
+                         local  enum PlayerNumber_t plr1
+                         local  enum PlayerNumber_t plr2
+                         inlines  PLR_HoledOut

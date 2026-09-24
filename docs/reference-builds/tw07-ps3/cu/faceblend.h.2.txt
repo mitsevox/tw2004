@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/animation/Headers/faceblend.h
+// compiled in: golf2_unity.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   34  0013E15C     C0  void FaceBlend::~FaceBlend(const struct FaceBlend* this)
+                         local  bool dashboardAutoUpdating
+   44  0013DEE0    150  void FaceBlend::FaceBlend(const struct FaceBlend* this, struct DynTex* dynTex, struct DynTexGroupT* outputDynTex)
+                         local  int i
+                         inlines  TexComp::AllowMissingTextures
+   95    inline-only   void FaceBlend::Pause(const struct FaceBlend* this)
+   96    inline-only   void FaceBlend::Resume(const struct FaceBlend* this)
+  107    inline-only   void FaceBlend::SetIsBlending(const struct FaceBlend* this, bool bStatus)

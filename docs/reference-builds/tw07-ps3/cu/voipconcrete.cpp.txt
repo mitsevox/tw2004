@@ -1,0 +1,26 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/voipconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   74  005E4A8C     34  void VoipConcrete(const struct VoipConcrete* this)
+   98  005E4B38      C  void ~VoipConcrete(const struct VoipConcrete* this)
+  122  0060DB44    188  void ToggleMute(const struct VoipConcrete* this)
+                         local  VoipRefT* pVoip
+                         local  const struct List<OSDK::VoiceUser>* pVoiceUsers
+                         local  uint32_t uNumUsers
+                         local  bool bUsersMuted
+                         local  uint32_t uMask
+                         local  uint32_t uIndex
+                         local  struct <anon>* pUser
+                         inlines  GetInstance, GetNumberOfElements
+  184  005CE22C     54  const struct List<OSDK::VoiceUser>* GetUsers(const const struct <anon>* this)
+                         local  struct <anon>* pFacade
+                         local  struct PeerConnectionManagerConcrete* pPeerMgr
+                         local  const struct List<OSDK::VoiceUser>* pVoiceUsers
+                         inlines  GetPeerConnectionManagerConcrete
+  212  005D1210     98  struct VoiceUser* GetLocalUser(const const struct <anon>* this)
+                         local  const struct List<OSDK::VoiceUser>* pVoiceUsers
+                         local  uint32_t uNumUsers
+                         local  uint32_t uIndex
+                         local  struct <anon>* pUser
+                         inlines  GetNumberOfElements

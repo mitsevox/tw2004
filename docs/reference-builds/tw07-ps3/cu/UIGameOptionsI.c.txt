@@ -1,0 +1,65 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/UIInterface/UIGameOptionsI.c
+// compiled in: apt_unity.cpp
+// 38 functions, source order. line | PS3 address | size
+
+   26  00071A40     88  void UIv_SetWeatherToggle(int32 param1)
+                         inlines  UIGameOptions::SetWeatherOption
+   43  0002D574     30  void UIv_SetWeatherOption(enum WEATHER_e weather)
+                         inlines  UIGameOptions::SetWeatherOption
+   48  0002D5A4     68  void UIv_SetWindOption(int32 wind)
+                         inlines  UIGameOptions::SetWindOption
+   67  00094248     8C  void UIv_SetTeeToggle(int32 param1)
+                         local  enum GM_TeeColorType_t teeLocation
+                         local  int i
+   78  000941C4     84  void UIv_SetTee(enum PlayerNumber_t p, enum GM_TeeColorType_t tee)
+                         inlines  UIGameOptions::SetTee
+   83  0002D60C     84  void UIv_SetTee(enum PlayerNumber_t p, enum GM_TeeFacilityIndex_t tee)
+                         inlines  UIGameOptions::SetTee
+   92  0002D690     30  void UIv_SetPin(int32 param1)
+                         inlines  UIGameOptions::SetPin
+   97  0002D6C0     28  int8 UIv_GetPin()
+  102  0002D6E8     30  void UIv_SetGreen(uint32 param1)
+                         inlines  UIGameOptions::SetGreen
+  107  0002D718     24  uint32 UIv_GetGreen()
+  117  0002D73C     68  void UIv_SetGreensOption(int32 param1)
+                         inlines  UIGameOptions::SetGreensOption
+  126  0002D7A4     68  void UIv_SetGreenHardnessOption(int32 param1)
+                         inlines  UIGameOptions::SetGreenHardnessOption
+  135  0002D80C     30  void UIv_SetFairwayOption(int32 param1)
+                         inlines  UIGameOptions::SetFairwayOption
+  145  0002D83C     68  void UIv_SetRoughsOption(int32 param1)
+                         inlines  UIGameOptions::SetRoughsOption
+  154  0008017C     54  void UIv_SetTimeOfDay(int32 param1)
+                         inlines  UIGameOptions::SetTimeOfDay, cGAME_GLOBALS::SetTimeOfDaySet
+  163  0002D8A4     5C  void UIv_SetTimeOfDay(int32 param1, int32 param2)
+                         inlines  UIGameOptions::SetTimeOfDay, cGAME_GLOBALS::SetTimeOfDaySet
+  172  0002D900     34  void UIv_SetNumberOfPlayers(int32 iNumPlayers)
+                         inlines  UIGameOptions::SetNumberOfPlayers
+  181  00079280     EC  void UIv_SetDefaultClubs(int32 iCurrPlayer)
+                         inlines  UIGameOptions::SetClubSelection
+  194  0007B658     A0  void UIv_SetController(int32 iPlayer, int32 iController)
+                         inlines  UIGameOptions::SetController, UserInfo::SetLoginIndex
+  210  0002D934     4C  void UIv_SetSeasonOption(int32 param1)
+                         inlines  UIGameOptions::SetSeasonOption, cGAME_GLOBALS::SetSeasonOptionSet
+  220  0002D2CC     4C  void UIv_SetGolfer(enum PlayerNumber_t player, enum Golfer_t golfer)
+                         inlines  UIGameOptions::SetGolfer
+  230  0002D980     3C  void UIv_SetCrowds(int32 param1)
+                         inlines  UIGameOptions::SetCrowds
+  240  0002D9BC     40  void UIv_SetCPUPlayer(int32 iUser, bool bCPU)
+                         inlines  UIGameOptions::SetIsCpuPlayer
+  259  0002D9FC     30  int32 UIv_GetCourseDefaultTee()
+  263  0002DA2C     30  int32 UIv_GetCourseDefaultPin()
+  267  0002DA5C     30  int32 UIv_GetCourseDefaultGreenSpeed()
+  271  0002DA8C     30  int32 UIv_GetCourseDefaultGreenHardness()
+  275  0002DABC     30  int32 UIv_GetCourseDefaultFrwySpeeds()
+  279  0002DAEC     30  int32 UIv_GetCourseDefaultRghLengths()
+  283  0002DB1C     30  int32 UIv_GetCourseDefaultWind()
+  291  0002D268     64  enum PlayerCtrl_t UIv_GetController(int32 iPlayer)
+  298  0002D21C     4C  void UIv_SetClubSelection(enum PlayerNumber_t i, bit32 clubselection)
+                         inlines  UIGameOptions::SetClubSelection
+  303  0002D1DC     40  enum Golfer_t UIv_GetGolfer(enum PlayerNumber_t p)
+  307  0002D1B4     28  int32 UIv_GetNumberOfPlayers()
+  311  0002D17C     38  bool UIv_GetIsCpuPlayer(enum PlayerNumber_t p)
+  315  0002D154     28  enum Golfer_t* UIv_GetGolferArrayPtr()
+  320  0002DB4C     28  void UIv_SetSaveOptionsAndRestoreOnReEntryFlag()
+  325  0007DF88     28  void UIv_TransferToGlobalOptions()

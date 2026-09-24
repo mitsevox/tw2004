@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/Headers/GameMode_SkillZoneTargetToTarget.h
+// compiled in: golf_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   32  0033F0A0     14  enum UIScoreCardDispMode_t GameModeSkillZoneTargetToTarget::GetScoreDisplayMode(const struct GameModeSkillZoneTargetToTarget* this, bool getAlternate)
+   34  0033F0B4      8  bool GameModeSkillZoneTargetToTarget::PopulateScoreCardUI(const struct GameModeSkillZoneTargetToTarget* this)
+   51  0033F0BC     18  const char* GameModeSkillZoneTargetToTarget::GetModeSpecificTipString(const struct GameModeSkillZoneTargetToTarget* this)

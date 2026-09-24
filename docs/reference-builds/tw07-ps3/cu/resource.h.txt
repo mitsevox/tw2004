@@ -1,0 +1,13 @@
+// ../../../../../TIGERCODE/RW45/platform/include/native/ps3-ppu-gcc/rw/core/resource/resource.h
+// compiled in: Legacy_unity.cpp, golf2_unity.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   77    inline-only   const struct <anon>& GetBaseResourceDescriptor(const const struct <anon>* this, uint32_t i)
+   86    inline-only   struct <anon>& GetBaseResourceDescriptor(const struct <anon>* this, uint32_t i)
+   96    inline-only   uint32_t GetNumberOfBaseResourceTypes()
+  232  001E8A94     5C  RwBool rw::operator==<4u>(const const struct <anon>& lhs, const const struct <anon>& rhs)
+                         local  uint32_t i
+                         inlines  GetBaseResourceDescriptor, rw::operator!=
+  340    inline-only   const BaseResource& GetBaseResource(const const struct <anon>* this, uint32_t i)
+  349    inline-only   BaseResource& GetBaseResource(const struct <anon>* this, uint32_t i)
+  359    inline-only   uint32_t GetNumberOfBaseResourceTypes()

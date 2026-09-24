@@ -1,0 +1,9 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/headers/UI_SeveTwentyOne.h
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   45  00125968     C0  void UISeveTwentyOne::~UISeveTwentyOne(const struct UISeveTwentyOne* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStaticCharBuffer<64u>::~AptStaticCharBuffer, AptStructSwapper::Free, AptSubscriberVariableGrp::~AptSubscriberVariableGrp, IAptSubscriber::~IAptSubscriber
+   47  000FE8E4      C  uint32 UISeveTwentyOne::GetSignature(const const struct UISeveTwentyOne* this)
+   57  00101000     14  enum TAptSequenceStatus UISeveTwentyOne::QueueShowText_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)
+   58  00103174     14  enum TAptSequenceStatus UISeveTwentyOne::DelayGhostSequence_func(struct IAptSubscriberBase* subs, bool inbFirstTime, void* inData)

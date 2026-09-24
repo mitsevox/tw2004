@@ -1,0 +1,195 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/lua-5.0.2/src/lvm.c
+// compiled in: lvm.c
+// 19 functions, source order. line | PS3 address | size
+
+   43  0054FBE0     90  const TObject* luaV_tonumber(const TObject* obj, TObject* n)
+                         local  lua_Number num
+                         local  TObject* i_o
+   55  0054FC70     D4  int luaV_tostring(lua_State* L, StkId obj)
+                         local  char[32] s
+                         local  TObject* i_o
+   67    inline-only   static void traceexec(lua_State* L)
+                         local  lu_byte mask
+                         local  CallInfo* ci
+                         local  Proto* p
+                         local  int newline
+   99  0054FD44     C4  static void callTMres(lua_State* L, const TObject* f, const TObject* p1, const TObject* p2)
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  const TObject* o2
+                         local  TObject* o1
+  112    inline-only   static void callTM(lua_State* L, const TObject* f, const TObject* p1, const TObject* p2, const TObject* p3)
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  const TObject* o2
+                         local  TObject* o1
+  124  0054FF2C    114  static const TObject* luaV_index(lua_State* L, const TObject* t, TObject* key, int loop)
+                         local  const TObject* tm
+  135  00550040    104  static const TObject* luaV_getnotable(lua_State* L, const TObject* t, TObject* key, int loop)
+                         local  const TObject* tm
+  153  0054FE08    124  const TObject* luaV_gettable(lua_State* L, const TObject* t, TObject* key, int loop)
+                         local  Table* h
+                         local  const TObject* v
+  169  00550144    27C  void luaV_settable(lua_State* L, const TObject* t, TObject* key, StkId val)
+                         local  const TObject* tm
+                         local  int loop
+                         local  Table* h
+                         local  TObject* oldval
+                         local  const TObject* o2
+                         local  TObject* o1
+                         inlines  callTM
+  196  005503C0    124  static int call_binTM(lua_State* L, const TObject* p1, const TObject* p2, StkId res, TMS event)
+                         local  ptrdiff_t result
+                         local  const TObject* tm
+                         local  const TObject* o2
+                         local  TObject* o1
+  210  005504E4    10C  static const TObject* get_compTM(lua_State* L, Table* mt1, Table* mt2, TMS event)
+                         local  const TObject* tm1
+                         local  const TObject* tm2
+  224  005505F0     EC  static int call_orderTM(lua_State* L, const TObject* p1, const TObject* p2, TMS event)
+                         local  const TObject* tm1
+                         local  const TObject* tm2
+  236  005506DC    120  static int luaV_strcmp(const TString* ls, const TString* rs)
+                         local  const char* l
+                         local  size_t ll
+                         local  const char* r
+                         local  size_t lr
+                         local  int temp
+                         local  size_t len
+  258  005507FC    118  int luaV_lessthan(lua_State* L, const TObject* l, const TObject* r)
+                         local  int res
+  272    inline-only   static int luaV_lessequal(lua_State* L, const TObject* l, const TObject* r)
+                         local  int res
+  288  00550914    150  int luaV_equalval(lua_State* L, const TObject* t1, const TObject* t2)
+                         local  const TObject* tm
+  315  00550A64    2CC  void luaV_concat(lua_State* L, int total, int last)
+                         local  StkId top
+                         local  int n
+                         local  lu_mem tl
+                         local  char* buffer
+                         local  int i
+                         local  TObject* i_o
+                         local  size_t l
+  349  00550D30    22C  static void Arith(lua_State* L, StkId ra, const TObject* rb, const TObject* rc, TMS op)
+                         local  TObject tempb
+                         local  TObject tempc
+                         local  const TObject* b
+                         local  const TObject* c
+                         local  TObject* i_o
+                         local  TObject* i_o
+                         local  TObject* i_o
+                         local  TObject* i_o
+                         local  const TObject* f
+                         local  ptrdiff_t res
+                         local  const TObject* o2
+                         local  TObject* o1
+  397  00550F5C   156C  StkId luaV_execute(lua_State* L)
+                         local  LClosure* cl
+                         local  TObject* k
+                         local  const Instruction* pc
+                         local  const Instruction i
+                         local  StkId base
+                         local  StkId ra
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  int nvar
+                         local  StkId cb
+                         local  TObject* rb
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  StkId firstResult
+                         local  int b
+                         local  int nresults
+                         local  CallInfo* ci
+                         local  int b
+                         local  int nresults
+                         local  int b
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  TObject* i_o
+                         local  TObject* rb
+                         local  int bc
+                         local  int n
+                         local  Table* h
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  Proto* p
+                         local  Closure* ncl
+                         local  int nup
+                         local  int j
+                         local  TObject* i_o
+                         local  lua_Number step
+                         local  lua_Number idx
+                         local  lua_Number limit
+                         local  const TObject* plimit
+                         local  const TObject* pstep
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  TObject* rb
+                         local  TObject* rc
+                         local  TObject* rb
+                         local  TObject* rc
+                         local  TObject* rb
+                         local  TObject* rc
+                         local  TObject* rb
+                         local  TObject* rc
+                         local  const TObject* rb
+                         local  TObject temp
+                         local  TObject* i_o
+                         local  int res
+                         local  TObject* i_o
+                         local  int b
+                         local  int c
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  int b
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  StkId rb
+                         local  TObject* rc
+                         local  StkId rb
+                         local  TObject* rc
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  const TObject* v
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  int b
+                         local  TObject* i_o
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  const TObject* v
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  TObject* rb
+                         local  const TObject* v
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  TObject* i_o
+                         local  TObject* i_o
+                         local  TObject* i_o
+                         local  TObject* i_o
+                         local  int aux
+                         local  const TObject* o2
+                         local  TObject* o1
+                         inlines  luaV_lessequal, traceexec

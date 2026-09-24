@@ -1,0 +1,46 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/Common/UI_Apt_MemoryCardUI.cpp
+// compiled in: apt_unity.cpp
+// 22 functions, source order. line | PS3 address | size
+
+   60  00077F2C     D0  bool UI_Memcard_ShowUI_IsBusy()
+                         local  bool bIsBusy
+                         local  struct AptScreenSubscriber* pPopup
+  114  0006253C     B0  void UI_Memcard_ShowUI_HidePopups()
+                         local  struct AptScreenSubscriber*[4] popupList
+                         local  unsigned int i
+  135  0005EED0    310  void UI_Memcard_ShowUI_SimplePopup()
+                         local  struct UIMemCardConfirmPopup* pPopup
+                         local  struct UIMemCardMenuPopup* pPopup
+                         local  struct UIMemCardMenuPopup* pPopup
+                         local  struct UIMemCardMenuPopup* pPopup
+  211  0006261C     68  void UI_Memcard_ShowUI_TimedPopup()
+  228  0007B0F4    100  void UI_Memcard_SimplePickMC_ResponseHandler(int32 index)
+  259  0007AF58    19C  static void UI_Memcard_UserList_ResponseHandler(int32 index)
+                         local  bool bDone
+                         local  enum eMemCardUserResp selectedResp
+  315  0007AE0C    14C  static void UI_Memcard_GamerList_ResponseHandler(int32 index)
+  357  0007AC60    1AC  static void UI_Memcard_ReplaysList_ResponseHandler(int32 index)
+                         local  bool bDone
+                         local  enum eMemCardUserResp selectedResp
+  411  0007ABBC     A4  static void UI_Memcard_SaveLocations_ResponseHandler(int32 index)
+  442  0005E03C    144  void UI_Memcard_ShowUI_SimplePicMCPopup(bool bHandleArrows)
+                         local  char* pFooter
+                         local  int i
+  528  0005E180    140  void UI_Memcard_ShowUI_UserList(bool bHandleArrows)
+                         local  char* pFooter
+                         local  int i
+  559  0005E2C0    114  void UI_Memcard_ShowUI_GamerList()
+                         local  int i
+  585  0005E3D4    148  void UI_Memcard_ShowUI_ReplaysList(bool bHandleArrows)
+                         local  int i
+  611  0005E51C    108  void UI_Memcard_ShowUI_SaveLocationsList()
+                         local  int i
+  729  0007AAF8     20  static void sUIMemCard_HandleMCChoice01()
+  737  0007AB58     20  static void sUIMemCard_HandleMCChoice02()
+  745  0007AB38     20  static void sUIMemCard_HandleMCChoice03()
+  753  0007AB18     20  static void sUIMemCard_HandleMCChoice04()
+  761  00062684     6C  void UI_Memcard_ShowUI_MessageBoxON()
+                         local  char[415] messageBoxStr
+  773  000626F0     14  void UI_Memcard_ShowUI_MessageBoxOFF()
+  781  00078538     2C  bool UI_Memcard_ShowUI_MessageBoxIsFadingIn()
+  790  000785D8     2C  bool UI_Memcard_ShowUI_MessageBoxIsFadingOut()

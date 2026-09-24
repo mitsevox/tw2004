@@ -1,0 +1,60 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/scenegraph/source/SceneGraph/Runtime/Nodes/SGNodeBSPCulledRenderable.cpp
+// compiled in: SGNodeBSPCulledRenderable.cpp
+// 19 functions, source order. line | PS3 address | size
+
+    0  008AF854    140  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  SGNodeCullableRenderableInfoC::SGNodeCullableRenderableInfoC, SGNodeCullableRenderableInfoC::~SGNodeCullableRenderableInfoC
+    0  008B03AC      C  void SGNodeCullableRenderableInfoC::~SGNodeCullableRenderableInfoC(const struct SGNodeCullableRenderableInfoC* this)
+                         inlines  ~SGNodeInfoC
+   50  008B0010     88  struct SGNodeC* SGNodeCullableRenderableInfoC::Create(const const struct SGNodeCullableRenderableInfoC* this)
+                         inlines  operator new
+   51  008AFE04      8  const char* SGNodeCullableRenderableInfoC::GetNodeTypeName(const const struct SGNodeCullableRenderableInfoC* this)
+   52    inline-only   NodeType_t SGNodeCullableRenderableInfoC::GetNodeTypeEnum(const const struct SGNodeCullableRenderableInfoC* this)
+   63  008AEDD4     5C  void SGNodeCullableRenderableC(const struct <anon>* this)
+   70  008AEE8C     BC  void ~SGNodeCullableRenderableC(const struct <anon>* this)
+                         inlines  operator delete
+   96  008AEF48    2A0  struct SGNodeC* Clone(const struct <anon>* this, bool8_t recurse, NodeCloneUserDataCallback userDataCallback, struct SGNodeC* baseClone)
+                         local  const char[6] __FUNCTION__
+                         local  struct <anon>* clone
+                         inlines  RNADebugBreak, SGNodeC::GetNodeTypeEnum, SetCuller, SetCullerID, operator new
+  124  008AEBD0      8  const struct SGNodeInfoC* GetNodeInfo(const const struct <anon>* this)
+  130  008AEBC8      8  const struct SGNodeInfoC* _GetNodeInfo()
+  137  008AED0C     C8  void SerializeIn(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[12] __FUNCTION__
+                         local  int32_t version
+                         inlines  RNADebugBreak
+  153  008AEBD8     A4  void SerializeOut(const const struct <anon>* this, const struct OutStreamC& out)
+  167  008AEC7C      8  void AttachRoot(const struct <anon>* this, struct <anon>* pRootNode)
+  172  008AF9B4    450  void RegisterNode(const struct <anon>* this, struct <anon>* pNode)
+                         local  const char[13] __FUNCTION__
+                         local  int32_t i
+                         local  int32_t idx
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct <anon>** newData
+                         inlines  Construct, GetIndex, Grow, RNADebugBreak, Resize, operator[]
+  210  008AF1E8    2A8  enum CullState_E BoundingVolumeVisibility(const struct <anon>* this, const RNAPlane* aPlanes, const RNAVector4* aVerts, struct <anon>* pCurrentNode)
+                         local  const struct <anon>& vertIDList
+                         local  int32_t nVerts
+                         local  int32_t iVisMask
+                         local  int32_t iVert
+                         local  int32_t iVertID
+                         local  int32_t iPlaneMask
+                         local  int32_t iPlane
+                         inlines  GetVertIDList, RNADebugBreak, Size, Vector3, operator[], vec_splat, vpu::Dot, vpu::operator+<VectorAxisW>, vpu::operator>
+  271  008AF490    35C  void UpdateVisibility(const struct <anon>* this, const RNAPlane* aPlanes, const RNAVector4* aVerts)
+                         local  const char[17] __FUNCTION__
+                         local  int32_t nCulled
+                         local  int32_t iNumUncheckedNodes
+                         local  int32_t iNumNotVisibleNodes
+                         local  const int32_t MAX_TMP_NODES
+                         local  struct <anon>*[512] aUncheckedNodes
+                         local  struct <anon>*[512] aNotVisibleNodes
+                         local  struct <anon>* pCurrentNode
+                         local  struct <anon>* pCurrentNode
+                         inlines  RNADebugBreak, SetVisiblity
+  346  008AEC84     88  void SetAllVisible(const struct <anon>* this)
+                         local  const char[14] __FUNCTION__
+                         inlines  RNADebugBreak
+  354  008AF9A4     10  static void _GLOBAL__I__ZN6SceneX25SGNodeCullableRenderableC16s_ClassAllocatorE()
+  355  008AF994     10  static void _GLOBAL__D__ZN6SceneX25SGNodeCullableRenderableC16s_ClassAllocatorE()

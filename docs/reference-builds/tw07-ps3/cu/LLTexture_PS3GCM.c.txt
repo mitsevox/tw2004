@@ -1,0 +1,55 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLTexture_PS3GCM.c
+// compiled in: Legacy_unity.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   41  003CAB58     C0  void TX_Init_ps3gcm()
+                         local  int i
+                         inlines  Gcm::cellGcmSetTextureOptimization
+   65  003C1FD4     60  void TX_Shutdown_ps3gcm()
+   77  0037F1DC     3C  void TX_ResetDuplicateTextureSetState_ps3gcm()
+   87  00389054    120  static size_t TX_CalculateLayerRowStride_ps3gcm(TextureFormat format, TextureOptions options, uint16 width, uint16 layer)
+                         local  size_t stride
+                         local  uint16 layerSize
+                         local  uint16 layerSize
+  125  00389174     D8  static size_t TX_CalculateLayerDataStride_ps3gcm(TextureFormat format, TextureOptions options, uint16 width, uint16 height, uint16 layer)
+                         local  size_t stride
+                         local  uint16 layerSize
+                         local  uint32 pixelsPerBlockY
+                         local  uint32 blocksY
+  145  0038924C    140  static size_t TX_CalculateLayerDataOffset_ps3gcm(TextureFormat format, TextureOptions options, uint16 width, uint16 height, uint16 layer)
+                         local  size_t stride
+                         local  int i
+  164  003BBBA8    1D4  size_t TX_GetTextureRowStride_ps3gcm(TextureRef ref, uint16 layer)
+                         local  struct TextureInfoNative* info
+                         inlines  TX_GetNativeTextureInfo, TX_TextureIsAllocated
+  175  003BBD7C    1B8  uint8* TX_GetTextureAddress_ps3gcm(TextureRef ref, uint16 layer)
+                         local  struct TextureInfoNative* info
+                         local  uint8* data
+                         inlines  TX_GetNativeTextureInfo, TX_TextureIsAllocated
+  188  003BC81C     A0  uint32 TX_GetTextureOffset_ps3gcm(TextureRef ref, uint16 layer)
+                         inlines  TX_AddressToOffset_ps3gcm
+  197    inline-only   static uint32 TX_SwapTextureRemap_ps3gcm(uint32 remap)
+                         local  unsigned int flippedRemap
+  212  003ACF34    690  int TX_AllocTexture_ps3gcm(TextureRef ref, struct TextureInfoNative* info)
+                         local  const char[23] __FUNCTION__
+                         local  struct TextureFormatNative nativeFormat
+                         local  size_t memSize
+                         local  TTypeAcces memType
+                         local  TTypeAcces memType
+                         inlines  TX_AddressToOffset_ps3gcm, TX_FormatIsDXTCompressed, TX_FormatIsFloatingPoint, TX_GetMemoryType, TX_GetNativeFormat, TX_SwapTextureRemap_ps3gcm, TagValuePair, operator+
+  314  003A929C     E0  void TX_Free_ps3gcm(TextureRef ref, struct TextureInfoNative* info)
+                         local  const char[15] __FUNCTION__
+  332  003BC8BC    434  void TX_SetTexture_ps3gcm(uint32 sampler, TextureRef ref, struct TextureInfoNative* info)
+                         local  struct TextureInfoNative* oldInfo
+                         inlines  Gcm::cellGcmSetInvalidateTextureCache, Gcm::cellGcmSetTexture, Gcm::cellGcmSetTextureAddress, Gcm::cellGcmSetTextureBorderColor, Gcm::cellGcmSetTextureControl, Gcm::cellGcmSetTextureFilter, Gcm::cellGcmSetVertexTexture, Gcm::cellGcmSetVertexTextureAddress, Gcm::cellGcmSetVertexTextureBorderColor, Gcm::cellGcmSetVertexTextureControl, Gcm::cellGcmSetVertexTextureFilter, TX_GetNativeTextureInfo
+  414  00388690    1CC  void TX_ChangeOptions_ps3gcm(TextureRef ref, struct TextureInfoNative* info)
+                         local  TextureOptions filter
+                         local  TextureOptions edge
+                         inlines  TX_FormatIs32bitFloatingPoint, TX_FormatIsFloatingPoint
+  469  003BC51C    300  void TX_LockTexture_ps3gcm(TextureRef ref, struct TextureInfoNative* info, struct TextureLockInfo* lockInfo)
+                         local  const char[22] __FUNCTION__
+                         local  uint8* srcData
+                         inlines  Gcm::cellGcmSetTransferData, TX_AddressToOffset_ps3gcm, TagValuePair, operator+
+  529  003BBF34    464  void TX_UnlockTexture_ps3gcm(TextureRef ref, struct TextureInfoNative* info, const struct TextureLockInfo* lockInfo)
+                         local  uint8* dstData
+                         inlines  Gcm::cellGcmSetConvertSwizzleFormat, Gcm::cellGcmSetTransferData, TX_AddressToOffset_ps3gcm, TX_FormatIsDXTCompressed

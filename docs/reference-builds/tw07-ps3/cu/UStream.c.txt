@@ -1,0 +1,167 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/specif/UStream.c
+// compiled in: Legacy_unity.cpp
+// 53 functions, source order. line | PS3 address | size
+
+  103  003CDC34     88  void STREAM_PRINTF(const char* fmt)
+                         local  char[255] stream_printf_buf
+                         local  va_list va
+  209    inline-only   static void Stream_StartStreamTiming(char* fileName)
+  227  00380950    1B0  static void Stream_UpdateStreamTiming()
+                         local  TI_STimeValue curLoopTime
+                         inlines  TI_fConvertTimeDifToSeconds
+  234    inline-only   static void Stream_ReadCompletedTiming()
+  240    inline-only   static void Stream_ReadStartedTiming()
+  245  00380B00     34  static void Stream_StartDecompressTiming()
+  250  0038372C    190  static void Stream_StopDecompressTiming()
+                         inlines  TI_fConvertTimeDifToSeconds
+  255    inline-only   static void Stream_StartAllocationTiming()
+  260    inline-only   static void Stream_StopAllocationTiming()
+  265  00381D9C    1F0  static void Stream_EndStreamTiming()
+                         local  float mb
+                         local  float mbPerSec
+  294  003A49D8     24  static void* Stream_CompressionAlloc(void* , unsigned int items, unsigned int size)
+  299  003A3FB0     18  static void Stream_CompressionFree(void* , void* ptr)
+  304  003B1950    1B4  static void Stream_CompressionInit()
+                         local  const char[23] __FUNCTION__
+                         local  uint32 windowBits
+                         local  uint32 workSize
+                         local  int zlibret
+                         inlines  Allocator::GetTempAllocator, TagValuePair, operator+
+  326    inline-only   static int32 Stream_CompressionDecompress(unsigned char* src, uint32 srcSize, unsigned char* dst, uint32 dstSize)
+                         local  int zlibret
+  365    inline-only   static void Stream_CompressionRestart()
+                         local  int zlibret
+  375    inline-only   static void Stream_CompressionClose()
+                         local  int zlibret
+  428    inline-only   static char* Stream_GetResourceName(uint32 AssocChkID, uint32 AssocChkRef)
+                         local  TResourceMap* pRM
+                         local  TResourceInfo* pRI
+                         local  uint32 i
+                         local  TStreamDataPtr pResList
+  455  003871E8     B8  static void addToFreeList(CDBufPtr cdp)
+                         local  CDBufPtr walkp
+                         local  StrmCB* gs
+  491  00392E64    36C  static void _readBufAsync()
+                         local  CDBufPtr freeBuf
+                         local  StrmCB* gs
+                         inlines  Stream_ReadStartedTiming, TryLock, Unlock
+  556  00393410    380  static void myAsyncReadCallback(int32 bytesRead, int32 error)
+                         local  int32 size
+                         local  bool skipChunk
+                         local  StrmCB* gs
+                         local  int32 startWithSWVR
+                         inlines  Stream_ReadCompletedTiming
+  696  00380B34     20  void Stream_RegisterGlobalChunkChecker(LoadChunkCheckCallbackPtr chunkCheckCallback, LoadChunkDataCallbackPtr dataCallbackPtr)
+  702  00380B54     24  void Stream_UnregisterGlobalChunkChecker()
+  709    inline-only   static int32 loadStreamChunk(ParseInProg* curParseInfo, StreamChunkPtr cp)
+                         local  Drive3DChunkHdrPtr dataPtr
+                         local  TStreamDataPtr curParseStreamData
+                         local  int32 MustLoad
+                         local  int i
+                         local  int i
+  834    inline-only   static void moveFinishedDataToFreeList()
+                         local  CDBufPtr cdp
+                         local  CDBufPtr walkp
+                         local  StrmCB* gs
+  877  0038ECC0     F8  static void addToDrive3DQueue(TStreamDataPtr tsp)
+                         local  TStreamQueuePtr walkp
+                         local  TStreamQueuePtr newElemPtr
+                         local  StrmCB* gs
+  913  003931D0    240  static CDBufPtr fillBuffers(bool lookAtFilledBuffers)
+                         local  CDBufPtr walkp
+                         local  CDBufPtr filledBuf
+                         local  CDBufPtr freeBuf
+                         local  StrmCB* gs
+  969    inline-only   static void Stream_RemoveExtensionInStreamName(char* s)
+                         local  char* ext
+                         local  char* pes
+                         local  char* pe
+                         local  char c
+ 1222  003A6DF4    EB4  static void Stream_ParseBufs()
+                         local  StreamChunkPtr cp
+                         local  CDBufPtr bp
+                         local  int32 status
+                         local  int32 theSize
+                         local  ParseInProg* curParseInfo
+                         local  StrmCB* gs
+                         local  uint8* dataStart
+                         local  uint8* dest
+                         local  CDBuf debug_b
+                         local  int32 theCopySize
+                         local  int chunkHeaderSize
+                         local  int32 compressedSize
+                         local  int32 uncompressedSize
+                         local  uint32* pSrcName
+                         local  uint32* pDstName
+                         local  int i
+                         inlines  Stream_CompressionDecompress, Stream_RemoveExtensionInStreamName, Stream_StartAllocationTiming, Stream_StopAllocationTiming, loadStreamChunk, moveFinishedDataToFreeList
+ 1719  003C3DAC    204  static void Stream_OpenFileForStreaming(StrmCB* gs)
+                         inlines  Stream_StartStreamTiming
+ 1779    inline-only   static void Stream_OpenNextStreamFile(StrmCB* gs)
+                         local  int32 i
+                         local  int lastIndex
+ 1841  003C4DCC    35C  static TStreamDataPtr Stream_GetDataElement(bool tryToLoadData)
+                         local  TStreamDataPtr theStream
+                         local  TStreamQueuePtr qp
+                         local  StrmCB* gs
+                         inlines  Stream_OpenNextStreamFile
+ 1901  003872A0    2A0  bool Stream_GetStreamStatus(int32* curFile, int32* curOffset, int32* fileSize, float* ratio)
+                         local  StrmCB* gs
+ 1935  003C5128    4A8  bool Stream_Progress()
+                         local  TStreamDataPtr Data
+                         local  TStreamDataPtr nextData
+                         local  TStreamDataPtr tempData
+                         local  int32 i
+                         local  ChunkTypeBudgetMapping_t* pBudgetMapping
+                         local  StrmCB* gs
+                         inlines  Allocator::GetTempAllocator, Allocator::InvalidateCurrentAllocator, Allocator::SetCurrentAllocator
+ 2201  00380B78     68  bool Stream_StopLoading()
+                         local  StrmCB* gs
+ 2223  00380BE0     48  bool Stream_PauseLoading()
+ 2235  00380C28     48  bool Stream_ResumeLoading()
+ 2252  00380C70     3C  void Stream_SetDecompressionLimit(int32 limit)
+ 2260  003A8AC8    204  bool Stream_LoadResource(uint32 offset, uint32 size)
+                         local  StrmCB* gs
+ 2323  003C4BF0    1DC  void Stream_CloseModule()
+                         local  StrmCB* gs
+                         local  int32 saveFD
+                         local  TStreamDataPtr pResList
+                         local  TStreamDataPtr pPurgeResList
+                         inlines  Stream_CompressionClose
+ 2410  003C4908    2E8  int32 Stream_CloseStreamFile(int32 whichFile)
+                         local  int32 i
+ 2504  00380CAC     3C  int32 Stream_SetCurrentStreamFile(int32 whichFile)
+ 2514  003C3FB0    1BC  int32 Stream_OpenStreamFiles(struct StreamFileList* streamFileList)
+                         local  int32 ourIndex
+                         local  StrmCB* gs
+ 2625  003C416C     9C  int32 Stream_OpenStreamFile(char* streamFileName, bool nonSequential)
+                         local  struct StreamFileList streamFileList
+ 2660  00392ACC    274  bool Stream_RegisterLoadChunkCallback(int32 chunkType, LoadChunkCallbackPtr callbackPtr, LoadChunkCheckCallbackPtr callbackCheckPtr, LoadChunkDataCallbackPtr dataCallbackPtr)
+                         local  int i
+ 2714  0038D730    294  bool Stream_UnregisterLoadChunkCallback(int32 chunkType)
+                         local  int32 cb
+                         local  int32 cbdel
+ 2758  003ABE80    134  void Stream_InitOnce()
+                         local  const char[16] __FUNCTION__
+                         inlines  TagValuePair, operator+
+ 2771  003A8A70     58  void Stream_CloseOnce()
+ 2784  003B1B04    204  void Stream_InitModule()
+                         local  int32 i
+                         local  CDBufPtr bp
+                         local  CDBufPtr lastBp
+                         local  int32 actualEntrySize
+                         local  int32 numBuffers
+                         inlines  Allocator::GetTempAllocator
+ 2847  00380CE8     30  void Stream_ClearFileCallbacks(struct StreamFileList* streamFileList)
+                         local  int i
+ 2868  003C8624     C4  uint32 Stream_LocalLoadFixedSize(char* filename, uint32 expectedSize, void* pInFillBuffer)
+                         local  void* pFileData
+                         local  uint32 datasize
+ 2896  003C85A8     7C  uint32 Stream_LocalLoadVariableSize(char* filename, void** ppFileData)
+                         local  uint32 datasize
+ 2920  003A8998     D8  uint32 Stream_StreamLoadFixedSize(char* filename, struct TStreamData* pStreamData, uint32 expectedSize, void* pInFillBuffer)
+                         local  uint32 datasize
+                         local  void* pFileData
+                         local  uint32[2] iffprint
+ 2956  00390F4C     70  uint32 Stream_StreamLoadVariableSize(char* filename, struct TStreamData* pStreamData, void** ppFileData)
+                         local  uint32 datasize

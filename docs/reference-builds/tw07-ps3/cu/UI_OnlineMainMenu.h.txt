@@ -1,0 +1,12 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_OnlineMainMenu.h
+// compiled in: apt_unity.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   27    inline-only   void UIOnlineMainMenu::Init(const struct UIOnlineMainMenu* this)
+   28    inline-only   void UIOnlineMainMenu::Close(const struct UIOnlineMainMenu* this)
+   30  000FF474      C  uint32 UIOnlineMainMenu::GetSignature(const const struct UIOnlineMainMenu* this)
+   38  001030F0     14  void UIOnlineMainMenu::NotifyPlayOnline_func(struct IAptSubscriber* subs)
+   39  001157F4     14  void UIOnlineMainMenu::NotifyOnlineGameModes_func(struct IAptSubscriber* subs)
+   56  00103104     14  void UIOnlineMainMenu::NotifyESPN_func(struct IAptSubscriber* subs)
+   57  001157E0     14  void UIOnlineMainMenu::NotifyOnlineRankedMatch_func(struct IAptSubscriber* subs)
+   58  001157CC     14  void UIOnlineMainMenu::NotifyOnlineUnrankedMatch_func(struct IAptSubscriber* subs)

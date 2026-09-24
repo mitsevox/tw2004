@@ -1,0 +1,18 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/api_src/CCT.cpp
+// compiled in: CCT.cpp
+// 9 functions, source order. line | PS3 address | size
+
+   27  005986D8     20  void CCT::SetFrameCacheParams(uint32_t maxFrames, uint32_t bufferMemory)
+   35  005986F8     18  void CCT::SetTempFrameStackParams(uint32_t maxFrames)
+   41  00598840    10C  bool CCT::Init(struct IAllocator* alloc, struct IEventHandler* eventhandler, struct IBuildMatrices* build)
+                         local  struct PositionsFrameCache* cache
+                         local  void* buffer
+                         inlines  TagValuePair
+   74  00598728     A8  void CCT::Deinit()
+                         local  struct PositionsFrameCache* cache
+                         inlines  Singleton<EA::CCT::Internal::PositionsFrameCache>::GetSingletonPtr
+   92  005987D0     28  bool CCT::RegisterCodec(int32_t fourcc, struct ICodec* codec)
+   97  00598710     18  struct IAllocator* CCT::GetAllocator()
+  102  005987F8     18  void CCT::SetEventHandler(struct IEventHandler* handler)
+  107  00598810     18  struct IEventHandler* CCT::GetEventHandler()
+  112  00598828     18  struct IBuildMatrices* CCT::GetBuildMatrices()

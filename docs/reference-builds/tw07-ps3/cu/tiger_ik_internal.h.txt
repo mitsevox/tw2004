@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_ik/tiger_ik_internal.h
+// compiled in: tiger_ik.cpp
+// 2 functions, source order. line | PS3 address | size
+
+   87    inline-only   const float* TigerIK_Internal::GetObjectPos(const const struct TigerIK_Internal* this, unsigned int boneI)
+  106    inline-only   const float* TigerIK_Internal::GetRootMtx(const const struct TigerIK_Internal* this)

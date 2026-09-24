@@ -1,0 +1,6 @@
+// C:/packages/job_manager/1.11.00/include/job_manager/job_scheduler.h
+// compiled in: dac.cpp, job_scheduler_platform.cpp
+// 2 functions, source order. line | PS3 address | size
+
+  163    inline-only   int32_t GetDebugOutputFilter(const struct JobScheduler* this)
+  203    inline-only   uint32_t GetSPUThreadCount(const struct JobScheduler* this)

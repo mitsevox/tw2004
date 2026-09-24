@@ -1,0 +1,22 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/././invitationabstract.h
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 18 functions, source order. line | PS3 address | size
+
+   69  00623D58      8  struct User* GetUser(const const struct <anon>* this)
+   72  00623D70      C  int32_t GetIdentifier(const const struct <anon>* this)
+   75    inline-only   const struct Dictionary* GetParameters(const const struct <anon>* this)
+   78  00623DA4      8  uint32_t GetType(const const struct <anon>* this)
+   81  00623DBC      C  const struct Timestamp* GetTimestamp(const const struct <anon>* this)
+   84    inline-only   void PrepareForOperation(const struct InvitationAbstract* this)
+   96    inline-only   enum InvitationContext GetContext(const const struct <anon>* this)
+   99    inline-only   bool OperationInProgress(const const struct <anon>* this)
+  102    inline-only   void MarkForRemoval(const struct InvitationAbstract* this)
+  105    inline-only   bool IsMarkedForRemoval(const const struct <anon>* this)
+  108  00623DD0      8  int32_t GetSessionId(const const struct <anon>* this)
+  111  00623DE0     18  void SetPendingAction(const struct InvitationAbstract* this)
+  114  00623E00     14  void ClearPendingAction(const struct InvitationAbstract* this)
+  117  00623E1C      C  bool IsPendingAction(const const struct <anon>* this)
+  124    inline-only   void SetIdentifier(const struct InvitationAbstract* this, int32_t iIdentifier)
+  127    inline-only   struct Operation* GetCurrentOperation(const struct InvitationAbstract* this)
+  130    inline-only   void SetCurrentOperation(const struct InvitationAbstract* this, struct Operation* pOperation)
+  133    inline-only   uint32_t GetOperationTimeout(const const struct <anon>* this)

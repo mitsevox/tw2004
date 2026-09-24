@@ -1,0 +1,13 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/sndi_findprime.cpp
+// compiled in: sndi_findprime.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    6  006F6DA8     50  int SNDI_cheapsqrt(int val)
+                         local  int i
+                         local  int done
+                         local  int temp
+   36  006F6DF8     C0  int SNDI_findprime(int samplerate, int delay)
+                         local  int i
+                         local  int prime
+                         local  int upper
+                         local  int done

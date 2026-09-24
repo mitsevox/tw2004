@@ -1,0 +1,7 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/ischannelmapsupported.cpp
+// compiled in: ischannelmapsupported.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   10  006E390C    188  bool IsChannelMapSupported(const struct PlugInRegistry* this, const struct <anon>* pChannelMap, int inputChannels, int outputChannels)
+                         local  int i
+                         local  bool inputChannelsSupported

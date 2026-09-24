@@ -1,0 +1,15 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/productupdatecleanupstrategy.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   72  005D87C0    124  void Cleanup(const struct <anon>* this)
+                         local  const char8_t* pDir
+                         local  char8_t[16] strPattern
+                         local  struct <anon> dirEntry
+                         local  char8_t[256] strPath
+                         inlines  GetGameDataPath
+  106  006216D4     54  void ProductUpdateCleanupStrategy(const struct <anon>* this, struct ProductUpdateManagerStrategy* pUpdateStrategy, enum UpdateStageE eStage)
+                         inlines  ProductUpdateStage
+  132  0062177C      C  void ~ProductUpdateCleanupStrategy(const struct <anon>* this)
+                         inlines  ~ProductUpdateStage
+  158  005D88E4     24  enum ProcessResultE Process(const struct <anon>* this)

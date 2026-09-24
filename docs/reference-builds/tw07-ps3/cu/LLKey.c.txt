@@ -1,0 +1,27 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLKey.c
+// compiled in: Legacy_unity.cpp
+// 9 functions, source order. line | PS3 address | size
+
+  208  0037D9CC     10  void KB_vClearKeyboardBuffer(KB_SConsoleKeyboard* spConsoleKeyboard)
+  222  0037D9DC     28  void KB_vClearKeysStatus(KB_SConsoleKeyboard* spConsoleKeyboard)
+                         local  int32 i
+  238  0037DA04     6C  void KB_vInitKeyboard(KB_SConsoleKeyboard* spConsoleKeyboard)
+  260    inline-only   static void KB_vInitKeyboardDrivers()
+                         local  int32 iRet
+                         local  int32 i
+  307  0037DA70     C0  void KB_vInitOnce()
+                         local  int32 i
+                         inlines  KB_vInitKeyboardDrivers
+  317  0037DB30     24  void KB_vCloseOnce()
+  330  0037DB54     A0  void KB_vAddKeyToKeyboardBuffer(KB_SConsoleKeyboard* spConsoleKeyboard_p, uint8 uiKey_p)
+                         local  char chKey
+                         local  KB_EKeyboardConfig eKeyboardConfig
+  391  00394B84    29C  void KB_vUpdateKeyboardBuffer(KB_SConsoleKeyboard* spConsoleKeyboard)
+                         local  int32 iRet
+                         local  int32 i
+                         local  int32 j
+                         local  CellKbInfo info
+                         local  CellKbData kdata
+                         local  uint8 convKey
+  777  0037DBF4     48  char KB_chReadKeyFromKeyboardBuffer(KB_SConsoleKeyboard* spConsoleKeyboard_p)
+                         local  char chKey

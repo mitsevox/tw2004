@@ -1,0 +1,282 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/AnalysisUtilities.c
+// compiled in: golf_unity.cpp
+// 57 functions, source order. line | PS3 address | size
+
+   47  0032F848    5AC  bool GameAnalysis_IsPuttForLead(enum PlayerNumber_t playerID)
+                         local  enum GM_ScoringType_t scoreType
+                         local  int i
+                         local  int myScore
+                         local  int myStrokes
+                         local  int theirScore
+                         local  int bestOpponentScore
+                         local  int numOpponentStrokes
+                         local  int bestOpponentStrokes
+                         local  int[4] cumulativeParScore
+                         local  int32 holeValue
+                         local  void* ptr
+                         local  struct GameModeSkins* pSkin
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_GetScoringType
+  224  0032EFAC    5F0  bool GameAnalysis_IsPuttForWin(enum PlayerNumber_t playerID)
+                         local  enum GM_ScoringType_t scoreType
+                         local  int i
+                         local  int myScore
+                         local  int myStrokes
+                         local  int theirScore
+                         local  int bestOpponentScore
+                         local  int numOpponentStrokes
+                         local  int bestOpponentStrokes
+                         local  int[4] cumulativeParScore
+                         local  int holesRemaining
+                         local  int32 holeValue
+                         local  void* ptr
+                         local  struct GameModeSkins* pSkin
+                         inlines  GM_GetCurrentHoleIndex, GM_GetNumHolesRemainingInRound, GM_GetPlayerHoleStrokes, GM_GetScoringType, GM_IsPlayoff
+  409  00288AC8    17C  bool GameAnalysis_IsPredictedBallRecord(enum PlayerNumber_t playerID)
+                         inlines  Singleton<HighScoreRecords>::GetSingleton
+  442  00247AC0     F8  bool GameAnalysis_IsPredictedBallTrophy(enum PlayerNumber_t playerID)
+  469  00314B8C    754  uint32 GameAnalysis_IsShotForRecord(enum PlayerNumber_t playerID)
+                         local  uint32 result
+                         local  int j
+                         local  int score
+                         local  struct PhysicsBall_t* pBall
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_IsPlayoff, Singleton<HighScoreRecords>::GetSingleton
+  564  002F8E04    214  uint32 GameAnalysis_IsShotForTrophyBall(enum PlayerNumber_t playerID)
+                         local  uint32 result
+                         local  uint32 trophyIndex
+                         local  int i
+                         inlines  EarningsManager::GetGameTrophyIndex, EarningsManager::GetHoleTrophyIndex, EarningsManager::GetShotTrophyIndex, GM_IsPlayoff
+  667  0032ED60    244  int GameAnalysis_GetCurrentEventLead(enum PlayerNumber_t playerID)
+                         local  enum GM_ScoringType_t scoreType
+                         local  int i
+                         local  int myScore
+                         local  int theirScore
+                         local  int bestOpponentScore
+                         local  int[4] cumulativeParScore
+                         inlines  GM_GetScoringType
+  752  00313B88    15C  int GameAnalysis_GetPotentailRoundParScore(enum PlayerNumber_t playerID)
+                         local  int totalpar
+                         local  int totalscore
+                         local  int i
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_GetScoringType
+  778  0032E8F8    460  int GameAnalysis_GetPotentialEventLead(enum PlayerNumber_t playerID)
+                         local  enum GM_ScoringType_t scoreType
+                         local  int i
+                         local  int myScore
+                         local  int theirScore
+                         local  int bestOpponentScore
+                         local  int[4] cumulativeParScore
+                         local  int currentLead
+                         local  enum GM_HoleResult_t potentialHoleResult
+                         local  int32 holeValue
+                         local  void* ptr
+                         local  struct GameModeSkins* pSkin
+                         inlines  GM_GetCurrentEventLead, GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_GetPotentialHoleResult, GM_GetScoringType
+  885  00313CE4    1CC  bool GameAnalysis_ShotWouldEndHole(enum PlayerNumber_t playerID)
+                         local  enum Lie_t saveLie
+                         local  int saveScore
+                         local  bool result
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_SetPlayerHoleStrokes
+  921  00313EB0    2A8  enum GM_HoleResult_t GameAnalysis_GetPotentialHoleResult(enum PlayerNumber_t playerID)
+                         local  int i
+                         local  int myScore
+                         local  int theirScore
+                         local  int bestOpponentScore
+                         inlines  GM_GetCurrentHoleIndex, GM_GetModeType, GM_GetPlayerHoleStrokes
+  982  001F5190     30  bool GameAnalysis_IsLeftHanded(enum PlayerNumber_t playerID)
+  990  002C5D40     34  float GameAnalysis_GetCurrentDistanceToPin(enum PlayerNumber_t playerID)
+                         local  float distanceToPin
+ 1002  002C7BFC     34  float GameAnalysis_GetCurrentDistanceToGreen(enum PlayerNumber_t playerID)
+                         local  float distanceToGreen
+ 1015  002C5CC4     34  float GameAnalysis_GetInitialDistanceToPin(enum PlayerNumber_t playerID)
+                         local  float distanceToPin
+ 1028  002C5C90     34  float GameAnalysis_GetEstimatedDistanceToPin(enum PlayerNumber_t playerID)
+                         local  float distanceToPin
+ 1041  00247BB8     4C  int32 GameAnalysis_GetEstimatedLie(enum PlayerNumber_t playerID)
+                         local  int32 surface
+ 1055  002C4D60     E4  float GameAnalysis_GetCurrentBallFlightDistance(enum PlayerNumber_t playerID)
+                         local  vec4flt v
+                         inlines  LLMath_Length3, LLMath_Subtract3, vec_madd, vec_sld
+ 1067  002C55DC     C0  float GameAnalysis_GetPositionDistanceToPin(float* pos)
+                         local  vec4flt ballToPin
+                         local  float distanceToPin
+                         inlines  LLMath_Length3, LLMath_Subtract3, vec_madd, vec_sld
+ 1084  002C7AF0    10C  float GameAnalysis_GetPositionDistanceToGreen(float* pos)
+                         local  int currentGreen
+                         local  vec4flt ballToGreen
+                         local  float distanceToGreen
+                         inlines  LLMath_Length3, LLMath_Subtract3, vec4flt_Copy, vec_madd, vec_sld, vec_sub
+ 1108  00314158     D4  int GameAnalysis_NumHolesCompleted(enum PlayerNumber_t playerID, bool includeCurrentHole)
+                         local  int i
+                         local  int startHole
+                         local  int numHoles
+                         inlines  GM_GetCurrentHoleIndex
+ 1139  0031422C    1D4  int GameAnalysis_NumHolesInOneSoFarThisRound(enum PlayerNumber_t playerID, bool includeCurrentHole, bool onlyCompletedHoles)
+                         local  int i
+                         local  int startHole
+                         local  int numHolesInOne
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_PlayerHoledOut, Singleton<GamePlayerManager>::GetSingleton
+ 1173  00314400    22C  int GameAnalysis_NumStrokesSoFarThisRound(enum PlayerNumber_t playerID, bool includeCurrentHole)
+                         local  int i
+                         local  int startHole
+                         local  int numStrokes
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_IsPlayoff
+ 1222  0031462C    128  int GameAnalysis_TotalModePointsSoFarThisRound(enum PlayerNumber_t playerID, bool includeCurrentHole)
+                         local  int i
+                         local  int startHole
+                         local  int modePoints
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerModePoints
+ 1252  00314754    21C  int GameAnalysis_NumBirdiesSoFarThisRound(enum PlayerNumber_t playerID, bool includeCurrentHole, bool onlyCompletedHoles)
+                         local  int i
+                         local  int startHole
+                         local  int numBirdies
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_PlayerHoledOut
+ 1288  00314970    21C  int GameAnalysis_NumEaglesSoFarThisRound(enum PlayerNumber_t playerID, bool includeCurrentHole, bool onlyCompletedHoles)
+                         local  int i
+                         local  int startHole
+                         local  int numEagles
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_PlayerHoledOut
+ 1323  003152E0    164  int GameAnalysis_CurrentBirdieStreak(enum PlayerNumber_t playerID, bool includeCurrentHole)
+                         local  int i
+                         local  int startHole
+                         local  int currentStreak
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes
+ 1361  00315444    164  int GameAnalysis_CurrentEagleStreak(enum PlayerNumber_t playerID, bool includeCurrentHole)
+                         local  int i
+                         local  int startHole
+                         local  int currentStreak
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes
+ 1398  002C7CD8    25C  float GameAnalysis_GetPuttBreakAngle(enum PlayerNumber_t PlayerID)
+                         local  vec4flt endLocation
+                         local  vec4flt ballToCup
+                         local  vec4flt ballToEnd
+                         local  float dot
+                         local  float angle
+                         local  float crossProductY
+                         inlines  LLMath_DotProduct3, LLMath_Length3, LLMath_Subtract3, vec_madd, vec_sld
+ 1483  003155A8     7C  int GameAnalysis_IsPuttFor(enum PlayerNumber_t playerID)
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes
+ 1492  001F51D0     B0  bool GameAnalysis_AllOpponentsAreAI(enum PlayerNumber_t playerID)
+                         local  int i
+ 1508  0031628C    140  bool GameAnalysis_LastHoleWasTied()
+                         local  int i
+                         local  int j
+                         inlines  GM_GetCurrentHoleIndex, GM_OnFirstSelectedHole
+ 1539  001F5280     A0  uint32 GameAnalysis_GetInitialStartingLie(enum PlayerNumber_t PlayerID)
+ 1562  003163CC    1FC  bool GameAnalysis_CurrentShotGIR(enum PlayerNumber_t PlayerID, bool underGIR, bool predicted)
+                         local  struct TGD_MaterialInfo* playerSurface
+                         local  enum Lie_t ballLie
+                         local  int strokesAfterHit
+                         local  int strokesBeforeHit
+                         local  int par
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes
+ 1612  001F5320     98  bool GameAnalysis_GetFairwayDrive(enum PlayerNumber_t PlayerID)
+ 1626  0030D978    108  int GameAnalysis_CountTotalHoleScores(enum PlayerNumber_t PlayerID, int relativeScore)
+                         local  int strokes
+                         local  int par
+                         local  int scorecount
+                         local  int i
+                         inlines  GM_GetPlayerHoleStrokes
+ 1655  0030DA80     F0  int GameAnalysis_CountExactHoleScores(enum PlayerNumber_t PlayerID, int relativeScore)
+                         local  int strokes
+                         local  int par
+                         local  int scorecount
+                         local  int i
+                         inlines  GM_GetPlayerHoleStrokes
+ 1684  0030DB70     BC  int GameAnalysis_CountHolesInOne(enum PlayerNumber_t PlayerID)
+                         local  int strokes
+                         local  int scorecount
+                         local  int i
+                         inlines  GM_GetPlayerHoleStrokes
+ 1707  0030DC2C     D8  int GameAnalysis_CountBogeysOrWorse(enum PlayerNumber_t PlayerID)
+                         local  int strokes
+                         local  int par
+                         local  int scorecount
+                         local  int i
+                         inlines  GM_GetPlayerHoleStrokes
+ 1736  003165C8    1E0  int GameAnalysis_NumParsSoFarThisRound(enum PlayerNumber_t playerID, bool includeCurrentHole, bool onlyCompletedHoles)
+                         local  int i
+                         local  int startHole
+                         local  int numBog
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_PlayerHoledOut, Singleton<GamePlayerManager>::GetSingleton
+ 1771  003167A8    1E4  int GameAnalysis_NumSingleBogeysSoFarThisRound(enum PlayerNumber_t playerID, bool includeCurrentHole, bool onlyCompletedHoles)
+                         local  int i
+                         local  int startHole
+                         local  int numBog
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_PlayerHoledOut, Singleton<GamePlayerManager>::GetSingleton
+ 1806  0031698C    1E4  int GameAnalysis_NumDoubleBogeysSoFarThisRound(enum PlayerNumber_t playerID, bool includeCurrentHole, bool onlyCompletedHoles)
+                         local  int i
+                         local  int startHole
+                         local  int numBog
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes, GM_PlayerHoledOut, Singleton<GamePlayerManager>::GetSingleton
+ 1841  00316B70    18C  int GameAnalysis_NumTripleBogeysOrWorseSoFarThisRound(enum PlayerNumber_t playerID, bool includeCurrentHole, bool onlyCompletedHoles)
+                         local  int i
+                         local  int startHole
+                         local  int numBog
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes
+ 1875  00316CFC    17C  int GameAnalysis_CountCompletedHoles(enum PlayerNumber_t playerID, bool includeCurrentHole, bool onlyCompletedHoles)
+                         local  int i
+                         local  int startHole
+                         local  int numComp
+                         inlines  GM_GetCurrentHoleIndex, GM_PlayerHoledOut
+ 1907  0030DD04    140  int GameAnalysis_CountStreakHoleScores(enum PlayerNumber_t PlayerID, int relativeScore)
+                         local  int strokes
+                         local  int par
+                         local  int streak
+                         local  int bestStreak
+                         local  int i
+                         inlines  GM_GetPlayerHoleStrokes
+ 1944  00316E78    1C4  int GameAnalysis_CountElligibleFairwaysSoFarThisRound(enum PlayerNumber_t PlayerID, bool includeCurrentHole, bool onlyCompletedHoles)
+                         local  int i
+                         local  int startHole
+                         local  int fairwaycount
+                         inlines  GM_GetCurrentHoleIndex, GM_PlayerHoledOut, Singleton<GamePlayerManager>::GetSingleton
+ 1974  0031703C    1D8  int GameAnalysis_CountTotalFairwaysSoFarThisRound(enum PlayerNumber_t PlayerID, bool includeCurrentHole, bool onlyCompletedHoles)
+                         local  int i
+                         local  int startHole
+                         local  int fairwaycount
+                         inlines  GM_GetCurrentHoleIndex, GM_PlayerHoledOut, Singleton<GamePlayerManager>::GetSingleton
+ 2002  0023760C     B8  int GameAnalysis_CountTotalFairways(enum PlayerNumber_t PlayerID)
+                         local  int fairwaycount
+                         local  int i
+ 2020  002376C4     FC  int GameAnalysis_CountStreakFairways(enum PlayerNumber_t PlayerID)
+                         local  int streak
+                         local  int bestStreak
+                         local  int i
+ 2052  00317214    1D8  int GameAnalysis_CountTotalGIRsSoFarThisRound(enum PlayerNumber_t PlayerID, bool includeCurrentHole, bool onlyCompletedHoles)
+                         local  int i
+                         local  int startHole
+                         local  int gircount
+                         inlines  GM_GetCurrentHoleIndex, GM_PlayerHoledOut, Singleton<GamePlayerManager>::GetSingleton
+ 2080  002B2D14    138  int GameAnalysis_CountTotalGIRs(enum PlayerNumber_t PlayerID, bool onlyCompletedHoles)
+                         local  int gircount
+                         local  int i
+                         inlines  GM_PlayerHoledOut
+ 2099  002377C0     EC  int GameAnalysis_CountStreakGIRs(enum PlayerNumber_t PlayerID)
+                         local  int streak
+                         local  int bestStreak
+                         local  int i
+ 2128  003173EC    1C0  int GameAnalysis_CountTotalPuttsSoFarThisRound(enum PlayerNumber_t PlayerID, bool includeCurrentHole, bool onlyCompletedHoles)
+                         local  int puttcount
+                         local  int i
+                         local  int startHole
+                         inlines  GM_GetCurrentHoleIndex, GM_PlayerHoledOut
+ 2153  002378AC     B4  int GameAnalysis_CountTotalPutts(enum PlayerNumber_t PlayerID)
+                         local  int puttcount
+                         local  int i
+ 2172  001F53B8    160  int GameAnalysis_vGetPlayerWindDirection(enum PlayerNumber_t PlayerID)
+                         local  vec4flt windDir
+                         local  float windMag
+                         local  float plrAngle
+                         local  float windAngle
+                         local  float diff
+ 2239  0028CC7C    198  int GameAnalysis_GetSidehillLie(enum PlayerNumber_t PlayerID)
+                         local  vec4flt normalAtBall
+                         local  float shotDirection
+                         local  vec4flt tempNormal
+                         local  float uphillAngle
+                         local  float tempSin
+                         local  float tempCos
+                         local  float epsilon
+                         local  float normalMag
+                         inlines  LLMath_LengthSquared3, RotateXY, std::cosf, std::sinf, vec4flt_Copy3, vec_madd, vec_sld
+ 2303  001F5518     18  bool GameAnalysis_FakingHoleOut()

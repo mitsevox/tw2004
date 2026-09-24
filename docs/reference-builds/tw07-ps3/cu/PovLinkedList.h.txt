@@ -1,0 +1,32 @@
+// ../../../../../TIGERCODE/Code/Golf/Spectator/PovLinkedList.h
+// compiled in: golf2_unity.cpp
+// 22 functions, source order. line | PS3 address | size
+
+   69    inline-only   struct CSpectatorCloneGroup* CPovLink<CSpectatorCloneGroup>::GetNext(const struct CPovLink<CSpectatorCloneGroup>* this)
+   69    inline-only   struct CSpectatorInstance* CPovLink<CSpectatorInstance>::GetNext(const struct CPovLink<CSpectatorInstance>* this)
+   70    inline-only   void CPovLink<CSpectatorInstance>::SetNext(const struct CPovLink<CSpectatorInstance>* this, struct CSpectatorInstance* p)
+   70    inline-only   void CPovLink<CSpectatorCloneGroup>::SetNext(const struct CPovLink<CSpectatorCloneGroup>* this, struct CSpectatorCloneGroup* p)
+   72    inline-only   struct CSpectatorInstance* CPovLink<CSpectatorInstance>::GetPrev(const struct CPovLink<CSpectatorInstance>* this)
+   72    inline-only   struct CSpectatorCloneGroup* CPovLink<CSpectatorCloneGroup>::GetPrev(const struct CPovLink<CSpectatorCloneGroup>* this)
+   73    inline-only   void CPovLink<CSpectatorInstance>::SetPrev(const struct CPovLink<CSpectatorInstance>* this, struct CSpectatorInstance* p)
+   73    inline-only   void CPovLink<CSpectatorCloneGroup>::SetPrev(const struct CPovLink<CSpectatorCloneGroup>* this, struct CSpectatorCloneGroup* p)
+   77    inline-only   void CPovLink<CSpectatorInstance>::Link(const struct CPovLink<CSpectatorInstance>* this, struct CSpectatorInstance* record)
+                         local  struct CSpectatorInstance* next
+   77    inline-only   void CPovLink<CSpectatorCloneGroup>::Link(const struct CPovLink<CSpectatorCloneGroup>* this, struct CSpectatorCloneGroup* record)
+                         local  struct CSpectatorCloneGroup* next
+   91    inline-only   void CPovLink<CSpectatorCloneGroup>::Unlink(const struct CPovLink<CSpectatorCloneGroup>* this)
+                         local  struct CSpectatorCloneGroup* next
+                         local  struct CSpectatorCloneGroup* prev
+   91    inline-only   void CPovLink<CSpectatorInstance>::Unlink(const struct CPovLink<CSpectatorInstance>* this)
+                         local  struct CSpectatorInstance* next
+                         local  struct CSpectatorInstance* prev
+  110    inline-only   void CPovLinkedList<CSpectatorInstance>::Init(const struct CPovLinkedList<CSpectatorInstance>* this)
+  110    inline-only   void CPovLinkedList<CSpectatorCloneGroup>::Init(const struct CPovLinkedList<CSpectatorCloneGroup>* this)
+  112    inline-only   struct CSpectatorCloneGroup* CPovLinkedList<CSpectatorCloneGroup>::First(const struct CPovLinkedList<CSpectatorCloneGroup>* this)
+  112    inline-only   struct CSpectatorInstance* CPovLinkedList<CSpectatorInstance>::First(const struct CPovLinkedList<CSpectatorInstance>* this)
+  113    inline-only   struct CSpectatorInstance* CPovLinkedList<CSpectatorInstance>::Last(const struct CPovLinkedList<CSpectatorInstance>* this)
+  113    inline-only   struct CSpectatorCloneGroup* CPovLinkedList<CSpectatorCloneGroup>::Last(const struct CPovLinkedList<CSpectatorCloneGroup>* this)
+  114    inline-only   struct CSpectatorCloneGroup* CPovLinkedList<CSpectatorCloneGroup>::End(const struct CPovLinkedList<CSpectatorCloneGroup>* this)
+  114    inline-only   struct CSpectatorInstance* CPovLinkedList<CSpectatorInstance>::End(const struct CPovLinkedList<CSpectatorInstance>* this)
+  127    inline-only   void CPovLinkedList<CSpectatorInstance>::Append(const struct CPovLinkedList<CSpectatorInstance>* this, struct CSpectatorInstance* p)
+  127    inline-only   void CPovLinkedList<CSpectatorCloneGroup>::Append(const struct CPovLinkedList<CSpectatorCloneGroup>* this, struct CSpectatorCloneGroup* p)

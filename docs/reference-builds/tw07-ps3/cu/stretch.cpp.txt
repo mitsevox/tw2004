@@ -1,0 +1,49 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/stretch.cpp
+// compiled in: stretch.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   38  006D1998    140  static void crossfade(float* src1, float* src2, float* dest, int windowsize, int delta)
+                         local  float fade
+                         local  float faderate
+                         local  int delay
+                         local  int i
+   74  006D1AD8    120  static int determineaction(int windowsize, float stretchratio, unsigned char** ppsideband, float* sampleerror)
+                         local  float error1
+                         local  float error2
+                         local  int delay
+  123    inline-only   static void applyaction(TIMESTRETCHSTATE* ts, float** ppsampledata, int delta)
+                         local  float* src1
+                         local  float* src2
+  171  006D1F40     CC  static int transferframes(TIMESTRETCHSTATE* ts, int* poutputframes, float** ppoutputdata)
+                         local  float* src
+                         local  float* dest
+                         local  int count
+                         inlines  MemCpy
+  199  006D1BF8    1B8  int stretchframesneeded(void* ptsstate, int outputframes)
+                         local  TIMESTRETCHSTATE* ts
+                         local  unsigned char* psideband
+                         local  float sampleerror
+                         local  int framesneeded
+                         local  int framesleft
+                         local  int framesconsumed
+                         local  int framesgenerated
+                         local  int delta
+  291  006D200C    320  int stretch(void* ptsstate, int outputframes, float* psampledata, float* poutputdata)
+                         local  TIMESTRETCHSTATE* ts
+                         local  int framesoutput
+                         local  int delta
+                         local  int count
+                         inlines  MemCpy, applyaction
+  351  006D1DB0     20  void SFILTER_timestretchsetratio(TIMESTRETCHSTATE* ptss, int timemult)
+  371  006D232C    1C8  int SFILTER_timestretch(void* pstate, int outputframes, void* psrcpassed, void* pdstpassed, int )
+                         local  TIMESTRETCHSTATE* ptss
+                         local  int inputframes
+                         local  float* psrc
+                         local  float* pdst
+                         local  int retVal
+                         local  int totalNeededBufSize
+                         local  float* ptemp
+  459  006D1DD0     60  void SFILTER_timestretchrestore(void* pstate)
+                         local  TIMESTRETCHSTATE* ptss
+                         inlines  SNDMEMI_free
+  474  006D1E30    110  int SFILTER_timestretchinit(TIMESTRETCHSTATE* ptss, unsigned char* psideband, int voice)

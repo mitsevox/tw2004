@@ -1,0 +1,11 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/SceneGraph/include/SceneGraph/Runtime/Nodes/SGNodeBoundingVolume.h
+// compiled in: SGNodeBoundingVolume.cpp
+// 7 functions, source order. line | PS3 address | size
+
+   46    inline-only   void* operator new(size_t size, const char* text, struct ICoreAllocator* allocator, enum AllocFlags allocator_flags, uint32_t alignment)
+   46    inline-only   struct ICoreAllocator* GetClassAllocator()
+   46    inline-only   void operator delete(void* address)
+   65    inline-only   void SetAABBMin(const struct <anon>* this, const const RNAVector3& v3Val)
+   66    inline-only   void SetAABBMax(const struct <anon>* this, const const RNAVector3& v3Val)
+   67    inline-only   RNAVector3 GetAABBMin(const struct <anon>* this)
+   68    inline-only   RNAVector3 GetAABBMax(const struct <anon>* this)

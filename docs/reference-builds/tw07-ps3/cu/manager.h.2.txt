@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/quick_spu/dev-football/include/quick_spu/manager.h
+// compiled in: managerplat.cpp
+// 6 functions, source order. line | PS3 address | size
+
+  184    inline-only   void* Alloc(const const struct <anon>* this, size_t size, size_t alignment)
+  188    inline-only   void Free(const const struct <anon>* this, void* p)
+  194    inline-only   void EnterCriticalSection(const const struct <anon>* this)
+  201    inline-only   void LeaveCriticalSection(const const struct <anon>* this)
+  434    inline-only   const char* GetName(const struct <anon>* this)
+  446  008DF590      C  void ~Manager(const struct <anon>* this)

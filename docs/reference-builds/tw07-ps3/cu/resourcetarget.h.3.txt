@@ -1,0 +1,10 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/RW45/platform/include/native/ps3-ppu-gcc/rw/core/resource/resourcetarget.h
+// compiled in: MemoryManager.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   85  0081E5B4     88  void ResourceDescriptor(const struct <anon>* this, const const MemoryResourceDescriptor& mainMemory)
+   95  0081E6AC     D0  void ResourceDescriptor(const struct <anon>* this, uint32_t size, uint32_t alignment)
+  246  0081E8C0     84  void Resource(const struct <anon>* this, const const MemoryResource& mainMemory)
+  270  0081E944     54  MemoryResource& GetMemoryResource(const struct <anon>* this)
+  337    inline-only   const RwChar* GetBaseResourceTypeName(uint32_t index)
+                         local  const char[24] __FUNCTION__

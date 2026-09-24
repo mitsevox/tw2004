@@ -1,0 +1,93 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/RNADevice.cpp
+// compiled in: RNADevice.cpp
+// 30 functions, source order. line | PS3 address | size
+
+    0  00826D04    1B0  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  GetRow, Matrix44, Quaternion, Set, Vector2, Vector3, Vector4
+   57  00826B54     44  static void RNA::NullRenderCallback(struct <anon>* pDevice, void* pContext, void* pObject, uintptr_t userData)
+                         local  const char[19] __FUNCTION__
+                         inlines  RNADebugBreak
+   86  00828574    4EC  void DeviceC(const struct <anon>* this)
+                         local  uint32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct VertexFormatC** newData
+                         inlines  Init, RNADebugBreak, Reserve, Vector
+  150  008276B8    254  void ~DeviceC(const struct <anon>* this)
+                         local  const char[9] __FUNCTION__
+                         local  int32_t i
+                         inlines  RNADebugBreak, operator[], ~Vector
+  190  00826C6C     98  bool BeginFrame(const struct <anon>* this)
+                         local  const char[11] __FUNCTION__
+                         inlines  RNADebugBreak
+  223  00827304    12C  void EndFrame(const struct <anon>* this)
+                         local  const char[9] __FUNCTION__
+                         inlines  RNADebugBreak
+  270  00826958     58  int32_t GetNumPasses(const const struct <anon>* this)
+  302  008269B0     5C  void SetPass(const struct <anon>* this, int32_t iPass)
+  338  0082707C    130  void BindShader(const struct <anon>* this, struct ShaderC* pShader, int32_t iTechnique)
+                         inlines  Flush
+  397  008271AC    158  void BindMaterial(const struct <anon>* this, struct MaterialC* pMaterial)
+                         local  const char[13] __FUNCTION__
+                         local  struct ShaderC* pShader
+                         local  int32_t iTechOverride
+                         inlines  MaterialC::GetShader, RNADebugBreak, SetParmBlock, ShaderC::GetOverrideTechnique
+  464  00826950      8  void BindMaterialList(const struct <anon>* this, struct MaterialListC* pMaterialList)
+  489  00827430     AC  struct MaterialC* GetMaterialByIndex(const struct <anon>* this, int32_t iMaterial)
+                         inlines  MaterialListC::GetMaterial, RNADebugBreak, operator[]
+  523  008274DC    108  void BindMaterialByIndex(const struct <anon>* this, int32_t iMaterial)
+                         local  struct MaterialC* pMaterial
+                         inlines  MaterialListC::GetMaterial, RNADebugBreak, operator[]
+  551  00826A14     9C  RenderCallbackPtr GetRenderCallback(const struct <anon>* this, enum RenderCallbackID idCallback)
+                         local  const char[18] __FUNCTION__
+                         inlines  RNADebugBreak
+  557  00826AB0     A4  void* GetRenderContext(const struct <anon>* this, enum RenderCallbackID idCallback)
+                         local  const char[17] __FUNCTION__
+                         inlines  RNADebugBreak
+  563  00826B98     D4  void SetRenderCallback(const struct <anon>* this, enum RenderCallbackID idCallback, RenderCallbackPtr pRenderFunc, void* pContext)
+                         local  const char[18] __FUNCTION__
+                         inlines  RNADebugBreak
+  606  008281D4     F4  void SetProjection(const struct <anon>* this, const const RNAMatrix44& Matrix)
+                         inlines  RNADebugBreak, ScopeParmC::Set<RNAMath::RNAMatrix44>, Update, operator=
+  613  008275E4     D4  const RNAVector3 GetCameraPosition(const struct <anon>* this)
+                         inlines  RNADebugBreak, ScopeParmC::GetRef<RNAMath::RNAVector3>, Vector3
+  618  00826ED4    1A8  const RNAVector3 ExtractCameraPosition(const const RNAMatrix44& view)
+                         local  RNAVector4 viewW
+                         local  RNAVector3 v
+                         local  RNAMatrix44 viewT
+                         local  RNAMatrix33 viewUP
+                         local  unsigned char[16] permuteControl
+                         inlines  Matrix44, VecFloat<VectorAxisX>, VecFloat<VectorAxisY>, VecFloat<VectorAxisZ>, Vector3, Vector3<VectorAxisX, VectorAxisY, VectorAxisZ>, Vector4, operator float, operator(), vec_perm, vpu::Mult, vpu::Transpose, vpu::_asmMultAdd, vpu::operator-
+  636  008282C8    1B8  void SetView(const struct <anon>* this, const const RNAMatrix44& Matrix)
+                         local  RNAVector3 vEyePos
+                         inlines  RNADebugBreak, ScopeParmC::Set<RNAMath::RNAMatrix44>, ScopeParmC::Set<RNAMath::RNAVector3>, Update
+  645  00828480     F4  void SetLocalToWorld(const struct <anon>* this, const const RNAMatrix44& Matrix)
+                         inlines  RNADebugBreak, ScopeParmC::Set<RNAMath::RNAMatrix44>, Update, operator=
+  651  00827F4C     D8  RNAMatrix44 GetProjection(const struct <anon>* this)
+                         inlines  Matrix44, RNADebugBreak, ScopeParmC::GetRef<RNAMath::RNAMatrix44>
+  657  00828024     D8  RNAMatrix44 GetView(const struct <anon>* this)
+                         inlines  Matrix44, RNADebugBreak, ScopeParmC::GetRef<RNAMath::RNAMatrix44>
+  662  008280FC     D8  RNAMatrix44 GetLocalToWorld(const struct <anon>* this)
+                         inlines  Matrix44, RNADebugBreak, ScopeParmC::GetRef<RNAMath::RNAMatrix44>
+  675  00828F4C    41C  struct VertexFormatC* RegisterVertexFormat(const struct <anon>* this, const const struct <anon>& vf)
+                         local  struct VertexFormatC* pVertexFormat
+                         local  char[256] strName
+                         local  int32_t newMaxElements
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct VertexFormatC** newData
+                         local  int32_t i
+                         local  int32_t i
+                         local  uint32_t newArraySize
+                         local  const char* buf
+                         local  struct VertexFormatC** newData
+                         inlines  Construct, PushBack, RNADebugBreak, SetName, operator new
+  704  00827EF4     58  struct VertexFormatC* FindVertexFormat(const struct <anon>* this, const const struct <anon>& vf)
+                         local  char[256] strName
+  716  00827DC0    134  struct VertexFormatC* FindVertexFormat(const struct <anon>* this, const char* pStrName)
+                         local  int32_t i
+                         local  struct VertexFormatC* pVertexFormat
+                         inlines  operator[]
+  731  00826A0C      8  struct VertexFormatC* GetVertexFormat(const struct <anon>* this)
+  737  00826EC4     10  static void _GLOBAL__I__ZN3RNA7DeviceCC2Ev()
+  738  00826EB4     10  static void _GLOBAL__D__ZN3RNA7DeviceCC2Ev()

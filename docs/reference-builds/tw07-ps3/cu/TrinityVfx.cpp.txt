@@ -1,0 +1,14 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_trinity/trinity/Runtime/src/TrinityVfx.cpp
+// compiled in: TrinityVfx.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   30  00593E18     70  void InitVfx(const struct TrinityVfx* this, struct Sequence* pSequence, int32_t vfxId, char* pVfxName, float[3]* pInitialPos)
+   46  00593E88     54  void ReInitVfx(const struct TrinityVfx* this)
+   63  00593EDC    150  void Tick(const struct TrinityVfx* this, float_t fDeltaSec)
+                         local  mat44flt matrix
+                         local  bool8_t bApplyMatrix
+  106  0059402C      C  int32_t GetVfxId(const const struct <anon>* this)
+  116  00594038    280  void Start(const struct TrinityVfx* this)
+                         local  vec4flt vPos4
+                         local  mat44flt matrix
+                         local  vec4flt vTempPos

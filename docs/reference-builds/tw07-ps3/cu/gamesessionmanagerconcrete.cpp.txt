@@ -1,0 +1,56 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/gamesessionmanagerconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 11 functions, source order. line | PS3 address | size
+
+   79  005DC0A0     B8  struct GameSessionConcrete* FindGameSession(const struct GameSessionManagerConcrete* this, int32_t iGameSessionId)
+                         local  uint32_t uNumGameSessions
+                         local  uint32_t uIndex
+                         local  struct GameSessionConcrete* pCurrentGameSession
+                         inlines  GetElementAt, GetNumberOfElements
+  118  00620448    1D4  void LobbyDispatch(const struct GameSessionManagerConcrete* this, const struct Lobby* , LobbyApiMsgT* pMesg)
+                         local  const char8_t* pGameInfo
+                         local  struct <anon> GameInfoDictionary
+                         local  char8_t[2] strGameName
+                         local  int32_t iIdent
+                         local  struct <anon> pDeletedGame
+                         local  uint32_t uNumElements
+                         local  struct GameSessionObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList, RCPointer, ~RCPointer
+  186  005E1884    240  void ProcessComplete(const struct GameSessionManagerConcrete* this)
+                         local  uint32_t uNumGameSessions
+                         local  struct <anon>* pFacade
+                         local  uint32_t uNumElements
+                         local  struct GameSessionObserver** pList
+                         local  uint32_t uIndex
+                         local  struct GameSessionConcrete* pGameSession
+                         local  uint32_t uNumElements
+                         local  struct GameSessionObserver** pList
+                         inlines  FastRemoveElementAt, GetElementAt, GetInstance, GetMaxNumberOfObservers, GetNumberOfElements, GetObserverList, MarkClean
+  247  005B6B98      4  void SetGameMode(const struct GameSessionManagerConcrete* this, int32_t iGameMode)
+  277  00617530    17C  void GameSessionManagerConcrete(const struct GameSessionManagerConcrete* this)
+                         local  struct LobbyConcrete* pLobby
+                         inlines  AddObserver, GetLobbyConcrete, List, LobbyDispatchObserver, Observable, RCPointer
+  317  00617B34    140  void ~GameSessionManagerConcrete(const struct GameSessionManagerConcrete* this)
+                         local  struct LobbyConcrete* pLobby
+                         inlines  GetLobbyConcrete, RemoveAll, RemoveObserver, ~List, ~LobbyDispatchObserver, ~Observable, ~RCPointer
+  350  0061F4B0    1A8  struct GameSessionConcrete* GetGameSession(const struct GameSessionManagerConcrete* this, const char8_t* pGameInfo)
+                         local  struct <anon> GameInfoDictionary
+                         local  int32_t iGameSessionId
+                         local  struct GameSessionConcrete* pGameSession
+                         local  uint32_t uNumElements
+                         local  struct GameSessionObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList, InsertElement, MarkDirty
+  400  0061FB48      8  void UpdateGameSession(const struct GameSessionManagerConcrete* this, LobbyApiMsgT* pMesg)
+  424  005EEF2C    324  void SetJoinedGameSession(const struct GameSessionManagerConcrete* this, struct GameSessionConcrete* pJoinedGame)
+                         local  uint32_t uNumElements
+                         local  struct GameSessionObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList, Instance, cOsdkBase, operator->, operator=
+  477  005D24E0    13C  void ClearJoinedGameSession(const struct GameSessionManagerConcrete* this, enum GameSessionLeftReason eReason)
+                         local  struct <anon> pCurrentJoinedGameSession
+                         local  uint32_t uNumElements
+                         local  struct GameSessionObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList, RCPointer, operator OSDK::GameSessionConcrete*, operator=, ~RCPointer
+  513  0061FA78     D0  void ChangeGameSession(const struct GameSessionManagerConcrete* this, LobbyApiMsgT* pMesg)
+                         local  struct <anon> GameInfoDictionary
+                         local  int32_t iGameSessionId
+                         local  struct GameSessionConcrete* pGameSession

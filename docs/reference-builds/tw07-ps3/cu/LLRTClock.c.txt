@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/legacy/ll/LLRTClock.c
+// compiled in: Legacy_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   18  0037E28C    114  void RTClock_GetDateTimeString(char* s, size_t sBufSize)
+                         local  bool ok
+                         local  int month
+                         local  int day
+                         local  int year
+                         local  int hour
+                         local  int minute
+                         local  int dummy
+                         local  char* AMPM

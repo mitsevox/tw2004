@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/UI_Core/AptRuntime/Headers/UI_Tutorial.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   89    inline-only   void UITutorial::SetTutorialType(const struct UITutorial* this, enum TutorialLessonID type)

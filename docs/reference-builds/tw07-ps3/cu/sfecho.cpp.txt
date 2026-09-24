@@ -1,0 +1,27 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/sfecho.cpp
+// compiled in: sfecho.cpp
+// 5 functions, source order. line | PS3 address | size
+
+   12    inline-only   void SNDI_echo(ECHOSTATE* pes, int frames, void* psrcp, void* pdstp)
+                         local  float* ptaken
+                         local  float[4] fedforward
+                         local  float* psrc
+                         local  float* pdst
+                         local  float* pdstend
+   83  006F4124    22C  int SFILTER_echo(void* pstate, int frames, void* psrcp, void* pdstp, int requester)
+                         local  ECHOSTATE* pes
+                         local  float* ptempsrc
+                         local  float* ptempdst
+                         local  int moduleframes
+                         local  int temp
+                         inlines  SNDI_echo
+  141  006F4350     60  void SFILTER_echorestore(void* pstate)
+                         local  ECHOSTATE* pes
+                         inlines  SNDMEMI_free
+  157  006F43B0     38  int SFILTER_createECHO(ECHOSTATE* pes)
+  173  006F43E8     F8  void SFILTER_modifyECHO(ECHOSTATE* pes, FIXED24P8* pparams)
+                         local  int feedback
+                         local  int samplerate
+                         local  int delaytime
+                         local  int delaybufsize
+                         inlines  SNDMEMI_alloc

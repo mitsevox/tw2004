@@ -1,0 +1,6 @@
+// ../../../../../TIGERCODE/Code/Legacy/LL/Headers/LLPoolAllocator.h
+// compiled in: other_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   58    inline-only   enum eMemoryPools CorePoolAllocator::SetPoolType(const struct CorePoolAllocator* this, enum eMemoryPools poolType)
+                         local  enum eMemoryPools old

@@ -1,0 +1,28 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_OnlineTermsConditions.cpp
+// compiled in: apt_unity.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   35  000F766C     B0  void UIOnlineTermsConditions::UIOnlineTermsConditions(const struct UIOnlineTermsConditions* this)
+                         inlines  TAptArrayStruct, TArrayInternal<char*,AptStructSwapper>::TArrayInternal, TExternArray<UIOnlineTermsConditions::DstMenuItem_oltc>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   41  000F0794     84  void UIOnlineTermsConditions::Init(const struct UIOnlineTermsConditions* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   52  00048264     60  void UIOnlineTermsConditions::OnShow(const struct UIOnlineTermsConditions* this)
+   62  000926D0    314  void UIOnlineTermsConditions::Show(const struct UIOnlineTermsConditions* this, char* TermsConditions)
+                         local  const char[5] __FUNCTION__
+                         local  int i
+                         local  char** szText
+                         inlines  AptStructSwapper::Swap, TArrayInternal<char*,AptStructSwapper>::Push, TagValuePair, operator+
+   83  000D8A48     B0  void UIOnlineTermsConditions::Hide(const struct UIOnlineTermsConditions* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<char*,AptStructSwapper>::Flush
+  101  000BE924    180  void UIOnlineTermsConditions::UpdateItemAndLabel(const struct UIOnlineTermsConditions* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_oltc* dest
+                         inlines  TArrayInternal<char*,AptStructSwapper>::operator[]
+  128  000845C4    160  enum eAptHandleInput UIOnlineTermsConditions::HandleInput(const struct UIOnlineTermsConditions* this, int32 cID)
+  174  000810DC    210  void UIOnlineTermsConditions::UpdateTOS(const struct UIOnlineTermsConditions* this, const char* TOS, int tosSize)
+                         local  int index
+                         local  char* szLine
+                         local  char* szNextLine
+                         inlines  TArrayInternal<char*,AptStructSwapper>::operator[]
+  224  000812EC     18  void UIOnlineTermsConditions::RefreshTOS(const struct UIOnlineTermsConditions* this, const char* TOS, int tosSize)
+  236  000D8AF8     B0  void UIOnlineTermsConditions::Close(const struct UIOnlineTermsConditions* this)
+                         inlines  AptStructSwapper::Free, TArrayInternal<char*,AptStructSwapper>::Flush

@@ -1,0 +1,64 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/AI/Emotion.c
+// compiled in: golf2_unity.cpp
+// 23 functions, source order. line | PS3 address | size
+
+   69  00146E4C     28  enum PlayerEmotionType_e Emotion_GetEmotionType(enum PlayerNumber_t ePlayerID)
+   77  00146E74     2C  enum PlayerEmotionStrength_e Emotion_GetEmotionStrength(enum PlayerNumber_t ePlayerID)
+   85  00146EA0     2C  enum PlayerEmotionPostShotAnimationType_e Emotion_GetEmotionAnimationType(enum PlayerNumber_t ePlayerID)
+   92  00146ECC     2C  enum PlayerEmotionType_e Emotion_GetPredictedEmotionType(enum PlayerNumber_t ePlayerID)
+  100  00146EF8     2C  enum PlayerEmotionStrength_e Emotion_GetPredictedEmotionStrength(enum PlayerNumber_t ePlayerID)
+  107  0013CEF4     30  enum PlayerEmotionPostShotAnimationType_e Emotion_GetPredictedEmotionAnimationType(enum PlayerNumber_t ePlayerID)
+  121  0018FBB4    2A0  void Emotion_SetAnimationType(enum PlayerNumber_t ePlayerID, enum PlayerEmotionPostShotAnimationType_e type)
+                         local  uint32 holeIndex
+                         inlines  GM_GetPlayerHoleStrokes, GM_SetPlayerHoleStrokes
+  176  00132C98     30  void Emotion_SetPredictedAnimationType(enum PlayerNumber_t ePlayerID, enum PlayerEmotionPostShotAnimationType_e type)
+  187  001AEF64     90  void Emotion_PostBallEvent(enum PlayerNumber_t ePlayerID, enum BallEmotionEvent_e event)
+                         local  enum BallEmotionEvent_e prevEvent
+  238  001AED88    1DC  void Emotion_UpdatePlayerEmotion(enum PlayerNumber_t ePlayerID)
+                         local  int8 state
+                         local  enum PlayerEmotionType_e prevType
+                         local  enum PlayerEmotionStrength_e prevStrength
+  299  00146F24      4  void Emotion_RecordPredictedEmotion(enum PlayerNumber_t ePlayerID)
+  307  00190BF4    260  void Emotion_PreShotEmotionUpdate(enum PlayerNumber_t ePlayerID)
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+  379  001AEB5C    22C  void Emotion_SwingEmotionUpdate(enum PlayerNumber_t ePlayerID)
+                         local  vec4flt aimToPos
+                         local  float aimToPosLength
+                         inlines  LLMath_Length3, LLMath_Subtract3, vec_madd, vec_sld
+  455  0016EC10     74  void Emotion_SimulateUpdate(enum PlayerNumber_t ePlayerID)
+  483  0018FF2C    288  void Emotion_PostShotUpdate(enum PlayerNumber_t ePlayerID, bool predicted)
+                         local  struct PhysicsBall_t* ball
+                         inlines  GameEffects_IsScriptedMomentOn, GamePlayer::GetEstimatedBall
+ 1225  001617C8    1F8  void Emotion_BallHitUpdate(enum PlayerNumber_t ePlayerID)
+                         local  float estimatedStrength
+                         local  float strengthDiff
+ 1277  00146F28     34  void Emotion_BallCollisionUpdate(enum PlayerNumber_t ePlayerID)
+ 1286  00146F5C    1EC  void Emotion_BallBounceUpdate(enum PlayerNumber_t ePlayerID)
+                         local  struct TGD_MaterialInfo* lie
+ 1337  0016E864    3AC  void Emotion_BallTopOfArcUpdate(enum PlayerNumber_t ePlayerID)
+                         local  vec4flt playerToAim
+                         local  vec4flt playerToBall
+                         local  float angle
+                         local  int curStrength
+                         inlines  LLMath_DotProduct3, LLMath_Subtract3, vec_madd, vec_sld, vec_sub
+ 1459  00133008     50  void Emotion_ResetSuspenseMeter(enum PlayerNumber_t ePlayerID)
+ 1472  00147148     BC  bool Emotion_GetSuspenseMeter(enum PlayerNumber_t ePlayerID, int32* pLevel)
+                         local  struct EmotionStruct_t* pem
+                         local  bool ret
+                         local  int32 level
+ 1511  00164B30    310  void Emotion_UpdateSuspenseMeter(enum PlayerNumber_t ePlayerID)
+                         local  struct EmotionStruct_t* pem
+                         local  struct PhysicsBall_t* pball
+                         local  TGD_TerrainInfo* pTerrainGameData
+                         local  vec4flt vecBallToCup
+                         local  float dist
+                         local  float[4] circleRadii
+                         local  vec4flt vecBallVel
+                         local  float normScale
+                         local  float convergence
+                         local  bool estimateGood
+                         local  int32 thiscircle
+                         local  int32 iCircle
+                         inlines  LLMath_Scale3, LLMath_Subtract3, __vec_mul, vec_ld, vec_splat
+ 1629  0018FE54     D8  bool Emotion_DoesShotExceedLimit(enum PlayerNumber_t ePlayerID, bool predicted)
+                         inlines  GM_GetCurrentHoleIndex, GM_GetPlayerHoleStrokes

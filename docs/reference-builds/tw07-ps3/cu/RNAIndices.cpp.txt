@@ -1,0 +1,29 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/rnacore/source/RNARender/PS3/RNAIndices.cpp
+// compiled in: RNAIndices.cpp
+// 12 functions, source order. line | PS3 address | size
+
+    0  008390F0     80  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   52  00838E90     54  void IndicesC::IndicesC(const struct IndicesC* this, struct UserData* pUserData, uint32_t uFlags)
+                         inlines  Object::SetAllocated
+   62  00838F2C     C8  void IndicesC::~IndicesC(const struct IndicesC* this)
+                         inlines  IndicesC::operator delete
+   71  00839190     74  uint32_t IndicesC::GetIndexDataSize(const const struct IndicesC* this)
+                         local  const char[17] __FUNCTION__
+                         inlines  RNADebugBreak
+   86  00839204     E8  void IndicesC::Create(const struct IndicesC* this, struct DeviceC* pDevice, enum IndexFormatE eFormat, int32_t nIndices, enum MemoryLocationE eLocation)
+                         local  const char[7] __FUNCTION__
+                         local  uint32_t uLength
+                         local  bool bForceToMainMem
+                         inlines  RNADebugBreak
+  108  00838EE4     48  void IndicesC::Destroy(const struct IndicesC* this)
+  119  00838FF4     60  void* IndicesC::Lock(const struct IndicesC* this, uint32_t uFlags)
+                         local  const char[5] __FUNCTION__
+                         local  void* pData
+                         inlines  RNADebugBreak
+  127  00839054      4  void IndicesC::Unlock(const struct IndicesC* this)
+  133  00839058     4C  void IndicesC::WriteIndices(const struct IndicesC* this, const int16_t* pIndices, int32_t iStartIndex, int32_t nIndices)
+                         local  int16_t* pData
+  145  008390A4     4C  void IndicesC::WriteIndices(const struct IndicesC* this, const int32_t* pIndices, int32_t iStartIndex, int32_t nIndices)
+                         local  int32_t* pData
+  156  00839170     10  static void _GLOBAL__I__ZN3RNA8IndicesC16s_ClassAllocatorE()
+  157  00839180     10  static void _GLOBAL__D__ZN3RNA8IndicesC16s_ClassAllocatorE()

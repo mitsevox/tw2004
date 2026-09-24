@@ -1,0 +1,13 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/productupdategetserverinfostrategy.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   77  005D0C08     A8  void LobbyApiCallback(LobbyApiRefT* pRef, LobbyApiMsgT* pMsg, void* pUserData)
+                         local  struct <anon>* pThis
+                         local  struct <anon> dict
+  129  00621D5C     5C  void ProductUpdateGetServerInfoStrategy(const struct <anon>* this, struct ProductUpdateManagerStrategy* pUpdateStrategy)
+                         inlines  ProductUpdateStage
+  152  005E4404     70  void ~ProductUpdateGetServerInfoStrategy(const struct <anon>* this)
+                         inlines  operator delete, ~ProductUpdateStage
+  178  005CEDD8     90  enum ProcessResultE Process(const struct <anon>* this)
+                         local  enum ProcessResultE eResult

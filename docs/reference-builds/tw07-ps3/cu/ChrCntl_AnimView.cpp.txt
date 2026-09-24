@@ -1,0 +1,31 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/src/ChrCntl_AnimView.cpp
+// compiled in: ChrCntl_AnimView.cpp
+// 12 functions, source order. line | PS3 address | size
+
+   35  0059EA34     A8  void ChrCntl_AnimView_Init(struct Character* viewInfo, struct Definition* character, void* parentObject)
+                         inlines  vec3flt_Set
+  139  0059E4D4     84  void ChrCntl_AnimView_ReserveInstVars(struct Character* viewInfo, uint32_t capacity)
+                         local  int i
+  149  0059E558     5C  void ChrCntl_AnimView_InitDynamicSkeletonFilter(struct Character* viewInfo)
+  163  0059E5B4     48  void ChrCntl_AnimView_DeInitDynamicSkeletonFilter(struct Character* viewInfo)
+  179  0059E5FC     20  void ChrCntl_AnimView_AddNumFramesAdjust(float delta)
+  184  0059E61C     20  void ChrCntl_AnimView_AddNumFramesFrameRateAdjust(float delta)
+  189  0059E63C     E8  float ChrCntl_AnimView_ChangeNumFrames(struct Character* viewInfo, const struct AnimNode* node, struct InstVars* vars, float newNumFrames, float prevNumFrames, float frameNum, int flags)
+  210  0059E724    258  int ChrCntl_AnimView_NextFrame(struct Character* viewInfo, float deltaFrameNum)
+                         local  int transitionTaken
+                         local  int eventIndex
+                         local  float wrappedFrameNum
+                         local  float wrappedPrevFrameNum
+                         local  int prevStateIdx
+                         local  struct <anon>* prevState
+  317  0059EADC    1D0  struct Frame* ChrCntl_AnimView_CalcFrame(struct Character* viewInfo, struct <anon>* gameMovement)
+                         local  struct Frame* frameRef
+                         local  int flags
+                         inlines  GetFilter, vec3flt_Set
+  414  0059E97C      4  void ChrCntl_AnimView_ReadGameMovement(struct Character* viewInfo, struct <anon>* gameMovement)
+  517  0059E980      8  struct ChrCntl_ModelRef_s* ChrCntl_AnimView_GetCurrentModelRef(struct Character* viewInfo)
+  558  0059E988     AC  const struct <anon>* ChrCntl_AnimView_SetCurrentSkeleton(struct Character* viewInfo, const char* name)
+                         local  const uint32_t nameID
+                         local  int32_t skeletonIndex
+                         local  const struct <anon>* skeleton
+                         inlines  Common::CommonHash

@@ -1,0 +1,57 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/gamemode/GameMode_HitShorterFarther.cpp
+// compiled in: golf_unity.cpp
+// 25 functions, source order. line | PS3 address | size
+
+   13  00204560     80  void GameModeHitShorterFarther::GameModeHitShorterFarther(const struct GameModeHitShorterFarther* this)
+   22  00202BF4     18  void GameModeHitShorterFarther::~GameModeHitShorterFarther(const struct GameModeHitShorterFarther* this)
+   26  00202C70     48  const char* GameModeHitShorterFarther::GetModeSpecificTipString(const struct GameModeHitShorterFarther* this)
+   43  002ABEE4     B8  void GameModeHitShorterFarther::EndGame(const struct GameModeHitShorterFarther* this)
+                         local  struct OnWinData_t onWinData
+                         inlines  OnWinData_t::OnWinData_t
+   61  0031AE8C    200  void GameModeHitShorterFarther::EndGolferTurn(const struct GameModeHitShorterFarther* this, enum PlayerNumber_t playerID)
+                         local  bool failure
+                         local  struct CoreShotInfo_t* pShotInfo
+                         local  float dist
+                         inlines  LLMath_DistanceBetween3, __vec_len_sqr3, vec4flt_Copy, vec_madd, vec_sld
+  118  00202CFC     50  void GameModeHitShorterFarther::GetCurrentScoreString(const struct GameModeHitShorterFarther* this, char* strBuf, int32 bufferSize)
+  123  00202D4C     50  enum PlayerNumber_t GameModeHitShorterFarther::GetHoleWinner(const const struct GameModeHitShorterFarther* this)
+                         local  enum PlayerNumber_t winner
+  134  00202D9C     C4  void GameModeHitShorterFarther::GetUIGameFinishedString(const struct GameModeHitShorterFarther* this, char* strBuf, int32 bufferSize)
+                         local  const int kMaxStringLength
+                         local  char[32] scoreStr
+  152  00202E60     78  bool GameModeHitShorterFarther::GameFinished(const struct GameModeHitShorterFarther* this, bool predict)
+                         local  bool bRet
+  166  00202ED8     2C  int32 GameModeHitShorterFarther::GetEndGameSequence(const struct GameModeHitShorterFarther* this)
+                         local  int32 sequence
+  174  00202F04     68  const char* GameModeHitShorterFarther::GetModeName(const struct GameModeHitShorterFarther* this)
+  182  00202F6C     1C  bool GameModeHitShorterFarther::HoleFinished(const struct GameModeHitShorterFarther* this, enum PlayerNumber_t PlayerID, bool predict)
+  190  0032D7C4    1C0  void GameModeHitShorterFarther::Init(const struct GameModeHitShorterFarther* this)
+                         local  uint32 playerID
+                         inlines  GM_GetCurrentHoleIndex
+  223  0027D678     48  void GameModeHitShorterFarther::PreShotInit(const struct GameModeHitShorterFarther* this, enum PlayerNumber_t PlayerID)
+  234  0020303C      4  void GameModeHitShorterFarther::QuitGame(const struct GameModeHitShorterFarther* this)
+  239  00202B0C     E8  void GameModeHitShorterFarther::InitForTrainingChallenge(const struct GameModeHitShorterFarther* this, const struct TrainingChallengeEvent_t* pEventInfo)
+                         local  enum HSF_GameType_e eType
+                         local  int iNumBallsNeededForWin
+  267  00202FD8     64  void GameModeHitShorterFarther::RestorePlayerClubs(const struct GameModeHitShorterFarther* this)
+                         local  uint32 playerID
+  275  0024A488     60  void GameModeHitShorterFarther::SavePlayerClubs(const struct GameModeHitShorterFarther* this)
+                         local  uint32 playerID
+  281  00202F88     50  void GameModeHitShorterFarther::SetClubRestrictions(const struct GameModeHitShorterFarther* this)
+                         local  const bit32 availableClubs
+                         local  uint32 playerID
+  290  00203040     1C  bool GameModeHitShorterFarther::QueryInterface(const struct GameModeHitShorterFarther* this, enum GM_ModeType_t typeID, const void*& ptr)
+                         local  bool bRet
+  303  0027D4BC    1BC  void GameModeHitShorterFarther::ShowUICurrentStanding(const struct GameModeHitShorterFarther* this, bool bFailure)
+                         local  const int kMaxSVStringLength
+                         local  char[32] mode
+                         local  char[32] curShot
+                         local  char[32] thresholdStr
+                         local  char[32] score
+                         local  int shotDist
+  343  002465F8     90  void GameModeHitShorterFarther::ShowUIInitialFlash(const struct GameModeHitShorterFarther* this)
+                         local  char[48] msg
+  353  0020305C      4  void GameModeHitShorterFarther::Shutdown(const struct GameModeHitShorterFarther* this)
+  357  00203060      4  void GameModeHitShorterFarther::Update(const struct GameModeHitShorterFarther* this)
+  364  00202CB8     44  bool GameModeHitShorterFarther::ValidShot(const const struct GameModeHitShorterFarther* this)
+                         local  bool bRet

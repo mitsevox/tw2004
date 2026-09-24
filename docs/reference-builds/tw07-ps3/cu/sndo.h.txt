@@ -1,0 +1,8 @@
+// C:/packages/rwaudiocore/2.08.01/include/snd/sndo.h
+// compiled in: sgp.cpp
+// 2 functions, source order. line | PS3 address | size
+
+ 1398  006C55AC      4  void GenericPlayer(const struct <anon>* this)
+ 1399  006C7644     9C  void ~GenericPlayer(const struct <anon>* this)
+                         local  struct <anon>* pGenericPlayerPrivate
+                         inlines  SNDMEMI_free

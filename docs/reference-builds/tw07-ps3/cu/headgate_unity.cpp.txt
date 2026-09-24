@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/headgate_unity.cpp
+// compiled in: headgate_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    0  003686F0    24C  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  GetRow, Matrix44, Quaternion, Set, Vector2, Vector3, Vector4

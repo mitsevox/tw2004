@@ -1,0 +1,120 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/source/common/Query.cpp
+// compiled in: Query.cpp
+// 20 functions, source order. line | PS3 address | size
+
+    0  007E6678    10C  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+   74  007E2F5C    D9C  struct Query* Create(struct Database* db, struct <anon>* pJoins, struct ExprNode* pFilter, struct <anon>* pColSort, QueryRef qryRef, bool isCached, struct <anon>* pRet, enum TDbError* dbError)
+                         local  const char[7] __FUNCTION__
+                         local  struct Query* pQry
+                         local  struct QuerySearch* pQData
+                         local  struct <anon>* pTempColSort
+                         local  struct <anon>* pNode
+                         local  enum TDbError dbResult
+                         local  struct <anon> filterRes
+  282  007E2C50    30C  enum TDbError Destroy(const struct Query* this)
+                         local  const char[8] __FUNCTION__
+                         local  struct <anon> lock
+                         local  struct Query* pTempQry
+  352  007DFC7C    3F8  enum TDbError GetNumberOfRows(const struct Query* this, RowNum* rowCount)
+                         local  const char[16] __FUNCTION__
+  407  007E1310     B8  enum TDbError Seek(const struct Query* this, enum SeekType seek, int seekOffset)
+                         local  struct <anon> lock
+                         local  struct SeekData data
+  414  007E1290     80  enum TDbError UnsafeSeek(const struct Query* this, enum SeekType seek, int seekOffset)
+                         local  struct SeekData data
+  423  007E0074   121C  enum TDbError InternalSeek(const struct Query* this, enum SeekType seek, int seekOffset, struct SeekData* pData)
+                         local  const char[13] __FUNCTION__
+                         local  enum TDbError dbResult
+                         local  struct <anon>* pIdxNode
+                         local  struct TableIndex* pIdx
+                         local  struct <anon>* pQIdx
+                         local  RowNum idxRow
+                         local  struct Table* pTable
+  818  007E1BF0     C0  enum TDbError Retrieve(const struct Query* this, enum SeekType seek, int seekOffset, struct <anon>* colLiterals)
+                         local  struct <anon> lock
+  826  007E13C8    828  enum TDbError UnsafeRetrieve(const struct Query* this, enum SeekType seek, int seekOffset, struct <anon>* colLiterals)
+                         local  const char[15] __FUNCTION__
+                         local  enum TDbError dbResult
+                         local  struct SeekData data
+                         local  RowNum idxRow
+                         local  struct Table* pTable
+                         local  ColNum colNum
+                         local  struct <anon>* pLit
+                         local  uint32_t tblNum
+                         local  struct QuerySearch* pQIdxSearchData
+  975  007E2AD0     C0  enum TDbError Update(const struct Query* this, enum SeekType seek, int seekOffset, struct <anon>* colLiterals)
+                         local  struct <anon> lock
+  981  007E2B90     C0  enum TDbError UpdateWithoutTrigger(const struct Query* this, enum SeekType seek, int seekOffset, struct <anon>* colLiterals)
+                         local  struct <anon> lock
+  989  007E2A20     B0  enum TDbError UnsafeUpdate(const struct Query* this, enum SeekType seek, int seekOffset, struct <anon>* colLiterals)
+                         local  enum TDbError dbResult
+ 1002  007E1F3C    AE4  enum TDbError UnsafeUpdateWithoutTrigger(const struct Query* this, enum SeekType seek, int seekOffset, struct <anon>* colLiterals)
+                         local  const char[27] __FUNCTION__
+                         local  enum TDbError dbResult
+                         local  struct SeekData data
+                         local  RowNum idxRow
+                         local  struct Table* pTable
+                         local  struct <anon> changeBits
+                         local  struct QuerySearch* pSearchData
+                         local  uint32_t tblNum
+                         local  ColNum colNum
+                         local  struct <anon>* pLit
+                         local  uint8_t* pRowData
+                         local  struct TableIndex* pIndex
+                         local  struct <anon>*[30] pINodes
+                         local  uint32_t INodeCount
+                         local  uint32_t trigCount
+                         local  uint32_t changeCount
+                         local  uint8_t trigStatus
+                         local  bool8_t tblChanged
+                         local  union <anon> tData
+                         local  struct TableIndex* pIndex
+                         local  enum TDbError dbError
+ 1239  007E3CF8   1FD0  enum TDbError CreateTable(const struct Query* this, struct Database* pDb, const TableRef tableRef, TableColRef* pTblColRefLst, struct <anon>* pDbRet)
+                         local  const char[12] __FUNCTION__
+                         local  struct <anon> dbRet
+                         local  struct <anon>* colDefs
+                         local  struct <anon>* pCurDef
+                         local  struct <anon>* pColDef
+                         local  ColNum iNumCols
+                         local  ColNum idxCol
+                         local  TableRef srcTableRef
+                         local  ColRef srcColRef
+                         local  TableColRef* pCurRef
+                         local  TableColRef* pSearchRef
+                         local  struct Table* pTable
+                         local  struct Table* pNewTable
+                         local  bool8_t bValid
+                         local  union <anon> ColData
+                         local  uint32_t tblNum
+                         local  struct <anon>* pQIdx
+                         local  uint8_t* pData
+                         local  uint8_t* pNewData
+                         local  RowNum iNumRows
+                         local  RowNum idxRow
+                         local  RowNum idxNewRow
+                         local  struct <anon>* pIdxNode
+                         local  struct ICollection* pIdxTree
+                         local  uintptr_t ptr
+                         local  uintptr_t tblPtr
+                         local  uintptr_t tblPtr
+                         local  uintptr_t tblPtr
+ 1786  007E1CB0    28C  void CallTriggers()
+                         local  const char[13] __FUNCTION__
+                         local  struct Query* pQry
+ 1860  007E5CC8    47C  enum TDbError ListQueryTables(const struct Query* this, DbRef* dbRefList, TableRef* tableRefList, int* maxItems)
+                         local  const char[16] __FUNCTION__
+                         local  struct <anon> lock
+                         local  int realMax
+ 1948  007E6144    140  enum TDbError SetTrigger(const struct Query* this, QueryTrigCallback pTriggerFunc)
+                         local  const char[11] __FUNCTION__
+                         local  struct <anon> lock
+ 1992  007E6284    3F4  struct Query* Select(struct Database* database, struct <anon>* pJoinList, struct ExprNode* pFilter, struct <anon>* pSortList, bool isCached, struct <anon>* pRet, char8_t* filename, uint32_t lineNum)
+                         local  const char[7] __FUNCTION__
+                         local  struct <anon> lock
+                         local  enum TDbError dbResult
+                         local  struct <anon> retStruct
+                         local  QueryRef qryRef
+                         local  struct Query* query
+ 2087  007E6784     3C  static void _GLOBAL__I__ZN2EA4T3db5Query6CreateEPNS0_8DatabaseEPNS0_8JoinExprEPNS0_8ExprNodeEPNS0_7ColSortEjbPNS0_9TDbReturnEPNS0_8TDbErrorE()
+ 2088  007E67C0     3C  static void _GLOBAL__D__ZN2EA4T3db5Query6CreateEPNS0_8DatabaseEPNS0_8JoinExprEPNS0_8ExprNodeEPNS0_7ColSortEjbPNS0_9TDbReturnEPNS0_8TDbErrorE()

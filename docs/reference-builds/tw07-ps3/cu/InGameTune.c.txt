@@ -1,0 +1,142 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/InGameTune/InGameTune.c
+// compiled in: golf2_unity.cpp
+// 40 functions, source order. line | PS3 address | size
+
+   85    inline-only   TU_eTuneType TU_sCategoryMgr::getDataType(const struct TU_sCategoryMgr* this, int i)
+   90    inline-only   TU_eTuneType TU_sCategoryMgr::getReadOnlyType(const struct TU_sCategoryMgr* this, int i)
+   95    inline-only   bool TU_sCategoryMgr::isReadOnly(const struct TU_sCategoryMgr* this, int i)
+  186  0014CDE0     84  static bool TU_CO_LoadTunerXML(int32 iNumberOfParams_p, char** chppParamStrings_p, void* vpUserData_p)
+  221    inline-only   static void TU_Failure(TU_sCategoryMgr* pCat, const char* leaf, const char* msg)
+                         local  char[1024] buffer
+                         local  int iParentID
+  248  00167FF4    3E0  void TU_vInitModule(int iMaxCategories, int iMaxNumStrings, int iMaxStringLength)
+                         local  const char[15] __FUNCTION__
+                         local  int once
+                         inlines  Allocator::GetTempAllocator, TagValuePair, WG_vSetCanvasPosition, operator+
+  328  0012D5EC    138  void TU_vResetModule()
+                         local  int i
+                         local  int j
+  357  00167F38     BC  void TU_vCloseModule()
+  385  00167EEC     4C  void TU_vActivate(bool bActivate)
+  406  00159FF0    190  void TU_vRemoveAllVarsInCategory(int iCategory)
+                         local  int i
+                         inlines  TU_sCategoryMgr::getDataType
+  456  0012D724     F0  int TU_GetCategoryID(const char* catName, int parent)
+                         local  int iCategory
+  482  0012D870     D8  int TU_GetVariableID(int category, const char* varName)
+                         local  int iCurItem
+  507  001598E4     B4  bool TU_GetVariable(int categoryId, int variableId, void** ppVal, TU_eTuneType* pType)
+                         local  TU_sCategoryMgr* pCat
+  527  00159998    1D4  bool TU_SetVariable(int categoryId, int variableId, void* pVal, TU_eTuneType type)
+                         local  TU_sCategoryMgr* pCat
+                         local  int maxChars
+  578  0012E3AC    43C  int TU_vAddNewCategory(const char* title, int iParentID, void* pMgr, TU_vTuneCallBack pFunk)
+                         local  RwHostOffset iCategory
+  676  0012D948    678  void TU_vAddVar(int iCategoryID, const char* str, float fLowRange, float fHighRange, void* data, TU_eTuneType eType, void* userType, TU_vTuneCallBack pFunk)
+                         local  int iCurItem
+                         local  const char* pSrcString
+                         local  char* pCopyString
+  810  0012F884    214  void TU_vSetVarCallback(int iCategoryID, const char* str, void* userType, TU_vTuneCallBack pFunk)
+                         local  int iCurItem
+  847  00159B6C    484  void TU_vRemoveCategory(int iCategoryID)
+                         local  int i
+                         local  int j
+  914  001683D4    13C  void TU_vSetActiveCategory(int iCategoryID)
+                         local  TU_sCategoryMgr* pMgr
+  961  0012AEF0     40  int TU_vGetActiveCategory()
+  975  0012FAFC     88  int TU_vGetCategoryParent(int iCategoryID)
+  994  0012D814     5C  bool TU_vIsCategoryValid(int category)
+ 1010  0012FB84      8  bool TU_ReadOnlyType(TU_eTuneType type)
+ 1021  00167E60     8C  void TU_vMainMenuInit()
+ 1041  00168510    FD8  void TU_vUpdate()
+                         local  struct Controller_StickInfo* info
+                         local  TU_sCategoryMgr* pMgr
+                         local  float fRangeDiff
+                         local  int32 oldDataInt
+                         local  float oldDataFloat
+                         local  int8 oldDataInt8
+                         local  bool valChanged
+                         local  bool oldBoolData
+                         local  bool incFloatData
+                         local  bool incFloatData
+ 1421  001BF0C4    3BC  void TU_vRender()
+                         local  float[2][4] xpVertices
+                         local  vec4flt xColor
+                         local  int i
+                         local  float fX
+                         local  float fY
+                         local  float fX1
+                         local  float fY1
+                         local  float fXoff
+                         local  float fYoff
+                         local  int iCount
+                         local  int iCurIndex
+                         local  int iNumPages
+                         local  int iNumItems
+                         local  int iCurrentPage
+                         inlines  DS_vEnableZBufferUpdate, DS_vSetAlphaEnable, DS_vSetAlphaFunction, PR_vFillVerticesWith2DRect, PR_vSetCurrentColor, PR_vSetCurrentUsage
+ 1531  001677D4    68C  void TU_vCreateVarItems()
+                         local  int i
+                         local  TU_sCategoryMgr* pMgr
+                         local  char* enumValName
+                         local  char* listValName
+ 1689  0012FA98     64  void TU_vSetTitle(char* str)
+ 1703  0012FB8C     28  bool TU_bIsTunerActive()
+ 1718  0012FBB4    714  void TU_vSetActiveItemToValue(float val)
+                         local  float fRangeDiff
+                         local  int32 oldDataInt
+                         local  float oldDataFloat
+                         local  int8 oldDataInt8
+                         local  bool oldDataBool
+                         local  bool valChanged
+                         local  TU_sCategoryMgr* pMgr
+                         local  int32 newVal
+ 1891  001302C8     60  void* TU_GetCurrentDataPointer()
+                         local  TU_sCategoryMgr* pMgr
+ 1909  00130328     60  const char* TU_GetCurrentDataString()
+                         local  TU_sCategoryMgr* pMgr
+ 1927  00130388     60  void* TU_GetCurrentUserType()
+                         local  TU_sCategoryMgr* pMgr
+ 1940  00166C74    604  struct XMLRPC_Value* TU_RPC_GetCategories(struct XMLRPC_Value* params)
+                         local  struct XMLRPC_Value* cat_array
+                         local  int i
+                         local  TU_sCategoryMgr* pCat
+                         local  struct XMLRPC_Value* item_array
+                         local  struct XMLRPC_Value* category
+                         local  int j
+                         local  struct XMLRPC_Value* item
+                         local  const char* string
+                         inlines  TU_Failure
+ 2007  00167278    36C  struct XMLRPC_Value* TU_RPC_SetVariable(struct XMLRPC_Value* params)
+                         local  struct XMLRPC_Value* fault
+                         local  int catId
+                         local  int varId
+                         local  TU_sCategoryMgr* pCat
+                         local  int maxChars
+                         local  char[8] format
+                         inlines  TU_sCategoryMgr::isReadOnly
+ 2087  001303E8    708  static void TU_LoadTunerXML_StartCallback(const char* tag, const char** attrs)
+                         local  int id
+                         local  int parentID
+                         local  const char* name
+                         local  int i
+                         local  TU_sCategoryMgr* pCat
+                         local  int parentID
+                         local  const char* name
+                         local  const char* para
+                         local  TU_sCategoryMgr* pCat
+                         local  const char** a
+                         local  int i
+                         local  int maxChars
+                         inlines  TU_sCategoryMgr::isReadOnly
+ 2213  00130AF0     3C  static void TU_LoadTunerXML_CDataCallback(const char* data)
+ 2218  00130B2C     70  static void TU_LoadTunerXML_EndCallback(const char* tag)
+ 2232  00130B9C    2FC  static void TU_LoadTunerXML_Create_StartCallback(const char* tag, const char** attrs)
+                         local  int id
+                         local  const char* name
+ 2292  0014CA90    350  bool TU_LoadTunerXML(const char* filename, const char** just_nodes)
+                         local  const char[16] __FUNCTION__
+                         local  int32 length
+                         local  void* data
+                         local  char* data_with_null
+                         inlines  TagValuePair, operator+

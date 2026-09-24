@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/SunFlare/ColGlow.h
+// compiled in: golf_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+  106    inline-only   void ColGlow_SetCurrentList(int32 theListIndex)
+  111    inline-only   void ColGlow_ResetCurrentList()
+  130    inline-only   void ColGlow_AddGlowToCurrentListWithSortingInfo(float* center, uint32 rgba0, uint32 rgba1, float radius0, float radius1, uint32 glowType, float roll, bool noZtest, bool boZSorting)
+                         local  TGlowDef* pGD

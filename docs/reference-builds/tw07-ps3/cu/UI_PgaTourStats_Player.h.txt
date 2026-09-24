@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_PgaTourStats_Player.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   16  000FF070      C  uint32 UIPgaTourStats_Player::GetSignature(const const struct UIPgaTourStats_Player* this)
+   21  000FF07C     44  void UIPgaTourStats_Player::ShowHelpText(const struct UIPgaTourStats_Player* this)
+   29  000FF0C8      C  struct IExternArray* UIPgaTourStats_Player::GetExternArray(const struct UIPgaTourStats_Player* this)

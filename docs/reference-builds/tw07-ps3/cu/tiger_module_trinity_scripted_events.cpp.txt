@@ -1,0 +1,11 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_trinity_scripted_events.cpp
+// compiled in: tiger_module_trinity_scripted_events.cpp
+// 5 functions, source order. line | PS3 address | size
+
+    0  005409C4     68  void ~TrinityScriptedEvents(const struct <anon>* this)
+                         inlines  ~Allocatable
+    7  005408CC     6C  void TrinityScriptedEvents(const struct <anon>* this, struct Lua* lua)
+                         inlines  Allocatable
+   12  00540894      4  void Initialize(const struct <anon>* this)
+   16  00540898      4  void Shutdown(const struct <anon>* this)
+   20  0054089C     30  void ScriptedEvents(const struct <anon>* this, int32_t eventID, int32_t dataSize, const char* pData)

@@ -1,0 +1,16 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_OnlineTournament_Gotw.cpp
+// compiled in: apt_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   31  000F77CC     94  void UIOnlineTournament_Gotw::UIOnlineTournament_Gotw(const struct UIOnlineTournament_Gotw* this)
+                         inlines  TArrayInternal<UIOnlineTournament_Gotw::DstMenuItem_olgw,AptStructSwapper>::TArrayInternal, TExternArray<UIOnlineTournament_Gotw::DstMenuItem_olgw>::TExternArray, UIMenuVertBase::UIMenuVertBase
+   35  000F0818     84  void UIOnlineTournament_Gotw::Init(const struct UIOnlineTournament_Gotw* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init, UIMenuVertBase::SetNumVisibleVertRows
+   46  00054C2C     80  void UIOnlineTournament_Gotw::Show(const struct UIOnlineTournament_Gotw* this)
+                         local  int32 numElements
+   58  0006F67C     E4  void UIOnlineTournament_Gotw::UpdateItemAndLabel(const struct UIOnlineTournament_Gotw* this, struct UIMenuItemBaseDst* dstMenuItemToUpdate, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 index, char* inLabel)
+                         local  struct DstMenuItem_olgw* dest
+                         local  int firstVisibleRow
+                         local  int myLeaderboardRow
+   88  00084510     B4  enum eAptHandleInput UIOnlineTournament_Gotw::HandleInput(const struct UIOnlineTournament_Gotw* this, int32 cID)
+  120  00081014     C8  void UIOnlineTournament_Gotw::RefreshRankList(const struct UIOnlineTournament_Gotw* this, int numRows)

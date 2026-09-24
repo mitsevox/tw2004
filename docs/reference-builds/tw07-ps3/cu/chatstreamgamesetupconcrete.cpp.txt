@@ -1,0 +1,25 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/chatstreamgamesetupconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 10 functions, source order. line | PS3 address | size
+
+   83  005F6E5C    118  void ChatStreamGameSetupConcrete(const struct <anon>* this, const char8_t* strID)
+                         local  struct <anon>* pFacade
+                         inlines  GetInstance, LobbyDispatchObserver
+  116  005F71FC    110  void ~ChatStreamGameSetupConcrete(const struct <anon>* this)
+                         local  struct <anon>* pFacade
+                         inlines  GetInstance, ~LobbyDispatchObserver
+  145  005D8484    194  void LobbyDispatch(const struct <anon>* this, const struct Lobby* , LobbyApiMsgT* pMesg)
+                         local  struct <anon> Message
+                         local  uint32_t uNumElements
+                         local  struct ChatStreamObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  181  005CDA20     C4  struct Operation* SendMessage(const struct <anon>* this, const char8_t* strMessage, struct <anon>* pCallback)
+                         local  struct <anon>* pLocalUser
+  223  005CD95C     C4  struct Operation* SendRawMessage(const struct <anon>* this, const char8_t* strMessage, struct <anon>* pCallback)
+                         local  struct <anon>* pLocalUser
+  264  005CD8A0     BC  struct Operation* SendPrivateMessage(const struct <anon>* this, const char8_t* strMessage, struct <anon>* pCallback)
+                         local  struct <anon>* pLocalUser
+  305  005B3CF0      4  void ReadMessage(const struct <anon>* this)
+  329  005B3CF4     5C  void GameSetupSendMessageFailed(const struct <anon>* this)
+  356  005B3D50     58  void GameSetupSendMessageSuccess(const struct <anon>* this)
+  382  005B3DA8     3C  void GameSessionJoined(const struct <anon>* this, struct GameSession* )

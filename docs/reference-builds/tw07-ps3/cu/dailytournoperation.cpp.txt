@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/dailytourn/source/common/dailytournoperation.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    6  005E2E0C     34  void DailyTournOperation(const struct <anon>* this)
+   10  005E5358      C  void ~DailyTournOperation(const struct <anon>* this)

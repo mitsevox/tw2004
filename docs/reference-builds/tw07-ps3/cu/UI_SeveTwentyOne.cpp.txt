@@ -1,0 +1,42 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_SeveTwentyOne.cpp
+// compiled in: apt_unity.cpp
+// 26 functions, source order. line | PS3 address | size
+
+   56  000FA678     90  void UISeveTwentyOne::UISeveTwentyOne(const struct UISeveTwentyOne* this)
+                         inlines  AptStaticCharBuffer<64u>::AptStaticCharBuffer
+   68  000CFFB0     64  void UISeveTwentyOne::Init(const struct UISeveTwentyOne* this)
+   78  0004CC64     7C  enum TAptSequenceStatus UISeveTwentyOne::QueueShowText(const struct UISeveTwentyOne* this, bool inbFirstTime, void* inData)
+                         local  enum SV_txtField field
+   93  0004CA44     AC  bool UISeveTwentyOne::StoreTextField(const struct UISeveTwentyOne* this, enum SV_txtField field, char* text)
+                         local  bool result
+  110  0004CA20     24  void UISeveTwentyOne::ClearTextField(const struct UISeveTwentyOne* this, enum SV_txtField field)
+  117  000580FC    104  void UISeveTwentyOne::ShowText(const struct UISeveTwentyOne* this, enum SV_txtField field, char* text)
+                         local  bool result
+  136  0004CBA0     68  void UISeveTwentyOne::HideText(const struct UISeveTwentyOne* this, enum SV_txtField field)
+  145  00058200     64  void UISeveTwentyOne::SizeTextField(const struct UISeveTwentyOne* this, int32 numPlayers)
+  154  00058264     48  enum TAptSequenceStatus UISeveTwentyOne::DelayGhostSequence(const struct UISeveTwentyOne* this, bool inbFirstTime, void* inData)
+  165  000CFF0C     A4  void UISeveTwentyOne::GhostSeveHUD(const struct UISeveTwentyOne* this)
+                         inlines  Singleton<GameModeDriverManager>::GetSingleton
+  179  000583D4     5C  void UISeveTwentyOne::UnGhostSeveHUD(const struct UISeveTwentyOne* this)
+  191  0004CAF0     64  char* UISeveTwentyOne::LookUpTextFieldLabel(const struct UISeveTwentyOne* this, enum SV_txtField field)
+                         local  int32 i
+  205  0004CC08     5C  void UISeveTwentyOne::ShowTextField(const struct UISeveTwentyOne* this, enum SV_txtField field, char* text)
+                         local  char* tempBuf
+  213  0004CB54     4C  void UISeveTwentyOne::HideTextField(const struct UISeveTwentyOne* this, enum SV_txtField field)
+                         local  char* tempBuf
+  222  0004CCE0     24  void UISeveTwentyOne::Show(const struct UISeveTwentyOne* this)
+  228  0004CD04     90  void UISeveTwentyOne::Hide(const struct UISeveTwentyOne* this)
+                         local  int32 i
+  240  0004CD94     D8  void UISeveTwentyOne::OnShow(const struct UISeveTwentyOne* this)
+                         local  char[8] tempBuf
+  253  0004CE6C      8  enum eAptHandleInput UISeveTwentyOne::HandleInput(const struct UISeveTwentyOne* this, int32 cID)
+  259  000583C8      C  void UISeveTwentyOne::Activate(const struct UISeveTwentyOne* this)
+  266  000582AC    11C  void UISeveTwentyOne::ShowAllBufferedText(const struct UISeveTwentyOne* this)
+                         local  int32 i
+  287  0004C9D8     48  void UISeveTwentyOne::Reset(const struct UISeveTwentyOne* this)
+                         local  int32 i
+  300  0004CE74     58  void UISeveTwentyOne::ShowBallTarget(const struct UISeveTwentyOne* this)
+  309  0004CECC     58  void UISeveTwentyOne::HideBallTarget(const struct UISeveTwentyOne* this)
+  318  0006A70C     48  void UISeveTwentyOne::SetTargetText(const struct UISeveTwentyOne* this, char* text)
+  323  000630C8     18  void UISeveTwentyOne::ClearTargetText(const struct UISeveTwentyOne* this)
+  329  0004CF24     58  void UISeveTwentyOne::SetTargetBG(const struct UISeveTwentyOne* this, bool isValid)

@@ -1,0 +1,5 @@
+// ../../../../../TIGERCODE/Code/Golf/UI_Core/AptRuntime/Headers/UI_Widget.h
+// compiled in: golf_unity.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   62    inline-only   void UIWidget::SetForceReLoadOfFacility(const struct UIWidget* this, bool bForceReLoad)

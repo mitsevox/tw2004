@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_PgaTournament_TourWins.h
+// compiled in: apt_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   20  001174BC    160  void UIPgaTournament_TourWins::~UIPgaTournament_TourWins(const struct UIPgaTournament_TourWins* this)
+                         inlines  AptScreenSubscriber::~AptScreenSubscriber, AptStructSwapper::Free, IAptSubscriber::operator delete, TExternArray<UIPgaTournament_TourWins::DstMenuItem_pgtw>::~TExternArray, UIMenuVertBase::~UIMenuVertBase
+   22  000FF1FC      C  uint32 UIPgaTournament_TourWins::GetSignature(const const struct UIPgaTournament_TourWins* this)
+   28  000FF210      C  struct IExternArray* UIPgaTournament_TourWins::GetExternArray(const struct UIPgaTournament_TourWins* this)

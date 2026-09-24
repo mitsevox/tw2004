@@ -1,0 +1,18 @@
+// ../../../../../TIGERCODE/Code/Golf/Online/OSDK/gamefacadeconcrete.h
+// compiled in: golf2_unity.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   81  001E7A60      C  struct DebugStrategy* GameFacadeConcrete::GetDebugStrategyImpl(const struct GameFacadeConcrete* this)
+   82  001E7A6C      C  struct MemoryStrategy* GameFacadeConcrete::GetMemoryStrategyImpl(const struct GameFacadeConcrete* this, int32_t iMemGroup)
+   83  001E7A78      C  struct MemoryStrategy* GameFacadeConcrete::GetPersistentMemoryStrategyImpl(const struct GameFacadeConcrete* this)
+   84  001E7A84      C  struct MemoryStrategy* GameFacadeConcrete::GetWebOfferMemoryStrategyImpl(const struct GameFacadeConcrete* this)
+   85  001E7A90      C  struct ResourceStrategy* GameFacadeConcrete::GetResourceStrategyImpl(const struct GameFacadeConcrete* this)
+   86  001E7A9C      C  struct SpreadSheetStrategy* GameFacadeConcrete::GetSpreadSheetStrategyImpl(const struct GameFacadeConcrete* this)
+   87  001E7AA8      C  struct StatsStrategy* GameFacadeConcrete::GetStatsStrategyImpl(const struct GameFacadeConcrete* this)
+   88  001E7AB4      C  struct TelemetryStrategy* GameFacadeConcrete::GetTelemetryStrategyImpl(const struct GameFacadeConcrete* this)
+   89  001E7AC0      C  struct WebOfferStrategy* GameFacadeConcrete::GetWebOfferStrategyImpl(const struct GameFacadeConcrete* this)
+   90  001E7AD4      C  struct NetRadioStrategy* GameFacadeConcrete::GetNetRadioStrategy(const struct GameFacadeConcrete* this)
+   91  001E7AE8      C  struct CareerStrategy* GameFacadeConcrete::GetCareerStrategy(const struct GameFacadeConcrete* this)
+   93  001E7AFC      C  struct LockerParameters* GameFacadeConcrete::GetLockerParameters(const struct GameFacadeConcrete* this)
+   94  001E7B10      C  struct LockerStrategy* GameFacadeConcrete::GetLockerStrategy(const struct GameFacadeConcrete* this)
+   95  001E7B24      C  struct MemoryStrategy* GameFacadeConcrete::GetLockerMemoryStrategy(const struct GameFacadeConcrete* this)

@@ -1,0 +1,14 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/SitDev/SitDevCommentaryZones.c
+// compiled in: golf2_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   34  001313F4     80  void SitDev_NetworkLoadCallback(struct TNetwork* netPtr)
+   42  00131474    10C  bool SitDev_ShouldLoadNetworkCallback(struct TNetwork* netPtr)
+                         local  bool shouldLoad
+                         local  int32 fairwayLevel
+                         local  int32 greenLevel
+                         local  TCommentaryNetworkParam* param
+   78  00131580    118  uint32 SitDev_GetCommentaryZones(float* location)
+                         local  int i
+                         local  uint32 uiReturnValue
+                         local  TCommentaryNetworkParam* pNetworkParams

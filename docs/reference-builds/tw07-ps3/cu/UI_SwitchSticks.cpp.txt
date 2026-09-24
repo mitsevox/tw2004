@@ -1,0 +1,16 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_SwitchSticks.cpp
+// compiled in: apt_unity.cpp
+// 6 functions, source order. line | PS3 address | size
+
+   21  000663BC     24  void _UISwitchSticksSaveCB(int32 inRst)
+   30  00040008     58  void UISwitchSticks::Init(const struct UISwitchSticks* this)
+   36  0006CE84     B0  void UISwitchSticks::Show(const struct UISwitchSticks* this)
+   47  000ACFD4    10C  void UISwitchSticks::Hide(const struct UISwitchSticks* this)
+                         inlines  UserInfo::SetLoginIndex
+   64  00066390     2C  void UISwitchSticks::HideNoSave(const struct UISwitchSticks* this)
+   71  000EEC78    2DC  void UISwitchSticks::ExternSet(const struct UISwitchSticks* this)
+                         local  bool rightSliceSwingStick
+                         local  bool leftSwingStick
+                         local  bool leftSwingStick
+                         local  bool rightSliceSwingStick
+                         inlines  GM_GetGolferUp, UserInfo::SetLeftSwingStick, UserInfo::SetRightSliceSwingStick

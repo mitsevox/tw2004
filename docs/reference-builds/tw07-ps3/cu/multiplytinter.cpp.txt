@@ -1,0 +1,13 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/TextureFX/multiplytinter.cpp
+// compiled in: other_unity.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   14  003D03CC     40  void MultiplyTinter::MultiplyTinter(const struct MultiplyTinter* this)
+   19  003D044C     18  void MultiplyTinter::~MultiplyTinter(const struct MultiplyTinter* this)
+   25  004221F4    1D0  void MultiplyTinter::Tint(const struct MultiplyTinter* this, int32_t numPixels, vec4flt* input, vec4flt* output, float* tintParams, float* scale)
+                         local  vec4flt zeroVec
+                         local  vec4flt oneVec
+                         local  int32_t i
+                         local  vec4flt scalar
+                         local  int32_t i
+                         inlines  LLMath_ClampVec, LLMath_MultiplyVec

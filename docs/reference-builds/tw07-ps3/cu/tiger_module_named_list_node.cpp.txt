@@ -1,0 +1,7 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_named_list_node.cpp
+// compiled in: tiger_module_named_list_node.cpp
+// 1 functions, source order. line | PS3 address | size
+
+    7  00580410     E0  struct <anon>* FindInList(const struct <anon>* this, const char* name)
+                         local  struct <anon>* node
+                         inlines  GetNext

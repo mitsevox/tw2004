@@ -1,0 +1,13 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/mix/sflpf.cpp
+// compiled in: sflpf.cpp
+// 3 functions, source order. line | PS3 address | size
+
+    9  006F4AE4     F0  int SFILTER_lpfRC(void* pstate, int outputframes, void* psrcp, void* pdstp, int requester)
+                         local  LPFRCSTATE* pls
+                         local  int temp
+                         local  LPFRC* plpf
+                         local  LPFSAMP* psrc
+                         local  LPFSAMP* pdst
+                         local  int i
+   59  006F4BD4     34  int SFILTER_createLPFRC(LPFRCSTATE* pls)
+   74  006F4C08     A0  void SFILTER_modifyLPFRC(LPFRCSTATE* pls, FIXED24P8* pparams)

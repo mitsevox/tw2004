@@ -1,0 +1,18 @@
+// ../ears_trinity/Trinity/Runtime/include/TrinityActor.h
+// compiled in: Sequence.cpp, TrinityActor.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   45  0058F7D4     18  void ~TrinityActor(const struct TrinityActor* this)
+  255  0058F824     58  void PlayAnim(const struct TrinityActor* this, char* pAnimName, bool8_t bUseCustomTransition, int32_t startFrame, int32_t blendDuration, int32_t sourceBehavior, int32_t destBehavior)
+  263  0058F87C     5C  bool8_t IsPossessed(const struct TrinityActor* this)
+  272  0058F8D8     5C  bool8_t RegisterJawMod(const struct TrinityActor* this, void* pTrans)
+  279  0058F934     58  void Show(const struct TrinityActor* this)
+  289  0058F98C     58  void TickActor(const struct TrinityActor* this, float_t fDeltaSec, bool8_t fTransDone, bool8_t bIsStart)
+  298  0058F9E4     5C  bool8_t UnregisterJawMod(const struct TrinityActor* this, void* pTrans)
+  322    inline-only   void TrinityActor::SetTurnRate(const struct TrinityActor* this, float_t turnRate)
+  330    inline-only   void TrinityActor::SetStartFrame(const struct TrinityActor* this, int32_t startFrame)
+  338    inline-only   void TrinityActor::SetBlendDuration(const struct TrinityActor* this, int32_t blendDuration)
+  346    inline-only   void TrinityActor::SetSourceBehavior(const struct TrinityActor* this, int32_t behavior)
+  354    inline-only   void TrinityActor::SetDestBehavior(const struct TrinityActor* this, int32_t behavior)
+  435    inline-only   bool8_t TrinityActor::TransToTarget(const const struct TrinityActor* this)
+  443    inline-only   bool8_t TrinityActor::AnimLooped(const const struct TrinityActor* this)

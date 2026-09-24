@@ -1,0 +1,14 @@
+// C:/packages/PlayStation3GCC/096.002/Installed/target/ppu/include/sys/spu_image.h
+// compiled in: ps3utils.cpp
+// 1 functions, source order. line | PS3 address | size
+
+  102    inline-only   static int sys_spu_image_open(sys_spu_image_t* img, const char* path)
+                         local  uint64_t p1
+                         local  uint64_t p2
+                         local  uint64_t p3
+                         local  uint64_t p4
+                         local  uint64_t p5
+                         local  uint64_t p6
+                         local  uint64_t p7
+                         local  uint64_t p8
+                         local  uint64_t n

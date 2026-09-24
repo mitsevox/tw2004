@@ -1,0 +1,38 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/RNA/dev-2.0-golf/RNA/scenegraph/source/SceneGraph/Runtime/Nodes/SGNodeBoundingVolume.cpp
+// compiled in: SGNodeBoundingVolume.cpp
+// 16 functions, source order. line | PS3 address | size
+
+    0  008AE8E4    140  static void __static_initialization_and_destruction_0(int __initialize_p, int __priority)
+                         inlines  SGNodeBoundingVolumeInfoC::SGNodeBoundingVolumeInfoC, SGNodeBoundingVolumeInfoC::~SGNodeBoundingVolumeInfoC
+    0  008AEB88      C  void SGNodeBoundingVolumeInfoC::~SGNodeBoundingVolumeInfoC(const struct SGNodeBoundingVolumeInfoC* this)
+                         inlines  ~SGNodeInfoC
+   49  008AEAF8     88  struct SGNodeC* SGNodeBoundingVolumeInfoC::Create(const const struct SGNodeBoundingVolumeInfoC* this)
+                         inlines  operator new
+   50  008AEAE4      8  const char* SGNodeBoundingVolumeInfoC::GetNodeTypeName(const const struct SGNodeBoundingVolumeInfoC* this)
+   51    inline-only   NodeType_t SGNodeBoundingVolumeInfoC::GetNodeTypeEnum(const const struct SGNodeBoundingVolumeInfoC* this)
+   62  008ADFE4     58  void SGNodeBoundingVolumeC(const struct <anon>* this)
+   67  008AE59C     BC  void ~SGNodeBoundingVolumeC(const struct <anon>* this)
+                         inlines  operator delete
+   93  008AE658    28C  struct SGNodeC* Clone(const struct <anon>* this, bool8_t recurse, NodeCloneUserDataCallback userDataCallback, struct SGNodeC* baseClone)
+                         local  const char[6] __FUNCTION__
+                         local  struct <anon>* clone
+                         local  int32_t i
+                         inlines  RNADebugBreak, SGNodeC::GetNodeTypeEnum, SetAABBMax, SetAABBMin, operator new, operator=
+  127  008ADE64      8  const struct SGNodeInfoC* GetNodeInfo(const const struct <anon>* this)
+  133  008ADE5C      8  const struct SGNodeInfoC* _GetNodeInfo()
+  138  008AE328    274  void TransformAABBIntoBox(const struct <anon>* this, const const RNAMatrix44& m4Matrix, RNAVector4* p8Vectors)
+                         local  RNAVector4[8] points
+                         local  int32_t i
+                         inlines  Matrix44, Vector4, X, Y, operator float, operator=, vpu::operator*
+  158  008AE094    294  void TransformAABBIntoBox(const struct <anon>* this, const const RNAMatrix44& m4Matrix, RNAVector3* p8Vectors)
+                         local  RNAVector4[8] points
+                         local  RNAVector4 v4Temp
+                         local  int32_t i
+                         inlines  Matrix44, Vector4, X, Y, operator float, operator=, vpu::operator*
+  189  008ADE6C     D8  void SerializeIn(const struct <anon>* this, const struct InStreamC& in)
+                         local  const char[12] __FUNCTION__
+                         local  int32_t version
+                         inlines  RNADebugBreak
+  202  008ADF44     A0  void SerializeOut(const const struct <anon>* this, const struct OutStreamC& out)
+  214  008AEA34     10  static void _GLOBAL__I__ZN6SceneX21SGNodeBoundingVolumeC16s_ClassAllocatorE()
+  215  008AEA24     10  static void _GLOBAL__D__ZN6SceneX21SGNodeBoundingVolumeC16s_ClassAllocatorE()

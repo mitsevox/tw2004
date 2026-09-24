@@ -1,0 +1,28 @@
+// ../../../../../TIGERCODE/packages/tiger_module/include/tiger_module_trinity.h
+// compiled in: Legacy_unity.cpp, golf_unity.cpp
+// 24 functions, source order. line | PS3 address | size
+
+   27  0033E3FC      4  void Trinity::StartIGC(const struct Trinity* this)
+   28  0033E400      4  void Trinity::StopIGC(const struct Trinity* this)
+   37    inline-only   bool Trinity::IsBallAnimEnabled(const const struct Trinity* this)
+   92    inline-only   int Trinity::GetCrowdCamMode(const const struct Trinity* this)
+   93    inline-only   bool Trinity::IsInCrowdCamMode(const const struct Trinity* this, bool bPip)
+   94    inline-only   float Trinity::GetCrowdCamHeight(const const struct Trinity* this)
+   96    inline-only   int Trinity::GetCrowdCamLocation(const const struct Trinity* this)
+   97    inline-only   float Trinity::GetCrowdCamDistance(const const struct Trinity* this)
+   98    inline-only   int Trinity::GetCrowdCamPosRefPoint(const const struct Trinity* this)
+   99    inline-only   float Trinity::GetCrowdCamTargetOffset(const const struct Trinity* this)
+  101    inline-only   bool Trinity::GetIsInterrupted(const const struct Trinity* this)
+  102    inline-only   void Trinity::SetIsInterrupted(const struct Trinity* this, bool bIsInterrupted)
+  106    inline-only   void Trinity::SetIsActorLeftHanded(const struct Trinity* this, bool bLeftHanded)
+  110    inline-only   void Trinity::SetCrowdCamHeight(const struct Trinity* this, float fHeight)
+  111    inline-only   void Trinity::SetCrowdCamFocalLength(const struct Trinity* this, float fFocalLength)
+  112    inline-only   void Trinity::SetCrowdCamMode(const struct Trinity* this, int crowdCamMode)
+  113    inline-only   void Trinity::SetCrowdCamLocation(const struct Trinity* this, int crowdCamLocation)
+  114    inline-only   void Trinity::SetCrowdCamPosRefPoint(const struct Trinity* this, int posRefPoint)
+  115    inline-only   void Trinity::SetCrowdCamDistance(const struct Trinity* this, float fDistance)
+  116    inline-only   void Trinity::SetCrowdCamTargetOffset(const struct Trinity* this, float fOffset)
+  118    inline-only   void Trinity::SetDisplayDebugInfo(const struct Trinity* this, bool bDisplay)
+  119    inline-only   bool Trinity::IsDisplayDebugInfo(const struct Trinity* this)
+  120  0033E404      8  bool Trinity::TestStartSequence(const struct Trinity* this, const char* sequenceName, unsigned int resourceTag)
+  124    inline-only   void Trinity::SetIsInTestMode(const struct Trinity* this, bool bTestMode)

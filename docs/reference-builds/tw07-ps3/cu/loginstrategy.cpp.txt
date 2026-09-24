@@ -1,0 +1,60 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/loginstrategy.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 30 functions, source order. line | PS3 address | size
+
+  135  0061ACC0    23C  void Cleanup(const struct <anon>* this)
+                         local  struct <anon>* pHud
+                         inlines  ClearLoginInProgress, GetInstance, RemoveObserver, operator->, operator=
+  206  0061A484    380  void LoginStrategy(const struct <anon>* this, struct LoginSlot* pLoginSlot, struct <anon>* pCallback)
+                         local  enum LoginState eLoginSlotState
+                         local  enum LoginState eUserNetworkState
+                         local  int32_t iConnStatus
+                         local  struct <anon>* pHud
+                         inlines  AddObserver, RCPointer, SetLoginInProgress, operator->
+  323  0061AEFC     E4  void ~LoginStrategy(const struct <anon>* this)
+                         inlines  operator delete, ~RCPointer
+  348  0061A0AC    3D8  bool OperationProcess(const struct <anon>* this, const struct Operation* )
+                         local  int32_t iConnectionStatus
+                         local  uint32_t uLoginIndex
+                         local  bool bContinue
+                         inlines  GetInstance, operator->, operator=
+  485  005BBE18      4  void OperationCancel(const struct <anon>* this, const struct Operation* )
+  511  005D3DE4     B4  void Abort(const struct <anon>* this)
+                         inlines  operator->
+  547  005D3EB8     C0  void HudClosed(const struct <anon>* this)
+                         local  struct <anon>* pHud
+                         local  enum LoginState eUserNetworkState
+                         inlines  RemoveObserver, operator->
+  588  005CCC50     70  void StateChanging(const struct <anon>* this, enum OsdkState eOldState, enum OsdkState eNewState)
+  620  0060C1D4    2F8  void StateChanged(const struct <anon>* this, enum OsdkState eOldState, enum OsdkState eNewState)
+                         local  uint32_t uLastSlot
+                         local  struct <anon>* pLocalUser
+                         local  uint32_t uCurrentSlot
+                         local  bool bMultiplayerEnabled
+                         local  struct LoginToMasterServerConcrete* pLoginToMasterServer
+                         inlines  AddObserver, GetInstance, operator new, operator->, operator=
+  666  005E1250     68  void LoginToMasterServerTOSNotAccepted(const struct <anon>* this, struct LoginToMasterServer* )
+  677  005E11C8     68  void AcceptTOS(const struct <anon>* this)
+  686  005E1140     68  void DeclineTOS(const struct <anon>* this)
+  695  005D3414     44  void Restart(const struct <anon>* this)
+  702  005E10D8     68  void LoginToMasterServerShareInfo(const struct <anon>* this, struct LoginToMasterServer* )
+  711  005BBE1C      4  void LoginToMasterServerReconnect(const struct <anon>* this, struct LoginToMasterServer* )
+  718  005BBE20     44  void LoginToMasterServerForeignRegAlert(const struct <anon>* this, struct LoginToMasterServer* )
+  726  005BBE64     48  void LoginToMasterServerProductUpdateAlert(const struct <anon>* this, struct LoginToMasterServer* , uint32_t uNumFiles)
+  734  005BBEAC     4C  void LoginToMasterServerProductUpdateProgress(const struct <anon>* this, struct LoginToMasterServer* , uint32_t uProgress, uint32_t uFileNum)
+  742  005BBEF8     44  void LoginToMasterServerProductUpdateComplete(const struct <anon>* this, struct LoginToMasterServer* )
+  750  005BBF3C     78  void LoginStageAlertOccurred(const struct <anon>* this, struct LoginStage* pLoginStage)
+                         local  const struct Alert* pAlert
+  761  005DD194      4  void LoginToMasterServerComplete(const struct <anon>* this, struct LoginToMasterServer* )
+  768  005DD188      C  void LoginToMasterServerFailed(const struct <anon>* this, struct LoginToMasterServer* )
+  776  005DD12C     5C  void LoginToMasterServerAborted(const struct <anon>* this, struct LoginToMasterServer* )
+  786  005F97DC     40  void UnsuspendSuccess(const struct <anon>* this)
+                         inlines  operator=
+  793  005F981C     54  void UnsuspendFailure(const struct <anon>* this)
+                         inlines  operator=
+  801  005E1030     88  void SetShareInfo(const struct <anon>* this, bool bEASpam, bool bPartnerSpam)
+  809  005D3458     44  void AcceptForeignRegistration(const struct <anon>* this)
+  816  005D349C     44  void AcceptProductUpdate(const struct <anon>* this)
+  823  005D34E0     44  void DeclineProductUpdate(const struct <anon>* this)
+  830  005DD060     CC  void DeleteLoginToMasterServer(const struct <anon>* this)
+                         inlines  GetInstance, RemoveObserver

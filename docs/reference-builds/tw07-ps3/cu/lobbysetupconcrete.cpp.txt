@@ -1,0 +1,41 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/core/source/common/lobbysetupconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 8 functions, source order. line | PS3 address | size
+
+   72  005F8C28    26C  bool OperationProcess(const struct LobbySetupConcrete* this, const struct Operation* )
+                         local  bool bContinue
+                         local  enum LobbySetupStateE eOverallState
+                         local  uint32_t uListSize
+                         local  int32_t iIndex
+                         local  struct LobbySetupElement* pElement
+                         local  uint32_t uNumElements
+                         local  struct LobbySetupObserver** pList
+                         local  LobbyApiRefT* pLobbyRef
+                         inlines  GetMaxNumberOfObservers, GetObserverList, RemoveElementAt, operator=
+  136  005BB680      4  void OperationTimeout(const struct LobbySetupConcrete* this, const struct Operation* )
+  163  005F8E94    170  void OperationCancel(const struct LobbySetupConcrete* this, const struct Operation* )
+                         local  uint32_t uIndex
+                         local  uint32_t uNumElements
+                         local  struct LobbySetupObserver** pList
+                         local  struct Operation* pOperation
+                         inlines  GetMaxNumberOfObservers, GetObserverList, RemoveAll, operator OSDK::Operation*, operator=
+  203  005F9004     D8  void LobbySetupStrategyComplete(const struct LobbySetupConcrete* this, const struct Operation* pOperation, bool bSuccess)
+                         local  uint32_t uListSize
+                         local  uint32_t uIndex
+                         local  struct LobbySetupElement* pElement
+                         inlines  GetElementAt, GetNumberOfElements, operator=
+  252  00611154     E4  void LobbySetupConcrete(const struct LobbySetupConcrete* this, uint32_t uMaximumOperations, uint32_t uMaximumObservers)
+                         inlines  List, Observable, RCPointer
+  277  0061131C    1B0  void ~LobbySetupConcrete(const struct LobbySetupConcrete* this)
+                         local  uint32_t uListSize
+                         local  uint32_t uIndex
+                         local  struct LobbySetupElement* pElement
+                         inlines  GetElementAt, GetNumberOfElements, RemoveAll, operator->, operator=, ~List, ~LobbySetupStrategyCallback, ~Observable, ~OperationStrategy, ~RCPointer
+  329  0060B358     D8  void AddSetupStrategy(const struct LobbySetupConcrete* this, struct LobbySetupStrategy* pStrategy)
+                         local  struct LobbySetupElement* pElement
+                         inlines  InsertElement, LobbySetupElement
+  363  005F90DC    14C  struct Operation* SetupLobby(const struct LobbySetupConcrete* this, struct <anon>* pCallback)
+                         local  uint32_t uListSize
+                         local  uint32_t uIndex
+                         local  struct LobbySetupElement* pElement
+                         inlines  GetElementAt, GetNumberOfElements, GetOperationManagerConcrete, operator=

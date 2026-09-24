@@ -1,0 +1,6 @@
+// C:/packages/rwaudiocore/2.08.01/source/9/cmn/soutputmap.cpp
+// compiled in: soutputmap.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   36  006DDFB0     A8  int Snd9::mapChannelToOutput(enum Channel outputChannel)
+                         local  int i

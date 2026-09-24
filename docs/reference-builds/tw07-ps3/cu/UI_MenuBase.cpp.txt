@@ -1,0 +1,63 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_MenuBase.cpp
+// compiled in: apt_unity.cpp
+// 25 functions, source order. line | PS3 address | size
+
+   15  0008B194     A4  bool Extraxt_BrTag_InString(char* strIn, char* line2)
+                         local  char* br
+                         inlines  std::strstr
+   39  000F4318     D4  void UIMenuBase::UIMenuBase(const struct UIMenuBase* this)
+                         inlines  MenuLevelStruct::MenuLevelStruct, UIExternCircleMenuIterator::UIExternCircleMenuIterator, UIResponseHandlerFromFlash::UIResponseHandlerFromFlash
+   50  00097160     4C  void UIMenuBase::Close(const struct UIMenuBase* this)
+   65  00041EA8     D0  void UIMenuBase::Init(const struct UIMenuBase* this)
+                         local  int i
+                         local  const struct MenuInfo& menuinfo
+   83  00042024    12C  bool UIMenuBase::LoadMenuAssets(const struct UIMenuBase* this)
+                         local  bool retVal
+  109  00042ED0     54  void UIMenuBase::Hide(const struct UIMenuBase* this)
+  119  00042D64    16C  bool UIMenuBase::HideMenuAssets(const struct UIMenuBase* this)
+                         local  bool retVal
+  153  00042FA0    154  void UIMenuBase::InitMenuArrayAndHandler(const struct UIMenuBase* this)
+                         local  const int32 index
+                         local  const struct MenuInfo& menuInfo
+  175  0006F40C    108  void UIMenuBase::FixNextArrayPresets(const struct UIMenuBase* this)
+                         local  const int32 oldItemIndex
+                         local  const int32 newItemIndex
+                         local  const int32 newFirstIndex
+                         local  int i
+                         local  const struct MenuInfo& menuinfo
+                         inlines  UIExternScrollMenuIterator::GetFirstRowIndex
+  199  0006F514    168  void UIMenuBase::SelectItemInMenu(const struct UIMenuBase* this, enum eSelectType selectType)
+                         local  struct UiMenuItemDefaultDst* opActiveItem
+                         local  int32 id
+  236  000431E0    198  void UIMenuBase::SetMenuItems(const struct UIMenuBase* this, struct UIMenuItemBaseSrc* srcMenuItemArray, int32 sizeMenu)
+                         local  struct IExternArray* menuExternArray
+                         local  int32 i
+                         local  int32 positionInArray
+                         local  struct UIMenuItemBaseSrc* src
+                         local  struct UIMenuItemBaseDst* dst
+                         inlines  UIExternIterator::GetExternArray
+  263  0003DC18     2C  enum AptThreadReturnValue UIMenuBase::MenuControlThread(const struct UIMenuBase* this)
+  271  000318A4     48  enum TAptSequenceStatus UIMenuBase::AddMenuControlThreadSequence(const struct UIMenuBase* this, bool inbFirstTime, void* inData)
+  280  00024CB0     48  enum TAptSequenceStatus UIMenuBase::RemoveMenuControlThreadSequence(const struct UIMenuBase* this, bool inbFirstTime, void* inData)
+  291  00043378     C8  void UIMenuBase::SetMenuItems_FromFlash(const struct UIMenuBase* this)
+                         local  char* tempString
+                         local  int32 sizeMenu
+  314  00043440     BC  void UIMenuBase::ShowMenu_FromFlash(const struct UIMenuBase* this, const char* pathFunction)
+                         local  const struct MenuInfo& menuinfo
+  334  00042150    1B0  void UIMenuBase::ShowMenu(const struct UIMenuBase* this, struct UIResponseHandler* inpHandler, struct UIMenuItemBaseSrc* inMenuItemArray, int32 sizeMenu, int32 sizeofMenu, enum eMenuAllocType alloctype)
+                         local  const struct MenuInfo& menuinfo
+  367  000434FC     84  void UIMenuBase::FSCommand(const struct UIMenuBase* this, const char* szCommand, const char* szParams)
+  378  00043580      C  int32 UIMenuBase::vGetElemCount(const struct UIMenuBase* this)
+  379  0004358C      4  void UIMenuBase::vFlush(const struct UIMenuBase* this)
+  380  00043590      8  void UIMenuBase::vSetNbrElems(const struct UIMenuBase* this, int32 inDefaultSize)
+  382  00043598     40  void* UIMenuBase::GetItem(const struct UIMenuBase* this, int32 inIndex)
+  384  000435D8    21C  void* UIMenuBase::UpdateElementAndLabel(const struct UIMenuBase* this, int32 inIndex, char* inLabel)
+                         local  struct UIMenuItemBaseDst* menuItem
+                         local  struct UIMenuItemBaseSrc* src
+  411  000437F4     54  void DefaultMenuArrayUpdate_UpdateItemAndLabel(struct UIMenuItemBaseDst* inMenuItemToUpdate, struct UIMenuItemBaseSrc* inMenuItemArray, int32 index, char* label)
+                         local  struct UIMenuItemDefaultSrc* menuItemIn
+                         local  struct UiMenuItemDefaultDst* menuItem
+  425  00043848     E0  void DefaultMenuArrayUpdate_UpdateItemAndLabelFlash(struct UIMenuItemBaseDst* inMenuItem, int32 index, char* label, struct UIResponseHandlerFromFlash* flashHandler)
+                         local  struct UiMenuItemDefaultDst* menuItem
+                         local  char[32] integerStr
+                         local  char[256] myTempString

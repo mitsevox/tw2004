@@ -1,0 +1,76 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/rsxgpu/dev/source/rsxgpu/RSXDisasm.cpp
+// compiled in: RSXDisasm.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   25  008CE69C   2F1C  bool RSXGetRegisterValueDefinition(uint32_t channel, enum RSXRegister regNum, uint32_t contents, char* strValue, size_t strValueLength)
+                         local  uint32_t tempContentsOne
+                         local  uint32_t tempContentsTwo
+                         local  int texture
+                         local  int window
+                         local  char[8][19] functionConversionTable
+                         local  char[8][19] functionConversionTable
+                         local  char[8][19] functionConversionTable
+                         local  char[8][19] functionConversionTable
+                         local  char[8][19] functionConversionTable
+                         local  char[8][19] functionConversionTable
+  857  008D15B8   1C98  bool RSXGetRegisterName(uint32_t channel, enum RSXRegister regNum, char* strName)
+                         local  int texture
+                         local  int texture
+                         local  int window
+ 1179  008D3250    21C  void RSXDisassemble(const uint32_t* pListBase, uint32_t listSizeInWords)
+                         local  const uint32_t* pListPtr
+                         local  const uint32_t* pListEnd
+                         local  uint32_t cmd
+                         local  uint32_t flags1
+                         local  uint32_t regAddr
+                         local  uint32_t regCount
+                         local  uint32_t channel
+                         local  uint32_t flags2
+                         local  char[256] regName
+                         local  uint32_t regData
+ 1244  008D346C    100  uint32_t RSXDisassembleSingleGpuCmd(const uint32_t* pListBase, const struct RsxGpuCommand& cmdInfo)
+                         local  const uint32_t* pListPtr
+                         local  uint32_t cmd
+                         local  uint32_t flags1
+                         local  uint32_t flags3
+                         local  uint32_t regAddr
+                         local  uint32_t regCount
+                         local  uint32_t channel
+                         local  unsigned int i
+ 1678    inline-only   static uint32_t ReadBit(const uint8_t* mem, uint32_t bitAddr)
+ 1685  008D356C     60  static uint32_t DecodeField(const uint32_t* opcode, uint32_t bitStart, uint32_t bitSize, uint32_t bitXOR, const char* name)
+                         local  uint32_t field
+                         local  uint32_t bit
+ 1710  008D35CC     BC  static void PrintSwizzle(uint32_t swizzle, bool bSwapOrder)
+                         local  char[4] swizzleChars
+                         local  int i
+ 1732  008D3688     FC  static void PrintUCodeWords(const uint8_t* mem, uint32_t numWords, bool bSwap16)
+ 1754    inline-only   static int32_t DecodeInstruction(const struct RSXFPInst& inst, const uint32_t* opcode)
+                         local  int instSize
+                         local  uint32_t opcodeBit
+                         local  uint32_t opcodeSize
+                         local  uint32_t bitXOR
+                         local  int i
+ 1829    inline-only   static void DisassembleInstruction(const struct RSXFPInst& inst)
+                         local  int i
+ 1893  008D3784    850  void RSXDisassembleFragmentUCode(const uint32_t* uCode, uint32_t numInsts)
+                         local  uint32_t addr
+                         local  bool exitOnEndBitSet
+                         local  struct RSXFPInst inst
+                         local  int32_t instSize
+                         local  uint32_t opcodeBit
+                         local  uint32_t opcodeSize
+                         local  uint32_t bitXOR
+                         local  int i
+                         inlines  DecodeInstruction, DisassembleInstruction
+ 1948    inline-only   static int32_t DecodeInstruction(const struct RSXVPInst& inst, const uint32_t* opcode)
+                         local  int instSize
+                         local  uint32_t opcodeBit
+                         local  uint32_t opcodeSize
+                         local  uint32_t bitXOR
+ 2004    inline-only   static void DisassembleInstruction(const struct RSXVPInst& inst)
+                         local  int i
+ 2066  008D3FD4    6F4  void RSXDisassembleVertexUCode(const uint32_t* uCode, uint32_t numInsts)
+                         local  uint32_t addr
+                         local  struct RSXVPInst inst
+                         inlines  DecodeInstruction, DisassembleInstruction

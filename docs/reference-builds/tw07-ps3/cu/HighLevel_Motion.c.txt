@@ -1,0 +1,21 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/ears_rt_cct/dev/src/HighLevel/HighLevel_Motion.c
+// compiled in: HighLevel_Motion.c
+// 5 functions, source order. line | PS3 address | size
+
+   26  005A29D8     68  int ChrCntl_Motion_HookUpBankPointers(void* bnk)
+                         local  struct <anon>* bank
+                         local  char* baseAddr
+                         local  int* relocs
+   49  005A2A40     54  float ChrCntl_Motion_NumDataFrames(const struct MotionDefinition* motionRef)
+   54  005A2A94      C  int ChrCntl_Motion_ModelIndex(const struct MotionDefinition* motionRef)
+   59  005A2AA0      C  const struct <anon>* ChrCntl_Motion_FromRef(const struct MotionDefinition* motionRef)
+   64  005A2AAC    2D4  void ChrCntl_Motion_ProcessEvents(const struct MotionDefinition* motionRef, struct Character* viewInfo, float frameNum, float prevFrameNum, float numFrames, int flags)
+                         local  int i
+                         local  int prevStateIdx
+                         local  struct <anon>* prevState
+                         local  float_t prevFrameNumWrapped
+                         local  const struct <anon>* eventInfo
+                         local  float eventFrameNum
+                         local  const struct <anon>* eventInfo
+                         local  float eventFrameNum
+                         local  float_t numLoops

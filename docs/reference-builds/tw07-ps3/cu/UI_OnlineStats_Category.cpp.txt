@@ -1,0 +1,25 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/Golf/UI_Core/AptRuntime/UI_OnlineStats_Category.cpp
+// compiled in: apt_unity.cpp
+// 15 functions, source order. line | PS3 address | size
+
+  163  000F7F34     F0  void UIOnlineStats_Category::UIOnlineStats_Category(const struct UIOnlineStats_Category* this)
+                         inlines  OnlineFlashItem::OnlineFlashItem, TArrayInternal<UIOnlineStats_Category::OnlineFlashItem,AptStructSwapper>::TArrayInternal, TExternArray<UIOnlineStats_Category::OnlineFlashItem>::TExternArray, UIMenuVertBase::SetNumVisibleVertRows, UIMenuVertBase::UIMenuVertBase
+  178  000F0B54     94  void UIOnlineStats_Category::Init(const struct UIOnlineStats_Category* this)
+                         inlines  AptScreenSubscriber::SetIsOnlineScreen, FlashUpdateItem::SetFlashUpdateList, UIMenuVertBase::Init
+  190  000971B4      4  void UIOnlineStats_Category::Close(const struct UIOnlineStats_Category* this)
+  195  0007A924     C0  void UIOnlineStats_Category::UpdateHeaderStrings(const struct UIOnlineStats_Category* this)
+                         local  int32 activeStat
+                         local  int32 activeCategory
+  213  00048820      4  void UIOnlineStats_Category::UpdatePlayerStrings(const struct UIOnlineStats_Category* this)
+  228  0007AA68     70  void UIOnlineStats_Category::Show(const struct UIOnlineStats_Category* this)
+  236  00048824     48  void UIOnlineStats_Category::OnHide(const struct UIOnlineStats_Category* this)
+  241  00080D90     70  void UIOnlineStats_Category::OnShow(const struct UIOnlineStats_Category* this)
+  247  0007A9E4     84  void UIOnlineStats_Category::RefreshMenu(const struct UIOnlineStats_Category* this)
+  254  0008643C     C4  void UIOnlineStats_Category::CategoryRankingHandleInput(const struct UIOnlineStats_Category* this, int32 cID)
+  287  00086500     24  enum eAptHandleInput UIOnlineStats_Category::HandleInput(const struct UIOnlineStats_Category* this, int32 cID)
+  293  0004886C     40  void UIOnlineStats_Category::ChangeCategoryMenuItems(const struct UIOnlineStats_Category* this)
+  298  0005539C    114  void UIOnlineStats_Category::CategoryRankingUpdateItem(const struct UIOnlineStats_Category* this, struct OnlineFlashItem* dest, int32 index, char* label)
+  324  000554B0      C  void UIOnlineStats_Category::UpdateItemAndLabel(const struct UIOnlineStats_Category* this, struct UIMenuItemBaseDst* destItem, struct UIMenuItemBaseSrc* srcItem, int32 index, char* label)
+                         local  struct OnlineFlashItem* dest
+  330  00080CE0     B0  void UIOnlineStats_Category::RefreshRankList(const struct UIOnlineStats_Category* this, int numRows)
+                         local  int iClampedRows

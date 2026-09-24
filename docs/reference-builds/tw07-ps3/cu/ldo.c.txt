@@ -1,0 +1,101 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/lua-5.0.2/src/ldo.c
+// compiled in: ldo.c
+// 23 functions, source order. line | PS3 address | size
+
+   50  005463D0    10C  static void seterrorobj(lua_State* L, int errcode, StkId oldtop)
+                         local  TObject* i_o
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  TObject* i_o
+   70  005464DC     60  void luaD_throw(lua_State* L, int errcode)
+   82  0054653C     90  int luaD_rawrunprotected(lua_State* L, Pfunc f, void* ud)
+                         local  struct lua_longjmp lj
+   94  0054666C     54  static void restore_stack_limit(lua_State* L)
+                         local  int inuse
+  106    inline-only   static void correctstack(lua_State* L, TObject* oldstack)
+                         local  CallInfo* ci
+                         local  GCObject* up
+  120  005466C0    114  void luaD_reallocstack(lua_State* L, int newsize)
+                         local  TObject* oldstack
+                         inlines  correctstack
+  129  005465CC     A0  void luaD_reallocCI(lua_State* L, int newsize)
+                         local  CallInfo* oldci
+  138  005467D4     2C  void luaD_growstack(lua_State* L, int n)
+  146    inline-only   static void luaD_growCI(lua_State* L)
+  157  00546800    14C  void luaD_callhook(lua_State* L, int event, int line)
+                         local  lua_Hook hook
+                         local  ptrdiff_t top
+                         local  ptrdiff_t ci_top
+                         local  lua_Debug ar
+  183    inline-only   static void adjust_varargs(lua_State* L, int nfixargs, StkId base)
+                         local  int i
+                         local  Table* htab
+                         local  TObject nname
+                         local  int actual
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  TObject* i_o
+                         local  TObject* i_o
+                         local  TObject* i_o
+  206    inline-only   static StkId tryfuncTM(lua_State* L, StkId func)
+                         local  const TObject* tm
+                         local  StkId p
+                         local  ptrdiff_t funcr
+                         local  const TObject* o2
+                         local  TObject* o1
+                         local  const TObject* o2
+                         local  TObject* o1
+  221  0054694C    550  StkId luaD_precall(lua_State* L, StkId func)
+                         local  LClosure* cl
+                         local  ptrdiff_t funcr
+                         local  CallInfo* ci
+                         local  int n
+                         local  CallInfo* ci
+                         local  Proto* p
+                         local  TObject* i_o
+                         local  TObject* i_o
+                         local  TObject* i_o
+                         local  const TObject* o2
+                         local  TObject* o1
+                         inlines  adjust_varargs, luaD_growCI, tryfuncTM
+  267    inline-only   static StkId callrethooks(lua_State* L, StkId firstResult)
+                         local  ptrdiff_t fr
+  278  00546E9C    1D4  void luaD_poscall(lua_State* L, int wanted, StkId firstResult)
+                         local  StkId res
+                         local  const TObject* o2
+                         local  TObject* o1
+                         inlines  callrethooks
+  302  00547070     F4  void luaD_call(lua_State* L, StkId func, int nResults)
+                         local  StkId firstResult
+  320  00547164    12C  static void resume(lua_State* L, void* ud)
+                         local  StkId firstResult
+                         local  int nargs
+                         local  CallInfo* ci
+                         local  int nresults
+  350  00547290     A4  static int resume_error(lua_State* L, const char* msg)
+                         local  TObject* i_o
+  359  00547334    14C  int lua_resume(lua_State* L, int nargs)
+                         local  int status
+                         local  lu_byte old_allowhooks
+  386  00547480    168  int lua_yield(lua_State* L, int nresults)
+                         local  CallInfo* ci
+                         local  int i
+                         local  const TObject* o2
+                         local  TObject* o1
+  409  005475E8     F4  int luaD_pcall(lua_State* L, Pfunc func, void* u, ptrdiff_t old_top, ptrdiff_t ef)
+                         local  int status
+                         local  short unsigned int oldnCcalls
+                         local  ptrdiff_t old_ci
+                         local  lu_byte old_allowhooks
+                         local  ptrdiff_t old_errfunc
+                         local  StkId oldtop
+  442  005476DC     F8  static void f_parser(lua_State* L, void* ud)
+                         local  struct SParser* p
+                         local  Proto* tf
+                         local  Closure* cl
+                         local  TObject* i_o
+  456  005477D4     C4  int luaD_protectedparser(lua_State* L, ZIO* z, int bin)
+                         local  struct SParser p
+                         local  int status
+                         local  ptrdiff_t oldtopr
+                         local  StkId oldtop

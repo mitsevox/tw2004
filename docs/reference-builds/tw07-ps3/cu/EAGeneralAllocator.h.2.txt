@@ -1,0 +1,5 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/PPMalloc/1.08.00/include/PPMalloc/EAGeneralAllocator.h
+// compiled in: tiger_module_allocator.cpp
+// 1 functions, source order. line | PS3 address | size
+
+ 1393    inline-only   void Lock(const struct GeneralAllocator* this, bool bEnable)

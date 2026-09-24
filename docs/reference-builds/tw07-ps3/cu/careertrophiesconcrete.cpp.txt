@@ -1,0 +1,40 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/career/source/common/careertrophiesconcrete.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 16 functions, source order. line | PS3 address | size
+
+   80  0062A8F0     40  void ~LoadUserOperation(const struct <anon>* this)
+  129  006057D8     6C  void LoadUserOperation(const struct <anon>* this, const char8_t* strParameters, struct CareerTrophiesLoadUserInternalCallback* pCallback)
+  136  005C8C1C     48  void AriesOperationFailure(const struct <anon>* this, int32_t )
+  160  005C8C64     94  bool AriesOperationResult(const struct <anon>* this, LobbyApiMsgT* pMsg)
+  188  005C8CF8     48  void AriesOperationCancel(const struct <anon>* this)
+  213  005CC19C    1E8  void LoadUserSuccess(const struct <anon>* this, const char8_t* strData)
+                         local  uint32_t uCount
+                         local  uint32_t uIndex
+                         local  struct <anon>* pResourceManager
+                         local  const char8_t* strLoadingImage
+  282  005C8DB0     5C  void LoadUserFailure(const struct <anon>* this, enum Failure eFailure)
+  312  005EAE30     C8  void CareerTrophiesConcrete(const struct <anon>* this)
+                         inlines  CareerTrophiesLoadUserInternalCallback
+  342  005C8E0C     D8  void Terminate(const struct <anon>* this)
+                         local  uint32_t uIndex
+  381  005DDEB0     6C  void ~CareerTrophiesConcrete(const struct <anon>* this)
+                         inlines  ~CareerTrophiesLoadUserInternalCallback
+  403  00605844    208  struct Operation* LoadUser(const struct <anon>* this, const char8_t* strUserName, struct CareerTrophiesCallback* pCallback)
+                         local  struct <anon> params
+                         inlines  GetTagField
+  429  005C8EE4      4  void ResourceProgress(const struct <anon>* this, void* , const char8_t* , uint32_t , uint32_t )
+  433  005D90D0     FC  void ResourceSuccess(const struct <anon>* this, void* pContext, const char8_t* , struct Resource* pResource)
+                         local  uint32_t uTrophyIndex
+                         local  uint32_t uNumElements
+                         local  struct CareerTrophiesObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  443  005C8F4C     FC  void ResourceFailure(const struct <anon>* this, void* pContext, const char8_t* , enum Failure )
+                         local  uint32_t uTrophyIndex
+                         local  const char8_t* strFailureImage
+                         local  uint32_t uNumElements
+                         local  struct CareerTrophiesObserver** pList
+                         inlines  GetMaxNumberOfObservers, GetObserverList
+  474  005C8D40     70  bool SetDynamicOperation(const struct <anon>* this, uint32_t uTrophyID, struct Operation* pOperation)
+                         local  uint32_t uIndex
+  507  005C8EE8     64  void ClearDynamicOperation(const struct <anon>* this, uint32_t uTrophyID)
+                         local  uint32_t uIndex

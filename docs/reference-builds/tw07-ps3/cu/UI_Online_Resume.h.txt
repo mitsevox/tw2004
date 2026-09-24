@@ -1,0 +1,8 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/AptRuntime/Headers/UI_Online_Resume.h
+// compiled in: apt_unity.cpp
+// 4 functions, source order. line | PS3 address | size
+
+   23  000FF954     44  void UIOnlineResume::ShowHelpText(const struct UIOnlineResume* this)
+   27  000FF998     24  void UIOnlineResume::RegainFocus(const struct UIOnlineResume* this, uint32 )
+   28  000FF9BC     24  void UIOnlineResume::LooseFocus(const struct UIOnlineResume* this, uint32 )
+   30  000FF9E8      C  uint32 UIOnlineResume::GetSignature(const const struct UIOnlineResume* this)

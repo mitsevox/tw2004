@@ -1,0 +1,6 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/OSDK/2.06.04/extensions/career/source/common/careertrophiescallback.cpp
+// compiled in: BulkBuild_runtime.OSDK.bulkbuild.sourcefiles.cpp
+// 2 functions, source order. line | PS3 address | size
+
+    6  005C8BC0      C  void CareerTrophiesCallback(const struct CareerTrophiesCallback* this)
+   10  005C8BD8      C  void ~CareerTrophiesCallback(const struct CareerTrophiesCallback* this)

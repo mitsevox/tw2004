@@ -1,0 +1,19 @@
+// C:/packages/rwaudiocore/2.08.01/source/cmn/ibase.h
+// compiled in: decealayer3.cpp, decoderregistry.cpp, plugin.cpp, samplebuffercreateinstance.cpp, sndplayer1.cpp, streampool.cpp, system.cpp, voice.cpp
+// 14 functions, source order. line | PS3 address | size
+
+   54    inline-only   void core::LinearAllocAddSize(const unsigned int& totalSize, unsigned int size, unsigned int alignment)
+   63    inline-only   void core::LinearAlloc<std::uintptr_t, std::uintptr_t>(const uintptr_t& addr, const uintptr_t& memBlock, unsigned int size, unsigned int alignment)
+   63    inline-only   void core::LinearAlloc<unsigned int*, std::uintptr_t>(const unsigned int*& addr, const uintptr_t& memBlock, unsigned int size, unsigned int alignment)
+   63    inline-only   void core::LinearAlloc<rw::audio::core::StreamPool::StreamDesc*, std::uintptr_t>(const struct StreamDesc*& addr, const uintptr_t& memBlock, unsigned int size, unsigned int alignment)
+   63    inline-only   void core::LinearAlloc<char*, std::uintptr_t>(const char*& addr, const uintptr_t& memBlock, unsigned int size, unsigned int alignment)
+   63    inline-only   void core::LinearAlloc<rw::core::thread::Mutex*, std::uintptr_t>(const struct <anon>*& addr, const uintptr_t& memBlock, unsigned int size, unsigned int alignment)
+   63    inline-only   void core::LinearAlloc<void*, std::uintptr_t>(const void*& addr, const uintptr_t& memBlock, unsigned int size, unsigned int alignment)
+   63    inline-only   void core::LinearAlloc<rw::audio::core::PlugInLocationDesc*, std::uintptr_t>(const struct <anon>*& addr, const uintptr_t& memBlock, unsigned int size, unsigned int alignment)
+   63    inline-only   void core::LinearAlloc<rw::audio::core::EALayer3Core**, std::uintptr_t>(const struct EALayer3Core**& addr, const uintptr_t& memBlock, unsigned int size, unsigned int alignment)
+   63    inline-only   void core::LinearAlloc<rw::audio::core::EALayer3Core*, rw::audio::core::EALayer3Core*>(const struct EALayer3Core*& addr, const struct EALayer3Core*& memBlock, unsigned int size, unsigned int alignment)
+   71    inline-only   void* core::MemCpy(void* pDest, const void* pSrc, size_t size)
+  127    inline-only   void* core::MemSet(void* pDest, int value, size_t size)
+                         local  void* pDestReturned
+  160    inline-only   bool core::IsIntegral(float value)
+  180    inline-only   unsigned char core::IncrementCircularIndex<unsigned char>(unsigned char index, unsigned char maxIndex)

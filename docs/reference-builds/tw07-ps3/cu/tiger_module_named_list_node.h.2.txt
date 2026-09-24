@@ -1,0 +1,6 @@
+// c:/dev/Tiger/DL_Default/TigerCode/packages/tiger_module/source/tiger_module_named_list_node.h
+// compiled in: tiger_module_trinity_sequence.cpp
+// 1 functions, source order. line | PS3 address | size
+
+   11  00540D80     18  void ~NamedListNode(const struct <anon>* this)
+                         inlines  ~ListNode

@@ -1,0 +1,80 @@
+// c:/dev/Tiger/DL_Default/TigerCode/Code/golf/ui_core/UIInterface/UIPlayNowOptionsI.c
+// compiled in: apt_unity.cpp
+// 45 functions, source order. line | PS3 address | size
+
+   24  00079638     64  void GM_vPlayNowSetWeather(int32 param1)
+                         inlines  cGAME_GLOBALS::SetPlayNowWeatherOptions
+   41  0002DB74     3C  int32 GM_vPlayNowGetWeather()
+   62  0002DBB0     20  enum GM_TeeColorType_t LookUpTeeFromIndex(int32 param1)
+                         local  enum GM_TeeColorType_t teeLocation
+   88  0002DBD0     2C  int32 LookUpIndexFromTee(enum GM_TeeColorType_t tee)
+                         local  int32 teeLocation
+  116  0002DBFC     18  int32 GM_vPlayNowGetTee()
+  121  0002DC14     78  void GM_vPlayNowSetTee(int32 param1)
+                         local  enum GM_TeeColorType_t teeLocation
+                         inlines  cGAME_GLOBALS::SetPlayNowTeeOption
+  131  0002DC8C     20  int32 GM_vGetPlayNowMulligan()
+  136  0002DCAC     94  void GM_vSetPlayNowMulligan(int32 param1)
+                         inlines  cGAME_GLOBALS::SetPlayNowMulligansOption
+  144  0007D274     34  void GM_vPlayNowSetFirstTime(int32 param1)
+                         inlines  cGAME_GLOBALS::SetPlayNowFirstTimeOption
+  152  0002DD40     20  int32 GM_vPlayNowGetFirstTime()
+  163  0002DD60     E0  void GM_vPlayNowSetHoleSelectOption(int32 param1)
+                         inlines  cGAME_GLOBALS::SetPlayNowHoleSelectOption
+  184  0007D90C     20  int32 GM_vPlayNowGetHoleSelectOptionToggle()
+  189  0002DE40     18  enum GM_HoleSelectType_t GM_vPlayNowGetHoleSelectOption()
+  208  0007D92C     78  int32 GM_vPlayNowGetCourseOptionToggleValue()
+                         local  enum GM_CourseType_t[15] unlockedCourseIDs
+                         local  int32 i
+                         inlines  cGAME_GLOBALS::GetPlayNowCourseOption
+  222  0006A564     A8  void GM_vPlayNowSetCourseOption(int32 param1)
+                         local  enum GM_CourseType_t[15] unlockedCourseIDs
+                         inlines  cGAME_GLOBALS::SetPlayNowCourseOption
+  244  0002DE58     1C  int32 GM_vPlayNowGetCourseOption()
+  250  0006A498     CC  int32 GM_PlayNowNumberCourses(enum GM_CourseType_t* courseIDs)
+                         local  int32 numCourses
+                         local  int32 i
+  277  0007D9A4     50  int32 GM_vPlayNowGetGameModeOptionToggle()
+                         local  int32 i
+  288  0002DE74     98  void GM_vPlayNowSetGameModeOptionToggle(int32 param1)
+                         inlines  cGAME_GLOBALS::SetPlayNowGameModeOption
+  298  0002DF0C     1C  int32 GM_vPlayNowGetGameModeOption()
+  311  00079774     70  int32 GM_vPlayNowGetGolfer_tOption()
+                         local  enum Golfer_t[64] unlockedGolferIDs
+                         local  int32 i
+  326  000796E4     78  void GM_vPlayNowSetGolfer_tOption(int32 param1)
+                         local  enum Golfer_t[64] unlockedGolferIDs
+                         inlines  cGAME_GLOBALS::SetPlayNowGolferOption
+  340  0007975C     18  enum Golfer_t GM_VGetPlayNowOptionGolfer()
+  345  0002DF28      8  int32 GM_NumUnlockedPlaynowGolfers(enum Golfer_t* golferIDs)
+  364  0002DF30     24  int32 GM_vPlayNowGetProfileOption()
+  372  000795A4     94  void GM_vPlayNowSetProfileOption(int32 param1)
+                         inlines  cGAME_GLOBALS::SetPlayNowGolferOption
+  390  0002DF54     24  int32 GM_vPlayNowGetNumPlayersOption()
+  395  0002DF78     9C  void GM_vPlayNowSetNumPlayersOption(int32 param1)
+                         inlines  cGAME_GLOBALS::SetPlayNowNumGolfersOption
+  406  0002E014     88  void GM_vPlayNowSetPin(int32 param1)
+                         inlines  cGAME_GLOBALS::SetPlayNowPinOption
+  414  0002E09C     1C  int32 GM_vPlayNowGetPin()
+  420  0002E0B8    104  void GM_vPlayNowSetWind(int32 param1)
+                         inlines  cGAME_GLOBALS::SetPlayNowWindOption
+  443  0002E1BC     1C  int32 GM_vPlayNowGetWind()
+  449  0002E1D8    104  void GM_vPlayNowSetGreensOption(int32 param1)
+                         inlines  cGAME_GLOBALS::SetPlayNowGreensOption
+  472  0002E2DC     1C  int32 GM_vPlayNowGetGreensOption()
+  480  0002E2F8    104  void GM_vPlayNowSetGreenHardnessOption(int32 param1)
+                         inlines  cGAME_GLOBALS::SetPlayNowGreenHardnessOption
+  503  0002E3FC     1C  int32 GM_vPlayNowGetGreenHardnessOption()
+  509  0002E418    104  void GM_vPlayNowSetFairwaysOption(int32 param1)
+                         inlines  cGAME_GLOBALS::SetPlayNowFairwayOption
+  532  0002E51C     1C  int32 GM_vPlayNowGetFairwaysOption()
+  538  0002E538     18  int32 GM_vPlayNowGetCrowds()
+  543  0002E550     24  void GM_vPlayNowSetCrowds(int32 param1)
+                         inlines  cGAME_GLOBALS::SetPlayNowCrowdsOption
+  550  0002E574     DC  void GM_vPlayNowSetRoughOption(int32 param1)
+                         inlines  cGAME_GLOBALS::SetPlayNowRoughsOption
+  570  0002E650     1C  int32 GM_vPlayNowGetRoughOption()
+  576  0002E66C     18  void GM_vPlayNowSetSeason(int32 param1)
+                         inlines  cGAME_GLOBALS::SetPlayNowSeasonOption
+  581  0002E684     1C  int32 GM_vPlayNowGetSeason()
+  587  000B8B28     E8  void GM_vSetAllPlayNowOptions()

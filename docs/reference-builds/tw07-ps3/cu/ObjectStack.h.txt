@@ -1,0 +1,7 @@
+// C:/Dev/Tiger/DL_Default/TigerCode/packages/t3db/2.21.03-RW-EAC/include/common/t3db/ObjectStack.h
+// compiled in: Compiler.cpp, ObjectStack.cpp
+// 3 functions, source order. line | PS3 address | size
+
+   47  007BD4D8     6C  void* Attach(const struct <anon>* this)
+   66  007DF530     24  void ObjectStack(const struct <anon>* this)
+   67  007DF578     24  void ~ObjectStack(const struct <anon>* this)
