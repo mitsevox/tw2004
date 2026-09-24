@@ -34,9 +34,9 @@ Files
 Names
 -----
 
-- **Functions and globals:** use a real name when there is evidence (a TW06 name from
-  `tw06-names.md`, a string in the binary, an unambiguous role). Otherwise keep the address name
-  (`fn_800FA518`, `lbl_80211D38`). Do not invent names from guesses.
+- **Functions and globals:** use a real name only with the evidence described in "Where names and
+  comments come from" below. Otherwise keep the address name (`fn_800FA518`, `lbl_80211D38`). Do
+  not invent names from guesses.
 - **Renaming a global or function** is done in `config/GW4E69/symbols.txt`, so every file and the
   assembly see the new name. Never alias with `#define NICE_NAME lbl_XXXXXXXX`.
 - **Style of names:** EA's own. Functions `System_Verb` (`View_SetCamera`, `Session_SetNumPlayers`)
@@ -49,6 +49,26 @@ Names
   has its offset in a trailing comment (`// 0xC38`).
 - **Macros** are for real abstractions (`PLAYER(i)`, a table's row count), in the header next to
   the thing they describe. Not for shortening a name.
+
+Where names and comments come from
+----------------------------------
+
+The name and comment audit (`config/GW4E69/audit.tsv`, from 2026-09-24) found about 7% of our
+function names and about 1 in 5 of our function comments wrong: swapped cases, claims the code
+does not show, text copied between similar game modes, stale status notes. They had been written
+during matching, where nothing checks them. So a name or a behaviour comment in EA game code needs
+one of two things before it goes in:
+
+- **Hard evidence:** EA's own text in the binary (a string that names the job), or EA's name from
+  a related build that the code confirms (TW06, TW07; `docs/reference-builds/`). Say which.
+- **Two independent readers:** two blind reads of the function (neither sees the current name or
+  comments) that agree on what it does, reconciled against the code (`tools/match/blindview.py`,
+  the audit ledger). A name that rests only on our own deduction is provisional:
+  `fn_<address>_<Guess>`.
+
+Matching work writes only matching notes (`fake match:`, `EA bug:`, `port:`, register, data-order
+and section notes) and keeps `fn_`/`lbl_` names. Behaviour comments and names come from the audit
+process above, never as a side effect of making bytes match.
 
 Data access
 -----------

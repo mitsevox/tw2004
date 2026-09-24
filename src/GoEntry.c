@@ -233,7 +233,7 @@ void fn_800083A4(void) {
     fn_8006C770();
 }
 
-// The round is over (lbl_802811E8[1], set by fn_8006DC34).
+// A hole load is asked for (lbl_802811E8[1], set by fn_8006F4B4): the loop loads another hole.
 u8 fn_80008820(void) {
     return lbl_802811E8[1];
 }

@@ -63,9 +63,9 @@ extern u8    lbl_80281B8E;              // the reset button was pressed (OSGetRe
 extern u8    lbl_80281E50;              // set after a create-a-player frame, cleared otherwise
 extern void*       lbl_80281E54;        // the render camera made from the three below (fn_8001371C)
 extern void*       lbl_80281E58;        // } made by VM_spCreateViewport,
-extern GoFrameBuf* lbl_80281E5C;        // }   fn_8006E1C8
+extern GoFrameBuf* lbl_80281E5C;        // }   FB_spCreateFrameBuffer
 extern void*       lbl_80281E60;        // }   and CA_spCreateCamera when a game type starts
-extern u8*   lbl_802811E8;              // [1]: the round is over (fn_8006DC34)
+extern u8*   lbl_802811E8;              // [1]: a hole load is asked for (fn_8006F4B4)
 
 // Replay.c
 void fn_8006BED4(void);                 // make the replay buffer
@@ -696,7 +696,7 @@ void fn_800F39CC(s32 a);                // GameMode14.c
 void fn_800F48C4(void);                 // GameMode15.c
 void fn_800F7DE8(void);                 // GameMode13.c
 void fn_800F80D4(s32 a);                // GameMode13.c
-s32  fn_800F9254(void);                 // GameMode2.c: the skin on this hole
+s32  GameModeSkins_CurrentHoleValue(void);                 // GameMode2.c: the skin on this hole
 s32  fn_800F9328(void);                 // GameMode2.c: the first selected hole (-1: none)
 s32  fn_800F93D8(int h);                // the next selected hole after h (-1: none)
 s32  fn_800F9414(int h);                // the selected hole before h (-1: none)

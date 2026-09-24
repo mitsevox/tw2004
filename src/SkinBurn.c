@@ -1,5 +1,5 @@
 // SkinBurn.c (EA's name, from its asserts): "burns" a skin: drops the unused parts of a skin's data,
-// renumbers what is left and packs it into one allocation. Only partly decompiled.
+// renumbers what is left and packs it into one allocation.
 #include "game_types.h"
 #include "platform.h"
 #include "engine.h"
@@ -281,7 +281,7 @@ void fn_80127B10(Skin* pSkin, HwsBurn* pBurn) {
     fn_801276E4(pSkin);
 }
 
-// The callback fn_80127B98 hands hwsBurn.c: copies an entry and clears its bit 1 and n16.
+// The callback fn_80127B98 hands hwsBurn.c: patches an entry (fn_800CE224), clears bit 1 and n16.
 void fn_80127B4C(Skin* pSkin, SkinDesc14* pEntry) {
     fn_800CE224(pSkin, pEntry, NULL, NULL, 0);
     pEntry->u08 &= ~2;
@@ -290,7 +290,7 @@ void fn_80127B4C(Skin* pSkin, SkinDesc14* pEntry) {
 
 // Burns the skin's description down to what it shows now. Each part keeps its current option,
 // and its current variant unless aParts lists it (then every variant is kept). Morph targets in
-// aList are kept, the others are blended in for good at weight 0. The burnt description replaces
+// aList are kept at weight 0; the others are dropped (hwsBurn a1C). The burnt description replaces
 // the model's (the old one is freed) and the skin's first mesh table. aParts and aList end with -1.
 void fn_80127B98(Skin* pSkin, s32* aParts, s32* aList) {
     HwsBurn* pBurn;

@@ -29,8 +29,8 @@ u8 fn_800D1698(int nPlayer) {
     return Wind_Get(NULL) > 6.0f;
 }
 
-// A tip test: a shot other than a putt, in a wind over 6 blowing from 135 to 225 degrees off the
-// aim (the angle measured like the aim's, from +z).
+// A tip test: a shot other than a putt, in a wind over 6 whose vector (Wind_Get) lies 135 to 225
+// degrees off the aim (the angle measured like the aim's, from +z).
 u8 fn_800D16F0(int nPlayer) {
     f32 fAim;
     f32 fAngle;
@@ -55,7 +55,7 @@ u8 fn_800D16F0(int nPlayer) {
     return 0;
 }
 
-// A tip test: as fn_800D16F0, with the wind from -45 to 45 degrees off the aim.
+// A tip test: as fn_800D16F0, with the wind's vector -45 to 45 degrees off the aim.
 u8 fn_800D17E4(int nPlayer) {
     f32 fAim;
     f32 fAngle;
@@ -90,7 +90,7 @@ u8 fn_800D18D8(int nPlayer) {
     fQuality = 100.0f * (gSurfaceTypes[gPlayers[nPlayer].ball.nSurface].f00 +
                          0.01f * (gPlayers[nPlayer].ball.f70 *
                                   (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL)));
-    // the surface's random lie range (f04), narrowed by recovery
+    // the surface's f04, times 100 less the recovery
     fSpread = gSurfaceTypes[gPlayers[nPlayer].ball.nSurface].f04 *
               (100.0f - (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL));
     return fQuality + fSpread < 75.0f;

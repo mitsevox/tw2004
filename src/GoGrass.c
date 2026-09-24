@@ -297,9 +297,9 @@ void fn_8011E974(void) {
 // The grass's render camera: a flat 20 x 20 lens drawing into a 256 x 256 frame buffer.
 void fn_8011E9D8(void) {
     lbl_80281900->pLens = CA_spCreateCamera();
-    lbl_80281900->pFrameBuf = fn_8006E1C8();
+    lbl_80281900->pFrameBuf = FB_spCreateFrameBuffer();
     lbl_80281900->pRect = VM_spCreateViewport();
-    fn_8006E26C(lbl_80281900->pFrameBuf, 0.0f, 0.0f, 256.0f, 256.0f, 1.0f, 1.0f);
+    FB_vSetFrameBuffer(lbl_80281900->pFrameBuf, 0.0f, 0.0f, 256.0f, 256.0f, 1.0f, 1.0f);
     fn_800171D8(lbl_80281900->pRect, 0.0f, 0.0f, 1.0f, 1.0f);
     fn_800B3438(lbl_80281900->pRect, 1.0f, 1.0f);
     CA_vInitCamera(lbl_80281900->pLens);
@@ -310,7 +310,7 @@ void fn_8011E9D8(void) {
 }
 
 void fn_8011EAB8(void) {
-    fn_8006E214(lbl_80281900->pFrameBuf);
+    FB_vReleaseFrameBuffer(lbl_80281900->pFrameBuf);
     CA_vDestroyCamera(lbl_80281900->pLens);
     VM_vReleaseViewport(lbl_80281900->pRect);
     fn_800137B0(lbl_80281900->pCamera);

@@ -31,7 +31,7 @@ void  GM_CheckBallForUIHints(int nPlayer);
 u8    fn_8008AC40(void);
 void  fn_800D9350(int nPlayer);
 void  fn_800BB0A8(void);
-void  fn_8006C4C0(int nPlayer);
+void  REPLAY_Restore(int nPlayer);
 
 u8    GM_bIsZoomButtonPressed(int nPlayer);
 u8    GM_bIsElevatorCamButtonPressed(int nPlayer);
@@ -546,7 +546,7 @@ u8 GM_PlayerTakeMulligan(int nPlayer) {
     fn_800E4204();
     fn_800335F8(1);
     fn_800A76E4();
-    fn_8006C4C0(nPlayer);
+    REPLAY_Restore(nPlayer);
     gPlayers[nPlayer].bC2E = 1;
     gPlayers[nPlayer].bC2F = 1;
     gpGame->pfn254(nPlayer);
@@ -997,7 +997,7 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
             gpGame->b287 && (s8)GOLFERSTATE_GetCurrentState(nPlayer) != GS_CONCEDED && !fn_800E53B8() &&
             !(gPlayers[nPlayer].pChar->u10 & 0x40)) {
             fn_80062D0C(nPlayer);
-            fn_8006C300(nPlayer);
+            REPLAY_Play(nPlayer);
             GOLFERSTATE_Switch(GS_REPLAY_SWING, nPlayer);
             return;
         }
