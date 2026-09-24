@@ -137,6 +137,24 @@ void fn_80017508(Character* pChar) {
     }
 }
 
+// Sets the character's animation events from the blend's, fStart later. Events 5..14 are only
+// taken when their time is past 0.
+void fn_800175B0(Character* pChar, ClipBlend* pBlend, f32 fStart) {
+    u32 uId;
+    int i;
+
+    fn_80017508(pChar);
+    if (pBlend->pEvents != NULL) {
+        for (i = 0; i < pBlend->nEvents; i++) {
+            uId = pBlend->pEvents[i].uId;
+            if (uId < 5 || uId > 14 || pBlend->pEvents[i].fTime > 0.0f) {
+                pChar->events[uId].bSet = 1;
+                pChar->events[uId].fTime = fStart + pBlend->pEvents[i].fTime;
+            }
+        }
+    }
+}
+
 // Pick the character's clip for an animation group and style from its animation library, keyed
 // also by the character's club class (class 1 looks up as 0) and n16D4. The lookup's fallback flags
 // go to bits 0x200 / 0x400 of uFlags; the clip is kept in pCurClip.
