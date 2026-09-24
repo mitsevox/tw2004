@@ -996,11 +996,11 @@ void fn_800CE52C(Skin* pSkin, int n, SkinListEntry* aList, s32* pnList, int nCop
     s32 nOut;
     SkinDesc* pDesc;
     SkinDesc44* p44;
-    s32* pIndex;
+    s32 nFirst;
     int i;
     int j;
-    s32 nFirst;
     s32 nIndices;
+    s32* pIndex;
     s32 n44;
 
     pDesc = pSkin->pModel->pDesc;
