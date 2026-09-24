@@ -6,8 +6,6 @@
 void  fn_80076A54(f32* pRect);
 void  fn_80076AC4(void);
 void  fn_80076AC8(void);
-f32*  fn_80076ACC(void);
-void  fn_80076B18(f32* pRect);
 void  fn_80076B38(f32* pRect);
 
 // A viewport's derived values, from its size ([2], [3]) and scale ([4], [5]): the scaled size,
