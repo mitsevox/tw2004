@@ -61,13 +61,6 @@ LAYOUT_ASSERT(SD_SShaderTypeData_Grass_Static, 0x378);
 
 extern SD_SShaderTypeData_Grass_Static* SD_gpGrassTypeData;
 
-// One of GoGrass.c's 0x4C-byte records (GrassManager.pEC).
-typedef struct GrassRecord {
-    u8    unk0[0x40];
-    void* p40;                  // 0x40  freed with the records (fn_80120194)
-    u8    unk44[0x4C - 0x44];
-} GrassRecord;
-
 // A grass data chunk as fn_8011E4D8 is given it: n2 0x30-byte entries follow the header, then the
 // data (GrassChunkData).
 typedef struct GrassChunk {
@@ -97,14 +90,18 @@ typedef struct GrassTile {
     u32 u14;                    // 0x14  } made into addresses on load
 } GrassTile;
 
-// One of GoGrass.c's buffers, kept in GrassManager.apD8 / apDC.
+// One of GoGrass.c's 16 buffers (0x4C bytes): the array at GrassManager.pEC, which fn_8011FFCC
+// makes and puts in the apDC slots; apD8 and apF0 hold pointers into it too.
 typedef struct GrassBuffer {
-    f32 f0;                     // 0x00  } handed on by fn_8011F3AC
-    f32 f4;                     // 0x04  }
-    u8  unk8[0x14 - 0x8];
-    u8  a14[0x44 - 0x14];       // 0x14  handed to fn_80008248 when the buffer is put back
-    s32 n44;                    // 0x44  its size: fn_8011FDEC picks the smallest big enough
+    f32   f0;                   // 0x00  } handed on by fn_8011F3AC
+    f32   f4;                   // 0x04  }
+    u8    unk8[0x14 - 0x8];
+    u8    a14[0x40 - 0x14];     // 0x14  handed to fn_80008248 when the buffer is put back
+    void* p40;                  // 0x40  n44 16-byte vertices (fn_8011FFCC); freed with the buffers
+    s32   n44;                  // 0x44  its vertex count: fn_8011FDEC picks the smallest big enough
+    u8    unk48[0x4C - 0x48];
 } GrassBuffer;
+LAYOUT_ASSERT(GrassBuffer, 0x4C);
 
 // GoGrass.c's state (*lbl_80281900). Only the fields the decompiled code uses; its size is not known.
 typedef struct GrassManager {
@@ -133,7 +130,7 @@ typedef struct GrassManager {
     s32          nE0;           // 0xE0  the records at pEC
     u32          nE4;           // 0xE4  apD8's depth
     u32          nE8;           // 0xE8  apDC's used slots
-    GrassRecord* pEC;           // 0xEC
+    GrassBuffer* pEC;           // 0xEC  the nE0 buffers
     GrassBuffer** apF0[2];      // 0xF0  two buffer lists; n100 picks the one in use
     s32          anF8[2];       // 0xF8  their lengths
     s32          n100;          // 0x100

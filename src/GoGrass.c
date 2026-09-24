@@ -36,7 +36,7 @@ void fn_8011E4D8(GrassChunk* pChunk);
 void fn_8011EB80(void);
 void fn_8011E9D8(void);
 void fn_8011EB04(void);
-void fn_8011FFCC(void);
+s32 fn_8011FFCC(void);
 void fn_8011E584(UStreamObject* pObject);
 int  fn_8011E6B0(f32** ppA, f32** ppB);
 void fn_8011FD74(GrassBuffer* pBuffer);
@@ -360,6 +360,41 @@ void fn_8011FF58(void) {
 }
 
 // ---- end of sweep code ----
+
+// Makes the 16 grass buffers and their lists, all free: the first four hold 600 vertices, the rest
+// 450. Returns the bytes allocated.
+s32 fn_8011FFCC(void) {
+    s32 nBytes;
+    s32 nVerts;
+    s32 nSize;
+    int i;
+
+    lbl_80281900->nE4 = 0;
+    lbl_80281900->nE8 = 16;
+    lbl_80281900->nE0 = 16;
+    lbl_80281900->anF8[0] = 0;
+    lbl_80281900->anF8[1] = 0;
+    lbl_80281900->pEC = fn_80009B34(16 * sizeof(GrassBuffer), 2, 16, "GoGrass.c", 3707);
+    lbl_80281900->apF0[0] = fn_80009B34(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3709);
+    lbl_80281900->apF0[1] = fn_80009B34(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3711);
+    lbl_80281900->apD8 = fn_80009B34(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3714);
+    lbl_80281900->apDC = fn_80009B34(16 * sizeof(GrassBuffer*), 2, 16, "GoGrass.c", 3716);
+    nBytes = 16 * sizeof(GrassBuffer) + 4 * (16 * sizeof(GrassBuffer*));
+    for (i = 0; i < lbl_80281900->nE0; i++) {
+        nVerts = 450;
+        if (i < 4) {
+            nVerts = 600;
+        }
+        nSize = nVerts * 16;
+        lbl_80281900->pEC[i].p40 = fn_80009B34(nSize, 2, 16, "GoGrass.c", 3729);
+        nBytes += nSize;
+        lbl_80281900->pEC[i].n44 = nVerts;
+    }
+    for (i = 0; i < lbl_80281900->nE0; i++) {
+        lbl_80281900->apDC[i] = &lbl_80281900->pEC[i];
+    }
+    return nBytes;
+}
 
 // ---- sweep code (not yet cleaned up) ----
 
