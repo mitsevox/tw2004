@@ -26,5 +26,9 @@ extern f32        lbl_801F5B78[8];
 extern UObject*   lbl_802820D0; // made from the 'TEO ' object 10003
 extern CamLens*   lbl_802820CC; // the objects' lens (fn_80076400)
 extern LightGroup lbl_801F5B40; // their lights
+extern f32        lbl_802820B8; // } the light's colour (red, green, blue: fn_800AEFE4)
+extern f32        lbl_80281470; // }   0.05
+extern f32        lbl_80281474; // }   0.476
+extern f32        lbl_80281478; // 0.19: fn_800AEFE4 hands 255 times it to fn_80035154
 
 #endif
