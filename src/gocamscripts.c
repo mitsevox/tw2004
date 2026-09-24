@@ -1315,7 +1315,8 @@ void fn_80041EA8(int nPlayer, f32* pOut, f32* pCam, CamShot* pShot, CamScript* p
             fRate *= pScript->f88 / lbl_80281F78->f158;
         }
         if (pScript->f88 < lbl_80281F78->f15C) {
-            vMove[1] *= powf(pScript->f88 / lbl_80281F78->f15C, lbl_80281F78->f160) * (fTime / (1.0f / FRAME_RATE));
+            vMove[1] *= powf(pScript->f88 / lbl_80281F78->f15C, lbl_80281F78->f160)
+                        * (fTime / (1.0f / FRAME_RATE));
         }
         if (gPlayers[nPlayer].ball.bHitTopArc) {
             if (gPlayers[nPlayer].ball.fHeight <= 0.15f) {
