@@ -62,6 +62,69 @@ void fn_80071B94(void) {
     }
 }
 
+// Set up *ppNode (taken from nType's pool when NULL) as an empty node of nType: no time, full
+// weight, a fresh pose buffer of nFormat (format 1's three blocks all set, their floats 0).
+void fn_80071C28(SKABlendNode** ppNode, int nType, int nFormat, SKABlendFn pfnBlend, int nC) {
+    SKABlendNode* pNode;
+    s32 i;
+    s32 j;
+
+    if (ppNode == NULL) return;
+    if (*ppNode == NULL) {
+        switch (nType) {
+        case 0:
+            *ppNode = fn_8000B078(lbl_80281E98);
+            break;
+        case 1:
+            *ppNode = fn_8000B078(lbl_80281E94);
+            break;
+        default:
+            *ppNode = fn_8000B078(lbl_80281E90);
+            break;
+        }
+        if (*ppNode == NULL) return;
+        (*ppNode)->bPooled = 1;
+    } else {
+        (*ppNode)->bPooled = 0;
+    }
+    (*ppNode)->nType = nType;
+    (*ppNode)->nFormat = nFormat;
+    (*ppNode)->bC = nC;
+    (*ppNode)->fStart = (*ppNode)->fEnd = 0.0f;
+    (*ppNode)->fWeight = 1.0f;
+    if ((*ppNode)->nFormat == 0) {
+        (*ppNode)->pPose = fn_8000B078(lbl_80281E8C);
+        if ((*ppNode)->pPose == NULL) return;
+        fn_8001E938((*ppNode)->pPose->a0, 128);
+        fn_8001E938((*ppNode)->pPose->a10, 128);
+        fn_8001E8A4((*ppNode)->pPose->a20, 128);
+        fn_8001E8A4((*ppNode)->pPose->a30, 128);
+    } else if ((*ppNode)->nFormat == 1) {
+        (*ppNode)->pPose = fn_8000B078(lbl_80281E88);
+        if ((*ppNode)->pPose == NULL) return;
+        fn_8001E938(((SkelPose1*)(*ppNode)->pPose)->pose.a0, 128);
+        fn_8001E938(((SkelPose1*)(*ppNode)->pPose)->pose.a10, 128);
+        fn_8001E8A4(((SkelPose1*)(*ppNode)->pPose)->pose.a20, 128);
+        fn_8001E8A4(((SkelPose1*)(*ppNode)->pPose)->pose.a30, 128);
+        for (i = 0; i < 3; i++) {
+            fn_8001E8A4(((SkelPose1*)(*ppNode)->pPose)->aBlocks[i].aBits, 20);
+            for (j = 0; j < 20; j++) {
+                ((SkelPose1*)(*ppNode)->pPose)->aBlocks[i].af8[j] = 0.0f;
+            }
+        }
+    }
+    pNode = *ppNode;
+    if (pNode->nType == 0) {
+        pNode->u.src.pSrc = NULL;
+        ((SKASourceNode*)pNode)->n30 = 0;
+        pNode->u.src.fFrom = pNode->u.src.fTo = 0.0f;
+    } else if (pNode->nType == 1) {
+        pNode->u.blend.pfnBlend = pfnBlend;
+        pNode->u.blend.apChild[0] = NULL;
+        pNode->u.blend.apChild[1] = NULL;
+    }
+}
+
 // Give the tree at *ppNode back: each node's pose buffer to its pool, then its children (or, with
 // bFreeSources, a source node's clip), then the node itself if it came from a pool (*ppNode is
 // then NULL).
@@ -136,6 +199,30 @@ int fn_800723E8(SKABlendNode* pNode, SKABlendNode*** pppOldest) {
         i++;
     } while (i < 2);
     return nSources;
+}
+
+// pNew starts playing pClip from its start at weight fWeight. When the tree at pNode already has
+// lbl_80280E20 sources, it is emptied first and set up again as a blend node of its format.
+void fn_800724C0(SKABlendNode* pNode, SKABlendNode* pNew, void* pClip, f32 fWeight) {
+    SKABlendNode** ppOldest = NULL;
+
+    if (pNew == NULL) return;
+    if (fn_800723E8(pNode, &ppOldest) >= lbl_80280E20) {
+        fn_80071F58(&pNode, 0);
+        fn_80071C28(&pNode, 1, pNode->nFormat, fn_80072ACC, 1);
+        fn_800725BC(pNode, fn_80072ACC, 1.0f);
+    }
+    pNew->nType = 0;
+    pNew->u.src.pSrc = pClip;
+    ((SKASourceNode*)pNew)->f2C = 0.0f;
+    pNew->u.src.fFrom = 0.0f;
+    pNew->fStart = 0.0f;
+    if (pNew->nFormat == 0) {
+        pNew->fEnd = pNew->u.src.fTo = ((Clip*)pClip)->f18;
+    } else if (pNew->nFormat == 1) {
+        pNew->fEnd = pNew->u.src.fTo = ((MtaLib*)pClip)->f1C;
+    }
+    pNew->fWeight = fWeight;
 }
 
 // Make pNode a blend node that mixes its children with pfnBlend, and take its times from them.
@@ -430,7 +517,7 @@ void fn_80073108(Character* pChar, int nPlayer, AnimPlayer* pPlayer, SKABlendNod
                             (fn_80009638(5.0f * pPlayer->f34) + fn_80009638(7.0f * pPlayer->f34 / 3.0f)))) /
                        6.0f;
     if (gPlayers[nPlayer].nClub == 25) {
-        if (pChar->blend.nGroup == 9) {
+        if (pChar->nGroup == 9) {
             fWave *= 0.033f;
         } else {
             fWave *= 0.3f;

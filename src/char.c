@@ -1035,7 +1035,7 @@ Character* fn_8001942C(void) {
     pChar->uId = 0;
     pChar->pBlend = NULL;
     pChar->fBackswing = 0.0f;
-    pChar->blend.nGroup = -1;
+    pChar->nGroup = -1;
     pChar->n5CC = -1;
     pChar->p1790 = NULL;
     pChar->n1784 = -1;

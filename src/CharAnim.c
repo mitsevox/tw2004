@@ -136,7 +136,7 @@ void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKA
     pNode = &pChar->blend;
     pNew = NULL;
     pChar->u10 &= ~0x8000;
-    pChar->blend.nGroup = nGroup;
+    pChar->nGroup = nGroup;
     pChar->uFlags &= 0x818;
     if (-70000.0f == fFrom && pChar->pBlend != NULL) {
         pClip = pChar->pBlend;
@@ -648,7 +648,7 @@ void CharacterState_UpdateSKAState(Character* pChar) {
     }
     pChar->n20 = pChar->nAnim;
     pChar->n18 &= ~1;
-    if (pChar->blend.nGroup != 4) {
+    if (pChar->nGroup != 4) {
         pChar->n26 = 0;
         pChar->u10 &= ~0x100;
     }
