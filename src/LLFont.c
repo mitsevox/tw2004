@@ -717,7 +717,8 @@ u32 fn_8001208C(UFontContext* pCtx, u8 r, u8 g, u8 b, u8 a, f32 fXScale, f32 fYS
     fV = fY * fYScale;
     pStop = pCtx->a14;
     pNext = pStop + 1;
-    fU = pCtx->f0C * (fU - pCtx->f04);
+    fU -= pCtx->f04;
+    fU *= pCtx->f0C;
     fU -= (s32)fU;
     if (fU < 0.0f) {
         fU = 1.0f + fU;

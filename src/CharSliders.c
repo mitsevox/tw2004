@@ -229,19 +229,19 @@ void fn_8010DE04(CharSliderDefs* pDefs) {
 
 // Cut each pair of sliders that share a length back to it.
 void fn_8010DE60(CharSliderDefs* pDefs) {
-    CharSliderValue* pValue;
-    CharSliderDef* pDef;
-    CharSliderLimit* pLimit;
-    CharSliderValue* pOther;
-    f32 fLength;
     int i;
     int j;
+    CharSliderDef* pDef;
+    CharSliderValue* pValue;
+    CharSliderValue* pOther;
+    CharSliderLimit* pLimit;
+    f32 fLength;
     int n;
 
     if (pDefs != NULL) {
         for (i = 0; i < pDefs->nSliders; i++) {
-            pValue = &pDefs->pValues[i];
             pDef = &pDefs->pDefs[i];
+            pValue = &pDefs->pValues[i];
             if (pValue->bFixed != 1 && pDef->nLimits > 0) {
                 for (j = 0; j < pDef->nLimits; j++) {
                     pLimit = &pDef->pLimits[j];
@@ -251,7 +251,7 @@ void fn_8010DE60(CharSliderDefs* pDefs) {
                         if (pOther->bFixed == 0) {
                             fLength = fn_80009680(pValue->fValue * pValue->fValue
                                                   + pOther->fValue * pOther->fValue);
-                            if (fLength > pLimit->fLength && fLength != 0.0f) {
+                            if (!(fLength <= pLimit->fLength) && fLength != 0.0f) {
                                 pValue->fValue = pLimit->fLength * (pValue->fValue / fLength);
                                 pOther->fValue = pLimit->fLength * (pOther->fValue / fLength);
                             }
@@ -266,6 +266,8 @@ void fn_8010DE60(CharSliderDefs* pDefs) {
 // Let each slider move the ranges of the sliders it links to, keeping their values at the same
 // place in their ranges.
 void fn_8010DF8C(CharSliderDefs* pDefs) {
+    int i;
+    int j;
     CharSliderDef* pDef;
     CharSliderValue* pValue;
     CharSliderLink* pLink;
@@ -274,8 +276,6 @@ void fn_8010DF8C(CharSliderDefs* pDefs) {
     f32 fSpan;
     f32 fPlace;
     u8 bMove;
-    int i;
-    int j;
     int n;
 
     if (pDefs != NULL) {
@@ -347,15 +347,15 @@ f32 fn_8010E194(f32 fFrom, f32 fTo, f32 fX, f32 fA, f32 fB) {
 
 // Scale the model's bones by the sliders.
 void fn_8010E224(CharSliderDefs* pDefs, CharModel* pModel) {
+    int i;
+    int j;
+    int k;
     CharSliderDef* pDef;
     CharSliderValue* pValue;
     CharSliderRange* pRange;
     CharSliderBone* pBone;
     f32 fScale;
     int nBone;
-    int i;
-    int j;
-    int k;
 
     if (pDefs == NULL || pModel == NULL) {
         return;
@@ -365,7 +365,7 @@ void fn_8010E224(CharSliderDefs* pDefs, CharModel* pModel) {
         pValue = &pDefs->pValues[i];
         for (j = 0; j < pDef->nBoneRanges; j++) {
             pRange = &pDef->pBoneRanges[j];
-            if (pValue->fValue >= pRange->fStart && pValue->fValue < pRange->fEnd) {
+            if (pRange->fStart <= pValue->fValue && pRange->fEnd > pValue->fValue) {
                 for (k = 0; k < pRange->nItems; k++) {
                     pBone = &pRange->items.pBones[k];
                     fScale = fn_8010E194(pRange->fStart, pRange->fEnd, pValue->fValue,
@@ -382,15 +382,15 @@ void fn_8010E224(CharSliderDefs* pDefs, CharModel* pModel) {
 
 // Weight the skin's morph targets by the sliders (and mark the first 20 in the blend node).
 void fn_8010E35C(CharSliderDefs* pDefs, Skin* pSkin, SKABlendNode* pNode) {
+    int i;
+    int j;
+    int k;
     CharSliderDef* pDef;
     CharSliderValue* pValue;
     CharSliderRange* pRange;
     CharSliderMorph* pMorph;
-    f32 fWeight;
-    int i;
-    int j;
-    int k;
     int m;
+    f32 fWeight;
 
     if (pDefs == NULL || pSkin == NULL) {
         return;
@@ -400,7 +400,7 @@ void fn_8010E35C(CharSliderDefs* pDefs, Skin* pSkin, SKABlendNode* pNode) {
         pValue = &pDefs->pValues[i];
         for (j = 0; j < pDef->nMorphRanges; j++) {
             pRange = &pDef->pMorphRanges[j];
-            if (pValue->fValue >= pRange->fStart && pValue->fValue < pRange->fEnd) {
+            if (pRange->fStart <= pValue->fValue && pRange->fEnd > pValue->fValue) {
                 for (k = 0; k < pRange->nItems; k++) {
                     pMorph = &pRange->items.pMorphs[k];
                     fWeight = fn_8010E194(pRange->fStart, pRange->fEnd, pValue->fValue,

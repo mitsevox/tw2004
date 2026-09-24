@@ -26,6 +26,9 @@ typedef struct GXFifoObj {
 // ---- the matrix library (MTX), for the matrices GX takes -------------------------------------
 
 void PSMTXIdentity(f32 (*pMtx)[4]);
+void PSMTXConcat(f32 (*pA)[4], f32 (*pB)[4], f32 (*pOut)[4]);
+void PSMTXScale(f32 (*pMtx)[4], f32 fX, f32 fY, f32 fZ);
+void PSMTXTrans(f32 (*pMtx)[4], f32 fX, f32 fY, f32 fZ);
 void C_MTXOrtho(f32 (*pMtx)[4], f32 fTop, f32 fBottom, f32 fLeft, f32 fRight, f32 fNear, f32 fFar);
 
 // ---- the command FIFO -------------------------------------------------------------------------
@@ -83,6 +86,7 @@ void GXLoadTexObj(GXTexObj* pObj, int eMap);
 void GXLoadTlut(GXTlutObj* pObj, u32 nTlut);
 void GXSetNumTexGens(u8 nGens);
 void GXLoadTexMtxIndx(u16 nIndex, u32 nId, int eType);
+void GXLoadTexMtxImm(f32 (*pMtx)[4], u32 nId, int eType);
 void GXSetTexCoordGen2(int nDst, int nFunc, int nSrc, int nMtx, u8 bNormalize, int nPostMtx);
 void GXSetAlphaCompare(int eComp0, u8 nRef0, int eOp, int eComp1, u8 nRef1);
 void GXSetZCompLoc(u8 bBeforeTex);

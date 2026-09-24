@@ -2229,13 +2229,12 @@ f32 fn_800351D8(u32 n, f32 fPeriod) {
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_80013D68();
-void fn_80013D9C();
 void fn_80035398(void);
 void fn_8003541C();
 void fn_80035440(TerSettings* pSettings);
 
 void fn_80035240(f32 (*pMtx)[4]) {
-    fn_80013D9C(*(s32*)((u8*)lbl_80280DF0), pMtx, lbl_80280DF0);
+    fn_80013D9C(*lbl_80280DF0, pMtx);
 }
 
 f32* fn_8003526C(void) {

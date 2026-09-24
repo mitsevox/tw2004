@@ -12,7 +12,6 @@
 
 void fn_8001052C(s16 n);
 void fn_8010A668(DynTex* pTex);
-void* fn_8010A780(DynTex* pTex);
 void fn_8010B098(void* p);
 int fn_8010C458(int nFormat);
 s32 fn_8010B664(DynTexPalette* pPal);
@@ -133,7 +132,7 @@ void fn_8010A6A8(DynTex* pSrc, DynTex* pDst) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void* fn_8010A780(DynTex* pTex) {
+DynTexHeader* fn_8010A780(DynTex* pTex) {
     return pTex->p4;
 }
 
@@ -611,8 +610,8 @@ void fn_8010BC88(void* p) {
 // qsort's order for DynTexUse entries: by where their textures' pixels start in the bank.
 s32 fn_8010BC94(const void* pA, const void* pB) {
     // port: EA converts the offsets as signed
-    f32 fA = (s32)((DynTexUse*)pA)->pTex->uPixels;
-    f32 fB = (s32)((DynTexUse*)pB)->pTex->uPixels;
+    f32 fA = (s32)((DynTexUse*)pA)->pTex->aMips[0].uPixels;
+    f32 fB = (s32)((DynTexUse*)pB)->pTex->aMips[0].uPixels;
 
     return (fA < fB) ? -1 : (fA >= fB);
 }
@@ -766,10 +765,10 @@ u8 fn_8010BFE0(void) {
                                 lbl_80282488->aUses[lbl_80282488->n970].n8);
                 lbl_80282488->p4 = pTex->p18 +
                     pTex->p4->p8[lbl_80282488->aUses[lbl_80282488->n970].nC].aBlocks[0].nOffset;
-                lbl_80282488->u98C = DYNTEX_CHAR(lbl_80282488->p8)->n58 + pEntry->uPixels;
+                lbl_80282488->u98C = DYNTEX_CHAR(lbl_80282488->p8)->n58 + pEntry->aMips[0].uPixels;
                 lbl_80282488->u98C &= ~0x7FF;
                 lbl_80282488->nA94 =
-                    DYNTEX_CHAR(lbl_80282488->p8)->n58 + pEntry->uPixels - lbl_80282488->u98C;
+                    DYNTEX_CHAR(lbl_80282488->p8)->n58 + pEntry->aMips[0].uPixels - lbl_80282488->u98C;
                 lbl_80282488->n988 = fn_8010B5F8((DynTexObj*)pEntry) << 4;
                 if (pPal != NULL) {
                     lbl_80282488->n988 += fn_8010B664((DynTexPalette*)pPal) << 4;

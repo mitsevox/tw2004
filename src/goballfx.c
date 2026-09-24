@@ -22,6 +22,11 @@ void fn_8006F430(f32 f);
 // Skin.c
 void fn_80036054(void* pMesh, int n, s32* pDesc);
 void fn_800360A0(void* pMesh);
+void fn_800360D4(u8* pMesh);
+void fn_80036100(u8* pMesh, void* pDesc, int n);
+
+// GoTerrainCollision.c
+f32 fn_8004D80C(CourseInfo* pCourse, f32* pPos);
 
 void fn_80093524(void) {
     int i;
@@ -210,6 +215,85 @@ void BFX_vInit(void) {
 
 void fn_80093AD4(void) {
     lbl_80281F40 = 1;
+}
+
+// Draws the player's ball marker: a quad 0.04 across in the player's colour, just above the ground
+// under the ball; nothing where there is no ground.
+void fn_80093AE0(Ball* pBall, int nPlayer) {
+    s16 aIndex[4] = {0, 1, 2, 3};
+    TrailMeshDesc desc;
+    f32* pPos;
+    u8* pColour;
+    f32* pUV;
+    f32 fGround;
+    f32 fY;
+    u8 r;
+    u8 g;
+    u8 b;
+    u8 a;
+    fGround = fn_8004D80C(fn_8000C594(), pBall->vPos);
+    if (-65536.125f != fGround) {
+        fn_8005CC64(lbl_80281F44, lbl_80281F48);
+        fn_80016B9C();
+        fn_80035118(4, 5);
+        pPos = lbl_801D95C8[nPlayer];
+        fY = 0.01f + fGround;
+        pPos[0] = pBall->vPos[0] - 0.02f;
+        pPos[1] = fY;
+        pPos[2] = pBall->vPos[2] - 0.02f;
+        pPos[3] = pBall->vPos[0] - 0.02f;
+        pPos[4] = fY;
+        pPos[5] = pBall->vPos[2] + 0.02f;
+        pPos[6] = pBall->vPos[0] + 0.02f;
+        pPos[7] = fY;
+        pPos[8] = pBall->vPos[2] - 0.02f;
+        pPos[9] = pBall->vPos[0] + 0.02f;
+        pPos[10] = fY;
+        pPos[11] = pBall->vPos[2] + 0.02f;
+        r = lbl_80189CB0[nPlayer][0];
+        g = lbl_80189CB0[nPlayer][1];
+        b = lbl_80189CB0[nPlayer][2];
+        a = lbl_80189CB0[nPlayer][3];
+        pColour = lbl_801D9578[nPlayer];
+        pUV = lbl_801D94D8[nPlayer];
+        pColour[0] = r;
+        pColour[1] = g;
+        pColour[2] = b;
+        pColour[3] = a;
+        pColour[4] = r;
+        pColour[5] = g;
+        pColour[6] = b;
+        pColour[7] = a;
+        pColour[8] = r;
+        pColour[9] = g;
+        pColour[10] = b;
+        pColour[11] = a;
+        pColour[12] = r;
+        pColour[13] = g;
+        pColour[14] = b;
+        pColour[15] = a;
+        pUV[0] = 0.0f;
+        pUV[1] = 0.0f;
+        pUV[2] = 0.0f;
+        pUV[3] = 1.0f;
+        pUV[4] = 1.0f;
+        pUV[5] = 0.0f;
+        pUV[6] = 1.0f;
+        pUV[7] = 1.0f;
+        fn_80014118(0x70);
+        fn_80035138(0);
+        fn_80012EF8();
+        desc.n0 = 4;
+        desc.nVerts = 4;
+        desc.pDraw = NULL;
+        desc.pIndices = aIndex;
+        desc.pPos = pPos;
+        desc.pColour = pColour;
+        desc.pUV = pUV;
+        fn_80036100(lbl_801D94B0, &desc, lbl_80281F40);
+        fn_800360D4(lbl_801D94B0);
+        lbl_80281F40 = 0;
+    }
 }
 
 void fn_80093D14(void) {

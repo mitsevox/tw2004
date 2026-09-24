@@ -49,6 +49,15 @@ typedef struct GlowQueue {
 
 extern GlowQueue* lbl_80281F80;
 
+// What fn_80098938 hands the glow mesh (our name): Skin.c's fn_80036100 passes it on, fn_80098884
+// copies it and fn_8009884C draws the queue with it.
+typedef struct GlowDrawDesc {
+    GlowQueue* pQueue;          // 0x0
+    s32  bFirst;                // 0x4  1 on the first pass, 0 on the second (fn_8009884C: bOnTop =
+                                //      !bFirst)
+    f32  (*pMtx)[4];            // 0x8  the lens's world-to-camera matrix
+} GlowDrawDesc;
+
 // A part of a SunFlrView (0x20 bytes; our name): one of four images, one per video field mod 4.
 typedef struct SunFlrPart {
     s32  n0;                    // 0x00  } where fn_8009A754 starts reading p1C's pixels (x, y)

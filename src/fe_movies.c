@@ -7,6 +7,8 @@
 #include "game/frontend.h"
 #include "llvideo.h"
 #include "core/startup.h"
+#include "frontend/uisvec.h"
+#include "unsorted/cull.h"
 
 void fn_80008380(void);
 void fn_80092250(f32* pA, f32* pB, f32* pOut);
@@ -19,8 +21,12 @@ void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
 f32  fn_8006E118(u64 tEnd, u64 tStart);    // GameManager.c: seconds between two time stamps
 void fn_8000AE48(f32* pA, f32* pB, f32* pOut);     // pOut = pA * pB, element by element
 void fn_80090D28(FEQuad* pQuad);
-void fn_800913EC(s16 n0, s16 n1);
-void fn_80091460(s16 n0, s16 n1);
+void fn_800913EC(s16 nTable, s16 nEntry);
+void fn_80091460(s16 nTable, s16 nEntry);
+f32* fn_80093268(void);             // uiTransform.c
+void fn_8009222C(f32* pOut, LLPict* pPict);
+void fn_80090940(int nEntry);      // makes the picture of entry nEntry (lbl_801D87C0's table)
+void fn_800909B4(int nEntry);       // sets flag 0x10 on entry nEntry (lbl_801D87C0's table)
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -269,6 +275,158 @@ void fn_800912F4(FEVertex* pVtx, f32* pPos, f32* pUV, f32* pColour, f32* pScale,
     pColour[3] = pVtx->au14[3];
     fn_8000AE48(pColour, pScale, pColour);
     fn_80092250(pColour, pAdd, pColour);
+}
+
+// Draw pQuad: with a UI file entry, textured by it (flag 1: a texture, flag 2: a movie's current
+// picture); its colours tinted, recoloured from the colour table (n4) and scaled by the transform
+// level's colour; its corners transformed and projected; nothing when every corner is transparent.
+void fn_80090D28(FEQuad* pQuad) {
+    FEVertex aVtx[4];
+    Vec4 aPos[4];
+    Vec4 aOut[4];
+    f32 aUV[4][4];
+    f32 aColour[4][4];
+    f32 vScale[4];
+    f32 vAdd[4];
+    f32 vPictUV[4];     // fn_8009222C fills two; the original's buffer is 16 bytes
+    f32 fDist;
+    f32 fZ;
+    f32 fProj;
+    UIColorEntry* pEntry;
+    LLPict* pPict;
+    UITransform* pMtx;
+    UITransform* pColour;
+    UITransform* pAdd;
+    TexBank* pBank;
+    TexEntry* pTex;
+    char* szName;
+    int nBank;
+    s16 nColour;
+    u8 bTint;
+    int i;
+
+    fDist = fn_80093268()[2];
+    fZ = fn_80092210();
+    pMtx = fn_80093274();
+    pColour = fn_80093274();
+    pAdd = fn_80093274();
+    lbl_80281F28 = fn_8016C198()->a;
+    lbl_80281F2C = fn_8016C18C()->a;
+    bTint = 1;
+    if (pQuad->n2 != -1) {
+        pEntry = lbl_80281F1C->pFile->p8->apTables[pQuad->n2]->apEntries[pQuad->n0];
+        szName = pEntry->szC;
+        if (pEntry->u0 & 1) {
+            if (gSession.nGameType == 3) {
+                pBank = lbl_801A26DC[pQuad->n0];
+                pTex = fn_800922A0(pBank);
+                fn_8005CC64(pBank, pTex);
+            } else {
+                // the texture bank by the entry's name (fn_8008FFF0: -1, 0 or 1)
+                nBank = fn_8008FFF0(szName);
+                fn_8005CC64(lbl_80281F1C->p8->ap4[nBank], pEntry->p4);
+            }
+            if (!(pQuad->n8 & 1)) {
+                bTint = 0;
+            }
+        } else if (pEntry->u0 & 2) {
+            pPict = (LLPict*)pEntry->p8;
+            fn_800760D8(pPict);
+        }
+        fn_80014118(0x50);
+    } else {
+        fn_80014118(0x40);
+    }
+    fn_80013EEC(fn_8001614C());
+    vScale[0] = (1.0f / 511.0f) * pColour->w40.a[0];
+    vScale[1] = (1.0f / 511.0f) * pColour->w40.a[1];
+    vScale[2] = (1.0f / 511.0f) * pColour->w40.a[2];
+    vScale[3] = (1.0f / 511.0f) * pColour->w40.a[3];
+    vAdd[0] = pAdd->f50[0];
+    vAdd[1] = pAdd->f50[1];
+    vAdd[2] = pAdd->f50[2];
+    vAdd[3] = pAdd->f5C;
+    nColour = pQuad->n4;
+    if (lbl_80281F1C->p14 != NULL && nColour < (s16)lbl_80281F1C->p14->nCount && nColour != -1) {
+        // the table's colours are alpha, blue, green, red
+        pQuad->aVtx[0].au14[3] = lbl_80281F1C->p14->apEntries[nColour]->p8[0];
+        pQuad->aVtx[1].au14[3] = lbl_80281F1C->p14->apEntries[nColour]->p8[0];
+        pQuad->aVtx[2].au14[3] = lbl_80281F1C->p14->apEntries[nColour]->p8[0];
+        pQuad->aVtx[3].au14[3] = lbl_80281F1C->p14->apEntries[nColour]->p8[0];
+        pQuad->aVtx[0].au14[2] = lbl_80281F1C->p14->apEntries[nColour]->p8[1];
+        pQuad->aVtx[1].au14[2] = lbl_80281F1C->p14->apEntries[nColour]->p8[1];
+        pQuad->aVtx[2].au14[2] = lbl_80281F1C->p14->apEntries[nColour]->p8[1];
+        pQuad->aVtx[3].au14[2] = lbl_80281F1C->p14->apEntries[nColour]->p8[1];
+        pQuad->aVtx[0].au14[1] = lbl_80281F1C->p14->apEntries[nColour]->p8[2];
+        pQuad->aVtx[1].au14[1] = lbl_80281F1C->p14->apEntries[nColour]->p8[2];
+        pQuad->aVtx[2].au14[1] = lbl_80281F1C->p14->apEntries[nColour]->p8[2];
+        pQuad->aVtx[3].au14[1] = lbl_80281F1C->p14->apEntries[nColour]->p8[2];
+        pQuad->aVtx[0].au14[0] = lbl_80281F1C->p14->apEntries[nColour]->p8[3];
+        pQuad->aVtx[1].au14[0] = lbl_80281F1C->p14->apEntries[nColour]->p8[3];
+        pQuad->aVtx[2].au14[0] = lbl_80281F1C->p14->apEntries[nColour]->p8[3];
+        pQuad->aVtx[3].au14[0] = lbl_80281F1C->p14->apEntries[nColour]->p8[3];
+    }
+    fn_80090B80(&pQuad->aVtx[0], &aVtx[0], bTint);
+    fn_80090B80(&pQuad->aVtx[1], &aVtx[1], bTint);
+    fn_80090B80(&pQuad->aVtx[2], &aVtx[2], bTint);
+    fn_80090B80(&pQuad->aVtx[3], &aVtx[3], bTint);
+    fn_800912F4(&aVtx[0], &aPos[0].x, aUV[0], aColour[0], vScale, vAdd);
+    fn_800912F4(&aVtx[1], &aPos[1].x, aUV[1], aColour[1], vScale, vAdd);
+    fn_800912F4(&aVtx[2], &aPos[2].x, aUV[2], aColour[2], vScale, vAdd);
+    fn_800912F4(&aVtx[3], &aPos[3].x, aUV[3], aColour[3], vScale, vAdd);
+    if (pQuad->n2 != -1 && (pEntry->u0 & 2)) {
+        // a movie's picture fills only part of its texture
+        fn_8009222C(vPictUV, pPict);
+        aUV[0][0] *= vPictUV[0];
+        aUV[0][1] *= vPictUV[1];
+        aUV[1][0] *= vPictUV[0];
+        aUV[1][1] *= vPictUV[1];
+        aUV[2][0] *= vPictUV[0];
+        aUV[2][1] *= vPictUV[1];
+        aUV[3][0] *= vPictUV[0];
+        aUV[3][1] *= vPictUV[1];
+    }
+    for (i = 0; i < 4; i++) {
+        fn_800BAD60(pMtx->m, &aPos[i], &aOut[i]);
+        fProj = fDist / (fDist + aOut[i].z);
+        aOut[i].x *= fProj;
+        aOut[i].y *= fProj;
+        aOut[i].z = fZ;
+    }
+    fn_80012F34(0);
+    fn_80012F18(7);
+    fn_80012EF8();
+    if (aColour[0][3] != 0.0f || aColour[1][3] != 0.0f || aColour[2][3] != 0.0f
+        || aColour[3][3] != 0.0f) {
+        if (pQuad->n2 == -1) {
+            fn_8001644C(0xA0, &aOut[0].x, aColour[0], NULL, 4);
+        } else {
+            fn_8001644C(0xA0, &aOut[0].x, aColour[0], aUV[0], 4);
+        }
+    }
+}
+
+// Make the picture of UI file entry (nTable, nEntry) when its flags have 2 set and 1 clear.
+void fn_800913EC(s16 nTable, s16 nEntry) {
+    u32 uFlags;
+
+    if (nTable == -1) return;
+    uFlags = lbl_80281F1C->pFile->p8->apTables[nTable]->apEntries[nEntry]->u0;
+    if (!(uFlags & 1) && (uFlags & 2)) {
+        fn_80090940(nEntry);
+    }
+}
+
+// For UI file entry (nTable, nEntry) with flags 2 set and 1 clear: fn_80008380, then flag 0x10.
+void fn_80091460(s16 nTable, s16 nEntry) {
+    u32 uFlags;
+
+    if (nTable == -1) return;
+    uFlags = lbl_80281F1C->pFile->p8->apTables[nTable]->apEntries[nEntry]->u0;
+    if (!(uFlags & 1) && (uFlags & 2)) {
+        fn_80008380();
+        fn_800909B4(nEntry);
+    }
 }
 
 // Update the loading screen set up by fn_800918A4, unless the session has flag 4: add the time since

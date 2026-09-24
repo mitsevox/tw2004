@@ -597,7 +597,8 @@ UMemPool* fn_8000AFA0(int nNodes, u32 uNodeSize, u32 uFlags, u32 uAlign) {
         pPool->nNodes = nNodes;
         pPool->nFree = nNodes;
         pPool->uNodeSize = uSize;
-        pPool->pEnd = (u8*)pPool + uTotal;
+        // fake match: added as integers; `(u8*)pPool + uTotal` puts pPool first in the add
+        pPool->pEnd = (u8*)(uTotal + (uptr)pPool);
         pNode = (u8*)pPool + uAlign;
         pPrev = NULL;
         while (nNodes-- > 0) {

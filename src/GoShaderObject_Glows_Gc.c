@@ -5,6 +5,7 @@
 #include "gx.h"
 #include "core/startup.h"
 #include "unsorted/cull.h"
+#include "terrain.h"
 
 void fn_80097EC4(f32* pPos);
 void fn_800124A8(void);                                 // LLFont.c: end the primitive
@@ -313,3 +314,48 @@ void fn_80098910(void) {
 }
 
 // ---- end of sweep code ----
+
+// Skin.c
+void fn_80036100(u8* pMesh, void* pDesc, int n);
+void fn_800360D4(u8* pMesh);
+
+// Draws the queued glows through the glow mesh in two passes, with the lens's matrices, then puts
+// the camera's identity view matrix back.
+void fn_80098938(void) {
+    GlowDrawDesc desc;
+    void* pCamera = fn_8001614C();
+    CamLens* pLens = fn_80008370(pCamera);
+    f32 (*pMtx)[4];
+    if (lbl_80281F80 != NULL && lbl_80281F80->nCount > 0) {
+        pMtx = pLens->m44;
+        // port: the lens's 0x04..0x44 block is used as a matrix here (CamLens has v4 there)
+        fn_80013D9C(pCamera, (f32 (*)[4])pLens->v4);
+        fn_80013EEC(fn_8001614C());
+        fn_80016B9C();
+        fn_80035118(4, 1);
+        fn_80012F50(0, 6, 0x80);
+        fn_80012F34(0);
+        fn_80014118(0x40);
+        fn_80012F18(3);
+        fn_80012EF8();
+        desc.pQueue = lbl_80281F80;
+        desc.bFirst = 1;
+        desc.pMtx = pMtx;
+        fn_80036100(lbl_801D9A40, &desc, 1);
+        fn_800360D4(lbl_801D9A40);
+        fn_80012F18(7);
+        fn_80012EF8();
+        desc.pQueue = lbl_80281F80;
+        desc.bFirst = 0;
+        desc.pMtx = pMtx;
+        fn_80036100(lbl_801D9A40, &desc, 1);
+        fn_800360D4(lbl_801D9A40);
+        fn_80013D9C(pCamera, NULL);
+        fn_80013EEC(fn_8001614C());
+        fn_80012F34(1);
+        fn_80012F18(3);
+        fn_80012F50(1, 6, 0x80);
+        fn_80035118(4, 5);
+        fn_80012EF8();
+    }
+}

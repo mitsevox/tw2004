@@ -171,11 +171,17 @@ void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);   // cross product
 // ---- textures --------------------------------------------------------------------------------
 
 // A texture in a bank (0x50 bytes; the bank's p8 is an array of them). Only what the game code reads.
+// One level of a texture (12 bytes; char.c fn_8001DD18 byte-swaps four of them).
+typedef struct TexMip {
+    u32  uPixels;               // 0x0  where its pixels start in the bank's p18
+    s16  nC;                    // 0x4  its size in 16-byte units (fn_80045FC8, fn_800B9EB8 copy nC * 16)
+    u8   unk6[0xC - 0x6];
+} TexMip;
+
 typedef struct TexEntry {
     u64  u0;                    // 0x00  its name's hash (fn_8000BEE4; fn_8001005C finds a texture by it)
-    u32  uPixels;               // 0x08  where its pixels start in the bank's p18
-    s16  nC;                    // 0x0C  GoDynObj.c's fn_80045FC8 copies nC * 16 bytes of its pixels
-    u8   unkE[0x3C - 0xE];
+    TexMip aMips[4];            // 0x08  its levels (n41 of them are used)
+    u8   unk38[0x3C - 0x38];
     s16  nPalette;              // 0x3C  its row in the bank's pC
     u16  n3E;                   // 0x3E  its row in the bank's p10 (ShaderObjectsData fn_800740F4)
     s8   b40;                   // 0x40  0: char.c fn_8001DD18 decodes the name and pairs the texture
@@ -921,7 +927,7 @@ void fn_80014118(int a);
 void fn_80014194(f32* pColour);
 void fn_800141F8(f32* pXY, f32* pUV, f32 x0, f32 y0, f32 x1, f32 y1);
 void fn_8001425C(int a);
-void fn_8001644C(int a, f32* pXY, int b, f32* pUV, int c);
+void fn_8001644C(int a, f32* pXY, f32* pColour, f32* pUV, int c);
 void fn_800BA74C(u8 bFade);             // ScreenClear.c: a black screen for 1, 2 or 30 frames
 u32  fn_800142AC(int nButton, int a);   // a button's mask
 u8   fn_80014300(u32 uMask);            // any pad pressed these buttons

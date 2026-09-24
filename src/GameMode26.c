@@ -234,8 +234,8 @@ void fn_8010CA2C(int nPlayer) {
     if (fn_8010D33C(NULL)) {
         return;
     }
-    gPlayers[nPlayer].nEA0++;
     nLead = gPlayers[nPlayer].nEBC - gPlayers[nPlayer == 0].nEBC;
+    gPlayers[nPlayer].nEA0++;
     switch (pPlayer->ball.nSurface) {
     case 0x9B:
         nKind = 1;

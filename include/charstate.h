@@ -92,7 +92,8 @@ typedef struct SkinDesc44 {
     s32  n18;                   // 0x18  the first one's number (fn_8011C850: n14 + n18 needed)
     u8   unk1C[0x24 - 0x1C];
     u32  u24;                   // 0x24  bit 1: has morph targets
-    u8   unk28[0x30 - 0x28];
+    s32  n28;                   // 0x28  its first entry in SkinDesc.pA4
+    s32  n2C;                   // 0x2C  its first entry in SkinDesc.pAC
 } SkinDesc44;
 LAYOUT_ASSERT(SkinDesc44, 0x30);
 
@@ -134,14 +135,23 @@ typedef struct SkinDescB8 {
 LAYOUT_ASSERT(SkinDescB8, 0x10);
 
 // A skin's description (SkinModel.pDesc), as loaded from its file.
+// A material of SkinDesc.p18 (fn_80112DD8 sets up GX from it); SkinDesc.p20 holds indexes of them.
+typedef struct SkinDesc18 {
+    TexEntry* pTex;             // 0x00  NULL: drawn untextured
+    u8   unk4[4];
+    TexBank* pBank;             // 0x08  pTex's bank
+    f32  afC[4];                // 0x0C  the later passes' texture scale (x, y) and offset (x, y)
+} SkinDesc18;
+LAYOUT_ASSERT(SkinDesc18, 0x1C);
+
 typedef struct SkinDesc {
-    s32  nVersion;              // 0x000  8
+    s32  nVersion;            // 0x000  8
     s32  n04;                   // 0x004
     s32  n08;                   // 0x008  a burnt one's size, in bytes (fn_80111850)
     u32  uFlags;                // 0x00C  bit 1: its offsets are pointers now
     s32  n10;                   // 0x010  entries in p14 and p18
     SkinDesc14* p14;            // 0x014
-    u8*  p18;                   // 0x018  0x1C bytes each
+    SkinDesc18* p18;            // 0x018
     s32  n1C;                   // 0x01C  entries in p20
     s32* p20;                   // 0x020
     s32  n24;                   // 0x024  entries in p28
@@ -177,10 +187,10 @@ typedef struct SkinDesc {
     u8   unk98[4];
     u8*  p9C;                   // 0x09C
     s32  nA0;                   // 0x0A0  entries in pA4
-    u8*  pA4;                   // 0x0A4  2 bytes each
+    s16* pA4;                   // 0x0A4  per p44 entry from its n28: where its meshes start (fn_80112DD8)
     s32  nA8;                   // 0x0A8  entries in pAC
-    u8*  pAC;                   // 0x0AC  2 bytes each
-    u8   unkB0[4];
+    s16* pAC;                   // 0x0AC  per p44 entry from its n2C: how many each mesh adds
+    f32  fB0;                   // 0x0B0  the scale fn_801132C4 gives the positions
     s32  nB4;                   // 0x0B4  entries in pB8
     SkinDescB8* pB8;            // 0x0B8
     u8   unkBC[0x120 - 0xBC];
@@ -301,12 +311,27 @@ typedef struct HwsOverrideTable {
     void** apMesh;              // 0x8  nMeshes of them, right after this header
 } HwsOverrideTable;
 
+// Where a mesh's data goes by its flags (fn_801136C4 fills it in; our name). fn_80112DD8 fills
+// one per draw and hands it to fn_801132C4.
+typedef struct SkinMeshRefs {
+    u16  n0;                    // 0x00  } flag 2: the two numbers fn_801136C4 is given, and the data
+    u16  n2;                    // 0x02  }   (fn_801132C4 draws n2 of p4's u16 indices from n0 on)
+    void* p4;                   // 0x04  }
+    s32  n8;                    // 0x08  } flag 0x200000: the mesh's count and data
+    void* pC;                   // 0x0C  }
+    s32  n10;                   // 0x10  } flags 1 and 0x10: the mesh's count and data
+    void* p14;                  // 0x14  }
+    s32  n18;                   // 0x18  } flags 1 and 0x40: the mesh's count and its data's third
+    void* p1C;                  // 0x1C  }   part (after n10 bits and n10 words when 0x10 is set)
+    f32  f20;                   // 0x20  fn_801132C4 scales the positions by it (SkinDesc.fB0)
+} SkinMeshRefs;
+LAYOUT_ASSERT(SkinMeshRefs, 0x24);
+
 // Part of the renderer's state that fn_80112B34 sets up.
 typedef struct HwsRender10 {
-    u32  u0;                    // 0x00  cleared by fn_80112B34
-    u8   unk4[0x24 - 0x4];
+    SkinMeshRefs refs;          // 0x00  its first word cleared by fn_80112B34
     u8   a24[0x48 - 0x24];      // 0x24
-    u32* p48;                   // 0x48  fn_80112B34 points it at u0 (fn_80113764 gives it)
+    SkinMeshRefs* p48;          // 0x48  fn_80112B34 points it at refs (fn_80113764 gives it)
     u8*  p4C;                   // 0x4C  and this at a24
     s32  n50;                   // 0x50  cleared by fn_8011389C
 } HwsRender10;
@@ -322,6 +347,7 @@ typedef struct HwsRenderState {
 LAYOUT_ASSERT(HwsRenderState, 0x64);
 
 extern HwsRenderState lbl_80223BB0;
+extern f32 lbl_80223C14[3][4];      // the texture matrix fn_80112DD8 loads for a textured pass
 
 // A character's body sliders (Character.p17AC, made by CharSlider_CreateDefinitionsFromMem; our
 // names). fn_8010E4DC sets each slider's value, lets the sliders push on each other, then moves
@@ -429,21 +455,6 @@ typedef struct SkinMeshIter {
 } SkinMeshIter;
 LAYOUT_ASSERT(SkinMeshIter, 0x20);
 
-// Where a mesh's data goes by its flags (fn_801136C4 fills it in; our name, its users are not
-// decompiled yet).
-typedef struct SkinMeshRefs {
-    u16  n0;                    // 0x00  } flag 2: the two numbers fn_801136C4 is given, and the data
-    u16  n2;                    // 0x02  }   (fn_801132C4 draws n2 of p4's u16 indices from n0 on)
-    void* p4;                   // 0x04  }
-    s32  n8;                    // 0x08  } flag 0x200000: the mesh's count and data
-    void* pC;                   // 0x0C  }
-    s32  n10;                   // 0x10  } flags 1 and 0x10: the mesh's count and data
-    void* p14;                  // 0x14  }
-    s32  n18;                   // 0x18  } flags 1 and 0x40: the mesh's count and its data's third
-    void* p1C;                  // 0x1C  }   part (after n10 bits and n10 words when 0x10 is set)
-    f32  f20;                   // 0x20  fn_801132C4 scales the positions by it
-    // The size is not known past 0x24.
-} SkinMeshRefs;
 
 // The whole iterator fn_80113A9C and fn_80113B34 build (our name): the SkinDesc.p6C entries of one
 // SkinDesc.p5C entry. fn_80113B34's kind walks each entry's meshes with a SkinMeshIter in sub.
@@ -585,9 +596,9 @@ void  fn_800CC408(Character* pChar, SkinChoices* pChoices);
 void  fn_800CC710(Character* pChar, int nSkin, u64 uPart, u64 uVariant);
 void  fn_800CC7DC(Character* pChar, int nSkin, u64 uSet, u64 uVariant, u64 uOption);
 void  fn_800CC8BC(Character* pChar, u8 bOn);
-void  fn_800CEB1C(Skin** apSkins, int nSkins, u8* p);
-void  fn_800CEBE8(Skin** apSkins, int nSkins, u8* p, u64* aIds, int nIds);
-void  fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, u8* p);
+void  fn_800CEB1C(Skin** apSkins, int nSkins, struct DynTex* pTex);
+void  fn_800CEBE8(Skin** apSkins, int nSkins, struct DynTex* pTex, u64* aIds, int nIds);
+void  fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, struct DynTex* pTex);
 u8    fn_800CEE90(void);
 
 // SkinPart.c, as SkinBurn.c uses it: the mesh iterator and an entry's copy.
@@ -604,10 +615,13 @@ void  fn_80113A7C(SkinIter* pIter);     // and its end
 
 // SkinMorph.c: the morph targets a skin description needs.
 s32   fn_8011C850(SkinDesc* pDesc);
+void  fn_8011CD3C(Skin* pSkin, HwsMemBlock* pBlock, HwsOverrideTable* pTable);
 
 // hwsOverride_Gc.c: a mesh table and a memory block for a skin description's morphed meshes.
 HwsMemBlock* fn_801128EC(SkinDesc* pDesc, s32 nSize);
+void  fn_80112910(HwsMemBlock* pBlock);
 HwsOverrideTable* fn_80112A34(SkinDesc* pDesc, s32 nMeshes);
+void  fn_80112A58(HwsOverrideTable* pTable);
 void* fn_80112A80(HwsMemBlock* pBlock, HwsOverrideTable* pTable, int i, u8 bKeep);
 
 // hwsBurn.c: pfn is called with pSkin on each SkinDesc.p14 entry the burn copies; fn_80111EB0

@@ -19,9 +19,9 @@ extern u8* lbl_80280DF0;
 void fn_80013D58(s32 p0);
 void fn_80013D5C(s32 v);
 void RC_vUpdateRenderCtxScreenMatricesAndInfo();
-void fn_80013DD0(u8* arg0, u32 arg1);
+void fn_80013DD0(u8* arg0, f32 (*arg1)[4]);
 void fn_80013D68(s32 p0);
-void fn_80013D9C(u8* p0, u32 p1);
+void fn_80013D9C(void* pCamera, f32 (*pMtx)[4]);
 s32 fn_8000ADC0();
 void fn_80013E28(u8* p, s32 v);
 void fn_80013E30(u8* p, s32 v);
@@ -73,13 +73,14 @@ void fn_80013D68(s32 p0) {
     fn_80013D58(p0);
 }
 
-void fn_80013D9C(u8* p0, u32 p1) {
-    fn_80013DD0(p0, p1);
-    fn_80013CCC(p0);
+// Gives the camera the view matrix pMtx (NULL: the identity).
+void fn_80013D9C(void* pCamera, f32 (*pMtx)[4]) {
+    fn_80013DD0(pCamera, pMtx);
+    fn_80013CCC(pCamera);
 }
 
-void fn_80013DD0(u8* arg0, u32 arg1) {
-    if (arg1 == 0U) {
+void fn_80013DD0(u8* arg0, f32 (*arg1)[4]) {
+    if (arg1 == NULL) {
         fn_8000ADC0(arg0 + 0x1C);
         (*(s8*)((u8*)(arg0) + 0x1DC)) = 1;
         return;
