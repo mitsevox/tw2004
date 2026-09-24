@@ -178,18 +178,22 @@ void vec4flt_CrossProduct(f32* pA, f32* pB, f32* pOut);   // cross product
 typedef struct TexMip {
     u32  uPixels;               // 0x0  where its pixels start in the bank's p18
     s16  nC;                    // 0x4  its size in 16-byte units (fn_80045FC8, fn_800B9EB8 copy nC * 16)
-    u8   unk6[0xC - 0x6];
+    u8   unk6[0x8 - 0x6];
+    s16  n8;                    // 0x8  TX_spParseTextureGroupFromStream adds the bank's n28 to it
+    u8   unkA[0xC - 0xA];
 } TexMip;
 
 typedef struct TexEntry {
     u64  u0;                    // 0x00  its name's hash (fn_8000BEE4; fn_8001005C finds a texture by it)
     TexMip aMips[4];            // 0x08  its levels (n41 of them are used)
-    u8   unk38[0x3C - 0x38];
+    u16  nWidth;                // 0x38  (GXInitTexObj in TX_spParseTextureGroupFromStream)
+    u16  nHeight;               // 0x3A
     s16  nPalette;              // 0x3C  its row in the bank's pC
     u16  n3E;                   // 0x3E  its row in the bank's p10 (ShaderObjectsData fn_800740F4)
     s8   b40;                   // 0x40  0: char.c fn_8001DD18 decodes the name and pairs the texture
     s8   n41;                   // 0x41  (fn_80045FC8)
-    u8   unk42[0x47 - 0x42];
+    u8   unk42[0x46 - 0x42];
+    s8   b46;                   // 0x46  bit 0: clamp in s, bit 1: clamp in t (else repeat)
     u8   b47;                   // 0x47  bit 0: the next texture goes with it (char.c fn_80019798);
                                 //       bit 0x40: byte-swapped (fn_8001DD18)
     u8   unk48[0x50 - 0x48];
@@ -199,9 +203,19 @@ LAYOUT_ASSERT(TexEntry, 0x50);
 // A row of a bank's palette table (12 bytes).
 typedef struct TexPalette {
     u32  uColors;               // 0x0  where its colours start in the bank's p20
-    u8   unk4[0xC - 0x4];
+    u8   unk4[0x6 - 0x4];
+    s16  n6;                    // 0x6  TX_spParseTextureGroupFromStream adds the bank's n28 to it
+    s16  nEntries;              // 0x8  (GXInitTlutObj)
+    s16  nFormat;               // 0xA  (GXInitTlutObj)
 } TexPalette;
 LAYOUT_ASSERT(TexPalette, 0xC);
+
+// A section of a 'txf ' object's data: an 8-byte header, then nSize bytes
+// (TX_spParseTextureGroupFromStream steps from one to the next).
+typedef struct TexSection {
+    u32  unk0;
+    s32  nSize;                 // 0x4
+} TexSection;
 
 // A row of a bank's p10 (0x40 bytes): a texture's GX texture object, loaded with GXLoadTexObj
 // (ShaderObjectsData fn_800740F4); a texture whose b47 bit 0 is set uses the next row too.
@@ -226,10 +240,11 @@ typedef struct TexBank {
     TexGXObj* p10;              // 0x10  the textures' GX objects, by TexEntry.n3E
     TexGXTlut* p14;             // 0x14  the textures' GX palette objects, by TexEntry.n3E
     u8*  p18;                   // 0x18  the pixel data
-    u8   unk1C[0x20 - 0x1C];
+    s32  n1C;                   // 0x1C  the size of the pixel data, when the bank has its own copy
     u8*  p20;                   // 0x20  the palette data
-    u32  u24;                   // 0x24  the size of one palette (FE_LogoDesign copies this much)
-    u8   unk28[0x2D - 0x28];
+    s32  n24;                   // 0x24  the size of one palette (FE_LogoDesign copies this much)
+    int  n28;                   // 0x28  the load argument; added to every level's n8 and palette's n6
+    u8   b2C;                   // 0x2C  (cleared on load)
     u8   b2D;                   // 0x2D  1: p18 and p20 are not the bank's own (never freed)
     u8   unk2E[2];
 } TexBank;
@@ -263,6 +278,16 @@ typedef struct LLTexItemList {
     s32  nItems;                // 0x00  followed by nItems LLTexItem pointers
 } LLTexItemList;
 extern LLTexItemList* lbl_80281C60;
+
+// LLTex.c's script interpreter (fn_8000EA1C): its value stack, a flag that stops every script, and
+// the four variable tables its opcodes read and write. lbl_80281C6C's entries from 7 on hold
+// addresses that some opcodes read and write through; lbl_80281C74 keeps its values times 5.
+extern int lbl_801A3438[8];
+extern u8 lbl_80281C68;
+extern int* lbl_80281C6C;
+extern int* lbl_80281C70;
+extern int* lbl_80281C74;
+extern int* lbl_80281C78;
 
 u64  fn_8000BEE4(char* pName);          // a name's 64-bit hash
 // Find a loaded texture by its name's hash: its bank and entry (both NULL if none).
@@ -1392,7 +1417,7 @@ void fn_800A78F0(f32 f);                // } and a0[1] (FE_MessageTable.c, GameU
 void fn_800A7924(f32 f);                // }
 void Vec_Normalize(f32* pSrc, f32* pDst);
 void fn_800BAF04(f32* pSrc, f32* pDst);   // normalise
-void fn_800B5918(f32* pSrc, f32* pDst);   // copy three floats (not decompiled yet)
+void fn_800B5918(const f32* pSrc, f32* pDst);   // GoShaderObject_Rain_Gc.c: copy three floats
 f32  fn_800BAFC0(f32* pSrc, f32* pDst);   // VecMath.c: normalises pSrc into pDst, gives its length
 f32  Vec_Distance(f32* pA, f32* pB);
 void fn_800BD83C(int nSound, int a);      // SitDevFile.c: fn_800A7664(0, nSound, a)

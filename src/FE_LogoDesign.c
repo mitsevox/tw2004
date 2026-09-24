@@ -164,7 +164,7 @@ void fn_8010FAF4(void) {
         fn_8000BDF8("__LogoSquare", &pBank, &pTex);
         if (pTex != NULL) {
             pPalette = fn_8010FBC4();
-            Mem_cpy(pPalette, pBank->p20 + pBank->pC[pTex->nPalette].uColors, pBank->u24);
+            Mem_cpy(pPalette, pBank->p20 + pBank->pC[pTex->nPalette].uColors, pBank->n24);
             lbl_802824C0 = 1;
         }
     }

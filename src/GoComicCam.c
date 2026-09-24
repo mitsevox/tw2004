@@ -195,10 +195,16 @@ u8 fn_800B3C64(ComicPanel* pPanel, int nPlayer) {
     switch (pPanel->n0) {
     case 0:
         bBefore = !(fn_8005CB78(gPlayers[nPlayer].pChar, 1) < gPlayers[nPlayer].pChar->fAnimTime);
-        return !bBefore;
+        if (!bBefore) {
+            return 1;
+        }
+        return 0;
     case 1:
         bBefore = !(fn_8005CB78(gPlayers[nPlayer].pChar, 2) < gPlayers[nPlayer].pChar->fAnimTime);
-        return !bBefore;
+        if (!bBefore) {
+            return 1;
+        }
+        return 0;
     case 2:
         return lbl_80282178->fTime >= pPanel->f4;
     default:
@@ -458,5 +464,8 @@ u8 fn_800B4AE0(void) {
     u8 bBefore = !(fn_8005CB78(gPlayers[lbl_80282178->nPlayer].pChar, 2) <
                    gPlayers[lbl_80282178->nPlayer].pChar->fAnimTime);
 
-    return !bBefore;
+    if (!bBefore) {
+        return 1;
+    }
+    return 0;
 }

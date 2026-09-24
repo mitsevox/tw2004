@@ -16,9 +16,9 @@ u8 fn_800D256C(u32 nYear) {
         if (nYear % 100 == 0) {
             if (nYear == 1900) return 1;
             if (nYear % 400 == 0) return 1;
-            return 0;
+        } else {
+            return 1;
         }
-        return 1;
     }
     return 0;
 }
