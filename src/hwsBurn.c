@@ -5,13 +5,8 @@
 #include "engine.h"
 #include "charstate.h"
 
-s32   fn_8011C850(SkinDesc* pDesc);
-SkinIter* fn_80113910(u8* pBuf, SkinIterArgs* pArgs);   // hwsRender_Gc.c
 SkinIter* fn_80113A9C(u8* pBuf, SkinIterArgs* pArgs);   // hwsRender_Gc.c
 void  fn_80113B14(SkinIter* pIter);                     // hwsRender_Gc.c: ends the iterator
-u8    fn_800CEEC0(SkinIter* pIter);                     // SkinPart.c
-void  fn_800CEEC8(SkinIter* pIter);
-s32   fn_800CEEFC(SkinIter* pIter);
 s32   fn_800CF104(SkinDesc* pDesc, u64 uId);
 void  fn_80110A38(HwsBurn* pBurn, int n);
 void  fn_80111850(HwsBurn* pBurn);
