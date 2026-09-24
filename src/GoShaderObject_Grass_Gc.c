@@ -59,6 +59,7 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
     u32* pBits;
     u16 nBits;
     u16* pRows;
+    u16 uHead;
     u16* pCur;
     u16* pEnd;
     u16* pOld;
@@ -131,21 +132,22 @@ void SD_vShaderObject_Grass_Static_Init(SD_SShaderObject_Static* pObject, GrassB
 
             // the row: a count word (points kept, points new), then both lists of point indexes
             pCur = pRows + 1;
+            uHead = *pRows;
             nCur = 1 - nCur;
             nPrev = nCount;
             nCount = 0;
-            pEnd = pCur + (*pRows >> 8);
+            pEnd = pCur + (u8)(uHead >> 8);
             nOther = 1 - nOther;
-            nOldRows = (u8)(*pRows >> 8);
+            nOldRows = (u8)(uHead >> 8);
             pNew = SD_gpGrassTypeData->a000[nOther];
             pNewStep = SD_gpGrassTypeData->a200[nOther];
             pOld = SD_gpGrassTypeData->a000[nCur];
             pOldStep = SD_gpGrassTypeData->a200[nCur];
             nBit = nBitBase;
             nNewBit = nBitBase + nOldRows;
-            nNewRows = (u8)*pRows;
+            nNewRows = (u8)uHead;
             pNewEnd = pEnd;
-            pNext = pEnd + (u8)*pRows;
+            pNext = pEnd + (u8)uHead;
             uStep = fn_8001E9CC(pBits, nBit);
             uNewStep = fn_8001E9CC(pBits, nNewBit);
             bFirst = 1;
