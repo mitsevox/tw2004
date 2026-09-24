@@ -106,8 +106,6 @@ void fn_80112DA0(void) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_801136C4();
-void fn_8011368C(u8* p0, s32 p1, s32 p2, s32 p3);
 u32* fn_80113764(void);
 void fn_80113840(void);
 void fn_80113844(void);
@@ -122,9 +120,44 @@ void fn_80113B14(SkinIter* pIter);
 void fn_80113E54(SkinIter* pIter, void (**ppfnNext)(SkinIter* pIter));
 void fn_80113E5C(SkinIter* pIter);
 
-void fn_8011368C(u8* p0, s32 p1, s32 p2, s32 p3) {
-    fn_801136C4(p0, *(s32*)(p0 + 0x0), p1, p2, p3, p1);
+// ---- end of sweep code ----
+
+void fn_801136C4(SkinMesh* pMesh, void* pData, SkinMeshRefs* pOut, u16 n0, s16 n2);
+
+// fn_801136C4 with the mesh's own data.
+void fn_8011368C(SkinMesh* pMesh, SkinMeshRefs* pOut, u16 n0, s16 n2) {
+    fn_801136C4(pMesh, pMesh->pBits, pOut, n0, n2);
 }
+
+// Point pOut at pData by the mesh's flags (nothing for an empty mesh).
+void fn_801136C4(SkinMesh* pMesh, void* pData, SkinMeshRefs* pOut, u16 n0, s16 n2) {
+    if (pMesh->n8 == 0) {
+        return;
+    }
+    if (pMesh->uFlags & 1) {
+        if (pMesh->uFlags & 0x10) {
+            pOut->n10 = pMesh->n8;
+            pOut->p14 = pData;
+            if (pMesh->uFlags & 0x40) {
+                // The third part follows n10 bits (8 bytes each) and n10 words.
+                pOut->p1C = (u8*)pMesh->pBits + (pOut->n10 * 4 + pOut->n10 * 8);
+                pOut->n18 = pMesh->n8;
+            }
+        } else if (pMesh->uFlags & 0x40) {
+            pOut->n18 = pMesh->n8;
+            pOut->p1C = pMesh->pBits;
+        }
+    } else if (pMesh->uFlags & 2) {
+        pOut->n0 = n0;
+        pOut->n2 = n2;
+        pOut->p4 = pData;
+    } else if (pMesh->uFlags & 0x200000) {
+        pOut->n8 = pMesh->n8;
+        pOut->pC = pData;
+    }
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 u32* fn_80113764(void) {
     return lbl_80223BB0.s10.p48;

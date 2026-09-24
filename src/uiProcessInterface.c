@@ -288,12 +288,10 @@ void fn_800908D0(void) {
 
 s32 fn_8001005C();
 void fn_800107E4();
-s32 fn_80012EC4();
-
 void fn_800908D4(f32 x0) {
-    s32 t0;
-    t0 = fn_80012EC4();
-    *(f32*)(((u8*)t0) + 0xB4) = x0;
+    UFontContext* pCtx;
+    pCtx = fn_80012EC4();
+    pCtx->fB4 = x0;
 }
 
 void fn_80090904(s32 p0) {

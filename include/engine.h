@@ -663,6 +663,79 @@ void* fn_800065C8(const char* pName, u32* puSize, int nAlign);
 
 f32  fn_80012C30(char* sz);             // UFont.c: a string's width
 
+// UFont.c's text settings: how the next string is drawn. Each queued string keeps its own copy
+// (fn_800128F8 copies all 0xD8 bytes), linked through pNext.
+typedef struct UFontContext {
+    struct UFontContext* pNext;   // 0x00  the next string queued on the same font
+    f32   f04;                    // 0x04
+    f32   f08;                    // 0x08
+    f32   f0C;                    // 0x0C  1 / (f08 - f04), set by fn_80012E00
+    s32   n10;                    // 0x10
+    u8    pad14[0x60 - 0x14];     // 0x14
+    s32   n60;                    // 0x60
+    s32   n64;                    // 0x64
+    s32   n68;                    // 0x68
+    s32   n6C;                    // 0x6C
+    f32   f70;                    // 0x70  where fn_800128F8 draws the string
+    f32   f74;                    // 0x74
+    f32   f78;                    // 0x78
+    f32   f7C;                    // 0x7C
+    f32   f80;                    // 0x80
+    f32   f84;                    // 0x84
+    f32   f88;                    // 0x88
+    f32   a8C[4];                 // 0x8C
+    s32   n9C;                    // 0x9C
+    s32   nFont;                  // 0xA0  the font slot strings are drawn with
+    s32   nA4;                    // 0xA4
+    u8    uA8;                    // 0xA8
+    s32   nAC;                    // 0xAC
+    f32   fB0;                    // 0xB0
+    f32   fB4;                    // 0xB4
+    f32   fB8;                    // 0xB8
+    f32   fBC;                    // 0xBC
+    f32   fC0;                    // 0xC0
+    u8    padC4[0xCC - 0xC4];     // 0xC4
+    f32   fCC;                    // 0xCC
+    f32   fD0;                    // 0xD0
+    char* szText;                 // 0xD4  a queued string's copy of its text
+} UFontContext;                   // 0xD8
+
+UFontContext* fn_80012EC4(void);        // UFont.c: the current text settings
+
+// A loaded font, from an 'sfn ' stream object (FO_spLoadFontFromStream). LLFont is our name.
+typedef struct LLFont {
+    u8    pad00[0x470];           // 0x00
+    void* p470;                   // 0x470  freed with the font
+    s32   n474;                   // 0x474
+} LLFont;
+
+// UFont.c's state (lbl_80280DE0 points at the 0x1E0-byte block lbl_801A34C0).
+typedef struct UFontState {
+    u8    a00[0xA0];              // 0x00  LLFont.c's state (fn_80011034 sets it up)
+    LLFont* apFonts[6];           // 0xA0  loaded fonts; NULL: a free slot
+    UFontContext* apQueue[6];     // 0xB8  each font's queued strings, newest first
+    UFontContext* pQueuePool;     // 0xD0  room for 50 queued strings
+    UFontContext* pQueueNext;     // 0xD4  the pool's next free entry
+    u8    padD8[0xE0 - 0xD8];     // 0xD8
+    UFontContext ctx;             // 0xE0  the current settings
+    s32   n1B8;                   // 0x1B8  0: fn_800128F8 queues strings, 1: draws them at once
+    char* pStrings;               // 0x1BC  0x1F4 bytes of queued text
+    char* pStringNext;            // 0x1C0
+} UFontState;
+
+extern UFontState* lbl_80280DE0;
+
+// LLFont.c: the font renderer UFont.c draws through. A font is a loaded 'sfn ' stream object.
+LLFont* FO_spLoadFontFromStream(void* pData, UFontState* pState);
+void fn_80011034(UFontState* pState);
+void fn_80011160(UFontState* pState);
+void fn_800111A4(LLFont* pFont);        // free a font
+void fn_80011310(LLFont* pFont, UFontState* pState);
+void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz);
+void fn_80011C8C(LLFont* pFont);
+f32  fn_80011C90(LLFont* pFont, UFontContext* pCtx, char* sz); // a string's width
+void fn_80012438(LLFont* pFont);
+
 // ---- controller input ------------------------------------------------------------------------
 
 // One controller as the pad library reads it (12 bytes a pad, filled by PADRead).

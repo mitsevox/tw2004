@@ -97,6 +97,7 @@ s64  OSGetTime(void);           // the time base, in ticks
 void OSTicksToCalendarTime(s64 nTicks, OSCalendarTime* pTime);
 u32  OSGetTick(void);           // the low 32 bits of the time base
 void OSReport(const char* pFmt, ...);   // debug print (nothing in the retail build)
+void OSPanic(const char* pFile, int nLine, const char* pFmt, ...);   // print and halt
 
 // ---- the GameCube DVD library -----------------------------------------------------------------
 

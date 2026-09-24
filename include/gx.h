@@ -44,6 +44,8 @@ void GXSetClipMode(int eMode);
 void GXSetArray(int eAttr, void* pBase, u8 nStride);
 void GXClearVtxDesc(void);
 void GXSetVtxDesc(int eAttr, int eType);
+void GXSetVtxAttrFmt(int eFmt, int eAttr, int eCompCnt, int eCompType, u8 nFrac);
+void GXBegin(int ePrim, int eFmt, u16 nVerts);
 
 // ---- textures ---------------------------------------------------------------------------------
 
@@ -52,6 +54,8 @@ void GXInitTexObj(GXTexObj* pObj, void* pImage, u16 nWidth, u16 nHeight, int eFo
 void GXInitTexObjCI(GXTexObj* pObj, void* pImage, u16 nWidth, u16 nHeight, int eFormat, int eWrapS,
                     int eWrapT, u8 bMipmap, u32 nTlut);
 void GXInitTlutObj(GXTlutObj* pObj, void* pLut, int eFormat, u16 nEntries);
+void GXLoadTexObj(GXTexObj* pObj, int eMap);
+void GXSetNumTexGens(u8 nGens);
 void GXLoadTexMtxIndx(u16 nIndex, u32 nId, int eType);
 void GXSetTexCoordGen2(int nDst, int nFunc, int nSrc, int nMtx, u8 bNormalize, int nPostMtx);
 void GXSetNumTexGens(u8 nGens);

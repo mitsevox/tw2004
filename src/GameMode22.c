@@ -442,7 +442,8 @@ s32 fn_80126640(int n) {
 // Adds message n to the list the shot's comment is picked from (20 at most). Our name.
 #define ADD_MSG(n)                          \
     if (nMsgs < 20) {                       \
-        aMsgs[nMsgs++] = (n);               \
+        aMsgs[nMsgs] = (n);                 \
+        nMsgs++;                            \
     }
 
 // A shot is over (gpGame->pfn244): the player's points for it from where the ball ended up (and
@@ -659,19 +660,19 @@ void fn_80126EC0(void) {
     s32 i;
 
     for (i = 0; i < 5; i++) {
-        gPlayers[i].nEA0 = 0;
-        gPlayers[i].nEA4 = 0;
-        gPlayers[i].nEA8 = 0;
-        gPlayers[i].nEBC = 0;
-        gPlayers[i].nEC0 = 0;
-        gPlayers[i].nEC4 = 0;
-        gPlayers[i].nEC8 = 0;
-        gPlayers[i].nECC = 0;
-        gPlayers[i].nED0 = 0;
-        gPlayers[i].nED4 = 0;
-        gPlayers[i].nED8 = 0;
-        gPlayers[i].nEDC = 0;
-        fn_800E5CA4(i, gPlayers[i].nEBC, 0, 0, 0, 0, 0, 0.0f);
+        PLAYER(i)->nEA0 = 0;
+        PLAYER(i)->nEA4 = 0;
+        PLAYER(i)->nEA8 = 0;
+        PLAYER(i)->nEBC = 0;
+        PLAYER(i)->nEC0 = 0;
+        PLAYER(i)->nEC4 = 0;
+        PLAYER(i)->nEC8 = 0;
+        PLAYER(i)->nECC = 0;
+        PLAYER(i)->nED0 = 0;
+        PLAYER(i)->nED4 = 0;
+        PLAYER(i)->nED8 = 0;
+        PLAYER(i)->nEDC = 0;
+        fn_800E5CA4(i, PLAYER(i)->nEBC, 0, 0, 0, 0, 0, 0.0f);
     }
     lbl_80282278 = 5;
     fn_80126F7C();
