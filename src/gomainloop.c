@@ -255,7 +255,7 @@ void fn_800E2F14(void);
 void fn_800E5314(void);
 s32  fn_800FD6A4(int nPlayer);
 void fn_801020BC(void);
-void fn_801037F8(void);
+void FE_CrAP_InitModule(void);
 void fn_80103A64(void);
 void fn_8010A448(int nSize);
 void fn_8010A4E8(void);
@@ -531,7 +531,7 @@ void GO_vInitFE(void) {
     fn_80029FC8();
     fn_8009CC00();
     fn_800905A8();
-    fn_801037F8();
+    FE_CrAP_InitModule();
     fn_8010A448(0x18000);
     lbl_80281E60 = CA_spCreateCamera();
     CameraTuning_Init();

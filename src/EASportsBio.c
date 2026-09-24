@@ -9,7 +9,7 @@
 #include "frontend/fe.h"
 
 s32 fn_80106ED8(s32 arg0, s32 nLevel);
-s32 fn_80107084(s32 arg0, s32 nLevel);
+s32 FE_CrAP_GetNextUnlockVal(s32 arg0, s32 nLevel);
 s32 EASBio_ConvertError(EASBErrorE eError);
 s32 EASBio_WaitForAsyncProcessToComplete(void);
 s32 fn_80125520(u8 b);
@@ -482,7 +482,7 @@ u8 fn_801257A0(void) {
 
     nLevel = fn_801258E8();
     nUnlocked = fn_80106ED8(12, nLevel);
-    nNext = fn_80107084(12, nLevel);
+    nNext = FE_CrAP_GetNextUnlockVal(12, nLevel);
     if (nNext == -1) {
         nNext = EASB_MAX_LEVEL + 1;
     }

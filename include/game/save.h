@@ -297,7 +297,7 @@ typedef struct SaveProfile {
     // also clears aB344 and aB4BC; fn_8001E9CC tests a bit).
     u32  aAssetLocked[94];      // 0x0B054  the asset was locked (fn_80078008) when last checked
     u32  aB1CC[94];             // 0x0B1CC  set where fn_80105C0C gives 0; an asset of lock kind 0
-                                //          stays locked until the bit its fn_80105610 names is set
+                                //          stays locked until the bit its FE_CrAP_GetPartGMLockValByAssetNum names is set
     u32  aB344[94];             // 0x0B344
     u32  aB4BC[94];             // 0x0B4BC
     TourSeason tour;            // 0x0B634

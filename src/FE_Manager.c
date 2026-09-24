@@ -525,8 +525,8 @@ void fn_80077C1C(int a, int b) {
 }
 
 // Whether a Create-A-Player asset is still locked for the profile (never in the session's 0x4000
-// mode, nor while PasswordManager_IsPasswordEntered(0) holds). The asset names a lock kind (fn_801055DC) and a number
-// for it (fn_80105610): a bit, an award, a tournament won, a count of them to reach, a season...
+// mode, nor while PasswordManager_IsPasswordEntered(0) holds). The asset names a lock kind (FE_CrAP_GetPartGMLockIDByAssetNum) and a number
+// for it (FE_CrAP_GetPartGMLockValByAssetNum): a bit, an award, a tournament won, a count of them to reach, a season...
 u8 fn_80078008(s32 nAsset, SaveProfile* pProfile) {
     int aBits[5] = {1, 2, 3, 4, 5};
     int nCount = 0;
@@ -537,8 +537,8 @@ u8 fn_80078008(s32 nAsset, SaveProfile* pProfile) {
     if (gSession.uFlags & 0x4000) {
         return 0;
     }
-    nKind = fn_801055DC(nAsset);
-    n = fn_80105610(nAsset);
+    nKind = FE_CrAP_GetPartGMLockIDByAssetNum(nAsset);
+    n = FE_CrAP_GetPartGMLockValByAssetNum(nAsset);
     if (PasswordManager_IsPasswordEntered(0)) {
         return 0;
     }
@@ -735,7 +735,7 @@ void fn_80078680(SaveProfile* pProfile) {
     int i;
     int nCount;
     s8 nSaved;
-    if (fn_80105C30()) {
+    if (FE_CrAP_IsCrAPDBLoaded()) {
         nSaved = fn_80103BB4();
         nCount = fn_80105C00();
         for (i = 0; i < nCount; i++) {
@@ -763,17 +763,17 @@ void fn_8007873C(SaveProfile* pProfile) {
     int nAttrB;
     int nTierA;
     int nTierB;
-    if (fn_80105C30()) {
+    if (FE_CrAP_IsCrAPDBLoaded()) {
         for (i = 0; i < NUM_ATTRS; i++) {
             pProfile->createdGolfer.tier[i] = 0;
         }
         for (nSlot = 0; nSlot < 53; nSlot++) {
             nAsset = fn_80103D14(nSlot);
             if (nAsset >= 0) {
-                nAttrA = fn_80105494(nAsset);
-                nAttrB = fn_80105504(nAsset);
-                nTierA = fn_801054CC(nAsset);
-                nTierB = fn_8010553C(nAsset);
+                nAttrA = FE_CrAP_GetPartAttributeUpgrade1ByAssetID(nAsset);
+                nAttrB = FE_CrAP_GetPartAttributeUpgrade2ByAssetID(nAsset);
+                nTierA = FE_CrAP_GetPartAttributeModifier1ByAssetID(nAsset);
+                nTierB = FE_CrAP_GetPartAttributeModifier2ByAssetID(nAsset);
                 if (nAttrA >= 0 && pProfile->createdGolfer.tier[nAttrA] < nTierA) {
                     pProfile->createdGolfer.tier[nAttrA] = nTierA;
                 }
@@ -1118,10 +1118,10 @@ void fn_80079664(SaveProfile* pProfile) {
     fn_80078E34(pProfile);
 }
 
-// Part nPart at a random b (fn_801049C8 counts them), then at a random choice (fn_800797E0), which
+// Part nPart at a random b (FE_CrAP_GetNumberOfSubcategoryIndicesForCategory counts them), then at a random choice (fn_800797E0), which
 // is returned (FE_CrAPMessages.c fn_80109FB4 uses it).
 int fn_8007975C(SaveProfile* pProfile, s16 nPart, int nChance) {
-    int nCount = fn_801049C8(nPart);
+    int nCount = FE_CrAP_GetNumberOfSubcategoryIndicesForCategory(nPart);
     int nPick;
     if (nCount > 0) {
         nPick = Misc_RandFunc(0) % nCount;
