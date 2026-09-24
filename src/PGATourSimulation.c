@@ -307,7 +307,7 @@ void fn_801180C4(int nPlayer, u8 bUser, u8 bFirst) {
     nAhead = 0;
     for (i = 0; i < PGA_NUM_PROS; i++) {
         if (gpSaveData[nPlayer].tour.aStats[i].nCareerWinnings >
-            pProfile->tour.aStats[PGA_USER_GOLFER].nCareerWinnings) {
+            gpSaveData[nPlayer].tour.aStats[PGA_USER_GOLFER].nCareerWinnings) {
             nAhead++;
         }
     }
@@ -330,7 +330,7 @@ void fn_801180C4(int nPlayer, u8 bUser, u8 bFirst) {
 
     nNext = GameModeDriverPGATour_GetNextEvent();
     if (nNext == -1) {
-        if (gpSaveData[nPlayer].tour.nSeason == 0 && pProfile->tour.aStats[PGA_USER_GOLFER].nSeasonWins > 1
+        if (gpSaveData[nPlayer].tour.nSeason == 0 && gpSaveData[nPlayer].tour.aStats[PGA_USER_GOLFER].nSeasonWins > 1
             && fn_800D7770(nPlayer, &gpSaveData[nPlayer].a1C0[12])) {
             fn_8011C054(12, 2);
         }
