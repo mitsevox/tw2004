@@ -137,12 +137,22 @@ typedef struct Unk802811F0 {
 } Unk802811F0;
 extern Unk802811F0* lbl_802811F0;       // 0x802811F0
 
+// lbl_80188900: five choices per course (fn_8006F650). A roll picks choice n with chance fShare
+// (setting bit n of lbl_802811F0->uFlags); in game option mode 2 it then lasts nMin..nMax calls.
+typedef struct Unk80188900 {
+    f32 fShare;                 // 0x0
+    s32 nMin;                   // 0x4
+    s32 nMax;                   // 0x8
+} Unk80188900;
+
 u8   fn_80035574(void);                 // lbl_802811F0's flag 0x2
 
 // ---- the course table (CourseData.c) ---------------------------------------------------------
 
 #define NUM_COURSE_DATA 21      // courses in the 'CRI ' table
 #define NUM_BUILT_ROUNDS 7      // rounds in the 'CMPS' table
+
+extern Unk80188900 lbl_80188900[NUM_COURSE_DATA][5];   // (above)
 
 // One hole of the course table (0x38 bytes).
 typedef struct HoleData {
