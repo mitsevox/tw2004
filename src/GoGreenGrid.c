@@ -8,6 +8,7 @@
 #include "ball.h"
 #include "camera.h"
 #include "physics.h"
+#include "terrain.h"
 #include "unsorted/cull.h"
 #include "greengrid.h"
 
@@ -180,6 +181,180 @@ void fn_8009BE08(int nView) {
         }
         nSteps++;
         lbl_802813C0->anDone[nView]++;
+    }
+}
+
+// Builds the view's grid lines from the sampled heights: first the rows across, then the lines
+// along. Each point gives two vertices (a line strip drawn doubled back); a point with no ground
+// (the -65536.125 marker) breaks the line, and the end of each line fades out. The texture scrolls
+// with the frame count.
+void fn_8009C0BC(int nView) {
+    f32 fPrev;
+    f32 fHole;
+    f32 fDirX;
+    f32 fDirZ;
+    f32 fCornerX;
+    f32 fCornerZ;
+    f32 fAlong;
+    f32 fAcross;
+    f32 fHeight;
+    f32 fX;
+    f32 fY;
+    f32 fZ;
+    f32 fU;
+    f32 fV;
+    f32 fGap;
+    f32 fPeriod;
+    int n;
+    int nRow;
+    int nCol;
+    int nEdge;
+    int nGapEdge;
+    int bInGap;
+    int k;
+    int i;
+    lbl_802813C0->nVerts = 0;
+    fPrev = 0.0f;
+    lbl_802813C0->nIndices = 0;
+    bInGap = 0;
+    nGapEdge = -1;
+    fHole = -65536.125f;
+    fDirX = lbl_802813C0->aDir[nView][0];
+    fDirZ = lbl_802813C0->aDir[nView][2];
+    fCornerX = lbl_802813C0->aCorner[nView][0];
+    fCornerZ = lbl_802813C0->aCorner[nView][2];
+    for (n = 0; n < lbl_802813C0->nCols * lbl_802813C0->anRows[nView]; n++) {
+        nRow = n / lbl_802813C0->nCols;
+        nCol = n % lbl_802813C0->nCols;
+        fAlong = nRow * lbl_802813C0->fCellD;
+        fHeight = lbl_802813C0->apHeight[nView][nCol + nRow * lbl_802813C0->nCols];
+        fAcross = nCol * lbl_802813C0->fCellW;
+        if (nCol == 0) {
+            nEdge = 0;
+        } else if (nCol == lbl_802813C0->nCols - 1) {
+            nEdge = 1;
+        } else {
+            nEdge = -1;
+        }
+        if (fHole == fHeight) {
+            if (!bInGap) {
+                nGapEdge = nEdge;
+                bInGap = 1;
+            }
+        } else {
+            if (bInGap) {
+                nEdge = nGapEdge;
+                bInGap = 0;
+            }
+            fY = 0.01f + fHeight;
+            fX = fAcross * fDirZ + (fAlong * fDirX + fCornerX);
+            fZ = (fAlong * fDirZ + fCornerZ) - fAcross * fDirX;
+            k = 0;
+            do {
+                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 0] = fX;
+                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 1] = fY;
+                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 2] = fZ;
+                lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 0] = lbl_802813C0->anColor[0];
+                lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 1] = lbl_802813C0->anColor[1];
+                lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 2] = lbl_802813C0->anColor[2];
+                lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 3] =
+                    (k == nEdge) ? 0 : (u8)lbl_802813C0->anColor[3];
+                if (k == 0 && lbl_802813C0->nVerts > 0) {
+                    fU = (u32)gSession.nFrameCount * lbl_802813C0->f100 * (fPrev - fHeight);
+                    fU = fU - fn_80035074(fU);
+                    lbl_802813C0->apUV[nView][lbl_802813C0->nVerts * 2 + 0] = fU;
+                    lbl_802813C0->apUV[nView][lbl_802813C0->nVerts * 2 + 1] = 0.75f;
+                    lbl_802813C0->apUV[nView][lbl_802813C0->nVerts * 2 - 2] = fU + lbl_802813C0->fFC;
+                    lbl_802813C0->apUV[nView][lbl_802813C0->nVerts * 2 - 1] = 0.75f;
+                }
+                k++;
+                lbl_802813C0->apIndex[nView][lbl_802813C0->nIndices] = lbl_802813C0->nVerts;
+                lbl_802813C0->nIndices++;
+                lbl_802813C0->nVerts++;
+            } while (k < 2);
+            fPrev = fHeight;
+        }
+    }
+    bInGap = 0;
+    fHole = -65536.125f;
+    nGapEdge = -1;
+    for (n = 0; n < lbl_802813C0->nCols * lbl_802813C0->anRows[nView]; n++) {
+        nCol = n / lbl_802813C0->anRows[nView];
+        nRow = n % lbl_802813C0->anRows[nView];
+        fAcross = nCol * lbl_802813C0->fCellW;
+        fAlong = nRow * lbl_802813C0->fCellD;
+        fHeight = lbl_802813C0->apHeight[nView][nCol + nRow * lbl_802813C0->nCols];
+        if (nRow == 0) {
+            nEdge = 0;
+        } else if (nRow == lbl_802813C0->anRows[nView] - 1) {
+            nEdge = 1;
+        } else {
+            nEdge = -1;
+        }
+        if (fHole == fHeight) {
+            if (!bInGap) {
+                nGapEdge = nEdge;
+                bInGap = 1;
+            }
+        } else {
+            if (bInGap) {
+                nEdge = nGapEdge;
+                bInGap = 0;
+            }
+            k = 0;
+            fY = 0.01f + fHeight;
+            fX = fAcross * fDirZ + (fAlong * fDirX + fCornerX);
+            fZ = (fAlong * fDirZ + fCornerZ) - fAcross * fDirX;
+            do {
+                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 0] = fX;
+                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 1] = fY;
+                lbl_802813C0->apVert[nView][lbl_802813C0->nVerts * 3 + 2] = fZ;
+                lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 0] = lbl_802813C0->anColor[0];
+                lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 1] = lbl_802813C0->anColor[1];
+                lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 2] = lbl_802813C0->anColor[2];
+                lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 + 3] =
+                    (k == nEdge) ? 0 : (u8)lbl_802813C0->anColor[3];
+                if (k == 0 && lbl_802813C0->nVerts > 0) {
+                    fU = (u32)gSession.nFrameCount * lbl_802813C0->f100 * (fPrev - fHeight);
+                    if ((s8)GOLFERSTATE_GetCurrentState(fn_8001707C(nView)) == GS_ZOOM) {
+                        fV = 0.75f;
+                        fGap = 0.0625f;
+                    } else {
+                        fV = 0.25f;
+                        fGap = 0.1875f;
+                    }
+                    if (lbl_802813C0->fCellW > lbl_802813C0->fCellD) {
+                        fPeriod = lbl_802813C0->fFC * (lbl_802813C0->fCellD / lbl_802813C0->fCellW) + fGap;
+                        fU = fU - fPeriod * (int)(fU / fPeriod);
+                        if (fU < 0.0f) {
+                            fU += fPeriod;
+                        }
+                        fU = fU + ((1.0f + fGap) - fPeriod);
+                    } else {
+                        fU = fU - fn_80035074(fU);
+                    }
+                    lbl_802813C0->apUV[nView][lbl_802813C0->nVerts * 2 + 0] = fU;
+                    lbl_802813C0->apUV[nView][lbl_802813C0->nVerts * 2 + 1] = fV;
+                    lbl_802813C0->apUV[nView][lbl_802813C0->nVerts * 2 - 2] =
+                        lbl_802813C0->fFC * (lbl_802813C0->fCellD / lbl_802813C0->fCellW) + fU;
+                    lbl_802813C0->apUV[nView][lbl_802813C0->nVerts * 2 - 1] = fV;
+                }
+                k++;
+                lbl_802813C0->apIndex[nView][lbl_802813C0->nIndices] = lbl_802813C0->nVerts;
+                lbl_802813C0->nIndices++;
+                lbl_802813C0->nVerts++;
+            } while (k < 2);
+            fPrev = fHeight;
+        }
+    }
+    // the strip's first and last vertices are clear, and so is each pair with a clear half
+    lbl_802813C0->apColor[nView][3] = 0;
+    lbl_802813C0->apColor[nView][lbl_802813C0->nVerts * 4 - 1] = 0;
+    for (i = 1; i < lbl_802813C0->nVerts - 1; i += 2) {
+        if (lbl_802813C0->apColor[nView][i * 4 + 3] == 0 || lbl_802813C0->apColor[nView][i * 4 + 7] == 0) {
+            lbl_802813C0->apColor[nView][i * 4 + 3] = 0;
+            lbl_802813C0->apColor[nView][i * 4 + 7] = 0;
+        }
     }
 }
 
