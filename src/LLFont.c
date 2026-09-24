@@ -166,6 +166,131 @@ f32 fn_80011C90(LLFont* pFont, UFontContext* pCtx, char* sz) {
 
 // ---- end of sweep code ----
 
+// Word-wraps sz (NULL: pCtx->szText) into the box pCtx->a8C (x, y, width, height), drawing each line
+// when bDraw is set. f70/f74 come in as 0..1 within the box and are turned into screen positions;
+// f74 then steps down a line at a time. Lines break at spaces and '\n' ('\r' counts as a space);
+// a word wider than the box is cut where it stops fitting. Returns the number of lines broken,
+// 0 for an empty box, or -1 when not even one character fits.
+int fn_80011D0C(LLFont* pFont, UFontContext* pCtx, u8 bDraw, char* sz) {
+    f32 fLine;
+    char* pLine;
+    char* p;
+    char* pBreak;
+    int nLines;
+    char c;
+    char* pCut;
+    char cSaved;
+    int n;
+
+    if (pCtx->a8C[2] <= 0.0f || pCtx->a8C[3] <= 0.0f) {
+        return 0;
+    }
+    nLines = 0;
+    pCtx->f70 = pCtx->a8C[2] * pCtx->f70 + pCtx->a8C[0];
+    fLine = pCtx->fB4 * (pFont->f00 * pCtx->f80);
+    pCtx->f74 = pCtx->a8C[3] * pCtx->f74 + pCtx->a8C[1];
+    if (sz == NULL) {
+        pLine = pCtx->szText;
+    } else {
+        pLine = sz;
+    }
+    p = pLine;
+    pBreak = NULL;
+    for (;; p++) {
+        c = *p;
+        if (c != ' ' && c != '\n' && c != '\r' && c != '\0') {
+            continue;
+        }
+        cSaved = c;
+        if (c == '\r') {
+            cSaved = ' ';
+        }
+        *p = '\0';
+        if (fn_80011C90(pFont, pCtx, pLine) <= pCtx->a8C[2]) {
+            // The line still fits up to here: remember the break and go on.
+            *p = cSaved;
+            pBreak = p;
+            if (*p == '\0') {
+                if (bDraw) {
+                    fn_8001144C(pFont, pCtx, pLine);
+                }
+                break;
+            }
+            if (*p == '\r') {
+                *p = ' ';
+            }
+            if (*p == '\n') {
+                *p = '\0';
+                if (bDraw) {
+                    fn_8001144C(pFont, pCtx, pLine);
+                }
+                *p = cSaved;
+                nLines++;
+                pCtx->f74 += fLine;
+                if (bDraw && pCtx->f74 + fLine > pCtx->a8C[1] + pCtx->a8C[3]) {
+                    return nLines;
+                }
+                for (p++; *p != '\0'; p++) {
+                    if (*p != ' ') {
+                        break;
+                    }
+                }
+                pLine = p;
+                pBreak = NULL;
+                p--;
+            }
+        } else {
+            *p = cSaved;
+            if (pBreak == NULL) {
+                // One word wider than the box: cut it where it stops fitting.
+                n = p - pLine - 1;
+                pCut = pLine + n;
+                for (; n > 0; n--, pCut--) {
+                    cSaved = *pCut;
+                    *pCut = '\0';
+                    if (fn_80011C90(pFont, pCtx, pLine) <= pCtx->a8C[2]) {
+                        if (bDraw) {
+                            fn_8001144C(pFont, pCtx, pLine);
+                        }
+                        nLines++;
+                        pCtx->f74 += fLine;
+                        if (bDraw && pCtx->f74 + fLine > pCtx->a8C[1] + pCtx->a8C[3]) {
+                            return nLines;
+                        }
+                        pLine[n] = cSaved;
+                        pLine += n;
+                        p = pLine;
+                        break;
+                    }
+                    *pCut = cSaved;
+                }
+                if (n == 0) {
+                    return -1;
+                }
+            } else {
+                // Break the line at the last space that fitted.
+                c = *pBreak;
+                *pBreak = '\0';
+                if (bDraw) {
+                    fn_8001144C(pFont, pCtx, pLine);
+                }
+                *pBreak = c;
+                nLines++;
+                pCtx->f74 += fLine;
+                if (bDraw && pCtx->f74 + fLine > pCtx->a8C[1] + pCtx->a8C[3]) {
+                    return nLines;
+                }
+                for (; *pBreak != '\0' && (*pBreak == ' ' || *pBreak == '\n'); pBreak++) {
+                }
+                pLine = pBreak;
+                p = pBreak - 1;
+                pBreak = NULL;
+            }
+        }
+    }
+    return nLines;
+}
+
 // The colour of a text vertex under pCtx's colour gradients, as the four bytes of a GXColor.
 // Unless a gradient is on, it is the colour passed in. Across (n10 bit 1) the position runs
 // fX * fXScale from f04 to f08 and wraps, and the colour blends between the two stops around it;

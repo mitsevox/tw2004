@@ -706,7 +706,8 @@ typedef struct LLGlyph {
 
 // A loaded font, from an 'sfn ' stream object (FO_spLoadFontFromStream). LLFont is our name.
 typedef struct LLFont {
-    u8    pad00[0xC];             // 0x00
+    f32   f00;                    // 0x00  its line height (fn_80011D0C steps down a line by it)
+    u8    pad04[0xC - 0x4];       // 0x04
     LLGlyph* apGlyphs[256];       // 0x0C  by character code; NULL: the font has no such glyph
     u8    pad40C[0x440 - 0x40C];  // 0x40C
     GXTexObj tex;                 // 0x440
@@ -747,6 +748,7 @@ void fn_80011310(LLFont* pFont, UFontState* pState);
 void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz);
 void fn_80011C8C(LLFont* pFont);
 f32  fn_80011C90(LLFont* pFont, UFontContext* pCtx, char* sz); // a string's width
+int  fn_80011D0C(LLFont* pFont, UFontContext* pCtx, u8 bDraw, char* sz); // word-wrapped text
 void fn_80012438(LLFont* pFont);
 
 // ---- controller input ------------------------------------------------------------------------
