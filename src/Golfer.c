@@ -248,10 +248,9 @@ void AI_ChooseTarget(int nPlayer) {
         AI_DefaultTarget(nPlayer);
         return;
     }
-    pBest          = &gAITargets[nBest];
-    p->vTarget[0]    = pBest->pDef->x;
-    p->vTarget[2]    = pBest->pDef->z;
-    p->nShotShape = pBest->nType;
+    p->vTarget[0]    = gAITargets[nBest].pDef->x;
+    p->vTarget[2]    = gAITargets[nBest].pDef->z;
+    p->nShotShape = gAITargets[nBest].nType;
     fn_8002BDEC_SetTarget(nPlayer, p->vTarget);
     Vec_Copy(p->vTarget, p->vTarget2);
 }
