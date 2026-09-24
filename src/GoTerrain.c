@@ -24,7 +24,18 @@ CamLens* fn_8001F004(void);         // the current camera's lens
 f32   fn_8001414C(u8* p);
 f32   fn_80014280(f32 x);           // tan
 void  fn_80030894(void);
-void  fn_80030A40(void* p, int n);
+void  fn_80030A40(void* pHoleData, int nView);
+void  fn_80030CC8(void* pHoleData);
+void  fn_8003185C(void);
+void  fn_800318D8(void);
+void  fn_80031AB4(void);
+void  fn_80031E58(void);
+void  fn_80032518(int nRenderPass);
+void  fn_80032770(void);
+void  fn_80032954(void);
+void  fn_80033F94(void* pHoleData, int nList);
+void  fn_8003546C(f32* pA, f32* pB, f32* pOut);
+f32   fn_8001EFFC(CamLens* pLens);
 f32   fn_800351D8(u32 n, f32 fPeriod);
 void  fn_8003519C(int nRow, void* pData);   // calls row nRow's function of lbl_80188E88 with pData
 s32   fn_800318AC(const void* pA, const void* pB);
@@ -151,6 +162,69 @@ void fn_80030894(void) {
     fn_8003519C(4, &wave);
     nFrame = gSession.nFrameCount;
     fn_8003519C(5, &nFrame);
+}
+
+// Draws the terrain in view nView: takes the camera's position and look direction, the flat
+// distance to the nearest ball, the followed player's distance to the pin and the smaller half
+// field of view's tangent, then builds the lists and draws them pass by pass.
+void fn_80030A40(void* pHoleData, int nView) {
+    int i;
+    CamLens* pLens;
+    f32 vToPin[4];
+    f32 vDiff[4];
+    f32 fDist;
+    f32 fTan;
+    f32 fWideTan;
+
+    lbl_801D3CB0.iCurrentViewContext = nView;
+    pLens = fn_8001F004();
+    lbl_801D3CB0.fFOVScale = 1.0f / fn_8001EFFC(pLens);
+    lbl_801D3CB0.xCameraReferencePos[0] = pLens->v34[0];
+    lbl_801D3CB0.xCameraReferencePos[1] = pLens->v34[1];
+    lbl_801D3CB0.xCameraReferencePos[2] = pLens->v34[2];
+    lbl_801D3CB0.xCameraReferencePos[3] = 1.0f;
+    lbl_801D3CB0.xCameraLookVector[0] = pLens->v24[0];
+    lbl_801D3CB0.xCameraLookVector[1] = pLens->v24[1];
+    lbl_801D3CB0.xCameraLookVector[2] = pLens->v24[2];
+    lbl_801D3CB0.xCameraLookVector[3] = 1.0f;
+    lbl_801D3CB0.fXZDistanceToClosestBallSquared = 1000000.0f;
+    for (i = 0; i < gNumPlayersSetUp; i++) {
+        fn_80035490(gPlayers[i].ball.vPos, lbl_801D3CB0.xCameraReferencePos, vDiff);
+        vDiff[1] = 0.0f;
+        fDist = fn_80009744(vDiff);
+        if (fDist < lbl_801D3CB0.fXZDistanceToClosestBallSquared) {
+            lbl_801D3CB0.fXZDistanceToClosestBallSquared = fDist;
+        }
+    }
+    fn_8003546C(gPlayers[fn_8001707C(lbl_801D3CB0.iCurrentViewContext)].vBall,
+                &fn_8000C594()->pin[Game_CurrentPinSet()].x, vToPin);
+    vToPin[1] = 0.0f;
+    lbl_801D3CB0.fGolferDistanceToCup = fn_80009680(fn_80009744(vToPin));
+    fTan = fn_80014280(0.5f * pLens->fFov);
+    fWideTan = fn_80014280(0.5f * (0.75f * pLens->fFov * fn_8001414C((u8*)fn_8003526C())));
+    lbl_801D3CB0.fCameraMinHalfFieldOfViewTan =
+        (fTan <= fWideTan / fn_80017028(nView)->f54) ? fTan : fWideTan / fn_80017028(nView)->f54;
+    fn_80012EF8();
+    if (!lbl_801D3CB0.bObjectTestMode) {
+        fn_80033F94(pHoleData, 0);
+    }
+    fn_80030CC8(pHoleData);
+    fn_8003185C();
+    fn_800318D8();
+    fn_80031AB4();
+    fn_80031E58();
+    fn_80032518(0);
+    fn_80032770();
+    if (!lbl_801D3CB0.bObjectTestMode) {
+        fn_80033F94(pHoleData, 2);
+    }
+    fn_80032518(1);
+    fn_80032518(2);
+    fn_80032954();
+    fn_80035118(4, 5);
+    fn_80012F50(1, 6, 0x80);
+    fn_80014118(0x70);
+    fn_80012EF8();
 }
 
 // Sorts pObjectSortList by distance, except when gSession.b11 is set.
