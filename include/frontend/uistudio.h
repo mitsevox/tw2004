@@ -282,7 +282,7 @@ u32 fn_8016604C(UIStudio* pStudio, UISNodeInfo* pNodeInfo, u32 uId);
 // Runs a screen's script from pFrame (a bytecode interpreter).
 s8 fn_80166098(UIStudio* pStudio, s32* p, UISFrame* pFrame, UISScreen* pScreen, UISNodeInfo* pInfo);
 void fn_801686F8(UIStudio* pStudio, u8 bOn, u16 uGroup, u16 uScreen);
-void fn_80168918(UIStudio* pStudio, u8 bOn, s16 nId, UISNodeInfo* pInfo, s32* p, u16 uScreen, u16 uGroup);
+void fn_80168918(UIStudio* pStudio, u8 bOn, s32 nId,UISNodeInfo* pInfo, s32* p, u16 uScreen, u16 uGroup);
 void fn_80168B80(UIStudio* pStudio, u32 uEvent);
 
 // UISApi.c
