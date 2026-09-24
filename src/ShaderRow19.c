@@ -1,6 +1,7 @@
 // ShaderRow19.c (our name): the four hooks of row 19 of the shader-object table lbl_80188E88
 // (engine.h's ModuleHooks, +0x34..+0x40): make and free the object's dynamic rendering buffer
-// (0x8007018C..0x80070764), fill it and draw it. The same code as row 0's hooks at 0x8006FF80.
+// (0x8007018C..0x80070764), fill it and draw it. The same code as row 0's hooks (ShaderRow0.c)
+// except that the fill adds its draws as primitive kind 3 (row 0: 0).
 // Which shader object row 19 is, is not known yet.
 
 #include "game_types.h"
@@ -9,7 +10,7 @@
 void fn_801247C0(DynRenderObject* pObj, const DynRenderSize* pSize);
 void fn_80124814(DynRenderObject* pObj);
 void fn_80124838(DynRenderObject* pObj);
-void fn_801248B8(DynRenderObject* pObj, const DynRenderFill* pFill, u8 bRestart);
+void fn_801248B8(DynRenderObject* pObj, DynRenderFill* pFill, u8 bRestart);
 
 // Make the object's buffer, at the given sizes or at 50 vertices and one draw.
 void fn_801247C0(DynRenderObject* pObj, const DynRenderSize* pSize) {
@@ -46,7 +47,7 @@ void fn_80124838(DynRenderObject* pObj) {
 // Add a frame's draws, indices and vertices to the object's buffer (bRestart: replace what is
 // there). Without a draw list, the indices form one draw; with one, the index count is the end of
 // the furthest draw.
-void fn_801248B8(DynRenderObject* pObj, const DynRenderFill* pFill, u8 bRestart) {
+void fn_801248B8(DynRenderObject* pObj, DynRenderFill* pFill, u8 bRestart) {
     u16 nIndices;
     u16 i;
 

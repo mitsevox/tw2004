@@ -10,7 +10,7 @@
 void fn_8006FF80(DynRenderObject* pObj, const DynRenderSize* pSize);
 void fn_8006FFD4(DynRenderObject* pObj);
 void fn_8006FFF8(DynRenderObject* pObj);
-void fn_80070078(DynRenderObject* pObj, const DynRenderFill* pFill, u8 bRestart);
+void fn_80070078(DynRenderObject* pObj, DynRenderFill* pFill, u8 bRestart);
 
 // Make the object's buffer, at the given sizes or at 50 vertices and one draw.
 void fn_8006FF80(DynRenderObject* pObj, const DynRenderSize* pSize) {
@@ -47,7 +47,7 @@ void fn_8006FFF8(DynRenderObject* pObj) {
 // Add a frame's draws, indices and vertices to the object's buffer (bRestart: replace what is
 // there). Without a draw list, the indices form one draw; with one, the index count is the end of
 // the furthest draw.
-void fn_80070078(DynRenderObject* pObj, const DynRenderFill* pFill, u8 bRestart) {
+void fn_80070078(DynRenderObject* pObj, DynRenderFill* pFill, u8 bRestart) {
     u16 nIndices;
     u16 i;
 
