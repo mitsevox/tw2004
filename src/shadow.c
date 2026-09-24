@@ -441,11 +441,11 @@ void fn_800B2FB0(Character* pChar, int nView, u8 bFlat) {
     f32           fV;
     int           nList;
     int           n;
-    int           nCount;
-    int           nVerts;
     int           i;
-    int           j;
+    int           nCount;
     TerPolyRef*   pRef;
+    int           j;
+    int           nVerts;
     int           nStrips;
     f32*          pVert;
 
