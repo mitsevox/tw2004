@@ -4,6 +4,9 @@
 
 #include "ustream.h"
 #include "camera.h"
+#include "game.h"
+#include "golfer.h"
+#include "character.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -36,8 +39,10 @@ void fn_800A295C();
 void fn_800A298C();
 void fn_80014594(void);
 void fn_800145E0(void);
-s32 fn_800918A4();
-s32 fn_8009198C(s32);
+void fn_800918A4(void);     // fe_movies.c: set up the loading screen
+void fn_8009198C(int nMode);    // fe_movies.c: update the loading screen
+void fn_80091818(void);     // fe_movies.c
+void fn_8001529C(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
 void fn_8001462C(void);
 void fn_8000B9E4();
 void fn_8000BA14();
@@ -97,20 +102,23 @@ void fn_8001494C(void);
 void fn_80014A60(void);
 void fn_80014DC0(void);
 void fn_80014DF8(void);
-void fn_80014E68(void);
-void fn_80014E6C(void);
+void fn_80014E68(void* pArg);
+void fn_80014E6C(void* pArg);
 void fn_80014E70(void* pArg);
 void fn_80014E74(void* pArg);
-void fn_80014E78(void);
-void fn_80014E7C(void);
-void fn_80014E80(void);
-void fn_80014E84(void);
+void fn_80014E78(void* pArg);
+void fn_80014E7C(void* pArg);
+void fn_80014E80(void* pArg);
+void fn_80014E84(void* pArg);
 void fn_80014E88(void* pArg);
 void fn_80014E8C(void* pArg);
 void fn_800153CC(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
 void fn_80015030(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
-void fn_80014E90(void);
-void fn_80014E94(void);
+void fn_80015334(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
+u32  Skalib_CurSlot(void);          // skalib.c
+int  Skalib_HasOverlays(int nSlot); // skalib.c
+void fn_80014E90(void* pArg);
+void fn_80014E94(void* pArg);
 void UStream_Close();
 s32 UStream_Open();
 void fn_800150B8(void);
@@ -127,8 +135,6 @@ void fn_8001526C(void);
 void fn_80015324(void);
 void fn_800153BC(void);
 void fn_80015454(void);
-extern u8* gpGame;
-s32 fn_80015464(void);
 void fn_80015620(void);
 void fn_80016124(s32 p0, s32 p1, s32 p2, s32 p3);
 void fn_800162A0(void);
@@ -316,29 +322,30 @@ void fn_80014DC0(void) {
 void fn_80014DF8(void) {
 }
 
-void fn_80014E68(void) {
+// Stream file callbacks that do nothing: fn_80014E68..fn_80014E7C are called when a list's file
+// is opened, fn_80014E80..fn_80014E94 when it is closed.
+void fn_80014E68(void* pArg) {
 }
 
-void fn_80014E6C(void) {
+void fn_80014E6C(void* pArg) {
 }
 
-// Stream file callbacks that do nothing (opened/closed of the Load%d and FEChars files).
 void fn_80014E70(void* pArg) {
 }
 
 void fn_80014E74(void* pArg) {
 }
 
-void fn_80014E78(void) {
+void fn_80014E78(void* pArg) {
 }
 
-void fn_80014E7C(void) {
+void fn_80014E7C(void* pArg) {
 }
 
-void fn_80014E80(void) {
+void fn_80014E80(void* pArg) {
 }
 
-void fn_80014E84(void) {
+void fn_80014E84(void* pArg) {
 }
 
 void fn_80014E88(void* pArg) {
@@ -347,10 +354,10 @@ void fn_80014E88(void* pArg) {
 void fn_80014E8C(void* pArg) {
 }
 
-void fn_80014E90(void) {
+void fn_80014E90(void* pArg) {
 }
 
-void fn_80014E94(void) {
+void fn_80014E94(void* pArg) {
 }
 
 void fn_800150B8(void) {
@@ -421,8 +428,8 @@ void fn_80015454(void) {
     lbl_80280DF8->aParams[3].nNumFiles = 0;
 }
 
-s32 fn_80015464(void) {
-    return *(s32*)(gpGame + 0x60);
+int fn_80015464(void) {
+    return gpGame->nCurHoleNum;
 }
 
 void fn_80015620(void) {
@@ -531,6 +538,129 @@ void fn_80014544(int nFile) {
 
     sprintf(szName, lbl_80186C14, nFile);
     fn_80015030(szName, fn_80014E70, fn_80014E88);
+}
+
+// Stream the current hole's file (data/<course>/<hole>/hole.hog, or the session's override) as
+// list 6, updating the loading screen until it is all read.
+void StreamManagerHole_StreamFiles(void) {
+    char szPath[0x80];  // size unknown: the frame allows up to 0x84 bytes
+    char* szCourse;
+    char* szHole;
+
+    fn_800918A4();
+    fn_80015324();
+    if (gSession.n5B34 != 0) {
+        fn_8001529C(gSession.p5B30, fn_80014E7C, fn_80014E94);
+    } else {
+        szCourse = fn_800E2680();
+        szHole = GameManager_GetHoleName(fn_80015464());
+        sprintf(szPath, lbl_80186C2C, szCourse);
+        strcat(szPath, szHole);
+        strcat(szPath, lbl_80186C38);
+        fn_8001529C(szPath, fn_80014E7C, fn_80014E94);
+    }
+    fn_8001526C();
+    do {
+        fn_8009198C(0);
+    } while (UStream_Update() != 0);
+    fn_8009198C(1);
+    fn_80015244();
+    fn_80091818();
+}
+
+// Set up the stream lists: empty them all, then put the front end's files in list 1 and the
+// load-once and startup files in lists 4 and 5.
+void fn_800143B8(void) {
+    int i;
+
+    lbl_80280DF8->aParams[0].nNumFiles = 0;
+    lbl_80280DF8->aParams[1].nNumFiles = 0;
+    lbl_80280DF8->aParams[2].nNumFiles = 0;
+    lbl_80280DF8->aParams[3].nNumFiles = 0;
+    lbl_80280DF8->aParams[4].nNumFiles = 0;
+    lbl_80280DF8->aParams[5].nNumFiles = 0;
+    lbl_80280DF8->aParams[6].nNumFiles = 0;
+    fn_80014FA8(lbl_80186BD8, fn_80014E6C, fn_80014E84);
+    fn_80014FA8(lbl_80186BEC, fn_80014E6C, fn_80014E84);
+    fn_80014F20(lbl_80186BF8, fn_80014E78, fn_80014E90);
+    fn_80014E98(lbl_80186BF8, fn_80014E78, fn_80014E90);
+    fn_80014E98(lbl_80186C08, fn_80014E78, fn_80014E90);
+    for (i = 0; i < 30; i++) {
+        lbl_801A48C8[i] = 0;
+    }
+    fn_80014DF8();
+    fn_80014A60();
+}
+
+// Refill stream list 0 with the global data and character files and every player's golfer's
+// character file.
+void fn_80014A64(void) {
+    char szName[0x80];  // size unknown: the frame allows up to 0x84 bytes
+    int nPlayer;
+    int i;
+
+    lbl_80281CE4 = 0;
+    fn_800153BC();
+    fn_80015334(lbl_80186C44, fn_80014E78, fn_80014E90);
+    fn_80015334(lbl_80186C50, fn_80014E68, fn_80014E80);
+    for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
+        sprintf(szName, lbl_80186C5C, fn_8001C558(nPlayer) + 1);
+        fn_80015334(szName, fn_80014E68, fn_80014E80);
+    }
+    for (i = 0; i < 30; i++) {
+        lbl_801A48C8[i] = 0;
+    }
+}
+
+// Refill stream list 0 with the swing-animation files: the male and/or female sac file for each
+// animation slot that has overlays, and every player's golfer's CharSac file.
+void fn_80014BB4(void) {
+    char szName[0x80];  // size unknown: the frame allows up to 0x88 bytes
+    int nPlayer;
+
+    fn_800153BC();
+    if (Skalib_HasOverlays(0) != 0) {
+        fn_80015334(lbl_80186C74, fn_80014E78, fn_80014E90);
+    }
+    if (Skalib_HasOverlays(1) != 0) {
+        fn_80015334(lbl_80186C80, fn_80014E78, fn_80014E90);
+    }
+    for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
+        sprintf(szName, lbl_80186C8C, fn_8001C558(nPlayer) + 1);
+        fn_80015334(szName, fn_80014E68, fn_80014E80);
+    }
+}
+
+// Refill stream list 0 with the current animation slot's sac file and the CharSac file of every
+// player whose golfer has an overlay loaded in that slot.
+void fn_80014C9C(void) {
+    char szName[0x80];  // size unknown: the frame allows up to 0x8C bytes
+    u32 nSlot;
+    LibSlot* pSlot;
+    int nPlayer;
+    int nModel;
+    int i;
+
+    fn_800153BC();
+    nSlot = Skalib_CurSlot();
+    if (nSlot == 0) {
+        fn_80015334(lbl_80186C74, fn_80014E78, fn_80014E90);
+    } else {
+        fn_80015334(lbl_80186C80, fn_80014E78, fn_80014E90);
+    }
+    pSlot = &lbl_801C6068[nSlot];
+    for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
+        nModel = fn_8001C558(nPlayer);
+        for (i = 0; i < pSlot->nOverlays; i++) {
+            if (pSlot->overlays[i].n14 == nModel) {
+                break;
+            }
+        }
+        if (i < pSlot->nOverlays) {
+            sprintf(szName, lbl_80186C8C, nModel + 1);
+            fn_80015334(szName, fn_80014E68, fn_80014E80);
+        }
+    }
 }
 
 // Make stream list 3 hold only the front-end character file for character nChar

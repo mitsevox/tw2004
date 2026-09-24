@@ -492,7 +492,8 @@ typedef struct Session {
     RecordEntry recB[3][3][5];  // 0x53C0  3 x 3 kinds, top 5 each
     RecordEntry recC[5][2][5];  // 0x5744  5 x 2 kinds, top 5 each
     u32  nSeed;                 // 0x5B2C
-    u8   unk5B30[4];
+    char* p5B30;                // 0x5B30  while n5B34 is set: the hole file StreamManagerHole_StreamFiles
+                                //         loads instead of data/<course>/<hole>/hole.hog
     s32  n5B34;                 // 0x5B34
     s8   nPinSet;               // 0x5B38  the pin position every hole uses (0..3; -1 = 0), copied to
                                 //         gpGame->nPinSet[] at the start of a round
