@@ -13,6 +13,7 @@ void fn_80037E50(void);
 void fn_80038A90(f32* pV, u8 b, int nView, int nField, f32 f14, f32 f18);
 void fn_80038724(int nField, int nView, f32 f8, f32 f4);
 void fn_800A6070(u8 nPlayer, u8 bLimit);      // GameAudio.c
+void fn_80016948(void);
 
 // Makes the screen copy (game types 4..8 only) and clears every effect.
 void PostFx_CopyScreenToBuffer(void) {
@@ -137,6 +138,28 @@ void fn_800383A8(void) {
     fn_8002A2FC();
 }
 
+// Draws pColour over the whole screen.
+void fn_80038624(f32* pColour) {
+    f32 aXY[8];
+    f32 aUV[8];
+
+    fn_8001425C(0);
+    fn_80016948();
+    fn_80012F34(0);
+    fn_80012F18(7);
+    fn_80014118(0x40);
+    fn_80035118(4, 5);
+    fn_80012F50(0, 6, 0x80);
+    fn_80012EF8();
+    fn_800141F8(aXY, aUV, 0.0f, 0.0f, 1.0f, 1.0f);
+    fn_80014194(pColour);
+    fn_8001644C(0xA1, aXY, NULL, NULL, 2);
+    fn_80012F34(1);
+    fn_80012F18(3);
+    fn_80012F50(1, 6, 0x80);
+    fn_80012EF8();
+}
+
 // ---- sweep code (not yet cleaned up) ----
 
 // Copies view nView's colour to pOut.
@@ -197,4 +220,32 @@ void fn_800392D0(void) {
 
 void fn_80039344(int nView, f32 f) {
     lbl_801D5010[nView] = f;
+}
+
+// Covers the screen in black at view nView's share (lbl_801D5010) of CamTuning.f208's alpha.
+void fn_80039358(int nView) {
+    f32 aColour[4];
+    f32 aXY[8];
+    f32 f = lbl_801D5010[nView];
+
+    if (f != 0.0f) {
+        aColour[0] = 0.0f;
+        aColour[1] = 0.0f;
+        aColour[2] = 0.0f;
+        aColour[3] = lbl_80281F78->f208 * f;
+        fn_8001425C(0);
+        fn_80014118(0x40);
+        fn_80035118(4, 5);
+        fn_80012F34(0);
+        fn_80012F18(7);
+        fn_80012F50(0, 6, 0x80);
+        fn_80014194(aColour);
+        fn_80012EF8();
+        fn_800141F8(aXY, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
+        fn_8001644C(0xA1, aXY, NULL, NULL, 2);
+        fn_80012F34(1);
+        fn_80012F18(3);
+        fn_80012F50(1, 6, 0x80);
+        fn_80012EF8();
+    }
 }
