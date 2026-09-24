@@ -4,6 +4,13 @@
 #include "game_types.h"
 #include "engine.h"
 #include "rain.h"
+#include "gx.h"
+#include "core/startup.h"
+
+void fn_80012520(u32 ePrim, u32 eFormat, u16 nVerts);  // LLFont.c: GXBegin
+void fn_800124A8(void);                                // LLFont.c: end the primitive
+void fn_800B58B4(s32 p0);
+void fn_800B58C0(f32 farg0, f32 farg1, f32 farg2);
 
 void fn_800B4B5C(void);
 void fn_800B4BB0(void);
@@ -39,6 +46,44 @@ void fn_800B4BD8(void) {
 }
 
 void fn_800B4BFC(void) {
+}
+
+// Build the display list of nDrops raindrops: each a line from a random point in a 35 x 25 x 35
+// box to 0.2 to 0.3 below it, coloured from palette entries 0 and 1.
+void fn_800B4C00(RainList* pList, int nDrops) {
+    u32 uSize;
+    void* pBuf;
+    f32 fX;
+    f32 fY;
+    f32 fZ;
+    int i;
+
+    uSize = ((nDrops * 32 + 31) & ~31) + 0x400;
+    pBuf = fn_80009B34(uSize, 1, 0x20, "GoShaderObject_Rain_Gc.c", 218);
+    DCInvalidateRange(pBuf, uSize);
+    GXBeginDisplayList(pBuf, uSize);
+    GXResetWriteGatherPipe();
+    GXClearVtxDesc();
+    GXSetVtxDesc(9, 1);         // position, direct
+    GXSetVtxDesc(11, 2);        // colour 0, an 8-bit index
+    GXInvalidateVtxCache();
+    fn_80012520(0xA8, 4, nDrops * 2);   // lines
+    for (i = 0; i < nDrops; i++) {
+        fX = 35.0f * Rand_Float(1) - 17.5f;
+        fY = 25.0f * Rand_Float(1) - 12.5f;
+        fZ = 35.0f * Rand_Float(1) - 17.5f;
+        fn_800B58C0(fX, fY, fZ);
+        fn_800B58B4(0);
+        fn_800B58C0(fX, (fY - 0.2f) - 0.1f * Rand_Float(1), fZ);
+        fn_800B58B4(1);
+    }
+    fn_800124A8();
+    uSize = GXEndDisplayList();
+    pList->pList = fn_80009B34(uSize, 2, 0x20, "GoShaderObject_Rain_Gc.c", 251);
+    Mem_cpy(pList->pList, pBuf, uSize);
+    DCFlushRange(pBuf, uSize);
+    fn_80009E70(pBuf);
+    pList->uSize = uSize;
 }
 
 // Set up a rain object: the drops' display list and its cleared buffers, and find the "splash"
@@ -77,8 +122,6 @@ void fn_800B4F24(RainObject* pRain) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_800B58B4(s32 p0);
-void fn_800B58C0(f32 farg0, f32 farg1, f32 farg2);
 void fn_800B58D4(f32 farg0, f32 farg1);
 void fn_800B58E4(s32 p0, s32 p1, s32 p2, s32 p3);
 
