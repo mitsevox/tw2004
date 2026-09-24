@@ -1009,7 +1009,8 @@ int fn_800D1530(int nPlayer) {
     fCos = fn_80009638(fAim);
     Vec3Copy(vNormal, vTurned);
     fn_80055D70(&vTurned[2], &vTurned[0], fSin, fCos);
-    if (vTurned[1] < 0.000001f && vTurned[1] > -0.000001f) {
+    fDegrees = 0.000001f;
+    if (vTurned[1] < fDegrees && vTurned[1] > -fDegrees) {
         if (vTurned[0] < 0.0f) {
             fDegrees = -90.0f;
         } else {
