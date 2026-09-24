@@ -213,6 +213,29 @@ They will be sorted into the sections below.
   are `int`** (GoARAM fn_800B65C0: u32 99.3, int param only 97.2, both int 100).
 - **[verified] The stack frame does not fix a local char buffer's size** (GoDynamicCam fn_8003C9D0 exact
   with 12..0x18 bytes): say in a comment that the size is unknown.
+- **[verified] Angles: write `x / 180.0f * PI`, not `DEG(x)`.** MWCC rounds some `DEG()` products one bit
+  off EA's constants (175, -17, -5 degrees); objdiff masks it, constcheck catches it (GoLighting
+  fn_8006EDC0).
+- **[verified] A local `int` copy of an `s32` parameter survives as its own register** (an s32 copy is
+  merged away). MC_Gc's CARD waits: `int nChan = nPort;`, 8 functions 73-99 -> 100. Mark it fake match.
+- **[verified] When every caller masks a result with `clrlwi`, declare the callee `u8`** even if its body
+  shows no mask (UStream_Update: callers FEgolferanim fn_8008B450 97.0 -> 100). The callee's own score
+  does not decide it; the callers do.
+- **[verified] A `const` source pointer lets CW hoist an unrolled copy loop's loads above its stores**;
+  drop the `const` when the original alternates load/store (DynamicRenderingBuffer fn_800705F0 83 -> 100).
+- **[verified] Test one flag bit as `(u & bit) >> n`, not `(u >> n) & 1`** (same `extrwi`, different
+  epilogue order; FE_MessageTable fn_8007C440 99.3 -> 100).
+- **[verified] A call made in every branch of an if-chain is one call after it**, with the arguments
+  picked per branch (Code8006F154 fn_8006F154 91.3 -> 98.75). `(f32)sqrt(...)` must be cast before
+  multiplying by a float constant, or the multiply is done in double.
+- **[verified] A call or global load on the right of a comparison is evaluated first**: write
+  `f(n) + 1 < rec`, not `rec > f(n) + 1`, when the original calls first (HoleScore fn_800CF904 78.7 ->
+  98.8).
+- **[verified] `do {} while (++i < 4)`** for a 4-step loop with no ctr and the test at the bottom (UKernel
+  fn_80049298 80.5 -> 100).
+- **[verified] A struct's size can be proved by a `Mem_cpy` of it** (CamScript 0x118).
+- **[verified] `li r3/r4` missing before a call is not a missing argument**: CW reuses a still-live
+  argument register (char fn_8001D4A4).
 - **Linking (tools):**
   - A unit's `.data` range ends at its own 8-byte alignment, not the next object's 32-byte alignment
     (GoARAM). The last object in `.sdata`/`.sbss` ends at the true section end, not rounded to 8 (CARD).
