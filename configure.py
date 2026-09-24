@@ -1006,7 +1006,7 @@ config.libs = [
             Object(NonMatching, "LLDynTex.c"),
             Object(NonMatching, "GameMode26.c"),
             Object(Matching, "CharSliders.c"),
-            Object(NonMatching, "FE_PGATourMessages.c"),
+            Object(Matching, "FE_PGATourMessages.c"),
             Object(Matching, "FE_LogoDesign.c"),
             Object(NonMatching, "LogoTexture.c"),
             Object(Matching, "DiscCheck.c"),
