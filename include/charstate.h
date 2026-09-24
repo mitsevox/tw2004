@@ -168,15 +168,22 @@ typedef struct SkinDesc {
 } SkinDesc;
 LAYOUT_ASSERT(SkinDesc, 0x120);
 
-// What Skin.pModel points at; only what SkinPart.c reads.
+// An entry of SkinModel.p44: its first word is an index SkinBurn.c renumbers (fn_80127140).
+typedef struct SkinModel44 {
+    s32  n0;                    // 0x0
+    u8   unk4[0x10 - 4];
+} SkinModel44;
+LAYOUT_ASSERT(SkinModel44, 0x10);
+
+// What Skin.pModel points at; only what SkinPart.c and SkinBurn.c read.
 typedef struct SkinModel {
     u8   unk0[0x14];
     s32  n14;                   // 0x14  how many matrices Skin.p108C holds (fn_80018710)
     u8   unk18[0x34 - 0x18];
     void* p34;                  // 0x34  handed to the character's model (fn_80029A74)
     u8   unk38[0x40 - 0x38];
-    s32  n40;                   // 0x40  bits in Skin.p10D0
-    u8   unk44[4];
+    s32  n40;                   // 0x40  bits in Skin.p10D0; also the entries in p44
+    SkinModel44* p44;           // 0x44
     SkinDesc* pDesc;            // 0x48
     u8   unk4C[4];
     s32  n50;                   // 0x50  bits in Skin.p10CC
@@ -222,6 +229,13 @@ typedef struct HwsOverrideTable {
     s32  nMeshes;               // 0x4
     void** apMesh;              // 0x8  nMeshes of them, right after this header
 } HwsOverrideTable;
+
+// What fn_801104AC (hwsBurn.c) makes when SkinBurn.c burns a skin (our name); only what SkinBurn.c
+// reads.
+typedef struct HwsBurn {
+    u8   unk0[0x30];
+    s32* p30;                   // 0x30  the new index of each old one, -1: dropped (fn_80127140)
+} HwsBurn;
 
 // Part of the renderer's state that fn_80112B34 sets up.
 typedef struct HwsRender10 {
@@ -425,6 +439,18 @@ void  fn_800CEB1C(Skin** apSkins, int nSkins, u8* p);
 void  fn_800CEBE8(Skin** apSkins, int nSkins, u8* p, u64* aIds, int nIds);
 void  fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, u8* p);
 u8    fn_800CEE90(void);
+
+// SkinPart.c, as SkinBurn.c uses it: the mesh iterator and an entry's copy.
+s32   fn_800CE224(Skin* pSkin, SkinDesc14* pEntry, u8** ppOut, s32* pnOut, int nCopy);
+u8    fn_800CEEC0(SkinIter* pIter);
+void  fn_800CEEC8(SkinIter* pIter);
+SkinMesh* fn_800CEEF4(SkinIter* pIter);
+SkinIter* fn_80113B34(u8* pBuf, SkinIterArgs* pArgs);
+void  fn_80113BAC(SkinIter* pIter);
+
+// SkinBurn.c: burns a skin (aParts and aList each end with -1).
+void  fn_80127B98(Skin* pSkin, s32* aParts, s32* aList);
+extern s32* lbl_802825A8;               // the new number of each mesh bit (fn_801271E0)
 
 // Bit n of a bit array of 32-bit words: test, set, clear.
 void  fn_8001E938(u32* aBits, u32 nBits);  // clears a bit array

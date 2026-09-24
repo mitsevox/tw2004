@@ -3,6 +3,10 @@
 #include "game_types.h"
 #include "platform.h"
 #include "engine.h"
+#include "charstate.h"
+
+void fn_801272B4(Skin* pSkin);
+void fn_801276E4(Skin* pSkin);
 
 char lbl_802819A8[8] = "";      // the folder the signature file is looked for in
 
@@ -20,6 +24,69 @@ void fn_801270F0(void) {
         *(volatile s32*)0 = 0;
     }
     fn_8000633C(hFile);
+}
+
+// Renumbers the model's p44 entries with pBurn's table and packs the kept ones to the front,
+// dropping those whose new number is -1.
+void fn_80127140(Skin* pSkin, HwsBurn* pBurn) {
+    SkinModel44* pEntries;
+    SkinModel44* pSrc;
+    SkinModel44* pDst;
+    s32 i;
+    s32 nCount;
+    s32 nKept;
+    s32 nNew;
+
+    nKept = 0;
+    i = 0;
+    pEntries = pSkin->pModel->p44;
+    nCount = pSkin->pModel->n40;
+    pSrc = pEntries;
+    pDst = pEntries;
+    for (; i < nCount; i++) {
+        nNew = pBurn->p30[pSrc->n0];
+        if (nNew != -1) {
+            if (pSrc != pDst) {
+                memcpy(pDst, pSrc, sizeof(SkinModel44));
+            }
+            pDst->n0 = nNew;
+            pDst++;
+            nKept++;
+        }
+        pSrc++;
+    }
+    pSkin->pModel->n40 = nKept;
+}
+
+// Renumbers a mesh's bits with lbl_802825A8 (pSkin is unused).
+void fn_801271E0(Skin* pSkin, SkinMesh* pMesh) {
+    SkinMeshBit* pBit = pMesh->pBits;
+    s32 i;
+
+    for (i = 0; i < pMesh->n8; i++) {
+        pBit->nBit = lbl_802825A8[pBit->nBit];
+        pBit++;
+    }
+}
+
+// Renumbers the bits of the meshes of the skin's p5C entry n that have flags 1 and 0x10.
+void fn_80127218(Skin* pSkin, s32 n) {
+    SkinIterArgs args;
+    u8 aBuf[0x48];      // the iterator's buffer; its size is not known
+    SkinIter* pIter;
+    SkinMesh* pMesh;
+
+    args.pDesc = pSkin->pModel->pDesc;
+    args.n = n;
+    pIter = fn_80113B34(aBuf, &args);
+    while (fn_800CEEC0(pIter)) {
+        pMesh = fn_800CEEF4(pIter);
+        if ((pMesh->uFlags & 1) && (pMesh->uFlags & 0x10)) {
+            fn_801271E0(pSkin, pMesh);
+        }
+        fn_800CEEC8(pIter);
+    }
+    fn_80113BAC(pIter);
 }
 
 // The bytes nCount items of nSize take, rounded up to nAlign (a power of two); 0 when there is no
@@ -59,17 +126,15 @@ void* fn_801276A8(u8* pBase, s32* pOffset, s32 nSize, s32 nAlign) {
     return p;
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
-void fn_80127140();
-void fn_801272B4();
-void fn_801276E4();
-void fn_80127B10(s32 p0);
-
-void fn_80127B10(s32 p0) {
-    fn_80127140();
-    fn_801272B4(p0);
-    fn_801276E4(p0);
+void fn_80127B10(Skin* pSkin, HwsBurn* pBurn) {
+    fn_80127140(pSkin, pBurn);
+    fn_801272B4(pSkin);
+    fn_801276E4(pSkin);
 }
 
-// ---- end of sweep code ----
+// The callback fn_80127B98 hands hwsBurn.c: copies an entry and clears its bit 1 and n16.
+void fn_80127B4C(Skin* pSkin, SkinDesc14* pEntry) {
+    fn_800CE224(pSkin, pEntry, NULL, NULL, 0);
+    pEntry->u08 &= ~2;
+    pEntry->n16 = 0;
+}
