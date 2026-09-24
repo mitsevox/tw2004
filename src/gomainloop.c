@@ -351,6 +351,14 @@ void fn_8006E0BC(void);
 u8   fn_8006E0C0(void);
 void fn_8006E0F8(void);
 
+s32 lbl_801888D0[4] = {0, 1, 2, 3};     // the order the views are drawn in
+
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x802838C0), before the constants fn_8006C968 uses first; its body is unknown.
+static f32 gomainloop_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
+
 f32 fn_8006C630(void) {
     return lbl_802811F0->f18;
 }
