@@ -23,6 +23,11 @@ typedef struct GXFifoObj {
     u8 unk0[0x80];
 } GXFifoObj;                    // the command FIFO (0x80 bytes)
 
+// ---- the matrix library (MTX), for the matrices GX takes -------------------------------------
+
+void PSMTXIdentity(f32 (*pMtx)[4]);
+void C_MTXOrtho(f32 (*pMtx)[4], f32 fTop, f32 fBottom, f32 fLeft, f32 fRight, f32 fNear, f32 fFar);
+
 // ---- the command FIFO -------------------------------------------------------------------------
 
 void GXGetFifoStatus(GXFifoObj* pFifo, u8* pbOverHigh, u8* pbUnderLow, u32* puCount, u8* pbCpuWrite,
@@ -30,6 +35,9 @@ void GXGetFifoStatus(GXFifoObj* pFifo, u8* pbOverHigh, u8* pbUnderLow, u32* puCo
 
 // ---- the viewport and projection ----------------------------------------------------------------
 
+void GXSetCullMode(int eMode);
+void GXSetProjection(f32 (*pMtx)[4], int eType);
+void GXSetCurrentMtx(u32 nId);
 void GXSetViewport(f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight, f32 fNear, f32 fFar);
 void GXGetViewportv(f32* pViewport);    // 6 values: GXSetViewport's arguments
 void GXSetProjectionv(f32* pProj);      // 7 values: the type, then the matrix's terms

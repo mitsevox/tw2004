@@ -12,7 +12,6 @@ void fn_80012444(f32* pViewport);
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_80011164(LLFont* pFont);
-void fn_800112DC(void);
 
 // UFont.c passes its state; this build does nothing with it.
 void fn_80011160(UFontState* pState) {
@@ -30,6 +29,32 @@ void fn_800111A4(LLFont* pFont) {
     fn_80009E70(pFont);
 }
 
+// Sets GX up to draw text in 2D: position, colour and texture coordinates per vertex, no culling
+// or depth test, and a 0..1 orthographic projection. The viewport and projection are saved for
+// fn_800112DC.
+void fn_800111D8(void) {
+    f32 mProj[4][4];
+    f32 mView[3][4];
+
+    GXClearVtxDesc();
+    GXSetVtxDesc(9, 1);
+    GXSetVtxAttrFmt(7, 9, 0, 4, 0);
+    GXSetVtxDesc(11, 1);
+    GXSetVtxAttrFmt(7, 11, 1, 5, 0);
+    GXSetVtxDesc(13, 1);
+    GXSetVtxAttrFmt(7, 13, 1, 4, 0);
+    GXGetViewportv(lbl_801A3494);
+    GXGetProjectionv(lbl_801A3478);
+    GXSetCullMode(0);
+    GXSetZMode(0, 7, 1);
+    PSMTXIdentity(mView);
+    C_MTXOrtho(mProj, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f);
+    GXSetProjection(mProj, 1);
+    GXLoadPosMtxImm(mView, 0);
+    GXSetCurrentMtx(0);
+}
+
+// Puts back the viewport and projection fn_800111D8 saved.
 void fn_800112DC(void) {
     fn_80012444(lbl_801A3494);
     GXSetProjectionv(lbl_801A3478);

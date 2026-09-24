@@ -724,6 +724,8 @@ LLFont* FO_spLoadFontFromStream(void* pData, UFontState* pState);
 void fn_80011034(UFontState* pState);
 void fn_80011160(UFontState* pState);
 void fn_800111A4(LLFont* pFont);        // free a font
+void fn_800111D8(void);                 // set GX up for text (saves the viewport and projection)
+void fn_800112DC(void);                 // put the saved viewport and projection back
 void fn_80011310(LLFont* pFont, UFontState* pState);
 void fn_8001144C(LLFont* pFont, UFontContext* pCtx, char* sz);
 void fn_80011C8C(LLFont* pFont);
