@@ -2332,13 +2332,13 @@ u8 fn_800D9998(int nPlayer, int nAward) {
     if (fn_800E177C() != 0) return 0;
     pProfile = &gpSaveData[nPlayer];
     if (!pProfile->bActive) return 0;
+    bSeasonEnd = 0;
     if ((pProfile->tour.nEvent == -1 || GameModeDriverPGATour_GetNextEvent() == -1) &&
         pProfile->tour.nRound + 1 == GameModeDriverPGATour_GetRounds(pProfile->tour.nEvent)) {
         bSeasonEnd = 1;
-    } else {
-        bSeasonEnd = 0;
     }
-    bFullSeason = pProfile->tour.aStats[PGA_USER_GOLFER].nEvents >= 15;
+    // fake match: the (int) changes nothing in C, but gives EA's signed compare (srawi; subfc; adde)
+    bFullSeason = (int)pProfile->tour.aStats[PGA_USER_GOLFER].nEvents >= 15;
 
     switch (nAward) {
     case 23:

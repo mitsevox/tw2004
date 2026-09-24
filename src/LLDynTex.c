@@ -301,12 +301,12 @@ void fn_8010ADA4(DynTex* pTex) {
     DynTex18* pOut14 = pHdr->p14;
     DynTexEntry* pEntry;
     DynTexEntry* pOutEntry = pTex->p0;
-    s32 nKept;
-    u32 nDst;
-    u32 nSrc;
+    int i;
     u8 bMoved;
     s32 nObjs;
-    int i;
+    u32 nDst;
+    u32 nSrc;
+    s32 nKept;
     int j;
 
     nSrc = 0;
