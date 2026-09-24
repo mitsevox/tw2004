@@ -49,6 +49,8 @@ u8   fn_80043920(CamScript* pScript, int nPlayer);
 void fn_80044768(f32* pPos, f32* pOut);
 f32  fn_8003F790(CamScript* pScript);   // the blend's share (0..1) so far
 f32  fn_80044F58(int nPlayer, CamScript* pScript);
+CamLens* fn_8001F004(void);             // the current camera's lens
+f32  fn_8001EFFC(u8* pLens);            // the lens's fB0 (char.c: its parameter is u8*)
 void fn_80040CF0(CamScript* pScript, f32* pSub, int nPlayer, f32* pPrev, f32 fTime);
 void fn_800090E4(f32* pTurn, f32* pVec, f32* pOut);     // the vector turned by it
 u8   fn_800DC464(int nPlayer);          // GameEffects.c: the ball is simulated from its position
@@ -387,6 +389,17 @@ void fn_8003F518(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
         }
     }
     pScript->fA8 = fT * (pNext->f9C - pShot->f9C) + pShot->f9C;
+}
+
+// The blend's share so far: fCamTime over the length f8C, eased (half a cosine wave) when bCE is
+// set or past the middle.
+f32 fn_8003F790(CamScript* pScript) {
+    f32 fT = pScript->fCamTime / pScript->f8C;
+
+    if (pScript->bCE || fT > 0.5f) {
+        fT = 1.0f - (0.5f * fn_80009638(PI * fT) + 0.5f);
+    }
+    return fT;
 }
 
 // Blend kind 13: as kind 0, but the share is how far the ball's flight has run (fn_80044EA8) over
@@ -1239,6 +1252,21 @@ void CameraScript_InterpToNewScript(CamScript* pScript, CamShot* pShot, int nPla
     pScript->fF8 = 0.0f;
 }
 
+// pPos's height, brought down by CamTuning.fD0 times how far it is above the shot's f6C over the
+// script's ground height fD8 (times the lens's fB0).
+f32 fn_80043420(int nPlayer, CamScript* pScript, f32* pPos, f32* pCam, CamShot* pShot) {
+    f32 fY = pPos[1];
+    f32 fAbove = pPos[1] - pScript->fD8;
+    f32 fDrop;
+
+    if (fAbove > pShot->f6C) {
+        fDrop = lbl_80281F78->fD0 * (fAbove - pShot->f6C);
+        fDrop *= fn_8001EFFC((u8*)fn_8001F004());
+        fY -= fDrop;
+    }
+    return fY;
+}
+
 // The script's shot, or else its next one (unless the next kind is 5), has bAC 0 or 13 while the
 // ball makes no update this frame.
 u8 fn_80043920(CamScript* pScript, int nPlayer) {
@@ -1493,6 +1521,24 @@ u8 fn_80044E74(CamShot* pShot) {
         return 1;
     }
     return 0;
+}
+
+// How far the ball's flight has run: 1 less its distance to the landing estimate (v50) over the
+// shot's start's; 1 when the start is on it.
+f32 fn_80044EA8(int nPlayer, CamScript* pScript) {
+    f32 vStart[4];
+    f32 vBall[4];
+    f32 fStart;
+    f32 fBall;
+
+    fn_80045428(pScript->v50, gPlayers[nPlayer].ball.vStart, vStart);
+    fn_80045428(pScript->v50, gPlayers[nPlayer].ball.vPos, vBall);
+    fStart = fn_80009680(fn_80009744(vStart));
+    fBall = fn_80009680(fn_80009744(vBall));
+    if (fStart > 0.0f) {
+        return 1.0f - fBall / fStart;
+    }
+    return 1.0f;
 }
 
 // How much of the way from the shot's start to the pin the ball has covered, over the ground

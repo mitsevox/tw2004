@@ -266,7 +266,8 @@ typedef struct CamTuning {
     f32  fC4;                   // 0x0C4
     f32  fC8;                   // 0x0C8
     f32  fCC;                   // 0x0CC
-    u8   unkD0[0xD8 - 0xD0];
+    f32  fD0;                   // 0x0D0  fn_80043420: how fast the aim comes down to a shot's f6C height
+    u8   unkD4[0xD8 - 0xD4];
     f32  fD8;                   // 0x0D8  CamScript_GetLookAtPoint: CameraScript_LagAimMarker's first lag
     f32  fDC;                   // 0x0DC  the green zoom-to-aim camera's aim marker (CameraScript_LagAimMarker)
     u8   unkE0[0xE4 - 0xE0];
