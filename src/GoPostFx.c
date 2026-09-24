@@ -10,8 +10,11 @@
 #include "terrain.h"
 
 void fn_80037E50(void);
-void fn_80038A90(f32* pV, u8 b, int nView, int nField, f32 f14, f32 f18);
+void fn_80038A90(f32* pColour, u8 bCopy, int nView, int nField, f32 fCX, f32 fCY);
 void fn_80038724(int nField, int nView, f32 fAlpha, f32 fShake);
+void fn_80038E7C(f32* pXY, f32* pColour, f32* pUV, int n, f32* pSrc, f32 fCX, f32 fCY, f32 fX0,
+                 f32 fY0, f32 fX1, f32 fY1, f32 fMaxDist);
+void fn_800390CC(int nField, RenderCamera* pCamera);
 void fn_800A6070(u8 nPlayer, u8 bLimit);      // GameAudio.c
 void fn_80016948(void);
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
@@ -97,12 +100,12 @@ void fn_80038054(u8 b, int nView, f32 f4, f32 f8) {
     }
 }
 
-void fn_800380A8(u8 b, f32* pV, u8 b1, int nView, f32 f14, f32 f18) {
+void fn_800380A8(u8 b, f32* pColour, u8 bCopy, int nView, f32 fX, f32 fY) {
     lbl_801D5020[nView].b0 = b;
-    Vec_Copy(pV, lbl_801D5020[nView].v4);
-    lbl_801D5020[nView].b1 = b1;
-    lbl_801D5020[nView].f14 = f14;
-    lbl_801D5020[nView].f18 = f18;
+    Vec_Copy(pColour, lbl_801D5020[nView].aColour);
+    lbl_801D5020[nView].b1 = bCopy;
+    lbl_801D5020[nView].fX = fX;
+    lbl_801D5020[nView].fY = fY;
 }
 
 // Draws a thin vertical strip down the middle of the screen (x 0.495 to 0.505), clear at its edges
@@ -210,8 +213,8 @@ void fn_80038314(void) {
 
     for (i = 0; i < 4; i++) {
         if (lbl_801D5020[i].b0 && fn_800170A0(i)) {
-            fn_80038A90(lbl_801D5020[i].v4, lbl_801D5020[i].b1, i, lbl_80281B88 & 1,
-                        lbl_801D5020[i].f14, lbl_801D5020[i].f18);
+            fn_80038A90(lbl_801D5020[i].aColour, lbl_801D5020[i].b1, i, lbl_80281B88 & 1,
+                        lbl_801D5020[i].fX, lbl_801D5020[i].fY);
             lbl_801D5020[i].b0 = 0;
         }
     }
@@ -413,6 +416,102 @@ void fn_800392D0(void) {
 }
 
 // ---- end of sweep code ----
+
+// Draws pColour over view nView as a fan from (fCX, fCY) (fractions of the view) to its edges, the
+// alpha growing with the distance from the centre to pColour's alpha at the farthest corner.
+// With bCopy, the effect's screen copy is drawn first.
+void fn_80038A90(f32* pColour, u8 bCopy, int nView, int nField, f32 fCX, f32 fCY) {
+    f32 aXY[18][4];
+    f32 aUV[18][4];
+    f32 aColour[18][4];
+    RenderCamera* pCamera;
+    f32* pRect;
+    f32 fX0;
+    f32 fX1;
+    f32 fY0;
+    f32 fY1;
+    f32 fMaxDist;
+    f32 fDXSq;
+    f32 fDYSq;
+    f32 fAlpha;
+
+    pCamera = fn_80017004(nView);
+    pRect = pCamera->pRect;
+    if (bCopy) {
+        fn_800390CC(nField, pCamera);
+    }
+    fX0 = pRect[0];
+    fY0 = pRect[1];
+    fX1 = fX0 + pRect[2];
+    fY1 = fY0 + pRect[3];
+    fCX = fCX * pRect[2] + pRect[0];
+    fCY = fCY * pRect[3] + pRect[1];
+    fn_80012F34(0);
+    if (bCopy) {
+        fn_80014118(0x50);
+    } else {
+        fn_80014118(0x40);
+    }
+    fn_80035118(4, 5);
+    fn_80012F50(0, 1, 0x80);
+    fn_80012F18(7);
+    fn_8002A608(&lbl_801D4F80);
+    fn_8001425C(0);
+    fn_80012EF8();
+
+    // The distance to the farthest corner of the screen.
+    if (fCX < 0.5f) {
+        if (fCY < 0.5f) {
+            fMaxDist = fn_80009680((1.0f - fCY) * (1.0f - fCY) + (1.0f - fCX) * (1.0f - fCX));
+        } else {
+            fMaxDist = fn_80009680(fCY * fCY + (1.0f - fCX) * (1.0f - fCX));
+        }
+    } else if (fCY < 0.5f) {
+        fMaxDist = fn_80009680(fCX * fCX + (1.0f - fCY) * (1.0f - fCY));
+    } else {
+        fMaxDist = fn_80009680(fCY * fCY + fCX * fCX);
+    }
+
+    aXY[0][0] = fCX;
+    aXY[0][1] = fCY;
+    aXY[0][2] = 1.0f;
+    aXY[0][3] = 1.0f;
+    aUV[0][0] = fCX;
+    aUV[0][1] = 224.0f * fCY * (1.0f / 128.0f);
+    aUV[0][2] = 1.0f;
+    aUV[0][3] = 1.0f;
+    aColour[0][0] = pColour[0];
+    aColour[0][1] = pColour[1];
+    aColour[0][2] = pColour[2];
+    aColour[0][3] = 0.0f;
+    fn_80038E7C(aXY[1], aColour[1], aUV[1], 4, pColour, fCX, fCY, fX0, fY0, fX1, fY0, fMaxDist);
+    fn_80038E7C(aXY[5], aColour[5], aUV[5], 4, pColour, fCX, fCY, fX1, fY0, fX1, fY1, fMaxDist);
+    fn_80038E7C(aXY[9], aColour[9], aUV[9], 4, pColour, fCX, fCY, fX1, fY1, fX0, fY1, fMaxDist);
+    fn_80038E7C(aXY[13], aColour[13], aUV[13], 4, pColour, fCX, fCY, fX0, fY1, fX0, fY0, fMaxDist);
+
+    // The fan closes at the first corner.
+    fDXSq = (fX0 - fCX) * (fX0 - fCX);
+    fDYSq = (fY0 - fCY) * (fY0 - fCY);
+    aXY[17][0] = fX0;
+    aXY[17][1] = fY0;
+    aXY[17][2] = 1.0f;
+    aXY[17][3] = 1.0f;
+    aUV[17][0] = fX0;
+    aUV[17][1] = 224.0f * fY0 * (1.0f / 128.0f);
+    aUV[17][2] = 1.0f;
+    aUV[17][3] = 1.0f;
+    fAlpha = pColour[3] * ((f32)fn_80009680(fDXSq + fDYSq) / fMaxDist);
+    fAlpha = (fAlpha < 0.0f) ? 0.0f : ((fAlpha > pColour[3]) ? pColour[3] : fAlpha);
+    aColour[17][0] = pColour[0];
+    aColour[17][1] = pColour[1];
+    aColour[17][2] = pColour[2];
+    aColour[17][3] = fAlpha;
+    fn_8001644C(0xA0, aXY[0], aColour[0], aUV[0], 18);
+    fn_80012F34(1);
+    fn_80012F50(1, 6, 0x80);
+    fn_80012F18(3);
+    fn_80012EF8();
+}
 
 // Fills n vertices of a fan edge running from (fX0, fY0) towards (fX1, fY1): each gets pSrc's
 // colour, with its alpha scaled by the vertex's distance from (fCX, fCY) over fMaxDist (at most

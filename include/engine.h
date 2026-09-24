@@ -738,15 +738,15 @@ typedef struct PostFx5090 {
 } PostFx5090;
 LAYOUT_ASSERT(PostFx5090, 0xC);
 
-// Set by fn_800380A8, drawn by fn_80038A90.
+// A colour fading in from a centre point towards the view's edges (fn_800380A8 sets it,
+// fn_80038A90 draws it).
 typedef struct PostFx5020 {
     u8   b0;                    // 0x00  set: draw it this frame
-    u8   b1;                    // 0x01
+    u8   b1;                    // 0x01  set: draw the effect's screen copy under it first
     u8   unk2[2];
-    f32  v4[3];                 // 0x04
-    u8   unk10[4];
-    f32  f14;                   // 0x14
-    f32  f18;                   // 0x18
+    f32  aColour[4];            // 0x04  fn_800380A8 sets the first three; [3] scales the alpha
+    f32  fX;                    // 0x14  } the centre, as fractions of the view's width and height
+    f32  fY;                    // 0x18  }
 } PostFx5020;
 LAYOUT_ASSERT(PostFx5020, 0x1C);
 
