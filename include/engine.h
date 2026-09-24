@@ -78,6 +78,7 @@ void fn_800953C8(int nWatch);           // start
 u8   fn_80095430(int nWatch);           // running?
 u64  fn_80095444(int nWatch);           // stop; returns the reading
 u64  fn_800954A4(int nWatch);           // the reading
+f32  fn_8006E118(u64 uNow, u64 uLast);  // seconds between two readings (gomainloop.c)
 void fn_80095504(int nWatch);           // reset to 0
 // Pack up to 12 characters of pName into a 64-bit code (base 40, table lbl_80191520).
 int   fn_800CB700(u64* pId, const char* pName);
@@ -520,7 +521,8 @@ void fn_80015624(void);                 // hand GX the groups of lbl_801B8980 th
 // the pointer lbl_80280E00). fn_80015470 frees them all; fn_800154F4 moves nNext past the used ones.
 typedef struct BufferPoolBlock {
     u8   unk0[0x1000];
-    u32  u1000;                 // 0x1000  nonzero: in use
+    u32  u1000;                 // 0x1000  nonzero: in use (UObject3D.c: the size of the display
+                                //         list recorded in unk0)
 } BufferPoolBlock;
 LAYOUT_ASSERT(BufferPoolBlock, 0x1004);
 
@@ -534,6 +536,7 @@ typedef struct BufferPool {
 LAYOUT_ASSERT(BufferPool, 0x14080);
 
 extern BufferPool* lbl_80280E00;
+BufferPoolBlock* fn_800154F4(void);     // the first block not in use (UObject3D.c fills it)
 
 // The view being drawn to (our name; lbl_801B8A98, 0x110 bytes, reached through the pointer
 // lbl_80280E08; the renderer state lbl_801B8980 sits just before it). Only what the code reads.

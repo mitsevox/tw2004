@@ -1573,7 +1573,7 @@ void Swing_RumbleOff(int nPlayer) {
         p           = &gPlayers[nPlayer];
         pFrames     = &p->swing.nVibrateCount;
         pController = &p->nController;
-        fn_800130F8(p->nController, 0);
+        fn_800130F8(*pController, 0);
         fn_80013130(*pController, 0);
         gPlayers[nPlayer].swing.bVibrating = 0;
         *pFrames = 0;

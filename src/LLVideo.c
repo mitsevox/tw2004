@@ -140,8 +140,6 @@ void fn_800A7994(void);
 void fn_800A79B4(void);
 void fn_800A79D4(void);
 void fn_800A79F4(void);
-// GameManager.c
-f32  fn_8006E118(u64 tEnd, u64 tStart);    // seconds between two time stamps
 // the renderer
 void fn_80008380(void);
 void fn_800083A0(void);
