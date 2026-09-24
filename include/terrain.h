@@ -36,8 +36,9 @@ LAYOUT_ASSERT(Ter_PatchReference, 0x34);
 // An object to sort by distance (0x30 bytes; TW06: Ter_ObjectReference, 0x24, the same up to 0x14).
 // From 0x1C on the fields carry TW06's names by their use (fn_80031AB4); TW06 keeps them elsewhere.
 typedef struct Ter_ObjectReference {
-    struct UObjMesh* apObject[4];   // 0x00  its model at each level of detail (fn_80031E58). TW06:
+    struct UObjMesh* apObject[3];   // 0x00  its model at each level of detail (fn_80031E58). TW06:
                                 //       pObject
+    struct Ter_PatchReference* pContainerPatch; // 0x0C  the patch it is in (fn_80031154). TW06: the same
     f32  fDistanceSquared;      // 0x10  the sort key (fn_8003185C, smallest first). TW06: the same
     f32  f14;                   // 0x14  } fn_80031E58 draws it opaque when f14 is beyond
     f32  f18;                   // 0x18  }   fXZDistanceToClosestBallSquared and f18 is above 0
