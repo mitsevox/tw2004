@@ -330,7 +330,8 @@ void fn_801180C4(int nPlayer, u8 bUser, u8 bFirst) {
 
     nNext = GameModeDriverPGATour_GetNextEvent();
     if (nNext == -1) {
-        if (gpSaveData[nPlayer].tour.nSeason == 0 && gpSaveData[nPlayer].tour.aStats[PGA_USER_GOLFER].nSeasonWins > 1
+        if (gpSaveData[nPlayer].tour.nSeason == 0
+            && gpSaveData[nPlayer].tour.aStats[PGA_USER_GOLFER].nSeasonWins > 1
             && fn_800D7770(nPlayer, &gpSaveData[nPlayer].a1C0[12])) {
             fn_8011C054(12, 2);
         }
