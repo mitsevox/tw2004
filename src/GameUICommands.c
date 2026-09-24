@@ -290,7 +290,6 @@ void  fn_800E4238(int i);
 void  fn_800E42F4(int i);
 void  fn_800E508C(void);
 void  fn_800E50FC(void);
-void  fn_800E5240(int n);
 void  fn_800E53A4(u8 b);
 void  fn_800E53AC(void);
 void  fn_800E53C0(void);

@@ -1474,7 +1474,6 @@ done:
 // lbl_80281CE4 is set).
 void AnimLib_FreeWorkCopies(void) {
     LibSlot*    pSlot;
-    int         j;
     int         k;
     u32         i;
     LibOverlay* pOv;
@@ -1485,8 +1484,8 @@ void AnimLib_FreeWorkCopies(void) {
         if (pSlot->nOverlays != 0) {
             for (k = 0; pSlot->nOverlays > k; k++) {
             }
-            for (j = 0; j < pSlot->nOverlays; j++) {
-                pOv = &pSlot->overlays[j];
+            for (k = 0; k < pSlot->nOverlays; k++) {
+                pOv = &pSlot->overlays[k];
                 AnimLib_Free(pOv->pWork);
                 pOv->pWork = NULL;
                 pOv->n10   = -1;

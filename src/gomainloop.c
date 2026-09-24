@@ -179,7 +179,6 @@ u8   fn_8008EB10(void);
 u8   fn_8008F39C(void);
 void fn_8008F648(int n);
 void fn_8008FD60(int n);
-void fn_8009005C(char* pName);
 void fn_800905A8(void);
 void fn_80090628(void);
 void fn_80090664(void);

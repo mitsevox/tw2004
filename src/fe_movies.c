@@ -292,7 +292,7 @@ void fn_80090D28(FEQuad* pQuad) {
     f32 fDist;
     f32 fZ;
     f32 fProj;
-    UIColorEntry* pEntry;
+    UIFileEntry* pEntry;
     LLPict* pPict;
     UITransform* pMtx;
     UITransform* pColour;
