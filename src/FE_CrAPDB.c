@@ -11,8 +11,7 @@
 #include "frontend/fe.h"
 #include "game/frontend.h"
 
-s32  fn_800CCA40(Skin* pSkin);          // SkinPart.c: how many choices aParts[3] holds
-s32  fn_800CCEA0(Skin* pSkin);          // SkinPart.c: and aSets[3]
+s32  fn_800CCEA0(Skin* pSkin);          // SkinPart.c: how many choices aSets[3] holds
 
 // This file, in address order.
 void fn_80103920(void);

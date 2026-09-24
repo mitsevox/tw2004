@@ -9,8 +9,6 @@
 #include "charstate.h"
 #include "golfer.h"
 
-void fn_8011CADC(Skin* pSkin, int nMorph, f32 fWeight);    // SkinMorph.c
-
 // Free slider definitions made by CharSlider_CreateDefinitionsFromMem.
 void fn_8010D454(CharSliderDefs* pDefs) {
     int i;

@@ -283,3 +283,58 @@ void fn_80127B4C(Skin* pSkin, SkinDesc14* pEntry) {
     pEntry->u08 &= ~2;
     pEntry->n16 = 0;
 }
+
+// Burns the skin's description down to what it shows now. Each part keeps its current option,
+// and its current variant unless aParts lists it (then every variant is kept). Morph targets in
+// aList are kept, the others are blended in for good at weight 0. The burnt description replaces
+// the model's (the old one is freed) and the skin's first mesh table. aParts and aList end with -1.
+void fn_80127B98(Skin* pSkin, s32* aParts, s32* aList) {
+    HwsBurn* pBurn;
+    s32 nCount;
+    s32 i;
+    s32 j;
+    SkinDesc* pOld;
+    SkinDesc* pDesc;
+    HwsMemBlock* pBlock;
+    HwsOverrideTable* pTable;
+
+    if (pSkin->pModel == NULL || pSkin->pModel->pDesc == NULL) return;
+
+    pBurn = fn_801104AC(pSkin->pModel->pDesc);
+    fn_801109F0(pBurn, fn_80127B4C, pSkin);
+    nCount = fn_800CCA40(pSkin);
+    for (i = 0; i < nCount; i++) {
+        for (j = 0; aParts[j] >= 0; j++) {
+            if (i == aParts[j]) break;
+        }
+        if (aParts[j] < 0) {
+            fn_801109FC(pBurn, i, fn_800CCD30(pSkin, i, 0));
+        }
+        fn_80110A0C(pBurn, i, fn_800CCD84(pSkin, i, 0));
+    }
+
+    nCount = fn_8011C850(pSkin->pModel->pDesc);
+    for (i = 0; i < nCount; i++) {
+        for (j = 0; aList[j] >= 0; j++) {
+            if (i == aList[j]) break;
+        }
+        if (aList[j] < 0) {
+            fn_80110A24(pBurn, i);
+        } else {
+            fn_8011CADC(pSkin, i, 0.0f);
+        }
+    }
+
+    fn_8011CC40(pSkin, &pBlock, &pTable);
+    fn_80110A1C(pBurn, pTable);
+    pDesc = fn_80111EB0(pBurn);
+    pOld = pSkin->pModel->pDesc;
+    pSkin->pModel->pDesc = pDesc;
+    fn_80009E70(pOld);
+    fn_80127B10(pSkin, pBurn);
+    fn_801108B0(pBurn);
+    fn_8011CD3C(pSkin, pBlock, pTable);
+    if (pSkin->a10A0[0] != NULL) {
+        pSkin->a10A0[0]->pDesc = pDesc;
+    }
+}
