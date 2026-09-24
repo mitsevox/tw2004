@@ -2078,6 +2078,7 @@ void fn_80034DE4(void) {
     u8 bFirst = 1;
     int i;
     s32 nClip;
+    Ter_PatchReference* pPatch;
 
     fn_8003272C(0);
     fn_80012EF8();
@@ -2096,14 +2097,10 @@ void fn_80034DE4(void) {
         }
         fn_80012EF8();
         for (i = lbl_801D3CB0.iNumGrassPatches - 1; i >= 0; i--) {
-            if (nClip == lbl_801D3CB0.xpGrassPatchList[i].eClipMethod
-                && (lbl_801D3CB0.xpGrassPatchList[i].n1C & 0x80)) {
-                fn_80032B7C(lbl_801D3CB0.xpGrassPatchList[i].pGround, nClip, 3,
-                            lbl_801D3CB0.xpGrassPatchList[i].n1C, lbl_801D3CB0.xpGrassPatchList[i].n18,
-                            lbl_801D3CB0.xpGrassPatchList[i].n20, &bFirst, 0, 1,
-                            lbl_801D3CB0.xpGrassPatchList[i].fDistance,
-                            lbl_801D3CB0.xpGrassPatchList[i].fDistance
-                                + 2.0f * lbl_801D3CB0.xpGrassPatchList[i].fBoundingRadius);
+            pPatch = &lbl_801D3CB0.xpGrassPatchList[i];
+            if (pPatch->eClipMethod == nClip && (pPatch->n1C & 0x80)) {
+                fn_80032B7C(pPatch->pGround, nClip, 3, pPatch->n1C, pPatch->n18, pPatch->n20, &bFirst, 0,
+                            1, pPatch->fDistance, pPatch->fDistance + 2.0f * pPatch->fBoundingRadius);
             }
         }
     }
