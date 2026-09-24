@@ -62,6 +62,17 @@ u32   fn_800D0BAC(int nPlayer);                         // the class of the grou
 u8    fn_800D0BF8(int nPlayer, u8 bUnder, u8 bAnyLie);
 u8    fn_800D0D54(int nPlayer);
 int   fn_800D0DC8(int nPlayer, int nToPar);
+int   fn_800D0E74(int nPlayer);
+int   fn_800D0F04(int nPlayer, int nToPar);
+int   fn_800D0FBC(int nPlayer);
+int   fn_800D10B0(int nPlayer);
+int   fn_800D1170(int nPlayer, u8 bOnlyFlagged);
+int   fn_800D1250(int nPlayer);
+int   fn_800D1330(int nPlayer);
+int   fn_800D3208(void);                                // CourseData.c
+u8    fn_800D61E4(int nPlayer, u8 bCheck);
+u8    fn_800D68CC(int nPlayer, u8 bCheck);
+u8    fn_800D69B8(int nPlayer, u8 bCheck);
 
 int   fn_800D3A20(int nProfile, u8 bMessage);
 int   fn_800D3CF8(int nRating);
@@ -724,6 +735,181 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
             if (!bPreview && lbl_80200538.aPuttGoal[i].nBio != -1) {
                 fn_80125874(lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].szName,
                             lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].nValue);
+            }
+        }
+    }
+
+    for (i = Game_CurHoleIndex() + 1; i < 18; i++) {
+        gPlayers[nPlayer].nStrokes[i] = 0;
+        gPlayers[nPlayer].nPutts[i] = 0;
+    }
+    if (bPreview) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]--;
+        gPlayers[nPlayer].nPutts[Game_CurHoleIndex()]--;
+    }
+}
+
+// After a hole (bRoundOver: after the round), as fn_800D4F14 does for the putt goals: check the
+// hole goals against the round so far and fill the working tables (lbl_80200268 awards,
+// lbl_802002E0 money prizes).
+void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
+    s32 aPrizeIds[10];
+    s32 aAwardIds[10];
+    int i;
+    int nSlot;
+    u8 bReplace;
+    u8 bLost;
+    int j;
+    s32 nValue;
+    u8 bHole;
+    u8 bTee;
+    int nHoles;
+    int nNeed;
+    u8 bMore;
+
+    lbl_80282254 = 0;
+    lbl_80282250 = 0;
+    if (gSession.uFlags & 0x4000) return;
+    if (!fn_800D748C(nPlayer)) return;
+    if (fn_800E177C() != 0) return;
+
+    for (i = Game_CurHoleIndex() + 1; i < 18; i++) {
+        gPlayers[nPlayer].nStrokes[i] = 999;
+        gPlayers[nPlayer].nPutts[i] = 999;
+    }
+    if (bPreview) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]++;
+        gPlayers[nPlayer].nPutts[Game_CurHoleIndex()]++;
+    }
+    nNeed = 0;                  // fake match: the flag is worked out in an int first
+    if (!bRoundOver && (!fn_800E1BBC() || Game_CurHoleIndex() != 17)) {
+        nNeed = 1;
+    }
+    bMore = nNeed;
+
+    for (i = 0; i < NUM_HOLE_GOALS; i++) {
+        if (lbl_80200538.aHoleGoal[i].bRoundOver && !bRoundOver) continue;
+        if (!lbl_80200538.aHoleGoal[i].bRoundOver && bRoundOver) continue;
+        if (!lbl_80200538.aHoleGoal[i].bEnabled) continue;
+        if (!fn_800D4EF8(lbl_80200538.aHoleGoal[i].uModes, Game_GetMode())) continue;
+        if (fn_800EC550() && !fn_801025F4() && !fn_800D4EF8(lbl_80200538.aHoleGoal[i].uModes, 5)) continue;
+        if (!lbl_80200538.aHoleGoal[i].b19 && !bMore) continue;
+        if (lbl_80200538.aHoleGoal[i].aToPar[0] != 0 &&
+            lbl_80200538.aHoleGoal[i].aToPar[0] > fn_800D0DC8(nPlayer, 0)) continue;
+        if (lbl_80200538.aHoleGoal[i].aToPar[1] != 0 &&
+            lbl_80200538.aHoleGoal[i].aToPar[1] > fn_800D0DC8(nPlayer, -1)) continue;
+        if (lbl_80200538.aHoleGoal[i].aToPar[2] != 0 &&
+            lbl_80200538.aHoleGoal[i].aToPar[2] > fn_800D0DC8(nPlayer, -2)) continue;
+        if (lbl_80200538.aHoleGoal[i].aToPar[3] != 0 &&
+            lbl_80200538.aHoleGoal[i].aToPar[3] > fn_800D0DC8(nPlayer, -3)) continue;
+        if (lbl_80200538.aHoleGoal[i].aToPar[4] != 0 &&
+            lbl_80200538.aHoleGoal[i].aToPar[4] > fn_800D0DC8(nPlayer, -5)) continue;
+        if (lbl_80200538.aHoleGoal[i].aRun[0] != 0 &&
+            lbl_80200538.aHoleGoal[i].aRun[0] > fn_800D0F04(nPlayer, 0)) continue;
+        if (lbl_80200538.aHoleGoal[i].aRun[1] != 0 &&
+            lbl_80200538.aHoleGoal[i].aRun[1] > fn_800D0F04(nPlayer, -1)) continue;
+        if (lbl_80200538.aHoleGoal[i].aRun[2] != 0 &&
+            lbl_80200538.aHoleGoal[i].aRun[2] > fn_800D0F04(nPlayer, -2)) continue;
+        if (lbl_80200538.aHoleGoal[i].aRun[3] != 0 &&
+            lbl_80200538.aHoleGoal[i].aRun[3] > fn_800D0F04(nPlayer, -3)) continue;
+        if (lbl_80200538.aHoleGoal[i].aRun[4] != 0 &&
+            lbl_80200538.aHoleGoal[i].aRun[4] > fn_800D0F04(nPlayer, -5)) continue;
+        if (lbl_80200538.aHoleGoal[i].n13 != 0) {
+            nNeed = lbl_80200538.aHoleGoal[i].n13;
+            nHoles = fn_800D3208();
+            if (nHoles < 10) continue;
+            if (nNeed > nHoles) {
+                nNeed = nHoles;
+            }
+            if (nNeed > fn_800D0FBC(nPlayer)) continue;
+        }
+        if (lbl_80200538.aHoleGoal[i].n14 != 0 &&
+            lbl_80200538.aHoleGoal[i].n14 > fn_800D1170(nPlayer, 0)) continue;
+        if (lbl_80200538.aHoleGoal[i].n15 != 0 &&
+            lbl_80200538.aHoleGoal[i].n15 > fn_800D10B0(nPlayer)) continue;
+        if (lbl_80200538.aHoleGoal[i].n16 != 0 &&
+            lbl_80200538.aHoleGoal[i].n16 > fn_800D1250(nPlayer)) continue;
+        if (lbl_80200538.aHoleGoal[i].n17 != 0 &&
+            lbl_80200538.aHoleGoal[i].n17 > fn_800D1330(nPlayer)) continue;
+        if (lbl_80200538.aHoleGoal[i].nMaxStrokes != 0 &&
+            lbl_80200538.aHoleGoal[i].nMaxStrokes < fn_800E17AC(nPlayer)) continue;
+        if (lbl_80200538.aHoleGoal[i].nKind != 0) {
+            if (lbl_80200538.aHoleGoal[i].nKind == 1 && !fn_800D61E4(nPlayer, bPreview)) continue;
+            if (lbl_80200538.aHoleGoal[i].nKind == 2 && !fn_800D68CC(nPlayer, bPreview)) continue;
+            if (lbl_80200538.aHoleGoal[i].nKind == 3) continue;
+            if (lbl_80200538.aHoleGoal[i].nKind == 4 && !fn_800D69B8(nPlayer, bPreview)) continue;
+            if (lbl_80200538.aHoleGoal[i].nKind == 5 && fn_800D0E74(nPlayer) != 0) continue;
+            if (lbl_80200538.aHoleGoal[i].nKind == 6 && fn_800D2FB4(0) <= fn_800E17AC(nPlayer)) continue;
+        }
+        if (lbl_80200538.aHoleGoal[i].nAward >= 23 && lbl_80200538.aHoleGoal[i].nAward <= 38 &&
+            (bPreview || !fn_800D9998(nPlayer, lbl_80200538.aHoleGoal[i].nAward))) continue;
+        if (lbl_80200538.aHoleGoal[i].nAward == 22 &&
+            GM_GetGameProgress(&gpSaveData[nPlayer]) < 100.0f) continue;
+
+        if (lbl_80200538.aHoleGoal[i].nAward != 39) {
+            if (!fn_800D76AC(nPlayer, lbl_80200538.aHoleGoal[i].nAward)) continue;
+            bReplace = 0;
+            bLost = 0;
+            nSlot = lbl_80282250;
+            if (lbl_80200538.aHoleGoal[i].nId != 0) {
+                for (j = 0; j < lbl_80282250; j++) {
+                    if (lbl_80200538.aHoleGoal[i].nId == aAwardIds[j]) {
+                        if (lbl_80200538.aHoleGoal[i].nValue > lbl_802001F0[j]) {
+                            nSlot = j;
+                            bReplace = 1;
+                        } else {
+                            bLost = 1;
+                        }
+                    }
+                }
+            }
+            if (bLost) continue;
+            lbl_80200268[nSlot] = lbl_80200538.aHoleGoal[i].nAward;
+            lbl_802001F0[nSlot] = lbl_80200538.aHoleGoal[i].nValue;
+            aAwardIds[nSlot] = lbl_80200538.aHoleGoal[i].nId;
+            if (!bReplace) {
+                lbl_80282250++;
+            }
+            if (!bPreview && lbl_80200538.aHoleGoal[i].nBio != -1) {
+                fn_80125874(lbl_80200538.aBio[lbl_80200538.aHoleGoal[i].nBio].szName,
+                            lbl_80200538.aBio[lbl_80200538.aHoleGoal[i].nBio].nValue);
+            }
+        } else {
+            nValue = lbl_80200538.aHoleGoal[i].nValue;
+            if (nValue == 0) continue;
+            bReplace = 0;
+            bLost = 0;
+            nSlot = lbl_80282254;
+            if (lbl_80200538.aHoleGoal[i].nId != 0) {
+                for (j = 0; j < lbl_80282254; j++) {
+                    if (lbl_80200538.aHoleGoal[i].nId == aPrizeIds[j]) {
+                        if (lbl_80200538.aHoleGoal[i].nValue > lbl_802002E0[j]) {
+                            nSlot = j;
+                            bReplace = 1;
+                        } else {
+                            bLost = 1;
+                        }
+                    }
+                }
+            }
+            if (bLost) continue;
+            aPrizeIds[nSlot] = lbl_80200538.aHoleGoal[i].nId;
+            lbl_802002E0[nSlot] = nValue;
+            bHole = fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 2);
+            bTee = fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 1);
+            lbl_80200358[nSlot] = fn_800D6A70(lbl_802002E0[nSlot], nPlayer,
+                                              fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 0), bTee, bHole,
+                                              &lbl_801FFAE8[nSlot]);
+            if (fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 3)) {
+                lbl_80200358[nSlot] = fn_800D7220(lbl_80200358[nSlot], nPlayer, &lbl_801FFAE8[nSlot]);
+            }
+            lbl_802003D0[nSlot] = lbl_80200538.aHoleGoal[i].n25;
+            if (!bReplace) {
+                lbl_80282254++;
+            }
+            if (!bPreview && lbl_80200538.aHoleGoal[i].nBio != -1) {
+                fn_80125874(lbl_80200538.aBio[lbl_80200538.aHoleGoal[i].nBio].szName,
+                            lbl_80200538.aBio[lbl_80200538.aHoleGoal[i].nBio].nValue);
             }
         }
     }
