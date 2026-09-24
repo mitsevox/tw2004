@@ -23,11 +23,15 @@ void  fn_800CD404(Skin* pSkin);                // SkinPart.c
 s32   fn_800CD700(Skin* pSkin);                // SkinPart.c
 void  fn_800CE164(void);                       // SkinPart.c
 void  fn_8011C9B0(Skin* pSkin);                // SkinMorph.c
+void  fn_8011CADC(Skin* pSkin, int nMorph, f32 fWeight);     // SkinMorph.c
 s32   fn_8011CDE8(Skin* pSkin);                // SkinMorph.c
 void  fn_8011CE58(Skin* pSkin);                // SkinMorph.c
 HwsMemBlock* fn_801128C8(SkinDesc* pDesc, s32 nSize);         // hwsOverride_Gc.c
 HwsOverrideTable* fn_80112A10(SkinDesc* pDesc, s32 nMeshes);  // hwsOverride_Gc.c
+void  fn_80112B18(HwsOverrideTable* pTable, int i, void* p);   // hwsOverride_Gc.c
 
+u8    fn_8001EC48(Character* pChar);           // char.c
+void  fn_80035D10(Character* pChar, int nView);
 void  fn_80035F40(void* pCamera);
 void  fn_8003612C(LightGroup* pGroup);
 void  fn_80036278(SkinModel44* pEntries, s32 nEntries);
@@ -52,6 +56,18 @@ void fn_80035F40(void* pCamera) {
 
     pRect = fn_80012EF0(pCamera);
     fn_80016978(fn_80012EE8(pRect), fn_80012EE0(pRect), fn_80012ED8(pRect), fn_80012ED0(pRect));
+}
+
+// Runs fn_80035D10 for view nView on every character made so far, except those fn_8001EC48 picks
+// and those with flag 0x40 or 1.
+void fn_80035E98(int nView) {
+    int i;
+
+    for (i = 0; i < lbl_80281CA8; i++) {
+        if (!fn_8001EC48(lbl_801B9624[i]) && !(lbl_801B9624[i]->u10 & 0x41)) {
+            fn_80035D10(lbl_801B9624[i], nView);
+        }
+    }
 }
 
 void fn_80035FBC(void) {
@@ -196,6 +212,23 @@ void fn_800364AC(SkinModel* pModel) {
         fn_80036344(pModel->p44, pModel->n40);
     }
     pModel->u30 = pModel->u30 | 0x80000000;
+}
+
+// Hands table n (Skin.a10A0) every p44 entry whose bit is set in p10D0, with the matrices.
+void fn_80036790(Skin* pSkin, int n) {
+    int i;
+    s32 nEntries;
+    HwsOverrideTable* pTable;
+
+    if (pSkin->a10A0[n] != NULL && (pSkin->u10D4 & 2)) {
+        pTable = pSkin->a10A0[n];
+        nEntries = pSkin->pModel->n40;
+        for (i = 0; i < nEntries; i++) {
+            if (fn_8001E9CC(pSkin->p10D0, i)) {
+                fn_80112B18(pTable, pSkin->pModel->p44[i].n0, pSkin->p108C);
+            }
+        }
+    }
 }
 
 // Byte-swaps a model's header.
@@ -645,6 +678,23 @@ Skin* fn_800377FC(u8* pData, u8 b) {
     return pSkin;
 }
 
+// Hands the skin the morph weights a format 1 pose buffer changed (bits 5..19 of its first block),
+// then clears the block's bits.
+void fn_80037C48(Skin* pSkin, SkelPose* pPose) {
+    SkelPoseBlock* pBlock;
+    int i;
+
+    if (pSkin != NULL) {
+        pBlock = &((SkelPose1*)pPose)->aBlocks[0];
+        for (i = 5; i < 20; i++) {
+            if (fn_8001E9CC(pBlock->aBits, i)) {
+                fn_8011CADC(pSkin, i - 5, pBlock->af8[i]);
+            }
+        }
+        fn_8001E938(pBlock->aBits, 20);
+    }
+}
+
 // ---- sweep code (tidied) ----
 
 void fn_80037CD8(Skin* pSkin) {
@@ -668,3 +718,14 @@ void fn_80037CD8(Skin* pSkin) {
 }
 
 // ---- end of sweep code ----
+
+// Frees the mesh bit data a description allocated for itself (flag 0x400000).
+void fn_80037D5C(SkinDesc* pDesc) {
+    int i;
+
+    for (i = 0; i < pDesc->n2C; i++) {
+        if (pDesc->p34[i].pBits != NULL && (pDesc->p34[i].uFlags & 0x400000)) {
+            fn_80009E70(pDesc->p34[i].pBits);
+        }
+    }
+}
