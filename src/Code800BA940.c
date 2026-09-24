@@ -14,7 +14,7 @@ void fn_800BA940(void);
 void fn_800BAA4C(void);
 void fn_800BAA50(int nPlayer);
 void fn_800BAB80(int nPlayer);
-void fn_8009AA18(Player* pPlayer);
+void fn_8009AA18(void);                 // Code8009A928.c: empty the glow queue
 void fn_8006DEA8(void);                 // gomainloop.c
 void fn_80098938(void);                 // GoShaderObject_Glows_Gc.c: draw the queued glows
 void fn_8006DF28(void);                 // gomainloop.c
@@ -53,7 +53,6 @@ void fn_800BAA4C(void) {
 
 // Queue the player's two glows, unless the game is paused.
 void fn_800BAA50(int nPlayer) {
-    Player* pPlayer;
     u32 uColour;
     f32 fScale;
     f32 fSize;
@@ -62,9 +61,8 @@ void fn_800BAA50(int nPlayer) {
 
     fn_80008370(fn_8001614C());
     if (gSession.nPaused == 0 && lbl_80281F80 != NULL) {
-        pPlayer = &gPlayers[nPlayer];
-        nView = pPlayer->nView[0];
-        fn_8009AA18(pPlayer);
+        nView = gPlayers[nPlayer].nView[0];
+        fn_8009AA18();
         for (i = 0; i < 2; i++) {
             fScale = lbl_80281518->aGlow[nView][i].fScale;
             fSize = 0.005f * lbl_80281518->aSize[nView][i] * fScale;

@@ -115,21 +115,23 @@ extern PsEmitter* lbl_801DB888[6];
 extern s32 lbl_80281F8C;        // UFstPart.c: the fixed emitter fn_80099758 hands out next
 extern f32 lbl_801DB878[4];     // UFstPart.c: the point fn_80099E34 orders emitters by distance from
 
-// PsBallFx.c's state (lbl_801F1708, 0x88 bytes), reached through lbl_80281408.
+// PsBallFx.c's state (lbl_801F1708, 0x88 bytes), reached through lbl_80281408. The sand trail's
+// fields (0x28-0x74) are arrays of one, indexed by the trail number (fn_800A34C0).
 typedef struct PsBallFxState {
     ShaderObject mesh;          // 0x00  a row 0 shader object (Skin.c's fn_80036054; fn_800A2E14 frees it)
-    void* p28;                  // 0x28  } freed by fn_800A2E14; PsBallFx_InitModule allocates
-    f32*  p2C;                  // 0x2C  } 0x960, 0x640 and 0x320 bytes; p2C holds the corners
-    void* p30;                  // 0x30  } (0,0) (1,0) (0,1) (1,1) of 50 quads
-    s32  n34;                   // 0x34  } cleared by fn_800A2E68
-    s32  n38;                   // 0x38  }
-    s32  n3C;                   // 0x3C  }
-    s32  n40;                   // 0x40  }
-    s32  n44;                   // 0x44  }
+    f32* ap28[1];               // 0x28  } freed by fn_800A2E14; PsBallFx_InitModule allocates 0x960,
+    f32* ap2C[1];               // 0x2C  } 0x640 and 0x320 bytes: 200 vertices' positions (x, y, z),
+    u8*  ap30[1];               // 0x30  } texture corners (0,0) (1,0) (0,1) (1,1) of 50 quads, colours
+    s32  an34[1];               // 0x34  } the next vertex (ring of 200); cleared by fn_800A2E68
+    s32  an38[1];               // 0x38  } the next index (ring of 600)
+    s32  an3C[1];               // 0x3C  } the oldest vertex once the ring is full
+    s32  an40[1];               // 0x40  } the first index drawn
+    s32  an44[1];               // 0x44  } the vertices in use (up to 200)
     TexBank*  pBank;            // 0x48  the "sandtrl" texture's bank (PsBallFx_InitModule)
     TexEntry* pTex;             // 0x4C  and the texture
-    void* p50;                  // 0x50  freed by fn_800A2E14 (0x4B0 bytes)
-    f32  a54[8];                // 0x54  cleared by fn_800A2E68
+    u16* ap50[1];               // 0x50  the indices; freed by fn_800A2E14 (0x4B0 bytes)
+    f32  a54[1][4];             // 0x54  the ball position the trail last reached; cleared by fn_800A2E68
+    f32  a64[1][4];             // 0x64  the direction it last went
     PsEmitter* ap74[2];         // 0x74  one per view (Player.nView[0]); fn_800A2FFC
     PsEmitter* apEmitter[(0x88 - 0x7C) / 4];    // 0x7C  one per view (Player.nView[0])
 } PsBallFxState;
