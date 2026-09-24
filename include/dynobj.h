@@ -32,9 +32,20 @@ typedef struct DynObjTurningDef {
     f32  fSpeed;                // 0x1C  degrees a second
 } DynObjTurningDef;
 
+// Type 11's definition (GoAnimalActors.c fn_8004A24C): a DynObjDef and the animal's settings.
+typedef struct DynObjAnimalDef {
+    DynObjDef base;             // 0x00
+    f32  f1C;                   // 0x1C  -> DynObjAnimal.f16C (and twice it f174)
+    f32  a20[5];                // 0x20  -> DynObjAnimal.a178
+    f32  f34;                   // 0x34  -> DynObjAnimal.f194
+    f32  f38;                   // 0x38  -> DynObjAnimal.f198
+    f32  aAngles[3];            // 0x3C  its rotation, in degrees (given to fn_8000A194 as 0x40, 0x3C, 0x44)
+} DynObjAnimalDef;
+
 // The stream object an object's model comes from (a view of UStreamObject: its +4 is the model).
 typedef struct DynObjModelRef {
-    u8   unk0[4];
+    u8*  pData;                 // 0x00  UStreamObject.pData; an animal's route follows a 12-byte
+                                //       header in it (fn_8004A24C)
     struct UObjModel* p4;       // 0x04  goes to fn_800486F4
 } DynObjModelRef;
 
@@ -119,9 +130,16 @@ typedef struct UObjMesh {
     s32  n28;                   // 0x28
 } UObjMesh;
 
+// What UObjModel.p10 points to (our view): a mesh tree at 0xEC (GoAnimalActors.c fn_8004ABB4).
+typedef struct UObjModelRoot {
+    u8   unk0[0xEC];
+    UObjMesh* pMesh;            // 0x0EC
+} UObjModelRoot;
+
 // A UObject's model (UObject.pModel).
 typedef struct UObjModel {
-    u8   unk0[0x14];
+    u8   unk0[0x10];
+    UObjModelRoot* p10;         // 0x10  (GoAnimalActors.c fn_8004A24C)
     UObjMesh* apLod[4];         // 0x14  its levels of detail (all four the same: it has none)
     u8   unk24[0x2C - 0x24];
     f32  v2C[3];                // 0x2C
@@ -212,12 +230,23 @@ typedef struct DynObjAnimal {
     f32  f16C;                  // 0x16C  } divided by the route's length (fn_8004A14C)
     f32  f170;                  // 0x170
     f32  f174;                  // 0x174  }
-    u8   unk178[0x1A8 - 0x178];
-    AnimalRoute* pRoute;        // 0x1A8
+    f32  a178[5];               // 0x178  from its definition's a20
+    f32  f18C;                  // 0x18C
+    f32  f190;                  // 0x190
+    f32  f194;                  // 0x194
+    f32  f198;                  // 0x198  a height it stands above its position or route (-999: 0)
+    f32  f19C;                  // 0x19C
+    f32  f1A0;                  // 0x1A0
+    s32  n1A4;                  // 0x1A4  0..4, from its model's mesh bits (4: no model)
+    AnimalRoute* pRoute;        // 0x1A8  NULL: it stands at its definition's position
     s32  n1AC;                  // 0x1AC  } copied to its UObject's n108 and f10C before it is drawn
-    u8   unk1B0[4];             //        }
+    s32  n1B0;                  // 0x1B0  }
     f32  f1B4;                  // 0x1B4  }
-    u8   unk1B8[0x1C0 - 0x1B8];
+    s32  n1B8;                  // 0x1B8
+    u8   b1BC;                  // 0x1BC
+    u8   b1BD;                  // 0x1BD  set when its route's first point with ground under it is
+                                //        less than 0.5 above the ground (and f198 was given)
+    u8   unk1BE[2];
 } DynObjAnimal;
 LAYOUT_ASSERT(DynObjAnimal, 0x1C0);
 
