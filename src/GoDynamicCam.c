@@ -44,6 +44,17 @@ void fn_8003B534(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32
 void fn_8003B6D0(CamShot* pShot, int nPlayer, CamScript* pScript, f32* pOut, f32* pCam, f32* pSub);
 f32  fn_8003DBA8(f32 f);
 void fn_8003D810(f32* pDir, f32* pA, f32* pB);
+u8   fn_8003CAFC(CamSequence* pSequence, int nKind);
+s32  fn_8003CB80(u32 n, int nPlayer);
+s32  fn_8003CBD4(int n, int nPlayer);
+u8   fn_8003CBE8(CamSequence* pSequence, int nPlayer);
+u8   fn_8003CD6C(CamSequence* pSequence, f32 f);
+u8   fn_8003CD9C(CamSequence* pSequence, int nPlayer, u8 b);
+u8   fn_8003CEEC(CamSequence* pSequence, int nPlayer);
+u8   fn_8003D00C(CamSequence* pSequence);
+u8   fn_8003D054(CamSequence* pSequence);
+u8   fn_8003D0A0(int nMask, int nBit);
+u8   fn_8003D140(CamSequence* pSequence);
 
 // Registers the handlers of the camera files ('CAMS', 'CAMV', 'CAMA').
 void fn_80039454(void) {
@@ -988,6 +999,94 @@ void DynamicCam_GetLocation(int nKind, int nPlayer, f32* pOut, CamScript* pScrip
         pOut[2] = 100.0f;
         break;
     }
+}
+
+// Picks a camera sequence of kind nKind for nPlayer's shot: one of those (up to 50) that fit the
+// player, the club, the lie (nLie) and nClass bits, the pin's height over the ball and fDist
+// (f24..f28), at random by their weights (f34). With none, the default sequence that fits, or the
+// first default one with shot choices; NULL without a course.
+CamSequence* fn_8003BDBC(int nPlayer, int nLie, int nClass, int nKind, u8 a, f32 fDist) {
+    int anPicked[50];
+    CourseInfo* pCourse;
+    CamSequence* pSeq;
+    int i;
+    int nPicked;
+    int nSum;
+    int nDefault;
+    int nTee;
+    int nClassBit;
+    int nPinSet;
+    u32 uRand;
+    f32 fHeight;
+    f32 fTotal;
+    f32 fWeight;
+
+    nPicked = 0;
+    nSum = 0;
+    nDefault = -1;
+    if (Player_OnTee(nPlayer)) {
+        nTee = 1;
+    } else {
+        nTee = fn_8003CBD4(nLie, nPlayer);
+    }
+    nClassBit = fn_8003CB80(nClass, nPlayer);
+    nPinSet = Game_CurrentPinSet();
+    pCourse = fn_8000C594();
+    if (pCourse == NULL) {
+        return NULL;
+    }
+    fHeight = pCourse->pin[nPinSet].y - gPlayers[nPlayer].vBall[1];
+    for (i = 0; i < lbl_80281D88->nSequences; i++) {
+        if (nPicked >= 50) {
+            break;
+        }
+        if (lbl_80281D88->pSequences[i].nChoices > 0) {
+            if (fn_8003CAFC(&lbl_80281D88->pSequences[i], nKind) &&
+                fn_8003D00C(&lbl_80281D88->pSequences[i])) {
+                nDefault = i;
+            } else if (fn_8003D0EC(&lbl_80281D88->pSequences[i], nKind) &&
+                       fn_8003CBE8(&lbl_80281D88->pSequences[i], nPlayer) &&
+                       fn_8003CD9C(&lbl_80281D88->pSequences[i], nPlayer, a) &&
+                       fn_8003CEEC(&lbl_80281D88->pSequences[i], nPlayer) &&
+                       fn_8003D00C(&lbl_80281D88->pSequences[i]) &&
+                       fn_8003D054(&lbl_80281D88->pSequences[i]) &&
+                       fn_8003D0A0(lbl_80281D88->pSequences[i].b49, nTee) &&
+                       fn_8003D0A0(lbl_80281D88->pSequences[i].b4A, nClassBit) &&
+                       fn_8003CD6C(&lbl_80281D88->pSequences[i], fHeight) &&
+                       fn_8003D140(&lbl_80281D88->pSequences[i])) {
+                pSeq = &lbl_80281D88->pSequences[i];
+                if (fDist >= pSeq->f24 && fDist <= pSeq->f28 && pSeq->nChoices > 0) {
+                    anPicked[nPicked] = i;
+                    nPicked++;
+                }
+            }
+        }
+    }
+    if (nPicked == 0) {
+        if (nDefault >= 0) {
+            return &lbl_80281D88->pSequences[nDefault];
+        }
+        for (i = 0; i < lbl_80281D88->nSequences; i++) {
+            if (fn_8003CAFC(&lbl_80281D88->pSequences[i], nKind) &&
+                lbl_80281D88->pSequences[i].nChoices > 0) {
+                return &lbl_80281D88->pSequences[i];
+            }
+        }
+        return NULL;
+    }
+    uRand = Rand_Next(1);
+    fTotal = 0.0f;
+    for (i = 0; i < nPicked; i++) {
+        fTotal += lbl_80281D88->pSequences[anPicked[i]].f34;
+    }
+    for (i = 0; i < nPicked; i++) {
+        fWeight = 1000.0f * lbl_80281D88->pSequences[anPicked[i]].f34;
+        if ((f32)(int)(uRand % (int)(1000.0f * fTotal) - nSum) < fWeight) {
+            return &lbl_80281D88->pSequences[anPicked[i]];
+        }
+        nSum += (int)fWeight;
+    }
+    return &lbl_80281D88->pSequences[anPicked[0]];
 }
 
 // The set named szName (case ignored) gives a sequence (*ppSeq) or a shot (*ppShot): its p20

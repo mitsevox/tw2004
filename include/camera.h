@@ -170,7 +170,7 @@ typedef struct CamSequence {
     f32  f28;                   // 0x28  ... to this
     f32  f2C;                   // 0x2C  fn_8003CD6C: picked for values from this ...
     f32  f30;                   // 0x30  ... to this
-    u8   unk34[0x38 - 0x34];
+    f32  f34;                   // 0x34  its weight when several fit (fn_8003BDBC)
     f32  f38;                   // 0x38  its length
     s32  nChoices;              // 0x3C  how many shot choices p4C holds
     u32  uCourses;              // 0x40  one bit per course it is used on
@@ -619,7 +619,7 @@ CamShot* fn_8003A8C4(char* szName);     // the shot with this name (case ignored
 // pointer may be NULL).
 CamShot* fn_8003A950(CamSequence* pSequence, int nKind, int* pA, f32* pF1, f32* pF2, int* pB, f32* pF3,
                      int nPlayer);
-CamSequence* fn_8003BDBC(int nPlayer, int nLie, int nClass, int nKind, int a, f32 fDist);
+CamSequence* fn_8003BDBC(int nPlayer, int nLie, int nClass, int nKind, u8 a, f32 fDist);
 CamSequence* DynamicCam_ChoosePreFlightSequence(int nPlayer, int nLie, int nKind);
 // The sequence and shot named after the golfer's clip (with b, Character.p1790 first).
 u8       fn_8003C9D0(int nPlayer, u8 b, CamSequence** ppSeq, CamShot** ppShot);
