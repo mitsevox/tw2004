@@ -974,6 +974,48 @@ void fn_8002957C(CharModel* pModel) {
     fn_80009E70(pModel);
 }
 
+// Fills in aBone: finds each model bone's id by its name (the first 8 bytes of its uId). Of the
+// bones with no known name (up to 30), the first named after a club becomes bone 0x52, the club.
+void fn_80029664(CharModel* pModel) {
+    char szName[9];
+    u8 aUnknown[30];
+    int nUnknown = 0;
+    int i;
+    int j;
+    s32 nId;
+
+    pModel->aBone[0] = 0;
+    for (nId = 1; nId < 0x59; nId++) {
+        pModel->aBone[nId] = 0xFF;
+    }
+    for (i = 1; i < pModel->nBones; i++) {
+        strncpy(szName, (char*)&pModel->pBones[i].uId, 8);
+        szName[8] = '\0';
+        for (j = 0; j < 0x59; j++) {
+            if (strcmp(szName, lbl_80187278[j]) == 0) {
+                pModel->aBone[j] = i;
+                break;
+            }
+        }
+        if (j == 0x59 && nUnknown < 30) {
+            aUnknown[nUnknown] = i;
+            nUnknown++;
+        }
+    }
+    if (nUnknown != 0) {
+        for (i = 0; i < nUnknown; i++) {
+            strncpy(szName, (char*)&pModel->pBones[aUnknown[i]].uId, 8);
+            szName[8] = '\0';
+            for (j = 0; j < sizeof(lbl_80187418) / sizeof(lbl_80187418[0]); j++) {
+                if (strcmp(lbl_80187418[j], szName) == 0) {
+                    pModel->aBone[0x52] = aUnknown[i];
+                    return;
+                }
+            }
+        }
+    }
+}
+
 // Fills in aBone2: each bone maps to itself, except the pairs in lbl_8018742C, where the model's
 // first bone maps to its second.
 void fn_80029804(CharModel* pModel) {
