@@ -679,7 +679,7 @@ u8   fn_800F2788(int nPlayer, f32 f);   // whether f is far enough for the playe
 s32  fn_800F2810(s32 n);
 void fn_800F2958(s32 nMsg, s32 a);
 // The modes' own getters behind the dispatchers fn_800F2408..fn_800F2534, which pass their
-// argument on; the getters ignore it.
+// argument on; the getters ignore it (not fn_800F354C: it is called directly, per player).
 int  fn_800F354C(int nPlayer);          // GameMode14.c
 s32  fn_800F37F8(s32 a);                // GameMode14.c
 s32  fn_800F59CC(s32 a);                // GameMode16.c

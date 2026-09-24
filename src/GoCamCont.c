@@ -81,8 +81,8 @@ void fn_80062F1C(View* pView) {
     pView->b268 = 0;
 }
 
-// The view's camera, every frame: runs the current mode's update (mode 25, no camera, only moves
-// the script), shakes the camera on the swing's events 5..14, and keeps its v20 nonzero.
+// The view's camera, every frame: runs the current mode's update (mode 25, no camera, only steps
+// the script's colour fade), shakes the camera on the swing's events 5..14, and keeps v20 nonzero.
 void CameraController_Idle(View* pView, int nPlayer) {
     int i;
     int nMove;
@@ -173,7 +173,7 @@ void CameraController_Idle(View* pView, int nPlayer) {
         nMove = pView->script.nCamera;
         if (gSession.nPaused == 0) {
             fn_8003F2E0(&pView->script, FRAME_TIME);   // port: one NTSC frame a call, not gSession.fFrameTime
-            // A move of kind 4 that has just ended stays on.
+            // A colour fade held in state 4 (after fading up) stays on instead of ending.
             if (nMove == 4 && pView->script.nCamera == 0) {
                 pView->script.nCamera = 4;
             }
@@ -326,7 +326,7 @@ u8 fn_800635D0(int nPlayer) {
 
 // fake match: stands in for code the original compiled here and the linker stripped: the pool has
 // fn_8006434C's constants (-0.0001f, 0.0001f, -10000.0f, 10000.0f, 0x802836F8) at this point, not
-// after CameraController_ResetAimMarkerInSwingCamera_800642D0's; the body is unknown.
+// after fn_800642D0_ReapplyCurrentShot's; the body is unknown.
 static f32 GoCamCont_StrippedFn2(f32 x) {
     if (x < -0.0001f || x > 0.0001f) {
         return 1.0f / x;
@@ -408,8 +408,8 @@ u8 fn_800637C4(int nPlayer, int nView) {
     return 0;
 }
 
-// Switches the view to camera 2 once the player's ball falls below the tuning height before its
-// first bounce.
+// Asks for shot kind 2 (fn_80063CF0) once the player's ball falls below the tuning height before
+// its first bounce.
 void fn_800638B8(View* pView, int nPlayer) {
     if (gPlayers[nPlayer].ball.vVel[1] < 0.0f && gPlayers[nPlayer].ball.fHeight < lbl_80281F78->f90
         && gPlayers[nPlayer].ball.nCollideCount < 1) {
@@ -488,7 +488,8 @@ void fn_80063920(int nView, f32* pBounds) {
     CamScript_PutBackOnFairway(&pView->script, pPos, pAt, nPlayer, &pView->shot19C, pPos);
 }
 
-// Camera 2 on the point pVec, over fTime.
+// Colour fade state 2 (fn_8003F2E0): the colour pVec over the view, its alpha falling from pVec[3]
+// to 0 over fTime.
 void fn_80063B98(View* pView, f32 fTime, f32* pVec) {
     pView->script.nCamera = 2;
     Vec_Copy(pVec, pView->script.v40);
@@ -496,7 +497,8 @@ void fn_80063B98(View* pView, f32 fTime, f32* pVec) {
     pView->script.f94 = fTime;
 }
 
-// Camera 1 on the point pVec, over fTime.
+// Colour fade state 1 (fn_8003F2E0): the colour pVec over the view, its alpha rising from 0 to
+// pVec[3] over fTime.
 void fn_80063BF4(View* pView, f32 fTime, f32* pVec) {
     pView->script.nCamera = 1;
     Vec_Copy(pVec, pView->script.v40);
@@ -667,7 +669,7 @@ u8 fn_800642B0(void) {
 }
 
 // Blends the view's script into its current shot.
-void CameraController_ResetAimMarkerInSwingCamera_800642D0(View* pView, int nPlayer) {
+void fn_800642D0_ReapplyCurrentShot(View* pView, int nPlayer) {
     f32* pPos = fn_8001731C(pView);
 
     CameraScript_InterpToNewScript(&pView->script, pView->script.pShot, nPlayer, pPos, fn_80017314(pView), 5,

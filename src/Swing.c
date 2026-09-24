@@ -3832,7 +3832,7 @@ void STATEFUNC_SwingUpdate(int nPlayer) {
                 fn_80062CB0(gPlayers[nPlayer].nC58, 1);
             }
             fn_80068AA8(nPlayer);
-            CameraController_ResetAimMarkerInSwingCamera_800642D0(fn_80017028(gPlayers[nPlayer].nView[0]), nPlayer);
+            fn_800642D0_ReapplyCurrentShot(fn_80017028(gPlayers[nPlayer].nView[0]), nPlayer);
             fn_800E3D38(nPlayer, 1);
         } else {
             fn_80068AA8(nPlayer);
