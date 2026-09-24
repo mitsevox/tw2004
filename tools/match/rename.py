@@ -44,7 +44,7 @@ def write(p, text):
 def load(tsv):
     rows = []
     for n, l in enumerate(pathlib.Path(tsv).read_text(encoding='utf-8-sig').splitlines(), 1):
-        if not l.strip() or l.lstrip().startswith('#'):
+        if not l.strip() or l.lstrip().startswith('#') or l.split('\t')[0].strip().lower() == 'address':
             continue
         f = l.split('\t')
         if len(f) < 3:

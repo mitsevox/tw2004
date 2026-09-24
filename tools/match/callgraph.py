@@ -75,6 +75,13 @@ def read_obj(path):
     return [(f[2], f[0], f[1]) for f in funcs], calls, refs
 
 
+def current_objects():
+    """The split objects of the current units (objdiff.json); build/GW4E69/obj also keeps objects
+    of splits since replaced."""
+    return [p for p in (ROOT / u['target_path'] for u in json.loads((ROOT / 'objdiff.json').read_text())['units']
+                        if u.get('target_path')) if p.exists()]
+
+
 def symbol_addresses():
     out = collections.defaultdict(list)
     for l in (ROOT / 'config/GW4E69/symbols.txt').read_text(encoding='utf-8').splitlines():
@@ -105,12 +112,7 @@ def main():
     if not target.exists():
         sys.exit('%s not found: give the unit as configure.py names it, after a build' % target.relative_to(ROOT))
     callers = collections.defaultdict(set)
-    # only the current units (objdiff.json); build/GW4E69/obj keeps objects of splits since replaced
-    current = [ROOT / u['target_path'] for u in json.loads((ROOT / 'objdiff.json').read_text())['units']
-               if u.get('target_path')]
-    for o in current:
-        if not o.exists():
-            continue
+    for o in current_objects():
         _, calls, _ = read_obj(o)
         u = o.relative_to(OBJ).with_suffix('').as_posix()
         for f, cs in calls.items():
