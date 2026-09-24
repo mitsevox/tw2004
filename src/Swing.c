@@ -515,7 +515,6 @@ f32 fn_8005CC84(f32 fTan) {
 // threshold, all of it above. Putts, chips and pitches skip the error; a putt over 75% on the
 // meter counts as full power.
 f32 SW_vCalculateShotPower(int nPlayer) {
-    Player* p;
     f32*    pPower;
     f32     fPower, fError;
     int     nRowScale, nRowThresh;
@@ -523,9 +522,9 @@ f32 SW_vCalculateShotPower(int nPlayer) {
     f32     fThresh, fScale;
 
     if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
-        p      = &gPlayers[nPlayer];
-        fPower = p->fPower * AI_PowerScale(nPlayer);
-        if (p->nShotKind == SHOT_TYPE_PUTT_e && !(p->uFlags & 8)) {
+        fPower = PLAYER(nPlayer)->fPower;
+        fPower *= AI_PowerScale(nPlayer);
+        if (PLAYER(nPlayer)->nShotKind == SHOT_TYPE_PUTT_e && !(PLAYER(nPlayer)->uFlags & 8)) {
             fPower *= 1.05f;
             if (fPower < 0.1f) {
                 fPower = 0.1f;
@@ -533,19 +532,18 @@ f32 SW_vCalculateShotPower(int nPlayer) {
         }
         goto clamp;         // fake match: the shared clamp as a jump (without the gotos: 83.9%, not 84.9%)
     }
-    p      = &gPlayers[nPlayer];
-    fPower = p->fPower;
-    pPower = &p->fPower;
-    fError = fabs(p->swing.fMishitAngle);
-    p->swing.fNonPowerShotPower = Swing_ApplyPowerBoost(nPlayer, fPower) - fError;
-    switch (p->nShotKind) {
+    fPower = PLAYER(nPlayer)->fPower;
+    pPower = &PLAYER(nPlayer)->fPower;
+    fError = fabs(PLAYER(nPlayer)->swing.fMishitAngle);
+    PLAYER(nPlayer)->swing.fNonPowerShotPower = Swing_ApplyPowerBoost(nPlayer, fPower) - fError;
+    switch (PLAYER(nPlayer)->nShotKind) {
     case SHOT_TYPE_PUTT_e: {
-        f32 fDist = p->fDistance < 1.0f ? 1.0f : p->fDistance;
+        f32 fDist = PLAYER(nPlayer)->fDistance < 1.0f ? 1.0f : PLAYER(nPlayer)->fDistance;
         if (*pPower > gpSwing->fPuttFullPower) {
             *pPower = 1.0f;
         }
         fPower = *pPower * fn_80050D34(fDist);
-        Golfer_GetAttribute(p, ATTR_PUTTING, ATTR_TOTAL);
+        Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_PUTTING, ATTR_TOTAL);
         if (fPower < 0.1f) {
             fPower = 0.1f;
         }
@@ -554,11 +552,12 @@ f32 SW_vCalculateShotPower(int nPlayer) {
     case SHOT_TYPE_CHIP_e:
     case SHOT_TYPE_PITCH_e: {
         f32 f = *pPower;
-        if (p->nShotKind == SHOT_TYPE_CHIP_e) {
-            f = *pPower * Physics_EstimateShotPower(p->fDistance, &p->ball, SHOT_TYPE_CHIP_e, p->nClub);
+        if (PLAYER(nPlayer)->nShotKind == SHOT_TYPE_CHIP_e) {
+            f = *pPower * Physics_EstimateShotPower(PLAYER(nPlayer)->fDistance, &PLAYER(nPlayer)->ball,
+                                                    SHOT_TYPE_CHIP_e, PLAYER(nPlayer)->nClub);
         }
         fPower = Swing_ApplyPowerBoost(nPlayer, f);
-        Golfer_GetAttribute(p, ATTR_APPROACH, ATTR_TOTAL);
+        Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_APPROACH, ATTR_TOTAL);
         if (fPower < 0.1f) {
             fPower = 0.1f;
         }
@@ -570,18 +569,19 @@ f32 SW_vCalculateShotPower(int nPlayer) {
         fPower     = Swing_ApplyPowerBoost(nPlayer, *pPower);
         nRowScale  = ROW_RECOVERY_PWR + 1;
         nRowThresh = ROW_RECOVERY_PWR;
-        nAttr      = (s8)Golfer_GetAttribute(p, ATTR_RECOVERY, ATTR_TOTAL);
+        nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL);
         break;
     default:
-        if (p->ball.nLie == 6 || p->ball.nLie == 7 || p->ball.nLie == 8 || p->ball.nLie == 3 ||
-            p->ball.nLie == 4) {
+        if (PLAYER(nPlayer)->ball.nLie == 6 || PLAYER(nPlayer)->ball.nLie == 7 ||
+            PLAYER(nPlayer)->ball.nLie == 8 || PLAYER(nPlayer)->ball.nLie == 3 ||
+            PLAYER(nPlayer)->ball.nLie == 4) {
             nRowScale  = ROW_RECOVERY_PWR + 1;
             nRowThresh = ROW_RECOVERY_PWR;
-            nAttr      = (s8)Golfer_GetAttribute(p, ATTR_RECOVERY, ATTR_TOTAL);
+            nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL);
         } else {
             nRowScale  = ROW_DRIVING_PWR + 1;
             nRowThresh = ROW_DRIVING_PWR;
-            nAttr      = (s8)Golfer_GetAttribute(p, ATTR_DRIVING_ACCURACY, ATTR_TOTAL);
+            nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_DRIVING_ACCURACY, ATTR_TOTAL);
         }
         fPower = *pPower * AI_PowerScale(nPlayer);
         fPower = Swing_ApplyPowerBoost(nPlayer, fPower);
@@ -743,12 +743,14 @@ f32 fn_8005BA94_MishitAngle(int nPlayer) {
 // of a quarter turn goes through a three-piece curve (knots at gpSwing 0xB8..0xC4), scaled by
 // the club's shaping range (fCurveMin..fCurveMax by gClubCurve/26) and a quarter turn.
 f32 Swing_CurveAngle(s32* pClub, f32 fBackAngle) {
-    f32 fOut   = 0.0f;
-    f32 fT     = fBackAngle / (PI / 2);
-    f32 fRange = gpSwing->fCurveMin +
-                 ((f32)gClubCurve[*pClub] / 26.0f) * (gpSwing->fCurveMax - gpSwing->fCurveMin);
+    f32 fOut;
+    f32 fT;
+    f32 fRange;
 
-    fT = (f32)fabs(fT);
+    fOut   = 0.0f;
+    fRange = gpSwing->fCurveMin +
+             ((f32)gClubCurve[*pClub] / 26.0f) * (gpSwing->fCurveMax - gpSwing->fCurveMin);
+    fT     = (f32)fabs(fBackAngle / (PI / 2));
     if (fT < gpSwing->fKnot1X) {
         fOut = gpSwing->fKnot1Y * fT / gpSwing->fKnot1X;
     } else {
