@@ -126,7 +126,7 @@ void  fn_8011763C(void);                        // TW06: PGATourSimulation_OpenO
 void  fn_8011766C(void);                        // TW06: PGATourSimulation_CloseONCE
 void  fn_801176C0(TourSeason* pTour);
 void  fn_80117860(TourSeason* pTour);
-void  fn_801178C8(s32 nPlayer, SeasonEvent* pEvent, int nRound, int n, int uFlags);   // TW06: GM_PgaTourSim_SimRound
+void  fn_801178C8(int nPlayer, SeasonEvent* pEvent, int nRound, int n, int uFlags);   // TW06: GM_PgaTourSim_SimRound
 void  fn_80117AF8(int nPlayer);
 void  fn_80117B58(int nPlayer);
 void  fn_80117C50(int nPlayer, int nEntrant);
