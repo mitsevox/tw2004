@@ -634,7 +634,7 @@ void fn_80014718(void) {
 // Free every block of the pool.
 void fn_80015470(void) {
     BufferPoolBlock* pBlock;
-    int i;
+    s32 i;
 
     lbl_80280E00->nNext = 0;
     lbl_80280E00->n4 = 0;
