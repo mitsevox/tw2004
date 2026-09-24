@@ -199,91 +199,108 @@ void fn_80070B68(u16 nIndex) {
     *(volatile u16*)0xCC008000 = nIndex;
 }
 
-// ---- sweep code (not yet cleaned up) ----
+// ---- the static shader object hooks of rows 7, 8, 1 and 3 of lbl_80188E88 ----
 
 void fn_80070B74(void);
-void fn_80074DA8();
-void fn_8007524C();
-void fn_80070B78(u8* p0, s32 p1);
-void fn_80070BAC(u8* p0);
-s32 fn_80070168(s32, s32);
-void fn_80070BD0(void* arg0);
-void fn_80070C24(u8* p0, s32 p1);
-void fn_80070C58(u8* p0);
-void fn_80070C7C(void* arg0);
-void fn_80070CD0(u8* p0, s32 p1);
-void fn_80070D04(u8* p0);
-void fn_80070D28(void* arg0);
-void fn_80070D7C(u8* p0);
-void fn_80070D88(u8* p0, s32 p1);
-void fn_80097624();
-void fn_80070DBC(u8* p0);
+void fn_80070B78(StaticShaderObject* pObj, ShaderCmds* pCmds);
+void fn_80070BAC(StaticShaderObject* pObj);
+void fn_80070BD0(StaticShaderObject* pObj);
+void fn_80070C24(StaticShaderObject* pObj, ShaderCmds* pCmds);
+void fn_80070C58(StaticShaderObject* pObj);
+void fn_80070C7C(StaticShaderObject* pObj);
+void fn_80070CD0(StaticShaderObject* pObj, ShaderCmds* pCmds);
+void fn_80070D04(StaticShaderObject* pObj);
+void fn_80070D28(StaticShaderObject* pObj);
+void fn_80070D7C(f32* pfWeight);
+void fn_80070D88(StaticShaderObject* pObj, ShaderCmds* pCmds);
+void fn_80070DBC(StaticShaderObject* pObj);
+void fn_80070DF4(StaticShaderObject* pObj);
+void fn_80070168(void);     // sweep_80070168.c: calls a display list
+void fn_8007524C(void);     // GoShaderObjectCommon_ShaderObjectsData_Gc.c: empty
+s32 fn_80097688(void);      // GoShaderObjectCommon_MorphAnimManager_Gc.c: how many animations
+void fn_80097624(MorphAnim* pAnim);     // GoShaderObjectCommon_MorphAnimManager_Gc.c: free its data
 
+// Row 7's data hook: nothing.
 void fn_80070B74(void) {
 }
 
-void fn_80070B78(u8* p0, s32 p1) {
-    fn_80074DA8(*(s32*)(p0 + 0x24), *(s32*)(p0 + 0x0), (p0 + 0x4), p1);
+// Row 7's static init: build the object's display list from pCmds.
+void fn_80070B78(StaticShaderObject* pObj, ShaderCmds* pCmds) {
+    fn_80074DA8(pObj->pArrays, pObj->eType, &pObj->anim, pCmds);
 }
 
-void fn_80070BAC(u8* p0) {
-    fn_8007524C((p0 + 0x4));
+// Row 7's static close.
+void fn_80070BAC(StaticShaderObject* pObj) {
+    // port: EA passes an argument fn_8007524C ignores
+    ((void (*)(MorphAnim*))fn_8007524C)(&pObj->anim);
 }
 
-void fn_80070BD0(void* arg0) {
-    if ((u8) (*(u8*)((u8*)(arg0) + 0xC)) != 0) {
-        GXSetArray(9, *(*(void***)((u8*)(arg0) + 0x24)), 0xC);
+// Row 7's static render: the display list (with the object's positions when the list sets none).
+void fn_80070BD0(StaticShaderObject* pObj) {
+    if (pObj->anim.b8 != 0) {
+        GXSetArray(9, pObj->pArrays->apPos[0], 12);
     }
-    fn_80070168((*(s32*)((u8*)(arg0) + 8)), (*(s32*)((u8*)(arg0) + 4)));
+    // port: fn_80070168 (sweep_80070168.c) is defined without parameters but hands r3 and r4
+    // on to GXCallDisplayList
+    ((void (*)(void*, u32))fn_80070168)(pObj->anim.p4, pObj->anim.n0);
 }
 
-void fn_80070C24(u8* p0, s32 p1) {
-    fn_80074DA8(*(s32*)(p0 + 0x24), *(s32*)(p0 + 0x0), (p0 + 0x4), p1);
+// Row 8's static init.
+void fn_80070C24(StaticShaderObject* pObj, ShaderCmds* pCmds) {
+    fn_80074DA8(pObj->pArrays, pObj->eType, &pObj->anim, pCmds);
 }
 
-void fn_80070C58(u8* p0) {
-    fn_8007524C((p0 + 0x4));
+// Row 8's static close.
+void fn_80070C58(StaticShaderObject* pObj) {
+    // port: EA passes an argument fn_8007524C ignores
+    ((void (*)(MorphAnim*))fn_8007524C)(&pObj->anim);
 }
 
-void fn_80070C7C(void* arg0) {
-    if ((u8) (*(u8*)((u8*)(arg0) + 0xC)) != 0) {
-        GXSetArray(9, *(*(void***)((u8*)(arg0) + 0x24)), 0xC);
+// Row 8's static render.
+void fn_80070C7C(StaticShaderObject* pObj) {
+    if (pObj->anim.b8 != 0) {
+        GXSetArray(9, pObj->pArrays->apPos[0], 12);
     }
-    fn_80070168((*(s32*)((u8*)(arg0) + 8)), (*(s32*)((u8*)(arg0) + 4)));
+    // port: see fn_80070BD0
+    ((void (*)(void*, u32))fn_80070168)(pObj->anim.p4, pObj->anim.n0);
 }
 
-void fn_80070CD0(u8* p0, s32 p1) {
-    fn_80074DA8(*(s32*)(p0 + 0x24), *(s32*)(p0 + 0x0), (p0 + 0x4), p1);
+// Row 1's static init.
+void fn_80070CD0(StaticShaderObject* pObj, ShaderCmds* pCmds) {
+    fn_80074DA8(pObj->pArrays, pObj->eType, &pObj->anim, pCmds);
 }
 
-void fn_80070D04(u8* p0) {
-    fn_8007524C((p0 + 0x4));
+// Row 1's static close.
+void fn_80070D04(StaticShaderObject* pObj) {
+    // port: EA passes an argument fn_8007524C ignores
+    ((void (*)(MorphAnim*))fn_8007524C)(&pObj->anim);
 }
 
-void fn_80070D28(void* arg0) {
-    if ((u8) (*(u8*)((u8*)(arg0) + 0xC)) != 0) {
-        GXSetArray(9, *(*(void***)((u8*)(arg0) + 0x24)), 0xC);
+// Row 1's static render.
+void fn_80070D28(StaticShaderObject* pObj) {
+    if (pObj->anim.b8 != 0) {
+        GXSetArray(9, pObj->pArrays->apPos[0], 12);
     }
-    fn_80070168((*(s32*)((u8*)(arg0) + 8)), (*(s32*)((u8*)(arg0) + 4)));
+    // port: see fn_80070BD0
+    ((void (*)(void*, u32))fn_80070168)(pObj->anim.p4, pObj->anim.n0);
 }
 
-void fn_80070D7C(u8* p0) {
-    lbl_80281E70 = *(f32*)p0;
+// Row 3's data hook: the morph weight.
+void fn_80070D7C(f32* pfWeight) {
+    lbl_80281E70 = *pfWeight;
 }
 
-void fn_80070D88(u8* p0, s32 p1) {
-    fn_80074DA8(*(s32*)(p0 + 0x24), *(s32*)(p0 + 0x0), (p0 + 0x4), p1);
+// Row 3's static init.
+void fn_80070D88(StaticShaderObject* pObj, ShaderCmds* pCmds) {
+    fn_80074DA8(pObj->pArrays, pObj->eType, &pObj->anim, pCmds);
 }
 
-void fn_80070DBC(u8* p0) {
-    fn_80097624((p0 + 0x4));
-    fn_8007524C((p0 + 0x4));
+// Row 3's static close: free the morph animation's data.
+void fn_80070DBC(StaticShaderObject* pObj) {
+    fn_80097624(&pObj->anim);
+    // port: EA passes an argument fn_8007524C ignores
+    ((void (*)(MorphAnim*))fn_8007524C)(&pObj->anim);
 }
-
-// ---- end of sweep code ----
-
-s32 fn_80097688(void);      // GoShaderObjectCommon_MorphAnimManager_Gc.c: how many animations
-void fn_80070DF4(StaticShaderObject* pObj);
 
 // Row 3's static render: the display list, with the morph animation brought up to date first once
 // in every three frames, each animation on its own frame of the cycle.
