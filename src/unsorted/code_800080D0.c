@@ -9,7 +9,8 @@ typedef struct {
     /* 0x14 */ int unk14;
 } UnkGlobal;
 
-extern UnkGlobal* lbl_80280DA0;
+UnkGlobal lbl_801A24A0;
+UnkGlobal* lbl_80280DA0 = &lbl_801A24A0;
 
 void GXSetVtxAttrFmt(int vtxfmt, int attr, int cnt, int type, unsigned char frac);
 

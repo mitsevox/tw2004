@@ -42,6 +42,8 @@ LLObj_Gc.c:
 
 unsorted/code_800080D0.c:
 	.text       start:0x800080D0 end:0x800082F8
+	.bss        start:0x801A24A0 end:0x801A24B8
+	.sdata      start:0x80280DA0 end:0x80280DA8
 
 unsorted/code_800082F8.c:
 	.text       start:0x800082F8 end:0x800083A4
@@ -1072,6 +1074,7 @@ LogoTexture.c:
 
 unsorted/sweep_8010FF5C.c:
 	.text       start:0x8010FF5C end:0x8010FF9C
+	.bss        start:0x80212B60 end:0x80213B60
 
 DiscCheck.c:
 	.text       start:0x8010FF9C end:0x801104AC
