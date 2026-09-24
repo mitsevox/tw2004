@@ -71,7 +71,7 @@ void fn_801229F8(void) {
     for (i = 0; i < GBA_NUM_CHANNELS; i++) {
         lbl_80260E18[i].n0 = 0;
         fn_8012408C(0x12);
-        lbl_80260E18[i].n5C = 0x40;
+        lbl_80260E18[i].u5C = 0x40;
         lbl_80260E18[i].n64 = 0;
         lbl_80260E18[i].n4C = 0;
         lbl_80260E18[i].n50 = 0;
@@ -568,7 +568,7 @@ void fn_80123CBC(s32 a, s32 b) {
     u8* pStatus;
 
     do {
-        if (pCh->n5C != 0x40000 || (lbl_80281984 != -1 && lbl_80281984 != nChan)) {
+        if (pCh->u5C != 0x40000 || (lbl_80281984 != -1 && lbl_80281984 != nChan)) {
             pCh->n4C = 0;
             pCh->n0 = 0;
         } else {
@@ -614,22 +614,25 @@ void fn_80123CBC(s32 a, s32 b) {
 // no port is being worked on); ports with a pad (types 8 and 0x40) are reset.
 void fn_80123E34(void) {
     u32 uReset = 0;
-    s32 nChan = 0;
-    GbaChannel* pCh = lbl_80260E18;
+    s32 nChan;
+    GbaChannel* pCh;
     PadStatus* pPad;
     const u32* pMask;
     u32 uKey;
     u32 uStart;
     u8 uProc;
+    u32* pType;
 
     PADRead(lbl_80260FF8);
     PADClamp(lbl_80260FF8);
+    nChan = 0;
+    pCh = lbl_80260E18;
     pPad = lbl_80260FF8;
     pMask = lbl_80184E30;
     do {
         if (pCh->n0 == 2) {
             if (pCh->n64 != 0) {
-                if ((u8)pCh->u58 == fn_801228E0((pCh->u58 & 0xFF00) | ((pCh->u58 >> 16) & 0xFF))) {
+                if ((u8)pCh->u58 == fn_801228E0(((pCh->u58 >> 16) & 0xFF) | (pCh->u58 & 0xFF00))) {
                     uKey = pCh->u58;
                     pPad->uButtons = (((uKey >> 23) & 1) ? 4 : 0) |
                                      ((((uKey >> 22) & 1) ? 8 : 0) |
@@ -641,16 +644,17 @@ void fn_80123E34(void) {
             if (pCh->n0 == 0 && GBAGetProcessStatus(nChan, &uProc) != 2) {
                 if (lbl_80281984 == -1) {
                     uStart = OSGetTick();
+                    pType = &pCh->u5C;
                     do {
                         fn_800A4BDC();
                         fn_800B7490();
-                        pCh->n5C = SIProbe(nChan);
-                    } while (pCh->n5C != 0x40000 && OSGetTick() - uStart < GBA_TICKS_PER_MS * 800);
+                        *pType = SIProbe(nChan);
+                    } while (*pType != 0x40000 && OSGetTick() - uStart < GBA_TICKS_PER_MS * 800);
                 } else if (nChan != lbl_80281984) {
-                    pCh->n5C = SIProbe(nChan);
+                    pCh->u5C = SIProbe(nChan);
                 }
             }
-            if (pCh->n5C == 8 || pCh->n5C == 0x40) {
+            if (pCh->u5C == 8 || pCh->u5C == 0x40) {
                 uReset |= *pMask;
             }
         }
