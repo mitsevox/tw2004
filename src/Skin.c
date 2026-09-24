@@ -30,6 +30,9 @@ HwsOverrideTable* fn_80112A10(SkinDesc* pDesc, s32 nMeshes);  // hwsOverride_Gc.
 
 void  fn_80035F40(void* pCamera);
 void  fn_8003612C(LightGroup* pGroup);
+void  fn_80036278(SkinModel44* pEntries, s32 nEntries);
+void  fn_80036344(SkinModel44* pEntries, s32 nEntries);
+void  fn_800363B4(SkinModel54* pEntries, s32 nEntries);
 void  fn_800364AC(SkinModel* pModel);
 void  fn_8003682C(SkinModel* pModel);
 void  fn_80036894(SkinDesc* pDesc);
@@ -88,6 +91,48 @@ void fn_8003614C(void* pObj, f32* pOut) {
     }
 }
 
+// Byte-swaps nEntries SkinModel44 entries.
+void fn_80036278(SkinModel44* pEntries, s32 nEntries) {
+    SwapField aFormat[5] = { { 4, 4 }, { 4, 4 }, { 2, 2 }, { 2, 2 }, { 4, 2 } };
+    void* pSrc;
+    void* pDst;
+    int i;
+
+    for (i = 0; i < nEntries; i++) {
+        pSrc = pDst = pEntries;
+        fn_8001F08C(&pSrc, &pDst, aFormat, 5, 1);
+        pEntries++;
+    }
+}
+
+// Byte-swaps each SkinModel44 entry's p4 array.
+void fn_80036344(SkinModel44* pEntries, s32 nEntries) {
+    u8* pData;
+    u8* pSrc;
+    int i;
+
+    for (i = 0; i < nEntries; i++) {
+        pData = (u8*)pEntries->p4;
+        pSrc = pData;
+        fn_80076158(&pSrc, pData, pEntries->n8 * 4, 4);
+        pEntries++;
+    }
+}
+
+// Byte-swaps nEntries SkinModel54 entries.
+void fn_800363B4(SkinModel54* pEntries, s32 nEntries) {
+    SwapField aFormat[3] = { { 2, 2 }, { 6, 2 }, { 12, 4 } };
+    void* pSrc;
+    void* pDst;
+    int i;
+
+    for (i = 0; i < nEntries; i++) {
+        pSrc = pDst = pEntries;
+        fn_8001F08C(&pSrc, &pDst, aFormat, 3, 1);
+        pEntries++;
+    }
+}
+
 void fn_80036460(int n) {
 }
 
@@ -102,6 +147,84 @@ void fn_80036464(void) {
 
 void fn_800364A0(void) {
     lbl_80281D74 = 0;
+}
+
+// Turns a model's offsets into pointers and byte-swaps its tables, once (bit 31 of u30). A model
+// that is not version 4 is cleared to an empty one.
+void fn_800364AC(SkinModel* pModel) {
+    int i;
+
+    if (pModel->u30 & 0x80000000) {
+        return;
+    }
+    if (pModel->n00 != 4) {
+        memset(pModel, 0, sizeof(SkinModel));
+        pModel->n00 = 4;
+        pModel->n04 = 0;
+        pModel->n18 = pModel->n1A = pModel->n1C = pModel->n1E = -1;
+        pModel->n20 = pModel->n24 = -1;
+        pModel->n28 = pModel->n2C = -1;
+        pModel->u30 = 0x80000000;
+        return;
+    }
+    if (pModel->p34 != NULL) {
+        pModel->p34 = (u8*)pModel + (uptr)pModel->p34;
+    }
+    if (pModel->p38 != NULL) {
+        pModel->p38 = (u8*)pModel + (uptr)pModel->p38;
+    }
+    if (pModel->p3C != NULL) {
+        pModel->p3C = (u8*)pModel + (uptr)pModel->p3C;
+    }
+    if (pModel->p44 != NULL) {
+        pModel->p44 = (SkinModel44*)((u8*)pModel + (uptr)pModel->p44);
+    }
+    if (pModel->pDesc != NULL) {
+        pModel->pDesc = (SkinDesc*)((u8*)pModel + (uptr)pModel->pDesc);
+    }
+    if (pModel->p54 != NULL) {
+        pModel->p54 = (SkinModel54*)((u8*)pModel + (uptr)pModel->p54);
+    }
+    fn_80036278(pModel->p44, pModel->n40);
+    fn_800363B4(pModel->p54, pModel->n50);
+    for (i = 0; i < pModel->n40; i++) {
+        if (pModel->p44[i].p4 != NULL) {
+            pModel->p44[i].p4 = (s32*)((u8*)pModel + (uptr)pModel->p44[i].p4);
+        }
+        // EA bug: swaps every entry's array once per entry, and reaches entries whose p4 is
+        // still an offset; right only for a single entry.
+        fn_80036344(pModel->p44, pModel->n40);
+    }
+    pModel->u30 = pModel->u30 | 0x80000000;
+}
+
+// Byte-swaps a model's header.
+void fn_8003682C(SkinModel* pModel) {
+    SwapField aFormat[26] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 2, 2 },
+                              { 2, 2 }, { 2, 2 }, { 2, 2 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+                              { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+                              { 4, 4 }, { 4, 4 }, { 4, 4 }, { 8, 1 }, { 224, 4 } };
+    void* pSrc;
+    void* pDst;
+
+    pDst = pSrc = pModel;
+    fn_8001F08C(&pSrc, &pDst, aFormat, 26, 1);
+}
+
+// Byte-swaps a skin description's header.
+void fn_80036894(SkinDesc* pDesc) {
+    SwapField aFormat[48] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+                              { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+                              { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+                              { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+                              { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+                              { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+                              { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 100, 4 } };
+    void* pSrc;
+    void* pDst;
+
+    pDst = pSrc = pDesc;
+    fn_8001F08C(&pSrc, &pDst, aFormat, 48, 1);
 }
 
 // Byte-swaps a skin description read from its little-endian file, in place, and turns its mesh

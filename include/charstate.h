@@ -231,14 +231,22 @@ LAYOUT_ASSERT(SkinModel54, 0x14);
 // What Skin.pModel points at; only what SkinPart.c and SkinBurn.c read.
 typedef struct SkinModel {
     s32  n00;                   // 0x00  4: the file carries a SkinDesc at pDesc (fn_800377FC)
-    u8   unk4[4];
+    s32  n04;                   // 0x04
     s32  n08;                   // 0x08  its size with all its arrays once burnt (fn_801276E4)
     s32  n0C;                   // 0x0C  entries in p3C
     u8   unk10[4];
     s32  n14;                   // 0x14  how many matrices Skin.p108C holds (fn_80018710); also
                                 //       the 0x20-byte entries in p34
-    u8   unk18[0x30 - 0x18];
-    u32  u30;                   // 0x30  0x40000002 both set: already byte-swapped (fn_800377FC)
+    s16  n18;                   // 0x18  } -1 in a model fn_800364AC makes up
+    s16  n1A;                   // 0x1A  }
+    s16  n1C;                   // 0x1C  }
+    s16  n1E;                   // 0x1E  }
+    s32  n20;                   // 0x20  }
+    s32  n24;                   // 0x24  }
+    s32  n28;                   // 0x28  }
+    s32  n2C;                   // 0x2C  }
+    u32  u30;                   // 0x30  0x40000002 both set: already byte-swapped (fn_800377FC);
+                                //       0x80000000: offsets made pointers (fn_800364AC)
     void* p34;                  // 0x34  handed to the character's model (fn_80029A74)
     void* p38;                  // 0x38  one 0x50-byte block
     void* p3C;                  // 0x3C  n0C 0x50-byte blocks
