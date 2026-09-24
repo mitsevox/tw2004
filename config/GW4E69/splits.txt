@@ -258,6 +258,9 @@ user.c:
 
 PasswordManager.c:
 	.text       start:0x80056480 end:0x80057F18
+	.rodata     start:0x801834C0 end:0x80183578
+	.data       start:0x80187F88 end:0x80188138
+	.sdata      start:0x80281140 end:0x80281188
 
 fe_craputils.c:
 	.text       start:0x80057F18 end:0x800589F8
@@ -307,23 +310,10 @@ Code8006F154.c:
 	.sdata      start:0x802811E0 end:0x802811E8
 	.sdata2     start:0x80283958 end:0x80283988
 
-unsorted/sweep_8006F4B4.c:
-	.text       start:0x8006F4B4 end:0x8006F4E0
-
-unsorted/sweep_8006F4E0.c:
-	.text       start:0x8006F4E0 end:0x8006F4F0
-
-unsorted/sweep_8006F4F0.c:
-	.text       start:0x8006F4F0 end:0x8006F518
-
-unsorted/sweep_8006F518.c:
-	.text       start:0x8006F518 end:0x8006F568
-
-unsorted/sweep_8006F568.c:
-	.text       start:0x8006F568 end:0x8006F5F8
-
-unsorted/sweep_8006F5F8.c:
-	.text       start:0x8006F5F8 end:0x8006F608
+Code8006F438.c:
+	.text       start:0x8006F438 end:0x8006F608
+	.sdata      start:0x802811E8 end:0x802811F0
+	.sbss       start:0x80281E68 end:0x80281E70
 
 unsorted/sweep_8006F608.c:
 	.text       start:0x8006F608 end:0x8006F64C
@@ -377,6 +367,9 @@ GoViewport.c:
 
 GoShaderObjectCommon_TexAnimManager_Gc.c:
 	.text       start:0x80076B7C end:0x80076E48
+	.data       start:0x801894A0 end:0x801894D0
+	.sbss       start:0x80281EC0 end:0x80281EC8
+	.sdata2     start:0x80283AA8 end:0x80283AC0
 
 FE_Manager.c:
 	.text       start:0x80076E48 end:0x80079E6C
@@ -453,6 +446,9 @@ unsorted/sweep_800977CC.c:
 
 GoCamTuningVars.c:
 	.text       start:0x800977F8 end:0x80097E98
+	.data       start:0x80189D60 end:0x80189D78
+	.sbss       start:0x80281F78 end:0x80281F80
+	.sdata2     start:0x80283D28 end:0x80283DF8
 
 unsorted/sweep_80097E98.c:
 	.text       start:0x80097E98 end:0x80097F44

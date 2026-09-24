@@ -31,4 +31,15 @@ typedef struct ShaderCmds {
 // + 0x0).
 void fn_80074DA8(ShaderVtxArrays* pArrays, int eType, MorphAnim* pAnim, ShaderCmds* pCmds);
 
+// A static shader object (our name, after row 17's SD_vShaderObject_Grass_Static_Init/_Close/
+// _Render at +0x24..+0x2C of its row of lbl_80188E88): drawn from a display list.
+typedef struct StaticShaderObject {
+    s32  eType;                 // 0x00  its shader type
+    MorphAnim anim;             // 0x04  its display list and morph animation
+    ShaderVtxArrays* pArrays;   // 0x24
+} StaticShaderObject;
+
+extern f32 lbl_80281E70;        // row 3's morph weight, handed in by fn_80070D7C
+extern f32 lbl_80281E78;        // row 2's morph weight, handed in by fn_80070FB0
+
 #endif
