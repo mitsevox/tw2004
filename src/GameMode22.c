@@ -251,8 +251,9 @@ void fn_801260BC(void) {
 void fn_801260C0(void) {
     s32 i;
 
-    for (i = 0; i < gSession.nNumPlayers; i++) {
-        gSession.nTeeSet[i] = 0;
+    i = 0;
+    while (i < gSession.nNumPlayers) {
+        gSession.nTeeSet[i++] = 0;
     }
     gSession.options.n20 = 0;
     lbl_80195498.n8 = 5;
