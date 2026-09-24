@@ -66,10 +66,9 @@ DynTex* fn_8010A520(int nC, int nSize, int n2, int n3, int n4) {
     DynTex* pTex;
     DynTexHeader* pHeader;
 
-    // fake match: the terms' order and the casts only steer CW's regrouping (still 90%)
-    nBytes = nC * (s32)sizeof(DynTexObj) + nC * (s32)sizeof(DynTexEntry) +
+    nBytes = (s32)sizeof(DynTex) + nC * (s32)sizeof(DynTexEntry) + nC * (s32)sizeof(DynTexObj) +
              nC * (s32)sizeof(DynTexPalette) + nC * (s32)sizeof(DynTex40) +
-             nC * (s32)sizeof(DynTex18) + (s32)sizeof(DynTex);
+             nC * (s32)sizeof(DynTex18);
     pTex = fn_80009B34(nBytes, 2, 16, "LLDynTex.c", 151);
     memset(pTex, 0, nBytes);
     pTex->nC = nC;
@@ -820,12 +819,14 @@ u32 fn_8010B6AC(DynTexObj* pObj, int nLevel) {
     u32 nA = pObj->n3A;
     u32 nB = pObj->n38;
     int i;
+    u32 nSize;
 
     for (i = 0; i < nLevel; i++) {
         nA >>= 1;
         nB >>= 1;
     }
-    return (nA * nB * fn_8010C458(pObj->n40) + 7) >> 3;
+    nSize = (nA * nB * fn_8010C458(pObj->n40) + 7) >> 3;
+    return nSize;
 }
 
 // The bytes of all of a texture's levels.
@@ -844,12 +845,15 @@ u32 fn_8010B548(DynTexObj* pObj, int nLevel) {
     u32 nA = pObj->n3A;
     u32 nB = pObj->n38;
     int i;
+    u32 nSize;
 
     for (i = 0; i < nLevel; i++) {
         nA >>= 1;
         nB >>= 1;
     }
-    return (((nA * nB * fn_8010C458(pObj->n40) + 7) >> 3) + 15) >> 4;
+    nSize = (nA * nB * fn_8010C458(pObj->n40) + 7) >> 3;
+    nSize = (nSize + 15) >> 4;
+    return nSize;
 }
 
 // The 16-byte units of all of a texture's levels.

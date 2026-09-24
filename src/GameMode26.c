@@ -222,10 +222,10 @@ s32 fn_8010C9D4(int nLie) {
 // player to lbl_80281760 points wins.
 void fn_8010CA2C(int nPlayer) {
     Player* pPlayer = &gPlayers[nPlayer];
-    u8 bCounts = 0;
-    s32 nMsgs = 0;
-    s32 nLead;
     s32 nKind;
+    u8 bCounts = 0;
+    s32 nLead;
+    s32 nMsgs = 0;
     s32 nLength;
     s32 nPoints;
     u32 nPick;

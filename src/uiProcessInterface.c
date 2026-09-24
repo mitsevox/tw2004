@@ -94,9 +94,11 @@ void fn_8008F568(s32 nCmd, s32 unused1, s32 unused2, s32 unused3, s32 a, s32 b) 
 // group is ignored.
 void* fn_8008F610(u16 uGroup, u16 uScreen) {
     UIFilePairs* pPairs = lbl_80281F1C->pFile->p4;
+    UIFilePair* pPair;
 
-    if (uScreen >= pPairs->nCount) return NULL;
-    return pPairs->aPairs[uScreen].p4;
+    if (pPairs->nCount <= uScreen) return NULL;
+    pPair = &pPairs->aPairs[uScreen];
+    return pPair->p4;
 }
 
 // The studio's UISUnloadFn: nothing to do, the screens' data stays in the UI file.
@@ -300,13 +302,14 @@ void fn_8008FD60(u32 uEvent) {
 // and turn its entries' colour offsets into pointers; with none, p14 is NULL.
 void fn_8008FDDC(FrontEnd* pFE) {
     UIFile* pFile = pFE->pFile;
+    UIColorTable* pTable;
     u8 bFound = 0;
     int nTables;
     int i;
 
     nTables = pFile->p8->nCount;
     for (i = 0; i < nTables; i++) {
-        UIColorTable* pTable = pFE->pFile->p8->apTables[i];
+        pTable = pFE->pFile->p8->apTables[i];
 
         // fake match: the original tests the count unsigned here (cmplwi), signed below
         if ((u32)pTable->nCount != 0 && pTable->apEntries[0]->u0 == 0x10) {
@@ -553,6 +556,7 @@ void fn_800907AC(int nValue, char* szOut) {
     int nDigit = 1;
     u32 nLen;
     u32 nCommas;
+    u32 nTotal;
     int i;
 
     sprintf(szOut, "%d", nValue);
@@ -561,8 +565,9 @@ void fn_800907AC(int nValue, char* szOut) {
     if (nLen % 3 == 0) {
         nCommas--;
     }
-    aBuf[nLen + nCommas] = '\0';
-    for (i = nLen + nCommas - 1; i >= 0; i--) {
+    nTotal = nLen + nCommas;
+    aBuf[nTotal] = '\0';
+    for (i = nTotal - 1; i >= 0; i--) {
         if (nDigit % 4 == 0) {
             aBuf[i] = ',';
         } else {
