@@ -47,6 +47,7 @@ void fn_80165528(UIStudio* pStudio, u8 bScreenOnly) {
     s32* pKeep;
     UISEventData* pData;
     s32 nType;
+    s32* pNext;
 
     if (pStudio->uFlags & 1) return;
     pStudio->uFlags |= 1;
@@ -55,8 +56,11 @@ void fn_80165528(UIStudio* pStudio, u8 bScreenOnly) {
     if (bScreenOnly) {
         while (p > pStudio->pEventTop) {
             nType = p[0];
-            pData = (UISEventData*)(p - 7);
-            p = p - 8 - p[-8];
+            // below the type word: the event's data, its argument count and its arguments
+            pNext = p - 7;
+            pData = (UISEventData*)pNext;
+            pNext--;
+            pNext -= p[-8];
             switch (nType) {
             case 5:
                 if (pData->as[1] == 0) {
@@ -73,7 +77,7 @@ void fn_80165528(UIStudio* pStudio, u8 bScreenOnly) {
                 }
                 break;
             }
-            p--;
+            p = pNext - 1;
         }
     } else {
         while (p > pStudio->pEventTop) {

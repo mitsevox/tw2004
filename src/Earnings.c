@@ -57,13 +57,32 @@ void  fn_8005844C(int nProfile);                        // the same for aCourseU
 u8    fn_8005846C(int nProfile);
 void  fn_80058494(int nProfile);                        // and for aCourseUnlocked[22]
 u8    fn_800584B4(int nProfile);
+f32   fn_800D04AC(int nPlayer);                         // HoleScore.c
+u32   fn_800D0BAC(int nPlayer);                         // the class of the ground the shot left
+u8    fn_800D0BF8(int nPlayer, u8 bUnder, u8 bAnyLie);
+u8    fn_800D0D54(int nPlayer);
+int   fn_800D0DC8(int nPlayer, int nToPar);
+int   fn_800D0E74(int nPlayer);
+int   fn_800D0F04(int nPlayer, int nToPar);
+int   fn_800D0FBC(int nPlayer);
+int   fn_800D10B0(int nPlayer);
+int   fn_800D1170(int nPlayer, u8 bOnlyFlagged);
+int   fn_800D1250(int nPlayer);
+int   fn_800D1330(int nPlayer);
+int   fn_800D3208(void);                                // CourseData.c
+u8    fn_800D61E4(int nPlayer, u8 bCheck);
+u8    fn_800D68CC(int nPlayer, u8 bCheck);
+u8    fn_800D69B8(int nPlayer, u8 bCheck);
+s32   fn_80126FA0(void);                                // GameMode22.c
+s32   fn_80127098(s32 n);
 
 int   fn_800D3A20(int nProfile, u8 bMessage);
 int   fn_800D3CF8(int nRating);
 u8    fn_800D4010(int nId);
 f32   fn_800D6EEC(void);
+u8    fn_800D748C(int nPlayer);
 u8    fn_800D76AC(int nPlayer, int nAward);
-int   fn_800D7DA0(int nPlayer, u8 a, u8 b, u8 c);
+int   fn_800D7DA0(int nPlayer, int bSave, u8 bCountStroke, u8 bAll);
 s32   fn_800D9E00(s32 i);
 
 // Put the working tables back to their saved copies.
@@ -572,6 +591,529 @@ u8 fn_800D4EF8(u32 uMask, int nBit) {
     return (uMask & (1 << nBit)) != 0;
 }
 
+// After a putt: check the putt goals and fill the working tables with what they give, awards
+// (lbl_80282250 of them) and money prizes (lbl_80282254). Of goals with the same id only the one
+// with the biggest nValue is kept. The holes still to come count 999 strokes and putts meanwhile.
+// With bPreview the hole counts one more stroke and putt (the ball dropping now), a few tests are
+// skipped and no EA Sports Bio accomplishment is posted.
+void fn_800D4F14(int nPlayer, u8 bPreview) {
+    s32 aPrizeIds[10];
+    s32 aAwardIds[10];
+    int i;
+    int nSlot;
+    u8 bReplace;
+    u8 bLost;
+    int j;
+    s32 nValue;
+    u8 bHole;
+    u8 bTee;
+
+    lbl_80282254 = 0;
+    lbl_80282250 = 0;
+    if (gSession.uFlags & 0x4000) return;
+    if (Player_IsCPU(nPlayer)) return;
+    if (!fn_800D748C(nPlayer)) return;
+    if (fn_800EC550() && !fn_801025F4()) return;
+    if (fn_800E177C() != 0) return;
+
+    for (i = Game_CurHoleIndex() + 1; i < 18; i++) {
+        gPlayers[nPlayer].nStrokes[i] = 999;
+        gPlayers[nPlayer].nPutts[i] = 999;
+    }
+    if (bPreview) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]++;
+        gPlayers[nPlayer].nPutts[Game_CurHoleIndex()]++;
+    }
+
+    for (i = 0; i < NUM_PUTT_GOALS; i++) {
+        if (!lbl_80200538.aPuttGoal[i].bEnabled) continue;
+        if (!fn_800D4EF8(lbl_80200538.aPuttGoal[i].uModes, Game_GetMode())) continue;
+        if (fn_800EC550() && !fn_801025F4() && !fn_800D4EF8(lbl_80200538.aPuttGoal[i].uModes, 5)) continue;
+        if (!fn_800D4EF8(lbl_80200538.aPuttGoal[i].uPars, 0) && fn_800D2B08() == 3) continue;
+        if (!fn_800D4EF8(lbl_80200538.aPuttGoal[i].uPars, 1) && fn_800D2B08() == 4) continue;
+        if (!fn_800D4EF8(lbl_80200538.aPuttGoal[i].uPars, 2) && fn_800D2B08() == 5) continue;
+        if (!fn_800D4EF8(lbl_80200538.aPuttGoal[i].uLies, fn_800D4694(fn_800D0BAC(nPlayer)))) continue;
+        if (lbl_80200538.aPuttGoal[i].f0C > fn_800D04AC(nPlayer)) continue;
+        if (!fn_800D4EF8(lbl_80200538.aPuttGoal[i].uShotKinds, gPlayers[nPlayer].nShotKind)) continue;
+        if (!fn_800D4EF8(lbl_80200538.aPuttGoal[i].uClubs, gPlayers[nPlayer].nClub)) continue;
+        if (fn_800D4EF8(lbl_80200538.aPuttGoal[i].uFlags, 0) && !fn_800D0BF8(nPlayer, 1, 0)) continue;
+        if (fn_800D4EF8(lbl_80200538.aPuttGoal[i].uFlags, 1) && !fn_800D0BF8(nPlayer, 0, 0)) continue;
+        if (!bPreview && fn_800D4EF8(lbl_80200538.aPuttGoal[i].uFlags, 2) && !fn_800D0D54(nPlayer)) continue;
+        if (fn_800D4EF8(lbl_80200538.aPuttGoal[i].uFlags, 4) &&
+            !gPlayers[nPlayer].b310 && !gPlayers[nPlayer].b311) continue;
+        if (!bPreview && fn_800D4EF8(lbl_80200538.aPuttGoal[i].uFlags, 5) &&
+            !gPlayers[nPlayer].b30D) continue;
+        if (lbl_80200538.aPuttGoal[i].nMaxPutts != 0 &&
+            lbl_80200538.aPuttGoal[i].nMaxPutts < gPlayers[nPlayer].nPutts[Game_CurHoleIndex()]) continue;
+        // The score on the hole: 2 triple bogey or better, 3 double bogey, 4 bogey, 5 par or better,
+        // 6 birdie, 7 eagle and 8 albatross (not with a hole in one), 9 a hole in one.
+        if (lbl_80200538.aPuttGoal[i].nScore == 2 &&
+            gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] > fn_800D2B08() + 3) continue;
+        if (lbl_80200538.aPuttGoal[i].nScore == 3 &&
+            gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] != fn_800D2B08() + 2) continue;
+        if (lbl_80200538.aPuttGoal[i].nScore == 4 &&
+            gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] != fn_800D2B08() + 1) continue;
+        if (lbl_80200538.aPuttGoal[i].nScore == 5 &&
+            gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] > fn_800D2B08()) continue;
+        if (lbl_80200538.aPuttGoal[i].nScore == 6 &&
+            gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] != fn_800D2B08() - 1) continue;
+        if (lbl_80200538.aPuttGoal[i].nScore == 7 &&
+            (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 ||
+             gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] != fn_800D2B08() - 2)) continue;
+        if (lbl_80200538.aPuttGoal[i].nScore == 8 &&
+            (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1 ||
+             gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] != fn_800D2B08() - 3)) continue;
+        if (lbl_80200538.aPuttGoal[i].nScore == 9 &&
+            gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] > 1) continue;
+        // Flag 6: a hole in one, and the round's second (fn_800D0DC8 below -3 counts holes in one).
+        if (fn_800D4EF8(lbl_80200538.aPuttGoal[i].uFlags, 6) &&
+            (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] > 1 || fn_800D0DC8(nPlayer, -5) < 2)) continue;
+        if (lbl_80200538.aPuttGoal[i].nAward >= 23 && lbl_80200538.aPuttGoal[i].nAward <= 38 &&
+            (bPreview || !fn_800D9998(nPlayer, lbl_80200538.aPuttGoal[i].nAward))) continue;
+        if (lbl_80200538.aPuttGoal[i].nAward == 22 &&
+            GM_GetGameProgress(&gpSaveData[nPlayer]) < 100.0f) continue;
+
+        if (lbl_80200538.aPuttGoal[i].nAward != 39) {
+            if (!fn_800D76AC(nPlayer, lbl_80200538.aPuttGoal[i].nAward)) continue;
+            bReplace = 0;
+            bLost = 0;
+            nSlot = lbl_80282250;
+            if (lbl_80200538.aPuttGoal[i].nId != 0) {
+                for (j = 0; j < lbl_80282250; j++) {
+                    if (lbl_80200538.aPuttGoal[i].nId == aAwardIds[j]) {
+                        if (lbl_80200538.aPuttGoal[i].nValue > lbl_80200218[j]) {
+                            nSlot = j;
+                            bReplace = 1;
+                        } else {
+                            bLost = 1;
+                        }
+                    }
+                }
+            }
+            if (bLost) continue;
+            lbl_80200290[nSlot] = lbl_80200538.aPuttGoal[i].nAward;
+            lbl_80200218[nSlot] = lbl_80200538.aPuttGoal[i].nValue;
+            aAwardIds[nSlot] = lbl_80200538.aPuttGoal[i].nId;
+            if (!bReplace) {
+                lbl_80282250++;
+            }
+            if (!bPreview && lbl_80200538.aPuttGoal[i].nBio != -1) {
+                fn_80125874(lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].szName,
+                            lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].nValue);
+            }
+        } else {
+            nValue = lbl_80200538.aPuttGoal[i].nValue;
+            if (nValue == 0) continue;
+            bReplace = 0;
+            bLost = 0;
+            nSlot = lbl_80282254;
+            if (lbl_80200538.aPuttGoal[i].nId != 0) {
+                for (j = 0; j < lbl_80282254; j++) {
+                    if (lbl_80200538.aPuttGoal[i].nId == aPrizeIds[j]) {
+                        if (lbl_80200538.aPuttGoal[i].nValue > lbl_80200308[j]) {
+                            nSlot = j;
+                            bReplace = 1;
+                        } else {
+                            bLost = 1;
+                        }
+                    }
+                }
+            }
+            if (bLost) continue;
+            aPrizeIds[nSlot] = lbl_80200538.aPuttGoal[i].nId;
+            lbl_80200308[nSlot] = nValue;
+            bHole = fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 2);
+            bTee = fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 1);
+            lbl_80200380[nSlot] = fn_800D6A70(lbl_80200308[nSlot], nPlayer,
+                                              fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 0), bTee, bHole,
+                                              &lbl_801FFAE8[nSlot]);
+            if (fn_800D4EF8(lbl_80200538.aPuttGoal[i].uMults, 3)) {
+                lbl_80200380[nSlot] = fn_800D7220(lbl_80200380[nSlot], nPlayer, &lbl_801FFAE8[nSlot]);
+            }
+            lbl_802003F8[nSlot] = lbl_80200538.aPuttGoal[i].n1D;
+            if (!bReplace) {
+                lbl_80282254++;
+            }
+            if (!bPreview && lbl_80200538.aPuttGoal[i].nBio != -1) {
+                fn_80125874(lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].szName,
+                            lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].nValue);
+            }
+        }
+    }
+
+    for (i = Game_CurHoleIndex() + 1; i < 18; i++) {
+        gPlayers[nPlayer].nStrokes[i] = 0;
+        gPlayers[nPlayer].nPutts[i] = 0;
+    }
+    if (bPreview) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]--;
+        gPlayers[nPlayer].nPutts[Game_CurHoleIndex()]--;
+    }
+}
+
+// After a hole (bRoundOver: after the round), as fn_800D4F14 does for the putt goals: check the
+// hole goals against the round so far and fill the working tables (lbl_80200268 awards,
+// lbl_802002E0 money prizes).
+void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
+    s32 aPrizeIds[10];
+    s32 aAwardIds[10];
+    int i;
+    int nSlot;
+    u8 bReplace;
+    u8 bLost;
+    int j;
+    s32 nValue;
+    u8 bHole;
+    u8 bTee;
+    int nHoles;
+    int nNeed;
+    u8 bMore;
+
+    lbl_80282254 = 0;
+    lbl_80282250 = 0;
+    if (gSession.uFlags & 0x4000) return;
+    if (!fn_800D748C(nPlayer)) return;
+    if (fn_800E177C() != 0) return;
+
+    for (i = Game_CurHoleIndex() + 1; i < 18; i++) {
+        gPlayers[nPlayer].nStrokes[i] = 999;
+        gPlayers[nPlayer].nPutts[i] = 999;
+    }
+    if (bPreview) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]++;
+        gPlayers[nPlayer].nPutts[Game_CurHoleIndex()]++;
+    }
+    nNeed = 0;                  // fake match: the flag is worked out in an int first
+    if (!bRoundOver && (!fn_800E1BBC() || Game_CurHoleIndex() != 17)) {
+        nNeed = 1;
+    }
+    bMore = nNeed;
+
+    for (i = 0; i < NUM_HOLE_GOALS; i++) {
+        if (lbl_80200538.aHoleGoal[i].bRoundOver && !bRoundOver) continue;
+        if (!lbl_80200538.aHoleGoal[i].bRoundOver && bRoundOver) continue;
+        if (!lbl_80200538.aHoleGoal[i].bEnabled) continue;
+        if (!fn_800D4EF8(lbl_80200538.aHoleGoal[i].uModes, Game_GetMode())) continue;
+        if (fn_800EC550() && !fn_801025F4() && !fn_800D4EF8(lbl_80200538.aHoleGoal[i].uModes, 5)) continue;
+        if (!lbl_80200538.aHoleGoal[i].b19 && !bMore) continue;
+        if (lbl_80200538.aHoleGoal[i].aToPar[0] != 0 &&
+            lbl_80200538.aHoleGoal[i].aToPar[0] > fn_800D0DC8(nPlayer, 0)) continue;
+        if (lbl_80200538.aHoleGoal[i].aToPar[1] != 0 &&
+            lbl_80200538.aHoleGoal[i].aToPar[1] > fn_800D0DC8(nPlayer, -1)) continue;
+        if (lbl_80200538.aHoleGoal[i].aToPar[2] != 0 &&
+            lbl_80200538.aHoleGoal[i].aToPar[2] > fn_800D0DC8(nPlayer, -2)) continue;
+        if (lbl_80200538.aHoleGoal[i].aToPar[3] != 0 &&
+            lbl_80200538.aHoleGoal[i].aToPar[3] > fn_800D0DC8(nPlayer, -3)) continue;
+        if (lbl_80200538.aHoleGoal[i].aToPar[4] != 0 &&
+            lbl_80200538.aHoleGoal[i].aToPar[4] > fn_800D0DC8(nPlayer, -5)) continue;
+        if (lbl_80200538.aHoleGoal[i].aRun[0] != 0 &&
+            lbl_80200538.aHoleGoal[i].aRun[0] > fn_800D0F04(nPlayer, 0)) continue;
+        if (lbl_80200538.aHoleGoal[i].aRun[1] != 0 &&
+            lbl_80200538.aHoleGoal[i].aRun[1] > fn_800D0F04(nPlayer, -1)) continue;
+        if (lbl_80200538.aHoleGoal[i].aRun[2] != 0 &&
+            lbl_80200538.aHoleGoal[i].aRun[2] > fn_800D0F04(nPlayer, -2)) continue;
+        if (lbl_80200538.aHoleGoal[i].aRun[3] != 0 &&
+            lbl_80200538.aHoleGoal[i].aRun[3] > fn_800D0F04(nPlayer, -3)) continue;
+        if (lbl_80200538.aHoleGoal[i].aRun[4] != 0 &&
+            lbl_80200538.aHoleGoal[i].aRun[4] > fn_800D0F04(nPlayer, -5)) continue;
+        if (lbl_80200538.aHoleGoal[i].n13 != 0) {
+            nNeed = lbl_80200538.aHoleGoal[i].n13;
+            nHoles = fn_800D3208();
+            if (nHoles < 10) continue;
+            if (nNeed > nHoles) {
+                nNeed = nHoles;
+            }
+            if (nNeed > fn_800D0FBC(nPlayer)) continue;
+        }
+        if (lbl_80200538.aHoleGoal[i].n14 != 0 &&
+            lbl_80200538.aHoleGoal[i].n14 > fn_800D1170(nPlayer, 0)) continue;
+        if (lbl_80200538.aHoleGoal[i].n15 != 0 &&
+            lbl_80200538.aHoleGoal[i].n15 > fn_800D10B0(nPlayer)) continue;
+        if (lbl_80200538.aHoleGoal[i].n16 != 0 &&
+            lbl_80200538.aHoleGoal[i].n16 > fn_800D1250(nPlayer)) continue;
+        if (lbl_80200538.aHoleGoal[i].n17 != 0 &&
+            lbl_80200538.aHoleGoal[i].n17 > fn_800D1330(nPlayer)) continue;
+        if (lbl_80200538.aHoleGoal[i].nMaxStrokes != 0 &&
+            lbl_80200538.aHoleGoal[i].nMaxStrokes < fn_800E17AC(nPlayer)) continue;
+        if (lbl_80200538.aHoleGoal[i].nKind != 0) {
+            if (lbl_80200538.aHoleGoal[i].nKind == 1 && !fn_800D61E4(nPlayer, bPreview)) continue;
+            if (lbl_80200538.aHoleGoal[i].nKind == 2 && !fn_800D68CC(nPlayer, bPreview)) continue;
+            if (lbl_80200538.aHoleGoal[i].nKind == 3) continue;
+            if (lbl_80200538.aHoleGoal[i].nKind == 4 && !fn_800D69B8(nPlayer, bPreview)) continue;
+            if (lbl_80200538.aHoleGoal[i].nKind == 5 && fn_800D0E74(nPlayer) != 0) continue;
+            if (lbl_80200538.aHoleGoal[i].nKind == 6 && fn_800D2FB4(0) <= fn_800E17AC(nPlayer)) continue;
+        }
+        if (lbl_80200538.aHoleGoal[i].nAward >= 23 && lbl_80200538.aHoleGoal[i].nAward <= 38 &&
+            (bPreview || !fn_800D9998(nPlayer, lbl_80200538.aHoleGoal[i].nAward))) continue;
+        if (lbl_80200538.aHoleGoal[i].nAward == 22 &&
+            GM_GetGameProgress(&gpSaveData[nPlayer]) < 100.0f) continue;
+
+        if (lbl_80200538.aHoleGoal[i].nAward != 39) {
+            if (!fn_800D76AC(nPlayer, lbl_80200538.aHoleGoal[i].nAward)) continue;
+            bReplace = 0;
+            bLost = 0;
+            nSlot = lbl_80282250;
+            if (lbl_80200538.aHoleGoal[i].nId != 0) {
+                for (j = 0; j < lbl_80282250; j++) {
+                    if (lbl_80200538.aHoleGoal[i].nId == aAwardIds[j]) {
+                        if (lbl_80200538.aHoleGoal[i].nValue > lbl_802001F0[j]) {
+                            nSlot = j;
+                            bReplace = 1;
+                        } else {
+                            bLost = 1;
+                        }
+                    }
+                }
+            }
+            if (bLost) continue;
+            lbl_80200268[nSlot] = lbl_80200538.aHoleGoal[i].nAward;
+            lbl_802001F0[nSlot] = lbl_80200538.aHoleGoal[i].nValue;
+            aAwardIds[nSlot] = lbl_80200538.aHoleGoal[i].nId;
+            if (!bReplace) {
+                lbl_80282250++;
+            }
+            if (!bPreview && lbl_80200538.aHoleGoal[i].nBio != -1) {
+                fn_80125874(lbl_80200538.aBio[lbl_80200538.aHoleGoal[i].nBio].szName,
+                            lbl_80200538.aBio[lbl_80200538.aHoleGoal[i].nBio].nValue);
+            }
+        } else {
+            nValue = lbl_80200538.aHoleGoal[i].nValue;
+            if (nValue == 0) continue;
+            bReplace = 0;
+            bLost = 0;
+            nSlot = lbl_80282254;
+            if (lbl_80200538.aHoleGoal[i].nId != 0) {
+                for (j = 0; j < lbl_80282254; j++) {
+                    if (lbl_80200538.aHoleGoal[i].nId == aPrizeIds[j]) {
+                        if (lbl_80200538.aHoleGoal[i].nValue > lbl_802002E0[j]) {
+                            nSlot = j;
+                            bReplace = 1;
+                        } else {
+                            bLost = 1;
+                        }
+                    }
+                }
+            }
+            if (bLost) continue;
+            aPrizeIds[nSlot] = lbl_80200538.aHoleGoal[i].nId;
+            lbl_802002E0[nSlot] = nValue;
+            bHole = fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 2);
+            bTee = fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 1);
+            lbl_80200358[nSlot] = fn_800D6A70(lbl_802002E0[nSlot], nPlayer,
+                                              fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 0), bTee, bHole,
+                                              &lbl_801FFAE8[nSlot]);
+            if (fn_800D4EF8(lbl_80200538.aHoleGoal[i].uMults, 3)) {
+                lbl_80200358[nSlot] = fn_800D7220(lbl_80200358[nSlot], nPlayer, &lbl_801FFAE8[nSlot]);
+            }
+            lbl_802003D0[nSlot] = lbl_80200538.aHoleGoal[i].n25;
+            if (!bReplace) {
+                lbl_80282254++;
+            }
+            if (!bPreview && lbl_80200538.aHoleGoal[i].nBio != -1) {
+                fn_80125874(lbl_80200538.aBio[lbl_80200538.aHoleGoal[i].nBio].szName,
+                            lbl_80200538.aBio[lbl_80200538.aHoleGoal[i].nBio].nValue);
+            }
+        }
+    }
+
+    for (i = Game_CurHoleIndex() + 1; i < 18; i++) {
+        gPlayers[nPlayer].nStrokes[i] = 0;
+        gPlayers[nPlayer].nPutts[i] = 0;
+    }
+    if (bPreview) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]--;
+        gPlayers[nPlayer].nPutts[Game_CurHoleIndex()]--;
+    }
+}
+
+// The marked holes (fn_800E1CE8's items, kind 0). Without bCheck: whether the profile has all 71.
+// With it: whether this par 5 was played in eagle or better with 70 held and this hole the one
+// missing.
+u8 fn_800D61E4(int nPlayer, u8 bCheck) {
+    int nProfile;
+    u8 bAll;
+    int i;
+    int nHave;
+    int nItem;
+
+    nProfile = gPlayers[nPlayer].nIndex;
+    if (!gpSaveData[nProfile].bActive) return 0;
+    if (!bCheck) {
+        bAll = 1;
+        for (i = 0; i < 71; i++) {
+            if (!fn_800588F4(&gpSaveData[nProfile], 0, i)) {
+                bAll = 0;
+            }
+        }
+        return bAll;
+    }
+    if (fn_800D2ABC(Game_GetCourse(), fn_80015464()) == 5 &&
+        gPlayers[nPlayer].nStrokes[fn_80015464()] <= fn_800D2ABC(gpGame->nCurCourse, fn_80015464()) - 2) {
+        // EA bug: from here the profile is picked by nPlayer, not nProfile as above.
+        nHave = 0;
+        for (i = 0; i < 71; i++) {
+            if (fn_800588F4(&gpSaveData[nPlayer], 0, i)) {
+                nHave++;
+            }
+        }
+        if (nHave == 70) {
+            nItem = -1;
+            switch (Game_GetCourse()) {
+            case 0:
+                switch (fn_80015464() + 1) {
+                case 2: nItem = 0; break;
+                case 6: nItem = 1; break;
+                case 14: nItem = 2; break;
+                case 18: nItem = 3; break;
+                }
+                break;
+            case 1:
+                switch (fn_80015464() + 1) {
+                case 2: nItem = 4; break;
+                case 4: nItem = 5; break;
+                case 10: nItem = 6; break;
+                case 15: nItem = 7; break;
+                }
+                break;
+            case 2:
+                switch (fn_80015464() + 1) {
+                case 2: nItem = 8; break;
+                case 9: nItem = 9; break;
+                case 11: nItem = 10; break;
+                case 16: nItem = 11; break;
+                }
+                break;
+            case 3:
+                switch (fn_80015464() + 1) {
+                case 2: nItem = 12; break;
+                case 9: nItem = 13; break;
+                case 13: nItem = 14; break;
+                case 18: nItem = 15; break;
+                }
+                break;
+            case 6:
+                switch (fn_80015464() + 1) {
+                case 6: nItem = 16; break;
+                case 15: nItem = 17; break;
+                case 17: nItem = 18; break;
+                }
+                break;
+            case 12:
+                switch (fn_80015464() + 1) {
+                case 2: nItem = 19; break;
+                case 6: nItem = 20; break;
+                case 11: nItem = 21; break;
+                case 18: nItem = 22; break;
+                }
+                break;
+            case 9:
+                switch (fn_80015464() + 1) {
+                case 4: nItem = 23; break;
+                case 6: nItem = 24; break;
+                case 12: nItem = 25; break;
+                case 16: nItem = 26; break;
+                }
+                break;
+            // EA left out course 10 (items 27..30), which fn_800E1CE8 has.
+            case 11:
+                switch (fn_80015464() + 1) {
+                case 4: nItem = 31; break;
+                case 9: nItem = 32; break;
+                case 10: nItem = 33; break;
+                case 12: nItem = 34; break;
+                case 18: nItem = 35; break;
+                }
+                break;
+            case 13:
+                switch (fn_80015464() + 1) {
+                case 3: nItem = 36; break;
+                case 13: nItem = 37; break;
+                case 15: nItem = 38; break;
+                }
+                break;
+            case 15:
+                switch (fn_80015464() + 1) {
+                case 5: nItem = 39; break;
+                case 14: nItem = 40; break;
+                }
+                break;
+            case 14:
+                switch (fn_80015464() + 1) {
+                case 6: nItem = 41; break;
+                case 9: nItem = 42; break;
+                case 13: nItem = 43; break;
+                case 18: nItem = 44; break;
+                }
+                break;
+            case 16:
+                switch (fn_80015464() + 1) {
+                case 2: nItem = 45; break;
+                case 6: nItem = 46; break;
+                case 11: nItem = 47; break;
+                }
+                break;
+            case 17:
+                switch (fn_80015464() + 1) {
+                case 1: nItem = 48; break;
+                case 6: nItem = 49; break;
+                case 7: nItem = 50; break;
+                case 11: nItem = 51; break;
+                case 15: nItem = 52; break;
+                }
+                break;
+            case 18:
+                switch (fn_80015464() + 1) {
+                case 5: nItem = 53; break;
+                case 8: nItem = 54; break;
+                case 13: nItem = 55; break;
+                case 18: nItem = 56; break;
+                }
+                break;
+            case 19:
+                switch (fn_80015464() + 1) {
+                case 5: nItem = 57; break;
+                case 9: nItem = 58; break;
+                case 15: nItem = 59; break;
+                case 18: nItem = 60; break;
+                }
+                break;
+            case 20:
+                switch (fn_80015464() + 1) {
+                case 4: nItem = 61; break;
+                case 10: nItem = 62; break;
+                case 16: nItem = 63; break;
+                }
+                break;
+            case 5:
+                switch (fn_80015464() + 1) {
+                case 4: nItem = 64; break;
+                case 7: nItem = 65; break;
+                case 13: nItem = 66; break;
+                }
+                break;
+            case 8:
+                switch (fn_80015464() + 1) {
+                case 4: nItem = 67; break;
+                case 6: nItem = 68; break;
+                case 12: nItem = 69; break;
+                case 16: nItem = 70; break;
+                }
+                break;
+            case 4:
+                switch (fn_80015464() + 1) {
+                case 1: nItem = 71; break;
+                case 7: nItem = 72; break;
+                case 10: nItem = 73; break;
+                case 18: nItem = 74; break;
+                }
+                break;
+            }
+            if (nItem >= 0 && !fn_800588F4(&gpSaveData[nPlayer], 0, nItem)) return 1;
+        }
+    }
+    return 0;
+}
+
 // Without bCheck: whether the profile has won all 31 PGA TOUR tournaments. With it: whether this is
 // game mode 23 with 30 won and fn_800CF450 agrees.
 u8 fn_800D68CC(int nPlayer, u8 bCheck) {
@@ -979,6 +1521,126 @@ int fn_800D7B1C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll) {
     return lbl_80282258;
 }
 
+// After a hole, the round records as fn_800D782C checks the drive: mode 22's (kind 9), the
+// fn_800E39F0 rounds' (kind 8), or the score (0), fn_800D1170's (3) and fn_800D0FBC's (5) counts,
+// the holes under par (7) and at two under or better (6) and the putts (4). bCountStroke counts
+// the hole one stroke more meanwhile; the results go to lbl_80200448/lbl_802004C0 as there.
+int fn_800D7DA0(int nPlayer, int bSave, u8 bCountStroke, u8 bAll) {
+    char szName[32];
+    int nProfile;
+    int nResult;
+    int i;
+    int nValue;
+
+    lbl_80282258 = 0;
+    if (gSession.uFlags & 0x4000) return 0;
+    if (Player_IsCPU(nPlayer)) return 0;
+    if (Game_GetMode() == 12) return 0;
+    if (fn_800E177C() != 0) return 0;
+    nProfile = gPlayers[nPlayer].nIndex;
+    if (gpSaveData[nProfile].bActive == 0) return 0;
+    if (lbl_801D7148.aLoaded[nProfile] == 0) {
+        sprintf(szName, "User %d", nProfile + 1);
+    } else {
+        strcpy(szName, gpSaveData[nProfile].szName);
+    }
+    if (Game_GetMode() == 22) {
+        if (fn_800D8DB4(9)) {
+            nResult = fn_800D8750(9, gPlayers[nPlayer].nEBC, bSave, szName, nPlayer);
+            if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
+                lbl_80200448[lbl_80282258] = nResult;
+                lbl_802004C0[lbl_80282258] = 9;
+                lbl_80282258++;
+            }
+        }
+        return lbl_80282258;
+    }
+    if (fn_800E39F0()) {
+        if (fn_800D8DB4(8)) {
+            nResult = fn_800D8750(8, gPlayers[nPlayer].nDD8, bSave, szName, nPlayer);
+            if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
+                lbl_80200448[lbl_80282258] = nResult;
+                lbl_802004C0[lbl_80282258] = 8;
+                lbl_80282258++;
+            }
+        }
+        return lbl_80282258;
+    }
+    if (gpGame->b137) return 0;
+    if (bCountStroke) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]++;
+    }
+    nValue = fn_800E17AC(nPlayer);
+    if (fn_800D8DB4(0)) {
+        nResult = fn_800D8750(0, nValue, bSave, szName, nPlayer);
+        if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
+            lbl_80200448[lbl_80282258] = nResult;
+            lbl_802004C0[lbl_80282258] = 0;
+            lbl_80282258++;
+        }
+    }
+    if (fn_800D8DB4(3)) {
+        nResult = fn_800D8750(3, fn_800D1170(nPlayer, 0), bSave, szName, nPlayer);
+        if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
+            lbl_80200448[lbl_80282258] = nResult;
+            lbl_802004C0[lbl_80282258] = 3;
+            lbl_80282258++;
+        }
+    }
+    if (fn_800D8DB4(5)) {
+        nResult = fn_800D8750(5, fn_800D0FBC(nPlayer), bSave, szName, nPlayer);
+        if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
+            lbl_80200448[lbl_80282258] = nResult;
+            lbl_802004C0[lbl_80282258] = 5;
+            lbl_80282258++;
+        }
+    }
+    nValue = 0;
+    for (i = 0; i < 18; i++) {
+        if (gPlayers[nPlayer].nStrokes[i] <= fn_800D2AD8(i) - 1) {
+            nValue++;
+        }
+    }
+    if (fn_800D8DB4(7)) {
+        nResult = fn_800D8750(7, nValue, bSave, szName, nPlayer);
+        if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
+            lbl_80200448[lbl_80282258] = nResult;
+            lbl_802004C0[lbl_80282258] = 7;
+            lbl_80282258++;
+        }
+    }
+    nValue = 0;
+    for (i = 0; i < 18; i++) {
+        if (gPlayers[nPlayer].nStrokes[i] < fn_800D2AD8(i) - 1) {
+            nValue++;
+        }
+    }
+    if (fn_800D8DB4(6)) {
+        nResult = fn_800D8750(6, nValue, bSave, szName, nPlayer);
+        if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
+            lbl_80200448[lbl_80282258] = nResult;
+            lbl_802004C0[lbl_80282258] = 6;
+            lbl_80282258++;
+        }
+    }
+    nValue = 0;
+    for (i = 0; i < 18; i++) {
+        nValue += gPlayers[nPlayer].nPutts[i];
+    }
+    if (fn_800D8DB4(4)) {
+        nResult = fn_800D8750(4, nValue, bSave, szName, nPlayer);
+        if ((bAll && (nResult == 2 || nResult == 4)) || (!bAll && nResult != 0)) {
+            lbl_80200448[lbl_80282258] = nResult;
+            lbl_802004C0[lbl_80282258] = 4;
+            lbl_80282258++;
+        }
+    }
+    if (bCountStroke) {
+        gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]--;
+    }
+    return lbl_80282258;
+}
+
 // Whether nValue and szName are among the top five of course k's record i. Never on a round whose
 // holes are not one course's 1..18.
 u8 fn_800D8458(int i, int nValue, const char* szName, int k) {
@@ -1071,6 +1733,133 @@ s32 fn_800D8720(s32 n) {
     default:
         return 2;
     }
+}
+
+// Offer nValue and szName to record kind nKind: kinds 0..7 to the course's records and the
+// all-time recA, kind 8 to recB (by game mode), the rest to recC. Returns 1 for a place in the
+// course (or recB/recC) top five, 2 for its best, 3 and 4 the same for recA. With bSave the entry
+// is written in (the ones below move down) and the player's profile gets b70.
+// EA passes szName to sprintf as the format. The callers pass bSave unmasked and this function
+// tests its low byte (the (u8) casts): EA's definition took a u8 behind an int prototype.
+int fn_800D8750(int nKind, int nValue, int bSave, const char* szName, int nPlayer) {
+    int nResult;
+    int nPos;
+    int j;
+    int n;
+    RecordEntry* pFrom;
+    RecordEntry* pTo;
+
+    nResult = 0;
+    if (gpGame->b136) return 0;
+    if (nKind < 8) {
+        if (fn_800D867C(nKind, nValue, gSession.aCourseRecord[Game_GetCourse()].aRecord[nKind][4].nValue)) {
+            nResult = 1;
+            nPos = 4;
+            for (j = 3; j >= 0; j--) {
+                if (fn_800D867C(nKind, nValue,
+                                gSession.aCourseRecord[Game_GetCourse()].aRecord[nKind][j].nValue)) {
+                    nPos = j;
+                }
+            }
+            if (nPos == 0) {
+                nResult = 2;
+            }
+            if ((u8)bSave) {
+                for (j = 4; j > nPos; j--) {
+                    pFrom = &gSession.aCourseRecord[Game_GetCourse()].aRecord[nKind][j - 1];
+                    pTo = &gSession.aCourseRecord[Game_GetCourse()].aRecord[nKind][j];
+                    pTo->nValue = pFrom->nValue;
+                    sprintf(pTo->szName, pFrom->szName);
+                }
+                pTo = &gSession.aCourseRecord[Game_GetCourse()].aRecord[nKind][nPos];
+                pTo->nValue = nValue;
+                sprintf(pTo->szName, szName);
+            }
+        }
+        if (fn_800D867C(nKind, nValue, gSession.recA[nKind][4].nValue)) {
+            nResult = 3;
+            nPos = 4;
+            for (j = 3; j >= 0; j--) {
+                if (fn_800D867C(nKind, nValue, gSession.recA[nKind][j].nValue)) {
+                    nPos = j;
+                }
+            }
+            if (nPos == 0) {
+                nResult = 4;
+            }
+            if ((u8)bSave) {
+                for (j = 4; j > nPos; j--) {
+                    pFrom = &gSession.recA[nKind][j - 1];
+                    pTo = &gSession.recA[nKind][j];
+                    pTo->nValue = pFrom->nValue;
+                    sprintf(pTo->szName, pFrom->szName);
+                }
+                pTo = &gSession.recA[nKind][nPos];
+                pTo->nValue = nValue;
+                sprintf(pTo->szName, szName);
+            }
+        }
+    } else if (nKind == 8) {
+        n = fn_800D86DC(Game_GetMode());
+        if (n != 3) {
+            if (fn_800D867C(nKind, nValue, gSession.recB[fn_80015464()][n][4].nValue)) {
+                nResult = 1;
+                nPos = 4;
+                for (j = 3; j >= 0; j--) {
+                    if (fn_800D867C(nKind, nValue, gSession.recB[fn_80015464()][n][j].nValue)) {
+                        nPos = j;
+                    }
+                }
+                if (nPos == 0) {
+                    nResult = 2;
+                }
+                if ((u8)bSave) {
+                    for (j = 4; j > nPos; j--) {
+                        pFrom = &gSession.recB[fn_80015464()][n][j - 1];
+                        pTo = &gSession.recB[fn_80015464()][n][j];
+                        pTo->nValue = pFrom->nValue;
+                        sprintf(pTo->szName, pFrom->szName);
+                    }
+                    pTo = &gSession.recB[fn_80015464()][n][nPos];
+                    pTo->nValue = nValue;
+                    sprintf(pTo->szName, szName);
+                }
+            }
+        }
+    } else {
+        n = fn_800D8720(fn_80126FA0());
+        if (n != 2) {
+            if (fn_800D867C(nKind, nValue, gSession.recC[fn_80127098(fn_80015464())][n][4].nValue)) {
+                nResult = 1;
+                nPos = 4;
+                for (j = 3; j >= 0; j--) {
+                    if (fn_800D867C(nKind, nValue, gSession.recC[fn_80127098(fn_80015464())][n][j].nValue)) {
+                        nPos = j;
+                    }
+                }
+                if (nPos == 0) {
+                    nResult = 2;
+                }
+                if ((u8)bSave) {
+                    for (j = 4; j > nPos; j--) {
+                        pFrom = &gSession.recC[fn_80127098(fn_80015464())][n][j - 1];
+                        pTo = &gSession.recC[fn_80127098(fn_80015464())][n][j];
+                        pTo->nValue = pFrom->nValue;
+                        sprintf(pTo->szName, pFrom->szName);
+                    }
+                    pTo = &gSession.recC[fn_80127098(fn_80015464())][n][nPos];
+                    pTo->nValue = nValue;
+                    sprintf(pTo->szName, szName);
+                }
+            }
+        }
+    }
+    if (nPlayer != 5 && nResult != 0 && (u8)bSave) {
+        if (gpSaveData[gPlayers[nPlayer].nIndex].bActive) {
+            gpSaveData[gPlayers[nPlayer].nIndex].b70 = 1;
+        }
+    }
+    return nResult;
 }
 
 // Clear the player's flags b30C..b30F (Swing.c calls it).

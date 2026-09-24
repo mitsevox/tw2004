@@ -55,7 +55,7 @@ void fn_800AA5A0(AudVoice* pVoice, int nReason) {
     pTrack = pVoice->pUser;
     nChannel = pVoice->nIndex;
     fn_800AA400(pVoice, nReason);
-    if (nReason != 1 || !pVoice->bA_1) {
+    if (nReason != 1 || !pVoice->flags.b.bA_1) {
         pTrack->u.seq.apEvents[nChannel] = NULL;
     }
 }

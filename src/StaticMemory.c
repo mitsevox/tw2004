@@ -124,9 +124,9 @@ int fn_800099BC(int nSize) {
 // fn_800099BC; -1 when none is big enough.
 int fn_80009A60(int nSize) {
     int i;
-    int nSpan;
-    int nBest;
     int nBestSpan;
+    int nBest;
+    int nSpan;
 
     nBestSpan = 0x40000000;
     nBest = -1;
