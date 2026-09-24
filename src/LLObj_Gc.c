@@ -9,6 +9,7 @@ int fn_80007BC4(RenderObj* obj, Camera* cam, float* outDepth, int mode, float sc
 void fn_80008214(void);
 void fn_80008248(void* p);
 void fn_80007930(UObjModelRoot* pRoot, int nSet);
+void fn_80007658(UObjModelRoot* pRoot, UObjMesh* pMesh, u8* pData, int nCount, int n);   // not decompiled yet
 
 // Frees a mesh's used parts and table, then its children's, recursively.
 void fn_80007524(UObjMesh* pMesh) {
@@ -71,6 +72,54 @@ void fn_80007930(UObjModelRoot* pRoot, int nSet) {
             fn_80009E70(pRoot->aSets[nSet].ap0[i]);
         }
     }
+}
+
+// Builds a mesh and, depth first, its children from the model data at *ppData; the children's
+// pointer tables are taken from *ppNext. The children follow the mesh in memory. Returns how many
+// meshes it built.
+int fn_8000799C(UObjModelRoot* pRoot, UObjMesh* pMesh, int n, u8** ppData, u8** ppNext) {
+    int nCount = 1;
+    UObjMesh* pChild;
+    int nBuilt;
+    int i;
+    u8* pChunk;
+
+    *ppData += 8;
+    pChunk = *ppData;
+    *ppData = pChunk + 0x94;
+    pMesh->pInfo = (UObjMeshInfo*)pChunk;
+    pMesh->n20 = 0;
+    pMesh->n24 = 0;
+    pMesh->p18 = NULL;
+    pMesh->n28 = 0;
+    fn_80005AE8(pMesh->a1C, 0, sizeof(pMesh->a1C));
+    if (pMesh->pInfo->n4 != 0) {
+        pChunk = *ppData;
+        *ppData += 8;
+        *ppData += 0x78;
+        fn_80007658(pRoot, pMesh, *ppData, pMesh->pInfo->n4 * 2, n);
+        *ppData = &(*ppData)[((u32*)pChunk)[1] - 0x78];   // past the chunk (its size at [1])
+    }
+    pMesh->p8 = NULL;
+    if (pMesh->pInfo->n0 != 0) {
+        pMesh->p8 = (UObjMesh**)*ppNext;
+        *ppNext += pMesh->pInfo->n0 * sizeof(UObjMesh*);
+        pChild = pMesh + 1;
+        for (i = 0; i < pMesh->pInfo->n0; i++) {
+            pMesh->p8[pMesh->pInfo->n0 - i - 1] = pChild;
+            if (i != 0) {
+                pChild->p14 = pMesh->p10;
+            } else {
+                pChild->p14 = NULL;
+            }
+            pMesh->p10 = pChild;
+            pChild->pC = pMesh;
+            nBuilt = fn_8000799C(pRoot, pChild, n, ppData, ppNext);
+            nCount += nBuilt;
+            pChild += nBuilt;
+        }
+    }
+    return nCount;
 }
 
 // Culls a mesh by its bounding sphere scaled by fScale: 3 when it is out of view, 2 when it is
