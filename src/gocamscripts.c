@@ -2514,9 +2514,9 @@ f32 Terrain_HeightAt(f32* pPos, SurfaceType** ppSurface) {
                     fBest = aHeights[j];
                 }
             }
-            // fake match: the row number through u32 addresses (not 64-bit safe); the u8* spelling
-            // swaps two registers
-            if ((int)(((u32)aSurfaces[nIdx] - (u32)gSurfaceTypes) / sizeof(SurfaceType)) != 149
+            // fake match: the row number from the addresses as unsigned integers; pointer
+            // subtraction (or the u8* spelling) swaps two registers
+            if ((int)(((uptr)aSurfaces[nIdx] - (uptr)gSurfaceTypes) / sizeof(SurfaceType)) != 149
                 && !(Game_GetCourse() == 7 && fn_80015464() == 2 && fBest > 10.0f)) {
                 if (fn_80044AA8(aSurfaces[nIdx])) {
                     if (!bRegion && fLast - aHeights[nIdx] > lbl_80281F78->f130) {
