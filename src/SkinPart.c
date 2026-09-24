@@ -601,9 +601,10 @@ s32 fn_800CD664(SkinDesc* pDesc, int nPart) {
 // the counted entries of p34 together.
 s32 fn_800CD700(Skin* pSkin) {
     SkinDesc* pDesc;
-    int i;
     s32 nBytes;
+    int i;
     s32 nAll;
+    int j;
 
     nBytes = 0;
     pDesc = pSkin->pModel->pDesc;
@@ -612,9 +613,9 @@ s32 fn_800CD700(Skin* pSkin) {
         nBytes += fn_800CD664(pDesc, i);
     }
     nAll = 0;
-    for (i = 0; i < pDesc->n30; i++) {
-        if ((pDesc->p34[i].uFlags & 0x300000) == 0x300000) {
-            nAll += pDesc->p34[i].nSize;
+    for (j = 0; j < pDesc->n30; j++) {
+        if ((pDesc->p34[j].uFlags & 0x300000) == 0x300000) {
+            nAll += pDesc->p34[j].nSize;
         }
     }
     if (nBytes > nAll) {
