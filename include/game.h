@@ -333,7 +333,7 @@ LAYOUT_ASSERT(GameEffects, 0x58);
 
 extern GameEffects lbl_80202898;        // 0x80202898
 
-int  fn_800DB86C(int nPlayer);          // this lie is worth a GameBreaker (GameEffects.c)
+int  fn_800DB86C(int nPlayer);          // the putt about to be played is a big one (GameEffects.c)
 u8   fn_800DC818(Ball* pBall, int nPlayer, u8 bNext);
 u8   fn_800DC784(void);                 // TW06: GameEffects_SkipOtherCommentary
 void fn_800DB30C(int nPlayer, int nReason);
@@ -341,7 +341,7 @@ void fn_800DBA50(int nPlayer);
 GameEffects* fn_800DAF74(void);
 void GameEffects_ResetGameEffectSettings(void);
 f32  GameEffects_GetLetterboxHeight(void);
-int  GameEffects_BallUpdatesThisFrame(int nPlayer);   // preview speed: ghost steps per frame
+int  GameEffects_BallUpdatesThisFrame(int nPlayer);   // the ball's physics steps this frame
 void fn_800DB4E8(int nPlayer);
 void fn_800DB714(int nPlayer);
 void fn_800DBDA8(int nPlayer);

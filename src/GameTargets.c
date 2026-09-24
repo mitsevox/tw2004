@@ -243,7 +243,8 @@ void fn_800F21B4(int nPlayer) {
     }
 }
 
-// The player's game is over (all shots taken).
+// No multiplier roll for this shot: in mode 16 at 20 shots taken, in mode 17 at 5, in the other
+// modes before the first shot.
 u8 fn_800F2358(int nPlayer) {
     if (Game_GetMode() == 0x10) {
         if (gPlayers[nPlayer].nDC0 == 20) {

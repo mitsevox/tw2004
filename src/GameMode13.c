@@ -1,6 +1,6 @@
 // GameMode13.c (our name): game mode 13, the timed target game. Each player starts with 90 seconds
 // (5400 frames, in n290 for the hole). Hitting a target pays points and adds time; each earlier hit
-// on the same target scales both by 0.75, and a target pays at most 3 times. Bonuses picked up on
+// on the same target scales both by 0.75, and a target pays at most 4 times. Bonuses picked up on
 // the way raise a points multiplier. The game ends when everyone's time is up.
 
 #include "golfer.h"
@@ -42,7 +42,7 @@ void  fn_800F7FF4(int nPlayer, int nId);
 s32   fn_800F8068(int nPlayer, int i);
 void  fn_800F80A8(void);
 
-// Mode 13 starts: one player at a time, no wind, no gimmes, any number of mulligans.
+// Mode 13 starts: one view, no wind, no gimmes, any number of mulligans.
 void fn_800F6A60(void) {
     gpGame->pfnInit = fn_800F6A60;
     gpGame->pfnShutdown = fn_800F6CC4;
@@ -137,7 +137,7 @@ s32 fn_800F6D14(int nPlayer) {
     return 5;
 }
 
-// End of a golfer's turn: the clock stops, the ball goes back to the tee; count the shots.
+// End of a golfer's turn: message 18, the ball goes back to the tee; count the shots.
 void fn_800F6DFC(int nPlayer) {
     fn_800ED710(nPlayer);
     if (gReplayData.bF10) {
@@ -423,8 +423,8 @@ void fn_800F7A4C(s32 nSurface, s32* pPoints, s32* pTime, s32* pBalls) {
     }
 }
 
-// Hole start: maybe a multiplier, the clock shows the time left, and a player who has not shot
-// aims at their target.
+// Next golfer: maybe a multiplier, the clock shows the time left, and a player who has not shot
+// aims at their target; the bonus multiplier goes back to 1.
 void fn_800F7B44(void) {
     int i;
     fn_800F2030();
@@ -548,7 +548,7 @@ void fn_800F7FF4(int nPlayer, int nId) {
     lbl_802823B4 += n + 2;
 }
 
-// A target's state for the HUD: 1 when it has paid out 3 times.
+// A target's marker model kind (GoDynObj): 1 once it has paid out 4 times, else 0.
 s32 fn_800F8068(int nPlayer, int i) {
     if (gPlayers[nPlayer].nDE4[i] > 3) {
         return 1;
