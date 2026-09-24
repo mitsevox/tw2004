@@ -315,9 +315,11 @@ LAYOUT_ASSERT(AudTrack, 0x8C);
 // A sound source: a playing sound (AudTable.c's table of 256, lbl_80282058), one track per
 // channel of its sound, and where it is heard.
 typedef struct AudSource {
-    u8   u0;                    // 0x0    bits set by the sequencer's event fn_800AAB48
-    u8   u1;                    // 0x1    the same, for events whose n4 is 0
-    u8   unk2[0x24 - 0x2];
+    u8   u0;                    // 0x0    tracks switched on, a bit each (hlaudemitter.c; the
+                                //        sequencer's event fn_800AAB48 sets bits too)
+    u8   u1;                    // 0x1    tracks switched off (and fn_800AAB48, for events whose n4 is 0)
+    u16  uChanged;              // 0x2    bits 0-7: that track's auParams was set; 0x200: u0 / u1
+    u32  auParams[8];           // 0x4    per track (hlaudemitter.c's fn_800AD790)
     f32  aPos[2][3];            // 0x24   where it is from each listener (fn_800B1A40 measures it)
     AudSound* pSound;           // 0x3C
     s16  nSound;                // 0x40   its number (fn_800A85CC)
@@ -335,19 +337,9 @@ LAYOUT_ASSERT(AudSource, 0x7C);
 typedef void (*AudSeqHandler)(AudSeqEvent* pEvent, AudTrack* pTrack);
 extern AudSeqHandler lbl_801F1880[13];
 
-// What an instance asks of its eight tracks (AudInstance.pCmd), written by fn_800AD698,
-// fn_800AD734 and fn_800AD790; only those fields are known.
-typedef struct AudInstanceCmd {
-    u8   uOn;                   // 0x0    tracks switched on, a bit each
-    u8   uOff;                  // 0x1    tracks switched off
-    u16  uChanged;              // 0x2    bits 0-7: that track's auParams was set; 0x200: uOn / uOff
-    u32  auParams[8];           // 0x4    per track
-    f32  aPos[2][3];            // 0x24   the instance's position as each view hears it (fn_800AD800)
-} AudInstanceCmd;
-
 // One of hlaudemitter.c's 256 emitter instances (lbl_801F2740); only the fields read so far.
 typedef struct AudInstance {
-    AudInstanceCmd* pCmd;       // 0x0
+    AudSource* pCmd;            // 0x0    its sound source (fn_800A7C30, the same number)
     struct AudInstance* pPrevActive;   // 0x4    the previous in AudEmitters.pActive's list
     struct AudInstance* pNextActive;   // 0x8    the next in AudEmitters.pActive's list (or pFree's)
     struct AudInstance* pNext;  // 0xC    the next instance of the same emitter (AudEmitters)
