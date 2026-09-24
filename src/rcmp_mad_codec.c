@@ -484,7 +484,7 @@ int fn_800B8AA0(void) {
 }
 
 // The inverse DCT's first pass: eight coefficients in, a column of pOut (8 apart) out.
-void fn_800B8C54(const s32* pIn, s32* pOut) {
+void fn_800B8C54(s32* pIn, s32* pOut) {
     s32 z10;
     s32 z11;
     s32 z12;
@@ -519,11 +519,13 @@ void fn_800B8C54(const s32* pIn, s32* pOut) {
     z12 = pIn[1] - pIn[7];
     z11 = pIn[1] + pIn[7];
     z13 = pIn[5] + pIn[3];
+    t11 = z11 - z13;
+    s = z13 + z11;
     z5 = fn_800B8A04(z10 + z12, 0x61F8);
     t10 = z5 + fn_800B8A04(z10, 0x8A8C);
-    t11 = fn_800B8A04(z11 - z13, 0xB505);
+    t11 = fn_800B8A04(t11, 0xB505);
     t12 = fn_800B8A04(z12, 0x14E7B) - z5;
-    o0 = z13 + z11 + t12;
+    o0 = s + t12;
     o1 = t12 + t11;
     o2 = t11 + t10;
     e0 = pIn[0] + pIn[4];
@@ -545,7 +547,7 @@ void fn_800B8C54(const s32* pIn, s32* pOut) {
 }
 
 // The second pass: a row of the first pass's output into eight 16.16 values.
-void fn_800B8DF4(const s32* pIn, s32* pOut) {
+void fn_800B8DF4(s32* pIn, s32* pOut) {
     s32 z10;
     s32 z11;
     s32 z12;
