@@ -11,7 +11,7 @@ void fn_8002A3AC(u8 b);                 // GxUtil.c
 void fn_80010114(int nDst, int nFunc, int nSrc, int nMtx);
 
 // Builds a bank from a 'txf ' object's data, into pBank or, when it is NULL, a new allocation.
-TexBank* TX_spParseTextureGroupFromStream(u8* pData, TexBank* pBank, int n);
+TexBank* TX_spParseTextureGroupFromStream(u8* pData, TexBank* pInto, int n);
 
 // A DynObj is going: every item whose def has its id counts one fewer (n1A).
 void fn_8000E830(DynObj* pObj) {
@@ -549,7 +549,6 @@ TexBank* TX_spParseTextureGroupFromStream(u8* p, TexBank* pInto, int n) {
     u8* pTables;
     u8* pColors;
     TexEntry* pTex;
-    TexMip* pMip;
     TexPalette* pPalette;
     int nSize;
     int i;
@@ -565,10 +564,12 @@ TexBank* TX_spParseTextureGroupFromStream(u8* p, TexBank* pInto, int n) {
         pBank = pInto;
     } else {
         pBank = fn_80009B34(nSize, 2, 0x10, "LLTex.c", 0x717);
+        pInto = pBank;
     }
+    // the bank's first 8 bytes (its counts n2 and n4) as the data has them
     ((u32*)pBank)[0] = ((u32*)pHead)[0];
     ((u32*)pBank)[1] = ((u32*)pHead)[1];
-    pTables = (u8*)(pBank + 1);
+    pTables = (u8*)(pInto + 1);
     pBank->p8 = (TexEntry*)pTables;
     pTables += pBank->n2 * sizeof(TexEntry);
     pBank->pC = (TexPalette*)pTables;
