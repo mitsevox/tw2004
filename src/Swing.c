@@ -1380,11 +1380,15 @@ int Swing_UpdateBackswing(int nPlayer) {
         fRate   = 1.0f + (f32)fabs(fDelta) / fRange;
         fRate   = fRate * fRate - 1.0f;
         fRate   = (fRate < 1.0f) ? fRate : 1.0f;
-        if (gPlayers[nPlayer].nShotKind == 1 || gPlayers[nPlayer].nShotKind == 2 ||
-            gPlayers[nPlayer].nShotKind == 3) {
-            fRange = fRange / gSwingRange[gPlayers[nPlayer].nShotKind];
-        } else {
-            fRange = 1.0f;
+        {
+            int nKind = gPlayers[nPlayer].nShotKind;
+            // fake match: written as == 1 || == 2 || == 3, CW merges the first two tests into one
+            // range compare; the negated form keeps three compares on the loaded kind
+            if (!(nKind != 1 && nKind != 2 && nKind != 3)) {
+                fRange = fRange / gSwingRange[nKind];
+            } else {
+                fRange = 1.0f;
+            }
         }
         Anim_SetRate(pObj->anim, fRate * fRange);
         if (fMag > 93.0f) {
