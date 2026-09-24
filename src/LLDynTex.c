@@ -12,7 +12,6 @@
 
 void fn_8001052C(s16 n);
 void fn_8010A668(DynTex* pTex);
-void* fn_8010A780(DynTex* pTex);
 void fn_8010B098(void* p);
 int fn_8010C458(int nFormat);
 s32 fn_8010B664(DynTexPalette* pPal);
@@ -133,7 +132,7 @@ void fn_8010A6A8(DynTex* pSrc, DynTex* pDst) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-void* fn_8010A780(DynTex* pTex) {
+DynTexHeader* fn_8010A780(DynTex* pTex) {
     return pTex->p4;
 }
 

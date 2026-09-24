@@ -596,9 +596,9 @@ void  fn_800CC408(Character* pChar, SkinChoices* pChoices);
 void  fn_800CC710(Character* pChar, int nSkin, u64 uPart, u64 uVariant);
 void  fn_800CC7DC(Character* pChar, int nSkin, u64 uSet, u64 uVariant, u64 uOption);
 void  fn_800CC8BC(Character* pChar, u8 bOn);
-void  fn_800CEB1C(Skin** apSkins, int nSkins, u8* p);
-void  fn_800CEBE8(Skin** apSkins, int nSkins, u8* p, u64* aIds, int nIds);
-void  fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, u8* p);
+void  fn_800CEB1C(Skin** apSkins, int nSkins, struct DynTex* pTex);
+void  fn_800CEBE8(Skin** apSkins, int nSkins, struct DynTex* pTex, u64* aIds, int nIds);
+void  fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, struct DynTex* pTex);
 u8    fn_800CEE90(void);
 
 // SkinPart.c, as SkinBurn.c uses it: the mesh iterator and an entry's copy.
