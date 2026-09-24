@@ -377,7 +377,7 @@ void fn_8016B4D4(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 nMove) {
 }
 
 // Whether one of pNode's groups links to the node pInfo belongs to.
-static inline s32 UIS_NodeLinks(UISScreenFile* pData, UISNode* pNode, UISNodeInfo* pInfo) {
+static inline u8 UIS_NodeLinks(UISScreenFile* pData, UISNode* pNode, UISNodeInfo* pInfo) {
     u32 i;
     u32 j;
 
