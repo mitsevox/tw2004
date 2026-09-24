@@ -40,6 +40,8 @@ LAYOUT_ASSERT(MCCardState, 0x98);
 // MCCardState.uFlags. Each bit is set or cleared where the CARD library returns the result named.
 #define MC_CARD_PRESENT     0x02    // cleared on CARD_RESULT_NOCARD
 #define MC_CARD_MOUNTED     0x04    // set by a mount (fn_8009D74C), cleared by an unmount (fn_8009DBAC)
+#define MC_CARD_FORMATTED   0x08    // cleared before a format and set when it succeeds (fn_8009E918);
+                                    // without it fn_8009F734 answers -1
 #define MC_CARD_WRONGDEVICE 0x10    // CARD_RESULT_WRONGDEVICE: not a memory card
 #define MC_CARD_IOERROR     0x20    // CARD_RESULT_IOERROR
 #define MC_CARD_BROKEN      0x40    // CARD_RESULT_BROKEN

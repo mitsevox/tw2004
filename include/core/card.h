@@ -57,7 +57,10 @@ typedef void (*CARDCallback)(s32 nChan, s32 nResult);
 
 s32  CARDClose(CARDFileInfo* pFile);
 s32  CARDCreateAsync(s32 nChan, const char* pName, u32 uSize, CARDFileInfo* pFile, CARDCallback pfnCallback);
+s32  CARDDeleteAsync(s32 nChan, const char* pName, CARDCallback pfnCallback);
+s32  CARDFastDeleteAsync(s32 nChan, s32 nFileNo, CARDCallback pfnCallback);
 s32  CARDFastOpen(s32 nChan, s32 nFileNo, CARDFileInfo* pFile);
+s32  CARDFormatAsync(s32 nChan, CARDCallback pfnCallback);
 s32  CARDFreeBlocks(s32 nChan, s32* pnFreeBytes, s32* pnFreeFiles);
 s32  CARDGetAttributes(s32 nChan, s32 nFileNo, u8* puAttr);
 s32  CARDGetResultCode(s32 nChan);
