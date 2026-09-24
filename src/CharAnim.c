@@ -22,6 +22,13 @@ s32   fn_800962F8(Character* pChar);
 s32   fn_80096508(void);
 int   fn_80096530(Character* pChar);
 f32   fn_800971B8(Character* pChar);
+u8    fn_8001EC48(Character* pChar);                        // char.c
+int   fn_8001BD18(Character* pChar, Clip* pClip);           // char.c
+void  fn_800175B0(Character* pChar, Clip* pBlend, f32 fStart);   // char.c
+void  fn_801141F8(struct DynChain* pChain, CharModel* pModel);   // DynChain.c
+char* fn_801008A8(void);                                    // GameMode11.c
+void  fn_8000A144(f32 (*pSrc)[4], f32 (*pDst)[4]);          // UMemPool.c: copies three rows
+void  fn_800089D4(f32 (*m)[4], f32* pQ);                    // Quaternion.c: a rotation matrix's quaternion
 
 // Clear the queued state change and stop the second player; with bReset, rebuild its blend node as
 // a half-and-half blend. In game type 3 the created golfer's sliders are applied again.
@@ -105,6 +112,114 @@ f32 fn_800958F8(Character* pChar, f32* aPrev, Clip* pClip, f32* aBlend, f32 fFro
         aBlend[4] = aBlend[3] + (aBlend[1] - aBlend[0]);
     }
     return aBlend[4] - aBlend[3];
+}
+
+// Play clip group nGroup on the golfer (nothing at style -1): the clip is the blend clip for
+// fFrom -70000, the one kept for groups 5, 6, 10 and 9, or else Char_SetClip's pick (in a lesson,
+// group 1 by the lesson's name). The putting clip "gplptt12" first turns the root bone square to
+// the ground under the golfer. With bReset the blend tree starts over. The rest is as in
+// fn_80095FD0, on the first player; a clip with a pF4 library also starts it on the second.
+void CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKABlendFn pfnBlend, int nC,
+                                    int nAnim, f32 fStart, f32 fFrom, f32 fTo, f32 fOffset, f32 fTime) {
+    SKABlendNode* pNode;
+    SKABlendNode* pNew;
+    f32 aBlend[6];
+    f32 m[4][4];
+    f32 vNormal[4];
+    Clip* pClip;
+    char* pName;
+    CourseInfo* pCourse;
+    AnimPlayer* pAnim;
+    f32 fDelay;
+
+    if (pChar->nStyle == -1) return;
+    pNode = &pChar->blend;
+    pNew = NULL;
+    pChar->u10 &= ~0x8000;
+    pChar->blend.nGroup = nGroup;
+    pChar->uFlags &= 0x818;
+    if (-70000.0f == fFrom && pChar->pBlend != NULL) {
+        pClip = pChar->pBlend;
+    } else {
+        if ((nGroup == 5 || nGroup == 10 || nGroup == 6) && pChar->p1790 != NULL) {
+            pClip = pChar->p1790;
+        } else if (nGroup == 9 && pChar->p1794 != NULL) {
+            pClip = pChar->p1794;
+        } else {
+            pName = NULL;
+            if (fn_80100294() && nGroup == 1) {
+                pName = fn_801008A8();
+            }
+            pClip = Char_SetClip(pChar, nGroup, pChar->nStyle, pName);
+            if (nGroup == 5 || nGroup == 10 || nGroup == 6) {
+                pChar->p1790 = pClip;
+            } else if (nGroup == 9) {
+                pChar->p1794 = pClip;
+            }
+        }
+        if (strcmp(pClip->name, "gplptt12") == 0 && (pCourse = fn_8000C594()) != NULL &&
+            Ter_GetSupportingGroundNormal(pCourse, pChar->pModel->pMatrices[0][3], vNormal)) {
+            Vec_Copy(pChar->a179C, m[1]);
+            vec4flt_CrossProduct(pChar->pModel->pMatrices[0][0], pChar->a179C, m[2]);
+            fn_800BAF04(m[2], m[2]);
+            vec4flt_CrossProduct(pChar->a179C, m[2], m[0]);
+            m[0][3] = 0.0f;
+            m[1][3] = 0.0f;
+            m[2][3] = 0.0f;
+            m[3][3] = 1.0f;
+            fn_8000A144(m, pChar->pModel->pMatrices[0]);
+            fn_800089D4(m, pChar->pModel->pBones->q0C);
+            pChar->u10 |= 0x8000;
+        }
+        strcpy(pChar->sz1614, pClip->name);
+        EVENT_Trigger(pChar->nPlayer, 0x48, NULL, nGroup);
+        if (pClip->pD8 != NULL) {
+            pChar->pBlend = pClip;
+        } else {
+            pChar->pBlend = NULL;
+        }
+    }
+    if (fn_8001EC48(pChar)) {
+        fn_8001BD18(pChar, pClip);
+    }
+    pAnim = (AnimPlayer*)pChar->anim;
+    if (bReset) {
+        pAnim->fTime = 0.0f;
+        fn_80071F58(&pNode, 0);
+        fn_80071C28(&pNode, 1, pNode->nFormat, pfnBlend, nC);
+        fn_801141F8(pChar->pModel->pF0, pChar->pModel);
+        fn_801141F8(pChar->pModel->pF4, pChar->pModel);
+        fn_801141F8(pChar->pModel->pF8, pChar->pModel);
+    }
+    if (-20000.0f == fStart) {
+        fStart = pAnim->fTime;
+    }
+    fn_800958F8(pChar, NULL, pClip, aBlend, fFrom, fTo, fStart, fOffset);
+    fDelay = fOffset + (pAnim->fEnd - pAnim->fTime);
+    fn_800175B0(pChar, pClip, aBlend[3] - aBlend[0]);
+    pNew = NULL;
+    fn_80071C28(&pNew, 0, pNode->nFormat, pfnBlend, nC);
+    fn_800724C0(&pChar->blend, pNew, pClip, 1.0f);
+    fn_800720C8(pChar, pNew, &pNode, aBlend, pfnBlend, nC);
+    pAnim->n00 = 0;
+    pAnim->n08 = 1;
+    pAnim->fStart = pNode->fStart;
+    pAnim->fEnd = pNode->fEnd;
+    if (-20000.0f == fTime) {
+        fTime = pAnim->fTime;
+    } else if (-10000.0f == fTime) {
+        fTime = pNode->fEnd;
+    } else if (-30000.0f == fTime) {
+        fTime = pNode->fStart;
+    }
+    if (fOffset < 0.0f) {
+        fTime += fOffset;
+    }
+    fn_800958EC(pAnim, nAnim, fTime);
+    pChar->p178C = NULL;
+    if (pClip != NULL && pClip->pF4 != NULL) {
+        fn_8009622C(pChar, pClip->pF4, bReset, fDelay);
+    }
 }
 
 // Play pLib (a MAL bank's library) on the second player from fFrom to fTo, starting at fStart on

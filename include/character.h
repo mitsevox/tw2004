@@ -751,8 +751,8 @@ int   fn_80095798(Character* pChar);
 void  fn_800957B0(Character* pChar, int a);
 void  fn_800957D8(Character* pChar);
 void  fn_800957FC(Character* pChar, u8 bReset);   // CharAnim.c: stop the second player
-void  CharacterState_AddSKABlendData(Character* pChar, int a, int nGroup, SKABlendFn pfnBlend, int c, int d,
-                                     f32 f1, f32 f2, f32 f3, f32 f4, f32 f5);
+void  CharacterState_AddSKABlendData(Character* pChar, u8 bReset, int nGroup, SKABlendFn pfnBlend, int nC,
+                                     int nAnim, f32 fStart, f32 fFrom, f32 fTo, f32 fOffset, f32 fTime);
 void  CharAnim_StartTapIn(Character* pChar);
 void  CharacterState_UpdateSKAState(Character* pChar);
 void  fn_800CC5C0(Character* pChar, char* pA, char* pB);   // an attachment (the glove) on / off
