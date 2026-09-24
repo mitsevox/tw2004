@@ -351,6 +351,7 @@ GoShaderObject_PrelitUVAnimation_Gc.c:
 
 animblender.c:
 	.text       start:0x80071AD0 end:0x80073878
+	.sdata2     start:0x802839E8 end:0x80283A30
 
 GoShaderObjectCommon_ShaderObjectsData_Gc.c:
 	.text       start:0x80073878 end:0x80075280
