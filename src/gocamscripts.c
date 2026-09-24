@@ -1097,7 +1097,8 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
             Vec3Copy(gPlayers[nPlayer].ball.vPos, vPos);
             vPos[1] -= gPlayers[nPlayer].ball.fHeight;
             fn_8004255C(vPos, pCam, pShot->f74, pShot->f70);
-            fStep = (vPos[1] - pOut[1]) * lbl_80281F78->f164;
+            fStep = vPos[1] - pOut[1];
+            fStep *= lbl_80281F78->f164;
             pOut[0] = vPos[0];
             pOut[1] += fStep;
             pOut[2] = vPos[2];
