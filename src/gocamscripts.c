@@ -48,6 +48,7 @@ u8   fn_800439E4(f32* pCam, int nPlayer);
 u8   fn_80043920(CamScript* pScript, int nPlayer);
 void fn_80044768(f32* pPos, f32* pOut);
 f32  fn_8003F790(CamScript* pScript);   // the blend's share (0..1) so far
+f32  fn_80044F58(int nPlayer, CamScript* pScript);
 void fn_80040CF0(CamScript* pScript, f32* pSub, int nPlayer, f32* pPrev, f32 fTime);
 void fn_800090E4(f32* pTurn, f32* pVec, f32* pOut);     // the vector turned by it
 u8   fn_800DC464(int nPlayer);          // GameEffects.c: the ball is simulated from its position
@@ -356,6 +357,109 @@ void fn_8003F518(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     f32 f;
     f32 f90;
 
+    fn_80045428(pScript->v10, pScript->v0, vMove);
+    fn_8001EF34(vMove, fT, vPos);
+    fn_8004544C(vPos, pScript->v0, vPos);
+    Vec3Copy(vPos, pCam);
+    CamScript_GetLookAtPoint(pShot, nPlayer, pScript->a20, pScript->v0, pScript, pPrev, fTime);
+    CamScript_GetLookAtPoint(pNext, nPlayer, &pScript->a20[4], pScript->v10, pScript, pPrev, fTime);
+    fn_80045428(&pScript->a20[4], pScript->a20, vMove);
+    fn_8001EF34(vMove, fT, vPos);
+    fn_8004544C(vPos, pScript->a20, vPos);
+    Vec3Copy(vPos, pSub);
+    f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
+    f += fn_800DC3A4();
+    if (fn_80044E74(pScript->pShot)) {
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[1])), f);
+    } else {
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), f);
+    }
+    f = fT * (pNext->f88 - pShot->f88) + pShot->f88;
+    f += fn_800DC45C(f);
+    fn_800457B8(nPlayer, f);
+    f = fT * (pNext->f8C - pShot->f8C) + pShot->f8C;
+    f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
+    if (f > 0.0f || f90 > 0.0f) {
+        if (fn_80044E74(pShot)) {
+            fn_80038054(1, gPlayers[nPlayer].nView[1], f90, f);
+        } else {
+            fn_80038054(1, gPlayers[nPlayer].nView[0], f90, f);
+        }
+    }
+    pScript->fA8 = fT * (pNext->f9C - pShot->f9C) + pShot->f9C;
+}
+
+// Blend kind 13: as kind 0, but the share is how far the ball's flight has run (fn_80044EA8) over
+// the blend's length f8C, 0..1, never going back (kept in fF8).
+void fn_8003F7EC(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
+    f32 vMove[4];
+    f32 vPos[4];
+    CamShot* pShot = pScript->pShot;
+    CamShot* pNext = pScript->pNextShot;
+    f32 fT = fn_80044EA8(nPlayer, pScript) / pScript->f8C;
+    f32 f;
+    f32 f90;
+
+    if (fT < 0.0f) {
+        fT = 0.0f;
+    } else if (fT > 1.0f) {
+        fT = 1.0f;
+    }
+    if (fT < pScript->fF8) {
+        fT = pScript->fF8;
+    }
+    pScript->fF8 = fT;
+    fn_80045428(pScript->v10, pScript->v0, vMove);
+    fn_8001EF34(vMove, fT, vPos);
+    fn_8004544C(vPos, pScript->v0, vPos);
+    Vec3Copy(vPos, pCam);
+    CamScript_GetLookAtPoint(pShot, nPlayer, pScript->a20, pScript->v0, pScript, pPrev, fTime);
+    CamScript_GetLookAtPoint(pNext, nPlayer, &pScript->a20[4], pScript->v10, pScript, pPrev, fTime);
+    fn_80045428(&pScript->a20[4], pScript->a20, vMove);
+    fn_8001EF34(vMove, fT, vPos);
+    fn_8004544C(vPos, pScript->a20, vPos);
+    Vec3Copy(vPos, pSub);
+    f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
+    f += fn_800DC3A4();
+    if (fn_80044E74(pScript->pShot)) {
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[1])), f);
+    } else {
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), f);
+    }
+    f = fT * (pNext->f88 - pShot->f88) + pShot->f88;
+    f += fn_800DC45C(f);
+    fn_800457B8(nPlayer, f);
+    f = fT * (pNext->f8C - pShot->f8C) + pShot->f8C;
+    f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
+    if (f > 0.0f || f90 > 0.0f) {
+        if (fn_80044E74(pShot)) {
+            fn_80038054(1, gPlayers[nPlayer].nView[1], f90, f);
+        } else {
+            fn_80038054(1, gPlayers[nPlayer].nView[0], f90, f);
+        }
+    }
+    pScript->fA8 = fT * (pNext->f9C - pShot->f9C) + pShot->f9C;
+}
+
+// Blend kind 15: as kind 13, with fn_80044F58's share of the way to the pin.
+void fn_8003FAA0(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
+    f32 vMove[4];
+    f32 vPos[4];
+    CamShot* pShot = pScript->pShot;
+    CamShot* pNext = pScript->pNextShot;
+    f32 fT = fn_80044F58(nPlayer, pScript) / pScript->f8C;
+    f32 f;
+    f32 f90;
+
+    if (fT < 0.0f) {
+        fT = 0.0f;
+    } else if (fT > 1.0f) {
+        fT = 1.0f;
+    }
+    if (fT < pScript->fF8) {
+        fT = pScript->fF8;
+    }
+    pScript->fF8 = fT;
     fn_80045428(pScript->v10, pScript->v0, vMove);
     fn_8001EF34(vMove, fT, vPos);
     fn_8004544C(vPos, pScript->v0, vPos);
@@ -1392,8 +1496,9 @@ u8 fn_80044E74(CamShot* pShot) {
 }
 
 // How much of the way from the shot's start to the pin the ball has covered, over the ground
-// (0 at the start, 1 at the pin); 0 without a hole loaded.
-f32 fn_80044F58(int nPlayer) {
+// (0 at the start, 1 at the pin); 0 without a hole loaded. The script is not read (fn_8003FAA0
+// passes it, as it does to fn_80044EA8).
+f32 fn_80044F58(int nPlayer, CamScript* pScript) {
     CourseInfo* pCourse = fn_8000C594();
     f32* pPin;
     f32 vStart[4];
