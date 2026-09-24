@@ -78,6 +78,7 @@ void fn_800953C8(int nWatch);           // start
 u8   fn_80095430(int nWatch);           // running?
 u64  fn_80095444(int nWatch);           // stop; returns the reading
 u64  fn_800954A4(int nWatch);           // the reading
+f32  fn_8006E118(u64 uNow, u64 uLast);  // seconds between two readings (gomainloop.c)
 void fn_80095504(int nWatch);           // reset to 0
 // Pack up to 12 characters of pName into a 64-bit code (base 40, table lbl_80191520).
 int   fn_800CB700(u64* pId, const char* pName);
@@ -1231,7 +1232,8 @@ typedef struct UFontState {
     s32   n1B8;                   // 0x1B8  0: fn_800128F8 queues strings, 1: draws them at once
     char* pStrings;               // 0x1BC  0x1F4 bytes of queued text
     char* pStringNext;            // 0x1C0
-} UFontState;
+    u8    pad1C4[0x1E0 - 0x1C4];  // 0x1C4
+} UFontState;                     // 0x1E0
 
 extern UFontState* lbl_80280DE0;
 
