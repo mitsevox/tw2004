@@ -63,6 +63,8 @@ void  fn_80035584(s32 v);
 void  fn_80035590(f32* p0);
 void  fn_800355B8(f32* p0);
 void  fn_80034648(int n);
+void  fn_80035514(u8* pObject);
+void  fn_8000ADC0(f32 (*pMtx)[4]);  // identity matrix
 void  fn_80035370(void);
 void  fn_80035098(u8 b);
 void  fn_80034CAC(int nRenderPass);
@@ -852,6 +854,114 @@ void fn_80032AEC(void) {
     fn_8003084C();
     fn_80012F50(1, 6, 128);
     fn_80012EF8();
+}
+
+// Draws one patch's ground in render pass nPass: its mesh for the pass and the patch's bits (n1C
+// bits 0-2 and 0x80, n18 bit 1), then the extra meshes its word 2 asks for: bit 0x8 drawn at once,
+// bits 0x10 and 0x20 as deferred items, bit 0x40 (near enough, not in split screen) raised by
+// 0.005 without z writes. Passes 1 and 2 leave out patches beyond 100 x fFOVScale unless the
+// ground's bit 0x80 is set. A lake surface (n20 bit 0x80) uses fLakeSurfaceMipmapBias; while the
+// camera moves, one with ground bit 0x80 is left out. *pbFirst tracks a renderer state switched
+// by fFar; b2 keeps it and the deferred and raised meshes out. b1 is not read.
+void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s32 n20, u8* pbFirst, u8 b1,
+                 u8 b2, f32 fNear, f32 fFar) {
+    f32 mRaise[4][4];
+    u8 bFirst;
+    s32 uFlags2;
+    UObjMesh* pMesh;
+    u8 nMesh;
+    u8 bPinSet;
+    u8 bLake;
+    u32 uPinBit;
+    u32 uOtherPins;
+    f32 fBias;
+
+    bPinSet = 0;
+    bLake = 0;
+    uPinBit = 1 << Game_CurrentPinSet();
+    uOtherPins = ~(uPinBit | uPinBit) & 0xF;
+    if (nPass >= 1 && nPass <= 2 && fNear > 100.0f * lbl_801D3CB0.fFOVScale
+        && !(fn_800354D0(pGround, 0) & 0x80)) {
+        return;
+    }
+    nMesh = n1C & 7;
+    if (n1C & 0x80) {
+        nMesh |= 8;
+    }
+    if (n18 & 2) {
+        nMesh |= 0x10;
+    }
+    if (n20 & 0x80) {
+        if (!fn_800172C4(fn_80017028(lbl_801D3CB0.iCurrentViewContext)) && (fn_800354D0(pGround, 0) & 0x80)) {
+            return;
+        }
+        bLake = 1;
+        fBias = lbl_801D3CB0.fLakeSurfaceMipmapBias;
+    }
+    pGround = fn_800354E4(pGround, lbl_801D3A30[nPass][nMesh]);
+    bFirst = *pbFirst;
+    if (bFirst == 0 && fFar > 0.0f && b2 == 0) {
+        *pbFirst = 1;
+        fn_80014118(0x70);
+        fn_80012EF8();
+    } else if ((fFar <= 0.0f || b2 != 0) && bFirst != 0) {
+        *pbFirst = 0;
+        fn_80014118(0x50);
+        fn_80012EF8();
+    }
+    uFlags2 = fn_800354D0(pGround, 2);
+    pMesh = fn_800354E4(pGround, 0);
+    if ((n20 & uPinBit) && !(n20 & uOtherPins)) {
+        fn_80012F50(1, 6, 1);
+        fn_80012EF8();
+        bPinSet = 1;
+    }
+    if (bLake) {
+        fn_80012EF8();
+    }
+    if (uFlags2 & 8) {
+        fn_80035514((u8*)pMesh);
+        pMesh = fn_800354BC(pMesh);
+    }
+    if (bLake) {
+        fn_80012EF8();
+    }
+    if ((uFlags2 & 0x10) && b2 == 0) {
+        if (pMesh->n20 != 0) {
+            fn_8003241C(&lbl_801D3CB0.pDeferredItemsList[lbl_801D3CB0.iDeferredItems],
+                        &lbl_801D3CB0.iDeferredItems, 50, pMesh, 0x289, eClipMethod, fFar > 0.0f, 0, 1.0f,
+                        bLake ? fBias : 0.0f, 0.0f);
+        }
+        pMesh = fn_800354BC(pMesh);
+    }
+    if (uFlags2 & 0x20) {
+        if (pMesh->n20 != 0) {
+            fn_8003241C(&lbl_801D3CB0.pDeferredItemsList[lbl_801D3CB0.iDeferredItems],
+                        &lbl_801D3CB0.iDeferredItems, 50, pMesh, 0x289, eClipMethod, fFar > 0.0f, 0, 1.0f,
+                        bLake ? fBias : 0.0f, 0.0f);
+        }
+        pMesh = fn_800354BC(pMesh);
+    }
+    if (gSession.nSplitScreen == 0 && (uFlags2 & 0x40) && b2 == 0) {
+        if (fNear < 60.0f * lbl_801D3CB0.fFOVScale && pMesh->n20 != 0) {
+            fn_8000ADC0(mRaise);
+            mRaise[3][1] = 0.005f;
+            fn_80035240(mRaise);
+            fn_80016B9C();
+            fn_80012F34(0);
+            fn_80012EF8();
+            fn_80035514((u8*)pMesh);
+            fn_80012F34(1);
+            fn_80035240(NULL);
+            fn_80016B9C();
+            fn_80012EF8();
+        }
+        fn_800354BC(pMesh);
+    }
+    if (bPinSet) {
+        fn_80012F50(0, 6, 1);
+        fn_80012EF8();
+    }
 }
 
 void fn_800332F4(void) {

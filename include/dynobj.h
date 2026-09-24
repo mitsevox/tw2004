@@ -110,7 +110,10 @@ typedef struct UObjMesh {
     struct UObjMesh* p14;       // 0x14  the next terrain mesh of a list (fn_800354BC); a patch's
                                 //       ground's is its objects (Ter_PatchReference.pObjects)
     struct UObjMeshPart* p18;   // 0x18  fn_80048A84 passes entry n28 to fn_800082CC
-    u8   a1C[0x28 - 0x1C];      // 0x1C  nonzero: entry i of p18 is used
+    u8   a1C[0x20 - 0x1C];      // 0x1C  nonzero: entry i of p18 is used
+    u32  n20;                   // 0x20  a word: GoTerrain.c fn_80032B7C draws a ground's extra meshes
+                                //       only when it is not 0
+    u8   unk24[0x28 - 0x24];
     s32  n28;                   // 0x28
 } UObjMesh;
 

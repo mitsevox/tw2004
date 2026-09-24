@@ -208,6 +208,8 @@ LAYOUT_ASSERT(TerSettings, 0x54);
 extern Ter_TerrainRendererMgr lbl_801D3CB0;
 extern TerSettings* lbl_802811E0;    // Code8006F154.c: points at lbl_801D70A8
 extern TerSettings lbl_801D70A8;
+extern s32 lbl_801D3A30[5][32];     // fn_80030254 fills it; fn_80032B7C picks a ground's mesh from
+                                    // row nPass by the bits of the patch's n1C and n18
 
 void fn_8006F334(TerSettings* pSettings);   // Code8006F154.c: the default colours
 extern f32 lbl_801876D8[21][3];     // rows fn_80034648 copies into fDefaultObjectMipmapBias
