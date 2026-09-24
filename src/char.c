@@ -81,6 +81,9 @@ void  fn_800CEE88(u8 b);
 u8    fn_800FCC38(int nPlayer);
 void  fn_8010A668(void* p);
 void  fn_80008380(void);
+void  fn_80035604(void);                // GoTerrain.c
+void  fn_800358E0(Character* pChar, u32 uFlags);
+int   fn_800636EC(void);                // GoCamCont.c
 void  fn_8010BF68(void);
 void  fn_8010BFE0(void);
 void  fn_80112C64(int n);
@@ -467,6 +470,26 @@ void fn_8001B58C(CharSkinSet* pSet) {
             }
             fn_80009E70(lbl_80280E24[i]);
             lbl_80280E24[i] = NULL;
+        }
+    }
+}
+
+// With characters made: fn_80035604, then fn_800358E0 for every character that is not in state 2
+// (fn_8001EE90), not the camera's player (fn_800636EC), has neither bit 0x40 nor 1 of u10 set and,
+// when uFlags has bit 4, passes fn_8001EC48.
+void fn_8001BBD8(u32 uFlags) {
+    int i;
+    int nPlayer;
+
+    if (lbl_80281CA8 != 0) {
+        fn_80035604();
+        for (i = 0; i < lbl_80281CA8; i++) {
+            nPlayer = fn_800636EC();
+            if (fn_8001EE90(lbl_801B9624[i]) != 2 && nPlayer != lbl_801B9624[i]->nPlayer &&
+                !(lbl_801B9624[i]->u10 & 0x41) &&
+                (fn_8001EC48(lbl_801B9624[i]) || (uFlags & 4) == 0)) {
+                fn_800358E0(lbl_801B9624[i], uFlags);
+            }
         }
     }
 }
