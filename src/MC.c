@@ -220,6 +220,76 @@ int fn_800A1758(MCCardPos* pPos) {
     return fn_800A2248(pPos->nPort, pPos->nSlot) == 0;
 }
 
+// Read the names of the profiles saved on the card into its MCCardState, for the menus.
+void fn_800A178C(s32 nPort, s32 nSlot) {
+    MCCardState* pState;
+    s32 nMount;
+    int i;
+
+    pState = fn_8009F834(nPort, nSlot);
+    fn_8001E938(pState->aNameUsed, 4);
+    pState->aszName[0][0] = 0;
+    pState->aszName[1][0] = 0;
+    pState->aszName[2][0] = 0;
+    pState->aszName[3][0] = 0;
+    if (nPort >= MC_NUM_PORTS || nSlot >= MC_NUM_SLOTS) return;
+    nMount = fn_8009D74C(nPort, nSlot);
+    if (nMount != 0 && nMount != MC_ERR_MOUNTED) return;
+    if (fn_8009F734(nPort, nSlot) != 0) {
+        if (nMount == 0) {
+            fn_8009DBAC(nPort, nSlot);
+        }
+        return;
+    }
+    if (fn_8009DD44(nPort, nSlot, MC_DIR_NAME) != 0) {
+        if (nMount == 0) {
+            fn_8009DBAC(nPort, nSlot);
+        }
+        return;
+    }
+    if (fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FE4, MC_BUFFER_SIZE) != 0) {
+        if (nMount == 0) {
+            fn_8009DBAC(nPort, nSlot);
+        }
+        return;
+    }
+    if (!fn_800A233C(lbl_80281FE4, &lbl_80281FE4->trailer)) {
+        if (nMount == 0) {
+            fn_8009DBAC(nPort, nSlot);
+        }
+        return;
+    }
+    Mem_cpy(lbl_80281FD8, lbl_80281FE4, MC_BUFFER_SIZE);
+    for (i = 0; i < NUM_SAVE_PROFILES; i++) {
+        if (lbl_80281FD8->uFlags & MC_SAVE_PROFILE(i)) {
+            fn_8001EA34(pState->aNameUsed, i);
+            strncpy(pState->aszName[i], lbl_80281FD8->aProfile[i].szName, 0x1D);
+        }
+    }
+    if (nMount == 0) {
+        fn_8009DBAC(nPort, nSlot);
+    }
+}
+
+// How many profiles the card at pPos holds (fn_800A178C reads their names).
+s32 fn_800A1964(MCCardPos* pPos) {
+    MCCardState* pState;
+    s32 nPort;
+    s32 nSlot;
+    int i;
+    s32 nCount = 0;
+    nSlot = pPos->nSlot;
+    nPort = pPos->nPort;
+    pState = fn_8009F834(nPort, nSlot);
+    fn_800A178C(nPort, nSlot);
+    for (i = 0; i < 4; i++) {
+        if (fn_8001E9CC(pState->aNameUsed, i)) {
+            nCount++;
+        }
+    }
+    return nCount;
+}
+
 void fn_800A19F4(void) {
 }
 
@@ -367,6 +437,35 @@ s32 fn_800A2030(void) {
         pEntry++;
     }
     return nMarked;
+}
+
+// At start-up: point the images' spare pointers at the second image, build the CRC table, start the
+// CARD library and clear the per-card format failures and the 'eagm' bits.
+void fn_800A2064(void) {
+    int nPort;
+    int nSlot;
+    fn_800A19F4();
+    if (lbl_80281FDC == NULL) {
+        lbl_80281FDC = NULL;
+        lbl_80281FD8 = NULL;
+        lbl_80281FE0 = NULL;
+    }
+    if (lbl_80281FD8 == NULL) {
+        lbl_80281FD8 = lbl_80281FDC;
+    }
+    if (lbl_80281FE0 == NULL) {
+        lbl_80281FE0 = lbl_80281FDC;
+    }
+    fn_800A253C();
+    CARDInit();
+    for (nPort = 0; nPort < MC_NUM_PORTS; nPort++) {
+        // EA bug: the slot loop runs to 2 where a port has one slot, so [0][1] is [1][0] and
+        // [1][1] writes past the array, into lbl_801F1640's texture names
+        for (nSlot = 0; nSlot < 2; nSlot++) {
+            lbl_801F1510[nPort][nSlot].b94 = 0;
+        }
+    }
+    fn_8001E938(lbl_801F1100, 0x80);
 }
 
 // Format the card. A card that is broken or has the wrong encoding can still be formatted.
