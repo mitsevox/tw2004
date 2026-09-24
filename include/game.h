@@ -236,7 +236,7 @@ int  fn_800D7220(int nReward, int nPlayer, CourseMoneyTracking* pMoney);
 s32  fn_800D7660(int nPlayer, Ball* pBall, u8 b);   // one of GameEffects' GameBreaker checks
 s32  fn_800D7684(int nPlayer, Ball* pBall, u8 b);   // the same through fn_800D4F14 (pBall unused)
 u8   fn_800D8DB4(int nKind);            // Earnings.c: whether goals of a kind count now
-s32  fn_800D477C(int nPlayer, Ball* pBall, u8 b);   // Earnings.c: the shot's check
+void fn_800D477C(int nPlayer, Ball* pBall, u8 b);   // Earnings.c: the shot's check
 void fn_800D4F14(int nPlayer, u8 b);                // the putt's
 void fn_800D588C(int nPlayer, u8 a, u8 bRoundOver); // the hole's
 s32  fn_800D9954(void);                 // lbl_80282250: the entries in the three lists below

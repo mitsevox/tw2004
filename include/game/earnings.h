@@ -32,13 +32,42 @@ typedef struct MatchPrize {
 } MatchPrize;
 
 // An EA Sports Bio accomplishment the game posts (0x48 bytes): a value and its text ("Won The Long
-// Drive Challenge Trophy Ball"), handed to fn_80125874.
+// Drive Challenge Trophy Ball"), handed to EASBio_SetAccomplishment.
 typedef struct BioAccomplishment {
     s32  nValue;                // 0x00
     char szName[0x44];          // 0x04
 } BioAccomplishment;
 
-#define NUM_BIO_ACCOMPLISHMENTS 50  // the 'ERN ' data fills 50 (0xA54..0x1864); the rest is other data
+#define NUM_BIO_ACCOMPLISHMENTS 49  // 0xA54..0x181C: fn_800D477C's shot goals start at 0x1860
+
+// A shot goal (0x34 bytes, fn_800D477C): what a shot must show when it stops to earn an award, or
+// a money prize (award 0x27). Laid out as PuttGoal, with more ball tests.
+typedef struct ShotGoal {
+    s32  nId;                   // 0x00  goals with the same nonzero id compete: the biggest nValue is kept
+    u32  uModes;                // 0x04  the game modes it counts in, a bit per mode
+    u8   unk08;                 // 0x08
+    u8   uPars;                 // 0x09  the hole's pars it counts on: bit 0 par 3, 1 par 4, 2 par 5
+    u8   uShotKinds;            // 0x0A  a bit per Player.nShotKind
+    u8   uLies;                 // 0x0B  a bit per fn_800D4694 class of the ground the shot left
+    f32  f0C;                   // 0x0C  the most fn_800D04AC may return
+    u8   uBallLies;             // 0x10  a bit per fn_800D46E8 class of the ball's lie
+    f32  f14;                   // 0x14  the least fn_800D0550 (the shot's length) may return
+    f32  f18;                   // 0x18  the most fn_800D0478 (the distance from the pin) may return, 0 any
+    u32  uClubs;                // 0x1C  a bit per Player.nClub
+    u16  uFlags;                // 0x20  more tests, a bit each (fn_800D477C)
+    u8   uMults;                // 0x22  the multipliers a prize takes (as PuttGoal.uMults)
+    u8   unk23;                 // 0x23
+    s32  nValue;                // 0x24  the prize (award 0x27), else what ranks goals with the same id
+    u8   unk28;                 // 0x28
+    s8   nAward;                // 0x29  the award it gives (fn_800D76AC), 0x27 a money prize
+    s8   n2A;                   // 0x2A  kept with a money prize (lbl_80200420)
+    u8   unk2B;                 // 0x2B
+    u8   bEnabled;              // 0x2C
+    u8   unk2D[3];              // 0x2D
+    s32  nBio;                  // 0x30  the EA Sports Bio accomplishment it posts (aBio), -1 none
+} ShotGoal;
+
+#define NUM_SHOT_GOALS 15
 
 // A putt goal (0x24 bytes, fn_800D4F14): what a hole must show when the putt drops to earn an
 // award, or a money prize (award 0x27).
@@ -151,7 +180,8 @@ typedef struct EarningsTable {
     s32  nA24;                  // 0xA24  paid with award 0x1C after a challenge (GameMode5)
     u8   unkA28[0xA54 - 0xA28];
     BioAccomplishment aBio[NUM_BIO_ACCOMPLISHMENTS];    // 0xA54
-    u8   unk1864[0x1B6C - 0x1864];
+    u8   unk181C[0x1860 - 0x181C];
+    ShotGoal aShotGoal[NUM_SHOT_GOALS];                 // 0x1860
     PuttGoal aPuttGoal[NUM_PUTT_GOALS];                 // 0x1B6C
     HoleGoal aHoleGoal[NUM_HOLE_GOALS];                 // 0x1DF4
 } EarningsTable;
@@ -166,6 +196,7 @@ extern s32 lbl_80200470[10];    // the putt record results (fn_800D7B1C)
 extern s32 lbl_80200498[10];    // a working table: fn_800D3DDC messages the entries of kind 2 or 4
 extern s32 lbl_80200510[10];    // with these ids
 extern s32 lbl_80282258;        // their count
+extern s32 lbl_80200330[10];    // the money prizes fn_800D477C finds, before the multipliers
 extern s32 lbl_80200308[10];    // the money prizes fn_800D4F14 finds, before the multipliers
 extern s32 lbl_802002E0[10];    // and those fn_800D588C finds
 
