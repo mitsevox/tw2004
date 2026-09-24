@@ -351,7 +351,7 @@ void  fn_8001EE98(Character* pChar, u8 b);    // sets the model's bEE
 void  fn_8010E4DC(CharSliderDefs* pDefs, CharModel* pModel, Skin* pSkin, int nSliders, u8* aValues,
                   u8* pNode);
                                         // applies slider values (Character.p17AC's definitions)
-void  fn_8010D454(void* pDefs);         // CharSliders.c: frees slider definitions
+void  fn_8010D454(CharSliderDefs* pDefs);   // CharSliders.c: frees slider definitions
 void  fn_800CE170(Skin* pSkin, SkinTarget* pTarget);
 void  fn_800CC1EC(Character* pChar, SkinChoices* pChoices);
 void  fn_800CC658(Character* pChar, char* pSet, char* pVariant, char* pOption);

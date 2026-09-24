@@ -2,13 +2,14 @@
 // the matched small functions.
 
 #include "engine.h"
+#include "character.h"
+#include "charstate.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
 void fn_8010C714(void);
-extern u8 gSession[];
 extern s32 lbl_80281764;
-u8* fn_8010C718(void);
+void fn_8010C718(void);
 void fn_8010C73C(void);
 void fn_8010C740(void);
 void fn_8010D330(void);
@@ -25,22 +26,19 @@ void fn_8010D250(void);
 extern s32 lbl_80281760;
 void fn_8010D32C(void);
 void fn_8010D334(s32 v);
-s32 Game_GetMode();
 s32 fn_8010D364(void);
 extern s32 lbl_8028176C;
 s32 fn_8010D390(void);
-void fn_800A7664();
 void fn_8010D428(s32 p0, s32 p1);
 
 void fn_8010C714(void) {
 }
 
-u8* fn_8010C718(void) {
-    *(s32*)(gSession + 0x58) = 0;
-    *(s32*)(gSession + 0x5C) = 0;
-    *(s32*)(gSession + 0xE98) = 0;
+void fn_8010C718(void) {
+    gSession.nTeeSet[0] = 0;
+    gSession.nTeeSet[1] = 0;
+    gSession.options.n20 = 0;
     lbl_80281764 = 5;
-    return gSession;
 }
 
 void fn_8010C73C(void) {
@@ -114,3 +112,42 @@ void fn_8010D428(s32 p0, s32 p1) {
 }
 
 // ---- end of sweep code ----
+
+// Free slider definitions made by CharSlider_CreateDefinitionsFromMem.
+void fn_8010D454(CharSliderDefs* pDefs) {
+    int i;
+    int j;
+
+    if (pDefs != NULL) {
+        if (pDefs->pDefs != NULL) {
+            for (i = 0; i < pDefs->nSliders; i++) {
+                if (pDefs->pDefs[i].pLinks != NULL) {
+                    fn_80009E70(pDefs->pDefs[i].pLinks);
+                }
+                if (pDefs->pDefs[i].pLimits != NULL) {
+                    fn_80009E70(pDefs->pDefs[i].pLimits);
+                }
+                if (pDefs->pDefs[i].pBoneRanges != NULL) {
+                    for (j = 0; j < pDefs->pDefs[i].nBoneRanges; j++) {
+                        fn_80009E70(pDefs->pDefs[i].pBoneRanges[j].items.pBones);
+                    }
+                    fn_80009E70(pDefs->pDefs[i].pBoneRanges);
+                }
+                if (pDefs->pDefs[i].pMorphRanges != NULL) {
+                    for (j = 0; j < pDefs->pDefs[i].nMorphRanges; j++) {
+                        fn_80009E70(pDefs->pDefs[i].pMorphRanges[j].items.pMorphs);
+                    }
+                    fn_80009E70(pDefs->pDefs[i].pMorphRanges);
+                }
+            }
+            fn_80009E70(pDefs->pDefs);
+        }
+        if (pDefs->pValues != NULL) {
+            fn_80009E70(pDefs->pValues);
+        }
+        if (pDefs->aMorphIds != NULL) {
+            fn_80009E70(pDefs->aMorphIds);
+        }
+        fn_80009E70(pDefs);
+    }
+}
