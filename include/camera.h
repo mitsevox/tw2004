@@ -11,17 +11,18 @@
 // the pointer at the render camera's +0x10. Only the fields read so far; its size is unknown.
 typedef struct CamLens {
     s32  nType;                 // 0x00  0: a perspective camera, else flat (LLObj_Gc.c)
-    f32  v4[3];                 // 0x04  a position: the green zoom-to-aim camera copies it to View.v20
-    u8   unk10[0x24 - 0x10];
-    f32  v24[3];                // 0x24  a direction: goballfx.c's fn_80093A50 takes its angle to a light
-    u8   unk30[0x34 - 0x30];
-    f32  v34[3];                // 0x34  a position: GameMode8 measures the ball's distance to it
-    f32  f40;                   // 0x40  1.0: v34's w in the camera-to-world matrix (fn_80017208)
+    f32  m4[4][4];              // 0x04  camera to world space (shadow.c fn_800B3484 hands it on as a
+                                //       matrix): m4[2] is the view direction (goballfx.c fn_80093A50
+                                //       takes its angle to a light), m4[3] the camera's position
+                                //       (GameMode8 measures the ball's distance to it); the green
+                                //       zoom-to-aim camera copies m4[0] to View.v20
     f32  m44[4][4];             // 0x44  world to camera space (hlaudemitter.c fn_800AD800 moves a
                                 //       sound's position with it)
-    f32  f84[8];                // 0x84  ViewController.c fn_8001728C sets all eight to 1.0
-    f32  fFov;                 // 0xA4  the field of view (GoGolfCam.c sets DEG(60.0f) or DEG(30.0f))
-    u8   unkA8[0xB0 - 0xA8];
+    f32  m84[2][4];             // 0x84  [1] the scale fn_80076664 puts on the world around a point,
+                                //       [0] its inverse; ViewController.c fn_8001728C sets all to 1.0
+    f32  fFov;                  // 0xA4  the field of view (GoGolfCam.c sets DEG(60.0f) or DEG(30.0f))
+    f32  fA8;                   // 0xA8  fn_800768E0 starts it at 0.1
+    f32  fAC;                   // 0xAC  fn_800768E0 starts it at 4096 (GoTerrain.c fn_800354B4 sets it)
     f32  fB0;                   // 0xB0  fn_8001EFFC; the zoom-to-aim camera divides its distance by it
     f32  fB4;                  // 0xB4  a flat camera's view width (guess)
     f32  fB8;                   // 0xB8  its view height (guess)
@@ -801,7 +802,7 @@ void        fn_8006E26C(GoFrameBuf* pBuf, f32 f0, f32 f4, f32 fWidth, f32 fHeigh
 
 CamLens* fn_80076400(void);                     // a new lens
 void     fn_8007644C(CamLens* pLens);           // free it
-void     fn_8007646C(CamLens* pLens, f32* pA, f32* pB);   // not decompiled yet: two 4-float points
+void     fn_8007646C(CamLens* pLens, f32* pPos, f32* pTarget);   // aims the lens from pPos at pTarget
 void     fn_800768E0(CamLens* pLens);
 void     fn_80076948(CamLens* pLens, f32 fB4, f32 fB8);   // sets fB4 and fB8
 void     fn_80076A0C(CamLens* pLens, s32 nType);          // sets nType

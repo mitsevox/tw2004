@@ -26,7 +26,6 @@ void  fn_8001A7C8(void);
 Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, SkinChoices* pChoices);
 CharSkinSet* fn_8001B208(u8* pData);
 Character* fn_8001942C(void);
-void  fn_80072D90(void* pAnim);                                 // animblender.c: reset a player
 s32   fn_800962F8(Character* pChar);                            // CharAnim.c
 void  fn_800184E4(Character* pChar, Skin* pSkin);
 void  fn_80018710(Character* pChar);
@@ -74,8 +73,6 @@ void  fn_800279C0(Character* pChar);                            // Skeleton.c
 void  SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, u8 bTransform);   // Skeleton.c
 void  fn_80037C48(Skin* pSkin, SkelPose* pPose);                // Skin.c
 void  fn_8007260C(Character* pChar, SKABlendNode* pNode, CharModel* pModel, f32 fTime);  // animblender.c
-void  fn_80072ED8(void* pAnim, SKABlendNode* pNode, f32 fTime);                          // animblender.c
-void  fn_80073108(Character* pChar, int nPlayer, void* pAnim, SKABlendNode* pNode, f32 fTime);
 void  fn_8009622C(Character* pChar, void* pClip, u8 bKeep, f32 fOffset);                  // CharAnim.c
 void  fn_80096F0C(Character* pChar);                            // CharAnim.c
 void  fn_8000914C(f32* pQ, f32 (*m)[4]);                        // Quaternion.c: a rotation matrix
@@ -484,11 +481,11 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
         bC860 = 1;
     }
     if (pChar->n20 == 8 && pChar->nAnim == 8) {
-        fn_80073108(pChar, pChar->nPlayer, pChar->anim, &pChar->blend, fTime);
+        fn_80073108(pChar, pChar->nPlayer, (AnimPlayer*)pChar->anim, &pChar->blend, fTime);
     } else if (pChar->u10 & 0x100) {
-        fn_80072ED8(pChar->anim, &pChar->blend, 5.0f * fTime);
+        fn_80072ED8((AnimPlayer*)pChar->anim, &pChar->blend, 5.0f * fTime);
     } else {
-        fn_80072ED8(pChar->anim, &pChar->blend, fTime);
+        fn_80072ED8((AnimPlayer*)pChar->anim, &pChar->blend, fTime);
         if (pChar->uFlags & 0x1000) {
             pChar->uFlags &= ~0x1000;
             if (pChar->pCurClip != NULL && pChar->pCurClip->pF4 != NULL) {
@@ -1007,7 +1004,7 @@ Character* fn_8001942C(void) {
         pChar->buffers[i].pBuf = fn_80009B34(0x890, 2, 0x40, "char.c", 0x8AF);
     }
     pNode = &pChar->blend;
-    fn_80072D90(pChar->anim);
+    fn_80072D90((AnimPlayer*)pChar->anim);
     fn_80071C28(&pNode, 1, 0, fn_80072ACC, 1);
     pNode = (SKABlendNode*)pChar->node3E0;
     fn_80072D90(&pChar->anim29C);
@@ -1938,8 +1935,8 @@ void fn_8001B878(Character* pChar, int nPlayer) {
     pChar->n1654 = fn_80007D74(&sphere, fn_8001614C(), 0);
     sphere.radius = 3.0f;
     pChar->n1658 = fn_80007D74(&sphere, fn_8001614C(), 0);
-    fn_8001EFB4(pMtx[3], fn_8001F004()->v34, vDir);
-    fDist = fn_8000C5FC(fn_8001F004()->v24, vDir);
+    fn_8001EFB4(pMtx[3], fn_8001F004()->m4[3], vDir);
+    fDist = fn_8000C5FC(fn_8001F004()->m4[2], vDir);
     fLen = (f32)fn_80009680(fn_80009744(vDir));
     if (fLen < pChar->f14) {
         pChar->f14 = fLen;

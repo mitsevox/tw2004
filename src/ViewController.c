@@ -172,24 +172,23 @@ void fn_800171D8(f32* pRect, f32 x, f32 y, f32 w, f32 h) {
 // the angles, pPos as the translation row) and inverts it into the world-to-camera matrix m44.
 void fn_80017208(CamLens* pLens, f32* pPos, f32* pAngles) {
     fn_8001728C(pLens);
-    // port: the camera-to-world matrix is the 4x4 block at 0x04 (v24 and v34 are its rows 2 and 3)
-    fn_8000A194((f32 (*)[4])pLens->v4, pAngles[1], pAngles[0], pAngles[2]);
-    pLens->v34[0] = pPos[0];
-    pLens->v34[1] = pPos[1];
-    pLens->v34[2] = pPos[2];
-    pLens->f40 = 1.0f;
-    fn_8000A798((f32 (*)[4])pLens->v4, pLens->m44);
+    fn_8000A194(pLens->m4, pAngles[1], pAngles[0], pAngles[2]);
+    pLens->m4[3][0] = pPos[0];
+    pLens->m4[3][1] = pPos[1];
+    pLens->m4[3][2] = pPos[2];
+    pLens->m4[3][3] = 1.0f;
+    fn_8000A798(pLens->m4, pLens->m44);
 }
 
 void fn_8001728C(CamLens* pLens) {
-    pLens->f84[0] = 1.0f;
-    pLens->f84[1] = 1.0f;
-    pLens->f84[2] = 1.0f;
-    pLens->f84[3] = 1.0f;
-    pLens->f84[4] = 1.0f;
-    pLens->f84[5] = 1.0f;
-    pLens->f84[6] = 1.0f;
-    pLens->f84[7] = 1.0f;
+    pLens->m84[0][0] = 1.0f;
+    pLens->m84[0][1] = 1.0f;
+    pLens->m84[0][2] = 1.0f;
+    pLens->m84[0][3] = 1.0f;
+    pLens->m84[1][0] = 1.0f;
+    pLens->m84[1][1] = 1.0f;
+    pLens->m84[1][2] = 1.0f;
+    pLens->m84[1][3] = 1.0f;
 }
 
 f32* fn_800172B4(View* pView) {
