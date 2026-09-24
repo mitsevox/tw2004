@@ -336,7 +336,7 @@ typedef struct DiscFile {
     u8   unk3C[0xC4 - 0x3C];
 } DiscFile;
 
-// A queued read (lbl_8019E880's lists); only the fields read so far.
+// A queued read (0x24 bytes: lbl_8019E880 holds eight free ones per priority).
 typedef struct FileReq {
     struct FileReq* pNext;      // 0x00
     struct FileReq* pPrev;      // 0x04
@@ -344,7 +344,26 @@ typedef struct FileReq {
     void* pBuf;                 // 0x0C
     s32   nLen;                 // 0x10
     s32   nOffset;              // 0x14
+    void (*pfnDone)(int nBytes, int nError);    // 0x18
+    s32   n1C;                  // 0x1C
+    u8    b20;                  // 0x20
+    u8    b21;                  // 0x21
+    u8    unk22[2];
 } FileReq;
+
+// A priority's reads: a ring through the FileReqs, the list itself as its end (lbl_8019E868[2]).
+typedef struct FileQueue {
+    FileReq* pNext;             // 0x00
+    FileReq* pPrev;             // 0x04
+    s32   nCount;               // 0x08
+} FileQueue;
+
+// A priority's free FileReqs (lbl_8019E880[2]): a ring like FileQueue's, and the eight requests.
+typedef struct FileReqPool {
+    FileReq* pNext;             // 0x00
+    FileReq* pPrev;             // 0x04
+    FileReq  aReq[8];           // 0x08
+} FileReqPool;
 
 // ---- the renderer ----------------------------------------------------------------------------
 
