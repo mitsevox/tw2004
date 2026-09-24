@@ -996,6 +996,7 @@ int fn_800D1530(int nPlayer) {
     f32 fSin;
     f32 fCos;
     f32 fDegrees;
+    f32 fEpsilon;
 
     if (!Ter_GetSupportingGroundNormal(fn_8000C594(), gPlayers[nPlayer].ball.vPos, vNormal)) {
         return 0;
@@ -1009,8 +1010,8 @@ int fn_800D1530(int nPlayer) {
     fCos = fn_80009638(fAim);
     Vec3Copy(vNormal, vTurned);
     fn_80055D70(&vTurned[2], &vTurned[0], fSin, fCos);
-    fDegrees = 0.000001f;
-    if (vTurned[1] < fDegrees && vTurned[1] > -fDegrees) {
+    fEpsilon = 0.000001f;
+    if (vTurned[1] < fEpsilon && vTurned[1] > -fEpsilon) {
         if (vTurned[0] < 0.0f) {
             fDegrees = -90.0f;
         } else {
