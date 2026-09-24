@@ -94,12 +94,6 @@ void fn_8000ADC0(f32 (*m)[4]);          // identity matrix
 void fn_80014DFC(s32 a, s32 b);
 void fn_80016E90(int nView);
 void fn_80018484(Character* pChar, CharModel* pModel);
-void fn_800192D4(f32 fAngle);
-void fn_80019D64(Character* pChar, void (*pfnA)(void), void (*pfnB)(void), void* p);
-void fn_80019DE8(void);
-void fn_80019E80(void);
-void fn_80019EF4(void);
-void fn_8001A0FC(void);
 void fn_8001BE88(Character* pChar, Clip* pClip, int bNoBlend, f32 f);
 void fn_8001C0E0(Character* pChar);
 void fn_8001C5B4(Character* pChar, int n);
@@ -352,7 +346,7 @@ void fn_8008B4C0(void) {
     fn_8001D4A4(lbl_80281EE0->pB8->pChar, lbl_80281ED4->nSlot);
     fn_800CEE88(0);
     fn_8010B098(lbl_80281EE0->pB8->pChar->a64[lbl_80281EE0->pB8->pChar->n74]);
-    fn_80019D64(lbl_80281EE0->pB8->pChar, fn_80019DE8, fn_80019E80, NULL);
+    fn_80019D64(lbl_80281EE0->pB8->pChar, fn_80019DE8, fn_80019E80);
 }
 
 void fn_8008B570(void) {
@@ -380,7 +374,7 @@ void fn_8008B5FC(void) {
 // State 4: set up the golfer shown.
 void fn_8008B61C(void) {
     fn_8001D4A4(lbl_80281EE0->pB4->pChar, lbl_80281ED4->nSlot);
-    fn_80019D64(lbl_80281EE0->pB4->pChar, fn_80019EF4, fn_8001A0FC, NULL);
+    fn_80019D64(lbl_80281EE0->pB4->pChar, fn_80019EF4, fn_8001A0FC);
 }
 
 void fn_8008B674(void) {
@@ -723,7 +717,7 @@ void fn_8008E0B0(f32 fTurn) {
         }
     }
     if (lbl_80281EE0->pB4->pChar != NULL) {
-        fn_800192D4(lbl_80281EE0->f19C);
+        fn_800192D4(lbl_80281EE0->pB4->pChar, lbl_80281EE0->f19C);
     }
 }
 
@@ -754,7 +748,7 @@ void fn_8008E2F8(u8 bTarget, f32 fAngle) {
     lbl_80281EE0->f19C = fAngle;
     lbl_80281EE0->f1A0 = fAngle;
     if (lbl_80281EE0->pB4->pChar != NULL) {
-        fn_800192D4(lbl_80281EE0->f19C);
+        fn_800192D4(lbl_80281EE0->pB4->pChar, lbl_80281EE0->f19C);
     }
 }
 

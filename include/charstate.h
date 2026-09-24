@@ -170,7 +170,11 @@ LAYOUT_ASSERT(SkinDesc, 0x120);
 
 // What Skin.pModel points at; only what SkinPart.c reads.
 typedef struct SkinModel {
-    u8   unk0[0x40];
+    u8   unk0[0x14];
+    s32  n14;                   // 0x14  how many matrices Skin.p108C holds (fn_80018710)
+    u8   unk18[0x34 - 0x18];
+    void* p34;                  // 0x34  handed to the character's model (fn_80029A74)
+    u8   unk38[0x40 - 0x38];
     s32  n40;                   // 0x40  bits in Skin.p10D0
     u8   unk44[4];
     SkinDesc* pDesc;            // 0x48
@@ -181,7 +185,14 @@ typedef struct SkinModel {
 // A skin (Skin.c): a character's body or one of its attachments; only what the code reads.
 typedef struct Skin {
     SkinModel* pModel;          // 0x0000
-    u8   unk4[0x10A0 - 4];
+    SkelPose pose;              // 0x0004  (fn_80018710 hands it to SKEL_UpdateState)
+    u8   b1044;                 // 0x1044  set once fn_800184E4 has filled a1048
+    u8   pad1045[3];
+    f32  a1048[4][4];           // 0x1048  four leg points, each through fn_8000AB40 of its bone's
+                                //         matrix (fn_800184E4: bones 0x3A, 0x48, 0x39, 0x47)
+    f32  (*p1088)[4][4];        // 0x1088  } matrices fn_80018710 hands the model (fn_80029A88,
+    f32  (*p108C)[4][4];        // 0x108C  } fn_80029A7C)
+    u8   unk1090[0x10A0 - 0x1090];
     void* a10A0[2];             // 0x10A0  indexed by fn_800CE02C's argument; Skin.c sets [0]
     SkinChoice* aParts[4];      // 0x10A8  a choice per part, four copies (fn_800CEE04 copies one
                                 //         over another); [3] is set while lbl_80282238 is clear
@@ -191,6 +202,8 @@ typedef struct Skin {
     u32* p10D0;                 // 0x10D0  }
     u32  u10D4;                 // 0x10D4  bit 1 set by fn_80019CEC and when the choices change; bit 2
                                 //         tested by fn_80037708
+    f32  f10D8;                 // 0x10D8  from the CHR object's header (fn_8001A9F4)
+    f32  f10DC;                 // 0x10DC  1 when loaded
 } Skin;
 
 // hwsOverride_Gc.c (our names): a block of memory handed out in pieces (fn_80112938), sized for

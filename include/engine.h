@@ -170,7 +170,9 @@ typedef struct TexEntry {
     u32  uPixels;               // 0x08  where its pixels start in the bank's p18
     u8   unkC[0x3C - 0xC];
     s16  nPalette;              // 0x3C  its row in the bank's pC
-    u8   unk3E[0x50 - 0x3E];
+    u8   unk3E[0x47 - 0x3E];
+    u8   b47;                   // 0x47  bit 0: the next texture goes with it (char.c fn_80019798)
+    u8   unk48[0x50 - 0x48];
 } TexEntry;
 LAYOUT_ASSERT(TexEntry, 0x50);
 

@@ -23,8 +23,22 @@ void  fn_8001A58C(int nPlayer);
 void  fn_8001A75C(UStreamObject* pObject);
 void  fn_8001A798(void);
 void  fn_8001A7C8(void);
-Character* fn_8001A9F4(u8* pData, int a, int nPlayer, u32 uId, u8 b, void* p);
+Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, SkinChoices* pChoices);
 void* fn_8001B208(u8* pData);
+Character* fn_8001942C(void);
+void  fn_800184E4(Character* pChar, Skin* pSkin);
+void  fn_80018710(Character* pChar);
+void  fn_8001DC64(Character* pChar, SkinChoices* pChoices);
+void  ClipBank_Restore(int nSlot);                  // skalib.c
+ClipBank* ClipBank_Get(u32 nSlot);                  // skalib.c
+AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank);  // skalib.c
+CharModel* fn_80028564(u8* pData, int n, CharModelDefs* pDefs, u8 b);   // Skeleton.c
+Skin* fn_800377FC(u8* pData, u8 b);                 // Skin.c
+s32   fn_80037708(void* pSkin);                     // Skin.c
+void  fn_800375AC(Skin* pSkin, int n);              // Skin.c
+void  fn_80037AB8(Skin* pSkin, CharModel* pModel, int nBone, int nId);   // Skin.c
+void  fn_800CC4EC(Character* pChar);                // SkinPart.c
+void* CharSlider_CreateDefinitionsFromMem(u8** ppData);
 void  fn_8001B58C(CharSkinSet* pSet);
 void  fn_8001B878(Character* pChar, int n);
 void  fn_8001C0E0(Character* pChar);
@@ -43,11 +57,56 @@ void  fn_8001CD80(UStreamObject* pObject);
 void  fn_8001CE5C(UStreamObject* pObject);
 void  fn_8001D020(UStreamObject* pObject);
 void  fn_8001D3EC(UStreamObject* pObject);
-void  fn_8001D7EC(void);
+void  fn_8001D7EC(Character* pChar);
 void  fn_8001C5B4(Character* pChar, int n);
 void  fn_800BBADC(int nValue);         // SitDevFile.c
 void  fn_8001EBD8(Character* pChar, int nBone, f32* pPos);
 u8    fn_8001EC48(Character* pChar);
+f32   fn_8001ED44(Character* pChar, int b);
+void  fn_80017DDC(Character* pChar);
+void  fn_8001899C(Character* pChar, int a, int b);
+void  fn_8001B644(Character* pChar);
+void  fn_8001C860(Character* pChar);
+void  fn_80021978(u8 v);                                        // ska_shared.c
+void  fn_8002787C(CharModel* pModel);                           // Skeleton.c
+void  fn_800279C0(Character* pChar);                            // Skeleton.c
+void  SKEL_UpdateState(CharModel* pModel, SkelPose* pPose, int n);   // Skeleton.c
+void  fn_80037C48(Skin* pSkin, SkelPose* pPose);                // Skin.c
+void  fn_8007260C(Character* pChar, SKABlendNode* pNode, CharModel* pModel, f32 fTime);  // animblender.c
+void  fn_80072ED8(void* pAnim, SKABlendNode* pNode, f32 fTime);                          // animblender.c
+void  fn_80073108(Character* pChar, int nPlayer, void* pAnim, SKABlendNode* pNode, f32 fTime);
+void  fn_8009622C(Character* pChar, void* pClip, u8 bKeep, f32 fOffset);                  // CharAnim.c
+void  fn_80096F0C(Character* pChar);                            // CharAnim.c
+s32   fn_8009637C(Character* pChar);                            // CharAnim.c
+void  fn_8000914C(f32* pQ, f32 (*m)[4]);                        // Quaternion.c: a rotation matrix
+void  fn_8001BD18(Character* pChar, Clip* pClip);
+void  fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, int n, f32 fTime);
+void  fn_800280E8(Character* pChar, f32* pPos, int bPlace);     // Skeleton.c
+void  fn_8001EFB4(f32* pA, f32* pB, f32* pOut);
+void  fn_8001A14C(Character* pChar);
+void  fn_8001D6D8(int n);
+void  fn_8010B098(void* pModel);                                // LLDynTex.c
+void  fn_80071C28(SKABlendNode** ppNode, int a, int b, SKABlendFn pfnBlend, int c);   // animblender.c
+void  fn_800725BC(SKABlendNode* pNode, SKABlendFn pfnBlend, f32 f);                  // animblender.c
+void  fn_800958EC(AnimPlayer* pAnim, s32 n, f32 f);            // CharAnim.c
+void  fn_800094D8(f32* pQ, f32* pA, f32* pB, f32* pC);          // Quaternion.c: a rotation as angles
+void  fn_80029968(CharModel* pModel, SkelPose* pPose);          // Skeleton.c
+void  fn_8000AB40(f32 (*pSrc)[4], f32 (*pDst)[4]);              // UMemPool.c
+void  fn_8001EDA8(Character* pChar, int nBone, f32* pPos);
+void  fn_8001EF54(f32* pA, f32* pB, f32* pOut);
+void  fn_80095558(void);
+void  AnimLib_ApplyOverlays(int nSlot);                         // skalib.c
+void  fn_80025478(void);                                        // skalib.c
+void  fn_800CA7E0(void);                                        // AnimStream.c
+void  fn_800CABA0(void);                                        // AnimStream.c
+void  fn_800CB078(void);                                        // AnimStream.c
+void  fn_8001DD18(u8* pData, int nBytes);
+void  fn_8001DEC8(u8* pData, int nBytes);
+s32   fn_800CE8C0(Skin** apSkins, int nSkins, SkinListEntry** ppList);   // SkinPart.c
+void  fn_800CEEBC(void);                                        // SkinPart.c: empty
+void  fn_800100B0(TexBank* pBank, TexEntry* p8, TexPalette* pC, void* p10, void* p14, s16 nNumTex,
+                  s16 nNumPalettes);                            // LLTex.c
+void  fn_8001EFD8(f32* pA, f32* pB, f32* pOut);
 f32 (*fn_8001EC6C(Character* pChar, int nBone))[4];
 f32 (*fn_8001ECA8(Character* pChar, int nBone))[4];
 f32   fn_8001EFFC(CamLens* pLens);
@@ -76,6 +135,7 @@ void  fn_800C9FE0(void);
 void  fn_800CCA1C(void);
 void  fn_800CCA3C(void);
 void  fn_800CEE04(Skin* pSkin, int a, int b);
+s32   fn_800CCEA0(Skin* pSkin);         // SkinPart.c: how many choices aSets[3] holds
 void  fn_800CEE88(u8 b);
 u8    fn_800FCC38(int nPlayer);
 void  fn_8010A668(void* p);
@@ -154,6 +214,20 @@ void fn_800175B0(Character* pChar, ClipBlend* pBlend, f32 fStart) {
     }
 }
 
+// A random item of group nGroup of the 'MAL ' bank of the character's slot, or NULL without one.
+void* fn_80017678(Character* pChar, int nGroup, int n) {
+    void* pItem = NULL;
+    int nNum = 0;
+    MalBank* pBank;
+
+    if ((pBank = fn_8001F760(pChar->nSlot)) != NULL) {
+        // port: EA passes fn_8001F780's arguments (with the count's address) to fn_8001F79C, which
+        // takes three: the count's address arrives as its unused n, and n is ignored
+        pItem = ((void* (*)(MalBank*, int, int*, int))fn_8001F79C)(pBank, nGroup, &nNum, n);
+    }
+    return pItem;
+}
+
 // Pick the character's clip for an animation group and style from its animation library, keyed
 // also by the character's club class (class 1 looks up as 0) and n16D4. The lookup's fallback flags
 // go to bits 0x200 / 0x400 of uFlags; the clip is kept in pCurClip.
@@ -179,6 +253,134 @@ void* Char_SetClip(Character* pChar, int nGroup, int nStyle, const char* pName) 
     return pClip;
 }
 
+// Advances the character's animation by fTime: both animation players and their blend trees, the
+// pose (the club head at the club class's height), the bones, the feet on the ground and the
+// model's dynamic chains. Unless bForce, it waits while a golfer's state is 0x13 and while f14 of
+// any other character is above fn_8001ED44.
+void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
+    u32 auBits[4];
+    int bC860 = 0;
+    int bLegA = 0;
+    int bLegB = 0;
+    int i;
+
+    if (pChar == NULL) {
+        return;
+    }
+    if (pChar->uFlags & 1) {
+        pChar->n1698 = 0;
+        return;
+    }
+    if (pChar->u10 & 1) {
+        return;
+    }
+    if (!bForce) {
+        if (fn_8001EC48(pChar)) {
+            // fake match: the state is compared as an s8 (see GOLFERSTATE_GetCurrentState)
+            if ((s8)GOLFERSTATE_GetCurrentState(pChar->nPlayer) == 0x13) {
+                return;
+            }
+        } else if (pChar->f14 > fn_8001ED44(pChar, gSession.nSplitScreen)) {
+            pChar->f14 = 1073741824.0f;
+            pChar->n1698 = 0;
+            return;
+        }
+    }
+    pChar->f14 = 1073741824.0f;
+    if (pChar->u10 & 4) {
+        fn_8001C860(pChar);
+        bC860 = 1;
+    }
+    if (pChar->n20 == 8 && pChar->nAnim == 8) {
+        fn_80073108(pChar, pChar->nPlayer, pChar->anim, &pChar->blend, fTime);
+    } else if (pChar->u10 & 0x100) {
+        fn_80072ED8(pChar->anim, &pChar->blend, 5.0f * fTime);
+    } else {
+        fn_80072ED8(pChar->anim, &pChar->blend, fTime);
+        if (pChar->uFlags & 0x1000) {
+            pChar->uFlags &= ~0x1000;
+            if (pChar->pCurClip != NULL && pChar->pCurClip->pF4 != NULL) {
+                fn_8009622C(pChar, pChar->pCurClip->pF4, 0, 0.5f);
+            }
+        }
+    }
+    fn_80021978(pChar->pModel->bEE);
+    if (!gSession.b11) {
+        fn_80072ED8(&pChar->anim29C, (SKABlendNode*)pChar->node3E0, fTime);
+    }
+    if (fn_8001EC48(pChar)) {
+        CharacterState_UpdateSKAState(pChar);
+        if (!gSession.b11) {
+            fn_80096F0C(pChar);
+        }
+    }
+    if (pChar->pModel->pSkel != NULL) {
+        fn_8002787C(pChar->pModel);
+    }
+    if (pChar->blend.pPose != NULL) {
+        fn_8007260C(pChar, &pChar->blend, pChar->pModel, pChar->fAnimTime);
+        if (fn_8001EC48(pChar) && pChar->p16D8 != NULL) {
+            pChar->blend.pPose->aBones[pChar->nClubHeadBone].v10[1] = pChar->p16D8->afC[pChar->nClubClass];
+        }
+        SKEL_UpdateState(pChar->pModel, pChar->blend.pPose, 0);
+        if (fn_8001EC48(pChar)) {
+            if (fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x36)) ||
+                fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x38)) ||
+                fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x39)) ||
+                fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x3A))) {
+                bLegA = 1;
+            }
+            if (fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x44)) ||
+                fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x46)) ||
+                fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x47)) ||
+                fn_8001E9CC(pChar->blend.pPose->a0, fn_8001EEE4(pChar->pModel, 0x48))) {
+                bLegB = 1;
+            }
+        }
+    }
+    if (!gSession.b11 && fn_8001EC48(pChar) && ((SKABlendNode*)pChar->node3E0)->pPose != NULL) {
+        fn_8007260C(pChar, (SKABlendNode*)pChar->node3E0, pChar->pModel, pChar->anim29C.fTime);
+        fn_80037C48(pChar->pSkin, ((SKABlendNode*)pChar->node3E0)->pPose);
+    }
+    if (pChar->uFlags & 2) {
+        pChar->uFlags |= 1;
+        return;
+    }
+    if (pChar->pfn17B0 != NULL) {
+        pChar->pfn17B0();
+    }
+    fn_8001E8A4(auBits, 0x80);
+    SKEL_TransformBones(pChar->pModel, auBits);
+    if (fn_8001EC48(pChar)) {
+        Character_UpdateTestPoints(pChar);
+        Character_UpdateFeetTerrainInfo(pChar, bC860 || pChar->n20 != 5 || pChar->n26 == 1);
+        if (pChar->n20 == 1 || pChar->n20 == 0 || pChar->n20 == 9 ||
+            (pChar->n20 == 11 && !(pChar->u10 & 0x8000)) || pChar->n20 == 5 || pChar->n20 == 12) {
+            Character_PlaceFeetOnGround(pChar);
+        }
+        fn_8001899C(pChar, bLegA, bLegB);
+    }
+    if (fn_8001EC48(pChar)) {
+        if (pChar->pModel->pSkel != NULL) {
+            fn_800279C0(pChar);
+        }
+        fn_80017DDC(pChar);
+    }
+    pChar->n1698 = 0;
+    fn_8001B644(pChar);
+    if (fn_8001EC48(pChar)) {
+        fn_80029948(pChar->pModel, pChar->pModel->pF0, fTime);
+        fn_80029948(pChar->pModel, pChar->pModel->pF4, fTime);
+        fn_80029948(pChar->pModel, pChar->pModel->pF8, fTime);
+        for (i = 0; i < 6; i++) {
+            fn_80029948(pChar->pModel, pChar->pModel->apFC[i], fTime);
+        }
+        for (i = 0; i < 6; i++) {
+            fn_80029948(pChar->pModel, pChar->pModel->ap114[i], fTime);
+        }
+    }
+}
+
 // Give the character its model and look up the bones the swing needs: the club head (0x53), the
 // grip (0x52) and bone 0x15.
 void fn_80018484(Character* pChar, CharModel* pModel) {
@@ -187,6 +389,88 @@ void fn_80018484(Character* pChar, CharModel* pModel) {
         pChar->nClubHeadBone = fn_8001EED8(pChar->pModel, 0x53);
         pChar->nGripBone     = fn_8001EED8(pChar->pModel, 0x52);
         pChar->n16A8         = fn_8001EEE4(pChar->pModel, 0x15);
+    }
+}
+
+// Gives the character its body's skin and poses the model from it; for a golfer, the skin also
+// keeps four points of the legs (bones 0x3A, 0x48, 0x39, 0x47, each moved by a small offset that
+// depends on the animation slot) in the frame of their bone (through fn_8000AB40's matrix).
+void fn_800184E4(Character* pChar, Skin* pSkin) {
+    f32 m48[4][4];
+    f32 m3A[4][4];
+    f32 m47[4][4];
+    f32 m39[4][4];
+    Vec4 v48;
+    Vec4 v3A;
+    Vec4 v47;
+    Vec4 v39;
+    Vec4 vOffsetB;
+    Vec4 vOffsetA;
+    f32 (*pMtx48)[4];
+    f32 (*pMtx3A)[4];
+    f32 (*pMtx47)[4];
+    f32 (*pMtx39)[4];
+
+    if (pChar != NULL) {
+        pChar->pSkin = pSkin;
+        fn_80018710(pChar);
+        if (fn_8001EC48(pChar)) {
+            pMtx48 = fn_8001EC6C(pChar, 0x48);
+            pMtx3A = fn_8001EC6C(pChar, 0x3A);
+            pMtx47 = fn_8001EC6C(pChar, 0x47);
+            pMtx39 = fn_8001EC6C(pChar, 0x39);
+            fn_8000AB40(pMtx48, m48);
+            fn_8000AB40(pMtx3A, m3A);
+            fn_8000AB40(pMtx47, m47);
+            fn_8000AB40(pMtx39, m39);
+            if (pChar->nSlot == 0) {
+                vOffsetA.x = 0.0f;
+                vOffsetA.y = -0.031f;
+                vOffsetA.z = 0.0f;
+                vOffsetA.w = 1.0f;
+                vOffsetB.x = 0.0f;
+                vOffsetB.y = -0.11f;
+                vOffsetB.z = -0.06f;
+                vOffsetB.w = 1.0f;
+            } else {
+                vOffsetA.x = 0.0f;
+                vOffsetA.y = -0.025f;
+                vOffsetA.z = 0.0f;
+                vOffsetA.w = 1.0f;
+                vOffsetB.x = 0.0f;
+                vOffsetB.y = -0.08f;
+                vOffsetB.z = -0.025f;
+                vOffsetB.w = 1.0f;
+            }
+            fn_8001EDA8(pChar, 0x48, &v48.x);
+            fn_8001EDA8(pChar, 0x3A, &v3A.x);
+            fn_8001EDA8(pChar, 0x47, &v47.x);
+            fn_8001EDA8(pChar, 0x39, &v39.x);
+            fn_8001EF54(&v48.x, &vOffsetA.x, &v48.x);
+            fn_8001EF54(&v3A.x, &vOffsetA.x, &v3A.x);
+            fn_8001EF54(&v47.x, &vOffsetB.x, &v47.x);
+            fn_8001EF54(&v39.x, &vOffsetB.x, &v39.x);
+            fn_800BAD60(m3A, &v3A, (Vec4*)pChar->pSkin->a1048[0]);
+            fn_800BAD60(m48, &v48, (Vec4*)pChar->pSkin->a1048[1]);
+            fn_800BAD60(m39, &v39, (Vec4*)pChar->pSkin->a1048[2]);
+            fn_800BAD60(m47, &v47, (Vec4*)pChar->pSkin->a1048[3]);
+            pChar->pSkin->b1044 = 1;
+        }
+    }
+}
+
+// Poses the character's model from its body's skin: the skin's pose (SKEL_UpdateState,
+// fn_80029968) and, when the skin has a model, the skin's matrices.
+void fn_80018710(Character* pChar) {
+    if (pChar != NULL && pChar->pSkin != NULL && pChar->pModel != NULL) {
+        SKEL_UpdateState(pChar->pModel, &pChar->pSkin->pose, 1);
+        fn_80029968(pChar->pModel, &pChar->pSkin->pose);
+        if (pChar->pSkin->pModel != NULL) {
+            fn_80037AB8(pChar->pSkin, pChar->pModel, 0, 0);
+            fn_80029A74(pChar->pModel, pChar->pSkin->pModel->p34);
+            fn_80029A88(pChar->pModel, pChar->pSkin->p1088);
+            fn_80029A7C(pChar->pModel, pChar->pSkin->p108C, pChar->pSkin->pModel->n14);
+        }
     }
 }
 
@@ -256,10 +540,10 @@ void fn_8001966C(Character* pChar) {
         pChar->u10 |= 0x10000;
         pChar->u10 |= 8;
         pChar->u10 |= 4;
-        pChar->pModel->pSkel->n2C = 0;
+        pChar->pModel->pSkel->pClip = NULL;
         pChar->fAnimTime = pChar->f180 + fn_8001F02C(pChar->pBlend, 2) - pChar->v1638[1];
         Character_UpdateAnimation(pChar, 0, 0.0f);
-        pChar->pModel->pSkel->n2C = 0;
+        pChar->pModel->pSkel->pClip = NULL;
     }
 }
 
@@ -281,6 +565,127 @@ void fn_8001971C(Character* pChar) {
     if (pChar->hFile >= 0) {
         fn_8000633C(pChar->hFile);
     }
+}
+
+// Reads the character's textures from its CHR object (after the slider definitions, p4C) into
+// bank78: in the front end (game types 10 and 3) all of them; otherwise, for each name the skins
+// use (fn_800CE8C0), the texture of that name (and the one after it when it goes with it) with its
+// palette, or an empty one. Then it opens the golfer's texture file.
+void fn_80019798(Character* pChar, Skin** apSkins, int nSkins) {
+    int nTexBytes;
+    int nPalBytes;
+    u8* pData;
+    SkinListEntry* pList;
+    TexEntry* pTexData;
+    TexPalette* pPalData;
+    u8 bAll;
+    u8 bFound;
+    int nTex;
+    int nPal;
+    int nExtra;
+    int nNames;
+    int nOut;
+    int i;
+    int j;
+
+    nExtra = 0;
+    pList = NULL;
+    pData = pChar->p4C;
+    fn_80076158(&pData, (u8*)&nTexBytes, 4, 4);
+    fn_80076158(&pData, (u8*)&nPalBytes, 4, 4);
+    fn_80076158(&pData, (u8*)&pChar->n58, 4, 4);
+    fn_80076158(&pData, (u8*)&pChar->n5C, 4, 4);
+    if (nTexBytes != 0) {
+        pTexData = (TexEntry*)pData;
+        fn_8001DD18(pData, nTexBytes);
+        pData += nTexBytes;
+    }
+    if (nPalBytes != 0) {
+        pPalData = (TexPalette*)pData;
+        fn_8001DEC8(pData, nPalBytes);
+    } else {
+        pChar->n5C = 0;
+    }
+    bAll = 0;
+    if (gSession.nGameType == 10 || gSession.nGameType == 3) {
+        bAll = 1;
+    }
+    nTex = nTexBytes / (int)sizeof(TexEntry);
+    nPal = nPalBytes / (int)sizeof(TexPalette);
+    if (bAll) {
+        pChar->nAC = nTex;
+        pChar->nB4 = nPal;
+    } else {
+        pChar->nAC = fn_800CE8C0(apSkins, nSkins, &pList);
+        nExtra = 0;
+        pChar->nB4 = pChar->nAC;
+        nPalBytes = pChar->nB4 * sizeof(TexPalette);
+        for (i = 0; i < pChar->nAC; i++) {
+            for (j = 0; j < nTex; j++) {
+                if (pList[i].uId == pTexData[j].u0 && (pTexData[j].b47 & 1)) {
+                    nExtra++;
+                    break;
+                }
+            }
+        }
+        pChar->nAC += nExtra;
+    }
+    pChar->pA8 = NULL;
+    pChar->pB8 = NULL;
+    pChar->pB0 = NULL;
+    pChar->pBC = NULL;
+    if (pChar->nAC != 0) {
+        pChar->pA8 = fn_80009B34(pChar->nAC * sizeof(TexEntry), 2, 0x10, "char.c", 0x9A9);
+        pChar->pB8 = fn_80009B34(pChar->nAC * 64, 2, 0x10, "char.c", 0x9AE);
+    }
+    if (pChar->nB4 != 0) {
+        pChar->pB0 = fn_80009B34(nPalBytes, 2, 0x10, "char.c", 0x9B8);
+        pChar->pBC = fn_80009B34(nPal, 2, 0x10, "char.c", 0x9BD);
+    }
+    if (bAll) {
+        if (pChar->nAC != 0) {
+            Mem_cpy(pChar->pA8, pTexData, nTexBytes);
+        }
+        if (pChar->nB4 != 0) {
+            Mem_cpy(pChar->pB0, pPalData, nPalBytes);
+        }
+    } else {
+        nOut = 0;
+        nNames = pChar->nAC - nExtra;
+        for (i = 0; i < nNames; i++) {
+            bFound = 0;
+            for (j = 0; j < nTex; j++) {
+                if (pList[i].uId == pTexData[j].u0) {
+                    Mem_cpy(&pChar->pA8[nOut], &pTexData[j], sizeof(TexEntry));
+                    if (pTexData[j].nPalette != -1) {
+                        Mem_cpy(&pChar->pB0[i], &pPalData[pTexData[j].nPalette], sizeof(TexPalette));
+                        pChar->pA8[nOut].nPalette = i;
+                    }
+                    nOut++;
+                    if (pTexData[j].b47 & 1) {
+                        Mem_cpy(&pChar->pA8[nOut], &pTexData[j + 1], sizeof(TexEntry));
+                        nOut++;
+                    }
+                    bFound = 1;
+                    break;
+                }
+            }
+            if (!bFound) {
+                pChar->pA8[nOut].u0 = 0;
+                pChar->pA8[nOut].nPalette = -1;
+                nOut++;
+            }
+        }
+    }
+    if (pList != NULL) {
+        fn_80009E70(pList);
+    }
+    fn_800100B0(&pChar->bank78, pChar->pA8, pChar->pB0, pChar->pB8, pChar->pBC, pChar->nAC, pChar->nB4);
+    pChar->p50 = &pChar->bank78;
+    // port: EA passes arguments fn_800CEEBC (empty) ignores
+    ((void (*)(Skin*, TexBank*, int, int))fn_800CEEBC)(pChar->pSkin, &pChar->bank78, 0xBF600, 0xCDA);
+    sprintf(pChar->szE1, "%sdata\\CharStrm\\CharTex\\%02dalltex.fxg", "", pChar->nC + 1);
+    pChar->hFile = fn_800060E0(pChar->szE1);
 }
 
 void fn_80019C1C(Character* pChar) {
@@ -305,20 +710,37 @@ void fn_80019CEC(Character* pChar) {
     }
 }
 
+// Queues a dynamic texture job (LLDynTex.c) for the character with its two functions; the pool's
+// last entry points at the character, or at nothing when no job is free.
+void fn_80019D64(Character* pChar, void (*pfnA)(Character* pChar), void (*pfnB)(Character* pChar)) {
+    DynTexJob* pJob = fn_8010B8EC();
+
+    if (pJob != NULL) {
+        lbl_801B95E8.a[6].p = pChar;
+        pJob->pfnA = pfnA;
+        pJob->pChar = pChar;
+        pJob->pfnB = pfnB;
+        pJob->p0 = &pChar->p50;
+        fn_8010B930(pJob);
+    } else {
+        lbl_801B95E8.a[6].p = NULL;
+    }
+}
+
 // Sets up the dynamic textures (LLDynTex.c) for the character's model in use.
 void fn_80019DE8(Character* pChar) {
     void* pModel = pChar->a64[pChar->n74];
 
     fn_8008EAC8(0);
     pChar->p60 = pModel;
-    fn_8010BC88(pChar->a50);
-    // not exact: the original passes pModel here and to fn_8010BED4, whose definitions take
-    // nothing (FEgolferanim.c calls fn_8010BEC4 with no argument)
-    fn_8010BEC4();
+    fn_8010BC88(&pChar->p50);
+    // port: EA passes an argument fn_8010BEC4 ignores
+    ((void (*)(void*))fn_8010BEC4)(pModel);
     fn_80019C1C(pChar);
     fn_800CEB1C(pChar->apSkins, pChar->nSkins, pModel);
     fn_800CEBE8(pChar->apSkins, pChar->nSkins, pModel, NULL, 0);
-    fn_8010BED4();
+    // port: EA passes an argument fn_8010BED4 ignores
+    ((void (*)(void*))fn_8010BED4)(pModel);
 }
 
 // Puts the profile's created golfer's logos on the character's model in use.
@@ -328,6 +750,36 @@ void fn_80019E80(Character* pChar) {
     fn_8001744C(pChar, pChar->a64[pChar->n74], &fn_80077ACC()->choices);
     fn_8010BA2C(pChar->a64[pChar->n74]);
     fn_8008EA38(1);
+}
+
+// Sets up the dynamic textures on the character's other model: the model in use is copied to it
+// (fn_8010A6A8) and each skin choice that differs from the skin's current one is put on it.
+void fn_80019EF4(Character* pChar) {
+    void* pModel;
+    Skin* pSkin;
+    int i;
+    int j;
+
+    fn_8008E918(1);
+    pModel = pChar->a64[1 - pChar->n74];
+    fn_8010A6A8(pChar->a64[pChar->n74], pModel);
+    pChar->p60 = pModel;
+    fn_8010BC88(&pChar->p50);
+    // port: EA passes an argument fn_8010BEC4 ignores
+    ((void (*)(void*))fn_8010BEC4)(pModel);
+    for (i = 0; i < pChar->nSkins; i++) {
+        pSkin = pChar->apSkins[i];
+        for (j = 0; j < fn_800CCEA0(pSkin); j++) {
+            if (memcmp(&pSkin->aSets[2][j], &pSkin->aSets[3][j], sizeof(SkinChoice)) != 0) {
+                fn_800CECE0(pSkin, j, pSkin->aSets[3][j].nVariant, pSkin->aSets[3][j].nOption, pModel);
+            }
+        }
+    }
+    fn_80019C1C(pChar);
+    fn_800CEB1C(pChar->apSkins, pChar->nSkins, pModel);
+    fn_800CEBE8(pChar->apSkins, pChar->nSkins, pModel, NULL, 0);
+    // port: EA passes an argument fn_8010BED4 ignores
+    ((void (*)(void*))fn_8010BED4)(pModel);
 }
 
 // Once the menu golfer is flagged (fn_8008EAD4): switches the character to its other model and
@@ -360,6 +812,30 @@ void fn_8001A0FC(Character* pChar) {
     if (fn_8008E938() == 0) {
         fn_8001A024(pChar);
     }
+}
+
+// Sets up the dynamic textures for the character's model in use (fn_8010B098), dresses it
+// (fn_8001D4A4) and puts its skins on the model, the "Glove" set first; the last marked player
+// (lbl_80281CAC) is dressed again.
+void fn_8001A14C(Character* pChar) {
+    u64 uGlove;
+    void* pModel;
+
+    pModel = pChar->a64[pChar->n74];
+    pChar->p60 = pModel;
+    fn_8010BC88(&pChar->p50);
+    fn_8010B098(pModel);
+    // port: EA passes an argument fn_8010BEC4 ignores
+    ((void (*)(void*))fn_8010BEC4)(pModel);
+    fn_8001D4A4(pChar, pChar->nPlayer);
+    fn_80019C1C(pChar);
+    fn_800CB700(&uGlove, "Glove");
+    fn_800CEBE8(pChar->apSkins, pChar->nSkins, pModel, &uGlove, 1);
+    if (lbl_80281CAC >= 0) {
+        fn_8001D4A4(gPlayers[lbl_80281CAC].pChar, lbl_80281CAC);
+    }
+    // port: EA passes an argument fn_8010BED4 ignores
+    ((void (*)(void*))fn_8010BED4)(pModel);
 }
 
 void fn_8001A20C(Character* pChar) {
@@ -435,6 +911,26 @@ void fn_8001A488(void) {
     }
 }
 
+// With more than two players, only the player with the honor keeps pool entries: every player's
+// character gives its back, then that player's takes them and queues its dynamic textures.
+void fn_8001A4BC(void) {
+    Character* pChar;
+    int i;
+
+    lbl_80281CAC = -1;
+    if (gSession.nNumPlayers > 2) {
+        for (i = 0; i < gSession.nNumPlayers; i++) {
+            fn_8001A484(gPlayers[i].pChar);
+            fn_8001A3B0(gPlayers[i].pChar);
+        }
+        i = gpGame->pfnGetHonors(5);
+        pChar = gPlayers[i].pChar;
+        fn_8001A418(pChar);
+        fn_80019D64(pChar, fn_8001A14C, fn_8001A20C);
+        fn_8010BF68();
+    }
+}
+
 void fn_8001A73C(void) {
     fn_8010BF68();
 }
@@ -492,6 +988,218 @@ void fn_8001A870(void) {
         sprintf(pChar->szE1, "%sdata\\CharStrm\\CharTex\\%02dalltex.fxg", "", pChar->nC + 1);
         pChar->hFile = fn_800060E0(pChar->szE1);
     }
+}
+
+// With two players or fewer, every player's character takes its pool entries and queues its
+// dynamic textures (in split screen it is flagged for fn_8001D6D8 too); then the animation slots
+// take their overlays and the work copies are freed.
+void fn_8001A920(void) {
+    int i;
+    Character* pChar;
+
+    fn_80095558();
+    if (gSession.nNumPlayers <= 2) {
+        for (i = 0; i < gSession.nNumPlayers; i++) {
+            pChar = gPlayers[i].pChar;
+            fn_8001A418(pChar);
+            fn_80019D64(pChar, fn_8001A14C, fn_8001A20C);
+            fn_8010BF68();
+            if (gSession.nSplitScreen) {
+                fn_8001D6D8(i);
+            }
+        }
+    }
+    AnimLib_ApplyOverlays(0);
+    AnimLib_ApplyOverlays(1);
+    fn_800CA9DC(-1);
+    fn_800CA7E0();
+    fn_80025478();
+    fn_8001A7F0();
+    AnimLib_FreeWorkCopies();
+    fn_800CABA0();
+    fn_800CB078();
+}
+
+// Builds a character from its CHR object: a header (its animation slot and a few values), its
+// skin, the p44 entries, its model (fn_80028564), its own animation library, and its slider
+// definitions; then a golfer's club skins and, with bLook, its look from pChoices. Every value read
+// is followed by 12 bytes it skips.
+// port: the object is little-endian on disc and fn_80076158 swaps each value as it reads it: a
+//       little-endian port does not swap there.
+Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, SkinChoices* pChoices) {
+    int nSize;
+    int bLib;
+    int nFlag400;
+    int nModel;
+    f32 fSkin;
+    f32 f12C;
+    f32 f130;
+    f32 f134;
+    f32 f138;
+    f32 f13C;
+    int nBank;
+    u32 uLibFlags;
+    u8* pPeek;
+    Character* pChar;
+    CharModelDefs* pDefs = NULL;
+    u8* pStart;
+    u8* pCopy;
+    AnimLib* pLib;
+    Skin* pSkin;
+    u8 bGolfer;
+    u8 bModel;
+    int i;
+
+    pChar = fn_8001942C();
+    if (pChar == NULL) {
+        return NULL;
+    }
+    pChar->nC = nId;
+    pStart = pData;
+    fn_80076158(&pData, (u8*)&pChar->nSlot, 4, 4);
+    fn_80076158(&pData, (u8*)&fSkin, 4, 4);
+    fn_80076158(&pData, (u8*)&nFlag400, 4, 4);
+    fn_80076158(&pData, (u8*)&nModel, 4, 4);
+    fn_80076158(&pData, (u8*)&f134, 4, 4);
+    fn_80076158(&pData, (u8*)&f138, 4, 4);
+    fn_80076158(&pData, (u8*)&f13C, 4, 4);
+    fn_80076158(&pData, (u8*)&f12C, 4, 4);
+    fn_80076158(&pData, (u8*)&f130, 4, 4);
+    if (gSession.nGameType == 3) {
+        ClipBank_Restore(pChar->nSlot);
+    }
+    pData += 0xC;
+    if (nFlag400 == 1) {
+        pChar->u10 |= 0x400;
+    }
+    bGolfer = fn_8001EC48(pChar);
+
+    // its skin
+    fn_80076158(&pData, (u8*)&nSize, 4, 4);
+    pData += 0xC;
+    if (nSize == 0) {
+        pChar->pSkin = NULL;
+    } else {
+        pChar->pSkin = fn_800377FC(pData, bLook);
+        pChar->pSkin->f10D8 = fSkin;
+        pChar->pSkin->f10DC = 1.0f;
+        if (gSession.nGameType != 10 && gSession.nGameType != 3 && fn_8001EC48(pChar)) {
+            fn_80037708(pChar->pSkin);
+        }
+    }
+    pData += nSize;
+
+    // the p44 entries
+    fn_80076158(&pData, (u8*)&pChar->n40, 4, 4);
+    pData += 0xC;
+    pChar->p44 = fn_80009B34(pChar->n40 * sizeof(CharEntry44), 2, 0x40, "char.c", 0xE04);
+    for (i = 0; i < pChar->n40; i++) {
+        fn_80076158(&pData, (u8*)pChar->p44[i].v0, 0xC, 4);
+        pChar->p44[i].fC = 1.0f;
+        fn_80076158(&pData, (u8*)&pChar->p44[i].a10[0], 4, 4);
+        fn_80076158(&pData, (u8*)&pChar->p44[i].a10[1], 4, 4);
+        fn_80076158(&pData, (u8*)&pChar->p44[i].a10[2], 4, 4);
+        fn_80076158(&pData, (u8*)&pChar->p44[i].a10[3], 4, 4);
+        fn_80076158(&pData, (u8*)&pChar->p44[i].a10[4], 4, 4);
+        fn_80076158(&pData, (u8*)&pChar->p44[i].a10[5], 4, 4);
+        pData += 0xC;
+    }
+
+    // its model
+    fn_80076158(&pData, (u8*)&nSize, 4, 4);
+    pData += 0xC;
+    if (bGolfer && gSession.nGameType != 10 && gSession.nGameType != 3) {
+        if (gSession.nSplitScreen) {
+            pDefs = &lbl_80280E18;
+        } else {
+            pDefs = &lbl_80280E10;
+        }
+    }
+    bModel = nModel == 1;
+    if (bLook && pChoices != NULL) {
+        bModel = pChoices->n113;
+    }
+    fn_80018484(pChar, fn_80028564(pData, 1, pDefs, bModel));
+    if (pChar->pSkin != NULL) {
+        fn_800184E4(pChar, pChar->pSkin);
+    }
+    pChar->pModel->f12C = f12C;
+    pChar->pModel->f130 = f130;
+    pChar->pModel->f134 = f134;
+    pChar->pModel->f138 = f138;
+    pChar->pModel->f13C = f13C;
+    pData += nSize;
+    pChar->n3D4 = pData - pStart;
+
+    // its own animation library: kept when its clips are its own or in a bank, otherwise merged over
+    // its slot's library as an overlay
+    fn_80076158(&pData, (u8*)&bLib, 4, 4);
+    pData += 0xC;
+    if (bLib != 0) {
+        fn_80076158(&pData, (u8*)&nSize, 4, 4);
+        pData += 0xC;
+        pPeek = pData + 0x138;
+        fn_80076158(&pPeek, (u8*)&nBank, 4, 4);
+        pPeek = pData + 0x13C;
+        fn_80076158(&pPeek, (u8*)&uLibFlags, 4, 4);
+        if (pChar->nSlot == 2 || nBank != 0 || (uLibFlags & 1)) {
+            pCopy = fn_80009B34(nSize, 2, 0x40, "char.c", 0xE54);
+        } else {
+            pCopy = fn_80009B34(nSize, 1, 0x40, "char.c", 0xE57);
+        }
+        Mem_cpy(pCopy, pData, nSize);
+        pLib = AnimLib_Load(pCopy, ClipBank_Get(pChar->nSlot));
+        if (pLib->pBank != NULL || (pLib->uFlags & 1)) {
+            pChar->pLib = pLib;
+        } else {
+            lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].pWork = pLib;
+            lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].pCopy =
+                fn_80009B34(nSize, 2, 0x40, "char.c", 0xE68);
+            Mem_cpy(lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].pCopy,
+                    pData, nSize);
+            lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].nSize = nSize;
+            lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].pChar = pChar;
+            lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].n10 = nId + 3;
+            lbl_801C6068[pChar->nSlot].overlays[lbl_801C6068[pChar->nSlot].nOverlays].bActive = bLook;
+            lbl_801C6068[pChar->nSlot].nOverlays++;
+            pChar->pLib = fn_80009B34(0x2800, 2, 0x40, "char.c", 0xE75);
+        }
+        pData += nSize;
+    } else {
+        pChar->pLib = NULL;
+    }
+
+    pChar->p17AC = CharSlider_CreateDefinitionsFromMem(&pData);
+    pChar->p4C = pData;
+    fn_80018710(pChar);
+    if (bGolfer) {
+        pChar->p16D8 = lbl_80280E24[nSet];
+        pChar->nClubHeadBone = fn_8001EED8(pChar->pModel, 0x53);
+        pChar->f165C = 100.0f;
+        pChar->f1660 = 200.0f;
+    } else {
+        pChar->nClubHeadBone = 0;
+        pChar->f165C = 50.0f;
+        pChar->f1660 = 100.0f;
+    }
+    if (pChar->p16D8 != NULL) {
+        for (i = 0; i < 6; i++) {
+            pSkin = pChar->p16D8->apSkins[i];
+            if (pSkin != NULL) {
+                fn_80037AB8(pSkin, pChar->pModel, fn_8001EED8(pChar->pModel, 0x52) - 0x52, 0x52);
+            }
+        }
+    }
+    pChar->pChoices = pChoices;
+    if (bLook) {
+        fn_8001DC64(pChar, pChoices);
+        fn_800CC4EC(pChar);
+    }
+    if (gSession.nSplitScreen && fn_8001EC48(pChar)) {
+        fn_800375AC(pChar->pSkin, 0);
+        fn_80018710(pChar);
+    }
+    return pChar;
 }
 
 // Frees the club skin sets (lbl_80280E24): each one's skins and a9C blocks, then the set. pSet is
@@ -764,6 +1472,113 @@ void fn_8001C804(int nPlayer, u8 a, u8 b) {
     }
 }
 
+// Puts the golfer at its player's ball, facing the target (level), and resets its root bone's pose
+// and matrix. With u10 bit 8 and a skeleton, it then takes the stance of its clip for the style:
+// the clip is started on the skeleton when it changed (at pD4's f24 with bit 0x10000), the root is
+// moved by the club class's offset (mirrored when the model is), the pose updated, the feet placed
+// and both leg chains moved with the root, and the IK weight set (1 in the swing's states 5 and 7).
+// Bits 4, 8, 0x200 and 0x10000 of u10 are cleared; 0x200 also places the feet on the terrain.
+void fn_8001C860(Character* pChar) {
+    f32 vDir[4];
+    f32 vOffsetX[4];
+    f32 vOffsetZ[4];
+    f32 vPos[4];
+    int bStance;
+    int bPlace;
+    int bClipTime;
+    CharModel* pModel;
+    f32* pBallPos;
+    Player* pPlayer;
+    Skeleton* pSkel;
+    Clip* pOldClip;
+    Clip* pClip;
+    f32 fY;
+
+    pPlayer = &gPlayers[pChar->nPlayer];
+    pModel = pChar->pModel;
+    bPlace = pChar->u10 & 0x200;
+    bStance = pChar->u10 & 8;
+    bClipTime = pChar->u10 & 0x10000;
+    pBallPos = pPlayer->ball.vPos;
+    Character_SetPosition(pChar, pBallPos, 0);
+    pChar->u10 &= ~(0x10000 | 0x200 | 8 | 4);
+    // fake match: n2C is compared unsigned here
+    if (pChar->p1798 != NULL && (u32)pChar->p1798->n2C == 6 && pChar->n16D4 == 0) {
+        pChar->n16D4 = 4;
+    }
+    fn_8001EFB4(pPlayer->vTarget, pBallPos, vDir);
+    vDir[1] = 0.0f;
+    fn_80019358(pChar, vDir, 0.0f);
+    fn_8001E85C(pModel->pBones[0].q0C, pModel->pPoses[0].q0);
+    fn_8001E85C(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
+    fn_8000914C(pModel->pPoses[0].q0, pModel->pMatrices[0]);
+    fn_8001E880(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
+    if (bStance && (pSkel = pChar->pModel->pSkel) != NULL) {
+        pOldClip = pChar->pCurClip;
+        fn_8001EED8(pChar->pModel, 1);      // the results are not used
+        fn_8001EED8(pChar->pModel, 0x52);
+        pClip = Char_SetClip(pChar, 0, pChar->nStyle, NULL);
+        if (pClip->uD8 == 0) {
+            fn_80027108(pSkel);
+            SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 0.0f);
+            pChar->pModel->pSkel->f1074 = 0.0f;
+            return;
+        }
+        if (pSkel->pClip != pClip) {
+            pSkel->pClip = pClip;
+            fn_80021978(pChar->pModel->bEE);
+            if (bClipTime) {
+                fn_8001FCF4(pChar, pClip, &pSkel->pose, 0, pClip->pD4->f24);
+            } else {
+                fn_8001FCF4(pChar, pClip, &pSkel->pose, 0, 0.0f);
+            }
+        }
+        fn_8001BD18(pChar, pSkel->pClip);
+        fn_8000AE28(pChar->pModel->pMatrices[0][0], -lbl_80187184[pChar->nClubClass][0], vOffsetX);
+        fn_8000AE28(pChar->pModel->pMatrices[0][2], -lbl_80187184[pChar->nClubClass][2], vOffsetZ);
+        if (pChar->pModel->bEE) {
+            vOffsetZ[0] = -vOffsetZ[0];
+            vOffsetZ[2] = -vOffsetZ[2];
+        }
+        fn_8001EFD8(vOffsetX, pChar->pModel->pBones[0].v1C, pChar->pModel->pBones[0].v1C);
+        fn_8001EFD8(vOffsetZ, pChar->pModel->pBones[0].v1C, pChar->pModel->pBones[0].v1C);
+        fn_8001E85C(pModel->pBones[0].v1C, pModel->pPoses[0].v10);
+        fn_8001E880(pModel->pPoses[0].v10, pModel->pMatrices[0][3]);
+        fn_80027108(pSkel);
+        if (pChar->p16D8 != NULL) {
+            pSkel->pose.aBones[pChar->nClubHeadBone].v10[1] = pChar->p16D8->afC[pChar->nClubClass];
+        }
+        SKEL_UpdateState(pChar->pModel, &pSkel->pose, 1);
+        Character_UpdateTestPoints(pChar);
+        if (bPlace) {
+            pChar->n1784 = -1;
+            Character_UpdateFeetTerrainInfo(pChar, 1);
+        }
+        fY = pChar->pModel->pBones[0].v1C[1];
+        Character_PlaceFeetOnGround(pChar);
+        fY = pChar->pModel->pBones[0].v1C[1] - fY;
+        SKEL_TranslateIKChainY(pChar->pModel, &pChar->pModel->pSkel->pChains[0], fY);
+        SKEL_TranslateIKChainY(pChar->pModel, &pChar->pModel->pSkel->pChains[1], fY);
+        fn_8001EFD8(gPlayers[pChar->nPlayer].ball.vPos, vOffsetX, vPos);
+        fn_8001EFD8(vPos, vOffsetZ, vPos);
+        vPos[1] += lbl_80187184[pChar->nClubClass][1];
+        fn_800280E8(pChar, vPos, bPlace);
+        pChar->pModel->pSkel->n1130 = pChar->n16D4;
+        pChar->pModel->pSkel->n112C = pChar->nClubClass;
+        if (((pChar->n20 == 5 || pChar->nAnim == 5) && fn_8009637C(pChar)) || pChar->n20 == 7) {
+            SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 1.0f);
+        } else {
+            SKEL_SetIKSolutionWeight(pChar->pModel->pSkel, 0.0f);
+        }
+        if (pOldClip != NULL) {
+            fn_8001BD18(pChar, pOldClip);
+        }
+    }
+    if (pChar->pModel->pSkel != NULL) {
+        pChar->pModel->pSkel->f1074 = 0.0f;
+    }
+}
+
 // The 'CLB ' handlers: what fn_8001B208 makes of the object is kept unless there already is one;
 // the first handler makes a second one for split screen.
 void fn_8001CCF8(UStreamObject* pObject) {
@@ -944,9 +1759,33 @@ void fn_8001D6F0(void) {
 }
 
 void fn_8001D7A4(Character* pChar) {
-    fn_8001D7EC();
+    fn_8001D7EC(pChar);
     pChar->u10 = pChar->u10 & ~0x20C;
     pChar->u10 = pChar->u10 | 0x40;
+}
+
+// Resets the character's animation: both blend trees are given back and rebuilt as one node
+// blending with fn_80072ACC (fn_800725BC, 0.5), both animation players are reset and the state
+// cleared.
+void fn_8001D7EC(Character* pChar) {
+    SKABlendNode* pNode;
+
+    pNode = &pChar->blend;
+    fn_80071F58(&pNode, 0);
+    fn_80071C28(&pNode, 1, 0, fn_80072ACC, 0);
+    fn_800725BC(pNode, fn_80072ACC, 0.5f);
+    pNode = (SKABlendNode*)pChar->node3E0;
+    fn_80071F58(&pNode, 0);
+    fn_80071C28(&pNode, 1, 1, fn_80072ACC, 1);
+    fn_800725BC(pNode, fn_80072ACC, 0.5f);
+    fn_800958EC(&pChar->anim29C, 0, 0.0f);
+    pChar->n2C = 0;
+    pChar->n30 = 0;
+    fn_800958EC((AnimPlayer*)pChar->anim, 0, 0.0f);
+    pChar->nAnim = 0;
+    pChar->n20 = 0;
+    pChar->n18 = 0;
+    pChar->u28 = 0;
 }
 
 void fn_8001D8DC(int nPlayer) {
@@ -972,6 +1811,29 @@ void Character_GetBallOnFingerPosition(Character* pChar, f32* pPos) {
         fn_8000C5D4(pPos, vAxis, 0.05f, pPos);
     } else {
         fn_8000C5D4(pPos, vAxis, -0.05f, pPos);
+    }
+}
+
+// Where the hand holds the ball, for the swing: bone 0x1A's position moved 0.000625 along the
+// bone's x axis (the other way while the model's bEE is set), and bone 0x15's pose as three angles
+// (fn_800094D8), the second 30 degrees more.
+void fn_8001DA04(Character* pChar, f32* pPos, f32* pAngles) {
+    f32 (*pMtx)[4];
+    f32 vAxis[3];
+
+    if (pChar != NULL && pChar->pModel != NULL) {
+        pMtx = fn_8001EC6C(pChar, 0x1A);
+        Vec_Copy(pMtx[3], pPos);
+        Vec3Copy(pMtx[0], vAxis);
+        fn_800BAF04(vAxis, vAxis);
+        if (fn_8001EDF4(pChar)) {
+            fn_8000C5D4(pPos, vAxis, -0.000625f, pPos);
+        } else {
+            fn_8000C5D4(pPos, vAxis, 0.000625f, pPos);
+        }
+        fn_800094D8(pChar->pModel->pPoses[fn_8001EEE4(pChar->pModel, 0x15)].q0, &pAngles[0], &pAngles[1],
+                    &pAngles[2]);
+        pAngles[1] += 30.0f / 180.0f * PI;
     }
 }
 
