@@ -1757,6 +1757,32 @@ f32 fn_80044F58(int nPlayer, CamScript* pScript) {
     return 1.0f;
 }
 
+// Whether something would stand between the camera and the golfer if the script cut to pShot: a
+// copy of the script is cut to it and run one frame, and the ground is tested from that camera to
+// 1 above Player.vBall.
+u8 CameraScript_WillGolferBeOccludedInThisView(int nPlayer, CamShot* pShot, CamScript* pScript) {
+    CourseInfo* pCourse = fn_8000C594();
+    CamScript script;
+    CamShot shot;
+    CamShot shotSaved;
+    f32 vHit[4];
+    f32 vNormal[4];
+    f32 vCam[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    f32 vSub[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    f32 vGolfer[4];
+    TerObject* pObj;
+    SurfaceType* pSurface;
+
+    if (pCourse == NULL) return 0;
+    Mem_cpy(&shot, pShot, sizeof(CamShot));
+    Mem_cpy(&script, pScript, sizeof(CamScript));
+    CameraScript_InterpToNewScript(&script, &shot, nPlayer, vCam, vSub, 5, 0.0f, 100.0f, 25, 0.0f);
+    fn_8003DCE8(nPlayer, vCam, vSub, &script, &shotSaved, 0, 0.0f);
+    Vec_Copy(gPlayers[nPlayer].vBall, vGolfer);
+    vGolfer[1] += 1.0f;
+    return Ter_CheckForGroundCollision(pCourse, vCam, vGolfer, vHit, vNormal, &pSurface, &pObj) != 0;
+}
+
 u8 fn_800453C8(int nPlayer, CamShot* pShot) {
     if (gSession.nGameType == 3) {
         return 0;
