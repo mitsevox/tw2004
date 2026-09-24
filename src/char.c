@@ -431,7 +431,7 @@ void fn_80017DDC(Character* pChar) {
                 fHead = pChar->p16D8->afC[pChar->nClubClass];
                 fLength = (fHead - fUnder * vNormal[1] / fDot) / fHead;
                 if (fLength > 0.75f) {
-                    fn_8001EF34(pMtx[1], fLength, pMtx[1]);
+                    fn_8001EF34(fLength, pMtx[1], pMtx[1]);
                     SKEL_UpdateSkinningMatrix(pChar->pModel, pMtx, 0x52);
                 }
             }
@@ -878,7 +878,7 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
         }
     }
     if (fabsf(fTurn) > 0.0001f) {
-        fn_8001EF34(vNormal, fTurn, vAxis);
+        fn_8001EF34(fTurn, vNormal, vAxis);
         Quat_BuildFromVector(vAxis, qTurn);
         Quat_Invert(pChar->pModel->pPoses[nBoneB].q0, qA8);
         Quat_RotateVector(qA8, qTurn, q98);
@@ -890,7 +890,7 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     fTurn2 = fn_8000965C(fShin * fn_800095F0(fAngleA) / fReach);
     fTurn2 -= fn_8000965C(fShin * fn_800095F0(fAngleB) / fLeg);
     if (fabsf(fTurn2) > 0.0001f) {
-        fn_8001EF34(vNormal, fTurn2, vAxis);
+        fn_8001EF34(fTurn2, vNormal, vAxis);
         vAxis[3] = 0.0f;
         Quat_BuildFromVector(vAxis, qTurn);
         Quat_Invert(pChar->pModel->pPoses[nBoneA].q0, qA8);
@@ -920,7 +920,7 @@ void Character_IKLegToGround(Character* pChar, CourseInfo* pCourse, int nLeg, in
     fTurn3 = fn_80009614((fCos < -1.0f) ? -1.0f : ((fCos > 1.0f) ? 1.0f : fCos));
     fTurn3 *= fDrop;
     if (fabsf(fTurn3) > 0.0001f) {
-        fn_8001EF34(vAxis, fTurn3, vAxis);
+        fn_8001EF34(fTurn3, vAxis, vAxis);
         Quat_Multiply(q48, q68, q38);
         Quat_Invert(q38, q28);
         vAxis[3] = 0.0f;
@@ -972,7 +972,7 @@ void fn_80019358(Character* pChar, f32* pDir, f32 fAngle) {
     if (pChar != NULL) {
         fLen = fn_80009680(fn_80009744(pDir));
         if (fLen < 0.01f) return;
-        fn_8001EF34(pDir, 1.0f / fLen, mtx[0]);
+        fn_8001EF34(1.0f / fLen, pDir, mtx[0]);
         mtx[0][3] = 0.0f;
         mtx[1][0] = 0.0f;
         mtx[1][1] = 1.0f;
@@ -1900,7 +1900,7 @@ void fn_8001B644(Character* pChar) {
     pChar->vMax[1] += 0.33f;
     pChar->vMax[2] += 0.33f;
     fn_8001EF54(pChar->vMin, pChar->vMax, vCentre);
-    fn_8001EF34(vCentre, 0.5f, vCentre);
+    fn_8001EF34(0.5f, vCentre, vCentre);
     pChar->v1668[0] = vCentre[0];
     pChar->v1668[1] = vCentre[1];
     pChar->v1668[2] = vCentre[2];
@@ -2430,8 +2430,8 @@ void Character_SetupForShot(Character* pChar) {
             }
         }
         fn_8001BD18(pChar, pSkel->pClip);
-        fn_8000AE28(pChar->pModel->pMatrices[0][0], -lbl_80187184[pChar->nClubClass][0], vOffsetX);
-        fn_8000AE28(pChar->pModel->pMatrices[0][2], -lbl_80187184[pChar->nClubClass][2], vOffsetZ);
+        fn_8000AE28(-lbl_80187184[pChar->nClubClass][0], pChar->pModel->pMatrices[0][0], vOffsetX);
+        fn_8000AE28(-lbl_80187184[pChar->nClubClass][2], pChar->pModel->pMatrices[0][2], vOffsetZ);
         if (pChar->pModel->bEE) {
             vOffsetZ[0] = -vOffsetZ[0];
             vOffsetZ[2] = -vOffsetZ[2];
@@ -3231,7 +3231,7 @@ void fn_8001EF10(f32* pA, f32* pB, f32* pOut) {
 
 // in scaled by f into out (three floats)
 #ifdef __MWERKS__
-asm void fn_8001EF34(register f32* pIn, register f32 f, register f32* pOut) {
+asm void fn_8001EF34(register f32 f, register f32* pIn, register f32* pOut) {
     nofralloc
     fmr      f2, f
     psq_l    f0, 0(pIn), 0, 0
@@ -3244,7 +3244,7 @@ asm void fn_8001EF34(register f32* pIn, register f32 f, register f32* pOut) {
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_8001EF34(f32* pIn, f32 f, f32* pOut) {
+void fn_8001EF34(f32 f, f32* pIn, f32* pOut) {
     pOut[0] = pIn[0] * f;
     pOut[1] = pIn[1] * f;
     pOut[2] = pIn[2] * f;

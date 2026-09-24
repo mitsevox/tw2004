@@ -152,7 +152,7 @@ f32 fn_80026D18(CharModel* pModel, IKChain* pChain, f32* pTarget, int nLink, int
                     vLocal[pLink->n8] = 0.0f;
                 }
                 fn_800BAF04(vLocal, vLocal);
-                fn_8001EF34(vLocal, fAngle, vLocal);
+                fn_8001EF34(fAngle, vLocal, vLocal);
                 fn_80029BF4(vLocal, pLink->v58, pLink->v58);
                 Quat_BuildFromVectorAndScale(vLocal, qTurn, fAngle);
                 Quat_RotateVector(pModel->pPoses[nBone].q0, qTurn, qRot);
@@ -385,7 +385,7 @@ void SKEL_SetIKSolutionWeight(Skeleton* pSkel, f32 fWeight) {
         pSkel->p28 = pSkel->p24;
     }
     pSkel->f10C4 = fWeight;
-    fn_8001EF34(pSkel->v10A4, fWeight, pSkel->v10B4);
+    fn_8001EF34(fWeight, pSkel->v10A4, pSkel->v10B4);
 }
 
 // Gives the skeleton a rotation; below full IK weight it is blended toward the identity by the

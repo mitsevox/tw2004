@@ -411,7 +411,7 @@ void fn_800A3CB0(f32* pPos, int nPlayer) {
     int nView = gPlayers[nPlayer].nView[0];
 
     Wind_Get(vWind);
-    fn_8000AE28(vWind, 0.1f, vWind);
+    fn_8000AE28(0.1f, vWind, vWind);
     Vec3Copy(pPos, lbl_8018CA98[15].v80);
     Vec3Copy(vWind, lbl_8018CA98[15].vA0);
     lbl_80281408->apEmitter[nView] = fn_80099758(&lbl_8018CA98[15]);

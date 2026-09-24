@@ -23,10 +23,10 @@ void fn_800A27FC(f32 fDir, f32 fPoint) {
 
     for (i = 0; i < fn_8000C594()->lights.nLights; i++) {
         if (fn_8000C594()->lights.aLight[i].nType == 1) {
-            fn_8000AE28(fn_8000C594()->lights.aLight[i].vColor, fDir,
+            fn_8000AE28(fDir, fn_8000C594()->lights.aLight[i].vColor,
                         fn_8000C594()->lights.aLight[i].vColor);
         } else if (fn_8000C594()->lights.aLight[i].nType == 2) {
-            fn_8000AE28(fn_8000C594()->lights.aLight[i].vColor, fPoint,
+            fn_8000AE28(fPoint, fn_8000C594()->lights.aLight[i].vColor,
                         fn_8000C594()->lights.aLight[i].vColor);
         }
     }
