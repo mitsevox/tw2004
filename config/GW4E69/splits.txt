@@ -125,6 +125,7 @@ GoRenderCtx_Gc.c:
 
 streammanagerhole.c:
 	.text       start:0x800143B8 end:0x80015470
+	.data       start:0x80186BD8 end:0x80186CC8
 	.bss        start:0x801A3728 end:0x801A4900
 	.sdata      start:0x80280DF8 end:0x80280E00
 
