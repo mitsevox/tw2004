@@ -483,8 +483,7 @@ static void UStream_ParseChunks(void) {
     u32 uTag;
     if (UStream_PumpBuffers(1) == NULL) return;
     if (gnCurStream == -1) return;
-    pBuffer = gpCurList;
-    while (pBuffer != NULL) {
+    while ((pBuffer = gpCurList) != NULL) {
         while (pBuffer->uPos < USTREAM_BUFFER_SIZE) {
             pChunk = (UStreamChunk*)(pBuffer->data + pBuffer->uPos);
             // port: the chunk header is big-endian and read through UStreamChunk (and copied into the
@@ -493,11 +492,16 @@ static void UStream_ParseChunks(void) {
             uLen = pChunk->uLength;
             switch (uTag) {
             case TAG('S', 'W', 'V', 'R'):
-                *(u32*)&gSWVRName[0] = ((u32*)pChunk)[0];
-                *(u32*)&gSWVRName[4] = ((u32*)pChunk)[1];
-                *(u32*)&gSWVRName[8] = ((u32*)pChunk)[2];
-                *(u32*)&gSWVRName[12] = ((u32*)pChunk)[3];
-                *(u32*)&gSWVRName[16] = 0;
+                // the stream's name: the 16 bytes after the header
+                {
+                    u32* pName = (u32*)gSWVRName;
+
+                    pName[0] = ((u32*)(pChunk + 1))[0];
+                    pName[1] = ((u32*)(pChunk + 1))[1];
+                    pName[2] = ((u32*)(pChunk + 1))[2];
+                    pName[3] = ((u32*)(pChunk + 1))[3];
+                    pName[4] = 0;
+                }
                 UStream_StripStreamExt(gSWVRName);
                 break;
             case TAG('S', 'H', 'O', 'C'):
@@ -548,17 +552,20 @@ static void UStream_ParseChunks(void) {
                 break;
             case TAG('S', 'O', 'N', 'O'):
                 if (pChunk->uSubTag == TAG('S', 'H', 'D', 'R')) {
-                    u32 uKind = pChunk->uType;
-                    if (uKind == TAG('s', 'h', 'd', 'r')) {
+                    switch (pChunk->uType) {
+                    case TAG('s', 'h', 'd', 'r'):
                         if (pChunk->uId == 2) {
                             gSoundHeader.pDst = fn_800A9374(pChunk->uSize);
                         } else {
                             gSoundHeader.pDst = fn_800A8FB4(pChunk->uSize, pChunk->uId);
                         }
-                    } else if (uKind == TAG('s', 'a', 'm', 'p')) {
+                        break;
+                    case TAG('s', 'a', 'm', 'p'):
                         gSoundHeader.pDst = fn_800A925C(pChunk->uSize, pChunk->uId);
-                    } else {
+                        break;
+                    default:
                         gSoundHeader.pDst = NULL;
+                        break;
                     }
                     gSoundHeader.uSize = pChunk->uSize;
                     gSoundHeader.uPos = 0;
@@ -612,7 +619,6 @@ static void UStream_ParseChunks(void) {
         }
         UStream_RetireCurrentBuffer();
         UStream_PumpBuffers(0);
-        pBuffer = gpCurList;
     }
 }
 
