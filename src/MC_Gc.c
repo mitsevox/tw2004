@@ -134,28 +134,29 @@ s32 fn_8009CDA0(s32 nPort, s32 nSlot, const char* pOldName, const char* pNewName
 // Open file pName on the card into pFile.
 s32 fn_8009CEF8(s32 nPort, s32 nSlot, const char* pName, CARDFileInfo* pFile) {
     s32 nResult;
+    int nChan = nPort;
     do {
         fn_800A4BDC();
-        nResult = CARDOpen(nPort, pName, pFile);
+        nResult = CARDOpen(nChan, pName, pFile);
         fn_8006C63C();
     } while (nResult == CARD_RESULT_BUSY);
     switch (nResult) {
     case CARD_RESULT_FATAL_ERROR:
         return MC_ERR_FATAL;
     case CARD_RESULT_NOCARD:
-        lbl_801F1510[nPort][nSlot].uFlags &= ~MC_CARD_PRESENT;
+        lbl_801F1510[nChan][nSlot].uFlags &= ~MC_CARD_PRESENT;
         return MC_ERR_NOCARD;
+    case CARD_RESULT_NOFILE:
+        return MC_ERR_NOFILE;
     case CARD_RESULT_NOPERM:
         return MC_ERR_NOPERM;
     case CARD_RESULT_BROKEN:
-        lbl_801F1510[nPort][nSlot].uFlags |= MC_CARD_BROKEN;
+        lbl_801F1510[nChan][nSlot].uFlags |= MC_CARD_BROKEN;
         return MC_ERR_BROKEN;
     default:
         return MC_ERR_UNKNOWN;
     case CARD_RESULT_READY:
         return 0;
-    case CARD_RESULT_NOFILE:
-        return MC_ERR_NOFILE;
     }
 }
 
@@ -537,16 +538,18 @@ s32 fn_8009E130(s32 nPort, s32 nSlot, CARDFileInfo* pFile, const void* pBuf, s32
 // Read the directory entry of file nFile into pStat.
 s32 fn_8009E280(s32 nPort, s32 nSlot, s32 nFile, CARDStat* pStat) {
     s32 nResult;
+    int nChan = nPort;
+    int nFileNo = nFile;
     do {
         fn_800A4BDC();
-        nResult = CARDGetStatus(nPort, nFile, pStat);
+        nResult = CARDGetStatus(nChan, nFileNo, pStat);
         fn_8006C63C();
     } while (nResult == CARD_RESULT_BUSY);
     switch (nResult) {
     case CARD_RESULT_FATAL_ERROR:
         return MC_ERR_FATAL;
     case CARD_RESULT_NOCARD:
-        lbl_801F1510[nPort][nSlot].uFlags &= ~MC_CARD_PRESENT;
+        lbl_801F1510[nChan][nSlot].uFlags &= ~MC_CARD_PRESENT;
         return MC_ERR_NOCARD;
     case CARD_RESULT_NOFILE:
         return MC_ERR_NOFILE;
