@@ -222,16 +222,25 @@ void fn_80165C74(UIStudio* pStudio) {
     }
 }
 
-// Marks a rate function as finished.
-void fn_80165D2C(UIStudio* pStudio, UISNodeInfo* pNodeInfo, u32 uId) {
+// Returns the index of a rate function, or the count when there is none. fn_8016604C exports it;
+// the functions below have it inlined (their index is a copy of the search's: `li` then `mr`).
+static inline u32 FindRateFn(UIStudio* pStudio, UISNodeInfo* pNodeInfo, u32 uId) {
     u32 i;
     UISRateFn* pFn;
-    u32 n = pStudio->nRateFns;
 
-    for (i = 0; i < n; i++) {
+    for (i = 0; i < pStudio->nRateFns; i++) {
         pFn = &pStudio->pRateFns[i];
         if (pFn->uId == uId && pFn->pNodeInfo == pNodeInfo) break;
     }
+    return i;
+}
+
+// Marks a rate function as finished.
+void fn_80165D2C(UIStudio* pStudio, UISNodeInfo* pNodeInfo, u32 uId) {
+    u32 i;
+    u32 n = pStudio->nRateFns;
+
+    i = FindRateFn(pStudio, pNodeInfo, uId);
     if (i < n) {
         pStudio->pRateFns[i].uState = 1;
     }
@@ -253,9 +262,7 @@ void fn_80165D90(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pNodeInfo, 
         lbl_80282A28(0, "UISEvent.c", 151, szMsg);
         return;
     }
-    for (i = 0; i < pStudio->nRateFns; i++) {
-        if (pStudio->pRateFns[i].uId == uId && pStudio->pRateFns[i].pNodeInfo == pNodeInfo) break;
-    }
+    i = FindRateFn(pStudio, pNodeInfo, uId);
     if (i == pStudio->nRateFns) {
         pStudio->nRateFns++;
     }
@@ -294,9 +301,7 @@ void fn_80165E9C(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pNodeInfo, 
         lbl_80282A28(0, "UISEvent.c", 107, szMsg);
         return;
     }
-    for (i = 0; i < pStudio->nRateFns; i++) {
-        if (pStudio->pRateFns[i].uId == uId && pStudio->pRateFns[i].pNodeInfo == pNodeInfo) break;
-    }
+    i = FindRateFn(pStudio, pNodeInfo, uId);
     if (i == pStudio->nRateFns) {
         pStudio->nRateFns++;
     }
@@ -318,6 +323,7 @@ void fn_80165E9C(UIStudio* pStudio, UISScreen* pScreen, UISNodeInfo* pNodeInfo, 
 }
 
 // Returns the index of a rate function, or the count when there is none.
+// Written out, not through FindRateFn: a call to it copies the index (`mr`), which this one lacks.
 u32 fn_8016604C(UIStudio* pStudio, UISNodeInfo* pNodeInfo, u32 uId) {
     u32 i;
     UISRateFn* pFn;

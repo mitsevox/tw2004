@@ -59,8 +59,10 @@ u8    lbl_80282238;             // set: a choice goes to all four copies
 // Copies a golfer's choices between the body's skin and pChoices: while pChoices holds none yet
 // (every entry -1), the skin's go into it; otherwise its go into all four copies of the skin's.
 void fn_800CC1EC(Character* pChar, SkinChoices* pChoices) {
-    int i;
     u8 bEmpty;
+    int i;
+    int k;
+    int j;
 
     if (pChar == NULL || pChoices == NULL || pChar->pSkin == NULL) return;
     bEmpty = 1;
@@ -77,16 +79,16 @@ void fn_800CC1EC(Character* pChar, SkinChoices* pChoices) {
     if (bEmpty) {
         Mem_cpy(pChoices->aParts, pChar->pSkin->aParts[0], fn_800CCA40(pChar->pSkin) * sizeof(SkinChoice));
     } else {
-        for (i = 0; i < 4; i++) {
-            Mem_cpy(pChar->pSkin->aParts[i], pChoices->aParts,
+        for (j = 0; j < 4; j++) {
+            Mem_cpy(pChar->pSkin->aParts[j], pChoices->aParts,
                     fn_800CCA40(pChar->pSkin) * sizeof(SkinChoice));
         }
     }
     if (bEmpty) {
         Mem_cpy(pChoices->aSets, pChar->pSkin->aSets[0], fn_800CCEA0(pChar->pSkin) * sizeof(SkinChoice));
     } else {
-        for (i = 0; i < 4; i++) {
-            Mem_cpy(pChar->pSkin->aSets[i], pChoices->aSets,
+        for (k = 0; k < 4; k++) {
+            Mem_cpy(pChar->pSkin->aSets[k], pChoices->aSets,
                     fn_800CCEA0(pChar->pSkin) * sizeof(SkinChoice));
         }
     }

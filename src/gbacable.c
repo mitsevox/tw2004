@@ -210,10 +210,10 @@ s32 fn_80122E68(s32 nChan, u32* pWord) {
 // The handshake: the GBA answers with the disc's game code or 0x42545745, is sent the game code,
 // asked for its context and read it in eight words ("GbaReadContext").
 s32 fn_80122FD8(s32 nChan) {
-    u32 uCmd;
-    u32 i;
-    GbaChannel* pCh;
     u32* pWord;
+    u32 uCmd;
+    GbaChannel* pCh;
+    u32 i;
 
     if (fn_80122AF0(nChan) == 0) {
         return 0;
@@ -230,8 +230,7 @@ s32 fn_80122FD8(s32 nChan) {
         OSReport("GbaReadContext: An error occurred to command 'FROMGC_REQUEST_CONTEXT' (chan=%d).\n", nChan);
         return 0;
     }
-    pWord = (u32*)&pCh->got;
-    for (i = 0; i < sizeof(GbaContext); i += 4) {
+    for (i = 0, pWord = (u32*)&pCh->got; i < sizeof(GbaContext); i += 4) {
         if (fn_80122E68(nChan, pWord) == 0) {
             OSReport("GbaReadContext: An error occurred in reading the %d(th) part of %d (chan=%d).\n", i + 1,
                      sizeof(GbaContext), nChan);

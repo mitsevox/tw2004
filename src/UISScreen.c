@@ -93,11 +93,11 @@ void fn_8016A510(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
             fn_8016C15C(add.a[0] + pInfo->afAdd[0], add.a[1] + pInfo->afAdd[1], add.a[2] + pInfo->afAdd[2],
                         add.a[3] + pInfo->afAdd[3]);
             pStudio->pfnTransform(1, pNode->pInfo->af8);
-            for (i = 0; i < pNode->nGroups; i++) {
-                UISGroup* pGroup = pNode->ppGroups[i];
+            for (j = 0; j < pNode->nGroups; j++) {
+                UISGroup* pGroup = pNode->ppGroups[j];
                 if (pGroup->pInfo->p0 != NULL) {
-                    for (j = 0; j < pGroup->nEntries; j++) {
-                        UISEntry* pEntry = &pGroup->pEntries[j];
+                    for (i = 0; i < pGroup->nEntries; i++) {
+                        UISEntry* pEntry = &pGroup->pEntries[i];
                         if (pEntry->uHandler == 0xFFFF) {
                             fn_8016A510(pStudio, pScreen, pEntry->u4.nNode, nMsg);
                         } else if (pEntry->n2 != 0 && pEntry->uHandler < pStudio->nHandlers) {
@@ -249,10 +249,10 @@ void fn_8016AEEC(UIStudio* pStudio, UISScreen* pScreen, u32 nNode, s32 nMsg) {
                 pEntry->n2 = 1;
             }
         }
-        for (i = 0; i < pNode->nGroups; i++) {
-            UISGroup* pGroup = pNode->ppGroups[i];
-            for (j = 0; j < pGroup->nEntries; j++) {
-                UISEntry* pEntry = &pGroup->pEntries[j];
+        for (j = 0; j < pNode->nGroups; j++) {
+            UISGroup* pGroup = pNode->ppGroups[j];
+            for (i = 0; i < pGroup->nEntries; i++) {
+                UISEntry* pEntry = &pGroup->pEntries[i];
                 if (pEntry->uHandler == 0xFFFF) {
                     fn_8016AEEC(pStudio, pScreen, pEntry->u4.nNode, nMsg);
                 } else if (pEntry->uHandler < pStudio->nHandlers) {
@@ -346,6 +346,7 @@ void fn_8016B4D4(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 nMove) {
     s32 nFrom;
     s32 nTo;
     u32 i;
+    u32 j;
     UISScreen tmp;
 
     nScreens = pStudio->nScreens;
@@ -362,7 +363,7 @@ void fn_8016B4D4(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 nMove) {
         while (nCount-- != 0) {
             nFrom = nTo;
             nTo += nStep;
-            if (nTo >= nScreens || nTo < 0) return;
+            if (nTo >= nScreens || nTo < 0) break;
             if (pStudio->nCurScreen == nTo) {
                 pStudio->nCurScreen = nFrom;
             } else if (pStudio->nCurScreen == nFrom) {
@@ -375,11 +376,11 @@ void fn_8016B4D4(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 nMove) {
                     pStudio->pRateFns[i].pScreen = &pStudio->pScreens[nTo];
                 }
             }
-            for (i = 0; i < pStudio->n5C; i++) {
-                if (pStudio->p60[i].pScreen == &pStudio->pScreens[nTo]) {
-                    pStudio->p60[i].pScreen = &pStudio->pScreens[nFrom];
-                } else if (pStudio->p60[i].pScreen == &pStudio->pScreens[nFrom]) {
-                    pStudio->p60[i].pScreen = &pStudio->pScreens[nTo];
+            for (j = 0; j < pStudio->n5C; j++) {
+                if (pStudio->p60[j].pScreen == &pStudio->pScreens[nTo]) {
+                    pStudio->p60[j].pScreen = &pStudio->pScreens[nFrom];
+                } else if (pStudio->p60[j].pScreen == &pStudio->pScreens[nFrom]) {
+                    pStudio->p60[j].pScreen = &pStudio->pScreens[nTo];
                 }
             }
             memcpy(&tmp, &pStudio->pScreens[nTo], sizeof(UISScreen));
@@ -404,29 +405,35 @@ static inline u8 UIS_NodeLinks(UISScreenFile* pData, UISNode* pNode, UISNodeInfo
     return 0;
 }
 
+// The info of the first node pNode links to whose u4 is set, or NULL.
+static inline UISNodeInfo* UIS_LinkedOn(UISScreenFile* pData, UISNode* pNode) {
+    u32 i;
+    u32 j;
+
+    for (i = 0; i < pNode->nGroups; i++) {
+        UISGroup* pGroup = pNode->ppGroups[i];
+        for (j = 0; j < pGroup->nEntries; j++) {
+            UISEntry* pEntry = &pGroup->pEntries[j];
+            if (pEntry->uHandler == 0xFFFF) {
+                UISNodeInfo* pLinked = pData->pNodes[pEntry->u4.nNode].pInfo;
+                if (pLinked->u4 != 0) return pLinked;
+            }
+        }
+    }
+    return NULL;
+}
+
 // Finds the node that links to pInfo's node and returns the info of the first node it links to
 // whose u4 is set.
 UISNodeInfo* fn_8016B6BC(UISScreen* pScreen, UISNodeInfo* pInfo) {
     UISScreenFile* pData;
     u32 i;
-    u32 j;
-    u32 k;
 
     pData = pScreen->pData;
     for (i = 0; i < pData->nNodes; i++) {
         UISNode* pNode = &pData->pNodes[i];
         if (UIS_NodeLinks(pData, pNode, pInfo)) {
-            for (j = 0; j < pNode->nGroups; j++) {
-                UISGroup* pGroup = pNode->ppGroups[j];
-                for (k = 0; k < pGroup->nEntries; k++) {
-                    UISEntry* pEntry = &pGroup->pEntries[k];
-                    if (pEntry->uHandler == 0xFFFF) {
-                        UISNodeInfo* pLinked = pData->pNodes[pEntry->u4.nNode].pInfo;
-                        if (pLinked->u4 != 0) return pLinked;
-                    }
-                }
-            }
-            return NULL;
+            return UIS_LinkedOn(pData, pNode);
         }
     }
     return NULL;
@@ -817,7 +824,15 @@ u8* fn_8016C674(UISNode* pNode, u16 uEvent) {
     return NULL;
 }
 
-// The index of a loaded screen, or the number of screens when it is not loaded.
+// The index of a loaded screen, or the number of screens when it is not loaded. Written out, not
+// through UIS_FindScreen: returning an inlined call adds a copy of the index (88.6 -> 90.5%).
 u16 fn_8016C6C4(UIStudio* pStudio, u16 uGroup, u16 uScreen) {
-    return UIS_FindScreen(pStudio, uGroup, uScreen);
+    u16 i;
+    UISScreen* pScreen;
+
+    for (i = 0; i < pStudio->nScreens; i++) {
+        pScreen = &pStudio->pScreens[i];
+        if (pScreen->uGroup == uGroup && pScreen->uScreen == uScreen) break;
+    }
+    return i;
 }
