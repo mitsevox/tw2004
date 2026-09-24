@@ -8,7 +8,6 @@
 #include "golfer.h"
 
 void fn_8000ADC0(f32 (*pMtx)[4]);                   // identity
-void fn_800082CC(UObjMeshPart* pPart);
 void fn_800488B4(UObject* pObj);
 void fn_80048A84(UObjMesh* pMesh);
 UObjMesh* fn_80048AC4(UObjMesh* pMesh, int i);
