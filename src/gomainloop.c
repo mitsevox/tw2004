@@ -280,7 +280,7 @@ void fn_801250C0(void);
 void fn_80124C10(void);
 void AI_TargetsInit(void);
 void BreakLine_Update(int nView);
-void FE_GetBIOMovieName(void);
+void FE_UpdateMovieQueue(void);
 void fn_800DFC18(void);
 void GM_Update(void);
 void GR_vInit(void);
@@ -1023,7 +1023,7 @@ void fn_8006D838(void) {
     fn_8009069C();
     fn_8008FD60(1);
     fn_800382E0();
-    FE_GetBIOMovieName();
+    FE_UpdateMovieQueue();
     fn_8006DE28();
     fn_8006DDA8();
     fn_801242D0();
