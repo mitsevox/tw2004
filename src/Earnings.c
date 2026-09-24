@@ -947,6 +947,7 @@ u8 fn_800D61E4(int nPlayer, u8 bCheck) {
     }
     if (fn_800D2ABC(Game_GetCourse(), fn_80015464()) == 5 &&
         gPlayers[nPlayer].nStrokes[fn_80015464()] <= fn_800D2ABC(gpGame->nCurCourse, fn_80015464()) - 2) {
+        // EA bug: from here the profile is picked by nPlayer, not nProfile as above.
         nHave = 0;
         for (i = 0; i < 71; i++) {
             if (fn_800588F4(&gpSaveData[nPlayer], 0, i)) {
