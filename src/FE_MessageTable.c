@@ -32,6 +32,7 @@ s32  fn_8009EB44(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_800A1164(s32 nPort, s32 nSlot, char* pName, s32 n);     // MC.c
 s32  fn_800A1590(s32 nPort, s32 nSlot, s32 n, char* szOut);     // MC.c: clears szOut first
 void fn_8007739C(Replay* pReplay);      // FE_Manager.c
+f32  GM_GetBonusProgress(SaveProfile* pProfile);    // GameManager.c
 u8   fn_800E22E4(int nSlot, int a, int b);      // GameRound.c
 int  fn_800E234C(int nSlot, int a, int b);      // GameRound.c
 int  fn_800D3D10(int nGolfer);          // Earnings.c: the golfer's rating
@@ -2928,6 +2929,62 @@ void fn_8007EFEC(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_8007F088(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = GM_vGetAllTimeRecordsHeld(&gpSaveData[pArgs[0].i]);
+}
+
+// Profile pArgs[0]'s progress, into the values pArgs[1..7] point at: ladder awards won, PGA TOUR
+// tournaments won, the bonus progress, aB1CC bits set, real-time event awards won and a1054C
+// entries set (pArgs[5] is not used).
+void fn_8007F0D0(MsgArg* pArgs, MsgArg* pResult) {
+    int  nProfile = pArgs[0].i;
+    s32* pnLadder = pArgs[1].p;
+    s32* pnTour = pArgs[2].p;
+    s32* pnBits = pArgs[4].p;
+    s32* pnRTE = pArgs[6].p;
+    s32* pnLocks = pArgs[7].p;
+    int  i;
+    int  n;
+
+    n = 0;
+    for (i = 0; i < 25; i++) {
+        if (gpSaveData[nProfile].aLadderAward[i].bWon) {
+            n++;
+        }
+    }
+    *pnLadder = n;
+
+    n = 0;
+    for (i = 0; i < 31; i++) {
+        if (gpSaveData[nProfile].aC8[i].award.bWon) {
+            n++;
+        }
+    }
+    *pnTour = n;
+
+    *(f32*)pArgs[3].p = GM_GetBonusProgress(&gpSaveData[nProfile]);
+
+    n = 0;
+    for (i = 0; i < 3000; i++) {
+        if (fn_8001E9CC(gpSaveData[nProfile].aB1CC, i)) {
+            n++;
+        }
+    }
+    *pnBits = n;
+
+    n = 0;
+    for (i = 0; i < 75; i++) {
+        if (gpSaveData[nProfile].aRTEAward[i].bWon) {
+            n++;
+        }
+    }
+    *pnRTE = n;
+
+    n = 0;
+    for (i = 0; i < 11; i++) {
+        if (gpSaveData[nProfile].a1054C[i].b) {
+            n++;
+        }
+    }
+    *pnLocks = n;
 }
 
 // How many of the 71 marked holes the slot's profile has (fn_800588F4's kind 0).
