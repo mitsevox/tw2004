@@ -6,7 +6,8 @@
 #include <dolphin/GBAPriv.h>
 
 // Returns GBA_BUSY while a download or another command runs on the port, and the download's
-// progress in percent in *percentp: the share of bytes sent, eased in over the first 5.5 seconds.
+// progress in percent in *percentp: the share of bytes sent, scaled down during the first 5.5
+// seconds so the bar does not jump ahead.
 s32 GBAGetProcessStatus(s32 chan, u8* percentp) {
     BOOL enabled;
     s32 ret;
