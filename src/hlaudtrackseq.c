@@ -112,7 +112,7 @@ void fn_800AA744(AudSeqEvent* pEvent, AudTrack* pTrack) {
     AudTrackTmpl* pTmpl;
     AudSeqTone* pTone;
     s16 nVolume;
-    u32 bLoops;
+    u8 bLoops;
     u8 nChannel;
     u8 i;
     AudVoice* pVoice;
@@ -124,7 +124,8 @@ void fn_800AA744(AudSeqEvent* pEvent, AudTrack* pTrack) {
     nVolume = fn_800A85FC((f32)(pEvent->n4 << 7),
                           fn_800A85FC(pTrack->f48, fn_800AA44C(pTmpl->data.pBank->n3)));
     bLoops = pTone->n10 & 1;
-    if (nVolume == 0 || pTone == NULL) return;
+    if (nVolume == 0) return;
+    if (pTone == NULL) return;
     nChannel = pTrack->u.seq.n65;
     request.n4 = bLoops != 0;
     if (!fn_800AB374() && pTrack->pSource->nSound == 1 && pTrack->nChannel == 0) {
