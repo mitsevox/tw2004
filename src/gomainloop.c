@@ -149,8 +149,8 @@ void fn_8006765C(void);
 void fn_80067B80(void);
 void fn_80067CD4(int nPlayer);
 void fn_8006795C(void);
-void fn_8006E1C0(void);
-void fn_8006E1C4(void);
+void FB_vInitModule(void);
+void FB_vCloseModule(void);
 void fn_8006E2A4(void);
 void fn_8006E424(void);
 void fn_8006F14C(void);
@@ -436,7 +436,7 @@ void fn_8006C7A8(void) {
     fn_80016198();
     UFont_Init();
     fn_80015540();
-    fn_8006E1C0();
+    FB_vInitModule();
     fn_8007185C();
     VM_vInitModule();
     fn_800136F4();
@@ -478,7 +478,7 @@ void fn_8006C854(void) {
     fn_8001049C();
     fn_80013718();
     VM_vCloseModule();
-    fn_8006E1C4();
+    FB_vCloseModule();
     fn_80015620();
     UFont_Shutdown();
     fn_800162A0();
@@ -537,7 +537,7 @@ void fn_8006C9EC(void) {
     CameraTuning_Init();
     fn_80062E00();
     fn_80039FF8();
-    lbl_80281E5C = fn_8006E1C8();
+    lbl_80281E5C = FB_spCreateFrameBuffer();
     lbl_80281E58 = VM_spCreateViewport();
     lbl_80281E54 = fn_8001371C(lbl_80281E60, lbl_80281E5C, lbl_80281E58);
     fn_80013D5C(lbl_80281E54);
@@ -572,7 +572,7 @@ void fn_8006CB2C(void) {
     fn_8008B00C();
     fn_80077428();
     VM_vReleaseViewport(lbl_80281E58);
-    fn_8006E214(lbl_80281E5C);
+    FB_vReleaseFrameBuffer(lbl_80281E5C);
     CA_vDestroyCamera(lbl_80281E60);
     fn_80062E20();
     fn_8003A074();
@@ -609,7 +609,7 @@ void GO_vInitIG(void) {
     fn_8001C254();
     fn_80055D54();
     lbl_80281E60 = CA_spCreateCamera();
-    lbl_80281E5C = fn_8006E1C8();
+    lbl_80281E5C = FB_spCreateFrameBuffer();
     lbl_80281E58 = VM_spCreateViewport();
     lbl_80281E54 = fn_8001371C(lbl_80281E60, lbl_80281E5C, lbl_80281E58);
     fn_80013D5C(lbl_80281E54);
@@ -680,7 +680,7 @@ void GO_vInitIG(void) {
 void fn_8006CDC4(void) {
     fn_800137B0(lbl_80281E54);
     VM_vReleaseViewport(lbl_80281E58);
-    fn_8006E214(lbl_80281E5C);
+    FB_vReleaseFrameBuffer(lbl_80281E5C);
     CA_vDestroyCamera(lbl_80281E60);
     fn_80091870();
     fn_8011E3B0();
@@ -741,7 +741,7 @@ void fn_8006CEFC(void) {
     fn_8009CC00();
     fn_800905A8();
     lbl_80281E60 = CA_spCreateCamera();
-    lbl_80281E5C = fn_8006E1C8();
+    lbl_80281E5C = FB_spCreateFrameBuffer();
     lbl_80281E58 = VM_spCreateViewport();
     lbl_80281E54 = fn_8001371C(lbl_80281E60, lbl_80281E5C, lbl_80281E58);
     fn_80013D5C(lbl_80281E54);
@@ -764,7 +764,7 @@ void fn_8006CFC8(void) {
     fn_8010F794();
     fn_800137B0(lbl_80281E54);
     VM_vReleaseViewport(lbl_80281E58);
-    fn_8006E214(lbl_80281E5C);
+    FB_vReleaseFrameBuffer(lbl_80281E5C);
     fn_80016E3C(0);
     fn_8009CC88();
     fn_80037F80();

@@ -119,8 +119,8 @@ void SH_vSetShadowIntensity(u8 bHigh) {
     lbl_80282160 = fn_80009B34(0x1000, 2, 16, "shadow.c", 184);
     p->pLens = CA_spCreateCamera();
     p->pRect = VM_spCreateViewport();
-    p->pFrameBuf = fn_8006E1C8();
-    fn_8006E26C(p->pFrameBuf, 0.0f, 0.0f, 256.0f, 256.0f, 1.0f, 1.0f);
+    p->pFrameBuf = FB_spCreateFrameBuffer();
+    FB_vSetFrameBuffer(p->pFrameBuf, 0.0f, 0.0f, 256.0f, 256.0f, 1.0f, 1.0f);
     fn_800171D8(p->pRect, 0.0f, 0.0f, 1.0f, 1.0f);
     fn_800B3438(p->pRect, 1.0f, 1.0f);
     p->pCamera = fn_8001371C(p->pLens, p->pFrameBuf, p->pRect);
@@ -158,7 +158,7 @@ void fn_800B2734(void) {
         fn_800360A0(p->aMesh[i]);
     }
     if (p->pFrameBuf != NULL) {
-        fn_8006E214(p->pFrameBuf);
+        FB_vReleaseFrameBuffer(p->pFrameBuf);
         p->pFrameBuf = NULL;
     }
     if (p->pCamera != NULL) {

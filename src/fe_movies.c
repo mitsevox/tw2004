@@ -620,7 +620,7 @@ void fn_80092080(LLPict* pPict, f32 fAlpha) {
     fn_80012F50(0, 6, 0x80);
     fn_80012F18(7);
     nOld = fn_800171B0();
-    fn_8006E26C(&frameBuf, 0.0f, 0.0f, 512.0f, 448.0f, 1.0f, 1.0f);
+    FB_vSetFrameBuffer(&frameBuf, 0.0f, 0.0f, 512.0f, 448.0f, 1.0f, 1.0f);
     // port: the render slot is typed s32 but holds a pointer
     fn_80092274((s32)&frameBuf);
     fn_80013EEC(fn_8001614C());

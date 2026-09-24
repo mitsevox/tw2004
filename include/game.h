@@ -63,7 +63,7 @@ extern u8    lbl_80281B8E;              // the reset button was pressed (OSGetRe
 extern u8    lbl_80281E50;              // set after a create-a-player frame, cleared otherwise
 extern void*       lbl_80281E54;        // the render camera made from the three below (fn_8001371C)
 extern void*       lbl_80281E58;        // } made by VM_spCreateViewport,
-extern GoFrameBuf* lbl_80281E5C;        // }   fn_8006E1C8
+extern GoFrameBuf* lbl_80281E5C;        // }   FB_spCreateFrameBuffer
 extern void*       lbl_80281E60;        // }   and CA_spCreateCamera when a game type starts
 extern u8*   lbl_802811E8;              // [1]: the round is over (fn_8006DC34)
 

@@ -1,6 +1,6 @@
 // char_tex_manager.c (TW06's golf/animation/char_tex_manager.c; sGetUserTextureIdx is TW06's
 // name): puts the user logos on a golfer's model. A texture named "_usrtextr<n>" in the model is
-// replaced by the profile's logo n (0..4) and its palette.
+// replaced by the profile's logo n (0..4) and the logo palette (fn_8010FBC4, the same for all).
 
 #include "frontend/fe.h"
 #include "lldyntex.h"

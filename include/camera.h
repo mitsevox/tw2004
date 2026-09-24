@@ -849,8 +849,8 @@ u8     fn_800C7340(View* pView, int nPlayer);
 
 // ---- frame buffers (GoFrameBuf.c) -----------------------------------------------------------
 
-// A frame buffer's size and scale (0x34 bytes; fn_8006E1C8 makes one). The last seven fields are
-// worked out from the first six by fn_8006E150.
+// A frame buffer's size and scale (0x34 bytes; FB_spCreateFrameBuffer makes one). The last seven fields are
+// worked out from the first six by FB_vUpdateInternalFrameBufferData.
 typedef struct GoFrameBuf {
     f32  f0;                    // 0x00  0 by default
     f32  f4;                    // 0x04  0 by default
@@ -868,11 +868,11 @@ typedef struct GoFrameBuf {
 } GoFrameBuf;
 LAYOUT_ASSERT(GoFrameBuf, 0x34);
 
-void        fn_8006E150(GoFrameBuf* pBuf);   // work out the derived fields
-GoFrameBuf* fn_8006E1C8(void);               // a new frame buffer with the default size
-void        fn_8006E214(GoFrameBuf* pBuf);   // free it
-void        fn_8006E234(GoFrameBuf* pBuf);   // the default size: 512 x 448, scale 1
-void        fn_8006E26C(GoFrameBuf* pBuf, f32 f0, f32 f4, f32 fWidth, f32 fHeight, f32 f10, f32 f14);
+void        FB_vUpdateInternalFrameBufferData(GoFrameBuf* pBuf);   // work out the derived fields
+GoFrameBuf* FB_spCreateFrameBuffer(void);               // a new frame buffer with the default size
+void        FB_vReleaseFrameBuffer(GoFrameBuf* pBuf);   // free it
+void        FB_vSetDefaultFrameBuffer(GoFrameBuf* pBuf);   // the default size: 512 x 448, scale 1
+void        FB_vSetFrameBuffer(GoFrameBuf* pBuf, f32 f0, f32 f4, f32 fWidth, f32 fHeight, f32 f10, f32 f14);
 f32         fn_8001415C(GoFrameBuf* pBuf);   // GoRenderCtx_Gc.c: fHeight
 f32         fn_80014164(GoFrameBuf* pBuf);   // f4
 f32         fn_8001416C(GoFrameBuf* pBuf);   // fWidth
