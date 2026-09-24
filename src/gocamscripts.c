@@ -51,6 +51,7 @@ f32  fn_8003F790(CamScript* pScript);   // the blend's share (0..1) so far
 f32  fn_80044F58(int nPlayer, CamScript* pScript);
 CamLens* fn_8001F004(void);             // the current camera's lens
 f32  fn_8001EFFC(u8* pLens);            // the lens's fB0 (char.c: its parameter is u8*)
+f32  fn_80014278(u8* pLens);            // the lens's field of view (GoRenderCtx_Gc.c: u8*)
 void fn_80038010(u8 a, int n, f32* pVec);
 void fn_800386F0(int n, f32* pVec);
 f32  fn_8003F194(CamShot* pShot, f32 fA, f32 fB, f32 fTime);
@@ -1132,6 +1133,56 @@ void fn_8004255C(f32* pPos, f32* pTarget, f32 fUp, f32 fSide) {
     }
     pPos[0] += fSide * -vDir[2];
     pPos[2] += fSide * vDir[0];
+}
+
+// Records the camera as it is now into pShot ("ON THE FLY CAM"): positioned at pCam, looking at
+// pSub (bAC 24), with the lens's field of view (less the letterbox's change, except with bView1:
+// the player's second view) and the current shot's timing and slow motion. The script is left with
+// no next shot.
+void CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int nPlayer, CamScript* pScript,
+                                   u8 bView1) {
+    char szName[] = "ON THE FLY CAM";
+
+    strcpy(pShot->szName, szName);
+    pShot->bA8 = 0;
+    Vec3Copy(pCam, pShot->v20);
+    pShot->p40 = NULL;
+    pScript->pNextShot = NULL;
+    pScript->f8C = 0.0f;
+    pShot->f4C = 2.0f;
+    pScript->nBC = 0;
+    pShot->bAD = 4;
+    pShot->bAC = 24;
+    Vec3Copy(pSub, pShot->v30);
+    pShot->f70 = 0.0f;
+    pShot->f74 = 0.0f;
+    pShot->bAA = 1;
+    if (bView1) {
+        pShot->f78 = fn_80014278((u8*)fn_80008370(fn_80016CFC(gPlayers[nPlayer].nView[1])->pCamera));
+    } else {
+        pShot->f78 = fn_80014278((u8*)fn_80008370(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera));
+        pShot->f78 -= fn_800DC3A4();
+    }
+    pShot->f7C = pShot->f78;
+    pShot->f9C = pScript->fA8;
+    if (pScript->pShot != NULL) {
+        pShot->bAD = pScript->pShot->bAD;
+        pShot->f8C = pScript->pShot->f8C;
+        pShot->f90 = pScript->pShot->f90;
+        pShot->f88 = pScript->pShot->f88;
+        pShot->nA0 = pScript->pShot->nA0;
+        pShot->f68 = pScript->pShot->f68;
+        pShot->f68 = pScript->pShot->f6C;  // EA bug: f68 is stored twice; f6C was likely meant
+    } else {
+        pShot->f8C = 0.0f;
+        pShot->f90 = 0.0f;
+        pShot->f88 = 0.0f;
+        pShot->nA0 = 1;
+        pShot->f68 = 0.0f;
+        pShot->f68 = 1000.0f;   // EA bug: likewise (CamScript_PutBackOnFairway puts 1000 in f6C)
+    }
+    pShot->f94 = 0.0f;
+    pShot->f98 = 0.0f;
 }
 
 // Where the ball-flight camera expects the ball to land, into the script's v50: the ball as it lay

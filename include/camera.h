@@ -525,7 +525,7 @@ void     fn_8003EA50(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamS
                      f32 fFrameTime);
 void     fn_8003F2E0(CamScript* pScript, f32 fTime);
 void     CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int nPlayer, CamScript* pScript,
-                                       int a);
+                                       u8 bView1);
 void     CameraScript_InterpToNewScript(CamScript* pScript, CamShot* pShot, int nPlayer, f32* pCam, f32* pSub,
                                         int nA, f32 f1, f32 f2, int nB, f32 f3);
 u8       fn_80043388(CamScript* pScript, CamShot* pShot);
