@@ -709,6 +709,8 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     f32 fAngle;
     f32 fScale;
     s32 nFrames;
+    f32 fAmp;
+    f32 fWave;
     u32 nPeriod;
     int nRef;
     int i;
@@ -773,12 +775,13 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
             } else {
                 fPeriod = 100000000.0f;
             }
-            fSize = DEG(lbl_802824F8->f60) * fSize;
+            fAmp = DEG(lbl_802824F8->f60);
+            fAmp *= fSize;
             if (0.0f != fPeriod) {
                 nPeriod = fPeriod;
-                fAngle = fn_800095F0(2.0f * PI * ((f32)(pChain->n18 % nPeriod) / fPeriod) +
-                                     pChain->n10 / 0.5f);
-                fAngle *= fSize;
+                fWave = fn_800095F0(2.0f * PI * ((f32)(pChain->n18 % nPeriod) / fPeriod) +
+                                    pChain->n10 / 0.5f);
+                fAngle = fAmp * fWave;
             } else {
                 fAngle = 0.0f;
             }
