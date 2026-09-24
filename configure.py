@@ -1008,6 +1008,7 @@ config.libs = [
             Object(Matching, "CharSliders.c"),
             Object(NonMatching, "FE_PGATourMessages.c"),
             Object(Matching, "FE_LogoDesign.c"),
+            Object(NonMatching, "LogoTexture.c"),
             Object(Matching, "DiscCheck.c"),
             Object(NonMatching, "hwsBurn.c"),
             Object(Matching, "CalendarScreen.c"),
