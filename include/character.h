@@ -101,11 +101,14 @@ typedef struct Skeleton {
     f32  q107C[4];              // 0x107C  a rotation (quaternion) fn_800279C0 turns the grip's by
     f32  v108C[4];              // 0x108C  an offset from the grip, turned by its rotation: the IK
                                 //         target of the second chain (fn_800279C0)
-    u8   unk109C[0x10A4 - 0x109C];
+    f32  f109C;                 // 0x109C  } 0.025 and 0.15 from fn_800280E8
+    f32  f10A0;                 // 0x10A0  }
     f32  v10A4[4];              // 0x10A4
     f32  v10B4[4];              // 0x10B4  v10A4 scaled by the IK weight
     f32  f10C4;                 // 0x10C4  the IK weight
-    u8   unk10C8[0x10D4 - 0x10C8];
+    f32  f10C8;                 // 0x10C8  } set up by fn_800280E8: the first link's offset height,
+    f32  f10CC;                 // 0x10CC  }   0.025 and 0.05
+    f32  f10D0;                 // 0x10D0  }
     f32  q10D4[4];              // 0x10D4  a rotation (quaternion) given by fn_80027808
     s32  n10E4;                 // 0x10E4  set to 4 as a swing starts
     f32  a10E8[4][4];           // 0x10E8  per leg, the last good bend axis (Character_IKLegToGround)

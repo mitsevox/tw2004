@@ -13,6 +13,7 @@ f32  fn_80026D18(CharModel* pModel, IKChain* pChain, f32* pTarget, int nLink, in
                                                                                        // remaining error
 void fn_800271A0(CharModel* pModel, IKChain* pChain);
 void fn_80027478(CharModel* pModel, IKChain* pChain);
+f32  fn_800275F4(CharModel* pModel, IKChain* pChain, f32* pTarget);   // an IK error (fn_800273BC)
 void fn_80008F20(f32* pQ, f32* pOut);                   // Quaternion.c
 void fn_8001FBA4(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two points by fT
 void fn_800BAD60(f32 mtx[4][4], Vec4* src, Vec4* dst);  // VecMath.c: a point through a matrix
@@ -490,6 +491,36 @@ f32 fn_80027E8C(CharModel* pModel, IKChain* pChain, f32* pTarget, int bNormals) 
         return fDrop;
     }
     return 0.0f;
+}
+
+// Sets the character's IK up toward pTarget: keeps bone 0x28's place off the grip, sets the first
+// chain up and lowers the root toward the target (fn_80027E8C), resets the skeleton's IK state,
+// solves the first chain (fn_800275F4 as its error) and applies it at full weight. Returns the drop.
+f32 fn_800280E8(Character* pChar, f32* pTarget, int bNormals) {
+    CharModel* pModel = pChar->pModel;
+    Skeleton* pSkel = pModel->pSkel;
+    IKChain* pChain = pSkel->pChains;   // EA bug: read before the NULL test below
+    f32 fDrop;
+
+    if (pSkel == NULL || lbl_802810A6 == 0) return 0.0f;
+    lbl_80281D20 = pChar;
+    fn_80027D14(pChar);
+    fn_800271A0(pModel, pChain);
+    fDrop = fn_80027E8C(pModel, pChain, pTarget, bNormals);
+    pSkel->f109C = 0.025f;
+    pSkel->f10A0 = 0.15f;
+    fn_80029BC8(pSkel->v10A4);
+    fn_80029BC8(pSkel->v10B4);
+    pSkel->f10C4 = 1.0f;
+    pSkel->f10C8 = pChain->pLinks[0].v28[1];
+    pSkel->f10CC = 0.025f;
+    pSkel->f10D0 = 0.05f;
+    pSkel->n10E4 = 0;
+    fn_80009710(pSkel->q10D4);
+    fn_800273BC(pModel, pChain, pTarget, pChain->n18, fn_800275F4, pChain->f1C);
+    SKEL_SetIKSolutionWeight(pSkel, 1.0f);
+    pSkel->f1074 = 0.0f;
+    return fDrop;
 }
 
 // Frees a skeleton: its chains' links, the chains, and both rotation sets.
