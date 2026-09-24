@@ -2184,7 +2184,6 @@ void fn_800D9350(int nPlayer) {
 // player's profile (putts, the per-hole flags b2E4 and b2F6, the score against par), recording the
 // date of an eagle or better on a par 5 when the hole is a marked one.
 void fn_800D9458(int nPlayer) {
-    Player* pPlayer;
     int nProfile;
     int nPar;
     int nDiff;
@@ -2210,57 +2209,58 @@ void fn_800D9458(int nPlayer) {
         }
         if (fn_800E177C() == 0) {
             // How far the ball ended from vBall; the result is not used.
-            pPlayer = &gPlayers[nPlayer];
-            dx = pPlayer->ball.vPos[0] - pPlayer->vBall[0];
-            dz = pPlayer->ball.vPos[2] - pPlayer->vBall[2];
+            dx = gPlayers[nPlayer].ball.vPos[0] - gPlayers[nPlayer].vBall[0];
+            dz = gPlayers[nPlayer].ball.vPos[2] - gPlayers[nPlayer].vBall[2];
             fn_80009680(dx * dx + dz * dz);
-            nProfile = pPlayer->nIndex;
+            nProfile = gPlayers[nPlayer].nIndex;
             nPar = fn_800D2B08();
             if (gpSaveData[nProfile].bActive) {
                 gpSaveData[nProfile].b70 = 1;
-                if (nPar == 4 || nPar == 5) {
-                    if (gPlayers[nPlayer].b2E4[Game_CurHoleIndex()]) {
-                        gpSaveData[nProfile].n90++;
-                        gpSaveData[nProfile].n94++;
-                    } else {
-                        gpSaveData[nProfile].n90++;
-                    }
-                }
-                if (gPlayers[nPlayer].b2F6[Game_CurHoleIndex()]) {
-                    gpSaveData[nProfile].n98++;
-                    gpSaveData[nProfile].n9C++;
+            } else {
+                return;
+            }
+            if (nPar == 4 || nPar == 5) {
+                if (gPlayers[nPlayer].b2E4[Game_CurHoleIndex()]) {
+                    gpSaveData[nProfile].n90++;
+                    gpSaveData[nProfile].n94++;
                 } else {
-                    gpSaveData[nProfile].n98++;
+                    gpSaveData[nProfile].n90++;
                 }
-                if (gPlayers[nPlayer].nPutts[Game_CurHoleIndex()] < 10) {
-                    gpSaveData[nProfile].n80++;
-                    gpSaveData[nProfile].n84 += gPlayers[nPlayer].nPutts[Game_CurHoleIndex()];
-                }
-                nDiff = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] - fn_800D2B08();
-                if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1) {
-                    gpSaveData[nProfile].nAC++;
-                } else if (nDiff == -3) {
-                    gpSaveData[nProfile].nB0++;
-                } else if (nDiff == -2) {
-                    gpSaveData[nProfile].nB4++;
-                } else if (nDiff == -1) {
-                    gpSaveData[nProfile].nB8++;
-                } else if (nDiff == 0) {
-                    gpSaveData[nProfile].nBC++;
-                } else if (nDiff == 1) {
-                    gpSaveData[nProfile].nC0++;
-                } else if (nDiff > 1) {
-                    gpSaveData[nProfile].nC4++;
-                }
-                if (gpSaveData[nProfile].bActive && nPar == 5 &&
-                    gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] <= 3) {
-                    nMarked = fn_800E1CE8(gpGame->nCurCourse, fn_80015464());
-                    fn_8011E020(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
-                    nDate = fn_80078604(nMonth, nDay, nYear);
-                    if (nMarked != -1) {
-                        fn_8005897C(&gpSaveData[nProfile], 0, nMarked, 1);
-                        fn_8005897C(&gpSaveData[nProfile], 1, nMarked, nDate);
-                    }
+            }
+            if (gPlayers[nPlayer].b2F6[Game_CurHoleIndex()]) {
+                gpSaveData[nProfile].n98++;
+                gpSaveData[nProfile].n9C++;
+            } else {
+                gpSaveData[nProfile].n98++;
+            }
+            if (gPlayers[nPlayer].nPutts[Game_CurHoleIndex()] < 10) {
+                gpSaveData[nProfile].n80++;
+                gpSaveData[nProfile].n84 += gPlayers[nPlayer].nPutts[Game_CurHoleIndex()];
+            }
+            nDiff = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] - fn_800D2B08();
+            if (gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] == 1) {
+                gpSaveData[nProfile].nAC++;
+            } else if (nDiff == -3) {
+                gpSaveData[nProfile].nB0++;
+            } else if (nDiff == -2) {
+                gpSaveData[nProfile].nB4++;
+            } else if (nDiff == -1) {
+                gpSaveData[nProfile].nB8++;
+            } else if (nDiff == 0) {
+                gpSaveData[nProfile].nBC++;
+            } else if (nDiff == 1) {
+                gpSaveData[nProfile].nC0++;
+            } else if (nDiff > 1) {
+                gpSaveData[nProfile].nC4++;
+            }
+            if (gpSaveData[nProfile].bActive && nPar == 5 &&
+                gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] <= 3) {
+                nMarked = fn_800E1CE8(gpGame->nCurCourse, fn_80015464());
+                fn_8011E020(&nMonth, &nDay, &nYear, &nHour, &nMinute, &nSecond, &nMsec);
+                nDate = fn_80078604(nMonth, nDay, nYear);
+                if (nMarked != -1) {
+                    fn_8005897C(&gpSaveData[nProfile], 0, nMarked, 1);
+                    fn_8005897C(&gpSaveData[nProfile], 1, nMarked, nDate);
                 }
             }
         }

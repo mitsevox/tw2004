@@ -9,6 +9,17 @@
 #include "charstate.h"
 #include "golfer.h"
 
+// The byte-swap layouts of the records CharSlider_CreateDefinitionsFromMem reads.
+SwapField lbl_80193B70[5] = { { 8, -8 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };   // CharSliderBone
+SwapField lbl_80193B98[4] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };   // CharSliderRange of bones
+SwapField lbl_80193BB8[3] = { { 8, 8 }, { 4, 4 }, { 4, 4 } };             // CharSliderMorph
+SwapField lbl_80193BD0[4] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };   // CharSliderRange of morph targets
+SwapField lbl_80193BF0[6] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };  // CharSliderLink
+SwapField lbl_80193C20[2] = { { 4, 4 }, { 4, 4 } };                         // CharSliderLimit
+SwapField lbl_80193C30[10] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+                               { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };   // CharSliderDef
+SwapField lbl_80281788[1] = { { 8, 8 } };                                   // a morph target id (u64)
+
 // Free slider definitions made by CharSlider_CreateDefinitionsFromMem.
 void fn_8010D454(CharSliderDefs* pDefs) {
     int i;
@@ -58,6 +69,11 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
     int i;
     int j;
     int k;
+    // fake match: these four loops count with their own variables, not j and k (register allocation)
+    int nMorphRange;
+    int nBone;
+    int nBoneRange;
+    int nLimit;
 
     fn_80076158(ppData, (u8*)&nSliders, 4, 4);
     fn_80076158(ppData, (u8*)&nMorphs, 4, 4);
@@ -100,8 +116,8 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
         if (pDefs->pDefs[i].nLimits > 0) {
             pDefs->pDefs[i].pLimits = fn_80009B34(pDefs->pDefs[i].nLimits * sizeof(CharSliderLimit), 2, 0,
                                                   "CharSliders.c", 1053);
-            for (j = 0; j < pDefs->pDefs[i].nLimits; j++) {
-                pDst = &pDefs->pDefs[i].pLimits[j];
+            for (nLimit = 0; nLimit < pDefs->pDefs[i].nLimits; nLimit++) {
+                pDst = &pDefs->pDefs[i].pLimits[nLimit];
                 fn_8001F08C((void**)ppData, &pDst, lbl_80193C20, 2, 1);
             }
         }
@@ -112,10 +128,10 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
         if (pDefs->pDefs[i].nBoneRanges > 0) {
             pDefs->pDefs[i].pBoneRanges = fn_80009B34(pDefs->pDefs[i].nBoneRanges * sizeof(CharSliderRange),
                                                       2, 0, "CharSliders.c", 1067);
-            for (j = 0; j < pDefs->pDefs[i].nBoneRanges; j++) {
-                pDst = &pDefs->pDefs[i].pBoneRanges[j];
+            for (nBoneRange = 0; nBoneRange < pDefs->pDefs[i].nBoneRanges; nBoneRange++) {
+                pDst = &pDefs->pDefs[i].pBoneRanges[nBoneRange];
                 fn_8001F08C((void**)ppData, &pDst, lbl_80193B98, 4, 1);
-                pDefs->pDefs[i].pBoneRanges[j].items.pBones = NULL;
+                pDefs->pDefs[i].pBoneRanges[nBoneRange].items.pBones = NULL;
             }
         }
     }
@@ -125,8 +141,8 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
                 pDefs->pDefs[i].pBoneRanges[j].items.pBones =
                     fn_80009B34(pDefs->pDefs[i].pBoneRanges[j].nItems * sizeof(CharSliderBone), 2, 0,
                                 "CharSliders.c", 1084);
-                for (k = 0; k < pDefs->pDefs[i].pBoneRanges[j].nItems; k++) {
-                    pDst = &pDefs->pDefs[i].pBoneRanges[j].items.pBones[k];
+                for (nBone = 0; nBone < pDefs->pDefs[i].pBoneRanges[j].nItems; nBone++) {
+                    pDst = &pDefs->pDefs[i].pBoneRanges[j].items.pBones[nBone];
                     fn_8001F08C((void**)ppData, &pDst, lbl_80193B70, 5, 1);
                 }
             }
@@ -138,10 +154,10 @@ CharSliderDefs* CharSlider_CreateDefinitionsFromMem(u8** ppData) {
         if (pDefs->pDefs[i].nMorphRanges > 0) {
             pDefs->pDefs[i].pMorphRanges = fn_80009B34(pDefs->pDefs[i].nMorphRanges * sizeof(CharSliderRange),
                                                        2, 0, "CharSliders.c", 1100);
-            for (j = 0; j < pDefs->pDefs[i].nMorphRanges; j++) {
-                pDst = &pDefs->pDefs[i].pMorphRanges[j];
+            for (nMorphRange = 0; nMorphRange < pDefs->pDefs[i].nMorphRanges; nMorphRange++) {
+                pDst = &pDefs->pDefs[i].pMorphRanges[nMorphRange];
                 fn_8001F08C((void**)ppData, &pDst, lbl_80193BD0, 4, 1);
-                pDefs->pDefs[i].pMorphRanges[j].items.pMorphs = NULL;
+                pDefs->pDefs[i].pMorphRanges[nMorphRange].items.pMorphs = NULL;
             }
         }
     }
