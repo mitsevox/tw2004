@@ -326,26 +326,32 @@ void Swing_ApplyForgiveness(int nPlayer) {
             nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL);
             break;
         default:
-            if (gPlayers[nPlayer].nClub >= 0 && gPlayers[nPlayer].nClub < 9) {
+            switch (gPlayers[nPlayer].nClub) {
+            case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
                 nRowScale  = ROW_DRIVING + 1;
                 nRowThresh = ROW_DRIVING;
                 nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_DRIVING_ACCURACY, ATTR_TOTAL);
-            } else if (gPlayers[nPlayer].nClub >= 9 && gPlayers[nPlayer].nClub < 13) {
+                break;
+            case 9: case 10: case 11: case 12:
                 nRowScale  = ROW_STRIKING_A + 1;
                 nRowThresh = ROW_STRIKING_A;
                 nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_BALL_STRIKING, ATTR_TOTAL);
-            } else if (gPlayers[nPlayer].nClub >= 13 && gPlayers[nPlayer].nClub < 17) {
+                break;
+            case 13: case 14: case 15: case 16:
                 nRowScale  = ROW_STRIKING_B + 1;
                 nRowThresh = ROW_STRIKING_B;
                 nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_BALL_STRIKING, ATTR_TOTAL);
-            } else if (gPlayers[nPlayer].nClub >= 17 && gPlayers[nPlayer].nClub < 25) {
+                break;
+            case 17: case 18: case 19: case 20: case 21: case 22: case 23: case 24:
                 nRowScale  = ROW_STRIKING_C + 1;
                 nRowThresh = ROW_STRIKING_C;
                 nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_BALL_STRIKING, ATTR_TOTAL);
-            } else {
+                break;
+            default:
                 nRowScale  = ROW_STRIKING_C + 1;
                 nRowThresh = ROW_STRIKING_C;
                 nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_BALL_STRIKING, ATTR_TOTAL);
+                break;
             }
             break;
         }
