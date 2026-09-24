@@ -334,7 +334,7 @@ u8   fn_800BCC48(void);
 s32  fn_800BCCA0(int nPlayer);
 u8   fn_800BCD24(int nPlayer);
 s32  fn_800BCD5C(void);
-void fn_800BD77C(u16 uSound);
+void fn_800BD77C(int nSound);
 void fn_800BD7D0(u8 nMusic);
 void fn_800BD7E8(u16 uSound);
 void fn_800BD868(int nSound, int a);
@@ -684,8 +684,8 @@ void fn_800BCD68(SitDevEntry* pEntry, int nSit, int nPlayer, u8 nEvent) {
 // Play a sound drawn from the action's deck, once per kind; not while the GameBreaker holds the
 // commentary back (then, for event 8, hand it to GameEffects for later).
 u8 fn_800BCE70(SitDevAction* pAction, u8 nEvent) {
-    int nCount;
     u32 nLeft;
+    int nCount;
     u32 nSound;
     int bNot30;
     if (lbl_802811B8->abPlayed[pAction->nKind]) return 0;
@@ -694,7 +694,7 @@ u8 fn_800BCE70(SitDevAction* pAction, u8 nEvent) {
     nSound = fn_800BB334(pAction->aList, nCount, nLeft, Rand_Next(1) % nLeft);
     bNot30 = nEvent != 30;
     if (!fn_800DC784()) {
-        fn_800BD83C((u16)nSound, bNot30);
+        fn_800BD83C(nSound, bNot30);
         lbl_802811B8->abPlayed[pAction->nKind] = 1;
         return 1;
     }
@@ -871,9 +871,9 @@ void fn_800BD74C(void) {
 // ---- sounds and music ----------------------------------------------------------------------
 
 // Hand GameEffects a sound to stop later (u48), unless one is waiting already; not in mode 11.
-void fn_800BD77C(u16 uSound) {
+void fn_800BD77C(int nSound) {
     if (Game_GetMode() != 11 && !lbl_80202898.b47) {
-        lbl_80202898.u48 = uSound;
+        lbl_80202898.u48 = nSound;
         lbl_80202898.b47 = 1;
     }
 }
