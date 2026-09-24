@@ -1660,9 +1660,9 @@ void fn_800A71E4(void) {
 }
 
 void fn_800A7220(f32 fAmount) {
-    u8 n;
+    u32 n;
 
-    n = 3.0f * fAmount;
+    n = (u8)(int)(3.0f * fAmount);
     if (gpGame->b288) {
         fn_800ADC44(0, 2, (n <= 2) ? n : 2);
         fn_800ADB4C(0, 2, 1);
