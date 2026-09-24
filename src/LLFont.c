@@ -1,34 +1,31 @@
 // LLFont.c (EA's name, from its asserts; also in EA's 2002 source tree; TW06): not yet decompiled;
 // the sweep code below is the matched small functions.
 
-#include "game_types.h"
+#include "engine.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80011160(void);
-s32 fn_80009E70();
-void fn_80011164(void* arg0);
-void fn_800111A4(s32 p0);
+void fn_80011164(LLFont* pFont);
 extern u8 lbl_801A3478[];
 extern u8 lbl_801A3494[];
 void GXSetProjectionv();
 void fn_80012444();
 void fn_800112DC(void);
-void fn_80011C8C(void);
 
-void fn_80011160(void) {
+// UFont.c passes its state; this build does nothing with it.
+void fn_80011160(UFontState* pState) {
 }
 
-void fn_80011164(void* arg0) {
-    if ((u32) (*(u32*)((u8*)(arg0) + 0x470)) != 0U) {
-        fn_80009E70((*(u32*)((u8*)(arg0) + 0x470)));
-        (*(u32*)((u8*)(arg0) + 0x470)) = 0U;
+void fn_80011164(LLFont* pFont) {
+    if (pFont->p470 != NULL) {
+        fn_80009E70(pFont->p470);
+        pFont->p470 = NULL;
     }
 }
 
-void fn_800111A4(s32 p0) {
-    fn_80011164((void*)p0);
-    fn_80009E70(p0);
+void fn_800111A4(LLFont* pFont) {
+    fn_80011164(pFont);
+    fn_80009E70(pFont);
 }
 
 void fn_800112DC(void) {
@@ -36,14 +33,14 @@ void fn_800112DC(void) {
     GXSetProjectionv(lbl_801A3478);
 }
 
-void fn_80011C8C(void) {
+// UFont.c passes the font; this build does nothing with it.
+void fn_80011C8C(LLFont* pFont) {
 }
 
 // ---- end of sweep code ----
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_80012438(u8* p);
 void GXSetTexCoordGen2();
 void fn_8001247C(s32 p0, s32 p1, s32 p2, s32 p3);
 void fn_800124CC();
@@ -55,8 +52,8 @@ void fn_80012540(f32 farg0, f32 farg1);
 void fn_80012550(s32 p0);
 void fn_8001255C(f32 farg0, f32 farg1);
 
-void fn_80012438(u8* p) {
-    *(s32*)(p + 0x474) = 0;
+void fn_80012438(LLFont* pFont) {
+    pFont->n474 = 0;
 }
 
 void fn_8001247C(s32 p0, s32 p1, s32 p2, s32 p3) {
