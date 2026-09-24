@@ -135,8 +135,11 @@ LAYOUT_ASSERT(EASBImageSlot, 0x4401);
 // The library's state, allocated when it starts (lbl_802825B8).
 typedef struct EASBState {
     u32 uHeapID;                    // 0x0000: EASBInitParams.uHeapID, passed to TibExt.c's allocator
-    u8 unk4[0x50];
-    EASBTotals totals;              // 0x0054: the Bio's totals, raised with the product's
+    char szProductName[EASB_PRODUCT_NAME_SIZE];                 // 0x0004: EASBInitParams.szProductName
+    u16 szGamesPlayedType[EASB_GAMES_PLAYED_TYPE_SIZE];         // 0x0028: EASBInitParams.szGamesPlayedType
+    u16 uGamesPlayedTypeLanguage;   // 0x0050: EASBInitParams.uGamesPlayedTypeLanguage
+    u8 unk52[2];
+    EASBTotals totals;             // 0x0054: the Bio's totals, raised with the product's
     EASBProduct product;            // 0x0068: this game's record
     u8 b11D0;                       // 0x11D0: this game's slot in pProductBuffer, or EASB_PRODUCT_NONE
     u8 unk11D1[3];
@@ -278,6 +281,13 @@ u8 fn_8012C83C(void);
 u8 fn_8012C848(void);
 EASBErrorE fn_8012C854(u8* pnSlot);  // the storage code's slot number (EASB_PRODUCT_NONE: none)
 EASBErrorE fn_8012C888(u32* pOut);
+EASBErrorE fn_80128200(void* pIcon, u32 uHeapID);
+EASBErrorE fn_8012BD0C(u32 uHeapID, SFIOFuncTable* pCallbacks);
+EASBErrorE fn_8012BE74(void);
+EASBErrorE fn_8012C388(EASBProcessE* peProcess, s32* pnOperation);
+EASBErrorE fn_8012C6D4(EASBTotals* pTotals, EASBProduct* pProduct, int eDevice, void* pHeader,
+                       EASBImage* pImage);
+s32 fn_8012CCC0(void);              // the operation that failed (EASBStorage.nLastOperation)
 
 // EASB.c
 EASBErrorE fn_8012CCD8(s32 nNeed);
@@ -291,7 +301,7 @@ EASBErrorE fn_8012D290(u8 nProduct, EASBProduct** ppProduct);
 EASBErrorE fn_8012D394(EASBInitParams* pParams);
 EASBErrorE fn_8012D560(void);
 EASBErrorE fn_8012D5B0(void);
-EASBErrorE fn_8012D5E4(void* p0, void* p1);
+EASBErrorE fn_8012D5E4(void* pIcon, EASBImage* pImage);
 EASBErrorE fn_8012D694(void);
 EASBErrorE fn_8012D6C8(void);
 EASBErrorE fn_8012D710(void);
@@ -304,8 +314,8 @@ EASBErrorE fn_8012D93C(u32 uCount);
 EASBErrorE fn_8012D9B4(u16* puLevel);
 EASBErrorE fn_8012DA38(u16* puNextLevel);
 EASBErrorE fn_8012DAB8(u16 uLevel);
-EASBErrorE fn_8012DB30(u16* szName, s32 arg1, s32 nLanguage, u32 uTime);
-EASBErrorE fn_8012DD24(u16* szName, s32 arg1, s32 nLanguage);
+EASBErrorE fn_8012DB30(u16* szName, u32 uValue, u16 uLanguage, u32 uTime);
+EASBErrorE fn_8012DD24(u16* szName, u32 uValue, u16 uLanguage);
 EASBErrorE fn_8012DD7C(u8 bFlag);
 EASBErrorE fn_8012DDE0(u32* pOut);
 EASBErrorE fn_8012DE38(u32* pOut);
@@ -320,6 +330,9 @@ EASBErrorE fn_8012E25C(u8 nProduct, u32* pOut);
 EASBErrorE fn_8012E2D4(u8 nProduct, u32* pOut);
 EASBErrorE fn_8012E34C(u8 nProduct, u32* pOut);
 EASBErrorE fn_8012E3C0(u8 nProduct, u32* pOut);
+EASBErrorE fn_8012E434(u8 nProduct, u8 nIndex, s32 nSort, u16* szName, u32 uLength, u32* puTime,
+                       u16* aLanguages, u8 nLanguages, u16* puLanguage);
+EASBErrorE fn_8012E670(u8 nProduct, s32 nSort, u8* pnCount);
 EASBErrorE fn_8012E818(u8 n, void* pImage);
 EASBErrorE fn_8012E820(u32 uTime, u16* pnDays, u8* pnHours, u8* pnMinutes, u8* pnSeconds);
 EASBErrorE fn_8012E8A8(u32 uTime, u16* pnYear, u8* pnMonth, u8* pnDay, u8* pnHours, u8* pnMinutes,
