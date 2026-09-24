@@ -179,10 +179,7 @@ LogoRecord* fn_8010FB70(void) {
     return &fn_80077ACC()->choices.aLogo[lbl_802824B8->n0];
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
+// The palette.
 s16* fn_8010FBC4(void) {
     return lbl_802824BC;
 }
-
-// ---- end of sweep code ----
