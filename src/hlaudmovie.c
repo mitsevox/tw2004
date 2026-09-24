@@ -204,12 +204,13 @@ void Mov_Start(void) {
 }
 
 // A chunk of the movie's sound came in: each channel goes into the next block of its voice's ring.
-void fn_800A8AD4(MovieSoundBlock* pBlock) {
-    u32 uRight;
+void fn_800A8AD4(void* pChunk) {
+    MovieSoundBlock* pBlock = pChunk;
     int nMode;
     u8* pDataL;
     u8* pDataR;
     u32 uLeft;
+    u32 uRight;
 
     if (lbl_801F1850.nState == 0) return;
     if (lbl_801F1850.nSendBlock == 0) {
@@ -364,8 +365,8 @@ void fn_800A8FFC(u32 uMemory) {
     u8* pSampleData;
     u8 bBank0;
     AudSound* pSound;
-    AudGroup* pGroup;
     u32 j;
+    AudGroup* pGroup;
     AudTrackTmpl* pTrack;
     AudTrackTmpl* pEnd;
 
@@ -376,10 +377,10 @@ void fn_800A8FFC(u32 uMemory) {
         pBank = lbl_80282074;
     }
     pSounds = (u8*)&pBank->apSounds[pBank->nSounds];
-    pData = pSounds + (pBank->n2C + pBank->nGroups * 4);
+    pData = pSounds + pBank->n2C + pBank->nGroups * 4;
+    pSampleData = pData + pBank->n14;
     // port: the offsets are stored in the pointer fields
     pBank->ppGroups = (AudGroup**)((u8*)pBank + (uptr)pBank->ppGroups);
-    pSampleData = pData + pBank->n14;
     pBank->pSamples = (AudSample*)(pSampleData + pBank->n24);
     for (nGroup = 0; nGroup < pBank->nGroups; nGroup++) {
         pGroup = (AudGroup*)(pData + (uptr)pBank->ppGroups[nGroup]);
