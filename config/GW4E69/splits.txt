@@ -281,6 +281,9 @@ GoStaticCam.c:
 
 event.c:
 	.text       start:0x80065B44 end:0x80067710
+	.data       start:0x80188628 end:0x80188778
+	.sbss       start:0x80281E20 end:0x80281E28
+	.sdata2     start:0x80283748 end:0x80283770
 
 Code80067710.c:
 	.text       start:0x80067710 end:0x80067B80
