@@ -137,6 +137,21 @@ void OSInitSemaphore(OSSemaphore* pSem, s32 nCount);
 s32  OSWaitSemaphore(OSSemaphore* pSem);
 s32  OSSignalSemaphore(OSSemaphore* pSem);
 
+// ---- the GameCube audio library (AX) and its effects (AXFX) ------------------------------------
+// The effects' state is only handed to the library, so its layout is left to it.
+
+typedef void (*AXAuxCallback)(void* pData, void* pContext);
+
+typedef struct AXFX_DELAY AXFX_DELAY;
+typedef struct AXFX_REVERBHI AXFX_REVERBHI;
+
+void AXRegisterAuxACallback(AXAuxCallback cb, void* pContext);
+void AXFXSetHooks(void* (*pAlloc)(u32 uSize), void (*pFree)(void* p));
+int  AXFXDelayInit(AXFX_DELAY* pDelay);         // 1: set up
+void AXFXDelayCallback(void* pData, void* pContext);
+int  AXFXReverbHiInit(AXFX_REVERBHI* pReverb);  // 1: set up
+void AXFXReverbHiCallback(void* pData, void* pContext);
+
 // ---- the GameCube DVD library -----------------------------------------------------------------
 
 // The disc's ID (the first bytes of the disc).

@@ -80,6 +80,15 @@ typedef struct UAudMemStack {
 } UAudMemStack;
 LAYOUT_ASSERT(UAudMemStack, 0x20);
 
+void  fn_800B5A14(UAudMemStack* pStack, u8* pMem, u32 uSize, u32 nMaxBlocks, UAudMemStackBlock* pBlocks,
+                  u32 nAlign);
+void* fn_800B5AAC(UAudMemStack* pStack, u32 uSize);
+
+// AudReverb.c's effect settings (initialised data; the effects library owns their layout).
+extern AXFX_REVERBHI lbl_8018EC20;      // the reverb for mode 0
+extern AXFX_DELAY lbl_8018EE00;         // the delay (mode 1)
+extern AXFX_REVERBHI lbl_8018EE60;      // the reverb for mode 2
+
 void*      fn_800B5BD8(u32 uSize);      // the sound engine's allocator
 void       fn_800B5C04(void* p);        // gives back what fn_800B5BD8 handed out
 
