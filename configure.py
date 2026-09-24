@@ -961,7 +961,7 @@ config.libs = [
             Object(NonMatching, "CamSpline.c"),
             Object(NonMatching, "GoBreakLine.c"),
             Object(NonMatching, "AnimStream.c"),
-            Object(NonMatching, "TerrainGround.c"),
+            Object(Matching, "TerrainGround.c"),
             Object(NonMatching, "SkinPart.c"),
             Object(Matching, "HoleScore.c"),
             Object(Matching, "SwingTips.c"),
