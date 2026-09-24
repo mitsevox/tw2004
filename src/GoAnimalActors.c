@@ -309,8 +309,9 @@ void fn_8004A578(DynObjAnimal* pAnimal, void* pArg) {
     u32 i;
 
     fDt = *(f32*)&pArg;  // port: the frame time's float bits arrive as the message argument
-    if (fDt > 0.50050056f) {
-        fDt = 0.50050056f;
+    // at most 30 frames (port: at the NTSC rate)
+    if (fDt > 30.0f * (1.0f / 59.94f)) {
+        fDt = 30.0f * (1.0f / 59.94f);  // port: NTSC rate
     }
     if (fDt < 0.0f) {
         fDt = 0.0f;
