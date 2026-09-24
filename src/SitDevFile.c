@@ -484,6 +484,86 @@ u8 fn_800BCE70(SitDevAction* pAction, u8 nEvent) {
     return 0;
 }
 
+// Run the action's p1C entries: one of each kind not played yet. A lone entry runs unless it is
+// the last line played (except for event 30). Otherwise each kind draws one of its entries at
+// random, skipping those already drawn (bit 15 of the list entry; when all are, the marks are
+// cleared) and the last line played.
+u8 fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent) {
+    s32 anCount[14];
+    s32 aaIndex[14][50];
+    SitDevEntry8* pDo;
+    int nKind;
+    int nPick;
+    int nStart;
+    int nEntry;
+    int i;
+    u8 bPlayed = 0;
+
+    if (pAction->aList[1] == 0xFFF0) {
+        pDo = &lbl_80282208->p1C[pAction->aList[0]];
+        if (pDo == lbl_802811B8->pE8 && nEvent != 30) return 0;
+        if (lbl_802811B8->abPlayed[pDo->nKind]) return 0;
+        fn_800BD580(pDo, nPlayer, nEvent);
+        lbl_802811B8->abPlayed[pDo->nKind] = 1;
+        return 1;
+    }
+    for (i = 0; i < 14; i++) {
+        anCount[i] = 0;
+    }
+    // Sort the entries not played yet by kind.
+    for (i = 0; i < 50; i++) {
+        if (pAction->aList[i] != 0xFFF0) {
+            nKind = lbl_80282208->p1C[pAction->aList[i] & 0x7FFF].nKind;
+            if (!lbl_802811B8->abPlayed[nKind]) {
+                aaIndex[nKind][anCount[nKind]] = i;
+                anCount[nKind]++;
+            }
+        }
+    }
+    for (nKind = 0; nKind < 14; nKind++) {
+        if (anCount[nKind] == 1) {
+            if (&lbl_80282208->p1C[pAction->aList[aaIndex[nKind][0]]] != lbl_802811B8->pE8) {
+                fn_800BD580(&lbl_80282208->p1C[pAction->aList[aaIndex[nKind][0]]], nPlayer, nEvent);
+                bPlayed = 1;
+                lbl_802811B8->abPlayed[nKind] = 1;
+            }
+        } else if (anCount[nKind] > 1) {
+            nPick = Rand_Next(1) % anCount[nKind];
+            nEntry = aaIndex[nKind][nPick];
+            nStart = nPick;
+            while (pAction->aList[nEntry] & 0x8000) {
+                nPick++;
+                if (nPick == anCount[nKind]) {
+                    nPick = 0;
+                }
+                nEntry = aaIndex[nKind][nPick];
+                if (nPick == nStart) {
+                    // Every entry has been drawn: start the deck over.
+                    for (i = 0; i < anCount[nKind]; i++) {
+                        pAction->aList[aaIndex[nKind][i]] &= 0x7FFF;
+                    }
+                    nPick = nStart;
+                    break;
+                }
+            }
+            pDo = &lbl_80282208->p1C[pAction->aList[nEntry]];
+            if (pDo == lbl_802811B8->pE8) {
+                nPick++;
+                if (nPick == anCount[nKind]) {
+                    nPick = 0;
+                }
+                nEntry = aaIndex[nKind][nPick];
+                pDo =&lbl_80282208->p1C[pAction->aList[nEntry] & 0x7FFF];
+            }
+            fn_800BD580(pDo, nPlayer, nEvent);
+            lbl_802811B8->abPlayed[nKind] = 1;
+            pAction->aList[nEntry] |= 0x8000;
+            bPlayed = 1;
+        }
+    }
+    return bPlayed;
+}
+
 // Whether an action is held back: in modes with odd holes, or for a ball in the cup, at situations
 // 21 and 22; for events 20 and 31 while the GameBreaker is up; and commentary (kinds 1 and 2)
 // during a replay, in modes 6..8 and where fn_800E39F0 says so, and everywhere but mode 11.
