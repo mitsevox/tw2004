@@ -485,18 +485,19 @@ config.libs = [
         ],
     },
     {
-        # The GBA library (link cable). This game links its debug build: no optimization, code
-        # sized for space, no inlining, asserts on (OSPanic with the source file and line).
+        # The GBA library (link cable). This game links its debug build: optimization level 0
+        # sized for space, no scheduling or inlining, debug info on (-sym on changes the peephole
+        # pass), asserts on (OSPanic with the source file and line).
         "lib": "gba",
         "mw_version": "GC/1.2.5n",
-        "cflags": [*cflags_sdk, "-opt level=0,space", "-schedule off", "-inline off", "-D_DEBUG"],
+        "cflags": [*cflags_sdk, "-opt level=0,space", "-schedule off", "-inline off", "-sym on", "-D_DEBUG"],
         "progress_category": "sdk",
         "objects": [
-            Object(NonMatching, "dolphin/gba/GBA.c"),
-            Object(NonMatching, "dolphin/gba/GBAGetProcessStatus.c"),
-            Object(NonMatching, "dolphin/gba/GBARead.c"),
-            Object(NonMatching, "dolphin/gba/GBAWrite.c"),
-            Object(NonMatching, "dolphin/gba/GBAXfer.c"),
+            Object(Matching, "dolphin/gba/GBA.c"),
+            Object(Matching, "dolphin/gba/GBAGetProcessStatus.c"),
+            Object(Matching, "dolphin/gba/GBARead.c"),
+            Object(Matching, "dolphin/gba/GBAWrite.c"),
+            Object(Matching, "dolphin/gba/GBAXfer.c"),
         ],
     },
     {

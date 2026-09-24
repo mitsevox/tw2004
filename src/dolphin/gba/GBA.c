@@ -37,9 +37,9 @@ void GBAInit(void) {
         gba->delay = OSMicrosecondsToTicks(60);
         OSInitThreadQueue(&gba->threadQueue);
         gba->param = &SecParams[chan];
-// The debug library's assert carries Nintendo's source line.
+// The debug library's assert carries Nintendo's source line and spelling ("(u32) gba").
 #line 90
-        ASSERT((u32)gba->param % 32 == 0);
+        ASSERT((u32) gba->param % 32 == 0);
     }
     OSInitAlarm();
     DSPInit();
