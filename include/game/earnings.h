@@ -182,7 +182,7 @@ u8   fn_800D85DC(int i, int nValue, const char* szName, int k);
 // Offer nValue and szName to record kind nKind of the table that the game mode and
 // gpGame->nCurHoleNum pick (MC.c sets both to reach recB and recC, and passes nPlayer 5).
 // Earnings.c tests for 2 or 4, a new best.
-int  fn_800D8750(int nKind, int nValue, int a, const char* szName, int nPlayer);
+int  fn_800D8750(int nKind, int nValue, int bSave, const char* szName, int nPlayer);
 void fn_800D8D10(int nPlayer);          // clear the player's flags b30C..b30F
 void fn_800D8D38(int nPlayer);          // clear the flags fn_800D9350 sets (b310..b312)
 void fn_800D8D5C(int nPlayer);          // clear the player's money breakdown for the round

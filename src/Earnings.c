@@ -73,6 +73,8 @@ int   fn_800D3208(void);                                // CourseData.c
 u8    fn_800D61E4(int nPlayer, u8 bCheck);
 u8    fn_800D68CC(int nPlayer, u8 bCheck);
 u8    fn_800D69B8(int nPlayer, u8 bCheck);
+s32   fn_80126FA0(void);                                // GameMode22.c
+s32   fn_80127098(s32 n);
 
 int   fn_800D3A20(int nProfile, u8 bMessage);
 int   fn_800D3CF8(int nRating);
@@ -1611,6 +1613,133 @@ s32 fn_800D8720(s32 n) {
     default:
         return 2;
     }
+}
+
+// Offer nValue and szName to record kind nKind: kinds 0..7 to the course's records and the
+// all-time recA, kind 8 to recB (by game mode), the rest to recC. Returns 1 for a place in the
+// course (or recB/recC) top five, 2 for its best, 3 and 4 the same for recA. With bSave the entry
+// is written in (the ones below move down) and the player's profile gets b70.
+// EA passes szName to sprintf as the format. The callers pass bSave unmasked and this function
+// tests its low byte (the (u8) casts): EA's definition took a u8 behind an int prototype.
+int fn_800D8750(int nKind, int nValue, int bSave, const char* szName, int nPlayer) {
+    int nResult;
+    int nPos;
+    int j;
+    int n;
+    RecordEntry* pFrom;
+    RecordEntry* pTo;
+
+    nResult = 0;
+    if (gpGame->b136) return 0;
+    if (nKind < 8) {
+        if (fn_800D867C(nKind, nValue, gSession.aCourseRecord[Game_GetCourse()].aRecord[nKind][4].nValue)) {
+            nResult = 1;
+            nPos = 4;
+            for (j = 3; j >= 0; j--) {
+                if (fn_800D867C(nKind, nValue,
+                                gSession.aCourseRecord[Game_GetCourse()].aRecord[nKind][j].nValue)) {
+                    nPos = j;
+                }
+            }
+            if (nPos == 0) {
+                nResult = 2;
+            }
+            if ((u8)bSave) {
+                for (j = 4; j > nPos; j--) {
+                    pFrom = &gSession.aCourseRecord[Game_GetCourse()].aRecord[nKind][j - 1];
+                    pTo = &gSession.aCourseRecord[Game_GetCourse()].aRecord[nKind][j];
+                    pTo->nValue = pFrom->nValue;
+                    sprintf(pTo->szName, pFrom->szName);
+                }
+                pTo = &gSession.aCourseRecord[Game_GetCourse()].aRecord[nKind][nPos];
+                pTo->nValue = nValue;
+                sprintf(pTo->szName, szName);
+            }
+        }
+        if (fn_800D867C(nKind, nValue, gSession.recA[nKind][4].nValue)) {
+            nResult = 3;
+            nPos = 4;
+            for (j = 3; j >= 0; j--) {
+                if (fn_800D867C(nKind, nValue, gSession.recA[nKind][j].nValue)) {
+                    nPos = j;
+                }
+            }
+            if (nPos == 0) {
+                nResult = 4;
+            }
+            if ((u8)bSave) {
+                for (j = 4; j > nPos; j--) {
+                    pFrom = &gSession.recA[nKind][j - 1];
+                    pTo = &gSession.recA[nKind][j];
+                    pTo->nValue = pFrom->nValue;
+                    sprintf(pTo->szName, pFrom->szName);
+                }
+                pTo = &gSession.recA[nKind][nPos];
+                pTo->nValue = nValue;
+                sprintf(pTo->szName, szName);
+            }
+        }
+    } else if (nKind == 8) {
+        n = fn_800D86DC(Game_GetMode());
+        if (n != 3) {
+            if (fn_800D867C(nKind, nValue, gSession.recB[fn_80015464()][n][4].nValue)) {
+                nResult = 1;
+                nPos = 4;
+                for (j = 3; j >= 0; j--) {
+                    if (fn_800D867C(nKind, nValue, gSession.recB[fn_80015464()][n][j].nValue)) {
+                        nPos = j;
+                    }
+                }
+                if (nPos == 0) {
+                    nResult = 2;
+                }
+                if ((u8)bSave) {
+                    for (j = 4; j > nPos; j--) {
+                        pFrom = &gSession.recB[fn_80015464()][n][j - 1];
+                        pTo = &gSession.recB[fn_80015464()][n][j];
+                        pTo->nValue = pFrom->nValue;
+                        sprintf(pTo->szName, pFrom->szName);
+                    }
+                    pTo = &gSession.recB[fn_80015464()][n][nPos];
+                    pTo->nValue = nValue;
+                    sprintf(pTo->szName, szName);
+                }
+            }
+        }
+    } else {
+        n = fn_800D8720(fn_80126FA0());
+        if (n != 2) {
+            if (fn_800D867C(nKind, nValue, gSession.recC[fn_80127098(fn_80015464())][n][4].nValue)) {
+                nResult = 1;
+                nPos = 4;
+                for (j = 3; j >= 0; j--) {
+                    if (fn_800D867C(nKind, nValue, gSession.recC[fn_80127098(fn_80015464())][n][j].nValue)) {
+                        nPos = j;
+                    }
+                }
+                if (nPos == 0) {
+                    nResult = 2;
+                }
+                if ((u8)bSave) {
+                    for (j = 4; j > nPos; j--) {
+                        pFrom = &gSession.recC[fn_80127098(fn_80015464())][n][j - 1];
+                        pTo = &gSession.recC[fn_80127098(fn_80015464())][n][j];
+                        pTo->nValue = pFrom->nValue;
+                        sprintf(pTo->szName, pFrom->szName);
+                    }
+                    pTo = &gSession.recC[fn_80127098(fn_80015464())][n][nPos];
+                    pTo->nValue = nValue;
+                    sprintf(pTo->szName, szName);
+                }
+            }
+        }
+    }
+    if (nPlayer != 5 && nResult != 0 && (u8)bSave) {
+        if (gpSaveData[gPlayers[nPlayer].nIndex].bActive) {
+            gpSaveData[gPlayers[nPlayer].nIndex].b70 = 1;
+        }
+    }
+    return nResult;
 }
 
 // Clear the player's flags b30C..b30F (Swing.c calls it).
