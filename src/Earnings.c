@@ -45,8 +45,6 @@ extern s32 lbl_80282254;
 extern s32 lbl_80191A08[39];
 extern f32 lbl_80191AA4[70];
 
-u8    fn_800CF450(int nPlayer);
-int   fn_8008AB40(void);
 
 void  fn_800D344C(UStreamObject* pObject);
 int   fn_800584DC(int nProfile);
@@ -63,16 +61,9 @@ u8    fn_800584B4(int nProfile);
 int   fn_800D3A20(int nProfile, u8 bMessage);
 int   fn_800D3CF8(int nRating);
 u8    fn_800D4010(int nId);
-s32   fn_800D477C(int nPlayer, Ball* pBall, u8 b);
-void  fn_800D4F14(int nPlayer, u8 b);
-void  fn_800D588C(int nPlayer, u8 a, u8 bRoundOver);
 f32   fn_800D6EEC(void);
 u8    fn_800D76AC(int nPlayer, int nAward);
-int   fn_800D782C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll);
-int   fn_800D7B1C(int nPlayer, Ball* pBall, int a, u8 bCountStroke, u8 bAll);
 int   fn_800D7DA0(int nPlayer, u8 a, u8 b, u8 c);
-u8    fn_800D8DB4(int nKind);
-s32   fn_800D9954(void);
 s32   fn_800D9E00(s32 i);
 
 // Put the working tables back to their saved copies.
@@ -861,7 +852,7 @@ s32 fn_800D7660(int nPlayer, Ball* pBall, u8 b) {
     return fn_800D9954();
 }
 
-s32 fn_800D7684(int nPlayer, int a, u8 b) {
+s32 fn_800D7684(int nPlayer, Ball* pBall, u8 b) {
     fn_800D4F14(nPlayer, b);
     return fn_800D9954();
 }

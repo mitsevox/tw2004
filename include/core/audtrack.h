@@ -317,14 +317,45 @@ LAYOUT_ASSERT(AudSource, 0x7C);
 typedef void (*AudSeqHandler)(AudSeqEvent* pEvent, AudTrack* pTrack);
 extern AudSeqHandler lbl_801F1880[13];
 
+// What an instance asks of its eight tracks (AudInstance.pCmd), written by fn_800AD698,
+// fn_800AD734 and fn_800AD790; only those fields are known.
+typedef struct AudInstanceCmd {
+    u8   uOn;                   // 0x0    tracks switched on, a bit each
+    u8   uOff;                  // 0x1    tracks switched off
+    u16  uChanged;              // 0x2    bits 0-7: that track's auParams was set; 0x200: uOn / uOff
+    u32  auParams[8];           // 0x4    per track
+} AudInstanceCmd;
+
 // One of hlaudemitter.c's 256 emitter instances (lbl_801F2740); only the fields read so far.
 typedef struct AudInstance {
-    u8   unk0[0x22];
+    AudInstanceCmd* pCmd;       // 0x0
+    u8   unk4[0x8 - 0x4];
+    struct AudInstance* pNextActive;   // 0x8    the next in AudEmitters.pActive's list
+    struct AudInstance* pNext;  // 0xC    the next instance of the same emitter (AudEmitters)
+    u8   unk10[0x20 - 0x10];
+    u8   nId;                   // 0x20   its number (its index in lbl_801F2740)
+    u8   unk21;
     u8   u22;                   // 0x22   bits cleared by fn_800ADDC8
     u8   unk23[0x30 - 0x23];
     void (*pfnCallback)(u8 nId, u8 nBit, s32 n);  // 0x30
 } AudInstance;
 LAYOUT_ASSERT(AudInstance, 0x34);
+
+extern AudInstance lbl_801F2740[256];   // the instances, by id (0xFF: none)
+
+// hlaudemitter.c's emitters (lbl_801F2668, 0xD8 bytes): per emitter, its list of instances and
+// a sound number. 32 fit the layout: the list heads end where the sound numbers begin.
+typedef struct AudEmitters {
+    u8   unk0[0x8];
+    AudInstance* pActive;       // 0x8    the instances in use, linked through pNextActive
+    u8   unkC[0x10 - 0xC];
+    AudInstance* apFirst[32];   // 0x10   linked through AudInstance.pNext
+    s16  anSound[32];           // 0x90   fn_800ADC44 hands it to fn_800ADA08
+    u8   unkD0[0xD8 - 0xD0];
+} AudEmitters;
+LAYOUT_ASSERT(AudEmitters, 0xD8);
+
+extern AudEmitters lbl_801F2668;
 
 // The two track lists: [0] in start order, [1] sorted on f48, highest first.
 extern UList lbl_801F1868[2];
@@ -502,5 +533,11 @@ u8   fn_800ACE38(AudVoice* pVoice, u32* puPos);
 
 // hlaudemitter.c
 void fn_800ADDC8(u8 nId, u8 nBit, s32 n);
+int  fn_800AD0C4(void);                 // fn_800AD450 on every instance in use, emitters emptied
+void fn_800AD450(u8 nId);
+void fn_800ADB4C(s16 nEmitter, u8 nTrack, u8 bOn);   // for every instance of an emitter: fn_800AD698
+void fn_800ADC44(s16 nEmitter, u8 nTrack, u8 n);     // fn_800AD9AC
+void fn_800ADCD0(s16 nEmitter, u8 nTrack, u8 n, int bCheck);   // fn_800ADA28
+void fn_800ADD54(s16 nEmitter, u8 nTrack, f32 fVolume);        // fn_800ADA94
 
 #endif

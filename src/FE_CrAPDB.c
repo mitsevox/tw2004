@@ -197,8 +197,8 @@ void fn_80103D6C(void) {
     SaveProfile* pProfile = fn_80077ACC();
     Skin* pSkin = lbl_80281EE0->pB4->pChar->pSkin;
 
-    Mem_cpy(pProfile->a5614, pSkin->aParts[3], fn_800CCA40(pSkin) * sizeof(SkinChoice));
-    Mem_cpy(pProfile->a5754, pSkin->aSets[3], fn_800CCEA0(pSkin) * sizeof(SkinChoice));
+    Mem_cpy(pProfile->choices.aParts, pSkin->aParts[3], fn_800CCA40(pSkin) * sizeof(SkinChoice));
+    Mem_cpy(pProfile->choices.aSets, pSkin->aSets[3], fn_800CCEA0(pSkin) * sizeof(SkinChoice));
 }
 
 // And the entries of its six other skins.
@@ -209,8 +209,8 @@ void fn_80103DE0(void) {
 
     for (i = 0; i < 6; i++) {
         pSkin = lbl_80281EE0->pB4->pChar->p16D8->apSkins[i];
-        Mem_cpy(pProfile->a5AF4[i], pSkin->aParts[3], fn_800CCA40(pSkin) * sizeof(SkinChoice));
-        Mem_cpy(pProfile->a5CD4[i], pSkin->aSets[3], fn_800CCEA0(pSkin) * sizeof(SkinChoice));
+        Mem_cpy(pProfile->choices.aSkinParts[i], pSkin->aParts[3], fn_800CCA40(pSkin) * sizeof(SkinChoice));
+        Mem_cpy(pProfile->choices.aSkinSets[i], pSkin->aSets[3], fn_800CCEA0(pSkin) * sizeof(SkinChoice));
     }
 }
 
@@ -306,7 +306,7 @@ void sTurnOnLogo(s16 nPart, int b, int i) {
     fn_800CCF90(pSkin, nSet, i, 0);
     if (i > 0 && i <= 5) {
         sprintf(szLogo, "%s%d", "userlogo", nLogo);
-        if (pProfile->aLogos[nLogo].nShape == LOGO_SQUARE) {
+        if (pProfile->choices.aLogo[nLogo].nShape == LOGO_SQUARE) {
             strcpy(szShape, "square");
         } else {
             strcpy(szShape, "wide");
@@ -1448,7 +1448,7 @@ void fn_80106B04(CrAPAsset* pAsset, Skin* pSkin) {
 }
 
 // The same for a club skin, except that a set's "DefaultL" variant is used instead when it has one
-// and the profile's n5613 is 1.
+// and the profile's choices.n113 is 1.
 void fn_80106BF8(CrAPAsset* pAsset, Skin* pSkin) {
     s32 nSet;
     s32 nVariant;
@@ -1460,7 +1460,7 @@ void fn_80106BF8(CrAPAsset* pAsset, Skin* pSkin) {
         nSet = fn_800CDC2C(pSkin, pAsset->aSet[i]);
         nVariant = fn_800CDCE0(pSkin, nSet, pAsset->aSetVariant[i]);
         nDefaultL = fn_800CDD5C(pSkin, nSet, "DefaultL");
-        if (nDefaultL >= 0 && fn_80077ACC()->n5613 == 1) {
+        if (nDefaultL >= 0 && fn_80077ACC()->choices.n113 == 1) {
             nVariant = nDefaultL;
         }
         if (nSet >= 0 && nVariant >= 0) {

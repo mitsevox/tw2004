@@ -12,7 +12,7 @@
 typedef struct DynTexState {
     void* p0;                   // 0x000  a 0x40-byte block allocated with it
     u8    unk4[4];
-    s32   n8;                   // 0x008
+    void* p8;                   // 0x008  set by fn_8010BC88 (char.c gives it Character.a50)
     u8    unkC[0x96C - 0xC];
     s32   n96C;                 // 0x96C
     u8    unk970[4];
@@ -32,6 +32,11 @@ LAYOUT_ASSERT(DynTexState, 0xA9C);
 
 extern DynTexState* lbl_80282488;
 
+void  fn_8010BC64(u8* p);
+void  fn_8010BC88(void* p);
+void  fn_8010BEC4(void);
+void  fn_8010BED4(void);
+
 // A dynamic texture (made by fn_8010A520, freed by fn_8010A668); only what the code reads so far.
 typedef struct DynTex {
     void* p0;                   // 0x00
@@ -43,5 +48,7 @@ typedef struct DynTex {
     void* p18;                  // 0x18  a buffer of n10 bytes
     s16   n1C;                  // 0x1C  from fn_800106F0; fn_8001052C takes it back
 } DynTex;
+
+DynTex* fn_8010A520(int nC, int nSize, int n2, int n3, int n4);
 
 #endif

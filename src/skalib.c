@@ -12,7 +12,6 @@
 ClipBank* ClipBank_Get(u32 nSlot);
 void  fn_80020BC8(void* pClip);                        // swaps a clip in place
 void  fn_80020F60(struct Clip* pClip, u32 uAram);
-void  AnimLib_Free(AnimLib* pLib);
 void  fn_800269E4(struct LibOverlay* pOv, int nSlot, s32 n);
 u32   Skalib_NextSlot(void);
 void  Skalib_SetBudgets(void);
@@ -75,7 +74,6 @@ void Skalib_Init(void) {
     lbl_80281CD0 = (u8*)((((uptr)lbl_80281CD0 >> 5) + 1) << 5);
 }
 
-void AnimLib_Free(AnimLib* pLib);
 void ClipBank_Free(ClipBank* pBank);
 
 // Frees every library and bank.
