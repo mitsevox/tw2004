@@ -30,6 +30,8 @@ void fn_8009CD80(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_8009D390(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_8009EB44(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_800A1164(s32 nPort, s32 nSlot, char* pName, s32 n);     // MC.c
+s32  fn_800A1590(s32 nPort, s32 nSlot, s32 n, char* szOut);     // MC.c: clears szOut first
+void fn_8007739C(Replay* pReplay);      // FE_Manager.c
 u8   fn_800E22E4(int nSlot, int a, int b);      // GameRound.c
 int  fn_800E234C(int nSlot, int a, int b);      // GameRound.c
 int  fn_800D3D10(int nGolfer);          // Earnings.c: the golfer's rating
@@ -3022,6 +3024,41 @@ void fn_8007F87C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].nTourCardLevel;
 }
 
+// Shows the replay profile pArgs[0] saved with award pArgs[1] (awards 0, 6, 9, 3 and 13 have one).
+// SaveProfile.aReplay is bytes (save.h cannot see game.h's Replay), so each is copied as a Replay.
+void fn_8007F8A0(MsgArg* pArgs, MsgArg* pResult) {
+    Replay replay0;
+    Replay replay6;
+    Replay replay9;
+    Replay replay3;
+    Replay replay13;
+
+    lbl_80281ED4->b0 = 1;
+    lbl_80281ED4->n1061C = pArgs[1].i;
+    switch (pArgs[1].i) {
+    case 0:
+        replay0 = *(Replay*)gpSaveData[pArgs[0].i].aReplay[0];
+        fn_8007739C(&replay0);
+        break;
+    case 6:
+        replay6 = *(Replay*)gpSaveData[pArgs[0].i].aReplay[1];
+        fn_8007739C(&replay6);
+        break;
+    case 9:
+        replay9 = *(Replay*)gpSaveData[pArgs[0].i].aReplay[2];
+        fn_8007739C(&replay9);
+        break;
+    case 3:
+        replay3 = *(Replay*)gpSaveData[pArgs[0].i].aReplay[3];
+        fn_8007739C(&replay3);
+        break;
+    case 13:
+        replay13 = *(Replay*)gpSaveData[pArgs[0].i].aReplay[4];
+        fn_8007739C(&replay13);
+        break;
+    }
+}
+
 void fn_8007FCC0(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = lbl_801D7148.nMode;
 }
@@ -5217,6 +5254,21 @@ void fn_80084C88(MsgArg* pArgs, MsgArg* pResult) {
     }
     if (n == 0) {
         sprintf(szName, "User %d", lbl_80281ED4->nSlot + 1);
+    }
+}
+
+// Checks the card pArgs[0], pArgs[1] with fn_800A1590: 1 when it succeeds, -1 when the file read
+// back is not a good save, else 0.
+void fn_80084CFC(MsgArg* pArgs, MsgArg* pResult) {
+    char sz[0x20];              // the size is unknown (0x20 gives the original's frame)
+    s32  nResult = fn_800A1590(pArgs[0].i, pArgs[1].i, pArgs[2].i, sz);
+
+    if (nResult == 0) {
+        pResult->i = 1;
+    } else if (nResult == MC_ERR_BADDATA) {
+        pResult->i = -1;
+    } else {
+        pResult->i = 0;
     }
 }
 
