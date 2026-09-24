@@ -74,15 +74,16 @@ u8   Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32*
 // moves on to the next shot when the current one has run its f8C (kinds 13 and 15: when fF8
 // reaches 1).
 void fn_8003DCE8(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot* pShot, u8 b, f32 fTime) {
-    f32 vBall[4];
-    f32 vMove[4];
     f32 vPrev[4];
+    f32 vMove[4];
+    f32 vBall[4];
     f32 fFov;
     f32 fStep;
     f32 f88;
     f32 f8C;
     f32 f90;
     int nUpdates;
+    u8 bFirstFrame;
 
     if (pScript->pShot == NULL) return;
     if (fn_800C714C()) {
@@ -130,8 +131,8 @@ void fn_8003DCE8(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
             fn_80064F54(pScript->pNextShot, nPlayer, pScript->v10);
         }
     }
-    if (pScript->pNextShot == NULL || pScript->nBC == 5 || pScript->nBC == 6
-        || (pScript->nBC >= 8 && pScript->nBC <= 10) || pScript->nBC == 4) {
+    if (pScript->pNextShot == NULL || pScript->nBC == 5 || pScript->nBC == 6 || pScript->nBC == 8
+        || pScript->nBC == 9 || pScript->nBC == 10 || pScript->nBC == 4) {
         Vec3Copy(pScript->v0, pCam);
         CamScript_GetLookAtPoint(pScript->pShot, nPlayer, pScript->a20, pCam, pScript, vPrev, fTime);
         Vec3Copy(pScript->a20, pSub);
@@ -222,7 +223,7 @@ void fn_8003DCE8(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
     } else {
         fn_80045428(pCam, vPrev, pScript->v60);
     }
-    b = fn_80043388(pScript, pScript->pShot);
+    bFirstFrame = fn_80043388(pScript, pScript->pShot);
     fStep = fn_8003F064(pScript, fTime);
     pScript->f84 = pScript->fCamTime;
     pScript->fCamTime += fStep;
@@ -238,14 +239,14 @@ void fn_8003DCE8(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
         pScript->bCC = 0;
     }
     if (pScript->pNextShot != NULL) {
-        if ((pScript->nBC == 13 || pScript->nBC == 15) ? pScript->fF8 >= 1.0f
-                                                         : pScript->fCamTime > pScript->f8C) {
+        if (((pScript->nBC == 13 || pScript->nBC == 15) && pScript->fF8 >= 1.0f)
+            || (pScript->nBC != 13 && pScript->nBC != 15 && pScript->fCamTime > pScript->f8C)) {
             if (pScript->nBC == 7) {
                 pScript->pNextShot = NULL;
                 pScript->nBC = 5;
             } else {
                 CameraScript_GoToNewScript(pScript, pScript->pNextShot, nPlayer, pCam, pSub, pShot);
-                b = fn_80043388(pScript, pScript->pShot);
+                bFirstFrame = fn_80043388(pScript, pScript->pShot);
             }
             if (fStep > 0.0f) {
                 fn_80045428(vPrev, pCam, vMove);
@@ -254,7 +255,7 @@ void fn_8003DCE8(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
         }
     }
     if (pScript->pShot->bA8 == 1) {
-        CamScript_CheckOutOfBounds(pScript, pCam, pSub, nPlayer, pShot, vPrev, b);
+        CamScript_CheckOutOfBounds(pScript, pCam, pSub, nPlayer, pShot, vPrev, bFirstFrame);
     }
 }
 
@@ -1139,6 +1140,8 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
     f32 fLen;
     f32 fStep;
     CourseInfo* pCourse;
+    int nPin;
+    int nTee;
 
     if (!fn_80043388(pScript, pShot)) {
         fn_800418B0(pShot, vOffset, pScript->f9C, pShot->f98);
@@ -1148,7 +1151,8 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
     case 0:
         if ((s8)GOLFERSTATE_GetCurrentState(nPlayer) == 18) {  // fake match: see game.h
             pCourse = fn_8000C594();
-            Vec3Copy(&pCourse->pin[Game_CurrentPinSet()].x, pOut);
+            nPin = Game_CurrentPinSet();
+            Vec3Copy(&pCourse->pin[nPin].x, pOut);
         } else if (fn_80043388(pScript, pShot)) {
             fn_8003D9AC(pScript, pShot, nPlayer, vPos, 0);
             if (pScript->bCF) {
@@ -1283,11 +1287,15 @@ void CamScript_GetLookAtPoint(CamShot* pShot, int nPlayer, f32* pOut, f32* pCam,
         }
         break;
     case 10:
-        Vec3Copy(&fn_8000C594()->pin[Game_CurrentPinSet()].x, pOut);
+        nPin = Game_CurrentPinSet();
+        pCourse = fn_8000C594();
+        Vec3Copy(&pCourse->pin[nPin].x, pOut);
         fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
         break;
     case 11:
-        Vec3Copy(&fn_8000C594()->tee[gSession.nTeeSet[nPlayer]].x, pOut);
+        nTee = gSession.nTeeSet[nPlayer];
+        pCourse = fn_8000C594();
+        Vec3Copy(&pCourse->tee[nTee].x, pOut);
         fn_8004255C(pOut, pCam, pShot->f74, pShot->f70);
         break;
     case 9:

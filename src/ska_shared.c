@@ -248,6 +248,7 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
 u8 fn_80020328(Clip* pClip, int nFrame, f32* pPose2, f32* pPose1, u8* pExtra) {
     ARAMTransfer* pTransfer = NULL;
     u8* pFrame;
+    int nSize;
 
     if (pClip->n36 != 0) {
         if (pClip->uFlags & 4) {
@@ -265,8 +266,9 @@ u8 fn_80020328(Clip* pClip, int nFrame, f32* pPose2, f32* pPose1, u8* pExtra) {
     }
     if (pClip->n0A != 0) {
         if (pClip->uFlags & 4) {
+            nSize = pClip->n8C * 2;
             if (pTransfer == NULL) {
-                pTransfer = fn_8001FCA8(pClip->uAram + pClip->n8C * nFrame * 2, lbl_80281CC8, pClip->n8C * 2);
+                pTransfer = fn_8001FCA8(pClip->uAram + pClip->n8C * nFrame * 2, lbl_80281CC8, nSize);
             }
             fn_8001FCD4(pTransfer);
             pFrame = lbl_80281CC8;
@@ -589,7 +591,7 @@ Clip* fn_80020DD4(u8* p, u32* pu30, u32 nAlign) {
         uPad = 0;
     }
     pClip = (Clip*)(p + uPad);
-    fn_8002091C(pClip);
+    fn_8002091C((Clip*)(p + uPad));  // fake match: the sum passed again, not pClip (register order)
     pClip->pC0 = p;
     p = (u8*)pClip + sizeof(Clip);
     if (pClip->nEvents != 0) {
