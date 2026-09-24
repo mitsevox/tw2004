@@ -27,7 +27,6 @@ void fn_8008E358(s32 p0);               // FEgolferanim.c
 s32  fn_800A0C6C(MCCardPosStr* pPos);   // MC.c
 s32  fn_800A0230(MCCardPos* pPos);      // MC.c: load a replay from the card
 void fn_8009CD80(s32 nPort, s32 nSlot); // MC_Gc.c
-s32  fn_8009D390(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_8009EB44(s32 nPort, s32 nSlot); // MC_Gc.c
 s32  fn_800A1164(s32 nPort, s32 nSlot, char* pName, s32 n);     // MC.c
 s32  fn_800A1590(s32 nPort, s32 nSlot, s32 n, char* szOut);     // MC.c: clears szOut first
@@ -644,7 +643,6 @@ void fn_80083A4C(MsgArg* pArgs, MsgArg* pResult);
 void fn_80083BA4(MsgArg* pArgs, MsgArg* pResult);
 void fn_80083BC8(MsgArg* pArgs, MsgArg* pResult);
 void fn_80083BFC(MsgArg* pArgs, MsgArg* pResult);
-void fn_80083D88(MsgArg* pArgs, MsgArg* pResult);
 void fn_80083E48(MsgArg* pArgs, MsgArg* pResult);
 void fn_80083E70(MsgArg* pArgs, MsgArg* pResult);
 void fn_80083E94(MsgArg* pArgs, MsgArg* pResult);

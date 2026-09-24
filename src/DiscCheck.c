@@ -188,7 +188,7 @@ void fn_80110458(u8 b) {
     lbl_802824D1 = b;
 }
 
-u8 fn_80110460(void) {
+int fn_80110460(void) {
     return lbl_802824D1;
 }
 

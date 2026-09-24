@@ -766,6 +766,11 @@ void Caddie_Update(int nPlayer);
 void Luck_TakePerfectShot(int nPlayer);
 void Caddie_ApplyTip(int nPlayer);
 int  Golfer_GetAttribute(Player* pPlayer, int nAttr, int nMode);
+u8   Controller_IsNotCPU(int nController);  // Golfer.c
+f32  fn_8005C1EC(int nPlayer);          // Swing.c
+f32  fn_8005C268(int nPlayer);          // Swing.c
+int  fn_8005CB48(int nPlayer);          // Swing.c
+int  fn_8005CB60(int nPlayer);          // Swing.c
 u8   Player_IsHoledNotState23(int nPlayer);
 u8   Team_IsAllCPU(int nTeam);
 u8   Player_IsNotCPU(int nPlayer);
