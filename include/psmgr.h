@@ -40,12 +40,13 @@ typedef struct PsEmitter {
     f32  mtx[4][4];             // 0x00  the new particles go through it (ParticleMsg.u.emit.pMtx);
                                 //       row 3 is its position (fn_800A3D6C)
     struct PsEmitter* p40;      // 0x40  the next in the list fn_80099EA4 pushes onto
-    u8   unk44[0x4C - 0x44];
+    f32  f44;                   // 0x44  -1 from fn_80099758
+    f32  f48;                   // 0x48
     f32  f4C;                   // 0x4C  the last time fn_80099344 moved it on
     s32  n50;                   // 0x50  fn_800A3DF4 sets 1000000
-    u8   unk54[0x58 - 0x54];
+    s32  n54;                   // 0x54  -1 from fn_80099758
     s32  n58;                   // 0x58  cleared by fn_80099B74; counted up by fn_80099344
-    s8   b5C;                   // 0x5C  cleared by fn_80098BDC
+    u8   b5C;                   // 0x5C  in use: set by fn_80099758, cleared by fn_80098BDC
     u8   unk5D[0x60 - 0x5D];
     ParticleParams params;      // 0x60  its settings, copied from those fn_80099758 is given
     ShaderObject mesh;          // 0x180 its particle system
@@ -54,6 +55,7 @@ LAYOUT_ASSERT(PsEmitter, 0x1A8);
 
 // UFstPart.c's six fixed emitters.
 extern PsEmitter* lbl_801DB888[6];
+extern s32 lbl_80281F8C;        // UFstPart.c: the fixed emitter fn_80099758 hands out next
 extern f32 lbl_801DB878[4];     // UFstPart.c: the point fn_80099E34 orders emitters by distance from
 
 // PsBallFx.c's state (lbl_801F1708, 0x88 bytes), reached through lbl_80281408.

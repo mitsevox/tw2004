@@ -504,22 +504,35 @@ typedef struct SD_SShaderObject_Static {
 typedef struct ParticleParams {
     u8   unk0[4];
     f32  f4;                    // 0x04  the particles' lifetime: older ones are dropped (fn_80094B84)
-    u8   unk8[0x24 - 0x8];
-    f32  f24;                   // 0x24  the radius fn_80099AE4 tests an emitter with (over 1000: always)
-    u8   unk28[0x40 - 0x28];
-    f32  f40;                   // 0x40  written by fn_800A30E4
-    u8   unk44[0x54 - 0x44];
+    u8   unk8[0x18 - 0x8];
+    f32  f18;                   // 0x18  at least 1/60 (fn_80099758)
+    u8   unk1C[4];
+    f32  f20;                   // 0x20
+    f32  f24;                   // 0x24  the radius fn_80099AE4 tests an emitter with (over 1000: always);
+                                //       fn_80099758 works it out when f4 is not 0
+    f32  f28;                   // 0x28
+    f32  f2C;                   // 0x2C
+    f32  f30;                   // 0x30
+    f32  f34;                   // 0x34
+    f32  f38;                   // 0x38  fn_80099758 replaces it with pi/2 minus it
+    u8   unk3C[4];
+    f32  f40;                   // 0x40  } three angles fn_80099758 makes the emitter's matrix from;
+    f32  f44;                   // 0x44  } f40 is written by fn_800A30E4
+    f32  f48;                   // 0x48  }
+    u8   unk4C[0x54 - 0x4C];
     s32  n54;                   // 0x54  below 0 in an emitter: fn_80098BDC frees it
     u32  u58;                   // 0x58  flags; 0x80 and 0x100 pick the blend (fn_800949D0); in an
                                 //       emitter 0x80000000 marks it done (fn_80098C70, fn_80099344)
-    u8   unk5C[2];
+    u16  u5C;                   // 0x5C  a factor in fn_80099758's particle count
     s16  nCount;                // 0x5E  how many particles
-    u8   unk60[0x6C - 0x60];
+    f32  v60[3];                // 0x60
     s16  nTexture;              // 0x6C  the texture: its name in lbl_801F1640
     u8   unk6E[0x70 - 0x6E];
     f32  v70[4];                // 0x70  a point fn_80099AE4 puts through the camera's view matrix
     f32  v80[4];                // 0x80  a position (the ball's, fn_800A2FFC; fn_800A3D6C)
-    u8   unk90[0x10];
+    u8   unk90[4];
+    f32  f94;                   // 0x94  not 0: fn_80099758 starts the emitter's f48 from it
+    u8   unk98[0xA0 - 0x98];
     f32  vA0[4];               // 0xA0  } ParticleShape.v60 = vB0 + vA0 x f110; fn_800A3CB0
                                 //       puts the wind vector x 0.1 here
     f32  vB0[4];                // 0xB0  }
