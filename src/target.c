@@ -364,28 +364,27 @@ void TARGET_ResetMomentums(int nPlayer) {
 // kind 2, else the longest usable club) is undone and fA60 parked at -1000 or 1000, where later
 // calls skip it. Returns 1 when either input was non-zero (an undone move too).
 u8 TARGET_UpdateMomentums(int nPlayer) {
-    f32* pTarget;
-    f32  vToCamera[4];
-    f32  vSaved[4];
-    f32  vDir[4];
     f32  fZoom;
-    f32  fStep;
-    f32  fTurn;
-    f32  fMin;
     f32  fSin;
-    f32  fCos;
-    f32  fCameraDist;
-    f32  fDX;
+    f32  vToCamera[4];
     f32  fDZ;
     int  nClub;
+    f32  fCameraDist;
+    f32  fDX;
+    f32  fAimDist;
+    f32  vSaved[4];
+    f32  fCos;
+    f32  fTurn;
     u8   bInRange;
     u8   bMoved;
+    f32  fMin;
+    f32  vDir[4];
+    f32  fStep;
 
     fStep = 0.5f;
     bInRange = 0;
-    pTarget = gPlayers[nPlayer].vTarget;
     bMoved = 0;
-    Vec3Copy(pTarget, vSaved);
+    Vec3Copy(gPlayers[nPlayer].vTarget, vSaved);
     fZoom = fn_8001EFFC(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])));
 
     // the turn eases off towards 0
@@ -425,14 +424,14 @@ u8 TARGET_UpdateMomentums(int nPlayer) {
         fDZ = fCos * gPlayers[nPlayer].fDistance;
         gPlayers[nPlayer].vTarget[0] = fDX + gPlayers[nPlayer].vBall[0];
         gPlayers[nPlayer].vTarget[2] = fDZ + gPlayers[nPlayer].vBall[2];
-        fn_8002BDEC_SetTarget(nPlayer, pTarget);
-        Vec_Copy(pTarget, gPlayers[nPlayer].vTarget2);
+        fn_8002BDEC_SetTarget(nPlayer, gPlayers[nPlayer].vTarget);
+        Vec_Copy(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vTarget2);
         fn_8001C804(nPlayer, 0, 1);
         fn_80062C38();
         fn_8006A8B0();
     }
 
-    Vec3Copy(pTarget, vSaved);
+    Vec3Copy(gPlayers[nPlayer].vTarget, vSaved);
     if (1000.0f == fabsf(gPlayers[nPlayer].fA60)) {
         return bMoved;
     }
@@ -463,9 +462,10 @@ u8 TARGET_UpdateMomentums(int nPlayer) {
         fDZ = fStep * fCos;
         gPlayers[nPlayer].vTarget[0] += fDX;
         gPlayers[nPlayer].vTarget[2] += fDZ;
-        fn_8006A964(pTarget, gPlayers[nPlayer].vBall, vDir);
+        fn_8006A964(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vBall, vDir);
         vDir[1] = 0.0f;
-        if (gPlayers[nPlayer].fA60 < 0.0f && (f32)fn_80009680(fn_80009744(vDir)) >= fMin) {
+        fAimDist = fn_80009680(fn_80009744(vDir));
+        if (gPlayers[nPlayer].fA60 < 0.0f && fAimDist >= fMin) {
             bInRange = 1;
         } else if (gPlayers[nPlayer].fA60 > 0.0f
                    && ((gPlayers[nPlayer].nShotKind == 0 && 3.0f * gPlayers[nPlayer].fDistance < 180.0f)
@@ -478,15 +478,15 @@ u8 TARGET_UpdateMomentums(int nPlayer) {
             bInRange = 1;
         }
         if (bInRange) {
-            fn_8002BDEC_SetTarget(nPlayer, pTarget);
+            fn_8002BDEC_SetTarget(nPlayer, gPlayers[nPlayer].vTarget);
             fSin = fn_800095F0(gPlayers[nPlayer].fAim);
             fCos = fn_80009638(gPlayers[nPlayer].fAim);
             fDX = -fSin * gPlayers[nPlayer].fDistance;
             fDZ = fCos * gPlayers[nPlayer].fDistance;
             gPlayers[nPlayer].vTarget[0] = fDX + gPlayers[nPlayer].vBall[0];
             gPlayers[nPlayer].vTarget[2] = fDZ + gPlayers[nPlayer].vBall[2];
-            fn_8002BDEC_SetTarget(nPlayer, pTarget);
-            Vec_Copy(pTarget, gPlayers[nPlayer].vTarget2);
+            fn_8002BDEC_SetTarget(nPlayer, gPlayers[nPlayer].vTarget);
+            Vec_Copy(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vTarget2);
             if (gPlayers[nPlayer].nShotKind != 2) {
                 nClub = gPlayers[nPlayer].nClub;
                 gPlayers[nPlayer].nClub = AI_ClubForShot(nPlayer, gPlayers[nPlayer].nShotKind, 1,
@@ -507,7 +507,7 @@ u8 TARGET_UpdateMomentums(int nPlayer) {
             } else {
                 gPlayers[nPlayer].fA60 = 1000.0f;
             }
-            Vec3Copy(vSaved, pTarget);
+            Vec3Copy(vSaved, gPlayers[nPlayer].vTarget);
         }
     }
     return bMoved;
