@@ -8,12 +8,15 @@
 
 #define NUM_GLOWS 13
 
+// A glow's display list (our name): fn_80097F44 starts one, fn_80098004 ends it.
+typedef struct GlowList {
+    s32   n0;                   // 0x0  the list's size
+    void* p4;                   // 0x4  the list; freed by fn_800987D4
+} GlowList;
+
 // The glows' table (lbl_801D99D0, 0x70 bytes).
 typedef struct GlowTable {
-    struct {
-        s32   n0;               // 0x0
-        void* p4;               // 0x4  allocated; freed by fn_800987D4
-    } a[NUM_GLOWS];             // 0x00
+    GlowList a[NUM_GLOWS];      // 0x00
     s32  nCount;                // 0x68  how many of a[] hold a p4
     u8   unk6C[4];
 } GlowTable;

@@ -29,6 +29,12 @@ void GXSetZMode(u8 bCompare, int eCompare, u8 bUpdate);
 // ---- vertex arrays ----------------------------------------------------------------------------
 
 void GXInvalidateVtxCache(void);
+
+// ---- display lists ----------------------------------------------------------------------------
+
+void GXBeginDisplayList(void* pList, u32 uSize);
+u32  GXEndDisplayList(void);            // the list's size
+void GXResetWriteGatherPipe(void);
 void GXSetArray(int eAttr, void* pBase, u8 nStride);
 void GXClearVtxDesc(void);
 void GXSetVtxDesc(int eAttr, int eType);

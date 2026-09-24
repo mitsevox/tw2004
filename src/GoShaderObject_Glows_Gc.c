@@ -2,10 +2,78 @@
 // decompiled; the sweep code below is the matched small functions.
 
 #include "glows.h"
+#include "gx.h"
+#include "core/startup.h"
+
+void fn_80097EC4(f32* pPos);
+void fn_800124A8(void);                                 // LLFont.c: end the primitive
+void fn_80012520(u32 ePrim, u32 eFormat, u16 nVerts);  // LLFont.c: GXBegin
+
+// Starts glow nGlow's display list, with room for nVerts vertices of 32 bytes and 1 KB more.
+GlowList* fn_80097F44(int nGlow, int nVerts) {
+    u32 uSize;
+    void* pList;
+
+    uSize = ((nVerts * 32 + 31) & ~31) + 0x400;
+    pList = fn_80009B34(uSize, 1, 32, "GoShaderObject_Glows_Gc.c", 134);
+    DCInvalidateRange(pList, uSize);
+    GXBeginDisplayList(pList, uSize);
+    GXResetWriteGatherPipe();
+    GXClearVtxDesc();
+    GXSetVtxDesc(0, 1);                         // matrix index, position, colour: direct
+    GXSetVtxDesc(9, 1);
+    GXSetVtxDesc(11, 1);
+    GXInvalidateVtxCache();
+    lbl_801D99D0.a[nGlow].p4 = pList;
+    return &lbl_801D99D0.a[nGlow];
+}
+
+// Ends pList's display list and keeps a copy of just its size.
+void fn_80098004(GlowList* pList) {
+    void* pCopy;
+    u32 uSize;
+
+    uSize = GXEndDisplayList();
+    pCopy = fn_80009B34(uSize, 2, 32, "GoShaderObject_Glows_Gc.c", 159);
+    Mem_cpy(pCopy, pList->p4, uSize);
+    DCFlushRange(pCopy, uSize);
+    fn_80009E70(pList->p4);
+    pList->p4 = pCopy;
+    pList->n0 = uSize;
+    lbl_801D99D0.nCount++;
+}
+
+// Glow nGlow as a ring of nSides sides around the unit circle: a strip with two vertices at each
+// point (fn_80097EC4), starting and ending at (1, 0, 0).
+void fn_8009809C(int nGlow, int nSides) {
+    int nVerts;
+    GlowList* pList;
+    int i;
+    f32 fAngle;
+    f32 vRim[4];                                // the fourth is not used
+    f32 vStart[4];
+
+    nVerts = (nSides + 1) * 2;
+    pList = fn_80097F44(nGlow, nVerts);
+    fn_80012520(0x98, 4, nVerts);
+    vStart[0] = 1.0f;
+    vStart[1] = 0.0f;
+    vStart[2] = 0.0f;
+    fn_80097EC4(vStart);
+    for (i = 1; i < nSides; i++) {
+        fAngle = (2.0f * PI) * ((f32)i / (f32)nSides);
+        vRim[0] = fn_80009638(fAngle);
+        vRim[1] = fn_800095F0(fAngle);
+        vRim[2] = 0.0f;
+        fn_80097EC4(vRim);
+    }
+    fn_80097EC4(vStart);
+    fn_800124A8();
+    fn_80098004(pList);
+}
 
 // ---- sweep code (not yet cleaned up) ----
 
-void fn_8009809C();
 void fn_800981D0();
 void fn_80098350(void);
 
