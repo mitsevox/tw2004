@@ -117,6 +117,9 @@ LLFont.c:
 
 UFont.c:
 	.text       start:0x8001256C end:0x80012ED0
+	.bss        start:0x801A34C0 end:0x801A36A0
+	.sdata      start:0x80280DE0 end:0x80280DF0
+	.sdata2     start:0x80282B48 end:0x80282B58
 
 Code80012ED0.c:
 	.text       start:0x80012ED0 end:0x80012FA4

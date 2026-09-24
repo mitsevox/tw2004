@@ -1232,7 +1232,8 @@ typedef struct UFontState {
     s32   n1B8;                   // 0x1B8  0: fn_800128F8 queues strings, 1: draws them at once
     char* pStrings;               // 0x1BC  0x1F4 bytes of queued text
     char* pStringNext;            // 0x1C0
-} UFontState;
+    u8    pad1C4[0x1E0 - 0x1C4];  // 0x1C4
+} UFontState;                     // 0x1E0
 
 extern UFontState* lbl_80280DE0;
 

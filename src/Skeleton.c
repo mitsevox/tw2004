@@ -689,7 +689,7 @@ void fn_800284DC(Skeleton* pSkel) {
 // Loads a model from pData: its bone count, two floats, then per bone its id, parent and position.
 // A negative nExtra asks for that many bones in all: the missing ones are added at the root, with
 // bone 0x54's id. Then builds its matrices, skeleton (with pDefs) and dynamic chains.
-CharModel* fn_80028564(u8* pData, s8 nExtra, CharModelDefs* pDefs, u8 b) {
+CharModel* fn_80028564(u8* pData, s8 nExtra, CharModelDefs* pDefs, int b) {
     u32 aAll[4];
     s8 nTotal;
     CharModel* pModel;
