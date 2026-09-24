@@ -1486,6 +1486,7 @@ void fn_80033704(u16 nPatch, u16 nObject) {
 // bit 0x1 of word 0: crowd members (bit 0x2) held in iCrowdPose, swaying in their pose or easing to
 // the next one through lbl_801877E0 (lbl_80187858 with bit 0x40 of word 3); bit 0x1 of word 3 rises
 // to 1 once n1C is 1; the trees sway by their period with noise.
+// fake match: `3 == n18` in the two pose-step tests (register order; found by the permuter).
 void fn_80033744(void) {
     f32 fTime;
     s32 i;
@@ -1579,7 +1580,7 @@ void fn_80033744(void) {
                         && lbl_801D3CB0.pObjectStateList[i].n1C == lbl_801877E0[k].n4) {
                         fStep = lbl_801877E0[k].fC - lbl_801D3CB0.pObjectStateList[i].f4;
                         if (lbl_801D3CB0.pObjectStateList[i].n18 == 2
-                            || lbl_801D3CB0.pObjectStateList[i].n18 == 3) {
+                            || 3 == lbl_801D3CB0.pObjectStateList[i].n18) {
                             if (fStep > 6.0f * fTime) {
                                 fStep = 6.0f * fTime;
                             }
@@ -1642,7 +1643,7 @@ void fn_80033744(void) {
                         && lbl_801D3CB0.pObjectStateList[i].n1C == lbl_80187858[k].n4) {
                         fStep = lbl_80187858[k].fC - lbl_801D3CB0.pObjectStateList[i].f4;
                         if (lbl_801D3CB0.pObjectStateList[i].n18 == 2
-                            || lbl_801D3CB0.pObjectStateList[i].n18 == 3) {
+                            || 3 == lbl_801D3CB0.pObjectStateList[i].n18) {
                             if (fStep > 6.0f * fTime) {
                                 fStep = 6.0f * fTime;
                             }
