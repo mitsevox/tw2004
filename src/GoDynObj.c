@@ -560,11 +560,10 @@ void fn_8004731C(u8* pState) {
             pLogoB = NULL;
         }
         if (gPlayers[i].ball.nState != 0 && gPlayers[i].ball.nState != 1) {
-            fn_8001EF34(gPlayers[i].ball.vSpin,
-                        // port: NTSC rate; the frame's spin turn, scaled by the ball's radius squared
+            fn_8001EF34(// port: NTSC rate; the frame's spin turn, scaled by the ball's radius squared
                         60.0f * ((59.94f / 60.0f) * (59.94f * gSession.fFrameTime) * lbl_80283304 /
                                  36.0f),
-                        aSpin);
+                        gPlayers[i].ball.vSpin, aSpin);
             Quat_BuildFromVector(aSpin, aTurn);
             Quat_Multiply(gPlayers[i].vOrient, aTurn, aRot);
             fn_8001E85C(aRot, gPlayers[i].vOrient);
@@ -657,26 +656,26 @@ void fn_8004731C(u8* pState) {
         if (fSize < 1.5f) {
             fGrow = 1.0f / (fSize / 1.5f);
             fGrow = 0.7f * (fGrow - 1.0f) + 1.0f;
-            fn_8000AE28(pBall->m40[0], fGrow, pBall->m40[0]);
-            fn_8000AE28(pBall->m40[1], fGrow, pBall->m40[1]);
-            fn_8000AE28(pBall->m40[2], fGrow, pBall->m40[2]);
+            fn_8000AE28(fGrow, pBall->m40[0], pBall->m40[0]);
+            fn_8000AE28(fGrow, pBall->m40[1], pBall->m40[1]);
+            fn_8000AE28(fGrow, pBall->m40[2], pBall->m40[2]);
             if (pLogoA != NULL) {
-                fn_8000AE28(pLogoA->m40[0], fGrow, pLogoA->m40[0]);
-            }
-            if (pLogoA != NULL) {
-                fn_8000AE28(pLogoA->m40[1], fGrow, pLogoA->m40[1]);
+                fn_8000AE28(fGrow, pLogoA->m40[0], pLogoA->m40[0]);
             }
             if (pLogoA != NULL) {
-                fn_8000AE28(pLogoA->m40[2], fGrow, pLogoA->m40[2]);
+                fn_8000AE28(fGrow, pLogoA->m40[1], pLogoA->m40[1]);
+            }
+            if (pLogoA != NULL) {
+                fn_8000AE28(fGrow, pLogoA->m40[2], pLogoA->m40[2]);
             }
             if (pLogoB != NULL) {
-                fn_8000AE28(pLogoB->m40[0], fGrow, pLogoB->m40[0]);
+                fn_8000AE28(fGrow, pLogoB->m40[0], pLogoB->m40[0]);
             }
             if (pLogoB != NULL) {
-                fn_8000AE28(pLogoB->m40[1], fGrow, pLogoB->m40[1]);
+                fn_8000AE28(fGrow, pLogoB->m40[1], pLogoB->m40[1]);
             }
             if (pLogoB != NULL) {
-                fn_8000AE28(pLogoB->m40[2], fGrow, pLogoB->m40[2]);
+                fn_8000AE28(fGrow, pLogoB->m40[2], pLogoB->m40[2]);
             }
         }
         fn_8000C5A4(pBall->m0);
@@ -724,10 +723,10 @@ f32 fn_8004787C(int nPlayer) {
     fn_800BAD60(pCamera->m5C, &vAbove, &vTop);
     fn_800BAD60(pCamera->m5C, &vBelow, &vBottom);
     if (0.0f != vTop.w) {
-        fn_8000AE28(&vTop.x, 1.0f / vTop.w, &vTop.x);
+        fn_8000AE28(1.0f / vTop.w, &vTop.x, &vTop.x);
     }
     if (0.0f != vBottom.w) {
-        fn_8000AE28(&vBottom.x, 1.0f / vBottom.w, &vBottom.x);
+        fn_8000AE28(1.0f / vBottom.w, &vBottom.x, &vBottom.x);
     }
     vTop.z = 0.0f;
     vTop.x = 256.0f * (1.0f + vTop.x);
@@ -821,7 +820,7 @@ void fn_80047C24(int nPlayer) {
         fn_8000C5A4(pB->pF0->obj.m0);
         Vec_Copy(pB->v20, pB->v30);
         fn_8004858C(pB->v40, pB->fC, lbl_80281DA0->fAA0);
-        fn_8000AE28(pB->v40, lbl_80281DA0->fA98 * (0.5f * Misc_RandFuncf(1) + 0.5f), pB->v40);
+        fn_8000AE28(lbl_80281DA0->fA98 * (0.5f * Misc_RandFuncf(1) + 0.5f), pB->v40, pB->v40);
         pB->v40[3] = pB->v40[1];
         pB->bF5 = 0;
         pB->b0 = 1;
@@ -839,9 +838,9 @@ void fn_80047C24(int nPlayer) {
     }
     pB->f10 += gSession.fFrameTime;
     Wind_Get(vWind);
-    fn_8000AE28(vWind, 0.48888f * 0.3f, vWind);
+    fn_8000AE28(0.48888f * 0.3f, vWind, vWind);
     fn_800486C8(vWind, pB->v40, vMove);
-    fn_8001EF34(vMove, pB->f10, vMove);
+    fn_8001EF34(pB->f10, vMove, vMove);
     vMove[1] = vMove[1] + -4.9f * pB->f10 * pB->f10;
     fn_800486C8(vMove, pB->v20, pB->v30);
     pB->b0 = 1;
@@ -962,7 +961,7 @@ void fn_80048184(int nPlayer) {
             fn_8000C5A4(pA->pF4->obj.m0);
             Vec_Copy(pA->v20, pA->v30);
             fn_8004858C(pA->v40, pA->fC, lbl_80281DA0->fA9C);
-            fn_8000AE28(pA->v40, lbl_80281DA0->fA94 * Misc_RandFuncf(1), pA->v40);
+            fn_8000AE28(lbl_80281DA0->fA94 * Misc_RandFuncf(1), pA->v40, pA->v40);
             pA->v40[3] = pA->v40[1];
             pA->bF9 = 0;
             pA->b0 = 1;
@@ -980,9 +979,9 @@ void fn_80048184(int nPlayer) {
         }
         pA->f10 += gSession.fFrameTime;
         Wind_Get(vWind);
-        fn_8000AE28(vWind, 0.48888f, vWind);
+        fn_8000AE28(0.48888f, vWind, vWind);
         fn_800486C8(vWind, pA->v40, vMove);
-        fn_8001EF34(vMove, pA->f10, vMove);
+        fn_8001EF34(pA->f10, vMove, vMove);
         vMove[1] = vMove[1] + -4.9f * pA->f10 * pA->f10;
         fn_800486C8(vMove, pA->v20, pA->v30);
         pA->b0 = 1;

@@ -291,35 +291,35 @@ void fn_80114540(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     // Pulled toward where it hangs, and by gravity.
     fn_801164D4(vHang, pChain->pLinks->v04, vDiff);
     fLag = fn_80009680(fn_80009744(vDiff));
-    fn_8001EF34(vDiff, fDelta, vDiff);
+    fn_8001EF34(fDelta, vDiff, vDiff);
     fn_801164F8(pChain->pLinks->v24, vDiff, pChain->pLinks->v24);
     pChain->pLinks->v24[1] -= 0.018f * fDelta;
     fSpeed = fn_80009680(fn_80009744(pChain->pLinks->v24));
     if (fSpeed > fMaxSpeed) {
         fSpeed = fMaxSpeed;
         fn_800BAF04(pChain->pLinks->v24, pChain->pLinks->v24);
-        fn_8001EF34(pChain->pLinks->v24, fMaxSpeed, pChain->pLinks->v24);
+        fn_8001EF34(fMaxSpeed, pChain->pLinks->v24, pChain->pLinks->v24);
     }
     if (fLag > fMaxLag) {
         // Too far behind: put it back at the limit, moving toward where it hangs.
         fn_800BAF04(vDiff, vDiff);
-        fn_8001EF34(vDiff, -fMaxLag, vBack);
+        fn_8001EF34(-fMaxLag, vDiff, vBack);
         fn_801164F8(vHang, vBack, pChain->pLinks->v04);
         fn_801164D4(vHang, pChain->pLinks->v04, vDiff);
         fn_800BAF04(vDiff, vDiff);
-        fn_8001EF34(vDiff, fSpeed, pChain->pLinks->v24);
+        fn_8001EF34(fSpeed, vDiff, pChain->pLinks->v24);
     }
     fDrag = -0.069f * fDelta;
     if (fabs(fDrag) < fabs(fSpeed)) {
         fn_800BAF04(pChain->pLinks->v24, vDrag);
-        fn_8001EF34(vDrag, fDrag, vDrag);
+        fn_8001EF34(fDrag, vDrag, vDrag);
         fn_801164F8(pChain->pLinks->v24, vDrag, pChain->pLinks->v24);
         fn_801164F8(pChain->pLinks->v24, pChain->pLinks->v04, pChain->pLinks->v04);
     }
 
     // Drop the part of its offset along the matrix's y axis.
     fn_801164D4(vHang, pChain->pLinks->v04, vDiff);
-    fn_8001EF34(vUp, fn_8000C5FC(vDiff, vUp), vMove);
+    fn_8001EF34(fn_8000C5FC(vDiff, vUp), vUp, vMove);
     fn_801164F8(vMove, pChain->pLinks->v04, pChain->pLinks->v04);
     fn_801164D4(pChain->pLinks->v04, pModel->pMatrices[pChain->nBone][3], vTo);
     fn_800BAF04(vTo, vTo);
@@ -394,7 +394,7 @@ void fn_80114A84(CharModel* pModel, DynChain* pChain, f32 fDelta) {
     fn_801143D0(pModel->pMatrices[pChain->nBone], vUnitZ, vZ);
     fn_800BAF04(vZ, vZ);
     Vec3Copy(pModel->pMatrices[pChain->nBone][3], vTop);
-    fn_8001EF34(vZ, 0.025f, vOff);
+    fn_8001EF34(0.025f, vZ, vOff);
     fn_801164F8(vTop, vOff, vTop);
 
     // Each link's offset to the next bone as the model stands now.
@@ -656,7 +656,7 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         } else {
             fAngle = 0.0f;
         }
-        fn_8000AE28(vAxis1, fAngle, vAxis1);
+        fn_8000AE28(fAngle, vAxis1, vAxis1);
         Quat_BuildFromVector(vAxis1, qTurn);
         fn_8001E85C(pModel->pBones[pChain->pLinks[i].nBone].q0C, pChain->pLinks[i].q44);
         if (lbl_802824F8->an9C[pChain->n10] != 0) {
@@ -701,7 +701,7 @@ void fn_80115348(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         } else {
             fAngle = 0.0f;
         }
-        fn_8000AE28(vAxis2, fAngle, vAxis2);
+        fn_8000AE28(fAngle, vAxis2, vAxis2);
         Quat_BuildFromVector(vAxis2, qTurn);
         if (lbl_802824F8->an9C[pChain->n10] != 0) {
             Quat_Multiply(pModel->pBones[pChain->pLinks[i].nBone].q0C, qTurn, qOut);
@@ -787,7 +787,7 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
         vec4flt_CrossProduct(vBone, vDown, vAxis);
         if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
             fn_800BAF04(vAxis, vAxisN);
-            fn_8000AE28(vAxisN, DEG(lbl_802824F8->f68) * fLevel, vTurn);
+            fn_8000AE28(DEG(lbl_802824F8->f68) * fLevel, vAxisN, vTurn);
             Quat_BuildFromVector(vTurn, qTurn);
             Quat_RotateVector(qTurn, vBone, vNew);
             fn_801164F8(vNew, pModel->pMatrices[pChain->pLinks->nParent][3],
@@ -846,12 +846,12 @@ void fn_80115B2C(CharModel* pModel, DynChain* pChain, f32 fDelta) {
                         if (!(fabsf(vAxis[0]) < 0.001f) || !(fabsf(vAxis[1]) < 0.001f) ||
                             !(fabsf(vAxis[2]) < 0.001f)) {
                             fn_800BAF04(vAxis, vAxis);
-                            fn_8001EF34(vSide, lbl_802824F8->f6C, vSide);
+                            fn_8001EF34(lbl_802824F8->f6C, vSide, vSide);
                             fn_801164F8(vSide, vAxis, vAxis);
                             if (!(fabsf(vAxis[0]) < 0.001f) || !(fabsf(vAxis[1]) < 0.001f) ||
                                 !(fabsf(vAxis[2]) < 0.001f)) {
                                 fn_800BAF04(vAxis, vAxis);
-                                fn_8000AE28(vAxis, fAngle, vAxis);
+                                fn_8000AE28(fAngle, vAxis, vAxis);
                                 Quat_BuildFromVector(vAxis, qTurn);
                                 Quat_RotateVector(qTurn, vDir, vSwung);
                                 fn_801164F8(vSwung, pModel->pMatrices[pChain->pLinks->nParent][3],

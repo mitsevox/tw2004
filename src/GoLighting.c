@@ -103,7 +103,7 @@ void fn_8006E460(LightGroup* pGroup) {
         vScale[1] = 1.0f;
         vScale[2] = 1.0f;
         vScale[3] = 1.0f;
-        fn_8001EF34(vScale, pGroup->v18[0], vScale);
+        fn_8001EF34(pGroup->v18[0], vScale, vScale);
     } else {
         vScale[0] = 1.0f;
         vScale[1] = 1.0f;
@@ -123,7 +123,7 @@ void fn_8006E460(LightGroup* pGroup) {
     if (pGroup != NULL) {
         pGroup->v28[3] = 1.0f;
         fn_8000AE48(pGroup->v28, vScale, vScale);
-        fn_8001EF34(vScale, pGroup->v18[0], vScale);
+        fn_8001EF34(pGroup->v18[0], vScale, vScale);
     }
     fn_8000AE48(lbl_802811D8->aPointColour[0], vScale, lbl_802811D8->aPointColour2[0]);
     for (n = lbl_802811D8->nPoints; n < NUM_POINT_LIGHTS; n++) {

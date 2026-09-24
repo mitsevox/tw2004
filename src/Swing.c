@@ -1698,8 +1698,8 @@ void fn_8005A0FC(int nPlayer) {
         fLen = fn_80009680(fn_8005CC18(v8));
         for (i = 1; i <= 5; i++) {
             f = (f32)i / 5.0f;
-            fn_8001EF34(v38, f, v18);
-            fn_8001EF34(v48, f, v28);
+            fn_8001EF34(f, v38, v18);
+            fn_8001EF34(f, v48, v28);
             Vec_Add(v18, v78, v18);
             Vec_Add(v28, v58, v28);
             Vec_Sub(v18, v28, v8);
@@ -1707,7 +1707,7 @@ void fn_8005A0FC(int nPlayer) {
                 v8[3] = 0.0f;
                 Vec_Normalize(v8, v8);
             }
-            fn_8001EF34(v8, fLen, v8);
+            fn_8001EF34(fLen, v8, v8);
             Vec_Add(v8, v28, v8);
             for (k = 24; k > 0; k--) {
                 Mem_cpy(&pSw->prevClub[k], &pSw->prevClub[k - 1], sizeof(pSw->prevClub[k]));

@@ -672,7 +672,7 @@ void fn_8011F7F8(void) {
         fn_800BAF04(vFlat, vFlat);
     }
     Vec_Copy(pLens->m4[3], vPos);
-    fn_8000AE28(vFlat, lbl_80281900->f3EC, vAhead);
+    fn_8000AE28(lbl_80281900->f3EC, vFlat, vAhead);
     fn_80120268(vAhead, vPos, vCentre);
     if (vCentre[0] < 0.0f) {
         fX = vCentre[0] - (2.5f - (f32)fabs(fn_80120244(vCentre[0], 2.5f)));

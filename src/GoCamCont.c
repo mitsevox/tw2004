@@ -620,7 +620,7 @@ void fn_80063F08(f32* pA, f32* pB, f32* pOut) {
     if (vAxis[0] != 0.0f || vAxis[1] != 0.0f || vAxis[2] != 0.0f) {
         fn_800BAF04(vAxis, vAxis);
     }
-    fn_8001EF34(vAxis, fAngle, vAxis);
+    fn_8001EF34(fAngle, vAxis, vAxis);
     Quat_BuildFromVector(vAxis, qTurn);
     vA[3] = 0.0f;
     Quat_RotateVector(qTurn, vA, pOut);
@@ -646,7 +646,7 @@ void fn_80064108(View* pView) {
     if (pView->script.pShot == NULL) {
         pView->script.fA8 = 0.0f;
     }
-    fn_8001EF34(vDir, pView->script.fA8, vDir);
+    fn_8001EF34(pView->script.fA8, vDir, vDir);
     Quat_BuildFromVector(vDir, qTurn);
     vSide[3] = 0.0f;
     Quat_RotateVector(qTurn, vSide, pView->v20);
@@ -688,11 +688,11 @@ u8 fn_8006434C(void* pCamera, f32* pPos, f32* pX, f32* pY, f32* pZ) {
         bInFront = 0;
     }
     if (v[3] < -0.0001f || v[3] > 0.0001f) {
-        fn_8000AE28(v, 1.0f / v[3], v);
+        fn_8000AE28(1.0f / v[3], v, v);
     } else if (v[3] < 0.0f) {
-        fn_8000AE28(v, -10000.0f, v);
+        fn_8000AE28(-10000.0f, v, v);
     } else {
-        fn_8000AE28(v, 10000.0f, v);
+        fn_8000AE28(10000.0f, v, v);
     }
     if (pX != NULL) {
         *pX = 0.5f * (1.0f + v[0]);

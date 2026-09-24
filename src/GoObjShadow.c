@@ -66,7 +66,7 @@ void fn_80093DB8(Ball* pBall, int nPlayer) {
         vAway[2] = pBall->vPos[2] - gSession.f5B44;
         vAway[3] = 1.0f;
         fn_800BAF04(vAway, vAway);
-        fn_8001EF34(vAway, lbl_802813A0, vAway);
+        fn_8001EF34(lbl_802813A0, vAway, vAway);
         lbl_801D97B0[0] = vAway[0] + (pBall->vPos[0] - lbl_8028139C);
         lbl_801D97B0[1] = 0.005f + fGround;
         lbl_801D97B0[2] = vAway[2] + (pBall->vPos[2] - lbl_8028139C);

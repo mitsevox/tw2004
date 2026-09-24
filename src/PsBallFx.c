@@ -15,6 +15,9 @@ void fn_800352BC(void);
 void PsBallFx_TriggerTrail(Ball* pBall, int nPlayer);   // below; Ball.c declares it too
 void fn_800A34C0(int nTrail, Ball* pBall, f32* pDir);     // below
 
+PsBallFxState lbl_801F1708;                     // .bss
+PsBallFxState* lbl_80281408 = &lbl_801F1708;    // .sdata
+
 // Set up the mesh and its buffers (50 quads; the second buffer gets each quad's texture corners),
 // clear the emitters and find the "sandtrl" texture.
 void PsBallFx_InitModule(void) {
@@ -208,33 +211,6 @@ void fn_800A3348(Ball* pBall, int nPlayer) {
     fn_80046C34(pBall->vPos, nPlayer);
 }
 
-// A trail behind a ball moving over sand (surface class 6), along its flat direction; not in
-// split screen.
-void PsBallFx_TriggerTrail(Ball* pBall, int nPlayer) {
-    f32 vPos[4];
-    f32 vNormal[4];
-    f32 vDir[4];
-    SurfaceType* pSurface;
-
-    if (gSession.nSplitScreen) {
-        return;
-    }
-    vPos[0] = pBall->vPos[0];
-    vPos[1] = pBall->vPos[1];
-    vPos[2] = pBall->vPos[2];
-    vPos[3] = 1.0f;
-    if (TER_NO_GROUND == Ter_GetSupportingGroundData(fn_8000C594(), vPos, &pSurface, vNormal) ||
-        0.375f != pSurface->f1C || (int)pSurface->nClass != 6) {    // EA compares the class signed here
-        return;
-    }
-    Vec_Copy(gPlayers[nPlayer].ball.vVel, vDir);
-    vDir[1] = 0.0f;
-    if (vDir[0] != 0.0f || vDir[2] != 0.0f) {
-        fn_800BAF04(vDir, vDir);
-        fn_800A34C0(0, pBall, vDir);
-    }
-}
-
 // Extend sand trail nTrail to the ball once it has moved on (squared distance 0.001): a pair of
 // vertices 0.01 either side of the ball across pDir, in a ring of 200, and a strip of indices to them
 // in a ring of 600. A pair far from the last one (squared 0.1) or a turn of more than 90 degrees first
@@ -337,6 +313,33 @@ void fn_800A34C0(int nTrail, Ball* pBall, f32* pDir) {
     }
 }
 
+// A trail behind a ball moving over sand (surface class 6), along its flat direction; not in
+// split screen.
+void PsBallFx_TriggerTrail(Ball* pBall, int nPlayer) {
+    f32 vPos[4];
+    f32 vNormal[4];
+    f32 vDir[4];
+    SurfaceType* pSurface;
+
+    if (gSession.nSplitScreen) {
+        return;
+    }
+    vPos[0] = pBall->vPos[0];
+    vPos[1] = pBall->vPos[1];
+    vPos[2] = pBall->vPos[2];
+    vPos[3] = 1.0f;
+    if (TER_NO_GROUND == Ter_GetSupportingGroundData(fn_8000C594(), vPos, &pSurface, vNormal) ||
+        0.375f != pSurface->f1C || (int)pSurface->nClass != 6) {    // EA compares the class signed here
+        return;
+    }
+    Vec_Copy(gPlayers[nPlayer].ball.vVel, vDir);
+    vDir[1] = 0.0f;
+    if (vDir[0] != 0.0f || vDir[2] != 0.0f) {
+        fn_800BAF04(vDir, vDir);
+        fn_800A34C0(0, pBall, vDir);
+    }
+}
+
 // Keep each view's emitter from fn_800A2FFC at the ball of the player that view follows, then
 // draw the sand trail: the indices from n40 up to n38 in the ring of 600 (two draws when they
 // wrap), once it has more than two vertices.
@@ -344,8 +347,9 @@ void fn_800A3A84(void) {
     DynRenderDrawIn aDraws[2];
     DynRenderFill fill;
     PsEmitter* pEmitter;
-    s32 nFirst;
     s32 nEnd;
+    s32 nFirst;
+    DynRenderDrawIn* pDraw;
 
     pEmitter = lbl_80281408->ap74[0];
     if (pEmitter != NULL && (pEmitter->params.u58 & 0x20000)) {
@@ -373,19 +377,20 @@ void fn_800A3A84(void) {
         fn_80012EF8();
         nFirst = lbl_80281408->an40[0];
         nEnd = lbl_80281408->an38[0];
+        pDraw = aDraws;
         if (nFirst < nEnd) {
             fill.nCount = 1;
-            aDraws[0].nPrim = 0;
-            aDraws[0].nStart = nFirst;
-            aDraws[0].nCount = nEnd - nFirst;
+            pDraw[0].nPrim = 0;
+            pDraw[0].nStart = nFirst;
+            pDraw[0].nCount = nEnd - nFirst;
         } else {
-            aDraws[0].nPrim = 0;
             fill.nCount = 2;
-            aDraws[0].nStart = nFirst;
-            aDraws[0].nCount = 600 - nFirst;
-            aDraws[1].nPrim = 0;
-            aDraws[1].nStart = 0;
-            aDraws[1].nCount = nEnd;
+            pDraw[0].nPrim = 0;
+            pDraw[0].nStart = nFirst;
+            pDraw[0].nCount = 600 - nFirst;
+            pDraw[1].nPrim = 0;
+            pDraw[1].nStart = 0;
+            pDraw[1].nCount = nEnd;
         }
         fill.pDraws = aDraws;
         fill.nVerts = lbl_80281408->an44[0];
@@ -406,7 +411,7 @@ void fn_800A3CB0(f32* pPos, int nPlayer) {
     int nView = gPlayers[nPlayer].nView[0];
 
     Wind_Get(vWind);
-    fn_8000AE28(vWind, 0.1f, vWind);
+    fn_8000AE28(0.1f, vWind, vWind);
     Vec3Copy(pPos, lbl_8018CA98[15].v80);
     Vec3Copy(vWind, lbl_8018CA98[15].vA0);
     lbl_80281408->apEmitter[nView] = fn_80099758(&lbl_8018CA98[15]);

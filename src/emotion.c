@@ -561,8 +561,8 @@ void fn_8006BB5C(int nPlayer) {
         if (fClosest < 9.3f && fClosest > 3.5f / 36.0f && pBall->fSpeed > 0.0f) {
             bNoBreak = pEmotion->nC == 0 && pEmotion->n10 >= 1;
             pEmotion->b1C = 1;
-            fn_8001EF34(vToPin, 1.0f / fClosest, vToPin);
-            fn_8001EF34(pBall->vVel, 1.0f / ((12.0f * (3.0f * pBall->fSpeed)) / 60.0f), vVel);
+            fn_8001EF34(1.0f / fClosest, vToPin, vToPin);
+            fn_8001EF34(1.0f / ((12.0f * (3.0f * pBall->fSpeed)) / 60.0f), pBall->vVel, vVel);
             if (vToPin[0] * vVel[0] + vToPin[2] * vVel[2] < 0.866f && !bNoBreak) {
                 pEmotion->b1D = 1;
                 return;

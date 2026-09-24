@@ -318,8 +318,8 @@ int fn_8000A818(f32 (*pA)[4], f32 (*pB)[4]) {
         }
         fPivInv = 1.0f / pA[nCol][nCol];
         pA[nCol][nCol] = 1.0f;
-        fn_8000AE28(pA[nCol], fPivInv, pA[nCol]);
-        fn_8000AE28(pB[nCol], fPivInv, pB[nCol]);
+        fn_8000AE28(fPivInv, pA[nCol], pA[nCol]);
+        fn_8000AE28(fPivInv, pB[nCol], pB[nCol]);
         for (j = 0; j < 4; j++) {
             if (j != nCol) {
                 fDum = -pA[j][nCol];
@@ -468,7 +468,7 @@ void fn_8000AE0C(f32* pSrc, f32* pDst) {
 
 // Scales a 4-float vector into pOut.
 #ifdef __MWERKS__
-asm void fn_8000AE28(register f32* pIn, register f32 fScale, register f32* pOut) {
+asm void fn_8000AE28(register f32 fScale, register f32* pIn, register f32* pOut) {
     nofralloc
     fmr      f2, fScale
     psq_l    f0, 0(pIn), 0, 0
@@ -481,7 +481,7 @@ asm void fn_8000AE28(register f32* pIn, register f32 fScale, register f32* pOut)
 }
 #else
 // port: untested, the plain-C version for compilers without paired singles.
-void fn_8000AE28(f32* pIn, f32 fScale, f32* pOut) {
+void fn_8000AE28(f32 fScale, f32* pIn, f32* pOut) {
     pOut[0] = pIn[0] * fScale;
     pOut[1] = pIn[1] * fScale;
     pOut[2] = pIn[2] * fScale;
