@@ -53,6 +53,11 @@ int lbl_80281848 = 0;
 u8 gbStatsDirty = 1;
 u8 gbScoresDirty = 1;
 
+PgaPro lbl_8024B9CC[PGA_NUM_PROS];
+PgaStatRanking lbl_80226870[GM_PGA_STAT_COUNT];
+PgaEntrant lbl_80224070[PGA_MAX_ENTRANTS];
+PgaScoreRanking lbl_80223C70;
+
 PgaEntrantMC* GetEntrantMCPtr(int nPlayer, int nEntrant) {
     return &gpSaveData[nPlayer].tour.field.aEntrant[nEntrant];
 }
