@@ -13,6 +13,8 @@ void fn_800AFEF4(u16 nVoice, s16 nVolume, int a, int b); // startUp.c
 void fn_800B0034(u16 nVoice, u8 nPan, int nMode);       // startUp.c
 void fn_800B00A4(u16 nVoice, u32 u, int a);             // startUp.c
 void fn_800B01B4(u16 nVoice, u8 bA, u8 bB);             // startUp.c
+u8   fn_800AFB98(u16 nVoice);                           // startUp.c
+void fn_800B0430(void);                                 // startUp.c
 
 void fn_800AC330(void);
 u8   fn_800AC6B0(AudVoiceRequest* pRequest, s16* pPriority);
@@ -82,7 +84,7 @@ void fn_800AC6D0(AudVoice* pVoice, AudVoiceParams* pParams, u8 nVolume, f32 fPit
     }
     pVoice->uC = fn_800ACEC4(uRate, fPitch);
     pVoice->n14 = nVolume;
-    pVoice->bA_0 = 1;
+    pVoice->flags.b.bA_0 = 1;
     fn_800AFDC8(nHwVoice, pTone->pHeader);
     // EA bug: hands over the address of the pointer, so the voice's envelope is the pointer's bits;
     // the tone's own envelope (changed above, for every voice that plays it) is never used.
@@ -104,7 +106,7 @@ void fn_800AC7DC(AudVoice* pVoice, u32 uLen, u32 nRate, u8 bLoud) {
     env.nRelease = bLoud ? 0x10 : 0x80;
     pVoice->uC = nRate;
     pVoice->n14 = 0x7F;
-    pVoice->bA_0 = 1;
+    pVoice->flags.b.bA_0 = 1;
     fn_80005AE8(&hdr, 0, sizeof(hdr));
     hdr.uC = 1;
     // the buffer's start and end in 4-bit units, past the first frame's header
@@ -128,14 +130,14 @@ void fn_800AC91C(AudVoice* pVoice, AudVoiceParams* pParams) {
     int bPlaying;
     u8 bReverb;
 
-    if (!pVoice->bA_5) {
+    if (!pVoice->flags.b.bA_5) {
         uRate = pVoice->uC;
-        if (pVoice->bA_0) {
-            bReverb = !pVoice->bA_6;
+        if (pVoice->flags.b.bA_0) {
+            bReverb = !pVoice->flags.b.bA_6;
             fn_800AFBD8(nHwVoice, 1);
             fn_800B01B4(nHwVoice, bReverb, bReverb);
             bPlaying = 0;
-            pVoice->bA_0 = 0;
+            pVoice->flags.b.bA_0 = 0;
             bSetRate = 1;
         } else {
             bPlaying = 1;
@@ -155,13 +157,13 @@ void fn_800AC91C(AudVoice* pVoice, AudVoiceParams* pParams) {
             fn_800B00A4(nHwVoice, uRate, bPlaying);
         }
     } else {
-        pVoice->bA_5 = 0;
+        pVoice->flags.b.bA_5 = 0;
     }
 }
 
 // Pauses or resumes a voice's hardware voice.
 void fn_800ACA5C(AudVoice* pVoice, u8 bPause) {
-    if (pVoice != NULL && !pVoice->bB_6) {
+    if (pVoice != NULL && !pVoice->flags.b.bB_6) {
         fn_800AFCBC(pVoice->nHwVoice, bPause);
     }
 }
@@ -169,14 +171,14 @@ void fn_800ACA5C(AudVoice* pVoice, u8 bPause) {
 // Lets a voice end: its hardware voice is stopped and it moves to list 0, where fn_800ACB98 frees
 // it once the hardware voice is done.
 void fn_800ACA94(AudVoice* pVoice) {
-    if (!pVoice->bStopped) {
+    if (!pVoice->flags.b.bStopped) {
         fn_800AFBD8(pVoice->nHwVoice, 0);
         if (pVoice->n10 > 0) {
             fn_800ADF6C(&lbl_801F19B8->aLists[pVoice->n10], &pVoice->link);
             fn_800ADE88(&lbl_801F19B8->aLists[0], &pVoice->link);
             pVoice->n10 = 0;
         }
-        pVoice->bStopped = 1;
+        pVoice->flags.b.bStopped = 1;
     }
 }
 
@@ -186,13 +188,56 @@ void fn_800ACB28(AudVoice* pVoice) {
     pVoice->pfnCallback = NULL;
     pVoice->pUser = NULL;
     pVoice->nIndex = 0;
-    if (pVoice->bA_4) {
+    if (pVoice->flags.b.bA_4) {
         fn_800ACA5C(pVoice, 1);
         if (pVoice->uAram != 0) {
             fn_800B0748(pVoice->uAram);
             pVoice->uAram = 0;
             pVoice->uPlayPos = 0;
         }
+    }
+}
+
+// Once a frame: frees the ended voices whose hardware voice is done (telling their track), and counts
+// the voices in use.
+void fn_800ACB98(void) {
+    AudVoicePool* pPool = lbl_801F19B8;
+    AudVoicePool* pEnd = lbl_801F19B8 + 1;
+    AudVoice* pVoice;
+    AudVoice* pNext;
+
+    lbl_802820B0 = AUD_NUM_VOICES;
+    for (; pPool < pEnd; pPool++) {
+        for (pVoice = (AudVoice*)pPool->aLists[0].pHead; pVoice != NULL; pVoice = pNext) {
+            pNext = (AudVoice*)pVoice->link.pNext;
+            if (pVoice->n15 <= 0) {
+                if (fn_800AFB98(pVoice->nHwVoice)) {
+                    fn_800ADF6C(&pPool->aLists[0], &pVoice->link);
+                    fn_800AE1DC(&pPool->free, pVoice);
+                    // port: EA passes arguments fn_800B0430 (empty) ignores
+                    ((void (*)(u16, int))fn_800B0430)(pVoice->nHwVoice, pVoice->flags.b.bA_1 != 0);
+                    if (pVoice->flags.b.bA_4) {
+                        pVoice->flags.b.bHalf = 0;
+                        if (pVoice->uAram != 0) {
+                            fn_800B0748(pVoice->uAram);
+                            pVoice->uAram = 0;
+                            pVoice->uPlayPos = 0;
+                        }
+                    }
+                    pVoice->n10 = -1;
+                    pVoice->flags.n = 0;
+                    if (pVoice->pfnCallback != NULL) {
+                        pVoice->pfnCallback(pVoice, 0);
+                        pVoice->pfnCallback = NULL;
+                        pVoice->pUser = NULL;
+                        pVoice->nIndex = 0;
+                    }
+                }
+            } else {
+                pVoice->n15--;
+            }
+        }
+        lbl_802820B0 -= (u8)pPool->free.nFree;
     }
 }
 
@@ -214,8 +259,8 @@ void fn_800ACCF4(u8 bPause, u8 bStreams) {
             for (; pVoice < pVoiceEnd; pVoice++) {
                 if (bPause) {
                     fn_800AFCBC(pVoice->nHwVoice, 1);
-                } else if (bStreams && pVoice->bA_4) {
-                    pVoice->bB_6 = 1;
+                } else if (bStreams && pVoice->flags.b.bA_4) {
+                    pVoice->flags.b.bB_6 = 1;
                 } else {
                     fn_800AFCBC(pVoice->nHwVoice, 0);
                 }
@@ -225,8 +270,8 @@ void fn_800ACCF4(u8 bPause, u8 bStreams) {
             for (pVoiceEnd--; pPool->aVoices <= pVoiceEnd; pVoiceEnd--) {
                 if (bPause) {
                     fn_800AFCBC(pVoiceEnd->nHwVoice, 1);
-                } else if (bStreams && pVoiceEnd->bA_4) {
-                    pVoiceEnd->bB_6 = 1;
+                } else if (bStreams && pVoiceEnd->flags.b.bA_4) {
+                    pVoiceEnd->flags.b.bB_6 = 1;
                 } else {
                     fn_800AFCBC(pVoiceEnd->nHwVoice, 0);
                 }

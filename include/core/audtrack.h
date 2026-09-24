@@ -11,16 +11,21 @@
 typedef struct AudVoice {
     UListNode link;             // 0x0    in one of its pool's lists (AudVoicePool.aLists)
     u16  nHwVoice;              // 0x8    the startUp.c voice it plays on
-    u8   bHalf : 1;             // 0xA    which half of its ARAM buffer the next stream block fills
-    u8   bA_6 : 1;              //        no reverb: fn_800AC91C starts it with aux A off
-    u8   bA_5 : 1;              //        fn_800AC91C skips its next settings (and clears it)
-    u8   bA_4 : 1;              //        it owns uAram, given back when it stops (fn_800ACB28)
-    u8   unkA_3 : 2;
-    u8   bA_1 : 1;              //        fn_800AA5A0 keeps the channel's event when it is set
-    u8   bA_0 : 1;              //        set up (fn_800AC6D0, fn_800AC7DC), started by fn_800AC91C
-    u8   bStopped : 1;          // 0xB    fn_800ACA94 has stopped it and taken it off its list
-    u8   bB_6 : 1;              //        paused; Stm_Tick resumes it once the drive is fine
-    u8   unkB : 6;
+    union {
+        struct {
+            u8 bHalf : 1;       // 0xA    which half of its ARAM buffer the next stream block fills
+            u8 bA_6 : 1;        //        no reverb: fn_800AC91C starts it with aux A off
+            u8 bA_5 : 1;        //        fn_800AC91C skips its next settings (and clears it)
+            u8 bA_4 : 1;        //        it owns uAram, given back when it stops (fn_800ACB28)
+            u8 unkA_3 : 2;
+            u8 bA_1 : 1;        //        fn_800AA5A0 keeps the channel's event when it is set
+            u8 bA_0 : 1;        //        set up (fn_800AC6D0, fn_800AC7DC), started by fn_800AC91C
+            u8 bStopped : 1;    // 0xB    fn_800ACA94 has stopped it and taken it off its list
+            u8 bB_6 : 1;        //        paused; Stm_Tick resumes it once the drive is fine
+            u8 unkB : 6;
+        } b;
+        u16 n;                  //        cleared as a whole when the voice is freed (fn_800ACB98)
+    } flags;                    // 0xA
     u32  uC;                    // 0xC
     s32  n10;                   // 0x10   the request's n4, and the pool list it is on: a voice with
                                 //        a lower one can be stolen
@@ -49,6 +54,7 @@ typedef struct AudVoicePool {
 LAYOUT_ASSERT(AudVoicePool, 0xCAC);
 
 extern AudVoicePool lbl_801F19B8[1];
+extern u8  lbl_802820B0;                // the voices in use, counted by fn_800ACB98
 extern s32 lbl_802820B4;                // flipped by each pause: the order fn_800ACCF4 goes through
 
 // Settings for a voice; the flags say which fields are set. fn_800AC91C sets them on a voice;
