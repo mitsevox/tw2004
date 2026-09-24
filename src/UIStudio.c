@@ -62,6 +62,87 @@ void fn_801686F8(UIStudio* pStudio, u8 bOn, u16 uGroup, u16 uScreen) {
     }
 }
 
+// Switches (bOn) the node with info pInfo in a screen on or off and runs its scripts for event
+// -6 (on) or -7 (off), and those of the node that links to it by index. Switching one on first
+// switches off the one fn_8016B6BC finds set. The scripts get nId and pInfo's place in the
+// list p (a count, a word, then file offsets; -1 when not there).
+void fn_80168918(UIStudio* pStudio, u8 bOn, s16 nId, UISNodeInfo* pInfo, s32* p, u16 uScreen, u16 uGroup) {
+    s32 aArgs[2];
+    UISScreen* pScreen;
+    UISScreenFile* pFile;
+    UISNode* pNode;
+    UISNode* pLinkNode;
+    UISNode* pCheck;
+    UISNodeInfo* pOther;
+    u8* pScript;
+    u16 nIndex;
+    u32 nNode;
+    u32 n;
+    s32 i;
+    s32 nSlot;
+    s32 nEvent;
+
+    nSlot = -1;
+    nIndex = fn_8016C6C4(pStudio, uGroup, uScreen);
+    pNode = NULL;
+    if (nIndex >= pStudio->nScreens) {
+        return;
+    }
+    pScreen = &pStudio->pScreens[nIndex];
+    nEvent = (bOn == 1) - 7;
+    pFile = pScreen->pData;
+    nNode = pFile->nNodes;
+    while (nNode-- != 0) {
+        pCheck = &pFile->pNodes[nNode];
+        if (pCheck->pInfo == pInfo) {
+            pNode = pCheck;
+            break;
+        }
+    }
+    pLinkNode = NULL;
+    n = pFile->nNodes;
+    while (n-- != 0) {
+        pCheck = &pFile->pNodes[n];
+        for (i = 0; i < (s32)pCheck->nHandlers; i++) {
+            if (!(pCheck->pHandlers[i].uFlags & 0xC000)
+                && (pCheck->pHandlers[i].uFlags & 0x2FFF) == (s16)nNode) {
+                pLinkNode = pCheck;
+                break;
+            }
+        }
+    }
+    if (bOn == 1) {
+        pOther = fn_8016B6BC(pScreen, pInfo);
+        if (pOther != NULL) {
+            fn_80168918(pStudio, 0, 0, pOther, NULL, uScreen, uGroup);
+        }
+    }
+    // EA bug: pNode is NULL when no node of the screen has pInfo; nothing checks it.
+    pScript = fn_8016C674(pNode, nEvent);
+    pNode->pInfo->u4 = bOn;
+    if (p != NULL) {
+        nSlot = p[0];
+        while (nSlot-- != 0) {
+            if (pInfo == (UISNodeInfo*)((u8*)pScreen->pData + p[nSlot + 2])) {
+                break;
+            }
+        }
+    }
+    aArgs[0] = nId;
+    aArgs[1] = nSlot;
+    if (pScript != NULL) {
+        fn_8016C270(pStudio, pScreen, pNode->pInfo, &pStudio->stack64, pScript, 2, aArgs, 0, NULL, 0, 0,
+                    NULL);
+    }
+    if (pLinkNode != NULL) {
+        pScript = fn_8016C614(pLinkNode, nNode, nEvent);
+        if (pScript != NULL) {
+            fn_8016C270(pStudio, pScreen, pLinkNode->pInfo, &pStudio->stack64, pScript, 2, aArgs, 0, NULL, 0,
+                        0, NULL);
+        }
+    }
+}
+
 // Runs the queued events, then sends event uEvent to every screen.
 void fn_80168B80(UIStudio* pStudio, u32 uEvent) {
     s32 i;
