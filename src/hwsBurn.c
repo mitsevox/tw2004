@@ -224,11 +224,8 @@ void fn_80110D10(HwsBurn* pBurn, int nPart, int nVariant) {
     SkinVariant* pOther;
     s32 nOption;
     s32 nFirst;
-    s32 nChosen;
     int nLinked;
-    int j;
     s32 nFirstLink;
-    s32 nFirstVariant;
 
     nOption = pBurn->aOption[nPart];
     nFirst = pBurn->pDesc->pVariants[nVariant].nFirstOption;
@@ -242,6 +239,10 @@ void fn_80110D10(HwsBurn* pBurn, int nPart, int nVariant) {
         pLink = &pBurn->pDesc->pLinks[nFirstLink + i];
         nLinked = fn_800CF104(pBurn->pDesc, pLink->uPart);
         if (nLinked != -1) {
+            int j;
+            s32 nFirstVariant;
+            s32 nChosen;
+
             nOption = pLink->nOption;
             nChosen = pBurn->aVariant[nLinked];
             nFirstVariant = pBurn->pDesc->pParts[nLinked].nFirst;

@@ -42,14 +42,21 @@ def write(p, text):
 
 
 def load(tsv):
-    rows = []
+    """(line, address, old, new). A file with a header row naming `previous_name` and `name` columns
+    (config/GW4E69/name_sources.tsv, the repo's rename log) is read by those columns."""
+    rows, cols = [], None
     for n, l in enumerate(pathlib.Path(tsv).read_text(encoding='utf-8-sig').splitlines(), 1):
-        if not l.strip() or l.lstrip().startswith('#') or l.split('\t')[0].strip().lower() == 'address':
+        f = [x.strip() for x in l.split('\t')]
+        if not l.strip() or l.lstrip().startswith('#'):
             continue
-        f = l.split('\t')
-        if len(f) < 3:
+        if f[0].lower() == 'address':
+            if 'previous_name' in f and 'name' in f:
+                cols = (f.index('previous_name'), f.index('name'))
+            continue
+        old, new = (f[cols[0]], f[cols[1]]) if cols else (f[1] if len(f) > 1 else '', f[2] if len(f) > 2 else '')
+        if not old or not new:
             sys.exit('%s:%d: need address<TAB>current<TAB>new' % (tsv, n))
-        rows.append((n, int(f[0].strip().removeprefix('0x'), 16), f[1].strip(), f[2].strip()))
+        rows.append((n, int(f[0].removeprefix('0x'), 16), old, new))
     return rows
 
 
@@ -59,11 +66,18 @@ def main():
     rows = load(sys.argv[1])
     dry, refs_only = '--dry-run' in sys.argv, '--refs-only' in sys.argv
     sym_lines = read(SYMS).split('\n')
-    sym_names = {}
+    sym_names, fn_at = {}, {}
     for i, l in enumerate(sym_lines):
-        m = re.match(r'^(\S+) = \.\w+:0x([0-9A-Fa-f]+);', l)
+        m = re.match(r'^(\S+) = \.(\w+):0x([0-9A-Fa-f]+);', l)
         if m:
-            sym_names.setdefault(m.group(1), []).append((i, int(m.group(2), 16)))
+            sym_names.setdefault(m.group(1), []).append((i, int(m.group(3), 16)))
+            if m.group(2) == 'text':
+                fn_at[int(m.group(3), 16)] = m.group(1)
+    if refs_only:
+        # every old name goes straight to the name the address has NOW (a name renamed twice
+        # leaves two log rows: A -> B, B -> C; both A and B become C)
+        rows = [(n, a, old, fn_at.get(a, new)) for n, a, old, new in rows if old != fn_at.get(a, new)]
+        rows = list({old: (n, a, old, new) for n, a, old, new in rows}.values())
     files = {p: read(p) for p in source_files()}
     words = set()
     for t in files.values():
@@ -74,7 +88,7 @@ def main():
     errors, olds, news = [], {}, {}
     for n, addr, old, new in rows:
         where = 'line %d (%s -> %s)' % (n, old, new)
-        if old in olds or new in news:
+        if old in olds or (new in news and not refs_only):
             errors.append('%s: %s or %s appears on two lines' % (where, old, new))
         olds[old], news[new] = n, n
         if refs_only:
