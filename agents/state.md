@@ -12,7 +12,12 @@ except UISScreen until local/uisscreen-deferred is merged (the whole UIS library
 `-inline auto,deferred`: the flag alone changes no score; the gain needs reversed source order +
 auto_inline pragmas; next a lane for UISApi/UISEvent/UIStudio). Merged from the PC: target,
 streaming (3 files), goterrain (+4 exact; inline renamed fn_80031E58_Read, no name evidence).
-Waiting: the PC's split survey (agent/map-05), then size the next round.
+Also merged: holecontests-link (GameHoleContests linked), hlaudmovie (+1), uisscreen-deferred,
+split-finder (LLTime.c, Code800B90F4.c linked; survey in agents/findings/split-survey.tsv).
+Strong split leads from the survey, all free now: Swing (3 state files, ~23 KB exact), Golfer
+(Caddie part ~4.8 KB), Ball (Wind.c), goballfx (GoLightFogEnv); medium: Golfer club part, Glows,
+hlaudmovie. Next round proposed: a split lane on those + a lane reworking UISApi/UISEvent/UIStudio
+for the deferred build.
 local/target-link and local/streaming-link (streammanagerhole split in 3, all linked, +8 % data)
 are merged; the owner deletes those branches (the session cannot). The PC's split finder
 (agent/map-05, to ~18:00) surveys unlinked units for EA file boundaries: no cloud splits until it
