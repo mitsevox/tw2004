@@ -37,7 +37,8 @@ typedef struct Camera {
     /* 0x05C */ float m5C[4][4];     // camera space to the screen (GoDynObj.c fn_8004787C divides by w)
     /* 0x09C */ char pad9C[0x80];
     /* 0x11C */ float viewMtx[4][4];
-    /* 0x15C */ char pad15C[0x98];
+    /* 0x15C */ float m15C[4][4];    // GoShaderObject_Rain_Gc.c fn_800B4FA4 builds its position matrix from it
+    /* 0x19C */ char pad19C[0x58];
     /* 0x1F4 */ float unk1F4;
     /* 0x1F8 */ float unk1F8;
     /* 0x1FC */ char pad1FC[0x8];
