@@ -8,6 +8,7 @@
 #include "sitdev.h"
 #include "game.h"
 #include "game/modes/pgatoursim.h"
+#include "game/modes/pgatour.h"
 
 // Defined here, last address first (CodeWarrior lays out .sbss in reverse).
 u8    lbl_80282200;     // 0x80282200  the watched ball has reached surface 105
@@ -337,6 +338,223 @@ void fn_800BD77C(u16 uSound);
 void fn_800BD7D0(u8 nMusic);
 void fn_800BD7E8(u16 uSound);
 void fn_800BD868(int nSound, int a);
+
+// Whether n is a row of gSurfaceTypes (our name; EA's code has it inlined).
+static inline int SurfaceType_IsValid(int n) {
+    int bValid = 0;
+    if (n >= 0 && n < NUM_SURFACE_TYPES) {
+        bValid = 1;
+    }
+    return bValid;
+}
+
+// Fill in the values the scripts test for the player, for a situation of kind nKind: each kind
+// sets its own values and falls through to the ones every later group needs (the round and the
+// golfer, then the shot so far, then the ball and the hole).
+void FE_GolferAttributes(int nPlayer, u8 nKind) {
+    Player* pPlayer = &gPlayers[nPlayer];
+    Ball* pBall = &pPlayer->ball;
+    Ball* pBefore = &pPlayer->ballBefore;
+    int nSurface = pBall->nSurface;
+    int nBeforeSurface = pBefore->nSurface;
+    u16* pValues = lbl_802811B8->aValue;
+    u32* pSetBits = lbl_802811B8->aSetBits;
+    u16 nRound = fn_800BCD5C();
+    s32 nValue;
+    int nMode;
+    int nHole;
+    int nDeg;
+    f32 fAngle;
+
+    lbl_802811B8->aSetBits[0] = 0;
+    lbl_802811B8->aSetBits[1] = 0;
+    lbl_802811B8->aSetBits[2] = 0;
+    lbl_802811B8->abPlayed[0] = 0;
+    lbl_802811B8->abPlayed[1] = 0;
+    lbl_802811B8->abPlayed[2] = 0;
+    lbl_802811B8->abPlayed[3] = 0;
+    lbl_802811B8->abPlayed[4] = 0;
+    lbl_802811B8->abPlayed[5] = 0;
+    lbl_802811B8->abPlayed[6] = 0;
+    lbl_802811B8->abPlayed[7] = 0;
+    lbl_802811B8->abPlayed[8] = 0;
+    lbl_802811B8->abPlayed[9] = 0;
+    lbl_802811B8->abPlayed[10] = 0;
+    lbl_802811B8->abPlayed[11] = 0;
+    lbl_802811B8->abPlayed[12] = 0;
+    lbl_802811B8->abPlayed[13] = 0;
+    if (nKind == 25) {
+        fn_80067B1C(pValues, 5, pPlayer->nClub, pSetBits);
+    }
+    switch (nKind) {
+    case 0:
+    case 1:
+    case 12:
+    case 13:
+    case 22:
+    case 23:
+    case 24:
+    case 26:
+    case 30:
+        nMode = Game_GetMode();
+        fn_80067B1C(pValues, 1, nMode, pSetBits);
+        fn_80067B1C(pValues, 54, fn_800BB3F8(nMode), pSetBits);
+        fn_80067B1C(pValues, 60, fn_800E1734(), pSetBits);
+        fn_80067B1C(pValues, 0, fn_80015464() + 1, pSetBits);
+        fn_80067B1C(pValues, 30, Game_GetCourse(), pSetBits);
+        fn_80067B1C(pValues, 83, GameModeDriverPGATour_GetCurrentEventID() + 1, pSetBits);
+        fn_80067B1C(pValues, 62, nRound + 1, pSetBits);
+        fn_80067B1C(pValues, 7, fn_800D2B08(), pSetBits);
+        fn_80067B1C(pValues, 29, fn_800BCD50(), pSetBits);
+        fn_80067B1C(pValues, 28, fn_8008AB4C(), pSetBits);
+        fn_80067B1C(pValues, 31, fn_800D0AF4(), pSetBits);
+        fn_80067B1C(pValues, 65, Game_CurrentPinSet(), pSetBits);
+        fn_80067B1C(pValues, 85, 0, pSetBits);
+        fn_80067B1C(pValues, 88, gSession.options.n20, pSetBits);
+        fn_80067B1C(pValues, 89, gSession.options.n18, pSetBits);
+        fn_80067B1C(pValues, 90, gSession.options.n1C, pSetBits);
+        fn_80067B1C(pValues, 91, gSession.nTeeSet[nPlayer], pSetBits);
+        fn_80067B1C(pValues, 92, gSession.options.nWind, pSetBits);
+    case 2:
+        nValue = nRound != 0 ? pPlayer->nRoundScore[nRound - 1] : 0;
+        fn_80067B1C(pValues, 14, nValue, pSetBits);
+        fn_80067B1C(pValues, 33, fn_800D07D8(nPlayer, 0), pSetBits);
+        fn_80067B1C(pValues, 34, fn_800D089C(nPlayer, 0), pSetBits);
+        fn_80067B1C(pValues, 35, fn_800D10B0(nPlayer), pSetBits);
+        fn_80067B1C(pValues, 36, fn_800D1250(nPlayer), pSetBits);
+        fn_80067B1C(pValues, 39, fn_800D0620(nPlayer, 0, 0), pSetBits);
+        fn_80067B1C(pValues, 40, fn_800D06FC(nPlayer, 0, 0), pSetBits);
+        fn_80067B1C(pValues, 41, fn_800D0FBC(nPlayer), pSetBits);
+        fn_80067B1C(pValues, 42, fn_800D1170(nPlayer, 0), pSetBits);
+        fn_80067B1C(pValues, 6, pPlayer->pChar->nSlot, pSetBits);
+        fn_80067B1C(pValues, 13, Controller_IsNotCPU(pPlayer->nController), pSetBits);
+        fn_80067B1C(pValues, 84, gSession.nGolfer[nPlayer] >= 30, pSetBits);
+        fn_80067B1C(pValues, 61, gSession.nGolfer[nPlayer], pSetBits);
+        if (gSession.nNumPlayers == 2) {
+            // the other golfer
+            if (nPlayer == 0) {
+                fn_80067B1C(pValues, 45, gSession.nGolfer[1], pSetBits);
+            } else if (nPlayer == 1) {
+                fn_80067B1C(pValues, 45, gSession.nGolfer[0], pSetBits);
+            }
+        }
+        fn_80067B1C(pValues, 68, Golfer_GetAttribute(pPlayer, 0, 2), pSetBits);
+        fn_80067B1C(pValues, 69, Golfer_GetAttribute(pPlayer, 1, 2), pSetBits);
+        fn_80067B1C(pValues, 70, Golfer_GetAttribute(pPlayer, 3, 2), pSetBits);
+        fn_80067B1C(pValues, 71, Golfer_GetAttribute(pPlayer, 4, 2), pSetBits);
+        fn_80067B1C(pValues, 72, Golfer_GetAttribute(pPlayer, 5, 2), pSetBits);
+        fn_80067B1C(pValues, 73, Golfer_GetAttribute(pPlayer, 6, 2), pSetBits);
+        fn_80067B1C(pValues, 74, Golfer_GetAttribute(pPlayer, 7, 2), pSetBits);
+        fn_80067B1C(pValues, 77, Golfer_GetAttribute(pPlayer, 10, 2), pSetBits);
+        fn_80067B1C(pValues, 78, Golfer_GetAttribute(pPlayer, 11, 2), pSetBits);
+        fn_80067B1C(pValues, 93, fn_800E81A0(nPlayer), pSetBits);
+    case 3:
+    case 4:
+    case 6:
+    case 8:
+    case 9:
+    case 18:
+    case 19:
+    case 20:
+    case 25:
+    case 28:
+    case 32:
+    case 33:
+    case 34:
+        fn_80067B1C(pValues, 95, fn_800BB0D4(), pSetBits);
+        fn_80067B1C(pValues, 43, pPlayer->b310 && !pPlayer->bMulliganUsed, pSetBits);
+        fn_80067B1C(pValues, 44, pPlayer->b311 && !pPlayer->bMulliganUsed, pSetBits);
+        fn_80067B1C(pValues, 49, fn_800BCD24(nPlayer), pSetBits);
+        fn_80067B1C(pValues, 38, fn_800BCCF8(nPlayer), pSetBits);
+        fn_80067B1C(pValues, 51, fn_800CF848(nPlayer), pSetBits);
+        fn_80067B1C(pValues, 52, fn_800CF77C(nPlayer), pSetBits);
+        fn_80067B1C(pValues, 37, fn_800E184C(nPlayer, 0), pSetBits);
+        fn_80067B1C(pValues, 55, fn_800E1904(nPlayer, 0), pSetBits);
+        // radians to degrees
+        nDeg = 180.0f * fn_800D0960(nPlayer) / PI;
+        fn_80067B1C(pValues, 17, nDeg, pSetBits);
+        fn_80067B1C(pValues, 57, nDeg, pSetBits);
+        // yards to inches
+        fn_80067B1C(pValues, 16, (s32)(36.0f * (pPlayer->vTarget[1] - pBall->vStart[1])), pSetBits);
+        fn_80067B1C(pValues, 66, fn_800D13F4(nPlayer), pSetBits);
+        fn_80067B1C(pValues, 67, fn_800D1530(nPlayer), pSetBits);
+        fn_80067B1C(pValues, 80, (f32)pPlayer->n2E0 >= 10.0f / 3.0f, pSetBits);
+        fn_80067B1C(pValues, 81, pPlayer->n308 & 2, pSetBits);
+        fn_80067B1C(pValues, 82, pPlayer->n308 & 1, pSetBits);
+        fn_80067B1C(pValues, 47, fn_800CFD58(nPlayer), pSetBits);
+        fn_80067B1C(pValues, 94, fn_800BB37C(nPlayer), pSetBits);
+    case 5:
+    case 7:
+    case 15:
+    case 16:
+    case 21:
+    case 27:
+    case 29:
+    case 31:
+        nHole = Game_CurHoleIndex();
+        fn_80067B1C(pValues, 46, fn_800CF904(nPlayer), pSetBits);
+        fn_80067B1C(pValues, 48, fn_800BCCCC(nPlayer), pSetBits);
+        fn_80067B1C(pValues, 50, fn_800BCCA0(nPlayer), pSetBits);
+        fn_80067B1C(pValues, 53, Hole_ScoreAfterTapIn(nPlayer), pSetBits);
+        fn_80067B1C(pValues, 10, pPlayer->nShotKind, pSetBits);
+        if (nKind == 33) {
+            lbl_802811B8->aValue[53]--;
+        }
+        fn_80067B1C(pValues, 56, fn_800CFFE4(nPlayer), pSetBits);
+        fn_80067B1C(pValues, 8, pPlayer->nStrokes[nHole], pSetBits);
+        fn_80067B1C(pValues, 9, pPlayer->nPutts[nHole], pSetBits);
+        fn_80067B1C(pValues, 32, fn_800BCB88(), pSetBits);
+        fn_80067B1C(pValues, 11, gSession.options.nC, pSetBits);
+        fn_80067B1C(pValues, 12, (s32)Wind_Get(NULL), pSetBits);
+
+        // the class of where the shot started
+        nValue = SurfaceType_IsValid(pBall->nStartSurface) ?
+                 gSurfaceTypes[pBall->nStartSurface].nClass : -1;
+        fn_800BCB74(&nValue, pBall->nStartSurface);
+        fn_80067B1C(pValues, 2, nValue, pSetBits);
+        nValue = 36.0f * pPlayer->fA64;
+        fn_80067B1C(pValues, 3, nValue, pSetBits);
+        fn_80067B1C(pValues, 4, nValue, pSetBits);
+        // the class of the ground aimed at
+        nValue = SurfaceType_IsValid(pPlayer->nSurface) ? gSurfaceTypes[pPlayer->nSurface].nClass : -1;
+        fn_80067B1C(pValues, 15, nValue, pSetBits);
+        nValue = 36.0f * fn_800D0550(nPlayer);
+        fn_80067B1C(pValues, 18, nValue, pSetBits);
+        fn_80067B1C(pValues, 19, nValue, pSetBits);
+        nValue = 36.0f * fn_800D0478(nPlayer);
+        fn_80067B1C(pValues, 20, nValue, pSetBits);
+        fn_80067B1C(pValues, 21, nValue, pSetBits);
+        // the class of where the ball lies
+        nValue = SurfaceType_IsValid(nSurface) ? gSurfaceTypes[pBall->nSurface].nClass : -1;
+        fn_800BCA60(&nValue, pBall->nSurface, pBall, pPlayer);
+        fn_80067B1C(pValues, 22, nValue, pSetBits);
+        fn_80067B1C(pValues, 87, lbl_80281E28 && lbl_80282218 != nValue, pSetBits);
+        fn_80067B1C(pValues, 25, (s32)(36.0f * pBall->fClosest), pSetBits);
+        fn_80067B1C(pValues, 26, (s32)(36.0f * fn_800D04E0(nPlayer)), pSetBits);
+        nValue = fn_800D0514(nPlayer);
+        fn_800BCA60(&nValue, nBeforeSurface, pBefore, pPlayer);
+        fn_80067B1C(pValues, 27, nValue, pSetBits);
+        // the lie, in percent (fn_800510EC inlined)
+        nValue = SurfaceType_IsValid(pBall->nStartSurface) ?
+                 (u32)(100.0f * (pBall->f70 + gSurfaceTypes[pBall->nStartSurface].f00)) : 100;
+        fn_80067B1C(pValues, 58, nValue, pSetBits);
+        fn_80067B1C(pValues, 59, nValue, pSetBits);
+        nValue = pBall->pHitSurface != NULL ? pBall->pHitSurface->nClass : 0;
+        fn_80067B1C(pValues, 63, nValue, pSetBits);
+        nValue = pBefore->pHitSurface != NULL ? pBefore->pHitSurface->nClass : 0;
+        fn_80067B1C(pValues, 64, nValue, pSetBits);
+        if (nKind == 29) {
+            lbl_80282218 = nValue;
+        }
+        fn_80067B1C(pValues, 79, fn_800BB6FC(pBefore->vPos), pSetBits);
+        fn_80067B1C(pValues, 75, fn_8005CB48(nPlayer), pSetBits);
+        fn_80067B1C(pValues, 76, fn_8005CB60(nPlayer), pSetBits);
+        fn_80067B1C(pValues, 23, (s32)(100.0f * fn_8005C1EC(nPlayer)), pSetBits);
+        fAngle = 100.0f * fabsf(fn_8005C268(nPlayer));
+        fn_80067B1C(pValues, 24, (s32)(fAngle / PI), pSetBits);
+        break;
+    }
+}
 
 // Correct the surface class of where a ball lies (SurfaceType.nClass) for the scripts: outside the
 // course outline, or on ground a ball may not stay on, is 19 (not playable) unless it is water; a
