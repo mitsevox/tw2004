@@ -28,6 +28,8 @@ f32   fn_800351D8(u32 n, f32 fPeriod);
 void  fn_8003519C(int nRow, void* pData);   // calls row nRow's function of lbl_80188E88 with pData
 s32   fn_800318AC(const void* pA, const void* pB);
 void  fn_8003272C(int n);
+void  fn_80035154(u8 b);
+void  fn_80035170(u32 uClear, u32 uSet);
 void  fn_80031938(Ter_LODPlane* pPlanes, f32 fStep, s32 a, s32 b, s32 c, s32 d);
 void  fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s32 n20, u8* pbFirst, u8 b1,
                   u8 b2, f32 fNear, f32 fFar);
@@ -48,6 +50,7 @@ UObjMesh* fn_800354E4(UObjMesh* pNode, s32 n);
 s32       fn_800354F4(UObjMesh* pNode);
 UObjMesh* fn_80035500(u8* pHoleData);
 UObjMesh* fn_8003556C(UObjMesh* pGround);
+s32       fn_80035554(UObjMesh* pMesh);
 
 // Fills pPatch from a patch's node: its ground is node 0, its objects come with a second node.
 void fn_80031084(UObjMesh* pNode, s32 eClipMethod, s32 iRenderPass, Ter_PatchReference* pPatch,
@@ -389,6 +392,45 @@ void fn_80032AEC(void) {
 void fn_800332F4(void) {
     lbl_802810CC = -1;
     lbl_802810C8 = -1.0f;
+}
+
+// Sets the renderer up for an object's draw, unless its alpha and z writes are those of the last one
+// (lbl_802810C8, lbl_802810CC) and bForce is clear; returns whether it did. An opaque object gets
+// the mesh's own blend flags and z writes, a faded one draws with its alpha.
+u8 fn_80033308(Ter_ObjectDrawData* pDraw, u8 bForce) {
+    f32 fAlpha = pDraw->fAlpha;
+    s32 nRef;
+    u32 uFlags;
+    u8 bZWrite;
+
+    if (fn_80035554(pDraw->pObject) & 2) {
+        nRef = 1;
+        uFlags = 0x40;
+        bZWrite = 0;
+    } else {
+        nRef = 0x50;
+        uFlags = 0;
+        bZWrite = 1;
+    }
+    if (fAlpha != lbl_802810C8 || (s8)bZWrite != lbl_802810CC || bForce) {
+        if (1.0f == fAlpha) {
+            fn_80012F50(1, 6, nRef);
+            fn_80035170(0x40, ((uFlags & 0x40) ? 0x40 : 0)
+                                  | (((uFlags & 0x10) ? 0x10 : 0) | ((uFlags & 0x20) ? 0x20 : 0)));
+            fn_8003272C(bZWrite);
+            fn_80035098(0);
+            fn_80035118(4, 5);
+        } else {
+            fn_80012F50(1, 6, fAlpha * nRef);
+            fn_8003272C(1);
+            fn_80035098(1);
+            fn_80035154(255.0f * (0.5f * fAlpha));
+        }
+        fn_80012EF8();
+        lbl_802810C8 = fAlpha;
+        return 1;
+    }
+    return 0;
 }
 
 // Starts the crowd's animation: after fDelay seconds when that is above 0 (fn_80033744 counts it
@@ -943,7 +985,6 @@ void fn_8006F154();
 void fn_800082CC(void* p);
 void fn_800354B4(u8* p, f32 v);
 s32 fn_80035508(u8* p0);
-s32 fn_80035554(u8* p0);
 f32 fn_80035560(u8* p0);
 void fn_80035584(s32 v);
 void fn_80035590(f32* p0);
@@ -1065,8 +1106,8 @@ void fn_80035514(u8* pObject) {
     }
 }
 
-s32 fn_80035554(u8* p0) {
-    return *(u8*)(((u8*)*(s32*)p0) + 0x8B);
+s32 fn_80035554(UObjMesh* pMesh) {
+    return pMesh->pInfo->b8B;
 }
 
 f32 fn_80035560(u8* p0) {
