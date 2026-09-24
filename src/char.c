@@ -100,8 +100,8 @@ void  fn_8001DD18(u8* pData, int nBytes);
 void  fn_8001DEC8(u8* pData, int nBytes);
 s32   fn_800CE8C0(Skin** apSkins, int nSkins, SkinListEntry** ppList);   // SkinPart.c
 void  fn_800CEEBC(void);                                        // SkinPart.c: empty
-void  fn_800100B0(TexBank* pBank, TexEntry* p8, TexPalette* pC, void* p10, void* p14, s16 nNumTex,
-                  s16 nNumPalettes);                            // LLTex.c
+void  fn_800100B0(TexBank* pBank, TexEntry* p8, TexPalette* pC, void* p10, void* p14, int nNumTex,
+                  int nNumPalettes);                            // LLTex.c
 void  fn_8001EFD8(f32* pA, f32* pB, f32* pOut);
 f32 (*fn_8001EC6C(Character* pChar, int nBone))[4];
 f32 (*fn_8001ECA8(Character* pChar, int nBone))[4];

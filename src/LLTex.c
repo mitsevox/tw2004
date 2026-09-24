@@ -685,8 +685,8 @@ int fn_8001005C(TexBank* pBank, u64 uHash) {
     return 0x80000000;
 }
 
-void fn_800100B0(TexBank* pBank, TexEntry* p8, TexPalette* pC, void* p10, void* p14, s16 nNumTex,
-                 s16 nNumPalettes) {
+void fn_800100B0(TexBank* pBank, TexEntry* p8, TexPalette* pC, void* p10, void* p14, int nNumTex,
+                 int nNumPalettes) {
     fn_80005AE8(pBank, 0, sizeof(TexBank));
     pBank->p8 = p8;
     pBank->pC = pC;
