@@ -473,7 +473,8 @@ typedef struct CharSkinSet {
     u8   unk0[0xC];
     f32  afC[6];                // 0x0C  per club class: the club head bone's height (fn_8001C5B4)
     Skin* apSkins[6];           // 0x24
-    u8   unk3C[0x9C - 0x3C];
+    f32  a3C[6][4];             // 0x3C  per club class: a point on the club, through bone 0x52's matrix
+                                //       (Character_UpdateTestPoints: aPoints[4])
     void* a9C[6];               // 0x9C  freed with fn_8001B1E8 (fn_8001B58C)
 } CharSkinSet;
 

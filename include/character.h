@@ -124,7 +124,9 @@ typedef struct CharModel {
     Bone*     pBones;           // 0x004
     f32     (*pMatrices)[4][4]; // 0x008  one per bone (fn_8001EED8 gives a bone's index); row 3 is its
                                 //        position
-    u8        unkC[0x34 - 0xC];
+    f32       fC;               // 0x00C  } lengths Character_UpdateTestPoints sets points 0-3 out by
+    f32       f10;              // 0x010  } along the leg bones' axes when the skin has no a1048
+    u8        unk14[0x34 - 0x14];
     BonePose* pPoses;           // 0x034  one per bone; freed with the model
     Skeleton* pSkel;            // 0x038
     u8        aBone[0x59];      // 0x03C  each bone id's index (fn_8001EED8), 0xFF none; fn_80029664

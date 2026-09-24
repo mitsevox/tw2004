@@ -377,6 +377,50 @@ f32 Character_GetTerrainHeightAndNormal(Character* pChar, f32* pPos, f32** ppNor
     return -65536.125f;
 }
 
+// Moves a golfer's test points with its bones: points 0-3 from the skin's leg points through the
+// leg bones' matrices (or, without them, set out along the bones' axes by the model's fC and f10),
+// point 4 from the club class's club point through bone 0x52's matrix.
+void Character_UpdateTestPoints(Character* pChar) {
+    f32 (*pClubMtx)[4];
+    f32 (*pMtx48)[4];
+    f32 (*pMtx3A)[4];
+    f32 (*pMtx47)[4];
+    f32 (*pMtx39)[4];
+    f32 fA;
+    f32 fB;
+
+    if (!fn_8001EC48(pChar)) {
+        return;
+    }
+    pClubMtx = fn_8001ED08(pChar, 0x52);
+    if (pChar->pSkin->b1044) {
+        pMtx48 = fn_8001EC6C(pChar, 0x48);
+        pMtx3A = fn_8001EC6C(pChar, 0x3A);
+        pMtx47 = fn_8001EC6C(pChar, 0x47);
+        pMtx39 = fn_8001EC6C(pChar, 0x39);
+        fn_800BAD60(pMtx3A, (Vec4*)pChar->pSkin->a1048[0], (Vec4*)pChar->aPoints[0]);
+        fn_800BAD60(pMtx48, (Vec4*)pChar->pSkin->a1048[1], (Vec4*)pChar->aPoints[1]);
+        fn_800BAD60(pMtx39, (Vec4*)pChar->pSkin->a1048[2], (Vec4*)pChar->aPoints[2]);
+        fn_800BAD60(pMtx47, (Vec4*)pChar->pSkin->a1048[3], (Vec4*)pChar->aPoints[3]);
+    } else {
+        fA = 0.8f * pChar->pModel->f10;
+        fB = 0.8f * pChar->pModel->fC;
+        pMtx48 = fn_8001EC6C(pChar, 0x48);
+        pMtx3A = fn_8001EC6C(pChar, 0x3A);
+        pMtx47 = fn_8001EC6C(pChar, 0x47);
+        pMtx39 = fn_8001EC6C(pChar, 0x39);
+        fn_8000AE6C(pMtx3A[3], pMtx3A[1], pChar->pModel->f10, pChar->aPoints[0]);
+        fn_8000AE6C(pMtx48[3], pMtx48[1], pChar->pModel->fC, pChar->aPoints[1]);
+        fn_8000AE6C(pMtx39[3], pMtx3A[2], fA, pChar->aPoints[2]);
+        fn_8000AE6C(pMtx47[3], pMtx48[2], fB, pChar->aPoints[3]);
+        fn_8000AE6C(pChar->aPoints[0], pMtx3A[2], 0.25f * fA, pChar->aPoints[0]);
+        fn_8000AE6C(pChar->aPoints[1], pMtx48[2], 0.25f * fB, pChar->aPoints[1]);
+    }
+    if (pChar->p16D8 != NULL && pClubMtx != NULL) {
+        fn_800BAD60(pClubMtx, (Vec4*)pChar->p16D8->a3C[pChar->nClubClass], (Vec4*)pChar->aPoints[4]);
+    }
+}
+
 // Keeps the club out of the ground: when point 4 is below the terrain and bone 0x52's y axis
 // points into the slope, that axis is shortened by how far the point is under, measured against
 // the club class's head height (not below 3/4 of it).
