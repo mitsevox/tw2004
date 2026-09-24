@@ -25,6 +25,7 @@ void fn_8006A9AC(f32* pColor);
 void fn_800760B0(s32 nX, s32 nY, s32 nW, s32 nH);
 
 void fn_80092BE8(f32* pColor);
+void fn_80012E54(f32* pColor, u8* pOut);    // UFont.c: packs an RGBA colour into pOut
 void fn_80092C38(f32 x0, f32 x1);
 void fn_80092C78(f32 x0, f32 x1);
 void fn_80092CB8(f32 x0);
@@ -255,6 +256,16 @@ void fn_80092BA0(void) {
 void fn_80092BC4(void) {
     fn_80012898(0);
 }
+
+// ---- end of sweep code ----
+
+// Sets up the text shadow: nC4 0x12, and uC8 packed from the colour pColor.
+void fn_80092BE8(f32* pColor) {
+    fn_80012EC4()->nC4 = 0x12;
+    fn_80012E54(pColor, (u8*)&fn_80012EC4()->uC8);
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_80092C38(f32 x0, f32 x1) {
     UFontContext* pCtx;
