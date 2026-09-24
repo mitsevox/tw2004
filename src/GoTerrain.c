@@ -1222,6 +1222,12 @@ void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s3
     }
 }
 
+// fake match: EA passes the flags through an inline; CodeWarrior substitutes the argument expression at
+// each use, so it is built twice and its bits are taken apart again.
+static inline void Ter_FlagBits(u32 uFlags) {
+    fn_80014118(((uFlags & 0x10) ? 0x10 : 0) | ((uFlags & 0x20) ? 0x20 : 0) | 0x40);
+}
+
 // Draws nCount objects of a draw list, switching the renderer state only when it changes from one
 // object to the next: the clip method, the mipmap bias, and the flags (0x40, fog 0x20, and 0x10 for
 // shader types other than 1 and 3) unless the object sets its own. Objects whose state word 0 has
@@ -1243,7 +1249,6 @@ void fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFil
     s32 i;
     u8 bNewBit5;
     u8 bNewShaded;
-    u32 uState;
     f32 fDamp;
 
     fn_800332F4();
@@ -1270,24 +1275,21 @@ void fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFil
             bDirty = 1;
         }
         bNewBit5 = (lbl_801D3CB0.pObjectStateList[iObject].a20[1] >> 5) & 1;
-        bNewShaded = 0;
-        if (pDraw->eShaderObjectType != 1 && pDraw->eShaderObjectType != 3) {
-            bNewShaded = 1;
-        }
+        bNewShaded = pDraw->eShaderObjectType != 1 && pDraw->eShaderObjectType != 3;
         if (pDraw->bSetsPrimField == 0
             && (bUseFog != pDraw->bUseFog || bBit5 != bNewBit5 || bShaded != bNewShaded || bForce)) {
             bUseFog = pDraw->bUseFog;
             bBit5 = bNewBit5;
             bShaded = bNewShaded;
-            fn_80014118((bShaded ? 0x10 : 0) | (bUseFog ? 0x20 : 0) | 0x40);
+            Ter_FlagBits((bShaded ? 0x10 : 0) | 0x40 | (bUseFog ? 0x20 : 0));
             bForce = 0;
             bDirty = 1;
         }
         if (fn_80033308(pDraw, 0)) {
             bDirty = 1;
         }
-        uState = lbl_801D3CB0.pObjectStateList[iObject].a20[0];
-        if ((uState & 1) && !(uState & 2)) {
+        if ((lbl_801D3CB0.pObjectStateList[iObject].a20[0] & 1)
+            && !(lbl_801D3CB0.pObjectStateList[iObject].a20[0] & 2)) {
             fDamp = 1.0f;
             if (lbl_801D3CB0.fTreeDampingMaxForce) {
                 fDamp = lbl_801D3CB0.fTreeDampingMaxForce
@@ -1308,7 +1310,8 @@ void fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFil
                 fWave3 = fDamp * (lbl_801D3CB0.pObjectStateList[iObject].f4 - 0.5f) + 0.5f;
                 fn_8003519C(3, &fWave3);
             }
-        } else if ((uState & 1) && (uState & 2)) {
+        } else if ((lbl_801D3CB0.pObjectStateList[iObject].a20[0] & 1)
+                   && (lbl_801D3CB0.pObjectStateList[iObject].a20[0] & 2)) {
             if (bDirty) {
                 fn_80012EF8();
                 bDirty = 0;
