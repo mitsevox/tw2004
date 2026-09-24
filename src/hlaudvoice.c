@@ -22,6 +22,11 @@ void fn_800AC330(void);
 u8   fn_800AC6B0(AudVoiceRequest* pRequest, s16* pPriority);
 f32  fn_800ACEC4(f32 fA, f32 fB);
 
+AudVoicePool lbl_801F19B8[1];
+
+s32 lbl_802820B4;
+u8  lbl_802820B0;
+
 // Set the voice pool up: every voice free, numbered after its hardware voice.
 void fn_800AC330(void) {
     AudVoicePool* pPool = lbl_801F19B8;
