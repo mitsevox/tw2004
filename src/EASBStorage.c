@@ -99,7 +99,7 @@ EASBErrorE fn_80127F88(EASBProduct* pProduct) {
 }
 
 // Checks an accomplishment: in use, set within 2003-2023, u86 in 1-250 and a usable name.
-EASBErrorE fn_80128054(EASBAccomplishment* pAccomplishment) {
+EASBErrorE fn_80128054(const EASBAccomplishment* pAccomplishment) {
     u32 uLength;
 
     if (pAccomplishment == NULL) return EASB_ERROR_NULL_PARAMETERS;
@@ -209,7 +209,7 @@ EASBErrorE fn_8012830C(char* sz, u32 uSize, u32* puLength) {
 }
 
 // The same for wide text, uSize in characters.
-EASBErrorE fn_8012835C(u16* sz, u32 uSize, u32* puLength) {
+EASBErrorE fn_8012835C(const u16* sz, u32 uSize, u32* puLength) {
     *puLength = 0;
     while (sz[*puLength] != 0 && *puLength < uSize) {
         *puLength = *puLength + 1;
@@ -442,7 +442,7 @@ char* fn_80128BF8(char* szDest, char* szSrc, u32 uSize) {
 }
 
 // The same for wide text.
-u16* fn_80128C4C(u16* szDest, u16* szSrc, u32 uLength) {
+u16* fn_80128C4C(u16* szDest, const u16* szSrc, u32 uLength) {
     u16* pDest;
     u16 c;
 
@@ -923,7 +923,7 @@ void fn_80129F98(EASBTotals* pTotals, const EASBTotals* pAdd, s32 nMode) {
 
 // Adds pFrom's record into pInto when both are in use: the counters, every valid
 // accomplishment (through fn_8012DB30), b1167, u1160 and the higher level.
-void fn_8012A050(EASBProduct* pInto, EASBProduct* pFrom) {
+void fn_8012A050(EASBProduct* pInto, const EASBProduct* pFrom) {
     u32 i;
 
     if (!pInto->bValid || !pFrom->bValid) return;

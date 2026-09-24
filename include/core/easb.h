@@ -250,10 +250,10 @@ extern EASBStorage* lbl_802825B0;
 
 // EASBStorage.c: the code before EASB.c.
 EASBErrorE fn_80127F88(EASBProduct* pProduct);  // EASB_ERROR_INVALID_PRODUCT if the record is bad
-EASBErrorE fn_80128054(EASBAccomplishment* pAccomplishment);
+EASBErrorE fn_80128054(const EASBAccomplishment* pAccomplishment);
 u8 fn_801280F8(u16 uLanguage);      // is it a language the library knows
 u8 fn_801281B4(u16 uLanguage, u16* aLanguages, u8 nLanguages);  // is uLanguage in the list
-EASBErrorE fn_8012835C(u16* sz, u32 uSize, u32* puLength);
+EASBErrorE fn_8012835C(const u16* sz, u32 uSize, u32* puLength);
 EASBErrorE fn_801283B0(EASBInitParams* pParams);
 void fn_80128488(EASBProduct* pProduct, u8 bValid, char* szName, u16* szGamesPlayedType, u16 uLanguage);
 u32 fn_80128468(u32 uA, u32 uB);    // uA + uB, saturating at 0xFFFFFFFF
@@ -262,7 +262,7 @@ void fn_80128624(EASBProduct* aProducts, u32 nCount);          // a shell sort o
 void fn_8012872C(EASBAccomplishment** apList, u32 nCount, s32 nSort);
 s32 fn_80128CA0(char* szA, char* szB, u8 bCase);                // compares two texts (0: same)
 char* fn_80128BF8(char* szDest, char* szSrc, u32 uSize);        // bounded string copy
-u16* fn_80128C4C(u16* szDest, u16* szSrc, u32 uLength);         // the same for wide text
+u16* fn_80128C4C(u16* szDest, const u16* szSrc, u32 uLength);         // the same for wide text
 void fn_80128EC0(char* sz);
 void fn_80128F04(u16* sz, u16 uLanguage);
 EASBErrorE fn_80128FD4(EASBTotals* pTotals, u16* puLevel, f32* pfProgress);
@@ -314,7 +314,7 @@ EASBErrorE fn_8012D93C(u32 uCount);
 EASBErrorE fn_8012D9B4(u16* puLevel);
 EASBErrorE fn_8012DA38(u16* puNextLevel);
 EASBErrorE fn_8012DAB8(u16 uLevel);
-EASBErrorE fn_8012DB30(u16* szName, u32 uValue, u16 uLanguage, u32 uTime);
+EASBErrorE fn_8012DB30(const u16* szName, u32 uValue, u16 uLanguage, u32 uTime);
 EASBErrorE fn_8012DD24(u16* szName, u32 uValue, u16 uLanguage);
 EASBErrorE fn_8012DD7C(u8 bFlag);
 EASBErrorE fn_8012DDE0(u32* pOut);
