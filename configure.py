@@ -909,7 +909,7 @@ config.libs = [
             Object(NonMatching, "goballfx.c"),
             Object(NonMatching, "GoObjShadow.c"),
             Object(NonMatching, "GoShaderObject_Particle_Gc.c"),
-            Object(NonMatching, "CharAnim.c"),
+            Object(Matching, "CharAnim.c"),
             Object(NonMatching, "GoShaderObjectCommon_MorphAnimManager_Gc.c"),
             Object(Matching, "GoCamTuningVars.c"),
             Object(NonMatching, "GoShaderObject_Glows_Gc.c"),

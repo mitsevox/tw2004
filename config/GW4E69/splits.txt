@@ -443,6 +443,9 @@ unsorted/sweep_800957D8.c:
 
 CharAnim.c:
 	.text       start:0x800957FC end:0x80097208
+	.rodata     start:0x80183A70 end:0x80183A98
+	.data       start:0x80189CE8 end:0x80189D30
+	.sdata2     start:0x80283CD8 end:0x80283D18
 
 GoShaderObjectCommon_MorphAnimManager_Gc.c:
 	.text       start:0x80097208 end:0x800977CC
