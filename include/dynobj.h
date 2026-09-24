@@ -354,6 +354,9 @@ extern UMemPool* lbl_80281DAC;
 extern UMemPool* lbl_80281DA8;
 
 // GoDynObj.c
+void fn_80046E1C(f32* pPos, int nPlayer);  // put the player's 'TEO ' 10001 object at pPos
+void fn_80047A24(f32* pPos, int nPlayer);  // put the player's 'TEO ' 10002 object at pPos
+void fn_8004816C(int nPlayer);             // launch the player's 'TEO ' 10004 object
 int  fn_800484F4(const char* szName);   // the index of the name among lbl_80187B98's 27 (-1: none)
 
 // UKernel.c, UObject.c. The UObject functions take the object part (&DynObj.obj).

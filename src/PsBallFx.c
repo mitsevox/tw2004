@@ -5,6 +5,7 @@
 #include "psmgr.h"
 #include "game.h"
 #include "golfer.h"
+#include "dynobj.h"
 
 void fn_800360A0(void* pMesh);     // Skin.c
 
@@ -84,6 +85,41 @@ void fn_800A30E4(int nKind, Ball* pBall, int nPlayer, u8 bFlight, f32 fValue) {
                 fn_80099EA4(pEmitter);
             }
         }
+    }
+}
+
+// The ball has come down: its surface's effect, and on some lies and surfaces (a club above 8, shot
+// kind 1 or 4) the player's 'TEO ' objects at the ball.
+void fn_800A31E0(Ball* pBall, int nPlayer) {
+    f32 vPos[4];
+    f32 vNormal[4];
+    SurfaceType* pSurface;
+    int nLie;
+
+    if (gPlayers[nPlayer].nClub == 25) {
+        return;
+    }
+    vPos[0] = pBall->vPos[0];
+    vPos[1] = pBall->vPos[1];
+    vPos[2] = pBall->vPos[2];
+    vPos[3] = 1.0f;
+    if (TER_NO_GROUND != Ter_GetSupportingGroundData(fn_8000C594(), vPos, &pSurface, vNormal)) {
+        if (0.375f != pSurface->f1C) {
+            return;
+        }
+        fn_800A30E4(pSurface->nSwingEffectId, pBall, nPlayer, 0, 0.0f);
+    }
+    nLie = gPlayers[nPlayer].ball.nLie;
+    if ((nLie == 1 || (u32)(nLie - 2) <= 2 || nLie == 0) && pSurface != NULL &&
+        (pSurface->nClass == 1 || pSurface->nClass == 2 || pSurface->nClass == 5 ||
+         pSurface->nClass == 11) &&
+        gPlayers[nPlayer].nClub > 8 &&
+        (gPlayers[nPlayer].nShotKind == 1 || gPlayers[nPlayer].nShotKind == 4)) {
+        fn_80046E1C(pBall->vPos, nPlayer);
+        fn_80047A24(pBall->vPos, nPlayer);
+    }
+    if (gPlayers[nPlayer].ball.nLie == 0) {
+        fn_8004816C(nPlayer);
     }
 }
 
