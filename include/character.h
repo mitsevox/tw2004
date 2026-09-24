@@ -237,6 +237,7 @@ extern f32 lbl_80193E48[6];     // DynChain.c: an angle per chain kind, in degre
 // Skeleton.c: a short string per bone id (the first is empty); the model loader (fn_80028564)
 // copies bone 0x54's first 8 bytes into each bone it adds as the bone's uId.
 extern char* lbl_80187278[90];
+extern struct Character* lbl_80281D20;   // Skeleton.c: the character fn_80027E8C moves with its root
 extern u8 lbl_80281098[6];      // Skeleton.c: the bone ids of the model's kind 2 dynamic chains
 extern u8 lbl_802810A0[6];      // Skeleton.c: the bone ids of its kind 3 dynamic chains
 

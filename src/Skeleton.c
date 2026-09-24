@@ -17,6 +17,8 @@ void fn_80008F20(f32* pQ, f32* pOut);                   // Quaternion.c
 void fn_8001FBA4(f32* pA, f32* pB, f32* pOut, f32 fT);  // a blend of two points by fT
 void fn_800BAD60(f32 mtx[4][4], Vec4* src, Vec4* dst);  // VecMath.c: a point through a matrix
 void fn_80009410(f32 fAngle, f32* pOut);                // Quaternion.c
+void Character_UpdateFeetTerrainInfo(Character* pChar, int bNormals);   // char.c
+void Character_PlaceFeetOnGround(Character* pChar);                     // char.c
 void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // pDst = pSrc's rows
                                                                                 // through pMtx
 void fn_80113E60(void);                                 // DynChain.c
@@ -405,6 +407,57 @@ void SKEL_TranslateIKChainY(CharModel* pModel, IKChain* pChain, f32 f) {
         pModel->pPoses[nBone].v10[1] += f;
         pModel->pMatrices[nBone][3][1] += f;
     }
+}
+
+// When the chain's end is more than 0.1 above pTarget, lowers the root toward it: the drop (eased in
+// from 0.1 to 0.2, at most 0.65, then times 0.75) becomes a sideways move of the chain's root, the
+// model's root bone and lbl_80281D20's points; the feet are put back on the ground (with bNormals,
+// their terrain first) and the chain re-posed. Returns the drop, 0 when nothing moved.
+f32 fn_80027E8C(CharModel* pModel, IKChain* pChain, f32* pTarget, int bNormals) {
+    f32 fDx;
+    f32 fDz;
+    f32 fDrop;
+    f32 fOldY;
+    f32 fScale;
+    f32 fDy;
+    int i;
+
+    fDrop = pChain->v8[1] - pTarget[1];
+    if (fDrop < -0.1f) {
+        if (fDrop > -0.2f) {
+            fDrop *= (fDrop - -0.1f) / -0.1f;
+        }
+        if (fDrop < -0.65f) {
+            fDrop = -0.65f;
+        }
+        fDrop *= 0.75f;
+        fDx = pChain->v8[0] - pChain->pLinks[0].v28[0];
+        fDz = pChain->v8[2] - pChain->pLinks[0].v28[2];
+        fScale = fDrop / (f32)fn_80009680(fDx * fDx + fDz * fDz);
+        fDx *= fScale;
+        fDz *= fScale;
+        pChain->pLinks[0].v28[0] += fDx;
+        pChain->pLinks[0].v28[2] += fDz;
+        pModel->pBones[0].v1C[0] += fDx;
+        pModel->pBones[0].v1C[2] += fDz;
+        for (i = 0; i < 5; i++) {
+            lbl_80281D20->aPoints[i][0] += fDx;
+            lbl_80281D20->aPoints[i][2] += fDz;
+        }
+        if (bNormals) {
+            Character_UpdateFeetTerrainInfo(lbl_80281D20, 1);
+        }
+        fOldY = pModel->pBones[0].v1C[1];
+        Character_PlaceFeetOnGround(lbl_80281D20);
+        fDy = pModel->pBones[0].v1C[1] - fOldY;
+        pChain->pLinks[0].v28[1] += fDy;
+        pChain->v8[1] += fDy;
+        pChain->v8[0] += fDx;
+        pChain->v8[2] += fDz;
+        fn_80026BF4(pModel, pChain);
+        return fDrop;
+    }
+    return 0.0f;
 }
 
 // Frees a skeleton: its chains' links, the chains, and both rotation sets.
