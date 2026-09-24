@@ -1068,8 +1068,8 @@ void fn_8001644C(int ePrim, f32* pPos, f32* pColour, f32* pUV, int nVerts) {
     f32 aViewport[6];
     ViewState* pView = lbl_80280E08;
     f32* pP;
-    f32* pC;
     f32* pT;
+    f32* pC;
     int i;
 
     if (ePrim == 0xA1) {
@@ -1096,32 +1096,30 @@ void fn_8001644C(int ePrim, f32* pPos, f32* pColour, f32* pUV, int nVerts) {
         GXSetVtxAttrFmt(7, 13, 1, 4, 0);
     }
     fn_80012520(ePrim, 7, nVerts);
+    // fake match: which loops walk a parameter itself and which a copy was picked by score (98.5 -> 99.0%)
     if (pUV != NULL) {
         if (pColour != NULL) {
-            pP = pPos;
             pC = pColour;
             pT = pUV;
             for (i = 0; i < nVerts; i++) {
-                fn_800168A0(pP, pC, pT);
+                fn_800168A0(pPos, pC, pT);
                 pT += 4;
                 pC += 4;
-                pP += 4;
+                pPos += 4;
             }
         } else {
             pP = pPos;
-            pT = pUV;
             for (i = 0; i < nVerts; i++) {
-                fn_80016800(pP, pT);
-                pT += 4;
+                fn_80016800(pP, pUV);
+                pUV += 4;
                 pP += 4;
             }
         }
     } else if (pColour != NULL) {
         pP = pPos;
-        pC = pColour;
         for (i = 0; i < nVerts; i++) {
-            fn_80016770(pP, pC);
-            pC += 4;
+            fn_80016770(pP, pColour);
+            pColour += 4;
             pP += 4;
         }
     } else {

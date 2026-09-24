@@ -483,11 +483,13 @@ static void Stream_ParseBufs(void) {
     UStreamBuffer* pBuffer;
     u32 uLen;
     u32 uTag;
+    u32 uCopy;
     UStreamFill* pFill;
     if (UStream_PumpBuffers(1) == NULL) return;
     if (gnCurStream == -1) return;
     while ((pBuffer = gpCurList) != NULL) {
-        while ((int)pBuffer->uPos < USTREAM_BUFFER_SIZE) {
+        // fake match: a volatile signed read of uPos makes the loop top load it again, as the original does
+        while (*(volatile s32*)&pBuffer->uPos < USTREAM_BUFFER_SIZE) {
             pChunk = (UStreamChunk*)&pBuffer->data[pBuffer->uPos];
             // port: the chunk header is big-endian and read through UStreamChunk (and copied into the
             // object by UStream_BeginObject): a little-endian port converts its 0x40 bytes here
@@ -515,7 +517,7 @@ static void Stream_ParseBufs(void) {
                     pBuffer->uPos += 0x40;
                     pFill = &gFill;
                     if (pFill->pObject != NULL) {
-                        u32 uCopy = uLen;
+                        uCopy = uLen;
                         if ((int)(pFill->uPos + uLen) > (int)pFill->pObject->uSize) {
                             uCopy = pFill->pObject->uSize - pFill->uPos;
                         }
