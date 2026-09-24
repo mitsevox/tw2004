@@ -279,7 +279,8 @@ typedef struct Skin {
                                 //         matrix (fn_800184E4: bones 0x3A, 0x48, 0x39, 0x47)
     f32  (*p1088)[4][4];        // 0x1088  } matrices fn_80018710 hands the model (fn_80029A88,
     f32  (*p108C)[4][4];        // 0x108C  } fn_80029A7C)
-    u8   unk1090[0x1098 - 0x1090];
+    struct HwsMemBlock* p1090;  // 0x1090  freed by fn_80037708
+    u8   unk1094[0x1098 - 0x1094];
     struct HwsMemBlock* a1098[2];   // 0x1098  indexed like a10A0 (fn_8011CB5C)
     void* a10A0[2];             // 0x10A0  indexed by fn_800CE02C's argument; Skin.c sets [0]
     SkinChoice* aParts[4];      // 0x10A8  a choice per part, four copies (fn_800CEE04 copies one
@@ -570,7 +571,11 @@ extern s32        lbl_80280E20;         // set to 6 (4 in split screen) by fn_80
 extern CharSkinSet* lbl_80280E24[2];   // what fn_8001B208 makes of the 'CLB ' object: one, or one per
                                         // view in split screen (Character.p16D8; fn_8001B58C frees them)
 
-void  fn_80037CD8(void* pSkin);         // Skin.c: frees a skin
+void  fn_80037CD8(Skin* pSkin);         // Skin.c: frees a skin
+s32   fn_80037708(Skin* pSkin);         // Skin.c: frees what loading it allocated
+extern void* lbl_80281D70;              // } Skin.c; fn_80036464 frees lbl_80281D70 and clears all
+extern s32   lbl_80281D74;              // } three
+extern s32   lbl_80281D78;              // }
 
 // SkinPart.c, as FE_CrAPDB.c uses it: find a part (or set) by id, a variant by id or name, and
 // pick a part's (or set's) variant.
@@ -613,8 +618,18 @@ void  fn_80113BAC(SkinIter* pIter);
 SkinIter* fn_80113910(u8* pBuf, SkinIterArgs* pArgs);   // hwsRender_Gc.c: another mesh iterator
 void  fn_80113A7C(SkinIter* pIter);     // and its end
 
+// SkinPart.c, as Skin.c uses it.
+u64   fn_800CCDDC(Skin* pSkin, int nPart);
+void  fn_800CD56C(Skin* pSkin);
+s32   fn_800CDB70(Skin* pSkin, const char* pName);
+void  fn_800CE02C(Skin* pSkin, int n);
+void  fn_800CE0B0(Skin* pSkin, int nPart);
+void  fn_800CE128(Skin* pSkin);
+void  fn_800CE168(void);
+
 // SkinMorph.c: the morph targets a skin description needs.
 s32   fn_8011C850(SkinDesc* pDesc);
+void  fn_8011CD84(Skin* pSkin);
 void  fn_8011CD3C(Skin* pSkin, HwsMemBlock* pBlock, HwsOverrideTable* pTable);
 
 // hwsOverride_Gc.c: a mesh table and a memory block for a skin description's morphed meshes.
