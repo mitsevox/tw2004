@@ -909,6 +909,63 @@ void fn_8010988C(MsgArg* pArgs, MsgArg* pResult) {
 void fn_801098AC(MsgArg* pArgs, MsgArg* pResult) {
 }
 
+// Make a random created golfer: clear the slots, then dress it as fn_80109FB4 does with more parts
+// drawn (0 and 4 at 80%, 5 and 6 at 90%, 19, 20 and 8 at 70%), part 7 at b 1 or 2, and save.
+void fn_801098B0(MsgArg* pArgs, MsgArg* pResult) {
+    SaveProfile* pProfile = fn_80077ACC();
+    int nRoll = Rand_Next(0) % 100;
+    int nChoice;
+
+    Rand_Next(0);                       // drawn, not used
+    fn_80103B74(0);
+    fn_801073DC(2);
+    fn_801073DC(5);
+    fn_801073DC(6);
+    fn_801073DC(7);
+    fn_801073DC(8);
+    fn_801073DC(11);
+    fn_801073DC(12);
+    fn_801073DC(13);
+    fn_801073DC(14);
+    FE_CrAP_TurnOnPart(5, 0, 0);
+    FE_CrAP_TurnOnPart(6, 0, 0);
+    FE_CrAP_TurnOnPart(4, 0, 0);
+    fn_8007975C(pProfile, 0, 80);
+    fn_8007975C(pProfile, 3, 0);
+    fn_8007975C(pProfile, 4, 80);
+    fn_8007975C(pProfile, 15, 0);
+    fn_8007975C(pProfile, 5, 90);
+    fn_8007975C(pProfile, 6, 90);
+    fn_8007975C(pProfile, 1, 0);
+    fn_8007975C(pProfile, 2, 0);
+    fn_8007975C(pProfile, 7, 0);
+    fn_8007975C(pProfile, 16, 0);
+    fn_8007975C(pProfile, 19, 70);
+    fn_8007975C(pProfile, 20, 70);
+    fn_8007975C(pProfile, 8, 70);
+    nChoice = fn_8007975C(pProfile, 14, 0);
+    if (Rand_Next(0) % 100 < 95) {
+        FE_CrAP_TurnOnPart(15, 0, nChoice);
+    } else {
+        fn_8007975C(pProfile, 15, 0);
+    }
+    if (nRoll < 75) {
+        FE_CrAP_TurnOnPart(9, 0, Rand_Next(0) % 3);
+    } else if (nRoll >= 75 && nRoll < 85) {
+        Rand_Next(0);                   // drawn, not used
+        FE_CrAP_TurnOnPart(9, 0, 6);
+    } else if (nRoll >= 85 && nRoll < 95) {
+        Rand_Next(0);                   // drawn, not used
+        FE_CrAP_TurnOnPart(9, 0, 4);
+    } else {
+        Rand_Next(0);                   // drawn, not used
+        FE_CrAP_TurnOnPart(9, 0, 8);
+    }
+    fn_80078A2C(10, 95);
+    fn_800797E0(pProfile, 7, (Rand_Next(0) & 1) + 1, 0);
+    fn_8007873C(pProfile);
+}
+
 void fn_80109BA4(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = fn_80077ACC();
     fn_80103B74(0);
