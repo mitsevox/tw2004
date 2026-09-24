@@ -42,6 +42,8 @@ char lbl_80187B98[27][13] = {
 };
 char lbl_80187CF8[4][13] = {"logoea", "logonike", "logotitl", "logostrt"};
 
+GoDynObjMgr* lbl_80281DA0;
+
 void fn_80045FC8(UStreamObject* pObject);   // the 'BALL' stream handler
 void fn_80046FDC(s32 nView);
 void fn_800470B0(s32 nView);
