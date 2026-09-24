@@ -23,6 +23,8 @@ void fn_8006A89C(void);
 void fn_8006A8B0(void);
 void fn_8006A964(f32* pA, f32* pB, f32* pOut);
 void fn_8006A988(f32* pA, f32* pB, f32* pOut);
+f32  fn_8006A9FC(void);
+LLFont* fn_8006AA3C(void);
 
 // Set up at boot: the hole's chunk 3 loader, the marker textures and every player's marker.
 void fn_80067B80(void) {
@@ -252,6 +254,13 @@ void fn_80069BEC(int nPlayer) {
     }
 }
 
+// Draw sz centred on (fX, fY).
+void fn_80069C64(char* sz, f32 fX, f32 fY) {
+    fX -= 0.5f * fn_80012C30(sz);
+    fY -= 0.5f * fn_8006A9FC();
+    fn_800128F8(sz, fX, fY);
+}
+
 // fA88: the heading from the game's point (gpGame->p130) to the placement point, less a quarter
 // turn; and the aim marker's usual settings.
 void fn_8006A6C4(int nPlayer) {
@@ -271,6 +280,34 @@ void fn_8006A6C4(int nPlayer) {
     lbl_801D5BF0[nPlayer].f1C = 0.5f;
     lbl_801D5BF0[nPlayer].f20 = 0.2f;
     lbl_801D5BF0[nPlayer].f24 = 0.2f;
+}
+
+// The hole's chunk 3 loader: the placement outline. Each node is listed in lbl_801D5CCC, and any
+// of its links that names the node itself is cleared.
+void fn_8006A7A8(u8* pChunk) {
+    TNetNode* pNode;
+    int i;
+    int j;
+
+    lbl_80281E30 = (TNetwork*)pChunk;
+    pNode = lbl_80281E30->aNodes;
+    lbl_80281E44 = 0;
+    for (i = 0; i < lbl_80281E30->nNumNodes; i++) {
+        lbl_801D5CCC[i].pNode = pNode;
+        if (pNode->nLink10 == i) {
+            pNode->nLink10 = -1;
+        }
+        if (pNode->nLink12 == i) {
+            pNode->nLink12 = -1;
+        }
+        for (j = 0; j < 8; j++) {
+            if (pNode->a14[j] == i) {
+                pNode->a14[j] = -1;
+            }
+        }
+        pNode++;
+        lbl_80281E44++;
+    }
 }
 
 void fn_8006A89C(void) {
@@ -344,4 +381,20 @@ void fn_8006A8D4(void* pCamera, f32* pX, f32* pY) {
 
     *pX = fn_80012EE8(pRect) + *pX * fn_80012ED8(pRect);
     *pY = fn_80012EE0(pRect) + *pY * fn_80012ED0(pRect);
+}
+
+// Draw text in one colour (pColor: RGBA).
+void fn_8006A9AC(f32* pColor) {
+    fn_80012EC4()->nA4 = 0x12;
+    fn_80012E54(pColor, (u8*)&fn_80012EC4()->u5C);
+}
+
+// The current font's line height, scaled as the text is drawn.
+f32 fn_8006A9FC(void) {
+    return fn_8006A8A8((u8*)fn_8006AA3C()) * fn_80012EC4()->f80;
+}
+
+// The font the current text settings draw with.
+LLFont* fn_8006AA3C(void) {
+    return lbl_80280DE0->apFonts[fn_80012EC4()->nFont];
 }
