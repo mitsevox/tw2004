@@ -504,18 +504,22 @@ typedef struct SD_SShaderObject_Static {
 typedef struct ParticleParams {
     u8   unk0[4];
     f32  f4;                    // 0x04  the particles' lifetime: older ones are dropped (fn_80094B84)
-    u8   unk8[0x18 - 0x8];
+    u8   unk8[4];
+    f32  fC;                    // 0x0C  } a new particle's two values after its velocity:
+    f32  f10;                   // 0x10  } fC (with flag 2 times a random -1..1), f10 (with flag 4
+    f32  f14;                   // 0x14  } plus up to f14; fn_80098CDC)
     f32  f18;                   // 0x18  at least 1/60 (fn_80099758)
     u8   unk1C[4];
     f32  f20;                   // 0x20
     f32  f24;                   // 0x24  the radius fn_80099AE4 tests an emitter with (over 1000: always);
                                 //       fn_80099758 works it out when f4 is not 0
-    f32  f28;                   // 0x28
+    f32  f28;                   // 0x28  a new particle's speed (flag 8: plus up to f2C; fn_80098CDC)
     f32  f2C;                   // 0x2C
-    f32  f30;                   // 0x30
+    f32  f30;                   // 0x30  its distance from the emitter (flag 0x20: plus up to f34)
     f32  f34;                   // 0x34
-    f32  f38;                   // 0x38  fn_80099758 replaces it with pi/2 minus it
-    u8   unk3C[4];
+    f32  f38;                   // 0x38  the angle it leaves at (flag 0x40: plus up to f3C);
+                                //       fn_80099758 replaces it with pi/2 minus it
+    f32  f3C;                   // 0x3C
     f32  f40;                   // 0x40  } three angles fn_80099758 makes the emitter's matrix from;
     f32  f44;                   // 0x44  } f40 is written by fn_800A30E4
     f32  f48;                   // 0x48  }

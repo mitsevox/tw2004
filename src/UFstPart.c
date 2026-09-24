@@ -90,6 +90,126 @@ void fn_80098C70(void) {
     lbl_801DB888[5]->params.u58 |= 0x80000000;
 }
 
+// A new particle's position and velocity (w 1 and 0) for pParams, both in the direction of a random
+// turn about y at the angle f38 above the plane: its distance f30 and speed f28, each with some
+// random added when a flag says so. Flag 0x200 spreads the position further by v60 (0x400: along
+// a random direction, else by a random -1..1 per axis). Then the three values after them.
+void fn_80098CDC(ParticleParams* pParams, f32* pPos, f32* pVel, f32* p18, f32* p1C, f32* p20) {
+    f32 fSpread;
+    f32 fSpeed;
+    f32 fDist;
+    f32 fRand;
+    f32 fTurn;
+    f32 fSinTurn;
+    f32 fCosTurn;
+    f32 fPitch;
+    f32 fSinPitch;
+    f32 fCosPitch;
+    f32 fDistXZ;
+    f32 fSpeedXZ;
+    f32 fRandXZ;
+    f32 x;
+    f32 y;
+    f32 z;
+
+    if (pParams->u58 & 8) {
+        fSpeed = pParams->f2C * Rand_Float(1) + pParams->f28;
+    } else {
+        fSpeed = pParams->f28;
+    }
+    if (pParams->u58 & 0x20) {
+        fRand = Rand_Float(1);
+        if (pParams->u58 & 0x10) {
+            fRand = fn_80009680(fRand);
+        }
+        fDist = pParams->f34 * fRand + pParams->f30;
+    } else {
+        fDist = pParams->f30;
+    }
+    fTurn = 2.0f * PI * Rand_Float(1);
+    fSinTurn = fn_800095F0(fTurn);
+    fCosTurn = fn_80009638(fTurn);
+    if (pParams->u58 & 0x40) {
+        fPitch = pParams->f3C * Rand_Float(1) + pParams->f38;
+    } else {
+        fPitch = pParams->f38;
+    }
+    fSinPitch = fn_800095F0(fPitch);
+    fCosPitch = fn_80009638(fPitch);
+    fDistXZ = fDist * fCosPitch;
+    fSpeedXZ = fSpeed * fCosPitch;
+    pPos[0] = fDistXZ * fCosTurn;
+    pPos[1] = fDist * fSinPitch;
+    pPos[2] = fDistXZ * fSinTurn;
+    pPos[3] = 1.0f;
+    pVel[0] = fSpeedXZ * fCosTurn;
+    pVel[1] = fSpeed * fSinPitch;
+    pVel[2] = fSpeedXZ * fSinTurn;
+    pVel[3] = 0.0f;
+    if (pParams->u58 & 0x200) {
+        if (pParams->u58 & 0x400) {
+            fTurn = 2.0f * PI * Rand_Float(1);
+            fSinTurn = fn_800095F0(fTurn);
+            fCosTurn = fn_80009638(fTurn);
+            fPitch = 2.0f * PI * Rand_Float(1);
+            fSinPitch = fn_800095F0(fPitch);
+            fCosPitch = fn_80009638(fPitch);
+            if (pParams->u58 & 0x800) {
+                fRand = Rand_Float(1);
+                fRandXZ = fRand * fSinPitch;
+                y = fRand * fCosPitch;
+                z = fRandXZ * fSinTurn;
+                x = fRandXZ * fCosTurn;
+            } else if (pParams->v60[1]) {
+                x = fCosTurn;
+                y = 0.0f;
+                z = fSinTurn;
+            } else {
+                z = fSinTurn;
+                x = fCosTurn;
+                y = fCosPitch;
+            }
+            if (pParams->v60[0]) {
+                pPos[0] += pParams->v60[0] * x;
+            }
+            if (pParams->v60[1]) {
+                pPos[1] += pParams->v60[1] * y;
+            }
+            if (pParams->v60[2]) {
+                pPos[2] += pParams->v60[2] * z;
+            }
+        } else {
+            fSpread = pParams->v60[0];
+            if (fSpread) {
+                pPos[0] += fSpread * (2.0f * Rand_Float(1) - 1.0f);
+            }
+            fSpread = pParams->v60[1];
+            if (fSpread) {
+                pPos[1] += fSpread * (2.0f * Rand_Float(1) - 1.0f);
+            }
+            fSpread = pParams->v60[2];
+            if (fSpread) {
+                pPos[2] += fSpread * (2.0f * Rand_Float(1) - 1.0f);
+            }
+        }
+    }
+    if (pParams->u58 & 1) {
+        *p18 = 2.0f * PI * Rand_Float(1);
+    } else {
+        *p18 = 0.0f;
+    }
+    if (pParams->u58 & 2) {
+        *p1C = pParams->fC * -(2.0f * Rand_Float(1) - 1.0f);
+    } else {
+        *p1C = pParams->fC;
+    }
+    if (pParams->u58 & 4) {
+        *p20 = pParams->f14 * Rand_Float(1) + pParams->f10;
+    } else {
+        *p20 = pParams->f10;
+    }
+}
+
 // Emit n particles through the emitter's matrix (ages spread over fAgeSpread), and add n to its n50.
 void fn_800990BC(PsEmitter* pEmitter, int n, f32 f10, f32 fAgeSpread) {
     ParticleMsg msg;
