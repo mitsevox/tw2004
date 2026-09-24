@@ -664,79 +664,85 @@ void fn_800670A8(int nPlayer, int nEvent, void* pData, int nArg) {
 }
 
 // The next shot kind, with its club and aim.
+// fake match: EA reads a few fields as gPlayers[nPlayer] beside pPlayer (the asm recomputes the
+// address there), so those stay in that form.
 void fn_80067220(int nPlayer) {
-    switch (gPlayers[nPlayer].nShotKind) {
+    Player* pPlayer = &gPlayers[nPlayer];
+
+    switch (pPlayer->nShotKind) {
     case 0:
-        gPlayers[nPlayer].nShotKind = 3;
-        gPlayers[nPlayer].nClub = gPlayers[nPlayer].nClubPerKind[gPlayers[nPlayer].nShotKind];
+        pPlayer->nShotKind = 3;
+        pPlayer->nClub = pPlayer->nClubPerKind[pPlayer->nShotKind];
         break;
     case 1:
-        gPlayers[nPlayer].nShotKind = 4;
-        gPlayers[nPlayer].nClub = gPlayers[nPlayer].nClubPerKind[gPlayers[nPlayer].nShotKind];
-        gPlayers[nPlayer].nShotKind2 = gPlayers[nPlayer].nShotKind;
+        pPlayer->nShotKind = 4;
+        pPlayer->nClub = pPlayer->nClubPerKind[pPlayer->nShotKind];
+        pPlayer->nShotKind2 = pPlayer->nShotKind;
         break;
     case 4:
-        gPlayers[nPlayer].nShotKind = 3;
-        gPlayers[nPlayer].nClub = gPlayers[nPlayer].nClubPerKind[gPlayers[nPlayer].nShotKind];
-        gPlayers[nPlayer].nShotKind2 = gPlayers[nPlayer].nShotKind;
+        pPlayer->nShotKind = 3;
+        pPlayer->nClub = pPlayer->nClubPerKind[pPlayer->nShotKind];
+        pPlayer->nShotKind2 = pPlayer->nShotKind;
         break;
     case 3:
-        if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e || AI_GreenTowardPin(nPlayer, 1.5f)) {
+        if (pPlayer->ball.nLie == LIE_GREEN_e || AI_GreenTowardPin(nPlayer, 1.5f)) {
             AI_AimAtPin(nPlayer);
-            gPlayers[nPlayer].fAim = Shot_AimAngle(nPlayer);
-            gPlayers[nPlayer].nShotKind = 2;
-            gPlayers[nPlayer].nClub = gPlayers[nPlayer].nClub =
-                gPlayers[nPlayer].nClubPerKind[gPlayers[nPlayer].nShotKind];
+            pPlayer->fAim = Shot_AimAngle(nPlayer);
+            pPlayer->nShotKind = 2;
+            pPlayer->nClub = pPlayer->nClub =
+                pPlayer->nClubPerKind[pPlayer->nShotKind];
             Shot_FitTargetToClub(nPlayer);
         } else {
-            gPlayers[nPlayer].nShotKind = 5;
-            gPlayers[nPlayer].nClub = gPlayers[nPlayer].nClubPerKind[gPlayers[nPlayer].nShotKind];
-            gPlayers[nPlayer].nShotKind2 = gPlayers[nPlayer].nShotKind;
+            pPlayer->nShotKind = 5;
+            pPlayer->nClub = pPlayer->nClubPerKind[pPlayer->nShotKind];
+            pPlayer->nShotKind2 = pPlayer->nShotKind;
         }
         break;
     case 5:
-        if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e || AI_GreenTowardPin(nPlayer, 1.5f)) {
+        if (pPlayer->ball.nLie == LIE_GREEN_e || AI_GreenTowardPin(nPlayer, 1.5f)) {
             AI_AimAtPin(nPlayer);
-            gPlayers[nPlayer].fAim = Shot_AimAngle(nPlayer);
-            gPlayers[nPlayer].nShotKind = 0;
-            gPlayers[nPlayer].nClub = CLUB_PUTTER_e;
+            pPlayer->fAim = Shot_AimAngle(nPlayer);
+            pPlayer->nShotKind = 0;
+            pPlayer->nClub = CLUB_PUTTER_e;
             Shot_FitTargetToClub(nPlayer);
         } else if (Lie_AllowsFullSwing(nPlayer)) {
             AI_AimAtPin(nPlayer);
-            gPlayers[nPlayer].fAim = Shot_AimAngle(nPlayer);
-            gPlayers[nPlayer].nShotKind = 2;
-            gPlayers[nPlayer].nClub = gPlayers[nPlayer].nClubPerKind[gPlayers[nPlayer].nShotKind];
-            gPlayers[nPlayer].nShotKind2 = gPlayers[nPlayer].nShotKind;
+            pPlayer->fAim = Shot_AimAngle(nPlayer);
+            pPlayer->nShotKind = 2;
+            pPlayer->nClub = pPlayer->nClubPerKind[pPlayer->nShotKind];
+            pPlayer->nShotKind2 = gPlayers[nPlayer].nShotKind;
             Shot_FitTargetToClub(nPlayer);
         } else {
-            gPlayers[nPlayer].nShotKind = 1;
-            gPlayers[nPlayer].nClub = gPlayers[nPlayer].nClubPerKind[gPlayers[nPlayer].nShotKind];
-            gPlayers[nPlayer].nShotKind2 = gPlayers[nPlayer].nShotKind;
+            pPlayer->nShotKind = 1;
+            pPlayer->nClub = pPlayer->nClubPerKind[pPlayer->nShotKind];
+            pPlayer->nShotKind2 = gPlayers[nPlayer].nShotKind;
         }
         break;
     case 2:
-        if (gPlayers[nPlayer].ball.nLie == LIE_GREEN_e) {
+        if (pPlayer->ball.nLie == LIE_GREEN_e) {
             AI_AimAtPin(nPlayer);
-            gPlayers[nPlayer].fAim = Shot_AimAngle(nPlayer);
-            gPlayers[nPlayer].nShotKind = 0;
-            gPlayers[nPlayer].nClub = CLUB_PUTTER_e;
+            pPlayer->fAim = Shot_AimAngle(nPlayer);
+            pPlayer->nShotKind = 0;
+            pPlayer->nClub = CLUB_PUTTER_e;
             Shot_FitTargetToClub(nPlayer);
         } else {
-            gPlayers[nPlayer].nShotKind = 1;
-            gPlayers[nPlayer].nClub = gPlayers[nPlayer].nClubPerKind[gPlayers[nPlayer].nShotKind];
-            gPlayers[nPlayer].nShotKind2 = gPlayers[nPlayer].nShotKind;
+            pPlayer->nShotKind = 1;
+            pPlayer->nClub = pPlayer->nClubPerKind[pPlayer->nShotKind];
+            pPlayer->nShotKind2 = pPlayer->nShotKind;
         }
         break;
+    case 6:
+    case 7:
     default:
-        gPlayers[nPlayer].nShotKind = 1;
-        gPlayers[nPlayer].nClub = gPlayers[nPlayer].nClubPerKind[gPlayers[nPlayer].nShotKind];
-        gPlayers[nPlayer].nShotKind2 = gPlayers[nPlayer].nShotKind;
+        pPlayer->nShotKind = 1;
+        pPlayer->nClub = pPlayer->nClubPerKind[pPlayer->nShotKind];
+        pPlayer->nShotKind2 = pPlayer->nShotKind;
         break;
     }
     fn_800689D4(nPlayer);
-    gPlayers[nPlayer].fA60 = 0.0f;
+    pPlayer->fA60 = 0.0f;
     Shot_FitTargetToClub(nPlayer);
-    Vec_Copy(gPlayers[nPlayer].vTarget, gPlayers[nPlayer].vTarget2);
+    Vec_Copy(pPlayer->vTarget, pPlayer->vTarget2);
     gPlayers[nPlayer].fPower = AI_PowerForTarget(nPlayer);
     fn_80062C38();
     fn_8001C680(nPlayer);
