@@ -70,7 +70,12 @@ void fn_8012408C(s32 v);
 s32  fn_8012411C(void);
 void fn_80124138(s32 n);
 s32  fn_80124174(void);
+s32  fn_80124190(void);
 s32  fn_801241CC(void);
+void fn_801241D4(s32 v);
+void fn_8012421C(s32 v);
+s32  fn_80124224(void);
+void fn_80123CBC(s32 a, s32 b);
 
 // The other files' message handlers in the table (the Create-A-Player screens, the logo editor,
 // the PGA TOUR screens, the stats screen, the EA Sports Bio...).
@@ -4360,6 +4365,35 @@ void fn_80083EE0(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_80083F54(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
+}
+
+// Read five values over the Game Boy Advance link (gbacable.c) into the words pArgs[0..4] point
+// at: fn_80124174's after request 0x70, then fn_80124190's after requests 0xB0 with 0 to 3. It
+// stops once the link's state (fn_80124094) is 18 or -1. Then, if fn_80124224 says so, a state
+// of 7 or 9 becomes 12 or 13.
+void fn_80084008(MsgArg* pArgs, MsgArg* pResult) {
+    u32 i;
+
+    if (fn_80124094() != 18 && fn_80124094() != -1) {
+        fn_80123CBC(0x70, 0);
+        if (fn_80124094() != 18 && fn_80124094() != -1) {
+            *(s32*)pArgs[0].p = fn_80124174();
+            for (i = 0; i < 4; i++) {
+                fn_80123CBC(0xB0, i);
+                if (fn_80124094() == 18 || fn_80124094() == -1) break;
+                *(s32*)pArgs[1 + i].p = fn_80124190();
+            }
+        }
+    }
+    fn_801241D4(0);
+    if (fn_80124224()) {
+        if (fn_80124094() == 7) {
+            fn_8012408C(12);
+        } else if (fn_80124094() == 9) {
+            fn_8012408C(13);
+        }
+        fn_8012421C(0);
+    }
 }
 
 void fn_8008410C(MsgArg* pArgs, MsgArg* pResult) {
