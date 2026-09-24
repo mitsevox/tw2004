@@ -1,0 +1,38 @@
+money-01, cloud round 1 (2026-09-24, 15:58-16:23 CDT). Scores = differing instructions (quicktrial)
+unless marked "aligned".
+
+DONE
+- uiLoadFile fn_8008EFC0 / fn_8008EFFC -> 100, unit linked. Fix: the relocation add through a local,
+  `pName = t->apNames[i]; pName += (uptr)pList; t->apNames[i] = pName;` (same for the 'FONS' offsets);
+  any declaration position of the local matches. `x = a[i] + base` and `p = a[i]; a[i] = p + base`
+  do not. Link: lbl_80281360 defined after fn_8008EC68 (.sdata strings first), .sbss globals in
+  reverse address order, lbl_801D87A8 defined in the unit; graduate.py failed, done by hand.
+
+LEFT
+- SunFlr_Gc fn_8009A708 (3): the original adds pImage + block first; CodeWarrior reassociates our sums
+  so pImage comes last. None better than 3: 2-D/3-D array casts u8 (*)[64], [8][8], [4][8],
+  [2][4][8], [8][4][2]; struct-of-arrays casts; inline Tile/Row/Px helpers; uptr accumulator with +=;
+  `p = pImage; p += ...` x3 and an n temp; u16*/u32*/(*)[4] scaled pointers; the 6 term orders x
+  (u32) casts per term; `(u8*)((uptr)pImage + ...)` = 3.
+- SunFlr_Gc fn_8009A3F4 (33): nEndY/nBottom and pView/nCopyY get each other's registers. nEndX/nEndY/
+  nX/nY as inline expressions 33-127; nEnd = nSun + k no better; nX straight from v[] 60-90;
+  positional declaration climb over all 23 declarations stays 33.
+- PsMgr fn_800A2A80 (dead second `b end`), whole-switch rewrites through trial.py, all <= 97.78:
+  case 1 / default combinations before and after case 0; `break; break;`; a statement before the
+  first case; do{}while(0) / if(1) around the switch; `case 1: goto done;`; an nRet local; an empty
+  inline call or `if (pArg) {}` in case 1; `return PsZero()`; `case 1: return 0;` 93; `case 1:
+  return;` 95.6. (fn_800A2B34 gets its dead `b` from `case 1: return;` in a void function.)
+- Earnings fn_800D4F14 (14): the 36 orders of the bReplace/bLost/nSlot setup: no change; chained or
+  copied zeroing 14-15; `int j` inside the `if (nId)` block 25.
+- Earnings fn_800D477C (19): nAdj + nHoles operand orders and `(nHoles = fn()) < 10` 19-21; the 6
+  orders of {ball copy, nAdj, bNoBall} 19-66; nAdj set inside the bPreview if/else 25-26; permuter
+  10 min -j2: 95 -> 65 only with an unused shadowing nSlot plus a `new_var = i` copy (fake, unusable).
+- DepthField DF_vDrawBufferToScreen: best 27 aligned (was 79, old best 51) with
+  `DF_Clamp(f64 f, f64 fLo, f32 fHi)` { f32 x = f; if (x < fLo) x = fLo; else if (x > fHi) x = fHi;
+  return x; } - not applied: it compares the low bound in double and reloads it, the mirror of the
+  original (0.0 kept in f31, 1.0 reloaded with lfs into the result register). Operand orders x 3
+  body forms x f32/f64 on every parameter, int/s32/u8/s16 fHi, nested Min(Max()) (143): none < 27.
+- Ball Physics_HandleCollision (92 aligned): `fGrip *= gTurfSpeedMul[]` as a*b, b*a, through a temp,
+  with a cast, in pointer form, at both sites in every pairing: all 92.
+- Compiler versions: GC/2.0, 2.6, 2.7, 1.3.2 give output identical to 2.5 on all eight functions
+  above (1.2.5 and 3.0a5 far off).
