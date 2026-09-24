@@ -310,13 +310,13 @@ u32 fn_800B8984(u8* pData, int nBytes) {
         return pData[0];
     }
     if (nBytes == 2) {
-        return pData[0] | (pData[1] << 8);
+        return (pData[1] << 8) | pData[0];
     }
     if (nBytes == 3) {
-        return pData[0] | ((pData[1] << 8) | (pData[2] << 16));
+        return pData[0] | ((pData[2] << 16) | (pData[1] << 8));
     }
     if (nBytes == 4) {
-        return pData[0] | ((pData[1] << 8) | ((pData[2] << 16) | (pData[3] << 24)));
+        return pData[0] | ((pData[1] << 8) | ((pData[3] << 24) | (pData[2] << 16)));
     }
     return 0;
 }
