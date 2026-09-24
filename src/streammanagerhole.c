@@ -9,6 +9,7 @@
 #include "character.h"
 #include "frontend/fe.h"
 #include "gx.h"
+#include "unsorted/cull.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -48,6 +49,8 @@ void fn_80091778(void);     // fe_movies.c
 void fn_8000ADC0(f32 (*m)[4]);          // identity matrix
 void fn_800141CC(void);
 s32  fn_800072E0(void);
+void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);  // UMemPool.c: copy a 4x4 matrix
+void fn_80016C28(f32* pSrc, f32* pDst);             // negate four floats
 void fn_800169AC(void);     // apply lbl_80280E08's viewport
 void fn_80016208(void);
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
@@ -757,6 +760,15 @@ void fn_800168A0(f32* pPos, f32* pColour, f32* pUV) {
     fn_80016C94(pPos[0], pPos[1], pPos[2]);
     fn_80016C7C(255.0f * pColour[0], 255.0f * pColour[1], 255.0f * pColour[2], 255.0f * pColour[3]);
     fn_80016CA8(pUV[0], pUV[1]);
+}
+
+// Give the renderer the current camera's matrices, with rows 0 and 2 of the first negated.
+void fn_80016B9C(void) {
+    fn_8000A0E8(((Camera*)fn_8001614C())->m15C, lbl_801B8980.m34);
+    fn_8000A0E8(((Camera*)fn_8001614C())->m9C, lbl_801B8980.m74);
+    fn_80016C28(lbl_801B8980.m34[0], lbl_801B8980.m34[0]);
+    fn_80016C28(lbl_801B8980.m34[2], lbl_801B8980.m34[2]);
+    lbl_801B8980.u110 |= 0x100;
 }
 
 // Set the viewport's corners, as fractions of the screen.
