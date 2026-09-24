@@ -938,7 +938,7 @@ config.libs = [
             Object(NonMatching, "MC.c"),
             Object(NonMatching, "PsMgr.c"),
             Object(NonMatching, "PsBallFx.c"),
-            Object(NonMatching, "GameAudio.c"),
+            Object(Matching, "GameAudio.c"),
             Object(Matching, "AudTable.c"),
             Object(NonMatching, "hlaudmovie.c"),
             Object(NonMatching, "hlaudtrackstm.c"),
