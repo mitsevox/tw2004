@@ -44,13 +44,29 @@ LAYOUT_ASSERT(SkinLink, 0x10);
 typedef struct SkinDesc14 {
     u64  uId;                   // 0x00
     u32  u08;                   // 0x08  bit 2: take a4 from SkinDesc.pB8
-    u8   unkC[0x16 - 0xC];
+    u32  u0C;                   // 0x0C
+    u32  u10;                   // 0x10
+    s16  n14;                   // 0x14
     s16  n16;                   // 0x16  entries of pB8 from n1C
     s32  n18;                   // 0x18  an entry of SkinDesc.p8C, -1 none
     s32  n1C;                   // 0x1C
     u32  a20[4];                // 0x20
 } SkinDesc14;
 LAYOUT_ASSERT(SkinDesc14, 0x30);
+
+// A SkinDesc14 as version 8 descriptions with n04 == 0 store it (our name): fn_800368FC moves
+// u14 to SkinDesc14.u10 and narrows n10 and n18 into n14 and n16.
+typedef struct SkinDesc14Old {
+    u64  uId;                   // 0x00
+    u32  u08;                   // 0x08
+    u32  u0C;                   // 0x0C
+    s32  n10;                   // 0x10  -> SkinDesc14.n14
+    u32  u14;                   // 0x14  -> SkinDesc14.u10
+    s32  n18;                   // 0x18  -> SkinDesc14.n16
+    s32  n1C;                   // 0x1C
+    u32  a20[4];                // 0x20
+} SkinDesc14Old;
+LAYOUT_ASSERT(SkinDesc14Old, 0x30);
 
 typedef struct SkinMeshBit {
     u8   unk0[6];
