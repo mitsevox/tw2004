@@ -533,13 +533,13 @@ f32 SW_vCalculateShotPower(int nPlayer) {
         goto clamp;         // fake match: the shared clamp as a jump (without the gotos: 83.9%, not 84.9%)
     }
     // fake match: PLAYER() from here, gPlayers[] in the block above (91.3%; one Player* local: 84.9%)
-    fPower = PLAYER(nPlayer)->fPower;
+    fPower = gPlayers[nPlayer].fPower;
     pPower = &PLAYER(nPlayer)->fPower;
-    fError = fabs(PLAYER(nPlayer)->swing.fMishitAngle);
-    PLAYER(nPlayer)->swing.fNonPowerShotPower = Swing_ApplyPowerBoost(nPlayer, fPower) - fError;
-    switch (PLAYER(nPlayer)->nShotKind) {
+    fError = fabs(gPlayers[nPlayer].swing.fMishitAngle);
+    gPlayers[nPlayer].swing.fNonPowerShotPower = Swing_ApplyPowerBoost(nPlayer, fPower) - fError;
+    switch (gPlayers[nPlayer].nShotKind) {
     case SHOT_TYPE_PUTT_e: {
-        f32 fDist = PLAYER(nPlayer)->fDistance < 1.0f ? 1.0f : PLAYER(nPlayer)->fDistance;
+        f32 fDist = gPlayers[nPlayer].fDistance < 1.0f ? 1.0f : gPlayers[nPlayer].fDistance;
         if (*pPower > gpSwing->fPuttFullPower) {
             *pPower = 1.0f;
         }
@@ -553,9 +553,9 @@ f32 SW_vCalculateShotPower(int nPlayer) {
     case SHOT_TYPE_CHIP_e:
     case SHOT_TYPE_PITCH_e: {
         f32 f;
-        if (PLAYER(nPlayer)->nShotKind == SHOT_TYPE_CHIP_e) {
-            f = *pPower * Physics_EstimateShotPower(PLAYER(nPlayer)->fDistance, &PLAYER(nPlayer)->ball,
-                                                    SHOT_TYPE_CHIP_e, PLAYER(nPlayer)->nClub);
+        if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_CHIP_e) {
+            f = *pPower * Physics_EstimateShotPower(gPlayers[nPlayer].fDistance, &gPlayers[nPlayer].ball,
+                                                    SHOT_TYPE_CHIP_e, gPlayers[nPlayer].nClub);
         } else {
             f = *pPower;
         }
@@ -575,9 +575,9 @@ f32 SW_vCalculateShotPower(int nPlayer) {
         nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL);
         break;
     default:
-        if (PLAYER(nPlayer)->ball.nLie == 6 || PLAYER(nPlayer)->ball.nLie == 7 ||
-            PLAYER(nPlayer)->ball.nLie == 8 || PLAYER(nPlayer)->ball.nLie == 3 ||
-            PLAYER(nPlayer)->ball.nLie == 4) {
+        if (gPlayers[nPlayer].ball.nLie == 6 || gPlayers[nPlayer].ball.nLie == 7 ||
+            gPlayers[nPlayer].ball.nLie == 8 || gPlayers[nPlayer].ball.nLie == 3 ||
+            gPlayers[nPlayer].ball.nLie == 4) {
             nRowScale  = ROW_RECOVERY_PWR + 1;
             nRowThresh = ROW_RECOVERY_PWR;
             nAttr      = (s8)Golfer_GetAttribute(&gPlayers[nPlayer], ATTR_RECOVERY, ATTR_TOTAL);
