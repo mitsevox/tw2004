@@ -533,8 +533,9 @@ f32 SW_vCalculateShotPower(int nPlayer) {
         }
         goto clamp;         // fake match: the shared clamp as a jump (without the gotos: 83.9%, not 84.9%)
     }
-    // fake match: PLAYER() from here, gPlayers[] in the block above (91.3%; one Player* local: 84.9%)
     fPower = gPlayers[nPlayer].fPower;
+    // fake match: pPower through PLAYER(), everything else through gPlayers[] (98.4%; all
+    // gPlayers[]: 92.4%; one Player* local: 84.9%)
     pPower = &PLAYER(nPlayer)->fPower;
     fError = fabs(gPlayers[nPlayer].swing.fMishitAngle);
     gPlayers[nPlayer].swing.fNonPowerShotPower = Swing_ApplyPowerBoost(nPlayer, fPower) - fError;
