@@ -80,7 +80,7 @@ void fn_800703B8(DynRenderBuffer* pBuf, u32 nStart, u16 nCount, int nPrim) {
 void fn_800704C4(DynRenderBuffer* pBuf, const void* pPos, const void* pColour, const void* pTexCoord,
                  int nVerts, u8 bFlip) {
     u8* pDst;
-    u32 uSize;
+    int uSize;
     u8 nBuffer;
 
     if (bFlip) {
@@ -150,8 +150,7 @@ void fn_80070764(DynRenderBuffer* pBuf, const DynRenderDrawIn* pIn, u16 nCount, 
             return;
         }
         pList->nDraws = nCount;
-        pDraw = pList->aDraws;
-        for (i = 0; i < nCount; i++) {
+        for (i = 0, pDraw = pList->aDraws; i < nCount; i++) {
             pDraw->nStart = pIn[i].nStart;
             pDraw->nCount = pIn[i].nCount;
             pDraw->nPrim = pIn[i].nPrim;
