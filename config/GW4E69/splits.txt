@@ -303,6 +303,7 @@ gomainloop.c:
 	.text       start:0x8006C630 end:0x8006E150
 	.data       start:0x801888D0 end:0x801888E0
 	.sdata      start:0x802811D0 end:0x802811D8
+	.sbss       start:0x80281E50 end:0x80281E68
 	.sdata2     start:0x802838C0 end:0x802838F0
 
 GoFrameBuf.c:
@@ -847,18 +848,25 @@ GameMode15.c:
 
 GameMode16.c:
 	.text       start:0x800F4B40 end:0x800F5AAC
+	.sdata      start:0x80281698 end:0x802816A0
+	.sbss       start:0x80282390 end:0x802823A0
 	.sdata2     start:0x802846D0 end:0x802846E0
 
 GameMode17.c:
 	.text       start:0x800F5AAC end:0x800F6A60
+	.sdata      start:0x802816A0 end:0x802816A8
+	.sbss       start:0x802823A0 end:0x802823B0
 	.sdata2     start:0x802846E0 end:0x802846E8
 
 GameMode13.c:
 	.text       start:0x800F6A60 end:0x800F80FC
+	.sdata      start:0x802816A8 end:0x802816B0
+	.sbss       start:0x802823B0 end:0x802823C0
 	.sdata2     start:0x802846E8 end:0x80284700
 
 GameMode2.c:
 	.text       start:0x800F80FC end:0x800F944C
+	.sbss       start:0x802823C0 end:0x802823C8
 	.sdata2     start:0x80284700 end:0x80284708
 
 GameMode6.c:

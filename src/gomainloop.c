@@ -10,6 +10,12 @@
 #include "game/frontend.h"
 #include "llpict.h"
 
+void*       lbl_80281E60;
+GoFrameBuf* lbl_80281E5C;
+void*       lbl_80281E58;
+void*       lbl_80281E54;
+u8          lbl_80281E50;
+
 // The other systems' start-up, shut-down and per-frame calls, from their files (most are not
 // decompiled yet; the types are from the calls here).
 u8   OSGetResetButtonState(void);
