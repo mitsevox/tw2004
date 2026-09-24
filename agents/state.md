@@ -17,8 +17,10 @@ split-finder (LLTime.c, Code800B90F4.c linked; survey in agents/findings/split-s
 Strong split leads from the survey, all free now: Swing (3 state files, ~23 KB exact), Golfer
 (Caddie part ~4.8 KB), Ball (Wind.c), goballfx (GoLightFogEnv); medium: Golfer club part, Glows,
 hlaudmovie. RUNNING (cloud, to 19:15 CDT, no permuter): split-01 (worktree cam-01) on Swing, Ball/Wind,
-goballfx/GoLightFogEnv, Golfer; uis-01 (worktree swing-01) reworking UISApi, UISEvent, UIStudio for
-the deferred build. Fake-match helpers now named fn_<caller>_Read (brief).
+goballfx/GoLightFogEnv, Golfer. uis-01 done: UISApi/UISEvent/UIStudio reversed + deferred give
+byte-identical code and data (no evidence either way; no score moved). Merged only UISEvent, where
+it lets FindRateFn's fake copy go (callers call fn_8016604C); UISApi/UIStudio left as they were
+(branch agent/swing-01 commit db03b3f has the reversed versions). Fake-match helpers now named fn_<caller>_Read (brief).
 Held by the owner's PC to ~19:15 CDT (wins come as local/<name> branches): map-02 GoGolfCam,
 Earnings, gocamscripts; map-03 Skin, UStream, GoBreakLine, GoStaticCam, UObject, uiText,
 TerrainData, GoShaderObject_Rain_Gc, hlaudmovie, LLFileIO_Gc; map-04 ska_shared, AnimStream, skalib;
