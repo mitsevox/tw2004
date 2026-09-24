@@ -818,7 +818,7 @@ void Swing_FaceVector(int nPlayer, f32* pOut) {
 // The second launch block: a CPU's (or a perfect shot's) shape vector; square for a human.
 void Swing_ShapeVector(int nPlayer, f32* pOut) {
     if (Player_IsCPU(nPlayer) || gPlayers[nPlayer].bPerfect) {
-        AI_FaceVector(nPlayer, pOut);
+        fn_8002D560_ShapeDir(nPlayer, pOut);
     } else {
         pOut[0] = 0.0f;
         pOut[1] = 0.0f;
@@ -1545,7 +1545,7 @@ int Swing_UpdateDownswing(int nPlayer) {
         if (!Controller_IsCPU(nController) && gSession.bReplay == 0) {
             gPlayers[nPlayer].swing.bCanSpin = 1;
         }
-        if (Controller_IsPad(nController) && gSession.bReplay == 0) {
+        if (fn_8002E898_IsPad(nController) && gSession.bReplay == 0) {
             Swing_MisHitRumble(nPlayer);
         }
         if (gPlayers[nPlayer].nShotKind == SHOT_TYPE_PUTT_e) {
@@ -1571,7 +1571,7 @@ void Swing_RumbleOff(int nPlayer) {
     s32*    pFrames;
     s32*    pController;
     Player* p;
-    if (Player_HasPad(nPlayer)) {
+    if (fn_8002E868_HasPad(nPlayer)) {
         p           = &gPlayers[nPlayer];
         pFrames     = &p->swing.nVibrateCount;
         pController = &p->nController;
@@ -1584,7 +1584,7 @@ void Swing_RumbleOff(int nPlayer) {
 
 // Count the mis-hit rumble down and stop it when it runs out.
 void Swing_RumbleTick(int nPlayer) {
-    if (Player_HasPad(nPlayer)) {
+    if (fn_8002E868_HasPad(nPlayer)) {
         if (gPlayers[nPlayer].swing.bVibrating) {
             if (gPlayers[nPlayer].swing.nVibrateCount <= 0) {
                 Swing_RumbleOff(nPlayer);

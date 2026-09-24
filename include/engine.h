@@ -734,7 +734,7 @@ struct ShaderObject {
 };
 LAYOUT_ASSERT(ShaderObject, 0x28);
 
-void fn_80036100(ShaderObject* pObj, const void* pData, int n);    // Skin.c: hands it a frame's data
+void fn_80036100(ShaderObject* pObj, const void* pData, int n);    // Skin.c: hands it data through its fill hook
 
 struct UObjMeshPart;
 struct UObjArraySet;

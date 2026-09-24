@@ -91,7 +91,7 @@ void  fn_8001EDA8(Character* pChar, int nBone, f32* pPos);
 void  fn_8001EF54(f32* pA, f32* pB, f32* pOut);
 void  fn_8001EF10(f32* pA, f32* pB, f32* pOut);
 void  fn_80095558(void);
-void  AnimLib_ApplyOverlays(int nSlot);                         // skalib.c
+void  fn_800253E0_ApplySavedChoices(int nSlot);                         // skalib.c
 void  fn_80025478(void);                                        // skalib.c
 void  fn_800CA7E0(void);                                        // AnimStream.c
 void  fn_800CABA0(void);                                        // AnimStream.c
@@ -1591,8 +1591,8 @@ void fn_8001A920(void) {
             }
         }
     }
-    AnimLib_ApplyOverlays(0);
-    AnimLib_ApplyOverlays(1);
+    fn_800253E0_ApplySavedChoices(0);
+    fn_800253E0_ApplySavedChoices(1);
     fn_800CA9DC(-1);
     fn_800CA7E0();
     fn_80025478();

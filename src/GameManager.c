@@ -985,7 +985,7 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
         CameraController_FadeOut(pView, lbl_80281F78->f170, vOffset);
         return;
     }
-    if (Player_IsNotCPU(nPlayer) && gSession.nSplitScreen == 0) {
+    if (fn_8002E8B4(nPlayer) && gSession.nSplitScreen == 0) {
         if (gSession.bReplay == 0 && (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0x19, 0)) &&
             !(gPlayers[nPlayer].uFlags & 8)) {
             if (GM_PlayerTakeMulligan(nPlayer)) {
@@ -1004,7 +1004,7 @@ void GM_DoPostShotInHoleUI(int nPlayer) {
         if ((fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0, 0)) && !fn_8008AC40()) {
             fn_800E41D4(nPlayer);
         }
-    } else if (Player_IsNotCPU(nPlayer)) {
+    } else if (fn_8002E8B4(nPlayer)) {
         if (!fn_8008AC40() && (fn_800136DC(gPlayers[nPlayer].nController) & fn_800142AC(0, 0))) {
             fn_800E41D4(nPlayer);
         }

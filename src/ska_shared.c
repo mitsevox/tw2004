@@ -1,6 +1,6 @@
 // ska_shared.c (TW06's golf/animation/ska_shared.c): the skeletal animation code the golfer's
-// character shares: blending animation clips into bone rotations (quaternions) and reading the
-// clip banks, and byte-swapping and laying out a clip read from disc.
+// character shares: decoding clip frames (from memory or ARAM) into bone rotations (quaternions)
+// and blending them, and byte-swapping and laying out a clip read from disc.
 
 #include "game_types.h"
 #include "core/goaram.h"
@@ -241,10 +241,10 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
     }
 }
 
-// Decodes frame nFrame of pClip: its second-stream frame into pPose2 (fn_8002148C) and its
-// first-stream frame into pPose1 (fn_80021134), fetching them from ARAM first when the clip's
-// frames live there (then n28 bytes of the first-stream frame are also copied to pExtra).
-// Always returns 1.
+// Decodes frame nFrame of pClip: its second-stream frame into pPose2 (fn_8002148C, when n36 is not
+// 0) and its first-stream frame into pPose1 (fn_80021134, when n0A is not 0), fetching them from
+// ARAM first when the clip's frames live there (then, when pF0 is set, n28 bytes at n2A of the
+// first-stream frame are also copied to pExtra). Always returns 1.
 u8 fn_80020328(Clip* pClip, int nFrame, f32* pPose2, f32* pPose1, u8* pExtra) {
     ARAMTransfer* pTransfer = NULL;
     u8* pFrame2;
@@ -364,8 +364,9 @@ f32 fn_800205F8(Clip* pClip, f32 fTime) {
 }
 
 // Lays out a clip's data after its tracks: the pE8 and pE0 blocks from pC8 (rounded up to 16
-// bytes), then the first frame stream (in ARAM at uAram when uAram is not 0), the second, and the
-// tracks' ranges and keys. Tracks only get their key pointers when the frames stay in memory.
+// bytes), then the first frame stream, the second, and the tracks' ranges and keys (from uAram on,
+// in ARAM, when uAram is not 0). Tracks with flag 0x10 get their key pointers only when the frames
+// stay in memory.
 void fn_800206C8(Clip* pClip, u32 uAram) {
     u8* p = pClip->pC8;
     ClipTrack* pTrack;
@@ -435,7 +436,8 @@ void fn_800206C8(Clip* pClip, u32 uAram) {
     }
 }
 
-// Byte-swaps a clip's frame streams, ranges and keys in place (the clip is laid out in memory).
+// Byte-swaps a laid-out clip's 16-bit data in place: the first frame stream, the pE0 and pE8
+// blocks, the ranges (words) and the keys; not the byte-wide second stream.
 void fn_80020858(Clip* pClip) {
     u8* pSrc;
 
@@ -509,9 +511,10 @@ void fn_80020B2C(void* pRecords, int nCount) {
     fn_8001F08C(&pSrc, &pDst, aRecord, 4, nCount);
 }
 
-// Byte-swaps the clip read from disc at p in place and sets its pointers as it goes: header, events,
-// BlendClip and tracks, then the data blocks after them (fn_800206C8's layout, all in memory),
-// its pF4 library (fn_8001F110) and two bit arrays of 2 * n1C bits (pF8, pFC).
+// Byte-swaps the clip read from disc at p in place: header, events, BlendClip and tracks, then the
+// data blocks after them (fn_800206C8's layout, all in memory), its pF4 library (fn_8001F110) and
+// two bit arrays of 2 * n1C bits. It sets pD0, pC4/pC8 and the later blocks' pointers (uAram, pE4,
+// pEC, pF0, pF4, pF8, pFC), not pEvents, pD8, pE8 or pE0.
 void fn_80020BC8(u8* p) {
     Clip* pClip = (Clip*)p;
     u8* pSrc;
@@ -691,9 +694,9 @@ void fn_80020FF8(f32* pOut, f32 fX, f32 fY, f32 fZ) {
 }
 
 // Decodes nBones bone rotations packed as u16 angles (0x10000 to a turn) from pFrame into pOut's
-// quaternions (4 floats each). Two bits per bone in pBits give its kind: one angle about z (1), about
-// x (2) or about y (3), or three angles (0). While lbl_80281CC0 is clear the z and y angles and the
-// last two of three angles are negated (fn_80021978 sets it).
+// quaternions (4 floats each). Two bits per bone in pBits give its kind: one angle about z (1),
+// about x (2) or about y (3), or three angles (0). A lone x angle is always negated; lbl_80281CC0
+// (fn_80021978 sets it) negates a lone z or y angle while clear, the last two of three while set.
 void fn_80021134(u16* p, f32* pOut, s32 nBones, u32* pBits) {
     int nBit;   // fake match: 2 * i kept in its own counter for the second bit (the first is (u32)i * 2)
     int i;

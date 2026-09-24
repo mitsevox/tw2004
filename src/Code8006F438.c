@@ -47,7 +47,7 @@ void fn_8006F4E0(void);
 void fn_800676AC();
 void fn_8006A89C();
 void fn_8006F600(void);
-void AI_TargetsHook();
+void fn_8002BC6C();
 void fn_80019648();
 void fn_80037E50();
 void DynObj_InitForHole();
@@ -92,7 +92,7 @@ void fn_8006F4F0(void) {
 void fn_8006F518(void) {
     fn_8009B894();
     fn_800C8134();
-    AI_TargetsHook();
+    fn_8002BC6C();
     fn_80019648();
     DynObj_InitForHole();
     fn_8006F650();

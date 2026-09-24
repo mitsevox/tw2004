@@ -1,5 +1,6 @@
-// Skin.c (EA's name, from its asserts; also in EA's 2002 source tree): not yet decompiled; the
-// sweep code below is the matched small functions.
+// Skin.c (EA's name, from its asserts; also in EA's 2002 source tree): a character's skinned
+// model: making a skin from its file (byte-swapped, offsets to pointers), its bone matrices and
+// morph weights, and drawing it (all its parts but "shadow", or only those).
 
 #include "game_types.h"
 #include "engine.h"
@@ -409,7 +410,7 @@ void fn_800360D4(ShaderObject* pObj) {
     pObj->pHooks->pfnDraw(pObj);
 }
 
-// Hands it a frame's data.
+// Hands it pData and n through its row's fill hook.
 void fn_80036100(ShaderObject* pObj, const void* pData, int n) {
     pObj->pHooks->pfnFill(pObj, pData, n);
 }
@@ -425,8 +426,9 @@ void fn_8003614C(Character* pChar, f32* pOut) {
     }
 }
 
-// Blends the morph weights of two format 1 poses into pOut, fWeight of the way from pA to pB, for
-// each morph either sets; the morphs pOut gets are those of both, and pA's and pB's are cleared.
+// Blends two format 1 poses into pOut, fWeight of the way from pA to pB: in each of the three
+// blocks, each of the 20 channels either sets; pOut's bits become the union of both, and pA's and
+// pB's bits are cleared.
 void fn_80036180(SkelPose1* pA, SkelPose1* pB, SkelPose1* pOut, f32 fWeight) {
     u32 aBits[4];   // only 20 bits are used; the size is not known
     int i;

@@ -422,7 +422,7 @@ u8 fn_80068AC8(int nPlayer) {
         fDZ = fCos * gPlayers[nPlayer].fDistance;
         gPlayers[nPlayer].vTarget[0] = fDX + gPlayers[nPlayer].vBall[0];
         gPlayers[nPlayer].vTarget[2] = fDZ + gPlayers[nPlayer].vBall[2];
-        AI_PlanShot(nPlayer, pTarget);
+        fn_8002BDEC_SetTarget(nPlayer, pTarget);
         Vec_Copy(pTarget, gPlayers[nPlayer].vTarget2);
         fn_8001C804(nPlayer, 0, 1);
         fn_80062C38();
@@ -475,14 +475,14 @@ u8 fn_80068AC8(int nPlayer) {
             bInRange = 1;
         }
         if (bInRange) {
-            AI_PlanShot(nPlayer, pTarget);
+            fn_8002BDEC_SetTarget(nPlayer, pTarget);
             fSin = fn_800095F0(gPlayers[nPlayer].fAim);
             fCos = fn_80009638(gPlayers[nPlayer].fAim);
             fDX = -fSin * gPlayers[nPlayer].fDistance;
             fDZ = fCos * gPlayers[nPlayer].fDistance;
             gPlayers[nPlayer].vTarget[0] = fDX + gPlayers[nPlayer].vBall[0];
             gPlayers[nPlayer].vTarget[2] = fDZ + gPlayers[nPlayer].vBall[2];
-            AI_PlanShot(nPlayer, pTarget);
+            fn_8002BDEC_SetTarget(nPlayer, pTarget);
             Vec_Copy(pTarget, gPlayers[nPlayer].vTarget2);
             if (gPlayers[nPlayer].nShotKind != 2) {
                 nClub = gPlayers[nPlayer].nClub;

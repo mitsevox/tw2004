@@ -740,44 +740,44 @@ void AI_DefaultTarget(int nPlayer);
 s8   Caddie_GetTip(int nPlayer, f32* pOut);     // 0 no tip, 1 the aim point in pOut, 2 gave up
 u8   Player_IsCPU(int nPlayer);
 u8   Controller_IsCPU(int nController);
-u8   Player_HasPad(int nPlayer);
-u8   Controller_IsPad(int nController);
+u8   fn_8002E868_HasPad(int nPlayer);
+u8   fn_8002E898_IsPad(int nController);
 u8   Player_IsController8(int nPlayer);
 u8   Player_OnTee(int nPlayer);
 u8   Player_IsHoled(int nPlayer);
 u8   Team_IsAllHuman(int nTeam);        // team 0 is players 0 and 1, team 1 players 2 and 3
-void AI_PlanShot(int nPlayer, f32* pTarget);
+void fn_8002BDEC_SetTarget(int nPlayer, f32* pTarget);
 u8   AI_GreenTowardPin(int nPlayer, f32 fDist);
 u8   AI_RehearseShot(int nPlayer, f32* pOutDist2, u8 bFast, f32 fTolerance);
 void AI_ApplyError(int nPlayer);
-u8   Lie_AllowsFullSwing(int nPlayer);
+u8   Player_NotInSand(int nPlayer);
 void Shot_FitTargetToClub(int nPlayer);
 void Shot_Plan(int nPlayer, u8 bNotify);
 void Shot_Prepare(int nPlayer, u8 bNotify);
 int  Shot_Trajectory(int nPlayer);
-void Shot_DefaultSpin(int nPlayer, f32* pOut);
-void Shot_FaceVector(int nPlayer, f32* pOut);
+void fn_8002D544_StraightDir(int nPlayer, f32* pOut);
+void fn_8002D680_CpuShapeDir(int nPlayer, f32* pOut);
 f32  Shot_AimAngle(int nPlayer);
 void AI_ClubLonger(int nPlayer, s32* pClub, int nStep);
 void AI_ClubShorter(int nPlayer, s32* pClub, int nStep);
 void AI_ChooseTarget(int nPlayer);
 void GOLFERSTATE_Kill(int nPlayer);      // Swing.c: pop every state
 f32  AI_PowerScale(int nPlayer);
-void AI_FaceVector(int nPlayer, f32* pOut);
+void fn_8002D560_ShapeDir(int nPlayer, f32* pOut);
 void Caddie_Start(int nPlayer);
 void Caddie_Stop(void);
 void Caddie_Update(int nPlayer);
 void Luck_TakePerfectShot(int nPlayer);
 void Caddie_ApplyTip(int nPlayer);
 int  Golfer_GetAttribute(Player* pPlayer, int nAttr, int nMode);
-u8   Controller_IsNotCPU(int nController);  // Golfer.c
+u8   fn_8002E8E4(int nController);  // Golfer.c
 f32  fn_8005C1EC(int nPlayer);          // Swing.c
 f32  fn_8005C268(int nPlayer);          // Swing.c
 int  fn_8005CB48(int nPlayer);          // Swing.c
 int  fn_8005CB60(int nPlayer);          // Swing.c
 u8   Player_IsHoledNotState23(int nPlayer);
 u8   Team_IsAllCPU(int nTeam);
-u8   Player_IsNotCPU(int nPlayer);
+u8   fn_8002E8B4(int nPlayer);
 u8   Bag_AddClub(int nPlayer, int nBit);
 u8   Bag_RemoveClub(int nPlayer, int nBit);
 u8   Bag_HasClub(int nPlayer, int nBit);

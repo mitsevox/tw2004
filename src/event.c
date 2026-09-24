@@ -706,7 +706,7 @@ void fn_80067220(int nPlayer) {
             pPlayer->nShotKind = 0;
             pPlayer->nClub = CLUB_PUTTER_e;
             Shot_FitTargetToClub(nPlayer);
-        } else if (Lie_AllowsFullSwing(nPlayer)) {
+        } else if (Player_NotInSand(nPlayer)) {
             AI_AimAtPin(nPlayer);
             pPlayer->fAim = Shot_AimAngle(nPlayer);
             pPlayer->nShotKind = 2;

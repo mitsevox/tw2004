@@ -427,7 +427,7 @@ void FE_GolferAttributes(int nPlayer, u8 nKind) {
         fn_80067B1C(pValues, 41, fn_800D0FBC(nPlayer), pSetBits);
         fn_80067B1C(pValues, 42, fn_800D1170(nPlayer, 0), pSetBits);
         fn_80067B1C(pValues, 6, pPlayer->pChar->nSlot, pSetBits);
-        fn_80067B1C(pValues, 13, Controller_IsNotCPU(pPlayer->nController), pSetBits);
+        fn_80067B1C(pValues, 13, fn_8002E8E4(pPlayer->nController), pSetBits);
         fn_80067B1C(pValues, 84, gSession.nGolfer[nPlayer] >= 30, pSetBits);
         fn_80067B1C(pValues, 61, gSession.nGolfer[nPlayer], pSetBits);
         if (gSession.nNumPlayers == 2) {
@@ -844,7 +844,7 @@ void fn_800BD580(SitDevEntry8* pDo, int nPlayer, u8 nEvent) {
         }
         break;
     case 4:
-        if (Player_IsNotCPU(nPlayer)) {
+        if (fn_8002E8B4(nPlayer)) {
             if (pDo->n4 == 0) {
                 fn_800DBA50(nPlayer);
             } else {
