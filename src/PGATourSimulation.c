@@ -438,6 +438,82 @@ s32 fn_8011913C(int nPlayer, int nEntrant, u8 b) {
     return nRet;
 }
 
+// The entrant's strokes in the tournament so far: every round played plus the holes of the
+// current one (in game type 3 before the first round, all four rounds; b as for fn_8011913C).
+s32 fn_801191D0(int nPlayer, int nEntrant, u8 b) {
+    PgaEntrant* pEntrant;
+    s32 nStrokes;
+    s32 nHoles;
+    s32 i;
+
+    GetEntrantMCPtr(nPlayer, nEntrant);
+    pEntrant = GetEntrantNonMCPtr(nEntrant);
+    nStrokes = 0;
+    if (gSession.nGameType == 3 && gpSaveData[nPlayer].tour.nRound == 0) {
+        for (i = 0; i < 4; i++) {
+            nStrokes += fn_80119638(nPlayer, nEntrant, i);
+        }
+    } else {
+        for (i = 0; i < gpSaveData[nPlayer].tour.nRound; i++) {
+            nStrokes += fn_80119638(nPlayer, nEntrant, i);
+        }
+        if (gpSaveData[nPlayer].tour.nRound < 4) {
+            nHoles = fn_8011913C(nPlayer, nEntrant, b);
+            for (i = 0; i < nHoles; i++) {
+                nStrokes += pEntrant->aHoleStrokes[i];
+            }
+        }
+    }
+    return nStrokes;
+}
+
+// The entrant's score to par so far (fn_801191D0's strokes less the par of the rounds and holes
+// played). A built round (course 22) and courses 24..29 take each hole's course and number from
+// fn_800D3118/fn_800D315C.
+int fn_8011937C(int nPlayer, int nEntrant, u8 b) {
+    s32 aCourses[4];
+    s32 nEvent;
+    s32 nScore;
+    s32 nHoles;
+    s32 nCourse;
+    s32 nPar;
+    s32 i;
+
+    nEvent = gpSaveData[nPlayer].tour.nEvent;
+    if (nEvent == -1) {
+        nEvent = GameModeDriverPGATour_GetFinalEventOfSeason();
+    }
+    GameModeDriverPGATour_GetCourses(fn_800EFA70(nEvent), aCourses);
+    GetEntrantNonMCPtr(nEntrant);
+    nScore = fn_801191D0(nPlayer, nEntrant, b);
+    if (gSession.nGameType == 3 && gpSaveData[nPlayer].tour.nRound == 0) {
+        for (i = 0; i < 4; i++) {
+            nScore -= fn_800D2F00(aCourses[i], 0);
+        }
+    } else {
+        for (i = 0; i < gpSaveData[nPlayer].tour.nRound; i++) {
+            nScore -= fn_800D2F00(aCourses[i], 0);
+        }
+        if (gpSaveData[nPlayer].tour.nRound < 4) {
+            nHoles = fn_8011913C(nPlayer, nEntrant, b);
+            for (i = 0; i < nHoles; i++) {
+                if (aCourses[gpSaveData[nPlayer].tour.nRound] == 22) {
+                    nCourse = fn_800D3118(22, i);
+                    nPar = fn_800D2ABC(nCourse, fn_800D315C(22, i) - 1);
+                } else if (aCourses[gpSaveData[nPlayer].tour.nRound] >= 24
+                           && aCourses[gpSaveData[nPlayer].tour.nRound] < 30) {
+                    nCourse = fn_800D3118(aCourses[gpSaveData[nPlayer].tour.nRound], i);
+                    nPar = fn_800D2ABC(nCourse, fn_800D315C(aCourses[gpSaveData[nPlayer].tour.nRound], i) - 1);
+                } else {
+                    nPar = fn_800D2ABC(aCourses[gpSaveData[nPlayer].tour.nRound], i);
+                }
+                nScore -= nPar;
+            }
+        }
+    }
+    return nScore;
+}
+
 // The best score among the entrants still in the field other than the player (b as for
 // fn_8011937C).
 s32 fn_80119588(int nPlayer, u8 b) {
@@ -451,6 +527,26 @@ s32 fn_80119588(int nPlayer, u8 b) {
         }
     }
     return nBest;
+}
+
+// The entrant's strokes in a round: for the round being played (outside game type 3) the holes
+// so far, otherwise the round's saved total.
+s32 fn_80119638(int nPlayer, int nEntrant, int nRound) {
+    PgaEntrantMC* pEntrantMC = GetEntrantMCPtr(nPlayer, nEntrant);
+    PgaEntrant* pEntrant = GetEntrantNonMCPtr(nEntrant);
+    s32 nStrokes;
+    s32 i;
+
+    if (nRound == gpSaveData[nPlayer].tour.nRound && gSession.nGameType != 3) {
+        nStrokes = 0;
+        // The (s16) is in the original (an extsh before each add), as in fn_80117CB8.
+        for (i = 0; i < pEntrant->nCurrentHole; i++) {
+            nStrokes += (s16)pEntrant->aHoleStrokes[i];
+        }
+    } else {
+        nStrokes = pEntrantMC->aRoundStrokes[nRound];
+    }
+    return nStrokes;
 }
 
 u8 fn_801197A4(int nPlayer, int nEntrant) {

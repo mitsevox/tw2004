@@ -186,6 +186,7 @@ extern CourseData lbl_801FA2F4[NUM_COURSE_DATA];     // 0x801FA2F4
 void fn_800D29E8(void);
 int  Hole_WindDir(void);
 f32  Hole_WindSpeed(void);
+s32  fn_800D2F00(int nCourse, int nTeeSet);    // a course's par from a tee set
 s32  fn_800D2FB4(s32 nTeeSet);          // the course's par (the tee set is not used)
 u8   fn_800D3080(int nHole);
 int  fn_800D3118(int nRound, int nHole);    // a built round's course for a hole
