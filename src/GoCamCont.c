@@ -1,6 +1,6 @@
 // GoCamCont.c (TW06's golf/cameras/gocamcont.c; our spelling): the camera controller of each view
 // (View, TW06's CameraController): picking the camera mode (View_SetCamera), its idle state and the
-// small setters and tests the camera code uses. Not decompiled yet beyond the functions below.
+// small setters and tests the camera code uses.
 
 #include "golfer.h"
 #include "game.h"
@@ -15,6 +15,10 @@ void fn_80064478(f32* pA, f32* pB, f32* pOut);
 void fn_800090E4(f32* pQuat, f32* pIn, f32* pOut);      // Quaternion.c: a vector turned by it
 void fn_80016CD8(int nView);                            // ViewController.c: sets the current view
 void fn_80045824(int n);                                // DepthField.c: turns depth-of-field layer n off
+void fn_800A6070(u8 nPlayer, u8 bLimit);                // GameAudio.c
+f32  fn_8005CC18(f32* pV);                              // Swing.c
+void fn_8006421C(View* pView);
+void fn_80064108(View* pView);
 
 // Sets a view up: no camera (25), no shots, the script cleared.
 void fn_80062E40(View* pView) {
@@ -69,6 +73,132 @@ void fn_80062F1C(View* pView) {
     pView->p80 = NULL;
     pView->p74 = NULL;
     pView->b268 = 0;
+}
+
+// The view's camera, every frame: runs the current mode's update (mode 25, no camera, only moves
+// the script), shakes the camera on the swing's events 5..14, and keeps its v20 nonzero.
+void CameraController_Idle(View* pView, int nPlayer) {
+    int i;
+    int nMove;
+
+    if (pView->nCurCamera != 2) {
+        pView->v20[0] = 0.0f;
+        pView->v20[1] = 0.0f;
+        pView->v20[2] = 0.0f;
+        pView->v20[3] = 0.0f;
+    }
+    switch (pView->nCurCamera) {
+    case 10:
+        fn_800C0914(pView, nPlayer);
+        break;
+    case 0:
+        fn_800BDBA4(pView, nPlayer);
+        break;
+    case 11:
+        fn_800C0C0C(pView, nPlayer);
+        break;
+    case 1:
+        GolfCamera_ProcessZoomToAimCamera(pView, nPlayer);
+        break;
+    case 2:
+        GolfCamera_ProcessGreenZoomToAimCamera(pView, nPlayer);
+        break;
+    case 3:
+        fn_800BF094(pView, nPlayer);
+        break;
+    case 4:
+        fn_800BFE00(pView, nPlayer);
+        break;
+    case 5:
+        fn_800C0414(pView, nPlayer);
+        break;
+    case 6:
+        fn_800C06C8(pView, nPlayer);
+        break;
+    case 7:
+        fn_800C0804(pView, nPlayer);
+        break;
+    case 8:
+        fn_800BF184(pView, nPlayer);
+        break;
+    case 9:
+        fn_800BF658(pView, nPlayer);
+        break;
+    case 12:
+        fn_800C1338(pView, nPlayer);
+        break;
+    case 13:
+        fn_800C1530(pView, nPlayer);
+        break;
+    case 14:
+        GolfCamera_ProcessBallFlightCamera(pView, nPlayer);
+        break;
+    case 15:
+        GolfCamera_ProcessPostShotCamera(pView, nPlayer);
+        break;
+    case 16:
+        GolfCamera_ProcessInHoleCamera(pView, nPlayer);
+        break;
+    case 17:
+        fn_800C34F8(pView, nPlayer);
+        break;
+    case 18:
+        fn_800C37FC(pView, nPlayer);
+        break;
+    case 23:
+        fn_800C39A8(pView, nPlayer);
+        break;
+    case 24:
+        fn_800C3EDC(pView, nPlayer);
+        break;
+    case 19:
+        GolfCamera_ProcessSteepSlopeCamera(pView, nPlayer);
+        break;
+    case 20:
+        fn_800C16C4(pView, nPlayer);
+        break;
+    case 21:
+        GolfCamera_ProcessHeartBeatCamera(pView, nPlayer);
+        break;
+    case 22:
+        fn_800C1D3C(pView, nPlayer);
+        break;
+    case 25:
+        nMove = pView->script.nCamera;
+        if (gSession.nPaused == 0) {
+            fn_8003F2E0(&pView->script, FRAME_TIME);   // port: one NTSC frame a call, not gSession.fFrameTime
+            // A move of kind 4 that has just ended stays on.
+            if (nMove == 4 && pView->script.nCamera == 0) {
+                pView->script.nCamera = 4;
+            }
+            pView->script.f90 += FRAME_TIME;
+        }
+        break;
+    }
+    if (gPlayers[nPlayer].pChar != NULL && gSession.nGameType != 3) {
+        for (i = 0; i <= 9; i++) {
+            if (fn_80048574(gPlayers[nPlayer].pChar, i + 5) && fn_80062BB0(gPlayers[nPlayer].pChar, i + 5)) {
+                fn_80062B98(gPlayers[nPlayer].pChar, i + 5);
+                fn_800642A4(pView, lbl_80281F78->f204, lbl_80281F78->f200);
+                fn_800A6070(nPlayer, 0);
+            }
+        }
+    }
+    if (pView->script.fF0 > 0.0f && gSession.fFrameTime > 0.0f) {
+        fn_8006421C(pView);
+        pView->script.fF0 -= gSession.fFrameTime;
+    }
+    if ((f32)fn_80009680(fn_8005CC18(pView->v20)) == 0.0f) {
+        fn_80064108(pView);
+        if ((f32)fn_80009680(fn_8005CC18(pView->v20)) == 0.0f) {
+            pView->v20[0] = 1.0f;
+            pView->v20[1] = 0.0f;
+            pView->v20[2] = 0.0f;
+        }
+    }
+    if (pView->bFade) {
+        pView->fFade += gSession.fFrameTime;
+    }
 }
 
 // Switches the view to camera mode nCamera for the player (TW06's CameraController_SetCameraMode):

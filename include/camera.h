@@ -443,8 +443,9 @@ typedef struct CamTuning {
     f32  f1F4;                  // 0x1F4  ... how far the aim may move per call
     f32  fMaxPitchUp;           // 0x1F8  fn_800C4AB0: the steepest camera angle above the horizontal (degrees)
     f32  fMaxPitchDown;         // 0x1FC  and below it
-    u8   unk200[0x208 - 0x200];
-    f32  f208;                  // 0x208  times lbl_801D5010[view]: the alpha of GoPostFx fn_80039358's
+    f32  f200;                  // 0x200  } the camera shake CameraController_Idle starts on the swing's
+    f32  f204;                  // 0x204  } events 5..14: CamScript.fF4 and fF0 (fn_800642A4)
+    f32  f208;                 // 0x208  times lbl_801D5010[view]: the alpha of GoPostFx fn_80039358's
                                 //        black cover
     f32  f20C;                 // 0x20C  camera 4: the most View.f54 grows to
     f32  f210;                  // 0x210  camera 4: how fast (per second) it moves in from its start
@@ -735,6 +736,33 @@ void   GolfCamera_InitHeartBeatCamera(View* pView, int nPlayer);    // 21
 void   GolfCamera_InitShutterCamera(View* pView, int nPlayer);      // 22
 void   fn_800C38BC(View* pView, int nPlayer);                       // 23
 void   fn_800C3EB8(View* pView, int nPlayer);                       // 24
+
+// ... and their per-frame updates (GoGolfCam.c), one per mode, run by CameraController_Idle.
+void   fn_800BDBA4(View* pView, int nPlayer);                       // camera 0
+void   GolfCamera_ProcessZoomToAimCamera(View* pView, int nPlayer); // 1
+void   GolfCamera_ProcessGreenZoomToAimCamera(View* pView, int nPlayer); // 2
+void   fn_800BF094(View* pView, int nPlayer);                       // 3
+void   fn_800BFE00(View* pView, int nPlayer);                       // 4
+void   fn_800C0414(View* pView, int nPlayer);                       // 5
+void   fn_800C06C8(View* pView, int nPlayer);                       // 6
+void   fn_800C0804(View* pView, int nPlayer);                       // 7
+void   fn_800BF184(View* pView, int nPlayer);                       // 8
+void   fn_800BF658(View* pView, int nPlayer);                       // 9
+void   fn_800C0914(View* pView, int nPlayer);                       // 10
+void   fn_800C0C0C(View* pView, int nPlayer);                       // 11
+void   fn_800C1338(View* pView, int nPlayer);                       // 12
+void   fn_800C1530(View* pView, int nPlayer);                       // 13
+void   GolfCamera_ProcessBallFlightCamera(View* pView, int nPlayer); // 14
+void   GolfCamera_ProcessPostShotCamera(View* pView, int nPlayer);  // 15
+void   GolfCamera_ProcessInHoleCamera(View* pView, int nPlayer);    // 16
+void   fn_800C34F8(View* pView, int nPlayer);                       // 17
+void   fn_800C37FC(View* pView, int nPlayer);                       // 18
+void   GolfCamera_ProcessSteepSlopeCamera(View* pView, int nPlayer); // 19
+void   fn_800C16C4(View* pView, int nPlayer);                       // 20
+void   GolfCamera_ProcessHeartBeatCamera(View* pView, int nPlayer); // 21
+void   fn_800C1D3C(View* pView, int nPlayer);                       // 22
+void   fn_800C39A8(View* pView, int nPlayer);                       // 23
+void   fn_800C3EDC(View* pView, int nPlayer);                       // 24
 
 // ---- the camera controller (0x80062F38..) ---------------------------------------------------
 
