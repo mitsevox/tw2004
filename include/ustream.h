@@ -100,7 +100,7 @@ typedef struct UStreamNode {
 } UStreamNode;
 
 // The calls the movie player (LLVideo.c) makes on the loader's buffers.
-int  UStream_Update(void);              // runs the loader once
+u8   UStream_Update(void);              // runs the loader once; 0 when nothing is left to read
 void UStream_AddBufferRef(UStreamBuffer** ppList);          // a chunk of the buffer is kept
 void UStream_ReleaseObjectBuffer(UStreamBuffer** ppBuffer);  // a kept chunk is done with
 

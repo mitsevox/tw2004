@@ -292,14 +292,20 @@ typedef struct RenderState {
     f32  f28;                   // 0x028  } bit 0x8, with a30. fn_80035398 sets all three from
     f32  f2C;                   // 0x02C  } lbl_802811E0
     u8   a30[4];                // 0x030  a colour: three bytes given, the fourth always 0x80
-    u8   unk34[0xFC - 0x34];
+    u8   unk34[0xBC - 0x34];
+    s32  nBC;                   // 0x0BC  } a rectangle, bit 0x200 (LLVideo.c fn_800760B0: x,
+    s32  nC0;                   // 0x0C0  } width, y, height; the movies give 0, 512, 0, 448)
+    s32  nC4;                   // 0x0C4  }
+    s32  nC8;                   // 0x0C8  }
+    u8   unkCC[0xFC - 0xCC];
     s32  nFC;                   // 0x0FC  bit 0x400
     TexBank*  p100;             // 0x100  } the texture of the next draw (fn_8005CC64: the swing
     TexEntry* p104;             // 0x104  } trail's, the logo editor's)
     struct GxTexture* pTex108;  // 0x108  or this texture (fn_8002A608)
-    u8   unk10C[0x110 - 0x10C];
+    struct LLPict* pPict10C;    // 0x10C  or this picture (LLVideo.c fn_800760D8: a movie's)
     u32  u110;                  // 0x110  which of the groups above changed
-    u32  uFlags;                // 0x114  bit 1: p100/p104 are set; bit 2: pTex108 is
+    u32  uFlags;                // 0x114  bit 1: p100/p104 are set; bit 2: pTex108 is; bit 4:
+                                //        pPict10C is
 } RenderState;
 LAYOUT_ASSERT(RenderState, 0x118);
 

@@ -5,8 +5,10 @@
 #include "game_types.h"
 #include "ustream.h"
 #include "llvideo.h"
+#include "camera.h"
+#include "terrain.h"
 
-int  fn_80075280(Video* pVideo, int* pnQueued);
+u8   fn_80075280(Video* pVideo, int* pnQueued);
 void fn_800752DC(Video* pVideo);
 void fn_8007531C(VideoChunk* pChunk);
 void fn_8007533C(VideoChunk* pChunk);
@@ -17,12 +19,12 @@ int  fn_80076088(VideoQueue* pQueue);
 u8   fn_80076090(VideoQueue* pQueue);
 
 // Runs the stream loader once; pnQueued, if given, gets how many chunks are now queued.
-int fn_80075280(Video* pVideo, int* pnQueued) {
-    int nRet = UStream_Update();
+u8 fn_80075280(Video* pVideo, int* pnQueued) {
+    u8 bRet = UStream_Update();
     if (pnQueued != NULL) {
         *pnQueued = fn_80076088(&pVideo->queue);
     }
-    return nRet;
+    return bRet;
 }
 
 // Runs the stream loader until 16 chunks are queued (before the movie starts).
@@ -141,6 +143,100 @@ void fn_800A79D4(void);
 void fn_800A79F4(void);
 // GameManager.c
 f32  fn_8006E118(u64 tEnd, u64 tStart);    // seconds between two time stamps
+// the renderer
+void fn_80008380(void);
+void fn_800083A0(void);
+void fn_80012898(s32 v);
+s32  fn_800128A4(void);
+void fn_80012B2C(f32 x0, f32 x1);
+void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
+void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
+void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
+void fn_800137D0(void* pCamera);
+void fn_800162A8(void);
+void fn_80007254(void);
+u8   fn_80007258(void);
+void fn_80007260(void);
+void VIWaitForRetrace(void);
+// the stream loader (UStream.c) and the music (fn_800BA734)
+int  UStream_OpenFileByName(const char* pName);
+void UStream_SetAutoRead(u8 bAuto);
+int  UStream_Stop(void);
+int  UStream_Close(int nStream);
+void fn_800BA734(int n, s8 nTrack);
+
+void fn_80075C48(void);
+void fn_80075C68(void);
+void fn_80075C88(void);
+void fn_80075D58(void);
+int  fn_800760A0(Video* pVideo);
+u8   fn_800760A8(Video* pVideo);
+void fn_800760B0(int nX, int nY, int nWidth, int nHeight);
+void fn_800760D8(LLPict* pPict);
+void fn_800760F4(f32* pUV, LLPict* pPict);
+void fn_80076128(s32 p0);
+
+// Clears the screen for one frame (two when nFlags bit 0 is clear). With bit 1 it first darkens
+// it over 30 frames (black at alpha 0.1 each frame, 0.5 for the last two), then clears.
+void fn_800755F0(int nFlags) {
+    f32 xy[8];
+    f32 colour[4];
+    int nFrames;
+    int bBit0;
+    int i;
+    int bFade;
+
+    bFade = nFlags & 2;
+    colour[0] = 0.0f;
+    colour[1] = 0.0f;
+    colour[2] = 0.0f;
+    colour[3] = bFade ? 0.1f : 0.5f;
+    fn_80014194(colour);
+    fn_800141F8(xy, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
+    fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
+    fn_80008380();
+    if (bFade) {
+        nFrames = 30;
+    } else {
+        nFrames = (nFlags & 1) + 1;
+    }
+    bBit0 = nFlags & 1;
+    for (i = 0; i < nFrames; i++) {
+        if (bFade && i >= nFrames - 2) {
+            colour[3] = 0.5f;
+            fn_80014194(colour);
+        }
+        fn_800162A8();
+        fn_80006EDC();
+        fn_800137D0(fn_8001614C());
+        // the original tests bBit0 here although both branches make the same call
+        if (bBit0) {
+            fn_800760B0(0, 0, 512, 448);
+        } else {
+            fn_800760B0(0, 0, 512, 448);
+        }
+        fn_80035118(4, 5);
+        fn_8001425C(0);
+        fn_80014118(0x40);
+        fn_80012F50(0, 6, 0x80);
+        fn_80012F18(7);
+        fn_80012EF8();
+        fn_8001644C(0xA1, xy, 0, NULL, 2);
+        fn_80013400();
+        fn_80006FE8();
+        fn_80008380();
+        if (!bBit0) {
+            fn_80007254();
+        }
+        if (bBit0) {
+            fn_80007260();
+        }
+        fn_800083A0();
+    }
+    if (bFade) {
+        fn_800755F0(bBit0);
+    }
+}
 
 // Empties every slot.
 void fn_800757B8(void) {
@@ -270,22 +366,6 @@ u8 fn_80075BF4(Video* pVideo) {
     return 1;
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
-void fn_80007254();
-void fn_80075C48(void);
-void fn_80075C68(void);
-s32 UStream_Close(s32);
-s32 UStream_OpenFileByName(s32);
-s32 UStream_SetAutoRead(s32);
-void fn_80006FE8(void);
-u8 fn_80007258();
-s32 fn_800755F0(s32);
-s32 fn_800BA734(s32, s32);
-s32 fn_80075DEC(Video*, s32, s32);
-extern u8 lbl_80281EB8;
-void fn_80075FB8(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
-
 void fn_80075C48(void) {
     fn_80007254();
 }
@@ -294,31 +374,124 @@ void fn_80075C68(void) {
     fn_80007254();
 }
 
-void fn_80075FB8(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
-    s32 temp_r3_2;
-    Video* temp_r3_3;
-    u8 temp_r3;
+// Sets the renderer up for full-screen movie frames (512 x 448); fn_80075D58 puts it back.
+void fn_80075C88(void) {
+    fn_80008380();
+    fn_800140E8(0, 512, 448, 0, 8, 1);
+    fn_80014118(0x10);
+    fn_80012F34(0);
+    fn_80012F50(0, 6, 0x80);
+    fn_80012F18(7);
+    fn_800760B0(0, 0, 512, 448);
+    fn_80016B54(512, 448, 1.0f, 1.0f);
+    fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
+    fn_80014194(NULL);
+    lbl_80281200->n20 = fn_800128A4();
+    fn_80012898(1);
+    fn_80012B2C(1.0f, 1.0f);
+    fn_80076128(10);
+}
 
-    temp_r3 = fn_80007258();
-    lbl_80281EB8 = temp_r3;
-    if (temp_r3 != 0) {
+// Puts the renderer back after a movie.
+void fn_80075D58(void) {
+    fn_80008380();
+    fn_80006EDC();
+    fn_80012B2C(1.0f, 1.0f);
+    fn_80012898(lbl_80281200->n20);
+    fn_80012F34(1);
+    fn_80012F50(0, 6, 0x80);
+    fn_80012F18(3);
+    fn_80016B54(512, 448, 1.0f, 1.0f);
+    fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
+    fn_80012EF8();
+    fn_80006FE8();
+    fn_800083A0();
+    fn_80008380();
+}
+
+// Plays a movie until its data runs out, showing each new frame full screen, at most 33 times a
+// second. pfnStop(pVideo, nArg), if given, is asked every frame whether to stop early.
+void fn_80075DEC(Video* pVideo, u8 (*pfnStop)(Video* pVideo, int nArg), int nArg) {
+    f32 xy[8];
+    f32 uv[8];
+    u64 tFrame;
+    u8 bFirst;
+    u8 bDone;
+    int nLastFrame;
+
+    fn_80075C48();
+    fn_80075C88();
+    fn_80075A14(pVideo);
+    tFrame = fn_800954A4(0);
+    nLastFrame = -1;
+    bFirst = 1;
+    bDone = 0;
+    do {
+        if (!fn_80075280(pVideo, NULL)) {
+            bDone = 1;
+        } else {
+            fn_80075AD0();
+            if (pfnStop != NULL && pfnStop(pVideo, nArg)) {
+                UStream_Stop();
+                fn_8007599C(pVideo);
+            }
+            if (fn_800760A8(pVideo)) {
+                UStream_Stop();
+                fn_8007599C(pVideo);
+            }
+            if (nLastFrame == fn_800760A0(pVideo)) {
+                continue;
+            }
+            nLastFrame = fn_800760A0(pVideo);
+            fn_80006EDC();
+            fn_800162A8();
+            fn_800760B0(0, 0, 512, 448);
+            fn_80012EF8();
+            if (bFirst) {
+                fn_800141F8(xy, NULL, 0.0f, 0.0f, 1.0f, 1.0f);
+                fn_800760F4(uv, &pVideo->pict);
+                bFirst = 0;
+            }
+        }
+        fn_800760D8(&pVideo->pict);
+        fn_80012EF8();
+        fn_8001644C(0xA1, xy, 0, uv, 2);
+        while (fn_8006E118(fn_800954A4(0), tFrame) < 1.0f / 33.0f) {
+        }
+        fn_80006FE8();
+        VIWaitForRetrace();
+        tFrame = fn_800954A4(0);
+        fn_800083A0();
+        fn_80008380();
+    } while (!bDone);
+    fn_8007599C(pVideo);
+    fn_800755F0(6);
+    fn_80075D58();
+    fn_80075C68();
+}
+
+// Plays the movie file pName in slot 0 (fn_80075DEC), after clearing the screen (fn_800755F0).
+void fn_80075FB8(const char* pName, u8 (*pfnStop)(Video* pVideo, int nArg), int nArg, int nFlags) {
+    int nStream;
+    Video* pVideo;
+
+    lbl_80281EB8 = fn_80007258();
+    if (lbl_80281EB8) {
         fn_80006FE8();
     }
     fn_800BA734(0, 0);
-    fn_800755F0(arg3 | 1);
-    temp_r3_2 = UStream_OpenFileByName(arg0);
-    if (temp_r3_2 != -1) {
+    fn_800755F0(nFlags | 1);
+    nStream = UStream_OpenFileByName(pName);
+    if (nStream != -1) {
         UStream_SetAutoRead(1);
-        temp_r3_3 = fn_80075800();
-        fn_80075904(0, temp_r3_3);
-        fn_80075DEC(temp_r3_3, arg1, arg2);
+        pVideo = fn_80075800();
+        fn_80075904(0, pVideo);
+        fn_80075DEC(pVideo, pfnStop, nArg);
         UStream_SetAutoRead(0);
-        fn_800758B4(temp_r3_3);
-        UStream_Close(temp_r3_2);
+        fn_800758B4(pVideo);
+        UStream_Close(nStream);
     }
 }
-
-// ---- end of sweep code ----
 
 // How many chunks are queued.
 int fn_80076088(VideoQueue* pQueue) {
@@ -330,20 +503,46 @@ u8 fn_80076090(VideoQueue* pQueue) {
     return pQueue->nCount == 0;
 }
 
+// The frames decoded so far (-1 before the first).
+int fn_800760A0(Video* pVideo) {
+    return pVideo->nFrame;
+}
+
+// The decoder has run out.
+u8 fn_800760A8(Video* pVideo) {
+    return pVideo->bEnded;
+}
+
+// Sets the renderer's rectangle (x, y, width, height).
+void fn_800760B0(int nX, int nY, int nWidth, int nHeight) {
+    lbl_801B8980.nBC = nX;
+    lbl_801B8980.nC4 = nY;
+    lbl_801B8980.nC0 = nWidth;
+    lbl_801B8980.nC8 = nHeight;
+    lbl_801B8980.u110 |= 0x200;
+}
+
+// The next draw uses this picture.
+void fn_800760D8(LLPict* pPict) {
+    lbl_801B8980.pPict10C = pPict;
+    lbl_801B8980.uFlags |= 4;
+}
+
+// Fills the texture coordinates for drawing a picture (fn_8001644C).
+void fn_800760F4(f32* pUV, LLPict* pPict) {
+    pUV[0] = 0.0f;
+    pUV[1] = 0.0f;
+    pUV[2] = 0.0f;
+    pUV[3] = 1.0f;
+    pUV[4] = pPict->f6C;
+    pUV[5] = pPict->f70;
+    pUV[6] = 0.0f;
+    pUV[7] = 1.0f;
+}
+
 // ---- sweep code (not yet cleaned up) ----
 
-s32 fn_800760A0(u8* p);
-u8 fn_800760A8(u8* p);
 s32 fn_80012EC4();
-void fn_80076128(s32 p0);
-
-s32 fn_800760A0(u8* p) {
-    return *(s32*)(p + 0x10A4);
-}
-
-u8 fn_800760A8(u8* p) {
-    return *(u8*)(p + 0x1022);
-}
 
 void fn_80076128(s32 p0) {
     s32 t0;

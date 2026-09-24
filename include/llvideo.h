@@ -67,5 +67,6 @@ typedef struct VideoSlots {
 } VideoSlots;
 LAYOUT_ASSERT(VideoSlots, 0x28);
 extern VideoSlots* lbl_80281200;
+extern u8 lbl_80281EB8;                 // fn_80007258()'s value when the last movie started
 
 #endif
