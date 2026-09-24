@@ -1526,8 +1526,9 @@ int Swing_UpdateDownswing(int nPlayer) {
         nX     = Swing_StickX(nPlayer, pPad);
         nY     = Swing_StickY(nPlayer, pPad);
         nDX    = nX - pSw->nCalibrateX;
+        nDX    = nDX * nDX;     // fake match: squaring in its own statement sets the schedule (99.9%)
         nDY    = nY - pSw->nCalibrateY;
-        fDist2 = nDX * nDX + nDY * nDY;
+        fDist2 = nDX + nDY * nDY;
         if (nY <= 96 && fDist2 > 300.0f) {
             pSw->nFollowThroughX  = nX;
             pSw->nFollowThroughY  = nY;
