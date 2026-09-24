@@ -7,7 +7,6 @@
 #include "psmgr.h"
 
 DynObj* fn_80049018(DynObjSetup* pSetup);
-int  fn_8000EA1C(const char* pName, int a, int b, void* pObj);
 void fn_8000E830(DynObj* pObj);
 void fn_8000ADC0(f32 (*pMtx)[4]);                   // identity
 void fn_8000C5A4(f32 (*pMtx)[4]);

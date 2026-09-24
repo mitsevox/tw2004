@@ -85,11 +85,10 @@ void fn_800935CC(CourseLights* pLights) {
     pLight->u.point.f18 = 1.0f;
 
     bSkip = 0;
-    if (pLights->aLight[0].nType == 1) {
-        bSkip = 1;
-    }
-    if (pLights->aLight[1].nType == 1) {
-        bSkip = 1;
+    for (i = 0; i < 2; i++) {
+        if (pLights->aLight[i].nType == 1) {
+            bSkip = 1;
+        }
     }
     pRec = bSkip ? &pLights->aLight[2] : &pLights->aLight[1];
     pLight = pSet->group.apLight[1];
@@ -102,14 +101,10 @@ void fn_800935CC(CourseLights* pLights) {
     pLight->u.point.f18 = 1.0f;
 
     bSkip = 0;
-    if (pLights->aLight[0].nType == 1) {
-        bSkip = 1;
-    }
-    if (pLights->aLight[1].nType == 1) {
-        bSkip = 1;
-    }
-    if (pLights->aLight[2].nType == 1) {
-        bSkip = 1;
+    for (i = 0; i < 3; i++) {
+        if (pLights->aLight[i].nType == 1) {
+            bSkip = 1;
+        }
     }
     pRec = bSkip ? &pLights->aLight[3] : &pLights->aLight[2];
     pLight = pSet->group.apLight[2];

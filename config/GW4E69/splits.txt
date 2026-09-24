@@ -281,6 +281,9 @@ GoStaticCam.c:
 
 event.c:
 	.text       start:0x80065B44 end:0x80067710
+	.data       start:0x80188628 end:0x80188778
+	.sbss       start:0x80281E20 end:0x80281E28
+	.sdata2     start:0x80283748 end:0x80283770
 
 Code80067710.c:
 	.text       start:0x80067710 end:0x80067B80
@@ -397,6 +400,12 @@ GameUICommands.c:
 
 FEgolferanim.c:
 	.text       start:0x8008AD80 end:0x8008EC30
+	.rodata     start:0x80183960 end:0x80183A70
+	.data       start:0x801899E0 end:0x80189B18
+	.bss        start:0x801D8708 end:0x801D87A8
+	.sdata      start:0x80281330 end:0x80281350
+	.sbss       start:0x80281EE0 end:0x80281EF0
+	.sdata2     start:0x80283B38 end:0x80283B78
 
 uiLoadFile.c:
 	.text       start:0x8008EC30 end:0x8008F39C
@@ -915,6 +924,8 @@ llrtclock.c:
 
 GoGrass.c:
 	.text       start:0x8011E170 end:0x80120298
+	.data       start:0x80194598 end:0x80194648
+	.sdata2     start:0x80284A30 end:0x80284AD0
 
 GoShaderObject_Grass_Gc.c:
 	.text       start:0x80120298 end:0x80121430
@@ -941,6 +952,9 @@ GameMode22.c:
 
 SkinBurn.c:
 	.text       start:0x801270F0 end:0x80127D84
+	.data       start:0x80195500 end:0x80195520
+	.sdata      start:0x802819A8 end:0x802819B0
+	.sdata2     start:0x80284B38 end:0x80284B40
 
 EASBStorage.c:
 	.text       start:0x80127D84 end:0x8012CCD8
