@@ -565,6 +565,7 @@ void fn_800364AC(SkinModel* pModel) {
 // p10CC is a weighted sum of up to three of them (SkinModel.p54). nView: both callers pass the
 // character's n17B4; unused.
 void fn_8003662C(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int nView) {
+    int j;
     SkinModel54* pEntry;
     f32 (*aMtx)[4][4];
     f32 (*pDst)[4];
@@ -572,7 +573,6 @@ void fn_8003662C(Skin* pSkin, CharModel* pCharModel, int nSkip, int nFirst, int 
     f32 fWeight;
     int nBones;
     int i;
-    int j;
     int k;
     s32 nMatrices;
 

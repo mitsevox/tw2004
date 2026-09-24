@@ -365,12 +365,12 @@ void fn_80065488(CamScript* pScript, int nPath, f32* pCam, f32* pSub, f32* pFov,
     f32 fTarget;
     f32 fDist;
     f32 fLastDist;
+    f32 fLoDist;
     f32 fLastT;
     f32 fFrom;
     f32 fStep;
     f32 fLoT;
     f32 fHiT;
-    f32 fLoDist;
     f32 fHiDist;
     int i;
 
