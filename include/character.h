@@ -372,7 +372,8 @@ typedef struct Character {
     s32   uFlags;               // 0x168  bit 0x40: the backswing is being backed down; 0x200 / 0x400: the
                                 //        clip lookup fell back (Char_SetClip). Signed: the original tests
                                 //        it with cmpwi
-    u8    unk16C[0x17C - 0x16C];
+    s32   n16C;                 // 0x16C  set to -1 by fn_8001D020
+    u8    unk170[0x17C - 0x170];
     f32   fAnimTime;            // 0x17C
     f32   f180;                 // 0x180  fn_8001966C: fAnimTime = f180 + the blend's time - v1638[1]
     f32   fAnimEnd;             // 0x184  the animation's end time
@@ -450,6 +451,8 @@ extern ViewSlot gViewSlots[5];          // 0x80187124  per player
 // Club names as 64-bit ids ("IGdriver", [1] unset, "IGputter", "IGiron3", "IGiron7", "IGwedge"),
 // set by fn_8001C37C; FEgolferanim compares ids against them.
 extern u64 lbl_801B9638[6];
+
+extern f32 lbl_80189A30[4];             // (0, 0, 0, 0): where fn_8001D020 places the menu's golfer
 
 // char.c: the club skins' part and set names, one per club kind (0 drivers, 1 fairway woods,
 // 2 putters, 3 and 4 the 3 and 7 irons, 5 wedges), for Character_SetClubStatesForCharacter

@@ -139,6 +139,10 @@ void  fn_8010A668(void* p);
 void  fn_80008380(void);
 void  fn_800106AC(int n);               // LLTexGrp.c
 void  fn_800106B8(u8 b);                // LLTexGrp.c
+void  fn_8008F310(void);                // uiLoadFile.c: park the UI file's data in ARAM
+void* fn_8008F354(void);                // uiLoadFile.c: the UI file's buffer
+void  fn_8008F35C(void);                // uiLoadFile.c: bring the UI file's data back
+void  fn_8001BE88(Character* pChar, Clip* pClip, int bNoBlend, f32 f);
 void  fn_80035600(void);                // GoTerrain.c
 void  fn_80035604(void);                // GoTerrain.c
 void  fn_800358E0(Character* pChar, u32 uFlags);
@@ -1775,6 +1779,55 @@ void fn_8001CE5C(UStreamObject* pObject) {
 // The 'CHR ' stream objects: two handlers for the same type.
 void fn_8001CFF0(void) {
     UStream_RegisterHandler('CHR ', fn_8001CE5C);
+}
+
+// A 'CHR ' object for the golfer the menu is loading (lbl_80281EE0->pB8): the UI file is parked in
+// ARAM and its buffer takes a copy of the object (header and data), from which the character is
+// made while the static heap counts what it takes. The character is placed at the origin facing
+// f19C, dressed as the profile's created golfer for golfers 7 and 29, set to club class 5 and its
+// first clip. When it is still the golfer the menu wants, its body and club skins go on the model
+// (created golfers with one pool entry take two) and it takes its pool entries.
+void fn_8001D020(UStreamObject* pObject) {
+    UStreamObject* pCopy;
+    Character* pChar;
+    Clip* pClip;
+
+    fn_8000A0BC();
+    fn_8000A0C8();
+    fn_8008F310();
+    pCopy = fn_8008F354();
+    Mem_cpy(pCopy, pObject, pObject->uSize + 0x80);
+    fn_80009E70(pObject);
+    pCopy->pData = (u8*)pCopy + 0x80;
+    lbl_80281EE0->pB8->pChar = fn_8001A9F4(pCopy->pData, 0, 0, pCopy->uId, 0, NULL);
+    fn_8000A0D4();
+    fn_8000A0E0();
+    fn_80019798(lbl_80281EE0->pB8->pChar, NULL, 0);
+    fn_8008F35C();
+    lbl_80281EE0->pB8->pChar->n16C = -1;
+    Character_SetPosition(lbl_80281EE0->pB8->pChar, lbl_80189A30, 1);
+    fn_800192D4(lbl_80281EE0->pB8->pChar, lbl_80281EE0->f19C);
+    if (lbl_80281EE0->pB8->pChar->nC == 7 || lbl_80281EE0->pB8->pChar->nC == 29) {
+        fn_8001DC64(lbl_80281EE0->pB8->pChar, &fn_80077ACC()->choices);
+    }
+    fn_8001C5B4(lbl_80281EE0->pB8->pChar, 5);
+    pClip = Char_SetClip(lbl_80281EE0->pB8->pChar, 0, 0, NULL);
+    fn_8001BE88(lbl_80281EE0->pB8->pChar, pClip, 1, 0.0f);
+    if (lbl_80281EE0->pB8->nC == lbl_80281EE0->n8C) {
+        pChar = lbl_80281EE0->pB8->pChar;
+        pChar->nSkins = 7;
+        pChar->apSkins[0] = pChar->pSkin;
+        pChar->apSkins[1] = pChar->p16D8->apSkins[0];
+        pChar->apSkins[2] = pChar->p16D8->apSkins[1];
+        pChar->apSkins[3] = pChar->p16D8->apSkins[2];
+        pChar->apSkins[4] = pChar->p16D8->apSkins[3];
+        pChar->apSkins[5] = pChar->p16D8->apSkins[4];
+        pChar->apSkins[6] = pChar->p16D8->apSkins[5];
+        if ((pChar->nC == 7 || pChar->nC == 29) && pChar->n70 == 1) {
+            pChar->n70 = 2;
+        }
+        fn_8001A418(pChar);
+    }
 }
 
 void fn_8001D238(void) {

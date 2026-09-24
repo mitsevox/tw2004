@@ -20,6 +20,10 @@ void* fn_80009B34(int nSize, int nMode, int nAlign, const char* pFile, int nLine
 void  fn_80009E70(void* p);             // free
 void  fn_8000A0AC(s32 v);               // } a value callers pass on as fn_80009B34's uFlags
 s32   fn_8000A0B4(void);                // } (EASportsBio.c sets 0 while the Bio starts, then 2)
+void  fn_8000A0BC(void);                // start a new count of the bytes taken
+void  fn_8000A0C8(void);                // } counting on / off
+void  fn_8000A0D4(void);                // }
+s32   fn_8000A0E0(void);                // the bytes taken since fn_8000A0BC
 // The main-memory heap (GoShaderObject_Particle_Gc.c): fn_80095108 makes it from the arena.
 // fn_800951A0 returns a block aligned to nAlign (0: 16) that remembers the heap block and its
 // own padding just before and after it (every caller passes 1 as n, which it does not read).
