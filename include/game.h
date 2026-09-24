@@ -7,6 +7,7 @@
 
 #include "golfer.h"
 #include "ball.h"
+#include "game/save.h"          // SaveProfile, SaveRecords (ReplayBuffer)
 
 // ---- the round -------------------------------------------------------------------------------
 
@@ -44,9 +45,12 @@ extern Replay gReplayData;              // 0x801D6030
 extern char* lbl_80191990[NUM_COURSES]; // each course's name ("Pebble Beach", ...)
 
 // The replay recorder's buffer (our name; 0x15260 bytes, made by fn_8006BED4 at the start of a
-// round). Only the flag is read so far.
+// round): what fn_8006BF60 saves before a shot besides gReplayData, put back when it replays.
 typedef struct ReplayBuffer {
-    u8   unk0[0x1525C];
+    SaveProfile profile;        // 0x00000  the player's save profile
+    SaveRecords records;        // 0x10600  the session's record tables
+    s32  aQueueCount[12];       // 0x1522C  the UI queues' counts, lbl_802822B8 down to lbl_80282288
+                                //          (GameUI.c; lbl_802822A4 is not kept)
     u8   b1525C;                // 0x1525C  set by fn_8006C5E0, cleared by fn_8006C608 (not in a replay)
     u8   unk1525D[3];
 } ReplayBuffer;
@@ -133,12 +137,22 @@ typedef struct Unk802811F0 {
 } Unk802811F0;
 extern Unk802811F0* lbl_802811F0;       // 0x802811F0
 
+// lbl_80188900: five choices per course (fn_8006F650). A roll picks choice n with chance fShare
+// (setting bit n of lbl_802811F0->uFlags); in game option mode 2 it then lasts nMin..nMax calls.
+typedef struct Unk80188900 {
+    f32 fShare;                 // 0x0
+    s32 nMin;                   // 0x4
+    s32 nMax;                   // 0x8
+} Unk80188900;
+
 u8   fn_80035574(void);                 // lbl_802811F0's flag 0x2
 
 // ---- the course table (CourseData.c) ---------------------------------------------------------
 
 #define NUM_COURSE_DATA 21      // courses in the 'CRI ' table
 #define NUM_BUILT_ROUNDS 7      // rounds in the 'CMPS' table
+
+extern Unk80188900 lbl_80188900[NUM_COURSE_DATA][5];   // (above)
 
 // One hole of the course table (0x38 bytes).
 typedef struct HoleData {
@@ -208,6 +222,23 @@ int  fn_800D06FC(int nPlayer, u8 bCurrent, u8 bOnlyFlagged);   // two under par 
 int  fn_800D07D8(int nPlayer, u8 bCurrent);   // the current run of holes under par
 int  fn_800D089C(int nPlayer, u8 bCurrent);   // the current run of holes two under par or better
 u8   fn_800D0AF4(void);                 // nobody took anything on the last hole played
+u8   fn_800CF77C(int nPlayer);          // HoleScore.c
+u8   fn_800CF848(int nPlayer);          // HoleScore.c
+u32  fn_800CF904(int nPlayer);          // HoleScore.c
+u32  fn_800CFD58(int nPlayer);          // HoleScore.c
+int  fn_800CFFE4(int nPlayer);          // HoleScore.c
+f32  fn_800D04E0(int nPlayer);          // HoleScore.c
+int  fn_800D0514(int nPlayer);          // HoleScore.c
+f32  fn_800D0960(int nPlayer);          // HoleScore.c
+int  fn_800D0FBC(int nPlayer);          // HoleScore.c
+int  fn_800D10B0(int nPlayer);          // HoleScore.c
+int  fn_800D1170(int nPlayer, u8 bOnlyFlagged);    // HoleScore.c
+int  fn_800D1250(int nPlayer);          // HoleScore.c
+int  fn_800D13F4(int nPlayer);          // HoleScore.c
+int  fn_800D1530(int nPlayer);          // HoleScore.c
+s32  fn_8008AB4C(void);                 // GameUICommands.c
+int  fn_800E184C(int nPlayer, u8 bCurrent);        // GameRound.c
+s32  fn_800E81A0(int nPlayer);          // GameModeBattle.c
 s32  fn_800BCCCC(int nPlayer);          // SitDevFile.c: gpGame->pfn208
 s32  fn_800BCCF8(int nPlayer);          // SitDevFile.c: strokes behind the leader (gpGame->pfn200)
 u8   fn_800BCD50(void);                 // SitDevFile.c: gpGame->bD4
@@ -757,7 +788,7 @@ s32  fn_8011027C(void);                 // the disc in the drive is not disc 1 (
 void fn_801102AC(void);                 // ask for the other disc and wait for it
 int  fn_80110450(void);                 // the disc change has finished (lbl_802824D0)
 void fn_80110458(u8 b);
-u8   fn_80110460(void);
+int  fn_80110460(void);                 // lbl_802824D1 (its one caller, startUp.c, tests a whole word)
 int  fn_80110468(void);                 // the disc in the drive (its disk number; 0: disc 1)
 DVDCommandBlock* fn_801104A0(void);     // the disc change's command block
 extern DVDDiskID lbl_80213B60;          // the disc asked for by fn_80110390

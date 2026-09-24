@@ -124,6 +124,7 @@ extern s32 lbl_80282504;        // the player's playoff strokes (fn_8011989C)
 // PGATourSimulation.c functions other files call. The TW06 name follows where the code matches it.
 void  fn_8011763C(void);                        // TW06: PGATourSimulation_OpenONCE
 void  fn_8011766C(void);                        // TW06: PGATourSimulation_CloseONCE
+void  fn_801176C0(TourSeason* pTour);
 void  fn_80117860(TourSeason* pTour);
 void  fn_801178C8(s32 nPlayer, SeasonEvent* pEvent, int nRound, int n, int uFlags);   // TW06: GM_PgaTourSim_SimRound
 void  fn_80117AF8(int nPlayer);

@@ -191,5 +191,16 @@ LAYOUT_ASSERT(GxTexture, 0x30);
 void fn_8002A528(GxTexture* pTex, int nWidth, int nHeight, void* pImage, void* pLut, int eFormat,
                  int eLutFormat, int eWrapS, int eWrapT);
 void fn_8002A608(GxTexture* pTex);  // make pTex the texture of the next draw
+void fn_8002A024(u8 bOn, f32 x0, f32 y0, f32 x1, f32 y1);
+void fn_8002A164(int nMode);
+void fn_8002A2FC(void);             // the end of fn_8002A164's drawing
+
+// DepthField.c's textures: the half-size screen copy, and the two full-size image buffers.
+extern GxTexture lbl_801D5198;
+extern GxTexture lbl_801D51C8[2];
+
+// GoPostFx.c's textures: of its own screen copy (twice), and of the shared one.
+extern GxTexture lbl_801D4F80;
+extern GxTexture lbl_801D4FB0[2];
 
 #endif
