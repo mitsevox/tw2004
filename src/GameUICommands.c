@@ -330,7 +330,6 @@ s32   fn_800F3668(int n);
 s8    fn_800F4878(void);
 s32   fn_800F4B00(void);
 void  fn_800F7DA4(void);
-s32   fn_800F9254(void);
 s32   fn_800F9308(void);
 s32   fn_800FA4B8(int nPlayer);
 s32   fn_800FD704(int nPlayer, int nHole, s32* pWon);

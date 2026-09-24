@@ -331,8 +331,6 @@ u8   fn_800BCBE0(void);
 u8   fn_800BCC38(void);
 u8   fn_800BCC48(void);
 s32  fn_800BCCA0(int nPlayer);
-s32  fn_800BCCCC(int nPlayer);
-s32  fn_800BCCF8(int nPlayer);
 u8   fn_800BCD24(int nPlayer);
 u8   fn_800BCD50(void);
 s32  fn_800BCD5C(void);

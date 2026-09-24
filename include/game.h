@@ -202,6 +202,8 @@ int  fn_800D06FC(int nPlayer, u8 bCurrent, u8 bOnlyFlagged);   // two under par 
 int  fn_800D07D8(int nPlayer, u8 bCurrent);   // the current run of holes under par
 int  fn_800D089C(int nPlayer, u8 bCurrent);   // the current run of holes two under par or better
 u8   fn_800D0AF4(void);                 // nobody took anything on the last hole played
+s32  fn_800BCCCC(int nPlayer);          // SitDevFile.c: gpGame->pfn208
+s32  fn_800BCCF8(int nPlayer);          // SitDevFile.c: strokes behind the leader (gpGame->pfn200)
 void fn_800D2714(u16* pDate, s32* pMonth, s32* pDay, s32* pYear);
 void fn_800D2678(u16* pDate, s32 nMonth, s32 nDay, u32 nYear);    // make a date
 void fn_800D27CC(u16* pDate, s32 nDays);        // move a date on by nDays
@@ -618,6 +620,7 @@ void fn_800F39CC(s32 a);                // GameMode14.c
 void fn_800F48C4(void);                 // GameMode15.c
 void fn_800F7DE8(void);                 // GameMode13.c
 void fn_800F80D4(s32 a);                // GameMode13.c
+s32  fn_800F9254(void);                 // GameMode2.c: the skin on this hole
 s32  fn_800F9328(void);                 // GameMode2.c: the first selected hole (-1: none)
 s32  fn_800F93D8(int h);                // the next selected hole after h (-1: none)
 s32  fn_800F9414(int h);                // the selected hole before h (-1: none)

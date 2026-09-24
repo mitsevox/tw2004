@@ -70,6 +70,76 @@ int fn_800CFFE4(int nPlayer) {
     return (nStrokes - nPar) + gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1 - fn_800D2B08();
 }
 
+// The player's lead (strokes, or holes or skins by the scoring kind fn_8008AB40) once this hole's
+// ball drops, 0 when playing alone. Kind 0 (strokes): the best other round total, with a holed
+// ball's score on this hole, less the player's total with the tap-in; players who missed the cut
+// are left out. Kinds 1 and 2: the lead from fn_800BCCF8, moved by fn_800BCCCC's value: 3 no
+// change, 2 up one (kind 2: up this hole's skin), 0 down the same.
+int fn_800D0098(int nPlayer) {
+    int anTotal[5];   // size not proven
+    int i;
+    int nKind;
+    int nMine;
+    int nBest;
+    int nOther;
+    int nLead;
+    int nHole;
+
+    nKind = fn_8008AB40();
+    if (gNumPlayersSetUp == 1) {
+        return 0;
+    }
+    if (nKind == 0) {
+        nBest = 1000;
+        // EA bug: nMine is never set when nPlayer is cut or not one of the players set up
+        for (i = 0; i < gNumPlayersSetUp; i++) {
+            if (!gPlayers[i].bPlayerCut) {
+                anTotal[i] = fn_800E1904(i, 0);
+                if (i == nPlayer) {
+                    nMine = anTotal[i];
+                    nMine += gPlayers[i].nStrokes[Game_CurHoleIndex()] + 1 - fn_800D2B08();
+                } else {
+                    nOther = anTotal[i];
+                    if (gPlayers[i].ball.nLie == LIE_INCUP_e) {
+                        nOther += gPlayers[i].nStrokes[Game_CurHoleIndex()] - fn_800D2B08();
+                    }
+                    if (nOther < nBest) {
+                        nBest = nOther;
+                    }
+                }
+            }
+        }
+        return nBest - nMine;
+    } else if (nKind == 1) {
+        nLead = fn_800BCCF8(nPlayer);
+        nHole = fn_800BCCCC(nPlayer);
+        if (nHole == 3) {
+            return nLead;
+        }
+        if (nHole == 2) {
+            return nLead + 1;
+        }
+        if (nHole == 0) {
+            return nLead - 1;
+        }
+        return nLead;
+    } else if (nKind == 2) {
+        nLead = fn_800BCCF8(nPlayer);
+        nHole = fn_800BCCCC(nPlayer);
+        if (nHole == 3) {
+            return nLead;
+        }
+        if (nHole == 2) {
+            return nLead + fn_800F9254();
+        }
+        if (nHole == 0) {
+            nLead -= fn_800F9254();
+        }
+        return nLead;
+    }
+    return 0;
+}
+
 // Whether holing the ball now would finish the hole: puts the ball in the cup with one more
 // stroke, asks the mode (pfnHoleFinished, only asking), then puts both back.
 u8 fn_800D024C(int nPlayer) {
@@ -87,6 +157,57 @@ u8 fn_800D024C(int nPlayer) {
     gPlayers[nPlayer].ball.nLie = nLie;
     gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] = nStrokes;
     return bFinished;
+}
+
+// How the hole ends for the player if the ball drops now, against the best of the others (a
+// ball not yet holed counts one more stroke; in mode 21 the other side is player 2 or 0): 2 the
+// player wins it, 1 ties, 0 loses; 3 when playing alone or when holing would not end the hole.
+int fn_800D030C(int nPlayer) {
+    int i;
+    int nMine;
+    int nBest;
+    int nOther;
+
+    fn_8008AB40();
+    if (gNumPlayersSetUp == 1) {
+        return 3;
+    }
+    if (!fn_800D024C(nPlayer)) {
+        return 3;
+    }
+    nBest = 1000;
+    if (Game_GetMode() == 21) {
+        nMine = gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()] + 1;
+        if (nPlayer == 0 || nPlayer == 1) {
+            i = 2;
+        } else {
+            i = 0;
+        }
+        nOther = gPlayers[i].nStrokes[Game_CurHoleIndex()];
+        if (gPlayers[i].ball.nLie != LIE_INCUP_e) {
+            nOther++;
+        }
+        nBest = nOther;
+    } else {
+        // EA bug: nMine is never set when nPlayer is not one of the players set up
+        for (i = 0; i < gNumPlayersSetUp; i++) {
+            if (i == nPlayer) {
+                nMine = gPlayers[i].nStrokes[Game_CurHoleIndex()] + 1;
+            } else {
+                nOther = gPlayers[i].nStrokes[Game_CurHoleIndex()];
+                if (gPlayers[i].ball.nLie != LIE_INCUP_e) {
+                    nOther++;
+                }
+                if (nOther < nBest) {
+                    nBest = nOther;
+                }
+            }
+        }
+    }
+    if (nMine < nBest) {
+        return 2;
+    }
+    return nMine == nBest;
 }
 
 // The ball's distance from the pin: where it lies, where the shot started, and where it lay before
