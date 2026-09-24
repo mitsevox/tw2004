@@ -191,7 +191,7 @@ void fn_80110A38(HwsBurn* pBurn, int n) {
     if (pEntry->nC >= 0) {
         p28 = &pBurn->pDesc->p28[pEntry->nC];
         nCount = 0;
-        for (i = 0; i < p28->n0; i++) {
+        for (i = 0; p28->n0 > i; i++) {
             nCount += p28->a8[i].n1;
         }
     }
