@@ -324,19 +324,23 @@ typedef struct AudInstanceCmd {
     u8   uOff;                  // 0x1    tracks switched off
     u16  uChanged;              // 0x2    bits 0-7: that track's auParams was set; 0x200: uOn / uOff
     u32  auParams[8];           // 0x4    per track
+    f32  aPos[2][3];            // 0x24   the instance's position as each view hears it (fn_800AD800)
 } AudInstanceCmd;
 
 // One of hlaudemitter.c's 256 emitter instances (lbl_801F2740); only the fields read so far.
 typedef struct AudInstance {
     AudInstanceCmd* pCmd;       // 0x0
-    u8   unk4[0x8 - 0x4];
-    struct AudInstance* pNextActive;   // 0x8    the next in AudEmitters.pActive's list
+    struct AudInstance* pPrevActive;   // 0x4    the previous in AudEmitters.pActive's list
+    struct AudInstance* pNextActive;   // 0x8    the next in AudEmitters.pActive's list (or pFree's)
     struct AudInstance* pNext;  // 0xC    the next instance of the same emitter (AudEmitters)
-    u8   unk10[0x20 - 0x10];
+    f32  vPos[4];               // 0x10   its position (fn_800AD800)
     u8   nId;                   // 0x20   its number (its index in lbl_801F2740)
-    u8   unk21;
+    s8   nEmitter;              // 0x21   the emitter whose list it is in (-1: none)
     u8   u22;                   // 0x22   bits cleared by fn_800ADDC8
-    u8   unk23[0x30 - 0x23];
+    u8   unk23;
+    s32  n24;                   // 0x24   1: fn_800AD1C8 sends vPos again every frame
+    s32  n28;                   // 0x28   0: vPos is moved into each view's camera space
+    u8   unk2C[0x30 - 0x2C];
     void (*pfnCallback)(u8 nId, u8 nBit, s32 n);  // 0x30
 } AudInstance;
 LAYOUT_ASSERT(AudInstance, 0x34);
@@ -346,12 +350,14 @@ extern AudInstance lbl_801F2740[256];   // the instances, by id (0xFF: none)
 // hlaudemitter.c's emitters (lbl_801F2668, 0xD8 bytes): per emitter, its list of instances and
 // a sound number. 32 fit the layout: the list heads end where the sound numbers begin.
 typedef struct AudEmitters {
-    u8   unk0[0x8];
+    AudInstance* pFree;         // 0x0    the free instances, linked through pNextActive
+    AudInstance* pFreeTail;     // 0x4
     AudInstance* pActive;       // 0x8    the instances in use, linked through pNextActive
-    u8   unkC[0x10 - 0xC];
+    AudInstance* pActiveTail;   // 0xC
     AudInstance* apFirst[32];   // 0x10   linked through AudInstance.pNext
     s16  anSound[32];           // 0x90   fn_800ADC44 hands it to fn_800ADA08
-    u8   unkD0[0xD8 - 0xD0];
+    u32  nActive;               // 0xD0   instances in use (up to 256)
+    u32  uFlags;                // 0xD4   bit 0: set up (fn_800ACECC)
 } AudEmitters;
 LAYOUT_ASSERT(AudEmitters, 0xD8);
 
@@ -436,7 +442,7 @@ u8             fn_800A7AF0(void);
 s32            fn_800A7C24(void);
 void           fn_800A7C2C(void);
 AudSource*     fn_800A7C30(u8 nEntry, s16 nSound);
-void           fn_800A7CA4(u8 nEntry, u8 uMaskA, u8 uMaskB, u32* auStreams, s32 n, u16 uMask);
+void           fn_800A7CA4(u8 nEntry, u8 uMaskA, u8 uMaskB, u32* auStreams, f32 (*aPos)[3], u16 uMask);
 void           fn_800A8200(u8 nEntry);
 void           fn_800A8248(u8 nEntry, u8 nTrack, u8 n);
 void           fn_800A82CC(u8 nEntry, u8 nTrack, u8 n);

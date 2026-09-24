@@ -1,89 +1,224 @@
-// Trax.c (our name): the EA Trax music display: the 'TRAX' and 'TRXT' stream chunks (the track
-// list and its text) and the on-screen name of the song playing ("%s" in quotes), kept in
-// lbl_801F8458. Not yet decompiled beyond the sweep code below.
+// Trax.c (our name): the EA Trax music display: the 'TRAX' and 'TRXT' stream objects (the song
+// list and the EA Trax logo) and, for 240 frames after a song starts, its names in a box that
+// slides in from the left and fades out.
 
-#include "game_types.h"
+#include "engine.h"
+#include "golfer.h"
+#include "terrain.h"
+#include "platform.h"
+#include "frontend/fe.h"
+#include "trax.h"
 
-// ---- sweep code (not yet cleaned up) ----
+TraxState lbl_801F8458;
+TraxTrack lbl_801F846C[TRAX_NUM_TRACKS];
 
-extern u8 lbl_801F8458[];
 u8 fn_800BA080(void);
-extern u8 lbl_801F846C[];
-void UStream_UnregisterHandler();
-void Mem_cpy();
-void fn_80009E70();
-s32 fn_800107C0();
-void fn_800BA0E4(void);
-void fn_800BA118(u8* p0);
-void fn_800BA15C(s32 p0);
-extern f32 lbl_802841EC;
+void fn_800BA118(UStreamObject* pObject);
+void fn_800BA15C(UStreamObject* pObject);
 f32 fn_800BA3A4(void);
-extern f32 lbl_802841F0;
-extern f32 lbl_802841F4;
 f32 fn_800BA3D8(void);
-extern f32 lbl_802841F8;
-extern f32 lbl_802841FC;
 f32 fn_800BA40C(void);
-extern f32 lbl_80284230;
+f32 fn_800BA440(void);
+f32 fn_800BA504(f32 fAlpha);
+void fn_800BA550(void);
 f32 fn_800BA6CC(void);
-extern f32 lbl_8028420C;
-extern f32 lbl_80284234;
 f32 fn_800BA700(void);
+TexBank* fn_800106C4(int nSlot);                                    // LLTexGrp.c
+int fn_800107C0(UStreamObject* pObject, TexBank* pBank, int n);     // LLTexGrp.c
+TexEntry* fn_800922A0(TexBank* pBank);                              // fe_movies.c: its first texture
+void fn_80012898(s32 v);
+void fn_80012B9C(f32 fX, f32 fY);
+void fn_8006A9AC(f32* pColor);
+void fn_80012868(s32 nFont);
+void fn_800128F8(char* sz, f32 x, f32 y);                           // draw a string
+void fn_80076128(s32 n);
 
+void fn_800B9FF0(void) {
+    lbl_801F8458.bShow = 0;
+    lbl_801F8458.nFrames = 0;
+    lbl_801F8458.nTrack = 0;
+    lbl_801F8458.nLogo = -1;
+    if (gSession.nGameType == 10) {
+        lbl_801F8458.nFont = 2;
+        return;
+    }
+    lbl_801F8458.nFont = 1;
+}
+
+void fn_800BA038(void) {
+    if (fn_800BA080()) {
+        fn_80010544(lbl_801F8458.nLogo);
+    }
+    lbl_801F8458.nLogo = -1;
+}
+
+// The logo is loaded.
 u8 fn_800BA080(void) {
-    return ((u32)((-1 - *(s32*)(lbl_801F8458 + 0x10)) | (*(s32*)(lbl_801F8458 + 0x10) + 1)) >> 31);
+    return ((u32)((-1 - lbl_801F8458.nLogo) | (lbl_801F8458.nLogo + 1)) >> 31);
+}
+
+void fn_800BA0A0(void) {
+    UStream_RegisterHandler('TRAX', fn_800BA118);
+    UStream_RegisterHandler('TRXT', fn_800BA15C);
 }
 
 void fn_800BA0E4(void) {
-    UStream_UnregisterHandler(1414676824);
-    UStream_UnregisterHandler(1414682708);
+    UStream_UnregisterHandler('TRAX');
+    UStream_UnregisterHandler('TRXT');
 }
 
-void fn_800BA118(u8* p0) {
-    Mem_cpy(lbl_801F846C, *(s32*)p0, 7296);
-    fn_80009E70(p0);
+// The song list.
+void fn_800BA118(UStreamObject* pObject) {
+    Mem_cpy(lbl_801F846C, pObject->pData, sizeof(lbl_801F846C));
+    fn_80009E70(pObject);
 }
 
-void fn_800BA15C(s32 p0) {
-    s32 t0;
-    t0 = fn_800107C0(p0, 0, 0);
-    *(s32*)(lbl_801F8458 + 0x10) = t0;
-    fn_80009E70(p0, lbl_801F8458);
+// The logo's texture bank.
+void fn_800BA15C(UStreamObject* pObject) {
+    lbl_801F8458.nLogo = fn_800107C0(pObject, NULL, 0);
+    fn_80009E70(pObject);
 }
 
+// Draw the box (with the logo when it is loaded) and the song's names.
+void fn_800BA1A4(void) {
+    f32 vColour[4];
+    f32 aXY[8];
+    f32 aUV[8];
+    TexBank* pBank;
+    TexEntry* pTex;
+
+    if (lbl_801D87C0.b0 || (gSession.uFlags & 0x4000)) {
+        return;
+    }
+    if (lbl_801F8458.bShow && lbl_801F8458.nFrames < 240) {
+        if (fn_800BA080()) {
+            pBank = fn_800106C4(lbl_801F8458.nLogo);
+            pTex = fn_800922A0(pBank);
+        }
+        fn_80035118(4, 5);
+        fn_80012F50(0, 6, 0x80);
+        fn_80012F18(7);
+        fn_8001425C(0);
+        fn_80012F34(0);
+        if (fn_800BA080()) {
+            fn_8005CC64(pBank, pTex);
+            fn_80014118(0x50);
+        } else {
+            fn_80014118(0x40);
+        }
+        fn_80012EF8();
+        if (fn_800BA080()) {
+            vColour[0] = 0.5f;
+            vColour[1] = 0.5f;
+            vColour[2] = 0.5f;
+            vColour[3] = fn_800BA504(0.5f);
+        } else {
+            vColour[0] = 0.9f;
+            vColour[1] = 0.9f;
+            vColour[2] = 0.9f;
+            vColour[3] = fn_800BA504(0.15f);
+        }
+        fn_80014194(vColour);
+        fn_800141F8(aXY, aUV, fn_800BA440(), fn_800BA40C(), fn_800BA440() + fn_800BA3D8(),
+                    fn_800BA40C() + fn_800BA3A4());
+        fn_8001644C(0xA1, aXY, 0, aUV, 2);
+        fn_800BA550();
+        lbl_801F8458.nFrames++;
+        return;
+    }
+    lbl_801F8458.bShow = 0;
+    lbl_801F8458.nFrames = 0;
+}
+
+// The box's height.
 f32 fn_800BA3A4(void) {
-    if (fn_800BA080() != 0) {
-        return lbl_802841EC;
+    if (fn_800BA080()) {
+        return 0.13f;
     }
-    return lbl_802841EC;
+    return 0.13f;
 }
 
+// The box's width.
 f32 fn_800BA3D8(void) {
-    if (fn_800BA080() != 0) {
-        return lbl_802841F0;
+    if (fn_800BA080()) {
+        return 0.4f;
     }
-    return lbl_802841F4;
+    return 0.3f;
 }
 
+// The box's top.
 f32 fn_800BA40C(void) {
-    if (fn_800BA080() != 0) {
-        return lbl_802841F8;
+    if (fn_800BA080()) {
+        return 0.79f;
     }
-    return lbl_802841FC;
+    return 0.83f;
 }
 
+// The box's left: it slides in over the first 30 frames.
+f32 fn_800BA440(void) {
+    if (fn_800BA080()) {
+        if (lbl_801F8458.nFrames <= 30) {
+            return (0.02f - -0.4f) * (lbl_801F8458.nFrames / 30.0f) + -0.4f;
+        }
+        return 0.02f;
+    }
+    if (lbl_801F8458.nFrames <= 30) {
+        return (0.02f - -0.3f) * (lbl_801F8458.nFrames / 30.0f) + -0.3f;
+    }
+    return 0.02f;
+}
+
+// fAlpha, faded out over the last 15 frames.
+f32 fn_800BA504(f32 fAlpha) {
+    int nLeft = 240 - lbl_801F8458.nFrames;
+
+    if (nLeft <= 15) {
+        fAlpha *= nLeft / 15.0f;
+    }
+    return fAlpha;
+}
+
+// The song's three names, one under the other.
+void fn_800BA550(void) {
+    f32 vColour[4] = {0.0f, 0.0f, 0.0f, 0.5f};
+    s8 nTrack = lbl_801F8458.nTrack;
+    char szSong[0xA0];          // size unknown: the frame leaves room for this much
+
+    vColour[3] = fn_800BA504(0.5f);
+    fn_80012898(1);
+    fn_80012B9C(0.8f, 0.8f);
+    fn_8006A9AC(vColour);
+    fn_80012868(lbl_801F8458.nFont);
+    fn_800128F8(lbl_801F846C[nTrack].sz0, fn_800BA440() + fn_800BA700(),
+                fn_800BA40C() + fn_800BA6CC());
+    sprintf(szSong, "\"%s\"", lbl_801F846C[nTrack].szSong);
+    fn_800128F8(szSong, fn_800BA440() + fn_800BA700(),
+                0.029f + (fn_800BA40C() + fn_800BA6CC()));
+    fn_800128F8(lbl_801F846C[nTrack].sz100, fn_800BA440() + fn_800BA700(),
+                0.058f + (fn_800BA40C() + fn_800BA6CC()));
+    fn_80012898(0);
+    fn_80076128(11);
+}
+
+// The text's offset down from the box's top.
 f32 fn_800BA6CC(void) {
-    if (fn_800BA080() != 0) {
-        return lbl_80284230;
+    if (fn_800BA080()) {
+        return 0.025f;
     }
-    return lbl_80284230;
+    return 0.025f;
 }
 
+// The text's offset right from the box's left: past the logo when there is one.
 f32 fn_800BA700(void) {
-    if (fn_800BA080() != 0) {
-        return lbl_80284234;
+    if (fn_800BA080()) {
+        return 0.1f;
     }
-    return lbl_8028420C;
+    return 0.02f;
 }
 
-// ---- end of sweep code ----
+// Show song nTrack's names (bShow 1), or stop showing them.
+void fn_800BA734(int bShow, s8 nTrack) {
+    lbl_801F8458.bShow = bShow;
+    lbl_801F8458.nTrack = nTrack;
+    lbl_801F8458.nFrames = 0;
+}

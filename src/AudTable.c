@@ -13,7 +13,7 @@ void fn_800A7E44(AudSource* pSource);
 f32  fn_800A7EA4(f32 fDist, f32 fScale);
 void fn_800A7F2C(AudSource* pSource);
 void fn_800A7FA8(AudSource* pSource);
-f32  fn_800A809C(AudSource* pSource, s32 n);
+f32  fn_800A809C(AudSource* pSource, f32 (*aPos)[3]);
 void fn_800A8134(AudSource* pSource, u32* auStreams, u16 uMask);
 
 AudSource* lbl_80282058;
@@ -55,7 +55,7 @@ AudSource* fn_800A7C30(u8 nEntry, s16 nSound) {
 }
 
 // Updates entry nEntry's tracks. A placed sound out of earshot is stopped.
-void fn_800A7CA4(u8 nEntry, u8 uMaskA, u8 uMaskB, u32* auStreams, s32 n, u16 uMask) {
+void fn_800A7CA4(u8 nEntry, u8 uMaskA, u8 uMaskB, u32* auStreams, f32 (*aPos)[3], u16 uMask) {
     AudSource* pSource;
     f32 fDist;
     u8 bHeard;
@@ -74,7 +74,7 @@ void fn_800A7CA4(u8 nEntry, u8 uMaskA, u8 uMaskB, u32* auStreams, s32 n, u16 uMa
         fn_800A8134(pSource, auStreams, uMask);
     }
     if (pSource->pSound->n3 & 1) {
-        fDist = fn_800A809C(pSource, n);
+        fDist = fn_800A809C(pSource, aPos);
         bHeard = fDist - pSource->pSound->f4 < 0.0f;
         if (bHeard) {
             pSource->fDist = fDist;
@@ -181,8 +181,9 @@ void fn_800A7FA8(AudSource* pSource) {
     pSource->f68 = 1.0f;
 }
 
-// Measures the sound's distance from each listener; returns the nearest.
-f32 fn_800A809C(AudSource* pSource, s32 n) {
+// Measures the sound's distance from each listener; returns the nearest. aPos (the position as
+// each view hears it) is not used: the distances come from pSource->aPos.
+f32 fn_800A809C(AudSource* pSource, f32 (*aPos)[3]) {
     f32 fNearest;
     u8 i;
     f32 fDist;
