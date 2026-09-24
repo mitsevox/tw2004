@@ -36,20 +36,16 @@ void fn_8004731C(u8* pState);
 void fn_80047C24(int nPlayer);
 void fn_80048184(int nPlayer);
 void fn_80035240(int n);
-u8   fn_8000B54C(u32 uType, u32 uId);     // a stream object of this type and id is loaded
-UStreamObject* fn_8000B70C(u32 uType, u32 uId);
 
 // ---- sweep code (not yet cleaned up) ----
 
-s32 fn_8000B4B8(void*);
-u8 fn_8000B508();
 s32 fn_80045D80(s32);
 void fn_800460F8(UStreamObject* arg0);
 void fn_80045F74(UStreamObject* arg0);
 s32 fn_800075CC(s32);
 
 void fn_80045F74(UStreamObject* arg0) {
-    if (fn_8000B508() == 0) {
+    if (fn_8000B508(arg0) == 0) {
         (*(s32*)((u8*)(arg0) + 4)) = fn_80045D80((*(s32*)((u8*)(arg0) + 0)));
         (*(void (**)(UStreamObject*))((u8*)(arg0) + 8)) = fn_800460F8;
         fn_8000B4B8(arg0);

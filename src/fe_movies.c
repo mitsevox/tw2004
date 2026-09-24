@@ -15,8 +15,6 @@ void fn_800083A0();
 void fn_80091BDC();
 void fn_800A4BDC();
 void fn_80091B98(s32 p0);
-extern u8 lbl_801A25F0[];
-extern s32 lbl_80281C04;
 void fn_80012EF8();
 void fn_8005CC64();
 void fn_80091DB8();

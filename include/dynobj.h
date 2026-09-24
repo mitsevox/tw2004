@@ -13,7 +13,7 @@
 typedef int (*DynObjHandler)(int nMsg, struct DynObj* pObj, void* pArg, void* pArg2);
 
 // An object's definition in the course data: its 'tACT' chunk from the chunk's id on
-// (fn_80048BDC; DynObjChunk).
+// (fn_80048BDC; TagRecord).
 typedef struct DynObjDef {
     s32  n0;                    // 0x00  the chunk's id -> DynObj.n140
     u8   n4;                    // 0x04  its type (fn_800499B0) -> DynObj.n146
@@ -47,20 +47,12 @@ typedef struct DynObjModelEntry {
     } u;
 } DynObjModelEntry;
 
-// An object's 'aRSL' chunk, laid over the chunk from its id on (DynObjChunk): the stream objects
+// An object's 'aRSL' chunk, laid over the chunk from its id on (TagRecord): the stream objects
 // it uses, the first its model.
 typedef struct DynObjModel {
     s32  nEntries;              // 0x0  set from the chunk's size
     DynObjModelEntry aEntries[1]; // 0x4  nEntries of them (as many as the chunk holds)
 } DynObjModel;
-
-// A tagged piece of a stream object's data: fn_8000B748 finds one by tag and id and returns what
-// follows the header, fn_8000B7B0 returns the header.
-typedef struct DynObjChunk {
-    u32  uTag;                  // 0x0
-    u32  uSize;                 // 0x4  header included
-    u32  uId;                   // 0x8
-} DynObjChunk;
 
 // The names an object passes to fn_8000EA1C (DynObjSetup.pC).
 typedef struct DynObjNames {

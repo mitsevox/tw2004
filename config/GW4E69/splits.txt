@@ -78,41 +78,14 @@ UMemPool.c:
 urandom.c:
 	.text       start:0x8000B130 end:0x8000B46C
 
-unsorted/sweep_8000B4B0.c:
-	.text       start:0x8000B4B0 end:0x8000B4B8
+ObjList.c:
+	.text       start:0x8000B46C end:0x8000B884
 
-unsorted/sweep_8000B984.c:
-	.text       start:0x8000B984 end:0x8000B9E4
+LoadData.c:
+	.text       start:0x8000B884 end:0x8000BF20
 
-unsorted/sweep_8000BA14.c:
-	.text       start:0x8000BA14 end:0x8000BA3C
-
-unsorted/sweep_8000BA6C.c:
-	.text       start:0x8000BA6C end:0x8000BA94
-
-unsorted/sweep_8000BEC8.c:
-	.text       start:0x8000BEC8 end:0x8000BED8
-
-unsorted/sweep_8000BED8.c:
-	.text       start:0x8000BED8 end:0x8000BEE4
-
-unsorted/sweep_8000BF8C.c:
-	.text       start:0x8000BF8C end:0x8000BF9C
-
-unsorted/sweep_8000C0F0.c:
-	.text       start:0x8000C0F0 end:0x8000C104
-
-unsorted/sweep_8000C244.c:
-	.text       start:0x8000C244 end:0x8000C278
-
-unsorted/sweep_8000C594.c:
-	.text       start:0x8000C594 end:0x8000C5A4
-
-unsorted/sweep_8000C5A4.c:
-	.text       start:0x8000C5A4 end:0x8000C5D4
-
-unsorted/sweep_8000C5FC.c:
-	.text       start:0x8000C5FC end:0x8000C624
+TerrainData.c:
+	.text       start:0x8000BF20 end:0x8000C624
 
 UStream.c:
 	.text       start:0x8000C624 end:0x8000E830
@@ -284,6 +257,9 @@ GoStaticCam.c:
 event.c:
 	.text       start:0x80065B44 end:0x80067710
 
+Code80067710.c:
+	.text       start:0x80067710 end:0x80067B80
+
 target.c:
 	.text       start:0x80067B80 end:0x8006AA70
 
@@ -302,11 +278,10 @@ GoFrameBuf.c:
 GoLighting.c:
 	.text       start:0x8006E2A4 end:0x8006F154
 
-unsorted/sweep_8006F400.c:
-	.text       start:0x8006F400 end:0x8006F430
-
-unsorted/sweep_8006F430.c:
-	.text       start:0x8006F430 end:0x8006F438
+Code8006F154.c:
+	.text       start:0x8006F154 end:0x8006F438
+	.sdata      start:0x802811E0 end:0x802811E8
+	.sdata2     start:0x80283958 end:0x80283988
 
 unsorted/sweep_8006F4B4.c:
 	.text       start:0x8006F4B4 end:0x8006F4E0
@@ -347,59 +322,11 @@ unsorted/sweep_8006FFD4.c:
 unsorted/sweep_80070168.c:
 	.text       start:0x80070168 end:0x8007018C
 
-unsorted/sweep_80070348.c:
-	.text       start:0x80070348 end:0x800703B8
+DynamicRenderingBuffer.c:
+	.text       start:0x8007018C end:0x80070EC4
 
-unsorted/sweep_80070B50.c:
-	.text       start:0x80070B50 end:0x80070B74
-
-unsorted/sweep_80070B74.c:
-	.text       start:0x80070B74 end:0x80070B78
-
-unsorted/sweep_80070B78.c:
-	.text       start:0x80070B78 end:0x80070BD0
-
-unsorted/sweep_80070BD0.c:
-	.text       start:0x80070BD0 end:0x80070C24
-
-unsorted/sweep_80070C24.c:
-	.text       start:0x80070C24 end:0x80070C7C
-
-unsorted/sweep_80070C7C.c:
-	.text       start:0x80070C7C end:0x80070CD0
-
-unsorted/sweep_80070CD0.c:
-	.text       start:0x80070CD0 end:0x80070D28
-
-unsorted/sweep_80070D28.c:
-	.text       start:0x80070D28 end:0x80070D7C
-
-unsorted/sweep_80070D7C.c:
-	.text       start:0x80070D7C end:0x80070D88
-
-unsorted/sweep_80070D88.c:
-	.text       start:0x80070D88 end:0x80070DBC
-
-unsorted/sweep_80070DBC.c:
-	.text       start:0x80070DBC end:0x80070DF4
-
-unsorted/sweep_80070F00.c:
-	.text       start:0x80070F00 end:0x80070F34
-
-unsorted/sweep_80070F34.c:
-	.text       start:0x80070F34 end:0x80070F5C
-
-unsorted/sweep_80070F5C.c:
-	.text       start:0x80070F5C end:0x80070FB0
-
-unsorted/sweep_80070FB0.c:
-	.text       start:0x80070FB0 end:0x80070FBC
-
-unsorted/sweep_80070FBC.c:
-	.text       start:0x80070FBC end:0x80070FF0
-
-unsorted/sweep_80070FF0.c:
-	.text       start:0x80070FF0 end:0x80071028
+Code80070EC4.c:
+	.text       start:0x80070EC4 end:0x8007110C
 
 GoShaderObject_PrelitUVAnimation_Gc.c:
 	.text       start:0x8007110C end:0x80071AD0
