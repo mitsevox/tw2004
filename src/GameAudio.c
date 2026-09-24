@@ -29,6 +29,7 @@ void fn_800ADD54(s16 nKind, u8 nTrack, f32 fVolume);        // types unproven
 
 f32  fn_8006E118(u64 tEnd, u64 tStart);    // GameManager.c: seconds between two time stamps
 void fn_8010D3D8(int nPlayer);
+u8   fn_8006BEA4(void);                    // GoGolfCam.c: the GameBreaker letterbox is up
 void fn_800ADA94(u8 nId, u8 nTrack, f32 fVolume);
 void fn_800ADB4C(s16 nKind, u8 nTrack, u8 bOn);
 void fn_800ADC44(s16 nKind, u8 nTrack, u8 n);
@@ -101,6 +102,14 @@ GameAudioCourseSound lbl_8018EA08[9] = {
     { 15, 18, 1 },
     { 18, 2, 2 },
     { 18, 18, 2 },
+};
+
+// fn_800A5980: the swing sound per club (Player.nClub) and per lie (Ball.nLie).
+const u8 lbl_80183AD8[28] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 3, 0, 0,
+};
+const u8 lbl_80183AF4[20] = {
+    0, 0, 0, 1, 2, 3, 4, 4, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 };
 
 GameAudioView lbl_801F1790[2];
@@ -1133,6 +1142,105 @@ void fn_800A573C(u8 nPlayer) {
             pView->fC = gSession.fFrameTime;
         }
     }
+}
+
+// The swing: its sound by club and lie on the view's emitter 0, the crowd's reaction for a few
+// calls after fn_800A68C0 set lbl_80282034.
+void fn_800A5980(u8 nPlayer) {
+    Player* pPlayer;
+    GameAudioView* pView;
+    Clip* pClip;
+    u64 uName;
+    int nKind;
+    int nMode;
+    u8 nIdSwing;
+    u8 nIdA;
+    u8 nIdB;
+    u8 bRestore;
+    u8 n;
+    u8 nCrowd;
+
+    pPlayer = &gPlayers[nPlayer];
+    pView = &lbl_801F1790[pPlayer->nView[0]];
+    nIdSwing = pView->n0;
+    nIdA = pView->n2;
+    nIdB = pView->n3;
+    nKind = fn_800C7138(fn_80017028(pPlayer->nView[0]));
+    bRestore = 1;
+    nMode = Game_GetMode();
+    if (fn_8006BEA4()) {
+        fn_800A6C98(nPlayer, 0);
+        bRestore = 0;
+    }
+    if (lbl_80282034 > 0) {
+        n = 1;
+        if (lbl_80282034 == 1) {
+            switch (nKind) {
+            case 2:
+                n = 2;
+                break;
+            case 5:
+            case 8:
+                n = 3;
+                break;
+            case 11:
+                nCrowd = 1;
+                if (gPlayers[nPlayer].pChar != NULL) {
+                    pClip = gPlayers[nPlayer].pChar->pCurClip;
+                    if (pClip != NULL) {
+                        // port: the clip name's first 8 characters read as one big-endian u64
+                        uName = *(u64*)pClip->name;
+                        if (uName == 0x67646C66756C3332ULL || uName == 0x66646C66756C3332ULL) {
+                            nCrowd = 2;
+                        }
+                    }
+                }
+                fn_800A6C98(nPlayer, nCrowd);
+                break;
+            default:
+                n = 0;
+                break;
+            }
+        }
+        if (n) {
+            fn_800AD9AC(nIdA, 4, n);
+            fn_800AD9AC(nIdB, 4, n);
+            fn_800AD698(nIdA, 4, 1);
+            fn_800AD698(nIdB, 4, 1);
+        }
+        lbl_80282034--;
+        return;
+    }
+    if (lbl_80282032) {
+        if (nKind == 11) {
+            fn_800AD9AC(nIdA, 5, 2);
+            fn_800AD9AC(nIdB, 5, 2);
+        } else {
+            fn_800AD9AC(nIdA, 5, 0);
+            fn_800AD9AC(nIdB, 5, 0);
+        }
+        fn_800ADA94(nIdSwing, 1, 2.0f);
+        fn_800AD698(nIdA, 5, 1);
+        fn_800AD698(nIdB, 5, 1);
+        lbl_80282032 = 0;
+    } else {
+        fn_800ADA94(nIdSwing, 1, 1.0f);
+    }
+    fn_800AD800(nIdSwing, pPlayer->ball.vPos, NULL, 0);
+    fn_800AD9AC(nIdSwing, 1, lbl_80183AD8[pPlayer->nClub]);
+    if ((nMode == 22 || nMode == 26) && fn_8005C280(nPlayer) > 1.0f) {
+        fn_800AD950(nIdSwing, 1, 5);
+    } else {
+        fn_800AD950(nIdSwing, 1, lbl_80183AF4[pPlayer->ball.nLie]);
+    }
+    fn_800AD698(nIdSwing, 1, 1);
+    if (bRestore && lbl_80281428 != -1) {
+        fn_800A6DCC(lbl_80281428, 1);
+        lbl_80281428 = -1;
+        lbl_8028202F = 0;
+    }
+    lbl_80282033 = 1;
+    pView->tLast = fn_800954A4(1);
 }
 
 // The ball's impact sound, by the surface it hit (its nSoundId) and scaled by its speed; on
