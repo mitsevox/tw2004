@@ -53,6 +53,7 @@ CamLens* fn_8001F004(void);             // the current camera's lens
 f32  fn_8001EFFC(u8* pLens);            // the lens's fB0 (char.c: its parameter is u8*)
 f32  fn_80014278(u8* pLens);            // the lens's field of view (GoRenderCtx_Gc.c: u8*)
 u8   fn_8004561C(void);
+u8   fn_80044E2C(int n);
 void fn_80038010(u8 a, int n, f32* pVec);
 void fn_800386F0(int n, f32* pVec);
 f32  fn_8003F194(CamShot* pShot, f32 fA, f32 fB, f32 fTime);
@@ -1963,6 +1964,85 @@ f32 fn_80044B70(f32* pHeights, u32 nCount, f32 fMin) {
     }
     if (bFound) return fBest;
     return TER_NO_GROUND;
+}
+
+// Keeps the camera at pNew at least fClearance above the ground under it (the highest ground below
+// it, else the lowest above). With bCheckPath, when the move from pOld crosses the ground (other
+// than the one surface fn_80044E2C excuses), the ground just under or over the crossing counts
+// instead, and the answer is 1. pbFound: any ground under pNew at all (none answers 1); pfGround:
+// the ground height used; pbRaised: pNew was raised. nPlayer is not read.
+u8 CamScript_KeepAboveGround(int nPlayer, f32* pNew, f32* pOld, u8 bCheckPath, u8* pbFound, f32* pfGround,
+                             u8* pbRaised, f32 fClearance) {
+    f32 vHit[4];
+    f32 vNormal[4];
+    SurfaceType* aSurfaces[20];
+    f32 aHeights[20];
+    TerObject* pObj;
+    CourseInfo* pCourse = fn_8000C594();
+    u8 bCrossed = 0;
+    u32 nHeights;
+    u8 bHit;
+    int nSurface;
+    f32 fBelow;
+    f32 fAbove;
+    f32 fGround;
+
+    if (pbRaised != NULL) {
+        *pbRaised = 0;
+    }
+    if (pCourse == NULL) return 0;
+    pCourse = fn_8000C594();    // fetched a second time (two calls in the original)
+    nHeights = fn_8004DCC4(pCourse, pNew, aSurfaces, aHeights, 20);
+    if (nHeights == 0) {
+        if (pbFound != NULL) {
+            *pbFound = 0;
+        }
+        return 1;
+    }
+    if (pbFound != NULL) {
+        *pbFound = 1;
+    }
+    fBelow = fn_80044B0C(aHeights, nHeights, pNew[1]);
+    fAbove = fn_80044B70(aHeights, nHeights, pNew[1]);
+    if (bCheckPath) {
+        bHit = Ter_CheckForGroundCollision(pCourse, pOld, pNew, vHit, vNormal, aSurfaces, &pObj);
+        if (bHit) {
+            nSurface = ((u8*)aSurfaces[0] - (u8*)gSurfaceTypes) / sizeof(SurfaceType);
+        }
+        if (bHit && !fn_80044E2C(nSurface)) {
+            bCrossed = 1;
+            if (vNormal[1] > 0.0f) {
+                vHit[1] -= 0.001f;
+                fGround = fn_80044B70(aHeights, nHeights, vHit[1]);
+            } else {
+                vHit[1] += 0.1f;
+                fGround = fn_80044B70(aHeights, nHeights, vHit[1]);
+            }
+            if (fGround < -60000.0f) {
+                fGround = fn_80044B0C(aHeights, nHeights, vHit[1]);
+            }
+        } else {
+            fGround = fBelow;
+            if (fBelow < -60000.0f) {
+                fGround = fAbove;
+            }
+        }
+    } else {
+        fGround = fBelow;
+        if (fBelow < -60000.0f) {
+            fGround = fAbove;
+        }
+    }
+    if (!(fGround < -60000.0f) && pNew[1] - fGround < fClearance) {
+        pNew[1] = fGround + fClearance;
+        if (pbRaised != NULL) {
+            *pbRaised = 1;
+        }
+    }
+    if (pfGround != NULL) {
+        *pfGround = fGround;
+    }
+    return bCrossed;
 }
 
 // n is 149 on course 7's hole 2.

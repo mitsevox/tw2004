@@ -299,6 +299,8 @@ u8   fn_80050A9C(f32* pA, f32* pB, f32* pC, f32 fX, f32 fZ);   // (x, z) lies in
 void fn_800509D8(f32 (*pTri)[3], f32* pPos, f32* pA, f32* pB, f32* pC);   // a point's weights in a triangle
 f32  fn_8004D5C0(CourseInfo* pCourse, f32* pPos);   // ground height, -65536.1 if none
 f32  fn_8004D5F0(CourseInfo* pCourse, f32* pPos);   // ground height (GoTerrainCollision.c)
+// Every ground height under and over pPos (up to nMax), with its surface; returns how many.
+u32  fn_8004DCC4(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurfaces, f32* pHeights, u32 nMax);
 f32  fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and below if none
 SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, f32* pPos);   // the surface under a point
 f32  Ter_GetSupportingGroundData(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pNormal);
