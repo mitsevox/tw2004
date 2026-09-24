@@ -67,7 +67,7 @@ void fn_8000BF9C(UStreamObject* pObject) {
     lbl_801A2A40[lbl_80281C10++] = pNet;
     pNode = pNet->aNodes;
     for (i = 0; i < pNet->nNumNodes; i++) {
-        if (0.0f == pNode->vPos[1]) {
+        if (!pNode->vPos[1]) {
             pNode->vPos[1] = fn_8000BF20(pNode->vPos);
         }
         pNode++;
@@ -144,13 +144,13 @@ f32 fn_8000C244(f32* pA, f32* pB, f32* pP) {
 
 // Where the segments a-b and c-d cross, in x and z (pOut's x and z); 0 if they do not.
 u8 fn_8000C278(f32* pA, f32* pB, f32* pC, f32* pD, f32* pOut) {
-    f32 fAx = pA[0];
-    f32 fAz = pA[2];
     f32 fCx = pC[0];
-    f32 fCz = pC[2];
-    f32 fDx1 = pB[0] - fAx;
-    f32 fDz1 = pB[2] - fAz;
     f32 fDx2 = pD[0] - fCx;
+    f32 fAz = pA[2];
+    f32 fDz1 = pB[2] - fAz;
+    f32 fAx = pA[0];
+    f32 fDx1 = pB[0] - fAx;
+    f32 fCz = pC[2];
     f32 fDz2 = pD[2] - fCz;
     f32 fDen = fDz2 * fDx1 - fDx2 * fDz1;
     f32 fT1;
@@ -171,13 +171,13 @@ u8 fn_8000C278(f32* pA, f32* pB, f32* pC, f32* pD, f32* pOut) {
 
 // The ray from a through b crosses the segment c-d (x and z).
 u8 fn_8000C328(f32* pA, f32* pB, f32* pC, f32* pD) {
-    f32 fAx = pA[0];
-    f32 fAz = pA[2];
     f32 fCx = pC[0];
-    f32 fCz = pC[2];
-    f32 fDx1 = pB[0] - fAx;
-    f32 fDz1 = pB[2] - fAz;
     f32 fDx2 = pD[0] - fCx;
+    f32 fAz = pA[2];
+    f32 fDz1 = pB[2] - fAz;
+    f32 fAx = pA[0];
+    f32 fDx1 = pB[0] - fAx;
+    f32 fCz = pC[2];
     f32 fDz2 = pD[2] - fCz;
     f32 fDen = fDz2 * fDx1 - fDx2 * fDz1;
     f32 fT1;
