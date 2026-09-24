@@ -1157,10 +1157,7 @@ void fn_80019798(Character* pChar, Skin** apSkins, int nSkins) {
     } else {
         pChar->n5C = 0;
     }
-    bAll = 0;
-    if (gSession.nGameType == 10 || gSession.nGameType == 3) {
-        bAll = 1;
-    }
+    bAll = gSession.nGameType == 10 || gSession.nGameType == 3;
     nTex = nTexBytes / (int)sizeof(TexEntry);
     nPal = nPalBytes / (int)sizeof(TexPalette);
     if (bAll) {
