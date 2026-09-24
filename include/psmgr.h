@@ -37,7 +37,8 @@ void fn_800A2C08(int nView);    // draw it (the view is not used)
 typedef struct PsEmitter {
     u8   unk0[0x30];
     f32  v30[4];                // 0x30  a position (fn_800A3D6C)
-    u8   unk40[0x50 - 0x40];
+    struct PsEmitter* p40;      // 0x40  the next in the list fn_80099EA4 pushes onto
+    u8   unk44[0x50 - 0x44];
     s32  n50;                   // 0x50  fn_800A3DF4 sets 1000000
     u8   unk54[0xB8 - 0x54];
     u32  uB8;                   // 0xB8  flags; the functions below only act with 0x20000 set
@@ -51,14 +52,46 @@ typedef struct PsBallFxState {
     void* p28;                  // 0x28  } freed by fn_800A2E14
     void* p2C;                  // 0x2C  }
     void* p30;                  // 0x30  }
-    u8   unk34[0x50 - 0x34];
+    s32  n34;                   // 0x34  } cleared by fn_800A2E68
+    s32  n38;                   // 0x38  }
+    s32  n3C;                   // 0x3C  }
+    s32  n40;                   // 0x40  }
+    s32  n44;                   // 0x44  }
+    u8   unk48[0x50 - 0x48];
     void* p50;                  // 0x50  freed by fn_800A2E14
-    u8   unk54[0x7C - 0x54];
+    f32  a54[8];                // 0x54  cleared by fn_800A2E68
+    PsEmitter* ap74[2];         // 0x74  one per view (Player.nView[0]); fn_800A2FFC
     PsEmitter* apEmitter[(0x88 - 0x7C) / 4];    // 0x7C  one per view (Player.nView[0])
 } PsBallFxState;
 LAYOUT_ASSERT(PsBallFxState, 0x88);
 
+// An emitter's settings (0x120 bytes): lbl_8018CA98 holds 25 of them; UFstPart.c's fn_80099758
+// starts an emitter from one. Only the fields written here.
+typedef struct PsEmitterDef {
+    u8   unk0[0x40];
+    f32  f40;                   // 0x40  written by fn_800A30E4
+    u8   unk44[0x80 - 0x44];
+    f32  v80[3];                // 0x80  a position (the ball's, fn_800A2FFC)
+    u8   unk8C[0xA0 - 0x8C];
+    f32  vA0[3];                // 0xA0  fn_800A3CB0 puts the wind vector x 0.1 here
+    u8   unkAC[0xF0 - 0xAC];
+    f32  vF0[4];                // 0xF0  set per course by fn_800A2E68 (emitters 0, 6 and 14)
+    u8   unk100[0x120 - 0x100];
+} PsEmitterDef;
+LAYOUT_ASSERT(PsEmitterDef, 0x120);
+
+// Two vectors per course for emitters 0, 6 and 14 (fn_800A2E68); lbl_8018E958 replaces them on
+// course 18 in some modes.
+extern f32 lbl_8018E6B8[21][2][4];         // 21: NUM_COURSE_DATA (game.h)
+extern f32 lbl_8018E958[2][4];
+
 extern PsBallFxState* lbl_80281408;
+extern PsEmitterDef lbl_8018CA98[25];
+extern PsEmitter* lbl_80281F88;             // UFstPart.c's list head (fn_80099EA4)
+
+// UFstPart.c
+PsEmitter* fn_80099758(PsEmitterDef* pDef);  // start an emitter from pDef (may return NULL)
+void fn_80099EA4(PsEmitter* pEmitter);       // push pEmitter onto the list at lbl_80281F88
 
 void fn_800A3D6C(f32* pPos, int nPlayer);
 void fn_800A3DF4(int nPlayer);

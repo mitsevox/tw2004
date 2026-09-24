@@ -2,10 +2,10 @@
 // sweep code below is the matched small functions.
 
 #include "game_types.h"
+#include "psmgr.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
-s32 fn_80009E70(u8*);
 s32 fn_800360A0(u8*);
 void fn_80098BDC(u8* arg0);
 extern u8 lbl_801DB888[];
@@ -37,14 +37,7 @@ void fn_80099B74(u8* p0) {
 
 // ---- end of sweep code ----
 
-// ---- sweep code (not yet cleaned up) ----
-
-extern void* lbl_80281F88;
-void fn_80099EA4(void* arg0);
-
-void fn_80099EA4(void* arg0) {
-    (*(void**)((u8*)(arg0) + 0x40)) = (void* ) lbl_80281F88;
-    lbl_80281F88 = arg0;
+void fn_80099EA4(PsEmitter* pEmitter) {
+    pEmitter->p40 = lbl_80281F88;
+    lbl_80281F88 = pEmitter;
 }
-
-// ---- end of sweep code ----
