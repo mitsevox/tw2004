@@ -85,19 +85,20 @@ void fn_800488B4(UObject* pObj) {
     int bLit;
     int nFlags0;
     int nClip;
+    int nLod;
     UObjMesh* pMesh;
     f32 fFov;
     f32 fMax;
-    f32 fSize;
     int nFlags2;
     f32 fLod;
 
-    pMesh = pObj->pModel->apLod[fn_80048AE8(pObj)];
+    nLod = fn_80048AE8(pObj);
+    pMesh = pObj->pModel->apLod[nLod];
     fFov = fn_8001F004()->fFov;
     fMax = 0.75f * fFov * fn_8001414C((u8*)fn_8003526C());
     fn_80035240(pObj->m80);
-    fSize = fn_80014280(0.5f * (fFov > fMax ? fMax : fFov));
-    nClip = fn_80007B2C(pMesh, fn_8001614C(), 0.0f, fSize, 1.0f);
+    fFov = fn_80014280((fFov <= fMax ? fFov : fMax) / 2.0f);
+    nClip = fn_80007B2C(pMesh, fn_8001614C(), 0.0f, fFov, 1.0f);
     if (nClip == 3) return;
     nFlags0 = fn_80048AD4(pMesh, 0);
     nFlags2 = fn_80048AD4(pMesh, 2);
