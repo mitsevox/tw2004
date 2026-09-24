@@ -292,7 +292,6 @@ void Players_SetupAll(void);
 void PostFx_CopyScreenToBuffer(void);
 void PsBallFx_InitModule(void);
 void SH_vSetShadowIntensity(int n);
-void Session_SetupProfiles(void);
 void UI_Obj_InitModule(void);
 void UStream_CloseAll(void);
 void UStream_Init(void);

@@ -81,6 +81,9 @@ void GXLoadTexObj(GXTexObj* pObj, int eMap);
 void GXLoadTlut(GXTlutObj* pObj, u32 nTlut);
 void GXSetNumTexGens(u8 nGens);
 void GXLoadTexMtxIndx(u16 nIndex, u32 nId, int eType);
+void GXSetTexCoordGen2(int nDst, int nFunc, int nSrc, int nMtx, u8 bNormalize, int nPostMtx);
+void GXSetAlphaCompare(int eComp0, u8 nRef0, int eOp, int eComp1, u8 nRef1);
+void GXSetZCompLoc(u8 bBeforeTex);
 
 // ---- the texture environment (TEV) ------------------------------------------------------------
 

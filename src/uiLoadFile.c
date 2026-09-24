@@ -28,14 +28,10 @@ void fn_8008EEB8(UStreamObject* pObject);
 void fn_8008EFC0(u32* pTable);
 void fn_8008EFFC(UStreamObject* pObject);
 void* fn_8008F0C0(void);
-void fn_8008F0C8(void* p);
 UILoaded* fn_8008F0F0(void);
 u32* fn_8008F15C(void);
-void fn_8008F164(void* p);
 u32* fn_8008F18C(void);
 u8 fn_8008F204(int nKind);
-s32 fn_80090B10();
-void fn_8008F24C(void);
 void fn_80090898(void);                                 // uiProcessInterface.c
 void fn_80010028(void* pBank);                          // LLTex.c: free a texture bank
 int  fn_80012D04(void);                                 // UFont.c: a free font slot
