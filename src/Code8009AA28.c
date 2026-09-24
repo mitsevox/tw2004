@@ -31,7 +31,9 @@ void fn_8009AA28(void) {
     int n;
     int i;
 
-    n = 1;
+    // fake match: counted up from 0 past entry 0; a plain n = 1 lets CW fold the first loop's n * 16
+    n = 0;
+    n++;
     for (i = 0; i < 10; i++) {
         lbl_802813B8->a24[n][0] = 0.1f * i;
         lbl_802813B8->a24[n][1] = 1.0f;

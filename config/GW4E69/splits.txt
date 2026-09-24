@@ -512,6 +512,7 @@ Code8009A928.c:
 
 Code8009AA28.c:
 	.text       start:0x8009AA28 end:0x8009B314
+	.sdata2     start:0x80283E98 end:0x80283EC0
 
 unsorted/sweep_8009B314.c:
 	.text       start:0x8009B314 end:0x8009B340
@@ -578,6 +579,9 @@ UAudContainers.c:
 
 uiobject.c:
 	.text       start:0x800AE1F8 end:0x800AF114
+	.rodata     start:0x80183B08 end:0x80183BC8
+	.sdata      start:0x80281470 end:0x80281490
+	.sdata2     start:0x80284018 end:0x80284070
 
 AudReverb.c:
 	.text       start:0x800AF114 end:0x800AF324

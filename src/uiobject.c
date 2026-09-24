@@ -33,6 +33,16 @@ void fn_8006EADC(UObject* pObj);        // GoLighting.c: light the object
 void fn_8006ED70(void);                 // GoLighting.c
 void fn_80035294(void);                 // GoTerrain.c
 
+f32 lbl_80281470 = 0.05f;
+f32 lbl_80281474 = 0.476f;
+f32 lbl_80281478 = 0.19f;
+
+// fake match: stands in for a function the original linker stripped. The file's pool starts with
+// 1.0f (0x80284018), before the 1.35f UI_Obj_InitModule uses first; its body is unknown.
+static f32 uiobject_StrippedFn(f32 x) {
+    return x + 1.0f;
+}
+
 // Set up the objects: their settings, lens, textures and one directional light.
 void UI_Obj_InitModule(void) {
     u64 uName;
@@ -103,40 +113,41 @@ void fn_800AE3C4(void) {
 // ring per level that grows and fades), then the ball-like model tilted toward the spin asked
 // for and rolling with it. The object's own lens is used, and the view put back afterwards.
 void fn_800AE3F8(int nObj) {
-    f32 aBlack[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-    f32 aEye[4] = {0.0f, 0.0f, -100.0f, 0.0f};
-    f32 aColour[4] = {0.5f, 0.5f, 0.5f, 0.25f};
-    f32 aBase[4] = {0.5f, 0.5f, 0.5f, 0.25f};
-    f32 aUp[4] = {1.0f, 0.0f, 0.0f, 0.0f};
-    f32 aDir[4];
-    f32 vPos[4];
-    f32 aRect[8];
-    f32 aUV[16] = {
-        1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-        1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-    };
-    f32 aQuad[12] = {
-        -0.03f, 0.03f,  0.0f, 0.03f,  0.03f,  0.0f,
-        -0.03f, -0.03f, 0.0f, 0.03f,  -0.03f, 0.0f,
-    };
-    f32 aXYZ[16];
-    f32 mSave80[4][4];
-    f32 mSave40[4][4];
-    f32 mSave0[4][4];
-    f32 mScale[4][4];
-    f32 mRot[4][4];
     f32 mRoll[4][4];
     f32 mTilt[4][4];
-    UIObjSettings* pSet;
+    f32 mRot[4][4];
+    f32 mScale[4][4];
+    f32 mSave0[4][4];
+    f32 mSave40[4][4];
+    f32 mSave80[4][4];
+    f32 aXYZ[4][4];
+    f32 vPos[4];
+    f32 aDir[4];
+    f32 aUp[4] = {1.0f, 0.0f, 0.0f, 0.0f};
+    f32 aBase[4] = {0.5f, 0.5f, 0.5f, 0.25f};
+    f32 aColour[4] = {0.5f, 0.5f, 0.5f, 0.25f};
+    f32 aBlack[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    f32 aEye[4] = {0.0f, 0.0f, -100.0f, 0.0f};
+    f32 aQuad[4][3] = {
+        {-0.03f, 0.03f, 0.0f},
+        {0.03f, 0.03f, 0.0f},
+        {-0.03f, -0.03f, 0.0f},
+        {0.03f, -0.03f, 0.0f},
+    };
+    f32 aUV[4][4] = {
+        {1.0f, 0.0f, 1.0f, 1.0f},
+        {0.0f, 0.0f, 1.0f, 1.0f},
+        {1.0f, 1.0f, 1.0f, 1.0f},
+        {0.0f, 1.0f, 1.0f, 1.0f},
+    };
+    f32 aRect[2][4];
     CamLens* pLens;
-    f32 fSpinX;
     f32 fSpinY;
+    f32 fSpinX;
     f32 fY;
     f32 fBoost;
     f32 fMax;
     f32 fFade;
-    f32 fRange;
-    f32 fRing;
     f32 fDot;
     f32 fSinRoll;
     f32 fCosRoll;
@@ -144,6 +155,7 @@ void fn_800AE3F8(int nObj) {
     f32 fCosTilt;
     int nPlayer;
     int i;
+    int j;
 
     nPlayer = fn_8001707C(nObj);
     // the object rises with the GameBreaker letterbox
@@ -152,20 +164,19 @@ void fn_800AE3F8(int nObj) {
     } else {
         fY = (0.23f - 0.17f) * (GameEffects_GetLetterboxHeight() / 0.15f) + -0.23f;
     }
-    pSet = &lbl_801F5B98[nObj];
+    lbl_801F5B98[nObj].a0[1] = fY;
+    vPos[0] = lbl_801F5B98[nObj].a0[0];
+    vPos[1] = lbl_801F5B98[nObj].a0[1];
+    vPos[2] = lbl_801F5B98[nObj].a0[2];
     vPos[3] = 1.0f;
-    aRect[0] = 0.5f;
-    pSet->a0[1] = fY;
-    vPos[0] = pSet->a0[0];
-    vPos[1] = pSet->a0[1];
-    vPos[2] = pSet->a0[2];
-    aRect[1] = 0.5f;
-    aRect[2] = 1.0f;
-    aRect[3] = 1.0f;
-    aRect[4] = 1.0f;
-    aRect[5] = 1.0f;
-    aRect[6] = 1.0f;
-    aRect[7] = 1.0f;
+    aRect[0][0] = 0.5f;
+    aRect[0][1] = 0.5f;
+    aRect[0][2] = 1.0f;
+    aRect[0][3] = 1.0f;
+    aRect[1][0] = 1.0f;
+    aRect[1][1] = 1.0f;
+    aRect[1][2] = 1.0f;
+    aRect[1][3] = 1.0f;
 
     // clear the depth under the object's corner of the screen
     fn_8001425C(0);
@@ -177,7 +188,7 @@ void fn_800AE3F8(int nObj) {
     fn_800140E8(0, 0x200, 0x1C0, lbl_80281B88 & 1, 2, 1);
     fn_80012EF8();
     GXSetZMode(1, 7, 1);
-    fn_8001644C(0xA1, aRect, NULL, NULL, 2);
+    fn_8001644C(0xA1, aRect[0], NULL, NULL, 2);
     fn_80012F50(1, 6, 0x80);
     fn_80012F18(3);
     fn_800140E8(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
@@ -194,7 +205,7 @@ void fn_800AE3F8(int nObj) {
     fn_80013EEC(fn_8001614C());
     fn_80016B9C();
 
-    fBoost = (f32)gPlayers[nPlayer].swing.nPowerBoost * 0.125f;
+    fBoost = (f32)gPlayers[nPlayer].swing.nPowerBoost / 8.0f;
     fn_80014118(0x50);
     fn_80012F34(1);
     fn_8001425C(1);
@@ -205,20 +216,20 @@ void fn_800AE3F8(int nObj) {
     fn_8005CC64(lbl_802820BC, lbl_802820C8);
     fn_80012EF8();
     for (i = 0; i < 4; i++) {
-        aXYZ[i * 4 + 0] = aQuad[i * 3 + 0] + pSet->a0[0];
-        aXYZ[i * 4 + 1] = aQuad[i * 3 + 1] + pSet->a0[1];
-        aXYZ[i * 4 + 2] = aQuad[i * 3 + 2] + pSet->a0[2];
-        aXYZ[i * 4 + 3] = 1.0f;
+        aXYZ[i][0] = aQuad[i][0] + lbl_801F5B98[nObj].a0[0];
+        aXYZ[i][1] = aQuad[i][1] + lbl_801F5B98[nObj].a0[1];
+        aXYZ[i][2] = aQuad[i][2] + lbl_801F5B98[nObj].a0[2];
+        aXYZ[i][3] = 1.0f;
     }
     fn_80014194(aBase);
-    fn_8001644C(0x98, aXYZ, NULL, aUV, 4);
+    fn_8001644C(0x98, aXYZ[0], NULL, aUV[0], 4);
 
     // the same, grown by the boost level, in the level's colour
     for (i = 0; i < 4; i++) {
-        aXYZ[i * 4 + 0] = fBoost * aQuad[i * 3 + 0] + pSet->a0[0];
-        aXYZ[i * 4 + 1] = fBoost * aQuad[i * 3 + 1] + pSet->a0[1];
-        aXYZ[i * 4 + 2] = fBoost * aQuad[i * 3 + 2] + pSet->a0[2];
-        aXYZ[i * 4 + 3] = 1.0f;
+        aXYZ[i][0] = fBoost * aQuad[i][0] + lbl_801F5B98[nObj].a0[0];
+        aXYZ[i][1] = fBoost * aQuad[i][1] + lbl_801F5B98[nObj].a0[1];
+        aXYZ[i][2] = fBoost * aQuad[i][2] + lbl_801F5B98[nObj].a0[2];
+        aXYZ[i][3] = 1.0f;
     }
     fn_8005CC64(lbl_802820BC, lbl_802820C4);
     fn_80012F50(0, 6, 0x80);
@@ -227,43 +238,34 @@ void fn_800AE3F8(int nObj) {
     }
     fn_80014194(aColour);
     fn_80012EF8();
-    fn_8001644C(0x98, aXYZ, NULL, aUV, 4);
+    fn_8001644C(0x98, aXYZ[0], NULL, aUV[0], 4);
 
     // a ring per level: each grows until it passes the largest size, fading out on the way
     fn_8005CC64(lbl_802820BC, lbl_802820C0);
     fn_80012EF8();
     fMax = lbl_801F5B98[0].a28[0];
     fFade = lbl_801F5B98[0].a28[1];
-    fRange = fMax - fFade;
     for (i = 0; i < gPlayers[nPlayer].swing.nPowerBoost; i++) {
-        fRing = lbl_801F5B78[i];
-        if (!(fRing > fMax)) {
-            aXYZ[0] = aQuad[0] * fRing + pSet->a0[0];
-            aXYZ[1] = aQuad[1] * fRing + pSet->a0[1];
-            aXYZ[2] = aQuad[2] * fRing + pSet->a0[2];
-            aXYZ[4] = aQuad[3] * fRing + pSet->a0[0];
-            aXYZ[5] = aQuad[4] * fRing + pSet->a0[1];
-            aXYZ[6] = aQuad[5] * fRing + pSet->a0[2];
-            aXYZ[8] = aQuad[6] * fRing + pSet->a0[0];
-            aXYZ[9] = aQuad[7] * fRing + pSet->a0[1];
-            aXYZ[10] = aQuad[8] * fRing + pSet->a0[2];
-            aXYZ[3] = 1.0f;
-            aXYZ[7] = 1.0f;
-            aXYZ[11] = 1.0f;
-            aXYZ[12] = aQuad[9] * fRing + pSet->a0[0];
-            aXYZ[13] = aQuad[10] * fRing + pSet->a0[1];
-            aXYZ[14] = aQuad[11] * fRing + pSet->a0[2];
-            aXYZ[15] = 1.0f;
-            aColour[0] = lbl_8018830C[i][0];
-            aColour[1] = lbl_8018830C[i][1];
-            aColour[2] = lbl_8018830C[i][2];
+        if (!(lbl_801F5B78[i] > fMax)) {
+            for (j = 0; j < 4; j++) {
+                aXYZ[j][0] = aQuad[j][0] * lbl_801F5B78[i] + lbl_801F5B98[nObj].a0[0];
+                aXYZ[j][1] = aQuad[j][1] * lbl_801F5B78[i] + lbl_801F5B98[nObj].a0[1];
+                aXYZ[j][2] = aQuad[j][2] * lbl_801F5B78[i] + lbl_801F5B98[nObj].a0[2];
+                aXYZ[j][3] = 1.0f;
+            }
             if (lbl_801F5B78[i] < fFade) {
+                aColour[0] = lbl_8018830C[i][0];
+                aColour[1] = lbl_8018830C[i][1];
+                aColour[2] = lbl_8018830C[i][2];
                 aColour[3] = 1.0f;
             } else {
-                aColour[3] = 1.0f - (lbl_801F5B78[i] - fFade) / fRange;
+                aColour[0] = lbl_8018830C[i][0];
+                aColour[1] = lbl_8018830C[i][1];
+                aColour[2] = lbl_8018830C[i][2];
+                aColour[3] = 1.0f - (lbl_801F5B78[i] - fFade) / (fMax - fFade);
             }
             fn_80014194(aColour);
-            fn_8001644C(0x98, aXYZ, NULL, aUV, 4);
+            fn_8001644C(0x98, aXYZ[0], NULL, aUV[0], 4);
             lbl_801F5B78[i] += lbl_801F5B98[0].a28[2];
         }
     }
@@ -277,13 +279,8 @@ void fn_800AE3F8(int nObj) {
             aDir[2] = 0.0f;
             aDir[3] = 1.0f;
             fn_800BAF04(aDir, aDir);
-            if (fn_8000C5FC(aUp, aDir) < -1.0f) {
-                fDot = -1.0f;
-            } else if (fn_8000C5FC(aUp, aDir) > 1.0f) {
-                fDot = 1.0f;
-            } else {
-                fDot = fn_8000C5FC(aUp, aDir);
-            }
+            fDot = (fn_8000C5FC(aUp, aDir) < -1.0f) ? -1.0f
+                 : ((fn_8000C5FC(aUp, aDir) > 1.0f) ? 1.0f : fn_8000C5FC(aUp, aDir));
             lbl_801F5B98[nObj].a0[5] = fn_80009614(fDot);
             if (fSpinY < 0.0f) {
                 lbl_801F5B98[nObj].a0[5] = -lbl_801F5B98[nObj].a0[5];
@@ -292,7 +289,9 @@ void fn_800AE3F8(int nObj) {
             fn_8000ADC0(mRoll);
             fn_8000ADC0(mTilt);
             fn_8000ADC0(mScale);
-            mScale[0][0] = mScale[1][1] = mScale[2][2] = lbl_801F5B98[nObj].a0[6];
+            mScale[0][0] = lbl_801F5B98[nObj].a0[6];
+            mScale[1][1] = lbl_801F5B98[nObj].a0[6];
+            mScale[2][2] = lbl_801F5B98[nObj].a0[6];
             fSinRoll = fn_800095F0(lbl_801F5B98[nObj].a0[9]);
             fCosRoll = fn_80009638(lbl_801F5B98[nObj].a0[9]);
             fSinTilt = fn_800095F0(lbl_801F5B98[nObj].a0[5]);
@@ -327,8 +326,9 @@ void fn_800AE3F8(int nObj) {
             Vec_Copy(vPos, lbl_802820D0->m80[3]);
             lbl_802820D0->m80[3][3] = 1.0f;
             fn_800AEFE4();
-            fn_8000A0E8(mSave40, lbl_802820D0->m40);
-            fn_8000A0E8(mSave0, lbl_802820D0->m0);
+            // EA bug: m0's copy goes back into m40 and m40's into m0
+            fn_8000A0E8(mSave0, lbl_802820D0->m40);
+            fn_8000A0E8(mSave40, lbl_802820D0->m0);
             fn_8000A0E8(mSave80, lbl_802820D0->m80);
         }
     }
