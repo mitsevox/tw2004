@@ -70,7 +70,12 @@ void fn_8012408C(s32 v);
 s32  fn_8012411C(void);
 void fn_80124138(s32 n);
 s32  fn_80124174(void);
+s32  fn_80124190(void);
 s32  fn_801241CC(void);
+void fn_801241D4(s32 v);
+void fn_8012421C(s32 v);
+s32  fn_80124224(void);
+void fn_80123CBC(s32 a, s32 b);
 
 // The other files' message handlers in the table (the Create-A-Player screens, the logo editor,
 // the PGA TOUR screens, the stats screen, the EA Sports Bio...).
@@ -2175,6 +2180,33 @@ void fn_8007D7E4(MsgArg* pArgs, MsgArg* pResult) {
     fn_800A75B4();
 }
 
+// Show golfer pArgs[0] (fn_8008B044), then give the profile's player (unless it is player 0) the
+// first n0 (0..3) that no player up to and including it with the same golfer model has.
+void fn_8007D810(MsgArg* pArgs, MsgArg* pResult) {
+    u8 abFree[4] = {1, 1, 1, 1};
+    int i;
+    u32 n;
+    GolferRecord* pMine;
+    GolferRecord* pOther;
+
+    fn_80077ACC();
+    fn_8008B044(pArgs[0].i, pArgs[1].i, pArgs[2].i);
+    for (i = 0; i <= lbl_80281ED4->nSlot; i++) {
+        pMine = fn_80077A80(gSession.nGolfer[lbl_80281ED4->nSlot]);
+        pOther = fn_80077A80(gSession.nGolfer[i]);
+        if (pMine->nModelID == pOther->nModelID) {
+            abFree[gSession.aProfile[i].n0] = 0;
+        }
+    }
+    for (n = 0; n < 4; n++) {
+        if (abFree[n] && lbl_80281ED4->nSlot > 0) {
+            gSession.aProfile[lbl_80281ED4->nSlot].n0 = n;
+            break;
+        }
+    }
+    Session_SetupProfiles();
+}
+
 void fn_8007D924(MsgArg* pArgs, MsgArg* pResult) {
     gSession.nSplitScreen = pArgs[0].i;
 }
@@ -2338,6 +2370,38 @@ void fn_8007DEE8(MsgArg* pArgs, MsgArg* pResult) {
 
 void fn_8007DF0C(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = gpSaveData[pArgs[0].i].nC4;
+}
+
+// Step the profile's player's n0 on (0..3, wrapping) to the next one that no player up to and
+// including it with the same golfer model has (fn_8007D810), stopping if it comes round to where
+// it started; then fn_8001D624 for the golfer shown.
+void fn_8007DF30(MsgArg* pArgs, MsgArg* pResult) {
+    u8 abFree[4] = {1, 1, 1, 1};
+    int i;
+    s8 nStart;
+    GolferRecord* pMine;
+    GolferRecord* pOther;
+
+    for (i = 0; i <= lbl_80281ED4->nSlot; i++) {
+        pMine = fn_80077A80(gSession.nGolfer[lbl_80281ED4->nSlot]);
+        pOther = fn_80077A80(gSession.nGolfer[i]);
+        if (pMine->nModelID == pOther->nModelID) {
+            abFree[gSession.aProfile[i].n0] = 0;
+        }
+    }
+    nStart = gSession.aProfile[lbl_80281ED4->nSlot].n0;
+    gSession.aProfile[lbl_80281ED4->nSlot].n0++;
+    if (gSession.aProfile[lbl_80281ED4->nSlot].n0 > 3) {
+        gSession.aProfile[lbl_80281ED4->nSlot].n0 = 0;
+    }
+    while (!abFree[gSession.aProfile[lbl_80281ED4->nSlot].n0]) {
+        gSession.aProfile[lbl_80281ED4->nSlot].n0++;
+        if (gSession.aProfile[lbl_80281ED4->nSlot].n0 > 3) {
+            gSession.aProfile[lbl_80281ED4->nSlot].n0 = 0;
+        }
+        if (gSession.aProfile[lbl_80281ED4->nSlot].n0 == nStart) break;
+    }
+    fn_8001D624(lbl_80281EE0->pB4->n10);
 }
 
 void fn_8007E0BC(MsgArg* pArgs, MsgArg* pResult) {
@@ -4240,6 +4304,20 @@ void fn_80083A44(MsgArg* pArgs, MsgArg* pResult) {
 void fn_80083A48(MsgArg* pArgs, MsgArg* pResult) {
 }
 
+// Fill string pArgs[0] with pArgs[1] asterisks (a hidden entry).
+void fn_80083A4C(MsgArg* pArgs, MsgArg* pResult) {
+    char szStars[64] = "";
+    int i;
+    int nLen;
+
+    nLen = pArgs[1].i;
+    for (i = 0; i < nLen; i++) {
+        szStars[i] = '*';
+    }
+    szStars[i + 1] = '\0';      // EA bug: one past the stars; the buffer is zeroed anyway
+    strcpy(((MsgString*)pArgs[0].p)->pStr, szStars);
+}
+
 void fn_80083BA4(MsgArg* pArgs, MsgArg* pResult) {
     fn_8010D334(pArgs[0].i);
 }
@@ -4362,6 +4440,35 @@ void fn_80083F54(MsgArg* pArgs, MsgArg* pResult) {
     pResult->i = 0;
 }
 
+// Read five values over the Game Boy Advance link (gbacable.c) into the words pArgs[0..4] point
+// at: fn_80124174's after request 0x70, then fn_80124190's after requests 0xB0 with 0 to 3. It
+// stops once the link's state (fn_80124094) is 18 or -1. Then, if fn_80124224 says so, a state
+// of 7 or 9 becomes 12 or 13.
+void fn_80084008(MsgArg* pArgs, MsgArg* pResult) {
+    u32 i;
+
+    if (fn_80124094() != 18 && fn_80124094() != -1) {
+        fn_80123CBC(0x70, 0);
+        if (fn_80124094() != 18 && fn_80124094() != -1) {
+            *(s32*)pArgs[0].p = fn_80124174();
+            for (i = 0; i < 4; i++) {
+                fn_80123CBC(0xB0, i);
+                if (fn_80124094() == 18 || fn_80124094() == -1) break;
+                *(s32*)pArgs[1 + i].p = fn_80124190();
+            }
+        }
+    }
+    fn_801241D4(0);
+    if (fn_80124224()) {
+        if (fn_80124094() == 7) {
+            fn_8012408C(12);
+        } else if (fn_80124094() == 9) {
+            fn_8012408C(13);
+        }
+        fn_8012421C(0);
+    }
+}
+
 void fn_8008410C(MsgArg* pArgs, MsgArg* pResult) {
     s32 n;
 
@@ -4427,6 +4534,38 @@ void fn_800842D0(MsgArg* pArgs, MsgArg* pResult) {
     nError = fn_801253F0(pArgs[0].i, pArgs[1].i);
     lbl_80281ED4->n11704 = nError;
     pResult->i = nError == 0;
+}
+
+// The EA Sports Bio requests for the card in slot pArgs[0], pArgs[1]: unless fn_80125194 answers 0
+// or -18, fn_80125280 first (only for -43 and -44), then fn_801252D0; the first error ends it,
+// else fn_801251EC runs. The answer is 1, or the error; the profile's n11704 keeps it too.
+void fn_80084354(MsgArg* pArgs, MsgArg* pResult) {
+    s32 aPos[2];
+    s32 nError;
+
+    aPos[0] = pArgs[0].i;
+    aPos[1] = pArgs[1].i;
+    nError = fn_80125194(aPos[0], aPos[1]);
+    if (nError != 0 && nError != -18) {
+        if (nError == -43 || nError == -44) {
+            nError = fn_80125280(pArgs[0].i, pArgs[1].i);
+            lbl_80281ED4->n11704 = nError;
+            if (nError != 0) {
+                pResult->i = (nError != 0) ? nError : 1;
+                return;
+            }
+        }
+        nError = fn_801252D0(pArgs[0].i, pArgs[1].i);
+        lbl_80281ED4->n11704 = nError;
+        if (nError != 0) {
+            pResult->i = (nError != 0) ? nError : 1;
+            lbl_80281ED4->n11704 = nError;
+            return;
+        }
+    }
+    nError = fn_801251EC(aPos);
+    pResult->i = (nError != 0) ? nError : 1;
+    lbl_80281ED4->n11704 = nError;
 }
 
 // For the card in slot pArgs[0], pArgs[1]: fn_801255C4's answer.

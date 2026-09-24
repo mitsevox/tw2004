@@ -9,16 +9,10 @@ static ViewController lbl_801B8BA8[4];
 static int lbl_80281CA0;                    // the current view
 static ViewController* lbl_80281CA4;        // and its controller
 
-void* fn_80076400(void);
-f32*  fn_80076ACC(void);                            // a new screen rectangle
-void* fn_8001371C(void* p, s32 n, f32* pRect);      // GoRenderCtx_Gc.c: a new render camera
 s32   fn_80013E40(u8* p);                           // GoRenderCtx_Gc.c
 void  fn_80062E40(View* pView);                     // set up a camera controller
 void  fn_80038010(u8 a, int n, f32* pVec);
 void  fn_80038054(u8 a, int n, f32 f1, f32 f2);
-void  fn_8007644C(CamLens* pLens);                  // free a lens
-void  fn_80076B18(f32* pRect);                      // free a screen rectangle
-void  fn_800137B0(void* pCamera);                   // GoRenderCtx_Gc.c: free a render camera
 void  CameraController_Idle(View* pView, int nPlayer);
 void  fn_8007656C(CamLens* pLens, f32* pPos, f32* pAt, f32* pUp);
 void  fn_80076664(CamLens* pLens, f32* pPos, f32* pAt, f32* pF5C, f32* pF50);
@@ -59,14 +53,15 @@ int fn_80016D10(void) {
 // Sets a view up on the screen rectangle x, y, w, h (fractions of the screen).
 void fn_80016D18(int nView, f32 x, f32 y, f32 w, f32 h) {
     ViewController* pCtrl;
-    void* p;
+    CamLens* pLens;
     f32* pRect;
 
     pCtrl = fn_80016E28(nView);
-    p = fn_80076400();
+    pLens = fn_80076400();
     pRect = fn_80076ACC();
     fn_800171D8(pRect, x, y, w, h);
-    pCtrl->pCamera = fn_8001371C(p, fn_800171B0(), pRect);
+    // port: fn_800171B0 is typed s32, but its value is the frame buffer
+    pCtrl->pCamera = fn_8001371C(pLens, (GoFrameBuf*)fn_800171B0(), pRect);
     fn_80062E40(&pCtrl->view);
     pCtrl->nPlayer = 5;
     pCtrl->b274 = 1;

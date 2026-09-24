@@ -521,7 +521,6 @@ u32 fn_8001208C(UFontContext* pCtx, u8 r, u8 g, u8 b, u8 a, f32 fXScale, f32 fYS
 
 // ---- sweep code (not yet cleaned up) ----
 
-void GXSetTexCoordGen2();
 void fn_800124CC(void);
 void fn_800124A4(void);
 void fn_800124A8(void);

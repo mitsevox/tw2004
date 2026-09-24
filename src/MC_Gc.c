@@ -14,7 +14,6 @@
 #include "core/goaram.h"
 
 void fn_8006C63C(void);         // } called around every CARD library call (not yet known)
-void fn_800A4BDC(void);         // }
 void fn_8009DC80(s32 nPort, s32 nSlot, s32 nResult);
 void fn_8009DCE8(void);
 void fn_8009EB30(UStreamObject* pObject);
