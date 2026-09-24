@@ -424,6 +424,30 @@ They will be sorted into the sections below.
 - **Orphan data:** after linking a unit, attach its orphan `.bss` too (define its globals in the unit in
   reverse address order, add the `.bss` range to splits.txt): 45 units, data linked 30.8% -> 65.0%.
 
+### New from the first cloud lanes (2026-09-24 evening)
+
+- **[verified] A pointer local one callee-saved register too low: assign it from a one-line static
+  inline that returns the address** (`static inline Player* F(int n) { return &gPlayers[fn(n)]; }`):
+  BreakLine_Reset 19 diffs -> 0, gbacable fn_80123E34 22 -> 11 (then a declaration swap -> 0), Skin
+  fn_800368FC 16 -> 7. The same for a value: `eLayout` read through `static inline u16 ReadU16(u16* p,
+  int i)` moved r27 -> r31 (ShaderObjectsData fn_80074628 exact). Mark each `// fake match:`.
+- **[verified] `a[i] = a[i] + base` with value and offset in each other's registers:** three statements
+  through a local, `x = a[i]; x += base; a[i] = x;` (uiLoadFile fn_8008EFC0 97.67 -> 100, fn_8008EFFC).
+- **[verified] A one-line float product in the wrong multiply order:** one multiply per statement with
+  `*=` (PlaceBall_UpdateMomentums exact).
+- **[verified] How the calls before a loop are written can change how the loop unrolls:** TARGET_Init
+  19 diffs -> 0 from passing a call's result through a `u64 textureID` local (EA's TW07 name) alone.
+- **[verified] `for` and the equivalent `do/while` load their loop constants in a different order**
+  (Glows fn_800981D0: do/while -> `for (j = 0; j <= 4; j++)` 95.78 -> 100; `j < 5` is not exact).
+- **[verified] Indexing a struct's array through a `u8*`** (`&((u8*)p->data)[p->uPos]`, not
+  `&p->data[p->uPos]`) adds the index to the struct pointer first and folds the array offset into the
+  loads (Stream_ParseBufs exact).
+- **[verified] Link: `.sbss` defined last-first also flips chained assignments.** With the globals in
+  reverse address order, `a = b = c = 0` stores in the opposite order; write the chain low address first
+  to keep EA's store order (ShaderObjectsData: the only DOL differences were two chains).
+- Other compiler versions (GC 2.0, 2.0p1, 2.6, 2.7, 1.3.2) gave output identical to 2.5 on 18 near-miss
+  functions tried today: not a lever for these.
+
 ### Loops and unrolling
 
 - **[verified] Two tests on players n and n + 1 can be a two-pass loop.** When the second

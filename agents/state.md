@@ -1,17 +1,16 @@
 # State (keep this short: current facts only; history goes to docs/journal.md)
 
-Updated 2026-09-24 ~16:30 CDT. RUNNING (cloud), quickest wins first:
-- cam-01 (to 17:00 CDT): GoGolfCam, GoBreakLine, UStream, Skin, gbacable
-- swing-01 (to 17:30, no permuter): gocamscripts, Swing, ska_shared, MC
-- golfer-01 (to 17:30, no permuter): Golfer, hwsRender_Gc, GameModeBestBall, CamSpline, LLPictInt
-- money-01 round 2 (to 17:30, no permuter): GoTerrainCollision, GoShaderObject_Glows_Gc, uiArc,
-  LLDynTex, goballfx. Round 1 (merged): uiLoadFile linked; Earnings, SunFlr_Gc, Ball, DepthField,
-  PsMgr not exact (agents/notes/money-01-notes_cloud1.txt).
+Updated 2026-09-24 ~17:10 CDT. RUNNING (cloud, to 18:00 CDT, no permuter):
+- swing-01 round 2: GoStaticCam, UObject, uiText, TerrainData, GoShaderObject_Rain_Gc
+- cam-01 round 2: GameMode26, LLFileIO_Gc, startUp, GoDynObj
+Round 1 merged (notes: agents/notes/cloud-2026-09-24-round1.txt, money-01-notes_cloud1.txt): linked
+uiLoadFile, gbacable, target (the owner's PC), ShaderObjectsData; exact BreakLine_Reset,
+Stream_ParseBufs, Glows fn_800981D0; closer Skin (1 instruction), hwsRender, AI_ChooseTarget, PictInt.
 
-Held by the owner's PC until ~16:45 CDT (permuters + a closer lane on agent/map-09; hands wins to the
-cloud to apply, never pushes): GoStaticCam, GoShaderObjectCommon_ShaderObjectsData_Gc, UObject,
-TerrainData, GoShaderObject_Rain_Gc, startUp, LLFileIO_Gc, GameMode26, GoDynObj, uiText; plus
-(closer agents, from ~16:15) hlaudmovie, streammanagerhole, target, uiProcessInterface.
+Held by the owner's PC (closer lanes on local/<name> branches, wins handed over, never pushed to main):
+to ~17:15 CDT hlaudmovie, streammanagerhole, uiProcessInterface; to ~17:45 LLDisp_Gc, LogoTexture,
+GameMode22, GameHoleContests, GoShaderObjectCommon_MorphAnimManager_Gc, UISApi, UISScreen, GoTerrain.
+Branch local/target-link is merged; the session cannot delete remote branches (owner deletes it).
 
 ## Numbers (report.json)
 
