@@ -21,10 +21,13 @@ void fn_8000ADC0(f32 (*pMtx)[4]);                   // identity
 void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
 void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
 
+const GXColor lbl_80283904 = {0xFF, 0xFF, 0xFF, 0xFF};    // white
+
 // Makes the pool (every light free), loads no lights, and sets channel 4's ambient and material
 // colours to white.
 void fn_8006E2A4(void) {
-    GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+    GXColor amb;
+    GXColor mat;
     GoLight* pLight;
     s32 i;
 
@@ -60,8 +63,10 @@ void fn_8006E2A4(void) {
     lbl_802811D8->aPointColour2[3][3] = 0.0f;
     fn_80029BC8(lbl_802811D8->vFC);
     fn_8006E7A4(NULL);
-    GXSetChanAmbColor(4, white);
-    GXSetChanMatColor(4, white);
+    amb = lbl_80283904;
+    mat = lbl_80283904;
+    GXSetChanAmbColor(4, amb);
+    GXSetChanMatColor(4, mat);
 }
 
 // Frees the pool.
