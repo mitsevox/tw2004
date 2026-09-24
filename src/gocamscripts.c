@@ -47,6 +47,8 @@ void fn_800441E4(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer, CamShot*
 u8   fn_800439E4(f32* pCam, int nPlayer);
 u8   fn_80043920(CamScript* pScript, int nPlayer);
 void fn_80044768(f32* pPos, f32* pOut);
+f32  fn_8003F790(CamScript* pScript);   // the blend's share (0..1) so far
+void fn_800090E4(f32* pTurn, f32* pVec, f32* pOut);     // the vector turned by it
 u8   fn_800DC464(int nPlayer);          // GameEffects.c: the ball is simulated from its position
 u8   Ter_CheckForGroundCollision(CourseInfo* pCourse, f32* pFrom, f32* pTo, f32* pHit, f32* pNormal,
                                  SurfaceType** ppSurface, TerObject** ppObj);
@@ -339,6 +341,84 @@ void fn_8003E624(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
             pScript->fD4 = (f32)fn_80009680(fn_80009744(vMove)) / fTime;
         }
     }
+}
+
+// Blend kind 1: the camera moves on the straight line from the current shot's position to the next
+// one's (by fn_8003F790's share), and its view direction turns from the one shot's to the other's
+// about their common axis; field of view, fn_800457B8's value, slow motion and fA8 blend the same.
+void fn_8003FD54(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPrev, f32 fTime) {
+    f32 vDir0[4];
+    f32 vDir1[4];
+    f32 vFromAim[4];
+    f32 vToAim[4];
+    f32 vMove[4];
+    f32 vPos[4];
+    f32 vAxis[4];
+    f32 qTurn[4];
+    CamShot* pShot = pScript->pShot;
+    CamShot* pNext = pScript->pNextShot;
+    f32 fT = fn_8003F790(pScript);
+    f32 fDot;
+    f32 fAngle;
+    f32 fDist;
+    f32 f;
+    f32 f90;
+
+    fn_80045428(pScript->v10, pScript->v0, vMove);
+    fn_8001EF34(vMove, fT, vPos);
+    fn_8004544C(vPos, pScript->v0, vPos);
+    Vec3Copy(vPos, pCam);
+    fn_80045428(pScript->v0, pScript->a20, vFromAim);
+    CamScript_GetLookAtPoint(pShot, nPlayer, pScript->a20, pScript->v0, pScript, pPrev, fTime);
+    fn_80045428(pScript->a20, pScript->v0, vDir0);
+    if (0.0f != vDir0[0] || 0.0f != vDir0[1] || 0.0f != vDir0[2]) {
+        fn_800BAF04(vDir0, vDir0);
+    }
+    fn_80045428(pScript->v10, &pScript->a20[4], vToAim);
+    CamScript_GetLookAtPoint(pNext, nPlayer, &pScript->a20[4], pScript->v10, pScript, pPrev, fTime);
+    fn_80045428(&pScript->a20[4], pScript->v10, vDir1);
+    if (0.0f != vDir1[0] || 0.0f != vDir1[1] || 0.0f != vDir1[2]) {
+        fn_800BAF04(vDir1, vDir1);
+    }
+    // the dot product clamped to -1..1 (worked out again for each test)
+    fDot = fn_8000C5FC(vDir0, vDir1) < -1.0f ? -1.0f
+         : (fn_8000C5FC(vDir0, vDir1) > 1.0f ? 1.0f : fn_8000C5FC(vDir0, vDir1));
+    fAngle = fn_80009614(fDot);
+    fAngle *= fT;
+    vec4flt_CrossProduct(vDir0, vDir1, vAxis);
+    if (0.0f != vAxis[0] || 0.0f != vAxis[1] || 0.0f != vAxis[2]) {
+        fn_800BAF04(vAxis, vAxis);
+    }
+    fn_8001EF34(vAxis, fAngle, vAxis);
+    fn_8000923C(vAxis, qTurn);
+    vDir0[3] = 0.0f;
+    fn_800090E4(qTurn, vDir0, pSub);
+    if (0.0f != pSub[0] || 0.0f != pSub[1] || 0.0f != pSub[2]) {
+        fn_800BAF04(pSub, pSub);
+    }
+    fDist = fn_80009680(fn_80009744(vFromAim));
+    fn_8001EF34(pSub, fT * ((f32)fn_80009680(fn_80009744(vToAim)) - fDist) + fDist, pSub);
+    fn_8004544C(pCam, pSub, pSub);
+    f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
+    f += fn_800DC3A4();
+    if (fn_80044E74(pScript->pShot)) {
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[1])), f);
+    } else {
+        fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), f);
+    }
+    f = fT * (pNext->f88 - pShot->f88) + pShot->f88;
+    f += fn_800DC45C(f);
+    fn_800457B8(nPlayer, f);
+    f = fT * (pNext->f8C - pShot->f8C) + pShot->f8C;
+    f90 = fT * (pNext->f90 - pShot->f90) + pShot->f90;
+    if (f > 0.0f || f90 > 0.0f) {
+        if (fn_80044E74(pShot)) {
+            fn_80038054(1, gPlayers[nPlayer].nView[1], f90, f);
+        } else {
+            fn_80038054(1, gPlayers[nPlayer].nView[0], f90, f);
+        }
+    }
+    pScript->fA8 = fT * (pNext->f9C - pShot->f9C) + pShot->f9C;
 }
 
 // Where the camera looks for the shot's bAC, into pOut: the pin (kind 0 in golfer state 18), the
