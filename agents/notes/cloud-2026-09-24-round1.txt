@@ -124,3 +124,34 @@ TRIED, NO GAIN
   inlines for bit/mask/clear 2-10; statement orders x 3 `&=` spellings (2); flags local 2-11; offset
   local 8 forms (7+); pointer or int parameter (8); lbl_802820F0/F4/lbl_80282108 int/s32/u32 in every
   combination (2).
+
+== swing-01 round 2 (no gain; GC 1.2.5n-3.0a5 swept on each, none better) ==
+- GoStaticCam StaticCam_GetFlybyInformation (2: block 2 computes into f3 then `fmr f31,f3`; EA into f31
+  then `fmr f3,f31`): `fT +=`, `fT = fT + ...`, chained `fT = fEnd = ...`, `fEnd = fT += ...`, operands
+  swapped: 12 (registers right, argument setup r3,r4,r5,r6 vs EA r3,r6,r4,r5: EA likely had a separate
+  temp allocated to fT's register). Fresh block-2 local, fresh locals in both blocks, `fEnd = fT; fEnd
+  += ...`, any dead float local as the temp: 2. Call takes fEnd with `fT = fEnd` after: 17. TW07's
+  percentDiff/distDiff/testPercent as locals (every subset/order x 9 final forms): 2. `fHiT -= fT` first
+  4/13; ratio in fEnd first 6/16.
+- UObject fn_800488B4 (1: EA's `fmuls f1,f0,f1` = 0.5 * min(fFov,fMax), 0.5 loaded after the ternary):
+  a literal as either operand (c*x, x*c, 1.0f/2.0f, (f32)0.5, 0.25f+0.25f) loads it before the ternary 5;
+  `x / 2.0f` late load but x first 1; `if (fFov <= fMax) fMax = fFov; 0.5f * fMax` right order, x in f30
+  4; inline Half/HalfTan/MinHalf/TanHalf/MinF/Scale, fresh fX (if/else, ternary), fHalf/fTwo locals, *=,
+  extern/static/defined const f32, extern f64: 1-6.
+- uiText fn_800922A8 (2: ours merges EA's `ori 4` / `ori 0x400` into `ori 0x404`; CW folds adjacent
+  in-place ORs late, a dead statement between them still folds): `uTmp = uFlags; uFlags = uTmp | 4;
+  uFlags |= 0x400;` or `uFlags = (int)uFlags | 4;` with int uFlags give `li r30,4; ori r30,r30,0x400`
+  (1: uFlags then treated as the known 0). Copies after the first OR `li 0x404` 2; chained expressions,
+  1<<10, 4<<8, bit-field union (130), inline SetBit (value/pointer): 2; 5 types x 15x15 casts: best 1.
+- TerrainData fn_8000C278 (1: `fmuls f0,f4,f3`, EA f3,f4): operand order and the pD[0]/pB[2] load
+  registers move together; the twin function's order `(fDx-fCx)*(fBz-fAz)` fixes the fmuls, swaps the
+  loads (4). Twin order plus every declaration move/swap, 1680 interleavings of short/long-lived
+  declarations, 206 orders of the 8 loads: 2-4. Loads in place, ReadF inline on 1-2 loads, difference
+  locals (every subset/order/operand order), 256 operand orders of the 8 products: 1. Casts, `+ -fAz`,
+  numerators before the zero test, pOut forms x 3 range-test shapes: 4-40.
+- GoShaderObject_Rain_Gc fn_800B52D4 (14; EA pData r19, k r22, second-loop i r22, apB offset r20):
+  `int j;` below `f32 fY;` 13 (k right, pData r23; not applied: scrambled order for one instruction);
+  climb (19 lines), 11.5k random 2-3-move orders, 20 min annealing from 13: 13; int/long/u32 for
+  i/nHalf/j/nBuf/k (243): 14; pData from a static inline returning &p->data 53 (raises pData to r29);
+  pRain->data. per use (27 combinations) 24-72; inline row/element/point getters 14-106; second loop on
+  k/j/nHalf 42-44.
