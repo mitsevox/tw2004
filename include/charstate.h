@@ -6,6 +6,7 @@
 #define CHARSTATE_H
 
 #include "character.h"
+#include "game/save.h"              // SkinChoice, SkinChoices
 
 // ---- a skin's parts (SkinPart.c) ----------------------------------------------------------------
 // Parts, variants and the other entries are found by a 64-bit name code: fn_800CB700 packs a name
@@ -177,14 +178,6 @@ typedef struct SkinModel {
     s32  n50;                   // 0x50  bits in Skin.p10CC
 } SkinModel;
 
-// A part's (or a set's) choice: its variant and that variant's option. For a set, the variant is
-// an entry of its p7C run and the option one of that entry's p8C run.
-typedef struct SkinChoice {
-    s32  nVariant;              // 0x0  -1 none
-    s32  nOption;               // 0x4  -1 none
-} SkinChoice;
-LAYOUT_ASSERT(SkinChoice, 8);
-
 // A skin (Skin.c): a character's body or one of its attachments; only what the code reads.
 typedef struct Skin {
     SkinModel* pModel;          // 0x0000
@@ -216,16 +209,6 @@ typedef struct SkinIterArgs {
     s32  n;                     // 0x4
 } SkinIterArgs;
 
-// A golfer's skin choices as kept outside the skins (fn_800CC1EC fills it from the body's skin or
-// the skin from it; fn_800CC408 gives the other six skins theirs).
-typedef struct SkinChoices {
-    u8   unk0[0x114];
-    SkinChoice aParts[40];      // 0x114  the body's, per part (-1 -1 throughout: not set yet)
-    SkinChoice aSets[116];      // 0x254  the body's, per set
-    SkinChoice aSkinParts[6][10];   // 0x5F4  the six skins' of CharSkinSet
-    SkinChoice aSkinSets[6][10];    // 0x7D4
-} SkinChoices;
-
 // An entry of the lists fn_800CE660 and fn_800CE8C0 build: each name code once.
 typedef struct SkinListEntry {
     u64  uId;                   // 0x0
@@ -245,6 +228,8 @@ typedef struct CharSkinSet {
     u8   unk0[0xC];
     f32  afC[6];                // 0x0C  per club class: the club head bone's height (fn_8001C5B4)
     Skin* apSkins[6];           // 0x24
+    u8   unk3C[0x9C - 0x3C];
+    void* a9C[6];               // 0x9C  freed with fn_8001B1E8 (fn_8001B58C)
 } CharSkinSet;
 
 // A pool of seven entries characters take (fn_8001A418) and give back (fn_8001A3B0).
@@ -266,9 +251,10 @@ extern s32        lbl_80281CA8;         // how many
 extern s32        lbl_80281CAC;         // the player fn_8001D8DC last marked (-1 at start)
 extern s32        lbl_80187164[8];      // the clip key for each shot kind (fn_8001C724)
 extern s32        lbl_80280E20;         // set to 6 (4 in split screen) by fn_8001C254, 3 by fn_8001C304
-extern void*      lbl_80280E24[2];      // what fn_8001B208 makes of the 'CLB ' object: one, or one per view
-                                        // in split screen
-extern Character* lbl_80281EE8;   // a character fn_8001C37C clears and fn_8001C518 frees
+extern CharSkinSet* lbl_80280E24[2];   // what fn_8001B208 makes of the 'CLB ' object: one, or one per
+                                        // view in split screen (Character.p16D8; fn_8001B58C frees them)
+
+void  fn_80037CD8(void* pSkin);         // Skin.c: frees a skin
 
 // SkinPart.c, as FE_CrAPDB.c uses it: find a part (or set) by id, a variant by id or name, and
 // pick a part's (or set's) variant.
@@ -283,6 +269,20 @@ s32   fn_800CDCA0(Skin* pSkin, const char* pName);
 s32   fn_800CDCE0(Skin* pSkin, int nSet, u64 uId);
 s32   fn_800CDD5C(Skin* pSkin, int nSet, const char* pName);
 s32   fn_800CDDB0(Skin* pSkin, int nSet, int nVariant, u64 uId);
+void  fn_8001D4A4(Character* pChar, int nSlot);   // dresses the character (its skins and clubs)
+void  fn_8001EE98(Character* pChar, u8 b);    // sets the model's bEE
+void  fn_8010E4DC(void* pDefs, CharModel* pModel, Skin* pSkin, int nSliders, u8* aValues, u8* pNode);
+                                        // applies slider values (Character.p17AC's definitions)
+void  fn_8010D454(void* pDefs);         // CharSliders.c: frees slider definitions
+void  fn_800CE170(Skin* pSkin, SkinTarget* pTarget);
+void  fn_800CC1EC(Character* pChar, SkinChoices* pChoices);
+void  fn_800CC658(Character* pChar, char* pSet, char* pVariant, char* pOption);
+void  fn_800CC408(Character* pChar, SkinChoices* pChoices);
+void  fn_800CC710(Character* pChar, int nSkin, u64 uPart, u64 uVariant);
+void  fn_800CC7DC(Character* pChar, int nSkin, u64 uSet, u64 uVariant, u64 uOption);
+void  fn_800CC8BC(Character* pChar, u8 bOn);
+void  fn_800CEB1C(Skin** apSkins, int nSkins, u8* p);
+void  fn_800CEBE8(Skin** apSkins, int nSkins, u8* p, u64* aIds, int nIds);
 void  fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, u8* p);
 u8    fn_800CEE90(void);
 
@@ -290,6 +290,7 @@ u8    fn_800CEE90(void);
 void  fn_8001E938(u32* aBits, u32 nBits);  // clears a bit array
 u8    fn_8001E9CC(u32* aBits, u32 n);
 void  fn_8001EA34(u32* aBits, u32 n);
+void  fn_8001EA54(u32* aA, u32* aB, u32* aOut, u32 nBits);  // the bits set in both
 void  fn_8001EB6C(u32* aBits, u32 n);
 u8    fn_8001E9F4(u32* aA, u32* aB, u32 nBits);  // two bit arrays share a set bit
 

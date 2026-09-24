@@ -60,7 +60,7 @@ s32 lbl_80281340 = -1;          // } the golfer and profile slot last drawn (fn_
 s32 lbl_80281344 = -1;          // }
 
 CrAPState* lbl_80281EE0;
-s32 lbl_80281EE8[CRAP_NUM_GOLFERS];     // per golfer slot: the character it starts with (none)
+Character* lbl_80281EE8[CRAP_NUM_GOLFERS];
 
 void fn_8008B00C(void);
 void fn_8008B704(void);
@@ -161,8 +161,8 @@ void fn_8008AD80(void) {
         if (nNext >= CRAP_NUM_GOLFERS) {
             nNext = 0;
         }
-        lbl_80281EE8[i] = 0;
-        lbl_80281EE0->aGolfer[i].pChar = (Character*)lbl_80281EE8[i];
+        lbl_80281EE8[i] = NULL;
+        lbl_80281EE0->aGolfer[i].pChar = lbl_80281EE8[i];
         lbl_80281EE0->aGolfer[i].n10 = i;
         lbl_80281EE0->aGolfer[i].n14 = -1;
         lbl_80281EE0->aGolfer[i].n1C = -1;
@@ -613,7 +613,7 @@ u8 fn_8008DCF0(int nGolfer, CrAPGolfer* pGolfer) {
 }
 
 void fn_8008DD34(int nProfile, s8 n) {
-    gpSaveData[nProfile].n5613 = n;
+    gpSaveData[nProfile].choices.n113 = n;
 }
 
 // Start the golfer's idle animation (or the one n8 asks for) and point the camera at him.
@@ -660,10 +660,10 @@ void fn_8008DD50(u8 bNoBlend) {
         pClip = fn_8008E02C();
     }
     if (pClip->uD8 != 0) {
-        if (!fn_8001EDF4(lbl_80281EE0->pB4->pChar) && fn_80077ACC()->n5613 != 0) {
+        if (!fn_8001EDF4(lbl_80281EE0->pB4->pChar) && fn_80077ACC()->choices.n113 != 0) {
             fn_8008E2F8(0, PI);
         }
-        fn_8008EA44(fn_80077ACC()->n5613);
+        fn_8008EA44(fn_80077ACC()->choices.n113);
     } else {
         if (fn_8001EDF4(lbl_80281EE0->pB4->pChar)) {
             fn_8008E2F8(0, 0.0f);
@@ -826,10 +826,10 @@ u8 fn_8008E468(char* szAnim, char* szShot, u8 bNoBlend) {
             return 0;
         }
         if (pClip->uD8 != 0) {
-            if (!fn_8001EDF4(lbl_80281EE0->pB4->pChar) && fn_80077ACC()->n5613 != 0) {
+            if (!fn_8001EDF4(lbl_80281EE0->pB4->pChar) && fn_80077ACC()->choices.n113 != 0) {
                 fn_8008E2F8(0, PI);
             }
-            fn_8008EA44(fn_80077ACC()->n5613);
+            fn_8008EA44(fn_80077ACC()->choices.n113);
         } else {
             if (fn_8001EDF4(lbl_80281EE0->pB4->pChar)) {
                 fn_8008E2F8(0, 0.0f);

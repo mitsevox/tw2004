@@ -21,25 +21,25 @@ int sGetUserTextureIdx(u64 uHash) {
 }
 
 // The pixels of the user logo a texture stands for, or NULL.
-u8* fn_80017398(u64 uHash, ProfileLogos* pLogos) {
+u8* fn_80017398(u64 uHash, SkinChoices* pChoices) {
     int nLogo;
     int nWidth;
     int nHeight;
 
     nLogo = sGetUserTextureIdx(uHash);
     if (nLogo < 0 || nLogo >= 5) return NULL;
-    if (pLogos->aLogo[nLogo].nShape == LOGO_SQUARE) {
+    if (pChoices->aLogo[nLogo].nShape == LOGO_SQUARE) {
         nWidth = 64;
         nHeight = 64;
     } else {
         nWidth = 128;
         nHeight = 32;
     }
-    return fn_8010FF5C(pLogos->aLogo[nLogo].aPixels, nWidth, nHeight);
+    return fn_8010FF5C(pChoices->aLogo[nLogo].aPixels, nWidth, nHeight);
 }
 
 // The palette for a user logo texture, or NULL.
-s16* fn_80017410(u64 uHash, ProfileLogos* pLogos) {
+s16* fn_80017410(u64 uHash, SkinChoices* pChoices) {
     int nLogo;
 
     nLogo = sGetUserTextureIdx(uHash);
@@ -48,21 +48,21 @@ s16* fn_80017410(u64 uHash, ProfileLogos* pLogos) {
 }
 
 // Puts the profile's logos into every user logo texture of the model.
-void fn_8001744C(void* pChar, void* pModel, ProfileLogos* pLogos) {
+void fn_8001744C(void* pChar, void* pModel, SkinChoices* pChoices) {
     int nNumTex;
     int i;
     u64 uHash;
     u8* pPixels;
     s16* pPalette;
 
-    if (pLogos != NULL && pModel != NULL) {
+    if (pChoices != NULL && pModel != NULL) {
         nNumTex = fn_8010AD10(pModel);
         for (i = 0; i < nNumTex; i++) {
             uHash = fn_8010AD18(pModel, i);
-            pPixels = fn_80017398(uHash, pLogos);
+            pPixels = fn_80017398(uHash, pChoices);
             if (pPixels != NULL) {
                 fn_8010B1D4(pModel, i, pPixels, 0, -1);
-                pPalette = fn_80017410(uHash, pLogos);
+                pPalette = fn_80017410(uHash, pChoices);
                 if (pPalette != NULL) {
                     fn_8010B2A8(pModel, i, pPalette, 0, -1);
                 }

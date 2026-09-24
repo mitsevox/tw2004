@@ -168,10 +168,10 @@ void fn_80107BA4(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- end of sweep code ----
 
-// Slider n of the created golfer (the profile's a5EB4, read signed).
+// Slider n of the created golfer (the profile's choices.a9B4, read signed).
 void fn_80107BA8(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = fn_80077ACC();
-    pResult->i = (s8)pProfile->a5EB4[pArgs[0].i];
+    pResult->i = (s8)pProfile->choices.a9B4[pArgs[0].i];
 }
 
 // ---- sweep code (not yet cleaned up) ----
@@ -310,8 +310,8 @@ void fn_80108140(MsgArg* pArgs, MsgArg* pResult) {
 
 // ---- end of sweep code ----
 
-// Set one of the profile's settings: 0 its name (pArgs[1]), 1 nAF7A, 2 the date (packed as
-// fn_80078604 packs it), 3 n5613 (pArgs[2]).
+// Set one of the profile's settings: 0 its name (pArgs[1]), 1 choices.n5A7A, 2 the date (packed as
+// fn_80078604 packs it), 3 choices.n113 (pArgs[2]).
 void fn_80108178(MsgArg* pArgs, MsgArg* pResult) {
     int nMonth;
     int nDay;
@@ -323,8 +323,8 @@ void fn_80108178(MsgArg* pArgs, MsgArg* pResult) {
         fn_80057ED0(pProfile, ((MsgString*)pArgs[1].p)->pStr);
         break;
     case 1:
-        pProfile->nAF7A = pArgs[2].i;
-        fn_80103B8C(pProfile->nAF7A);
+        pProfile->choices.n5A7A = pArgs[2].i;
+        fn_80103B8C(pProfile->choices.n5A7A);
         break;
     case 2:
         fn_80078620(pArgs[2].i, &nMonth, &nDay, &nYear);
@@ -333,7 +333,7 @@ void fn_80108178(MsgArg* pArgs, MsgArg* pResult) {
         pProfile->nDateYear = nYear;
         break;
     case 3:
-        pProfile->n5613 = pArgs[2].i;
+        pProfile->choices.n113 = pArgs[2].i;
         break;
     }
 }
@@ -347,13 +347,13 @@ void fn_80108244(MsgArg* pArgs, MsgArg* pResult) {
         strcpy(((MsgString*)pArgs[1].p)->pStr, pProfile->szName);
         break;
     case 1:
-        *(s32*)pArgs[2].p = (s8)pProfile->nAF7A;
+        *(s32*)pArgs[2].p = (s8)pProfile->choices.n5A7A;
         break;
     case 2:
         *(s32*)pArgs[2].p = fn_80078604(pProfile->nDateMonth, pProfile->nDateDay, pProfile->nDateYear);
         break;
     case 3:
-        *(s32*)pArgs[2].p = pProfile->n5613;
+        *(s32*)pArgs[2].p = pProfile->choices.n113;
         break;
     }
 }
@@ -779,7 +779,7 @@ void fn_8010920C(MsgArg* pArgs, MsgArg* pResult) {
 // The profile's logo n's b1020.
 void fn_80109248(MsgArg* pArgs, MsgArg* pResult) {
     SaveProfile* pProfile = fn_80077ACC();
-    pResult->i = pProfile->aLogos[pArgs[0].i].b1020;
+    pResult->i = pProfile->choices.aLogo[pArgs[0].i].b1020;
 }
 
 // Keep the edited logo: copy it into the profile's logo fn_8010F7D8.
@@ -788,7 +788,7 @@ void fn_80109294(MsgArg* pArgs, MsgArg* pResult) {
     s32 nLogo = fn_8010F7D8();
 
     lbl_80281ED4->logo106E0.b1020 = 1;
-    Mem_cpy(&pProfile->aLogos[nLogo], &lbl_80281ED4->logo106E0, sizeof(LogoRecord));
+    Mem_cpy(&pProfile->choices.aLogo[nLogo], &lbl_80281ED4->logo106E0, sizeof(LogoRecord));
     lbl_80281ED4->b10640 = 0;
 }
 
@@ -861,8 +861,8 @@ void fn_80109514(MsgArg* pArgs, MsgArg* pResult) {
         lbl_80281ED4->b10640 = 0;
         return;
     }
-    if (pProfile->aLogos[nLogo].b1020) {
-        Mem_cpy(&lbl_80281ED4->logo106E0, &pProfile->aLogos[nLogo], sizeof(LogoRecord));
+    if (pProfile->choices.aLogo[nLogo].b1020) {
+        Mem_cpy(&lbl_80281ED4->logo106E0, &pProfile->choices.aLogo[nLogo], sizeof(LogoRecord));
     } else {
         sprintf(szName, "MyLogo %d", nLogo + 1);
         strcpy(lbl_80281ED4->logo106E0.szName, szName);

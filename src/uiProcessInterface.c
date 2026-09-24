@@ -3,9 +3,12 @@
 // running (start-up, the menus or a round), and formats numbers for it.
 
 #include "golfer.h"
+#include "game.h"
 #include "game/frontend.h"
+#include "frontend/fe.h"
 
 u8 lbl_80281F19;
+u8 lbl_80281F1A;                // set: fn_8008FD60 passes events to the UI
 u8 lbl_80281F1B;
 
 void fn_800B1D3C(s32 nCmd, s32 a, s32 b);
@@ -16,6 +19,16 @@ s32 fn_800BA038();
 s32 fn_80090400();
 void fn_80090664(void);
 void fn_8008FE88(FrontEnd* pFE);
+void fn_8008F820(void);
+void fn_800E573C(void);         // GameMessages.c
+void fn_800E5798(void);         // GameMessages.c
+void fn_800E5708(void);         // GameMessages.c
+void fn_80092BA0(void);         // uiText.c
+void fn_8008EC30(void);         // uiLoadFile.c
+void fn_800B9FF0(void);
+// UIStudio.c, with the front end's view of the handler (uistudio.h cannot be included with
+// game/frontend.h; it takes a UIStudio*).
+void fn_80168B80(void* pHandler, u32 uEvent);
 
 u8 fn_8008F39C(void) {
     return lbl_80281F1B;
@@ -71,15 +84,67 @@ u32 fn_8008F610(void* unused, u16 n) {
 void fn_8008F644(void) {
 }
 
-// ---- sweep code (not yet cleaned up) ----
-
-extern u8 lbl_801D87C0[];
-
-void fn_8008F80C(s32 p0, s32 p1) {
-    *(u8*)((lbl_801D87C0 + p0) + 0x30) = p1;
+void fn_8008F80C(s32 n, s32 b) {
+    lbl_801D87C0.a30[n] = b;
 }
 
-// ---- end of sweep code ----
+// Passes an event to the UI (while lbl_80281F1A is set). With lbl_80281F19 set it then shuts the UI
+// down (fn_80090400) and sets lbl_80281F1B; otherwise fn_8008F820 runs.
+void fn_8008FD60(u32 uEvent) {
+    if (lbl_80281F1A) {
+        if (lbl_80281F1C != NULL) {
+            fn_80168B80(lbl_80281F1C->pHandler, uEvent);
+        }
+        if (lbl_80281F19) {
+            fn_80090400(lbl_80281F1C);
+            lbl_80281F19 = 0;
+            lbl_80281F1A = 0;
+            lbl_80281F1B = 1;
+        } else if (lbl_80281F1C != NULL) {
+            fn_8008F820();
+        }
+    }
+}
+
+// A UI name starting "tu": 1 in a lesson, -1 otherwise; 0 for any other name, and
+// always 0 when the game type is 1.
+int fn_8008FFF0(const char* szName) {
+    if (gSession.nGameType == 1) return 0;
+    if (szName[0] == 't' && szName[1] == 'u') {
+        if (fn_80100294()) return 1;
+        return -1;
+    }
+    return 0;
+}
+
+// Resets the front end's screen state.
+void fn_800905A8(void) {
+    s32 i;
+
+    fn_80092BA0();
+    fn_8008EC30();
+    lbl_801D87C0.n34 = 0;
+    lbl_801D87C0.n38 = 0;
+    lbl_801D87C0.b49 = 0;
+    lbl_801D87C0.b40 = 0;
+    for (i = 0; i < 4; i++) {
+        lbl_801D87C0.a18[i] = 0;
+        lbl_801D87C0.a2C[i] = 0;
+        lbl_801D87C0.a30[i] = 1;
+    }
+    lbl_801D87C0.b48 = 0;
+    fn_800B9FF0();
+    fn_800E5708();
+}
+
+// Sends the pending messages (GameMessages.c): game type 3 has its own set.
+void fn_80090628(void) {
+    if (gSession.nGameType == 3) {
+        fn_800E573C();
+    } else {
+        fn_800E5798();
+    }
+}
 
 void fn_80090664(void) {
     if (lbl_80281F1C != NULL) {

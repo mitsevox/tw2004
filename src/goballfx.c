@@ -15,8 +15,6 @@ f32  fn_80093A04(s32 nLight, CamLens* pLens);
 f32  fn_80093A50(GoLight* pLight, CamLens* pLens);
 
 // GoLighting.c
-void fn_8006E5A8(GoLight** apLight, s32 nLights);
-void fn_8006E62C(GoLight** apLight);
 void fn_8006F144(LightSet* pSet);
 void fn_8006F148(LightSet* pSet);
 void fn_8006F400(LightSet* pSet, s32 nLight, f32* pVec, f32 f);
@@ -63,7 +61,7 @@ void fn_800935CC(CourseLights* pLights) {
         pDir = &pLights->aLight[i];
         if (pDir->nType == 1) break;
     }
-    pLight = pSet->apLight[4];
+    pLight = pSet->group.apLight[4];
     pLight->nType = 1;
     fn_8000AE28(pDir->vColor, 0.5f, pLight->u.dir.vColor);
     pLight->u.dir.f10 = 1.0f;
@@ -78,7 +76,7 @@ void fn_800935CC(CourseLights* pLights) {
     } else {
         pRec = &pLights->aLight[0];
     }
-    pLight = pSet->apLight[0];
+    pLight = pSet->group.apLight[0];
     pLight->nType = 2;
     fn_8000AE28(pRec->vColor, 0.5f, pLight->u.point.vColor);
     Vec_Copy(pRec->vPos, pLight->u.point.vPos);
@@ -99,7 +97,7 @@ void fn_800935CC(CourseLights* pLights) {
     } else {
         pRec = &pLights->aLight[1];
     }
-    pLight = pSet->apLight[1];
+    pLight = pSet->group.apLight[1];
     pLight->nType = 2;
     fn_8000AE28(pRec->vColor, 0.5f, pLight->u.point.vColor);
     Vec_Copy(pRec->vPos, pLight->u.point.vPos);
@@ -123,7 +121,7 @@ void fn_800935CC(CourseLights* pLights) {
     } else {
         pRec = &pLights->aLight[2];
     }
-    pLight = pSet->apLight[2];
+    pLight = pSet->group.apLight[2];
     pLight->nType = 2;
     fn_8000AE28(pRec->vColor, 0.5f, pLight->u.point.vColor);
     Vec_Copy(pRec->vPos, pLight->u.point.vPos);
@@ -134,7 +132,7 @@ void fn_800935CC(CourseLights* pLights) {
 
     // EA bug: the last point light always takes the fourth record, even when that is the
     // directional one
-    pLight = pSet->apLight[3];
+    pLight = pSet->group.apLight[3];
     pLight->nType = 2;
     fn_8000AE28(pLights->aLight[3].vColor, 0.5f, pLight->u.point.vColor);
     Vec_Copy(pLights->aLight[3].vPos, pLight->u.point.vPos);
@@ -153,22 +151,22 @@ void fn_80093854(LightParams* pParams) {
     LightSet* pSet;
     GoLight* pLight;
     pSet = fn_8003532C();
-    Vec3Copy(pParams->v0, pSet->v7C);
-    pLight = pSet->apLight[4];
+    Vec3Copy(pParams->v0, pSet->group.v28);
+    pLight = pSet->group.apLight[4];
     pLight->u.dir.f10 = pParams->f10;
-    pLight = pSet->apLight[0];
+    pLight = pSet->group.apLight[0];
     pLight->u.point.fC = pParams->f20;
     pLight->u.point.f10 = pParams->f24;
     pLight->u.point.f14 = pParams->f24;
-    pLight = pSet->apLight[1];
+    pLight = pSet->group.apLight[1];
     pLight->u.point.fC = pParams->f1C;
     pLight->u.point.f10 = 1.0f;
     pLight->u.point.f14 = 1.0f;
-    pLight = pSet->apLight[2];
+    pLight = pSet->group.apLight[2];
     pLight->u.point.fC = pParams->f18;
     pLight->u.point.f10 = 1.0f;
     pLight->u.point.f14 = 1.0f;
-    pLight = pSet->apLight[3];
+    pLight = pSet->group.apLight[3];
     pLight->u.point.fC = pParams->f14;
     pLight->u.point.f10 = 1.0f;
     pLight->u.point.f14 = 1.0f;
@@ -185,18 +183,18 @@ void fn_80093900(CourseLightBlock* pBlock) {
 }
 
 void fn_80093990(LightSet* pSet) {
-    fn_8006E5A8(pSet->apLight, NUM_SET_LIGHTS);
+    fn_8006E5A8(&pSet->group, NUM_SET_LIGHTS);
     fn_8006F144(pSet);
 }
 
 void fn_800939CC(LightSet* pSet) {
-    fn_8006E62C(pSet->apLight);
+    fn_8006E62C(&pSet->group);
     fn_8006F148(pSet);
 }
 
 // The angle between the camera's direction and light nLight of the current set.
 f32 fn_80093A04(s32 nLight, CamLens* pLens) {
-    return fn_80093A50(fn_8003532C()->apLight[nLight], pLens);
+    return fn_80093A50(fn_8003532C()->group.apLight[nLight], pLens);
 }
 
 f32 fn_80093A50(GoLight* pLight, CamLens* pLens) {

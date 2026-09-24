@@ -9,6 +9,7 @@
 #include "frontend/fe.h"
 #include "game/earnings.h"
 #include "game/frontend.h"
+#include "frontend/uistudio.h"
 
 s32 fn_800A13E8(s32 nPort, s32 nSlot, s32 n);
 s32 fn_800A2248(s32 nPort, s32 nSlot);
@@ -110,7 +111,7 @@ s32 fn_8009FAD0(void) {
                         fn_80005AE8(args, 0, sizeof(args));
                         args[0].i = nPort;
                         args[1].i = nSlot;
-                        fn_8016B0F8(lbl_80281F1C->pHandler, 0x85, 2, args);
+                        fn_8016B0F8(lbl_80281F1C->pHandler, 0x85, 2, (const s32*)args);
                     }
                     nResult = fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE);
                     if (nResult == 0) {
@@ -142,7 +143,7 @@ s32 fn_8009FAD0(void) {
         fn_8009EF98();
     } else if (lbl_80281F1C != NULL) {
         fn_80005AE8(&arg, 0, sizeof(arg));
-        fn_8016B0F8(lbl_80281F1C->pHandler, 0x86, 1, &arg);
+        fn_8016B0F8(lbl_80281F1C->pHandler, 0x86, 1, (const s32*)&arg);
     }
     // EA bug: nResult is never set when no card gets as far as the file check
     return nResult;
