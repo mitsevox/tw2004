@@ -126,16 +126,6 @@ LAYOUT_ASSERT(MCOpCardName, 0xC);
 
 #define MC_BUFFER_SIZE  0x50000     // one save file image in memory
 
-// The session's record tables as the save file keeps them: a copy of gSession from aCourseRecord
-// to recC (0xF00..0x5B2C, the same layout).
-typedef struct SaveRecords {
-    CourseRecord aCourseRecord[NUM_COURSE_RECORDS];    // 0x0000
-    RecordEntry recA[8][5];     // 0x41A0
-    RecordEntry recB[3][3][5];  // 0x44C0
-    RecordEntry recC[5][2][5];  // 0x4844
-} SaveRecords;
-LAYOUT_ASSERT(SaveRecords, 0x4C2C);
-
 // The end of the saved data: a mark and a checksum of everything before it (fn_800A23BC).
 typedef struct SaveTrailer {
     char aMagic[3];             // 0x0  "@BE" (fn_800A233C also takes "@BD")

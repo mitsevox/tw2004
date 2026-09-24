@@ -6,6 +6,8 @@
 #include "lighting.h"
 #include "camera.h"
 #include "gx.h"
+#include "dynobj.h"
+#include "unsorted/cull.h"
 
 void    fn_8006E2A4(void);
 void    fn_8006E424(void);
@@ -20,6 +22,7 @@ void fn_80029BC8(f32* pVec);                        // sets a vector to lbl_8018
 void fn_8000ADC0(f32 (*pMtx)[4]);                   // identity
 void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);   // VecMath.c
 void fn_800BADB4(f32 (*pMtx)[4], f32* pIn, f32* pOut);     // a vector through a matrix
+void fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);  // UMemPool.c: inverts a rotation+translation
 
 const GXColor lbl_80283904 = {0xFF, 0xFF, 0xFF, 0xFF};    // white
 
@@ -191,6 +194,8 @@ void fn_8006E7A4(LightGroup* pGroup) {
         for (; n > 0; n--) {
             pLight = *ppLight++;
             switch (pLight->nType) {
+            case 0:
+                break;
             case 1:
                 bAmbient = 1;
                 lbl_802811D8->vAmbient[0] =
@@ -230,6 +235,62 @@ void fn_8006E7A4(LightGroup* pGroup) {
         lbl_802811D8->aPointColour[i][2] = 0.0f;
     }
     fn_8006E460(pGroup);
+}
+
+// Loads the lights for drawing pObj (or, without one, in world space): the ambient colour on
+// channel 4, then each point light, turned into pObj's space and through the camera's view,
+// pushed far out along its direction and lit on channel 0.
+void fn_8006EADC(UObject* pObj) {
+    Camera* pCamera = fn_8001614C();
+    GXColor colour;
+    f32 vPos[4];
+    f32 mInv[4][4];
+    f32 aPos[3][NUM_POINT_LIGHTS];   // the lights' x, y and z
+    GXLightObj light;
+    f32 (*pPoint)[4];
+    u32 uMask = 0;
+    int i;
+
+    colour.a = 0x80;
+    colour.r = lbl_802811D8->vAmbient2[0];
+    colour.g = lbl_802811D8->vAmbient2[1];
+    colour.b = lbl_802811D8->vAmbient2[2];
+    GXSetChanAmbColor(4, colour);
+    if (pObj == NULL) {
+        pPoint = lbl_802811D8->aPointPos;
+        for (i = 0; i < lbl_802811D8->nPoints; i++) {
+            uMask |= 1 << i;
+            fn_800BADB4(pCamera->viewMtx, *pPoint, vPos);
+            aPos[0][i] = vPos[0];
+            aPos[1][i] = vPos[1];
+            aPos[2][i] = vPos[2];
+            pPoint++;
+        }
+    } else {
+        fn_8000A798(pObj->m0, mInv);
+        pPoint = lbl_802811D8->aPointPos;
+        for (i = 0; i < lbl_802811D8->nPoints; i++) {
+            uMask |= 1 << i;
+            fn_800BADB4(mInv, *pPoint, vPos);
+            fn_800BADB4(pCamera->viewMtx, vPos, vPos);
+            aPos[0][i] = vPos[0];
+            aPos[1][i] = vPos[1];
+            aPos[2][i] = vPos[2];
+            pPoint++;
+        }
+    }
+    for (i = 0; i < lbl_802811D8->nPoints; i++) {
+        // red, green and blue all come from the red channel: the point lights are grey
+        colour.r = lbl_802811D8->aPointColour2[i][0];
+        colour.g = lbl_802811D8->aPointColour2[i][0];
+        colour.b = lbl_802811D8->aPointColour2[i][0];
+        GXInitLightPos(&light, -999999.0f * aPos[0][i], 999999.0f * aPos[1][i],
+                       -999999.0f * aPos[2][i]);
+        GXInitLightColor(&light, colour);
+        GXLoadLightObjImm(&light, 1 << i);
+    }
+    GXSetChanCtrl(0, 1, 0, 0, uMask, 2, 2);
+    GXSetChanCtrl(2, 0, 0, 0, 0, 0, 2);
 }
 
 // Channel 4 unlit, with a grey ambient colour.

@@ -11,7 +11,6 @@
 #include "discerror.h"
 #include "core/startup.h"
 
-void fn_800066E4(int a, int b, int c, int d);
 void fn_8001437C(void);
 void fn_800A3F38(u8 b, u8 b2);
 void VIWaitForRetrace(void);

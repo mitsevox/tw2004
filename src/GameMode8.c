@@ -1225,7 +1225,7 @@ void fn_800FBD2C(int nPlayer) {
         fToPlace = fn_80009680(vDir[0] * vDir[0] + vDir[2] * vDir[2]);
         // the distance to the view's camera lens position, if that is nearer; the second square
         // root is written twice, as a MIN() macro would expand
-        fn_800FE190(pBall->vPos, fn_80008370(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera)->v34, vDir);
+        fn_800FE190(pBall->vPos, fn_80008370(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera)->m4[3], vDir);
         fDist = (fToPlace <= (f32)fn_80009680(vDir[0] * vDir[0] + vDir[2] * vDir[2]))
 
                     ? fToPlace

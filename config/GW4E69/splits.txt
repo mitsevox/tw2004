@@ -130,6 +130,9 @@ streammanagerhole.c:
 
 ViewController.c:
 	.text       start:0x80016CB8 end:0x80017320
+	.bss        start:0x801B8BA8 end:0x801B95C8
+	.sbss       start:0x80281CA0 end:0x80281CA8
+	.sdata2     start:0x80282BB8 end:0x80282BC0
 
 char_tex_manager.c:
 	.text       start:0x80017320 end:0x80017508
@@ -276,6 +279,8 @@ emotion.c:
 
 Replay.c:
 	.text       start:0x8006BED4 end:0x8006C630
+	.data       start:0x801888C0 end:0x801888D0
+	.sdata2     start:0x802838B8 end:0x802838C0
 
 gomainloop.c:
 	.text       start:0x8006C630 end:0x8006E150
@@ -356,6 +361,8 @@ GoCamera.c:
 
 GoViewport.c:
 	.text       start:0x80076A54 end:0x80076B7C
+	.data       start:0x80189490 end:0x801894A0
+	.sdata2     start:0x80283A98 end:0x80283AA8
 
 GoShaderObjectCommon_TexAnimManager_Gc.c:
 	.text       start:0x80076B7C end:0x80076E48
@@ -873,6 +880,8 @@ ShaderRow19.c:
 
 EASportsBio.c:
 	.text       start:0x801249A8 end:0x8012597C
+	.data       start:0x80195308 end:0x801953E0
+	.sdata2     start:0x80284B10 end:0x80284B28
 
 GameMode22.c:
 	.text       start:0x8012597C end:0x801270F0
@@ -882,9 +891,14 @@ SkinBurn.c:
 
 EASBStorage.c:
 	.text       start:0x80127D84 end:0x8012CCD8
+	.rodata     start:0x80184E40 end:0x80184FC0
+	.data       start:0x80195700 end:0x80195750
+	.sdata      start:0x802819B0 end:0x802819B8
+	.sdata2     start:0x80284B40 end:0x80284B58
 
 EASB.c:
 	.text       start:0x8012CCD8 end:0x8012E950
+	.sdata2     start:0x80284B58 end:0x80284B60
 
 src/vi/vi.c:
 	.text       start:0x8012E950 end:0x8013042C

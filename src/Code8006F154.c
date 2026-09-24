@@ -29,8 +29,8 @@ void fn_8006F154(void) {
     f32* pTo;
     f32 fT;
 
-    fZ = pLens->v24[2];
-    fX = pLens->v24[0];
+    fZ = pLens->m4[2][2];
+    fX = pLens->m4[2][0];
     fLen2 = fX * fX + fZ * fZ;
     fScale = (fLen2 == 0.0f) ? 0.0f : 1.0f / fn_80029B64(fLen2);
     fX *= fScale;

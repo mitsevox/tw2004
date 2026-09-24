@@ -5,9 +5,10 @@
 
 #include "unsorted/cull.h"
 
-static ViewController lbl_801B8BA8[4];
-static int lbl_80281CA0;                    // the current view
-static ViewController* lbl_80281CA4;        // and its controller
+// .bss/.sbss in reverse address order (CodeWarrior lays them out last-defined-first)
+ViewController lbl_801B8BA8[4];
+ViewController* lbl_80281CA4;               // the current view's controller
+int lbl_80281CA0;                           // the current view
 
 s32   fn_80013E40(u8* p);                           // GoRenderCtx_Gc.c
 void  fn_80062E40(View* pView);                     // set up a camera controller
@@ -19,6 +20,9 @@ void  fn_80076664(CamLens* pLens, f32* pPos, f32* pAt, f32* pF5C, f32* pF50);
 void  fn_80017208(CamLens* pLens, f32* pPos, f32* pAngles);
 void  fn_80013D68(void* pCamera);
 void  fn_80076A54(f32* pRect);
+void  fn_8000A194(f32 (*pMtx)[4], f32 fA, f32 fB, f32 fC);  // UMemPool.c: a rotation matrix from three angles
+void  fn_8000A798(f32 (*pSrc)[4], f32 (*pDst)[4]);          // UMemPool.c: inverts a rotation+translation
+void  fn_8001728C(CamLens* pLens);
 
 ViewController* fn_80016E28(int nView);
 s32  fn_800171B0(void);
@@ -162,6 +166,29 @@ void fn_800171D8(f32* pRect, f32 x, f32 y, f32 w, f32 h) {
     pRect[2] = w;
     pRect[3] = h;
     fn_80076A54(pRect);
+}
+
+// Points the lens from pPos with the view's angles: builds its camera-to-world matrix (rotation from
+// the angles, pPos as the translation row) and inverts it into the world-to-camera matrix m44.
+void fn_80017208(CamLens* pLens, f32* pPos, f32* pAngles) {
+    fn_8001728C(pLens);
+    fn_8000A194(pLens->m4, pAngles[1], pAngles[0], pAngles[2]);
+    pLens->m4[3][0] = pPos[0];
+    pLens->m4[3][1] = pPos[1];
+    pLens->m4[3][2] = pPos[2];
+    pLens->m4[3][3] = 1.0f;
+    fn_8000A798(pLens->m4, pLens->m44);
+}
+
+void fn_8001728C(CamLens* pLens) {
+    pLens->m84[0][0] = 1.0f;
+    pLens->m84[0][1] = 1.0f;
+    pLens->m84[0][2] = 1.0f;
+    pLens->m84[0][3] = 1.0f;
+    pLens->m84[1][0] = 1.0f;
+    pLens->m84[1][1] = 1.0f;
+    pLens->m84[1][2] = 1.0f;
+    pLens->m84[1][3] = 1.0f;
 }
 
 f32* fn_800172B4(View* pView) {
