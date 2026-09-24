@@ -129,6 +129,10 @@ extern u8    lbl_80281F40;      // set by fn_80093AD4; fn_80093AE0 passes it on 
 extern TexBank*  lbl_80281F44;  // the "marker" texture's bank (BFX_vInit)
 extern TexEntry* lbl_80281F48;  // and the texture
 extern u8    lbl_801D94B0[0x28];    // the marker's mesh object (Skin.c's fn_80036054 sets it up)
+extern u8    lbl_80189CB0[6][4];    // each player's marker colour (the last two are 0)
+extern f32   lbl_801D94D8[5][8];    // per player: the marker's texture coordinates
+extern u8    lbl_801D9578[5][16];   // per player: its vertex colours
+extern f32   lbl_801D95C8[5][12];   // per player: its four corners
 
 void BFX_vInit(void);
 

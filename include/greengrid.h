@@ -18,7 +18,7 @@ typedef struct GreenGrid {
     s32  nIndices;              // 0x074  indexes built so far
     f32* apHeight[2];           // 0x078  ground height per grid point, nCols x anRows[view]
     f32  aCorner[2][4];         // 0x080  the grid's first point (x, -, z)
-    f32  aDir[2][4];            // 0x0A0  unit direction from the target to the ball, flat
+    f32  aDir[2][4];            // 0x0A0  unit direction from the ball to the target, flat
     f32  aTarget[2][4];         // 0x0C0  the target the grid was laid out for
     s32  anDone[2];             // 0x0E0  grid points sampled so far (fn_8009BE08, 4 a frame)
     s32  nCols;                 // 0x0E8  points across (4)
