@@ -6,6 +6,7 @@
 #include "core/goaram.h"
 #include "engine.h"
 #include "character.h"
+#include "charstate.h"
 #include "endian.h"
 
 // Blends rotation pA toward pB by fT into pOut (a slerp from pA to pOut after copying pB there);
@@ -47,14 +48,14 @@ void fn_8001FCD4(ARAMTransfer* pTransfer) {
     fn_800B67EC(pTransfer);
 }
 
-void fn_80021134(u8* pFrame, void* pPose, s32 n, u8* pBits);
+void fn_80021134(u16* pFrame, f32* pOut, s32 nBones, u32* pBits);
 void fn_8002148C(u8* pFrame, void* pPose, s32 n, u8* pBits, u8* pData);
 
 // Decodes frame nFrame of pClip: its second-stream frame into pPose2 (fn_8002148C) and its
 // first-stream frame into pPose1 (fn_80021134), fetching them from ARAM first when the clip's
 // frames live there (then n28 bytes of the first-stream frame are also copied to pExtra).
 // Always returns 1.
-u8 fn_80020328(Clip* pClip, int nFrame, void* pPose2, void* pPose1, u8* pExtra) {
+u8 fn_80020328(Clip* pClip, int nFrame, void* pPose2, f32* pPose1, u8* pExtra) {
     ARAMTransfer* pTransfer = NULL;
     u8* pFrame;
 
@@ -85,7 +86,7 @@ u8 fn_80020328(Clip* pClip, int nFrame, void* pPose2, void* pPose1, u8* pExtra) 
         } else {
             pFrame = (u8*)pClip->uAram + pClip->n8C * nFrame * 2;
         }
-        fn_80021134(pFrame, pPose1, pClip->n5C, pClip->pFC);
+        fn_80021134((u16*)pFrame, pPose1, pClip->n5C, (u32*)pClip->pFC);
     }
     return 1;
 }
@@ -495,9 +496,58 @@ void fn_80020FF8(f32* pOut, f32 fX, f32 fY, f32 fZ) {
     pOut[2] = fSinZ * fCosXY + fSinY * (fCosZ * fSinX);
 }
 
-// ---- sweep code (not yet cleaned up) ----
+// Decodes nBones bone rotations packed as u16 angles (0x10000 to a turn) from pFrame into pOut's
+// quaternions (4 floats each). Two bits per bone in pBits give its kind: one angle about z (1), about
+// x (2) or about y (3), or three angles (0). While lbl_80281CC0 is clear the z and y angles and the
+// last two of three angles are negated (fn_80021978 sets it).
+void fn_80021134(u16* p, f32* pOut, s32 nBones, u32* pBits) {
+    u64 uKind;  // fake match: a 64-bit switch value (the asm compares register pairs)
+    int i;
 
-extern u8 lbl_80281CC0;
+    for (i = 0; i < nBones; pOut += 4, i++) {
+        uKind = 0;
+        if (fn_8001E9CC(pBits, i * 2)) {
+            uKind = 1;
+        }
+        if (fn_8001E9CC(pBits, i * 2 + 1)) {
+            uKind |= 2;
+        }
+        switch (uKind) {
+        case 1:
+            if (lbl_80281CC0) {
+                fn_800093AC(TWOPI * p[0] / 65536.0f, pOut);
+            } else {
+                fn_800093AC(-(TWOPI * p[0]) / 65536.0f, pOut);
+            }
+            p += 1;
+            break;
+        case 3:
+            if (lbl_80281CC0) {
+                fn_80009410(TWOPI * p[0] / 65536.0f, pOut);
+            } else {
+                fn_80009410(-(TWOPI * p[0]) / 65536.0f, pOut);
+            }
+            p += 1;
+            break;
+        case 2:
+            fn_80009474(-(TWOPI * p[0]) / 65536.0f, pOut);
+            p += 1;
+            break;
+        case 0:
+        default:
+            if (lbl_80281CC0) {
+                fn_80020FF8(pOut, TWOPI * p[2] / 65536.0f, -(TWOPI * p[1]) / 65536.0f,
+                            -(TWOPI * p[0]) / 65536.0f);
+            } else {
+                fn_80020FF8(pOut, TWOPI * p[2] / 65536.0f, TWOPI * p[1] / 65536.0f, TWOPI * p[0] / 65536.0f);
+            }
+            p += 3;
+            break;
+        }
+    }
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_80021978(u8 v) {
     lbl_80281CC0 = v;

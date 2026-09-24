@@ -928,6 +928,7 @@ extern u8          lbl_801D9908[0xC8];
 extern s32         lbl_80281070;        // leaves this short are left alone by the drop pass
 extern s32         lbl_80281074;        // clips a leaf may keep this round
 extern u32         lbl_80281078;        // the current slot
+extern u8          lbl_80281CC0;        // ska_shared.c: fn_80021978 sets it; clear: fn_80021134 negates angles
 extern u8*         lbl_80281CC4;        // staging buffers (32-aligned), see Skalib_Init
 extern u8*         lbl_80281CC8;
 extern u8*         lbl_80281CCC;
