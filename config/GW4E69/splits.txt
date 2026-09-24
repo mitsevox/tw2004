@@ -290,6 +290,12 @@ Code80067710.c:
 
 target.c:
 	.text       start:0x80067B80 end:0x8006AA70
+	.rodata     start:0x80183768 end:0x80183848
+	.data       start:0x80188778 end:0x80188830
+	.bss        start:0x801D5BF0 end:0x801D5F78
+	.sdata      start:0x802811C0 end:0x802811D0
+	.sbss       start:0x80281E30 end:0x80281E48
+	.sdata2     start:0x80283778 end:0x80283868
 
 emotion.c:
 	.text       start:0x8006AA70 end:0x8006BED4
