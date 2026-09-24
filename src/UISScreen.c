@@ -145,8 +145,8 @@ void fn_8016A830(UIStudio* pStudio, s32 nOp, UISScreen* pScreen, u32 nNode) {
 void fn_8016ABBC(UIStudio* pStudio, UISScreen* pScreen, s32 n, s32 nKind, void* p, u8 bAll) {
     u32 i;
 
-    if (pStudio == NULL || pScreen == NULL) return;
-    if (p == NULL) return;
+    if (pStudio == NULL) return;
+    if (pScreen == NULL || p == NULL) return;
     switch (nKind) {
     case 8: {
         UISNode* pNode = p;
