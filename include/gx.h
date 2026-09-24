@@ -19,6 +19,29 @@ typedef struct GXTlutObj {
 typedef struct GXColor {
     u8 r, g, b, a;
 } GXColor;
+typedef struct GXFifoObj {
+    u8 unk0[0x80];
+} GXFifoObj;                    // the command FIFO (0x80 bytes)
+
+// ---- the matrix library (MTX), for the matrices GX takes -------------------------------------
+
+void PSMTXIdentity(f32 (*pMtx)[4]);
+void C_MTXOrtho(f32 (*pMtx)[4], f32 fTop, f32 fBottom, f32 fLeft, f32 fRight, f32 fNear, f32 fFar);
+
+// ---- the command FIFO -------------------------------------------------------------------------
+
+void GXGetFifoStatus(GXFifoObj* pFifo, u8* pbOverHigh, u8* pbUnderLow, u32* puCount, u8* pbCpuWrite,
+                     u8* pbGpRead, u8* pbWrapped);
+
+// ---- the viewport and projection ----------------------------------------------------------------
+
+void GXSetCullMode(int eMode);
+void GXSetProjection(f32 (*pMtx)[4], int eType);
+void GXSetCurrentMtx(u32 nId);
+void GXSetViewport(f32 fLeft, f32 fTop, f32 fWidth, f32 fHeight, f32 fNear, f32 fFar);
+void GXGetViewportv(f32* pViewport);    // 6 values: GXSetViewport's arguments
+void GXSetProjectionv(f32* pProj);      // 7 values: the type, then the matrix's terms
+void GXGetProjectionv(f32* pProj);
 
 // ---- what drawing writes ----------------------------------------------------------------------
 
@@ -55,6 +78,7 @@ void GXInitTexObjCI(GXTexObj* pObj, void* pImage, u16 nWidth, u16 nHeight, int e
                     int eWrapT, u8 bMipmap, u32 nTlut);
 void GXInitTlutObj(GXTlutObj* pObj, void* pLut, int eFormat, u16 nEntries);
 void GXLoadTexObj(GXTexObj* pObj, int eMap);
+void GXLoadTlut(GXTlutObj* pObj, u32 nTlut);
 void GXSetNumTexGens(u8 nGens);
 void GXLoadTexMtxIndx(u16 nIndex, u32 nId, int eType);
 
@@ -74,6 +98,7 @@ typedef struct GXLightObj {
     u32 unk0[16];
 } GXLightObj;                   // a light (0x40 bytes)
 
+void GXSetNumChans(u8 nChans);
 void GXSetChanAmbColor(int eChan, GXColor colour);
 void GXSetChanMatColor(int eChan, GXColor colour);
 void GXSetChanCtrl(int eChan, u8 bEnable, int eAmbSrc, int eMatSrc, u32 uLightMask, int eDiffFn,

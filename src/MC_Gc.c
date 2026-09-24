@@ -29,7 +29,6 @@ s32  fn_80125194(s32 a, s32 b);         // EA Sports Bio (0x80125194)
 s32  fn_801255C4(s32* pPos);            // EASportsBio.c
 s32  fn_801255F8(void);                 // EASportsBio.c: the EA Sports Bio file's size
 void fn_8012CCCC(int uHandle);          // EASBStorage.c
-void GXSetVtxAttrFmt(int nFmt, int nAttr, int nCnt, int nType, u8 uFrac);   // port: GameCube only
 u8*  Skalib_ScratchToAram(int n);       // skalib.c
 void Skalib_ScratchFromAram(int n);     // skalib.c
 

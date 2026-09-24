@@ -19,8 +19,6 @@ void fn_80012E00(UFontContext* pCtx);
 void fn_80012E1C(LLFont* pFont, s32 v);
 void fn_80012E24(LLFont* pFont, UFontContext* pCtx);
 s32  fn_80012E4C(LLFont* pFont);
-void fn_800111D8(void);
-void fn_800112DC(void);
 
 // Empties every font's queue and both pools.
 void fn_8001256C(void) {
