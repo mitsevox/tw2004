@@ -354,6 +354,8 @@ int  fn_801062C8(s16 nPart, int n);     // the asset in the first slot of aAF80 
 
 void FE_MakeMoviePath(char* pName, char* pPath);        // "data/movies/<name>.NGC"
 void FE_MakeCameoMoviePath(char* pName, char* pPath);   // "data/movies/cameos/<name>.NGC"
+// A movie's skip test for LLVideo.c's fn_80075FB8 (whose arguments it ignores): any button.
+u8   fn_80076FDC(struct Video* pVideo, int nArg);
 
 // fe_movies.c: the texture bank loaded from LoadData.c's 'txf2' copy (fn_80091778), its slot and its
 // first texture.
