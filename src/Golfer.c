@@ -162,7 +162,7 @@ void AI_ChooseTarget(int nPlayer) {
             if (!t->bEnabled) continue;
             fDZ    = pCourse->pin[nPinSet].z - t->pDef->z;
             fDX    = pCourse->pin[nPinSet].x - t->pDef->x;
-            fDist2 = fDX * fDX + fDZ * fDZ;
+            fDist2 = fDZ * fDZ + fDX * fDX;
             if (t->nTeeSet != -1 && t->nTeeSet != gSession.nTeeSet[nPlayer]) continue;
             if (t->nPinSet != -1 && t->nPinSet != nPinSet) continue;
             if (nBest == -1 && t->bPriority) {
