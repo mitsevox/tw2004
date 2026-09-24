@@ -731,6 +731,34 @@ void fn_800169AC(void) {
     pView->m80[2][2] = 0.0f;
 }
 
+// Send a vertex to the GPU: its position and the view's colour.
+void fn_800166E8(f32* pPos) {
+    fn_80016C94(pPos[0], pPos[1], pPos[2]);
+    fn_80016C7C(255.0f * lbl_80280E08->aColour[0], 255.0f * lbl_80280E08->aColour[1],
+                255.0f * lbl_80280E08->aColour[2], 255.0f * lbl_80280E08->aColour[3]);
+}
+
+// Send a vertex with its own colour (0..1 per channel).
+void fn_80016770(f32* pPos, f32* pColour) {
+    fn_80016C94(pPos[0], pPos[1], pPos[2]);
+    fn_80016C7C(255.0f * pColour[0], 255.0f * pColour[1], 255.0f * pColour[2], 255.0f * pColour[3]);
+}
+
+// Send a vertex with the view's colour and a texture coordinate.
+void fn_80016800(f32* pPos, f32* pUV) {
+    fn_80016C94(pPos[0], pPos[1], pPos[2]);
+    fn_80016C7C(255.0f * lbl_80280E08->aColour[0], 255.0f * lbl_80280E08->aColour[1],
+                255.0f * lbl_80280E08->aColour[2], 255.0f * lbl_80280E08->aColour[3]);
+    fn_80016CA8(pUV[0], pUV[1]);
+}
+
+// Send a vertex with its own colour and a texture coordinate.
+void fn_800168A0(f32* pPos, f32* pColour, f32* pUV) {
+    fn_80016C94(pPos[0], pPos[1], pPos[2]);
+    fn_80016C7C(255.0f * pColour[0], 255.0f * pColour[1], 255.0f * pColour[2], 255.0f * pColour[3]);
+    fn_80016CA8(pUV[0], pUV[1]);
+}
+
 // Set the viewport's corners, as fractions of the screen.
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1) {
     ViewState* pView = lbl_80280E08;

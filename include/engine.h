@@ -409,7 +409,9 @@ typedef struct ViewState {
     f32  fF0;                   // 0x0F0  }
     f32  fF4;                   // 0x0F4  } fn_80016B6C
     f32  fF8;                   // 0x0F8  }
-    u8   unkFC[0x110 - 0xFC];
+    f32  aColour[4];            // 0x0FC  the colour fn_800166E8 and fn_80016800 give a vertex
+                                //        (0..1 per channel)
+    u8   unk10C[0x110 - 0x10C];
 } ViewState;
 LAYOUT_ASSERT(ViewState, 0x110);
 
