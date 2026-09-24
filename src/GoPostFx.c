@@ -11,9 +11,14 @@
 
 void fn_80037E50(void);
 void fn_80038A90(f32* pV, u8 b, int nView, int nField, f32 f14, f32 f18);
-void fn_80038724(int nField, int nView, f32 f8, f32 f4);
+void fn_80038724(int nField, int nView, f32 fAlpha, f32 fShake);
 void fn_800A6070(u8 nPlayer, u8 bLimit);      // GameAudio.c
 void fn_80016948(void);
+void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
+void fn_800169AC(void);                     // apply lbl_80280E08's viewport
+void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
+void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
+void fn_80035F40(void* pCamera);            // Skin.c
 
 // Makes the screen copy (game types 4..8 only) and clears every effect.
 void PostFx_CopyScreenToBuffer(void) {
@@ -314,8 +319,8 @@ void fn_80038724(int nField, int nView, f32 fAlpha, f32 fShake) {
     pRect = ((RenderCamera*)fn_80017004(nView))->pRect;
     fX = pRect[0];
     fY = pRect[1];
-    fRight = fX + pRect[2];
-    fBottom = fY + pRect[3];
+    fRight = pRect[0] + pRect[2];
+    fBottom = pRect[1] + pRect[3];
     fn_80012F34(0);
     fn_80014118(0x50);
     fn_80035118(4, 5);
@@ -332,8 +337,8 @@ void fn_80038724(int nField, int nView, f32 fAlpha, f32 fShake) {
     fDX = fShake * (Rand_Float(1) - 0.5f);
     fDY = fShake * (Rand_Float(1) - 0.5f);
     aXY[0] += fDX;
-    aXY[4] += fDX;
     aXY[1] += fDY;
+    aXY[4] += fDX;
     aXY[5] += fDY;
     aColour[0] = 0.5f;
     aColour[1] = 0.5f;
@@ -408,6 +413,54 @@ void fn_800392D0(void) {
 }
 
 // ---- end of sweep code ----
+
+// Draws the effect's screen copy (nField picks which of the two) at half size into pCamera's
+// rectangle, stretched to twice its height.
+void fn_800390CC(int nField, RenderCamera* pCamera) {
+    f32 aColour[4];
+    f32 aXY[8];
+    f32 aUV[8];
+    f32* pRect;
+    f32 fX;
+    f32 fY;
+    f32 fRight;
+    f32 fBottom;
+
+    pRect = pCamera->pRect;
+    fX = pRect[0];
+    fY = pRect[1];
+    fRight = pRect[0] + pRect[2];
+    fBottom = pRect[1] + pRect[3];
+    fn_80012F34(0);
+    fn_80014118(0x10);
+    fn_80012F50(0, 1, 0x80);
+    fn_80012F18(7);
+    fn_8002A608(nField ? &lbl_801D4FB0[1] : &lbl_801D4FB0[0]);
+    fn_800140E8(1, 256, 224, 0, 1, 1);
+    fn_80016B54(256, 128, 1.0f, 1.0f);
+    fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
+    fn_800169AC();
+    fn_800141F8(aXY, NULL, fX, fY, fRight, 2.0f * fBottom);
+    aUV[0] = aXY[0];
+    aUV[1] = aXY[1];
+    aUV[4] = aXY[4];
+    aUV[5] = aXY[5];
+    aColour[0] = 0.5f;
+    aColour[1] = 0.5f;
+    aColour[2] = 0.5f;
+    aColour[3] = 1.0f;
+    fn_80014194(aColour);
+    fn_8001425C(0);
+    fn_80012EF8();
+    fn_8001644C(0xA1, aXY, NULL, aUV, 2);
+    fn_800140E8(0, 512, 448, lbl_80281B88 & 1, 8, 1);
+    fn_80012F34(1);
+    fn_80012F50(1, 6, 0x80);
+    fn_80012F18(3);
+    fn_80016B54(512, 448, 1.0f, 1.0f);
+    fn_80035F40(pCamera);
+    fn_80012EF8();
+}
 
 void fn_80039344(int nView, f32 f) {
     lbl_801D5010[nView] = f;
