@@ -668,8 +668,10 @@ void fn_80031AB4(void) {
             iObject = lbl_801D3CB0.pObjectSortList[i].iGlobalObjectIndex;
             fDistanceSquared = lbl_801D3CB0.pObjectSortList[i].fDistanceSquared;
             nLast = lbl_801D3CB0.pObjectSortList[i].nLODs - 1;
-            uFlags = lbl_801D3CB0.pObjectStateList[iObject].a20[3];
-            if (((uFlags & 4) || (uFlags & 0x10) || (uFlags & 0x20)) && fn_80031E40()) {
+            if (((lbl_801D3CB0.pObjectStateList[iObject].a20[3] & 4) ||
+                 (lbl_801D3CB0.pObjectStateList[iObject].a20[3] & 0x10) ||
+                 (lbl_801D3CB0.pObjectStateList[iObject].a20[3] & 0x20)) &&
+                fn_80031E40()) {
                 nLOD = 0;
             } else {
                 for (nLOD = 0; nLOD < nLast; nLOD++) {
