@@ -520,17 +520,8 @@ UAudContainers.c:
 uiobject.c:
 	.text       start:0x800AE1F8 end:0x800AF114
 
-unsorted/sweep_800AF140.c:
-	.text       start:0x800AF140 end:0x800AF144
-
-unsorted/sweep_800AF2D8.c:
-	.text       start:0x800AF2D8 end:0x800AF2DC
-
-unsorted/sweep_800AF2DC.c:
-	.text       start:0x800AF2DC end:0x800AF31C
-
-unsorted/sweep_800AF31C.c:
-	.text       start:0x800AF31C end:0x800AF324
+AudReverb.c:
+	.text       start:0x800AF114 end:0x800AF324
 
 startUp.c:
 	.text       start:0x800AF324 end:0x800B1AA8
