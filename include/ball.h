@@ -223,9 +223,20 @@ typedef struct TNetNode {
     u8   unkC[4];
     s16  nLink10;               // 0x10  } the two neighbouring nodes
     s16  nLink12;               // 0x12  }
-    u8   unk14[0x30 - 0x14];
+    s16  a14[8];                // 0x14  more node indexes (-1: none); fn_8006A7A8 clears those
+                                //       naming the node itself
+    u8   unk24[0x30 - 0x24];
 } TNetNode;
 LAYOUT_ASSERT(TNetNode, 0x30);
+
+// The placement outline's nodes (target.c fn_8006A7A8 fills pNode; lbl_80281E44 counts them).
+// Only what the cleaned code reads; the table's full size (0x2AC) is not a whole number of these.
+typedef struct TPlaceNode {
+    TNetNode* pNode;            // 0x0
+    u8   unk4[4];
+} TPlaceNode;
+extern TPlaceNode lbl_801D5CCC[85];
+extern s32 lbl_80281E44;
 
 // A closed outline on the course (TW06: TNetwork, 0x14 bytes there): the free-drop areas and the
 // in-bounds outlines, from the hole's 'Cnet' stream objects (TerrainData.c). The nodes follow

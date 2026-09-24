@@ -847,12 +847,9 @@ FE_PGATourMessages.c:
 	.text       start:0x8010E58C end:0x8010F6C8
 
 FE_LogoDesign.c:
-	.text       start:0x8010F6C8 end:0x8010FB70
+	.text       start:0x8010F6C8 end:0x8010FC3C
 	.data       start:0x80193D28 end:0x80193D58
 	.sbss       start:0x802824B8 end:0x802824C8
-
-unsorted/sweep_8010FBC4.c:
-	.text       start:0x8010FBC4 end:0x8010FBCC
 
 unsorted/sweep_8010FF5C.c:
 	.text       start:0x8010FF5C end:0x8010FF9C

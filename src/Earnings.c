@@ -10,6 +10,9 @@
 #include "game/save.h"
 #include "game/earnings.h"
 #include "frontend/fe.h"
+#include "core/easb.h"
+#include "game/modes/pgatour.h"
+#include "game/modes/pgatoursim.h"
 
 // The working tables and their saved copies, ten entries each.
 extern s32 lbl_80200010[10];
@@ -50,7 +53,6 @@ void  fn_800D344C(UStreamObject* pObject);
 int   fn_800584DC(int nProfile);
 int   fn_801020C0(void);
 int   fn_801021FC(void);                                // GameMode4: the current ladder event
-void  fn_80125874(const char* szName, s32 arg1);        // EASportsBio.c: post an accomplishment
 void  fn_800583B0(int nProfile, int nCourse);           // unlock a course (aCourseUnlocked)
 u8    fn_800583FC(int nProfile, int nCourse);           // whether a course is unlocked
 void  fn_8005844C(int nProfile);                        // the same for aCourseUnlocked[21]
@@ -79,6 +81,7 @@ s32   fn_80127098(s32 n);
 int   fn_800D3A20(int nProfile, u8 bMessage);
 int   fn_800D3CF8(int nRating);
 u8    fn_800D4010(int nId);
+u8    fn_800D4EF8(u32 uMask, int nBit);
 f32   fn_800D6EEC(void);
 u8    fn_800D748C(int nPlayer);
 u8    fn_800D76AC(int nPlayer, int nAward);
@@ -255,8 +258,8 @@ int fn_800D38F0(int nWinner, int nLoser, int nMargin, s32* pPrize) {
     }
     nMoney = lbl_80200538.aLadderPrize[nEvent].nBase + lbl_80200538.aLadderPrize[nEvent].nPerHole * nMargin;
     if (lbl_80200538.aLadderPrize[nEvent].nBio != -1) {
-        fn_80125874(lbl_80200538.aBio[lbl_80200538.aLadderPrize[nEvent].nBio].szName,
-                    lbl_80200538.aBio[lbl_80200538.aLadderPrize[nEvent].nBio].nValue);
+        EASBio_SetAccomplishment(lbl_80200538.aBio[lbl_80200538.aLadderPrize[nEvent].nBio].szName,
+                                 lbl_80200538.aBio[lbl_80200538.aLadderPrize[nEvent].nBio].nValue);
     }
     return nMoney;
 }
@@ -291,8 +294,8 @@ int fn_800D3A20(int nProfile, u8 bMessage) {
                 lbl_801FFD68[n] = i;
                 n++;
                 if (lbl_80200538.aCoursePrice[i].nBio != -1) {
-                    fn_80125874(lbl_80200538.aBio[lbl_80200538.aCoursePrice[i].nBio].szName,
-                                lbl_80200538.aBio[lbl_80200538.aCoursePrice[i].nBio].nValue);
+                    EASBio_SetAccomplishment(lbl_80200538.aBio[lbl_80200538.aCoursePrice[i].nBio].szName,
+                                             lbl_80200538.aBio[lbl_80200538.aCoursePrice[i].nBio].nValue);
                 }
             }
         }
@@ -301,16 +304,16 @@ int fn_800D3A20(int nProfile, u8 bMessage) {
         fn_80058494(nProfile);
         fn_800E4364(3, 7, 2, nProfile);
         if (lbl_80200538.aCoursePrice[21].nBio != -1) {
-            fn_80125874(lbl_80200538.aBio[lbl_80200538.aCoursePrice[21].nBio].szName,
-                        lbl_80200538.aBio[lbl_80200538.aCoursePrice[21].nBio].nValue);
+            EASBio_SetAccomplishment(lbl_80200538.aBio[lbl_80200538.aCoursePrice[21].nBio].szName,
+                                     lbl_80200538.aBio[lbl_80200538.aCoursePrice[21].nBio].nValue);
         }
     }
     if (gpSaveData[nProfile].n64 >= lbl_80200538.aCoursePrice[23].nPrice && !fn_8005846C(nProfile)) {
         fn_8005844C(nProfile);
         fn_800E4364(3, 7, 3, nProfile);
         if (lbl_80200538.aCoursePrice[23].nBio != -1) {
-            fn_80125874(lbl_80200538.aBio[lbl_80200538.aCoursePrice[23].nBio].szName,
-                        lbl_80200538.aBio[lbl_80200538.aCoursePrice[23].nBio].nValue);
+            EASBio_SetAccomplishment(lbl_80200538.aBio[lbl_80200538.aCoursePrice[23].nBio].szName,
+                                     lbl_80200538.aBio[lbl_80200538.aCoursePrice[23].nBio].nValue);
         }
     }
     if (bMessage) {
@@ -586,6 +589,159 @@ s32 fn_800D46E8(int n) {
     return r;
 }
 
+// After a shot: check the shot goals and fill the working tables with what they give, awards
+// (lbl_80282250 of them) and money prizes (lbl_80282254), as fn_800D4F14 does for putts. With
+// pBall the check runs on that ball in place of the player's own. With bPreview the shot is not
+// counted yet (one stroke fewer), and no EA Sports Bio accomplishment is posted; without a ball
+// too, the tests on the ball are skipped.
+void fn_800D477C(int nPlayer, Ball* pBall, u8 bPreview) {
+    s32 aPrizeIds[10];
+    s32 aAwardIds[10];
+    Ball saved;
+    int i;
+    int nSlot;
+    u8 bReplace;
+    u8 bLost;
+    int j;
+    s32 nValue;
+    u8 bHole;
+    u8 bTee;
+    u8 bNoBall;
+    int nAdj;
+    int nHoles;
+
+    lbl_80282254 = 0;
+    lbl_80282250 = 0;
+    if (gSession.uFlags & 0x4000) return;
+    if (Player_IsCPU(nPlayer)) return;
+    if (!fn_800D748C(nPlayer)) return;
+    if (fn_80100294()) return;
+    if (fn_800E177C() != 0) return;
+
+    if (pBall != NULL) {
+        Mem_cpy(&saved, &gPlayers[nPlayer].ball, sizeof(Ball));
+        Mem_cpy(&gPlayers[nPlayer].ball, pBall, sizeof(Ball));
+    }
+    nAdj = bPreview ? -1 : 0;
+    if (bPreview) {
+        if (pBall == NULL) {
+            bNoBall = 1;
+        } else {
+            bNoBall = 0;
+        }
+    } else {
+        bNoBall = 0;
+    }
+
+    for (i = 0; i < NUM_SHOT_GOALS; i++) {
+        if (!lbl_80200538.aShotGoal[i].bEnabled) continue;
+        if (!fn_800D4EF8(lbl_80200538.aShotGoal[i].uModes, Game_GetMode())) continue;
+        if (fn_800EC550() && !fn_801025F4() && !fn_800D4EF8(lbl_80200538.aShotGoal[i].uModes, 5)) continue;
+        if (!fn_800D4EF8(lbl_80200538.aShotGoal[i].uPars, 0) && fn_800D2B08() == 3) continue;
+        if (!fn_800D4EF8(lbl_80200538.aShotGoal[i].uPars, 1) && fn_800D2B08() == 4) continue;
+        if (!fn_800D4EF8(lbl_80200538.aShotGoal[i].uPars, 2) && fn_800D2B08() == 5) continue;
+        if (!fn_800D4EF8(lbl_80200538.aShotGoal[i].uLies, fn_800D4694(fn_800D0BAC(nPlayer)))) continue;
+        if (lbl_80200538.aShotGoal[i].f0C > fn_800D04AC(nPlayer)) continue;
+        if (!bNoBall && !fn_800D4EF8(lbl_80200538.aShotGoal[i].uBallLies,
+                                     fn_800D46E8(gPlayers[nPlayer].ball.nLie))) continue;
+        if (!bNoBall && lbl_80200538.aShotGoal[i].f14 > fn_800D0550(nPlayer)) continue;
+        if (!bNoBall && lbl_80200538.aShotGoal[i].f18 != 0.0f &&
+            lbl_80200538.aShotGoal[i].f18 < fn_800D0478(nPlayer)) continue;
+        if (!fn_800D4EF8(lbl_80200538.aShotGoal[i].uShotKinds, gPlayers[nPlayer].nShotKind)) continue;
+        if (!fn_800D4EF8(lbl_80200538.aShotGoal[i].uClubs, gPlayers[nPlayer].nClub)) continue;
+        if (fn_800D4EF8(lbl_80200538.aShotGoal[i].uFlags, 0) && !fn_800D0BF8(nPlayer, 1, bPreview)) continue;
+        if (fn_800D4EF8(lbl_80200538.aShotGoal[i].uFlags, 1) && !fn_800D0BF8(nPlayer, 0, bPreview)) continue;
+        if (!bNoBall && fn_800D4EF8(lbl_80200538.aShotGoal[i].uFlags, 2) && !fn_800D0D54(nPlayer)) continue;
+        if (fn_800D4EF8(lbl_80200538.aShotGoal[i].uFlags, 3) && gPlayers[nPlayer].b312) continue;
+        if (!bNoBall && fn_800D4EF8(lbl_80200538.aShotGoal[i].uFlags, 4) && !gPlayers[nPlayer].b30C) continue;
+        if (!bNoBall && fn_800D4EF8(lbl_80200538.aShotGoal[i].uFlags, 5) && !gPlayers[nPlayer].b30D) continue;
+        // Flag 6: the hole's first stroke.
+        if (fn_800D4EF8(lbl_80200538.aShotGoal[i].uFlags, 6) &&
+            nAdj + 1 != gPlayers[nPlayer].nStrokes[Game_CurHoleIndex()]) continue;
+        if (fn_800D4EF8(lbl_80200538.aShotGoal[i].uFlags, 7) && fn_800D1170(nPlayer, 0) < nAdj + 18) continue;
+        if (fn_800D4EF8(lbl_80200538.aShotGoal[i].uFlags, 8)) {
+            nHoles = fn_800D3208();
+            if (nHoles < 10) continue;
+            if (nHoles + nAdj > fn_800D0FBC(nPlayer)) continue;
+        }
+        if (lbl_80200538.aShotGoal[i].nAward >= 23 && lbl_80200538.aShotGoal[i].nAward <= 38 &&
+            (bPreview || !fn_800D9998(nPlayer, lbl_80200538.aShotGoal[i].nAward))) continue;
+        if (lbl_80200538.aShotGoal[i].nAward == 22 &&
+            GM_GetGameProgress(&gpSaveData[nPlayer]) < 100.0f) continue;
+
+        if (lbl_80200538.aShotGoal[i].nAward != 39) {
+            if (!fn_800D76AC(nPlayer, lbl_80200538.aShotGoal[i].nAward)) continue;
+            bReplace = 0;
+            bLost = 0;
+            nSlot = lbl_80282250;
+            if (lbl_80200538.aShotGoal[i].nId != 0) {
+                for (j = 0; j < lbl_80282250; j++) {
+                    if (lbl_80200538.aShotGoal[i].nId == aAwardIds[j]) {
+                        if (lbl_80200538.aShotGoal[i].nValue > lbl_80200240[j]) {
+                            nSlot = j;
+                            bReplace = 1;
+                        } else {
+                            bLost = 1;
+                        }
+                    }
+                }
+            }
+            if (bLost) continue;
+            lbl_802002B8[nSlot] = lbl_80200538.aShotGoal[i].nAward;
+            lbl_80200240[nSlot] = lbl_80200538.aShotGoal[i].nValue;
+            aAwardIds[nSlot] = lbl_80200538.aShotGoal[i].nId;
+            if (!bReplace) {
+                lbl_80282250++;
+            }
+            if (!bPreview && lbl_80200538.aShotGoal[i].nBio != -1) {
+                EASBio_SetAccomplishment(lbl_80200538.aBio[lbl_80200538.aShotGoal[i].nBio].szName,
+                                         lbl_80200538.aBio[lbl_80200538.aShotGoal[i].nBio].nValue);
+            }
+        } else {
+            nValue = lbl_80200538.aShotGoal[i].nValue;
+            if (nValue == 0) continue;
+            bReplace = 0;
+            bLost = 0;
+            nSlot = lbl_80282254;
+            if (lbl_80200538.aShotGoal[i].nId != 0) {
+                for (j = 0; j < lbl_80282254; j++) {
+                    if (lbl_80200538.aShotGoal[i].nId == aPrizeIds[j]) {
+                        if (lbl_80200538.aShotGoal[i].nValue > lbl_80200330[j]) {
+                            nSlot = j;
+                            bReplace = 1;
+                        } else {
+                            bLost = 1;
+                        }
+                    }
+                }
+            }
+            if (bLost) continue;
+            aPrizeIds[nSlot] = lbl_80200538.aShotGoal[i].nId;
+            lbl_80200330[nSlot] = nValue;
+            bHole = fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 2);
+            bTee = fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 1);
+            lbl_802003A8[nSlot] = fn_800D6A70(lbl_80200330[nSlot], nPlayer,
+                                              fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 0), bTee, bHole,
+                                              &lbl_801FFAE8[nSlot]);
+            if (fn_800D4EF8(lbl_80200538.aShotGoal[i].uMults, 3)) {
+                lbl_802003A8[nSlot] = fn_800D7220(lbl_802003A8[nSlot], nPlayer, &lbl_801FFAE8[nSlot]);
+            }
+            lbl_80200420[nSlot] = lbl_80200538.aShotGoal[i].n2A;
+            if (!bReplace) {
+                lbl_80282254++;
+            }
+            if (!bPreview && lbl_80200538.aShotGoal[i].nBio != -1) {
+                EASBio_SetAccomplishment(lbl_80200538.aBio[lbl_80200538.aShotGoal[i].nBio].szName,
+                                         lbl_80200538.aBio[lbl_80200538.aShotGoal[i].nBio].nValue);
+            }
+        }
+    }
+
+    if (pBall != NULL) {
+        Mem_cpy(&gPlayers[nPlayer].ball, &saved, sizeof(Ball));
+    }
+}
+
 // Whether bit nBit of uMask is set.
 u8 fn_800D4EF8(u32 uMask, int nBit) {
     return (uMask & (1 << nBit)) != 0;
@@ -698,8 +854,8 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
                 lbl_80282250++;
             }
             if (!bPreview && lbl_80200538.aPuttGoal[i].nBio != -1) {
-                fn_80125874(lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].szName,
-                            lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].nValue);
+                EASBio_SetAccomplishment(lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].szName,
+                                         lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].nValue);
             }
         } else {
             nValue = lbl_80200538.aPuttGoal[i].nValue;
@@ -735,8 +891,8 @@ void fn_800D4F14(int nPlayer, u8 bPreview) {
                 lbl_80282254++;
             }
             if (!bPreview && lbl_80200538.aPuttGoal[i].nBio != -1) {
-                fn_80125874(lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].szName,
-                            lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].nValue);
+                EASBio_SetAccomplishment(lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].szName,
+                                         lbl_80200538.aBio[lbl_80200538.aPuttGoal[i].nBio].nValue);
             }
         }
     }
@@ -873,8 +1029,8 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
                 lbl_80282250++;
             }
             if (!bPreview && lbl_80200538.aHoleGoal[i].nBio != -1) {
-                fn_80125874(lbl_80200538.aBio[lbl_80200538.aHoleGoal[i].nBio].szName,
-                            lbl_80200538.aBio[lbl_80200538.aHoleGoal[i].nBio].nValue);
+                EASBio_SetAccomplishment(lbl_80200538.aBio[lbl_80200538.aHoleGoal[i].nBio].szName,
+                                         lbl_80200538.aBio[lbl_80200538.aHoleGoal[i].nBio].nValue);
             }
         } else {
             nValue = lbl_80200538.aHoleGoal[i].nValue;
@@ -910,8 +1066,8 @@ void fn_800D588C(int nPlayer, u8 bPreview, u8 bRoundOver) {
                 lbl_80282254++;
             }
             if (!bPreview && lbl_80200538.aHoleGoal[i].nBio != -1) {
-                fn_80125874(lbl_80200538.aBio[lbl_80200538.aHoleGoal[i].nBio].szName,
-                            lbl_80200538.aBio[lbl_80200538.aHoleGoal[i].nBio].nValue);
+                EASBio_SetAccomplishment(lbl_80200538.aBio[lbl_80200538.aHoleGoal[i].nBio].szName,
+                                         lbl_80200538.aBio[lbl_80200538.aHoleGoal[i].nBio].nValue);
             }
         }
     }
@@ -2169,6 +2325,113 @@ s32 fn_800D9970(s32 i) {
 
 s32 fn_800D9984(s32 i) {
     return lbl_80200268[i];
+}
+
+// Whether the profile has earned award nAward (23..38, the PGA TOUR and career awards); others
+// give 0. Most need the season's last round and at least 15 tournaments started.
+u8 fn_800D9998(int nPlayer, int nAward) {
+    SaveProfile* pProfile;
+    u8 bSeasonEnd;
+    u8 bFullSeason;
+    int i;
+    int nLeads;
+
+    if (fn_800E177C() != 0) return 0;
+    pProfile = &gpSaveData[nPlayer];
+    if (!pProfile->bActive) return 0;
+    if ((pProfile->tour.nEvent == -1 || GameModeDriverPGATour_GetNextEvent() == -1) &&
+        pProfile->tour.nRound + 1 == GameModeDriverPGATour_GetRounds(pProfile->tour.nEvent)) {
+        bSeasonEnd = 1;
+    } else {
+        bSeasonEnd = 0;
+    }
+    bFullSeason = pProfile->tour.aStats[PGA_USER_GOLFER].nEvents >= 15;
+
+    switch (nAward) {
+    case 23:
+        return pProfile->nAC > 18;
+    case 24:
+        // Top 25 in every tournament played.
+        if (bSeasonEnd && bFullSeason) {
+            for (i = 0; i < fn_800EF834(); i++) {
+                if (pProfile->tour.aEvent[i].nUserRankType == 0) continue;
+                if (pProfile->tour.aEvent[i].nUserRankType == 2 &&
+                    pProfile->tour.aEvent[i].nUserRank <= 25) continue;
+                return 0;
+            }
+            return 1;
+        }
+        return 0;
+    case 25:
+        // Leads the tour in 15 statistics.
+        if (bSeasonEnd && bFullSeason) {
+            nLeads = 0;
+            for (i = 0; i < 28; i++) {
+                if (fn_80118F60(nPlayer, PGA_USER_GOLFER, i)) {
+                    nLeads++;
+                }
+            }
+            if (nLeads >= 15) return 1;
+        }
+        return 0;
+    case 26:
+        if (bSeasonEnd && bFullSeason && fn_80118F60(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_PAR3BIRDS) &&
+            fn_80118F60(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_PAR4BIRDS) &&
+            fn_80118F60(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_PAR5BIRDS)) {
+            return 1;
+        }
+        return 0;
+    case 27:
+        if (bSeasonEnd && bFullSeason &&
+            GM_PgaTourSim_GetStatValueFromGolferID(nPlayer, PGA_USER_GOLFER,
+                                                   GM_PGA_STAT_BIRDIESPERROUND) > 4.25f) {
+            return 1;
+        }
+        return 0;
+    case 28:
+        if (fn_800ED6F0() && fn_800EC558() == 0) return 1;
+        return 0;
+    case 29:
+        return fn_80118F60(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_CAREER_WINNINGS) != 0;
+    case 30:
+        // Under par in every tournament played.
+        if (bSeasonEnd && bFullSeason) {
+            for (i = 0; i < fn_800EF834(); i++) {
+                if (pProfile->tour.aEvent[i].nUserRankType == 0) continue;
+                if (pProfile->tour.aEvent[i].nUserRankType == 2 &&
+                    pProfile->tour.aEvent[i].nUserScore < pProfile->tour.aEvent[i].nEventPar) continue;
+                return 0;
+            }
+            return 1;
+        }
+        return 0;
+    case 31:
+        return pProfile->tour.n4E96 > 11;
+    case 32:
+        return fn_800E17AC(nPlayer) < 59;
+    case 33:
+        if (bSeasonEnd && bFullSeason &&
+            GM_PgaTourSim_GetStatValueFromGolferID(nPlayer, PGA_USER_GOLFER, GM_PGA_STAT_SCORING) < 68.17f) {
+            return 1;
+        }
+        return 0;
+    case 34:
+        if (pProfile->tour.n4E94 > 100 &&
+            (f32)pProfile->tour.aStats[PGA_USER_GOLFER].nCareerWins / (f32)pProfile->tour.n4E94 > 0.28f) {
+            return 1;
+        }
+        return 0;
+    case 35:
+        return pProfile->tour.n4E98 > 66;
+    case 36:
+        return pProfile->tour.n4E9A > 18;
+    case 37:
+        return pProfile->tour.aStats[PGA_USER_GOLFER].nSeasonWins > 9;
+    case 38:
+        // Tiger Woods's season record, $9,188,321 in 2000.
+        return pProfile->tour.aStats[PGA_USER_GOLFER].nSeasonWinnings > 9188321;
+    }
+    return 0;
 }
 
 s32 fn_800D9E00(s32 i) {

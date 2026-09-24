@@ -53,10 +53,13 @@ extern FEState lbl_801D7148;
 // The front end's screen state (lbl_801D87C0, 0x4C bytes). Only what the cleaned code reads.
 typedef struct FEScreen {
     u8  b0;                     // 0x00  set by fn_80079AD4
-    u8  a1[9];                  // 0x01  read by a menu message (fn_8007C7EC: 1 for index 9)
-    u8  unkA[0x18 - 0xA];
-    s32 a18[4];                 // 0x18  cleared by fn_800905A8
-    u8  unk28[0x2C - 0x28];
+    u8  a1[4];                  // 0x01  per controller: plugged in (fn_8008F820); read by a menu
+                                //       message (fn_8007C7EC: 1 for index 9)
+    u8  unk5[3];
+    u32 a8[4];                  // 0x08  per controller: the buttons held last frame (fn_8008F820)
+    u32 a18[4];                 // 0x18  per controller: frames the same buttons have been held,
+                                //       restarted past 8; cleared by fn_800905A8
+    u8  a28[4];                 // 0x28  per controller: a1 as of the last frame
     u8  a2C[4];                 // 0x2C  read and cleared by menu messages
     u8  a30[4];                 // 0x30  set to 1 by fn_800905A8; fn_8008F80C sets one
     s32 n34;                    // 0x34  cleared by fn_800905A8
@@ -122,6 +125,11 @@ typedef union FEMsgArg {
     s32 n;
     f32 f;
 } FEMsgArg;
+
+void fn_8008D8F4(void);                 // FEgolferanim.c (FE_Manager.c, uiProcessInterface.c call it)
+
+// fe_movies.c: the quads' message handler (the studio's handler 0, uiProcessInterface.c fn_8009005C).
+void fn_800914DC(FEQuad* pQuad, int nMsg, u32 bSplit, FEMsgArg* pArgs);
 
 // Four floats each, set by fe_movies.c fn_80090D28: fn_80090B80 tints a vertex colour to
 // lbl_80281F28 * (colour + lbl_80281F2C).
@@ -412,6 +420,14 @@ int  fn_80106E48(s16 n);                // FE_CrAPDB.c: the profile's assets who
 s32  fn_801070F4(void);                 // FE_CrAPDB.c: fill lbl_80282470; how many records
 void fn_80107244(int n, s16* pN0, s32* pN4, char* pDst);   // FE_CrAPDB.c: copy record n out
 void fn_80107294(s16 n, char* pDst);    // FE_CrAPDB.c: name n of lbl_801935C8
+// FE_CrAPDB.c: send message nMsg with its values to the front end (the EA Sports Bio screens).
+void fn_80107554(int nMsg, s32 nA);
+void fn_80107594(int nMsg, s32 nA, char* szB);
+void fn_801075F8(int nMsg, s32 nA, char* szB, s32 nC);
+int  fn_801076B0(char* sz, int nMsg);
+void fn_8010771C(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, f32 fG);
+void fn_80107774(int nMsg, s32 nA, s32 nB, s32 nC, s32 nD, s32 nE, s32 nF, s32 nG, s32 nH, s32 nI,
+                 s32 nJ);
 SaveProfile* fn_80077ACC(void);         // the profile being worked on
 u8   fn_80078008(s32 nAsset, SaveProfile* pProfile);  // the asset is locked (FE_Manager.c)
 int  fn_80078604(int a, int b, int c);  // a date (month, day, year from fn_8011E020) packed
@@ -510,8 +526,8 @@ LogoRecord* fn_8010FB70(void);          // the logo being edited
 s16* fn_8010FBC4(void);                 // the palette
 int  fn_8010FBCC(int nX, int nY, u32* pR, u32* pG, u32* pB, u32* pA);  // a pixel's colour index,
                                         // and its colour as fn_8010F7FC gives it
-void fn_8010FC3C(u8* pDst, u8* pSrc, int a, int nWidth, int nHeight);   // copy pixels: a = 0
-                                        // from a texture into the logo, 1 from the logo into one
+void fn_8010FC3C(u8* pDst, u8* pSrc, int bToTexture, int nWidth, int nHeight);  // copy pixels:
+                                        // 0 from a texture into the logo, 1 from the logo into one
 u8*  fn_8010FF5C(u8* pLogo, int nWidth, int nHeight);   // the logo's pixels as a texture (in
                                         // lbl_80212B60)
 

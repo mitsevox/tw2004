@@ -15,17 +15,14 @@ UISVec4* lbl_80281F30;
 
 // UFont.c's text state setters.
 void fn_80012868(s32 nFont);
-void fn_800128F8(char* sz, f32 x, f32 y);               // draw a string
 void fn_80012B6C(f32 f);
 void fn_80012B9C(f32 fX, f32 fY);
 void fn_80012C84(s32 uFlags);                           // 1/2: the alignment
 void fn_80012CB4(f32 fX, f32 fY, f32 fW, f32 fH);
 
-void fn_8006A9AC(f32* pColor);
 void fn_800760B0(s32 nX, s32 nY, s32 nW, s32 nH);
 
 void fn_80092BE8(f32* pColor);
-void fn_80012E54(f32* pColor, u8* pOut);    // UFont.c: packs an RGBA colour into pOut
 void fn_80092C38(f32 x0, f32 x1);
 void fn_80092C78(f32 x0, f32 x1);
 void fn_80092CB8(f32 x0);
