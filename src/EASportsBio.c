@@ -148,7 +148,7 @@ void fn_80124C10(void) {
     }
     if (lbl_8028257C) {
         nCount = 0;
-        bByTime = !lbl_80282568;
+        bByTime = lbl_80282568 == 0;
         fn_8012E670(lbl_80282570, bByTime, &nCount);
         fn_80107554(0xAF, nCount);
         for (i = lbl_80282574, n = 0; i < nCount; i++) {
