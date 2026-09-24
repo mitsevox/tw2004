@@ -59,7 +59,7 @@ u8 fn_800CF158(int nPlayer) {
             for (i = 0; i < gNumPlayersSetUp; i++) {
                 if (!gPlayers[i].bPlayerCut) {
                     if (i == nPlayer) {
-                        nMineStrokes = anTotal[i] + (gPlayers[i].nStrokes[Game_CurHoleIndex()] + 1) -
+                        nMineStrokes = anTotal[i] + gPlayers[i].nStrokes[Game_CurHoleIndex()] + 1 -
                                        fn_800D2B08();
                     } else {
                         nOther = anTotal[i] + gPlayers[i].nStrokes[Game_CurHoleIndex()] - fn_800D2B08();
@@ -165,7 +165,7 @@ u8 fn_800CF450(int nPlayer) {
         for (i = 0; i < gNumPlayersSetUp; i++) {
             if (!gPlayers[i].bPlayerCut) {
                 if (i == nPlayer) {
-                    nMineStrokes = anTotal[i] + (gPlayers[i].nStrokes[Game_CurHoleIndex()] + 1) -
+                    nMineStrokes = anTotal[i] + gPlayers[i].nStrokes[Game_CurHoleIndex()] + 1 -
                                    fn_800D2B08();
                 } else {
                     nOther = anTotal[i] + gPlayers[i].nStrokes[Game_CurHoleIndex()] - fn_800D2B08();
