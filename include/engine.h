@@ -361,6 +361,7 @@ typedef struct DVDFileInfo {
 typedef void (*DVDCallback)(s32 nResult, DVDFileInfo* pInfo);
 s32 DVDReadAsyncPrio(DVDFileInfo* pInfo, void* pBuf, s32 nLen, s32 nOffset, DVDCallback pCallback,
                      s32 nPrio);
+void DVDInit(void);
 s32 DVDConvertPathToEntrynum(const char* pPath);
 int DVDFastOpen(s32 nEntry, DVDFileInfo* pInfo);
 int DVDClose(DVDFileInfo* pInfo);
