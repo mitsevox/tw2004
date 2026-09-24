@@ -19,7 +19,6 @@ void fn_8008B704(void);
 void fn_8008B754(int a);
 void fn_8008B7D0(int a);
 void fn_8008D8CC(void);
-void fn_8008D8F4(void);
 void fn_8008DBE8(void);
 void fn_80092198(void);
 void fn_8009220C(void);

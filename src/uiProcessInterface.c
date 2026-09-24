@@ -7,6 +7,7 @@
 #include "game/frontend.h"
 #include "frontend/fe.h"
 #include "camera.h"
+#include "frontend/uistudio.h"
 
 u8 lbl_80281F19;
 u8 lbl_80281F1A;                // set: fn_8008FD60 passes events to the UI
@@ -32,18 +33,19 @@ void fn_80099ED8(void);                 // BootCourse.c
 void fn_80077340(void);                 // FE_Manager.c
 void fn_80077344(void);                 // FE_Manager.c
 void fn_80077348(void);                 // FE_Manager.c
-// UIStudio.c, with the front end's view of the handler (uistudio.h cannot be included with
-// game/frontend.h; it takes a UIStudio*).
-void fn_80168B80(void* pHandler, u32 uEvent);
-void fn_80169B4C(void* pHandler);      // UISApi.c: unload every screen
-void fn_80168C24(void* pHandler, s32 nTicks);     // UIStudio.c: run the UI
-void fn_8016B09C(void* pHandler, u32 uEvent, s32 nArgs, const s32* pArgs);
-void fn_80168DB0(void* pHandler, u32 uEvent, s32 n, u8 b, void* p, u8 bAll);
 void fn_80016B6C(f32 x, f32 y);
 void fn_80012898(s32 nMode);
 void fn_80012C54(s32 v);
 void fn_8001273C(void);
 void fn_800908D4(f32 x0);
+void fn_80090890(s32 nLevel, const char* szFile, s32 nLine, const char* szMsg);
+void fn_80090894(u16 uGroup, u16 uScreen, s32 n);
+void fn_800908BC(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
+void fn_800908C0(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
+void fn_800908C4(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
+void fn_800908C8(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
+void fn_800908CC(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
+void fn_800908D0(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4);
 
 u8 fn_8008F39C(void) {
     return lbl_80281F1B;
@@ -98,7 +100,8 @@ u32 fn_8008F610(u16 uGroup, u16 uScreen) {
     return (u32)pPairs->aPairs[uScreen].p4;
 }
 
-void fn_8008F644(void) {
+// The studio's UISUnloadFn: nothing to do, the screens' data stays in the UI file.
+void fn_8008F644(u16 uGroup, u16 uScreen, void* pData) {
 }
 
 // Run and draw the UI for nTicks (while lbl_80281F1A is set), then step lbl_801D880C: counting
@@ -372,6 +375,73 @@ int fn_8008FFF0(const char* szName) {
     return 0;
 }
 
+// Start the front end with the UI set szSet: take what uiLoadFile.c loaded, resolve the UI file,
+// set up the studio (the handlers for its nine element kinds and the game's callbacks), load the
+// file's "GlobalScript" screen and show the first screen (start-up passes it two zero words).
+FrontEnd* fn_8009005C(char* szSet) {
+    s32 aArgs[2];
+    int i;
+
+    lbl_80281F19 = 0;
+    lbl_80281F1A = 1;
+    lbl_80281F1B = 0;
+    fn_8008EC60(szSet);
+    lbl_80281F1C = fn_80009B34(sizeof(FrontEnd), 2, 16, "uiProcessInterface.c", 904);
+    lbl_80281F1C->f18 = 0.0f;
+    lbl_80281F1C->pFile = fn_8008F0C0(szSet);
+    lbl_80281F1C->p8 = fn_8008F0F0(szSet);
+    lbl_80281F1C->pC = fn_8008F15C(szSet);
+    lbl_80281F1C->p10 = fn_8008F18C(szSet);
+    fn_8009349C();
+    lbl_801D87C0.a2C[0] = 0;
+    lbl_801D87C0.a2C[1] = 0;
+    lbl_801D87C0.a2C[2] = 0;
+    lbl_801D87C0.a2C[3] = 0;
+    lbl_801D87C0.b0 = 0;
+    lbl_801D87C0.fFade = 0.0f;
+    lbl_801D880C.n4 = 0;
+    lbl_801D880C.n0 = -1;
+    fn_8008F488(lbl_80281F1C);
+    fn_8008FE88(lbl_80281F1C);
+    fn_8008FDDC(lbl_80281F1C);
+    lbl_80281F1C->pHandler = fn_80009B34(fn_80169D90(10, 9, 256, 2, 2048, 128), 2, 16,
+                                         "uiProcessInterface.c", 943);
+    fn_80169C0C(lbl_80281F1C->pHandler, 10, 9, 256, 2, 2048, 128, 16);
+    fn_80169B0C(lbl_80281F1C->pHandler, 0, (UISHandlerFn)fn_800914DC);
+    fn_80169B0C(lbl_80281F1C->pHandler, 1, fn_800908BC);
+    fn_80169B0C(lbl_80281F1C->pHandler, 2, fn_800908C0);
+    fn_80169B0C(lbl_80281F1C->pHandler, 3, fn_800908C4);
+    fn_80169B0C(lbl_80281F1C->pHandler, 4, fn_800908C8);
+    fn_80169B0C(lbl_80281F1C->pHandler, 5, fn_800908CC);
+    fn_80169B0C(lbl_80281F1C->pHandler, 6, fn_800908D0);
+    fn_80169B0C(lbl_80281F1C->pHandler, 7, (UISHandlerFn)fn_800929E4);
+    fn_80169B0C(lbl_80281F1C->pHandler, 8, (UISHandlerFn)fn_80103684);
+    fn_80169B30(lbl_80281F1C->pHandler, fn_8008F610, fn_8008F644);
+    fn_80169B28(lbl_80281F1C->pHandler, (UISTransformFn)fn_80093280);
+    fn_80169B44(lbl_80281F1C->pHandler, fn_8008F568);
+    // fake match: the original compares the count signed here (cmpw), unsigned in fn_8008F610
+    for (i = 0; i < (s32)lbl_80281F1C->pFile->p4->nCount; i++) {
+        if (strcmp(lbl_80281F1C->pFile->p4->aPairs[i].p0, "GlobalScript") == 0) {
+            fn_80169520(lbl_80281F1C->pHandler, lbl_80281F1C->pFile->p4->aPairs[i].p4);
+            break;
+        }
+    }
+    if (gSession.nGameType != 1) {
+        fn_801694A0(lbl_80281F1C->pHandler, 0, 0, 0, NULL);
+    } else {
+        aArgs[0] = 0;
+        aArgs[1] = 0;
+        fn_801694A0(lbl_80281F1C->pHandler, 0, 0, 2, aArgs);
+    }
+    if (gSession.nGameType == 3) {
+        fn_8008D8F4();
+    }
+    fn_80168F5C(lbl_80281F1C->pHandler, 0, 0);
+    fn_80169B3C(lbl_80281F1C->pHandler, fn_80090894);
+    fn_80165C6C(fn_80090890);
+    return lbl_80281F1C;
+}
+
 // Shut the front end down: in game type 1 with no nC, fe_movies.c's fn_80091EE8; in game type 3,
 // every lbl_801D8890 entry whose lbl_801D8ED0 word is set gets b0 set and b1 cleared, and the
 // menus' data is brought back and freed (fn_8008F294, fn_8008F24C). Then everything the front
@@ -505,32 +575,35 @@ void fn_800907AC(int nValue, char* szOut) {
     sprintf(szOut, aBuf);       // EA: the result is used as a format; it holds only digits, '-' and ','
 }
 
-void fn_80090890(void) {
+// The studio's report callback (UISReportFn): the retail game prints nothing.
+void fn_80090890(s32 nLevel, const char* szFile, s32 nLine, const char* szMsg) {
 }
 
-void fn_80090894(void) {
+// The studio's UISScreenDataFn: nothing to do.
+void fn_80090894(u16 uGroup, u16 uScreen, s32 n) {
 }
 
 void fn_80090898(void) {
     fn_8008FE88(lbl_80281F1C);
 }
 
-void fn_800908BC(void) {
+// The studio's handlers 1 to 6 (fn_8009005C): those element kinds take no messages.
+void fn_800908BC(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 }
 
-void fn_800908C0(void) {
+void fn_800908C0(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 }
 
-void fn_800908C4(void) {
+void fn_800908C4(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 }
 
-void fn_800908C8(void) {
+void fn_800908C8(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 }
 
-void fn_800908CC(void) {
+void fn_800908CC(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 }
 
-void fn_800908D0(void) {
+void fn_800908D0(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 }
 
 // ---- sweep code (not yet cleaned up) ----

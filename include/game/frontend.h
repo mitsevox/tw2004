@@ -100,6 +100,13 @@ void fn_8008F164(void* p);              // free p unless it is NULL
 void fn_8008F194(u32* pTable);          // free the fonts' slots and the 'FONS' data
 void fn_8008F24C(void);
 void fn_8008F294(void);
+// uiLoadFile.c: what the front end's start (uiProcessInterface.c fn_8009005C) takes. EA passes
+// the UI set's name to each; only fn_8008EC60 uses it.
+void fn_8008EC60(char* szSet);
+void* fn_8008F0C0(char* szUnused);          // the UI file's data
+UILoaded* fn_8008F0F0(char* szUnused);      // the texture banks
+UINamedList* fn_8008F15C(char* szUnused);   // the 'GRPS'/'MPCS' data
+u32* fn_8008F18C(char* szUnused);           // the 'FONS' data
 
 // One font in the 'FONS' object (uiLoadFile.c fn_8008EFFC): the font's data starts at 0x20; once
 // it is loaded into a font slot, its first word holds the slot.
@@ -240,6 +247,16 @@ typedef struct UITransformDesc {
 } UITransformDesc;
 
 UITransform* fn_80093274(void);         // the current level (uiTransform.c)
+void fn_80093280(int nOp, UITransformDesc* p);  // uiTransform.c: the studio's transform callback
+void fn_8009349C(void);                         // uiTransform.c: allocate the stack
+
+// The studio's message handlers the front end registers (uiProcessInterface.c fn_8009005C).
+void fn_800929E4(UIText* pText, int nMsg, s32 n, MsgArg* pArgs, MsgArg* pResult);  // uiText.c
+void fn_80103684(UIArc* pArc, int nMsg, s32 n, MsgArg* pArgs);                     // uiArc.c
+
+// uiProcessInterface.c: start the front end with the UI set szSet ("frontend", "ingame" or
+// "startup").
+FrontEnd* fn_8009005C(char* szSet);
 
 // uiProcessInterface.c: for a UI name starting "tu", 1 in a lesson and -1 otherwise; else 0.
 int fn_8008FFF0(const char* szName);

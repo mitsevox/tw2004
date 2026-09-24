@@ -126,6 +126,11 @@ typedef union FEMsgArg {
     f32 f;
 } FEMsgArg;
 
+void fn_8008D8F4(void);                 // FEgolferanim.c (FE_Manager.c, uiProcessInterface.c call it)
+
+// fe_movies.c: the quads' message handler (the studio's handler 0, uiProcessInterface.c fn_8009005C).
+void fn_800914DC(FEQuad* pQuad, int nMsg, u32 bSplit, FEMsgArg* pArgs);
+
 // Four floats each, set by fe_movies.c fn_80090D28: fn_80090B80 tints a vertex colour to
 // lbl_80281F28 * (colour + lbl_80281F2C).
 extern f32* lbl_80281F28;
