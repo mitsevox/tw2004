@@ -771,6 +771,55 @@ s32 fn_800A1590(s32 nPort, s32 nSlot, s32 nProfile, char* szName) {
     return -15;
 }
 
+// Save profile nProfile (gpSaveData) over the saved profile named szName, with the options and the
+// records; the save then remembers it as the last one saved (n4D0C0).
+s32 fn_800A1164(s32 nPort, s32 nSlot, const char* szName, s32 nProfile) {
+    s32 nMount;
+    s32 nResult;
+    s32 nFound;
+
+    nMount = fn_8009D74C(nPort, nSlot);
+    if (nMount != 0 && nMount != MC_ERR_MOUNTED) return nMount;
+    // EA bug: this return and the ones below leave a card it mounted mounted
+    nResult = fn_8009F734(nPort, nSlot);
+    if (nResult != 0) return nResult;
+    if (fn_8009DD44(nPort, nSlot, MC_DIR_NAME) != 0) {
+        if (nMount == 0) {
+            fn_8009DBAC(nPort, nSlot);
+        }
+        return -15;
+    }
+    if (fn_8009DD94(nPort, nSlot, MC_FILE_NAME, lbl_80281FE8, MC_BUFFER_SIZE) != 0) {
+        lbl_80281FE8->uFlags = 0;
+        return MC_ERR_BADDATA;
+    }
+    if (!fn_800A233C(lbl_80281FE8, &lbl_80281FE8->trailer)) {
+        lbl_80281FE8->uFlags = 0;
+        return MC_ERR_BADDATA;
+    }
+    Mem_cpy(lbl_80281FDC, lbl_80281FE8, MC_BUFFER_SIZE);
+    nFound = fn_800A0B18(nPort, nSlot, szName, lbl_80281FDC);
+    if (nFound < 0) return nFound;
+    lbl_80281FD8->uFlags &= ~MC_SAVE_PROFILE(nFound);
+    lbl_80281FD8->uFlags |= MC_SAVE_PROFILE(nFound);
+    Mem_cpy(&lbl_80281FD8->aProfile[nFound], &gpSaveData[nProfile], sizeof(SaveProfile));
+    lbl_80281FDC->n4D0C0 = nFound;
+    lbl_80281FDC->uFlags |= MC_SAVE_4D0C0;
+    lbl_80281FDC->uFlags |= MC_SAVE_OPTIONS;
+    lbl_80281FDC->uFlags |= MC_SAVE_RECORDS;
+    Mem_cpy(&lbl_80281FDC->options, &gSession.options, sizeof(GameOptions));
+    Mem_cpy(&lbl_80281FDC->records, gSession.aCourseRecord, sizeof(SaveRecords));
+    lbl_80281FDC->trailer.aMagic[0] = '@';
+    lbl_80281FDC->trailer.aMagic[1] = 'B';
+    lbl_80281FDC->trailer.aMagic[2] = 'E';
+    lbl_80281FDC->trailer.uChecksum = fn_800A23BC(lbl_80281FDC, &lbl_80281FDC->trailer);
+    nResult = fn_8009E604(nPort, nSlot, MC_FILE_NAME, lbl_80281FDC, MC_BUFFER_SIZE, MC_BACKUP_NAME);
+    if (nMount == 0) {
+        fn_8009DBAC(nPort, nSlot);
+    }
+    return nResult;
+}
+
 // Read the names of the profiles saved on the card into its MCCardState, for the menus.
 void fn_800A178C(s32 nPort, s32 nSlot) {
     MCCardState* pState;
@@ -957,6 +1006,51 @@ void fn_800A1C58(char* szText) {
     }
     aBuf[n] = 0;
     strcpy(szText, aBuf);
+}
+
+// The 'eagm' handler: build the 'eagm' list from the object's text, then free the object. The text
+// is a list of entries, each a quoted line with the entry's name followed by its names, one a line.
+void fn_800A1D4C(UStreamObject* pObject) {
+    char* p;
+    int i;
+    int j;
+    s32 nLen;
+
+    if (lbl_80281FF0 != NULL) {
+        fn_80009E70(pObject);
+        return;
+    }
+    p = (char*)pObject->pData;
+    lbl_80281FF4 = fn_800A1B94(p);
+    if (lbl_80281FF4 == 0) {
+        fn_80009E70(pObject);
+        return;
+    }
+    lbl_80281FF0 = fn_80009B34(lbl_80281FF4 * sizeof(MCEagmEntry), 2, 0x10, "MC.c", 3336);
+    for (i = 0; i < lbl_80281FF4; i++) {
+        lbl_80281FF0[i].n8 = fn_800A1B28(p);
+        lbl_80281FF0[i].p4 = fn_80009B34(lbl_80281FF0[i].n8 * 16, 2, 0x10, "MC.c", 3349);
+        for (j = 0; j < lbl_80281FF0[i].n8 + 1; j++) {
+            p = fn_800A1A90(p);
+        }
+    }
+    p = (char*)pObject->pData;
+    for (i = 0; i < lbl_80281FF4; i++) {
+        lbl_80281FF0[i].b0 = 0;
+        nLen = fn_800A19F8(p);
+        strncpy(lbl_80281FF0[i].szName, p, nLen);
+        lbl_80281FF0[i].szName[nLen] = 0;
+        fn_800A1C58(lbl_80281FF0[i].szName);
+        p = fn_800A1A90(p);
+        for (j = 0; j < lbl_80281FF0[i].n8; j++) {
+            nLen = fn_800A19F8(p);
+            strncpy(lbl_80281FF0[i].p4 + j * 16, p, nLen);
+            (lbl_80281FF0[i].p4 + j * 16)[nLen] = 0;
+            fn_800A1C58(lbl_80281FF0[i].p4 + j * 16);
+            p = fn_800A1A90(p);
+        }
+    }
+    fn_80009E70(pObject);
 }
 
 // Find the first 'eagm' entry holding a name that szGameCode starts with: mark it and set its bit
