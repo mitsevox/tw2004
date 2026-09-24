@@ -477,8 +477,8 @@ static void UStream_NullCallback(u32 n) {
 // Walk the chunks of the current buffers. SHOC chunks build objects, SONO chunks build sound
 // objects (through the audio module), the stream / movie tags go to their players.
 static void UStream_ParseChunks(void) {
-    UStreamBuffer* pBuffer;
     UStreamChunk* pChunk;
+    UStreamBuffer* pBuffer;
     u32 uLen;
     u32 uTag;
     if (UStream_PumpBuffers(1) == NULL) return;
