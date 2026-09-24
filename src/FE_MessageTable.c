@@ -1969,6 +1969,23 @@ void fn_8007D0E0(MsgArg* pArgs, MsgArg* pResult) {
     gGolferTable[gSession.nGolfer[nSlot]].nModelID = pProfile->createdGolfer.nModelID;
 }
 
+// The string at szName + 10 of slot pArgs[0]'s profile (its own field is not proven: see save.h).
+void fn_8007D160(MsgArg* pArgs, MsgArg* pResult) {
+    strcpy(((MsgString*)pArgs[1].p)->pStr, &gpSaveData[pArgs[0].i].szName[10]);
+}
+
+// Set that string to pArgs[1], less its trailing spaces.
+void fn_8007D1A4(MsgArg* pArgs, MsgArg* pResult) {
+    int i;
+
+    strcpy(&gpSaveData[pArgs[0].i].szName[10], ((MsgString*)pArgs[1].p)->pStr);
+    i = strlen(&gpSaveData[pArgs[0].i].szName[10]) - 1;
+    while (gpSaveData[pArgs[0].i].szName[10 + i] == ' ') {
+        i--;
+    }
+    gpSaveData[pArgs[0].i].szName[10 + i + 1] = '\0';
+}
+
 void fn_8007D25C(MsgArg* pArgs, MsgArg* pResult) {
 }
 
@@ -2001,6 +2018,20 @@ void fn_8007D2A4(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_8007D2D0(MsgArg* pArgs, MsgArg* pResult) {
+}
+
+// Whether that string has anything but spaces.
+void fn_8007D2D4(MsgArg* pArgs, MsgArg* pResult) {
+    int i;
+    int nLen = strlen(&gpSaveData[pArgs[0].i].szName[10]);
+
+    pResult->i = 0;
+    for (i = 0; i < nLen; i++) {
+        if (gpSaveData[pArgs[0].i].szName[10 + i] != ' ') {
+            pResult->i = 1;
+            return;
+        }
+    }
 }
 
 void fn_8007D380(MsgArg* pArgs, MsgArg* pResult) {
