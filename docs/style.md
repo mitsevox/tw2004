@@ -70,6 +70,22 @@ Matching work writes only matching notes (`fake match:`, `EA bug:`, `port:`, reg
 and section notes) and keeps `fn_`/`lbl_` names. Behaviour comments and names come from the audit
 process above, never as a side effect of making bytes match.
 
+**The audit baseline** (git tag `audit-baseline-1`, `config/GW4E69/audit_baseline.tsv`): the
+function audit reached 100% (6,610 functions) on 2026-09-24, and the baseline fingerprints each
+function's name, comments and code as audited. `python tools/match/auditbaseline.py` sorts the
+game code into:
+
+- **audited:** unchanged since the audit, which read byte-matching C (6,422 functions at the tag).
+- **draft:** audited, but from our non-exact draft C (188 functions at the tag). Once it matches,
+  re-check its comments against the final code.
+- **changed:** its name, comments or code changed after the tag; `git diff audit-baseline-1 --
+  <file>` shows what. A new matching note is fine, anything else needs the audit process.
+- **new:** a function the baseline does not have.
+- **headers:** struct field comments in game headers (phase 3, not audited).
+
+Never audited: the names of globals, types, struct fields and parameters. Treat them as claims.
+Never rewrite the baseline file by hand; a later audit milestone writes a new one with a new tag.
+
 Data access
 -----------
 
