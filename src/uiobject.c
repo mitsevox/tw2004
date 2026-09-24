@@ -28,7 +28,6 @@ void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);          // copy a matrix
 void fn_8000C5A4(f32 (*pMtx)[4]);
 void fn_800AEFE4(void);
 void fn_800AF0D4(UObjMesh* pMesh);
-void fn_800082CC(UObjMeshPart* pPart);
 void fn_8003612C(LightGroup* pGroup);   // Skin.c: load the group's lights (fn_8006E7A4)
 void fn_8006EADC(UObject* pObj);        // GoLighting.c: light the object
 void fn_8006ED70(void);                 // GoLighting.c

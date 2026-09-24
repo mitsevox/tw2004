@@ -1,15 +1,61 @@
-// LLObj_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree): not yet decompiled.
-// The code below is the visibility tests (0x80007BC4..: move an object's bounding sphere into
-// camera space, then cull it), written earlier as unsorted/code_80007BC4.c and not yet cleaned up.
+// LLObj_Gc.c (EA's name, from its asserts; also in EA's 2002 source tree): building and freeing a
+// model's mesh tree from its stream data, then the visibility tests (0x80007BC4..: move an
+// object's bounding sphere into camera space, then cull it), written earlier as
+// unsorted/code_80007BC4.c and not yet cleaned up.
 
 #include "unsorted/cull.h"
 #include "dynobj.h"
 
 int fn_80007BC4(RenderObj* obj, Camera* cam, float* outDepth, int mode, float scale);
-void fn_80008214(void);
-void fn_80008248(void* p);
 void fn_80007930(UObjModelRoot* pRoot, int nSet);
-void fn_80007658(UObjModelRoot* pRoot, UObjMesh* pMesh, u8* pData, int nCount, int n);   // not decompiled yet
+int fn_8000799C(UObjModelRoot* pRoot, UObjMesh* pMesh, int n, u8** ppData, u8** ppNext);
+void fn_80007658(UObjModelRoot* pRoot, UObjMesh* pMesh, u8* pData, int nCount, int n);
+void fn_80007824(UObjModelRoot* pRoot, int nSet);
+
+// Builds a model from its stream data: the 'ARRA' chunks before the 'HEAD' chunk go to array set
+// 0's setup, and the meshes, built from the chunks after it, follow the model in one block.
+UObjModelRoot* fn_800073B4(u8* pData, int n) {
+    u8* pNext;
+    u8* pCur;
+    UObjArrayList list;
+    u32* pChunk;
+    UObjModelHead* pHead;
+    UObjModelRoot* pRoot;
+
+    // The original stores pData, then pData + 8, and keeps pData in r30 (ours: r29): 95%.
+    pCur = pData;
+    pCur += 8;
+    list.n = 0;
+    for (;;) {
+        pChunk = (u32*)pCur;
+        pCur += 8;
+        if (pChunk[0] == 0x41525241) {  // 'ARRA'
+            list.ap[list.n++] = pCur;
+            pCur += pChunk[1];
+        } else if (pChunk[0] == 0x48454144) {   // 'HEAD'
+            break;
+        }
+    }
+    pHead = (UObjModelHead*)pCur;
+    pCur += sizeof(UObjModelHead);
+    pRoot = fn_80009B34(sizeof(UObjModelRoot) + pHead->nMeshes * sizeof(UObjMesh) +
+                        (pHead->nMeshes - 1) * sizeof(UObjMesh*), 2, 16, "LLObj_Gc.c", 198);
+    pNext = (u8*)pRoot;
+    pRoot->pE4 = NULL;
+    pRoot->pE0 = pData;
+    pRoot->pE8 = pHead;
+    fn_80005AE8(pRoot, 0, sizeof(pRoot->aSets));
+    pRoot->aSets[0].n30 = -1;
+    pRoot->aSets[1].n30 = -1;
+    pRoot->aSets[2].n30 = -1;
+    pRoot->aSets[3].n30 = -1;
+    fn_800081C8(&pRoot->aSets[0], 0, &list);
+    pNext += sizeof(UObjModelRoot);
+    pRoot->pMesh = (UObjMesh*)pNext;
+    pNext += pRoot->pE8->nMeshes * sizeof(UObjMesh);
+    fn_8000799C(pRoot, pRoot->pMesh, n, &pCur, &pNext);
+    return pRoot;
+}
 
 // Frees a mesh's used parts and table, then its children's, recursively.
 void fn_80007524(UObjMesh* pMesh) {
@@ -35,7 +81,7 @@ void fn_80007524(UObjMesh* pMesh) {
 void fn_800075CC(UObjModelRoot* pRoot) {
     int i;
 
-    fn_80008214();
+    fn_80008214(&pRoot->aSets[0]);
     for (i = 1; i < 4; i++) {
         if (pRoot->aSets[i].n30 != -1) {
             fn_80007930(pRoot, i);
@@ -46,6 +92,45 @@ void fn_800075CC(UObjModelRoot* pRoot) {
         fn_80009E70(pRoot->pE4);
     }
     fn_80009E70(pRoot);
+}
+
+// Makes a mesh's parts from the model data at pData: the first gets its type (pInfo->n88) set up
+// from a UObjPartDesc; when that part is used, the others are copies of it, each on its own array
+// set (made from set 0 when it is not yet). n is not used: fn_8000799C, the only caller, passes it.
+void fn_80007658(UObjModelRoot* pRoot, UObjMesh* pMesh, u8* pData, int nCount, int n) {
+    UObjPartDesc desc;
+    int i;
+
+    if (nCount == 0) {
+        return;
+    }
+    pMesh->p18 = fn_80009B34(pMesh->pInfo->n8C * sizeof(UObjMeshPart), 2, 32, "LLObj_Gc.c", 398);
+    fn_80005AE8(pMesh->p18, 0, pMesh->pInfo->n8C * sizeof(UObjMeshPart));
+    fn_80005AE8(pMesh->a1C, 0, sizeof(pMesh->a1C));
+    desc.n0 = pMesh->pInfo->n8C;
+    desc.n4 = nCount;
+    desc.u0A = 0;
+    desc.pC = pData;
+    desc.u8 = pMesh->pInfo->u8E;
+    if (pMesh->pInfo->b8B & 1) {
+        desc.u0A |= 1;
+    }
+    fn_8000827C(pMesh->p18, &pRoot->aSets[0], pMesh->pInfo->n88, &desc);
+    if (pMesh->p18->u8 != 0) {
+        pMesh->a1C[0] = 1;
+        pMesh->n20 = pMesh->p18->u8;
+        pMesh->n24 = pMesh->p18->n4;
+    }
+    if (pMesh->a1C[0] != 0) {
+        for (i = 1; i < desc.n0; i++) {
+            if (pRoot->aSets[i].n30 == -1) {
+                fn_80007824(pRoot, i);
+            }
+            pMesh->p18[i] = pMesh->p18[0];
+            pMesh->p18[i].pSet = &pRoot->aSets[i];
+            pMesh->a1C[i] = 1;
+        }
+    }
 }
 
 // Makes array set nSet a copy of set 0, with its own copy of each array (sizes rounded up to 32).
