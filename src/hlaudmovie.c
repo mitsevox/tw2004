@@ -442,7 +442,7 @@ void fn_800A929C(u32 uMemory) {
         }
         return;
     }
-    for (i = 0; i < pBank->nSamples; i++, pSample++) {
+    for (i = 0; i < pBank->nSamples; pSample++, i++) {
         pSample->u0 += pBank->uAram * 2;
         pSample->u4 += pBank->uAram * 2;
         if (pSample->uC != 0) {
