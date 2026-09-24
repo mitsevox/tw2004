@@ -138,21 +138,34 @@ def main():
         visit(f, set())
     size = {f[0]: f[2] for f in funcs}
     only_unnamed = '--unnamed' in sys.argv
+    blind = None
+    if '--blind' in sys.argv:
+        # audit mode: game function names not yet audited at T1/T2 (and each function's own name)
+        # show as addresses, see blindview.py
+        import blindview
+        b = blindview.Blinder()
+
+        def blind(s, own):
+            return blindview.IDENT.sub(lambda m: 'fn_%08X' % b.game[m.group(0)]
+                                       if m.group(0) == own or b.hide(m.group(0)) else m.group(0), s)
+    else:
+        def blind(s, own):
+            return s
     print('%s: %d functions, %d still fn_ (leaves first)\n' % (
         unit, len(funcs), sum(1 for f in funcs if f[0].startswith('fn_'))))
     for f in order:
         if only_unnamed and not f.startswith('fn_'):
             continue
         a = addr.get(f, [])
-        print('%s  %s  size 0x%X' % (f, '0x%08X' % a[0] if len(a) == 1 else '?', size[f]))
+        print(blind('%s  %s  size 0x%X' % (f, '0x%08X' % a[0] if len(a) == 1 else '?', size[f]), f))
         cs = calls.get(f, [])
-        print('  calls:     %s' % (', '.join(cs) or '-'))
+        print(blind('  calls:     %s' % (', '.join(cs) or '-'), f))
         by = sorted(callers.get(f, ()))
-        print('  called by: %s' % (', '.join(by[:12]) + (' ... +%d more' % (len(by) - 12) if len(by) > 12 else '') or '-'))
+        print(blind('  called by: %s' % (', '.join(by[:12]) + (' ... +%d more' % (len(by) - 12) if len(by) > 12 else '') or '-'), f))
         data = [r for r in refs.get(f, []) if not isinstance(r, tuple)]
         strs = [r[1] for r in refs.get(f, []) if isinstance(r, tuple)]
         if data:
-            print('  data:      %s' % ', '.join(data))
+            print(blind('  data:      %s' % ', '.join(data), f))
         if strs:
             print('  strings:   %s' % ', '.join('"%s"' % s for s in strs))
         if len(a) == 1 and a[0] in hints:
