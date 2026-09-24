@@ -2,6 +2,7 @@
 // decompiled; the sweep code below is the matched small functions.
 
 #include "game_types.h"
+#include "engine.h"
 
 // ---- sweep code (not yet cleaned up) ----
 
@@ -157,8 +158,6 @@ f32 fn_8001418C(u8* p) {
 
 // ---- sweep code (not yet cleaned up) ----
 
-extern u8* lbl_80280E08;
-void fn_8001425C(s32 v);
 f32 fn_80014268(u8* p);
 f32 fn_80014270(u8* p);
 f32 fn_80014278(u8* p);
@@ -169,8 +168,8 @@ void fn_800142A4(s8 v);
 void fn_800131C4(int nController);
 void fn_8001437C(void);
 
-void fn_8001425C(s32 v) {
-    *(s32*)(lbl_80280E08 + 0xD0) = v;
+void fn_8001425C(int a) {
+    lbl_80280E08->nD0 = a;
 }
 
 f32 fn_80014268(u8* p) {

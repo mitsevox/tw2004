@@ -387,6 +387,27 @@ LAYOUT_ASSERT(BufferPool, 0x14080);
 
 extern BufferPool* lbl_80280E00;
 
+// The view being drawn to (our name; lbl_801B8A98, 0x110 bytes, reached through the pointer
+// lbl_80280E08; the renderer state lbl_801B8980 sits just before it). Only what the code reads.
+typedef struct ViewState {
+    u8   unk0[0xD0];
+    s32  nD0;                   // 0x0D0  set by GoRenderCtx_Gc.c
+    f32  fD4;                   // 0x0D4  } the viewport's corners as fractions of the screen
+    f32  fD8;                   // 0x0D8  } (fn_80016978; fn_80016948 gives the whole screen:
+    f32  fDC;                   // 0x0DC  } 0, 0, 1, 1)
+    f32  fE0;                   // 0x0E0  }
+    s32  nE4;                   // 0x0E4  } the screen's size in pixels and two scales
+    s32  nE8;                   // 0x0E8  } (fn_80016B54: 512, 448, 1, 1 at reset)
+    f32  fEC;                   // 0x0EC  }
+    f32  fF0;                   // 0x0F0  }
+    f32  fF4;                   // 0x0F4  } fn_80016B6C
+    f32  fF8;                   // 0x0F8  }
+    u8   unkFC[0x110 - 0xFC];
+} ViewState;
+LAYOUT_ASSERT(ViewState, 0x110);
+
+extern ViewState* lbl_80280E08;
+
 void fn_8005CC64(TexBank* pBank, TexEntry* pTex);  // set the texture of the next draw
 
 // ---- shader objects ----------------------------------------------------------------------------

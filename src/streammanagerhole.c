@@ -46,6 +46,12 @@ void fn_8009198C(int nMode);    // fe_movies.c: update the loading screen
 void fn_80091818(void);     // fe_movies.c
 void fn_80091778(void);     // fe_movies.c
 void fn_8000ADC0(f32 (*m)[4]);          // identity matrix
+void fn_800141CC(void);
+void fn_800169AC(void);     // apply lbl_80280E08's viewport
+void fn_80016208(void);
+void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1);
+void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY);
+void fn_80016B6C(f32 fX, f32 fY);
 void fn_8001529C(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
 void fn_8001462C(void);
 void fn_8000B9E4();
@@ -676,6 +682,49 @@ void fn_80015540(void) {
     lbl_801B8980.uFlags = 0;
     GXSetCurrentMtx(0);
     fn_80015470();
+}
+
+// Reset the view: whole-screen viewport, a 512 x 448 screen, scales of 1.
+void fn_80016198(void) {
+    fn_80016B6C(1.0f, 1.0f);
+    fn_8001425C(0);
+    fn_800141CC();
+    lbl_80280E08->fF4 = 1.0f;
+    lbl_80280E08->fF8 = 1.0f;
+    fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
+    fn_80016B54(512, 448, 1.0f, 1.0f);
+    fn_80016208();
+}
+
+// Draw to the whole screen.
+void fn_80016948(void) {
+    fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
+}
+
+// Set the viewport's corners, as fractions of the screen.
+void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1) {
+    ViewState* pView = lbl_80280E08;
+
+    pView->fD4 = x0;
+    pView->fD8 = y0;
+    pView->fDC = x1;
+    pView->fE0 = y1;
+    fn_800169AC();
+}
+
+void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY) {
+    ViewState* pView = lbl_80280E08;
+
+    pView->nE4 = nWidth;
+    pView->nE8 = nHeight;
+    pView->fEC = fX;
+    pView->fF0 = fY;
+}
+
+void fn_80016B6C(f32 fX, f32 fY) {
+    lbl_80280E08->fF4 = fX;
+    lbl_80280E08->fF8 = fY;
+    fn_800169AC();
 }
 
 // Refill stream list 0 with the global data and character files and every player's golfer's
