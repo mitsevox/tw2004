@@ -368,6 +368,7 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
     f32 fLastDist;
     f32 fLoDist;
     f32 fFrom;
+    f32 fEnd;
     f32 fStep;
     f32 fLastT;
     f32 fLoT;
@@ -414,7 +415,14 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
     }
     if (fT != fLastT) {
         // home in: halve the step four times, then interpolate the rest
-        fFrom = (fT >= fLastT) ? fLastT : 0.0f;
+        if (fT >= fLastT) {
+            fFrom = fLastT;
+            fEnd = fT;
+        } else {
+            fFrom = 0.0f;
+            fEnd = fT;
+        }
+        fT = fEnd;
         fHiDist = fDist;
         fLoT = fT - 0.005f;
         fHiT = fT;
@@ -441,13 +449,15 @@ void StaticCam_GetFlybyInformation(CamScript* pScript, int nPath, f32* pCam, f32
             i++;
         } while (i < 4);
         if (fDist > fTarget) {
-            fT = (fT - fLoT) * (1.0f - (fDist - fTarget) / (fDist - fLoDist)) + fLoT;
+            fEnd = (fT - fLoT) * (1.0f - (fDist - fTarget) / (fDist - fLoDist)) + fLoT;
+            fT = fEnd;
             fn_800C7480(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20, pPrev->v30, pShot->v30, pNext->v30,
                         pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);
             fn_80065B20(pCam, vLast, vDiff);
             fDist = fLastDist + (f32)fn_80009680(fn_80009744(vDiff));
         } else if (fDist < fTarget) {
-            fT += (fHiT - fT) * ((fTarget - fDist) / (fHiDist - fDist));
+            fEnd = fT + (fHiT - fT) * ((fTarget - fDist) / (fHiDist - fDist));
+            fT = fEnd;
             fn_800C7480(pPrev->v20, pShot->v20, pNext->v20, pAfter->v20, pPrev->v30, pShot->v30, pNext->v30,
                         pAfter->v30, pCam, pSub, pFov, pShot->f78, pNext->f78, fT);
             fn_80065B20(pCam, vLast, vDiff);
