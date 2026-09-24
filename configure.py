@@ -938,7 +938,7 @@ config.libs = [
             Object(Matching, "Trax.c"),
             Object(NonMatching, "ScreenClear.c"),
             Object(NonMatching, "Code800BA940.c"),
-            Object(NonMatching, "VecMath.c"),
+            Object(Matching, "VecMath.c"),
             Object(NonMatching, "SitDevFile.c"),
             Object(NonMatching, "GoGolfCam.c"),
             Object(NonMatching, "CamSpline.c"),
