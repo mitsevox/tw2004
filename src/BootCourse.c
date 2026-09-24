@@ -33,10 +33,10 @@ void fn_80099ED8(void) {
     gSession.nPaused = 0;
     gSession.nNumPlayers = 2;
     fn_800E0B38(0);
-    gSession.aProfile[0].n0 = 0;
     gSession.nController[0] = 9;
     gSession.nGolfer[0] = lbl_80183AB8[lbl_80281F90];
     gSession.nTeeSet[0] = 2;
+    gSession.aProfile[0].n0 = 0;
     gSession.nController[1] = 9;
     gSession.nGolfer[1] = lbl_80183AC8[lbl_80281F90];
     gSession.nTeeSet[1] = 2;
