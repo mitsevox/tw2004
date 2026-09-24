@@ -29,7 +29,7 @@ typedef struct RainPoint {
     f32 vPos[3];                // 0x00
     u8  aColor[4];              // 0x0C  the drops' colour array; drawn when [3] or a10[3] is set
     u8  a10[4];                 // 0x10
-    u8  pad14[4];               // 0x14
+    f32 f14;                    // 0x14  how far the drops have fallen: 40 a second, wrapping at 25
 } RainPoint;
 LAYOUT_ASSERT(RainPoint, 0x18);
 
