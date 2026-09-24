@@ -9,6 +9,17 @@
 #include "charstate.h"
 #include "golfer.h"
 
+// The byte-swap layouts of the records CharSlider_CreateDefinitionsFromMem reads.
+SwapField lbl_80193B70[5] = { { 8, -8 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };   // CharSliderBone
+SwapField lbl_80193B98[4] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };   // CharSliderRange of bones
+SwapField lbl_80193BB8[3] = { { 8, 8 }, { 4, 4 }, { 4, 4 } };             // CharSliderMorph
+SwapField lbl_80193BD0[4] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };   // CharSliderRange of morph targets
+SwapField lbl_80193BF0[6] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };  // CharSliderLink
+SwapField lbl_80193C20[2] = { { 4, 4 }, { 4, 4 } };                         // CharSliderLimit
+SwapField lbl_80193C30[10] = { { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 },
+                               { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 }, { 4, 4 } };   // CharSliderDef
+SwapField lbl_80281788[1] = { { 8, 8 } };                                   // a morph target id (u64)
+
 // Free slider definitions made by CharSlider_CreateDefinitionsFromMem.
 void fn_8010D454(CharSliderDefs* pDefs) {
     int i;
