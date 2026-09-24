@@ -5,6 +5,9 @@ tell exactly which names and comments are still the audited ones and which chang
     python tools/match/auditbaseline.py --write <draft list> <tag>
         (once, at an audit milestone) write config/GW4E69/audit_baseline.tsv from the current tree;
         <draft list> = a file whose lines start with the addresses audited from non-exact draft C
+    python tools/match/auditbaseline.py --rehash
+        only when this script's fingerprint method changes: recompute the hashes from the source at
+        the baseline tag (what was audited stays the same)
 Classes:
   audited        passed the audit; name, comments and code unchanged since the baseline
   draft          passed the audit, but the audit read our non-exact draft C: re-check its comments
@@ -50,10 +53,17 @@ def mask(t):
     return comments, ''.join(code)
 
 
-def definitions(path):
+def line_end(code, i):
+    """After a top-level ';' or '}' at i: the end of its line when the rest of the line is blank
+    (a trailing comment there belongs to that item, not to the next one), else i + 1."""
+    j = code.find('\n', i + 1)
+    j = len(code) if j < 0 else j
+    return j if not code[i + 1:j].strip() else i + 1
+
+
+def definitions(t):
     """name -> [(start, end)] spans of each top-level function definition, where start is just after
     the previous top-level item (so the comment above the function belongs to it); plus the source."""
-    t = path.read_text(encoding='utf-8', errors='replace')
     comments, code = mask(t)
     out, depth, prev, head = {}, 0, 0, 0
     i, n = 0, len(code)
@@ -76,11 +86,12 @@ def definitions(path):
                 hdr = code[prev:head]
                 m = (re.search(r'\b([A-Za-z_]\w*)\s*\([^;{}]*\)\s*$', hdr) or    # T name(args)
                      re.search(r'\(\s*\*\s*([A-Za-z_]\w*)\s*\([^;{}]*\)\s*\)\s*[\[(][^;{}]*[\])]\s*$', hdr))  # T (*name(args))[4]
+                end = line_end(code, i)
                 if m and not re.search(r'=\s*$', hdr) and not re.search(r'\b(struct|union|enum)\b[^()]*$', hdr[:m.start()]):
-                    out.setdefault(m.group(1), []).append((prev, i + 1))
-                prev = i + 1
+                    out.setdefault(m.group(1), []).append((prev, end))
+                prev = end
         elif c == ';' and depth == 0:
-            prev = i + 1
+            prev = line_end(code, i)
         i += 1
     return out, t, comments, code
 
@@ -89,8 +100,14 @@ def sha(parts):
     return hashlib.sha1('\n'.join(parts).encode('utf-8')).hexdigest()[:12]
 
 
-def fingerprint():
-    """Current state: {('fn', address): row, ('file', path): row} for every game function and file."""
+def worktree(rel):
+    return (ROOT / rel).read_text(encoding='utf-8', errors='replace')
+
+
+def fingerprint(read=worktree):
+    """{('fn', address): row, ('file', path): row} for every game function and file, from the source
+    text read(path) gives (default: the working tree). The comments outside functions are hashed as
+    a sorted set: moving a global's declaration with its comment is not a change."""
     rep = json.loads((ROOT / 'build/GW4E69/report.json').read_text())
     rows = {}
     game = [u for u in rep['units'] if 'game' in u.get('metadata', {}).get('progress_categories', [])]
@@ -101,9 +118,8 @@ def fingerprint():
         md = u.get('metadata', {})
         if 'game' not in md.get('progress_categories', []) or not md.get('source_path'):
             continue
-        p = ROOT / md['source_path']
-        defs, t, comments, code = definitions(p)
-        rel = p.relative_to(ROOT).as_posix()
+        rel = md['source_path'].replace('\\', '/')
+        defs, t, comments, code = definitions(read(rel))
         owned = set()
         for f in u.get('functions', []):
             a = int(f.get('metadata', {}).get('virtual_address', 0))
@@ -116,7 +132,7 @@ def fingerprint():
                                         'comments_sha': sha(cm) if spans else 'missing', 'code_sha': sha(body) if spans else 'missing'}
         rest = [txt.strip() for o, txt in comments if o not in owned]
         rows[('file', rel)] = {'kind': 'file', 'address': '-', 'unit': u['name'].split('/', 1)[1], 'file': rel,
-                               'name': '-', 'comments': str(len(rest)), 'comments_sha': sha(rest), 'code_sha': '-'}
+                               'name': '-', 'comments': str(len(rest)), 'comments_sha': sha(sorted(rest)), 'code_sha': '-'}
     return rows
 
 
@@ -148,7 +164,7 @@ def load_base():
 
 def write(draft_file, tag):
     draft = {m.group(1).upper() for m in re.finditer(r'^([0-9A-Fa-f]{8})\b', pathlib.Path(draft_file).read_text(encoding='utf-8'), re.M)}
-    led, cur = ledger(), fingerprint()
+    led, cur = ledger(), fingerprint(worktree)
     missing = [k[1] for k in cur if k[0] == 'fn' and k[1] not in led]
     if missing:
         sys.exit('not every game function is audited (%d missing, e.g. %s): no baseline' % (len(missing), missing[:5]))
@@ -178,6 +194,27 @@ def write(draft_file, tag):
           sum(1 for r in fns if r['address'] in draft), sum(1 for k in cur if k[0] == 'file')))
 
 
+def rehash():
+    """The fingerprint method changed: recompute every hash from the source AT THE BASELINE TAG (git
+    show), keeping audited_on, tier and decision. What was audited does not change, only how it is hashed."""
+    import subprocess
+    tag, base = load_base()
+    at_tag = lambda rel: subprocess.run(['git', 'show', '%s:%s' % (tag, rel)], cwd=ROOT, capture_output=True,
+                                        check=True).stdout.decode('utf-8', errors='replace')
+    cur = fingerprint(at_tag)
+    lost = [k for k in base if k not in cur or cur[k]['name'] != base[k]['name']]
+    if lost:
+        sys.exit('%d baseline rows have no function of that name at the tag, e.g. %s' % (len(lost), lost[:5]))
+    head = [l for l in BASE.read_text(encoding='utf-8').splitlines() if l.startswith('#') or l.startswith('kind\t')]
+    lines = list(head)
+    for k in sorted(base, key=lambda k: (k[0] != 'file', base[k]['file'], k[1])):
+        r = dict(base[k])
+        r.update({c: cur[k][c] for c in ('comments', 'comments_sha', 'code_sha')})
+        lines.append('\t'.join(r[c] for c in COLS))
+    BASE.write_text('\n'.join(lines) + '\n', encoding='utf-8', newline='\n')
+    print('rehashed %d rows from tag %s' % (len(base), tag))
+
+
 def classify():
     tag, base = load_base()
     cur = fingerprint()
@@ -191,7 +228,8 @@ def classify():
         if b['audited_on'] == 'draft' and why == ['code']:
             out.append(('draft', r, 'audited from draft C; the code changed since (matching)'))
         elif why:
-            out.append(('changed', r, ', '.join(why) + ' changed (was %s)' % b['name'] if 'name' in why else ', '.join(why) + ' changed'))
+            out.append(('changed', r, ', '.join(why) + ' changed' + (' (was %s)' % b['name'] if 'name' in why else '')
+                        + ('; audited from draft C' if b['audited_on'] == 'draft' else '')))
         elif b['audited_on'] == 'draft':
             out.append(('draft', r, 'audited from draft C'))
         else:
@@ -206,6 +244,8 @@ def main():
     if '--write' in sys.argv:
         i = sys.argv.index('--write')
         return write(sys.argv[i + 1], sys.argv[i + 2])
+    if '--rehash' in sys.argv:
+        return rehash()
     tag, out = classify()
     if '--list' in sys.argv:
         want = sys.argv[sys.argv.index('--list') + 1]
