@@ -788,6 +788,54 @@ void fn_80016C44(f32* pViewport) {
     GXSetViewport(pViewport[0], pViewport[1], pViewport[2], pViewport[3], pViewport[4], pViewport[5]);
 }
 
+// Draw primitive 0xA1: each pair of vertices gives the opposite corners of a rectangle (x from
+// one, y from the other), drawn as a 4-vertex strip (0x98). Colours and texture coordinates are
+// spread over the corners the same way.
+void fn_800162AC(f32* pPos, f32* pColour, f32* pUV, int nVerts) {
+    f32 aPos[4][4];
+    f32 aColour[4][4];
+    f32 aUV[4][4];
+    f32* pQuadColour;
+    f32* pQuadUV;
+    f32 fX0;
+    f32 fX1;
+    int i;
+
+    for (i = 0; i < nVerts - 1; i += 2) {
+        fX0 = pPos[i * 4];
+        fX1 = pPos[i * 4 + 4];
+        Vec_Copy(&pPos[i * 4], aPos[0]);
+        Vec_Copy(&pPos[i * 4], aPos[1]);
+        aPos[1][0] = fX1;
+        Vec_Copy(&pPos[(i + 1) * 4], aPos[2]);
+        aPos[2][0] = fX0;
+        Vec_Copy(&pPos[(i + 1) * 4], aPos[3]);
+        if (pColour != NULL) {
+            Vec_Copy(&pColour[i * 4], aColour[0]);
+            Vec_Copy(&pColour[i * 4], aColour[1]);
+            Vec_Copy(&pColour[(i + 1) * 4], aColour[2]);
+            Vec_Copy(&pColour[(i + 1) * 4], aColour[3]);
+            pQuadColour = aColour[0];
+        } else {
+            pQuadColour = NULL;
+        }
+        if (pUV != NULL) {
+            fX0 = pUV[i * 4];
+            fX1 = pUV[i * 4 + 4];
+            Vec_Copy(&pUV[i * 4], aUV[0]);
+            Vec_Copy(&pUV[i * 4], aUV[1]);
+            aUV[1][0] = fX1;
+            Vec_Copy(&pUV[(i + 1) * 4], aUV[2]);
+            aUV[2][0] = fX0;
+            Vec_Copy(&pUV[(i + 1) * 4], aUV[3]);
+            pQuadUV = aUV[0];
+        } else {
+            pQuadUV = NULL;
+        }
+        fn_8001644C(0x98, aPos[0], pQuadColour, pQuadUV, 4);
+    }
+}
+
 // Draw nVerts vertices as primitive ePrim in the view (0xA1 goes through fn_800162AC). Each
 // vertex takes four floats of pPos, and of pColour and pUV when given; without pColour the view's
 // colour is used. Unless the view's nD0 is set, its viewport and matrices are used for the draw
