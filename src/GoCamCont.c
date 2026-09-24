@@ -4,11 +4,14 @@
 
 #include "golfer.h"
 #include "camera.h"
+#include "unsorted/cull.h"
 
 u8   fn_800C72DC(View* pView);
 u8   fn_80063608(int nPlayer, f32* pPos, f32 fMargin);
 u8   fn_800637C4(int nPlayer, int nView);
 void fn_800642A4(View* pView, f32 fF0, f32 fF4);
+void fn_80064478(f32* pA, f32* pB, f32* pOut);
+void fn_800090E4(f32* pQuat, f32* pIn, f32* pOut);      // Quaternion.c: a vector turned by it
 
 // Sets a view up: no camera (25), no shots, the script cleared.
 void fn_80062E40(View* pView) {
@@ -229,6 +232,62 @@ void fn_800642D0(View* pView, int nPlayer) {
 
     CameraScript_InterpToNewScript(&pView->script, pView->script.pShot, nPlayer, pPos, fn_80017314(pView), 5,
                                    0.0f, 100.0f, 25, 0.0f);
+}
+
+// The view's v20: the side vector of its flat look direction, turned about that direction by the
+// current shot's fA8 (0 without a shot).
+void fn_80064108(View* pView) {
+    f32 vDir[4];
+    f32 vUp[4] = {0.0f, 1.0f, 0.0f, 0.0f};
+    f32 vSide[4];
+    f32 qTurn[4];
+
+    fn_80064478(pView->v10, pView->v0, vDir);
+    vDir[1] = 0.0f;
+    if (vDir[0] == 0.0f && vDir[2] == 0.0f) {
+        vDir[0] = 0.01f;
+    }
+    if (vDir[0] != 0.0f || vDir[1] != 0.0f || vDir[2] != 0.0f) {
+        fn_800BAF04(vDir, vDir);
+    }
+    vec4flt_CrossProduct(vUp, vDir, vSide);
+    if (pView->script.pShot == NULL) {
+        pView->script.fA8 = 0.0f;
+    }
+    fn_8001EF34(vDir, pView->script.fA8, vDir);
+    fn_8000923C(vDir, qTurn);
+    vSide[3] = 0.0f;
+    fn_800090E4(qTurn, vSide, pView->v20);
+}
+
+// Puts the point pPos through the camera onto the screen: pX and pY from 0 to 1 across it, pZ its
+// depth. 0 when the point is behind the camera.
+u8 fn_8006434C(void* pCamera, f32* pPos, f32* pX, f32* pY, f32* pZ) {
+    f32 v[4];
+    u8 bInFront = 1;
+
+    pPos[3] = 1.0f;
+    fn_800BAD60(((Camera*)pCamera)->mDC, (Vec4*)pPos, (Vec4*)v);
+    if (v[3] >= 0.0f) {
+        bInFront = 0;
+    }
+    if (v[3] < -0.0001f || v[3] > 0.0001f) {
+        fn_8000AE28(v, 1.0f / v[3], v);
+    } else if (v[3] < 0.0f) {
+        fn_8000AE28(v, -10000.0f, v);
+    } else {
+        fn_8000AE28(v, 10000.0f, v);
+    }
+    if (pX != NULL) {
+        *pX = 0.5f * (1.0f + v[0]);
+    }
+    if (pY != NULL) {
+        *pY = 0.5f * (1.0f + v[1]);
+    }
+    if (pZ != NULL) {
+        *pZ = v[2];
+    }
+    return bInFront;
 }
 
 // a - b into out, three floats; the same helper as Ball.c's fn_80055EA0.
