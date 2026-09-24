@@ -855,7 +855,8 @@ void fn_800736D8(SKABlendNode* pNode, s32 nBit) {
     }
     for (i = 0; i < 2; i++) {
         pChild = pNode->u.blend.apChild[i];
-        if (pChild != NULL) {
+        // fake match: the null test reads the array again (a test of pChild takes other registers)
+        if (pNode->u.blend.apChild[i] != NULL) {
             if (pChild->nType == 1) {
                 fn_800736D8(pChild, nBit);
             } else if (pChild->nType == 0 && pNode->nFormat == 1) {
