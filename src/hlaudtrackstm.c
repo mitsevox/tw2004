@@ -41,8 +41,8 @@ u8 fn_800AB3A4(AudTrack* pTrack) {
 // Starts the voices on what is in their ARAM buffers.
 void fn_800AB428(AudTrack* pTrack) {
     AudPlayList* pList;
+    u8 bLoud;
     u8 i;
-    int bLoud;
 
     pList = pTrack->pTmpl->data.pPlayList;
     fn_800A85FC(pTrack->f44, fn_800AA44C(pList->n3));
@@ -146,11 +146,11 @@ void fn_800AB72C(AudTrack* pTrack, void (*pfnDone)(u32 bLast), u32 uStep, u8 bSk
     while (i < (nChannels = pList->nChannels)) {
         pVoice = pTrack->apVoices[i];
         if ((!bSkipEmpty || pVoice != NULL) && pVoice != NULL) {
-            uAram = pVoice->uAram + pVoice->bHalf * 0x7F00;
-            fn_800B0268(pVoice->nHwVoice, (StreamChunk*)pSrc, 0x8000, pVoice->bHalf);
+            uAram = pVoice->uAram + pVoice->flags.b.bHalf * 0x7F00;
+            fn_800B0268(pVoice->nHwVoice, (StreamChunk*)pSrc, 0x8000, pVoice->flags.b.bHalf);
             fn_800B044C(uAram, pSrc + 0x100, 0x7F00, pfnDone, i == nChannels - 1);
             pSrc += uStep;
-            pVoice->bHalf = !pVoice->bHalf;
+            pVoice->flags.b.bHalf = !pVoice->flags.b.bHalf;
         }
         i++;
     }
@@ -340,8 +340,8 @@ u8 Stm_Tick(AudTrack* pTrack) {
     if (DVDGetDriveStatus() == 0) {
         ppVoice = pTrack->apVoices;
         for (i = 0; i < pList->nChannels; i++, ppVoice++) {
-            if (*ppVoice != NULL && (*ppVoice)->bB_6) {
-                (*ppVoice)->bB_6 = 0;
+            if (*ppVoice != NULL && (*ppVoice)->flags.b.bB_6) {
+                (*ppVoice)->flags.b.bB_6 = 0;
                 fn_800ACA5C(*ppVoice, 0);
             }
         }

@@ -310,7 +310,7 @@ typedef struct Skin {
     struct HwsMemBlock* p1090;  // 0x1090  freed by fn_80037708
     u8   unk1094[0x1098 - 0x1094];
     struct HwsMemBlock* a1098[2];   // 0x1098  indexed like a10A0 (fn_8011CB5C)
-    void* a10A0[2];             // 0x10A0  indexed by fn_800CE02C's argument; Skin.c sets [0]
+    struct HwsOverrideTable* a10A0[2];  // 0x10A0  indexed by fn_800CE02C's argument; Skin.c sets [0]
     SkinChoice* aParts[4];      // 0x10A8  a choice per part, four copies (fn_800CEE04 copies one
                                 //         over another); [3] is set while lbl_80282238 is clear
     SkinChoice* aSets[4];       // 0x10B8  the same per SkinDesc.p74 set
@@ -651,7 +651,11 @@ void  fn_800CEBE8(Skin** apSkins, int nSkins, struct DynTex* pTex, u64* aIds, in
 void  fn_800CECE0(Skin* pSkin, int nSet, int nVariant, int nOption, struct DynTex* pTex);
 u8    fn_800CEE90(void);
 
-// SkinPart.c, as SkinBurn.c uses it: the mesh iterator and an entry's copy.
+// SkinPart.c, as SkinBurn.c uses it: the part count, a part's variant and option, the mesh
+// iterator and an entry's copy.
+s32   fn_800CCA40(Skin* pSkin);
+s32   fn_800CCD30(Skin* pSkin, int nPart, int nCopy);
+s32   fn_800CCD84(Skin* pSkin, int nPart, int nCopy);
 void  fn_800CD9EC(Skin* pSkin);
 s32   fn_800CE224(Skin* pSkin, SkinDesc14* pEntry, u8** ppOut, s32* pnOut, int nCopy);
 u8    fn_800CEEC0(SkinIter* pIter);
@@ -674,6 +678,8 @@ void  fn_800CE168(void);
 
 // SkinMorph.c: the morph targets a skin description needs.
 s32   fn_8011C850(SkinDesc* pDesc);
+void  fn_8011CADC(Skin* pSkin, int nMorph, f32 fWeight);
+void  fn_8011CC40(Skin* pSkin, HwsMemBlock** ppBlock, HwsOverrideTable** ppTable);
 void  fn_8011CD84(Skin* pSkin);
 void  fn_8011CD3C(Skin* pSkin, HwsMemBlock* pBlock, HwsOverrideTable* pTable);
 
@@ -686,7 +692,13 @@ void* fn_80112A80(HwsMemBlock* pBlock, HwsOverrideTable* pTable, int i, u8 bKeep
 
 // hwsBurn.c: pfn is called with pSkin on each SkinDesc.p14 entry the burn copies; fn_80111EB0
 // makes the burnt skin's description.
+HwsBurn* fn_801104AC(SkinDesc* pDesc);
+void  fn_801108B0(HwsBurn* pBurn);
 void  fn_801109F0(HwsBurn* pBurn, void (*pfn)(Skin* pSkin, SkinDesc14* pEntry), Skin* pSkin);
+void  fn_801109FC(HwsBurn* pBurn, int nPart, s32 nVariant);
+void  fn_80110A0C(HwsBurn* pBurn, int nPart, s32 nOption);
+void  fn_80110A1C(HwsBurn* pBurn, HwsOverrideTable* pOverride);
+void  fn_80110A24(HwsBurn* pBurn, int n);
 SkinDesc* fn_80111EB0(HwsBurn* pBurn);
 
 // SkinBurn.c: burns a skin (aParts and aList each end with -1).

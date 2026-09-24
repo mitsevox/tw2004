@@ -145,8 +145,8 @@ void fn_8016A830(UIStudio* pStudio, s32 nOp, UISScreen* pScreen, u32 nNode) {
 void fn_8016ABBC(UIStudio* pStudio, UISScreen* pScreen, s32 n, s32 nKind, void* p, u8 bAll) {
     u32 i;
 
-    if (pStudio == NULL || pScreen == NULL) return;
-    if (p == NULL) return;
+    if (pStudio == NULL) return;
+    if (pScreen == NULL || p == NULL) return;
     switch (nKind) {
     case 8: {
         UISNode* pNode = p;
@@ -377,7 +377,7 @@ void fn_8016B4D4(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 nMove) {
 }
 
 // Whether one of pNode's groups links to the node pInfo belongs to.
-static inline s32 UIS_NodeLinks(UISScreenFile* pData, UISNode* pNode, UISNodeInfo* pInfo) {
+static inline u8 UIS_NodeLinks(UISScreenFile* pData, UISNode* pNode, UISNodeInfo* pInfo) {
     u32 i;
     u32 j;
 
@@ -601,7 +601,7 @@ s32 fn_8016B844(char* pOut, s32 nSize, const char* szFormat, s32 nArgs, const UI
 char* fn_8016BEDC(char* pOut, char* pEnd, s32 nWidth, s32 nPrec, f32 f) {
     char aDigits[64];
     s32 nDigits;
-    u8 bNeg;
+    s32 bNeg;
     f32 fRound;
     s32 i;
     f32 fFrac;
@@ -618,7 +618,7 @@ char* fn_8016BEDC(char* pOut, char* pEnd, s32 nWidth, s32 nPrec, f32 f) {
     }
     fRound = 0.5f;
     for (i = 0; i < nPrec; i++) {
-        fRound *= 0.1f;
+        fRound = 0.1f * fRound;
     }
     f += fRound;
     fFrac = f - (s32)f;

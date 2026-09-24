@@ -19,12 +19,9 @@ int   fn_8001005C(TexBank* pBank, u64 uHash);   // LLTex.c: the texture's index,
 void  fn_800CC588(Character* pChar, int nPart, int nVariant);
 void  fn_800CCA1C(void);
 void  fn_800CCA3C(void);
-s32   fn_800CCA40(Skin* pSkin);
 s32   fn_800CCA70(Skin* pSkin, int nPart);
 s32   fn_800CCAC0(Skin* pSkin, int nPart, int nVariant);
 void  fn_800CCC1C(Skin* pSkin, int nPart, int nOption);
-s32   fn_800CCD30(Skin* pSkin, int nPart, int nCopy);
-s32   fn_800CCD84(Skin* pSkin, int nPart, int nCopy);
 u64   fn_800CCE24(Skin* pSkin, int nPart, int nVariant);
 s32   fn_800CCEA0(Skin* pSkin);
 s32   fn_800CCED0(Skin* pSkin, int nSet);

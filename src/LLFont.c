@@ -584,17 +584,17 @@ int fn_80011D0C(LLFont* pFont, UFontContext* pCtx, u8 bDraw, char* sz) {
     char* p;
     char* pBreak;
     int nLines;
-    char c;
     char* pCut;
     char cSaved;
+    char c;
     int n;
 
     if (pCtx->a8C[2] <= 0.0f || pCtx->a8C[3] <= 0.0f) {
         return 0;
     }
     nLines = 0;
-    pCtx->f70 = pCtx->a8C[2] * pCtx->f70 + pCtx->a8C[0];
     fLine = pCtx->fB4 * (pFont->f00 * pCtx->f80);
+    pCtx->f70 = pCtx->a8C[2] * pCtx->f70 + pCtx->a8C[0];
     pCtx->f74 = pCtx->a8C[3] * pCtx->f74 + pCtx->a8C[1];
     if (sz == NULL) {
         pLine = pCtx->szText;
@@ -687,7 +687,10 @@ int fn_80011D0C(LLFont* pFont, UFontContext* pCtx, u8 bDraw, char* sz) {
                 if (bDraw && pCtx->f74 + fLine > pCtx->a8C[1] + pCtx->a8C[3]) {
                     return nLines;
                 }
-                for (; *pBreak != '\0' && (*pBreak == ' ' || *pBreak == '\n'); pBreak++) {
+                for (; *pBreak != '\0'; pBreak++) {
+                    if (*pBreak != ' ' && *pBreak != '\n') {
+                        break;
+                    }
                 }
                 pLine = pBreak;
                 p = pBreak - 1;

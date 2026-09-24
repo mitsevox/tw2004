@@ -24,7 +24,6 @@ s32   fn_800CD700(Skin* pSkin);                // SkinPart.c
 void  fn_800CE164(void);                       // SkinPart.c
 void  fn_800CDA68(Skin* pSkin);                // SkinPart.c
 void  fn_8011C9B0(Skin* pSkin);                // SkinMorph.c
-void  fn_8011CADC(Skin* pSkin, int nMorph, f32 fWeight);     // SkinMorph.c
 s32   fn_8011CDE8(Skin* pSkin);                // SkinMorph.c
 void  fn_8011CE58(Skin* pSkin);                // SkinMorph.c
 HwsMemBlock* fn_801128C8(SkinDesc* pDesc, s32 nSize);         // hwsOverride_Gc.c
@@ -32,7 +31,6 @@ HwsOverrideTable* fn_80112A10(SkinDesc* pDesc, s32 nMeshes);  // hwsOverride_Gc.
 void  fn_80112B18(HwsOverrideTable* pTable, int i, void* p);   // hwsOverride_Gc.c
 
 u8    fn_8001EC48(Character* pChar);           // char.c
-s32   fn_800CCA40(Skin* pSkin);                // SkinPart.c: how many parts
 void  fn_80035810(Character* pChar);
 void  fn_80035D10(Character* pChar, int nView);
 void  fn_80035F40(void* pCamera);
