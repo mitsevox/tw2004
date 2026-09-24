@@ -482,7 +482,7 @@ LAYOUT_ASSERT(AnimPlayerEntry, 0x18);
 // fields are named in Character directly, and anim29C.
 typedef struct AnimPlayer {
     s32   n00;                  // 0x00  } reset to 0 and -1 by fn_8001BE88
-    s32   uFlags;               // 0x04  fn_8007325C sets bit 2, fn_8007326C clears bits 1 and 2
+    s32   uFlags;               // 0x04  fn_8007325C sets bit 2, SKATime_UnPause clears bits 1 and 2
     s32   n08;                  // 0x08  }
     s32   nC;                   // 0x0C  } set together by fn_800958EC
     f32   f10;                  // 0x10  }
@@ -493,10 +493,10 @@ typedef struct AnimPlayer {
     f32   f24;                  // 0x24  } fn_800737B4: with uFlags bit 3, f28 climbs to f24; with
     f32   f28;                  // 0x28  } bit 4, it falls to f2C (at 0 bit 4 gives way to bit 0),
     f32   f2C;                  // 0x2C  } and the step is scaled by f28 / f24 on the way
-    f32   f30;                  // 0x30  with uFlags bit 7, fn_80072ED8 counts it down to 0, then
+    f32   f30;                  // 0x30  with uFlags bit 7, SKATime_Update counts it down to 0, then
                                 //       clears bits 0 and 7
-    f32   f34;                  // 0x34  fn_80073108: a clock that drives a sway of three cosines
-    f32   f38;                  // 0x38  fn_80073108: the time the sway is centred on
+    f32   f34;                  // 0x34  SKATime_Idle: a clock that drives a sway of three cosines
+    f32   f38;                  // 0x38  SKATime_Idle: the time the sway is centred on
     s32   n3C;                  // 0x3C  } cleared by fn_80072D90
     s32   n40;                  // 0x40  }
     struct AnimPlayerEntry* p44;    // 0x44  a48[0] after fn_80072D90
@@ -530,7 +530,7 @@ extern CharModelDefs lbl_80280E18;
 extern f32 lbl_80187184[6][3];
 
 // The golfer's character object (0x1798 bytes or more); only the fields read so far. Anim_SetRate,
-// Anim_SetTime and fn_8007326C take the address of its animation player at 0x164, whose fields
+// Anim_SetTime and SKATime_UnPause take the address of its animation player at 0x164, whose fields
 // from 0x168 on are named here directly.
 typedef struct Character {
     s32   nIndex;               // 0x000  its entry in lbl_801B9624 (fn_8001C21C)
@@ -819,9 +819,9 @@ int   fn_80048574(Character* pChar, u64 uEvent);    // the character's animation
 u8    fn_8009637C(Character* pChar);    // CharAnim.c: n26 is not 1 (both callers mask the result)
 void  fn_80072ACC(SKABlendNode* pNode, CharModel* pModel, f32 fTime);
 f32   fn_80072CB8(SKABlendNode* pNode, u64 uEvent); // an event's time in a blend tree
-void  fn_80072ED8(AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT);    // advance a player
-void  fn_80073108(Character* pChar, int nPlayer, AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT);
-void  fn_8007326C(u8* pAnim);
+void  SKATime_Update(AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT);    // advance a player
+void  SKATime_Idle(Character* pChar, int nPlayer, AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT);
+void  SKATime_UnPause(u8* pAnim);
 void  Anim_SetTime(u8* pAnim, f32 fTime);           // 0x8007327C
 u8    fn_800734A0(SKABlendNode* pNode);
 void  fn_80095744(Character* pChar, int nAnim);     // play an animation

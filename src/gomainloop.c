@@ -146,7 +146,7 @@ void StaticCam_DeInit(void);
 void fn_80065B44(void);
 void fn_80067608(void);
 void fn_8006765C(void);
-void fn_80067B80(void);
+void TARGET_Init(void);
 void fn_80067CD4(int nPlayer);
 void SitDev_ProcessEventQueue(void);
 void FB_vInitModule(void);
@@ -634,7 +634,7 @@ void GO_vInitIG(void) {
     fn_8001462C();
     fn_800145E0();
     fn_80045660();
-    fn_80067B80();
+    TARGET_Init();
     AI_TargetsInit();
     UI_Obj_InitModule();
     fn_80016CB8();

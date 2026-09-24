@@ -947,7 +947,7 @@ void GM_CheckForShotChanges(int nPlayer) {
         EVENT_Trigger(nPlayer, 0x15, 0, -1);
         bChanged = 1;
     }
-    if (fn_80068AC8(nPlayer)) {
+    if (TARGET_UpdateMomentums(nPlayer)) {
         bChanged = 1;
     }
     if (bChanged) {

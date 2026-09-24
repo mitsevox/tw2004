@@ -2464,7 +2464,7 @@ void fn_8007E194(MsgArg* pArgs, MsgArg* pResult) {
 void fn_8007E200(MsgArg* pArgs, MsgArg* pResult) {
 }
 
-// Whether club pArgs[1] is in player pArgs[0]'s golfer's bag; the player's bag starts as the
+// Whether club pArgs[1] is in player pArgs[0]'s golfer's bag; the player's bag is also set to the
 // golfer's.
 void fn_8007E204(MsgArg* pArgs, MsgArg* pResult) {
     GolferRecord* pRecord = fn_80077A80(gSession.nGolfer[pArgs[0].i]);

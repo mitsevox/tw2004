@@ -3113,7 +3113,7 @@ void fn_800C4FF0(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
 
 // The matrix camera's tick (the ball-flight camera runs it while fn_800C6D28): the screen effect
 // fn_80038054 (the tuning's f64); with no next shot, clear b54 (a freeze-time flag:
-// GolfCamera_IsFreezeTimeActive tests it), release the golfer's animation (fn_8007326C) and queue
+// GolfCamera_IsFreezeTimeActive tests it), release the golfer's animation (SKATime_UnPause) and queue
 // the shot from before (the current shot's p44) as a hand-made shot. Returns the time to run the
 // script by: with the tuning's f60 set, f60 once every f60 seconds and 0 in between, else one
 // frame (FRAME_TIME); 0 while paused.
@@ -3125,7 +3125,7 @@ f32 fn_800C54FC(View* pView, f32* pCam, f32* pSub, int nPlayer) {
     }
     if (pView->script.pNextShot == NULL) {
         lbl_80282220->b54 = 0;
-        fn_8007326C(gPlayers[nPlayer].pChar->anim);
+        SKATime_UnPause(gPlayers[nPlayer].pChar->anim);
         EVENT_Trigger(nPlayer, 0x33, NULL, -1);
         EVENT_Trigger(nPlayer, 0x3B, NULL, 1);
         pShot = pView->script.pShot->p44;
@@ -3246,7 +3246,7 @@ void fn_800C56B4(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
 
 // The super zoom's tick (the ball-flight camera runs it while GolfCamera_IsSuperZoomCamActive):
 // with no next shot and 0.05 s gone, clear b58 (a freeze-time flag: GolfCamera_IsFreezeTimeActive
-// tests it), release the golfer's animation (fn_8007326C) and queue the shot from before (the
+// tests it), release the golfer's animation (SKATime_UnPause) and queue the shot from before (the
 // current shot's p44) as a hand-made shot; while a next shot is pending, ease the two super-zoom
 // shots' lens (f78/f7C) from the tuning's f7C to f80. Returns one frame (FRAME_TIME), 0 paused.
 f32 fn_800C5A70(View* pView, f32* pCam, f32* pSub, int nPlayer) {
@@ -3261,7 +3261,7 @@ f32 fn_800C5A70(View* pView, f32* pCam, f32* pSub, int nPlayer) {
     }
     if (pView->script.pNextShot == NULL && pView->script.fCamTime > 0.05f) {
         lbl_80282220->b58 = 0;
-        fn_8007326C(gPlayers[nPlayer].pChar->anim);
+        SKATime_UnPause(gPlayers[nPlayer].pChar->anim);
         EVENT_Trigger(nPlayer, 0x3A, NULL, -1);
         EVENT_Trigger(nPlayer, 0x3B, NULL, 1);
         if (pView->script.pShot != NULL) {

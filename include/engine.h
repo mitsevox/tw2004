@@ -1396,7 +1396,7 @@ typedef void (*EventHandler)(int nPlayer, int nEvent, void* pData, int nArg);   
 void EVENT_Trigger(int nPlayer, int nEvent, void* pData, int b);   // through the event table at
                                         // lbl_80188628; pData: the ball, a position, or NULL
 void TARGET_SetupTarget(int nPlayer);
-u8   fn_80068AC8(int nPlayer);
+u8   TARGET_UpdateMomentums(int nPlayer);
 void PlaceBall_Set(int nPlayer, f32* pPos);
 u8   PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed);   // 0 when the cursor was stopped
 void PlaceBall_SetupTarget(int nPlayer);

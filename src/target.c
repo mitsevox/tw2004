@@ -6,9 +6,9 @@
 #include "camera.h"
 #include "unsorted/cull.h"
 
-void fn_80067B80(void);
+void TARGET_Init(void);
 void fn_80067CD4(int nPlayer);
-void fn_80067DAC(int nPlayer);
+void TARGET_RenderBallTarget(int nPlayer);
 void TARGET_ResetMomentums(int nPlayer);
 void fn_800690C0(int nPlayer);
 void fn_80069104(int nPlayer);
@@ -19,7 +19,7 @@ void fn_80069A84(int nPlayer);
 void fn_80069AFC(int nPlayer);
 void fn_80069B74(int nPlayer);
 void fn_80069BEC(int nPlayer);
-void fn_80069CDC(int nPlayer);
+void PlaceBall_RenderBallTarget(int nPlayer);
 void fn_8006A7A8(u8* pChunk);
 void fn_8006A89C(void);
 void fn_8006A8B0(void);
@@ -28,8 +28,9 @@ void fn_8006A988(f32* pA, f32* pB, f32* pOut);
 f32  fn_8006A9FC(void);
 LLFont* fn_8006AA3C(void);
 
-// Set up at boot: the hole's chunk 3 loader, the marker textures and every player's marker.
-void fn_80067B80(void) {
+// Set up when play starts (GO_vInitIG): the hole's chunk 3 loader, the marker textures ("tball"
+// and "shadow") and the five players' marker settings.
+void TARGET_Init(void) {
     int i;
 
     Course_RegisterLoader(3, fn_8006A7A8);
@@ -61,14 +62,14 @@ void fn_80067CD4(int nPlayer) {
     int nState = GOLFERSTATE_GetCurrentState(nPlayer);
 
     if (fn_800E2EAC(nPlayer)) {
-        fn_80069CDC(nPlayer);
+        PlaceBall_RenderBallTarget(nPlayer);
         return;
     }
     if ((s8)nState != GS_WAIT && !Player_IsCPU(nPlayer) && !fn_800E415C() && !fn_800E5098()
         && ((u8)(nState - GS_SHOT_SETUP) <= GS_ELEVATOR - GS_SHOT_SETUP || (s8)nState == GS_KNEE_CAM
             || (s8)nState == GS_SWING || (s8)nState == GS_GREEN_MORPH)
         && gPlayers[nPlayer].swing.nState == 0) {
-        fn_80067DAC(nPlayer);
+        TARGET_RenderBallTarget(nPlayer);
     }
 }
 
@@ -77,10 +78,11 @@ void fn_800E5118(int a, int b, int nPlayer);                       // GameMessag
 void fn_800E5178(int nPlayer, f32 a, f32 b, f32 c, f32 d);          // GameMessages.c
 
 // The aim marker at the target, each frame while a human lines up a shot: a sign turned to face
-// the camera, bigger the further the camera is, and its shadow; with f8 set it cycles through
-// three heights (every 0.5 / f8 frames), drawn in three shades. Passes the target's screen
-// position, the lie's height difference and the shot's share of the club's range to the HUD.
-void fn_80067DAC(int nPlayer) {
+// the camera, bigger the further the camera is, and its shadow; with f8 set it is drawn three
+// times, stacked, in three shades that change places each time fC (from 0.5, less f8 a frame)
+// drops below 0.125. Passes the target's screen position, its height above the ball and the
+// shot's share of the club's range to the HUD (GameMessages.c).
+void TARGET_RenderBallTarget(int nPlayer) {
     f32   aMarker[4][4];
     f32   aShadow[4][4];
     f32   aMarkerQuad[4][3];
@@ -357,10 +359,11 @@ void TARGET_ResetMomentums(int nPlayer) {
 
 // A human moving the aim point with the stick: fA5C turns it about the ball (a degree a tick at
 // full stick, half that on a putt; slower the further the camera is from the ball), fA60 moves
-// it nearer or further along the aim. A move past the shot's range (closer than 0.3 or 5, further
-// than 180 feet on a putt, 30 on shot kind 2, else the longest usable club) is undone and fA60
-// parked at -1000 or 1000 until the stick is let go. Returns whether the aim point moved.
-u8 fn_80068AC8(int nPlayer) {
+// it nearer or further along the aim, re-picking the club (not on shot kind 2) and the power. A
+// move past the shot's range (closer than 0.3 or 5, further than 180 feet on a putt, 30 on shot
+// kind 2, else the longest usable club) is undone and fA60 parked at -1000 or 1000, where later
+// calls skip it. Returns 1 when either input was non-zero (an undone move too).
+u8 TARGET_UpdateMomentums(int nPlayer) {
     f32* pTarget;
     f32  vToCamera[4];
     f32  vSaved[4];
@@ -614,10 +617,10 @@ TNetwork* PlaceBall_GetPlaceBallNetwork(void) {
 }
 
 // Each frame while the ball is being placed: fA80 and fA84 (the cursor's push, -1..1) ease off
-// by 0.05 and move the placement point, slower on rough, sand or water (not in game mode 9);
-// fA7C turns the heading fA88. A spot outside the placement outline is retried turned 15, 30 ..
-// 90 degrees either way; with none inside, the cursor stops. Then flags whether the ball can be
-// placed there. Returns 0 only when the cursor was stopped.
+// by 0.05 and move the placement point, scaled by fSpeed and by the ground's surface class under
+// it (0.5 to 1.2; 1 in game mode 9); fA7C turns the heading fA88. A spot outside the placement
+// outline is retried turned 15, 30 .. 90 degrees either way; with none inside, the cursor stops.
+// Then flags whether the ball can be placed there. Returns 0 only when the cursor was stopped.
 u8 PlaceBall_UpdateMomentums(int nPlayer, f32 fSpeed) {
     SurfaceType* pSurface;
     f32          vPos[3];
@@ -853,11 +856,12 @@ void fn_80069C64(char* sz, f32 fX, f32 fY) {
 
 f32  fn_8001414C(u8* p);    // GoRenderCtx_Gc.c: of the screen rectangle
 
-// Each frame while the ball is being placed: the bobbing marker ball and its shadow at the
-// placement point, kept inside the camera's view, and the distances to the tee, the ball and the
-// hole below it (the text red when the ball can't go there). A mode whose pfn230 says so, with
-// nC3C's bit 0 set, is placing its ball rather than a tee: no text then.
-void fn_80069CDC(int nPlayer) {
+// Each frame while the ball is being placed (not while paused): the bobbing marker ball and its
+// shadow at the placement point, the marker kept inside the camera's view, and below it the
+// distances to the tee and the hole, in another colour when the spot is out of bounds or not a
+// valid drop. When the mode's pfn230 says so, only the marker is drawn, and only with nC3C's
+// bit 0 set.
+void PlaceBall_RenderBallTarget(int nPlayer) {
     char  szText[128];          // size unknown
     f32   aMarker[4][4];
     f32   aShadow[4][4];
@@ -1037,7 +1041,7 @@ void fn_80069CDC(int nPlayer) {
         aShadow[i][3] = 1.0f;
     }
 
-    // the bob: f4 runs between 0 and f18 at f0 a frame, and the shadow shrinks as it rises
+    // the bob: the marker sinks by f4 (0 to f18, f0 a frame); its shadow grows as it rises
     if (0.0f != lbl_801D5BF0[nPlayer].f0) {
         for (i = 0; i < 4; i++) {
             aMarker[i][1] -= lbl_801D5BF0[nPlayer].f4;

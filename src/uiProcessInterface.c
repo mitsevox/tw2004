@@ -1,6 +1,7 @@
-// uiProcessInterface.c (EA's name, from its asserts; also in EA's 2002 source tree): runs the menu
-// UI. Prepares the loaded UI file, passes the UI's commands to whichever part of the game is
-// running (start-up, the menus or a round), and formats numbers for it.
+// uiProcessInterface.c (EA's name, from its asserts; also in EA's 2002 source tree): runs the
+// UI (start-up, the menus and a round's screens). Prepares the loaded UI file, reads the
+// controllers for it, passes the UI's commands to whichever part of the game is running, fades
+// the screen out, and formats numbers for it.
 
 #include "golfer.h"
 #include "game.h"
@@ -157,11 +158,13 @@ void fn_8008F80C(s32 n, s32 b) {
 }
 
 // Read the controllers for the UI. The main stick works the D-pad in start-up, the menus and (when
-// fn_800E415C says so) game type 6. In a round, nothing happens while a camera is still moving.
-// Each plugged-in controller's buttons (the stick's directions folded into the D-pad bits) are
-// compared with last frame's; each newly pressed button sends its lbl_80189B58 event to the UI.
-// In the menus the UI switches between its lone-player and many-player forms (0x34, 0x2D) by
-// how many controllers are plugged in.
+// fn_800E415C says so) game type 6. In a round, nothing happens while a player's view runs a
+// scripted camera (fn_80063C90, or script camera 3) other than camera 0x15. Each plugged-in
+// controller's buttons (the stick's directions folded into the D-pad bits) are compared with last
+// frame's, a held button repeating every 9 frames; each newly pressed button sends its
+// lbl_80189B58 event to the UI (not during the fade or while a movie is queued). In the menus,
+// event 0x34 (which stops that input) is sent with fewer than two controllers in mode 0x1A, or in
+// mode 7 without CPU players; otherwise 0x2D while any is plugged in.
 void fn_8008F820(void) {
     f32 fOne;
     s32 aArgs[1];
@@ -303,8 +306,8 @@ void fn_8008FD60(u32 uEvent) {
     }
 }
 
-// Find the colour table among the UI file's tables (the one whose first entry is of kind 0x10)
-// and turn its entries' colour offsets into pointers; with none, p14 is NULL.
+// Find the UI file's table whose first entry is of kind 0x10 (the last, if several), keep it in
+// p14 and turn its entries' p8 offsets into pointers; with none, p14 is NULL.
 void fn_8008FDDC(FrontEnd* pFE) {
     uptr uBase = (uptr)pFE->pFile;
     UIColorTable* pTable;
@@ -332,8 +335,8 @@ void fn_8008FDDC(FrontEnd* pFE) {
 }
 
 // Resolve the UI file's entries by their names: kind 1 (except in game type 3) to the texture of
-// that name in the texture bank fn_8008FFF0 picks, kind 2 to the record of that name in pC (its
-// table noted in lbl_801D87C0.n3C).
+// that name in the texture bank fn_8008FFF0 picks (none for -1), kind 2 (with a name list in pC)
+// to the same name in that list (p8 cleared; the table's index noted in lbl_801D87C0.n3C).
 void fn_8008FE88(FrontEnd* pFE) {
     u32 k;
     UIColorTable* pTable;
@@ -383,8 +386,9 @@ int fn_8008FFF0(const char* szName) {
 }
 
 // Start the front end with the UI set szSet: take what uiLoadFile.c loaded, resolve the UI file,
-// set up the studio (the handlers for its nine element kinds and the game's callbacks), load the
-// file's "GlobalScript" screen and show the first screen (start-up passes it two zero words).
+// set up the studio (its handlers 0 to 8 and the game's callbacks), hand it the file's
+// "GlobalScript" screen if there is one and show the first screen (start-up passes it two zero
+// words).
 FrontEnd* fn_8009005C(char* szSet) {
     s32 aArgs[2];
     int i;
@@ -481,7 +485,8 @@ void fn_80090400(FrontEnd* pFE) {
     lbl_80281F1C = NULL;
 }
 
-// Resets the front end's screen state.
+// Resets the UI's controller state (all four controllers enabled); also calls fn_80092BA0,
+// fn_8008EC30 (nothing loaded), fn_800B9FF0 and fn_800E5708.
 void fn_800905A8(void) {
     s32 i;
 
@@ -519,9 +524,10 @@ void fn_80090664(void) {
     fn_800BA038();
 }
 
-// The fade to black before a movie: draw it, 0.05 darker each frame. Once it is black, unpause,
-// and in start-up (1) or the menus (3) shut the UI down (fn_8008FD60 sees lbl_80281F19); the menus
-// then leave for the mode's next step.
+// The fade to black (while lbl_801D87C0.b0 is set): draw it, 0.05 darker each frame. Once it is
+// black, unpause; start-up (1) shuts the UI down (fn_8008FD60 sees lbl_80281F19) and sets
+// gSession.b12, the menus (3) shut it down, start the demo when gSession.a8[0] is set and call
+// FE_Manager.c's function for mode 0x17, 0x18 or 4, and other game types set gSession.b12.
 void fn_8009069C(void) {
     f32 aColor[4];
 
@@ -596,7 +602,7 @@ void fn_80090898(void) {
     fn_8008FE88(lbl_80281F1C);
 }
 
-// The studio's handlers 1 to 6 (fn_8009005C): those element kinds take no messages.
+// The studio's handlers 1 to 6 (fn_8009005C): they do nothing.
 void fn_800908BC(void* pVar, s32 nMsg, s32 n2, s32* pn3, s32 n4) {
 }
 

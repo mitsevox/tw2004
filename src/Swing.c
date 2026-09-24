@@ -2814,7 +2814,7 @@ void STATEFUNC_KneeCamUpdate(int nPlayer) {
     } else {
         fn_800C60E8(fn_80017028(gPlayers[nPlayer].nView[0]), nPlayer);
     }
-    fn_80068AC8(nPlayer);
+    TARGET_UpdateMomentums(nPlayer);
 }
 
 // State 4: an aiming camera held while button 7 is down (the caddie keeps updating). Buttons
@@ -2846,7 +2846,7 @@ void STATEFUNC_ElevatorUpdate(int nPlayer) {
             }
         }
     }
-    fn_80068AC8(nPlayer);
+    TARGET_UpdateMomentums(nPlayer);
 }
 
 // State 2, a shot begins. A CPU takes camera 0 (with gpGame+0x290) or 12 and, with that flag,
@@ -3092,7 +3092,7 @@ void STATEFUNC_ZoomUpdate(int nPlayer) {
             }
         }
     }
-    fn_80068AC8(nPlayer);
+    TARGET_UpdateMomentums(nPlayer);
     if (lbl_80281E11 != 0) {
         if (fn_800C7340(fn_80017028(gPlayers[nPlayer].nView[0]), nPlayer)) {
             fn_80062D6C(0x67, nPlayer);
@@ -3366,7 +3366,7 @@ void STATEFUNC_PreShotInit(int nPlayer) {
         fn_800E3D38(nPlayer, 1);
     }
     if (GM_DoPreshotAnimation(nPlayer) != 0) {
-        fn_8007326C(gPlayers[nPlayer].pChar->anim);
+        SKATime_UnPause(gPlayers[nPlayer].pChar->anim);
         if (gPlayers[nPlayer].bLowIQPenalty != 0 && gPlayers[nPlayer].ball.nLie != 0 && !fn_80100294()) {
             fn_80095744(gPlayers[nPlayer].pChar, 10);
         } else {
@@ -3691,7 +3691,7 @@ void STATEFUNC_SwingInit(int nPlayer) {
     fn_8001C724(gPlayers[nPlayer].pChar, gPlayers[nPlayer].nShotKind);
     fn_80062BFC(gPlayers[nPlayer].pChar);
     fn_80062BE8(gPlayers[nPlayer].pChar);
-    fn_8007326C(gPlayers[nPlayer].pChar->anim);
+    SKATime_UnPause(gPlayers[nPlayer].pChar->anim);
     if (gPlayers[nPlayer].swing.unk630 == 0) {
         fn_80058FA4(nPlayer);
         gPlayers[nPlayer].swing.unk630 = 1;

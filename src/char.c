@@ -477,11 +477,11 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
         bC860 = 1;
     }
     if (pChar->n20 == 8 && pChar->nAnim == 8) {
-        fn_80073108(pChar, pChar->nPlayer, (AnimPlayer*)pChar->anim, &pChar->blend, fTime);
+        SKATime_Idle(pChar, pChar->nPlayer, (AnimPlayer*)pChar->anim, &pChar->blend, fTime);
     } else if (pChar->u10 & 0x100) {
-        fn_80072ED8((AnimPlayer*)pChar->anim, &pChar->blend, 5.0f * fTime);
+        SKATime_Update((AnimPlayer*)pChar->anim, &pChar->blend, 5.0f * fTime);
     } else {
-        fn_80072ED8((AnimPlayer*)pChar->anim, &pChar->blend, fTime);
+        SKATime_Update((AnimPlayer*)pChar->anim, &pChar->blend, fTime);
         if (pChar->uFlags & 0x1000) {
             pChar->uFlags &= ~0x1000;
             if (pChar->pCurClip != NULL && pChar->pCurClip->pF4 != NULL) {
@@ -491,7 +491,7 @@ void Character_UpdateAnimation(Character* pChar, int bForce, f32 fTime) {
     }
     fn_80021978(pChar->pModel->bEE);
     if (!gSession.b11) {
-        fn_80072ED8(&pChar->anim29C, &pChar->node3E0, fTime);
+        SKATime_Update(&pChar->anim29C, &pChar->node3E0, fTime);
     }
     if (fn_8001EC48(pChar)) {
         CharacterState_UpdateSKAState(pChar);

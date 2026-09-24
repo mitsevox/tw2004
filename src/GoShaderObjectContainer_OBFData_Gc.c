@@ -17,10 +17,12 @@ u8   fn_8006FCCC(void);         // a flag (fn_8006F650 tests it as a byte)
 void fn_8006FCD4(void);
 void fn_8006FCD8(void);
 
-// Picks lbl_802811F0's flags for the hole: bit 0 in split screen, bit 4 in a strong wind on
-// courses 0, 1, 2 and 6, then by the game option nC: a roll over the course's lbl_80188900 choices
-// (mode 1, and mode 2, which keeps a choice for a rolled number of calls while f18 rises then
-// falls by 0.3), bit 1 (mode 3) or bit 0 (modes 0 and 4). Not on course 4's hole 18.
+// Picks lbl_802811F0's flags for the hole, then reseeds random stream 1 and applies them
+// (fn_8006FB10). Split screen (or session flag 0x4000) gets bit 0 only; else a wind over 6 (wind
+// option on) on courses 0, 1, 2 and 6 sets bit 4, then b1C sets bit 1, or the game option nC
+// picks (not on course 4's hole 18): a roll over the course's lbl_80188900 choices with f18 rolled
+// 0.25..1 (mode 1; mode 2 keeps a choice for a rolled number of calls while f18 rises then falls
+// by 0.3), bit 1 with f18 rolled (mode 3) or bit 0 (modes 0 and 4).
 void fn_8006F650(void) {
     u32 uSeed;
 

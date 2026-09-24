@@ -2,7 +2,7 @@
 // not proven, and TW06's SKATime_* functions sit near its end): blends the golfer's animations.
 // A character's blend tree (SKABlendNode) has blend nodes with two children and source nodes that
 // play one clip; the nodes and their pose buffers come from five pools. The animation player
-// (AnimPlayer) functions follow. Only part is decompiled so far.
+// (AnimPlayer) functions follow. All of it is in C.
 
 #include "character.h"
 #include "charstate.h"
@@ -460,8 +460,9 @@ f32 fn_80072938(SKABlendNode* pNode) {
 }
 
 // The blend weight at fTime across the overlap of two nodes, from the later start to the earlier
-// end: it runs from nLater (0 when pA starts later, else 1) to the other end, or back with bOut.
-// When one node lies inside the other, it is folded to |2w - 1|.
+// end: it runs from nLater (0 when pA starts later, else 1) to the other value; with bOut, across
+// the gap from the earlier end to the later start instead. When one node lies inside the other,
+// it is folded to |2w - 1|.
 f32 fn_80072980(SKABlendNode* pA, SKABlendNode* pB, u8 bOut, f32 fTime) {
     f32 fStart;
     f32 fEnd;
@@ -509,9 +510,9 @@ f32 fn_80072980(SKABlendNode* pA, SKABlendNode* pB, u8 bOut, f32 fTime) {
 }
 
 // The blend callback: pose pNode's buffer at fTime from its children. While both play (or neither,
-// between them) and fTime is inside their overlap, their weights come from fn_80072980 and the
+// between them) and fTime is inside their span, their weights come from fn_80072980 and the
 // poses are blended by format; while only one plays, its pose is copied (a format 1 copy then
-// has the child's morph bits cleared).
+// has the child's three block masks cleared).
 void fn_80072ACC(SKABlendNode* pNode, CharModel* pModel, f32 fTime) {
     int nPlaying;
     u8 bBetween;
@@ -575,7 +576,7 @@ f32 fn_80072CB8(SKABlendNode* pNode, u64 uEvent) {
     return fTime;
 }
 
-// Resets a player: stopped at time 0, f14 1, and its ten entries chained in order from p44.
+// Resets a player: time, flags and counters 0, f14 1, its ten entries chained both ways from p44.
 void fn_80072D90(AnimPlayer* pPlayer) {
     int i;
     AnimPlayerEntry* pPrev;
@@ -598,11 +599,12 @@ void fn_80072D90(AnimPlayer* pPlayer) {
     }
 }
 
-// Advances a player by fT across the times of the tree under pNode: forward, or backward with
-// uFlags bit 6. At an end n08 counts the plays down (at 0 the player stops there, bit 2; with bit 8
-// it rewinds and clears itself instead); with bit 5 it turns round (bit 6 flips), else it wraps to
-// the other end and sets bit 12.
-void fn_80072ED8(AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT) {
+// Advances a player by its step for fT (fn_800737B4) across the times of the tree under pNode,
+// unless uFlags bit 0 holds it (with bit 7, f30 counts down, then clears bits 0 and 7): forward,
+// or backward with bit 6. At an end n08 counts the plays down (at 0 the player stops there with
+// bit 2 set; going forward with bit 8 it rewinds to 0 and clears bits 0, 2 and 8 instead); with
+// bit 5 it turns round (bit 6 flips, bit 2 set), else it wraps to the other end and sets bit 12.
+void SKATime_Update(AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT) {
     f32 fStep;
     f32 fEnd;
     f32 fStart;
@@ -675,7 +677,7 @@ void fn_80072ED8(AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT) {
 // Sways pPlayer's time around f38: three cosines of the f34 clock (advanced by fT) make a wave
 // from 0 to 1, scaled by 0.033 or 0.3 (club 25, by the clip group) or 0.05; the player then runs
 // forward or backward (uFlags bit 6) towards that time.
-void fn_80073108(Character* pChar, int nPlayer, AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT) {
+void SKATime_Idle(Character* pChar, int nPlayer, AnimPlayer* pPlayer, SKABlendNode* pNode, f32 fT) {
     f32 fWave;
     f32 fDelta;
 
@@ -699,7 +701,7 @@ void fn_80073108(Character* pChar, int nPlayer, AnimPlayer* pPlayer, SKABlendNod
     } else {
         pPlayer->uFlags &= ~0x40;
     }
-    fn_80072ED8(pPlayer, pNode, fDelta);
+    SKATime_Update(pPlayer, pNode, fDelta);
 }
 
 // Character.anim is still declared as bytes, so these three take its address as a u8*.
@@ -707,7 +709,7 @@ void fn_8007325C(u8* pAnim) {
     ((AnimPlayer*)pAnim)->uFlags |= 2;
 }
 
-void fn_8007326C(u8* pAnim) {
+void SKATime_UnPause(u8* pAnim) {
     ((AnimPlayer*)pAnim)->uFlags &= ~3;
 }
 
