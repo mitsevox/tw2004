@@ -2349,17 +2349,22 @@ u8 fn_800D9998(int nPlayer, int nAward) {
     u8 bFullSeason;
     int i;
     int nLeads;
+    PgaStatCounts* pStats;
+    TourSeason* pTour;
 
     if (fn_800E177C() != 0) return 0;
     pProfile = &gpSaveData[nPlayer];
     if (!pProfile->bActive) return 0;
-    bSeasonEnd = 0;
+    pStats = &pProfile->tour.aStats[PGA_USER_GOLFER];
+    pTour = &pProfile->tour;
     if ((pProfile->tour.nEvent == -1 || GameModeDriverPGATour_GetNextEvent() == -1) &&
         pProfile->tour.nRound + 1 == GameModeDriverPGATour_GetRounds(pProfile->tour.nEvent)) {
         bSeasonEnd = 1;
+    } else {
+        bSeasonEnd = 0;
     }
     // fake match: the (int) changes nothing in C, but gives EA's signed compare (srawi; subfc; adde)
-    bFullSeason = (int)pProfile->tour.aStats[PGA_USER_GOLFER].nEvents >= 15;
+    bFullSeason = (int)pStats->nEvents >= 15;
 
     switch (nAward) {
     case 23:
@@ -2420,7 +2425,7 @@ u8 fn_800D9998(int nPlayer, int nAward) {
         }
         return 0;
     case 31:
-        return pProfile->tour.n4E96 > 11;
+        return pTour->n4E96 > 11;
     case 32:
         return fn_800E17AC(nPlayer) < 59;
     case 33:
@@ -2430,20 +2435,19 @@ u8 fn_800D9998(int nPlayer, int nAward) {
         }
         return 0;
     case 34:
-        if (pProfile->tour.n4E94 > 100 &&
-            (f32)pProfile->tour.aStats[PGA_USER_GOLFER].nCareerWins / (f32)pProfile->tour.n4E94 > 0.28f) {
+        if (pTour->n4E94 > 100 && (f32)pStats->nCareerWins / (f32)pTour->n4E94 > 0.28f) {
             return 1;
         }
         return 0;
     case 35:
-        return pProfile->tour.n4E98 > 66;
+        return pTour->n4E98 > 66;
     case 36:
-        return pProfile->tour.n4E9A > 18;
+        return pTour->n4E9A > 18;
     case 37:
-        return pProfile->tour.aStats[PGA_USER_GOLFER].nSeasonWins > 9;
+        return pStats->nSeasonWins > 9;
     case 38:
         // Tiger Woods's season record, $9,188,321 in 2000.
-        return pProfile->tour.aStats[PGA_USER_GOLFER].nSeasonWinnings > 9188321;
+        return pStats->nSeasonWinnings > 9188321;
     }
     return 0;
 }
