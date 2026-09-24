@@ -414,6 +414,43 @@ void fn_800392D0(void) {
 
 // ---- end of sweep code ----
 
+// Fills n vertices of a fan edge running from (fX0, fY0) towards (fX1, fY1): each gets pSrc's
+// colour, with its alpha scaled by the vertex's distance from (fCX, fCY) over fMaxDist (at most
+// pSrc's own alpha), and texture coordinates in the 256 x 128 screen copy.
+void fn_80038E7C(f32* pXY, f32* pColour, f32* pUV, int n, f32* pSrc, f32 fCX, f32 fCY, f32 fX0,
+                 f32 fY0, f32 fX1, f32 fY1, f32 fMaxDist) {
+    int i;
+    f32 fX;
+    f32 fY;
+    f32 fDXSq;
+    f32 fDYSq;
+    f32 fAlpha;
+
+    for (i = 0; i < n; i++) {
+        fX = (f32)i * ((fX1 - fX0) / (f32)n) + fX0;
+        fY = (f32)i * ((fY1 - fY0) / (f32)n) + fY0;
+        fDXSq = (fX - fCX) * (fX - fCX);
+        fDYSq = (fY - fCY) * (fY - fCY);
+        fAlpha = pSrc[3] * ((f32)fn_80009680(fDXSq + fDYSq) / fMaxDist);
+        fAlpha = (fAlpha < 0.0f) ? 0.0f : ((fAlpha > pSrc[3]) ? pSrc[3] : fAlpha);
+        pXY[0] = fX;
+        pXY[1] = fY;
+        pXY[2] = 1.0f;
+        pXY[3] = 1.0f;
+        pXY += 4;
+        pUV[0] = fX;
+        pUV[1] = 224.0f * fY * (1.0f / 128.0f);
+        pUV[2] = 1.0f;
+        pUV[3] = 1.0f;
+        pUV += 4;
+        pColour[0] = pSrc[0];
+        pColour[1] = pSrc[1];
+        pColour[2] = pSrc[2];
+        pColour[3] = fAlpha;
+        pColour += 4;
+    }
+}
+
 // Draws the effect's screen copy (nField picks which of the two) at half size into pCamera's
 // rectangle, stretched to twice its height.
 void fn_800390CC(int nField, RenderCamera* pCamera) {
