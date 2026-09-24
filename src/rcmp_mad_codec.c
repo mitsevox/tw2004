@@ -9,6 +9,8 @@
 
 #include "engine.h"
 #include "dynobj.h"
+#include "character.h"
+#include "camera.h"
 #include "llpict.h"
 
 s32 lbl_802821A8;               // the decoder's tables are built
@@ -342,12 +344,14 @@ int fn_800B8AA0(void) {
     int n;
     int i;
     int nDC;
+    s32* p;
 
     nDC = (s32)lbl_802821B4 >> 24;
     lbl_801F8358[0] = nDC * lbl_801F7058[0];
     fn_800B8A2C(8);
-    for (i = 1; i < 64; i++) {
-        lbl_801F8358[i] = 0;
+    p = &lbl_801F8358[1];
+    for (i = 63; i != 0; i--) {
+        *p++ = 0;
     }
     n = 1;
     while (1) {
@@ -789,8 +793,24 @@ UObject* lbl_802821DC;          // } 10030
 UObject* lbl_802821E0;          // } and 10000
 u8 lbl_802814E8 = 1;
 
+f32 lbl_802821C8;               // } the held ball's offset in its bone (x, y); never set, so 0
+f32 lbl_802821CC;               // }
+f32 lbl_802814EC = -2.0f;       // }  and z
+f32 lbl_802814F0 = 1.0f;        // } the ball's scale on each axis
+f32 lbl_802814F4 = 1.0f;        // }
+f32 lbl_802814F8 = 1.0f;        // }
+char lbl_802814FC[] = "logoea";
+
 void fn_800B99BC(UStreamObject* pObject);
 void fn_800B99FC(UStreamObject* arg0);
+void fn_8000A0E8(f32 (*pSrc)[4], f32 (*pDst)[4]);
+void fn_8000ADC0(f32 (*pMtx)[4]);                   // identity
+void fn_8000C5A4(f32 (*pMtx)[4]);
+void fn_800BADF8(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
+void fn_800BAE5C(f32 (*pMtx)[4], f32 (*pSrc)[4], f32 (*pDst)[4], int nRows);
+void fn_8001EB8C(Character* pChar, int nBone, f32* pPos);
+void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
+void fn_80035240(int n);
 
 void fn_800B9944(void) {
     UStream_RegisterHandler('TEO ', fn_800B99FC);
@@ -887,5 +907,74 @@ void fn_800B9B48(void) {
         if (pObject != NULL) {
             lbl_802821D8 = fn_80048808((UObjModel*)pObject->uUnk4);
         }
+    }
+}
+
+// Draw pObj turned by mBone and scaled by mScale, at pPos in the create-a-player view; its
+// matrices are put back after.
+void fn_800B9BF4(UObject* pObj, f32 (*mBone)[4], f32 (*mScale)[4], f32* pPos) {
+    f32 m0[4][4];
+    f32 m40[4][4];
+    f32 m80[4][4];
+
+    fn_8000A0E8(pObj->m0, m0);
+    fn_8000A0E8(pObj->m40, m40);
+    fn_8000A0E8(pObj->m80, m80);
+    fn_800BAE5C(mBone, pObj->m0, pObj->m0, 3);
+    fn_800BAE5C(mScale, pObj->m40, pObj->m40, 3);
+    fn_8000C5A4(pObj->m0);
+    Vec_Copy(pPos, pObj->m80[3]);
+    pObj->m80[3][3] = 1.0f;
+    fn_800BADF8(lbl_80281EE0->mC0, pObj->m80, pObj->m80, 4);
+    fn_8000ADC0(pObj->m0);
+    fn_80048894(pObj);
+    fn_8000A0E8(m0, pObj->m0);
+    fn_8000A0E8(m40, pObj->m40);
+    fn_8000A0E8(m80, pObj->m80);
+}
+
+// Draw the ball in the create-a-player golfer's hand (bone 0x54), when he holds it: to the
+// 384x528 target when bTarget, else to the screen.
+void fn_800B9CF0(u8 bTarget) {
+    f32 vPos[4];
+    f32 mScale[4][4];
+    f32 (*mBone)[4];
+
+    if (fn_8001DBF4(lbl_80281EE0->pB4->pChar)) {
+        vPos[0] = lbl_802821C8;
+        vPos[1] = lbl_802821CC;
+        vPos[2] = lbl_802814EC;
+        vPos[3] = 1.0f;
+        fn_8001EB8C(lbl_80281EE0->pB4->pChar, 0x54, vPos);
+        mBone = fn_8001ED08(lbl_80281EE0->pB4->pChar, 0x54);
+        fn_8000ADC0(mScale);
+        mScale[0][0] = lbl_802814F0;
+        mScale[1][1] = lbl_802814F4;
+        mScale[2][2] = lbl_802814F8;
+        if (bTarget) {
+            fn_800140E8(1, 0x180, 0x210, 0, 1, 1);
+        } else {
+            fn_800140E8(0, 0x200, 0x1C0, lbl_80281B88 & 1, 1, 1);
+        }
+        fn_80013EEC(fn_8001614C());
+        fn_80035118(4, 5);
+        fn_80012F50(0, 6, 0x80);
+        fn_80012F34(1);
+        fn_80012EF8();
+        if (lbl_802821E0 != NULL) {
+            fn_800B9BF4(lbl_802821E0, mBone, mScale, vPos);
+        }
+        if (lbl_802814E8) {
+            if (lbl_802821DC != NULL) {
+                fn_800B9BF4(lbl_802821DC, mBone, mScale, vPos);
+            }
+            if (lbl_802821D8 != NULL) {
+                fn_800B9BF4(lbl_802821D8, mBone, mScale, vPos);
+            }
+        }
+        fn_80035240(0);
+        fn_800140E8(0, 0x200, 0x1C0, lbl_80281B88 & 1, 8, 1);
+        fn_80013EEC(fn_8001614C());
+        fn_80012EF8();
     }
 }
