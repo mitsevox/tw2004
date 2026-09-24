@@ -185,12 +185,10 @@ int fn_800060E0(const char* szName) {
     int hFile;
     int i;
     s32 nEntry;
-    DiscFile* pFile;
 
     hFile = -1;
     fn_80005BE8(szName, szPath);
     fn_800B596C("File_Open");
-    pFile = lbl_8019EAD0;
     for (i = 0; i < 32; i++) {
         if (lbl_8019EAD0[i].nEntry == -1) {
             hFile = i;
@@ -204,8 +202,8 @@ int fn_800060E0(const char* szName) {
                 fn_800B7490();
             }
         } while (nEntry < 0);
-        for (i = 0; i < 32; i++, pFile++) {
-            if (nEntry == pFile->nEntry && strcmp(szPath, pFile->szPath) == 0) {
+        for (i = 0; i < 32; i++) {
+            if (nEntry == lbl_8019EAD0[i].nEntry && strcmp(szPath, lbl_8019EAD0[i].szPath) == 0) {
                 hFile = i;
                 lbl_8019EAD0[i].nOpens++;
                 break;
