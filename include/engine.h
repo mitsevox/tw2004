@@ -534,6 +534,7 @@ typedef struct BufferPool {
 LAYOUT_ASSERT(BufferPool, 0x14080);
 
 extern BufferPool* lbl_80280E00;
+BufferPoolBlock* fn_800154F4(void);     // skip the used blocks; returns the first free one
 
 // The view being drawn to (our name; lbl_801B8A98, 0x110 bytes, reached through the pointer
 // lbl_80280E08; the renderer state lbl_801B8980 sits just before it). Only what the code reads.
