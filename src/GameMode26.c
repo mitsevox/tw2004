@@ -11,6 +11,14 @@
 #include "game.h"
 #include "game/modes/mode26.h"
 
+s32 lbl_80281760 = 10000;
+s32 lbl_80281764 = 5;
+s32 lbl_80281768 = 5;
+s32 lbl_8028176C = 120;
+s32 lbl_80281770 = 15;
+s32 lbl_80281774[2] = {0, 0};
+s32 lbl_8028177C[2] = {0, 0};
+
 // .sbss in reverse address order (CodeWarrior lays it out backwards)
 u8  lbl_802824A8[5];
 u8  lbl_802824A0[5];

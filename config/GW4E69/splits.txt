@@ -1004,6 +1004,7 @@ LLDynTex.c:
 GameMode26.c:
 	.text       start:0x8010C4A0 end:0x8010D454
 	.data       start:0x80193B28 end:0x80193B70
+	.sdata      start:0x80281760 end:0x80281788
 	.sbss       start:0x80282490 end:0x802824B0
 	.sdata2     start:0x80284890 end:0x802848A0
 
