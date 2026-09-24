@@ -1098,7 +1098,7 @@ typedef struct UFontContext {
     f32   f0C;                    // 0x0C  1 / (f08 - f04), set by fn_80012E00_CalcGradientScale
     s32   n10;                    // 0x10  gradients on: 1 the stops in a14[0..4], 2 a14[4] to a14[5]
     UFontStop a14[6];             // 0x14
-    u32   u5C;                    // 0x5C  the colour (a GXColor's bytes) when nA4 is 0x12
+    GXColor u5C;                  // 0x5C  the colour when nA4 is 0x12
     s32   n60;                    // 0x60
     s32   n64;                    // 0x64
     s32   n68;                    // 0x68
@@ -1122,7 +1122,7 @@ typedef struct UFontContext {
     f32   fBC;                    // 0xBC
     f32   fC0;                    // 0xC0
     s32   nC4;                    // 0xC4  the shadow's nA4 (n9C bit 0x10000: drawn first, moved by fCC, fD0)
-    u32   uC8;                    // 0xC8  the shadow's u5C
+    GXColor uC8;                  // 0xC8  the shadow's u5C
     f32   fCC;                    // 0xCC
     f32   fD0;                    // 0xD0
     char* szText;                 // 0xD4  a queued string's copy of its text
