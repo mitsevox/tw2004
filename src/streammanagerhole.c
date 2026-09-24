@@ -163,9 +163,58 @@ void fn_80016C7C(s32 p0, s32 p1, s32 p2, s32 p3);
 void fn_80016C94(f32 farg0, f32 farg1, f32 farg2);
 void fn_80016CA8(f32 farg0, f32 farg1);
 
+// ---- end of sweep code ----
+
+void fn_80014E98(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
+void fn_80014F20(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
+void fn_80014FA8(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*));
+void fn_800166E8(f32* pPos);
+void fn_80016770(f32* pPos, f32* pColour);
+void fn_80016800(f32* pPos, f32* pUV);
+void fn_800168A0(f32* pPos, f32* pColour, f32* pUV);
+void fn_80016C44(const f32* pViewport);
+
+// Set up the stream lists: empty them all, then put the front end's files in list 1 and the
+// load-once and startup files in lists 4 and 5.
+void fn_800143B8(void) {
+    int i;
+
+    lbl_80280DF8->aParams[0].nNumFiles = 0;
+    lbl_80280DF8->aParams[1].nNumFiles = 0;
+    lbl_80280DF8->aParams[2].nNumFiles = 0;
+    lbl_80280DF8->aParams[3].nNumFiles = 0;
+    lbl_80280DF8->aParams[4].nNumFiles = 0;
+    lbl_80280DF8->aParams[5].nNumFiles = 0;
+    lbl_80280DF8->aParams[6].nNumFiles = 0;
+    fn_80014FA8(lbl_80186BD8, fn_80014E6C, fn_80014E84);
+    fn_80014FA8(lbl_80186BEC, fn_80014E6C, fn_80014E84);
+    fn_80014F20(lbl_80186BF8, fn_80014E78, fn_80014E90);
+    fn_80014E98(lbl_80186BF8, fn_80014E78, fn_80014E90);
+    fn_80014E98(lbl_80186C08, fn_80014E78, fn_80014E90);
+    for (i = 0; i < 30; i++) {
+        lbl_801A48C8[i] = 0;
+    }
+    fn_80014DF8();
+    fn_80014A60();
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_80014524(void) {
     fn_800143B8();
 }
+
+// ---- end of sweep code ----
+
+// Add loading file nFile (data/Load/Load<n>.gcb) to stream list 2.
+void fn_80014544(int nFile) {
+    char szName[0x40];   // size unknown: the frame allows 0x40..0x48 bytes
+
+    sprintf(szName, lbl_80186C14, nFile);
+    fn_80015030(szName, fn_80014E70, fn_80014E88);
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_80014590(void) {
 }
@@ -244,6 +293,31 @@ void fn_800146C4(void) {
     fn_8009EAF0();
     UI_vEATraxUnRegisterStreamClients();
 }
+
+// ---- end of sweep code ----
+
+// Stream list 1 (the front end's files), with the loading screen unless the front end's b0F is set.
+void fn_80014718(void) {
+    if (lbl_801D7148.b0F == 0) {
+        fn_80091778();
+        fn_800918A4();
+    }
+    fn_80015134();
+    do {
+        if (lbl_801D7148.b0F == 0) {
+            fn_8009198C(0);
+        }
+    } while (UStream_Update() != 0);
+    if (lbl_801D7148.b0F == 0) {
+        fn_8009198C(1);
+    }
+    fn_8001510C();
+    if (lbl_801D7148.b0F == 0) {
+        fn_80091818();
+    }
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_800147A4(void) {
     fn_8001518C();
@@ -327,8 +401,115 @@ void fn_8001494C(void) {
     fn_800644CC();
 }
 
+// ---- end of sweep code ----
+
+// Stream the current hole's file (data/<course>/<hole>/hole.hog, or the session's override) as
+// list 6, updating the loading screen until it is all read.
+void StreamManagerHole_StreamFiles(void) {
+    char szPath[0x80];  // size unknown: the frame allows up to 0x84 bytes
+    char* szCourse;
+    char* szHole;
+
+    fn_800918A4();
+    fn_80015324();
+    if (gSession.n5B34 != 0) {
+        fn_8001529C(gSession.p5B30, fn_80014E7C, fn_80014E94);
+    } else {
+        szCourse = fn_800E2680();
+        szHole = GameManager_GetHoleName(fn_80015464());
+        sprintf(szPath, lbl_80186C2C, szCourse);
+        strcat(szPath, szHole);
+        strcat(szPath, lbl_80186C38);
+        fn_8001529C(szPath, fn_80014E7C, fn_80014E94);
+    }
+    fn_8001526C();
+    do {
+        fn_8009198C(0);
+    } while (UStream_Update() != 0);
+    fn_8009198C(1);
+    fn_80015244();
+    fn_80091818();
+}
+
+// ---- sweep code (not yet cleaned up) ----
+
 void fn_80014A60(void) {
 }
+
+// ---- end of sweep code ----
+
+// Refill stream list 0 with the global data and character files and every player's golfer's
+// character file.
+void fn_80014A64(void) {
+    char szName[0x80];  // size unknown: the frame allows up to 0x84 bytes
+    int nPlayer;
+    int i;
+
+    lbl_80281CE4 = 0;
+    fn_800153BC();
+    fn_80015334(lbl_80186C44, fn_80014E78, fn_80014E90);
+    fn_80015334(lbl_80186C50, fn_80014E68, fn_80014E80);
+    for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
+        sprintf(szName, lbl_80186C5C, fn_8001C558(nPlayer) + 1);
+        fn_80015334(szName, fn_80014E68, fn_80014E80);
+    }
+    for (i = 0; i < 30; i++) {
+        lbl_801A48C8[i] = 0;
+    }
+}
+
+// Refill stream list 0 with the sac files: malesac for animation slot 0 and femsac for slot 1
+// when that slot has overlays, and every player's golfer's CharSac file.
+void fn_80014BB4(void) {
+    char szName[0x80];  // size unknown: the frame allows up to 0x88 bytes
+    int nPlayer;
+
+    fn_800153BC();
+    if (Skalib_HasOverlays(0) != 0) {
+        fn_80015334(lbl_80186C74, fn_80014E78, fn_80014E90);
+    }
+    if (Skalib_HasOverlays(1) != 0) {
+        fn_80015334(lbl_80186C80, fn_80014E78, fn_80014E90);
+    }
+    for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
+        sprintf(szName, lbl_80186C8C, fn_8001C558(nPlayer) + 1);
+        fn_80015334(szName, fn_80014E68, fn_80014E80);
+    }
+}
+
+// Refill stream list 0 with the current animation slot's sac file and the CharSac file of every
+// player whose golfer has an overlay loaded in that slot.
+void fn_80014C9C(void) {
+    char szName[0x80];  // size unknown: the frame allows up to 0x8C bytes
+    u32 nSlot;
+    int nPlayer;
+    LibSlot* pSlot;
+    int nModel;
+    int i;
+
+    fn_800153BC();
+    nSlot = Skalib_CurSlot();
+    if (nSlot == 0) {
+        fn_80015334(lbl_80186C74, fn_80014E78, fn_80014E90);
+    } else {
+        fn_80015334(lbl_80186C80, fn_80014E78, fn_80014E90);
+    }
+    pSlot = &lbl_801C6068[nSlot];
+    for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
+        nModel = fn_8001C558(nPlayer);
+        for (i = 0; i < pSlot->nOverlays; i++) {
+            if (pSlot->overlays[i].n14 == nModel) {
+                break;
+            }
+        }
+        if (i < pSlot->nOverlays) {
+            sprintf(szName, lbl_80186C8C, nModel + 1);
+            fn_80015334(szName, fn_80014E68, fn_80014E80);
+        }
+    }
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_80014DC0(void) {
     fn_800150E0();
@@ -340,6 +521,21 @@ void fn_80014DC0(void) {
 
 void fn_80014DF8(void) {
 }
+
+// ---- end of sweep code ----
+
+// Make stream list 3 hold only the front-end character file for character nChar
+// (data/FEChars/<nChar + 1>charfe.gcb), for the golfer the front end is loading.
+void fn_80014DFC(s32 nChar, s32 nUnused) {   // port: FEgolferanim.c passes a second argument this ignores
+    char szName[0x100];  // size unknown: the frame allows up to 0x100 bytes
+
+    fn_80015454();
+    sprintf(szName, lbl_80186CA8, nChar + 1);
+    lbl_80281EE0->pB8->n14 = -1;
+    fn_800153CC(szName, fn_80014E74, fn_80014E8C);
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 // Stream file callbacks that do nothing: fn_80014E68..fn_80014E7C are called when a list's file
 // is opened, fn_80014E80..fn_80014E94 when it is closed.
@@ -378,6 +574,42 @@ void fn_80014E90(void* pArg) {
 
 void fn_80014E94(void* pArg) {
 }
+
+// ---- end of sweep code ----
+
+// Add a file to stream list 5, with the calls made when it is opened and closed.
+void fn_80014E98(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
+    strcpy(lbl_80280DF8->aParams[5].aszName[lbl_80280DF8->aParams[5].nNumFiles], szName);
+    lbl_80280DF8->aParams[5].apfnOpened[lbl_80280DF8->aParams[5].nNumFiles] = pfnOpened;
+    lbl_80280DF8->aParams[5].apfnClosed[lbl_80280DF8->aParams[5].nNumFiles] = pfnClosed;
+    lbl_80280DF8->aParams[5].nNumFiles++;
+}
+
+// The same for list 4.
+void fn_80014F20(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
+    strcpy(lbl_80280DF8->aParams[4].aszName[lbl_80280DF8->aParams[4].nNumFiles], szName);
+    lbl_80280DF8->aParams[4].apfnOpened[lbl_80280DF8->aParams[4].nNumFiles] = pfnOpened;
+    lbl_80280DF8->aParams[4].apfnClosed[lbl_80280DF8->aParams[4].nNumFiles] = pfnClosed;
+    lbl_80280DF8->aParams[4].nNumFiles++;
+}
+
+// The same for list 1.
+void fn_80014FA8(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
+    strcpy(lbl_80280DF8->aParams[1].aszName[lbl_80280DF8->aParams[1].nNumFiles], szName);
+    lbl_80280DF8->aParams[1].apfnOpened[lbl_80280DF8->aParams[1].nNumFiles] = pfnOpened;
+    lbl_80280DF8->aParams[1].apfnClosed[lbl_80280DF8->aParams[1].nNumFiles] = pfnClosed;
+    lbl_80280DF8->aParams[1].nNumFiles++;
+}
+
+// The same for list 2.
+void fn_80015030(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
+    strcpy(lbl_80280DF8->aParams[2].aszName[lbl_80280DF8->aParams[2].nNumFiles], szName);
+    lbl_80280DF8->aParams[2].apfnOpened[lbl_80280DF8->aParams[2].nNumFiles] = pfnOpened;
+    lbl_80280DF8->aParams[2].apfnClosed[lbl_80280DF8->aParams[2].nNumFiles] = pfnClosed;
+    lbl_80280DF8->aParams[2].nNumFiles++;
+}
+
+// ---- sweep code (not yet cleaned up) ----
 
 void fn_800150B8(void) {
     UStream_Close(lbl_80280DF8->nStream);
@@ -435,97 +667,7 @@ void fn_8001526C(void) {
     lbl_80280DF8->nStream = t0;
 }
 
-void fn_80015324(void) {
-    lbl_80280DF8->aParams[6].nNumFiles = 0;
-}
-
-void fn_800153BC(void) {
-    lbl_80280DF8->aParams[0].nNumFiles = 0;
-}
-
-void fn_80015454(void) {
-    lbl_80280DF8->aParams[3].nNumFiles = 0;
-}
-
-int fn_80015464(void) {
-    return gpGame->nCurHoleNum;
-}
-
-void fn_80015620(void) {
-}
-
-void fn_80016124(s32 p0, s32 p1, s32 p2, s32 p3) {
-    GXSetTexCoordGen2(p0, p1, p2, p3, 0, 125);
-}
-
-void* fn_8001614C(void) {
-    return *lbl_80280DF0;
-}
-
-void fn_8001618C(u8 v) {
-    *(u8*)(lbl_80280DC8 + 0x0) = v;
-}
-
-void fn_800162A0(void) {
-}
-
-void fn_800162A4(void) {
-}
-
-void fn_800162A8(void) {
-}
-
-void fn_80016C7C(s32 p0, s32 p1, s32 p2, s32 p3) {
-    *(volatile u8*)0xCC008000 = p0;
-    *(volatile u8*)0xCC008000 = p1;
-    *(volatile u8*)0xCC008000 = p2;
-    *(volatile u8*)0xCC008000 = p3;
-}
-
-void fn_80016C94(f32 farg0, f32 farg1, f32 farg2) {
-    *(f32* )0xCC008000 = farg0;
-    *(f32* )0xCC008000 = farg1;
-    *(f32* )0xCC008000 = farg2;
-}
-
-void fn_80016CA8(f32 farg0, f32 farg1) {
-    *(f32* )0xCC008000 = farg0;
-    *(f32* )0xCC008000 = farg1;
-}
-
 // ---- end of sweep code ----
-
-// Add a file to stream list 5, with the calls made when it is opened and closed.
-void fn_80014E98(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
-    strcpy(lbl_80280DF8->aParams[5].aszName[lbl_80280DF8->aParams[5].nNumFiles], szName);
-    lbl_80280DF8->aParams[5].apfnOpened[lbl_80280DF8->aParams[5].nNumFiles] = pfnOpened;
-    lbl_80280DF8->aParams[5].apfnClosed[lbl_80280DF8->aParams[5].nNumFiles] = pfnClosed;
-    lbl_80280DF8->aParams[5].nNumFiles++;
-}
-
-// The same for list 4.
-void fn_80014F20(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
-    strcpy(lbl_80280DF8->aParams[4].aszName[lbl_80280DF8->aParams[4].nNumFiles], szName);
-    lbl_80280DF8->aParams[4].apfnOpened[lbl_80280DF8->aParams[4].nNumFiles] = pfnOpened;
-    lbl_80280DF8->aParams[4].apfnClosed[lbl_80280DF8->aParams[4].nNumFiles] = pfnClosed;
-    lbl_80280DF8->aParams[4].nNumFiles++;
-}
-
-// The same for list 1.
-void fn_80014FA8(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
-    strcpy(lbl_80280DF8->aParams[1].aszName[lbl_80280DF8->aParams[1].nNumFiles], szName);
-    lbl_80280DF8->aParams[1].apfnOpened[lbl_80280DF8->aParams[1].nNumFiles] = pfnOpened;
-    lbl_80280DF8->aParams[1].apfnClosed[lbl_80280DF8->aParams[1].nNumFiles] = pfnClosed;
-    lbl_80280DF8->aParams[1].nNumFiles++;
-}
-
-// The same for list 2.
-void fn_80015030(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
-    strcpy(lbl_80280DF8->aParams[2].aszName[lbl_80280DF8->aParams[2].nNumFiles], szName);
-    lbl_80280DF8->aParams[2].apfnOpened[lbl_80280DF8->aParams[2].nNumFiles] = pfnOpened;
-    lbl_80280DF8->aParams[2].apfnClosed[lbl_80280DF8->aParams[2].nNumFiles] = pfnClosed;
-    lbl_80280DF8->aParams[2].nNumFiles++;
-}
 
 // The same for list 6.
 void fn_8001529C(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
@@ -535,6 +677,14 @@ void fn_8001529C(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)
     lbl_80280DF8->aParams[6].nNumFiles++;
 }
 
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_80015324(void) {
+    lbl_80280DF8->aParams[6].nNumFiles = 0;
+}
+
+// ---- end of sweep code ----
+
 // The same for list 0.
 void fn_80015334(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
     strcpy(lbl_80280DF8->aParams[0].aszName[lbl_80280DF8->aParams[0].nNumFiles], szName);
@@ -542,6 +692,14 @@ void fn_80015334(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)
     lbl_80280DF8->aParams[0].apfnClosed[lbl_80280DF8->aParams[0].nNumFiles] = pfnClosed;
     lbl_80280DF8->aParams[0].nNumFiles++;
 }
+
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_800153BC(void) {
+    lbl_80280DF8->aParams[0].nNumFiles = 0;
+}
+
+// ---- end of sweep code ----
 
 // The same for list 3.
 void fn_800153CC(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)(void*)) {
@@ -551,86 +709,17 @@ void fn_800153CC(const char* szName, void (*pfnOpened)(void*), void (*pfnClosed)
     lbl_80280DF8->aParams[3].nNumFiles++;
 }
 
-// Add loading file nFile (data/Load/Load<n>.gcb) to stream list 2.
-void fn_80014544(int nFile) {
-    char szName[0x40];   // size unknown: the frame allows 0x40..0x48 bytes
+// ---- sweep code (not yet cleaned up) ----
 
-    sprintf(szName, lbl_80186C14, nFile);
-    fn_80015030(szName, fn_80014E70, fn_80014E88);
-}
-
-// Stream the current hole's file (data/<course>/<hole>/hole.hog, or the session's override) as
-// list 6, updating the loading screen until it is all read.
-void StreamManagerHole_StreamFiles(void) {
-    char szPath[0x80];  // size unknown: the frame allows up to 0x84 bytes
-    char* szCourse;
-    char* szHole;
-
-    fn_800918A4();
-    fn_80015324();
-    if (gSession.n5B34 != 0) {
-        fn_8001529C(gSession.p5B30, fn_80014E7C, fn_80014E94);
-    } else {
-        szCourse = fn_800E2680();
-        szHole = GameManager_GetHoleName(fn_80015464());
-        sprintf(szPath, lbl_80186C2C, szCourse);
-        strcat(szPath, szHole);
-        strcat(szPath, lbl_80186C38);
-        fn_8001529C(szPath, fn_80014E7C, fn_80014E94);
-    }
-    fn_8001526C();
-    do {
-        fn_8009198C(0);
-    } while (UStream_Update() != 0);
-    fn_8009198C(1);
-    fn_80015244();
-    fn_80091818();
-}
-
-// Set up the stream lists: empty them all, then put the front end's files in list 1 and the
-// load-once and startup files in lists 4 and 5.
-void fn_800143B8(void) {
-    int i;
-
-    lbl_80280DF8->aParams[0].nNumFiles = 0;
-    lbl_80280DF8->aParams[1].nNumFiles = 0;
-    lbl_80280DF8->aParams[2].nNumFiles = 0;
+void fn_80015454(void) {
     lbl_80280DF8->aParams[3].nNumFiles = 0;
-    lbl_80280DF8->aParams[4].nNumFiles = 0;
-    lbl_80280DF8->aParams[5].nNumFiles = 0;
-    lbl_80280DF8->aParams[6].nNumFiles = 0;
-    fn_80014FA8(lbl_80186BD8, fn_80014E6C, fn_80014E84);
-    fn_80014FA8(lbl_80186BEC, fn_80014E6C, fn_80014E84);
-    fn_80014F20(lbl_80186BF8, fn_80014E78, fn_80014E90);
-    fn_80014E98(lbl_80186BF8, fn_80014E78, fn_80014E90);
-    fn_80014E98(lbl_80186C08, fn_80014E78, fn_80014E90);
-    for (i = 0; i < 30; i++) {
-        lbl_801A48C8[i] = 0;
-    }
-    fn_80014DF8();
-    fn_80014A60();
 }
 
-// Stream list 1 (the front end's files), with the loading screen unless the front end's b0F is set.
-void fn_80014718(void) {
-    if (lbl_801D7148.b0F == 0) {
-        fn_80091778();
-        fn_800918A4();
-    }
-    fn_80015134();
-    do {
-        if (lbl_801D7148.b0F == 0) {
-            fn_8009198C(0);
-        }
-    } while (UStream_Update() != 0);
-    if (lbl_801D7148.b0F == 0) {
-        fn_8009198C(1);
-    }
-    fn_8001510C();
-    if (lbl_801D7148.b0F == 0) {
-        fn_80091818();
-    }
+int fn_80015464(void) {
+    return gpGame->nCurHoleNum;
 }
+
+// ---- end of sweep code ----
 
 // Free every block of the pool.
 void fn_80015470(void) {
@@ -693,6 +782,13 @@ void fn_80015540(void) {
     GXSetCurrentMtx(0);
     fn_80015470();
 }
+
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_80015620(void) {
+}
+
+// ---- end of sweep code ----
 
 // Hand GX every group of the renderer's state that changed (u110), then the texture of the next
 // draw (uFlags). While fn_8002A164's screen copy is drawn with, it takes TEV stage 0 and the
@@ -896,6 +992,18 @@ void fn_80015624(void) {
     }
 }
 
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_80016124(s32 p0, s32 p1, s32 p2, s32 p3) {
+    GXSetTexCoordGen2(p0, p1, p2, p3, 0, 125);
+}
+
+void* fn_8001614C(void) {
+    return *lbl_80280DF0;
+}
+
+// ---- end of sweep code ----
+
 // Set the alpha of TEV constant colour 0.
 void fn_80016158(u8 nAlpha) {
     GXColor colour;
@@ -904,6 +1012,14 @@ void fn_80016158(u8 nAlpha) {
     colour.a = nAlpha;
     GXSetTevKColor(0, colour);
 }
+
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_8001618C(u8 v) {
+    *(u8*)(lbl_80280DC8 + 0x0) = v;
+}
+
+// ---- end of sweep code ----
 
 // Reset the view: whole-screen viewport, a 512 x 448 screen, scales of 1.
 void fn_80016198(void) {
@@ -928,92 +1044,18 @@ void fn_80016208(void) {
     lbl_80280E08->m40[2][2] = -((f32)n - 1.0f) / (f32)n;
 }
 
-// Draw to the whole screen.
-void fn_80016948(void) {
-    fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
+// ---- sweep code (not yet cleaned up) ----
+
+void fn_800162A0(void) {
 }
 
-// Work out the viewport in pixels from its corners and the screen size, and its matrix.
-void fn_800169AC(void) {
-    ViewState* pView = lbl_80280E08;
-
-    pView->n70 = pView->fD4 * pView->nE4;
-    pView->n74 = pView->fD8 * pView->nE8;
-    pView->n78 = pView->fDC * pView->nE4;
-    pView->n7C = pView->fE0 * pView->nE8;
-    pView->m40[0][0] = pView->fF4;
-    pView->m40[1][1] = pView->fF8;
-    fn_8000ADC0(pView->m80);
-    pView->m80[3][0] += pView->n70;
-    pView->m80[3][1] += pView->n74;
-    pView->m80[0][0] = pView->n78 * pView->fF4;
-    pView->m80[1][1] = pView->n7C * pView->fF8;
-    pView->m80[2][2] = 0.0f;
+void fn_800162A4(void) {
 }
 
-// Send a vertex to the GPU: its position and the view's colour.
-void fn_800166E8(f32* pPos) {
-    fn_80016C94(pPos[0], pPos[1], pPos[2]);
-    fn_80016C7C(255.0f * lbl_80280E08->aColour[0], 255.0f * lbl_80280E08->aColour[1],
-                255.0f * lbl_80280E08->aColour[2], 255.0f * lbl_80280E08->aColour[3]);
+void fn_800162A8(void) {
 }
 
-// Send a vertex with its own colour (0..1 per channel).
-void fn_80016770(f32* pPos, f32* pColour) {
-    fn_80016C94(pPos[0], pPos[1], pPos[2]);
-    fn_80016C7C(255.0f * pColour[0], 255.0f * pColour[1], 255.0f * pColour[2], 255.0f * pColour[3]);
-}
-
-// Send a vertex with the view's colour and a texture coordinate.
-void fn_80016800(f32* pPos, f32* pUV) {
-    fn_80016C94(pPos[0], pPos[1], pPos[2]);
-    fn_80016C7C(255.0f * lbl_80280E08->aColour[0], 255.0f * lbl_80280E08->aColour[1],
-                255.0f * lbl_80280E08->aColour[2], 255.0f * lbl_80280E08->aColour[3]);
-    fn_80016CA8(pUV[0], pUV[1]);
-}
-
-// Send a vertex with its own colour and a texture coordinate.
-void fn_800168A0(f32* pPos, f32* pColour, f32* pUV) {
-    fn_80016C94(pPos[0], pPos[1], pPos[2]);
-    fn_80016C7C(255.0f * pColour[0], 255.0f * pColour[1], 255.0f * pColour[2], 255.0f * pColour[3]);
-    fn_80016CA8(pUV[0], pUV[1]);
-}
-
-// Give the renderer the current camera's matrices, with rows 0 and 2 of the first negated.
-void fn_80016B9C(void) {
-    fn_8000A0E8(((Camera*)fn_8001614C())->m15C, lbl_801B8980.m34);
-    fn_8000A0E8(((Camera*)fn_8001614C())->m9C, lbl_801B8980.m74);
-    fn_80016C28(lbl_801B8980.m34[0], lbl_801B8980.m34[0]);
-    fn_80016C28(lbl_801B8980.m34[2], lbl_801B8980.m34[2]);
-    lbl_801B8980.u110 |= 0x100;
-}
-
-// Negates four floats from pSrc into pDst (paired singles).
-#ifdef __MWERKS__
-asm void fn_80016C28(register f32* pSrc, register f32* pDst) {
-    nofralloc
-    psq_l  f0, 0(pSrc), 0, 0
-    psq_l  f1, 8(pSrc), 0, 0
-    ps_neg f0, f0
-    ps_neg f1, f1
-    psq_st f0, 0(pDst), 0, 0
-    psq_st f1, 8(pDst), 0, 0
-    blr
-}
-#else
-// port: untested, the plain-C version for compilers without paired singles.
-void fn_80016C28(f32* pSrc, f32* pDst) {
-    pDst[0] = -pSrc[0];
-    pDst[1] = -pSrc[1];
-    pDst[2] = -pSrc[2];
-    pDst[3] = -pSrc[3];
-}
-#endif
-
-// Set the GX viewport from six values (GXGetViewportv's layout).
-void fn_80016C44(const f32* pViewport) {
-    GXSetViewport(pViewport[0], pViewport[1], pViewport[2], pViewport[3], pViewport[4], pViewport[5]);
-}
+// ---- end of sweep code ----
 
 // Draw primitive 0xA1: each pair of vertices gives the opposite corners of a rectangle (x from
 // one, y from the other), drawn as a 4-vertex strip (0x98). Texture coordinates are spread over
@@ -1125,6 +1167,39 @@ void fn_8001644C(int ePrim, f32* pPos, f32* pColour, f32* pUV, int nVerts) {
     }
 }
 
+// Send a vertex to the GPU: its position and the view's colour.
+void fn_800166E8(f32* pPos) {
+    fn_80016C94(pPos[0], pPos[1], pPos[2]);
+    fn_80016C7C(255.0f * lbl_80280E08->aColour[0], 255.0f * lbl_80280E08->aColour[1],
+                255.0f * lbl_80280E08->aColour[2], 255.0f * lbl_80280E08->aColour[3]);
+}
+
+// Send a vertex with its own colour (0..1 per channel).
+void fn_80016770(f32* pPos, f32* pColour) {
+    fn_80016C94(pPos[0], pPos[1], pPos[2]);
+    fn_80016C7C(255.0f * pColour[0], 255.0f * pColour[1], 255.0f * pColour[2], 255.0f * pColour[3]);
+}
+
+// Send a vertex with the view's colour and a texture coordinate.
+void fn_80016800(f32* pPos, f32* pUV) {
+    fn_80016C94(pPos[0], pPos[1], pPos[2]);
+    fn_80016C7C(255.0f * lbl_80280E08->aColour[0], 255.0f * lbl_80280E08->aColour[1],
+                255.0f * lbl_80280E08->aColour[2], 255.0f * lbl_80280E08->aColour[3]);
+    fn_80016CA8(pUV[0], pUV[1]);
+}
+
+// Send a vertex with its own colour and a texture coordinate.
+void fn_800168A0(f32* pPos, f32* pColour, f32* pUV) {
+    fn_80016C94(pPos[0], pPos[1], pPos[2]);
+    fn_80016C7C(255.0f * pColour[0], 255.0f * pColour[1], 255.0f * pColour[2], 255.0f * pColour[3]);
+    fn_80016CA8(pUV[0], pUV[1]);
+}
+
+// Draw to the whole screen.
+void fn_80016948(void) {
+    fn_80016978(0.0f, 0.0f, 1.0f, 1.0f);
+}
+
 // Set the viewport's corners, as fractions of the screen.
 void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1) {
     ViewState* pView = lbl_80280E08;
@@ -1134,6 +1209,24 @@ void fn_80016978(f32 x0, f32 y0, f32 x1, f32 y1) {
     pView->fDC = x1;
     pView->fE0 = y1;
     fn_800169AC();
+}
+
+// Work out the viewport in pixels from its corners and the screen size, and its matrix.
+void fn_800169AC(void) {
+    ViewState* pView = lbl_80280E08;
+
+    pView->n70 = pView->fD4 * pView->nE4;
+    pView->n74 = pView->fD8 * pView->nE8;
+    pView->n78 = pView->fDC * pView->nE4;
+    pView->n7C = pView->fE0 * pView->nE8;
+    pView->m40[0][0] = pView->fF4;
+    pView->m40[1][1] = pView->fF8;
+    fn_8000ADC0(pView->m80);
+    pView->m80[3][0] += pView->n70;
+    pView->m80[3][1] += pView->n74;
+    pView->m80[0][0] = pView->n78 * pView->fF4;
+    pView->m80[1][1] = pView->n7C * pView->fF8;
+    pView->m80[2][2] = 0.0f;
 }
 
 void fn_80016B54(int nWidth, int nHeight, f32 fX, f32 fY) {
@@ -1151,84 +1244,60 @@ void fn_80016B6C(f32 fX, f32 fY) {
     fn_800169AC();
 }
 
-// Refill stream list 0 with the global data and character files and every player's golfer's
-// character file.
-void fn_80014A64(void) {
-    char szName[0x80];  // size unknown: the frame allows up to 0x84 bytes
-    int nPlayer;
-    int i;
-
-    lbl_80281CE4 = 0;
-    fn_800153BC();
-    fn_80015334(lbl_80186C44, fn_80014E78, fn_80014E90);
-    fn_80015334(lbl_80186C50, fn_80014E68, fn_80014E80);
-    for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
-        sprintf(szName, lbl_80186C5C, fn_8001C558(nPlayer) + 1);
-        fn_80015334(szName, fn_80014E68, fn_80014E80);
-    }
-    for (i = 0; i < 30; i++) {
-        lbl_801A48C8[i] = 0;
-    }
+// Give the renderer the current camera's matrices, with rows 0 and 2 of the first negated.
+void fn_80016B9C(void) {
+    fn_8000A0E8(((Camera*)fn_8001614C())->m15C, lbl_801B8980.m34);
+    fn_8000A0E8(((Camera*)fn_8001614C())->m9C, lbl_801B8980.m74);
+    fn_80016C28(lbl_801B8980.m34[0], lbl_801B8980.m34[0]);
+    fn_80016C28(lbl_801B8980.m34[2], lbl_801B8980.m34[2]);
+    lbl_801B8980.u110 |= 0x100;
 }
 
-// Refill stream list 0 with the sac files: malesac for animation slot 0 and femsac for slot 1
-// when that slot has overlays, and every player's golfer's CharSac file.
-void fn_80014BB4(void) {
-    char szName[0x80];  // size unknown: the frame allows up to 0x88 bytes
-    int nPlayer;
+// Negates four floats from pSrc into pDst (paired singles).
+#ifdef __MWERKS__
+asm void fn_80016C28(register f32* pSrc, register f32* pDst) {
+    nofralloc
+    psq_l  f0, 0(pSrc), 0, 0
+    psq_l  f1, 8(pSrc), 0, 0
+    ps_neg f0, f0
+    ps_neg f1, f1
+    psq_st f0, 0(pDst), 0, 0
+    psq_st f1, 8(pDst), 0, 0
+    blr
+}
+#else
+// port: untested, the plain-C version for compilers without paired singles.
+void fn_80016C28(f32* pSrc, f32* pDst) {
+    pDst[0] = -pSrc[0];
+    pDst[1] = -pSrc[1];
+    pDst[2] = -pSrc[2];
+    pDst[3] = -pSrc[3];
+}
+#endif
 
-    fn_800153BC();
-    if (Skalib_HasOverlays(0) != 0) {
-        fn_80015334(lbl_80186C74, fn_80014E78, fn_80014E90);
-    }
-    if (Skalib_HasOverlays(1) != 0) {
-        fn_80015334(lbl_80186C80, fn_80014E78, fn_80014E90);
-    }
-    for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
-        sprintf(szName, lbl_80186C8C, fn_8001C558(nPlayer) + 1);
-        fn_80015334(szName, fn_80014E68, fn_80014E80);
-    }
+// Set the GX viewport from six values (GXGetViewportv's layout).
+void fn_80016C44(const f32* pViewport) {
+    GXSetViewport(pViewport[0], pViewport[1], pViewport[2], pViewport[3], pViewport[4], pViewport[5]);
 }
 
-// Refill stream list 0 with the current animation slot's sac file and the CharSac file of every
-// player whose golfer has an overlay loaded in that slot.
-void fn_80014C9C(void) {
-    char szName[0x80];  // size unknown: the frame allows up to 0x8C bytes
-    u32 nSlot;
-    int nPlayer;
-    LibSlot* pSlot;
-    int nModel;
-    int i;
+// ---- sweep code (not yet cleaned up) ----
 
-    fn_800153BC();
-    nSlot = Skalib_CurSlot();
-    if (nSlot == 0) {
-        fn_80015334(lbl_80186C74, fn_80014E78, fn_80014E90);
-    } else {
-        fn_80015334(lbl_80186C80, fn_80014E78, fn_80014E90);
-    }
-    pSlot = &lbl_801C6068[nSlot];
-    for (nPlayer = 0; nPlayer < gSession.nNumPlayers; nPlayer++) {
-        nModel = fn_8001C558(nPlayer);
-        for (i = 0; i < pSlot->nOverlays; i++) {
-            if (pSlot->overlays[i].n14 == nModel) {
-                break;
-            }
-        }
-        if (i < pSlot->nOverlays) {
-            sprintf(szName, lbl_80186C8C, nModel + 1);
-            fn_80015334(szName, fn_80014E68, fn_80014E80);
-        }
-    }
+void fn_80016C7C(s32 p0, s32 p1, s32 p2, s32 p3) {
+    *(volatile u8*)0xCC008000 = p0;
+    *(volatile u8*)0xCC008000 = p1;
+    *(volatile u8*)0xCC008000 = p2;
+    *(volatile u8*)0xCC008000 = p3;
 }
 
-// Make stream list 3 hold only the front-end character file for character nChar
-// (data/FEChars/<nChar + 1>charfe.gcb), for the golfer the front end is loading.
-void fn_80014DFC(s32 nChar, s32 nUnused) {   // port: FEgolferanim.c passes a second argument this ignores
-    char szName[0x100];  // size unknown: the frame allows up to 0x100 bytes
-
-    fn_80015454();
-    sprintf(szName, lbl_80186CA8, nChar + 1);
-    lbl_80281EE0->pB8->n14 = -1;
-    fn_800153CC(szName, fn_80014E74, fn_80014E8C);
+void fn_80016C94(f32 farg0, f32 farg1, f32 farg2) {
+    *(f32* )0xCC008000 = farg0;
+    *(f32* )0xCC008000 = farg1;
+    *(f32* )0xCC008000 = farg2;
 }
+
+void fn_80016CA8(f32 farg0, f32 farg1) {
+    *(f32* )0xCC008000 = farg0;
+    *(f32* )0xCC008000 = farg1;
+}
+
+// ---- end of sweep code ----
