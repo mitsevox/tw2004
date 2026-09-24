@@ -6,51 +6,71 @@
 #include "engine.h"
 #include "charstate.h"
 
-// ---- sweep code (not yet cleaned up) ----
+void fn_8011C068(SkinMorphWork* pWork, SkinMeshBit* aVerts, u8* pExtra, u32 nVerts);
+void fn_8011C1FC(SkinMorphWork* pWork, u8* pVerts, u8* pExtra, u32 nVerts);
 
-void fn_8011C46C(void* arg0);
-void fn_8011C1FC();
-void fn_8011C4D4(s32 p0, s32 p1);
-void fn_8011C580(s32 p0, s32 p1);
-s32 fn_8011C58C(s32 p0, s32 p1, s32 p2);
-void fn_8011C59C(s32 p0, s32 p1);
-void fn_8011C5A8(s32 p0, s32 p1);
-void fn_8011C84C(void);
+// Swaps the work area's two buffers.
+void fn_8011C46C(SkinMorphWork* pWork) {
+    void* p = pWork->p10020;
 
-void fn_8011C46C(void* arg0) {
-    s32 temp_r4;
-
-    temp_r4 = (*(s32*)((u8*)(arg0) + 0x10020));
-    (*(s32*)((u8*)(arg0) + 0x10020)) = (s32) (*(s32*)((u8*)(arg0) + 0x10024));
-    (*(s32*)((u8*)(arg0) + 0x10024)) = temp_r4;
+    pWork->p10020 = pWork->p10024;
+    pWork->p10024 = p;
 }
 
-void fn_8011C4D4(s32 p0, s32 p1) {
-    fn_8011C1FC(p0, p1, (p1 + (*(u16*)(((u8*)(p0 + 0x10000)) + 0x18) << 3)), *(u16*)(((u8*)(p0 + 0x10000)) + 0x18));
+// Points the second buffer at a target mesh's vertices; gives its vertex count.
+s32 fn_8011C484(SkinMorphWork* pWork, SkinMesh* pMesh) {
+    s32 nVerts = pMesh->n8;
+
+    pWork->p10024 = pMesh->pBits;
+    return nVerts;
 }
 
-void fn_8011C580(s32 p0, s32 p1) {
-    *(s32*)(((u8*)(p0 + 0x10000)) + 0x228) = p1;
+// Unpacks a mesh's vertices (and the bytes after them) into the work area.
+void fn_8011C49C(SkinMorphWork* pWork, SkinMesh* pMesh) {
+    s32 nVerts = pMesh->n8;
+    SkinMeshBit* aVerts = pMesh->pBits;
+
+    pWork->n10018 = nVerts;
+    fn_8011C068(pWork, aVerts, (u8*)(aVerts + nVerts), nVerts);
 }
 
-s32 fn_8011C58C(s32 p0, s32 p1, s32 p2) {
-    *(s32*)(((u8*)(p0 + 0x10000)) + 0x230) = p1;
-    *(s32*)(((u8*)(p0 + 0x10000)) + 0x22C) = p2;
-    return (p0 + 0x10000);
+// Packs the work area's vertices back into pDst.
+void fn_8011C4D4(SkinMorphWork* pWork, u8* pDst) {
+    u32 nVerts = pWork->n10018;
+
+    fn_8011C1FC(pWork, pDst, pDst + (nVerts << 3), nVerts);    // 8 bytes a vertex
 }
 
-void fn_8011C59C(s32 p0, s32 p1) {
-    *(s32*)(((u8*)(p0 + 0x10000)) + 0x238) = p1;
+// Clears the work area's skin and gives it.
+SkinMorphWork* fn_8011C564(void) {
+    SkinMorphWork* pWork = lbl_80281880;
+
+    pWork->pDesc = NULL;
+    pWork->afWeights = NULL;
+    pWork->nMorphs = 0;
+    return pWork;
 }
 
-void fn_8011C5A8(s32 p0, s32 p1) {
-    *(s32*)(((u8*)(p0 + 0x10000)) + 0x234) = p1;
+void fn_8011C580(SkinMorphWork* pWork, SkinDesc* pDesc) {
+    pWork->pDesc = pDesc;
 }
 
-void fn_8011C84C(void) {
+void fn_8011C58C(SkinMorphWork* pWork, f32* afWeights, s32 nMorphs) {
+    pWork->afWeights = afWeights;
+    pWork->nMorphs = nMorphs;
 }
 
-// ---- end of sweep code ----
+void fn_8011C59C(SkinMorphWork* pWork, HwsOverrideTable* pTable) {
+    pWork->pTable = pTable;
+}
+
+void fn_8011C5A8(SkinMorphWork* pWork, HwsMemBlock* pBlock) {
+    pWork->pBlock = pBlock;
+}
+
+// Every caller passes the work area; it is unused.
+void fn_8011C84C(SkinMorphWork* pWork) {
+}
 
 // The morph targets a skin description needs: the highest n14 + n18 of its p44 entries that have
 // morph targets.

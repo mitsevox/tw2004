@@ -219,6 +219,25 @@ typedef struct SkinMorphState {
                                 //      fn_8011CE58 sets every bit, fn_8011CB5C clears one
 } SkinMorphState;
 
+// SkinMorph.c's work area (lbl_80281880; our name): blends a mesh's morph targets into one of two
+// vertex buffers. Only what the code reads.
+typedef struct SkinMorphWork {
+    u8   unk0[0x10018];
+    u16  n10018;                // 0x10018  vertices in the mesh being blended (fn_8011C49C)
+    u8   pad1001A[0x10020 - 0x1001A];
+    void* p10020;               // 0x10020  } the two buffers; fn_8011C46C swaps them
+    void* p10024;               // 0x10024  }
+    SkinMesh* apTargets[64];    // 0x10028  the target meshes fn_8011C5B4 picks
+    f32  afTargets[64];         // 0x10128  and their weights
+    SkinDesc* pDesc;            // 0x10228
+    s32  nMorphs;               // 0x1022C  } SkinMorphState's (fn_8011C58C)
+    f32* afWeights;             // 0x10230  }
+    struct HwsMemBlock* pBlock;         // 0x10234  (fn_8011C5A8)
+    struct HwsOverrideTable* pTable;    // 0x10238  (fn_8011C59C)
+} SkinMorphWork;
+
+extern SkinMorphWork* lbl_80281880;
+
 // A skin (Skin.c): a character's body or one of its attachments; only what the code reads.
 typedef struct Skin {
     SkinModel* pModel;          // 0x0000
