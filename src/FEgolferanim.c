@@ -177,7 +177,7 @@ void fn_8008AD80(void) {
             nPrev = CRAP_NUM_GOLFERS - 1;
         }
         nNext = i + 1;
-        if (nNext >= CRAP_NUM_GOLFERS) {
+        if (nNext > CRAP_NUM_GOLFERS - 1) {
             nNext = 0;
         }
         lbl_80281EE8[i] = NULL;
