@@ -317,7 +317,7 @@ u8 GameModeAlternateShot_GameFinished(u8 bCheck) {
             gpGame->nD8++;
             fn_800E2BA4();
             CLEAR_ROUNDS(PLAYER_AT);
-            fn_800E45C0();
+            GUI_GolfersTiedUIMessage();
         }
     } else {
         nLeft = 0;
@@ -361,7 +361,7 @@ u8 GameModeAlternateShot_GoToPlayoff(u8 bCheck) {
         CLEAR_ROUNDS(PLAYER);
         gpGame->bD4 = 1;
         gpGame->nD8++;
-        fn_800E45C0();
+        GUI_GolfersTiedUIMessage();
         return 1;
     }
     return 0;

@@ -10,7 +10,7 @@
 #include "core/audtrack.h"
 #include "core/startup.h"
 
-void fn_800ACCF4(void);
+void Voc_PauseAll(void);
 u8   fn_800AF264(u8 a, u8 b);
 void fn_800AF2D8(void);
 void fn_800AF2DC(u8 b);
@@ -148,8 +148,8 @@ void Mov_Init(void) {
     request.pUser = NULL;
     request.nIndex = 0;
     fn_800B596C("Mov_Init");
-    lbl_801F1850.pLeft = fn_800AC4A0(&request);
-    lbl_801F1850.pRight = fn_800AC4A0(&request);
+    lbl_801F1850.pLeft = Voc_Alloc(&request);
+    lbl_801F1850.pRight = Voc_Alloc(&request);
     if (lbl_801F1850.pLeft != NULL && lbl_801F1850.pRight != NULL) {
         lbl_801F1850.pLeft->uAram = fn_800B0790();
         lbl_801F1850.pRight->uAram = lbl_801F1850.pLeft->uAram + MOVIE_BLOCKS * MOVIE_BLOCK_SIZE;
@@ -166,12 +166,12 @@ void Mov_Exit(void) {
     fn_800B596C("Mov_Exit");
     if (lbl_801F1850.pLeft != NULL) {
         lbl_801F1850.pLeft->uAram = 0;
-        fn_800ACB28(lbl_801F1850.pLeft);
+        Voc_Delete(lbl_801F1850.pLeft);
         lbl_801F1850.pLeft = NULL;
     }
     if (lbl_801F1850.pRight != NULL) {
         lbl_801F1850.pRight->uAram = 0;
-        fn_800ACB28(lbl_801F1850.pRight);
+        Voc_Delete(lbl_801F1850.pRight);
         lbl_801F1850.pRight = NULL;
     }
     lbl_801F1850.uPlayed = 0;
@@ -194,11 +194,11 @@ void Mov_Start(void) {
     params.nVolume = 0x2FFF;
     params.nPan = 0;
     params.n7 = 0x7F;
-    fn_800AC91C(lbl_801F1850.pLeft, &params);
+    Voc_Render(lbl_801F1850.pLeft, &params);
     params.nVolume = 0x2FFF;
     params.nPan = 0x7F;
     params.n7 = 0x7F;
-    fn_800AC91C(lbl_801F1850.pRight, &params);
+    Voc_Render(lbl_801F1850.pRight, &params);
     lbl_801F1850.nState = 2;
     fn_800B5994("Mov_Start");
 }
@@ -334,7 +334,7 @@ u8 fn_800A8DC8(u8 a, u8 b, u8 nListeners) {
 }
 
 void fn_800A8F68(u8 b) {
-    fn_800ACCF4();
+    Voc_PauseAll();
     fn_800AF2DC(b);
     if (b) {
         lbl_8028207C |= 0x40;
@@ -557,7 +557,7 @@ void fn_800A9590(AudSource* pSource, AudTrack* pTrack, f32 fVolume) {
             params.nVolume = fn_800A85FC(fVolume, pVoice->n14 << 7);
             params.nPan = 64.0f * pSource->fPan + 64.0f;
             params.n7 = 64.0f * pSource->f68 + 64.0f;
-            fn_800AC91C(pVoice, &params);
+            Voc_Render(pVoice, &params);
         }
     }
 }
@@ -588,7 +588,7 @@ void fn_800A96DC(AudSource* pSource, AudTrack* pTrack, f32 fVolume) {
             params.nVolume = fn_800A85FC(pVoice->n14 << 7, fVolume);
             params.nPan = bMono ? 0x40 : bRight ? 0x7F : 0;
             params.n7 = 0x7F;
-            fn_800AC91C(pVoice, &params);
+            Voc_Render(pVoice, &params);
         }
         bRight ^= 1;
     }

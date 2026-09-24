@@ -1,5 +1,5 @@
 // GoCamCont.c (TW06's golf/cameras/gocamcont.c; our spelling): the camera controller of each view
-// (View, TW06's CameraController): picking the camera mode (View_SetCamera), its idle state and the
+// (View, TW06's CameraController): picking the camera mode (CameraController_SetCameraMode), its idle state and the
 // small setters and tests the camera code uses.
 
 #include "golfer.h"
@@ -17,7 +17,7 @@ void fn_80016CD8(int nView);                            // ViewController.c: set
 void fn_80045824(int n);                                // DepthField.c: turns depth-of-field layer n off
 void fn_800A6070(u8 nPlayer, u8 bLimit);                // GameAudio.c
 f32  fn_8005CC18(f32* pV);                              // Swing.c
-void CameraController_Shake(View* pView);
+void CameraController_ShakeCamera(View* pView);
 void fn_80064108(View* pView);
 
 // fake match: stands in for a function the original linker stripped. The file's pool starts with
@@ -191,7 +191,7 @@ void CameraController_Idle(View* pView, int nPlayer) {
         }
     }
     if (pView->script.fF0 > 0.0f && gSession.fFrameTime > 0.0f) {
-        CameraController_Shake(pView);
+        CameraController_ShakeCamera(pView);
         pView->script.fF0 -= gSession.fFrameTime;
     }
     if ((f32)fn_80009680(fn_8005CC18(pView->v20)) == 0.0f) {
@@ -209,7 +209,7 @@ void CameraController_Idle(View* pView, int nPlayer) {
 
 // Switches the view to camera mode nCamera for the player (TW06's CameraController_SetCameraMode):
 // the mode's setup runs with nView as the current view.
-void View_SetCamera(View* pView, int nCamera, int nPlayer, int nView) {
+void CameraController_SetCameraMode(View* pView, int nCamera, int nPlayer, int nView) {
     int nPrevView;
 
     fn_8001731C(pView);
@@ -490,7 +490,7 @@ void fn_80063920(int nView, f32* pBounds) {
 
 // Colour fade state 2 (fn_8003F2E0): the colour pVec over the view, its alpha falling from pVec[3]
 // to 0 over fTime.
-void fn_80063B98(View* pView, f32 fTime, f32* pVec) {
+void CameraController_FadeIn(View* pView, f32 fTime, f32* pVec) {
     pView->script.nCamera = 2;
     Vec_Copy(pVec, pView->script.v40);
     pView->script.f90 = 0.0f;
@@ -499,7 +499,7 @@ void fn_80063B98(View* pView, f32 fTime, f32* pVec) {
 
 // Colour fade state 1 (fn_8003F2E0): the colour pVec over the view, its alpha rising from 0 to
 // pVec[3] over fTime.
-void fn_80063BF4(View* pView, f32 fTime, f32* pVec) {
+void CameraController_FadeOut(View* pView, f32 fTime, f32* pVec) {
     pView->script.nCamera = 1;
     Vec_Copy(pVec, pView->script.v40);
     pView->script.f90 = 0.0f;
@@ -556,7 +556,7 @@ void fn_80063CF0(View* pView, int nKind, int nPlayer) {
                                            100.0f, 25, 0.0f);
             pView->script.nBC = 5;
             pView->script.f8C = 0.3f;
-            fn_80063BF4(pView, 0.3f, vSpeed);
+            CameraController_FadeOut(pView, 0.3f, vSpeed);
         }
     }
     if (nKind == 7) {
@@ -653,10 +653,10 @@ void fn_80064108(View* pView) {
 }
 
 // Shakes the camera: moves its position by up to half of the script's fF4 each way.
-void CameraController_Shake(View* pView) {
-    pView->v0[0] += pView->script.fF4 * (Rand_Float(0) - 0.5f);
-    pView->v0[1] += pView->script.fF4 * (Rand_Float(0) - 0.5f);
-    pView->v0[2] += pView->script.fF4 * (Rand_Float(0) - 0.5f);
+void CameraController_ShakeCamera(View* pView) {
+    pView->v0[0] += pView->script.fF4 * (Misc_RandFuncf(0) - 0.5f);
+    pView->v0[1] += pView->script.fF4 * (Misc_RandFuncf(0) - 0.5f);
+    pView->v0[2] += pView->script.fF4 * (Misc_RandFuncf(0) - 0.5f);
 }
 
 void fn_800642A4(View* pView, f32 fF0, f32 fF4) {

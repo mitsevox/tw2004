@@ -1610,7 +1610,7 @@ void fn_8007C5F0(MsgArg* pArgs, MsgArg* pResult) {
 
     n = pArgs[0].i;
     if (n == 11) {
-        fn_800A73F0((Rand_Next(0) & 7) + 11);
+        fn_800A73F0((Misc_RandFunc(0) & 7) + 11);
     } else {
         fn_800A73F0(n);
     }
@@ -3615,7 +3615,7 @@ void fn_80080CC8(MsgArg* pArgs, MsgArg* pResult) {
         }
     }
 retry:
-    nPick = Rand_Next(1) % nUnlocked + 1;
+    nPick = Misc_RandFunc(1) % nUnlocked + 1;
     nFound = 0;
     for (i = 0; i < 20; i++) {
         if ((gpSaveData[nSlot].aCourseUnlocked[aCourses[i]] ||
@@ -3625,7 +3625,7 @@ retry:
             break;
         }
     }
-    nHoleNum = Rand_Next(1) % 18;
+    nHoleNum = Misc_RandFunc(1) % 18;
     for (i = 0; i < 18; i++) {
         if (nCourse == gpSaveData[nSlot].aSavedRound[nRound].nCourse[i] &&
             nHoleNum == gpSaveData[nSlot].aSavedRound[nRound].nHoleNum[i]) {

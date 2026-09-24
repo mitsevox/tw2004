@@ -414,7 +414,7 @@ void fn_800E4364(u32 nQueue, int a, int b, int c) {
     }
 }
 
-void fn_800E45C0(void) {
+void GUI_GolfersTiedUIMessage(void) {
     lbl_802822A4 = 14;
 }
 
@@ -613,8 +613,8 @@ void fn_800E4D94(u8 bHuman) {
         GameEffects_ResetGameEffectSettings();
         if ((Game_GetMode() == 26 || Game_GetMode() == 22) && gSession.nSplitScreen) {
             f32 v[4] = {0.0f, 0.0f, 0.0f, 1.0f};
-            fn_80063B98(fn_80017028(gPlayers[0].nView[0]), 0.0f, v);
-            fn_80063B98(fn_80017028(gPlayers[1].nView[0]), 0.0f, v);
+            CameraController_FadeIn(fn_80017028(gPlayers[0].nView[0]), 0.0f, v);
+            CameraController_FadeIn(fn_80017028(gPlayers[1].nView[0]), 0.0f, v);
         }
         if (bHuman) {
             fn_80062D38(0xE, 2, 1);

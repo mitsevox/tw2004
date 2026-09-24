@@ -211,7 +211,7 @@ void fn_800F08A8(void) {
         break;
     }
     if (!bFirst && !bSaid) {
-        switch (Rand_Next(0) & 3) {
+        switch (Misc_RandFunc(0) & 3) {
         case 0:
             fn_800E4364(10, 2, 0, 0);
             return;

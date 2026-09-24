@@ -67,9 +67,9 @@ void fn_800D9F34(void) {
         }
     }
     if (bFound) {
-        lbl_80281568 = Rand_Next(0) % 18;
+        lbl_80281568 = Misc_RandFunc(0) % 18;
         while (fn_800D2AD8(lbl_80281568) == 3 || !fn_800D304C(lbl_80281568)) {
-            lbl_80281568 = Rand_Next(0) % 18;
+            lbl_80281568 = Misc_RandFunc(0) % 18;
         }
     } else {
         lbl_80281568 = -1;
@@ -82,15 +82,15 @@ void fn_800D9F34(void) {
         }
     }
     if (bFound) {
-        lbl_8028156C = Rand_Next(0) % 18;
+        lbl_8028156C = Misc_RandFunc(0) % 18;
         while (fn_800D2AD8(lbl_8028156C) > 3) {
-            lbl_8028156C = Rand_Next(0) % 18;
+            lbl_8028156C = Misc_RandFunc(0) % 18;
         }
     } else {
         lbl_8028156C = -1;
     }
 
-    if ((int)(Rand_Next(0) % 100) < 20) {
+    if ((int)(Misc_RandFunc(0) % 100) < 20) {
         bFound = 0;
         for (i = 0; i < 18; i++) {
             if (fn_800D2AD8(i) == 3 && i != lbl_8028156C) {
@@ -98,9 +98,9 @@ void fn_800D9F34(void) {
             }
         }
         if (bFound) {
-            lbl_80281570 = Rand_Next(0) % 18;
+            lbl_80281570 = Misc_RandFunc(0) % 18;
             while (fn_800D2AD8(lbl_80281570) > 3 || lbl_80281570 == lbl_8028156C) {
-                lbl_80281570 = Rand_Next(0) % 18;
+                lbl_80281570 = Misc_RandFunc(0) % 18;
             }
         } else {
             lbl_80281570 = -1;

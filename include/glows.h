@@ -47,7 +47,7 @@ typedef struct GlowQueue {
     s32  nCount;                    // 0x1E00
     u8   unk1E04[0x1E10 - 0x1E04];  // no code found reads these
 } GlowQueue;
-// 0x1E10 bytes: fn_8009AA00 picks a queue by n * 0x1E10 from lbl_801D9A68 (one queue, 0x1E10
+// 0x1E10 bytes: ColGlow_SetCurrentList picks a queue by n * 0x1E10 from lbl_801D9A68 (one queue, 0x1E10
 // bytes; lbl_801DB878 follows it).
 LAYOUT_ASSERT(GlowQueue, 0x1E10);
 

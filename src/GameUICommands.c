@@ -2088,7 +2088,7 @@ void fn_80089600(MsgArg* pArgs, MsgArg* pResult) {
 }
 
 void fn_80089648(MsgArg* pArgs, MsgArg* pResult) {
-    pResult->i = Rand_Next(1);
+    pResult->i = Misc_RandFunc(1);
 }
 
 void fn_8008967C(MsgArg* pArgs, MsgArg* pResult) {

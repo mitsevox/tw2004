@@ -158,7 +158,7 @@ void fn_800FFF34(void) {
     gSession.options.b84 = 0;
     gSession.options.bBoostEnabled = 1;
     gSession.options.bSpinEnabled = 1;
-    fn_8000B1D4(0, 69);
+    Misc_SetSeedFunc(0, 69);
 }
 
 // Hole start.
@@ -537,7 +537,7 @@ void fn_80100C08(void) {
             if (lbl_80282424 == 13) {
                 lbl_80282428 = 18;
                 lbl_80282424 = 13;
-                fn_80063BF4(fn_80017028(gPlayers[0].nView[0]), 0.25f, v);
+                CameraController_FadeOut(fn_80017028(gPlayers[0].nView[0]), 0.25f, v);
             }
         }
         break;
@@ -818,7 +818,7 @@ void fn_80100C08(void) {
     case 19:
         if (fn_80063C7C(fn_80017028(gPlayers[0].nView[0]))) {
             nView = gPlayers[0].nView[0];
-            View_SetCamera(fn_80017028(nView), 18, 0, nView);
+            CameraController_SetCameraMode(fn_80017028(nView), 18, 0, nView);
             if (lbl_802823FC == 12) {
                 lbl_80282424 = 13;
                 lbl_80282428 = 1;

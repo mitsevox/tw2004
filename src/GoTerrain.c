@@ -333,7 +333,6 @@ void fn_80030A40(void* pHoleData, int nView) {
 // bits ask for. In object test mode the whole object tree goes in as one patch.
 void fn_80030CC8(void* pHoleData) {
     Ter_PatchReference* pPatch;
-    s32 n;
     s32 nCount;
     s32 iRenderPass;
     UObjMesh* pMesh;
@@ -380,8 +379,8 @@ void fn_80030CC8(void* pHoleData) {
         pList = fn_800354E4(pRoot, 1);
         nCount = fn_800354F4(pList);
         pMesh = fn_800354E4(pList, 0);
-        for (n = nCount; n > 0; n--) {
-            lbl_801D3CB0.iPatchFirstObjectInstanceIndex[nCount - n] = nFirstObject;
+        for (i = nCount; i > 0; i--) {
+            lbl_801D3CB0.iPatchFirstObjectInstanceIndex[nCount - i] = nFirstObject;
             uFlags = fn_800354D0(pMesh, 1);
             if ((uFlags & uPinBit) || !(uFlags & 0xF)) {
                 if (uFlags & 0x40) {

@@ -1,6 +1,6 @@
 // hlaudvoice.c (TW06's name, by structure: golf/audio/engine/hl/hlaudvoice.c, the file after
 // hlaudtrackstm.c): the sound engine's voices. Each wraps one of startUp.c's hardware voices; a
-// track takes one per channel (fn_800AC4A0) and is called back when it ends. Its extent is its
+// track takes one per channel (Voc_Alloc) and is called back when it ends. Its extent is its
 // data: it is the first to use the .bss at 0x801F19B8 and the .sdata2 block 0x80283FF8-0x80284008.
 
 #include "core/audtrack.h"
@@ -50,7 +50,7 @@ void fn_800AC330(void) {
     }
 }
 
-u8 fn_800AC470(void) {
+u8 Voc_InitModule(void) {
     fn_800AC330();
     return 1;
 }
@@ -62,10 +62,10 @@ u8 fn_800AC494(void) {
 void fn_800AC49C(void) {
 }
 
-// Takes a voice for a request: a free one, or else (with 8 or fewer free) one on a list up to the
-// request's n4 whose playing volume the request beats, stolen from its track. A stolen voice
-// skips its first settings (bA_5). NULL when none can be had.
-AudVoice* fn_800AC4A0(AudVoiceRequest* pRequest) {
+// Takes a voice for a request (NULL at priority 0 or when none can be had). With 8 or fewer free,
+// one on a list up to n4 whose playing volume the request beats is first stolen from its track:
+// deleted if a free voice is left, else reused (it then skips its first settings, bA_5).
+AudVoice* Voc_Alloc(AudVoiceRequest* pRequest) {
     AudVoicePool* pPool = lbl_801F19B8;
     AudVoice* pVoice = NULL;
     u8 bStolen = 0;
@@ -97,7 +97,7 @@ AudVoice* fn_800AC4A0(AudVoiceRequest* pRequest) {
                     pVoice->pfnCallback(pVoice, 1);
                 }
                 if (pPool->free.nFree != 0) {
-                    fn_800ACB28(pVoice);
+                    Voc_Delete(pVoice);
                     pVoice = NULL;
                 } else {
                     fn_800AFBD8(pVoice->nHwVoice, 0);
@@ -132,7 +132,7 @@ AudVoice* fn_800AC4A0(AudVoiceRequest* pRequest) {
             }
             pVoice->uAram = fn_800B06F4();
             if (pVoice->uAram == 0) {
-                fn_800ACB28(pVoice);
+                Voc_Delete(pVoice);
                 return NULL;
             }
             pVoice->uPlayPos = pVoice->uAram;
@@ -149,7 +149,7 @@ u8 fn_800AC6B0(AudVoiceRequest* pRequest, s16* pPriority) {
 
 // Sets a sequenced voice up to play its tone at pitch fPitch and volume nVolume; the params' a8
 // (when flagged) change the tone's attack and decay.
-void fn_800AC6D0(AudVoice* pVoice, AudVoiceParams* pParams, u8 nVolume, f32 fPitch) {
+void Voc_Start(AudVoice* pVoice, AudVoiceParams* pParams, u8 nVolume, f32 fPitch) {
     u16 nHwVoice = pVoice->nHwVoice;
     AudSeqTone* pTone = pVoice->pTone;
     VoiceEnvelope* pEnv = pTone->pEnv;
@@ -173,8 +173,8 @@ void fn_800AC6D0(AudVoice* pVoice, AudVoiceParams* pParams, u8 nVolume, f32 fPit
     fn_800B0114(nHwVoice, (VoiceEnvelope*)ppEnv);
 }
 
-// Sets a streamed voice up to play uLen bytes of its ARAM buffer at nRate, looping: a slow attack,
-// full sustain and a quick release when bLoud.
+// Sets a streamed voice up to play uLen bytes of its ARAM buffer at nRate, looping: attack
+// 0x200, full sustain, release 0x10 with bLoud, else 0x80.
 void fn_800AC7DC(AudVoice* pVoice, u32 uLen, u32 nRate, u8 bLoud) {
     VoiceEnvelope env;
     SoundHeader hdr;
@@ -205,7 +205,7 @@ void fn_800AC7DC(AudVoice* pVoice, u32 uLen, u32 nRate, u8 bLoud) {
 }
 
 // Passes a voice's settings on to its hardware voice; a voice just set up is started first.
-void fn_800AC91C(AudVoice* pVoice, AudVoiceParams* pParams) {
+void Voc_Render(AudVoice* pVoice, AudVoiceParams* pParams) {
     u16 nHwVoice = pVoice->nHwVoice;
     u32 uRate;
     u8 bSetRate;
@@ -243,15 +243,15 @@ void fn_800AC91C(AudVoice* pVoice, AudVoiceParams* pParams) {
 }
 
 // Pauses or resumes a voice's hardware voice.
-void fn_800ACA5C(AudVoice* pVoice, u8 bPause) {
+void Voc_Pause(AudVoice* pVoice, u8 bPause) {
     if (pVoice != NULL && !pVoice->flags.b.bB_6) {
         fn_800AFCBC(pVoice->nHwVoice, bPause);
     }
 }
 
-// Lets a voice end: its hardware voice is stopped and it moves to list 0, where fn_800ACB98 frees
+// Lets a voice end: its hardware voice is stopped and it moves to list 0, where Voc_Cycle frees
 // it once the hardware voice is done.
-void fn_800ACA94(AudVoice* pVoice) {
+void Voc_Stop(AudVoice* pVoice) {
     if (!pVoice->flags.b.bStopped) {
         fn_800AFBD8(pVoice->nHwVoice, 0);
         if (pVoice->n10 > 0) {
@@ -264,13 +264,13 @@ void fn_800ACA94(AudVoice* pVoice) {
 }
 
 // Stops a voice at once: it forgets its track and gives back its ARAM buffer.
-void fn_800ACB28(AudVoice* pVoice) {
-    fn_800ACA94(pVoice);
+void Voc_Delete(AudVoice* pVoice) {
+    Voc_Stop(pVoice);
     pVoice->pfnCallback = NULL;
     pVoice->pUser = NULL;
     pVoice->nIndex = 0;
     if (pVoice->flags.b.bA_4) {
-        fn_800ACA5C(pVoice, 1);
+        Voc_Pause(pVoice, 1);
         if (pVoice->uAram != 0) {
             fn_800B0748(pVoice->uAram);
             pVoice->uAram = 0;
@@ -281,7 +281,7 @@ void fn_800ACB28(AudVoice* pVoice) {
 
 // Once a frame: frees the ended voices whose hardware voice is done (telling their track), and counts
 // the voices in use.
-void fn_800ACB98(void) {
+void Voc_Cycle(void) {
     AudVoicePool* pPool = lbl_801F19B8;
     AudVoicePool* pEnd = lbl_801F19B8 + 1;
     AudVoice* pVoice;
@@ -324,7 +324,7 @@ void fn_800ACB98(void) {
 
 // Pause (bPause) or resume every voice. Resuming leaves the streamed voices (bA_4) paused when
 // bStreams is set, for Stm_Tick to resume. Each pause flips the order the voices are gone through.
-void fn_800ACCF4(u8 bPause, u8 bStreams) {
+void Voc_PauseAll(u8 bPause, u8 bStreams) {
     AudVoicePool* pPool = lbl_801F19B8;
     AudVoicePool* pEnd = lbl_801F19B8 + 1;
     AudVoice* pVoice;

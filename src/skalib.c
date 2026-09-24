@@ -362,7 +362,7 @@ void Skalib_SetBudgets(void) {
         lbl_80281074 = aKeepDouble[n - 1];
         lbl_80281CDC = aBytes[n - 1];
     }
-    lbl_80281078 = (Rand_Next(1) & 1) ^ 1;
+    lbl_80281078 = (Misc_RandFunc(1) & 1) ^ 1;
     if (lbl_80281CD8) {
         pSlot0 = &lbl_801C6068[0];
         pSlot1 = &lbl_801C6068[1];
@@ -447,7 +447,7 @@ int AnimLib_TrimCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* pLeafB,
 }
 
 f32 Skalib_Random(void) {
-    return Rand_Float(1);
+    return Misc_RandFuncf(1);
 }
 
 // A clip that can still be kept: not moved (2, 0x10), not kept already (1), and used by
@@ -484,7 +484,7 @@ int AnimLib_KeepRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* p
             nMarked = 0;
             pIdx    = pLib->pIndex + pLeaf->nFirst;
             for (i = 0; i < nExtra; i++) {
-                nStart = Rand_Next(1) % pLeaf->nCount;
+                nStart = Misc_RandFunc(1) % pLeaf->nCount;
                 for (j = nStart; j < pLeaf->nCount; j++) {
                     pRec = &pLib->pRecords[pIdx[j]];
                     if (SKA_KEEPABLE(pRec, pCtx)) {
@@ -512,7 +512,7 @@ int AnimLib_KeepRandomCb(AnimLib* pA, AnimLib* pB, AnimLeaf* pLeafA, AnimLeaf* p
                 }
             }
             for (i = nMarked; i < nExtra; i++) {
-                nStart = Rand_Next(1) % pLeaf->nCount;
+                nStart = Misc_RandFunc(1) % pLeaf->nCount;
                 for (j = nStart; j < pLeaf->nCount; j++) {
                     pRec = &pLib->pRecords[pIdx[j]];
                     while ((pRec->n12 & 2) || (pRec->n12 & 0x10)) {
@@ -1751,7 +1751,7 @@ int AnimLib_RandomIndex(u32 uUsed, int nCount) {
     int nTries = 0;
     u32 nPick;
     do {
-        nPick = Rand_Next(1) % nCount;
+        nPick = Misc_RandFunc(1) % nCount;
         if (!((1 << nPick) & uUsed)) break;
     } while (++nTries < 3);
     return nPick;

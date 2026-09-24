@@ -309,7 +309,7 @@ u8 fn_800F9F04(u8 bCheck) {
             }
         }
         gpGame->bD4 = 1;
-        fn_800E45C0();
+        GUI_GolfersTiedUIMessage();
         return 1;
     }
     return 0;
@@ -478,7 +478,7 @@ void fn_800FA608(int nPlayer) {
     Emotion_UpdatePlayerEmotion(nPlayer);
     fn_80062F1C(fn_80017028(gPlayers[nPlayer].nView[0]));
     i = gPlayers[nPlayer].nView[0];
-    View_SetCamera(fn_80017028(i), 12, nPlayer, i);
+    CameraController_SetCameraMode(fn_80017028(i), 12, nPlayer, i);
     gPlayers[nPlayer].nC54 = 74;
     gPlayers[nPlayer].nC3C |= 2;
     fn_800FE02C();
@@ -1164,7 +1164,7 @@ void fn_800FBD2C(int nPlayer) {
         fn_80069330(nPlayer, vStart);
         fn_8006A6C4(nPlayer);
         n = gPlayers[nPlayer].nView[0];
-        View_SetCamera(fn_80017028(n), 9, nPlayer, n);
+        CameraController_SetCameraMode(fn_80017028(n), 9, nPlayer, n);
         gPlayers[nPlayer].nC3C |= 1;
         fn_80062C80(gPlayers[nPlayer].nC58, 0);
         gPlayers[nPlayer].fCB4 = lbl_802816B8;
@@ -1266,7 +1266,7 @@ void fn_800FBD2C(int nPlayer) {
 // States 12 and 24, exit: camera 25.
 void fn_800FCBDC(int nPlayer) {
     int nView = gPlayers[nPlayer].nView[0];
-    View_SetCamera(fn_80017028(nView), 25, nPlayer, nView);
+    CameraController_SetCameraMode(fn_80017028(nView), 25, nPlayer, nView);
 }
 
 // 1 when the player's pad has buttons 0x1000, 0x400 and 0x800 (Start, X and Y on a GameCube pad)

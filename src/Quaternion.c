@@ -102,7 +102,7 @@ static double Quaternion_StrippedFn(double x) {
 
 // The quaternion of three angles (each negated), into pOut. An angle of exactly 0 skips its sin
 // and cos.
-void fn_80008BB8(f32* pOut, f32 fA, f32 fB, f32 fC) {
+void fn_80008BB8(f32 fA, f32 fB, f32 fC, f32* pOut) {
     f32 fHalf;
     f32 fSinA;
     f32 fCosA;

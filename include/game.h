@@ -346,7 +346,7 @@ void fn_800DB4E8(int nPlayer);
 void fn_800DB714(int nPlayer);
 void fn_800DBDA8(int nPlayer);
 void GameEffects_SetSuperSlowMo(u8 bOn, int nPlayer, f32 fRate);
-f32  fn_800DC3A4(void);                 // the letterbox's field-of-view change
+f32  GameEffects_FieldOfViewChange(void);                 // the GameBreaker's field-of-view change
 u8   fn_800DC514(int nPlayer);         // super slow motion is on (nPlayer unused)
 void fn_800DC9D4(int a);                // pause or resume a GameBreaker
 u8   fn_8003DCAC(void);                 // GoDynamicCam.c: the letterbox is up (predicted, or b19)
@@ -368,7 +368,7 @@ u8   GM_CheckForBallOOB(int nPlayer);
 void GM_BumpBallForObstructions(int nPlayer);
 void GM_PlayerTookShot(int nPlayer);
 u8   GM_PlayerTakeMulligan(int nPlayer);
-int  fn_800DDFB4(int nPlayer);
+int  GM_DoPreshotAnimation(int nPlayer);
 int  GM_ShowPostShotAnimation(int nPlayer);
 u8   GM_ShowPostShotCrowdFlyby(void);
 void GM_FlyByMode_Init(void);
@@ -440,7 +440,7 @@ void fn_800E4204(void);
 u8   fn_800E4254(int nPlayer);          // whether a message or screen still holds the player
 u8   fn_800E430C(int nPlayer);
 void fn_800E4364(u32 nQueue, int a, int b, int c);    // add an item to a display queue
-void fn_800E45C0(void);
+void GUI_GolfersTiedUIMessage(void);
 u8   fn_800E45CC(void);                 // whether a queued item, message or deferred screen waits
 u8   fn_800E46B4(void);                 // the display pump; nonzero while anything is showing
 u8   fn_800E4BF8(void);

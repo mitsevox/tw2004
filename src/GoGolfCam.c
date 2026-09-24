@@ -1,5 +1,5 @@
 // GoGolfCam.c (EA's name, from its asserts): the golf cameras (TW06's GolfCamera_*). Each camera
-// mode has an init, called by View_SetCamera, and a per-frame process, called by
+// mode has an init, called by CameraController_SetCameraMode, and a per-frame process, called by
 // CameraController_Idle; both drive the view's camera script. The shared camera state
 // (lbl_80282220) is allocated here, with a per-course elevator camera height.
 
@@ -1318,7 +1318,7 @@ void GolfCamera_InitPreShotCamera(View* pView, int nPlayer) {
     nLie = gPlayers[nPlayer].ball.nLie;
     pView->p74 = NULL;
     pShot = fn_80064F7C(nPlayer, 0x20, 0, pView->script.pShot);
-    if (pShot == NULL || Rand_Next(1) % 100 > 50) {
+    if (pShot == NULL || Misc_RandFunc(1) % 100 > 50) {
         if (fn_8003C9D0(nPlayer, 0, &pView->p74, &pShot) && pView->p74 != NULL) {
             pShot = fn_8003A950(pView->p74, 13, &nA, &f1, &f2, &nB, &f3, nPlayer);
         }
@@ -1653,7 +1653,7 @@ void fn_800C16C4(View* pView, int nPlayer) {
     nView = gPlayers[nPlayer].nView[0];
     if (fn_800B36F4(pView, nPlayer, gSession.fFrameTime)) {
         fn_800C1790(pView, nPlayer);
-        View_SetCamera(fn_80017028(nView), 14, nPlayer, nView);
+        CameraController_SetCameraMode(fn_80017028(nView), 14, nPlayer, nView);
         GolfCamera_ProcessBallFlightCamera(pView, nPlayer);
     } else {
         fn_8003DCE8(nPlayer, pCam, pSub, &pView->script, &pView->shot19C, 0, gSession.fFrameTime);
@@ -1696,7 +1696,7 @@ void GolfCamera_InitHeartBeatCamera(View* pView, int nPlayer) {
     pView->script.n110 = 0;
     pView->script.f108 = 0.0f;
     lbl_80282220->b5A = 1;
-    fn_80063B98(pView, lbl_80281F78->fC4, v);
+    CameraController_FadeIn(pView, lbl_80281F78->fC4, v);
     fRate = (FRAME_RATE * (fn_800C741C(gPlayers[nPlayer].pChar, 2) - fStart))
           / (FRAME_RATE * (lbl_80281F78->fC4 * (lbl_80281F78->nBeatFrames * (lbl_80281F78->nBeats + 1))
                        + (lbl_80281F78->nBeats * lbl_80281F78->fC8
@@ -1719,9 +1719,9 @@ void GolfCamera_ProcessHeartBeatCamera(View* pView, int nPlayer) {
                 if (pView->script.n110 >= lbl_80281F78->nBeats * lbl_80281F78->nBeatFrames) {
                     lbl_80282220->b5A = 0;
                 } else if ((pView->script.n110 + 1) % lbl_80281F78->nBeatFrames == 0) {
-                    fn_80063BF4(pView, lbl_80281F78->fC8, v);
+                    CameraController_FadeOut(pView, lbl_80281F78->fC8, v);
                 } else {
-                    fn_80063B98(pView, lbl_80281F78->fC4, v);
+                    CameraController_FadeIn(pView, lbl_80281F78->fC4, v);
                     pView->script.n110++;
                 }
             } else if (pView->script.f108 > lbl_80281F78->fCC) {
@@ -1739,7 +1739,7 @@ void GolfCamera_ProcessHeartBeatCamera(View* pView, int nPlayer) {
                     CameraScript_InterpToNewScript(&pView->script, pShot, nPlayer, pCam, pSub, 5, 0.0f,
                                                    100.0f, 0x19, 0.0f);
                 }
-                fn_80063B98(pView, lbl_80281F78->fC4, v);
+                CameraController_FadeIn(pView, lbl_80281F78->fC4, v);
                 pView->script.n110++;
                 pView->script.f108 = 0.0f;
             } else if (pView->script.nCamera == 0 || pView->script.nCamera == 4
@@ -2281,7 +2281,7 @@ void GolfCamera_ProcessInHoleCamera(View* pView, int nPlayer) {
 void fn_800C3478(View* pView, int nPlayer) {
     f32 v[4] = {0.0f, 0.0f, 0.0f, 0.5f};
     if (fn_80063C7C(pView) || fn_80063C90(pView)) {
-        fn_80063B98(pView, lbl_80281F78->f170, v);
+        CameraController_FadeIn(pView, lbl_80281F78->f170, v);
     }
 }
 
@@ -2298,7 +2298,7 @@ void GolfCamera_InitTutorialWaitCamera(View* pView, int nPlayer) {
     f32 v[4] = {0.0f, 0.0f, 0.0f, 0.5f};
     char szName[] = "TUTORIAL WAIT";
     if (fn_80063C7C(pView)) {
-        fn_80063B98(pView, lbl_80281F78->f170, v);
+        CameraController_FadeIn(pView, lbl_80281F78->f170, v);
     }
     fn_80016CFC(gPlayers[nPlayer].nView[0])->bFlagOut = 0;
     strcpy(lbl_80282220->shot6C.szName, szName);
@@ -2996,7 +2996,7 @@ void fn_800C4FF0(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
     lbl_80282220->shot6C.f74 = 0.0f;
     lbl_80282220->shot6C.f68 = 0.2f;
     lbl_80282220->shot6C.f6C = 20.0f;
-    fChange = fn_800DC3A4();
+    fChange = GameEffects_FieldOfViewChange();
     lbl_80282220->shot6C.f78 =
         fn_80014278(fn_80008370(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera)) - fChange;
     lbl_80282220->shot6C.f7C = lbl_80282220->shot6C.f78;
@@ -3196,7 +3196,7 @@ void fn_800C56B4(View* pView, f32* pFrom, f32* pTo, int nPlayer) {
     lbl_80282220->shot12C.f74 = 0.0f;
     lbl_80282220->shot12C.f68 = 0.2f;
     lbl_80282220->shot12C.f6C = 20.0f;
-    fChange = fn_800DC3A4();
+    fChange = GameEffects_FieldOfViewChange();
     lbl_80281F78->f80 = fn_80014278(fn_80008370(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera)) - fChange;
     lbl_80282220->shot12C.f78 = lbl_80281F78->f80;
     lbl_80282220->shot12C.f7C = lbl_80282220->shot12C.f78;
@@ -3556,7 +3556,7 @@ void fn_800C6618(View* pView, int nPlayer) {
         if (fPower > lbl_80281F78->fB4 && (u8)bShortClub) {
             pView->n260 = 11;
         } else if (fPower > lbl_80281F78->fA4) {
-            if ((f32)(s32)(Rand_Next(1) % 100) < lbl_80281F78->fB0) {
+            if ((f32)(s32)(Misc_RandFunc(1) % 100) < lbl_80281F78->fB0) {
                 pView->n260 = lbl_80282220->n1EC[nPlayer];
                 lbl_80282220->n1EC[nPlayer]++;
                 if (lbl_80282220->n1EC[nPlayer] >= 12) {
@@ -3564,7 +3564,7 @@ void fn_800C6618(View* pView, int nPlayer) {
                 }
             }
         } else if (fPower > lbl_80281F78->fA0) {
-            if ((f32)(s32)(Rand_Next(1) % 100) < lbl_80281F78->fAC) {
+            if ((f32)(s32)(Misc_RandFunc(1) % 100) < lbl_80281F78->fAC) {
                 pView->n260 = lbl_80282220->n1EC[nPlayer];
                 lbl_80282220->n1EC[nPlayer]++;
                 if (lbl_80282220->n1EC[nPlayer] >= 12) {
@@ -3572,7 +3572,7 @@ void fn_800C6618(View* pView, int nPlayer) {
                 }
             }
         } else if (fPower > lbl_80281F78->f9C) {
-            if ((f32)(s32)(Rand_Next(1) % 100) < lbl_80281F78->fA8) {
+            if ((f32)(s32)(Misc_RandFunc(1) % 100) < lbl_80281F78->fA8) {
                 pView->n260 = lbl_80282220->n1EC[nPlayer];
                 lbl_80282220->n1EC[nPlayer]++;
                 if (lbl_80282220->n1EC[nPlayer] >= 12) {
@@ -3584,7 +3584,7 @@ void fn_800C6618(View* pView, int nPlayer) {
             pView->n260 = 1;
             lbl_80282220->n1EC[nPlayer] = 2;
         }
-        if (fn_8006BEA4() && Rand_Next(1) % 100 > 50) {
+        if (fn_8006BEA4() && Misc_RandFunc(1) % 100 > 50) {
             pView->n260 = 7;
             lbl_80282220->n1EC[nPlayer] = 8;
             if (lbl_80282220->n1EC[nPlayer] >= 12) {

@@ -147,6 +147,9 @@ skalib.c:
 
 Skeleton.c:
 	.text       start:0x80026B4C end:0x80029FC8
+	.data       start:0x80187400 end:0x80187490
+	.sdata      start:0x80281080 end:0x802810A8
+	.sdata2     start:0x80282D10 end:0x80282D60
 
 GxUtil.c:
 	.text       start:0x80029FC8 end:0x8002A630
@@ -163,6 +166,7 @@ GoRenderSurface.c:
 
 LLPict_Gc.c:
 	.text       start:0x8002F4FC end:0x80030254
+	.sdata2     start:0x80282F30 end:0x80282F48
 
 GoTerrain.c:
 	.text       start:0x80030254 end:0x80035640
@@ -544,6 +548,7 @@ hlaudmovie.c:
 
 hlaudtrack.c:
 	.text       start:0x800A9808 end:0x800AA4BC
+	.sdata2     start:0x80283FD0 end:0x80283FD8
 
 hlaudtrackseq.c:
 	.text       start:0x800AA4BC end:0x800AB3A4
@@ -653,6 +658,7 @@ AnimStream.c:
 
 TerrainGround.c:
 	.text       start:0x800CB950 end:0x800CC1EC
+	.sdata2     start:0x80284460 end:0x80284478
 
 SkinPart.c:
 	.text       start:0x800CC1EC end:0x800CF158

@@ -46,6 +46,22 @@ void SKEL_TransformBones(CharModel* pModel, u32* aBits);
 Skeleton* fn_80028314(CharModel* pModel, CharModelDefs* pDefs);
 struct DynChain* fn_80114270(CharModel* pModel, int nBone, s32 nType, s32 n10);   // DynChain.c
 
+char* lbl_80187418[5] = { "IGDriver", "IGputter", "IGiron3", "IGiron7", "IGwedge" };
+
+u8 lbl_8018742C[42][2] = {
+    { 0x23, 0x10 }, { 0x24, 0x11 }, { 0x25, 0x12 }, { 0x26, 0x13 }, { 0x27, 0x14 }, { 0x28, 0x15 },
+    { 0x29, 0x16 }, { 0x2A, 0x17 }, { 0x2B, 0x18 }, { 0x2C, 0x19 }, { 0x2D, 0x1A }, { 0x2E, 0x1B },
+    { 0x2F, 0x1C }, { 0x30, 0x1D }, { 0x31, 0x1E }, { 0x10, 0x23 }, { 0x11, 0x24 }, { 0x12, 0x25 },
+    { 0x13, 0x26 }, { 0x14, 0x27 }, { 0x15, 0x28 }, { 0x16, 0x29 }, { 0x17, 0x2A }, { 0x18, 0x2B },
+    { 0x19, 0x2C }, { 0x1A, 0x2D }, { 0x1B, 0x2E }, { 0x1C, 0x2F }, { 0x1D, 0x30 }, { 0x1E, 0x31 },
+    { 0x44, 0x36 }, { 0x45, 0x37 }, { 0x46, 0x38 }, { 0x47, 0x39 }, { 0x48, 0x3A }, { 0x36, 0x44 },
+    { 0x37, 0x45 }, { 0x38, 0x46 }, { 0x39, 0x47 }, { 0x3A, 0x48 },
+};
+
+u8 lbl_80281098[6] = { 0x3E, 0x41, 0x3B, 0x4C, 0x4F, 0x49 };
+u8 lbl_802810A0[6] = { 0x1F, 0x20, 0x21, 0x32, 0x33, 0x34 };
+u8 lbl_802810A6 = 1;
+
 // Poses the chain's links (those with f4 above 0) from their rotation vectors.
 void fn_80026B4C(Skeleton* pSkel, IKChain* pChain) {
     int i;
@@ -147,6 +163,12 @@ f32 fn_80026D18(CharModel* pModel, IKChain* pChain, f32* pTarget, int nLink, int
     Vec3Copy(vEnd, pChain->v8);
     fn_80029C18(vEnd, pTarget, vDiff);
     return (f32)fn_80009680(fn_80009744(vDiff));
+}
+
+// fake match: EA's file had a function here that the linker stripped; it used the 0.5 and 3.0 of
+// fn_80029B64's square root first, which puts them here in .sdata2.
+static f64 Skeleton_StrippedFn(f64 x) {
+    return 0.5 * x * (3.0 - x);
 }
 
 // Resets the chain's links (all of them with bAll, else those with f4 above 0) to no rotation and
@@ -1048,17 +1070,17 @@ void fn_80029664(CharModel* pModel) {
     for (nId = 1; nId < 0x59; nId++) {
         pModel->aBone[nId] = 0xFF;
     }
-    for (i = 1; i < pModel->nBones; i++) {
-        strncpy(szName, (char*)&pModel->pBones[i].uId, 8);
+    for (nId = 1; nId < pModel->nBones; nId++) {
+        strncpy(szName, (char*)&pModel->pBones[nId].uId, 8);
         szName[8] = '\0';
         for (j = 0; j < 0x59; j++) {
             if (strcmp(szName, lbl_80187278[j]) == 0) {
-                pModel->aBone[j] = i;
+                pModel->aBone[j] = nId;
                 break;
             }
         }
         if (j == 0x59 && nUnknown < 30) {
-            aUnknown[nUnknown] = i;
+            aUnknown[nUnknown] = nId;
             nUnknown++;
         }
     }
@@ -1256,7 +1278,6 @@ void fn_80029C3C(f32* pA, f32* pB, f32* pOut) {
 // nShift bits carry into the bottom of the next word.
 void fn_80029C60(u32* aSrc, u32* aDst, u32 nBits, u32 nShift) {
     u32 uWord;
-    u32 nWords;
     u32 i;
     u32 j;
     u32 uCarry = 0;
@@ -1265,8 +1286,7 @@ void fn_80029C60(u32* aSrc, u32* aDst, u32 nBits, u32 nShift) {
     for (i = 0; i < nShift; i++) {
         uMask |= 1 << (31 - i);
     }
-    nWords = (nBits + 31) >> 5;
-    for (j = 0; j < nWords; j++) {
+    for (j = 0; j < (nBits + 31) >> 5; j++) {
         uWord = aSrc[j];
         aDst[j] = uWord << nShift;
         aDst[j] |= uCarry >> (32 - nShift);

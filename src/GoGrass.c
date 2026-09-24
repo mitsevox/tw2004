@@ -252,7 +252,7 @@ void fn_8011E6E8(void) {
     }
     if (lbl_80281900->f3D4 != lbl_80281900->f3D8) {
         for (i = 0; i < 8; i++) {
-            lbl_80281900->af168[i] = lbl_80281900->f3D4 * Rand_Float(1);
+            lbl_80281900->af168[i] = lbl_80281900->f3D4 * Misc_RandFuncf(1);
         }
         lbl_80281900->f3D8 = lbl_80281900->f3D4;
     }

@@ -201,10 +201,10 @@ void fn_80099BA0(void);
 void fn_8009A16C(void);
 u8   fn_8009A180(void);
 void fn_8009A1F4(void);
-void fn_8009A928(int n);
-void fn_8009A968(void);
-void fn_8009A990(int nView);
-void fn_8009A9CC(int nView);
+void GLW_vInitModule(int n);
+void GLW_vCloseModule(void);
+void GLW_vUpdateGlows(int nView);
+void GLW_vRenderGlows(int nView);
 void fn_8009B134(void);
 void fn_8009B898(void);
 void fn_8009BE08(int nView);
@@ -306,7 +306,7 @@ void fn_8006C7A8(void);
 void fn_8006C854(void);
 void fn_8006C8EC(int nView);
 void fn_8006C968(void);
-void fn_8006C9EC(void);
+void GO_vInitFE(void);
 void fn_8006CB2C(void);
 void GO_vInitIG(void);
 void fn_8006CDC4(void);
@@ -444,9 +444,9 @@ void fn_8006C7A8(void) {
     fn_800952D8();
     fn_8001C37C();
     fn_8002F180();
-    uSeed = fn_8000B244();
+    uSeed = Misc_CreateRandomSeed();
     gSession.nSeed = uSeed;
-    fn_8000B2B8(uSeed);
+    Misc_InitModule(uSeed);
     fn_80055F14();
     fn_80045D18();
     fn_800486EC();
@@ -472,7 +472,7 @@ void fn_8006C854(void) {
     fn_80045D5C();
     fn_800486F0();
     fn_80055F18();
-    fn_8000B30C();
+    Misc_CloseModule();
     fn_8001C468();
     fn_80095364();
     fn_8001049C();
@@ -523,7 +523,7 @@ void fn_8006C968(void) {
 }
 
 // Starts the front end (game type 3).
-void fn_8006C9EC(void) {
+void GO_vInitFE(void) {
     int nView;
 
     fn_8006C7A8();
@@ -554,7 +554,7 @@ void fn_8006C9EC(void) {
     fn_800146C4();
     Player_SetGolfer(0, 0, 0, 0, 0);
     nView = gPlayers[0].nView[0];
-    View_SetCamera(fn_80017028(nView), 0x17, 0, nView);
+    CameraController_SetCameraMode(fn_80017028(nView), 0x17, 0, nView);
     fn_8005D3A8(0);
     GOLFERSTATE_Set(0, 0);
     fn_800A4E34();
@@ -642,9 +642,9 @@ void GO_vInitIG(void) {
     fn_800DCC04();
     fn_8001A920();
     if (!gSession.nSplitScreen) {
-        fn_8009A928(1);
+        GLW_vInitModule(1);
     } else {
-        fn_8009A928(2);
+        GLW_vInitModule(2);
     }
     fn_800C808C();
     BFX_vInit();
@@ -708,7 +708,7 @@ void fn_8006CDC4(void) {
     fn_800A2958();
     fn_80055D6C();
     fn_800BAA4C();
-    fn_8009A968();
+    GLW_vCloseModule();
     fn_8006DD84();
     fn_800B2734();
     fn_8006BF20();
@@ -753,7 +753,7 @@ void fn_8006CEFC(void) {
     fn_8006DCA8(0, 0, 0, 4);
     fn_80037DD8();
     nView = gPlayers[0].nView[0];
-    View_SetCamera(fn_80017028(nView), 0x19, 0, nView);
+    CameraController_SetCameraMode(fn_80017028(nView), 0x19, 0, nView);
     fn_8010F748();
     fn_8010FF9C();
 }
@@ -951,8 +951,8 @@ void fn_8006D27C(void) {
         }
         fn_8006DEA8();
         if (nView < 2 && (!fn_80035574() || (fn_80035574() && fn_8006E0C0()))) {
-            fn_8009A990(nView);
-            fn_8009A9CC(nView);
+            GLW_vUpdateGlows(nView);
+            GLW_vRenderGlows(nView);
         }
         fn_8006DF28();
         if (nView < 2) {

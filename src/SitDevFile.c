@@ -670,7 +670,7 @@ void fn_800BCD68(SitDevEntry* pEntry, int nSit, int nPlayer, u8 nEvent) {
     for (i = 0; i < 4; i++) {
         if (pEntry->aActions[i] == 0xFFF0) break;
         pAction = &lbl_80282208->p18[pEntry->aActions[i]];
-        if (pAction->nChance > Rand_Next(1) % 100 && !fn_800BD3F8(pAction, nSit, nPlayer, nEvent)) {
+        if (pAction->nChance > Misc_RandFunc(1) % 100 && !fn_800BD3F8(pAction, nSit, nPlayer, nEvent)) {
             if (pAction->bSound) {
                 bPlayed = fn_800BCE70(pAction, nEvent);
             } else {
@@ -694,7 +694,7 @@ u8 fn_800BCE70(SitDevAction* pAction, u8 nEvent) {
     if (lbl_802811B8->abPlayed[pAction->nKind]) return 0;
     nCount = fn_800BB218(pAction->aList, 50);
     nLeft = fn_800BB248(pAction->aList, nCount);
-    nSound = fn_800BB334(pAction->aList, nCount, nLeft, Rand_Next(1) % nLeft);
+    nSound = fn_800BB334(pAction->aList, nCount, nLeft, Misc_RandFunc(1) % nLeft);
     bNot30 = nEvent != 30;
     if (!fn_800DC784()) {
         fn_800BD83C(nSound, bNot30);
@@ -751,7 +751,7 @@ u8 fn_800BCF84(SitDevAction* pAction, int nPlayer, u8 nEvent) {
                 lbl_802811B8->abPlayed[nKind] = 1;
             }
         } else if (anCount[nKind] > 1) {
-            nPick = Rand_Next(1) % anCount[nKind];
+            nPick = Misc_RandFunc(1) % anCount[nKind];
             nEntry = aaIndex[nKind][nPick];
             nStart = nPick;
             while (pAction->aList[nEntry] & 0x8000) {

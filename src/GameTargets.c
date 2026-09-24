@@ -205,9 +205,9 @@ void fn_800F21B4(int nPlayer) {
     s32 r;
     if (!fn_800F2358(nPlayer)) {
         if (gPlayers[nPlayer].nE98 >= 10) {
-            r = Rand_Next(0) % 20;
+            r = Misc_RandFunc(0) % 20;
         } else {
-            r = Rand_Next(0) % 100;
+            r = Misc_RandFunc(0) % 100;
         }
         if (r <= 5) {
             gPlayers[nPlayer].nDBC = 5;

@@ -144,7 +144,7 @@ void fn_8003DCE8(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
         } else {
             fFov = pScript->pShot->f7C;
         }
-        fFov += fn_800DC3A4();
+        fFov += GameEffects_FieldOfViewChange();
         if (fn_80044E74(pScript->pShot)) {
             fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[1])), fFov);
         } else {
@@ -292,7 +292,7 @@ void fn_8003E624(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, CamShot*
         } else {
             fFov = pScript->pShot->f7C;
         }
-        fFov += fn_800DC3A4();
+        fFov += GameEffects_FieldOfViewChange();
         if (fn_80044E74(pScript->pShot)) {
             fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[1])), fFov);
         } else {
@@ -560,7 +560,7 @@ f32 fn_8003F194(CamShot* pShot, f32 fA, f32 fB, f32 fTime) {
     return (f32)fn_80009680(fn_80009744(vDiff)) / fTime;
 }
 
-// The script's slow-motion move (nCamera, set by fn_80063B98 and its kin): hands fn_80038010 the
+// The script's slow-motion move (nCamera, set by CameraController_FadeIn and its kin): hands fn_80038010 the
 // vector v40 with its [3] eased in (1), out (2), held (3) or kept from the current value (4),
 // within 0..v40[3]. Once the move's time f90 passes its length f94, 1 turns into 4 and 2 into 5;
 // 4 and 5 end (0) on the next frame that has time in it.
@@ -632,7 +632,7 @@ void fn_8003F518(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     fn_8004544C(vPos, pScript->a20, vPos);
     Vec3Copy(vPos, pSub);
     f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
-    f += fn_800DC3A4();
+    f += GameEffects_FieldOfViewChange();
     if (fn_80044E74(pScript->pShot)) {
         fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[1])), f);
     } else {
@@ -695,7 +695,7 @@ void fn_8003F7EC(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     fn_8004544C(vPos, pScript->a20, vPos);
     Vec3Copy(vPos, pSub);
     f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
-    f += fn_800DC3A4();
+    f += GameEffects_FieldOfViewChange();
     if (fn_80044E74(pScript->pShot)) {
         fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[1])), f);
     } else {
@@ -746,7 +746,7 @@ void fn_8003FAA0(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     fn_8004544C(vPos, pScript->a20, vPos);
     Vec3Copy(vPos, pSub);
     f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
-    f += fn_800DC3A4();
+    f += GameEffects_FieldOfViewChange();
     if (fn_80044E74(pScript->pShot)) {
         fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[1])), f);
     } else {
@@ -824,7 +824,7 @@ void fn_8003FD54(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     fn_8001EF34(pSub, fT * ((f32)fn_80009680(fn_80009744(vToAim)) - fDist) + fDist, pSub);
     fn_8004544C(pCam, pSub, pSub);
     f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
-    f += fn_800DC3A4();
+    f += GameEffects_FieldOfViewChange();
     if (fn_80044E74(pScript->pShot)) {
         fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[1])), f);
     } else {
@@ -895,7 +895,7 @@ void CamScript_SplineCameras(int nPlayer, f32* pCam, f32* pSub, CamScript* pScri
     }
     fn_800C7480(vPrevPos, vPos0, vPos1, vNextPos, vPrevLook, vLook0, vLook1, vNextLook, pCam, pSub, &fFov,
                 pShot->f78, pNext->f78, fT);
-    fFov += fn_800DC3A4();
+    fFov += GameEffects_FieldOfViewChange();
     if (fn_80044E74(pScript->pShot)) {
         fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[1])), fFov);
     } else {
@@ -939,7 +939,7 @@ void fn_800407D4(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     }
     fn_800C7E50(pScript->v0, pScript->v10, pSub, pScript->nD0, pCam, fT);
     f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
-    f += fn_800DC3A4();
+    f += GameEffects_FieldOfViewChange();
     if (fn_80044E74(pScript->pShot)) {
         fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[1])), f);
     } else {
@@ -992,7 +992,7 @@ void fn_80040A58(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     }
     fn_800C7E50(pScript->v0, pScript->v10, pSub, pScript->nD0, pCam, fShare);
     f = fShare * (pNext->f78 - pShot->f78) + pShot->f78;
-    f += fn_800DC3A4();
+    f += GameEffects_FieldOfViewChange();
     if (fn_80044E74(pScript->pShot)) {
         fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[1])), f);
     } else {
@@ -1049,7 +1049,7 @@ void fn_8004017C(int nPlayer, f32* pCam, f32* pSub, CamScript* pScript, f32* pPr
     fn_8004544C(vPos, pScript->a20, vPos);
     Vec3Copy(vPos, pSub);
     f = fT * (pNext->f78 - pShot->f78) + pShot->f78;
-    f += fn_800DC3A4();
+    f += GameEffects_FieldOfViewChange();
     if (fn_80044E74(pScript->pShot)) {
         fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[1])), f);
     } else {
@@ -1644,7 +1644,7 @@ void CameraScript_RecordCurrentCam(CamShot* pShot, f32* pCam, f32* pSub, int nPl
         pShot->f78 = fn_80014278(fn_80008370(fn_80016CFC(gPlayers[nPlayer].nView[1])->pCamera));
     } else {
         pShot->f78 = fn_80014278(fn_80008370(fn_80016CFC(gPlayers[nPlayer].nView[0])->pCamera));
-        pShot->f78 -= fn_800DC3A4();
+        pShot->f78 -= GameEffects_FieldOfViewChange();
     }
     pShot->f7C = pShot->f78;
     pShot->f9C = pScript->fA8;
@@ -2403,7 +2403,7 @@ void CamScript_PutBackOnFairway(CamScript* pScript, f32* pCam, f32* pSub, int nP
     }
     CameraScript_InterpToNewScript(pScript, pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 25, 0.0f);
     CamScript_GetLookAtPoint(pScript->pShot, nPlayer, pSub, pCam, pScript, pPrev, 0.0f);
-    fFov = pScript->pShot->f78 + fn_800DC3A4();
+    fFov = pScript->pShot->f78 + GameEffects_FieldOfViewChange();
     fn_80045470(fn_80008370(fn_80017004(gPlayers[nPlayer].nView[0])), fFov);
     pScript->bCF = 1;
     pScript->fCamTime = 0.001f;

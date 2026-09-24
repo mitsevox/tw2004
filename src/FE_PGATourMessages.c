@@ -329,7 +329,7 @@ void fn_8010EF8C(MsgArg* pArgs, MsgArg* pResult) {
         n8 = fn_800F0304(i);
         if (!pProfile->a1054C[i].b && nProgress <= (s32)GM_GetGameProgress(pProfile)) {
         retry:
-            nKind = lbl_80193CFC[Rand_Next(0) % 11];
+            nKind = lbl_80193CFC[Misc_RandFunc(0) % 11];
             for (j = 0; j < i; j++) {
                 if (pProfile->a1054C[j].n == nKind && pProfile->a1054C[j].b) {
                     // fake match: EA jumps straight back (a do-while adds a test)
@@ -383,7 +383,7 @@ void fn_8010F1B4(MsgArg* pArgs, MsgArg* pResult) {
     s32* p4 = (s32*)pArgs[1].p;
     s32* p8 = (s32*)pArgs[2].p;
 
-    fn_800588D4(lbl_80193CFC[Rand_Next(0) % 11]);
+    fn_800588D4(lbl_80193CFC[Misc_RandFunc(0) % 11]);
     *pKind = fn_800588E8();
     *p4 = fn_800F02EC(0);
     *p8 = fn_800F0304(0);
