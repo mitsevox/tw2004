@@ -53,28 +53,28 @@ void fn_8009A3D0(s32 nView, SunFlrView* pView) {
 // window of pixels centred on the sun, clipped to the view, in a 12 x 12 Z24X8 texture. u18 is the
 // sun's own depth, so fn_8009A754 later counts the pixels nothing is drawn in front of.
 void fn_8009A3F4(s32 nView) {
-    SunFlrView* pView;
-    SunFlrPart* pPart;
     void* pCamera;
     int iPart;
     f32 v[4];
-    int nSunX;
     int nSunY;
+    int nSunX;
     int nLeft;
     int nTop;
-    int nRight;
-    int nBottom;
+    SunFlrPart* pPart;
     int nX;
     int nY;
+    int nBottom;
     int nEndX;
+    int nRight;
     int nEndY;
-    int nCopyX;
     int nCopyY;
+    int nCopyX;
     int nReadX;
     int nReadY;
     int nWeightX;
     int nWeightY;
     int nWidth;
+    SunFlrView* pView;
     int nHeight;
 
     pView = &lbl_802813B8->aView[nView];
@@ -206,7 +206,7 @@ u32 fn_8009A708(u8* pImage, int x, int y) {
     u8* p;
     u32 uColour;
 
-    p = &pImage[(x / 4 + y / 4 * 3) * 64 + (y & 3) * 8 + (x & 3) * 2];
+    p = &pImage[(x & 3) * 2 + (y & 3) * 8 + (x / 4 + y / 4 * 3) * 64];
     uColour = (p[1] << 16) | (p[0x20] << 8);
     return uColour | p[0x21];
 }

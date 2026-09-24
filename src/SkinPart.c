@@ -950,7 +950,7 @@ s32 fn_800CE224(Skin* pSkin, SkinDesc14* pEntry, u8** ppOut, s32* pnOut, int nCo
                     }
                     if (nVariant > 0) {
                         bChanged = 1;
-                        pEntry->uId = pDesc->p84[j + (nVariant * pSet->n0C + pSet->n14)];
+                        pEntry->uId = pDesc->p84[nVariant * pSet->n0C + j + pSet->n14];
                     }
                 }
             }
