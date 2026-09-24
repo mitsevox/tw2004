@@ -1952,6 +1952,62 @@ void CamScript_PutBackOnFairway(CamScript* pScript, f32* pCam, f32* pSub, int nP
     pScript->fCamTime = 0.001f;
 }
 
+// The fairway camera: narrows the current shot's field of view down to CamTuning.f110, and once the
+// camera has run f104, is at least f100 (level) from the spot fn_80044768 picks by the ball, and
+// the ball is not heading back past it (f108), cuts the shot to that spot (f10C above the ground
+// there) with the same field of view.
+void CamScript_UpdateFairwayCam(CamScript* pScript, f32* pCam, f32* pSub, int nPlayer) {
+    f32 vSpot[4];
+    f32 vToSpot[4];
+    f32 vFromBall[4];
+    f32 vDir[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    f32 vVel[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    f32 fFov;
+    f32 fDist;
+    f32 fDot;
+    f32 fHeight;
+
+    if (pScript->pShot != NULL && pScript->pShot->f78 > lbl_80281F78->f110) {
+        pScript->pShot->f78 -= lbl_80281F78->f118;
+        pScript->pShot->f7C = pScript->pShot->f78;
+    }
+    if (pScript->fCamTime > lbl_80281F78->f104) {
+        fFov = pScript->pShot->f78;
+        fn_80044768(gPlayers[nPlayer].ball.vPos, vSpot);
+        fn_80045428(pCam, vSpot, vToSpot);
+        vToSpot[1] = 0.0f;
+        fDist = fn_80009680(fn_80009744(vToSpot));
+        fn_80045428(pCam, gPlayers[nPlayer].ball.vPos, vFromBall);
+        vFromBall[1] = 0.0f;
+        if (0.0f != vFromBall[0] || 0.0f != vFromBall[1] || 0.0f != vFromBall[2]) {
+            fn_800BAF04(vFromBall, vDir);
+        } else {
+            vDir[0] = 0.0f;
+            vDir[1] = 0.0f;
+            vDir[2] = 0.0f;
+        }
+        Vec3Copy(gPlayers[nPlayer].ball.vVel, vVel);
+        vVel[1] = 0.0f;
+        if (0.0f != vVel[0] || 0.0f != vVel[1] || 0.0f != vVel[2]) {
+            fn_800BAF04(vVel, vVel);
+        }
+        fDot = fn_8000C5FC(vDir, vVel);
+        if (fDist < lbl_80281F78->f100) return;
+        if (fDot > lbl_80281F78->f108) return;
+        fHeight = Terrain_HeightAt(vSpot, NULL);
+        if (!(fHeight < -60000.0f) && pScript->pShot != NULL) {
+            Vec3Copy(vSpot, pScript->pShot->v20);
+            pScript->pShot->v20[1] = fHeight + lbl_80281F78->f10C;
+            pScript->pShot->f78 = fFov;
+            pScript->pShot->f7C = pScript->pShot->f78;
+            CameraScript_InterpToNewScript(pScript, pScript->pShot, nPlayer, pCam, pSub, 5, 0.0f, 100.0f, 25,
+                                           0.0f);
+            Vec3Copy(pScript->pShot->v20, pCam);
+            CamScript_GetLookAtPoint(pScript->pShot, nPlayer, pSub, pCam, pScript, pCam, 0.0f);
+        }
+    }
+}
+
 // The pin, when pPos is near no AI target: pOut gets the nearest target, or the current pin
 // position of the hole.
 void fn_80044768(f32* pPos, f32* pOut) {

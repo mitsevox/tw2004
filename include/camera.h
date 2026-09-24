@@ -283,11 +283,16 @@ typedef struct CamTuning {
     u8   unkF8[0xFC - 0xF8];
     f32  fFC;                   // 0x0FC  CameraScript_IsDefaultSwingCam: the least dot product of the
                                 //        camera's and the aim's level directions from the ball
-    u8   unk100[0x10C - 0x100];
+    f32  f100;                  // 0x100  CamScript_UpdateFairwayCam: moves on only from this level
+                                //        distance to the spot fn_80044768 picks ...
+    f32  f104;                  // 0x104  ... after this long on the camera ...
+    f32  f108;                  // 0x108  ... and while the ball heads away from the camera (a dot
+                                //        product at most this)
     f32  f10C;                  // 0x10C  fn_80043C74: the camera's height over the ground at the spot
-    u8   unk110[0x114 - 0x110];
+    f32  f110;                  // 0x110  CamScript_UpdateFairwayCam: the shot's field of view narrows
+                                //        down to this ...
     f32  f114;                  // 0x114  CamScript_PutBackOnFairway: its shot's field of view
-    u8   unk118[0x11C - 0x118];
+    f32  f118;                  // 0x118  ... by this a frame (CamScript_UpdateFairwayCam)
     f32  f11C;                  // 0x11C  fn_800418B0: a shot's f94 over this is its wobble's size
     f32  f120;                  // 0x120  fn_800439E4: a camera closer to the pin than this (level, times
                                 //        the lens's fB0) ...
