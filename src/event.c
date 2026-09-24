@@ -431,10 +431,17 @@ void fn_80066A9C(int nPlayer, int nEvent, void* pData, int nArg) {
     if (Game_GetMode() != 11 || nArg == 1) {
         nA = fn_8006AA70(nPlayer);
         nB = fn_8006AA84(nPlayer);
-        if (nA < 5 && nA >= 0) {
+        switch (nA) {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        case 4:
             nAnim = 1;
-        } else {
+            break;
+        default:
             nAnim = -1;
+            break;
         }
         if (nAnim >= 0) {
             fn_800957B0(gPlayers[nPlayer].pChar, nAnim);
@@ -450,6 +457,7 @@ void fn_80066A9C(int nPlayer, int nEvent, void* pData, int nArg) {
             case 2:
                 fn_8003349C(0.8f, 8.0f, 0.0f);
                 break;
+            case 3:     // EA lists case 3 with the default (it sets CW's compare tree)
             default:
                 fn_8003349C(1.0f, 10.0f, 0.0f);
                 break;
