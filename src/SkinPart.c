@@ -801,6 +801,7 @@ s32 fn_800CDDB0(Skin* pSkin, int nSet, int nVariant, u64 uId) {
     SkinDesc74* pSet;
     SkinDesc7C* pVariant;
     int i;
+    s32 nFirst;
 
     if (nSet < 0 || pSkin == NULL || pSkin->pModel == NULL || (pDesc = pSkin->pModel->pDesc) == NULL
         || nSet >= pDesc->n70 || nSet < 0) {
@@ -808,8 +809,9 @@ s32 fn_800CDDB0(Skin* pSkin, int nSet, int nVariant, u64 uId) {
     }
     if (nVariant < 0 || nVariant >= (pSet = &pDesc->p74[nSet])->n08) return 0;
     pVariant = &pDesc->p7C[nVariant + pSet->n10];
+    nFirst = pVariant->n0C;
     for (i = 0; i < pVariant->n08; i++) {
-        if (pDesc->p8C[pVariant->n0C + i].uId == uId) {
+        if (pDesc->p8C[nFirst + i].uId == uId) {
             return i;
         }
     }
