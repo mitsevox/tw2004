@@ -32,7 +32,7 @@ void  fn_80018710(Character* pChar);
 void  ClipBank_Restore(int nSlot);                  // skalib.c
 ClipBank* ClipBank_Get(u32 nSlot);                  // skalib.c
 AnimLib* AnimLib_Load(u8* pData, ClipBank* pBank);  // skalib.c
-CharModel* fn_80028564(u8* pData, s8 n, CharModelDefs* pDefs, u8 b);    // Skeleton.c
+CharModel* fn_80028564(u8* pData, s8 n, CharModelDefs* pDefs, int b);   // Skeleton.c
 void  fn_80037AB8(Skin* pSkin, CharModel* pModel, int nBone, int nId);   // Skin.c
 void  fn_800CC4EC(Character* pChar);                // SkinPart.c
 void* CharSlider_CreateDefinitionsFromMem(u8** ppData);
@@ -1629,7 +1629,7 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
     AnimLib* pLib;
     Skin* pSkin;
     u8 bGolfer;
-    u8 bModel;
+    int bModel;
 
     pChar = fn_8001942C();
     if (pChar == NULL) {
@@ -1698,7 +1698,7 @@ Character* fn_8001A9F4(u8* pData, int nUnused, int nSet, int nId, u8 bLook, Skin
     }
     bModel = nModel == 1;
     if (bLook && pChoices != NULL) {
-        bModel = pChoices->n113;
+        bModel = (u8)pChoices->n113;
     }
     fn_80018484(pChar, fn_80028564(pData, 1, pDefs, bModel));
     if (pChar->pSkin != NULL) {
