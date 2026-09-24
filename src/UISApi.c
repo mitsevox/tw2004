@@ -106,6 +106,7 @@ s32 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
     u32 i;
     UISEventData data;
     u8 bOut;
+    u32 j;
 
     nIndex = fn_8016C6C4(pStudio, uGroup, uScreen);
     if (nIndex < pStudio->nScreens) {
@@ -130,10 +131,10 @@ s32 fn_80168FC8(UIStudio* pStudio, u16 uGroup, u16 uScreen, s32 n) {
         fn_80165ACC(pStudio, uGroup, uScreen);
         fn_8016AEEC(pStudio, pScreen, 0, -3);
         fn_8016A830(pStudio, 3, pScreen, 0);
-        i = pStudio->nRateFns;
-        while (i-- != 0) {
-            if (pStudio->pRateFns[i].pScreen == pScreen) {
-                pStudio->pRateFns[i].uState = 1;
+        j = pStudio->nRateFns;
+        while (j-- != 0) {
+            if (pStudio->pRateFns[j].pScreen == pScreen) {
+                pStudio->pRateFns[j].uState = 1;
             }
         }
         fn_80165C74(pStudio);
