@@ -378,12 +378,22 @@ struct SKABlendNode {
 };
 LAYOUT_ASSERT(SKABlendNode, 0x30);
 
-// What Clip.pD8 points at; only what the swing reads.
+// One of a BlendClip's keys: six values fn_800204A0 blends between neighbouring keys.
+typedef struct BlendKey {
+    f32  a[6];                  // 0x00
+} BlendKey;
+
+// What Clip.pD8 points at: 20 keys evenly spaced f04 apart from time f08 to f0C (fn_800204A0,
+// fn_800205F8). A clip file holds it right after the clip's events (fn_80020F60).
 typedef struct BlendClip {
-    u8   unk0[8];
-    f32  f08;                   // 0x08  added to the time fn_800204A0 samples the clip at
-    f32  f0C;                   // 0x0C
+    u8   unk0[4];
+    f32  f04;                   // 0x04  the time between keys
+    f32  f08;                   // 0x08  the first key's time; added to the time fn_800204A0 samples
+                                //       the clip at
+    f32  f0C;                   // 0x0C  the last key's time
+    BlendKey aKeys[20];         // 0x10
 } BlendClip;
+LAYOUT_ASSERT(BlendClip, 0x1F0);
 
 // One of a clip's timed events (Clip.pEvents; fn_8001F02C finds one by its id). Event 2's time is
 // the ball-hit time the swing measures (fn_8001C860 starts the skeleton's clip at it).
