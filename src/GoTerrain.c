@@ -754,6 +754,12 @@ u8 fn_80031E40(void) {
 // stay solid, faded in over the near range (pNearbyObjectList), and their fading level into
 // pTranslucentObjectList. Crowd objects (bit 0x20 of word 0, or 0x10 or 0x20 of word 3; not when
 // fn_800172C4 is 0 for the view) use the crowd's fade distances.
+// fake match: EA reads the default mipmap bias through an inline; with the plain array read the
+// compiler schedules the arguments of the fn_8003241C calls differently.
+static inline f32 Ter_MipmapBias(s32 iLOD) {
+    return lbl_801D3CB0.fDefaultObjectMipmapBias[iLOD];
+}
+
 void fn_80031E58(void) {
     UObjMesh* pModel;
     s32 uFlags0;
@@ -808,7 +814,7 @@ void fn_80031E58(void) {
             fn_8003241C(&lbl_801D3CB0.pPostDrawItemsList[lbl_801D3CB0.iPostDrawItems],
                         &lbl_801D3CB0.iPostDrawItems, 400, pRef->apObject[pRef->iOpaqueLOD],
                         pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0, 1.0f,
-                        lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iOpaqueLOD], pRef->fDistanceSquared);
+                        Ter_MipmapBias(pRef->iOpaqueLOD), pRef->fDistanceSquared);
         } else if (lbl_801D3CB0.pObjectSortList[i].fDistanceSquared < fFarSquared) {
             fDistance = fn_80009680(lbl_801D3CB0.pObjectSortList[i].fDistanceSquared);
             if (fDistance > fFar || (uFlags0 & 0x40)
@@ -823,7 +829,7 @@ void fn_80031E58(void) {
                 fn_8003241C(&lbl_801D3CB0.pOpaqueObjectList[lbl_801D3CB0.iOpaqueObjects],
                             &lbl_801D3CB0.iOpaqueObjects, 650, pRef->apObject[pRef->iOpaqueLOD],
                             pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0,
-                            1.0f, lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iOpaqueLOD],
+                            1.0f, Ter_MipmapBias(pRef->iOpaqueLOD),
                             pRef->fDistanceSquared);
             } else {
                 fT = (fDistance - fNear) / fRange;
@@ -835,7 +841,7 @@ void fn_80031E58(void) {
                     fn_8003241C(&lbl_801D3CB0.pNearbyObjectList[lbl_801D3CB0.iNearbyObjects],
                                 &lbl_801D3CB0.iNearbyObjects, 70, pRef->apObject[pRef->iOpaqueLOD],
                                 pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f,
-                                0, fT, lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iOpaqueLOD],
+                                0, fT, Ter_MipmapBias(pRef->iOpaqueLOD),
                                 pRef->fDistanceSquared);
                 }
             }
@@ -847,7 +853,7 @@ void fn_80031E58(void) {
             fn_8003241C(&lbl_801D3CB0.pOpaqueObjectList[lbl_801D3CB0.iOpaqueObjects],
                         &lbl_801D3CB0.iOpaqueObjects, 650, pRef->apObject[pRef->iOpaqueLOD],
                         pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0, 1.0f,
-                        lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iOpaqueLOD], pRef->fDistanceSquared);
+                        Ter_MipmapBias(pRef->iOpaqueLOD), pRef->fDistanceSquared);
         }
         if (gSession.b11 == 0) {
             pRef = &lbl_801D3CB0.pObjectSortList[i];
@@ -855,7 +861,7 @@ void fn_80031E58(void) {
                 fn_8003241C(&lbl_801D3CB0.pTranslucentObjectList[lbl_801D3CB0.iTranslucentObjects],
                             &lbl_801D3CB0.iTranslucentObjects, 200, pRef->apObject[pRef->iTranslucentLOD],
                             pRef->iGlobalObjectIndex, pRef->eClipMethod, pRef->fDistanceSquared > 0.0f, 0,
-                            pRef->fAlpha, lbl_801D3CB0.fDefaultObjectMipmapBias[pRef->iTranslucentLOD],
+                            pRef->fAlpha, Ter_MipmapBias(pRef->iTranslucentLOD),
                             pRef->fDistanceSquared);
             }
         }
