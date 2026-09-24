@@ -73,7 +73,9 @@ LAYOUT_ASSERT(Ter_ObjectDrawData, 0x20);
 // The state of one course object (0x40 bytes; TW06: Ter_ObjectState, 0x2C, laid out differently).
 // Found by patch: iPatchFirstObjectInstanceIndex[patch] + the object's number in it.
 typedef struct Ter_ObjectState {
-    u8   unk0[0x10];
+    u8   unk0[4];
+    f32  f4;                    // 0x04  handed to row 2 or 3 of fn_8003519C (fn_80032F88), 0.5 the rest
+    u8   unk8[0x10 - 0x8];
     f32  f10;                   // 0x10  } fn_800335F8 resets f14 to f10, or to 0 with n18
     f32  f14;                   // 0x14  }
     s32  n18;                   // 0x18

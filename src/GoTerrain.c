@@ -64,6 +64,8 @@ void  fn_80035590(f32* p0);
 void  fn_800355B8(f32* p0);
 void  fn_80034648(int n);
 void  fn_80035514(u8* pObject);
+void  fn_800332F4(void);
+u8    fn_80033308(Ter_ObjectDrawData* pDraw, u8 bForce);
 void  fn_8000ADC0(f32 (*pMtx)[4]);  // identity matrix
 void  fn_80035370(void);
 void  fn_80035098(u8 b);
@@ -961,6 +963,116 @@ void fn_80032B7C(void* pGround, s32 eClipMethod, s32 nPass, s32 n1C, s32 n18, s3
     if (bPinSet) {
         fn_80012F50(0, 6, 1);
         fn_80012EF8();
+    }
+}
+
+// Draws nCount objects of a draw list, switching the renderer state only when it changes from one
+// object to the next: the clip method, the mipmap bias, and the flags (0x40, fog 0x20, and 0x10 for
+// shader types other than 1 and 3) unless the object sets its own. Objects whose state word 0 has
+// bit 0x1 hand their f4 to row 2 or 3 of fn_8003519C (by shader type); without bit 0x2 it is
+// damped toward 0.5 with distance (fTreeDampingMaxForce, fTreeDampingDistance). The filters are
+// not read.
+void fn_80032F88(Ter_ObjectDrawData* pList, s32 nCount, s32 eFilterMin, s32 eFilterMag) {
+    f32 fWave2;
+    f32 fWave3;
+    Ter_ObjectDrawData* pDraw;
+    s32 iObject;
+    f32 fBias = 100.0f;
+    s32 eClipMethod = 3;
+    u8 bUseFog = 1;
+    u8 bBit5 = 0;
+    u8 bShaded = 1;
+    u8 bDirty = 0;
+    u8 bForce = 1;
+    s32 i;
+    u8 bNewBit5;
+    u8 bNewShaded;
+    u32 uState;
+    f32 fDamp;
+
+    fn_800332F4();
+    pDraw = pList;
+    for (i = 0; i < nCount; i++) {
+        iObject = pDraw->iGlobalObjectIndex;
+        if (eClipMethod != pDraw->eClipMethod) {
+            eClipMethod = pDraw->eClipMethod;
+            switch (eClipMethod) {
+            case 2:
+                fn_80035138(1);
+                break;
+            case 1:
+                fn_80035138(1);
+                break;
+            default:
+                fn_80035138(0);
+                break;
+            }
+            bDirty = 1;
+        }
+        if (fBias != pDraw->fMipmapBias) {
+            fBias = pDraw->fMipmapBias;
+            bDirty = 1;
+        }
+        bNewBit5 = (lbl_801D3CB0.pObjectStateList[iObject].a20[1] >> 5) & 1;
+        bNewShaded = 0;
+        if (pDraw->eShaderObjectType != 1 && pDraw->eShaderObjectType != 3) {
+            bNewShaded = 1;
+        }
+        if (pDraw->bSetsPrimField == 0
+            && (bUseFog != pDraw->bUseFog || bBit5 != bNewBit5 || bShaded != bNewShaded || bForce)) {
+            bUseFog = pDraw->bUseFog;
+            bBit5 = bNewBit5;
+            bShaded = bNewShaded;
+            fn_80014118((bShaded ? 0x10 : 0) | (bUseFog ? 0x20 : 0) | 0x40);
+            bForce = 0;
+            bDirty = 1;
+        }
+        if (fn_80033308(pDraw, 0)) {
+            bDirty = 1;
+        }
+        uState = lbl_801D3CB0.pObjectStateList[iObject].a20[0];
+        if ((uState & 1) && !(uState & 2)) {
+            fDamp = 1.0f;
+            if (lbl_801D3CB0.fTreeDampingMaxForce) {
+                fDamp = lbl_801D3CB0.fTreeDampingMaxForce
+                        * (pDraw->fDistanceSquared / lbl_801D3CB0.fTreeDampingDistance)
+                      + (1.0f - lbl_801D3CB0.fTreeDampingMaxForce);
+                if (fDamp > 1.0f) {
+                    fDamp = 1.0f;
+                }
+            }
+            if (bDirty) {
+                fn_80012EF8();
+                bDirty = 0;
+            }
+            if (pDraw->eShaderObjectType == 2) {
+                fWave2 = fDamp * (lbl_801D3CB0.pObjectStateList[iObject].f4 - 0.5f) + 0.5f;
+                fn_8003519C(2, &fWave2);
+            } else if (pDraw->eShaderObjectType == 3) {
+                fWave3 = fDamp * (lbl_801D3CB0.pObjectStateList[iObject].f4 - 0.5f) + 0.5f;
+                fn_8003519C(3, &fWave3);
+            }
+        } else if ((uState & 1) && (uState & 2)) {
+            if (bDirty) {
+                fn_80012EF8();
+                bDirty = 0;
+            }
+            if (pDraw->eShaderObjectType == 2) {
+                fWave2 = lbl_801D3CB0.pObjectStateList[iObject].f4;
+                fn_8003519C(2, &fWave2);
+            } else if (pDraw->eShaderObjectType == 3) {
+                fWave3 = lbl_801D3CB0.pObjectStateList[iObject].f4;
+                fn_8003519C(3, &fWave3);
+            }
+        } else if (bDirty) {
+            fn_80012EF8();
+            bDirty = 0;
+        }
+        fn_80035514((u8*)pDraw->pObject);
+        if (pDraw->bSetsPrimField) {
+            bForce = 1;
+        }
+        pDraw++;
     }
 }
 
