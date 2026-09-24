@@ -29,8 +29,6 @@ void fn_8011E974(void);
 void fn_8011EAB8(void);
 void fn_8011EBF8(void);
 void fn_8011EC2C(void);
-extern f32 lbl_801945B8[];     // a colour: 0.21, 0.31, 0.1, 1
-extern f32 lbl_801945C8[];     // the unit square's corners
 void fn_80013D5C(void* pCamera);   // makes it the current render camera
 void fn_800140E8(int a, int nWidth, int nHeight, int nField, int b, int c);
 void fn_800760B0(int nX, int nY, int nWidth, int nHeight);
@@ -39,9 +37,6 @@ void fn_80035F1C(void);
 void fn_80016948(void);
 s32  fn_8003505C(s32 n);           // sets a value, returns the old one
 void fn_80034AE4(void);
-extern f32 lbl_801945E8[];
-extern f32 lbl_801945F8[];
-extern f32 lbl_80194618[];
 void fn_80035138();
 void fn_800352BC();
 void GrassRender_vBuildAndUploadOneTimeData();

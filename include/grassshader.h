@@ -211,6 +211,13 @@ extern s32 lbl_80282514;        // cleared when the grass is freed (fn_8011E3B4)
 extern void* lbl_80282510;      // the grass's 256x256 texture buffer (fn_8011EB80)
 extern GXTexObj lbl_8026038C;   // its texture
 
+// GoGrass.c's draw data (not in C yet).
+extern f32 lbl_801945B8[4];     // a colour: 0.21, 0.31, 0.1, 1 (fn_8011EC84)
+extern f32 lbl_801945C8[8];     // the unit square's corners (fn_8011EC84)
+extern f32 lbl_801945E8[4];     // a colour: 0.5 each (fn_8011EE4C)
+extern f32 lbl_801945F8[8];     // (fn_8011EE4C)
+extern f32 lbl_80194618[8];     // (fn_8011EE4C)
+
 // The grass parameters GoGrass.c hands over once per hole (SD_vSetGrassParamsOnce).
 extern f32 lbl_802607D0[16][4];
 extern f32 lbl_802608D0[4];
