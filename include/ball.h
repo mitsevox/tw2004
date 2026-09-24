@@ -315,6 +315,8 @@ f32  fn_8004D620(CourseInfo* pCourse, f32* pPos);   // ground height, -60000 and
 f32  fn_8004D650(CourseInfo* pCourse, f32* pPos, f32* pNormal);   // covering ground height and normal
 SurfaceType* Ter_GetSupportingWorldMaterial(CourseInfo* pCourse, f32* pPos);   // the surface under a point
 f32  Ter_GetSupportingGroundData(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pNormal);
+// The same with objects included (TW06: Ter_GetSupportingWorldData); GoTerrainCollision.c.
+f32  fn_8004DBB0(CourseInfo* pCourse, f32* pPos, SurfaceType** ppSurface, f32* pNormal);
 void Ter_GetEnclosingGroundHeight(CourseInfo* pCourse, f32* pPos, f32* pLow, f32* pHigh);
 void Ter_GetEnclosingGroundData(CourseInfo* pCourse, f32* pPos, f32* pLow, SurfaceType** ppSurfaceLow,
                                 f32* pNormalLow, f32* pHigh, SurfaceType** ppSurfaceHigh, f32* pNormalHigh);

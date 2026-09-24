@@ -8,6 +8,7 @@
 #include "dynobj.h"
 
 void fn_800360A0(void* pMesh);     // Skin.c
+void PsBallFx_TriggerTrail(Ball* pBall, int nPlayer);   // below; Ball.c declares it too
 
 void fn_800A2E14(void) {
     fn_800360A0(lbl_80281408->mesh);
@@ -88,8 +89,8 @@ void fn_800A30E4(int nKind, Ball* pBall, int nPlayer, u8 bFlight, f32 fValue) {
     }
 }
 
-// The ball has come down: its surface's effect, and on some lies and surfaces (a club above 8, shot
-// kind 1 or 4) the player's 'TEO ' objects at the ball.
+// The swing effect of the surface under the ball (unless the club is 25), and on some lies and
+// surfaces (a club above 8, shot kind 1 or 4) the player's 'TEO ' objects at the ball.
 void fn_800A31E0(Ball* pBall, int nPlayer) {
     f32 vPos[4];
     f32 vNormal[4];
@@ -121,6 +122,43 @@ void fn_800A31E0(Ball* pBall, int nPlayer) {
     if (gPlayers[nPlayer].ball.nLie == 0) {
         fn_8004816C(nPlayer);
     }
+}
+
+// The ball hit a surface: if a ball may stop on it, the surface's collision effect and the game
+// mode's, with the ball's speed into the ground as the value, and the trail; then fn_80046C34
+// (skipped only for a surface a ball can't stop on).
+void fn_800A3348(Ball* pBall, int nPlayer) {
+    f32 vPos[4];
+    f32 vNormal[4];
+    SurfaceType* pGround;
+    SurfaceType* pSurface;
+    f32 fDot;
+
+    vPos[0] = pBall->vPos[0];
+    pSurface = gPlayers[nPlayer].ball.pHitSurface;
+    vPos[1] = pBall->vPos[1];
+    vPos[2] = pBall->vPos[2];
+    vPos[3] = 1.0f;
+    if (pSurface != NULL) {
+        if (0.375f != pSurface->f1C) {
+            return;
+        }
+        if (pSurface->nClass == 6) {
+            gPlayers[nPlayer].b30F = 1;
+        }
+        if (pSurface->nClass == 7 || pSurface->nClass == 16) {
+            gPlayers[nPlayer].b30E = 1;
+        }
+        fn_8004DBB0(fn_8000C594(), vPos, &pGround, vNormal);
+        fDot = fn_8000C5FC(gPlayers[nPlayer].ball.vVel, vNormal);
+        if (fDot < 0.0f) {
+            fDot *= -1.0f;
+        }
+        fn_800A30E4(pSurface->nCollisionEffectId, pBall, nPlayer, 1, fDot);
+        fn_800A30E4(gpGame->pfn240(nPlayer), pBall, nPlayer, 1, fDot);
+        PsBallFx_TriggerTrail(pBall, nPlayer);
+    }
+    fn_80046C34(pBall->vPos, nPlayer);
 }
 
 // Start emitter 15 at pPos for nPlayer's view, drifting with a tenth of the wind.
