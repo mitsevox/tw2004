@@ -162,7 +162,7 @@ void AI_ChooseTarget(int nPlayer) {
             if (!t->bEnabled) continue;
             fDZ    = pCourse->pin[nPinSet].z - t->pDef->z;
             fDX    = pCourse->pin[nPinSet].x - t->pDef->x;
-            fDist2 = fDZ * fDZ + fDX * fDX;
+            fDist2 = fDX * fDX + fDZ * fDZ;
             if (t->nTeeSet != -1 && t->nTeeSet != gSession.nTeeSet[nPlayer]) continue;
             if (t->nPinSet != -1 && t->nPinSet != nPinSet) continue;
             if (nBest == -1 && t->bPriority) {
@@ -174,7 +174,7 @@ void AI_ChooseTarget(int nPlayer) {
 
             fDZ    = p->vBall[2] - t->pDef->z;
             fDX    = p->vBall[0] - t->pDef->x;
-            fDist  = fn_80009680(fDZ * fDZ + fDX * fDX);
+            fDist  = fn_80009680(fDX * fDX + fDZ * fDZ);
             nKind  = AI_ShotKindForDistance(nPlayer, fDist);
             nClub  = AI_ClubForShot(nPlayer, nKind, 0, fDist);
             nSkill = Golfer_GetAttribute(p, Shot_GoverningAttribute(nPlayer, nClub, p->ball.nLie, nKind),
@@ -244,7 +244,7 @@ void AI_ChooseTarget(int nPlayer) {
     // Already closer to the pin than the chosen point: aim normally instead.
     fDZ = p->vBall[2] - pCourse->pin[nPinSet].z;
     fDX = p->vBall[0] - pCourse->pin[nPinSet].x;
-    if (fDZ * fDZ + fDX * fDX < fBestDist2 && !(gpGame->nCurCourse == 3 && fn_80015464() == 17)) {
+    if (fDX * fDX + fDZ * fDZ < fBestDist2 && !(gpGame->nCurCourse == 3 && fn_80015464() == 17)) {
         AI_DefaultTarget(nPlayer);
         return;
     }
