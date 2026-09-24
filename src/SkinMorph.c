@@ -390,6 +390,16 @@ void fn_8011CC40(Skin* pSkin, HwsMemBlock** ppBlock, HwsOverrideTable** ppTable)
     *ppTable = pTable;
 }
 
+// Frees the block and table fn_8011CC40 made (SkinBurn.c calls it); pSkin is unused.
+void fn_8011CD3C(Skin* pSkin, HwsMemBlock* pBlock, HwsOverrideTable* pTable) {
+    if (pBlock != NULL) {
+        fn_80112910(pBlock);
+    }
+    if (pTable != NULL) {
+        fn_80112A58(pTable);
+    }
+}
+
 // Frees the skin's morph state (Skin.c calls it).
 void fn_8011CD84(Skin* pSkin) {
     if (pSkin->pMorph != NULL) {

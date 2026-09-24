@@ -146,7 +146,7 @@ u8 fn_8000BD80(char* pName, u8** ppPixels) {
     if (pTex == NULL) {
         return 0;
     }
-    *ppPixels = pBank->p18 + pTex->uPixels;
+    *ppPixels = pBank->p18 + pTex->aMips[0].uPixels;
     return 1;
 }
 
