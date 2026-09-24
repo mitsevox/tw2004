@@ -468,7 +468,6 @@ f32 fn_80072980(SKABlendNode* pA, SKABlendNode* pB, u8 bOut, f32 fTime) {
     int nLater;
     u8 bInside;
     f32 fDir;
-    f32 fLen;
     f32 fWeight;
 
     if (pA->fStart > pB->fStart) {
@@ -487,14 +486,16 @@ f32 fn_80072980(SKABlendNode* pA, SKABlendNode* pB, u8 bOut, f32 fTime) {
     }
     fDir = 2.0f * ((f32)nLater - 0.5f);
     if (!bOut) {
-        fLen = fEnd - fStart;
+        f32 fLen = fEnd - fStart;
+
         if (fLen < 0.00001f) {
             fWeight = nLater;
         } else {
             fWeight = nLater - fDir * (fTime - fStart) / fLen;
         }
     } else {
-        fLen = fStart - fEnd;
+        f32 fLen = fStart - fEnd;
+
         if (fLen < 0.00001f) {
             fWeight = nLater;
         } else {
