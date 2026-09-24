@@ -60,7 +60,7 @@ typedef struct SkelPose {
 LAYOUT_ASSERT(SkelPose, 0x1040);
 
 // A format 1 pose buffer (0x114C bytes; animblender.c copies it whole): three blocks from 0x4, each
-// starting with a bit per morph (20: fn_80072ACC clears them all; FE_PGATourMessages.c clears morph
+// starting with a bit per morph (20: fn_80072ACC clears them all; CharSliders.c clears morph
 // m's in every block with fn_800736D8).
 // fn_80071C28 sets each block's bits and its 20 floats, and clears the SkelPose's first bit arrays.
 typedef struct SkelPoseBlock {
