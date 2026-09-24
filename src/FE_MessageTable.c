@@ -3938,6 +3938,30 @@ void fn_80081D50(MsgArg* pArgs, MsgArg* pResult) {
     *(s32*)pArgs[5].p = (s8)gpSaveData[pArgs[0].i].n54C2;
 }
 
+// Slot pArgs[0]'s created golfer: a level 1..4 per attribute group (below 50, 50, 75, 100) into
+// the words pArgs[1..5] point at: power (4 once the tour card is at level 6), ball striking and
+// approach together, putting, spin and recovery.
+void fn_80081DB8(MsgArg* pArgs, MsgArg* pResult) {
+    s8 nPower = gpSaveData[pArgs[0].i].createdGolfer.attr[ATTR_POWER];
+    s8 nStriking = gpSaveData[pArgs[0].i].createdGolfer.attr[ATTR_BALL_STRIKING];
+    s8 nApproach = gpSaveData[pArgs[0].i].createdGolfer.attr[ATTR_APPROACH];
+    s8 nPutting = gpSaveData[pArgs[0].i].createdGolfer.attr[ATTR_PUTTING];
+    s8 nSpin = gpSaveData[pArgs[0].i].createdGolfer.attr[ATTR_SPIN];
+    s8 nRecovery = gpSaveData[pArgs[0].i].createdGolfer.attr[ATTR_RECOVERY];
+
+    *(s32*)pArgs[1].p = (gpSaveData[pArgs[0].i].nTourCardLevel == 6) ? 4
+                      : (nPower >= 75)                                ? 3
+                      : (nPower >= 50)                                ? 2
+                                                                      : 1;
+    *(s32*)pArgs[2].p = (nStriking >= 100 && nApproach >= 100) ? 4
+                      : (nStriking >= 75 && nApproach >= 75)   ? 3
+                      : (nStriking >= 50 && nApproach >= 50)   ? 2
+                                                               : 1;
+    *(s32*)pArgs[3].p = (nPutting >= 100) ? 4 : (nPutting >= 75) ? 3 : (nPutting >= 50) ? 2 : 1;
+    *(s32*)pArgs[4].p = (nSpin >= 100) ? 4 : (nSpin >= 75) ? 3 : (nSpin >= 50) ? 2 : 1;
+    *(s32*)pArgs[5].p = (nRecovery >= 100) ? 4 : (nRecovery >= 75) ? 3 : (nRecovery >= 50) ? 2 : 1;
+}
+
 void fn_80081F98(MsgArg* pArgs, MsgArg* pResult) {
     lbl_80281ED4->n1 = pArgs[0].i;
 }
