@@ -57,7 +57,6 @@ f32 fn_80021A98(Clip* pClip, f32 fTime);
 // buffers (kept while they still hold them) and blended by where fTime falls between them. A time
 // at or past the pending event n5CC is held there once.
 void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32 fTime) {
-    CharBuffer* pBuf;
     ClipTrack* pTrack;
     BonePose* pBone;
     f32* pRot;
@@ -81,6 +80,7 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
     int aSlot[2];
     int aFree[2];
     int aFrame[2];
+    int* pFree;
 
     if (pChar != NULL && pClip->pEvents != NULL && pChar->n5CC >= 0) {
         if (fTime >= pClip->pEvents[pChar->n5CC].fTime) {
@@ -110,6 +110,7 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
     }
 
     // find the buffers already holding the two keys, and the ones free to take them
+    pFree = aFree;              // fake match: EA's search keeps aFree on the stack, not in registers
     aFrame[0] = nKey;
     aFrame[1] = nNext;
     aFree[1] = -1;
@@ -129,13 +130,13 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
                 aSlot[1] = i;
             }
             if (pChar->buffers[i].n00 != nKey && pChar->buffers[i].n00 != nNext) {
-                aFree[1] = aFree[0];
-                aFree[0] = i;
+                pFree[1] = pFree[0];
+                pFree[0] = i;
             }
-        } else if (aFree[0] < 0) {
-            aFree[0] = i;
-        } else if (aFree[1] < 0) {
-            aFree[1] = i;
+        } else if (pFree[0] < 0) {
+            pFree[0] = i;
+        } else if (pFree[1] < 0) {
+            pFree[1] = i;
         }
     }
 
@@ -149,8 +150,7 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
             pChar->buffers[*pSlot].n00 = *pFrame;
             if (pChar->buffers[*pSlot].p04 != pClip) {
                 pChar->buffers[*pSlot].p04 = pClip;
-                pBuf = &pChar->buffers[*pSlot];
-                pBuf->p0C = pBuf->pBuf;
+                pChar->buffers[*pSlot].p0C = pChar->buffers[*pSlot].pBuf;
                 if (i == 1) {
                     Mem_cpy(pChar->buffers[aSlot[1]].p0C, pChar->buffers[aSlot[0]].p0C,
                             pClip->n60 * 16);
@@ -160,7 +160,7 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
                     fn_80021134((u16*)pClip->pE8, (f32*)pChar->buffers[*pSlot].p0C, pClip->n60, aTmp);
                     pChar->buffers[*pSlot].p10 = pChar->buffers[*pSlot].pBuf + pClip->n60 * 16;
                 } else {
-                    pBuf->p10 = pBuf->pBuf;
+                    pChar->buffers[*pSlot].p10 = pChar->buffers[*pSlot].pBuf;
                 }
                 pChar->buffers[*pSlot].p14 = pChar->buffers[*pSlot].p10 + pClip->n58 * 16;
                 pChar->buffers[*pSlot].p18 = pChar->buffers[*pSlot].p14 + pClip->n5C * 16;
@@ -206,9 +206,9 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
         }
     }
 
-    pBone = pPose->aBones;
     for (i = 0; i < pClip->n1C; i++) {
         pTrack = &((ClipTrack*)pClip->pD0)[i];
+        pBone = &pPose->aBones[i];
         uFlags = pTrack->uFlags;
         if (uFlags & 4) {
             fn_8001E85C(pRot, pBone->q0);
@@ -224,7 +224,6 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
                 pB14 += 4;
             }
         } else {
-            pBone++;
             continue;
         }
         fn_8001EA34(pPose->a0, i);
@@ -234,7 +233,6 @@ void fn_8001FCF4(Character* pChar, Clip* pClip, SkelPose* pPose, u32* aBits, f32
             fn_8001FBA4(aA, aB, pBone->v10, fFrac);
             fn_8001EA34(pPose->a10, i);
         }
-        pBone++;
     }
     if (aBits != NULL) {
         fn_80021980(pPose->a0, pPose->a10, aBits, 0x80);
