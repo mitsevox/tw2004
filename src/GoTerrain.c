@@ -998,6 +998,7 @@ void fn_8003272C(int n) {
 // Draws render pass 0's fourth patch lists (pSortedPatchList[0][3]), if it has any, without z
 // writes; the lens's value at 0xAC is raised by 25 while the renderer is set up, then put back. In
 // split screen, patches with bit 0x8 of n1C are left out.
+// fake match: the (u32) casts on the clip index, as in fn_80032518.
 void fn_80032770(void) {
     u8 bFirst = 1;
     u8 bAny;
@@ -1008,12 +1009,11 @@ void fn_80032770(void) {
     f32 fAC;
 
     bAny = 0;
-    if (lbl_801D3CB0.pSortedPatchList[0][3][0] != NULL) {
-        bAny = 1;
-    } else if (lbl_801D3CB0.pSortedPatchList[0][3][1] != NULL) {
-        bAny = 1;
-    } else if (lbl_801D3CB0.pSortedPatchList[0][3][2] != NULL) {
-        bAny = 1;
+    for (nClip = 0; nClip < 3; nClip++) {
+        if (lbl_801D3CB0.pSortedPatchList[0][3][(u32)nClip] != NULL) {
+            bAny = 1;
+            break;
+        }
     }
     if (bAny) {
         fn_8003272C(0);
@@ -1029,7 +1029,6 @@ void fn_80032770(void) {
         fn_80012EF8();
         fn_80014118(0x70);
         for (nClip = 0; nClip <= 2; nClip++) {
-            // fake match: an unsigned index, as in fn_80032518
             ppHead = &lbl_801D3CB0.pSortedPatchList[0][3][(u32)nClip];
             if (*ppHead != NULL) {
                 switch (nClip) {
