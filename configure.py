@@ -1001,7 +1001,7 @@ config.libs = [
             Object(Matching, "GameMode11.c"),
             Object(Matching, "GameMode4.c"),
             Object(NonMatching, "uiArc.c"),
-            Object(NonMatching, "FE_CrAPDB.c"),
+            Object(Matching, "FE_CrAPDB.c"),
             Object(Matching, "FE_CrAPMessages.c"),
             Object(NonMatching, "LLDynTex.c"),
             Object(NonMatching, "GameMode26.c"),
